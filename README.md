@@ -1,46 +1,77 @@
-# Getting Started with Create React App
+# Green Budget
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### System Requirements
 
-## Available Scripts
+- npm
+- nvm
 
-In the project directory, you can run:
+## Getting Started
 
-### `npm start`
+#### Step 1: Repository
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Clone this repository locally and `cd` into the directory.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+```bash
+$ git clone https://<user>@bitbucket.org/Saturation-IO/greenbudget-frontend.git
+```
 
-### `npm test`
+#### Step 2: Environment
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+##### Node Version
 
-### `npm run build`
+Install [`nvm`](https://github.com/nvm-sh/nvm) first. This will
+allow you to manage your Node version on a project basis.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Use `nvm` to establish the version of Node that you will use with this project.
+Typically, version 8.17.0 is a safe bet, as anything lower than 8.0.0 is likely
+a candidate to cause a problem.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+$ nvm install 10.12.0
+$ nvm use 10.12.0
+```
 
-### `npm run eject`
+Confirm that `nvm` is pointing at the correct Node version:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+$ nvm current
+$ v10.12.0
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+##### Dependencies
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Now we need to setup the dependencies. We use [`yarn`](https://yarnpkg.com/)
+as a package management system. This should be included as a part of the
+`nvm` current node installation.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+To install the dependencies, simply do
 
-## Learn More
+```bash
+$ yarn install
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+This will install the project dependencies in the `package.json` file.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+##### ENV File
+
+Finally, we need to create and edit a `.env.local` file in the project root to
+include the configuration that the frontend application relies on. This
+file is not version tracked.
+
+You can refer to the `base_env` file, but for a quick look this is generally
+what it should look like to get things running locally:
+
+## Development
+
+### Running Locally
+
+Once the dependencies are installed via `yarn` and the `.env.local` file is
+present, all you need to do to start the development server is the following
+
+```bash
+$ yarn start
+```

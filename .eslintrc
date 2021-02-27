@@ -1,0 +1,71 @@
+{
+    "env": {
+      "commonjs": true,
+      "es6": true,
+      "node": true
+    },
+    "extends": [
+      "react-app",
+      "eslint:recommended",
+      "plugin:prettier/recommended"
+    ],
+    "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+      "ecmaVersion": 2018,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "rules": {
+      "prettier/prettier": "error",
+      "no-global-assign": 2,
+      "no-redeclare": 2,
+      "no-shadow": 2,
+      "no-restricted-globals": 2,
+      "quotes": [
+        1,
+        "double"
+      ],
+      "semi": [
+        1,
+        "always"
+      ],
+      "indent": [
+        1,
+        2
+      ],
+      "no-undef": "error",
+      "no-unused-expressions": "warn",
+      "no-use-before-define": "warn",
+      "no-multi-spaces": "warn",
+      "no-trailing-spaces": "warn",
+      "no-console": "warn",
+      "no-eval": "warn",
+      "import/first": "warn",
+      "object-curly-spacing": [
+        1,
+        "always"
+      ],
+      "react/no-unused-prop-types": "warn",
+      "react/no-unused-state": "warn",
+      "react/jsx-uses-react": "warn",
+      "react/jsx-uses-vars": "warn",
+      "react/jsx-no-undef": "error",
+      "react/jsx-no-comment-textnodes": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "@typescript-eslint/explicit-function-return-type": [
+        "off"
+      ],
+      "react/jsx-curly-brace-presence": [
+        "warn",
+        {
+          "props": "always",
+          "children": "always"
+        }
+      ]
+    }
+  }
