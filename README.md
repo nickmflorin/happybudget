@@ -2,7 +2,7 @@
 
 ### System Requirements
 
-- npm
+- yarn
 - nvm
 
 ## Getting Started
