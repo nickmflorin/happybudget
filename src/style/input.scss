@@ -17,11 +17,15 @@ input.ant-input:focus,
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused,
 select:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 1000px $white inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px #f7f7f7 inset !important;
 }
 
 form {
   width: 100%;
+}
+
+input.ant-input {
+  background-color: #f7f7f7 !important;
 }
 
 .input {
@@ -31,6 +35,7 @@ form {
   align-items: center;
   font-family: $ibm-plex-sans-regular;
   width: 100%;
+  background-color: #f7f7f7 !important;
 
   .ant-input-prefix {
     margin-right: 12px;
@@ -53,8 +58,7 @@ form {
     }
 
     input.ant-input {
-      color: $gray !important;
-      background-color: $white !important;
+      color: #212529 !important;
       border: none;
       border-top: 1px solid $gray-light;
       border-bottom: 1px solid $gray-light;
@@ -62,6 +66,7 @@ form {
       border-right: 1px solid $gray-light;
       border-top-right-radius: $input-border-radius;
       border-bottom-right-radius: $input-border-radius;
+      background-color: #f7f7f7 !important;
     }
 
     .ant-input-affix-wrapper {
@@ -74,7 +79,8 @@ form {
 
       input.ant-input {
         border: none;
-        color: $gray !important;
+        color: #212529 !important;
+        background-color: #f7f7f7 !important;
       }
     }
   }

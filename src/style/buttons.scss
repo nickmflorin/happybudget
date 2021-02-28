@@ -288,7 +288,7 @@
     &:hover,
     &:focus {
       border-color: transparent !important;
-      background-color: darken($blue-theme, 5%) !important;
+      background-color: $green-darker !important;
       color: $white !important;
       box-shadow: none !important;
     }

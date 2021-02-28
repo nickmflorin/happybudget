@@ -16,6 +16,17 @@ label,
 .ant-form-item {
   margin-bottom: 15px;
 
+  // When a text field in a form has an error, do not give the text field a
+  // red border and highlight the prefix icon red.
+  &.ant-form-item-has-error {
+    .input {
+      border: 1px solid #d9d9d9 !important;
+      .ant-input-prefix {
+        color: unset !important;
+      }
+    }
+  }
+
   .ant-form-item-extra {
     margin-top: 4px;
   }
