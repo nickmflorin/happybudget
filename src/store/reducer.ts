@@ -1,9 +1,7 @@
 import { Reducer, combineReducers } from "redux";
-import { forEach, isNil, includes, find } from "lodash";
-import { replaceInArray } from "util/arrays";
+import { forEach, isNil, includes } from "lodash";
 import { ApplicationActionTypes } from "./actions";
-import { createInitialUserState, createInitialOrganizationState } from "./initialState";
-import { createListResponseReducer } from "./util";
+import { createInitialUserState } from "./initialState";
 
 /**
  * Wraps each individual module level reducer so that if any action includes
@@ -43,28 +41,6 @@ const createWrappedModuleReducer = (
 };
 
 /**
- * Creates the reducer to handle state changes to the Organization that the
- * User in the Redux store belongs to. The initial state for the reducer is
- * constructed with the provided Organization ID.
- *
- * @param orgId   The Organization ID of the currently logged in User.
- */
-const createUserOrganizationReducer = (orgId: number): Reducer<Redux.IOrganizationStore, Redux.IAction<any>> => {
-  const initialOrganizationState = createInitialOrganizationState(orgId);
-  const organizationReducer: Reducer<Redux.IOrganizationStore, Redux.IAction<any>> = (
-    state: Redux.IOrganizationStore = initialOrganizationState,
-    action: Redux.IAction<any>
-  ): Redux.IOrganizationStore => {
-    let newState = { ...state };
-    if (action.type === ApplicationActionTypes.User.Organization.Users.Response) {
-      newState.users = { ...newState.users, data: action.payload.data, count: action.payload.count };
-    }
-    return newState;
-  };
-  return organizationReducer;
-};
-
-/**
  * Creates the reducer to handle state changes to the User in the Redux store.
  * The initial state for the reducer is constructed with the provided Organization
  * ID and User Role.
@@ -86,34 +62,6 @@ const createUserReducer = (user: IUser): Reducer<Redux.IUserStore, Redux.IAction
   return userReducer;
 };
 
-const servicesReducer: Reducer<Redux.IServicesStore, Redux.IAction<any>> = (
-  state: Redux.IServicesStore = { data: [], count: 0, loading: false },
-  action: Redux.IAction<any>
-): Redux.IServicesStore => {
-  let newState = { ...state };
-  if (action.type === ApplicationActionTypes.Services.Response) {
-    newState = { ...state, data: action.payload.data, count: action.payload.count };
-  } else if (action.type === ApplicationActionTypes.Services.Loading) {
-    newState = { ...state, loading: action.payload };
-  } else if (action.type === ApplicationActionTypes.Services.AddCapabilities) {
-    const existingService = find(state.data, { service: action.payload.service });
-    if (!isNil(existingService)) {
-      const newService = { ...existingService, capabilities: action.payload.capabilities };
-      newState = {
-        ...state,
-        data: replaceInArray<IService>(state.data, { service: action.payload.service }, newService)
-      };
-    } else {
-      /* eslint-disable no-console */
-      console.warn(
-        `Inconsistent State!: Inconsistent state found when adding capabilities to
-        service ${action.payload.service} - the service is not in the state.`
-      );
-    }
-  }
-  return newState;
-};
-
 /**
  * Creates the base application reducer that bundles up the reducers from the
  * individual modules with other top level reducers.
@@ -128,26 +76,7 @@ const createApplicationReducer = (config: Redux.IApplicationConfig, user: IUser)
   });
   return combineReducers({
     ...moduleReducers,
-    user: createUserReducer(user),
-    organizations: createListResponseReducer<
-      IOrganization,
-      Redux.IListResponseStore<IOrganization>,
-      Redux.IAction<any>
-    >(
-      {
-        Response: ApplicationActionTypes.Organizations.Response,
-        Request: ApplicationActionTypes.Organizations.Request,
-        Loading: ApplicationActionTypes.Organizations.Loading,
-        AddToState: ApplicationActionTypes.Organizations.AddToState,
-        RemoveFromState: ApplicationActionTypes.Organizations.RemoveFromState,
-        UpdateInState: ApplicationActionTypes.Organizations.UpdateInState
-      },
-      {
-        referenceEntity: "organization"
-      }
-    ),
-    services: servicesReducer,
-    organization: createUserOrganizationReducer(user.organization.id)
+    user: createUserReducer(user)
   });
 };
 

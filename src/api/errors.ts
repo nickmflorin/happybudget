@@ -1,6 +1,8 @@
 import { find, isNil, filter, map, forEach } from "lodash";
 import { AxiosResponse } from "axios";
 
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
 export enum HttpErrorTypes {
   CLIENT = "CLIENT",
   NETWORK = "NETWORK",

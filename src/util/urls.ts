@@ -90,3 +90,27 @@ export const addQueryParamsToUrl = (
   }
   return url;
 };
+
+/**
+ * Given an object representing the ordering of fields that should be applied
+ * to the GET request, converts the object to a string so that it can be used
+ * as a query parameter.
+ *
+ * @param ordering The ordering object that should be converted to a query
+ *                 compatible string.  Each field in the object should have
+ *                 value 1 or -1.
+ */
+export const convertOrderingQueryToString = (ordering: Http.Ordering): string => {
+  let orderingStrings: string[] = [];
+  forEach(ordering, (order: number, field: string) => {
+    if (order === 1) {
+      orderingStrings.push(field);
+    } else if (order === -1) {
+      orderingStrings.push(`-${field}`);
+    }
+  });
+  if (orderingStrings.length !== 0) {
+    return orderingStrings.join(",");
+  }
+  return "";
+};

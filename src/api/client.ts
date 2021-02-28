@@ -3,7 +3,6 @@ import axiosRetry from "axios-retry";
 import Cookies from "universal-cookie";
 import { isNil } from "lodash";
 import { addQueryParamsToUrl, convertOrderingQueryToString } from "util/urls";
-import { LocalStorage } from "util/localStorage";
 import { ClientError, NetworkError, ServerError, AuthenticationError } from "./errors";
 import { HttpRequestMethods } from "./model";
 import { ErrorCodes } from "./codes";
@@ -33,23 +32,6 @@ _client.interceptors.request.use(
  * and returns an appropriate ClientError to be handled.
  *
  * @param error The AxiosError that was raised.
- *
- * Here, we have to parse the error from the response while keeping in
- * mind that the errors used to be included in the response in a
- * different way.
- *
- * New Style DRF Errors:
- * >>> { errors: { __all__: [{ detail: "...", code: "..." }] } }
- *
- * Old Style DRF Errors:
- * >>> { message: { detail: "" } }
- *
- * In the case of the Old Style DRF Errors, we have to make an
- * assumption about what the code is, so we assume UNKNOWN.
- *
- * Eventually, we will be able to restrict this to checking for the
- * New Style DRF Errors - but for the time being, we need to handle
- * both cases.
  */
 const createClientError = (error: AxiosError): ClientError | undefined => {
   if (isNil(error.response) || isNil(error.response.data)) {
@@ -200,7 +182,6 @@ export class ApiClient {
       return response.data;
     } catch (e) {
       if (e instanceof AuthenticationError && options.redirectOnAuthenticationError !== false) {
-        LocalStorage.clearSession();
         window.location.href = "/login";
       }
       throw e;

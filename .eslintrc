@@ -11,7 +11,8 @@
     ],
     "globals": {
       "Atomics": "readonly",
-      "SharedArrayBuffer": "readonly"
+      "SharedArrayBuffer": "readonly",
+      "JSX": "readonly"
     },
     "parserOptions": {
       "ecmaVersion": 2018,
@@ -38,9 +39,7 @@
         1,
         2
       ],
-      "no-undef": "error",
       "no-unused-expressions": "warn",
-      "no-use-before-define": "warn",
       "no-multi-spaces": "warn",
       "no-trailing-spaces": "warn",
       "no-console": "warn",
@@ -66,6 +65,17 @@
           "props": "always",
           "children": "always"
         }
-      ]
+      ],
+      // Note:  These non-typescript base rules have to be disabled as of TS
+      // 4.0.0 in order to prevent false positives.  The no-undef lint rule does
+      // not use TypeScript to determine the global variables that exist -
+      // instead, it relies upon ESLint's configuration - so it is strongly
+      // recommended that it be turned off since TS will handle it anyways.
+      // https://github.com/typescript-eslint/typescript-eslint/blob/master/
+      // docs/getting-started/linting/FAQ.md#i-get-errors-from-the-no-undef-
+      // rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+      "no-use-before-define": "off",
+      "no-undef": "off",
+      "@typescript-eslint/no-use-before-define": ["error"]
     }
   }

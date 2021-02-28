@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Store } from "redux";
 import { Provider } from "react-redux";
 import { Redirect } from "react-router-dom";
@@ -10,7 +10,7 @@ import { validateToken } from "services";
 import configureStore from "store";
 
 interface WrapInApplicationStoreProps {
-  children: JSX.Element;
+  children: ReactNode;
   [key: string]: any;
 }
 
