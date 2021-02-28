@@ -8,7 +8,7 @@ import { HttpRequestMethods } from "./model";
 import { ErrorCodes } from "./codes";
 
 const _client = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: process.env.REACT_APP_API_DOMAIN,
   withCredentials: true
 });
 
