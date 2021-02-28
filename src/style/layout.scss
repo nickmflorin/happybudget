@@ -1,0 +1,323 @@
+@import "./colors";
+@import "./typography";
+
+$nav-bar-height: 70px;
+$footer-height: 48px;
+$footer-logo-height: 24px;
+$copyright-height: 32px;
+
+$app-background: #f4f6f9;
+$nav-bar-background-color: $white;
+$footer-light-color: #5e78fa;
+
+$layout-border: 1px solid #efefef;
+$sidebar-width: 160px;
+
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: $app-background;
+  font-family: $ibm-plex-sans-regular !important;
+  overflow-y: hidden;
+
+  .header {
+    margin-top: auto;
+    height: $nav-bar-height;
+    position: fixed !important;
+    top: 0 !important;
+    width: 100%;
+    padding-right: 60px;
+    padding-left: 60px;
+    background-color: $white !important;
+    border-bottom: $layout-border;
+  }
+
+  .footer {
+    width: 100%;
+    max-height: calc(#{$footer-height} + #{$copyright-height} + 20px);
+    margin-top: 20px;
+
+    .logo-container {
+      height: $footer-height;
+      padding-top: calc(0.5 * (#{$footer-height} - #{$footer-logo-height}));
+      padding-bottom: calc(0.5 * (#{$footer-height} - #{$footer-logo-height}));
+      margin-bottom: 20px;
+
+      img {
+        height: 100%;
+        display: block;
+        margin: 0 auto;
+      }
+    }
+
+    // We substract 12px because that is the line-height of the copyright text.
+    .copyright-container {
+      padding-top: calc(0.5 * (#{$copyright-height} - 12px));
+      padding-bottom: calc(0.5 * (#{$copyright-height} - 12px));
+      height: $copyright-height;
+
+      .copyright-text {
+        font-family: $ibm-plex-mono-regular;
+        letter-spacing: 0.03rem;
+        line-height: 12px;
+        text-align: center;
+        font-size: 11px;
+        margin: 0;
+      }
+    }
+  }
+  // Landing Content - Container for the main content that gets displayed
+  // outside of the logged in application.  This is for thinks like login,
+  // reset password, etc.
+  .landing-content {
+    height: 100vh;
+    overflow-y: hidden;
+
+    .footer {
+      position: fixed;
+      bottom: 0 !important;
+
+      .copyright-container {
+        background-color: rgba(0, 0, 0, 0.05);
+
+        .copyright-text {
+          color: #7bc3ff;
+        }
+      }
+    }
+  }
+
+  // App Content - Container for the main content that gets displayed inside
+  // the logged in application.  This content is displayed below the
+  // navigation bar, and includes the footer.
+  .app-content {
+    margin-top: $nav-bar-height;
+    height: calc(100vh - #{$nav-bar-height});
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - #{$nav-bar-height});
+
+    > * {
+      flex-grow: 100;
+    }
+
+    .page {
+      padding: 30px 60px;
+      display: flex;
+      flex-direction: column;
+
+      .sidebar-container {
+        width: $sidebar-width;
+        margin-right: 15px;
+      }
+
+      .page-content-container {
+        flex-grow: 100;
+
+        &.with-sidebar {
+          margin-left: 15px;
+          width: calc(100% - #{$sidebar-width});
+        }
+
+        .page-content {
+          width: 100%;
+        }
+      }
+    }
+
+    .footer {
+      width: 100%;
+
+      .copyright-container {
+        background-color: $off-white;
+        border-top: $layout-border;
+
+        .copyright-text {
+          color: rgb(144, 144, 144);
+        }
+      }
+    }
+  }
+}
+
+.position-relative {
+  position: relative;
+}
+
+.display {
+  &--none {
+    display: none !important;
+  }
+  &--ineline {
+    display: inline !important;
+  }
+  &--flex {
+    display: flex !important;
+  }
+  &--block {
+    display: block !important;
+  }
+  &--inline-block {
+    display: inline-block !important;
+  }
+}
+
+.align--center {
+  align-items: center;
+}
+
+.width--100 {
+  width: 100%;
+}
+
+.max-width--100 {
+  max-width: 100%;
+}
+
+.scope--100 {
+  width: 100%;
+  height: 100%;
+}
+
+.margin {
+  &--auto {
+    margin: auto !important;
+  }
+  &--7 {
+    margin: 7px;
+  }
+}
+
+.padding {
+  &--10 {
+    padding: 10px;
+  }
+}
+
+.float {
+  &--left {
+    float: left !important;
+  }
+  &--right {
+    float: right !important;
+  }
+}
+
+.mb {
+  &--0 {
+    margin-bottom: 0px !important;
+  }
+  &--5 {
+    margin-bottom: 5px !important;
+  }
+  &--10 {
+    margin-bottom: 10px !important;
+  }
+  &--15 {
+    margin-bottom: 15px !important;
+  }
+  &--20 {
+    margin-bottom: 20px !important;
+  }
+  &--25 {
+    margin-bottom: 25px !important;
+  }
+  &--30 {
+    margin-bottom: 30px !important;
+  }
+}
+
+.mt {
+  &--0 {
+    margin-top: 0px !important;
+  }
+  &--3 {
+    margin-top: 3rem !important;
+  }
+  &--5 {
+    margin-top: 5px !important;
+  }
+  &--10 {
+    margin-top: 10px !important;
+  }
+  &--15 {
+    margin-top: 15px !important;
+  }
+  &--20 {
+    margin-top: 20px !important;
+  }
+  &--25 {
+    margin-top: 25px !important;
+  }
+  &--30 {
+    margin-top: 30px !important;
+  }
+}
+
+.ml {
+  &--0 {
+    margin-left: 0px !important;
+  }
+  &--3 {
+    margin-left: 3px !important;
+  }
+  &--5 {
+    margin-left: 5px !important;
+  }
+  &--6 {
+    margin-left: 6px !important;
+  }
+  &--8 {
+    margin-left: 8px !important;
+  }
+  &--10 {
+    margin-left: 10px !important;
+  }
+  &--15 {
+    margin-left: 15px !important;
+  }
+  &--20 {
+    margin-left: 20px !important;
+  }
+  &--25 {
+    margin-left: 25px !important;
+  }
+  &--30 {
+    margin-left: 30px !important;
+  }
+}
+
+.mr {
+  &--0 {
+    margin-right: 0px !important;
+  }
+  &--3 {
+    margin-right: 3px !important;
+  }
+  &--5 {
+    margin-right: 5px !important;
+  }
+  &--6 {
+    margin-right: 6px !important;
+  }
+  &--8 {
+    margin-right: 8px !important;
+  }
+  &--10 {
+    margin-right: 10px !important;
+  }
+  &--15 {
+    margin-right: 15px !important;
+  }
+  &--20 {
+    margin-right: 20px !important;
+  }
+  &--25 {
+    margin-right: 25px !important;
+  }
+  &--30 {
+    margin-right: 30px !important;
+  }
+}

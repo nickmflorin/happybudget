@@ -1,0 +1,382 @@
+@import "./colors";
+
+@font-face {
+  font-family: 'IBMPlexMono-Light';
+  font-style: normal;
+  font-weight: 300;
+  src: url("./fonts/IBMPlexMono/IBMPlexMono-Light.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'IBMPlexMono-Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: url("./fonts/IBMPlexMono/IBMPlexMono-Regular.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'IBMPlexMono-Medium';
+  font-style: normal;
+  font-weight: 500;
+  src: url("./fonts/IBMPlexMono/IBMPlexMono-Medium.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'IBMPlexMono-Bold';
+  font-style: normal;
+  font-weight: 600;
+  src: url("./fonts/IBMPlexMono/IBMPlexMono-Bold.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'IBMPlexSans-Light';
+  font-style: normal;
+  font-weight: 300;
+  src: url("./fonts/IBMPlexSans/IBMPlexSans-Light.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'IBMPlexSans-Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: url("./fonts/IBMPlexSans/IBMPlexSans-Regular.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'IBMPlexSans-Medium';
+  font-style: normal;
+  font-weight: 500;
+  src: url("./fonts/IBMPlexSans/IBMPlexSans-Medium.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'IBMPlexSans-Bold';
+  font-style: normal;
+  font-weight: 600;
+  src: url("./fonts/IBMPlexSans/IBMPlexSans-Bold.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Raleway-Light';
+  font-style: normal;
+  font-weight: 300;
+  src: url("./fonts/Raleway/Raleway-Light.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Raleway-Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: url("./fonts/Raleway/Raleway-Regular.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Raleway-Medium';
+  font-style: normal;
+  font-weight: 500;
+  src: url("./fonts/Raleway/Raleway-Medium.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Raleway-Bold';
+  font-style: normal;
+  font-weight: 600;
+  src: url("./fonts/Raleway/Raleway-Bold.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Raleway-ExtraBold';
+  font-style: normal;
+  font-weight: 700;
+  src: url("./fonts/Raleway/Raleway-ExtraBold.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'OpenSans-Light';
+  font-style: normal;
+  font-weight: 300;
+  src: url("./fonts/OpenSans/OpenSans-Light.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'OpenSans-Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: url("./fonts/OpenSans/OpenSans-Regular.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'OpenSans-Medium';
+  font-style: normal;
+  font-weight: 500;
+  src: url("./fonts/OpenSans/OpenSans-SemiBold.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'OpenSans-Bold';
+  font-style: normal;
+  font-weight: 600;
+  src: url("./fonts/OpenSans/OpenSans-Bold.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto-Light';
+  font-style: normal;
+  font-weight: 300;
+  src: url("./fonts/Roboto/Roboto-Light.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto-Regular';
+  font-style: normal;
+  font-weight: 400;
+  src: url("./fonts/Roboto/Roboto-Regular.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto-Medium';
+  font-style: normal;
+  font-weight: 500;
+  src: url("./fonts/Roboto/Roboto-Medium.ttf") format('truetype');
+}
+
+@font-face {
+  font-family: 'Roboto-Bold';
+  font-style: normal;
+  font-weight: 600;
+  src: url("./fonts/Roboto/Roboto-Bold.ttf") format('truetype');
+}
+
+$ibm-plex-mono-light: "IBMPlexMono-Light";
+$ibm-plex-mono-regular: "IBMPlexMono-Regular";
+$ibm-plex-mono-medium: "IBMPlexMono-Medium";
+$ibm-plex-mono-bold: "IBMPlexMono-Bold";
+
+$ibm-plex-sans-light: "IBMPlexSans-Light";
+$ibm-plex-sans-regular: "IBMPlexSans-Regular";
+$ibm-plex-sans-medium: "IBMPlexSans-Medium";
+$ibm-plex-sans-bold: "IBMPlexSans-Bold";
+
+$raleway-light: "Raleway-Light";
+$raleway-regular: "Raleway-Regular";
+$raleway-medium: "Raleway-Medium";
+$raleway-bold: "Raleway-Bold";
+$raleway-extra-bold: "Raleway-ExtraBold";
+
+$open-sans-light: "OpenSans-Light";
+$open-sans-regular: "OpenSans-Regular";
+$open-sans-medium: "OpenSans-Medium";
+$open-sans-bold: "OpenSans-Bold";
+
+$roboto-light: "Roboto-Light";
+$roboto-regular: "Roboto-Regular";
+$roboto-medium: "Roboto-Medium";
+$roboto-bold: "Roboto-Bold";
+
+$helvetica: "Helvetica, sans-serif";
+
+.header-base {
+  color: $text-primary;
+  margin-top: 0;
+  margin-bottom: 0;
+  font-family: $ibm-plex-sans-medium;
+}
+
+h1 {
+  @extend .header-base;
+
+  &.ant-typography {
+    font-size: 28px;
+  }
+}
+
+h2 {
+  @extend .header-base;
+
+  &.ant-typography {
+
+  }
+}
+
+h3 {
+  @extend .header-base;
+
+  &.ant-typography {
+
+  }
+}
+
+h4 {
+  @extend .header-base;
+
+  &.ant-typography {
+    color: $text-secondary;
+    font-size: 16px;
+    font-family: $ibm-plex-sans-medium;
+    font-weight: 400;
+    line-height: 20px;
+  }
+}
+
+h5 {
+  @extend .header-base;
+
+  &.ant-typography {
+
+  }
+}
+
+h6 {
+  @extend .header-base;
+
+  &.ant-typography {
+
+  }
+}
+
+.helvetica {
+  font-family: $helvetica !important;
+}
+
+.ibm-plex-sans {
+  font-family: $ibm-plex-sans-regular !important;
+
+  &--light {
+    font-family: $ibm-plex-sans-light !important;
+  }
+
+  &--regular {
+    font-family: $ibm-plex-sans-regular !important;
+  }
+
+  &--medium {
+    font-family: $ibm-plex-sans-medium !important;
+  }
+
+  &--bold {
+    font-family: $ibm-plex-sans-bold !important;
+  }
+}
+
+.ibm-plex-mono {
+  font-family: $ibm-plex-mono-regular !important;
+
+  &--light {
+    font-family: $ibm-plex-mono-light !important;
+  }
+
+  &--regular {
+    font-family: $ibm-plex-mono-regular !important;
+  }
+
+  &--medium {
+    font-family: $ibm-plex-mono-medium !important;
+  }
+
+  &--bold {
+    font-family: $ibm-plex-mono-bold !important;
+  }
+}
+
+.roboto {
+  font-family: $roboto-regular !important;
+
+  &--light {
+    font-family: $roboto-light !important;
+  }
+
+  &--regular {
+    font-family: $roboto-regular !important;
+  }
+
+  &--medium {
+    font-family: $roboto-medium !important;
+  }
+
+  &--bold {
+    font-family: $roboto-bold !important;
+  }
+}
+
+.raleway {
+  font-family: $raleway-regular !important;
+
+  &--light {
+    font-family: $raleway-light !important;
+  }
+
+  &--regular {
+    font-family: $raleway-regular !important;
+  }
+
+  &--medium {
+    font-family: $raleway-medium !important;
+  }
+
+  &--bold {
+    font-family: $raleway-bold !important;
+  }
+}
+
+.open-sans {
+  font-family: $open-sans-regular !important;
+
+  &--light {
+    font-family: $open-sans-light !important;
+  }
+
+  &--regular {
+    font-family: $open-sans-regular !important;
+  }
+
+  &--medium {
+    font-family: $open-sans-medium !important;
+  }
+
+  &--bold {
+    font-family: $open-sans-bold !important;
+  }
+}
+
+.weight {
+  &--bold {
+    font-weight: 600 !important;
+  }
+  &--medium {
+    font-weight: 500 !important;
+  }
+  &--regular {
+    font-weight: 400 !important;
+  }
+  &--light {
+    font-weight: 300 !important;
+  }
+}
+
+.no-text-transform {
+  text-transform: unset !important;
+}
+
+.overflow-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.font-size {
+  &--10 {
+    font-size: 10px !important;
+  }
+}
+
+.text-align {
+  &--left {
+    text-align: left;
+  }
+  &--right {
+    text-align: right;
+  }
+  &--center {
+    text-align: center;
+  }
+}

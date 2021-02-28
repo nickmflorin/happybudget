@@ -4,7 +4,7 @@ $red-hover: #e2707b;
 $red-alpha: #fff1f0;
 $red-light: #ffdce0;
 
-$green: #36cea2;
+$green: #0fb767;
 $green-light: #b7eb8f;
 $green-alpha: #f6ffed;
 
@@ -55,35 +55,8 @@ $text-primary: rgba(0, 0, 0, 0.85);
 $text-secondary: rgba(35, 35, 35, 0.85);
 $text-tertiary: #5a5a5a;
 
-$error: $red;
-$success: $green;
-$done: $green;
-$cancel: $gray-light;
-$confirm: $gray;
-$delete: $gray;
-
-$new: $orange;
-$review: $yellow;
-$info: $blue;
-$approved: $green;
-$declined: #fc4d76;
-$processing: $blue;
-$complete: $green;
-$failed: $red;
-
-$separator-color: $gray-light-light;
-
 // Icon Colors
 $icon-color: $gray;
-$icon-color-light: $gray-light;
-$icon-color-light-light: $gray-light-light;
-$icon-error-color: $error;
-$icon-done-color: $done;
-$icon-success-color: $success;
-$icon-delete-color: $delete;
-$icon-cancel-color: $cancel;
-$icon-confirm-color: $confirm;
-$icon-close-color: #727272;
 
 .color {
   &--text-primary {
@@ -115,30 +88,6 @@ $icon-close-color: #727272;
   }
   &--gray-light-light {
     color: $gray-light-light !important;
-  }
-  &--new {
-    color: $new !important;
-  }
-  &--review {
-    color: $review !important;
-  }
-  &--info {
-    color: $info !important;
-  }
-  &--approved {
-    color: $approved !important;
-  }
-  &--declined {
-    color: $declined !important;
-  }
-  &--processing {
-    color: $processing !important;
-  }
-  &--failed {
-    color: $failed !important;
-  }
-  &--complete {
-    color: $complete !important;
   }
 }
 
@@ -188,28 +137,4 @@ $icon-close-color: #727272;
     background: $pink-alpha;
     border: 1px solid $pink-light !important;
   }
-}
-
-.ant-tag-orange {
-  color: $orange;
-}
-
-.ant-tag-yellow {
-  color: $yellow;
-}
-
-.ant-tag-blue {
-  color: $blue;
-}
-
-.ant-tag-red {
-  color: $red;
-}
-
-.ant-tag-green {
-  color: $green;
-}
-
-.color-99 {
-  color: #999999;
 }

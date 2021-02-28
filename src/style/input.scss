@@ -1,0 +1,81 @@
+@import "./colors";
+
+// Input Fields
+$input-border-radius: 6px;
+$checkbox-selected-color: $gray;
+$checkbox-active-color: $blue;
+
+// This is to get rid of the blue-background that Chrome sometimes sets on
+// auto-fill fields.
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+input.ant-input:focus,
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused,
+select:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px $white inset !important;
+}
+
+form {
+  width: 100%;
+}
+
+.input {
+  cursor: text;
+  position: relative;
+  box-sizing: border-box;
+  align-items: center;
+  font-family: $ibm-plex-sans-regular;
+  width: 100%;
+
+  .ant-input-prefix {
+    margin-right: 12px;
+  }
+
+  .ant-input-wrapper {
+    .ant-input-group-addon {
+      background-color: $white;
+      border: none;
+      border-top: 1px solid $gray-light;
+      border-bottom: 1px solid $gray-light;
+      border-left: 1px solid $gray-light;
+      border-right: none;
+      border-top-left-radius: $input-border-radius;
+      border-bottom-left-radius: $input-border-radius;
+
+      .anticon {
+        color: rgb(211, 211, 211);
+      }
+    }
+
+    input.ant-input {
+      color: $gray !important;
+      background-color: $white !important;
+      border: none;
+      border-top: 1px solid $gray-light;
+      border-bottom: 1px solid $gray-light;
+      border-left: none;
+      border-right: 1px solid $gray-light;
+      border-top-right-radius: $input-border-radius;
+      border-bottom-right-radius: $input-border-radius;
+    }
+
+    .ant-input-affix-wrapper {
+      border-top: 1px solid $gray-light;
+      border-bottom: 1px solid $gray-light;
+      border-left: none;
+      border-right: 1px solid $gray-light;
+      border-top-right-radius: $input-border-radius;
+      border-bottom-right-radius: $input-border-radius;
+
+      input.ant-input {
+        border: none;
+        color: $gray !important;
+      }
+    }
+  }
+}

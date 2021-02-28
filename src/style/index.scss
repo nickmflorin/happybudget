@@ -1,4 +1,12 @@
 @import "./colors";
+@import "./typography";
+@import "./input";
+@import "./layout";
+@import "./buttons";
+@import "./input";
+@import "./forms";
+
+@import "~antd/dist/antd.css";
 
 body {
     margin: 0;

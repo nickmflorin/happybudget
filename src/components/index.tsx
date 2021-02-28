@@ -13,7 +13,7 @@ function App(): JSX.Element {
       <div className={"root"}>
         <Suspense fallback={<SuspenseFallback />}>
           <Switch>
-            <Route path={["/reset", "/signup", "/changepassword", "/login", "/register"]} component={Landing} />
+            <Route path={["/login"]} component={Landing} />
             <Route path={["/"]} component={Application} />
           </Switch>
         </Suspense>

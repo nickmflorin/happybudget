@@ -1,0 +1,300 @@
+@import "./colors";
+@import "./typography";
+
+// This class is not meant to be used in the components.
+.btn-link-base {
+  font-size: 12px;
+  letter-spacing: 0.028em;
+  text-transform: uppercase;
+  font-family: $roboto-medium;
+  font-stretch: normal;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  align-items: center;
+  user-select: none;
+  vertical-align: middle;
+  justify-content: center;
+
+  &.disabled {
+    pointer-events: none;
+    box-shadow: none;
+  }
+
+  &.no-transform {
+    text-transform: unset;
+  }
+}
+
+.link {
+  @extend .btn-link-base;
+  color: $blue;
+  transition: none;
+  box-shadow: none;
+  background-color: transparent;
+  padding: 0;
+  border: none !important;
+
+  .icon-wrapper {
+    .icon {
+      svg {
+        color: $icon-color !important;
+      }
+    }
+  }
+
+  .icon {
+    cursor: pointer;
+
+    svg {
+      color: $icon-color !important;
+      height: 1.5rem;
+      width: 1.5rem;
+    }
+  }
+
+  &--black {
+    color: $text-primary;
+    text-transform: none !important;
+  }
+
+  &--inline {
+    font-size: inherit !important;
+  }
+
+  &--icon-only {
+    @extend .link;
+    min-width: 0px;
+    box-shadow: none !important;
+    height: 28px;
+    width: 28px;
+    display: block;
+    padding: 5px;
+    border-radius: 100px;
+    border: 1px solid transparent;
+
+    svg {
+      height: 18px;
+      width: 18px;
+      color: $gray-light !important;
+    }
+
+    &:hover,
+    &:focus {
+      color: $gray-light !important;
+      background-color: rgba(0, 0, 0, 0.015);
+
+      svg {
+        color: $blue !important;
+      }
+    }
+  }
+
+  // Links that are displayed immediately under a FormItem.  This is used in
+  // the login/reset password pages.
+  &--form-supplementary {
+    color: #868686;
+    font-family: $ibm-plex-sans-medium;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: unset !important;
+    padding-left: 4px;
+
+    &:hover {
+      color: #cacaca !important;
+    }
+  }
+}
+
+.btn,
+.ant-btn {
+  @extend .btn-link-base;
+  padding: 6px 12px;
+  min-width: 64px;
+  height: 32px;
+  line-height: 19px;
+  border-radius: 0px;
+  margin: 0;
+  display: inline-flex;
+  outline: 0;
+  background: $white;
+  border-color: #d9d9d9;
+  border-width: 1px;
+  color: rgba(70, 70, 70, 0.6);
+  box-sizing: border-box;
+  font-family: $roboto-medium;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+
+  // Size of the CircularProgress is set in JS/TS.
+  .spinner {
+    color: $blue;
+    position: initial;
+
+    &.left {
+      margin-right: 6px;
+    }
+    &.right {
+      margin-left: 6px;
+    }
+  }
+
+  .icon {
+    cursor: pointer;
+    height: 100%;
+    width: auto;
+
+    svg {
+      height: 100%;
+      width: auto;
+      color: $icon-color !important;
+    }
+  }
+
+  &--large {
+    @extend .btn;
+    font-size: 20px;
+    line-height: 20px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    height: auto;
+    border-radius: 4px;
+    width: 230px;
+    font-family: $ibm-plex-sans-regular;
+    text-transform: unset;
+    font-weight: 600;
+  }
+
+  // A Button That Looks Like a <a> Link
+  &--link {
+    @extend .btn;
+    color: $blue;
+    transition: none;
+    box-shadow: none;
+    background-color: transparent;
+    padding: 0;
+    min-width: 0;
+    text-decoration: none !important;
+    height: auto;
+    border: none !important;
+
+    .ant-icon {
+      color: $icon-color !important;
+      cursor: pointer;
+    }
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+
+  &--primary {
+    @extend .btn;
+    color: $white;
+    background: $green;
+    border-color: $green;
+  }
+
+  &--danger {
+    @extend .btn;
+    color: $white;
+    background: $red;
+    border-color: $red;
+
+    &:hover {
+      color: $white;
+      background: $red-hover;
+      border-color: $red;
+    }
+  }
+
+  &--icon-only {
+    min-width: 0px;
+    box-shadow: none !important;
+    height: 28px;
+    width: 28px;
+    display: block;
+    padding: 5px;
+    border-radius: 100px;
+    border: 1px solid $transparent;
+    background-color: $transparent;
+
+    svg {
+      height: 18px !important;
+      width: 18px !important;
+      color: $gray-light !important;
+    }
+
+    &:hover,
+    &:focus {
+      border-color: $transparent !important;
+      background-color: rgba(0, 0, 0, 0.015);
+
+      svg {
+        color: $blue !important;
+      }
+    }
+  }
+
+  &--as-icon {
+    min-width: 0px;
+    box-shadow: none !important;
+    height: 32px;
+    width: 32px;
+    display: block;
+    background-color: $transparent;
+    padding: 0px !important;
+    border: none !important;
+
+    svg {
+      height: 32px !important;
+      width: 32px !important;
+      color: $gray-light !important;
+    }
+
+    &:hover,
+    &:focus {
+      svg {
+        color: $blue !important;
+      }
+    }
+  }
+
+  &--square {
+    border-radius: 0px !important;
+  }
+
+  &--rounded {
+    border-radius: 50px !important;
+  }
+
+  &--login,
+  &--reset {
+    @extend .btn--large;
+    background-color: $green;
+    color: $white;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
+
+    .anticon-loading {
+      color: $white !important;
+    }
+
+    &:hover,
+    &:focus {
+      border-color: transparent !important;
+      background-color: darken($blue-theme, 5%) !important;
+      color: $white !important;
+      box-shadow: none !important;
+    }
+
+    &.disabled {
+      background-color: rgba(0, 0, 0, 0.12);
+    }
+  }
+}

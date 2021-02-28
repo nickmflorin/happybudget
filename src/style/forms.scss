@@ -1,0 +1,81 @@
+@import "./colors";
+@import "./typography";
+
+label,
+.ant-form-item-label {
+  font-family: $ibm-plex-sans-medium;
+  color: $text-primary;
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.ant-form-vertical .ant-form-item:last-child {
+  margin-bottom: 0px !important;
+}
+
+.ant-form-item {
+  margin-bottom: 15px;
+
+  .ant-form-item-extra {
+    margin-top: 4px;
+  }
+
+  .ant-form-item-label {
+    font-family: $ibm-plex-sans-medium !important;
+    color: $text-secondary !important;
+
+    & > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
+      margin-left: -3px;
+
+      &:before {
+        content: "";
+      }
+    }
+  }
+
+  .ant-form-item-control {
+    .ant-form-item-extra {
+      font-size: 12px;
+      line-height: 12px;
+      min-height: 12px;
+      margin-top: 6px;
+      font-family: $roboto-regular;
+    }
+    .ant-form-item-control-input {
+      .ant-form-item-control-input-content {
+        // The actual <input> element.
+        .ant-input {
+        }
+      }
+    }
+    // Alerts/feedback that go underneath the form control.
+    div[role="alert"] {
+      margin-top: 5px;
+      font-size: 11px;
+    }
+  }
+}
+
+.ant-form-item-has-error {
+  .ant-form-item-control {
+    .ant-form-item-control-input {
+      .ant-form-item-control-input-content {
+        .ant-input,
+        .ant-input-affix-wrapper,
+        .ant-input:hover,
+        .ant-input-affix-wrapper:hover {
+          border: 1px solid $red;
+        }
+        .ant-input-affix-wrapper {
+          .ant-input,
+          .ant-input:hover {
+            border: none !important;
+          }
+        }
+      }
+    }
+    .ant-form-item-explain.ant-form-item-explain-error {
+      color: $red;
+    }
+  }
+}
