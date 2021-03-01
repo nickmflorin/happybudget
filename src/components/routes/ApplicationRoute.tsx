@@ -10,7 +10,7 @@ const ApplicationRoute = ({ ...props }: { [key: string]: any }): JSX.Element => 
       <Header />
       <div className={"app-content"}>
         <Route {...props} />
-        <Footer copyright brand />
+        <Footer />
       </div>
     </WrapInApplicationStore>
   );

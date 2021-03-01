@@ -1,10 +1,6 @@
 /// <reference path="redux/index.d.ts" />
 /// <reference path="redux-sagas/index.d.ts" />
 /// <reference path="./main.d.ts" />
-// import { Action, Reducer } from "redux";
-// import { Saga } from "redux-saga";
-
-// import { Model, IUser } from "./main";
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13,7 +9,7 @@ namespace Redux {
     [key: string]: any;
   }
 
-  type ModuleLabel = "";
+  type ModuleLabel = "budgets";
 
   interface IActionConfig {
     error?: Error | string | undefined;
@@ -28,6 +24,12 @@ namespace Redux {
     readonly meta?: any;
     readonly label?: ModuleLabel | ModuleLabel[] | undefined;
   }
+
+  type ActionCreator<P = any, A extends Redux.IAction<P> = Redux.IAction<P>> = (
+    type: string,
+    payload?: P,
+    options?: IActionConfig
+  ) => A;
 
   interface IModuleConfig<S extends IModuleStore, A extends IAction<any>> {
     readonly rootSaga?: Saga;
@@ -65,5 +67,12 @@ namespace Redux {
 
   interface IApplicationStore extends IModulesStore {
     user: IUserStore;
+    budgets: Budgets.IStore;
+  }
+
+  namespace Budgets {
+    interface IStore {
+      budgets: IListResponseStore<IBudget>;
+    }
   }
 }

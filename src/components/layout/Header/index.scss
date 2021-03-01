@@ -1,0 +1,13 @@
+@import "style/typography";
+@import "style/colors";
+@import "style/layout";
+
+.header {
+  display: flex;
+  justify-content: space-between;
+
+  .home-container {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+}

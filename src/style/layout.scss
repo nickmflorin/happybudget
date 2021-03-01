@@ -2,12 +2,10 @@
 @import "./typography";
 
 $nav-bar-height: 70px;
-$footer-height: 48px;
-$footer-logo-height: 24px;
-$copyright-height: 32px;
+$footer-height: 24px;
 
-$app-background: $off-white;
-$nav-bar-background-color: $white;
+$app-background: $white;
+$header-background-color: $white;
 $footer-light-color: #5e78fa;
 
 $layout-border: 1px solid #efefef;
@@ -27,46 +25,26 @@ $sidebar-width: 160px;
     position: fixed !important;
     top: 0 !important;
     width: 100%;
-    padding-right: 60px;
-    padding-left: 60px;
-    background-color: $white !important;
-    border-bottom: $layout-border;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: $header-background-color !important;
   }
 
   .footer {
     width: 100%;
-    max-height: calc(#{$footer-height} + #{$copyright-height} + 20px);
+    max-height: 24px;
     margin-top: 20px;
 
-    .logo-container {
-      height: $footer-height;
-      padding-top: calc(0.5 * (#{$footer-height} - #{$footer-logo-height}));
-      padding-bottom: calc(0.5 * (#{$footer-height} - #{$footer-logo-height}));
-      margin-bottom: 20px;
-
-      img {
-        height: 100%;
-        display: block;
-        margin: 0 auto;
-      }
-    }
-
-    // We substract 12px because that is the line-height of the copyright text.
-    .copyright-container {
-      padding-top: calc(0.5 * (#{$copyright-height} - 12px));
-      padding-bottom: calc(0.5 * (#{$copyright-height} - 12px));
-      height: $copyright-height;
-
-      .copyright-text {
-        font-family: $ibm-plex-mono-regular;
-        letter-spacing: 0.03rem;
-        line-height: 12px;
-        text-align: center;
-        font-size: 11px;
-        margin: 0;
-      }
+    .copyright-text {
+      font-family: $ibm-plex-mono-regular;
+      letter-spacing: 0.03rem;
+      line-height: 16px;
+      text-align: center;
+      font-size: 11px;
+      margin: 0;
     }
   }
+
   // Landing Content - Container for the main content that gets displayed
   // outside of the logged in application.  This is for thinks like login,
   // reset password, etc.

@@ -5,10 +5,10 @@ import { isNil } from "lodash";
 import { Typography, Form } from "antd";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
+import { LogoWhite } from "components/display/svgs";
 import { login } from "services";
 
 import LoginForm, { ILoginFormValues } from "./LoginForm";
-import GreenBudgetIcon from "./GreenBudgetIcon";
 
 import "./index.scss";
 
@@ -59,7 +59,7 @@ const Login = (): JSX.Element => {
       </div>
       <div className={"login-page-right"}>
         <div className={"logo-container"}>
-          <GreenBudgetIcon />
+          <LogoWhite />
         </div>
       </div>
     </div>
