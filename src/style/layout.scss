@@ -56,16 +56,12 @@ $footer-background-color: $off-white;
       flex-direction: column;
       overflow-y: hidden;
 
-      &.collapsed {
-        margin-left: $sidebar-collapsed-width;
-      }
-
       .header {
         margin-top: auto;
         height: $header-height;
         position: fixed !important;
         top: 0 !important;
-        width: 100%;
+        width: calc(100% - #{$sidebar-width});
         padding-left: 20px;
         padding-right: 20px;
         background-color: $header-background-color !important;
@@ -104,6 +100,13 @@ $footer-background-color: $off-white;
           font-size: 11px;
           margin: 0;
           color: rgb(144, 144, 144);
+        }
+      }
+
+      &.collapsed {
+        margin-left: $sidebar-collapsed-width;
+        .header {
+          width: calc(100% - #{$sidebar-collapsed-width});
         }
       }
     }

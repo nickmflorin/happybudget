@@ -14,3 +14,8 @@ export { default as SFXIcon } from "./SFXIcon";
 export { default as SoundIcon } from "./SoundIcon";
 export { default as WriterIcon } from "./WriterIcon";
 export { default as LeafLogo } from "./LeafLogo";
+export { default as ExportIcon } from "./ExportIcon";
+export { default as ChatIcon } from "./ChatIcon";
+export { default as SettingsIcon } from "./SettingsIcon";
+export { default as BidAssistantIcon } from "./BidAssistantIcon";
+export { default as ShareIcon } from "./ShareIcon";

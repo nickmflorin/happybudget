@@ -4,16 +4,18 @@ import { isNil } from "lodash";
 import Header from "./Header";
 import Footer from "./Footer";
 import Sidebar, { ISidebarItem } from "./Sidebar";
+import { IToolbarItem } from "./Toolbar";
 
 interface LayoutProps {
   className?: string;
   children: any;
   sidebar?: ISidebarItem[] | (() => JSX.Element);
+  toolbar?: IToolbarItem[] | (() => JSX.Element);
   style?: React.CSSProperties;
   collapsed?: boolean;
 }
 
-const Layout = ({ className, children, sidebar, style = {}, collapsed = false }: LayoutProps): JSX.Element => {
+const Layout = ({ className, children, toolbar, sidebar, style = {}, collapsed = false }: LayoutProps): JSX.Element => {
   return (
     <div className={classNames("application", className)} style={style}>
       {!isNil(sidebar) && (
@@ -26,7 +28,7 @@ const Layout = ({ className, children, sidebar, style = {}, collapsed = false }:
         </div>
       )}
       <div className={classNames("application-content", { collapsed })}>
-        <Header />
+        <Header toolbar={toolbar} />
         <div className={"content"}>{children}</div>
         <Footer />
       </div>

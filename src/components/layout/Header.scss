@@ -6,8 +6,9 @@
   display: flex;
   justify-content: space-between;
 
-  .home-container {
-    padding-top: 15px;
-    padding-bottom: 15px;
+  .toolbar-wrapper {
+    justify-content: flex-end;
+    flex-grow: 100;
+    display: flex;
   }
 }

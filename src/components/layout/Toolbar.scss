@@ -1,0 +1,38 @@
+@import "style/colors";
+
+.toolbar {
+  display: flex;
+  padding-top: 22.5px;
+  padding-bottom: 22.5px;
+
+  .toolbar-item {
+    height: 100%;
+    position: relative;
+    width: 25px;
+    cursor: pointer;
+
+    &:not(:last-child) {
+      margin-right: 40px;
+    }
+
+    svg {
+      height: 25px;
+      width: auto;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    &.active, &:hover {
+      svg {
+        color: $green;
+      }
+    }
+
+    &.disabled {
+      svg {
+        color: #d3d3d3;
+      }
+    }
+  }
+}

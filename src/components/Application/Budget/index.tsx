@@ -4,6 +4,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { FileAddOutlined, ContactsOutlined, FolderOutlined, DeleteOutlined } from "@ant-design/icons";
 
 import { Layout } from "components/layout";
+import { ShareIcon, ChatIcon, ExportIcon, SettingsIcon, BidAssistantIcon } from "components/svgs";
 
 const Content = React.lazy(() => import("./Content"));
 
@@ -14,6 +15,23 @@ const Budget = (): JSX.Element => {
   return (
     <Layout
       collapsed
+      toolbar={[
+        {
+          icon: <BidAssistantIcon />
+        },
+        {
+          icon: <ExportIcon />
+        },
+        {
+          icon: <ShareIcon />
+        },
+        {
+          icon: <SettingsIcon />
+        },
+        {
+          icon: <ChatIcon />
+        }
+      ]}
       sidebar={[
         {
           icon: <FileAddOutlined className={"icon"} />,
