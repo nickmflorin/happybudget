@@ -87,6 +87,7 @@ $footer-background-color: $off-white;
         background-color: $footer-background-color !important;
 
         .copyright-text {
+          padding-right: $sidebar-width;
           font-family: $ibm-plex-mono-regular;
           letter-spacing: 0.03rem;
           line-height: 24px;

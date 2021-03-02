@@ -1,5 +1,4 @@
-import { isNil, map, filter } from "lodash";
-import classNames from "classnames";
+import { map } from "lodash";
 import { Link } from "react-router-dom";
 
 import { ShowHide } from "components/display";
@@ -29,19 +28,9 @@ const Sidebar = ({ sidebarItems = [] }: SidebarProps): JSX.Element => {
         </Link>
       </div>
       <ShowHide show={sidebarItems.length !== 0}>
-        <div
-          className={classNames("sidebar-menu", {
-            "space-for-caret": filter(sidebarItems, (it: ISidebarItem) => !isNil(it.children)).length !== 0
-          })}
-        >
+        <div className={"sidebar-menu"}>
           {map(sidebarItems, (item: ISidebarItem, index: number) => (
-            <SidebarItem
-              key={index}
-              siblingWithCaret={
-                filter(sidebarItems, (it: ISidebarItem) => it !== item && !isNil(it.children)).length !== 0
-              }
-              {...item}
-            />
+            <SidebarItem key={index} {...item} />
           ))}
         </div>
       </ShowHide>

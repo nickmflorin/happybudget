@@ -3,9 +3,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import { isNil, map } from "lodash";
 import classNames from "classnames";
 
-import { CaretDownOutlined, CaretRightOutlined } from "@ant-design/icons";
-
-import { ShowHide, RenderOrSpinner } from "components/display";
+import { RenderOrSpinner } from "components/display";
 
 export interface ISidebarItem {
   icon?: JSX.Element;
@@ -22,10 +20,6 @@ export interface ISidebarItem {
   onChildrenExpanded?: () => void;
 }
 
-interface SidebarItemProps extends ISidebarItem {
-  siblingWithCaret?: boolean;
-}
-
 const SidebarItem = ({
   icon,
   text,
@@ -38,11 +32,10 @@ const SidebarItem = ({
   childrenLoading = false,
   onClick,
   onActivated,
-  onChildrenExpanded,
-  siblingWithCaret = false
-}: SidebarItemProps): JSX.Element => {
+  onChildrenExpanded
+}: ISidebarItem): JSX.Element => {
   const [isActive, setIsActive] = useState(false);
-  const [childrenVisible, setChildrenVisible] = useState(defaultShowChildren);
+  const [childrenVisible] = useState(defaultShowChildren);
   const history = useHistory();
   const location = useLocation();
 
@@ -82,44 +75,19 @@ const SidebarItem = ({
     return <></>;
   }
   return (
-    <div
-      className={classNames("sidebar-menu-item", {
-        active: isActive,
-        "no-caret": isNil(children) && siblingWithCaret === true
-      })}
-    >
-      <div className={"sidebar-menu-item-item"}>
-        {!isNil(children) && (
-          <div
-            className={"caret-container"}
-            onClick={() => {
-              if (!childrenVisible && !isNil(onChildrenExpanded)) {
-                onChildrenExpanded();
-              }
-              setChildrenVisible(!childrenVisible);
-            }}
-          >
-            <ShowHide show={childrenVisible}>
-              <CaretDownOutlined className={"icon"} />
-            </ShowHide>
-            <ShowHide show={!childrenVisible}>
-              <CaretRightOutlined className={"icon"} />
-            </ShowHide>
-          </div>
-        )}
-        <div
-          className={"sidebar-menu-item-title"}
-          onClick={() => {
-            if (!isNil(to)) {
-              history.push(to);
-            } else if (!isNil(onClick)) {
-              onClick();
-            }
-          }}
-        >
-          {!isNil(icon) && <div className={"icon-container"}>{icon}</div>}
-          <span className={"text-container"}>{text}</span>
-        </div>
+    <div className={classNames("sidebar-menu-item", { active: isActive })}>
+      <div
+        className={"sidebar-menu-item-item"}
+        onClick={() => {
+          if (!isNil(to)) {
+            history.push(to);
+          } else if (!isNil(onClick)) {
+            onClick();
+          }
+        }}
+      >
+        {!isNil(icon) && <div className={"icon-container"}>{icon}</div>}
+        <span className={"text-container"}>{text}</span>
       </div>
       {!isNil(children) && childrenVisible && (
         <div className={"sidebar-menu nested"}>
