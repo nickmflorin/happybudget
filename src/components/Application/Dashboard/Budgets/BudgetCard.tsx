@@ -1,3 +1,5 @@
+import { useHistory } from "react-router-dom";
+
 import { useLoggedInUser, useTimezone } from "store/hooks";
 import { toAbbvDisplayDateTime } from "util/dates";
 import { selectRandom } from "util/arrays";
@@ -9,11 +11,12 @@ interface BudgetCardProps {
 }
 
 const BudgetCard = ({ budget }: BudgetCardProps): JSX.Element => {
+  const history = useHistory();
   const user = useLoggedInUser();
   const tz = useTimezone();
   const Icon = selectRandom(Icons);
   return (
-    <div className={"budget-card"}>
+    <div className={"budget-card"} onClick={() => history.push(`/budgets/${budget.id}`)}>
       <div className={"budget-card-icon-wrapper"} style={{ backgroundColor: selectRandom(Colors) }}>
         <Icon />
       </div>

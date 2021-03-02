@@ -13,3 +13,4 @@ export { default as SceneIcon } from "./SceneIcon";
 export { default as SFXIcon } from "./SFXIcon";
 export { default as SoundIcon } from "./SoundIcon";
 export { default as WriterIcon } from "./WriterIcon";
+export { default as LeafLogo } from "./LeafLogo";

@@ -5,9 +5,8 @@
 .sidebar {
   padding-top: 20px;
   padding-bottom: 20px;
-  // 270px is the width of the sidebar SVG.
-  padding-left: calc(0.5 * (#{$sidebar-width} - 270px));
-  padding-right: calc(0.5 * (#{$sidebar-width} - 270px));
+  padding-left: calc(0.5 * (#{$sidebar-width} - 200px));
+  padding-right: calc(0.5 * (#{$sidebar-width} - 200px));
 
   .logo-container {
     width: 100%;
@@ -16,6 +15,11 @@
       display: block;
       text-align: center;
       height: 40px;
+
+      svg {
+        max-height: 40px;
+        max-width: 200px;
+      }
     }
   }
 
@@ -27,7 +31,6 @@
 
     .sidebar-menu-item {
       position: relative;
-      min-width: 150px;
       padding: 0 !important;
       background: transparent !important;
       margin-bottom: 20px;
@@ -117,6 +120,45 @@
         > .sidebar-menu-item-item {
           > .text-container {
             font-size: 13px;
+          }
+        }
+      }
+    }
+  }
+
+  &.collapsed {
+    padding: 0px !important;
+
+    .logo-container {
+      width: 100%;
+
+      .logo-link {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        height: 64px;
+
+        svg {
+          max-width: 25px;
+        }
+      }
+    }
+    .sidebar-menu {
+      .sidebar-menu-item {
+        margin-bottom: 10px;
+
+        > .sidebar-menu-item-item {
+          border-top-left-radius: 0px;
+          border-bottom-left-radius: 0px;
+          padding-top: 4px !important;
+          padding-bottom: 4px !important;
+          height: 42px;
+          justify-content: center;
+          align-items: center;
+          -webkit-box-align: center;
+          -webkit-box-pack: center;
+          > .icon-container {
+            width: auto;
+            margin-right: 0px;
           }
         }
       }

@@ -1,8 +1,9 @@
-import { map } from "lodash";
 import { Link } from "react-router-dom";
+import { map } from "lodash";
+import classNames from "classnames";
 
 import { ShowHide } from "components/display";
-import { SidebarLogo } from "components/svgs";
+import { SidebarLogo, LeafLogo } from "components/svgs";
 
 import SidebarItem, { ISidebarItem } from "./SidebarItem";
 import "./index.scss";
@@ -17,20 +18,26 @@ export interface ISidebarDropdownItem {
 
 interface SidebarProps {
   sidebarItems?: ISidebarItem[];
+  collapsed?: boolean;
 }
 
-const Sidebar = ({ sidebarItems = [] }: SidebarProps): JSX.Element => {
+const Sidebar = ({ sidebarItems = [], collapsed = false }: SidebarProps): JSX.Element => {
   return (
-    <div className={"sidebar"}>
+    <div className={classNames("sidebar", { collapsed })}>
       <div className={"logo-container"}>
         <Link className={"logo-link"} to={"/"}>
-          <SidebarLogo />
+          <ShowHide show={collapsed}>
+            <LeafLogo />
+          </ShowHide>
+          <ShowHide show={!collapsed}>
+            <SidebarLogo />
+          </ShowHide>
         </Link>
       </div>
       <ShowHide show={sidebarItems.length !== 0}>
         <div className={"sidebar-menu"}>
           {map(sidebarItems, (item: ISidebarItem, index: number) => (
-            <SidebarItem key={index} {...item} />
+            <SidebarItem key={index} collapsed={collapsed} {...item} />
           ))}
         </div>
       </ShowHide>

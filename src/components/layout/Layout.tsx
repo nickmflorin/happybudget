@@ -10,17 +10,22 @@ interface LayoutProps {
   children: any;
   sidebar?: ISidebarItem[] | (() => JSX.Element);
   style?: React.CSSProperties;
+  collapsed?: boolean;
 }
 
-const Layout = ({ className, children, sidebar, style = {} }: LayoutProps): JSX.Element => {
+const Layout = ({ className, children, sidebar, style = {}, collapsed = false }: LayoutProps): JSX.Element => {
   return (
     <div className={classNames("application", className)} style={style}>
       {!isNil(sidebar) && (
-        <div className={"sidebar-container"}>
-          {Array.isArray(sidebar) ? <Sidebar sidebarItems={sidebar as ISidebarItem[]} /> : sidebar()}
+        <div className={classNames("sidebar-container", { collapsed })}>
+          {Array.isArray(sidebar) ? (
+            <Sidebar collapsed={collapsed} sidebarItems={sidebar as ISidebarItem[]} />
+          ) : (
+            sidebar()
+          )}
         </div>
       )}
-      <div className={classNames("application-content", { "with-sidebar": !isNil(sidebar) })}>
+      <div className={classNames("application-content", { collapsed })}>
         <Header />
         <div className={"content"}>{children}</div>
         <Footer />

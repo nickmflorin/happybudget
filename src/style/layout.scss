@@ -6,7 +6,8 @@ $header-background-color: $off-white;
 
 $app-background-color: $off-white;
 
-$sidebar-width: 300px;
+$sidebar-width: 260px;
+$sidebar-collapsed-width: 70px;
 $sidebar-background-color: $white;
 $sidebar-background-color: $white;
 
@@ -43,6 +44,10 @@ $footer-background-color: $off-white;
       background: $sidebar-background-color;
       position: fixed;
       height: 100vh;
+
+      &.collapsed {
+        max-width: $sidebar-collapsed-width;
+      }
     }
 
     .application-content {
@@ -50,6 +55,10 @@ $footer-background-color: $off-white;
       display: flex;
       flex-direction: column;
       overflow-y: hidden;
+
+      &.collapsed {
+        margin-left: $sidebar-collapsed-width;
+      }
 
       .header {
         margin-top: auto;
