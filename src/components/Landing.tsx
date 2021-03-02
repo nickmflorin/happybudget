@@ -1,15 +1,15 @@
 import React from "react";
-import { Switch } from "react-router-dom";
-
-import { LandingRoute } from "./routes";
+import { Route, Switch } from "react-router-dom";
 
 const Login = React.lazy(() => import("components/auth/Login"));
 
 const Landing = (): JSX.Element => {
   return (
-    <Switch>
-      <LandingRoute exact path={"/login"} component={Login} />
-    </Switch>
+    <div className={"landing"}>
+      <Switch>
+        <Route exact path={"/login"} component={Login} />
+      </Switch>
+    </div>
   );
 };
 

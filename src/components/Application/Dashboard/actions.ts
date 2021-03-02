@@ -1,4 +1,4 @@
-import { simpleAction } from "store/actions";
+import { createAction, simpleAction } from "store/actions";
 
 export const ActionType = {
   Budgets: {
@@ -16,7 +16,9 @@ export const ActionType = {
   }
 };
 
-export const requestBudgetsAction = simpleAction<null>(ActionType.Budgets.Request);
+export const requestBudgetsAction = (): Redux.IAction<null> => {
+  return createAction(ActionType.Budgets.Request);
+};
 export const loadingBudgetsAction = simpleAction<boolean>(ActionType.Budgets.Loading);
 export const responseBudgetsAction = simpleAction<Http.IListResponse<IBudget>>(ActionType.Budgets.Response);
 export const selectBudgetsAction = simpleAction<number[]>(ActionType.Budgets.Select);

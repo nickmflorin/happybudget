@@ -2,7 +2,7 @@ import { Reducer, combineReducers } from "redux";
 import { createListResponseReducer } from "store/util";
 import { ActionType } from "./actions";
 
-const rootReducer: Reducer<Redux.Budgets.IStore, Redux.IAction<any>> = combineReducers({
+const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.IAction<any>> = combineReducers({
   budgets: createListResponseReducer<IBudget, Redux.IListResponseStore<IBudget>, Redux.IAction<any>>(
     {
       Response: ActionType.Budgets.Response,

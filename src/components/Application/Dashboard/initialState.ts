@@ -1,6 +1,6 @@
 import { initialListResponseState } from "store/initialState";
 
-const initialState: Redux.Budgets.IStore = {
+const initialState: Redux.Dashboard.IStore = {
   budgets: initialListResponseState
 };
 

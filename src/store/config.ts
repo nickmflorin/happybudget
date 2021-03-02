@@ -1,4 +1,4 @@
-import BudgetsReduxConfig from "components/workspace/Budgets/config";
+import BudgetsReduxConfig from "components/Application/Dashboard/config";
 
 const ApplicationReduxConfig: Redux.IApplicationConfig = [BudgetsReduxConfig];
 

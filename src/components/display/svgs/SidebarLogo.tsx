@@ -1,4 +1,4 @@
-const HeaderLogo = (): JSX.Element => {
+const SidebarLogo = (): JSX.Element => {
   return (
     <svg xmlns={"http://www.w3.org/2000/svg"} width={"244.317"} height={"39.654"} viewBox={"0 0 244.317 39.654"}>
       <path
@@ -51,4 +51,4 @@ const HeaderLogo = (): JSX.Element => {
   );
 };
 
-export default HeaderLogo;
+export default SidebarLogo;

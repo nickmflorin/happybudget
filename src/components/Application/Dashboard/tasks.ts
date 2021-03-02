@@ -7,9 +7,9 @@ import { loadingBudgetsAction, responseBudgetsAction } from "./actions";
 export function* getBudgetsTask(action: Redux.IAction<any>): SagaIterator {
   const query = yield select((state: Redux.IApplicationStore) => {
     return {
-      search: state.budgets.budgets.search,
-      page_size: state.budgets.budgets.pageSize,
-      page: state.budgets.budgets.page
+      search: state.dashboard.budgets.search,
+      page_size: state.dashboard.budgets.pageSize,
+      page: state.dashboard.budgets.page
     };
   });
   yield put(loadingBudgetsAction(true));

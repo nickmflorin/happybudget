@@ -1,0 +1,70 @@
+.budget-container {
+  border: 1px solid black;
+  border-radius: 14px;
+  padding: 10px;
+}
+
+h1 {
+  margin: 75px 40px 24px 40px;
+  font-weight: 600;
+  font-size: 30px;
+}
+
+.budgets-list {
+  display: flex;
+  flex-wrap: wrap;
+  cursor: pointer;
+  margin-left: 30px;
+}
+
+.budget-card {
+  display: inline-block;
+  width: 300px;
+  border-radius: 14px;
+  margin: 10px;
+  height: 200px;
+  z-index: 1;
+
+  .budget-image {
+    height: 150px;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    position: relative;
+    div.dropdown {
+      z-index: 2;
+      position: absolute;
+      top: 10px;
+      right: 0px;
+    }
+  }
+
+  .budget-text {
+    background-color: #404151;
+    color: white;
+    height: 50px;
+    font-size: 18px;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+  }
+
+  .budget-title {
+    padding: 8px 16px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+}
+
+.budget-card:hover {
+  box-shadow: 0px 3px 20px #8e8e8e;
+}
+
+// Override default Bootstrap theme:
+.dropdown-icon {
+  fill: #fff;
+}
+
+.dropdown:hover .dropdown-icon {
+  fill: #2c7be5;
+}

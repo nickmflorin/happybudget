@@ -9,7 +9,7 @@ namespace Redux {
     [key: string]: any;
   }
 
-  type ModuleLabel = "budgets";
+  type ModuleLabel = "dashboard" | "budget";
 
   interface IActionConfig {
     error?: Error | string | undefined;
@@ -67,10 +67,10 @@ namespace Redux {
 
   interface IApplicationStore extends IModulesStore {
     user: IUserStore;
-    budgets: Budgets.IStore;
+    dashboard: Dashboard.IStore;
   }
 
-  namespace Budgets {
+  namespace Dashboard {
     interface IStore {
       budgets: IListResponseStore<IBudget>;
     }
