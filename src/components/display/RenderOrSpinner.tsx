@@ -1,10 +1,10 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import Spinner from "./Spinner";
 
 interface RenderOrSpinnerProps {
   hide?: boolean;
   loading?: boolean;
-  children: JSX.Element;
+  children: ReactNode;
   [key: string]: any;
 }
 

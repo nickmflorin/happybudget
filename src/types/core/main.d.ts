@@ -26,15 +26,18 @@ interface IUser extends ISimpleUser {
   readonly date_joined: string;
   readonly created_at: string;
   readonly updated_at: string;
+  readonly timezone: string;
 }
 
 interface IBudget extends Model {
   id: number;
+  name: string;
   author: IUser;
   project_number: number;
   production_type: ProductionType;
   production_type_name: ProductionTypeName;
   created_at: string;
+  updated_at: string;
   shoot_date: string;
   delivery_date: string;
   build_days: number;

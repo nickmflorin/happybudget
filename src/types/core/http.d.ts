@@ -26,9 +26,7 @@ namespace Http {
     readonly search?: string;
   }
 
-  interface IPayload {
-    [key: string]: any;
-  }
+  interface IPayload {}
 
   interface IListResponse<T> {
     readonly count: number;
@@ -48,5 +46,10 @@ namespace Http {
 
   interface ILoginResponse {
     readonly detail: string;
+  }
+
+  interface IBudgetPayload extends IPayload {
+    production_type: ProductionType;
+    name: string;
   }
 }

@@ -1,0 +1,27 @@
+@import "style/colors";
+@import "style/typography";
+
+.display-alert {
+  padding: 12px 20px 12px 50px !important;
+
+  .ant-alert-icon {
+    position: absolute;
+    top: 10px !important;
+    left: 20px !important;
+    font-size: 18px !important;
+  }
+
+  .ant-alert-message {
+    font-size: 16px !important;
+    line-height: 16px !important;
+    margin-bottom: 8px !important;
+    color: $text-primary !important;
+  }
+
+  .ant-alert-description {
+    font-size: 13px !important;
+    line-height: 18px !important;
+    font-family: $ibm-plex-sans-regular;
+    color: $text-secondary !important;
+  }
+}

@@ -1,0 +1,80 @@
+import React, { useState } from "react";
+import { isNil } from "lodash";
+
+import { Modal, Form, Input } from "antd";
+
+import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
+import { createBudget } from "services";
+import { RenderWithSpinner, DisplayAlert } from "components/display";
+
+interface CreateBudgetModalProps {
+  onSuccess: (budget: IBudget) => void;
+  onCancel: () => void;
+  open: boolean;
+  productionType: ProductionType;
+}
+
+const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: CreateBudgetModalProps): JSX.Element => {
+  const [loading, setLoading] = useState(false);
+  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
+  const [form] = Form.useForm();
+
+  return (
+    <Modal
+      title={"Create Budget"}
+      visible={open}
+      onCancel={() => onCancel()}
+      okText={"Create"}
+      cancelText={"Cancel"}
+      onOk={() => {
+        form
+          .validateFields()
+          .then(values => {
+            setLoading(true);
+            createBudget({ name: values.name, production_type: productionType })
+              .then((budget: IBudget) => {
+                form.resetFields();
+                onSuccess(budget);
+              })
+              .catch((e: Error) => {
+                if (e instanceof ClientError) {
+                  if (!isNil(e.errors.__all__)) {
+                    /* eslint-disable no-console */
+                    console.error(e.errors.__all__);
+                    setGlobalError(e.errors.__all__[0].message);
+                  } else {
+                    // Render the errors for each field next to the form field.
+                    renderFieldErrorsInForm(form, e);
+                  }
+                } else if (e instanceof NetworkError) {
+                  setGlobalError("There was a problem communicating with the server.");
+                } else {
+                  throw e;
+                }
+              })
+              .finally(() => {
+                setLoading(false);
+              });
+          })
+          .catch(info => {
+            return;
+          });
+      }}
+    >
+      <RenderWithSpinner loading={loading}>
+        <Form form={form} layout={"vertical"} name={"form_in_modal"} initialValues={{}}>
+          <Form.Item
+            name={"name"}
+            label={"Name"}
+            rules={[{ required: true, message: "Please provide a valid budget name." }]}
+          >
+            <Input placeholder={"Name"} />
+          </Form.Item>
+          <DisplayAlert style={{ marginBottom: 25 }}>{globalError}</DisplayAlert>
+        </Form>
+      </RenderWithSpinner>
+    </Modal>
+  );
+};
+
+export default CreateBudgetModal;

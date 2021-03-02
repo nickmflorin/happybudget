@@ -3,9 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { map } from "lodash";
 
-import { RenderOrSpinner } from "components/display";
+import { Page } from "components/layout";
+
 import { requestBudgetsAction } from "../actions";
 import BudgetCard from "./BudgetCard";
+import "./index.scss";
 
 const Content = (): JSX.Element => {
   const dispatch: Dispatch = useDispatch();
@@ -16,16 +18,13 @@ const Content = (): JSX.Element => {
   }, []);
 
   return (
-    <RenderOrSpinner loading={budgets.loading}>
-      <React.Fragment>
-        <div>{"Budgets"}</div>
-        <div className={"budgets"}>
-          {map(budgets.data, (budget: IBudget) => {
-            return <BudgetCard budget={budget} />;
-          })}
-        </div>
-      </React.Fragment>
-    </RenderOrSpinner>
+    <Page className={"budgets"} loading={budgets.loading} title={"Budgets"}>
+      <div className={"budgets-grid"}>
+        {map(budgets.data, (budget: IBudget) => {
+          return <BudgetCard budget={budget} />;
+        })}
+      </div>
+    </Page>
   );
 };
 

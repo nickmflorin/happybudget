@@ -1,5 +1,7 @@
+import { Page } from "components/layout";
+
 const Contacts = (): JSX.Element => {
-  return <div>{"Contacts"}</div>;
+  return <Page title={"Contacts"}></Page>;
 };
 
 export default Contacts;

@@ -22,3 +22,7 @@ export const replaceInArray = <T>(
   }
   return newArray;
 };
+
+export const selectRandom = <T = any>(array: T[]): T => {
+  return array[Math.floor(Math.random() * array.length)];
+};

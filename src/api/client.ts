@@ -19,7 +19,7 @@ _client.interceptors.request.use(
     // The CSRF Token needs to be set as a header for POST/PATCH/PUT requests
     // with Django - unfortunately, we cannot include it as a cookie only
     // because their middleware looks for it in the headers.
-    const csrfToken: string = cookies.get("nirvedacsrftoken");
+    const csrfToken: string = cookies.get("greenbudgetcsrftoken");
     if (!isNil(csrfToken)) {
       config.headers["X-CSRFToken"] = csrfToken;
     }

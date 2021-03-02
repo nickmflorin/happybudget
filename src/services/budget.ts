@@ -13,3 +13,11 @@ export const getBudget = async (id: number, options: Http.IRequestOptions = {}):
   const url = URL.v1("budgets", id);
   return client.retrieve<IBudget>(url, options);
 };
+
+export const createBudget = async (
+  payload: Http.IBudgetPayload,
+  options: Http.IRequestOptions = {}
+): Promise<IBudget> => {
+  const url = URL.v1("budgets");
+  return client.post<IBudget>(url, payload, options);
+};

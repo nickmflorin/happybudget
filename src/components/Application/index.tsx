@@ -1,7 +1,7 @@
 import React from "react";
 import { Redirect, Switch, Route, useHistory, useLocation } from "react-router-dom";
 
-import { FileAddOutlined, ContactsOutlined, FolderOutlined } from "@ant-design/icons";
+import { FileAddOutlined, ContactsOutlined, FolderOutlined, DeleteOutlined } from "@ant-design/icons";
 
 import { Logout } from "components/auth";
 import { Layout } from "components/layout";
@@ -30,6 +30,12 @@ const Application = (): JSX.Element => {
           active: location.pathname.startsWith("/budgets")
         },
         {
+          text: "Trash",
+          icon: <DeleteOutlined className={"icon"} />,
+          onClick: () => history.push("/trash"),
+          active: location.pathname.startsWith("/trash")
+        },
+        {
           text: "Contacts",
           icon: <ContactsOutlined className={"icon"} />,
           onClick: () => history.push("/contacts"),
@@ -40,7 +46,7 @@ const Application = (): JSX.Element => {
       <Switch>
         <Redirect exact from={"/"} to={"/budgets"} />
         <ApplicationRoute exact path={"/budgets/:budgetId"} component={Budget} />
-        <ApplicationRoute path={["/budgets", "/contacts", "/templates"]} component={Dashboard} />
+        <ApplicationRoute path={["/budgets", "/contacts", "/templates", "/trash"]} component={Dashboard} />
         <Route exact path={"/logout"} component={Logout} />
       </Switch>
     </Layout>

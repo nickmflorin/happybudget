@@ -4,3 +4,4 @@ export { default as RenderWithSpinner } from "./RenderWithSpinner";
 export { default as RenderOrSpinner } from "./RenderOrSpinner";
 export { default as SuspenseFallback } from "./SuspenseFallback";
 export { default as Separator } from "./Separator";
+export { default as DisplayAlert } from "./DisplayAlert";
