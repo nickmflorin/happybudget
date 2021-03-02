@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import { Typography, Form } from "antd";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
-import { LogoWhite } from "components/display/svgs";
+import { LogoWhite } from "components/svgs";
 import { login } from "services";
 
 import LoginForm, { ILoginFormValues } from "./LoginForm";

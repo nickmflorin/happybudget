@@ -1,0 +1,33 @@
+@import "style/typography";
+
+.templates {
+  .templates-grid {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 100;
+
+    .template {
+      flex: 1 1 100px;
+      margin-right: 50px;
+
+      .template-icon {
+        height: 100px;
+        width: 100px;
+        justify-content: center;
+        align-items: center;
+        border-radius: 20px;
+        display: inline-flex;
+        cursor: pointer;
+        -webkit-box-align: center;
+        -webkit-box-pack: center;
+      }
+
+      .template-text {
+        margin-top: 8px;
+        font-family: $ibm-plex-sans-medium;
+        text-align: center;
+      }
+    }
+  }
+}

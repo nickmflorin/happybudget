@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { Link } from "react-router-dom";
 
 import { ShowHide } from "components/display";
-import { SidebarLogo } from "components/display/svgs";
+import { SidebarLogo } from "components/svgs";
 
 import SidebarItem, { ISidebarItem } from "./SidebarItem";
 import "./index.scss";

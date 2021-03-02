@@ -2,7 +2,8 @@
 /// <reference path="./redux.d.ts" />
 /// <reference path="./ui.d.ts" />
 
-type ProductionType = "Film" | "Episodic" | "Music" | "Commercial" | "Documentary" | "Custom";
+type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
+type ProductionType = 0 | 1 | 2 | 3 | 4 | 5;
 
 interface Model {
   id: number;
@@ -31,8 +32,8 @@ interface IBudget extends Model {
   id: number;
   author: IUser;
   project_number: number;
-  production_type: number;
-  production_type_name: ProductionType;
+  production_type: ProductionType;
+  production_type_name: ProductionTypeName;
   created_at: string;
   shoot_date: string;
   delivery_date: string;

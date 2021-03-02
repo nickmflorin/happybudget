@@ -1,7 +1,7 @@
 import React from "react";
 import { Redirect, Switch, Route, useHistory, useLocation } from "react-router-dom";
 
-import { HomeOutlined, DeleteOutlined, FolderOutlined } from "@ant-design/icons";
+import { FileAddOutlined, ContactsOutlined, FolderOutlined } from "@ant-design/icons";
 
 import { Logout } from "components/auth";
 import { Layout } from "components/layout";
@@ -18,10 +18,10 @@ const Application = (): JSX.Element => {
     <Layout
       sidebar={[
         {
-          text: "Dashboard",
-          icon: <HomeOutlined className={"icon"} />,
-          onClick: () => history.push("/"),
-          active: location.pathname.startsWith("/")
+          text: "New Budget",
+          icon: <FileAddOutlined className={"icon"} />,
+          onClick: () => history.push("/templates"),
+          active: location.pathname.startsWith("/templates")
         },
         {
           text: "Budgets",
@@ -31,7 +31,7 @@ const Application = (): JSX.Element => {
         },
         {
           text: "Contacts",
-          icon: <DeleteOutlined className={"icon"} />,
+          icon: <ContactsOutlined className={"icon"} />,
           onClick: () => history.push("/contacts"),
           active: location.pathname.startsWith("/contacts")
         }
@@ -39,8 +39,8 @@ const Application = (): JSX.Element => {
     >
       <Switch>
         <Redirect exact from={"/"} to={"/budgets"} />
-        <ApplicationRoute path={["/budgets", "/contacts"]} component={Dashboard} />
         <ApplicationRoute exact path={"/budgets/:budgetId"} component={Budget} />
+        <ApplicationRoute path={["/budgets", "/contacts", "/templates"]} component={Dashboard} />
         <Route exact path={"/logout"} component={Logout} />
       </Switch>
     </Layout>
