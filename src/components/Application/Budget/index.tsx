@@ -1,16 +1,19 @@
 import React from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { Redirect, Switch, Route, useRouteMatch, useHistory, useLocation } from "react-router-dom";
 
 import { FileAddOutlined, ContactsOutlined, FolderOutlined, DeleteOutlined } from "@ant-design/icons";
 
 import { Layout } from "components/layout";
 import { ShareIcon, ChatIcon, ExportIcon, SettingsIcon, BidAssistantIcon } from "components/svgs";
 
-const Content = React.lazy(() => import("./Content"));
+const Account = React.lazy(() => import("./components/Account"));
+const Accounts = React.lazy(() => import("./components/Accounts"));
+const SubAccount = React.lazy(() => import("./components/SubAccount"));
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
+  const match = useRouteMatch();
 
   return (
     <Layout
@@ -71,7 +74,12 @@ const Budget = (): JSX.Element => {
         }
       ]}
     >
-      <Content />
+      <Switch>
+        <Redirect exact from={match.url} to={`${match.url}/accounts`} />
+        <Route exact path={`${match.url}/accounts`} component={Accounts} />
+        <Route exact path={`${match.url}/accounts/:accountId`} component={Account} />
+        <Route exact path={`${match.url}/subaccounts/:subaccountId`} component={SubAccount} />
+      </Switch>
     </Layout>
   );
 };

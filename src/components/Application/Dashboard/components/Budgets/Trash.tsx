@@ -5,7 +5,7 @@ import { map } from "lodash";
 
 import { Page } from "components/layout";
 
-import { ActionDomains, requestBudgetsAction, restoreBudgetAction, permanentlyDeleteBudgetAction } from "../actions";
+import { ActionDomains, requestBudgetsAction, restoreBudgetAction, permanentlyDeleteBudgetAction } from "../../actions";
 import { BudgetTrashCard } from "./Card";
 import "./index.scss";
 

@@ -46,3 +46,36 @@ interface IBudget extends Model {
   readonly location_days: number;
   readonly trash: boolean;
 }
+
+interface IAccount extends Model {
+  readonly account_number: string;
+  readonly description: string;
+  readonly created_by: ISimpleUser | null;
+  readonly updated_by: ISimpleUser | null;
+  readonly created_at: string;
+  readonly updated_at: string;
+  readonly access: number[];
+  readonly budget: number;
+}
+
+type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
+type Unit = 0 | 1 | 2 | 3 | 4 | 5;
+type ParentType = "subaccount" | "account";
+
+interface ISubAccount extends Model {
+  readonly name: string;
+  readonly line: string;
+  readonly description: string | null;
+  readonly created_by: ISimpleUser | null;
+  readonly updated_by: ISimpleUser | null;
+  readonly created_at: string;
+  readonly updated_at: string;
+  readonly quantity: number | null;
+  readonly rate: number | null;
+  readonly multiplier: number | null;
+  readonly unit: Unit | null;
+  readonly unit_name: UnitName;
+  readonly account: number;
+  readonly parent: number;
+  readonly parent_type: ParentType;
+}

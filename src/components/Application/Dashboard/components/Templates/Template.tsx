@@ -4,7 +4,7 @@ import { Dispatch } from "redux";
 
 import { CreateBudgetModal } from "components/modals";
 
-import { ActionDomains, addBudgetToStateAction } from "../actions";
+import { ActionDomains, addBudgetToStateAction } from "../../actions";
 import { TemplateConfig } from "./constants";
 
 interface TemplateProps {

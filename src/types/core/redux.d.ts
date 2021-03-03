@@ -96,4 +96,34 @@ namespace Redux {
       budgets: IBudgetsStore;
     }
   }
+
+  namespace Budget {
+    /* eslint-disable no-shadow */
+    interface IAction<T = any> extends Redux.IAction<T> {
+      readonly budgetId?: number | undefined;
+      readonly accountId?: number | undefined;
+      readonly subaccountId?: number | undefined;
+    }
+
+    interface ISubAccountStore {
+      detail: IDetailResponseStore<ISubAccount>;
+      subaccounts: IListResponseStore<ISubAccount>;
+    }
+
+    interface IAccountStore {
+      detail: IDetailResponseStore<IAccount>;
+      subaccounts: IListResponseStore<ISubAccount>;
+    }
+
+    interface IAccountsStore {
+      list: IListResponseStore<IAccount>;
+      details: IIndexedStore<IAccountStore>;
+    }
+
+    interface IStore {
+      budget: IDetailResponseStore<IBudget>;
+      accounts: IAccountsStore;
+      subaccounts: IIndexedStore<ISubAccountStore>;
+    }
+  }
 }
