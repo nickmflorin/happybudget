@@ -5,7 +5,7 @@ import { map } from "lodash";
 
 import { Page } from "components/layout";
 
-import { ActionDomains, requestBudgetsAction } from "../actions";
+import { ActionDomains, requestBudgetsAction, restoreBudgetAction, permanentlyDeleteBudgetAction } from "../actions";
 import { BudgetTrashCard } from "./Card";
 import "./index.scss";
 
@@ -24,8 +24,8 @@ const Trash = (): JSX.Element => {
           return (
             <BudgetTrashCard
               budget={budget}
-              onRestore={(b: IBudget) => console.log(b)}
-              onDelete={(b: IBudget) => console.log(b)}
+              onRestore={(b: IBudget) => dispatch(restoreBudgetAction(b.id))}
+              onDelete={(b: IBudget) => dispatch(permanentlyDeleteBudgetAction(b.id))}
             />
           );
         })}

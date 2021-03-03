@@ -5,7 +5,7 @@ import { includes, map, filter } from "lodash";
 
 import { Page } from "components/layout";
 
-import { ActionDomains, requestBudgetsAction, selectBudgetsAction } from "../actions";
+import { ActionDomains, requestBudgetsAction, selectBudgetsAction, deleteBudgetAction } from "../actions";
 import { BudgetCard } from "./Card";
 import "./index.scss";
 
@@ -24,7 +24,7 @@ const Budgets = (): JSX.Element => {
           return (
             <BudgetCard
               budget={budget}
-              loading={false}
+              loading={includes(budgets.deleting, budget.id)}
               selected={includes(budgets.selected, budget.id)}
               onSelect={(checked: boolean) => {
                 if (checked === true) {
@@ -51,7 +51,7 @@ const Budgets = (): JSX.Element => {
                 }
               }}
               onEdit={(b: IBudget) => console.log(b)}
-              onDelete={(b: IBudget) => console.log(b)}
+              onDelete={(b: IBudget) => dispatch(deleteBudgetAction(b.id))}
             />
           );
         })}

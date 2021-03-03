@@ -78,9 +78,18 @@ namespace Redux {
       readonly domain: ActionDomain;
     }
 
+    interface IActiveBudgetsListStore extends IListResponseStore<IBudget> {
+      deleting: number[];
+    }
+
+    interface ITrashBudgetsListStore extends IListResponseStore<IBudget> {
+      deleting: number[];
+      restoring: number[];
+    }
+
     interface IBudgetsStore {
-      active: IListResponseStore<IBudget>;
-      trash: IListResponseStore<IBudget>;
+      active: IActiveBudgetsListStore;
+      trash: ITrashBudgetsListStore;
     }
 
     interface IStore {

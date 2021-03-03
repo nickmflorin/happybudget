@@ -2,8 +2,8 @@ import { initialListResponseState } from "store/initialState";
 
 const initialState: Redux.Dashboard.IStore = {
   budgets: {
-    trash: initialListResponseState,
-    active: initialListResponseState
+    trash: { ...initialListResponseState, deleting: [], restoring: [] },
+    active: { ...initialListResponseState, deleting: [] }
   }
 };
 

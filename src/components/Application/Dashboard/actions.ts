@@ -1,4 +1,4 @@
-import { createAction } from "store/actions";
+import { createAction, simpleAction } from "store/actions";
 
 export const ActionDomains: { [key: string]: Redux.Dashboard.ActionDomain } = {
   TRASH: "trash",
@@ -17,7 +17,13 @@ export const ActionType = {
     SetPageAndSize: "dashboard.budgets.SetPageAndSize",
     UpdateInState: "dashboard.budgets.UpdateInState",
     RemoveFromState: "dashboard.budgets.RemoveFromState",
-    AddToState: "dashboard.budgets.AddToState"
+    AddToState: "dashboard.budgets.AddToState",
+    Delete: "dashboard.budgets.Delete",
+    PermanentlyDelete: "dashboard.budgets.PermanentlyDelete",
+    Restore: "dashboard.budgets.Restore",
+    Deleting: "dashboard.budgets.Deleting",
+    PermanentlyDeleting: "dashboard.budgets.PermanentlyDeleting",
+    Restoring: "dashboard.budgets.Restoring"
   }
 };
 
@@ -44,3 +50,14 @@ export const setBudgetsPageAndSizeAction = simpleDomainAction<PageAndSize>(Actio
 export const updateBudgetInStateAction = simpleDomainAction<IBudget>(ActionType.Budgets.UpdateInState);
 export const addBudgetToStateAction = simpleDomainAction<IBudget>(ActionType.Budgets.AddToState);
 export const removeBudgetFromStateAction = simpleDomainAction<number>(ActionType.Budgets.RemoveFromState);
+
+export const deleteBudgetAction = simpleAction<number>(ActionType.Budgets.Delete);
+export const deletingBudgetAction = simpleAction<{ id: number; value: boolean }>(ActionType.Budgets.Deleting);
+
+export const permanentlyDeleteBudgetAction = simpleAction<number>(ActionType.Budgets.PermanentlyDelete);
+export const permanentlyDeletingBudgetAction = simpleAction<{ id: number; value: boolean }>(
+  ActionType.Budgets.PermanentlyDeleting
+);
+
+export const restoreBudgetAction = simpleAction<number>(ActionType.Budgets.Restore);
+export const restoringBudgetAction = simpleAction<{ id: number; value: boolean }>(ActionType.Budgets.Restoring);
