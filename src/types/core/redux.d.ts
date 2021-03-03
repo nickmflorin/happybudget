@@ -71,8 +71,20 @@ namespace Redux {
   }
 
   namespace Dashboard {
+    type ActionDomain = "trash" | "active";
+
+    /* eslint-disable no-shadow */
+    interface IAction<T = any> extends Redux.IAction<T> {
+      readonly domain: ActionDomain;
+    }
+
+    interface IBudgetsStore {
+      active: IListResponseStore<IBudget>;
+      trash: IListResponseStore<IBudget>;
+    }
+
     interface IStore {
-      budgets: IListResponseStore<IBudget>;
+      budgets: IBudgetsStore;
     }
   }
 }

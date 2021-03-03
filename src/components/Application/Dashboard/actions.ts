@@ -1,31 +1,46 @@
-import { createAction, simpleAction } from "store/actions";
+import { createAction } from "store/actions";
+
+export const ActionDomains: { [key: string]: Redux.Dashboard.ActionDomain } = {
+  TRASH: "trash",
+  ACTIVE: "active"
+};
 
 export const ActionType = {
   Budgets: {
-    Loading: "budgets.budgets.Loading",
-    Response: "budgets.budgets.Response",
-    Request: "budgets.budgets.Request",
-    Select: "budgets.budgets.Select",
-    SetSearch: "budgets.budgets.SetSearch",
-    SetPage: "budgets.budgets.SetPage",
-    SetPageSize: "budgets.budgets.SetPageSize",
-    SetPageAndSize: "budgets.budgets.SetPageAndSize",
-    UpdateInState: "budgets.budgets.UpdateInState",
-    RemoveFromState: "budgets.budgets.RemoveFromState",
-    AddToState: "budgets.budgets.AddToState"
+    Loading: "dashboard.budgets.Loading",
+    Response: "dashboard.budgets.Response",
+    Request: "dashboard.budgets.Request",
+    Select: "dashboard.budgets.Select",
+    SetSearch: "dashboard.budgets.SetSearch",
+    SetPage: "dashboard.budgets.SetPage",
+    SetPageSize: "dashboard.budgets.SetPageSize",
+    SetPageAndSize: "dashboard.budgets.SetPageAndSize",
+    UpdateInState: "dashboard.budgets.UpdateInState",
+    RemoveFromState: "dashboard.budgets.RemoveFromState",
+    AddToState: "dashboard.budgets.AddToState"
   }
 };
 
-export const requestBudgetsAction = (): Redux.IAction<null> => {
-  return createAction(ActionType.Budgets.Request);
+export const simpleDomainAction = <P = any>(type: string) => {
+  return (
+    domain: Redux.Dashboard.ActionDomain,
+    payload: P,
+    options?: Redux.IActionConfig
+  ): Redux.Dashboard.IAction<P> => {
+    return { ...createAction<P>(type, payload, options), domain };
+  };
 };
-export const loadingBudgetsAction = simpleAction<boolean>(ActionType.Budgets.Loading);
-export const responseBudgetsAction = simpleAction<Http.IListResponse<IBudget>>(ActionType.Budgets.Response);
-export const selectBudgetsAction = simpleAction<number[]>(ActionType.Budgets.Select);
-export const setBudgetsSearchAction = simpleAction<string>(ActionType.Budgets.SetSearch);
-export const setBudgetsPageAction = simpleAction<number>(ActionType.Budgets.SetPage);
-export const setBudgetsPageSizeAction = simpleAction<number>(ActionType.Budgets.SetPageSize);
-export const setBudgetsPageAndSizeAction = simpleAction<PageAndSize>(ActionType.Budgets.SetPageAndSize);
-export const updateBudgetInStateAction = simpleAction<IBudget>(ActionType.Budgets.UpdateInState);
-export const addBudgetToStateAction = simpleAction<IBudget>(ActionType.Budgets.AddToState);
-export const removeBudgetFromStateAction = simpleAction<number>(ActionType.Budgets.RemoveFromState);
+
+export const requestBudgetsAction = (domain: Redux.Dashboard.ActionDomain): Redux.Dashboard.IAction<null> => {
+  return { ...createAction(ActionType.Budgets.Request), domain };
+};
+export const loadingBudgetsAction = simpleDomainAction<boolean>(ActionType.Budgets.Loading);
+export const responseBudgetsAction = simpleDomainAction<Http.IListResponse<IBudget>>(ActionType.Budgets.Response);
+export const selectBudgetsAction = simpleDomainAction<number[]>(ActionType.Budgets.Select);
+export const setBudgetsSearchAction = simpleDomainAction<string>(ActionType.Budgets.SetSearch);
+export const setBudgetsPageAction = simpleDomainAction<number>(ActionType.Budgets.SetPage);
+export const setBudgetsPageSizeAction = simpleDomainAction<number>(ActionType.Budgets.SetPageSize);
+export const setBudgetsPageAndSizeAction = simpleDomainAction<PageAndSize>(ActionType.Budgets.SetPageAndSize);
+export const updateBudgetInStateAction = simpleDomainAction<IBudget>(ActionType.Budgets.UpdateInState);
+export const addBudgetToStateAction = simpleDomainAction<IBudget>(ActionType.Budgets.AddToState);
+export const removeBudgetFromStateAction = simpleDomainAction<number>(ActionType.Budgets.RemoveFromState);

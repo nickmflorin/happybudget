@@ -4,7 +4,7 @@ import { Dispatch } from "redux";
 
 import { CreateBudgetModal } from "components/modals";
 
-import { addBudgetToStateAction } from "../actions";
+import { ActionDomains, addBudgetToStateAction } from "../actions";
 import { TemplateConfig } from "./constants";
 
 interface TemplateProps {
@@ -29,7 +29,7 @@ const Template = ({ config }: TemplateProps): JSX.Element => {
         onCancel={() => setCreateModalOpen(false)}
         onSuccess={(budget: IBudget) => {
           setCreateModalOpen(false);
-          dispatch(addBudgetToStateAction(budget));
+          dispatch(addBudgetToStateAction(ActionDomains.ACTIVE, budget));
         }}
       />
     </React.Fragment>

@@ -1,0 +1,35 @@
+.icon-or-spinner {
+  position: relative;
+  margin-right: 8px;
+
+  .icon-wrapper {
+    height: 100%;
+    width: 100%;
+    position: relative;
+
+    .anticon,
+    .icon {
+      svg {
+        height: 100%;
+        width: auto;
+      }
+    }
+  }
+
+  .spinner-wrapper {
+    height: 100% !important;
+    width: 100% !important;
+    position: relative !important;
+
+    .spinner {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+
+      .anticon-loading {
+        height: 100% !important;
+        width: 100% !important;
+      }
+    }
+  }
+}

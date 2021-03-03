@@ -1,9 +1,9 @@
 import { Reducer, combineReducers } from "redux";
 import { createListResponseReducer } from "store/util";
-import { ActionType } from "./actions";
+import { ActionType, ActionDomains } from "./actions";
 
-const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.IAction<any>> = combineReducers({
-  budgets: createListResponseReducer<IBudget, Redux.IListResponseStore<IBudget>, Redux.IAction<any>>(
+const createBudgetsReducer = (domain: Redux.Dashboard.ActionDomain) =>
+  createListResponseReducer<IBudget, Redux.IListResponseStore<IBudget>, Redux.Dashboard.IAction<any>>(
     {
       Response: ActionType.Budgets.Response,
       Loading: ActionType.Budgets.Loading,
@@ -17,9 +17,18 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.IAction<any>> = combine
       UpdateInState: ActionType.Budgets.UpdateInState
     },
     {
-      referenceEntity: "budget"
+      referenceEntity: "budget",
+      excludeActions: (action: Redux.Dashboard.IAction<any>) => {
+        return domain !== action.domain;
+      }
     }
-  )
+  );
+
+const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>> = combineReducers({
+  budgets: combineReducers({
+    active: createBudgetsReducer(ActionDomains.ACTIVE),
+    trash: createBudgetsReducer(ActionDomains.TRASH)
+  })
 });
 
 export default rootReducer;

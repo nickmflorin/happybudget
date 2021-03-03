@@ -2,17 +2,16 @@
 @import "./typography";
 
 $header-height: 70px;
-$header-background-color: $off-white;
+$header-background-color: $white;
 
-$app-background-color: $off-white;
+$app-background-color: $white;
 
 $sidebar-width: 260px;
 $sidebar-collapsed-width: 70px;
-$sidebar-background-color: $white;
-$sidebar-background-color: $white;
+$sidebar-background-color: $off-white;;
 
 $footer-height: 24px;
-$footer-background-color: $off-white;
+$footer-background-color: $white;
 
 .root {
   display: flex;

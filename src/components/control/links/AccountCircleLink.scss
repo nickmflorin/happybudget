@@ -1,0 +1,15 @@
+@import "style/typography";
+@import "style/colors";
+
+.account-circle-link {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 100%;
+  font-family: $roboto-regular;
+  line-height: 18px;
+  font-size: 14px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  text-align: center;
+  border-width: 1px;
+}

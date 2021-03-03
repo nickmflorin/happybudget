@@ -1,0 +1,69 @@
+@import "style/typography";
+@import "style/colors";
+
+.budget-card {
+  border-radius: 14px;
+  position: relative;
+  height: 214px;
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: 0px 3px 20px #8E8E8E;
+  }
+
+  .card-checkbox {
+    position: absolute;
+    left: 14px;
+    top: 10px;
+  }
+
+  .card-dropdown-ellipsis {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    svg {
+      height: 24px !important;
+      color: $white !important;
+    }
+  }
+
+  .budget-card-icon-wrapper {
+    height: 150px;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    display: inline-flex;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+  }
+
+  .budget-card-footer {
+    position: absolute;
+    top: 150px;
+    height: 64px;
+    width: 100%;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+    background-color: #404151;
+    color: $white;
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+
+    .title {
+      font-size: 18px;
+      font-family: $roboto-medium;
+      line-height: 20px;
+      margin-bottom: 4px;
+    }
+
+    .subTitle {
+      font-size: 11px;
+      font-family: $roboto-regular;
+      line-height: 12px;
+    }
+  }
+}

@@ -1,0 +1,10 @@
+@import "style/colors";
+
+.card-dropdown-menu {
+  .card-dropdown-menu-item {
+    &.disabled {
+      cursor: not-allowed !important;
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
+}

@@ -30,18 +30,19 @@ interface IUser extends ISimpleUser {
 }
 
 interface IBudget extends Model {
-  id: number;
-  name: string;
-  author: IUser;
-  project_number: number;
-  production_type: ProductionType;
-  production_type_name: ProductionTypeName;
-  created_at: string;
-  updated_at: string;
-  shoot_date: string;
-  delivery_date: string;
-  build_days: number;
-  prelight_days: number;
-  studio_shoot_days: number;
-  location_days: number;
+  readonly id: number;
+  readonly name: string;
+  readonly author: IUser;
+  readonly project_number: number;
+  readonly production_type: ProductionType;
+  readonly production_type_name: ProductionTypeName;
+  readonly created_at: string;
+  readonly updated_at: string;
+  readonly shoot_date: string;
+  readonly delivery_date: string;
+  readonly build_days: number;
+  readonly prelight_days: number;
+  readonly studio_shoot_days: number;
+  readonly location_days: number;
+  readonly trash: boolean;
 }
