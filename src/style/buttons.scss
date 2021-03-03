@@ -297,4 +297,44 @@
       background-color: rgba(0, 0, 0, 0.12);
     }
   }
+
+  &--google {
+    @extend .btn--large;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1) !important;
+    border-radius: 4px !important;
+    width: 230px !important;
+    font-family: $ibm-plex-sans-regular !important;
+    text-transform: unset !important;
+    font-weight: 600 !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+    height: 48px;
+    font-size: 14px;
+
+    &:hover,
+    &:focus {
+      border-color: #d9d9d9 !important;
+      box-shadow: none !important;
+      color: rgba(70, 70, 70, 0.6) !important;
+    }
+
+    .content-wrapper {
+      display: flex;
+      margin: 0 auto;
+
+      .icon-wrapper {
+        padding: 13px;
+        svg {
+          top: 1px;
+          position: relative;
+          height: 18px;
+          width: 18px;
+        }
+      }
+
+      .text-wrapper {
+        line-height: 48px;
+      }
+    }
+  }
 }

@@ -44,6 +44,11 @@ namespace Http {
     readonly user: IUser;
   }
 
+  interface ISocialPayload {
+    readonly token_id: string;
+    readonly provider: string;
+  }
+
   interface ILoginResponse {
     readonly detail: string;
   }

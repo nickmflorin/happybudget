@@ -20,7 +20,7 @@ label,
   // red border and highlight the prefix icon red.
   &.ant-form-item-has-error {
     .input {
-      border: 1px solid #d9d9d9 !important;
+      border: none !important;
       .ant-input-prefix {
         color: unset !important;
       }

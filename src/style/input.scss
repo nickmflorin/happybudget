@@ -1,7 +1,7 @@
 @import "./colors";
 
 // Input Fields
-$input-border-radius: 6px;
+$input-border-radius: 8px;
 $checkbox-selected-color: $gray;
 $checkbox-active-color: $blue;
 
@@ -36,6 +36,8 @@ input.ant-input {
   font-family: $ibm-plex-sans-regular;
   width: 100%;
   background-color: #f7f7f7 !important;
+  border: none !important;
+  border-radius: $input-border-radius;
 
   .ant-input-prefix {
     margin-right: 12px;

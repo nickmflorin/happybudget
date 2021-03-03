@@ -9,6 +9,14 @@ export const login = async (
   return client.post<Http.ILoginResponse>("/v1/auth/login", { email, password }, options);
 };
 
+export const socialLogin = async (
+  payload: Http.ISocialPayload,
+  options?: Http.IRequestOptions
+): Promise<Http.ILoginResponse> => {
+  options = { ...options, redirectOnAuthenticationError: false };
+  return client.post<Http.ILoginResponse>("/v1/auth/social-login", payload, options);
+};
+
 export const logout = async (): Promise<null> => {
   return client.post<null>("/v1/auth/logout");
 };

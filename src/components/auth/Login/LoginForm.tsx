@@ -5,6 +5,7 @@ import { Form, Button, Input } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 
 import { validateEmail } from "util/validate";
+import SocialButton from "./SocialButton";
 
 export interface ILoginFormValues {
   email?: string;
@@ -17,9 +18,19 @@ interface LoginFormProps {
   style?: React.CSSProperties;
   className?: string;
   onSubmit: (values: ILoginFormValues) => void;
+  onGoogleSuccess: (tokenId: string) => void;
+  onGoogleError: (error: any) => void;
 }
 
-const LoginForm = ({ style, className, form, loading, onSubmit }: LoginFormProps): JSX.Element => {
+const LoginForm = ({
+  style,
+  className,
+  form,
+  loading,
+  onSubmit,
+  onGoogleSuccess,
+  onGoogleError
+}: LoginFormProps): JSX.Element => {
   return (
     <Form
       style={style}
@@ -44,7 +55,7 @@ const LoginForm = ({ style, className, form, loading, onSubmit }: LoginFormProps
         <Input className={"input"} size={"large"} placeholder={"Email"} prefix={<MailOutlined className={"icon"} />} />
       </Form.Item>
       <Form.Item
-        className={"mb--0"}
+        className={"mb--15"}
         name={"password"}
         rules={[{ required: true, message: "Please enter a valid password.", min: 8 }]}
       >
@@ -58,6 +69,7 @@ const LoginForm = ({ style, className, form, loading, onSubmit }: LoginFormProps
       <Button loading={loading} className={"btn--login"} htmlType={"submit"}>
         {"Login"}
       </Button>
+      <SocialButton provider={"google"} onGoogleSuccess={onGoogleSuccess} onGoogleError={onGoogleError} />
     </Form>
   );
 };

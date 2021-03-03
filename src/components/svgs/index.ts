@@ -19,3 +19,4 @@ export { default as ChatIcon } from "./ChatIcon";
 export { default as SettingsIcon } from "./SettingsIcon";
 export { default as BidAssistantIcon } from "./BidAssistantIcon";
 export { default as ShareIcon } from "./ShareIcon";
+export { default as GoogleIcon } from "./GoogleIcon";
