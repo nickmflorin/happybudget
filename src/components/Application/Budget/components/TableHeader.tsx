@@ -22,20 +22,20 @@ const TableHeader = ({ search, setSearch, onDelete, onSum, onPercentage }: Table
       <Checkbox checked={false} />
       <IconButton
         className={"dark"}
-        size={"small"}
+        size={"large"}
         icon={<FontAwesomeIcon icon={faTrash} />}
         onClick={() => onDelete()}
       />
       <IconButton
         className={"dark"}
-        size={"small"}
+        size={"large"}
         // TODO: Change to the Sigma Icon once we have pro.
         icon={<FontAwesomeIcon icon={faPlusSquare} />}
         onClick={() => onSum()}
       />
       <IconButton
         className={"dark"}
-        size={"small"}
+        size={"large"}
         icon={<FontAwesomeIcon icon={faPercentage} />}
         onClick={() => onPercentage()}
       />

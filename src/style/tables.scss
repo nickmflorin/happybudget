@@ -37,15 +37,15 @@
   }
   .ag-row {
     background: $white !important;
-    border-color: 1px solid #f2f2f2 !important;
+    border-color: 1px solid $gray-light !important;
   }
-  .ag-row-hover {
-    background-color: #f0faff !important;
+  .ag-row-hover div[role=gridcell] {
+      background-color: $gray-highlight !important;
   }
   .ag-row-hover div[role='gridcell'],
   .ag-row-hover div[col-id='estimated'][role='gridcell'],
   .ag-row-hover div[col-id='actuals'][role='gridcell'] {
-    background-color: #f0faff !important;
+    background-color: $gray-highlight !important;
   }
   .ag-header-cell-text {
     color: $text-secondary;
@@ -57,9 +57,18 @@
     padding: 0;
   }
   div[role='gridcell'] {
-    border-right: 1px solid #f2f2f2 !important;
+    border-right: 1px solid $gray-light !important;
+    &.action-cell {
+      border: unset !important;
+      text-align: center;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
   }
   div[role='gridcell'].ag-cell-focus {
     border: 2px solid $green !important;
+    &.no-select, &.action-cell {
+      border: unset !important;
+    }
   }
 }

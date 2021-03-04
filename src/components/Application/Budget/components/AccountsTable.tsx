@@ -1,11 +1,17 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { forEach, map, find, isNil } from "lodash";
+import { forEach, map, find, isNil, includes, filter } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
-import { AgGridReact } from "ag-grid-react";
-import { ColDef, CellEditingStoppedEvent } from "ag-grid-community";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
+import { Checkbox } from "antd";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { AgGridReact } from "ag-grid-react";
+import { ColDef, CellEditingStoppedEvent, ICellRendererParams, CellClassParams } from "ag-grid-community";
+
+import { IconButton } from "components/control/buttons";
 import { createAccount, updateAccount } from "services";
 import { handleRequestError } from "store/tasks";
 import { replaceInArray } from "util/arrays";
@@ -13,7 +19,8 @@ import { replaceInArray } from "util/arrays";
 import {
   addBudgetAccountToStateAction,
   updateBudgetAccountInStateAction,
-  setBudgetAccountsSearchAction
+  setBudgetAccountsSearchAction,
+  selectBudgetAccountsAction
 } from "../actions";
 import TableFooter from "./TableFooter";
 import TableHeader from "./TableHeader";
@@ -24,32 +31,8 @@ interface IRow {
   exists?: boolean;
   account_number: string;
   description: string;
+  selected?: boolean;
 }
-
-const colDefs: ColDef[] = [
-  {
-    field: "account_number",
-    headerName: "Account",
-    editable: true
-  },
-  {
-    field: "description",
-    headerName: "Category Description",
-    editable: true
-  },
-  {
-    field: "estimated",
-    headerName: "Estimated"
-  },
-  {
-    field: "actual",
-    headerName: "Actual"
-  },
-  {
-    field: "variance",
-    headerName: "Variance"
-  }
-];
 
 interface AccountsTableProps {
   budgetId: number;
@@ -58,8 +41,17 @@ interface AccountsTableProps {
 const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
   const [gridApi, setGridApi] = useState<any | undefined>(undefined);
   const [rowData, setRowData] = useState<IRow[]>([]);
+  const [columns, setColumns] = useState<ColDef[]>([]);
+
+  const [selectedPlaceholderIds, setSelectedPlaceholderIds] = useState<string[]>([]);
   const dispatch = useDispatch();
   const accounts = useSelector((state: Redux.IApplicationStore) => state.budget.accounts.list);
+
+  // TODO: The fact that we have to do this in order to allow the cell renderer
+  // to access the state is not ideal.  If there is a better way to do this, we
+  // should investigate it.
+  const selected = useRef<number[]>(accounts.selected);
+  const selectedPlaceholders = useRef<string[]>(selectedPlaceholderIds);
 
   const onGridReady = useCallback((params: any): void => {
     setGridApi(params.api);
@@ -87,11 +79,148 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
     }
   }, [accounts.data, accounts.responseWasReceived]);
 
-  // useEffect(() => {
-  //   if (!isNil(gridApi)) {
-  //     gridApi.setQuickFilter(search);
-  //   }
-  // }, [search, gridApi]);
+  useEffect(() => {
+    setColumns([
+      {
+        field: "select",
+        editable: false,
+        headerName: "",
+        width: 50
+      },
+      {
+        field: "account_number",
+        headerName: "Account",
+        editable: true
+      },
+      {
+        field: "description",
+        headerName: "Category Description",
+        editable: true
+      },
+      {
+        field: "estimated",
+        headerName: "Estimated"
+      },
+      {
+        field: "actual",
+        headerName: "Actual"
+      },
+      {
+        field: "variance",
+        headerName: "Variance"
+      },
+      {
+        field: "delete",
+        editable: false,
+        headerName: "",
+        width: 70
+      }
+    ]);
+  }, []);
+
+  useEffect(() => {
+    selected.current = accounts.selected;
+  }, [accounts.selected]);
+
+  useEffect(() => {
+    selectedPlaceholders.current = selectedPlaceholderIds;
+  }, [selectedPlaceholderIds]);
+
+  useEffect(() => {
+    if (!isNil(gridApi)) {
+      gridApi.setQuickFilter(accounts.search);
+    }
+  }, [accounts.search, gridApi]);
+
+  const getCellFrameworkComponent = useCallback(() => {
+    const CellRendererFramework = (params: ICellRendererParams): JSX.Element => {
+      if (params.colDef.field === "select") {
+        const se = params.node.data.selected;
+        console.log(se);
+        return (
+          <Checkbox
+            checked={
+              params.node.data.exists === false
+                ? includes(selectedPlaceholders.current, params.node.data.id)
+                : includes(selected.current, params.node.data.id)
+            }
+            onChange={(e: CheckboxChangeEvent) => {
+              if (e.target.checked) {
+                if (params.node.data.exists === false) {
+                  if (!includes(selectedPlaceholders.current, params.node.data.id)) {
+                    setSelectedPlaceholderIds([...selectedPlaceholders.current, params.node.data.id]);
+                    params.api.refreshCells({ force: true, rowNodes: [params.node] });
+                  } else {
+                    /* eslint-disable no-console */
+                    console.warn(
+                      `Inconsistent state!  Did not expect placeholder account ${params.node.data.id}
+                      to exist in selected state.`
+                    );
+                  }
+                } else {
+                  if (!includes(accounts.selected, params.node.data.id)) {
+                    dispatch(selectBudgetAccountsAction(budgetId, [...selected.current, params.node.data.id]));
+                    params.api.refreshCells({ force: true, rowNodes: [params.node] });
+                  } else {
+                    /* eslint-disable no-console */
+                    console.warn(
+                      `Inconsistent state!  Did not expect account ${params.node.data.id} to exist
+                      in selected state.`
+                    );
+                  }
+                }
+              } else {
+                if (params.node.data.exists === false) {
+                  if (includes(selectedPlaceholderIds, params.node.data.id)) {
+                    setSelectedPlaceholderIds(
+                      filter(selectedPlaceholders.current, (id: string) => id !== params.node.data.id)
+                    );
+                    params.api.refreshCells({ force: true, rowNodes: [params.node] });
+                  } else {
+                    /* eslint-disable no-console */
+                    console.warn(
+                      `Inconsistent state!  Expected placeholder account ${params.node.data.id}
+                      to exist in selected state when it does not.`
+                    );
+                  }
+                } else {
+                  if (includes(selected.current, params.node.data.id)) {
+                    dispatch(
+                      selectBudgetAccountsAction(
+                        budgetId,
+                        filter(selected.current, (id: number) => id !== params.node.data.id)
+                      )
+                    );
+                    params.api.refreshCells({ force: true, rowNodes: [params.node] });
+                  } else {
+                    /* eslint-disable no-console */
+                    console.warn(
+                      `Inconsistent state!  Expected account ${params.node.data.id} to exist
+                      in selected state when it does not.`
+                    );
+                  }
+                }
+              }
+            }}
+          />
+        );
+      } else if (params.colDef.field === "delete") {
+        return (
+          <IconButton
+            className={"dark"}
+            size={"medium"}
+            icon={<FontAwesomeIcon icon={faTrash} />}
+            onClick={() => {
+              setRowData([]);
+            }}
+          />
+        );
+      } else {
+        return <span>{params.value}</span>;
+      }
+    };
+    return CellRendererFramework;
+  }, [accounts.selected]);
 
   return (
     <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
@@ -103,10 +232,16 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
         onPercentage={() => console.log("Not yet supported.")}
       />
       <AgGridReact
-        columnDefs={map(colDefs, (col: ColDef) => ({
+        columnDefs={map(columns, (col: ColDef) => ({
           ...col,
           suppressMenu: true,
-          suppressMenuHide: true
+          suppressMenuHide: true,
+          cellClass: (params: CellClassParams) => {
+            if (includes(["delete", "select"], params.colDef.field)) {
+              return "action-cell";
+            }
+            return "";
+          }
         }))}
         rowDragManaged={true}
         allowContextMenuWithControlKey={true}
@@ -118,17 +253,20 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
           resizable: false,
           sortable: true,
           filter: false,
-          cellRenderer: "cellRenderer"
+          cellRendererFramework: getCellFrameworkComponent()
         }}
         onCellEditingStopped={(event: CellEditingStoppedEvent) => {
-          // TODO: The better way to do this is to just update the account in
+          // TODO: Is the better way to do this is to just update the account in
           // the store and let the changes take affect?
           const field = event.column.getColId();
           if (event.node.data.exists === false) {
             const existing: IRow | undefined = find(rowData, { id: event.node.data.id });
             if (isNil(existing)) {
               /* eslint-disable no-console */
-              console.error("");
+              console.error(
+                `Inconsistent State!  Expected account ${event.node.data.id} to exist
+                in table data when it does not.`
+              );
             } else {
               // NOTE: We might run into race conditions here if we are editing
               // the table cells to fast.  There might be better ways to handle

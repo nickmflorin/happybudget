@@ -28,7 +28,7 @@ const Toolbar = ({ items }: ToolbarProps): JSX.Element => {
         return (
           <IconButton
             className={"dark"}
-            size={"small"}
+            size={"large"}
             icon={item.icon}
             disabled={item.disabled}
             onClick={() => {
