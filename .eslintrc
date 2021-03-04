@@ -39,6 +39,7 @@
         1,
         2
       ],
+      "no-unused-vars": "warn",
       "no-unused-expressions": "warn",
       "no-multi-spaces": "warn",
       "no-trailing-spaces": "warn",

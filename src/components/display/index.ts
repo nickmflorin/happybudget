@@ -7,4 +7,4 @@ export { default as Separator } from "./Separator";
 export { default as DisplayAlert } from "./DisplayAlert";
 export { default as TooltipWrapper } from "./TooltipWrapper";
 export { default as IconOrSpinner } from "./IconOrSpinner";
-export { default as IconWrapper } from "./IconWrapper";
+export { default as RenderIfValidId } from "./RenderIfValidId";

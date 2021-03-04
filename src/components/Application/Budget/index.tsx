@@ -1,10 +1,13 @@
 import React from "react";
 import { Redirect, Switch, Route, useRouteMatch, useHistory, useLocation } from "react-router-dom";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRobot, faDownload, faShareAlt, faCog, faComments } from "@fortawesome/free-solid-svg-icons";
+
 import { FileAddOutlined, ContactsOutlined, FolderOutlined, DeleteOutlined } from "@ant-design/icons";
 
 import { Layout } from "components/layout";
-import { ShareIcon, ChatIcon, ExportIcon, SettingsIcon, BidAssistantIcon } from "components/svgs";
+import "./index.scss";
 
 const Account = React.lazy(() => import("./components/Account"));
 const Accounts = React.lazy(() => import("./components/Accounts"));
@@ -20,19 +23,24 @@ const Budget = (): JSX.Element => {
       collapsed
       toolbar={[
         {
-          icon: <BidAssistantIcon />
+          icon: <FontAwesomeIcon icon={faRobot} />,
+          disabled: true
         },
         {
-          icon: <ExportIcon />
+          icon: <FontAwesomeIcon icon={faDownload} />,
+          disabled: true
         },
         {
-          icon: <ShareIcon />
+          icon: <FontAwesomeIcon icon={faShareAlt} />,
+          disabled: true
         },
         {
-          icon: <SettingsIcon />
+          icon: <FontAwesomeIcon icon={faCog} />,
+          disabled: true
         },
         {
-          icon: <ChatIcon />
+          icon: <FontAwesomeIcon icon={faComments} />,
+          disabled: true
         }
       ]}
       sidebar={[
@@ -74,12 +82,14 @@ const Budget = (): JSX.Element => {
         }
       ]}
     >
-      <Switch>
-        <Redirect exact from={match.url} to={`${match.url}/accounts`} />
-        <Route exact path={`${match.url}/accounts`} component={Accounts} />
-        <Route exact path={`${match.url}/accounts/:accountId`} component={Account} />
-        <Route exact path={`${match.url}/subaccounts/:subaccountId`} component={SubAccount} />
-      </Switch>
+      <div className={"budget"}>
+        <Switch>
+          <Redirect exact from={match.url} to={`${match.url}/accounts`} />
+          <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
+          <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
+          <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
+        </Switch>
+      </div>
     </Layout>
   );
 };

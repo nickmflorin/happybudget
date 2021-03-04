@@ -61,19 +61,19 @@ export const ActionType = {
 };
 
 export const simpleBudgetAction = <P = any>(type: string) => {
-  return (budgetId: number, payload: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
+  return (budgetId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
     return { ...createAction<P>(type, payload, options), budgetId };
   };
 };
 
 export const simpleAccountAction = <P = any>(type: string) => {
-  return (accountId: number, budgetId: number, payload: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
+  return (accountId: number, budgetId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
     return { ...createAction<P>(type, payload, options), accountId, budgetId };
   };
 };
 
 export const simpleSubAccountAction = <P = any>(type: string) => {
-  return (subaccountId: number, payload: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
+  return (subaccountId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
     return { ...createAction<P>(type, payload, options), subaccountId };
   };
 };

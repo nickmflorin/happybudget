@@ -1,6 +1,10 @@
 @import "./colors";
 @import "./typography";
 
+form {
+  width: 100%;
+}
+
 label,
 .ant-form-item-label {
   font-family: $ibm-plex-sans-medium;

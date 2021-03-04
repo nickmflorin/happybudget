@@ -45,18 +45,23 @@ $yellow: #efcd5d;
 $white: #ffffff;
 $off-white: #fbfbfb;
 $black: #000000;
-$gray-dark: #727272;
-$gray: #c1c1c1;
-$gray-light: #e2e2e2;
-$gray-light-light: #f1f1f1;
+$gray-dark: #595959;
+$gray: #b9b9b9;
+$gray-hover: lighten($gray-dark, 20%);
+$gray-light: #f7f7f7;
 $transparent: rgba(0, 0, 0, 0);
 
 // Typography Colors - These need to be revisited.
 $text-primary: rgba(0, 0, 0, 0.85);
-$text-secondary: rgba(35, 35, 35, 0.85);
-$text-tertiary: #5a5a5a;
+$text-secondary: $gray-dark;
 
 // Icon Colors
 $icon-color: $gray;
 
-$separator-color: $gray-light-light;
+$separator-color: $gray-light;
+
+.color {
+  &--green {
+    color: $green !important;
+  }
+}

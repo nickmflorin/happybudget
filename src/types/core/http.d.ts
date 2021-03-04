@@ -57,4 +57,10 @@ namespace Http {
     production_type: ProductionType;
     name: string;
   }
+
+  interface IAccountPayload extends IPayload {
+    account_number?: string;
+    description?: string;
+    access?: number[];
+  }
 }

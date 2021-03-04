@@ -1,0 +1,65 @@
+@import "./colors";
+
+@import '~ag-grid-community/dist/styles/ag-grid.css';
+@import '~ag-grid-community/dist/styles/ag-theme-alpine.css';
+
+.ag-theme-alpine {
+  /* Note:
+     Numeric columns prop causes some headers to be right aligned.
+     We want to overwrite that to keep all columns left aligned:
+  */
+  .ag-right-aligned-header div.ag-header-cell-label {
+    justify-content: flex-end !important;
+  }
+  div[role='gridcell'] {
+    background-color: $white;
+  }
+  // Disabled Cells
+  div[col-id='estimated'][role='gridcell'],
+  div[col-id='actuals'][role='gridcell'],
+  div[col-id='actual'][role='gridcell'],
+  div[col-id='variance'][role='gridcell'] {
+    background-color: #f7fffa;
+  }
+  .ag-layout-auto-height .ag-center-cols-clipper,
+  .ag-layout-auto-height .ag-center-cols-container,
+  .ag-layout-print .ag-center-cols-clipper,
+  .ag-layout-print .ag-center-cols-container {
+    min-height: 0px !important;
+  }
+  .ag-root-wrapper {
+    border: none;
+  }
+  .ag-header {
+    border: none;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+  .ag-row {
+    background: $white !important;
+    border-color: 1px solid #f2f2f2 !important;
+  }
+  .ag-row-hover {
+    background-color: #f0faff !important;
+  }
+  .ag-row-hover div[role='gridcell'],
+  .ag-row-hover div[col-id='estimated'][role='gridcell'],
+  .ag-row-hover div[col-id='actuals'][role='gridcell'] {
+    background-color: #f0faff !important;
+  }
+  .ag-header-cell-text {
+    color: $text-secondary;
+  }
+  .ag-cell-range-selected {
+    background-color: $white !important;
+  }
+  div.ag-cell-value[col-id='lineNumber'] {
+    padding: 0;
+  }
+  div[role='gridcell'] {
+    border-right: 1px solid #f2f2f2 !important;
+  }
+  div[role='gridcell'].ag-cell-focus {
+    border: 2px solid $green !important;
+  }
+}

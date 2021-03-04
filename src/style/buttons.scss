@@ -216,53 +216,72 @@
   &--icon-only {
     min-width: 0px;
     box-shadow: none !important;
-    height: 28px;
-    width: 28px;
     display: block;
-    padding: 5px;
     border-radius: 100px;
     border: 1px solid $transparent;
     background-color: $transparent;
+    padding: 0px;
+    height: 36px;
+    width: 36px;
 
     svg {
-      height: 18px !important;
-      width: 18px !important;
-      color: $gray-light !important;
+      color: $gray-light;
+      height: 100%;
+      width: auto !important;
+    }
+
+    &.small {
+      padding: 6px;
+    }
+    &.medium {
+      padding: 4px;
+    }
+    &.large {
+      padding: 2px;
     }
 
     &:hover,
     &:focus {
       border-color: $transparent !important;
-      background-color: rgba(0, 0, 0, 0.015);
-
+      background-color: transparent;
       svg {
-        color: $blue !important;
+        color: $text-secondary !important;
       }
     }
-  }
 
-  &--as-icon {
-    min-width: 0px;
-    box-shadow: none !important;
-    height: 32px;
-    width: 32px;
-    display: block;
-    background-color: $transparent;
-    padding: 0px !important;
-    border: none !important;
-
-    svg {
-      height: 32px !important;
-      width: 32px !important;
-      color: $gray-light !important;
-    }
-
-    &:hover,
-    &:focus {
+    &.dark {
       svg {
-        color: $blue !important;
+        color: $text-secondary !important;
+      }
+      &:hover, &:focus {
+        svg {
+          color: $gray-hover !important;
+        }
       }
     }
+
+    &.green {
+      svg {
+        color: $green !important;
+      }
+      &:hover, &:focus {
+        svg {
+          color: $green-darker !important;
+        }
+      }
+    }
+
+    &.disabled {
+      svg {
+        color: #d3d3d3 !important;
+      }
+      &:hover, &:focus {
+        svg {
+          color: #d3d3d3 !important;
+        }
+      }
+    }
+
   }
 
   &--square {

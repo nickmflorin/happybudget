@@ -11,7 +11,7 @@ const Application = (): JSX.Element => {
   return (
     <Switch>
       <Redirect exact from={"/"} to={"/budgets"} />
-      <ApplicationRoute exact path={"/budgets/:budgetId"} component={Budget} />
+      <ApplicationRoute path={"/budgets/:budgetId"} component={Budget} />
       <ApplicationRoute path={["/budgets", "/contacts", "/templates", "/trash"]} component={Dashboard} />
       <Route exact path={"/logout"} component={Logout} />
     </Switch>

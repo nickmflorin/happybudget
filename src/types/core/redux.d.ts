@@ -68,6 +68,7 @@ namespace Redux {
   interface IApplicationStore extends IModulesStore {
     user: IUserStore;
     dashboard: Dashboard.IStore;
+    budget: Budget.IStore;
   }
 
   namespace Dashboard {

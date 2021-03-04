@@ -1,0 +1,13 @@
+.table-header {
+  display: flex;
+
+  .ant-checkbox-wrapper {
+    margin-right: 8px;
+    .ant-checkbox {
+      padding: 10px;
+    }
+  }
+  .btn--icon-only {
+    margin-right: 14px;
+  }
+}

@@ -18,7 +18,7 @@ $footer-background-color: $white;
   flex-direction: column;
   min-height: 100vh;
   background: $app-background-color;
-  font-family: $ibm-plex-sans-regular !important;
+  font-family: $noto-sans-regular !important;
   overflow-y: hidden;
 
   // Landing Content - Container for the main content that gets displayed
@@ -34,8 +34,6 @@ $footer-background-color: $white;
   .application {
     height: 100vh;
     overflow-y: scroll;
-    // display: flex;
-    // flex-direction: row;
     min-height: 100vh;
 
     .sidebar-container {
@@ -92,7 +90,7 @@ $footer-background-color: $white;
 
         .copyright-text {
           padding-right: $sidebar-width;
-          font-family: $ibm-plex-mono-regular;
+          font-family: $noto-sans-regular;
           letter-spacing: 0.03rem;
           line-height: 24px;
           text-align: center;
@@ -147,32 +145,6 @@ $footer-background-color: $white;
   }
   &--inline-block {
     display: inline-block !important;
-  }
-}
-
-.align--center {
-  align-items: center;
-}
-
-.width--100 {
-  width: 100%;
-}
-
-.max-width--100 {
-  max-width: 100%;
-}
-
-.scope--100 {
-  width: 100%;
-  height: 100%;
-}
-
-.margin {
-  &--auto {
-    margin: auto !important;
-  }
-  &--7 {
-    margin: 7px;
   }
 }
 

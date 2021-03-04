@@ -1,10 +1,10 @@
-import React from "react";
+import { ReactNode } from "react";
 import classNames from "classnames";
 import Button from "./Button";
 
 interface ButtonProps {
   className?: string;
-  children: JSX.Element | string;
+  children: ReactNode | string;
   [key: string]: any;
 }
 
