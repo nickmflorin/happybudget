@@ -1,0 +1,40 @@
+@import "style/colors";
+@import "style/typography";
+
+.saving-changes {
+  display: flex;
+  width: 180px;
+  height: 36px;
+
+  .indicator-container {
+    padding: 7px;
+
+    .spinner-wrapper {
+      height: 22px;
+      width: 22px;
+
+      .saving-changes-spinner {
+        height: 22px;
+        width: 22px;
+      }
+    }
+
+    .check-wrapper {
+      height: 22px;
+      width: 22px;
+      padding: 2px;
+
+      svg {
+        height: auto;
+        width: 18px;
+        color: $green;
+      }
+    }
+  }
+
+  .text-container {
+    font-family: $noto-sans-regular;
+    color: $text-secondary;
+    line-height: 36px;
+  }
+}

@@ -1,6 +1,6 @@
 import { Reducer, combineReducers } from "redux";
 import { isNil } from "lodash";
-import { createListResponseReducer, createDetailResponseReducer } from "store/util";
+import { createListResponseReducer, createDetailResponseReducer, createModelListActionReducer } from "store/util";
 import { initialAccountState, initialSubAccountState } from "./initialState";
 
 import { ActionType } from "./actions";
@@ -146,6 +146,7 @@ const rootReducer = combineReducers({
   subaccounts: subaccountsIndexedDetailsReducer,
   accounts: combineReducers({
     details: accountsIndexedDetailsReducer,
+    deleting: createModelListActionReducer(ActionType.DeletingAccount, { referenceEntity: "account" }),
     list: createListResponseReducer(
       {
         Response: ActionType.Accounts.Response,

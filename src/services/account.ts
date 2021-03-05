@@ -15,6 +15,11 @@ export const getAccount = async (id: number, options: Http.IRequestOptions = {})
   return client.retrieve<IAccount>(url, options);
 };
 
+export const deleteAccount = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
+  const url = URL.v1("accounts", id);
+  return client.delete<null>(url, options);
+};
+
 export const createAccount = async (
   budgetId: number,
   payload: Http.IAccountPayload,

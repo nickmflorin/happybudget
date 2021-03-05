@@ -12,6 +12,7 @@ export const initialAccountState: Redux.Budget.IAccountStore = {
 
 export const initialAccountsState: Redux.Budget.IAccountsStore = {
   list: initialListResponseState,
+  deleting: [],
   details: {}
 };
 

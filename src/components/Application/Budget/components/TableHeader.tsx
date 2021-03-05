@@ -1,3 +1,5 @@
+import { isNil } from "lodash";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPlusSquare, faPercentage } from "@fortawesome/free-solid-svg-icons";
 
@@ -5,10 +7,12 @@ import { Form, Input, Checkbox } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 
 import { IconButton } from "components/control/buttons";
+import { SavingChanges } from "components/display";
 
 import "./TableHeader.scss";
 
 interface TableHeaderProps {
+  saving?: boolean;
   search: string;
   setSearch: (value: string) => void;
   onDelete: () => void;
@@ -16,7 +20,7 @@ interface TableHeaderProps {
   onPercentage: () => void;
 }
 
-const TableHeader = ({ search, setSearch, onDelete, onSum, onPercentage }: TableHeaderProps): JSX.Element => {
+const TableHeader = ({ search, saving, setSearch, onDelete, onSum, onPercentage }: TableHeaderProps): JSX.Element => {
   return (
     <div className={"table-header"}>
       <Checkbox checked={false} />
@@ -39,7 +43,7 @@ const TableHeader = ({ search, setSearch, onDelete, onSum, onPercentage }: Table
         icon={<FontAwesomeIcon icon={faPercentage} />}
         onClick={() => onPercentage()}
       />
-      <Form layout={"horizontal"}>
+      <Form layout={"horizontal"} style={{ marginRight: 6 }}>
         <Form.Item name={"search"}>
           <Input
             placeholder={"Search Rows"}
@@ -50,6 +54,7 @@ const TableHeader = ({ search, setSearch, onDelete, onSum, onPercentage }: Table
           />
         </Form.Item>
       </Form>
+      {!isNil(saving) && <SavingChanges saving={saving} />}
     </div>
   );
 };

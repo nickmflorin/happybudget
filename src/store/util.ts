@@ -21,6 +21,53 @@ export const composeReducers = <A extends AnyAction = AnyAction>(initialState: a
   return composed;
 };
 
+export interface IModelListActionReducerOptions {
+  referenceEntity?: string;
+}
+
+export const createModelListActionReducer = <A extends Redux.IAction<Redux.ModelListActionPayload>>(
+  actionType: string,
+  options: IModelListActionReducerOptions = {}
+): Reducer<Redux.ListStore<number>, A> => {
+  options = mergeWithDefaults(options, {
+    referenceEntity: "entity"
+  });
+  const reducer: Reducer<Redux.ListStore<number>, A> = (
+    state: Redux.ListStore<number> = [],
+    action: A
+  ): Redux.ListStore<number> => {
+    let newState = [...state];
+    if (action.type === actionType && !isNil(action.payload)) {
+      const payload: Redux.ModelListActionPayload = action.payload;
+      if (payload.value === true) {
+        if (includes(newState, payload.id)) {
+          /* eslint-disable no-console */
+          console.warn(
+            `Inconsistent State!  Inconsistent state noticed when adding ${options.referenceEntity}
+            to action list state... the ${options.referenceEntity} with ID ${payload.id} already
+            exists in the action list state when it is not expected to.`
+          );
+        } else {
+          newState = [...newState, payload.id];
+        }
+      } else {
+        if (!includes(newState, payload.id)) {
+          /* eslint-disable no-console */
+          console.warn(
+            `Inconsistent State!  Inconsistent state noticed when removing ${options.referenceEntity}
+            from action list state... the ${options.referenceEntity} with ID ${payload.id} does
+            not exist in the action list state when it is expected to.`
+          );
+        } else {
+          newState = filter(newState, (id: number) => id !== payload.id);
+        }
+      }
+    }
+    return newState;
+  };
+  return reducer;
+};
+
 export type Transformer<S, A extends Redux.IAction<any>> = (payload: any, st: S, action: A) => any;
 
 export type Transformers<O, S, A extends Redux.IAction<any>> = Record<keyof O, Transformer<S, A>>;

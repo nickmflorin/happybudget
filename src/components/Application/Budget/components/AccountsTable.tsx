@@ -9,7 +9,16 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { AgGridReact } from "ag-grid-react";
-import { ColDef, CellEditingStoppedEvent, ICellRendererParams, CellClassParams } from "ag-grid-community";
+import {
+  ColDef,
+  CellEditingStoppedEvent,
+  ICellRendererParams,
+  CellClassParams,
+  RowNode,
+  GridApi,
+  GridReadyEvent,
+  ColumnApi
+} from "ag-grid-community";
 
 import { IconButton } from "components/control/buttons";
 import { createAccount, updateAccount } from "services";
@@ -20,7 +29,8 @@ import {
   addBudgetAccountToStateAction,
   updateBudgetAccountInStateAction,
   setBudgetAccountsSearchAction,
-  selectBudgetAccountsAction
+  selectBudgetAccountsAction,
+  deleteAccountAction
 } from "../actions";
 import TableFooter from "./TableFooter";
 import TableHeader from "./TableHeader";
@@ -31,7 +41,6 @@ interface IRow {
   exists?: boolean;
   account_number: string;
   description: string;
-  selected?: boolean;
 }
 
 interface AccountsTableProps {
@@ -39,45 +48,52 @@ interface AccountsTableProps {
 }
 
 const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
-  const [gridApi, setGridApi] = useState<any | undefined>(undefined);
+  const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [rowData, setRowData] = useState<IRow[]>([]);
   const [columns, setColumns] = useState<ColDef[]>([]);
 
   const [selectedPlaceholderIds, setSelectedPlaceholderIds] = useState<string[]>([]);
   const dispatch = useDispatch();
   const accounts = useSelector((state: Redux.IApplicationStore) => state.budget.accounts.list);
+  const deleting = useSelector((state: Redux.IApplicationStore) => state.budget.accounts.deleting);
 
   // TODO: The fact that we have to do this in order to allow the cell renderer
   // to access the state is not ideal.  If there is a better way to do this, we
-  // should investigate it.
+  // should investigate it.  Note that we could set the selected state on the
+  // IRow in the rowData, but this would cause the entire table to refresh
+  // when an account is selected.
   const selected = useRef<number[]>(accounts.selected);
   const selectedPlaceholders = useRef<string[]>(selectedPlaceholderIds);
 
-  const onGridReady = useCallback((params: any): void => {
-    setGridApi(params.api);
-    params.api.sizeColumnsToFit();
+  const onGridReady = useCallback((event: GridReadyEvent): void => {
+    setGridApi(event.api);
+    event.api.sizeColumnsToFit();
   }, []);
 
   useEffect(() => {
-    if (accounts.responseWasReceived === true) {
-      const tableData: IRow[] = [];
-      if (accounts.data.length !== 0) {
-        forEach(accounts.data, (account: IAccount) => {
-          tableData.push({
-            account_number: account.account_number,
-            description: account.description,
-            id: account.id
+    if (!isNil(gridApi)) {
+      if (accounts.responseWasReceived === true) {
+        const tableData: IRow[] = [];
+        if (accounts.data.length !== 0) {
+          forEach(accounts.data, (account: IAccount) => {
+            tableData.push({
+              account_number: account.account_number,
+              description: account.description,
+              id: account.id
+            });
           });
-        });
-        setRowData(tableData);
-      } else {
-        setRowData([
-          { account_number: "", description: "", id: uuidv4(), exists: false },
-          { account_number: "", description: "", id: uuidv4(), exists: false }
-        ]);
+          setRowData(tableData);
+          gridApi.sizeColumnsToFit();
+        } else {
+          setRowData([
+            { account_number: "", description: "", id: uuidv4(), exists: false },
+            { account_number: "", description: "", id: uuidv4(), exists: false }
+          ]);
+          gridApi.sizeColumnsToFit();
+        }
       }
     }
-  }, [accounts.data, accounts.responseWasReceived]);
+  }, [accounts.data, accounts.responseWasReceived, gridApi]);
 
   useEffect(() => {
     setColumns([
@@ -135,8 +151,6 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
   const getCellFrameworkComponent = useCallback(() => {
     const CellRendererFramework = (params: ICellRendererParams): JSX.Element => {
       if (params.colDef.field === "select") {
-        const se = params.node.data.selected;
-        console.log(se);
         return (
           <Checkbox
             checked={
@@ -211,7 +225,30 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
             size={"medium"}
             icon={<FontAwesomeIcon icon={faTrash} />}
             onClick={() => {
-              setRowData([]);
+              const rowNodes: IRow[] = [];
+              params.api.forEachNode((node: RowNode, index: number) => {
+                if (node.data.id !== params.node.data.id) {
+                  rowNodes.push({
+                    id: node.data.id,
+                    exists: node.data.exists,
+                    account_number: node.data.account_number,
+                    description: node.data.description
+                  });
+                }
+              });
+              // It is annoying that we have to maintain 2 separate sources of
+              // truth.  This is also related to how we have to use references
+              // for the state values used by the cell renderer.  We should figure
+              // out how to improve this.
+              setRowData(rowNodes);
+              params.api.setRowData(rowNodes);
+
+              // If the row is not a placeholder row, and thus it exists in the
+              // database, we need to submit an API request to delete the account
+              // so the change persists.
+              if (params.node.data.exists !== false) {
+                dispatch(deleteAccountAction(params.node.data.id));
+              }
             }}
           />
         );
@@ -230,6 +267,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
         onDelete={() => console.log("Need to implement.")}
         onSum={() => console.log("Not yet supported.")}
         onPercentage={() => console.log("Not yet supported.")}
+        saving={deleting.length !== 0}
       />
       <AgGridReact
         columnDefs={map(columns, (col: ColDef) => ({

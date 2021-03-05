@@ -1,8 +1,8 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel } from "redux-saga/effects";
+import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
 import { isNil } from "lodash";
 import { ActionType } from "./actions";
-import { getBudgetAccountsTask } from "./tasks";
+import { getBudgetAccountsTask, deleteAccountTask } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
   let lastTasks;
@@ -17,6 +17,15 @@ function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
   }
 }
 
+// TODO: Figure out how to prevent this from firing twice if we are attempting
+// to delete the same account multiple times.  We don't want to prevent multiple
+// actions from going through, if there are multiple budgets being deleted
+// howerver.
+function* watchForDeleteAccountAction(): SagaIterator {
+  yield takeEvery(ActionType.DeleteAccount, deleteAccountTask);
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForTriggerBudgetAccountsSaga);
+  yield spawn(watchForDeleteAccountAction);
 }

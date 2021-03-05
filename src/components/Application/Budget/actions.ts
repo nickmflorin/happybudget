@@ -6,6 +6,9 @@ export const ActionDomains: { [key: string]: Redux.Dashboard.ActionDomain } = {
 };
 
 export const ActionType = {
+  DeleteAccount: "budget.DeleteAccount",
+  AccountRemoved: "budget.AccountRemoved",
+  DeletingAccount: "budget.DeletingAccount",
   Budget: {
     Loading: "budget.budget.Loading",
     Response: "budget.budget.Response",
@@ -58,6 +61,12 @@ export const ActionType = {
       AddToState: "budget.subaccount.subaccounts.AddToState"
     }
   }
+};
+
+export const simpleAction = <P = any>(type: string) => {
+  return (payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
+    return { ...createAction<P>(type, payload, options) };
+  };
 };
 
 export const simpleBudgetAction = <P = any>(type: string) => {
@@ -142,3 +151,8 @@ export const addSubAccountSubAccountToStateAction = simpleSubAccountAction<ISubA
 export const removeSubAccountSubAccountFromStateAction = simpleSubAccountAction<number>(
   ActionType.SubAccount.SubAccounts.RemoveFromState
 );
+
+// Holistic Actions That Operate Across Domains
+export const accountRemovedAction = simpleAction<number>(ActionType.AccountRemoved);
+export const deleteAccountAction = simpleAction<number>(ActionType.DeleteAccount);
+export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.DeletingAccount);

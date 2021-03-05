@@ -40,6 +40,10 @@ namespace Redux {
 
   type IApplicationConfig = IModuleConfig<any, any>[];
 
+  type ListStore<T> = T[];
+
+  type ModelListActionPayload = { id: number; value: boolean };
+
   interface IDetailResponseStore<T extends Model> {
     data: T | undefined;
     loading: boolean;
@@ -119,6 +123,7 @@ namespace Redux {
     interface IAccountsStore {
       list: IListResponseStore<IAccount>;
       details: IIndexedStore<IAccountStore>;
+      deleting: [];
     }
 
     interface IStore {
