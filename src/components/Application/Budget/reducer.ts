@@ -1,6 +1,11 @@
 import { Reducer, combineReducers } from "redux";
 import { isNil } from "lodash";
-import { createListResponseReducer, createDetailResponseReducer, createModelListActionReducer } from "store/util";
+import {
+  createListResponseReducer,
+  createDetailResponseReducer,
+  createSimpleBooleanReducer,
+  createModelListActionReducer
+} from "store/util";
 import { initialAccountState, initialSubAccountState } from "./initialState";
 
 import { ActionType } from "./actions";
@@ -54,7 +59,8 @@ const createAccountIndexedReducer = (accountId: number): Reducer<Redux.Budget.IA
       {
         Response: ActionType.Account.Response,
         Loading: ActionType.Account.Loading,
-        Request: ActionType.Account.Request
+        Request: ActionType.Account.Request,
+        UpdateInState: ActionType.Account.UpdateInState
       },
       {
         excludeActions: (act: Redux.Budget.IAction<any>) => {
@@ -145,6 +151,8 @@ const rootReducer = combineReducers({
   accounts: combineReducers({
     details: accountsIndexedDetailsReducer,
     deleting: createModelListActionReducer(ActionType.DeletingAccount, { referenceEntity: "account" }),
+    updating: createModelListActionReducer(ActionType.UpdatingAccount, { referenceEntity: "account" }),
+    creating: createSimpleBooleanReducer(ActionType.CreatingAccount),
     list: createListResponseReducer(
       {
         Response: ActionType.Accounts.Response,

@@ -58,9 +58,24 @@ namespace Http {
     name: string;
   }
 
+  // TODO: Instead of allowing partial fields to be undefined on the
+  // model, maybe we should instead have a set of required fields and
+  // only create the account when all of those fields are present.
   interface IAccountPayload extends IPayload {
     account_number?: string;
     description?: string;
     access?: number[];
+  }
+
+  // TODO: Instead of allowing partial fields to be undefined on the
+  // model, maybe we should instead have a set of required fields and
+  // only create the sub account when all of those fields are present.
+  interface ISubAccountPayload extends IPayload {
+    description?: string;
+    name?: string;
+    quantity?: number;
+    rate?: number;
+    multiplier?: number;
+    unit?: number;
   }
 }

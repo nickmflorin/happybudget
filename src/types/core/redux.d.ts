@@ -124,6 +124,8 @@ namespace Redux {
       list: IListResponseStore<IAccount>;
       details: IIndexedStore<IAccountStore>;
       deleting: [];
+      updating: [];
+      creating: boolean;
     }
 
     interface IStore {

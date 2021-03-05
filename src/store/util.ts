@@ -21,6 +21,18 @@ export const composeReducers = <A extends AnyAction = AnyAction>(initialState: a
   return composed;
 };
 
+export const createSimpleBooleanReducer = <A extends Redux.IAction<boolean>>(
+  actionType: string
+): Reducer<boolean, A> => {
+  const reducer: Reducer<boolean, A> = (state: boolean = false, action: A): boolean => {
+    if (action.type === actionType && !isNil(action.payload)) {
+      return action.payload;
+    }
+    return state;
+  };
+  return reducer;
+};
+
 export interface IModelListActionReducerOptions {
   referenceEntity?: string;
 }

@@ -1,25 +1,28 @@
 import { isNil } from "lodash";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-import { RenderIfValidId } from "components/display";
-import { requestBudgetAccountsAction } from "../actions";
-import AccountsTable from "./AccountsTable";
+import { RenderIfValidId, RenderWithSpinner } from "components/display";
+import { requestAccountsAction } from "../actions";
+import { AccountsTable } from "./tables";
 
 const Accounts = (): JSX.Element => {
   const { budgetId } = useParams<{ budgetId: string }>();
   const dispatch = useDispatch();
+  const accounts = useSelector((state: Redux.IApplicationStore) => state.budget.accounts.list);
 
   useEffect(() => {
     if (!isNil(budgetId) && !isNaN(parseInt(budgetId))) {
-      dispatch(requestBudgetAccountsAction(parseInt(budgetId)));
+      dispatch(requestAccountsAction(parseInt(budgetId)));
     }
   }, [budgetId]);
 
   return (
     <RenderIfValidId id={budgetId}>
-      <AccountsTable budgetId={parseInt(budgetId)} />
+      <RenderWithSpinner loading={accounts.loading}>
+        <AccountsTable budgetId={parseInt(budgetId)} />
+      </RenderWithSpinner>
     </RenderIfValidId>
   );
 };

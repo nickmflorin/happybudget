@@ -21,31 +21,38 @@ import {
 } from "ag-grid-community";
 
 import { IconButton } from "components/control/buttons";
-import { createAccount, updateAccount } from "services";
+import { createAccount } from "services";
 import { handleRequestError } from "store/tasks";
 import { replaceInArray } from "util/arrays";
 
-import { setBudgetAccountsSearchAction, selectBudgetAccountsAction, deleteAccountAction } from "../actions";
+import { setAccountsSearchAction, selectAccountsAction, deleteAccountAction, updateAccountAction } from "../../actions";
 import TableFooter from "./TableFooter";
 import TableHeader from "./TableHeader";
-import "./Table.scss";
+import "./index.scss";
 
 interface IRow {
   id: number;
-  account_number: string;
-  description: string;
+  account_number: string | null;
+  description: string | null;
 }
 
 interface IPlaceholderRow {
   id: string;
-  account_number: string;
-  description: string;
+  account_number: string | null;
+  description: string | null;
   exists: boolean;
 }
 
 function isPlaceholder(row: IRow | IPlaceholderRow): row is IPlaceholderRow {
   return (row as IPlaceholderRow).exists === false && typeof row.id === "string";
 }
+
+const createPlaceholder = (): IPlaceholderRow => ({
+  account_number: "",
+  description: "",
+  id: uuidv4(),
+  exists: false
+});
 
 interface AccountsTableProps {
   budgetId: number;
@@ -60,6 +67,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
   const dispatch = useDispatch();
   const accounts = useSelector((state: Redux.IApplicationStore) => state.budget.accounts.list);
   const deleting = useSelector((state: Redux.IApplicationStore) => state.budget.accounts.deleting);
+  const updating = useSelector((state: Redux.IApplicationStore) => state.budget.accounts.updating);
 
   // TODO: The fact that we have to do this in order to allow the cell renderer
   // to access the state is not ideal.  If there is a better way to do this, we
@@ -114,10 +122,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
           setRowData(tableData);
           gridApi.sizeColumnsToFit();
         } else {
-          setRowData([
-            { account_number: "", description: "", id: uuidv4(), exists: false },
-            { account_number: "", description: "", id: uuidv4(), exists: false }
-          ]);
+          setRowData([createPlaceholder(), createPlaceholder()]);
           gridApi.sizeColumnsToFit();
         }
       }
@@ -208,7 +213,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
                   }
                 } else {
                   if (!includes(accounts.selected, params.node.data.id)) {
-                    dispatch(selectBudgetAccountsAction(budgetId, [...selected.current, params.node.data.id]));
+                    dispatch(selectAccountsAction([...selected.current, params.node.data.id]));
                     params.api.refreshCells({ force: true, rowNodes: [params.node] });
                   } else {
                     /* eslint-disable no-console */
@@ -235,10 +240,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
                 } else {
                   if (includes(selected.current, params.node.data.id)) {
                     dispatch(
-                      selectBudgetAccountsAction(
-                        budgetId,
-                        filter(selected.current, (id: number) => id !== params.node.data.id)
-                      )
+                      selectAccountsAction(filter(selected.current, (id: number) => id !== params.node.data.id))
                     );
                     params.api.refreshCells({ force: true, rowNodes: [params.node] });
                   } else {
@@ -306,11 +308,11 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
     <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
       <TableHeader
         search={accounts.search}
-        setSearch={(value: string) => dispatch(setBudgetAccountsSearchAction(budgetId, value))}
+        setSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
         onDelete={() => console.log("Need to implement.")}
         onSum={() => console.log("Not yet supported.")}
         onPercentage={() => console.log("Not yet supported.")}
-        saving={deleting.length !== 0}
+        saving={deleting.length !== 0 || updating.length !== 0}
       />
       <AgGridReact
         columnDefs={map(columns, (col: ColDef) => ({
@@ -350,6 +352,11 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
               // NOTE: We might run into race conditions here if we are editing
               // the table cells to fast.  There might be better ways to handle
               // this.
+              // TODO: Instead of allowing partial fields to be undefined on the
+              // model, maybe we should instead have a set of required fields and
+              // only create the account when all of those fields are present.
+              // TODO: Do we want to dispatch the action here?  We then have
+              // the issue of replacing the ID of the placeholder cell.
               createAccount(budgetId, { [field]: event.newValue })
                 .then((account: IAccount) => {
                   // When the state is updated directly after an API request, via dispatching an action,
@@ -372,16 +379,14 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
             // it causes unnecessary rerendering of AGGridReact.  It is better to allow AGGridReact
             // to handle the state and only use the raw data to populate the table on it's first
             // render.  We should investigate if there are smarter ways to do this with AGGridReact.
-            updateAccount(event.data.id, { [field]: event.newValue }).catch((e: Error) => {
-              handleRequestError(e, "There was an error updating the account.");
-            });
+            dispatch(updateAccountAction(event.data.id, { [field]: event.newValue }));
           }
         }}
       />
       <TableFooter
         text={"Grand Total"}
         onNew={() => {
-          const newRowData = [...rowData, { account_number: "", description: "", id: uuidv4(), exists: false }];
+          const newRowData = [...rowData, createPlaceholder()];
           setRowData(newRowData);
         }}
       />

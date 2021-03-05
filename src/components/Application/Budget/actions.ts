@@ -1,4 +1,7 @@
+import { isNil } from "lodash";
 import { createAction } from "store/actions";
+
+export type Pointer = { accountId: number; subaccountId?: undefined } | { accountId?: undefined; subaccountId: number };
 
 export const ActionDomains: { [key: string]: Redux.Dashboard.ActionDomain } = {
   TRASH: "trash",
@@ -7,8 +10,23 @@ export const ActionDomains: { [key: string]: Redux.Dashboard.ActionDomain } = {
 
 export const ActionType = {
   DeleteAccount: "budget.DeleteAccount",
-  AccountRemoved: "budget.AccountRemoved",
   DeletingAccount: "budget.DeletingAccount",
+  DeleteSubAccount: "budget.DeleteSubAccount",
+  DeletingSubAccount: "budget.DeletingSubAccount",
+  UpdateAccount: "budget.UpdateAccount",
+  UpdatingAccount: "budget.UpdatingAccount",
+  UpdateSubAccount: "budget.UpdateSubAccount",
+  UpdatingSubAccount: "budget.UpdatingSubAccount",
+  CreateAccount: "budget.CreateAccount",
+  CreatingAccount: "budget.CreatingAccount",
+  CreateSubAccount: "budget.CreateSubAccount",
+  CreatingSubAccount: "budget.CreatingSubAccount",
+  AccountRemoved: "budget.AccountRemoved",
+  AccountChanged: "budget.AccountChanged",
+  AccountAdded: "budget.AccountAdded",
+  SubAccountRemoved: "budget.SubAccountRemoved",
+  SubAccountChanged: "budget.SubAccountChanged",
+  SubAccountAdded: "budget.SubAccountAdded",
   Budget: {
     Loading: "budget.budget.Loading",
     Response: "budget.budget.Response",
@@ -32,6 +50,7 @@ export const ActionType = {
     // Needs to be implemented.
     RemoveFromState: "budget.account.RemoveFromState",
     SubAccounts: {
+      Create: "budget.account.subaccounts.Create",
       Loading: "budget.account.subaccounts.Loading",
       Response: "budget.account.subaccounts.Response",
       Request: "budget.account.subaccounts.Request",
@@ -51,6 +70,7 @@ export const ActionType = {
     // Needs to be implemented.
     RemoveFromState: "budget.subaccount.RemoveFromState",
     SubAccounts: {
+      Create: "budget.subaccount.subaccounts.Create",
       Loading: "budget.subaccount.subaccounts.Loading",
       Response: "budget.subaccount.subaccounts.Response",
       Request: "budget.subaccount.subaccounts.Request",
@@ -75,9 +95,15 @@ export const simpleBudgetAction = <P = any>(type: string) => {
   };
 };
 
-export const simpleAccountAction = <P = any>(type: string) => {
+export const simpleBudgetAccountAction = <P = any>(type: string) => {
   return (accountId: number, budgetId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
     return { ...createAction<P>(type, payload, options), accountId, budgetId };
+  };
+};
+
+export const simpleAccountAction = <P = any>(type: string) => {
+  return (accountId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
+    return { ...createAction<P>(type, payload, options), accountId };
   };
 };
 
@@ -91,25 +117,26 @@ export const requestBudgetAction = simpleBudgetAction<null>(ActionType.Budget.Re
 export const loadingBudgetAction = simpleBudgetAction<boolean>(ActionType.Budget.Loading);
 export const responseBudgetAction = simpleBudgetAction<IBudget>(ActionType.Budget.Response);
 
-export const requestBudgetAccountsAction = simpleBudgetAction<null>(ActionType.Accounts.Request);
-export const loadingBudgetAccountsAction = simpleBudgetAction<boolean>(ActionType.Accounts.Loading);
-export const responseBudgetAccountsAction = simpleBudgetAction<Http.IListResponse<IAccount>>(
-  ActionType.Accounts.Response
-);
-export const selectBudgetAccountsAction = simpleBudgetAction<number[]>(ActionType.Accounts.Select);
-export const setBudgetAccountsSearchAction = simpleBudgetAction<string>(ActionType.Accounts.SetSearch);
+export const requestAccountsAction = simpleBudgetAction<null>(ActionType.Accounts.Request);
+export const loadingAccountsAction = simpleAction<boolean>(ActionType.Accounts.Loading);
+export const responseAccountsAction = simpleAction<Http.IListResponse<IAccount>>(ActionType.Accounts.Response);
+export const selectAccountsAction = simpleAction<number[]>(ActionType.Accounts.Select);
+export const setAccountsSearchAction = simpleAction<string>(ActionType.Accounts.SetSearch);
 // NOTE: These 3 actions are not currently used.  When the state is updated directly after an API request,
 // it causes unnecessary rerendering of AGGridReact.  It is better to allow AGGridReact to handle the state
 // and only use the raw data to populate the table on it's first render.
-export const updateBudgetAccountInStateAction = simpleBudgetAction<IAccount>(ActionType.Accounts.UpdateInState);
-export const addBudgetAccountToStateAction = simpleBudgetAction<IAccount>(ActionType.Accounts.AddToState);
-export const removeBudgetAccountFromStateAction = simpleBudgetAction<number>(ActionType.Accounts.RemoveFromState);
+export const updateAccountInStateAction = simpleAction<IAccount>(ActionType.Accounts.UpdateInState);
+export const addAccountToStateAction = simpleAction<IAccount>(ActionType.Accounts.AddToState);
+export const removeAccountFromStateAction = simpleAction<number>(ActionType.Accounts.RemoveFromState);
 
 export const requestAccountAction = simpleAccountAction<null>(ActionType.Account.Request);
 export const loadingAccountAction = simpleAccountAction<boolean>(ActionType.Account.Loading);
 export const responseAccountAction = simpleAccountAction<IAccount>(ActionType.Account.Response);
 
-export const requestAccountSubAccountsAction = simpleAccountAction<null>(ActionType.Account.SubAccounts.Request);
+export const createAccountSubAccountAction = simpleBudgetAccountAction<Http.ISubAccountPayload>(
+  ActionType.Account.SubAccounts.Create
+);
+export const requestAccountSubAccountsAction = simpleBudgetAccountAction<null>(ActionType.Account.SubAccounts.Request);
 export const loadingAccountSubAccountsAction = simpleAccountAction<boolean>(ActionType.Account.SubAccounts.Loading);
 export const responseAccountSubAccountsAction = simpleAccountAction<Http.IListResponse<ISubAccount>>(
   ActionType.Account.SubAccounts.Response
@@ -130,6 +157,9 @@ export const requestSubAccountAction = simpleSubAccountAction<null>(ActionType.S
 export const loadingSubAccountAction = simpleSubAccountAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = simpleSubAccountAction<IAccount>(ActionType.SubAccount.Response);
 
+export const createSubAccountSubAccountAction = simpleSubAccountAction<Http.ISubAccountPayload>(
+  ActionType.SubAccount.SubAccounts.Create
+);
 export const requestSubAccountSubAccountsAction = simpleSubAccountAction<null>(
   ActionType.SubAccount.SubAccounts.Request
 );
@@ -155,7 +185,50 @@ export const removeSubAccountSubAccountFromStateAction = simpleSubAccountAction<
   ActionType.SubAccount.SubAccounts.RemoveFromState
 );
 
+// Convenience actions that dictate which specific action should be called
+// based on the pointer.
+export const createSubAccountAction = (budgetId: number, payload: Http.ISubAccountPayload, pointer: Pointer) => {
+  if (pointer.accountId !== undefined) {
+    return createAccountSubAccountAction(pointer.accountId, budgetId, payload);
+  }
+  return createSubAccountSubAccountAction(pointer.subaccountId, payload);
+};
+
+export const selectSubAccountsAction = (payload: number[], pointer: Pointer) => {
+  if (pointer.accountId !== undefined) {
+    return selectAccountSubAccountsAction(pointer.accountId, payload);
+  }
+  return selectSubAccountSubAccountsAction(pointer.subaccountId, payload);
+};
+export const setSubAccountsSearchAction = (payload: string, pointer: Pointer) => {
+  if (pointer.accountId !== undefined) {
+    return setAccountSubAccountsSearchAction(pointer.accountId, payload);
+  }
+  return setSubAccountSubAccountsSearchAction(pointer.subaccountId, payload);
+};
+
 // Holistic Actions That Operate Across Domains
 export const accountRemovedAction = simpleAction<number>(ActionType.AccountRemoved);
+export const accountChangedAction = simpleAction<IAccount>(ActionType.AccountChanged);
+export const accountAddedAction = simpleAction<IAccount>(ActionType.AccountAdded);
+
 export const deleteAccountAction = simpleAction<number>(ActionType.DeleteAccount);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.DeletingAccount);
+export const updateAccountAction = simpleAccountAction<Partial<Http.IAccountPayload>>(ActionType.UpdateAccount);
+export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.UpdatingAccount);
+export const createAccountAction = simpleBudgetAction<Http.IAccountPayload>(ActionType.CreateAccount);
+export const creatingAccountAction = simpleAction<boolean>(ActionType.CreatingAccount);
+
+export const subaccountRemovedAction = simpleAction<number>(ActionType.SubAccountRemoved);
+export const subaccountChangedAction = simpleAction<ISubAccount>(ActionType.SubAccountChanged);
+export const subaccountAddedAction = simpleAction<ISubAccount>(ActionType.SubAccountAdded);
+
+export const deleteSubAccountAction = simpleAction<number>(ActionType.DeleteSubAccount);
+export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.DeletingSubAccount);
+export const updateSubAccountAction = simpleSubAccountAction<Partial<Http.ISubAccountPayload>>(
+  ActionType.UpdateSubAccount
+);
+export const updatingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.UpdatingSubAccount);
+// Need to know if it pertains to the budget or the account!
+// export const createSubAccountAction = simpleBudgetAction<Http.IAccountPayload>(ActionType.CreateSubAccount);
+// export const creatingSubAccountAction = simpleAction<boolean>(ActionType.CreatingSubAccount);
