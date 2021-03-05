@@ -2,12 +2,22 @@ import { initialDetailResponseState, initialListResponseState } from "store/init
 
 export const initialSubAccountState: Redux.Budget.ISubAccountStore = {
   detail: initialDetailResponseState,
-  subaccounts: initialListResponseState
+  subaccounts: {
+    list: initialListResponseState,
+    deleting: [],
+    updating: [],
+    creating: false
+  }
 };
 
 export const initialAccountState: Redux.Budget.IAccountStore = {
   detail: initialDetailResponseState,
-  subaccounts: initialListResponseState
+  subaccounts: {
+    list: initialListResponseState,
+    deleting: [],
+    updating: [],
+    creating: false
+  }
 };
 
 export const initialAccountsState: Redux.Budget.IAccountsStore = {
@@ -21,7 +31,8 @@ export const initialAccountsState: Redux.Budget.IAccountsStore = {
 const initialState: Redux.Budget.IStore = {
   budget: initialDetailResponseState,
   accounts: initialAccountsState,
-  subaccounts: {}
+  subaccounts: {},
+  subaccountsTable: []
 };
 
 export default initialState;

@@ -110,28 +110,49 @@ namespace Redux {
       readonly subaccountId?: number | undefined;
     }
 
+    interface ISubAccountListResponseStore {
+      deleting: IListStore<number>;
+      updating: IListStore<number>;
+      creating: boolean;
+      list: IListResponseStore<ISubAccount>;
+    }
+
     interface ISubAccountStore {
       detail: IDetailResponseStore<ISubAccount>;
-      subaccounts: IListResponseStore<ISubAccount>;
+      subaccounts: ISubAccountListResponseStore;
     }
 
     interface IAccountStore {
       detail: IDetailResponseStore<IAccount>;
-      subaccounts: IListResponseStore<ISubAccount>;
+      subaccounts: ISubAccountListResponseStore;
     }
 
     interface IAccountsStore {
       list: IListResponseStore<IAccount>;
       details: IIndexedStore<IAccountStore>;
-      deleting: [];
-      updating: [];
+      deleting: IListStore<number>;
+      updating: IListStore<number>;
       creating: boolean;
+    }
+
+    interface ISubAccountRow {
+      id: number | string;
+      line: string | null;
+      name: string | null;
+      description: string | null;
+      quantity: number | null;
+      unit: Unit | null;
+      multiplier: number | null;
+      rate: number | null;
+      selected: boolean;
+      isPlaceholder: boolean;
     }
 
     interface IStore {
       budget: IDetailResponseStore<IBudget>;
       accounts: IAccountsStore;
       subaccounts: IIndexedStore<ISubAccountStore>;
+      subaccountsTable: ISubAccountRow[];
     }
   }
 }

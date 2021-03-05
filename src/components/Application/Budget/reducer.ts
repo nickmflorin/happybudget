@@ -1,56 +1,71 @@
 import { Reducer, combineReducers } from "redux";
-import { isNil } from "lodash";
+import { isNil, find, filter } from "lodash";
 import {
   createListResponseReducer,
   createDetailResponseReducer,
   createSimpleBooleanReducer,
   createModelListActionReducer
 } from "store/util";
-import { initialAccountState, initialSubAccountState } from "./initialState";
+import { replaceInArray } from "util/arrays";
 
 import { ActionType } from "./actions";
+import initialState, { initialAccountState, initialSubAccountState } from "./initialState";
+import { createSubAccountRowPlaceholder } from "./util";
 
 const createAccountSubAccountsListResponseReducer = (
   accountId: number
-): Reducer<Redux.IListResponseStore<ISubAccount>> =>
-  createListResponseReducer(
-    {
-      Response: ActionType.Account.SubAccounts.Response,
-      Loading: ActionType.Account.SubAccounts.Loading,
-      Select: ActionType.Account.SubAccounts.Select,
-      SetSearch: ActionType.Account.SubAccounts.SetSearch,
-      AddToState: ActionType.Account.SubAccounts.AddToState,
-      RemoveFromState: ActionType.Account.SubAccounts.RemoveFromState,
-      UpdateInState: ActionType.Account.SubAccounts.UpdateInState
-    },
-    {
-      referenceEntity: "subaccount",
-      excludeActions: (action: Redux.Budget.IAction<any>) => {
-        return action.accountId !== accountId;
+): Reducer<Redux.Budget.ISubAccountListResponseStore> =>
+  combineReducers({
+    deleting: createModelListActionReducer(ActionType.Account.SubAccounts.Deleting, { referenceEntity: "subaccount" }),
+    updating: createModelListActionReducer(ActionType.Account.SubAccounts.Updating, { referenceEntity: "subaccount" }),
+    creating: createSimpleBooleanReducer(ActionType.Account.SubAccounts.Creating),
+    list: createListResponseReducer(
+      {
+        Response: ActionType.Account.SubAccounts.Response,
+        Loading: ActionType.Account.SubAccounts.Loading,
+        SetSearch: ActionType.Account.SubAccounts.SetSearch,
+        AddToState: ActionType.Account.SubAccounts.AddToState,
+        RemoveFromState: ActionType.Account.SubAccounts.RemoveFromState,
+        UpdateInState: ActionType.Account.SubAccounts.UpdateInState
+      },
+      {
+        referenceEntity: "subaccount",
+        excludeActions: (action: Redux.Budget.IAction<any>) => {
+          return action.accountId !== accountId;
+        }
       }
-    }
-  );
+    )
+  });
 
 const createSubAccountSubAccountsListResponseReducer = (
   subaccountId: number
-): Reducer<Redux.IListResponseStore<ISubAccount>> =>
-  createListResponseReducer(
-    {
-      Response: ActionType.SubAccount.SubAccounts.Response,
-      Loading: ActionType.SubAccount.SubAccounts.Loading,
-      Select: ActionType.SubAccount.SubAccounts.Select,
-      SetSearch: ActionType.SubAccount.SubAccounts.SetSearch,
-      AddToState: ActionType.SubAccount.SubAccounts.AddToState,
-      RemoveFromState: ActionType.SubAccount.SubAccounts.RemoveFromState,
-      UpdateInState: ActionType.SubAccount.SubAccounts.UpdateInState
-    },
-    {
-      referenceEntity: "subaccount",
-      excludeActions: (action: Redux.Budget.IAction<any>) => {
-        return action.subaccountId !== subaccountId;
+): Reducer<Redux.Budget.ISubAccountListResponseStore> =>
+  combineReducers({
+    deleting: createModelListActionReducer(ActionType.SubAccount.SubAccounts.Deleting, {
+      referenceEntity: "subaccount"
+    }),
+    updating: createModelListActionReducer(ActionType.SubAccount.SubAccounts.Updating, {
+      referenceEntity: "subaccount"
+    }),
+    creating: createSimpleBooleanReducer(ActionType.SubAccount.SubAccounts.Creating),
+    list: createListResponseReducer(
+      {
+        Response: ActionType.SubAccount.SubAccounts.Response,
+        Loading: ActionType.SubAccount.SubAccounts.Loading,
+        Select: ActionType.SubAccount.SubAccounts.Select,
+        SetSearch: ActionType.SubAccount.SubAccounts.SetSearch,
+        AddToState: ActionType.SubAccount.SubAccounts.AddToState,
+        RemoveFromState: ActionType.SubAccount.SubAccounts.RemoveFromState,
+        UpdateInState: ActionType.SubAccount.SubAccounts.UpdateInState
+      },
+      {
+        referenceEntity: "subaccount",
+        excludeActions: (action: Redux.Budget.IAction<any>) => {
+          return action.subaccountId !== subaccountId;
+        }
       }
-    }
-  );
+    )
+  });
 
 const createAccountIndexedReducer = (accountId: number): Reducer<Redux.Budget.IAccountStore, Redux.Budget.IAction> =>
   combineReducers({
@@ -141,6 +156,95 @@ const subaccountsIndexedDetailsReducer: Reducer<
   return newState;
 };
 
+const subaccountsTableReducer: Reducer<Redux.Budget.ISubAccountRow[], Redux.Budget.IAction<any>> = (
+  state: Redux.Budget.ISubAccountRow[] = initialState.subaccountsTable,
+  action: Redux.Budget.IAction<any>
+) => {
+  let newState = [...state];
+  if (action.type === ActionType.Account.SubAccountsTable.SetData) {
+    return action.payload;
+  } else if (action.type === ActionType.Account.SubAccountsTable.AddRow) {
+    newState = [...newState, createSubAccountRowPlaceholder()];
+  } else if (
+    action.type === ActionType.Account.SubAccountsTable.UpdateRow ||
+    action.type === ActionType.Account.SubAccountsTable.UpdateRowInStateOnly
+  ) {
+    // TODO: Eventually, we should wait until the set of required fields have
+    // been populated on the row before submitting a request to create the
+    // SubAccount in the backend.
+    const existing = find(newState, { id: action.payload.id });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State!:  Inconsistent state noticed when updating sub account in state...
+        the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
+      );
+    } else {
+      newState = replaceInArray<Redux.Budget.ISubAccountRow>(
+        newState,
+        { id: action.payload.id },
+        { ...existing, ...action.payload.payload }
+      );
+    }
+  } else if (action.type === ActionType.Account.SubAccountsTable.RemoveRow) {
+    const existing = find(newState, { id: action.payload.id });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State!:  Inconsistent state noticed when removing sub account from state...
+          the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
+      );
+    } else {
+      newState = filter(newState, (row: Redux.Budget.ISubAccountRow) => row.id !== action.payload.id);
+    }
+  } else if (action.type === ActionType.Account.SubAccountsTable.SelectRow) {
+    console.log("Selecting!");
+    const existing = find(newState, { id: action.payload });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State!:  Inconsistent state noticed when selecting sub account in state...
+        the subaccount with ID ${action.payload} does not exist in state when it is expected to.`
+      );
+    } else if (existing.selected === true) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State!:  Inconsistent state noticed when selecting sub account in state...
+        the subaccount with ID ${action.payload} is already selected when it is not expected to be.`
+      );
+    } else {
+      console.log(action.payload);
+      newState = replaceInArray<Redux.Budget.ISubAccountRow>(
+        newState,
+        { id: action.payload },
+        { ...existing, selected: true }
+      );
+    }
+  } else if (action.type === ActionType.Account.SubAccountsTable.DeselectRow) {
+    const existing = find(newState, { id: action.payload });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State!:  Inconsistent state noticed when deselecting sub account in state...
+        the subaccount with ID ${action.payload} does not exist in state when it is expected to.`
+      );
+    } else if (existing.selected === false) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State!:  Inconsistent state noticed when deselecting sub account in state...
+        the subaccount with ID ${action.payload} is already deselected when it is not expected to be.`
+      );
+    } else {
+      newState = replaceInArray<Redux.Budget.ISubAccountRow>(
+        newState,
+        { id: action.payload },
+        { ...existing, selected: false }
+      );
+    }
+  }
+  return newState;
+};
+
 const rootReducer = combineReducers({
   budget: createDetailResponseReducer<IBudget, Redux.IDetailResponseStore<IBudget>, Redux.Budget.IAction>({
     Response: ActionType.Budget.Response,
@@ -148,6 +252,7 @@ const rootReducer = combineReducers({
     Request: ActionType.Budget.Request
   }),
   subaccounts: subaccountsIndexedDetailsReducer,
+  subaccountsTable: subaccountsTableReducer,
   accounts: combineReducers({
     details: accountsIndexedDetailsReducer,
     deleting: createModelListActionReducer(ActionType.DeletingAccount, { referenceEntity: "account" }),

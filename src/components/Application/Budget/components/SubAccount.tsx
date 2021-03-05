@@ -19,7 +19,7 @@ const SubAccount = (): JSX.Element => {
         subState = state.budget.subaccounts[parseInt(subaccountId)];
       }
     }
-    return subState.subaccounts;
+    return subState.subaccounts.list;
   });
 
   useEffect(() => {

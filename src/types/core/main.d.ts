@@ -48,10 +48,7 @@ interface IBudget extends Model {
 }
 
 interface IAccount extends Model {
-  // TODO: Instead of allowing partial fields to be undefined on the
-  // model, maybe we should instead have a set of required fields and
-  // only create the account when all of those fields are present.
-  readonly account_number: string | null;
+  readonly account_number: string;
   readonly description: string | null;
   readonly created_by: ISimpleUser | null;
   readonly updated_by: ISimpleUser | null;
@@ -66,11 +63,8 @@ type Unit = 0 | 1 | 2 | 3 | 4 | 5;
 type ParentType = "subaccount" | "account";
 
 interface ISubAccount extends Model {
-  // TODO: Instead of allowing partial fields to be undefined on the
-  // model, maybe we should instead have a set of required fields and
-  // only create the sub account when all of those fields are present.
-  readonly name: string | null;
-  readonly line: string | null;
+  readonly name: string;
+  readonly line: string;
   readonly description: string | null;
   readonly created_by: ISimpleUser | null;
   readonly updated_by: ISimpleUser | null;
