@@ -1,10 +1,11 @@
 import { useCallback, useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { forEach, map, find, isNil, includes, filter } from "lodash";
 import { v4 as uuidv4 } from "uuid";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faArrowsAltV } from "@fortawesome/free-solid-svg-icons";
 
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -16,8 +17,7 @@ import {
   CellClassParams,
   RowNode,
   GridApi,
-  GridReadyEvent,
-  ColumnApi
+  GridReadyEvent
 } from "ag-grid-community";
 
 import { IconButton } from "components/control/buttons";
@@ -25,22 +25,26 @@ import { createAccount, updateAccount } from "services";
 import { handleRequestError } from "store/tasks";
 import { replaceInArray } from "util/arrays";
 
-import {
-  addBudgetAccountToStateAction,
-  updateBudgetAccountInStateAction,
-  setBudgetAccountsSearchAction,
-  selectBudgetAccountsAction,
-  deleteAccountAction
-} from "../actions";
+import { setBudgetAccountsSearchAction, selectBudgetAccountsAction, deleteAccountAction } from "../actions";
 import TableFooter from "./TableFooter";
 import TableHeader from "./TableHeader";
 import "./Table.scss";
 
 interface IRow {
-  id: number | string;
-  exists?: boolean;
+  id: number;
   account_number: string;
   description: string;
+}
+
+interface IPlaceholderRow {
+  id: string;
+  account_number: string;
+  description: string;
+  exists: boolean;
+}
+
+function isPlaceholder(row: IRow | IPlaceholderRow): row is IPlaceholderRow {
+  return (row as IPlaceholderRow).exists === false && typeof row.id === "string";
 }
 
 interface AccountsTableProps {
@@ -49,7 +53,7 @@ interface AccountsTableProps {
 
 const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
-  const [rowData, setRowData] = useState<IRow[]>([]);
+  const [rowData, setRowData] = useState<(IRow | IPlaceholderRow)[]>([]);
   const [columns, setColumns] = useState<ColDef[]>([]);
 
   const [selectedPlaceholderIds, setSelectedPlaceholderIds] = useState<string[]>([]);
@@ -65,6 +69,8 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
   const selected = useRef<number[]>(accounts.selected);
   const selectedPlaceholders = useRef<string[]>(selectedPlaceholderIds);
 
+  const history = useHistory();
+
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
     event.api.sizeColumnsToFit();
@@ -73,14 +79,37 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
   useEffect(() => {
     if (!isNil(gridApi)) {
       if (accounts.responseWasReceived === true) {
-        const tableData: IRow[] = [];
         if (accounts.data.length !== 0) {
+          const tableData: (IRow | IPlaceholderRow)[] = [];
+
+          // We cannot merely convert the accounts data to rows and set that
+          // as the row data because we have the placeholder cells to worry about.
+          forEach(rowData, (row: IRow | IPlaceholderRow) => {
+            if (isPlaceholder(row)) {
+              tableData.push(row);
+            } else {
+              // Only add the row back into the table data if it is also present
+              // in the updated set of accounts.  Otherwise, it should be removed.
+              const existing: IAccount | undefined = find(accounts.data, { id: row.id });
+              if (!isNil(existing)) {
+                tableData.push({
+                  account_number: existing.account_number,
+                  description: existing.description,
+                  id: existing.id
+                });
+              }
+            }
+          });
+          // Add the leftover accounts to the table that were not there before.
           forEach(accounts.data, (account: IAccount) => {
-            tableData.push({
-              account_number: account.account_number,
-              description: account.description,
-              id: account.id
-            });
+            const existing = find(tableData, { id: account.id });
+            if (isNil(existing)) {
+              tableData.push({
+                account_number: account.account_number,
+                description: account.description,
+                id: account.id
+              });
+            }
           });
           setRowData(tableData);
           gridApi.sizeColumnsToFit();
@@ -99,6 +128,12 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
     setColumns([
       {
         field: "select",
+        editable: false,
+        headerName: "",
+        width: 50
+      },
+      {
+        field: "expand",
         editable: false,
         headerName: "",
         width: 50
@@ -154,13 +189,13 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
         return (
           <Checkbox
             checked={
-              params.node.data.exists === false
+              isPlaceholder(params.node.data)
                 ? includes(selectedPlaceholders.current, params.node.data.id)
                 : includes(selected.current, params.node.data.id)
             }
             onChange={(e: CheckboxChangeEvent) => {
               if (e.target.checked) {
-                if (params.node.data.exists === false) {
+                if (isPlaceholder(params.node.data)) {
                   if (!includes(selectedPlaceholders.current, params.node.data.id)) {
                     setSelectedPlaceholderIds([...selectedPlaceholders.current, params.node.data.id]);
                     params.api.refreshCells({ force: true, rowNodes: [params.node] });
@@ -218,22 +253,30 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
             }}
           />
         );
+      } else if (params.colDef.field === "expand") {
+        if (!isPlaceholder(params.node.data)) {
+          return (
+            <IconButton
+              className={"dark"}
+              size={"small"}
+              icon={<FontAwesomeIcon icon={faArrowsAltV} />}
+              onClick={() => history.push(`/budgets/${budgetId}/accounts/${params.node.data.id}`)}
+            />
+          );
+        } else {
+          return <></>;
+        }
       } else if (params.colDef.field === "delete") {
         return (
           <IconButton
             className={"dark"}
-            size={"medium"}
+            size={"small"}
             icon={<FontAwesomeIcon icon={faTrash} />}
             onClick={() => {
               const rowNodes: IRow[] = [];
-              params.api.forEachNode((node: RowNode, index: number) => {
+              params.api.forEachNode((node: RowNode) => {
                 if (node.data.id !== params.node.data.id) {
-                  rowNodes.push({
-                    id: node.data.id,
-                    exists: node.data.exists,
-                    account_number: node.data.account_number,
-                    description: node.data.description
-                  });
+                  rowNodes.push({ ...node.data });
                 }
               });
               // It is annoying that we have to maintain 2 separate sources of
@@ -275,7 +318,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
           suppressMenu: true,
           suppressMenuHide: true,
           cellClass: (params: CellClassParams) => {
-            if (includes(["delete", "select"], params.colDef.field)) {
+            if (includes(["delete", "select", "expand"], params.colDef.field)) {
               return "action-cell";
             }
             return "";
@@ -294,11 +337,9 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
           cellRendererFramework: getCellFrameworkComponent()
         }}
         onCellEditingStopped={(event: CellEditingStoppedEvent) => {
-          // TODO: Is the better way to do this is to just update the account in
-          // the store and let the changes take affect?
           const field = event.column.getColId();
           if (event.node.data.exists === false) {
-            const existing: IRow | undefined = find(rowData, { id: event.node.data.id });
+            const existing: IRow | IPlaceholderRow | undefined = find(rowData, { id: event.node.data.id });
             if (isNil(existing)) {
               /* eslint-disable no-console */
               console.error(
@@ -311,10 +352,11 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
               // this.
               createAccount(budgetId, { [field]: event.newValue })
                 .then((account: IAccount) => {
-                  // TODO: Do we want to do this? Will this cause weird rendering
-                  // with AGGrid?
-                  dispatch(addBudgetAccountToStateAction(budgetId, account));
-                  const newRowData = replaceInArray<IRow>(
+                  // When the state is updated directly after an API request, via dispatching an action,
+                  // it causes unnecessary rerendering of AGGridReact.  It is better to allow AGGridReact
+                  // to handle the state and only use the raw data to populate the table on it's first
+                  // render.  We should investigate if there are smarter ways to do this with AGGridReact.
+                  const newRowData = replaceInArray<IRow | IPlaceholderRow>(
                     rowData,
                     { id: event.node.data.id },
                     { ...existing, id: account.id }
@@ -326,13 +368,13 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
                 });
             }
           } else {
-            updateAccount(event.data.id, { [field]: event.newValue })
-              .then((account: IAccount) => {
-                dispatch(updateBudgetAccountInStateAction(budgetId, account));
-              })
-              .catch((e: Error) => {
-                handleRequestError(e, "There was an error updating the account.");
-              });
+            // When the state is updated directly after an API request, via dispatching an action,
+            // it causes unnecessary rerendering of AGGridReact.  It is better to allow AGGridReact
+            // to handle the state and only use the raw data to populate the table on it's first
+            // render.  We should investigate if there are smarter ways to do this with AGGridReact.
+            updateAccount(event.data.id, { [field]: event.newValue }).catch((e: Error) => {
+              handleRequestError(e, "There was an error updating the account.");
+            });
           }
         }}
       />

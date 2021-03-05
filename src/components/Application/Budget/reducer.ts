@@ -91,21 +91,19 @@ const accountsIndexedDetailsReducer: Reducer<
   action: Redux.Budget.IAction<any>
 ): Redux.IIndexedStore<Redux.Budget.IAccountStore> => {
   let newState = { ...state };
-  if (!isNil(action.accountId)) {
-    if (action.type === ActionType.Account.RemoveFromState && !isNil(newState[action.accountId])) {
-      const key = action.accountId;
-      const { [key]: value, ...withoutAccount } = newState;
-      newState = { ...withoutAccount };
-    } else {
-      if (isNil(newState[action.accountId])) {
-        newState = { ...newState, [action.accountId]: initialAccountState };
-      }
-      const accountReducer = createAccountIndexedReducer(action.accountId);
-      newState = {
-        ...newState,
-        [action.accountId]: accountReducer(newState[action.accountId], action)
-      };
+  if (!isNil(action.payload) && action.type === ActionType.AccountRemoved && !isNil(newState[action.payload])) {
+    const key = action.payload;
+    const { [key]: value, ...withoutAccount } = newState;
+    newState = { ...withoutAccount };
+  } else if (!isNil(action.accountId)) {
+    if (isNil(newState[action.accountId])) {
+      newState = { ...newState, [action.accountId]: initialAccountState };
     }
+    const accountReducer = createAccountIndexedReducer(action.accountId);
+    newState = {
+      ...newState,
+      [action.accountId]: accountReducer(newState[action.accountId], action)
+    };
   }
   return newState;
 };

@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
 import { isNil } from "lodash";
 import { ActionType } from "./actions";
-import { getBudgetAccountsTask, deleteAccountTask } from "./tasks";
+import { getBudgetAccountsTask, deleteAccountTask, removeAccountFromStateTask } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
   let lastTasks;
@@ -25,7 +25,12 @@ function* watchForDeleteAccountAction(): SagaIterator {
   yield takeEvery(ActionType.DeleteAccount, deleteAccountTask);
 }
 
+function* watchForAccountRemovedAction(): SagaIterator {
+  yield takeEvery(ActionType.AccountRemoved, removeAccountFromStateTask);
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForTriggerBudgetAccountsSaga);
   yield spawn(watchForDeleteAccountAction);
+  yield spawn(watchForAccountRemovedAction);
 }

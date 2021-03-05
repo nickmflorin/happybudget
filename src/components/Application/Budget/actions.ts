@@ -98,6 +98,9 @@ export const responseBudgetAccountsAction = simpleBudgetAction<Http.IListRespons
 );
 export const selectBudgetAccountsAction = simpleBudgetAction<number[]>(ActionType.Accounts.Select);
 export const setBudgetAccountsSearchAction = simpleBudgetAction<string>(ActionType.Accounts.SetSearch);
+// NOTE: These 3 actions are not currently used.  When the state is updated directly after an API request,
+// it causes unnecessary rerendering of AGGridReact.  It is better to allow AGGridReact to handle the state
+// and only use the raw data to populate the table on it's first render.
 export const updateBudgetAccountInStateAction = simpleBudgetAction<IAccount>(ActionType.Accounts.UpdateInState);
 export const addBudgetAccountToStateAction = simpleBudgetAction<IAccount>(ActionType.Accounts.AddToState);
 export const removeBudgetAccountFromStateAction = simpleBudgetAction<number>(ActionType.Accounts.RemoveFromState);
