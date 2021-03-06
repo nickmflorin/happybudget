@@ -1,6 +1,6 @@
 import { Reducer, combineReducers } from "redux";
 import { includes, filter } from "lodash";
-import { createListResponseReducer } from "store/util";
+import { createListResponseReducer } from "store/reducerFactories";
 import { ActionType, ActionDomains } from "./actions";
 
 const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>> = combineReducers({

@@ -26,7 +26,7 @@ import {
   setSubAccountsSearchAction,
   removeSubAccountsRowAction,
   updateSubAccountsRowAction,
-  addAccountSubAccountsRowAction,
+  addSubAccountsRowAction,
   selectSubAccountsRowAction,
   deselectSubAccountsRowAction
 } from "../../actions";
@@ -62,8 +62,6 @@ const SubAccountsTable = ({ budgetId, pointer }: SubAccountsTableProps): JSX.Ele
     }
   });
 
-  const rowData = useSelector((state: Redux.IApplicationStore) => state.budget.subaccountsTable);
-
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
   }, []);
@@ -72,7 +70,7 @@ const SubAccountsTable = ({ budgetId, pointer }: SubAccountsTableProps): JSX.Ele
     if (!isNil(gridApi)) {
       gridApi.sizeColumnsToFit();
     }
-  }, [rowData, gridApi]);
+  }, [subAccountsStore.table, gridApi]);
 
   useEffect(() => {
     setColumns([
@@ -153,7 +151,7 @@ const SubAccountsTable = ({ budgetId, pointer }: SubAccountsTableProps): JSX.Ele
     // manually.
     if (!isNil(gridApi)) {
       gridApi.forEachNode((node: RowNode) => {
-        const existing = find(rowData, { id: node.data.id });
+        const existing = find(subAccountsStore.table, { id: node.data.id });
         if (!isNil(existing)) {
           if (existing.selected !== node.data.selected) {
             gridApi.refreshCells({ force: true, rowNodes: [node] });
@@ -161,9 +159,9 @@ const SubAccountsTable = ({ budgetId, pointer }: SubAccountsTableProps): JSX.Ele
         }
       });
     }
-  }, [rowData, gridApi]);
+  }, [subAccountsStore.table, gridApi]);
 
-  const getCellFrameworkComponent = useCallback(() => {
+  const getCellFrameworkComponent = () => {
     const CellRendererFramework = (params: ICellRendererParams): JSX.Element => {
       if (params.colDef.field === "select") {
         return (
@@ -205,7 +203,7 @@ const SubAccountsTable = ({ budgetId, pointer }: SubAccountsTableProps): JSX.Ele
       }
     };
     return CellRendererFramework;
-  }, [subAccountsStore.list.selected]);
+  };
 
   return (
     <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
@@ -233,7 +231,7 @@ const SubAccountsTable = ({ budgetId, pointer }: SubAccountsTableProps): JSX.Ele
         }))}
         rowDragManaged={true}
         allowContextMenuWithControlKey={true}
-        rowData={rowData}
+        rowData={subAccountsStore.table}
         getRowNodeId={(data: any) => data.id}
         immutableData={true}
         suppressRowClickSelection={true}
@@ -250,7 +248,7 @@ const SubAccountsTable = ({ budgetId, pointer }: SubAccountsTableProps): JSX.Ele
           dispatch(updateSubAccountsRowAction(event.data.id, budgetId, { [field]: event.newValue }, pointer));
         }}
       />
-      <TableFooter text={"Grand Total"} onNew={() => dispatch(addAccountSubAccountsRowAction())} />
+      <TableFooter text={"Grand Total"} onNew={() => dispatch(addSubAccountsRowAction(pointer))} />
     </div>
   );
 };

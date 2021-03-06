@@ -5,17 +5,13 @@ import { ActionType } from "./actions";
 import {
   getAccountsTask,
   getAccountSubAccountsTask,
-  deleteAccountTask,
-  removeAccountFromStateTask,
-  updateAccountTask,
-  updateAccountInStateTask,
-  createAccountTask,
-  addAccountToStateTask,
-  removeSubAccountFromStateTask,
-  updateSubAccountInStateTask,
-  addSubAccountToStateTask,
+  getSubAccountSubAccountsTask,
+  handleAccountRowUpdateTask,
   handleAccountSubAccountRowUpdateTask,
-  handleAccountSubAccountRowRemovalTask
+  handleAccountSubAccountRowRemovalTask,
+  handleAccountRowRemovalTask,
+  handleSubAccountSubAccountRowUpdateTask,
+  handleSubAccountSubAccountRowRemovalTask
 } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
@@ -44,90 +40,63 @@ function* watchForTriggerAccountSubAccountsSaga(): SagaIterator {
   }
 }
 
-// TODO: Figure out how to prevent this from firing twice if we are attempting
-// to delete the same account multiple times.  We don't want to prevent multiple
-// actions from going through, if there are multiple budgets being deleted
-// however.
-function* watchForDeleteAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.DeleteAccount, deleteAccountTask);
+function* watchForTriggerSubAccountSubAccountsSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.SubAccount.SubAccounts.Request);
+    if (!isNil(action.subaccountId)) {
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(getSubAccountSubAccountsTask, action);
+    }
+  }
 }
 
-// TODO: Figure out how to prevent this from firing twice if we are attempting
-// to update the same account multiple times.  We don't want to prevent multiple
-// actions from going through, if there are multiple budgets being updated
-// however.
-function* watchForUpdateAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.UpdateAccount, updateAccountTask);
+function* watchForAccountRemoveRowSaga(): SagaIterator {
+  yield takeEvery(ActionType.AccountsTable.RemoveRow, handleAccountRowRemovalTask);
 }
 
-// TODO: Figure out how to prevent this from firing twice if we are attempting
-// to create the same account multiple times.  We don't want to prevent multiple
-// actions from going through, if there are multiple budgets being created
-// however.
-function* watchForCreateAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.CreateAccount, createAccountTask);
-}
-
-function* watchForAccountRemovedSaga(): SagaIterator {
-  yield takeEvery(ActionType.AccountRemoved, removeAccountFromStateTask);
-}
-
-function* watchForAccountChangedSaga(): SagaIterator {
-  yield takeEvery(ActionType.AccountChanged, updateAccountInStateTask);
-}
-
-function* watchForAccountAddedSaga(): SagaIterator {
-  yield takeEvery(ActionType.AccountAdded, addAccountToStateTask);
-}
-
-// TODO: Figure out how to prevent this from firing twice if we are attempting
-// to delete the same account multiple times.  We don't want to prevent multiple
-// actions from going through, if there are multiple budgets being deleted
-// however.
-// function* watchForDeleteSubAccountSaga(): SagaIterator {
-//   yield takeEvery(ActionType.DeleteSubAccount, deleteSubAccountTask);
-// }
-
-// TODO: Figure out how to prevent this from firing twice if we are attempting
-// to update the same account multiple times.  We don't want to prevent multiple
-// actions from going through, if there are multiple budgets being updated
-// however.
-// function* watchForUpdateSubAccountSaga(): SagaIterator {
-//   yield takeEvery(ActionType.UpdateSubAccount, updateSubAccountTask);
-// }
-
-function* watchForSubAccountRemovedSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccountRemoved, removeSubAccountFromStateTask);
-}
-
-function* watchForSubAccountChangedSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccountChanged, updateSubAccountInStateTask);
-}
-
-function* watchForSubAccountAddedSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccountAdded, addSubAccountToStateTask);
-}
-
-function* watchForAccountSubAccountUpdateRowSaga(): SagaIterator {
-  yield takeEvery(ActionType.Account.SubAccountsTable.UpdateRow, handleAccountSubAccountRowUpdateTask);
+function* watchForSubAccountSubAccountRemoveRowSaga(): SagaIterator {
+  yield takeEvery(ActionType.SubAccount.SubAccountsTable.RemoveRow, handleSubAccountSubAccountRowRemovalTask);
 }
 
 function* watchForAccountSubAccountRemoveRowSaga(): SagaIterator {
   yield takeEvery(ActionType.Account.SubAccountsTable.RemoveRow, handleAccountSubAccountRowRemovalTask);
 }
 
-export default function* rootSaga(): SagaIterator {
+function* watchForAccountUpdateRowSaga(): SagaIterator {
+  yield takeEvery(ActionType.AccountsTable.UpdateRow, handleAccountRowUpdateTask);
+}
+
+function* watchForAccountSubAccountUpdateRowSaga(): SagaIterator {
+  yield takeEvery(ActionType.Account.SubAccountsTable.UpdateRow, handleAccountSubAccountRowUpdateTask);
+}
+
+function* watchForSubAccountSubAccountUpdateRowSaga(): SagaIterator {
+  yield takeEvery(ActionType.SubAccount.SubAccountsTable.UpdateRow, handleSubAccountSubAccountRowUpdateTask);
+}
+
+function* accountsSaga(): SagaIterator {
   yield spawn(watchForTriggerBudgetAccountsSaga);
+  yield spawn(watchForAccountRemoveRowSaga);
+  yield spawn(watchForAccountUpdateRowSaga);
+}
+
+function* accountSubAccountsSaga(): SagaIterator {
   yield spawn(watchForTriggerAccountSubAccountsSaga);
-  yield spawn(watchForDeleteAccountSaga);
-  yield spawn(watchForAccountRemovedSaga);
-  yield spawn(watchForUpdateAccountSaga);
-  yield spawn(watchForAccountChangedSaga);
-  yield spawn(watchForCreateAccountSaga);
-  yield spawn(watchForAccountAddedSaga);
-  yield spawn(watchForSubAccountRemovedSaga);
-  yield spawn(watchForSubAccountChangedSaga);
-  yield spawn(watchForSubAccountAddedSaga);
   yield spawn(watchForAccountSubAccountUpdateRowSaga);
   yield spawn(watchForAccountSubAccountRemoveRowSaga);
+}
+
+function* subAccountSubAccountsSaga(): SagaIterator {
+  yield spawn(watchForTriggerSubAccountSubAccountsSaga);
+  yield spawn(watchForSubAccountSubAccountUpdateRowSaga);
+  yield spawn(watchForSubAccountSubAccountRemoveRowSaga);
+}
+
+export default function* rootSaga(): SagaIterator {
+  yield spawn(accountsSaga);
+  yield spawn(accountSubAccountsSaga);
+  yield spawn(subAccountSubAccountsSaga);
 }

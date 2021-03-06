@@ -115,6 +115,7 @@ namespace Redux {
       updating: IListStore<number>;
       creating: boolean;
       list: IListResponseStore<ISubAccount>;
+      table: IListStore<ISubAccountRow>;
     }
 
     interface ISubAccountStore {
@@ -129,10 +130,19 @@ namespace Redux {
 
     interface IAccountsStore {
       list: IListResponseStore<IAccount>;
+      table: IListStore<IAccountRow>;
       details: IIndexedStore<IAccountStore>;
       deleting: IListStore<number>;
       updating: IListStore<number>;
       creating: boolean;
+    }
+
+    interface IAccountRow {
+      id: number | string;
+      account_number: string | null;
+      description: string | null;
+      selected: boolean;
+      isPlaceholder: boolean;
     }
 
     interface ISubAccountRow {
@@ -152,7 +162,6 @@ namespace Redux {
       budget: IDetailResponseStore<IBudget>;
       accounts: IAccountsStore;
       subaccounts: IIndexedStore<ISubAccountStore>;
-      subaccountsTable: ISubAccountRow[];
     }
   }
 }

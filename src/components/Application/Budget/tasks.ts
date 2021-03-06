@@ -4,10 +4,12 @@ import { call, put, select } from "redux-saga/effects";
 import {
   getAccounts,
   getAccountSubAccounts,
+  getSubAccountSubAccounts,
   deleteAccount,
   updateAccount,
   createAccount,
   createAccountSubAccount,
+  createSubAccountSubAccount,
   updateSubAccount,
   deleteSubAccount
 } from "services";
@@ -15,27 +17,51 @@ import { handleRequestError } from "store/tasks";
 import {
   loadingAccountsAction,
   loadingAccountSubAccountsAction,
+  loadingSubAccountSubAccountsAction,
   responseAccountsAction,
   responseAccountSubAccountsAction,
-  removeAccountFromStateAction,
+  responseSubAccountSubAccountsAction,
   deletingAccountAction,
-  updatingAccountAction,
-  creatingAccountAction,
-  accountRemovedAction,
-  accountChangedAction,
-  accountAddedAction,
-  updateAccountInStateAction,
-  addAccountToStateAction,
   deletingAccountSubAccountAction,
+  deletingSubAccountSubAccountAction,
+  creatingAccountAction,
   creatingAccountSubAccountAction,
+  creatingSubAccountSubAccountAction,
+  updatingAccountAction,
   updatingAccountSubAccountAction,
-  subaccountRemovedAction,
-  subaccountChangedAction,
-  addSubAccountSubAccountToStateAction,
+  updatingSubAccountSubAccountAction,
+  setAccountsDataAction,
   setAccountSubAccountsDataAction,
-  updateAccountSubAccountsRowInStateOnlyAction
+  setSubAccountSubAccountsDataAction,
+  updateAccountsRowInStateOnlyAction,
+  updateAccountSubAccountsRowInStateOnlyAction,
+  updateSubAccountSubAccountsRowInStateOnlyAction
 } from "./actions";
-import { subAccountPayloadFromRow, subAccountRowHasRequiredfields } from "./util";
+import { initialAccountState, initialSubAccountState } from "./initialState";
+import {
+  subAccountPayloadFromRow,
+  subAccountRowHasRequiredfields,
+  accountPayloadFromRow,
+  accountRowHasRequiredfields
+} from "./util";
+
+export function* handleAccountRowRemovalTask(action: Redux.Budget.IAction<Redux.Budget.IAccountRow>): SagaIterator {
+  if (!isNil(action.payload)) {
+    // NOTE: We cannot find the existing row from the table in state because the
+    // row was already removed from the table rows via the reducer synchronously.
+    if (action.payload.isPlaceholder === false) {
+      yield put(deletingAccountAction({ id: action.payload.id as number, value: true }));
+      try {
+        yield call(deleteAccount, action.payload.id as number);
+      } catch (e) {
+        // TODO: Should we put the row back in if there was an error?
+        handleRequestError(e, "There was an error deleting the account.");
+      } finally {
+        yield put(deletingAccountAction({ id: action.payload.id as number, value: false }));
+      }
+    }
+  }
+}
 
 export function* handleAccountSubAccountRowRemovalTask(
   action: Redux.Budget.IAction<Redux.Budget.ISubAccountRow>
@@ -57,6 +83,96 @@ export function* handleAccountSubAccountRowRemovalTask(
   }
 }
 
+export function* handleSubAccountSubAccountRowRemovalTask(
+  action: Redux.Budget.IAction<Redux.Budget.ISubAccountRow>
+): SagaIterator {
+  if (!isNil(action.payload) && !isNil(action.subaccountId)) {
+    // NOTE: We cannot find the existing row from the table in state because the
+    // row was already removed from the table rows via the reducer synchronously.
+    if (action.payload.isPlaceholder === false) {
+      yield put(
+        deletingSubAccountSubAccountAction(action.subaccountId, { id: action.payload.id as number, value: true })
+      );
+      try {
+        yield call(deleteSubAccount, action.payload.id as number);
+      } catch (e) {
+        // TODO: Should we put the row back in if there was an error?
+        handleRequestError(e, "There was an error deleting the sub account.");
+      } finally {
+        yield put(
+          deletingSubAccountSubAccountAction(action.subaccountId, { id: action.payload.id as number, value: false })
+        );
+      }
+    }
+  }
+}
+
+// TODO: Do we need both the ID and the payload here?  Can the ID from the payload
+// be used?
+export function* handleAccountRowUpdateTask(
+  action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.IAccountRow> }>
+): SagaIterator {
+  if (
+    !isNil(action.payload) &&
+    !isNil(action.payload.id) &&
+    !isNil(action.payload.payload) &&
+    !isNil(action.budgetId)
+  ) {
+    const table = yield select((state: Redux.IApplicationStore) => state.budget.accounts.table);
+
+    // Here, the existing row will have already been updated by the reducer because
+    // that runs synchronously.
+    const existing: Redux.Budget.IAccountRow = find(table, { id: action.payload.id });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State!:  Inconsistent state noticed when updating account in state...
+        the account with ID ${action.payload.id} does not exist in state when it is expected to.`
+      );
+    } else {
+      const payload = accountPayloadFromRow(existing);
+      if (existing.isPlaceholder === true) {
+        // Wait until all of the required fields are present before we create
+        // the SubAccount in the backend and remove the placeholder designation
+        // of the row in the frontend.
+        if (accountRowHasRequiredfields(existing)) {
+          console.log(payload);
+          yield put(creatingAccountAction(true));
+          try {
+            const response = yield call(createAccount, action.budgetId, payload);
+            // NOTE: We have to call a specific action that will only trigger the state update
+            // in the reducer, not the saga - this is because the saga will wind up triggering
+            // this task and we need to prevent the recursion.
+            yield put(
+              updateAccountsRowInStateOnlyAction({
+                id: existing.id,
+                payload: { id: response.id, isPlaceholder: false }
+              })
+            );
+          } catch (e) {
+            // TODO: Should we revert the changes if there was an error?
+            handleRequestError(e, "There was an error updating the account.");
+          } finally {
+            yield put(creatingAccountAction(false));
+          }
+        }
+      } else {
+        yield put(updatingAccountAction({ id: existing.id as number, value: true }));
+        try {
+          // The reducer has already handled updating the sub account in the state
+          // synchronously before the time that this API request is made.
+          yield call(updateAccount, existing.id as number, payload);
+        } catch (e) {
+          // TODO: Should we revert the changes if there was an error?
+          handleRequestError(e, "There was an error updating the account.");
+        } finally {
+          yield put(updatingAccountAction({ id: existing.id as number, value: false }));
+        }
+      }
+    }
+  }
+}
+
 // TODO: Do we need both the ID and the payload here?  Can the ID from the payload
 // be used?
 export function* handleAccountSubAccountRowUpdateTask(
@@ -69,7 +185,16 @@ export function* handleAccountSubAccountRowUpdateTask(
     !isNil(action.payload.id) &&
     !isNil(action.payload.payload)
   ) {
-    const table = yield select((state: Redux.IApplicationStore) => state.budget.subaccountsTable);
+    const accountId = action.accountId;
+
+    const table = yield select((state: Redux.IApplicationStore) => {
+      let subState: Redux.Budget.IAccountStore = initialAccountState;
+      if (!isNil(state.budget.accounts.details[accountId])) {
+        subState = state.budget.accounts.details[accountId];
+      }
+      return subState.subaccounts.table;
+    });
+
     // Here, the existing row will have already been updated by the reducer because
     // that runs synchronously.
     const existing: Redux.Budget.ISubAccountRow = find(table, { id: action.payload.id });
@@ -80,12 +205,12 @@ export function* handleAccountSubAccountRowUpdateTask(
         the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
+      const payload = subAccountPayloadFromRow(existing);
       if (existing.isPlaceholder === true) {
         // Wait until all of the required fields are present before we create
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
         if (subAccountRowHasRequiredfields(existing)) {
-          const payload = subAccountPayloadFromRow(existing);
           console.log(payload);
           yield put(creatingAccountSubAccountAction(action.accountId, true));
           try {
@@ -94,7 +219,7 @@ export function* handleAccountSubAccountRowUpdateTask(
             // in the reducer, not the saga - this is because the saga will wind up triggering
             // this task and we need to prevent the recursion.
             yield put(
-              updateAccountSubAccountsRowInStateOnlyAction(action.accountId, action.budgetId, {
+              updateAccountSubAccountsRowInStateOnlyAction(action.accountId, {
                 id: existing.id,
                 payload: { id: response.id, isPlaceholder: false }
               })
@@ -107,7 +232,6 @@ export function* handleAccountSubAccountRowUpdateTask(
           }
         }
       } else {
-        const payload = subAccountPayloadFromRow(existing);
         yield put(updatingAccountSubAccountAction(action.accountId, { id: existing.id as number, value: true }));
         try {
           // The reducer has already handled updating the sub account in the state
@@ -124,33 +248,114 @@ export function* handleAccountSubAccountRowUpdateTask(
   }
 }
 
-// TODO: Build in Pagination with AGGrid.
-export function* getAccountsTask(action: Redux.Budget.IAction<any>): SagaIterator {
+// TODO: Do we need both the ID and the payload here?  Can the ID from the payload
+// be used?
+export function* handleSubAccountSubAccountRowUpdateTask(
+  action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.ISubAccountRow> }>
+): SagaIterator {
+  if (
+    !isNil(action.subaccountId) &&
+    !isNil(action.payload) &&
+    !isNil(action.payload.id) &&
+    !isNil(action.payload.payload)
+  ) {
+    const subaccountId = action.subaccountId;
+
+    const table = yield select((state: Redux.IApplicationStore) => {
+      let subState: Redux.Budget.ISubAccountStore = initialSubAccountState;
+      if (!isNil(state.budget.subaccounts[subaccountId])) {
+        subState = state.budget.subaccounts[subaccountId];
+      }
+      return subState.subaccounts.table;
+    });
+
+    // Here, the existing row will have already been updated by the reducer because
+    // that runs synchronously.
+    const existing: Redux.Budget.ISubAccountRow = find(table, { id: action.payload.id });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State!:  Inconsistent state noticed when updating sub account in state...
+        the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
+      );
+    } else {
+      if (existing.isPlaceholder === true) {
+        // Wait until all of the required fields are present before we create
+        // the SubAccount in the backend and remove the placeholder designation
+        // of the row in the frontend.
+        if (subAccountRowHasRequiredfields(existing)) {
+          const payload = subAccountPayloadFromRow(existing);
+          yield put(creatingSubAccountSubAccountAction(action.subaccountId, true));
+          try {
+            const response = yield call(createSubAccountSubAccount, action.subaccountId, payload);
+            // NOTE: We have to call a specific action that will only trigger the state update
+            // in the reducer, not the saga - this is because the saga will wind up triggering
+            // this task and we need to prevent the recursion.
+            yield put(
+              updateSubAccountSubAccountsRowInStateOnlyAction(action.subaccountId, {
+                id: existing.id,
+                payload: { id: response.id, isPlaceholder: false }
+              })
+            );
+          } catch (e) {
+            // TODO: Should we revert the changes if there was an error?
+            handleRequestError(e, "There was an error updating the sub account.");
+          } finally {
+            yield put(creatingSubAccountSubAccountAction(action.subaccountId, false));
+          }
+        }
+      } else {
+        const payload = subAccountPayloadFromRow(existing);
+        yield put(updatingSubAccountSubAccountAction(action.subaccountId, { id: existing.id as number, value: true }));
+        try {
+          // The reducer has already handled updating the sub account in the state
+          // synchronously before the time that this API request is made.
+          yield call(updateSubAccount, existing.id as number, payload);
+        } catch (e) {
+          // TODO: Should we revert the changes if there was an error?
+          handleRequestError(e, "There was an error updating the sub account.");
+        } finally {
+          yield put(
+            updatingSubAccountSubAccountAction(action.subaccountId, { id: existing.id as number, value: false })
+          );
+        }
+      }
+    }
+  }
+}
+
+export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterator {
   if (!isNil(action.budgetId)) {
     yield put(loadingAccountsAction(true));
     try {
-      // TODO: Build in Pagination with AGGrid.
       const response = yield call(getAccounts, action.budgetId, { no_pagination: true });
       yield put(responseAccountsAction(response));
+      yield put(
+        setAccountsDataAction(
+          map(response.data, (account: IAccount) => {
+            return { ...account, selected: false, isPlaceholder: false };
+          })
+        )
+      );
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's accounts.");
       yield put(responseAccountsAction({ count: 0, data: [] }, { error: e }));
+      yield put(setAccountsDataAction([]));
     } finally {
       yield put(loadingAccountsAction(false));
     }
   }
 }
 
-// TODO: Build in Pagination with AGGrid.
-export function* getAccountSubAccountsTask(action: Redux.Budget.IAction<any>): SagaIterator {
+export function* getAccountSubAccountsTask(action: Redux.Budget.IAction<null>): SagaIterator {
   if (!isNil(action.budgetId) && !isNil(action.accountId)) {
     yield put(loadingAccountSubAccountsAction(action.accountId, true));
     try {
-      // TODO: Build in Pagination with AGGrid.
       const response = yield call(getAccountSubAccounts, action.accountId, action.budgetId, { no_pagination: true });
       yield put(responseAccountSubAccountsAction(action.accountId, response));
       yield put(
         setAccountSubAccountsDataAction(
+          action.accountId,
           map(response.data, (subaccount: ISubAccount) => {
             return { ...subaccount, selected: false, isPlaceholder: false };
           })
@@ -159,140 +364,61 @@ export function* getAccountSubAccountsTask(action: Redux.Budget.IAction<any>): S
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account's sub accounts.");
       yield put(responseAccountSubAccountsAction(action.accountId, { count: 0, data: [] }, { error: e }));
+      yield put(setAccountSubAccountsDataAction(action.accountId, []));
     } finally {
       yield put(loadingAccountSubAccountsAction(action.accountId, false));
     }
   }
 }
 
-export function* removeAccountFromStateTask(action: Redux.Budget.IAction<number>): SagaIterator {
-  if (!isNil(action.payload)) {
-    // NOTE: The reducer handles the removal of the account from the details state if it exists.
-    const accounts = yield select((state: Redux.IApplicationStore) => state.budget.accounts.list);
-    const existing = find(accounts, { id: action.payload });
-    if (!isNil(existing)) {
-      yield put(removeAccountFromStateAction(action.payload));
-    }
-  }
-}
-
-export function* updateAccountInStateTask(action: Redux.Budget.IAction<IAccount>): SagaIterator {
-  if (!isNil(action.payload)) {
-    // NOTE: The reducer handles the updating of the account from the details state if it exists.
-    const accounts = yield select((state: Redux.IApplicationStore) => state.budget.accounts.list);
-    const existing = find(accounts, { id: action.payload });
-    if (!isNil(existing)) {
-      yield put(updateAccountInStateAction(action.payload));
-    }
-  }
-}
-
-export function* addAccountToStateTask(action: Redux.Budget.IAction<IAccount>): SagaIterator {
-  // NOTE: Currently, there is no action to add the account to the set of account
-  // details - but we might want to incorporate that down the line.
-  if (!isNil(action.payload)) {
-    yield put(addAccountToStateAction(action.payload));
-  }
-}
-
-export function* deleteAccountTask(action: Redux.Budget.IAction<number>): SagaIterator {
-  if (!isNil(action.payload)) {
-    yield put(deletingAccountAction({ id: action.payload, value: true }));
+export function* getSubAccountSubAccountsTask(action: Redux.Budget.IAction<null>): SagaIterator {
+  if (!isNil(action.subaccountId)) {
+    yield put(loadingSubAccountSubAccountsAction(action.subaccountId, true));
     try {
-      yield call(deleteAccount, action.payload);
-      yield put(accountRemovedAction(action.payload));
+      const response = yield call(getSubAccountSubAccounts, action.subaccountId, { no_pagination: true });
+      yield put(responseSubAccountSubAccountsAction(action.subaccountId, response));
+      yield put(
+        setSubAccountSubAccountsDataAction(
+          action.subaccountId,
+          map(response.data, (subaccount: ISubAccount) => {
+            return { ...subaccount, selected: false, isPlaceholder: false };
+          })
+        )
+      );
     } catch (e) {
-      handleRequestError(e, "There was an error deleting the account.");
+      handleRequestError(e, "There was an error retrieving the subaccount's sub accounts.");
+      yield put(responseSubAccountSubAccountsAction(action.subaccountId, { count: 0, data: [] }, { error: e }));
+      yield put(setSubAccountSubAccountsDataAction(action.subaccountId, []));
     } finally {
-      yield put(deletingAccountAction({ id: action.payload, value: false }));
+      yield put(loadingSubAccountSubAccountsAction(action.subaccountId, false));
     }
   }
 }
 
-export function* updateAccountTask(action: Redux.Budget.IAction<Partial<Http.IAccountPayload>>): SagaIterator {
-  if (!isNil(action.accountId) && !isNil(action.payload)) {
-    yield put(updatingAccountAction({ id: action.accountId, value: true }));
-    try {
-      const response: IAccount = yield call(updateAccount, action.accountId, action.payload);
-      yield put(accountChangedAction(response));
-    } catch (e) {
-      handleRequestError(e, "There was an error updating the account.");
-    } finally {
-      yield put(updatingAccountAction({ id: action.accountId, value: false }));
-    }
-  }
-}
-
-export function* createAccountTask(action: Redux.Budget.IAction<Http.IAccountPayload>): SagaIterator {
-  if (!isNil(action.budgetId) && !isNil(action.payload)) {
-    yield put(creatingAccountAction(true));
-    try {
-      const response: IAccount = yield call(createAccount, action.budgetId, action.payload);
-      yield put(accountAddedAction(response));
-    } catch (e) {
-      handleRequestError(e, "There was an error creating the account.");
-    } finally {
-      yield put(creatingAccountAction(false));
-    }
-  }
-}
-
-export function* removeSubAccountFromStateTask(action: Redux.Budget.IAction<number>): SagaIterator {
-  if (!isNil(action.payload)) {
-    // NOTE: The reducer handles the removal of the account from the details state if it exists.
-    const accounts = yield select((state: Redux.IApplicationStore) => state.budget.accounts.list);
-    const existing = find(accounts, { id: action.payload });
-    if (!isNil(existing)) {
-      yield put(removeAccountFromStateAction(action.payload));
-    }
-  }
-}
-
-export function* updateSubAccountInStateTask(action: Redux.Budget.IAction<IAccount>): SagaIterator {
-  if (!isNil(action.payload)) {
-    // NOTE: The reducer handles the updating of the account from the details state if it exists.
-    const accounts = yield select((state: Redux.IApplicationStore) => state.budget.accounts.list);
-    const existing = find(accounts, { id: action.payload });
-    if (!isNil(existing)) {
-      yield put(updateAccountInStateAction(action.payload));
-    }
-  }
-}
-
-export function* addSubAccountToStateTask(action: Redux.Budget.IAction<ISubAccount>): SagaIterator {
-  // NOTE: Currently, there is no action to add the account to the set of account
-  // details - but we might want to incorporate that down the line.
-  // We need to figure out what the subaccountID is and if we are adding the sub
-  // account to an account or the sub account.
-  // if (!isNil(action.payload)) {
-  //   yield put(addSubAccountSubAccountToStateAction(action.payload));
-  // }
-}
-
-// export function* deleteSubAccountTask(action: Redux.Budget.IAction<number>): SagaIterator {
+// export function* deleteAccountTask(action: Redux.Budget.IAction<number>): SagaIterator {
 //   if (!isNil(action.payload)) {
-//     yield put(deletingSubAccountAction({ id: action.payload, value: true }));
+//     yield put(deletingAccountAction({ id: action.payload, value: true }));
 //     try {
-//       yield call(deleteSubAccount, action.payload);
-//       yield put(subaccountRemovedAction(action.payload));
+//       yield call(deleteAccount, action.payload);
+//       yield put(accountRemovedAction(action.payload));
 //     } catch (e) {
-//       handleRequestError(e, "There was an error deleting the sub account.");
+//       handleRequestError(e, "There was an error deleting the account.");
 //     } finally {
-//       yield put(deletingSubAccountAction({ id: action.payload, value: false }));
+//       yield put(deletingAccountAction({ id: action.payload, value: false }));
 //     }
 //   }
 // }
 
-// export function* updateSubAccountTask(action: Redux.Budget.IAction<Partial<Http.ISubAccountPayload>>): SagaIterator {
-//   if (!isNil(action.subaccountId) && !isNil(action.payload)) {
-//     yield put(updatingSubAccountAction({ id: action.subaccountId, value: true }));
+// export function* updateAccountTask(action: Redux.Budget.IAction<Partial<Http.IAccountPayload>>): SagaIterator {
+//   if (!isNil(action.accountId) && !isNil(action.payload)) {
+//     yield put(updatingAccountAction({ id: action.accountId, value: true }));
 //     try {
-//       const response: ISubAccount = yield call(updateSubAccount, action.subaccountId, action.payload);
-//       yield put(subaccountChangedAction(response));
+//       const response: IAccount = yield call(updateAccount, action.accountId, action.payload);
+//       yield put(accountChangedAction(response));
 //     } catch (e) {
-//       handleRequestError(e, "There was an error updating the sub account.");
+//       handleRequestError(e, "There was an error updating the account.");
 //     } finally {
-//       yield put(updatingSubAccountAction({ id: action.subaccountId, value: false }));
+//       yield put(updatingAccountAction({ id: action.accountId, value: false }));
 //     }
 //   }
 // }
