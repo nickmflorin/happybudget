@@ -1,12 +1,5 @@
 import { createAction } from "store/actions";
 
-export type Pointer = { accountId: number; subaccountId?: undefined } | { accountId?: undefined; subaccountId: number };
-
-export const ActionDomains: { [key: string]: Redux.Dashboard.ActionDomain } = {
-  TRASH: "trash",
-  ACTIVE: "active"
-};
-
 export const ActionType = {
   Budget: {
     Loading: "budget.budget.Loading",
@@ -247,49 +240,3 @@ export const responseSubAccountSubAccountsAction = simpleSubAccountAction<Http.I
 export const setSubAccountSubAccountsSearchAction = simpleSubAccountAction<string>(
   ActionType.SubAccount.SubAccounts.SetSearch
 );
-
-// Convenience actions that dictate which specific action should be called
-// based on the pointer.
-export const updateSubAccountsRowAction = (
-  id: number | string,
-  budgetId: number,
-  payload: Partial<Redux.Budget.ISubAccountRow>,
-  pointer: Pointer
-) => {
-  if (pointer.accountId !== undefined) {
-    return updateAccountSubAccountsRowAction(pointer.accountId, budgetId, { id, payload });
-  }
-  return updateSubAccountSubAccountsRowAction(pointer.subaccountId, { id, payload });
-};
-export const addSubAccountsRowAction = (pointer: Pointer) => {
-  if (pointer.accountId !== undefined) {
-    return addAccountSubAccountsRowAction(pointer.accountId);
-  }
-  return addSubAccountSubAccountsRowAction(pointer.subaccountId);
-};
-
-export const removeSubAccountsRowAction = (row: Redux.Budget.ISubAccountRow, pointer: Pointer) => {
-  if (pointer.accountId !== undefined) {
-    return removeAccountSubAccountsRowAction(pointer.accountId, row);
-  }
-  return removeSubAccountSubAccountsRowAction(pointer.subaccountId, row);
-};
-export const selectSubAccountsRowAction = (id: number | string, pointer: Pointer) => {
-  if (pointer.accountId !== undefined) {
-    return selectAccountSubAccountsRowAction(pointer.accountId, id);
-  }
-  return selectSubAccountSubAccountsRowAction(pointer.subaccountId, id);
-};
-export const deselectSubAccountsRowAction = (id: number | string, pointer: Pointer) => {
-  if (pointer.accountId !== undefined) {
-    return deselectAccountSubAccountsRowAction(pointer.accountId, id);
-  }
-  return deselectSubAccountSubAccountsRowAction(pointer.subaccountId, id);
-};
-
-export const setSubAccountsSearchAction = (payload: string, pointer: Pointer) => {
-  if (pointer.accountId !== undefined) {
-    return setAccountSubAccountsSearchAction(pointer.accountId, payload);
-  }
-  return setSubAccountSubAccountsSearchAction(pointer.subaccountId, payload);
-};

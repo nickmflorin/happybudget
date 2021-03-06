@@ -1,7 +1,5 @@
 import { useCallback, useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { useHistory } from "react-router-dom";
-import { map, isNil, includes, find } from "lodash";
+import { map, isNil, includes, find, concat } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faArrowsAltV } from "@fortawesome/free-solid-svg-icons";
@@ -20,32 +18,38 @@ import {
 } from "ag-grid-community";
 
 import { IconButton } from "components/control/buttons";
-
-import {
-  setAccountsSearchAction,
-  removeAccountsRowAction,
-  updateAccountsRowAction,
-  addAccountsRowAction,
-  selectAccountsRowAction,
-  deselectAccountsRowAction
-} from "../../actions";
 import TableFooter from "./TableFooter";
 import TableHeader from "./TableHeader";
 import "./index.scss";
 
-interface AccountsTableProps {
-  budgetId: number;
+interface GenericBudgetTableProps<R> {
+  columns: ColDef[];
+  table: R[];
+  search: string;
+  saving: boolean;
+  onSearch: (value: string) => void;
+  onRowSelect: (id: number | string) => void;
+  onRowDeselect: (id: number | string) => void;
+  onRowUpdate: (id: number | string, payload: { [key: string]: any }) => void;
+  onRowAdd: () => void;
+  onRowDelete: (row: R) => void;
+  onRowExpand: (id: number) => void;
 }
 
-const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
+const GenericBudgetTable = <R extends IRow>({
+  columns,
+  table,
+  search,
+  saving,
+  onSearch,
+  onRowUpdate,
+  onRowSelect,
+  onRowDeselect,
+  onRowAdd,
+  onRowDelete,
+  onRowExpand
+}: GenericBudgetTableProps<R>) => {
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
-  const [columns, setColumns] = useState<ColDef[]>([]);
-  const dispatch = useDispatch();
-  const history = useHistory();
-
-  const accountsStore: Redux.Budget.IAccountsStore = useSelector(
-    (state: Redux.IApplicationStore) => state.budget.accounts
-  );
 
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
@@ -55,58 +59,13 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
     if (!isNil(gridApi)) {
       gridApi.sizeColumnsToFit();
     }
-  }, [accountsStore.table, gridApi]);
-
-  useEffect(() => {
-    setColumns([
-      {
-        field: "select",
-        editable: false,
-        headerName: "",
-        width: 50
-      },
-      {
-        field: "expand",
-        editable: false,
-        headerName: "",
-        width: 50
-      },
-      {
-        field: "account_number",
-        headerName: "Account",
-        editable: true
-      },
-      {
-        field: "description",
-        headerName: "Category Description",
-        editable: true
-      },
-      {
-        field: "estimated",
-        headerName: "Estimated"
-      },
-      {
-        field: "actual",
-        headerName: "Actual"
-      },
-      {
-        field: "variance",
-        headerName: "Variance"
-      },
-      {
-        field: "delete",
-        editable: false,
-        headerName: "",
-        width: 70
-      }
-    ]);
-  }, []);
+  }, [table, gridApi]);
 
   useEffect(() => {
     if (!isNil(gridApi)) {
-      gridApi.setQuickFilter(accountsStore.list.search);
+      gridApi.setQuickFilter(search);
     }
-  }, [accountsStore.list.search, gridApi]);
+  }, [search, gridApi]);
 
   useEffect(() => {
     // Changes to the selected rows does not trigger a refresh of those cells
@@ -115,7 +74,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
     // manually.
     if (!isNil(gridApi)) {
       gridApi.forEachNode((node: RowNode) => {
-        const existing = find(accountsStore.table, { id: node.data.id });
+        const existing = find(table, { id: node.data.id });
         if (!isNil(existing)) {
           if (existing.selected !== node.data.selected) {
             gridApi.refreshCells({ force: true, rowNodes: [node] });
@@ -123,7 +82,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
         }
       });
     }
-  }, [accountsStore.table, gridApi]);
+  }, [table, gridApi]);
 
   const getCellFrameworkComponent = () => {
     const CellRendererFramework = (params: ICellRendererParams): JSX.Element => {
@@ -133,9 +92,9 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
             checked={params.node.data.selected}
             onChange={(e: CheckboxChangeEvent) => {
               if (e.target.checked) {
-                dispatch(selectAccountsRowAction(params.node.data.id));
+                onRowSelect(params.node.data.id);
               } else {
-                dispatch(deselectAccountsRowAction(params.node.data.id));
+                onRowDeselect(params.node.data.id);
               }
             }}
           />
@@ -147,7 +106,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
               className={"dark"}
               size={"small"}
               icon={<FontAwesomeIcon icon={faArrowsAltV} />}
-              onClick={() => history.push(`/budgets/${budgetId}/accounts/${params.node.data.id}`)}
+              onClick={() => onRowExpand(params.node.data.id)}
             />
           );
         } else {
@@ -159,7 +118,7 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
             className={"dark"}
             size={"small"}
             icon={<FontAwesomeIcon icon={faTrash} />}
-            onClick={() => dispatch(removeAccountsRowAction(params.node.data))}
+            onClick={() => onRowDelete(params.node.data)}
           />
         );
       } else {
@@ -172,28 +131,55 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
   return (
     <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
       <TableHeader
-        search={accountsStore.list.search}
-        setSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
+        search={search}
+        setSearch={(value: string) => onSearch(value)}
         onDelete={() => console.log("Need to implement.")}
         onSum={() => console.log("Not yet supported.")}
         onPercentage={() => console.log("Not yet supported.")}
-        saving={accountsStore.deleting.length !== 0 || accountsStore.updating.length !== 0 || accountsStore.creating}
+        saving={saving}
       />
       <AgGridReact
-        columnDefs={map(columns, (col: ColDef) => ({
-          ...col,
-          suppressMenu: true,
-          suppressMenuHide: true,
-          cellClass: (params: CellClassParams) => {
-            if (includes(["delete", "select", "expand"], params.colDef.field)) {
-              return "action-cell";
+        columnDefs={map(
+          concat(
+            [
+              {
+                field: "select",
+                editable: false,
+                headerName: "",
+                width: 50
+              },
+              {
+                field: "expand",
+                editable: false,
+                headerName: "",
+                width: 50
+              }
+            ],
+            columns,
+            [
+              {
+                field: "delete",
+                editable: false,
+                headerName: "",
+                width: 70
+              }
+            ]
+          ),
+          (col: ColDef) => ({
+            ...col,
+            suppressMenu: true,
+            suppressMenuHide: true,
+            cellClass: (params: CellClassParams) => {
+              if (includes(["delete", "select", "expand"], params.colDef.field)) {
+                return "action-cell";
+              }
+              return "";
             }
-            return "";
-          }
-        }))}
+          })
+        )}
         rowDragManaged={true}
         allowContextMenuWithControlKey={true}
-        rowData={accountsStore.table}
+        rowData={table}
         getRowNodeId={(data: any) => data.id}
         immutableData={true}
         suppressRowClickSelection={true}
@@ -207,12 +193,12 @@ const AccountsTable = ({ budgetId }: AccountsTableProps): JSX.Element => {
         }}
         onCellEditingStopped={(event: CellEditingStoppedEvent) => {
           const field = event.column.getColId();
-          dispatch(updateAccountsRowAction(budgetId, { id: event.data.id, payload: { [field]: event.newValue } }));
+          onRowUpdate(event.data.id, { [field]: event.newValue });
         }}
       />
-      <TableFooter text={"Grand Total"} onNew={() => dispatch(addAccountsRowAction())} />
+      <TableFooter text={"Grand Total"} onNew={() => onRowAdd()} />
     </div>
   );
 };
 
-export default AccountsTable;
+export default GenericBudgetTable;

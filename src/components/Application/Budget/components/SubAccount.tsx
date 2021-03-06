@@ -1,16 +1,25 @@
 import { isNil } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
-import { requestSubAccountSubAccountsAction } from "../actions";
+import {
+  requestSubAccountSubAccountsAction,
+  setSubAccountSubAccountsSearchAction,
+  selectSubAccountSubAccountsRowAction,
+  addSubAccountSubAccountsRowAction,
+  deselectSubAccountSubAccountsRowAction,
+  removeSubAccountSubAccountsRowAction,
+  updateSubAccountSubAccountsRowAction
+} from "../actions";
 import { initialSubAccountState } from "../initialState";
-import { SubAccountsTable } from "./tables";
+import GenericBudgetTable from "./GenericBudgetTable";
 
 const SubAccount = (): JSX.Element => {
   const { budgetId, subaccountId } = useParams<{ budgetId: string; subaccountId: string }>();
   const dispatch = useDispatch();
+  const history = useHistory();
 
   const subaccounts = useSelector((state: Redux.IApplicationStore) => {
     let subState = initialSubAccountState;
@@ -19,7 +28,7 @@ const SubAccount = (): JSX.Element => {
         subState = state.budget.subaccounts[parseInt(subaccountId)];
       }
     }
-    return subState.subaccounts.list;
+    return subState.subaccounts;
   });
 
   useEffect(() => {
@@ -30,8 +39,72 @@ const SubAccount = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={[budgetId, subaccountId]}>
-      <RenderWithSpinner loading={subaccounts.loading}>
-        <SubAccountsTable budgetId={parseInt(budgetId)} pointer={{ subaccountId: parseInt(subaccountId) }} />
+      <RenderWithSpinner loading={subaccounts.list.loading}>
+        <GenericBudgetTable<Redux.Budget.ISubAccountRow>
+          table={subaccounts.table}
+          search={subaccounts.list.search}
+          onSearch={(value: string) => dispatch(setSubAccountSubAccountsSearchAction(parseInt(subaccountId), value))}
+          saving={subaccounts.deleting.length !== 0 || subaccounts.updating.length !== 0 || subaccounts.creating}
+          onRowAdd={() => dispatch(addSubAccountSubAccountsRowAction(parseInt(subaccountId)))}
+          onRowSelect={(id: string | number) =>
+            dispatch(selectSubAccountSubAccountsRowAction(parseInt(subaccountId), id))
+          }
+          onRowDeselect={(id: string | number) =>
+            dispatch(deselectSubAccountSubAccountsRowAction(parseInt(subaccountId), id))
+          }
+          onRowDelete={(row: Redux.Budget.ISubAccountRow) =>
+            dispatch(removeSubAccountSubAccountsRowAction(parseInt(subaccountId), row))
+          }
+          onRowUpdate={(id: number | string, payload: { [key: string]: any }) =>
+            dispatch(updateSubAccountSubAccountsRowAction(parseInt(subaccountId), { id, payload }))
+          }
+          onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
+          columns={[
+            {
+              field: "line",
+              headerName: "Line",
+              editable: true
+            },
+            {
+              field: "description",
+              headerName: "Category Description",
+              editable: true
+            },
+            {
+              field: "name",
+              headerName: "Name",
+              editable: true
+            },
+            {
+              field: "quantity",
+              headerName: "Quantity",
+              editable: true
+            },
+            {
+              field: "unit",
+              headerName: "Unit",
+              editable: true
+            },
+            {
+              field: "multiplier",
+              headerName: "X",
+              editable: true
+            },
+            {
+              field: "rate",
+              headerName: "Rate",
+              editable: true
+            },
+            {
+              field: "estimated",
+              headerName: "Estimated"
+            },
+            {
+              field: "actual",
+              headerName: "Actual"
+            }
+          ]}
+        />
       </RenderWithSpinner>
     </RenderIfValidId>
   );

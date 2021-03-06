@@ -1,6 +1,7 @@
 /// <reference path="redux/index.d.ts" />
 /// <reference path="redux-sagas/index.d.ts" />
 /// <reference path="./main.d.ts" />
+/// <reference path="./ui.d.ts" />
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -137,7 +138,7 @@ namespace Redux {
       creating: boolean;
     }
 
-    interface IAccountRow {
+    interface IAccountRow extends IRow {
       id: number | string;
       account_number: string | null;
       description: string | null;
@@ -145,7 +146,7 @@ namespace Redux {
       isPlaceholder: boolean;
     }
 
-    interface ISubAccountRow {
+    interface ISubAccountRow extends IRow {
       id: number | string;
       line: string | null;
       name: string | null;
