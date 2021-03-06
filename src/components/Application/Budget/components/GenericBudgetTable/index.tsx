@@ -1,5 +1,5 @@
 import { useCallback, useState, useEffect } from "react";
-import { map, isNil, includes, find, concat } from "lodash";
+import { map, isNil, includes, find, concat, uniq, forEach, filter } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faArrowsAltV } from "@fortawesome/free-solid-svg-icons";
@@ -34,14 +34,16 @@ interface GenericBudgetTableProps<R> {
   onRowAdd: () => void;
   onRowDelete: (row: R) => void;
   onRowExpand: (id: number) => void;
+  onSelectAll: () => void;
 }
 
-const GenericBudgetTable = <R extends IRow>({
+const GenericBudgetTable = <R extends Redux.Budget.IRow>({
   columns,
   table,
   search,
   saving,
   onSearch,
+  onSelectAll,
   onRowUpdate,
   onRowSelect,
   onRowDeselect,
@@ -49,6 +51,7 @@ const GenericBudgetTable = <R extends IRow>({
   onRowDelete,
   onRowExpand
 }: GenericBudgetTableProps<R>) => {
+  const [allSelected, setAllSelected] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
 
   const onGridReady = useCallback((event: GridReadyEvent): void => {
@@ -128,15 +131,32 @@ const GenericBudgetTable = <R extends IRow>({
     return CellRendererFramework;
   };
 
+  useEffect(() => {
+    const mapped = map(table, (row: R) => row.selected);
+    const uniques = uniq(mapped);
+    if (uniques.length === 1 && uniques[0] === true) {
+      setAllSelected(true);
+    } else {
+      setAllSelected(false);
+    }
+  }, [table]);
+
   return (
     <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
       <TableHeader
         search={search}
         setSearch={(value: string) => onSearch(value)}
-        onDelete={() => console.log("Need to implement.")}
-        onSum={() => console.log("Not yet supported.")}
-        onPercentage={() => console.log("Not yet supported.")}
+        onDelete={() => {
+          forEach(table, (row: R) => {
+            if (row.selected === true) {
+              onRowDelete(row);
+            }
+          });
+        }}
         saving={saving}
+        selected={allSelected}
+        onSelect={onSelectAll}
+        deleteDisabled={filter(table, (row: R) => row.selected === true).length === 0}
       />
       <AgGridReact
         columnDefs={map(

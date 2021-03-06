@@ -3,6 +3,9 @@ import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
 import { isNil } from "lodash";
 import { ActionType } from "./actions";
 import {
+  getBudgetTask,
+  getAccountTask,
+  getSubAccountTask,
   getAccountsTask,
   getAccountSubAccountsTask,
   getSubAccountSubAccountsTask,
@@ -13,6 +16,7 @@ import {
   handleSubAccountSubAccountRowUpdateTask,
   handleSubAccountSubAccountRowRemovalTask
 } from "./tasks";
+import { getSubAccount } from "services";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
   let lastTasks;
@@ -95,7 +99,53 @@ function* subAccountSubAccountsSaga(): SagaIterator {
   yield spawn(watchForSubAccountSubAccountRemoveRowSaga);
 }
 
+function* watchForRequestBudgetSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.Budget.Request);
+    if (!isNil(action.budgetId)) {
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(getBudgetTask, action);
+    }
+  }
+}
+
+function* watchForRequestAccountSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.Account.Request);
+    if (!isNil(action.accountId)) {
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(getAccountTask, action);
+    }
+  }
+}
+
+function* watchForRequestSubAccountSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.SubAccount.Request);
+    if (!isNil(action.subaccountId)) {
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(getSubAccountTask, action);
+    }
+  }
+}
+
+function* detailsSaga(): SagaIterator {
+  yield spawn(watchForRequestBudgetSaga);
+  yield spawn(watchForRequestAccountSaga);
+  yield spawn(watchForRequestSubAccountSaga);
+}
+
 export default function* rootSaga(): SagaIterator {
+  yield spawn(detailsSaga);
   yield spawn(accountsSaga);
   yield spawn(accountSubAccountsSaga);
   yield spawn(subAccountSubAccountsSaga);

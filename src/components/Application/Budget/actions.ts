@@ -1,6 +1,7 @@
 import { createAction } from "store/actions";
 
 export const ActionType = {
+  SetAncestors: "budget.SetAncestors",
   Budget: {
     Loading: "budget.budget.Loading",
     Response: "budget.budget.Response",
@@ -23,6 +24,7 @@ export const ActionType = {
     UpdateRowInStateOnly: "budget.accountstable.UpdateRowInStateOnly",
     RemoveRow: "budget.accountstable.RemoveRow",
     SelectRow: "budget.accountstable.SelectRow",
+    SelectAllRows: "budget.accountstable.SelectAllRows",
     DeselectRow: "budget.accountstable.DeselectRow"
   },
   Account: {
@@ -35,6 +37,7 @@ export const ActionType = {
       UpdateRow: "budget.account.subaccountstable.UpdateRow",
       UpdateRowInStateOnly: "budget.account.subaccountstable.UpdateRowInStateOnly",
       RemoveRow: "budget.account.subaccountstable.RemoveRow",
+      SelectAllRows: "budget.account.subaccountstable.SelectAllRows",
       SelectRow: "budget.account.subaccountstable.SelectRow",
       DeselectRow: "budget.account.subaccountstable.DeselectRow"
     },
@@ -59,6 +62,7 @@ export const ActionType = {
       UpdateRowInStateOnly: "budget.subaccount.subaccountstable.UpdateRowInStateOnly",
       RemoveRow: "budget.subaccount.subaccountstable.RemoveRow",
       SelectRow: "budget.subaccount.subaccountstable.SelectRow",
+      SelectAllRows: "budget.subaccount.subaccountstable.SelectAllRows",
       DeselectRow: "budget.subaccount.subaccountstable.DeselectRow"
     },
     SubAccounts: {
@@ -104,9 +108,11 @@ export const simpleSubAccountAction = <P = any>(type: string) => {
   };
 };
 
+export const setAncestorsAction = simpleAction<IAncestor[]>(ActionType.SetAncestors);
+
 export const requestBudgetAction = simpleBudgetAction<null>(ActionType.Budget.Request);
-export const loadingBudgetAction = simpleBudgetAction<boolean>(ActionType.Budget.Loading);
-export const responseBudgetAction = simpleBudgetAction<IBudget>(ActionType.Budget.Response);
+export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loading);
+export const responseBudgetAction = simpleAction<IBudget>(ActionType.Budget.Response);
 
 export const requestAccountAction = simpleAccountAction<null>(ActionType.Account.Request);
 export const loadingAccountAction = simpleAccountAction<boolean>(ActionType.Account.Loading);
@@ -114,7 +120,7 @@ export const responseAccountAction = simpleAccountAction<IAccount>(ActionType.Ac
 
 export const requestSubAccountAction = simpleSubAccountAction<null>(ActionType.SubAccount.Request);
 export const loadingSubAccountAction = simpleSubAccountAction<boolean>(ActionType.SubAccount.Loading);
-export const responseSubAccountAction = simpleSubAccountAction<IAccount>(ActionType.SubAccount.Response);
+export const responseSubAccountAction = simpleSubAccountAction<ISubAccount>(ActionType.SubAccount.Response);
 
 /*
   Actions Pertaining to the Accounts
@@ -126,6 +132,7 @@ export const updateAccountsRowAction = simpleBudgetAction<{
   payload: Partial<Redux.Budget.IAccountRow>;
 }>(ActionType.AccountsTable.UpdateRow);
 export const selectAccountsRowAction = simpleAction<number | string>(ActionType.AccountsTable.SelectRow);
+export const selectAllAccountsRowsAction = simpleAction<null>(ActionType.AccountsTable.SelectAllRows);
 export const deselectAccountsRowAction = simpleAction<number | string>(ActionType.AccountsTable.DeselectRow);
 // This action is required because the action updateAccountSubAccountsRowAction
 // triggers both a state update in the reducer and the saga responsible for updating
@@ -162,6 +169,10 @@ export const selectAccountSubAccountsRowAction = simpleAccountAction<number | st
 export const deselectAccountSubAccountsRowAction = simpleAccountAction<number | string>(
   ActionType.Account.SubAccountsTable.DeselectRow
 );
+export const selectAllAccountSubAccountsRowsAction = simpleAccountAction<null>(
+  ActionType.Account.SubAccountsTable.SelectAllRows
+);
+
 // This action is required because the action updateAccountSubAccountsRowAction
 // triggers both a state update in the reducer and the saga responsible for updating
 // the row in the backend.  In this saga, we also need to perform an update to the
@@ -203,6 +214,9 @@ export const updateSubAccountSubAccountsRowAction = simpleSubAccountAction<{
 }>(ActionType.SubAccount.SubAccountsTable.UpdateRow);
 export const selectSubAccountSubAccountsRowAction = simpleSubAccountAction<number | string>(
   ActionType.SubAccount.SubAccountsTable.SelectRow
+);
+export const selectAllSubAccountSubAccountsRowsAction = simpleSubAccountAction<null>(
+  ActionType.SubAccount.SubAccountsTable.SelectAllRows
 );
 export const deselectSubAccountSubAccountsRowAction = simpleSubAccountAction<number | string>(
   ActionType.SubAccount.SubAccountsTable.DeselectRow

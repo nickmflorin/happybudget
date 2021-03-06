@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -13,9 +14,18 @@ interface LayoutProps {
   toolbar?: IToolbarItem[] | (() => JSX.Element);
   style?: React.CSSProperties;
   collapsed?: boolean;
+  breadcrumbs?: ReactNode;
 }
 
-const Layout = ({ className, children, toolbar, sidebar, style = {}, collapsed = false }: LayoutProps): JSX.Element => {
+const Layout = ({
+  className,
+  children,
+  toolbar,
+  breadcrumbs,
+  sidebar,
+  style = {},
+  collapsed = false
+}: LayoutProps): JSX.Element => {
   return (
     <div className={classNames("application", className)} style={style}>
       {!isNil(sidebar) && (
@@ -28,7 +38,7 @@ const Layout = ({ className, children, toolbar, sidebar, style = {}, collapsed =
         </div>
       )}
       <div className={classNames("application-content", { collapsed })}>
-        <Header toolbar={toolbar} />
+        <Header breadcrumbs={breadcrumbs} toolbar={toolbar} />
         <div className={"content"}>{children}</div>
         <Footer />
       </div>

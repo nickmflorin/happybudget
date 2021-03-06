@@ -1,13 +1,19 @@
-import React from "react";
-import { Redirect, Switch, Route, useRouteMatch, useHistory, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Redirect, Switch, Route, useRouteMatch, useHistory, useLocation, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRobot, faDownload, faShareAlt, faCog, faComments } from "@fortawesome/free-solid-svg-icons";
 
 import { FileAddOutlined, ContactsOutlined, FolderOutlined, DeleteOutlined } from "@ant-design/icons";
 
+import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { Layout } from "components/layout";
+import { requestBudgetAction } from "./actions";
+import { AncestorsBreadCrumbs } from "./components";
+
 import "./index.scss";
+import { isNil } from "lodash";
 
 const Account = React.lazy(() => import("./components/Account"));
 const Accounts = React.lazy(() => import("./components/Accounts"));
@@ -17,10 +23,23 @@ const Budget = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
   const match = useRouteMatch();
+  const dispatch = useDispatch();
+  const { budgetId } = useParams<{ budgetId: string }>();
+  const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
+  const ancestors = useSelector((state: Redux.IApplicationStore) => state.budget.ancestors);
+
+  useEffect(() => {
+    if (!isNaN(parseInt(budgetId))) {
+      dispatch(requestBudgetAction(parseInt(budgetId)));
+    }
+  }, [budgetId]);
+
+  console.log(ancestors);
 
   return (
     <Layout
       collapsed
+      breadcrumbs={!isNil(budget.data) ? <AncestorsBreadCrumbs ancestors={ancestors} budget={budget.data} /> : <></>}
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faRobot} />,
@@ -82,14 +101,18 @@ const Budget = (): JSX.Element => {
         }
       ]}
     >
-      <div className={"budget"}>
-        <Switch>
-          <Redirect exact from={match.url} to={`${match.url}/accounts`} />
-          <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
-          <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
-          <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
-        </Switch>
-      </div>
+      <RenderIfValidId id={[budgetId]}>
+        <RenderWithSpinner loading={budget.loading}>
+          <div className={"budget"}>
+            <Switch>
+              <Redirect exact from={match.url} to={`${match.url}/accounts`} />
+              <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
+              <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
+              <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
+            </Switch>
+          </div>
+        </RenderWithSpinner>
+      </RenderIfValidId>
     </Layout>
   );
 };

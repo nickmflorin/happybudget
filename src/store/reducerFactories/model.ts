@@ -21,6 +21,7 @@ export interface ITableActionMap {
   UpdateRowInStateOnly: string;
   SelectRow: string;
   DeselectRow: string;
+  SelectAllRows: string;
 }
 
 export interface IDetailResponseActionMap extends IReducerFactoryActionMap {

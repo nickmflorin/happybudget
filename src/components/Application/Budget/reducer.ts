@@ -14,8 +14,6 @@ import { createSubAccountRowPlaceholder, createAccountRowPlaceholder } from "./u
 
 const indexedAccountReducer = combineReducers({
   subaccounts: combineReducers({
-    // Do we want to require that these reducers all match by accountId?  Or is that
-    // guaranteed based on the indexing?
     deleting: createModelListActionReducer(ActionType.Account.SubAccounts.Deleting, { referenceEntity: "subaccount" }),
     updating: createModelListActionReducer(ActionType.Account.SubAccounts.Updating, { referenceEntity: "subaccount" }),
     creating: createSimpleBooleanReducer(ActionType.Account.SubAccounts.Creating),
@@ -27,22 +25,20 @@ const indexedAccountReducer = combineReducers({
         UpdateRow: ActionType.Account.SubAccountsTable.UpdateRow,
         UpdateRowInStateOnly: ActionType.Account.SubAccountsTable.UpdateRowInStateOnly,
         SelectRow: ActionType.Account.SubAccountsTable.SelectRow,
-        DeselectRow: ActionType.Account.SubAccountsTable.DeselectRow
+        DeselectRow: ActionType.Account.SubAccountsTable.DeselectRow,
+        SelectAllRows: ActionType.Account.SubAccountsTable.SelectAllRows
       },
       createSubAccountRowPlaceholder,
       { referenceEntity: "subaccount" }
     ),
+    // TODO: Do we want to also maintain the raw list data to keep it in sync
+    // with the table rows?  Right now we don't have to, because the raw data
+    // is just used for initial population of the tables, but we may need to.
     list: createListResponseReducer<ISubAccount, Redux.IListResponseStore<ISubAccount>, Redux.Budget.IAction<any>>(
       {
         Response: ActionType.Account.SubAccounts.Response,
         Loading: ActionType.Account.SubAccounts.Loading,
         SetSearch: ActionType.Account.SubAccounts.SetSearch
-        // TODO: Do we also want to have the updateInState, removeFromState and addToState
-        // functionality of the list responses so that when the tables rows are edited,
-        // added and removed, the raw data is updated as well?
-        // AddToState: ActionType.Account.SubAccounts.AddToState,
-        // RemoveFromState: ActionType.Account.SubAccounts.RemoveFromState,
-        // UpdateInState: ActionType.Account.SubAccounts.UpdateInState
       },
       {
         referenceEntity: "subaccount"
@@ -53,7 +49,6 @@ const indexedAccountReducer = combineReducers({
     Response: ActionType.Account.Response,
     Loading: ActionType.Account.Loading,
     Request: ActionType.Account.Request
-    // UpdateInState: ActionType.Account.UpdateInState
   })
 });
 
@@ -74,23 +69,21 @@ const indexedSubAccountReducer = combineReducers({
         UpdateRow: ActionType.SubAccount.SubAccountsTable.UpdateRow,
         UpdateRowInStateOnly: ActionType.SubAccount.SubAccountsTable.UpdateRowInStateOnly,
         SelectRow: ActionType.SubAccount.SubAccountsTable.SelectRow,
-        DeselectRow: ActionType.SubAccount.SubAccountsTable.DeselectRow
+        DeselectRow: ActionType.SubAccount.SubAccountsTable.DeselectRow,
+        SelectAllRows: ActionType.SubAccount.SubAccountsTable.SelectAllRows
       },
       createSubAccountRowPlaceholder,
       { referenceEntity: "subaccount" }
     ),
+    // TODO: Do we want to also maintain the raw list data to keep it in sync
+    // with the table rows?  Right now we don't have to, because the raw data
+    // is just used for initial population of the tables, but we may need to.
     list: createListResponseReducer<ISubAccount, Redux.IListResponseStore<ISubAccount>, Redux.Budget.IAction<any>>(
       {
         Response: ActionType.SubAccount.SubAccounts.Response,
         Loading: ActionType.SubAccount.SubAccounts.Loading,
         Select: ActionType.SubAccount.SubAccounts.Select,
         SetSearch: ActionType.SubAccount.SubAccounts.SetSearch
-        // TODO: Do we also want to have the updateInState, removeFromState and addToState
-        // functionality of the list responses so that when the tables rows are edited,
-        // added and removed, the raw data is updated as well?
-        // AddToState: ActionType.SubAccount.SubAccounts.AddToState,
-        // RemoveFromState: ActionType.SubAccount.SubAccounts.RemoveFromState,
-        // UpdateInState: ActionType.SubAccount.SubAccounts.UpdateInState
       },
       {
         referenceEntity: "subaccount"
@@ -112,11 +105,6 @@ const accountsIndexedDetailsReducer: Reducer<
   action: Redux.Budget.IAction<any>
 ): Redux.IIndexedStore<Redux.Budget.IAccountStore> => {
   let newState = { ...state };
-  // if (!isNil(action.payload) && action.type === ActionType.AccountRemoved && !isNil(newState[action.payload])) {
-  //   const key = action.payload;
-  //   const { [key]: value, ...withoutAccount } = newState;
-  //   newState = { ...withoutAccount };
-  // } else if (!isNil(action.accountId)) {
   if (!isNil(action.accountId)) {
     if (isNil(newState[action.accountId])) {
       newState = { ...newState, [action.accountId]: initialAccountState };
@@ -138,11 +126,6 @@ const subaccountsIndexedDetailsReducer: Reducer<
 ): Redux.IIndexedStore<Redux.Budget.ISubAccountStore> => {
   let newState = { ...state };
   if (!isNil(action.subaccountId)) {
-    // if (action.type === ActionType.SubAccount.RemoveFromState && !isNil(newState[action.subaccountId])) {
-    //   const key = action.subaccountId;
-    //   const { [key]: value, ...withoutAccount } = newState;
-    //   newState = { ...withoutAccount };
-    // } else {
     if (isNil(newState[action.subaccountId])) {
       newState = { ...newState, [action.subaccountId]: initialSubAccountState };
     }
@@ -154,7 +137,19 @@ const subaccountsIndexedDetailsReducer: Reducer<
   return newState;
 };
 
+const ancestorsReducer: Reducer<Redux.ListStore<IAncestor>, Redux.Budget.IAction<any>> = (
+  state: Redux.ListStore<IAncestor> = [],
+  action: Redux.Budget.IAction<any>
+) => {
+  let newState = [...state];
+  if (action.type === ActionType.SetAncestors) {
+    newState = action.payload;
+  }
+  return newState;
+};
+
 const rootReducer = combineReducers({
+  ancestors: ancestorsReducer,
   budget: createDetailResponseReducer<IBudget, Redux.IDetailResponseStore<IBudget>, Redux.Budget.IAction>({
     Response: ActionType.Budget.Response,
     Loading: ActionType.Budget.Loading,
@@ -174,23 +169,21 @@ const rootReducer = combineReducers({
         UpdateRow: ActionType.AccountsTable.UpdateRow,
         UpdateRowInStateOnly: ActionType.AccountsTable.UpdateRowInStateOnly,
         SelectRow: ActionType.AccountsTable.SelectRow,
-        DeselectRow: ActionType.AccountsTable.DeselectRow
+        DeselectRow: ActionType.AccountsTable.DeselectRow,
+        SelectAllRows: ActionType.AccountsTable.SelectAllRows
       },
       createAccountRowPlaceholder,
       { referenceEntity: "account" }
     ),
+    // TODO: Do we want to also maintain the raw list data to keep it in sync
+    // with the table rows?  Right now we don't have to, because the raw data
+    // is just used for initial population of the tables, but we may need to.
     list: createListResponseReducer(
       {
         Response: ActionType.Accounts.Response,
         Loading: ActionType.Accounts.Loading,
         Select: ActionType.Accounts.Select,
         SetSearch: ActionType.Accounts.SetSearch
-        // TODO: Do we also want to have the updateInState, removeFromState and addToState
-        // functionality of the list responses so that when the tables rows are edited,
-        // added and removed, the raw data is updated as well?
-        // AddToState: ActionType.Accounts.AddToState,
-        // RemoveFromState: ActionType.Accounts.RemoveFromState,
-        // UpdateInState: ActionType.Accounts.UpdateInState
       },
       {
         referenceEntity: "account"

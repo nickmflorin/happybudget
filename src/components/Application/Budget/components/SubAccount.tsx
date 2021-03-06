@@ -1,17 +1,19 @@
-import { isNil } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
+import { isNil } from "lodash";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
+  requestSubAccountAction,
   requestSubAccountSubAccountsAction,
   setSubAccountSubAccountsSearchAction,
   selectSubAccountSubAccountsRowAction,
   addSubAccountSubAccountsRowAction,
   deselectSubAccountSubAccountsRowAction,
   removeSubAccountSubAccountsRowAction,
-  updateSubAccountSubAccountsRowAction
+  updateSubAccountSubAccountsRowAction,
+  selectAllSubAccountSubAccountsRowsAction
 } from "../actions";
 import { initialSubAccountState } from "../initialState";
 import GenericBudgetTable from "./GenericBudgetTable";
@@ -30,6 +32,12 @@ const SubAccount = (): JSX.Element => {
     }
     return subState.subaccounts;
   });
+
+  useEffect(() => {
+    if (!isNaN(parseInt(subaccountId))) {
+      dispatch(requestSubAccountAction(parseInt(subaccountId)));
+    }
+  }, [subaccountId]);
 
   useEffect(() => {
     if (!isNil(subaccountId) && !isNil(parseInt(subaccountId))) {
@@ -59,6 +67,7 @@ const SubAccount = (): JSX.Element => {
             dispatch(updateSubAccountSubAccountsRowAction(parseInt(subaccountId), { id, payload }))
           }
           onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
+          onSelectAll={() => dispatch(selectAllSubAccountSubAccountsRowsAction(parseInt(subaccountId)))}
           columns={[
             {
               field: "line",

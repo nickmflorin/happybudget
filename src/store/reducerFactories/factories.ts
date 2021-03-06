@@ -109,7 +109,6 @@ export const createTableReducer = <R extends TableRowModel, A extends Redux.IAct
         newState = filter(newState, (row: R) => row.id !== action.payload.id);
       }
     } else if (action.type === mappings.SelectRow) {
-      console.log("Selecting!");
       const existing = find(newState, { id: action.payload });
       if (isNil(existing)) {
         /* eslint-disable no-console */
@@ -142,6 +141,13 @@ export const createTableReducer = <R extends TableRowModel, A extends Redux.IAct
         );
       } else {
         newState = replaceInArray<R>(newState, { id: action.payload }, { ...existing, selected: false });
+      }
+    } else if (action.type === mappings.SelectAllRows) {
+      const selected = filter(newState, (row: R) => row.selected === true);
+      if (selected.length === newState.length) {
+        newState = map(newState, (row: R) => ({ ...row, selected: false }));
+      } else {
+        newState = map(newState, (row: R) => ({ ...row, selected: true }));
       }
     }
     return newState;

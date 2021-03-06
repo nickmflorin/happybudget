@@ -1,7 +1,7 @@
-import { isNil } from "lodash";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
+import { isNil } from "lodash";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
@@ -11,7 +11,8 @@ import {
   deselectAccountsRowAction,
   selectAccountsRowAction,
   removeAccountsRowAction,
-  updateAccountsRowAction
+  updateAccountsRowAction,
+  selectAllAccountsRowsAction
 } from "../actions";
 import GenericBudgetTable from "./GenericBudgetTable";
 
@@ -43,6 +44,7 @@ const Accounts = (): JSX.Element => {
             dispatch(updateAccountsRowAction(parseInt(budgetId), { id, payload }))
           }
           onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
+          onSelectAll={() => dispatch(selectAllAccountsRowsAction())}
           columns={[
             {
               field: "account_number",

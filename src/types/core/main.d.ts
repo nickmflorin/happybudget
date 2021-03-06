@@ -47,6 +47,14 @@ interface IBudget extends Model {
   readonly trash: boolean;
 }
 
+type AncestorType = "budget" | "account" | "subaccount";
+
+interface IAncestor {
+  id: number;
+  name: string;
+  type: AncestorType;
+}
+
 interface IAccount extends Model {
   readonly account_number: string;
   readonly description: string | null;
@@ -56,6 +64,7 @@ interface IAccount extends Model {
   readonly updated_at: string;
   readonly access: number[];
   readonly budget: number;
+  readonly ancestors: IAncestor[];
 }
 
 type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
@@ -78,4 +87,5 @@ interface ISubAccount extends Model {
   readonly account: number;
   readonly parent: number;
   readonly parent_type: ParentType;
+  readonly ancestors: IAncestor[];
 }

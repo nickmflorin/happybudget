@@ -1,0 +1,55 @@
+@import "style/typography";
+
+.ancestors-bread-crumbs {
+  display: flex;
+  height: 36px;
+
+  .ancestors-bread-crumb-item {
+    display: flex;
+    cursor: pointer;
+
+    .content-wrapper {
+      line-height: 18px;
+      padding-top: 9px;
+      padding-bottom: 9px;
+      font-family: $noto-sans-regular;
+      color: $green;
+
+      .slash {
+        margin-left: 4px;
+        color: $text-primary;
+      }
+    }
+
+    .icon-wrapper {
+      margin-right: 8px;
+      padding-top: 9px;
+      padding-bottom: 9px;
+
+      svg {
+        height: 18px;
+        width: auto;
+        line-height: 18px;
+        display: block;
+        color: $green;
+      }
+    }
+
+    &:hover {
+      .content-wrapper {
+        font-family: $noto-sans-medium !important;
+      }
+    }
+
+    &.last {
+      .content-wrapper {
+        color: $text-primary;
+        font-family: $noto-sans-medium !important;
+      }
+    }
+
+    &:not(:last-child) {
+      margin-right: 6px;
+    }
+  }
+}

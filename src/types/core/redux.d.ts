@@ -1,7 +1,6 @@
 /// <reference path="redux/index.d.ts" />
 /// <reference path="redux-sagas/index.d.ts" />
 /// <reference path="./main.d.ts" />
-/// <reference path="./ui.d.ts" />
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -112,11 +111,11 @@ namespace Redux {
     }
 
     interface ISubAccountListResponseStore {
-      deleting: IListStore<number>;
-      updating: IListStore<number>;
+      deleting: ListStore<number>;
+      updating: ListStore<number>;
       creating: boolean;
       list: IListResponseStore<ISubAccount>;
-      table: IListStore<ISubAccountRow>;
+      table: ListStore<ISubAccountRow>;
     }
 
     interface ISubAccountStore {
@@ -133,17 +132,21 @@ namespace Redux {
       list: IListResponseStore<IAccount>;
       table: IListStore<IAccountRow>;
       details: IIndexedStore<IAccountStore>;
-      deleting: IListStore<number>;
-      updating: IListStore<number>;
+      deleting: ListStore<number>;
+      updating: ListStore<number>;
       creating: boolean;
+    }
+
+    interface IRow {
+      id: number | string;
+      selected: boolean;
+      isPlaceholder: boolean;
     }
 
     interface IAccountRow extends IRow {
       id: number | string;
       account_number: string | null;
       description: string | null;
-      selected: boolean;
-      isPlaceholder: boolean;
     }
 
     interface ISubAccountRow extends IRow {
@@ -155,14 +158,13 @@ namespace Redux {
       unit: Unit | null;
       multiplier: number | null;
       rate: number | null;
-      selected: boolean;
-      isPlaceholder: boolean;
     }
 
     interface IStore {
       budget: IDetailResponseStore<IBudget>;
       accounts: IAccountsStore;
       subaccounts: IIndexedStore<ISubAccountStore>;
+      ancestors: ListStore<IAncestor>;
     }
   }
 }
