@@ -2,14 +2,15 @@
 @import "style/colors";
 
 .account-circle-link {
-  width: 32px !important;
-  height: 32px !important;
+  display: block;
+  width: 36px !important;
+  height: 36px !important;
   border-radius: 100%;
   font-family: $roboto-regular;
   line-height: 18px;
   font-size: 14px;
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding-top: 9px;
+  padding-bottom: 9px;
   text-align: center;
   border-width: 1px;
 }

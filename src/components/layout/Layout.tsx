@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import Header from "./Header";
 import Footer from "./Footer";
 import Sidebar, { ISidebarItem } from "./Sidebar";
-import { IToolbarItem } from "./Toolbar";
+import { IToolbarItem } from "./Header/Toolbar";
 
 interface LayoutProps {
   className?: string;

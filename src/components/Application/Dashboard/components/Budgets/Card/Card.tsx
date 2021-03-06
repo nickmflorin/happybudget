@@ -1,9 +1,14 @@
 import React from "react";
 import { isNil } from "lodash";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
+import { Dropdown } from "components/control";
+import { IconButton } from "components/control/buttons";
 import { ShowHide, RenderWithSpinner } from "components/display";
 import {
   ActorsIcon,
@@ -16,8 +21,6 @@ import {
   WriterIcon
 } from "components/svgs";
 import { selectRandom } from "util/arrays";
-
-import CardDropdown, { ICardDropdownItem } from "./CardDropdown";
 import "./Card.scss";
 
 export const Icons: (() => JSX.Element)[] = [
@@ -44,7 +47,7 @@ export const Colors: string[] = [
 ];
 
 interface CardProps {
-  dropdown?: ICardDropdownItem[];
+  dropdown?: IMenuItem[];
   selected?: boolean;
   title?: string;
   subTitle?: string;
@@ -68,7 +71,11 @@ const Card = ({ title, subTitle, dropdown, onClick, loading, selected = false, o
               }
             }}
           />
-          {!isNil(dropdown) && <CardDropdown items={dropdown} />}
+          {!isNil(dropdown) && (
+            <Dropdown items={dropdown}>
+              <IconButton className={"card-dropdown-ellipsis"} icon={<FontAwesomeIcon icon={faEllipsisV} />} />
+            </Dropdown>
+          )}
           <div
             className={"budget-card-icon-wrapper"}
             onClick={onClick}

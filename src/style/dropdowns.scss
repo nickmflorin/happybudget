@@ -1,29 +1,70 @@
 @import "./typography";
 @import "./colors";
 
-// AntD Overrides
-.ant-dropdown-menu {
+.dropdown-base {
+  background-color: $white;
+  background-clip: padding-box;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: 0.25rem;
+}
+
+.menu-base {
   padding: 0;
-  line-height: 18px;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  font-size: 16px;
+}
+
+.menu-item-base {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  color: $text-secondary !important;
   font-family: $roboto-regular;
+  min-width: 100px;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 20px;
 
-  .ant-dropdown-menu-item {
+  &.ant-menu-item-selected {
     background-color: $white;
-    background: $white;
-    color: $text-secondary !important;
-    font-family: $roboto-regular;
-    padding: 10px 14px;
-    font-size: 13px;
+  }
+  &:hover {
+    background-color: $gray-highlight;
+    color: $green !important;
+  }
+  &.disabled {
+    cursor: not-allowed !important;
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
 
-    &:not(:last-child) {
-      border-bottom: 1px solid $off-white;
+.ant-dropdown {
+  @extend .dropdown-base;
+
+  .ant-dropdown-menu {
+    @extend .menu-base;
+
+    .ant-dropdown-menu-item {
+      @extend .menu-item-base;
     }
+  }
+}
 
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
+.ant-menu {
+  @extend .menu-base;
+  .ant-menu-item {
+    @extend .menu-item-base;
+  }
+}
+
+.dropdown-menu {
+  @extend .menu-base;
+
+  .dropdown-menu-item {
+    @extend .menu-item-base;
+    display: flex;
+
+    .icon {
+      display: block;
+      height: 100%;
+      width: 100%;
     }
   }
 }
