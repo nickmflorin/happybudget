@@ -4,6 +4,8 @@
 @import '~ag-grid-community/dist/styles/ag-theme-alpine.css';
 
 .ag-theme-alpine {
+  font-family: $roboto-regular;
+
   /* Note:
      Numeric columns prop causes some headers to be right aligned.
      We want to overwrite that to keep all columns left aligned:
@@ -34,6 +36,7 @@
     border: none;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
+    font-family: $noto-sans-light !important;
   }
   .ag-row {
     background: $white !important;
