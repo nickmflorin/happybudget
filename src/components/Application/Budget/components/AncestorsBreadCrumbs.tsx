@@ -1,11 +1,15 @@
 import { ReactNode } from "react";
 import { useHistory } from "react-router-dom";
-import { map, filter, isNil } from "lodash";
+import { map, isNil } from "lodash";
 import classNames from "classnames";
+
+import { Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel } from "@fortawesome/free-regular-svg-icons";
 
+import { RenderOrSpinner } from "components/display";
 import "./AncestorsBreadCrumbs.scss";
 
 interface AncestorBreadCrumbItemProps {
@@ -31,34 +35,38 @@ const AncestorBreadCrumbItem = ({ url, children, icon, last }: AncestorBreadCrum
 
 interface AncestorsBreadCrumbsProps {
   ancestors: IAncestor[];
-  budget: IBudget;
+  budgetId: number;
+  loading: boolean;
 }
 
-const AncestorsBreadCrumbs = ({ ancestors, budget }: AncestorsBreadCrumbsProps): JSX.Element => {
+const PrimaryAncestorIcon = ({ loading }: { loading: boolean }): JSX.Element => {
+  const loadingIcon = <LoadingOutlined spin />;
+  if (loading === false) {
+    return <FontAwesomeIcon icon={faFileExcel} />;
+  }
+  return <Spin className={"ancestor-spinner"} indicator={loadingIcon} size={"small"} />;
+};
+
+const AncestorsBreadCrumbs = ({ ancestors, budgetId, loading }: AncestorsBreadCrumbsProps): JSX.Element => {
   return (
     <div className={"ancestors-bread-crumbs"}>
-      <AncestorBreadCrumbItem
-        url={`/budgets/${budget.id}/accounts`}
-        icon={<FontAwesomeIcon icon={faFileExcel} />}
-        last={false}
-      >
-        {budget.name}
-      </AncestorBreadCrumbItem>
       {map(ancestors, (ancestor: IAncestor, index: number) => {
-        if (ancestor.type !== "budget") {
-          return (
-            <AncestorBreadCrumbItem
-              url={
-                ancestor.type === "subaccount"
-                  ? `/budgets/${budget.id}/subaccounts/${ancestor.id}`
-                  : `/budgets/${budget.id}/accounts/${ancestor.id}`
-              }
-              last={index === filter(ancestors, (a: IAncestor) => a.type !== "budget").length}
-            >
-              {ancestor.name}
-            </AncestorBreadCrumbItem>
-          );
-        }
+        return (
+          /* eslint-disable indent */
+          <AncestorBreadCrumbItem
+            url={
+              ancestor.type === "subaccount"
+                ? `/budgets/${budgetId}/subaccounts/${ancestor.id}`
+                : ancestor.type === "account"
+                ? `/budgets/${budgetId}/accounts/${ancestor.id}`
+                : `/budgets/${budgetId}/accounts`
+            }
+            last={index === ancestors.length - 1}
+            icon={ancestor.type === "budget" ? <PrimaryAncestorIcon loading={loading} /> : undefined}
+          >
+            {ancestor.name}
+          </AncestorBreadCrumbItem>
+        );
       })}
     </div>
   );

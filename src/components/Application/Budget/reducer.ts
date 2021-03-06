@@ -150,6 +150,7 @@ const ancestorsReducer: Reducer<Redux.ListStore<IAncestor>, Redux.Budget.IAction
 
 const rootReducer = combineReducers({
   ancestors: ancestorsReducer,
+  ancestorsLoading: createSimpleBooleanReducer(ActionType.SetAncestorsLoading),
   budget: createDetailResponseReducer<IBudget, Redux.IDetailResponseStore<IBudget>, Redux.Budget.IAction>({
     Response: ActionType.Budget.Response,
     Loading: ActionType.Budget.Loading,

@@ -35,7 +35,8 @@ const initialState: Redux.Budget.IStore = {
   budget: initialDetailResponseState,
   accounts: initialAccountsState,
   subaccounts: {},
-  ancestors: []
+  ancestors: [],
+  ancestorsLoading: false
 };
 
 export default initialState;

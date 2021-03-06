@@ -13,7 +13,7 @@
       padding-top: 9px;
       padding-bottom: 9px;
       font-family: $noto-sans-regular;
-      color: $green;
+      color: $text-secondary;
 
       .slash {
         margin-left: 4px;
@@ -26,18 +26,36 @@
       padding-top: 9px;
       padding-bottom: 9px;
 
+      .ancestor-spinner {
+        display: block;
+        height: 14px;
+        width: 14px;
+        padding: 1px;
+
+        .ant-spin-dot {
+          height: 12px;
+          width: 12px;
+          vertical-align: 0.1rem;
+
+          svg {
+            height: 12px;
+            width: 12px;
+          }
+        }
+      }
+
       svg {
         height: 18px;
         width: auto;
         line-height: 18px;
         display: block;
-        color: $green;
+        color: $text-secondary;
       }
     }
 
     &:hover {
       .content-wrapper {
-        font-family: $noto-sans-medium !important;
+        color: $text-primary;
       }
     }
 

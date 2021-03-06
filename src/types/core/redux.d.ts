@@ -165,6 +165,7 @@ namespace Redux {
       accounts: IAccountsStore;
       subaccounts: IIndexedStore<ISubAccountStore>;
       ancestors: ListStore<IAncestor>;
+      ancestorsLoading: boolean;
     }
   }
 }

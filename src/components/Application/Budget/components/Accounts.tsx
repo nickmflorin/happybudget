@@ -5,6 +5,7 @@ import { isNil } from "lodash";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
+  requestBudgetAction,
   requestAccountsAction,
   setAccountsSearchAction,
   addAccountsRowAction,
@@ -24,6 +25,7 @@ const Accounts = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(budgetId) && !isNaN(parseInt(budgetId))) {
+      dispatch(requestBudgetAction(parseInt(budgetId)));
       dispatch(requestAccountsAction(parseInt(budgetId)));
     }
   }, [budgetId]);

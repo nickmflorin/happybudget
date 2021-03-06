@@ -2,6 +2,7 @@ import { createAction } from "store/actions";
 
 export const ActionType = {
   SetAncestors: "budget.SetAncestors",
+  SetAncestorsLoading: "budget.SetAncestorsLoading",
   Budget: {
     Loading: "budget.budget.Loading",
     Response: "budget.budget.Response",
@@ -109,6 +110,7 @@ export const simpleSubAccountAction = <P = any>(type: string) => {
 };
 
 export const setAncestorsAction = simpleAction<IAncestor[]>(ActionType.SetAncestors);
+export const setAncestorsLoadingAction = simpleAction<boolean>(ActionType.SetAncestorsLoading);
 
 export const requestBudgetAction = simpleBudgetAction<null>(ActionType.Budget.Request);
 export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loading);

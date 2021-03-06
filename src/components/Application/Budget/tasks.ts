@@ -19,6 +19,7 @@ import {
 import { handleRequestError } from "store/tasks";
 import {
   setAncestorsAction,
+  setAncestorsLoadingAction,
   loadingBudgetAction,
   responseBudgetAction,
   loadingAccountAction,
@@ -407,14 +408,25 @@ export function* getSubAccountSubAccountsTask(action: Redux.Budget.IAction<null>
 
 export function* getBudgetTask(action: Redux.Budget.IAction<null>): SagaIterator {
   if (!isNil(action.budgetId)) {
+    yield put(setAncestorsLoadingAction(true));
     yield put(loadingBudgetAction(true));
     try {
-      const response = yield call(getBudget, action.budgetId);
+      const response: IBudget = yield call(getBudget, action.budgetId);
       yield put(responseBudgetAction(response));
+      yield put(
+        setAncestorsAction([
+          {
+            id: response.id,
+            name: response.name,
+            type: "budget"
+          }
+        ])
+      );
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget.");
       yield put(responseBudgetAction(undefined, { error: e }));
     } finally {
+      yield put(setAncestorsLoadingAction(false));
       yield put(loadingBudgetAction(false));
     }
   }
@@ -423,6 +435,7 @@ export function* getBudgetTask(action: Redux.Budget.IAction<null>): SagaIterator
 export function* getAccountTask(action: Redux.Budget.IAction<null>): SagaIterator {
   if (!isNil(action.accountId)) {
     yield put(loadingAccountAction(action.accountId, true));
+    yield put(setAncestorsLoadingAction(true));
     try {
       const response: IAccount = yield call(getAccount, action.accountId);
       yield put(responseAccountAction(action.accountId, response));
@@ -442,12 +455,14 @@ export function* getAccountTask(action: Redux.Budget.IAction<null>): SagaIterato
       yield put(responseAccountAction(action.accountId, undefined, { error: e }));
     } finally {
       yield put(loadingAccountAction(action.accountId, false));
+      yield put(setAncestorsLoadingAction(false));
     }
   }
 }
 
 export function* getSubAccountTask(action: Redux.Budget.IAction<null>): SagaIterator {
   if (!isNil(action.subaccountId)) {
+    yield put(setAncestorsLoadingAction(true));
     yield put(loadingSubAccountAction(action.subaccountId, true));
     try {
       const response: ISubAccount = yield call(getSubAccount, action.subaccountId);
@@ -469,6 +484,7 @@ export function* getSubAccountTask(action: Redux.Budget.IAction<null>): SagaIter
       yield put(responseSubAccountAction(action.subaccountId, undefined, { error: e }));
     } finally {
       yield put(loadingSubAccountAction(action.subaccountId, false));
+      yield put(setAncestorsLoadingAction(false));
     }
   }
 }
