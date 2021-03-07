@@ -82,7 +82,6 @@ const indexedSubAccountReducer = combineReducers({
       {
         Response: ActionType.SubAccount.SubAccounts.Response,
         Loading: ActionType.SubAccount.SubAccounts.Loading,
-        Select: ActionType.SubAccount.SubAccounts.Select,
         SetSearch: ActionType.SubAccount.SubAccounts.SetSearch
       },
       {
@@ -183,7 +182,6 @@ const rootReducer = combineReducers({
       {
         Response: ActionType.Accounts.Response,
         Loading: ActionType.Accounts.Loading,
-        Select: ActionType.Accounts.Select,
         SetSearch: ActionType.Accounts.SetSearch
       },
       {

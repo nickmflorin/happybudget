@@ -12,7 +12,6 @@ export const ActionType = {
     Loading: "budget.accounts.Loading",
     Response: "budget.accounts.Response",
     Request: "budget.accounts.Request",
-    Select: "budget.accounts.Select",
     SetSearch: "budget.accounts.SetSearch",
     Deleting: "budget.accounts.Deleting",
     Creating: "budget.accounts.Creating",
@@ -73,7 +72,6 @@ export const ActionType = {
       Loading: "budget.subaccount.subaccounts.Loading",
       Response: "budget.subaccount.subaccounts.Response",
       Request: "budget.subaccount.subaccounts.Request",
-      Select: "budget.subaccount.subaccounts.Select",
       SetSearch: "budget.subaccount.subaccounts.SetSearch"
     }
   }
