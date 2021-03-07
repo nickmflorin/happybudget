@@ -57,8 +57,12 @@
     &.action-cell {
       border: unset !important;
       text-align: center;
-      padding-top: 2px;
-      padding-bottom: 2px;
+      padding: 2px;
+      .ag-react-container {
+        > * {
+          margin: 0 auto;
+        }
+      }
     }
   }
   div[role='gridcell'].ag-cell-focus {

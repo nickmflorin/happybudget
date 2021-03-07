@@ -1,8 +1,21 @@
 @import "style/typography";
 
-.ag-theme-alpine {
+.primary-grid {
   .ag-row:last-child {
     border-bottom: none !important;
+  }
+}
+
+.footer-grid {
+  .ag-body-viewport {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    .ag-row {
+      border-bottom: none !important;
+      div[role='gridcell'] {
+        background-color: #f8f8f8;
+      }
+    }
   }
 }
 

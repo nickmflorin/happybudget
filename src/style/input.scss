@@ -24,7 +24,7 @@ form {
 
 // This class is not meant to be used in the components.
 .input-base {
-  border-radius: $input-border-radius;
+  border-radius: 0px;
   border: none;
   background-color: $gray-light !important;
   color: $text-secondary;

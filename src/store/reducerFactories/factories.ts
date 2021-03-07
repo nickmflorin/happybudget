@@ -198,9 +198,9 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
       SelectAllRows: () => {
         const selected = filter(newState, (row: R) => row.selected === true);
         if (selected.length === newState.length) {
-          newState = map(newState, (row: R) => ({ ...row, selected: false }));
+          return map(newState, (row: R) => ({ ...row, selected: false }));
         } else {
-          newState = map(newState, (row: R) => ({ ...row, selected: true }));
+          return map(newState, (row: R) => ({ ...row, selected: true }));
         }
       }
     };

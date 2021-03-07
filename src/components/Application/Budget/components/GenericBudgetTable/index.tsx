@@ -1,4 +1,5 @@
 import { useCallback, useState, useEffect } from "react";
+import classNames from "classnames";
 import { map, isNil, includes, find, concat, uniq, forEach, filter } from "lodash";
 
 import { AgGridReact } from "ag-grid-react";
@@ -9,12 +10,12 @@ import {
   GridApi,
   GridReadyEvent,
   RowNode,
-  EditableCallbackParams
+  EditableCallbackParams,
+  GridOptions
 } from "ag-grid-community";
 
-import TableFooter from "./TableFooter";
 import TableHeader from "./TableHeader";
-import { DeleteCell, ExpandCell, SelectCell, ValueCell, CellEditor } from "./cells";
+import { DeleteCell, ExpandCell, SelectCell, ValueCell, CellEditor, NewRowCell } from "./cells";
 import "./index.scss";
 
 interface GenericBudgetTableProps<R> {
@@ -50,16 +51,26 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
 }: GenericBudgetTableProps<R>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
+  const [footerGridApi, setFooterGridApi] = useState<GridApi | undefined>(undefined);
+  const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [footerColDefs, setFooterColDefs] = useState<ColDef[]>([]);
+  const [gridOptions, setGridOptions] = useState<GridOptions | undefined>(undefined);
+  const [footerOptions, setFooterOptions] = useState<GridOptions | undefined>(undefined);
 
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
   }, []);
 
+  const onFooterGridReady = useCallback((event: GridReadyEvent): void => {
+    setFooterGridApi(event.api);
+  }, []);
+
   useEffect(() => {
-    if (!isNil(gridApi)) {
+    if (!isNil(gridApi) && !isNil(footerGridApi)) {
       gridApi.sizeColumnsToFit();
+      footerGridApi.sizeColumnsToFit();
     }
-  }, [table, gridApi]);
+  }, [table, gridApi, footerGridApi]);
 
   useEffect(() => {
     if (!isNil(gridApi)) {
@@ -94,6 +105,150 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
     }
   }, [table]);
 
+  useEffect(() => {
+    const topOptions = {
+      alignedGrids: [],
+      defaultColDef: {
+        resizable: false,
+        sortable: true,
+        filter: false
+      },
+      suppressHorizontalScroll: true
+    };
+    const bottomOptions = {
+      alignedGrids: [],
+      defaultColDef: {
+        resizable: false,
+        sortable: true,
+        filter: false
+      }
+    };
+    setGridOptions(topOptions);
+    setFooterOptions(bottomOptions);
+  }, []);
+
+  useEffect(() => {
+    setColDefs(
+      map(
+        concat(
+          [
+            {
+              field: "select",
+              editable: false,
+              headerName: "",
+              width: 50,
+              cellRenderer: "SelectCell",
+              cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
+            },
+            {
+              field: "expand",
+              editable: false,
+              headerName: "",
+              width: 50,
+              cellRenderer: "ExpandCell",
+              cellRendererParams: { onClick: onRowExpand }
+            }
+          ],
+          map(
+            columns,
+            (def: ColDef) =>
+              ({
+                ...def,
+                cellRenderer: "ValueCell",
+                cellRendererParams: { isCellEditable },
+                filterParams: {
+                  textFormatter: (value: Redux.ICell): string => {
+                    if (!isNil(value)) {
+                      return value.value;
+                    }
+                    return "";
+                  }
+                }
+              } as ColDef)
+          ),
+          [
+            {
+              field: "delete",
+              editable: false,
+              headerName: "",
+              width: 70,
+              cellRenderer: "DeleteCell",
+              cellRendererParams: { onClick: onRowDelete }
+            }
+          ]
+        ),
+        (col: ColDef) => ({
+          ...col,
+          suppressMenu: true,
+          suppressMenuHide: true,
+          editable: (params: EditableCallbackParams) => {
+            if (includes(["delete", "select", "expand"], params.colDef.field)) {
+              return false;
+            }
+            const row: R = params.node.data;
+            return isCellEditable(row, params.colDef);
+          },
+          cellClass: (params: CellClassParams) => {
+            if (includes(["delete", "select", "expand"], params.colDef.field)) {
+              return "action-cell";
+            }
+            const row: R = params.node.data;
+            if (!isCellEditable(row, params.colDef)) {
+              return "not-editable";
+            }
+            return "";
+          }
+        })
+      )
+    );
+  }, [columns]);
+
+  useEffect(() => {
+    setFooterColDefs(
+      map(
+        concat(
+          [
+            {
+              field: "select",
+              editable: false,
+              headerName: "",
+              width: 50,
+              cellRenderer: "NewRowCell",
+              cellRendererParams: { onNew: onRowAdd }
+            },
+            {
+              field: "expand",
+              editable: false,
+              headerName: "",
+              width: 50
+            }
+          ],
+          columns,
+          [
+            {
+              field: "delete",
+              editable: false,
+              headerName: "",
+              width: 70
+            }
+          ]
+        ),
+        (col: ColDef) => ({
+          ...col,
+          suppressMenu: true,
+          suppressMenuHide: true,
+          editable: false,
+          cellClass: (params: CellClassParams) => {
+            if (includes(["delete", "select", "expand"], params.colDef.field)) {
+              return classNames("action-cell", "not-editable");
+            }
+            return "not-editable";
+          }
+        })
+      )
+    );
+  }, [columns]);
+
   return (
     <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
       <TableHeader
@@ -111,111 +266,69 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
         onSelect={onSelectAll}
         deleteDisabled={filter(table, (row: R) => row.selected === true).length === 0}
       />
-      <AgGridReact
-        columnDefs={map(
-          concat(
-            [
-              {
-                field: "select",
-                editable: false,
-                headerName: "",
-                width: 50,
-                cellRenderer: "SelectCell",
-                cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
-              },
-              {
-                field: "expand",
-                editable: false,
-                headerName: "",
-                width: 50,
-                cellRenderer: "ExpandCell",
-                cellRendererParams: { onClick: onRowExpand }
-              }
-            ],
-            map(
-              columns,
-              (def: ColDef) =>
-                ({
-                  ...def,
-                  cellRenderer: "ValueCell",
-                  cellRendererParams: { isCellEditable },
-                  filterParams: {
-                    textFormatter: (value: Redux.ICell): string => {
-                      if (!isNil(value)) {
-                        return value.value;
-                      }
-                      return "";
-                    }
-                  }
-                } as ColDef)
-            ),
-            [
-              {
-                field: "delete",
-                editable: false,
-                headerName: "",
-                width: 70,
-                cellRenderer: "DeleteCell",
-                cellRendererParams: { onClick: onRowDelete }
-              }
-            ]
-          ),
-          (col: ColDef) => ({
-            ...col,
-            suppressMenu: true,
-            suppressMenuHide: true,
-            editable: (params: EditableCallbackParams) => {
-              if (includes(["delete", "select", "expand"], params.colDef.field)) {
-                return false;
-              }
-              const row: R = params.node.data;
-              return isCellEditable(row, params.colDef);
-            },
-            cellClass: (params: CellClassParams) => {
-              if (includes(["delete", "select", "expand"], params.colDef.field)) {
-                return "action-cell";
-              }
-              const row: R = params.node.data;
-              if (!isCellEditable(row, params.colDef)) {
-                return "not-editable";
+      <div className={"primary-grid"}>
+        <AgGridReact
+          gridOptions={gridOptions}
+          columnDefs={colDefs}
+          rowDragManaged={true}
+          allowContextMenuWithControlKey={true}
+          rowData={table}
+          getRowNodeId={(data: any) => data.id}
+          immutableData={true}
+          suppressRowClickSelection={true}
+          onGridReady={onGridReady}
+          domLayout={"autoHeight"}
+          defaultColDef={{
+            cellEditor: "CellEditor",
+            getQuickFilterText: (params: { value: Redux.ICell }): string => {
+              if (!isNil(params.value)) {
+                return params.value.value;
               }
               return "";
             }
-          })
-        )}
-        rowDragManaged={true}
-        allowContextMenuWithControlKey={true}
-        rowData={table}
-        getRowNodeId={(data: any) => data.id}
-        immutableData={true}
-        suppressRowClickSelection={true}
-        onGridReady={onGridReady}
-        domLayout={"autoHeight"}
-        defaultColDef={{
-          resizable: false,
-          sortable: true,
-          filter: false,
-          cellEditor: "CellEditor",
-          getQuickFilterText: (params: { value: Redux.ICell }): string => {
-            if (!isNil(params.value)) {
-              return params.value.value;
+          }}
+          frameworkComponents={{
+            DeleteCell: DeleteCell,
+            ExpandCell: ExpandCell,
+            SelectCell: SelectCell,
+            ValueCell: ValueCell,
+            CellEditor: CellEditor
+          }}
+          onCellEditingStopped={(event: CellEditingStoppedEvent) => {
+            const field = event.column.getColId();
+            onRowUpdate(event.data.id, { [field]: event.newValue.value });
+          }}
+        />
+      </div>
+      <div className={"footer-grid"}>
+        <AgGridReact
+          gridOptions={footerOptions}
+          columnDefs={footerColDefs}
+          rowData={[
+            {
+              selected: false,
+              description: "",
+              line: "",
+              isPlaceholder: true,
+              name: "",
+              quantity: 0,
+              unit: "",
+              multiplier: 0,
+              rate: 0,
+              estimated: 0,
+              variance: 0,
+              subaccounts: []
             }
-            return "";
-          }
-        }}
-        frameworkComponents={{
-          DeleteCell: DeleteCell,
-          ExpandCell: ExpandCell,
-          SelectCell: SelectCell,
-          ValueCell: ValueCell,
-          CellEditor: CellEditor
-        }}
-        onCellEditingStopped={(event: CellEditingStoppedEvent) => {
-          const field = event.column.getColId();
-          onRowUpdate(event.data.id, { [field]: event.newValue.value });
-        }}
-      />
-      <TableFooter text={"Grand Total"} onNew={() => onRowAdd()} />
+          ]}
+          suppressRowClickSelection={true}
+          onGridReady={onFooterGridReady}
+          domLayout={"autoHeight"}
+          headerHeight={0}
+          frameworkComponents={{
+            NewRowCell: NewRowCell
+          }}
+        />
+      </div>
     </div>
   );
 };
