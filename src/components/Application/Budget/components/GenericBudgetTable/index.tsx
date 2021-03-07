@@ -212,8 +212,7 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
         }}
         onCellEditingStopped={(event: CellEditingStoppedEvent) => {
           const field = event.column.getColId();
-          console.log(event);
-          // onRowUpdate(event.data.id, { [field]: event.newValue.value });
+          onRowUpdate(event.data.id, { [field]: event.newValue.value });
         }}
       />
       <TableFooter text={"Grand Total"} onNew={() => onRowAdd()} />

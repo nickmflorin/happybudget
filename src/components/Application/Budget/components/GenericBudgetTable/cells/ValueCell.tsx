@@ -1,17 +1,17 @@
 import { isNil } from "lodash";
 
 import { LockOutlined } from "@ant-design/icons";
-import { ICellRendererParams, RowNode, ColDef } from "ag-grid-community";
+import { ICellRendererParams, ColDef } from "ag-grid-community";
 
 interface ValueCellProps extends ICellRendererParams {
-  isCellEditable: (row: RowNode, col: ColDef) => boolean;
+  isCellEditable: (row: Redux.Budget.IAccountRow | Redux.Budget.ISubAccountRow, col: ColDef) => boolean;
   onDeselect: (id: number | string) => void;
   value: Redux.ICell<any>;
   colDef: ColDef;
 }
 
 const ValueCell = ({ isCellEditable, node, value, colDef }: ValueCellProps): JSX.Element => {
-  if (!isCellEditable(node, colDef)) {
+  if (!isCellEditable(node.data, colDef)) {
     return (
       <div>
         <LockOutlined className={"icon--lock"} />

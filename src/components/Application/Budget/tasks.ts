@@ -142,8 +142,10 @@ export function* handleAccountUpdateTask(
         the account with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
-      const payload = accountPayloadFromRow(existing);
       if (existing.isPlaceholder === true) {
+        // The reducer will have already updated the existing value of the row
+        // synchronously.
+        const payload = accountPayloadFromRow(existing);
         // Wait until all of the required fields are present before we create
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
@@ -167,9 +169,11 @@ export function* handleAccountUpdateTask(
       } else {
         yield put(updatingAccountAction({ id: existing.id as number, value: true }));
         try {
-          // The reducer has already handled updating the sub account in the state
-          // synchronously before the time that this API request is made.
-          const response: IAccount = yield call(updateAccount, existing.id as number, payload);
+          const response: IAccount = yield call(
+            updateAccount,
+            existing.id as number,
+            action.payload.payload as Partial<Http.IAccountPayload>
+          );
           yield put(
             updateAccountsRowAction({
               id: existing.id,
@@ -215,8 +219,10 @@ export function* handleAccountSubAccountUpdateTask(
         the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
-      const payload = subAccountPayloadFromRow(existing);
       if (existing.isPlaceholder === true) {
+        // The reducer will have already updated the existing value of the row
+        // synchronously.
+        const payload = subAccountPayloadFromRow(existing);
         // Wait until all of the required fields are present before we create
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
@@ -247,7 +253,11 @@ export function* handleAccountSubAccountUpdateTask(
         try {
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
-          const response: ISubAccount = yield call(updateSubAccount, existing.id as number, payload);
+          const response: ISubAccount = yield call(
+            updateSubAccount,
+            existing.id as number,
+            action.payload.payload as Partial<Http.ISubAccountPayload>
+          );
           yield put(
             updateAccountSubAccountsRowAction(action.accountId, {
               id: existing.id,
@@ -293,11 +303,13 @@ export function* handleSubAccountSubAccountUpdateTask(
       );
     } else {
       if (existing.isPlaceholder === true) {
+        // The reducer will have already updated the existing value of the row
+        // synchronously.
+        const payload = subAccountPayloadFromRow(existing);
         // Wait until all of the required fields are present before we create
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
         if (subAccountRowHasRequiredfields(existing)) {
-          const payload = subAccountPayloadFromRow(existing);
           yield put(creatingSubAccountSubAccountAction(action.subaccountId, true));
           try {
             const response = yield call(createSubAccountSubAccount, action.subaccountId, payload);

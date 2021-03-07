@@ -19,8 +19,8 @@ export const subAccountPayloadFromRow = (
 ): Http.ISubAccountPayload | Partial<Http.ISubAccountPayload> => {
   const obj: { [key: string]: any } = {};
   forEach(SUBACCOUNT_PAYLOAD_FIELDS, (field: keyof Redux.Budget.ISubAccountRow) => {
-    if (!isNil(row[field])) {
-      obj[field] = row[field];
+    if (!isNil(row[field]) && !isNil(row[field].value)) {
+      obj[field] = row[field].value;
     }
   });
   return obj;
@@ -31,8 +31,8 @@ export const accountPayloadFromRow = (
 ): Http.IAccountPayload | Partial<Http.IAccountPayload> => {
   const obj: { [key: string]: any } = {};
   forEach(ACCOUNT_PAYLOAD_FIELDS, (field: keyof Redux.Budget.IAccountRow) => {
-    if (!isNil(row[field])) {
-      obj[field] = row[field];
+    if (!isNil(row[field]) && !isNil(row[field].value)) {
+      obj[field] = row[field].value;
     }
   });
   return obj;
@@ -41,7 +41,7 @@ export const accountPayloadFromRow = (
 export const subAccountRowHasRequiredfields = (row: Redux.Budget.ISubAccountRow): boolean => {
   let requiredFieldsPresent = true;
   forEach(SUBACCOUNT_REQUIRED_PAYLOAD_FIELDS, (field: keyof Redux.Budget.ISubAccountRow) => {
-    const val = row[field];
+    const val = row[field].value;
     if (isNil(val) || val === "") {
       requiredFieldsPresent = false;
       return false;
@@ -53,7 +53,7 @@ export const subAccountRowHasRequiredfields = (row: Redux.Budget.ISubAccountRow)
 export const accountRowHasRequiredfields = (row: Redux.Budget.IAccountRow): boolean => {
   let requiredFieldsPresent = true;
   forEach(ACCOUNT_REQUIRED_PAYLOAD_FIELDS, (field: keyof Redux.Budget.IAccountRow) => {
-    const val = row[field];
+    const val = row[field].value;
     if (isNil(val) || val === "") {
       requiredFieldsPresent = false;
       return false;
