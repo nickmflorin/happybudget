@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +20,6 @@ import {
   SoundIcon,
   WriterIcon
 } from "components/svgs";
-import { selectRandom } from "util/arrays";
 import "./Card.scss";
 
 export const Icons: (() => JSX.Element)[] = [
@@ -57,7 +56,27 @@ interface CardProps {
 }
 
 const Card = ({ title, subTitle, dropdown, onClick, loading, selected = false, onSelect }: CardProps): JSX.Element => {
-  const Icon = selectRandom(Icons);
+  const [color, setColor] = useState<string | undefined>(undefined);
+  const [Icon, setIcon] = useState<(() => JSX.Element) | undefined>(undefined);
+
+  const sumChars = (val: string): number => {
+    let sum = 0;
+    for (let i = 0; i < val.length; i++) {
+      sum += val.charCodeAt(i);
+    }
+    return sum;
+  };
+
+  useEffect(() => {
+    if (!isNil(title)) {
+      const iC = sumChars(title) % Colors.length;
+      setColor(Colors[iC]);
+
+      const iI = sumChars(title) % Icons.length;
+      setIcon(Icons[iI]);
+    }
+  }, [title]);
+
   return (
     <div className={"budget-card"}>
       <RenderWithSpinner loading={loading}>
@@ -76,12 +95,8 @@ const Card = ({ title, subTitle, dropdown, onClick, loading, selected = false, o
               <IconButton className={"card-dropdown-ellipsis"} icon={<FontAwesomeIcon icon={faEllipsisV} />} />
             </Dropdown>
           )}
-          <div
-            className={"budget-card-icon-wrapper"}
-            onClick={onClick}
-            style={{ backgroundColor: selectRandom(Colors) }}
-          >
-            <Icon />
+          <div className={"budget-card-icon-wrapper"} onClick={onClick} style={{ backgroundColor: color }}>
+            {!isNil(Icon) && Icon}
           </div>
           <div className={"budget-card-footer"} onClick={onClick}>
             <ShowHide show={!isNil(title)}>
