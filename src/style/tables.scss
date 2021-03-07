@@ -72,4 +72,9 @@
       border: unset !important;
     }
   }
+  .ag-cell-inline-editing {
+    .ag-react-container {
+      line-height: 1 !important;
+    }
+  }
 }

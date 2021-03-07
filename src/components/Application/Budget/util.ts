@@ -62,27 +62,87 @@ export const accountRowHasRequiredfields = (row: Redux.Budget.IAccountRow): bool
   return requiredFieldsPresent;
 };
 
+interface IOverrides {
+  selected?: boolean;
+  isPlaceholder?: boolean;
+}
+
+const getDefaultValue = (
+  field: "selected" | "isPlaceholder",
+  existing: Redux.Budget.ISubAccountRow | Redux.Budget.IAccountRow | undefined,
+  overrides: IOverrides | undefined,
+  def: boolean = false
+): boolean => {
+  if (!isNil(overrides) && !isNil(overrides[field])) {
+    return overrides[field] as boolean;
+  } else if (!isNil(existing) && !isNil(existing[field])) {
+    return existing[field];
+  } else {
+    return def;
+  }
+};
+
+export const convertAccountToRow = (
+  account: IAccount,
+  existing?: Redux.Budget.IAccountRow,
+  overrides?: IOverrides
+): Redux.Budget.IAccountRow => ({
+  account_number: {
+    value: account.account_number,
+    error: !isNil(existing) ? existing.account_number.error : undefined
+  },
+  description: { value: account.description, error: !isNil(existing) ? existing.description.error : undefined },
+  id: account.id,
+  isPlaceholder: getDefaultValue("isPlaceholder", existing, overrides),
+  selected: getDefaultValue("selected", existing, overrides),
+  estimated: { value: account.estimated, error: !isNil(existing) ? existing.estimated.error : undefined },
+  variance: { value: account.variance, error: !isNil(existing) ? existing.variance.error : undefined },
+  subaccounts: account.subaccounts
+});
+
+export const convertSubAccountToRow = (
+  subaccount: ISubAccount,
+  existing?: Redux.Budget.ISubAccountRow,
+  overrides?: IOverrides
+): Redux.Budget.ISubAccountRow => ({
+  name: { value: subaccount.name, error: !isNil(existing) ? existing.name.error : undefined },
+  line: { value: subaccount.line, error: !isNil(existing) ? existing.line.error : undefined },
+  unit: { value: subaccount.unit, error: !isNil(existing) ? existing.unit.error : undefined },
+  multiplier: { value: subaccount.multiplier, error: !isNil(existing) ? existing.multiplier.error : undefined },
+  rate: { value: subaccount.rate, error: !isNil(existing) ? existing.rate.error : undefined },
+  quantity: { value: subaccount.quantity, error: !isNil(existing) ? existing.quantity.error : undefined },
+  description: { value: subaccount.description, error: !isNil(existing) ? existing.description.error : undefined },
+  id: subaccount.id,
+  isPlaceholder: getDefaultValue("isPlaceholder", existing, overrides),
+  selected: getDefaultValue("selected", existing, overrides),
+  estimated: { value: subaccount.estimated, error: !isNil(existing) ? existing.estimated.error : undefined },
+  variance: { value: subaccount.variance, error: !isNil(existing) ? existing.variance.error : undefined },
+  subaccounts: subaccount.subaccounts
+});
+
 export const createSubAccountRowPlaceholder = (): Redux.Budget.ISubAccountRow => ({
-  name: null,
-  line: null,
-  unit: null,
-  multiplier: null,
-  rate: null,
-  quantity: null,
-  description: null,
+  name: { value: null },
+  line: { value: null },
+  unit: { value: null },
+  multiplier: { value: null },
+  rate: { value: null },
+  quantity: { value: null },
+  description: { value: null },
   id: uuidv4(),
   isPlaceholder: true,
   selected: false,
-  estimated: null,
+  estimated: { value: null },
+  variance: { value: null },
   subaccounts: []
 });
 
 export const createAccountRowPlaceholder = (): Redux.Budget.IAccountRow => ({
-  account_number: null,
-  description: null,
+  account_number: { value: null },
+  description: { value: null },
   id: uuidv4(),
   isPlaceholder: true,
   selected: false,
-  estimated: null,
+  estimated: { value: null },
+  variance: { value: null },
   subaccounts: []
 });

@@ -9,7 +9,12 @@ import {
 
 import { ActionType } from "./actions";
 import { initialAccountState, initialSubAccountState } from "./initialState";
-import { createSubAccountRowPlaceholder, createAccountRowPlaceholder } from "./util";
+import {
+  createSubAccountRowPlaceholder,
+  createAccountRowPlaceholder,
+  convertSubAccountToRow,
+  convertAccountToRow
+} from "./util";
 
 const indexedAccountReducer = combineReducers({
   subaccounts: combineReducers({
@@ -30,7 +35,7 @@ const indexedAccountReducer = combineReducers({
         SetSearch: ActionType.Account.SubAccountsTable.SetSearch
       },
       createSubAccountRowPlaceholder,
-      (subaccount: ISubAccount) => ({ ...subaccount, selected: false, isPlaceholder: false }),
+      convertSubAccountToRow,
       { referenceEntity: "subaccount" }
     )
   }),
@@ -64,7 +69,7 @@ const indexedSubAccountReducer = combineReducers({
         Request: ActionType.SubAccount.SubAccountsTable.Request
       },
       createSubAccountRowPlaceholder,
-      (subaccount: ISubAccount) => ({ ...subaccount, selected: false, isPlaceholder: false }),
+      convertSubAccountToRow,
       { referenceEntity: "subaccount" }
     )
   }),
@@ -154,7 +159,7 @@ const rootReducer = combineReducers({
         SetSearch: ActionType.AccountsTable.SetSearch
       },
       createAccountRowPlaceholder,
-      (account: IAccount) => ({ ...account, selected: false, isPlaceholder: false }),
+      convertAccountToRow,
       { referenceEntity: "account" }
     )
   })

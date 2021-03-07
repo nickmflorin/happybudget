@@ -49,6 +49,11 @@ namespace Redux {
     selected: boolean;
   }
 
+  interface ICell<T = string> {
+    value: T;
+    error?: string;
+  }
+
   interface IDetailResponseStore<T extends Model> {
     readonly data: T | undefined;
     readonly loading: boolean;
@@ -151,23 +156,24 @@ namespace Redux {
     interface IRow extends Redux.IRow {
       readonly selected: boolean;
       readonly isPlaceholder: boolean;
-      readonly estimated: number | null;
+      readonly estimated: ICell<number | null>;
+      readonly variance: ICell<number | null>;
       readonly subaccounts: ISimpleSubAccount[];
     }
 
     interface IAccountRow extends IRow {
-      readonly account_number: string | null;
-      readonly description: string | null;
+      readonly account_number: ICell<string | null>;
+      readonly description: ICell<string | null>;
     }
 
     interface ISubAccountRow extends IRow {
-      readonly line: string | null;
-      readonly name: string | null;
-      readonly description: string | null;
-      readonly quantity: number | null;
-      readonly unit: Unit | null;
-      readonly multiplier: number | null;
-      readonly rate: number | null;
+      readonly line: ICell<string | null>;
+      readonly name: ICell<string | null>;
+      readonly description: ICell<string | null>;
+      readonly quantity: ICell<number | null>;
+      readonly unit: ICell<Unit | null>;
+      readonly multiplier: ICell<number | null>;
+      readonly rate: ICell<number | null>;
     }
 
     interface IStore {

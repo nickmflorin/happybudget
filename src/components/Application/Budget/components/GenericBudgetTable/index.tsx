@@ -14,7 +14,7 @@ import {
 
 import TableFooter from "./TableFooter";
 import TableHeader from "./TableHeader";
-import { DeleteCell, ExpandCell, SelectCell, ValueCell } from "./cells";
+import { DeleteCell, ExpandCell, SelectCell, ValueCell, CellEditor } from "./cells";
 import "./index.scss";
 
 interface GenericBudgetTableProps<R> {
@@ -138,7 +138,15 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
                 ({
                   ...def,
                   cellRenderer: "ValueCell",
-                  cellRendererParams: { isCellEditable }
+                  cellRendererParams: { isCellEditable },
+                  filterParams: {
+                    textFormatter: (value: Redux.ICell): string => {
+                      if (!isNil(value)) {
+                        return value.value;
+                      }
+                      return "";
+                    }
+                  }
                 } as ColDef)
             ),
             [
@@ -186,17 +194,26 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
         defaultColDef={{
           resizable: false,
           sortable: true,
-          filter: false
+          filter: false,
+          cellEditor: "CellEditor",
+          getQuickFilterText: (params: { value: Redux.ICell }): string => {
+            if (!isNil(params.value)) {
+              return params.value.value;
+            }
+            return "";
+          }
         }}
         frameworkComponents={{
           DeleteCell: DeleteCell,
           ExpandCell: ExpandCell,
           SelectCell: SelectCell,
-          ValueCell: ValueCell
+          ValueCell: ValueCell,
+          CellEditor: CellEditor
         }}
         onCellEditingStopped={(event: CellEditingStoppedEvent) => {
           const field = event.column.getColId();
-          onRowUpdate(event.data.id, { [field]: event.newValue });
+          console.log(event);
+          // onRowUpdate(event.data.id, { [field]: event.newValue.value });
         }}
       />
       <TableFooter text={"Grand Total"} onNew={() => onRowAdd()} />

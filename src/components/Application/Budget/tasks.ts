@@ -1,4 +1,4 @@
-import { isNil, find, map, concat } from "lodash";
+import { isNil, find, concat } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import {
@@ -53,7 +53,9 @@ import {
   subAccountPayloadFromRow,
   subAccountRowHasRequiredfields,
   accountPayloadFromRow,
-  accountRowHasRequiredfields
+  accountRowHasRequiredfields,
+  convertSubAccountToRow,
+  convertAccountToRow
 } from "./util";
 
 export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Redux.Budget.IAccountRow>): SagaIterator {
@@ -149,12 +151,10 @@ export function* handleAccountUpdateTask(
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, action.budgetId, payload);
-            // TODO: Do we want to spread the whole response here?  Or should we just be
-            // looking for fields that correspond to the Row.  Probably the latter...
             yield put(
               updateAccountsRowAction({
                 id: existing.id,
-                payload: { ...response, isPlaceholder: false }
+                payload: convertAccountToRow(response, existing, { isPlaceholder: false, selected: false })
               })
             );
           } catch (e) {
@@ -170,12 +170,10 @@ export function* handleAccountUpdateTask(
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
           const response: IAccount = yield call(updateAccount, existing.id as number, payload);
-          // TODO: Do we want to spread the whole response here?  Or should we just be
-          // looking for fields that correspond to the Row.  Probably the latter...
           yield put(
             updateAccountsRowAction({
               id: existing.id,
-              payload: response
+              payload: convertAccountToRow(response, existing, { isPlaceholder: false, selected: false })
             })
           );
         } catch (e) {
@@ -231,12 +229,10 @@ export function* handleAccountSubAccountUpdateTask(
               action.budgetId,
               payload
             );
-            // TODO: Do we want to spread the whole response here?  Or should we just be
-            // looking for fields that correspond to the Row.  Probably the latter...
             yield put(
               updateAccountSubAccountsRowAction(action.accountId, {
                 id: existing.id,
-                payload: { ...response, isPlaceholder: false }
+                payload: convertSubAccountToRow(response, existing, { isPlaceholder: false, selected: false })
               })
             );
           } catch (e) {
@@ -252,12 +248,10 @@ export function* handleAccountSubAccountUpdateTask(
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
           const response: ISubAccount = yield call(updateSubAccount, existing.id as number, payload);
-          // TODO: Do we want to spread the whole response here?  Or should we just be
-          // looking for fields that correspond to the Row.  Probably the latter...
           yield put(
             updateAccountSubAccountsRowAction(action.accountId, {
               id: existing.id,
-              payload: response
+              payload: convertSubAccountToRow(response, existing, { isPlaceholder: false })
             })
           );
         } catch (e) {
@@ -307,12 +301,10 @@ export function* handleSubAccountSubAccountUpdateTask(
           yield put(creatingSubAccountSubAccountAction(action.subaccountId, true));
           try {
             const response = yield call(createSubAccountSubAccount, action.subaccountId, payload);
-            // TODO: Do we want to spread the whole response here?  Or should we just be
-            // looking for fields that correspond to the Row.  Probably the latter...
             yield put(
               updateSubAccountSubAccountsRowAction(action.subaccountId, {
                 id: existing.id,
-                payload: { ...response, isPlaceholder: false }
+                payload: convertSubAccountToRow(response, existing, { isPlaceholder: false })
               })
             );
           } catch (e) {
@@ -329,12 +321,10 @@ export function* handleSubAccountSubAccountUpdateTask(
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
           const response: ISubAccount = yield call(updateSubAccount, existing.id as number, payload);
-          // TODO: Do we want to spread the whole response here?  Or should we just be
-          // looking for fields that correspond to the Row.  Probably the latter...
           yield put(
             updateSubAccountSubAccountsRowAction(action.subaccountId, {
               id: existing.id,
-              payload: response
+              payload: convertSubAccountToRow(response, existing, { isPlaceholder: false })
             })
           );
         } catch (e) {

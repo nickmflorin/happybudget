@@ -67,6 +67,7 @@ interface IAccount extends Model {
   readonly budget: number;
   readonly ancestors: IAncestor[];
   readonly estimated: number | null;
+  readonly variance: number | null;
   readonly subaccounts: ISimpleSubAccount[];
 }
 
@@ -95,5 +96,6 @@ interface ISubAccount extends ISimpleSubAccount {
   readonly parent_type: ParentType;
   readonly ancestors: IAncestor[];
   readonly estimated: number | null;
+  readonly variance: number | null;
   readonly subaccounts: ISimpleSubAccount[];
 }
