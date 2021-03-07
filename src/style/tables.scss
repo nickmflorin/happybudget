@@ -16,13 +16,6 @@
   div[role='gridcell'] {
     background-color: $white;
   }
-  // Disabled Cells
-  div[col-id='estimated'][role='gridcell'],
-  div[col-id='actuals'][role='gridcell'],
-  div[col-id='actual'][role='gridcell'],
-  div[col-id='variance'][role='gridcell'] {
-    background-color: #f7fffa;
-  }
   .ag-layout-auto-height .ag-center-cols-clipper,
   .ag-layout-auto-height .ag-center-cols-container,
   .ag-layout-print .ag-center-cols-clipper,
@@ -43,7 +36,7 @@
     border-color: 1px solid $gray-light !important;
   }
   .ag-row-hover div[role=gridcell] {
-      background-color: $gray-highlight !important;
+    background-color: $gray-highlight !important;
   }
   .ag-row-hover div[role='gridcell'],
   .ag-row-hover div[col-id='estimated'][role='gridcell'],
@@ -69,8 +62,13 @@
     }
   }
   div[role='gridcell'].ag-cell-focus {
-    border: 2px solid $green !important;
-    &.no-select, &.action-cell {
+    &:not(.not-editable) {
+      border: 2px solid $green !important;
+      &.no-select, &.action-cell {
+        border: unset !important;
+      }
+    }
+    &.not-editable {
       border: unset !important;
     }
   }

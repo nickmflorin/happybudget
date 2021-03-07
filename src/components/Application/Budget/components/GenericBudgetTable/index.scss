@@ -1,5 +1,19 @@
+@import "style/typography";
+
 .ag-theme-alpine {
   .ag-row:last-child {
     border-bottom: none !important;
+  }
+}
+
+.icon--lock {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  color: $text-primary;
+
+  svg {
+    height: 0.8rem;
+    width: auto;
   }
 }

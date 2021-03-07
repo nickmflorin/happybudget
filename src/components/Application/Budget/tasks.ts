@@ -147,7 +147,6 @@ export function* handleAccountRowUpdateTask(
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
         if (accountRowHasRequiredfields(existing)) {
-          console.log(payload);
           yield put(creatingAccountAction(true));
           try {
             const response = yield call(createAccount, action.budgetId, payload);
@@ -222,7 +221,6 @@ export function* handleAccountSubAccountRowUpdateTask(
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
         if (subAccountRowHasRequiredfields(existing)) {
-          console.log(payload);
           yield put(creatingAccountSubAccountAction(action.accountId, true));
           try {
             const response = yield call(createAccountSubAccount, action.accountId, action.budgetId, payload);
@@ -467,7 +465,6 @@ export function* getSubAccountTask(action: Redux.Budget.IAction<null>): SagaIter
     try {
       const response: ISubAccount = yield call(getSubAccount, action.subaccountId);
       yield put(responseSubAccountAction(action.subaccountId, response));
-      console.log(response);
       yield put(
         setAncestorsAction(
           concat(response.ancestors, [

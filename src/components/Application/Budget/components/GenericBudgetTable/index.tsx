@@ -6,6 +6,7 @@ import { faTrash, faArrowsAltV } from "@fortawesome/free-solid-svg-icons";
 
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { LockOutlined } from "@ant-design/icons";
 import { AgGridReact } from "ag-grid-react";
 import {
   ColDef,
@@ -14,7 +15,8 @@ import {
   CellClassParams,
   GridApi,
   GridReadyEvent,
-  RowNode
+  RowNode,
+  EditableCallbackParams
 } from "ag-grid-community";
 
 import { IconButton } from "components/control/buttons";
@@ -35,6 +37,7 @@ interface GenericBudgetTableProps<R> {
   onRowDelete: (row: R) => void;
   onRowExpand: (id: number) => void;
   onSelectAll: () => void;
+  isCellEditable: (row: R, col: ColDef) => boolean;
 }
 
 const GenericBudgetTable = <R extends Redux.Budget.IRow>({
@@ -49,7 +52,8 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
   onRowDeselect,
   onRowAdd,
   onRowDelete,
-  onRowExpand
+  onRowExpand,
+  isCellEditable
 }: GenericBudgetTableProps<R>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
@@ -125,6 +129,15 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
           />
         );
       } else {
+        const row: R = params.node.data;
+        if (!isCellEditable(row, params.colDef)) {
+          return (
+            <div>
+              <LockOutlined className={"icon--lock"} />
+              {params.value}
+            </div>
+          );
+        }
         return <span>{params.value}</span>;
       }
     };
@@ -189,9 +202,20 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
             ...col,
             suppressMenu: true,
             suppressMenuHide: true,
+            editable: (params: EditableCallbackParams) => {
+              if (includes(["delete", "select", "expand"], params.colDef.field)) {
+                return false;
+              }
+              const row: R = params.node.data;
+              return isCellEditable(row, params.colDef);
+            },
             cellClass: (params: CellClassParams) => {
               if (includes(["delete", "select", "expand"], params.colDef.field)) {
                 return "action-cell";
+              }
+              const row: R = params.node.data;
+              if (!isCellEditable(row, params.colDef)) {
+                return "not-editable";
               }
               return "";
             }

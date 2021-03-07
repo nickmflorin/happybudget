@@ -45,6 +45,7 @@ interface IBudget extends Model {
   readonly studio_shoot_days: number;
   readonly location_days: number;
   readonly trash: boolean;
+  readonly estimated: number | null;
 }
 
 type AncestorType = "budget" | "account" | "subaccount";
@@ -65,14 +66,19 @@ interface IAccount extends Model {
   readonly access: number[];
   readonly budget: number;
   readonly ancestors: IAncestor[];
+  readonly estimated: number | null;
+  readonly subaccounts: ISimpleSubAccount[];
 }
 
 type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
 type Unit = 0 | 1 | 2 | 3 | 4 | 5;
 type ParentType = "subaccount" | "account";
 
-interface ISubAccount extends Model {
+interface ISimpleSubAccount extends Model {
   readonly name: string;
+}
+
+interface ISubAccount extends ISimpleSubAccount {
   readonly line: string;
   readonly description: string | null;
   readonly created_by: ISimpleUser | null;
@@ -88,4 +94,6 @@ interface ISubAccount extends Model {
   readonly parent: number;
   readonly parent_type: ParentType;
   readonly ancestors: IAncestor[];
+  readonly estimated: number | null;
+  readonly subaccounts: ISimpleSubAccount[];
 }

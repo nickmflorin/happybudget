@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
-import { isNil } from "lodash";
+import { isNil, includes } from "lodash";
+
+import { ColDef } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
@@ -35,6 +37,12 @@ const Accounts = (): JSX.Element => {
       <RenderWithSpinner loading={accounts.list.loading}>
         <GenericBudgetTable<Redux.Budget.IAccountRow>
           table={accounts.table}
+          isCellEditable={(row: Redux.Budget.IAccountRow, colDef: ColDef) => {
+            if (includes(["estimated", "actual", "variance"], colDef.field)) {
+              return false;
+            }
+            return true;
+          }}
           search={accounts.list.search}
           onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
           saving={accounts.deleting.length !== 0 || accounts.updating.length !== 0 || accounts.creating}
@@ -50,13 +58,11 @@ const Accounts = (): JSX.Element => {
           columns={[
             {
               field: "account_number",
-              headerName: "Account",
-              editable: true
+              headerName: "Account"
             },
             {
               field: "description",
-              headerName: "Category Description",
-              editable: true
+              headerName: "Category Description"
             },
             {
               field: "estimated",

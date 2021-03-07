@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
-import { isNil } from "lodash";
+import { isNil, includes } from "lodash";
+
+import { ColDef } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
@@ -23,14 +25,14 @@ const Account = (): JSX.Element => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const subaccounts = useSelector((state: Redux.IApplicationStore) => {
+  const accountStore = useSelector((state: Redux.IApplicationStore) => {
     let subState = initialAccountState;
     if (!isNaN(parseInt(accountId))) {
       if (!isNil(state.budget.accounts.details[parseInt(accountId)])) {
         subState = state.budget.accounts.details[parseInt(accountId)];
       }
     }
-    return subState.subaccounts;
+    return subState;
   });
 
   useEffect(() => {
@@ -47,12 +49,25 @@ const Account = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={[budgetId, accountId]}>
-      <RenderWithSpinner loading={subaccounts.list.loading}>
+      <RenderWithSpinner loading={accountStore.subaccounts.list.loading || accountStore.detail.loading}>
         <GenericBudgetTable<Redux.Budget.ISubAccountRow>
-          table={subaccounts.table}
-          search={subaccounts.list.search}
+          table={accountStore.subaccounts.table}
+          isCellEditable={(row: Redux.Budget.ISubAccountRow, colDef: ColDef) => {
+            if (includes(["estimated", "actual"], colDef.field)) {
+              return false;
+            } else if (includes(["line", "description", "name"], colDef.field)) {
+              return true;
+            } else {
+              return row.subaccounts.length === 0;
+            }
+          }}
+          search={accountStore.subaccounts.list.search}
           onSearch={(value: string) => dispatch(setAccountSubAccountsSearchAction(parseInt(accountId), value))}
-          saving={subaccounts.deleting.length !== 0 || subaccounts.updating.length !== 0 || subaccounts.creating}
+          saving={
+            accountStore.subaccounts.deleting.length !== 0 ||
+            accountStore.subaccounts.updating.length !== 0 ||
+            accountStore.subaccounts.creating
+          }
           onRowAdd={() => dispatch(addAccountSubAccountsRowAction(parseInt(accountId)))}
           onRowSelect={(id: string | number) => dispatch(selectAccountSubAccountsRowAction(parseInt(accountId), id))}
           onRowDeselect={(id: string | number) =>
@@ -69,38 +84,31 @@ const Account = (): JSX.Element => {
           columns={[
             {
               field: "line",
-              headerName: "Line",
-              editable: true
+              headerName: "Line"
             },
             {
               field: "description",
-              headerName: "Category Description",
-              editable: true
+              headerName: "Category Description"
             },
             {
               field: "name",
-              headerName: "Name",
-              editable: true
+              headerName: "Name"
             },
             {
               field: "quantity",
-              headerName: "Quantity",
-              editable: true
+              headerName: "Quantity"
             },
             {
               field: "unit",
-              headerName: "Unit",
-              editable: true
+              headerName: "Unit"
             },
             {
               field: "multiplier",
-              headerName: "X",
-              editable: true
+              headerName: "X"
             },
             {
               field: "rate",
-              headerName: "Rate",
-              editable: true
+              headerName: "Rate"
             },
             {
               field: "estimated",

@@ -12,9 +12,9 @@ namespace Redux {
   type ModuleLabel = "dashboard" | "budget";
 
   interface IActionConfig {
-    error?: Error | string | undefined;
-    meta?: any;
-    label?: ModuleLabel | ModuleLabel[] | undefined;
+    readonly error?: Error | string | undefined;
+    readonly meta?: any;
+    readonly label?: ModuleLabel | ModuleLabel[] | undefined;
   }
 
   interface IAction<P = any> extends Action<string> {
@@ -45,21 +45,21 @@ namespace Redux {
   type ModelListActionPayload = { id: number; value: boolean };
 
   interface IDetailResponseStore<T extends Model> {
-    data: T | undefined;
-    loading: boolean;
-    id: number | undefined;
-    responseWasReceived: boolean;
+    readonly data: T | undefined;
+    readonly loading: boolean;
+    readonly id: number | undefined;
+    readonly responseWasReceived: boolean;
   }
 
   interface IListResponseStore<T extends Model> {
-    data: T[];
-    count: number;
-    loading: boolean;
-    page: number;
-    pageSize: number;
-    search: string;
-    selected: number[];
-    responseWasReceived: boolean;
+    readonly data: T[];
+    readonly count: number;
+    readonly loading: boolean;
+    readonly page: number;
+    readonly pageSize: number;
+    readonly search: string;
+    readonly selected: number[];
+    readonly responseWasReceived: boolean;
   }
 
   type IIndexedStore<T> = { [key: number]: T };
@@ -70,9 +70,9 @@ namespace Redux {
   interface IUserStore extends IUser {}
 
   interface IApplicationStore extends IModulesStore {
-    user: IUserStore;
-    dashboard: Dashboard.IStore;
-    budget: Budget.IStore;
+    readonly user: IUserStore;
+    readonly dashboard: Dashboard.IStore;
+    readonly budget: Budget.IStore;
   }
 
   namespace Dashboard {
@@ -84,21 +84,21 @@ namespace Redux {
     }
 
     interface IActiveBudgetsListStore extends IListResponseStore<IBudget> {
-      deleting: number[];
+      readonly deleting: number[];
     }
 
     interface ITrashBudgetsListStore extends IListResponseStore<IBudget> {
-      deleting: number[];
-      restoring: number[];
+      readonly deleting: number[];
+      readonly restoring: number[];
     }
 
     interface IBudgetsStore {
-      active: IActiveBudgetsListStore;
-      trash: ITrashBudgetsListStore;
+      readonly active: IActiveBudgetsListStore;
+      readonly trash: ITrashBudgetsListStore;
     }
 
     interface IStore {
-      budgets: IBudgetsStore;
+      readonly budgets: IBudgetsStore;
     }
   }
 
@@ -111,61 +111,61 @@ namespace Redux {
     }
 
     interface ISubAccountListResponseStore {
-      deleting: ListStore<number>;
-      updating: ListStore<number>;
-      creating: boolean;
-      list: IListResponseStore<ISubAccount>;
-      table: ListStore<ISubAccountRow>;
+      readonly deleting: ListStore<number>;
+      readonly updating: ListStore<number>;
+      readonly creating: boolean;
+      readonly list: IListResponseStore<ISubAccount>;
+      readonly table: ListStore<ISubAccountRow>;
     }
 
     interface ISubAccountStore {
-      detail: IDetailResponseStore<ISubAccount>;
-      subaccounts: ISubAccountListResponseStore;
+      readonly detail: IDetailResponseStore<ISubAccount>;
+      readonly subaccounts: ISubAccountListResponseStore;
     }
 
     interface IAccountStore {
-      detail: IDetailResponseStore<IAccount>;
-      subaccounts: ISubAccountListResponseStore;
+      readonly detail: IDetailResponseStore<IAccount>;
+      readonly subaccounts: ISubAccountListResponseStore;
     }
 
     interface IAccountsStore {
-      list: IListResponseStore<IAccount>;
-      table: IListStore<IAccountRow>;
-      details: IIndexedStore<IAccountStore>;
-      deleting: ListStore<number>;
-      updating: ListStore<number>;
-      creating: boolean;
+      readonly list: IListResponseStore<IAccount>;
+      readonly table: IListStore<IAccountRow>;
+      readonly details: IIndexedStore<IAccountStore>;
+      readonly deleting: ListStore<number>;
+      readonly updating: ListStore<number>;
+      readonly creating: boolean;
     }
 
     interface IRow {
-      id: number | string;
-      selected: boolean;
-      isPlaceholder: boolean;
+      readonly id: number | string;
+      readonly selected: boolean;
+      readonly isPlaceholder: boolean;
+      readonly estimated: number | null;
+      readonly subaccounts: ISimpleSubAccount[];
     }
 
     interface IAccountRow extends IRow {
-      id: number | string;
-      account_number: string | null;
-      description: string | null;
+      readonly account_number: string | null;
+      readonly description: string | null;
     }
 
     interface ISubAccountRow extends IRow {
-      id: number | string;
-      line: string | null;
-      name: string | null;
-      description: string | null;
-      quantity: number | null;
-      unit: Unit | null;
-      multiplier: number | null;
-      rate: number | null;
+      readonly line: string | null;
+      readonly name: string | null;
+      readonly description: string | null;
+      readonly quantity: number | null;
+      readonly unit: Unit | null;
+      readonly multiplier: number | null;
+      readonly rate: number | null;
     }
 
     interface IStore {
-      budget: IDetailResponseStore<IBudget>;
-      accounts: IAccountsStore;
-      subaccounts: IIndexedStore<ISubAccountStore>;
-      ancestors: ListStore<IAncestor>;
-      ancestorsLoading: boolean;
+      readonly budget: IDetailResponseStore<IBudget>;
+      readonly accounts: IAccountsStore;
+      readonly subaccounts: IIndexedStore<ISubAccountStore>;
+      readonly ancestors: ListStore<IAncestor>;
+      readonly ancestorsLoading: boolean;
     }
   }
 }

@@ -72,7 +72,9 @@ export const createSubAccountRowPlaceholder = (): Redux.Budget.ISubAccountRow =>
   description: null,
   id: uuidv4(),
   isPlaceholder: true,
-  selected: false
+  selected: false,
+  estimated: null,
+  subaccounts: []
 });
 
 export const createAccountRowPlaceholder = (): Redux.Budget.IAccountRow => ({
@@ -80,5 +82,7 @@ export const createAccountRowPlaceholder = (): Redux.Budget.IAccountRow => ({
   description: null,
   id: uuidv4(),
   isPlaceholder: true,
-  selected: false
+  selected: false,
+  estimated: null,
+  subaccounts: []
 });

@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
-import { isNil } from "lodash";
+import { isNil, includes } from "lodash";
+
+import { ColDef } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
@@ -50,6 +52,15 @@ const SubAccount = (): JSX.Element => {
       <RenderWithSpinner loading={subaccounts.list.loading}>
         <GenericBudgetTable<Redux.Budget.ISubAccountRow>
           table={subaccounts.table}
+          isCellEditable={(row: Redux.Budget.ISubAccountRow, colDef: ColDef) => {
+            if (includes(["estimated", "actual"], colDef.field)) {
+              return false;
+            } else if (includes(["line", "description", "name"], colDef.field)) {
+              return true;
+            } else {
+              return row.subaccounts.length === 0;
+            }
+          }}
           search={subaccounts.list.search}
           onSearch={(value: string) => dispatch(setSubAccountSubAccountsSearchAction(parseInt(subaccountId), value))}
           saving={subaccounts.deleting.length !== 0 || subaccounts.updating.length !== 0 || subaccounts.creating}
