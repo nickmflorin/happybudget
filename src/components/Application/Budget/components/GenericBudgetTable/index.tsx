@@ -1,17 +1,10 @@
 import { useCallback, useState, useEffect } from "react";
 import { map, isNil, includes, find, concat, uniq, forEach, filter } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faArrowsAltV } from "@fortawesome/free-solid-svg-icons";
-
-import { Checkbox } from "antd";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
-import { LockOutlined } from "@ant-design/icons";
 import { AgGridReact } from "ag-grid-react";
 import {
   ColDef,
   CellEditingStoppedEvent,
-  ICellRendererParams,
   CellClassParams,
   GridApi,
   GridReadyEvent,
@@ -19,9 +12,9 @@ import {
   EditableCallbackParams
 } from "ag-grid-community";
 
-import { IconButton } from "components/control/buttons";
 import TableFooter from "./TableFooter";
 import TableHeader from "./TableHeader";
+import { DeleteCell, ExpandCell, SelectCell, ValueCell } from "./cells";
 import "./index.scss";
 
 interface GenericBudgetTableProps<R> {
@@ -91,59 +84,6 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
     }
   }, [table, gridApi]);
 
-  const getCellFrameworkComponent = () => {
-    const CellRendererFramework = (params: ICellRendererParams): JSX.Element => {
-      if (params.colDef.field === "select") {
-        return (
-          <Checkbox
-            checked={params.node.data.selected}
-            onChange={(e: CheckboxChangeEvent) => {
-              if (e.target.checked) {
-                onRowSelect(params.node.data.id);
-              } else {
-                onRowDeselect(params.node.data.id);
-              }
-            }}
-          />
-        );
-      } else if (params.colDef.field === "expand") {
-        if (params.node.data.isPlaceholder === false) {
-          return (
-            <IconButton
-              className={"dark"}
-              size={"small"}
-              icon={<FontAwesomeIcon icon={faArrowsAltV} />}
-              onClick={() => onRowExpand(params.node.data.id)}
-            />
-          );
-        } else {
-          return <></>;
-        }
-      } else if (params.colDef.field === "delete") {
-        return (
-          <IconButton
-            className={"dark"}
-            size={"small"}
-            icon={<FontAwesomeIcon icon={faTrash} />}
-            onClick={() => onRowDelete(params.node.data)}
-          />
-        );
-      } else {
-        const row: R = params.node.data;
-        if (!isCellEditable(row, params.colDef)) {
-          return (
-            <div>
-              <LockOutlined className={"icon--lock"} />
-              {params.value}
-            </div>
-          );
-        }
-        return <span>{params.value}</span>;
-      }
-    };
-    return CellRendererFramework;
-  };
-
   useEffect(() => {
     const mapped = map(table, (row: R) => row.selected);
     const uniques = uniq(mapped);
@@ -179,22 +119,36 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
                 field: "select",
                 editable: false,
                 headerName: "",
-                width: 50
+                width: 50,
+                cellRenderer: "SelectCell",
+                cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
               },
               {
                 field: "expand",
                 editable: false,
                 headerName: "",
-                width: 50
+                width: 50,
+                cellRenderer: "ExpandCell",
+                cellRendererParams: { onClick: onRowExpand }
               }
             ],
-            columns,
+            map(
+              columns,
+              (def: ColDef) =>
+                ({
+                  ...def,
+                  cellRenderer: "ValueCell",
+                  cellRendererParams: { isCellEditable }
+                } as ColDef)
+            ),
             [
               {
                 field: "delete",
                 editable: false,
                 headerName: "",
-                width: 70
+                width: 70,
+                cellRenderer: "DeleteCell",
+                cellRendererParams: { onClick: onRowDelete }
               }
             ]
           ),
@@ -232,8 +186,13 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
         defaultColDef={{
           resizable: false,
           sortable: true,
-          filter: false,
-          cellRendererFramework: getCellFrameworkComponent()
+          filter: false
+        }}
+        frameworkComponents={{
+          DeleteCell: DeleteCell,
+          ExpandCell: ExpandCell,
+          SelectCell: SelectCell,
+          ValueCell: ValueCell
         }}
         onCellEditingStopped={(event: CellEditingStoppedEvent) => {
           const field = event.column.getColId();
