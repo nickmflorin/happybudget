@@ -44,6 +44,11 @@ namespace Redux {
 
   type ModelListActionPayload = { id: number; value: boolean };
 
+  interface IRow {
+    id: any;
+    selected: boolean;
+  }
+
   interface IDetailResponseStore<T extends Model> {
     readonly data: T | undefined;
     readonly loading: boolean;
@@ -59,6 +64,14 @@ namespace Redux {
     readonly pageSize: number;
     readonly search: string;
     readonly selected: number[];
+    readonly responseWasReceived: boolean;
+  }
+
+  interface ITableStore<R extends IRow, M extends Model> {
+    readonly data: IListStore<R>;
+    readonly loading: boolean;
+    readonly rawData: IListStore<M>;
+    readonly search: string;
     readonly responseWasReceived: boolean;
   }
 
@@ -110,35 +123,32 @@ namespace Redux {
       readonly subaccountId?: number | undefined;
     }
 
-    interface ISubAccountListResponseStore {
+    interface ISubAccountListStore {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
-      readonly list: IListResponseStore<ISubAccount>;
-      readonly table: ListStore<ISubAccountRow>;
+      readonly table: ITableStore<ISubAccountRow, ISubAccount>;
     }
 
     interface ISubAccountStore {
       readonly detail: IDetailResponseStore<ISubAccount>;
-      readonly subaccounts: ISubAccountListResponseStore;
+      readonly subaccounts: ISubAccountListStore;
     }
 
     interface IAccountStore {
       readonly detail: IDetailResponseStore<IAccount>;
-      readonly subaccounts: ISubAccountListResponseStore;
+      readonly subaccounts: ISubAccountListStore;
     }
 
     interface IAccountsStore {
-      readonly list: IListResponseStore<IAccount>;
-      readonly table: IListStore<IAccountRow>;
+      readonly table: ITableStore<IAccountRow, IAccount>;
       readonly details: IIndexedStore<IAccountStore>;
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
     }
 
-    interface IRow {
-      readonly id: number | string;
+    interface IRow extends Redux.IRow {
       readonly selected: boolean;
       readonly isPlaceholder: boolean;
       readonly estimated: number | null;

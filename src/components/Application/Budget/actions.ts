@@ -9,46 +9,44 @@ export const ActionType = {
     Request: "budget.budget.Request"
   },
   Accounts: {
-    Loading: "budget.accounts.Loading",
-    Response: "budget.accounts.Response",
-    Request: "budget.accounts.Request",
-    SetSearch: "budget.accounts.SetSearch",
     Deleting: "budget.accounts.Deleting",
     Creating: "budget.accounts.Creating",
     Updating: "budget.accounts.Updating"
   },
   AccountsTable: {
-    SetData: "budget.accountstable.SetData",
     AddRow: "budget.accountstable.AddRow",
     UpdateRow: "budget.accountstable.UpdateRow",
     UpdateRowInStateOnly: "budget.accountstable.UpdateRowInStateOnly",
     RemoveRow: "budget.accountstable.RemoveRow",
     SelectRow: "budget.accountstable.SelectRow",
     SelectAllRows: "budget.accountstable.SelectAllRows",
-    DeselectRow: "budget.accountstable.DeselectRow"
+    DeselectRow: "budget.accountstable.DeselectRow",
+    Loading: "budget.accountstable.Loading",
+    SetSearch: "budget.accountstable.SetSearch",
+    Response: "budget.accountstable.Response",
+    Request: "budget.accountstable.Request"
   },
   Account: {
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",
     Request: "budget.account.Request",
     SubAccountsTable: {
-      SetData: "budget.account.subaccountstable.SetData",
       AddRow: "budget.account.subaccountstable.AddRow",
       UpdateRow: "budget.account.subaccountstable.UpdateRow",
       UpdateRowInStateOnly: "budget.account.subaccountstable.UpdateRowInStateOnly",
       RemoveRow: "budget.account.subaccountstable.RemoveRow",
       SelectAllRows: "budget.account.subaccountstable.SelectAllRows",
       SelectRow: "budget.account.subaccountstable.SelectRow",
-      DeselectRow: "budget.account.subaccountstable.DeselectRow"
+      DeselectRow: "budget.account.subaccountstable.DeselectRow",
+      SetSearch: "budget.account.subaccountstable.SetSearch",
+      Loading: "budget.account.subaccountstable.Loading",
+      Response: "budget.account.subaccountstable.Response",
+      Request: "budget.account.subaccountstable.Request"
     },
     SubAccounts: {
       Deleting: "budget.account.subaccounts.Deleting",
       Creating: "budget.account.subaccounts.Creating",
-      Updating: "budget.account.subaccounts.Updating",
-      Loading: "budget.account.subaccounts.Loading",
-      Response: "budget.account.subaccounts.Response",
-      Request: "budget.account.subaccounts.Request",
-      SetSearch: "budget.account.subaccounts.SetSearch"
+      Updating: "budget.account.subaccounts.Updating"
     }
   },
   SubAccount: {
@@ -56,23 +54,22 @@ export const ActionType = {
     Response: "budget.subaccount.Response",
     Request: "budget.subaccount.Request",
     SubAccountsTable: {
-      SetData: "budget.subaccount.subaccountstable.SetData",
       AddRow: "budget.subaccount.subaccountstable.AddRow",
       UpdateRow: "budget.subaccount.subaccountstable.UpdateRow",
       UpdateRowInStateOnly: "budget.subaccount.subaccountstable.UpdateRowInStateOnly",
       RemoveRow: "budget.subaccount.subaccountstable.RemoveRow",
       SelectRow: "budget.subaccount.subaccountstable.SelectRow",
       SelectAllRows: "budget.subaccount.subaccountstable.SelectAllRows",
-      DeselectRow: "budget.subaccount.subaccountstable.DeselectRow"
+      DeselectRow: "budget.subaccount.subaccountstable.DeselectRow",
+      SetSearch: "budget.subaccount.subaccountstable.SetSearch",
+      Loading: "budget.subaccount.subaccountstable.Loading",
+      Response: "budget.subaccount.subaccountstable.Response",
+      Request: "budget.subaccount.subaccountstable.Request"
     },
     SubAccounts: {
       Deleting: "budget.subaccount.subaccounts.Deleting",
       Creating: "budget.subaccount.subaccounts.Creating",
-      Updating: "budget.subaccount.subaccounts.Updating",
-      Loading: "budget.subaccount.subaccounts.Loading",
-      Response: "budget.subaccount.subaccounts.Response",
-      Request: "budget.subaccount.subaccounts.Request",
-      SetSearch: "budget.subaccount.subaccounts.SetSearch"
+      Updating: "budget.subaccount.subaccounts.Updating"
     }
   }
 };
@@ -125,7 +122,6 @@ export const responseSubAccountAction = simpleSubAccountAction<ISubAccount>(Acti
 /*
   Actions Pertaining to the Accounts
 */
-export const setAccountsDataAction = simpleAction<Redux.Budget.IAccountRow[]>(ActionType.AccountsTable.SetData);
 export const addAccountsRowAction = simpleAction<null>(ActionType.AccountsTable.AddRow);
 export const updateAccountsRowAction = simpleBudgetAction<{
   id: number | string;
@@ -147,17 +143,14 @@ export const removeAccountsRowAction = simpleAction<Redux.Budget.IAccountRow>(Ac
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Accounts.Creating);
-export const requestAccountsAction = simpleBudgetAction<null>(ActionType.Accounts.Request);
-export const loadingAccountsAction = simpleAction<boolean>(ActionType.Accounts.Loading);
-export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.Accounts.Response);
-export const setAccountsSearchAction = simpleAction<string>(ActionType.Accounts.SetSearch);
+export const requestAccountsAction = simpleBudgetAction<null>(ActionType.AccountsTable.Request);
+export const loadingAccountsAction = simpleAction<boolean>(ActionType.AccountsTable.Loading);
+export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.AccountsTable.Response);
+export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsTable.SetSearch);
 
 /*
   Actions Pertaining to the Sub Accounts of an Account
 */
-export const setAccountSubAccountsDataAction = simpleAccountAction<Redux.Budget.ISubAccountRow[]>(
-  ActionType.Account.SubAccountsTable.SetData
-);
 export const addAccountSubAccountsRowAction = simpleAccountAction<null>(ActionType.Account.SubAccountsTable.AddRow);
 export const updateAccountSubAccountsRowAction = simpleBudgetAccountAction<{
   id: number | string;
@@ -192,19 +185,22 @@ export const updatingAccountSubAccountAction = simpleAccountAction<Redux.ModelLi
   ActionType.Account.SubAccounts.Updating
 );
 export const creatingAccountSubAccountAction = simpleAccountAction<boolean>(ActionType.Account.SubAccounts.Creating);
-export const requestAccountSubAccountsAction = simpleBudgetAccountAction<null>(ActionType.Account.SubAccounts.Request);
-export const loadingAccountSubAccountsAction = simpleAccountAction<boolean>(ActionType.Account.SubAccounts.Loading);
-export const responseAccountSubAccountsAction = simpleAccountAction<Http.IListResponse<ISubAccount>>(
-  ActionType.Account.SubAccounts.Response
+export const requestAccountSubAccountsAction = simpleBudgetAccountAction<null>(
+  ActionType.Account.SubAccountsTable.Request
 );
-export const setAccountSubAccountsSearchAction = simpleAccountAction<string>(ActionType.Account.SubAccounts.SetSearch);
+export const loadingAccountSubAccountsAction = simpleAccountAction<boolean>(
+  ActionType.Account.SubAccountsTable.Loading
+);
+export const responseAccountSubAccountsAction = simpleAccountAction<Http.IListResponse<ISubAccount>>(
+  ActionType.Account.SubAccountsTable.Response
+);
+export const setAccountSubAccountsSearchAction = simpleAccountAction<string>(
+  ActionType.Account.SubAccountsTable.SetSearch
+);
 
 /*
   Actions Pertaining to the Sub Accounts of a Sub Account
 */
-export const setSubAccountSubAccountsDataAction = simpleSubAccountAction<Redux.Budget.ISubAccountRow[]>(
-  ActionType.SubAccount.SubAccountsTable.SetData
-);
 export const addSubAccountSubAccountsRowAction = simpleSubAccountAction<null>(
   ActionType.SubAccount.SubAccountsTable.AddRow
 );
@@ -243,14 +239,14 @@ export const creatingSubAccountSubAccountAction = simpleSubAccountAction<boolean
   ActionType.SubAccount.SubAccounts.Creating
 );
 export const requestSubAccountSubAccountsAction = simpleSubAccountAction<null>(
-  ActionType.SubAccount.SubAccounts.Request
+  ActionType.SubAccount.SubAccountsTable.Request
 );
 export const loadingSubAccountSubAccountsAction = simpleSubAccountAction<boolean>(
-  ActionType.SubAccount.SubAccounts.Loading
+  ActionType.SubAccount.SubAccountsTable.Loading
 );
 export const responseSubAccountSubAccountsAction = simpleSubAccountAction<Http.IListResponse<ISubAccount>>(
-  ActionType.SubAccount.SubAccounts.Response
+  ActionType.SubAccount.SubAccountsTable.Response
 );
 export const setSubAccountSubAccountsSearchAction = simpleSubAccountAction<string>(
-  ActionType.SubAccount.SubAccounts.SetSearch
+  ActionType.SubAccount.SubAccountsTable.SetSearch
 );

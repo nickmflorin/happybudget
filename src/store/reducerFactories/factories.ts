@@ -2,7 +2,7 @@ import { Reducer } from "redux";
 import { isNil, find, filter, forEach, includes, map } from "lodash";
 import { replaceInArray } from "util/arrays";
 import { mergeWithDefaults } from "util/objects";
-import { initialListResponseState, initialDetailResponseState } from "../initialState";
+import { initialListResponseState, initialDetailResponseState, initialTableState } from "../initialState";
 
 import {
   IReducerFactoryOptions,
@@ -13,7 +13,8 @@ import {
   IListResponseActionMap,
   IListResponseReducerOptions,
   ITableActionMap,
-  TableRowModel
+  ITableDataActionMap,
+  ITableReducerOptions
 } from "./model";
 
 export const createSimpleBooleanReducer = <A extends Redux.IAction<boolean>>(
@@ -71,87 +72,198 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
   return reducer;
 };
 
-export const createTableReducer = <R extends TableRowModel, A extends Redux.IAction<any>>(
-  mappings: ITableActionMap,
+export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAction<any>>(
+  mappings: Partial<ITableDataActionMap>,
   placeholderCreator: () => R,
   options: IReducerFactoryOptions = {}
 ) => {
   options = mergeWithDefaults(options, {
-    referenceEntity: "entity"
+    referenceEntity: "entity",
+    initialState: []
   });
 
   const reducer: Reducer<Redux.ListStore<R>, A> = (state: Redux.ListStore<R> = [], action: A) => {
     let newState = [...state];
-    if (action.type === mappings.SetData) {
-      return action.payload;
-    } else if (action.type === mappings.AddRow) {
-      newState = [...newState, placeholderCreator()];
-    } else if (action.type === mappings.UpdateRow || action.type === mappings.UpdateRowInStateOnly) {
-      const existing = find(newState, { id: action.payload.id });
-      if (isNil(existing)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when updating ${options.referenceEntity} in state...
-        the ${options.referenceEntity} with ID ${action.payload.id} does not exist in state when it is expected to.`
-        );
-      } else {
-        newState = replaceInArray<R>(newState, { id: action.payload.id }, { ...existing, ...action.payload.payload });
+
+    const transformers: Transformers<ITableDataActionMap, Redux.ListStore<R>, A> = {
+      SetData: (payload: R[]) => payload,
+      AddRow: () => [...newState, placeholderCreator()],
+      UpdateRow: (payload: { id: any; payload: Partial<R> }) => {
+        const existing = find(newState, { id: payload.id });
+        if (isNil(existing)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when updating ${options.referenceEntity} in state...
+          the ${options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
+          );
+          return newState;
+        } else {
+          return replaceInArray<R>(newState, { id: payload.id }, { ...existing, ...payload.payload });
+        }
+      },
+      UpdateRowInStateOnly: (payload: { id: any; payload: Partial<R> }) => {
+        const existing = find(newState, { id: payload.id });
+        if (isNil(existing)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when updating ${options.referenceEntity} in state...
+          the ${options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
+          );
+          return newState;
+        } else {
+          return replaceInArray<R>(newState, { id: payload.id }, { ...existing, ...payload.payload });
+        }
+      },
+      RemoveRow: (payload: { id: any }) => {
+        const existing = find(newState, { id: payload.id });
+        if (isNil(existing)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when removing ${options.referenceEntity} from state...
+          the ${options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
+          );
+          return newState;
+        } else {
+          return filter(newState, (row: R) => row.id !== payload.id);
+        }
+      },
+      SelectRow: (id: any) => {
+        const existing = find(newState, { id });
+        if (isNil(existing)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when selecting ${options.referenceEntity} in state...
+          the ${options.referenceEntity} with ID ${id} does not exist in state when it is expected to.`
+          );
+          return newState;
+        } else if (existing.selected === true) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when selecting ${options.referenceEntity} in state...
+          the ${options.referenceEntity} with ID ${id} is already selected when it is not expected to be.`
+          );
+          return newState;
+        } else {
+          return replaceInArray<R>(newState, { id }, { ...existing, selected: true });
+        }
+      },
+      DeselectRow: (id: any) => {
+        const existing = find(newState, { id });
+        if (isNil(existing)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when deselecting ${options.referenceEntity} in state...
+          the ${options.referenceEntity} with ID ${id} does not exist in state when it is expected to.`
+          );
+          return newState;
+        } else if (existing.selected === false) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when deselecting ${options.referenceEntity} in state...
+          the ${options.referenceEntity} with ID ${id} is already deselected when it is not expected to be.`
+          );
+          return newState;
+        } else {
+          return replaceInArray<R>(newState, { id: id }, { ...existing, selected: false });
+        }
+      },
+      SelectAllRows: () => {
+        const selected = filter(newState, (row: R) => row.selected === true);
+        if (selected.length === newState.length) {
+          newState = map(newState, (row: R) => ({ ...row, selected: false }));
+        } else {
+          newState = map(newState, (row: R) => ({ ...row, selected: true }));
+        }
       }
-    } else if (action.type === mappings.RemoveRow) {
-      const existing = find(newState, { id: action.payload.id });
-      if (isNil(existing)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when removing ${options.referenceEntity} from state...
-          the ${options.referenceEntity} with ID ${action.payload.id} does not exist in state when it is expected to.`
-        );
-      } else {
-        newState = filter(newState, (row: R) => row.id !== action.payload.id);
+    };
+
+    // Find the standardized action type.
+    let standardizedActionType: string | undefined = undefined;
+    forEach(mappings, (value: string | undefined | Transformer<Redux.ListStore<R>, A>, standard: string) => {
+      if (value !== undefined && value === action.type) {
+        standardizedActionType = standard;
+        return false;
       }
-    } else if (action.type === mappings.SelectRow) {
-      const existing = find(newState, { id: action.payload });
-      if (isNil(existing)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when selecting ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${action.payload} does not exist in state when it is expected to.`
-        );
-      } else if (existing.selected === true) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when selecting ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${action.payload} is already selected when it is not expected to be.`
-        );
-      } else {
-        newState = replaceInArray<R>(newState, { id: action.payload }, { ...existing, selected: true });
-      }
-    } else if (action.type === mappings.DeselectRow) {
-      const existing = find(newState, { id: action.payload });
-      if (isNil(existing)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when deselecting ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${action.payload} does not exist in state when it is expected to.`
-        );
-      } else if (existing.selected === false) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when deselecting ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${action.payload} is already deselected when it is not expected to be.`
-        );
-      } else {
-        newState = replaceInArray<R>(newState, { id: action.payload }, { ...existing, selected: false });
-      }
-    } else if (action.type === mappings.SelectAllRows) {
-      const selected = filter(newState, (row: R) => row.selected === true);
-      if (selected.length === newState.length) {
-        newState = map(newState, (row: R) => ({ ...row, selected: false }));
-      } else {
-        newState = map(newState, (row: R) => ({ ...row, selected: true }));
-      }
+    });
+
+    if (!isNil(standardizedActionType)) {
+      const transformer: Transformer<Redux.ListStore<R>, A> = transformers[standardizedActionType];
+      newState = transformer(action.payload, newState, action);
     }
+
     return newState;
   };
+  return reducer;
+};
+
+export const createTableReducer = <R extends Redux.IRow, M extends Model, A extends Redux.IAction<any>>(
+  mappings: ITableActionMap,
+  placeholderCreator: () => R,
+  modelToRow: (model: M) => R,
+  options: ITableReducerOptions<R, M> = {}
+) => {
+  options = mergeWithDefaults(options, {
+    referenceEntity: "entity",
+    initialState: initialTableState
+  });
+
+  const dataReducer = createTableDataReducer(
+    {
+      AddRow: mappings.AddRow,
+      RemoveRow: mappings.RemoveRow,
+      UpdateRow: mappings.UpdateRow,
+      UpdateRowInStateOnly: mappings.UpdateRowInStateOnly,
+      SelectRow: mappings.SelectRow,
+      DeselectRow: mappings.DeselectRow,
+      SelectAllRows: mappings.SelectAllRows
+    },
+    placeholderCreator,
+    options
+  );
+
+  const reducer: Reducer<Redux.ITableStore<R, M>, A> = (
+    state: Redux.ITableStore<R, M> = options.initialState as Redux.ITableStore<R, M>,
+    action: A
+  ) => {
+    let newState = { ...state };
+
+    // First, we use the reducer that just maintains the table's rows to update
+    // the table data.
+    newState = { ...newState, data: dataReducer(newState.data, action) };
+
+    const transformers: Transformers<ITableActionMap, Redux.ITableStore<R, M>, A> = {
+      SetSearch: (search: string) => ({ search }),
+      Loading: (loading: boolean) => ({ loading }),
+      Request: () => ({ rawData: [], data: [], responseWasReceived: false }),
+      Response: (response: Http.IListResponse<M>) => {
+        return {
+          data: map(response.data, (model: M) => modelToRow(model)),
+          rawData: response.data,
+          responseWasReceived: true
+        };
+      }
+    };
+
+    // Find the standardized action type.
+    let standardizedActionType: string | undefined = undefined;
+    forEach(mappings, (value: string | undefined | Transformer<Redux.ITableStore<R, M>, A>, standard: string) => {
+      if (value !== undefined && value === action.type) {
+        standardizedActionType = standard;
+        return false;
+      }
+    });
+
+    if (!isNil(standardizedActionType)) {
+      const transformer: Transformer<Redux.ITableStore<R, M>, A> = transformers[standardizedActionType];
+      if (!isNil(transformer)) {
+        const updateToState = transformer(action.payload, newState, action);
+        newState = { ...newState, ...updateToState };
+      }
+    }
+
+    return newState;
+  };
+
   return reducer;
 };
 
@@ -183,16 +295,16 @@ export const createDetailResponseReducer = <
     referenceEntity: "entity"
   });
 
+  const transformers: Transformers<IDetailResponseActionMap, S, A> = {
+    Response: (payload: M) => ({ data: payload, responseWasReceived: true }),
+    Loading: (payload: boolean) => ({ loading: payload }),
+    RemoveFromState: (payload?: null | undefined) => ({ data: undefined }),
+    UpdateInState: (payload: M) => ({ data: payload }),
+    Request: (payload: any) => ({ responseWasReceived: false })
+  };
+
   const reducer: Reducer<S, A> = (state: S = options.initialState as S, action: A): S => {
     let newState = { ...state };
-
-    const transformers: Transformers<IDetailResponseActionMap, S, A> = {
-      Response: (payload: M) => ({ data: payload, responseWasReceived: true }),
-      Loading: (payload: boolean) => ({ loading: payload }),
-      RemoveFromState: (payload?: null | undefined) => ({ data: undefined }),
-      UpdateInState: (payload: M) => ({ data: payload }),
-      Request: (payload: any) => ({ responseWasReceived: false })
-    };
 
     // Find the standardized action type.
     let standardizedActionType: string | undefined = undefined;
@@ -206,9 +318,11 @@ export const createDetailResponseReducer = <
     if (!isNil(standardizedActionType)) {
       // If the action is being filtered out of the reducer, do not update the state.
       if (isNil(options.excludeActions) || options.excludeActions(action, state) === false) {
-        const transformer: Transformer<S, A> = transformers[standardizedActionType];
-        const updateToState = transformer(action.payload, newState, action);
-        newState = { ...newState, ...updateToState };
+        const transformer: Transformer<S, A> | undefined = transformers[standardizedActionType];
+        if (!isNil(transformer)) {
+          const updateToState = transformer(action.payload, newState, action);
+          newState = { ...newState, ...updateToState };
+        }
       }
     } else {
       // The extension transformers are allowed to be included to allow the scope
@@ -344,9 +458,11 @@ export const createListResponseReducer = <
     if (!isNil(standardizedActionType)) {
       // If the action is being filtered out of the reducer, do not update the state.
       if (isNil(options.excludeActions) || options.excludeActions(action, state) === false) {
-        const transformer: Transformer<S, A> = transformers[standardizedActionType];
-        const updateToState = transformer(action.payload, newState, action);
-        newState = { ...newState, ...updateToState };
+        const transformer: Transformer<S, A> | undefined = transformers[standardizedActionType];
+        if (!isNil(transformer)) {
+          const updateToState = transformer(action.payload, newState, action);
+          newState = { ...newState, ...updateToState };
+        }
       }
     } else {
       // The extension transformers are allowed to be included to allow the scope

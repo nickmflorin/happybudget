@@ -41,9 +41,6 @@ import {
   updatingAccountAction,
   updatingAccountSubAccountAction,
   updatingSubAccountSubAccountAction,
-  setAccountsDataAction,
-  setAccountSubAccountsDataAction,
-  setSubAccountSubAccountsDataAction,
   updateAccountsRowInStateOnlyAction,
   updateAccountSubAccountsRowInStateOnlyAction,
   updateSubAccountSubAccountsRowInStateOnlyAction
@@ -339,17 +336,9 @@ export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterat
     try {
       const response = yield call(getAccounts, action.budgetId, { no_pagination: true });
       yield put(responseAccountsAction(response));
-      yield put(
-        setAccountsDataAction(
-          map(response.data, (account: IAccount) => {
-            return { ...account, selected: false, isPlaceholder: false };
-          })
-        )
-      );
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's accounts.");
       yield put(responseAccountsAction({ count: 0, data: [] }, { error: e }));
-      yield put(setAccountsDataAction([]));
     } finally {
       yield put(loadingAccountsAction(false));
     }
@@ -362,18 +351,9 @@ export function* getAccountSubAccountsTask(action: Redux.Budget.IAction<null>): 
     try {
       const response = yield call(getAccountSubAccounts, action.accountId, action.budgetId, { no_pagination: true });
       yield put(responseAccountSubAccountsAction(action.accountId, response));
-      yield put(
-        setAccountSubAccountsDataAction(
-          action.accountId,
-          map(response.data, (subaccount: ISubAccount) => {
-            return { ...subaccount, selected: false, isPlaceholder: false };
-          })
-        )
-      );
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account's sub accounts.");
       yield put(responseAccountSubAccountsAction(action.accountId, { count: 0, data: [] }, { error: e }));
-      yield put(setAccountSubAccountsDataAction(action.accountId, []));
     } finally {
       yield put(loadingAccountSubAccountsAction(action.accountId, false));
     }
@@ -386,18 +366,9 @@ export function* getSubAccountSubAccountsTask(action: Redux.Budget.IAction<null>
     try {
       const response = yield call(getSubAccountSubAccounts, action.subaccountId, { no_pagination: true });
       yield put(responseSubAccountSubAccountsAction(action.subaccountId, response));
-      yield put(
-        setSubAccountSubAccountsDataAction(
-          action.subaccountId,
-          map(response.data, (subaccount: ISubAccount) => {
-            return { ...subaccount, selected: false, isPlaceholder: false };
-          })
-        )
-      );
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the subaccount's sub accounts.");
       yield put(responseSubAccountSubAccountsAction(action.subaccountId, { count: 0, data: [] }, { error: e }));
-      yield put(setSubAccountSubAccountsDataAction(action.subaccountId, []));
     } finally {
       yield put(loadingSubAccountSubAccountsAction(action.subaccountId, false));
     }

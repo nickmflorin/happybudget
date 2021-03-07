@@ -34,16 +34,16 @@ const Accounts = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={budgetId}>
-      <RenderWithSpinner loading={accounts.list.loading}>
+      <RenderWithSpinner loading={accounts.table.loading}>
         <GenericBudgetTable<Redux.Budget.IAccountRow>
-          table={accounts.table}
+          table={accounts.table.data}
           isCellEditable={(row: Redux.Budget.IAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "variance"], colDef.field)) {
               return false;
             }
             return true;
           }}
-          search={accounts.list.search}
+          search={accounts.table.search}
           onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
           saving={accounts.deleting.length !== 0 || accounts.updating.length !== 0 || accounts.creating}
           onRowAdd={() => dispatch(addAccountsRowAction())}

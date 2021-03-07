@@ -1,7 +1,6 @@
 import { Reducer, combineReducers } from "redux";
 import { isNil } from "lodash";
 import {
-  createListResponseReducer,
   createDetailResponseReducer,
   createSimpleBooleanReducer,
   createModelListActionReducer,
@@ -17,32 +16,23 @@ const indexedAccountReducer = combineReducers({
     deleting: createModelListActionReducer(ActionType.Account.SubAccounts.Deleting, { referenceEntity: "subaccount" }),
     updating: createModelListActionReducer(ActionType.Account.SubAccounts.Updating, { referenceEntity: "subaccount" }),
     creating: createSimpleBooleanReducer(ActionType.Account.SubAccounts.Creating),
-    table: createTableReducer<Redux.Budget.ISubAccountRow, Redux.Budget.IAction<any>>(
+    table: createTableReducer<Redux.Budget.ISubAccountRow, ISubAccount, Redux.Budget.IAction<any>>(
       {
-        SetData: ActionType.Account.SubAccountsTable.SetData,
         AddRow: ActionType.Account.SubAccountsTable.AddRow,
         RemoveRow: ActionType.Account.SubAccountsTable.RemoveRow,
         UpdateRow: ActionType.Account.SubAccountsTable.UpdateRow,
         UpdateRowInStateOnly: ActionType.Account.SubAccountsTable.UpdateRowInStateOnly,
         SelectRow: ActionType.Account.SubAccountsTable.SelectRow,
         DeselectRow: ActionType.Account.SubAccountsTable.DeselectRow,
-        SelectAllRows: ActionType.Account.SubAccountsTable.SelectAllRows
+        SelectAllRows: ActionType.Account.SubAccountsTable.SelectAllRows,
+        Response: ActionType.Account.SubAccountsTable.Response,
+        Request: ActionType.Account.SubAccountsTable.Request,
+        Loading: ActionType.Account.SubAccountsTable.Loading,
+        SetSearch: ActionType.Account.SubAccountsTable.SetSearch
       },
       createSubAccountRowPlaceholder,
+      (subaccount: ISubAccount) => ({ ...subaccount, selected: false, isPlaceholder: false }),
       { referenceEntity: "subaccount" }
-    ),
-    // TODO: Do we want to also maintain the raw list data to keep it in sync
-    // with the table rows?  Right now we don't have to, because the raw data
-    // is just used for initial population of the tables, but we may need to.
-    list: createListResponseReducer<ISubAccount, Redux.IListResponseStore<ISubAccount>, Redux.Budget.IAction<any>>(
-      {
-        Response: ActionType.Account.SubAccounts.Response,
-        Loading: ActionType.Account.SubAccounts.Loading,
-        SetSearch: ActionType.Account.SubAccounts.SetSearch
-      },
-      {
-        referenceEntity: "subaccount"
-      }
     )
   }),
   detail: createDetailResponseReducer<IAccount, Redux.IDetailResponseStore<IAccount>, Redux.Budget.IAction>({
@@ -61,32 +51,23 @@ const indexedSubAccountReducer = combineReducers({
       referenceEntity: "subaccount"
     }),
     creating: createSimpleBooleanReducer(ActionType.SubAccount.SubAccounts.Creating),
-    table: createTableReducer<Redux.Budget.ISubAccountRow, Redux.Budget.IAction<any>>(
+    table: createTableReducer<Redux.Budget.ISubAccountRow, ISubAccount, Redux.Budget.IAction<any>>(
       {
-        SetData: ActionType.SubAccount.SubAccountsTable.SetData,
         AddRow: ActionType.SubAccount.SubAccountsTable.AddRow,
         RemoveRow: ActionType.SubAccount.SubAccountsTable.RemoveRow,
         UpdateRow: ActionType.SubAccount.SubAccountsTable.UpdateRow,
         UpdateRowInStateOnly: ActionType.SubAccount.SubAccountsTable.UpdateRowInStateOnly,
         SelectRow: ActionType.SubAccount.SubAccountsTable.SelectRow,
         DeselectRow: ActionType.SubAccount.SubAccountsTable.DeselectRow,
-        SelectAllRows: ActionType.SubAccount.SubAccountsTable.SelectAllRows
+        SelectAllRows: ActionType.SubAccount.SubAccountsTable.SelectAllRows,
+        Response: ActionType.SubAccount.SubAccountsTable.Response,
+        Loading: ActionType.SubAccount.SubAccountsTable.Loading,
+        SetSearch: ActionType.SubAccount.SubAccountsTable.SetSearch,
+        Request: ActionType.SubAccount.SubAccountsTable.Request
       },
       createSubAccountRowPlaceholder,
+      (subaccount: ISubAccount) => ({ ...subaccount, selected: false, isPlaceholder: false }),
       { referenceEntity: "subaccount" }
-    ),
-    // TODO: Do we want to also maintain the raw list data to keep it in sync
-    // with the table rows?  Right now we don't have to, because the raw data
-    // is just used for initial population of the tables, but we may need to.
-    list: createListResponseReducer<ISubAccount, Redux.IListResponseStore<ISubAccount>, Redux.Budget.IAction<any>>(
-      {
-        Response: ActionType.SubAccount.SubAccounts.Response,
-        Loading: ActionType.SubAccount.SubAccounts.Loading,
-        SetSearch: ActionType.SubAccount.SubAccounts.SetSearch
-      },
-      {
-        referenceEntity: "subaccount"
-      }
     )
   }),
   detail: createDetailResponseReducer<ISubAccount, Redux.IDetailResponseStore<ISubAccount>, Redux.Budget.IAction>({
@@ -161,32 +142,23 @@ const rootReducer = combineReducers({
     deleting: createModelListActionReducer(ActionType.Accounts.Deleting, { referenceEntity: "account" }),
     updating: createModelListActionReducer(ActionType.Accounts.Updating, { referenceEntity: "account" }),
     creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
-    table: createTableReducer<Redux.Budget.IAccountRow, Redux.Budget.IAction<any>>(
+    table: createTableReducer<Redux.Budget.IAccountRow, IAccount, Redux.Budget.IAction<any>>(
       {
-        SetData: ActionType.AccountsTable.SetData,
         AddRow: ActionType.AccountsTable.AddRow,
         RemoveRow: ActionType.AccountsTable.RemoveRow,
         UpdateRow: ActionType.AccountsTable.UpdateRow,
         UpdateRowInStateOnly: ActionType.AccountsTable.UpdateRowInStateOnly,
         SelectRow: ActionType.AccountsTable.SelectRow,
         DeselectRow: ActionType.AccountsTable.DeselectRow,
-        SelectAllRows: ActionType.AccountsTable.SelectAllRows
+        SelectAllRows: ActionType.AccountsTable.SelectAllRows,
+        Request: ActionType.AccountsTable.Request,
+        Response: ActionType.AccountsTable.Response,
+        Loading: ActionType.AccountsTable.Loading,
+        SetSearch: ActionType.AccountsTable.SetSearch
       },
       createAccountRowPlaceholder,
+      (account: IAccount) => ({ ...account, selected: false, isPlaceholder: false }),
       { referenceEntity: "account" }
-    ),
-    // TODO: Do we want to also maintain the raw list data to keep it in sync
-    // with the table rows?  Right now we don't have to, because the raw data
-    // is just used for initial population of the tables, but we may need to.
-    list: createListResponseReducer(
-      {
-        Response: ActionType.Accounts.Response,
-        Loading: ActionType.Accounts.Loading,
-        SetSearch: ActionType.Accounts.SetSearch
-      },
-      {
-        referenceEntity: "account"
-      }
     )
   })
 });

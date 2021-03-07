@@ -2,19 +2,13 @@ import { Reducer } from "redux";
 
 export type Transformer<S, A extends Redux.IAction<any>> = (payload: any, st: S, action: A) => any;
 
-export type Transformers<O, S, A extends Redux.IAction<any>> = Record<keyof O, Transformer<S, A>>;
+export type Transformers<O, S, A extends Redux.IAction<any>> = Partial<Record<keyof O, Transformer<S, A>>>;
 
 export type TransformerExtensions<S, A extends Redux.IAction<any>> = Record<string, Transformer<S, A>>;
 
 export type IReducerFactoryActionMap = { [key: string]: string };
 
-export type TableRowModel = {
-  id: any;
-  selected: boolean;
-};
-
-export interface ITableActionMap {
-  SetData: string;
+interface ICommonTableActionMap {
   AddRow: string;
   RemoveRow: string;
   UpdateRow: string;
@@ -22,6 +16,17 @@ export interface ITableActionMap {
   SelectRow: string;
   DeselectRow: string;
   SelectAllRows: string;
+}
+
+export interface ITableDataActionMap extends ICommonTableActionMap {
+  SetData: string;
+}
+
+export interface ITableActionMap extends ICommonTableActionMap {
+  Request: string;
+  Response: string;
+  Loading: string;
+  SetSearch: string;
 }
 
 export interface IDetailResponseActionMap extends IReducerFactoryActionMap {
@@ -48,6 +53,14 @@ export interface IListResponseActionMap extends IReducerFactoryActionMap {
 
 export interface IReducerFactoryOptions {
   referenceEntity?: string;
+}
+
+export interface ITableReducerOptions<
+  R extends Redux.IRow,
+  M extends Model,
+  S extends Redux.ITableStore<R, M> = Redux.ITableStore<R, M>
+> extends IReducerFactoryOptions {
+  initialState?: S;
 }
 
 export interface IDetailResponseReducerOptions<

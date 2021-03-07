@@ -16,12 +16,11 @@ import {
   handleSubAccountSubAccountRowUpdateTask,
   handleSubAccountSubAccountRowRemovalTask
 } from "./tasks";
-import { getSubAccount } from "services";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Accounts.Request);
+    const action = yield take(ActionType.AccountsTable.Request);
     if (!isNil(action.budgetId)) {
       if (lastTasks) {
         yield cancel(lastTasks);
@@ -34,7 +33,7 @@ function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
 function* watchForTriggerAccountSubAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Account.SubAccounts.Request);
+    const action = yield take(ActionType.Account.SubAccountsTable.Request);
     if (!isNil(action.budgetId) && !isNil(action.accountId)) {
       if (lastTasks) {
         yield cancel(lastTasks);
@@ -47,7 +46,7 @@ function* watchForTriggerAccountSubAccountsSaga(): SagaIterator {
 function* watchForTriggerSubAccountSubAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.SubAccount.SubAccounts.Request);
+    const action = yield take(ActionType.SubAccount.SubAccountsTable.Request);
     if (!isNil(action.subaccountId)) {
       if (lastTasks) {
         yield cancel(lastTasks);

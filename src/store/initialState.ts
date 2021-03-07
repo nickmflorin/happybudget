@@ -1,6 +1,6 @@
 import { forEach } from "lodash";
 
-export const initialListResponseState = {
+export const initialListResponseState: Redux.IListResponseStore<any> = {
   loading: false,
   data: [],
   count: 0,
@@ -11,10 +11,18 @@ export const initialListResponseState = {
   responseWasReceived: false
 };
 
-export const initialDetailResponseState = {
+export const initialDetailResponseState: Redux.IDetailResponseStore<any> = {
   loading: false,
   data: undefined,
   id: undefined,
+  responseWasReceived: false
+};
+
+export const initialTableState: Redux.ITableStore<any, any> = {
+  loading: false,
+  data: [],
+  rawData: [],
+  search: "",
   responseWasReceived: false
 };
 
