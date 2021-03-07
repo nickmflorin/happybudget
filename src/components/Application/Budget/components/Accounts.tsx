@@ -13,8 +13,8 @@ import {
   addAccountsRowAction,
   deselectAccountsRowAction,
   selectAccountsRowAction,
-  removeAccountsRowAction,
-  updateAccountsRowAction,
+  removeAccountAction,
+  updateAccountAction,
   selectAllAccountsRowsAction
 } from "../actions";
 import GenericBudgetTable from "./GenericBudgetTable";
@@ -49,9 +49,9 @@ const Accounts = (): JSX.Element => {
           onRowAdd={() => dispatch(addAccountsRowAction())}
           onRowSelect={(id: string | number) => dispatch(selectAccountsRowAction(id))}
           onRowDeselect={(id: string | number) => dispatch(deselectAccountsRowAction(id))}
-          onRowDelete={(row: Redux.Budget.IAccountRow) => dispatch(removeAccountsRowAction(row))}
+          onRowDelete={(row: Redux.Budget.IAccountRow) => dispatch(removeAccountAction(row))}
           onRowUpdate={(id: number | string, payload: { [key: string]: any }) =>
-            dispatch(updateAccountsRowAction(parseInt(budgetId), { id, payload }))
+            dispatch(updateAccountAction(parseInt(budgetId), { id, payload }))
           }
           onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountsRowsAction())}

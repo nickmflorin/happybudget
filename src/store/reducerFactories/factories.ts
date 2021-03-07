@@ -101,19 +101,6 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
           return replaceInArray<R>(newState, { id: payload.id }, { ...existing, ...payload.payload });
         }
       },
-      UpdateRowInStateOnly: (payload: { id: any; payload: Partial<R> }) => {
-        const existing = find(newState, { id: payload.id });
-        if (isNil(existing)) {
-          /* eslint-disable no-console */
-          console.error(
-            `Inconsistent State!:  Inconsistent state noticed when updating ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
-          );
-          return newState;
-        } else {
-          return replaceInArray<R>(newState, { id: payload.id }, { ...existing, ...payload.payload });
-        }
-      },
       RemoveRow: (payload: { id: any }) => {
         const existing = find(newState, { id: payload.id });
         if (isNil(existing)) {
@@ -212,7 +199,6 @@ export const createTableReducer = <R extends Redux.IRow, M extends Model, A exte
       AddRow: mappings.AddRow,
       RemoveRow: mappings.RemoveRow,
       UpdateRow: mappings.UpdateRow,
-      UpdateRowInStateOnly: mappings.UpdateRowInStateOnly,
       SelectRow: mappings.SelectRow,
       DeselectRow: mappings.DeselectRow,
       SelectAllRows: mappings.SelectAllRows

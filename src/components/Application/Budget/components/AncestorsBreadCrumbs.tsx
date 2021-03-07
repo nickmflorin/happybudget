@@ -9,7 +9,6 @@ import { LoadingOutlined } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileExcel } from "@fortawesome/free-regular-svg-icons";
 
-import { RenderOrSpinner } from "components/display";
 import "./AncestorsBreadCrumbs.scss";
 
 interface AncestorBreadCrumbItemProps {
@@ -54,6 +53,7 @@ const AncestorsBreadCrumbs = ({ ancestors, budgetId, loading }: AncestorsBreadCr
         return (
           /* eslint-disable indent */
           <AncestorBreadCrumbItem
+            key={index}
             url={
               ancestor.type === "subaccount"
                 ? `/budgets/${budgetId}/subaccounts/${ancestor.id}`

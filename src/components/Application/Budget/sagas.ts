@@ -9,12 +9,12 @@ import {
   getAccountsTask,
   getAccountSubAccountsTask,
   getSubAccountSubAccountsTask,
-  handleAccountRowUpdateTask,
-  handleAccountSubAccountRowUpdateTask,
-  handleAccountSubAccountRowRemovalTask,
-  handleAccountRowRemovalTask,
-  handleSubAccountSubAccountRowUpdateTask,
-  handleSubAccountSubAccountRowRemovalTask
+  handleAccountUpdateTask,
+  handleAccountSubAccountUpdateTask,
+  handleAccountSubAccountRemovalTask,
+  handleAccountRemovalTask,
+  handleSubAccountSubAccountUpdateTask,
+  handleSubAccountSubAccountRemovalTask
 } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
@@ -56,45 +56,45 @@ function* watchForTriggerSubAccountSubAccountsSaga(): SagaIterator {
   }
 }
 
-function* watchForAccountRemoveRowSaga(): SagaIterator {
-  yield takeEvery(ActionType.AccountsTable.RemoveRow, handleAccountRowRemovalTask);
+function* watchForRemoveAccountSaga(): SagaIterator {
+  yield takeEvery(ActionType.Accounts.Remove, handleAccountRemovalTask);
 }
 
 function* watchForSubAccountSubAccountRemoveRowSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccount.SubAccountsTable.RemoveRow, handleSubAccountSubAccountRowRemovalTask);
+  yield takeEvery(ActionType.SubAccount.SubAccountsTable.RemoveRow, handleSubAccountSubAccountRemovalTask);
 }
 
-function* watchForAccountSubAccountRemoveRowSaga(): SagaIterator {
-  yield takeEvery(ActionType.Account.SubAccountsTable.RemoveRow, handleAccountSubAccountRowRemovalTask);
+function* watchForRemoveAccountSubAccountSaga(): SagaIterator {
+  yield takeEvery(ActionType.Account.SubAccounts.Remove, handleAccountSubAccountRemovalTask);
 }
 
-function* watchForAccountUpdateRowSaga(): SagaIterator {
-  yield takeEvery(ActionType.AccountsTable.UpdateRow, handleAccountRowUpdateTask);
+function* watchForAccountUpdateSaga(): SagaIterator {
+  yield takeEvery(ActionType.Accounts.Update, handleAccountUpdateTask);
 }
 
-function* watchForAccountSubAccountUpdateRowSaga(): SagaIterator {
-  yield takeEvery(ActionType.Account.SubAccountsTable.UpdateRow, handleAccountSubAccountRowUpdateTask);
+function* watchForUpdateAccountSubAccountSaga(): SagaIterator {
+  yield takeEvery(ActionType.Account.SubAccounts.Update, handleAccountSubAccountUpdateTask);
 }
 
-function* watchForSubAccountSubAccountUpdateRowSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccount.SubAccountsTable.UpdateRow, handleSubAccountSubAccountRowUpdateTask);
+function* watchForUpdateSubAccountSubAccountwSaga(): SagaIterator {
+  yield takeEvery(ActionType.SubAccount.SubAccounts.Update, handleSubAccountSubAccountUpdateTask);
 }
 
 function* accountsSaga(): SagaIterator {
   yield spawn(watchForTriggerBudgetAccountsSaga);
-  yield spawn(watchForAccountRemoveRowSaga);
-  yield spawn(watchForAccountUpdateRowSaga);
+  yield spawn(watchForRemoveAccountSaga);
+  yield spawn(watchForAccountUpdateSaga);
 }
 
 function* accountSubAccountsSaga(): SagaIterator {
   yield spawn(watchForTriggerAccountSubAccountsSaga);
-  yield spawn(watchForAccountSubAccountUpdateRowSaga);
-  yield spawn(watchForAccountSubAccountRemoveRowSaga);
+  yield spawn(watchForUpdateSubAccountSubAccountwSaga);
+  yield spawn(watchForRemoveAccountSubAccountSaga);
 }
 
 function* subAccountSubAccountsSaga(): SagaIterator {
   yield spawn(watchForTriggerSubAccountSubAccountsSaga);
-  yield spawn(watchForSubAccountSubAccountUpdateRowSaga);
+  yield spawn(watchForUpdateAccountSubAccountSaga);
   yield spawn(watchForSubAccountSubAccountRemoveRowSaga);
 }
 

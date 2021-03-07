@@ -13,8 +13,8 @@ import {
   selectSubAccountSubAccountsRowAction,
   addSubAccountSubAccountsRowAction,
   deselectSubAccountSubAccountsRowAction,
-  removeSubAccountSubAccountsRowAction,
-  updateSubAccountSubAccountsRowAction,
+  removeSubAccountSubAccountAction,
+  updateSubAccountSubAccountAction,
   selectAllSubAccountSubAccountsRowsAction
 } from "../actions";
 import { initialSubAccountState } from "../initialState";
@@ -72,10 +72,10 @@ const SubAccount = (): JSX.Element => {
             dispatch(deselectSubAccountSubAccountsRowAction(parseInt(subaccountId), id))
           }
           onRowDelete={(row: Redux.Budget.ISubAccountRow) =>
-            dispatch(removeSubAccountSubAccountsRowAction(parseInt(subaccountId), row))
+            dispatch(removeSubAccountSubAccountAction(parseInt(subaccountId), row))
           }
           onRowUpdate={(id: number | string, payload: { [key: string]: any }) =>
-            dispatch(updateSubAccountSubAccountsRowAction(parseInt(subaccountId), { id, payload }))
+            dispatch(updateSubAccountSubAccountAction(parseInt(subaccountId), { id, payload }))
           }
           onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           onSelectAll={() => dispatch(selectAllSubAccountSubAccountsRowsAction(parseInt(subaccountId)))}

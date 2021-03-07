@@ -41,9 +41,12 @@ import {
   updatingAccountAction,
   updatingAccountSubAccountAction,
   updatingSubAccountSubAccountAction,
-  updateAccountsRowInStateOnlyAction,
-  updateAccountSubAccountsRowInStateOnlyAction,
-  updateSubAccountSubAccountsRowInStateOnlyAction
+  updateAccountsRowAction,
+  updateAccountSubAccountsRowAction,
+  updateSubAccountSubAccountsRowAction,
+  removeAccountsRowAction,
+  removeAccountSubAccountsRowAction,
+  removeSubAccountSubAccountsRowAction
 } from "./actions";
 import { initialAccountState, initialSubAccountState } from "./initialState";
 import {
@@ -53,10 +56,11 @@ import {
   accountRowHasRequiredfields
 } from "./util";
 
-export function* handleAccountRowRemovalTask(action: Redux.Budget.IAction<Redux.Budget.IAccountRow>): SagaIterator {
+export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Redux.Budget.IAccountRow>): SagaIterator {
   if (!isNil(action.payload)) {
+    yield put(removeAccountsRowAction(action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
-    // row was already removed from the table rows via the reducer synchronously.
+    // dispatched action above will remove the row from the table.
     if (action.payload.isPlaceholder === false) {
       yield put(deletingAccountAction({ id: action.payload.id as number, value: true }));
       try {
@@ -71,12 +75,13 @@ export function* handleAccountRowRemovalTask(action: Redux.Budget.IAction<Redux.
   }
 }
 
-export function* handleAccountSubAccountRowRemovalTask(
+export function* handleAccountSubAccountRemovalTask(
   action: Redux.Budget.IAction<Redux.Budget.ISubAccountRow>
 ): SagaIterator {
   if (!isNil(action.payload) && !isNil(action.accountId)) {
+    yield put(removeAccountSubAccountsRowAction(action.accountId, action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
-    // row was already removed from the table rows via the reducer synchronously.
+    // dispatched action above will remove the row from the table.
     if (action.payload.isPlaceholder === false) {
       yield put(deletingAccountSubAccountAction(action.accountId, { id: action.payload.id as number, value: true }));
       try {
@@ -91,12 +96,13 @@ export function* handleAccountSubAccountRowRemovalTask(
   }
 }
 
-export function* handleSubAccountSubAccountRowRemovalTask(
+export function* handleSubAccountSubAccountRemovalTask(
   action: Redux.Budget.IAction<Redux.Budget.ISubAccountRow>
 ): SagaIterator {
   if (!isNil(action.payload) && !isNil(action.subaccountId)) {
+    yield put(removeSubAccountSubAccountsRowAction(action.subaccountId, action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
-    // row was already removed from the table rows via the reducer synchronously.
+    // dispatched action above will remove the row from the table.
     if (action.payload.isPlaceholder === false) {
       yield put(
         deletingSubAccountSubAccountAction(action.subaccountId, { id: action.payload.id as number, value: true })
@@ -117,7 +123,7 @@ export function* handleSubAccountSubAccountRowRemovalTask(
 
 // TODO: Do we need both the ID and the payload here?  Can the ID from the payload
 // be used?
-export function* handleAccountRowUpdateTask(
+export function* handleAccountUpdateTask(
   action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.IAccountRow> }>
 ): SagaIterator {
   if (
@@ -126,7 +132,7 @@ export function* handleAccountRowUpdateTask(
     !isNil(action.payload.payload) &&
     !isNil(action.budgetId)
   ) {
-    const table = yield select((state: Redux.IApplicationStore) => state.budget.accounts.table);
+    const table = yield select((state: Redux.IApplicationStore) => state.budget.accounts.table.data);
 
     // Here, the existing row will have already been updated by the reducer because
     // that runs synchronously.
@@ -146,14 +152,13 @@ export function* handleAccountRowUpdateTask(
         if (accountRowHasRequiredfields(existing)) {
           yield put(creatingAccountAction(true));
           try {
-            const response = yield call(createAccount, action.budgetId, payload);
-            // NOTE: We have to call a specific action that will only trigger the state update
-            // in the reducer, not the saga - this is because the saga will wind up triggering
-            // this task and we need to prevent the recursion.
+            const response: IAccount = yield call(createAccount, action.budgetId, payload);
+            // TODO: Do we want to spread the whole response here?  Or should we just be
+            // looking for fields that correspond to the Row.  Probably the latter...
             yield put(
-              updateAccountsRowInStateOnlyAction({
+              updateAccountsRowAction({
                 id: existing.id,
-                payload: { id: response.id, isPlaceholder: false }
+                payload: { ...response, isPlaceholder: false }
               })
             );
           } catch (e) {
@@ -168,7 +173,15 @@ export function* handleAccountRowUpdateTask(
         try {
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
-          yield call(updateAccount, existing.id as number, payload);
+          const response: IAccount = yield call(updateAccount, existing.id as number, payload);
+          // TODO: Do we want to spread the whole response here?  Or should we just be
+          // looking for fields that correspond to the Row.  Probably the latter...
+          yield put(
+            updateAccountsRowAction({
+              id: existing.id,
+              payload: response
+            })
+          );
         } catch (e) {
           // TODO: Should we revert the changes if there was an error?
           handleRequestError(e, "There was an error updating the account.");
@@ -182,7 +195,7 @@ export function* handleAccountRowUpdateTask(
 
 // TODO: Do we need both the ID and the payload here?  Can the ID from the payload
 // be used?
-export function* handleAccountSubAccountRowUpdateTask(
+export function* handleAccountSubAccountUpdateTask(
   action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.ISubAccountRow> }>
 ): SagaIterator {
   if (
@@ -199,7 +212,7 @@ export function* handleAccountSubAccountRowUpdateTask(
       if (!isNil(state.budget.accounts.details[accountId])) {
         subState = state.budget.accounts.details[accountId];
       }
-      return subState.subaccounts.table;
+      return subState.subaccounts.table.data;
     });
 
     // Here, the existing row will have already been updated by the reducer because
@@ -220,14 +233,18 @@ export function* handleAccountSubAccountRowUpdateTask(
         if (subAccountRowHasRequiredfields(existing)) {
           yield put(creatingAccountSubAccountAction(action.accountId, true));
           try {
-            const response = yield call(createAccountSubAccount, action.accountId, action.budgetId, payload);
-            // NOTE: We have to call a specific action that will only trigger the state update
-            // in the reducer, not the saga - this is because the saga will wind up triggering
-            // this task and we need to prevent the recursion.
+            const response: ISubAccount = yield call(
+              createAccountSubAccount,
+              action.accountId,
+              action.budgetId,
+              payload
+            );
+            // TODO: Do we want to spread the whole response here?  Or should we just be
+            // looking for fields that correspond to the Row.  Probably the latter...
             yield put(
-              updateAccountSubAccountsRowInStateOnlyAction(action.accountId, {
+              updateAccountSubAccountsRowAction(action.accountId, {
                 id: existing.id,
-                payload: { id: response.id, isPlaceholder: false }
+                payload: { ...response, isPlaceholder: false }
               })
             );
           } catch (e) {
@@ -242,7 +259,15 @@ export function* handleAccountSubAccountRowUpdateTask(
         try {
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
-          yield call(updateSubAccount, existing.id as number, payload);
+          const response: ISubAccount = yield call(updateSubAccount, existing.id as number, payload);
+          // TODO: Do we want to spread the whole response here?  Or should we just be
+          // looking for fields that correspond to the Row.  Probably the latter...
+          yield put(
+            updateAccountSubAccountsRowAction(action.accountId, {
+              id: existing.id,
+              payload: response
+            })
+          );
         } catch (e) {
           // TODO: Should we revert the changes if there was an error?
           handleRequestError(e, "There was an error updating the sub account.");
@@ -256,7 +281,7 @@ export function* handleAccountSubAccountRowUpdateTask(
 
 // TODO: Do we need both the ID and the payload here?  Can the ID from the payload
 // be used?
-export function* handleSubAccountSubAccountRowUpdateTask(
+export function* handleSubAccountSubAccountUpdateTask(
   action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.ISubAccountRow> }>
 ): SagaIterator {
   if (
@@ -272,7 +297,7 @@ export function* handleSubAccountSubAccountRowUpdateTask(
       if (!isNil(state.budget.subaccounts[subaccountId])) {
         subState = state.budget.subaccounts[subaccountId];
       }
-      return subState.subaccounts.table;
+      return subState.subaccounts.table.data;
     });
 
     // Here, the existing row will have already been updated by the reducer because
@@ -294,13 +319,12 @@ export function* handleSubAccountSubAccountRowUpdateTask(
           yield put(creatingSubAccountSubAccountAction(action.subaccountId, true));
           try {
             const response = yield call(createSubAccountSubAccount, action.subaccountId, payload);
-            // NOTE: We have to call a specific action that will only trigger the state update
-            // in the reducer, not the saga - this is because the saga will wind up triggering
-            // this task and we need to prevent the recursion.
+            // TODO: Do we want to spread the whole response here?  Or should we just be
+            // looking for fields that correspond to the Row.  Probably the latter...
             yield put(
-              updateSubAccountSubAccountsRowInStateOnlyAction(action.subaccountId, {
+              updateSubAccountSubAccountsRowAction(action.subaccountId, {
                 id: existing.id,
-                payload: { id: response.id, isPlaceholder: false }
+                payload: { ...response, isPlaceholder: false }
               })
             );
           } catch (e) {
@@ -316,7 +340,15 @@ export function* handleSubAccountSubAccountRowUpdateTask(
         try {
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
-          yield call(updateSubAccount, existing.id as number, payload);
+          const response: ISubAccount = yield call(updateSubAccount, existing.id as number, payload);
+          // TODO: Do we want to spread the whole response here?  Or should we just be
+          // looking for fields that correspond to the Row.  Probably the latter...
+          yield put(
+            updateSubAccountSubAccountsRowAction(action.subaccountId, {
+              id: existing.id,
+              payload: response
+            })
+          );
         } catch (e) {
           // TODO: Should we revert the changes if there was an error?
           handleRequestError(e, "There was an error updating the sub account.");

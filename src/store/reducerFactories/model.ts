@@ -12,7 +12,6 @@ interface ICommonTableActionMap {
   AddRow: string;
   RemoveRow: string;
   UpdateRow: string;
-  UpdateRowInStateOnly: string;
   SelectRow: string;
   DeselectRow: string;
   SelectAllRows: string;

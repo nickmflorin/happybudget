@@ -11,12 +11,13 @@ export const ActionType = {
   Accounts: {
     Deleting: "budget.accounts.Deleting",
     Creating: "budget.accounts.Creating",
-    Updating: "budget.accounts.Updating"
+    Updating: "budget.accounts.Updating",
+    Update: "budget.accounts.Update",
+    Remove: "budget.accounts.Remove"
   },
   AccountsTable: {
     AddRow: "budget.accountstable.AddRow",
     UpdateRow: "budget.accountstable.UpdateRow",
-    UpdateRowInStateOnly: "budget.accountstable.UpdateRowInStateOnly",
     RemoveRow: "budget.accountstable.RemoveRow",
     SelectRow: "budget.accountstable.SelectRow",
     SelectAllRows: "budget.accountstable.SelectAllRows",
@@ -33,7 +34,6 @@ export const ActionType = {
     SubAccountsTable: {
       AddRow: "budget.account.subaccountstable.AddRow",
       UpdateRow: "budget.account.subaccountstable.UpdateRow",
-      UpdateRowInStateOnly: "budget.account.subaccountstable.UpdateRowInStateOnly",
       RemoveRow: "budget.account.subaccountstable.RemoveRow",
       SelectAllRows: "budget.account.subaccountstable.SelectAllRows",
       SelectRow: "budget.account.subaccountstable.SelectRow",
@@ -46,7 +46,9 @@ export const ActionType = {
     SubAccounts: {
       Deleting: "budget.account.subaccounts.Deleting",
       Creating: "budget.account.subaccounts.Creating",
-      Updating: "budget.account.subaccounts.Updating"
+      Updating: "budget.account.subaccounts.Updating",
+      Update: "budget.account.subaccounts.Update",
+      Remove: "budget.account.subaccounts.Remove"
     }
   },
   SubAccount: {
@@ -56,7 +58,6 @@ export const ActionType = {
     SubAccountsTable: {
       AddRow: "budget.subaccount.subaccountstable.AddRow",
       UpdateRow: "budget.subaccount.subaccountstable.UpdateRow",
-      UpdateRowInStateOnly: "budget.subaccount.subaccountstable.UpdateRowInStateOnly",
       RemoveRow: "budget.subaccount.subaccountstable.RemoveRow",
       SelectRow: "budget.subaccount.subaccountstable.SelectRow",
       SelectAllRows: "budget.subaccount.subaccountstable.SelectAllRows",
@@ -69,7 +70,9 @@ export const ActionType = {
     SubAccounts: {
       Deleting: "budget.subaccount.subaccounts.Deleting",
       Creating: "budget.subaccount.subaccounts.Creating",
-      Updating: "budget.subaccount.subaccounts.Updating"
+      Updating: "budget.subaccount.subaccounts.Updating",
+      Update: "budget.subaccount.subaccounts.Update",
+      Remove: "budget.subaccount.subaccounts.Remove"
     }
   }
 };
@@ -123,23 +126,19 @@ export const responseSubAccountAction = simpleSubAccountAction<ISubAccount>(Acti
   Actions Pertaining to the Accounts
 */
 export const addAccountsRowAction = simpleAction<null>(ActionType.AccountsTable.AddRow);
-export const updateAccountsRowAction = simpleBudgetAction<{
+export const updateAccountAction = simpleBudgetAction<{
+  id: number | string;
+  payload: Partial<Http.IAccountPayload>;
+}>(ActionType.Accounts.Update);
+export const updateAccountsRowAction = simpleAction<{
   id: number | string;
   payload: Partial<Redux.Budget.IAccountRow>;
 }>(ActionType.AccountsTable.UpdateRow);
 export const selectAccountsRowAction = simpleAction<number | string>(ActionType.AccountsTable.SelectRow);
 export const selectAllAccountsRowsAction = simpleAction<null>(ActionType.AccountsTable.SelectAllRows);
 export const deselectAccountsRowAction = simpleAction<number | string>(ActionType.AccountsTable.DeselectRow);
-// This action is required because the action updateAccountSubAccountsRowAction
-// triggers both a state update in the reducer and the saga responsible for updating
-// the row in the backend.  In this saga, we also need to perform an update to the
-// row state via the reducer, which is what this action is used for - otherwise,
-// we could run into an infinite recursion because the saga would trigger itself.
-export const updateAccountsRowInStateOnlyAction = simpleAction<{
-  id: number | string;
-  payload: Partial<Redux.Budget.IAccountRow>;
-}>(ActionType.AccountsTable.UpdateRowInStateOnly);
 export const removeAccountsRowAction = simpleAction<Redux.Budget.IAccountRow>(ActionType.AccountsTable.RemoveRow);
+export const removeAccountAction = simpleAction<Redux.Budget.IAccountRow>(ActionType.Accounts.Remove);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Accounts.Creating);
@@ -152,10 +151,10 @@ export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsT
   Actions Pertaining to the Sub Accounts of an Account
 */
 export const addAccountSubAccountsRowAction = simpleAccountAction<null>(ActionType.Account.SubAccountsTable.AddRow);
-export const updateAccountSubAccountsRowAction = simpleBudgetAccountAction<{
+export const updateAccountSubAccountAction = simpleBudgetAccountAction<{
   id: number | string;
-  payload: Partial<Redux.Budget.ISubAccountRow>;
-}>(ActionType.Account.SubAccountsTable.UpdateRow);
+  payload: Partial<Http.ISubAccountPayload>;
+}>(ActionType.Account.SubAccounts.Update);
 export const selectAccountSubAccountsRowAction = simpleAccountAction<number | string>(
   ActionType.Account.SubAccountsTable.SelectRow
 );
@@ -165,18 +164,15 @@ export const deselectAccountSubAccountsRowAction = simpleAccountAction<number | 
 export const selectAllAccountSubAccountsRowsAction = simpleAccountAction<null>(
   ActionType.Account.SubAccountsTable.SelectAllRows
 );
-
-// This action is required because the action updateAccountSubAccountsRowAction
-// triggers both a state update in the reducer and the saga responsible for updating
-// the row in the backend.  In this saga, we also need to perform an update to the
-// row state via the reducer, which is what this action is used for - otherwise,
-// we could run into an infinite recursion because the saga would trigger itself.
-export const updateAccountSubAccountsRowInStateOnlyAction = simpleAccountAction<{
+export const updateAccountSubAccountsRowAction = simpleAccountAction<{
   id: number | string;
   payload: Partial<Redux.Budget.ISubAccountRow>;
-}>(ActionType.Account.SubAccountsTable.UpdateRowInStateOnly);
+}>(ActionType.Account.SubAccountsTable.UpdateRow);
 export const removeAccountSubAccountsRowAction = simpleAccountAction<Redux.Budget.ISubAccountRow>(
   ActionType.Account.SubAccountsTable.RemoveRow
+);
+export const removeAccountSubAccountAction = simpleAccountAction<Redux.Budget.ISubAccountRow>(
+  ActionType.Account.SubAccounts.Remove
 );
 export const deletingAccountSubAccountAction = simpleAccountAction<Redux.ModelListActionPayload>(
   ActionType.Account.SubAccounts.Deleting
@@ -204,10 +200,10 @@ export const setAccountSubAccountsSearchAction = simpleAccountAction<string>(
 export const addSubAccountSubAccountsRowAction = simpleSubAccountAction<null>(
   ActionType.SubAccount.SubAccountsTable.AddRow
 );
-export const updateSubAccountSubAccountsRowAction = simpleSubAccountAction<{
+export const updateSubAccountSubAccountAction = simpleSubAccountAction<{
   id: number | string;
-  payload: Partial<Redux.Budget.ISubAccountRow>;
-}>(ActionType.SubAccount.SubAccountsTable.UpdateRow);
+  payload: Partial<Http.ISubAccountPayload>;
+}>(ActionType.SubAccount.SubAccounts.Update);
 export const selectSubAccountSubAccountsRowAction = simpleSubAccountAction<number | string>(
   ActionType.SubAccount.SubAccountsTable.SelectRow
 );
@@ -217,17 +213,15 @@ export const selectAllSubAccountSubAccountsRowsAction = simpleSubAccountAction<n
 export const deselectSubAccountSubAccountsRowAction = simpleSubAccountAction<number | string>(
   ActionType.SubAccount.SubAccountsTable.DeselectRow
 );
-// This action is required because the action updateSubAccountSubAccountsRowAction
-// triggers both a state update in the reducer and the saga responsible for updating
-// the row in the backend.  In this saga, we also need to perform an update to the
-// row state via the reducer, which is what this action is used for - otherwise,
-// we could run into an infinite recursion because the saga would trigger itself.
-export const updateSubAccountSubAccountsRowInStateOnlyAction = simpleSubAccountAction<{
+export const updateSubAccountSubAccountsRowAction = simpleSubAccountAction<{
   id: number | string;
   payload: Partial<Redux.Budget.ISubAccountRow>;
-}>(ActionType.SubAccount.SubAccountsTable.UpdateRowInStateOnly);
+}>(ActionType.SubAccount.SubAccountsTable.UpdateRow);
 export const removeSubAccountSubAccountsRowAction = simpleSubAccountAction<Redux.Budget.ISubAccountRow>(
   ActionType.SubAccount.SubAccountsTable.RemoveRow
+);
+export const removeSubAccountSubAccountAction = simpleSubAccountAction<Redux.Budget.ISubAccountRow>(
+  ActionType.SubAccount.SubAccounts.Remove
 );
 export const deletingSubAccountSubAccountAction = simpleSubAccountAction<Redux.ModelListActionPayload>(
   ActionType.SubAccount.SubAccounts.Deleting
