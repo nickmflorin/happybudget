@@ -121,8 +121,6 @@ export function* handleSubAccountSubAccountRemovalTask(
   }
 }
 
-// TODO: Do we need both the ID and the payload here?  Can the ID from the payload
-// be used?
 export function* handleAccountUpdateTask(
   action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.IAccountRow> }>
 ): SagaIterator {
@@ -134,8 +132,6 @@ export function* handleAccountUpdateTask(
   ) {
     const table = yield select((state: Redux.IApplicationStore) => state.budget.accounts.table.data);
 
-    // Here, the existing row will have already been updated by the reducer because
-    // that runs synchronously.
     const existing: Redux.Budget.IAccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
@@ -193,8 +189,6 @@ export function* handleAccountUpdateTask(
   }
 }
 
-// TODO: Do we need both the ID and the payload here?  Can the ID from the payload
-// be used?
 export function* handleAccountSubAccountUpdateTask(
   action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.ISubAccountRow> }>
 ): SagaIterator {
@@ -215,8 +209,6 @@ export function* handleAccountSubAccountUpdateTask(
       return subState.subaccounts.table.data;
     });
 
-    // Here, the existing row will have already been updated by the reducer because
-    // that runs synchronously.
     const existing: Redux.Budget.ISubAccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
@@ -279,8 +271,6 @@ export function* handleAccountSubAccountUpdateTask(
   }
 }
 
-// TODO: Do we need both the ID and the payload here?  Can the ID from the payload
-// be used?
 export function* handleSubAccountSubAccountUpdateTask(
   action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.ISubAccountRow> }>
 ): SagaIterator {
@@ -300,8 +290,6 @@ export function* handleSubAccountSubAccountUpdateTask(
       return subState.subaccounts.table.data;
     });
 
-    // Here, the existing row will have already been updated by the reducer because
-    // that runs synchronously.
     const existing: Redux.Budget.ISubAccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {
       /* eslint-disable no-console */

@@ -5,14 +5,14 @@ import { forEach } from "lodash";
  * default object and merging the value if and only if the key did not exist
  * in the original object.
  */
-export const mergeWithDefaults = <T = any>(obj: T, defaults: any): T => {
+export const mergeWithDefaults = <T extends object>(obj: Partial<T>, defaults: T): T => {
   let merged = { ...obj };
   forEach(defaults, (value: any, key: string) => {
     if (!Object.prototype.hasOwnProperty.call(obj, key)) {
       merged = { ...merged, [key]: value };
     }
   });
-  return merged;
+  return merged as T;
 };
 
 export const conditionalObj = (obj: any, condition: boolean) => {

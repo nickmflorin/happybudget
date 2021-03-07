@@ -17,10 +17,15 @@ import {
   ITableReducerOptions
 } from "./model";
 
-export const createSimpleBooleanReducer = <A extends Redux.IAction<boolean>>(
-  actionType: string
-): Reducer<boolean, A> => {
-  const reducer: Reducer<boolean, A> = (state: boolean = false, action: A): boolean => {
+export const createSimplePayloadReducer = <P, A extends Redux.IAction<P>>(
+  actionType: string,
+  options: Partial<IReducerFactoryOptions<P>> = { initialState: {} as P, referenceEntity: "entity" }
+): Reducer<P, A> => {
+  const Options = mergeWithDefaults<IReducerFactoryOptions<P>>(options, {
+    referenceEntity: "entity",
+    initialState: {} as P
+  });
+  const reducer: Reducer<P, A> = (state: P = Options.initialState, action: A): P => {
     if (action.type === actionType && !isNil(action.payload)) {
       return action.payload;
     }
@@ -29,15 +34,34 @@ export const createSimpleBooleanReducer = <A extends Redux.IAction<boolean>>(
   return reducer;
 };
 
+export const createSimpleBooleanReducer = <A extends Redux.IAction<boolean>>(actionType: string): Reducer<boolean, A> =>
+  createSimplePayloadReducer<boolean, A>(actionType, { initialState: false });
+
+/**
+ * A reducer factory that creates a generic reducer to handle the state of a
+ * list of primary keys that indicate that certain behavior is taking place for
+ * the models corresponding to the primary keys of the list.  For instance, if
+ * we wanted to keep track of the Accounts that are actively being updated, the
+ * reducer would handle the state of a list of primary keys corresponding to the
+ * Accounts that are being updated.
+ *
+ * The reducer has default behavior that is mapped to the action types via
+ * the mappings parameter.
+ *
+ * @param mappings  Mappings of the standard actions to the specific actions that
+ *                  the reducer should listen for.
+ * @param options   Additional options supplied to the reducer factory.
+ */
 export const createModelListActionReducer = <A extends Redux.IAction<Redux.ModelListActionPayload>>(
   actionType: string,
-  options: IReducerFactoryOptions = {}
+  options: Partial<IReducerFactoryOptions<Redux.ListStore<number>>> = { initialState: [], referenceEntity: "entity" }
 ): Reducer<Redux.ListStore<number>, A> => {
-  options = mergeWithDefaults(options, {
-    referenceEntity: "entity"
+  const Options = mergeWithDefaults<IReducerFactoryOptions<Redux.ListStore<number>>>(options, {
+    referenceEntity: "entity",
+    initialState: []
   });
   const reducer: Reducer<Redux.ListStore<number>, A> = (
-    state: Redux.ListStore<number> = [],
+    state: Redux.ListStore<number> = Options.initialState,
     action: A
   ): Redux.ListStore<number> => {
     let newState = [...state];
@@ -47,8 +71,8 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
         if (includes(newState, payload.id)) {
           /* eslint-disable no-console */
           console.warn(
-            `Inconsistent State!  Inconsistent state noticed when adding ${options.referenceEntity}
-            to action list state... the ${options.referenceEntity} with ID ${payload.id} already
+            `Inconsistent State!  Inconsistent state noticed when adding ${Options.referenceEntity}
+            to action list state... the ${Options.referenceEntity} with ID ${payload.id} already
             exists in the action list state when it is not expected to.`
           );
         } else {
@@ -58,8 +82,8 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
         if (!includes(newState, payload.id)) {
           /* eslint-disable no-console */
           console.warn(
-            `Inconsistent State!  Inconsistent state noticed when removing ${options.referenceEntity}
-            from action list state... the ${options.referenceEntity} with ID ${payload.id} does
+            `Inconsistent State!  Inconsistent state noticed when removing ${Options.referenceEntity}
+            from action list state... the ${Options.referenceEntity} with ID ${payload.id} does
             not exist in the action list state when it is expected to.`
           );
         } else {
@@ -72,17 +96,34 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
   return reducer;
 };
 
+/**
+ * A reducer factory that creates a generic reducer to handle the state of the
+ * data in a table that is generated from a list response of an API request, where a list
+ * response might be the response received from submitting an API request to /entity/.
+ *
+ * The reducer has default behavior that is mapped to the action types via
+ * the mappings parameter.
+ *
+ * @param mappings            Mappings of the standard actions to the specific actions that
+ *                            the reducer should listen for.
+ * @param placeholderCreator  A function that returns a placeholder row to be used when
+ *                            adding new rows to the table.
+ * @param options             Additional options supplied to the reducer factory.
+ */
 export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAction<any>>(
   mappings: Partial<ITableDataActionMap>,
   placeholderCreator: () => R,
-  options: IReducerFactoryOptions = {}
+  options: IReducerFactoryOptions<Redux.ListStore<R>> = { initialState: [], referenceEntity: "entity" }
 ) => {
-  options = mergeWithDefaults(options, {
+  const Options = mergeWithDefaults<IReducerFactoryOptions<Redux.ListStore<R>>>(options, {
     referenceEntity: "entity",
     initialState: []
   });
 
-  const reducer: Reducer<Redux.ListStore<R>, A> = (state: Redux.ListStore<R> = [], action: A) => {
+  const reducer: Reducer<Redux.ListStore<R>, A> = (
+    state: Redux.ListStore<R> = Options.initialState || [],
+    action: A
+  ) => {
     let newState = [...state];
 
     const transformers: Transformers<ITableDataActionMap, Redux.ListStore<R>, A> = {
@@ -93,8 +134,8 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
         if (isNil(existing)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when updating ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} in state...
+          the ${Options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
           );
           return newState;
         } else {
@@ -106,8 +147,8 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
         if (isNil(existing)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when removing ${options.referenceEntity} from state...
-          the ${options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when removing ${Options.referenceEntity} from state...
+          the ${Options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
           );
           return newState;
         } else {
@@ -119,15 +160,15 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
         if (isNil(existing)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when selecting ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when selecting ${Options.referenceEntity} in state...
+          the ${Options.referenceEntity} with ID ${id} does not exist in state when it is expected to.`
           );
           return newState;
         } else if (existing.selected === true) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when selecting ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${id} is already selected when it is not expected to be.`
+            `Inconsistent State!:  Inconsistent state noticed when selecting ${Options.referenceEntity} in state...
+          the ${Options.referenceEntity} with ID ${id} is already selected when it is not expected to be.`
           );
           return newState;
         } else {
@@ -139,15 +180,15 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
         if (isNil(existing)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when deselecting ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when deselecting ${Options.referenceEntity} in state...
+          the ${Options.referenceEntity} with ID ${id} does not exist in state when it is expected to.`
           );
           return newState;
         } else if (existing.selected === false) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when deselecting ${options.referenceEntity} in state...
-          the ${options.referenceEntity} with ID ${id} is already deselected when it is not expected to be.`
+            `Inconsistent State!:  Inconsistent state noticed when deselecting ${Options.referenceEntity} in state...
+          the ${Options.referenceEntity} with ID ${id} is already deselected when it is not expected to be.`
           );
           return newState;
         } else {
@@ -183,13 +224,29 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
   return reducer;
 };
 
+/**
+ * A reducer factory that creates a generic reducer to handle the state of a
+ * table that is generated from a list response of an API request, where a list
+ * response might be the response received from submitting an API request to /entity/.
+ *
+ * The reducer has default behavior that is mapped to the action types via
+ * the mappings parameter.
+ *
+ * @param mappings            Mappings of the standard actions to the specific actions that
+ *                            the reducer should listen for.
+ * @param placeholderCreator  A function that returns a placeholder row to be used when
+ *                            adding new rows to the table.
+ * @param modelToRow          A function that converts an entity of the list response
+ *                            to a row in the table.
+ * @param options             Additional options supplied to the reducer factory.
+ */
 export const createTableReducer = <R extends Redux.IRow, M extends Model, A extends Redux.IAction<any>>(
   mappings: ITableActionMap,
   placeholderCreator: () => R,
   modelToRow: (model: M) => R,
-  options: ITableReducerOptions<R, M> = {}
+  options: Partial<ITableReducerOptions<R, M>> = { initialState: initialTableState, referenceEntity: "entity" }
 ) => {
-  options = mergeWithDefaults(options, {
+  const Options: ITableReducerOptions<R, M> = mergeWithDefaults(options, {
     referenceEntity: "entity",
     initialState: initialTableState
   });
@@ -204,11 +261,11 @@ export const createTableReducer = <R extends Redux.IRow, M extends Model, A exte
       SelectAllRows: mappings.SelectAllRows
     },
     placeholderCreator,
-    options
+    { referenceEntity: Options.referenceEntity as string, initialState: Options.initialState.data }
   );
 
   const reducer: Reducer<Redux.ITableStore<R, M>, A> = (
-    state: Redux.ITableStore<R, M> = options.initialState as Redux.ITableStore<R, M>,
+    state: Redux.ITableStore<R, M> = Options.initialState as Redux.ITableStore<R, M>,
     action: A
   ) => {
     let newState = { ...state };
@@ -272,11 +329,14 @@ export const createDetailResponseReducer = <
 >(
   /* eslint-disable indent */
   mappings: Partial<IDetailResponseActionMap>,
-  options: IDetailResponseReducerOptions<M, S, A> = {}
+  options: Partial<IDetailResponseReducerOptions<M, S, A>> = {
+    initialState: initialDetailResponseState as S,
+    referenceEntity: "entity"
+  }
 ): Reducer<S, A> => {
-  options = mergeWithDefaults(options, {
+  const Options = mergeWithDefaults<IDetailResponseReducerOptions<M, S, A>>(options, {
     extensions: {},
-    initialState: initialDetailResponseState,
+    initialState: initialDetailResponseState as S,
     excludeActionsFromExtensions: true,
     referenceEntity: "entity"
   });
@@ -289,7 +349,7 @@ export const createDetailResponseReducer = <
     Request: (payload: any) => ({ responseWasReceived: false })
   };
 
-  const reducer: Reducer<S, A> = (state: S = options.initialState as S, action: A): S => {
+  const reducer: Reducer<S, A> = (state: S = Options.initialState as S, action: A): S => {
     let newState = { ...state };
 
     // Find the standardized action type.
@@ -303,7 +363,7 @@ export const createDetailResponseReducer = <
 
     if (!isNil(standardizedActionType)) {
       // If the action is being filtered out of the reducer, do not update the state.
-      if (isNil(options.excludeActions) || options.excludeActions(action, state) === false) {
+      if (isNil(Options.excludeActions) || Options.excludeActions(action, state) === false) {
         const transformer: Transformer<S, A> | undefined = transformers[standardizedActionType];
         if (!isNil(transformer)) {
           const updateToState = transformer(action.payload, newState, action);
@@ -313,13 +373,13 @@ export const createDetailResponseReducer = <
     } else {
       // The extension transformers are allowed to be included to allow the scope
       // of this generic reducer to be expanded, without requiring a new reducer.
-      if (!isNil(options.extensions) && !isNil(options.extensions[action.type])) {
+      if (!isNil(Options.extensions) && !isNil(Options.extensions[action.type])) {
         if (
-          isNil(options.excludeActions) ||
-          options.excludeActionsFromExtensions !== true ||
-          options.excludeActions(action, state) === false
+          isNil(Options.excludeActions) ||
+          Options.excludeActionsFromExtensions !== true ||
+          Options.excludeActions(action, state) === false
         ) {
-          const updateToState = options.extensions[action.type](action.payload, newState, action);
+          const updateToState = Options.extensions[action.type](action.payload, newState, action);
           newState = { ...newState, ...updateToState };
         }
       }
@@ -330,6 +390,18 @@ export const createDetailResponseReducer = <
   return reducer;
 };
 
+/**
+ * A reducer factory that creates a generic reducer to handle the state of a
+ * list response, where a list response might be the response received from
+ * submitting an API request to /entity/.
+ *
+ * The reducer has default behavior that is mapped to the action types via
+ * the mappings parameter.
+ *
+ * @param mappings  Mappings of the standard actions to the specific actions that
+ *                  the reducer should listen for.
+ * @param options   Additional options supplied to the reducer factory.
+ */
 export const createListResponseReducer = <
   M extends Model,
   S extends Redux.IListResponseStore<M> = Redux.IListResponseStore<M>,
@@ -337,16 +409,19 @@ export const createListResponseReducer = <
 >(
   /* eslint-disable indent */
   mappings: Partial<IListResponseActionMap>,
-  options: IListResponseReducerOptions<M, S, A> = {}
+  options: Partial<IListResponseReducerOptions<M, S, A>> = {
+    initialState: initialListResponseState as S,
+    referenceEntity: "entity"
+  }
 ): Reducer<S, A> => {
-  options = mergeWithDefaults(options, {
+  const Options = mergeWithDefaults<IListResponseReducerOptions<M, S, A>>(options, {
     referenceEntity: "entity",
     extensions: {},
-    initialState: initialListResponseState,
+    initialState: initialListResponseState as S,
     excludeActionsFromExtensions: true
   });
 
-  const reducer: Reducer<S, A> = (state: S = options.initialState as S, action: A): S => {
+  const reducer: Reducer<S, A> = (state: S = Options.initialState, action: A): S => {
     let newState = { ...state };
 
     const transformers: Transformers<IListResponseActionMap, S, A> = {
@@ -369,8 +444,8 @@ export const createListResponseReducer = <
         if (!isNil(existing)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when adding ${options.referenceEntity} to state...
-            the ${options.referenceEntity} with ID ${payload.id} already exists in state when it is not expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when adding ${Options.referenceEntity} to state...
+            the ${Options.referenceEntity} with ID ${payload.id} already exists in state when it is not expected to.`
           );
           return {};
         } else {
@@ -386,8 +461,8 @@ export const createListResponseReducer = <
         if (isNil(existing)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when removing ${options.referenceEntity} from state...
-            the ${options.referenceEntity} with ID ${payload} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when removing ${Options.referenceEntity} from state...
+            the ${Options.referenceEntity} with ID ${payload} does not exist in state when it is expected to.`
           );
           return {};
         } else {
@@ -410,8 +485,8 @@ export const createListResponseReducer = <
         if (isNil(existing)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when updating ${options.referenceEntity} in state...
-            the ${options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} in state...
+            the ${Options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
           );
           return {};
         }
@@ -425,7 +500,7 @@ export const createListResponseReducer = <
             selected.push(id);
           } else {
             /* eslint-disable no-console */
-            console.error(`Inconsistent State!: Selected ${options.referenceEntity} with ID ${id} not in state!`);
+            console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${id} not in state!`);
           }
         });
         return { selected };
@@ -443,7 +518,7 @@ export const createListResponseReducer = <
 
     if (!isNil(standardizedActionType)) {
       // If the action is being filtered out of the reducer, do not update the state.
-      if (isNil(options.excludeActions) || options.excludeActions(action, state) === false) {
+      if (isNil(Options.excludeActions) || Options.excludeActions(action, state) === false) {
         const transformer: Transformer<S, A> | undefined = transformers[standardizedActionType];
         if (!isNil(transformer)) {
           const updateToState = transformer(action.payload, newState, action);
@@ -453,27 +528,27 @@ export const createListResponseReducer = <
     } else {
       // The extension transformers are allowed to be included to allow the scope
       // of this generic reducer to be expanded, without requiring a new reducer.
-      if (!isNil(options.extensions) && !isNil(options.extensions[action.type])) {
+      if (!isNil(Options.extensions) && !isNil(Options.extensions[action.type])) {
         if (
-          isNil(options.excludeActions) ||
-          options.excludeActionsFromExtensions !== true ||
-          options.excludeActions(action, state) === false
+          isNil(Options.excludeActions) ||
+          Options.excludeActionsFromExtensions !== true ||
+          Options.excludeActions(action, state) === false
         ) {
-          const updateToState = options.extensions[action.type](action.payload, newState, action);
+          const updateToState = Options.extensions[action.type](action.payload, newState, action);
           newState = { ...newState, ...updateToState };
         }
       }
     }
-    if (!isNil(options.listReducer)) {
-      const listReducer: Reducer<M[], A> = options.listReducer;
+    if (!isNil(Options.listReducer)) {
+      const listReducer: Reducer<M[], A> = Options.listReducer;
       newState = { ...newState, data: listReducer(newState.data, action) };
     }
-    if (!isNil(options.itemReducer)) {
-      const itemReducer: Reducer<M, A> = options.itemReducer;
+    if (!isNil(Options.itemReducer)) {
+      const itemReducer: Reducer<M, A> = Options.itemReducer;
       newState = { ...newState, data: map(newState.data, (item: M) => itemReducer(item, action)) };
     }
-    if (!isNil(options.extension)) {
-      newState = options.extension(newState, action);
+    if (!isNil(Options.extension)) {
+      newState = Options.extension(newState, action);
     }
     return newState;
   };

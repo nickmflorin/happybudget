@@ -50,24 +50,22 @@ export interface IListResponseActionMap extends IReducerFactoryActionMap {
   Request: string;
 }
 
-export interface IReducerFactoryOptions {
-  referenceEntity?: string;
+export interface IReducerFactoryOptions<S> {
+  referenceEntity: string;
+  initialState: S;
 }
 
 export interface ITableReducerOptions<
   R extends Redux.IRow,
   M extends Model,
   S extends Redux.ITableStore<R, M> = Redux.ITableStore<R, M>
-> extends IReducerFactoryOptions {
-  initialState?: S;
-}
+> extends IReducerFactoryOptions<S> {}
 
 export interface IDetailResponseReducerOptions<
   M extends Model,
   S extends Redux.IDetailResponseStore<M> = Redux.IDetailResponseStore<M>,
   A extends Redux.IAction<any> = Redux.IAction<any>
-> extends IReducerFactoryOptions {
-  initialState?: S;
+> extends IReducerFactoryOptions<S> {
   excludeActions?: (action: A, state: S) => boolean | undefined | void;
   excludeActionsFromExtensions?: boolean;
   extensions?: TransformerExtensions<S, A>;
@@ -89,8 +87,7 @@ export interface IListResponseReducerOptions<
   M extends Model,
   S extends Redux.IListResponseStore<M> = Redux.IListResponseStore<M>,
   A extends Redux.IAction<any> = Redux.IAction<any>
-> extends IReducerFactoryOptions {
-  initialState?: S;
+> extends IReducerFactoryOptions<S> {
   excludeActions?: (action: A, state: S) => boolean | undefined | void;
   excludeActionsFromExtensions?: boolean;
   extensions?: TransformerExtensions<S, A>;
