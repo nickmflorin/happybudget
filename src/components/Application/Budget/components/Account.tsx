@@ -8,7 +8,7 @@ import { ColDef } from "ag-grid-community";
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
   requestAccountAction,
-  addAccountSubAccountsRowAction,
+  addAccountSubAccountsPlaceholdersAction,
   deselectAccountSubAccountsRowAction,
   removeAccountSubAccountAction,
   requestAccountSubAccountsAction,
@@ -68,7 +68,7 @@ const Account = (): JSX.Element => {
             accountStore.subaccounts.updating.length !== 0 ||
             accountStore.subaccounts.creating
           }
-          onRowAdd={() => dispatch(addAccountSubAccountsRowAction(parseInt(accountId)))}
+          onRowAdd={() => dispatch(addAccountSubAccountsPlaceholdersAction(parseInt(accountId)))}
           onRowSelect={(id: string | number) => dispatch(selectAccountSubAccountsRowAction(parseInt(accountId), id))}
           onRowDeselect={(id: string | number) =>
             dispatch(deselectAccountSubAccountsRowAction(parseInt(accountId), id))

@@ -28,7 +28,7 @@ const indexedAccountReducer = combineReducers({
       Redux.Budget.IAction<any>
     >(
       {
-        AddRow: ActionType.Account.SubAccountsTable.AddRow,
+        AddPlaceholders: ActionType.Account.SubAccountsTable.AddPlaceholders,
         RemoveRow: ActionType.Account.SubAccountsTable.RemoveRow,
         UpdateRow: ActionType.Account.SubAccountsTable.UpdateRow,
         SelectRow: ActionType.Account.SubAccountsTable.SelectRow,
@@ -68,7 +68,7 @@ const indexedSubAccountReducer = combineReducers({
       Redux.Budget.IAction<any>
     >(
       {
-        AddRow: ActionType.SubAccount.SubAccountsTable.AddRow,
+        AddPlaceholders: ActionType.SubAccount.SubAccountsTable.AddPlaceholders,
         RemoveRow: ActionType.SubAccount.SubAccountsTable.RemoveRow,
         UpdateRow: ActionType.SubAccount.SubAccountsTable.UpdateRow,
         SelectRow: ActionType.SubAccount.SubAccountsTable.SelectRow,
@@ -164,7 +164,7 @@ const rootReducer = combineReducers({
       Redux.Budget.IAction<any>
     >(
       {
-        AddRow: ActionType.AccountsTable.AddRow,
+        AddPlaceholders: ActionType.AccountsTable.AddPlaceholders,
         RemoveRow: ActionType.AccountsTable.RemoveRow,
         UpdateRow: ActionType.AccountsTable.UpdateRow,
         SelectRow: ActionType.AccountsTable.SelectRow,

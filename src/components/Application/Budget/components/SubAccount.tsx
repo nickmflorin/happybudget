@@ -11,7 +11,7 @@ import {
   requestSubAccountSubAccountsAction,
   setSubAccountSubAccountsSearchAction,
   selectSubAccountSubAccountsRowAction,
-  addSubAccountSubAccountsRowAction,
+  addSubAccountSubAccountsPlaceholdersAction,
   deselectSubAccountSubAccountsRowAction,
   removeSubAccountSubAccountAction,
   updateSubAccountSubAccountAction,
@@ -64,7 +64,7 @@ const SubAccount = (): JSX.Element => {
           search={subaccounts.table.search}
           onSearch={(value: string) => dispatch(setSubAccountSubAccountsSearchAction(parseInt(subaccountId), value))}
           saving={subaccounts.deleting.length !== 0 || subaccounts.updating.length !== 0 || subaccounts.creating}
-          onRowAdd={() => dispatch(addSubAccountSubAccountsRowAction(parseInt(subaccountId)))}
+          onRowAdd={() => dispatch(addSubAccountSubAccountsPlaceholdersAction(parseInt(subaccountId)))}
           onRowSelect={(id: string | number) =>
             dispatch(selectSubAccountSubAccountsRowAction(parseInt(subaccountId), id))
           }

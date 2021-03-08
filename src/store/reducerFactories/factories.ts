@@ -128,7 +128,14 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
 
     const transformers: Transformers<ITableDataActionMap, Redux.ListStore<R>, A> = {
       SetData: (payload: R[]) => payload,
-      AddRow: () => [...newState, placeholderCreator()],
+      AddPlaceholders: (numRows?: number) => {
+        const placeholders: R[] = [];
+        const numPlaceholders = numRows || 1;
+        for (let i = 0; i < numPlaceholders; i++) {
+          placeholders.push(placeholderCreator());
+        }
+        return [...newState, ...placeholders];
+      },
       UpdateRow: (payload: { id: any; payload: Partial<R> }) => {
         const row = find(newState, { id: payload.id });
         if (isNil(row)) {
@@ -297,7 +304,7 @@ export const createTableReducer = <
 
   const dataReducer = createTableDataReducer<R, E, A>(
     {
-      AddRow: mappings.AddRow,
+      AddPlaceholders: mappings.AddPlaceholders,
       RemoveRow: mappings.RemoveRow,
       UpdateRow: mappings.UpdateRow,
       SelectRow: mappings.SelectRow,

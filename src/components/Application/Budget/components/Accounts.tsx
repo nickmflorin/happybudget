@@ -10,7 +10,7 @@ import {
   requestBudgetAction,
   requestAccountsAction,
   setAccountsSearchAction,
-  addAccountsRowAction,
+  addAccountsPlaceholdersAction,
   deselectAccountsRowAction,
   selectAccountsRowAction,
   removeAccountAction,
@@ -46,7 +46,7 @@ const Accounts = (): JSX.Element => {
           search={accounts.table.search}
           onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
           saving={accounts.deleting.length !== 0 || accounts.updating.length !== 0 || accounts.creating}
-          onRowAdd={() => dispatch(addAccountsRowAction())}
+          onRowAdd={() => dispatch(addAccountsPlaceholdersAction())}
           onRowSelect={(id: string | number) => dispatch(selectAccountsRowAction(id))}
           onRowDeselect={(id: string | number) => dispatch(deselectAccountsRowAction(id))}
           onRowDelete={(row: Redux.Budget.IAccountRow) => dispatch(removeAccountAction(row))}

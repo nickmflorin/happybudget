@@ -48,7 +48,10 @@ import {
   removeAccountsRowAction,
   removeAccountSubAccountsRowAction,
   removeSubAccountSubAccountsRowAction,
-  setAccountsTableCellError
+  setAccountsTableCellError,
+  addAccountSubAccountsPlaceholdersAction,
+  addSubAccountSubAccountsPlaceholdersAction,
+  addAccountsPlaceholdersAction
 } from "./actions";
 import { initialAccountState, initialSubAccountState } from "./initialState";
 import {
@@ -154,7 +157,7 @@ export function* handleAccountUpdateTask(
         if (accountRowHasRequiredfields(existing)) {
           yield put(creatingAccountAction(true));
           try {
-            const response: IAccount = yield call(createAccount, action.budgetId, payload);
+            const response: IAccount = yield call(createAccount, action.budgetId, payload as Http.IAccountPayload);
             yield put(
               updateAccountsRowAction({
                 id: existing.id,
@@ -253,7 +256,7 @@ export function* handleAccountSubAccountUpdateTask(
               createAccountSubAccount,
               action.accountId,
               action.budgetId,
-              payload
+              payload as Http.ISubAccountPayload
             );
             yield put(
               updateAccountSubAccountsRowAction(action.accountId, {
@@ -332,7 +335,11 @@ export function* handleSubAccountSubAccountUpdateTask(
         if (subAccountRowHasRequiredfields(existing)) {
           yield put(creatingSubAccountSubAccountAction(action.subaccountId, true));
           try {
-            const response = yield call(createSubAccountSubAccount, action.subaccountId, payload);
+            const response = yield call(
+              createSubAccountSubAccount,
+              action.subaccountId,
+              payload as Http.ISubAccountPayload
+            );
             yield put(
               updateSubAccountSubAccountsRowAction(action.subaccountId, {
                 id: existing.id,
@@ -378,6 +385,9 @@ export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterat
     try {
       const response = yield call(getAccounts, action.budgetId, { no_pagination: true });
       yield put(responseAccountsAction(response));
+      if (response.data.length === 2) {
+        yield put(addAccountsPlaceholdersAction(2));
+      }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's accounts.");
       yield put(responseAccountsAction({ count: 0, data: [] }, { error: e }));
@@ -391,8 +401,16 @@ export function* getAccountSubAccountsTask(action: Redux.Budget.IAction<null>): 
   if (!isNil(action.budgetId) && !isNil(action.accountId)) {
     yield put(loadingAccountSubAccountsAction(action.accountId, true));
     try {
-      const response = yield call(getAccountSubAccounts, action.accountId, action.budgetId, { no_pagination: true });
+      const response: Http.IListResponse<ISubAccount> = yield call(
+        getAccountSubAccounts,
+        action.accountId,
+        action.budgetId,
+        { no_pagination: true }
+      );
       yield put(responseAccountSubAccountsAction(action.accountId, response));
+      if (response.data.length === 0) {
+        yield put(addAccountSubAccountsPlaceholdersAction(action.accountId, 2));
+      }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account's sub accounts.");
       yield put(responseAccountSubAccountsAction(action.accountId, { count: 0, data: [] }, { error: e }));
@@ -408,6 +426,9 @@ export function* getSubAccountSubAccountsTask(action: Redux.Budget.IAction<null>
     try {
       const response = yield call(getSubAccountSubAccounts, action.subaccountId, { no_pagination: true });
       yield put(responseSubAccountSubAccountsAction(action.subaccountId, response));
+      if (response.data.length === 0) {
+        yield put(addSubAccountSubAccountsPlaceholdersAction(action.subaccountId, 2));
+      }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the subaccount's sub accounts.");
       yield put(responseSubAccountSubAccountsAction(action.subaccountId, { count: 0, data: [] }, { error: e }));

@@ -60,7 +60,7 @@ export const getSubAccountSubAccounts = async (
 export const createAccountSubAccount = async (
   accountId: number,
   budgetId: number,
-  payload: Http.IAccountPayload,
+  payload: Http.ISubAccountPayload,
   options: Http.IRequestOptions = {}
 ): Promise<ISubAccount> => {
   const url = URL.v1("budgets", budgetId, "accounts", accountId, "subaccounts");

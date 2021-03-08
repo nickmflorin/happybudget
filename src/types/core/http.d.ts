@@ -54,28 +54,29 @@ namespace Http {
   }
 
   interface IBudgetPayload extends IPayload {
-    production_type: ProductionType;
-    name: string;
+    readonly production_type: ProductionType;
+    readonly name: string;
   }
 
   // TODO: Instead of allowing partial fields to be undefined on the
   // model, maybe we should instead have a set of required fields and
   // only create the account when all of those fields are present.
   interface IAccountPayload extends IPayload {
-    account_number?: string;
-    description?: string;
-    access?: number[];
+    readonly account_number: string;
+    readonly description?: string;
+    readonly access?: number[];
   }
 
   // TODO: Instead of allowing partial fields to be undefined on the
   // model, maybe we should instead have a set of required fields and
   // only create the sub account when all of those fields are present.
   interface ISubAccountPayload extends IPayload {
-    description?: string;
-    name?: string;
-    quantity?: number;
-    rate?: number;
-    multiplier?: number;
-    unit?: number;
+    readonly description?: string;
+    readonly name: string;
+    readonly line: string;
+    readonly quantity?: number;
+    readonly rate?: number;
+    readonly multiplier?: number;
+    readonly unit?: number;
   }
 }

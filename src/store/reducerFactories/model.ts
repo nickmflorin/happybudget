@@ -9,7 +9,7 @@ export type TransformerExtensions<S, A extends Redux.IAction<any>> = Record<stri
 export type IReducerFactoryActionMap = { [key: string]: string };
 
 interface ICommonTableActionMap {
-  AddRow: string;
+  AddPlaceholders: string;
   RemoveRow: string;
   UpdateRow: string;
   SelectRow: string;

@@ -16,7 +16,7 @@ export const ActionType = {
     Remove: "budget.accounts.Remove"
   },
   AccountsTable: {
-    AddRow: "budget.accountstable.AddRow",
+    AddPlaceholders: "budget.accountstable.AddPlaceholders",
     UpdateRow: "budget.accountstable.UpdateRow",
     RemoveRow: "budget.accountstable.RemoveRow",
     SelectRow: "budget.accountstable.SelectRow",
@@ -33,7 +33,7 @@ export const ActionType = {
     Response: "budget.account.Response",
     Request: "budget.account.Request",
     SubAccountsTable: {
-      AddRow: "budget.account.subaccountstable.AddRow",
+      AddPlaceholders: "budget.account.subaccountstable.AddPlaceholders",
       UpdateRow: "budget.account.subaccountstable.UpdateRow",
       RemoveRow: "budget.account.subaccountstable.RemoveRow",
       SelectAllRows: "budget.account.subaccountstable.SelectAllRows",
@@ -57,7 +57,7 @@ export const ActionType = {
     Response: "budget.subaccount.Response",
     Request: "budget.subaccount.Request",
     SubAccountsTable: {
-      AddRow: "budget.subaccount.subaccountstable.AddRow",
+      AddPlaceholders: "budget.subaccount.subaccountstable.AddPlaceholders",
       UpdateRow: "budget.subaccount.subaccountstable.UpdateRow",
       RemoveRow: "budget.subaccount.subaccountstable.RemoveRow",
       SelectRow: "budget.subaccount.subaccountstable.SelectRow",
@@ -126,7 +126,7 @@ export const responseSubAccountAction = simpleSubAccountAction<ISubAccount>(Acti
 /*
   Actions Pertaining to the Accounts
 */
-export const addAccountsRowAction = simpleAction<null>(ActionType.AccountsTable.AddRow);
+export const addAccountsPlaceholdersAction = simpleAction<number>(ActionType.AccountsTable.AddPlaceholders);
 export const updateAccountAction = simpleBudgetAction<{
   id: number | string;
   payload: Partial<Http.IAccountPayload>;
@@ -153,7 +153,9 @@ export const setAccountsTableCellError = simpleAction<Redux.Budget.AccountCellEr
 /*
   Actions Pertaining to the Sub Accounts of an Account
 */
-export const addAccountSubAccountsRowAction = simpleAccountAction<null>(ActionType.Account.SubAccountsTable.AddRow);
+export const addAccountSubAccountsPlaceholdersAction = simpleAccountAction<number>(
+  ActionType.Account.SubAccountsTable.AddPlaceholders
+);
 export const updateAccountSubAccountAction = simpleBudgetAccountAction<{
   id: number | string;
   payload: Partial<Http.ISubAccountPayload>;
@@ -200,8 +202,8 @@ export const setAccountSubAccountsSearchAction = simpleAccountAction<string>(
 /*
   Actions Pertaining to the Sub Accounts of a Sub Account
 */
-export const addSubAccountSubAccountsRowAction = simpleSubAccountAction<null>(
-  ActionType.SubAccount.SubAccountsTable.AddRow
+export const addSubAccountSubAccountsPlaceholdersAction = simpleSubAccountAction<number>(
+  ActionType.SubAccount.SubAccountsTable.AddPlaceholders
 );
 export const updateSubAccountSubAccountAction = simpleSubAccountAction<{
   id: number | string;
