@@ -58,18 +58,12 @@ namespace Http {
     readonly name: string;
   }
 
-  // TODO: Instead of allowing partial fields to be undefined on the
-  // model, maybe we should instead have a set of required fields and
-  // only create the account when all of those fields are present.
   interface IAccountPayload extends IPayload {
     readonly account_number: string;
     readonly description?: string;
     readonly access?: number[];
   }
 
-  // TODO: Instead of allowing partial fields to be undefined on the
-  // model, maybe we should instead have a set of required fields and
-  // only create the sub account when all of those fields are present.
   interface ISubAccountPayload extends IPayload {
     readonly description?: string;
     readonly name: string;
@@ -78,5 +72,15 @@ namespace Http {
     readonly rate?: number;
     readonly multiplier?: number;
     readonly unit?: Unit;
+  }
+
+  interface IActualPayload extends IPayload {
+    readonly description?: string;
+    readonly date?: string;
+    readonly vendor?: string;
+    readonly purchase_order?: string;
+    readonly payment_id?: string;
+    readonly value: number;
+    readonly payment_method?: PaymentMethod;
   }
 }

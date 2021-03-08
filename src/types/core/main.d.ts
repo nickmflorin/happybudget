@@ -6,8 +6,23 @@
 type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
 type ProductionType = 0 | 1 | 2 | 3 | 4 | 5;
 
+type PaymentMethodName = "Check" | "Card" | "Wire";
+type PaymentMethod = 0 | 1 | 2;
+
+type AncestorType = "budget" | "account" | "subaccount";
+type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
+type Unit = 0 | 1 | 2 | 3 | 4 | 5;
+type ParentType = "subaccount" | "account";
+
 interface Model {
   id: number;
+}
+
+interface TrackedModel extends Model {
+  readonly created_by: ISimpleUser | null;
+  readonly updated_by: ISimpleUser | null;
+  readonly created_at: string;
+  readonly updated_at: string;
 }
 
 interface ISimpleUser extends Model {
@@ -49,21 +64,15 @@ interface IBudget extends Model {
   readonly estimated: number | null;
 }
 
-type AncestorType = "budget" | "account" | "subaccount";
-
 interface IAncestor {
   id: number;
   name: string;
   type: AncestorType;
 }
 
-interface IAccount extends Model {
+interface IAccount extends TrackedModel {
   readonly account_number: string;
   readonly description: string | null;
-  readonly created_by: ISimpleUser | null;
-  readonly updated_by: ISimpleUser | null;
-  readonly created_at: string;
-  readonly updated_at: string;
   readonly access: number[];
   readonly budget: number;
   readonly ancestors: IAncestor[];
@@ -72,21 +81,14 @@ interface IAccount extends Model {
   readonly subaccounts: ISimpleSubAccount[];
 }
 
-type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
-type Unit = 0 | 1 | 2 | 3 | 4 | 5;
-type ParentType = "subaccount" | "account";
-
 interface ISimpleSubAccount extends Model {
   readonly name: string;
 }
 
-interface ISubAccount extends ISimpleSubAccount {
+interface ISubAccount extends TrackedModel {
+  readonly name: string;
   readonly line: string;
   readonly description: string | null;
-  readonly created_by: ISimpleUser | null;
-  readonly updated_by: ISimpleUser | null;
-  readonly created_at: string;
-  readonly updated_at: string;
   readonly quantity: number | null;
   readonly rate: number | null;
   readonly multiplier: number | null;
@@ -99,4 +101,17 @@ interface ISubAccount extends ISimpleSubAccount {
   readonly estimated: number | null;
   readonly variance: number | null;
   readonly subaccounts: ISimpleSubAccount[];
+}
+
+interface IActual extends TrackedModel {
+  readonly vendor: string | null;
+  readonly description: string | null;
+  readonly purchase_order: string | null;
+  readonly date: string | null;
+  readonly payment_id: string | null;
+  readonly value: string | null;
+  readonly payment_method: PaymentMethod;
+  readonly payment_method_name: PaymentMethodName;
+  readonly parent: number;
+  readonly parent_type: ParentType;
 }
