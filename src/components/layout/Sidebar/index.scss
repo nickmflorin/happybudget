@@ -39,9 +39,7 @@
         > .sidebar-menu-item-item {
           background-color: rgba(232, 232, 232, 0.5) !important;
           > .icon-container {
-            .icon,
-            .anticon,
-            span[role='img'] {
+            svg {
               color: $green;
             }
           }
@@ -52,9 +50,7 @@
         > .sidebar-menu-item-item {
           background-color: $green !important;
           > .icon-container {
-            .icon,
-            .anticon,
-            span[role='img'] {
+            svg {
               color: $white !important;
             }
           }
@@ -77,15 +73,10 @@
           width: 15px;
           line-height: 34px;
 
-          .icon,
-          .anticon,
-          span[role='img'] {
-            color: $text-primary;
-            vertical-align: -0.25rem;
-            svg {
-              height: 18px;
-              width: auto;
-            }
+          svg {
+            color: $text-secondary;
+            height: 18px;
+            width: auto;
           }
         }
 

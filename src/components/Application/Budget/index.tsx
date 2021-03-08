@@ -3,9 +3,19 @@ import { useSelector } from "react-redux";
 import { Redirect, Switch, Route, useRouteMatch, useHistory, useLocation, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRobot, faDownload, faShareAlt, faCog, faComments } from "@fortawesome/free-solid-svg-icons";
-
-import { FileAddOutlined, ContactsOutlined, FolderOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  faAddressBook,
+  faTrashAlt,
+  faRobot,
+  faDownload,
+  faShareAlt,
+  faCog,
+  faComments,
+  faFolderOpen,
+  faFolderPlus,
+  faCalculator,
+  faDollarSign
+} from "@fortawesome/free-solid-svg-icons";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { Layout } from "components/layout";
@@ -55,38 +65,51 @@ const Budget = (): JSX.Element => {
       ]}
       sidebar={[
         {
-          icon: <FileAddOutlined className={"icon"} />,
+          icon: <FontAwesomeIcon icon={faFolderPlus} />,
           onClick: () => history.push("/templates"),
-          active: location.pathname.startsWith("/templates"),
           tooltip: {
             title: "Create New Budget",
             placement: "right"
           }
         },
         {
-          icon: <FolderOutlined className={"icon"} />,
+          icon: <FontAwesomeIcon icon={faFolderOpen} />,
           onClick: () => history.push("/budgets"),
-          active: location.pathname.startsWith("/budgets"),
           tooltip: {
             title: "My Budgets",
             placement: "right"
           }
         },
         {
-          icon: <DeleteOutlined className={"icon"} />,
+          icon: <FontAwesomeIcon icon={faTrashAlt} />,
           onClick: () => history.push("/trash"),
-          active: location.pathname.startsWith("/trash"),
           tooltip: {
             title: "Deleted Budgets",
             placement: "right"
           }
         },
         {
-          icon: <ContactsOutlined className={"icon"} />,
+          icon: <FontAwesomeIcon icon={faAddressBook} />,
           onClick: () => history.push("/contacts"),
-          active: location.pathname.startsWith("/contacts"),
           tooltip: {
             title: "Contacts",
+            placement: "right"
+          }
+        },
+        {
+          icon: <FontAwesomeIcon icon={faCalculator} />,
+          onClick: () => history.push(`/budgets/${budgetId}`),
+          active: location.pathname.startsWith("/budgets"),
+          tooltip: {
+            title: "Budget",
+            placement: "right"
+          }
+        },
+        {
+          icon: <FontAwesomeIcon icon={faDollarSign} />,
+          onClick: () => history.push(`/budgets/${budgetId}`),
+          tooltip: {
+            title: "Actuals",
             placement: "right"
           }
         }
