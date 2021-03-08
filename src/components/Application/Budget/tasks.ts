@@ -403,7 +403,7 @@ export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterat
     try {
       const response = yield call(getAccounts, action.budgetId, { no_pagination: true });
       yield put(responseAccountsAction(response));
-      if (response.data.length === 2) {
+      if (response.data.length === 0) {
         yield put(addAccountsPlaceholdersAction(2));
       }
     } catch (e) {

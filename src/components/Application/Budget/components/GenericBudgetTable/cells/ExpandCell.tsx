@@ -9,7 +9,7 @@ interface ExpandCellProps extends ICellRendererParams {
 }
 
 const ExpandCell = ({ onClick, node }: ExpandCellProps): JSX.Element => {
-  if (node.data.isPlaceholder === false) {
+  if (node.data.meta.isPlaceholder === false) {
     return (
       <IconButton
         className={"dark"}

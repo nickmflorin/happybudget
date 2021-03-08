@@ -153,7 +153,11 @@ export const createTableDataReducer = <
           );
           return newState;
         } else {
-          return replaceInArray<R>(newState, { id: payload.oldId }, { ...row, id: payload.id, isPlaceholder: false });
+          return replaceInArray<R>(
+            newState,
+            { id: payload.oldId },
+            { ...row, id: payload.id, meta: { ...row.meta, isPlaceholder: false } }
+          );
         }
       },
       UpdateCell: (payload: ICellUpdate<F> | ICellUpdate<F>[]) => {

@@ -223,7 +223,8 @@ const GenericBudgetTable = <F, E extends IRowMeta, R extends IRow<F, E>>({
               return classNames("error-cell", { "unit-cell": params.colDef.field === "unit" });
             }
             if (!isCellEditable(row, params.colDef)) {
-              return classNames("not-editable", "not-editable-highlight", {
+              return classNames("not-editable", {
+                "not-editable-highlight": params.colDef.field !== "unit",
                 "unit-cell": params.colDef.field === "unit"
               });
             }
