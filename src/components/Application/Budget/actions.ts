@@ -25,7 +25,8 @@ export const ActionType = {
     Loading: "budget.accountstable.Loading",
     SetSearch: "budget.accountstable.SetSearch",
     Response: "budget.accountstable.Response",
-    Request: "budget.accountstable.Request"
+    Request: "budget.accountstable.Request",
+    SetError: "budget.accountstable.SetError"
   },
   Account: {
     Loading: "budget.account.Loading",
@@ -146,7 +147,9 @@ export const requestAccountsAction = simpleBudgetAction<null>(ActionType.Account
 export const loadingAccountsAction = simpleAction<boolean>(ActionType.AccountsTable.Loading);
 export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.AccountsTable.Response);
 export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsTable.SetSearch);
-
+export const setAccountsTableCellError = simpleAction<Redux.Budget.AccountCellError | Redux.Budget.AccountCellError[]>(
+  ActionType.AccountsTable.SetError
+);
 /*
   Actions Pertaining to the Sub Accounts of an Account
 */

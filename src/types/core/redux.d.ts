@@ -45,13 +45,19 @@ namespace Redux {
   type ModelListActionPayload = { id: number; value: boolean };
 
   interface IRow {
-    id: any;
+    id: number;
     selected: boolean;
   }
 
   interface ICell<T = string> {
     value: T;
     error?: string;
+  }
+
+  interface ICellError<F = any> {
+    id: number;
+    field: F;
+    error: string;
   }
 
   interface IDetailResponseStore<T extends Model> {
@@ -161,10 +167,16 @@ namespace Redux {
       readonly subaccounts: ISimpleSubAccount[];
     }
 
+    type AccountRowField = "account_number" | "description";
+    type AccountCellError = Redux.ICellError<AccountRowField>;
+
     interface IAccountRow extends IRow {
       readonly account_number: ICell<string | null>;
       readonly description: ICell<string | null>;
     }
+
+    type SubAccountRowField = "line" | "name" | "description" | "quantity" | "unit" | "multiplier" | "rate";
+    type SubAccountCellError = Redux.ICellError<ISubAccountRow>;
 
     interface ISubAccountRow extends IRow {
       readonly line: ICell<string | null>;

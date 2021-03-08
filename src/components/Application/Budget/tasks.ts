@@ -1,6 +1,7 @@
-import { isNil, find, concat } from "lodash";
+import { isNil, find, concat, forEach } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
+import { ClientError } from "api";
 import {
   getAccounts,
   getAccountSubAccounts,
@@ -46,7 +47,8 @@ import {
   updateSubAccountSubAccountsRowAction,
   removeAccountsRowAction,
   removeAccountSubAccountsRowAction,
-  removeSubAccountSubAccountsRowAction
+  removeSubAccountSubAccountsRowAction,
+  setAccountsTableCellError
 } from "./actions";
 import { initialAccountState, initialSubAccountState } from "./initialState";
 import {
@@ -181,8 +183,26 @@ export function* handleAccountUpdateTask(
             })
           );
         } catch (e) {
-          // TODO: Should we revert the changes if there was an error?
-          handleRequestError(e, "There was an error updating the account.");
+          if (e instanceof ClientError) {
+            const cellErrors: Redux.Budget.AccountCellError[] = [];
+            forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
+              cellErrors.push({
+                id: existing.id,
+                // TODO: We might want to build in a way to capture multiple errors for the cell.
+                error: errors[0].message,
+                // TODO: Should we make sure the field exists as a cell?  Instead of force
+                // coercing here?
+                field: field as Redux.Budget.AccountRowField
+              });
+            });
+            if (cellErrors.length === 0) {
+              handleRequestError(e, "There was an error updating the account.");
+            } else {
+              yield put(setAccountsTableCellError(cellErrors));
+            }
+          } else {
+            handleRequestError(e, "There was an error updating the account.");
+          }
         } finally {
           yield put(updatingAccountAction({ id: existing.id as number, value: false }));
         }

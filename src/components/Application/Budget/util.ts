@@ -1,5 +1,4 @@
 import { isNil, forEach } from "lodash";
-import { v4 as uuidv4 } from "uuid";
 
 const SUBACCOUNT_PAYLOAD_FIELDS: (keyof Redux.Budget.ISubAccountRow)[] = [
   "description",
@@ -14,13 +13,18 @@ const SUBACCOUNT_REQUIRED_PAYLOAD_FIELDS: (keyof Redux.Budget.ISubAccountRow)[] 
 const ACCOUNT_PAYLOAD_FIELDS: (keyof Redux.Budget.IAccountRow)[] = ["description", "account_number"];
 const ACCOUNT_REQUIRED_PAYLOAD_FIELDS: (keyof Redux.Budget.IAccountRow)[] = ["account_number"];
 
+export const generateRandomNumericId = (): number => {
+  return parseInt(Math.random().toString().slice(2, 11));
+};
+
 export const subAccountPayloadFromRow = (
   row: Redux.Budget.ISubAccountRow | Partial<Redux.Budget.ISubAccountRow>
 ): Http.ISubAccountPayload | Partial<Http.ISubAccountPayload> => {
   const obj: { [key: string]: any } = {};
   forEach(SUBACCOUNT_PAYLOAD_FIELDS, (field: keyof Redux.Budget.ISubAccountRow) => {
-    if (!isNil(row[field]) && !isNil(row[field].value)) {
-      obj[field] = row[field].value;
+    const cell = row[field] as Redux.ICell | undefined;
+    if (!isNil(cell) && !isNil(cell.value)) {
+      obj[field] = cell.value;
     }
   });
   return obj;
@@ -31,8 +35,9 @@ export const accountPayloadFromRow = (
 ): Http.IAccountPayload | Partial<Http.IAccountPayload> => {
   const obj: { [key: string]: any } = {};
   forEach(ACCOUNT_PAYLOAD_FIELDS, (field: keyof Redux.Budget.IAccountRow) => {
-    if (!isNil(row[field]) && !isNil(row[field].value)) {
-      obj[field] = row[field].value;
+    const cell = row[field] as Redux.ICell | undefined;
+    if (!isNil(cell) && !isNil(cell.value)) {
+      obj[field] = cell.value;
     }
   });
   return obj;
@@ -41,8 +46,8 @@ export const accountPayloadFromRow = (
 export const subAccountRowHasRequiredfields = (row: Redux.Budget.ISubAccountRow): boolean => {
   let requiredFieldsPresent = true;
   forEach(SUBACCOUNT_REQUIRED_PAYLOAD_FIELDS, (field: keyof Redux.Budget.ISubAccountRow) => {
-    const val = row[field].value;
-    if (isNil(val) || val === "") {
+    const cell = row[field] as Redux.ICell;
+    if (isNil(cell.value) || cell.value === "") {
       requiredFieldsPresent = false;
       return false;
     }
@@ -53,8 +58,8 @@ export const subAccountRowHasRequiredfields = (row: Redux.Budget.ISubAccountRow)
 export const accountRowHasRequiredfields = (row: Redux.Budget.IAccountRow): boolean => {
   let requiredFieldsPresent = true;
   forEach(ACCOUNT_REQUIRED_PAYLOAD_FIELDS, (field: keyof Redux.Budget.IAccountRow) => {
-    const val = row[field].value;
-    if (isNil(val) || val === "") {
+    const cell = row[field] as Redux.ICell;
+    if (isNil(cell.value) || cell.value === "") {
       requiredFieldsPresent = false;
       return false;
     }
@@ -128,7 +133,7 @@ export const createSubAccountRowPlaceholder = (): Redux.Budget.ISubAccountRow =>
   rate: { value: null },
   quantity: { value: null },
   description: { value: null },
-  id: uuidv4(),
+  id: generateRandomNumericId(),
   isPlaceholder: true,
   selected: false,
   estimated: { value: null },
@@ -139,7 +144,7 @@ export const createSubAccountRowPlaceholder = (): Redux.Budget.ISubAccountRow =>
 export const createAccountRowPlaceholder = (): Redux.Budget.IAccountRow => ({
   account_number: { value: null },
   description: { value: null },
-  id: uuidv4(),
+  id: generateRandomNumericId(),
   isPlaceholder: true,
   selected: false,
   estimated: { value: null },

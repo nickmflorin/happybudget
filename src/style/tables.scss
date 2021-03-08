@@ -64,6 +64,9 @@
         }
       }
     }
+    &.error-cell {
+      border: 2px solid $red !important;
+    }
   }
   div[role='gridcell'].ag-cell-focus {
     &:not(.not-editable) {

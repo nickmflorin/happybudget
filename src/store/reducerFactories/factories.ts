@@ -110,7 +110,7 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
  *                            adding new rows to the table.
  * @param options             Additional options supplied to the reducer factory.
  */
-export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAction<any>>(
+export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICellError, A extends Redux.IAction<any>>(
   mappings: Partial<ITableDataActionMap>,
   placeholderCreator: () => R,
   options: IReducerFactoryOptions<Redux.ListStore<R>> = { initialState: [], referenceEntity: "entity" }
@@ -130,69 +130,69 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
       SetData: (payload: R[]) => payload,
       AddRow: () => [...newState, placeholderCreator()],
       UpdateRow: (payload: { id: any; payload: Partial<R> }) => {
-        const existing = find(newState, { id: payload.id });
-        if (isNil(existing)) {
+        const row = find(newState, { id: payload.id });
+        if (isNil(row)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} in state...
-          the ${Options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} row in state...
+          the ${Options.referenceEntity} row with ID ${payload.id} does not exist in state when it is expected to.`
           );
           return newState;
         } else {
-          return replaceInArray<R>(newState, { id: payload.id }, { ...existing, ...payload.payload });
+          return replaceInArray<R>(newState, { id: payload.id }, { ...row, ...payload.payload });
         }
       },
       RemoveRow: (payload: { id: any }) => {
-        const existing = find(newState, { id: payload.id });
-        if (isNil(existing)) {
+        const row = find(newState, { id: payload.id });
+        if (isNil(row)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when removing ${Options.referenceEntity} from state...
-          the ${Options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when removing ${Options.referenceEntity} row from state...
+          the ${Options.referenceEntity} row with ID ${payload.id} does not exist in state when it is expected to.`
           );
           return newState;
         } else {
-          return filter(newState, (row: R) => row.id !== payload.id);
+          return filter(newState, (r: R) => r.id !== payload.id);
         }
       },
       SelectRow: (id: any) => {
-        const existing = find(newState, { id });
-        if (isNil(existing)) {
+        const row = find(newState, { id });
+        if (isNil(row)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when selecting ${Options.referenceEntity} in state...
-          the ${Options.referenceEntity} with ID ${id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when selecting ${Options.referenceEntity} row in state...
+          the ${Options.referenceEntity} row with ID ${id} does not exist in state when it is expected to.`
           );
           return newState;
-        } else if (existing.selected === true) {
+        } else if (row.selected === true) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when selecting ${Options.referenceEntity} in state...
-          the ${Options.referenceEntity} with ID ${id} is already selected when it is not expected to be.`
+            `Inconsistent State!:  Inconsistent state noticed when selecting ${Options.referenceEntity} row in state...
+          the ${Options.referenceEntity} row with ID ${id} is already selected when it is not expected to be.`
           );
           return newState;
         } else {
-          return replaceInArray<R>(newState, { id }, { ...existing, selected: true });
+          return replaceInArray<R>(newState, { id }, { ...row, selected: true });
         }
       },
       DeselectRow: (id: any) => {
-        const existing = find(newState, { id });
-        if (isNil(existing)) {
+        const row = find(newState, { id });
+        if (isNil(row)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when deselecting ${Options.referenceEntity} in state...
-          the ${Options.referenceEntity} with ID ${id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when deselecting ${Options.referenceEntity} row in state...
+          the ${Options.referenceEntity} row with ID ${id} does not exist in state when it is expected to.`
           );
           return newState;
-        } else if (existing.selected === false) {
+        } else if (row.selected === false) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when deselecting ${Options.referenceEntity} in state...
-          the ${Options.referenceEntity} with ID ${id} is already deselected when it is not expected to be.`
+            `Inconsistent State!:  Inconsistent state noticed when deselecting ${Options.referenceEntity} row in state...
+          the ${Options.referenceEntity} row with ID ${id} is already deselected when it is not expected to be.`
           );
           return newState;
         } else {
-          return replaceInArray<R>(newState, { id: id }, { ...existing, selected: false });
+          return replaceInArray<R>(newState, { id: id }, { ...row, selected: false });
         }
       },
       SelectAllRows: () => {
@@ -202,6 +202,44 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
         } else {
           return map(newState, (row: R) => ({ ...row, selected: true }));
         }
+      },
+      SetError: (payload: E | E[]) => {
+        const updateStateWithError = (st: Redux.ListStore<R>, e: E): Redux.ListStore<R> => {
+          const row = find(newState, { id: e.id }) as R;
+          if (isNil(row)) {
+            /* eslint-disable no-console */
+            console.error(
+              `Inconsistent State!:  Inconsistent state noticed when adding error to ${Options.referenceEntity} cell...
+          the ${Options.referenceEntity} row with ID ${e.id} does not exist in state when it is expected to.`
+            );
+            return newState;
+            // Ideally - we should improve the typecasting on the fields that comprise the sub account
+            // and account rows so we do not have to do `as keyof R` here.
+          } else if (isNil(row[e.field as keyof R])) {
+            /* eslint-disable no-console */
+            console.error(
+              `Inconsistent State!:  Inconsistent state noticed when adding error to ${Options.referenceEntity} cell...
+            the ${Options.referenceEntity} cell with field ${e.field} does not exist in state when it is expected to.`
+            );
+            return newState;
+          } else {
+            console.log("ADDING ERROR");
+            console.log({ ...row, [e.field]: { ...row[e.field as keyof R], error: e.error } });
+            return replaceInArray<R>(
+              newState,
+              { id: e.id },
+              { ...row, [e.field]: { ...row[e.field as keyof R], error: e.error } }
+            );
+          }
+        };
+        if (Array.isArray(payload)) {
+          for (let i = 0; i < payload.length; i++) {
+            newState = updateStateWithError(newState, payload[i]);
+          }
+        } else {
+          newState = updateStateWithError(newState, payload);
+        }
+        return newState;
       }
     };
 
@@ -240,7 +278,13 @@ export const createTableDataReducer = <R extends Redux.IRow, A extends Redux.IAc
  *                            to a row in the table.
  * @param options             Additional options supplied to the reducer factory.
  */
-export const createTableReducer = <R extends Redux.IRow, M extends Model, A extends Redux.IAction<any>>(
+export const createTableReducer = <
+  R extends Redux.IRow,
+  M extends Model,
+  E extends Redux.ICellError,
+  A extends Redux.IAction<any>
+>(
+  /* eslint-disable indent */
   mappings: ITableActionMap,
   placeholderCreator: () => R,
   modelToRow: (model: M) => R,
@@ -251,14 +295,15 @@ export const createTableReducer = <R extends Redux.IRow, M extends Model, A exte
     initialState: initialTableState
   });
 
-  const dataReducer = createTableDataReducer(
+  const dataReducer = createTableDataReducer<R, E, A>(
     {
       AddRow: mappings.AddRow,
       RemoveRow: mappings.RemoveRow,
       UpdateRow: mappings.UpdateRow,
       SelectRow: mappings.SelectRow,
       DeselectRow: mappings.DeselectRow,
-      SelectAllRows: mappings.SelectAllRows
+      SelectAllRows: mappings.SelectAllRows,
+      SetError: mappings.SetError
     },
     placeholderCreator,
     { referenceEntity: Options.referenceEntity as string, initialState: Options.initialState.data }

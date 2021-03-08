@@ -1,4 +1,4 @@
-@import "style/typography";
+@import 'style/typography';
 
 .primary-grid {
   .ag-row:last-child {
@@ -28,5 +28,29 @@
   svg {
     height: 0.8rem;
     width: auto;
+  }
+}
+
+.error-container {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  height: 10px;
+  display: flex;
+
+  .text-error {
+    color: $red;
+    font-size: 9px;
+    line-height: 10px;
+    display: block;
+  }
+  .icon--error {
+    color: $red;
+    display: block;
+
+    svg {
+      height: 10px;
+      width: auto;
+    }
   }
 }

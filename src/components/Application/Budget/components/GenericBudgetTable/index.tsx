@@ -193,6 +193,15 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
               return "action-cell";
             }
             const row: R = params.node.data;
+
+            if (
+              !isNil(params.colDef.field) &&
+              params.node.data[params.colDef.field] &&
+              !isNil(params.node.data[params.colDef.field].error)
+            ) {
+              return "error-cell";
+            }
+
             if (!isCellEditable(row, params.colDef)) {
               return "not-editable";
             }

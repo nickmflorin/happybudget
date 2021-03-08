@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 
-import { LockOutlined } from "@ant-design/icons";
+import { LockOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import { ICellRendererParams, ColDef } from "ag-grid-community";
 
 interface ValueCellProps extends ICellRendererParams {
@@ -15,6 +15,16 @@ const ValueCell = ({ isCellEditable, node, value, colDef }: ValueCellProps): JSX
     return (
       <div>
         <LockOutlined className={"icon--lock"} />
+        {!isNil(value) && value.value}
+      </div>
+    );
+  } else if (!isNil(value) && !isNil(value.error)) {
+    return (
+      <div>
+        <div className={"error-container"}>
+          <div className={"text-error"}>{value.error}</div>
+          <CloseCircleOutlined className={"icon--error"} />
+        </div>
         {!isNil(value) && value.value}
       </div>
     );

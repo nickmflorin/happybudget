@@ -15,6 +15,7 @@ interface ICommonTableActionMap {
   SelectRow: string;
   DeselectRow: string;
   SelectAllRows: string;
+  SetError: string;
 }
 
 export interface ITableDataActionMap extends ICommonTableActionMap {
