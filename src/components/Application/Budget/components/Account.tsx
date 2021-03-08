@@ -81,6 +81,11 @@ const Account = (): JSX.Element => {
           }
           onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountSubAccountsRowsAction(parseInt(accountId)))}
+          estimated={
+            !isNil(accountStore.detail.data) && !isNil(accountStore.detail.data.estimated)
+              ? accountStore.detail.data.estimated
+              : 0.0
+          }
           columns={[
             {
               field: "line",
@@ -96,27 +101,33 @@ const Account = (): JSX.Element => {
             },
             {
               field: "quantity",
-              headerName: "Quantity"
+              headerName: "Quantity",
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "unit",
-              headerName: "Unit"
+              headerName: "Unit",
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "multiplier",
-              headerName: "X"
+              headerName: "X",
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "rate",
-              headerName: "Rate"
+              headerName: "Rate",
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "estimated",
-              headerName: "Estimated"
+              headerName: "Estimated",
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "actual",
-              headerName: "Actual"
+              headerName: "Actual",
+              cellStyle: { textAlign: "right" }
             }
           ]}
         />

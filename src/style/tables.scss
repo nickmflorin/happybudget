@@ -13,9 +13,6 @@
   .ag-right-aligned-header div.ag-header-cell-label {
     justify-content: flex-end !important;
   }
-  div[role='gridcell'] {
-    background-color: $white;
-  }
   .ag-layout-auto-height .ag-center-cols-clipper,
   .ag-layout-auto-height .ag-center-cols-container,
   .ag-layout-print .ag-center-cols-clipper,
@@ -34,14 +31,13 @@
   .ag-row {
     background: $white !important;
     border-color: 1px solid $gray-light !important;
-  }
-  .ag-row-hover div[role=gridcell] {
-    background-color: $gray-highlight !important;
-  }
-  .ag-row-hover div[role='gridcell'],
-  .ag-row-hover div[col-id='estimated'][role='gridcell'],
-  .ag-row-hover div[col-id='actuals'][role='gridcell'] {
-    background-color: $gray-highlight !important;
+    &.ag-row-hover {
+      div[role=gridcell] {
+        &:not(.not-editable) {
+          background-color: $gray-highlight !important;
+        }
+      }
+    }
   }
   .ag-header-cell-text {
     color: $text-secondary;
@@ -53,6 +49,7 @@
     padding: 0;
   }
   div[role='gridcell'] {
+    background-color: $white;
     border-right: 1px solid $gray-light !important;
     &.action-cell {
       border: unset !important;
@@ -67,16 +64,19 @@
     &.error-cell {
       border: 2px solid $red !important;
     }
-  }
-  div[role='gridcell'].ag-cell-focus {
-    &:not(.not-editable) {
-      border: 2px solid $green !important;
-      &.no-select, &.action-cell {
+    &.not-editable-highlight {
+      background-color: #f7fffa !important;
+    }
+    &.ag-cell-focus {
+      &:not(.not-editable) {
+        border: 2px solid $green !important;
+        &.no-select, &.action-cell {
+          border: unset !important;
+        }
+      }
+      &.not-editable {
         border: unset !important;
       }
-    }
-    &.not-editable {
-      border: unset !important;
     }
   }
   .ag-cell-inline-editing {

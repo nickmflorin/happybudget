@@ -24,6 +24,7 @@ const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
   const history = useHistory();
   const accounts = useSelector((state: Redux.IApplicationStore) => state.budget.accounts);
+  const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
 
   useEffect(() => {
     if (!isNil(budgetId) && !isNaN(parseInt(budgetId))) {
@@ -55,6 +56,7 @@ const Accounts = (): JSX.Element => {
           }
           onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountsRowsAction())}
+          estimated={!isNil(budget.data) && !isNil(budget.data.estimated) ? budget.data.estimated : 0.0}
           columns={[
             {
               field: "account_number",
@@ -66,15 +68,18 @@ const Accounts = (): JSX.Element => {
             },
             {
               field: "estimated",
-              headerName: "Estimated"
+              headerName: "Estimated",
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "actual",
-              headerName: "Actual"
+              headerName: "Actual",
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "variance",
-              headerName: "Variance"
+              headerName: "Variance",
+              cellStyle: { textAlign: "right" }
             }
           ]}
         />

@@ -11,7 +11,8 @@ import {
   GridReadyEvent,
   RowNode,
   EditableCallbackParams,
-  GridOptions
+  GridOptions,
+  ColumnApi
 } from "ag-grid-community";
 
 import TableHeader from "./TableHeader";
@@ -23,6 +24,7 @@ interface GenericBudgetTableProps<R> {
   table: R[];
   search: string;
   saving: boolean;
+  estimated: number;
   onSearch: (value: string) => void;
   onRowSelect: (id: number | string) => void;
   onRowDeselect: (id: number | string) => void;
@@ -39,6 +41,7 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
   table,
   search,
   saving,
+  estimated,
   onSearch,
   onSelectAll,
   onRowUpdate,
@@ -50,7 +53,9 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
   isCellEditable
 }: GenericBudgetTableProps<R>) => {
   const [allSelected, setAllSelected] = useState(false);
+  const [focused, setFocused] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
+  const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [footerGridApi, setFooterGridApi] = useState<GridApi | undefined>(undefined);
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [footerColDefs, setFooterColDefs] = useState<ColDef[]>([]);
@@ -59,7 +64,25 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
 
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
+    setColumnApi(event.columnApi);
   }, []);
+
+  useEffect(() => {
+    if (!isNil(columnApi) && !isNil(gridApi)) {
+      const firstEditCol = columnApi.getAllDisplayedColumns()[2];
+      if (!isNil(firstEditCol) && focused === false) {
+        gridApi.ensureIndexVisible(0);
+        gridApi.ensureColumnVisible(firstEditCol);
+        gridApi.setFocusedCell(0, firstEditCol);
+        // TODO: Investigate if there is a better way to do this - currently,
+        // this hook is getting triggered numerous times when it shouldn't be.
+        // It is because the of the `columns` in the dependency array, which
+        // are necessary to get a situation when `firstEditCol` is not null,
+        // but also shouldn't be triggering this hook so many times.
+        setFocused(true);
+      }
+    }
+  }, [columnApi, gridApi, columns, focused]);
 
   const onFooterGridReady = useCallback((event: GridReadyEvent): void => {
     setFooterGridApi(event.api);
@@ -155,7 +178,6 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
               ({
                 ...def,
                 cellRenderer: "ValueCell",
-                cellRendererParams: { isCellEditable },
                 filterParams: {
                   textFormatter: (value: Redux.ICell): string => {
                     if (!isNil(value)) {
@@ -193,7 +215,6 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
               return "action-cell";
             }
             const row: R = params.node.data;
-
             if (
               !isNil(params.colDef.field) &&
               params.node.data[params.colDef.field] &&
@@ -201,16 +222,15 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
             ) {
               return "error-cell";
             }
-
             if (!isCellEditable(row, params.colDef)) {
-              return "not-editable";
+              return classNames("not-editable", "not-editable-highlight");
             }
             return "";
           }
         })
       )
     );
-  }, [columns]);
+  }, [columns.length]);
 
   useEffect(() => {
     setFooterColDefs(
@@ -305,7 +325,11 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
           }}
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {
             const field = event.column.getColId();
-            onRowUpdate(event.data.id, { [field]: event.newValue.value });
+            if (!isNil(event.newValue)) {
+              if (isNil(event.oldValue) || event.oldValue.value !== event.newValue.value) {
+                onRowUpdate(event.data.id, { [field]: event.newValue.value });
+              }
+            }
           }}
         />
       </div>
@@ -320,11 +344,11 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
               line: "",
               isPlaceholder: true,
               name: "",
-              quantity: 0,
+              quantity: "",
               unit: "",
-              multiplier: 0,
-              rate: 0,
-              estimated: 0,
+              multiplier: "",
+              rate: "",
+              estimated,
               variance: 0,
               subaccounts: []
             }

@@ -25,14 +25,14 @@ const SubAccount = (): JSX.Element => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const subaccounts = useSelector((state: Redux.IApplicationStore) => {
+  const subAccountStore = useSelector((state: Redux.IApplicationStore) => {
     let subState = initialSubAccountState;
     if (!isNaN(parseInt(subaccountId))) {
       if (!isNil(state.budget.subaccounts[parseInt(subaccountId)])) {
         subState = state.budget.subaccounts[parseInt(subaccountId)];
       }
     }
-    return subState.subaccounts;
+    return subState;
   });
 
   useEffect(() => {
@@ -49,9 +49,9 @@ const SubAccount = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={[budgetId, subaccountId]}>
-      <RenderWithSpinner loading={subaccounts.table.loading}>
+      <RenderWithSpinner loading={subAccountStore.subaccounts.table.loading}>
         <GenericBudgetTable<Redux.Budget.ISubAccountRow>
-          table={subaccounts.table.data}
+          table={subAccountStore.subaccounts.table.data}
           isCellEditable={(row: Redux.Budget.ISubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual"], colDef.field)) {
               return false;
@@ -61,9 +61,13 @@ const SubAccount = (): JSX.Element => {
               return row.subaccounts.length === 0;
             }
           }}
-          search={subaccounts.table.search}
+          search={subAccountStore.subaccounts.table.search}
           onSearch={(value: string) => dispatch(setSubAccountSubAccountsSearchAction(parseInt(subaccountId), value))}
-          saving={subaccounts.deleting.length !== 0 || subaccounts.updating.length !== 0 || subaccounts.creating}
+          saving={
+            subAccountStore.subaccounts.deleting.length !== 0 ||
+            subAccountStore.subaccounts.updating.length !== 0 ||
+            subAccountStore.subaccounts.creating
+          }
           onRowAdd={() => dispatch(addSubAccountSubAccountsPlaceholdersAction(parseInt(subaccountId)))}
           onRowSelect={(id: string | number) =>
             dispatch(selectSubAccountSubAccountsRowAction(parseInt(subaccountId), id))
@@ -79,49 +83,53 @@ const SubAccount = (): JSX.Element => {
           }
           onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           onSelectAll={() => dispatch(selectAllSubAccountSubAccountsRowsAction(parseInt(subaccountId)))}
+          estimated={
+            !isNil(subAccountStore.detail.data) && !isNil(subAccountStore.detail.data.estimated)
+              ? subAccountStore.detail.data.estimated
+              : 0.0
+          }
           columns={[
             {
               field: "line",
-              headerName: "Line",
-              editable: true
+              headerName: "Line"
             },
             {
               field: "description",
-              headerName: "Category Description",
-              editable: true
+              headerName: "Category Description"
             },
             {
               field: "name",
-              headerName: "Name",
-              editable: true
+              headerName: "Name"
             },
             {
               field: "quantity",
               headerName: "Quantity",
-              editable: true
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "unit",
               headerName: "Unit",
-              editable: true
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "multiplier",
               headerName: "X",
-              editable: true
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "rate",
               headerName: "Rate",
-              editable: true
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "estimated",
-              headerName: "Estimated"
+              headerName: "Estimated",
+              cellStyle: { textAlign: "right" }
             },
             {
               field: "actual",
-              headerName: "Actual"
+              headerName: "Actual",
+              cellStyle: { textAlign: "right" }
             }
           ]}
         />
