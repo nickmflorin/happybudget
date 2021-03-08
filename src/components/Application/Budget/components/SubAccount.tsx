@@ -50,7 +50,7 @@ const SubAccount = (): JSX.Element => {
   return (
     <RenderIfValidId id={[budgetId, subaccountId]}>
       <RenderWithSpinner loading={subAccountStore.subaccounts.table.loading}>
-        <GenericBudgetTable<Redux.Budget.ISubAccountRow>
+        <GenericBudgetTable<Redux.Budget.SubAccountRowField, Redux.Budget.IBudgetRowMeta, Redux.Budget.ISubAccountRow>
           table={subAccountStore.subaccounts.table.data}
           isCellEditable={(row: Redux.Budget.ISubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "unit"], colDef.field)) {
@@ -58,7 +58,7 @@ const SubAccount = (): JSX.Element => {
             } else if (includes(["line", "description", "name"], colDef.field)) {
               return true;
             } else {
-              return row.subaccounts.length === 0;
+              return row.meta.subaccounts.length === 0;
             }
           }}
           search={subAccountStore.subaccounts.table.search}

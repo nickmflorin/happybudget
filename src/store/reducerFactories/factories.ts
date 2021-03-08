@@ -110,7 +110,14 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
  *                            adding new rows to the table.
  * @param options             Additional options supplied to the reducer factory.
  */
-export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICellError, A extends Redux.IAction<any>>(
+export const createTableDataReducer = <
+  /* eslint-disable indent */
+  F extends keyof R,
+  E extends IRowMeta,
+  R extends IRow<F, E>,
+  Y extends ICellError<F>,
+  A extends Redux.IAction<any>
+>(
   mappings: Partial<ITableDataActionMap>,
   placeholderCreator: () => R,
   options: IReducerFactoryOptions<Redux.ListStore<R>> = { initialState: [], referenceEntity: "entity" }
@@ -136,27 +143,47 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
         }
         return [...newState, ...placeholders];
       },
-      UpdateRow: (payload: { id: any; payload: { [k in keyof R]: R[k] } }) => {
-        const row = find(newState, { id: payload.id });
+      ActivatePlaceholder: (payload: Redux.Budget.IActivatePlaceholderPayload) => {
+        const row: R | undefined = find(newState, { id: payload.oldId } as any);
         if (isNil(row)) {
           /* eslint-disable no-console */
           console.error(
-            `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} row in state...
-          the ${Options.referenceEntity} row with ID ${payload.id} does not exist in state when it is expected to.`
+            `Inconsistent State!:  Inconsistent state noticed when activating ${Options.referenceEntity} placeholder row in state...
+            the ${Options.referenceEntity} row with ID ${payload.oldId} does not exist in state when it is expected to.`
           );
           return newState;
         } else {
-          forEach(payload.payload, (v: any, k: string) => {
-            newState = replaceInArray<R>(
-              newState,
-              { id: payload.id },
-              { ...row, [k]: { ...row[k as keyof R], value: v } }
-            );
-          });
-          return newState;
+          return replaceInArray<R>(newState, { id: payload.oldId }, { ...row, id: payload.id, isPlaceholder: false });
         }
       },
-      RemoveRow: (payload: { id: any }) => {
+      UpdateCell: (payload: ICellUpdate<F> | ICellUpdate<F>[]) => {
+        const updateCellInState = (st: Redux.ListStore<R>, update: ICellUpdate<F>) => {
+          const row: R | undefined = find(st, { id: update.row } as any);
+          if (isNil(row)) {
+            /* eslint-disable no-console */
+            console.error(
+              `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} row in state...
+              the ${Options.referenceEntity} row with ID ${update.row} does not exist in state when it is expected to.`
+            );
+            return st;
+          } else {
+            return replaceInArray<R>(
+              st,
+              { id: update.row },
+              { ...row, [update.column]: { ...row[update.column], value: update.value } }
+            );
+          }
+        };
+        if (Array.isArray(payload)) {
+          for (let i = 0; i < payload.length; i++) {
+            newState = updateCellInState(newState, payload[i]);
+          }
+        } else {
+          newState = updateCellInState(newState, payload);
+        }
+        return newState;
+      },
+      RemoveRow: (payload: { id: number }) => {
         const row = find(newState, { id: payload.id });
         if (isNil(row)) {
           /* eslint-disable no-console */
@@ -178,7 +205,7 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
           the ${Options.referenceEntity} row with ID ${id} does not exist in state when it is expected to.`
           );
           return newState;
-        } else if (row.selected === true) {
+        } else if (row.meta.selected === true) {
           /* eslint-disable no-console */
           console.error(
             `Inconsistent State!:  Inconsistent state noticed when selecting ${Options.referenceEntity} row in state...
@@ -198,7 +225,7 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
           the ${Options.referenceEntity} row with ID ${id} does not exist in state when it is expected to.`
           );
           return newState;
-        } else if (row.selected === false) {
+        } else if (row.meta.selected === false) {
           /* eslint-disable no-console */
           console.error(
             `Inconsistent State!:  Inconsistent state noticed when deselecting ${Options.referenceEntity} row in state...
@@ -210,15 +237,15 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
         }
       },
       SelectAllRows: () => {
-        const selected = filter(newState, (row: R) => row.selected === true);
+        const selected = filter(newState, (row: R) => row.meta.selected === true);
         if (selected.length === newState.length) {
           return map(newState, (row: R) => ({ ...row, selected: false }));
         } else {
           return map(newState, (row: R) => ({ ...row, selected: true }));
         }
       },
-      SetError: (payload: E | E[]) => {
-        const updateStateWithError = (st: Redux.ListStore<R>, e: E): Redux.ListStore<R> => {
+      SetError: (payload: Y | Y[]) => {
+        const updateStateWithError = (st: Redux.ListStore<R>, e: Y): Redux.ListStore<R> => {
           const row = find(newState, { id: e.id }) as R;
           if (isNil(row)) {
             /* eslint-disable no-console */
@@ -229,7 +256,7 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
             return newState;
             // Ideally - we should improve the typecasting on the fields that comprise the sub account
             // and account rows so we do not have to do `as keyof R` here.
-          } else if (isNil(row[e.field as keyof R])) {
+          } else if (isNil(row[e.field])) {
             /* eslint-disable no-console */
             console.error(
               `Inconsistent State!:  Inconsistent state noticed when adding error to ${Options.referenceEntity} cell...
@@ -240,7 +267,7 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
             return replaceInArray<R>(
               newState,
               { id: e.id },
-              { ...row, [e.field]: { ...row[e.field as keyof R], error: e.error } }
+              { ...row, [e.field]: { ...row[e.field], error: e.error } }
             );
           }
         };
@@ -291,27 +318,31 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
  * @param options             Additional options supplied to the reducer factory.
  */
 export const createTableReducer = <
-  R extends Redux.IRow,
+  /* eslint-disable indent */
+  F extends keyof R,
+  E extends IRowMeta,
+  R extends IRow<F, E>,
   M extends Model,
-  E extends Redux.ICellError,
+  Y extends ICellError<F>,
   A extends Redux.IAction<any>
 >(
   /* eslint-disable indent */
   mappings: ITableActionMap,
   placeholderCreator: () => R,
   modelToRow: (model: M) => R,
-  options: Partial<ITableReducerOptions<R, M>> = { initialState: initialTableState, referenceEntity: "entity" }
+  options: Partial<ITableReducerOptions<F, E, R, M>> = { initialState: initialTableState, referenceEntity: "entity" }
 ) => {
-  const Options: ITableReducerOptions<R, M> = mergeWithDefaults(options, {
+  const Options: ITableReducerOptions<F, E, R, M> = mergeWithDefaults(options, {
     referenceEntity: "entity",
     initialState: initialTableState
   });
 
-  const dataReducer = createTableDataReducer<R, E, A>(
+  const dataReducer = createTableDataReducer<F, E, R, Y, A>(
     {
       AddPlaceholders: mappings.AddPlaceholders,
       RemoveRow: mappings.RemoveRow,
-      UpdateRow: mappings.UpdateRow,
+      UpdateCell: mappings.UpdateCell,
+      ActivatePlaceholder: mappings.ActivatePlaceholder,
       SelectRow: mappings.SelectRow,
       DeselectRow: mappings.DeselectRow,
       SelectAllRows: mappings.SelectAllRows,

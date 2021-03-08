@@ -1,6 +1,7 @@
 /// <reference path="redux/index.d.ts" />
 /// <reference path="redux-sagas/index.d.ts" />
 /// <reference path="./main.d.ts" />
+/// <reference path="./table.d.ts" />
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -43,22 +44,6 @@ namespace Redux {
   type ListStore<T> = T[];
 
   type ModelListActionPayload = { id: number; value: boolean };
-
-  interface IRow {
-    id: number;
-    selected: boolean;
-  }
-
-  interface ICell<T = string> {
-    value: T;
-    error?: string;
-  }
-
-  interface ICellError<F = any> {
-    id: number;
-    field: F;
-    error: string;
-  }
 
   interface IDetailResponseStore<T extends Model> {
     readonly data: T | undefined;
@@ -159,26 +144,30 @@ namespace Redux {
       readonly creating: boolean;
     }
 
-    interface IRow extends Redux.IRow {
-      readonly selected: boolean;
+    type AccountRowField = "account_number" | "description";
+    type AccountCellError = ICellError<AccountRowField>;
+
+    interface IActivatePlaceholderPayload {
+      oldId: number;
+      id: number;
+    }
+
+    interface IBudgetRowMeta extends IRowMeta {
       readonly isPlaceholder: boolean;
-      readonly estimated: ICell<number | null>;
-      readonly variance: ICell<number | null>;
       readonly subaccounts: ISimpleSubAccount[];
     }
 
-    type AccountRowField = "account_number" | "description";
-    type AccountCellError = Redux.ICellError<AccountRowField>;
-
-    interface IAccountRow extends IRow {
+    interface IAccountRow extends IRow<AccountRowField, IBudgetRowMeta> {
       readonly account_number: ICell<string | null>;
       readonly description: ICell<string | null>;
+      readonly estimated: ICell<number | null>;
+      readonly variance: ICell<number | null>;
     }
 
     type SubAccountRowField = "line" | "name" | "description" | "quantity" | "unit" | "multiplier" | "rate";
-    type SubAccountCellError = Redux.ICellError<ISubAccountRow>;
+    type SubAccountCellError = ICellError<SubAccountRowField>;
 
-    interface ISubAccountRow extends IRow {
+    interface ISubAccountRow extends IRow<SubAccountRowField, IBudgetRowMeta> {
       readonly line: ICell<string | null>;
       readonly name: ICell<string | null>;
       readonly description: ICell<string | null>;
@@ -186,6 +175,8 @@ namespace Redux {
       readonly unit: ICell<Unit | null>;
       readonly multiplier: ICell<number | null>;
       readonly rate: ICell<number | null>;
+      readonly estimated: ICell<number | null>;
+      readonly variance: ICell<number | null>;
     }
 
     interface IStore {

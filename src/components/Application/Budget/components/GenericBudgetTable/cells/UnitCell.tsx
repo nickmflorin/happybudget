@@ -4,7 +4,7 @@ import { UnitDropdown } from "components/control";
 
 interface UnitCellProps extends ICellRendererParams {
   onChange: (id: Unit, row: Redux.Budget.ISubAccountRow) => void;
-  value: Redux.ICell<any>;
+  value: ICell<any>;
   node: RowNode;
 }
 

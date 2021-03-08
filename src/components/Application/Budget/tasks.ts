@@ -1,4 +1,4 @@
-import { isNil, find, concat, forEach } from "lodash";
+import { isNil, find, concat, forEach, map } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import { ClientError } from "api";
@@ -42,9 +42,12 @@ import {
   updatingAccountAction,
   updatingAccountSubAccountAction,
   updatingSubAccountSubAccountAction,
-  updateAccountsRowAction,
-  updateAccountSubAccountsRowAction,
-  updateSubAccountSubAccountsRowAction,
+  updateAccountsCellAction,
+  updateAccountSubAccountsCellAction,
+  updateSubAccountSubAccountsCellAction,
+  activateAccountSubAccountsPlaceholderAction,
+  activateAccountsPlaceholderAction,
+  activateSubAccountSubAccountsPlaceholderAction,
   removeAccountsRowAction,
   removeAccountSubAccountsRowAction,
   removeSubAccountSubAccountsRowAction,
@@ -59,8 +62,8 @@ import {
   subAccountRowHasRequiredfields,
   accountPayloadFromRow,
   accountRowHasRequiredfields,
-  convertSubAccountToRow,
-  convertAccountToRow
+  convertAccountResponseToCellUpdates,
+  convertSubAccountResponseToCellUpdates
 } from "./util";
 
 export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Redux.Budget.IAccountRow>): SagaIterator {
@@ -68,7 +71,7 @@ export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Redux.Bud
     yield put(removeAccountsRowAction(action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
     // dispatched action above will remove the row from the table.
-    if (action.payload.isPlaceholder === false) {
+    if (action.payload.meta.isPlaceholder === false) {
       yield put(deletingAccountAction({ id: action.payload.id as number, value: true }));
       try {
         yield call(deleteAccount, action.payload.id as number);
@@ -89,7 +92,7 @@ export function* handleAccountSubAccountRemovalTask(
     yield put(removeAccountSubAccountsRowAction(action.accountId, action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
     // dispatched action above will remove the row from the table.
-    if (action.payload.isPlaceholder === false) {
+    if (action.payload.meta.isPlaceholder === false) {
       yield put(deletingAccountSubAccountAction(action.accountId, { id: action.payload.id as number, value: true }));
       try {
         yield call(deleteSubAccount, action.payload.id as number);
@@ -110,7 +113,7 @@ export function* handleSubAccountSubAccountRemovalTask(
     yield put(removeSubAccountSubAccountsRowAction(action.subaccountId, action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
     // dispatched action above will remove the row from the table.
-    if (action.payload.isPlaceholder === false) {
+    if (action.payload.meta.isPlaceholder === false) {
       yield put(
         deletingSubAccountSubAccountAction(action.subaccountId, { id: action.payload.id as number, value: true })
       );
@@ -147,7 +150,7 @@ export function* handleAccountUpdateTask(
         the account with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
-      if (existing.isPlaceholder === true) {
+      if (existing.meta.isPlaceholder === true) {
         // The reducer will have already updated the existing value of the row
         // synchronously.
         const payload = accountPayloadFromRow(existing);
@@ -158,12 +161,9 @@ export function* handleAccountUpdateTask(
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, action.budgetId, payload as Http.IAccountPayload);
-            yield put(
-              updateAccountsRowAction({
-                id: existing.id,
-                payload: convertAccountToRow(response, existing, { isPlaceholder: false, selected: false })
-              })
-            );
+            yield put(activateAccountsPlaceholderAction({ oldId: existing.id, id: response.id }));
+            const updates = convertAccountResponseToCellUpdates(response);
+            yield put(updateAccountsCellAction(updates));
           } catch (e) {
             // TODO: Should we revert the changes if there was an error?
             handleRequestError(e, "There was an error updating the account.");
@@ -179,12 +179,8 @@ export function* handleAccountUpdateTask(
             existing.id as number,
             action.payload.payload as Partial<Http.IAccountPayload>
           );
-          yield put(
-            updateAccountsRowAction({
-              id: existing.id,
-              payload: convertAccountToRow(response, existing, { isPlaceholder: false, selected: false })
-            })
-          );
+          const updates = convertAccountResponseToCellUpdates(response);
+          yield put(updateAccountsCellAction(updates));
         } catch (e) {
           if (e instanceof ClientError) {
             const cellErrors: Redux.Budget.AccountCellError[] = [];
@@ -215,7 +211,7 @@ export function* handleAccountUpdateTask(
 }
 
 export function* handleAccountSubAccountUpdateTask(
-  action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.ISubAccountRow> }>
+  action: Redux.Budget.IAction<{ id: number; payload: { [key in Redux.Budget.SubAccountRowField]: any } }>
 ): SagaIterator {
   if (
     !isNil(action.budgetId) &&
@@ -225,6 +221,8 @@ export function* handleAccountSubAccountUpdateTask(
     !isNil(action.payload.payload)
   ) {
     const accountId = action.accountId;
+    const payload = action.payload.payload;
+    const id = action.payload.id;
 
     const table = yield select((state: Redux.IApplicationStore) => {
       let subState: Redux.Budget.IAccountStore = initialAccountState;
@@ -234,7 +232,7 @@ export function* handleAccountSubAccountUpdateTask(
       return subState.subaccounts.table.data;
     });
 
-    const existing: Redux.Budget.ISubAccountRow = find(table, { id: action.payload.id });
+    const existing: Redux.Budget.ISubAccountRow = find(table, { id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.error(
@@ -242,10 +240,10 @@ export function* handleAccountSubAccountUpdateTask(
         the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
-      if (existing.isPlaceholder === true) {
+      if (existing.meta.isPlaceholder === true) {
         // The reducer will have already updated the existing value of the row
         // synchronously.
-        const payload = subAccountPayloadFromRow(existing);
+        const requestPayload = subAccountPayloadFromRow(existing);
 
         // Wait until all of the required fields are present before we create
         // the SubAccount in the backend and remove the placeholder designation
@@ -257,14 +255,11 @@ export function* handleAccountSubAccountUpdateTask(
               createAccountSubAccount,
               action.accountId,
               action.budgetId,
-              payload as Http.ISubAccountPayload
+              requestPayload as Http.ISubAccountPayload
             );
-            yield put(
-              updateAccountSubAccountsRowAction(action.accountId, {
-                id: existing.id,
-                payload: convertSubAccountToRow(response, existing, { isPlaceholder: false, selected: false })
-              })
-            );
+            yield put(activateAccountSubAccountsPlaceholderAction({ oldId: existing.id, id: response.id }));
+            const updates = convertSubAccountResponseToCellUpdates(response);
+            yield put(updateAccountSubAccountsCellAction(action.accountId, updates));
           } catch (e) {
             // TODO: Should we revert the changes if there was an error?
             handleRequestError(e, "There was an error updating the sub account.");
@@ -274,17 +269,19 @@ export function* handleAccountSubAccountUpdateTask(
         } else {
           // TODO: Is it worth always updating the row, and doing so before any
           // potential API request, so that non-text changes to the tables happen
-          // more snappy?
-          yield put(
-            updateAccountSubAccountsRowAction(action.accountId, {
-              id: existing.id,
-              payload: action.payload.payload
-            })
-          );
+          // more snappy?  Also note that this block is required for the Unit dropdown
+          // to update.
+          const updates: ICellUpdate<Redux.Budget.SubAccountRowField>[] = [];
+          forEach(Object.keys(payload), (column: string) => {
+            updates.push({
+              column: column as Redux.Budget.SubAccountRowField,
+              row: id,
+              value: payload[column as Redux.Budget.SubAccountRowField]
+            });
+          });
+          yield put(updateAccountSubAccountsCellAction(action.accountId, updates));
         }
       } else {
-        console.log("EXISTING");
-        console.log(existing);
         yield put(updatingAccountSubAccountAction(action.accountId, { id: existing.id as number, value: true }));
         try {
           // The reducer has already handled updating the sub account in the state
@@ -294,14 +291,8 @@ export function* handleAccountSubAccountUpdateTask(
             existing.id as number,
             action.payload.payload as Partial<Http.ISubAccountPayload>
           );
-          const p = convertSubAccountToRow(response, existing, { isPlaceholder: false });
-          console.log(p);
-          yield put(
-            updateAccountSubAccountsRowAction(action.accountId, {
-              id: existing.id,
-              payload: p
-            })
-          );
+          const updates = convertSubAccountResponseToCellUpdates(response);
+          yield put(updateAccountSubAccountsCellAction(action.accountId, updates));
         } catch (e) {
           // TODO: Should we revert the changes if there was an error?
           handleRequestError(e, "There was an error updating the sub account.");
@@ -323,6 +314,8 @@ export function* handleSubAccountSubAccountUpdateTask(
     !isNil(action.payload.payload)
   ) {
     const subaccountId = action.subaccountId;
+    const payload = action.payload.payload;
+    const id = action.payload.id;
 
     const table = yield select((state: Redux.IApplicationStore) => {
       let subState: Redux.Budget.ISubAccountStore = initialSubAccountState;
@@ -340,10 +333,10 @@ export function* handleSubAccountSubAccountUpdateTask(
         the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
-      if (existing.isPlaceholder === true) {
+      if (existing.meta.isPlaceholder === true) {
         // The reducer will have already updated the existing value of the row
         // synchronously.
-        const payload = subAccountPayloadFromRow(existing);
+        const requestPayload = subAccountPayloadFromRow(existing);
         // Wait until all of the required fields are present before we create
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
@@ -353,14 +346,11 @@ export function* handleSubAccountSubAccountUpdateTask(
             const response = yield call(
               createSubAccountSubAccount,
               action.subaccountId,
-              payload as Http.ISubAccountPayload
+              requestPayload as Http.ISubAccountPayload
             );
-            yield put(
-              updateSubAccountSubAccountsRowAction(action.subaccountId, {
-                id: existing.id,
-                payload: convertSubAccountToRow(response, existing, { isPlaceholder: false })
-              })
-            );
+            yield put(activateSubAccountSubAccountsPlaceholderAction({ oldId: existing.id, id: response.id }));
+            const updates = convertSubAccountResponseToCellUpdates(response);
+            yield put(updateSubAccountSubAccountsCellAction(subaccountId, updates));
           } catch (e) {
             // TODO: Should we revert the changes if there was an error?
             handleRequestError(e, "There was an error updating the sub account.");
@@ -370,27 +360,30 @@ export function* handleSubAccountSubAccountUpdateTask(
         } else {
           // TODO: Is it worth always updating the row, and doing so before any
           // potential API request, so that non-text changes to the tables happen
-          // more snappy?
-          yield put(
-            updateSubAccountSubAccountsRowAction(action.subaccountId, {
-              id: existing.id,
-              payload: action.payload.payload
-            })
-          );
+          // more snappy?  Also note that this block is required for the Unit dropdown
+          // to update.
+          const updates: ICellUpdate<Redux.Budget.SubAccountRowField>[] = [];
+          forEach(Object.keys(payload), (column: string) => {
+            updates.push({
+              column: column as Redux.Budget.SubAccountRowField,
+              row: id,
+              value: payload[column as Redux.Budget.SubAccountRowField]
+            });
+          });
+          yield put(updateSubAccountSubAccountsCellAction(action.subaccountId, updates));
         }
       } else {
-        const payload = subAccountPayloadFromRow(existing);
         yield put(updatingSubAccountSubAccountAction(action.subaccountId, { id: existing.id as number, value: true }));
         try {
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
-          const response: ISubAccount = yield call(updateSubAccount, existing.id as number, payload);
-          yield put(
-            updateSubAccountSubAccountsRowAction(action.subaccountId, {
-              id: existing.id,
-              payload: convertSubAccountToRow(response, existing, { isPlaceholder: false })
-            })
+          const response: ISubAccount = yield call(
+            updateSubAccount,
+            existing.id as number,
+            payload as Partial<Http.ISubAccountPayload>
           );
+          const updates = convertSubAccountResponseToCellUpdates(response);
+          yield put(updateAccountSubAccountsCellAction(action.subaccountId, updates));
         } catch (e) {
           // TODO: Should we revert the changes if there was an error?
           handleRequestError(e, "There was an error updating the sub account.");

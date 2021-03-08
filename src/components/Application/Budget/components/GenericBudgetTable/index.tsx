@@ -19,7 +19,7 @@ import TableHeader from "./TableHeader";
 import { DeleteCell, ExpandCell, SelectCell, ValueCell, CellEditor, NewRowCell, UnitCell } from "./cells";
 import "./index.scss";
 
-interface GenericBudgetTableProps<R> {
+interface GenericBudgetTableProps<F, E extends IRowMeta, R extends IRow<F, E>> {
   columns: ColDef[];
   table: R[];
   search: string;
@@ -36,7 +36,7 @@ interface GenericBudgetTableProps<R> {
   isCellEditable: (row: R, col: ColDef) => boolean;
 }
 
-const GenericBudgetTable = <R extends Redux.Budget.IRow>({
+const GenericBudgetTable = <F, E extends IRowMeta, R extends IRow<F, E>>({
   columns,
   table,
   search,
@@ -51,7 +51,7 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
   onRowDelete,
   onRowExpand,
   isCellEditable
-}: GenericBudgetTableProps<R>) => {
+}: GenericBudgetTableProps<F, E, R>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
@@ -108,9 +108,9 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
     // manually.
     if (!isNil(gridApi)) {
       gridApi.forEachNode((node: RowNode) => {
-        const existing = find(table, { id: node.data.id });
+        const existing: R | undefined = find(table, { id: node.data.meta.id });
         if (!isNil(existing)) {
-          if (existing.selected !== node.data.selected) {
+          if (existing.meta.selected !== node.data.selected) {
             gridApi.refreshCells({ force: true, rowNodes: [node] });
           }
         }
@@ -119,7 +119,7 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
   }, [table, gridApi]);
 
   useEffect(() => {
-    const mapped = map(table, (row: R) => row.selected);
+    const mapped = map(table, (row: R) => row.meta.selected);
     const uniques = uniq(mapped);
     if (uniques.length === 1 && uniques[0] === true) {
       setAllSelected(true);
@@ -179,7 +179,7 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
                 cellRenderer: "ValueCell",
                 ...def,
                 filterParams: {
-                  textFormatter: (value: Redux.ICell): string => {
+                  textFormatter: (value: ICell): string => {
                     if (!isNil(value)) {
                       return value.value;
                     }
@@ -287,7 +287,7 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
         setSearch={(value: string) => onSearch(value)}
         onDelete={() => {
           forEach(table, (row: R) => {
-            if (row.selected === true) {
+            if (row.meta.selected === true) {
               onRowDelete(row);
             }
           });
@@ -295,7 +295,7 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
         saving={saving}
         selected={allSelected}
         onSelect={onSelectAll}
-        deleteDisabled={filter(table, (row: R) => row.selected === true).length === 0}
+        deleteDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
       />
       <div className={"primary-grid"}>
         <AgGridReact
@@ -311,7 +311,7 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
           domLayout={"autoHeight"}
           defaultColDef={{
             cellEditor: "CellEditor",
-            getQuickFilterText: (params: { value: Redux.ICell }): string => {
+            getQuickFilterText: (params: { value: ICell }): string => {
               if (!isNil(params.value)) {
                 return params.value.value;
               }

@@ -11,7 +11,8 @@ export type IReducerFactoryActionMap = { [key: string]: string };
 interface ICommonTableActionMap {
   AddPlaceholders: string;
   RemoveRow: string;
-  UpdateRow: string;
+  UpdateCell: string;
+  ActivatePlaceholder: string;
   SelectRow: string;
   DeselectRow: string;
   SelectAllRows: string;
@@ -57,7 +58,9 @@ export interface IReducerFactoryOptions<S> {
 }
 
 export interface ITableReducerOptions<
-  R extends Redux.IRow,
+  F,
+  E extends IRowMeta,
+  R extends IRow<F, E>,
   M extends Model,
   S extends Redux.ITableStore<R, M> = Redux.ITableStore<R, M>
 > extends IReducerFactoryOptions<S> {}

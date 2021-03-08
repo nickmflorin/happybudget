@@ -17,7 +17,8 @@ export const ActionType = {
   },
   AccountsTable: {
     AddPlaceholders: "budget.accountstable.AddPlaceholders",
-    UpdateRow: "budget.accountstable.UpdateRow",
+    UpdateCell: "budget.accountstable.UpdateCell",
+    ActivatePlaceholder: "budget.accountstable.ActivatePlaceholder",
     RemoveRow: "budget.accountstable.RemoveRow",
     SelectRow: "budget.accountstable.SelectRow",
     SelectAllRows: "budget.accountstable.SelectAllRows",
@@ -34,7 +35,8 @@ export const ActionType = {
     Request: "budget.account.Request",
     SubAccountsTable: {
       AddPlaceholders: "budget.account.subaccountstable.AddPlaceholders",
-      UpdateRow: "budget.account.subaccountstable.UpdateRow",
+      UpdateCell: "budget.account.subaccountstable.UpdateCell",
+      ActivatePlaceholder: "budget.account.subaccountstable.ActivatePlaceholder",
       RemoveRow: "budget.account.subaccountstable.RemoveRow",
       SelectAllRows: "budget.account.subaccountstable.SelectAllRows",
       SelectRow: "budget.account.subaccountstable.SelectRow",
@@ -58,7 +60,8 @@ export const ActionType = {
     Request: "budget.subaccount.Request",
     SubAccountsTable: {
       AddPlaceholders: "budget.subaccount.subaccountstable.AddPlaceholders",
-      UpdateRow: "budget.subaccount.subaccountstable.UpdateRow",
+      UpdateCell: "budget.subaccount.subaccountstable.UpdateCell",
+      ActivatePlaceholder: "budget.subaccount.subaccountstable.ActivatePlaceholder",
       RemoveRow: "budget.subaccount.subaccountstable.RemoveRow",
       SelectRow: "budget.subaccount.subaccountstable.SelectRow",
       SelectAllRows: "budget.subaccount.subaccountstable.SelectAllRows",
@@ -131,10 +134,12 @@ export const updateAccountAction = simpleBudgetAction<{
   id: number;
   payload: Partial<Http.IAccountPayload>;
 }>(ActionType.Accounts.Update);
-export const updateAccountsRowAction = simpleAction<{
-  id: number;
-  payload: Partial<Redux.Budget.IAccountRow>;
-}>(ActionType.AccountsTable.UpdateRow);
+export const updateAccountsCellAction = simpleAction<
+  ICellUpdate<Redux.Budget.AccountRowField> | ICellUpdate<Redux.Budget.AccountRowField>[]
+>(ActionType.AccountsTable.UpdateCell);
+export const activateAccountsPlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
+  ActionType.AccountsTable.ActivatePlaceholder
+);
 export const selectAccountsRowAction = simpleAction<number>(ActionType.AccountsTable.SelectRow);
 export const selectAllAccountsRowsAction = simpleAction<null>(ActionType.AccountsTable.SelectAllRows);
 export const deselectAccountsRowAction = simpleAction<number>(ActionType.AccountsTable.DeselectRow);
@@ -169,10 +174,12 @@ export const deselectAccountSubAccountsRowAction = simpleAccountAction<number>(
 export const selectAllAccountSubAccountsRowsAction = simpleAccountAction<null>(
   ActionType.Account.SubAccountsTable.SelectAllRows
 );
-export const updateAccountSubAccountsRowAction = simpleAccountAction<{
-  id: number;
-  payload: Partial<Redux.Budget.ISubAccountRow>;
-}>(ActionType.Account.SubAccountsTable.UpdateRow);
+export const updateAccountSubAccountsCellAction = simpleAccountAction<
+  ICellUpdate<Redux.Budget.SubAccountRowField> | ICellUpdate<Redux.Budget.SubAccountRowField>[]
+>(ActionType.Account.SubAccountsTable.UpdateCell);
+export const activateAccountSubAccountsPlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
+  ActionType.Account.SubAccountsTable.ActivatePlaceholder
+);
 export const removeAccountSubAccountsRowAction = simpleAccountAction<Redux.Budget.ISubAccountRow>(
   ActionType.Account.SubAccountsTable.RemoveRow
 );
@@ -218,10 +225,12 @@ export const selectAllSubAccountSubAccountsRowsAction = simpleSubAccountAction<n
 export const deselectSubAccountSubAccountsRowAction = simpleSubAccountAction<number>(
   ActionType.SubAccount.SubAccountsTable.DeselectRow
 );
-export const updateSubAccountSubAccountsRowAction = simpleSubAccountAction<{
-  id: number;
-  payload: Partial<Redux.Budget.ISubAccountRow>;
-}>(ActionType.SubAccount.SubAccountsTable.UpdateRow);
+export const updateSubAccountSubAccountsCellAction = simpleSubAccountAction<
+  ICellUpdate<Redux.Budget.SubAccountRowField> | ICellUpdate<Redux.Budget.SubAccountRowField>[]
+>(ActionType.SubAccount.SubAccountsTable.UpdateCell);
+export const activateSubAccountSubAccountsPlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
+  ActionType.SubAccount.SubAccountsTable.ActivatePlaceholder
+);
 export const removeSubAccountSubAccountsRowAction = simpleSubAccountAction<Redux.Budget.ISubAccountRow>(
   ActionType.SubAccount.SubAccountsTable.RemoveRow
 );

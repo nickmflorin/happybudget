@@ -12,8 +12,8 @@ import { initialAccountState, initialSubAccountState } from "./initialState";
 import {
   createSubAccountRowPlaceholder,
   createAccountRowPlaceholder,
-  convertSubAccountToRow,
-  convertAccountToRow
+  initializeRowFromAccount,
+  initializeRowFromSubAccount
 } from "./util";
 
 const indexedAccountReducer = combineReducers({
@@ -22,6 +22,8 @@ const indexedAccountReducer = combineReducers({
     updating: createModelListActionReducer(ActionType.Account.SubAccounts.Updating, { referenceEntity: "subaccount" }),
     creating: createSimpleBooleanReducer(ActionType.Account.SubAccounts.Creating),
     table: createTableReducer<
+      Redux.Budget.SubAccountRowField,
+      Redux.Budget.IBudgetRowMeta,
       Redux.Budget.ISubAccountRow,
       ISubAccount,
       Redux.Budget.SubAccountCellError,
@@ -30,7 +32,8 @@ const indexedAccountReducer = combineReducers({
       {
         AddPlaceholders: ActionType.Account.SubAccountsTable.AddPlaceholders,
         RemoveRow: ActionType.Account.SubAccountsTable.RemoveRow,
-        UpdateRow: ActionType.Account.SubAccountsTable.UpdateRow,
+        UpdateCell: ActionType.Account.SubAccountsTable.UpdateCell,
+        ActivatePlaceholder: ActionType.Account.SubAccountsTable.ActivatePlaceholder,
         SelectRow: ActionType.Account.SubAccountsTable.SelectRow,
         DeselectRow: ActionType.Account.SubAccountsTable.DeselectRow,
         SelectAllRows: ActionType.Account.SubAccountsTable.SelectAllRows,
@@ -41,7 +44,7 @@ const indexedAccountReducer = combineReducers({
         SetError: ""
       },
       createSubAccountRowPlaceholder,
-      convertSubAccountToRow,
+      initializeRowFromSubAccount,
       { referenceEntity: "subaccount" }
     )
   }),
@@ -62,6 +65,8 @@ const indexedSubAccountReducer = combineReducers({
     }),
     creating: createSimpleBooleanReducer(ActionType.SubAccount.SubAccounts.Creating),
     table: createTableReducer<
+      Redux.Budget.SubAccountRowField,
+      Redux.Budget.IBudgetRowMeta,
       Redux.Budget.ISubAccountRow,
       ISubAccount,
       Redux.Budget.SubAccountCellError,
@@ -70,7 +75,8 @@ const indexedSubAccountReducer = combineReducers({
       {
         AddPlaceholders: ActionType.SubAccount.SubAccountsTable.AddPlaceholders,
         RemoveRow: ActionType.SubAccount.SubAccountsTable.RemoveRow,
-        UpdateRow: ActionType.SubAccount.SubAccountsTable.UpdateRow,
+        UpdateCell: ActionType.SubAccount.SubAccountsTable.UpdateCell,
+        ActivatePlaceholder: ActionType.SubAccount.SubAccountsTable.ActivatePlaceholder,
         SelectRow: ActionType.SubAccount.SubAccountsTable.SelectRow,
         DeselectRow: ActionType.SubAccount.SubAccountsTable.DeselectRow,
         SelectAllRows: ActionType.SubAccount.SubAccountsTable.SelectAllRows,
@@ -81,7 +87,7 @@ const indexedSubAccountReducer = combineReducers({
         SetError: ""
       },
       createSubAccountRowPlaceholder,
-      convertSubAccountToRow,
+      initializeRowFromSubAccount,
       { referenceEntity: "subaccount" }
     )
   }),
@@ -158,6 +164,8 @@ const rootReducer = combineReducers({
     updating: createModelListActionReducer(ActionType.Accounts.Updating, { referenceEntity: "account" }),
     creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
     table: createTableReducer<
+      Redux.Budget.AccountRowField,
+      Redux.Budget.IBudgetRowMeta,
       Redux.Budget.IAccountRow,
       IAccount,
       Redux.Budget.AccountCellError,
@@ -166,7 +174,8 @@ const rootReducer = combineReducers({
       {
         AddPlaceholders: ActionType.AccountsTable.AddPlaceholders,
         RemoveRow: ActionType.AccountsTable.RemoveRow,
-        UpdateRow: ActionType.AccountsTable.UpdateRow,
+        UpdateCell: ActionType.AccountsTable.UpdateCell,
+        ActivatePlaceholder: ActionType.AccountsTable.ActivatePlaceholder,
         SelectRow: ActionType.AccountsTable.SelectRow,
         DeselectRow: ActionType.AccountsTable.DeselectRow,
         SelectAllRows: ActionType.AccountsTable.SelectAllRows,
@@ -177,7 +186,7 @@ const rootReducer = combineReducers({
         SetError: ActionType.AccountsTable.SetError
       },
       createAccountRowPlaceholder,
-      convertAccountToRow,
+      initializeRowFromAccount,
       { referenceEntity: "account" }
     )
   })

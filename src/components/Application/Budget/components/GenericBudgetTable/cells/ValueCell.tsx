@@ -4,7 +4,7 @@ import { CloseCircleOutlined } from "@ant-design/icons";
 import { ICellRendererParams } from "ag-grid-community";
 
 interface ValueCellProps extends ICellRendererParams {
-  value: Redux.ICell<any>;
+  value: ICell<any>;
 }
 
 const ValueCell = ({ value }: ValueCellProps): JSX.Element => {
