@@ -4,6 +4,18 @@
   .ag-row:last-child {
     border-bottom: none !important;
   }
+  div[role='gridcell'].unit-cell {
+    // This padding is an attempt to vertically align the tag in the cell.  It
+    // is not the best way, since the height of the cell can cause the vertical
+    // alignment to become skewed.  We should figure out the right way to do this.
+    padding-top: 6px;
+    padding-bottom: 6px;
+    .ag-react-container {
+      width: auto;
+      display: flex;
+      justify-content: center;
+    }
+  }
 }
 
 .footer-grid {

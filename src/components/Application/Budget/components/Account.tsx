@@ -53,7 +53,7 @@ const Account = (): JSX.Element => {
         <GenericBudgetTable<Redux.Budget.ISubAccountRow>
           table={accountStore.subaccounts.table.data}
           isCellEditable={(row: Redux.Budget.ISubAccountRow, colDef: ColDef) => {
-            if (includes(["estimated", "actual"], colDef.field)) {
+            if (includes(["estimated", "actual", "unit"], colDef.field)) {
               return false;
             } else if (includes(["line", "description", "name"], colDef.field)) {
               return true;
@@ -69,17 +69,15 @@ const Account = (): JSX.Element => {
             accountStore.subaccounts.creating
           }
           onRowAdd={() => dispatch(addAccountSubAccountsPlaceholdersAction(parseInt(accountId)))}
-          onRowSelect={(id: string | number) => dispatch(selectAccountSubAccountsRowAction(parseInt(accountId), id))}
-          onRowDeselect={(id: string | number) =>
-            dispatch(deselectAccountSubAccountsRowAction(parseInt(accountId), id))
-          }
+          onRowSelect={(id: number) => dispatch(selectAccountSubAccountsRowAction(parseInt(accountId), id))}
+          onRowDeselect={(id: number) => dispatch(deselectAccountSubAccountsRowAction(parseInt(accountId), id))}
           onRowDelete={(row: Redux.Budget.ISubAccountRow) =>
             dispatch(removeAccountSubAccountAction(parseInt(accountId), row))
           }
-          onRowUpdate={(id: number | string, payload: { [key: string]: any }) =>
+          onRowUpdate={(id: number, payload: { [key: string]: any }) =>
             dispatch(updateAccountSubAccountAction(parseInt(accountId), parseInt(budgetId), { id, payload }))
           }
-          onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
+          onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountSubAccountsRowsAction(parseInt(accountId)))}
           estimated={
             !isNil(accountStore.detail.data) && !isNil(accountStore.detail.data.estimated)
@@ -107,7 +105,17 @@ const Account = (): JSX.Element => {
             {
               field: "unit",
               headerName: "Unit",
-              cellStyle: { textAlign: "right" }
+              cellStyle: { textAlign: "right" },
+              cellRenderer: "UnitCell",
+              cellRendererParams: {
+                onChange: (value: Unit, row: Redux.Budget.ISubAccountRow) =>
+                  dispatch(
+                    updateAccountSubAccountAction(parseInt(accountId), parseInt(budgetId), {
+                      id: row.id,
+                      payload: { unit: value }
+                    })
+                  )
+              }
             },
             {
               field: "multiplier",

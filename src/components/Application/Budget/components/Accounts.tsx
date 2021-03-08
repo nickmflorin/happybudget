@@ -48,13 +48,13 @@ const Accounts = (): JSX.Element => {
           onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
           saving={accounts.deleting.length !== 0 || accounts.updating.length !== 0 || accounts.creating}
           onRowAdd={() => dispatch(addAccountsPlaceholdersAction())}
-          onRowSelect={(id: string | number) => dispatch(selectAccountsRowAction(id))}
-          onRowDeselect={(id: string | number) => dispatch(deselectAccountsRowAction(id))}
+          onRowSelect={(id: number) => dispatch(selectAccountsRowAction(id))}
+          onRowDeselect={(id: number) => dispatch(deselectAccountsRowAction(id))}
           onRowDelete={(row: Redux.Budget.IAccountRow) => dispatch(removeAccountAction(row))}
-          onRowUpdate={(id: number | string, payload: { [key: string]: any }) =>
+          onRowUpdate={(id: number, payload: { [key: string]: any }) =>
             dispatch(updateAccountAction(parseInt(budgetId), { id, payload }))
           }
-          onRowExpand={(id: string | number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
+          onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountsRowsAction())}
           estimated={!isNil(budget.data) && !isNil(budget.data.estimated) ? budget.data.estimated : 0.0}
           columns={[

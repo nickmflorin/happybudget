@@ -1,13 +1,10 @@
 import { isNil } from "lodash";
 
 import { CloseCircleOutlined } from "@ant-design/icons";
-import { ICellRendererParams, ColDef } from "ag-grid-community";
+import { ICellRendererParams } from "ag-grid-community";
 
 interface ValueCellProps extends ICellRendererParams {
-  isCellEditable: (row: Redux.Budget.IAccountRow | Redux.Budget.ISubAccountRow, col: ColDef) => boolean;
-  onDeselect: (id: number | string) => void;
   value: Redux.ICell<any>;
-  colDef: ColDef;
 }
 
 const ValueCell = ({ value }: ValueCellProps): JSX.Element => {

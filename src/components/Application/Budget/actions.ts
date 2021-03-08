@@ -128,16 +128,16 @@ export const responseSubAccountAction = simpleSubAccountAction<ISubAccount>(Acti
 */
 export const addAccountsPlaceholdersAction = simpleAction<number>(ActionType.AccountsTable.AddPlaceholders);
 export const updateAccountAction = simpleBudgetAction<{
-  id: number | string;
+  id: number;
   payload: Partial<Http.IAccountPayload>;
 }>(ActionType.Accounts.Update);
 export const updateAccountsRowAction = simpleAction<{
-  id: number | string;
+  id: number;
   payload: Partial<Redux.Budget.IAccountRow>;
 }>(ActionType.AccountsTable.UpdateRow);
-export const selectAccountsRowAction = simpleAction<number | string>(ActionType.AccountsTable.SelectRow);
+export const selectAccountsRowAction = simpleAction<number>(ActionType.AccountsTable.SelectRow);
 export const selectAllAccountsRowsAction = simpleAction<null>(ActionType.AccountsTable.SelectAllRows);
-export const deselectAccountsRowAction = simpleAction<number | string>(ActionType.AccountsTable.DeselectRow);
+export const deselectAccountsRowAction = simpleAction<number>(ActionType.AccountsTable.DeselectRow);
 export const removeAccountsRowAction = simpleAction<Redux.Budget.IAccountRow>(ActionType.AccountsTable.RemoveRow);
 export const removeAccountAction = simpleAction<Redux.Budget.IAccountRow>(ActionType.Accounts.Remove);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Deleting);
@@ -157,20 +157,20 @@ export const addAccountSubAccountsPlaceholdersAction = simpleAccountAction<numbe
   ActionType.Account.SubAccountsTable.AddPlaceholders
 );
 export const updateAccountSubAccountAction = simpleBudgetAccountAction<{
-  id: number | string;
+  id: number;
   payload: Partial<Http.ISubAccountPayload>;
 }>(ActionType.Account.SubAccounts.Update);
-export const selectAccountSubAccountsRowAction = simpleAccountAction<number | string>(
+export const selectAccountSubAccountsRowAction = simpleAccountAction<number>(
   ActionType.Account.SubAccountsTable.SelectRow
 );
-export const deselectAccountSubAccountsRowAction = simpleAccountAction<number | string>(
+export const deselectAccountSubAccountsRowAction = simpleAccountAction<number>(
   ActionType.Account.SubAccountsTable.DeselectRow
 );
 export const selectAllAccountSubAccountsRowsAction = simpleAccountAction<null>(
   ActionType.Account.SubAccountsTable.SelectAllRows
 );
 export const updateAccountSubAccountsRowAction = simpleAccountAction<{
-  id: number | string;
+  id: number;
   payload: Partial<Redux.Budget.ISubAccountRow>;
 }>(ActionType.Account.SubAccountsTable.UpdateRow);
 export const removeAccountSubAccountsRowAction = simpleAccountAction<Redux.Budget.ISubAccountRow>(
@@ -206,20 +206,20 @@ export const addSubAccountSubAccountsPlaceholdersAction = simpleSubAccountAction
   ActionType.SubAccount.SubAccountsTable.AddPlaceholders
 );
 export const updateSubAccountSubAccountAction = simpleSubAccountAction<{
-  id: number | string;
+  id: number;
   payload: Partial<Http.ISubAccountPayload>;
 }>(ActionType.SubAccount.SubAccounts.Update);
-export const selectSubAccountSubAccountsRowAction = simpleSubAccountAction<number | string>(
+export const selectSubAccountSubAccountsRowAction = simpleSubAccountAction<number>(
   ActionType.SubAccount.SubAccountsTable.SelectRow
 );
 export const selectAllSubAccountSubAccountsRowsAction = simpleSubAccountAction<null>(
   ActionType.SubAccount.SubAccountsTable.SelectAllRows
 );
-export const deselectSubAccountSubAccountsRowAction = simpleSubAccountAction<number | string>(
+export const deselectSubAccountSubAccountsRowAction = simpleSubAccountAction<number>(
   ActionType.SubAccount.SubAccountsTable.DeselectRow
 );
 export const updateSubAccountSubAccountsRowAction = simpleSubAccountAction<{
-  id: number | string;
+  id: number;
   payload: Partial<Redux.Budget.ISubAccountRow>;
 }>(ActionType.SubAccount.SubAccountsTable.UpdateRow);
 export const removeSubAccountSubAccountsRowAction = simpleSubAccountAction<Redux.Budget.ISubAccountRow>(

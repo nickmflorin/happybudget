@@ -16,7 +16,7 @@ import {
 } from "ag-grid-community";
 
 import TableHeader from "./TableHeader";
-import { DeleteCell, ExpandCell, SelectCell, ValueCell, CellEditor, NewRowCell } from "./cells";
+import { DeleteCell, ExpandCell, SelectCell, ValueCell, CellEditor, NewRowCell, UnitCell } from "./cells";
 import "./index.scss";
 
 interface GenericBudgetTableProps<R> {
@@ -26,9 +26,9 @@ interface GenericBudgetTableProps<R> {
   saving: boolean;
   estimated: number;
   onSearch: (value: string) => void;
-  onRowSelect: (id: number | string) => void;
-  onRowDeselect: (id: number | string) => void;
-  onRowUpdate: (id: number | string, payload: { [key: string]: any }) => void;
+  onRowSelect: (id: number) => void;
+  onRowDeselect: (id: number) => void;
+  onRowUpdate: (id: number, payload: { [key: string]: any }) => void;
   onRowAdd: () => void;
   onRowDelete: (row: R) => void;
   onRowExpand: (id: number) => void;
@@ -176,8 +176,8 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
             columns,
             (def: ColDef) =>
               ({
-                ...def,
                 cellRenderer: "ValueCell",
+                ...def,
                 filterParams: {
                   textFormatter: (value: Redux.ICell): string => {
                     if (!isNil(value)) {
@@ -220,12 +220,14 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
               params.node.data[params.colDef.field] &&
               !isNil(params.node.data[params.colDef.field].error)
             ) {
-              return "error-cell";
+              return classNames("error-cell", { "unit-cell": params.colDef.field === "unit" });
             }
             if (!isCellEditable(row, params.colDef)) {
-              return classNames("not-editable", "not-editable-highlight");
+              return classNames("not-editable", "not-editable-highlight", {
+                "unit-cell": params.colDef.field === "unit"
+              });
             }
-            return "";
+            return classNames({ "unit-cell": params.colDef.field === "unit" });
           }
         })
       )
@@ -321,6 +323,7 @@ const GenericBudgetTable = <R extends Redux.Budget.IRow>({
             ExpandCell: ExpandCell,
             SelectCell: SelectCell,
             ValueCell: ValueCell,
+            UnitCell: UnitCell,
             CellEditor: CellEditor
           }}
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {

@@ -246,6 +246,7 @@ export function* handleAccountSubAccountUpdateTask(
         // The reducer will have already updated the existing value of the row
         // synchronously.
         const payload = subAccountPayloadFromRow(existing);
+
         // Wait until all of the required fields are present before we create
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
@@ -270,8 +271,20 @@ export function* handleAccountSubAccountUpdateTask(
           } finally {
             yield put(creatingAccountSubAccountAction(action.accountId, false));
           }
+        } else {
+          // TODO: Is it worth always updating the row, and doing so before any
+          // potential API request, so that non-text changes to the tables happen
+          // more snappy?
+          yield put(
+            updateAccountSubAccountsRowAction(action.accountId, {
+              id: existing.id,
+              payload: action.payload.payload
+            })
+          );
         }
       } else {
+        console.log("EXISTING");
+        console.log(existing);
         yield put(updatingAccountSubAccountAction(action.accountId, { id: existing.id as number, value: true }));
         try {
           // The reducer has already handled updating the sub account in the state
@@ -281,10 +294,12 @@ export function* handleAccountSubAccountUpdateTask(
             existing.id as number,
             action.payload.payload as Partial<Http.ISubAccountPayload>
           );
+          const p = convertSubAccountToRow(response, existing, { isPlaceholder: false });
+          console.log(p);
           yield put(
             updateAccountSubAccountsRowAction(action.accountId, {
               id: existing.id,
-              payload: convertSubAccountToRow(response, existing, { isPlaceholder: false })
+              payload: p
             })
           );
         } catch (e) {
@@ -352,6 +367,16 @@ export function* handleSubAccountSubAccountUpdateTask(
           } finally {
             yield put(creatingSubAccountSubAccountAction(action.subaccountId, false));
           }
+        } else {
+          // TODO: Is it worth always updating the row, and doing so before any
+          // potential API request, so that non-text changes to the tables happen
+          // more snappy?
+          yield put(
+            updateSubAccountSubAccountsRowAction(action.subaccountId, {
+              id: existing.id,
+              payload: action.payload.payload
+            })
+          );
         }
       } else {
         const payload = subAccountPayloadFromRow(existing);

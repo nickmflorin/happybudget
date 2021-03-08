@@ -1,0 +1,26 @@
+@import "style/colors";
+@import "style/typography";
+
+.unit-dropdown-menu-item {
+  display: flex;
+  padding: 7px 10px !important;
+  font-family: $noto-sans-regular !important;
+}
+
+.unit-tag {
+  text-align: center;
+  line-height: 14px;
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 5px;
+  padding-left: 8px;
+  padding-right: 8px;
+  font-family: $noto-sans-regular;
+  width: fit-content;
+  padding: .3rem .75rem 0.45rem 0.75rem;
+  margin-right: .2rem;
+  color: $white;
+  border-radius: 20px;
+  text-transform: uppercase;
+  font-weight: 700;
+}

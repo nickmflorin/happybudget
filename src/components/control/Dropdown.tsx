@@ -6,7 +6,7 @@ import { Dropdown as AntdDropdown, Menu } from "antd";
 
 import { IconOrSpinner } from "components/display";
 
-interface DropdownProps {
+export interface DropdownProps {
   children: ReactNode;
   items: IMenuItem[];
   className?: string;

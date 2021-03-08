@@ -4,3 +4,4 @@ export { default as SelectCell } from "./SelectCell";
 export { default as ValueCell } from "./ValueCell";
 export { default as CellEditor } from "./CellEditor";
 export { default as NewRowCell } from "./NewRowCell";
+export { default as UnitCell } from "./UnitCell";

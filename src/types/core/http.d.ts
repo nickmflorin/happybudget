@@ -77,6 +77,6 @@ namespace Http {
     readonly quantity?: number;
     readonly rate?: number;
     readonly multiplier?: number;
-    readonly unit?: number;
+    readonly unit?: Unit;
   }
 }

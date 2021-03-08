@@ -136,7 +136,7 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
         }
         return [...newState, ...placeholders];
       },
-      UpdateRow: (payload: { id: any; payload: Partial<R> }) => {
+      UpdateRow: (payload: { id: any; payload: { [k in keyof R]: R[k] } }) => {
         const row = find(newState, { id: payload.id });
         if (isNil(row)) {
           /* eslint-disable no-console */
@@ -146,7 +146,14 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
           );
           return newState;
         } else {
-          return replaceInArray<R>(newState, { id: payload.id }, { ...row, ...payload.payload });
+          forEach(payload.payload, (v: any, k: string) => {
+            newState = replaceInArray<R>(
+              newState,
+              { id: payload.id },
+              { ...row, [k]: { ...row[k as keyof R], value: v } }
+            );
+          });
+          return newState;
         }
       },
       RemoveRow: (payload: { id: any }) => {
@@ -230,8 +237,6 @@ export const createTableDataReducer = <R extends Redux.IRow, E extends Redux.ICe
             );
             return newState;
           } else {
-            console.log("ADDING ERROR");
-            console.log({ ...row, [e.field]: { ...row[e.field as keyof R], error: e.error } });
             return replaceInArray<R>(
               newState,
               { id: e.id },
