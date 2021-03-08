@@ -8,6 +8,27 @@ export const ActionType = {
     Response: "budget.budget.Response",
     Request: "budget.budget.Request"
   },
+  Actuals: {
+    Deleting: "budget.actuals.Deleting",
+    Creating: "budget.actuals.Creating",
+    Updating: "budget.actuals.Updating",
+    Update: "budget.actuals.Update",
+    Remove: "budget.actuals.Remove"
+  },
+  ActualsTable: {
+    AddPlaceholders: "budget.actualstable.AddPlaceholders",
+    UpdateCell: "budget.actualstable.UpdateCell",
+    ActivatePlaceholder: "budget.actualstable.ActivatePlaceholder",
+    RemoveRow: "budget.actualstable.RemoveRow",
+    SelectRow: "budget.actualstable.SelectRow",
+    SelectAllRows: "budget.actualstable.SelectAllRows",
+    DeselectRow: "budget.actualstable.DeselectRow",
+    Loading: "budget.actualstable.Loading",
+    SetSearch: "budget.actualstable.SetSearch",
+    Response: "budget.actualstable.Response",
+    Request: "budget.actualstable.Request",
+    SetError: "budget.actualstable.SetError"
+  },
   Accounts: {
     Deleting: "budget.accounts.Deleting",
     Creating: "budget.accounts.Creating",
@@ -257,4 +278,34 @@ export const responseSubAccountSubAccountsAction = simpleSubAccountAction<Http.I
 );
 export const setSubAccountSubAccountsSearchAction = simpleSubAccountAction<string>(
   ActionType.SubAccount.SubAccountsTable.SetSearch
+);
+
+/*
+  Actions Pertaining to the Actuals
+*/
+export const addActualsPlaceholdersAction = simpleAction<number>(ActionType.ActualsTable.AddPlaceholders);
+export const updateActualAction = simpleBudgetAction<{
+  id: number;
+  payload: Partial<Http.IAccountPayload>;
+}>(ActionType.Actuals.Update);
+export const updateActualsCellAction = simpleAction<
+  ICellUpdate<Redux.Budget.AccountRowField> | ICellUpdate<Redux.Budget.AccountRowField>[]
+>(ActionType.ActualsTable.UpdateCell);
+export const activateActualsPlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
+  ActionType.ActualsTable.ActivatePlaceholder
+);
+export const selectActualsRowAction = simpleAction<number>(ActionType.ActualsTable.SelectRow);
+export const selectAllActualsRowsAction = simpleAction<null>(ActionType.ActualsTable.SelectAllRows);
+export const deselectActualsRowAction = simpleAction<number>(ActionType.ActualsTable.DeselectRow);
+export const removeActualsRowAction = simpleAction<Redux.Budget.IActualRow>(ActionType.ActualsTable.RemoveRow);
+export const removeActualAction = simpleAction<Redux.Budget.IActualRow>(ActionType.Actuals.Remove);
+export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Actuals.Deleting);
+export const updatingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Actuals.Updating);
+export const creatingActualAction = simpleAction<boolean>(ActionType.Actuals.Creating);
+export const requestActualsAction = simpleBudgetAction<null>(ActionType.ActualsTable.Request);
+export const loadingActualsAction = simpleAction<boolean>(ActionType.ActualsTable.Loading);
+export const responseActualsAction = simpleAction<Http.IListResponse<IActual>>(ActionType.ActualsTable.Response);
+export const setActualsSearchAction = simpleAction<string>(ActionType.ActualsTable.SetSearch);
+export const setActualsTableCellError = simpleAction<Redux.Budget.AccountCellError | Redux.Budget.AccountCellError[]>(
+  ActionType.ActualsTable.SetError
 );

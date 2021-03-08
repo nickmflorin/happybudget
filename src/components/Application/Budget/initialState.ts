@@ -28,12 +28,20 @@ export const initialAccountsState: Redux.Budget.IAccountsStore = {
   details: {}
 };
 
+export const initialActualsState: Redux.Budget.IActualsStore = {
+  table: initialTableState,
+  deleting: [],
+  updating: [],
+  creating: false
+};
+
 const initialState: Redux.Budget.IStore = {
   budget: initialDetailResponseState,
   accounts: initialAccountsState,
   subaccounts: {},
   ancestors: [],
-  ancestorsLoading: false
+  ancestorsLoading: false,
+  actuals: initialActualsState
 };
 
 export default initialState;

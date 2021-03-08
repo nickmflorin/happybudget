@@ -25,6 +25,7 @@ import "./index.scss";
 const Account = React.lazy(() => import("./components/Account"));
 const Accounts = React.lazy(() => import("./components/Accounts"));
 const SubAccount = React.lazy(() => import("./components/SubAccount"));
+const Actuals = React.lazy(() => import("./components/Actuals"));
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
@@ -99,7 +100,8 @@ const Budget = (): JSX.Element => {
         {
           icon: <FontAwesomeIcon icon={faCalculator} />,
           onClick: () => history.push(`/budgets/${budgetId}`),
-          active: location.pathname.startsWith("/budgets"),
+          active:
+            location.pathname.startsWith("/budgets") && !location.pathname.startsWith(`/budgets/${budgetId}/actuals`),
           tooltip: {
             title: "Budget",
             placement: "right"
@@ -107,7 +109,8 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faDollarSign} />,
-          onClick: () => history.push(`/budgets/${budgetId}`),
+          onClick: () => history.push(`/budgets/${budgetId}/actuals`),
+          active: location.pathname.startsWith(`/budgets/${budgetId}/actuals`),
           tooltip: {
             title: "Actuals",
             placement: "right"
@@ -122,6 +125,7 @@ const Budget = (): JSX.Element => {
               <Redirect exact from={match.url} to={`${match.url}/accounts`} />
               <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
               <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
+              <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
               <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
             </Switch>
           </div>

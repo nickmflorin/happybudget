@@ -12,8 +12,10 @@ import { initialAccountState, initialSubAccountState } from "./initialState";
 import {
   createSubAccountRowPlaceholder,
   createAccountRowPlaceholder,
+  createActualRowPlaceholder,
   initializeRowFromAccount,
-  initializeRowFromSubAccount
+  initializeRowFromSubAccount,
+  initializeRowFromActual
 } from "./util";
 
 const indexedAccountReducer = combineReducers({
@@ -158,6 +160,37 @@ const rootReducer = combineReducers({
     Request: ActionType.Budget.Request
   }),
   subaccounts: subaccountsIndexedDetailsReducer,
+  actuals: combineReducers({
+    deleting: createModelListActionReducer(ActionType.Actuals.Deleting, { referenceEntity: "actual" }),
+    updating: createModelListActionReducer(ActionType.Actuals.Updating, { referenceEntity: "actual" }),
+    creating: createSimpleBooleanReducer(ActionType.Actuals.Creating),
+    table: createTableReducer<
+      Redux.Budget.ActualRowField,
+      Redux.Budget.IActualRowMeta,
+      Redux.Budget.IActualRow,
+      IActual,
+      Redux.Budget.ActualCellError,
+      Redux.Budget.IAction<any>
+    >(
+      {
+        AddPlaceholders: ActionType.ActualsTable.AddPlaceholders,
+        RemoveRow: ActionType.ActualsTable.RemoveRow,
+        UpdateCell: ActionType.ActualsTable.UpdateCell,
+        ActivatePlaceholder: ActionType.ActualsTable.ActivatePlaceholder,
+        SelectRow: ActionType.ActualsTable.SelectRow,
+        DeselectRow: ActionType.ActualsTable.DeselectRow,
+        SelectAllRows: ActionType.ActualsTable.SelectAllRows,
+        Request: ActionType.ActualsTable.Request,
+        Response: ActionType.ActualsTable.Response,
+        Loading: ActionType.ActualsTable.Loading,
+        SetSearch: ActionType.ActualsTable.SetSearch,
+        SetError: ActionType.ActualsTable.SetError
+      },
+      createActualRowPlaceholder,
+      initializeRowFromActual,
+      { referenceEntity: "actual" }
+    )
+  }),
   accounts: combineReducers({
     details: accountsIndexedDetailsReducer,
     deleting: createModelListActionReducer(ActionType.Accounts.Deleting, { referenceEntity: "account" }),

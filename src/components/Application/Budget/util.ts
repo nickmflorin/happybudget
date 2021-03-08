@@ -130,6 +130,22 @@ export const initializeRowFromAccount = (account: IAccount): Redux.Budget.IAccou
   variance: { value: account.variance }
 });
 
+export const initializeRowFromActual = (actual: IActual): Redux.Budget.IActualRow => ({
+  id: actual.id,
+  meta: {
+    isPlaceholder: false,
+    selected: false
+  },
+  description: { value: actual.description },
+  vendor: { value: actual.vendor },
+  purchase_order: { value: actual.purchase_order },
+  date: { value: actual.date },
+  payment_id: { value: actual.payment_id },
+  value: { value: actual.value },
+  payment_method: { value: actual.payment_method },
+  parent: { value: actual.parent }
+});
+
 export const initializeRowFromSubAccount = (subaccount: ISubAccount): Redux.Budget.ISubAccountRow => ({
   id: subaccount.id,
   meta: {
@@ -146,6 +162,22 @@ export const initializeRowFromSubAccount = (subaccount: ISubAccount): Redux.Budg
   description: { value: subaccount.description },
   estimated: { value: subaccount.estimated },
   variance: { value: subaccount.variance }
+});
+
+export const createActualRowPlaceholder = (): Redux.Budget.IActualRow => ({
+  id: generateRandomNumericId(),
+  meta: {
+    isPlaceholder: true,
+    selected: false
+  },
+  description: { value: null },
+  vendor: { value: null },
+  purchase_order: { value: null },
+  date: { value: null },
+  payment_id: { value: null },
+  value: { value: null },
+  payment_method: { value: null },
+  parent: { value: null }
 });
 
 export const createSubAccountRowPlaceholder = (): Redux.Budget.ISubAccountRow => ({

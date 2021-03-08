@@ -31,7 +31,7 @@ interface GenericBudgetTableProps<F, E extends IRowMeta, R extends IRow<F, E>> {
   onRowUpdate: (id: number, payload: { [key: string]: any }) => void;
   onRowAdd: () => void;
   onRowDelete: (row: R) => void;
-  onRowExpand: (id: number) => void;
+  onRowExpand?: (id: number) => void;
   onSelectAll: () => void;
   isCellEditable: (row: R, col: ColDef) => boolean;
 }
@@ -151,27 +151,40 @@ const GenericBudgetTable = <F, E extends IRowMeta, R extends IRow<F, E>>({
   }, []);
 
   useEffect(() => {
+    const baseLeftColumns: ColDef[] = [
+      {
+        field: "select",
+        editable: false,
+        headerName: "",
+        width: 50,
+        cellRenderer: "SelectCell",
+        cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
+      }
+    ];
+    if (!isNil(onRowExpand)) {
+      baseLeftColumns.push({
+        field: "expand",
+        editable: false,
+        headerName: "",
+        width: 50,
+        cellRenderer: "ExpandCell",
+        cellRendererParams: { onClick: onRowExpand }
+      });
+    }
+    const baseRightColumns: ColDef[] = [
+      {
+        field: "delete",
+        editable: false,
+        headerName: "",
+        width: 70,
+        cellRenderer: "DeleteCell",
+        cellRendererParams: { onClick: onRowDelete }
+      }
+    ];
     setColDefs(
       map(
         concat(
-          [
-            {
-              field: "select",
-              editable: false,
-              headerName: "",
-              width: 50,
-              cellRenderer: "SelectCell",
-              cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
-            },
-            {
-              field: "expand",
-              editable: false,
-              headerName: "",
-              width: 50,
-              cellRenderer: "ExpandCell",
-              cellRendererParams: { onClick: onRowExpand }
-            }
-          ],
+          baseLeftColumns,
           map(
             columns,
             (def: ColDef) =>
@@ -188,16 +201,7 @@ const GenericBudgetTable = <F, E extends IRowMeta, R extends IRow<F, E>>({
                 }
               } as ColDef)
           ),
-          [
-            {
-              field: "delete",
-              editable: false,
-              headerName: "",
-              width: 70,
-              cellRenderer: "DeleteCell",
-              cellRendererParams: { onClick: onRowDelete }
-            }
-          ]
+          baseRightColumns
         ),
         (col: ColDef) => ({
           ...col,

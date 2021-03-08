@@ -35,7 +35,7 @@ const Accounts = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={budgetId}>
-      <RenderWithSpinner loading={accounts.table.loading}>
+      <RenderWithSpinner loading={accounts.table.loading || budget.loading}>
         <GenericBudgetTable<Redux.Budget.AccountRowField, Redux.Budget.IBudgetRowMeta, Redux.Budget.IAccountRow>
           table={accounts.table.data}
           isCellEditable={(row: Redux.Budget.IAccountRow, colDef: ColDef) => {

@@ -15,7 +15,7 @@ export const mergeWithDefaults = <T extends object>(obj: Partial<T>, defaults: T
   return merged as T;
 };
 
-export const conditionalObj = (obj: any, condition: boolean) => {
+export const conditionalObj = <T = any>(obj: T, condition: boolean): Partial<T> => {
   if (condition === true) {
     return obj;
   }
