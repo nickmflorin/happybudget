@@ -45,23 +45,27 @@
 
 .error-container {
   position: absolute;
-  top: 3px;
-  right: 3px;
-  height: 10px;
+  top: 0px;
+  right: 0px;
+  height: 18px;
   display: flex;
+  z-index: 100000;
+  background-color: #d73a49;
+  color: white;
+  padding: 2px 4px;
 
   .text-error {
-    color: $red;
-    font-size: 9px;
-    line-height: 10px;
-    display: block;
+    color: white;
+    font-size: 11px;
+    line-height: 14px;
   }
   .icon--error {
-    color: $red;
+    color: $white;
     display: block;
+    margin-right: 6px;
 
     svg {
-      height: 10px;
+      height: 14px;
       width: auto;
     }
   }

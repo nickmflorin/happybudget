@@ -30,8 +30,8 @@ const ValueCell = ({ value, node, colDef }: ValueCellProps): JSX.Element => {
     return (
       <div>
         <div className={"error-container"}>
-          <div className={"text-error"}>{cellErrors[0].error}</div>
           <CloseCircleOutlined className={"icon--error"} />
+          <div className={"text-error"}>{cellErrors[0].error}</div>
         </div>
         {!isNil(value) && value}
       </div>
