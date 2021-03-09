@@ -22,7 +22,6 @@ export const initialTableState: Redux.ITableStore<any, any, any, any> = {
   loading: false,
   data: [],
   rawData: [],
-  errors: [],
   search: "",
   responseWasReceived: false
 };

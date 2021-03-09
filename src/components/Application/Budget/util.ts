@@ -100,7 +100,8 @@ export const initializeRowFromAccount = (account: IAccount): Table.IAccountRow =
   meta: {
     isPlaceholder: false,
     selected: false,
-    subaccounts: account.subaccounts
+    subaccounts: account.subaccounts,
+    errors: []
   },
   account_number: account.account_number,
   description: account.description,
@@ -112,7 +113,8 @@ export const initializeRowFromActual = (actual: IActual): Table.IActualRow => ({
   id: actual.id,
   meta: {
     isPlaceholder: false,
-    selected: false
+    selected: false,
+    errors: []
   },
   description: actual.description,
   vendor: actual.vendor,
@@ -129,7 +131,8 @@ export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.ISub
   meta: {
     isPlaceholder: false,
     selected: false,
-    subaccounts: subaccount.subaccounts
+    subaccounts: subaccount.subaccounts,
+    errors: []
   },
   name: subaccount.name,
   line: subaccount.line,
@@ -146,7 +149,8 @@ export const createActualRowPlaceholder = (): Table.IActualRow => ({
   id: generateRandomNumericId(),
   meta: {
     isPlaceholder: true,
-    selected: false
+    selected: false,
+    errors: []
   },
   description: null,
   vendor: null,
@@ -172,7 +176,8 @@ export const createSubAccountRowPlaceholder = (): Table.ISubAccountRow => ({
   meta: {
     isPlaceholder: true,
     selected: false,
-    subaccounts: []
+    subaccounts: [],
+    errors: []
   }
 });
 
@@ -185,6 +190,7 @@ export const createAccountRowPlaceholder = (): Table.IAccountRow => ({
   meta: {
     isPlaceholder: true,
     selected: false,
-    subaccounts: []
+    subaccounts: [],
+    errors: []
   }
 });

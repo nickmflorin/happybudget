@@ -25,7 +25,7 @@ const indexedAccountReducer = combineReducers({
     creating: createSimpleBooleanReducer(ActionType.Account.SubAccounts.Creating),
     table: createTableReducer<
       Table.SubAccountRowField,
-      Table.IBudgetRowMeta,
+      Table.IBudgetRowMeta<Table.SubAccountRowField>,
       Table.ISubAccountRow,
       ISubAccount,
       Table.ICellError<Table.SubAccountRowField>,
@@ -68,7 +68,7 @@ const indexedSubAccountReducer = combineReducers({
     creating: createSimpleBooleanReducer(ActionType.SubAccount.SubAccounts.Creating),
     table: createTableReducer<
       Table.SubAccountRowField,
-      Table.IBudgetRowMeta,
+      Table.IBudgetRowMeta<Table.SubAccountRowField>,
       Table.ISubAccountRow,
       ISubAccount,
       Table.ICellError<Table.SubAccountRowField>,
@@ -166,7 +166,7 @@ const rootReducer = combineReducers({
     creating: createSimpleBooleanReducer(ActionType.Actuals.Creating),
     table: createTableReducer<
       Table.ActualRowField,
-      Table.IActualRowMeta,
+      Table.IActualRowMeta<Table.ActualRowField>,
       Table.IActualRow,
       IActual,
       Table.ICellError<Table.ActualRowField>,
@@ -198,7 +198,7 @@ const rootReducer = combineReducers({
     creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
     table: createTableReducer<
       Table.AccountRowField,
-      Table.IBudgetRowMeta,
+      Table.IBudgetRowMeta<Table.AccountRowField>,
       Table.IAccountRow,
       IAccount,
       Table.ICellError<Table.AccountRowField>,

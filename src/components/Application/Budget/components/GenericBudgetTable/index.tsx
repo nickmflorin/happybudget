@@ -12,14 +12,15 @@ import {
   RowNode,
   EditableCallbackParams,
   GridOptions,
-  ColumnApi
+  ColumnApi,
+  Column
 } from "ag-grid-community";
 
 import TableHeader from "./TableHeader";
 import { DeleteCell, ExpandCell, SelectCell, ValueCell, CellEditor, NewRowCell, UnitCell } from "./cells";
 import "./index.scss";
 
-interface GenericBudgetTableProps<F, E extends Table.IRowMeta, R extends Table.IRow<F, E>> {
+interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta<F>, R extends Table.IRow<F, E>> {
   columns: ColDef[];
   table: R[];
   search: string;
@@ -36,7 +37,7 @@ interface GenericBudgetTableProps<F, E extends Table.IRowMeta, R extends Table.I
   isCellEditable: (row: R, col: ColDef) => boolean;
 }
 
-const GenericBudgetTable = <F, E extends Table.IRowMeta, R extends Table.IRow<F, E>>({
+const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R extends Table.IRow<F, E>>({
   columns,
   table,
   search,
@@ -119,6 +120,32 @@ const GenericBudgetTable = <F, E extends Table.IRowMeta, R extends Table.IRow<F,
   }, [table, gridApi]);
 
   useEffect(() => {
+    // Changes to the errors in the rows does not trigger a refresh of those cells
+    // via AGGridReact because AGGridReact cannot detect changes in that type of
+    // data structure for the row.
+    if (!isNil(gridApi) && !isNil(columnApi)) {
+      gridApi.forEachNode((node: RowNode) => {
+        const existing: R | undefined = find(table, { id: node.data.id });
+        if (!isNil(existing)) {
+          // TODO: We might want to do a deeper comparison in the future here.
+          if (existing.meta.errors.length !== node.data.meta.errors.length) {
+            const cols = columnApi.getAllColumns();
+            forEach(cols, (col: Column) => {
+              const colDef = col.getColDef();
+              if (!isNil(colDef.field)) {
+                const cellErrors = filter(existing.meta.errors, { id: node.data.id, field: colDef.field });
+                if (cellErrors.length !== 0) {
+                  gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] });
+                }
+              }
+            });
+          }
+        }
+      });
+    }
+  }, [table, gridApi, columnApi]);
+
+  useEffect(() => {
     const mapped = map(table, (row: R) => row.meta.selected);
     const uniques = uniq(mapped);
     if (uniques.length === 1 && uniques[0] === true) {
@@ -191,14 +218,6 @@ const GenericBudgetTable = <F, E extends Table.IRowMeta, R extends Table.IRow<F,
               ({
                 cellRenderer: "ValueCell",
                 ...def
-                // filterParams: {
-                //   textFormatter: (value: ICell): string => {
-                //     if (!isNil(value)) {
-                //       return value.value;
-                //     }
-                //     return "";
-                //   }
-                // }
               } as ColDef)
           ),
           baseRightColumns
@@ -218,13 +237,18 @@ const GenericBudgetTable = <F, E extends Table.IRowMeta, R extends Table.IRow<F,
             if (includes(["delete", "select", "expand"], params.colDef.field)) {
               return "action-cell";
             }
+            // TODO: This is not working!
             const row: R = params.node.data;
-            if (
-              !isNil(params.colDef.field) &&
-              params.node.data[params.colDef.field] &&
-              !isNil(params.node.data[params.colDef.field].error)
-            ) {
-              return classNames("error-cell", { "unit-cell": params.colDef.field === "unit" });
+            let hasError = false;
+            if (row.meta.errors.length !== 0 && !isNil(params.colDef.field)) {
+              const field = params.colDef.field;
+              const errors = filter(
+                row.meta.errors,
+                (error: Table.ICellError<F>) => error.field === field && error.id === row.id
+              );
+              if (errors.length !== 0) {
+                hasError = true;
+              }
             }
             if (!isCellEditable(row, params.colDef)) {
               return classNames("not-editable", {
@@ -232,7 +256,7 @@ const GenericBudgetTable = <F, E extends Table.IRowMeta, R extends Table.IRow<F,
                 "unit-cell": params.colDef.field === "unit"
               });
             }
-            return classNames({ "unit-cell": params.colDef.field === "unit" });
+            return classNames({ "has-error": hasError, "unit-cell": params.colDef.field === "unit" });
           }
         })
       )
@@ -314,17 +338,6 @@ const GenericBudgetTable = <F, E extends Table.IRowMeta, R extends Table.IRow<F,
           suppressRowClickSelection={true}
           onGridReady={onGridReady}
           domLayout={"autoHeight"}
-          defaultColDef={
-            {
-              // cellEditor: "CellEditor",
-              // getQuickFilterText: (params: { value: Table.ICell }): string => {
-              //   if (!isNil(params.value)) {
-              //     return params.value.value;
-              //   }
-              //   return "";
-              // }
-            }
-          }
           frameworkComponents={{
             DeleteCell: DeleteCell,
             ExpandCell: ExpandCell,

@@ -63,19 +63,12 @@ namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
-  interface ITableStore<
-    F,
-    E extends IRowMeta,
-    R extends IRow<F, E>,
-    M extends Model,
-    Y extends ICellError<F> = ICellError<F>
-  > {
+  interface ITableStore<F, E extends IRowMeta, R extends IRow<F, E>, M extends Model> {
     readonly data: IListStore<R>;
     readonly loading: boolean;
     readonly rawData: IListStore<M>;
     readonly search: string;
     readonly responseWasReceived: boolean;
-    readonly errors: Y[];
   }
 
   type IIndexedStore<T> = { [key: number]: T };
@@ -128,12 +121,12 @@ namespace Redux {
 
     interface ISubAccountStore {
       readonly detail: IDetailResponseStore<ISubAccount>;
-      readonly subaccounts: ISubAccountListStore;
+      readonly subaccounts: ISubAccountsStore;
     }
 
     interface IAccountStore {
       readonly detail: IDetailResponseStore<IAccount>;
-      readonly subaccounts: ISubAccountListStore;
+      readonly subaccounts: ISubAccountsStore;
     }
 
     interface ISubAccountsStore {

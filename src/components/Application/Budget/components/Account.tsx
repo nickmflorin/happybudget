@@ -50,7 +50,11 @@ const Account = (): JSX.Element => {
   return (
     <RenderIfValidId id={[budgetId, accountId]}>
       <RenderWithSpinner loading={accountStore.subaccounts.table.loading || accountStore.detail.loading}>
-        <GenericBudgetTable<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow>
+        <GenericBudgetTable<
+          Table.SubAccountRowField,
+          Table.IBudgetRowMeta<Table.SubAccountRowField>,
+          Table.ISubAccountRow
+        >
           table={accountStore.subaccounts.table.data}
           isCellEditable={(row: Table.ISubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "unit"], colDef.field)) {

@@ -1,30 +1,24 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Table {
-  type RowCells<F> = { [key in F]: ICell<any> };
-
-  interface ICell<T = string> {
-    value: T;
-    error?: string;
-  }
-
-  interface ICellError<F> {
+  interface ICellError<F extends string> {
     id: number;
     field: F;
     error: string;
   }
 
-  interface IRowMeta {
+  interface IRowMeta<F extends string, Y extends ICellError<F> = ICellError<F>> {
     selected: boolean;
+    errors: Y[];
   }
 
-  interface IRow<F, E extends IRowMeta> {
+  interface IRow<F extends string, E extends IRowMeta<F, Y>, Y extends ICellError<F> = ICellError<F>> {
     id: number;
     meta: E;
-    [key in F]: ICell<any>;
+    [key in F]: any;
   }
 
-  interface ICellUpdate<F> {
+  interface ICellUpdate<F extends string> {
     column: F;
     row: number;
     value: any;
@@ -42,23 +36,25 @@ namespace Table {
     | "payment_id"
     | "value";
 
-  interface IBudgetRowMeta extends IRowMeta {
+  interface IBudgetRowMeta<F extends string, Y extends ICellError<F> = ICellError<F>> extends IRowMeta<F, Y> {
     readonly isPlaceholder: boolean;
     readonly subaccounts: ISimpleSubAccount[];
   }
 
-  interface IActualRowMeta extends IRowMeta {
+  interface IActualRowMeta<F extends string, Y extends ICellError<F> = ICellError<F>> extends IRowMeta<F, Y> {
     readonly isPlaceholder: boolean;
   }
 
-  interface IAccountRow extends IRow<AccountRowField, IBudgetRowMeta> {
+  interface IAccountRow<Y extends ICellError<AccountRowField> = ICellError<AccountRowField>>
+    extends IRow<AccountRowField, IBudgetRowMeta<AccountRowField, Y>> {
     readonly account_number: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
     readonly variance: number | null;
   }
 
-  interface ISubAccountRow extends IRow<SubAccountRowField, IBudgetRowMeta> {
+  interface ISubAccountRow<Y extends ICellError<SubAccountRowField> = ICellError<SubAccountRowField>>
+    extends IRow<SubAccountRowField, IBudgetRowMeta<SubAccountRowField, Y>> {
     readonly line: string | null;
     readonly name: string | null;
     readonly description: string | null;
@@ -70,7 +66,8 @@ namespace Table {
     readonly variance: number | null;
   }
 
-  interface IActualRow extends IRow<ActualRowField, IActualRowMeta> {
+  interface IActualRow<Y extends ICellError<ActualRowField> = ICellError<ActualRowField>>
+    extends IRow<ActualRowField, IActualRowMeta<ActualRowField, Y>> {
     readonly parent: number | null;
     readonly description: string | null;
     readonly vendor: string | null;

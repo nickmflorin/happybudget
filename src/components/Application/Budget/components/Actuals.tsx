@@ -33,7 +33,7 @@ const Actuals = (): JSX.Element => {
   return (
     <RenderIfValidId id={budgetId}>
       <RenderWithSpinner loading={actuals.table.loading || budget.loading}>
-        <GenericBudgetTable<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow>
+        <GenericBudgetTable<Table.ActualRowField, Table.IActualRowMeta<Table.ActualRowField>, Table.IActualRow>
           table={actuals.table.data}
           isCellEditable={() => true}
           search={actuals.table.search}
