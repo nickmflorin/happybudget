@@ -16,7 +16,7 @@ interface ICommonTableActionMap {
   SelectRow: string;
   DeselectRow: string;
   SelectAllRows: string;
-  SetError: string;
+  AddErrors: string;
 }
 
 export interface ITableDataActionMap extends ICommonTableActionMap {
@@ -59,10 +59,10 @@ export interface IReducerFactoryOptions<S> {
 
 export interface ITableReducerOptions<
   F,
-  E extends IRowMeta,
-  R extends IRow<F, E>,
+  E extends Table.IRowMeta,
+  R extends Table.IRow<F, E>,
   M extends Model,
-  S extends Redux.ITableStore<R, M> = Redux.ITableStore<R, M>
+  S extends Redux.ITableStore<F, E, R, M> = Redux.ITableStore<F, E, R, M>
 > extends IReducerFactoryOptions<S> {}
 
 export interface IDetailResponseReducerOptions<

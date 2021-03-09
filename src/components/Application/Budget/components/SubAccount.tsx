@@ -50,9 +50,9 @@ const SubAccount = (): JSX.Element => {
   return (
     <RenderIfValidId id={[budgetId, subaccountId]}>
       <RenderWithSpinner loading={subAccountStore.subaccounts.table.loading}>
-        <GenericBudgetTable<Redux.Budget.SubAccountRowField, Redux.Budget.IBudgetRowMeta, Redux.Budget.ISubAccountRow>
+        <GenericBudgetTable<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow>
           table={subAccountStore.subaccounts.table.data}
-          isCellEditable={(row: Redux.Budget.ISubAccountRow, colDef: ColDef) => {
+          isCellEditable={(row: Table.ISubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "unit"], colDef.field)) {
               return false;
             } else if (includes(["line", "description", "name"], colDef.field)) {
@@ -71,7 +71,7 @@ const SubAccount = (): JSX.Element => {
           onRowAdd={() => dispatch(addSubAccountSubAccountsPlaceholdersAction(parseInt(subaccountId)))}
           onRowSelect={(id: number) => dispatch(selectSubAccountSubAccountsRowAction(parseInt(subaccountId), id))}
           onRowDeselect={(id: number) => dispatch(deselectSubAccountSubAccountsRowAction(parseInt(subaccountId), id))}
-          onRowDelete={(row: Redux.Budget.ISubAccountRow) =>
+          onRowDelete={(row: Table.ISubAccountRow) =>
             dispatch(removeSubAccountSubAccountAction(parseInt(subaccountId), row))
           }
           onRowUpdate={(id: number, payload: { [key: string]: any }) =>
@@ -108,7 +108,7 @@ const SubAccount = (): JSX.Element => {
               cellStyle: { textAlign: "right" },
               cellRenderer: "UnitCell",
               cellRendererParams: {
-                onChange: (value: Unit, row: Redux.Budget.ISubAccountRow) => console.log({ value, id: row.id })
+                onChange: (value: Unit, row: Table.ISubAccountRow) => console.log({ value, id: row.id })
               }
             },
             {

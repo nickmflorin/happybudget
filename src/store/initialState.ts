@@ -18,10 +18,11 @@ export const initialDetailResponseState: Redux.IDetailResponseStore<any> = {
   responseWasReceived: false
 };
 
-export const initialTableState: Redux.ITableStore<any, any> = {
+export const initialTableState: Redux.ITableStore<any, any, any, any> = {
   loading: false,
   data: [],
   rawData: [],
+  errors: [],
   search: "",
   responseWasReceived: false
 };

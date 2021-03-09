@@ -24,11 +24,11 @@ const indexedAccountReducer = combineReducers({
     updating: createModelListActionReducer(ActionType.Account.SubAccounts.Updating, { referenceEntity: "subaccount" }),
     creating: createSimpleBooleanReducer(ActionType.Account.SubAccounts.Creating),
     table: createTableReducer<
-      Redux.Budget.SubAccountRowField,
-      Redux.Budget.IBudgetRowMeta,
-      Redux.Budget.ISubAccountRow,
+      Table.SubAccountRowField,
+      Table.IBudgetRowMeta,
+      Table.ISubAccountRow,
       ISubAccount,
-      Redux.Budget.SubAccountCellError,
+      Table.ICellError<Table.SubAccountRowField>,
       Redux.Budget.IAction<any>
     >(
       {
@@ -43,7 +43,7 @@ const indexedAccountReducer = combineReducers({
         Request: ActionType.Account.SubAccountsTable.Request,
         Loading: ActionType.Account.SubAccountsTable.Loading,
         SetSearch: ActionType.Account.SubAccountsTable.SetSearch,
-        SetError: ""
+        AddErrors: ""
       },
       createSubAccountRowPlaceholder,
       initializeRowFromSubAccount,
@@ -67,11 +67,11 @@ const indexedSubAccountReducer = combineReducers({
     }),
     creating: createSimpleBooleanReducer(ActionType.SubAccount.SubAccounts.Creating),
     table: createTableReducer<
-      Redux.Budget.SubAccountRowField,
-      Redux.Budget.IBudgetRowMeta,
-      Redux.Budget.ISubAccountRow,
+      Table.SubAccountRowField,
+      Table.IBudgetRowMeta,
+      Table.ISubAccountRow,
       ISubAccount,
-      Redux.Budget.SubAccountCellError,
+      Table.ICellError<Table.SubAccountRowField>,
       Redux.Budget.IAction<any>
     >(
       {
@@ -86,7 +86,7 @@ const indexedSubAccountReducer = combineReducers({
         Loading: ActionType.SubAccount.SubAccountsTable.Loading,
         SetSearch: ActionType.SubAccount.SubAccountsTable.SetSearch,
         Request: ActionType.SubAccount.SubAccountsTable.Request,
-        SetError: ""
+        AddErrors: ""
       },
       createSubAccountRowPlaceholder,
       initializeRowFromSubAccount,
@@ -165,11 +165,11 @@ const rootReducer = combineReducers({
     updating: createModelListActionReducer(ActionType.Actuals.Updating, { referenceEntity: "actual" }),
     creating: createSimpleBooleanReducer(ActionType.Actuals.Creating),
     table: createTableReducer<
-      Redux.Budget.ActualRowField,
-      Redux.Budget.IActualRowMeta,
-      Redux.Budget.IActualRow,
+      Table.ActualRowField,
+      Table.IActualRowMeta,
+      Table.IActualRow,
       IActual,
-      Redux.Budget.ActualCellError,
+      Table.ICellError<Table.ActualRowField>,
       Redux.Budget.IAction<any>
     >(
       {
@@ -184,7 +184,7 @@ const rootReducer = combineReducers({
         Response: ActionType.ActualsTable.Response,
         Loading: ActionType.ActualsTable.Loading,
         SetSearch: ActionType.ActualsTable.SetSearch,
-        SetError: ActionType.ActualsTable.SetError
+        AddErrors: ActionType.ActualsTable.AddErrors
       },
       createActualRowPlaceholder,
       initializeRowFromActual,
@@ -197,11 +197,11 @@ const rootReducer = combineReducers({
     updating: createModelListActionReducer(ActionType.Accounts.Updating, { referenceEntity: "account" }),
     creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
     table: createTableReducer<
-      Redux.Budget.AccountRowField,
-      Redux.Budget.IBudgetRowMeta,
-      Redux.Budget.IAccountRow,
+      Table.AccountRowField,
+      Table.IBudgetRowMeta,
+      Table.IAccountRow,
       IAccount,
-      Redux.Budget.AccountCellError,
+      Table.ICellError<Table.AccountRowField>,
       Redux.Budget.IAction<any>
     >(
       {
@@ -216,7 +216,7 @@ const rootReducer = combineReducers({
         Response: ActionType.AccountsTable.Response,
         Loading: ActionType.AccountsTable.Loading,
         SetSearch: ActionType.AccountsTable.SetSearch,
-        SetError: ActionType.AccountsTable.SetError
+        AddErrors: ActionType.AccountsTable.AddErrors
       },
       createAccountRowPlaceholder,
       initializeRowFromAccount,

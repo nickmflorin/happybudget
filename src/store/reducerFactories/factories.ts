@@ -113,9 +113,9 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
 export const createTableDataReducer = <
   /* eslint-disable indent */
   F extends keyof R,
-  E extends IRowMeta,
-  R extends IRow<F, E>,
-  Y extends ICellError<F>,
+  E extends Table.IRowMeta,
+  R extends Table.IRow<F, E>,
+  Y extends Table.ICellError<F>,
   A extends Redux.IAction<any>
 >(
   mappings: Partial<ITableDataActionMap>,
@@ -160,8 +160,8 @@ export const createTableDataReducer = <
           );
         }
       },
-      UpdateCell: (payload: ICellUpdate<F> | ICellUpdate<F>[]) => {
-        const updateCellInState = (st: Redux.ListStore<R>, update: ICellUpdate<F>) => {
+      UpdateCell: (payload: Table.ICellUpdate<F> | Table.ICellUpdate<F>[]) => {
+        const updateCellInState = (st: Redux.ListStore<R>, update: Table.ICellUpdate<F>) => {
           const row: R | undefined = find(st, { id: update.row } as any);
           if (isNil(row)) {
             /* eslint-disable no-console */
@@ -171,11 +171,7 @@ export const createTableDataReducer = <
             );
             return st;
           } else {
-            return replaceInArray<R>(
-              st,
-              { id: update.row },
-              { ...row, [update.column]: { ...row[update.column], value: update.value } }
-            );
+            return replaceInArray<R>(st, { id: update.row }, { ...row, [update.column]: update.value });
           }
         };
         if (Array.isArray(payload)) {
@@ -248,13 +244,13 @@ export const createTableDataReducer = <
           return map(newState, (row: R) => ({ ...row, meta: { ...row.meta, selected: true } }));
         }
       },
-      SetError: (payload: Y | Y[]) => {
+      AddErrors: (payload: Y | Y[]) => {
         const updateStateWithError = (st: Redux.ListStore<R>, e: Y): Redux.ListStore<R> => {
           const row = find(newState, { id: e.id }) as R;
           if (isNil(row)) {
             /* eslint-disable no-console */
             console.error(
-              `Inconsistent State!:  Inconsistent state noticed when adding error to ${Options.referenceEntity} cell...
+              `Inconsistent State!:  Inconsistent state noticed when adding error to ${Options.referenceEntity} table...
           the ${Options.referenceEntity} row with ID ${e.id} does not exist in state when it is expected to.`
             );
             return newState;
@@ -263,7 +259,7 @@ export const createTableDataReducer = <
           } else if (isNil(row[e.field])) {
             /* eslint-disable no-console */
             console.error(
-              `Inconsistent State!:  Inconsistent state noticed when adding error to ${Options.referenceEntity} cell...
+              `Inconsistent State!:  Inconsistent state noticed when adding error to ${Options.referenceEntity} table...
             the ${Options.referenceEntity} cell with field ${e.field} does not exist in state when it is expected to.`
             );
             return newState;
@@ -324,11 +320,11 @@ export const createTableDataReducer = <
 export const createTableReducer = <
   /* eslint-disable indent */
   F extends keyof R,
-  E extends IRowMeta,
-  R extends IRow<F, E>,
+  E extends Table.IRowMeta,
+  R extends Table.IRow<F, E>,
   M extends Model,
-  Y extends ICellError<F>,
-  A extends Redux.IAction<any>
+  Y extends Table.ICellError<F> = Table.ICellError<F>,
+  A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   /* eslint-disable indent */
   mappings: ITableActionMap,
@@ -349,15 +345,14 @@ export const createTableReducer = <
       ActivatePlaceholder: mappings.ActivatePlaceholder,
       SelectRow: mappings.SelectRow,
       DeselectRow: mappings.DeselectRow,
-      SelectAllRows: mappings.SelectAllRows,
-      SetError: mappings.SetError
+      SelectAllRows: mappings.SelectAllRows
     },
     placeholderCreator,
     { referenceEntity: Options.referenceEntity as string, initialState: Options.initialState.data }
   );
 
-  const reducer: Reducer<Redux.ITableStore<R, M>, A> = (
-    state: Redux.ITableStore<R, M> = Options.initialState as Redux.ITableStore<R, M>,
+  const reducer: Reducer<Redux.ITableStore<F, E, R, M, Y>, A> = (
+    state: Redux.ITableStore<F, E, R, M, Y> = Options.initialState as Redux.ITableStore<F, E, R, M, Y>,
     action: A
   ) => {
     let newState = { ...state };
@@ -366,7 +361,7 @@ export const createTableReducer = <
     // the table data.
     newState = { ...newState, data: dataReducer(newState.data, action) };
 
-    const transformers: Transformers<ITableActionMap, Redux.ITableStore<R, M>, A> = {
+    const transformers: Transformers<ITableActionMap, Redux.ITableStore<F, E, R, M, Y>, A> = {
       SetSearch: (search: string) => ({ search }),
       Loading: (loading: boolean) => ({ loading }),
       Request: () => ({ rawData: [], data: [], responseWasReceived: false }),
@@ -376,20 +371,56 @@ export const createTableReducer = <
           rawData: response.data,
           responseWasReceived: true
         };
+      },
+      AddErrors: (payload: Y | Y[]) => {
+        const updateStateWithError = (st: Redux.ITableStore<F, E, R, M, Y>, e: Y): Redux.ITableStore<F, E, R, M, Y> => {
+          const row = find(newState, { id: e.id }) as R;
+          if (isNil(row)) {
+            /* eslint-disable no-console */
+            console.error(
+              `Inconsistent State!:  Inconsistent state noticed when adding error to ${Options.referenceEntity} table...
+          the ${Options.referenceEntity} row with ID ${e.id} does not exist in state when it is expected to.`
+            );
+            return newState;
+            // Ideally - we should improve the typecasting on the fields that comprise the sub account
+            // and account rows so we do not have to do `as keyof R` here.
+          } else if (isNil(row[e.field])) {
+            /* eslint-disable no-console */
+            console.error(
+              `Inconsistent State!:  Inconsistent state noticed when adding error to ${Options.referenceEntity} table...
+            the ${Options.referenceEntity} cell with field ${e.field} does not exist in state when it is expected to.`
+            );
+            return newState;
+          } else {
+            newState = { ...newState, errors: [...newState.errors, e] };
+            return newState;
+          }
+        };
+        if (Array.isArray(payload)) {
+          for (let i = 0; i < payload.length; i++) {
+            newState = updateStateWithError(newState, payload[i]);
+          }
+        } else {
+          newState = updateStateWithError(newState, payload);
+        }
+        return newState;
       }
     };
 
     // Find the standardized action type.
     let standardizedActionType: string | undefined = undefined;
-    forEach(mappings, (value: string | undefined | Transformer<Redux.ITableStore<R, M>, A>, standard: string) => {
-      if (value !== undefined && value === action.type) {
-        standardizedActionType = standard;
-        return false;
+    forEach(
+      mappings,
+      (value: string | undefined | Transformer<Redux.ITableStore<F, E, R, M, Y>, A>, standard: string) => {
+        if (value !== undefined && value === action.type) {
+          standardizedActionType = standard;
+          return false;
+        }
       }
-    });
+    );
 
     if (!isNil(standardizedActionType)) {
-      const transformer: Transformer<Redux.ITableStore<R, M>, A> = transformers[standardizedActionType];
+      const transformer: Transformer<Redux.ITableStore<F, E, R, M, Y>, A> = transformers[standardizedActionType];
       if (!isNil(transformer)) {
         const updateToState = transformer(action.payload, newState, action);
         newState = { ...newState, ...updateToState };

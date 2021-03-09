@@ -36,9 +36,9 @@ const Accounts = (): JSX.Element => {
   return (
     <RenderIfValidId id={budgetId}>
       <RenderWithSpinner loading={accounts.table.loading || budget.loading}>
-        <GenericBudgetTable<Redux.Budget.AccountRowField, Redux.Budget.IBudgetRowMeta, Redux.Budget.IAccountRow>
+        <GenericBudgetTable<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow>
           table={accounts.table.data}
-          isCellEditable={(row: Redux.Budget.IAccountRow, colDef: ColDef) => {
+          isCellEditable={(row: Table.IAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "variance"], colDef.field)) {
               return false;
             }
@@ -50,7 +50,7 @@ const Accounts = (): JSX.Element => {
           onRowAdd={() => dispatch(addAccountsPlaceholdersAction())}
           onRowSelect={(id: number) => dispatch(selectAccountsRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectAccountsRowAction(id))}
-          onRowDelete={(row: Redux.Budget.IAccountRow) => dispatch(removeAccountAction(row))}
+          onRowDelete={(row: Table.IAccountRow) => dispatch(removeAccountAction(row))}
           onRowUpdate={(id: number, payload: { [key: string]: any }) =>
             dispatch(updateAccountAction(parseInt(budgetId), { id, payload }))
           }

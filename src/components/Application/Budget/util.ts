@@ -1,6 +1,6 @@
 import { isNil, forEach } from "lodash";
 
-const ACTUAL_PAYLOAD_FIELDS: Redux.Budget.ActualRowField[] = [
+const ACTUAL_PAYLOAD_FIELDS: Table.ActualRowField[] = [
   "description",
   "parent",
   "vendor",
@@ -10,8 +10,8 @@ const ACTUAL_PAYLOAD_FIELDS: Redux.Budget.ActualRowField[] = [
   "payment_id",
   "value"
 ];
-const ACTUAL_REQUIRED_PAYLOAD_FIELDS: Redux.Budget.ActualRowField[] = ["parent"];
-const SUBACCOUNT_PAYLOAD_FIELDS: Redux.Budget.SubAccountRowField[] = [
+const ACTUAL_REQUIRED_PAYLOAD_FIELDS: Table.ActualRowField[] = ["parent"];
+const SUBACCOUNT_PAYLOAD_FIELDS: Table.SubAccountRowField[] = [
   "description",
   "name",
   "quantity",
@@ -20,48 +20,44 @@ const SUBACCOUNT_PAYLOAD_FIELDS: Redux.Budget.SubAccountRowField[] = [
   "unit",
   "line"
 ];
-const SUBACCOUNT_REQUIRED_PAYLOAD_FIELDS: Redux.Budget.SubAccountRowField[] = ["line", "name"];
-const ACCOUNT_PAYLOAD_FIELDS: Redux.Budget.AccountRowField[] = ["description", "account_number"];
-const ACCOUNT_REQUIRED_PAYLOAD_FIELDS: Redux.Budget.AccountRowField[] = ["account_number"];
+const SUBACCOUNT_REQUIRED_PAYLOAD_FIELDS: Table.SubAccountRowField[] = ["line", "name"];
+const ACCOUNT_PAYLOAD_FIELDS: Table.AccountRowField[] = ["description", "account_number"];
+const ACCOUNT_REQUIRED_PAYLOAD_FIELDS: Table.AccountRowField[] = ["account_number"];
 
 export const generateRandomNumericId = (): number => {
   return parseInt(Math.random().toString().slice(2, 11));
 };
 
 export const subAccountPayloadFromRow = (
-  row: Redux.Budget.ISubAccountRow
+  row: Table.ISubAccountRow
 ): Http.ISubAccountPayload | Partial<Http.ISubAccountPayload> => {
   const obj: { [key: string]: any } = {};
-  forEach(SUBACCOUNT_PAYLOAD_FIELDS, (field: Redux.Budget.SubAccountRowField) => {
-    const cell = row[field] as ICell | undefined;
-    if (!isNil(cell) && !isNil(cell.value)) {
-      obj[field] = cell.value;
+  forEach(SUBACCOUNT_PAYLOAD_FIELDS, (field: Table.SubAccountRowField) => {
+    const cell = row[field];
+    if (!isNil(cell)) {
+      obj[field] = cell;
     }
   });
   return obj;
 };
 
-export const accountPayloadFromRow = (
-  row: Redux.Budget.IAccountRow
-): Http.IAccountPayload | Partial<Http.IAccountPayload> => {
+export const accountPayloadFromRow = (row: Table.IAccountRow): Http.IAccountPayload | Partial<Http.IAccountPayload> => {
   const obj: { [key: string]: any } = {};
-  forEach(ACCOUNT_PAYLOAD_FIELDS, (field: Redux.Budget.AccountRowField) => {
-    const cell = row[field] as ICell | undefined;
-    if (!isNil(cell) && !isNil(cell.value)) {
-      obj[field] = cell.value;
+  forEach(ACCOUNT_PAYLOAD_FIELDS, (field: Table.AccountRowField) => {
+    const cell = row[field];
+    if (!isNil(cell)) {
+      obj[field] = cell;
     }
   });
   return obj;
 };
 
-export const actualPayloadFromRow = (
-  row: Redux.Budget.IActualRow
-): Http.IActualPayload | Partial<Http.IActualPayload> => {
+export const actualPayloadFromRow = (row: Table.IActualRow): Http.IActualPayload | Partial<Http.IActualPayload> => {
   const obj: { [key: string]: any } = {};
-  forEach(ACTUAL_PAYLOAD_FIELDS, (field: Redux.Budget.ActualRowField) => {
-    const cell = row[field] as ICell | undefined;
-    if (!isNil(cell) && !isNil(cell.value)) {
-      obj[field] = cell.value;
+  forEach(ACTUAL_PAYLOAD_FIELDS, (field: Table.ActualRowField) => {
+    const cell = row[field];
+    if (!isNil(cell)) {
+      obj[field] = cell;
     }
   });
   return obj;
@@ -70,8 +66,8 @@ export const actualPayloadFromRow = (
 const rowHasRequiredFieldsFn = <F extends string>(fields: F[]) => (row: any): boolean => {
   let requiredFieldsPresent = true;
   forEach(fields, (field: F) => {
-    const cell = row[field] as ICell;
-    if (isNil(cell.value) || cell.value === "") {
+    const cell = row[field];
+    if (isNil(cell) || cell === "") {
       requiredFieldsPresent = false;
       return false;
     }
@@ -83,8 +79,8 @@ export const subAccountRowHasRequiredfields = rowHasRequiredFieldsFn(SUBACCOUNT_
 export const accountRowHasRequiredfields = rowHasRequiredFieldsFn(ACCOUNT_REQUIRED_PAYLOAD_FIELDS);
 export const actualRowHasRequiredfields = rowHasRequiredFieldsFn(ACTUAL_REQUIRED_PAYLOAD_FIELDS);
 
-const convertResponseToCellUpdatesFn = <F extends string>(fields: F[]) => (response: any): ICellUpdate<F>[] => {
-  const updates: ICellUpdate<F>[] = [];
+const convertResponseToCellUpdatesFn = <F extends string>(fields: F[]) => (response: any): Table.ICellUpdate<F>[] => {
+  const updates: Table.ICellUpdate<F>[] = [];
   forEach(fields, (field: F) => {
     updates.push({
       row: response.id,
@@ -99,82 +95,80 @@ export const convertAccountResponseToCellUpdates = convertResponseToCellUpdatesF
 export const convertSubAccountResponseToCellUpdates = convertResponseToCellUpdatesFn(SUBACCOUNT_PAYLOAD_FIELDS);
 export const convertActualResponseToCellUpdates = convertResponseToCellUpdatesFn(ACTUAL_PAYLOAD_FIELDS);
 
-export const initializeRowFromAccount = (account: IAccount): Redux.Budget.IAccountRow => ({
+export const initializeRowFromAccount = (account: IAccount): Table.IAccountRow => ({
   id: account.id,
   meta: {
     isPlaceholder: false,
     selected: false,
     subaccounts: account.subaccounts
   },
-  account_number: {
-    value: account.account_number
-  },
-  description: { value: account.description },
-  estimated: { value: account.estimated },
-  variance: { value: account.variance }
+  account_number: account.account_number,
+  description: account.description,
+  estimated: account.estimated,
+  variance: account.variance
 });
 
-export const initializeRowFromActual = (actual: IActual): Redux.Budget.IActualRow => ({
+export const initializeRowFromActual = (actual: IActual): Table.IActualRow => ({
   id: actual.id,
   meta: {
     isPlaceholder: false,
     selected: false
   },
-  description: { value: actual.description },
-  vendor: { value: actual.vendor },
-  purchase_order: { value: actual.purchase_order },
-  date: { value: actual.date },
-  payment_id: { value: actual.payment_id },
-  value: { value: actual.value },
-  payment_method: { value: actual.payment_method },
-  parent: { value: actual.parent }
+  description: actual.description,
+  vendor: actual.vendor,
+  purchase_order: actual.purchase_order,
+  date: actual.date,
+  payment_id: actual.payment_id,
+  value: actual.value,
+  payment_method: actual.payment_method,
+  parent: actual.parent
 });
 
-export const initializeRowFromSubAccount = (subaccount: ISubAccount): Redux.Budget.ISubAccountRow => ({
+export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.ISubAccountRow => ({
   id: subaccount.id,
   meta: {
     isPlaceholder: false,
     selected: false,
     subaccounts: subaccount.subaccounts
   },
-  name: { value: subaccount.name },
-  line: { value: subaccount.line },
-  unit: { value: subaccount.unit },
-  multiplier: { value: subaccount.multiplier },
-  rate: { value: subaccount.rate },
-  quantity: { value: subaccount.quantity },
-  description: { value: subaccount.description },
-  estimated: { value: subaccount.estimated },
-  variance: { value: subaccount.variance }
+  name: subaccount.name,
+  line: subaccount.line,
+  unit: subaccount.unit,
+  multiplier: subaccount.multiplier,
+  rate: subaccount.rate,
+  quantity: subaccount.quantity,
+  description: subaccount.description,
+  estimated: subaccount.estimated,
+  variance: subaccount.variance
 });
 
-export const createActualRowPlaceholder = (): Redux.Budget.IActualRow => ({
+export const createActualRowPlaceholder = (): Table.IActualRow => ({
   id: generateRandomNumericId(),
   meta: {
     isPlaceholder: true,
     selected: false
   },
-  description: { value: null },
-  vendor: { value: null },
-  purchase_order: { value: null },
-  date: { value: null },
-  payment_id: { value: null },
-  value: { value: null },
-  payment_method: { value: null },
-  parent: { value: null }
+  description: null,
+  vendor: null,
+  purchase_order: null,
+  date: null,
+  payment_id: null,
+  value: null,
+  payment_method: null,
+  parent: null
 });
 
-export const createSubAccountRowPlaceholder = (): Redux.Budget.ISubAccountRow => ({
+export const createSubAccountRowPlaceholder = (): Table.ISubAccountRow => ({
   id: generateRandomNumericId(),
-  name: { value: null },
-  line: { value: null },
-  unit: { value: null },
-  multiplier: { value: null },
-  rate: { value: null },
-  quantity: { value: null },
-  description: { value: null },
-  estimated: { value: null },
-  variance: { value: null },
+  name: null,
+  line: null,
+  unit: null,
+  multiplier: null,
+  rate: null,
+  quantity: null,
+  description: null,
+  estimated: null,
+  variance: null,
   meta: {
     isPlaceholder: true,
     selected: false,
@@ -182,12 +176,12 @@ export const createSubAccountRowPlaceholder = (): Redux.Budget.ISubAccountRow =>
   }
 });
 
-export const createAccountRowPlaceholder = (): Redux.Budget.IAccountRow => ({
+export const createAccountRowPlaceholder = (): Table.IAccountRow => ({
   id: generateRandomNumericId(),
-  account_number: { value: null },
-  description: { value: null },
-  estimated: { value: null },
-  variance: { value: null },
+  account_number: null,
+  description: null,
+  estimated: null,
+  variance: null,
   meta: {
     isPlaceholder: true,
     selected: false,

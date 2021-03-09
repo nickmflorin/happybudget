@@ -50,9 +50,9 @@ const Account = (): JSX.Element => {
   return (
     <RenderIfValidId id={[budgetId, accountId]}>
       <RenderWithSpinner loading={accountStore.subaccounts.table.loading || accountStore.detail.loading}>
-        <GenericBudgetTable<Redux.Budget.SubAccountRowField, Redux.Budget.IBudgetRowMeta, Redux.Budget.ISubAccountRow>
+        <GenericBudgetTable<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow>
           table={accountStore.subaccounts.table.data}
-          isCellEditable={(row: Redux.Budget.ISubAccountRow, colDef: ColDef) => {
+          isCellEditable={(row: Table.ISubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "unit"], colDef.field)) {
               return false;
             } else if (includes(["line", "description", "name"], colDef.field)) {
@@ -71,9 +71,7 @@ const Account = (): JSX.Element => {
           onRowAdd={() => dispatch(addAccountSubAccountsPlaceholdersAction(parseInt(accountId)))}
           onRowSelect={(id: number) => dispatch(selectAccountSubAccountsRowAction(parseInt(accountId), id))}
           onRowDeselect={(id: number) => dispatch(deselectAccountSubAccountsRowAction(parseInt(accountId), id))}
-          onRowDelete={(row: Redux.Budget.ISubAccountRow) =>
-            dispatch(removeAccountSubAccountAction(parseInt(accountId), row))
-          }
+          onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeAccountSubAccountAction(parseInt(accountId), row))}
           onRowUpdate={(id: number, payload: { [key: string]: any }) =>
             dispatch(updateAccountSubAccountAction(parseInt(accountId), parseInt(budgetId), { id, payload }))
           }
@@ -108,7 +106,7 @@ const Account = (): JSX.Element => {
               cellStyle: { textAlign: "right" },
               cellRenderer: "UnitCell",
               cellRendererParams: {
-                onChange: (value: Unit, row: Redux.Budget.ISubAccountRow) =>
+                onChange: (value: Unit, row: Table.ISubAccountRow) =>
                   dispatch(
                     updateAccountSubAccountAction(parseInt(accountId), parseInt(budgetId), {
                       id: row.id,

@@ -19,7 +19,7 @@ import TableHeader from "./TableHeader";
 import { DeleteCell, ExpandCell, SelectCell, ValueCell, CellEditor, NewRowCell, UnitCell } from "./cells";
 import "./index.scss";
 
-interface GenericBudgetTableProps<F, E extends IRowMeta, R extends IRow<F, E>> {
+interface GenericBudgetTableProps<F, E extends Table.IRowMeta, R extends Table.IRow<F, E>> {
   columns: ColDef[];
   table: R[];
   search: string;
@@ -36,7 +36,7 @@ interface GenericBudgetTableProps<F, E extends IRowMeta, R extends IRow<F, E>> {
   isCellEditable: (row: R, col: ColDef) => boolean;
 }
 
-const GenericBudgetTable = <F, E extends IRowMeta, R extends IRow<F, E>>({
+const GenericBudgetTable = <F, E extends Table.IRowMeta, R extends Table.IRow<F, E>>({
   columns,
   table,
   search,
@@ -190,15 +190,15 @@ const GenericBudgetTable = <F, E extends IRowMeta, R extends IRow<F, E>>({
             (def: ColDef) =>
               ({
                 cellRenderer: "ValueCell",
-                ...def,
-                filterParams: {
-                  textFormatter: (value: ICell): string => {
-                    if (!isNil(value)) {
-                      return value.value;
-                    }
-                    return "";
-                  }
-                }
+                ...def
+                // filterParams: {
+                //   textFormatter: (value: ICell): string => {
+                //     if (!isNil(value)) {
+                //       return value.value;
+                //     }
+                //     return "";
+                //   }
+                // }
               } as ColDef)
           ),
           baseRightColumns
@@ -314,15 +314,17 @@ const GenericBudgetTable = <F, E extends IRowMeta, R extends IRow<F, E>>({
           suppressRowClickSelection={true}
           onGridReady={onGridReady}
           domLayout={"autoHeight"}
-          defaultColDef={{
-            cellEditor: "CellEditor",
-            getQuickFilterText: (params: { value: ICell }): string => {
-              if (!isNil(params.value)) {
-                return params.value.value;
-              }
-              return "";
+          defaultColDef={
+            {
+              // cellEditor: "CellEditor",
+              // getQuickFilterText: (params: { value: Table.ICell }): string => {
+              //   if (!isNil(params.value)) {
+              //     return params.value.value;
+              //   }
+              //   return "";
+              // }
             }
-          }}
+          }
           frameworkComponents={{
             DeleteCell: DeleteCell,
             ExpandCell: ExpandCell,
@@ -334,8 +336,8 @@ const GenericBudgetTable = <F, E extends IRowMeta, R extends IRow<F, E>>({
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {
             const field = event.column.getColId();
             if (!isNil(event.newValue)) {
-              if (isNil(event.oldValue) || event.oldValue.value !== event.newValue.value) {
-                onRowUpdate(event.data.id, { [field]: event.newValue.value });
+              if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
+                onRowUpdate(event.data.id, { [field]: event.newValue });
               }
             }
           }}

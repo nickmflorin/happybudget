@@ -27,7 +27,7 @@ export const ActionType = {
     SetSearch: "budget.actualstable.SetSearch",
     Response: "budget.actualstable.Response",
     Request: "budget.actualstable.Request",
-    SetError: "budget.actualstable.SetError"
+    AddErrors: "budget.actualstable.AddErrors"
   },
   Accounts: {
     Deleting: "budget.accounts.Deleting",
@@ -48,7 +48,7 @@ export const ActionType = {
     SetSearch: "budget.accountstable.SetSearch",
     Response: "budget.accountstable.Response",
     Request: "budget.accountstable.Request",
-    SetError: "budget.accountstable.SetError"
+    AddErrors: "budget.accountstable.AddErrors"
   },
   Account: {
     Loading: "budget.account.Loading",
@@ -156,7 +156,7 @@ export const updateAccountAction = simpleBudgetAction<{
   payload: Partial<Http.IAccountPayload>;
 }>(ActionType.Accounts.Update);
 export const updateAccountsCellAction = simpleAction<
-  ICellUpdate<Redux.Budget.AccountRowField> | ICellUpdate<Redux.Budget.AccountRowField>[]
+  Table.ICellUpdate<Table.AccountRowField> | Table.ICellUpdate<Table.AccountRowField>[]
 >(ActionType.AccountsTable.UpdateCell);
 export const activateAccountsPlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
   ActionType.AccountsTable.ActivatePlaceholder
@@ -164,8 +164,8 @@ export const activateAccountsPlaceholderAction = simpleAction<Redux.Budget.IActi
 export const selectAccountsRowAction = simpleAction<number>(ActionType.AccountsTable.SelectRow);
 export const selectAllAccountsRowsAction = simpleAction<null>(ActionType.AccountsTable.SelectAllRows);
 export const deselectAccountsRowAction = simpleAction<number>(ActionType.AccountsTable.DeselectRow);
-export const removeAccountsRowAction = simpleAction<Redux.Budget.IAccountRow>(ActionType.AccountsTable.RemoveRow);
-export const removeAccountAction = simpleAction<Redux.Budget.IAccountRow>(ActionType.Accounts.Remove);
+export const removeAccountsRowAction = simpleAction<Table.IAccountRow>(ActionType.AccountsTable.RemoveRow);
+export const removeAccountAction = simpleAction<Table.IAccountRow>(ActionType.Accounts.Remove);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Accounts.Creating);
@@ -174,8 +174,8 @@ export const loadingAccountsAction = simpleAction<boolean>(ActionType.AccountsTa
 export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.AccountsTable.Response);
 export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsTable.SetSearch);
 export const setAccountsTableCellErrorAction = simpleAction<
-  Redux.Budget.AccountCellError | Redux.Budget.AccountCellError[]
->(ActionType.AccountsTable.SetError);
+  Table.ICellError<Table.AccountRowField> | Table.ICellError<Table.AccountRowField>[]
+>(ActionType.AccountsTable.AddErrors);
 /*
   Actions Pertaining to the Sub Accounts of an Account
 */
@@ -196,15 +196,15 @@ export const selectAllAccountSubAccountsRowsAction = simpleAccountAction<null>(
   ActionType.Account.SubAccountsTable.SelectAllRows
 );
 export const updateAccountSubAccountsCellAction = simpleAccountAction<
-  ICellUpdate<Redux.Budget.SubAccountRowField> | ICellUpdate<Redux.Budget.SubAccountRowField>[]
+  Table.ICellUpdate<Table.SubAccountRowField> | Table.ICellUpdate<Table.SubAccountRowField>[]
 >(ActionType.Account.SubAccountsTable.UpdateCell);
 export const activateAccountSubAccountsPlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
   ActionType.Account.SubAccountsTable.ActivatePlaceholder
 );
-export const removeAccountSubAccountsRowAction = simpleAccountAction<Redux.Budget.ISubAccountRow>(
+export const removeAccountSubAccountsRowAction = simpleAccountAction<Table.ISubAccountRow>(
   ActionType.Account.SubAccountsTable.RemoveRow
 );
-export const removeAccountSubAccountAction = simpleAccountAction<Redux.Budget.ISubAccountRow>(
+export const removeAccountSubAccountAction = simpleAccountAction<Table.ISubAccountRow>(
   ActionType.Account.SubAccounts.Remove
 );
 export const deletingAccountSubAccountAction = simpleAccountAction<Redux.ModelListActionPayload>(
@@ -247,15 +247,15 @@ export const deselectSubAccountSubAccountsRowAction = simpleSubAccountAction<num
   ActionType.SubAccount.SubAccountsTable.DeselectRow
 );
 export const updateSubAccountSubAccountsCellAction = simpleSubAccountAction<
-  ICellUpdate<Redux.Budget.SubAccountRowField> | ICellUpdate<Redux.Budget.SubAccountRowField>[]
+  Table.ICellUpdate<Table.SubAccountRowField> | Table.ICellUpdate<Table.SubAccountRowField>[]
 >(ActionType.SubAccount.SubAccountsTable.UpdateCell);
 export const activateSubAccountSubAccountsPlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
   ActionType.SubAccount.SubAccountsTable.ActivatePlaceholder
 );
-export const removeSubAccountSubAccountsRowAction = simpleSubAccountAction<Redux.Budget.ISubAccountRow>(
+export const removeSubAccountSubAccountsRowAction = simpleSubAccountAction<Table.ISubAccountRow>(
   ActionType.SubAccount.SubAccountsTable.RemoveRow
 );
-export const removeSubAccountSubAccountAction = simpleSubAccountAction<Redux.Budget.ISubAccountRow>(
+export const removeSubAccountSubAccountAction = simpleSubAccountAction<Table.ISubAccountRow>(
   ActionType.SubAccount.SubAccounts.Remove
 );
 export const deletingSubAccountSubAccountAction = simpleSubAccountAction<Redux.ModelListActionPayload>(
@@ -289,7 +289,7 @@ export const updateActualAction = simpleBudgetAction<{
   payload: Partial<Http.IAccountPayload>;
 }>(ActionType.Actuals.Update);
 export const updateActualsCellAction = simpleAction<
-  ICellUpdate<Redux.Budget.ActualRowField> | ICellUpdate<Redux.Budget.ActualRowField>[]
+  Table.ICellUpdate<Table.ActualRowField> | Table.ICellUpdate<Table.ActualRowField>[]
 >(ActionType.ActualsTable.UpdateCell);
 export const activateActualsPlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
   ActionType.ActualsTable.ActivatePlaceholder
@@ -297,8 +297,8 @@ export const activateActualsPlaceholderAction = simpleAction<Redux.Budget.IActiv
 export const selectActualsRowAction = simpleAction<number>(ActionType.ActualsTable.SelectRow);
 export const selectAllActualsRowsAction = simpleAction<null>(ActionType.ActualsTable.SelectAllRows);
 export const deselectActualsRowAction = simpleAction<number>(ActionType.ActualsTable.DeselectRow);
-export const removeActualsRowAction = simpleAction<Redux.Budget.IActualRow>(ActionType.ActualsTable.RemoveRow);
-export const removeActualAction = simpleAction<Redux.Budget.IActualRow>(ActionType.Actuals.Remove);
+export const removeActualsRowAction = simpleAction<Table.IActualRow>(ActionType.ActualsTable.RemoveRow);
+export const removeActualAction = simpleAction<Table.IActualRow>(ActionType.Actuals.Remove);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Actuals.Deleting);
 export const updatingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Actuals.Updating);
 export const creatingActualAction = simpleAction<boolean>(ActionType.Actuals.Creating);
@@ -307,5 +307,5 @@ export const loadingActualsAction = simpleAction<boolean>(ActionType.ActualsTabl
 export const responseActualsAction = simpleAction<Http.IListResponse<IActual>>(ActionType.ActualsTable.Response);
 export const setActualsSearchAction = simpleAction<string>(ActionType.ActualsTable.SetSearch);
 export const setActualsTableCellErrorAction = simpleAction<
-  Redux.Budget.ActualCellError | Redux.Budget.ActualCellError[]
->(ActionType.ActualsTable.SetError);
+  Table.ICellError<Table.ActualRowField> | Table.ICellError<Table.ActualRowField>[]
+>(ActionType.ActualsTable.AddErrors);

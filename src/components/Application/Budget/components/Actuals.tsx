@@ -33,7 +33,7 @@ const Actuals = (): JSX.Element => {
   return (
     <RenderIfValidId id={budgetId}>
       <RenderWithSpinner loading={actuals.table.loading || budget.loading}>
-        <GenericBudgetTable<Redux.Budget.ActualRowField, Redux.Budget.IActualRowMeta, Redux.Budget.IActualRow>
+        <GenericBudgetTable<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow>
           table={actuals.table.data}
           isCellEditable={() => true}
           search={actuals.table.search}
@@ -42,7 +42,7 @@ const Actuals = (): JSX.Element => {
           onRowAdd={() => dispatch(addActualsPlaceholdersAction())}
           onRowSelect={(id: number) => dispatch(selectActualsRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectActualsRowAction(id))}
-          onRowDelete={(row: Redux.Budget.IActualRow) => dispatch(removeActualAction(row))}
+          onRowDelete={(row: Table.IActualRow) => dispatch(removeActualAction(row))}
           onRowUpdate={(id: number, payload: { [key: string]: any }) =>
             dispatch(updateActualAction(parseInt(budgetId), { id, payload }))
           }

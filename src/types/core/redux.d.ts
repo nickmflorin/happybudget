@@ -63,12 +63,19 @@ namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
-  interface ITableStore<R extends IRow, M extends Model> {
+  interface ITableStore<
+    F,
+    E extends IRowMeta,
+    R extends IRow<F, E>,
+    M extends Model,
+    Y extends ICellError<F> = ICellError<F>
+  > {
     readonly data: IListStore<R>;
     readonly loading: boolean;
     readonly rawData: IListStore<M>;
     readonly search: string;
     readonly responseWasReceived: boolean;
+    readonly errors: Y[];
   }
 
   type IIndexedStore<T> = { [key: number]: T };
@@ -133,83 +140,27 @@ namespace Redux {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
-      readonly table: ITableStore<ISubAccountRow, ISubAccount>;
+      readonly table: ITableStore<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow, ISubAccount>;
     }
 
     interface IActualsStore {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
-      readonly table: ITableStore<IActualRow, IActual>;
+      readonly table: ITableStore<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow, IActual>;
     }
 
     interface IAccountsStore {
-      readonly table: ITableStore<IAccountRow, IAccount>;
+      readonly table: ITableStore<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>;
       readonly details: IIndexedStore<IAccountStore>;
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
     }
 
-    type AccountRowField = "account_number" | "description";
-    type AccountCellError = ICellError<AccountRowField>;
-
-    type SubAccountRowField = "line" | "name" | "description" | "quantity" | "unit" | "multiplier" | "rate";
-    type SubAccountCellError = ICellError<SubAccountRowField>;
-
-    type ActualRowField =
-      | "parent"
-      | "description"
-      | "vendor"
-      | "purchase_order"
-      | "date"
-      | "payment_method"
-      | "payment_id"
-      | "value";
-    type ActualCellError = ICellError<ActualRowField>;
-
     interface IActivatePlaceholderPayload {
       oldId: number;
       id: number;
-    }
-
-    interface IBudgetRowMeta extends IRowMeta {
-      readonly isPlaceholder: boolean;
-      readonly subaccounts: ISimpleSubAccount[];
-    }
-
-    interface IActualRowMeta extends IRowMeta {
-      readonly isPlaceholder: boolean;
-    }
-
-    interface IAccountRow extends IRow<AccountRowField, IBudgetRowMeta> {
-      readonly account_number: ICell<string | null>;
-      readonly description: ICell<string | null>;
-      readonly estimated: ICell<number | null>;
-      readonly variance: ICell<number | null>;
-    }
-
-    interface ISubAccountRow extends IRow<SubAccountRowField, IBudgetRowMeta> {
-      readonly line: ICell<string | null>;
-      readonly name: ICell<string | null>;
-      readonly description: ICell<string | null>;
-      readonly quantity: ICell<number | null>;
-      readonly unit: ICell<Unit | null>;
-      readonly multiplier: ICell<number | null>;
-      readonly rate: ICell<number | null>;
-      readonly estimated: ICell<number | null>;
-      readonly variance: ICell<number | null>;
-    }
-
-    interface IActualRow extends IRow<ActualRowField, IActualRowMeta> {
-      readonly parent: ICell<number | null>;
-      readonly description: ICell<string | null>;
-      readonly vendor: ICell<string | null>;
-      readonly purchase_order: ICell<string | null>;
-      readonly date: ICell<string | null>;
-      readonly payment_method: ICell<PaymentMethod | null>;
-      readonly payment_id: ICell<string | null>;
-      readonly value: ICell<string | null>;
     }
 
     interface IStore {

@@ -84,7 +84,7 @@ import {
   actualRowHasRequiredfields
 } from "./util";
 
-export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Redux.Budget.IAccountRow>): SagaIterator {
+export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Table.IAccountRow>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(removeAccountsRowAction(action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
@@ -103,7 +103,7 @@ export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Redux.Bud
   }
 }
 
-export function* handleActualRemovalTask(action: Redux.Budget.IAction<Redux.Budget.IActualRow>): SagaIterator {
+export function* handleActualRemovalTask(action: Redux.Budget.IAction<Table.IActualRow>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(removeActualsRowAction(action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
@@ -122,9 +122,7 @@ export function* handleActualRemovalTask(action: Redux.Budget.IAction<Redux.Budg
   }
 }
 
-export function* handleAccountSubAccountRemovalTask(
-  action: Redux.Budget.IAction<Redux.Budget.ISubAccountRow>
-): SagaIterator {
+export function* handleAccountSubAccountRemovalTask(action: Redux.Budget.IAction<Table.ISubAccountRow>): SagaIterator {
   if (!isNil(action.payload) && !isNil(action.accountId)) {
     yield put(removeAccountSubAccountsRowAction(action.accountId, action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
@@ -144,7 +142,7 @@ export function* handleAccountSubAccountRemovalTask(
 }
 
 export function* handleSubAccountSubAccountRemovalTask(
-  action: Redux.Budget.IAction<Redux.Budget.ISubAccountRow>
+  action: Redux.Budget.IAction<Table.ISubAccountRow>
 ): SagaIterator {
   if (!isNil(action.payload) && !isNil(action.subaccountId)) {
     yield put(removeSubAccountSubAccountsRowAction(action.subaccountId, action.payload));
@@ -169,7 +167,7 @@ export function* handleSubAccountSubAccountRemovalTask(
 }
 
 export function* handleAccountUpdateTask(
-  action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.IAccountRow> }>
+  action: Redux.Budget.IAction<{ id: number; payload: Partial<Table.IAccountRow> }>
 ): SagaIterator {
   if (
     !isNil(action.payload) &&
@@ -179,7 +177,7 @@ export function* handleAccountUpdateTask(
   ) {
     const table = yield select((state: Redux.IApplicationStore) => state.budget.accounts.table.data);
 
-    const existing: Redux.Budget.IAccountRow = find(table, { id: action.payload.id });
+    const existing: Table.IAccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.error(
@@ -220,7 +218,7 @@ export function* handleAccountUpdateTask(
           yield put(updateAccountsCellAction(updates));
         } catch (e) {
           if (e instanceof ClientError) {
-            const cellErrors: Redux.Budget.AccountCellError[] = [];
+            const cellErrors: Table.ICellError<Table.AccountRowField>[] = [];
             forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
               cellErrors.push({
                 id: existing.id,
@@ -228,7 +226,7 @@ export function* handleAccountUpdateTask(
                 error: errors[0].message,
                 // TODO: Should we make sure the field exists as a cell?  Instead of force
                 // coercing here?
-                field: field as Redux.Budget.AccountRowField
+                field: field as Table.AccountRowField
               });
             });
             if (cellErrors.length === 0) {
@@ -248,7 +246,7 @@ export function* handleAccountUpdateTask(
 }
 
 export function* handleActualUpdateTask(
-  action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.IActualRow> }>
+  action: Redux.Budget.IAction<{ id: number; payload: Partial<Table.IActualRow> }>
 ): SagaIterator {
   if (
     !isNil(action.payload) &&
@@ -256,11 +254,9 @@ export function* handleActualUpdateTask(
     !isNil(action.payload.payload) &&
     !isNil(action.budgetId)
   ) {
-    const table: Redux.Budget.IActualRow[] = yield select(
-      (state: Redux.IApplicationStore) => state.budget.actuals.table.data
-    );
+    const table: Table.IActualRow[] = yield select((state: Redux.IApplicationStore) => state.budget.actuals.table.data);
 
-    const existing: Redux.Budget.IActualRow | undefined = find(table, { id: action.payload.id });
+    const existing: Table.IActualRow | undefined = find(table, { id: action.payload.id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.error(
@@ -302,7 +298,7 @@ export function* handleActualUpdateTask(
           yield put(updateActualsCellAction(updates));
         } catch (e) {
           if (e instanceof ClientError) {
-            const cellErrors: Redux.Budget.ActualCellError[] = [];
+            const cellErrors: Table.ICellError<Table.ActualRowField>[] = [];
             forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
               cellErrors.push({
                 id: existing.id,
@@ -310,7 +306,7 @@ export function* handleActualUpdateTask(
                 error: errors[0].message,
                 // TODO: Should we make sure the field exists as a cell?  Instead of force
                 // coercing here?
-                field: field as Redux.Budget.ActualRowField
+                field: field as Table.ActualRowField
               });
             });
             if (cellErrors.length === 0) {
@@ -330,7 +326,7 @@ export function* handleActualUpdateTask(
 }
 
 export function* handleAccountSubAccountUpdateTask(
-  action: Redux.Budget.IAction<{ id: number; payload: { [key in Redux.Budget.SubAccountRowField]: any } }>
+  action: Redux.Budget.IAction<{ id: number; payload: { [key in Table.SubAccountRowField]: any } }>
 ): SagaIterator {
   if (
     !isNil(action.budgetId) &&
@@ -351,7 +347,7 @@ export function* handleAccountSubAccountUpdateTask(
       return subState.subaccounts.table.data;
     });
 
-    const existing: Redux.Budget.ISubAccountRow = find(table, { id });
+    const existing: Table.ISubAccountRow = find(table, { id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.error(
@@ -390,12 +386,12 @@ export function* handleAccountSubAccountUpdateTask(
           // potential API request, so that non-text changes to the tables happen
           // more snappy?  Also note that this block is required for the Unit dropdown
           // to update.
-          const updates: ICellUpdate<Redux.Budget.SubAccountRowField>[] = [];
+          const updates: Table.ICellUpdate<Table.SubAccountRowField>[] = [];
           forEach(Object.keys(payload), (column: string) => {
             updates.push({
-              column: column as Redux.Budget.SubAccountRowField,
+              column: column as Table.SubAccountRowField,
               row: id,
-              value: payload[column as Redux.Budget.SubAccountRowField]
+              value: payload[column as Table.SubAccountRowField]
             });
           });
           yield put(updateAccountSubAccountsCellAction(action.accountId, updates));
@@ -424,7 +420,7 @@ export function* handleAccountSubAccountUpdateTask(
 }
 
 export function* handleSubAccountSubAccountUpdateTask(
-  action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.ISubAccountRow> }>
+  action: Redux.Budget.IAction<{ id: number; payload: Partial<Table.ISubAccountRow> }>
 ): SagaIterator {
   if (
     !isNil(action.subaccountId) &&
@@ -444,7 +440,7 @@ export function* handleSubAccountSubAccountUpdateTask(
       return subState.subaccounts.table.data;
     });
 
-    const existing: Redux.Budget.ISubAccountRow = find(table, { id: action.payload.id });
+    const existing: Table.ISubAccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.error(
@@ -481,12 +477,12 @@ export function* handleSubAccountSubAccountUpdateTask(
           // potential API request, so that non-text changes to the tables happen
           // more snappy?  Also note that this block is required for the Unit dropdown
           // to update.
-          const updates: ICellUpdate<Redux.Budget.SubAccountRowField>[] = [];
+          const updates: Table.ICellUpdate<Table.SubAccountRowField>[] = [];
           forEach(Object.keys(payload), (column: string) => {
             updates.push({
-              column: column as Redux.Budget.SubAccountRowField,
+              column: column as Table.SubAccountRowField,
               row: id,
-              value: payload[column as Redux.Budget.SubAccountRowField]
+              value: payload[column as Table.SubAccountRowField]
             });
           });
           yield put(updateSubAccountSubAccountsCellAction(action.subaccountId, updates));
