@@ -1,5 +1,16 @@
 import { isNil, forEach } from "lodash";
 
+const ACTUAL_PAYLOAD_FIELDS: Redux.Budget.ActualRowField[] = [
+  "description",
+  "parent",
+  "vendor",
+  "purchase_order",
+  "date",
+  "payment_method",
+  "payment_id",
+  "value"
+];
+const ACTUAL_REQUIRED_PAYLOAD_FIELDS: Redux.Budget.ActualRowField[] = ["parent"];
 const SUBACCOUNT_PAYLOAD_FIELDS: Redux.Budget.SubAccountRowField[] = [
   "description",
   "name",
@@ -43,9 +54,22 @@ export const accountPayloadFromRow = (
   return obj;
 };
 
-export const subAccountRowHasRequiredfields = (row: Redux.Budget.ISubAccountRow): boolean => {
+export const actualPayloadFromRow = (
+  row: Redux.Budget.IActualRow
+): Http.IActualPayload | Partial<Http.IActualPayload> => {
+  const obj: { [key: string]: any } = {};
+  forEach(ACTUAL_PAYLOAD_FIELDS, (field: Redux.Budget.ActualRowField) => {
+    const cell = row[field] as ICell | undefined;
+    if (!isNil(cell) && !isNil(cell.value)) {
+      obj[field] = cell.value;
+    }
+  });
+  return obj;
+};
+
+const rowHasRequiredFieldsFn = <F extends string>(fields: F[]) => (row: any): boolean => {
   let requiredFieldsPresent = true;
-  forEach(SUBACCOUNT_REQUIRED_PAYLOAD_FIELDS, (field: Redux.Budget.SubAccountRowField) => {
+  forEach(fields, (field: F) => {
     const cell = row[field] as ICell;
     if (isNil(cell.value) || cell.value === "") {
       requiredFieldsPresent = false;
@@ -55,43 +79,13 @@ export const subAccountRowHasRequiredfields = (row: Redux.Budget.ISubAccountRow)
   return requiredFieldsPresent;
 };
 
-export const accountRowHasRequiredfields = (row: Redux.Budget.IAccountRow): boolean => {
-  let requiredFieldsPresent = true;
-  forEach(ACCOUNT_REQUIRED_PAYLOAD_FIELDS, (field: Redux.Budget.AccountRowField) => {
-    const cell = row[field] as ICell;
-    if (isNil(cell.value) || cell.value === "") {
-      requiredFieldsPresent = false;
-      return false;
-    }
-  });
-  return requiredFieldsPresent;
-};
+export const subAccountRowHasRequiredfields = rowHasRequiredFieldsFn(SUBACCOUNT_REQUIRED_PAYLOAD_FIELDS);
+export const accountRowHasRequiredfields = rowHasRequiredFieldsFn(ACCOUNT_REQUIRED_PAYLOAD_FIELDS);
+export const actualRowHasRequiredfields = rowHasRequiredFieldsFn(ACTUAL_REQUIRED_PAYLOAD_FIELDS);
 
-interface IOverrides {
-  selected?: boolean;
-  isPlaceholder?: boolean;
-}
-
-const getDefaultMetaValue = (
-  field: "selected" | "isPlaceholder",
-  existing: Redux.Budget.ISubAccountRow | Redux.Budget.IAccountRow | undefined,
-  overrides: IOverrides | undefined,
-  def: boolean = false
-): boolean => {
-  if (!isNil(overrides) && !isNil(overrides[field])) {
-    return overrides[field] as boolean;
-  } else if (!isNil(existing) && !isNil(existing.meta[field])) {
-    return existing.meta[field];
-  } else {
-    return def;
-  }
-};
-
-export const convertAccountResponseToCellUpdates = (
-  response: IAccount
-): ICellUpdate<Redux.Budget.AccountRowField>[] => {
-  const updates: ICellUpdate<Redux.Budget.AccountRowField>[] = [];
-  forEach(ACCOUNT_PAYLOAD_FIELDS, (field: Redux.Budget.AccountRowField) => {
+const convertResponseToCellUpdatesFn = <F extends string>(fields: F[]) => (response: any): ICellUpdate<F>[] => {
+  const updates: ICellUpdate<F>[] = [];
+  forEach(fields, (field: F) => {
     updates.push({
       row: response.id,
       column: field,
@@ -101,19 +95,9 @@ export const convertAccountResponseToCellUpdates = (
   return updates;
 };
 
-export const convertSubAccountResponseToCellUpdates = (
-  response: ISubAccount
-): ICellUpdate<Redux.Budget.SubAccountRowField>[] => {
-  const updates: ICellUpdate<Redux.Budget.SubAccountRowField>[] = [];
-  forEach(SUBACCOUNT_PAYLOAD_FIELDS, (field: Redux.Budget.SubAccountRowField) => {
-    updates.push({
-      row: response.id,
-      column: field,
-      value: response[field]
-    });
-  });
-  return updates;
-};
+export const convertAccountResponseToCellUpdates = convertResponseToCellUpdatesFn(ACCOUNT_PAYLOAD_FIELDS);
+export const convertSubAccountResponseToCellUpdates = convertResponseToCellUpdatesFn(SUBACCOUNT_PAYLOAD_FIELDS);
+export const convertActualResponseToCellUpdates = convertResponseToCellUpdatesFn(ACTUAL_PAYLOAD_FIELDS);
 
 export const initializeRowFromAccount = (account: IAccount): Redux.Budget.IAccountRow => ({
   id: account.id,

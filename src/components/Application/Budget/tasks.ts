@@ -1,4 +1,4 @@
-import { isNil, find, concat, forEach, map } from "lodash";
+import { isNil, find, concat, forEach } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import { ClientError } from "api";
@@ -15,7 +15,12 @@ import {
   deleteSubAccount,
   getBudget,
   getAccount,
-  getSubAccount
+  getSubAccount,
+  getBudgetActuals,
+  deleteActual,
+  updateActual,
+  createAccountActual,
+  createSubAccountActual
 } from "services";
 import { handleRequestError } from "store/tasks";
 import {
@@ -30,9 +35,11 @@ import {
   loadingAccountsAction,
   loadingAccountSubAccountsAction,
   loadingSubAccountSubAccountsAction,
+  loadingActualsAction,
   responseAccountsAction,
   responseAccountSubAccountsAction,
   responseSubAccountSubAccountsAction,
+  responseActualsAction,
   deletingAccountAction,
   deletingAccountSubAccountAction,
   deletingSubAccountSubAccountAction,
@@ -43,27 +50,38 @@ import {
   updatingAccountSubAccountAction,
   updatingSubAccountSubAccountAction,
   updateAccountsCellAction,
+  updateActualsCellAction,
   updateAccountSubAccountsCellAction,
   updateSubAccountSubAccountsCellAction,
   activateAccountSubAccountsPlaceholderAction,
   activateAccountsPlaceholderAction,
   activateSubAccountSubAccountsPlaceholderAction,
+  activateActualsPlaceholderAction,
   removeAccountsRowAction,
   removeAccountSubAccountsRowAction,
   removeSubAccountSubAccountsRowAction,
-  setAccountsTableCellError,
+  setAccountsTableCellErrorAction,
+  setActualsTableCellErrorAction,
   addAccountSubAccountsPlaceholdersAction,
   addSubAccountSubAccountsPlaceholdersAction,
-  addAccountsPlaceholdersAction
+  addAccountsPlaceholdersAction,
+  addActualsPlaceholdersAction,
+  removeActualsRowAction,
+  deletingActualAction,
+  creatingActualAction,
+  updatingActualAction
 } from "./actions";
 import { initialAccountState, initialSubAccountState } from "./initialState";
 import {
   subAccountPayloadFromRow,
+  actualPayloadFromRow,
   subAccountRowHasRequiredfields,
   accountPayloadFromRow,
   accountRowHasRequiredfields,
   convertAccountResponseToCellUpdates,
-  convertSubAccountResponseToCellUpdates
+  convertSubAccountResponseToCellUpdates,
+  convertActualResponseToCellUpdates,
+  actualRowHasRequiredfields
 } from "./util";
 
 export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Redux.Budget.IAccountRow>): SagaIterator {
@@ -80,6 +98,25 @@ export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Redux.Bud
         handleRequestError(e, "There was an error deleting the account.");
       } finally {
         yield put(deletingAccountAction({ id: action.payload.id as number, value: false }));
+      }
+    }
+  }
+}
+
+export function* handleActualRemovalTask(action: Redux.Budget.IAction<Redux.Budget.IActualRow>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(removeActualsRowAction(action.payload));
+    // NOTE: We cannot find the existing row from the table in state because the
+    // dispatched action above will remove the row from the table.
+    if (action.payload.meta.isPlaceholder === false) {
+      yield put(deletingActualAction({ id: action.payload.id as number, value: true }));
+      try {
+        yield call(deleteActual, action.payload.id as number);
+      } catch (e) {
+        // TODO: Should we put the row back in if there was an error?
+        handleRequestError(e, "There was an error deleting the actual.");
+      } finally {
+        yield put(deletingActualAction({ id: action.payload.id as number, value: false }));
       }
     }
   }
@@ -197,13 +234,95 @@ export function* handleAccountUpdateTask(
             if (cellErrors.length === 0) {
               handleRequestError(e, "There was an error updating the account.");
             } else {
-              yield put(setAccountsTableCellError(cellErrors));
+              yield put(setAccountsTableCellErrorAction(cellErrors));
             }
           } else {
             handleRequestError(e, "There was an error updating the account.");
           }
         } finally {
           yield put(updatingAccountAction({ id: existing.id as number, value: false }));
+        }
+      }
+    }
+  }
+}
+
+export function* handleActualUpdateTask(
+  action: Redux.Budget.IAction<{ id: number; payload: Partial<Redux.Budget.IActualRow> }>
+): SagaIterator {
+  if (
+    !isNil(action.payload) &&
+    !isNil(action.payload.id) &&
+    !isNil(action.payload.payload) &&
+    !isNil(action.budgetId)
+  ) {
+    const table: Redux.Budget.IActualRow[] = yield select(
+      (state: Redux.IApplicationStore) => state.budget.actuals.table.data
+    );
+
+    const existing: Redux.Budget.IActualRow | undefined = find(table, { id: action.payload.id });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State!:  Inconsistent state noticed when updating actual in state...
+        the actual with ID ${action.payload.id} does not exist in state when it is expected to.`
+      );
+    } else {
+      if (existing.meta.isPlaceholder === true) {
+        // The reducer will have already updated the existing value of the row
+        // synchronously.
+        const payload = actualPayloadFromRow(existing);
+        // Wait until all of the required fields are present before we create
+        // the SubAccount in the backend and remove the placeholder designation
+        // of the row in the frontend.
+        if (actualRowHasRequiredfields(existing)) {
+          yield put(creatingActualAction(true));
+          console.log(payload);
+          // try {
+          //   const response: IActual = yield call(createActual, action.budgetId, payload as Http.IAccountPayload);
+          //   yield put(activateActualsPlaceholderAction({ oldId: existing.id, id: response.id }));
+          //   const updates = convertActualResponseToCellUpdates(response);
+          //   yield put(updateActualsCellAction(updates));
+          // } catch (e) {
+          //   // TODO: Should we revert the changes if there was an error?
+          //   handleRequestError(e, "There was an error updating the actual.");
+          // } finally {
+          //   yield put(creatingActualAction(false));
+          // }
+        }
+      } else {
+        yield put(updatingActualAction({ id: existing.id as number, value: true }));
+        try {
+          const response: IActual = yield call(
+            updateActual,
+            existing.id as number,
+            action.payload.payload as Partial<Http.IActualPayload>
+          );
+          const updates = convertActualResponseToCellUpdates(response);
+          yield put(updateActualsCellAction(updates));
+        } catch (e) {
+          if (e instanceof ClientError) {
+            const cellErrors: Redux.Budget.ActualCellError[] = [];
+            forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
+              cellErrors.push({
+                id: existing.id,
+                // TODO: We might want to build in a way to capture multiple errors for the cell.
+                error: errors[0].message,
+                // TODO: Should we make sure the field exists as a cell?  Instead of force
+                // coercing here?
+                field: field as Redux.Budget.ActualRowField
+              });
+            });
+            if (cellErrors.length === 0) {
+              handleRequestError(e, "There was an error updating the actual.");
+            } else {
+              yield put(setActualsTableCellErrorAction(cellErrors));
+            }
+          } else {
+            handleRequestError(e, "There was an error updating the actual.");
+          }
+        } finally {
+          yield put(updatingActualAction({ id: existing.id as number, value: false }));
         }
       }
     }
@@ -411,6 +530,24 @@ export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterat
       yield put(responseAccountsAction({ count: 0, data: [] }, { error: e }));
     } finally {
       yield put(loadingAccountsAction(false));
+    }
+  }
+}
+
+export function* getActualsTask(action: Redux.Budget.IAction<null>): SagaIterator {
+  if (!isNil(action.budgetId)) {
+    yield put(loadingActualsAction(true));
+    try {
+      const response = yield call(getBudgetActuals, action.budgetId, { no_pagination: true });
+      yield put(responseActualsAction(response));
+      if (response.data.length === 0) {
+        yield put(addActualsPlaceholdersAction(2));
+      }
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the budget's actuals.");
+      yield put(responseActualsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingActualsAction(false));
     }
   }
 }

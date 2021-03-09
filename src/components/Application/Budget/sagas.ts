@@ -7,6 +7,7 @@ import {
   getAccountTask,
   getSubAccountTask,
   getAccountsTask,
+  getActualsTask,
   getAccountSubAccountsTask,
   getSubAccountSubAccountsTask,
   handleAccountUpdateTask,
@@ -14,7 +15,9 @@ import {
   handleAccountSubAccountRemovalTask,
   handleAccountRemovalTask,
   handleSubAccountSubAccountUpdateTask,
-  handleSubAccountSubAccountRemovalTask
+  handleSubAccountSubAccountRemovalTask,
+  handleActualRemovalTask,
+  handleActualUpdateTask
 } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
@@ -26,6 +29,19 @@ function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
         yield cancel(lastTasks);
       }
       lastTasks = yield call(getAccountsTask, action);
+    }
+  }
+}
+
+function* watchForTriggerBudgetActualsSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.ActualsTable.Request);
+    if (!isNil(action.budgetId)) {
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(getActualsTask, action);
     }
   }
 }
@@ -60,8 +76,12 @@ function* watchForRemoveAccountSaga(): SagaIterator {
   yield takeEvery(ActionType.Accounts.Remove, handleAccountRemovalTask);
 }
 
-function* watchForSubAccountSubAccountRemoveRowSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccount.SubAccountsTable.RemoveRow, handleSubAccountSubAccountRemovalTask);
+function* watchForRemoveActualSaga(): SagaIterator {
+  yield takeEvery(ActionType.Actuals.Remove, handleActualRemovalTask);
+}
+
+function* watchForRemoveSubAccountSubAccountSaga(): SagaIterator {
+  yield takeEvery(ActionType.SubAccount.SubAccounts.Remove, handleSubAccountSubAccountRemovalTask);
 }
 
 function* watchForRemoveAccountSubAccountSaga(): SagaIterator {
@@ -70,6 +90,10 @@ function* watchForRemoveAccountSubAccountSaga(): SagaIterator {
 
 function* watchForAccountUpdateSaga(): SagaIterator {
   yield takeEvery(ActionType.Accounts.Update, handleAccountUpdateTask);
+}
+
+function* watchForActualUpdateSaga(): SagaIterator {
+  yield takeEvery(ActionType.Actuals.Update, handleActualUpdateTask);
 }
 
 function* watchForUpdateAccountSubAccountSaga(): SagaIterator {
@@ -86,6 +110,12 @@ function* accountsSaga(): SagaIterator {
   yield spawn(watchForAccountUpdateSaga);
 }
 
+function* actualsSaga(): SagaIterator {
+  yield spawn(watchForTriggerBudgetActualsSaga);
+  yield spawn(watchForRemoveActualSaga);
+  yield spawn(watchForActualUpdateSaga);
+}
+
 function* accountSubAccountsSaga(): SagaIterator {
   yield spawn(watchForTriggerAccountSubAccountsSaga);
   yield spawn(watchForUpdateSubAccountSubAccountwSaga);
@@ -95,7 +125,7 @@ function* accountSubAccountsSaga(): SagaIterator {
 function* subAccountSubAccountsSaga(): SagaIterator {
   yield spawn(watchForTriggerSubAccountSubAccountsSaga);
   yield spawn(watchForUpdateAccountSubAccountSaga);
-  yield spawn(watchForSubAccountSubAccountRemoveRowSaga);
+  yield spawn(watchForRemoveSubAccountSubAccountSaga);
 }
 
 function* watchForRequestBudgetSaga(): SagaIterator {
@@ -146,6 +176,7 @@ function* detailsSaga(): SagaIterator {
 export default function* rootSaga(): SagaIterator {
   yield spawn(detailsSaga);
   yield spawn(accountsSaga);
+  yield spawn(actualsSaga);
   yield spawn(accountSubAccountsSaga);
   yield spawn(subAccountSubAccountsSaga);
 }

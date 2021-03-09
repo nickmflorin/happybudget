@@ -52,8 +52,9 @@ export const permanentlyDeleteBudget = async (id: number, options: Http.IRequest
 
 export const getBudgetActuals = async (
   id: number,
+  query: Http.IListQuery = {},
   options: Http.IRequestOptions = {}
 ): Promise<Http.IListResponse<IActual>> => {
   const url = URL.v1("budgets", id, "actuals");
-  return client.list<IActual>(url, options);
+  return client.list<IActual>(url, query, options);
 };

@@ -173,9 +173,9 @@ export const requestAccountsAction = simpleBudgetAction<null>(ActionType.Account
 export const loadingAccountsAction = simpleAction<boolean>(ActionType.AccountsTable.Loading);
 export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.AccountsTable.Response);
 export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsTable.SetSearch);
-export const setAccountsTableCellError = simpleAction<Redux.Budget.AccountCellError | Redux.Budget.AccountCellError[]>(
-  ActionType.AccountsTable.SetError
-);
+export const setAccountsTableCellErrorAction = simpleAction<
+  Redux.Budget.AccountCellError | Redux.Budget.AccountCellError[]
+>(ActionType.AccountsTable.SetError);
 /*
   Actions Pertaining to the Sub Accounts of an Account
 */
@@ -289,7 +289,7 @@ export const updateActualAction = simpleBudgetAction<{
   payload: Partial<Http.IAccountPayload>;
 }>(ActionType.Actuals.Update);
 export const updateActualsCellAction = simpleAction<
-  ICellUpdate<Redux.Budget.AccountRowField> | ICellUpdate<Redux.Budget.AccountRowField>[]
+  ICellUpdate<Redux.Budget.ActualRowField> | ICellUpdate<Redux.Budget.ActualRowField>[]
 >(ActionType.ActualsTable.UpdateCell);
 export const activateActualsPlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
   ActionType.ActualsTable.ActivatePlaceholder
@@ -306,6 +306,6 @@ export const requestActualsAction = simpleBudgetAction<null>(ActionType.ActualsT
 export const loadingActualsAction = simpleAction<boolean>(ActionType.ActualsTable.Loading);
 export const responseActualsAction = simpleAction<Http.IListResponse<IActual>>(ActionType.ActualsTable.Response);
 export const setActualsSearchAction = simpleAction<string>(ActionType.ActualsTable.SetSearch);
-export const setActualsTableCellError = simpleAction<Redux.Budget.AccountCellError | Redux.Budget.AccountCellError[]>(
-  ActionType.ActualsTable.SetError
-);
+export const setActualsTableCellErrorAction = simpleAction<
+  Redux.Budget.ActualCellError | Redux.Budget.ActualCellError[]
+>(ActionType.ActualsTable.SetError);
