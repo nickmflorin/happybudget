@@ -14,7 +14,9 @@ import {
   GridOptions,
   ColumnApi,
   Column,
-  CellKeyDownEvent
+  CellKeyDownEvent,
+  CellPosition,
+  NavigateToNextCellParams
 } from "ag-grid-community";
 
 import TableHeader from "./TableHeader";
@@ -339,6 +341,15 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R ext
           suppressRowClickSelection={true}
           onGridReady={onGridReady}
           domLayout={"autoHeight"}
+          navigateToNextCell={(params: NavigateToNextCellParams): CellPosition => {
+            if (!isNil(params.nextCellPosition)) {
+              if (includes(["estimated", "expand"], params.nextCellPosition.column.getColId())) {
+                return params.previousCellPosition;
+              }
+              return params.nextCellPosition;
+            }
+            return params.previousCellPosition;
+          }}
           onCellKeyDown={(event: CellKeyDownEvent) => {
             const count = event.api.getDisplayedRowCount();
             if (!isNil(event.rowIndex) && count === event.rowIndex + 1 && !isNil(event.event)) {
