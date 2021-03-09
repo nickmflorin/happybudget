@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import classNames from "classnames";
 import { map, isNil, includes, find, concat, uniq, forEach, filter } from "lodash";
 
@@ -13,7 +13,8 @@ import {
   EditableCallbackParams,
   GridOptions,
   ColumnApi,
-  Column
+  Column,
+  CellKeyDownEvent
 } from "ag-grid-community";
 
 import TableHeader from "./TableHeader";
@@ -326,7 +327,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R ext
         onSelect={onSelectAll}
         deleteDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
       />
-      <div className={"primary-grid"}>
+      <div className={"primary-grid"} id={"grid"}>
         <AgGridReact
           gridOptions={gridOptions}
           columnDefs={colDefs}
@@ -338,6 +339,24 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R ext
           suppressRowClickSelection={true}
           onGridReady={onGridReady}
           domLayout={"autoHeight"}
+          onCellKeyDown={(event: CellKeyDownEvent) => {
+            const count = event.api.getDisplayedRowCount();
+            if (!isNil(event.rowIndex) && count === event.rowIndex + 1 && !isNil(event.event)) {
+              // I do not understand why AGGrid's Event has an underlying Event that is in
+              // reality a KeyboardEvent but does not have any of the properties that a KeyboardEvent
+              // should have - meaning we have to tell TS to ignore this line.
+              /* @ts-ignore */
+              if (event.event.keyCode === 13) {
+                onRowAdd();
+                const firstEditCol = event.columnApi.getColumn(event.column.getColId());
+                if (!isNil(firstEditCol)) {
+                  event.api.ensureColumnVisible(firstEditCol);
+                  event.api.setFocusedCell(event.rowIndex + 1, firstEditCol);
+                }
+              }
+            }
+          }}
+          enterMovesDown={true}
           frameworkComponents={{
             DeleteCell: DeleteCell,
             ExpandCell: ExpandCell,
