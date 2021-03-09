@@ -108,9 +108,9 @@ const GenericBudgetTable = <F, E extends IRowMeta, R extends IRow<F, E>>({
     // manually.
     if (!isNil(gridApi)) {
       gridApi.forEachNode((node: RowNode) => {
-        const existing: R | undefined = find(table, { id: node.data.meta.id });
+        const existing: R | undefined = find(table, { id: node.data.id });
         if (!isNil(existing)) {
-          if (existing.meta.selected !== node.data.selected) {
+          if (existing.meta.selected !== node.data.meta.selected) {
             gridApi.refreshCells({ force: true, rowNodes: [node] });
           }
         }

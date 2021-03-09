@@ -217,7 +217,7 @@ export const createTableDataReducer = <
           );
           return newState;
         } else {
-          return replaceInArray<R>(newState, { id }, { ...row, selected: true });
+          return replaceInArray<R>(newState, { id }, { ...row, meta: { ...row.meta, selected: true } });
         }
       },
       DeselectRow: (id: any) => {
@@ -237,15 +237,15 @@ export const createTableDataReducer = <
           );
           return newState;
         } else {
-          return replaceInArray<R>(newState, { id: id }, { ...row, selected: false });
+          return replaceInArray<R>(newState, { id }, { ...row, meta: { ...row.meta, selected: false } });
         }
       },
       SelectAllRows: () => {
         const selected = filter(newState, (row: R) => row.meta.selected === true);
         if (selected.length === newState.length) {
-          return map(newState, (row: R) => ({ ...row, selected: false }));
+          return map(newState, (row: R) => ({ ...row, meta: { ...row.meta, selected: false } }));
         } else {
-          return map(newState, (row: R) => ({ ...row, selected: true }));
+          return map(newState, (row: R) => ({ ...row, meta: { ...row.meta, selected: true } }));
         }
       },
       SetError: (payload: Y | Y[]) => {
