@@ -79,9 +79,13 @@ import {
   requestAccountAction,
   requestSubAccountAction
 } from "./actions";
-import { FieldDefinitions, IFieldDefinition } from "./config";
-import { initialAccountState, initialSubAccountState } from "./initialState";
-import { payloadFromResponse, payloadFromRow, rowHasRequiredFields, requestWarrantsParentRefresh } from "./util";
+import {
+  payloadFromResponse,
+  postPayloadFromRow,
+  rowHasRequiredFields,
+  requestWarrantsParentRefresh,
+  payloadBeforeResponse
+} from "./util";
 
 function* handleTableErrors(
   e: Error,
@@ -213,13 +217,28 @@ export function* handleAccountUpdateTask(
         the account with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
+      // There are some cases where we need to update the row in the table before
+      // we make the request, to improve the UI.  This happens for cells where the
+      // value is rendered via an HTML element (i.e. the Unit Cell).  AGGridReact will
+      // not automatically update the cell when the Unit is changed via the dropdown,
+      // so we need to udpate the row in the data used to populate the table.  We could
+      // do this by updating with a payload generated from the response, but it is quicker
+      // to do it before hand.
+      const preResponsePayload = payloadBeforeResponse<Table.IAccountRow>(action.payload.data, "subaccount");
+      if (Object.keys(preResponsePayload).length !== 0) {
+        yield put(
+          updateAccountsTableRowAction({
+            id: existing.id,
+            data: preResponsePayload
+          })
+        );
+      }
       if (existing.meta.isPlaceholder === true) {
-        // The reducer will have already updated the existing value of the row
-        // synchronously.
-        const payload = payloadFromRow<Table.IAccountRow, Http.IAccountPayload>(existing, "account");
-        // Wait until all of the required fields are present before we create
-        // the SubAccount in the backend and remove the placeholder designation
-        // of the row in the frontend.
+        const payload = postPayloadFromRow<Table.IAccountRow, Http.IAccountPayload>(existing, "account");
+        // Wait until all of the required fields are present before we create the entity in the
+        // backend.  Once the entity is created in the backend, we can remove the placeholder
+        // designation of the row so it will be updated instead of created the next time the row
+        // is changed.
         if (rowHasRequiredFields<Table.IAccountRow>(existing, "account")) {
           yield put(creatingAccountAction(true));
           try {
@@ -281,12 +300,11 @@ export function* handleActualUpdateTask(
       );
     } else {
       if (existing.meta.isPlaceholder === true) {
-        // The reducer will have already updated the existing value of the row
-        // synchronously.
-        const payload = payloadFromRow<Table.IActualRow, Http.IActualPayload>(existing, "actual");
-        // Wait until all of the required fields are present before we create
-        // the SubAccount in the backend and remove the placeholder designation
-        // of the row in the frontend.
+        const payload = postPayloadFromRow<Table.IActualRow, Http.IActualPayload>(existing, "actual");
+        // Wait until all of the required fields are present before we create the entity in the
+        // backend.  Once the entity is created in the backend, we can remove the placeholder
+        // designation of the row so it will be updated instead of created the next time the row
+        // is changed.
         if (rowHasRequiredFields<Table.IActualRow>(existing, "actual")) {
           yield put(creatingActualAction(true));
           // try {
@@ -350,11 +368,31 @@ export function* handleAccountSubAccountUpdateTask(
         the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
+      // There are some cases where we need to update the row in the table before
+      // we make the request, to improve the UI.  This happens for cells where the
+      // value is rendered via an HTML element (i.e. the Unit Cell).  AGGridReact will
+      // not automatically update the cell when the Unit is changed via the dropdown,
+      // so we need to udpate the row in the data used to populate the table.  We could
+      // do this by updating with a payload generated from the response, but it is quicker
+      // to do it before hand.
+      const preResponsePayload = payloadBeforeResponse<Table.ISubAccountRow>(action.payload.data, "subaccount");
+      if (Object.keys(preResponsePayload).length !== 0) {
+        yield put(
+          updateAccountSubAccountsTableRowAction({
+            id: existing.id,
+            data: preResponsePayload
+          })
+        );
+      }
       if (existing.meta.isPlaceholder === true) {
-        // The reducer will have already updated the existing value of the row synchronously.
-        const requestPayload = payloadFromRow<Table.ISubAccountRow, Http.ISubAccountPayload>(existing, "subaccount");
-        // Wait until all of the required fields are present before we create the SubAccount in the
-        // backend and remove the placeholder designation of the row in the frontend.
+        const requestPayload = postPayloadFromRow<Table.ISubAccountRow, Http.ISubAccountPayload>(
+          existing,
+          "subaccount"
+        );
+        // Wait until all of the required fields are present before we create the entity in the
+        // backend.  Once the entity is created in the backend, we can remove the placeholder
+        // designation of the row so it will be updated instead of created the next time the row
+        // is changed.
         if (rowHasRequiredFields<Table.ISubAccountRow>(existing, "subaccount")) {
           yield put(creatingAccountSubAccountAction(true));
           try {
@@ -383,8 +421,6 @@ export function* handleAccountSubAccountUpdateTask(
         yield put(updatingAccountSubAccountAction({ id: existing.id as number, value: true }));
         const requestPayload = action.payload.data as Partial<Http.ISubAccountPayload>;
         try {
-          // The reducer has already handled updating the sub account in the state
-          // synchronously before the time that this API request is made.
           const response: ISubAccount = yield call(updateSubAccount, existing.id as number, requestPayload);
           const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
           yield put(updateAccountSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));
@@ -425,12 +461,31 @@ export function* handleSubAccountSubAccountUpdateTask(
         the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
+      // There are some cases where we need to update the row in the table before
+      // we make the request, to improve the UI.  This happens for cells where the
+      // value is rendered via an HTML element (i.e. the Unit Cell).  AGGridReact will
+      // not automatically update the cell when the Unit is changed via the dropdown,
+      // so we need to udpate the row in the data used to populate the table.  We could
+      // do this by updating with a payload generated from the response, but it is quicker
+      // to do it before hand.
+      const preResponsePayload = payloadBeforeResponse<Table.ISubAccountRow>(action.payload.data, "subaccount");
+      if (Object.keys(preResponsePayload).length !== 0) {
+        yield put(
+          updateSubAccountSubAccountsTableRowAction({
+            id: existing.id,
+            data: preResponsePayload
+          })
+        );
+      }
       if (existing.meta.isPlaceholder === true) {
-        // The reducer will have already updated the existing value of the row synchronously.
-        const requestPayload = payloadFromRow<Table.ISubAccountRow, Http.ISubAccountPayload>(existing, "subaccount");
-        // Wait until all of the required fields are present before we create
-        // the SubAccount in the backend and remove the placeholder designation
-        // of the row in the frontend.
+        const requestPayload = postPayloadFromRow<Table.ISubAccountRow, Http.ISubAccountPayload>(
+          existing,
+          "subaccount"
+        );
+        // Wait until all of the required fields are present before we create the entity in the
+        // backend.  Once the entity is created in the backend, we can remove the placeholder
+        // designation of the row so it will be updated instead of created the next time the row
+        // is changed.
         if (rowHasRequiredFields<Table.ISubAccountRow>(existing, "subaccount")) {
           yield put(creatingSubAccountSubAccountAction(true));
           try {
@@ -458,9 +513,7 @@ export function* handleSubAccountSubAccountUpdateTask(
         yield put(updatingSubAccountSubAccountAction({ id: existing.id as number, value: true }));
         const requestPayload = action.payload.data as Partial<Http.ISubAccountPayload>;
         try {
-          // The reducer has already handled updating the sub account in the state
-          // synchronously before the time that this API request is made.
-          const response: ISubAccount = yield call(updateSubAccount, existing.id as number, requestPayload);
+          const response: ISubAccount = yield call(updateSubAccount, existing.id, requestPayload);
           const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
           yield put(
             updateSubAccountSubAccountsTableRowAction({

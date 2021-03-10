@@ -11,39 +11,40 @@ const Config: Redux.IModuleConfig<Redux.Budget.IStore, Redux.IAction<any>> = {
 
 export interface IFieldDefinition {
   name: string;
-  payload?: boolean;
-  required?: boolean;
-  response?: boolean;
+  postPayload?: boolean;
+  requiredForPost?: boolean;
+  responsePayload?: boolean;
   triggerParentRefresh?: boolean;
+  updateBeforeResponse?: boolean;
 }
 
 export const FieldDefinitions: { [key in Table.RowType]: IFieldDefinition[] } = {
   actual: [
-    { name: "description", payload: true },
-    { name: "parent", payload: false, required: true },
-    { name: "vendor", payload: true },
-    { name: "purchase_order", payload: true },
-    { name: "date", payload: true },
-    { name: "payment_method", payload: true },
-    { name: "payment_id", payload: true },
-    { name: "value", payload: true }
+    { name: "description", postPayload: true },
+    { name: "parent", postPayload: false, requiredForPost: true },
+    { name: "vendor", postPayload: true },
+    { name: "purchase_order", postPayload: true },
+    { name: "date", postPayload: true },
+    { name: "payment_method", postPayload: true },
+    { name: "payment_id", postPayload: true },
+    { name: "value", postPayload: true }
   ],
   subaccount: [
-    { name: "description", payload: true },
-    { name: "name", payload: true, required: true },
-    { name: "quantity", payload: true, triggerParentRefresh: true },
-    { name: "rate", payload: true, triggerParentRefresh: true },
-    { name: "multiplier", payload: true, triggerParentRefresh: true },
-    { name: "unit", payload: true },
-    { name: "line", payload: true, required: true },
-    { name: "estimated", response: true }
+    { name: "description", postPayload: true },
+    { name: "name", postPayload: true, requiredForPost: true },
+    { name: "quantity", postPayload: true, triggerParentRefresh: true },
+    { name: "rate", postPayload: true, triggerParentRefresh: true },
+    { name: "multiplier", postPayload: true, triggerParentRefresh: true },
+    { name: "unit", postPayload: true, updateBeforeResponse: true },
+    { name: "line", postPayload: true, requiredForPost: true },
+    { name: "estimated", responsePayload: true }
   ],
   account: [
-    { name: "description", payload: true },
-    { name: "account_number", payload: true, required: true },
-    { name: "estimated", response: true },
-    { name: "variance", response: true },
-    { name: "actual", response: true }
+    { name: "description", postPayload: true },
+    { name: "account_number", postPayload: true, requiredForPost: true },
+    { name: "estimated", responsePayload: true },
+    { name: "variance", responsePayload: true },
+    { name: "actual", responsePayload: true }
   ]
 };
 

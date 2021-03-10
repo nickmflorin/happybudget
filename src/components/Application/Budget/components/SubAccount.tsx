@@ -55,6 +55,7 @@ const SubAccount = (): JSX.Element => {
             subAccountStore.subaccounts.updating.length !== 0 ||
             subAccountStore.subaccounts.creating
           }
+          rowRefreshRequired={(existing: Table.ISubAccountRow, row: Table.ISubAccountRow) => existing.unit !== row.unit}
           onRowAdd={() => dispatch(addSubAccountSubAccountsTablePlaceholdersAction())}
           onRowSelect={(id: number) => dispatch(selectSubAccountSubAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectSubAccountSubAccountsTableRowAction(id))}
@@ -95,7 +96,8 @@ const SubAccount = (): JSX.Element => {
               cellStyle: { textAlign: "right" },
               cellRenderer: "UnitCell",
               cellRendererParams: {
-                onChange: (value: Unit, row: Table.ISubAccountRow) => console.log({ value, id: row.id })
+                onChange: (unit: Unit, row: Table.ISubAccountRow) =>
+                  dispatch(updateSubAccountSubAccountAction({ id: row.id, data: { unit } }))
               }
             },
             {

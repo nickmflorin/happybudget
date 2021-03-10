@@ -5,10 +5,10 @@ export const generateRandomNumericId = (): number => {
   return parseInt(Math.random().toString().slice(2, 11));
 };
 
-export const payloadFromRow = <R, P>(row: R, type: Table.RowType): P => {
+export const postPayloadFromRow = <R, P>(row: R, type: Table.RowType): P => {
   const obj: { [key: string]: any } = {};
   forEach(FieldDefinitions[type], (def: IFieldDefinition) => {
-    if (def.payload === true && !isNil(row[def.name as keyof R])) {
+    if (def.postPayload === true && !isNil(row[def.name as keyof R])) {
       obj[def.name] = row[def.name as keyof R];
     }
   });
@@ -18,8 +18,18 @@ export const payloadFromRow = <R, P>(row: R, type: Table.RowType): P => {
 export const payloadFromResponse = <M>(model: M, type: Table.RowType): { [key: string]: any } => {
   const obj: { [key: string]: any } = {};
   forEach(FieldDefinitions[type], (def: IFieldDefinition) => {
-    if (def.response === true) {
+    if (def.responsePayload === true && def.updateBeforeResponse !== true) {
       obj[def.name] = model[def.name as keyof M];
+    }
+  });
+  return obj;
+};
+
+export const payloadBeforeResponse = <R>(data: Partial<R>, type: Table.RowType): { [key: string]: any } => {
+  const obj: { [key: string]: any } = {};
+  forEach(FieldDefinitions[type], (def: IFieldDefinition) => {
+    if (def.updateBeforeResponse === true && !isNil(data[def.name as keyof R])) {
+      obj[def.name] = data[def.name as keyof R];
     }
   });
   return obj;
@@ -45,7 +55,7 @@ export const rowHasRequiredFields = <R extends { [key: string]: any }>(row: R, t
   let requiredFieldsPresent = true;
   const fieldDefs = FieldDefinitions[type] as IFieldDefinition[];
   forEach(fieldDefs, (def: IFieldDefinition) => {
-    if (def.required === true) {
+    if (def.requiredForPost === true) {
       const val = row[def.name];
       if (isNil(val) || val === "") {
         requiredFieldsPresent = false;

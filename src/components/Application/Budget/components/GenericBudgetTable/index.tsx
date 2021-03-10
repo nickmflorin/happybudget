@@ -30,6 +30,7 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R 
   saving: boolean;
   estimated: number;
   highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
+  rowRefreshRequired?: (existing: R, row: R) => boolean;
   onSearch: (value: string) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
@@ -56,7 +57,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   onRowDelete,
   onRowExpand,
   isCellEditable,
-  highlightNonEditableCell
+  highlightNonEditableCell,
+  rowRefreshRequired
 }: GenericBudgetTableProps<F, E, R>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -108,15 +110,17 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   }, [search, gridApi]);
 
   useEffect(() => {
-    // Changes to the selected rows does not trigger a refresh of those cells
-    // via AGGridReact because AGGridReact cannot detect changes to an HTML checkbox
-    // as a change to the value of a cell.  Therefore, we must trigger the refresh
-    // manually.
+    // Changes to the selected rows and other possible HTML based cells do not trigger
+    // refreshes via AGGrid because AGGrid cannot detect changes to these HTML
+    // based cells.  Therefore, we must trigger the refresh manually.
     if (!isNil(gridApi)) {
       gridApi.forEachNode((node: RowNode) => {
         const existing: R | undefined = find(table, { id: node.data.id });
         if (!isNil(existing)) {
-          if (existing.meta.selected !== node.data.meta.selected) {
+          if (
+            existing.meta.selected !== node.data.meta.selected ||
+            (!isNil(rowRefreshRequired) && rowRefreshRequired(existing, node.data))
+          ) {
             gridApi.refreshCells({ force: true, rowNodes: [node] });
           }
         }
