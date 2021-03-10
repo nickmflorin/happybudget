@@ -3,7 +3,6 @@ import { isNil, find, filter, forEach, includes, map } from "lodash";
 import { replaceInArray } from "util/arrays";
 import { mergeWithDefaults } from "util/objects";
 import { initialListResponseState, initialDetailResponseState, initialTableState } from "../initialState";
-
 import {
   IReducerFactoryOptions,
   IDetailResponseActionMap,
@@ -16,7 +15,6 @@ import {
   ITableDataActionMap,
   ITableReducerOptions
 } from "./model";
-import { TableLocale } from "antd/lib/table/interface";
 
 export const createSimplePayloadReducer = <P, A extends Redux.IAction<P>>(
   actionType: string,
@@ -143,7 +141,7 @@ export const createTableDataReducer = <
         }
         return [...newState, ...placeholders];
       },
-      ActivatePlaceholder: (payload: Redux.Budget.IActivatePlaceholderPayload) => {
+      ActivatePlaceholder: (payload: Table.IActivatePlaceholderPayload) => {
         const row: R | undefined = find(newState, { id: payload.oldId } as any);
         if (isNil(row)) {
           /* eslint-disable no-console */

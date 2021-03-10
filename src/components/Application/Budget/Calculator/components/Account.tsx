@@ -6,36 +6,37 @@ import { isNil, includes } from "lodash";
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
-import {
-  setSubAccountIdAction,
-  setSubAccountSubAccountsSearchAction,
-  selectSubAccountSubAccountsTableRowAction,
-  addSubAccountSubAccountsTablePlaceholdersAction,
-  deselectSubAccountSubAccountsTableRowAction,
-  removeSubAccountSubAccountAction,
-  updateSubAccountSubAccountAction,
-  selectAllSubAccountSubAccountsTableRowsAction
-} from "../actions";
-import GenericBudgetTable from "./GenericBudgetTable";
+import { GenericBudgetTable } from "components/tables";
 
-const SubAccount = (): JSX.Element => {
-  const { budgetId, subaccountId } = useParams<{ budgetId: string; subaccountId: string }>();
+import {
+  setAccountIdAction,
+  addAccountSubAccountsTablePlaceholdersAction,
+  deselectAccountSubAccountsTableRowAction,
+  removeAccountSubAccountAction,
+  selectAccountSubAccountsTableRowAction,
+  setAccountSubAccountsSearchAction,
+  updateAccountSubAccountAction,
+  selectAllAccountSubAccountsTableRowsAction
+} from "../actions";
+
+const Account = (): JSX.Element => {
+  const { accountId } = useParams<{ budgetId: string; accountId: string }>();
   const dispatch = useDispatch();
   const history = useHistory();
-
-  const subAccountStore = useSelector((state: Redux.IApplicationStore) => state.budget.subaccount);
+  const accountStore = useSelector((state: Redux.IApplicationStore) => state.calculator.account);
+  const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
 
   useEffect(() => {
-    if (!isNaN(parseInt(subaccountId))) {
-      dispatch(setSubAccountIdAction(parseInt(subaccountId)));
+    if (!isNaN(parseInt(accountId))) {
+      dispatch(setAccountIdAction(parseInt(accountId)));
     }
-  }, [subaccountId]);
+  }, [accountId]);
 
   return (
-    <RenderIfValidId id={[budgetId, subaccountId]}>
-      <RenderWithSpinner loading={subAccountStore.subaccounts.table.loading}>
+    <RenderIfValidId id={[accountId]}>
+      <RenderWithSpinner loading={accountStore.subaccounts.table.loading || accountStore.detail.loading}>
         <GenericBudgetTable<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow>
-          table={subAccountStore.subaccounts.table.data}
+          table={accountStore.subaccounts.table.data}
           isCellEditable={(row: Table.ISubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "unit"], colDef.field)) {
               return false;
@@ -48,26 +49,26 @@ const SubAccount = (): JSX.Element => {
           highlightNonEditableCell={(row: Table.ISubAccountRow, colDef: ColDef) => {
             return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
           }}
-          search={subAccountStore.subaccounts.table.search}
-          onSearch={(value: string) => dispatch(setSubAccountSubAccountsSearchAction(value))}
+          search={accountStore.subaccounts.table.search}
+          onSearch={(value: string) => dispatch(setAccountSubAccountsSearchAction(value))}
           saving={
-            subAccountStore.subaccounts.deleting.length !== 0 ||
-            subAccountStore.subaccounts.updating.length !== 0 ||
-            subAccountStore.subaccounts.creating
+            accountStore.subaccounts.deleting.length !== 0 ||
+            accountStore.subaccounts.updating.length !== 0 ||
+            accountStore.subaccounts.creating
           }
           rowRefreshRequired={(existing: Table.ISubAccountRow, row: Table.ISubAccountRow) => existing.unit !== row.unit}
-          onRowAdd={() => dispatch(addSubAccountSubAccountsTablePlaceholdersAction())}
-          onRowSelect={(id: number) => dispatch(selectSubAccountSubAccountsTableRowAction(id))}
-          onRowDeselect={(id: number) => dispatch(deselectSubAccountSubAccountsTableRowAction(id))}
-          onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeSubAccountSubAccountAction(row))}
+          onRowAdd={() => dispatch(addAccountSubAccountsTablePlaceholdersAction(parseInt(accountId)))}
+          onRowSelect={(id: number) => dispatch(selectAccountSubAccountsTableRowAction(id))}
+          onRowDeselect={(id: number) => dispatch(deselectAccountSubAccountsTableRowAction(id))}
+          onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeAccountSubAccountAction(row))}
           onRowUpdate={(id: number, data: { [key: string]: any }) =>
-            dispatch(updateSubAccountSubAccountAction({ id, data }))
+            dispatch(updateAccountSubAccountAction({ id, data }))
           }
-          onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
-          onSelectAll={() => dispatch(selectAllSubAccountSubAccountsTableRowsAction())}
+          onRowExpand={(id: number) => history.push(`/budgets/${budget.id}/subaccounts/${id}`)}
+          onSelectAll={() => dispatch(selectAllAccountSubAccountsTableRowsAction())}
           estimated={
-            !isNil(subAccountStore.detail.data) && !isNil(subAccountStore.detail.data.estimated)
-              ? subAccountStore.detail.data.estimated
+            !isNil(accountStore.detail.data) && !isNil(accountStore.detail.data.estimated)
+              ? accountStore.detail.data.estimated
               : 0.0
           }
           columns={[
@@ -96,8 +97,13 @@ const SubAccount = (): JSX.Element => {
               cellStyle: { textAlign: "right" },
               cellRenderer: "UnitCell",
               cellRendererParams: {
-                onChange: (unit: Unit, row: Table.ISubAccountRow) =>
-                  dispatch(updateSubAccountSubAccountAction({ id: row.id, data: { unit } }))
+                onChange: (value: Unit, row: Table.ISubAccountRow) =>
+                  dispatch(
+                    updateAccountSubAccountAction({
+                      id: row.id,
+                      data: { unit: value }
+                    })
+                  )
               }
             },
             {
@@ -127,4 +133,4 @@ const SubAccount = (): JSX.Element => {
   );
 };
 
-export default SubAccount;
+export default Account;

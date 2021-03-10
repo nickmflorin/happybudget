@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Redirect, Switch, Route, useRouteMatch, useHistory, useLocation, useParams } from "react-router-dom";
+import { Switch, Route, useHistory, useLocation, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -20,19 +20,16 @@ import {
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { Layout } from "components/layout";
 import { setBudgetIdAction } from "./actions";
-import { AncestorsBreadCrumbs } from "./components";
+import AncestorsBreadCrumbs from "./AncestorsBreadCrumbs";
 import "./index.scss";
 
-const Account = React.lazy(() => import("./components/Account"));
-const Accounts = React.lazy(() => import("./components/Accounts"));
-const SubAccount = React.lazy(() => import("./components/SubAccount"));
-const Actuals = React.lazy(() => import("./components/Actuals"));
+const Calculator = React.lazy(() => import("./Calculator"));
+const Actuals = React.lazy(() => import("./Actuals"));
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
-  const match = useRouteMatch();
   const { budgetId } = useParams<{ budgetId: string }>();
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
   const ancestors = useSelector((state: Redux.IApplicationStore) => state.budget.ancestors);
@@ -130,11 +127,8 @@ const Budget = (): JSX.Element => {
         <RenderWithSpinner loading={budget.detail.loading}>
           <div className={"budget"}>
             <Switch>
-              <Redirect exact from={match.url} to={`${match.url}/accounts`} />
-              <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
-              <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
               <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
-              <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
+              <Route path={"/budgets/:budgetId"} component={Calculator} />
             </Switch>
           </div>
         </RenderWithSpinner>

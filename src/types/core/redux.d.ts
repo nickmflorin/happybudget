@@ -10,7 +10,7 @@ namespace Redux {
     [key: string]: any;
   }
 
-  type ModuleLabel = "dashboard" | "budget";
+  type ModuleLabel = "dashboard" | "budget" | "actuals" | "calculator";
 
   interface IActionConfig {
     readonly error?: Error | string | undefined;
@@ -75,14 +75,6 @@ namespace Redux {
 
   interface IModulesStore {}
 
-  interface IUserStore extends IUser {}
-
-  interface IApplicationStore extends IModulesStore {
-    readonly user: IUserStore;
-    readonly dashboard: Dashboard.IStore;
-    readonly budget: Budget.IStore;
-  }
-
   namespace Dashboard {
     type ActionDomain = "trash" | "active";
 
@@ -110,19 +102,12 @@ namespace Redux {
     }
   }
 
-  namespace Budget {
+  namespace Calculator {
     interface ISubAccountsStore {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
       readonly table: ITableStore<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow, ISubAccount>;
-    }
-
-    interface IActualsStore {
-      readonly deleting: ListStore<number>;
-      readonly updating: ListStore<number>;
-      readonly creating: boolean;
-      readonly table: ITableStore<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow, IActual>;
     }
 
     interface IAccountsStore {
@@ -133,35 +118,52 @@ namespace Redux {
     }
 
     interface ISubAccountStore {
-      id: number | null;
-      detail: IDetailResponseStore<ISubAccount>;
-      subaccounts: ISubAccountsStore;
+      readonly id: number | null;
+      readonly detail: IDetailResponseStore<ISubAccount>;
+      readonly subaccounts: ISubAccountsStore;
     }
 
     interface IAccountStore {
-      id: number | null;
-      detail: IDetailResponseStore<IAccount>;
-      subaccounts: ISubAccountsStore;
-    }
-
-    interface IBudgetStore {
-      id: number | null;
-      detail: IDetailResponseStore<IBudget>;
-      accounts: IAccountsStore;
-    }
-
-    interface IActivatePlaceholderPayload {
-      oldId: number;
-      id: number;
+      readonly id: number | null;
+      readonly detail: IDetailResponseStore<IAccount>;
+      readonly subaccounts: ISubAccountsStore;
     }
 
     interface IStore {
-      readonly budget: IBudgetStore;
       readonly subaccount: ISubAccountStore;
       readonly account: IAccountStore;
+      readonly accounts: IAccountsStore;
+    }
+  }
+
+  namespace Actuals {
+    interface IStore {
+      readonly deleting: ListStore<number>;
+      readonly updating: ListStore<number>;
+      readonly creating: boolean;
+      readonly table: ITableStore<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow, IActual>;
+    }
+  }
+
+  namespace Budget {
+    interface IBudgetStore {
+      id: number | null;
+      detail: IDetailResponseStore<IBudget>;
+    }
+    interface IStore {
+      readonly budget: IBudgetStore;
       readonly ancestors: ListStore<IAncestor>;
       readonly ancestorsLoading: boolean;
-      readonly actuals: IActualsStore;
     }
+  }
+
+  interface IUserStore extends IUser {}
+
+  interface IApplicationStore extends IModulesStore {
+    readonly user: IUserStore;
+    readonly dashboard: Dashboard.IStore;
+    readonly budget: Budget.IStore;
+    readonly calculator: Calculator.IStore;
+    readonly actuals: Actuals.IStore;
   }
 }

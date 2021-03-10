@@ -9,6 +9,8 @@ const Config: Redux.IModuleConfig<Redux.Budget.IStore, Redux.IAction<any>> = {
   label: "budget"
 };
 
+export default Config;
+
 export interface IFieldDefinition {
   name: string;
   postPayload?: boolean;
@@ -47,5 +49,3 @@ export const FieldDefinitions: { [key in Table.RowType]: IFieldDefinition[] } = 
     { name: "actual", responsePayload: true }
   ]
 };
-
-export default Config;

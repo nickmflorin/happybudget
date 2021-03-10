@@ -18,6 +18,11 @@ namespace Table {
     [key in F]: any;
   }
 
+  interface IActivatePlaceholderPayload {
+    readonly oldId: number;
+    readonly id: number;
+  }
+
   type RowType = "account" | "subaccount" | "actual";
 
   type AccountRowField = "account_number" | "description";
