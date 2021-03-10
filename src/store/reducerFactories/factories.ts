@@ -160,28 +160,18 @@ export const createTableDataReducer = <
           );
         }
       },
-      UpdateCell: (payload: Table.ICellUpdate<F> | Table.ICellUpdate<F>[]) => {
-        const updateCellInState = (st: Redux.ListStore<R>, update: Table.ICellUpdate<F>) => {
-          const row: R | undefined = find(st, { id: update.row } as any);
-          if (isNil(row)) {
-            /* eslint-disable no-console */
-            console.error(
-              `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} row in state...
-              the ${Options.referenceEntity} row with ID ${update.row} does not exist in state when it is expected to.`
-            );
-            return st;
-          } else {
-            return replaceInArray<R>(st, { id: update.row }, { ...row, [update.column]: update.value });
-          }
-        };
-        if (Array.isArray(payload)) {
-          for (let i = 0; i < payload.length; i++) {
-            newState = updateCellInState(newState, payload[i]);
-          }
+      UpdateRow: (payload: { id: number; data: Partial<R> }) => {
+        const row: R | undefined = find(newState, { id: payload.id } as any);
+        if (isNil(row)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} row in state...
+              the ${Options.referenceEntity} row with ID ${payload.id} does not exist in state when it is expected to.`
+          );
+          return newState;
         } else {
-          newState = updateCellInState(newState, payload);
+          return replaceInArray<R>(newState, { id: payload.id }, { ...row, ...payload.data });
         }
-        return newState;
       },
       RemoveRow: (payload: { id: number }) => {
         const row = find(newState, { id: payload.id });
@@ -271,7 +261,6 @@ export const createTableDataReducer = <
             );
           }
         };
-        console.log(payload);
         if (Array.isArray(payload)) {
           for (let i = 0; i < payload.length; i++) {
             newState = updateStateWithError(newState, payload[i]);
@@ -342,7 +331,7 @@ export const createTableReducer = <
     {
       AddPlaceholders: mappings.AddPlaceholders,
       RemoveRow: mappings.RemoveRow,
-      UpdateCell: mappings.UpdateCell,
+      UpdateRow: mappings.UpdateRow,
       ActivatePlaceholder: mappings.ActivatePlaceholder,
       SelectRow: mappings.SelectRow,
       DeselectRow: mappings.DeselectRow,

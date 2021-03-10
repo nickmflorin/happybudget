@@ -10,12 +10,12 @@ import {
   requestSubAccountAction,
   requestSubAccountSubAccountsAction,
   setSubAccountSubAccountsSearchAction,
-  selectSubAccountSubAccountsRowAction,
-  addSubAccountSubAccountsPlaceholdersAction,
-  deselectSubAccountSubAccountsRowAction,
+  selectSubAccountSubAccountsTableRowAction,
+  addSubAccountSubAccountsTablePlaceholdersAction,
+  deselectSubAccountSubAccountsTableRowAction,
   removeSubAccountSubAccountAction,
   updateSubAccountSubAccountAction,
-  selectAllSubAccountSubAccountsRowsAction
+  selectAllSubAccountSubAccountsTableRowsAction
 } from "../actions";
 import { initialSubAccountState } from "../initialState";
 import GenericBudgetTable from "./GenericBudgetTable";
@@ -65,6 +65,9 @@ const SubAccount = (): JSX.Element => {
               return row.meta.subaccounts.length === 0;
             }
           }}
+          highlightNonEditableCell={(row: Table.ISubAccountRow, colDef: ColDef) => {
+            return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
+          }}
           search={subAccountStore.subaccounts.table.search}
           onSearch={(value: string) => dispatch(setSubAccountSubAccountsSearchAction(parseInt(subaccountId), value))}
           saving={
@@ -72,17 +75,19 @@ const SubAccount = (): JSX.Element => {
             subAccountStore.subaccounts.updating.length !== 0 ||
             subAccountStore.subaccounts.creating
           }
-          onRowAdd={() => dispatch(addSubAccountSubAccountsPlaceholdersAction(parseInt(subaccountId)))}
-          onRowSelect={(id: number) => dispatch(selectSubAccountSubAccountsRowAction(parseInt(subaccountId), id))}
-          onRowDeselect={(id: number) => dispatch(deselectSubAccountSubAccountsRowAction(parseInt(subaccountId), id))}
+          onRowAdd={() => dispatch(addSubAccountSubAccountsTablePlaceholdersAction(parseInt(subaccountId)))}
+          onRowSelect={(id: number) => dispatch(selectSubAccountSubAccountsTableRowAction(parseInt(subaccountId), id))}
+          onRowDeselect={(id: number) =>
+            dispatch(deselectSubAccountSubAccountsTableRowAction(parseInt(subaccountId), id))
+          }
           onRowDelete={(row: Table.ISubAccountRow) =>
             dispatch(removeSubAccountSubAccountAction(parseInt(subaccountId), row))
           }
-          onRowUpdate={(id: number, payload: { [key: string]: any }) =>
-            dispatch(updateSubAccountSubAccountAction(parseInt(subaccountId), { id, payload }))
+          onRowUpdate={(id: number, data: { [key: string]: any }) =>
+            dispatch(updateSubAccountSubAccountAction(parseInt(subaccountId), { id, data }))
           }
           onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
-          onSelectAll={() => dispatch(selectAllSubAccountSubAccountsRowsAction(parseInt(subaccountId)))}
+          onSelectAll={() => dispatch(selectAllSubAccountSubAccountsTableRowsAction(parseInt(subaccountId)))}
           estimated={
             !isNil(subAccountStore.detail.data) && !isNil(subAccountStore.detail.data.estimated)
               ? subAccountStore.detail.data.estimated

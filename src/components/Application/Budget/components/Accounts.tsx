@@ -10,12 +10,12 @@ import {
   requestBudgetAction,
   requestAccountsAction,
   setAccountsSearchAction,
-  addAccountsPlaceholdersAction,
-  deselectAccountsRowAction,
-  selectAccountsRowAction,
+  addAccountsTablePlaceholdersAction,
+  deselectAccountsTableRowAction,
+  selectAccountsTableRowAction,
   removeAccountAction,
   updateAccountAction,
-  selectAllAccountsRowsAction
+  selectAllAccountsTableRowsAction
 } from "../actions";
 import GenericBudgetTable from "./GenericBudgetTable";
 
@@ -47,15 +47,15 @@ const Accounts = (): JSX.Element => {
           search={accounts.table.search}
           onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
           saving={accounts.deleting.length !== 0 || accounts.updating.length !== 0 || accounts.creating}
-          onRowAdd={() => dispatch(addAccountsPlaceholdersAction())}
-          onRowSelect={(id: number) => dispatch(selectAccountsRowAction(id))}
-          onRowDeselect={(id: number) => dispatch(deselectAccountsRowAction(id))}
+          onRowAdd={() => dispatch(addAccountsTablePlaceholdersAction())}
+          onRowSelect={(id: number) => dispatch(selectAccountsTableRowAction(id))}
+          onRowDeselect={(id: number) => dispatch(deselectAccountsTableRowAction(id))}
           onRowDelete={(row: Table.IAccountRow) => dispatch(removeAccountAction(row))}
-          onRowUpdate={(id: number, payload: { [key: string]: any }) =>
-            dispatch(updateAccountAction(parseInt(budgetId), { id, payload }))
+          onRowUpdate={(id: number, data: { [key: string]: any }) =>
+            dispatch(updateAccountAction(parseInt(budgetId), { id, data }))
           }
           onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
-          onSelectAll={() => dispatch(selectAllAccountsRowsAction())}
+          onSelectAll={() => dispatch(selectAllAccountsTableRowsAction())}
           estimated={!isNil(budget.data) && !isNil(budget.data.estimated) ? budget.data.estimated : 0.0}
           columns={[
             {

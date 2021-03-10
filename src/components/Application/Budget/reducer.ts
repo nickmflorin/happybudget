@@ -34,7 +34,7 @@ const indexedAccountReducer = combineReducers({
       {
         AddPlaceholders: ActionType.Account.SubAccountsTable.AddPlaceholders,
         RemoveRow: ActionType.Account.SubAccountsTable.RemoveRow,
-        UpdateCell: ActionType.Account.SubAccountsTable.UpdateCell,
+        UpdateRow: ActionType.Account.SubAccountsTable.UpdateRow,
         ActivatePlaceholder: ActionType.Account.SubAccountsTable.ActivatePlaceholder,
         SelectRow: ActionType.Account.SubAccountsTable.SelectRow,
         DeselectRow: ActionType.Account.SubAccountsTable.DeselectRow,
@@ -77,7 +77,7 @@ const indexedSubAccountReducer = combineReducers({
       {
         AddPlaceholders: ActionType.SubAccount.SubAccountsTable.AddPlaceholders,
         RemoveRow: ActionType.SubAccount.SubAccountsTable.RemoveRow,
-        UpdateCell: ActionType.SubAccount.SubAccountsTable.UpdateCell,
+        UpdateRow: ActionType.SubAccount.SubAccountsTable.UpdateRow,
         ActivatePlaceholder: ActionType.SubAccount.SubAccountsTable.ActivatePlaceholder,
         SelectRow: ActionType.SubAccount.SubAccountsTable.SelectRow,
         DeselectRow: ActionType.SubAccount.SubAccountsTable.DeselectRow,
@@ -175,7 +175,7 @@ const rootReducer = combineReducers({
       {
         AddPlaceholders: ActionType.ActualsTable.AddPlaceholders,
         RemoveRow: ActionType.ActualsTable.RemoveRow,
-        UpdateCell: ActionType.ActualsTable.UpdateCell,
+        UpdateRow: ActionType.ActualsTable.UpdateRow,
         ActivatePlaceholder: ActionType.ActualsTable.ActivatePlaceholder,
         SelectRow: ActionType.ActualsTable.SelectRow,
         DeselectRow: ActionType.ActualsTable.DeselectRow,
@@ -207,7 +207,7 @@ const rootReducer = combineReducers({
       {
         AddPlaceholders: ActionType.AccountsTable.AddPlaceholders,
         RemoveRow: ActionType.AccountsTable.RemoveRow,
-        UpdateCell: ActionType.AccountsTable.UpdateCell,
+        UpdateRow: ActionType.AccountsTable.UpdateRow,
         ActivatePlaceholder: ActionType.AccountsTable.ActivatePlaceholder,
         SelectRow: ActionType.AccountsTable.SelectRow,
         DeselectRow: ActionType.AccountsTable.DeselectRow,

@@ -11,7 +11,7 @@ export type IReducerFactoryActionMap = { [key: string]: string };
 interface ICommonTableActionMap {
   AddPlaceholders: string;
   RemoveRow: string;
-  UpdateCell: string;
+  UpdateRow: string;
   ActivatePlaceholder: string;
   SelectRow: string;
   DeselectRow: string;

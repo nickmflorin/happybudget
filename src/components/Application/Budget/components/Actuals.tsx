@@ -8,12 +8,12 @@ import {
   requestBudgetAction,
   requestActualsAction,
   setActualsSearchAction,
-  addActualsPlaceholdersAction,
-  deselectActualsRowAction,
-  selectActualsRowAction,
+  addActualsTablePlaceholdersAction,
+  deselectActualsTableRowAction,
+  selectActualsTableRowAction,
   removeActualAction,
   updateActualAction,
-  selectAllActualsRowsAction
+  selectAllActualsTableRowsAction
 } from "../actions";
 import GenericBudgetTable from "./GenericBudgetTable";
 
@@ -39,14 +39,14 @@ const Actuals = (): JSX.Element => {
           search={actuals.table.search}
           onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
           saving={actuals.deleting.length !== 0 || actuals.updating.length !== 0 || actuals.creating}
-          onRowAdd={() => dispatch(addActualsPlaceholdersAction())}
-          onRowSelect={(id: number) => dispatch(selectActualsRowAction(id))}
-          onRowDeselect={(id: number) => dispatch(deselectActualsRowAction(id))}
+          onRowAdd={() => dispatch(addActualsTablePlaceholdersAction())}
+          onRowSelect={(id: number) => dispatch(selectActualsTableRowAction(id))}
+          onRowDeselect={(id: number) => dispatch(deselectActualsTableRowAction(id))}
           onRowDelete={(row: Table.IActualRow) => dispatch(removeActualAction(row))}
-          onRowUpdate={(id: number, payload: { [key: string]: any }) =>
-            dispatch(updateActualAction(parseInt(budgetId), { id, payload }))
+          onRowUpdate={(id: number, data: { [key: string]: any }) =>
+            dispatch(updateActualAction(parseInt(budgetId), { id, data }))
           }
-          onSelectAll={() => dispatch(selectAllActualsRowsAction())}
+          onSelectAll={() => dispatch(selectAllActualsTableRowsAction())}
           estimated={!isNil(budget.data) && !isNil(budget.data.estimated) ? budget.data.estimated : 0.0}
           columns={[
             {

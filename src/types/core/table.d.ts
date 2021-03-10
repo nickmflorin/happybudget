@@ -18,11 +18,7 @@ namespace Table {
     [key in F]: any;
   }
 
-  interface ICellUpdate<F extends string> {
-    column: F;
-    row: number;
-    value: any;
-  }
+  type RowType = "account" | "subaccount" | "actual";
 
   type AccountRowField = "account_number" | "description";
   type SubAccountRowField = "line" | "name" | "description" | "quantity" | "unit" | "multiplier" | "rate";

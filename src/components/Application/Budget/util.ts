@@ -1,99 +1,80 @@
 import { isNil, forEach } from "lodash";
 
-const ACTUAL_PAYLOAD_FIELDS: Table.ActualRowField[] = [
-  "description",
-  "parent",
-  "vendor",
-  "purchase_order",
-  "date",
-  "payment_method",
-  "payment_id",
-  "value"
-];
-const ACTUAL_REQUIRED_PAYLOAD_FIELDS: Table.ActualRowField[] = ["parent"];
-const SUBACCOUNT_PAYLOAD_FIELDS: Table.SubAccountRowField[] = [
-  "description",
-  "name",
-  "quantity",
-  "rate",
-  "multiplier",
-  "unit",
-  "line"
-];
-const SUBACCOUNT_REQUIRED_PAYLOAD_FIELDS: Table.SubAccountRowField[] = ["line", "name"];
-const ACCOUNT_PAYLOAD_FIELDS: Table.AccountRowField[] = ["description", "account_number"];
-const ACCOUNT_REQUIRED_PAYLOAD_FIELDS: Table.AccountRowField[] = ["account_number"];
+interface FieldDefinition<F> {
+  name: F;
+  payload?: boolean;
+  required?: boolean;
+  response?: boolean;
+}
+
+const FieldDefinitions: { [key in Table.RowType]: FieldDefinition<string>[] } = {
+  actual: [
+    { name: "description", payload: true },
+    { name: "parent", payload: false, required: true },
+    { name: "vendor", payload: true },
+    { name: "purchase_order", payload: true },
+    { name: "date", payload: true },
+    { name: "payment_method", payload: true },
+    { name: "payment_id", payload: true },
+    { name: "value", payload: true }
+  ],
+  subaccount: [
+    { name: "description", payload: true },
+    { name: "name", payload: true, required: true },
+    { name: "quantity", payload: true },
+    { name: "rate", payload: true },
+    { name: "multiplier", payload: true },
+    { name: "unit", payload: true },
+    { name: "line", payload: true, required: true },
+    { name: "estimated", response: true }
+  ],
+  account: [
+    { name: "description", payload: true },
+    { name: "account_number", payload: true, required: true },
+    { name: "estimated", response: true },
+    { name: "variance", response: true },
+    { name: "actual", response: true }
+  ]
+};
 
 export const generateRandomNumericId = (): number => {
   return parseInt(Math.random().toString().slice(2, 11));
 };
 
-export const subAccountPayloadFromRow = (
-  row: Table.ISubAccountRow
-): Http.ISubAccountPayload | Partial<Http.ISubAccountPayload> => {
+export const payloadFromRow = <R, P>(row: R, type: Table.RowType): P => {
   const obj: { [key: string]: any } = {};
-  forEach(SUBACCOUNT_PAYLOAD_FIELDS, (field: Table.SubAccountRowField) => {
-    const cell = row[field];
-    if (!isNil(cell)) {
-      obj[field] = cell;
+  forEach(FieldDefinitions[type], (def: FieldDefinition<string>) => {
+    if (def.payload === true && !isNil(row[def.name as keyof R])) {
+      obj[def.name] = row[def.name as keyof R];
+    }
+  });
+  return obj as P;
+};
+
+export const payloadFromResponse = <M>(model: M, type: Table.RowType): { [key: string]: any } => {
+  const obj: { [key: string]: any } = {};
+  forEach(FieldDefinitions[type], (def: FieldDefinition<string>) => {
+    if (def.response === true) {
+      obj[def.name] = model[def.name as keyof M];
     }
   });
   return obj;
 };
 
-export const accountPayloadFromRow = (row: Table.IAccountRow): Http.IAccountPayload | Partial<Http.IAccountPayload> => {
-  const obj: { [key: string]: any } = {};
-  forEach(ACCOUNT_PAYLOAD_FIELDS, (field: Table.AccountRowField) => {
-    const cell = row[field];
-    if (!isNil(cell)) {
-      obj[field] = cell;
-    }
-  });
-  return obj;
-};
-
-export const actualPayloadFromRow = (row: Table.IActualRow): Http.IActualPayload | Partial<Http.IActualPayload> => {
-  const obj: { [key: string]: any } = {};
-  forEach(ACTUAL_PAYLOAD_FIELDS, (field: Table.ActualRowField) => {
-    const cell = row[field];
-    if (!isNil(cell)) {
-      obj[field] = cell;
-    }
-  });
-  return obj;
-};
-
-const rowHasRequiredFieldsFn = <F extends string>(fields: F[]) => (row: any): boolean => {
+export const rowHasRequiredFields = <R extends { [key: string]: any }>(row: R, type: Table.RowType): boolean => {
   let requiredFieldsPresent = true;
-  forEach(fields, (field: F) => {
-    const cell = row[field];
-    if (isNil(cell) || cell === "") {
-      requiredFieldsPresent = false;
-      return false;
+  const fieldDefs = FieldDefinitions[type] as FieldDefinition<any>[];
+  forEach(fieldDefs, (def: FieldDefinition<any>) => {
+    if (def.required === true) {
+      const val = row[def.name];
+      if (isNil(val) || val === "") {
+        requiredFieldsPresent = false;
+        return false;
+      }
     }
   });
   return requiredFieldsPresent;
 };
-
-export const subAccountRowHasRequiredfields = rowHasRequiredFieldsFn(SUBACCOUNT_REQUIRED_PAYLOAD_FIELDS);
-export const accountRowHasRequiredfields = rowHasRequiredFieldsFn(ACCOUNT_REQUIRED_PAYLOAD_FIELDS);
-export const actualRowHasRequiredfields = rowHasRequiredFieldsFn(ACTUAL_REQUIRED_PAYLOAD_FIELDS);
-
-const convertResponseToCellUpdatesFn = <F extends string>(fields: F[]) => (response: any): Table.ICellUpdate<F>[] => {
-  const updates: Table.ICellUpdate<F>[] = [];
-  forEach(fields, (field: F) => {
-    updates.push({
-      row: response.id,
-      column: field,
-      value: response[field]
-    });
-  });
-  return updates;
-};
-
-export const convertAccountResponseToCellUpdates = convertResponseToCellUpdatesFn(ACCOUNT_PAYLOAD_FIELDS);
-export const convertSubAccountResponseToCellUpdates = convertResponseToCellUpdatesFn(SUBACCOUNT_PAYLOAD_FIELDS);
-export const convertActualResponseToCellUpdates = convertResponseToCellUpdatesFn(ACTUAL_PAYLOAD_FIELDS);
 
 export const initializeRowFromAccount = (account: IAccount): Table.IAccountRow => ({
   id: account.id,

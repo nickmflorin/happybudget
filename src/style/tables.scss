@@ -33,7 +33,7 @@
     border-color: 1px solid $gray-light !important;
     &.ag-row-hover {
       div[role=gridcell] {
-        &:not(.not-editable) {
+        &:not(.not-editable-highlight) {
           background-color: $gray-highlight !important;
         }
       }

@@ -20,7 +20,7 @@ import {
 } from "ag-grid-community";
 
 import TableHeader from "./TableHeader";
-import { DeleteCell, ExpandCell, SelectCell, ValueCell, CellEditor, NewRowCell, UnitCell } from "./cells";
+import { DeleteCell, ExpandCell, SelectCell, ValueCell, NewRowCell, UnitCell } from "./cells";
 import "./index.scss";
 
 interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta<F>, R extends Table.IRow<F, E>> {
@@ -29,6 +29,7 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta<F>,
   search: string;
   saving: boolean;
   estimated: number;
+  highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
   onSearch: (value: string) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
@@ -54,7 +55,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R ext
   onRowAdd,
   onRowDelete,
   onRowExpand,
-  isCellEditable
+  isCellEditable,
+  highlightNonEditableCell
 }: GenericBudgetTableProps<F, E, R>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -77,7 +79,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R ext
       if (!isNil(firstEditCol) && focused === false) {
         gridApi.ensureIndexVisible(0);
         gridApi.ensureColumnVisible(firstEditCol);
-        gridApi.setFocusedCell(0, firstEditCol);
+        setTimeout(() => gridApi.setFocusedCell(0, firstEditCol), 500);
         // TODO: Investigate if there is a better way to do this - currently,
         // this hook is getting triggered numerous times when it shouldn't be.
         // It is because the of the `columns` in the dependency array, which
@@ -253,13 +255,14 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R ext
                 hasError = true;
               }
             }
-            if (!isCellEditable(row, params.colDef)) {
-              return classNames("not-editable", {
-                "not-editable-highlight": params.colDef.field !== "unit",
-                "unit-cell": params.colDef.field === "unit"
-              });
-            }
-            return classNames({ "has-error": hasError, "unit-cell": params.colDef.field === "unit" });
+            return classNames({
+              "not-editable": !isCellEditable(row, params.colDef),
+              "not-editable-highlight":
+                !isCellEditable(row, params.colDef) &&
+                (isNil(highlightNonEditableCell) || highlightNonEditableCell(row, params.colDef) === true),
+              "unit-cell": params.colDef.field === "unit",
+              "has-error": hasError
+            });
           }
         })
       )
@@ -343,7 +346,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R ext
           domLayout={"autoHeight"}
           navigateToNextCell={(params: NavigateToNextCellParams): CellPosition => {
             if (!isNil(params.nextCellPosition)) {
-              if (includes(["estimated", "expand"], params.nextCellPosition.column.getColId())) {
+              if (includes(["estimated", "expand", "select", "delete"], params.nextCellPosition.column.getColId())) {
                 return params.previousCellPosition;
               }
               return params.nextCellPosition;
@@ -373,8 +376,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R ext
             ExpandCell: ExpandCell,
             SelectCell: SelectCell,
             ValueCell: ValueCell,
-            UnitCell: UnitCell,
-            CellEditor: CellEditor
+            UnitCell: UnitCell
           }}
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {
             const field = event.column.getColId();
