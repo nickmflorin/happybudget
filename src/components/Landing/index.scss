@@ -1,0 +1,31 @@
+@import 'style/colors';
+@import 'style/typography';
+
+.landing-page {
+  display: flex;
+  height: 100vh;
+
+  .landing-page-left {
+    max-width: 700px;
+    min-width: 600px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+  }
+
+  .landing-page-right {
+    flex-grow: 100;
+    justify-content: center;
+    align-items: center;
+    background-color: $green;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-box-align: center;
+
+    .logo-container {
+      text-align: center;
+    }
+  }
+}

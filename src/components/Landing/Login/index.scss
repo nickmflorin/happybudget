@@ -1,0 +1,53 @@
+@import 'style/colors';
+@import 'style/typography';
+
+.form-container {
+  padding: 80px;
+  width: 100%;
+
+  .title {
+    font-size: 28px;
+    font-family: $noto-sans-medium;
+    text-align: center;
+  }
+
+  .sub-title {
+    font-size: 16px;
+    font-family: $noto-sans-regular;
+    color: $text-secondary;
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .login-form {
+    button[type='submit'] {
+      margin-top: 15px;
+      width: 100%;
+      &:not(:last-child) {
+        margin-bottom: 12px;
+      }
+    }
+    .btn--google {
+      width: 100% !important;
+    }
+    .forgot-password-text {
+      text-align: right;
+      .forgot-link {
+        font-family: $roboto-regular;
+        font-size: 13px;
+      }
+    }
+    .signup-text {
+      font-size: 13px;
+      text-align: center;
+      margin-top: 12px;
+
+      .signup-link {
+        margin-left: 6px;
+        font-family: $roboto-regular;
+        font-size: 13px;
+        line-height: 15px;
+      }
+    }
+  }
+}

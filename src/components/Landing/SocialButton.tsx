@@ -1,9 +1,9 @@
-import React from "react";
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
-import { GoogleLoginButton } from "components/control/buttons";
+import { GoogleAuthButton } from "components/control/buttons";
 
 interface SocialButtonProps {
   provider: "google";
+  text: string;
   onGoogleSuccess: (tokenId: string) => void;
   // TODO: Come up with interface for Google structured error.
   onGoogleError: (error: any) => void;
@@ -21,13 +21,13 @@ const isOfflineResponse = (
 // TODO: Store in the .env file.
 const GOOGLE_CLIENT_ID = "609051398044-dn6cb2km2heebcqsau5ou5bs800s1vtc.apps.googleusercontent.com";
 
-const SocialButton = ({ provider, onGoogleSuccess, onGoogleError }: SocialButtonProps): JSX.Element => {
+const SocialButton = ({ provider, text, onGoogleSuccess, onGoogleError }: SocialButtonProps): JSX.Element => {
   if (provider === "google") {
     return (
       <GoogleLogin
         clientId={GOOGLE_CLIENT_ID}
         render={(props: { onClick: () => void; disabled?: boolean }) => (
-          <GoogleLoginButton onClick={props.onClick} disabled={props.disabled} />
+          <GoogleAuthButton text={text} onClick={props.onClick} disabled={props.disabled} />
         )}
         onSuccess={(response: GoogleLoginResponse | GoogleLoginResponseOffline) => {
           // In the case that the response is GoogleLoginResponseOffline, the response

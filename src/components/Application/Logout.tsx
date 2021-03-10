@@ -1,14 +1,14 @@
-import { useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Redirect } from "react-router-dom";
 import { logout } from "services";
 
-export function Logout(): null {
-  const history = useHistory();
+export const Logout = (): JSX.Element => {
+  const [redirect, setRedirect] = useState(false);
 
   useEffect(() => {
     logout()
       .then(() => {
-        history.push("/login");
+        setRedirect(true);
       })
       .catch(e => {
         // TODO: This is an edge case (or at least should be) - we want to
@@ -19,9 +19,12 @@ export function Logout(): null {
         /* eslint-disable no-console */
         console.error(`There was an error logging out: \n ${e}`);
       });
-  }, [history]);
+  }, []);
 
-  return null;
-}
+  if (redirect === true) {
+    return <Redirect to={"/login"} />;
+  }
+  return <></>;
+};
 
 export default Logout;

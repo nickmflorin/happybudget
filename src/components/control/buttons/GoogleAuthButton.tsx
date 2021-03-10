@@ -1,23 +1,27 @@
-import React from "react";
 import { Button } from "antd";
 import { GoogleIcon } from "components/svgs";
 
-interface GoogleLoginButtonProps {
+interface GoogleAuthButtonProps {
   onClick?: () => void;
   disabled?: boolean;
+  text?: string;
 }
 
-const GoogleLoginButton = ({ onClick, disabled = false }: GoogleLoginButtonProps): JSX.Element => {
+const GoogleAuthButton = ({
+  onClick,
+  text = "Login with Google",
+  disabled = false
+}: GoogleAuthButtonProps): JSX.Element => {
   return (
     <Button className={"btn--google"} onClick={onClick} disabled={disabled}>
       <div className={"content-wrapper"}>
         <div className={"icon-wrapper"}>
           <GoogleIcon />
         </div>
-        <span className={"text-wrapper"}>{"Login with Google"}</span>
+        <span className={"text-wrapper"}>{text}</span>
       </div>
     </Button>
   );
 };
 
-export default GoogleLoginButton;
+export default GoogleAuthButton;

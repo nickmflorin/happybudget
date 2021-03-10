@@ -1,4 +1,5 @@
 import { client } from "api";
+import { URL } from "./util";
 
 export const login = async (
   email: string,
@@ -6,7 +7,8 @@ export const login = async (
   options?: Http.IRequestOptions
 ): Promise<Http.ILoginResponse> => {
   options = { ...options, redirectOnAuthenticationError: false };
-  return client.post<Http.ILoginResponse>("/v1/auth/login", { email, password }, options);
+  const url = URL.v1("auth", "login");
+  return client.post<Http.ILoginResponse>(url, { email, password }, options);
 };
 
 export const socialLogin = async (
@@ -14,13 +16,16 @@ export const socialLogin = async (
   options?: Http.IRequestOptions
 ): Promise<Http.ILoginResponse> => {
   options = { ...options, redirectOnAuthenticationError: false };
-  return client.post<Http.ILoginResponse>("/v1/auth/social-login", payload, options);
+  const url = URL.v1("auth", "social-login");
+  return client.post<Http.ILoginResponse>(url, payload, options);
 };
 
 export const logout = async (): Promise<null> => {
-  return client.post<null>("/v1/auth/logout");
+  const url = URL.v1("auth", "logout");
+  return client.post<null>(url);
 };
 
 export const validateToken = async (): Promise<Http.ITokenValidationResponse> => {
-  return client.post<Http.ITokenValidationResponse>("/v1/jwt/validate");
+  const url = URL.v1("jwt", "validate");
+  return client.post<Http.ITokenValidationResponse>(url);
 };
