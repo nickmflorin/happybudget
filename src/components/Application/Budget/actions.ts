@@ -54,6 +54,7 @@ export const ActionType = {
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",
     Request: "budget.account.Request",
+    Refresh: "budget.account.Refresh",
     SubAccountsTable: {
       AddPlaceholders: "budget.account.subaccountstable.AddPlaceholders",
       UpdateRow: "budget.account.subaccountstable.UpdateRow",
@@ -104,8 +105,6 @@ export const ActionType = {
   }
 };
 
-export type ActionCreator = (payload?: any, options?: Redux.IActionConfig) => Redux.Budget.IAction<any>;
-
 export const simpleAction = <P = any>(type: string) => {
   return (payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
     return { ...createAction<P>(type, payload, options) };
@@ -144,6 +143,7 @@ export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loadi
 export const responseBudgetAction = simpleAction<IBudget>(ActionType.Budget.Response);
 
 export const requestAccountAction = simpleAccountAction<null>(ActionType.Account.Request);
+export const refreshAccountAction = simpleAction<null>(ActionType.Account.Refresh);
 export const loadingAccountAction = simpleAccountAction<boolean>(ActionType.Account.Loading);
 export const responseAccountAction = simpleAccountAction<IAccount>(ActionType.Account.Response);
 

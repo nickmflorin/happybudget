@@ -1,41 +1,5 @@
-import { isNil, forEach } from "lodash";
-
-interface FieldDefinition<F> {
-  name: F;
-  payload?: boolean;
-  required?: boolean;
-  response?: boolean;
-}
-
-const FieldDefinitions: { [key in Table.RowType]: FieldDefinition<string>[] } = {
-  actual: [
-    { name: "description", payload: true },
-    { name: "parent", payload: false, required: true },
-    { name: "vendor", payload: true },
-    { name: "purchase_order", payload: true },
-    { name: "date", payload: true },
-    { name: "payment_method", payload: true },
-    { name: "payment_id", payload: true },
-    { name: "value", payload: true }
-  ],
-  subaccount: [
-    { name: "description", payload: true },
-    { name: "name", payload: true, required: true },
-    { name: "quantity", payload: true },
-    { name: "rate", payload: true },
-    { name: "multiplier", payload: true },
-    { name: "unit", payload: true },
-    { name: "line", payload: true, required: true },
-    { name: "estimated", response: true }
-  ],
-  account: [
-    { name: "description", payload: true },
-    { name: "account_number", payload: true, required: true },
-    { name: "estimated", response: true },
-    { name: "variance", response: true },
-    { name: "actual", response: true }
-  ]
-};
+import { isNil, forEach, map, filter } from "lodash";
+import { IFieldDefinition, FieldDefinitions } from "./config";
 
 export const generateRandomNumericId = (): number => {
   return parseInt(Math.random().toString().slice(2, 11));
@@ -43,7 +7,7 @@ export const generateRandomNumericId = (): number => {
 
 export const payloadFromRow = <R, P>(row: R, type: Table.RowType): P => {
   const obj: { [key: string]: any } = {};
-  forEach(FieldDefinitions[type], (def: FieldDefinition<string>) => {
+  forEach(FieldDefinitions[type], (def: IFieldDefinition) => {
     if (def.payload === true && !isNil(row[def.name as keyof R])) {
       obj[def.name] = row[def.name as keyof R];
     }
@@ -53,7 +17,7 @@ export const payloadFromRow = <R, P>(row: R, type: Table.RowType): P => {
 
 export const payloadFromResponse = <M>(model: M, type: Table.RowType): { [key: string]: any } => {
   const obj: { [key: string]: any } = {};
-  forEach(FieldDefinitions[type], (def: FieldDefinition<string>) => {
+  forEach(FieldDefinitions[type], (def: IFieldDefinition) => {
     if (def.response === true) {
       obj[def.name] = model[def.name as keyof M];
     }
@@ -61,10 +25,26 @@ export const payloadFromResponse = <M>(model: M, type: Table.RowType): { [key: s
   return obj;
 };
 
+export const requestWarrantsParentRefresh = <P>(data: Partial<P>, type: Table.RowType): boolean => {
+  let parentRefreshRequired = false;
+  const fieldDefs = FieldDefinitions[type] as IFieldDefinition[];
+  const fieldsTriggeringRefresh = map(
+    filter(fieldDefs, (def: IFieldDefinition) => def.triggerParentRefresh === true),
+    (def: IFieldDefinition) => def.name
+  );
+  forEach(fieldsTriggeringRefresh, (field: string) => {
+    if (!isNil(data[field as keyof Partial<P>])) {
+      parentRefreshRequired = true;
+      return false;
+    }
+  });
+  return parentRefreshRequired;
+};
+
 export const rowHasRequiredFields = <R extends { [key: string]: any }>(row: R, type: Table.RowType): boolean => {
   let requiredFieldsPresent = true;
-  const fieldDefs = FieldDefinitions[type] as FieldDefinition<any>[];
-  forEach(fieldDefs, (def: FieldDefinition<any>) => {
+  const fieldDefs = FieldDefinitions[type] as IFieldDefinition[];
+  forEach(fieldDefs, (def: IFieldDefinition) => {
     if (def.required === true) {
       const val = row[def.name];
       if (isNil(val) || val === "") {

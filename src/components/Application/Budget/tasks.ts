@@ -1,7 +1,6 @@
-import { isNil, find, concat, forEach } from "lodash";
-import { AnyAction } from "redux";
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
+import { isNil, find, concat, forEach, filter, map } from "lodash";
 import { ClientError } from "api";
 import {
   getAccounts,
@@ -25,7 +24,7 @@ import {
 } from "services";
 import { handleRequestError } from "store/tasks";
 import {
-  ActionCreator,
+  refreshAccountAction,
   setAncestorsAction,
   setAncestorsLoadingAction,
   loadingBudgetAction,
@@ -75,8 +74,9 @@ import {
   creatingActualAction,
   updatingActualAction
 } from "./actions";
+import { FieldDefinitions, IFieldDefinition } from "./config";
 import { initialAccountState, initialSubAccountState } from "./initialState";
-import { payloadFromResponse, payloadFromRow, rowHasRequiredFields } from "./util";
+import { payloadFromResponse, payloadFromRow, rowHasRequiredFields, requestWarrantsParentRefresh } from "./util";
 
 function* handleTableErrors(
   e: Error,
@@ -375,13 +375,19 @@ export function* handleAccountSubAccountUpdateTask(
         }
       } else {
         yield put(updatingAccountSubAccountAction(action.accountId, { id: existing.id as number, value: true }));
-        const payload = action.payload.data as Partial<Http.ISubAccountPayload>;
+        const requestPayload = action.payload.data as Partial<Http.ISubAccountPayload>;
         try {
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
-          const response: ISubAccount = yield call(updateSubAccount, existing.id as number, payload);
+          const response: ISubAccount = yield call(updateSubAccount, existing.id as number, requestPayload);
           const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
           yield put(updateAccountSubAccountsTableRowAction(accountId, { id: existing.id, data: responsePayload }));
+
+          // Determine if the parent account needs to be refreshed due to updates to the underlying
+          // account fields that calculate the values of the parent account.
+          if (requestWarrantsParentRefresh(requestPayload, "subaccount")) {
+            yield put(refreshAccountAction());
+          }
         } catch (e) {
           yield call(
             handleTableErrors,

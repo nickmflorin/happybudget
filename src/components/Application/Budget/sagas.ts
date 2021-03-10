@@ -154,6 +154,17 @@ function* watchForRequestAccountSaga(): SagaIterator {
   }
 }
 
+// function* watchForRefreshAccountSaga(): SagaIterator {
+//   let lastTasks;
+//   while (true) {
+//     const action = yield take(ActionType.Account.Refresh);
+//     if (lastTasks) {
+//       yield cancel(lastTasks);
+//     }
+//     lastTasks = yield call(refreshAccountTask, action);
+//   }
+// }
+
 function* watchForRequestSubAccountSaga(): SagaIterator {
   let lastTasks;
   while (true) {
