@@ -25,6 +25,7 @@ import {
 } from "services";
 import { handleRequestError } from "store/tasks";
 import {
+  ActionCreator,
   setAncestorsAction,
   setAncestorsLoadingAction,
   loadingBudgetAction,
@@ -61,8 +62,10 @@ import {
   removeAccountsTableRowAction,
   removeAccountSubAccountsRowAction,
   removeSubAccountSubAccountsTableRowAction,
-  setAccountsTableCellErrorAction,
-  setActualsTableCellErrorAction,
+  addErrorsToAccountsTableAction,
+  addErrorsToAccountSubAccountsTableAction,
+  addErrorsToSubAccountSubAccountsTableAction,
+  addErrorsToActualsTableAction,
   addAccountSubAccountsTablePlaceholdersAction,
   addSubAccountSubAccountsTablePlaceholdersAction,
   addAccountsTablePlaceholdersAction,
@@ -75,14 +78,14 @@ import {
 import { initialAccountState, initialSubAccountState } from "./initialState";
 import { payloadFromResponse, payloadFromRow, rowHasRequiredFields } from "./util";
 
-function* handleTableErrors<F extends string = string>(
+function* handleTableErrors(
   e: Error,
   message: string,
   id: number,
-  actionCreator: (errors: Table.ICellError<F>[], ...args: any[]) => Redux.Budget.IAction<any>
+  action: (errors: Table.ICellError[]) => Redux.Budget.IAction<any>
 ): SagaIterator {
   if (e instanceof ClientError) {
-    const cellErrors: Table.ICellError<F>[] = [];
+    const cellErrors: Table.ICellError[] = [];
     forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
       cellErrors.push({
         id: id,
@@ -90,13 +93,13 @@ function* handleTableErrors<F extends string = string>(
         error: errors[0].message,
         // TODO: Should we make sure the field exists as a cell?  Instead of force
         // coercing here?
-        field: field as F
+        field: field
       });
     });
     if (cellErrors.length === 0) {
       handleRequestError(e, message);
     } else {
-      yield put(actionCreator(cellErrors));
+      yield put(action(cellErrors));
     }
   } else {
     handleRequestError(e, message);
@@ -214,8 +217,13 @@ export function* handleAccountUpdateTask(
             const responsePayload = payloadFromResponse<IAccount>(response, "account");
             yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
           } catch (e) {
-            // TODO: Should we revert the changes if there was an error?
-            handleRequestError(e, "There was an error updating the account.");
+            yield call(
+              handleTableErrors,
+              e,
+              "There was an error updating the account.",
+              existing.id,
+              (errors: Table.ICellError[]) => addErrorsToAccountsTableAction(errors)
+            );
           } finally {
             yield put(creatingAccountAction(false));
           }
@@ -231,13 +239,13 @@ export function* handleAccountUpdateTask(
           const responsePayload = payloadFromResponse<IAccount>(response, "account");
           yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
         } catch (e) {
-          // yield call(
-          //   handleTableErrors,
-          //   e,
-          //   "There was an error updating the account.",
-          //   existing.id,
-          //   setAccountsTableCellErrorAction
-          // );
+          yield call(
+            handleTableErrors,
+            e,
+            "There was an error updating the account.",
+            existing.id,
+            (errors: Table.ICellError[]) => addErrorsToAccountsTableAction(errors)
+          );
         } finally {
           yield put(updatingAccountAction({ id: existing.id as number, value: false }));
         }
@@ -292,26 +300,13 @@ export function* handleActualUpdateTask(
           const responsePayload = payloadFromResponse<IActual>(response, "actual");
           yield put(updateActualsTableCellAction({ id: existing.id, data: responsePayload }));
         } catch (e) {
-          if (e instanceof ClientError) {
-            const cellErrors: Table.ICellError<Table.ActualRowField>[] = [];
-            forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
-              cellErrors.push({
-                id: existing.id,
-                // TODO: We might want to build in a way to capture multiple errors for the cell.
-                error: errors[0].message,
-                // TODO: Should we make sure the field exists as a cell?  Instead of force
-                // coercing here?
-                field: field as Table.ActualRowField
-              });
-            });
-            if (cellErrors.length === 0) {
-              handleRequestError(e, "There was an error updating the actual.");
-            } else {
-              yield put(setActualsTableCellErrorAction(cellErrors));
-            }
-          } else {
-            handleRequestError(e, "There was an error updating the actual.");
-          }
+          yield call(
+            handleTableErrors,
+            e,
+            "There was an error updating the actual.",
+            existing.id,
+            (errors: Table.ICellError[]) => addErrorsToActualsTableAction(errors)
+          );
         } finally {
           yield put(updatingActualAction({ id: existing.id as number, value: false }));
         }
@@ -355,24 +350,27 @@ export function* handleAccountSubAccountUpdateTask(
         // Wait until all of the required fields are present before we create the SubAccount in the
         // backend and remove the placeholder designation of the row in the frontend.
         if (rowHasRequiredFields<Table.ISubAccountRow>(existing, "subaccount")) {
-          yield put(creatingAccountSubAccountAction(action.accountId, true));
+          yield put(creatingAccountSubAccountAction(accountId, true));
           try {
             const response: ISubAccount = yield call(
               createAccountSubAccount,
-              action.accountId,
+              accountId,
               action.budgetId,
               requestPayload as Http.ISubAccountPayload
             );
             yield put(activateAccountSubAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
-            yield put(
-              updateAccountSubAccountsTableRowAction(action.accountId, { id: existing.id, data: responsePayload })
-            );
+            yield put(updateAccountSubAccountsTableRowAction(accountId, { id: existing.id, data: responsePayload }));
           } catch (e) {
-            // TODO: Should we revert the changes if there was an error?
-            handleRequestError(e, "There was an error updating the sub account.");
+            yield call(
+              handleTableErrors,
+              e,
+              "There was an error updating the sub account.",
+              existing.id,
+              (errors: Table.ICellError[]) => addErrorsToAccountSubAccountsTableAction(accountId, errors)
+            );
           } finally {
-            yield put(creatingAccountSubAccountAction(action.accountId, false));
+            yield put(creatingAccountSubAccountAction(accountId, false));
           }
         }
       } else {
@@ -383,14 +381,17 @@ export function* handleAccountSubAccountUpdateTask(
           // synchronously before the time that this API request is made.
           const response: ISubAccount = yield call(updateSubAccount, existing.id as number, payload);
           const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
-          yield put(
-            updateAccountSubAccountsTableRowAction(action.accountId, { id: existing.id, data: responsePayload })
-          );
+          yield put(updateAccountSubAccountsTableRowAction(accountId, { id: existing.id, data: responsePayload }));
         } catch (e) {
-          // TODO: Should we revert the changes if there was an error?
-          handleRequestError(e, "There was an error updating the sub account.");
+          yield call(
+            handleTableErrors,
+            e,
+            "There was an error updating the sub account.",
+            existing.id,
+            (errors: Table.ICellError[]) => addErrorsToAccountSubAccountsTableAction(accountId, errors)
+          );
         } finally {
-          yield put(updatingAccountSubAccountAction(action.accountId, { id: existing.id as number, value: false }));
+          yield put(updatingAccountSubAccountAction(accountId, { id: existing.id as number, value: false }));
         }
       }
     }
@@ -428,12 +429,11 @@ export function* handleSubAccountSubAccountUpdateTask(
       if (existing.meta.isPlaceholder === true) {
         // The reducer will have already updated the existing value of the row synchronously.
         const requestPayload = payloadFromRow<Table.ISubAccountRow, Http.ISubAccountPayload>(existing, "subaccount");
-
         // Wait until all of the required fields are present before we create
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
         if (rowHasRequiredFields<Table.ISubAccountRow>(existing, "subaccount")) {
-          yield put(creatingSubAccountSubAccountAction(action.subaccountId, true));
+          yield put(creatingSubAccountSubAccountAction(subaccountId, true));
           try {
             const response = yield call(
               createSubAccountSubAccount,
@@ -446,14 +446,19 @@ export function* handleSubAccountSubAccountUpdateTask(
               updateSubAccountSubAccountsTableRowAction(subaccountId, { id: existing.id, data: responsePayload })
             );
           } catch (e) {
-            // TODO: Should we revert the changes if there was an error?
-            handleRequestError(e, "There was an error updating the sub account.");
+            yield call(
+              handleTableErrors,
+              e,
+              "There was an error updating the sub account.",
+              existing.id,
+              (errors: Table.ICellError[]) => addErrorsToSubAccountSubAccountsTableAction(subaccountId, errors)
+            );
           } finally {
-            yield put(creatingSubAccountSubAccountAction(action.subaccountId, false));
+            yield put(creatingSubAccountSubAccountAction(subaccountId, false));
           }
         }
       } else {
-        yield put(updatingSubAccountSubAccountAction(action.subaccountId, { id: existing.id as number, value: true }));
+        yield put(updatingSubAccountSubAccountAction(subaccountId, { id: existing.id as number, value: true }));
         try {
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
@@ -464,18 +469,21 @@ export function* handleSubAccountSubAccountUpdateTask(
           );
           const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
           yield put(
-            updateSubAccountSubAccountsTableRowAction(action.subaccountId, {
+            updateSubAccountSubAccountsTableRowAction(subaccountId, {
               id: response.id,
               data: responsePayload
             })
           );
         } catch (e) {
-          // TODO: Should we revert the changes if there was an error?
-          handleRequestError(e, "There was an error updating the sub account.");
-        } finally {
-          yield put(
-            updatingSubAccountSubAccountAction(action.subaccountId, { id: existing.id as number, value: false })
+          yield call(
+            handleTableErrors,
+            e,
+            "There was an error updating the sub account.",
+            existing.id,
+            (errors: Table.ICellError[]) => addErrorsToSubAccountSubAccountsTableAction(subaccountId, errors)
           );
+        } finally {
+          yield put(updatingSubAccountSubAccountAction(subaccountId, { id: existing.id as number, value: false }));
         }
       }
     }

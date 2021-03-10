@@ -65,7 +65,8 @@ export const ActionType = {
       SetSearch: "budget.account.subaccountstable.SetSearch",
       Loading: "budget.account.subaccountstable.Loading",
       Response: "budget.account.subaccountstable.Response",
-      Request: "budget.account.subaccountstable.Request"
+      Request: "budget.account.subaccountstable.Request",
+      AddErrors: "budget.account.subaccountstable.AddErrors"
     },
     SubAccounts: {
       Deleting: "budget.account.subaccounts.Deleting",
@@ -90,7 +91,8 @@ export const ActionType = {
       SetSearch: "budget.subaccount.subaccountstable.SetSearch",
       Loading: "budget.subaccount.subaccountstable.Loading",
       Response: "budget.subaccount.subaccountstable.Response",
-      Request: "budget.subaccount.subaccountstable.Request"
+      Request: "budget.subaccount.subaccountstable.Request",
+      AddErrors: "budget.subaccount.subaccountstable.AddErrors"
     },
     SubAccounts: {
       Deleting: "budget.subaccount.subaccounts.Deleting",
@@ -101,6 +103,8 @@ export const ActionType = {
     }
   }
 };
+
+export type ActionCreator = (payload?: any, options?: Redux.IActionConfig) => Redux.Budget.IAction<any>;
 
 export const simpleAction = <P = any>(type: string) => {
   return (payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
@@ -173,9 +177,9 @@ export const requestAccountsAction = simpleBudgetAction<null>(ActionType.Account
 export const loadingAccountsAction = simpleAction<boolean>(ActionType.AccountsTable.Loading);
 export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.AccountsTable.Response);
 export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsTable.SetSearch);
-export const setAccountsTableCellErrorAction = simpleAction<
-  Table.ICellError<Table.AccountRowField> | Table.ICellError<Table.AccountRowField>[]
->(ActionType.AccountsTable.AddErrors);
+export const addErrorsToAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
+  ActionType.AccountsTable.AddErrors
+);
 /*
   Actions Pertaining to the Sub Accounts of an Account
 */
@@ -226,6 +230,9 @@ export const responseAccountSubAccountsAction = simpleAccountAction<Http.IListRe
 );
 export const setAccountSubAccountsSearchAction = simpleAccountAction<string>(
   ActionType.Account.SubAccountsTable.SetSearch
+);
+export const addErrorsToAccountSubAccountsTableAction = simpleAccountAction<Table.ICellError | Table.ICellError[]>(
+  ActionType.Account.SubAccountsTable.AddErrors
 );
 
 /*
@@ -281,6 +288,9 @@ export const responseSubAccountSubAccountsAction = simpleSubAccountAction<Http.I
 export const setSubAccountSubAccountsSearchAction = simpleSubAccountAction<string>(
   ActionType.SubAccount.SubAccountsTable.SetSearch
 );
+export const addErrorsToSubAccountSubAccountsTableAction = simpleSubAccountAction<
+  Table.ICellError | Table.ICellError[]
+>(ActionType.SubAccount.SubAccountsTable.AddErrors);
 
 /*
   Actions Pertaining to the Actuals
@@ -308,6 +318,6 @@ export const requestActualsAction = simpleBudgetAction<null>(ActionType.ActualsT
 export const loadingActualsAction = simpleAction<boolean>(ActionType.ActualsTable.Loading);
 export const responseActualsAction = simpleAction<Http.IListResponse<IActual>>(ActionType.ActualsTable.Response);
 export const setActualsSearchAction = simpleAction<string>(ActionType.ActualsTable.SetSearch);
-export const setActualsTableCellErrorAction = simpleAction<
-  Table.ICellError<Table.ActualRowField> | Table.ICellError<Table.ActualRowField>[]
->(ActionType.ActualsTable.AddErrors);
+export const addErrorsToActualsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
+  ActionType.ActualsTable.AddErrors
+);

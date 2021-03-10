@@ -59,10 +59,9 @@ export interface IReducerFactoryOptions<S> {
 
 export interface ITableReducerOptions<
   F extends string,
-  E extends Table.IRowMeta<F, Y>,
+  E extends Table.IRowMeta,
   R extends Table.IRow<F, E>,
   M extends Model,
-  Y extends Table.ICellError<F> = Table.ICellError<F>,
   S extends Redux.ITableStore<F, E, R, M> = Redux.ITableStore<F, E, R, M>
 > extends IReducerFactoryOptions<S> {}
 

@@ -16,6 +16,7 @@ import {
   ITableDataActionMap,
   ITableReducerOptions
 } from "./model";
+import { TableLocale } from "antd/lib/table/interface";
 
 export const createSimplePayloadReducer = <P, A extends Redux.IAction<P>>(
   actionType: string,
@@ -113,9 +114,8 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
 export const createTableDataReducer = <
   /* eslint-disable indent */
   F extends string,
-  E extends Table.IRowMeta<F, Y>,
+  E extends Table.IRowMeta,
   R extends Table.IRow<F, E>,
-  Y extends Table.ICellError<F> = Table.ICellError<F>,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   mappings: Partial<ITableDataActionMap>,
@@ -234,8 +234,8 @@ export const createTableDataReducer = <
           return map(newState, (row: R) => ({ ...row, meta: { ...row.meta, selected: true } }));
         }
       },
-      AddErrors: (payload: Y | Y[]) => {
-        const updateStateWithError = (st: Redux.ListStore<R>, e: Y): Redux.ListStore<R> => {
+      AddErrors: (payload: Table.ICellError | Table.ICellError[]) => {
+        const updateStateWithError = (st: Redux.ListStore<R>, e: Table.ICellError): Redux.ListStore<R> => {
           const row = find(newState, { id: e.id }) as R;
           if (isNil(row)) {
             /* eslint-disable no-console */
@@ -310,10 +310,9 @@ export const createTableDataReducer = <
 export const createTableReducer = <
   /* eslint-disable indent */
   F extends string,
-  E extends Table.IRowMeta<F, Y>,
+  E extends Table.IRowMeta,
   R extends Table.IRow<F, E>,
   M extends Model,
-  Y extends Table.ICellError<F> = Table.ICellError<F>,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   /* eslint-disable indent */
@@ -327,7 +326,7 @@ export const createTableReducer = <
     initialState: initialTableState
   });
 
-  const dataReducer = createTableDataReducer<F, E, R, Y, A>(
+  const dataReducer = createTableDataReducer<F, E, R, A>(
     {
       AddPlaceholders: mappings.AddPlaceholders,
       RemoveRow: mappings.RemoveRow,

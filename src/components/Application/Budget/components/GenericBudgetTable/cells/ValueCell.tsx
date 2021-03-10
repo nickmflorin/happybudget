@@ -12,14 +12,14 @@ interface ValueCellProps extends ICellRendererParams {
 }
 
 const ValueCell = ({ value, node, colDef }: ValueCellProps): JSX.Element => {
-  const [cellErrors, setCellErrors] = useState<Table.ICellError<any>[]>([]);
+  const [cellErrors, setCellErrors] = useState<Table.ICellError[]>([]);
 
   useEffect(() => {
     if (!isNil(colDef.field)) {
       setCellErrors(
         filter(
           node.data.meta.errors,
-          (error: Table.ICellError<any>) => error.field === colDef.field && error.id === node.data.id
+          (error: Table.ICellError) => error.field === colDef.field && error.id === node.data.id
         )
       );
     }

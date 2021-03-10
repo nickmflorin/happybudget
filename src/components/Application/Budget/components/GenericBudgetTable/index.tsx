@@ -23,7 +23,7 @@ import TableHeader from "./TableHeader";
 import { DeleteCell, ExpandCell, SelectCell, ValueCell, NewRowCell, UnitCell } from "./cells";
 import "./index.scss";
 
-interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta<F>, R extends Table.IRow<F, E>> {
+interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R extends Table.IRow<F, E>> {
   columns: ColDef[];
   table: R[];
   search: string;
@@ -41,7 +41,7 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta<F>,
   isCellEditable: (row: R, col: ColDef) => boolean;
 }
 
-const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R extends Table.IRow<F, E>>({
+const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extends Table.IRow<F, E>>({
   columns,
   table,
   search,
@@ -249,7 +249,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta<F>, R ext
               const field = params.colDef.field;
               const errors = filter(
                 row.meta.errors,
-                (error: Table.ICellError<F>) => error.field === field && error.id === row.id
+                (error: Table.ICellError) => error.field === field && error.id === row.id
               );
               if (errors.length !== 0) {
                 hasError = true;
