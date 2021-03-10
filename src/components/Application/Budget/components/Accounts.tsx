@@ -7,8 +7,7 @@ import { ColDef } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
-  requestBudgetAction,
-  requestAccountsAction,
+  setBudgetIdAction,
   setAccountsSearchAction,
   addAccountsTablePlaceholdersAction,
   deselectAccountsTableRowAction,
@@ -27,9 +26,8 @@ const Accounts = (): JSX.Element => {
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
 
   useEffect(() => {
-    if (!isNil(budgetId) && !isNaN(parseInt(budgetId))) {
-      dispatch(requestBudgetAction(parseInt(budgetId)));
-      dispatch(requestAccountsAction(parseInt(budgetId)));
+    if (!isNaN(parseInt(budgetId))) {
+      dispatch(setBudgetIdAction(parseInt(budgetId)));
     }
   }, [budgetId]);
 
@@ -51,9 +49,7 @@ const Accounts = (): JSX.Element => {
           onRowSelect={(id: number) => dispatch(selectAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectAccountsTableRowAction(id))}
           onRowDelete={(row: Table.IAccountRow) => dispatch(removeAccountAction(row))}
-          onRowUpdate={(id: number, data: { [key: string]: any }) =>
-            dispatch(updateAccountAction(parseInt(budgetId), { id, data }))
-          }
+          onRowUpdate={(id: number, data: { [key: string]: any }) => dispatch(updateAccountAction({ id, data }))}
           onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountsTableRowsAction())}
           estimated={!isNil(budget.data) && !isNil(budget.data.estimated) ? budget.data.estimated : 0.0}

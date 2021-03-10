@@ -1,8 +1,10 @@
 import { createAction } from "store/actions";
 
 export const ActionType = {
+  SetAccountId: "budget.SetAccountId",
   SetAncestors: "budget.SetAncestors",
   SetAncestorsLoading: "budget.SetAncestorsLoading",
+  SetBudgetId: "budget.SetBudgetId",
   Budget: {
     Loading: "budget.budget.Loading",
     Response: "budget.budget.Response",
@@ -51,6 +53,7 @@ export const ActionType = {
     AddErrors: "budget.accountstable.AddErrors"
   },
   Account: {
+    SetId: "budget.account.SetId",
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",
     Request: "budget.account.Request",
@@ -111,18 +114,6 @@ export const simpleAction = <P = any>(type: string) => {
   };
 };
 
-export const simpleBudgetAction = <P = any>(type: string) => {
-  return (budgetId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
-    return { ...createAction<P>(type, payload, options), budgetId };
-  };
-};
-
-export const simpleBudgetAccountAction = <P = any>(type: string) => {
-  return (accountId: number, budgetId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
-    return { ...createAction<P>(type, payload, options), accountId, budgetId };
-  };
-};
-
 export const simpleAccountAction = <P = any>(type: string) => {
   return (accountId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
     return { ...createAction<P>(type, payload, options), accountId };
@@ -135,10 +126,13 @@ export const simpleSubAccountAction = <P = any>(type: string) => {
   };
 };
 
+export const setAccountIdAction = simpleAction<number>(ActionType.Account.SetId);
+export const setBudgetIdAction = simpleAction<number>(ActionType.SetBudgetId);
+
 export const setAncestorsAction = simpleAction<IAncestor[]>(ActionType.SetAncestors);
 export const setAncestorsLoadingAction = simpleAction<boolean>(ActionType.SetAncestorsLoading);
 
-export const requestBudgetAction = simpleBudgetAction<null>(ActionType.Budget.Request);
+export const requestBudgetAction = simpleAction<null>(ActionType.Budget.Request);
 export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loading);
 export const responseBudgetAction = simpleAction<IBudget>(ActionType.Budget.Response);
 
@@ -155,7 +149,7 @@ export const responseSubAccountAction = simpleSubAccountAction<ISubAccount>(Acti
   Actions Pertaining to the Accounts
 */
 export const addAccountsTablePlaceholdersAction = simpleAction<number>(ActionType.AccountsTable.AddPlaceholders);
-export const updateAccountAction = simpleBudgetAction<{
+export const updateAccountAction = simpleAction<{
   id: number;
   data: Partial<Http.IAccountPayload>;
 }>(ActionType.Accounts.Update);
@@ -173,7 +167,7 @@ export const removeAccountAction = simpleAction<Table.IAccountRow>(ActionType.Ac
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Accounts.Creating);
-export const requestAccountsAction = simpleBudgetAction<null>(ActionType.AccountsTable.Request);
+export const requestAccountsAction = simpleAction<null>(ActionType.AccountsTable.Request);
 export const loadingAccountsAction = simpleAction<boolean>(ActionType.AccountsTable.Loading);
 export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.AccountsTable.Response);
 export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsTable.SetSearch);
@@ -186,7 +180,7 @@ export const addErrorsToAccountsTableAction = simpleAction<Table.ICellError | Ta
 export const addAccountSubAccountsTablePlaceholdersAction = simpleAccountAction<number>(
   ActionType.Account.SubAccountsTable.AddPlaceholders
 );
-export const updateAccountSubAccountAction = simpleBudgetAccountAction<{
+export const updateAccountSubAccountAction = simpleAccountAction<{
   id: number;
   data: Partial<Http.ISubAccountPayload>;
 }>(ActionType.Account.SubAccounts.Update);
@@ -219,9 +213,7 @@ export const updatingAccountSubAccountAction = simpleAccountAction<Redux.ModelLi
   ActionType.Account.SubAccounts.Updating
 );
 export const creatingAccountSubAccountAction = simpleAccountAction<boolean>(ActionType.Account.SubAccounts.Creating);
-export const requestAccountSubAccountsAction = simpleBudgetAccountAction<null>(
-  ActionType.Account.SubAccountsTable.Request
-);
+export const requestAccountSubAccountsAction = simpleAccountAction<null>(ActionType.Account.SubAccountsTable.Request);
 export const loadingAccountSubAccountsAction = simpleAccountAction<boolean>(
   ActionType.Account.SubAccountsTable.Loading
 );
@@ -296,7 +288,7 @@ export const addErrorsToSubAccountSubAccountsTableAction = simpleSubAccountActio
   Actions Pertaining to the Actuals
 */
 export const addActualsTablePlaceholdersAction = simpleAction<number>(ActionType.ActualsTable.AddPlaceholders);
-export const updateActualAction = simpleBudgetAction<{
+export const updateActualAction = simpleAction<{
   id: number;
   data: Partial<Http.IAccountPayload>;
 }>(ActionType.Actuals.Update);
@@ -314,7 +306,7 @@ export const removeActualAction = simpleAction<Table.IActualRow>(ActionType.Actu
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Actuals.Deleting);
 export const updatingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Actuals.Updating);
 export const creatingActualAction = simpleAction<boolean>(ActionType.Actuals.Creating);
-export const requestActualsAction = simpleBudgetAction<null>(ActionType.ActualsTable.Request);
+export const requestActualsAction = simpleAction<null>(ActionType.ActualsTable.Request);
 export const loadingActualsAction = simpleAction<boolean>(ActionType.ActualsTable.Loading);
 export const responseActualsAction = simpleAction<Http.IListResponse<IActual>>(ActionType.ActualsTable.Response);
 export const setActualsSearchAction = simpleAction<string>(ActionType.ActualsTable.SetSearch);

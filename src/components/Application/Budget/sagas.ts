@@ -17,19 +17,18 @@ import {
   handleSubAccountSubAccountUpdateTask,
   handleSubAccountSubAccountRemovalTask,
   handleActualRemovalTask,
-  handleActualUpdateTask
+  handleActualUpdateTask,
+  handleBudgetChangedTask
 } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.AccountsTable.Request);
-    if (!isNil(action.budgetId)) {
-      if (lastTasks) {
-        yield cancel(lastTasks);
-      }
-      lastTasks = yield call(getAccountsTask, action);
+    if (lastTasks) {
+      yield cancel(lastTasks);
     }
+    lastTasks = yield call(getAccountsTask, action);
   }
 }
 
@@ -37,12 +36,10 @@ function* watchForTriggerBudgetActualsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.ActualsTable.Request);
-    if (!isNil(action.budgetId)) {
-      if (lastTasks) {
-        yield cancel(lastTasks);
-      }
-      lastTasks = yield call(getActualsTask, action);
+    if (lastTasks) {
+      yield cancel(lastTasks);
     }
+    lastTasks = yield call(getActualsTask, action);
   }
 }
 
@@ -50,7 +47,7 @@ function* watchForTriggerAccountSubAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.Account.SubAccountsTable.Request);
-    if (!isNil(action.budgetId) && !isNil(action.accountId)) {
+    if (!isNil(action.accountId)) {
       if (lastTasks) {
         yield cancel(lastTasks);
       }
@@ -132,12 +129,10 @@ function* watchForRequestBudgetSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.Budget.Request);
-    if (!isNil(action.budgetId)) {
-      if (lastTasks) {
-        yield cancel(lastTasks);
-      }
-      lastTasks = yield call(getBudgetTask, action);
+    if (lastTasks) {
+      yield cancel(lastTasks);
     }
+    lastTasks = yield call(getBudgetTask, action);
   }
 }
 
@@ -154,16 +149,16 @@ function* watchForRequestAccountSaga(): SagaIterator {
   }
 }
 
-// function* watchForRefreshAccountSaga(): SagaIterator {
-//   let lastTasks;
-//   while (true) {
-//     const action = yield take(ActionType.Account.Refresh);
-//     if (lastTasks) {
-//       yield cancel(lastTasks);
-//     }
-//     lastTasks = yield call(refreshAccountTask, action);
-//   }
-// }
+function* watchForBudgetIdChangedSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.SetBudgetId);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(handleBudgetChangedTask, action);
+  }
+}
 
 function* watchForRequestSubAccountSaga(): SagaIterator {
   let lastTasks;
@@ -185,6 +180,7 @@ function* detailsSaga(): SagaIterator {
 }
 
 export default function* rootSaga(): SagaIterator {
+  yield spawn(watchForBudgetIdChangedSaga);
   yield spawn(detailsSaga);
   yield spawn(accountsSaga);
   yield spawn(actualsSaga);

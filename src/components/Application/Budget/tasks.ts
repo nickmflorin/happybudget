@@ -72,7 +72,9 @@ import {
   removeActualsTableRowAction,
   deletingActualAction,
   creatingActualAction,
-  updatingActualAction
+  updatingActualAction,
+  requestAccountsAction,
+  requestBudgetAction
 } from "./actions";
 import { FieldDefinitions, IFieldDefinition } from "./config";
 import { initialAccountState, initialSubAccountState } from "./initialState";
@@ -103,6 +105,13 @@ function* handleTableErrors(
     }
   } else {
     handleRequestError(e, message);
+  }
+}
+
+export function* handleBudgetChangedTask(action: Redux.Budget.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(requestAccountsAction());
+    yield put(requestBudgetAction());
   }
 }
 
@@ -497,10 +506,12 @@ export function* handleSubAccountSubAccountUpdateTask(
 }
 
 export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  if (!isNil(action.budgetId)) {
+  console.log("Getting accounts!");
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budgetId);
+  if (!isNil(budgetId)) {
     yield put(loadingAccountsAction(true));
     try {
-      const response = yield call(getAccounts, action.budgetId, { no_pagination: true });
+      const response = yield call(getAccounts, budgetId, { no_pagination: true });
       yield put(responseAccountsAction(response));
       if (response.data.length === 0) {
         yield put(addAccountsTablePlaceholdersAction(2));
@@ -574,11 +585,12 @@ export function* getSubAccountSubAccountsTask(action: Redux.Budget.IAction<null>
 }
 
 export function* getBudgetTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  if (!isNil(action.budgetId)) {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budgetId);
+  if (!isNil(budgetId)) {
     yield put(setAncestorsLoadingAction(true));
     yield put(loadingBudgetAction(true));
     try {
-      const response: IBudget = yield call(getBudget, action.budgetId);
+      const response: IBudget = yield call(getBudget, budgetId);
       yield put(responseBudgetAction(response));
       yield put(
         setAncestorsAction([

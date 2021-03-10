@@ -14,7 +14,6 @@ export const initialListResponseState: Redux.IListResponseStore<any> = {
 export const initialDetailResponseState: Redux.IDetailResponseStore<any> = {
   loading: false,
   data: undefined,
-  id: undefined,
   responseWasReceived: false
 };
 

@@ -48,7 +48,6 @@ namespace Redux {
   interface IDetailResponseStore<T extends Model> {
     readonly data: T | undefined;
     readonly loading: boolean;
-    readonly id: number | undefined;
     readonly responseWasReceived: boolean;
   }
 
@@ -159,6 +158,8 @@ namespace Redux {
     interface IStore {
       readonly budget: IDetailResponseStore<IBudget>;
       readonly accounts: IAccountsStore;
+      readonly accountId: number | null;
+      readonly budgetId: number | null;
       readonly subaccounts: IIndexedStore<ISubAccountStore>;
       readonly ancestors: ListStore<IAncestor>;
       readonly ancestorsLoading: boolean;

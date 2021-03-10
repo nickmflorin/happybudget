@@ -23,12 +23,12 @@ const Actuals = (): JSX.Element => {
   const actuals = useSelector((state: Redux.IApplicationStore) => state.budget.actuals);
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
 
-  useEffect(() => {
-    if (!isNil(budgetId) && !isNaN(parseInt(budgetId))) {
-      dispatch(requestBudgetAction(parseInt(budgetId)));
-      dispatch(requestActualsAction(parseInt(budgetId)));
-    }
-  }, [budgetId]);
+  // useEffect(() => {
+  //   if (!isNil(budgetId) && !isNaN(parseInt(budgetId))) {
+  //     dispatch(requestBudgetAction(parseInt(budgetId)));
+  //     dispatch(requestActualsAction(parseInt(budgetId)));
+  //   }
+  // }, [budgetId]);
 
   return (
     <RenderIfValidId id={budgetId}>
@@ -43,9 +43,7 @@ const Actuals = (): JSX.Element => {
           onRowSelect={(id: number) => dispatch(selectActualsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectActualsTableRowAction(id))}
           onRowDelete={(row: Table.IActualRow) => dispatch(removeActualAction(row))}
-          onRowUpdate={(id: number, data: { [key: string]: any }) =>
-            dispatch(updateActualAction(parseInt(budgetId), { id, data }))
-          }
+          onRowUpdate={(id: number, data: { [key: string]: any }) => dispatch(updateActualAction({ id, data }))}
           onSelectAll={() => dispatch(selectAllActualsTableRowsAction())}
           estimated={!isNil(budget.data) && !isNil(budget.data.estimated) ? budget.data.estimated : 0.0}
           columns={[

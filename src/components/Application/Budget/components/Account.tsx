@@ -7,7 +7,7 @@ import { ColDef } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
-  requestAccountAction,
+  setAccountIdAction,
   addAccountSubAccountsTablePlaceholdersAction,
   deselectAccountSubAccountsTableRowAction,
   removeAccountSubAccountAction,
@@ -37,13 +37,13 @@ const Account = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
-      dispatch(requestAccountAction(parseInt(accountId)));
+      dispatch(setAccountIdAction(parseInt(accountId)));
     }
   }, [accountId]);
 
   useEffect(() => {
     if (!isNil(budgetId) && !isNaN(parseInt(budgetId)) && !isNil(accountId) && !isNil(parseInt(accountId))) {
-      dispatch(requestAccountSubAccountsAction(parseInt(accountId), parseInt(budgetId)));
+      dispatch(requestAccountSubAccountsAction(parseInt(accountId)));
     }
   }, [budgetId, accountId]);
 
@@ -76,7 +76,7 @@ const Account = (): JSX.Element => {
           onRowDeselect={(id: number) => dispatch(deselectAccountSubAccountsTableRowAction(parseInt(accountId), id))}
           onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeAccountSubAccountAction(parseInt(accountId), row))}
           onRowUpdate={(id: number, data: { [key: string]: any }) =>
-            dispatch(updateAccountSubAccountAction(parseInt(accountId), parseInt(budgetId), { id, data }))
+            dispatch(updateAccountSubAccountAction(parseInt(accountId), { id, data }))
           }
           onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountSubAccountsTableRowsAction(parseInt(accountId)))}
@@ -111,7 +111,7 @@ const Account = (): JSX.Element => {
               cellRendererParams: {
                 onChange: (value: Unit, row: Table.ISubAccountRow) =>
                   dispatch(
-                    updateAccountSubAccountAction(parseInt(accountId), parseInt(budgetId), {
+                    updateAccountSubAccountAction(parseInt(accountId), {
                       id: row.id,
                       data: { unit: value }
                     })

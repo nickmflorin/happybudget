@@ -1,5 +1,5 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Switch, Route, useRouteMatch, useHistory, useLocation, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,6 +19,7 @@ import {
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { Layout } from "components/layout";
+import { setBudgetIdAction } from "./actions";
 import { AncestorsBreadCrumbs } from "./components";
 import "./index.scss";
 
@@ -30,11 +31,18 @@ const Actuals = React.lazy(() => import("./components/Actuals"));
 const Budget = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
+  const dispatch = useDispatch();
   const match = useRouteMatch();
   const { budgetId } = useParams<{ budgetId: string }>();
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
   const ancestors = useSelector((state: Redux.IApplicationStore) => state.budget.ancestors);
   const ancestorsLoading = useSelector((state: Redux.IApplicationStore) => state.budget.ancestorsLoading);
+
+  useEffect(() => {
+    if (!isNaN(parseInt(budgetId))) {
+      dispatch(setBudgetIdAction(parseInt(budgetId)));
+    }
+  }, [budgetId]);
 
   return (
     <Layout

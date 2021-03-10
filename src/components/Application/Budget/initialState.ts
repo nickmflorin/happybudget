@@ -38,6 +38,8 @@ export const initialActualsState: Redux.Budget.IActualsStore = {
 const initialState: Redux.Budget.IStore = {
   budget: initialDetailResponseState,
   accounts: initialAccountsState,
+  accountId: null,
+  budgetId: null,
   subaccounts: {},
   ancestors: [],
   ancestorsLoading: false,

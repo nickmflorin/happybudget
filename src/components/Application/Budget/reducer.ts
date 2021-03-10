@@ -4,7 +4,8 @@ import {
   createDetailResponseReducer,
   createSimpleBooleanReducer,
   createModelListActionReducer,
-  createTableReducer
+  createTableReducer,
+  createSimplePayloadReducer
 } from "store/reducerFactories";
 
 import { ActionType } from "./actions";
@@ -150,6 +151,8 @@ const ancestorsReducer: Reducer<Redux.ListStore<IAncestor>, Redux.Budget.IAction
 };
 
 const rootReducer = combineReducers({
+  accountId: createSimplePayloadReducer(ActionType.SetAccountId),
+  budgetId: createSimplePayloadReducer(ActionType.SetBudgetId),
   ancestors: ancestorsReducer,
   ancestorsLoading: createSimpleBooleanReducer(ActionType.SetAncestorsLoading),
   budget: createDetailResponseReducer<IBudget, Redux.IDetailResponseStore<IBudget>, Redux.Budget.IAction>({
