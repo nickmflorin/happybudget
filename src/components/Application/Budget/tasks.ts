@@ -74,7 +74,11 @@ import {
   creatingActualAction,
   updatingActualAction,
   requestAccountsAction,
-  requestBudgetAction
+  requestAccountSubAccountsAction,
+  requestSubAccountSubAccountsAction,
+  requestBudgetAction,
+  requestAccountAction,
+  requestSubAccountAction
 } from "./actions";
 import { FieldDefinitions, IFieldDefinition } from "./config";
 import { initialAccountState, initialSubAccountState } from "./initialState";
@@ -112,6 +116,20 @@ export function* handleBudgetChangedTask(action: Redux.Budget.IAction<number>): 
   if (!isNil(action.payload)) {
     yield put(requestAccountsAction());
     yield put(requestBudgetAction());
+  }
+}
+
+export function* handleAccountChangedTask(action: Redux.Budget.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(requestAccountAction());
+    yield put(requestAccountSubAccountsAction(action.payload));
+  }
+}
+
+export function* handleSubAccountChangedTask(action: Redux.Budget.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(requestSubAccountAction());
+    yield put(requestSubAccountSubAccountsAction(action.payload));
   }
 }
 
@@ -506,7 +524,6 @@ export function* handleSubAccountSubAccountUpdateTask(
 }
 
 export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  console.log("Getting accounts!");
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budgetId);
   if (!isNil(budgetId)) {
     yield put(loadingAccountsAction(true));
@@ -526,10 +543,11 @@ export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterat
 }
 
 export function* getActualsTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  if (!isNil(action.budgetId)) {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budgetId);
+  if (!isNil(budgetId)) {
     yield put(loadingActualsAction(true));
     try {
-      const response = yield call(getBudgetActuals, action.budgetId, { no_pagination: true });
+      const response = yield call(getBudgetActuals, budgetId, { no_pagination: true });
       yield put(responseActualsAction(response));
       if (response.data.length === 0) {
         yield put(addActualsTablePlaceholdersAction(2));
@@ -544,15 +562,13 @@ export function* getActualsTask(action: Redux.Budget.IAction<null>): SagaIterato
 }
 
 export function* getAccountSubAccountsTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  if (!isNil(action.budgetId) && !isNil(action.accountId)) {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budgetId);
+  if (!isNil(budgetId) && !isNil(action.accountId)) {
     yield put(loadingAccountSubAccountsAction(action.accountId, true));
     try {
-      const response: Http.IListResponse<ISubAccount> = yield call(
-        getAccountSubAccounts,
-        action.accountId,
-        action.budgetId,
-        { no_pagination: true }
-      );
+      const response: Http.IListResponse<ISubAccount> = yield call(getAccountSubAccounts, action.accountId, budgetId, {
+        no_pagination: true
+      });
       yield put(responseAccountSubAccountsAction(action.accountId, response));
       if (response.data.length === 0) {
         yield put(addAccountSubAccountsTablePlaceholdersAction(action.accountId, 2));

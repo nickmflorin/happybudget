@@ -153,6 +153,7 @@ const ancestorsReducer: Reducer<Redux.ListStore<IAncestor>, Redux.Budget.IAction
 const rootReducer = combineReducers({
   accountId: createSimplePayloadReducer(ActionType.SetAccountId),
   budgetId: createSimplePayloadReducer(ActionType.SetBudgetId),
+  subaccountId: createSimplePayloadReducer(ActionType.SetSubAccountId),
   ancestors: ancestorsReducer,
   ancestorsLoading: createSimpleBooleanReducer(ActionType.SetAncestorsLoading),
   budget: createDetailResponseReducer<IBudget, Redux.IDetailResponseStore<IBudget>, Redux.Budget.IAction>({

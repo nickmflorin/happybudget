@@ -11,7 +11,6 @@ import {
   addAccountSubAccountsTablePlaceholdersAction,
   deselectAccountSubAccountsTableRowAction,
   removeAccountSubAccountAction,
-  requestAccountSubAccountsAction,
   selectAccountSubAccountsTableRowAction,
   setAccountSubAccountsSearchAction,
   updateAccountSubAccountAction,
@@ -27,9 +26,9 @@ const Account = (): JSX.Element => {
 
   const accountStore = useSelector((state: Redux.IApplicationStore) => {
     let subState = initialAccountState;
-    if (!isNaN(parseInt(accountId))) {
-      if (!isNil(state.budget.accounts.details[parseInt(accountId)])) {
-        subState = state.budget.accounts.details[parseInt(accountId)];
+    if (!isNil(state.budget.accountId)) {
+      if (!isNil(state.budget.accounts.details[state.budget.accountId])) {
+        subState = state.budget.accounts.details[state.budget.accountId];
       }
     }
     return subState;
@@ -40,12 +39,6 @@ const Account = (): JSX.Element => {
       dispatch(setAccountIdAction(parseInt(accountId)));
     }
   }, [accountId]);
-
-  useEffect(() => {
-    if (!isNil(budgetId) && !isNaN(parseInt(budgetId)) && !isNil(accountId) && !isNil(parseInt(accountId))) {
-      dispatch(requestAccountSubAccountsAction(parseInt(accountId)));
-    }
-  }, [budgetId, accountId]);
 
   return (
     <RenderIfValidId id={[budgetId, accountId]}>

@@ -40,6 +40,7 @@ const initialState: Redux.Budget.IStore = {
   accounts: initialAccountsState,
   accountId: null,
   budgetId: null,
+  subaccountId: null,
   subaccounts: {},
   ancestors: [],
   ancestorsLoading: false,

@@ -7,8 +7,7 @@ import { ColDef } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
-  requestSubAccountAction,
-  requestSubAccountSubAccountsAction,
+  setSubAccountIdAction,
   setSubAccountSubAccountsSearchAction,
   selectSubAccountSubAccountsTableRowAction,
   addSubAccountSubAccountsTablePlaceholdersAction,
@@ -27,9 +26,9 @@ const SubAccount = (): JSX.Element => {
 
   const subAccountStore = useSelector((state: Redux.IApplicationStore) => {
     let subState = initialSubAccountState;
-    if (!isNaN(parseInt(subaccountId))) {
-      if (!isNil(state.budget.subaccounts[parseInt(subaccountId)])) {
-        subState = state.budget.subaccounts[parseInt(subaccountId)];
+    if (!isNil(state.budget.subaccountId)) {
+      if (!isNil(state.budget.subaccounts[state.budget.subaccountId])) {
+        subState = state.budget.subaccounts[state.budget.subaccountId];
       }
     }
     return subState;
@@ -37,13 +36,7 @@ const SubAccount = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
-      dispatch(requestSubAccountAction(parseInt(subaccountId)));
-    }
-  }, [subaccountId]);
-
-  useEffect(() => {
-    if (!isNil(subaccountId) && !isNil(parseInt(subaccountId))) {
-      dispatch(requestSubAccountSubAccountsAction(parseInt(subaccountId)));
+      dispatch(setSubAccountIdAction(parseInt(subaccountId)));
     }
   }, [subaccountId]);
 

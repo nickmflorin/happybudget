@@ -18,7 +18,9 @@ import {
   handleSubAccountSubAccountRemovalTask,
   handleActualRemovalTask,
   handleActualUpdateTask,
-  handleBudgetChangedTask
+  handleBudgetChangedTask,
+  handleAccountChangedTask,
+  handleSubAccountChangedTask
 } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
@@ -101,30 +103,6 @@ function* watchForUpdateSubAccountSubAccountwSaga(): SagaIterator {
   yield takeEvery(ActionType.SubAccount.SubAccounts.Update, handleSubAccountSubAccountUpdateTask);
 }
 
-function* accountsSaga(): SagaIterator {
-  yield spawn(watchForTriggerBudgetAccountsSaga);
-  yield spawn(watchForRemoveAccountSaga);
-  yield spawn(watchForAccountUpdateSaga);
-}
-
-function* actualsSaga(): SagaIterator {
-  yield spawn(watchForTriggerBudgetActualsSaga);
-  yield spawn(watchForRemoveActualSaga);
-  yield spawn(watchForActualUpdateSaga);
-}
-
-function* accountSubAccountsSaga(): SagaIterator {
-  yield spawn(watchForTriggerAccountSubAccountsSaga);
-  yield spawn(watchForUpdateSubAccountSubAccountwSaga);
-  yield spawn(watchForRemoveAccountSubAccountSaga);
-}
-
-function* subAccountSubAccountsSaga(): SagaIterator {
-  yield spawn(watchForTriggerSubAccountSubAccountsSaga);
-  yield spawn(watchForUpdateAccountSubAccountSaga);
-  yield spawn(watchForRemoveSubAccountSubAccountSaga);
-}
-
 function* watchForRequestBudgetSaga(): SagaIterator {
   let lastTasks;
   while (true) {
@@ -160,6 +138,28 @@ function* watchForBudgetIdChangedSaga(): SagaIterator {
   }
 }
 
+function* watchForAccountIdChangedSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.SetAccountId);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(handleAccountChangedTask, action);
+  }
+}
+
+function* watchForSubAccountIdChangedSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.SetSubAccountId);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(handleSubAccountChangedTask, action);
+  }
+}
+
 function* watchForRequestSubAccountSaga(): SagaIterator {
   let lastTasks;
   while (true) {
@@ -173,6 +173,30 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
   }
 }
 
+function* accountsSaga(): SagaIterator {
+  yield spawn(watchForTriggerBudgetAccountsSaga);
+  yield spawn(watchForRemoveAccountSaga);
+  yield spawn(watchForAccountUpdateSaga);
+}
+
+function* actualsSaga(): SagaIterator {
+  yield spawn(watchForTriggerBudgetActualsSaga);
+  yield spawn(watchForRemoveActualSaga);
+  yield spawn(watchForActualUpdateSaga);
+}
+
+function* accountSubAccountsSaga(): SagaIterator {
+  yield spawn(watchForTriggerAccountSubAccountsSaga);
+  yield spawn(watchForUpdateSubAccountSubAccountwSaga);
+  yield spawn(watchForRemoveAccountSubAccountSaga);
+}
+
+function* subAccountSubAccountsSaga(): SagaIterator {
+  yield spawn(watchForTriggerSubAccountSubAccountsSaga);
+  yield spawn(watchForUpdateAccountSubAccountSaga);
+  yield spawn(watchForRemoveSubAccountSubAccountSaga);
+}
+
 function* detailsSaga(): SagaIterator {
   yield spawn(watchForRequestBudgetSaga);
   yield spawn(watchForRequestAccountSaga);
@@ -181,6 +205,8 @@ function* detailsSaga(): SagaIterator {
 
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForBudgetIdChangedSaga);
+  yield spawn(watchForAccountIdChangedSaga);
+  yield spawn(watchForSubAccountIdChangedSaga);
   yield spawn(detailsSaga);
   yield spawn(accountsSaga);
   yield spawn(actualsSaga);

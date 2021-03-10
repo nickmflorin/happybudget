@@ -160,6 +160,7 @@ namespace Redux {
       readonly accounts: IAccountsStore;
       readonly accountId: number | null;
       readonly budgetId: number | null;
+      readonly subaccountId: number | null;
       readonly subaccounts: IIndexedStore<ISubAccountStore>;
       readonly ancestors: ListStore<IAncestor>;
       readonly ancestorsLoading: boolean;

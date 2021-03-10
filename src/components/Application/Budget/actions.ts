@@ -5,6 +5,7 @@ export const ActionType = {
   SetAncestors: "budget.SetAncestors",
   SetAncestorsLoading: "budget.SetAncestorsLoading",
   SetBudgetId: "budget.SetBudgetId",
+  SetSubAccountId: "budget.SetSubAccountId",
   Budget: {
     Loading: "budget.budget.Loading",
     Response: "budget.budget.Response",
@@ -53,7 +54,6 @@ export const ActionType = {
     AddErrors: "budget.accountstable.AddErrors"
   },
   Account: {
-    SetId: "budget.account.SetId",
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",
     Request: "budget.account.Request",
@@ -126,8 +126,9 @@ export const simpleSubAccountAction = <P = any>(type: string) => {
   };
 };
 
-export const setAccountIdAction = simpleAction<number>(ActionType.Account.SetId);
+export const setAccountIdAction = simpleAction<number>(ActionType.SetAccountId);
 export const setBudgetIdAction = simpleAction<number>(ActionType.SetBudgetId);
+export const setSubAccountIdAction = simpleAction<number>(ActionType.SetSubAccountId);
 
 export const setAncestorsAction = simpleAction<IAncestor[]>(ActionType.SetAncestors);
 export const setAncestorsLoadingAction = simpleAction<boolean>(ActionType.SetAncestorsLoading);
@@ -136,12 +137,12 @@ export const requestBudgetAction = simpleAction<null>(ActionType.Budget.Request)
 export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loading);
 export const responseBudgetAction = simpleAction<IBudget>(ActionType.Budget.Response);
 
-export const requestAccountAction = simpleAccountAction<null>(ActionType.Account.Request);
+export const requestAccountAction = simpleAction<null>(ActionType.Account.Request);
 export const refreshAccountAction = simpleAction<null>(ActionType.Account.Refresh);
 export const loadingAccountAction = simpleAccountAction<boolean>(ActionType.Account.Loading);
 export const responseAccountAction = simpleAccountAction<IAccount>(ActionType.Account.Response);
 
-export const requestSubAccountAction = simpleSubAccountAction<null>(ActionType.SubAccount.Request);
+export const requestSubAccountAction = simpleAction<null>(ActionType.SubAccount.Request);
 export const loadingSubAccountAction = simpleSubAccountAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = simpleSubAccountAction<ISubAccount>(ActionType.SubAccount.Response);
 
