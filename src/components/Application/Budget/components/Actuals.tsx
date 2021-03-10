@@ -32,7 +32,7 @@ const Actuals = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={budgetId}>
-      <RenderWithSpinner loading={actuals.table.loading || budget.loading}>
+      <RenderWithSpinner loading={actuals.table.loading || budget.detail.loading}>
         <GenericBudgetTable<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow>
           table={actuals.table.data}
           isCellEditable={() => true}
@@ -45,7 +45,9 @@ const Actuals = (): JSX.Element => {
           onRowDelete={(row: Table.IActualRow) => dispatch(removeActualAction(row))}
           onRowUpdate={(id: number, data: { [key: string]: any }) => dispatch(updateActualAction({ id, data }))}
           onSelectAll={() => dispatch(selectAllActualsTableRowsAction())}
-          estimated={!isNil(budget.data) && !isNil(budget.data.estimated) ? budget.data.estimated : 0.0}
+          estimated={
+            !isNil(budget.detail.data) && !isNil(budget.detail.data.estimated) ? budget.detail.data.estimated : 0.0
+          }
           columns={[
             {
               field: "parent",

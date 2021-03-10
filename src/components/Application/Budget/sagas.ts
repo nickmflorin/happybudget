@@ -1,6 +1,5 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
-import { isNil } from "lodash";
 import { ActionType } from "./actions";
 import {
   getBudgetTask,
@@ -49,12 +48,10 @@ function* watchForTriggerAccountSubAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.Account.SubAccountsTable.Request);
-    if (!isNil(action.accountId)) {
-      if (lastTasks) {
-        yield cancel(lastTasks);
-      }
-      lastTasks = yield call(getAccountSubAccountsTask, action);
+    if (lastTasks) {
+      yield cancel(lastTasks);
     }
+    lastTasks = yield call(getAccountSubAccountsTask, action);
   }
 }
 
@@ -62,12 +59,10 @@ function* watchForTriggerSubAccountSubAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.SubAccount.SubAccountsTable.Request);
-    if (!isNil(action.subaccountId)) {
-      if (lastTasks) {
-        yield cancel(lastTasks);
-      }
-      lastTasks = yield call(getSubAccountSubAccountsTask, action);
+    if (lastTasks) {
+      yield cancel(lastTasks);
     }
+    lastTasks = yield call(getSubAccountSubAccountsTask, action);
   }
 }
 
@@ -118,19 +113,17 @@ function* watchForRequestAccountSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.Account.Request);
-    if (!isNil(action.accountId)) {
-      if (lastTasks) {
-        yield cancel(lastTasks);
-      }
-      lastTasks = yield call(getAccountTask, action);
+    if (lastTasks) {
+      yield cancel(lastTasks);
     }
+    lastTasks = yield call(getAccountTask, action);
   }
 }
 
 function* watchForBudgetIdChangedSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.SetBudgetId);
+    const action = yield take(ActionType.Budget.SetId);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -141,7 +134,7 @@ function* watchForBudgetIdChangedSaga(): SagaIterator {
 function* watchForAccountIdChangedSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.SetAccountId);
+    const action = yield take(ActionType.Account.SetId);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -152,7 +145,7 @@ function* watchForAccountIdChangedSaga(): SagaIterator {
 function* watchForSubAccountIdChangedSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.SetSubAccountId);
+    const action = yield take(ActionType.SubAccount.SetId);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -164,12 +157,10 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.SubAccount.Request);
-    if (!isNil(action.subaccountId)) {
-      if (lastTasks) {
-        yield cancel(lastTasks);
-      }
-      lastTasks = yield call(getSubAccountTask, action);
+    if (lastTasks) {
+      yield cancel(lastTasks);
     }
+    lastTasks = yield call(getSubAccountTask, action);
   }
 }
 

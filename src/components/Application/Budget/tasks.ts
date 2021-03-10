@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
-import { call, put, select } from "redux-saga/effects";
-import { isNil, find, concat, forEach, filter, map } from "lodash";
+import { call, put, select, all } from "redux-saga/effects";
+import { isNil, find, concat, forEach } from "lodash";
 import { ClientError } from "api";
 import {
   getAccounts,
@@ -24,7 +24,6 @@ import {
 } from "services";
 import { handleRequestError } from "store/tasks";
 import {
-  refreshAccountAction,
   setAncestorsAction,
   setAncestorsLoadingAction,
   loadingBudgetAction,
@@ -88,7 +87,7 @@ function* handleTableErrors(
   e: Error,
   message: string,
   id: number,
-  action: (errors: Table.ICellError[]) => Redux.Budget.IAction<any>
+  action: (errors: Table.ICellError[]) => Redux.IAction<any>
 ): SagaIterator {
   if (e instanceof ClientError) {
     const cellErrors: Table.ICellError[] = [];
@@ -112,28 +111,19 @@ function* handleTableErrors(
   }
 }
 
-export function* handleBudgetChangedTask(action: Redux.Budget.IAction<number>): SagaIterator {
-  if (!isNil(action.payload)) {
-    yield put(requestAccountsAction());
-    yield put(requestBudgetAction());
-  }
+export function* handleBudgetChangedTask(action: Redux.IAction<number>): SagaIterator {
+  yield all([put(requestAccountsAction()), put(requestBudgetAction())]);
 }
 
-export function* handleAccountChangedTask(action: Redux.Budget.IAction<number>): SagaIterator {
-  if (!isNil(action.payload)) {
-    yield put(requestAccountAction());
-    yield put(requestAccountSubAccountsAction(action.payload));
-  }
+export function* handleAccountChangedTask(action: Redux.IAction<number>): SagaIterator {
+  yield all([put(requestAccountAction()), put(requestAccountSubAccountsAction())]);
 }
 
-export function* handleSubAccountChangedTask(action: Redux.Budget.IAction<number>): SagaIterator {
-  if (!isNil(action.payload)) {
-    yield put(requestSubAccountAction());
-    yield put(requestSubAccountSubAccountsAction(action.payload));
-  }
+export function* handleSubAccountChangedTask(action: Redux.IAction<number>): SagaIterator {
+  yield all([put(requestSubAccountAction()), put(requestSubAccountSubAccountsAction())]);
 }
 
-export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Table.IAccountRow>): SagaIterator {
+export function* handleAccountRemovalTask(action: Redux.IAction<Table.IAccountRow>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(removeAccountsTableRowAction(action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
@@ -152,7 +142,7 @@ export function* handleAccountRemovalTask(action: Redux.Budget.IAction<Table.IAc
   }
 }
 
-export function* handleActualRemovalTask(action: Redux.Budget.IAction<Table.IActualRow>): SagaIterator {
+export function* handleActualRemovalTask(action: Redux.IAction<Table.IActualRow>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(removeActualsTableRowAction(action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
@@ -162,7 +152,6 @@ export function* handleActualRemovalTask(action: Redux.Budget.IAction<Table.IAct
       try {
         yield call(deleteActual, action.payload.id as number);
       } catch (e) {
-        // TODO: Should we put the row back in if there was an error?
         handleRequestError(e, "There was an error deleting the actual.");
       } finally {
         yield put(deletingActualAction({ id: action.payload.id as number, value: false }));
@@ -171,55 +160,50 @@ export function* handleActualRemovalTask(action: Redux.Budget.IAction<Table.IAct
   }
 }
 
-export function* handleAccountSubAccountRemovalTask(action: Redux.Budget.IAction<Table.ISubAccountRow>): SagaIterator {
-  if (!isNil(action.payload) && !isNil(action.accountId)) {
-    yield put(removeAccountSubAccountsRowAction(action.accountId, action.payload));
+export function* handleAccountSubAccountRemovalTask(action: Redux.IAction<Table.ISubAccountRow>): SagaIterator {
+  const accountId = yield select((state: Redux.IApplicationStore) => state.budget.account.id);
+  if (!isNil(action.payload) && !isNil(accountId)) {
+    yield put(removeAccountSubAccountsRowAction(accountId, action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
     // dispatched action above will remove the row from the table.
     if (action.payload.meta.isPlaceholder === false) {
-      yield put(deletingAccountSubAccountAction(action.accountId, { id: action.payload.id as number, value: true }));
+      yield put(deletingAccountSubAccountAction({ id: action.payload.id as number, value: true }));
       try {
         yield call(deleteSubAccount, action.payload.id as number);
       } catch (e) {
-        // TODO: Should we put the row back in if there was an error?
         handleRequestError(e, "There was an error deleting the sub account.");
       } finally {
-        yield put(deletingAccountSubAccountAction(action.accountId, { id: action.payload.id as number, value: false }));
+        yield put(deletingAccountSubAccountAction({ id: action.payload.id as number, value: false }));
       }
     }
   }
 }
 
-export function* handleSubAccountSubAccountRemovalTask(
-  action: Redux.Budget.IAction<Table.ISubAccountRow>
-): SagaIterator {
-  if (!isNil(action.payload) && !isNil(action.subaccountId)) {
-    yield put(removeSubAccountSubAccountsTableRowAction(action.subaccountId, action.payload));
+export function* handleSubAccountSubAccountRemovalTask(action: Redux.IAction<Table.ISubAccountRow>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.budget.subaccount.id);
+  if (!isNil(action.payload) && !isNil(subaccountId)) {
+    yield put(removeSubAccountSubAccountsTableRowAction(subaccountId, action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
     // dispatched action above will remove the row from the table.
     if (action.payload.meta.isPlaceholder === false) {
-      yield put(
-        deletingSubAccountSubAccountAction(action.subaccountId, { id: action.payload.id as number, value: true })
-      );
+      yield put(deletingSubAccountSubAccountAction({ id: action.payload.id as number, value: true }));
       try {
         yield call(deleteSubAccount, action.payload.id as number);
       } catch (e) {
-        // TODO: Should we put the row back in if there was an error?
         handleRequestError(e, "There was an error deleting the sub account.");
       } finally {
-        yield put(
-          deletingSubAccountSubAccountAction(action.subaccountId, { id: action.payload.id as number, value: false })
-        );
+        yield put(deletingSubAccountSubAccountAction({ id: action.payload.id as number, value: false }));
       }
     }
   }
 }
 
 export function* handleAccountUpdateTask(
-  action: Redux.Budget.IAction<{ id: number; data: Partial<Table.IAccountRow> }>
+  action: Redux.IAction<{ id: number; data: Partial<Table.IAccountRow> }>
 ): SagaIterator {
-  if (!isNil(action.payload) && !isNil(action.payload.id) && !isNil(action.payload.data) && !isNil(action.budgetId)) {
-    const table = yield select((state: Redux.IApplicationStore) => state.budget.accounts.table.data);
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(action.payload) && !isNil(action.payload.id) && !isNil(action.payload.data) && !isNil(budgetId)) {
+    const table = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.table.data);
 
     const existing: Table.IAccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {
@@ -239,7 +223,7 @@ export function* handleAccountUpdateTask(
         if (rowHasRequiredFields<Table.IAccountRow>(existing, "account")) {
           yield put(creatingAccountAction(true));
           try {
-            const response: IAccount = yield call(createAccount, action.budgetId, payload as Http.IAccountPayload);
+            const response: IAccount = yield call(createAccount, budgetId, payload as Http.IAccountPayload);
             yield put(activateAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = payloadFromResponse<IAccount>(response, "account");
             yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
@@ -282,9 +266,10 @@ export function* handleAccountUpdateTask(
 }
 
 export function* handleActualUpdateTask(
-  action: Redux.Budget.IAction<{ id: number; data: Partial<Table.IActualRow> }>
+  action: Redux.IAction<{ id: number; data: Partial<Table.IActualRow> }>
 ): SagaIterator {
-  if (!isNil(action.payload) && !isNil(action.payload.id) && !isNil(action.payload.data) && !isNil(action.budgetId)) {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(action.payload) && !isNil(action.payload.id) && !isNil(action.payload.data) && !isNil(budgetId)) {
     const table: Table.IActualRow[] = yield select((state: Redux.IApplicationStore) => state.budget.actuals.table.data);
 
     const existing: Table.IActualRow | undefined = find(table, { id: action.payload.id });
@@ -343,25 +328,19 @@ export function* handleActualUpdateTask(
 }
 
 export function* handleAccountSubAccountUpdateTask(
-  action: Redux.Budget.IAction<{ id: number; data: { [key in Table.SubAccountRowField]: any } }>
+  action: Redux.IAction<{ id: number; data: { [key in Table.SubAccountRowField]: any } }>
 ): SagaIterator {
+  const accountId = yield select((state: Redux.IApplicationStore) => state.budget.account.id);
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (
-    !isNil(action.budgetId) &&
-    !isNil(action.accountId) &&
+    !isNil(budgetId) &&
+    !isNil(accountId) &&
     !isNil(action.payload) &&
     !isNil(action.payload.id) &&
     !isNil(action.payload.data)
   ) {
-    const accountId = action.accountId;
     const id = action.payload.id;
-
-    const table = yield select((state: Redux.IApplicationStore) => {
-      let subState: Redux.Budget.IAccountStore = initialAccountState;
-      if (!isNil(state.budget.accounts.details[accountId])) {
-        subState = state.budget.accounts.details[accountId];
-      }
-      return subState.subaccounts.table.data;
-    });
+    const table = yield select((state: Redux.IApplicationStore) => state.budget.account.subaccounts.table.data);
 
     const existing: Table.ISubAccountRow = find(table, { id });
     if (isNil(existing)) {
@@ -377,43 +356,43 @@ export function* handleAccountSubAccountUpdateTask(
         // Wait until all of the required fields are present before we create the SubAccount in the
         // backend and remove the placeholder designation of the row in the frontend.
         if (rowHasRequiredFields<Table.ISubAccountRow>(existing, "subaccount")) {
-          yield put(creatingAccountSubAccountAction(accountId, true));
+          yield put(creatingAccountSubAccountAction(true));
           try {
             const response: ISubAccount = yield call(
               createAccountSubAccount,
               accountId,
-              action.budgetId,
+              budgetId,
               requestPayload as Http.ISubAccountPayload
             );
             yield put(activateAccountSubAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
-            yield put(updateAccountSubAccountsTableRowAction(accountId, { id: existing.id, data: responsePayload }));
+            yield put(updateAccountSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));
           } catch (e) {
             yield call(
               handleTableErrors,
               e,
               "There was an error updating the sub account.",
               existing.id,
-              (errors: Table.ICellError[]) => addErrorsToAccountSubAccountsTableAction(accountId, errors)
+              (errors: Table.ICellError[]) => addErrorsToAccountSubAccountsTableAction(errors)
             );
           } finally {
-            yield put(creatingAccountSubAccountAction(accountId, false));
+            yield put(creatingAccountSubAccountAction(false));
           }
         }
       } else {
-        yield put(updatingAccountSubAccountAction(action.accountId, { id: existing.id as number, value: true }));
+        yield put(updatingAccountSubAccountAction({ id: existing.id as number, value: true }));
         const requestPayload = action.payload.data as Partial<Http.ISubAccountPayload>;
         try {
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
           const response: ISubAccount = yield call(updateSubAccount, existing.id as number, requestPayload);
           const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
-          yield put(updateAccountSubAccountsTableRowAction(accountId, { id: existing.id, data: responsePayload }));
+          yield put(updateAccountSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));
 
           // Determine if the parent account needs to be refreshed due to updates to the underlying
           // account fields that calculate the values of the parent account.
           if (requestWarrantsParentRefresh(requestPayload, "subaccount")) {
-            yield put(refreshAccountAction());
+            yield put(requestAccountAction());
           }
         } catch (e) {
           yield call(
@@ -421,10 +400,10 @@ export function* handleAccountSubAccountUpdateTask(
             e,
             "There was an error updating the sub account.",
             existing.id,
-            (errors: Table.ICellError[]) => addErrorsToAccountSubAccountsTableAction(accountId, errors)
+            (errors: Table.ICellError[]) => addErrorsToAccountSubAccountsTableAction(errors)
           );
         } finally {
-          yield put(updatingAccountSubAccountAction(accountId, { id: existing.id as number, value: false }));
+          yield put(updatingAccountSubAccountAction({ id: existing.id as number, value: false }));
         }
       }
     }
@@ -432,24 +411,12 @@ export function* handleAccountSubAccountUpdateTask(
 }
 
 export function* handleSubAccountSubAccountUpdateTask(
-  action: Redux.Budget.IAction<{ id: number; data: Partial<Table.ISubAccountRow> }>
+  action: Redux.IAction<{ id: number; data: Partial<Table.ISubAccountRow> }>
 ): SagaIterator {
-  if (
-    !isNil(action.subaccountId) &&
-    !isNil(action.payload) &&
-    !isNil(action.payload.id) &&
-    !isNil(action.payload.data)
-  ) {
-    const subaccountId = action.subaccountId;
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.budget.subaccount.id);
+  if (!isNil(subaccountId) && !isNil(action.payload) && !isNil(action.payload.id) && !isNil(action.payload.data)) {
     const payload = action.payload.data;
-
-    const table = yield select((state: Redux.IApplicationStore) => {
-      let subState: Redux.Budget.ISubAccountStore = initialSubAccountState;
-      if (!isNil(state.budget.subaccounts[subaccountId])) {
-        subState = state.budget.subaccounts[subaccountId];
-      }
-      return subState.subaccounts.table.data;
-    });
+    const table = yield select((state: Redux.IApplicationStore) => state.budget.subaccount.subaccounts.table.data);
 
     const existing: Table.ISubAccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {
@@ -466,32 +433,30 @@ export function* handleSubAccountSubAccountUpdateTask(
         // the SubAccount in the backend and remove the placeholder designation
         // of the row in the frontend.
         if (rowHasRequiredFields<Table.ISubAccountRow>(existing, "subaccount")) {
-          yield put(creatingSubAccountSubAccountAction(subaccountId, true));
+          yield put(creatingSubAccountSubAccountAction(true));
           try {
             const response = yield call(
               createSubAccountSubAccount,
-              action.subaccountId,
+              subaccountId,
               requestPayload as Http.ISubAccountPayload
             );
             yield put(activateSubAccountSubAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
-            yield put(
-              updateSubAccountSubAccountsTableRowAction(subaccountId, { id: existing.id, data: responsePayload })
-            );
+            yield put(updateSubAccountSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));
           } catch (e) {
             yield call(
               handleTableErrors,
               e,
               "There was an error updating the sub account.",
               existing.id,
-              (errors: Table.ICellError[]) => addErrorsToSubAccountSubAccountsTableAction(subaccountId, errors)
+              (errors: Table.ICellError[]) => addErrorsToSubAccountSubAccountsTableAction(errors)
             );
           } finally {
-            yield put(creatingSubAccountSubAccountAction(subaccountId, false));
+            yield put(creatingSubAccountSubAccountAction(false));
           }
         }
       } else {
-        yield put(updatingSubAccountSubAccountAction(subaccountId, { id: existing.id as number, value: true }));
+        yield put(updatingSubAccountSubAccountAction({ id: existing.id as number, value: true }));
         try {
           // The reducer has already handled updating the sub account in the state
           // synchronously before the time that this API request is made.
@@ -502,7 +467,7 @@ export function* handleSubAccountSubAccountUpdateTask(
           );
           const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
           yield put(
-            updateSubAccountSubAccountsTableRowAction(subaccountId, {
+            updateSubAccountSubAccountsTableRowAction({
               id: response.id,
               data: responsePayload
             })
@@ -513,18 +478,18 @@ export function* handleSubAccountSubAccountUpdateTask(
             e,
             "There was an error updating the sub account.",
             existing.id,
-            (errors: Table.ICellError[]) => addErrorsToSubAccountSubAccountsTableAction(subaccountId, errors)
+            (errors: Table.ICellError[]) => addErrorsToSubAccountSubAccountsTableAction(errors)
           );
         } finally {
-          yield put(updatingSubAccountSubAccountAction(subaccountId, { id: existing.id as number, value: false }));
+          yield put(updatingSubAccountSubAccountAction({ id: existing.id as number, value: false }));
         }
       }
     }
   }
 }
 
-export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budgetId);
+export function* getAccountsTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     yield put(loadingAccountsAction(true));
     try {
@@ -542,8 +507,8 @@ export function* getAccountsTask(action: Redux.Budget.IAction<null>): SagaIterat
   }
 }
 
-export function* getActualsTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budgetId);
+export function* getActualsTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     yield put(loadingActualsAction(true));
     try {
@@ -561,47 +526,49 @@ export function* getActualsTask(action: Redux.Budget.IAction<null>): SagaIterato
   }
 }
 
-export function* getAccountSubAccountsTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budgetId);
-  if (!isNil(budgetId) && !isNil(action.accountId)) {
-    yield put(loadingAccountSubAccountsAction(action.accountId, true));
+export function* getAccountSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  const accountId = yield select((state: Redux.IApplicationStore) => state.budget.account.id);
+  if (!isNil(budgetId) && !isNil(accountId)) {
+    yield put(loadingAccountSubAccountsAction(true));
     try {
-      const response: Http.IListResponse<ISubAccount> = yield call(getAccountSubAccounts, action.accountId, budgetId, {
+      const response: Http.IListResponse<ISubAccount> = yield call(getAccountSubAccounts, accountId, budgetId, {
         no_pagination: true
       });
-      yield put(responseAccountSubAccountsAction(action.accountId, response));
+      yield put(responseAccountSubAccountsAction(response));
       if (response.data.length === 0) {
-        yield put(addAccountSubAccountsTablePlaceholdersAction(action.accountId, 2));
+        yield put(addAccountSubAccountsTablePlaceholdersAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account's sub accounts.");
-      yield put(responseAccountSubAccountsAction(action.accountId, { count: 0, data: [] }, { error: e }));
+      yield put(responseAccountSubAccountsAction({ count: 0, data: [] }, { error: e }));
     } finally {
-      yield put(loadingAccountSubAccountsAction(action.accountId, false));
+      yield put(loadingAccountSubAccountsAction(false));
     }
   }
 }
 
-export function* getSubAccountSubAccountsTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  if (!isNil(action.subaccountId)) {
-    yield put(loadingSubAccountSubAccountsAction(action.subaccountId, true));
+export function* getSubAccountSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.budget.subaccount.id);
+  if (!isNil(subaccountId)) {
+    yield put(loadingSubAccountSubAccountsAction(true));
     try {
-      const response = yield call(getSubAccountSubAccounts, action.subaccountId, { no_pagination: true });
-      yield put(responseSubAccountSubAccountsAction(action.subaccountId, response));
+      const response = yield call(getSubAccountSubAccounts, subaccountId, { no_pagination: true });
+      yield put(responseSubAccountSubAccountsAction(response));
       if (response.data.length === 0) {
-        yield put(addSubAccountSubAccountsTablePlaceholdersAction(action.subaccountId, 2));
+        yield put(addSubAccountSubAccountsTablePlaceholdersAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the subaccount's sub accounts.");
-      yield put(responseSubAccountSubAccountsAction(action.subaccountId, { count: 0, data: [] }, { error: e }));
+      yield put(responseSubAccountSubAccountsAction({ count: 0, data: [] }, { error: e }));
     } finally {
-      yield put(loadingSubAccountSubAccountsAction(action.subaccountId, false));
+      yield put(loadingSubAccountSubAccountsAction(false));
     }
   }
 }
 
-export function* getBudgetTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budgetId);
+export function* getBudgetTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     yield put(setAncestorsLoadingAction(true));
     yield put(loadingBudgetAction(true));
@@ -627,13 +594,14 @@ export function* getBudgetTask(action: Redux.Budget.IAction<null>): SagaIterator
   }
 }
 
-export function* getAccountTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  if (!isNil(action.accountId)) {
-    yield put(loadingAccountAction(action.accountId, true));
+export function* getAccountTask(action: Redux.IAction<null>): SagaIterator {
+  const accountId = yield select((state: Redux.IApplicationStore) => state.budget.account.id);
+  if (!isNil(accountId)) {
+    yield put(loadingAccountAction(true));
     yield put(setAncestorsLoadingAction(true));
     try {
-      const response: IAccount = yield call(getAccount, action.accountId);
-      yield put(responseAccountAction(action.accountId, response));
+      const response: IAccount = yield call(getAccount, accountId);
+      yield put(responseAccountAction(response));
       yield put(
         setAncestorsAction(
           concat(response.ancestors, [
@@ -647,21 +615,22 @@ export function* getAccountTask(action: Redux.Budget.IAction<null>): SagaIterato
       );
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account.");
-      yield put(responseAccountAction(action.accountId, undefined, { error: e }));
+      yield put(responseAccountAction(undefined, { error: e }));
     } finally {
-      yield put(loadingAccountAction(action.accountId, false));
+      yield put(loadingAccountAction(false));
       yield put(setAncestorsLoadingAction(false));
     }
   }
 }
 
-export function* getSubAccountTask(action: Redux.Budget.IAction<null>): SagaIterator {
-  if (!isNil(action.subaccountId)) {
+export function* getSubAccountTask(action: Redux.IAction<null>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.budget.subaccount.id);
+  if (!isNil(subaccountId)) {
     yield put(setAncestorsLoadingAction(true));
-    yield put(loadingSubAccountAction(action.subaccountId, true));
+    yield put(loadingSubAccountAction(true));
     try {
-      const response: ISubAccount = yield call(getSubAccount, action.subaccountId);
-      yield put(responseSubAccountAction(action.subaccountId, response));
+      const response: ISubAccount = yield call(getSubAccount, subaccountId);
+      yield put(responseSubAccountAction(response));
       yield put(
         setAncestorsAction(
           concat(response.ancestors, [
@@ -675,9 +644,9 @@ export function* getSubAccountTask(action: Redux.Budget.IAction<null>): SagaIter
       );
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account.");
-      yield put(responseSubAccountAction(action.subaccountId, undefined, { error: e }));
+      yield put(responseSubAccountAction(undefined, { error: e }));
     } finally {
-      yield put(loadingSubAccountAction(action.subaccountId, false));
+      yield put(loadingSubAccountAction(false));
       yield put(setAncestorsLoadingAction(false));
     }
   }

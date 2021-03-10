@@ -22,7 +22,7 @@ const Accounts = (): JSX.Element => {
   const { budgetId } = useParams<{ budgetId: string }>();
   const dispatch = useDispatch();
   const history = useHistory();
-  const accounts = useSelector((state: Redux.IApplicationStore) => state.budget.accounts);
+  const accounts = useSelector((state: Redux.IApplicationStore) => state.budget.budget.accounts);
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const Accounts = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={budgetId}>
-      <RenderWithSpinner loading={accounts.table.loading || budget.loading}>
+      <RenderWithSpinner loading={accounts.table.loading || budget.detail.loading}>
         <GenericBudgetTable<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow>
           table={accounts.table.data}
           isCellEditable={(row: Table.IAccountRow, colDef: ColDef) => {
@@ -52,7 +52,9 @@ const Accounts = (): JSX.Element => {
           onRowUpdate={(id: number, data: { [key: string]: any }) => dispatch(updateAccountAction({ id, data }))}
           onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountsTableRowsAction())}
-          estimated={!isNil(budget.data) && !isNil(budget.data.estimated) ? budget.data.estimated : 0.0}
+          estimated={
+            !isNil(budget.detail.data) && !isNil(budget.detail.data.estimated) ? budget.detail.data.estimated : 0.0
+          }
           columns={[
             {
               field: "account_number",

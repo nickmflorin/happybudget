@@ -10,7 +10,7 @@ export const createAction = <P = any>(type: string, payload?: P, options?: Redux
 };
 
 export const simpleAction = <P = any, A extends Redux.IAction<P> = Redux.IAction<P>>(type: string) => {
-  return (payload: P, options?: Redux.IActionConfig): A => {
+  return (payload?: P | undefined, options?: Redux.IActionConfig): A => {
     return { ...createAction<P>(type, payload, options) } as A;
   };
 };

@@ -127,7 +127,7 @@ const Budget = (): JSX.Element => {
       ]}
     >
       <RenderIfValidId id={[budgetId]}>
-        <RenderWithSpinner loading={budget.loading}>
+        <RenderWithSpinner loading={budget.detail.loading}>
           <div className={"budget"}>
             <Switch>
               <Redirect exact from={match.url} to={`${match.url}/accounts`} />

@@ -111,23 +111,6 @@ namespace Redux {
   }
 
   namespace Budget {
-    /* eslint-disable no-shadow */
-    interface IAction<T = any> extends Redux.IAction<T> {
-      readonly budgetId?: number | undefined;
-      readonly accountId?: number | undefined;
-      readonly subaccountId?: number | undefined;
-    }
-
-    interface ISubAccountStore {
-      readonly detail: IDetailResponseStore<ISubAccount>;
-      readonly subaccounts: ISubAccountsStore;
-    }
-
-    interface IAccountStore {
-      readonly detail: IDetailResponseStore<IAccount>;
-      readonly subaccounts: ISubAccountsStore;
-    }
-
     interface ISubAccountsStore {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
@@ -144,10 +127,27 @@ namespace Redux {
 
     interface IAccountsStore {
       readonly table: ITableStore<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>;
-      readonly details: IIndexedStore<IAccountStore>;
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
+    }
+
+    interface ISubAccountStore {
+      id: number | null;
+      detail: IDetailResponseStore<ISubAccount>;
+      subaccounts: ISubAccountsStore;
+    }
+
+    interface IAccountStore {
+      id: number | null;
+      detail: IDetailResponseStore<IAccount>;
+      subaccounts: ISubAccountsStore;
+    }
+
+    interface IBudgetStore {
+      id: number | null;
+      detail: IDetailResponseStore<IBudget>;
+      accounts: IAccountsStore;
     }
 
     interface IActivatePlaceholderPayload {
@@ -156,12 +156,9 @@ namespace Redux {
     }
 
     interface IStore {
-      readonly budget: IDetailResponseStore<IBudget>;
-      readonly accounts: IAccountsStore;
-      readonly accountId: number | null;
-      readonly budgetId: number | null;
-      readonly subaccountId: number | null;
-      readonly subaccounts: IIndexedStore<ISubAccountStore>;
+      readonly budget: IBudgetStore;
+      readonly subaccount: ISubAccountStore;
+      readonly account: IAccountStore;
       readonly ancestors: ListStore<IAncestor>;
       readonly ancestorsLoading: boolean;
       readonly actuals: IActualsStore;

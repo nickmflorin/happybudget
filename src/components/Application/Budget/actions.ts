@@ -1,12 +1,10 @@
-import { createAction } from "store/actions";
+import { simpleAction } from "store/actions";
 
 export const ActionType = {
-  SetAccountId: "budget.SetAccountId",
   SetAncestors: "budget.SetAncestors",
   SetAncestorsLoading: "budget.SetAncestorsLoading",
-  SetBudgetId: "budget.SetBudgetId",
-  SetSubAccountId: "budget.SetSubAccountId",
   Budget: {
+    SetId: "budget.budget.SetId",
     Loading: "budget.budget.Loading",
     Response: "budget.budget.Response",
     Request: "budget.budget.Request"
@@ -54,6 +52,7 @@ export const ActionType = {
     AddErrors: "budget.accountstable.AddErrors"
   },
   Account: {
+    SetId: "budget.account.SetId",
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",
     Request: "budget.account.Request",
@@ -81,6 +80,7 @@ export const ActionType = {
     }
   },
   SubAccount: {
+    SetId: "budget.subaccount.SetId",
     Loading: "budget.subaccount.Loading",
     Response: "budget.subaccount.Response",
     Request: "budget.subaccount.Request",
@@ -108,27 +108,9 @@ export const ActionType = {
   }
 };
 
-export const simpleAction = <P = any>(type: string) => {
-  return (payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
-    return { ...createAction<P>(type, payload, options) };
-  };
-};
-
-export const simpleAccountAction = <P = any>(type: string) => {
-  return (accountId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
-    return { ...createAction<P>(type, payload, options), accountId };
-  };
-};
-
-export const simpleSubAccountAction = <P = any>(type: string) => {
-  return (subaccountId: number, payload?: P, options?: Redux.IActionConfig): Redux.Budget.IAction<P> => {
-    return { ...createAction<P>(type, payload, options), subaccountId };
-  };
-};
-
-export const setAccountIdAction = simpleAction<number>(ActionType.SetAccountId);
-export const setBudgetIdAction = simpleAction<number>(ActionType.SetBudgetId);
-export const setSubAccountIdAction = simpleAction<number>(ActionType.SetSubAccountId);
+export const setAccountIdAction = simpleAction<number>(ActionType.Account.SetId);
+export const setBudgetIdAction = simpleAction<number>(ActionType.Budget.SetId);
+export const setSubAccountIdAction = simpleAction<number>(ActionType.SubAccount.SetId);
 
 export const setAncestorsAction = simpleAction<IAncestor[]>(ActionType.SetAncestors);
 export const setAncestorsLoadingAction = simpleAction<boolean>(ActionType.SetAncestorsLoading);
@@ -138,13 +120,12 @@ export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loadi
 export const responseBudgetAction = simpleAction<IBudget>(ActionType.Budget.Response);
 
 export const requestAccountAction = simpleAction<null>(ActionType.Account.Request);
-export const refreshAccountAction = simpleAction<null>(ActionType.Account.Refresh);
-export const loadingAccountAction = simpleAccountAction<boolean>(ActionType.Account.Loading);
-export const responseAccountAction = simpleAccountAction<IAccount>(ActionType.Account.Response);
+export const loadingAccountAction = simpleAction<boolean>(ActionType.Account.Loading);
+export const responseAccountAction = simpleAction<IAccount>(ActionType.Account.Response);
 
 export const requestSubAccountAction = simpleAction<null>(ActionType.SubAccount.Request);
-export const loadingSubAccountAction = simpleSubAccountAction<boolean>(ActionType.SubAccount.Loading);
-export const responseSubAccountAction = simpleSubAccountAction<ISubAccount>(ActionType.SubAccount.Response);
+export const loadingSubAccountAction = simpleAction<boolean>(ActionType.SubAccount.Loading);
+export const responseSubAccountAction = simpleAction<ISubAccount>(ActionType.SubAccount.Response);
 
 /*
   Actions Pertaining to the Accounts
@@ -178,112 +159,100 @@ export const addErrorsToAccountsTableAction = simpleAction<Table.ICellError | Ta
 /*
   Actions Pertaining to the Sub Accounts of an Account
 */
-export const addAccountSubAccountsTablePlaceholdersAction = simpleAccountAction<number>(
+export const addAccountSubAccountsTablePlaceholdersAction = simpleAction<number>(
   ActionType.Account.SubAccountsTable.AddPlaceholders
 );
-export const updateAccountSubAccountAction = simpleAccountAction<{
+export const updateAccountSubAccountAction = simpleAction<{
   id: number;
   data: Partial<Http.ISubAccountPayload>;
 }>(ActionType.Account.SubAccounts.Update);
-export const selectAccountSubAccountsTableRowAction = simpleAccountAction<number>(
+export const selectAccountSubAccountsTableRowAction = simpleAction<number>(
   ActionType.Account.SubAccountsTable.SelectRow
 );
-export const deselectAccountSubAccountsTableRowAction = simpleAccountAction<number>(
+export const deselectAccountSubAccountsTableRowAction = simpleAction<number>(
   ActionType.Account.SubAccountsTable.DeselectRow
 );
-export const selectAllAccountSubAccountsTableRowsAction = simpleAccountAction<null>(
+export const selectAllAccountSubAccountsTableRowsAction = simpleAction<null>(
   ActionType.Account.SubAccountsTable.SelectAllRows
 );
-export const updateAccountSubAccountsTableRowAction = simpleAccountAction<{
+export const updateAccountSubAccountsTableRowAction = simpleAction<{
   id: number;
   data: Partial<Table.ISubAccountRow>;
 }>(ActionType.Account.SubAccountsTable.UpdateRow);
 export const activateAccountSubAccountsTablePlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
   ActionType.Account.SubAccountsTable.ActivatePlaceholder
 );
-export const removeAccountSubAccountsRowAction = simpleAccountAction<Table.ISubAccountRow>(
+export const removeAccountSubAccountsRowAction = simpleAction<Table.ISubAccountRow>(
   ActionType.Account.SubAccountsTable.RemoveRow
 );
-export const removeAccountSubAccountAction = simpleAccountAction<Table.ISubAccountRow>(
-  ActionType.Account.SubAccounts.Remove
-);
-export const deletingAccountSubAccountAction = simpleAccountAction<Redux.ModelListActionPayload>(
+export const removeAccountSubAccountAction = simpleAction<Table.ISubAccountRow>(ActionType.Account.SubAccounts.Remove);
+export const deletingAccountSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Account.SubAccounts.Deleting
 );
-export const updatingAccountSubAccountAction = simpleAccountAction<Redux.ModelListActionPayload>(
+export const updatingAccountSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Account.SubAccounts.Updating
 );
-export const creatingAccountSubAccountAction = simpleAccountAction<boolean>(ActionType.Account.SubAccounts.Creating);
-export const requestAccountSubAccountsAction = simpleAccountAction<null>(ActionType.Account.SubAccountsTable.Request);
-export const loadingAccountSubAccountsAction = simpleAccountAction<boolean>(
-  ActionType.Account.SubAccountsTable.Loading
-);
-export const responseAccountSubAccountsAction = simpleAccountAction<Http.IListResponse<ISubAccount>>(
+export const creatingAccountSubAccountAction = simpleAction<boolean>(ActionType.Account.SubAccounts.Creating);
+export const requestAccountSubAccountsAction = simpleAction<null>(ActionType.Account.SubAccountsTable.Request);
+export const loadingAccountSubAccountsAction = simpleAction<boolean>(ActionType.Account.SubAccountsTable.Loading);
+export const responseAccountSubAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(
   ActionType.Account.SubAccountsTable.Response
 );
-export const setAccountSubAccountsSearchAction = simpleAccountAction<string>(
-  ActionType.Account.SubAccountsTable.SetSearch
-);
-export const addErrorsToAccountSubAccountsTableAction = simpleAccountAction<Table.ICellError | Table.ICellError[]>(
+export const setAccountSubAccountsSearchAction = simpleAction<string>(ActionType.Account.SubAccountsTable.SetSearch);
+export const addErrorsToAccountSubAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
   ActionType.Account.SubAccountsTable.AddErrors
 );
 
 /*
   Actions Pertaining to the Sub Accounts of a Sub Account
 */
-export const addSubAccountSubAccountsTablePlaceholdersAction = simpleSubAccountAction<number>(
+export const addSubAccountSubAccountsTablePlaceholdersAction = simpleAction<number>(
   ActionType.SubAccount.SubAccountsTable.AddPlaceholders
 );
-export const updateSubAccountSubAccountAction = simpleSubAccountAction<{
+export const updateSubAccountSubAccountAction = simpleAction<{
   id: number;
   data: Partial<Http.ISubAccountPayload>;
 }>(ActionType.SubAccount.SubAccounts.Update);
-export const selectSubAccountSubAccountsTableRowAction = simpleSubAccountAction<number>(
+export const selectSubAccountSubAccountsTableRowAction = simpleAction<number>(
   ActionType.SubAccount.SubAccountsTable.SelectRow
 );
-export const selectAllSubAccountSubAccountsTableRowsAction = simpleSubAccountAction<null>(
+export const selectAllSubAccountSubAccountsTableRowsAction = simpleAction<null>(
   ActionType.SubAccount.SubAccountsTable.SelectAllRows
 );
-export const deselectSubAccountSubAccountsTableRowAction = simpleSubAccountAction<number>(
+export const deselectSubAccountSubAccountsTableRowAction = simpleAction<number>(
   ActionType.SubAccount.SubAccountsTable.DeselectRow
 );
-export const updateSubAccountSubAccountsTableRowAction = simpleSubAccountAction<{
+export const updateSubAccountSubAccountsTableRowAction = simpleAction<{
   id: number;
   data: Partial<Table.ISubAccountRow>;
 }>(ActionType.SubAccount.SubAccountsTable.UpdateRow);
 export const activateSubAccountSubAccountsTablePlaceholderAction = simpleAction<Redux.Budget.IActivatePlaceholderPayload>(
   ActionType.SubAccount.SubAccountsTable.ActivatePlaceholder
 );
-export const removeSubAccountSubAccountsTableRowAction = simpleSubAccountAction<Table.ISubAccountRow>(
+export const removeSubAccountSubAccountsTableRowAction = simpleAction<Table.ISubAccountRow>(
   ActionType.SubAccount.SubAccountsTable.RemoveRow
 );
-export const removeSubAccountSubAccountAction = simpleSubAccountAction<Table.ISubAccountRow>(
+export const removeSubAccountSubAccountAction = simpleAction<Table.ISubAccountRow>(
   ActionType.SubAccount.SubAccounts.Remove
 );
-export const deletingSubAccountSubAccountAction = simpleSubAccountAction<Redux.ModelListActionPayload>(
+export const deletingSubAccountSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.SubAccount.SubAccounts.Deleting
 );
-export const updatingSubAccountSubAccountAction = simpleSubAccountAction<Redux.ModelListActionPayload>(
+export const updatingSubAccountSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.SubAccount.SubAccounts.Updating
 );
-export const creatingSubAccountSubAccountAction = simpleSubAccountAction<boolean>(
-  ActionType.SubAccount.SubAccounts.Creating
-);
-export const requestSubAccountSubAccountsAction = simpleSubAccountAction<null>(
-  ActionType.SubAccount.SubAccountsTable.Request
-);
-export const loadingSubAccountSubAccountsAction = simpleSubAccountAction<boolean>(
-  ActionType.SubAccount.SubAccountsTable.Loading
-);
-export const responseSubAccountSubAccountsAction = simpleSubAccountAction<Http.IListResponse<ISubAccount>>(
+export const creatingSubAccountSubAccountAction = simpleAction<boolean>(ActionType.SubAccount.SubAccounts.Creating);
+export const requestSubAccountSubAccountsAction = simpleAction<null>(ActionType.SubAccount.SubAccountsTable.Request);
+export const loadingSubAccountSubAccountsAction = simpleAction<boolean>(ActionType.SubAccount.SubAccountsTable.Loading);
+export const responseSubAccountSubAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(
   ActionType.SubAccount.SubAccountsTable.Response
 );
-export const setSubAccountSubAccountsSearchAction = simpleSubAccountAction<string>(
+export const setSubAccountSubAccountsSearchAction = simpleAction<string>(
   ActionType.SubAccount.SubAccountsTable.SetSearch
 );
-export const addErrorsToSubAccountSubAccountsTableAction = simpleSubAccountAction<
-  Table.ICellError | Table.ICellError[]
->(ActionType.SubAccount.SubAccountsTable.AddErrors);
+export const addErrorsToSubAccountSubAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
+  ActionType.SubAccount.SubAccountsTable.AddErrors
+);
 
 /*
   Actions Pertaining to the Actuals
