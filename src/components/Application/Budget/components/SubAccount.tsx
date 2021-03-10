@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
 import { isNil, includes } from "lodash";
 
-import { ColDef } from "ag-grid-community";
+import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import {
@@ -80,7 +80,9 @@ const SubAccount = (): JSX.Element => {
             },
             {
               field: "name",
-              headerName: "Name"
+              headerName: "Name",
+              colSpan: (params: ColSpanParams) =>
+                !isNil(params.data.meta) && params.data.meta.subaccounts.length !== 0 ? 5 : 1
             },
             {
               field: "quantity",
