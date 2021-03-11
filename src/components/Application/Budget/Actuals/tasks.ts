@@ -11,9 +11,10 @@ import {
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
 import {
+  activateActualsPlaceholderAction,
   loadingActualsAction,
   responseActualsAction,
-  updateActualsTableCellAction,
+  updateActualsTableRowAction,
   addErrorsToActualsTableAction,
   addActualsTablePlaceholdersAction,
   removeActualsTableRowAction,
@@ -23,13 +24,7 @@ import {
   loadingBudgetItemsAction,
   responseBudgetItemsAction
 } from "./actions";
-import {
-  payloadFromResponse,
-  postPayloadFromRow,
-  rowHasRequiredFields,
-  requestWarrantsParentRefresh,
-  payloadBeforeResponse
-} from "../util";
+import { payloadFromResponse, postPayloadFromRow, rowHasRequiredFields, payloadBeforeResponse } from "../util";
 
 export function* handleActualRemovalTask(action: Redux.IAction<Table.IActualRow>): SagaIterator {
   if (!isNil(action.payload)) {
@@ -64,25 +59,55 @@ export function* handleActualUpdateTask(
         the actual with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
+      // There are some cases where we need to update the row in the table before
+      // we make the request, to improve the UI.  This happens for cells where the
+      // value is rendered via an HTML element (i.e. the Unit Cell).  AGGridReact will
+      // not automatically update the cell when the Unit is changed via the dropdown,
+      // so we need to udpate the row in the data used to populate the table.  We could
+      // do this by updating with a payload generated from the response, but it is quicker
+      // to do it before hand.
+      const preResponsePayload = payloadBeforeResponse<Table.IActualRow>(action.payload.data, "actual");
+      if (Object.keys(preResponsePayload).length !== 0) {
+        yield put(
+          updateActualsTableRowAction({
+            id: existing.id,
+            data: preResponsePayload
+          })
+        );
+      }
       if (existing.meta.isPlaceholder === true) {
-        const payload = postPayloadFromRow<Table.IActualRow, Http.IActualPayload>(existing, "actual");
+        const updatedRow = { ...existing, ...action.payload.data };
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (rowHasRequiredFields<Table.IActualRow>(existing, "actual")) {
+        if (rowHasRequiredFields<Table.IActualRow>(updatedRow, "actual")) {
           yield put(creatingActualAction(true));
-          // try {
-          //   const response: IActual = yield call(createActual, action.budgetId, payload as Http.IAccountPayload);
-          //   yield put(activateActualsPlaceholderAction({ oldId: existing.id, id: response.id }));
-          //   const updates = convertActualResponseToCellUpdates(response);
-          //   yield put(updateActualsCellAction(updates));
-          // } catch (e) {
-          //   // TODO: Should we revert the changes if there was an error?
-          //   handleRequestError(e, "There was an error updating the actual.");
-          // } finally {
-          //   yield put(creatingActualAction(false));
-          // }
+          const payload = postPayloadFromRow<Table.IActualRow, Http.IActualPayload>(updatedRow, "actual");
+          if (!isNil(updatedRow.object_id)) {
+            let service = createAccountActual;
+            if (updatedRow.parent_type === "subaccount") {
+              service = createSubAccountActual;
+            }
+            try {
+              const response: IActual = yield call(service, updatedRow.object_id, payload);
+              yield put(activateActualsPlaceholderAction({ oldId: existing.id, id: response.id }));
+              const responsePayload = payloadFromResponse<IActual>(response, "actual");
+              if (Object.keys(responsePayload).length !== 0) {
+                yield put(updateActualsTableRowAction({ id: response.id, data: responsePayload }));
+              }
+            } catch (e) {
+              yield call(
+                handleTableErrors,
+                e,
+                "There was an error updating the actual.",
+                existing.id,
+                (errors: Table.ICellError[]) => addErrorsToActualsTableAction(errors)
+              );
+            } finally {
+              yield put(creatingActualAction(false));
+            }
+          }
         }
       } else {
         yield put(updatingActualAction({ id: existing.id as number, value: true }));
@@ -93,7 +118,7 @@ export function* handleActualUpdateTask(
             action.payload.data as Partial<Http.IActualPayload>
           );
           const responsePayload = payloadFromResponse<IActual>(response, "actual");
-          yield put(updateActualsTableCellAction({ id: existing.id, data: responsePayload }));
+          yield put(updateActualsTableRowAction({ id: existing.id, data: responsePayload }));
         } catch (e) {
           yield call(
             handleTableErrors,

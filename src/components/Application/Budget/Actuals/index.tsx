@@ -43,6 +43,9 @@ const Actuals = (): JSX.Element => {
         onRowUpdate={(id: number, data: { [key: string]: any }) => dispatch(updateActualAction({ id, data }))}
         onSelectAll={() => dispatch(selectAllActualsTableRowsAction())}
         frameworkComponents={{ BudgetItemCell }}
+        rowRefreshRequired={(existing: Table.IActualRow, row: Table.IActualRow) =>
+          existing.object_id !== row.object_id || existing.parent_type !== row.parent_type
+        }
         cellClass={(params: CellClassParams) => (params.colDef.field === "parent" ? "no-select" : undefined)}
         columns={[
           {
@@ -50,8 +53,9 @@ const Actuals = (): JSX.Element => {
             headerName: "Account",
             cellRenderer: "BudgetItemCell",
             cellRendererParams: {
-              onChange: (id: number, row: Table.IActualRow) => {
-                dispatch(updateActualAction({ id: row.id, data: { object_id: id } }));
+              onChange: (object_id: number, parent_type: BudgetItemType, row: Table.IActualRow) => {
+                console.log("ON CHANGE HOOK");
+                dispatch(updateActualAction({ id: row.id, data: { object_id, parent_type } }));
               }
             }
           },

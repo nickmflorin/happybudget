@@ -169,6 +169,8 @@ export function* handleAccountUpdateTask(
         );
       }
       if (existing.meta.isPlaceholder === true) {
+        // TODO: Should we be using the payload data here?  Instead of the existing row?
+        // Or we should probably merge them, right?
         const payload = postPayloadFromRow<Table.IAccountRow, Http.IAccountPayload>(existing, "account");
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
@@ -259,6 +261,8 @@ export function* handleAccountSubAccountUpdateTask(
         );
       }
       if (existing.meta.isPlaceholder === true) {
+        // TODO: Should we be using the payload data here?  Instead of the existing row?
+        // Or we should probably merge them, right?
         const requestPayload = postPayloadFromRow<Table.ISubAccountRow, Http.ISubAccountPayload>(
           existing,
           "subaccount"
@@ -352,6 +356,8 @@ export function* handleSubAccountSubAccountUpdateTask(
         );
       }
       if (existing.meta.isPlaceholder === true) {
+        // TODO: Should we be using the payload data here?  Instead of the existing row?
+        // Or we should probably merge them, right?
         const requestPayload = postPayloadFromRow<Table.ISubAccountRow, Http.ISubAccountPayload>(
           existing,
           "subaccount"
