@@ -17,7 +17,7 @@ export function* getBudgetTask(action: Redux.IAction<null>): SagaIterator {
         setAncestorsAction([
           {
             id: response.id,
-            name: response.name,
+            identifier: response.name,
             type: "budget"
           }
         ])

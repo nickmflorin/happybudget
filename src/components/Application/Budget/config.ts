@@ -33,17 +33,17 @@ export const FieldDefinitions: { [key in Table.RowType]: IFieldDefinition[] } = 
   ],
   subaccount: [
     { name: "description", postPayload: true },
-    { name: "name", postPayload: true, requiredForPost: true },
+    { name: "name", postPayload: true },
     { name: "quantity", postPayload: true, triggerParentRefresh: true },
     { name: "rate", postPayload: true, triggerParentRefresh: true },
     { name: "multiplier", postPayload: true, triggerParentRefresh: true },
     { name: "unit", postPayload: true, updateBeforeResponse: true },
-    { name: "line", postPayload: true, requiredForPost: true },
+    { name: "identifier", postPayload: true, requiredForPost: true },
     { name: "estimated", responsePayload: true }
   ],
   account: [
     { name: "description", postPayload: true },
-    { name: "account_number", postPayload: true, requiredForPost: true },
+    { name: "identifier", postPayload: true, requiredForPost: true },
     { name: "estimated", responsePayload: true },
     { name: "variance", responsePayload: true },
     { name: "actual", responsePayload: true }

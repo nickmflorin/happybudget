@@ -25,8 +25,8 @@ namespace Table {
 
   type RowType = "account" | "subaccount" | "actual";
 
-  type AccountRowField = "account_number" | "description";
-  type SubAccountRowField = "line" | "name" | "description" | "quantity" | "unit" | "multiplier" | "rate";
+  type AccountRowField = "identifier" | "description";
+  type SubAccountRowField = "identifier" | "name" | "description" | "quantity" | "unit" | "multiplier" | "rate";
   type ActualRowField =
     | "parent"
     | "description"
@@ -47,14 +47,14 @@ namespace Table {
   }
 
   interface IAccountRow extends IRow<AccountRowField, IBudgetRowMeta> {
-    readonly account_number: string | null;
+    readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
     readonly variance: number | null;
   }
 
   interface ISubAccountRow extends IRow<SubAccountRowField, IBudgetRowMeta> {
-    readonly line: string | null;
+    readonly identifier: string | null;
     readonly name: string | null;
     readonly description: string | null;
     readonly quantity: number | null;

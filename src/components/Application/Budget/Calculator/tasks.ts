@@ -489,7 +489,7 @@ export function* getAccountTask(action: Redux.IAction<null>): SagaIterator {
           concat(response.ancestors, [
             {
               id: response.id,
-              name: response.account_number,
+              identifier: response.identifier,
               type: "account"
             }
           ])
@@ -518,7 +518,7 @@ export function* getSubAccountTask(action: Redux.IAction<null>): SagaIterator {
           concat(response.ancestors, [
             {
               id: response.id,
-              name: response.name,
+              identifier: response.identifier,
               type: "subaccount"
             }
           ])

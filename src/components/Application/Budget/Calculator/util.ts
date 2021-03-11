@@ -8,7 +8,7 @@ export const initializeRowFromAccount = (account: IAccount): Table.IAccountRow =
     subaccounts: account.subaccounts,
     errors: []
   },
-  account_number: account.account_number,
+  identifier: account.identifier,
   description: account.description,
   estimated: account.estimated,
   variance: account.variance
@@ -23,7 +23,7 @@ export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.ISub
     errors: []
   },
   name: subaccount.name,
-  line: subaccount.line,
+  identifier: subaccount.identifier,
   unit: subaccount.unit,
   multiplier: subaccount.multiplier,
   rate: subaccount.rate,
@@ -36,7 +36,7 @@ export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.ISub
 export const createSubAccountRowPlaceholder = (): Table.ISubAccountRow => ({
   id: generateRandomNumericId(),
   name: null,
-  line: null,
+  identifier: null,
   unit: null,
   multiplier: null,
   rate: null,
@@ -54,7 +54,7 @@ export const createSubAccountRowPlaceholder = (): Table.ISubAccountRow => ({
 
 export const createAccountRowPlaceholder = (): Table.IAccountRow => ({
   id: generateRandomNumericId(),
-  account_number: null,
+  identifier: null,
   description: null,
   estimated: null,
   variance: null,

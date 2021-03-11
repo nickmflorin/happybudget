@@ -64,7 +64,7 @@ const AncestorsBreadCrumbs = ({ ancestors, budgetId, loading }: AncestorsBreadCr
             last={index === ancestors.length - 1}
             icon={ancestor.type === "budget" ? <PrimaryAncestorIcon loading={loading} /> : undefined}
           >
-            {ancestor.name}
+            {ancestor.identifier}
           </AncestorBreadCrumbItem>
         );
       })}

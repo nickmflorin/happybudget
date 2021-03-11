@@ -12,7 +12,7 @@ type PaymentMethod = 0 | 1 | 2;
 type AncestorType = "budget" | "account" | "subaccount";
 type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
 type Unit = 0 | 1 | 2 | 3 | 4 | 5;
-type ParentType = "subaccount" | "account";
+type BudgetItemType = "subaccount" | "account";
 
 interface Model {
   id: number;
@@ -66,15 +66,19 @@ interface IBudget extends Model {
 
 interface IAncestor {
   id: number;
-  name: string;
+  identifier: string;
   type: AncestorType;
 }
 
-interface IAccount extends TrackedModel {
-  readonly account_number: string;
+interface IBudgetItem extends TrackedModel {
+  readonly identifier: string;
   readonly description: string | null;
-  readonly access: number[];
   readonly budget: number;
+  readonly type: "account" | "subaccount";
+}
+
+interface IAccount extends IBudgetItem {
+  readonly access: number[];
   readonly ancestors: IAncestor[];
   readonly estimated: number | null;
   readonly variance: number | null;
@@ -85,10 +89,8 @@ interface ISimpleSubAccount extends Model {
   readonly name: string;
 }
 
-interface ISubAccount extends TrackedModel {
-  readonly name: string;
-  readonly line: string;
-  readonly description: string | null;
+interface ISubAccount extends IBudgetItem {
+  readonly name: string | null;
   readonly quantity: number | null;
   readonly rate: number | null;
   readonly multiplier: number | null;
@@ -96,7 +98,7 @@ interface ISubAccount extends TrackedModel {
   readonly unit_name: UnitName;
   readonly account: number;
   readonly parent: number;
-  readonly parent_type: ParentType;
+  readonly parent_type: BudgetItemType;
   readonly ancestors: IAncestor[];
   readonly estimated: number | null;
   readonly variance: number | null;
@@ -113,5 +115,5 @@ interface IActual extends TrackedModel {
   readonly payment_method: PaymentMethod;
   readonly payment_method_name: PaymentMethodName;
   readonly parent: number;
-  readonly parent_type: ParentType;
+  readonly parent_type: BudgetItemType;
 }

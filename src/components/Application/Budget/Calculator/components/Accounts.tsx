@@ -54,7 +54,7 @@ const Accounts = (): JSX.Element => {
         }
         columns={[
           {
-            field: "account_number",
+            field: "identifier",
             headerName: "Account"
           },
           {

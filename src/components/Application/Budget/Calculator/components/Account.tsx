@@ -40,7 +40,7 @@ const Account = (): JSX.Element => {
           isCellEditable={(row: Table.ISubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "unit"], colDef.field)) {
               return false;
-            } else if (includes(["line", "description", "name"], colDef.field)) {
+            } else if (includes(["identifier", "description", "name"], colDef.field)) {
               return true;
             } else {
               return row.meta.subaccounts.length === 0;
@@ -73,18 +73,18 @@ const Account = (): JSX.Element => {
           }
           columns={[
             {
-              field: "line",
+              field: "identifier",
               headerName: "Line"
             },
             {
               field: "description",
-              headerName: "Category Description"
+              headerName: "Category Description",
+              colSpan: (params: ColSpanParams) =>
+                !isNil(params.data.meta) && params.data.meta.subaccounts.length !== 0 ? 6 : 1
             },
             {
               field: "name",
-              headerName: "Name",
-              colSpan: (params: ColSpanParams) =>
-                !isNil(params.data.meta) && params.data.meta.subaccounts.length !== 0 ? 5 : 1
+              headerName: "Name"
             },
             {
               field: "quantity",
