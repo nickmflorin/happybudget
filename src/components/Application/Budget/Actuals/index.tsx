@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil } from "lodash";
+import { CellClassParams } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
 import {
+  requestBudgetItemsAction,
   requestActualsAction,
   setActualsSearchAction,
   addActualsTablePlaceholdersAction,
@@ -14,6 +16,7 @@ import {
   updateActualAction,
   selectAllActualsTableRowsAction
 } from "./actions";
+import BudgetItemCell from "./BudgetItemCell";
 
 const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
@@ -21,6 +24,7 @@ const Actuals = (): JSX.Element => {
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
 
   useEffect(() => {
+    dispatch(requestBudgetItemsAction());
     dispatch(requestActualsAction());
   }, []);
 
@@ -38,13 +42,18 @@ const Actuals = (): JSX.Element => {
         onRowDelete={(row: Table.IActualRow) => dispatch(removeActualAction(row))}
         onRowUpdate={(id: number, data: { [key: string]: any }) => dispatch(updateActualAction({ id, data }))}
         onSelectAll={() => dispatch(selectAllActualsTableRowsAction())}
-        estimated={
-          !isNil(budget.detail.data) && !isNil(budget.detail.data.estimated) ? budget.detail.data.estimated : 0.0
-        }
+        frameworkComponents={{ BudgetItemCell }}
+        cellClass={(params: CellClassParams) => (params.colDef.field === "parent" ? "no-select" : undefined)}
         columns={[
           {
             field: "parent",
-            headerName: "Account"
+            headerName: "Account",
+            cellRenderer: "BudgetItemCell",
+            cellRendererParams: {
+              onChange: (id: number, row: Table.IActualRow) => {
+                dispatch(updateActualAction({ id: row.id, data: { object_id: id } }));
+              }
+            }
           },
           {
             field: "description",

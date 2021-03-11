@@ -6,6 +6,12 @@ export const ActionType = {
   Updating: "actuals.Updating",
   Update: "actuals.Update",
   Remove: "actuals.Remove",
+  BudgetItems: {
+    Loading: "actuals.budgetitems.Loading",
+    Response: "actuals.budgetitems.Response",
+    Request: "actuals.budgetitems.Request",
+    SetSearch: "actuals.budgetitems.SetSearch"
+  },
   ActualsTable: {
     AddPlaceholders: "actuals.table.AddPlaceholders",
     UpdateRow: "actuals.table.UpdateRow",
@@ -25,7 +31,7 @@ export const ActionType = {
 export const addActualsTablePlaceholdersAction = simpleAction<number>(ActionType.ActualsTable.AddPlaceholders);
 export const updateActualAction = simpleAction<{
   id: number;
-  data: Partial<Http.IAccountPayload>;
+  data: Partial<Http.IActualPayload>;
 }>(ActionType.Update);
 export const updateActualsTableCellAction = simpleAction<{ id: number; data: Partial<Table.IActualRow> }>(
   ActionType.ActualsTable.UpdateRow
@@ -48,3 +54,8 @@ export const setActualsSearchAction = simpleAction<string>(ActionType.ActualsTab
 export const addErrorsToActualsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
   ActionType.ActualsTable.AddErrors
 );
+
+export const requestBudgetItemsAction = simpleAction<null>(ActionType.BudgetItems.Request);
+export const loadingBudgetItemsAction = simpleAction<boolean>(ActionType.BudgetItems.Loading);
+export const responseBudgetItemsAction = simpleAction<Http.IListResponse<IBudgetItem>>(ActionType.BudgetItems.Response);
+export const setBudgetItemsSearchAction = simpleAction<string>(ActionType.BudgetItems.SetSearch);

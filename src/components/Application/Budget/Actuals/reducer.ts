@@ -1,5 +1,10 @@
 import { combineReducers } from "redux";
-import { createSimpleBooleanReducer, createModelListActionReducer, createTableReducer } from "store/reducerFactories";
+import {
+  createSimpleBooleanReducer,
+  createModelListActionReducer,
+  createTableReducer,
+  createListResponseReducer
+} from "store/reducerFactories";
 import { ActionType } from "./actions";
 import { createActualRowPlaceholder, initializeRowFromActual } from "./util";
 
@@ -7,6 +12,15 @@ const rootReducer = combineReducers({
   deleting: createModelListActionReducer(ActionType.Deleting, { referenceEntity: "actual" }),
   updating: createModelListActionReducer(ActionType.Updating, { referenceEntity: "actual" }),
   creating: createSimpleBooleanReducer(ActionType.Creating),
+  budgetItems: createListResponseReducer<IBudgetItem>(
+    {
+      Response: ActionType.BudgetItems.Response,
+      Request: ActionType.BudgetItems.Request,
+      Loading: ActionType.BudgetItems.Loading,
+      SetSearch: ActionType.BudgetItems.SetSearch
+    },
+    { referenceEntity: "budget item" }
+  ),
   table: createTableReducer<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow, IActual>(
     {
       AddPlaceholders: ActionType.ActualsTable.AddPlaceholders,

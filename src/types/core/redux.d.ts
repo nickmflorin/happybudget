@@ -138,6 +138,7 @@ namespace Redux {
 
   namespace Actuals {
     interface IStore {
+      readonly budgetItems: IListResponseStore<IBudgetItem>;
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;

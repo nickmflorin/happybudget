@@ -87,7 +87,9 @@ namespace Http {
     readonly vendor?: string;
     readonly purchase_order?: string;
     readonly payment_id?: string;
-    readonly value: number;
+    readonly value?: number;
     readonly payment_method?: PaymentMethod;
+    readonly object_id: number;
+    readonly parent_type: BudgetItemType;
   }
 }

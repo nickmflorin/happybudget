@@ -70,26 +70,28 @@ interface IAncestor {
   type: AncestorType;
 }
 
-interface IBudgetItem extends TrackedModel {
+interface IBudgetItem extends Model {
   readonly identifier: string;
-  readonly description: string | null;
   readonly budget: number;
   readonly type: "account" | "subaccount";
 }
 
-interface IAccount extends IBudgetItem {
+interface IAccount extends IBudgetItem, TrackedModel {
+  readonly description: string | null;
   readonly access: number[];
   readonly ancestors: IAncestor[];
   readonly estimated: number | null;
   readonly variance: number | null;
   readonly subaccounts: ISimpleSubAccount[];
+  readonly type: "account";
 }
 
 interface ISimpleSubAccount extends Model {
   readonly name: string;
 }
 
-interface ISubAccount extends IBudgetItem {
+interface ISubAccount extends IBudgetItem, TrackedModel {
+  readonly description: string | null;
   readonly name: string | null;
   readonly quantity: number | null;
   readonly rate: number | null;
@@ -97,7 +99,9 @@ interface ISubAccount extends IBudgetItem {
   readonly unit: Unit | null;
   readonly unit_name: UnitName;
   readonly account: number;
-  readonly parent: number;
+  readonly object_id: number;
+  readonly type: "subaccount";
+  readonly object_id: number;
   readonly parent_type: BudgetItemType;
   readonly ancestors: IAncestor[];
   readonly estimated: number | null;
@@ -114,6 +118,6 @@ interface IActual extends TrackedModel {
   readonly value: string | null;
   readonly payment_method: PaymentMethod;
   readonly payment_method_name: PaymentMethodName;
-  readonly parent: number;
+  readonly object_id: number;
   readonly parent_type: BudgetItemType;
 }

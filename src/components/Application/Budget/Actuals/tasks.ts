@@ -1,7 +1,14 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import { isNil, find } from "lodash";
-import { getBudgetActuals, deleteActual, updateActual, createAccountActual, createSubAccountActual } from "services";
+import {
+  getBudgetActuals,
+  deleteActual,
+  updateActual,
+  getBudgetItems,
+  createAccountActual,
+  createSubAccountActual
+} from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
 import {
   loadingActualsAction,
@@ -12,7 +19,9 @@ import {
   removeActualsTableRowAction,
   deletingActualAction,
   creatingActualAction,
-  updatingActualAction
+  updatingActualAction,
+  loadingBudgetItemsAction,
+  responseBudgetItemsAction
 } from "./actions";
 import {
   payloadFromResponse,
@@ -116,6 +125,23 @@ export function* getActualsTask(action: Redux.IAction<null>): SagaIterator {
       yield put(responseActualsAction({ count: 0, data: [] }, { error: e }));
     } finally {
       yield put(loadingActualsAction(false));
+    }
+  }
+}
+
+export function* getBudgetItemsTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId)) {
+    yield put(loadingBudgetItemsAction(true));
+    try {
+      const response = yield call(getBudgetItems, budgetId, { no_pagination: true });
+      console.log(response);
+      yield put(responseBudgetItemsAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the budget's items.");
+      yield put(responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingBudgetItemsAction(false));
     }
   }
 }

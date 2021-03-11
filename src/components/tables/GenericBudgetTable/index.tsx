@@ -28,7 +28,9 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R 
   table: R[];
   search: string;
   saving: boolean;
-  estimated: number;
+  estimated?: number;
+  frameworkComponents?: { [key: string]: any };
+  cellClass?: (params: CellClassParams) => string | undefined;
   highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
   onSearch: (value: string) => void;
@@ -48,6 +50,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   search,
   saving,
   estimated,
+  frameworkComponents = {},
+  cellClass,
   onSearch,
   onSelectAll,
   onRowUpdate,
@@ -259,7 +263,11 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
                 hasError = true;
               }
             }
-            return classNames({
+            let rootClassNames = undefined;
+            if (!isNil(cellClass)) {
+              rootClassNames = cellClass(params);
+            }
+            return classNames(rootClassNames, {
               "not-editable": !isCellEditable(row, params.colDef),
               "not-editable-highlight":
                 !isCellEditable(row, params.colDef) &&
@@ -380,7 +388,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
             ExpandCell: ExpandCell,
             SelectCell: SelectCell,
             ValueCell: ValueCell,
-            UnitCell: UnitCell
+            UnitCell: UnitCell,
+            ...frameworkComponents
           }}
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {
             const field = event.column.getColId();

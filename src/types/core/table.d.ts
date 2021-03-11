@@ -66,7 +66,8 @@ namespace Table {
   }
 
   interface IActualRow extends IRow<ActualRowField, IActualRowMeta> {
-    readonly parent: number | null;
+    readonly object_id: number | null;
+    readonly parent_type: BudgetItemType | null;
     readonly description: string | null;
     readonly vendor: string | null;
     readonly purchase_order: string | null;

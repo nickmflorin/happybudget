@@ -14,7 +14,8 @@ export const initializeRowFromActual = (actual: IActual): Table.IActualRow => ({
   payment_id: actual.payment_id,
   value: actual.value,
   payment_method: actual.payment_method,
-  parent: actual.parent
+  parent_type: actual.parent_type,
+  object_id: actual.object_id
 });
 
 export const createActualRowPlaceholder = (): Table.IActualRow => ({
@@ -31,5 +32,6 @@ export const createActualRowPlaceholder = (): Table.IActualRow => ({
   payment_id: null,
   value: null,
   payment_method: null,
-  parent: null
+  parent_type: null,
+  object_id: null
 });
