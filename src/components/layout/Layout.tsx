@@ -37,6 +37,8 @@ const Layout = <D extends string = string>({
   const [drawer, setDrawer] = useState<JSX.Element | undefined>(undefined);
   const dispatch = useDispatch();
 
+  // NOTE: Adding the drawers as a dependency to this effect is causing infinite
+  // recursions - we should figure out why that is.
   useEffect(() => {
     if (!isNil(drawers) && !isNil(visibleDrawer) && !isNil(drawers[visibleDrawer])) {
       const d: (() => JSX.Element) | JSX.Element = drawers[visibleDrawer];
@@ -50,7 +52,7 @@ const Layout = <D extends string = string>({
       dispatch(setDrawerVisibilityAction(false));
       setDrawer(undefined);
     }
-  }, [drawers, visibleDrawer]);
+  }, [visibleDrawer]);
 
   return (
     <div className={classNames("application", className)} style={style}>

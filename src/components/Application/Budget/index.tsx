@@ -20,8 +20,7 @@ import {
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { Layout } from "components/layout";
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibility } from "./actions";
-import { AncestorsBreadCrumbs } from "./components";
-import { CommentsHistoryDrawer } from "./components/Calculator/components";
+import { AncestorsBreadCrumbs, CommentsHistoryDrawer } from "./components";
 
 import "./index.scss";
 
