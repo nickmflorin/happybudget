@@ -200,7 +200,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         field: "select",
         editable: false,
         headerName: "",
-        width: 50,
+        width: 30,
         cellRenderer: "SelectCell",
         cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
       }
@@ -210,7 +210,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         field: "expand",
         editable: false,
         headerName: "",
-        width: 50,
+        width: 40,
         cellRenderer: "ExpandCell",
         cellRendererParams: { onClick: onRowExpand }
       });
@@ -220,7 +220,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         field: "delete",
         editable: false,
         headerName: "",
-        width: 70,
+        width: 30,
         cellRenderer: "DeleteCell",
         cellRendererParams: { onClick: onRowDelete }
       }
@@ -294,7 +294,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               field: "select",
               editable: false,
               headerName: "",
-              width: 50,
+              width: 30,
               cellRenderer: "NewRowCell",
               cellRendererParams: { onNew: onRowAdd }
             },
@@ -302,7 +302,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               field: "expand",
               editable: false,
               headerName: "",
-              width: 50
+              width: 40
             }
           ],
           columns,
@@ -311,7 +311,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               field: "delete",
               editable: false,
               headerName: "",
-              width: 70
+              width: 30
             }
           ]
         ),

@@ -49,6 +49,15 @@ $cell-border: 1px solid $cell-border-color;
     border-bottom: none;
     border-left: $cell-border;
 
+    // This will vertically center the text nicely while also not adjusting the
+    // vertical location of the text when the cell is selected.
+    .ag-react-container {
+      max-height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
     &.action-cell {
       border: unset !important;
       text-align: center;
