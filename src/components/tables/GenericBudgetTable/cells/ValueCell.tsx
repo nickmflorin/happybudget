@@ -9,10 +9,24 @@ interface ValueCellProps extends ICellRendererParams {
   value: string | number | null;
   node: RowNode;
   colDef: ColDef;
+  formatter?: (value: string | number) => string | number | null;
 }
 
-const ValueCell = ({ value, node, colDef }: ValueCellProps): JSX.Element => {
+const ValueCell = ({ value, node, colDef, formatter }: ValueCellProps): JSX.Element => {
   const [cellErrors, setCellErrors] = useState<Table.ICellError[]>([]);
+  const [cellValue, setCellValue] = useState<string | number | null>(null);
+
+  useEffect(() => {
+    if (!isNil(value)) {
+      if (!isNil(formatter)) {
+        setCellValue(formatter(value));
+      } else {
+        setCellValue(value);
+      }
+    } else {
+      setCellValue(value);
+    }
+  }, [value, formatter]);
 
   useEffect(() => {
     if (!isNil(colDef.field)) {
@@ -33,11 +47,11 @@ const ValueCell = ({ value, node, colDef }: ValueCellProps): JSX.Element => {
           <CloseCircleOutlined className={"icon--error"} />
           <div className={"text-error"}>{cellErrors[0].error}</div>
         </div>
-        {!isNil(value) && value}
+        {cellValue}
       </div>
     );
   } else {
-    return <>{!isNil(value) && value}</>;
+    return <>{cellValue}</>;
   }
 };
 

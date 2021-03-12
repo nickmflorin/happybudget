@@ -3,8 +3,12 @@
 @import '~ag-grid-community/dist/styles/ag-grid.css';
 @import '~ag-grid-community/dist/styles/ag-theme-alpine.css';
 
+$cell-border-color: #f7f7f7;
+$cell-border: 1px solid $cell-border-color;
+
 .ag-theme-alpine {
-  font-family: $roboto-regular;
+  font-family: $roboto-light;
+  font-weight: 400;
 
   /* Note:
      Numeric columns prop causes some headers to be right aligned.
@@ -27,17 +31,8 @@
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
     font-family: $noto-sans-light !important;
-  }
-  .ag-row {
-    background: $white !important;
-    border-color: 1px solid $gray-light !important;
-    &.ag-row-hover {
-      div[role=gridcell] {
-        &:not(.not-editable-highlight) {
-          background-color: $gray-highlight !important;
-        }
-      }
-    }
+    color: #4E4D4D !important;
+    letter-spacing: 0.045em;
   }
   .ag-header-cell-text {
     color: $text-secondary;
@@ -50,7 +45,10 @@
   }
   div[role='gridcell'] {
     background-color: $white;
-    border-right: 1px solid $gray-light !important;
+    border-top: $cell-border;
+    border-bottom: none;
+    border-left: $cell-border;
+
     &.action-cell {
       border: unset !important;
       text-align: center;
@@ -66,6 +64,7 @@
     }
     &.not-editable-highlight {
       background-color: #f7fffa !important;
+      border: none !important;
     }
     &.ag-cell-focus {
       &:not(.not-editable) {
@@ -75,7 +74,30 @@
         }
       }
       &.not-editable {
-        border: unset !important;
+        &:not(.not-editable-highlight) {
+          border: unset !important;
+        }
+      }
+    }
+  }
+  .ag-row {
+    background: $white !important;
+    border: none !important;
+    &.ag-row-hover {
+      div[role=gridcell] {
+        &:not(.not-editable-highlight) {
+          background-color: $gray-highlight !important;
+        }
+      }
+    }
+    &:first-child {
+      .ag-cell {
+        border-top: none !important;
+      }
+    }
+    &:last-child {
+      .ag-cell {
+        border-bottom: none !important;
       }
     }
   }

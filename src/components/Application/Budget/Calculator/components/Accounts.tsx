@@ -66,17 +66,20 @@ const Accounts = (): JSX.Element => {
           {
             field: "estimated",
             headerName: "Estimated",
-            cellStyle: { textAlign: "right" }
+            cellStyle: { textAlign: "right" },
+            cellRendererParams: { formatter: (value: string | number) => `$${value}` }
           },
           {
             field: "actual",
             headerName: "Actual",
-            cellStyle: { textAlign: "right" }
+            cellStyle: { textAlign: "right" },
+            cellRendererParams: { formatter: (value: string | number) => `$${value}` }
           },
           {
             field: "variance",
             headerName: "Variance",
-            cellStyle: { textAlign: "right" }
+            cellStyle: { textAlign: "right" },
+            cellRendererParams: { formatter: (value: string | number) => `$${value}` }
           }
         ]}
       />

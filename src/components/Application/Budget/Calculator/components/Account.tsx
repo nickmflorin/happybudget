@@ -124,7 +124,8 @@ const Account = (): JSX.Element => {
             {
               field: "actual",
               headerName: "Actual",
-              cellStyle: { textAlign: "right" }
+              cellStyle: { textAlign: "right" },
+              cellRendererParams: { formatter: (value: string | number) => `$${value}` }
             }
           ]}
         />
