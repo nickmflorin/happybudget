@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { isNil } from "lodash";
+
 import { CellClassParams, ColDef } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
@@ -16,8 +18,7 @@ import {
   updateActualAction,
   selectAllActualsTableRowsAction
 } from "./actions";
-import BudgetItemCell from "./BudgetItemCell";
-import { isNil } from "lodash";
+import { BudgetItemCell } from "./cells";
 
 const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
