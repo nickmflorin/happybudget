@@ -5,7 +5,7 @@ import { map } from "lodash";
 import { Form, Input, Button, Empty } from "antd";
 
 import { RenderWithSpinner, ShowHide } from "components/display";
-import { requestBudgetCommentsAction } from "../Calculator/actions";
+import { requestBudgetCommentsAction, submitBudgetCommentAction } from "../Calculator/actions";
 
 const Comments = (): JSX.Element => {
   const [form] = Form.useForm();
@@ -36,12 +36,17 @@ const Comments = (): JSX.Element => {
           form={form}
           layout={"vertical"}
           initialValues={{}}
-          onFinish={(values: any) => console.log(values)}
+          onFinish={(values: Http.ICommentPayload) => dispatch(submitBudgetCommentAction(values))}
         >
           <Form.Item name={"text"} rules={[{ required: true, message: "Please enter a comment to send!" }]}>
             <Input.TextArea style={{ minHeight: 120 }} maxLength={1028} placeholder={"Leave comment here..."} />
           </Form.Item>
-          <Button htmlType={"submit"} className={"btn--primary"} style={{ width: "100%" }}>
+          <Button
+            htmlType={"submit"}
+            loading={comments.submitting}
+            className={"btn--primary"}
+            style={{ width: "100%" }}
+          >
             {"Send"}
           </Button>
         </Form>

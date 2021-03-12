@@ -16,7 +16,8 @@ import {
   getSubAccount,
   getBudgetComments,
   getAccountComments,
-  getSubAccountComments
+  getSubAccountComments,
+  createBudgetComment
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
@@ -64,7 +65,9 @@ import {
   loadingAccountCommentsAction,
   responseAccountCommentsAction,
   loadingSubAccountCommentsAction,
-  responseSubAccountCommentsAction
+  responseSubAccountCommentsAction,
+  submittingBudgetCommentAction,
+  addBudgetCommentToStateAction
 } from "./actions";
 import {
   payloadFromResponse,
@@ -74,6 +77,21 @@ import {
   payloadBeforeResponse
 } from "../../util";
 
+export function* submitBudgetCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId) && !isNil(action.payload)) {
+    yield put(submittingBudgetCommentAction(true));
+    try {
+      const response: IComment = yield call(createBudgetComment, budgetId, action.payload);
+      yield put(addBudgetCommentToStateAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error submitting the comment.");
+    } finally {
+      yield put(submittingBudgetCommentAction(false));
+    }
+  }
+}
+
 export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
@@ -81,7 +99,6 @@ export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator
     try {
       // TODO: We will have to build in pagination.
       const response = yield call(getBudgetComments, budgetId);
-      console.log(response);
       yield put(responseBudgetCommentsAction(response));
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's comments.");

@@ -24,9 +24,13 @@ const rootReducer = combineReducers({
       {
         Response: ActionType.Comments.Response,
         Request: ActionType.Comments.Request,
-        Loading: ActionType.Comments.Loading
+        Loading: ActionType.Comments.Loading,
+        AddToState: ActionType.Comments.AddToState
       },
-      { referenceEntity: "comment" }
+      {
+        referenceEntity: "comment",
+        keyReducers: { submitting: createSimpleBooleanReducer(ActionType.Comments.Submitting) }
+      }
     ),
     table: createTableReducer<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>(
       {
@@ -61,7 +65,10 @@ const rootReducer = combineReducers({
         Request: ActionType.Account.Comments.Request,
         Loading: ActionType.Account.Comments.Loading
       },
-      { referenceEntity: "comment" }
+      {
+        referenceEntity: "comment",
+        keyReducers: { submitting: createSimpleBooleanReducer(ActionType.Account.Comments.Submitting) }
+      }
     ),
     subaccounts: combineReducers({
       deleting: createModelListActionReducer(ActionType.Account.SubAccounts.Deleting, {
@@ -107,7 +114,7 @@ const rootReducer = combineReducers({
       },
       {
         referenceEntity: "comment",
-        keyReducers: { submitting: createModelListActionReducer(ActionType.Comments.Submitting) }
+        keyReducers: { submitting: createSimpleBooleanReducer(ActionType.SubAccount.Comments.Submitting) }
       }
     ),
     subaccounts: combineReducers({

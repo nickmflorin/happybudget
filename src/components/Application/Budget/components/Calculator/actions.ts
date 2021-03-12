@@ -13,7 +13,8 @@ export const ActionType = {
     Response: "calculator.comments.Response",
     Request: "calculator.comments.Request",
     Submit: "calculator.comments.Submit",
-    Submitting: "calculator.comments.Submitting"
+    Submitting: "calculator.comments.Submitting",
+    AddToState: "calculator.comments.AddToState"
   },
   AccountsTable: {
     AddPlaceholders: "calculator.accountstable.AddPlaceholders",
@@ -38,7 +39,8 @@ export const ActionType = {
     Comments: {
       Loading: "calculator.account.comments.Loading",
       Response: "calculator.account.comments.Response",
-      Request: "calculator.account.comments.Request"
+      Request: "calculator.account.comments.Request",
+      Submitting: "calculator.account.comments.Submitting"
     },
     SubAccountsTable: {
       AddPlaceholders: "calculator.account.subaccountstable.AddPlaceholders",
@@ -70,7 +72,8 @@ export const ActionType = {
     Comments: {
       Loading: "calculator.subaccount.comments.Loading",
       Response: "calculator.subaccount.comments.Response",
-      Request: "calculator.subaccount.comments.Request"
+      Request: "calculator.subaccount.comments.Request",
+      Submitting: "calculator.subaccount.comments.Submitting"
     },
     SubAccountsTable: {
       AddPlaceholders: "calculator.subaccount.subaccountstable.AddPlaceholders",
@@ -112,6 +115,7 @@ export const responseBudgetCommentsAction = simpleAction<Http.IListResponse<ICom
 export const loadingBudgetCommentsAction = simpleAction<boolean>(ActionType.Comments.Loading);
 export const submitBudgetCommentAction = simpleAction<Http.ICommentPayload>(ActionType.Comments.Submit);
 export const submittingBudgetCommentAction = simpleAction<boolean>(ActionType.Comments.Submitting);
+export const addBudgetCommentToStateAction = simpleAction<IComment>(ActionType.Comments.AddToState);
 
 export const requestAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
 export const responseAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(

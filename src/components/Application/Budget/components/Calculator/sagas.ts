@@ -17,7 +17,8 @@ import {
   handleSubAccountChangedTask,
   getBudgetCommentsTask,
   getAccountCommentsTask,
-  getSubAccountCommentsTask
+  getSubAccountCommentsTask,
+  submitBudgetCommentTask
 } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
@@ -132,6 +133,17 @@ function* watchForTriggerBudgetCommentsSaga(): SagaIterator {
   }
 }
 
+function* watchForSubmitBudgetCommentSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.Comments.Submit);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(submitBudgetCommentTask, action);
+  }
+}
+
 function* watchForTriggerAccountCommentsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
@@ -171,4 +183,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForTriggerBudgetCommentsSaga);
   yield spawn(watchForTriggerAccountCommentsSaga);
   yield spawn(watchForTriggerSubAccountCommentsSaga);
+  yield spawn(watchForSubmitBudgetCommentSaga);
 }
