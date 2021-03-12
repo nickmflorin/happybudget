@@ -1,9 +1,6 @@
-import { ReactNode, useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { ReactNode } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
-
-import { setDrawerVisibilityAction } from "store/actions";
 
 import Header from "./Header";
 import Footer from "./Footer";
@@ -11,7 +8,7 @@ import Sidebar, { ISidebarItem } from "./Sidebar";
 import { IToolbarItem } from "./Header/Toolbar";
 
 /* eslint-disable no-unused-vars */
-interface LayoutProps<D extends string = string> {
+interface LayoutProps {
   className?: string;
   children: any;
   sidebar?: ISidebarItem[] | (() => JSX.Element);
@@ -19,41 +16,17 @@ interface LayoutProps<D extends string = string> {
   style?: React.CSSProperties;
   collapsed?: boolean;
   breadcrumbs?: ReactNode;
-  drawers?: { [key in D]: (() => JSX.Element) | JSX.Element };
-  visibleDrawer?: D | undefined;
 }
 
-const Layout = <D extends string = string>({
+const Layout = ({
   className,
   children,
   toolbar,
   breadcrumbs,
   sidebar,
   style = {},
-  collapsed = false,
-  drawers,
-  visibleDrawer
-}: LayoutProps<D>): JSX.Element => {
-  const [drawer, setDrawer] = useState<JSX.Element | undefined>(undefined);
-  const dispatch = useDispatch();
-
-  // NOTE: Adding the drawers as a dependency to this effect is causing infinite
-  // recursions - we should figure out why that is.
-  useEffect(() => {
-    if (!isNil(drawers) && !isNil(visibleDrawer) && !isNil(drawers[visibleDrawer])) {
-      const d: (() => JSX.Element) | JSX.Element = drawers[visibleDrawer];
-      dispatch(setDrawerVisibilityAction(true));
-      if (typeof d === "function") {
-        setDrawer(d());
-      } else {
-        setDrawer(d);
-      }
-    } else {
-      dispatch(setDrawerVisibilityAction(false));
-      setDrawer(undefined);
-    }
-  }, [visibleDrawer]);
-
+  collapsed = false
+}: LayoutProps): JSX.Element => {
   return (
     <div className={classNames("application", className)} style={style}>
       {!isNil(sidebar) && (

@@ -20,7 +20,7 @@ import {
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { Layout } from "components/layout";
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibility } from "./actions";
-import { AncestorsBreadCrumbs, CommentsHistoryDrawer } from "./components";
+import { AncestorsBreadCrumbs } from "./components";
 
 import "./index.scss";
 
@@ -46,13 +46,11 @@ const Budget = (): JSX.Element => {
   }, [budgetId]);
 
   return (
-    <Layout<"budgetDrawer">
+    <Layout
       collapsed
       breadcrumbs={
         <AncestorsBreadCrumbs loading={ancestorsLoading} ancestors={ancestors} budgetId={parseInt(budgetId)} />
       }
-      // drawers={{ budgetDrawer: <CommentsHistoryDrawer /> }}
-      // visibleDrawer={commentsHistoryDrawerOpen ? "budgetDrawer" : undefined}
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faRobot} />,

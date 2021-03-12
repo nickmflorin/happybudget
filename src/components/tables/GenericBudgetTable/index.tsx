@@ -1,5 +1,4 @@
 import { useCallback, useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import classNames from "classnames";
 import { map, isNil, includes, find, concat, uniq, forEach, filter } from "lodash";
 
@@ -78,21 +77,11 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   const [footerColDefs, setFooterColDefs] = useState<ColDef[]>([]);
   const [gridOptions, setGridOptions] = useState<GridOptions | undefined>(undefined);
   const [footerOptions, setFooterOptions] = useState<GridOptions | undefined>(undefined);
-  const drawerVisible = useSelector((state: Redux.IApplicationStore) => state.drawerVisible);
 
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
     setColumnApi(event.columnApi);
   }, []);
-
-  useEffect(() => {
-    if (!isNil(gridApi)) {
-      setTimeout(() => gridApi.sizeColumnsToFit(), 200);
-    }
-    if (!isNil(footerGridApi)) {
-      setTimeout(() => footerGridApi.sizeColumnsToFit(), 200);
-    }
-  }, [drawerVisible, gridApi, footerGridApi]);
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {

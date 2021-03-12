@@ -1,5 +1,8 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
+import { Dispatch } from "redux";
+import { useDispatch } from "react-redux";
 import classNames from "classnames";
+import { setDrawerVisibilityAction } from "store/actions";
 import Portal from "./Portal";
 
 interface DrawerSectionProps {
@@ -43,6 +46,12 @@ export const DrawerFooter = ({
 };
 
 const Drawer = ({ children, className, visible, style = {} }: DrawerProps): JSX.Element => {
+  const dispatch: Dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(setDrawerVisibilityAction(visible));
+  }, [visible]);
+
   return (
     <Portal id={"drawer-target"} visible={visible}>
       <div className={classNames("drawer", className)} style={style}>
