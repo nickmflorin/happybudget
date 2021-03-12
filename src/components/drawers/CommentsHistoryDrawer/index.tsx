@@ -5,7 +5,7 @@ import { HorizontalMenu } from "components/control";
 import { IHorizontalMenuItem } from "components/control/HorizontalMenu";
 import { Drawer } from "components/layout";
 
-import Comments from "./Comments";
+import Comments, { CommentsProps } from "./Comments";
 import History from "./History";
 import "./index.scss";
 
@@ -13,11 +13,11 @@ type Page = "comments" | "history";
 
 interface CommentsHistoryDrawerProps {
   visible: boolean;
+  commentsProps: CommentsProps;
 }
 
-const CommentsHistoryDrawer = ({ visible }: CommentsHistoryDrawerProps): JSX.Element => {
+const CommentsHistoryDrawer = ({ visible, commentsProps }: CommentsHistoryDrawerProps): JSX.Element => {
   const [page, setPage] = useState<Page>("comments");
-  const [loading, setLoading] = useState(false);
 
   return (
     <Drawer visible={visible}>
@@ -30,7 +30,7 @@ const CommentsHistoryDrawer = ({ visible }: CommentsHistoryDrawerProps): JSX.Ele
         ]}
       />
       <ShowHide show={page === "comments"}>
-        <Comments />
+        <Comments {...commentsProps} />
       </ShowHide>
       <ShowHide show={page === "history"}>
         <History />

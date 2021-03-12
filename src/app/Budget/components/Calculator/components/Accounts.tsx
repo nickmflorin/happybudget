@@ -6,10 +6,10 @@ import { isNil, includes } from "lodash";
 import { ColDef } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
+import { CommentsHistoryDrawer } from "components/drawers";
 import { GenericBudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
-import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
 import {
   requestAccountsAction,
   setAccountsSearchAction,
@@ -18,7 +18,9 @@ import {
   selectAccountsTableRowAction,
   removeAccountAction,
   updateAccountAction,
-  selectAllAccountsTableRowsAction
+  selectAllAccountsTableRowsAction,
+  submitBudgetCommentAction,
+  requestBudgetCommentsAction
 } from "../actions";
 
 const Accounts = (): JSX.Element => {
@@ -29,6 +31,7 @@ const Accounts = (): JSX.Element => {
   const commentsHistoryDrawerOpen = useSelector(
     (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
   );
+  const comments = useSelector((state: Redux.IApplicationStore) => state.calculator.accounts.comments);
 
   useEffect(() => {
     dispatch(requestAccountsAction());
@@ -92,7 +95,16 @@ const Accounts = (): JSX.Element => {
           ]}
         />
       </RenderWithSpinner>
-      <CommentsHistoryDrawer visible={commentsHistoryDrawerOpen} />
+      <CommentsHistoryDrawer
+        visible={commentsHistoryDrawerOpen}
+        commentsProps={{
+          comments: comments.data,
+          loading: comments.loading,
+          submitting: comments.submitting,
+          onRequest: () => dispatch(requestBudgetCommentsAction()),
+          onSubmit: (payload: Http.ICommentPayload) => dispatch(submitBudgetCommentAction(payload))
+        }}
+      />
     </React.Fragment>
   );
 };

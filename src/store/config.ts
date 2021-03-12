@@ -1,10 +1,10 @@
-import BudgetsReduxConfig from "scenes/Dashboard/config";
-import CalculatorReduxConfig from "scenes/Budget/components/Calculator/config";
-import BudgetReduxConfig from "scenes/Budget/config";
-import ActualsReduxConfig from "scenes/Budget/components/Actuals/config";
+import BudgetReduxConfig from "app/Budget/config";
+import CalculatorReduxConfig from "app/Budget/components/Calculator/config";
+import ActualsReduxConfig from "app/Budget/components/Actuals/config";
+import DashboardReduxConfig from "app/Dashboard/config";
 
 const ApplicationReduxConfig: Redux.IApplicationConfig = [
-  BudgetsReduxConfig,
+  DashboardReduxConfig,
   BudgetReduxConfig,
   CalculatorReduxConfig,
   ActualsReduxConfig

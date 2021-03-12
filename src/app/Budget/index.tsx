@@ -17,11 +17,10 @@ import {
   faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 
+import { AncestorsBreadCrumbs } from "components";
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { Layout } from "components/layout";
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibility } from "./actions";
-import { AncestorsBreadCrumbs } from "./components";
-
 import "./index.scss";
 
 const Calculator = React.lazy(() => import("./components/Calculator"));

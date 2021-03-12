@@ -11,7 +11,7 @@ import {
   DATE_DISPLAY_FORMAT,
   TIME_DISPLAY_FORMAT,
   DATETIME_ABBV_DISPLAY_FORMAT
-} from "app/constants";
+} from "config/constants";
 
 export const momentToDateTimeUrlString = (mmt: Moment): string => {
   if (!mmt.isValid()) {

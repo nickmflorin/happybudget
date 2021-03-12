@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { map } from "lodash";
 
 import { Form, Input, Button, Empty } from "antd";
@@ -7,28 +6,33 @@ import { Form, Input, Button, Empty } from "antd";
 import { Comment } from "components/control";
 import { RenderWithSpinner, ShowHide } from "components/display";
 import { Drawer } from "components/layout";
-import { requestBudgetCommentsAction, submitBudgetCommentAction } from "../Calculator/actions";
 
-const Comments = (): JSX.Element => {
+export interface CommentsProps {
+  loading: boolean;
+  comments: IComment[];
+  submitting: boolean;
+  onSubmit: (payload: Http.ICommentPayload) => void;
+  onRequest: () => void;
+}
+
+const Comments = ({ comments, loading, submitting, onSubmit, onRequest }: CommentsProps): JSX.Element => {
   const [form] = Form.useForm();
-  const dispatch = useDispatch();
-  const comments = useSelector((state: Redux.IApplicationStore) => state.calculator.accounts.comments);
 
   useEffect(() => {
-    dispatch(requestBudgetCommentsAction());
+    onRequest();
   }, []);
 
   return (
     <React.Fragment>
       <Drawer.Content className={"comments-comments"} noPadding>
         <div className={"comments-section"}>
-          <RenderWithSpinner loading={comments.loading}>
-            <ShowHide show={comments.data.length !== 0}>
-              {map(comments.data, (comment: IComment, index: number) => (
+          <RenderWithSpinner loading={loading}>
+            <ShowHide show={comments.length !== 0}>
+              {map(comments, (comment: IComment, index: number) => (
                 <Comment key={index} comment={comment} />
               ))}
             </ShowHide>
-            <ShowHide show={comments.data.length === 0}>
+            <ShowHide show={comments.length === 0}>
               <Empty className={"empty"} description={"No Comments!"} />
             </ShowHide>
           </RenderWithSpinner>
@@ -36,21 +40,15 @@ const Comments = (): JSX.Element => {
       </Drawer.Content>
       <Drawer.Footer className={"form-section"}>
         <Form
-          className={"organization-form"}
           form={form}
           layout={"vertical"}
           initialValues={{}}
-          onFinish={(values: Http.ICommentPayload) => dispatch(submitBudgetCommentAction(values))}
+          onFinish={(payload: Http.ICommentPayload) => onSubmit(payload)}
         >
           <Form.Item name={"text"} rules={[{ required: true, message: "Please enter a comment to send!" }]}>
             <Input.TextArea style={{ minHeight: 120 }} maxLength={1028} placeholder={"Leave comment here..."} />
           </Form.Item>
-          <Button
-            htmlType={"submit"}
-            loading={comments.submitting}
-            className={"btn--primary"}
-            style={{ width: "100%" }}
-          >
+          <Button htmlType={"submit"} loading={submitting} className={"btn--primary"} style={{ width: "100%" }}>
             {"Send"}
           </Button>
         </Form>
