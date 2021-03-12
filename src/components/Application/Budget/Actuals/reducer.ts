@@ -16,8 +16,7 @@ const rootReducer = combineReducers({
     {
       Response: ActionType.BudgetItems.Response,
       Request: ActionType.BudgetItems.Request,
-      Loading: ActionType.BudgetItems.Loading,
-      SetSearch: ActionType.BudgetItems.SetSearch
+      Loading: ActionType.BudgetItems.Loading
     },
     { referenceEntity: "budget item" }
   ),

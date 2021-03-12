@@ -158,8 +158,13 @@ export function* getBudgetItemsTask(action: Redux.IAction<null>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     yield put(loadingBudgetItemsAction(true));
+    const search = yield select((state: Redux.IApplicationStore) => state.actuals.budgetItems.search);
+    let query: Http.IListQuery = { no_pagination: true };
+    if (!isNil(search)) {
+      query = { ...query, search };
+    }
     try {
-      const response = yield call(getBudgetItems, budgetId, { no_pagination: true });
+      const response = yield call(getBudgetItems, budgetId, query);
       console.log(response);
       yield put(responseBudgetItemsAction(response));
     } catch (e) {

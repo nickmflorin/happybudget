@@ -9,8 +9,7 @@ export const ActionType = {
   BudgetItems: {
     Loading: "actuals.budgetitems.Loading",
     Response: "actuals.budgetitems.Response",
-    Request: "actuals.budgetitems.Request",
-    SetSearch: "actuals.budgetitems.SetSearch"
+    Request: "actuals.budgetitems.Request"
   },
   ActualsTable: {
     AddPlaceholders: "actuals.table.AddPlaceholders",
@@ -58,4 +57,3 @@ export const addErrorsToActualsTableAction = simpleAction<Table.ICellError | Tab
 export const requestBudgetItemsAction = simpleAction<null>(ActionType.BudgetItems.Request);
 export const loadingBudgetItemsAction = simpleAction<boolean>(ActionType.BudgetItems.Loading);
 export const responseBudgetItemsAction = simpleAction<Http.IListResponse<IBudgetItem>>(ActionType.BudgetItems.Response);
-export const setBudgetItemsSearchAction = simpleAction<string>(ActionType.BudgetItems.SetSearch);

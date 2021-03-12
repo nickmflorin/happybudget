@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CellClassParams } from "ag-grid-community";
+import { CellClassParams, ColDef } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
@@ -47,7 +47,8 @@ const Actuals = (): JSX.Element => {
     <RenderWithSpinner loading={actuals.table.loading || budget.detail.loading}>
       <GenericBudgetTable<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow>
         table={actuals.table.data}
-        isCellEditable={() => true}
+        isCellEditable={(row: Table.IActualRow, col: ColDef) => col.field !== "parent"}
+        highlightNonEditableCell={(row: Table.IActualRow, col: ColDef) => col.field !== "parent"}
         search={actuals.table.search}
         onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
         saving={actuals.deleting.length !== 0 || actuals.updating.length !== 0 || actuals.creating}
