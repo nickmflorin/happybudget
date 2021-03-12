@@ -40,7 +40,9 @@ export const ActionType = {
       Loading: "calculator.account.comments.Loading",
       Response: "calculator.account.comments.Response",
       Request: "calculator.account.comments.Request",
-      Submitting: "calculator.account.comments.Submitting"
+      Submitting: "calculator.account.comments.Submitting",
+      Submit: "calculator.account.comments.Submit",
+      AddToState: "calculator.account.comments.AddToState"
     },
     SubAccountsTable: {
       AddPlaceholders: "calculator.account.subaccountstable.AddPlaceholders",
@@ -73,7 +75,9 @@ export const ActionType = {
       Loading: "calculator.subaccount.comments.Loading",
       Response: "calculator.subaccount.comments.Response",
       Request: "calculator.subaccount.comments.Request",
-      Submitting: "calculator.subaccount.comments.Submitting"
+      Submitting: "calculator.subaccount.comments.Submitting",
+      Submit: "calculator.subaccount.comments.Submit",
+      AddToState: "calculator.subaccount.comments.AddToState"
     },
     SubAccountsTable: {
       AddPlaceholders: "calculator.subaccount.subaccountstable.AddPlaceholders",
@@ -110,6 +114,9 @@ export const requestSubAccountAction = simpleAction<null>(ActionType.SubAccount.
 export const loadingSubAccountAction = simpleAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = simpleAction<ISubAccount>(ActionType.SubAccount.Response);
 
+/*
+  Actions Pertaining to the Accounts
+*/
 export const requestBudgetCommentsAction = simpleAction<null>(ActionType.Comments.Request);
 export const responseBudgetCommentsAction = simpleAction<Http.IListResponse<IComment>>(ActionType.Comments.Response);
 export const loadingBudgetCommentsAction = simpleAction<boolean>(ActionType.Comments.Loading);
@@ -117,21 +124,6 @@ export const submitBudgetCommentAction = simpleAction<Http.ICommentPayload>(Acti
 export const submittingBudgetCommentAction = simpleAction<boolean>(ActionType.Comments.Submitting);
 export const addBudgetCommentToStateAction = simpleAction<IComment>(ActionType.Comments.AddToState);
 
-export const requestAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
-export const responseAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(
-  ActionType.Account.Comments.Response
-);
-export const loadingAccountCommentsAction = simpleAction<boolean>(ActionType.Account.Comments.Loading);
-
-export const requestSubAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
-export const responseSubAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(
-  ActionType.SubAccount.Comments.Response
-);
-export const loadingSubAccountCommentsAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Loading);
-
-/*
-  Actions Pertaining to the Accounts
-*/
 export const addAccountsTablePlaceholdersAction = simpleAction<number>(ActionType.AccountsTable.AddPlaceholders);
 export const updateAccountAction = simpleAction<{
   id: number;
@@ -161,6 +153,15 @@ export const addErrorsToAccountsTableAction = simpleAction<Table.ICellError | Ta
 /*
   Actions Pertaining to the Sub Accounts of an Account
 */
+export const requestAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
+export const responseAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(
+  ActionType.Account.Comments.Response
+);
+export const loadingAccountCommentsAction = simpleAction<boolean>(ActionType.Account.Comments.Loading);
+export const submitAccountCommentAction = simpleAction<Http.ICommentPayload>(ActionType.Account.Comments.Submit);
+export const submittingAccountCommentAction = simpleAction<boolean>(ActionType.Account.Comments.Submitting);
+export const addAccountCommentToStateAction = simpleAction<IComment>(ActionType.Account.Comments.AddToState);
+
 export const addAccountSubAccountsTablePlaceholdersAction = simpleAction<number>(
   ActionType.Account.SubAccountsTable.AddPlaceholders
 );
@@ -208,6 +209,15 @@ export const addErrorsToAccountSubAccountsTableAction = simpleAction<Table.ICell
 /*
   Actions Pertaining to the Sub Accounts of a Sub Account
 */
+export const requestSubAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
+export const responseSubAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(
+  ActionType.SubAccount.Comments.Response
+);
+export const loadingSubAccountCommentsAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Loading);
+export const submitSubAccountCommentAction = simpleAction<Http.ICommentPayload>(ActionType.SubAccount.Comments.Submit);
+export const submittingSubAccountCommentAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Submitting);
+export const addSubAccountCommentToStateAction = simpleAction<IComment>(ActionType.SubAccount.Comments.AddToState);
+
 export const addSubAccountSubAccountsTablePlaceholdersAction = simpleAction<number>(
   ActionType.SubAccount.SubAccountsTable.AddPlaceholders
 );

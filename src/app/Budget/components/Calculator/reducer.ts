@@ -63,7 +63,8 @@ const rootReducer = combineReducers({
       {
         Response: ActionType.Account.Comments.Response,
         Request: ActionType.Account.Comments.Request,
-        Loading: ActionType.Account.Comments.Loading
+        Loading: ActionType.Account.Comments.Loading,
+        AddToState: ActionType.Account.Comments.AddToState
       },
       {
         referenceEntity: "comment",
@@ -110,7 +111,8 @@ const rootReducer = combineReducers({
       {
         Response: ActionType.SubAccount.Comments.Response,
         Request: ActionType.SubAccount.Comments.Request,
-        Loading: ActionType.SubAccount.Comments.Loading
+        Loading: ActionType.SubAccount.Comments.Loading,
+        AddToState: ActionType.SubAccount.Comments.AddToState
       },
       {
         referenceEntity: "comment",

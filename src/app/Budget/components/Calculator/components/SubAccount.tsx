@@ -6,6 +6,7 @@ import { isNil, includes } from "lodash";
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
+import { CommentsHistoryDrawer } from "components/drawers";
 import { GenericBudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
@@ -17,7 +18,9 @@ import {
   deselectSubAccountSubAccountsTableRowAction,
   removeSubAccountSubAccountAction,
   updateSubAccountSubAccountAction,
-  selectAllSubAccountSubAccountsTableRowsAction
+  selectAllSubAccountSubAccountsTableRowsAction,
+  requestSubAccountCommentsAction,
+  submitSubAccountCommentAction
 } from "../actions";
 
 const SubAccount = (): JSX.Element => {
@@ -27,6 +30,10 @@ const SubAccount = (): JSX.Element => {
 
   const subAccountStore = useSelector((state: Redux.IApplicationStore) => state.calculator.subaccount);
   const budgetId = useSelector((state: Redux.IApplicationStore) => state.budget.budget.id);
+  const commentsHistoryDrawerOpen = useSelector(
+    (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
+  );
+  const comments = useSelector((state: Redux.IApplicationStore) => state.calculator.subaccount.comments);
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
@@ -134,6 +141,16 @@ const SubAccount = (): JSX.Element => {
           ]}
         />
       </RenderWithSpinner>
+      <CommentsHistoryDrawer
+        visible={commentsHistoryDrawerOpen}
+        commentsProps={{
+          comments: comments.data,
+          loading: comments.loading,
+          submitting: comments.submitting,
+          onRequest: () => dispatch(requestSubAccountCommentsAction()),
+          onSubmit: (payload: Http.ICommentPayload) => dispatch(submitSubAccountCommentAction(payload))
+        }}
+      />
     </RenderIfValidId>
   );
 };

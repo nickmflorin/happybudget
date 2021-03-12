@@ -17,7 +17,9 @@ import {
   getBudgetComments,
   getAccountComments,
   getSubAccountComments,
-  createBudgetComment
+  createBudgetComment,
+  createAccountComment,
+  createSubAccountComment
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
@@ -67,7 +69,11 @@ import {
   loadingSubAccountCommentsAction,
   responseSubAccountCommentsAction,
   submittingBudgetCommentAction,
-  addBudgetCommentToStateAction
+  addBudgetCommentToStateAction,
+  submittingAccountCommentAction,
+  addAccountCommentToStateAction,
+  submittingSubAccountCommentAction,
+  addSubAccountCommentToStateAction
 } from "./actions";
 import {
   payloadFromResponse,
@@ -109,6 +115,21 @@ export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator
   }
 }
 
+export function* submitAccountCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
+  const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
+  if (!isNil(accountId) && !isNil(action.payload)) {
+    yield put(submittingAccountCommentAction(true));
+    try {
+      const response: IComment = yield call(createAccountComment, accountId, action.payload);
+      yield put(addAccountCommentToStateAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error submitting the comment.");
+    } finally {
+      yield put(submittingAccountCommentAction(false));
+    }
+  }
+}
+
 export function* getAccountCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(accountId)) {
@@ -122,6 +143,21 @@ export function* getAccountCommentsTask(action: Redux.IAction<any>): SagaIterato
       yield put(responseAccountCommentsAction({ count: 0, data: [] }, { error: e }));
     } finally {
       yield put(loadingAccountCommentsAction(false));
+    }
+  }
+}
+
+export function* submitSubAccountCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
+  if (!isNil(subaccountId) && !isNil(action.payload)) {
+    yield put(submittingSubAccountCommentAction(true));
+    try {
+      const response: IComment = yield call(createSubAccountComment, subaccountId, action.payload);
+      yield put(addSubAccountCommentToStateAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error submitting the comment.");
+    } finally {
+      yield put(submittingSubAccountCommentAction(false));
     }
   }
 }

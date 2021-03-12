@@ -24,7 +24,7 @@ const Comments = ({ comments, loading, submitting, onSubmit, onRequest }: Commen
 
   return (
     <React.Fragment>
-      <Drawer.Content className={"comments-comments"} noPadding>
+      <Drawer.Content className={"comments"} noPadding>
         <div className={"comments-section"}>
           <RenderWithSpinner loading={loading}>
             <ShowHide show={comments.length !== 0}>
@@ -33,7 +33,9 @@ const Comments = ({ comments, loading, submitting, onSubmit, onRequest }: Commen
               ))}
             </ShowHide>
             <ShowHide show={comments.length === 0}>
-              <Empty className={"empty"} description={"No Comments!"} />
+              <div className={"no-data-wrapper"}>
+                <Empty className={"empty"} description={"No Comments!"} />
+              </div>
             </ShowHide>
           </RenderWithSpinner>
         </div>

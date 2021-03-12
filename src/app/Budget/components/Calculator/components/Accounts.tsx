@@ -10,6 +10,7 @@ import { CommentsHistoryDrawer } from "components/drawers";
 import { GenericBudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
+import { setAncestorsAction } from "../../../actions";
 import {
   requestAccountsAction,
   setAccountsSearchAction,
@@ -36,6 +37,20 @@ const Accounts = (): JSX.Element => {
   useEffect(() => {
     dispatch(requestAccountsAction());
   }, []);
+
+  useEffect(() => {
+    if (!isNil(budget.detail.data)) {
+      dispatch(
+        setAncestorsAction([
+          {
+            id: budget.detail.data.id,
+            identifier: budget.detail.data.name,
+            type: "budget"
+          }
+        ])
+      );
+    }
+  }, [budget.detail.data]);
 
   return (
     <React.Fragment>

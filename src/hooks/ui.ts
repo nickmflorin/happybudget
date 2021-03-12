@@ -61,19 +61,6 @@ export const usePortalReference = (id: string | number) => {
   return getRootElem();
 };
 
-/**
- * Hook to create a React Portal.
- * Automatically handles creating and tearing-down the root elements (no SRR
- * makes this trivial), so there is no need to ensure the parent target already
- * exists.
- *
- * @example
- * const target = usePortal(id, [id]);
- * return createPortal(children, target);
- *
- * @param {String | number} id  The id of the target container.
- * @returns {HTMLElement}       The DOM node to use as the Portal target.
- */
 export const usePortal = (id: string | number) => {
   const [parent, setParent] = useState<Element | null>(null);
 
@@ -81,12 +68,6 @@ export const usePortal = (id: string | number) => {
     const existingParent = document.querySelector(`#${id}`);
     const parentElem = existingParent || createRootElement(id);
     setParent(parentElem);
-
-    return () => {
-      if (!parentElem.childElementCount) {
-        parentElem.remove();
-      }
-    };
   }, [id]);
 
   return parent;
