@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { ICellRendererParams, RowNode } from "ag-grid-community";
-import { map, concat, isNil } from "lodash";
+import { map, isNil } from "lodash";
 
 import { Select } from "antd";
 
@@ -21,28 +21,14 @@ const BudgetItemCell = ({ node, onChange }: UnitCellProps): JSX.Element => {
   const budgetItems = useSelector((state: Redux.IApplicationStore) => state.actuals.budgetItems);
 
   useEffect(() => {
-    const newOptions = map(budgetItems.data, (item: IBudgetItem, index: number) => ({
-      key: index + 1,
-      label: item.identifier,
-      value: `${item.id}-${item.type}`
-    }));
-    if (isNil(node.data.object_id) || isNil(node.data.parent_type)) {
-      setOptions(
-        concat(
-          [
-            {
-              key: 0,
-              label: "None",
-              value: "None"
-            }
-          ],
-          newOptions
-        )
-      );
-    } else {
-      setOptions(newOptions);
-    }
-  }, [budgetItems.data, node.data]);
+    setOptions(
+      map(budgetItems.data, (item: IBudgetItem, index: number) => ({
+        key: index + 1,
+        label: item.identifier,
+        value: `${item.id}-${item.type}`
+      }))
+    );
+  }, [budgetItems.data]);
 
   return (
     <Select<string>
@@ -59,15 +45,13 @@ const BudgetItemCell = ({ node, onChange }: UnitCellProps): JSX.Element => {
       value={
         !isNil(node.data.object_id) && !isNil(node.data.parent_type)
           ? `${node.data.object_id}-${node.data.parent_type}`
-          : "None"
+          : undefined
       }
       placeholder={"Select Account"}
       onChange={(id: string) => {
-        if (id !== "None") {
-          const parts = id.split("-");
-          if (!isNaN(parseInt(parts[0]))) {
-            onChange(parseInt(parts[0]), parts[1], node.data);
-          }
+        const parts = id.split("-");
+        if (!isNaN(parseInt(parts[0]))) {
+          onChange(parseInt(parts[0]), parts[1], node.data);
         }
       }}
     />
