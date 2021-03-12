@@ -62,6 +62,8 @@ interface IBudget extends Model {
   readonly location_days: number;
   readonly trash: boolean;
   readonly estimated: number | null;
+  readonly actual: number | null;
+  readonly variance: number | null;
 }
 
 interface IAncestor {
@@ -82,6 +84,7 @@ interface IAccount extends IBudgetItem, TrackedModel {
   readonly ancestors: IAncestor[];
   readonly estimated: number | null;
   readonly variance: number | null;
+  readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
   readonly type: "account";
 }
@@ -101,11 +104,11 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly account: number;
   readonly object_id: number;
   readonly type: "subaccount";
-  readonly object_id: number;
   readonly parent_type: BudgetItemType;
   readonly ancestors: IAncestor[];
   readonly estimated: number | null;
   readonly variance: number | null;
+  readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
 }
 

@@ -52,6 +52,8 @@ const Accounts = (): JSX.Element => {
         estimated={
           !isNil(budget.detail.data) && !isNil(budget.detail.data.estimated) ? budget.detail.data.estimated : 0.0
         }
+        actual={!isNil(budget.detail.data) && !isNil(budget.detail.data.actual) ? budget.detail.data.actual : 0.0}
+        variance={!isNil(budget.detail.data) && !isNil(budget.detail.data.variance) ? budget.detail.data.variance : 0.0}
         columns={[
           {
             field: "identifier",

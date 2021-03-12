@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isNil } from "lodash";
 import { CellClassParams } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
+import { setAncestorsAction } from "../actions";
 import {
   requestBudgetItemsAction,
   requestActualsAction,
@@ -17,6 +17,7 @@ import {
   selectAllActualsTableRowsAction
 } from "./actions";
 import BudgetItemCell from "./BudgetItemCell";
+import { isNil } from "lodash";
 
 const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
@@ -27,6 +28,20 @@ const Actuals = (): JSX.Element => {
     dispatch(requestBudgetItemsAction());
     dispatch(requestActualsAction());
   }, []);
+
+  useEffect(() => {
+    if (!isNil(budget.detail.data)) {
+      dispatch(
+        setAncestorsAction([
+          {
+            id: budget.detail.data.id,
+            identifier: budget.detail.data.name,
+            type: "budget"
+          }
+        ])
+      );
+    }
+  }, [budget.detail.data]);
 
   return (
     <RenderWithSpinner loading={actuals.table.loading || budget.detail.loading}>
@@ -54,7 +69,6 @@ const Actuals = (): JSX.Element => {
             cellRenderer: "BudgetItemCell",
             cellRendererParams: {
               onChange: (object_id: number, parent_type: BudgetItemType, row: Table.IActualRow) => {
-                console.log("ON CHANGE HOOK");
                 dispatch(updateActualAction({ id: row.id, data: { object_id, parent_type } }));
               }
             }

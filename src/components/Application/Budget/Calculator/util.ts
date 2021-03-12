@@ -11,7 +11,8 @@ export const initializeRowFromAccount = (account: IAccount): Table.IAccountRow =
   identifier: account.identifier,
   description: account.description,
   estimated: account.estimated,
-  variance: account.variance
+  variance: account.variance,
+  actual: account.actual
 });
 
 export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.ISubAccountRow => ({
@@ -30,7 +31,8 @@ export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.ISub
   quantity: subaccount.quantity,
   description: subaccount.description,
   estimated: subaccount.estimated,
-  variance: subaccount.variance
+  variance: subaccount.variance,
+  actual: subaccount.actual
 });
 
 export const createSubAccountRowPlaceholder = (): Table.ISubAccountRow => ({
@@ -44,6 +46,7 @@ export const createSubAccountRowPlaceholder = (): Table.ISubAccountRow => ({
   description: null,
   estimated: null,
   variance: null,
+  actual: null,
   meta: {
     isPlaceholder: true,
     selected: false,
@@ -58,6 +61,7 @@ export const createAccountRowPlaceholder = (): Table.IAccountRow => ({
   description: null,
   estimated: null,
   variance: null,
+  actual: null,
   meta: {
     isPlaceholder: true,
     selected: false,

@@ -51,6 +51,7 @@ namespace Table {
     readonly description: string | null;
     readonly estimated: number | null;
     readonly variance: number | null;
+    readonly actual: number | null;
   }
 
   interface ISubAccountRow extends IRow<SubAccountRowField, IBudgetRowMeta> {
@@ -61,6 +62,7 @@ namespace Table {
     readonly unit: Unit | null;
     readonly multiplier: number | null;
     readonly rate: number | null;
+    readonly actual: number | null;
     readonly estimated: number | null;
     readonly variance: number | null;
   }

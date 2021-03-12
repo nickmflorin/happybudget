@@ -29,6 +29,8 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R 
   search: string;
   saving: boolean;
   estimated?: number;
+  actual?: number;
+  variance?: number;
   frameworkComponents?: { [key: string]: any };
   cellClass?: (params: CellClassParams) => string | undefined;
   highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
@@ -50,6 +52,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   search,
   saving,
   estimated,
+  actual,
+  variance,
   frameworkComponents = {},
   cellClass,
   onSearch,
@@ -417,7 +421,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               multiplier: "",
               rate: "",
               estimated,
-              variance: 0,
+              variance,
+              actual,
               subaccounts: []
             }
           ]}
