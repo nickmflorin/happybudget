@@ -418,7 +418,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           columnDefs={footerColDefs}
           rowData={[
             {
-              meta: {},
+              meta: { subaccounts: [] },
               identifier: "Grand Total",
               estimated,
               variance,
