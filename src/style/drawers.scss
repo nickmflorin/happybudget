@@ -1,0 +1,19 @@
+@import "style/colors";
+@import "style/typography";
+
+.drawer-menu {
+  li.ant-menu-item {
+    font-family: $noto-sans-medium;
+    color: $text-secondary;
+    font-size: 15px;
+    padding: 10px 20px !important;
+
+    &:hover {
+      background-color: transparent !important;
+      border-bottom: 2px solid $green !important;
+    }
+    &.ant-menu-item-selected {
+      border-bottom: 2px solid $green !important;
+    }
+  }
+}

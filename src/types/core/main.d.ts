@@ -9,7 +9,7 @@ type ProductionType = 0 | 1 | 2 | 3 | 4 | 5;
 type PaymentMethodName = "Check" | "Card" | "Wire";
 type PaymentMethod = 0 | 1 | 2;
 
-type AncestorType = "budget" | "account" | "subaccount";
+type EntityType = "budget" | "account" | "subaccount";
 type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
 type Unit = 0 | 1 | 2 | 3 | 4 | 5;
 type BudgetItemType = "subaccount" | "account";
@@ -30,6 +30,9 @@ interface ISimpleUser extends Model {
   readonly last_name?: string;
   readonly full_name: string;
   readonly email: string;
+}
+
+interface INestedUser extends ISimpleUser {
   readonly username: string;
   readonly is_active: boolean;
   readonly is_staff: boolean;
@@ -37,7 +40,7 @@ interface ISimpleUser extends Model {
   readonly is_superuser: boolean;
 }
 
-interface IUser extends ISimpleUser {
+interface IUser extends INestedUser {
   readonly last_login: null | string;
   readonly date_joined: string;
   readonly created_at: string;
@@ -69,13 +72,13 @@ interface IBudget extends Model {
 interface IAncestor {
   id: number;
   identifier: string;
-  type: AncestorType;
+  type: EntityType;
 }
 
 interface IBudgetItem extends Model {
   readonly identifier: string;
   readonly budget: number;
-  readonly type: "account" | "subaccount";
+  readonly type: BudgetItemType;
 }
 
 interface IAccount extends IBudgetItem, TrackedModel {
@@ -123,4 +126,14 @@ interface IActual extends TrackedModel {
   readonly payment_method_name: PaymentMethodName;
   readonly object_id: number;
   readonly parent_type: BudgetItemType;
+}
+
+interface IComment {
+  readonly created_at: string;
+  readonly updated_at: string;
+  readonly likes: ISimpleUser[];
+  readonly user: ISimpleUser;
+  readonly text: string;
+  readonly object_id: number;
+  readonly content_object_type: EntityType;
 }

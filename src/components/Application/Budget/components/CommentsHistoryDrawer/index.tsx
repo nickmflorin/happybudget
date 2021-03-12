@@ -14,8 +14,13 @@ const CommentsHistoryDrawer = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className={"budget-comments-history-drawer"}>
-      <Menu onClick={(info: any) => setPage(info.key)} selectedKeys={[page]} mode={"horizontal"}>
+    <div className={"drawer"}>
+      <Menu
+        className={"drawer-menu"}
+        onClick={(info: any) => setPage(info.key)}
+        selectedKeys={[page]}
+        mode={"horizontal"}
+      >
         <Menu.Item key={"comments"}>{"Comments"}</Menu.Item>
         <Menu.Item key={"history"}>{"History"}</Menu.Item>
       </Menu>

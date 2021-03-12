@@ -92,4 +92,9 @@ namespace Http {
     readonly object_id?: number;
     readonly parent_type?: BudgetItemType;
   }
+
+  interface ICommentPayload extends IPayload {
+    readonly likes?: number[];
+    readonly text: string;
+  }
 }
