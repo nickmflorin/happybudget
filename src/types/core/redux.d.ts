@@ -167,5 +167,6 @@ namespace Redux {
     readonly budget: Budget.IStore;
     readonly calculator: Calculator.IStore;
     readonly actuals: Actuals.IStore;
+    readonly drawerVisible: boolean;
   }
 }

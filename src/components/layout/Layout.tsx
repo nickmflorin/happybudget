@@ -1,6 +1,9 @@
 import { ReactNode, useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import classNames from "classnames";
 import { isNil } from "lodash";
+
+import { setDrawerVisibilityAction } from "store/actions";
 
 import Header from "./Header";
 import Footer from "./Footer";
@@ -32,16 +35,19 @@ const Layout = <D extends string = string>({
   visibleDrawer
 }: LayoutProps<D>): JSX.Element => {
   const [drawer, setDrawer] = useState<JSX.Element | undefined>(undefined);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!isNil(drawers) && !isNil(visibleDrawer) && !isNil(drawers[visibleDrawer])) {
       const d: (() => JSX.Element) | JSX.Element = drawers[visibleDrawer];
+      dispatch(setDrawerVisibilityAction(true));
       if (typeof d === "function") {
         setDrawer(d());
       } else {
         setDrawer(d);
       }
     } else {
+      dispatch(setDrawerVisibilityAction(false));
       setDrawer(undefined);
     }
   }, [drawers, visibleDrawer]);

@@ -1,4 +1,5 @@
 export const ApplicationActionTypes = {
+  SetDrawerVisibility: "SetDrawerVisibility",
   User: {
     UpdateInState: "user.UpdateInState"
   }
@@ -18,3 +19,5 @@ export const simpleAction = <P = any, A extends Redux.IAction<P> = Redux.IAction
 export const updateLoggedInUserAction = (user: Partial<IUser>) => {
   return createAction<Partial<IUser>>(ApplicationActionTypes.User.UpdateInState, user);
 };
+
+export const setDrawerVisibilityAction = simpleAction<boolean>(ApplicationActionTypes.SetDrawerVisibility);

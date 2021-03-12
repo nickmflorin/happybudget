@@ -41,7 +41,8 @@ const createApplicationInitialState = (config: Redux.IApplicationConfig, user: I
     }
   });
   return {
-    user: createInitialUserState(user)
+    user: createInitialUserState(user),
+    drawerVisible: false
   } as Redux.IApplicationStore;
 };
 

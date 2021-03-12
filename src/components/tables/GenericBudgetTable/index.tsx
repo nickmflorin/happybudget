@@ -78,9 +78,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   const [footerColDefs, setFooterColDefs] = useState<ColDef[]>([]);
   const [gridOptions, setGridOptions] = useState<GridOptions | undefined>(undefined);
   const [footerOptions, setFooterOptions] = useState<GridOptions | undefined>(undefined);
-  const commentsHistoryDrawerOpen = useSelector(
-    (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
-  );
+  const drawerVisible = useSelector((state: Redux.IApplicationStore) => state.drawerVisible);
 
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
@@ -94,7 +92,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
     if (!isNil(footerGridApi)) {
       setTimeout(() => footerGridApi.sizeColumnsToFit(), 200);
     }
-  }, [commentsHistoryDrawerOpen, gridApi, footerGridApi]);
+  }, [drawerVisible, gridApi, footerGridApi]);
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {

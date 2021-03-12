@@ -2,6 +2,7 @@ import { Reducer, combineReducers } from "redux";
 import { forEach, isNil, includes } from "lodash";
 import { ApplicationActionTypes } from "./actions";
 import { createInitialUserState } from "./initialState";
+import { createSimpleBooleanReducer } from "./reducerFactories";
 
 /**
  * Wraps each individual module level reducer so that if any action includes
@@ -76,7 +77,8 @@ const createApplicationReducer = (config: Redux.IApplicationConfig, user: IUser)
   });
   return combineReducers({
     ...moduleReducers,
-    user: createUserReducer(user)
+    user: createUserReducer(user),
+    drawerVisible: createSimpleBooleanReducer(ApplicationActionTypes.SetDrawerVisibility)
   });
 };
 
