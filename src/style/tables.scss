@@ -45,10 +45,15 @@ $cell-border: 1px solid $cell-border-color;
   }
   div[role='gridcell'] {
     background-color: $white;
-    border-top: $cell-border;
     border-bottom: none;
-    border-left: $cell-border;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
+    &:not(.borderless) {
+      border-top: $cell-border;
+      border-left: $cell-border;
+    }
     // This will vertically center the text nicely while also not adjusting the
     // vertical location of the text when the cell is selected.
     .ag-react-container {

@@ -68,6 +68,8 @@ const Actuals = (): JSX.Element => {
           {
             field: "parent",
             headerName: "Account",
+            width: 200,
+            cellClass: "borderless",
             cellRenderer: "BudgetItemCell",
             cellRendererParams: {
               onChange: (object_id: number, parent_type: BudgetItemType, row: Table.IActualRow) => {
@@ -103,7 +105,8 @@ const Actuals = (): JSX.Element => {
           {
             field: "value",
             headerName: "Actual",
-            cellStyle: { textAlign: "right" }
+            cellStyle: { textAlign: "right" },
+            cellRendererParams: { formatter: (value: string | number) => `$${value}` }
           }
         ]}
       />
