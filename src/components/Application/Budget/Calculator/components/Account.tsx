@@ -7,6 +7,7 @@ import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
+import { formatCurrency } from "util/string";
 
 import {
   setAccountIdAction,
@@ -125,7 +126,7 @@ const Account = (): JSX.Element => {
               field: "actual",
               headerName: "Actual",
               cellStyle: { textAlign: "right" },
-              cellRendererParams: { formatter: (value: string | number) => `$${value}` }
+              cellRendererParams: { formatter: formatCurrency }
             }
           ]}
         />

@@ -1,4 +1,4 @@
-@import "./colors";
+@import './colors';
 
 @import '~ag-grid-community/dist/styles/ag-grid.css';
 @import '~ag-grid-community/dist/styles/ag-theme-alpine.css';
@@ -31,7 +31,7 @@ $cell-border: 1px solid $cell-border-color;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
     font-family: $noto-sans-light !important;
-    color: #4E4D4D !important;
+    color: #4e4d4d !important;
     letter-spacing: 0.045em;
   }
   .ag-header-cell-text {
@@ -75,6 +75,33 @@ $cell-border: 1px solid $cell-border-color;
     }
     &.error-cell {
       border: 2px solid $red !important;
+      .error-container {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        height: 18px;
+        display: flex;
+        z-index: 100000;
+        background-color: #d73a49;
+        color: white;
+        padding: 2px 4px;
+
+        .text-error {
+          color: white;
+          font-size: 11px;
+          line-height: 14px;
+        }
+        .icon--error {
+          color: $white;
+          display: block;
+          margin-right: 6px;
+
+          svg {
+            height: 14px;
+            width: auto;
+          }
+        }
+      }
     }
     &.not-editable-highlight {
       background-color: #f7fffa !important;
@@ -83,7 +110,8 @@ $cell-border: 1px solid $cell-border-color;
     &.ag-cell-focus {
       &:not(.not-editable) {
         border: 3px solid $green !important;
-        &.no-select, &.action-cell {
+        &.no-select,
+        &.action-cell {
           border: unset !important;
         }
       }
@@ -98,7 +126,7 @@ $cell-border: 1px solid $cell-border-color;
     background: $white !important;
     border: none !important;
     &.ag-row-hover {
-      div[role=gridcell] {
+      div[role='gridcell'] {
         &:not(.not-editable-highlight) {
           background-color: $gray-highlight !important;
         }

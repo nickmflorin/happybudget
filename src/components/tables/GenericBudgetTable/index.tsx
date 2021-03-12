@@ -305,7 +305,14 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               width: 40
             }
           ],
-          columns,
+          map(
+            columns,
+            (def: ColDef) =>
+              ({
+                cellRenderer: "ValueCell",
+                ...def
+              } as ColDef)
+          ),
           [
             {
               field: "delete",
@@ -348,7 +355,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         onSelect={onSelectAll}
         deleteDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
       />
-      <div className={"primary-grid"} id={"grid"}>
+      <div className={"primary-grid"}>
         <AgGridReact
           gridOptions={gridOptions}
           columnDefs={colDefs}
@@ -411,19 +418,11 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           columnDefs={footerColDefs}
           rowData={[
             {
-              selected: false,
-              description: "",
-              line: "",
-              isPlaceholder: true,
-              name: "",
-              quantity: "",
-              unit: "",
-              multiplier: "",
-              rate: "",
+              meta: {},
+              identifier: "Grand Total",
               estimated,
               variance,
-              actual,
-              subaccounts: []
+              actual
             }
           ]}
           suppressRowClickSelection={true}
@@ -431,7 +430,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           domLayout={"autoHeight"}
           headerHeight={0}
           frameworkComponents={{
-            NewRowCell: NewRowCell
+            NewRowCell: NewRowCell,
+            ValueCell: ValueCell
           }}
         />
       </div>

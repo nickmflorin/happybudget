@@ -7,6 +7,7 @@ import { ColDef } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
+import { formatCurrency } from "util/string";
 
 import {
   requestAccountsAction,
@@ -67,19 +68,19 @@ const Accounts = (): JSX.Element => {
             field: "estimated",
             headerName: "Estimated",
             cellStyle: { textAlign: "right" },
-            cellRendererParams: { formatter: (value: string | number) => `$${value}` }
+            cellRendererParams: { formatter: formatCurrency }
           },
           {
             field: "actual",
             headerName: "Actual",
             cellStyle: { textAlign: "right" },
-            cellRendererParams: { formatter: (value: string | number) => `$${value}` }
+            cellRendererParams: { formatter: formatCurrency }
           },
           {
             field: "variance",
             headerName: "Variance",
             cellStyle: { textAlign: "right" },
-            cellRendererParams: { formatter: (value: string | number) => `$${value}` }
+            cellRendererParams: { formatter: formatCurrency }
           }
         ]}
       />

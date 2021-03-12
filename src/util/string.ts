@@ -32,3 +32,14 @@ export const toTitleCase = (value: string): string => {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
 };
+
+export const formatCurrency = (value: string | number): string => {
+  var formatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+  });
+  if (typeof value === "string") {
+    return formatter.format(parseInt(value));
+  }
+  return formatter.format(value);
+};

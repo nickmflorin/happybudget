@@ -1,3 +1,4 @@
+@import 'style/colors';
 @import 'style/typography';
 
 .primary-grid {
@@ -10,11 +11,6 @@
     // alignment to become skewed.  We should figure out the right way to do this.
     padding-top: 6px;
     padding-bottom: 6px;
-    .ag-react-container {
-      width: auto;
-      display: flex;
-      justify-content: center;
-    }
   }
 }
 
@@ -26,6 +22,8 @@
       border-bottom: none !important;
       div[role='gridcell'] {
         background-color: #f8f8f8;
+        font-family: $noto-sans-medium;
+        color: $text-secondary;
       }
     }
   }
@@ -40,33 +38,5 @@
   svg {
     height: 0.8rem;
     width: auto;
-  }
-}
-
-.error-container {
-  position: absolute;
-  top: 0px;
-  right: 0px;
-  height: 18px;
-  display: flex;
-  z-index: 100000;
-  background-color: #d73a49;
-  color: white;
-  padding: 2px 4px;
-
-  .text-error {
-    color: white;
-    font-size: 11px;
-    line-height: 14px;
-  }
-  .icon--error {
-    color: $white;
-    display: block;
-    margin-right: 6px;
-
-    svg {
-      height: 14px;
-      width: auto;
-    }
   }
 }

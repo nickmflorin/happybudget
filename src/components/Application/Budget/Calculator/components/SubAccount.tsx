@@ -7,6 +7,7 @@ import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
+import { formatCurrency } from "util/string";
 
 import {
   setSubAccountIdAction,
@@ -115,12 +116,20 @@ const SubAccount = (): JSX.Element => {
             {
               field: "estimated",
               headerName: "Estimated",
-              cellStyle: { textAlign: "right" }
+              cellStyle: { textAlign: "right" },
+              cellRendererParams: { formatter: formatCurrency }
             },
             {
               field: "actual",
               headerName: "Actual",
-              cellStyle: { textAlign: "right" }
+              cellStyle: { textAlign: "right" },
+              cellRendererParams: { formatter: formatCurrency }
+            },
+            {
+              field: "variance",
+              headerName: "Variance",
+              cellStyle: { textAlign: "right" },
+              cellRendererParams: { formatter: formatCurrency }
             }
           ]}
         />
