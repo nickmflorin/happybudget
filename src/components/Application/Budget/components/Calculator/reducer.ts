@@ -4,7 +4,8 @@ import {
   createSimpleBooleanReducer,
   createModelListActionReducer,
   createTableReducer,
-  createSimplePayloadReducer
+  createSimplePayloadReducer,
+  createListResponseReducer
 } from "store/reducerFactories";
 import { ActionType } from "./actions";
 import {
@@ -19,6 +20,14 @@ const rootReducer = combineReducers({
     deleting: createModelListActionReducer(ActionType.Accounts.Deleting, { referenceEntity: "account" }),
     updating: createModelListActionReducer(ActionType.Accounts.Updating, { referenceEntity: "account" }),
     creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
+    comments: createListResponseReducer<IComment>(
+      {
+        Response: ActionType.Comments.Response,
+        Request: ActionType.Comments.Request,
+        Loading: ActionType.Comments.Loading
+      },
+      { referenceEntity: "comment" }
+    ),
     table: createTableReducer<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>(
       {
         AddPlaceholders: ActionType.AccountsTable.AddPlaceholders,
@@ -46,6 +55,14 @@ const rootReducer = combineReducers({
       Loading: ActionType.Account.Loading,
       Request: ActionType.Account.Request
     }),
+    comments: createListResponseReducer<IComment>(
+      {
+        Response: ActionType.Account.Comments.Response,
+        Request: ActionType.Account.Comments.Request,
+        Loading: ActionType.Account.Comments.Loading
+      },
+      { referenceEntity: "comment" }
+    ),
     subaccounts: combineReducers({
       deleting: createModelListActionReducer(ActionType.Account.SubAccounts.Deleting, {
         referenceEntity: "subaccount"
@@ -82,6 +99,14 @@ const rootReducer = combineReducers({
       Loading: ActionType.SubAccount.Loading,
       Request: ActionType.SubAccount.Request
     }),
+    comments: createListResponseReducer<IComment>(
+      {
+        Response: ActionType.SubAccount.Comments.Response,
+        Request: ActionType.SubAccount.Comments.Request,
+        Loading: ActionType.SubAccount.Comments.Loading
+      },
+      { referenceEntity: "comment" }
+    ),
     subaccounts: combineReducers({
       deleting: createModelListActionReducer(ActionType.SubAccount.SubAccounts.Deleting, {
         referenceEntity: "subaccount"

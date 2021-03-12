@@ -12,6 +12,7 @@ textarea:-webkit-autofill:hover textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 input.ant-input:focus,
+textarea:focus,
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused,
 select:-webkit-autofill:focus {
@@ -67,4 +68,12 @@ input.ant-input,
       border-left: none;
     }
   }
+}
+
+textarea {
+  background-color: $gray-light !important;
+  color: $text-secondary !important;
+  font-family: $roboto-regular !important;
+  border-radius: 10px !important;
+  border: 1px solid transparent !important;
 }

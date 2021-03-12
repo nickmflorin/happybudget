@@ -3,6 +3,10 @@ import { useState } from "react";
 import { Menu } from "antd";
 
 import { ShowHide } from "components/display";
+import { HorizontalMenu } from "components/control";
+import { IHorizontalMenuItem } from "components/control/HorizontalMenu";
+import { Drawer } from "components/layout";
+
 import Comments from "./Comments";
 import History from "./History";
 import "./index.scss";
@@ -14,23 +18,24 @@ const CommentsHistoryDrawer = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <div className={"drawer"}>
-      <Menu
-        className={"drawer-menu"}
-        onClick={(info: any) => setPage(info.key)}
-        selectedKeys={[page]}
-        mode={"horizontal"}
-      >
-        <Menu.Item key={"comments"}>{"Comments"}</Menu.Item>
-        <Menu.Item key={"history"}>{"History"}</Menu.Item>
-      </Menu>
-      <ShowHide show={page === "comments"}>
-        <Comments />
-      </ShowHide>
-      <ShowHide show={page === "history"}>
-        <History />
-      </ShowHide>
-    </div>
+    <Drawer>
+      <HorizontalMenu
+        onChange={(item: IHorizontalMenuItem) => setPage(item.id)}
+        selected={[page]}
+        items={[
+          { id: "comments", label: "Comments" },
+          { id: "history", label: "History" }
+        ]}
+      />
+      <Drawer.Content noPadding>
+        <ShowHide show={page === "comments"}>
+          <Comments />
+        </ShowHide>
+        <ShowHide show={page === "history"}>
+          <History />
+        </ShowHide>
+      </Drawer.Content>
+    </Drawer>
   );
 };
 

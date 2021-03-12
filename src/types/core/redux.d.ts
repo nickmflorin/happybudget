@@ -112,6 +112,7 @@ namespace Redux {
 
     interface IAccountsStore {
       readonly table: ITableStore<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>;
+      readonly comments: IListResponseStore<IComment>;
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
@@ -121,12 +122,14 @@ namespace Redux {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<ISubAccount>;
       readonly subaccounts: ISubAccountsStore;
+      readonly comments: IListResponseStore<IComment>;
     }
 
     interface IAccountStore {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<IAccount>;
       readonly subaccounts: ISubAccountsStore;
+      readonly comments: IListResponseStore<IComment>;
     }
 
     interface IStore {

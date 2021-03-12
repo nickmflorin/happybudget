@@ -1,28 +1,45 @@
-@import "./colors";
-@import "./typography";
-@import "./drawers";
-@import "./input";
-@import "./layout";
-@import "./buttons";
-@import "./input";
-@import "./forms";
-@import "./tooltips";
-@import "./dropdowns";
-@import "./tables";
+@import './colors';
+@import './typography';
+@import './drawers';
+@import './input';
+@import './layout';
+@import './buttons';
+@import './input';
+@import './forms';
+@import './tooltips';
+@import './dropdowns';
+@import './tables';
 
-@import "~react-toastify/dist/ReactToastify.css";
-@import "~antd/dist/antd.css";
+@import '~react-toastify/dist/ReactToastify.css';
+@import '~antd/dist/antd.css';
 
 body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+    'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  code {
-    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-      monospace;
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.empty {
+  margin: 0 auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+
+  .ant-empty-image {
+    height: 50px;
+    margin-bottom: 8px;
   }
+  .ant-empty-description {
+    font-size: 13px;
+    color: $text-secondary;
+    font-family: $noto-sans-regular;
+  }
+}

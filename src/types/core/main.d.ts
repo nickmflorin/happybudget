@@ -128,7 +128,7 @@ interface IActual extends TrackedModel {
   readonly parent_type: BudgetItemType;
 }
 
-interface IComment {
+interface IComment extends Model {
   readonly created_at: string;
   readonly updated_at: string;
   readonly likes: ISimpleUser[];

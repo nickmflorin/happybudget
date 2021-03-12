@@ -13,10 +13,13 @@ import {
   updateSubAccount,
   deleteSubAccount,
   getAccount,
-  getSubAccount
+  getSubAccount,
+  getBudgetComments,
+  getAccountComments,
+  getSubAccountComments
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
-import { requestBudgetAction, setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
+import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
 import {
   loadingAccountAction,
   responseAccountAction,
@@ -52,11 +55,16 @@ import {
   addAccountSubAccountsTablePlaceholdersAction,
   addSubAccountSubAccountsTablePlaceholdersAction,
   addAccountsTablePlaceholdersAction,
-  requestAccountsAction,
   requestAccountSubAccountsAction,
   requestSubAccountSubAccountsAction,
   requestAccountAction,
-  requestSubAccountAction
+  requestSubAccountAction,
+  loadingBudgetCommentsAction,
+  responseBudgetCommentsAction,
+  loadingAccountCommentsAction,
+  responseAccountCommentsAction,
+  loadingSubAccountCommentsAction,
+  responseSubAccountCommentsAction
 } from "./actions";
 import {
   payloadFromResponse,
@@ -66,10 +74,56 @@ import {
   payloadBeforeResponse
 } from "../../util";
 
-// TODO: Is this going to be triggered even when we are inside the actuals component?
-export function* handleBudgetChangedTask(action: Redux.IAction<number>): SagaIterator {
-  console.log("Handling budget changed task!");
-  yield all([put(requestAccountsAction()), put(requestBudgetAction())]);
+export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId)) {
+    yield put(loadingBudgetCommentsAction(true));
+    try {
+      // TODO: We will have to build in pagination.
+      const response = yield call(getBudgetComments, budgetId);
+      console.log(response);
+      yield put(responseBudgetCommentsAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the budget's comments.");
+      yield put(responseBudgetCommentsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingBudgetCommentsAction(false));
+    }
+  }
+}
+
+export function* getAccountCommentsTask(action: Redux.IAction<any>): SagaIterator {
+  const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
+  if (!isNil(accountId)) {
+    yield put(loadingAccountCommentsAction(true));
+    try {
+      // TODO: We will have to build in pagination.
+      const response = yield call(getAccountComments, accountId);
+      yield put(responseAccountCommentsAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the account's comments.");
+      yield put(responseAccountCommentsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingAccountCommentsAction(false));
+    }
+  }
+}
+
+export function* getSubAccountCommentsTask(action: Redux.IAction<any>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
+  if (!isNil(subaccountId)) {
+    yield put(loadingSubAccountCommentsAction(true));
+    try {
+      // TODO: We will have to build in pagination.
+      const response = yield call(getSubAccountComments, subaccountId);
+      yield put(responseSubAccountCommentsAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the subaccount's comments.");
+      yield put(responseSubAccountCommentsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingSubAccountCommentsAction(false));
+    }
+  }
 }
 
 export function* handleAccountChangedTask(action: Redux.IAction<number>): SagaIterator {

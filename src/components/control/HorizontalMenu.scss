@@ -1,0 +1,24 @@
+@import "style/colors";
+@import "style/typography";
+
+.horizontal-menu {
+  display: flex;
+  justify-content: space-between;
+
+  .horizontal-menu-item {
+    flex: 1;
+    padding: 10px 20px !important;
+    font-size: 15px;
+    line-height: 18px;
+    color: $text-secondary;
+    font-family: $noto-sans-medium;
+    text-align: center;
+
+    &:hover {
+      border-bottom: 2px solid $green;
+    }
+    &.horizontal-menu-item-selected {
+      border-bottom: 3px solid $green;
+    }
+  }
+}

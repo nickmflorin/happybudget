@@ -8,6 +8,11 @@ export const ActionType = {
     Update: "budget.accounts.Update",
     Remove: "budget.accounts.Remove"
   },
+  Comments: {
+    Loading: "calculator.comments.Loading",
+    Response: "calculator.comments.Response",
+    Request: "calculator.comments.Request"
+  },
   AccountsTable: {
     AddPlaceholders: "calculator.accountstable.AddPlaceholders",
     UpdateRow: "calculator.accountstable.UpdateRow",
@@ -28,6 +33,11 @@ export const ActionType = {
     Response: "calculator.account.Response",
     Request: "calculator.account.Request",
     Refresh: "calculator.account.Refresh",
+    Comments: {
+      Loading: "calculator.account.comments.Loading",
+      Response: "calculator.account.comments.Response",
+      Request: "calculator.account.comments.Request"
+    },
     SubAccountsTable: {
       AddPlaceholders: "calculator.account.subaccountstable.AddPlaceholders",
       UpdateRow: "calculator.account.subaccountstable.UpdateRow",
@@ -55,6 +65,11 @@ export const ActionType = {
     Loading: "calculator.subaccount.Loading",
     Response: "calculator.subaccount.Response",
     Request: "calculator.subaccount.Request",
+    Comments: {
+      Loading: "calculator.subaccount.comments.Loading",
+      Response: "calculator.subaccount.comments.Response",
+      Request: "calculator.subaccount.comments.Request"
+    },
     SubAccountsTable: {
       AddPlaceholders: "calculator.subaccount.subaccountstable.AddPlaceholders",
       UpdateRow: "calculator.subaccount.subaccountstable.UpdateRow",
@@ -89,6 +104,22 @@ export const responseAccountAction = simpleAction<IAccount>(ActionType.Account.R
 export const requestSubAccountAction = simpleAction<null>(ActionType.SubAccount.Request);
 export const loadingSubAccountAction = simpleAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = simpleAction<ISubAccount>(ActionType.SubAccount.Response);
+
+export const requestBudgetCommentsAction = simpleAction<null>(ActionType.Comments.Request);
+export const responseBudgetCommentsAction = simpleAction<Http.IListResponse<IComment>>(ActionType.Comments.Response);
+export const loadingBudgetCommentsAction = simpleAction<boolean>(ActionType.Comments.Loading);
+
+export const requestAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
+export const responseAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(
+  ActionType.Account.Comments.Response
+);
+export const loadingAccountCommentsAction = simpleAction<boolean>(ActionType.Account.Comments.Loading);
+
+export const requestSubAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
+export const responseSubAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(
+  ActionType.SubAccount.Comments.Response
+);
+export const loadingSubAccountCommentsAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Loading);
 
 /*
   Actions Pertaining to the Accounts

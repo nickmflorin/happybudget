@@ -1,6 +1,5 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
-import { ActionType as RootActionType } from "../../actions";
 import { ActionType } from "./actions";
 import {
   getAccountTask,
@@ -14,9 +13,11 @@ import {
   handleAccountRemovalTask,
   handleSubAccountSubAccountUpdateTask,
   handleSubAccountSubAccountRemovalTask,
-  handleBudgetChangedTask,
   handleAccountChangedTask,
-  handleSubAccountChangedTask
+  handleSubAccountChangedTask,
+  getBudgetCommentsTask,
+  getAccountCommentsTask,
+  getSubAccountCommentsTask
 } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
@@ -120,6 +121,39 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
   }
 }
 
+function* watchForTriggerBudgetCommentsSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.Comments.Request);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(getBudgetCommentsTask, action);
+  }
+}
+
+function* watchForTriggerAccountCommentsSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.Account.Comments.Request);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(getAccountCommentsTask, action);
+  }
+}
+
+function* watchForTriggerSubAccountCommentsSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.SubAccount.Comments.Request);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(getSubAccountCommentsTask, action);
+  }
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForAccountIdChangedSaga);
   yield spawn(watchForSubAccountIdChangedSaga);
@@ -134,4 +168,7 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForTriggerSubAccountSubAccountsSaga);
   yield spawn(watchForUpdateAccountSubAccountSaga);
   yield spawn(watchForRemoveSubAccountSubAccountSaga);
+  yield spawn(watchForTriggerBudgetCommentsSaga);
+  yield spawn(watchForTriggerAccountCommentsSaga);
+  yield spawn(watchForTriggerSubAccountCommentsSaga);
 }
