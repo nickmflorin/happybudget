@@ -105,7 +105,10 @@ const rootReducer = combineReducers({
         Request: ActionType.SubAccount.Comments.Request,
         Loading: ActionType.SubAccount.Comments.Loading
       },
-      { referenceEntity: "comment" }
+      {
+        referenceEntity: "comment",
+        keyReducers: { submitting: createModelListActionReducer(ActionType.Comments.Submitting) }
+      }
     ),
     subaccounts: combineReducers({
       deleting: createModelListActionReducer(ActionType.SubAccount.SubAccounts.Deleting, {

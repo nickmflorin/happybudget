@@ -492,6 +492,7 @@ export const createListResponseReducer = <
   const Options = mergeWithDefaults<IListResponseReducerOptions<M, S, A>>(options, {
     referenceEntity: "entity",
     extensions: {},
+    keyReducers: {},
     initialState: initialListResponseState as S,
     excludeActionsFromExtensions: true
   });
@@ -612,6 +613,15 @@ export const createListResponseReducer = <
           const updateToState = Options.extensions[action.type](action.payload, newState, action);
           newState = { ...newState, ...updateToState };
         }
+      }
+      if (!isNil(Options.keyReducers)) {
+        const subReducers: { [key: string]: Reducer<any, A> } = Options.keyReducers;
+        forEach(Object.keys(Options.keyReducers), (key: string) => {
+          if (!isNil(newState[key as keyof S])) {
+            const red: Reducer<any, A> = subReducers[key];
+            newState = { ...newState, [key]: red(newState[key as keyof S], action) };
+          }
+        });
       }
     }
     if (!isNil(Options.listReducer)) {

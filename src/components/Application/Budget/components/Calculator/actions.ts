@@ -11,7 +11,9 @@ export const ActionType = {
   Comments: {
     Loading: "calculator.comments.Loading",
     Response: "calculator.comments.Response",
-    Request: "calculator.comments.Request"
+    Request: "calculator.comments.Request",
+    Submit: "calculator.comments.Submit",
+    Submitting: "calculator.comments.Submitting"
   },
   AccountsTable: {
     AddPlaceholders: "calculator.accountstable.AddPlaceholders",
@@ -108,6 +110,8 @@ export const responseSubAccountAction = simpleAction<ISubAccount>(ActionType.Sub
 export const requestBudgetCommentsAction = simpleAction<null>(ActionType.Comments.Request);
 export const responseBudgetCommentsAction = simpleAction<Http.IListResponse<IComment>>(ActionType.Comments.Response);
 export const loadingBudgetCommentsAction = simpleAction<boolean>(ActionType.Comments.Loading);
+export const submitBudgetCommentAction = simpleAction<Http.ICommentPayload>(ActionType.Comments.Submit);
+export const submittingBudgetCommentAction = simpleAction<boolean>(ActionType.Comments.Submitting);
 
 export const requestAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
 export const responseAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(

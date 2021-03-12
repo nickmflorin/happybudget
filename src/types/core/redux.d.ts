@@ -103,6 +103,10 @@ namespace Redux {
   }
 
   namespace Calculator {
+    interface ICommentsStore extends IListResponseStore<IComment> {
+      submitting: boolean;
+    }
+
     interface ISubAccountsStore {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
@@ -112,7 +116,7 @@ namespace Redux {
 
     interface IAccountsStore {
       readonly table: ITableStore<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>;
-      readonly comments: IListResponseStore<IComment>;
+      readonly comments: ICommentsStore;
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
@@ -122,14 +126,14 @@ namespace Redux {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<ISubAccount>;
       readonly subaccounts: ISubAccountsStore;
-      readonly comments: IListResponseStore<IComment>;
+      readonly comments: ICommentsStore;
     }
 
     interface IAccountStore {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<IAccount>;
       readonly subaccounts: ISubAccountsStore;
-      readonly comments: IListResponseStore<IComment>;
+      readonly comments: ICommentsStore;
     }
 
     interface IStore {

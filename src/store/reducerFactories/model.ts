@@ -98,4 +98,5 @@ export interface IListResponseReducerOptions<
   listReducer?: Reducer<M[], A>;
   itemReducer?: Reducer<M, A>;
   extension?: Reducer<S, A>;
+  keyReducers?: { [key: string]: Reducer<any, A> };
 }
