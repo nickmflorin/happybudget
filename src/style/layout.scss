@@ -1,5 +1,5 @@
-@import "./colors";
-@import "./typography";
+@import './colors';
+@import './typography';
 
 $header-height: 70px;
 $header-background-color: $white;
@@ -8,7 +8,7 @@ $app-background-color: $white;
 
 $sidebar-width: 260px;
 $sidebar-collapsed-width: 70px;
-$sidebar-background-color: $off-white;;
+$sidebar-background-color: $off-white;
 
 $footer-height: 24px;
 $footer-background-color: $white;
@@ -84,15 +84,35 @@ $footer-background-color: $white;
         height: calc(100vh - #{$header-height} - #{$footer-height});
         overflow-y: scroll;
         margin-bottom: $footer-height;
+        display: flex;
 
-        .page {
-          padding: 30px 60px;
-          display: flex;
-          flex-direction: column;
+        .content-left {
+          flex-grow: 100;
+          -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+          transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+          transition: transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+          transition: transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1),
+            -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
 
-          .page-content {
-            width: 100%;
+          .page {
+            padding: 30px 60px;
+            display: flex;
+            flex-direction: column;
+
+            .page-content {
+              width: 100%;
+            }
           }
+        }
+        // content-right is the container for any side drawers that may be toggled
+        // into and out of visibility on the screen.
+        .content-right {
+          max-width: 300px;
+          -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+          transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+          transition: transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+          transition: transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1),
+            -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
         }
       }
 
@@ -288,4 +308,3 @@ $footer-background-color: $white;
     margin-right: 30px !important;
   }
 }
-

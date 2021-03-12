@@ -21,6 +21,8 @@ import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { Layout } from "components/layout";
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibility } from "./actions";
 import { AncestorsBreadCrumbs } from "./components";
+import { CommentsHistoryDrawer } from "./components/Calculator/components";
+
 import "./index.scss";
 
 const Calculator = React.lazy(() => import("./components/Calculator"));
@@ -45,11 +47,13 @@ const Budget = (): JSX.Element => {
   }, [budgetId]);
 
   return (
-    <Layout
+    <Layout<"budgetDrawer">
       collapsed
       breadcrumbs={
         <AncestorsBreadCrumbs loading={ancestorsLoading} ancestors={ancestors} budgetId={parseInt(budgetId)} />
       }
+      drawers={{ budgetDrawer: <CommentsHistoryDrawer /> }}
+      visibleDrawer={commentsHistoryDrawerOpen ? "budgetDrawer" : undefined}
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faRobot} />,

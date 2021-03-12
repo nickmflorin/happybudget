@@ -1,29 +1,16 @@
 import { useState } from "react";
-import { Drawer } from "antd";
-
 import { RenderWithSpinner } from "components/display";
+import "./CommentsHistoryDrawer.scss";
 
-interface CommentsHistoryDrawerProps {
-  visible: boolean;
-  onClose: () => void;
-}
-
-const CommentsHistoryDrawer = ({ visible, onClose }: CommentsHistoryDrawerProps): JSX.Element => {
+const CommentsHistoryDrawer = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
 
   return (
-    <Drawer
-      title={"Profile"}
-      placement={"right"}
-      closable={false}
-      onClose={() => onClose()}
-      visible={visible}
-      width={350}
-    >
+    <div className={"budget-comments-history-drawer"}>
       <RenderWithSpinner loading={loading}>
         <div>{"Comments"}</div>
       </RenderWithSpinner>
-    </Drawer>
+    </div>
   );
 };
 

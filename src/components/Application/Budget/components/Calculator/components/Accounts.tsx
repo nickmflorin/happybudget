@@ -9,7 +9,6 @@ import { RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
-import { setCommentsHistoryDrawerVisibility } from "../../../actions";
 import {
   requestAccountsAction,
   setAccountsSearchAction,
@@ -20,16 +19,12 @@ import {
   updateAccountAction,
   selectAllAccountsTableRowsAction
 } from "../actions";
-import CommentsHistoryDrawer from "./CommentsHistoryDrawer";
 
 const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
   const history = useHistory();
   const accounts = useSelector((state: Redux.IApplicationStore) => state.calculator.accounts);
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
-  const commentsHistoryDrawerOpen = useSelector(
-    (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
-  );
 
   useEffect(() => {
     dispatch(requestAccountsAction());
@@ -93,10 +88,6 @@ const Accounts = (): JSX.Element => {
           ]}
         />
       </RenderWithSpinner>
-      <CommentsHistoryDrawer
-        visible={commentsHistoryDrawerOpen}
-        onClose={() => dispatch(setCommentsHistoryDrawerVisibility(false))}
-      />
     </React.Fragment>
   );
 };
