@@ -148,7 +148,11 @@ const SubAccount = (): JSX.Element => {
           loading: comments.loading,
           submitting: comments.submitting,
           onRequest: () => dispatch(requestSubAccountCommentsAction()),
-          onSubmit: (payload: Http.ICommentPayload) => dispatch(submitSubAccountCommentAction(payload))
+          onSubmit: (payload: Http.ICommentPayload) => dispatch(submitSubAccountCommentAction(payload)),
+          onEdit: (comment: IComment) => console.log(comment),
+          onLike: (comment: IComment) => console.log(comment),
+          onDislike: (comment: IComment) => console.log(comment),
+          onDelete: (comment: IComment) => console.log(comment)
         }}
       />
     </RenderIfValidId>

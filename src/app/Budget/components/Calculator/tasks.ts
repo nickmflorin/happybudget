@@ -98,6 +98,21 @@ export function* submitBudgetCommentTask(action: Redux.IAction<Http.ICommentPayl
   }
 }
 
+// export function* deleteBudgetCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
+//   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+//   if (!isNil(budgetId) && !isNil(action.payload)) {
+//     yield put(submittingBudgetCommentAction(true));
+//     try {
+//       const response: IComment = yield call(createBudgetComment, budgetId, action.payload);
+//       yield put(addBudgetCommentToStateAction(response));
+//     } catch (e) {
+//       handleRequestError(e, "There was an error submitting the comment.");
+//     } finally {
+//       yield put(submittingBudgetCommentAction(false));
+//     }
+//   }
+// }
+
 export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {

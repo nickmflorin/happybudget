@@ -13,9 +13,23 @@ export interface CommentsProps {
   submitting: boolean;
   onSubmit: (payload: Http.ICommentPayload) => void;
   onRequest: () => void;
+  onDelete: (comment: IComment) => void;
+  onLike: (comment: IComment) => void;
+  onDislike: (comment: IComment) => void;
+  onEdit: (comment: IComment) => void;
 }
 
-const Comments = ({ comments, loading, submitting, onSubmit, onRequest }: CommentsProps): JSX.Element => {
+const Comments = ({
+  comments,
+  loading,
+  submitting,
+  onSubmit,
+  onRequest,
+  onDelete,
+  onLike,
+  onDislike,
+  onEdit
+}: CommentsProps): JSX.Element => {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -29,7 +43,14 @@ const Comments = ({ comments, loading, submitting, onSubmit, onRequest }: Commen
           <RenderWithSpinner loading={loading}>
             <ShowHide show={comments.length !== 0}>
               {map(comments, (comment: IComment, index: number) => (
-                <Comment key={index} comment={comment} />
+                <Comment
+                  key={index}
+                  comment={comment}
+                  onDelete={() => onDelete(comment)}
+                  onLike={() => onLike(comment)}
+                  onDislike={() => onDislike(comment)}
+                  onEdit={() => onEdit(comment)}
+                />
               ))}
             </ShowHide>
             <ShowHide show={comments.length === 0}>

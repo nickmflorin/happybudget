@@ -145,7 +145,11 @@ const Account = (): JSX.Element => {
           loading: comments.loading,
           submitting: comments.submitting,
           onRequest: () => dispatch(requestAccountCommentsAction()),
-          onSubmit: (payload: Http.ICommentPayload) => dispatch(submitAccountCommentAction(payload))
+          onSubmit: (payload: Http.ICommentPayload) => dispatch(submitAccountCommentAction(payload)),
+          onEdit: (comment: IComment) => console.log(comment),
+          onLike: (comment: IComment) => console.log(comment),
+          onDislike: (comment: IComment) => console.log(comment),
+          onDelete: (comment: IComment) => console.log(comment)
         }}
       />
     </RenderIfValidId>
