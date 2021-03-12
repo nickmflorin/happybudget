@@ -19,12 +19,12 @@ import {
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { Layout } from "components/layout";
-import { setBudgetIdAction } from "./actions";
-import AncestorsBreadCrumbs from "./AncestorsBreadCrumbs";
+import { setBudgetIdAction, setCommentsHistoryDrawerVisibility } from "./actions";
+import { AncestorsBreadCrumbs } from "./components";
 import "./index.scss";
 
-const Calculator = React.lazy(() => import("./Calculator"));
-const Actuals = React.lazy(() => import("./Actuals"));
+const Calculator = React.lazy(() => import("./components/Calculator"));
+const Actuals = React.lazy(() => import("./components/Actuals"));
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
@@ -34,6 +34,9 @@ const Budget = (): JSX.Element => {
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
   const ancestors = useSelector((state: Redux.IApplicationStore) => state.budget.ancestors);
   const ancestorsLoading = useSelector((state: Redux.IApplicationStore) => state.budget.ancestorsLoading);
+  const commentsHistoryDrawerOpen = useSelector(
+    (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
+  );
 
   useEffect(() => {
     if (!isNaN(parseInt(budgetId))) {
@@ -66,7 +69,7 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faComments} />,
-          disabled: true
+          onClick: () => dispatch(setCommentsHistoryDrawerVisibility(!commentsHistoryDrawerOpen))
         }
       ]}
       sidebar={[

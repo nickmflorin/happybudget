@@ -8,7 +8,8 @@ export const initialBudgetState: Redux.Budget.IBudgetStore = {
 const initialState: Redux.Budget.IStore = {
   budget: initialBudgetState,
   ancestors: [],
-  ancestorsLoading: false
+  ancestorsLoading: false,
+  commentsHistoryDrawerOpen: false
 };
 
 export default initialState;

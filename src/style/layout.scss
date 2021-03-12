@@ -13,6 +13,21 @@ $sidebar-background-color: $off-white;;
 $footer-height: 24px;
 $footer-background-color: $white;
 
+.ant-drawer-open,
+.ant-drawer {
+  height: calc(100vh - #{$header-height}) !important;
+  top: $header-height !important;
+
+  .ant-drawer-mask {
+    background-color: transparent !important;
+  }
+  .ant-drawer-content-wrapper {
+    border-left: none !important;
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+  }
+}
+
 .root {
   display: flex;
   flex-direction: column;

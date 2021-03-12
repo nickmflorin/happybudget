@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
-import { ActionType as RootActionType } from "../actions";
+import { ActionType as RootActionType } from "../../actions";
 import { ActionType } from "./actions";
 import {
   getAccountTask,

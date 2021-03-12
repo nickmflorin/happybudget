@@ -5,7 +5,7 @@ const Account = React.lazy(() => import("./components/Account"));
 const Accounts = React.lazy(() => import("./components/Accounts"));
 const SubAccount = React.lazy(() => import("./components/SubAccount"));
 
-const Budget = (): JSX.Element => {
+const Calculator = (): JSX.Element => {
   const match = useRouteMatch();
   return (
     <Switch>
@@ -17,4 +17,4 @@ const Budget = (): JSX.Element => {
   );
 };
 
-export default Budget;
+export default Calculator;

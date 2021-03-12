@@ -155,6 +155,7 @@ namespace Redux {
       readonly budget: IBudgetStore;
       readonly ancestors: ListStore<IAncestor>;
       readonly ancestorsLoading: boolean;
+      readonly commentsHistoryDrawerOpen: boolean;
     }
   }
 
