@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import classNames from "classnames";
+import Portal from "./Portal";
 
 interface DrawerSectionProps {
   children: ReactNode;
@@ -12,6 +13,7 @@ interface DrawerProps {
   children: ReactNode;
   style?: React.CSSProperties;
   className?: string;
+  visible: boolean;
 }
 
 export const DrawerContent = ({
@@ -40,11 +42,13 @@ export const DrawerFooter = ({
   );
 };
 
-const Drawer = ({ children, className, style = {} }: DrawerProps): JSX.Element => {
+const Drawer = ({ children, className, visible, style = {} }: DrawerProps): JSX.Element => {
   return (
-    <div className={classNames("drawer", className)} style={style}>
-      {children}
-    </div>
+    <Portal id={"drawer-target"} visible={visible}>
+      <div className={classNames("drawer", className)} style={style}>
+        {children}
+      </div>
+    </Portal>
   );
 };
 

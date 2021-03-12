@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-import { Menu } from "antd";
-
 import { ShowHide } from "components/display";
 import { HorizontalMenu } from "components/control";
 import { IHorizontalMenuItem } from "components/control/HorizontalMenu";
@@ -13,12 +11,16 @@ import "./index.scss";
 
 type Page = "comments" | "history";
 
-const CommentsHistoryDrawer = (): JSX.Element => {
+interface CommentsHistoryDrawerProps {
+  visible: boolean;
+}
+
+const CommentsHistoryDrawer = ({ visible }: CommentsHistoryDrawerProps): JSX.Element => {
   const [page, setPage] = useState<Page>("comments");
   const [loading, setLoading] = useState(false);
 
   return (
-    <Drawer>
+    <Drawer visible={visible}>
       <HorizontalMenu
         onChange={(item: IHorizontalMenuItem) => setPage(item.id)}
         selected={[page]}

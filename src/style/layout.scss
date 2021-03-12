@@ -71,7 +71,9 @@ $footer-background-color: $white;
         margin-bottom: $footer-height;
         display: flex;
 
-        .content-left {
+        // This is the container for the content that will be displayed to the
+        // left of the drawers.
+        .sub-content {
           flex-grow: 100;
           -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
           transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
@@ -86,9 +88,9 @@ $footer-background-color: $white;
             }
           }
         }
-        // content-right is the container for any side drawers that may be toggled
+        // This is the container for any side drawers that may be toggled
         // into and out of visibility on the screen.
-        .content-right {
+        .drawer-wrapper {
           max-height: 100%;
           -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
           transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);

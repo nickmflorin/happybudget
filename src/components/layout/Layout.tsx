@@ -68,8 +68,8 @@ const Layout = <D extends string = string>({
       <div className={classNames("application-content", { collapsed })}>
         <Header breadcrumbs={breadcrumbs} toolbar={toolbar} />
         <div className={"content"}>
-          <div className={"content-left"}>{children}</div>
-          <div className={"content-right"}>{!isNil(drawer) && drawer}</div>
+          <div className={"sub-content"}>{children}</div>
+          <div className={"drawer-wrapper"} id={"drawer-target"}></div>
         </div>
         <Footer />
       </div>

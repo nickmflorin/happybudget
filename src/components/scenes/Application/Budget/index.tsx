@@ -51,8 +51,8 @@ const Budget = (): JSX.Element => {
       breadcrumbs={
         <AncestorsBreadCrumbs loading={ancestorsLoading} ancestors={ancestors} budgetId={parseInt(budgetId)} />
       }
-      drawers={{ budgetDrawer: <CommentsHistoryDrawer /> }}
-      visibleDrawer={commentsHistoryDrawerOpen ? "budgetDrawer" : undefined}
+      // drawers={{ budgetDrawer: <CommentsHistoryDrawer /> }}
+      // visibleDrawer={commentsHistoryDrawerOpen ? "budgetDrawer" : undefined}
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faRobot} />,
