@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Switch } from "react-router-dom";
 
 import { LogoWhite } from "components/svgs";
-import "./index.scss";
+import "./Landing.scss";
 
 const Login = React.lazy(() => import("./Login"));
 const Signup = React.lazy(() => import("./Signup"));
