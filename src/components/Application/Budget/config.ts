@@ -23,8 +23,20 @@ export interface IFieldDefinition {
 export const FieldDefinitions: { [key in Table.RowType]: IFieldDefinition[] } = {
   actual: [
     { name: "description", postPayload: true },
-    { name: "object_id", postPayload: false, requiredForPost: true, updateBeforeResponse: true },
-    { name: "parent_type", postPayload: false, requiredForPost: true, updateBeforeResponse: true },
+    {
+      name: "object_id",
+      postPayload: false,
+      requiredForPost: true,
+      updateBeforeResponse: true,
+      triggerParentRefresh: true
+    },
+    {
+      name: "parent_type",
+      postPayload: false,
+      requiredForPost: true,
+      updateBeforeResponse: true,
+      triggerParentRefresh: true
+    },
     { name: "vendor", postPayload: true },
     { name: "purchase_order", postPayload: true },
     { name: "date", postPayload: true },

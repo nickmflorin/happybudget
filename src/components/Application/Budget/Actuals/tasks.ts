@@ -11,6 +11,13 @@ import {
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
 import {
+  payloadFromResponse,
+  postPayloadFromRow,
+  rowHasRequiredFields,
+  payloadBeforeResponse,
+  requestWarrantsParentRefresh
+} from "../util";
+import {
   activateActualsPlaceholderAction,
   loadingActualsAction,
   responseActualsAction,
@@ -24,7 +31,7 @@ import {
   loadingBudgetItemsAction,
   responseBudgetItemsAction
 } from "./actions";
-import { payloadFromResponse, postPayloadFromRow, rowHasRequiredFields, payloadBeforeResponse } from "../util";
+import { requestBudgetAction } from "../actions";
 
 export function* handleActualRemovalTask(action: Redux.IAction<Table.IActualRow>): SagaIterator {
   if (!isNil(action.payload)) {
@@ -111,14 +118,17 @@ export function* handleActualUpdateTask(
         }
       } else {
         yield put(updatingActualAction({ id: existing.id as number, value: true }));
+        const requestPayload = action.payload.data as Partial<Http.IActualPayload>;
         try {
-          const response: IActual = yield call(
-            updateActual,
-            existing.id as number,
-            action.payload.data as Partial<Http.IActualPayload>
-          );
+          const response: IActual = yield call(updateActual, existing.id as number, requestPayload);
           const responsePayload = payloadFromResponse<IActual>(response, "actual");
           yield put(updateActualsTableRowAction({ id: existing.id, data: responsePayload }));
+
+          // Determine if the parent budget needs to be refreshed due to updates to the underlying
+          // actual fields that calculate the values of the parent budget.
+          if (requestWarrantsParentRefresh(requestPayload, "actual")) {
+            yield put(requestBudgetAction());
+          }
         } catch (e) {
           yield call(
             handleTableErrors,
