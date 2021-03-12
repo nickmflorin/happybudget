@@ -55,14 +55,16 @@
 
     .title {
       font-size: 18px;
-      font-family: $roboto-medium;
+      font-family: $roboto;
+    font-weight: 600;
       line-height: 20px;
       margin-bottom: 4px;
     }
 
     .subTitle {
       font-size: 11px;
-      font-family: $roboto-regular;
+      font-family: $roboto;
+      font-weight: 400;
       line-height: 12px;
     }
   }

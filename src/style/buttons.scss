@@ -27,7 +27,8 @@
 .link {
   @extend .btn-link-base;
   color: $blue;
-  font-family: $roboto-regular;
+  font-family: $roboto;
+  font-weight: 400;
   transition: none;
   box-shadow: none;
   background-color: transparent;
@@ -93,9 +94,9 @@
   // the login/reset password pages.
   &--form-supplementary {
     color: #868686;
-    font-family: $ibm-plex-sans-medium;
+    font-family: $nunito;
+    font-weight: 400;
     font-size: 14px;
-    font-weight: 500;
     text-transform: unset !important;
     padding-left: 4px;
 
@@ -108,7 +109,8 @@
 .btn,
 .ant-btn {
   @extend .btn-link-base;
-  font-family: $roboto-medium;
+  font-family: $roboto;
+  font-weight: 600;
   padding: 6px 12px;
   min-width: 64px;
   height: 32px;
@@ -163,7 +165,7 @@
     padding-bottom: 12px;
     height: auto;
     width: 230px;
-    font-family: $ibm-plex-sans-regular;
+    font-family: $nunito;
     text-transform: unset;
     font-weight: 600;
   }

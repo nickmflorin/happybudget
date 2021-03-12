@@ -89,6 +89,7 @@ $footer-background-color: $white;
         // content-right is the container for any side drawers that may be toggled
         // into and out of visibility on the screen.
         .content-right {
+          max-height: 100%;
           -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
           transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
         }

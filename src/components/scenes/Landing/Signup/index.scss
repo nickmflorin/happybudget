@@ -19,7 +19,7 @@
     margin-bottom: 32px;
   }
 
-  .login-form {
+  .signup-form {
     button[type='submit'] {
       margin-top: 15px;
       width: 100%;
@@ -30,21 +30,15 @@
     .btn--google {
       width: 100% !important;
     }
-    .forgot-password-text {
-      text-align: right;
-      .forgot-link {
-        font-family: $roboto-regular;
-        font-size: 13px;
-      }
-    }
-    .signup-text {
+    .login-text {
       font-size: 13px;
       text-align: center;
       margin-top: 12px;
 
-      .signup-link {
+      .login-link {
         margin-left: 6px;
-        font-family: $roboto-regular;
+        font-family: $roboto;
+        font-weight: 400;
         font-size: 13px;
         line-height: 15px;
       }

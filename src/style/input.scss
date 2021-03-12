@@ -73,7 +73,8 @@ input.ant-input,
 textarea {
   background-color: $gray-light !important;
   color: $text-secondary !important;
-  font-family: $roboto-regular !important;
+  font-family: $roboto !important;
+  font-weight: 400;
   border-radius: 10px !important;
   border: 1px solid transparent !important;
 }

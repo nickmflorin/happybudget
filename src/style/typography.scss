@@ -29,34 +29,6 @@
 }
 
 @font-face {
-  font-family: 'IBMPlexSans-Light';
-  font-style: normal;
-  font-weight: 300;
-  src: url("./fonts/IBMPlexSans/IBMPlexSans-Light.ttf") format('truetype');
-}
-
-@font-face {
-  font-family: 'IBMPlexSans-Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: url("./fonts/IBMPlexSans/IBMPlexSans-Regular.ttf") format('truetype');
-}
-
-@font-face {
-  font-family: 'IBMPlexSans-Medium';
-  font-style: normal;
-  font-weight: 500;
-  src: url("./fonts/IBMPlexSans/IBMPlexSans-Medium.ttf") format('truetype');
-}
-
-@font-face {
-  font-family: 'IBMPlexSans-Bold';
-  font-style: normal;
-  font-weight: 600;
-  src: url("./fonts/IBMPlexSans/IBMPlexSans-Bold.ttf") format('truetype');
-}
-
-@font-face {
   font-family: 'OpenSans-Light';
   font-style: normal;
   font-weight: 300;
@@ -84,66 +56,29 @@
   src: url("./fonts/OpenSans/OpenSans-Bold.ttf") format('truetype');
 }
 
-@font-face {
-  font-family: 'Roboto-Light';
-  font-style: normal;
-  font-weight: 300;
-  src: url("./fonts/Roboto/Roboto-Light.ttf") format('truetype');
-}
-
-@font-face {
-  font-family: 'Roboto-Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: url("./fonts/Roboto/Roboto-Regular.ttf") format('truetype');
-}
-
-@font-face {
-  font-family: 'Roboto-Medium';
-  font-style: normal;
-  font-weight: 500;
-  src: url("./fonts/Roboto/Roboto-Medium.ttf") format('truetype');
-}
-
-@font-face {
-  font-family: 'Roboto-Bold';
-  font-style: normal;
-  font-weight: 600;
-  src: url("./fonts/Roboto/Roboto-Bold.ttf") format('truetype');
-}
+$nunito: 'Nunito', sans-serif;
+$roboto: 'Roboto', sans-serif;
 
 $noto-sans-light: "NotoSansJP-Light";
 $noto-sans-regular: "NotoSansJP-Regular";
 $noto-sans-medium: "NotoSansJP-Medium";
 $noto-sans-bold: "NotoSansJP-Bold";
 
-$ibm-plex-sans-light: "IBMPlexSans-Light";
-$ibm-plex-sans-regular: "IBMPlexSans-Regular";
-$ibm-plex-sans-medium: "IBMPlexSans-Medium";
-$ibm-plex-sans-bold: "IBMPlexSans-Bold";
-
 $open-sans-light: "OpenSans-Light";
 $open-sans-regular: "OpenSans-Regular";
 $open-sans-medium: "OpenSans-Medium";
 $open-sans-bold: "OpenSans-Bold";
 
-$roboto-light: "Roboto-Light";
-$roboto-regular: "Roboto-Regular";
-$roboto-medium: "Roboto-Medium";
-$roboto-bold: "Roboto-Bold";
-
-$helvetica: "Helvetica, sans-serif";
-
 .header-base {
   color: $text-primary;
   margin-top: 0;
   margin-bottom: 0;
-  font-family: $ibm-plex-sans-medium;
+  font-family: $nunito;
+  font-weight: 600;
 }
 
 h1 {
   @extend .header-base;
-
   &.ant-typography {
     font-size: 28px;
   }
@@ -163,7 +98,6 @@ h4 {
   &.ant-typography {
     color: $text-secondary;
     font-size: 16px;
-    font-family: $ibm-plex-sans-medium;
     font-weight: 400;
     line-height: 20px;
   }
@@ -175,84 +109,4 @@ h5 {
 
 h6 {
   @extend .header-base;
-}
-
-.helvetica {
-  font-family: $helvetica !important;
-}
-
-.ibm-plex-sans {
-  font-family: $ibm-plex-sans-regular !important;
-  &--light {
-    font-family: $ibm-plex-sans-light !important;
-  }
-  &--regular {
-    font-family: $ibm-plex-sans-regular !important;
-  }
-  &--medium {
-    font-family: $ibm-plex-sans-medium !important;
-  }
-  &--bold {
-    font-family: $ibm-plex-sans-bold !important;
-  }
-}
-
-.roboto {
-  font-family: $roboto-regular !important;
-  &--light {
-    font-family: $roboto-light !important;
-  }
-  &--regular {
-    font-family: $roboto-regular !important;
-  }
-  &--medium {
-    font-family: $roboto-medium !important;
-  }
-  &--bold {
-    font-family: $roboto-bold !important;
-  }
-}
-
-.noto-sans {
-  font-family: $noto-sans-regular !important;
-  &--light {
-    font-family: $noto-sans-light !important;
-  }
-  &--regular {
-    font-family: $noto-sans-regular !important;
-  }
-  &--medium {
-    font-family: $noto-sans-medium !important;
-  }
-  &--bold {
-    font-family: $noto-sans-bold !important;
-  }
-}
-
-.open-sans {
-  font-family: $open-sans-regular !important;
-  &--light {
-    font-family: $open-sans-light !important;
-  }
-  &--regular {
-    font-family: $open-sans-regular !important;
-  }
-  &--medium {
-    font-family: $open-sans-medium !important;
-  }
-  &--bold {
-    font-family: $open-sans-bold !important;
-  }
-}
-
-.text-align {
-  &--left {
-    text-align: left;
-  }
-  &--right {
-    text-align: right;
-  }
-  &--center {
-    text-align: center;
-  }
 }

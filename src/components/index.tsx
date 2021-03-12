@@ -5,8 +5,8 @@ import "style/index.scss";
 
 import { SuspenseFallback } from "components/display";
 
-const Landing = React.lazy(() => import("./Landing"));
-const Application = React.lazy(() => import("./Application"));
+const Landing = React.lazy(() => import("./scenes/Landing"));
+const Application = React.lazy(() => import("./scenes/Application"));
 
 function App(): JSX.Element {
   return (

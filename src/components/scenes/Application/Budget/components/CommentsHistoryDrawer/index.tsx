@@ -27,14 +27,12 @@ const CommentsHistoryDrawer = (): JSX.Element => {
           { id: "history", label: "History" }
         ]}
       />
-      <Drawer.Content noPadding>
-        <ShowHide show={page === "comments"}>
-          <Comments />
-        </ShowHide>
-        <ShowHide show={page === "history"}>
-          <History />
-        </ShowHide>
-      </Drawer.Content>
+      <ShowHide show={page === "comments"}>
+        <Comments />
+      </ShowHide>
+      <ShowHide show={page === "history"}>
+        <History />
+      </ShowHide>
     </Drawer>
   );
 };

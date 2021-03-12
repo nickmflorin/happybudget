@@ -156,3 +156,36 @@ export const toDisplayTime = (
   }
   return mmt.format(TIME_DISPLAY_FORMAT);
 };
+
+export const toDisplayTimeSince = (
+  value: string | Moment,
+  options: IDateOptions = { tz: undefined, strict: false, defaultTz: "America/Toronto", onError: "" }
+): string => {
+  const mmt = toLocalizedMoment(value, options);
+  const now = moment();
+
+  const duration = moment.duration(now.diff(mmt));
+  let days = duration.days();
+  if (days < 1) {
+    let hours = duration.asHours();
+    if (hours < 1) {
+      const minutes = duration.asMinutes();
+      if (parseInt(String(minutes)) === 1) {
+        return "1 minute ago";
+      }
+      return `${parseInt(String(minutes))} minutes ago`;
+    } else {
+      hours = parseInt(String(hours));
+      if (hours === 1) {
+        return "1 hour ago";
+      }
+      return `${hours} hours ago`;
+    }
+  } else {
+    days = parseInt(String(days));
+    if (days === 1) {
+      return "1 day ago";
+    }
+    return `${days} days ago`;
+  }
+};

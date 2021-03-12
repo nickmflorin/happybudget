@@ -1,0 +1,36 @@
+@import "style/colors";
+@import "style/typography";
+
+.comment {
+  display: flex;
+  flex-direction: column;
+
+  &:not(:last-child) {
+    margin-bottom: 10px;
+  }
+  .comment-header {
+    display: flex;
+    .comment-user-name {
+      line-height: 36px;
+      margin-left: 6px;
+      margin-right: 6px;
+      font-family: $nunito;
+      font-weight: 400;
+      color: #454545;
+      font-size: 15px;
+    }
+    .comment-updated-at {
+      line-height: 36px;
+      font-family: $noto-sans-regular;
+      color: $gray;
+      font-size: 12px;
+    }
+  }
+  .comment-body {
+    color: #616161;
+    font-family: $roboto;
+    font-weight: 400;
+    margin-top: 6px;
+    margin-bottom: 6px;
+  }
+}

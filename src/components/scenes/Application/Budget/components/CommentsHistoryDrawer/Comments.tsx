@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { map } from "lodash";
 
 import { Form, Input, Button, Empty } from "antd";
 
+import { Comment } from "components/control";
 import { RenderWithSpinner, ShowHide } from "components/display";
+import { Drawer } from "components/layout";
 import { requestBudgetCommentsAction, submitBudgetCommentAction } from "../Calculator/actions";
 
 const Comments = (): JSX.Element => {
@@ -17,20 +19,22 @@ const Comments = (): JSX.Element => {
   }, []);
 
   return (
-    <div className={"comments"}>
-      <div className={"comments-section"}>
-        <RenderWithSpinner loading={comments.loading}>
-          <ShowHide show={comments.data.length !== 0}>
-            {map(comments.data, (comment: IComment) => {
-              return <div className={"comment"}>{comment.text}</div>;
-            })}
-          </ShowHide>
-          <ShowHide show={comments.data.length === 0}>
-            <Empty className={"empty"} description={"No Comments!"} />
-          </ShowHide>
-        </RenderWithSpinner>
-      </div>
-      <div className={"form-section"}>
+    <React.Fragment>
+      <Drawer.Content className={"comments-comments"} noPadding>
+        <div className={"comments-section"}>
+          <RenderWithSpinner loading={comments.loading}>
+            <ShowHide show={comments.data.length !== 0}>
+              {map(comments.data, (comment: IComment, index: number) => (
+                <Comment key={index} comment={comment} />
+              ))}
+            </ShowHide>
+            <ShowHide show={comments.data.length === 0}>
+              <Empty className={"empty"} description={"No Comments!"} />
+            </ShowHide>
+          </RenderWithSpinner>
+        </div>
+      </Drawer.Content>
+      <Drawer.Footer className={"form-section"}>
         <Form
           className={"organization-form"}
           form={form}
@@ -50,8 +54,8 @@ const Comments = (): JSX.Element => {
             {"Send"}
           </Button>
         </Form>
-      </div>
-    </div>
+      </Drawer.Footer>
+    </React.Fragment>
   );
 };
 
