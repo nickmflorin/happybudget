@@ -6,10 +6,11 @@
   flex-direction: column;
 
   &:not(:last-child) {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
   }
   .comment-header {
     display: flex;
+
     .comment-user-name {
       line-height: 36px;
       margin-left: 6px;
@@ -21,16 +22,34 @@
     }
     .comment-updated-at {
       line-height: 36px;
-      font-family: $noto-sans-regular;
+      font-family: $roboto;
+      font-weight: 400;
       color: $gray;
       font-size: 12px;
     }
   }
   .comment-body {
-    color: #616161;
+    color: #9e9e9e;
     font-family: $roboto;
     font-weight: 400;
     margin-top: 6px;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
+    padding-left: 6px;
+  }
+  .comment-footer {
+    display: flex;
+    justify-content: space-between;
+
+    .btn--icon-only {
+      padding: 4px;
+      height: 24px;
+      width: auto;
+    }
+    .comment-footer-left {
+      display: flex;
+    }
+    .comment-footer-right {
+      display: flex;
+    }
   }
 }

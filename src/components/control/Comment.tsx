@@ -1,3 +1,8 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faReply } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp, faThumbsDown, faEdit, faTrashAlt } from "@fortawesome/free-regular-svg-icons";
+
+import { IconButton } from "components/control/buttons";
 import { AccountCircleLink } from "components/control/links";
 import { toDisplayTimeSince } from "util/dates";
 
@@ -21,11 +26,53 @@ const CommentBody = (props: { text: string }): JSX.Element => {
   return <div className={"comment-body"}>{props.text}</div>;
 };
 
+const ComentFooter = (): JSX.Element => {
+  return (
+    <div className={"comment-footer"}>
+      <div className={"comment-footer-left"}>
+        <IconButton
+          className={"dark"}
+          size={"small"}
+          icon={<FontAwesomeIcon icon={faReply} />}
+          onClick={() => console.log("Clicked")}
+        />
+        <IconButton
+          className={"dark"}
+          size={"small"}
+          icon={<FontAwesomeIcon icon={faThumbsUp} />}
+          onClick={() => console.log("Clicked")}
+        />
+        <IconButton
+          className={"dark"}
+          size={"small"}
+          icon={<FontAwesomeIcon icon={faThumbsDown} />}
+          onClick={() => console.log("Clicked")}
+        />
+      </div>
+      <div className={"comment-footer-right"}>
+        <IconButton
+          className={"dark"}
+          size={"small"}
+          icon={<FontAwesomeIcon icon={faEdit} />}
+          onClick={() => console.log("Clicked")}
+        />
+        <IconButton
+          className={"dark"}
+          size={"small"}
+          icon={<FontAwesomeIcon icon={faTrashAlt} />}
+          onClick={() => console.log("Clicked")}
+        />
+      </div>
+    </div>
+  );
+};
+
 const Comment = ({ comment }: CommentProps): JSX.Element => {
   return (
     <div className={"comment"}>
       <CommentHeader user={comment.user} updatedAt={comment.updated_at} />
       <CommentBody text={comment.text} />
+      <ComentFooter />
     </div>
   );
 };
