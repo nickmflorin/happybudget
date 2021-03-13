@@ -22,7 +22,8 @@ import {
   requestAccountCommentsAction,
   submitAccountCommentAction,
   deleteAccountCommentAction,
-  editAccountCommentAction
+  editAccountCommentAction,
+  replyToAccountCommentAction
 } from "../actions";
 
 const Account = (): JSX.Element => {
@@ -146,12 +147,16 @@ const Account = (): JSX.Element => {
           comments: comments.data,
           loading: comments.loading,
           submitting: comments.submitting,
-          deleting: comments.deleting,
-          editing: comments.editing,
+          commentLoading: (comment: IComment) =>
+            includes(comments.deleting, comment.id) ||
+            includes(comments.editing, comment.id) ||
+            includes(comments.replying, comment.id),
           onRequest: () => dispatch(requestAccountCommentsAction()),
           onSubmit: (payload: Http.ICommentPayload) => dispatch(submitAccountCommentAction(payload)),
           onDoneEditing: (comment: IComment, value: string) =>
             dispatch(editAccountCommentAction({ id: comment.id, data: { text: value } })),
+          onDoneReplying: (comment: IComment, value: string) =>
+            dispatch(replyToAccountCommentAction({ id: comment.id, data: { text: value } })),
           onLike: (comment: IComment) => console.log(comment),
           onDislike: (comment: IComment) => console.log(comment),
           onDelete: (comment: IComment) => dispatch(deleteAccountCommentAction(comment.id))

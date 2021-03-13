@@ -22,7 +22,8 @@ import {
   requestSubAccountCommentsAction,
   submitSubAccountCommentAction,
   deleteSubAccountCommentAction,
-  editSubAccountCommentAction
+  editSubAccountCommentAction,
+  replyToSubAccountCommentAction
 } from "../actions";
 
 const SubAccount = (): JSX.Element => {
@@ -149,12 +150,16 @@ const SubAccount = (): JSX.Element => {
           comments: comments.data,
           loading: comments.loading,
           submitting: comments.submitting,
-          deleting: comments.deleting,
-          editing: comments.editing,
+          commentLoading: (comment: IComment) =>
+            includes(comments.deleting, comment.id) ||
+            includes(comments.editing, comment.id) ||
+            includes(comments.replying, comment.id),
           onRequest: () => dispatch(requestSubAccountCommentsAction()),
           onSubmit: (payload: Http.ICommentPayload) => dispatch(submitSubAccountCommentAction(payload)),
           onDoneEditing: (comment: IComment, value: string) =>
             dispatch(editSubAccountCommentAction({ id: comment.id, data: { text: value } })),
+          onDoneReplying: (comment: IComment, value: string) =>
+            dispatch(replyToSubAccountCommentAction({ id: comment.id, data: { text: value } })),
           onLike: (comment: IComment) => console.log(comment),
           onDislike: (comment: IComment) => console.log(comment),
           onDelete: (comment: IComment) => dispatch(deleteSubAccountCommentAction(comment.id))

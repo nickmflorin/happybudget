@@ -111,6 +111,7 @@ namespace Redux {
       submitting: boolean;
       deleting: number[];
       editing: number[];
+      replying: number[];
     }
 
     interface ISubAccountsStore {

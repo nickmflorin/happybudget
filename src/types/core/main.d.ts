@@ -10,9 +10,11 @@ type PaymentMethodName = "Check" | "Card" | "Wire";
 type PaymentMethod = 0 | 1 | 2;
 
 type EntityType = "budget" | "account" | "subaccount";
+type BudgetItemType = "subaccount" | "account";
+type CommentParentType = "budget" | "account" | "subaccount" | "comment";
+
 type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
 type Unit = 0 | 1 | 2 | 3 | 4 | 5;
-type BudgetItemType = "subaccount" | "account";
 
 interface Model {
   id: number;
@@ -135,5 +137,6 @@ interface IComment extends Model {
   readonly user: ISimpleUser;
   readonly text: string;
   readonly object_id: number;
-  readonly content_object_type: EntityType;
+  readonly content_object_type: CommentParentType;
+  readonly comments: IComment[];
 }

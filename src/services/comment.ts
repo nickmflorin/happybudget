@@ -47,6 +47,15 @@ export const updateComment = async (
   return client.patch<IComment>(url, payload, options);
 };
 
+export const replyToComment = async (
+  id: number,
+  text: string,
+  options: Http.IRequestOptions = {}
+): Promise<IComment> => {
+  const url = URL.v1("comments", id, "reply");
+  return client.post<IComment>(url, { text }, options);
+};
+
 export const createBudgetComment = async (
   id: number,
   payload: Http.ICommentPayload,

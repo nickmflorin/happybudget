@@ -21,7 +21,8 @@ import {
   createAccountComment,
   createSubAccountComment,
   deleteComment,
-  updateComment
+  updateComment,
+  replyToComment
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
@@ -94,7 +95,13 @@ import {
   updateSubAccountCommentInStateAction,
   editingBudgetCommentAction,
   editingAccountCommentAction,
-  editingSubAccountCommentAction
+  editingSubAccountCommentAction,
+  replyingToBudgetCommentAction,
+  replyingToAccountCommentAction,
+  replyingToSubAccountCommentAction,
+  updateBudgetCommentWithChildInStateAction,
+  updateAccountCommentWithChildInStateAction,
+  updateSubAccountCommentWithChildInStateAction
 } from "./actions";
 
 export function* submitBudgetCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
@@ -139,6 +146,26 @@ export function* editBudgetCommentTask(action: Redux.IAction<Redux.UpdateModelAc
       handleRequestError(e, "There was an error updating the comment.");
     } finally {
       yield put(editingBudgetCommentAction({ id, value: false }));
+    }
+  }
+}
+
+export function* replyToBudgetCommentTask(
+  action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>
+): SagaIterator {
+  if (!isNil(action.payload) && !isNil(action.payload.data.text)) {
+    const {
+      id,
+      data: { text }
+    } = action.payload;
+    yield put(replyingToBudgetCommentAction({ id, value: true }));
+    try {
+      const response: IComment = yield call(replyToComment, id, text);
+      yield put(updateBudgetCommentWithChildInStateAction({ id, data: response }));
+    } catch (e) {
+      handleRequestError(e, "There was an error replying to the comment.");
+    } finally {
+      yield put(replyingToBudgetCommentAction({ id, value: false }));
     }
   }
 }
@@ -206,6 +233,26 @@ export function* editAccountCommentTask(action: Redux.IAction<Redux.UpdateModelA
   }
 }
 
+export function* replyToAccountCommentTask(
+  action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>
+): SagaIterator {
+  if (!isNil(action.payload) && !isNil(action.payload.data.text)) {
+    const {
+      id,
+      data: { text }
+    } = action.payload;
+    yield put(replyingToAccountCommentAction({ id, value: true }));
+    try {
+      const response: IComment = yield call(replyToComment, id, text);
+      yield put(updateAccountCommentWithChildInStateAction({ id, data: response }));
+    } catch (e) {
+      handleRequestError(e, "There was an error replying to the comment.");
+    } finally {
+      yield put(replyingToAccountCommentAction({ id, value: false }));
+    }
+  }
+}
+
 export function* getAccountCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(accountId)) {
@@ -267,6 +314,26 @@ export function* editSubAccountCommentTask(
       handleRequestError(e, "There was an error updating the comment.");
     } finally {
       yield put(editingSubAccountCommentAction({ id, value: false }));
+    }
+  }
+}
+
+export function* replyToSubAccountCommentTask(
+  action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>
+): SagaIterator {
+  if (!isNil(action.payload) && !isNil(action.payload.data.text)) {
+    const {
+      id,
+      data: { text }
+    } = action.payload;
+    yield put(replyingToSubAccountCommentAction({ id, value: true }));
+    try {
+      const response: IComment = yield call(replyToComment, id, text);
+      yield put(updateSubAccountCommentWithChildInStateAction({ id, data: response }));
+    } catch (e) {
+      handleRequestError(e, "There was an error replying to the comment.");
+    } finally {
+      yield put(replyingToSubAccountCommentAction({ id, value: false }));
     }
   }
 }

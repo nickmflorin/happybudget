@@ -11,9 +11,9 @@ import { IconButton } from "components/control/buttons";
 import { AccountCircleLink } from "components/control/links";
 import { ShowHide, RenderWithSpinner } from "components/display";
 import { toDisplayTimeSince } from "util/dates";
-
 import { useLoggedInUser } from "store/hooks";
 
+import Comments from "./Comments";
 import "./Comment.scss";
 
 const CommentHeader = (props: { comment: IComment }): JSX.Element => {
@@ -115,6 +115,7 @@ const ComentFooter = ({ comment, onDelete, onEdit, onLike, onDislike, onReply }:
 interface CommentProps {
   comment: IComment;
   loading?: boolean;
+  setReplying: (value: boolean) => void;
   onDelete?: () => void;
   onDoneEditing?: (value: string) => void;
   onLike?: () => void;
@@ -125,6 +126,7 @@ interface CommentProps {
 const Comment = ({
   comment,
   loading,
+  setReplying,
   onDelete,
   onDoneEditing,
   onLike,
@@ -152,7 +154,7 @@ const Comment = ({
         onEdit={() => setEditing(true)}
         onLike={onLike}
         onDislike={onDislike}
-        onReply={onReply}
+        onReply={() => setReplying(true)}
       />
     </RenderWithSpinner>
   );

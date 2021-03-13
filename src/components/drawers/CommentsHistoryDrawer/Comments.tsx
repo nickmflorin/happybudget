@@ -1,39 +1,37 @@
 import React, { useEffect } from "react";
-import { includes, map } from "lodash";
 
-import { Form, Input, Button, Empty } from "antd";
+import { Form, Input, Button } from "antd";
 
-import { Comment } from "components/control";
-import { RenderWithSpinner, ShowHide } from "components/display";
+import { Comments } from "components/ui";
 import { Drawer } from "components/layout";
 
-export interface CommentsProps {
+export interface CommentsDrawerContentProps {
   loading: boolean;
   comments: IComment[];
-  deleting: number[];
-  editing: number[];
   submitting: boolean;
+  commentLoading: (comment: IComment) => boolean;
   onSubmit: (payload: Http.ICommentPayload) => void;
   onRequest: () => void;
   onDelete: (comment: IComment) => void;
   onLike: (comment: IComment) => void;
   onDislike: (comment: IComment) => void;
   onDoneEditing: (comment: IComment, value: string) => void;
+  onDoneReplying: (comment: IComment, value: string) => void;
 }
 
-const Comments = ({
+const CommentsDrawerContent = ({
   comments,
   loading,
   submitting,
-  deleting,
-  editing,
+  commentLoading,
   onSubmit,
   onRequest,
   onDelete,
   onLike,
   onDislike,
-  onDoneEditing
-}: CommentsProps): JSX.Element => {
+  onDoneEditing,
+  onDoneReplying
+}: CommentsDrawerContentProps): JSX.Element => {
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -44,26 +42,16 @@ const Comments = ({
     <React.Fragment>
       <Drawer.Content className={"comments"} noPadding>
         <div className={"comments-section"}>
-          <RenderWithSpinner loading={loading}>
-            <ShowHide show={comments.length !== 0}>
-              {map(comments, (comment: IComment, index: number) => (
-                <Comment
-                  key={index}
-                  comment={comment}
-                  loading={includes(deleting, comment.id) || includes(editing, comment.id)}
-                  onDelete={() => onDelete(comment)}
-                  onLike={() => onLike(comment)}
-                  onDislike={() => onDislike(comment)}
-                  onDoneEditing={(value: string) => onDoneEditing(comment, value)}
-                />
-              ))}
-            </ShowHide>
-            <ShowHide show={comments.length === 0}>
-              <div className={"no-data-wrapper"}>
-                <Empty className={"empty"} description={"No Comments!"} />
-              </div>
-            </ShowHide>
-          </RenderWithSpinner>
+          <Comments
+            comments={comments}
+            loading={loading}
+            commentLoading={commentLoading}
+            onDelete={onDelete}
+            onLike={onLike}
+            onDislike={onDislike}
+            onDoneEditing={onDoneEditing}
+            onDoneReplying={onDoneReplying}
+          />
         </div>
       </Drawer.Content>
       <Drawer.Footer className={"form-section"}>
@@ -85,4 +73,4 @@ const Comments = ({
   );
 };
 
-export default Comments;
+export default CommentsDrawerContent;

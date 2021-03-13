@@ -23,7 +23,8 @@ import {
   submitBudgetCommentAction,
   requestBudgetCommentsAction,
   deleteBudgetCommentAction,
-  editBudgetCommentAction
+  editBudgetCommentAction,
+  replyToBudgetCommentAction
 } from "../actions";
 
 const Accounts = (): JSX.Element => {
@@ -118,12 +119,16 @@ const Accounts = (): JSX.Element => {
           comments: comments.data,
           loading: comments.loading,
           submitting: comments.submitting,
-          deleting: comments.deleting,
-          editing: comments.editing,
+          commentLoading: (comment: IComment) =>
+            includes(comments.deleting, comment.id) ||
+            includes(comments.editing, comment.id) ||
+            includes(comments.replying, comment.id),
           onRequest: () => dispatch(requestBudgetCommentsAction()),
           onSubmit: (payload: Http.ICommentPayload) => dispatch(submitBudgetCommentAction(payload)),
           onDoneEditing: (comment: IComment, value: string) =>
             dispatch(editBudgetCommentAction({ id: comment.id, data: { text: value } })),
+          onDoneReplying: (comment: IComment, value: string) =>
+            dispatch(replyToBudgetCommentAction({ id: comment.id, data: { text: value } })),
           onLike: (comment: IComment) => console.log(comment),
           onDislike: (comment: IComment) => console.log(comment),
           onDelete: (comment: IComment) => dispatch(deleteBudgetCommentAction(comment.id))
