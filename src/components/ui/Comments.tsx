@@ -6,6 +6,7 @@ import { Empty, Input } from "antd";
 import { RenderWithSpinner, ShowHide } from "components/display";
 
 import Comment from "./Comment";
+import "./Comments.scss";
 
 export interface CommentsProps {
   loading: boolean;
@@ -59,6 +60,7 @@ const Comments = ({
             <ShowHide show={comment.comments.length !== 0}>
               <Comments
                 comments={comment.comments}
+                nested={true}
                 loading={!isNil(commentLoading) && commentLoading(comment)}
                 onDelete={onDelete}
                 onLike={onLike}
