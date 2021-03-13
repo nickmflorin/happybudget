@@ -1,4 +1,3 @@
-import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 import "./Separator.scss";
