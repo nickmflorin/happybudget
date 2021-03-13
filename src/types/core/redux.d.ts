@@ -101,8 +101,15 @@ namespace Redux {
       readonly trash: ITrashBudgetsListStore;
     }
 
+    interface IContactsStore extends IListResponseStore<IContact> {
+      readonly deleting: number[];
+      readonly updating: number[];
+      readonly creating: boolean;
+    }
+
     interface IStore {
       readonly budgets: IBudgetsStore;
+      readonly contacts: IContactsStore;
     }
   }
 

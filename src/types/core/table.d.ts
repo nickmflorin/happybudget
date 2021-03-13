@@ -12,6 +12,11 @@ namespace Table {
     errors: ICellError[];
   }
 
+  interface PageAndSize {
+    page: number;
+    pageSize: number;
+  }
+
   interface IRow<F extends string, E extends IRowMeta> {
     id: number;
     meta: E;

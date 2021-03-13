@@ -97,4 +97,15 @@ namespace Http {
     readonly likes?: number[];
     readonly text: string;
   }
+
+  interface IContactPayload extends IPayload {
+    readonly first_name: string;
+    readonly last_name: string;
+    readonly email: string;
+    readonly role: Role;
+    readonly city: string;
+    readonly country: string;
+    readonly phone_number: string;
+    readonly email: string;
+  }
 }

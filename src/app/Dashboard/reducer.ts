@@ -1,9 +1,37 @@
 import { Reducer, combineReducers } from "redux";
 import { includes, filter } from "lodash";
-import { createListResponseReducer } from "store/reducerFactories";
+import {
+  createListResponseReducer,
+  createSimpleBooleanReducer,
+  createModelListActionReducer
+} from "store/reducerFactories";
 import { ActionType, ActionDomains } from "./actions";
+import { initialContactsState } from "./initialState";
 
 const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>> = combineReducers({
+  contacts: createListResponseReducer<IContact, Redux.Dashboard.IContactsStore>(
+    {
+      Response: ActionType.Contacts.Response,
+      Request: ActionType.Contacts.Request,
+      Loading: ActionType.Contacts.Loading,
+      Select: ActionType.Contacts.Select,
+      SetPage: ActionType.Contacts.SetPage,
+      SetPageSize: ActionType.Contacts.SetPageSize,
+      SetPageAndSize: ActionType.Contacts.SetPageAndSize,
+      AddToState: ActionType.Contacts.AddToState,
+      RemoveFromState: ActionType.Contacts.RemoveFromState,
+      UpdateInState: ActionType.Contacts.UpdateInState
+    },
+    {
+      referenceEntity: "contact",
+      initialState: initialContactsState,
+      keyReducers: {
+        submitting: createSimpleBooleanReducer(ActionType.Contacts.Creating),
+        deleting: createModelListActionReducer(ActionType.Contacts.Deleting),
+        updating: createModelListActionReducer(ActionType.Contacts.Updating)
+      }
+    }
+  ),
   budgets: combineReducers({
     active: createListResponseReducer<IBudget, Redux.Dashboard.IActiveBudgetsListStore, Redux.Dashboard.IAction<any>>(
       {

@@ -24,6 +24,25 @@ export const ActionType = {
     Deleting: "dashboard.budgets.Deleting",
     PermanentlyDeleting: "dashboard.budgets.PermanentlyDeleting",
     Restoring: "dashboard.budgets.Restoring"
+  },
+  Contacts: {
+    Loading: "dashboard.contacts.Loading",
+    Response: "dashboard.contacts.Response",
+    Request: "dashboard.contacts.Request",
+    Select: "dashboard.contacts.Select",
+    SetSearch: "dashboard.contacts.SetSearch",
+    SetPage: "dashboard.contacts.SetPage",
+    SetPageSize: "dashboard.contacts.SetPageSize",
+    SetPageAndSize: "dashboard.contacts.SetPageAndSize",
+    UpdateInState: "dashboard.contacts.UpdateInState",
+    RemoveFromState: "dashboard.contacts.RemoveFromState",
+    AddToState: "dashboard.contacts.AddToState",
+    Delete: "dashboard.contacts.Delete",
+    Deleting: "dashboard.contacts.Deleting",
+    Update: "dashboard.contacts.Update",
+    Updating: "dashboard.contacts.Updating",
+    Create: "dashboard.contacts.Create",
+    Creating: "dashboard.contacts.Creating"
   }
 };
 
@@ -63,3 +82,23 @@ export const permanentlyDeletingBudgetAction = simpleAction<{ id: number; value:
 
 export const restoreBudgetAction = simpleAction<number>(ActionType.Budgets.Restore);
 export const restoringBudgetAction = simpleAction<{ id: number; value: boolean }>(ActionType.Budgets.Restoring);
+
+export const requestContactsAction = simpleAction<null>(ActionType.Contacts.Request);
+export const loadingContactsAction = simpleAction<boolean>(ActionType.Contacts.Loading);
+export const responseContactsAction = simpleAction<Http.IListResponse<IContact>>(ActionType.Contacts.Response);
+export const selectContactsAction = simpleAction<number[]>(ActionType.Contacts.Select);
+export const setContactsSearchAction = simpleAction<string>(ActionType.Contacts.SetSearch);
+export const setContactsPageSizeAction = simpleAction<number>(ActionType.Contacts.SetPageSize);
+export const setContactsPageAction = simpleAction<number>(ActionType.Contacts.SetPage);
+export const setContactsPageAndSizeAction = simpleAction<PageAndSize>(ActionType.Contacts.SetPageAndSize);
+export const deleteContactAction = simpleAction<number>(ActionType.Contacts.Delete);
+export const deletingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Deleting);
+export const updateContactAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(ActionType.Contacts.Update);
+export const updatingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Updating);
+export const createContactAction = simpleAction<Http.IContactPayload>(ActionType.Contacts.Create);
+export const creatingContactAction = simpleAction<boolean>(ActionType.Contacts.Creating);
+export const removeContactFromStateAction = simpleAction<number>(ActionType.Contacts.RemoveFromState);
+export const updateContactInStateAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(
+  ActionType.Contacts.UpdateInState
+);
+export const addContactToStateAction = simpleAction<IContact>(ActionType.Contacts.AddToState);

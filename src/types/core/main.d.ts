@@ -16,6 +16,20 @@ type CommentParentType = "budget" | "account" | "subaccount" | "comment";
 type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
 type Unit = 0 | 1 | 2 | 3 | 4 | 5;
 
+type RoleName =
+  | "Producer"
+  | "Executive Producer"
+  | "Production Manager"
+  | "Production Designer"
+  | "Actor"
+  | "Director"
+  | "Medic"
+  | "Wardrobe"
+  | "Writer"
+  | "Client"
+  | "Other";
+type Role = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+
 interface Model {
   id: number;
 }
@@ -28,8 +42,8 @@ interface TrackedModel extends Model {
 }
 
 interface ISimpleUser extends Model {
-  readonly first_name?: string;
-  readonly last_name?: string;
+  readonly first_name: string;
+  readonly last_name: string;
   readonly full_name: string;
   readonly email: string;
 }
@@ -139,4 +153,19 @@ interface IComment extends Model {
   readonly object_id: number;
   readonly content_object_type: CommentParentType;
   readonly comments: IComment[];
+}
+
+interface IContact extends Model {
+  readonly first_name: string;
+  readonly last_name: string;
+  readonly full_name: string;
+  readonly email: string;
+  readonly created_at: string;
+  readonly updated_at: string;
+  readonly role: Role;
+  readonly role_name: RoleName;
+  readonly city: string;
+  readonly country: string;
+  readonly phone_number: string;
+  readonly email: string;
 }

@@ -1,7 +1,44 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, takeLatest, debounce, takeEvery } from "redux-saga/effects";
 import { ActionType } from "./actions";
-import { getBudgetsTask, deleteBudgetTask, restoreBudgetTask, permanentlyDeleteBudgetTask } from "./tasks";
+import {
+  getBudgetsTask,
+  deleteBudgetTask,
+  restoreBudgetTask,
+  permanentlyDeleteBudgetTask,
+  getContactsTask,
+  deleteContactTask,
+  updateContactTask,
+  createContactTask
+} from "./tasks";
+
+function* watchForContactsRefreshSaga(): SagaIterator {
+  yield takeLatest(
+    [
+      ActionType.Contacts.Request,
+      ActionType.Contacts.SetPage,
+      ActionType.Contacts.SetPageSize,
+      ActionType.Contacts.SetPageAndSize
+    ],
+    getContactsTask
+  );
+}
+
+function* watchForSearchContactsSaga(): SagaIterator {
+  yield debounce(250, ActionType.Contacts.SetSearch, getContactsTask);
+}
+
+function* watchForDeleteContactSaga(): SagaIterator {
+  yield takeEvery(ActionType.Contacts.Delete, deleteContactTask);
+}
+
+function* watchForUpdateContactSaga(): SagaIterator {
+  yield takeEvery(ActionType.Contacts.Update, updateContactTask);
+}
+
+function* watchForCreateContactSaga(): SagaIterator {
+  yield takeEvery(ActionType.Contacts.Create, createContactTask);
+}
 
 function* watchForBudgetsRefreshSaga(): SagaIterator {
   yield takeLatest(
@@ -37,4 +74,9 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForDeleteBudgetSaga);
   yield spawn(watchForPermanentlyDeleteBudgetSaga);
   yield spawn(watchForRestoreBudgetSaga);
+  yield spawn(watchForContactsRefreshSaga);
+  yield spawn(watchForSearchContactsSaga);
+  yield spawn(watchForDeleteContactSaga);
+  yield spawn(watchForUpdateContactSaga);
+  yield spawn(watchForCreateContactSaga);
 }

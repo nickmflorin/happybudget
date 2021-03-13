@@ -3,8 +3,193 @@
 @import '~ag-grid-community/dist/styles/ag-grid.css';
 @import '~ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-$cell-border-color: #f7f7f7;
-$cell-border: 1px solid $cell-border-color;
+$table-border-color: #f7f7f7;
+$table-border: 1px solid $table-border-color;
+
+.select-controller {
+  display: flex;
+  margin-bottom: 8px;
+  min-height: 28px;
+  height: 28px;
+
+  &.table-select-controller {
+    padding-left: 14px;
+  }
+
+  &.grid-select-controller {
+    margin-bottom: 14px;
+
+    .ant-checkbox-wrapper {
+      margin-right: 10px;
+      padding-top: 6px;
+      height: 28px;
+      padding-bottom: 6px;
+      .ant-checkbox {
+        display: block;
+        top: 0 !important;
+      }
+    }
+  }
+
+  .select-controller-icon-button {
+    bottom: 1px;
+
+    :not(:last-child) {
+      margin-right: 12px;
+    }
+  }
+  .select-controller-selected-text {
+    line-height: 28px;
+    margin-left: 12px;
+    font-size: 13px;
+  }
+}
+
+.ag-menu-list {
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+.ant-empty-image {
+  height: 50px;
+  margin-bottom: 8px;
+}
+
+.ant-table {
+  font-size: 13px;
+
+  .ant-table-cell {
+    padding: 8px;
+  }
+
+  thead.ant-table-thead {
+    tr {
+      th.ant-table-cell {
+        border-top: $table-border !important;
+        &:first-child {
+          border-left: $table-border !important;
+        }
+        &:last-child {
+          border-right: $table-border !important;
+        }
+      }
+    }
+  }
+
+  tr.ant-table-expanded-row {
+    td.ant-table-cell {
+      background: $white !important;
+      .ant-table {
+        margin: -8px -8px -8px -8px !important;
+        thead.ant-table-thead {
+          th.ant-table-cell {
+            border-top: none !important;
+          }
+        }
+      }
+    }
+    .ant-table tbody.ant-table-tbody {
+      .ant-table-placeholder {
+        td.ant-table-cell {
+          border-left: none !important;
+          border-right: none !important;
+          border-bottom: none !important;
+        }
+      }
+    }
+  }
+
+  tr.ant-table-expanded-row-level-1 {
+    thead.ant-table-thead {
+      th.ant-table-cell:not(:only-child) {
+        &:first-child {
+          padding-left: 100px;
+        }
+      }
+    }
+    tbody.ant-table-tbody {
+      td.ant-table-cell:not(:only-child) {
+        &:first-child {
+          padding-left: 100px;
+        }
+      }
+    }
+
+    tr.ant-table-expanded-row-level-1 {
+      thead.ant-table-thead {
+        th.ant-table-cell {
+          &:first-child:not(:only-child) {
+            padding-left: 140px;
+          }
+        }
+      }
+      tbody.ant-table-tbody {
+        td.ant-table-cell {
+          &:first-child:not(:only-child) {
+            padding-left: 140px;
+          }
+        }
+      }
+    }
+  }
+
+  td {
+    font-size: 12px;
+
+    .icon-cell-container {
+      line-height: 14px;
+      padding-top: 3px;
+      padding-bottom: 3px;
+      display: flex;
+
+      .icon-container {
+        margin-right: 8px;
+      }
+      .link,
+      .text-container {
+        line-height: 22px;
+      }
+      .link {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 300px;
+      }
+    }
+    .ant-badge {
+      .ant-badge-status-text {
+        font-size: 12px;
+      }
+    }
+    .actions-table-cell {
+      float: right;
+      display: flex;
+    }
+  }
+
+  td,
+  th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 300px;
+  }
+
+  tbody.ant-table-tbody {
+    .ant-table-placeholder {
+      td.ant-table-cell {
+        border-left: $table-border !important;
+        border-right: $table-border !important;
+        border-bottom: $table-border !important;
+      }
+    }
+  }
+
+  .ant-table-pagination.ant-pagination {
+    margin-top: 15px !important;
+    margin-bottom: 0px !important;
+  }
+}
 
 .ag-theme-alpine {
   font-family: $roboto;
@@ -51,8 +236,8 @@ $cell-border: 1px solid $cell-border-color;
     justify-content: center;
 
     &:not(.borderless) {
-      border-top: $cell-border;
-      border-left: $cell-border;
+      border-top: $table-border;
+      border-left: $table-border;
     }
     // This will vertically center the text nicely while also not adjusting the
     // vertical location of the text when the cell is selected.
@@ -75,6 +260,7 @@ $cell-border: 1px solid $cell-border-color;
     }
     &.error-cell {
       border: 2px solid $red !important;
+
       .error-container {
         position: absolute;
         top: 0px;
