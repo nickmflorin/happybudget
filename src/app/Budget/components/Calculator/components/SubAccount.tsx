@@ -20,7 +20,9 @@ import {
   updateSubAccountSubAccountAction,
   selectAllSubAccountSubAccountsTableRowsAction,
   requestSubAccountCommentsAction,
-  submitSubAccountCommentAction
+  submitSubAccountCommentAction,
+  deleteSubAccountCommentAction,
+  editSubAccountCommentAction
 } from "../actions";
 
 const SubAccount = (): JSX.Element => {
@@ -147,12 +149,15 @@ const SubAccount = (): JSX.Element => {
           comments: comments.data,
           loading: comments.loading,
           submitting: comments.submitting,
+          deleting: comments.deleting,
+          editing: comments.editing,
           onRequest: () => dispatch(requestSubAccountCommentsAction()),
           onSubmit: (payload: Http.ICommentPayload) => dispatch(submitSubAccountCommentAction(payload)),
-          onEdit: (comment: IComment) => console.log(comment),
+          onDoneEditing: (comment: IComment, value: string) =>
+            dispatch(editSubAccountCommentAction({ id: comment.id, data: { text: value } })),
           onLike: (comment: IComment) => console.log(comment),
           onDislike: (comment: IComment) => console.log(comment),
-          onDelete: (comment: IComment) => console.log(comment)
+          onDelete: (comment: IComment) => dispatch(deleteSubAccountCommentAction(comment.id))
         }}
       />
     </RenderIfValidId>

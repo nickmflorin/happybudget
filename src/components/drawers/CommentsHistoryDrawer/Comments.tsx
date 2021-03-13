@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { map } from "lodash";
+import { includes, map } from "lodash";
 
 import { Form, Input, Button, Empty } from "antd";
 
@@ -10,25 +10,29 @@ import { Drawer } from "components/layout";
 export interface CommentsProps {
   loading: boolean;
   comments: IComment[];
+  deleting: number[];
+  editing: number[];
   submitting: boolean;
   onSubmit: (payload: Http.ICommentPayload) => void;
   onRequest: () => void;
   onDelete: (comment: IComment) => void;
   onLike: (comment: IComment) => void;
   onDislike: (comment: IComment) => void;
-  onEdit: (comment: IComment) => void;
+  onDoneEditing: (comment: IComment, value: string) => void;
 }
 
 const Comments = ({
   comments,
   loading,
   submitting,
+  deleting,
+  editing,
   onSubmit,
   onRequest,
   onDelete,
   onLike,
   onDislike,
-  onEdit
+  onDoneEditing
 }: CommentsProps): JSX.Element => {
   const [form] = Form.useForm();
 
@@ -46,10 +50,11 @@ const Comments = ({
                 <Comment
                   key={index}
                   comment={comment}
+                  loading={includes(deleting, comment.id) || includes(editing, comment.id)}
                   onDelete={() => onDelete(comment)}
                   onLike={() => onLike(comment)}
                   onDislike={() => onDislike(comment)}
-                  onEdit={() => onEdit(comment)}
+                  onDoneEditing={(value: string) => onDoneEditing(comment, value)}
                 />
               ))}
             </ShowHide>

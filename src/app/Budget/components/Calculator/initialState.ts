@@ -12,21 +12,21 @@ export const initialAccountsState: Redux.Calculator.IAccountsStore = {
   deleting: [],
   updating: [],
   creating: false,
-  comments: { ...initialListResponseState, submitting: false }
+  comments: { ...initialListResponseState, submitting: false, deleting: [], editing: [] }
 };
 
 export const initialAccountState: Redux.Calculator.IAccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialSubAccountsState,
-  comments: { ...initialListResponseState, submitting: false }
+  comments: { ...initialListResponseState, submitting: false, deleting: [], editing: [] }
 };
 
 export const initialSubAccountState: Redux.Calculator.ISubAccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialSubAccountsState,
-  comments: { ...initialListResponseState, submitting: false }
+  comments: { ...initialListResponseState, submitting: false, deleting: [], editing: [] }
 };
 
 const initialState: Redux.Calculator.IStore = {

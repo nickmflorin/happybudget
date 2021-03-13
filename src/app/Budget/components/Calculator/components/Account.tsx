@@ -20,7 +20,9 @@ import {
   updateAccountSubAccountAction,
   selectAllAccountSubAccountsTableRowsAction,
   requestAccountCommentsAction,
-  submitAccountCommentAction
+  submitAccountCommentAction,
+  deleteAccountCommentAction,
+  editAccountCommentAction
 } from "../actions";
 
 const Account = (): JSX.Element => {
@@ -144,12 +146,15 @@ const Account = (): JSX.Element => {
           comments: comments.data,
           loading: comments.loading,
           submitting: comments.submitting,
+          deleting: comments.deleting,
+          editing: comments.editing,
           onRequest: () => dispatch(requestAccountCommentsAction()),
           onSubmit: (payload: Http.ICommentPayload) => dispatch(submitAccountCommentAction(payload)),
-          onEdit: (comment: IComment) => console.log(comment),
+          onDoneEditing: (comment: IComment, value: string) =>
+            dispatch(editAccountCommentAction({ id: comment.id, data: { text: value } })),
           onLike: (comment: IComment) => console.log(comment),
           onDislike: (comment: IComment) => console.log(comment),
-          onDelete: (comment: IComment) => console.log(comment)
+          onDelete: (comment: IComment) => dispatch(deleteAccountCommentAction(comment.id))
         }}
       />
     </RenderIfValidId>

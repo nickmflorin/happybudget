@@ -47,7 +47,9 @@ export const setBudgetsSearchAction = simpleDomainAction<string>(ActionType.Budg
 export const setBudgetsPageAction = simpleDomainAction<number>(ActionType.Budgets.SetPage);
 export const setBudgetsPageSizeAction = simpleDomainAction<number>(ActionType.Budgets.SetPageSize);
 export const setBudgetsPageAndSizeAction = simpleDomainAction<PageAndSize>(ActionType.Budgets.SetPageAndSize);
-export const updateBudgetInStateAction = simpleDomainAction<IBudget>(ActionType.Budgets.UpdateInState);
+export const updateBudgetInStateAction = simpleDomainAction<Redux.UpdateModelActionPayload<IBudget>>(
+  ActionType.Budgets.UpdateInState
+);
 export const addBudgetToStateAction = simpleDomainAction<IBudget>(ActionType.Budgets.AddToState);
 export const removeBudgetFromStateAction = simpleDomainAction<number>(ActionType.Budgets.RemoveFromState);
 

@@ -19,10 +19,19 @@ import {
   getSubAccountComments,
   createBudgetComment,
   createAccountComment,
-  createSubAccountComment
+  createSubAccountComment,
+  deleteComment,
+  updateComment
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
+import {
+  payloadFromResponse,
+  postPayloadFromRow,
+  rowHasRequiredFields,
+  requestWarrantsParentRefresh,
+  payloadBeforeResponse
+} from "../../util";
 import {
   loadingAccountAction,
   responseAccountAction,
@@ -73,15 +82,20 @@ import {
   submittingAccountCommentAction,
   addAccountCommentToStateAction,
   submittingSubAccountCommentAction,
-  addSubAccountCommentToStateAction
+  addSubAccountCommentToStateAction,
+  deletingBudgetCommentAction,
+  deletingAccountCommentAction,
+  deletingSubAccountCommentAction,
+  removeBudgetCommentFromStateAction,
+  removeAccountCommentFromStateAction,
+  removeSubAccountCommentFromStateAction,
+  updateBudgetCommentInStateAction,
+  updateAccountCommentInStateAction,
+  updateSubAccountCommentInStateAction,
+  editingBudgetCommentAction,
+  editingAccountCommentAction,
+  editingSubAccountCommentAction
 } from "./actions";
-import {
-  payloadFromResponse,
-  postPayloadFromRow,
-  rowHasRequiredFields,
-  requestWarrantsParentRefresh,
-  payloadBeforeResponse
-} from "../../util";
 
 export function* submitBudgetCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
@@ -98,20 +112,36 @@ export function* submitBudgetCommentTask(action: Redux.IAction<Http.ICommentPayl
   }
 }
 
-// export function* deleteBudgetCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
-//   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
-//   if (!isNil(budgetId) && !isNil(action.payload)) {
-//     yield put(submittingBudgetCommentAction(true));
-//     try {
-//       const response: IComment = yield call(createBudgetComment, budgetId, action.payload);
-//       yield put(addBudgetCommentToStateAction(response));
-//     } catch (e) {
-//       handleRequestError(e, "There was an error submitting the comment.");
-//     } finally {
-//       yield put(submittingBudgetCommentAction(false));
-//     }
-//   }
-// }
+export function* deleteBudgetCommentTask(action: Redux.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(deletingBudgetCommentAction({ id: action.payload, value: true }));
+    try {
+      yield call(deleteComment, action.payload);
+      yield put(removeBudgetCommentFromStateAction(action.payload));
+    } catch (e) {
+      handleRequestError(e, "There was an error deleting the comment.");
+    } finally {
+      yield put(deletingBudgetCommentAction({ id: action.payload, value: false }));
+    }
+  }
+}
+
+export function* editBudgetCommentTask(action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>): SagaIterator {
+  if (!isNil(action.payload)) {
+    const { id, data } = action.payload;
+    yield put(editingBudgetCommentAction({ id, value: true }));
+    try {
+      // Here we are assuming that Partial<IComment> can be mapped to Partial<Http.ICommentPayload>,
+      // which is the case right now but may not be in the future.
+      const response: IComment = yield call(updateComment, id, data as Partial<Http.ICommentPayload>);
+      yield put(updateBudgetCommentInStateAction({ id, data: response }));
+    } catch (e) {
+      handleRequestError(e, "There was an error updating the comment.");
+    } finally {
+      yield put(editingBudgetCommentAction({ id, value: false }));
+    }
+  }
+}
 
 export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
@@ -145,6 +175,37 @@ export function* submitAccountCommentTask(action: Redux.IAction<Http.ICommentPay
   }
 }
 
+export function* deleteAccountCommentTask(action: Redux.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(deletingAccountCommentAction({ id: action.payload, value: true }));
+    try {
+      yield call(deleteComment, action.payload);
+      yield put(removeAccountCommentFromStateAction(action.payload));
+    } catch (e) {
+      handleRequestError(e, "There was an error deleting the comment.");
+    } finally {
+      yield put(deletingAccountCommentAction({ id: action.payload, value: false }));
+    }
+  }
+}
+
+export function* editAccountCommentTask(action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>): SagaIterator {
+  if (!isNil(action.payload)) {
+    const { id, data } = action.payload;
+    yield put(editingAccountCommentAction({ id, value: true }));
+    try {
+      // Here we are assuming that Partial<IComment> can be mapped to Partial<Http.ICommentPayload>,
+      // which is the case right now but may not be in the future.
+      const response: IComment = yield call(updateComment, id, data as Partial<Http.ICommentPayload>);
+      yield put(updateAccountCommentInStateAction({ id, data: response }));
+    } catch (e) {
+      handleRequestError(e, "There was an error updating the comment.");
+    } finally {
+      yield put(editingAccountCommentAction({ id, value: false }));
+    }
+  }
+}
+
 export function* getAccountCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(accountId)) {
@@ -173,6 +234,39 @@ export function* submitSubAccountCommentTask(action: Redux.IAction<Http.IComment
       handleRequestError(e, "There was an error submitting the comment.");
     } finally {
       yield put(submittingSubAccountCommentAction(false));
+    }
+  }
+}
+
+export function* deleteSubAccountCommentTask(action: Redux.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(deletingSubAccountCommentAction({ id: action.payload, value: true }));
+    try {
+      yield call(deleteComment, action.payload);
+      yield put(removeSubAccountCommentFromStateAction(action.payload));
+    } catch (e) {
+      handleRequestError(e, "There was an error deleting the comment.");
+    } finally {
+      yield put(deletingSubAccountCommentAction({ id: action.payload, value: false }));
+    }
+  }
+}
+
+export function* editSubAccountCommentTask(
+  action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>
+): SagaIterator {
+  if (!isNil(action.payload)) {
+    const { id, data } = action.payload;
+    yield put(editingSubAccountCommentAction({ id, value: true }));
+    try {
+      // Here we are assuming that Partial<IComment> can be mapped to Partial<Http.ICommentPayload>,
+      // which is the case right now but may not be in the future.
+      const response: IComment = yield call(updateComment, id, data as Partial<Http.ICommentPayload>);
+      yield put(updateSubAccountCommentInStateAction({ id, data: response }));
+    } catch (e) {
+      handleRequestError(e, "There was an error updating the comment.");
+    } finally {
+      yield put(editingSubAccountCommentAction({ id, value: false }));
     }
   }
 }

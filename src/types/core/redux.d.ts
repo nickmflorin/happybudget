@@ -44,6 +44,10 @@ namespace Redux {
   type ListStore<T> = T[];
 
   type ModelListActionPayload = { id: number; value: boolean };
+  interface UpdateModelActionPayload<M> {
+    id: number;
+    data: Partial<M>;
+  }
 
   interface IDetailResponseStore<T extends Model> {
     readonly data: T | undefined;
@@ -105,6 +109,8 @@ namespace Redux {
   namespace Calculator {
     interface ICommentsStore extends IListResponseStore<IComment> {
       submitting: boolean;
+      deleting: number[];
+      editing: number[];
     }
 
     interface ISubAccountsStore {

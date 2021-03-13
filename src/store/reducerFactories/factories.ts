@@ -554,8 +554,8 @@ export const createListResponseReducer = <
           return partial;
         }
       },
-      UpdateInState: (payload: M, st: S) => {
-        const existing = find(st.data, { id: payload.id });
+      UpdateInState: (payload: Redux.UpdateModelActionPayload<M>, st: S) => {
+        const existing: M | undefined = find(st.data, { id: payload.id } as any);
         // TODO: If the entity does not exist in the state when updating, should
         // we auto add it?
         if (isNil(existing)) {
@@ -566,7 +566,8 @@ export const createListResponseReducer = <
           );
           return {};
         }
-        return { data: replaceInArray<M>(st.data, { id: payload.id }, payload) };
+        const { id: _, ...withoutId } = payload.data;
+        return { data: replaceInArray<M>(st.data, { id: payload.id }, { ...existing, ...withoutId }) };
       },
       Select: (payload: number[], st: S) => {
         const selected: number[] = [];

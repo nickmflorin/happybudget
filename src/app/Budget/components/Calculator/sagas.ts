@@ -20,7 +20,13 @@ import {
   getSubAccountCommentsTask,
   submitBudgetCommentTask,
   submitAccountCommentTask,
-  submitSubAccountCommentTask
+  submitSubAccountCommentTask,
+  deleteBudgetCommentTask,
+  deleteAccountCommentTask,
+  deleteSubAccountCommentTask,
+  editBudgetCommentTask,
+  editAccountCommentTask,
+  editSubAccountCommentTask
 } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
@@ -146,6 +152,14 @@ function* watchForSubmitBudgetCommentSaga(): SagaIterator {
   }
 }
 
+function* watchForRemoveBudgetCommentSaga(): SagaIterator {
+  yield takeEvery(ActionType.Comments.Delete, deleteBudgetCommentTask);
+}
+
+function* watchForEditBudgetCommentSaga(): SagaIterator {
+  yield takeEvery(ActionType.Comments.Edit, editBudgetCommentTask);
+}
+
 function* watchForTriggerAccountCommentsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
@@ -166,6 +180,14 @@ function* watchForSubmitAccountCommentSaga(): SagaIterator {
     }
     lastTasks = yield call(submitAccountCommentTask, action);
   }
+}
+
+function* watchForRemoveAccountCommentSaga(): SagaIterator {
+  yield takeEvery(ActionType.Account.Comments.Delete, deleteAccountCommentTask);
+}
+
+function* watchForEditAccountCommentSaga(): SagaIterator {
+  yield takeEvery(ActionType.Account.Comments.Edit, editAccountCommentTask);
 }
 
 function* watchForTriggerSubAccountCommentsSaga(): SagaIterator {
@@ -190,6 +212,14 @@ function* watchForSubmitSubAccountCommentSaga(): SagaIterator {
   }
 }
 
+function* watchForRemoveSubAccountCommentSaga(): SagaIterator {
+  yield takeEvery(ActionType.SubAccount.Comments.Delete, deleteSubAccountCommentTask);
+}
+
+function* watchForEditSubAccountCommentSaga(): SagaIterator {
+  yield takeEvery(ActionType.SubAccount.Comments.Edit, editSubAccountCommentTask);
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForAccountIdChangedSaga);
   yield spawn(watchForSubAccountIdChangedSaga);
@@ -210,4 +240,10 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForSubmitBudgetCommentSaga);
   yield spawn(watchForSubmitAccountCommentSaga);
   yield spawn(watchForSubmitSubAccountCommentSaga);
+  yield spawn(watchForRemoveBudgetCommentSaga);
+  yield spawn(watchForRemoveAccountCommentSaga);
+  yield spawn(watchForRemoveSubAccountCommentSaga);
+  yield spawn(watchForEditBudgetCommentSaga);
+  yield spawn(watchForEditAccountCommentSaga);
+  yield spawn(watchForEditSubAccountCommentSaga);
 }

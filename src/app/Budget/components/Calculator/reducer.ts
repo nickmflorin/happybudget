@@ -25,11 +25,17 @@ const rootReducer = combineReducers({
         Response: ActionType.Comments.Response,
         Request: ActionType.Comments.Request,
         Loading: ActionType.Comments.Loading,
-        AddToState: ActionType.Comments.AddToState
+        AddToState: ActionType.Comments.AddToState,
+        RemoveFromState: ActionType.Comments.RemoveFromState,
+        UpdateInState: ActionType.Comments.UpdateInState
       },
       {
         referenceEntity: "comment",
-        keyReducers: { submitting: createSimpleBooleanReducer(ActionType.Comments.Submitting) }
+        keyReducers: {
+          submitting: createSimpleBooleanReducer(ActionType.Comments.Submitting),
+          deleting: createModelListActionReducer(ActionType.Comments.Deleting),
+          editing: createModelListActionReducer(ActionType.Comments.Editing)
+        }
       }
     ),
     table: createTableReducer<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>(
@@ -64,11 +70,17 @@ const rootReducer = combineReducers({
         Response: ActionType.Account.Comments.Response,
         Request: ActionType.Account.Comments.Request,
         Loading: ActionType.Account.Comments.Loading,
-        AddToState: ActionType.Account.Comments.AddToState
+        AddToState: ActionType.Account.Comments.AddToState,
+        RemoveFromState: ActionType.Account.Comments.RemoveFromState,
+        UpdateInState: ActionType.Account.Comments.UpdateInState
       },
       {
         referenceEntity: "comment",
-        keyReducers: { submitting: createSimpleBooleanReducer(ActionType.Account.Comments.Submitting) }
+        keyReducers: {
+          submitting: createSimpleBooleanReducer(ActionType.Account.Comments.Submitting),
+          deleting: createModelListActionReducer(ActionType.Account.Comments.Deleting),
+          editing: createModelListActionReducer(ActionType.Account.Comments.Editing)
+        }
       }
     ),
     subaccounts: combineReducers({
@@ -112,11 +124,17 @@ const rootReducer = combineReducers({
         Response: ActionType.SubAccount.Comments.Response,
         Request: ActionType.SubAccount.Comments.Request,
         Loading: ActionType.SubAccount.Comments.Loading,
-        AddToState: ActionType.SubAccount.Comments.AddToState
+        AddToState: ActionType.SubAccount.Comments.AddToState,
+        RemoveFromState: ActionType.SubAccount.Comments.RemoveFromState,
+        UpdateInState: ActionType.SubAccount.Comments.UpdateInState
       },
       {
         referenceEntity: "comment",
-        keyReducers: { submitting: createSimpleBooleanReducer(ActionType.SubAccount.Comments.Submitting) }
+        keyReducers: {
+          submitting: createSimpleBooleanReducer(ActionType.SubAccount.Comments.Submitting),
+          deleting: createModelListActionReducer(ActionType.SubAccount.Comments.Deleting),
+          editing: createModelListActionReducer(ActionType.SubAccount.Comments.Editing)
+        }
       }
     ),
     subaccounts: combineReducers({

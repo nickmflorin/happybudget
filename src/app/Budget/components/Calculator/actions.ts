@@ -1,4 +1,4 @@
-import { simpleAction } from "store/actions";
+import { createAction, simpleAction } from "store/actions";
 
 export const ActionType = {
   Accounts: {
@@ -12,9 +12,15 @@ export const ActionType = {
     Loading: "calculator.comments.Loading",
     Response: "calculator.comments.Response",
     Request: "calculator.comments.Request",
+    Delete: "calculator.comments.Delete",
+    Edit: "calculator.comments.Edit",
     Submit: "calculator.comments.Submit",
     Submitting: "calculator.comments.Submitting",
-    AddToState: "calculator.comments.AddToState"
+    Deleting: "calculator.comments.Deleting",
+    Editing: "calculator.comments.Editing",
+    AddToState: "calculator.comments.AddToState",
+    RemoveFromState: "calculator.comments.RemoveFromState",
+    UpdateInState: "calculator.comments.UpdateInState"
   },
   AccountsTable: {
     AddPlaceholders: "calculator.accountstable.AddPlaceholders",
@@ -41,8 +47,14 @@ export const ActionType = {
       Response: "calculator.account.comments.Response",
       Request: "calculator.account.comments.Request",
       Submitting: "calculator.account.comments.Submitting",
+      Deleting: "calculator.account.comments.Deleting",
+      Editing: "calculator.account.comments.Editing",
+      Delete: "calculator.account.comments.Delete",
+      Edit: "calculator.account.comments.Edit",
       Submit: "calculator.account.comments.Submit",
-      AddToState: "calculator.account.comments.AddToState"
+      AddToState: "calculator.account.comments.AddToState",
+      RemoveFromState: "calculator.account.comments.RemoveFromState",
+      UpdateInState: "calculator.account.comments.UpdateInState"
     },
     SubAccountsTable: {
       AddPlaceholders: "calculator.account.subaccountstable.AddPlaceholders",
@@ -75,9 +87,15 @@ export const ActionType = {
       Loading: "calculator.subaccount.comments.Loading",
       Response: "calculator.subaccount.comments.Response",
       Request: "calculator.subaccount.comments.Request",
+      Delete: "calculator.subaccount.comments.Delete",
+      Edit: "calculator.subaccount.comments.Edit",
       Submitting: "calculator.subaccount.comments.Submitting",
+      Deleting: "calculator.subaccount.comments.Deleting",
+      Editing: "calculator.subaccount.comments.Editing",
       Submit: "calculator.subaccount.comments.Submit",
-      AddToState: "calculator.subaccount.comments.AddToState"
+      AddToState: "calculator.subaccount.comments.AddToState",
+      RemoveFromState: "calculator.subaccount.comments.RemoveFromState",
+      UpdateInState: "calculator.subaccount.comments.UpdateInState"
     },
     SubAccountsTable: {
       AddPlaceholders: "calculator.subaccount.subaccountstable.AddPlaceholders",
@@ -115,15 +133,26 @@ export const loadingSubAccountAction = simpleAction<boolean>(ActionType.SubAccou
 export const responseSubAccountAction = simpleAction<ISubAccount>(ActionType.SubAccount.Response);
 
 /*
-  Actions Pertaining to the Accounts
+  Actions Pertaining to Budget Comments
 */
 export const requestBudgetCommentsAction = simpleAction<null>(ActionType.Comments.Request);
 export const responseBudgetCommentsAction = simpleAction<Http.IListResponse<IComment>>(ActionType.Comments.Response);
 export const loadingBudgetCommentsAction = simpleAction<boolean>(ActionType.Comments.Loading);
 export const submitBudgetCommentAction = simpleAction<Http.ICommentPayload>(ActionType.Comments.Submit);
 export const submittingBudgetCommentAction = simpleAction<boolean>(ActionType.Comments.Submitting);
+export const deleteBudgetCommentAction = simpleAction<number>(ActionType.Comments.Delete);
+export const editBudgetCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(ActionType.Comments.Edit);
+export const deletingBudgetCommentAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Comments.Deleting);
+export const editingBudgetCommentAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Comments.Editing);
 export const addBudgetCommentToStateAction = simpleAction<IComment>(ActionType.Comments.AddToState);
+export const removeBudgetCommentFromStateAction = simpleAction<number>(ActionType.Comments.RemoveFromState);
+export const updateBudgetCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
+  ActionType.Comments.UpdateInState
+);
 
+/*
+  Actions Pertaining to Budget Accounts
+*/
 export const addAccountsTablePlaceholdersAction = simpleAction<number>(ActionType.AccountsTable.AddPlaceholders);
 export const updateAccountAction = simpleAction<{
   id: number;
@@ -150,8 +179,9 @@ export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsT
 export const addErrorsToAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
   ActionType.AccountsTable.AddErrors
 );
+
 /*
-  Actions Pertaining to the Sub Accounts of an Account
+  Actions Pertaining to Account Comments
 */
 export const requestAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
 export const responseAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(
@@ -160,8 +190,26 @@ export const responseAccountCommentsAction = simpleAction<Http.IListResponse<ICo
 export const loadingAccountCommentsAction = simpleAction<boolean>(ActionType.Account.Comments.Loading);
 export const submitAccountCommentAction = simpleAction<Http.ICommentPayload>(ActionType.Account.Comments.Submit);
 export const submittingAccountCommentAction = simpleAction<boolean>(ActionType.Account.Comments.Submitting);
-export const addAccountCommentToStateAction = simpleAction<IComment>(ActionType.Account.Comments.AddToState);
+export const deleteAccountCommentAction = simpleAction<number>(ActionType.Account.Comments.Delete);
+export const editAccountCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
+  ActionType.Account.Comments.Edit
+);
 
+export const deletingAccountCommentAction = simpleAction<Redux.ModelListActionPayload>(
+  ActionType.Account.Comments.Deleting
+);
+export const editingAccountCommentAction = simpleAction<Redux.ModelListActionPayload>(
+  ActionType.Account.Comments.Editing
+);
+export const addAccountCommentToStateAction = simpleAction<IComment>(ActionType.Account.Comments.AddToState);
+export const removeAccountCommentFromStateAction = simpleAction<number>(ActionType.Account.Comments.RemoveFromState);
+export const updateAccountCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
+  ActionType.Account.Comments.UpdateInState
+);
+
+/*
+  Actions Pertaining to Account Sub Accounts
+*/
 export const addAccountSubAccountsTablePlaceholdersAction = simpleAction<number>(
   ActionType.Account.SubAccountsTable.AddPlaceholders
 );
@@ -207,7 +255,7 @@ export const addErrorsToAccountSubAccountsTableAction = simpleAction<Table.ICell
 );
 
 /*
-  Actions Pertaining to the Sub Accounts of a Sub Account
+  Actions Pertaining to Sub Account Comments
 */
 export const requestSubAccountCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
 export const responseSubAccountCommentsAction = simpleAction<Http.IListResponse<IComment>>(
@@ -216,8 +264,28 @@ export const responseSubAccountCommentsAction = simpleAction<Http.IListResponse<
 export const loadingSubAccountCommentsAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Loading);
 export const submitSubAccountCommentAction = simpleAction<Http.ICommentPayload>(ActionType.SubAccount.Comments.Submit);
 export const submittingSubAccountCommentAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Submitting);
-export const addSubAccountCommentToStateAction = simpleAction<IComment>(ActionType.SubAccount.Comments.AddToState);
+export const deleteSubAccountCommentAction = simpleAction<number>(ActionType.SubAccount.Comments.Delete);
+export const editSubAccountCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
+  ActionType.SubAccount.Comments.Edit
+);
 
+export const deletingSubAccountCommentAction = simpleAction<Redux.ModelListActionPayload>(
+  ActionType.SubAccount.Comments.Deleting
+);
+export const editingSubAccountCommentAction = simpleAction<Redux.ModelListActionPayload>(
+  ActionType.SubAccount.Comments.Editing
+);
+export const addSubAccountCommentToStateAction = simpleAction<IComment>(ActionType.SubAccount.Comments.AddToState);
+export const removeSubAccountCommentFromStateAction = simpleAction<number>(
+  ActionType.SubAccount.Comments.RemoveFromState
+);
+export const updateSubAccountCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
+  ActionType.SubAccount.Comments.UpdateInState
+);
+
+/*
+  Actions Pertaining to Sub Account Sub Accounts
+*/
 export const addSubAccountSubAccountsTablePlaceholdersAction = simpleAction<number>(
   ActionType.SubAccount.SubAccountsTable.AddPlaceholders
 );
