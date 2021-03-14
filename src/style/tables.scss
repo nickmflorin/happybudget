@@ -73,6 +73,9 @@ $table-border: 1px solid $table-border-color;
 
   .ant-table-tbody {
     > tr {
+      &.loading {
+        opacity: 0.2;
+      }
       > td {
         font-size: 12px;
         border-bottom: none !important;

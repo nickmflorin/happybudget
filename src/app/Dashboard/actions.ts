@@ -38,6 +38,7 @@ export const ActionType = {
     RemoveFromState: "dashboard.contacts.RemoveFromState",
     AddToState: "dashboard.contacts.AddToState",
     Delete: "dashboard.contacts.Delete",
+    DeleteMultiple: "dashboard.contacts.DeleteMultiple",
     Deleting: "dashboard.contacts.Deleting",
     Update: "dashboard.contacts.Update",
     Updating: "dashboard.contacts.Updating",
@@ -92,6 +93,7 @@ export const setContactsPageSizeAction = simpleAction<number>(ActionType.Contact
 export const setContactsPageAction = simpleAction<number>(ActionType.Contacts.SetPage);
 export const setContactsPageAndSizeAction = simpleAction<PageAndSize>(ActionType.Contacts.SetPageAndSize);
 export const deleteContactAction = simpleAction<number>(ActionType.Contacts.Delete);
+export const deleteContactsAction = simpleAction<number[]>(ActionType.Contacts.DeleteMultiple);
 export const deletingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Deleting);
 export const updateContactAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(ActionType.Contacts.Update);
 export const updatingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Updating);

@@ -6,11 +6,11 @@ import { isNil, includes } from "lodash";
 import { ColDef } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
-import { CommentsHistoryDrawer } from "components/drawers";
 import { GenericBudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
 import { setAncestorsAction } from "../../../actions";
+import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
 import {
   requestAccountsAction,
   setAccountsSearchAction,

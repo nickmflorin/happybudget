@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
-import { forEach, isNil, map } from "lodash";
+import { forEach, includes, isNil, map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
+import { DeleteContactsModal } from "components/modals";
 import { Table, ActionsTableCell, ModelSelectController } from "components/tables";
 
 import {
@@ -13,7 +14,9 @@ import {
   setContactsPageAction,
   setContactsPageSizeAction,
   setContactsPageAndSizeAction,
-  selectContactsAction
+  selectContactsAction,
+  deleteContactsAction,
+  deleteContactAction
 } from "../../actions";
 
 interface IRow {
@@ -70,6 +73,11 @@ const ContactsTable = (): JSX.Element => {
         tableLayout={"fixed"}
         dataSource={data}
         loading={contacts.loading}
+        rowClassName={(record: IRow, index: number) => {
+          if (includes(contacts.deleting, record.key) || includes(contacts.updating, record.key)) {
+            return "loading";
+          }
+        }}
         rowSelection={{
           selectedRowKeys: contacts.selected,
           onChange: (selectedKeys: React.ReactText[]) => {
@@ -111,11 +119,6 @@ const ContactsTable = (): JSX.Element => {
             dataIndex: "role"
           },
           {
-            title: "Type",
-            key: "type",
-            dataIndex: "type"
-          },
-          {
             title: "Location",
             key: "location",
             dataIndex: "contact",
@@ -152,7 +155,7 @@ const ContactsTable = (): JSX.Element => {
                   },
                   {
                     tooltip: `Delete ${contact.full_name}`,
-                    onClick: () => setContactsToDelete([contact]),
+                    onClick: () => dispatch(deleteContactAction(contact.id)),
                     icon: <FontAwesomeIcon icon={faTrashAlt} />
                   }
                 ]}
@@ -161,6 +164,19 @@ const ContactsTable = (): JSX.Element => {
           }
         ]}
       />
+      {!isNil(contactsToDelete) && (
+        <DeleteContactsModal
+          visible={true}
+          contacts={contactsToDelete}
+          onCancel={() => setContactsToDelete(undefined)}
+          onOk={(cs: IContact[]) => {
+            setContactsToDelete(undefined);
+            if (cs.length !== 0) {
+              dispatch(deleteContactsAction(map(cs, (c: IContact) => c.id)));
+            }
+          }}
+        />
+      )}
     </React.Fragment>
   );
 };

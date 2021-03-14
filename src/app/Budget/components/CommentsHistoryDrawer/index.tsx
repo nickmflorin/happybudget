@@ -20,7 +20,7 @@ const CommentsHistoryDrawer = ({ visible, commentsProps }: CommentsHistoryDrawer
   const [page, setPage] = useState<Page>("comments");
 
   return (
-    <Drawer visible={visible}>
+    <Drawer className={"comments-history-drawer"} visible={visible}>
       <HorizontalMenu
         onChange={(item: IHorizontalMenuItem) => setPage(item.id)}
         selected={[page]}

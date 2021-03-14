@@ -15,6 +15,7 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
       Request: ActionType.Contacts.Request,
       Loading: ActionType.Contacts.Loading,
       Select: ActionType.Contacts.Select,
+      SetSearch: ActionType.Contacts.SetSearch,
       SetPage: ActionType.Contacts.SetPage,
       SetPageSize: ActionType.Contacts.SetPageSize,
       SetPageAndSize: ActionType.Contacts.SetPageAndSize,

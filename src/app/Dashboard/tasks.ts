@@ -1,4 +1,4 @@
-import { isNil } from "lodash";
+import { isNil, includes } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import {
@@ -129,14 +129,17 @@ export function* getContactsTask(action: Redux.IAction<any>): SagaIterator {
 
 export function* deleteContactTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(deletingContactAction({ id: action.payload, value: true }));
-    try {
-      yield call(deleteContact, action.payload);
-      yield put(removeContactFromStateAction(action.payload));
-    } catch (e) {
-      handleRequestError(e, "There was an error deleting the contact.");
-    } finally {
-      yield put(deletingContactAction({ id: action.payload, value: false }));
+    const deleting = yield select((state: Redux.IApplicationStore) => state.dashboard.contacts.deleting);
+    if (!includes(deleting, action.payload)) {
+      yield put(deletingContactAction({ id: action.payload, value: true }));
+      try {
+        yield call(deleteContact, action.payload);
+        yield put(removeContactFromStateAction(action.payload));
+      } catch (e) {
+        handleRequestError(e, "There was an error deleting the contact.");
+      } finally {
+        yield put(deletingContactAction({ id: action.payload, value: false }));
+      }
     }
   }
 }

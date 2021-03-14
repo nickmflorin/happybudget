@@ -46,9 +46,8 @@ const Comments = ({
     >
       <ShowHide show={comments.length !== 0}>
         {map(comments, (comment: IComment, index: number) => (
-          <React.Fragment>
+          <React.Fragment key={index}>
             <Comment
-              key={index}
               comment={comment}
               setReplying={setReplying}
               loading={!isNil(commentLoading) && commentLoading(comment)}
@@ -77,6 +76,7 @@ const Comments = ({
                   setReplyText(e.target.value);
                 }}
                 onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+                  setReplying(false);
                   if (e.code === "Enter") {
                     onDoneReplying(comment, replyText);
                   }

@@ -1,6 +1,7 @@
+import { includes, isNil } from "lodash";
 import { SagaIterator } from "redux-saga";
-import { spawn, takeLatest, debounce, takeEvery } from "redux-saga/effects";
-import { ActionType } from "./actions";
+import { spawn, takeLatest, debounce, takeEvery, select, take, put } from "redux-saga/effects";
+import { ActionType, deleteContactAction } from "./actions";
 import {
   getBudgetsTask,
   deleteBudgetTask,
@@ -30,6 +31,21 @@ function* watchForSearchContactsSaga(): SagaIterator {
 
 function* watchForDeleteContactSaga(): SagaIterator {
   yield takeEvery(ActionType.Contacts.Delete, deleteContactTask);
+}
+
+function* watchForDeleteContactsSaga(): SagaIterator {
+  while (true) {
+    const action: Redux.IAction<number[]> = yield take(ActionType.Contacts.DeleteMultiple);
+    if (!isNil(action.payload)) {
+      const deleting = yield select((state: Redux.IApplicationStore) => state.dashboard.contacts.deleting);
+      for (let i = 0; i < action.payload.length; i++) {
+        const id: number = action.payload[i];
+        if (!includes(deleting, id)) {
+          yield put(deleteContactAction(id));
+        }
+      }
+    }
+  }
 }
 
 function* watchForUpdateContactSaga(): SagaIterator {
@@ -79,4 +95,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForDeleteContactSaga);
   yield spawn(watchForUpdateContactSaga);
   yield spawn(watchForCreateContactSaga);
+  yield spawn(watchForDeleteContactsSaga);
 }
