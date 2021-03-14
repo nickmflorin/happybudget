@@ -20,6 +20,14 @@ const rootReducer = combineReducers({
     },
     { referenceEntity: "budget item" }
   ),
+  budgetItemsTree: createListResponseReducer<IBudgetItemTreeNode>(
+    {
+      Response: ActionType.BudgetItemsTree.Response,
+      Request: ActionType.BudgetItemsTree.Request,
+      Loading: ActionType.BudgetItemsTree.Loading
+    },
+    { referenceEntity: "budget item tree node" }
+  ),
   table: createTableReducer<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow, IActual>(
     {
       AddPlaceholders: ActionType.ActualsTable.AddPlaceholders,

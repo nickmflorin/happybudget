@@ -17,9 +17,8 @@ import {
   faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 
-import { AncestorsBreadCrumbs } from "components";
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
-import { Layout } from "components/layout";
+import { Layout, AncestorsBreadCrumbs } from "components/layout";
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibility } from "./actions";
 import "./index.scss";
 

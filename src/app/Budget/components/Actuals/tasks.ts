@@ -6,6 +6,7 @@ import {
   deleteActual,
   updateActual,
   getBudgetItems,
+  getBudgetItemsTree,
   createAccountActual,
   createSubAccountActual
 } from "services";
@@ -29,7 +30,9 @@ import {
   creatingActualAction,
   updatingActualAction,
   loadingBudgetItemsAction,
-  responseBudgetItemsAction
+  responseBudgetItemsAction,
+  loadingBudgetItemsTreeAction,
+  responseBudgetItemsTreeAction
 } from "./actions";
 import { requestBudgetAction } from "../../actions";
 
@@ -176,6 +179,22 @@ export function* getBudgetItemsTask(action: Redux.IAction<null>): SagaIterator {
       yield put(responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
     } finally {
       yield put(loadingBudgetItemsAction(false));
+    }
+  }
+}
+
+export function* getBudgetItemsTreeTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId)) {
+    yield put(loadingBudgetItemsTreeAction(true));
+    try {
+      const response = yield call(getBudgetItemsTree, budgetId, { no_pagination: true });
+      yield put(responseBudgetItemsTreeAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the budget's items.");
+      yield put(responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingBudgetItemsTreeAction(false));
     }
   }
 }

@@ -11,6 +11,11 @@ export const ActionType = {
     Response: "actuals.budgetitems.Response",
     Request: "actuals.budgetitems.Request"
   },
+  BudgetItemsTree: {
+    Loading: "actuals.budgetitemstree.Loading",
+    Response: "actuals.budgetitemstree.Response",
+    Request: "actuals.budgetitemstree.Request"
+  },
   ActualsTable: {
     AddPlaceholders: "actuals.table.AddPlaceholders",
     UpdateRow: "actuals.table.UpdateRow",
@@ -57,3 +62,9 @@ export const addErrorsToActualsTableAction = simpleAction<Table.ICellError | Tab
 export const requestBudgetItemsAction = simpleAction<null>(ActionType.BudgetItems.Request);
 export const loadingBudgetItemsAction = simpleAction<boolean>(ActionType.BudgetItems.Loading);
 export const responseBudgetItemsAction = simpleAction<Http.IListResponse<IBudgetItem>>(ActionType.BudgetItems.Response);
+
+export const requestBudgetItemsTreeAction = simpleAction<null>(ActionType.BudgetItemsTree.Request);
+export const loadingBudgetItemsTreeAction = simpleAction<boolean>(ActionType.BudgetItemsTree.Loading);
+export const responseBudgetItemsTreeAction = simpleAction<Http.IListResponse<IBudgetItemTreeNode>>(
+  ActionType.BudgetItemsTree.Response
+);

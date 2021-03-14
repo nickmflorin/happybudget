@@ -16,7 +16,8 @@ import {
   selectActualsTableRowAction,
   removeActualAction,
   updateActualAction,
-  selectAllActualsTableRowsAction
+  selectAllActualsTableRowsAction,
+  requestBudgetItemsTreeAction
 } from "./actions";
 import { BudgetItemCell } from "./cells";
 
@@ -28,6 +29,7 @@ const Actuals = (): JSX.Element => {
   useEffect(() => {
     dispatch(requestBudgetItemsAction());
     dispatch(requestActualsAction());
+    dispatch(requestBudgetItemsTreeAction());
   }, []);
 
   useEffect(() => {

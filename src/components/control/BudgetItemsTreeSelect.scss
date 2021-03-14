@@ -1,0 +1,33 @@
+@import "style/colors";
+@import "style/typography";
+
+.budget-items-tree-menu {
+  .budget-items-tree-menu-item {
+    display: flex;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+
+    &:hover {
+      background-color: #EFEFEF;
+    }
+
+    .budget-items-tree-menu-item-icon-container {
+      height: 100%;
+      position: relative;
+
+      svg {
+        color: $text-secondary;
+        height: 100%;
+        width: auto;
+      }
+    }
+    .budget-items-tree-menu-item-title {
+      line-height: 22px;
+      font-size: 14px;
+      font-family: $roboto;
+      color: $text-secondary;
+    }
+  }
+}

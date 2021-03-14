@@ -98,6 +98,15 @@ interface IBudgetItem extends Model {
   readonly type: BudgetItemType;
 }
 
+interface IBudgetItemNode extends Model {
+  readonly identifier: string;
+  readonly type: BudgetItemType;
+}
+
+interface IBudgetItemTreeNode extends IBudgetItemNode {
+  readonly children: IBudgetItemTreeNode[];
+}
+
 interface IAccount extends IBudgetItem, TrackedModel {
   readonly description: string | null;
   readonly access: number[];

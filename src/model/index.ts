@@ -1,3 +1,5 @@
+import { forEach } from "lodash";
+
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
 export enum ContactRoleNames {
@@ -31,3 +33,21 @@ export const ContactRoleModels: { [key: string]: ContactRoleModel } = {
 };
 
 export const ContactRoleModelsList = Object.values(ContactRoleModels);
+
+export const flattenBudgetItemTreeNodes = (nodes: IBudgetItemTreeNode[]): IBudgetItemNode[] => {
+  const flattened: IBudgetItemNode[] = [];
+
+  const addNode = (node: IBudgetItemTreeNode): void => {
+    const { children, ...withoutChildren } = node;
+    flattened.push(withoutChildren);
+    if (node.children.length !== 0) {
+      forEach(node.children, (child: IBudgetItemTreeNode) => {
+        addNode(child);
+      });
+    }
+  };
+  forEach(nodes, (node: IBudgetItemTreeNode) => {
+    addNode(node);
+  });
+  return flattened;
+};

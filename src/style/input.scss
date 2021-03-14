@@ -5,6 +5,8 @@ $input-border-radius: 8px;
 
 // This is to get rid of the blue-background that Chrome sometimes sets on
 // auto-fill fields.
+button:-webkit-autofill,
+button:-webkit-autofill:hover,
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus textarea:-webkit-autofill,
@@ -16,6 +18,7 @@ textarea:focus,
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused,
 select:-webkit-autofill:focus {
+  box-shadow: 0 0 0px 1000px $gray-light inset !important;
   -webkit-box-shadow: 0 0 0px 1000px $gray-light inset !important;
 }
 

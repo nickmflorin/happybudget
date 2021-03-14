@@ -312,6 +312,46 @@
     border-radius: 50px !important;
   }
 
+  &--caret {
+    background-color: $transparent !important;
+    border: none !important;
+    color: $text-secondary;
+    box-shadow: none !important;
+
+    .caret-button-inner {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      position: relative;
+
+      .caret-button-text {
+        font-family: $roboto;
+        font-weight: 400;
+      }
+      .caret-button-caret {
+        position: absolute;
+        right: 0;
+      }
+    }
+
+    &:hover,
+    &:focus {
+      border-color: transparent !important;
+      background-color: $transparent !important;
+      box-shadow: none !important;
+      .caret-button-inner {
+        .caret-button-text {
+          color: lighten($text-secondary, 20%);
+        }
+        .caret-button-caret {
+          svg {
+            color: lighten($text-secondary, 20%);
+          }
+        }
+      }
+    }
+  }
+
   &--login,
   &--reset {
     @extend .btn--large;
