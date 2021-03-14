@@ -9,37 +9,17 @@ $table-border: 1px solid $table-border-color;
 .select-controller {
   display: flex;
   margin-bottom: 8px;
-  min-height: 28px;
-  height: 28px;
-
-  &.table-select-controller {
-    padding-left: 14px;
-  }
-
-  &.grid-select-controller {
-    margin-bottom: 14px;
-
-    .ant-checkbox-wrapper {
-      margin-right: 10px;
-      padding-top: 6px;
-      height: 28px;
-      padding-bottom: 6px;
-      .ant-checkbox {
-        display: block;
-        top: 0 !important;
-      }
-    }
-  }
+  min-height: 36px;
+  height: 36px;
 
   .select-controller-icon-button {
     bottom: 1px;
-
     :not(:last-child) {
       margin-right: 12px;
     }
   }
   .select-controller-selected-text {
-    line-height: 28px;
+    line-height: 36px;
     margin-left: 12px;
     font-size: 13px;
   }
@@ -63,119 +43,87 @@ $table-border: 1px solid $table-border-color;
   }
 
   thead.ant-table-thead {
-    tr {
-      th.ant-table-cell {
-        border-top: $table-border !important;
+    > tr {
+      > th {
+        font-family: $nunito;
+        font-weight: 600;
+        font-size: 14px;
+        color: $text-secondary;
+        background: $white !important;
+        border-top: none !important;
+        border-bottom: none !important;
+
         &:first-child {
-          border-left: $table-border !important;
+          border-left: none !important;
         }
         &:last-child {
-          border-right: $table-border !important;
-        }
-      }
-    }
-  }
-
-  tr.ant-table-expanded-row {
-    td.ant-table-cell {
-      background: $white !important;
-      .ant-table {
-        margin: -8px -8px -8px -8px !important;
-        thead.ant-table-thead {
-          th.ant-table-cell {
-            border-top: none !important;
-          }
-        }
-      }
-    }
-    .ant-table tbody.ant-table-tbody {
-      .ant-table-placeholder {
-        td.ant-table-cell {
-          border-left: none !important;
           border-right: none !important;
-          border-bottom: none !important;
         }
       }
-    }
-  }
-
-  tr.ant-table-expanded-row-level-1 {
-    thead.ant-table-thead {
-      th.ant-table-cell:not(:only-child) {
-        &:first-child {
-          padding-left: 100px;
-        }
-      }
-    }
-    tbody.ant-table-tbody {
-      td.ant-table-cell:not(:only-child) {
-        &:first-child {
-          padding-left: 100px;
-        }
-      }
-    }
-
-    tr.ant-table-expanded-row-level-1 {
-      thead.ant-table-thead {
-        th.ant-table-cell {
-          &:first-child:not(:only-child) {
-            padding-left: 140px;
-          }
-        }
-      }
-      tbody.ant-table-tbody {
-        td.ant-table-cell {
-          &:first-child:not(:only-child) {
-            padding-left: 140px;
-          }
-        }
-      }
-    }
-  }
-
-  td {
-    font-size: 12px;
-
-    .icon-cell-container {
-      line-height: 14px;
-      padding-top: 3px;
-      padding-bottom: 3px;
-      display: flex;
-
-      .icon-container {
-        margin-right: 8px;
-      }
-      .link,
-      .text-container {
-        line-height: 22px;
-      }
-      .link {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 300px;
-      }
-    }
-    .ant-badge {
-      .ant-badge-status-text {
-        font-size: 12px;
-      }
-    }
-    .actions-table-cell {
-      float: right;
-      display: flex;
     }
   }
 
   td,
   th {
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    // text-overflow: ellipsis;
+    // white-space: nowrap;
     max-width: 300px;
   }
 
-  tbody.ant-table-tbody {
+  .ant-table-tbody {
+    > tr {
+      > td {
+        font-size: 12px;
+        border-bottom: none !important;
+
+        .icon-cell-container {
+          line-height: 14px;
+          padding-top: 3px;
+          padding-bottom: 3px;
+          display: flex;
+
+          .icon-container {
+            margin-right: 8px;
+          }
+          .link,
+          .text-container {
+            line-height: 22px;
+          }
+          .link {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 300px;
+          }
+        }
+        .ant-badge {
+          .ant-badge-status-text {
+            font-size: 12px;
+          }
+        }
+        .actions-table-cell {
+          float: right;
+          display: flex;
+        }
+
+        &:first-child {
+          border: 1px solid $transparent;
+          border-top-left-radius: 6px;
+          border-bottom-left-radius: 6px;
+        }
+        &:last-child {
+          border: 1px solid $transparent;
+          border-top-right-radius: 6px;
+          border-bottom-right-radius: 6px;
+        }
+      }
+      &:hover {
+        > td {
+          background: #f3f3f3 !important;
+        }
+      }
+    }
     .ant-table-placeholder {
       td.ant-table-cell {
         border-left: $table-border !important;

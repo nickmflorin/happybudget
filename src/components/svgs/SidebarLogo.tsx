@@ -9,10 +9,10 @@ const SidebarLogo = (): JSX.Element => {
       <text
         transform={"translate(219.086 37.08)"}
         fill={"#fff"}
-        font-size={"6"}
-        font-family={"AvenirNext-Bold, Avenir Next"}
-        font-weight={"700"}
-        letter-spacing={"0.08em"}
+        fontSize={"6"}
+        fontFamily={"AvenirNext-Bold, Avenir Next"}
+        fontWeight={"700"}
+        letterSpacing={"0.08em"}
       >
         <tspan x={"0"} y={"0"}>
           {"BETA"}

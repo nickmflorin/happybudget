@@ -76,12 +76,12 @@
     svg {
       height: 18px;
       width: 18px;
-      color: $gray-light !important;
+      color: #909090 !important;
     }
 
     &:hover,
     &:focus {
-      color: $gray-light !important;
+      color: lighten(#909090, 20%) !important;
       background-color: rgba(0, 0, 0, 0.015);
 
       svg {
@@ -256,9 +256,9 @@
     width: 36px;
 
     svg {
-      color: $gray-light;
       height: 100%;
       width: auto !important;
+      color: $text-secondary !important;
     }
 
     &.small {
@@ -276,18 +276,7 @@
       border-color: $transparent !important;
       background-color: transparent;
       svg {
-        color: $text-secondary !important;
-      }
-    }
-
-    &.dark {
-      svg {
-        color: $text-secondary !important;
-      }
-      &:hover, &:focus {
-        svg {
-          color: $gray-hover !important;
-        }
+        color: $gray-hover !important;
       }
     }
 

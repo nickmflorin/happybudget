@@ -37,10 +37,10 @@ const GreenBudgetIcon = (): JSX.Element => {
         <text
           transform={"translate(343.891 55.169)"}
           fill={"#0eaf7a"}
-          font-size={"9"}
-          font-family={"AvenirNext-Bold, Avenir Next"}
-          font-weight={"700"}
-          letter-spacing={"0.08em"}
+          fontSize={"9"}
+          fontFamily={"AvenirNext-Bold, Avenir Next"}
+          fontWeight={"700"}
+          letterSpacing={"0.08em"}
         >
           <tspan x={"0"} y={"0"}>
             {"BETA"}

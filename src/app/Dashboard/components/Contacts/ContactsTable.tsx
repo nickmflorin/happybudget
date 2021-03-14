@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { forEach, isNil, map } from "lodash";
 
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 import { Table, ActionsTableCell, ModelSelectController } from "components/tables";
 
@@ -53,14 +54,13 @@ const ContactsTable = (): JSX.Element => {
   return (
     <React.Fragment>
       <ModelSelectController<IContact>
-        className={"table-select-controller"}
         selected={contacts.selected}
         data={contacts.data}
         entityName={"contact"}
         items={[
           {
             actionName: "Delete",
-            icon: <DeleteOutlined className={"icon"} />,
+            icon: <FontAwesomeIcon icon={faTrashAlt} />,
             onClick: (ctcts: IContact[]) => setContactsToDelete(ctcts)
           }
         ]}
@@ -148,12 +148,12 @@ const ContactsTable = (): JSX.Element => {
                   {
                     tooltip: `Edit ${contact.full_name}`,
                     onClick: () => setContactToEdit(contact),
-                    icon: <EditOutlined className={"icon"} />
+                    icon: <FontAwesomeIcon icon={faEdit} />
                   },
                   {
                     tooltip: `Delete ${contact.full_name}`,
                     onClick: () => setContactsToDelete([contact]),
-                    icon: <DeleteOutlined className={"icon"} />
+                    icon: <FontAwesomeIcon icon={faTrashAlt} />
                   }
                 ]}
               />

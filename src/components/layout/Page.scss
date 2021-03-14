@@ -2,43 +2,15 @@
 @import "style/colors";
 
 .page {
-  .page-header-container {
-    margin-bottom: 30px;
-    height: 50px;
-    flex: 0 0 auto; // don't grow, take up only needed space
-    display: flex;
-
-    .page-header-text {
-      line-height: 34px;
+  .ant-page-header-heading {
+    .ant-page-header-heading-title {
+      margin-right: 0px;
+      margin-bottom: 0;
+      color: $text-secondary !important;
+      font-weight: 700;
+      font-family: $roboto;
       font-size: 28px;
-      font-family: $nunito;
-      color: $text-primary;
-      margin-top: 0px;
-      margin-bottom: 0px;
-      padding-top: 8px;
-      padding-bottom: 8px;
-      font-weight: 600;
-      flex: 1 0 auto;
-    }
-
-    .page-header-extra-container {
-      height: 100%;
-      display: flex;
-    }
-  }
-
-  .page-content-container {
-    flex-grow: 100;
-
-    &.with-sidebar {
-      margin-left: 15px;
-    }
-
-    .page-content {
-      width: 100%;
-    }
-
-    .page-spinner {
+      line-height: 32px;
     }
   }
 }
