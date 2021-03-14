@@ -1,8 +1,8 @@
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
 export enum HttpRequestMethods {
-  GET = "get",
-  POST = "post",
+  GET = "GET",
+  POST = "POST",
   DELETE = "DELETE",
   PUT = "PUT",
   PATCH = "PATCH"
