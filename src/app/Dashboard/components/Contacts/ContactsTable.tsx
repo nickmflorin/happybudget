@@ -18,7 +18,7 @@ import {
 interface IRow {
   key: number;
   name: string;
-  role: RoleName;
+  role: ContactRoleName;
   phone_number: string;
   email: string;
   contact: IContact;
@@ -56,7 +56,7 @@ const ContactsTable = (): JSX.Element => {
         className={"table-select-controller"}
         selected={contacts.selected}
         data={contacts.data}
-        entityName={"contacts"}
+        entityName={"contact"}
         items={[
           {
             actionName: "Delete",

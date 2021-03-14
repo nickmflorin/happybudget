@@ -95,10 +95,13 @@ export const deleteContactAction = simpleAction<number>(ActionType.Contacts.Dele
 export const deletingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Deleting);
 export const updateContactAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(ActionType.Contacts.Update);
 export const updatingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Updating);
-export const createContactAction = simpleAction<Http.IContactPayload>(ActionType.Contacts.Create);
-export const creatingContactAction = simpleAction<boolean>(ActionType.Contacts.Creating);
 export const removeContactFromStateAction = simpleAction<number>(ActionType.Contacts.RemoveFromState);
 export const updateContactInStateAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(
   ActionType.Contacts.UpdateInState
 );
 export const addContactToStateAction = simpleAction<IContact>(ActionType.Contacts.AddToState);
+
+// Not currently used, because the createContact service is used directly in the
+// modal for creating a contact, but we might use in the future.
+export const createContactAction = simpleAction<Http.IContactPayload>(ActionType.Contacts.Create);
+export const creatingContactAction = simpleAction<boolean>(ActionType.Contacts.Creating);

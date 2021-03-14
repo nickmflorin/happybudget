@@ -113,8 +113,8 @@
   font-weight: 600;
   padding: 6px 12px;
   min-width: 64px;
-  height: 32px;
-  line-height: 19px;
+  height: 36px;
+  line-height: 24px;
   border-radius: 4px;
   margin: 0;
   display: inline-flex;
@@ -190,6 +190,25 @@
 
     &:hover {
       background-color: transparent;
+    }
+  }
+
+  &--default {
+    @extend .btn;
+    color: $text-secondary;
+    background: #ececec;
+    border-color: #ececec;
+
+    &:hover,
+    &:focus {
+      border-color: transparent !important;
+      background-color: darken(#ececec, 10%) !important;
+      color: $text-secondary !important;
+      box-shadow: none !important;
+    }
+
+    &.disabled {
+      background-color: rgba(0, 0, 0, 0.12);
     }
   }
 

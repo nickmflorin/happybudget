@@ -8,7 +8,7 @@ form {
 label,
 .ant-form-item-label {
   font-family: $nunito !important;
-  font-weight: 400 !important;
+  font-weight: 600 !important;
   color: $text-primary;
   font-size: 13px;
   line-height: 22px;
@@ -19,12 +19,12 @@ label,
 }
 
 .ant-form-item {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 
   // When a text field in a form has an error, do not give the text field a
   // red border and highlight the prefix icon red.
   &.ant-form-item-has-error {
-    .input {
+    .input, .ant-input-affix-wrapper {
       border: none !important;
       .ant-input-prefix {
         color: unset !important;
@@ -60,6 +60,7 @@ label,
       font-weight: 400;
     }
     .ant-form-item-control-input {
+      min-height: 36px;
       .ant-form-item-control-input-content {
         // The actual <input> element.
         .ant-input {
@@ -67,10 +68,14 @@ label,
       }
     }
     // Alerts/feedback that go underneath the form control.
-    div[role="alert"] {
-      margin-top: 5px;
-      font-size: 11px;
-      margin-left: 5px;
+    .ant-form-item-explain {
+      min-height: 12px;
+      div[role="alert"] {
+        margin-top: 5px;
+        font-size: 11px;
+        line-height: 12px;
+        margin-left: 5px;
+      }
     }
   }
 }

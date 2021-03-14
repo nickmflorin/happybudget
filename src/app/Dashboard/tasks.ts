@@ -156,6 +156,8 @@ export function* updateContactTask(action: Redux.IAction<Redux.UpdateModelAction
   }
 }
 
+// Not currently used, because the createContact service is used directly in the
+// modal for creating a contact, but we might use in the future.
 export function* createContactTask(action: Redux.IAction<Http.IContactPayload>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(creatingContactAction(true));

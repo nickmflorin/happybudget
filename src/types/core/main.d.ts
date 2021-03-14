@@ -16,7 +16,7 @@ type CommentParentType = "budget" | "account" | "subaccount" | "comment";
 type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
 type Unit = 0 | 1 | 2 | 3 | 4 | 5;
 
-type RoleName =
+type ContactRoleName =
   | "Producer"
   | "Executive Producer"
   | "Production Manager"
@@ -28,7 +28,8 @@ type RoleName =
   | "Writer"
   | "Client"
   | "Other";
-type Role = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+type ContactRole = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+type ContactRoleModel = { id: ContactRole; name: ContactRoleName };
 
 interface Model {
   id: number;
@@ -162,8 +163,8 @@ interface IContact extends Model {
   readonly email: string;
   readonly created_at: string;
   readonly updated_at: string;
-  readonly role: Role;
-  readonly role_name: RoleName;
+  readonly role: ContactRole;
+  readonly role_name: ContactRoleName;
   readonly city: string;
   readonly country: string;
   readonly phone_number: string;

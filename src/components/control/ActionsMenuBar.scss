@@ -1,0 +1,20 @@
+.actions-menu-bar {
+  display: flex;
+  height: 36px;
+
+  > .actions-menu-bar-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    position: relative;
+
+    &.expand {
+      flex-grow: 100;
+    }
+
+    &:not(:last-child) {
+      margin-right: 15px;
+    }
+  }
+}

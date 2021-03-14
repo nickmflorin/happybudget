@@ -1,0 +1,19 @@
+@import "style/colors";
+@import "style/typography";
+
+.ant-modal-content {
+  border-radius: 6px;
+
+  .ant-modal-header {
+    padding: 16px 24px;
+    background: $green !important;
+    border-bottom: none !important;
+    border-radius: 6px 6px 0 0;
+
+    .ant-modal-title {
+      font-family: $nunito !important;
+      font-weight: 600 !important;
+      color: $white !important;
+    }
+  }
+}
