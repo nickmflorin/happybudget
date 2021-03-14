@@ -144,6 +144,8 @@ export function* deleteContactTask(action: Redux.IAction<number>): SagaIterator 
   }
 }
 
+// Not currently used, because the updateContact service is used directly in the
+// modal for editing a contact, but we might use in the future.
 export function* updateContactTask(action: Redux.IAction<Redux.UpdateModelActionPayload<IContact>>): SagaIterator {
   if (!isNil(action.payload)) {
     const { id, data } = action.payload;
