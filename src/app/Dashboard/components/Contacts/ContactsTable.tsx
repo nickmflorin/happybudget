@@ -18,6 +18,7 @@ import {
   deleteContactsAction,
   deleteContactAction
 } from "../../actions";
+import EditContactModal from "./EditContactModal";
 
 interface IRow {
   key: number;
@@ -175,6 +176,14 @@ const ContactsTable = (): JSX.Element => {
               dispatch(deleteContactsAction(map(cs, (c: IContact) => c.id)));
             }
           }}
+        />
+      )}
+      {!isNil(contactToEdit) && (
+        <EditContactModal
+          contact={contactToEdit}
+          onCancel={() => setContactToEdit(undefined)}
+          onSuccess={() => setContactToEdit(undefined)}
+          visible={true}
         />
       )}
     </React.Fragment>

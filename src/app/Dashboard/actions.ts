@@ -95,13 +95,16 @@ export const setContactsPageAndSizeAction = simpleAction<PageAndSize>(ActionType
 export const deleteContactAction = simpleAction<number>(ActionType.Contacts.Delete);
 export const deleteContactsAction = simpleAction<number[]>(ActionType.Contacts.DeleteMultiple);
 export const deletingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Deleting);
-export const updateContactAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(ActionType.Contacts.Update);
-export const updatingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Updating);
 export const removeContactFromStateAction = simpleAction<number>(ActionType.Contacts.RemoveFromState);
 export const updateContactInStateAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(
   ActionType.Contacts.UpdateInState
 );
 export const addContactToStateAction = simpleAction<IContact>(ActionType.Contacts.AddToState);
+
+// Not currently used, because the updateContact service is used directly in the
+// modal for editing a contact, but we might use in the future.
+export const updateContactAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(ActionType.Contacts.Update);
+export const updatingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Updating);
 
 // Not currently used, because the createContact service is used directly in the
 // modal for creating a contact, but we might use in the future.

@@ -6,18 +6,19 @@ import { isNil } from "lodash";
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
 import { Form, ContactForm } from "components/forms";
 import { Modal } from "components/modals";
-import { createContact } from "services";
+import { updateContact } from "services";
 
-import { addContactToStateAction } from "../../actions";
+import { updateContactInStateAction } from "../../actions";
 
-interface CreateContactModalProps {
-  open: boolean;
+interface EditContactModalProps {
+  contact: IContact;
+  visible: boolean;
   onCancel: () => void;
   onSuccess: () => void;
 }
 
 // TODO: Create front end validators for phone number, city, and country.
-const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
+const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContactModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
@@ -25,22 +26,22 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
 
   return (
     <Modal
-      title={"Create a New Contact"}
-      visible={open}
+      title={`Edit Contact: ${contact.full_name}`}
+      visible={visible}
       onCancel={() => onCancel()}
-      okText={"Create"}
+      okText={"Save"}
       cancelText={"Cancel"}
       loading={loading}
       onOk={() => {
         form
           .validateFields()
-          .then(values => {
+          .then((values: Http.IContactPayload) => {
             setLoading(true);
-            createContact(values)
-              .then((contact: IContact) => {
+            updateContact(contact.id, values)
+              .then((newContact: IContact) => {
                 setGlobalError(undefined);
                 form.resetFields();
-                dispatch(addContactToStateAction(contact));
+                dispatch(updateContactInStateAction({ id: contact.id, data: newContact }));
                 onSuccess();
               })
               .catch((e: Error) => {
@@ -48,7 +49,7 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
                   if (!isNil(e.errors.__all__)) {
                     /* eslint-disable no-console */
                     console.error(e.errors.__all__);
-                    setGlobalError("There was a problem creating the contact.");
+                    setGlobalError("There was a problem updating the contact.");
                   } else {
                     // Render the errors for each field next to the form field.
                     renderFieldErrorsInForm(form, e);
@@ -68,9 +69,21 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
           });
       }}
     >
-      <ContactForm form={form} globalError={globalError} />
+      <ContactForm
+        form={form}
+        globalError={globalError}
+        initialValues={{
+          first_name: contact.first_name,
+          last_name: contact.last_name,
+          email: contact.email,
+          role: contact.role,
+          country: contact.country,
+          city: contact.city,
+          phone_number: contact.phone_number
+        }}
+      />
     </Modal>
   );
 };
 
-export default CreateContactModal;
+export default EditContactModal;
