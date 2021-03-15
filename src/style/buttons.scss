@@ -291,17 +291,6 @@
       }
     }
 
-    &.disabled {
-      svg {
-        color: #d3d3d3 !important;
-      }
-      &:hover, &:focus {
-        svg {
-          color: #d3d3d3 !important;
-        }
-      }
-    }
-
     &.ag-grid-table-action-button {
       width: 100%;
       height: 100%;
@@ -313,7 +302,18 @@
       svg {
         height: 16px;
         width: auto !important;
-        color: $text-secondary !important;
+        color: $text-secondary;
+      }
+    }
+
+    &.disabled {
+      svg {
+        color: #d3d3d3 !important;
+      }
+      &:hover, &:focus {
+        svg {
+          color: #d3d3d3 !important;
+        }
       }
     }
   }

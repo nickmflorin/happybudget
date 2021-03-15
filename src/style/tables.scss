@@ -187,7 +187,7 @@ $table-border: 1px solid $table-border-color;
     justify-content: center;
 
     &:not(.borderless) {
-      border-top: $table-border;
+      border-bottom: $table-border;
       border-left: $table-border;
     }
     // This will vertically center the text nicely while also not adjusting the
@@ -248,7 +248,7 @@ $table-border: 1px solid $table-border-color;
     }
     &.ag-cell-focus {
       &:not(.cell--not-editable) {
-        border: 3px solid $green !important;
+        border: 2px solid $green !important;
         &.cell--no-select,
         &.cell--action {
           border: unset !important;

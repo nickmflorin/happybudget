@@ -16,8 +16,7 @@ import {
   Column,
   CellKeyDownEvent,
   CellPosition,
-  NavigateToNextCellParams,
-  ColSpanParams
+  NavigateToNextCellParams
 } from "ag-grid-community";
 
 import TableHeader from "./TableHeader";
@@ -27,11 +26,9 @@ import "./index.scss";
 interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R extends Table.IRow<F, E>> {
   columns: ColDef[];
   table: R[];
+  footerRow: Partial<R>;
   search: string;
   saving: boolean;
-  estimated?: number;
-  actual?: number;
-  variance?: number;
   frameworkComponents?: { [key: string]: any };
   cellClass?: (params: CellClassParams) => string | undefined;
   highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
@@ -52,9 +49,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   table,
   search,
   saving,
-  estimated,
-  actual,
-  variance,
+  footerRow,
   frameworkComponents = {},
   cellClass,
   onSearch,
@@ -202,7 +197,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         field: "select",
         editable: false,
         headerName: "",
-        width: 30,
+        width: 40,
         cellRenderer: "SelectCell",
         cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
       }
@@ -222,7 +217,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         field: "delete",
         editable: false,
         headerName: "",
-        width: 30,
+        width: 40,
         cellRenderer: "DeleteCell",
         cellRendererParams: { onClick: onRowDelete }
       }
@@ -285,8 +280,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               headerName: "",
               width: 40,
               cellRenderer: "NewRowCell",
-              cellRendererParams: { onNew: onRowAdd },
-              colSpan: (params: ColSpanParams) => 2
+              cellRendererParams: { onNew: onRowAdd }
             },
             {
               field: "expand",
@@ -308,7 +302,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               field: "delete",
               editable: false,
               headerName: "",
-              width: 30
+              width: 40
             }
           ]
         ),
@@ -406,15 +400,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         <AgGridReact
           gridOptions={footerOptions}
           columnDefs={footerColDefs}
-          rowData={[
-            {
-              meta: { subaccounts: [] },
-              identifier: "Grand Total",
-              estimated,
-              variance,
-              actual
-            }
-          ]}
+          rowData={[{ meta: { subaccounts: [], errors: [], selected: false, isPlaceholder: false }, ...footerRow }]}
           suppressRowClickSelection={true}
           onGridReady={onFooterGridReady}
           domLayout={"autoHeight"}

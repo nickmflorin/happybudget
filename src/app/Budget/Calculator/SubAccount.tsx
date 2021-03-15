@@ -79,11 +79,21 @@ const SubAccount = (): JSX.Element => {
           }
           onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           onSelectAll={() => dispatch(selectAllSubAccountSubAccountsTableRowsAction())}
-          estimated={
-            !isNil(subAccountStore.detail.data) && !isNil(subAccountStore.detail.data.estimated)
-              ? subAccountStore.detail.data.estimated
-              : 0.0
-          }
+          footerRow={{
+            identifier: "Grand Total",
+            estimated:
+              !isNil(subAccountStore.detail.data) && !isNil(subAccountStore.detail.data.estimated)
+                ? subAccountStore.detail.data.estimated
+                : 0.0,
+            variance:
+              !isNil(subAccountStore.detail.data) && !isNil(subAccountStore.detail.data.variance)
+                ? subAccountStore.detail.data.variance
+                : 0.0,
+            actual:
+              !isNil(subAccountStore.detail.data) && !isNil(subAccountStore.detail.data.actual)
+                ? subAccountStore.detail.data.actual
+                : 0.0
+          }}
           columns={[
             {
               field: "identifier",

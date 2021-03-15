@@ -65,6 +65,11 @@ const Actuals = (): JSX.Element => {
         rowRefreshRequired={(existing: Table.IActualRow, row: Table.IActualRow) =>
           existing.object_id !== row.object_id || existing.parent_type !== row.parent_type
         }
+        footerRow={{
+          description: "Grand Total",
+          value:
+            !isNil(budget.detail.data) && !isNil(budget.detail.data.actual) ? String(budget.detail.data.actual) : "0.00"
+        }}
         cellClass={(params: CellClassParams) => (params.colDef.field === "parent" ? "no-select" : undefined)}
         columns={[
           {
