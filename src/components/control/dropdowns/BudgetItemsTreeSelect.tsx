@@ -126,7 +126,19 @@ const BudgetItemsTreeSelect = ({
     <Dropdown
       visible={visible}
       className={classNames("dropdown", className)}
-      overlay={<TreeMenu id={id} nodes={nodes} onChange={onChange} onClickAway={() => setVisible(false)} />}
+      overlay={
+        <TreeMenu
+          id={id}
+          nodes={nodes}
+          onChange={(item: IBudgetItem) => {
+            setVisible(false);
+            if (item.id !== value) {
+              !isNil(onChange) && onChange(item);
+            }
+          }}
+          onClickAway={() => setVisible(false)}
+        />
+      }
     >
       <CaretButton id={`#${id}`} onClick={() => setVisible(!visible)}>
         {!isNil(currentNode) ? currentNode.identifier : !isNil(placeholderText) ? placeholderText : ""}
