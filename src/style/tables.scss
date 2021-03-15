@@ -37,9 +37,9 @@ $table-border: 1px solid $table-border-color;
 
 .ant-table {
 
-  // .ant-table-cell {
-  //   padding: 6px;
-  // }
+  .ant-table-cell {
+    padding: 6px;
+  }
 
   thead.ant-table-thead {
     > tr {
@@ -300,6 +300,7 @@ $table-border: 1px solid $table-border-color;
       padding: 0px !important;
       border: none !important;
       box-shadow: none !important;
+      background-color: transparent !important;
     }
   }
 }
