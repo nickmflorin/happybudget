@@ -20,7 +20,7 @@ const rootReducer = combineReducers({
     },
     { referenceEntity: "budget item" }
   ),
-  budgetItemsTree: createListResponseReducer<IBudgetItemTreeNode>(
+  budgetItemsTree: createListResponseReducer<IBudgetItemNode>(
     {
       Response: ActionType.BudgetItemsTree.Response,
       Request: ActionType.BudgetItemsTree.Request,

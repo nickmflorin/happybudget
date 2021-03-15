@@ -6,7 +6,7 @@ import { CellClassParams, ColDef } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
-import { setAncestorsAction } from "../../actions";
+import { setAncestorsAction } from "../actions";
 import {
   requestBudgetItemsAction,
   requestActualsAction,

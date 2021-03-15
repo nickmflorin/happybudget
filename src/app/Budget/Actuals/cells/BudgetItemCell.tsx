@@ -14,7 +14,7 @@ const BudgetItemCell = ({ node, onChange }: UnitCellProps): JSX.Element => {
   return (
     <BudgetItemsTreeSelect
       value={node.data.object_id}
-      onChange={(nd: IBudgetItemNode) => onChange(nd.id, nd.type, node.data)}
+      onChange={(nd: IBudgetItem) => onChange(nd.id, nd.type, node.data)}
       nodes={budgetItemsTree.data}
     />
   );

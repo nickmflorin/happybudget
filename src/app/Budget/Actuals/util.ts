@@ -1,5 +1,5 @@
 import { isNil } from "lodash";
-import { generateRandomNumericId } from "../../util";
+import { generateRandomNumericId } from "../util";
 
 // export const postPayloadFromRow = <R, P>(row: R, type: Table.RowType): P => {
 //   const obj: { [key: string]: any } = {};

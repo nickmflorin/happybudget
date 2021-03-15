@@ -22,8 +22,8 @@ import { Layout, AncestorsBreadCrumbs } from "components/layout";
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibility } from "./actions";
 import "./index.scss";
 
-const Calculator = React.lazy(() => import("./components/Calculator"));
-const Actuals = React.lazy(() => import("./components/Actuals"));
+const Calculator = React.lazy(() => import("./Calculator"));
+const Actuals = React.lazy(() => import("./Actuals"));
 
 const Budget = (): JSX.Element => {
   const history = useHistory();

@@ -63,9 +63,9 @@ export const getBudgetItemsTree = async (
   id: number,
   query: Http.IListQuery = {},
   options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<IBudgetItemTreeNode>> => {
+): Promise<Http.IListResponse<IBudgetItemNode>> => {
   const url = URL.v1("budgets", id, "items", "tree");
-  return client.list<IBudgetItemTreeNode>(url, query, options);
+  return client.list<IBudgetItemNode>(url, query, options);
 };
 
 export const getBudgetActuals = async (

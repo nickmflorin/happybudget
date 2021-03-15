@@ -1,4 +1,4 @@
-import { generateRandomNumericId } from "../../util";
+import { generateRandomNumericId } from "../util";
 
 export const initializeRowFromAccount = (account: IAccount): Table.IAccountRow => ({
   id: account.id,

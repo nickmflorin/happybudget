@@ -17,7 +17,7 @@ import {
   rowHasRequiredFields,
   payloadBeforeResponse,
   requestWarrantsParentRefresh
-} from "../../util";
+} from "../util";
 import {
   activateActualsPlaceholderAction,
   loadingActualsAction,
@@ -34,7 +34,7 @@ import {
   loadingBudgetItemsTreeAction,
   responseBudgetItemsTreeAction
 } from "./actions";
-import { requestBudgetAction } from "../../actions";
+import { requestBudgetAction } from "../actions";
 
 export function* handleActualRemovalTask(action: Redux.IAction<Table.IActualRow>): SagaIterator {
   if (!isNil(action.payload)) {

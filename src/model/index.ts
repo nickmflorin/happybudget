@@ -34,19 +34,19 @@ export const ContactRoleModels: { [key: string]: ContactRoleModel } = {
 
 export const ContactRoleModelsList = Object.values(ContactRoleModels);
 
-export const flattenBudgetItemTreeNodes = (nodes: IBudgetItemTreeNode[]): IBudgetItemNode[] => {
-  const flattened: IBudgetItemNode[] = [];
+export const flattenBudgetItemNodes = (nodes: IBudgetItemNode[]): IBudgetItem[] => {
+  const flattened: IBudgetItem[] = [];
 
-  const addNode = (node: IBudgetItemTreeNode): void => {
+  const addNode = (node: IBudgetItemNode): void => {
     const { children, ...withoutChildren } = node;
     flattened.push(withoutChildren);
     if (node.children.length !== 0) {
-      forEach(node.children, (child: IBudgetItemTreeNode) => {
+      forEach(node.children, (child: IBudgetItemNode) => {
         addNode(child);
       });
     }
   };
-  forEach(nodes, (node: IBudgetItemTreeNode) => {
+  forEach(nodes, (node: IBudgetItemNode) => {
     addNode(node);
   });
   return flattened;

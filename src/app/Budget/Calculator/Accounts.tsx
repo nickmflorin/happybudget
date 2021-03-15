@@ -9,8 +9,8 @@ import { RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
-import { setAncestorsAction } from "../../../actions";
-import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
+import { setAncestorsAction } from "../actions";
+import CommentsHistoryDrawer from "../CommentsHistoryDrawer";
 import {
   requestAccountsAction,
   setAccountsSearchAction,
@@ -25,7 +25,7 @@ import {
   deleteBudgetCommentAction,
   editBudgetCommentAction,
   replyToBudgetCommentAction
-} from "../actions";
+} from "./actions";
 
 const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();

@@ -94,16 +94,11 @@ interface IAncestor {
 
 interface IBudgetItem extends Model {
   readonly identifier: string;
-  readonly budget: number;
+  readonly description: string;
   readonly type: BudgetItemType;
 }
 
-interface IBudgetItemNode extends Model {
-  readonly identifier: string;
-  readonly type: BudgetItemType;
-}
-
-interface IBudgetItemTreeNode extends IBudgetItemNode {
+interface IBudgetItemNode extends IBudgetItem {
   readonly children: IBudgetItemTreeNode[];
 }
 

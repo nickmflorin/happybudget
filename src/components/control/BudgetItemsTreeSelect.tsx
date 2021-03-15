@@ -3,17 +3,15 @@ import ClickAwayListener from "react-click-away-listener";
 import { map, uniqueId, isNil, find } from "lodash";
 import classNames from "classnames";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSitemap } from "@fortawesome/free-solid-svg-icons";
 import { Dropdown } from "antd";
 
 import { CaretButton } from "components/control/buttons";
-import { flattenBudgetItemTreeNodes } from "model";
+import { flattenBudgetItemNodes } from "model";
 import { isNodeDescendantOf } from "util/dom";
 import "./BudgetItemsTreeSelect.scss";
 
 interface MenuItemProps {
-  node: IBudgetItemTreeNode;
+  node: IBudgetItemNode;
   onClick?: () => void;
   index?: number;
 }
@@ -21,17 +19,15 @@ interface MenuItemProps {
 export const MenuItem = ({ node, onClick, index = 0 }: MenuItemProps): JSX.Element => {
   return (
     <div className={"budget-items-tree-menu-item"} onClick={() => !isNil(onClick) && onClick()}>
-      <div className={"budget-items-tree-menu-item-icon-container"} style={{ marginLeft: index * 10 }}>
-        <FontAwesomeIcon icon={faSitemap} />
-      </div>
-      <div className={"budget-items-tree-menu-item-title"}>{node.identifier}</div>
+      <div className={"budget-items-tree-menu-item-identifier"}>{node.identifier}</div>
+      <div className={"budget-items-tree-menu-item-title"}>{node.description}</div>
     </div>
   );
 };
 
 interface MenuNodeProps {
-  node: IBudgetItemTreeNode;
-  onClick?: (node: IBudgetItemNode) => void;
+  node: IBudgetItemNode;
+  onClick?: (node: IBudgetItem) => void;
   index?: number;
 }
 
@@ -48,7 +44,7 @@ export const MenuNode = ({ node, onClick, index = 0 }: MenuNodeProps): JSX.Eleme
           }}
         />
         <div className={"budget-items-tree-menu nested"}>
-          {map(node.children, (child: IBudgetItemTreeNode) => {
+          {map(node.children, (child: IBudgetItemNode) => {
             return <MenuNode key={child.id} index={index + 1} node={child} onClick={onClick} />;
           })}
         </div>
@@ -70,9 +66,9 @@ export const MenuNode = ({ node, onClick, index = 0 }: MenuNodeProps): JSX.Eleme
 
 interface TreeMenuProps {
   id: string;
-  nodes: IBudgetItemTreeNode[];
+  nodes: IBudgetItemNode[];
   onClickAway: () => void;
-  onChange?: (node: IBudgetItemNode) => void;
+  onChange?: (node: IBudgetItem) => void;
 }
 
 export const TreeMenu = ({ id, nodes, onClickAway, onChange }: TreeMenuProps): JSX.Element => {
@@ -86,9 +82,9 @@ export const TreeMenu = ({ id, nodes, onClickAway, onChange }: TreeMenuProps): J
       }}
     >
       <div className={"budget-items-tree-menu"}>
-        {map(nodes, (node: IBudgetItemTreeNode) => {
+        {map(nodes, (node: IBudgetItemNode) => {
           return (
-            <MenuNode key={node.id} node={node} onClick={(nd: IBudgetItemNode) => !isNil(onChange) && onChange(nd)} />
+            <MenuNode key={node.id} node={node} onClick={(item: IBudgetItem) => !isNil(onChange) && onChange(item)} />
           );
         })}
       </div>
@@ -100,8 +96,8 @@ export interface BudgetItemsTreeSelectProps {
   className?: string;
   value: number;
   placeholderText?: string;
-  onChange?: (node: IBudgetItemNode) => void;
-  nodes: IBudgetItemTreeNode[];
+  onChange?: (item: IBudgetItem) => void;
+  nodes: IBudgetItemNode[];
   trigger?: ("click" | "hover" | "contextMenu")[];
 }
 
@@ -113,9 +109,9 @@ const BudgetItemsTreeSelect = ({
   onChange
 }: BudgetItemsTreeSelectProps): JSX.Element => {
   const [visible, setVisible] = useState(false);
-  const [currentNode, setCurrentNode] = useState<IBudgetItemNode | undefined>(undefined);
+  const [currentNode, setCurrentNode] = useState<IBudgetItem | undefined>(undefined);
   const id = useMemo(() => uniqueId("budget-items-tree-select-button-"), []);
-  const flattenedBudgetItemTreeNodes = useMemo(() => flattenBudgetItemTreeNodes(nodes), [nodes]);
+  const flattenedBudgetItemTreeNodes = useMemo(() => flattenBudgetItemNodes(nodes), [nodes]);
 
   useEffect(() => {
     const node = find(flattenedBudgetItemTreeNodes, { id: value });

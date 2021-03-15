@@ -25,14 +25,14 @@ import {
   replyToComment
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
-import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
+import { setAncestorsLoadingAction, setAncestorsAction } from "../actions";
 import {
   payloadFromResponse,
   postPayloadFromRow,
   rowHasRequiredFields,
   requestWarrantsParentRefresh,
   payloadBeforeResponse
-} from "../../util";
+} from "../util";
 import {
   loadingAccountAction,
   responseAccountAction,

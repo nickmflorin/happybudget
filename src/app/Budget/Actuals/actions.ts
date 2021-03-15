@@ -65,6 +65,6 @@ export const responseBudgetItemsAction = simpleAction<Http.IListResponse<IBudget
 
 export const requestBudgetItemsTreeAction = simpleAction<null>(ActionType.BudgetItemsTree.Request);
 export const loadingBudgetItemsTreeAction = simpleAction<boolean>(ActionType.BudgetItemsTree.Loading);
-export const responseBudgetItemsTreeAction = simpleAction<Http.IListResponse<IBudgetItemTreeNode>>(
+export const responseBudgetItemsTreeAction = simpleAction<Http.IListResponse<IBudgetItemNode>>(
   ActionType.BudgetItemsTree.Response
 );
