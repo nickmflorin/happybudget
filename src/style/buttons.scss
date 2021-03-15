@@ -335,16 +335,13 @@
     .caret-button-inner {
       display: flex;
       width: 100%;
-      justify-content: center;
       position: relative;
 
       .caret-button-text {
         font-family: $roboto;
         font-weight: 400;
-      }
-      .caret-button-caret {
-        position: absolute;
-        right: 0;
+        flex-grow: 100;
+        text-align: center;
       }
     }
 

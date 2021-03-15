@@ -1,4 +1,4 @@
-import { isNil, map, filter } from "lodash";
+import { isNil, map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPlusSquare, faPercentage } from "@fortawesome/free-solid-svg-icons";
@@ -69,7 +69,7 @@ const TableHeader = ({
             };
           }
         )}
-        buttonProps={{ style: { minWidth: 120 } }}
+        buttonProps={{ style: { minWidth: 90 } }}
         onChange={(fields: IFieldMenuField[]) => onColumnsChange(fields)}
       >
         {"Columns"}
