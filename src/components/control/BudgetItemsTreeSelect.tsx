@@ -19,7 +19,9 @@ interface MenuItemProps {
 export const MenuItem = ({ node, onClick, index = 0 }: MenuItemProps): JSX.Element => {
   return (
     <div className={"budget-items-tree-menu-item"} onClick={() => !isNil(onClick) && onClick()}>
-      <div className={"budget-items-tree-menu-item-identifier"}>{node.identifier}</div>
+      <div className={"budget-items-tree-menu-item-identifier"} style={{ marginLeft: index * 10 }}>
+        {node.identifier}
+      </div>
       <div className={"budget-items-tree-menu-item-title"}>{node.description}</div>
     </div>
   );
