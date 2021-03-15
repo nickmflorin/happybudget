@@ -42,7 +42,7 @@ export const FieldDefinitions: { [key in Table.RowType]: IFieldDefinition[] } = 
     { name: "date", postPayload: true },
     { name: "payment_method", postPayload: true },
     { name: "payment_id", postPayload: true },
-    { name: "value", postPayload: true }
+    { name: "value", postPayload: true, triggerParentRefresh: true }
   ],
   subaccount: [
     { name: "description", postPayload: true },
