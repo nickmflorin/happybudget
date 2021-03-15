@@ -24,10 +24,11 @@ interface ToolbarProps {
 const Toolbar = ({ items }: ToolbarProps): JSX.Element => {
   return (
     <div className={"toolbar"}>
-      {map(items, (item: IToolbarItem) => {
+      {map(items, (item: IToolbarItem, index: number) => {
         return (
           <IconButton
             className={"dark"}
+            key={index}
             size={"large"}
             icon={item.icon}
             disabled={item.disabled}
