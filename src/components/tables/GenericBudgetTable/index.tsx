@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, uniq, forEach, filter } from "lodash";
+import { map, isNil, includes, find, concat, uniq, forEach, filter, sortBy } from "lodash";
 
 import { AgGridReact } from "ag-grid-react";
 import {
@@ -69,6 +69,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [footerGridApi, setFooterGridApi] = useState<GridApi | undefined>(undefined);
+  const [footerColumnApi, setFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [footerColDefs, setFooterColDefs] = useState<ColDef[]>([]);
   const [gridOptions, setGridOptions] = useState<GridOptions | undefined>(undefined);
@@ -77,6 +78,11 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
     setColumnApi(event.columnApi);
+  }, []);
+
+  const onFooterGridReady = useCallback((event: GridReadyEvent): void => {
+    setFooterGridApi(event.api);
+    setFooterColumnApi(event.columnApi);
   }, []);
 
   useEffect(() => {
@@ -95,10 +101,6 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
       }
     }
   }, [columnApi, gridApi, columns, focused]);
-
-  const onFooterGridReady = useCallback((event: GridReadyEvent): void => {
-    setFooterGridApi(event.api);
-  }, []);
 
   useEffect(() => {
     if (!isNil(gridApi) && !isNil(footerGridApi)) {
@@ -267,7 +269,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         })
       )
     );
-  }, [columns.length]);
+  }, [columns]);
 
   useEffect(() => {
     setFooterColDefs(
@@ -327,6 +329,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
       <TableHeader
         search={search}
         setSearch={(value: string) => onSearch(value)}
+        columns={columns}
         onDelete={() => {
           forEach(table, (row: R) => {
             if (row.meta.selected === true) {
@@ -338,6 +341,22 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         selected={allSelected}
         onSelect={onSelectAll}
         deleteDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
+        onColumnsChange={(fields: IFieldMenuField[]) => {
+          if (!isNil(columnApi) && !isNil(footerColumnApi)) {
+            forEach(columns, (col: ColDef) => {
+              if (!isNil(col.field)) {
+                const associatedField = find(fields, { id: col.field });
+                if (!isNil(associatedField)) {
+                  columnApi.setColumnVisible(col.field, true);
+                  footerColumnApi.setColumnVisible(col.field, true);
+                } else {
+                  columnApi.setColumnVisible(col.field, false);
+                  footerColumnApi.setColumnVisible(col.field, false);
+                }
+              }
+            });
+          }
+        }}
       />
       <div className={"primary-grid"}>
         <AgGridReact

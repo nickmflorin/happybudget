@@ -8,7 +8,7 @@ import { Form, ContactForm } from "components/forms";
 import { Modal } from "components/modals";
 import { createContact } from "services";
 
-import { addContactToStateAction } from "../../actions";
+import { addContactToStateAction } from "../actions";
 
 interface CreateContactModalProps {
   open: boolean;

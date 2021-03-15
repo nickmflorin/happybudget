@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,7 +7,7 @@ import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { Dropdown } from "components/control";
+import { Dropdown } from "components/control/dropdowns";
 import { IconButton } from "components/control/buttons";
 import { ShowHide, RenderWithSpinner } from "components/display";
 import {

@@ -8,7 +8,7 @@ import { Form, ContactForm } from "components/forms";
 import { Modal } from "components/modals";
 import { updateContact } from "services";
 
-import { updateContactInStateAction } from "../../actions";
+import { updateContactInStateAction } from "../actions";
 
 interface EditContactModalProps {
   contact: IContact;

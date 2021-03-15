@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import { Layout } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
 
-import { Dropdown } from "components/control";
+import { Dropdown } from "components/control/dropdowns";
 import { AccountCircleLink } from "components/control/links";
 import { ShowHide } from "components/display";
 import { useLoggedInUser } from "store/hooks";

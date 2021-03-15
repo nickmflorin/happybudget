@@ -5,10 +5,10 @@ import { FileAddOutlined, ContactsOutlined, FolderOutlined, DeleteOutlined } fro
 
 import { Layout } from "components/layout";
 
-const Contacts = React.lazy(() => import("./components/Contacts"));
-const Budgets = React.lazy(() => import("./components/Budgets/Active"));
-const Trash = React.lazy(() => import("./components/Budgets/Trash"));
-const Templates = React.lazy(() => import("./components/Templates"));
+const Contacts = React.lazy(() => import("./Contacts"));
+const Budgets = React.lazy(() => import("./Budgets/Active"));
+const Trash = React.lazy(() => import("./Budgets/Trash"));
+const Templates = React.lazy(() => import("./Templates"));
 
 const Dashboard = (): JSX.Element => {
   const history = useHistory();

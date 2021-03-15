@@ -1,0 +1,49 @@
+@import "style/colors";
+@import "style/typography";
+
+.field-menu {
+  background: #fff;
+
+  .field-menu-menu {
+    .field-menu-menu-item {
+      margin-bottom: 0px !important;
+      margin-top: 0px !important;
+      height: 30px;
+      display: flex;
+
+      .ant-checkbox-wrapper {
+        padding-top: 7px;
+        height: 30px;
+        padding-bottom: 7px;
+        .ant-checkbox {
+          display: block;
+          top: 0 !important;
+        }
+      }
+
+      &.ant-menu-item-selected {
+        background-color: unset !important;
+        span.text-container {
+          color: $text-primary !important;
+        }
+      }
+
+      span.text-container {
+        margin-left: 8px;
+        font-family: $nunito;
+        font-size: 13px;
+        color: $text-primary !important;
+        line-height: 30px;
+      }
+    }
+  }
+
+  .btn-container {
+    width: 100%;
+    padding: 8px;
+    > .btn--field-menu {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+  }
+}

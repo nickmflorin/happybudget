@@ -1,6 +1,6 @@
 import { ICellRendererParams, RowNode } from "ag-grid-community";
 
-import { UnitDropdown } from "components/control";
+import { UnitDropdown } from "components/control/dropdowns";
 
 interface UnitCellProps extends ICellRendererParams {
   onChange: (id: Unit, row: Table.ISubAccountRow) => void;

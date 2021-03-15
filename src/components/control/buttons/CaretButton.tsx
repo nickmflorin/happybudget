@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import classNames from "classnames";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,14 +7,19 @@ import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "antd";
 import { ButtonProps } from "antd/lib/button";
 
-interface CaretButtonProps extends ButtonProps {
+export interface CaretButtonProps extends ButtonProps {
   className?: string;
+  solid?: boolean;
+  style?: React.CSSProperties;
+}
+
+interface _CaretButtonProps extends CaretButtonProps {
   children: ReactNode;
 }
 
-const CaretButton = ({ children, className, ...props }: CaretButtonProps): JSX.Element => {
+const CaretButton = ({ children, className, style = {}, solid = false, ...props }: _CaretButtonProps): JSX.Element => {
   return (
-    <Button className={classNames("btn--caret", className)} {...props}>
+    <Button className={classNames("btn--caret", { primary: solid }, className)} style={style} {...props}>
       <div className={"caret-button-inner"}>
         <div className={"caret-button-text"}>{children}</div>
         <div className={"caret-button-caret"}>

@@ -327,10 +327,10 @@
   }
 
   &--caret {
-    background-color: $transparent !important;
-    border: none !important;
+    background-color: $transparent;
+    border: none;
     color: $text-secondary;
-    box-shadow: none !important;
+    box-shadow: none;
 
     .caret-button-inner {
       display: flex;
@@ -362,6 +362,30 @@
             color: lighten($text-secondary, 20%);
           }
         }
+      }
+    }
+
+    &.primary {
+      color: $white;
+      background: $green;
+      border-color: $green;
+
+      &:hover,
+      &:focus {
+        background-color: $green-darker !important;
+        .caret-button-inner {
+          .caret-button-text {
+            color: $white !important;
+          }
+          .caret-button-caret {
+            svg {
+              color: $white !important;
+            }
+          }
+        }
+      }
+      &.disabled {
+        background-color: rgba(0, 0, 0, 0.12);
       }
     }
   }

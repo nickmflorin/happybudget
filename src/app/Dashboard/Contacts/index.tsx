@@ -5,10 +5,10 @@ import { Dispatch } from "redux";
 import { Input, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 
-import { ActionsMenuBar } from "components/control";
+import { ActionsMenuBar } from "components/control/menus";
 import { Page } from "components/layout";
 
-import { setContactsSearchAction } from "../../actions";
+import { setContactsSearchAction } from "../actions";
 import ContactsTable from "./ContactsTable";
 import CreateContactModal from "./CreateContactModal";
 

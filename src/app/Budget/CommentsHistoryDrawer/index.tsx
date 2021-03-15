@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 import { ShowHide } from "components/display";
-import { HorizontalMenu } from "components/control";
-import { IHorizontalMenuItem } from "components/control/HorizontalMenu";
+import { HorizontalMenu } from "components/control/menus";
+import { IHorizontalMenuItem } from "components/control/menus/HorizontalMenu";
 import { Drawer } from "components/layout";
 
 import CommentsDrawerContent, { CommentsDrawerContentProps } from "./Comments";

@@ -1,10 +1,12 @@
 @import "style/colors";
 @import "style/typography";
 
-.unit-dropdown-menu-item {
-  display: flex;
-  padding: 7px 10px !important;
-  font-family: $noto-sans-regular !important;
+.units-menu {
+  .units-menu-item {
+    display: flex;
+    padding: 7px 10px !important;
+    font-family: $noto-sans-regular !important;
+  }
 }
 
 .unit-tag {
