@@ -3,55 +3,79 @@ import { map, filter, includes, isNil } from "lodash";
 import classNames from "classnames";
 
 import { Menu, Checkbox, Button } from "antd";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import "./FieldsMenu.scss";
 
+export interface FieldMenuField extends Field {
+  defaultChecked?: boolean;
+}
+
 export interface IFieldMenuButton {
   text: string;
-  onClick?: (fields: IFieldMenuField[]) => void;
+  onClick?: (fields: Field[]) => void;
   className?: string;
   style?: React.CSSProperties;
 }
 
+interface FieldsMenuItemProps {
+  field: Field;
+  onChange?: (fields: Field[]) => void;
+  selected: Field[];
+  setSelected: (fields: Field[]) => void;
+  checked: boolean;
+}
+
+const FieldsMenuItem = ({ field, checked, selected, setSelected, onChange }: FieldsMenuItemProps): JSX.Element => {
+  return (
+    <Menu.Item
+      className={"fields-menu-menu-item"}
+      onClick={() => {
+        if (checked === false) {
+          setSelected([...selected, field]);
+          if (!isNil(onChange)) {
+            onChange([...selected, field]);
+          }
+        } else {
+          setSelected(filter(selected, (fld: Field) => fld.id !== field.id));
+          if (!isNil(onChange)) {
+            onChange(filter(selected, (fld: Field) => fld.id !== field.id));
+          }
+        }
+      }}
+    >
+      <Checkbox checked={checked} />
+      <span className={"text-container"}>{field.label}</span>
+    </Menu.Item>
+  );
+};
+
 export interface FieldsMenuProps {
-  fields: IFieldMenuField[];
+  fields: FieldMenuField[];
   buttons?: IFieldMenuButton[];
-  onChange?: (fields: IFieldMenuField[]) => void;
+  onChange?: (fields: Field[]) => void;
 }
 
 const FieldsMenu = ({ fields, buttons, onChange }: FieldsMenuProps): JSX.Element => {
-  const [selected, setSelected] = useState<IFieldMenuField[]>(
-    filter(fields, (field: IFieldMenuField) => field.defaultChecked !== false)
+  const [selected, setSelected] = useState<Field[]>(
+    filter(fields, (field: FieldMenuField) => field.defaultChecked !== false)
   );
 
   return (
-    <div className={"field-menu"}>
-      <Menu className={"field-menu-menu"}>
-        {map(fields, (field: IFieldMenuField, index: number) => {
+    <div className={"fields-menu"}>
+      <Menu className={"fields-menu-menu"}>
+        {map(fields, (field: FieldMenuField, index: number) => {
           return (
-            <Menu.Item key={index} className={"field-menu-menu-item"}>
-              <Checkbox
-                onChange={(e: CheckboxChangeEvent) => {
-                  if (e.target.checked) {
-                    setSelected([...selected, field]);
-                    if (!isNil(onChange)) {
-                      onChange([...selected, field]);
-                    }
-                  } else {
-                    setSelected(filter(selected, (fld: IFieldMenuField) => fld.id !== field.id));
-                    if (!isNil(onChange)) {
-                      onChange(filter(selected, (fld: IFieldMenuField) => fld.id !== field.id));
-                    }
-                  }
-                }}
-                checked={includes(
-                  map(selected, (fld: IFieldMenuField) => fld.id),
-                  field.id
-                )}
-              />
-              <span className={"text-container"}>{field.label}</span>
-            </Menu.Item>
+            <FieldsMenuItem
+              key={index}
+              field={field}
+              onChange={onChange}
+              selected={selected}
+              setSelected={setSelected}
+              checked={includes(
+                map(selected, (fld: Field) => fld.id),
+                field.id
+              )}
+            />
           );
         })}
       </Menu>

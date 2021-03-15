@@ -11,6 +11,7 @@ import { ColDef } from "ag-grid-community";
 
 import { IconButton } from "components/control/buttons";
 import { FieldsDropdown } from "components/control/dropdowns";
+import { FieldMenuField } from "components/control/menus/FieldsMenu";
 import { SavingChanges } from "components/display";
 
 import "./TableHeader.scss";
@@ -24,7 +25,8 @@ interface TableHeaderProps {
   setSearch: (value: string) => void;
   onDelete: () => void;
   onSelect: (checked: boolean) => void;
-  onColumnsChange: (fields: IFieldMenuField[]) => void;
+  onColumnsChange: (fields: Field[]) => void;
+  onExport: (fields: Field[]) => void;
 }
 
 const TableHeader = ({
@@ -36,7 +38,8 @@ const TableHeader = ({
   setSearch,
   onDelete,
   onSelect,
-  onColumnsChange
+  onColumnsChange,
+  onExport
 }: TableHeaderProps): JSX.Element => {
   return (
     <div className={"table-header"}>
@@ -61,7 +64,7 @@ const TableHeader = ({
       <FieldsDropdown
         fields={map(
           columns,
-          (col: ColDef): IFieldMenuField => {
+          (col: ColDef): FieldMenuField => {
             return {
               id: col.field as string,
               label: col.headerName as string,
@@ -70,9 +73,31 @@ const TableHeader = ({
           }
         )}
         buttonProps={{ style: { minWidth: 90 } }}
-        onChange={(fields: IFieldMenuField[]) => onColumnsChange(fields)}
+        onChange={(fields: Field[]) => onColumnsChange(fields)}
       >
         {"Columns"}
+      </FieldsDropdown>
+      <FieldsDropdown
+        fields={map(
+          columns,
+          (col: ColDef): FieldMenuField => {
+            return {
+              id: col.field as string,
+              label: col.headerName as string,
+              defaultChecked: true
+            };
+          }
+        )}
+        buttons={[
+          {
+            onClick: (fields: Field[]) => onExport(fields),
+            text: "Download",
+            className: "btn--primary"
+          }
+        ]}
+        buttonProps={{ style: { minWidth: 90 } }}
+      >
+        {"Export"}
       </FieldsDropdown>
     </div>
   );

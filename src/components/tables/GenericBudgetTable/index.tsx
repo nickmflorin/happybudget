@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, uniq, forEach, filter, sortBy } from "lodash";
+import { map, isNil, includes, find, concat, uniq, forEach, filter } from "lodash";
 
 import { AgGridReact } from "ag-grid-react";
 import {
@@ -19,9 +19,19 @@ import {
   NavigateToNextCellParams
 } from "ag-grid-community";
 
+import { downloadAsCsvFile } from "util/files";
+
 import TableHeader from "./TableHeader";
 import { DeleteCell, ExpandCell, SelectCell, ValueCell, NewRowCell, UnitCell } from "./cells";
 import "./index.scss";
+
+export interface GetExportValueParams {
+  node: RowNode;
+  colDef: ColDef;
+  value: string | undefined;
+}
+
+type ExportValueGetters = { [key: string]: (params: GetExportValueParams) => string };
 
 interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R extends Table.IRow<F, E>> {
   columns: ColDef[];
@@ -30,6 +40,8 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R 
   search: string;
   saving: boolean;
   frameworkComponents?: { [key: string]: any };
+  getExportValue?: ExportValueGetters;
+  exportFileName?: string;
   cellClass?: (params: CellClassParams) => string | undefined;
   highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
@@ -51,6 +63,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   saving,
   footerRow,
   frameworkComponents = {},
+  exportFileName,
+  getExportValue,
   cellClass,
   onSearch,
   onSelectAll,
@@ -341,7 +355,68 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         selected={allSelected}
         onSelect={onSelectAll}
         deleteDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
-        onColumnsChange={(fields: IFieldMenuField[]) => {
+        onExport={(fields: Field[]) => {
+          if (!isNil(gridApi) && !isNil(columnApi)) {
+            const includeColumn = (col: Column): boolean => {
+              const colDef = col.getColDef();
+              return (
+                !isNil(colDef.field) &&
+                includes(
+                  map(fields, (field: Field) => field.id),
+                  colDef.field
+                ) &&
+                includes(
+                  map(columns, (c: ColDef) => c.field),
+                  colDef.field
+                )
+              );
+            };
+
+            const cols = filter(columnApi.getAllColumns(), (col: Column) => includeColumn(col));
+            const headerRow: CSVRow = [];
+            forEach(cols, (col: Column) => {
+              const colDef = col.getColDef();
+              if (!isNil(colDef.field)) {
+                headerRow.push(colDef.headerName);
+              }
+            });
+
+            const data: CSVData = [headerRow];
+
+            gridApi.forEachNode((node: RowNode, index: number) => {
+              const row: CSVRow = [];
+              forEach(cols, (col: Column) => {
+                const colDef = col.getColDef();
+                if (!isNil(colDef.field)) {
+                  if (isNil(node.data[colDef.field])) {
+                    row.push("");
+                  } else {
+                    let value = node.data[colDef.field];
+                    if (!isNil(getExportValue) && !isNil(getExportValue[colDef.field])) {
+                      value = getExportValue[colDef.field]({
+                        node,
+                        colDef,
+                        value
+                      });
+                    }
+                    // TODO: Use a valueSetter instead of a formatter on the cell renderer.
+                    if (!isNil(colDef.cellRendererParams) && !isNil(colDef.cellRendererParams.formatter)) {
+                      value = colDef.cellRendererParams.formatter(value);
+                    }
+                    row.push(value);
+                  }
+                }
+              });
+              data.push(row);
+            });
+            let fileName = "make-me-current-date";
+            if (!isNil(exportFileName)) {
+              fileName = exportFileName;
+            }
+            downloadAsCsvFile(fileName, data);
+          }
+        }}
+        onColumnsChange={(fields: Field[]) => {
           if (!isNil(columnApi) && !isNil(footerColumnApi)) {
             forEach(columns, (col: ColDef) => {
               if (!isNil(col.field)) {

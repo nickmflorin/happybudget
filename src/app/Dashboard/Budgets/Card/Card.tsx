@@ -46,7 +46,7 @@ export const Colors: string[] = [
 ];
 
 interface CardProps {
-  dropdown?: IMenuItem[];
+  dropdown?: MenuItem[];
   selected?: boolean;
   title?: string;
   subTitle?: string;

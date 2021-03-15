@@ -2,6 +2,7 @@
 /// <reference path="./redux.d.ts" />
 /// <reference path="./ui.d.ts" />
 /// <reference path="./table.d.ts" />
+/// <reference path="./files.d.ts" />
 
 type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
 type ProductionType = 0 | 1 | 2 | 3 | 4 | 5;

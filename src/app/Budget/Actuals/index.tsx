@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isNil } from "lodash";
+import { isNil, find } from "lodash";
 
 import { CellClassParams, ColDef } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
+import { GetExportValueParams } from "components/tables/GenericBudgetTable";
 import { setAncestorsAction } from "../actions";
 import {
   requestBudgetItemsAction,
@@ -25,10 +26,11 @@ const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
   const actuals = useSelector((state: Redux.IApplicationStore) => state.actuals);
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
+  const budgetItems = useSelector((state: Redux.IApplicationStore) => state.actuals.budgetItems);
 
   useEffect(() => {
-    dispatch(requestBudgetItemsAction());
     dispatch(requestActualsAction());
+    dispatch(requestBudgetItemsAction());
     dispatch(requestBudgetItemsTreeAction());
   }, []);
 
@@ -50,8 +52,8 @@ const Actuals = (): JSX.Element => {
     <RenderWithSpinner loading={actuals.table.loading || budget.detail.loading}>
       <GenericBudgetTable<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow>
         table={actuals.table.data}
-        isCellEditable={(row: Table.IActualRow, col: ColDef) => col.field !== "parent"}
-        highlightNonEditableCell={(row: Table.IActualRow, col: ColDef) => col.field !== "parent"}
+        isCellEditable={(row: Table.IActualRow, col: ColDef) => col.field !== "object_id"}
+        highlightNonEditableCell={(row: Table.IActualRow, col: ColDef) => col.field !== "object_id"}
         search={actuals.table.search}
         onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
         saving={actuals.deleting.length !== 0 || actuals.updating.length !== 0 || actuals.creating}
@@ -70,10 +72,20 @@ const Actuals = (): JSX.Element => {
           value:
             !isNil(budget.detail.data) && !isNil(budget.detail.data.actual) ? String(budget.detail.data.actual) : "0.00"
         }}
-        cellClass={(params: CellClassParams) => (params.colDef.field === "parent" ? "no-select" : undefined)}
+        cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
+        exportFileName={"actuals.csv"}
+        getExportValue={{
+          object_id: ({ node }: GetExportValueParams) => {
+            const item = find(budgetItems.data, { id: node.data.object_id, type: node.data.parent_type });
+            if (!isNil(item)) {
+              return item.identifier;
+            }
+            return "";
+          }
+        }}
         columns={[
           {
-            field: "parent",
+            field: "object_id",
             headerName: "Account",
             width: 200,
             cellClass: "borderless",

@@ -8,7 +8,7 @@ import { IconOrSpinner } from "components/display";
 
 export interface DropdownProps {
   children: ReactNode;
-  items: IMenuItem[];
+  items: MenuItem[];
   className?: string;
   menuClassName?: string;
   menuItemClassName?: string;
@@ -29,7 +29,7 @@ const Dropdown = ({
       trigger={trigger}
       overlay={
         <Menu className={classNames("dropdown-menu", menuClassName)}>
-          {map(items, (item: IMenuItem, index: number) => {
+          {map(items, (item: MenuItem, index: number) => {
             return (
               <Menu.Item
                 key={index}

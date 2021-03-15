@@ -3,7 +3,7 @@ type PageAndSize = {
   pageSize?: number;
 };
 
-interface IMenuItem {
+interface MenuItem {
   text: string;
   loading?: boolean;
   onClick: () => void;
@@ -15,8 +15,7 @@ type Order = 1 | -1 | 0;
 
 type Ordering = { [key: string]: Order };
 
-interface IFieldMenuField {
+interface Field {
   id: string;
   label: string;
-  defaultChecked?: boolean;
 }

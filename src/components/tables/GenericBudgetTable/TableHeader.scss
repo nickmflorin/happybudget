@@ -15,4 +15,9 @@
   .btn--icon-only {
     margin-right: 14px;
   }
+  .btn--caret {
+    &:not(:last-child) {
+      margin-right: 14px;
+    }
+  }
 }

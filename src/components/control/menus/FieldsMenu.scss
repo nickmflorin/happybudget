@@ -1,13 +1,15 @@
 @import "style/colors";
 @import "style/typography";
 
-.field-menu {
+.fields-menu {
   background: #fff;
 
-  .field-menu-menu {
-    .field-menu-menu-item {
+  .fields-menu-menu {
+    .fields-menu-menu-item {
       margin-bottom: 0px !important;
       margin-top: 0px !important;
+      padding-left: 8px;
+      padding-right: 8px;
       height: 30px;
       display: flex;
 
@@ -30,10 +32,13 @@
 
       span.text-container {
         margin-left: 8px;
-        font-family: $nunito;
+        font-family: $roboto;
         font-size: 13px;
         color: $text-primary !important;
         line-height: 30px;
+      }
+      &:hover {
+        background-color: $hover !important;
       }
     }
   }
@@ -43,7 +48,9 @@
     padding: 8px;
     > .btn--field-menu {
       width: 100%;
-      margin-bottom: 8px;
+      &:not(:last-child) {
+        margin-bottom: 8px;
+      }
     }
   }
 }
