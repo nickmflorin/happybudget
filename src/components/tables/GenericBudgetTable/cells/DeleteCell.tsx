@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 import { ICellRendererParams } from "ag-grid-community";
 import { IconButton } from "components/control/buttons";
@@ -11,9 +11,9 @@ interface DeleteCellProps extends ICellRendererParams {
 const DeleteCell = ({ onClick, node }: DeleteCellProps): JSX.Element => {
   return (
     <IconButton
-      className={"dark"}
+      className={"ag-grid-table-action-button"}
       size={"small"}
-      icon={<FontAwesomeIcon icon={faTrash} />}
+      icon={<FontAwesomeIcon icon={faTrashAlt} />}
       onClick={() => onClick(node.data)}
     />
   );

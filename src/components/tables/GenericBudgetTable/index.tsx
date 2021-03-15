@@ -16,7 +16,8 @@ import {
   Column,
   CellKeyDownEvent,
   CellPosition,
-  NavigateToNextCellParams
+  NavigateToNextCellParams,
+  ColSpanParams
 } from "ag-grid-community";
 
 import TableHeader from "./TableHeader";
@@ -152,6 +153,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               if (!isNil(colDef.field)) {
                 const cellErrors = filter(existing.meta.errors, { id: node.data.id, field: colDef.field });
                 if (cellErrors.length !== 0) {
+                  col.setColDef({ ...colDef, cellClass: "cell--error" }, null);
                   gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] });
                 }
               }
@@ -252,32 +254,19 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           },
           cellClass: (params: CellClassParams) => {
             if (includes(["delete", "select", "expand"], params.colDef.field)) {
-              return "action-cell";
+              return "cell--action";
             }
-            // TODO: This is not working!
             const row: R = params.node.data;
-            let hasError = false;
-            if (row.meta.errors.length !== 0 && !isNil(params.colDef.field)) {
-              const field = params.colDef.field;
-              const errors = filter(
-                row.meta.errors,
-                (error: Table.ICellError) => error.field === field && error.id === row.id
-              );
-              if (errors.length !== 0) {
-                hasError = true;
-              }
-            }
             let rootClassNames = undefined;
             if (!isNil(cellClass)) {
               rootClassNames = cellClass(params);
             }
             return classNames(col.cellClass, rootClassNames, {
-              "not-editable": !isCellEditable(row, params.colDef),
-              "not-editable-highlight":
+              "cell--not-editable": !isCellEditable(row, params.colDef),
+              "cell--not-editable-highlight":
                 !isCellEditable(row, params.colDef) &&
                 (isNil(highlightNonEditableCell) || highlightNonEditableCell(row, params.colDef) === true),
-              "unit-cell": params.colDef.field === "unit",
-              "has-error": hasError
+              "unit-cell": params.colDef.field === "unit"
             });
           }
         })
@@ -294,9 +283,10 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               field: "select",
               editable: false,
               headerName: "",
-              width: 30,
+              width: 40,
               cellRenderer: "NewRowCell",
-              cellRendererParams: { onNew: onRowAdd }
+              cellRendererParams: { onNew: onRowAdd },
+              colSpan: (params: ColSpanParams) => 2
             },
             {
               field: "expand",
@@ -329,9 +319,9 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           editable: false,
           cellClass: (params: CellClassParams) => {
             if (includes(["delete", "select", "expand"], params.colDef.field)) {
-              return classNames("action-cell", "not-editable");
+              return classNames("cell--action", "cell--not-editable");
             }
-            return "not-editable";
+            return "cell--not-editable";
           }
         })
       )

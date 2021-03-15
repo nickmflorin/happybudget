@@ -12,7 +12,7 @@ const ExpandCell = ({ onClick, node }: ExpandCellProps): JSX.Element => {
   if (node.data.meta.isPlaceholder === false) {
     return (
       <IconButton
-        className={"dark"}
+        className={"ag-grid-table-action-button"}
         size={"small"}
         icon={<FontAwesomeIcon icon={faArrowsAltV} />}
         onClick={() => onClick(node.data.id)}
