@@ -350,6 +350,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           immutableData={true}
           suppressRowClickSelection={true}
           onGridReady={onGridReady}
+          rowHeight={36}
+          headerHeight={38}
           domLayout={"autoHeight"}
           navigateToNextCell={(params: NavigateToNextCellParams): CellPosition => {
             if (!isNil(params.nextCellPosition)) {

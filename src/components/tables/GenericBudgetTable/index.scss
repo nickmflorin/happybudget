@@ -22,7 +22,8 @@
       border-bottom: none !important;
       div[role='gridcell'] {
         background-color: #f8f8f8;
-        font-family: $noto-sans-medium;
+        font-family: $roboto;
+        font-weight: 400;
         color: $text-secondary;
       }
     }

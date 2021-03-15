@@ -36,18 +36,17 @@ $table-border: 1px solid $table-border-color;
 }
 
 .ant-table {
-  font-size: 13px;
 
-  .ant-table-cell {
-    padding: 8px;
-  }
+  // .ant-table-cell {
+  //   padding: 6px;
+  // }
 
   thead.ant-table-thead {
     > tr {
       > th {
         font-family: $nunito;
         font-weight: 600;
-        font-size: 14px;
+        font-size: 13px;
         color: $text-secondary;
         background: $white !important;
         border-top: none !important;
@@ -144,12 +143,14 @@ $table-border: 1px solid $table-border-color;
 
 .ag-theme-alpine {
   font-family: $roboto;
-  font-weight: 400;
 
-  /* Note:
-     Numeric columns prop causes some headers to be right aligned.
-     We want to overwrite that to keep all columns left aligned:
-  */
+  .ag-cell, .ag-full-width-row .ag-cell-wrapper.ag-row-group {
+      line-height: 32px;
+      padding-left: 10px;
+      padding-right: 10px;
+      -webkit-font-smoothing: subpixel-antialiased;
+  }
+
   .ag-right-aligned-header div.ag-header-cell-label {
     justify-content: flex-end !important;
   }
@@ -162,17 +163,24 @@ $table-border: 1px solid $table-border-color;
   .ag-root-wrapper {
     border: none;
   }
+
   .ag-header {
     border: none;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
-    font-family: $noto-sans-light !important;
     color: #4e4d4d !important;
-    letter-spacing: 0.045em;
+
+    .ag-header-cell {
+      .ag-cell-label-container {
+        letter-spacing: 0.045em;
+        font-family: $roboto;
+        font-size: 12px;
+        font-weight: 400;
+        color: $text-secondary;
+      }
+    }
   }
-  .ag-header-cell-text {
-    color: $text-secondary;
-  }
+
   .ag-cell-range-selected {
     background-color: $white !important;
   }
@@ -180,6 +188,8 @@ $table-border: 1px solid $table-border-color;
     padding: 0;
   }
   div[role='gridcell'] {
+    font-size: 12px;
+    font-weight: 300;
     background-color: $white;
     border-bottom: none;
     display: flex;
