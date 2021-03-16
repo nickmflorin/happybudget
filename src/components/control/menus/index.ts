@@ -1,4 +1,4 @@
 export { default as ActionsMenuBar } from "./ActionsMenuBar";
 export { default as HorizontalMenu } from "./HorizontalMenu";
 export { default as FieldsMenu } from "./FieldsMenu";
-export { default as UnitsMenu } from "./UnitsMenu";
+export { default as ModelTagsMenu } from "./ModelTagsMenu";

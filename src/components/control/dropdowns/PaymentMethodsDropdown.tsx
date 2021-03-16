@@ -5,20 +5,25 @@ import { Dropdown } from "antd";
 
 import { ModelTagsMenu } from "components/control/menus";
 import { Tag } from "components/display";
-import { UnitModelsList } from "model";
+import { PaymentMethodModelsList } from "model";
 
-interface UnitDropdownProps {
-  value: Unit | null;
+interface PaymentMethodsDropdownProps {
+  value: PaymentMethod | null;
   className?: string;
   trigger?: ("click" | "hover" | "contextMenu")[];
-  onChange: (value: Unit) => void;
+  onChange: (value: PaymentMethod) => void;
 }
 
-const UnitDropdown = ({ value, className, onChange, trigger = ["click"] }: UnitDropdownProps): JSX.Element => {
-  const [model, setModel] = useState<UnitModel | undefined>(undefined);
+const PaymentMethodsDropdown = ({
+  value,
+  className,
+  onChange,
+  trigger = ["click"]
+}: PaymentMethodsDropdownProps): JSX.Element => {
+  const [model, setModel] = useState<PaymentMethodModel | undefined>(undefined);
   useEffect(() => {
     if (!isNil(value)) {
-      const _item = find(UnitModelsList, { id: value });
+      const _item = find(PaymentMethodModelsList, { id: value });
       setModel(_item);
     } else {
       setModel(undefined);
@@ -29,7 +34,7 @@ const UnitDropdown = ({ value, className, onChange, trigger = ["click"] }: UnitD
     <Dropdown
       className={classNames("units-dropdown", className)}
       trigger={trigger}
-      overlay={<ModelTagsMenu<Unit, UnitName> models={UnitModelsList} onChange={onChange} />}
+      overlay={<ModelTagsMenu<PaymentMethod, PaymentMethodName> models={PaymentMethodModelsList} onChange={onChange} />}
     >
       <div className={"unit-dropdown-child"}>
         {!isNil(model) ? (
@@ -46,4 +51,4 @@ const UnitDropdown = ({ value, className, onChange, trigger = ["click"] }: UnitD
   );
 };
 
-export default UnitDropdown;
+export default PaymentMethodsDropdown;

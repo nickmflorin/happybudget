@@ -54,6 +54,22 @@ export const UnitModels: { [key: string]: UnitModel } = {
 
 export const UnitModelsList = Object.values(UnitModels);
 
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+export enum PaymentMethodNames {
+  CHECK = "Check",
+  CARD = "Card",
+  WIRE = "Wire"
+}
+
+export const PaymentMethodModels: { [key: string]: PaymentMethodModel } = {
+  MINUTES: { id: 0, name: PaymentMethodNames.CHECK },
+  HOURS: { id: 1, name: PaymentMethodNames.CARD },
+  WEEKS: { id: 2, name: PaymentMethodNames.WIRE }
+};
+
+export const PaymentMethodModelsList = Object.values(PaymentMethodModels);
+
 export const flattenBudgetItemNodes = (nodes: IBudgetItemNode[]): IBudgetItem[] => {
   const flattened: IBudgetItem[] = [];
 

@@ -40,7 +40,7 @@ export const FieldDefinitions: { [key in Table.RowType]: IFieldDefinition[] } = 
     { name: "vendor", postPayload: true },
     { name: "purchase_order", postPayload: true },
     { name: "date", postPayload: true },
-    { name: "payment_method", postPayload: true },
+    { name: "payment_method", postPayload: true, updateBeforeResponse: true },
     { name: "payment_id", postPayload: true },
     { name: "value", postPayload: true, triggerParentRefresh: true }
   ],

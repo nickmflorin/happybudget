@@ -20,7 +20,7 @@ import {
   selectAllActualsTableRowsAction,
   requestBudgetItemsTreeAction
 } from "./actions";
-import { BudgetItemCell } from "./cells";
+import { BudgetItemCell, PaymentMethodsCell } from "./cells";
 
 const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
@@ -63,10 +63,14 @@ const Actuals = (): JSX.Element => {
         onRowDelete={(row: Table.IActualRow) => dispatch(removeActualAction(row))}
         onRowUpdate={(id: number, data: { [key: string]: any }) => dispatch(updateActualAction({ id, data }))}
         onSelectAll={() => dispatch(selectAllActualsTableRowsAction())}
-        frameworkComponents={{ BudgetItemCell }}
-        rowRefreshRequired={(existing: Table.IActualRow, row: Table.IActualRow) =>
-          existing.object_id !== row.object_id || existing.parent_type !== row.parent_type
-        }
+        frameworkComponents={{ BudgetItemCell, PaymentMethodsCell }}
+        rowRefreshRequired={(existing: Table.IActualRow, row: Table.IActualRow) => {
+          return (
+            existing.object_id !== row.object_id ||
+            existing.parent_type !== row.parent_type ||
+            existing.payment_method !== row.payment_method
+          );
+        }}
         footerRow={{
           description: "Grand Total",
           value:
@@ -115,7 +119,18 @@ const Actuals = (): JSX.Element => {
           },
           {
             field: "payment_method",
-            headerName: "Payment Method"
+            headerName: "Payment Method",
+            cellRenderer: "PaymentMethodsCell",
+            cellClass: "cell--centered",
+            cellRendererParams: {
+              onChange: (value: PaymentMethod, row: Table.IActualRow) =>
+                dispatch(
+                  updateActualAction({
+                    id: row.id,
+                    data: { payment_method: value }
+                  })
+                )
+            }
           },
           {
             field: "payment_id",

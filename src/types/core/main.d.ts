@@ -4,11 +4,18 @@
 /// <reference path="./table.d.ts" />
 /// <reference path="./files.d.ts" />
 
+interface DistinctOptionModel<I extends number, N extends string> {
+  id: I;
+  name: N;
+}
+
 type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
 type ProductionType = 0 | 1 | 2 | 3 | 4 | 5;
+type ProductionTypeModel = DistinctOptionModel<ProductionType, ProductionTypeName>;
 
 type PaymentMethodName = "Check" | "Card" | "Wire";
 type PaymentMethod = 0 | 1 | 2;
+type PaymentMethodModel = DistinctOptionModel<PaymentMethod, PaymentMethodName>;
 
 type EntityType = "budget" | "account" | "subaccount";
 type BudgetItemType = "subaccount" | "account";
@@ -16,7 +23,7 @@ type CommentParentType = "budget" | "account" | "subaccount" | "comment";
 
 type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
 type Unit = 0 | 1 | 2 | 3 | 4 | 5;
-type UnitModel = { id: Unit; name: UnitName };
+type UnitModel = DistinctOptionModel<Unit, UnitName>;
 
 type ContactRoleName =
   | "Producer"

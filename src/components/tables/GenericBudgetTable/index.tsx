@@ -272,7 +272,6 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
             if (!isNil(cellClass)) {
               rootClassNames = cellClass(params);
             }
-            console.log(col.cellClass);
             return classNames(col.cellClass, rootClassNames, {
               "cell--not-editable": !isCellEditable(row, params.colDef),
               "cell--not-editable-highlight":
