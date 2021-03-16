@@ -604,7 +604,7 @@ export function* handleAccountSubAccountUpdateTask(
             );
             yield put(activateAccountSubAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
-            yield put(updateAccountSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));
+            yield put(updateAccountSubAccountsTableRowAction({ id: response.id, data: responsePayload }));
           } catch (e) {
             yield call(
               handleTableErrors,
