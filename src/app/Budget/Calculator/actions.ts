@@ -1,4 +1,4 @@
-import { createAction, simpleAction } from "store/actions";
+import { simpleAction } from "store/actions";
 
 export const ActionType = {
   Accounts: {
@@ -183,8 +183,8 @@ export const activateAccountsTablePlaceholderAction = simpleAction<Table.IActiva
 export const selectAccountsTableRowAction = simpleAction<number>(ActionType.AccountsTable.SelectRow);
 export const selectAllAccountsTableRowsAction = simpleAction<null>(ActionType.AccountsTable.SelectAllRows);
 export const deselectAccountsTableRowAction = simpleAction<number>(ActionType.AccountsTable.DeselectRow);
-export const removeAccountsTableRowAction = simpleAction<Table.IAccountRow>(ActionType.AccountsTable.RemoveRow);
-export const removeAccountAction = simpleAction<Table.IAccountRow>(ActionType.Accounts.Remove);
+export const removeAccountsTableRowAction = simpleAction<number>(ActionType.AccountsTable.RemoveRow);
+export const removeAccountAction = simpleAction<number>(ActionType.Accounts.Remove);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Accounts.Creating);
@@ -257,10 +257,10 @@ export const updateAccountSubAccountsTableRowAction = simpleAction<{
 export const activateAccountSubAccountsTablePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
   ActionType.Account.SubAccountsTable.ActivatePlaceholder
 );
-export const removeAccountSubAccountsRowAction = simpleAction<Table.ISubAccountRow>(
+export const removeAccountSubAccountsTableRowAction = simpleAction<number>(
   ActionType.Account.SubAccountsTable.RemoveRow
 );
-export const removeAccountSubAccountAction = simpleAction<Table.ISubAccountRow>(ActionType.Account.SubAccounts.Remove);
+export const removeAccountSubAccountAction = simpleAction<number>(ActionType.Account.SubAccounts.Remove);
 export const deletingAccountSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Account.SubAccounts.Deleting
 );
@@ -341,12 +341,10 @@ export const updateSubAccountSubAccountsTableRowAction = simpleAction<{
 export const activateSubAccountSubAccountsTablePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
   ActionType.SubAccount.SubAccountsTable.ActivatePlaceholder
 );
-export const removeSubAccountSubAccountsTableRowAction = simpleAction<Table.ISubAccountRow>(
+export const removeSubAccountSubAccountsTableRowAction = simpleAction<number>(
   ActionType.SubAccount.SubAccountsTable.RemoveRow
 );
-export const removeSubAccountSubAccountAction = simpleAction<Table.ISubAccountRow>(
-  ActionType.SubAccount.SubAccounts.Remove
-);
+export const removeSubAccountSubAccountAction = simpleAction<number>(ActionType.SubAccount.SubAccounts.Remove);
 export const deletingSubAccountSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.SubAccount.SubAccounts.Deleting
 );

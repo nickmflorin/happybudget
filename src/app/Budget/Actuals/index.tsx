@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isNil, find } from "lodash";
+import { isNil, find, includes } from "lodash";
 
 import { CellClassParams, ColDef } from "ag-grid-community";
 
@@ -52,8 +52,8 @@ const Actuals = (): JSX.Element => {
     <RenderWithSpinner loading={actuals.table.loading || budget.detail.loading}>
       <GenericBudgetTable<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow>
         table={actuals.table.data}
-        isCellEditable={(row: Table.IActualRow, col: ColDef) => col.field !== "object_id"}
-        highlightNonEditableCell={(row: Table.IActualRow, col: ColDef) => col.field !== "object_id"}
+        nonEditableCells={["object_id", "payment_method"]}
+        nonHighlightedNonEditableCells={["payment_method", "object_id"]}
         search={actuals.table.search}
         onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
         saving={actuals.deleting.length !== 0 || actuals.updating.length !== 0 || actuals.creating}

@@ -171,21 +171,21 @@ export const createTableDataReducer = <
           return replaceInArray<R>(newState, { id: payload.id }, { ...row, ...payload.data });
         }
       },
-      RemoveRow: (payload: { id: number }) => {
-        const row = find(newState, { id: payload.id });
+      RemoveRow: (id: number) => {
+        const row = find(newState, { id });
         if (isNil(row)) {
           /* eslint-disable no-console */
           console.error(
             `Inconsistent State!:  Inconsistent state noticed when removing ${Options.referenceEntity} row from state...
-          the ${Options.referenceEntity} row with ID ${payload.id} does not exist in state when it is expected to.`
+          the ${Options.referenceEntity} row with ID ${id} does not exist in state when it is expected to.`
           );
           return newState;
         } else {
-          return filter(newState, (r: R) => r.id !== payload.id);
+          return filter(newState, (r: R) => r.id !== id);
         }
       },
-      SelectRow: (id: any) => {
-        const row = find(newState, { id });
+      SelectRow: (id: number) => {
+        const row = find(newState, { id } as any);
         if (isNil(row)) {
           /* eslint-disable no-console */
           console.error(
@@ -204,8 +204,8 @@ export const createTableDataReducer = <
           return replaceInArray<R>(newState, { id }, { ...row, meta: { ...row.meta, selected: true } });
         }
       },
-      DeselectRow: (id: any) => {
-        const row = find(newState, { id });
+      DeselectRow: (id: number) => {
+        const row = find(newState, { id } as any);
         if (isNil(row)) {
           /* eslint-disable no-console */
           console.error(

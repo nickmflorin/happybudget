@@ -42,6 +42,9 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R 
   frameworkComponents?: { [key: string]: any };
   getExportValue?: ExportValueGetters;
   exportFileName?: string;
+  nonEditableCells?: (keyof R)[];
+  highlightedNonEditableCells?: (keyof R)[];
+  nonHighlightedNonEditableCells?: (keyof R)[];
   cellClass?: (params: CellClassParams) => string | undefined;
   highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
@@ -53,7 +56,7 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R 
   onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;
   onSelectAll: () => void;
-  isCellEditable: (row: R, col: ColDef) => boolean;
+  isCellEditable?: (row: R, col: ColDef) => boolean;
 }
 
 const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extends Table.IRow<F, E>>({
@@ -65,6 +68,9 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   frameworkComponents = {},
   exportFileName,
   getExportValue,
+  nonEditableCells,
+  highlightedNonEditableCells,
+  nonHighlightedNonEditableCells,
   cellClass,
   onSearch,
   onSelectAll,
@@ -98,6 +104,41 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
     setFooterGridApi(event.api);
     setFooterColumnApi(event.columnApi);
   }, []);
+
+  const _isCellEditable = useCallback(
+    (row: R, colDef: ColDef): boolean => {
+      if (includes(["delete", "select", "expand"], colDef.field)) {
+        return false;
+      }
+      if (!isNil(nonEditableCells) && includes(nonEditableCells, colDef.field as keyof R)) {
+        return false;
+      } else if (!isNil(isCellEditable)) {
+        return isCellEditable(row, colDef);
+      }
+      return true;
+    },
+    [nonEditableCells, isCellEditable]
+  );
+
+  const _isCellNonEditableHighlight = useCallback(
+    (row: R, colDef: ColDef): boolean => {
+      if (includes(["delete", "select", "expand"], colDef.field)) {
+        return false;
+      }
+      if (!_isCellEditable(row, colDef)) {
+        if (!isNil(nonHighlightedNonEditableCells)) {
+          return !includes(nonHighlightedNonEditableCells, colDef.field as keyof R);
+        } else if (!isNil(highlightedNonEditableCells)) {
+          return includes(highlightedNonEditableCells, colDef.field as keyof R);
+        } else if (!isNil(highlightNonEditableCell)) {
+          return highlightNonEditableCell(row, colDef);
+        }
+        return true;
+      }
+      return false;
+    },
+    [nonEditableCells, isCellEditable]
+  );
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {
@@ -256,13 +297,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           ...col,
           suppressMenu: true,
           suppressMenuHide: true,
-          editable: (params: EditableCallbackParams) => {
-            if (includes(["delete", "select", "expand"], params.colDef.field)) {
-              return false;
-            }
-            const row: R = params.node.data;
-            return isCellEditable(row, params.colDef);
-          },
+          editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
           cellClass: (params: CellClassParams) => {
             if (includes(["delete", "select", "expand"], params.colDef.field)) {
               return "cell--action";
@@ -273,11 +308,8 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
               rootClassNames = cellClass(params);
             }
             return classNames(col.cellClass, rootClassNames, {
-              "cell--not-editable": !isCellEditable(row, params.colDef),
-              "cell--not-editable-highlight":
-                !isCellEditable(row, params.colDef) &&
-                (isNil(highlightNonEditableCell) || highlightNonEditableCell(row, params.colDef) === true),
-              "unit-cell": params.colDef.field === "unit"
+              "cell--not-editable": !_isCellEditable(row, params.colDef),
+              "cell--not-editable-highlight": _isCellNonEditableHighlight(row, params.colDef)
             });
           }
         })

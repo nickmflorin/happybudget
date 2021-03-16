@@ -73,7 +73,7 @@ const SubAccount = (): JSX.Element => {
           onRowAdd={() => dispatch(addSubAccountSubAccountsTablePlaceholdersAction())}
           onRowSelect={(id: number) => dispatch(selectSubAccountSubAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectSubAccountSubAccountsTableRowAction(id))}
-          onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeSubAccountSubAccountAction(row))}
+          onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeSubAccountSubAccountAction(row.id))}
           onRowUpdate={(id: number, data: { [key: string]: any }) =>
             dispatch(updateSubAccountSubAccountAction({ id, data }))
           }

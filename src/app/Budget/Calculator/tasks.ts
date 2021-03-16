@@ -60,7 +60,7 @@ import {
   activateAccountsTablePlaceholderAction,
   activateSubAccountSubAccountsTablePlaceholderAction,
   removeAccountsTableRowAction,
-  removeAccountSubAccountsRowAction,
+  removeAccountSubAccountsTableRowAction,
   removeSubAccountSubAccountsTableRowAction,
   addErrorsToAccountsTableAction,
   addErrorsToAccountSubAccountsTableAction,
@@ -363,58 +363,97 @@ export function* handleSubAccountChangedTask(action: Redux.IAction<number>): Sag
   yield all([put(requestSubAccountAction()), put(requestSubAccountSubAccountsAction())]);
 }
 
-export function* handleAccountRemovalTask(action: Redux.IAction<Table.IAccountRow>): SagaIterator {
+export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(removeAccountsTableRowAction(action.payload));
-    // NOTE: We cannot find the existing row from the table in state because the
-    // dispatched action above will remove the row from the table.
-    if (action.payload.meta.isPlaceholder === false) {
-      yield put(deletingAccountAction({ id: action.payload.id as number, value: true }));
-      try {
-        yield call(deleteAccount, action.payload.id as number);
-      } catch (e) {
-        // TODO: Should we put the row back in if there was an error?
-        handleRequestError(e, "There was an error deleting the account.");
-      } finally {
-        yield put(deletingAccountAction({ id: action.payload.id as number, value: false }));
+    const tableData: Table.IAccountRow[] = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.accounts.table.data
+    );
+    const existing: Table.IAccountRow | undefined = find(tableData, { id: action.payload });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.warn(
+        `Inconsistent State!  Inconsistent state noticed when removing an account...
+        The account with ID ${action.payload} does not exist in state when it is expected to.`
+      );
+    } else {
+      // Dispatch the action to remove the row from the table in the UI.
+      yield put(removeAccountsTableRowAction(action.payload));
+      // Only make an API request to the server to delete the sub account if the
+      // row was not a placeholder (i.e. the sub account exists in the backend).
+      if (existing.meta.isPlaceholder === false) {
+        yield put(deletingAccountAction({ id: action.payload, value: true }));
+        try {
+          yield call(deleteAccount, action.payload);
+        } catch (e) {
+          // TODO: Should we put the row back in if there was an error?
+          handleRequestError(e, "There was an error deleting the account.");
+        } finally {
+          yield put(deletingAccountAction({ id: action.payload, value: false }));
+        }
       }
     }
   }
 }
 
-export function* handleAccountSubAccountRemovalTask(action: Redux.IAction<Table.ISubAccountRow>): SagaIterator {
+export function* handleAccountSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(action.payload) && !isNil(accountId)) {
-    yield put(removeAccountSubAccountsRowAction(accountId, action.payload));
-    // NOTE: We cannot find the existing row from the table in state because the
-    // dispatched action above will remove the row from the table.
-    if (action.payload.meta.isPlaceholder === false) {
-      yield put(deletingAccountSubAccountAction({ id: action.payload.id as number, value: true }));
-      try {
-        yield call(deleteSubAccount, action.payload.id as number);
-      } catch (e) {
-        handleRequestError(e, "There was an error deleting the sub account.");
-      } finally {
-        yield put(deletingAccountSubAccountAction({ id: action.payload.id as number, value: false }));
+    const tableData: Table.ISubAccountRow[] = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.data
+    );
+    const existing: Table.ISubAccountRow | undefined = find(tableData, { id: action.payload });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.warn(
+        `Inconsistent State!  Inconsistent state noticed when removing an account's sub account...
+        The sub account with ID ${action.payload} does not exist in state when it is expected to.`
+      );
+    } else {
+      // Dispatch the action to remove the row from the table in the UI.
+      yield put(removeAccountSubAccountsTableRowAction(action.payload));
+      // Only make an API request to the server to delete the sub account if the
+      // row was not a placeholder (i.e. the sub account exists in the backend).
+      if (existing.meta.isPlaceholder === false) {
+        yield put(deletingAccountSubAccountAction({ id: action.payload, value: true }));
+        try {
+          yield call(deleteSubAccount, action.payload);
+        } catch (e) {
+          handleRequestError(e, "There was an error deleting the sub account.");
+        } finally {
+          yield put(deletingAccountSubAccountAction({ id: action.payload, value: false }));
+        }
       }
     }
   }
 }
 
-export function* handleSubAccountSubAccountRemovalTask(action: Redux.IAction<Table.ISubAccountRow>): SagaIterator {
+export function* handleSubAccountSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(action.payload) && !isNil(subaccountId)) {
-    yield put(removeSubAccountSubAccountsTableRowAction(subaccountId, action.payload));
-    // NOTE: We cannot find the existing row from the table in state because the
-    // dispatched action above will remove the row from the table.
-    if (action.payload.meta.isPlaceholder === false) {
-      yield put(deletingSubAccountSubAccountAction({ id: action.payload.id as number, value: true }));
-      try {
-        yield call(deleteSubAccount, action.payload.id as number);
-      } catch (e) {
-        handleRequestError(e, "There was an error deleting the sub account.");
-      } finally {
-        yield put(deletingSubAccountSubAccountAction({ id: action.payload.id as number, value: false }));
+    const tableData: Table.ISubAccountRow[] = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table.data
+    );
+    const existing: Table.ISubAccountRow | undefined = find(tableData, { id: action.payload });
+    if (isNil(existing)) {
+      /* eslint-disable no-console */
+      console.warn(
+        `Inconsistent State!  Inconsistent state noticed when removing a sub account's sub account...
+        The sub account with ID ${action.payload} does not exist in state when it is expected to.`
+      );
+    } else {
+      // Dispatch the action to remove the row from the table in the UI.
+      yield put(removeSubAccountSubAccountsTableRowAction(action.payload));
+      // Only make an API request to the server to delete the sub account if the
+      // row was not a placeholder (i.e. the sub account exists in the backend).
+      if (existing.meta.isPlaceholder === false) {
+        yield put(deletingSubAccountSubAccountAction({ id: action.payload, value: true }));
+        try {
+          yield call(deleteSubAccount, action.payload);
+        } catch (e) {
+          handleRequestError(e, "There was an error deleting the sub account.");
+        } finally {
+          yield put(deletingSubAccountSubAccountAction({ id: action.payload, value: false }));
+        }
       }
     }
   }
