@@ -220,6 +220,13 @@ $table-border: 1px solid $table-border-color;
           }
         }
       }
+      &--centered {
+        .ag-react-container {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+        }
+      }
       &---error {
         border: 2px solid $red !important;
 

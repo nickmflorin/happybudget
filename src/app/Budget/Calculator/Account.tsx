@@ -116,7 +116,7 @@ const Account = (): JSX.Element => {
             {
               field: "unit",
               headerName: "Unit",
-              cellStyle: { textAlign: "right" },
+              cellClass: "cell--centered",
               cellRenderer: "UnitCell",
               cellRendererParams: {
                 onChange: (value: Unit, row: Table.ISubAccountRow) =>

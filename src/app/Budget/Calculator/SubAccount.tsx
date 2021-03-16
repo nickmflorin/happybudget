@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
 import { isNil, includes } from "lodash";
 
-import { ColDef, ColSpanParams } from "ag-grid-community";
+import { ColDef, ColSpanParams, CellClassParams } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
@@ -117,7 +117,7 @@ const SubAccount = (): JSX.Element => {
             {
               field: "unit",
               headerName: "Unit",
-              cellStyle: { textAlign: "right" },
+              cellClass: "cell--centered",
               cellRenderer: "UnitCell",
               cellRendererParams: {
                 onChange: (unit: Unit, row: Table.ISubAccountRow) =>

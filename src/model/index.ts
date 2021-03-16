@@ -16,8 +16,6 @@ export enum ContactRoleNames {
   OTHER = "Other"
 }
 
-/* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
 export const ContactRoleModels: { [key: string]: ContactRoleModel } = {
   PRODUCER: { id: 0, name: ContactRoleNames.PRODUCER },
   EXECUTIVE_PRODUCER: { id: 1, name: ContactRoleNames.EXECUTIVE_PRODUCER },
@@ -33,6 +31,28 @@ export const ContactRoleModels: { [key: string]: ContactRoleModel } = {
 };
 
 export const ContactRoleModelsList = Object.values(ContactRoleModels);
+
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+export enum UnitNames {
+  MINUTES = "Minutes",
+  HOURS = "Hours",
+  WEEKS = "Weeks",
+  MONTHS = "Months",
+  DAYS = "Days",
+  NIGHTS = "Nights"
+}
+
+export const UnitModels: { [key: string]: UnitModel } = {
+  MINUTES: { id: 0, name: UnitNames.MINUTES },
+  HOURS: { id: 1, name: UnitNames.HOURS },
+  WEEKS: { id: 2, name: UnitNames.WEEKS },
+  MONTHS: { id: 3, name: UnitNames.MONTHS },
+  DAYS: { id: 4, name: UnitNames.DAYS },
+  NIGHTS: { id: 5, name: UnitNames.NIGHTS }
+};
+
+export const UnitModelsList = Object.values(UnitModels);
 
 export const flattenBudgetItemNodes = (nodes: IBudgetItemNode[]): IBudgetItem[] => {
   const flattened: IBudgetItem[] = [];

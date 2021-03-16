@@ -16,6 +16,7 @@ type CommentParentType = "budget" | "account" | "subaccount" | "comment";
 
 type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
 type Unit = 0 | 1 | 2 | 3 | 4 | 5;
+type UnitModel = { id: Unit; name: UnitName };
 
 type ContactRoleName =
   | "Producer"

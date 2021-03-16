@@ -20,6 +20,7 @@ import {
   SoundIcon,
   WriterIcon
 } from "components/svgs";
+import { selectConsistent } from "util/arrays";
 import "./Card.scss";
 
 export const Icons: (() => JSX.Element)[] = [
@@ -59,21 +60,10 @@ const Card = ({ title, subTitle, dropdown, onClick, loading, selected = false, o
   const [color, setColor] = useState<string | undefined>(undefined);
   const [Icon, setIcon] = useState<(() => JSX.Element) | undefined>(undefined);
 
-  const sumChars = (val: string): number => {
-    let sum = 0;
-    for (let i = 0; i < val.length; i++) {
-      sum += val.charCodeAt(i);
-    }
-    return sum;
-  };
-
   useEffect(() => {
     if (!isNil(title)) {
-      const iC = sumChars(title) % Colors.length;
-      setColor(Colors[iC]);
-
-      const iI = sumChars(title) % Icons.length;
-      setIcon(Icons[iI]);
+      setColor(selectConsistent(Colors, title));
+      setIcon(selectConsistent(Icons, title));
     }
   }, [title]);
 

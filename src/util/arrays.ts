@@ -1,4 +1,5 @@
 import { findIndex, find, isNil } from "lodash";
+import { sumChars } from "./string";
 
 export const removeFromArray = (items: any[], key: any, value: any) => {
   const newItems = [...items];
@@ -25,4 +26,9 @@ export const replaceInArray = <T>(
 
 export const selectRandom = <T = any>(array: T[]): T => {
   return array[Math.floor(Math.random() * array.length)];
+};
+
+export const selectConsistent = <T = any>(array: T[], name: string): T => {
+  const index = sumChars(name) % array.length;
+  return array[index];
 };
