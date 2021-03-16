@@ -20,9 +20,10 @@ const Budgets = (): JSX.Element => {
   return (
     <Page className={"budgets"} loading={budgets.loading} title={"Budgets"}>
       <div className={"budgets-grid"}>
-        {map(budgets.data, (budget: IBudget) => {
+        {map(budgets.data, (budget: IBudget, index: number) => {
           return (
             <BudgetCard
+              key={index}
               budget={budget}
               loading={includes(budgets.deleting, budget.id)}
               selected={includes(budgets.selected, budget.id)}
