@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useHistory, useLocation } from "react-router-dom";
-import { isNil, map } from "lodash";
+import { isNil } from "lodash";
 import classNames from "classnames";
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 
-import { RenderOrSpinner, ShowHide, TooltipWrapper } from "components/display";
+import { ShowHide, TooltipWrapper } from "components/display";
 
 export interface ISidebarItem {
   icon?: JSX.Element;
@@ -20,7 +20,6 @@ export interface ISidebarItem {
   tooltip?: TooltipPropsWithTitle;
   onClick?: () => void;
   onActivated?: () => void;
-  onChildrenExpanded?: () => void;
 }
 
 const SidebarItem = ({
@@ -30,17 +29,12 @@ const SidebarItem = ({
   active,
   hidden,
   activePathRegexes,
-  children,
   tooltip,
-  defaultShowChildren = false,
-  childrenLoading = false,
   collapsed = false,
   onClick,
-  onActivated,
-  onChildrenExpanded
+  onActivated
 }: ISidebarItem): JSX.Element => {
   const [isActive, setIsActive] = useState(false);
-  const [childrenVisible] = useState(defaultShowChildren);
   const history = useHistory();
   const location = useLocation();
 
@@ -99,17 +93,6 @@ const SidebarItem = ({
             <span className={"text-container"}>{text}</span>
           </ShowHide>
         </div>
-        {collapsed === false && !isNil(children) && childrenVisible && (
-          <div className={"sidebar-menu nested"}>
-            <RenderOrSpinner loading={childrenLoading} fontSize={16}>
-              <React.Fragment>
-                {map(children, (child: ISidebarItem, index: number) => (
-                  <SidebarItem key={index} {...child} />
-                ))}
-              </React.Fragment>
-            </RenderOrSpinner>
-          </div>
-        )}
       </div>
     </TooltipWrapper>
   );

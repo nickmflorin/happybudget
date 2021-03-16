@@ -13,7 +13,6 @@ import { ShowHide, RenderWithSpinner } from "components/display";
 import { toDisplayTimeSince } from "util/dates";
 import { useLoggedInUser } from "store/hooks";
 
-import Comments from "./Comments";
 import "./Comment.scss";
 
 const CommentHeader = (props: { comment: IComment }): JSX.Element => {
@@ -136,7 +135,7 @@ const Comment = ({
   const [editing, setEditing] = useState(false);
 
   return (
-    <RenderWithSpinner className={"comment"} loading={loading} toggleOpacity={true} spinnerProps={{ color: "#b5b5b5" }}>
+    <RenderWithSpinner className={"comment"} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
       <CommentHeader comment={comment} />
       <CommentBody
         comment={comment}

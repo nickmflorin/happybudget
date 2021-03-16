@@ -1,21 +1,23 @@
 import React, { ReactNode } from "react";
-import Spinner from "./Spinner";
+import Spinner, { SpinnerProps } from "./Spinner";
 
-interface RenderOrSpinnerProps {
-  hide?: boolean;
+interface RenderOrSpinnerProps extends SpinnerProps {
   loading?: boolean;
   children: ReactNode;
-  [key: string]: any;
 }
 
-const RenderOrSpinner = ({ hide, loading, children, ...props }: RenderOrSpinnerProps): JSX.Element => {
-  if (hide === true) {
-    return <></>;
-  } else if (loading === true) {
-    return <Spinner {...props} />;
-  } else {
-    return <>{children}</>;
+const RenderOrSpinner = ({ loading, className, style = {}, children, ...props }: RenderOrSpinnerProps): JSX.Element => {
+  if (!(loading === true)) {
+    return (
+      <React.Fragment>
+        <div className={className} style={{ ...style, position: "relative" }}>
+          <Spinner {...props} />
+          {children}
+        </div>
+      </React.Fragment>
+    );
   }
+  return <></>;
 };
 
 export default RenderOrSpinner;

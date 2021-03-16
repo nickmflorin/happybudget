@@ -42,7 +42,7 @@ const Comments = ({
       className={classNames("comments", { nested })}
       loading={loading}
       toggleOpacity={true}
-      spinnerProps={{ color: "#b5b5b5" }}
+      color={"#b5b5b5"}
     >
       <ShowHide show={comments.length !== 0}>
         {map(comments, (comment: IComment, index: number) => (

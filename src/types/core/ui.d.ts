@@ -19,3 +19,8 @@ interface Field {
   id: string;
   label: string;
 }
+
+interface StandardComponentProps {
+  className?: string;
+  style?: React.CSSProperties;
+}
