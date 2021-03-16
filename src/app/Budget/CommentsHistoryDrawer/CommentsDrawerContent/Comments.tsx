@@ -39,6 +39,8 @@ const Comments = ({
 
   return (
     <RenderWithSpinner
+      absolute
+      size={15}
       className={classNames("comments", { nested })}
       loading={loading}
       toggleOpacity={true}

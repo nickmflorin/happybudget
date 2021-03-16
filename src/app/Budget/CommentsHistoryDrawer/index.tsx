@@ -5,8 +5,8 @@ import { HorizontalMenu } from "components/control/menus";
 import { IHorizontalMenuItem } from "components/control/menus/HorizontalMenu";
 import { Drawer } from "components/layout";
 
-import CommentsDrawerContent, { CommentsDrawerContentProps } from "./Comments";
-import History from "./History";
+import CommentsDrawerContent, { CommentsDrawerContentProps } from "./CommentsDrawerContent";
+import HistoryDrawerContent from "./HistoryDrawerContent";
 import "./index.scss";
 
 type Page = "comments" | "history";
@@ -33,7 +33,7 @@ const CommentsHistoryDrawer = ({ visible, commentsProps }: CommentsHistoryDrawer
         <CommentsDrawerContent {...commentsProps} />
       </ShowHide>
       <ShowHide show={page === "history"}>
-        <History />
+        <HistoryDrawerContent />
       </ShowHide>
     </Drawer>
   );

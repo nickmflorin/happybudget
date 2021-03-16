@@ -17,6 +17,7 @@ export interface SpinnerProps extends StandardComponentProps {
   position?: "absolute" | "fixed" | "relative";
   color?: string;
   fixed?: boolean;
+  absolute?: boolean;
   large?: boolean;
   medium?: boolean;
   small?: boolean;
@@ -25,6 +26,7 @@ export interface SpinnerProps extends StandardComponentProps {
 const Spinner = ({
   size = "medium",
   fixed,
+  absolute,
   className,
   color,
   small,
@@ -36,6 +38,8 @@ const Spinner = ({
   const spinnerPosition = useMemo(() => {
     if (fixed === true) {
       return "fixed";
+    } else if (absolute === true) {
+      return "absolute";
     }
     return position;
   }, [position, fixed]);

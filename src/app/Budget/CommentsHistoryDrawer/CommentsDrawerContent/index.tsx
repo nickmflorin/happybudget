@@ -2,8 +2,10 @@ import React, { useEffect } from "react";
 
 import { Form, Input, Button } from "antd";
 
-import { Comments } from "components/ui";
 import { Drawer } from "components/layout";
+import Comments from "./Comments";
+
+import "./index.scss";
 
 export interface CommentsDrawerContentProps {
   loading: boolean;
@@ -40,7 +42,7 @@ const CommentsDrawerContent = ({
 
   return (
     <React.Fragment>
-      <Drawer.Content className={"comments"} noPadding>
+      <Drawer.Content className={"comments-drawer-content"} noPadding>
         <div className={"comments-section"}>
           <Comments
             comments={comments}
