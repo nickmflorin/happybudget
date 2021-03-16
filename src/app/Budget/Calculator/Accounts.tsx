@@ -69,7 +69,7 @@ const Accounts = (): JSX.Element => {
           search={accounts.table.search}
           onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
           saving={accounts.deleting.length !== 0 || accounts.updating.length !== 0 || accounts.creating}
-          onRowAdd={() => dispatch(addAccountsTablePlaceholdersAction())}
+          onRowAdd={() => dispatch(addAccountsTablePlaceholdersAction(1))}
           onRowSelect={(id: number) => dispatch(selectAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectAccountsTableRowAction(id))}
           onRowDelete={(row: Table.IAccountRow) => dispatch(removeAccountAction(row.id))}

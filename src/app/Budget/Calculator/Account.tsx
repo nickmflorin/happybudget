@@ -69,7 +69,7 @@ const Account = (): JSX.Element => {
             accountStore.subaccounts.creating
           }
           rowRefreshRequired={(existing: Table.ISubAccountRow, row: Table.ISubAccountRow) => existing.unit !== row.unit}
-          onRowAdd={() => dispatch(addAccountSubAccountsTablePlaceholdersAction(parseInt(accountId)))}
+          onRowAdd={() => dispatch(addAccountSubAccountsTablePlaceholdersAction(1))}
           onRowSelect={(id: number) => dispatch(selectAccountSubAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectAccountSubAccountsTableRowAction(id))}
           onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeAccountSubAccountAction(row.id))}

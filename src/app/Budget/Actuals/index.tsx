@@ -57,7 +57,7 @@ const Actuals = (): JSX.Element => {
         search={actuals.table.search}
         onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
         saving={actuals.deleting.length !== 0 || actuals.updating.length !== 0 || actuals.creating}
-        onRowAdd={() => dispatch(addActualsTablePlaceholdersAction())}
+        onRowAdd={() => dispatch(addActualsTablePlaceholdersAction(1))}
         onRowSelect={(id: number) => dispatch(selectActualsTableRowAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectActualsTableRowAction(id))}
         onRowDelete={(row: Table.IActualRow) => dispatch(removeActualAction(row))}
