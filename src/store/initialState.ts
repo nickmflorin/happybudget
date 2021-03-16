@@ -17,6 +17,14 @@ export const initialDetailResponseState: Redux.IDetailResponseStore<any> = {
   responseWasReceived: false
 };
 
+export const initialCommentsListResponseState: Redux.ICommentsListResponseStore = {
+  ...initialListResponseState,
+  submitting: false,
+  deleting: [],
+  editing: [],
+  replying: []
+};
+
 export const initialTableState: Redux.ITableStore<any, any, any, any> = {
   loading: false,
   data: [],

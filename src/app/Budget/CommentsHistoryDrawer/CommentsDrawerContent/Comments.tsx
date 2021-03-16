@@ -78,8 +78,8 @@ const Comments = ({
                   setReplyText(e.target.value);
                 }}
                 onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-                  setReplying(false);
                   if (e.code === "Enter") {
+                    setReplying(false);
                     onDoneReplying(comment, replyText);
                   }
                 }}

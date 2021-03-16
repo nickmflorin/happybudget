@@ -3,6 +3,7 @@
 /// <reference path="./ui.d.ts" />
 /// <reference path="./table.d.ts" />
 /// <reference path="./files.d.ts" />
+/// <reference path="./reducerFactory.d.ts" />
 
 interface DistinctOptionModel<I extends number, N extends string> {
   id: I;

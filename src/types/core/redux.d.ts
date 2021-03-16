@@ -74,6 +74,13 @@ namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
+  interface ICommentsListResponseStore extends IListResponseStore<IComment> {
+    readonly submitting: boolean;
+    readonly deleting: number[];
+    readonly editing: number[];
+    readonly replying: number[];
+  }
+
   type IIndexedStore<T> = { [key: number]: T };
   type IIndexedDetailResponseStore<T> = IIndexedStore<IDetailResponseStore<T>>;
 
@@ -114,13 +121,6 @@ namespace Redux {
   }
 
   namespace Calculator {
-    interface ICommentsStore extends IListResponseStore<IComment> {
-      submitting: boolean;
-      deleting: number[];
-      editing: number[];
-      replying: number[];
-    }
-
     interface ISubAccountsStore {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;

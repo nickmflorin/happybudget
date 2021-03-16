@@ -1,12 +1,4 @@
-import { initialDetailResponseState, initialListResponseState, initialTableState } from "store/initialState";
-
-export const initialCommentsState: Redux.Calculator.ICommentsStore = {
-  ...initialListResponseState,
-  submitting: false,
-  deleting: [],
-  editing: [],
-  replying: []
-};
+import { initialDetailResponseState, initialTableState, initialCommentsListResponseState } from "store/initialState";
 
 export const initialSubAccountsState: Redux.Calculator.ISubAccountsStore = {
   table: initialTableState,
@@ -20,21 +12,21 @@ export const initialAccountsState: Redux.Calculator.IAccountsStore = {
   deleting: [],
   updating: [],
   creating: false,
-  comments: initialCommentsState
+  comments: initialCommentsListResponseState
 };
 
 export const initialAccountState: Redux.Calculator.IAccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialSubAccountsState,
-  comments: initialCommentsState
+  comments: initialCommentsListResponseState
 };
 
 export const initialSubAccountState: Redux.Calculator.ISubAccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialSubAccountsState,
-  comments: initialCommentsState
+  comments: initialCommentsListResponseState
 };
 
 const initialState: Redux.Calculator.IStore = {

@@ -1,9 +1,5 @@
 import { Reducer, combineReducers } from "redux";
-import {
-  createDetailResponseReducer,
-  createSimpleBooleanReducer,
-  createSimplePayloadReducer
-} from "store/reducerFactories";
+import { createDetailResponseReducer, createSimpleBooleanReducer, createSimplePayloadReducer } from "store/factories";
 import { ActionType } from "./actions";
 
 const ancestorsReducer: Reducer<Redux.ListStore<IAncestor>, Redux.IAction<any>> = (

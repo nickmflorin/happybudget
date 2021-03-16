@@ -1,10 +1,6 @@
 import { Reducer, combineReducers } from "redux";
 import { includes, filter } from "lodash";
-import {
-  createListResponseReducer,
-  createSimpleBooleanReducer,
-  createModelListActionReducer
-} from "store/reducerFactories";
+import { createListResponseReducer, createSimpleBooleanReducer, createModelListActionReducer } from "store/factories";
 import { ActionType, ActionDomains } from "./actions";
 import { initialContactsState } from "./initialState";
 

@@ -1,5 +1,6 @@
 import { combineReducers } from "redux";
 import { find, isNil } from "lodash";
+import { initialCommentsListResponseState } from "store/initialState";
 import {
   createDetailResponseReducer,
   createSimpleBooleanReducer,
@@ -7,10 +8,9 @@ import {
   createTableReducer,
   createSimplePayloadReducer,
   createListResponseReducer
-} from "store/reducerFactories";
+} from "store/factories";
 import { replaceInArray } from "util/arrays";
 import { ActionType } from "./actions";
-import { initialCommentsState } from "./initialState";
 import {
   createSubAccountRowPlaceholder,
   createAccountRowPlaceholder,
@@ -23,7 +23,7 @@ const rootReducer = combineReducers({
     deleting: createModelListActionReducer(ActionType.Accounts.Deleting, { referenceEntity: "account" }),
     updating: createModelListActionReducer(ActionType.Accounts.Updating, { referenceEntity: "account" }),
     creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
-    comments: createListResponseReducer<IComment, Redux.Calculator.ICommentsStore>(
+    comments: createListResponseReducer<IComment, Redux.ICommentsListResponseStore>(
       {
         Response: ActionType.Comments.Response,
         Request: ActionType.Comments.Request,
@@ -34,11 +34,11 @@ const rootReducer = combineReducers({
       },
       {
         referenceEntity: "comment",
-        initialState: initialCommentsState,
+        initialState: initialCommentsListResponseState,
         extensions: {
           [ActionType.Comments.UpdateWithChildInState]: (
             payload: { id: number; data: IComment },
-            st: Redux.Calculator.ICommentsStore
+            st: Redux.ICommentsListResponseStore
           ) => {
             // NOTE: This will only work for replies to top level comments.  For subsequent
             // comments, we will have to figure out a way to do this recursively.  The other
@@ -96,7 +96,7 @@ const rootReducer = combineReducers({
       Loading: ActionType.Account.Loading,
       Request: ActionType.Account.Request
     }),
-    comments: createListResponseReducer<IComment, Redux.Calculator.ICommentsStore>(
+    comments: createListResponseReducer<IComment, Redux.ICommentsListResponseStore>(
       {
         Response: ActionType.Account.Comments.Response,
         Request: ActionType.Account.Comments.Request,
@@ -107,11 +107,11 @@ const rootReducer = combineReducers({
       },
       {
         referenceEntity: "comment",
-        initialState: initialCommentsState,
+        initialState: initialCommentsListResponseState,
         extensions: {
           [ActionType.Account.Comments.UpdateWithChildInState]: (
             payload: { id: number; data: IComment },
-            st: Redux.Calculator.ICommentsStore
+            st: Redux.ICommentsListResponseStore
           ) => {
             // NOTE: This will only work for replies to top level comments.  For subsequent
             // comments, we will have to figure out a way to do this recursively.  The other
@@ -178,7 +178,7 @@ const rootReducer = combineReducers({
       Loading: ActionType.SubAccount.Loading,
       Request: ActionType.SubAccount.Request
     }),
-    comments: createListResponseReducer<IComment, Redux.Calculator.ICommentsStore>(
+    comments: createListResponseReducer<IComment, Redux.ICommentsListResponseStore>(
       {
         Response: ActionType.SubAccount.Comments.Response,
         Request: ActionType.SubAccount.Comments.Request,
@@ -189,11 +189,11 @@ const rootReducer = combineReducers({
       },
       {
         referenceEntity: "comment",
-        initialState: initialCommentsState,
+        initialState: initialCommentsListResponseState,
         extensions: {
           [ActionType.SubAccount.Comments.UpdateWithChildInState]: (
             payload: { id: number; data: IComment },
-            st: Redux.Calculator.ICommentsStore
+            st: Redux.ICommentsListResponseStore
           ) => {
             // NOTE: This will only work for replies to top level comments.  For subsequent
             // comments, we will have to figure out a way to do this recursively.  The other

@@ -4,7 +4,7 @@ import {
   createModelListActionReducer,
   createTableReducer,
   createListResponseReducer
-} from "store/reducerFactories";
+} from "store/factories";
 import { ActionType } from "./actions";
 import { createActualRowPlaceholder, initializeRowFromActual } from "./util";
 
