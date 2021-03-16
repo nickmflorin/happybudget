@@ -56,13 +56,20 @@ $text-primary: rgba(0, 0, 0, 0.85);
 $text-secondary: #3f4252;
 
 // Icon Colors
-$icon-color: $gray;
+$icon-color: #737373;
+$disabled-color: #d3d3d3;
 
 $separator-color: $gray-light;
 
 .color {
   &--green {
     color: $green !important;
+  }
+}
+
+.icon {
+  svg {
+    color: $icon-color;
   }
 }
 

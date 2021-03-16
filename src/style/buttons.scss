@@ -76,12 +76,12 @@
     svg {
       height: 18px;
       width: 18px;
-      color: #909090 !important;
+      color: $icon-color !important;
     }
 
     &:hover,
     &:focus {
-      color: lighten(#909090, 20%) !important;
+      color: lighten($icon-color, 20%) !important;
       background-color: rgba(0, 0, 0, 0.015);
 
       svg {
@@ -258,7 +258,7 @@
     svg {
       height: 100%;
       width: auto !important;
-      color: $text-secondary !important;
+      color: $icon-color !important;
     }
 
     &.small {
@@ -276,7 +276,7 @@
       border-color: $transparent !important;
       background-color: transparent;
       svg {
-        color: $gray-hover !important;
+        color: lighten($icon-color, 20%) !important;
       }
     }
 
@@ -302,17 +302,17 @@
       svg {
         height: 16px;
         width: auto !important;
-        color: $text-secondary;
+        color: $icon-color;
       }
     }
 
     &.disabled {
       svg {
-        color: #d3d3d3 !important;
+        color: $disabled-color !important;
       }
       &:hover, &:focus {
         svg {
-          color: #d3d3d3 !important;
+          color: $disabled-color !important;
         }
       }
     }
@@ -329,7 +329,7 @@
   &--caret {
     background-color: $transparent;
     border: none;
-    color: $text-secondary;
+    color: $icon-color;
     box-shadow: none;
 
     .caret-button-inner {
@@ -352,11 +352,11 @@
       box-shadow: none !important;
       .caret-button-inner {
         .caret-button-text {
-          color: lighten($text-secondary, 20%);
+          color: lighten($icon-color, 20%);
         }
         .caret-button-caret {
           svg {
-            color: lighten($text-secondary, 20%);
+            color: lighten($icon-color, 20%);
           }
         }
       }
