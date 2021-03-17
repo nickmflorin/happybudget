@@ -50,7 +50,7 @@ const SubAccount = (): JSX.Element => {
         <GenericBudgetTable<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow>
           table={subAccountStore.subaccounts.table.data}
           isCellEditable={(row: Table.ISubAccountRow, colDef: ColDef) => {
-            if (includes(["estimated", "actual", "unit"], colDef.field)) {
+            if (includes(["estimated", "actual", "variance", "unit"], colDef.field)) {
               return false;
             } else if (includes(["identifier", "description", "name"], colDef.field)) {
               return true;
