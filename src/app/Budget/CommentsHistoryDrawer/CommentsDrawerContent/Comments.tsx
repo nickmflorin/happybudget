@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { map, isNil } from "lodash";
 import classNames from "classnames";
-import { Empty, Input } from "antd";
+import { Empty } from "antd";
 
 import { RenderWithSpinner, ShowHide } from "components/display";
 
 import Comment from "./Comment";
+import CommentReply from "./CommentReply";
 import "./Comments.scss";
 
 export interface CommentsProps {
@@ -34,7 +35,6 @@ const Comments = ({
   // TODO: We need to figure out how to separate this out for each comment that
   // we can reply to, since the state will get jumbled between the different
   // comments.
-  const [replyText, setReplyText] = useState("");
   const [replying, setReplying] = useState(false);
 
   return (
@@ -63,21 +63,12 @@ const Comments = ({
                 onDoneReplying={onDoneReplying}
               />
             </ShowHide>
-            <ShowHide show={replying}>
-              <Input.TextArea
-                maxLength={1028}
-                value={replyText}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                  setReplyText(e.target.value);
-                }}
-                onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-                  if (e.code === "Enter") {
-                    setReplying(false);
-                    onDoneReplying(comment, replyText);
-                  }
-                }}
-              />
-            </ShowHide>
+            <CommentReply
+              comment={comment}
+              visible={replying}
+              onSubmit={(text: string) => onDoneReplying(comment, text)}
+              onClose={() => setReplying(false)}
+            />
           </div>
         ))}
       </ShowHide>

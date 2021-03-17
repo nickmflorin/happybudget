@@ -478,7 +478,10 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           onGridReady={onGridReady}
           rowHeight={36}
           headerHeight={38}
+          enableRangeSelection={true}
+          clipboardDeliminator={","}
           domLayout={"autoHeight"}
+          defaultColDef={{ editable: true }}
           navigateToNextCell={(params: NavigateToNextCellParams): CellPosition => {
             if (!isNil(params.nextCellPosition)) {
               if (includes(["estimated", "expand", "select", "delete"], params.nextCellPosition.column.getColId())) {

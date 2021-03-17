@@ -1,0 +1,35 @@
+@import "style/typography";
+
+.comment-reply {
+  padding: 4px;
+  padding-left: 18px;
+  margin-top: 4px;
+
+  .comment-reply-body {
+    display: flex;
+
+    .account-circle-wrapper {
+      height: 36px;
+      width: 36px;
+      margin-right: 6px;
+    }
+  }
+  .comment-reply-footer {
+    padding-left: 42px;
+
+    .cancel-text {
+      font-size: 12px;
+      line-height: 14px;
+      font-family: $roboto;
+      font-weight: 400;
+      .cancel-link {
+        margin-left: 2px;
+        font-family: $roboto;
+        font-weight: 400;
+        font-size: 12px;
+        line-height: 14px !important;
+        vertical-align: -0.04rem;
+      }
+    }
+  }
+}

@@ -36,18 +36,20 @@ const CommentBody = ({ comment, editing, onDoneEditing }: CommentBodyProps): JSX
   return (
     <div className={"comment-body"}>
       <ShowHide show={editing}>
-        <Input.TextArea
-          maxLength={1028}
-          value={text}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-            setText(e.target.value);
-          }}
-          onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-            if (e.code === "Enter") {
-              onDoneEditing(text);
-            }
-          }}
-        />
+        <div className={"comment-text-area-wrapper"}>
+          <Input.TextArea
+            maxLength={1028}
+            value={text}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+              setText(e.target.value);
+            }}
+            onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+              if (e.code === "Enter") {
+                onDoneEditing(text);
+              }
+            }}
+          />
+        </div>
       </ShowHide>
       <ShowHide show={!editing}>
         <div className={"comment-body-text"}>{text}</div>
@@ -146,14 +148,16 @@ const Comment = ({
           }
         }}
       />
-      <ComentFooter
-        comment={comment}
-        onDelete={onDelete}
-        onEdit={() => setEditing(true)}
-        onLike={onLike}
-        onDislike={onDislike}
-        onReply={() => setReplying(true)}
-      />
+      <ShowHide show={!editing}>
+        <ComentFooter
+          comment={comment}
+          onDelete={onDelete}
+          onEdit={() => setEditing(true)}
+          onLike={onLike}
+          onDislike={onDislike}
+          onReply={() => setReplying(true)}
+        />
+      </ShowHide>
     </RenderWithSpinner>
   );
 };
