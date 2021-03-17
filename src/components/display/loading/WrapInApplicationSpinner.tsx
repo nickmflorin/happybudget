@@ -9,9 +9,14 @@ import { setApplicationLoadingAction } from "store/actions";
 interface WrapInApplicationSpinnerProps {
   loading?: boolean;
   children: ReactNode;
+  hideWhileLoading?: boolean;
 }
 
-const WrapInApplicationSpinner = ({ loading, children }: WrapInApplicationSpinnerProps): JSX.Element => {
+const WrapInApplicationSpinner = ({
+  loading,
+  children,
+  hideWhileLoading = false
+}: WrapInApplicationSpinnerProps): JSX.Element => {
   const loadingState = useSelector((state: Redux.IApplicationStore) => state.loading);
   const id = useMemo(() => uuidv4(), []);
   const dispatch: Dispatch = useDispatch();
@@ -26,6 +31,9 @@ const WrapInApplicationSpinner = ({ loading, children }: WrapInApplicationSpinne
     }
   }, [loading, id]);
 
+  if (hideWhileLoading && loading === false) {
+    return <></>;
+  }
   return <>{children}</>;
 };
 

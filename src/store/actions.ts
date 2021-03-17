@@ -1,6 +1,7 @@
 export const ApplicationActionTypes = {
   SetDrawerVisibility: "SetDrawerVisibility",
   SetApplicationLoading: "SetApplicationLoading",
+  SetOverallApplicationLoading: "SetOverallApplicationLoading",
   User: {
     UpdateInState: "user.UpdateInState"
   }
@@ -24,4 +25,7 @@ export const updateLoggedInUserAction = (user: Partial<IUser>) => {
 export const setDrawerVisibilityAction = simpleAction<boolean>(ApplicationActionTypes.SetDrawerVisibility);
 export const setApplicationLoadingAction = simpleAction<{ id: string; value: boolean }>(
   ApplicationActionTypes.SetApplicationLoading
+);
+export const setOverallApplicationLoadingAction = simpleAction<boolean>(
+  ApplicationActionTypes.SetOverallApplicationLoading
 );

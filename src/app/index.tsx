@@ -15,7 +15,7 @@ function App(): JSX.Element {
       <ToastContainer />
       <div className={"root"}>
         <div id={"application-spinner-container"}></div>
-        <Suspense fallback={<ApplicationSpinner />}>
+        <Suspense fallback={<ApplicationSpinner visible={true} />}>
           <Switch>
             <Route path={["/login", "/signup"]} component={Landing} />
             <StoreConnectedRoute path={["/"]} component={Application} />

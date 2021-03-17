@@ -55,7 +55,7 @@ const WrapInApplicationStore = ({ children }: WrapInApplicationStoreProps): JSX.
   } else {
     if (isNil(reduxStore)) {
       if (authenticating) {
-        return <ApplicationSpinner />;
+        return <ApplicationSpinner visible={true} />;
       }
       // If the Redux Store is not set and we are not authenticating anymore,
       // there was an error with the token validation, in which case we should

@@ -4,7 +4,7 @@ import { Route, Redirect } from "react-router-dom";
 import { Dispatch } from "redux";
 
 import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
-import { ApplicationSpinner } from "components/display";
+import { WrapInApplicationSpinner } from "components/display";
 import { updateLoggedInUserAction } from "store/actions";
 import { validateToken } from "services";
 
@@ -38,10 +38,12 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
 
   if (redirect === true) {
     return <Redirect to={"/login"} />;
-  } else if (authenticating) {
-    return <ApplicationSpinner />;
   } else {
-    return <Route {...props} />;
+    return (
+      <WrapInApplicationSpinner loading={authenticating}>
+        <Route {...props} />
+      </WrapInApplicationSpinner>
+    );
   }
 };
 

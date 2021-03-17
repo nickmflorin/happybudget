@@ -63,36 +63,40 @@ const createUserReducer = (user: IUser): Reducer<Redux.IUserStore, Redux.IAction
   return userReducer;
 };
 
-const loadingReducer: Reducer<Redux.ILoadingStore, Redux.IAction<{ id: string; value: boolean }>> = (
+const loadingReducer: Reducer<Redux.ILoadingStore, Redux.IAction<any>> = (
   state: Redux.ILoadingStore = initialLoadingState,
-  action: Redux.IAction<{ id: string; value: boolean }>
+  action: Redux.IAction<any>
 ): Redux.ILoadingStore => {
   let newState = { ...state };
-  if (action.type === ApplicationActionTypes.SetApplicationLoading && !isNil(action.payload)) {
-    const { id, value } = action.payload;
-    if (value === false) {
-      if (!includes(newState.elements, id)) {
-        /* eslint-disable no-console */
-        console.warn(
-          `Inconsistent State!  Inconsistent state noticed when removing element from loading
-          state... the element with ID ${id} does not exist in state when it is expected to.`
-        );
+  if (!isNil(action.payload)) {
+    if (action.type === ApplicationActionTypes.SetApplicationLoading) {
+      const { id, value } = action.payload;
+      if (value === false) {
+        if (!includes(newState.elements, id)) {
+          /* eslint-disable no-console */
+          console.warn(
+            `Inconsistent State!  Inconsistent state noticed when removing element from loading
+            state... the element with ID ${id} does not exist in state when it is expected to.`
+          );
+        } else {
+          newState = {
+            ...newState,
+            elements: filter(newState.elements, (element: string) => element !== id)
+          };
+        }
       } else {
-        newState = {
-          ...newState,
-          elements: filter(newState.elements, (element: string) => element !== id)
-        };
+        if (includes(newState.elements, id)) {
+          /* eslint-disable no-console */
+          console.warn(
+            `Inconsistent State!  Inconsistent state noticed when adding element to loading
+            state... the element with ID ${id} already exists in state when it is not expected to.`
+          );
+        } else {
+          newState = { ...newState, elements: [...newState.elements, id] };
+        }
       }
-    } else {
-      if (includes(newState.elements, id)) {
-        /* eslint-disable no-console */
-        console.warn(
-          `Inconsistent State!  Inconsistent state noticed when adding element to loading
-          state... the element with ID ${id} already exists in state when it is not expected to.`
-        );
-      } else {
-        newState = { ...newState, elements: [...newState.elements, id] };
-      }
+    } else if (action.type === ApplicationActionTypes.SetOverallApplicationLoading) {
+      newState = { ...newState, loading: action.payload };
     }
   }
   return newState;
