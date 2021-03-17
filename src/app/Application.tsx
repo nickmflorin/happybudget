@@ -8,6 +8,7 @@ import Logout from "./Logout";
 
 const Dashboard = React.lazy(() => import("./Dashboard"));
 const Budget = React.lazy(() => import("./Budget"));
+const Settings = React.lazy(() => import("./Settings"));
 
 const Application = (): JSX.Element => {
   const applicationLoading = useSelector((state: Redux.IApplicationStore) => state.loading.loading);
@@ -19,6 +20,7 @@ const Application = (): JSX.Element => {
         <Redirect exact from={"/"} to={"/budgets"} />
         <PrivateRoute path={"/budgets/:budgetId"} component={Budget} />
         <PrivateRoute path={["/budgets", "/contacts", "/templates", "/trash"]} component={Dashboard} />
+        <PrivateRoute path={["/profile"]} component={Settings} />
         <Route exact path={"/logout"} component={Logout} />
       </Switch>
     </React.Fragment>

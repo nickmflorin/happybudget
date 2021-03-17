@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import "style/index.scss";
 
 import { ApplicationSpinner } from "components/display";
-import { StoreConnectedRoute } from "components/routes";
+import { ReduxRoute } from "components/routes";
 
 const Landing = React.lazy(() => import("./Landing"));
 const Application = React.lazy(() => import("./Application"));
@@ -18,7 +18,7 @@ function App(): JSX.Element {
         <Suspense fallback={<ApplicationSpinner visible={true} />}>
           <Switch>
             <Route path={["/login", "/signup"]} component={Landing} />
-            <StoreConnectedRoute path={["/"]} component={Application} />
+            <ReduxRoute path={["/"]} component={Application} />
           </Switch>
         </Suspense>
       </div>

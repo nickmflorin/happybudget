@@ -1,7 +1,8 @@
 import React from "react";
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
-import { FileAddOutlined, ContactsOutlined, FolderOutlined, DeleteOutlined } from "@ant-design/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFolderOpen, faFolderPlus, faTrashAlt, faAddressBook } from "@fortawesome/free-solid-svg-icons";
 
 import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
@@ -20,25 +21,25 @@ const Dashboard = (): JSX.Element => {
       sidebar={[
         {
           text: "New Budget",
-          icon: <FileAddOutlined className={"icon"} />,
+          icon: <FontAwesomeIcon icon={faFolderPlus} />,
           onClick: () => history.push("/templates"),
           active: location.pathname.startsWith("/templates")
         },
         {
           text: "Budgets",
-          icon: <FolderOutlined className={"icon"} />,
+          icon: <FontAwesomeIcon icon={faFolderOpen} />,
           onClick: () => history.push("/budgets"),
           active: location.pathname.startsWith("/budgets")
         },
         {
           text: "Trash",
-          icon: <DeleteOutlined className={"icon"} />,
+          icon: <FontAwesomeIcon icon={faTrashAlt} />,
           onClick: () => history.push("/trash"),
           active: location.pathname.startsWith("/trash")
         },
         {
           text: "Contacts",
-          icon: <ContactsOutlined className={"icon"} />,
+          icon: <FontAwesomeIcon icon={faAddressBook} />,
           onClick: () => history.push("/contacts"),
           active: location.pathname.startsWith("/contacts")
         }

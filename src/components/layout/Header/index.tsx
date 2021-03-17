@@ -2,8 +2,10 @@ import { ReactNode } from "react";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignOutAlt, faAddressCard } from "@fortawesome/free-solid-svg-icons";
+
 import { Layout } from "antd";
-import { LogoutOutlined } from "@ant-design/icons";
 
 import { Dropdown } from "components/control/dropdowns";
 import { AccountCircleLink } from "components/control/links";
@@ -33,7 +35,8 @@ const Header = ({ breadcrumbs, toolbar }: HeaderProps): JSX.Element => {
       </div>
       <Dropdown
         items={[
-          { text: "Logout", onClick: () => history.push("/logout"), icon: <LogoutOutlined className={"icon"} /> }
+          { text: "Profile", onClick: () => history.push("/profile"), icon: <FontAwesomeIcon icon={faAddressCard} /> },
+          { text: "Logout", onClick: () => history.push("/logout"), icon: <FontAwesomeIcon icon={faSignOutAlt} /> }
         ]}
       >
         <div className={"account-wrapper"}>

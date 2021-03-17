@@ -2,7 +2,7 @@ import { Route } from "react-router-dom";
 
 import WrapInApplicationStore from "./WrapInApplicationStore";
 
-const StoreConnectedRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
+const ReduxRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
   return (
     <WrapInApplicationStore>
       <Route {...props} />
@@ -10,4 +10,4 @@ const StoreConnectedRoute = ({ ...props }: { [key: string]: any }): JSX.Element 
   );
 };
 
-export default StoreConnectedRoute;
+export default ReduxRoute;
