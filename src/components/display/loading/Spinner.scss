@@ -4,6 +4,7 @@
   z-index: 1000;
   height: 25px;
   width: 25px;
+  color: $green;
 
   &.absolute {
     position: absolute;
@@ -22,12 +23,10 @@
   }
 
   .anticon {
-    color: $green;
     height: 100%;
     width: 100%;
 
     svg {
-      color: $green;
       height: 100%;
       width: auto;
     }

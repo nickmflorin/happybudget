@@ -126,7 +126,7 @@ const Comment = ({
   const [editing, setEditing] = useState(false);
 
   return (
-    <RenderWithSpinner className={"comment"} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
+    <RenderWithSpinner absolute className={"comment"} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
       <CommentHeader comment={comment} />
       <CommentBody
         comment={comment}

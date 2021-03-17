@@ -10,7 +10,7 @@ const RenderOrSpinner = ({ loading, className, style = {}, children, ...props }:
   if (!(loading === true)) {
     return (
       <React.Fragment>
-        <div className={className} style={{ ...style, position: "relative" }}>
+        <div className={className} style={{ position: "relative", height: "100%", width: "100%", ...style }}>
           <Spinner {...props} />
           {children}
         </div>
