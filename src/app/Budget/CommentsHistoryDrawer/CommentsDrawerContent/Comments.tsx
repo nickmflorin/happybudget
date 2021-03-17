@@ -6,10 +6,16 @@ import { RenderWithSpinner, ShowHide } from "components/display";
 import CommentBlock from "./CommentBlock";
 
 export interface CommentsProps {
-  loading: boolean;
+  // We don't want to include the loading parameter when the Comments component
+  // is nested, because the parent <CommentBlock /> component will handle the
+  // loading indicator.  If we include loading={true} when nested={true}, a
+  // loading indicator will be shown for both the <CommentBlock /> (which contains
+  // the comment itself and it's children) and the specific <Comment />, for a
+  // total of 2 loading indicators.
+  loading?: boolean;
   comments: IComment[];
   nested?: boolean;
-  commentLoading?: (comment: IComment) => boolean;
+  commentLoading: (comment: IComment) => boolean;
   onDelete: (comment: IComment) => void;
   onLike: (comment: IComment) => void;
   onDislike: (comment: IComment) => void;
@@ -35,6 +41,7 @@ const Comments = ({
           <CommentBlock
             nested={nested}
             comment={comment}
+            loading={commentLoading(comment)}
             commentLoading={commentLoading}
             onDelete={onDelete}
             onLike={onLike}

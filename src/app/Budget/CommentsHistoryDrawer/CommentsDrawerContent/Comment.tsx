@@ -7,7 +7,7 @@ import { faThumbsUp, faThumbsDown, faEdit, faTrashAlt } from "@fortawesome/free-
 
 import { IconButton } from "components/control/buttons";
 import { AccountCircleLink } from "components/control/links";
-import { ShowHide, RenderWithSpinner } from "components/display";
+import { ShowHide } from "components/display";
 import { toDisplayTimeSince } from "util/dates";
 import { useLoggedInUser } from "store/hooks";
 
@@ -106,7 +106,6 @@ const ComentFooter = ({ comment, onDelete, onEdit, onLike, onDislike, onReply }:
 
 interface CommentProps {
   comment: IComment;
-  loading?: boolean;
   onDelete?: () => void;
   onDoneEditing?: (value: string) => void;
   onLike?: () => void;
@@ -114,19 +113,11 @@ interface CommentProps {
   onReply?: () => void;
 }
 
-const Comment = ({
-  comment,
-  loading,
-  onDelete,
-  onDoneEditing,
-  onLike,
-  onDislike,
-  onReply
-}: CommentProps): JSX.Element => {
+const Comment = ({ comment, onDelete, onDoneEditing, onLike, onDislike, onReply }: CommentProps): JSX.Element => {
   const [editing, setEditing] = useState(false);
 
   return (
-    <RenderWithSpinner absolute className={"comment"} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
+    <div className={"comment"}>
       <CommentHeader comment={comment} />
       <CommentBody
         comment={comment}
@@ -149,7 +140,7 @@ const Comment = ({
           onReply={onReply}
         />
       </ShowHide>
-    </RenderWithSpinner>
+    </div>
   );
 };
 

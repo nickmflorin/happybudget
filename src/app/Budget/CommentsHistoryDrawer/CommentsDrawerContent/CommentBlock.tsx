@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { isNil } from "lodash";
 import classNames from "classnames";
 
-import { ShowHide } from "components/display";
+import { RenderWithSpinner, ShowHide } from "components/display";
 
 import Comment from "./Comment";
 import CommentReply from "./CommentReply";
@@ -13,7 +12,8 @@ import "./CommentBlock.scss";
 interface CommentBlockProps {
   comment: IComment;
   nested?: boolean;
-  commentLoading?: (comment: IComment) => boolean;
+  loading: boolean;
+  commentLoading: (comment: IComment) => boolean;
   onDelete: (comment: IComment) => void;
   onLike: (comment: IComment) => void;
   onDislike: (comment: IComment) => void;
@@ -24,6 +24,7 @@ interface CommentBlockProps {
 const CommentBlock = ({
   comment,
   nested,
+  loading,
   commentLoading,
   onDelete,
   onLike,
@@ -34,11 +35,17 @@ const CommentBlock = ({
   const [replying, setReplying] = useState(false);
 
   return (
-    <div className={classNames("comment-block", { nested })}>
+    <RenderWithSpinner
+      absolute
+      className={classNames("comment-block", { nested })}
+      size={15}
+      loading={loading}
+      toggleOpacity={true}
+      color={"#b5b5b5"}
+    >
       <Comment
         comment={comment}
         onReply={() => setReplying(true)}
-        loading={!isNil(commentLoading) && commentLoading(comment)}
         onDelete={() => onDelete(comment)}
         onLike={() => onLike(comment)}
         onDislike={() => onDislike(comment)}
@@ -48,7 +55,7 @@ const CommentBlock = ({
         <Comments
           comments={comment.comments}
           nested={true}
-          loading={!isNil(commentLoading) && commentLoading(comment)}
+          commentLoading={commentLoading}
           onDelete={onDelete}
           onLike={onLike}
           onDislike={onDislike}
@@ -62,7 +69,7 @@ const CommentBlock = ({
         onSubmit={(text: string) => onDoneReplying(comment, text)}
         onClose={() => setReplying(false)}
       />
-    </div>
+    </RenderWithSpinner>
   );
 };
 
