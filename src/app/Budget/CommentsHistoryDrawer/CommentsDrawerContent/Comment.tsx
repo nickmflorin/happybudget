@@ -33,7 +33,6 @@ interface CommentBodyProps {
 
 const CommentBody = ({ comment, editing, onDoneEditing }: CommentBodyProps): JSX.Element => {
   const [text, setText] = useState(comment.text);
-
   return (
     <div className={"comment-body"}>
       <ShowHide show={editing}>

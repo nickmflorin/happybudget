@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
-import { Form, Input, Button } from "antd";
+import { Input, Button } from "antd";
 
 import { Drawer } from "components/layout";
 import Comments from "./Comments";
@@ -34,7 +34,7 @@ const CommentsDrawerContent = ({
   onDoneEditing,
   onDoneReplying
 }: CommentsDrawerContentProps): JSX.Element => {
-  const [form] = Form.useForm();
+  const [text, setText] = useState("");
 
   useEffect(() => {
     onRequest();
@@ -57,19 +57,30 @@ const CommentsDrawerContent = ({
         </div>
       </Drawer.Content>
       <Drawer.Footer className={"form-section"}>
-        <Form
-          form={form}
-          layout={"vertical"}
-          initialValues={{}}
-          onFinish={(payload: Http.ICommentPayload) => onSubmit(payload)}
+        <Input.TextArea
+          style={{ marginBottom: 10 }}
+          maxLength={1028}
+          value={text}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            setText(e.target.value);
+          }}
+          onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            if (e.code === "Enter" && text.trim() !== "") {
+              e.stopPropagation();
+              onSubmit({ text });
+              setText("");
+            }
+          }}
+        />
+        <Button
+          disabled={text.trim() === ""}
+          loading={submitting}
+          className={"btn--primary"}
+          style={{ width: "100%" }}
+          onClick={() => onSubmit({ text })}
         >
-          <Form.Item name={"text"} rules={[{ required: true, message: "Please enter a comment to send!" }]}>
-            <Input.TextArea style={{ minHeight: 120 }} maxLength={1028} placeholder={"Leave comment here..."} />
-          </Form.Item>
-          <Button htmlType={"submit"} loading={submitting} className={"btn--primary"} style={{ width: "100%" }}>
-            {"Send"}
-          </Button>
-        </Form>
+          {"Send"}
+        </Button>
       </Drawer.Footer>
     </React.Fragment>
   );
