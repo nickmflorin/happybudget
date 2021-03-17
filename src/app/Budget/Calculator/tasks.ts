@@ -136,7 +136,7 @@ export function* deleteBudgetCommentTask(action: Redux.IAction<number>): SagaIte
   if (!isNil(action.payload)) {
     yield put(deletingBudgetCommentAction({ id: action.payload, value: true }));
     try {
-      // yield call(deleteComment, action.payload);
+      yield call(deleteComment, action.payload);
       yield put(removeBudgetCommentFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the comment.");
@@ -215,7 +215,7 @@ export function* deleteAccountCommentTask(action: Redux.IAction<number>): SagaIt
   if (!isNil(action.payload)) {
     yield put(deletingAccountCommentAction({ id: action.payload, value: true }));
     try {
-      // yield call(deleteComment, action.payload);
+      yield call(deleteComment, action.payload);
       yield put(removeAccountCommentFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the comment.");
@@ -294,7 +294,7 @@ export function* deleteSubAccountCommentTask(action: Redux.IAction<number>): Sag
   if (!isNil(action.payload)) {
     yield put(deletingSubAccountCommentAction({ id: action.payload, value: true }));
     try {
-      // yield call(deleteComment, action.payload);
+      yield call(deleteComment, action.payload);
       yield put(removeSubAccountCommentFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the comment.");

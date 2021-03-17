@@ -68,10 +68,12 @@
     box-shadow: none !important;
     height: 28px;
     width: 28px;
-    display: block;
     padding: 5px;
     border-radius: 100px;
     border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
     svg {
       height: 18px;
@@ -247,13 +249,15 @@
   &--icon-only {
     min-width: 0px;
     box-shadow: none !important;
-    display: block;
     border-radius: 100px;
     border: 1px solid $transparent;
     background-color: $transparent;
     padding: 0px;
     height: 36px;
     width: 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 
     svg {
       height: 100%;

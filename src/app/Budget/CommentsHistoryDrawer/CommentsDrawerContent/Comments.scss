@@ -2,4 +2,7 @@
   &.nested {
     padding-left: 15px;
   }
+  &:not(.nested) {
+    margin-bottom: 10px;
+  }
 }

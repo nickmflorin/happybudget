@@ -38,17 +38,10 @@ const Comments = ({
   const [replying, setReplying] = useState(false);
 
   return (
-    <RenderWithSpinner
-      absolute
-      size={15}
-      className={classNames("comments", { nested })}
-      loading={loading}
-      toggleOpacity={true}
-      color={"#b5b5b5"}
-    >
+    <RenderWithSpinner absolute size={15} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
       <ShowHide show={comments.length !== 0}>
         {map(comments, (comment: IComment, index: number) => (
-          <React.Fragment key={index}>
+          <div className={classNames("comments", { nested })}>
             <Comment
               comment={comment}
               setReplying={setReplying}
@@ -85,7 +78,7 @@ const Comments = ({
                 }}
               />
             </ShowHide>
-          </React.Fragment>
+          </div>
         ))}
       </ShowHide>
       <ShowHide show={comments.length === 0 && nested === false}>

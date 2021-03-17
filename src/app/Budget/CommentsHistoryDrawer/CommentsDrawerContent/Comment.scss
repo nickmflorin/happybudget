@@ -5,12 +5,13 @@
   display: flex;
   flex-direction: column;
 
-  &:not(:last-child) {
-    margin-bottom: 15px;
-  }
-
   .comment-header {
     display: flex;
+
+    .account-circle-link {
+      position: relative;
+      top: 6px;
+    }
 
     .comment-user-name {
       line-height: 36px;
@@ -30,24 +31,29 @@
     }
   }
   .comment-body {
-    margin-top: 6px;
-    margin-bottom: 4px;
-    padding-left: 6px;
+    padding-left: 42px;
+    margin-top: -6px;
 
     .comment-body-text {
       color: #9e9e9e;
       font-family: $roboto;
       font-weight: 400;
+      font-size: 0.9375rem;
     }
   }
   .comment-footer {
     display: flex;
     justify-content: space-between;
+    padding-left: 42px;
 
     .btn--icon-only {
       padding: 4px;
       height: 24px;
       width: auto;
+
+      svg {
+        vertical-align: 0 !important;
+      }
     }
     .comment-footer-left {
       display: flex;
