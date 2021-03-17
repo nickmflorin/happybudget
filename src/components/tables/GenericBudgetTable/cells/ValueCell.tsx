@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-
+import { useMemo, useState, useEffect } from "react";
+import classNames from "classnames";
 import { isNil, filter } from "lodash";
 
 import { CloseCircleOutlined } from "@ant-design/icons";
@@ -10,11 +10,27 @@ interface ValueCellProps extends ICellRendererParams {
   node: RowNode;
   colDef: ColDef;
   formatter?: (value: string | number) => string | number | null;
+  renderRedIfNegative?: boolean;
 }
 
-const ValueCell = ({ value, node, colDef, formatter }: ValueCellProps): JSX.Element => {
+const ValueCell = ({ value, node, colDef, renderRedIfNegative = false, formatter }: ValueCellProps): JSX.Element => {
   const [cellErrors, setCellErrors] = useState<Table.ICellError[]>([]);
   const [cellValue, setCellValue] = useState<string | number | null>(null);
+
+  const renderRed = useMemo(() => {
+    if (renderRedIfNegative === true && !isNil(value)) {
+      if (typeof value === "string") {
+        const parsed = parseFloat(value);
+        if (parsed < 0) {
+          return true;
+        }
+        return false;
+      } else if (value < 0) {
+        return true;
+      }
+      return false;
+    }
+  }, [value, renderRedIfNegative]);
 
   useEffect(() => {
     if (!isNil(value)) {
@@ -47,11 +63,11 @@ const ValueCell = ({ value, node, colDef, formatter }: ValueCellProps): JSX.Elem
           <CloseCircleOutlined className={"icon--error"} />
           <div className={"text-error"}>{cellErrors[0].error}</div>
         </div>
-        {cellValue}
+        <span className={classNames({ "color--red": renderRed })}>{cellValue}</span>
       </div>
     );
   } else {
-    return <>{cellValue}</>;
+    return <span className={classNames({ "color--red": renderRed })}>{cellValue}</span>;
   }
 };
 

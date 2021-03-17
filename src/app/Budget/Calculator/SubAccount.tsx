@@ -149,7 +149,7 @@ const SubAccount = (): JSX.Element => {
               field: "variance",
               headerName: "Variance",
               cellStyle: { textAlign: "right" },
-              cellRendererParams: { formatter: formatCurrency }
+              cellRendererParams: { formatter: formatCurrency, renderRedIfNegative: true }
             }
           ]}
         />

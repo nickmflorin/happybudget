@@ -147,6 +147,12 @@ const Account = (): JSX.Element => {
               headerName: "Actual",
               cellStyle: { textAlign: "right" },
               cellRendererParams: { formatter: formatCurrency }
+            },
+            {
+              field: "variance",
+              headerName: "Variance",
+              cellStyle: { textAlign: "right" },
+              cellRendererParams: { formatter: formatCurrency, renderRedIfNegative: true }
             }
           ]}
         />
