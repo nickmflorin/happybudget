@@ -54,7 +54,6 @@ const Accounts = (): JSX.Element => {
     }
   }, [budget.detail.data]);
 
-  console.log(comments.deleting);
   return (
     <React.Fragment>
       <RenderWithSpinner loading={accounts.table.loading || budget.detail.loading}>
