@@ -26,10 +26,7 @@ import {
   deleteSubAccountCommentTask,
   editBudgetCommentTask,
   editAccountCommentTask,
-  editSubAccountCommentTask,
-  replyToAccountCommentTask,
-  replyToBudgetCommentTask,
-  replyToSubAccountCommentTask
+  editSubAccountCommentTask
 } from "./tasks";
 
 function* watchForTriggerBudgetAccountsSaga(): SagaIterator {
@@ -163,10 +160,6 @@ function* watchForEditBudgetCommentSaga(): SagaIterator {
   yield takeEvery(ActionType.Comments.Edit, editBudgetCommentTask);
 }
 
-function* watchForReplyToBudgetCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Comments.Reply, replyToBudgetCommentTask);
-}
-
 function* watchForTriggerAccountCommentsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
@@ -195,10 +188,6 @@ function* watchForRemoveAccountCommentSaga(): SagaIterator {
 
 function* watchForEditAccountCommentSaga(): SagaIterator {
   yield takeEvery(ActionType.Account.Comments.Edit, editAccountCommentTask);
-}
-
-function* watchForReplyToAccountCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Account.Comments.Reply, replyToAccountCommentTask);
 }
 
 function* watchForTriggerSubAccountCommentsSaga(): SagaIterator {
@@ -231,10 +220,6 @@ function* watchForEditSubAccountCommentSaga(): SagaIterator {
   yield takeEvery(ActionType.SubAccount.Comments.Edit, editSubAccountCommentTask);
 }
 
-function* watchForReplyToSubAccountCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccount.Comments.Reply, replyToSubAccountCommentTask);
-}
-
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForAccountIdChangedSaga);
   yield spawn(watchForSubAccountIdChangedSaga);
@@ -261,7 +246,4 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForEditBudgetCommentSaga);
   yield spawn(watchForEditAccountCommentSaga);
   yield spawn(watchForEditSubAccountCommentSaga);
-  yield spawn(watchForReplyToBudgetCommentSaga);
-  yield spawn(watchForReplyToAccountCommentSaga);
-  yield spawn(watchForReplyToSubAccountCommentSaga);
 }

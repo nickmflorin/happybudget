@@ -102,7 +102,11 @@ export const createListReducerFromTransformers = <
     if (!isNil(transformer)) {
       // If the action is being filtered out of the reducer, do not update the state.
       if (isNil(options.excludeActions) || options.excludeActions(action, state) === false) {
-        newState = transformer(action.payload, newState, action);
+        const update = transformer(action.payload, newState, action);
+        console.log(update);
+        if (!isNil(update)) {
+          newState = update;
+        }
       }
     } else {
       if (!isNil(options.extensions) && !isNil(options.extensions[action.type])) {

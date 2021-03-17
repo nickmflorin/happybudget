@@ -1,15 +1,12 @@
 import { combineReducers } from "redux";
-import { find, isNil } from "lodash";
-import { initialCommentsListResponseState } from "store/initialState";
 import {
   createDetailResponseReducer,
   createSimpleBooleanReducer,
   createModelListActionReducer,
   createTableReducer,
   createSimplePayloadReducer,
-  createListResponseReducer
+  createCommentsListResponseReducer
 } from "store/factories";
-import { replaceInArray } from "util/arrays";
 import { ActionType } from "./actions";
 import {
   createSubAccountRowPlaceholder,
@@ -23,52 +20,18 @@ const rootReducer = combineReducers({
     deleting: createModelListActionReducer(ActionType.Accounts.Deleting, { referenceEntity: "account" }),
     updating: createModelListActionReducer(ActionType.Accounts.Updating, { referenceEntity: "account" }),
     creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
-    comments: createListResponseReducer<IComment, Redux.ICommentsListResponseStore>(
-      {
-        Response: ActionType.Comments.Response,
-        Request: ActionType.Comments.Request,
-        Loading: ActionType.Comments.Loading,
-        AddToState: ActionType.Comments.AddToState,
-        RemoveFromState: ActionType.Comments.RemoveFromState,
-        UpdateInState: ActionType.Comments.UpdateInState
-      },
-      {
-        referenceEntity: "comment",
-        initialState: initialCommentsListResponseState,
-        extensions: {
-          [ActionType.Comments.UpdateWithChildInState]: (
-            payload: { id: number; data: IComment },
-            st: Redux.ICommentsListResponseStore
-          ) => {
-            // NOTE: This will only work for replies to top level comments.  For subsequent
-            // comments, we will have to figure out a way to do this recursively.  The other
-            // option is to create a comments reducer for the nested sets of comments.
-            const existing = find(st.data, { id: payload.id });
-            if (isNil(existing)) {
-              /* eslint-disable no-console */
-              console.error(
-                `Inconsistent State!:  Inconsistent state noticed when updating comment in state...
-                the comment with ID ${payload.id} does not exist in state when it is expected to.`
-              );
-            } else {
-              return {
-                data: replaceInArray<IComment>(
-                  st.data,
-                  { id: payload.id },
-                  { ...existing, comments: [...existing.comments, payload.data] }
-                )
-              };
-            }
-          }
-        },
-        keyReducers: {
-          submitting: createSimpleBooleanReducer(ActionType.Comments.Submitting),
-          deleting: createModelListActionReducer(ActionType.Comments.Deleting),
-          editing: createModelListActionReducer(ActionType.Comments.Editing),
-          replying: createModelListActionReducer(ActionType.Comments.Replying)
-        }
-      }
-    ),
+    comments: createCommentsListResponseReducer({
+      Response: ActionType.Comments.Response,
+      Request: ActionType.Comments.Request,
+      Loading: ActionType.Comments.Loading,
+      AddToState: ActionType.Comments.AddToState,
+      RemoveFromState: ActionType.Comments.RemoveFromState,
+      UpdateInState: ActionType.Comments.UpdateInState,
+      Submitting: ActionType.Comments.Submitting,
+      Deleting: ActionType.Comments.Deleting,
+      Editing: ActionType.Comments.Editing,
+      Replying: ActionType.Comments.Replying
+    }),
     table: createTableReducer<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>(
       {
         AddPlaceholders: ActionType.AccountsTable.AddPlaceholders,
@@ -96,52 +59,18 @@ const rootReducer = combineReducers({
       Loading: ActionType.Account.Loading,
       Request: ActionType.Account.Request
     }),
-    comments: createListResponseReducer<IComment, Redux.ICommentsListResponseStore>(
-      {
-        Response: ActionType.Account.Comments.Response,
-        Request: ActionType.Account.Comments.Request,
-        Loading: ActionType.Account.Comments.Loading,
-        AddToState: ActionType.Account.Comments.AddToState,
-        RemoveFromState: ActionType.Account.Comments.RemoveFromState,
-        UpdateInState: ActionType.Account.Comments.UpdateInState
-      },
-      {
-        referenceEntity: "comment",
-        initialState: initialCommentsListResponseState,
-        extensions: {
-          [ActionType.Account.Comments.UpdateWithChildInState]: (
-            payload: { id: number; data: IComment },
-            st: Redux.ICommentsListResponseStore
-          ) => {
-            // NOTE: This will only work for replies to top level comments.  For subsequent
-            // comments, we will have to figure out a way to do this recursively.  The other
-            // option is to create a comments reducer for the nested sets of comments.
-            const existing = find(st.data, { id: payload.id });
-            if (isNil(existing)) {
-              /* eslint-disable no-console */
-              console.error(
-                `Inconsistent State!:  Inconsistent state noticed when updating comment in state...
-                the comment with ID ${payload.id} does not exist in state when it is expected to.`
-              );
-            } else {
-              return {
-                data: replaceInArray<IComment>(
-                  st.data,
-                  { id: payload.id },
-                  { ...existing, comments: [...existing.comments, payload.data] }
-                )
-              };
-            }
-          }
-        },
-        keyReducers: {
-          submitting: createSimpleBooleanReducer(ActionType.Account.Comments.Submitting),
-          deleting: createModelListActionReducer(ActionType.Account.Comments.Deleting),
-          editing: createModelListActionReducer(ActionType.Account.Comments.Editing),
-          replying: createModelListActionReducer(ActionType.Account.Comments.Replying)
-        }
-      }
-    ),
+    comments: createCommentsListResponseReducer({
+      Response: ActionType.Account.Comments.Response,
+      Request: ActionType.Account.Comments.Request,
+      Loading: ActionType.Account.Comments.Loading,
+      AddToState: ActionType.Account.Comments.AddToState,
+      RemoveFromState: ActionType.Account.Comments.RemoveFromState,
+      UpdateInState: ActionType.Account.Comments.UpdateInState,
+      Submitting: ActionType.Account.Comments.Submitting,
+      Deleting: ActionType.Account.Comments.Deleting,
+      Editing: ActionType.Account.Comments.Editing,
+      Replying: ActionType.Account.Comments.Replying
+    }),
     subaccounts: combineReducers({
       deleting: createModelListActionReducer(ActionType.Account.SubAccounts.Deleting, {
         referenceEntity: "subaccount"
@@ -178,52 +107,18 @@ const rootReducer = combineReducers({
       Loading: ActionType.SubAccount.Loading,
       Request: ActionType.SubAccount.Request
     }),
-    comments: createListResponseReducer<IComment, Redux.ICommentsListResponseStore>(
-      {
-        Response: ActionType.SubAccount.Comments.Response,
-        Request: ActionType.SubAccount.Comments.Request,
-        Loading: ActionType.SubAccount.Comments.Loading,
-        AddToState: ActionType.SubAccount.Comments.AddToState,
-        RemoveFromState: ActionType.SubAccount.Comments.RemoveFromState,
-        UpdateInState: ActionType.SubAccount.Comments.UpdateInState
-      },
-      {
-        referenceEntity: "comment",
-        initialState: initialCommentsListResponseState,
-        extensions: {
-          [ActionType.SubAccount.Comments.UpdateWithChildInState]: (
-            payload: { id: number; data: IComment },
-            st: Redux.ICommentsListResponseStore
-          ) => {
-            // NOTE: This will only work for replies to top level comments.  For subsequent
-            // comments, we will have to figure out a way to do this recursively.  The other
-            // option is to create a comments reducer for the nested sets of comments.
-            const existing = find(st.data, { id: payload.id });
-            if (isNil(existing)) {
-              /* eslint-disable no-console */
-              console.error(
-                `Inconsistent State!:  Inconsistent state noticed when updating comment in state...
-                the comment with ID ${payload.id} does not exist in state when it is expected to.`
-              );
-            } else {
-              return {
-                data: replaceInArray<IComment>(
-                  st.data,
-                  { id: payload.id },
-                  { ...existing, comments: [...existing.comments, payload.data] }
-                )
-              };
-            }
-          }
-        },
-        keyReducers: {
-          submitting: createSimpleBooleanReducer(ActionType.SubAccount.Comments.Submitting),
-          deleting: createModelListActionReducer(ActionType.SubAccount.Comments.Deleting),
-          editing: createModelListActionReducer(ActionType.SubAccount.Comments.Editing),
-          replying: createModelListActionReducer(ActionType.SubAccount.Comments.Replying)
-        }
-      }
-    ),
+    comments: createCommentsListResponseReducer({
+      Response: ActionType.SubAccount.Comments.Response,
+      Request: ActionType.SubAccount.Comments.Request,
+      Loading: ActionType.SubAccount.Comments.Loading,
+      AddToState: ActionType.SubAccount.Comments.AddToState,
+      RemoveFromState: ActionType.SubAccount.Comments.RemoveFromState,
+      UpdateInState: ActionType.SubAccount.Comments.UpdateInState,
+      Submitting: ActionType.SubAccount.Comments.Submitting,
+      Deleting: ActionType.SubAccount.Comments.Deleting,
+      Editing: ActionType.SubAccount.Comments.Editing,
+      Replying: ActionType.SubAccount.Comments.Replying
+    }),
     subaccounts: combineReducers({
       deleting: createModelListActionReducer(ActionType.SubAccount.SubAccounts.Deleting, {
         referenceEntity: "subaccount"

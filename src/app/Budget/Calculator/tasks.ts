@@ -98,23 +98,36 @@ import {
   editingSubAccountCommentAction,
   replyingToBudgetCommentAction,
   replyingToAccountCommentAction,
-  replyingToSubAccountCommentAction,
-  updateBudgetCommentWithChildInStateAction,
-  updateAccountCommentWithChildInStateAction,
-  updateSubAccountCommentWithChildInStateAction
+  replyingToSubAccountCommentAction
 } from "./actions";
 
-export function* submitBudgetCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
+export function* submitBudgetCommentTask(
+  action: Redux.IAction<{ parent?: number; data: Http.ICommentPayload }>
+): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
-    yield put(submittingBudgetCommentAction(true));
+    const { parent, data } = action.payload;
+    if (!isNil(parent)) {
+      yield put(replyingToBudgetCommentAction({ id: parent, value: true }));
+    } else {
+      yield put(submittingBudgetCommentAction(true));
+    }
     try {
-      const response: IComment = yield call(createBudgetComment, budgetId, action.payload);
-      yield put(addBudgetCommentToStateAction(response));
+      let response: IComment;
+      if (!isNil(parent)) {
+        response = yield call(replyToComment, parent, data.text);
+      } else {
+        response = yield call(createBudgetComment, budgetId, data);
+      }
+      yield put(addBudgetCommentToStateAction({ data: response, parent }));
     } catch (e) {
       handleRequestError(e, "There was an error submitting the comment.");
     } finally {
-      yield put(submittingBudgetCommentAction(false));
+      if (!isNil(parent)) {
+        yield put(replyingToBudgetCommentAction({ id: parent, value: false }));
+      } else {
+        yield put(submittingBudgetCommentAction(false));
+      }
     }
   }
 }
@@ -123,7 +136,7 @@ export function* deleteBudgetCommentTask(action: Redux.IAction<number>): SagaIte
   if (!isNil(action.payload)) {
     yield put(deletingBudgetCommentAction({ id: action.payload, value: true }));
     try {
-      yield call(deleteComment, action.payload);
+      // yield call(deleteComment, action.payload);
       yield put(removeBudgetCommentFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the comment.");
@@ -150,26 +163,6 @@ export function* editBudgetCommentTask(action: Redux.IAction<Redux.UpdateModelAc
   }
 }
 
-export function* replyToBudgetCommentTask(
-  action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>
-): SagaIterator {
-  if (!isNil(action.payload) && !isNil(action.payload.data.text)) {
-    const {
-      id,
-      data: { text }
-    } = action.payload;
-    yield put(replyingToBudgetCommentAction({ id, value: true }));
-    try {
-      const response: IComment = yield call(replyToComment, id, text);
-      yield put(updateBudgetCommentWithChildInStateAction({ id, data: response }));
-    } catch (e) {
-      handleRequestError(e, "There was an error replying to the comment.");
-    } finally {
-      yield put(replyingToBudgetCommentAction({ id, value: false }));
-    }
-  }
-}
-
 export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
@@ -187,17 +180,33 @@ export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator
   }
 }
 
-export function* submitAccountCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
+export function* submitAccountCommentTask(
+  action: Redux.IAction<{ parent?: number; data: Http.ICommentPayload }>
+): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(accountId) && !isNil(action.payload)) {
-    yield put(submittingAccountCommentAction(true));
+    const { parent, data } = action.payload;
+    if (!isNil(parent)) {
+      yield put(replyingToAccountCommentAction({ id: parent, value: true }));
+    } else {
+      yield put(submittingAccountCommentAction(true));
+    }
     try {
-      const response: IComment = yield call(createAccountComment, accountId, action.payload);
-      yield put(addAccountCommentToStateAction(response));
+      let response: IComment;
+      if (!isNil(parent)) {
+        response = yield call(replyToComment, parent, data.text);
+      } else {
+        response = yield call(createAccountComment, accountId, data);
+      }
+      yield put(addAccountCommentToStateAction({ data: response, parent }));
     } catch (e) {
       handleRequestError(e, "There was an error submitting the comment.");
     } finally {
-      yield put(submittingAccountCommentAction(false));
+      if (!isNil(parent)) {
+        yield put(replyingToAccountCommentAction({ id: parent, value: false }));
+      } else {
+        yield put(submittingAccountCommentAction(false));
+      }
     }
   }
 }
@@ -206,7 +215,7 @@ export function* deleteAccountCommentTask(action: Redux.IAction<number>): SagaIt
   if (!isNil(action.payload)) {
     yield put(deletingAccountCommentAction({ id: action.payload, value: true }));
     try {
-      yield call(deleteComment, action.payload);
+      // yield call(deleteComment, action.payload);
       yield put(removeAccountCommentFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the comment.");
@@ -233,26 +242,6 @@ export function* editAccountCommentTask(action: Redux.IAction<Redux.UpdateModelA
   }
 }
 
-export function* replyToAccountCommentTask(
-  action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>
-): SagaIterator {
-  if (!isNil(action.payload) && !isNil(action.payload.data.text)) {
-    const {
-      id,
-      data: { text }
-    } = action.payload;
-    yield put(replyingToAccountCommentAction({ id, value: true }));
-    try {
-      const response: IComment = yield call(replyToComment, id, text);
-      yield put(updateAccountCommentWithChildInStateAction({ id, data: response }));
-    } catch (e) {
-      handleRequestError(e, "There was an error replying to the comment.");
-    } finally {
-      yield put(replyingToAccountCommentAction({ id, value: false }));
-    }
-  }
-}
-
 export function* getAccountCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(accountId)) {
@@ -270,17 +259,33 @@ export function* getAccountCommentsTask(action: Redux.IAction<any>): SagaIterato
   }
 }
 
-export function* submitSubAccountCommentTask(action: Redux.IAction<Http.ICommentPayload>): SagaIterator {
+export function* submitSubAccountCommentTask(
+  action: Redux.IAction<{ parent?: number; data: Http.ICommentPayload }>
+): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId) && !isNil(action.payload)) {
-    yield put(submittingSubAccountCommentAction(true));
+    const { parent, data } = action.payload;
+    if (!isNil(parent)) {
+      yield put(replyingToSubAccountCommentAction({ id: parent, value: true }));
+    } else {
+      yield put(submittingSubAccountCommentAction(true));
+    }
     try {
-      const response: IComment = yield call(createSubAccountComment, subaccountId, action.payload);
-      yield put(addSubAccountCommentToStateAction(response));
+      let response: IComment;
+      if (!isNil(parent)) {
+        response = yield call(replyToComment, parent, data.text);
+      } else {
+        response = yield call(createSubAccountComment, subaccountId, data);
+      }
+      yield put(addSubAccountCommentToStateAction({ data: response, parent }));
     } catch (e) {
       handleRequestError(e, "There was an error submitting the comment.");
     } finally {
-      yield put(submittingSubAccountCommentAction(false));
+      if (!isNil(parent)) {
+        yield put(replyingToSubAccountCommentAction({ id: parent, value: false }));
+      } else {
+        yield put(submittingSubAccountCommentAction(false));
+      }
     }
   }
 }
@@ -289,7 +294,7 @@ export function* deleteSubAccountCommentTask(action: Redux.IAction<number>): Sag
   if (!isNil(action.payload)) {
     yield put(deletingSubAccountCommentAction({ id: action.payload, value: true }));
     try {
-      yield call(deleteComment, action.payload);
+      // yield call(deleteComment, action.payload);
       yield put(removeSubAccountCommentFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the comment.");
@@ -314,26 +319,6 @@ export function* editSubAccountCommentTask(
       handleRequestError(e, "There was an error updating the comment.");
     } finally {
       yield put(editingSubAccountCommentAction({ id, value: false }));
-    }
-  }
-}
-
-export function* replyToSubAccountCommentTask(
-  action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>
-): SagaIterator {
-  if (!isNil(action.payload) && !isNil(action.payload.data.text)) {
-    const {
-      id,
-      data: { text }
-    } = action.payload;
-    yield put(replyingToSubAccountCommentAction({ id, value: true }));
-    try {
-      const response: IComment = yield call(replyToComment, id, text);
-      yield put(updateSubAccountCommentWithChildInStateAction({ id, data: response }));
-    } catch (e) {
-      handleRequestError(e, "There was an error replying to the comment.");
-    } finally {
-      yield put(replyingToSubAccountCommentAction({ id, value: false }));
     }
   }
 }

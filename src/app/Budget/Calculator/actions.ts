@@ -14,7 +14,6 @@ export const ActionType = {
     Request: "calculator.comments.Request",
     Delete: "calculator.comments.Delete",
     Edit: "calculator.comments.Edit",
-    Reply: "calculator.comments.Reply",
     Submit: "calculator.comments.Submit",
     Submitting: "calculator.comments.Submitting",
     Deleting: "calculator.comments.Deleting",
@@ -22,8 +21,7 @@ export const ActionType = {
     Replying: "calculator.comments.Replying",
     AddToState: "calculator.comments.AddToState",
     RemoveFromState: "calculator.comments.RemoveFromState",
-    UpdateInState: "calculator.comments.UpdateInState",
-    UpdateWithChildInState: "calculator.comments.UpdateWithChildInState"
+    UpdateInState: "calculator.comments.UpdateInState"
   },
   AccountsTable: {
     AddPlaceholders: "calculator.accountstable.AddPlaceholders",
@@ -55,12 +53,10 @@ export const ActionType = {
       Replying: "calculator.account.comments.Replying",
       Delete: "calculator.account.comments.Delete",
       Edit: "calculator.account.comments.Edit",
-      Reply: "calculator.account.comments.Reply",
       Submit: "calculator.account.comments.Submit",
       AddToState: "calculator.account.comments.AddToState",
       RemoveFromState: "calculator.account.comments.RemoveFromState",
-      UpdateInState: "calculator.account.comments.UpdateInState",
-      UpdateWithChildInState: "calculator.account.comments.UpdateWithChildInState"
+      UpdateInState: "calculator.account.comments.UpdateInState"
     },
     SubAccountsTable: {
       AddPlaceholders: "calculator.account.subaccountstable.AddPlaceholders",
@@ -95,7 +91,6 @@ export const ActionType = {
       Request: "calculator.subaccount.comments.Request",
       Delete: "calculator.subaccount.comments.Delete",
       Edit: "calculator.subaccount.comments.Edit",
-      Reply: "calculator.subaccount.comments.Reply",
       Submitting: "calculator.subaccount.comments.Submitting",
       Deleting: "calculator.subaccount.comments.Deleting",
       Replying: "calculator.subaccount.comments.Replying",
@@ -103,8 +98,7 @@ export const ActionType = {
       Submit: "calculator.subaccount.comments.Submit",
       AddToState: "calculator.subaccount.comments.AddToState",
       RemoveFromState: "calculator.subaccount.comments.RemoveFromState",
-      UpdateInState: "calculator.subaccount.comments.UpdateInState",
-      UpdateWithChildInState: "calculator.subaccount.comments.UpdateWithChildInState"
+      UpdateInState: "calculator.subaccount.comments.UpdateInState"
     },
     SubAccountsTable: {
       AddPlaceholders: "calculator.subaccount.subaccountstable.AddPlaceholders",
@@ -147,23 +141,21 @@ export const responseSubAccountAction = simpleAction<ISubAccount>(ActionType.Sub
 export const requestBudgetCommentsAction = simpleAction<null>(ActionType.Comments.Request);
 export const responseBudgetCommentsAction = simpleAction<Http.IListResponse<IComment>>(ActionType.Comments.Response);
 export const loadingBudgetCommentsAction = simpleAction<boolean>(ActionType.Comments.Loading);
-export const submitBudgetCommentAction = simpleAction<Http.ICommentPayload>(ActionType.Comments.Submit);
+export const submitBudgetCommentAction = simpleAction<{ parent?: number; data: Http.ICommentPayload }>(
+  ActionType.Comments.Submit
+);
 export const submittingBudgetCommentAction = simpleAction<boolean>(ActionType.Comments.Submitting);
 export const deleteBudgetCommentAction = simpleAction<number>(ActionType.Comments.Delete);
-export const replyToBudgetCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
-  ActionType.Comments.Reply
-);
 export const editBudgetCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(ActionType.Comments.Edit);
 export const deletingBudgetCommentAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Comments.Deleting);
 export const editingBudgetCommentAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Comments.Editing);
 export const replyingToBudgetCommentAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Comments.Replying);
-export const addBudgetCommentToStateAction = simpleAction<IComment>(ActionType.Comments.AddToState);
+export const addBudgetCommentToStateAction = simpleAction<{ data: IComment; parent?: number }>(
+  ActionType.Comments.AddToState
+);
 export const removeBudgetCommentFromStateAction = simpleAction<number>(ActionType.Comments.RemoveFromState);
 export const updateBudgetCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
   ActionType.Comments.UpdateInState
-);
-export const updateBudgetCommentWithChildInStateAction = simpleAction<{ id: number; data: IComment }>(
-  ActionType.Comments.UpdateWithChildInState
 );
 
 /*
@@ -204,12 +196,11 @@ export const responseAccountCommentsAction = simpleAction<Http.IListResponse<ICo
   ActionType.Account.Comments.Response
 );
 export const loadingAccountCommentsAction = simpleAction<boolean>(ActionType.Account.Comments.Loading);
-export const submitAccountCommentAction = simpleAction<Http.ICommentPayload>(ActionType.Account.Comments.Submit);
+export const submitAccountCommentAction = simpleAction<{ parent?: number; data: Http.ICommentPayload }>(
+  ActionType.Account.Comments.Submit
+);
 export const submittingAccountCommentAction = simpleAction<boolean>(ActionType.Account.Comments.Submitting);
 export const deleteAccountCommentAction = simpleAction<number>(ActionType.Account.Comments.Delete);
-export const replyToAccountCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
-  ActionType.Account.Comments.Reply
-);
 export const editAccountCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
   ActionType.Account.Comments.Edit
 );
@@ -222,15 +213,13 @@ export const deletingAccountCommentAction = simpleAction<Redux.ModelListActionPa
 export const editingAccountCommentAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Account.Comments.Editing
 );
-export const addAccountCommentToStateAction = simpleAction<IComment>(ActionType.Account.Comments.AddToState);
+export const addAccountCommentToStateAction = simpleAction<{ data: IComment; parent?: number }>(
+  ActionType.Account.Comments.AddToState
+);
 export const removeAccountCommentFromStateAction = simpleAction<number>(ActionType.Account.Comments.RemoveFromState);
 export const updateAccountCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
   ActionType.Account.Comments.UpdateInState
 );
-export const updateAccountCommentWithChildInStateAction = simpleAction<{ id: number; data: IComment }>(
-  ActionType.Account.Comments.UpdateWithChildInState
-);
-
 /*
   Actions Pertaining to Account Sub Accounts
 */
@@ -286,12 +275,11 @@ export const responseSubAccountCommentsAction = simpleAction<Http.IListResponse<
   ActionType.SubAccount.Comments.Response
 );
 export const loadingSubAccountCommentsAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Loading);
-export const submitSubAccountCommentAction = simpleAction<Http.ICommentPayload>(ActionType.SubAccount.Comments.Submit);
+export const submitSubAccountCommentAction = simpleAction<{ parent?: number; data: Http.ICommentPayload }>(
+  ActionType.SubAccount.Comments.Submit
+);
 export const submittingSubAccountCommentAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Submitting);
 export const deleteSubAccountCommentAction = simpleAction<number>(ActionType.SubAccount.Comments.Delete);
-export const replyToSubAccountCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
-  ActionType.SubAccount.Comments.Reply
-);
 export const editSubAccountCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
   ActionType.SubAccount.Comments.Edit
 );
@@ -304,17 +292,15 @@ export const deletingSubAccountCommentAction = simpleAction<Redux.ModelListActio
 export const editingSubAccountCommentAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.SubAccount.Comments.Editing
 );
-export const addSubAccountCommentToStateAction = simpleAction<IComment>(ActionType.SubAccount.Comments.AddToState);
+export const addSubAccountCommentToStateAction = simpleAction<{ data: IComment; parent?: number }>(
+  ActionType.SubAccount.Comments.AddToState
+);
 export const removeSubAccountCommentFromStateAction = simpleAction<number>(
   ActionType.SubAccount.Comments.RemoveFromState
 );
 export const updateSubAccountCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
   ActionType.SubAccount.Comments.UpdateInState
 );
-export const updateSubAccountCommentWithChildInStateAction = simpleAction<{ id: number; data: IComment }>(
-  ActionType.SubAccount.Comments.UpdateWithChildInState
-);
-
 /*
   Actions Pertaining to Sub Account Sub Accounts
 */

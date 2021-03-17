@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
 import { isNil, includes } from "lodash";
 
-import { ColDef, ColSpanParams, CellClassParams } from "ag-grid-community";
+import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
@@ -23,8 +23,7 @@ import {
   requestSubAccountCommentsAction,
   submitSubAccountCommentAction,
   deleteSubAccountCommentAction,
-  editSubAccountCommentAction,
-  replyToSubAccountCommentAction
+  editSubAccountCommentAction
 } from "./actions";
 
 const SubAccount = (): JSX.Element => {
@@ -166,11 +165,11 @@ const SubAccount = (): JSX.Element => {
             includes(comments.editing, comment.id) ||
             includes(comments.replying, comment.id),
           onRequest: () => dispatch(requestSubAccountCommentsAction()),
-          onSubmit: (payload: Http.ICommentPayload) => dispatch(submitSubAccountCommentAction(payload)),
+          onSubmit: (payload: Http.ICommentPayload) => dispatch(submitSubAccountCommentAction({ data: payload })),
           onDoneEditing: (comment: IComment, value: string) =>
             dispatch(editSubAccountCommentAction({ id: comment.id, data: { text: value } })),
           onDoneReplying: (comment: IComment, value: string) =>
-            dispatch(replyToSubAccountCommentAction({ id: comment.id, data: { text: value } })),
+            dispatch(submitSubAccountCommentAction({ parent: comment.id, data: { text: value } })),
           onLike: (comment: IComment) => console.log(comment),
           onDislike: (comment: IComment) => console.log(comment),
           onDelete: (comment: IComment) => dispatch(deleteSubAccountCommentAction(comment.id))
