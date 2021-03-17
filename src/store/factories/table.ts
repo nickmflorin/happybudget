@@ -3,7 +3,7 @@ import { isNil, forEach, find, filter, map } from "lodash";
 import { replaceInArray } from "util/arrays";
 import { mergeWithDefaults } from "util/objects";
 import { initialTableState } from "store/initialState";
-import { createListReducerFromTransformers, createObjectReducerFromTransformers } from "./util";
+import { createListReducerFromTransformers } from "./util";
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of the

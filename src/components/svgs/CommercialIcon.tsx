@@ -6,9 +6,9 @@ const CommercialIcon = (): JSX.Element => {
         data-name={"$"}
         transform={"translate(0 67)"}
         fill={"#f7f7f7"}
-        font-size={"67"}
-        font-family={"AvenirNext-Bold, Avenir Next"}
-        font-weight={"700"}
+        fontSize={"67"}
+        fontFamily={"AvenirNext-Bold, Avenir Next"}
+        fontWeight={"700"}
       >
         <tspan x={"0"} y={"0"}>
           {"$"}

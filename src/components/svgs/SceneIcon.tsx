@@ -6,7 +6,7 @@ const SceneIcon = (): JSX.Element => {
           <rect width={"300"} height={"151"} />
         </clipPath>
       </defs>
-      <g id={"a"} clip-path={"url(#b)"}>
+      <g id={"a"} clipPath={"url(#b)"}>
         <g transform={"translate(63.193 39.425)"}>
           <g transform={"translate(55.117 5)"}>
             <g transform={"translate(0 0)"}>

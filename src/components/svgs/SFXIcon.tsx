@@ -6,7 +6,7 @@ const SFXIcon = (): JSX.Element => {
           <rect width={"300"} height={"151"} />
         </clipPath>
       </defs>
-      <g id={"a"} clip-path={"url(#b)"}>
+      <g id={"a"} clipPath={"url(#b)"}>
         <g transform={"translate(14.812 32.872)"}>
           <ellipse
             cx={"11.684"}
@@ -52,9 +52,9 @@ const SFXIcon = (): JSX.Element => {
           <text
             transform={"translate(0 129.423)"}
             fill={"#404152"}
-            font-size={"1"}
-            font-family={"HelveticaNeue-Bold, Helvetica Neue"}
-            font-weight={"700"}
+            fontSize={"1"}
+            fontFamily={"HelveticaNeue-Bold, Helvetica Neue"}
+            fontWeight={"700"}
           >
             <tspan x={"0"} y={"0"}>
               {"Created by Gan Khoon Lay"}
@@ -63,9 +63,9 @@ const SFXIcon = (): JSX.Element => {
           <text
             transform={"translate(0 132.02)"}
             fill={"#404152"}
-            font-size={"1"}
-            font-family={"HelveticaNeue-Bold, Helvetica Neue"}
-            font-weight={"700"}
+            fontSize={"1"}
+            fontFamily={"HelveticaNeue-Bold, Helvetica Neue"}
+            fontWeight={"700"}
           >
             <tspan x={"0"} y={"0"}>
               {"from the Noun Project"}

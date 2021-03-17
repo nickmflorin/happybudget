@@ -1,15 +1,4 @@
-import { isNil } from "lodash";
 import { generateRandomNumericId } from "../util";
-
-// export const postPayloadFromRow = <R, P>(row: R, type: Table.RowType): P => {
-//   const obj: { [key: string]: any } = {};
-//   forEach(FieldDefinitions[type], (def: IFieldDefinition) => {
-//     if (def.postPayload === true && !isNil(row[def.name as keyof R])) {
-//       obj[def.name] = row[def.name as keyof R];
-//     }
-//   });
-//   return obj as P;
-// };
 
 export const initializeRowFromActual = (actual: IActual): Table.IActualRow => {
   return {

@@ -6,7 +6,7 @@ const DirectorIcon = (): JSX.Element => {
           <rect width={"300"} height={"151"} />
         </clipPath>
       </defs>
-      <g id={"a"} clip-path={"url(#b)"}>
+      <g id={"a"} clipPath={"url(#b)"}>
         <g transform={"translate(420.219 339.747)"}>
           <g transform={"translate(-249.342 -311)"}>
             <path

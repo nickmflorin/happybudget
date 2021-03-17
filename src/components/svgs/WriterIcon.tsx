@@ -6,7 +6,7 @@ const WriterIcon = (): JSX.Element => {
           <rect width={"300"} height={"151"} />
         </clipPath>
       </defs>
-      <g id={"a"} clip-path={"url(#b)"}>
+      <g id={"a"} clipPath={"url(#b)"}>
         <g transform={"translate(93.421 -72.951)"}>
           <g transform={"translate(88 101)"}>
             <path

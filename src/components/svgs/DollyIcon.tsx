@@ -6,7 +6,7 @@ const DollyIcon = (): JSX.Element => {
           <rect width={"300"} height={"151"} />
         </clipPath>
       </defs>
-      <g id={"a"} clip-path={"url(#b)"}>
+      <g id={"a"} clipPath={"url(#b)"}>
         <g transform={"translate(131.284 36.782)"}>
           <g transform={"translate(-20.001 10)"}>
             <path

@@ -6,7 +6,7 @@ const EditorIcon = (): JSX.Element => {
           <rect width={"300"} height={"151"} />
         </clipPath>
       </defs>
-      <g id={"a"} clip-path={"url(#b)"}>
+      <g id={"a"} clipPath={"url(#b)"}>
         <g transform={"translate(125.204 42.525)"}>
           <rect width={"15.836"} height={"6.266"} transform={"translate(0 70.46)"} fill={"#404152"} />
           <path
