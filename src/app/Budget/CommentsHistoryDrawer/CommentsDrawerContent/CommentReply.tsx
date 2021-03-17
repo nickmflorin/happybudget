@@ -3,7 +3,7 @@ import { Input } from "antd";
 
 import { ShowHide } from "components/display";
 import { AccountCircleLink } from "components/control/links";
-import { ButtonLink } from "components/control/buttons";
+import { TextWithLink } from "components/control/links";
 
 import "./CommentReply.scss";
 
@@ -51,12 +51,10 @@ const CommentReply = ({ comment, visible, onSubmit, onClose }: CommentReplyProps
           />
         </div>
         <div className={"comment-reply-footer"}>
-          <span className={"cancel-text"}>
+          <TextWithLink>
             {"Press Esc to"}
-            <ButtonLink className={"cancel-link"} onClick={() => onClose()}>
-              {"Cancel"}
-            </ButtonLink>
-          </span>
+            <TextWithLink.Link onClick={() => onClose()}>{"Cancel"}</TextWithLink.Link>
+          </TextWithLink>
         </div>
       </div>
     </ShowHide>

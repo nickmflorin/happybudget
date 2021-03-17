@@ -1,5 +1,5 @@
-@import "./colors";
-@import "./typography";
+@import './colors';
+@import './typography';
 
 // This class is not meant to be used in the components.
 .btn-link-base {
@@ -108,6 +108,30 @@
   }
 }
 
+.text-with-link {
+  @extend .link;
+  font-size: 12px;
+  line-height: 14px;
+  font-family: $roboto;
+  font-weight: 400;
+  transition: none;
+  box-shadow: none;
+  background-color: transparent;
+  padding: 0;
+  border: none !important;
+  color: $text-secondary;
+
+  .text-embedded-link {
+    margin-left: 3px;
+    color: $blue;
+
+    &:hover {
+      color: rgba($blue, 0.6);
+    }
+  }
+}
+
+
 .btn,
 .ant-btn {
   @extend .btn-link-base;
@@ -136,15 +160,8 @@
 
   // Size of the CircularProgress is set in JS/TS.
   .spinner {
-    color: $blue;
+    color: $green;
     position: initial;
-
-    &.left {
-      margin-right: 6px;
-    }
-    &.right {
-      margin-left: 6px;
-    }
   }
 
   .icon {
@@ -288,7 +305,8 @@
       svg {
         color: $green !important;
       }
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         svg {
           color: $green-darker !important;
         }
@@ -314,7 +332,8 @@
       svg {
         color: $disabled-color !important;
       }
-      &:hover, &:focus {
+      &:hover,
+      &:focus {
         svg {
           color: $disabled-color !important;
         }

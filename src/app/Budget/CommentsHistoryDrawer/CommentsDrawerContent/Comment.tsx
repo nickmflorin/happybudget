@@ -1,7 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { isNil } from "lodash";
-
-import { Input } from "antd";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faReply } from "@fortawesome/free-solid-svg-icons";
@@ -13,6 +11,7 @@ import { ShowHide, RenderWithSpinner } from "components/display";
 import { toDisplayTimeSince } from "util/dates";
 import { useLoggedInUser } from "store/hooks";
 
+import CommentEdit from "./CommentEdit";
 import "./Comment.scss";
 
 const CommentHeader = (props: { comment: IComment }): JSX.Element => {
@@ -28,29 +27,22 @@ const CommentHeader = (props: { comment: IComment }): JSX.Element => {
 interface CommentBodyProps {
   comment: IComment;
   onDoneEditing: (value: string) => void;
+  onCancelEditing: () => void;
   editing: boolean;
 }
 
-const CommentBody = ({ comment, editing, onDoneEditing }: CommentBodyProps): JSX.Element => {
+const CommentBody = ({ comment, editing, onDoneEditing, onCancelEditing }: CommentBodyProps): JSX.Element => {
   const [text, setText] = useState(comment.text);
+
   return (
     <div className={"comment-body"}>
-      <ShowHide show={editing}>
-        <div className={"comment-text-area-wrapper"}>
-          <Input.TextArea
-            maxLength={1028}
-            value={text}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-              setText(e.target.value);
-            }}
-            onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-              if (e.code === "Enter") {
-                onDoneEditing(text);
-              }
-            }}
-          />
-        </div>
-      </ShowHide>
+      <CommentEdit
+        visible={editing}
+        setValue={(val: string) => setText(val)}
+        value={text}
+        onClose={() => onCancelEditing()}
+        onSubmit={(t: string) => onDoneEditing(t)}
+      />
       <ShowHide show={!editing}>
         <div className={"comment-body-text"}>{text}</div>
       </ShowHide>
@@ -115,7 +107,6 @@ const ComentFooter = ({ comment, onDelete, onEdit, onLike, onDislike, onReply }:
 interface CommentProps {
   comment: IComment;
   loading?: boolean;
-  setReplying: (value: boolean) => void;
   onDelete?: () => void;
   onDoneEditing?: (value: string) => void;
   onLike?: () => void;
@@ -126,7 +117,6 @@ interface CommentProps {
 const Comment = ({
   comment,
   loading,
-  setReplying,
   onDelete,
   onDoneEditing,
   onLike,
@@ -141,6 +131,7 @@ const Comment = ({
       <CommentBody
         comment={comment}
         editing={editing}
+        onCancelEditing={() => setEditing(false)}
         onDoneEditing={(value: string) => {
           setEditing(false);
           if (!isNil(onDoneEditing)) {
@@ -155,7 +146,7 @@ const Comment = ({
           onEdit={() => setEditing(true)}
           onLike={onLike}
           onDislike={onDislike}
-          onReply={() => setReplying(true)}
+          onReply={onReply}
         />
       </ShowHide>
     </RenderWithSpinner>

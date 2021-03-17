@@ -37,7 +37,7 @@ const CommentBlock = ({
     <div className={classNames("comment-block", { nested })}>
       <Comment
         comment={comment}
-        setReplying={setReplying}
+        onReply={() => setReplying(true)}
         loading={!isNil(commentLoading) && commentLoading(comment)}
         onDelete={() => onDelete(comment)}
         onLike={() => onLike(comment)}

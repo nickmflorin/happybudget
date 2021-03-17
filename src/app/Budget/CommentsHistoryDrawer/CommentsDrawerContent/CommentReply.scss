@@ -16,20 +16,5 @@
   }
   .comment-reply-footer {
     padding-left: 42px;
-
-    .cancel-text {
-      font-size: 12px;
-      line-height: 14px;
-      font-family: $roboto;
-      font-weight: 400;
-      .cancel-link {
-        margin-left: 2px;
-        font-family: $roboto;
-        font-weight: 400;
-        font-size: 12px;
-        line-height: 14px !important;
-        vertical-align: -0.04rem;
-      }
-    }
   }
 }
