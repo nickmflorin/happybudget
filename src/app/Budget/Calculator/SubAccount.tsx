@@ -33,9 +33,6 @@ const SubAccount = (): JSX.Element => {
 
   const subAccountStore = useSelector((state: Redux.IApplicationStore) => state.calculator.subaccount);
   const budgetId = useSelector((state: Redux.IApplicationStore) => state.budget.budget.id);
-  const commentsHistoryDrawerOpen = useSelector(
-    (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
-  );
   const comments = useSelector((state: Redux.IApplicationStore) => state.calculator.subaccount.comments);
 
   useEffect(() => {
@@ -155,7 +152,6 @@ const SubAccount = (): JSX.Element => {
         />
       </RenderWithSpinner>
       <CommentsHistoryDrawer
-        visible={commentsHistoryDrawerOpen}
         commentsProps={{
           comments: comments.data,
           loading: comments.loading,

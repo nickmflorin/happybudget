@@ -19,7 +19,7 @@ import {
 
 import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
-import { setBudgetIdAction, setCommentsHistoryDrawerVisibility } from "./actions";
+import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./actions";
 import "./index.scss";
 
 const Calculator = React.lazy(() => import("./Calculator"));
@@ -68,7 +68,8 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faComments} />,
-          onClick: () => dispatch(setCommentsHistoryDrawerVisibility(!commentsHistoryDrawerOpen))
+          onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen)),
+          role: "drawer-toggle"
         }
       ]}
       sidebar={[

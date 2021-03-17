@@ -15,6 +15,7 @@ export interface IToolbarItem {
   tooltip?: TooltipPropsWithTitle;
   onClick?: () => void;
   disabled?: boolean;
+  role?: string;
 }
 
 interface ToolbarProps {
@@ -28,6 +29,7 @@ const Toolbar = ({ items }: ToolbarProps): JSX.Element => {
         return (
           <IconButton
             className={"dark"}
+            role={item.role}
             key={index}
             size={"large"}
             icon={item.icon}

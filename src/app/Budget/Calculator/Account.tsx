@@ -32,9 +32,6 @@ const Account = (): JSX.Element => {
   const history = useHistory();
   const accountStore = useSelector((state: Redux.IApplicationStore) => state.calculator.account);
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
-  const commentsHistoryDrawerOpen = useSelector(
-    (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
-  );
   const comments = useSelector((state: Redux.IApplicationStore) => state.calculator.account.comments);
 
   useEffect(() => {
@@ -158,7 +155,6 @@ const Account = (): JSX.Element => {
         />
       </RenderWithSpinner>
       <CommentsHistoryDrawer
-        visible={commentsHistoryDrawerOpen}
         commentsProps={{
           comments: comments.data,
           loading: comments.loading,

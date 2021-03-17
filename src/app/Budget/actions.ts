@@ -18,4 +18,6 @@ export const setAncestorsLoadingAction = simpleAction<boolean>(ActionType.SetAnc
 export const requestBudgetAction = simpleAction<null>(ActionType.Budget.Request);
 export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loading);
 export const responseBudgetAction = simpleAction<IBudget>(ActionType.Budget.Response);
-export const setCommentsHistoryDrawerVisibility = simpleAction<boolean>(ActionType.SetCommentsHistoryDrawerVisibility);
+export const setCommentsHistoryDrawerVisibilityAction = simpleAction<boolean>(
+  ActionType.SetCommentsHistoryDrawerVisibility
+);
