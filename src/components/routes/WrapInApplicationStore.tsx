@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import { isNil } from "lodash";
 
 import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
-import { SuspenseFallback } from "components/display";
+import { ApplicationSpinner } from "components/display";
 import { validateToken } from "services";
 import configureStore from "store";
 
@@ -55,7 +55,7 @@ const WrapInApplicationStore = ({ children }: WrapInApplicationStoreProps): JSX.
   } else {
     if (isNil(reduxStore)) {
       if (authenticating) {
-        return <SuspenseFallback />;
+        return <ApplicationSpinner />;
       }
       // If the Redux Store is not set and we are not authenticating anymore,
       // there was an error with the token validation, in which case we should

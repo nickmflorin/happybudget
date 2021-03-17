@@ -1,5 +1,5 @@
 import React from "react";
-import { Redirect, Switch, Route, useRouteMatch } from "react-router-dom";
+import { Route, Redirect, Switch, useRouteMatch } from "react-router-dom";
 
 const Account = React.lazy(() => import("./Account"));
 const Accounts = React.lazy(() => import("./Accounts"));

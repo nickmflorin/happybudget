@@ -21,6 +21,32 @@ $footer-background-color: $white;
   font-family: $noto-sans-regular !important;
   overflow-y: hidden;
 
+  #application-spinner-container {
+    z-index: 1000;
+    height: 30px;
+    width: 30px;
+    position: fixed;
+    top: calc(50vh - 15px);
+    left: calc(50vw - 15px);
+
+    .application-spinner {
+      z-index: 1000;
+      height: 30px;
+      width: 30px;
+
+      .anticon {
+        height: 100%;
+        width: 100%;
+
+        svg {
+          height: 100%;
+          width: auto;
+          color: $green !important;
+        }
+      }
+    }
+  }
+
   // Landing Content - Container for the main content that gets displayed
   // outside of the logged in application.  This is for thinks like login,
   // reset password, etc.

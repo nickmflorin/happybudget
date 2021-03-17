@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Switch, Route, useHistory, useLocation, useParams } from "react-router-dom";
+import { Route, Switch, useHistory, useLocation, useParams } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -17,7 +17,7 @@ import {
   faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 
-import { RenderIfValidId, RenderWithSpinner } from "components/display";
+import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibility } from "./actions";
 import "./index.scss";
@@ -126,14 +126,14 @@ const Budget = (): JSX.Element => {
       ]}
     >
       <RenderIfValidId id={[budgetId]}>
-        <RenderWithSpinner loading={budget.detail.loading}>
+        <WrapInApplicationSpinner loading={budget.detail.loading}>
           <div className={"budget"}>
             <Switch>
               <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
               <Route path={"/budgets/:budgetId"} component={Calculator} />
             </Switch>
           </div>
-        </RenderWithSpinner>
+        </WrapInApplicationSpinner>
       </RenderIfValidId>
     </Layout>
   );

@@ -3,7 +3,8 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "style/index.scss";
 
-import { SuspenseFallback } from "components/display";
+import { ApplicationSpinner } from "components/display";
+import { StoreConnectedRoute } from "components/routes";
 
 const Landing = React.lazy(() => import("./Landing"));
 const Application = React.lazy(() => import("./Application"));
@@ -13,10 +14,11 @@ function App(): JSX.Element {
     <BrowserRouter>
       <ToastContainer />
       <div className={"root"}>
-        <Suspense fallback={<SuspenseFallback />}>
+        <div id={"application-spinner-container"}></div>
+        <Suspense fallback={<ApplicationSpinner />}>
           <Switch>
             <Route path={["/login", "/signup"]} component={Landing} />
-            <Route path={["/"]} component={Application} />
+            <StoreConnectedRoute path={["/"]} component={Application} />
           </Switch>
         </Suspense>
       </div>

@@ -33,6 +33,11 @@ export const initialTableState: Redux.ITableStore<any, any, any, any> = {
   responseWasReceived: false
 };
 
+export const initialLoadingState: Redux.ILoadingStore = {
+  elements: [],
+  loading: false
+};
+
 export const createInitialUserState = (user: IUser): Redux.IUserStore => {
   return {
     ...user

@@ -183,6 +183,11 @@ namespace Redux {
 
   interface IUserStore extends IUser {}
 
+  interface ILoadingStore {
+    readonly loading: boolean;
+    readonly elements: string[];
+  }
+
   interface IApplicationStore extends IModulesStore {
     readonly user: IUserStore;
     readonly dashboard: Dashboard.IStore;
@@ -190,5 +195,6 @@ namespace Redux {
     readonly calculator: Calculator.IStore;
     readonly actuals: Actuals.IStore;
     readonly drawerVisible: boolean;
+    readonly loading: ILoadingStore;
   }
 }

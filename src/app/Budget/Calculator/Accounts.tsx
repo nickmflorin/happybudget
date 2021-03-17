@@ -5,7 +5,7 @@ import { isNil, includes } from "lodash";
 
 import { ColDef } from "ag-grid-community";
 
-import { RenderWithSpinner } from "components/display";
+import { WrapInApplicationSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
@@ -56,7 +56,7 @@ const Accounts = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <RenderWithSpinner loading={accounts.table.loading || budget.detail.loading}>
+      <WrapInApplicationSpinner loading={budget.detail.loading || accounts.table.loading}>
         <GenericBudgetTable<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow>
           table={accounts.table.data}
           isCellEditable={(row: Table.IAccountRow, colDef: ColDef) => {
@@ -112,7 +112,7 @@ const Accounts = (): JSX.Element => {
             }
           ]}
         />
-      </RenderWithSpinner>
+      </WrapInApplicationSpinner>
       <CommentsHistoryDrawer
         visible={commentsHistoryDrawerOpen}
         commentsProps={{

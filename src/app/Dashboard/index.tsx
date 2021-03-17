@@ -1,9 +1,10 @@
 import React from "react";
-import { Route, Switch, useHistory, useLocation } from "react-router-dom";
+import { Switch, useHistory, useLocation } from "react-router-dom";
 
 import { FileAddOutlined, ContactsOutlined, FolderOutlined, DeleteOutlined } from "@ant-design/icons";
 
 import { Layout } from "components/layout";
+import { PrivateRoute } from "components/routes";
 
 const Contacts = React.lazy(() => import("./Contacts"));
 const Budgets = React.lazy(() => import("./Budgets/Active"));
@@ -44,10 +45,10 @@ const Dashboard = (): JSX.Element => {
       ]}
     >
       <Switch>
-        <Route exact path={"/contacts"} component={Contacts} />
-        <Route exact path={"/budgets"} component={Budgets} />
-        <Route exact path={"/templates"} component={Templates} />
-        <Route exact path={"/trash"} component={Trash} />
+        <PrivateRoute exact path={"/contacts"} component={Contacts} />
+        <PrivateRoute exact path={"/budgets"} component={Budgets} />
+        <PrivateRoute exact path={"/templates"} component={Templates} />
+        <PrivateRoute exact path={"/trash"} component={Trash} />
       </Switch>
     </Layout>
   );
