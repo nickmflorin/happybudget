@@ -184,3 +184,14 @@ interface IContact extends Model {
   readonly phone_number: string;
   readonly email: string;
 }
+
+interface IFieldAlterationEvent extends Model {
+  readonly created_at: string;
+  readonly new_value: string | null;
+  readonly old_value: string | null;
+  readonly field: string;
+  readonly content_object_type: "actual" | "account" | "subaccount";
+  readonly object_id: number;
+  readonly type: "field_alteration";
+  readonly user: ISimpleUser;
+}
