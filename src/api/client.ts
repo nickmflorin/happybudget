@@ -172,8 +172,6 @@ export class ApiClient {
       [HttpRequestMethods.PATCH]: _client.patch
     };
     url = this._prepare_url(url, query, method);
-    console.log(process.env.REACT_APP_API_DOMAIN);
-    console.log(url);
     let response: AxiosResponse<T>;
     try {
       response = await lookup[method](url, payload, {
