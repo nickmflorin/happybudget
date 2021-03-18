@@ -32,8 +32,9 @@ interface HorizontalMenuProps {
 const HorizontalMenu = ({ items, selected, onChange }: HorizontalMenuProps): JSX.Element => {
   return (
     <div className={"horizontal-menu"}>
-      {map(items, (item: IHorizontalMenuItem) => (
+      {map(items, (item: IHorizontalMenuItem, index: number) => (
         <HorizontalMenuItem
+          key={index}
           {...item}
           selected={
             !isNil(selected) ? (Array.isArray(selected) ? includes(selected, item.id) : selected === item.id) : false
