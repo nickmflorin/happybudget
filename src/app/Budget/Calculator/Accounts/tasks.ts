@@ -14,7 +14,13 @@ import {
   getAccountsHistory
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
-import { payloadFromResponse, postPayloadFromRow, rowHasRequiredFields, payloadBeforeResponse } from "../../util";
+import {
+  payloadFromResponse,
+  postPayload,
+  patchPayload,
+  rowHasRequiredFields,
+  payloadBeforeResponse
+} from "../../util";
 import {
   loadingAccountsAction,
   responseAccountsAction,
@@ -165,11 +171,9 @@ export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIt
   }
 }
 
-export function* handleAccountUpdateTask(
-  action: Redux.IAction<{ id: number; data: Partial<Table.IAccountRow> }>
-): SagaIterator {
+export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
-  if (!isNil(action.payload) && !isNil(action.payload.id) && !isNil(action.payload.data) && !isNil(budgetId)) {
+  if (!isNil(action.payload) && !isNil(action.payload.id)) {
     const table = yield select((state: Redux.IApplicationStore) => state.calculator.accounts.table.data);
 
     const existing: Table.IAccountRow = find(table, { id: action.payload.id });
@@ -187,7 +191,7 @@ export function* handleAccountUpdateTask(
       // so we need to udpate the row in the data used to populate the table.  We could
       // do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
-      const preResponsePayload = payloadBeforeResponse<Table.IAccountRow>(action.payload.data, "subaccount");
+      const preResponsePayload = payloadBeforeResponse(action.payload, "account");
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
           updateAccountsTableRowAction({
@@ -199,7 +203,7 @@ export function* handleAccountUpdateTask(
       if (existing.meta.isPlaceholder === true) {
         // TODO: Should we be using the payload data here?  Instead of the existing row?
         // Or we should probably merge them, right?
-        const payload = postPayloadFromRow<Table.IAccountRow, Http.IAccountPayload>(existing, "account");
+        const requestPayload = postPayload<Table.IAccountRow>(existing, "account");
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
@@ -207,7 +211,7 @@ export function* handleAccountUpdateTask(
         if (rowHasRequiredFields<Table.IAccountRow>(existing, "account")) {
           yield put(creatingAccountAction(true));
           try {
-            const response: IAccount = yield call(createAccount, budgetId, payload as Http.IAccountPayload);
+            const response: IAccount = yield call(createAccount, budgetId, requestPayload as Http.IAccountPayload);
             yield put(activateAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = payloadFromResponse<IAccount>(response, "account");
             yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
@@ -225,12 +229,9 @@ export function* handleAccountUpdateTask(
         }
       } else {
         yield put(updatingAccountAction({ id: existing.id as number, value: true }));
+        const requestPayload = patchPayload(action.payload, "account") as Partial<Http.IAccountPayload>;
         try {
-          const response: IAccount = yield call(
-            updateAccount,
-            existing.id as number,
-            action.payload.data as Partial<Http.IAccountPayload>
-          );
+          const response: IAccount = yield call(updateAccount, existing.id as number, requestPayload);
           const responsePayload = payloadFromResponse<IAccount>(response, "account");
           yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
         } catch (e) {

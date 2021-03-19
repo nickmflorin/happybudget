@@ -51,7 +51,7 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R 
   onSearch: (value: string) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
-  onRowUpdate: (id: number, payload: { [key: string]: any }) => void;
+  onRowUpdate: (payload: Table.RowChange) => void;
   onRowAdd: () => void;
   onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;
@@ -518,10 +518,13 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
             ...frameworkComponents
           }}
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {
-            const field = event.column.getColId();
+            const field = event.column.getColId() as F;
             if (!isNil(event.newValue)) {
               if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
-                onRowUpdate(event.data.id, { [field]: event.newValue });
+                onRowUpdate({
+                  id: event.data.id,
+                  data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+                });
               }
             }
           }}

@@ -1,18 +1,18 @@
-import { isNil, forEach, map, filter } from "lodash";
+import { isNil, forEach, map, filter, find } from "lodash";
 import { IFieldDefinition, FieldDefinitions } from "./config";
 
 export const generateRandomNumericId = (): number => {
   return parseInt(Math.random().toString().slice(2, 11));
 };
 
-export const postPayloadFromRow = <R, P>(row: R, type: Table.RowType): P => {
+export const postPayload = <R>(row: R, type: Table.RowType): { [key: string]: any } => {
   const obj: { [key: string]: any } = {};
   forEach(FieldDefinitions[type], (def: IFieldDefinition) => {
     if (def.postPayload === true && !isNil(row[def.name as keyof R])) {
       obj[def.name] = row[def.name as keyof R];
     }
   });
-  return obj as P;
+  return obj;
 };
 
 export const payloadFromResponse = <M>(model: M, type: Table.RowType): { [key: string]: any } => {
@@ -25,11 +25,21 @@ export const payloadFromResponse = <M>(model: M, type: Table.RowType): { [key: s
   return obj;
 };
 
-export const payloadBeforeResponse = <R>(data: Partial<R>, type: Table.RowType): { [key: string]: any } => {
+export const patchPayload = (payload: Table.RowChange, type: Table.RowType): { [key: string]: any } => {
   const obj: { [key: string]: any } = {};
   forEach(FieldDefinitions[type], (def: IFieldDefinition) => {
-    if (def.updateBeforeResponse === true && !isNil(data[def.name as keyof R])) {
-      obj[def.name] = data[def.name as keyof R];
+    if (!isNil(payload.data[def.name])) {
+      obj[def.name] = payload.data[def.name].newValue;
+    }
+  });
+  return obj;
+};
+
+export const payloadBeforeResponse = (payload: Table.RowChange, type: Table.RowType): { [key: string]: any } => {
+  const obj: { [key: string]: any } = {};
+  forEach(FieldDefinitions[type], (def: IFieldDefinition) => {
+    if (def.updateBeforeResponse === true && !isNil(payload.data[def.name])) {
+      obj[def.name] = payload.data[def.name].newValue;
     }
   });
   return obj;

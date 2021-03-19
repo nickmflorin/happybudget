@@ -16,7 +16,6 @@ export interface CommentsDrawerContentProps {
   onRequest: () => void;
   onDelete: (comment: IComment) => void;
   onLike: (comment: IComment) => void;
-  onDislike: (comment: IComment) => void;
   onDoneEditing: (comment: IComment, value: string) => void;
   onDoneReplying: (comment: IComment, value: string) => void;
 }
@@ -30,7 +29,6 @@ const CommentsDrawerContent = ({
   onRequest,
   onDelete,
   onLike,
-  onDislike,
   onDoneEditing,
   onDoneReplying
 }: CommentsDrawerContentProps): JSX.Element => {
@@ -50,7 +48,6 @@ const CommentsDrawerContent = ({
             commentLoading={commentLoading}
             onDelete={onDelete}
             onLike={onLike}
-            onDislike={onDislike}
             onDoneEditing={onDoneEditing}
             onDoneReplying={onDoneReplying}
           />

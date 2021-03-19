@@ -33,10 +33,7 @@ export const ActionType = {
 };
 
 export const addActualsTablePlaceholdersAction = simpleAction<number>(ActionType.ActualsTable.AddPlaceholders);
-export const updateActualAction = simpleAction<{
-  id: number;
-  data: Partial<Http.IActualPayload>;
-}>(ActionType.Update);
+export const updateActualAction = simpleAction<Table.RowChange>(ActionType.Update);
 export const updateActualsTableRowAction = simpleAction<{ id: number; data: Partial<Table.IActualRow> }>(
   ActionType.ActualsTable.UpdateRow
 );

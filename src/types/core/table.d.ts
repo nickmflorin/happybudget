@@ -23,6 +23,16 @@ namespace Table {
     [key in F]: any;
   }
 
+  interface CellChange {
+    oldValue: string | number | null;
+    newValue: string | number;
+  }
+
+  type RowChange = {
+    id: number;
+    data: { [key: string]: CellChange };
+  };
+
   interface IActivatePlaceholderPayload {
     readonly oldId: number;
     readonly id: number;

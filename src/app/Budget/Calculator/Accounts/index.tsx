@@ -71,7 +71,7 @@ const Accounts = (): JSX.Element => {
           onRowSelect={(id: number) => dispatch(selectAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectAccountsTableRowAction(id))}
           onRowDelete={(row: Table.IAccountRow) => dispatch(removeAccountAction(row.id))}
-          onRowUpdate={(id: number, data: { [key: string]: any }) => dispatch(updateAccountAction({ id, data }))}
+          onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountAction(payload))}
           onRowExpand={(id: number) => history.push(`/budgets/${budget.id}/accounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountsTableRowsAction())}
           footerRow={{
@@ -128,7 +128,6 @@ const Accounts = (): JSX.Element => {
           onDoneReplying: (comment: IComment, value: string) =>
             dispatch(submitBudgetCommentAction({ parent: comment.id, data: { text: value } })),
           onLike: (comment: IComment) => console.log(comment),
-          onDislike: (comment: IComment) => console.log(comment),
           onDelete: (comment: IComment) => dispatch(deleteBudgetCommentAction(comment.id))
         }}
         historyProps={{

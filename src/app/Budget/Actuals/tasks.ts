@@ -13,7 +13,8 @@ import {
 import { handleRequestError, handleTableErrors } from "store/tasks";
 import {
   payloadFromResponse,
-  postPayloadFromRow,
+  postPayload,
+  patchPayload,
   rowHasRequiredFields,
   payloadBeforeResponse,
   requestWarrantsParentRefresh
@@ -54,11 +55,9 @@ export function* handleActualRemovalTask(action: Redux.IAction<Table.IActualRow>
   }
 }
 
-export function* handleActualUpdateTask(
-  action: Redux.IAction<{ id: number; data: Partial<Table.IActualRow> }>
-): SagaIterator {
+export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
-  if (!isNil(action.payload) && !isNil(action.payload.id) && !isNil(action.payload.data) && !isNil(budgetId)) {
+  if (!isNil(action.payload) && !isNil(budgetId)) {
     const table: Table.IActualRow[] = yield select((state: Redux.IApplicationStore) => state.actuals.table.data);
 
     const existing: Table.IActualRow | undefined = find(table, { id: action.payload.id });
@@ -76,7 +75,7 @@ export function* handleActualUpdateTask(
       // so we need to udpate the row in the data used to populate the table.  We could
       // do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
-      const preResponsePayload = payloadBeforeResponse<Table.IActualRow>(action.payload.data, "actual");
+      const preResponsePayload = payloadBeforeResponse(action.payload, "actual");
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
           updateActualsTableRowAction({
@@ -86,14 +85,14 @@ export function* handleActualUpdateTask(
         );
       }
       if (existing.meta.isPlaceholder === true) {
-        const updatedRow = { ...existing, ...action.payload.data };
+        const updatedRow = { ...existing, ...patchPayload(action.payload, "actual") };
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
         if (rowHasRequiredFields<Table.IActualRow>(updatedRow, "actual")) {
           yield put(creatingActualAction(true));
-          const payload = postPayloadFromRow<Table.IActualRow, Http.IActualPayload>(updatedRow, "actual");
+          const payload = postPayload<Table.IActualRow>(updatedRow, "actual");
           if (!isNil(updatedRow.object_id)) {
             let service = createAccountActual;
             if (updatedRow.parent_type === "subaccount") {

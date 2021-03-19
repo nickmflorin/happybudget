@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faReply } from "@fortawesome/free-solid-svg-icons";
-import { faThumbsUp, faThumbsDown, faEdit, faTrashAlt } from "@fortawesome/free-regular-svg-icons";
+import { faThumbsUp, faEdit, faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 
 import { IconButton } from "components/control/buttons";
 import { AccountCircleLink } from "components/control/links";
@@ -55,11 +55,10 @@ interface CommentFooterProps {
   onDelete?: () => void;
   onEdit?: () => void;
   onLike?: () => void;
-  onDislike?: () => void;
   onReply?: () => void;
 }
 
-const ComentFooter = ({ comment, onDelete, onEdit, onLike, onDislike, onReply }: CommentFooterProps): JSX.Element => {
+const ComentFooter = ({ comment, onDelete, onEdit, onLike, onReply }: CommentFooterProps): JSX.Element => {
   const user = useLoggedInUser();
 
   return (
@@ -76,12 +75,6 @@ const ComentFooter = ({ comment, onDelete, onEdit, onLike, onDislike, onReply }:
           size={"small"}
           icon={<FontAwesomeIcon icon={faThumbsUp} />}
           onClick={() => !isNil(onLike) && onLike()}
-        />
-        <IconButton
-          className={"dark"}
-          size={"small"}
-          icon={<FontAwesomeIcon icon={faThumbsDown} />}
-          onClick={() => !isNil(onDislike) && onDislike()}
         />
       </div>
       <ShowHide show={user.id === comment.user.id}>
@@ -109,11 +102,10 @@ interface CommentProps {
   onDelete?: () => void;
   onDoneEditing?: (value: string) => void;
   onLike?: () => void;
-  onDislike?: () => void;
   onReply?: () => void;
 }
 
-const Comment = ({ comment, onDelete, onDoneEditing, onLike, onDislike, onReply }: CommentProps): JSX.Element => {
+const Comment = ({ comment, onDelete, onDoneEditing, onLike, onReply }: CommentProps): JSX.Element => {
   const [editing, setEditing] = useState(false);
 
   return (
@@ -136,7 +128,6 @@ const Comment = ({ comment, onDelete, onDoneEditing, onLike, onDislike, onReply 
           onDelete={onDelete}
           onEdit={() => setEditing(true)}
           onLike={onLike}
-          onDislike={onDislike}
           onReply={onReply}
         />
       </ShowHide>

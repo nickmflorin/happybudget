@@ -18,7 +18,8 @@ import { handleRequestError, handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
 import {
   payloadFromResponse,
-  postPayloadFromRow,
+  postPayload,
+  patchPayload,
   rowHasRequiredFields,
   requestWarrantsParentRefresh,
   payloadBeforeResponse
@@ -186,11 +187,9 @@ export function* handleSubAccountSubAccountRemovalTask(action: Redux.IAction<num
   }
 }
 
-export function* handleSubAccountSubAccountUpdateTask(
-  action: Redux.IAction<{ id: number; data: Partial<Table.ISubAccountRow> }>
-): SagaIterator {
+export function* handleSubAccountSubAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
-  if (!isNil(subaccountId) && !isNil(action.payload) && !isNil(action.payload.id) && !isNil(action.payload.data)) {
+  if (!isNil(subaccountId) && !isNil(action.payload)) {
     const table = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table.data);
 
     const existing: Table.ISubAccountRow = find(table, { id: action.payload.id });
@@ -208,7 +207,7 @@ export function* handleSubAccountSubAccountUpdateTask(
       // so we need to udpate the row in the data used to populate the table.  We could
       // do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
-      const preResponsePayload = payloadBeforeResponse<Table.ISubAccountRow>(action.payload.data, "subaccount");
+      const preResponsePayload = payloadBeforeResponse(action.payload, "subaccount");
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
           updateSubAccountSubAccountsTableRowAction({
@@ -220,10 +219,7 @@ export function* handleSubAccountSubAccountUpdateTask(
       if (existing.meta.isPlaceholder === true) {
         // TODO: Should we be using the payload data here?  Instead of the existing row?
         // Or we should probably merge them, right?
-        const requestPayload = postPayloadFromRow<Table.ISubAccountRow, Http.ISubAccountPayload>(
-          existing,
-          "subaccount"
-        );
+        const requestPayload = postPayload<Table.ISubAccountRow>(existing, "subaccount");
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
@@ -253,7 +249,7 @@ export function* handleSubAccountSubAccountUpdateTask(
         }
       } else {
         yield put(updatingSubAccountSubAccountAction({ id: existing.id as number, value: true }));
-        const requestPayload = action.payload.data as Partial<Http.ISubAccountPayload>;
+        const requestPayload = patchPayload(action.payload, "subaccount") as Partial<Http.ISubAccountPayload>;
         try {
           const response: ISubAccount = yield call(updateSubAccount, existing.id, requestPayload);
           const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");

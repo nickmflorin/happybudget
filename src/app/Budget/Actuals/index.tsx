@@ -61,7 +61,7 @@ const Actuals = (): JSX.Element => {
         onRowSelect={(id: number) => dispatch(selectActualsTableRowAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectActualsTableRowAction(id))}
         onRowDelete={(row: Table.IActualRow) => dispatch(removeActualAction(row))}
-        onRowUpdate={(id: number, data: { [key: string]: any }) => dispatch(updateActualAction({ id, data }))}
+        onRowUpdate={(payload: Table.RowChange) => dispatch(updateActualAction(payload))}
         onSelectAll={() => dispatch(selectAllActualsTableRowsAction())}
         frameworkComponents={{ BudgetItemCell, PaymentMethodsCell }}
         rowRefreshRequired={(existing: Table.IActualRow, row: Table.IActualRow) => {
@@ -96,7 +96,15 @@ const Actuals = (): JSX.Element => {
             cellRenderer: "BudgetItemCell",
             cellRendererParams: {
               onChange: (object_id: number, parent_type: BudgetItemType, row: Table.IActualRow) => {
-                dispatch(updateActualAction({ id: row.id, data: { object_id, parent_type } }));
+                dispatch(
+                  updateActualAction({
+                    id: row.id,
+                    data: {
+                      object_id: { newValue: object_id, oldValue: row.object_id },
+                      parent_type: { oldValue: row.parent_type, newValue: parent_type }
+                    }
+                  })
+                );
               }
             }
           },
@@ -123,11 +131,11 @@ const Actuals = (): JSX.Element => {
             cellRenderer: "PaymentMethodsCell",
             cellClass: "cell--centered",
             cellRendererParams: {
-              onChange: (value: PaymentMethod, row: Table.IActualRow) =>
+              onChange: (paymentMethod: PaymentMethod, row: Table.IActualRow) =>
                 dispatch(
                   updateActualAction({
                     id: row.id,
-                    data: { payment_method: value }
+                    data: { payment_method: { newValue: paymentMethod, oldValue: row.payment_method } }
                   })
                 )
             }

@@ -177,10 +177,7 @@ export const updateBudgetCommentInStateAction = simpleAction<Redux.UpdateModelAc
   Actions Pertaining to Budget Accounts
 */
 export const addAccountsTablePlaceholdersAction = simpleAction<number>(ActionType.AccountsTable.AddPlaceholders);
-export const updateAccountAction = simpleAction<{
-  id: number;
-  data: Partial<Http.IAccountPayload>;
-}>(ActionType.Accounts.Update);
+export const updateAccountAction = simpleAction<Table.RowChange>(ActionType.Accounts.Update);
 export const updateAccountsTableRowAction = simpleAction<{ id: number; data: Partial<Table.IAccountRow> }>(
   ActionType.AccountsTable.UpdateRow
 );
@@ -250,10 +247,7 @@ export const updateAccountCommentInStateAction = simpleAction<Redux.UpdateModelA
 export const addAccountSubAccountsTablePlaceholdersAction = simpleAction<number>(
   ActionType.Account.SubAccountsTable.AddPlaceholders
 );
-export const updateAccountSubAccountAction = simpleAction<{
-  id: number;
-  data: Partial<Http.ISubAccountPayload>;
-}>(ActionType.Account.SubAccounts.Update);
+export const updateAccountSubAccountAction = simpleAction<Table.RowChange>(ActionType.Account.SubAccounts.Update);
 export const selectAccountSubAccountsTableRowAction = simpleAction<number>(
   ActionType.Account.SubAccountsTable.SelectRow
 );
@@ -344,10 +338,7 @@ export const updateSubAccountCommentInStateAction = simpleAction<Redux.UpdateMod
 export const addSubAccountSubAccountsTablePlaceholdersAction = simpleAction<number>(
   ActionType.SubAccount.SubAccountsTable.AddPlaceholders
 );
-export const updateSubAccountSubAccountAction = simpleAction<{
-  id: number;
-  data: Partial<Http.ISubAccountPayload>;
-}>(ActionType.SubAccount.SubAccounts.Update);
+export const updateSubAccountSubAccountAction = simpleAction<Table.RowChange>(ActionType.SubAccount.SubAccounts.Update);
 export const selectSubAccountSubAccountsTableRowAction = simpleAction<number>(
   ActionType.SubAccount.SubAccountsTable.SelectRow
 );

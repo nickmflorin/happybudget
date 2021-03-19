@@ -72,9 +72,7 @@ const SubAccount = (): JSX.Element => {
           onRowSelect={(id: number) => dispatch(selectSubAccountSubAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectSubAccountSubAccountsTableRowAction(id))}
           onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeSubAccountSubAccountAction(row.id))}
-          onRowUpdate={(id: number, data: { [key: string]: any }) =>
-            dispatch(updateSubAccountSubAccountAction({ id, data }))
-          }
+          onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountSubAccountAction(payload))}
           onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           onSelectAll={() => dispatch(selectAllSubAccountSubAccountsTableRowsAction())}
           footerRow={{
@@ -119,7 +117,17 @@ const SubAccount = (): JSX.Element => {
               cellRenderer: "UnitCell",
               cellRendererParams: {
                 onChange: (unit: Unit, row: Table.ISubAccountRow) =>
-                  dispatch(updateSubAccountSubAccountAction({ id: row.id, data: { unit } }))
+                  dispatch(
+                    updateSubAccountSubAccountAction({
+                      id: row.id,
+                      data: {
+                        unit: {
+                          oldValue: row.unit,
+                          newValue: unit
+                        }
+                      }
+                    })
+                  )
               }
             },
             {
@@ -169,7 +177,6 @@ const SubAccount = (): JSX.Element => {
           onDoneReplying: (comment: IComment, value: string) =>
             dispatch(submitSubAccountCommentAction({ parent: comment.id, data: { text: value } })),
           onLike: (comment: IComment) => console.log(comment),
-          onDislike: (comment: IComment) => console.log(comment),
           onDelete: (comment: IComment) => dispatch(deleteSubAccountCommentAction(comment.id))
         }}
         historyProps={{

@@ -18,7 +18,6 @@ export interface CommentsProps {
   commentLoading: (comment: IComment) => boolean;
   onDelete: (comment: IComment) => void;
   onLike: (comment: IComment) => void;
-  onDislike: (comment: IComment) => void;
   onDoneEditing: (comment: IComment, value: string) => void;
   onDoneReplying: (comment: IComment, value: string) => void;
 }
@@ -30,7 +29,6 @@ const Comments = ({
   commentLoading,
   onDelete,
   onLike,
-  onDislike,
   onDoneEditing,
   onDoneReplying
 }: CommentsProps): JSX.Element => {
@@ -45,7 +43,6 @@ const Comments = ({
             commentLoading={commentLoading}
             onDelete={onDelete}
             onLike={onLike}
-            onDislike={onDislike}
             onDoneEditing={onDoneEditing}
             onDoneReplying={onDoneReplying}
           />

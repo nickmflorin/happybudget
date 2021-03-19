@@ -16,7 +16,6 @@ interface CommentBlockProps {
   commentLoading: (comment: IComment) => boolean;
   onDelete: (comment: IComment) => void;
   onLike: (comment: IComment) => void;
-  onDislike: (comment: IComment) => void;
   onDoneEditing: (comment: IComment, value: string) => void;
   onDoneReplying: (comment: IComment, value: string) => void;
 }
@@ -28,7 +27,6 @@ const CommentBlock = ({
   commentLoading,
   onDelete,
   onLike,
-  onDislike,
   onDoneEditing,
   onDoneReplying
 }: CommentBlockProps): JSX.Element => {
@@ -48,7 +46,6 @@ const CommentBlock = ({
         onReply={() => setReplying(true)}
         onDelete={() => onDelete(comment)}
         onLike={() => onLike(comment)}
-        onDislike={() => onDislike(comment)}
         onDoneEditing={(value: string) => onDoneEditing(comment, value)}
       />
       <ShowHide show={comment.comments.length !== 0}>
@@ -58,7 +55,6 @@ const CommentBlock = ({
           commentLoading={commentLoading}
           onDelete={onDelete}
           onLike={onLike}
-          onDislike={onDislike}
           onDoneEditing={onDoneEditing}
           onDoneReplying={onDoneReplying}
         />

@@ -103,7 +103,6 @@ export const createListReducerFromTransformers = <
       // If the action is being filtered out of the reducer, do not update the state.
       if (isNil(options.excludeActions) || options.excludeActions(action, state) === false) {
         const update = transformer(action.payload, newState, action);
-        console.log(update);
         if (!isNil(update)) {
           newState = update;
         }
