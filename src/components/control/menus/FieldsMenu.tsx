@@ -23,11 +23,20 @@ interface FieldsMenuItemProps {
   selected: Field[];
   setSelected: (fields: Field[]) => void;
   checked: boolean;
+  [key: string]: any;
 }
 
-const FieldsMenuItem = ({ field, checked, selected, setSelected, onChange }: FieldsMenuItemProps): JSX.Element => {
+const FieldsMenuItem = ({
+  field,
+  checked,
+  selected,
+  setSelected,
+  onChange,
+  ...props
+}: FieldsMenuItemProps): JSX.Element => {
   return (
     <Menu.Item
+      {...props}
       className={"fields-menu-menu-item"}
       onClick={() => {
         if (checked === false) {
