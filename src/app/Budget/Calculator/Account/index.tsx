@@ -9,7 +9,7 @@ import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
-import CommentsHistoryDrawer from "../CommentsHistoryDrawer";
+import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
 
 import {
   setAccountIdAction,
@@ -25,7 +25,7 @@ import {
   deleteAccountCommentAction,
   editAccountCommentAction,
   requestAccountSubAccountsHistoryAction
-} from "./actions";
+} from "../actions";
 
 const Account = (): JSX.Element => {
   const { accountId } = useParams<{ budgetId: string; accountId: string }>();
