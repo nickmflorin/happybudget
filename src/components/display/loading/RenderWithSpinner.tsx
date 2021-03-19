@@ -21,15 +21,15 @@ const RenderWithSpinner = ({
   return (
     <React.Fragment>
       <ShowHide show={toggleOpacity === true}>
-        <div className={className} style={{ position: "relative", height: "100%", width: "100%", ...style }}>
+        <div className={className} style={{ position: "relative", height: "100%", width: "100%" }}>
           {loading === true && <Spinner position={"absolute"} {...props} />}
-          <div style={{ opacity: loading ? 0.3 : 1 }}>{children}</div>
+          <div style={{ opacity: loading ? 0.3 : 1, ...style }}>{children}</div>
         </div>
       </ShowHide>
       <ShowHide show={toggleOpacity === false}>
-        <div className={className} style={{ position: "relative", height: "100%", width: "100%", ...style }}>
+        <div className={className} style={{ position: "relative", height: "100%", width: "100%" }}>
           {loading === true && <Spinner {...props} />}
-          {children}
+          <div style={style}>{children}</div>
         </div>
       </ShowHide>
     </React.Fragment>

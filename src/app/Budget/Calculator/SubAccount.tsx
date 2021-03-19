@@ -23,7 +23,8 @@ import {
   requestSubAccountCommentsAction,
   submitSubAccountCommentAction,
   deleteSubAccountCommentAction,
-  editSubAccountCommentAction
+  editSubAccountCommentAction,
+  requestSubAccountSubAccountsHistoryAction
 } from "./actions";
 
 const SubAccount = (): JSX.Element => {
@@ -34,6 +35,7 @@ const SubAccount = (): JSX.Element => {
   const subAccountStore = useSelector((state: Redux.IApplicationStore) => state.calculator.subaccount);
   const budgetId = useSelector((state: Redux.IApplicationStore) => state.budget.budget.id);
   const comments = useSelector((state: Redux.IApplicationStore) => state.calculator.subaccount.comments);
+  const events = useSelector((state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.history);
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
@@ -169,6 +171,11 @@ const SubAccount = (): JSX.Element => {
           onLike: (comment: IComment) => console.log(comment),
           onDislike: (comment: IComment) => console.log(comment),
           onDelete: (comment: IComment) => dispatch(deleteSubAccountCommentAction(comment.id))
+        }}
+        historyProps={{
+          history: events.data,
+          loading: events.loading,
+          onRequest: () => dispatch(requestSubAccountSubAccountsHistoryAction())
         }}
       />
     </RenderIfValidId>

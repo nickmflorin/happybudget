@@ -6,6 +6,7 @@ import classNames from "classnames";
 import { setDrawerVisibilityAction } from "store/actions";
 import { isNodeDescendantOf } from "util/dom";
 import Portal from "./Portal";
+import { isNil } from "lodash";
 
 interface DrawerSectionProps {
   children: ReactNode;
@@ -45,7 +46,7 @@ interface DrawerProps {
   style?: React.CSSProperties;
   className?: string;
   visible: boolean;
-  onClickAway: () => void;
+  onClickAway?: () => void;
 }
 
 const Drawer = ({ children, className, visible, style = {}, onClickAway }: DrawerProps): JSX.Element => {
@@ -70,7 +71,7 @@ const Drawer = ({ children, className, visible, style = {}, onClickAway }: Drawe
               return false;
             }
           });
-          if (ignoreClick === false) {
+          if (ignoreClick === false && !isNil(onClickAway)) {
             onClickAway();
           }
         }}

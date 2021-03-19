@@ -22,7 +22,10 @@ import {
   createSubAccountComment,
   deleteComment,
   updateComment,
-  replyToComment
+  replyToComment,
+  getAccountsHistory,
+  getAccountSubAccountsHistory,
+  getSubAccountSubAccountsHistory
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../actions";
@@ -98,8 +101,67 @@ import {
   editingSubAccountCommentAction,
   replyingToBudgetCommentAction,
   replyingToAccountCommentAction,
-  replyingToSubAccountCommentAction
+  replyingToSubAccountCommentAction,
+  loadingAccountsHistoryAction,
+  responseAccountsHistoryAction,
+  loadingAccountSubAccountsHistoryAction,
+  responseAccountSubAccountsHistoryAction,
+  loadingSubAccountSubAccountsHistoryAction,
+  responseSubAccountSubAccountsHistoryAction
 } from "./actions";
+
+export function* getSubAccountSubAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
+  if (!isNil(subaccountId)) {
+    yield put(loadingSubAccountSubAccountsHistoryAction(true));
+    try {
+      const response: Http.IListResponse<IFieldAlterationEvent> = yield call(
+        getSubAccountSubAccountsHistory,
+        subaccountId
+      );
+      yield put(responseSubAccountSubAccountsHistoryAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the sub account's sub accounts history.");
+    } finally {
+      yield put(loadingSubAccountSubAccountsHistoryAction(false));
+    }
+  }
+}
+
+export function* getAccountSubAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
+  if (!isNil(accountId) && !isNil(budgetId)) {
+    yield put(loadingAccountSubAccountsHistoryAction(true));
+    try {
+      const response: Http.IListResponse<IFieldAlterationEvent> = yield call(
+        getAccountSubAccountsHistory,
+        accountId,
+        budgetId
+      );
+      yield put(responseAccountSubAccountsHistoryAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the account's sub accounts history.");
+    } finally {
+      yield put(loadingAccountSubAccountsHistoryAction(false));
+    }
+  }
+}
+
+export function* getAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId)) {
+    yield put(loadingAccountsHistoryAction(true));
+    try {
+      const response: Http.IListResponse<IFieldAlterationEvent> = yield call(getAccountsHistory, budgetId);
+      yield put(responseAccountsHistoryAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the accounts history.");
+    } finally {
+      yield put(loadingAccountsHistoryAction(false));
+    }
+  }
+}
 
 export function* submitBudgetCommentTask(
   action: Redux.IAction<{ parent?: number; data: Http.ICommentPayload }>

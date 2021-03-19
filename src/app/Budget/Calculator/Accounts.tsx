@@ -23,7 +23,8 @@ import {
   submitBudgetCommentAction,
   requestBudgetCommentsAction,
   deleteBudgetCommentAction,
-  editBudgetCommentAction
+  editBudgetCommentAction,
+  requestAccountsHistoryAction
 } from "./actions";
 
 const Accounts = (): JSX.Element => {
@@ -32,6 +33,7 @@ const Accounts = (): JSX.Element => {
   const accounts = useSelector((state: Redux.IApplicationStore) => state.calculator.accounts);
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
   const comments = useSelector((state: Redux.IApplicationStore) => state.calculator.accounts.comments);
+  const events = useSelector((state: Redux.IApplicationStore) => state.calculator.accounts.history);
 
   useEffect(() => {
     dispatch(requestAccountsAction());
@@ -128,6 +130,11 @@ const Accounts = (): JSX.Element => {
           onLike: (comment: IComment) => console.log(comment),
           onDislike: (comment: IComment) => console.log(comment),
           onDelete: (comment: IComment) => dispatch(deleteBudgetCommentAction(comment.id))
+        }}
+        historyProps={{
+          history: events.data,
+          loading: events.loading,
+          onRequest: () => dispatch(requestAccountsHistoryAction())
         }}
       />
     </React.Fragment>

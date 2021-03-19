@@ -5,7 +5,8 @@ import {
   createModelListActionReducer,
   createTableReducer,
   createSimplePayloadReducer,
-  createCommentsListResponseReducer
+  createCommentsListResponseReducer,
+  createListResponseReducer
 } from "store/factories";
 import { ActionType } from "./actions";
 import {
@@ -20,6 +21,14 @@ const rootReducer = combineReducers({
     deleting: createModelListActionReducer(ActionType.Accounts.Deleting, { referenceEntity: "account" }),
     updating: createModelListActionReducer(ActionType.Accounts.Updating, { referenceEntity: "account" }),
     creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
+    history: createListResponseReducer<IFieldAlterationEvent>(
+      {
+        Response: ActionType.History.Response,
+        Request: ActionType.History.Request,
+        Loading: ActionType.History.Loading
+      },
+      { referenceEntity: "event" }
+    ),
     comments: createCommentsListResponseReducer({
       Response: ActionType.Comments.Response,
       Request: ActionType.Comments.Request,
@@ -78,6 +87,14 @@ const rootReducer = combineReducers({
       updating: createModelListActionReducer(ActionType.Account.SubAccounts.Updating, {
         referenceEntity: "subaccount"
       }),
+      history: createListResponseReducer<IFieldAlterationEvent>(
+        {
+          Response: ActionType.Account.SubAccounts.History.Response,
+          Request: ActionType.Account.SubAccounts.History.Request,
+          Loading: ActionType.Account.SubAccounts.History.Loading
+        },
+        { referenceEntity: "event" }
+      ),
       creating: createSimpleBooleanReducer(ActionType.Account.SubAccounts.Creating),
       table: createTableReducer<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow, ISubAccount>(
         {
@@ -127,6 +144,14 @@ const rootReducer = combineReducers({
         referenceEntity: "subaccount"
       }),
       creating: createSimpleBooleanReducer(ActionType.SubAccount.SubAccounts.Creating),
+      history: createListResponseReducer<IFieldAlterationEvent>(
+        {
+          Response: ActionType.SubAccount.SubAccounts.History.Response,
+          Request: ActionType.SubAccount.SubAccounts.History.Request,
+          Loading: ActionType.SubAccount.SubAccounts.History.Loading
+        },
+        { referenceEntity: "event" }
+      ),
       table: createTableReducer<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow, ISubAccount>(
         {
           AddPlaceholders: ActionType.SubAccount.SubAccountsTable.AddPlaceholders,

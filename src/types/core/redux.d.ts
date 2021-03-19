@@ -126,11 +126,13 @@ namespace Redux {
       readonly updating: ListStore<number>;
       readonly creating: boolean;
       readonly table: ITableStore<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow, ISubAccount>;
+      readonly history: IListResponseStore<IFieldAlterationEvent>;
     }
 
     interface IAccountsStore {
       readonly table: ITableStore<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>;
       readonly comments: ICommentsStore;
+      readonly history: IListResponseStore<IFieldAlterationEvent>;
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;

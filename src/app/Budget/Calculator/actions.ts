@@ -23,6 +23,11 @@ export const ActionType = {
     RemoveFromState: "calculator.comments.RemoveFromState",
     UpdateInState: "calculator.comments.UpdateInState"
   },
+  History: {
+    Loading: "calculator.history.Loading",
+    Response: "calculator.history.Response",
+    Request: "calculator.history.Request"
+  },
   AccountsTable: {
     AddPlaceholders: "calculator.accountstable.AddPlaceholders",
     UpdateRow: "calculator.accountstable.UpdateRow",
@@ -77,7 +82,12 @@ export const ActionType = {
       Creating: "calculator.account.subaccounts.Creating",
       Updating: "calculator.account.subaccounts.Updating",
       Update: "calculator.account.subaccounts.Update",
-      Remove: "calculator.account.subaccounts.Remove"
+      Remove: "calculator.account.subaccounts.Remove",
+      History: {
+        Loading: "calculator.account.subaccounts.history.Loading",
+        Response: "calculator.account.subaccounts.history.Response",
+        Request: "calculator.account.subaccounts.history.Request"
+      }
     }
   },
   SubAccount: {
@@ -119,7 +129,12 @@ export const ActionType = {
       Creating: "calculator.subaccount.subaccounts.Creating",
       Updating: "calculator.subaccount.subaccounts.Updating",
       Update: "calculator.subaccount.subaccounts.Update",
-      Remove: "calculator.subaccount.subaccounts.Remove"
+      Remove: "calculator.subaccount.subaccounts.Remove",
+      History: {
+        Loading: "calculator.subaccount.subaccounts.history.Loading",
+        Response: "calculator.subaccount.subaccounts.history.Response",
+        Request: "calculator.subaccount.subaccounts.history.Request"
+      }
     }
   }
 };
@@ -186,6 +201,15 @@ export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccoun
 export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsTable.SetSearch);
 export const addErrorsToAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
   ActionType.AccountsTable.AddErrors
+);
+
+/*
+  Actions Pertaining to Budget Accounts History
+*/
+export const requestAccountsHistoryAction = simpleAction<null>(ActionType.History.Request);
+export const loadingAccountsHistoryAction = simpleAction<boolean>(ActionType.History.Loading);
+export const responseAccountsHistoryAction = simpleAction<Http.IListResponse<IFieldAlterationEvent>>(
+  ActionType.History.Response
 );
 
 /*
@@ -265,6 +289,19 @@ export const responseAccountSubAccountsAction = simpleAction<Http.IListResponse<
 export const setAccountSubAccountsSearchAction = simpleAction<string>(ActionType.Account.SubAccountsTable.SetSearch);
 export const addErrorsToAccountSubAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
   ActionType.Account.SubAccountsTable.AddErrors
+);
+
+/*
+  Actions Pertaining to Account Sub Accounts History
+*/
+export const requestAccountSubAccountsHistoryAction = simpleAction<null>(
+  ActionType.Account.SubAccounts.History.Request
+);
+export const loadingAccountSubAccountsHistoryAction = simpleAction<boolean>(
+  ActionType.Account.SubAccounts.History.Loading
+);
+export const responseAccountSubAccountsHistoryAction = simpleAction<Http.IListResponse<IFieldAlterationEvent>>(
+  ActionType.Account.SubAccounts.History.Response
 );
 
 /*
@@ -348,4 +385,17 @@ export const setSubAccountSubAccountsSearchAction = simpleAction<string>(
 );
 export const addErrorsToSubAccountSubAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
   ActionType.SubAccount.SubAccountsTable.AddErrors
+);
+
+/*
+  Actions Pertaining to Sub Account Sub Accounts History
+*/
+export const requestSubAccountSubAccountsHistoryAction = simpleAction<null>(
+  ActionType.SubAccount.SubAccounts.History.Request
+);
+export const loadingSubAccountSubAccountsHistoryAction = simpleAction<boolean>(
+  ActionType.SubAccount.SubAccounts.History.Loading
+);
+export const responseSubAccountSubAccountsHistoryAction = simpleAction<Http.IListResponse<IFieldAlterationEvent>>(
+  ActionType.SubAccount.SubAccounts.History.Response
 );

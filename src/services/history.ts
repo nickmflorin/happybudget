@@ -19,13 +19,22 @@ export const getAccountHistory = async (
   return client.list<IFieldAlterationEvent>(url, query, options);
 };
 
-export const getSubAccountsHistory = async (
+export const getAccountSubAccountsHistory = async (
   accountId: number,
   budgetId: number,
   query: Http.IListQuery = {},
   options: Http.IRequestOptions = {}
 ): Promise<Http.IListResponse<IFieldAlterationEvent>> => {
   const url = URL.v1("budgets", budgetId, "accounts", accountId, "subaccounts", "history");
+  return client.list<IFieldAlterationEvent>(url, query, options);
+};
+
+export const getSubAccountSubAccountsHistory = async (
+  subaccountId: number,
+  query: Http.IListQuery = {},
+  options: Http.IRequestOptions = {}
+): Promise<Http.IListResponse<IFieldAlterationEvent>> => {
+  const url = URL.v1("subaccounts", subaccountId, "subaccounts", "history");
   return client.list<IFieldAlterationEvent>(url, query, options);
 };
 

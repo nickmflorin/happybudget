@@ -1,0 +1,59 @@
+@import "style/colors";
+@import "style/typography";
+
+.event {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 6px;
+
+  .event-header {
+    display: flex;
+
+    .account-circle-link {
+      position: relative;
+      top: 6px;
+    }
+    .event-user-name {
+      line-height: 36px;
+      margin-left: 6px;
+      margin-right: 6px;
+      font-family: $nunito;
+      font-weight: 400;
+      color: #454545;
+      font-size: 15px;
+    }
+    .event-created-at {
+      line-height: 36px;
+      font-family: $roboto;
+      font-weight: 400;
+      color: $gray;
+      font-size: 12px;
+    }
+  }
+  .event-body {
+    padding-left: 42px;
+    margin-top: -6px;
+
+    .event-body-text {
+      color: #2f2f2f;
+      font-family: $roboto;
+      font-weight: 400;
+      font-size: 0.9375rem;
+
+      span {
+        &.darker {
+          color: $text-primary;
+        }
+        &.bolder {
+          font-weight: 600;
+        }
+        &.ml {
+          margin-left: 2px;
+        }
+        &.mr {
+          margin-right: 2px;
+        }
+      }
+    }
+  }
+}
