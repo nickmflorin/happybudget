@@ -6,7 +6,7 @@ import classNames from "classnames";
 import { Dropdown } from "antd";
 
 import { CaretButton } from "components/control/buttons";
-import { flattenBudgetItemNodes } from "model";
+import { flattenBudgetItemNodes } from "model/util";
 import { isNodeDescendantOf } from "util/dom";
 import "./BudgetItemsTreeSelect.scss";
 

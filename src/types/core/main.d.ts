@@ -187,8 +187,8 @@ interface IContact extends Model {
 
 interface IFieldAlterationEvent extends Model {
   readonly created_at: string;
-  readonly new_value: string | null;
-  readonly old_value: string | null;
+  readonly new_value: string | number | null;
+  readonly old_value: string | number | null;
   readonly field: string;
   readonly content_object_type: "actual" | "account" | "subaccount";
   readonly object_id: number;

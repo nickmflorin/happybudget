@@ -1,9 +1,5 @@
-import { isNil, forEach, map, filter, find } from "lodash";
+import { isNil, forEach, map, filter } from "lodash";
 import { IFieldDefinition, FieldDefinitions } from "./config";
-
-export const generateRandomNumericId = (): number => {
-  return parseInt(Math.random().toString().slice(2, 11));
-};
 
 export const postPayload = <R>(row: R, type: Table.RowType): { [key: string]: any } => {
   const obj: { [key: string]: any } = {};

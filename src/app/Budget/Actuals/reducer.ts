@@ -5,8 +5,9 @@ import {
   createTableReducer,
   createListResponseReducer
 } from "store/factories";
+import { createActualRowPlaceholder, initializeRowFromActual } from "model/mappings";
+
 import { ActionType } from "./actions";
-import { createActualRowPlaceholder, initializeRowFromActual } from "./util";
 
 const rootReducer = combineReducers({
   deleting: createModelListActionReducer(ActionType.Deleting, { referenceEntity: "actual" }),

@@ -13,6 +13,11 @@ import {
   DATETIME_ABBV_DISPLAY_FORMAT
 } from "config/constants";
 
+export const nowAsString = (): string => {
+  const mmt = moment();
+  return mmt.format(MOMENT_DATETIME_FORMAT);
+};
+
 export const momentToDateTimeUrlString = (mmt: Moment): string => {
   if (!mmt.isValid()) {
     throw new Error("Cannot convert invalid moment to string.");

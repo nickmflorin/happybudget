@@ -1,5 +1,3 @@
-import { forEach } from "lodash";
-
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
 export enum ContactRoleNames {
@@ -69,21 +67,3 @@ export const PaymentMethodModels: { [key: string]: PaymentMethodModel } = {
 };
 
 export const PaymentMethodModelsList = Object.values(PaymentMethodModels);
-
-export const flattenBudgetItemNodes = (nodes: IBudgetItemNode[]): IBudgetItem[] => {
-  const flattened: IBudgetItem[] = [];
-
-  const addNode = (node: IBudgetItemNode): void => {
-    const { children, ...withoutChildren } = node;
-    flattened.push(withoutChildren);
-    if (node.children.length !== 0) {
-      forEach(node.children, (child: IBudgetItemNode) => {
-        addNode(child);
-      });
-    }
-  };
-  forEach(nodes, (node: IBudgetItemNode) => {
-    addNode(node);
-  });
-  return flattened;
-};

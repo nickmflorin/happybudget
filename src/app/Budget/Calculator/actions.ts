@@ -26,7 +26,8 @@ export const ActionType = {
   History: {
     Loading: "calculator.history.Loading",
     Response: "calculator.history.Response",
-    Request: "calculator.history.Request"
+    Request: "calculator.history.Request",
+    AddToState: "calculator.history.AddToState"
   },
   AccountsTable: {
     AddPlaceholders: "calculator.accountstable.AddPlaceholders",
@@ -208,6 +209,7 @@ export const loadingAccountsHistoryAction = simpleAction<boolean>(ActionType.His
 export const responseAccountsHistoryAction = simpleAction<Http.IListResponse<IFieldAlterationEvent>>(
   ActionType.History.Response
 );
+export const addAccountsHistoryToStateAction = simpleAction<IFieldAlterationEvent>(ActionType.History.AddToState);
 
 /*
   Actions Pertaining to Account Comments

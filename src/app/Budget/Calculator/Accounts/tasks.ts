@@ -14,6 +14,9 @@ import {
   getAccountsHistory
 } from "services";
 import { handleRequestError, handleTableErrors } from "store/tasks";
+import { userToSimpleUser } from "model/mappings";
+import { nowAsString } from "util/dates";
+import { generateRandomNumericId } from "util/math";
 import {
   payloadFromResponse,
   postPayload,
@@ -42,7 +45,8 @@ import {
   editingBudgetCommentAction,
   replyingToBudgetCommentAction,
   loadingAccountsHistoryAction,
-  responseAccountsHistoryAction
+  responseAccountsHistoryAction,
+  addAccountsHistoryToStateAction
 } from "../actions";
 
 export function* getAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
@@ -234,6 +238,29 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
           const response: IAccount = yield call(updateAccount, existing.id as number, requestPayload);
           const responsePayload = payloadFromResponse<IAccount>(response, "account");
           yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
+
+          const user = yield select((state: Redux.IApplicationStore) => state.user);
+
+          // Here, instead of refreshing the history from the API we can just add
+          // "mock" objects to the state so the history updates with less latency.
+          // This is not a big deal because there are no write operations associated
+          // with history, just read.
+          const fields = Object.keys(action.payload.data);
+          for (let i = 0; i < fields.length; i++) {
+            yield put(
+              addAccountsHistoryToStateAction({
+                id: generateRandomNumericId(),
+                created_at: nowAsString(),
+                new_value: action.payload.data[fields[i]].newValue,
+                old_value: action.payload.data[fields[i]].oldValue,
+                object_id: response.id,
+                content_object_type: "account",
+                type: "field_alteration",
+                user: userToSimpleUser(user),
+                field: fields[i]
+              })
+            );
+          }
         } catch (e) {
           yield call(
             handleTableErrors,

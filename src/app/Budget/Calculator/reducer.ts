@@ -8,13 +8,13 @@ import {
   createCommentsListResponseReducer,
   createListResponseReducer
 } from "store/factories";
-import { ActionType } from "./actions";
 import {
   createSubAccountRowPlaceholder,
   createAccountRowPlaceholder,
   initializeRowFromAccount,
   initializeRowFromSubAccount
-} from "./util";
+} from "model/mappings";
+import { ActionType } from "./actions";
 
 const rootReducer = combineReducers({
   accounts: combineReducers({
@@ -25,7 +25,8 @@ const rootReducer = combineReducers({
       {
         Response: ActionType.History.Response,
         Request: ActionType.History.Request,
-        Loading: ActionType.History.Loading
+        Loading: ActionType.History.Loading,
+        AddToState: ActionType.History.AddToState
       },
       { referenceEntity: "event" }
     ),
