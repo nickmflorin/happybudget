@@ -1,4 +1,4 @@
-import { client } from "api";
+import { client, unauthenticatedClient } from "api";
 import { URL } from "./util";
 
 export const login = async (
@@ -8,7 +8,7 @@ export const login = async (
 ): Promise<Http.ILoginResponse> => {
   options = { ...options, redirectOnAuthenticationError: false };
   const url = URL.v1("auth", "login");
-  return client.post<Http.ILoginResponse>(url, { email, password }, options);
+  return unauthenticatedClient.post<Http.ILoginResponse>(url, { email, password }, options);
 };
 
 export const socialLogin = async (
@@ -17,12 +17,12 @@ export const socialLogin = async (
 ): Promise<Http.ILoginResponse> => {
   options = { ...options, redirectOnAuthenticationError: false };
   const url = URL.v1("auth", "social-login");
-  return client.post<Http.ILoginResponse>(url, payload, options);
+  return unauthenticatedClient.post<Http.ILoginResponse>(url, payload, options);
 };
 
 export const logout = async (): Promise<null> => {
   const url = URL.v1("auth", "logout");
-  return client.post<null>(url);
+  return unauthenticatedClient.post<null>(url);
 };
 
 export const validateToken = async (): Promise<Http.ITokenValidationResponse> => {

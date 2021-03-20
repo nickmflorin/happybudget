@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosResponse, AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import Cookies from "universal-cookie";
 import { isNil } from "lodash";
@@ -25,12 +25,16 @@ export enum HttpRequestMethods {
   PATCH = "PATCH"
 }
 
-const _client = axios.create({
+const authenticatedInstance = axios.create({
   baseURL: process.env.REACT_APP_API_DOMAIN,
   withCredentials: true
 });
 
-_client.interceptors.request.use(
+const unauthenticatedInstance = axios.create({
+  baseURL: process.env.REACT_APP_API_DOMAIN
+});
+
+authenticatedInstance.interceptors.request.use(
   (config: AxiosRequestConfig): AxiosRequestConfig => {
     config = config || {};
     const cookies = new Cookies();
@@ -100,34 +104,42 @@ const createClientError = (error: AxiosError): ClientError | undefined => {
   }
 };
 
-_client.interceptors.response.use(
-  (response: AxiosResponse<any>): AxiosResponse<any> => {
-    return response;
-  },
-  (error: AxiosError<any>) => {
-    if (!isNil(error.response)) {
-      const response = error.response;
-      if (response.status >= 400 && response.status < 500) {
-        const clientError: ClientError | undefined = createClientError(error);
-        if (!isNil(clientError)) {
-          throw clientError;
-        }
-      } else {
-        const url = !isNil(error.request.config) ? error.request.config.url : undefined;
-        throw new ServerError(error.response.status, url);
+const errorHandlingMiddleware = (error: AxiosError<any>) => {
+  if (!isNil(error.response)) {
+    const response = error.response;
+    if (response.status >= 400 && response.status < 500) {
+      const clientError: ClientError | undefined = createClientError(error);
+      if (!isNil(clientError)) {
+        throw clientError;
       }
-    } else if (!isNil(error.request)) {
-      throw new NetworkError(!isNil(error.request.config) ? error.request.conf.url : undefined);
     } else {
-      throw error;
+      const url = !isNil(error.request.config) ? error.request.config.url : undefined;
+      throw new ServerError(error.response.status, url);
     }
+  } else if (!isNil(error.request)) {
+    throw new NetworkError(!isNil(error.request.config) ? error.request.conf.url : undefined);
+  } else {
+    throw error;
   }
+};
+
+authenticatedInstance.interceptors.response.use(
+  (response: AxiosResponse<any>): AxiosResponse<any> => response,
+  errorHandlingMiddleware
 );
 
-/**
- * A client for making HTTP requests to the backend API.
- */
+unauthenticatedInstance.interceptors.response.use(
+  (response: AxiosResponse<any>): AxiosResponse<any> => response,
+  errorHandlingMiddleware
+);
+
 export class ApiClient {
+  readonly instance: AxiosInstance;
+
+  constructor(instance: AxiosInstance) {
+    this.instance = instance;
+  }
+
   _prepare_url = (
     url: string,
     query: Http.IQuery = {},
@@ -180,14 +192,14 @@ export class ApiClient {
     payload: Http.IPayload = {},
     options: Http.IRequestOptions
   ): Promise<T> => {
-    axiosRetry(_client, { retries: options.retries });
+    axiosRetry(this.instance, { retries: options.retries });
 
     const lookup: { [key: string]: any } = {
-      [HttpRequestMethods.POST]: _client.post,
-      [HttpRequestMethods.GET]: _client.get,
-      [HttpRequestMethods.PUT]: _client.put,
-      [HttpRequestMethods.DELETE]: _client.delete,
-      [HttpRequestMethods.PATCH]: _client.patch
+      [HttpRequestMethods.POST]: this.instance.post,
+      [HttpRequestMethods.GET]: this.instance.get,
+      [HttpRequestMethods.PUT]: this.instance.put,
+      [HttpRequestMethods.DELETE]: this.instance.delete,
+      [HttpRequestMethods.PATCH]: this.instance.patch
     };
     url = this._prepare_url(url, query, method);
     let response: AxiosResponse<T>;
@@ -260,7 +272,7 @@ export class ApiClient {
     options: Http.IRequestOptions = {}
   ): Promise<AxiosResponse<T>> => {
     url = this._prepare_url(url, {}, HttpRequestMethods.POST);
-    return _client.post(url, payload, {
+    return this.instance.post(url, payload, {
       cancelToken: options.signal,
       headers: options.headers
     });
@@ -300,5 +312,6 @@ export class ApiClient {
   };
 }
 
-export const client = new ApiClient();
+export const client = new ApiClient(authenticatedInstance);
+export const unauthenticatedClient = new ApiClient(unauthenticatedInstance);
 export default client;
