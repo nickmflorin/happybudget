@@ -35,11 +35,6 @@
     margin-top: -6px;
 
     .event-body-text {
-      color: #2f2f2f;
-      font-family: $roboto;
-      font-weight: 400;
-      font-size: 0.9375rem;
-
       .arrow-change {
         color: #afafaf !important;
         height: 10px;
@@ -48,24 +43,6 @@
         line-height: 14px;
         margin-left: 2px;
         margin-right: 2px;
-      }
-
-      span {
-        &.darker {
-          color: $text-primary;
-        }
-        &.blue {
-          color: $blue;
-        }
-        &.bolder {
-          font-weight: 600;
-        }
-        &.ml {
-          margin-left: 2px;
-        }
-        &.mr {
-          margin-right: 2px;
-        }
       }
     }
   }

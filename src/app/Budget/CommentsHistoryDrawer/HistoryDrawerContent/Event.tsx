@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -5,11 +6,11 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
 import { ShowHide } from "components/display";
 import { AccountCircleLink } from "components/control/links";
+import { SegmentedText } from "components/typography";
 import { isFieldAlterationEvent } from "model/typeguards";
 import { toDisplayTimeSince } from "util/dates";
 
 import "./Event.scss";
-import React from "react";
 
 interface FieldAlterationProps {
   event: FieldAlterationEvent;
@@ -35,57 +36,48 @@ const EventHeader = (props: { event: HistoryEvent }): JSX.Element => {
 
 const FieldChange = ({ event }: FieldAlterationProps): JSX.Element => {
   return (
-    <div className={"event-body"}>
-      <div className={"event-body-text"}>
-        <span className={"darker mr"}>{event.user.full_name}</span>
-        {"changed the value of"}
-        <span className={"blue mr ml"}>{event.field}</span>
-        {"from"}
-        <span className={"bolder mr ml"}>{event.old_value}</span>
-        <FontAwesomeIcon className={"arrow-change"} icon={faArrowRight} />
-        {!isNil(event.content_object.identifier) && event.field !== "identifier" ? (
-          <React.Fragment>
-            <span className={"bolder ml mr"}>{event.new_value}</span>
-            <ShowHide show={!isNil(event.content_object.identifier) && event.field !== "identifier"}>
-              {"for"}
-              <span className={"ml mr"}>{event.content_object.type}</span>
-              <span className={"blue ml mr"}>{event.content_object.identifier}</span>
-            </ShowHide>
-          </React.Fragment>
-        ) : (
-          <span className={"bolder ml"}>{event.new_value}</span>
-        )}
-        {"."}
-      </div>
-    </div>
+    <SegmentedText suffix={"."}>
+      <SegmentedText.Segment dark>{event.user.full_name}</SegmentedText.Segment>
+      <SegmentedText.Segment>{"changed the value of"}</SegmentedText.Segment>
+      <SegmentedText.Segment blue>{event.field}</SegmentedText.Segment>
+      <SegmentedText.Segment>{"from"}</SegmentedText.Segment>
+      <SegmentedText.Segment bold>{event.old_value}</SegmentedText.Segment>
+      <FontAwesomeIcon className={"arrow-change"} icon={faArrowRight} />
+      {!isNil(event.content_object.identifier) && event.field !== "identifier" ? (
+        <SegmentedText>
+          <SegmentedText.Segment bold>{event.new_value}</SegmentedText.Segment>
+          <SegmentedText show={!isNil(event.content_object.identifier) && event.field !== "identifier"}>
+            <SegmentedText.Segment>{"for"}</SegmentedText.Segment>
+            <SegmentedText.Segment>{event.content_object.type}</SegmentedText.Segment>
+            <SegmentedText.Segment blue>{event.content_object.identifier}</SegmentedText.Segment>
+          </SegmentedText>
+        </SegmentedText>
+      ) : (
+        <SegmentedText.Segment bold>{event.new_value}</SegmentedText.Segment>
+      )}
+    </SegmentedText>
   );
 };
 
 const FieldAdd = ({ event }: FieldAlterationProps): JSX.Element => {
   return (
-    <div className={"event-body"}>
-      <div className={"event-body-text"}>
-        <span className={"darker mr"}>{event.user.full_name}</span>
-        {"added a value of"}
-        <span className={"bolder ml mr"}>{event.new_value}</span>
-        {"for"}
-        <span className={"blue ml"}>{event.field}</span>
-        {"."}
-      </div>
-    </div>
+    <SegmentedText suffix={"."}>
+      <SegmentedText.Segment dark>{event.user.full_name}</SegmentedText.Segment>
+      <SegmentedText.Segment>{"added a value of"}</SegmentedText.Segment>
+      <SegmentedText.Segment bold>{event.new_value}</SegmentedText.Segment>
+      <SegmentedText.Segment>{"for"}</SegmentedText.Segment>
+      <SegmentedText.Segment bold>{event.field}</SegmentedText.Segment>
+    </SegmentedText>
   );
 };
 
 const FieldRemove = ({ event }: FieldAlterationProps): JSX.Element => {
   return (
-    <div className={"event-body"}>
-      <div className={"event-body-text"}>
-        <span className={"darker mr"}>{event.user.full_name}</span>
-        {"removed the value of"}
-        <span className={"bolder ml"}>{event.field}</span>
-        {"."}
-      </div>
-    </div>
+    <SegmentedText suffix={"."}>
+      <SegmentedText.Segment dark>{event.user.full_name}</SegmentedText.Segment>
+      <SegmentedText.Segment>{"removed the value of"}</SegmentedText.Segment>
+      <SegmentedText.Segment bold>{event.field}</SegmentedText.Segment>
+    </SegmentedText>
   );
 };
 
@@ -107,18 +99,12 @@ const FieldAlteration = ({ event }: FieldAlterationProps): JSX.Element => {
 
 const ItemCreated = ({ event }: ItemCreatedProps): JSX.Element => {
   return (
-    <div className={"event-body"}>
-      <div className={"event-body-text"}>
-        <span className={"darker mr"}>{event.user.full_name}</span>
-        {"added"}
-        {!isNil(event.content_object.identifier) ? (
-          <span className={"bolder ml"}>{event.content_object.identifier}</span>
-        ) : (
-          <span className={"bolder ml"}>{event.content_object.type}</span>
-        )}
-        {"."}
-      </div>
-    </div>
+    <SegmentedText suffix={"."}>
+      <SegmentedText.Segment dark>{event.user.full_name}</SegmentedText.Segment>
+      <SegmentedText.Segment>{"added"}</SegmentedText.Segment>
+      <SegmentedText.Segment blue>{event.content_object.type}</SegmentedText.Segment>
+      <SegmentedText.Segment bold>{event.content_object.identifier}</SegmentedText.Segment>
+    </SegmentedText>
   );
 };
 
@@ -126,7 +112,11 @@ const Event = ({ event }: EventProps): JSX.Element => {
   return (
     <div className={"event"}>
       <EventHeader event={event} />
-      {isFieldAlterationEvent(event) ? <FieldAlteration event={event} /> : <ItemCreated event={event} />}
+      <div className={"event-body"}>
+        <div className={"event-body-text"}>
+          {isFieldAlterationEvent(event) ? <FieldAlteration event={event} /> : <ItemCreated event={event} />}
+        </div>
+      </div>
     </div>
   );
 };
