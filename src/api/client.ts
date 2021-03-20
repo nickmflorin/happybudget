@@ -150,21 +150,18 @@ export class ApiClient {
       | HttpRequestMethods.DELETE
       | HttpRequestMethods.PATCH
   ): string => {
-    // TODO: Eventually, we want to restrict the use of ALL query params to GET
-    // requests - but there are too many PATCH/POST requests improperly using
-    // query parameters.
-    const { ordering, ...rest } = query;
-    // Convert Ordering to String if Present
-    if (method === HttpRequestMethods.GET && !isNil(ordering)) {
-      if (typeof ordering !== "string") {
-        rest.ordering = convertOrderingQueryToString(ordering);
-      } else {
-        rest.ordering = ordering;
+    if (method === HttpRequestMethods.GET) {
+      const { ordering, ...rest } = query;
+      // Convert Ordering to String if Present
+      if (method === HttpRequestMethods.GET && !isNil(ordering)) {
+        if (typeof ordering !== "string") {
+          rest.ordering = convertOrderingQueryToString(ordering);
+        } else {
+          rest.ordering = ordering;
+        }
       }
-    }
-    // Add Query Params to URL
-    url = addQueryParamsToUrl(url, rest, { filter: [""] });
-    if (method !== HttpRequestMethods.GET && !url.endsWith("/")) {
+      url = addQueryParamsToUrl(url, rest, { filter: [""] });
+    } else if (!url.endsWith("/")) {
       url = url + "/";
     }
     return url;
