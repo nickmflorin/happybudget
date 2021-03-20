@@ -66,7 +66,7 @@ const FieldAdd = ({ event }: FieldAlterationProps): JSX.Element => {
       <SegmentedText.Segment>{"added a value of"}</SegmentedText.Segment>
       <SegmentedText.Segment bold>{event.new_value}</SegmentedText.Segment>
       <SegmentedText.Segment>{"for"}</SegmentedText.Segment>
-      <SegmentedText.Segment bold>{event.field}</SegmentedText.Segment>
+      <SegmentedText.Segment blue>{event.field}</SegmentedText.Segment>
     </SegmentedText>
   );
 };

@@ -1,9 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { LicenseManager } from "@ag-grid-enterprise/core";
+import { isNil } from "lodash";
 
 import "style/index.scss";
 import App from "./app";
 import reportWebVitals from "./config/reportWebVitals";
+
+let agGridKey = process.env.REACT_APP_AG_GRID_KEY;
+if (!isNil(agGridKey)) {
+  LicenseManager.setLicenseKey(agGridKey);
+} else {
+  /* eslint-disable no-console */
+  console.warn("No REACT_APP_AG_GRID_KEY found in environment.  App may not behave as expected.");
+}
 
 ReactDOM.render(
   <React.StrictMode>

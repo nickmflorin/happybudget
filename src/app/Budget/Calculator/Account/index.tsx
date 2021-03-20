@@ -146,7 +146,8 @@ const Account = (): JSX.Element => {
             {
               field: "estimated",
               headerName: "Estimated",
-              cellStyle: { textAlign: "right" }
+              cellStyle: { textAlign: "right" },
+              cellRendererParams: { formatter: formatCurrency }
             },
             {
               field: "actual",
