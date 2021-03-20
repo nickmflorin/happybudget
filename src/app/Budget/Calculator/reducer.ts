@@ -21,7 +21,7 @@ const rootReducer = combineReducers({
     deleting: createModelListActionReducer(ActionType.Accounts.Deleting, { referenceEntity: "account" }),
     updating: createModelListActionReducer(ActionType.Accounts.Updating, { referenceEntity: "account" }),
     creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
-    history: createListResponseReducer<IFieldAlterationEvent>(
+    history: createListResponseReducer<HistoryEvent>(
       {
         Response: ActionType.History.Response,
         Request: ActionType.History.Request,
@@ -88,7 +88,7 @@ const rootReducer = combineReducers({
       updating: createModelListActionReducer(ActionType.Account.SubAccounts.Updating, {
         referenceEntity: "subaccount"
       }),
-      history: createListResponseReducer<IFieldAlterationEvent>(
+      history: createListResponseReducer<HistoryEvent>(
         {
           Response: ActionType.Account.SubAccounts.History.Response,
           Request: ActionType.Account.SubAccounts.History.Request,
@@ -145,7 +145,7 @@ const rootReducer = combineReducers({
         referenceEntity: "subaccount"
       }),
       creating: createSimpleBooleanReducer(ActionType.SubAccount.SubAccounts.Creating),
-      history: createListResponseReducer<IFieldAlterationEvent>(
+      history: createListResponseReducer<HistoryEvent>(
         {
           Response: ActionType.SubAccount.SubAccounts.History.Response,
           Request: ActionType.SubAccount.SubAccounts.History.Request,

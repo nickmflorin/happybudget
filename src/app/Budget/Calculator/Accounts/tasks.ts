@@ -55,7 +55,7 @@ export function* getAccountsHistoryTask(action: Redux.IAction<null>): SagaIterat
   if (!isNil(budgetId)) {
     yield put(loadingAccountsHistoryAction(true));
     try {
-      const response: Http.IListResponse<IFieldAlterationEvent> = yield call(getAccountsHistory, budgetId);
+      const response: Http.IListResponse<HistoryEvent> = yield call(getAccountsHistory, budgetId);
       yield put(responseAccountsHistoryAction(response));
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the accounts history.");
@@ -176,6 +176,40 @@ export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIt
   }
 }
 
+export function* addToHistoryState(
+  account: IAccount,
+  eventType: HistoryEventType,
+  data?: { field: string; newValue: string | number; oldValue: string | number | null }
+): SagaIterator {
+  const user = yield select((state: Redux.IApplicationStore) => state.user);
+  const polymorphicEvent: PolymorphicEvent = {
+    id: generateRandomNumericId(),
+    created_at: nowAsString(),
+    type: eventType,
+    user: userToSimpleUser(user),
+    content_object: {
+      id: account.id,
+      identifier: account.identifier,
+      description: account.description,
+      type: "account"
+    }
+  };
+  if (eventType === "field_alteration") {
+    if (!isNil(data)) {
+      yield put(
+        addAccountsHistoryToStateAction({
+          ...polymorphicEvent,
+          new_value: data.newValue,
+          old_value: data.oldValue,
+          field: data.field
+        })
+      );
+    }
+  } else {
+    yield put(addAccountsHistoryToStateAction(polymorphicEvent as CreateEvent));
+  }
+}
+
 export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(action.payload) && !isNil(action.payload.id)) {
@@ -220,6 +254,12 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
             yield put(activateAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = payloadFromResponse<IAccount>(response, "account");
             yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
+
+            // Add an element to the history indicating that the account was created.
+            // This is faster than refreshing the history from the API and is not problematic
+            // because there are no write operations regarding history (i.e. making dummy IDs
+            // is OK).
+            yield call(addToHistoryState, response, "create");
           } catch (e) {
             yield call(
               handleTableErrors,
@@ -240,27 +280,17 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
           const responsePayload = payloadFromResponse<IAccount>(response, "account");
           yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
 
-          const user = yield select((state: Redux.IApplicationStore) => state.user);
-
-          // Here, instead of refreshing the history from the API we can just add
-          // "mock" objects to the state so the history updates with less latency.
-          // This is not a big deal because there are no write operations associated
-          // with history, just read.
+          // Add elements to the history indicating that the account was updated.
+          // This is faster than refreshing the history from the API and is not problematic
+          // because there are no write operations regarding history (i.e. making dummy IDs
+          // is OK).
           const fields = Object.keys(action.payload.data);
           for (let i = 0; i < fields.length; i++) {
-            yield put(
-              addAccountsHistoryToStateAction({
-                id: generateRandomNumericId(),
-                created_at: nowAsString(),
-                new_value: action.payload.data[fields[i]].newValue,
-                old_value: action.payload.data[fields[i]].oldValue,
-                object_id: response.id,
-                content_object_type: "account",
-                type: "field_alteration",
-                user: userToSimpleUser(user),
-                field: fields[i]
-              })
-            );
+            yield call(addToHistoryState, response, "field_alteration", {
+              field: fields[i],
+              oldValue: action.payload.data[fields[i]].oldValue,
+              newValue: action.payload.data[fields[i]].newValue
+            });
           }
         } catch (e) {
           yield call(

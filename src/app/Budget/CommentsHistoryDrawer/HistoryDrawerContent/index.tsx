@@ -10,7 +10,7 @@ import "./index.scss";
 
 export interface HistoryDrawerContentProps {
   loading: boolean;
-  history: IFieldAlterationEvent[];
+  history: HistoryEvent[];
   onRequest: () => void;
 }
 
@@ -23,7 +23,7 @@ const HistoryDrawerContent = ({ history, loading, onRequest }: HistoryDrawerCont
     <Drawer.Content className={"history-drawer-content"} noPadding>
       <RenderWithSpinner absolute size={15} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
         <ShowHide show={history.length !== 0}>
-          {map(history, (event: IFieldAlterationEvent, index: number) => {
+          {map(history, (event: HistoryEvent, index: number) => {
             return <Event key={index} event={event} />;
           })}
         </ShowHide>

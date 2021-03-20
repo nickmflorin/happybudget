@@ -59,11 +59,7 @@ export function* getAccountSubAccountsHistoryTask(action: Redux.IAction<null>): 
   if (!isNil(accountId) && !isNil(budgetId)) {
     yield put(loadingAccountSubAccountsHistoryAction(true));
     try {
-      const response: Http.IListResponse<IFieldAlterationEvent> = yield call(
-        getAccountSubAccountsHistory,
-        accountId,
-        budgetId
-      );
+      const response: Http.IListResponse<HistoryEvent> = yield call(getAccountSubAccountsHistory, accountId, budgetId);
       yield put(responseAccountSubAccountsHistoryAction(response));
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account's sub accounts history.");

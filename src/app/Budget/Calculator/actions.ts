@@ -206,10 +206,10 @@ export const addErrorsToAccountsTableAction = simpleAction<Table.ICellError | Ta
 */
 export const requestAccountsHistoryAction = simpleAction<null>(ActionType.History.Request);
 export const loadingAccountsHistoryAction = simpleAction<boolean>(ActionType.History.Loading);
-export const responseAccountsHistoryAction = simpleAction<Http.IListResponse<IFieldAlterationEvent>>(
+export const responseAccountsHistoryAction = simpleAction<Http.IListResponse<HistoryEvent>>(
   ActionType.History.Response
 );
-export const addAccountsHistoryToStateAction = simpleAction<IFieldAlterationEvent>(ActionType.History.AddToState);
+export const addAccountsHistoryToStateAction = simpleAction<HistoryEvent>(ActionType.History.AddToState);
 
 /*
   Actions Pertaining to Account Comments
@@ -296,7 +296,7 @@ export const requestAccountSubAccountsHistoryAction = simpleAction<null>(
 export const loadingAccountSubAccountsHistoryAction = simpleAction<boolean>(
   ActionType.Account.SubAccounts.History.Loading
 );
-export const responseAccountSubAccountsHistoryAction = simpleAction<Http.IListResponse<IFieldAlterationEvent>>(
+export const responseAccountSubAccountsHistoryAction = simpleAction<Http.IListResponse<HistoryEvent>>(
   ActionType.Account.SubAccounts.History.Response
 );
 
@@ -389,6 +389,6 @@ export const requestSubAccountSubAccountsHistoryAction = simpleAction<null>(
 export const loadingSubAccountSubAccountsHistoryAction = simpleAction<boolean>(
   ActionType.SubAccount.SubAccounts.History.Loading
 );
-export const responseSubAccountSubAccountsHistoryAction = simpleAction<Http.IListResponse<IFieldAlterationEvent>>(
+export const responseSubAccountSubAccountsHistoryAction = simpleAction<Http.IListResponse<HistoryEvent>>(
   ActionType.SubAccount.SubAccounts.History.Response
 );

@@ -40,9 +40,21 @@
       font-weight: 400;
       font-size: 0.9375rem;
 
+      .arrow-change {
+        color: #afafaf !important;
+        height: 14px;
+        width: auto;
+        vertical-align: -0.25em;
+        margin-left: 2px;
+        margin-right: 2px;
+      }
+
       span {
         &.darker {
           color: $text-primary;
+        }
+        &.blue {
+          color: $blue;
         }
         &.bolder {
           font-weight: 600;

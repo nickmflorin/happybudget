@@ -186,13 +186,29 @@ interface IContact extends Model {
   readonly email: string;
 }
 
-interface IFieldAlterationEvent extends Model {
+type HistoryEventType = "field_alteration" | "create";
+type HistoryEventContentObjectType = "account" | "subaccount" | "actual";
+
+interface HistoryEventContentObject {
+  readonly id: number;
+  readonly identifier?: string;
+  readonly description: string | null;
+  readonly type: HistoryEventContentObjectType;
+}
+
+interface PolymorphicEvent extends Model {
   readonly created_at: string;
+  readonly user: ISimpleUser;
+  readonly type: HistoryEventType;
+  readonly content_object: HistoryEventContentObject;
+}
+
+interface FieldAlterationEvent extends PolymorphicEvent {
   readonly new_value: string | number | null;
   readonly old_value: string | number | null;
   readonly field: string;
-  readonly content_object_type: "actual" | "account" | "subaccount";
-  readonly object_id: number;
-  readonly type: "field_alteration";
-  readonly user: ISimpleUser;
 }
+
+interface CreateEvent extends PolymorphicEvent {}
+
+type HistoryEvent = FieldAlterationEvent | CreateEvent;
