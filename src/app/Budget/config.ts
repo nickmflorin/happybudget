@@ -20,7 +20,7 @@ export interface IFieldDefinition {
   updateBeforeResponse?: boolean;
 }
 
-export const FieldDefinitions: { [key in Table.RowType]: IFieldDefinition[] } = {
+export const FieldDefinitions: { [key: string]: IFieldDefinition[] } = {
   actual: [
     { name: "description", postPayload: true },
     {

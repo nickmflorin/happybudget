@@ -251,6 +251,7 @@ export function* handleAccountSubAccountUpdateTask(action: Redux.IAction<Table.R
         yield put(updatingAccountSubAccountAction({ id: existing.id as number, value: true }));
         const requestPayload = patchPayload(action.payload, "subaccount") as Partial<Http.ISubAccountPayload>;
         try {
+          console.log(requestPayload);
           const response: ISubAccount = yield call(updateSubAccount, existing.id as number, requestPayload);
           const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
           yield put(updateAccountSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));

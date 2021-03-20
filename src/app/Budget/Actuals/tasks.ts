@@ -121,7 +121,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
         }
       } else {
         yield put(updatingActualAction({ id: existing.id as number, value: true }));
-        const requestPayload = action.payload.data as Partial<Http.IActualPayload>;
+        const requestPayload = patchPayload(action.payload, "actual") as Partial<Http.IActualPayload>;
         try {
           const response: IActual = yield call(updateActual, existing.id as number, requestPayload);
           const responsePayload = payloadFromResponse<IActual>(response, "actual");
