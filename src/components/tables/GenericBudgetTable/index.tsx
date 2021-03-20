@@ -522,7 +522,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
             if (!isNil(event.newValue)) {
               if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
                 if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
-                  const valid = event.colDef.valueSetter(event.newValue);
+                  const valid = event.colDef.valueSetter({ ...event });
                   if (valid === true) {
                     onRowUpdate({
                       id: event.data.id,
