@@ -521,10 +521,20 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
             const field = event.column.getColId() as F;
             if (!isNil(event.newValue)) {
               if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
-                onRowUpdate({
-                  id: event.data.id,
-                  data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
-                });
+                if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
+                  const valid = event.colDef.valueSetter(event.newValue);
+                  if (valid === true) {
+                    onRowUpdate({
+                      id: event.data.id,
+                      data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+                    });
+                  }
+                } else {
+                  onRowUpdate({
+                    id: event.data.id,
+                    data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+                  });
+                }
               }
             }
           }}

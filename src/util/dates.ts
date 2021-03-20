@@ -11,7 +11,7 @@ import {
   DATE_DISPLAY_FORMAT,
   TIME_DISPLAY_FORMAT,
   DATETIME_ABBV_DISPLAY_FORMAT
-} from "config/constants";
+} from "config";
 
 export const nowAsString = (): string => {
   const mmt = moment();

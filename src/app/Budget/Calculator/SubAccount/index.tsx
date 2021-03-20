@@ -8,6 +8,7 @@ import { ColDef, ColSpanParams } from "ag-grid-community";
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { GenericBudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
+import { floatValueSetter, integerValueSetter } from "util/table";
 
 import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
 
@@ -108,7 +109,8 @@ const SubAccount = (): JSX.Element => {
             {
               field: "quantity",
               headerName: "Quantity",
-              cellStyle: { textAlign: "right" }
+              cellStyle: { textAlign: "right" },
+              valueSetter: integerValueSetter("quantity")
             },
             {
               field: "unit",
@@ -133,12 +135,14 @@ const SubAccount = (): JSX.Element => {
             {
               field: "multiplier",
               headerName: "X",
-              cellStyle: { textAlign: "right" }
+              cellStyle: { textAlign: "right" },
+              valueSetter: floatValueSetter("multiplier")
             },
             {
               field: "rate",
               headerName: "Rate",
-              cellStyle: { textAlign: "right" }
+              cellStyle: { textAlign: "right" },
+              valueSetter: floatValueSetter("rate")
             },
             {
               field: "estimated",

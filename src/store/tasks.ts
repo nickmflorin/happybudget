@@ -3,6 +3,7 @@ import { put } from "redux-saga/effects";
 import { forEach } from "lodash";
 
 import { ClientError, handleRequestError } from "api";
+import { DISPLAY_ERRORS_IN_TABLE } from "config";
 
 export function* handleTableErrors(
   e: Error,
@@ -25,7 +26,10 @@ export function* handleTableErrors(
     if (cellErrors.length === 0) {
       handleRequestError(e, message);
     } else {
-      yield put(action(cellErrors));
+      /* @ts-ignore 2367 */
+      if (DISPLAY_ERRORS_IN_TABLE === true) {
+        yield put(action(cellErrors));
+      }
     }
   } else {
     handleRequestError(e, message);
