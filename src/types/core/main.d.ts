@@ -57,6 +57,7 @@ interface ISimpleUser extends Model {
   readonly last_name: string;
   readonly full_name: string;
   readonly email: string;
+  readonly profile_image: string;
 }
 
 interface INestedUser extends ISimpleUser {

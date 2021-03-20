@@ -1,6 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
 import { isNil, find, concat } from "lodash";
+import { handleRequestError } from "api";
 import {
   getSubAccountSubAccounts,
   createSubAccountSubAccount,
@@ -14,7 +15,7 @@ import {
   replyToComment,
   getSubAccountSubAccountsHistory
 } from "services";
-import { handleRequestError, handleTableErrors } from "store/tasks";
+import { handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
 import {
   payloadFromResponse,

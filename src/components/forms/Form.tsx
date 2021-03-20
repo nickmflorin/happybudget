@@ -5,13 +5,16 @@ import { FormProps as RootFormProps } from "antd/lib/form";
 
 import { DisplayAlert, RenderWithSpinner } from "components/display";
 
-interface FormProps extends RootFormProps {
+export interface FormProps extends RootFormProps {
   globalError?: string;
-  children: ReactNode;
   loading?: boolean;
 }
 
-const Form = ({ globalError, loading, children, ...props }: FormProps): JSX.Element => {
+interface _FormProps extends FormProps {
+  children: ReactNode;
+}
+
+const Form = ({ globalError, loading, children, ...props }: _FormProps): JSX.Element => {
   return (
     <RootForm {...props}>
       <RenderWithSpinner loading={loading}>

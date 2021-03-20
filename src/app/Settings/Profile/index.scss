@@ -1,0 +1,9 @@
+.profile {
+  display: flex;
+  justify-content: center;
+
+  .profile-form-container {
+    max-width: 500px;
+    min-width: 400px;
+  }
+}

@@ -1,8 +1,8 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import { isNil } from "lodash";
+import { handleRequestError } from "api";
 import { getBudget } from "services";
-import { handleRequestError } from "store/tasks";
 import { setAncestorsAction, setAncestorsLoadingAction, loadingBudgetAction, responseBudgetAction } from "./actions";
 
 export function* getBudgetTask(action: Redux.IAction<null>): SagaIterator {

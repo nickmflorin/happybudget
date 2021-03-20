@@ -1,4 +1,4 @@
-import { find, isNil, filter, map, forEach } from "lodash";
+import { find, isNil, filter } from "lodash";
 import { AxiosResponse } from "axios";
 
 /* eslint-disable no-shadow */
@@ -251,14 +251,3 @@ export class NetworkError extends HttpError implements IHttpNetworkError {
     return "There was a Network Error.";
   }
 }
-
-export const renderFieldErrorsInForm = (form: any, e: ClientError) => {
-  const fieldsWithErrors: { name: string; errors: string[] }[] = [];
-  forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
-    fieldsWithErrors.push({
-      name: field,
-      errors: map(errors, (error: Http.IErrorDetail) => error.message)
-    });
-  });
-  form.setFields(fieldsWithErrors);
-};

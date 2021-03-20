@@ -5,13 +5,27 @@
   display: block;
   width: 36px !important;
   height: 36px !important;
-  border-radius: 100%;
-  font-family: $roboto;
-  font-weight: 400;
-  line-height: 18px;
-  font-size: 14px;
-  padding-top: 9px;
-  padding-bottom: 9px;
+  border-radius: 18px;
+  overflow: hidden;
   text-align: center;
   border-width: 1px;
+  position: relative;
+
+  .user-profile-img {
+    height: 100%;
+    width: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: contain;
+  }
+
+  svg {
+    height: 100%;
+    width: auto !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #b5b5b5;
+  }
 }

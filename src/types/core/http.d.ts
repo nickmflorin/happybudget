@@ -56,8 +56,18 @@ namespace Http {
     readonly password: string;
   }
 
+  interface IUserPayload {
+    readonly first_name: string;
+    readonly last_name: string;
+    readonly profile_image: File | Blob | null;
+  }
+
   interface ILoginResponse {
     readonly detail: string;
+  }
+
+  interface IFileUploadResponse {
+    readonly fileUrl: string;
   }
 
   interface IBudgetPayload extends IPayload {

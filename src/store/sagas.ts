@@ -1,5 +1,5 @@
 import { SagaIterator, Saga } from "redux-saga";
-import { select, spawn, takeEvery, delay, put } from "redux-saga/effects";
+import { select, spawn, takeEvery, put } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import { ApplicationActionTypes, setOverallApplicationLoadingAction } from "./actions";
@@ -9,7 +9,6 @@ function* handleLoadingTask(action: Redux.IAction<{ id: string; value: boolean }
     const elementsLoading = yield select((state: Redux.IApplicationStore) => state.loading.elements);
     const loading = yield select((state: Redux.IApplicationStore) => state.loading.loading);
     if (elementsLoading.length === 0 && loading === true) {
-      yield delay(500);
       yield put(setOverallApplicationLoadingAction(false));
     } else if (elementsLoading.length !== 0 && loading === false) {
       yield put(setOverallApplicationLoadingAction(true));

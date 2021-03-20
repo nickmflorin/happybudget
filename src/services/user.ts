@@ -6,3 +6,11 @@ export const register = async (payload: Http.IRegistrationPayload, options?: Htt
   const url = URL.v1("users", "registration");
   return client.post<IUser>(url, payload, options);
 };
+
+export const updateActiveUser = async (
+  payload: Partial<Http.IUserPayload>,
+  options?: Http.IRequestOptions
+): Promise<IUser> => {
+  const url = URL.v1("users", "user");
+  return client.patch<IUser>(url, payload, options);
+};

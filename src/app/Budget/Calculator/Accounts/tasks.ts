@@ -1,6 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import { isNil, find } from "lodash";
+import { handleRequestError } from "api";
 import {
   getAccounts,
   deleteAccount,
@@ -13,7 +14,7 @@ import {
   replyToComment,
   getAccountsHistory
 } from "services";
-import { handleRequestError, handleTableErrors } from "store/tasks";
+import { handleTableErrors } from "store/tasks";
 import { userToSimpleUser } from "model/mappings";
 import { nowAsString } from "util/dates";
 import { generateRandomNumericId } from "util/math";

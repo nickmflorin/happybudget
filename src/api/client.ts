@@ -4,8 +4,26 @@ import Cookies from "universal-cookie";
 import { isNil } from "lodash";
 import { addQueryParamsToUrl, convertOrderingQueryToString } from "util/urls";
 import { ClientError, NetworkError, ServerError, AuthenticationError } from "./errors";
-import { HttpRequestMethods } from "./model";
-import { ErrorCodes } from "./codes";
+
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+export enum ErrorCodes {
+  EMAIL_DOES_NOT_EXIST = "email_does_not_exist",
+  INVALID_CREDENTIALS = "invalid_credentials",
+  ACCOUNT_DISABLED = "account_disabled",
+  UNKNOWN = "unknown",
+  NOT_FOUND = "not_found"
+}
+
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+export enum HttpRequestMethods {
+  GET = "GET",
+  POST = "POST",
+  DELETE = "DELETE",
+  PUT = "PUT",
+  PATCH = "PATCH"
+}
 
 const _client = axios.create({
   baseURL: process.env.REACT_APP_API_DOMAIN,
@@ -234,6 +252,18 @@ export class ApiClient {
    */
   post = async <T>(url: string, payload: Http.IPayload = {}, options: Http.IRequestOptions = {}): Promise<T> => {
     return this.request<T>(HttpRequestMethods.POST, url, {}, payload, options);
+  };
+
+  upload = async <T>(
+    url: string,
+    payload: Http.IPayload = {},
+    options: Http.IRequestOptions = {}
+  ): Promise<AxiosResponse<T>> => {
+    url = this._prepare_url(url, {}, HttpRequestMethods.POST);
+    return _client.post(url, payload, {
+      cancelToken: options.signal,
+      headers: options.headers
+    });
   };
 
   /**

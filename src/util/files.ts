@@ -1,18 +1,17 @@
 import { isNil } from "lodash";
 
-export const blobToFile = (blob: any): File => {
-  return new File([blob], blob.name, {
-    type: blob.type,
-    lastModified: Date.now()
-  });
-};
-
 export const getFileType = (filename: string): string | undefined => {
   if (!filename.includes(".")) {
     return undefined;
   }
   // TODO: Validate that the extension is valid.
   return filename.split(".").slice(-1)[0];
+};
+
+export const getBase64 = (file: File | Blob, callback: (result: string | ArrayBuffer | null) => void) => {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result));
+  reader.readAsDataURL(file);
 };
 
 export const base64ToArrayBuffer = (base64: string): Uint8Array => {

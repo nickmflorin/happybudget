@@ -12,7 +12,7 @@ import {
   updateContact,
   createContact
 } from "services";
-import { handleRequestError } from "store/tasks";
+import { handleRequestError } from "api";
 import {
   ActionDomains,
   loadingBudgetsAction,
