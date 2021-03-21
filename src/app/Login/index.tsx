@@ -60,7 +60,7 @@ const Login = (): JSX.Element => {
           if (!isNil(values.email) && !isNil(values.password)) {
             login(values.email.toLowerCase(), values.password)
               .then(() => {
-                history.push("/");
+                console.log("LOGGED IN");
               })
               .catch((e: Error) => {
                 if (e instanceof ClientError) {
