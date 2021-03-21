@@ -100,28 +100,28 @@ const createClientError = (error: AxiosError): ClientError | undefined => {
   }
 };
 
-const errorHandlingMiddleware = (error: AxiosError<any>) => {
-  if (!isNil(error.response)) {
-    const response = error.response;
-    if (response.status >= 400 && response.status < 500) {
-      const clientError: ClientError | undefined = createClientError(error);
-      if (!isNil(clientError)) {
-        throw clientError;
-      }
-    } else {
-      const url = !isNil(error.request.config) ? error.request.config.url : undefined;
-      throw new ServerError(error.response.status, url);
-    }
-  } else if (!isNil(error.request)) {
-    throw new NetworkError(!isNil(error.request.config) ? error.request.conf.url : undefined);
-  } else {
-    throw error;
-  }
-};
-
 instance.interceptors.response.use(
-  (response: AxiosResponse<any>): AxiosResponse<any> => response,
-  errorHandlingMiddleware
+  (response: AxiosResponse<any>): AxiosResponse<any> => {
+    return response;
+  },
+  (error: AxiosError<any>) => {
+    if (!isNil(error.response)) {
+      const response = error.response;
+      if (response.status >= 400 && response.status < 500) {
+        const clientError: ClientError | undefined = createClientError(error);
+        if (!isNil(clientError)) {
+          throw clientError;
+        }
+      } else {
+        const url = !isNil(error.request.config) ? error.request.config.url : undefined;
+        throw new ServerError(error.response.status, url);
+      }
+    } else if (!isNil(error.request)) {
+      throw new NetworkError(!isNil(error.request.config) ? error.request.conf.url : undefined);
+    } else {
+      throw error;
+    }
+  }
 );
 
 export class ApiClient {
