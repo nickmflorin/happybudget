@@ -25,16 +25,12 @@ export enum HttpRequestMethods {
   PATCH = "PATCH"
 }
 
-const authenticatedInstance = axios.create({
+const instance = axios.create({
   baseURL: process.env.REACT_APP_API_DOMAIN,
   withCredentials: true
 });
 
-const unauthenticatedInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_DOMAIN
-});
-
-authenticatedInstance.interceptors.request.use(
+instance.interceptors.request.use(
   (config: AxiosRequestConfig): AxiosRequestConfig => {
     config = config || {};
     const cookies = new Cookies();
@@ -123,12 +119,7 @@ const errorHandlingMiddleware = (error: AxiosError<any>) => {
   }
 };
 
-authenticatedInstance.interceptors.response.use(
-  (response: AxiosResponse<any>): AxiosResponse<any> => response,
-  errorHandlingMiddleware
-);
-
-unauthenticatedInstance.interceptors.response.use(
+instance.interceptors.response.use(
   (response: AxiosResponse<any>): AxiosResponse<any> => response,
   errorHandlingMiddleware
 );
@@ -309,6 +300,5 @@ export class ApiClient {
   };
 }
 
-export const client = new ApiClient(authenticatedInstance);
-export const unauthenticatedClient = new ApiClient(unauthenticatedInstance);
+export const client = new ApiClient(instance);
 export default client;
