@@ -91,6 +91,11 @@ namespace Http {
     readonly unit?: Unit;
   }
 
+  interface ISubAccountGroupPayload extends IPayload {
+    readonly name: string;
+    readonly subaccounts?: number[];
+  }
+
   interface IActualPayload extends IPayload {
     readonly description?: string;
     readonly date?: string;

@@ -124,6 +124,14 @@ interface IAccount extends IBudgetItem, TrackedModel {
   readonly type: "account";
 }
 
+interface ISubAccountNestedGroup extends TrackedModel {
+  readonly name: string;
+}
+
+interface ISubAccountGroup extends ISubAccountNestedGroup {
+  readonly subaccounts: ISimpleSubAccount[];
+}
+
 interface ISimpleSubAccount extends Model {
   readonly name: string;
 }
@@ -145,6 +153,7 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly variance: number | null;
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
+  readonly group: ISubAccountNestedGroup | null;
 }
 
 interface IActual extends TrackedModel {

@@ -48,15 +48,6 @@ export const getAccountSubAccounts = async (
   return client.list<ISubAccount>(url, query, options);
 };
 
-export const getSubAccountSubAccounts = async (
-  subaccountId: number,
-  query: Http.IListQuery = {},
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<ISubAccount>> => {
-  const url = URL.v1("subaccounts", subaccountId, "subaccounts");
-  return client.list<ISubAccount>(url, query, options);
-};
-
 export const createAccountSubAccount = async (
   accountId: number,
   budgetId: number,
@@ -67,83 +58,19 @@ export const createAccountSubAccount = async (
   return client.post<ISubAccount>(url, payload, options);
 };
 
-export const createSubAccountSubAccount = async (
-  subaccountId: number,
-  payload: Http.ISubAccountPayload,
+export const createAccountSubAccountGroup = async (
+  accountId: number,
+  payload: Http.ISubAccountGroupPayload,
   options: Http.IRequestOptions = {}
-): Promise<ISubAccount> => {
-  const url = URL.v1("subaccounts", subaccountId, "subaccounts");
-  return client.post<ISubAccount>(url, payload, options);
+): Promise<ISubAccountGroup> => {
+  const url = URL.v1("accounts", accountId, "subaccount-groups");
+  return client.post<ISubAccountGroup>(url, payload, options);
 };
 
-export const getSubAccount = async (id: number, options: Http.IRequestOptions = {}): Promise<ISubAccount> => {
-  const url = URL.v1("subaccounts", id);
-  return client.retrieve<ISubAccount>(url, options);
-};
-
-export const deleteSubAccount = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
-  const url = URL.v1("subaccounts", id);
-  return client.delete<null>(url, options);
-};
-
-export const updateSubAccount = async (
-  id: number,
-  payload: Partial<Http.ISubAccountPayload>,
+export const getAccountSubAccountGroups = async (
+  accountId: number,
   options: Http.IRequestOptions = {}
-): Promise<IAccount> => {
-  const url = URL.v1("subaccounts", id);
-  return client.patch<IAccount>(url, payload, options);
-};
-
-export const getActual = async (id: number, options: Http.IRequestOptions = {}): Promise<IActual> => {
-  const url = URL.v1("actuals", id);
-  return client.retrieve<IActual>(url, options);
-};
-
-export const deleteActual = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
-  const url = URL.v1("actuals", id);
-  return client.delete<null>(url, options);
-};
-
-export const updateActual = async (
-  id: number,
-  payload: Partial<Http.IActualPayload>,
-  options: Http.IRequestOptions = {}
-): Promise<IActual> => {
-  const url = URL.v1("actuals", id);
-  return client.patch<IActual>(url, payload, options);
-};
-
-export const getAccountActuals = async (
-  id: number,
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<IActual>> => {
-  const url = URL.v1("accounts", id, "actuals");
-  return client.list<IActual>(url, options);
-};
-
-export const createAccountActual = async (
-  id: number,
-  payload: Http.IActualPayload,
-  options: Http.IRequestOptions = {}
-): Promise<IActual> => {
-  const url = URL.v1("accounts", id, "actuals");
-  return client.post<IActual>(url, payload, options);
-};
-
-export const getSubAccountActuals = async (
-  id: number,
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<IActual>> => {
-  const url = URL.v1("subaccounts", id, "actuals");
-  return client.list<IActual>(url, options);
-};
-
-export const createSubAccountActual = async (
-  id: number,
-  payload: Http.IActualPayload,
-  options: Http.IRequestOptions = {}
-): Promise<IActual> => {
-  const url = URL.v1("subaccounts", id, "actuals");
-  return client.post<IActual>(url, payload, options);
+): Promise<Http.IListResponse<ISubAccountGroup>> => {
+  const url = URL.v1("accounts", accountId, "subaccount-groups");
+  return client.list<ISubAccountGroup>(url, options);
 };
