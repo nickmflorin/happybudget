@@ -6,7 +6,7 @@ import { isNil, includes } from "lodash";
 import { ColDef } from "ag-grid-community";
 
 import { WrapInApplicationSpinner } from "components/display";
-import { GenericBudgetTable } from "components/tables";
+import { BudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
 import { setAncestorsAction } from "../../actions";
@@ -56,9 +56,9 @@ const Accounts = (): JSX.Element => {
   return (
     <React.Fragment>
       <WrapInApplicationSpinner loading={budget.detail.loading || accounts.table.loading}>
-        <GenericBudgetTable<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow>
+        <BudgetTable<Table.AccountRow, Table.BudgetRowMeta>
           table={accounts.table.data}
-          isCellEditable={(row: Table.IAccountRow, colDef: ColDef) => {
+          isCellEditable={(row: Table.AccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "variance"], colDef.field)) {
               return false;
             }
@@ -70,7 +70,7 @@ const Accounts = (): JSX.Element => {
           onRowAdd={() => dispatch(addAccountsTablePlaceholdersAction(1))}
           onRowSelect={(id: number) => dispatch(selectAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectAccountsTableRowAction(id))}
-          onRowDelete={(row: Table.IAccountRow) => dispatch(removeAccountAction(row.id))}
+          onRowDelete={(row: Table.AccountRow) => dispatch(removeAccountAction(row.id))}
           onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountAction(payload))}
           onRowExpand={(id: number) => history.push(`/budgets/${budget.id}/accounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountsTableRowsAction())}

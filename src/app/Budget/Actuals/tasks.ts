@@ -38,7 +38,7 @@ import {
 } from "./actions";
 import { requestBudgetAction } from "../actions";
 
-export function* handleActualRemovalTask(action: Redux.IAction<Table.IActualRow>): SagaIterator {
+export function* handleActualRemovalTask(action: Redux.IAction<Table.ActualRow>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(removeActualsTableRowAction(action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
@@ -59,9 +59,9 @@ export function* handleActualRemovalTask(action: Redux.IAction<Table.IActualRow>
 export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(action.payload) && !isNil(budgetId)) {
-    const table: Table.IActualRow[] = yield select((state: Redux.IApplicationStore) => state.actuals.table.data);
+    const table: Table.ActualRow[] = yield select((state: Redux.IApplicationStore) => state.actuals.table.data);
 
-    const existing: Table.IActualRow | undefined = find(table, { id: action.payload.id });
+    const existing: Table.ActualRow | undefined = find(table, { id: action.payload.id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.error(
@@ -91,9 +91,9 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (rowHasRequiredFields<Table.IActualRow>(updatedRow, "actual")) {
+        if (rowHasRequiredFields<Table.ActualRow>(updatedRow, "actual")) {
           yield put(creatingActualAction(true));
-          const payload = postPayload<Table.IActualRow>(updatedRow, "actual");
+          const payload = postPayload<Table.ActualRow>(updatedRow, "actual");
           if (!isNil(updatedRow.object_id)) {
             let service = createAccountActual;
             if (updatedRow.parent_type === "subaccount") {
@@ -112,7 +112,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
                 e,
                 "There was an error updating the actual.",
                 existing.id,
-                (errors: Table.ICellError[]) => addErrorsToActualsTableAction(errors)
+                (errors: Table.CellError[]) => addErrorsToActualsTableAction(errors)
               );
             } finally {
               yield put(creatingActualAction(false));
@@ -138,7 +138,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
             e,
             "There was an error updating the actual.",
             existing.id,
-            (errors: Table.ICellError[]) => addErrorsToActualsTableAction(errors)
+            (errors: Table.CellError[]) => addErrorsToActualsTableAction(errors)
           );
         } finally {
           yield put(updatingActualAction({ id: existing.id as number, value: false }));

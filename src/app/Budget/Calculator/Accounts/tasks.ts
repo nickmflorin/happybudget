@@ -146,10 +146,10 @@ export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator
 
 export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    const tableData: Table.IAccountRow[] = yield select(
+    const tableData: Table.AccountRow[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.accounts.table.data
     );
-    const existing: Table.IAccountRow | undefined = find(tableData, { id: action.payload });
+    const existing: Table.AccountRow | undefined = find(tableData, { id: action.payload });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.warn(
@@ -215,7 +215,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
   if (!isNil(action.payload) && !isNil(action.payload.id)) {
     const table = yield select((state: Redux.IApplicationStore) => state.calculator.accounts.table.data);
 
-    const existing: Table.IAccountRow = find(table, { id: action.payload.id });
+    const existing: Table.AccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.error(
@@ -242,12 +242,12 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
       if (existing.meta.isPlaceholder === true) {
         // TODO: Should we be using the payload data here?  Instead of the existing row?
         // Or we should probably merge them, right?
-        const requestPayload = postPayload<Table.IAccountRow>(existing, "account");
+        const requestPayload = postPayload<Table.AccountRow>(existing, "account");
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (rowHasRequiredFields<Table.IAccountRow>(existing, "account")) {
+        if (rowHasRequiredFields<Table.AccountRow>(existing, "account")) {
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, budgetId, requestPayload as Http.IAccountPayload);
@@ -266,7 +266,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
               e,
               "There was an error updating the account.",
               existing.id,
-              (errors: Table.ICellError[]) => addErrorsToAccountsTableAction(errors)
+              (errors: Table.CellError[]) => addErrorsToAccountsTableAction(errors)
             );
           } finally {
             yield put(creatingAccountAction(false));
@@ -298,7 +298,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
             e,
             "There was an error updating the account.",
             existing.id,
-            (errors: Table.ICellError[]) => addErrorsToAccountsTableAction(errors)
+            (errors: Table.CellError[]) => addErrorsToAccountsTableAction(errors)
           );
         } finally {
           yield put(updatingAccountAction({ id: existing.id as number, value: false }));

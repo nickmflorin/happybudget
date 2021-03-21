@@ -156,10 +156,10 @@ export function* handleSubAccountChangedTask(action: Redux.IAction<number>): Sag
 export function* handleSubAccountSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(action.payload) && !isNil(subaccountId)) {
-    const tableData: Table.ISubAccountRow[] = yield select(
+    const tableData: Table.SubAccountRow[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table.data
     );
-    const existing: Table.ISubAccountRow | undefined = find(tableData, { id: action.payload });
+    const existing: Table.SubAccountRow | undefined = find(tableData, { id: action.payload });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.warn(
@@ -190,7 +190,7 @@ export function* handleSubAccountSubAccountUpdateTask(action: Redux.IAction<Tabl
   if (!isNil(subaccountId) && !isNil(action.payload)) {
     const table = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table.data);
 
-    const existing: Table.ISubAccountRow = find(table, { id: action.payload.id });
+    const existing: Table.SubAccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.error(
@@ -217,12 +217,12 @@ export function* handleSubAccountSubAccountUpdateTask(action: Redux.IAction<Tabl
       if (existing.meta.isPlaceholder === true) {
         // TODO: Should we be using the payload data here?  Instead of the existing row?
         // Or we should probably merge them, right?
-        const requestPayload = postPayload<Table.ISubAccountRow>(existing, "subaccount");
+        const requestPayload = postPayload<Table.SubAccountRow>(existing, "subaccount");
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (rowHasRequiredFields<Table.ISubAccountRow>(existing, "subaccount")) {
+        if (rowHasRequiredFields<Table.SubAccountRow>(existing, "subaccount")) {
           yield put(creatingSubAccountSubAccountAction(true));
           try {
             const response = yield call(
@@ -239,7 +239,7 @@ export function* handleSubAccountSubAccountUpdateTask(action: Redux.IAction<Tabl
               e,
               "There was an error updating the sub account.",
               existing.id,
-              (errors: Table.ICellError[]) => addErrorsToSubAccountSubAccountsTableAction(errors)
+              (errors: Table.CellError[]) => addErrorsToSubAccountSubAccountsTableAction(errors)
             );
           } finally {
             yield put(creatingSubAccountSubAccountAction(false));
@@ -268,7 +268,7 @@ export function* handleSubAccountSubAccountUpdateTask(action: Redux.IAction<Tabl
             e,
             "There was an error updating the sub account.",
             existing.id,
-            (errors: Table.ICellError[]) => addErrorsToSubAccountSubAccountsTableAction(errors)
+            (errors: Table.CellError[]) => addErrorsToSubAccountSubAccountsTableAction(errors)
           );
         } finally {
           yield put(updatingSubAccountSubAccountAction({ id: existing.id as number, value: false }));

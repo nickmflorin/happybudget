@@ -29,7 +29,7 @@ const rootReducer = combineReducers({
     },
     { referenceEntity: "budget item tree node" }
   ),
-  table: createTableReducer<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow, IActual>(
+  table: createTableReducer<Table.ActualRow, IActual>(
     {
       AddPlaceholders: ActionType.ActualsTable.AddPlaceholders,
       RemoveRow: ActionType.ActualsTable.RemoveRow,

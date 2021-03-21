@@ -79,37 +79,8 @@ namespace ReducerFactory {
   }
 
   interface ITableReducerOptions<
-    F extends string,
-    E extends Table.IRowMeta,
-    R extends Table.IRow<F, E>,
+    R extends Table.Row<F, E>,
     M extends Model,
-    S extends Redux.ITableStore<F, E, R, M> = Redux.ITableStore<F, E, R, M>
+    S extends Redux.ITableStore<R, M> = Redux.ITableStore<R, M>
   > extends IOptions<S> {}
-
-  // interface IDetailResponseReducerOptions<
-  //   M extends Model,
-  //   S extends Redux.IDetailResponseStore<M> = Redux.IDetailResponseStore<M>,
-  //   A extends Redux.IAction<any> = Redux.IAction<any>
-  // > extends IOptions<S> {
-  //   excludeActions?: (action: A, state: S) => boolean | undefined | void;
-  //   excludeActionsFromExtensions?: boolean;
-  //   extensions?: TransformerExtensions<S, A>;
-  // }
-
-  // interface IListResponseReducerOptions<
-  //   M extends Model,
-  //   S extends Redux.IListResponseStore<M> = Redux.IListResponseStore<M>,
-  //   A extends Redux.IAction<any> = Redux.IAction<any>
-  // > extends IOptions<S> {
-  //   excludeActions?: (action: A, state: S) => boolean | undefined | void;
-  //   excludeActionsFromExtensions?: boolean;
-  //   extensions?: TransformerExtensions<S, A>;
-  //   extension?: Reducer<S, A>;
-  //   keyReducers?: { [key: string]: Reducer<any, A> };
-  // }
-
-  // interface ICommentsListResponseReducerOptions<
-  //   S extends ICommentsListResponseStore = ICommentsListResponseStore,
-  //   A extends Redux.IAction<any> = Redux.IAction<any>
-  // > extends IListResponseReducerOptions<IComment, S, A> {}
 }

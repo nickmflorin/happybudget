@@ -1,12 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
-import { isNil, includes } from "lodash";
+import { isNil, includes, map } from "lodash";
 
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
-import { GenericBudgetTable } from "components/tables";
+import { CreateSubAccountGroupModal } from "components/modals";
+import { BudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
@@ -29,6 +30,8 @@ import {
 } from "../actions";
 
 const Account = (): JSX.Element => {
+  const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
+
   const { accountId } = useParams<{ budgetId: string; accountId: string }>();
   const dispatch = useDispatch();
   const history = useHistory();
@@ -46,18 +49,18 @@ const Account = (): JSX.Element => {
   return (
     <RenderIfValidId id={[accountId]}>
       <RenderWithSpinner loading={accountStore.subaccounts.table.loading || accountStore.detail.loading}>
-        <GenericBudgetTable<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow>
+        <BudgetTable<Table.SubAccountRow>
           table={accountStore.subaccounts.table.data}
-          isCellEditable={(row: Table.ISubAccountRow, colDef: ColDef) => {
+          isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "unit", "variance"], colDef.field)) {
               return false;
             } else if (includes(["identifier", "description", "name"], colDef.field)) {
               return true;
             } else {
-              return row.meta.subaccounts.length === 0;
+              return !isNil(row.meta) && row.meta.subaccounts.length === 0;
             }
           }}
-          highlightNonEditableCell={(row: Table.ISubAccountRow, colDef: ColDef) => {
+          highlightNonEditableCell={(row: Table.SubAccountRow, colDef: ColDef) => {
             return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
           }}
           search={accountStore.subaccounts.table.search}
@@ -67,13 +70,19 @@ const Account = (): JSX.Element => {
             accountStore.subaccounts.updating.length !== 0 ||
             accountStore.subaccounts.creating
           }
-          rowRefreshRequired={(existing: Table.ISubAccountRow, row: Table.ISubAccountRow) => existing.unit !== row.unit}
+          rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
           onRowAdd={() => dispatch(addAccountSubAccountsTablePlaceholdersAction(1))}
           onRowSelect={(id: number) => dispatch(selectAccountSubAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectAccountSubAccountsTableRowAction(id))}
-          onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeAccountSubAccountAction(row.id))}
+          onRowDelete={(row: Table.SubAccountRow) => dispatch(removeAccountSubAccountAction(row.id))}
           onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountSubAccountAction(payload))}
           onRowExpand={(id: number) => history.push(`/budgets/${budget.id}/subaccounts/${id}`)}
+          groupParams={{
+            field: "group",
+            valueGetter: (row: Table.SubAccountRow) => (!isNil(row.group) ? row.group.name : null),
+            onGroupRows: (rows: Table.SubAccountRow[]) =>
+              setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
+          }}
           onSelectAll={() => dispatch(selectAllAccountSubAccountsTableRowsAction())}
           footerRow={{
             identifier: "Grand Total",
@@ -99,7 +108,7 @@ const Account = (): JSX.Element => {
               field: "description",
               headerName: "Category Description",
               colSpan: (params: ColSpanParams) =>
-                !isNil(params.data.meta) && params.data.meta.subaccounts.length !== 0 ? 6 : 1
+                !isNil(params.data) && !isNil(params.data.meta) && params.data.meta.subaccounts.length !== 0 ? 6 : 1
             },
             {
               field: "name",
@@ -117,7 +126,7 @@ const Account = (): JSX.Element => {
               cellClass: "cell--centered",
               cellRenderer: "UnitCell",
               cellRendererParams: {
-                onChange: (unit: Unit, row: Table.ISubAccountRow) =>
+                onChange: (unit: Unit, row: Table.SubAccountRow) =>
                   dispatch(
                     updateAccountSubAccountAction({
                       id: row.id,
@@ -188,6 +197,17 @@ const Account = (): JSX.Element => {
           onRequest: () => dispatch(requestAccountSubAccountsHistoryAction())
         }}
       />
+      {!isNil(groupSubAccounts) && (
+        <CreateSubAccountGroupModal
+          accountId={parseInt(accountId)}
+          subaccounts={groupSubAccounts}
+          open={true}
+          onSuccess={(group: ISubAccountGroup) => {
+            setGroupSubAccounts(undefined);
+          }}
+          onCancel={() => setGroupSubAccounts(undefined)}
+        />
+      )}
     </RenderIfValidId>
   );
 };

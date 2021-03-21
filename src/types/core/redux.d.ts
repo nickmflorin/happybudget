@@ -66,7 +66,7 @@ namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
-  interface ITableStore<F, E extends IRowMeta, R extends IRow<F, E>, M extends Model> {
+  interface ITableStore<R extends Row, M extends Model> {
     readonly data: IListStore<R>;
     readonly loading: boolean;
     readonly rawData: IListStore<M>;
@@ -125,12 +125,12 @@ namespace Redux {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
-      readonly table: ITableStore<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow, ISubAccount>;
+      readonly table: ITableStore<Table.SubAccountRow, ISubAccount>;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
     }
 
     interface IAccountsStore {
-      readonly table: ITableStore<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>;
+      readonly table: ITableStore<Table.AccountRow, IAccount>;
       readonly comments: ICommentsStore;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
       readonly deleting: ListStore<number>;
@@ -166,7 +166,7 @@ namespace Redux {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
-      readonly table: ITableStore<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow, IActual>;
+      readonly table: ITableStore<Table.ActualRow, IActual>;
     }
   }
 

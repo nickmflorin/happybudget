@@ -5,7 +5,7 @@ import { ICellRendererParams } from "ag-grid-community";
 import { IconButton } from "components/control/buttons";
 
 interface DeleteCellProps extends ICellRendererParams {
-  onClick: (data: Table.IAccountRow | Table.ISubAccountRow) => void;
+  onClick: (data: Table.AccountRow | Table.SubAccountRow) => void;
 }
 
 const DeleteCell = ({ onClick, node }: DeleteCellProps): JSX.Element => {

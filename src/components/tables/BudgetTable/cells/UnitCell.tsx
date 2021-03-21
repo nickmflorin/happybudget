@@ -3,7 +3,7 @@ import { ICellRendererParams, RowNode } from "ag-grid-community";
 import { UnitDropdown } from "components/control/dropdowns";
 
 interface UnitCellProps extends ICellRendererParams {
-  onChange: (id: Unit, row: Table.ISubAccountRow) => void;
+  onChange: (id: Unit, row: Table.SubAccountRow) => void;
   value: Unit | null;
   node: RowNode;
 }

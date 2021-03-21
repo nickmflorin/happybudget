@@ -6,7 +6,7 @@ import { isNil, includes } from "lodash";
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
-import { GenericBudgetTable } from "components/tables";
+import { BudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
@@ -47,9 +47,9 @@ const SubAccount = (): JSX.Element => {
   return (
     <RenderIfValidId id={[subaccountId]}>
       <RenderWithSpinner loading={subAccountStore.subaccounts.table.loading}>
-        <GenericBudgetTable<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow>
+        <BudgetTable<Table.SubAccountRow>
           table={subAccountStore.subaccounts.table.data}
-          isCellEditable={(row: Table.ISubAccountRow, colDef: ColDef) => {
+          isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "variance", "unit"], colDef.field)) {
               return false;
             } else if (includes(["identifier", "description", "name"], colDef.field)) {
@@ -58,7 +58,7 @@ const SubAccount = (): JSX.Element => {
               return row.meta.subaccounts.length === 0;
             }
           }}
-          highlightNonEditableCell={(row: Table.ISubAccountRow, colDef: ColDef) => {
+          highlightNonEditableCell={(row: Table.SubAccountRow, colDef: ColDef) => {
             return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
           }}
           search={subAccountStore.subaccounts.table.search}
@@ -68,11 +68,11 @@ const SubAccount = (): JSX.Element => {
             subAccountStore.subaccounts.updating.length !== 0 ||
             subAccountStore.subaccounts.creating
           }
-          rowRefreshRequired={(existing: Table.ISubAccountRow, row: Table.ISubAccountRow) => existing.unit !== row.unit}
+          rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
           onRowAdd={() => dispatch(addSubAccountSubAccountsTablePlaceholdersAction(1))}
           onRowSelect={(id: number) => dispatch(selectSubAccountSubAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectSubAccountSubAccountsTableRowAction(id))}
-          onRowDelete={(row: Table.ISubAccountRow) => dispatch(removeSubAccountSubAccountAction(row.id))}
+          onRowDelete={(row: Table.SubAccountRow) => dispatch(removeSubAccountSubAccountAction(row.id))}
           onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountSubAccountAction(payload))}
           onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           onSelectAll={() => dispatch(selectAllSubAccountSubAccountsTableRowsAction())}
@@ -118,7 +118,7 @@ const SubAccount = (): JSX.Element => {
               cellClass: "cell--centered",
               cellRenderer: "UnitCell",
               cellRendererParams: {
-                onChange: (unit: Unit, row: Table.ISubAccountRow) =>
+                onChange: (unit: Unit, row: Table.SubAccountRow) =>
                   dispatch(
                     updateSubAccountSubAccountAction({
                       id: row.id,

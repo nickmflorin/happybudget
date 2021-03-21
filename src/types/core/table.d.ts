@@ -1,26 +1,32 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Table {
-  interface ICellError {
-    id: number;
-    field: string;
-    error: string;
+  interface CellError {
+    readonly id: number;
+    readonly field: string;
+    readonly error: string;
   }
 
-  interface IRowMeta {
-    selected: boolean;
-    errors: ICellError[];
+  interface RowMeta {
+    readonly selected: boolean;
+    readonly errors: CellError[];
+    readonly isPlaceholder: boolean;
+  }
+
+  interface RowGroup {
+    readonly id: number;
+    readonly name: string;
   }
 
   interface PageAndSize {
-    page: number;
-    pageSize: number;
+    readonly page: number;
+    readonly pageSize: number;
   }
 
-  interface IRow<F extends string, E extends IRowMeta> {
-    id: number;
-    meta: E;
-    [key in F]: any;
+  interface Row<E extends RowMeta = RowMeta, G extends RowGroup = RowGroup> {
+    readonly id: number;
+    readonly meta: E;
+    readonly group: G | null;
   }
 
   interface CellChange {
@@ -40,28 +46,11 @@ namespace Table {
 
   type RowType = "account" | "subaccount" | "actual";
 
-  type AccountRowField = "identifier" | "description";
-  type SubAccountRowField = "identifier" | "name" | "description" | "quantity" | "unit" | "multiplier" | "rate";
-  type ActualRowField =
-    | "parent"
-    | "description"
-    | "vendor"
-    | "purchase_order"
-    | "date"
-    | "payment_method"
-    | "payment_id"
-    | "value";
-
-  interface IBudgetRowMeta extends IRowMeta {
-    readonly isPlaceholder: boolean;
+  interface BudgetRowMeta extends RowMeta {
     readonly subaccounts: ISimpleSubAccount[];
   }
 
-  interface IActualRowMeta extends IRowMeta {
-    readonly isPlaceholder: boolean;
-  }
-
-  interface IAccountRow extends IRow<AccountRowField, IBudgetRowMeta> {
+  interface AccountRow extends Row<BudgetRowMeta> {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
@@ -69,7 +58,7 @@ namespace Table {
     readonly actual: number | null;
   }
 
-  interface ISubAccountRow extends IRow<SubAccountRowField, IBudgetRowMeta> {
+  interface SubAccountRow extends Row<BudgetRowMeta, ISubAccountNestedGroup> {
     readonly identifier: string | null;
     readonly name: string | null;
     readonly description: string | null;
@@ -82,7 +71,7 @@ namespace Table {
     readonly variance: number | null;
   }
 
-  interface IActualRow extends IRow<ActualRowField, IActualRowMeta> {
+  interface ActualRow extends Row {
     readonly object_id: number | null;
     readonly parent_type: BudgetItemType | null;
     readonly description: string | null;

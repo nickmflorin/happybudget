@@ -42,7 +42,7 @@ const rootReducer = combineReducers({
       Editing: ActionType.Comments.Editing,
       Replying: ActionType.Comments.Replying
     }),
-    table: createTableReducer<Table.AccountRowField, Table.IBudgetRowMeta, Table.IAccountRow, IAccount>(
+    table: createTableReducer<Table.AccountRow, IAccount>(
       {
         AddPlaceholders: ActionType.AccountsTable.AddPlaceholders,
         RemoveRow: ActionType.AccountsTable.RemoveRow,
@@ -97,7 +97,7 @@ const rootReducer = combineReducers({
         { referenceEntity: "event" }
       ),
       creating: createSimpleBooleanReducer(ActionType.Account.SubAccounts.Creating),
-      table: createTableReducer<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow, ISubAccount>(
+      table: createTableReducer<Table.SubAccountRow, ISubAccount>(
         {
           AddPlaceholders: ActionType.Account.SubAccountsTable.AddPlaceholders,
           RemoveRow: ActionType.Account.SubAccountsTable.RemoveRow,
@@ -153,7 +153,7 @@ const rootReducer = combineReducers({
         },
         { referenceEntity: "event" }
       ),
-      table: createTableReducer<Table.SubAccountRowField, Table.IBudgetRowMeta, Table.ISubAccountRow, ISubAccount>(
+      table: createTableReducer<Table.SubAccountRow, ISubAccount>(
         {
           AddPlaceholders: ActionType.SubAccount.SubAccountsTable.AddPlaceholders,
           RemoveRow: ActionType.SubAccount.SubAccountsTable.RemoveRow,

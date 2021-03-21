@@ -11,7 +11,7 @@ interface SelectCellProps extends ICellRendererParams {
 const SelectCell = ({ onSelect, onDeselect, node }: SelectCellProps): JSX.Element => {
   return (
     <Checkbox
-      checked={node.data.meta.selected}
+      checked={node.group === false && node.data.meta.selected}
       onChange={(e: CheckboxChangeEvent) => {
         if (e.target.checked) {
           onSelect(node.data.id);

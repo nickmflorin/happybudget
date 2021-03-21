@@ -20,7 +20,7 @@ import {
 } from "../actions";
 import EditContactModal from "./EditContactModal";
 
-interface IRow {
+interface Row {
   key: number;
   name: string;
   role: ContactRoleName;
@@ -41,7 +41,7 @@ const ContactsTable = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    const tableData: IRow[] = [];
+    const tableData: Row[] = [];
     forEach(contacts.data, (contact: IContact) => {
       tableData.push({
         key: contact.id,
@@ -74,7 +74,7 @@ const ContactsTable = (): JSX.Element => {
         tableLayout={"fixed"}
         dataSource={data}
         loading={contacts.loading}
-        rowClassName={(record: IRow, index: number) => {
+        rowClassName={(record: Row, index: number) => {
           if (includes(contacts.deleting, record.key) || includes(contacts.updating, record.key)) {
             return "loading";
           }

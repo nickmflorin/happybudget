@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { map, isNil, includes, find, concat, uniq, forEach, filter } from "lodash";
 
 import { AgGridReact } from "ag-grid-react";
+
 import {
   ColDef,
   CellEditingStoppedEvent,
@@ -11,12 +12,12 @@ import {
   GridReadyEvent,
   RowNode,
   EditableCallbackParams,
-  GridOptions,
   ColumnApi,
   Column,
   CellKeyDownEvent,
   CellPosition,
-  NavigateToNextCellParams
+  NavigateToNextCellParams,
+  ValueGetterParams
 } from "ag-grid-community";
 
 import { downloadAsCsvFile } from "util/files";
@@ -33,7 +34,21 @@ export interface GetExportValueParams {
 
 type ExportValueGetters = { [key: string]: (params: GetExportValueParams) => string };
 
-interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R extends Table.IRow<F, E>> {
+interface GroupProps<
+  R extends Table.Row<E, G>,
+  E extends Table.RowMeta = Table.RowMeta,
+  G extends Table.RowGroup = Table.RowGroup
+> {
+  field: string;
+  valueGetter: (row: R) => any;
+  onGroupRows: (rows: R[]) => void;
+}
+
+interface BudgetTableProps<
+  R extends Table.Row<E, G>,
+  E extends Table.RowMeta = Table.RowMeta,
+  G extends Table.RowGroup = Table.RowGroup
+> {
   columns: ColDef[];
   table: R[];
   footerRow: Partial<R>;
@@ -45,6 +60,7 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R 
   nonEditableCells?: (keyof R)[];
   highlightedNonEditableCells?: (keyof R)[];
   nonHighlightedNonEditableCells?: (keyof R)[];
+  groupParams?: GroupProps<R, E, G>;
   cellClass?: (params: CellClassParams) => string | undefined;
   highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
@@ -59,7 +75,12 @@ interface GenericBudgetTableProps<F extends string, E extends Table.IRowMeta, R 
   isCellEditable?: (row: R, col: ColDef) => boolean;
 }
 
-const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extends Table.IRow<F, E>>({
+const BudgetTable = <
+  R extends Table.Row<E, G>,
+  E extends Table.RowMeta = Table.RowMeta,
+  G extends Table.RowGroup = Table.RowGroup
+>({
+  /* eslint-disable indent */
   columns,
   table,
   search,
@@ -71,6 +92,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   nonEditableCells,
   highlightedNonEditableCells,
   nonHighlightedNonEditableCells,
+  groupParams,
   cellClass,
   onSearch,
   onSelectAll,
@@ -83,7 +105,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   isCellEditable,
   highlightNonEditableCell,
   rowRefreshRequired
-}: GenericBudgetTableProps<F, E, R>) => {
+}: BudgetTableProps<R, E, G>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
@@ -92,8 +114,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   const [footerColumnApi, setFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [footerColDefs, setFooterColDefs] = useState<ColDef[]>([]);
-  const [gridOptions, setGridOptions] = useState<GridOptions | undefined>(undefined);
-  const [footerOptions, setFooterOptions] = useState<GridOptions | undefined>(undefined);
+  const [orderedTable, setOrderedTable] = useState<R[]>([]);
 
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
@@ -140,6 +161,19 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
     [nonEditableCells, isCellEditable]
   );
 
+  // useEffect(() => {
+  //   const groupedRows: R[] = [];
+  //   const ungroupedRows: R[] = [];
+  //   forEach(table, (row: R) => {
+  //     if (!isNil(groupParams)) {
+  //       if (!isNil(row[groupParams.field])) {
+  //       }
+  //     } else {
+  //       ungroupedRows.push(row);
+  //     }
+  //   });
+  // }, [table]);
+
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {
       const firstEditCol = columnApi.getAllDisplayedColumns()[2];
@@ -176,13 +210,15 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
     // based cells.  Therefore, we must trigger the refresh manually.
     if (!isNil(gridApi)) {
       gridApi.forEachNode((node: RowNode) => {
-        const existing: R | undefined = find(table, { id: node.data.id });
-        if (!isNil(existing)) {
-          if (
-            existing.meta.selected !== node.data.meta.selected ||
-            (!isNil(rowRefreshRequired) && rowRefreshRequired(existing, node.data))
-          ) {
-            gridApi.refreshCells({ force: true, rowNodes: [node] });
+        if (node.group === false) {
+          const existing: R | undefined = find(table, { id: node.data.id });
+          if (!isNil(existing)) {
+            if (
+              existing.meta.selected !== node.data.meta.selected ||
+              (!isNil(rowRefreshRequired) && rowRefreshRequired(existing, node.data))
+            ) {
+              gridApi.refreshCells({ force: true, rowNodes: [node] });
+            }
           }
         }
       });
@@ -195,21 +231,23 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
     // data structure for the row.
     if (!isNil(gridApi) && !isNil(columnApi)) {
       gridApi.forEachNode((node: RowNode) => {
-        const existing: R | undefined = find(table, { id: node.data.id });
-        if (!isNil(existing)) {
-          // TODO: We might want to do a deeper comparison in the future here.
-          if (existing.meta.errors.length !== node.data.meta.errors.length) {
-            const cols = columnApi.getAllColumns();
-            forEach(cols, (col: Column) => {
-              const colDef = col.getColDef();
-              if (!isNil(colDef.field)) {
-                const cellErrors = filter(existing.meta.errors, { id: node.data.id, field: colDef.field });
-                if (cellErrors.length !== 0) {
-                  col.setColDef({ ...colDef, cellClass: "cell--error" }, null);
-                  gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] });
+        if (node.group === false) {
+          const existing: R | undefined = find(table, { id: node.data.id });
+          if (!isNil(existing)) {
+            // TODO: We might want to do a deeper comparison in the future here.
+            if (existing.meta.errors.length !== node.data.meta.errors.length) {
+              const cols = columnApi.getAllColumns();
+              forEach(cols, (col: Column) => {
+                const colDef = col.getColDef();
+                if (!isNil(colDef.field)) {
+                  const cellErrors = filter(existing.meta.errors, { id: node.data.id, field: colDef.field });
+                  if (cellErrors.length !== 0) {
+                    col.setColDef({ ...colDef, cellClass: "cell--error" }, null);
+                    gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] });
+                  }
                 }
-              }
-            });
+              });
+            }
           }
         }
       });
@@ -227,29 +265,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   }, [table]);
 
   useEffect(() => {
-    const topOptions = {
-      alignedGrids: [],
-      defaultColDef: {
-        resizable: false,
-        sortable: true,
-        filter: false
-      },
-      suppressHorizontalScroll: true
-    };
-    const bottomOptions = {
-      alignedGrids: [],
-      defaultColDef: {
-        resizable: false,
-        sortable: true,
-        filter: false
-      }
-    };
-    setGridOptions(topOptions);
-    setFooterOptions(bottomOptions);
-  }, []);
-
-  useEffect(() => {
-    const baseLeftColumns: ColDef[] = [
+    let baseLeftColumns: ColDef[] = [
       {
         field: "select",
         editable: false,
@@ -259,6 +275,14 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
       }
     ];
+    if (!isNil(groupParams)) {
+      baseLeftColumns.push({
+        field: groupParams.field,
+        hide: true,
+        rowGroup: true,
+        valueGetter: (params: ValueGetterParams) => groupParams.valueGetter(params.data as R)
+      });
+    }
     if (!isNil(onRowExpand)) {
       baseLeftColumns.push({
         field: "expand",
@@ -269,16 +293,6 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
         cellRendererParams: { onClick: onRowExpand }
       });
     }
-    const baseRightColumns: ColDef[] = [
-      {
-        field: "delete",
-        editable: false,
-        headerName: "",
-        width: 40,
-        cellRenderer: "DeleteCell",
-        cellRendererParams: { onClick: onRowDelete }
-      }
-    ];
     setColDefs(
       map(
         concat(
@@ -291,7 +305,16 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
                 ...def
               } as ColDef)
           ),
-          baseRightColumns
+          [
+            {
+              field: "delete",
+              editable: false,
+              headerName: "",
+              width: 40,
+              cellRenderer: "DeleteCell",
+              cellRendererParams: { onClick: onRowDelete }
+            }
+          ]
         ),
         (col: ColDef) => ({
           ...col,
@@ -299,6 +322,9 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           suppressMenuHide: true,
           editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
           cellClass: (params: CellClassParams) => {
+            if (params.node.group === true) {
+              return "";
+            }
             if (includes(["delete", "select", "expand"], params.colDef.field)) {
               return "cell--action";
             }
@@ -383,10 +409,16 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
             }
           });
         }}
+        onGroup={() => {
+          if (!isNil(groupParams)) {
+            groupParams.onGroupRows(filter(table, (row: R) => row.meta.selected === true));
+          }
+        }}
         saving={saving}
         selected={allSelected}
         onSelect={onSelectAll}
         deleteDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
+        groupDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
         onExport={(fields: Field[]) => {
           if (!isNil(gridApi) && !isNil(columnApi)) {
             const includeColumn = (col: Column): boolean => {
@@ -467,7 +499,12 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
       />
       <div className={"primary-grid"}>
         <AgGridReact
-          gridOptions={gridOptions}
+          defaultColDef={{
+            resizable: false,
+            sortable: true,
+            filter: false
+          }}
+          suppressHorizontalScroll={true}
           columnDefs={colDefs}
           rowDragManaged={true}
           allowContextMenuWithControlKey={true}
@@ -481,7 +518,10 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
           enableRangeSelection={true}
           clipboardDeliminator={","}
           domLayout={"autoHeight"}
-          defaultColDef={{ editable: true }}
+          groupDefaultExpanded={1}
+          groupUseEntireRow={true}
+          rowGroupPanelShow={"never"}
+          animateRows={true}
           navigateToNextCell={(params: NavigateToNextCellParams): CellPosition => {
             if (!isNil(params.nextCellPosition)) {
               if (includes(["estimated", "expand", "select", "delete"], params.nextCellPosition.column.getColId())) {
@@ -518,7 +558,7 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
             ...frameworkComponents
           }}
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {
-            const field = event.column.getColId() as F;
+            const field = event.column.getColId();
             if (!isNil(event.newValue)) {
               if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
                 if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
@@ -542,7 +582,12 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
       </div>
       <div className={"footer-grid"}>
         <AgGridReact
-          gridOptions={footerOptions}
+          defaultColDef={{
+            resizable: false,
+            sortable: false,
+            filter: false
+          }}
+          suppressHorizontalScroll={true}
           columnDefs={footerColDefs}
           rowData={[{ meta: { subaccounts: [], errors: [], selected: false, isPlaceholder: false }, ...footerRow }]}
           suppressRowClickSelection={true}
@@ -559,4 +604,4 @@ const GenericBudgetTable = <F extends string, E extends Table.IRowMeta, R extend
   );
 };
 
-export default GenericBudgetTable;
+export default BudgetTable;

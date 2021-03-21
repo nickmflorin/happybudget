@@ -34,7 +34,7 @@ export const ActionType = {
 
 export const addActualsTablePlaceholdersAction = simpleAction<number>(ActionType.ActualsTable.AddPlaceholders);
 export const updateActualAction = simpleAction<Table.RowChange>(ActionType.Update);
-export const updateActualsTableRowAction = simpleAction<{ id: number; data: Partial<Table.IActualRow> }>(
+export const updateActualsTableRowAction = simpleAction<{ id: number; data: Partial<Table.ActualRow> }>(
   ActionType.ActualsTable.UpdateRow
 );
 export const activateActualsPlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
@@ -43,8 +43,8 @@ export const activateActualsPlaceholderAction = simpleAction<Table.IActivatePlac
 export const selectActualsTableRowAction = simpleAction<number>(ActionType.ActualsTable.SelectRow);
 export const selectAllActualsTableRowsAction = simpleAction<null>(ActionType.ActualsTable.SelectAllRows);
 export const deselectActualsTableRowAction = simpleAction<number>(ActionType.ActualsTable.DeselectRow);
-export const removeActualsTableRowAction = simpleAction<Table.IActualRow>(ActionType.ActualsTable.RemoveRow);
-export const removeActualAction = simpleAction<Table.IActualRow>(ActionType.Remove);
+export const removeActualsTableRowAction = simpleAction<Table.ActualRow>(ActionType.ActualsTable.RemoveRow);
+export const removeActualAction = simpleAction<Table.ActualRow>(ActionType.Remove);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Deleting);
 export const updatingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Updating);
 export const creatingActualAction = simpleAction<boolean>(ActionType.Creating);
@@ -52,7 +52,7 @@ export const requestActualsAction = simpleAction<null>(ActionType.ActualsTable.R
 export const loadingActualsAction = simpleAction<boolean>(ActionType.ActualsTable.Loading);
 export const responseActualsAction = simpleAction<Http.IListResponse<IActual>>(ActionType.ActualsTable.Response);
 export const setActualsSearchAction = simpleAction<string>(ActionType.ActualsTable.SetSearch);
-export const addErrorsToActualsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
+export const addErrorsToActualsTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.ActualsTable.AddErrors
 );
 

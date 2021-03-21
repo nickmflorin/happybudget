@@ -14,7 +14,7 @@ interface ValueCellProps extends ICellRendererParams {
 }
 
 const ValueCell = ({ value, node, colDef, renderRedIfNegative = false, formatter }: ValueCellProps): JSX.Element => {
-  const [cellErrors, setCellErrors] = useState<Table.ICellError[]>([]);
+  const [cellErrors, setCellErrors] = useState<Table.CellError[]>([]);
   const [cellValue, setCellValue] = useState<string | number | null>(null);
 
   const renderRed = useMemo(() => {
@@ -45,15 +45,15 @@ const ValueCell = ({ value, node, colDef, renderRedIfNegative = false, formatter
   }, [value, formatter]);
 
   useEffect(() => {
-    if (!isNil(colDef.field)) {
+    if (!isNil(colDef.field) && node.group === false) {
       setCellErrors(
         filter(
           node.data.meta.errors,
-          (error: Table.ICellError) => error.field === colDef.field && error.id === node.data.id
+          (error: Table.CellError) => error.field === colDef.field && error.id === node.data.id
         )
       );
     }
-  }, [node.data.meta.errors, node.data.id, colDef]);
+  }, [node.data, node.group, colDef]);
 
   // TODO: For now, we will just use the first error.
   if (!isNil(value) && cellErrors.length !== 0) {

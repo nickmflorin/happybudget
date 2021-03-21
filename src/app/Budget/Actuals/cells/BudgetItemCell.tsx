@@ -4,7 +4,7 @@ import { ICellRendererParams, RowNode } from "ag-grid-community";
 import { BudgetItemsTreeSelect } from "components/control/dropdowns";
 
 interface UnitCellProps extends ICellRendererParams {
-  onChange: (object_id: number, parent_type: string, row: Table.IActualRow) => void;
+  onChange: (object_id: number, parent_type: string, row: Table.ActualRow) => void;
   node: RowNode;
 }
 

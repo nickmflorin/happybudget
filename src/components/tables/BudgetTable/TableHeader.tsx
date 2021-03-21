@@ -1,7 +1,7 @@
 import { isNil, map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPlusSquare, faPercentage } from "@fortawesome/free-solid-svg-icons";
+import { faTrash, faPlusSquare, faPercentage, faObjectGroup } from "@fortawesome/free-solid-svg-icons";
 
 import { Input, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -21,9 +21,11 @@ interface TableHeaderProps {
   selected?: boolean;
   search: string;
   deleteDisabled?: boolean;
+  groupDisabled?: boolean;
   columns: ColDef[];
   setSearch: (value: string) => void;
   onDelete: () => void;
+  onGroup?: () => void;
   onSelect: (checked: boolean) => void;
   onColumnsChange: (fields: Field[]) => void;
   onExport: (fields: Field[]) => void;
@@ -35,9 +37,11 @@ const TableHeader = ({
   saving = false,
   columns,
   deleteDisabled = false,
+  groupDisabled = false,
   setSearch,
   onDelete,
   onSelect,
+  onGroup,
   onColumnsChange,
   onExport
 }: TableHeaderProps): JSX.Element => {
@@ -50,6 +54,13 @@ const TableHeader = ({
         icon={<FontAwesomeIcon icon={faTrash} />}
         onClick={() => onDelete()}
         disabled={deleteDisabled}
+      />
+      <IconButton
+        className={"dark"}
+        size={"large"}
+        disabled={isNil(onGroup) || groupDisabled}
+        onClick={() => !isNil(onGroup) && onGroup()}
+        icon={<FontAwesomeIcon icon={faObjectGroup} />}
       />
       <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faPlusSquare} />} />
       <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faPercentage} />} />

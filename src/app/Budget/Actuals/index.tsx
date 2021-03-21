@@ -5,8 +5,8 @@ import { isNil, find } from "lodash";
 import { CellClassParams } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
-import { GenericBudgetTable } from "components/tables";
-import { GetExportValueParams } from "components/tables/GenericBudgetTable";
+import { BudgetTable } from "components/tables";
+import { GetExportValueParams } from "components/tables/BudgetTable";
 import { setAncestorsAction } from "../actions";
 import {
   requestBudgetItemsAction,
@@ -50,7 +50,7 @@ const Actuals = (): JSX.Element => {
 
   return (
     <RenderWithSpinner loading={actuals.table.loading || budget.detail.loading}>
-      <GenericBudgetTable<Table.ActualRowField, Table.IActualRowMeta, Table.IActualRow>
+      <BudgetTable<Table.ActualRow>
         table={actuals.table.data}
         nonEditableCells={["object_id", "payment_method"]}
         nonHighlightedNonEditableCells={["payment_method", "object_id"]}
@@ -60,11 +60,11 @@ const Actuals = (): JSX.Element => {
         onRowAdd={() => dispatch(addActualsTablePlaceholdersAction(1))}
         onRowSelect={(id: number) => dispatch(selectActualsTableRowAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectActualsTableRowAction(id))}
-        onRowDelete={(row: Table.IActualRow) => dispatch(removeActualAction(row))}
+        onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateActualAction(payload))}
         onSelectAll={() => dispatch(selectAllActualsTableRowsAction())}
         frameworkComponents={{ BudgetItemCell, PaymentMethodsCell }}
-        rowRefreshRequired={(existing: Table.IActualRow, row: Table.IActualRow) => {
+        rowRefreshRequired={(existing: Table.ActualRow, row: Table.ActualRow) => {
           return (
             existing.object_id !== row.object_id ||
             existing.parent_type !== row.parent_type ||
@@ -95,7 +95,7 @@ const Actuals = (): JSX.Element => {
             cellClass: "borderless",
             cellRenderer: "BudgetItemCell",
             cellRendererParams: {
-              onChange: (object_id: number, parent_type: BudgetItemType, row: Table.IActualRow) => {
+              onChange: (object_id: number, parent_type: BudgetItemType, row: Table.ActualRow) => {
                 dispatch(
                   updateActualAction({
                     id: row.id,
@@ -131,7 +131,7 @@ const Actuals = (): JSX.Element => {
             cellRenderer: "PaymentMethodsCell",
             cellClass: "cell--centered",
             cellRendererParams: {
-              onChange: (paymentMethod: PaymentMethod, row: Table.IActualRow) =>
+              onChange: (paymentMethod: PaymentMethod, row: Table.ActualRow) =>
                 dispatch(
                   updateActualAction({
                     id: row.id,

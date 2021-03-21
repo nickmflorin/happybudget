@@ -11,7 +11,7 @@ export const userToSimpleUser = (user: IUser): ISimpleUser => {
   };
 };
 
-export const initializeRowFromActual = (actual: IActual): Table.IActualRow => {
+export const initializeRowFromActual = (actual: IActual): Table.ActualRow => {
   return {
     id: actual.id,
     meta: {
@@ -27,11 +27,12 @@ export const initializeRowFromActual = (actual: IActual): Table.IActualRow => {
     value: actual.value,
     payment_method: actual.payment_method,
     object_id: actual.object_id,
-    parent_type: actual.parent_type
+    parent_type: actual.parent_type,
+    group: null
   };
 };
 
-export const createActualRowPlaceholder = (): Table.IActualRow => ({
+export const createActualRowPlaceholder = (): Table.ActualRow => ({
   id: generateRandomNumericId(),
   meta: {
     isPlaceholder: true,
@@ -46,10 +47,11 @@ export const createActualRowPlaceholder = (): Table.IActualRow => ({
   value: null,
   payment_method: null,
   object_id: null,
-  parent_type: null
+  parent_type: null,
+  group: null
 });
 
-export const initializeRowFromAccount = (account: IAccount): Table.IAccountRow => ({
+export const initializeRowFromAccount = (account: IAccount): Table.AccountRow => ({
   id: account.id,
   meta: {
     isPlaceholder: false,
@@ -61,10 +63,11 @@ export const initializeRowFromAccount = (account: IAccount): Table.IAccountRow =
   description: account.description,
   estimated: account.estimated,
   variance: account.variance,
-  actual: account.actual
+  actual: account.actual,
+  group: null
 });
 
-export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.ISubAccountRow => ({
+export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.SubAccountRow => ({
   id: subaccount.id,
   meta: {
     isPlaceholder: false,
@@ -81,10 +84,11 @@ export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.ISub
   description: subaccount.description,
   estimated: subaccount.estimated,
   variance: subaccount.variance,
-  actual: subaccount.actual
+  actual: subaccount.actual,
+  group: subaccount.group
 });
 
-export const createSubAccountRowPlaceholder = (): Table.ISubAccountRow => ({
+export const createSubAccountRowPlaceholder = (): Table.SubAccountRow => ({
   id: generateRandomNumericId(),
   name: null,
   identifier: null,
@@ -96,6 +100,7 @@ export const createSubAccountRowPlaceholder = (): Table.ISubAccountRow => ({
   estimated: null,
   variance: null,
   actual: null,
+  group: null,
   meta: {
     isPlaceholder: true,
     selected: false,
@@ -104,13 +109,14 @@ export const createSubAccountRowPlaceholder = (): Table.ISubAccountRow => ({
   }
 });
 
-export const createAccountRowPlaceholder = (): Table.IAccountRow => ({
+export const createAccountRowPlaceholder = (): Table.AccountRow => ({
   id: generateRandomNumericId(),
   identifier: null,
   description: null,
   estimated: null,
   variance: null,
   actual: null,
+  group: null,
   meta: {
     isPlaceholder: true,
     selected: false,

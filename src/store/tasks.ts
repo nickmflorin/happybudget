@@ -9,10 +9,10 @@ export function* handleTableErrors(
   e: Error,
   message: string,
   id: number,
-  action: (errors: Table.ICellError[]) => Redux.IAction<any>
+  action: (errors: Table.CellError[]) => Redux.IAction<any>
 ): SagaIterator {
   if (e instanceof ClientError) {
-    const cellErrors: Table.ICellError[] = [];
+    const cellErrors: Table.CellError[] = [];
     forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
       cellErrors.push({
         id: id,

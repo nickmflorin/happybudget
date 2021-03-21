@@ -179,7 +179,7 @@ export const updateBudgetCommentInStateAction = simpleAction<Redux.UpdateModelAc
 */
 export const addAccountsTablePlaceholdersAction = simpleAction<number>(ActionType.AccountsTable.AddPlaceholders);
 export const updateAccountAction = simpleAction<Table.RowChange>(ActionType.Accounts.Update);
-export const updateAccountsTableRowAction = simpleAction<{ id: number; data: Partial<Table.IAccountRow> }>(
+export const updateAccountsTableRowAction = simpleAction<{ id: number; data: Partial<Table.AccountRow> }>(
   ActionType.AccountsTable.UpdateRow
 );
 export const activateAccountsTablePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
@@ -197,7 +197,7 @@ export const requestAccountsAction = simpleAction<null>(ActionType.AccountsTable
 export const loadingAccountsAction = simpleAction<boolean>(ActionType.AccountsTable.Loading);
 export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.AccountsTable.Response);
 export const setAccountsSearchAction = simpleAction<string>(ActionType.AccountsTable.SetSearch);
-export const addErrorsToAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
+export const addErrorsToAccountsTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.AccountsTable.AddErrors
 );
 
@@ -261,7 +261,7 @@ export const selectAllAccountSubAccountsTableRowsAction = simpleAction<null>(
 );
 export const updateAccountSubAccountsTableRowAction = simpleAction<{
   id: number;
-  data: Partial<Table.ISubAccountRow>;
+  data: Partial<Table.SubAccountRow>;
 }>(ActionType.Account.SubAccountsTable.UpdateRow);
 export const activateAccountSubAccountsTablePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
   ActionType.Account.SubAccountsTable.ActivatePlaceholder
@@ -283,7 +283,7 @@ export const responseAccountSubAccountsAction = simpleAction<Http.IListResponse<
   ActionType.Account.SubAccountsTable.Response
 );
 export const setAccountSubAccountsSearchAction = simpleAction<string>(ActionType.Account.SubAccountsTable.SetSearch);
-export const addErrorsToAccountSubAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
+export const addErrorsToAccountSubAccountsTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.Account.SubAccountsTable.AddErrors
 );
 
@@ -352,7 +352,7 @@ export const deselectSubAccountSubAccountsTableRowAction = simpleAction<number>(
 );
 export const updateSubAccountSubAccountsTableRowAction = simpleAction<{
   id: number;
-  data: Partial<Table.ISubAccountRow>;
+  data: Partial<Table.SubAccountRow>;
 }>(ActionType.SubAccount.SubAccountsTable.UpdateRow);
 export const activateSubAccountSubAccountsTablePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
   ActionType.SubAccount.SubAccountsTable.ActivatePlaceholder
@@ -376,7 +376,7 @@ export const responseSubAccountSubAccountsAction = simpleAction<Http.IListRespon
 export const setSubAccountSubAccountsSearchAction = simpleAction<string>(
   ActionType.SubAccount.SubAccountsTable.SetSearch
 );
-export const addErrorsToSubAccountSubAccountsTableAction = simpleAction<Table.ICellError | Table.ICellError[]>(
+export const addErrorsToSubAccountSubAccountsTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.SubAccount.SubAccountsTable.AddErrors
 );
 

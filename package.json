@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@ag-grid-community/react": "^25.1.0",
     "@ag-grid-enterprise/all-modules": "^25.1.0",
     "@ag-grid-enterprise/charts": "^25.1.0",
     "@ag-grid-enterprise/clipboard": "^25.1.0",

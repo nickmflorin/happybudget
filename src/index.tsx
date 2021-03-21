@@ -7,8 +7,12 @@ import "style/index.scss";
 import App from "./app";
 import reportWebVitals from "./config/reportWebVitals";
 
+import "ag-grid-enterprise";
+
 let agGridKey = process.env.REACT_APP_AG_GRID_KEY;
 if (!isNil(agGridKey)) {
+  /* eslint-disable no-console */
+  console.info("Setting AG Grid License Key");
   LicenseManager.setLicenseKey(agGridKey);
 } else {
   /* eslint-disable no-console */
