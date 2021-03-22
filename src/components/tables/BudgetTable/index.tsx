@@ -511,6 +511,7 @@ const BudgetTable = <
             filter: false
           }}
           suppressHorizontalScroll={true}
+          suppressContextMenu={true}
           columnDefs={colDefs}
           rowDragManaged={true}
           allowContextMenuWithControlKey={true}
