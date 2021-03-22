@@ -27,6 +27,7 @@ namespace Table {
     readonly id: number;
     readonly meta: E;
     readonly group: G | null;
+    // readonly [key: string]: any;
   }
 
   interface CellChange {

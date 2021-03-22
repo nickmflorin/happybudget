@@ -39,7 +39,7 @@ interface GroupProps<
   E extends Table.RowMeta = Table.RowMeta,
   G extends Table.RowGroup = Table.RowGroup
 > {
-  field: string;
+  field: keyof R;
   valueGetter: (row: R) => any;
   onGroupRows: (rows: R[]) => void;
 }
@@ -161,18 +161,24 @@ const BudgetTable = <
     [nonEditableCells, isCellEditable]
   );
 
-  // useEffect(() => {
-  //   const groupedRows: R[] = [];
-  //   const ungroupedRows: R[] = [];
-  //   forEach(table, (row: R) => {
-  //     if (!isNil(groupParams)) {
-  //       if (!isNil(row[groupParams.field])) {
-  //       }
-  //     } else {
-  //       ungroupedRows.push(row);
-  //     }
-  //   });
-  // }, [table]);
+  useEffect(() => {
+    const groupedRows: R[] = [];
+    const ungroupedRows: R[] = [];
+    forEach(table, (row: R) => {
+      if (!isNil(groupParams)) {
+        if (!isNil(row[groupParams.field])) {
+          groupedRows.push(row);
+        } else {
+          ungroupedRows.push(row);
+        }
+      } else {
+        ungroupedRows.push(row);
+      }
+    });
+    // Make sure that ungrouped rows are at the top, AG Grid will handle ordering
+    // of the grouped rows.
+    setOrderedTable(concat(ungroupedRows, groupedRows));
+  }, [table]);
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {
@@ -196,7 +202,7 @@ const BudgetTable = <
       gridApi.sizeColumnsToFit();
       footerGridApi.sizeColumnsToFit();
     }
-  }, [table, gridApi, footerGridApi]);
+  }, [orderedTable, gridApi, footerGridApi]);
 
   useEffect(() => {
     if (!isNil(gridApi)) {
@@ -211,7 +217,7 @@ const BudgetTable = <
     if (!isNil(gridApi)) {
       gridApi.forEachNode((node: RowNode) => {
         if (node.group === false) {
-          const existing: R | undefined = find(table, { id: node.data.id });
+          const existing: R | undefined = find(orderedTable, { id: node.data.id });
           if (!isNil(existing)) {
             if (
               existing.meta.selected !== node.data.meta.selected ||
@@ -232,7 +238,7 @@ const BudgetTable = <
     if (!isNil(gridApi) && !isNil(columnApi)) {
       gridApi.forEachNode((node: RowNode) => {
         if (node.group === false) {
-          const existing: R | undefined = find(table, { id: node.data.id });
+          const existing: R | undefined = find(orderedTable, { id: node.data.id });
           if (!isNil(existing)) {
             // TODO: We might want to do a deeper comparison in the future here.
             if (existing.meta.errors.length !== node.data.meta.errors.length) {
@@ -252,17 +258,17 @@ const BudgetTable = <
         }
       });
     }
-  }, [table, gridApi, columnApi]);
+  }, [orderedTable, gridApi, columnApi]);
 
   useEffect(() => {
-    const mapped = map(table, (row: R) => row.meta.selected);
+    const mapped = map(orderedTable, (row: R) => row.meta.selected);
     const uniques = uniq(mapped);
     if (uniques.length === 1 && uniques[0] === true) {
       setAllSelected(true);
     } else {
       setAllSelected(false);
     }
-  }, [table]);
+  }, [orderedTable]);
 
   useEffect(() => {
     let baseLeftColumns: ColDef[] = [
@@ -277,7 +283,7 @@ const BudgetTable = <
     ];
     if (!isNil(groupParams)) {
       baseLeftColumns.push({
-        field: groupParams.field,
+        field: groupParams.field as string,
         hide: true,
         rowGroup: true,
         valueGetter: (params: ValueGetterParams) => groupParams.valueGetter(params.data as R)
@@ -403,7 +409,7 @@ const BudgetTable = <
         setSearch={(value: string) => onSearch(value)}
         columns={columns}
         onDelete={() => {
-          forEach(table, (row: R) => {
+          forEach(orderedTable, (row: R) => {
             if (row.meta.selected === true) {
               onRowDelete(row);
             }
@@ -411,14 +417,14 @@ const BudgetTable = <
         }}
         onGroup={() => {
           if (!isNil(groupParams)) {
-            groupParams.onGroupRows(filter(table, (row: R) => row.meta.selected === true));
+            groupParams.onGroupRows(filter(orderedTable, (row: R) => row.meta.selected === true));
           }
         }}
         saving={saving}
         selected={allSelected}
         onSelect={onSelectAll}
-        deleteDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
-        groupDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
+        deleteDisabled={filter(orderedTable, (row: R) => row.meta.selected === true).length === 0}
+        groupDisabled={filter(orderedTable, (row: R) => row.meta.selected === true).length === 0}
         onExport={(fields: Field[]) => {
           if (!isNil(gridApi) && !isNil(columnApi)) {
             const includeColumn = (col: Column): boolean => {
@@ -508,7 +514,7 @@ const BudgetTable = <
           columnDefs={colDefs}
           rowDragManaged={true}
           allowContextMenuWithControlKey={true}
-          rowData={table}
+          rowData={orderedTable}
           getRowNodeId={(data: any) => data.id}
           immutableData={true}
           suppressRowClickSelection={true}
