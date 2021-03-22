@@ -11,11 +11,13 @@ namespace Table {
     readonly selected: boolean;
     readonly errors: CellError[];
     readonly isPlaceholder: boolean;
+    readonly isGroupFooter: boolean;
   }
 
   interface RowGroup {
     readonly id: number;
     readonly name: string;
+    readonly color: string;
   }
 
   interface PageAndSize {
@@ -27,7 +29,6 @@ namespace Table {
     readonly id: number;
     readonly meta: E;
     readonly group: G | null;
-    // readonly [key: string]: any;
   }
 
   interface CellChange {

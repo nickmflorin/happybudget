@@ -160,6 +160,7 @@ $table-border: 1px solid $table-border-color;
   .ag-layout-print .ag-center-cols-container {
     min-height: 0px !important;
   }
+
   .ag-root-wrapper {
     border: none;
   }
@@ -181,12 +182,6 @@ $table-border: 1px solid $table-border-color;
     }
   }
 
-  .ag-cell-range-selected {
-    background-color: $white !important;
-  }
-  div.ag-cell-value[col-id='lineNumber'] {
-    padding: 0;
-  }
   div[role='gridcell'] {
     font-size: 12px;
     font-weight: 300;
@@ -200,6 +195,7 @@ $table-border: 1px solid $table-border-color;
       border-bottom: $table-border;
       border-left: $table-border;
     }
+
     // This will vertically center the text nicely while also not adjusting the
     // vertical location of the text when the cell is selected.
     .ag-react-container {
@@ -263,6 +259,7 @@ $table-border: 1px solid $table-border-color;
         border: none !important;
       }
     }
+
     &.ag-cell-focus {
       &:not(.cell--not-editable) {
         border: 2px solid $green !important;
@@ -278,10 +275,12 @@ $table-border: 1px solid $table-border-color;
       }
     }
   }
+
   .ag-row {
     background: $white !important;
     border: none !important;
-    &.ag-row-hover {
+
+    &.ag-row-hover:not(.row--group-footer) {
       div[role='gridcell'] {
         &:not(.cell--not-editable-highlight) {
           background-color: $gray-highlight !important;
@@ -298,7 +297,100 @@ $table-border: 1px solid $table-border-color;
         border-bottom: none !important;
       }
     }
+    &.row {
+      &--group-footer {
+        div[role='gridcell'] {
+          &:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+          }
+          &:last-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+          }
+        }
+        // Unfortunately, I have not been able to figure out a way around applying
+        // the background colors to the group footer row such that the classes do
+        // not have to be hardcoded in with the color reference.
+        &.bg-797695 {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #797695;
+          }
+        }
+        &.bg-ff7165 {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #ff7165;
+          }
+        }
+        &.bg-80cbc4 {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #80cbc4;
+          }
+        }
+        &.bg-ce93d8 {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #ce93d8;
+          }
+        }
+        &.bg-fed835 {
+          div[role='gridcell'] {
+            background-color: #fed835;
+          }
+        }
+        &.bg-c87987 {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #c87987;
+          }
+        }
+        &.bg-69f0ae {
+          div[role='gridcell'] {
+            background-color: #69f0ae;
+          }
+        }
+        &.bg-a1887f {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #a1887f;
+          }
+        }
+        &.bg-81d4fa {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #81d4fa;
+          }
+        }
+        &.bg-f75776 {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #f75776;
+          }
+        }
+        &.bg-66bb6a {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #66bb6a;
+          }
+        }
+        &.bg-58add6 {
+          div[role='gridcell'] {
+            color: $white !important;
+            background-color: #58add6;
+          }
+        }
+        &.bg-EFEFEF {
+          div[role='gridcell'] {
+            background-color: #EFEFEF;
+          }
+        }
+      }
+    }
   }
+
   .ag-cell-inline-editing {
     height: 36px;
     border-radius: 0px !important;

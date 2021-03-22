@@ -16,6 +16,7 @@ export const initializeRowFromActual = (actual: IActual): Table.ActualRow => {
     id: actual.id,
     meta: {
       isPlaceholder: false,
+      isGroupFooter: false,
       selected: false,
       errors: []
     },
@@ -36,6 +37,7 @@ export const createActualRowPlaceholder = (): Table.ActualRow => ({
   id: generateRandomNumericId(),
   meta: {
     isPlaceholder: true,
+    isGroupFooter: false,
     selected: false,
     errors: []
   },
@@ -55,6 +57,7 @@ export const initializeRowFromAccount = (account: IAccount): Table.AccountRow =>
   id: account.id,
   meta: {
     isPlaceholder: false,
+    isGroupFooter: false,
     selected: false,
     subaccounts: account.subaccounts,
     errors: []
@@ -71,6 +74,7 @@ export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.SubA
   id: subaccount.id,
   meta: {
     isPlaceholder: false,
+    isGroupFooter: false,
     selected: false,
     subaccounts: subaccount.subaccounts,
     errors: []
@@ -103,6 +107,7 @@ export const createSubAccountRowPlaceholder = (): Table.SubAccountRow => ({
   group: null,
   meta: {
     isPlaceholder: true,
+    isGroupFooter: false,
     selected: false,
     subaccounts: [],
     errors: []
@@ -119,6 +124,7 @@ export const createAccountRowPlaceholder = (): Table.AccountRow => ({
   group: null,
   meta: {
     isPlaceholder: true,
+    isGroupFooter: false,
     selected: false,
     subaccounts: [],
     errors: []

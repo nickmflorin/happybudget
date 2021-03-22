@@ -1,6 +1,6 @@
 import { useCallback, useState, useEffect } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, uniq, forEach, filter } from "lodash";
+import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
 
 import { AgGridReact } from "ag-grid-react";
 
@@ -17,7 +17,9 @@ import {
   CellKeyDownEvent,
   CellPosition,
   NavigateToNextCellParams,
-  ValueGetterParams
+  ValueGetterParams,
+  ColSpanParams,
+  RowClassParams
 } from "ag-grid-community";
 
 import { downloadAsCsvFile } from "util/files";
@@ -41,7 +43,9 @@ interface GroupProps<
 > {
   field: keyof R;
   valueGetter: (row: R) => any;
+  groupGetter: (row: R) => G | null;
   onGroupRows: (rows: R[]) => void;
+  createFooter: (group: G) => R;
 }
 
 interface BudgetTableProps<
@@ -162,23 +166,36 @@ const BudgetTable = <
   );
 
   useEffect(() => {
-    const groupedRows: R[] = [];
-    const ungroupedRows: R[] = [];
-    forEach(table, (row: R) => {
-      if (!isNil(groupParams)) {
-        if (!isNil(row[groupParams.field])) {
-          groupedRows.push(row);
-        } else {
-          ungroupedRows.push(row);
+    if (!isNil(groupParams)) {
+      const rowsWithGroup = filter(table, (row: R) => !isNil(groupParams.valueGetter(row)));
+      const rowsWithoutGroup = filter(table, (row: R) => isNil(groupParams.valueGetter(row)));
+
+      const newOrderedTable: R[] = [];
+
+      const groupedRows: { [key: number]: R[] } = groupBy(
+        rowsWithGroup,
+        (row: R) => (groupParams.groupGetter(row) as G).id
+      );
+
+      const allGroups: (G | null)[] = map(rowsWithGroup, (row: R) => groupParams.groupGetter(row));
+      const groups: G[] = [];
+      forEach(allGroups, (group: G | null) => {
+        if (!isNil(group) && isNil(find(groups, { id: group.id }))) {
+          groups.push(group);
         }
-      } else {
-        ungroupedRows.push(row);
-      }
-    });
-    // Make sure that ungrouped rows are at the top, AG Grid will handle ordering
-    // of the grouped rows.
-    setOrderedTable(concat(ungroupedRows, groupedRows));
-  }, [table]);
+      });
+      forEach(groupedRows, (rows: R[], groupId: string) => {
+        const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
+        if (!isNil(group)) {
+          const footer: R = groupParams.createFooter(group);
+          newOrderedTable.push(...rows, { ...footer, group, meta: { ...footer.meta, isGroupFooter: true } });
+        }
+      });
+      setOrderedTable([...newOrderedTable, ...rowsWithoutGroup]);
+    } else {
+      setOrderedTable(table);
+    }
+  }, [table, gridApi]);
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {
@@ -327,6 +344,16 @@ const BudgetTable = <
           suppressMenu: true,
           suppressMenuHide: true,
           editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
+          colSpan: (params: ColSpanParams) => {
+            const row: R = params.data;
+            if (row.meta.isGroupFooter === true) {
+              return baseLeftColumns.length + columns.length + 1;
+            } else if (!isNil(col.colSpan)) {
+              return col.colSpan(params);
+            }
+            return 1;
+          },
+          // !isNil(params.data) && !isNil(params.data.meta) && params.data.meta.subaccounts.length !== 0 ? 6 : 1
           cellClass: (params: CellClassParams) => {
             if (params.node.group === true) {
               return "";
@@ -517,6 +544,18 @@ const BudgetTable = <
           allowContextMenuWithControlKey={true}
           rowData={orderedTable}
           getRowNodeId={(data: any) => data.id}
+          getRowClass={(params: RowClassParams) => {
+            if (params.node.group === false) {
+              if (params.node.data.meta.isGroupFooter === true) {
+                let colorClass = params.node.data.group.color;
+                if (colorClass.startsWith("#")) {
+                  colorClass = params.node.data.group.color.slice(1);
+                }
+                return classNames("row--group-footer", `bg-${colorClass}`);
+              }
+            }
+            return "";
+          }}
           immutableData={true}
           suppressRowClickSelection={true}
           onGridReady={onGridReady}
@@ -529,6 +568,7 @@ const BudgetTable = <
           groupUseEntireRow={true}
           rowGroupPanelShow={"never"}
           animateRows={true}
+          groupRowRendererParams={{ suppressCount: true }}
           navigateToNextCell={(params: NavigateToNextCellParams): CellPosition => {
             if (!isNil(params.nextCellPosition)) {
               if (includes(["estimated", "expand", "select", "delete"], params.nextCellPosition.column.getColId())) {

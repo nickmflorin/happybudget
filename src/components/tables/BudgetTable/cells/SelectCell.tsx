@@ -9,6 +9,12 @@ interface SelectCellProps extends ICellRendererParams {
 }
 
 const SelectCell = ({ onSelect, onDeselect, node }: SelectCellProps): JSX.Element => {
+  // Since the SelectCell is the first cell in the table, group footers will
+  // potentially span this cell across the columns - but we never want the group
+  // footer row to be selectable.
+  if (node.data.meta.isGroupFooter === true) {
+    return <></>;
+  }
   return (
     <Checkbox
       checked={node.group === false && node.data.meta.selected}

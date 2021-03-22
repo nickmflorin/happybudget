@@ -126,6 +126,7 @@ interface IAccount extends IBudgetItem, TrackedModel {
 
 interface ISubAccountNestedGroup extends TrackedModel {
   readonly name: string;
+  readonly color: string;
 }
 
 interface ISubAccountGroup extends ISubAccountNestedGroup {

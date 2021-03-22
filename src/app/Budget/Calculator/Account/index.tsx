@@ -9,6 +9,7 @@ import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { CreateSubAccountGroupModal } from "components/modals";
 import { BudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
+import { generateRandomNumericId } from "util/math";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
 import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
@@ -49,7 +50,7 @@ const Account = (): JSX.Element => {
   return (
     <RenderIfValidId id={[accountId]}>
       <RenderWithSpinner loading={accountStore.subaccounts.table.loading || accountStore.detail.loading}>
-        <BudgetTable<Table.SubAccountRow>
+        <BudgetTable<Table.SubAccountRow, Table.BudgetRowMeta, ISubAccountNestedGroup>
           table={accountStore.subaccounts.table.data}
           isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "unit", "variance"], colDef.field)) {
@@ -80,6 +81,28 @@ const Account = (): JSX.Element => {
           groupParams={{
             field: "group",
             valueGetter: (row: Table.SubAccountRow) => (!isNil(row.group) ? row.group.name : null),
+            groupGetter: (row: Table.SubAccountRow) => row.group,
+            createFooter: (group: ISubAccountNestedGroup) => ({
+              id: generateRandomNumericId(),
+              name: null,
+              identifier: null,
+              unit: null,
+              multiplier: null,
+              rate: null,
+              quantity: null,
+              description: null,
+              estimated: null,
+              variance: null,
+              actual: null,
+              group: null,
+              meta: {
+                isPlaceholder: true,
+                isGroupFooter: true,
+                selected: false,
+                subaccounts: [],
+                errors: []
+              }
+            }),
             onGroupRows: (rows: Table.SubAccountRow[]) =>
               setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
           }}
