@@ -124,7 +124,16 @@ const BudgetTable = <
       field: identifierField,
       headerName: identifierFieldHeader,
       cellRenderer: "IdentifierCell",
-      ...identifierFieldParams
+      ...identifierFieldParams,
+      colSpan: (params: ColSpanParams) => {
+        const row: R = params.data;
+        if (row.meta.isGroupFooter === true) {
+          return bodyColumns.length + 1;
+        } else if (!isNil(identifierFieldParams.colSpan)) {
+          return identifierFieldParams.colSpan(params);
+        }
+        return 1;
+      }
     });
     return [
       baseLeftColumns,
@@ -216,7 +225,12 @@ const BudgetTable = <
         const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
         if (!isNil(group)) {
           const footer: R = groupParams.createFooter(group);
-          newTable.push(...rows, { ...footer, group, meta: { ...footer.meta, isGroupFooter: true } });
+          newTable.push(...rows, {
+            ...footer,
+            group,
+            [identifierField]: group.name,
+            meta: { ...footer.meta, isGroupFooter: true }
+          });
         }
       });
       setTable([...newTable, ...rowsWithoutGroup]);
@@ -343,15 +357,6 @@ const BudgetTable = <
           suppressMenu: true,
           suppressMenuHide: true,
           editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
-          colSpan: (params: ColSpanParams) => {
-            const row: R = params.data;
-            if (row.meta.isGroupFooter === true) {
-              return baseColumns[0].length + 1;
-            } else if (!isNil(col.colSpan)) {
-              return col.colSpan(params);
-            }
-            return 1;
-          },
           cellClass: (params: CellClassParams) => {
             if (params.node.group === true) {
               return "";
@@ -410,7 +415,7 @@ const BudgetTable = <
       )
     );
   }, [bodyColumns, calculatedColumns]);
-
+  console.log(_table);
   return (
     <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
       <TableHeader

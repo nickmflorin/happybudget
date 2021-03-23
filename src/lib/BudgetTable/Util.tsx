@@ -24,9 +24,6 @@ export const HideCellForGroupFooter = <R extends Table.Row>(func: Func): Func =>
 export const IncludeErrorsInCell = <R extends Table.Row>(func: Func): Func => {
   return ({ colDef, data, ...props }: ICellRendererParams): JSX.Element => {
     const row: R = data;
-    if (row.meta.isGroupFooter) {
-      return <></>;
-    }
     const Component = func;
     // TODO: I'm not sure if this will properly rerender if new cell errors appear.
     // We need to investigate this.

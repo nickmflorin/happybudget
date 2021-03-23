@@ -100,7 +100,14 @@ const SubAccount = (): JSX.Element => {
               headerName: "Category Description",
               colSpan: (params: ColSpanParams) => {
                 const row: Table.SubAccountRow = params.data;
-                if (!isNil(params.node) && params.node.group === false) {
+                // Not totally sure why this conditional is necessary, but it's necessity might
+                // be a symptom of another problem.  We should investigate.
+                if (
+                  !isNil(params.node) &&
+                  params.node.group === false &&
+                  !isNil(params.node) &&
+                  params.node.group === false
+                ) {
                   return row.meta.children.length !== 0 ? 5 : 1;
                 }
                 return 1;

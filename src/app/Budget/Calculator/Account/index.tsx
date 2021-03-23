@@ -85,7 +85,7 @@ const Account = (): JSX.Element => {
             createFooter: (group: ISubAccountNestedGroup) => ({
               id: generateRandomNumericId(),
               name: null,
-              identifier: null,
+              identifier: group.name,
               unit: null,
               multiplier: null,
               rate: null,
