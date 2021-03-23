@@ -567,17 +567,22 @@ const BudgetTable = <
           }}
           onCellKeyDown={(event: CellKeyDownEvent) => {
             const count = event.api.getDisplayedRowCount();
-            if (!isNil(event.rowIndex) && count === event.rowIndex + 1 && !isNil(event.event)) {
+            if (!isNil(event.rowIndex) && !isNil(event.event)) {
               // I do not understand why AGGrid's Event has an underlying Event that is in
               // reality a KeyboardEvent but does not have any of the properties that a KeyboardEvent
               // should have - meaning we have to tell TS to ignore this line.
               /* @ts-ignore */
               if (event.event.keyCode === 13) {
-                onRowAdd();
                 const firstEditCol = event.columnApi.getColumn(event.column.getColId());
                 if (!isNil(firstEditCol)) {
                   event.api.ensureColumnVisible(firstEditCol);
                   event.api.setFocusedCell(event.rowIndex + 1, firstEditCol);
+                }
+                if (count === event.rowIndex + 1) {
+                  onRowAdd();
+                  if (!isNil(firstEditCol)) {
+                    event.api.ensureColumnVisible(firstEditCol);
+                  }
                 }
               }
             }
