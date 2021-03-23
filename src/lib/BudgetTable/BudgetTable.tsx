@@ -282,13 +282,13 @@ const BudgetTable = <
               existing.meta.selected !== node.data.meta.selected ||
               (!isNil(rowRefreshRequired) && rowRefreshRequired(existing, node.data))
             ) {
-              setTimeout(() => gridApi.refreshCells({ force: true, rowNodes: [node] }), 0);
+              gridApi.refreshCells({ force: true, rowNodes: [node] });
             }
           }
         }
       });
     }
-  }, [table, gridApi]);
+  }, [_table, gridApi]);
 
   useEffect(() => {
     // Changes to the errors in the rows does not trigger a refresh of those cells
@@ -308,7 +308,7 @@ const BudgetTable = <
                   const cellErrors = filter(existing.meta.errors, { id: node.data.id, field: colDef.field });
                   if (cellErrors.length !== 0) {
                     col.setColDef({ ...colDef, cellClass: "cell--error" }, null);
-                    setTimeout(() => gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] }), 0);
+                    gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] });
                   }
                 }
               });

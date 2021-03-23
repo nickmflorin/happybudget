@@ -20,7 +20,7 @@ export const DEFAULT_TAG_COLOR_SCHEME = [
   "#58add6"
 ];
 
-interface TagProps {
+interface TagProps extends StandardComponentProps {
   children: string;
   color?: string;
   scheme?: string[];
@@ -28,7 +28,7 @@ interface TagProps {
   colorIndex?: number;
 }
 
-const Tag = ({ children, scheme, uppercase, color, colorIndex }: TagProps): JSX.Element => {
+const Tag = ({ children, scheme, uppercase, color, colorIndex, className, style = {} }: TagProps): JSX.Element => {
   const tagColor = useMemo(() => {
     if (!isNil(color)) {
       return color;
@@ -44,7 +44,7 @@ const Tag = ({ children, scheme, uppercase, color, colorIndex }: TagProps): JSX.
   }, [children, color]);
 
   return (
-    <div className={classNames("tag", { uppercase })} style={{ backgroundColor: tagColor }}>
+    <div className={classNames("tag", { uppercase }, className)} style={{ ...style, backgroundColor: tagColor }}>
       {children}
     </div>
   );

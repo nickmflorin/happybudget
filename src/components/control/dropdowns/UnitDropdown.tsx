@@ -37,7 +37,7 @@ const UnitDropdown = ({ value, className, onChange, trigger = ["click"] }: UnitD
             {model.name}
           </Tag>
         ) : (
-          <Tag uppercase color={"#c1c1c1"}>
+          <Tag uppercase style={{ opacity: 0 }}>
             {"None"}
           </Tag>
         )}
