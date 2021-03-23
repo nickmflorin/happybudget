@@ -16,7 +16,6 @@ import {
   CellKeyDownEvent,
   CellPosition,
   NavigateToNextCellParams,
-  ValueGetterParams,
   ColSpanParams,
   RowClassParams
 } from "ag-grid-community";
@@ -29,10 +28,6 @@ import TableHeader from "./TableHeader";
 import { HideCellForGroupFooter, IncludeErrorsInCell } from "./Util";
 
 import "./index.scss";
-
-const HideGroupRow = (props: any): JSX.Element => {
-  return <></>;
-};
 
 const BudgetTable = <
   R extends Table.Row<G, C>,
@@ -587,7 +582,6 @@ const BudgetTable = <
             ValueCell: IncludeErrorsInCell<R>(ValueCell),
             UnitCell: IncludeErrorsInCell<R>(UnitCell),
             IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
-            HideGroupRow: HideGroupRow,
             ...frameworkComponents
           }}
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {

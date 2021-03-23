@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 
@@ -14,6 +15,7 @@ interface TemplateProps {
 const Template = ({ config }: TemplateProps): JSX.Element => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const dispatch: Dispatch = useDispatch();
+  const history = useHistory();
 
   return (
     <React.Fragment>
@@ -30,6 +32,7 @@ const Template = ({ config }: TemplateProps): JSX.Element => {
         onSuccess={(budget: IBudget) => {
           setCreateModalOpen(false);
           dispatch(addBudgetToStateAction(ActionDomains.ACTIVE, budget));
+          history.push(`budgets/${budget.id}/accounts`);
         }}
       />
     </React.Fragment>
