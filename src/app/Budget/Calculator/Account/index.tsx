@@ -5,9 +5,10 @@ import { isNil, includes, map } from "lodash";
 
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
+import BudgetTable from "lib/BudgetTable";
+
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { CreateSubAccountGroupModal } from "components/modals";
-import { BudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 import { generateRandomNumericId } from "util/math";
 import { floatValueSetter, integerValueSetter } from "util/table";
@@ -50,15 +51,17 @@ const Account = (): JSX.Element => {
   return (
     <RenderIfValidId id={[accountId]}>
       <RenderWithSpinner loading={accountStore.subaccounts.table.loading || accountStore.detail.loading}>
-        <BudgetTable<Table.SubAccountRow, Table.BudgetRowMeta, ISubAccountNestedGroup>
+        <BudgetTable<Table.SubAccountRow, ISubAccountNestedGroup, ISimpleSubAccount>
           table={accountStore.subaccounts.table.data}
+          identifierField={"identifier"}
+          identifierFieldHeader={"Line"}
           isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "unit", "variance"], colDef.field)) {
               return false;
             } else if (includes(["identifier", "description", "name"], colDef.field)) {
               return true;
             } else {
-              return !isNil(row.meta) && row.meta.subaccounts.length === 0;
+              return !isNil(row.meta) && row.meta.children.length === 0;
             }
           }}
           highlightNonEditableCell={(row: Table.SubAccountRow, colDef: ColDef) => {
@@ -79,9 +82,6 @@ const Account = (): JSX.Element => {
           onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountSubAccountAction(payload))}
           onRowExpand={(id: number) => history.push(`/budgets/${budget.id}/subaccounts/${id}`)}
           groupParams={{
-            field: "group",
-            valueGetter: (row: Table.SubAccountRow) => (!isNil(row.group) ? row.group.name : null),
-            groupGetter: (row: Table.SubAccountRow) => row.group,
             createFooter: (group: ISubAccountNestedGroup) => ({
               id: generateRandomNumericId(),
               name: null,
@@ -99,7 +99,7 @@ const Account = (): JSX.Element => {
                 isPlaceholder: true,
                 isGroupFooter: true,
                 selected: false,
-                subaccounts: [],
+                children: [],
                 errors: []
               }
             }),
@@ -122,16 +122,25 @@ const Account = (): JSX.Element => {
                 ? accountStore.detail.data.actual
                 : 0.0
           }}
-          columns={[
-            {
-              field: "identifier",
-              headerName: "Line"
-            },
+          bodyColumns={[
             {
               field: "description",
               headerName: "Category Description",
-              colSpan: (params: ColSpanParams) =>
-                !isNil(params.data) && !isNil(params.data.meta) && params.data.meta.subaccounts.length !== 0 ? 6 : 1
+              colSpan: (params: ColSpanParams) => {
+                // Not totally sure why this conditional is necessary, but it's necessity might
+                // be a symptom of another problem.  We should investigate.
+                if (
+                  !isNil(params.node) &&
+                  params.node.group === false &&
+                  !isNil(params.data.meta) &&
+                  !isNil(params.data.meta.children)
+                ) {
+                  return !isNil(params.data) && !isNil(params.data.meta) && params.data.meta.children.length !== 0
+                    ? 6
+                    : 1;
+                }
+                return 1;
+              }
             },
             {
               field: "name",
@@ -174,7 +183,9 @@ const Account = (): JSX.Element => {
               headerName: "Rate",
               cellStyle: { textAlign: "right" },
               valueSetter: floatValueSetter("rate")
-            },
+            }
+          ]}
+          calculatedColumns={[
             {
               field: "estimated",
               headerName: "Estimated",

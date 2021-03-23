@@ -4,11 +4,11 @@ import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { ICellRendererParams } from "ag-grid-community";
 import { IconButton } from "components/control/buttons";
 
-interface DeleteCellProps extends ICellRendererParams {
-  onClick: (data: Table.AccountRow | Table.SubAccountRow) => void;
+interface DeleteCellProps<R extends Table.Row> extends ICellRendererParams {
+  onClick: (data: R) => void;
 }
 
-const DeleteCell = ({ onClick, node }: DeleteCellProps): JSX.Element => {
+const DeleteCell = <R extends Table.Row>({ onClick, node }: DeleteCellProps<R>): JSX.Element => {
   return (
     <IconButton
       className={"ag-grid-table-action-button"}

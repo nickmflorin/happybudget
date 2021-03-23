@@ -4,9 +4,9 @@ import { isNil, find } from "lodash";
 
 import { CellClassParams } from "ag-grid-community";
 
+import BudgetTable, { GetExportValueParams } from "lib/BudgetTable";
+
 import { RenderWithSpinner } from "components/display";
-import { BudgetTable } from "components/tables";
-import { GetExportValueParams } from "components/tables/BudgetTable";
 import { setAncestorsAction } from "../actions";
 import {
   requestBudgetItemsAction,
@@ -71,6 +71,26 @@ const Actuals = (): JSX.Element => {
             existing.payment_method !== row.payment_method
           );
         }}
+        identifierField={"object_id"}
+        identifierFieldHeader={"Account"}
+        identifierFieldParams={{
+          width: 200,
+          cellClass: "borderless",
+          cellRenderer: "BudgetItemCell",
+          cellRendererParams: {
+            onChange: (object_id: number, parent_type: BudgetItemType, row: Table.ActualRow) => {
+              dispatch(
+                updateActualAction({
+                  id: row.id,
+                  data: {
+                    object_id: { newValue: object_id, oldValue: row.object_id },
+                    parent_type: { oldValue: row.parent_type, newValue: parent_type }
+                  }
+                })
+              );
+            }
+          }
+        }}
         footerRow={{
           description: "Grand Total",
           value:
@@ -87,7 +107,7 @@ const Actuals = (): JSX.Element => {
             return "";
           }
         }}
-        columns={[
+        bodyColumns={[
           {
             field: "object_id",
             headerName: "Account",

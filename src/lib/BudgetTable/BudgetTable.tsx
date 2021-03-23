@@ -1,9 +1,8 @@
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useMemo } from "react";
 import classNames from "classnames";
 import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
 
 import { AgGridReact } from "ag-grid-react";
-
 import {
   ColDef,
   CellEditingStoppedEvent,
@@ -24,68 +23,21 @@ import {
 
 import { downloadAsCsvFile } from "util/files";
 
+import { DeleteCell, ExpandCell, SelectCell, ValueCell, NewRowCell, UnitCell, IdentifierCell } from "./cells";
+import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
-import { DeleteCell, ExpandCell, SelectCell, ValueCell, NewRowCell, UnitCell } from "./cells";
+import { HideCellForGroupFooter, IncludeErrorsInCell } from "./Util";
+
 import "./index.scss";
 
-export interface GetExportValueParams {
-  node: RowNode;
-  colDef: ColDef;
-  value: string | undefined;
-}
-
-type ExportValueGetters = { [key: string]: (params: GetExportValueParams) => string };
-
-interface GroupProps<
-  R extends Table.Row<E, G>,
-  E extends Table.RowMeta = Table.RowMeta,
-  G extends Table.RowGroup = Table.RowGroup
-> {
-  field: keyof R;
-  valueGetter: (row: R) => any;
-  groupGetter: (row: R) => G | null;
-  onGroupRows: (rows: R[]) => void;
-  createFooter: (group: G) => R;
-}
-
-interface BudgetTableProps<
-  R extends Table.Row<E, G>,
-  E extends Table.RowMeta = Table.RowMeta,
-  G extends Table.RowGroup = Table.RowGroup
-> {
-  columns: ColDef[];
-  table: R[];
-  footerRow: Partial<R>;
-  search: string;
-  saving: boolean;
-  frameworkComponents?: { [key: string]: any };
-  getExportValue?: ExportValueGetters;
-  exportFileName?: string;
-  nonEditableCells?: (keyof R)[];
-  highlightedNonEditableCells?: (keyof R)[];
-  nonHighlightedNonEditableCells?: (keyof R)[];
-  groupParams?: GroupProps<R, E, G>;
-  cellClass?: (params: CellClassParams) => string | undefined;
-  highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
-  rowRefreshRequired?: (existing: R, row: R) => boolean;
-  onSearch: (value: string) => void;
-  onRowSelect: (id: number) => void;
-  onRowDeselect: (id: number) => void;
-  onRowUpdate: (payload: Table.RowChange) => void;
-  onRowAdd: () => void;
-  onRowDelete: (row: R) => void;
-  onRowExpand?: (id: number) => void;
-  onSelectAll: () => void;
-  isCellEditable?: (row: R, col: ColDef) => boolean;
-}
-
 const BudgetTable = <
-  R extends Table.Row<E, G>,
-  E extends Table.RowMeta = Table.RowMeta,
-  G extends Table.RowGroup = Table.RowGroup
+  R extends Table.Row<G, C>,
+  G extends Table.RowGroup = Table.RowGroup,
+  C extends Table.RowChild = Table.RowChild
 >({
   /* eslint-disable indent */
-  columns,
+  bodyColumns,
+  calculatedColumns = [],
   table,
   search,
   saving,
@@ -97,6 +49,9 @@ const BudgetTable = <
   highlightedNonEditableCells,
   nonHighlightedNonEditableCells,
   groupParams,
+  identifierField,
+  identifierFieldHeader,
+  identifierFieldParams = {},
   cellClass,
   onSearch,
   onSelectAll,
@@ -109,7 +64,7 @@ const BudgetTable = <
   isCellEditable,
   highlightNonEditableCell,
   rowRefreshRequired
-}: BudgetTableProps<R, E, G>) => {
+}: BudgetTableProps<R, G, C>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
@@ -118,7 +73,83 @@ const BudgetTable = <
   const [footerColumnApi, setFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
   const [footerColDefs, setFooterColDefs] = useState<ColDef[]>([]);
-  const [orderedTable, setOrderedTable] = useState<R[]>([]);
+  const [_table, setTable] = useState<R[]>([]);
+
+  const groupGetter = useMemo((): ((row: R) => G | null) => {
+    if (!isNil(groupParams)) {
+      return !isNil(groupParams.groupGetter) ? groupParams.groupGetter : (row: R) => row.group;
+    }
+    return (row: R) => null;
+  }, [groupParams]);
+
+  const groupValueGetter = useMemo((): ((row: R) => any | null) => {
+    if (!isNil(groupParams)) {
+      return !isNil(groupParams.valueGetter) ? groupParams.valueGetter : (row: R) => groupGetter(row)?.name;
+    }
+    return (row: R) => null;
+  }, [groupParams, groupGetter]);
+
+  const baseColumns = useMemo((): ColDef[][] => {
+    let baseLeftColumns: ColDef[] = [
+      {
+        field: "select",
+        editable: false,
+        headerName: "",
+        width: 40,
+        cellClass: classNames("cell--action", "cell--not-editable"),
+        cellRenderer: "SelectCell",
+        cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
+      }
+    ];
+    if (!isNil(groupParams)) {
+      baseLeftColumns.push({
+        field: "group",
+        hide: true,
+        rowGroup: true,
+        valueGetter: (params: ValueGetterParams) => groupValueGetter(params.data as R)
+      });
+    }
+    if (!isNil(onRowExpand)) {
+      baseLeftColumns.push({
+        field: "expand",
+        editable: false,
+        headerName: "",
+        width: 40,
+        cellClass: classNames("cell--action", "cell--not-editable"),
+        cellRenderer: "ExpandCell",
+        cellRendererParams: { onClick: onRowExpand }
+      });
+    }
+    baseLeftColumns.push({
+      field: identifierField,
+      headerName: identifierFieldHeader,
+      cellRenderer: "IdentifierCell",
+      ...identifierFieldParams
+    });
+    return [
+      baseLeftColumns,
+      [
+        {
+          field: "delete",
+          editable: false,
+          headerName: "",
+          width: 40,
+          cellClass: classNames("cell--action", "cell--not-editable"),
+          cellRenderer: "DeleteCell",
+          cellRendererParams: { onClick: onRowDelete }
+        }
+      ]
+    ];
+  }, [
+    groupParams,
+    onRowSelect,
+    onRowDeselect,
+    onRowExpand,
+    onRowDelete,
+    identifierField,
+    identifierFieldHeader,
+    identifierFieldParams
+  ]);
 
   const onGridReady = useCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
@@ -167,17 +198,14 @@ const BudgetTable = <
 
   useEffect(() => {
     if (!isNil(groupParams)) {
-      const rowsWithGroup = filter(table, (row: R) => !isNil(groupParams.valueGetter(row)));
-      const rowsWithoutGroup = filter(table, (row: R) => isNil(groupParams.valueGetter(row)));
+      const rowsWithGroup = filter(table, (row: R) => !isNil(groupValueGetter(row)));
+      const rowsWithoutGroup = filter(table, (row: R) => isNil(groupValueGetter(row)));
 
-      const newOrderedTable: R[] = [];
+      const newTable: R[] = [];
 
-      const groupedRows: { [key: number]: R[] } = groupBy(
-        rowsWithGroup,
-        (row: R) => (groupParams.groupGetter(row) as G).id
-      );
+      const groupedRows: { [key: number]: R[] } = groupBy(rowsWithGroup, (row: R) => (groupGetter(row) as G).id);
 
-      const allGroups: (G | null)[] = map(rowsWithGroup, (row: R) => groupParams.groupGetter(row));
+      const allGroups: (G | null)[] = map(rowsWithGroup, (row: R) => groupGetter(row));
       const groups: G[] = [];
       forEach(allGroups, (group: G | null) => {
         if (!isNil(group) && isNil(find(groups, { id: group.id }))) {
@@ -188,14 +216,14 @@ const BudgetTable = <
         const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
         if (!isNil(group)) {
           const footer: R = groupParams.createFooter(group);
-          newOrderedTable.push(...rows, { ...footer, group, meta: { ...footer.meta, isGroupFooter: true } });
+          newTable.push(...rows, { ...footer, group, meta: { ...footer.meta, isGroupFooter: true } });
         }
       });
-      setOrderedTable([...newOrderedTable, ...rowsWithoutGroup]);
+      setTable([...newTable, ...rowsWithoutGroup]);
     } else {
-      setOrderedTable(table);
+      setTable(table);
     }
-  }, [table, gridApi]);
+  }, [table, groupParams]);
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {
@@ -212,14 +240,14 @@ const BudgetTable = <
         setFocused(true);
       }
     }
-  }, [columnApi, gridApi, columns, focused]);
+  }, [columnApi, gridApi, focused]);
 
   useEffect(() => {
     if (!isNil(gridApi) && !isNil(footerGridApi)) {
       gridApi.sizeColumnsToFit();
       footerGridApi.sizeColumnsToFit();
     }
-  }, [orderedTable, gridApi, footerGridApi]);
+  }, [_table, gridApi, footerGridApi]);
 
   useEffect(() => {
     if (!isNil(gridApi)) {
@@ -234,13 +262,13 @@ const BudgetTable = <
     if (!isNil(gridApi)) {
       gridApi.forEachNode((node: RowNode) => {
         if (node.group === false) {
-          const existing: R | undefined = find(orderedTable, { id: node.data.id });
+          const existing: R | undefined = find(_table, { id: node.data.id });
           if (!isNil(existing)) {
             if (
               existing.meta.selected !== node.data.meta.selected ||
               (!isNil(rowRefreshRequired) && rowRefreshRequired(existing, node.data))
             ) {
-              gridApi.refreshCells({ force: true, rowNodes: [node] });
+              setTimeout(() => gridApi.refreshCells({ force: true, rowNodes: [node] }), 0);
             }
           }
         }
@@ -255,7 +283,7 @@ const BudgetTable = <
     if (!isNil(gridApi) && !isNil(columnApi)) {
       gridApi.forEachNode((node: RowNode) => {
         if (node.group === false) {
-          const existing: R | undefined = find(orderedTable, { id: node.data.id });
+          const existing: R | undefined = find(_table, { id: node.data.id });
           if (!isNil(existing)) {
             // TODO: We might want to do a deeper comparison in the future here.
             if (existing.meta.errors.length !== node.data.meta.errors.length) {
@@ -266,7 +294,7 @@ const BudgetTable = <
                   const cellErrors = filter(existing.meta.errors, { id: node.data.id, field: colDef.field });
                   if (cellErrors.length !== 0) {
                     col.setColDef({ ...colDef, cellClass: "cell--error" }, null);
-                    gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] });
+                    setTimeout(() => gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] }), 0);
                   }
                 }
               });
@@ -275,69 +303,40 @@ const BudgetTable = <
         }
       });
     }
-  }, [orderedTable, gridApi, columnApi]);
+  }, [_table, gridApi, columnApi]);
 
   useEffect(() => {
-    const mapped = map(orderedTable, (row: R) => row.meta.selected);
+    const mapped = map(_table, (row: R) => row.meta.selected);
     const uniques = uniq(mapped);
     if (uniques.length === 1 && uniques[0] === true) {
       setAllSelected(true);
     } else {
       setAllSelected(false);
     }
-  }, [orderedTable]);
+  }, [_table]);
 
   useEffect(() => {
-    let baseLeftColumns: ColDef[] = [
-      {
-        field: "select",
-        editable: false,
-        headerName: "",
-        width: 40,
-        cellRenderer: "SelectCell",
-        cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
-      }
-    ];
-    if (!isNil(groupParams)) {
-      baseLeftColumns.push({
-        field: groupParams.field as string,
-        hide: true,
-        rowGroup: true,
-        valueGetter: (params: ValueGetterParams) => groupParams.valueGetter(params.data as R)
-      });
-    }
-    if (!isNil(onRowExpand)) {
-      baseLeftColumns.push({
-        field: "expand",
-        editable: false,
-        headerName: "",
-        width: 40,
-        cellRenderer: "ExpandCell",
-        cellRendererParams: { onClick: onRowExpand }
-      });
-    }
     setColDefs(
       map(
         concat(
-          baseLeftColumns,
+          baseColumns[0],
           map(
-            columns,
+            bodyColumns,
             (def: ColDef) =>
               ({
                 cellRenderer: "ValueCell",
                 ...def
               } as ColDef)
           ),
-          [
-            {
-              field: "delete",
-              editable: false,
-              headerName: "",
-              width: 40,
-              cellRenderer: "DeleteCell",
-              cellRendererParams: { onClick: onRowDelete }
-            }
-          ]
+          map(
+            calculatedColumns,
+            (def: ColDef) =>
+              ({
+                cellRenderer: "CalculatedCell",
+                ...def
+              } as ColDef)
+          ),
+          baseColumns[1]
         ),
         (col: ColDef) => ({
           ...col,
@@ -347,25 +346,26 @@ const BudgetTable = <
           colSpan: (params: ColSpanParams) => {
             const row: R = params.data;
             if (row.meta.isGroupFooter === true) {
-              return baseLeftColumns.length + columns.length + 1;
+              return baseColumns[0].length + 1;
             } else if (!isNil(col.colSpan)) {
               return col.colSpan(params);
             }
             return 1;
           },
-          // !isNil(params.data) && !isNil(params.data.meta) && params.data.meta.subaccounts.length !== 0 ? 6 : 1
           cellClass: (params: CellClassParams) => {
             if (params.node.group === true) {
               return "";
             }
             if (includes(["delete", "select", "expand"], params.colDef.field)) {
-              return "cell--action";
+              return col.cellClass;
             }
             const row: R = params.node.data;
             let rootClassNames = undefined;
             if (!isNil(cellClass)) {
               rootClassNames = cellClass(params);
             }
+            // TODO: See if we can move some of these to their specific column
+            // definitions in the map() above.
             return classNames(col.cellClass, rootClassNames, {
               "cell--not-editable": !_isCellEditable(row, params.colDef),
               "cell--not-editable-highlight": _isCellNonEditableHighlight(row, params.colDef)
@@ -374,69 +374,51 @@ const BudgetTable = <
         })
       )
     );
-  }, [columns]);
+  }, [bodyColumns, calculatedColumns]);
 
   useEffect(() => {
     setFooterColDefs(
       map(
         concat(
-          [
-            {
-              field: "select",
-              editable: false,
-              headerName: "",
-              width: 40,
-              cellRenderer: "NewRowCell",
-              cellRendererParams: { onNew: onRowAdd }
-            },
-            {
-              field: "expand",
-              editable: false,
-              headerName: "",
-              width: 40
-            }
-          ],
+          baseColumns[0],
           map(
-            columns,
+            bodyColumns,
             (def: ColDef) =>
               ({
                 cellRenderer: "ValueCell",
+                cellClass: "cell--not-editable",
                 ...def
               } as ColDef)
           ),
-          [
-            {
-              field: "delete",
-              editable: false,
-              headerName: "",
-              width: 40
-            }
-          ]
+          map(
+            calculatedColumns,
+            (def: ColDef) =>
+              ({
+                cellRenderer: "ValueCell",
+                cellClass: "cell--not-editable",
+                ...def
+              } as ColDef)
+          ),
+          baseColumns[1]
         ),
         (col: ColDef) => ({
           ...col,
           suppressMenu: true,
           suppressMenuHide: true,
-          editable: false,
-          cellClass: (params: CellClassParams) => {
-            if (includes(["delete", "select", "expand"], params.colDef.field)) {
-              return classNames("cell--action", "cell--not-editable");
-            }
-            return "cell--not-editable";
-          }
+          editable: false
         })
       )
     );
-  }, [columns]);
+  }, [bodyColumns, calculatedColumns]);
 
   return (
     <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
       <TableHeader
         search={search}
         setSearch={(value: string) => onSearch(value)}
-        columns={columns}
+        columns={[...bodyColumns, ...calculatedColumns]}
         onDelete={() => {
-          forEach(orderedTable, (row: R) => {
+          forEach(_table, (row: R) => {
             if (row.meta.selected === true) {
               onRowDelete(row);
             }
@@ -444,14 +426,14 @@ const BudgetTable = <
         }}
         onGroup={() => {
           if (!isNil(groupParams)) {
-            groupParams.onGroupRows(filter(orderedTable, (row: R) => row.meta.selected === true));
+            groupParams.onGroupRows(filter(_table, (row: R) => row.meta.selected === true));
           }
         }}
         saving={saving}
         selected={allSelected}
         onSelect={onSelectAll}
-        deleteDisabled={filter(orderedTable, (row: R) => row.meta.selected === true).length === 0}
-        groupDisabled={filter(orderedTable, (row: R) => row.meta.selected === true).length === 0}
+        deleteDisabled={filter(_table, (row: R) => row.meta.selected === true).length === 0}
+        groupDisabled={filter(_table, (row: R) => row.meta.selected === true).length === 0}
         onExport={(fields: Field[]) => {
           if (!isNil(gridApi) && !isNil(columnApi)) {
             const includeColumn = (col: Column): boolean => {
@@ -463,7 +445,7 @@ const BudgetTable = <
                   colDef.field
                 ) &&
                 includes(
-                  map(columns, (c: ColDef) => c.field),
+                  map([...bodyColumns, ...calculatedColumns], (c: ColDef) => c.field),
                   colDef.field
                 )
               );
@@ -515,7 +497,7 @@ const BudgetTable = <
         }}
         onColumnsChange={(fields: Field[]) => {
           if (!isNil(columnApi) && !isNil(footerColumnApi)) {
-            forEach(columns, (col: ColDef) => {
+            forEach([...bodyColumns, ...calculatedColumns], (col: ColDef) => {
               if (!isNil(col.field)) {
                 const associatedField = find(fields, { id: col.field });
                 if (!isNil(associatedField)) {
@@ -542,7 +524,7 @@ const BudgetTable = <
           columnDefs={colDefs}
           rowDragManaged={true}
           allowContextMenuWithControlKey={true}
-          rowData={orderedTable}
+          rowData={_table}
           getRowNodeId={(data: any) => data.id}
           getRowClass={(params: RowClassParams) => {
             if (params.node.group === false) {
@@ -597,11 +579,12 @@ const BudgetTable = <
           }}
           enterMovesDown={true}
           frameworkComponents={{
-            DeleteCell: DeleteCell,
+            DeleteCell: HideCellForGroupFooter<R>(DeleteCell),
             ExpandCell: ExpandCell,
             SelectCell: SelectCell,
-            ValueCell: ValueCell,
-            UnitCell: UnitCell,
+            ValueCell: IncludeErrorsInCell<R>(ValueCell),
+            UnitCell: IncludeErrorsInCell<R>(UnitCell),
+            IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
             ...frameworkComponents
           }}
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {

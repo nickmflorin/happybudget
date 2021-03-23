@@ -18,7 +18,8 @@ export const initializeRowFromActual = (actual: IActual): Table.ActualRow => {
       isPlaceholder: false,
       isGroupFooter: false,
       selected: false,
-      errors: []
+      errors: [],
+      children: []
     },
     description: actual.description,
     vendor: actual.vendor,
@@ -39,7 +40,8 @@ export const createActualRowPlaceholder = (): Table.ActualRow => ({
     isPlaceholder: true,
     isGroupFooter: false,
     selected: false,
-    errors: []
+    errors: [],
+    children: []
   },
   description: null,
   vendor: null,
@@ -59,7 +61,7 @@ export const initializeRowFromAccount = (account: IAccount): Table.AccountRow =>
     isPlaceholder: false,
     isGroupFooter: false,
     selected: false,
-    subaccounts: account.subaccounts,
+    children: account.subaccounts,
     errors: []
   },
   identifier: account.identifier,
@@ -76,7 +78,7 @@ export const initializeRowFromSubAccount = (subaccount: ISubAccount): Table.SubA
     isPlaceholder: false,
     isGroupFooter: false,
     selected: false,
-    subaccounts: subaccount.subaccounts,
+    children: subaccount.subaccounts,
     errors: []
   },
   name: subaccount.name,
@@ -109,7 +111,7 @@ export const createSubAccountRowPlaceholder = (): Table.SubAccountRow => ({
     isPlaceholder: true,
     isGroupFooter: false,
     selected: false,
-    subaccounts: [],
+    children: [],
     errors: []
   }
 });
@@ -126,7 +128,7 @@ export const createAccountRowPlaceholder = (): Table.AccountRow => ({
     isPlaceholder: true,
     isGroupFooter: false,
     selected: false,
-    subaccounts: [],
+    children: [],
     errors: []
   }
 });

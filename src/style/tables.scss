@@ -300,13 +300,15 @@ $table-border: 1px solid $table-border-color;
     &.row {
       &--group-footer {
         div[role='gridcell'] {
+          border: none !important;
+
           &:first-child {
             border-top-left-radius: 8px;
             border-bottom-left-radius: 8px;
           }
           &:last-child {
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
           }
         }
         // Unfortunately, I have not been able to figure out a way around applying
@@ -315,76 +317,76 @@ $table-border: 1px solid $table-border-color;
         &.bg-797695 {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #797695;
+            background-color: #797695 !important;
           }
         }
         &.bg-ff7165 {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #ff7165;
+            background-color: #ff7165 !important;
           }
         }
         &.bg-80cbc4 {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #80cbc4;
+            background-color: #80cbc4 !important;
           }
         }
         &.bg-ce93d8 {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #ce93d8;
+            background-color: #ce93d8 !important;
           }
         }
         &.bg-fed835 {
           div[role='gridcell'] {
-            background-color: #fed835;
+            background-color: #fed835 !important;
           }
         }
         &.bg-c87987 {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #c87987;
+            background-color: #c87987 !important;
           }
         }
         &.bg-69f0ae {
           div[role='gridcell'] {
-            background-color: #69f0ae;
+            background-color: #69f0ae !important;
           }
         }
         &.bg-a1887f {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #a1887f;
+            background-color: #a1887f !important;
           }
         }
         &.bg-81d4fa {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #81d4fa;
+            background-color: #81d4fa !important;
           }
         }
         &.bg-f75776 {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #f75776;
+            background-color: #f75776 !important;
           }
         }
         &.bg-66bb6a {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #66bb6a;
+            background-color: #66bb6a !important;
           }
         }
         &.bg-58add6 {
           div[role='gridcell'] {
             color: $white !important;
-            background-color: #58add6;
+            background-color: #58add6 !important;
           }
         }
         &.bg-EFEFEF {
           div[role='gridcell'] {
-            background-color: #EFEFEF;
+            background-color: #EFEFEF !important;
           }
         }
       }

@@ -5,8 +5,9 @@ import { isNil, includes } from "lodash";
 
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
+import BudgetTable from "lib/BudgetTable";
+
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
-import { BudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
@@ -48,6 +49,8 @@ const SubAccount = (): JSX.Element => {
     <RenderIfValidId id={[subaccountId]}>
       <RenderWithSpinner loading={subAccountStore.subaccounts.table.loading}>
         <BudgetTable<Table.SubAccountRow>
+          identifierField={"identifier"}
+          identifierFieldHeader={"Account"}
           table={subAccountStore.subaccounts.table.data}
           isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "variance", "unit"], colDef.field)) {
@@ -55,7 +58,7 @@ const SubAccount = (): JSX.Element => {
             } else if (includes(["identifier", "description", "name"], colDef.field)) {
               return true;
             } else {
-              return row.meta.subaccounts.length === 0;
+              return row.meta.children.length === 0;
             }
           }}
           highlightNonEditableCell={(row: Table.SubAccountRow, colDef: ColDef) => {
@@ -91,16 +94,17 @@ const SubAccount = (): JSX.Element => {
                 ? subAccountStore.detail.data.actual
                 : 0.0
           }}
-          columns={[
-            {
-              field: "identifier",
-              headerName: "Line"
-            },
+          bodyColumns={[
             {
               field: "description",
               headerName: "Category Description",
-              colSpan: (params: ColSpanParams) =>
-                !isNil(params.data.meta) && params.data.meta.subaccounts.length !== 0 ? 5 : 1
+              colSpan: (params: ColSpanParams) => {
+                const row: Table.SubAccountRow = params.data;
+                if (!isNil(params.node) && params.node.group === false) {
+                  return row.meta.children.length !== 0 ? 5 : 1;
+                }
+                return 1;
+              }
             },
             {
               field: "name",
@@ -143,7 +147,9 @@ const SubAccount = (): JSX.Element => {
               headerName: "Rate",
               cellStyle: { textAlign: "right" },
               valueSetter: floatValueSetter("rate")
-            },
+            }
+          ]}
+          calculatedColumns={[
             {
               field: "estimated",
               headerName: "Estimated",

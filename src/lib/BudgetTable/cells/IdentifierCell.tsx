@@ -5,7 +5,7 @@ import { isNil, filter } from "lodash";
 import { CloseCircleOutlined } from "@ant-design/icons";
 import { ICellRendererParams, RowNode, ColDef } from "ag-grid-community";
 
-interface ValueCellProps extends ICellRendererParams {
+interface IdentifierCellProps extends ICellRendererParams {
   value: string | number | null;
   node: RowNode;
   colDef: ColDef;
@@ -13,7 +13,13 @@ interface ValueCellProps extends ICellRendererParams {
   renderRedIfNegative?: boolean;
 }
 
-const ValueCell = ({ value, node, colDef, renderRedIfNegative = false, formatter }: ValueCellProps): JSX.Element => {
+const IdentifierCell = ({
+  value,
+  node,
+  colDef,
+  renderRedIfNegative = false,
+  formatter
+}: IdentifierCellProps): JSX.Element => {
   const [cellErrors, setCellErrors] = useState<Table.CellError[]>([]);
   const [cellValue, setCellValue] = useState<string | number | null>(null);
 
@@ -71,4 +77,4 @@ const ValueCell = ({ value, node, colDef, renderRedIfNegative = false, formatter
   }
 };
 
-export default ValueCell;
+export default IdentifierCell;

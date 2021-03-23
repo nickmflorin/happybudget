@@ -7,11 +7,16 @@ namespace Table {
     readonly error: string;
   }
 
-  interface RowMeta {
+  interface RowChild {
+    [key: string]: any;
+  }
+
+  interface RowMeta<C extends RowChild = RowChild> {
     readonly selected: boolean;
     readonly errors: CellError[];
-    readonly isPlaceholder: boolean;
-    readonly isGroupFooter: boolean;
+    readonly isPlaceholder?: boolean;
+    readonly isGroupFooter?: boolean;
+    readonly children: C[];
   }
 
   interface RowGroup {
@@ -25,9 +30,9 @@ namespace Table {
     readonly pageSize: number;
   }
 
-  interface Row<E extends RowMeta = RowMeta, G extends RowGroup = RowGroup> {
+  interface Row<G extends RowGroup = RowGroup, C extends RowChild = RowChild> {
     readonly id: number;
-    readonly meta: E;
+    readonly meta: RowMeta<C>;
     readonly group: G | null;
   }
 
@@ -48,11 +53,7 @@ namespace Table {
 
   type RowType = "account" | "subaccount" | "actual";
 
-  interface BudgetRowMeta extends RowMeta {
-    readonly subaccounts: ISimpleSubAccount[];
-  }
-
-  interface AccountRow extends Row<BudgetRowMeta> {
+  interface AccountRow extends Row<ISubAccountNestedGroup, ISimpleSubAccount> {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
@@ -60,7 +61,7 @@ namespace Table {
     readonly actual: number | null;
   }
 
-  interface SubAccountRow extends Row<BudgetRowMeta, ISubAccountNestedGroup> {
+  interface SubAccountRow extends Row<ISubAccountNestedGroup, ISimpleSubAccount> {
     readonly identifier: string | null;
     readonly name: string | null;
     readonly description: string | null;

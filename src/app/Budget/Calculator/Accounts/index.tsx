@@ -5,8 +5,9 @@ import { isNil, includes } from "lodash";
 
 import { ColDef } from "ag-grid-community";
 
+import BudgetTable from "lib/BudgetTable";
+
 import { WrapInApplicationSpinner } from "components/display";
-import { BudgetTable } from "components/tables";
 import { formatCurrency } from "util/string";
 
 import { setAncestorsAction } from "../../actions";
@@ -56,8 +57,10 @@ const Accounts = (): JSX.Element => {
   return (
     <React.Fragment>
       <WrapInApplicationSpinner loading={budget.detail.loading || accounts.table.loading}>
-        <BudgetTable<Table.AccountRow, Table.BudgetRowMeta>
+        <BudgetTable<Table.AccountRow>
           table={accounts.table.data}
+          identifierField={"identifier"}
+          identifierFieldHeader={"Account"}
           isCellEditable={(row: Table.AccountRow, colDef: ColDef) => {
             if (includes(["estimated", "actual", "variance"], colDef.field)) {
               return false;
@@ -82,15 +85,13 @@ const Accounts = (): JSX.Element => {
               !isNil(budget.detail.data) && !isNil(budget.detail.data.variance) ? budget.detail.data.variance : 0.0,
             actual: !isNil(budget.detail.data) && !isNil(budget.detail.data.actual) ? budget.detail.data.actual : 0.0
           }}
-          columns={[
-            {
-              field: "identifier",
-              headerName: "Account"
-            },
+          bodyColumns={[
             {
               field: "description",
               headerName: "Category Description"
-            },
+            }
+          ]}
+          calculatedColumns={[
             {
               field: "estimated",
               headerName: "Estimated",
