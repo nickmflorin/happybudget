@@ -30,6 +30,10 @@ import { HideCellForGroupFooter, IncludeErrorsInCell } from "./Util";
 
 import "./index.scss";
 
+const HideGroupRow = (props: any): JSX.Element => {
+  return <></>;
+};
+
 const BudgetTable = <
   R extends Table.Row<G, C>,
   G extends Table.RowGroup = Table.RowGroup,
@@ -101,14 +105,6 @@ const BudgetTable = <
         cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
       }
     ];
-    if (!isNil(groupParams)) {
-      baseLeftColumns.push({
-        field: "group",
-        hide: true,
-        rowGroup: true,
-        valueGetter: (params: ValueGetterParams) => groupValueGetter(params.data as R)
-      });
-    }
     if (!isNil(onRowExpand)) {
       baseLeftColumns.push({
         field: "expand",
@@ -207,14 +203,12 @@ const BudgetTable = <
 
   useEffect(() => {
     if (!isNil(groupParams)) {
-      console.log("REGROUPING!");
       const rowsWithGroup = filter(table, (row: R) => !isNil(groupValueGetter(row)));
       const rowsWithoutGroup = filter(table, (row: R) => isNil(groupValueGetter(row)));
 
       const newTable: R[] = [];
 
       const groupedRows: { [key: number]: R[] } = groupBy(rowsWithGroup, (row: R) => (groupGetter(row) as G).id);
-      console.log(groupedRows);
 
       const allGroups: (G | null)[] = map(rowsWithGroup, (row: R) => groupGetter(row));
       const groups: G[] = [];
@@ -523,7 +517,7 @@ const BudgetTable = <
         <AgGridReact
           defaultColDef={{
             resizable: false,
-            sortable: true,
+            sortable: false,
             filter: false
           }}
           suppressHorizontalScroll={true}
@@ -553,11 +547,7 @@ const BudgetTable = <
           enableRangeSelection={true}
           clipboardDeliminator={","}
           domLayout={"autoHeight"}
-          groupDefaultExpanded={1}
-          groupUseEntireRow={true}
-          rowGroupPanelShow={"never"}
           animateRows={true}
-          groupRowRendererParams={{ suppressCount: true }}
           navigateToNextCell={(params: NavigateToNextCellParams): CellPosition => {
             if (!isNil(params.nextCellPosition)) {
               if (includes(["estimated", "expand", "select", "delete"], params.nextCellPosition.column.getColId())) {
@@ -597,6 +587,7 @@ const BudgetTable = <
             ValueCell: IncludeErrorsInCell<R>(ValueCell),
             UnitCell: IncludeErrorsInCell<R>(UnitCell),
             IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
+            HideGroupRow: HideGroupRow,
             ...frameworkComponents
           }}
           onCellEditingStopped={(event: CellEditingStoppedEvent) => {

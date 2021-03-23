@@ -182,7 +182,6 @@ export const createTableDataReducer = <
             the ${Options.referenceEntity} row with ID ${payload.ids[i]} does not exist in state when it is expected to.`
           );
         } else {
-          console.log("Adding group to row");
           st = replaceInArray<R>(st, { id: payload.ids[i] }, { ...row, group: payload.group });
         }
       }
