@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
+import Content from "./Content";
 import Header from "./Header";
 import Footer from "./Footer";
 import Sidebar, { ISidebarItem } from "./Sidebar";
@@ -16,6 +17,8 @@ interface LayoutProps {
   style?: React.CSSProperties;
   collapsed?: boolean;
   breadcrumbs?: ReactNode;
+  headerProps?: StandardComponentProps;
+  contentProps?: StandardComponentProps;
 }
 
 const Layout = ({
@@ -25,7 +28,9 @@ const Layout = ({
   breadcrumbs,
   sidebar,
   style = {},
-  collapsed = false
+  collapsed = false,
+  headerProps = {},
+  contentProps = {}
 }: LayoutProps): JSX.Element => {
   return (
     <div className={classNames("application", className)} style={style}>
@@ -39,11 +44,8 @@ const Layout = ({
         </div>
       )}
       <div className={classNames("application-content", { collapsed })}>
-        <Header breadcrumbs={breadcrumbs} toolbar={toolbar} />
-        <div className={"content"}>
-          <div className={"sub-content"}>{children}</div>
-          <div className={"drawer-wrapper"} id={"drawer-target"}></div>
-        </div>
+        <Header breadcrumbs={breadcrumbs} toolbar={toolbar} {...headerProps} />
+        <Content {...contentProps}>{children}</Content>
         <Footer />
       </div>
     </div>

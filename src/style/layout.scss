@@ -59,7 +59,7 @@ $footer-background-color: $white;
   // the logged in application.
   .application {
     height: 100vh;
-    overflow-y: scroll;
+    overflow-y: hidden;
     min-height: 100vh;
 
     .sidebar-container {
@@ -81,7 +81,9 @@ $footer-background-color: $white;
 
       .header {
         margin-top: auto;
+        // This is a default, it is overriddene when there is an additional supplemenetary header.
         height: $header-height;
+        line-height: unset !important;
         position: fixed !important;
         top: 0 !important;
         width: calc(100% - #{$sidebar-width});

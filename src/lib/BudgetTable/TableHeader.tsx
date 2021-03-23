@@ -13,6 +13,7 @@ import { IconButton } from "components/control/buttons";
 import { FieldsDropdown } from "components/control/dropdowns";
 import { FieldMenuField } from "components/control/menus/FieldsMenu";
 import { SavingChanges } from "components/display";
+import { Portal } from "components/layout";
 
 interface TableHeaderProps {
   saving?: boolean;
@@ -44,71 +45,73 @@ const TableHeader = ({
   onExport
 }: TableHeaderProps): JSX.Element => {
   return (
-    <div className={"table-header"}>
-      <Checkbox checked={selected} onChange={(e: CheckboxChangeEvent) => onSelect(e.target.checked)} />
-      <IconButton
-        className={"dark"}
-        size={"large"}
-        icon={<FontAwesomeIcon icon={faTrash} />}
-        onClick={() => onDelete()}
-        disabled={deleteDisabled}
-      />
-      <IconButton
-        className={"dark"}
-        size={"large"}
-        disabled={isNil(onGroup) || groupDisabled}
-        onClick={() => !isNil(onGroup) && onGroup()}
-        icon={<FontAwesomeIcon icon={faObjectGroup} />}
-      />
-      <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faPlusSquare} />} />
-      <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faPercentage} />} />
-      <Input
-        placeholder={"Search Rows"}
-        value={search}
-        allowClear={true}
-        prefix={<SearchOutlined />}
-        onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
-      />
-      {!isNil(saving) && <SavingChanges saving={saving} />}
-      <FieldsDropdown
-        fields={map(
-          columns,
-          (col: ColDef): FieldMenuField => {
-            return {
-              id: col.field as string,
-              label: col.headerName as string,
-              defaultChecked: true
-            };
-          }
-        )}
-        buttonProps={{ style: { minWidth: 90 } }}
-        onChange={(fields: Field[]) => onColumnsChange(fields)}
-      >
-        {"Columns"}
-      </FieldsDropdown>
-      <FieldsDropdown
-        fields={map(
-          columns,
-          (col: ColDef): FieldMenuField => {
-            return {
-              id: col.field as string,
-              label: col.headerName as string,
-              defaultChecked: true
-            };
-          }
-        )}
-        buttons={[
-          {
-            onClick: (fields: Field[]) => onExport(fields),
-            text: "Download",
-            className: "btn--primary"
-          }
-        ]}
-        buttonProps={{ style: { minWidth: 90 } }}
-      >
-        {"Export"}
-      </FieldsDropdown>
-    </div>
+    <Portal id={"supplementary-header"} visible={true}>
+      <div className={"table-header"}>
+        <Checkbox checked={selected} onChange={(e: CheckboxChangeEvent) => onSelect(e.target.checked)} />
+        <IconButton
+          className={"dark"}
+          size={"large"}
+          icon={<FontAwesomeIcon icon={faTrash} />}
+          onClick={() => onDelete()}
+          disabled={deleteDisabled}
+        />
+        <IconButton
+          className={"dark"}
+          size={"large"}
+          disabled={isNil(onGroup) || groupDisabled}
+          onClick={() => !isNil(onGroup) && onGroup()}
+          icon={<FontAwesomeIcon icon={faObjectGroup} />}
+        />
+        <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faPlusSquare} />} />
+        <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faPercentage} />} />
+        <Input
+          placeholder={"Search Rows"}
+          value={search}
+          allowClear={true}
+          prefix={<SearchOutlined />}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
+        />
+        {!isNil(saving) && <SavingChanges saving={saving} />}
+        <FieldsDropdown
+          fields={map(
+            columns,
+            (col: ColDef): FieldMenuField => {
+              return {
+                id: col.field as string,
+                label: col.headerName as string,
+                defaultChecked: true
+              };
+            }
+          )}
+          buttonProps={{ style: { minWidth: 90 } }}
+          onChange={(fields: Field[]) => onColumnsChange(fields)}
+        >
+          {"Columns"}
+        </FieldsDropdown>
+        <FieldsDropdown
+          fields={map(
+            columns,
+            (col: ColDef): FieldMenuField => {
+              return {
+                id: col.field as string,
+                label: col.headerName as string,
+                defaultChecked: true
+              };
+            }
+          )}
+          buttons={[
+            {
+              onClick: (fields: Field[]) => onExport(fields),
+              text: "Download",
+              className: "btn--primary"
+            }
+          ]}
+          buttonProps={{ style: { minWidth: 90 } }}
+        >
+          {"Export"}
+        </FieldsDropdown>
+      </div>
+    </Portal>
   );
 };
 
