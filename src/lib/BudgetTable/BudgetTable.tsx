@@ -415,7 +415,7 @@ const BudgetTable = <
       )
     );
   }, [bodyColumns, calculatedColumns]);
-  console.log(_table);
+
   return (
     <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
       <TableHeader
