@@ -4,6 +4,7 @@ import { isNil } from "lodash";
 import { Input } from "antd";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
+import { ColorSelect } from "components/control";
 import { Form } from "components/forms";
 import { createAccountSubAccountGroup, createSubAccountSubAccountGroup } from "services";
 
@@ -90,6 +91,28 @@ const CreateSubAccountGroupModal = ({
           rules={[{ required: true, message: "Please provide a valid name for the group." }]}
         >
           <Input placeholder={"Name"} />
+        </Form.Item>
+        <Form.Item
+          name={"color"}
+          label={"Color"}
+          rules={[{ required: true, message: "Please select a color for the group." }]}
+        >
+          <ColorSelect
+            colors={[
+              "#797695",
+              "#ff7165",
+              "#80cbc4",
+              "#ce93d8",
+              "#fed835",
+              "#c87987",
+              "#69f0ae",
+              "#a1887f",
+              "#81d4fa",
+              "#f75776",
+              "#66bb6a",
+              "#58add6"
+            ]}
+          />
         </Form.Item>
       </Form>
     </Modal>
