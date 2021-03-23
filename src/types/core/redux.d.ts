@@ -126,12 +126,17 @@ namespace Redux {
   }
 
   namespace Calculator {
+    interface ISubAccountGroupsStore {
+      deleting: number[];
+    }
+
     interface ISubAccountsStore {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
       readonly table: ITableStore<Table.SubAccountRow, ISubAccount>;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
+      readonly groups: ISubAccountGroupsStore;
     }
 
     interface IAccountsStore {

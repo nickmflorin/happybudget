@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
 import { ActionType } from "../actions";
@@ -11,7 +12,8 @@ import {
   submitAccountCommentTask,
   deleteAccountCommentTask,
   editAccountCommentTask,
-  getAccountSubAccountsHistoryTask
+  getAccountSubAccountsHistoryTask,
+  deleteAccountSubAccountGroupTask
 } from "./tasks";
 
 function* watchForRequestSubAccountsSaga(): SagaIterator {
@@ -96,6 +98,26 @@ function* watchForRequestSubAccountsHistorySaga(): SagaIterator {
   }
 }
 
+function* watchForDeleteSubAccountGroupSaga(): SagaIterator {
+  let lastTasks: { [key: number]: any[] } = {};
+  while (true) {
+    const action = yield take(ActionType.Account.SubAccounts.Groups.Delete);
+    if (!isNil(action.payload)) {
+      if (isNil(lastTasks[action.payload])) {
+        lastTasks[action.payload] = [];
+      }
+      // If there were any previously submitted tasks to delete the same group,
+      // cancel them.
+      if (lastTasks[action.payload].length !== 0) {
+        const cancellable = lastTasks[action.payload];
+        lastTasks = { ...lastTasks, [action.payload]: [] };
+        yield cancel(cancellable);
+      }
+    }
+    lastTasks[action.payload].push(yield call(deleteAccountSubAccountGroupTask, action));
+  }
+}
+
 export default function* accountSaga(): SagaIterator {
   yield spawn(watchForAccountIdChangedSaga);
   yield spawn(watchForRequestSubAccountsHistorySaga);
@@ -107,4 +129,5 @@ export default function* accountSaga(): SagaIterator {
   yield spawn(watchForSubmitCommentSaga);
   yield spawn(watchForRemoveCommentSaga);
   yield spawn(watchForEditCommentSaga);
+  yield spawn(watchForDeleteSubAccountGroupSaga);
 }

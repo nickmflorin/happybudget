@@ -44,7 +44,8 @@ const rootReducer = combineReducers({
       SetSearch: ActionType.ActualsTable.SetSearch,
       AddErrors: ActionType.ActualsTable.AddErrors,
       // TODO: This should be allowed to not be defined.
-      AddGroupToRows: ""
+      AddGroupToRows: "",
+      RemoveGroupFromRows: ""
     },
     createActualRowPlaceholder,
     initializeRowFromActual,

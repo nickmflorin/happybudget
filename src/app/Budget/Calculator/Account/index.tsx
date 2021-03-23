@@ -10,7 +10,6 @@ import BudgetTable from "lib/BudgetTable";
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { CreateSubAccountGroupModal } from "components/modals";
 import { formatCurrency } from "util/string";
-import { generateRandomNumericId } from "util/math";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
 import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
@@ -29,7 +28,8 @@ import {
   deleteAccountCommentAction,
   editAccountCommentAction,
   requestAccountSubAccountsHistoryAction,
-  addGroupToAccountSubAccountsTableRowsAction
+  addGroupToAccountSubAccountsTableRowsAction,
+  deleteAccountSubAccountsGroupAction
 } from "../actions";
 
 const Account = (): JSX.Element => {
@@ -42,6 +42,7 @@ const Account = (): JSX.Element => {
   const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
   const comments = useSelector((state: Redux.IApplicationStore) => state.calculator.account.comments);
   const events = useSelector((state: Redux.IApplicationStore) => state.calculator.account.subaccounts.history);
+  const groups = useSelector((state: Redux.IApplicationStore) => state.calculator.account.subaccounts.groups);
 
   useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
@@ -54,6 +55,7 @@ const Account = (): JSX.Element => {
       <RenderWithSpinner loading={accountStore.subaccounts.table.loading || accountStore.detail.loading}>
         <BudgetTable<Table.SubAccountRow, ISubAccountNestedGroup, ISimpleSubAccount>
           table={accountStore.subaccounts.table.data}
+          loading={groups.deleting.length !== 0}
           identifierField={"identifier"}
           identifierFieldHeader={"Line"}
           isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
@@ -83,27 +85,7 @@ const Account = (): JSX.Element => {
           onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountSubAccountAction(payload))}
           onRowExpand={(id: number) => history.push(`/budgets/${budget.id}/subaccounts/${id}`)}
           groupParams={{
-            createFooter: (group: ISubAccountNestedGroup) => ({
-              id: generateRandomNumericId(),
-              name: null,
-              identifier: group.name,
-              unit: null,
-              multiplier: null,
-              rate: null,
-              quantity: null,
-              description: null,
-              estimated: null,
-              variance: null,
-              actual: null,
-              group: null,
-              meta: {
-                isPlaceholder: true,
-                isGroupFooter: true,
-                selected: false,
-                children: [],
-                errors: []
-              }
-            }),
+            onDeleteGroup: (group: ISubAccountNestedGroup) => dispatch(deleteAccountSubAccountsGroupAction(group.id)),
             onGroupRows: (rows: Table.SubAccountRow[]) =>
               setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
           }}

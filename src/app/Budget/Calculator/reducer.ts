@@ -57,7 +57,8 @@ const rootReducer = combineReducers({
         SetSearch: ActionType.AccountsTable.SetSearch,
         AddErrors: ActionType.AccountsTable.AddErrors,
         // TODO: This should be allowed to not be defined.
-        AddGroupToRows: ""
+        AddGroupToRows: "",
+        RemoveGroupFromRows: ""
       },
       createAccountRowPlaceholder,
       initializeRowFromAccount,
@@ -84,6 +85,11 @@ const rootReducer = combineReducers({
       Replying: ActionType.Account.Comments.Replying
     }),
     subaccounts: combineReducers({
+      groups: combineReducers({
+        deleting: createModelListActionReducer(ActionType.Account.SubAccounts.Groups.Deleting, {
+          referenceEntity: "group"
+        })
+      }),
       deleting: createModelListActionReducer(ActionType.Account.SubAccounts.Deleting, {
         referenceEntity: "subaccount"
       }),
@@ -113,7 +119,8 @@ const rootReducer = combineReducers({
           Loading: ActionType.Account.SubAccountsTable.Loading,
           SetSearch: ActionType.Account.SubAccountsTable.SetSearch,
           AddErrors: ActionType.Account.SubAccountsTable.AddErrors,
-          AddGroupToRows: ActionType.Account.SubAccountsTable.AddGroupToRows
+          AddGroupToRows: ActionType.Account.SubAccountsTable.AddGroupToRows,
+          RemoveGroupFromRows: ActionType.Account.SubAccountsTable.RemoveGroupFromRows
         },
         createSubAccountRowPlaceholder,
         initializeRowFromSubAccount,
@@ -171,7 +178,8 @@ const rootReducer = combineReducers({
           SetSearch: ActionType.SubAccount.SubAccountsTable.SetSearch,
           AddErrors: ActionType.SubAccount.SubAccountsTable.AddErrors,
           // TODO: This should be allowed to not be defined.
-          AddGroupToRows: ""
+          AddGroupToRows: "",
+          RemoveGroupFromRows: ""
         },
         createSubAccountRowPlaceholder,
         initializeRowFromSubAccount,

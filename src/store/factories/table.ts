@@ -186,6 +186,22 @@ export const createTableDataReducer = <
         }
       }
       return st;
+    },
+    RemoveGroupFromRows: (payload: number, st: Redux.ListStore<R>) => {
+      const rows = filter(st, (row: R) => !isNil(row.group) && row.group.id === payload);
+      if (rows.length === 0) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when removing group from rows of ${Options.referenceEntity} table...
+          no rows are associated wtih group ID ${payload} when they are expected.`
+        );
+        return st;
+      } else {
+        for (let i = 0; i < rows.length; i++) {
+          st = replaceInArray<R>(st, { id: rows[i].id }, { ...rows[i], group: null });
+        }
+        return st;
+      }
     }
   };
 
@@ -240,7 +256,8 @@ export const createTableReducer = <
       DeselectRow: mappings.DeselectRow,
       SelectAllRows: mappings.SelectAllRows,
       AddErrors: mappings.AddErrors,
-      AddGroupToRows: mappings.AddGroupToRows
+      AddGroupToRows: mappings.AddGroupToRows,
+      RemoveGroupFromRows: mappings.RemoveGroupFromRows
     },
     placeholderCreator,
     { referenceEntity: Options.referenceEntity as string, initialState: Options.initialState.data }

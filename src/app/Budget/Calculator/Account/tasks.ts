@@ -13,7 +13,8 @@ import {
   deleteComment,
   updateComment,
   replyToComment,
-  getAccountSubAccountsHistory
+  getAccountSubAccountsHistory,
+  deleteSubAccountGroup
 } from "services";
 import { handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
@@ -50,8 +51,24 @@ import {
   editingAccountCommentAction,
   replyingToAccountCommentAction,
   loadingAccountSubAccountsHistoryAction,
-  responseAccountSubAccountsHistoryAction
+  responseAccountSubAccountsHistoryAction,
+  deletingAccountSubAccountsGroupAction,
+  removeGroupFromAccountSubAccountsTableRowsAction
 } from "../actions";
+
+export function* deleteAccountSubAccountGroupTask(action: Redux.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(deletingAccountSubAccountsGroupAction(true));
+    try {
+      yield call(deleteSubAccountGroup, action.payload);
+      yield put(removeGroupFromAccountSubAccountsTableRowsAction(action.payload));
+    } catch (e) {
+      handleRequestError(e, "There was an error deleting the sub account group.");
+    } finally {
+      yield put(deletingAccountSubAccountsGroupAction(false));
+    }
+  }
+}
 
 export function* getAccountSubAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);

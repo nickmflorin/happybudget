@@ -24,6 +24,7 @@ namespace ReducerFactory {
     SelectAllRows: string;
     AddErrors: string;
     AddGroupToRows: string;
+    RemoveGroupFromRows: string;
   }
 
   interface ITableDataActionMap extends ICommonTableActionMap {

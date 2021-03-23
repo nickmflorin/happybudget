@@ -5,12 +5,17 @@ import {
   initialCommentsListResponseState
 } from "store/initialState";
 
+export const initialSubAccountGroupsState: Redux.Calculator.ISubAccountGroupsStore = {
+  deleting: []
+};
+
 export const initialSubAccountsState: Redux.Calculator.ISubAccountsStore = {
   table: initialTableState,
   deleting: [],
   updating: [],
   creating: false,
-  history: initialListResponseState
+  history: initialListResponseState,
+  groups: initialSubAccountGroupsState
 };
 
 export const initialAccountsState: Redux.Calculator.IAccountsStore = {

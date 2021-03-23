@@ -68,3 +68,8 @@ export const getSubAccountGroup = async (id: number, options: Http.IRequestOptio
   const url = URL.v1("subaccounts", "subaccount-groups", id);
   return client.retrieve<ISubAccountGroup>(url, options);
 };
+
+export const deleteSubAccountGroup = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
+  const url = URL.v1("subaccounts", "subaccount-groups", id);
+  return client.delete<null>(url, options);
+};

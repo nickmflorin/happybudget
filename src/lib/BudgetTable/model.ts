@@ -16,7 +16,7 @@ export interface GroupProps<
   valueGetter?: (row: R) => any;
   groupGetter?: (row: R) => G | null;
   onGroupRows: (rows: R[]) => void;
-  createFooter: (group: G) => R;
+  onDeleteGroup: (group: G) => void;
 }
 
 export interface BudgetTableProps<
@@ -40,6 +40,7 @@ export interface BudgetTableProps<
   highlightedNonEditableCells?: (keyof R)[];
   nonHighlightedNonEditableCells?: (keyof R)[];
   groupParams?: GroupProps<R, G, C>;
+  loading?: boolean;
   cellClass?: (params: CellClassParams) => string | undefined;
   highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
   rowRefreshRequired?: (existing: R, row: R) => boolean;

@@ -77,7 +77,8 @@ export const ActionType = {
       Response: "calculator.account.subaccountstable.Response",
       Request: "calculator.account.subaccountstable.Request",
       AddErrors: "calculator.account.subaccountstable.AddErrors",
-      AddGroupToRows: "calculator.account.subaccountstable.AddGroupToRows"
+      AddGroupToRows: "calculator.account.subaccountstable.AddGroupToRows",
+      RemoveGroupFromRows: "calculator.account.subaccountstable.RemoveGroupFromRows"
     },
     SubAccounts: {
       Deleting: "calculator.account.subaccounts.Deleting",
@@ -85,6 +86,10 @@ export const ActionType = {
       Updating: "calculator.account.subaccounts.Updating",
       Update: "calculator.account.subaccounts.Update",
       Remove: "calculator.account.subaccounts.Remove",
+      Groups: {
+        Delete: "calculator.account.subaccounts.groups.Delete",
+        Deleting: "calculator.account.subaccounts.groups.Deleting"
+      },
       History: {
         Loading: "calculator.account.subaccounts.history.Loading",
         Response: "calculator.account.subaccounts.history.Response",
@@ -290,6 +295,13 @@ export const addErrorsToAccountSubAccountsTableAction = simpleAction<Table.CellE
 export const addGroupToAccountSubAccountsTableRowsAction = simpleAction<{ group: Table.RowGroup; ids: number[] }>(
   ActionType.Account.SubAccountsTable.AddGroupToRows
 );
+export const removeGroupFromAccountSubAccountsTableRowsAction = simpleAction<number>(
+  ActionType.Account.SubAccountsTable.RemoveGroupFromRows
+);
+export const deletingAccountSubAccountsGroupAction = simpleAction<boolean>(
+  ActionType.Account.SubAccounts.Groups.Deleting
+);
+export const deleteAccountSubAccountsGroupAction = simpleAction<number>(ActionType.Account.SubAccounts.Groups.Delete);
 
 /*
   Actions Pertaining to Account Sub Accounts History
