@@ -94,6 +94,7 @@ namespace Http {
   interface ISubAccountGroupPayload extends IPayload {
     readonly name: string;
     readonly subaccounts?: number[];
+    readonly color: string;
   }
 
   interface IActualPayload extends IPayload {

@@ -28,7 +28,8 @@ import {
   submitAccountCommentAction,
   deleteAccountCommentAction,
   editAccountCommentAction,
-  requestAccountSubAccountsHistoryAction
+  requestAccountSubAccountsHistoryAction,
+  addGroupToAccountSubAccountsTableRowsAction
 } from "../actions";
 
 const Account = (): JSX.Element => {
@@ -238,6 +239,12 @@ const Account = (): JSX.Element => {
           open={true}
           onSuccess={(group: ISubAccountGroup) => {
             setGroupSubAccounts(undefined);
+            dispatch(
+              addGroupToAccountSubAccountsTableRowsAction({
+                group: { id: group.id, color: group.color, name: group.name },
+                ids: map(group.subaccounts, (subaccount: ISimpleSubAccount) => subaccount.id)
+              })
+            );
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
         />

@@ -207,12 +207,14 @@ const BudgetTable = <
 
   useEffect(() => {
     if (!isNil(groupParams)) {
+      console.log("REGROUPING!");
       const rowsWithGroup = filter(table, (row: R) => !isNil(groupValueGetter(row)));
       const rowsWithoutGroup = filter(table, (row: R) => isNil(groupValueGetter(row)));
 
       const newTable: R[] = [];
 
       const groupedRows: { [key: number]: R[] } = groupBy(rowsWithGroup, (row: R) => (groupGetter(row) as G).id);
+      console.log(groupedRows);
 
       const allGroups: (G | null)[] = map(rowsWithGroup, (row: R) => groupGetter(row));
       const groups: G[] = [];

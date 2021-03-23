@@ -10,6 +10,8 @@ namespace ReducerFactory {
 
   type TransformerExtensions<S, A extends Redux.IAction<any>> = Record<string, Transformer<S, A>>;
 
+  // TODO: We want to remove this parent because we want errors to be raised if it
+  // is an unexpected action map value.
   type IActionMap = { [key: string]: string };
 
   interface ICommonTableActionMap extends IActionMap {
@@ -21,6 +23,7 @@ namespace ReducerFactory {
     DeselectRow: string;
     SelectAllRows: string;
     AddErrors: string;
+    AddGroupToRows: string;
   }
 
   interface ITableDataActionMap extends ICommonTableActionMap {
@@ -79,8 +82,10 @@ namespace ReducerFactory {
   }
 
   interface ITableReducerOptions<
-    R extends Table.Row<F, E>,
+    R extends Table.Row<G, C>,
     M extends Model,
-    S extends Redux.ITableStore<R, M> = Redux.ITableStore<R, M>
+    G extends Table.RowGroup = Table.RowGroup,
+    C extends Table.RowChild = Table.RowChild,
+    S extends Redux.ITableStore<R, M, G, C> = Redux.ITableStore<R, M, G, C>
   > extends IOptions<S> {}
 }

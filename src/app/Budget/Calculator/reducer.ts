@@ -55,7 +55,9 @@ const rootReducer = combineReducers({
         Response: ActionType.AccountsTable.Response,
         Loading: ActionType.AccountsTable.Loading,
         SetSearch: ActionType.AccountsTable.SetSearch,
-        AddErrors: ActionType.AccountsTable.AddErrors
+        AddErrors: ActionType.AccountsTable.AddErrors,
+        // TODO: This should be allowed to not be defined.
+        AddGroupToRows: ""
       },
       createAccountRowPlaceholder,
       initializeRowFromAccount,
@@ -110,7 +112,8 @@ const rootReducer = combineReducers({
           Request: ActionType.Account.SubAccountsTable.Request,
           Loading: ActionType.Account.SubAccountsTable.Loading,
           SetSearch: ActionType.Account.SubAccountsTable.SetSearch,
-          AddErrors: ActionType.Account.SubAccountsTable.AddErrors
+          AddErrors: ActionType.Account.SubAccountsTable.AddErrors,
+          AddGroupToRows: ActionType.Account.SubAccountsTable.AddGroupToRows
         },
         createSubAccountRowPlaceholder,
         initializeRowFromSubAccount,
@@ -166,7 +169,9 @@ const rootReducer = combineReducers({
           Request: ActionType.SubAccount.SubAccountsTable.Request,
           Loading: ActionType.SubAccount.SubAccountsTable.Loading,
           SetSearch: ActionType.SubAccount.SubAccountsTable.SetSearch,
-          AddErrors: ActionType.SubAccount.SubAccountsTable.AddErrors
+          AddErrors: ActionType.SubAccount.SubAccountsTable.AddErrors,
+          // TODO: This should be allowed to not be defined.
+          AddGroupToRows: ""
         },
         createSubAccountRowPlaceholder,
         initializeRowFromSubAccount,

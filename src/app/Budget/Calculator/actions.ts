@@ -76,7 +76,8 @@ export const ActionType = {
       Loading: "calculator.account.subaccountstable.Loading",
       Response: "calculator.account.subaccountstable.Response",
       Request: "calculator.account.subaccountstable.Request",
-      AddErrors: "calculator.account.subaccountstable.AddErrors"
+      AddErrors: "calculator.account.subaccountstable.AddErrors",
+      AddGroupToRows: "calculator.account.subaccountstable.AddGroupToRows"
     },
     SubAccounts: {
       Deleting: "calculator.account.subaccounts.Deleting",
@@ -285,6 +286,9 @@ export const responseAccountSubAccountsAction = simpleAction<Http.IListResponse<
 export const setAccountSubAccountsSearchAction = simpleAction<string>(ActionType.Account.SubAccountsTable.SetSearch);
 export const addErrorsToAccountSubAccountsTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.Account.SubAccountsTable.AddErrors
+);
+export const addGroupToAccountSubAccountsTableRowsAction = simpleAction<{ group: Table.RowGroup; ids: number[] }>(
+  ActionType.Account.SubAccountsTable.AddGroupToRows
 );
 
 /*

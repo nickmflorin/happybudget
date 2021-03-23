@@ -21,7 +21,9 @@ import { createListReducerFromTransformers } from "./util";
  */
 export const createTableDataReducer = <
   /* eslint-disable indent */
-  R extends Table.Row,
+  R extends Table.Row<G, C>,
+  G extends Table.RowGroup = Table.RowGroup,
+  C extends Table.RowChild = Table.RowChild,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   mappings: Partial<ReducerFactory.ITableDataActionMap>,
@@ -169,6 +171,22 @@ export const createTableDataReducer = <
         state = updateStateWithError(state, payload);
       }
       return state;
+    },
+    AddGroupToRows: (payload: { group: G; ids: number[] }, st: Redux.ListStore<R>) => {
+      for (let i = 0; i < payload.ids.length; i++) {
+        const row = find(st, { id: payload.ids[i] } as any);
+        if (isNil(row)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when adding group to rows of ${Options.referenceEntity} table...
+            the ${Options.referenceEntity} row with ID ${payload.ids[i]} does not exist in state when it is expected to.`
+          );
+        } else {
+          console.log("Adding group to row");
+          st = replaceInArray<R>(st, { id: payload.ids[i] }, { ...row, group: payload.group });
+        }
+      }
+      return st;
     }
   };
 
@@ -193,25 +211,27 @@ export const createTableDataReducer = <
  */
 export const createTableReducer = <
   /* eslint-disable indent */
-  R extends Table.Row,
+  R extends Table.Row<G, C>,
   M extends Model,
+  G extends Table.RowGroup = Table.RowGroup,
+  C extends Table.RowChild = Table.RowChild,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   /* eslint-disable indent */
   mappings: ReducerFactory.ITableActionMap,
   placeholderCreator: () => R,
   modelToRow: (model: M) => R,
-  options: Partial<ReducerFactory.ITableReducerOptions<R, M>> = {
+  options: Partial<ReducerFactory.ITableReducerOptions<R, M, G, C>> = {
     initialState: initialTableState,
     referenceEntity: "entity"
   }
 ) => {
-  const Options: ReducerFactory.ITableReducerOptions<R, M> = mergeWithDefaults(options, {
+  const Options: ReducerFactory.ITableReducerOptions<R, M, G, C> = mergeWithDefaults(options, {
     referenceEntity: "entity",
     initialState: initialTableState
   });
 
-  const dataReducer = createTableDataReducer<R, A>(
+  const dataReducer = createTableDataReducer<R, G, C, A>(
     {
       AddPlaceholders: mappings.AddPlaceholders,
       RemoveRow: mappings.RemoveRow,
@@ -220,14 +240,15 @@ export const createTableReducer = <
       SelectRow: mappings.SelectRow,
       DeselectRow: mappings.DeselectRow,
       SelectAllRows: mappings.SelectAllRows,
-      AddErrors: mappings.AddErrors
+      AddErrors: mappings.AddErrors,
+      AddGroupToRows: mappings.AddGroupToRows
     },
     placeholderCreator,
     { referenceEntity: Options.referenceEntity as string, initialState: Options.initialState.data }
   );
 
-  const reducer: Reducer<Redux.ITableStore<R, M>, A> = (
-    state: Redux.ITableStore<R, M> = Options.initialState as Redux.ITableStore<R, M>,
+  const reducer: Reducer<Redux.ITableStore<R, M, G, C>, A> = (
+    state: Redux.ITableStore<R, M, G, C> = Options.initialState as Redux.ITableStore<R, M>,
     action: A
   ) => {
     let newState = { ...state };
@@ -235,7 +256,11 @@ export const createTableReducer = <
     // First, we use the reducer that just maintains the table's rows to update
     // the table data.
     newState = { ...newState, data: dataReducer(newState.data, action) };
-    const transformers: ReducerFactory.Transformers<ReducerFactory.ITableActionMap, Redux.ITableStore<R, M>, A> = {
+    const transformers: ReducerFactory.Transformers<
+      ReducerFactory.ITableActionMap,
+      Redux.ITableStore<R, M, G, C>,
+      A
+    > = {
       SetSearch: (search: string) => ({ search }),
       Loading: (loading: boolean) => ({ loading }),
       Request: () => ({ rawData: [], data: [], responseWasReceived: false }),
@@ -250,7 +275,7 @@ export const createTableReducer = <
 
     // Find the standardized action type.
     let standardizedActionType: string | undefined = undefined;
-    forEach(mappings, (value: string | undefined | Transformer<Redux.ITableStore<R, M>, A>, standard: string) => {
+    forEach(mappings, (value: string | undefined | Transformer<Redux.ITableStore<R, M, G, C>, A>, standard: string) => {
       if (value !== undefined && value === action.type) {
         standardizedActionType = standard;
         return false;
@@ -258,7 +283,7 @@ export const createTableReducer = <
     });
 
     if (!isNil(standardizedActionType)) {
-      const transformer: ReducerFactory.Transformer<Redux.ITableStore<R, M>, A> | undefined =
+      const transformer: ReducerFactory.Transformer<Redux.ITableStore<R, M, G, C>, A> | undefined =
         transformers[standardizedActionType];
       if (!isNil(transformer)) {
         const updateToState = transformer(action.payload, newState, action);

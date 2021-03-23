@@ -66,7 +66,12 @@ namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
-  interface ITableStore<R extends Row, M extends Model> {
+  interface ITableStore<
+    R extends Row<G, C>,
+    M extends Model,
+    G extends RowGroup = RowGroup,
+    C extends RowChild = RowChild
+  > {
     readonly data: IListStore<R>;
     readonly loading: boolean;
     readonly rawData: IListStore<M>;

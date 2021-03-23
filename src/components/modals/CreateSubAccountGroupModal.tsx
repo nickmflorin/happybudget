@@ -62,7 +62,11 @@ const CreateSubAccountGroupModal = ({
               }
             };
             if (!isNil(accountId)) {
-              createAccountSubAccountGroup(accountId, { name: values.name, subaccounts: subaccounts })
+              createAccountSubAccountGroup(accountId, {
+                name: values.name,
+                subaccounts: subaccounts,
+                color: values.color
+              })
                 .then((group: ISubAccountGroup) => {
                   form.resetFields();
                   onSuccess(group);
@@ -70,7 +74,11 @@ const CreateSubAccountGroupModal = ({
                 .catch((e: Error) => handleError(e))
                 .finally(() => setLoading(false));
             } else if (!isNil(subaccountId)) {
-              createSubAccountSubAccountGroup(subaccountId, { name: values.name, subaccounts: subaccounts })
+              createSubAccountSubAccountGroup(subaccountId, {
+                name: values.name,
+                subaccounts: subaccounts,
+                color: values.color
+              })
                 .then((group: ISubAccountGroup) => {
                   form.resetFields();
                   onSuccess(group);
