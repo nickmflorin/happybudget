@@ -1,43 +1,69 @@
 @import 'style/colors';
 @import 'style/typography';
 
-.primary-grid {
-  .ag-row:last-child {
-    border-bottom: none !important;
-  }
-  div[role='gridcell'].unit-cell {
-    // This padding is an attempt to vertically align the tag in the cell.  It
-    // is not the best way, since the height of the cell can cause the vertical
-    // alignment to become skewed.  We should figure out the right way to do this.
-    padding-top: 6px;
-    padding-bottom: 6px;
-  }
-}
+.table-header {
+  display: flex;
+  // This will align the checkbox in the header with the checkboxes in the
+  // rows vertically.
+  padding-left: 6px;
+  height: 36px;
+  margin-bottom: 10px;
 
-.footer-grid {
-  .ag-body-viewport {
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    .ag-row {
-      border-bottom: none !important;
-      div[role='gridcell'] {
-        background-color: #f8f8f8;
-        font-family: $roboto;
-        font-weight: 400;
-        color: $text-secondary;
-      }
+  .ant-checkbox-wrapper {
+    margin-right: 8px;
+    .ant-checkbox {
+      padding: 10px;
+    }
+  }
+  .btn--icon-only {
+    margin-right: 14px;
+  }
+  .btn--caret {
+    &:not(:last-child) {
+      margin-right: 14px;
     }
   }
 }
 
-.icon--lock {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  color: $text-primary;
+.budget-table {
+  .primary-grid {
+    .ag-row:last-child {
+      border-bottom: none !important;
+    }
+    div[role='gridcell'].unit-cell {
+      // This padding is an attempt to vertically align the tag in the cell.  It
+      // is not the best way, since the height of the cell can cause the vertical
+      // alignment to become skewed.  We should figure out the right way to do this.
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
+  }
 
-  svg {
-    height: 0.8rem;
-    width: auto;
+  .footer-grid {
+    .ag-body-viewport {
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+      .ag-row {
+        border-bottom: none !important;
+        div[role='gridcell'] {
+          background-color: #f8f8f8;
+          font-family: $roboto;
+          font-weight: 400;
+          color: $text-secondary;
+        }
+      }
+    }
+  }
+
+  .icon--lock {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    color: $text-primary;
+
+    svg {
+      height: 0.8rem;
+      width: auto;
+    }
   }
 }

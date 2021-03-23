@@ -14,8 +14,6 @@ import { FieldsDropdown } from "components/control/dropdowns";
 import { FieldMenuField } from "components/control/menus/FieldsMenu";
 import { SavingChanges } from "components/display";
 
-import "./TableHeader.scss";
-
 interface TableHeaderProps {
   saving?: boolean;
   selected?: boolean;

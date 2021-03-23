@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useMemo } from "react";
+import React, { useCallback, useState, useEffect, useMemo } from "react";
 import classNames from "classnames";
 import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
 
@@ -408,7 +408,7 @@ const BudgetTable = <
   }, [bodyColumns, calculatedColumns]);
 
   return (
-    <div className={"ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
+    <React.Fragment>
       <TableHeader
         search={search}
         setSearch={(value: string) => onSearch(value)}
@@ -508,126 +508,128 @@ const BudgetTable = <
           }
         }}
       />
-      <div className={"primary-grid"}>
-        <AgGridReact
-          defaultColDef={{
-            resizable: false,
-            sortable: false,
-            filter: false
-          }}
-          suppressHorizontalScroll={true}
-          suppressContextMenu={true}
-          columnDefs={colDefs}
-          rowDragManaged={true}
-          allowContextMenuWithControlKey={true}
-          rowData={_table}
-          getRowNodeId={(data: any) => data.id}
-          getRowClass={(params: RowClassParams) => {
-            if (params.node.group === false) {
-              if (params.node.data.meta.isGroupFooter === true) {
-                let colorClass = params.node.data.group.color;
-                if (colorClass.startsWith("#")) {
-                  colorClass = params.node.data.group.color.slice(1);
+      <div className={"budget-table ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
+        <div className={"primary-grid"}>
+          <AgGridReact
+            defaultColDef={{
+              resizable: false,
+              sortable: false,
+              filter: false
+            }}
+            suppressHorizontalScroll={true}
+            suppressContextMenu={true}
+            columnDefs={colDefs}
+            rowDragManaged={true}
+            allowContextMenuWithControlKey={true}
+            rowData={_table}
+            getRowNodeId={(data: any) => data.id}
+            getRowClass={(params: RowClassParams) => {
+              if (params.node.group === false) {
+                if (params.node.data.meta.isGroupFooter === true) {
+                  let colorClass = params.node.data.group.color;
+                  if (colorClass.startsWith("#")) {
+                    colorClass = params.node.data.group.color.slice(1);
+                  }
+                  return classNames("row--group-footer", `bg-${colorClass}`);
                 }
-                return classNames("row--group-footer", `bg-${colorClass}`);
               }
-            }
-            return "";
-          }}
-          immutableData={true}
-          suppressRowClickSelection={true}
-          onGridReady={onGridReady}
-          rowHeight={36}
-          headerHeight={38}
-          enableRangeSelection={true}
-          clipboardDeliminator={","}
-          domLayout={"autoHeight"}
-          animateRows={true}
-          navigateToNextCell={(params: NavigateToNextCellParams): CellPosition => {
-            if (!isNil(params.nextCellPosition)) {
-              if (includes(["estimated", "expand", "select", "delete"], params.nextCellPosition.column.getColId())) {
-                return params.previousCellPosition;
-              }
-              return params.nextCellPosition;
-            }
-            return params.previousCellPosition;
-          }}
-          onCellKeyDown={(event: CellKeyDownEvent) => {
-            const count = event.api.getDisplayedRowCount();
-            if (!isNil(event.rowIndex) && !isNil(event.event)) {
-              // I do not understand why AGGrid's Event has an underlying Event that is in
-              // reality a KeyboardEvent but does not have any of the properties that a KeyboardEvent
-              // should have - meaning we have to tell TS to ignore this line.
-              /* @ts-ignore */
-              if (event.event.keyCode === 13) {
-                const firstEditCol = event.columnApi.getColumn(event.column.getColId());
-                if (!isNil(firstEditCol)) {
-                  event.api.ensureColumnVisible(firstEditCol);
-                  event.api.setFocusedCell(event.rowIndex + 1, firstEditCol);
+              return "";
+            }}
+            immutableData={true}
+            suppressRowClickSelection={true}
+            onGridReady={onGridReady}
+            rowHeight={36}
+            headerHeight={38}
+            enableRangeSelection={true}
+            clipboardDeliminator={","}
+            domLayout={"autoHeight"}
+            animateRows={true}
+            navigateToNextCell={(params: NavigateToNextCellParams): CellPosition => {
+              if (!isNil(params.nextCellPosition)) {
+                if (includes(["estimated", "expand", "select", "delete"], params.nextCellPosition.column.getColId())) {
+                  return params.previousCellPosition;
                 }
-                if (count === event.rowIndex + 1) {
-                  onRowAdd();
+                return params.nextCellPosition;
+              }
+              return params.previousCellPosition;
+            }}
+            onCellKeyDown={(event: CellKeyDownEvent) => {
+              const count = event.api.getDisplayedRowCount();
+              if (!isNil(event.rowIndex) && !isNil(event.event)) {
+                // I do not understand why AGGrid's Event has an underlying Event that is in
+                // reality a KeyboardEvent but does not have any of the properties that a KeyboardEvent
+                // should have - meaning we have to tell TS to ignore this line.
+                /* @ts-ignore */
+                if (event.event.keyCode === 13) {
+                  const firstEditCol = event.columnApi.getColumn(event.column.getColId());
                   if (!isNil(firstEditCol)) {
                     event.api.ensureColumnVisible(firstEditCol);
+                    event.api.setFocusedCell(event.rowIndex + 1, firstEditCol);
+                  }
+                  if (count === event.rowIndex + 1) {
+                    onRowAdd();
+                    if (!isNil(firstEditCol)) {
+                      event.api.ensureColumnVisible(firstEditCol);
+                    }
                   }
                 }
               }
-            }
-          }}
-          enterMovesDown={true}
-          frameworkComponents={{
-            DeleteCell: HideCellForGroupFooter<R>(DeleteCell),
-            ExpandCell: ExpandCell,
-            SelectCell: SelectCell,
-            ValueCell: IncludeErrorsInCell<R>(ValueCell),
-            UnitCell: IncludeErrorsInCell<R>(UnitCell),
-            IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
-            ...frameworkComponents
-          }}
-          onCellEditingStopped={(event: CellEditingStoppedEvent) => {
-            const field = event.column.getColId();
-            if (!isNil(event.newValue)) {
-              if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
-                if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
-                  const valid = event.colDef.valueSetter({ ...event });
-                  if (valid === true) {
+            }}
+            enterMovesDown={true}
+            frameworkComponents={{
+              DeleteCell: HideCellForGroupFooter<R>(DeleteCell),
+              ExpandCell: ExpandCell,
+              SelectCell: SelectCell,
+              ValueCell: IncludeErrorsInCell<R>(ValueCell),
+              UnitCell: IncludeErrorsInCell<R>(UnitCell),
+              IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
+              ...frameworkComponents
+            }}
+            onCellEditingStopped={(event: CellEditingStoppedEvent) => {
+              const field = event.column.getColId();
+              if (!isNil(event.newValue)) {
+                if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
+                  if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
+                    const valid = event.colDef.valueSetter({ ...event });
+                    if (valid === true) {
+                      onRowUpdate({
+                        id: event.data.id,
+                        data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+                      });
+                    }
+                  } else {
                     onRowUpdate({
                       id: event.data.id,
                       data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
                     });
                   }
-                } else {
-                  onRowUpdate({
-                    id: event.data.id,
-                    data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
-                  });
                 }
               }
-            }
-          }}
-        />
+            }}
+          />
+        </div>
+        <div className={"footer-grid"}>
+          <AgGridReact
+            defaultColDef={{
+              resizable: false,
+              sortable: false,
+              filter: false
+            }}
+            suppressHorizontalScroll={true}
+            columnDefs={footerColDefs}
+            rowData={[{ meta: { subaccounts: [], errors: [], selected: false, isPlaceholder: false }, ...footerRow }]}
+            suppressRowClickSelection={true}
+            onGridReady={onFooterGridReady}
+            domLayout={"autoHeight"}
+            headerHeight={0}
+            frameworkComponents={{
+              NewRowCell: NewRowCell,
+              ValueCell: ValueCell
+            }}
+          />
+        </div>
       </div>
-      <div className={"footer-grid"}>
-        <AgGridReact
-          defaultColDef={{
-            resizable: false,
-            sortable: false,
-            filter: false
-          }}
-          suppressHorizontalScroll={true}
-          columnDefs={footerColDefs}
-          rowData={[{ meta: { subaccounts: [], errors: [], selected: false, isPlaceholder: false }, ...footerRow }]}
-          suppressRowClickSelection={true}
-          onGridReady={onFooterGridReady}
-          domLayout={"autoHeight"}
-          headerHeight={0}
-          frameworkComponents={{
-            NewRowCell: NewRowCell,
-            ValueCell: ValueCell
-          }}
-        />
-      </div>
-    </div>
+    </React.Fragment>
   );
 };
 
