@@ -558,6 +558,7 @@ const BudgetTable = <
               rowData={_table}
               getRowNodeId={(data: any) => data.id}
               getRowClass={(params: RowClassParams) => {
+                console.log("Getting row class");
                 if (params.node.group === false) {
                   if (params.node.data.meta.isGroupFooter === true) {
                     let colorClass = params.node.data.group.color;
@@ -597,16 +598,17 @@ const BudgetTable = <
                   // should have - meaning we have to tell TS to ignore this line.
                   /* @ts-ignore */
                   if (event.event.keyCode === 13) {
+                    event.api.stopEditing(false);
+                    event.api.clearFocusedCell();
+
                     const firstEditCol = event.columnApi.getColumn(event.column.getColId());
                     if (!isNil(firstEditCol)) {
                       event.api.ensureColumnVisible(firstEditCol);
                       event.api.setFocusedCell(event.rowIndex + 1, firstEditCol);
+                      event.api.clearRangeSelection();
                     }
                     if (count === event.rowIndex + 1) {
                       onRowAdd();
-                      if (!isNil(firstEditCol)) {
-                        event.api.ensureColumnVisible(firstEditCol);
-                      }
                     }
                   }
                 }
