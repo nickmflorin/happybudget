@@ -19,6 +19,13 @@ interface LayoutProps {
   breadcrumbs?: ReactNode;
   headerProps?: StandardComponentProps;
   contentProps?: StandardComponentProps;
+  // The default header height is 70px.  But this only applies when there is
+  // not a supplementary header below the default header.  To layout the component
+  // hierarchy properly with scrolling and fixed headers, we need to programatically
+  // adjust the height (so it can be dynamic, in the case of a supplementary header).
+  // Example: headerHeight: 100 would refer to a situation in which the supplementary
+  // header height is 30px.
+  headerHeight?: number;
 }
 
 const Layout = ({
@@ -30,6 +37,7 @@ const Layout = ({
   style = {},
   collapsed = false,
   headerProps = {},
+  headerHeight,
   contentProps = {}
 }: LayoutProps): JSX.Element => {
   return (
@@ -44,8 +52,10 @@ const Layout = ({
         </div>
       )}
       <div className={classNames("application-content", { collapsed })}>
-        <Header breadcrumbs={breadcrumbs} toolbar={toolbar} {...headerProps} />
-        <Content {...contentProps}>{children}</Content>
+        <Header breadcrumbs={breadcrumbs} toolbar={toolbar} {...headerProps} headerHeight={headerHeight} />
+        <Content {...contentProps} headerHeight={headerHeight}>
+          {children}
+        </Content>
         <Footer />
       </div>
     </div>

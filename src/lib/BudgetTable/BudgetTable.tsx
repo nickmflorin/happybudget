@@ -24,7 +24,16 @@ import { RenderWithSpinner } from "components/display";
 import { downloadAsCsvFile } from "util/files";
 import { generateRandomNumericId } from "util/math";
 
-import { DeleteCell, ExpandCell, SelectCell, ValueCell, NewRowCell, UnitCell, IdentifierCell } from "./cells";
+import {
+  DeleteCell,
+  ExpandCell,
+  SelectCell,
+  ValueCell,
+  NewRowCell,
+  UnitCell,
+  IdentifierCell,
+  CalculatedCell
+} from "./cells";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
 import { IncludeErrorsInCell } from "./Util";
@@ -621,6 +630,7 @@ const BudgetTable = <
                 ValueCell: IncludeErrorsInCell<R>(ValueCell),
                 UnitCell: IncludeErrorsInCell<R>(UnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
+                CalculatedCell: CalculatedCell,
                 ...frameworkComponents
               }}
               onCellEditingStopped={(event: CellEditingStoppedEvent) => {

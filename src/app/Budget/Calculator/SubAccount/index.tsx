@@ -8,7 +8,7 @@ import { ColDef, ColSpanParams } from "ag-grid-community";
 import BudgetTable from "lib/BudgetTable";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
-import { formatCurrency } from "util/string";
+import { formatCurrencyWithoutDollarSign } from "util/string";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
 import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
@@ -161,19 +161,19 @@ const SubAccount = (): JSX.Element => {
               field: "estimated",
               headerName: "Estimated",
               cellStyle: { textAlign: "right" },
-              cellRendererParams: { formatter: formatCurrency }
+              cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
             },
             {
               field: "actual",
               headerName: "Actual",
               cellStyle: { textAlign: "right" },
-              cellRendererParams: { formatter: formatCurrency }
+              cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
             },
             {
               field: "variance",
               headerName: "Variance",
               cellStyle: { textAlign: "right" },
-              cellRendererParams: { formatter: formatCurrency, renderRedIfNegative: true }
+              cellRendererParams: { formatter: formatCurrencyWithoutDollarSign, renderRedIfNegative: true }
             }
           ]}
         />

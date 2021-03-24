@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
 import { isNil, includes, map } from "lodash";
+import classNames from "classnames";
 
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
@@ -9,7 +10,7 @@ import BudgetTable from "lib/BudgetTable";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { CreateSubAccountGroupModal } from "components/modals";
-import { formatCurrency } from "util/string";
+import { formatCurrencyWithoutDollarSign } from "util/string";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
 import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
@@ -138,7 +139,7 @@ const Account = (): JSX.Element => {
             {
               field: "unit",
               headerName: "Unit",
-              cellClass: "cell--centered",
+              cellClass: classNames("cell--centered", "cell--not-editable-bordered"),
               cellRenderer: "UnitCell",
               cellRendererParams: {
                 onChange: (unit: Unit, row: Table.SubAccountRow) =>
@@ -173,19 +174,19 @@ const Account = (): JSX.Element => {
               field: "estimated",
               headerName: "Estimated",
               cellStyle: { textAlign: "right" },
-              cellRendererParams: { formatter: formatCurrency }
+              cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
             },
             {
               field: "actual",
               headerName: "Actual",
               cellStyle: { textAlign: "right" },
-              cellRendererParams: { formatter: formatCurrency }
+              cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
             },
             {
               field: "variance",
               headerName: "Variance",
               cellStyle: { textAlign: "right" },
-              cellRendererParams: { formatter: formatCurrency, renderRedIfNegative: true }
+              cellRendererParams: { formatter: formatCurrencyWithoutDollarSign, renderRedIfNegative: true }
             }
           ]}
         />

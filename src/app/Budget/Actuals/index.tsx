@@ -7,6 +7,8 @@ import { CellClassParams } from "ag-grid-community";
 import BudgetTable, { GetExportValueParams } from "lib/BudgetTable";
 
 import { RenderWithSpinner } from "components/display";
+import { formatCurrencyWithoutDollarSign } from "util/string";
+
 import { setAncestorsAction } from "../actions";
 import {
   requestBudgetItemsAction,
@@ -168,7 +170,7 @@ const Actuals = (): JSX.Element => {
             field: "value",
             headerName: "Actual",
             cellStyle: { textAlign: "right" },
-            cellRendererParams: { formatter: (value: string | number) => `$${value}` }
+            cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
           }
         ]}
       />

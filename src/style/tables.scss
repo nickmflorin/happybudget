@@ -263,12 +263,11 @@ $table-border: 1px solid $table-border-color;
     &.ag-cell-focus {
       &:not(.cell--not-editable) {
         border: 2px solid $green !important;
-        &.cell--no-select,
         &.cell--action {
           border: unset !important;
         }
       }
-      &.cell--not-editable {
+      &.cell--not-editable:not(.cell--not-editable-bordered) {
         &:not(.cell--not-editable-highlight) {
           border: unset !important;
         }

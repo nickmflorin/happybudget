@@ -44,6 +44,10 @@ export const formatCurrency = (value: string | number): string => {
   return formatter.format(value);
 };
 
+export const formatCurrencyWithoutDollarSign = (value: string | number): string => {
+  return formatCurrency(value).slice(1);
+};
+
 export const sumChars = (val: string): number => {
   let sum = 0;
   for (let i = 0; i < val.length; i++) {

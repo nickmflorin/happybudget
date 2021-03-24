@@ -3,9 +3,10 @@ import classNames from "classnames";
 
 interface ContentProps extends StandardComponentProps {
   children: ReactNode;
+  headerHeight?: number;
 }
 
-const Content = ({ children, className, style = {} }: ContentProps): JSX.Element => {
+const Content = ({ children, headerHeight, className, style = {} }: ContentProps): JSX.Element => {
   return (
     <div className={classNames("content", className)} style={style}>
       <div className={"sub-content"}>{children}</div>
