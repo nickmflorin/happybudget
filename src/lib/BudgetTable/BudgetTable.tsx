@@ -235,9 +235,14 @@ const BudgetTable = <
         errors: []
       }
     };
-    forEach([...bodyColumns, ...calculatedColumns], (col: ColDef) => {
+    forEach(bodyColumns, (col: ColDef) => {
       if (!isNil(col.field)) {
         footerObj[col.field] = null;
+      }
+    });
+    forEach(calculatedColumns, (col: ColDef) => {
+      if (!isNil(col.field) && !isNil(group[col.field as keyof G])) {
+        footerObj[col.field] = group[col.field as keyof G];
       }
     });
     return footerObj as R;
