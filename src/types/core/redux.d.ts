@@ -130,6 +130,13 @@ namespace Redux {
       deleting: number[];
     }
 
+    interface ICommentsStore extends IListResponseStore<IComment> {
+      readonly submitting: boolean;
+      readonly deleting: number[];
+      readonly replying: number[];
+      readonly editing: number[];
+    }
+
     interface ISubAccountsStore {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
