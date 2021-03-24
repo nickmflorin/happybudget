@@ -7,13 +7,11 @@ interface RenderWithSpinnerProps extends SpinnerProps {
   toggleOpacity?: boolean;
   children: ReactNode;
   className?: string;
-  style?: React.CSSProperties;
 }
 
 const RenderWithSpinner = ({
   loading,
   className,
-  style = {},
   toggleOpacity = false,
   children,
   ...props
@@ -23,13 +21,13 @@ const RenderWithSpinner = ({
       <ShowHide show={toggleOpacity === true}>
         <div className={className} style={{ position: "relative", height: "100%", width: "100%" }}>
           {loading === true && <Spinner position={"absolute"} {...props} />}
-          <div style={{ opacity: loading ? 0.3 : 1, ...style }}>{children}</div>
+          <div style={{ opacity: loading ? 0.3 : 1 }}>{children}</div>
         </div>
       </ShowHide>
       <ShowHide show={toggleOpacity === false}>
         <div className={className} style={{ position: "relative", height: "100%", width: "100%" }}>
           {loading === true && <Spinner {...props} />}
-          <div style={style}>{children}</div>
+          {children}
         </div>
       </ShowHide>
     </React.Fragment>

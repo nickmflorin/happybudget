@@ -47,7 +47,7 @@ const Budget = (): JSX.Element => {
     <Layout
       collapsed
       headerProps={{ style: { height: 70 + 36 } }}
-      contentProps={{ style: { marginTop: 70 + 36 + 10 } }}
+      contentProps={{ style: { marginTop: 70 + 36 + 10, height: "calc(100vh - 116px - 24px)" } }}
       breadcrumbs={
         <AncestorsBreadCrumbs loading={ancestorsLoading} ancestors={ancestors} budgetId={parseInt(budgetId)} />
       }
