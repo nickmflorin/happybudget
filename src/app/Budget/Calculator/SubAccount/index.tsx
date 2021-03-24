@@ -98,6 +98,7 @@ const SubAccount = (): JSX.Element => {
             {
               field: "description",
               headerName: "Category Description",
+              flex: 100,
               colSpan: (params: ColSpanParams) => {
                 const row: Table.SubAccountRow = params.data;
                 // Not totally sure why this conditional is necessary, but it's necessity might
@@ -115,11 +116,13 @@ const SubAccount = (): JSX.Element => {
             },
             {
               field: "name",
-              headerName: "Name"
+              headerName: "Name",
+              width: 15
             },
             {
               field: "quantity",
               headerName: "Quantity",
+              width: 10,
               cellStyle: { textAlign: "right" },
               valueSetter: integerValueSetter("quantity")
             },
@@ -128,6 +131,7 @@ const SubAccount = (): JSX.Element => {
               headerName: "Unit",
               cellClass: "cell--centered",
               cellRenderer: "UnitCell",
+              width: 20,
               cellRendererParams: {
                 onChange: (unit: Unit, row: Table.SubAccountRow) =>
                   dispatch(
@@ -146,12 +150,14 @@ const SubAccount = (): JSX.Element => {
             {
               field: "multiplier",
               headerName: "X",
+              width: 10,
               cellStyle: { textAlign: "right" },
               valueSetter: floatValueSetter("multiplier")
             },
             {
               field: "rate",
               headerName: "Rate",
+              width: 10,
               cellStyle: { textAlign: "right" },
               valueSetter: floatValueSetter("rate")
             }

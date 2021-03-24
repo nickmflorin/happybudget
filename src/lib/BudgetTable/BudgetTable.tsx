@@ -106,7 +106,8 @@ const BudgetTable = <
         field: "select",
         editable: false,
         headerName: "",
-        width: 40,
+        width: 25,
+        maxWidth: 30,
         cellClass: classNames("cell--action", "cell--not-editable"),
         cellRenderer: "SelectCell",
         cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
@@ -117,7 +118,8 @@ const BudgetTable = <
         field: "expand",
         editable: false,
         headerName: "",
-        width: 40,
+        width: 25,
+        maxWidth: 30,
         cellClass: classNames("cell--action", "cell--not-editable"),
         cellRenderer: "ExpandCell",
         cellRendererParams: { onClick: onRowExpand }
@@ -127,6 +129,8 @@ const BudgetTable = <
       field: identifierField,
       headerName: identifierFieldHeader,
       cellRenderer: "IdentifierCell",
+      minWidth: 100,
+      maxWidth: 125,
       ...identifierFieldParams,
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
@@ -145,7 +149,8 @@ const BudgetTable = <
           field: "delete",
           editable: false,
           headerName: "",
-          width: 40,
+          width: 25,
+          maxWidth: 30,
           cellClass: classNames("cell--action", "cell--not-editable"),
           cellRenderer: "DeleteCell",
           cellRendererParams: {
@@ -380,6 +385,8 @@ const BudgetTable = <
             (def: ColDef) =>
               ({
                 cellRenderer: "CalculatedCell",
+                minWidth: 100,
+                maxWidth: 125,
                 ...def
               } as ColDef)
           ),
@@ -567,7 +574,6 @@ const BudgetTable = <
               rowData={_table}
               getRowNodeId={(data: any) => data.id}
               getRowClass={(params: RowClassParams) => {
-                console.log("Getting row class");
                 if (params.node.group === false) {
                   if (params.node.data.meta.isGroupFooter === true) {
                     let colorClass = params.node.data.group.color;

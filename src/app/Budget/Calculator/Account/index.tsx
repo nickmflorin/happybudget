@@ -110,6 +110,7 @@ const Account = (): JSX.Element => {
             {
               field: "description",
               headerName: "Category Description",
+              flex: 100,
               colSpan: (params: ColSpanParams) => {
                 // Not totally sure why this conditional is necessary, but it's necessity might
                 // be a symptom of another problem.  We should investigate.
@@ -128,11 +129,13 @@ const Account = (): JSX.Element => {
             },
             {
               field: "name",
-              headerName: "Name"
+              headerName: "Name",
+              width: 15
             },
             {
               field: "quantity",
               headerName: "Quantity",
+              width: 10,
               cellStyle: { textAlign: "right" },
               valueSetter: integerValueSetter("quantity")
             },
@@ -141,6 +144,7 @@ const Account = (): JSX.Element => {
               headerName: "Unit",
               cellClass: classNames("cell--centered", "cell--not-editable-bordered"),
               cellRenderer: "UnitCell",
+              width: 20,
               cellRendererParams: {
                 onChange: (unit: Unit, row: Table.SubAccountRow) =>
                   dispatch(
@@ -159,12 +163,14 @@ const Account = (): JSX.Element => {
             {
               field: "multiplier",
               headerName: "X",
+              width: 10,
               cellStyle: { textAlign: "right" },
               valueSetter: floatValueSetter("multiplier")
             },
             {
               field: "rate",
               headerName: "Rate",
+              width: 10,
               cellStyle: { textAlign: "right" },
               valueSetter: floatValueSetter("rate")
             }
