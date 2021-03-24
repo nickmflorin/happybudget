@@ -267,9 +267,17 @@ $table-border: 1px solid $table-border-color;
           border: unset !important;
         }
       }
-      &.cell--not-editable:not(.cell--not-editable-bordered) {
+      // This has to be it's own redeclaration of the green border because otherwise
+      // AG Grid will border the cell as if it is being selected in a range.
+      &.cell--not-editable-bordered {
+        border: 2px solid $green !important;
+        border-color: $green !important;
+      }
+      &.cell--not-editable {
         &:not(.cell--not-editable-highlight) {
-          border: unset !important;
+          &:not(.cell--not-editable-bordered) {
+            border: unset !important;
+          }
         }
       }
     }
