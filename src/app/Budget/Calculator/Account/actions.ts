@@ -85,19 +85,19 @@ export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPa
 /*
   Actions Pertaining to Account Sub Accounts
 */
-export const addSubAccountsPlaceholdersAction = simpleAction<number>(ActionType.SubAccounts.AddPlaceholders);
+export const addPlaceholdersAction = simpleAction<number>(ActionType.SubAccounts.AddPlaceholders);
 export const updateSubAccountAction = simpleAction<Table.RowChange>(ActionType.SubAccounts.Update);
 export const selectSubAccountAction = simpleAction<number>(ActionType.SubAccounts.SelectRow);
 export const deselectSubAccountAction = simpleAction<number>(ActionType.SubAccounts.DeselectRow);
 export const selectAllSubAccountsAction = simpleAction<null>(ActionType.SubAccounts.SelectAllRows);
-export const updateSubAccountsTableRowAction = simpleAction<{
+export const updateTableRowAction = simpleAction<{
   id: number;
   data: Partial<Table.SubAccountRow>;
 }>(ActionType.SubAccounts.UpdateRow);
-export const activateSubAccountsTablePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
+export const activatePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
   ActionType.SubAccounts.ActivatePlaceholder
 );
-export const removeSubAccountsTableRowAction = simpleAction<number>(ActionType.SubAccounts.RemoveRow);
+export const removeTableRowAction = simpleAction<number>(ActionType.SubAccounts.RemoveRow);
 export const removeSubAccountAction = simpleAction<number>(ActionType.SubAccounts.Remove);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.SubAccounts.Deleting);
 export const updatingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.SubAccounts.Updating);
@@ -106,17 +106,15 @@ export const requestSubAccountsAction = simpleAction<null>(ActionType.SubAccount
 export const loadingSubAccountsAction = simpleAction<boolean>(ActionType.SubAccounts.Loading);
 export const responseSubAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.SubAccounts.Response);
 export const setSubAccountsSearchAction = simpleAction<string>(ActionType.SubAccounts.SetSearch);
-export const addErrorsToSubAccountsTableAction = simpleAction<Table.CellError | Table.CellError[]>(
+export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.SubAccounts.AddErrors
 );
-export const addGroupToSubAccountsTableRowsAction = simpleAction<{ group: Table.RowGroup; ids: number[] }>(
+export const addGroupToTableRowsAction = simpleAction<{ group: Table.RowGroup; ids: number[] }>(
   ActionType.SubAccounts.AddGroupToRows
 );
-export const removeGroupFromSubAccountsTableRowsAction = simpleAction<number>(
-  ActionType.SubAccounts.RemoveGroupFromRows
-);
-export const deletingSubAccountsGroupAction = simpleAction<boolean>(ActionType.SubAccounts.Groups.Deleting);
-export const deleteSubAccountsGroupAction = simpleAction<number>(ActionType.SubAccounts.Groups.Delete);
+export const removeGroupFromTableRowsAction = simpleAction<number>(ActionType.SubAccounts.RemoveGroupFromRows);
+export const deletingGroupAction = simpleAction<boolean>(ActionType.SubAccounts.Groups.Deleting);
+export const deleteGroupAction = simpleAction<number>(ActionType.SubAccounts.Groups.Delete);
 
 /*
   Actions Pertaining to Account Sub Accounts History

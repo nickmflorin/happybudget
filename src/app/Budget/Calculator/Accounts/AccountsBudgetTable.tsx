@@ -10,7 +10,7 @@ import BudgetTable from "../../BudgetTable";
 import { selectBudgetId, selectBudgetDetail } from "../selectors";
 import {
   setAccountsSearchAction,
-  addAccountsPlaceholdersAction,
+  addPlaceholdersAction,
   deselectAccountAction,
   selectAccountAction,
   removeAccountAction,
@@ -57,7 +57,7 @@ const AccountsBudgetTable = (): JSX.Element => {
       search={search}
       onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
       saving={saving}
-      onRowAdd={() => dispatch(addAccountsPlaceholdersAction(1))}
+      onRowAdd={() => dispatch(addPlaceholdersAction(1))}
       onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
       onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
       onRowDelete={(row: Table.AccountRow) => dispatch(removeAccountAction(row.id))}

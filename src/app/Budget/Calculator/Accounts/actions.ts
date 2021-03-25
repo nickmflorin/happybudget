@@ -69,18 +69,18 @@ export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPa
 /*
   Actions Pertaining to Budget Accounts
 */
-export const addAccountsPlaceholdersAction = simpleAction<number>(ActionType.Accounts.AddPlaceholders);
+export const addPlaceholdersAction = simpleAction<number>(ActionType.Accounts.AddPlaceholders);
 export const updateAccountAction = simpleAction<Table.RowChange>(ActionType.Accounts.Update);
-export const updateAccountsTableRowAction = simpleAction<{ id: number; data: Partial<Table.AccountRow> }>(
+export const updateTableRowAction = simpleAction<{ id: number; data: Partial<Table.AccountRow> }>(
   ActionType.Accounts.UpdateRow
 );
-export const activateAccountsPlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
+export const activatePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
   ActionType.Accounts.ActivatePlaceholder
 );
 export const selectAccountAction = simpleAction<number>(ActionType.Accounts.SelectRow);
 export const selectAllAccountsAction = simpleAction<null>(ActionType.Accounts.SelectAllRows);
 export const deselectAccountAction = simpleAction<number>(ActionType.Accounts.DeselectRow);
-export const removeAccountsTableRowAction = simpleAction<number>(ActionType.Accounts.RemoveRow);
+export const removeTableRowAction = simpleAction<number>(ActionType.Accounts.RemoveRow);
 export const removeAccountAction = simpleAction<number>(ActionType.Accounts.Remove);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Updating);
@@ -89,9 +89,7 @@ export const requestAccountsAction = simpleAction<null>(ActionType.Accounts.Requ
 export const loadingAccountsAction = simpleAction<boolean>(ActionType.Accounts.Loading);
 export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.Accounts.Response);
 export const setAccountsSearchAction = simpleAction<string>(ActionType.Accounts.SetSearch);
-export const addErrorsToAccountsTableAction = simpleAction<Table.CellError | Table.CellError[]>(
-  ActionType.Accounts.AddErrors
-);
+export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(ActionType.Accounts.AddErrors);
 
 /*
   Actions Pertaining to Budget Accounts History

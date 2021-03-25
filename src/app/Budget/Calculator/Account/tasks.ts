@@ -27,11 +27,11 @@ import {
   deletingSubAccountAction,
   creatingSubAccountAction,
   updatingSubAccountAction,
-  updateSubAccountsTableRowAction,
-  activateSubAccountsTablePlaceholderAction,
-  removeSubAccountsTableRowAction,
-  addErrorsToSubAccountsTableAction,
-  addSubAccountsPlaceholdersAction,
+  updateTableRowAction,
+  activatePlaceholderAction,
+  removeTableRowAction,
+  addErrorsToTableAction,
+  addPlaceholdersAction,
   requestSubAccountsAction,
   requestAccountAction,
   loadingCommentsAction,
@@ -45,20 +45,20 @@ import {
   replyingToCommentAction,
   loadingSubAccountsHistoryAction,
   responseSubAccountsHistoryAction,
-  deletingSubAccountsGroupAction,
-  removeGroupFromSubAccountsTableRowsAction
+  deletingGroupAction,
+  removeGroupFromTableRowsAction
 } from "./actions";
 
 export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(deletingSubAccountsGroupAction(true));
+    yield put(deletingGroupAction(true));
     try {
       yield call(deleteSubAccountGroup, action.payload);
-      yield put(removeGroupFromSubAccountsTableRowsAction(action.payload));
+      yield put(removeGroupFromTableRowsAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the sub account group.");
     } finally {
-      yield put(deletingSubAccountsGroupAction(false));
+      yield put(deletingGroupAction(false));
     }
   }
 }
@@ -177,7 +177,7 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
       );
     } else {
       // Dispatch the action to remove the row from the table in the UI.
-      yield put(removeSubAccountsTableRowAction(action.payload));
+      yield put(removeTableRowAction(action.payload));
       // Only make an API request to the server to delete the sub account if the
       // row was not a placeholder (i.e. the sub account exists in the backend).
       if (existing.meta.isPlaceholder === false) {
@@ -219,7 +219,7 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
       const preResponsePayload = SubAccountMapping.preRequestPayload(action.payload);
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
-          updateSubAccountsTableRowAction({
+          updateTableRowAction({
             id: existing.id,
             data: preResponsePayload
           })
@@ -242,16 +242,16 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
               budgetId,
               requestPayload as Http.ISubAccountPayload
             );
-            yield put(activateSubAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
+            yield put(activatePlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = SubAccountMapping.modelToRow(response);
-            yield put(updateSubAccountsTableRowAction({ id: response.id, data: responsePayload }));
+            yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
           } catch (e) {
             yield call(
               handleTableErrors,
               e,
               "There was an error updating the sub account.",
               existing.id,
-              (errors: Table.CellError[]) => addErrorsToSubAccountsTableAction(errors)
+              (errors: Table.CellError[]) => addErrorsToTableAction(errors)
             );
           } finally {
             yield put(creatingSubAccountAction(false));
@@ -265,7 +265,7 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
           // Since we are using a deep check lodash.isEqual in the selectors, this will only trigger
           // a rerender if the responsePayload has data that differs from that of the current data.
           const responsePayload = SubAccountMapping.modelToRow(response);
-          yield put(updateSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));
+          yield put(updateTableRowAction({ id: existing.id, data: responsePayload }));
 
           // Determine if the parent account needs to be refreshed due to updates to the underlying
           // account fields that calculate the values of the parent account.
@@ -278,7 +278,7 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
             e,
             "There was an error updating the sub account.",
             existing.id,
-            (errors: Table.CellError[]) => addErrorsToSubAccountsTableAction(errors)
+            (errors: Table.CellError[]) => addErrorsToTableAction(errors)
           );
         } finally {
           yield put(updatingSubAccountAction({ id: existing.id as number, value: false }));
@@ -299,7 +299,7 @@ export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
       });
       yield put(responseSubAccountsAction(response));
       if (response.data.length === 0) {
-        yield put(addSubAccountsPlaceholdersAction(2));
+        yield put(addPlaceholdersAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account's sub accounts.");

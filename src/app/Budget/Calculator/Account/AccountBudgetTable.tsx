@@ -14,15 +14,15 @@ import { floatValueSetter, integerValueSetter } from "util/table";
 import BudgetTable from "../../BudgetTable";
 import { selectBudgetId } from "../selectors";
 import {
-  addSubAccountsPlaceholdersAction,
+  addPlaceholdersAction,
   deselectSubAccountAction,
   removeSubAccountAction,
   selectSubAccountAction,
   setSubAccountsSearchAction,
   updateSubAccountAction,
   selectAllSubAccountsAction,
-  deleteSubAccountsGroupAction,
-  addGroupToSubAccountsTableRowsAction
+  deleteGroupAction,
+  addGroupToTableRowsAction
 } from "./actions";
 
 const selectTableData = simpleDeepEqualSelector(
@@ -77,14 +77,14 @@ const AccountBudgetTable = (): JSX.Element => {
         onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
         rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
-        onRowAdd={() => dispatch(addSubAccountsPlaceholdersAction(1))}
+        onRowAdd={() => dispatch(addPlaceholdersAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: Table.SubAccountRow) => dispatch(removeSubAccountAction(row.id))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountAction(payload))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         groupParams={{
-          onDeleteGroup: (group: ISubAccountNestedGroup) => dispatch(deleteSubAccountsGroupAction(group.id)),
+          onDeleteGroup: (group: ISubAccountNestedGroup) => dispatch(deleteGroupAction(group.id)),
           onGroupRows: (rows: Table.SubAccountRow[]) =>
             setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
         }}
@@ -186,7 +186,7 @@ const AccountBudgetTable = (): JSX.Element => {
           onSuccess={(group: ISubAccountGroup) => {
             setGroupSubAccounts(undefined);
             dispatch(
-              addGroupToSubAccountsTableRowsAction({
+              addGroupToTableRowsAction({
                 group: { id: group.id, color: group.color, name: group.name },
                 ids: map(group.subaccounts, (subaccount: ISimpleSubAccount) => subaccount.id)
               })

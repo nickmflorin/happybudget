@@ -25,11 +25,11 @@ import {
   deletingAccountAction,
   creatingAccountAction,
   updatingAccountAction,
-  updateAccountsTableRowAction,
-  activateAccountsPlaceholderAction,
-  removeAccountsTableRowAction,
-  addErrorsToAccountsTableAction,
-  addAccountsPlaceholdersAction,
+  updateTableRowAction,
+  activatePlaceholderAction,
+  removeTableRowAction,
+  addErrorsToTableAction,
+  addPlaceholdersAction,
   loadingCommentsAction,
   responseCommentsAction,
   submittingCommentAction,
@@ -152,7 +152,7 @@ export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIt
       );
     } else {
       // Dispatch the action to remove the row from the table in the UI.
-      yield put(removeAccountsTableRowAction(action.payload));
+      yield put(removeTableRowAction(action.payload));
       // Only make an API request to the server to delete the sub account if the
       // row was not a placeholder (i.e. the sub account exists in the backend).
       if (existing.meta.isPlaceholder === false) {
@@ -227,7 +227,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
       const preResponsePayload = AccountMapping.preRequestPayload(action.payload);
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
-          updateAccountsTableRowAction({
+          updateTableRowAction({
             id: existing.id,
             data: preResponsePayload
           })
@@ -245,9 +245,9 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, budgetId, requestPayload as Http.IAccountPayload);
-            yield put(activateAccountsPlaceholderAction({ oldId: existing.id, id: response.id }));
+            yield put(activatePlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = AccountMapping.modelToRow(response);
-            yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
+            yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
 
             // Add an element to the history indicating that the account was created.
             // This is faster than refreshing the history from the API and is not problematic
@@ -260,7 +260,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
               e,
               "There was an error updating the account.",
               existing.id,
-              (errors: Table.CellError[]) => addErrorsToAccountsTableAction(errors)
+              (errors: Table.CellError[]) => addErrorsToTableAction(errors)
             );
           } finally {
             yield put(creatingAccountAction(false));
@@ -272,7 +272,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
         try {
           const response: IAccount = yield call(updateAccount, existing.id as number, requestPayload);
           const responsePayload = AccountMapping.modelToRow(response);
-          yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
+          yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
 
           // Add elements to the history indicating that the account was updated.
           // This is faster than refreshing the history from the API and is not problematic
@@ -292,7 +292,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
             e,
             "There was an error updating the account.",
             existing.id,
-            (errors: Table.CellError[]) => addErrorsToAccountsTableAction(errors)
+            (errors: Table.CellError[]) => addErrorsToTableAction(errors)
           );
         } finally {
           yield put(updatingAccountAction({ id: existing.id as number, value: false }));
@@ -310,7 +310,7 @@ export function* getAccountsTask(action: Redux.IAction<null>): SagaIterator {
       const response = yield call(getAccounts, budgetId, { no_pagination: true });
       yield put(responseAccountsAction(response));
       if (response.data.length === 0) {
-        yield put(addAccountsPlaceholdersAction(2));
+        yield put(addPlaceholdersAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's accounts.");
