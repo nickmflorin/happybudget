@@ -128,7 +128,11 @@ class Mapping<
   postPayload = (row: R): P => {
     const obj: { [key: string]: any } = {};
     forEach(this.fields, (field: MappedField<M>) => {
-      if (field.calculatedField === false && !(field.excludeFromPost === true) && !isNil(row[field.field as keyof R])) {
+      if (
+        !(field.calculatedField === true) &&
+        !(field.excludeFromPost === true) &&
+        !isNil(row[field.field as keyof R])
+      ) {
         obj[field.field as string] = row[field.field as keyof R];
       }
     });
