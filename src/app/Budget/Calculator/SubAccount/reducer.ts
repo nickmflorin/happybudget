@@ -59,7 +59,10 @@ const rootReducer = combineReducers({
         Request: ActionType.SubAccounts.Request,
         Loading: ActionType.SubAccounts.Loading,
         SetSearch: ActionType.SubAccounts.SetSearch,
-        AddErrors: ActionType.SubAccounts.AddErrors
+        AddErrors: ActionType.SubAccounts.AddErrors,
+        AddGroup: ActionType.SubAccounts.Groups.AddToTable,
+        RemoveGroup: ActionType.SubAccounts.Groups.RemoveFromTable,
+        UpdateGroup: ActionType.SubAccounts.Groups.UpdateInTable
       },
       SubAccountMapping,
       { referenceEntity: "subaccount" }

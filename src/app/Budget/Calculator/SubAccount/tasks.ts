@@ -1,7 +1,8 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find, concat } from "lodash";
+import { isNil, find, concat, map } from "lodash";
 import { handleRequestError } from "api";
+import { subAccountGroupToSubAccountNestedGroup } from "model/mappings";
 import { SubAccountMapping } from "model/tableMappings";
 import {
   getSubAccountSubAccounts,
@@ -14,7 +15,8 @@ import {
   deleteComment,
   updateComment,
   replyToComment,
-  getSubAccountSubAccountsHistory
+  getSubAccountSubAccountsHistory,
+  deleteSubAccountGroup
 } from "services";
 import { handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
@@ -43,8 +45,38 @@ import {
   editingCommentAction,
   replyingToCommentAction,
   loadingSubAccountsHistoryAction,
-  responseSubAccountsHistoryAction
+  responseSubAccountsHistoryAction,
+  deletingGroupAction,
+  removeGroupFromTableAction,
+  addGroupToTableAction,
+  updateGroupInTableAction
 } from "./actions";
+
+export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(deletingGroupAction(true));
+    try {
+      yield call(deleteSubAccountGroup, action.payload);
+      yield put(removeGroupFromTableAction(action.payload));
+    } catch (e) {
+      handleRequestError(e, "There was an error deleting the sub account group.");
+    } finally {
+      yield put(deletingGroupAction(false));
+    }
+  }
+}
+
+export function* addSubAccountGroupToStateTask(action: Redux.IAction<ISubAccountGroup>): SagaIterator {
+  if (!isNil(action.payload)) {
+    const nestedGroup = subAccountGroupToSubAccountNestedGroup(action.payload);
+    yield put(
+      addGroupToTableAction({
+        group: nestedGroup,
+        ids: map(action.payload.subaccounts, (subaccount: ISimpleSubAccount) => subaccount.id)
+      })
+    );
+  }
+}
 
 export function* getSubAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
@@ -206,8 +238,6 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         );
       }
       if (existing.meta.isPlaceholder === true) {
-        // TODO: Should we be using the payload data here?  Instead of the existing row?
-        // Or we should probably merge them, right?
         const requestPayload = SubAccountMapping.postPayload(existing);
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
@@ -241,6 +271,8 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         const requestPayload = SubAccountMapping.patchPayload(action.payload);
         try {
           const response: ISubAccount = yield call(updateSubAccount, existing.id, requestPayload);
+          // Since we are using a deep check lodash.isEqual in the selectors, this will only trigger
+          // a rerender if the responsePayload has data that differs from that of the current data.
           const responsePayload = SubAccountMapping.modelToRow(response);
           yield put(
             updateTableRowAction({
@@ -249,9 +281,17 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
             })
           );
           // Determine if the parent account needs to be refreshed due to updates to the underlying
-          // subaccount fields that calculate the values of the parent subaccount.
+          // account fields that calculate the values of the parent models.
           if (SubAccountMapping.patchRequestRequiresRecalculation(requestPayload)) {
+            // TODO: Instead of refreshing the account, let's update the account in state.
             yield put(requestSubAccountAction());
+            // Should we remove the group from the table if the response does not have
+            // a group?  Probably - but this will not happen in practice (at least not now).
+            // TODO: We might want to do this before the request is made to make the table interactions
+            // faster.  This will require calculating the metrics in the front end.
+            if (!isNil(response.group)) {
+              yield put(updateGroupInTableAction({ groupId: response.group.id, group: response.group }));
+            }
           }
         } catch (e) {
           yield call(

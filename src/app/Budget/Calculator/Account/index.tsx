@@ -45,7 +45,7 @@ const Account = (): JSX.Element => {
   return (
     <RenderIfValidId id={[accountId]}>
       <WrapInApplicationSpinner loading={loading}>
-        <AccountBudgetTable />
+        <AccountBudgetTable accountId={parseInt(accountId)} />
       </WrapInApplicationSpinner>
       <AccountCommentsHistory />
     </RenderIfValidId>

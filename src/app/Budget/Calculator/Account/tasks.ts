@@ -241,8 +241,6 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         );
       }
       if (existing.meta.isPlaceholder === true) {
-        // TODO: Should we be using the payload data here?  Instead of the existing row?
-        // Or we should probably merge them, right?
         const requestPayload = SubAccountMapping.postPayload(existing);
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
@@ -280,7 +278,7 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
           // Since we are using a deep check lodash.isEqual in the selectors, this will only trigger
           // a rerender if the responsePayload has data that differs from that of the current data.
           const responsePayload = SubAccountMapping.modelToRow(response);
-          yield put(updateTableRowAction({ id: existing.id, data: responsePayload }));
+          yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
 
           // Determine if the parent account needs to be refreshed due to updates to the underlying
           // account fields that calculate the values of the parent models.

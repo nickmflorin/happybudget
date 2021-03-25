@@ -42,10 +42,13 @@ const selectAccountDetail = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.account.detail.data
 );
 
-const AccountBudgetTable = (): JSX.Element => {
+interface AccountBudgetTableProps {
+  accountId: number;
+}
+
+const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element => {
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
 
-  const { accountId } = useParams<{ budgetId: string; accountId: string }>();
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -67,7 +70,7 @@ const AccountBudgetTable = (): JSX.Element => {
           } else if (includes(["identifier", "description", "name"], colDef.field)) {
             return true;
           } else {
-            return !isNil(row.meta) && row.meta.children.length === 0;
+            return row.meta.children.length === 0;
           }
         }}
         highlightNonEditableCell={(row: Table.SubAccountRow, colDef: ColDef) => {
@@ -100,14 +103,7 @@ const AccountBudgetTable = (): JSX.Element => {
             headerName: "Category Description",
             flex: 100,
             colSpan: (params: ColSpanParams) => {
-              // Not totally sure why this conditional is necessary, but it's necessity might
-              // be a symptom of another problem.  We should investigate.
-              if (
-                !isNil(params.node) &&
-                params.node.group === false &&
-                !isNil(params.data.meta) &&
-                !isNil(params.data.meta.children)
-              ) {
+              if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
                 return !isNil(params.data) && !isNil(params.data.meta) && params.data.meta.children.length !== 0
                   ? 6
                   : 1;
@@ -180,7 +176,7 @@ const AccountBudgetTable = (): JSX.Element => {
       />
       {!isNil(groupSubAccounts) && (
         <CreateSubAccountGroupModal
-          accountId={parseInt(accountId)}
+          accountId={accountId}
           subaccounts={groupSubAccounts}
           open={true}
           onSuccess={(group: ISubAccountGroup) => {

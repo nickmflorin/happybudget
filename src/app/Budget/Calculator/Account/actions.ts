@@ -44,10 +44,10 @@ export const ActionType = {
     Groups: {
       Delete: "calculator.account.subaccounts.groups.Delete",
       Deleting: "calculator.account.subaccounts.groups.Deleting",
-      AddToState: "calculator.account.subaccounts.AddToState",
-      AddToTable: "calculator.account.subaccounts.AddToTable",
-      RemoveFromTable: "calculator.account.subaccounts.RemoveFromTable",
-      UpdateInTable: "calculator.account.subaccounts.UpdateInTable"
+      AddToState: "calculator.account.subaccounts.groups.AddToState",
+      AddToTable: "calculator.account.subaccounts.groups.AddToTable",
+      RemoveFromTable: "calculator.account.subaccounts.groups.RemoveFromTable",
+      UpdateInTable: "calculator.account.subaccounts.groups.UpdateInTable"
     },
     History: {
       Loading: "calculator.account.subaccounts.history.Loading",
@@ -119,7 +119,6 @@ export const updateGroupInTableAction = simpleAction<{ groupId: number; group: P
   ActionType.SubAccounts.Groups.UpdateInTable
 );
 export const removeGroupFromTableAction = simpleAction<number>(ActionType.SubAccounts.Groups.RemoveFromTable);
-
 export const deletingGroupAction = simpleAction<boolean>(ActionType.SubAccounts.Groups.Deleting);
 export const deleteGroupAction = simpleAction<number>(ActionType.SubAccounts.Groups.Delete);
 

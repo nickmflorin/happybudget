@@ -23,7 +23,7 @@ const SubAccount = (): JSX.Element => {
   return (
     <RenderIfValidId id={[subaccountId]}>
       <WrapInApplicationSpinner loading={subAccountStore.subaccounts.table.loading}>
-        <SubAccountBudgetTable />
+        <SubAccountBudgetTable subaccountId={parseInt(subaccountId)} />
       </WrapInApplicationSpinner>
       <SubAccountCommentsHistory />
     </RenderIfValidId>
