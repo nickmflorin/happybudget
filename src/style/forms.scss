@@ -5,6 +5,24 @@ form {
   width: 100%;
 }
 
+.form {
+  .form-alert-wrapper {
+    margin-top: 15px;
+  }
+  .form-footer {
+    margin-top: 15px;
+
+    > * {
+      &:first-child {
+        margin-top: 0px !important;
+      }
+      &:last-child {
+        margin-bottom: 0px !important;
+      }
+    }
+  }
+}
+
 label,
 .ant-form-item-label {
   font-family: $nunito !important;

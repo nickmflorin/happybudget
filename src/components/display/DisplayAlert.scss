@@ -2,26 +2,28 @@
 @import "style/typography";
 
 .display-alert {
-  padding: 12px 20px 12px 50px !important;
+  padding: 8px 20px 8px 50px !important;
+  border-radius: 6px;
 
   .ant-alert-icon {
     position: absolute;
     top: 10px !important;
     left: 20px !important;
-    font-size: 18px !important;
+    font-size: 16px !important;
   }
 
   .ant-alert-message {
-    font-size: 16px !important;
+    font-size: 14px !important;
     line-height: 16px !important;
-    margin-bottom: 8px !important;
+    margin-bottom: 6px !important;
     color: $text-primary !important;
+    font-family: $noto-sans-jp;
   }
 
   .ant-alert-description {
-    font-size: 13px !important;
-    line-height: 18px !important;
-    font-family: $nunito;
+    font-size: 12px !important;
+    line-height: 14px !important;
+    font-family: $noto-sans-jp;
     font-weight: 400;
     color: $text-secondary !important;
   }

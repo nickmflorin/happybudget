@@ -25,11 +25,11 @@ const Login = (): JSX.Element => {
     <div className={"form-container"}>
       <Typography.Title className={"title"}>{"Sign In"}</Typography.Title>
       <Typography.Title className={"sub-title"}>{"Cloud based budgeting at your fingertips."}</Typography.Title>
-      {!isNil(globalError) && <div className={"global-error"}>{globalError}</div>}
       <LoginForm
         className={"mb--20 mt--20"}
         form={form}
         loading={loading}
+        globalError={globalError}
         onGoogleSuccess={(token: string) => {
           setLoading(true);
           socialLogin({ token_id: token, provider: "google" })

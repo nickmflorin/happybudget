@@ -1,10 +1,12 @@
 import React from "react";
 import classNames from "classnames";
 
-import { Form, Button, Input } from "antd";
+import { Button, Input } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 
 import { RouterLink } from "components/control/links";
+import { Form } from "components/forms";
+
 import { validateEmail } from "util/validate";
 import SocialButton from "../SocialButton";
 
@@ -16,6 +18,7 @@ export interface ILoginFormValues {
 interface LoginFormProps {
   form: any;
   loading: boolean;
+  globalError: string | undefined;
   style?: React.CSSProperties;
   className?: string;
   onSubmit: (values: ILoginFormValues) => void;
@@ -28,6 +31,7 @@ const LoginForm = ({
   className,
   form,
   loading,
+  globalError,
   onSubmit,
   onGoogleSuccess,
   onGoogleError
@@ -36,6 +40,7 @@ const LoginForm = ({
     <Form
       style={style}
       form={form}
+      globalError={globalError}
       className={classNames("login-form", className)}
       onFinish={(values: ILoginFormValues) => onSubmit(values)}
     >
@@ -71,23 +76,25 @@ const LoginForm = ({
       <div className={"forgot-password-text"}>
         <RouterLink className={"forgot-link"}>{"Forgot Password?"}</RouterLink>
       </div>
-      <Button loading={loading} className={"btn--login"} htmlType={"submit"}>
-        {"Login"}
-      </Button>
-      <SocialButton
-        text={"Login with Google"}
-        provider={"google"}
-        onGoogleSuccess={onGoogleSuccess}
-        onGoogleError={onGoogleError}
-      />
-      <div className={"signup-text"}>
-        {"Don't have an account yet?"}
-        <span>
-          <RouterLink to={"/signup"} className={"signup-link"}>
-            {"Sign up"}
-          </RouterLink>
-        </span>
-      </div>
+      <Form.Footer>
+        <Button loading={loading} className={"btn--login"} htmlType={"submit"}>
+          {"Login"}
+        </Button>
+        <SocialButton
+          text={"Login with Google"}
+          provider={"google"}
+          onGoogleSuccess={onGoogleSuccess}
+          onGoogleError={onGoogleError}
+        />
+        <div className={"signup-text"}>
+          {"Don't have an account yet?"}
+          <span>
+            <RouterLink to={"/signup"} className={"signup-link"}>
+              {"Sign up"}
+            </RouterLink>
+          </span>
+        </div>
+      </Form.Footer>
     </Form>
   );
 };
