@@ -129,6 +129,11 @@ const BudgetTable = <
     setColumnApi(event.columnApi);
   });
 
+  const onFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
+    setFooterGridApi(event.api);
+    setFooterColumnApi(event.columnApi);
+  });
+
   useEffect(() => {
     setGridOptions({ ...gridOptions, alignedGrids: [footerGridOptions] });
     setFooterGridOptions({ ...footerGridOptions, alignedGrids: [gridOptions] });
@@ -301,7 +306,7 @@ const BudgetTable = <
       }
     });
     return footerObj as R;
-  }, [totals, footerIdentifierValue]);
+  }, [useDeepEqualMemo(totals), footerIdentifierValue]);
 
   const findFirstNonGroupFooterRow = useDynamicCallback((startingIndex: number, direction: "asc" | "desc" = "asc"): [
     RowNode | null,
@@ -724,7 +729,7 @@ const BudgetTable = <
           <div className={"primary-grid"}>
             <AgGridReact
               {...gridOptions}
-              debug={true}
+              // debug={true}
               columnDefs={colDefs}
               allowContextMenuWithControlKey={true}
               rowData={_table}
@@ -769,12 +774,10 @@ const BudgetTable = <
             <AgGridReact
               {...footerGridOptions}
               columnDefs={colDefs}
+              debug={true}
               rowData={[tableFooter]}
               suppressRowClickSelection={true}
-              onGridReady={(event: GridReadyEvent): void => {
-                setFooterGridApi(event.api);
-                setFooterColumnApi(event.columnApi);
-              }}
+              onGridReady={onFooterGridReady}
               headerHeight={0}
               frameworkComponents={{
                 NewRowCell: NewRowCell,
