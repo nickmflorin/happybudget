@@ -289,6 +289,8 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
             yield put(requestAccountAction());
             // Should we remove the group from the table if the response does not have
             // a group?  Probably - but this will not happen in practice (at least not now).
+            // TODO: We might want to do this before the request is made to make the table interactions
+            // faster.  This will require calculating the metrics in the front end.
             if (!isNil(response.group)) {
               yield put(updateGroupInTableAction({ groupId: response.group.id, group: response.group }));
             }
