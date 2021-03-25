@@ -44,6 +44,7 @@ const LoginForm = ({
         rules={[
           { required: true, message: "Please enter an email." },
           ({ getFieldValue }) => ({
+            validateTrigger: "onSubmit",
             validator(rule, value) {
               if (value !== "" && !validateEmail(value)) {
                 return Promise.reject("Please enter a valid email.");
