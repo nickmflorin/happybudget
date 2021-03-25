@@ -39,8 +39,9 @@ import {
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
 import { IncludeErrorsInCell } from "./Util";
-
 import "./index.scss";
+
+export * from "./model";
 
 const actionCell = (col: ColDef): ColDef => {
   return {
