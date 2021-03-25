@@ -7,13 +7,15 @@
 
   .title {
     font-size: 28px;
-    font-family: $noto-sans-medium;
+    font-family: $noto-sans-jp;
+    font-weight: 600;
     text-align: center;
   }
 
   .sub-title {
     font-size: 16px;
-    font-family: $noto-sans-regular;
+    font-family: $noto-sans-jp;
+    font-weight: 400;
     color: $text-secondary;
     text-align: center;
     margin-bottom: 32px;

@@ -1,73 +1,9 @@
 @import "./colors";
 
-@font-face {
-  font-family: 'NotoSansJP-Light';
-  font-style: normal;
-  font-weight: 300;
-  src: url("./fonts/Noto_Sans_JP/NotoSansJP-Light.otf") format('truetype');
-}
-
-@font-face {
-  font-family: 'NotoSansJP-Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: url("./fonts/Noto_Sans_JP/NotoSansJP-Regular.otf") format('truetype');
-}
-
-@font-face {
-  font-family: 'NotoSansJP-Medium';
-  font-style: normal;
-  font-weight: 500;
-  src: url("./fonts/Noto_Sans_JP/NotoSansJP-Medium.otf") format('truetype');
-}
-
-@font-face {
-  font-family: 'NotoSansJP-Bold';
-  font-style: normal;
-  font-weight: 600;
-  src: url("./fonts/Noto_Sans_JP/NotoSansJP-Bold.otf") format('truetype');
-}
-
-@font-face {
-  font-family: 'OpenSans-Light';
-  font-style: normal;
-  font-weight: 300;
-  src: url("./fonts/OpenSans/OpenSans-Light.ttf") format('truetype');
-}
-
-@font-face {
-  font-family: 'OpenSans-Regular';
-  font-style: normal;
-  font-weight: 400;
-  src: url("./fonts/OpenSans/OpenSans-Regular.ttf") format('truetype');
-}
-
-@font-face {
-  font-family: 'OpenSans-Medium';
-  font-style: normal;
-  font-weight: 500;
-  src: url("./fonts/OpenSans/OpenSans-SemiBold.ttf") format('truetype');
-}
-
-@font-face {
-  font-family: 'OpenSans-Bold';
-  font-style: normal;
-  font-weight: 600;
-  src: url("./fonts/OpenSans/OpenSans-Bold.ttf") format('truetype');
-}
-
 $nunito: 'Nunito', sans-serif;
 $roboto: 'Roboto', sans-serif;
-
-$noto-sans-light: "NotoSansJP-Light";
-$noto-sans-regular: "NotoSansJP-Regular";
-$noto-sans-medium: "NotoSansJP-Medium";
-$noto-sans-bold: "NotoSansJP-Bold";
-
-$open-sans-light: "OpenSans-Light";
-$open-sans-regular: "OpenSans-Regular";
-$open-sans-medium: "OpenSans-Medium";
-$open-sans-bold: "OpenSans-Bold";
+$noto-sans-jp: 'Noto Sans JP', sans-serif;
+$open-sans: 'Open Sans', sans-serif;
 
 .header-base {
   color: $text-primary;

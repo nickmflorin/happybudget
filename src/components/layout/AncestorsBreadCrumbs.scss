@@ -12,7 +12,8 @@
       line-height: 18px;
       padding-top: 9px;
       padding-bottom: 9px;
-      font-family: $noto-sans-regular;
+      font-family: $noto-sans-jp;
+      font-weight: 400;
       color: $text-secondary;
 
       .slash {
@@ -62,7 +63,8 @@
     &.last {
       .content-wrapper {
         color: $text-primary;
-        font-family: $noto-sans-medium !important;
+        font-family: $noto-sans-jp;
+        font-weight: 600;
       }
     }
 
