@@ -9,7 +9,6 @@ import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { CreateSubAccountGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { formatCurrencyWithoutDollarSign } from "util/string";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
 import BudgetTable from "../../BudgetTable";
@@ -167,21 +166,15 @@ const AccountBudgetTable = (): JSX.Element => {
         calculatedColumns={[
           {
             field: "estimated",
-            headerName: "Estimated",
-            cellStyle: { textAlign: "right" },
-            cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
+            headerName: "Estimated"
           },
           {
             field: "actual",
-            headerName: "Actual",
-            cellStyle: { textAlign: "right" },
-            cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
+            headerName: "Actual"
           },
           {
             field: "variance",
-            headerName: "Variance",
-            cellStyle: { textAlign: "right" },
-            cellRendererParams: { formatter: formatCurrencyWithoutDollarSign, renderRedIfNegative: true }
+            headerName: "Variance"
           }
         ]}
       />

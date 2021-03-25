@@ -5,7 +5,6 @@ import { ColDef } from "ag-grid-community";
 import { createSelector } from "reselect";
 
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { formatCurrencyWithoutDollarSign } from "util/string";
 
 import BudgetTable from "../../BudgetTable";
 import { selectBudgetId, selectBudgetDetail } from "../selectors";
@@ -79,21 +78,15 @@ const AccountsBudgetTable = (): JSX.Element => {
       calculatedColumns={[
         {
           field: "estimated",
-          headerName: "Estimated",
-          cellStyle: { textAlign: "right" },
-          cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
+          headerName: "Estimated"
         },
         {
           field: "actual",
-          headerName: "Actual",
-          cellStyle: { textAlign: "right" },
-          cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
+          headerName: "Actual"
         },
         {
           field: "variance",
-          headerName: "Variance",
-          cellStyle: { textAlign: "right" },
-          cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
+          headerName: "Variance"
         }
       ]}
     />

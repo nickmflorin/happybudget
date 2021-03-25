@@ -211,7 +211,9 @@ export const SubAccountMapping = new Mapping<
     { field: "multiplier", usedToCalculate: true },
     { field: "unit", updateBeforeRequest: true },
     { field: "identifier", requiredForPost: true },
-    { field: "estimated", calculatedField: true }
+    { field: "estimated", calculatedField: true },
+    { field: "variance", calculatedField: true },
+    { field: "actual", calculatedField: true }
   ],
   childrenGetter: (model: ISubAccount) => model.subaccounts,
   groupGetter: (model: ISubAccount) => model.group

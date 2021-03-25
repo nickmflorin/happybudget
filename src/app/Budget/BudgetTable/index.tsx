@@ -25,6 +25,7 @@ import { RenderWithSpinner } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
 import { downloadAsCsvFile } from "util/files";
 import { generateRandomNumericId } from "util/math";
+import { formatCurrencyWithoutDollarSign } from "util/string";
 
 import {
   DeleteCell,
@@ -583,6 +584,8 @@ const BudgetTable = <
                 cellRenderer: "CalculatedCell",
                 minWidth: 100,
                 maxWidth: 125,
+                cellStyle: { textAlign: "right" },
+                cellRendererParams: { formatter: formatCurrencyWithoutDollarSign, renderRedIfNegative: true },
                 ...def
               } as ColDef)
           ),
@@ -775,7 +778,14 @@ const BudgetTable = <
               headerHeight={0}
               frameworkComponents={{
                 NewRowCell: NewRowCell,
-                ValueCell: ValueCell
+                DeleteCell: DeleteCell,
+                ExpandCell: ExpandCell,
+                SelectCell: SelectCell,
+                ValueCell: IncludeErrorsInCell<R>(ValueCell),
+                UnitCell: IncludeErrorsInCell<R>(UnitCell),
+                IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
+                CalculatedCell: CalculatedCell,
+                ...frameworkComponents
               }}
             />
           </div>
