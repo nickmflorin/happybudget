@@ -13,7 +13,8 @@ import {
   deleteCommentTask,
   editAccountCommentTask,
   getSubAccountsHistoryTask,
-  deleteSubAccountGroupTask
+  deleteSubAccountGroupTask,
+  addSubAccountGroupToStateTask
 } from "./tasks";
 
 function* watchForRequestSubAccountsSaga(): SagaIterator {
@@ -98,10 +99,30 @@ function* watchForRequestSubAccountsHistorySaga(): SagaIterator {
   }
 }
 
-function* watchForDeleteSubAccountGroupSaga(): SagaIterator {
+function* watchForAddGroupToStateSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action = yield take(ActionType.SubAccounts.Groups.Delete);
+    const action: Redux.IAction<ISubAccountGroup> = yield take(ActionType.SubAccounts.Groups.AddToState);
+    if (!isNil(action.payload)) {
+      if (isNil(lastTasks[action.payload.id])) {
+        lastTasks[action.payload.id] = [];
+      }
+      // If there were any previously submitted tasks to add the same group,
+      // cancel them.
+      if (lastTasks[action.payload.id].length !== 0) {
+        const cancellable = lastTasks[action.payload.id];
+        lastTasks = { ...lastTasks, [action.payload.id]: [] };
+        yield cancel(cancellable);
+      }
+      lastTasks[action.payload.id].push(yield call(addSubAccountGroupToStateTask, action));
+    }
+  }
+}
+
+function* watchForDeleteGroupSaga(): SagaIterator {
+  let lastTasks: { [key: number]: any[] } = {};
+  while (true) {
+    const action: Redux.IAction<number> = yield take(ActionType.SubAccounts.Groups.Delete);
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload])) {
         lastTasks[action.payload] = [];
@@ -113,8 +134,8 @@ function* watchForDeleteSubAccountGroupSaga(): SagaIterator {
         lastTasks = { ...lastTasks, [action.payload]: [] };
         yield cancel(cancellable);
       }
+      lastTasks[action.payload].push(yield call(deleteSubAccountGroupTask, action));
     }
-    lastTasks[action.payload].push(yield call(deleteSubAccountGroupTask, action));
   }
 }
 
@@ -129,5 +150,6 @@ export default function* accountSaga(): SagaIterator {
   yield spawn(watchForSubmitCommentSaga);
   yield spawn(watchForRemoveCommentSaga);
   yield spawn(watchForEditCommentSaga);
-  yield spawn(watchForDeleteSubAccountGroupSaga);
+  yield spawn(watchForDeleteGroupSaga);
+  yield spawn(watchForAddGroupToStateSaga);
 }

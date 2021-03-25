@@ -9,10 +9,17 @@ export const userToSimpleUser = (user: IUser): ISimpleUser => {
   };
 };
 
-export const subAccountGroupToTableGroup = (group: ISubAccountGroup | ISubAccountNestedGroup): Table.RowGroup => {
+export const subAccountGroupToSubAccountNestedGroup = (group: ISubAccountGroup): ISubAccountNestedGroup => {
   return {
     id: group.id,
     color: group.color,
-    name: group.name
+    name: group.name,
+    estimated: group.estimated,
+    variance: group.variance,
+    actual: group.actual,
+    created_by: group.created_by,
+    updated_by: group.updated_by,
+    created_at: group.created_at,
+    updated_at: group.updated_at
   };
 };

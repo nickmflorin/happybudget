@@ -1,7 +1,8 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find, concat } from "lodash";
+import { isNil, find, concat, map } from "lodash";
 import { handleRequestError } from "api";
+import { subAccountGroupToSubAccountNestedGroup } from "model/mappings";
 import { SubAccountMapping } from "model/tableMappings";
 import {
   getAccountSubAccounts,
@@ -46,7 +47,9 @@ import {
   loadingSubAccountsHistoryAction,
   responseSubAccountsHistoryAction,
   deletingGroupAction,
-  removeGroupFromTableAction
+  removeGroupFromTableAction,
+  addGroupToTableAction,
+  updateGroupInTableAction
 } from "./actions";
 
 export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaIterator {
@@ -60,6 +63,18 @@ export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaI
     } finally {
       yield put(deletingGroupAction(false));
     }
+  }
+}
+
+export function* addSubAccountGroupToStateTask(action: Redux.IAction<ISubAccountGroup>): SagaIterator {
+  if (!isNil(action.payload)) {
+    const nestedGroup = subAccountGroupToSubAccountNestedGroup(action.payload);
+    yield put(
+      addGroupToTableAction({
+        group: nestedGroup,
+        ids: map(action.payload.subaccounts, (subaccount: ISimpleSubAccount) => subaccount.id)
+      })
+    );
   }
 }
 
@@ -268,9 +283,15 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
           yield put(updateTableRowAction({ id: existing.id, data: responsePayload }));
 
           // Determine if the parent account needs to be refreshed due to updates to the underlying
-          // account fields that calculate the values of the parent account.
+          // account fields that calculate the values of the parent models.
           if (SubAccountMapping.patchRequestRequiresRecalculation(requestPayload)) {
+            // TODO: Instead of refreshing the account, let's update the account in state.
             yield put(requestAccountAction());
+            // Should we remove the group from the table if the response does not have
+            // a group?  Probably - but this will not happen in practice (at least not now).
+            if (!isNil(response.group)) {
+              yield put(updateGroupInTableAction({ groupId: response.group.id, group: response.group }));
+            }
           }
         } catch (e) {
           yield call(

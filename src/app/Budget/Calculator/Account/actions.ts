@@ -44,8 +44,10 @@ export const ActionType = {
     Groups: {
       Delete: "calculator.account.subaccounts.groups.Delete",
       Deleting: "calculator.account.subaccounts.groups.Deleting",
+      AddToState: "calculator.account.subaccounts.AddToState",
       AddToTable: "calculator.account.subaccounts.AddToTable",
-      RemoveFromTable: "calculator.account.subaccounts.RemoveFromTable"
+      RemoveFromTable: "calculator.account.subaccounts.RemoveFromTable",
+      UpdateInTable: "calculator.account.subaccounts.UpdateInTable"
     },
     History: {
       Loading: "calculator.account.subaccounts.history.Loading",
@@ -109,8 +111,12 @@ export const setSubAccountsSearchAction = simpleAction<string>(ActionType.SubAcc
 export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.SubAccounts.AddErrors
 );
-export const addGroupToTableAction = simpleAction<{ group: Table.RowGroup; ids: number[] }>(
+export const addGroupToStateAction = simpleAction<ISubAccountGroup>(ActionType.SubAccounts.Groups.AddToState);
+export const addGroupToTableAction = simpleAction<{ group: ISubAccountNestedGroup; ids: number[] }>(
   ActionType.SubAccounts.Groups.AddToTable
+);
+export const updateGroupInTableAction = simpleAction<{ groupId: number; group: Partial<ISubAccountNestedGroup> }>(
+  ActionType.SubAccounts.Groups.UpdateInTable
 );
 export const removeGroupFromTableAction = simpleAction<number>(ActionType.SubAccounts.Groups.RemoveFromTable);
 

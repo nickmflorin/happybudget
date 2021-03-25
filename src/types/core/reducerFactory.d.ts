@@ -33,6 +33,7 @@ namespace ReducerFactory {
     AddErrors: string;
     AddGroup: string;
     RemoveGroup: string;
+    UpdateGroup: string;
   };
 
   type ITableActionMap = {
@@ -50,6 +51,7 @@ namespace ReducerFactory {
     AddErrors: string;
     AddGroup: string;
     RemoveGroup: string;
+    UpdateGroup: string;
   };
 
   type IDetailResponseActionMap = {

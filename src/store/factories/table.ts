@@ -174,6 +174,25 @@ export const createTableDataReducer = <
       }
       return state;
     },
+    UpdateGroup: (payload: { groupId: number; group: Partial<G> }, st: Redux.ListStore<R>) => {
+      const rowsWithGroup = filter(st, (row: R) => !isNil(row.group) && row.group.id === payload.groupId);
+      if (rowsWithGroup.length === 0) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when updating group in rows of ${Options.referenceEntity} table...
+          no rows that are associated with group ID ${payload.groupId} exist when they are expected to.`
+        );
+      } else {
+        for (let i = 0; i < rowsWithGroup.length; i++) {
+          st = replaceInArray<R>(
+            st,
+            { id: rowsWithGroup[i].id },
+            { ...rowsWithGroup[i], group: { ...rowsWithGroup[i].group, ...payload.group } }
+          );
+        }
+      }
+      return st;
+    },
     AddGroup: (payload: { group: G; ids: number[] }, st: Redux.ListStore<R>) => {
       for (let i = 0; i < payload.ids.length; i++) {
         const row = find(st, { id: payload.ids[i] } as any);
@@ -263,7 +282,8 @@ export const createTableReducer = <
       SelectAllRows: mappings.SelectAllRows,
       AddErrors: mappings.AddErrors,
       AddGroup: mappings.AddGroup,
-      RemoveGroup: mappings.RemoveGroup
+      RemoveGroup: mappings.RemoveGroup,
+      UpdateGroup: mappings.UpdateGroup
     },
     mapping,
     { referenceEntity: Options.referenceEntity as string, initialState: Options.initialState.data }
