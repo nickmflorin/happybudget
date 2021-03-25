@@ -79,7 +79,7 @@ class Mapping<
 
   createPlaceholder = (): R => {
     const meta: Table.RowMeta<C> = {
-      isPlaceholder: false,
+      isPlaceholder: true,
       isGroupFooter: false,
       isTableFooter: false,
       selected: false,
