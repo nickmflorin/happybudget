@@ -1,4 +1,5 @@
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
+import { isNil } from "lodash";
 import { GoogleAuthButton } from "components/control/buttons";
 
 interface SocialButtonProps {
@@ -18,14 +19,11 @@ const isOfflineResponse = (
   );
 };
 
-// TODO: Store in the .env file.
-const GOOGLE_CLIENT_ID = "609051398044-dn6cb2km2heebcqsau5ou5bs800s1vtc.apps.googleusercontent.com";
-
 const SocialButton = ({ provider, text, onGoogleSuccess, onGoogleError }: SocialButtonProps): JSX.Element => {
   if (provider === "google") {
     return (
       <GoogleLogin
-        clientId={GOOGLE_CLIENT_ID}
+        clientId={!isNil(process.env.REACT_APP_GOOGLE_CLIENT_KEY) ? process.env.REACT_APP_GOOGLE_CLIENT_KEY : ""}
         render={(props: { onClick: () => void; disabled?: boolean }) => (
           <GoogleAuthButton text={text} onClick={props.onClick} disabled={props.disabled} />
         )}
