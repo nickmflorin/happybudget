@@ -717,7 +717,7 @@ const BudgetTable = <
         }}
       />
       <RenderWithSpinner absolute loading={loading}>
-        <div className={"budget-table ag-theme-alpine"} style={{ width: "100%", position: "relative" }}>
+        <div className={"budget-table ag-theme-alpine"}>
           <div className={"primary-grid"}>
             <AgGridReact
               {...gridOptions}
@@ -745,7 +745,6 @@ const BudgetTable = <
               headerHeight={38}
               enableRangeSelection={true}
               clipboardDeliminator={","}
-              domLayout={"autoHeight"}
               animateRows={true}
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
@@ -773,7 +772,6 @@ const BudgetTable = <
                 setFooterGridApi(event.api);
                 setFooterColumnApi(event.columnApi);
               }}
-              domLayout={"autoHeight"}
               headerHeight={0}
               frameworkComponents={{
                 NewRowCell: NewRowCell,

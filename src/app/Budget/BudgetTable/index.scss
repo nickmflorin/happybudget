@@ -25,7 +25,13 @@
 }
 
 .budget-table {
+  display: flex;
+  flex-direction: column;
+  height: calc((100vh - 116px) - 24px);
+
   .primary-grid {
+    flex: 1 1 auto;
+
     .ag-row:last-child {
       border-bottom: none !important;
     }
@@ -39,15 +45,29 @@
   }
 
   .footer-grid {
+    flex: none;
+    height: 60px;
+
     .ag-body-viewport {
       border-radius: 8px;
       .ag-row {
         border-bottom: none !important;
+
         div[role='gridcell'] {
           background-color: #f8f8f8;
           font-family: $roboto;
           font-weight: 400;
           color: $text-secondary;
+
+          &:first-child {
+            border-bottom-left-radius: 8px;
+            border-top-left-radius: 8px;
+          }
+
+          &:last-child {
+            border-bottom-right-radius: 8px;
+            border-top-right-radius: 8px;
+          }
         }
       }
     }
