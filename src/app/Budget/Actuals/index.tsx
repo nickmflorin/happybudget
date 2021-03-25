@@ -4,12 +4,11 @@ import { isNil, find } from "lodash";
 
 import { CellClassParams } from "ag-grid-community";
 
-import BudgetTable, { GetExportValueParams } from "lib/BudgetTable";
-
 import { RenderWithSpinner } from "components/display";
 import { formatCurrencyWithoutDollarSign } from "util/string";
 
 import { setAncestorsAction } from "../actions";
+import BudgetTable, { GetExportValueParams } from "../BudgetTable";
 import {
   requestBudgetItemsAction,
   requestActualsAction,

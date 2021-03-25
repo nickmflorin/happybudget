@@ -4,11 +4,10 @@ import { isNil, includes } from "lodash";
 import { ColDef } from "ag-grid-community";
 import { createSelector } from "reselect";
 
-import BudgetTable from "lib/BudgetTable";
-
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { formatCurrencyWithoutDollarSign } from "util/string";
 
+import BudgetTable from "../../BudgetTable";
 import { selectBudgetId, selectBudgetDetail } from "../selectors";
 import {
   setAccountsSearchAction,

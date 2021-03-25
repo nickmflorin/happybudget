@@ -734,25 +734,25 @@ const BudgetTable = <
                 ...frameworkComponents
               }}
               onCellEditingStopped={(event: CellEditingStoppedEvent) => {
-                const field = event.column.getColId();
-                if (!isNil(event.newValue)) {
-                  if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
-                    if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
-                      const valid = event.colDef.valueSetter({ ...event });
-                      if (valid === true) {
-                        onRowUpdate({
-                          id: event.data.id,
-                          data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
-                        });
-                      }
-                    } else {
-                      onRowUpdate({
-                        id: event.data.id,
-                        data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
-                      });
-                    }
-                  }
-                }
+                // const field = event.column.getColId();
+                // if (!isNil(event.newValue)) {
+                //   if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
+                //     if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
+                //       const valid = event.colDef.valueSetter({ ...event });
+                //       if (valid === true) {
+                //         onRowUpdate({
+                //           id: event.data.id,
+                //           data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+                //         });
+                //       }
+                //     } else {
+                //       onRowUpdate({
+                //         id: event.data.id,
+                //         data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+                //       });
+                //     }
+                //   }
+                // }
               }}
             />
           </div>
