@@ -2,7 +2,7 @@ import React from "react";
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolderOpen, faFolderPlus, faTrashAlt, faAddressBook } from "@fortawesome/free-solid-svg-icons";
+import { faFolderOpen, faFolderPlus, faAddressBook } from "@fortawesome/free-solid-svg-icons";
 
 import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
@@ -31,12 +31,12 @@ const Dashboard = (): JSX.Element => {
           onClick: () => history.push("/budgets"),
           active: location.pathname.startsWith("/budgets")
         },
-        {
-          text: "Trash",
-          icon: <FontAwesomeIcon icon={faTrashAlt} />,
-          onClick: () => history.push("/trash"),
-          active: location.pathname.startsWith("/trash")
-        },
+        // {
+        //   text: "Trash",
+        //   icon: <FontAwesomeIcon icon={faTrashAlt} />,
+        //   onClick: () => history.push("/trash"),
+        //   active: location.pathname.startsWith("/trash")
+        // },
         {
           text: "Contacts",
           icon: <FontAwesomeIcon icon={faAddressBook} />,

@@ -91,14 +91,14 @@ const Budget = (): JSX.Element => {
             placement: "right"
           }
         },
-        {
-          icon: <FontAwesomeIcon icon={faTrashAlt} />,
-          onClick: () => history.push("/trash"),
-          tooltip: {
-            title: "Deleted Budgets",
-            placement: "right"
-          }
-        },
+        // {
+        //   icon: <FontAwesomeIcon icon={faTrashAlt} />,
+        //   onClick: () => history.push("/trash"),
+        //   tooltip: {
+        //     title: "Deleted Budgets",
+        //     placement: "right"
+        //   }
+        // },
         {
           icon: <FontAwesomeIcon icon={faAddressBook} />,
           onClick: () => history.push("/contacts"),
