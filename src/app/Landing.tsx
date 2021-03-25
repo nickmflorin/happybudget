@@ -2,10 +2,12 @@ import React from "react";
 import { Route, Switch } from "react-router-dom";
 
 import { LogoWhite } from "components/svgs";
+import { componentLoader } from "operational";
+
 import "./Landing.scss";
 
-const Login = React.lazy(() => import("./Login"));
-const Signup = React.lazy(() => import("./Signup"));
+const Login = React.lazy(() => componentLoader(() => import("./Login")));
+const Signup = React.lazy(() => componentLoader(() => import("./Signup")));
 
 const Landing = (): JSX.Element => {
   return (

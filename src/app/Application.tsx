@@ -4,11 +4,12 @@ import { useSelector } from "react-redux";
 
 import { ApplicationSpinner } from "components/display";
 import { PrivateRoute } from "components/routes";
+import { componentLoader } from "operational";
 import Logout from "./Logout";
 
-const Dashboard = React.lazy(() => import("./Dashboard"));
-const Budget = React.lazy(() => import("./Budget"));
-const Settings = React.lazy(() => import("./Settings"));
+const Dashboard = React.lazy(() => componentLoader(() => import("./Dashboard")));
+const Budget = React.lazy(() => componentLoader(() => import("./Budget")));
+const Settings = React.lazy(() => componentLoader(() => import("./Settings")));
 
 const Application = (): JSX.Element => {
   const applicationLoading = useSelector((state: Redux.IApplicationStore) => state.loading.loading);
