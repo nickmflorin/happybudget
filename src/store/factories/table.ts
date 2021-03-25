@@ -184,7 +184,11 @@ export const createTableDataReducer = <
             the ${Options.referenceEntity} row with ID ${payload.ids[i]} does not exist in state when it is expected to.`
           );
         } else {
-          st = replaceInArray<R>(st, { id: payload.ids[i] }, { ...row, group: payload.group });
+          st = replaceInArray<R>(
+            st,
+            { id: payload.ids[i] },
+            { ...row, group: payload.group, meta: { ...row.meta, selected: false } }
+          );
         }
       }
       return st;
