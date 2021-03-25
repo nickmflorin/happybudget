@@ -9,6 +9,10 @@ interface DeleteCellProps<R extends Table.Row> extends ICellRendererParams {
 }
 
 const DeleteCell = <R extends Table.Row>({ onClick, node }: DeleteCellProps<R>): JSX.Element => {
+  const row: R = node.data;
+  if (row.meta.isTableFooter === true) {
+    return <></>;
+  }
   return (
     <IconButton
       className={"ag-grid-table-action-button"}
