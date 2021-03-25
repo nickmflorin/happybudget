@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
@@ -16,6 +16,10 @@ const Login = (): JSX.Element => {
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
   const history = useHistory();
+
+  useEffect(() => {
+    setGlobalError(undefined);
+  }, []);
 
   return (
     <div className={"form-container"}>
