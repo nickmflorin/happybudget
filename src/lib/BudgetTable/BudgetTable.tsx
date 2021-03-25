@@ -212,6 +212,8 @@ const BudgetTable = <
     identifierFieldParams
   ]);
 
+  // TODO: It might make more sense to just treat all of the cells corresponding
+  // to the calculatedColumns as non-editable.
   const _isCellEditable = useDynamicCallback((row: R, colDef: ColDef): boolean => {
     if (includes(["delete", "select", "expand"], colDef.field)) {
       return false;
