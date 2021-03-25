@@ -123,6 +123,11 @@ const BudgetTable = <
   });
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
 
+  const onGridReady = useDynamicCallback((event: GridReadyEvent): void => {
+    setGridApi(event.api);
+    setColumnApi(event.columnApi);
+  });
+
   useEffect(() => {
     setGridOptions({ ...gridOptions, alignedGrids: [footerGridOptions] });
     setFooterGridOptions({ ...footerGridOptions, alignedGrids: [gridOptions] });
@@ -370,6 +375,69 @@ const BudgetTable = <
       return params.previousCellPosition;
     }
   );
+
+  const onCellKeyDown = useDynamicCallback((event: CellKeyDownEvent) => {
+    // const count = event.api.getDisplayedRowCount();
+    if (!isNil(event.rowIndex) && !isNil(event.event)) {
+      // I do not understand why AGGrid's Event has an underlying Event that is in
+      // reality a KeyboardEvent but does not have any of the properties that a KeyboardEvent
+      // should have - meaning we have to tell TS to ignore this line.
+      /* @ts-ignore */
+      if (event.event.keyCode === 13) {
+        event.api.stopEditing(false);
+        event.api.clearFocusedCell();
+
+        const firstEditCol = event.columnApi.getColumn(event.column.getColId());
+        if (!isNil(firstEditCol)) {
+          event.api.ensureColumnVisible(firstEditCol);
+
+          let foundNonFooterRow = false;
+          let nextRowNode: RowNode | null;
+          let additionalIndex = 1;
+          while (foundNonFooterRow === false) {
+            nextRowNode = event.api.getDisplayedRowAtIndex(event.rowIndex + additionalIndex);
+            if (isNil(nextRowNode)) {
+              onRowAdd();
+              event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
+              event.api.clearRangeSelection();
+              foundNonFooterRow = true;
+            } else {
+              let row: R = nextRowNode.data;
+              if (row.meta.isGroupFooter === false) {
+                event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
+                event.api.clearRangeSelection();
+                foundNonFooterRow = true;
+              } else {
+                additionalIndex = additionalIndex + 1;
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const onCellEditingStopped = useDynamicCallback((event: CellEditingStoppedEvent) => {
+    const field = event.column.getColId();
+    if (!isNil(event.newValue)) {
+      if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
+        if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
+          const valid = event.colDef.valueSetter({ ...event });
+          if (valid === true) {
+            onRowUpdate({
+              id: event.data.id,
+              data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+            });
+          }
+        } else {
+          onRowUpdate({
+            id: event.data.id,
+            data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+          });
+        }
+      }
+    }
+  });
 
   useEffect(() => {
     if (!isNil(groupParams)) {
@@ -653,6 +721,7 @@ const BudgetTable = <
           <div className={"primary-grid"}>
             <AgGridReact
               {...gridOptions}
+              debug={true}
               columnDefs={colDefs}
               allowContextMenuWithControlKey={true}
               rowData={_table}
@@ -671,10 +740,7 @@ const BudgetTable = <
               }}
               immutableData={true}
               suppressRowClickSelection={true}
-              onGridReady={(event: GridReadyEvent): void => {
-                setGridApi(event.api);
-                setColumnApi(event.columnApi);
-              }}
+              onGridReady={onGridReady}
               rowHeight={36}
               headerHeight={38}
               enableRangeSelection={true}
@@ -682,46 +748,7 @@ const BudgetTable = <
               domLayout={"autoHeight"}
               animateRows={true}
               navigateToNextCell={navigateToNextCell}
-              onCellKeyDown={(event: CellKeyDownEvent) => {
-                // const count = event.api.getDisplayedRowCount();
-                if (!isNil(event.rowIndex) && !isNil(event.event)) {
-                  // I do not understand why AGGrid's Event has an underlying Event that is in
-                  // reality a KeyboardEvent but does not have any of the properties that a KeyboardEvent
-                  // should have - meaning we have to tell TS to ignore this line.
-                  /* @ts-ignore */
-                  if (event.event.keyCode === 13) {
-                    event.api.stopEditing(false);
-                    event.api.clearFocusedCell();
-
-                    const firstEditCol = event.columnApi.getColumn(event.column.getColId());
-                    if (!isNil(firstEditCol)) {
-                      event.api.ensureColumnVisible(firstEditCol);
-
-                      let foundNonFooterRow = false;
-                      let nextRowNode: RowNode | null;
-                      let additionalIndex = 1;
-                      while (foundNonFooterRow === false) {
-                        nextRowNode = event.api.getDisplayedRowAtIndex(event.rowIndex + additionalIndex);
-                        if (isNil(nextRowNode)) {
-                          onRowAdd();
-                          event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
-                          event.api.clearRangeSelection();
-                          foundNonFooterRow = true;
-                        } else {
-                          let row: R = nextRowNode.data;
-                          if (row.meta.isGroupFooter === false) {
-                            event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
-                            event.api.clearRangeSelection();
-                            foundNonFooterRow = true;
-                          } else {
-                            additionalIndex = additionalIndex + 1;
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }}
+              onCellKeyDown={onCellKeyDown}
               enterMovesDown={true}
               frameworkComponents={{
                 DeleteCell: DeleteCell,
@@ -733,27 +760,7 @@ const BudgetTable = <
                 CalculatedCell: CalculatedCell,
                 ...frameworkComponents
               }}
-              onCellEditingStopped={(event: CellEditingStoppedEvent) => {
-                // const field = event.column.getColId();
-                // if (!isNil(event.newValue)) {
-                //   if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
-                //     if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
-                //       const valid = event.colDef.valueSetter({ ...event });
-                //       if (valid === true) {
-                //         onRowUpdate({
-                //           id: event.data.id,
-                //           data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
-                //         });
-                //       }
-                //     } else {
-                //       onRowUpdate({
-                //         id: event.data.id,
-                //         data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
-                //       });
-                //     }
-                //   }
-                // }
-              }}
+              onCellEditingStopped={onCellEditingStopped}
             />
           </div>
           <div className={"footer-grid"}>
