@@ -371,7 +371,6 @@ const BudgetTable = <
 
   useEffect(() => {
     if (!isNil(groupParams)) {
-      console.log("Updating table");
       const rowsWithGroup = filter(table, (row: R) => !isNil(groupValueGetter(row)));
       const rowsWithoutGroup = filter(table, (row: R) => isNil(groupValueGetter(row)));
 
