@@ -27,16 +27,7 @@ import { downloadAsCsvFile } from "util/files";
 import { generateRandomNumericId } from "util/math";
 import { formatCurrencyWithoutDollarSign } from "util/string";
 
-import {
-  DeleteCell,
-  ExpandCell,
-  SelectCell,
-  ValueCell,
-  NewRowCell,
-  UnitCell,
-  IdentifierCell,
-  CalculatedCell
-} from "./cells";
+import { DeleteCell, ExpandCell, IndexCell, ValueCell, UnitCell, IdentifierCell, CalculatedCell } from "./cells";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
 import { IncludeErrorsInCell } from "./Util";
@@ -156,12 +147,21 @@ const BudgetTable = <
   const baseColumns = useMemo((): ColDef[][] => {
     let baseLeftColumns: ColDef[] = [
       actionCell({
-        field: "select",
-        cellRenderer: "SelectCell",
-        cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect }
+        field: "index",
+        cellRenderer: "IndexCell",
+        cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect, onNew: onRowAdd },
+        colSpan: (params: ColSpanParams) => {
+          const row: R = params.data;
+          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true) {
+            return 2;
+          }
+          return 1;
+        }
       })
     ];
     if (!isNil(onRowExpand)) {
+      // This cell will be hidden for the table footer since the previous index
+      // cell will span over this column.
       baseLeftColumns.push(
         actionCell({
           field: "expand",
@@ -760,7 +760,7 @@ const BudgetTable = <
               frameworkComponents={{
                 DeleteCell: DeleteCell,
                 ExpandCell: ExpandCell,
-                SelectCell: SelectCell,
+                IndexCell: IndexCell,
                 ValueCell: IncludeErrorsInCell<R>(ValueCell),
                 UnitCell: IncludeErrorsInCell<R>(UnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
@@ -780,10 +780,9 @@ const BudgetTable = <
               onGridReady={onFooterGridReady}
               headerHeight={0}
               frameworkComponents={{
-                NewRowCell: NewRowCell,
+                IndexCell: IndexCell,
                 DeleteCell: DeleteCell,
                 ExpandCell: ExpandCell,
-                SelectCell: SelectCell,
                 ValueCell: IncludeErrorsInCell<R>(ValueCell),
                 UnitCell: IncludeErrorsInCell<R>(UnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
