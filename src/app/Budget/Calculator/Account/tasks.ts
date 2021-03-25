@@ -260,16 +260,19 @@ export function* handleAccountSubAccountUpdateTask(action: Redux.IAction<Table.R
       } else {
         yield put(updatingAccountSubAccountAction({ id: existing.id as number, value: true }));
         const requestPayload = SubAccountMapping.patchPayload(action.payload);
+        console.log(requestPayload);
         try {
           const response: ISubAccount = yield call(updateSubAccount, existing.id as number, requestPayload);
           // Since we are using a deep check lodash.isEqual in the selectors, this will only trigger
           // a rerender if the responsePayload has data that differs from that of the current data.
           const responsePayload = SubAccountMapping.modelToRow(response);
-          yield put(updateAccountSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));
+          console.log(responsePayload);
+          // yield put(updateAccountSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));
 
           // Determine if the parent account needs to be refreshed due to updates to the underlying
           // account fields that calculate the values of the parent account.
           if (SubAccountMapping.patchRequestRequiresRecalculation(requestPayload)) {
+            console.log("Recalculating");
             yield put(requestAccountAction());
           }
         } catch (e) {

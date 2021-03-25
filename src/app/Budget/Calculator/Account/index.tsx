@@ -99,6 +99,10 @@ const Account = (): JSX.Element => {
     }
   }, [accountId]);
 
+  useEffect(() => {
+    console.log("Table data changed");
+  }, [selectAccountsTableData]);
+
   return (
     <RenderIfValidId id={[accountId]}>
       <RenderWithSpinner loading={loading}>

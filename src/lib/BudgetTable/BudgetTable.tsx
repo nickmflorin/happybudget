@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
+import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy, isEqual } from "lodash";
 
 import { AgGridReact } from "ag-grid-react";
 import {
@@ -22,7 +22,7 @@ import {
 } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
-import { useDynamicCallback } from "hooks";
+import { useDynamicCallback, useDeepEqualMemo, usePrevious } from "hooks";
 import { downloadAsCsvFile } from "util/files";
 import { generateRandomNumericId } from "util/math";
 
@@ -120,6 +120,7 @@ const BudgetTable = <
     suppressHorizontalScroll: true
   });
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const prevTable = usePrevious(table);
 
   useEffect(() => {
     setGridOptions({ ...gridOptions, alignedGrids: [footerGridOptions] });
@@ -368,37 +369,41 @@ const BudgetTable = <
   );
 
   const _table = useMemo((): R[] => {
-    if (!isNil(groupParams)) {
-      const rowsWithGroup = filter(table, (row: R) => !isNil(groupValueGetter(row)));
-      const rowsWithoutGroup = filter(table, (row: R) => isNil(groupValueGetter(row)));
+    if (!isEqual(table, prevTable)) {
+      console.log("Updating table");
+      if (!isNil(groupParams)) {
+        const rowsWithGroup = filter(table, (row: R) => !isNil(groupValueGetter(row)));
+        const rowsWithoutGroup = filter(table, (row: R) => isNil(groupValueGetter(row)));
 
-      const newTable: R[] = [];
+        const newTable: R[] = [];
 
-      const groupedRows: { [key: number]: R[] } = groupBy(rowsWithGroup, (row: R) => (groupGetter(row) as G).id);
+        const groupedRows: { [key: number]: R[] } = groupBy(rowsWithGroup, (row: R) => (groupGetter(row) as G).id);
 
-      const allGroups: (G | null)[] = map(rowsWithGroup, (row: R) => groupGetter(row));
-      const groups: G[] = [];
-      forEach(allGroups, (group: G | null) => {
-        if (!isNil(group) && isNil(find(groups, { id: group.id }))) {
-          groups.push(group);
-        }
-      });
-      forEach(groupedRows, (rows: R[], groupId: string) => {
-        const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
-        if (!isNil(group)) {
-          const footer: R = createGroupFooter(group);
-          newTable.push(...rows, {
-            ...footer,
-            group,
-            [identifierField]: group.name,
-            meta: { ...footer.meta, isGroupFooter: true }
-          });
-        }
-      });
-      return [...newTable, ...rowsWithoutGroup];
-    } else {
-      return table;
+        const allGroups: (G | null)[] = map(rowsWithGroup, (row: R) => groupGetter(row));
+        const groups: G[] = [];
+        forEach(allGroups, (group: G | null) => {
+          if (!isNil(group) && isNil(find(groups, { id: group.id }))) {
+            groups.push(group);
+          }
+        });
+        forEach(groupedRows, (rows: R[], groupId: string) => {
+          const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
+          if (!isNil(group)) {
+            const footer: R = createGroupFooter(group);
+            newTable.push(...rows, {
+              ...footer,
+              group,
+              [identifierField]: group.name,
+              meta: { ...footer.meta, isGroupFooter: true }
+            });
+          }
+        });
+        return [...newTable, ...rowsWithoutGroup];
+      } else {
+        return table;
+      }
     }
+    return table;
   }, [table, groupParams]);
 
   useEffect(() => {
