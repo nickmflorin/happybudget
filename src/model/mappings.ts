@@ -8,3 +8,11 @@ export const userToSimpleUser = (user: IUser): ISimpleUser => {
     profile_image: user.profile_image
   };
 };
+
+export const subAccountGroupToTableGroup = (group: ISubAccountGroup | ISubAccountNestedGroup): Table.RowGroup => {
+  return {
+    id: group.id,
+    color: group.color,
+    name: group.name
+  };
+};

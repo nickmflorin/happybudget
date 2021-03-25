@@ -104,7 +104,8 @@ export const createCommentsListResponseReducer = <
   forEach(
     keyActions,
     (action: { action: string; key: string; factory: (actionType: string) => Reducer<any, Redux.IAction<any>> }) => {
-      const actionType: string | undefined = mappings[action.action];
+      const actionType: string | undefined =
+        mappings[action.action as keyof ReducerFactory.ICommentsListResponseActionMap];
       if (!isNil(actionType)) {
         keyReducers[action.key] = action.factory(actionType);
       }

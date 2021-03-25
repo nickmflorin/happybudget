@@ -4,17 +4,25 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace ReducerFactory {
-  type Transformer<S, A extends Redux.IAction<any>> = (payload: any, st: S, action: A) => any;
+  type Transformer<S, P = any, A extends Redux.IAction<any> = Redux.IAction<any>> = (
+    payload: P,
+    st: S,
+    action: A
+  ) => any;
 
-  type Transformers<O, S, A extends Redux.IAction<any>> = Partial<Record<keyof O, Transformer<S, A>>>;
+  type Transformers<O, S, A extends Redux.IAction<any> = Redux.IAction<any>> = Partial<
+    Record<keyof O, Transformer<S, any, A>>
+  >;
 
-  type TransformerExtensions<S, A extends Redux.IAction<any>> = Record<string, Transformer<S, A>>;
+  type TransformerExtensions<S, A extends Redux.IAction<any> = Redux.IAction<any>> = Record<
+    string,
+    Transformer<S, any, A>
+  >;
 
-  // TODO: We want to remove this parent because we want errors to be raised if it
-  // is an unexpected action map value.
-  type IActionMap = { [key: string]: string };
+  type ActionMap = { [key: string]: string };
 
-  interface ICommonTableActionMap extends IActionMap {
+  type ITableDataActionMap = {
+    SetData: string;
     AddPlaceholders: string;
     RemoveRow: string;
     UpdateRow: string;
@@ -23,30 +31,36 @@ namespace ReducerFactory {
     DeselectRow: string;
     SelectAllRows: string;
     AddErrors: string;
-    AddGroupToRows: string;
-    RemoveGroupFromRows: string;
-  }
+    AddGroup: string;
+    RemoveGroup: string;
+  };
 
-  interface ITableDataActionMap extends ICommonTableActionMap {
-    SetData: string;
-  }
-
-  interface ITableActionMap extends ICommonTableActionMap {
+  type ITableActionMap = {
     Request: string;
     Response: string;
     Loading: string;
     SetSearch: string;
-  }
+    AddPlaceholders: string;
+    RemoveRow: string;
+    UpdateRow: string;
+    ActivatePlaceholder: string;
+    SelectRow: string;
+    DeselectRow: string;
+    SelectAllRows: string;
+    AddErrors: string;
+    AddGroup: string;
+    RemoveGroup: string;
+  };
 
-  interface IDetailResponseActionMap extends IActionMap {
+  type IDetailResponseActionMap = {
     Loading: string;
     Response: string;
     Request: string;
     RemoveFromState: string;
     UpdateInState: string;
-  }
+  };
 
-  interface IListResponseActionMap extends IActionMap {
+  type IListResponseActionMap = {
     SetSearch: string;
     Loading: string;
     Response: string;
@@ -58,7 +72,7 @@ namespace ReducerFactory {
     UpdateInState: string;
     Select: string;
     Request: string;
-  }
+  };
 
   interface ICommentsListResponseActionMap extends IListResponseActionMap {
     Submitting: string;

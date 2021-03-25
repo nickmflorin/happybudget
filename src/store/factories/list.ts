@@ -123,9 +123,5 @@ export const createListResponseReducer = <
     }
   };
 
-  return createObjectReducerFromTransformers<ReducerFactory.IListResponseActionMap, S, A>(
-    mappings,
-    transformers,
-    Options
-  );
+  return createObjectReducerFromTransformers<{ [key: string]: string }, S, A>(mappings, transformers, Options);
 };

@@ -41,11 +41,11 @@ export const ActionType = {
     Response: "calculator.account.subaccounts.Response",
     Request: "calculator.account.subaccounts.Request",
     AddErrors: "calculator.account.subaccounts.AddErrors",
-    AddGroupToRows: "calculator.account.subaccounts.AddGroupToRows",
-    RemoveGroupFromRows: "calculator.account.subaccounts.RemoveGroupFromRows",
     Groups: {
       Delete: "calculator.account.subaccounts.groups.Delete",
-      Deleting: "calculator.account.subaccounts.groups.Deleting"
+      Deleting: "calculator.account.subaccounts.groups.Deleting",
+      AddToTable: "calculator.account.subaccounts.AddToTable",
+      RemoveFromTable: "calculator.account.subaccounts.RemoveFromTable"
     },
     History: {
       Loading: "calculator.account.subaccounts.history.Loading",
@@ -109,10 +109,11 @@ export const setSubAccountsSearchAction = simpleAction<string>(ActionType.SubAcc
 export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.SubAccounts.AddErrors
 );
-export const addGroupToTableRowsAction = simpleAction<{ group: Table.RowGroup; ids: number[] }>(
-  ActionType.SubAccounts.AddGroupToRows
+export const addGroupToTableAction = simpleAction<{ group: Table.RowGroup; ids: number[] }>(
+  ActionType.SubAccounts.Groups.AddToTable
 );
-export const removeGroupFromTableRowsAction = simpleAction<number>(ActionType.SubAccounts.RemoveGroupFromRows);
+export const removeGroupFromTableAction = simpleAction<number>(ActionType.SubAccounts.Groups.RemoveFromTable);
+
 export const deletingGroupAction = simpleAction<boolean>(ActionType.SubAccounts.Groups.Deleting);
 export const deleteGroupAction = simpleAction<number>(ActionType.SubAccounts.Groups.Delete);
 

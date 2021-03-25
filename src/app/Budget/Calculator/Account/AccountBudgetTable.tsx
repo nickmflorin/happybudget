@@ -22,7 +22,7 @@ import {
   updateSubAccountAction,
   selectAllSubAccountsAction,
   deleteGroupAction,
-  addGroupToTableRowsAction
+  addGroupToTableAction
 } from "./actions";
 
 const selectTableData = simpleDeepEqualSelector(
@@ -186,7 +186,7 @@ const AccountBudgetTable = (): JSX.Element => {
           onSuccess={(group: ISubAccountGroup) => {
             setGroupSubAccounts(undefined);
             dispatch(
-              addGroupToTableRowsAction({
+              addGroupToTableAction({
                 group: { id: group.id, color: group.color, name: group.name },
                 ids: map(group.subaccounts, (subaccount: ISimpleSubAccount) => subaccount.id)
               })

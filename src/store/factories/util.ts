@@ -2,7 +2,7 @@ import { Reducer } from "redux";
 import { forEach, isNil } from "lodash";
 
 const findTransformerForAction = <
-  P extends ReducerFactory.IActionMap,
+  P extends ReducerFactory.ActionMap,
   S,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
@@ -10,7 +10,7 @@ const findTransformerForAction = <
   action: A,
   mappings: Partial<P>,
   transformers: ReducerFactory.Transformers<P, S, A>
-): ReducerFactory.Transformer<S, A> | undefined => {
+): ReducerFactory.Transformer<S, any, A> | undefined => {
   // Find the standardized action type that the associated action maps to based
   // on the provided mappings.
   let standardizedActionType: string | undefined = undefined;
@@ -21,14 +21,14 @@ const findTransformerForAction = <
     }
   });
   if (!isNil(standardizedActionType)) {
-    const transformer: ReducerFactory.Transformer<S, A> | undefined = transformers[standardizedActionType];
+    const transformer: ReducerFactory.Transformer<S, any, A> | undefined = transformers[standardizedActionType];
     return transformer;
   }
   return undefined;
 };
 
 export const createObjectReducerFromTransformers = <
-  P extends ReducerFactory.IActionMap,
+  P extends ReducerFactory.ActionMap,
   S,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
@@ -83,7 +83,7 @@ export const createObjectReducerFromTransformers = <
 };
 
 export const createListReducerFromTransformers = <
-  P extends ReducerFactory.IActionMap,
+  P extends ReducerFactory.ActionMap,
   M extends Model,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(

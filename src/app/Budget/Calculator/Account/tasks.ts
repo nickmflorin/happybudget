@@ -46,7 +46,7 @@ import {
   loadingSubAccountsHistoryAction,
   responseSubAccountsHistoryAction,
   deletingGroupAction,
-  removeGroupFromTableRowsAction
+  removeGroupFromTableAction
 } from "./actions";
 
 export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaIterator {
@@ -54,7 +54,7 @@ export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaI
     yield put(deletingGroupAction(true));
     try {
       yield call(deleteSubAccountGroup, action.payload);
-      yield put(removeGroupFromTableRowsAction(action.payload));
+      yield put(removeGroupFromTableAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the sub account group.");
     } finally {

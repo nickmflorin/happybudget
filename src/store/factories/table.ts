@@ -174,7 +174,7 @@ export const createTableDataReducer = <
       }
       return state;
     },
-    AddGroupToRows: (payload: { group: G; ids: number[] }, st: Redux.ListStore<R>) => {
+    AddGroup: (payload: { group: G; ids: number[] }, st: Redux.ListStore<R>) => {
       for (let i = 0; i < payload.ids.length; i++) {
         const row = find(st, { id: payload.ids[i] } as any);
         if (isNil(row)) {
@@ -193,7 +193,7 @@ export const createTableDataReducer = <
       }
       return st;
     },
-    RemoveGroupFromRows: (payload: number, st: Redux.ListStore<R>) => {
+    RemoveGroup: (payload: number, st: Redux.ListStore<R>) => {
       const rows = filter(st, (row: R) => !isNil(row.group) && row.group.id === payload);
       if (rows.length === 0) {
         /* eslint-disable no-console */
@@ -240,7 +240,7 @@ export const createTableReducer = <
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   /* eslint-disable indent */
-  mappings: ReducerFactory.ITableActionMap,
+  mappings: Partial<ReducerFactory.ITableActionMap>,
   mapping: Mapping<R, M, P, C, G>,
   options: Partial<ReducerFactory.ITableReducerOptions<R, M, G, C>> = {
     initialState: initialTableState,
@@ -262,8 +262,8 @@ export const createTableReducer = <
       DeselectRow: mappings.DeselectRow,
       SelectAllRows: mappings.SelectAllRows,
       AddErrors: mappings.AddErrors,
-      AddGroupToRows: mappings.AddGroupToRows,
-      RemoveGroupFromRows: mappings.RemoveGroupFromRows
+      AddGroup: mappings.AddGroup,
+      RemoveGroup: mappings.RemoveGroup
     },
     mapping,
     { referenceEntity: Options.referenceEntity as string, initialState: Options.initialState.data }
@@ -303,10 +303,15 @@ export const createTableReducer = <
         return false;
       }
     });
-
     if (!isNil(standardizedActionType)) {
-      const transformer: ReducerFactory.Transformer<Redux.ITableStore<R, M, G, C>, A> | undefined =
-        transformers[standardizedActionType];
+      const transformer: ReducerFactory.Transformer<Redux.ITableStore<R, M, G, C>, any, A> | undefined =
+        transformers[
+          standardizedActionType as keyof ReducerFactory.Transformers<
+            ReducerFactory.ITableActionMap,
+            Redux.ITableStore<R, M, G, C>,
+            A
+          >
+        ];
       if (!isNil(transformer)) {
         const updateToState = transformer(action.payload, newState, action);
         newState = { ...newState, ...updateToState };

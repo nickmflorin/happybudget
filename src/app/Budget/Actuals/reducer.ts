@@ -42,10 +42,7 @@ const rootReducer = combineReducers({
       Response: ActionType.ActualsTable.Response,
       Loading: ActionType.ActualsTable.Loading,
       SetSearch: ActionType.ActualsTable.SetSearch,
-      AddErrors: ActionType.ActualsTable.AddErrors,
-      // TODO: This should be allowed to not be defined.
-      AddGroupToRows: "",
-      RemoveGroupFromRows: ""
+      AddErrors: ActionType.ActualsTable.AddErrors
     },
     ActualMapping,
     { referenceEntity: "actual" }

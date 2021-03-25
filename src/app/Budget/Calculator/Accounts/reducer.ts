@@ -47,10 +47,7 @@ const rootReducer = combineReducers({
       Response: ActionType.Accounts.Response,
       Loading: ActionType.Accounts.Loading,
       SetSearch: ActionType.Accounts.SetSearch,
-      AddErrors: ActionType.Accounts.AddErrors,
-      // TODO: This should be allowed to not be defined.
-      AddGroupToRows: "",
-      RemoveGroupFromRows: ""
+      AddErrors: ActionType.Accounts.AddErrors
     },
     AccountMapping,
     { referenceEntity: "account" }
