@@ -417,7 +417,7 @@
     color: $white;
     border: 1px solid transparent;
     font-family: $noto-sans-jp;
-    font-weight: 400;
+    font-weight: 500;
 
     .anticon-loading {
       color: $white !important;
@@ -442,7 +442,7 @@
     border-radius: 4px !important;
     width: 230px !important;
     text-transform: unset !important;
-    font-weight: 600 !important;
+    font-weight: 500 !important;
     padding-top: 2px !important;
     padding-bottom: 2px !important;
     height: 48px;
@@ -471,7 +471,7 @@
       }
 
       .text-wrapper {
-        line-height: 46px;
+        line-height: 45px;
       }
     }
   }
