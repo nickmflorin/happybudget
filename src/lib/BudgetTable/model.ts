@@ -30,7 +30,8 @@ export interface BudgetTableProps<
   identifierField: string;
   identifierFieldHeader: string;
   identifierFieldParams?: Partial<ColDef>;
-  footerRow: Partial<R>;
+  footerIdentifierValue?: string;
+  totals?: { [key: string]: any };
   search: string;
   saving: boolean;
   frameworkComponents?: { [key: string]: any };

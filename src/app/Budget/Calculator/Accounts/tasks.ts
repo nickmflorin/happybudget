@@ -2,6 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import { isNil, find } from "lodash";
 import { handleRequestError } from "api";
+import { AccountMapping } from "model/tableMappings";
 import {
   getAccounts,
   deleteAccount,
@@ -18,13 +19,6 @@ import { handleTableErrors } from "store/tasks";
 import { userToSimpleUser } from "model/mappings";
 import { nowAsString } from "util/dates";
 import { generateRandomNumericId } from "util/math";
-import {
-  payloadFromResponse,
-  postPayload,
-  patchPayload,
-  rowHasRequiredFields,
-  payloadBeforeResponse
-} from "../../util";
 import {
   loadingAccountsAction,
   responseAccountsAction,
@@ -230,7 +224,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
       // so we need to udpate the row in the data used to populate the table.  We could
       // do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
-      const preResponsePayload = payloadBeforeResponse(action.payload, "account");
+      const preResponsePayload = AccountMapping.preRequestPayload(action.payload);
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
           updateAccountsTableRowAction({
@@ -242,17 +236,17 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
       if (existing.meta.isPlaceholder === true) {
         // TODO: Should we be using the payload data here?  Instead of the existing row?
         // Or we should probably merge them, right?
-        const requestPayload = postPayload<Table.AccountRow>(existing, "account");
+        const requestPayload = AccountMapping.postPayload(existing);
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (rowHasRequiredFields<Table.AccountRow>(existing, "account")) {
+        if (AccountMapping.rowHasRequiredFields(existing)) {
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, budgetId, requestPayload as Http.IAccountPayload);
             yield put(activateAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
-            const responsePayload = payloadFromResponse<IAccount>(response, "account");
+            const responsePayload = AccountMapping.modelToRow(response);
             yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
 
             // Add an element to the history indicating that the account was created.
@@ -274,10 +268,10 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
         }
       } else {
         yield put(updatingAccountAction({ id: existing.id as number, value: true }));
-        const requestPayload = patchPayload(action.payload, "account") as Partial<Http.IAccountPayload>;
+        const requestPayload = AccountMapping.patchPayload(action.payload);
         try {
           const response: IAccount = yield call(updateAccount, existing.id as number, requestPayload);
-          const responsePayload = payloadFromResponse<IAccount>(response, "account");
+          const responsePayload = AccountMapping.modelToRow(response);
           yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
 
           // Add elements to the history indicating that the account was updated.

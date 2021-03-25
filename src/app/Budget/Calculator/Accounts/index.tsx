@@ -77,8 +77,7 @@ const Accounts = (): JSX.Element => {
           onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountAction(payload))}
           onRowExpand={(id: number) => history.push(`/budgets/${budget.id}/accounts/${id}`)}
           onSelectAll={() => dispatch(selectAllAccountsTableRowsAction())}
-          footerRow={{
-            identifier: "Grand Total",
+          totals={{
             estimated:
               !isNil(budget.detail.data) && !isNil(budget.detail.data.estimated) ? budget.detail.data.estimated : 0.0,
             variance:

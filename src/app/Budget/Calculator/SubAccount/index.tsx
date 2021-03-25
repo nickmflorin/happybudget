@@ -79,8 +79,7 @@ const SubAccount = (): JSX.Element => {
           onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountSubAccountAction(payload))}
           onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           onSelectAll={() => dispatch(selectAllSubAccountSubAccountsTableRowsAction())}
-          footerRow={{
-            identifier: "Grand Total",
+          totals={{
             estimated:
               !isNil(subAccountStore.detail.data) && !isNil(subAccountStore.detail.data.estimated)
                 ? subAccountStore.detail.data.estimated

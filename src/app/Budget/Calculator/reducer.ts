@@ -8,12 +8,7 @@ import {
   createCommentsListResponseReducer,
   createListResponseReducer
 } from "store/factories";
-import {
-  createSubAccountRowPlaceholder,
-  createAccountRowPlaceholder,
-  initializeRowFromAccount,
-  initializeRowFromSubAccount
-} from "model/mappings";
+import { SubAccountMapping, AccountMapping } from "model/tableMappings";
 import { ActionType } from "./actions";
 
 const rootReducer = combineReducers({
@@ -42,7 +37,7 @@ const rootReducer = combineReducers({
       Editing: ActionType.Comments.Editing,
       Replying: ActionType.Comments.Replying
     }),
-    table: createTableReducer<Table.AccountRow, IAccount>(
+    table: createTableReducer<Table.AccountRow, IAccount, Http.IAccountPayload>(
       {
         AddPlaceholders: ActionType.AccountsTable.AddPlaceholders,
         RemoveRow: ActionType.AccountsTable.RemoveRow,
@@ -60,8 +55,7 @@ const rootReducer = combineReducers({
         AddGroupToRows: "",
         RemoveGroupFromRows: ""
       },
-      createAccountRowPlaceholder,
-      initializeRowFromAccount,
+      AccountMapping,
       { referenceEntity: "account" }
     )
   }),
@@ -105,7 +99,7 @@ const rootReducer = combineReducers({
         { referenceEntity: "event" }
       ),
       creating: createSimpleBooleanReducer(ActionType.Account.SubAccounts.Creating),
-      table: createTableReducer<Table.SubAccountRow, ISubAccount>(
+      table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload>(
         {
           AddPlaceholders: ActionType.Account.SubAccountsTable.AddPlaceholders,
           RemoveRow: ActionType.Account.SubAccountsTable.RemoveRow,
@@ -122,8 +116,7 @@ const rootReducer = combineReducers({
           AddGroupToRows: ActionType.Account.SubAccountsTable.AddGroupToRows,
           RemoveGroupFromRows: ActionType.Account.SubAccountsTable.RemoveGroupFromRows
         },
-        createSubAccountRowPlaceholder,
-        initializeRowFromSubAccount,
+        SubAccountMapping,
         { referenceEntity: "subaccount" }
       )
     })
@@ -163,7 +156,7 @@ const rootReducer = combineReducers({
         },
         { referenceEntity: "event" }
       ),
-      table: createTableReducer<Table.SubAccountRow, ISubAccount>(
+      table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload>(
         {
           AddPlaceholders: ActionType.SubAccount.SubAccountsTable.AddPlaceholders,
           RemoveRow: ActionType.SubAccount.SubAccountsTable.RemoveRow,
@@ -181,8 +174,7 @@ const rootReducer = combineReducers({
           AddGroupToRows: "",
           RemoveGroupFromRows: ""
         },
-        createSubAccountRowPlaceholder,
-        initializeRowFromSubAccount,
+        SubAccountMapping,
         { referenceEntity: "subaccount" }
       )
     })

@@ -5,7 +5,7 @@ import {
   createTableReducer,
   createListResponseReducer
 } from "store/factories";
-import { createActualRowPlaceholder, initializeRowFromActual } from "model/mappings";
+import { ActualMapping } from "model/tableMappings";
 
 import { ActionType } from "./actions";
 
@@ -29,7 +29,7 @@ const rootReducer = combineReducers({
     },
     { referenceEntity: "budget item tree node" }
   ),
-  table: createTableReducer<Table.ActualRow, IActual>(
+  table: createTableReducer<Table.ActualRow, IActual, Http.IActualPayload>(
     {
       AddPlaceholders: ActionType.ActualsTable.AddPlaceholders,
       RemoveRow: ActionType.ActualsTable.RemoveRow,
@@ -47,8 +47,7 @@ const rootReducer = combineReducers({
       AddGroupToRows: "",
       RemoveGroupFromRows: ""
     },
-    createActualRowPlaceholder,
-    initializeRowFromActual,
+    ActualMapping,
     { referenceEntity: "actual" }
   )
 });

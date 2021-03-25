@@ -16,6 +16,7 @@ namespace Table {
     readonly errors: CellError[];
     readonly isPlaceholder?: boolean;
     readonly isGroupFooter?: boolean;
+    readonly isTableFooter?: boolean;
     readonly children: C[];
   }
 

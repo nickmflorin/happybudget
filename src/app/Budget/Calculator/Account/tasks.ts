@@ -2,6 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
 import { isNil, find, concat } from "lodash";
 import { handleRequestError } from "api";
+import { SubAccountMapping } from "model/tableMappings";
 import {
   getAccountSubAccounts,
   createAccountSubAccount,
@@ -18,14 +19,6 @@ import {
 } from "services";
 import { handleTableErrors } from "store/tasks";
 import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
-import {
-  payloadFromResponse,
-  postPayload,
-  patchPayload,
-  rowHasRequiredFields,
-  requestWarrantsParentRefresh,
-  payloadBeforeResponse
-} from "../../util";
 import {
   loadingAccountAction,
   responseAccountAction,
@@ -223,7 +216,7 @@ export function* handleAccountSubAccountUpdateTask(action: Redux.IAction<Table.R
       // so we need to udpate the row in the data used to populate the table.  We could
       // do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
-      const preResponsePayload = payloadBeforeResponse(action.payload, "subaccount");
+      const preResponsePayload = SubAccountMapping.preRequestPayload(action.payload);
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
           updateAccountSubAccountsTableRowAction({
@@ -235,12 +228,12 @@ export function* handleAccountSubAccountUpdateTask(action: Redux.IAction<Table.R
       if (existing.meta.isPlaceholder === true) {
         // TODO: Should we be using the payload data here?  Instead of the existing row?
         // Or we should probably merge them, right?
-        const requestPayload = postPayload<Table.SubAccountRow>(existing, "subaccount");
+        const requestPayload = SubAccountMapping.postPayload(existing);
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (rowHasRequiredFields<Table.SubAccountRow>(existing, "subaccount")) {
+        if (SubAccountMapping.rowHasRequiredFields(existing)) {
           yield put(creatingAccountSubAccountAction(true));
           try {
             const response: ISubAccount = yield call(
@@ -250,7 +243,7 @@ export function* handleAccountSubAccountUpdateTask(action: Redux.IAction<Table.R
               requestPayload as Http.ISubAccountPayload
             );
             yield put(activateAccountSubAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
-            const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
+            const responsePayload = SubAccountMapping.modelToRow(response);
             yield put(updateAccountSubAccountsTableRowAction({ id: response.id, data: responsePayload }));
           } catch (e) {
             yield call(
@@ -266,15 +259,17 @@ export function* handleAccountSubAccountUpdateTask(action: Redux.IAction<Table.R
         }
       } else {
         yield put(updatingAccountSubAccountAction({ id: existing.id as number, value: true }));
-        const requestPayload = patchPayload(action.payload, "subaccount") as Partial<Http.ISubAccountPayload>;
+        const requestPayload = SubAccountMapping.patchPayload(action.payload);
         try {
           const response: ISubAccount = yield call(updateSubAccount, existing.id as number, requestPayload);
-          const responsePayload = payloadFromResponse<ISubAccount>(response, "subaccount");
+          // Since we are using a deep check lodash.isEqual in the selectors, this will only trigger
+          // a rerender if the responsePayload has data that differs from that of the current data.
+          const responsePayload = SubAccountMapping.modelToRow(response);
           yield put(updateAccountSubAccountsTableRowAction({ id: existing.id, data: responsePayload }));
 
           // Determine if the parent account needs to be refreshed due to updates to the underlying
           // account fields that calculate the values of the parent account.
-          if (requestWarrantsParentRefresh(requestPayload, "subaccount")) {
+          if (SubAccountMapping.patchRequestRequiresRecalculation(requestPayload)) {
             yield put(requestAccountAction());
           }
         } catch (e) {

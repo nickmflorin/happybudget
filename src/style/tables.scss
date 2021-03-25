@@ -111,13 +111,13 @@ $table-border: 1px solid $table-border-color;
 
         &:first-child {
           border: 1px solid $transparent;
-          border-top-left-radius: 6px;
-          border-bottom-left-radius: 6px;
+          border-top-left-radius: 8px;
+          border-bottom-left-radius: 8px;
         }
         &:last-child {
           border: 1px solid $transparent;
-          border-top-right-radius: 6px;
-          border-bottom-right-radius: 6px;
+          border-top-right-radius: 8px;
+          border-bottom-right-radius: 8px;
         }
       }
       &:hover {
@@ -167,17 +167,13 @@ $table-border: 1px solid $table-border-color;
 
   .ag-header {
     border: none;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
-    color: #4e4d4d !important;
+    border-radius: 8px;
 
     .ag-header-cell {
       .ag-cell-label-container {
         letter-spacing: 0.045em;
-        font-family: $roboto;
         font-size: 12px;
         font-weight: 400;
-        color: $text-secondary;
       }
     }
   }
@@ -306,8 +302,9 @@ $table-border: 1px solid $table-border-color;
     }
     &.row {
       &--group-footer {
-        div[role='gridcell'] {
+        > div[role='gridcell'], > .ag-cell {
           border: none !important;
+          font-weight: 400 !important;
 
           &:first-child {
             border-top-left-radius: 8px;

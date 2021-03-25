@@ -4,7 +4,7 @@ import { replaceInArray } from "util/arrays";
 import { mergeWithDefaults } from "util/objects";
 import { initialTableState } from "store/initialState";
 import { createListReducerFromTransformers } from "./util";
-
+import Mapping from "model/tableMappings";
 /**
  * A reducer factory that creates a generic reducer to handle the state of the
  * data in a table that is generated from a list response of an API request, where a list
@@ -22,12 +22,14 @@ import { createListReducerFromTransformers } from "./util";
 export const createTableDataReducer = <
   /* eslint-disable indent */
   R extends Table.Row<G, C>,
-  G extends Table.RowGroup = Table.RowGroup,
+  M extends Model,
+  P extends Http.IPayload,
   C extends Table.RowChild = Table.RowChild,
+  G extends Table.RowGroup = Table.RowGroup,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   mappings: Partial<ReducerFactory.ITableDataActionMap>,
-  placeholderCreator: () => R,
+  mapping: Mapping<R, M, P, C, G>,
   options: ReducerFactory.IOptions<Redux.ListStore<R>> = { initialState: [], referenceEntity: "entity" }
 ) => {
   const Options = mergeWithDefaults<ReducerFactory.IOptions<Redux.ListStore<R>>>(options, {
@@ -41,7 +43,7 @@ export const createTableDataReducer = <
       const placeholders: R[] = [];
       const numPlaceholders = numRows || 1;
       for (let i = 0; i < numPlaceholders; i++) {
-        placeholders.push(placeholderCreator());
+        placeholders.push(mapping.createPlaceholder());
       }
       return [...st, ...placeholders];
     },
@@ -228,14 +230,14 @@ export const createTableReducer = <
   /* eslint-disable indent */
   R extends Table.Row<G, C>,
   M extends Model,
-  G extends Table.RowGroup = Table.RowGroup,
+  P extends Http.IPayload,
   C extends Table.RowChild = Table.RowChild,
+  G extends Table.RowGroup = Table.RowGroup,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   /* eslint-disable indent */
   mappings: ReducerFactory.ITableActionMap,
-  placeholderCreator: () => R,
-  modelToRow: (model: M) => R,
+  mapping: Mapping<R, M, P, C, G>,
   options: Partial<ReducerFactory.ITableReducerOptions<R, M, G, C>> = {
     initialState: initialTableState,
     referenceEntity: "entity"
@@ -246,7 +248,7 @@ export const createTableReducer = <
     initialState: initialTableState
   });
 
-  const dataReducer = createTableDataReducer<R, G, C, A>(
+  const dataReducer = createTableDataReducer<R, M, P, C, G, A>(
     {
       AddPlaceholders: mappings.AddPlaceholders,
       RemoveRow: mappings.RemoveRow,
@@ -259,7 +261,7 @@ export const createTableReducer = <
       AddGroupToRows: mappings.AddGroupToRows,
       RemoveGroupFromRows: mappings.RemoveGroupFromRows
     },
-    placeholderCreator,
+    mapping,
     { referenceEntity: Options.referenceEntity as string, initialState: Options.initialState.data }
   );
 
@@ -282,7 +284,7 @@ export const createTableReducer = <
       Request: () => ({ rawData: [], data: [], responseWasReceived: false }),
       Response: (response: Http.IListResponse<M>) => {
         return {
-          data: map(response.data, (model: M) => modelToRow(model)),
+          data: map(response.data, (model: M) => mapping.modelToRow(model)),
           rawData: response.data,
           responseWasReceived: true
         };

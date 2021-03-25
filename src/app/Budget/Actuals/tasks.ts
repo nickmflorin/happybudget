@@ -2,6 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import { isNil, find } from "lodash";
 import { handleRequestError } from "api";
+import { ActualMapping } from "model/tableMappings";
 import {
   getBudgetActuals,
   deleteActual,
@@ -12,14 +13,6 @@ import {
   createSubAccountActual
 } from "services";
 import { handleTableErrors } from "store/tasks";
-import {
-  payloadFromResponse,
-  postPayload,
-  patchPayload,
-  rowHasRequiredFields,
-  payloadBeforeResponse,
-  requestWarrantsParentRefresh
-} from "../util";
 import {
   activateActualsPlaceholderAction,
   loadingActualsAction,
@@ -76,7 +69,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
       // so we need to udpate the row in the data used to populate the table.  We could
       // do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
-      const preResponsePayload = payloadBeforeResponse(action.payload, "actual");
+      const preResponsePayload = ActualMapping.preRequestPayload(action.payload);
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
           updateActualsTableRowAction({
@@ -86,14 +79,14 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
         );
       }
       if (existing.meta.isPlaceholder === true) {
-        const updatedRow = { ...existing, ...patchPayload(action.payload, "actual") };
+        const updatedRow = { ...existing, ...ActualMapping.patchPayload(action.payload) } as Table.ActualRow;
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (rowHasRequiredFields<Table.ActualRow>(updatedRow, "actual")) {
+        if (ActualMapping.rowHasRequiredFields(updatedRow)) {
           yield put(creatingActualAction(true));
-          const payload = postPayload<Table.ActualRow>(updatedRow, "actual");
+          const payload = ActualMapping.postPayload(updatedRow);
           if (!isNil(updatedRow.object_id)) {
             let service = createAccountActual;
             if (updatedRow.parent_type === "subaccount") {
@@ -102,7 +95,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
             try {
               const response: IActual = yield call(service, updatedRow.object_id, payload);
               yield put(activateActualsPlaceholderAction({ oldId: existing.id, id: response.id }));
-              const responsePayload = payloadFromResponse<IActual>(response, "actual");
+              const responsePayload = ActualMapping.modelToRow(response);
               if (Object.keys(responsePayload).length !== 0) {
                 yield put(updateActualsTableRowAction({ id: response.id, data: responsePayload }));
               }
@@ -121,15 +114,15 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
         }
       } else {
         yield put(updatingActualAction({ id: existing.id as number, value: true }));
-        const requestPayload = patchPayload(action.payload, "actual") as Partial<Http.IActualPayload>;
+        const requestPayload = ActualMapping.patchPayload(action.payload);
         try {
           const response: IActual = yield call(updateActual, existing.id as number, requestPayload);
-          const responsePayload = payloadFromResponse<IActual>(response, "actual");
+          const responsePayload = ActualMapping.modelToRow(response);
           yield put(updateActualsTableRowAction({ id: existing.id, data: responsePayload }));
 
           // Determine if the parent budget needs to be refreshed due to updates to the underlying
           // actual fields that calculate the values of the parent budget.
-          if (requestWarrantsParentRefresh(requestPayload, "actual")) {
+          if (ActualMapping.patchRequestRequiresRecalculation(requestPayload)) {
             yield put(requestBudgetAction());
           }
         } catch (e) {

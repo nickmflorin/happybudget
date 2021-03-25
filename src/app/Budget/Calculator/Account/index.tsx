@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, useHistory } from "react-router-dom";
 import { isNil, includes, map } from "lodash";
 import classNames from "classnames";
+import { createSelector } from "reselect";
 
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
@@ -10,6 +11,7 @@ import BudgetTable from "lib/BudgetTable";
 
 import { RenderIfValidId, RenderWithSpinner } from "components/display";
 import { CreateSubAccountGroupModal } from "components/modals";
+import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/util";
 import { formatCurrencyWithoutDollarSign } from "util/string";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
@@ -33,17 +35,63 @@ import {
   deleteAccountSubAccountsGroupAction
 } from "../actions";
 
+const selectBudgetId = (state: Redux.IApplicationStore) => state.budget.budget.id;
+
+const selectAccountsTableData = simpleDeepEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.data
+);
+const selectAccountsTableSearch = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.search
+);
+const selectSaving = createSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.deleting,
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.updating,
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.creating,
+  (deleting: number[], updating: number[], creating: boolean) =>
+    deleting.length !== 0 || updating.length !== 0 || creating === true
+);
+const selectAccountDetail = simpleDeepEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.detail
+);
+const selectDetailData = createSelector(
+  selectAccountDetail,
+  (detail: Redux.IDetailResponseStore<IAccount>) => detail.data
+);
+const selectAccountsTableLoading = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.loading
+);
+const selectDetailLoading = createSelector(
+  selectAccountDetail,
+  (detail: Redux.IDetailResponseStore<IAccount>) => detail.loading
+);
+const selectDeletingGroups = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.groups.deleting.length !== 0
+);
+const selectLoading = createSelector(
+  selectDetailLoading,
+  selectAccountsTableLoading,
+  selectDeletingGroups,
+  (detailLoading: boolean, tableLoading: boolean, deletingGroups: boolean) =>
+    detailLoading || tableLoading || deletingGroups
+);
+
 const Account = (): JSX.Element => {
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
 
   const { accountId } = useParams<{ budgetId: string; accountId: string }>();
   const dispatch = useDispatch();
   const history = useHistory();
-  const accountStore = useSelector((state: Redux.IApplicationStore) => state.calculator.account);
-  const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
+
+  const budgetId = useSelector(selectBudgetId);
+  const subaccountsTableData = useSelector(selectAccountsTableData);
+  const subaccountsTableSearch = useSelector(selectAccountsTableSearch);
+  const saving = useSelector(selectSaving);
+  const detailData = useSelector(selectDetailData);
+  const loading = useSelector(selectLoading);
+
+  // TODO: Move selector functions outside of the component for these two selectors.
   const comments = useSelector((state: Redux.IApplicationStore) => state.calculator.account.comments);
   const events = useSelector((state: Redux.IApplicationStore) => state.calculator.account.subaccounts.history);
-  const groups = useSelector((state: Redux.IApplicationStore) => state.calculator.account.subaccounts.groups);
 
   useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
@@ -53,10 +101,9 @@ const Account = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={[accountId]}>
-      <RenderWithSpinner loading={accountStore.subaccounts.table.loading || accountStore.detail.loading}>
+      <RenderWithSpinner loading={loading}>
         <BudgetTable<Table.SubAccountRow, ISubAccountNestedGroup, ISimpleSubAccount>
-          table={accountStore.subaccounts.table.data}
-          loading={groups.deleting.length !== 0}
+          table={subaccountsTableData}
           identifierField={"identifier"}
           identifierFieldHeader={"Line"}
           isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
@@ -71,40 +118,26 @@ const Account = (): JSX.Element => {
           highlightNonEditableCell={(row: Table.SubAccountRow, colDef: ColDef) => {
             return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
           }}
-          search={accountStore.subaccounts.table.search}
+          search={subaccountsTableSearch}
           onSearch={(value: string) => dispatch(setAccountSubAccountsSearchAction(value))}
-          saving={
-            accountStore.subaccounts.deleting.length !== 0 ||
-            accountStore.subaccounts.updating.length !== 0 ||
-            accountStore.subaccounts.creating
-          }
+          saving={saving}
           rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
           onRowAdd={() => dispatch(addAccountSubAccountsTablePlaceholdersAction(1))}
           onRowSelect={(id: number) => dispatch(selectAccountSubAccountsTableRowAction(id))}
           onRowDeselect={(id: number) => dispatch(deselectAccountSubAccountsTableRowAction(id))}
           onRowDelete={(row: Table.SubAccountRow) => dispatch(removeAccountSubAccountAction(row.id))}
           onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountSubAccountAction(payload))}
-          onRowExpand={(id: number) => history.push(`/budgets/${budget.id}/subaccounts/${id}`)}
+          onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
           groupParams={{
             onDeleteGroup: (group: ISubAccountNestedGroup) => dispatch(deleteAccountSubAccountsGroupAction(group.id)),
             onGroupRows: (rows: Table.SubAccountRow[]) =>
               setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
           }}
           onSelectAll={() => dispatch(selectAllAccountSubAccountsTableRowsAction())}
-          footerRow={{
-            identifier: "Grand Total",
-            estimated:
-              !isNil(accountStore.detail.data) && !isNil(accountStore.detail.data.estimated)
-                ? accountStore.detail.data.estimated
-                : 0.0,
-            variance:
-              !isNil(accountStore.detail.data) && !isNil(accountStore.detail.data.variance)
-                ? accountStore.detail.data.variance
-                : 0.0,
-            actual:
-              !isNil(accountStore.detail.data) && !isNil(accountStore.detail.data.actual)
-                ? accountStore.detail.data.actual
-                : 0.0
+          totals={{
+            estimated: !isNil(detailData) && !isNil(detailData.estimated) ? detailData.estimated : 0.0,
+            variance: !isNil(detailData) && !isNil(detailData.variance) ? detailData.variance : 0.0,
+            actual: !isNil(detailData) && !isNil(detailData.actual) ? detailData.actual : 0.0
           }}
           bodyColumns={[
             {

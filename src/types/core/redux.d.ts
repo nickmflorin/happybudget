@@ -12,6 +12,8 @@ namespace Redux {
 
   type ModuleLabel = "dashboard" | "budget" | "actuals" | "calculator";
 
+  type SelectorFunc<T = any> = (state: Redux.IApplicationStore) => T;
+
   interface IActionConfig {
     readonly error?: Error | string | undefined;
     readonly meta?: any;

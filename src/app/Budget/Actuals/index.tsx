@@ -93,8 +93,7 @@ const Actuals = (): JSX.Element => {
             }
           }
         }}
-        footerRow={{
-          description: "Grand Total",
+        totals={{
           value:
             !isNil(budget.detail.data) && !isNil(budget.detail.data.actual) ? String(budget.detail.data.actual) : "0.00"
         }}
@@ -110,26 +109,6 @@ const Actuals = (): JSX.Element => {
           }
         }}
         bodyColumns={[
-          {
-            field: "object_id",
-            headerName: "Account",
-            width: 200,
-            cellClass: "borderless",
-            cellRenderer: "BudgetItemCell",
-            cellRendererParams: {
-              onChange: (object_id: number, parent_type: BudgetItemType, row: Table.ActualRow) => {
-                dispatch(
-                  updateActualAction({
-                    id: row.id,
-                    data: {
-                      object_id: { newValue: object_id, oldValue: row.object_id },
-                      parent_type: { oldValue: row.parent_type, newValue: parent_type }
-                    }
-                  })
-                );
-              }
-            }
-          },
           {
             field: "description",
             headerName: "Description"

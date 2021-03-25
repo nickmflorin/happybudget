@@ -1,4 +1,7 @@
 import { AnyAction, Reducer } from "redux";
+import { shallowEqual } from "react-redux";
+import { createSelectorCreator, defaultMemoize } from "reselect";
+import { isEqual } from "lodash";
 
 /**
  * Function to sequentially apply a series of simple reducers of form
@@ -15,4 +18,15 @@ export const composeReducers = <A extends AnyAction = AnyAction>(initialState: a
       {}
     );
   return composed;
+};
+
+export const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual);
+export const createShallowEqualSelector = createSelectorCreator(defaultMemoize, shallowEqual);
+
+export const simpleDeepEqualSelector = <T = any>(func: Redux.SelectorFunc<T>) => {
+  return createDeepEqualSelector(func, (data: T) => data);
+};
+
+export const simpleShallowEqualSelector = <T = any>(func: Redux.SelectorFunc<T>) => {
+  return createShallowEqualSelector(func, (data: T) => data);
 };
