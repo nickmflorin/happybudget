@@ -9,16 +9,16 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { formatCurrencyWithoutDollarSign } from "util/string";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
-import {
-  setSubAccountSubAccountsSearchAction,
-  selectSubAccountSubAccountsTableRowAction,
-  addSubAccountSubAccountsTablePlaceholdersAction,
-  deselectSubAccountSubAccountsTableRowAction,
-  removeSubAccountSubAccountAction,
-  updateSubAccountSubAccountAction,
-  selectAllSubAccountSubAccountsTableRowsAction
-} from "../actions";
 import { selectBudgetId } from "../selectors";
+import {
+  setSubAccountsSearchAction,
+  selectSubAccountAction,
+  addSubAccountsPlaceholdersAction,
+  deselectSubAccountAction,
+  removeSubAccountAction,
+  updateSubAccountAction,
+  selectAllSubAccountsAction
+} from "./actions";
 
 const selectTableData = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table.data
@@ -64,16 +64,16 @@ const SubAccountBudgetTable = (): JSX.Element => {
         return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
       }}
       search={search}
-      onSearch={(value: string) => dispatch(setSubAccountSubAccountsSearchAction(value))}
+      onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
       saving={saving}
       rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
-      onRowAdd={() => dispatch(addSubAccountSubAccountsTablePlaceholdersAction(1))}
-      onRowSelect={(id: number) => dispatch(selectSubAccountSubAccountsTableRowAction(id))}
-      onRowDeselect={(id: number) => dispatch(deselectSubAccountSubAccountsTableRowAction(id))}
-      onRowDelete={(row: Table.SubAccountRow) => dispatch(removeSubAccountSubAccountAction(row.id))}
-      onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountSubAccountAction(payload))}
+      onRowAdd={() => dispatch(addSubAccountsPlaceholdersAction(1))}
+      onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
+      onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
+      onRowDelete={(row: Table.SubAccountRow) => dispatch(removeSubAccountAction(row.id))}
+      onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountAction(payload))}
       onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
-      onSelectAll={() => dispatch(selectAllSubAccountSubAccountsTableRowsAction())}
+      onSelectAll={() => dispatch(selectAllSubAccountsAction())}
       totals={{
         estimated: !isNil(subaccountDetail) && !isNil(subaccountDetail.estimated) ? subaccountDetail.estimated : 0.0,
         variance: !isNil(subaccountDetail) && !isNil(subaccountDetail.variance) ? subaccountDetail.variance : 0.0,
@@ -120,7 +120,7 @@ const SubAccountBudgetTable = (): JSX.Element => {
           cellRendererParams: {
             onChange: (unit: Unit, row: Table.SubAccountRow) =>
               dispatch(
-                updateSubAccountSubAccountAction({
+                updateSubAccountAction({
                   id: row.id,
                   data: {
                     unit: {

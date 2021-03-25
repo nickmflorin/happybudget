@@ -14,18 +14,18 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { formatCurrencyWithoutDollarSign } from "util/string";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
-import {
-  addAccountSubAccountsTablePlaceholdersAction,
-  deselectAccountSubAccountsTableRowAction,
-  removeAccountSubAccountAction,
-  selectAccountSubAccountsTableRowAction,
-  setAccountSubAccountsSearchAction,
-  updateAccountSubAccountAction,
-  selectAllAccountSubAccountsTableRowsAction,
-  deleteAccountSubAccountsGroupAction,
-  addGroupToAccountSubAccountsTableRowsAction
-} from "../actions";
 import { selectBudgetId } from "../selectors";
+import {
+  addSubAccountsPlaceholdersAction,
+  deselectSubAccountAction,
+  removeSubAccountAction,
+  selectSubAccountAction,
+  setSubAccountsSearchAction,
+  updateSubAccountAction,
+  selectAllSubAccountsAction,
+  deleteSubAccountsGroupAction,
+  addGroupToSubAccountsTableRowsAction
+} from "./actions";
 
 const selectTableData = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.data
@@ -76,21 +76,21 @@ const AccountBudgetTable = (): JSX.Element => {
           return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
         }}
         search={search}
-        onSearch={(value: string) => dispatch(setAccountSubAccountsSearchAction(value))}
+        onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
         rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
-        onRowAdd={() => dispatch(addAccountSubAccountsTablePlaceholdersAction(1))}
-        onRowSelect={(id: number) => dispatch(selectAccountSubAccountsTableRowAction(id))}
-        onRowDeselect={(id: number) => dispatch(deselectAccountSubAccountsTableRowAction(id))}
-        onRowDelete={(row: Table.SubAccountRow) => dispatch(removeAccountSubAccountAction(row.id))}
-        onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountSubAccountAction(payload))}
+        onRowAdd={() => dispatch(addSubAccountsPlaceholdersAction(1))}
+        onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
+        onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
+        onRowDelete={(row: Table.SubAccountRow) => dispatch(removeSubAccountAction(row.id))}
+        onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountAction(payload))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         groupParams={{
-          onDeleteGroup: (group: ISubAccountNestedGroup) => dispatch(deleteAccountSubAccountsGroupAction(group.id)),
+          onDeleteGroup: (group: ISubAccountNestedGroup) => dispatch(deleteSubAccountsGroupAction(group.id)),
           onGroupRows: (rows: Table.SubAccountRow[]) =>
             setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
         }}
-        onSelectAll={() => dispatch(selectAllAccountSubAccountsTableRowsAction())}
+        onSelectAll={() => dispatch(selectAllSubAccountsAction())}
         totals={{
           estimated: !isNil(accountDetail) && !isNil(accountDetail.estimated) ? accountDetail.estimated : 0.0,
           variance: !isNil(accountDetail) && !isNil(accountDetail.variance) ? accountDetail.variance : 0.0,
@@ -138,7 +138,7 @@ const AccountBudgetTable = (): JSX.Element => {
             cellRendererParams: {
               onChange: (unit: Unit, row: Table.SubAccountRow) =>
                 dispatch(
-                  updateAccountSubAccountAction({
+                  updateSubAccountAction({
                     id: row.id,
                     data: {
                       unit: {
@@ -194,7 +194,7 @@ const AccountBudgetTable = (): JSX.Element => {
           onSuccess={(group: ISubAccountGroup) => {
             setGroupSubAccounts(undefined);
             dispatch(
-              addGroupToAccountSubAccountsTableRowsAction({
+              addGroupToSubAccountsTableRowsAction({
                 group: { id: group.id, color: group.color, name: group.name },
                 ids: map(group.subaccounts, (subaccount: ISimpleSubAccount) => subaccount.id)
               })

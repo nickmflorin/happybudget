@@ -21,56 +21,56 @@ import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
 import {
   loadingSubAccountAction,
   responseSubAccountAction,
-  loadingSubAccountSubAccountsAction,
-  responseSubAccountSubAccountsAction,
-  deletingSubAccountSubAccountAction,
-  creatingSubAccountSubAccountAction,
-  updatingSubAccountSubAccountAction,
-  updateSubAccountSubAccountsTableRowAction,
-  activateSubAccountSubAccountsTablePlaceholderAction,
-  removeSubAccountSubAccountsTableRowAction,
-  addErrorsToSubAccountSubAccountsTableAction,
-  addSubAccountSubAccountsTablePlaceholdersAction,
-  requestSubAccountSubAccountsAction,
   requestSubAccountAction,
-  loadingSubAccountCommentsAction,
-  responseSubAccountCommentsAction,
-  submittingSubAccountCommentAction,
-  addSubAccountCommentToStateAction,
-  deletingSubAccountCommentAction,
-  removeSubAccountCommentFromStateAction,
-  updateSubAccountCommentInStateAction,
-  editingSubAccountCommentAction,
-  replyingToSubAccountCommentAction,
-  loadingSubAccountSubAccountsHistoryAction,
-  responseSubAccountSubAccountsHistoryAction
-} from "../actions";
+  loadingSubAccountsAction,
+  responseSubAccountsAction,
+  deletingSubAccountAction,
+  creatingSubAccountAction,
+  updatingSubAccountAction,
+  updateSubAccountsTableRowAction,
+  activateSubAccountsPlaceholderAction,
+  removeSubAccountsTableRowAction,
+  addErrorsToSubAccountsTableAction,
+  addSubAccountsPlaceholdersAction,
+  requestSubAccountsAction,
+  loadingCommentsAction,
+  responseCommentsAction,
+  submittingCommentAction,
+  addCommentToStateAction,
+  deletingCommentAction,
+  removeCommentFromStateAction,
+  updateCommentInStateAction,
+  editingCommentAction,
+  replyingToCommentAction,
+  loadingSubAccountsHistoryAction,
+  responseSubAccountsHistoryAction
+} from "./actions";
 
-export function* getSubAccountSubAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
+export function* getSubAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId)) {
-    yield put(loadingSubAccountSubAccountsHistoryAction(true));
+    yield put(loadingSubAccountsHistoryAction(true));
     try {
       const response: Http.IListResponse<HistoryEvent> = yield call(getSubAccountSubAccountsHistory, subaccountId);
-      yield put(responseSubAccountSubAccountsHistoryAction(response));
+      yield put(responseSubAccountsHistoryAction(response));
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the sub account's sub accounts history.");
     } finally {
-      yield put(loadingSubAccountSubAccountsHistoryAction(false));
+      yield put(loadingSubAccountsHistoryAction(false));
     }
   }
 }
 
-export function* submitSubAccountCommentTask(
+export function* submitCommentTask(
   action: Redux.IAction<{ parent?: number; data: Http.ICommentPayload }>
 ): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId) && !isNil(action.payload)) {
     const { parent, data } = action.payload;
     if (!isNil(parent)) {
-      yield put(replyingToSubAccountCommentAction({ id: parent, value: true }));
+      yield put(replyingToCommentAction({ id: parent, value: true }));
     } else {
-      yield put(submittingSubAccountCommentAction(true));
+      yield put(submittingCommentAction(true));
     }
     try {
       let response: IComment;
@@ -79,74 +79,72 @@ export function* submitSubAccountCommentTask(
       } else {
         response = yield call(createSubAccountComment, subaccountId, data);
       }
-      yield put(addSubAccountCommentToStateAction({ data: response, parent }));
+      yield put(addCommentToStateAction({ data: response, parent }));
     } catch (e) {
       handleRequestError(e, "There was an error submitting the comment.");
     } finally {
       if (!isNil(parent)) {
-        yield put(replyingToSubAccountCommentAction({ id: parent, value: false }));
+        yield put(replyingToCommentAction({ id: parent, value: false }));
       } else {
-        yield put(submittingSubAccountCommentAction(false));
+        yield put(submittingCommentAction(false));
       }
     }
   }
 }
 
-export function* deleteSubAccountCommentTask(action: Redux.IAction<number>): SagaIterator {
+export function* deleteCommentTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(deletingSubAccountCommentAction({ id: action.payload, value: true }));
+    yield put(deletingCommentAction({ id: action.payload, value: true }));
     try {
       yield call(deleteComment, action.payload);
-      yield put(removeSubAccountCommentFromStateAction(action.payload));
+      yield put(removeCommentFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the comment.");
     } finally {
-      yield put(deletingSubAccountCommentAction({ id: action.payload, value: false }));
+      yield put(deletingCommentAction({ id: action.payload, value: false }));
     }
   }
 }
 
-export function* editSubAccountCommentTask(
-  action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>
-): SagaIterator {
+export function* editCommentTask(action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>): SagaIterator {
   if (!isNil(action.payload)) {
     const { id, data } = action.payload;
-    yield put(editingSubAccountCommentAction({ id, value: true }));
+    yield put(editingCommentAction({ id, value: true }));
     try {
       // Here we are assuming that Partial<IComment> can be mapped to Partial<Http.ICommentPayload>,
       // which is the case right now but may not be in the future.
       const response: IComment = yield call(updateComment, id, data as Partial<Http.ICommentPayload>);
-      yield put(updateSubAccountCommentInStateAction({ id, data: response }));
+      yield put(updateCommentInStateAction({ id, data: response }));
     } catch (e) {
       handleRequestError(e, "There was an error updating the comment.");
     } finally {
-      yield put(editingSubAccountCommentAction({ id, value: false }));
+      yield put(editingCommentAction({ id, value: false }));
     }
   }
 }
 
-export function* getSubAccountCommentsTask(action: Redux.IAction<any>): SagaIterator {
+export function* getCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId)) {
-    yield put(loadingSubAccountCommentsAction(true));
+    yield put(loadingCommentsAction(true));
     try {
       // TODO: We will have to build in pagination.
       const response = yield call(getSubAccountComments, subaccountId);
-      yield put(responseSubAccountCommentsAction(response));
+      yield put(responseCommentsAction(response));
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the subaccount's comments.");
-      yield put(responseSubAccountCommentsAction({ count: 0, data: [] }, { error: e }));
+      yield put(responseCommentsAction({ count: 0, data: [] }, { error: e }));
     } finally {
-      yield put(loadingSubAccountCommentsAction(false));
+      yield put(loadingCommentsAction(false));
     }
   }
 }
 
 export function* handleSubAccountChangedTask(action: Redux.IAction<number>): SagaIterator {
-  yield all([put(requestSubAccountAction()), put(requestSubAccountSubAccountsAction())]);
+  yield all([put(requestSubAccountAction()), put(requestSubAccountsAction())]);
 }
 
-export function* handleSubAccountSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
+export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(action.payload) && !isNil(subaccountId)) {
     const tableData: Table.SubAccountRow[] = yield select(
@@ -161,24 +159,24 @@ export function* handleSubAccountSubAccountRemovalTask(action: Redux.IAction<num
       );
     } else {
       // Dispatch the action to remove the row from the table in the UI.
-      yield put(removeSubAccountSubAccountsTableRowAction(action.payload));
+      yield put(removeSubAccountsTableRowAction(action.payload));
       // Only make an API request to the server to delete the sub account if the
       // row was not a placeholder (i.e. the sub account exists in the backend).
       if (existing.meta.isPlaceholder === false) {
-        yield put(deletingSubAccountSubAccountAction({ id: action.payload, value: true }));
+        yield put(deletingSubAccountAction({ id: action.payload, value: true }));
         try {
           yield call(deleteSubAccount, action.payload);
         } catch (e) {
           handleRequestError(e, "There was an error deleting the sub account.");
         } finally {
-          yield put(deletingSubAccountSubAccountAction({ id: action.payload, value: false }));
+          yield put(deletingSubAccountAction({ id: action.payload, value: false }));
         }
       }
     }
   }
 }
 
-export function* handleSubAccountSubAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
+export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId) && !isNil(action.payload)) {
     const table = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table.data);
@@ -201,7 +199,7 @@ export function* handleSubAccountSubAccountUpdateTask(action: Redux.IAction<Tabl
       const preResponsePayload = SubAccountMapping.preRequestPayload(action.payload);
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
-          updateSubAccountSubAccountsTableRowAction({
+          updateSubAccountsTableRowAction({
             id: existing.id,
             data: preResponsePayload
           })
@@ -216,36 +214,36 @@ export function* handleSubAccountSubAccountUpdateTask(action: Redux.IAction<Tabl
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
         if (SubAccountMapping.rowHasRequiredFields(existing)) {
-          yield put(creatingSubAccountSubAccountAction(true));
+          yield put(creatingSubAccountAction(true));
           try {
             const response = yield call(
               createSubAccountSubAccount,
               subaccountId,
               requestPayload as Http.ISubAccountPayload
             );
-            yield put(activateSubAccountSubAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
+            yield put(activateSubAccountsPlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = SubAccountMapping.modelToRow(response);
-            yield put(updateSubAccountSubAccountsTableRowAction({ id: response.id, data: responsePayload }));
+            yield put(updateSubAccountsTableRowAction({ id: response.id, data: responsePayload }));
           } catch (e) {
             yield call(
               handleTableErrors,
               e,
               "There was an error updating the sub account.",
               existing.id,
-              (errors: Table.CellError[]) => addErrorsToSubAccountSubAccountsTableAction(errors)
+              (errors: Table.CellError[]) => addErrorsToSubAccountsTableAction(errors)
             );
           } finally {
-            yield put(creatingSubAccountSubAccountAction(false));
+            yield put(creatingSubAccountAction(false));
           }
         }
       } else {
-        yield put(updatingSubAccountSubAccountAction({ id: existing.id as number, value: true }));
+        yield put(updatingSubAccountAction({ id: existing.id as number, value: true }));
         const requestPayload = SubAccountMapping.patchPayload(action.payload);
         try {
           const response: ISubAccount = yield call(updateSubAccount, existing.id, requestPayload);
           const responsePayload = SubAccountMapping.modelToRow(response);
           yield put(
-            updateSubAccountSubAccountsTableRowAction({
+            updateSubAccountsTableRowAction({
               id: response.id,
               data: responsePayload
             })
@@ -261,31 +259,31 @@ export function* handleSubAccountSubAccountUpdateTask(action: Redux.IAction<Tabl
             e,
             "There was an error updating the sub account.",
             existing.id,
-            (errors: Table.CellError[]) => addErrorsToSubAccountSubAccountsTableAction(errors)
+            (errors: Table.CellError[]) => addErrorsToSubAccountsTableAction(errors)
           );
         } finally {
-          yield put(updatingSubAccountSubAccountAction({ id: existing.id as number, value: false }));
+          yield put(updatingSubAccountAction({ id: existing.id as number, value: false }));
         }
       }
     }
   }
 }
 
-export function* getSubAccountSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
+export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId)) {
-    yield put(loadingSubAccountSubAccountsAction(true));
+    yield put(loadingSubAccountsAction(true));
     try {
       const response = yield call(getSubAccountSubAccounts, subaccountId, { no_pagination: true });
-      yield put(responseSubAccountSubAccountsAction(response));
+      yield put(responseSubAccountsAction(response));
       if (response.data.length === 0) {
-        yield put(addSubAccountSubAccountsTablePlaceholdersAction(2));
+        yield put(addSubAccountsPlaceholdersAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the subaccount's sub accounts.");
-      yield put(responseSubAccountSubAccountsAction({ count: 0, data: [] }, { error: e }));
+      yield put(responseSubAccountsAction({ count: 0, data: [] }, { error: e }));
     } finally {
-      yield put(loadingSubAccountSubAccountsAction(false));
+      yield put(loadingSubAccountsAction(false));
     }
   }
 }

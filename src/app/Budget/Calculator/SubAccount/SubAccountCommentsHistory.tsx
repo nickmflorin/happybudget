@@ -3,12 +3,12 @@ import { includes } from "lodash";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
 import {
-  requestSubAccountCommentsAction,
-  submitSubAccountCommentAction,
-  deleteSubAccountCommentAction,
-  editSubAccountCommentAction,
-  requestSubAccountSubAccountsHistoryAction
-} from "../actions";
+  requestCommentsAction,
+  submitCommentAction,
+  deleteCommentAction,
+  editCommentAction,
+  requestSubAccountsHistoryAction
+} from "./actions";
 
 const selectDeletingComments = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.subaccount.comments.deleting
@@ -56,19 +56,19 @@ const SubAccountCommentsHistory = (): JSX.Element => {
           includes(deletingComments, comment.id) ||
           includes(editingComments, comment.id) ||
           includes(replyingComments, comment.id),
-        onRequest: () => dispatch(requestSubAccountCommentsAction()),
-        onSubmit: (payload: Http.ICommentPayload) => dispatch(submitSubAccountCommentAction({ data: payload })),
+        onRequest: () => dispatch(requestCommentsAction()),
+        onSubmit: (payload: Http.ICommentPayload) => dispatch(submitCommentAction({ data: payload })),
         onDoneEditing: (comment: IComment, value: string) =>
-          dispatch(editSubAccountCommentAction({ id: comment.id, data: { text: value } })),
+          dispatch(editCommentAction({ id: comment.id, data: { text: value } })),
         onDoneReplying: (comment: IComment, value: string) =>
-          dispatch(submitSubAccountCommentAction({ parent: comment.id, data: { text: value } })),
+          dispatch(submitCommentAction({ parent: comment.id, data: { text: value } })),
         onLike: (comment: IComment) => console.log(comment),
-        onDelete: (comment: IComment) => dispatch(deleteSubAccountCommentAction(comment.id))
+        onDelete: (comment: IComment) => dispatch(deleteCommentAction(comment.id))
       }}
       historyProps={{
         history: history,
         loading: loadingHistory,
-        onRequest: () => dispatch(requestSubAccountSubAccountsHistoryAction())
+        onRequest: () => dispatch(requestSubAccountsHistoryAction())
       }}
     />
   );

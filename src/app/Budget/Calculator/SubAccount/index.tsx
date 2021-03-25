@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
 
-import { setSubAccountIdAction } from "../actions";
+import { setSubAccountIdAction } from "./actions";
 import SubAccountBudgetTable from "./SubAccountBudgetTable";
 import SubAccountCommentsHistory from "./SubAccountCommentsHistory";
 

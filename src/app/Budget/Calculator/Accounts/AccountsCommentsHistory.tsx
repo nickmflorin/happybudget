@@ -4,12 +4,12 @@ import { includes } from "lodash";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
 import {
-  submitBudgetCommentAction,
-  requestBudgetCommentsAction,
-  deleteBudgetCommentAction,
-  editBudgetCommentAction,
+  submitCommentAction,
+  requestCommentsAction,
+  deleteCommentAction,
+  editCommentAction,
   requestAccountsHistoryAction
-} from "../actions";
+} from "./actions";
 
 const selectDeletingComments = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.accounts.comments.deleting
@@ -57,14 +57,14 @@ const AccountCommentsHistory = (): JSX.Element => {
           includes(editingComments, comment.id) ||
           includes(deletingComments, comment.id) ||
           includes(replyingComments, comment.id),
-        onRequest: () => dispatch(requestBudgetCommentsAction()),
-        onSubmit: (payload: Http.ICommentPayload) => dispatch(submitBudgetCommentAction({ data: payload })),
+        onRequest: () => dispatch(requestCommentsAction()),
+        onSubmit: (payload: Http.ICommentPayload) => dispatch(submitCommentAction({ data: payload })),
         onDoneEditing: (comment: IComment, value: string) =>
-          dispatch(editBudgetCommentAction({ id: comment.id, data: { text: value } })),
+          dispatch(editCommentAction({ id: comment.id, data: { text: value } })),
         onDoneReplying: (comment: IComment, value: string) =>
-          dispatch(submitBudgetCommentAction({ parent: comment.id, data: { text: value } })),
+          dispatch(submitCommentAction({ parent: comment.id, data: { text: value } })),
         onLike: (comment: IComment) => console.log(comment),
-        onDelete: (comment: IComment) => dispatch(deleteBudgetCommentAction(comment.id))
+        onDelete: (comment: IComment) => dispatch(deleteCommentAction(comment.id))
       }}
       historyProps={{
         history,

@@ -6,7 +6,7 @@ import { createSelector } from "reselect";
 import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setAccountIdAction } from "../actions";
+import { setAccountIdAction } from "./actions";
 import AccountBudgetTable from "./AccountBudgetTable";
 import AccountCommentsHistory from "./AccountCommentsHistory";
 

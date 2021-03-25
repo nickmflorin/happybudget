@@ -4,12 +4,12 @@ import { includes } from "lodash";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
 import {
-  requestAccountCommentsAction,
-  submitAccountCommentAction,
-  deleteAccountCommentAction,
-  editAccountCommentAction,
-  requestAccountSubAccountsHistoryAction
-} from "../actions";
+  requestCommentsAction,
+  submitCommentAction,
+  deleteCommentAction,
+  editCommentAction,
+  requestSubAccountsHistoryAction
+} from "./actions";
 
 const selectDeletingComments = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.account.comments.deleting
@@ -57,19 +57,19 @@ const AccountCommentsHistory = (): JSX.Element => {
           includes(editingComments, comment.id) ||
           includes(deletingComments, comment.id) ||
           includes(replyingComments, comment.id),
-        onRequest: () => dispatch(requestAccountCommentsAction()),
-        onSubmit: (payload: Http.ICommentPayload) => dispatch(submitAccountCommentAction({ data: payload })),
+        onRequest: () => dispatch(requestCommentsAction()),
+        onSubmit: (payload: Http.ICommentPayload) => dispatch(submitCommentAction({ data: payload })),
         onDoneEditing: (comment: IComment, value: string) =>
-          dispatch(editAccountCommentAction({ id: comment.id, data: { text: value } })),
+          dispatch(editCommentAction({ id: comment.id, data: { text: value } })),
         onDoneReplying: (comment: IComment, value: string) =>
-          dispatch(submitAccountCommentAction({ parent: comment.id, data: { text: value } })),
+          dispatch(submitCommentAction({ parent: comment.id, data: { text: value } })),
         onLike: (comment: IComment) => console.log(comment),
-        onDelete: (comment: IComment) => dispatch(deleteAccountCommentAction(comment.id))
+        onDelete: (comment: IComment) => dispatch(deleteCommentAction(comment.id))
       }}
       historyProps={{
         history,
         loading: loadingHistory,
-        onRequest: () => dispatch(requestAccountSubAccountsHistoryAction())
+        onRequest: () => dispatch(requestSubAccountsHistoryAction())
       }}
     />
   );

@@ -1,21 +1,21 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
-import { ActionType } from "../actions";
+import { ActionType } from "./actions";
 import {
   getAccountsTask,
   handleAccountUpdateTask,
   handleAccountRemovalTask,
-  getBudgetCommentsTask,
-  submitBudgetCommentTask,
-  deleteBudgetCommentTask,
-  editBudgetCommentTask,
-  getAccountsHistoryTask
+  getCommentsTask,
+  submitCommentTask,
+  deleteCommentTask,
+  editCommentTask,
+  getHistoryTask
 } from "./tasks";
 
 function* watchForRequestAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.AccountsTable.Request);
+    const action = yield take(ActionType.Accounts.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -31,44 +31,44 @@ function* watchForAccountUpdateSaga(): SagaIterator {
   yield takeEvery(ActionType.Accounts.Update, handleAccountUpdateTask);
 }
 
-function* watchForTriggerBudgetCommentsSaga(): SagaIterator {
+function* watchForTriggerCommentsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.Comments.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(getBudgetCommentsTask, action);
+    lastTasks = yield call(getCommentsTask, action);
   }
 }
 
-function* watchForSubmitBudgetCommentSaga(): SagaIterator {
+function* watchForSubmitCommentSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.Comments.Submit);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(submitBudgetCommentTask, action);
+    lastTasks = yield call(submitCommentTask, action);
   }
 }
 
-function* watchForRemoveBudgetCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Comments.Delete, deleteBudgetCommentTask);
+function* watchForRemoveCommentSaga(): SagaIterator {
+  yield takeEvery(ActionType.Comments.Delete, deleteCommentTask);
 }
 
-function* watchForEditBudgetCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Comments.Edit, editBudgetCommentTask);
+function* watchForEditCommentSaga(): SagaIterator {
+  yield takeEvery(ActionType.Comments.Edit, editCommentTask);
 }
 
 function* watchForTriggerAccountsHistorySaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.History.Request);
+    const action = yield take(ActionType.Accounts.History.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(getAccountsHistoryTask, action);
+    lastTasks = yield call(getHistoryTask, action);
   }
 }
 
@@ -76,9 +76,9 @@ export default function* accountsSaga(): SagaIterator {
   yield spawn(watchForRequestAccountsSaga);
   yield spawn(watchForRemoveAccountSaga);
   yield spawn(watchForAccountUpdateSaga);
-  yield spawn(watchForTriggerBudgetCommentsSaga);
-  yield spawn(watchForSubmitBudgetCommentSaga);
-  yield spawn(watchForRemoveBudgetCommentSaga);
-  yield spawn(watchForEditBudgetCommentSaga);
+  yield spawn(watchForTriggerCommentsSaga);
+  yield spawn(watchForSubmitCommentSaga);
+  yield spawn(watchForRemoveCommentSaga);
+  yield spawn(watchForEditCommentSaga);
   yield spawn(watchForTriggerAccountsHistorySaga);
 }

@@ -1,38 +1,38 @@
 import { isNil } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
-import { ActionType } from "../actions";
+import { ActionType } from "./actions";
 import {
   getAccountTask,
-  getAccountSubAccountsTask,
-  handleAccountSubAccountUpdateTask,
-  handleAccountSubAccountRemovalTask,
+  getSubAccountsTask,
+  handleSubAccountUpdateTask,
+  handleSubAccountRemovalTask,
   handleAccountChangedTask,
   getAccountCommentsTask,
-  submitAccountCommentTask,
-  deleteAccountCommentTask,
+  submitCommentTask,
+  deleteCommentTask,
   editAccountCommentTask,
-  getAccountSubAccountsHistoryTask,
-  deleteAccountSubAccountGroupTask
+  getSubAccountsHistoryTask,
+  deleteSubAccountGroupTask
 } from "./tasks";
 
 function* watchForRequestSubAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Account.SubAccountsTable.Request);
+    const action = yield take(ActionType.SubAccounts.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(getAccountSubAccountsTask, action);
+    lastTasks = yield call(getSubAccountsTask, action);
   }
 }
 
 function* watchForRemoveSubAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.Account.SubAccounts.Remove, handleAccountSubAccountRemovalTask);
+  yield takeEvery(ActionType.SubAccounts.Remove, handleSubAccountRemovalTask);
 }
 
 function* watchForUpdateSubAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.Account.SubAccounts.Update, handleAccountSubAccountUpdateTask);
+  yield takeEvery(ActionType.SubAccounts.Update, handleSubAccountUpdateTask);
 }
 
 function* watchForRequestAccountSaga(): SagaIterator {
@@ -60,7 +60,7 @@ function* watchForAccountIdChangedSaga(): SagaIterator {
 function* watchForRequestCommentsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Account.Comments.Request);
+    const action = yield take(ActionType.Comments.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -71,37 +71,37 @@ function* watchForRequestCommentsSaga(): SagaIterator {
 function* watchForSubmitCommentSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Account.Comments.Submit);
+    const action = yield take(ActionType.Comments.Submit);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(submitAccountCommentTask, action);
+    lastTasks = yield call(submitCommentTask, action);
   }
 }
 
 function* watchForRemoveCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Account.Comments.Delete, deleteAccountCommentTask);
+  yield takeEvery(ActionType.Comments.Delete, deleteCommentTask);
 }
 
 function* watchForEditCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Account.Comments.Edit, editAccountCommentTask);
+  yield takeEvery(ActionType.Comments.Edit, editAccountCommentTask);
 }
 
 function* watchForRequestSubAccountsHistorySaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Account.SubAccounts.History.Request);
+    const action = yield take(ActionType.SubAccounts.History.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(getAccountSubAccountsHistoryTask, action);
+    lastTasks = yield call(getSubAccountsHistoryTask, action);
   }
 }
 
 function* watchForDeleteSubAccountGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action = yield take(ActionType.Account.SubAccounts.Groups.Delete);
+    const action = yield take(ActionType.SubAccounts.Groups.Delete);
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload])) {
         lastTasks[action.payload] = [];
@@ -114,7 +114,7 @@ function* watchForDeleteSubAccountGroupSaga(): SagaIterator {
         yield cancel(cancellable);
       }
     }
-    lastTasks[action.payload].push(yield call(deleteAccountSubAccountGroupTask, action));
+    lastTasks[action.payload].push(yield call(deleteSubAccountGroupTask, action));
   }
 }
 

@@ -26,25 +26,25 @@ import {
   creatingAccountAction,
   updatingAccountAction,
   updateAccountsTableRowAction,
-  activateAccountsTablePlaceholderAction,
+  activateAccountsPlaceholderAction,
   removeAccountsTableRowAction,
   addErrorsToAccountsTableAction,
-  addAccountsTablePlaceholdersAction,
-  loadingBudgetCommentsAction,
-  responseBudgetCommentsAction,
-  submittingBudgetCommentAction,
-  addBudgetCommentToStateAction,
-  deletingBudgetCommentAction,
-  removeBudgetCommentFromStateAction,
-  updateBudgetCommentInStateAction,
-  editingBudgetCommentAction,
-  replyingToBudgetCommentAction,
+  addAccountsPlaceholdersAction,
+  loadingCommentsAction,
+  responseCommentsAction,
+  submittingCommentAction,
+  addCommentToStateAction,
+  deletingCommentAction,
+  removeCommentFromStateAction,
+  updateCommentInStateAction,
+  editingCommentAction,
+  replyingToCommentAction,
   loadingAccountsHistoryAction,
   responseAccountsHistoryAction,
   addAccountsHistoryToStateAction
-} from "../actions";
+} from "./actions";
 
-export function* getAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
+export function* getHistoryTask(action: Redux.IAction<null>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     yield put(loadingAccountsHistoryAction(true));
@@ -59,16 +59,16 @@ export function* getAccountsHistoryTask(action: Redux.IAction<null>): SagaIterat
   }
 }
 
-export function* submitBudgetCommentTask(
+export function* submitCommentTask(
   action: Redux.IAction<{ parent?: number; data: Http.ICommentPayload }>
 ): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const { parent, data } = action.payload;
     if (!isNil(parent)) {
-      yield put(replyingToBudgetCommentAction({ id: parent, value: true }));
+      yield put(replyingToCommentAction({ id: parent, value: true }));
     } else {
-      yield put(submittingBudgetCommentAction(true));
+      yield put(submittingCommentAction(true));
     }
     try {
       let response: IComment;
@@ -77,63 +77,63 @@ export function* submitBudgetCommentTask(
       } else {
         response = yield call(createBudgetComment, budgetId, data);
       }
-      yield put(addBudgetCommentToStateAction({ data: response, parent }));
+      yield put(addCommentToStateAction({ data: response, parent }));
     } catch (e) {
       handleRequestError(e, "There was an error submitting the comment.");
     } finally {
       if (!isNil(parent)) {
-        yield put(replyingToBudgetCommentAction({ id: parent, value: false }));
+        yield put(replyingToCommentAction({ id: parent, value: false }));
       } else {
-        yield put(submittingBudgetCommentAction(false));
+        yield put(submittingCommentAction(false));
       }
     }
   }
 }
 
-export function* deleteBudgetCommentTask(action: Redux.IAction<number>): SagaIterator {
+export function* deleteCommentTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(deletingBudgetCommentAction({ id: action.payload, value: true }));
+    yield put(deletingCommentAction({ id: action.payload, value: true }));
     try {
       yield call(deleteComment, action.payload);
-      yield put(removeBudgetCommentFromStateAction(action.payload));
+      yield put(removeCommentFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the comment.");
     } finally {
-      yield put(deletingBudgetCommentAction({ id: action.payload, value: false }));
+      yield put(deletingCommentAction({ id: action.payload, value: false }));
     }
   }
 }
 
-export function* editBudgetCommentTask(action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>): SagaIterator {
+export function* editCommentTask(action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>): SagaIterator {
   if (!isNil(action.payload)) {
     const { id, data } = action.payload;
-    yield put(editingBudgetCommentAction({ id, value: true }));
+    yield put(editingCommentAction({ id, value: true }));
     try {
       // Here we are assuming that Partial<IComment> can be mapped to Partial<Http.ICommentPayload>,
       // which is the case right now but may not be in the future.
       const response: IComment = yield call(updateComment, id, data as Partial<Http.ICommentPayload>);
-      yield put(updateBudgetCommentInStateAction({ id, data: response }));
+      yield put(updateCommentInStateAction({ id, data: response }));
     } catch (e) {
       handleRequestError(e, "There was an error updating the comment.");
     } finally {
-      yield put(editingBudgetCommentAction({ id, value: false }));
+      yield put(editingCommentAction({ id, value: false }));
     }
   }
 }
 
-export function* getBudgetCommentsTask(action: Redux.IAction<any>): SagaIterator {
+export function* getCommentsTask(action: Redux.IAction<any>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
-    yield put(loadingBudgetCommentsAction(true));
+    yield put(loadingCommentsAction(true));
     try {
       // TODO: We will have to build in pagination.
       const response = yield call(getBudgetComments, budgetId);
-      yield put(responseBudgetCommentsAction(response));
+      yield put(responseCommentsAction(response));
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's comments.");
-      yield put(responseBudgetCommentsAction({ count: 0, data: [] }, { error: e }));
+      yield put(responseCommentsAction({ count: 0, data: [] }, { error: e }));
     } finally {
-      yield put(loadingBudgetCommentsAction(false));
+      yield put(loadingCommentsAction(false));
     }
   }
 }
@@ -245,7 +245,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, budgetId, requestPayload as Http.IAccountPayload);
-            yield put(activateAccountsTablePlaceholderAction({ oldId: existing.id, id: response.id }));
+            yield put(activateAccountsPlaceholderAction({ oldId: existing.id, id: response.id }));
             const responsePayload = AccountMapping.modelToRow(response);
             yield put(updateAccountsTableRowAction({ id: response.id, data: responsePayload }));
 
@@ -310,7 +310,7 @@ export function* getAccountsTask(action: Redux.IAction<null>): SagaIterator {
       const response = yield call(getAccounts, budgetId, { no_pagination: true });
       yield put(responseAccountsAction(response));
       if (response.data.length === 0) {
-        yield put(addAccountsTablePlaceholdersAction(2));
+        yield put(addAccountsPlaceholdersAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's accounts.");

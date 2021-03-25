@@ -9,16 +9,16 @@ import BudgetTable from "lib/BudgetTable";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { formatCurrencyWithoutDollarSign } from "util/string";
 
+import { selectBudgetId, selectBudgetDetail } from "../selectors";
 import {
   setAccountsSearchAction,
-  addAccountsTablePlaceholdersAction,
-  deselectAccountsTableRowAction,
-  selectAccountsTableRowAction,
+  addAccountsPlaceholdersAction,
+  deselectAccountAction,
+  selectAccountAction,
   removeAccountAction,
   updateAccountAction,
-  selectAllAccountsTableRowsAction
-} from "../actions";
-import { selectBudgetId, selectBudgetDetail } from "../selectors";
+  selectAllAccountsAction
+} from "./actions";
 
 const selectTableData = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.accounts.table.data
@@ -59,13 +59,13 @@ const AccountsBudgetTable = (): JSX.Element => {
       search={search}
       onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
       saving={saving}
-      onRowAdd={() => dispatch(addAccountsTablePlaceholdersAction(1))}
-      onRowSelect={(id: number) => dispatch(selectAccountsTableRowAction(id))}
-      onRowDeselect={(id: number) => dispatch(deselectAccountsTableRowAction(id))}
+      onRowAdd={() => dispatch(addAccountsPlaceholdersAction(1))}
+      onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
+      onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
       onRowDelete={(row: Table.AccountRow) => dispatch(removeAccountAction(row.id))}
       onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountAction(payload))}
       onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
-      onSelectAll={() => dispatch(selectAllAccountsTableRowsAction())}
+      onSelectAll={() => dispatch(selectAllAccountsAction())}
       totals={{
         estimated: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
         variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
