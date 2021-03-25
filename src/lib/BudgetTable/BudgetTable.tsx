@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import classNames from "classnames";
 import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
-import useDeepCompareEffect from "use-deep-compare-effect";
 
 import { AgGridReact } from "ag-grid-react";
 import {
