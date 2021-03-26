@@ -1,12 +1,17 @@
-import { initialListResponseState, initialTableState } from "store/initialState";
+import { initialListResponseState } from "store/initialState";
 
-const initialState: Redux.Actuals.IStore = {
-  budgetItems: initialListResponseState,
-  budgetItemsTree: initialListResponseState,
-  table: initialTableState,
+export const initialActualsState: Redux.Actuals.IActualsStore = {
+  table: [],
   deleting: [],
   updating: [],
-  creating: false
+  creating: false,
+  ...initialListResponseState
+};
+
+const initialState: Redux.Actuals.IStore = {
+  actuals: initialActualsState,
+  budgetItems: initialListResponseState,
+  budgetItemsTree: initialListResponseState
 };
 
 export default initialState;

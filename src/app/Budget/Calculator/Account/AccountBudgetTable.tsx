@@ -12,7 +12,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { floatValueSetter, integerValueSetter } from "util/table";
 
 import BudgetTable from "../../BudgetTable";
-import { selectBudgetId } from "../selectors";
+import { selectBudgetId } from "../../selectors";
 import {
   addPlaceholdersAction,
   deselectSubAccountAction,

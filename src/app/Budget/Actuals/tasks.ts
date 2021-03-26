@@ -13,14 +13,15 @@ import {
   createSubAccountActual
 } from "services";
 import { handleTableErrors } from "store/tasks";
+import { requestBudgetAction } from "../actions";
 import {
-  activateActualsPlaceholderAction,
+  activatePlaceholderAction,
   loadingActualsAction,
   responseActualsAction,
-  updateActualsTableRowAction,
-  addErrorsToActualsTableAction,
-  addActualsTablePlaceholdersAction,
-  removeActualsTableRowAction,
+  updateTableRowAction,
+  addErrorsToTableAction,
+  addPlaceholdersAction,
+  removeTableRowAction,
   deletingActualAction,
   creatingActualAction,
   updatingActualAction,
@@ -29,11 +30,10 @@ import {
   loadingBudgetItemsTreeAction,
   responseBudgetItemsTreeAction
 } from "./actions";
-import { requestBudgetAction } from "../actions";
 
 export function* handleActualRemovalTask(action: Redux.IAction<Table.ActualRow>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(removeActualsTableRowAction(action.payload));
+    yield put(removeTableRowAction(action.payload));
     // NOTE: We cannot find the existing row from the table in state because the
     // dispatched action above will remove the row from the table.
     if (action.payload.meta.isPlaceholder === false) {
@@ -52,7 +52,7 @@ export function* handleActualRemovalTask(action: Redux.IAction<Table.ActualRow>)
 export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(action.payload) && !isNil(budgetId)) {
-    const table: Table.ActualRow[] = yield select((state: Redux.IApplicationStore) => state.actuals.table.data);
+    const table: Table.ActualRow[] = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.table);
 
     const existing: Table.ActualRow | undefined = find(table, { id: action.payload.id });
     if (isNil(existing)) {
@@ -72,7 +72,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
       const preResponsePayload = ActualMapping.preRequestPayload(action.payload);
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
-          updateActualsTableRowAction({
+          updateTableRowAction({
             id: existing.id,
             data: preResponsePayload
           })
@@ -94,10 +94,10 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
             }
             try {
               const response: IActual = yield call(service, updatedRow.object_id, payload);
-              yield put(activateActualsPlaceholderAction({ oldId: existing.id, id: response.id }));
+              yield put(activatePlaceholderAction({ oldId: existing.id, id: response.id }));
               const responsePayload = ActualMapping.modelToRow(response);
               if (Object.keys(responsePayload).length !== 0) {
-                yield put(updateActualsTableRowAction({ id: response.id, data: responsePayload }));
+                yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
               }
             } catch (e) {
               yield call(
@@ -105,7 +105,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
                 e,
                 "There was an error updating the actual.",
                 existing.id,
-                (errors: Table.CellError[]) => addErrorsToActualsTableAction(errors)
+                (errors: Table.CellError[]) => addErrorsToTableAction(errors)
               );
             } finally {
               yield put(creatingActualAction(false));
@@ -118,7 +118,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
         try {
           const response: IActual = yield call(updateActual, existing.id as number, requestPayload);
           const responsePayload = ActualMapping.modelToRow(response);
-          yield put(updateActualsTableRowAction({ id: existing.id, data: responsePayload }));
+          yield put(updateTableRowAction({ id: existing.id, data: responsePayload }));
 
           // Determine if the parent budget needs to be refreshed due to updates to the underlying
           // actual fields that calculate the values of the parent budget.
@@ -131,7 +131,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
             e,
             "There was an error updating the actual.",
             existing.id,
-            (errors: Table.CellError[]) => addErrorsToActualsTableAction(errors)
+            (errors: Table.CellError[]) => addErrorsToTableAction(errors)
           );
         } finally {
           yield put(updatingActualAction({ id: existing.id as number, value: false }));
@@ -149,7 +149,7 @@ export function* getActualsTask(action: Redux.IAction<null>): SagaIterator {
       const response = yield call(getBudgetActuals, budgetId, { no_pagination: true });
       yield put(responseActualsAction(response));
       if (response.data.length === 0) {
-        yield put(addActualsTablePlaceholdersAction(2));
+        yield put(addPlaceholdersAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's actuals.");

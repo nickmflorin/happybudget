@@ -1,33 +1,57 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil, find } from "lodash";
+import { createSelector } from "reselect";
 
 import { CellClassParams } from "ag-grid-community";
 
-import { RenderWithSpinner } from "components/display";
-import { formatCurrencyWithoutDollarSign } from "util/string";
+import { WrapInApplicationSpinner } from "components/display";
+import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setAncestorsAction } from "../actions";
+import { selectBudgetDetailLoading, selectBudgetDetail } from "../selectors";
 import BudgetTable, { GetExportValueParams } from "../BudgetTable";
 import {
   requestBudgetItemsAction,
   requestActualsAction,
-  setActualsSearchAction,
-  addActualsTablePlaceholdersAction,
-  deselectActualsTableRowAction,
-  selectActualsTableRowAction,
+  setSearchAction,
+  addPlaceholdersAction,
+  deselectRowAction,
+  selectRowAction,
   removeActualAction,
   updateActualAction,
-  selectAllActualsTableRowsAction,
+  selectAllRowsAction,
   requestBudgetItemsTreeAction
 } from "./actions";
 import { BudgetItemCell, PaymentMethodsCell } from "./cells";
 
+const selectActualsLoading = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.actuals.actuals.loading
+);
+const selectLoading = createSelector(
+  selectBudgetDetailLoading,
+  selectActualsLoading,
+  (detailLoading: boolean, tableLoading: boolean) => detailLoading || tableLoading
+);
+const selectTableData = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.table);
+const selectTableSearch = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.search);
+const selectSaving = createSelector(
+  (state: Redux.IApplicationStore) => state.actuals.actuals.deleting,
+  (state: Redux.IApplicationStore) => state.actuals.actuals.updating,
+  (state: Redux.IApplicationStore) => state.actuals.actuals.creating,
+  (deleting: number[], updating: number[], creating: boolean) =>
+    deleting.length !== 0 || updating.length !== 0 || creating === true
+);
+const selectBudgetItems = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.budgetItems.data);
+
 const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
-  const actuals = useSelector((state: Redux.IApplicationStore) => state.actuals);
-  const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
-  const budgetItems = useSelector((state: Redux.IApplicationStore) => state.actuals.budgetItems);
+  const loading = useSelector(selectLoading);
+  const budgetItems = useSelector(selectBudgetItems);
+  const table = useSelector(selectTableData);
+  const search = useSelector(selectTableSearch);
+  const saving = useSelector(selectSaving);
+  const budgetDetail = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     dispatch(requestActualsAction());
@@ -36,34 +60,34 @@ const Actuals = (): JSX.Element => {
   }, []);
 
   useEffect(() => {
-    if (!isNil(budget.detail.data)) {
+    if (!isNil(budgetDetail)) {
       dispatch(
         setAncestorsAction([
           {
-            id: budget.detail.data.id,
-            identifier: budget.detail.data.name,
+            id: budgetDetail.id,
+            identifier: budgetDetail.name,
             type: "budget"
           }
         ])
       );
     }
-  }, [budget.detail.data]);
+  }, [budgetDetail]);
 
   return (
-    <RenderWithSpinner loading={actuals.table.loading || budget.detail.loading}>
+    <WrapInApplicationSpinner loading={loading}>
       <BudgetTable<Table.ActualRow>
-        table={actuals.table.data}
+        table={table}
         nonEditableCells={["object_id", "payment_method"]}
         nonHighlightedNonEditableCells={["payment_method", "object_id"]}
-        search={actuals.table.search}
-        onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
-        saving={actuals.deleting.length !== 0 || actuals.updating.length !== 0 || actuals.creating}
-        onRowAdd={() => dispatch(addActualsTablePlaceholdersAction(1))}
-        onRowSelect={(id: number) => dispatch(selectActualsTableRowAction(id))}
-        onRowDeselect={(id: number) => dispatch(deselectActualsTableRowAction(id))}
+        search={search}
+        onSearch={(value: string) => dispatch(setSearchAction(value))}
+        saving={saving}
+        onRowAdd={() => dispatch(addPlaceholdersAction(1))}
+        onRowSelect={(id: number) => dispatch(selectRowAction(id))}
+        onRowDeselect={(id: number) => dispatch(deselectRowAction(id))}
         onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateActualAction(payload))}
-        onSelectAll={() => dispatch(selectAllActualsTableRowsAction())}
+        onSelectAll={() => dispatch(selectAllRowsAction())}
         frameworkComponents={{ BudgetItemCell, PaymentMethodsCell }}
         rowRefreshRequired={(existing: Table.ActualRow, row: Table.ActualRow) => {
           return (
@@ -93,14 +117,13 @@ const Actuals = (): JSX.Element => {
           }
         }}
         totals={{
-          value:
-            !isNil(budget.detail.data) && !isNil(budget.detail.data.actual) ? String(budget.detail.data.actual) : "0.00"
+          value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? String(budgetDetail.actual) : "0.00"
         }}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         exportFileName={"actuals.csv"}
         getExportValue={{
           object_id: ({ node }: GetExportValueParams) => {
-            const item = find(budgetItems.data, { id: node.data.object_id, type: node.data.parent_type });
+            const item = find(budgetItems, { id: node.data.object_id, type: node.data.parent_type });
             if (!isNil(item)) {
               return item.identifier;
             }
@@ -143,16 +166,16 @@ const Actuals = (): JSX.Element => {
           {
             field: "payment_id",
             headerName: "Payment ID"
-          },
+          }
+        ]}
+        calculatedColumns={[
           {
             field: "value",
-            headerName: "Actual",
-            cellStyle: { textAlign: "right" },
-            cellRendererParams: { formatter: formatCurrencyWithoutDollarSign }
+            headerName: "Actual"
           }
         ]}
       />
-    </RenderWithSpinner>
+    </WrapInApplicationSpinner>
   );
 };
 

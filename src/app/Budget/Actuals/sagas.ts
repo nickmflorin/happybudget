@@ -12,7 +12,7 @@ import {
 function* watchForTriggerBudgetActualsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.ActualsTable.Request);
+    const action = yield take(ActionType.Actuals.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -43,11 +43,11 @@ function* watchForTriggerBudgetItemsTreeSaga(): SagaIterator {
 }
 
 function* watchForRemoveActualSaga(): SagaIterator {
-  yield takeEvery(ActionType.Remove, handleActualRemovalTask);
+  yield takeEvery(ActionType.Actuals.Remove, handleActualRemovalTask);
 }
 
 function* watchForActualUpdateSaga(): SagaIterator {
-  yield takeEvery(ActionType.Update, handleActualUpdateTask);
+  yield takeEvery(ActionType.Actuals.Update, handleActualUpdateTask);
 }
 
 export default function* rootSaga(): SagaIterator {

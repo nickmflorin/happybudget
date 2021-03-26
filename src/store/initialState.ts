@@ -25,14 +25,6 @@ export const initialCommentsListResponseState: Redux.ICommentsListResponseStore 
   replying: []
 };
 
-export const initialTableState: Redux.ITableStore<any, any> = {
-  loading: false,
-  data: [],
-  rawData: [],
-  search: "",
-  responseWasReceived: false
-};
-
 export const initialLoadingState: Redux.ILoadingStore = {
   elements: [],
   loading: false

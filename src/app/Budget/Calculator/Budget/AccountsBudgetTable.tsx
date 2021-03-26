@@ -7,7 +7,7 @@ import { createSelector } from "reselect";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import BudgetTable from "../../BudgetTable";
-import { selectBudgetId, selectBudgetDetail } from "../selectors";
+import { selectBudgetId, selectBudgetDetail } from "../../selectors";
 import {
   setAccountsSearchAction,
   addPlaceholdersAction,

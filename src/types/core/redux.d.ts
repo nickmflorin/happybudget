@@ -68,20 +68,6 @@ namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
-  // NOTE: This will be deprecated.
-  interface ITableStore<
-    R extends Row<G, C>,
-    M extends Model,
-    G extends RowGroup = RowGroup,
-    C extends RowChild = RowChild
-  > {
-    readonly data: ListStore<R>;
-    readonly loading: boolean;
-    readonly rawData: ListStore<M>;
-    readonly search: string;
-    readonly responseWasReceived: boolean;
-  }
-
   interface ICommentsListResponseStore extends IListResponseStore<IComment> {
     readonly submitting: boolean;
     readonly deleting: number[];
@@ -184,13 +170,17 @@ namespace Redux {
   }
 
   namespace Actuals {
-    interface IStore {
-      readonly budgetItems: IListResponseStore<IBudgetItem>;
-      readonly budgetItemsTree: IListResponseStore<IBudgetItemTreeNode>;
+    interface IActualsStore extends IListResponseStore<IActual> {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
-      readonly table: ITableStore<Table.ActualRow, IActual>;
+      readonly table: ListStore<Table.ActualRow>;
+    }
+
+    interface IStore {
+      readonly budgetItems: IListResponseStore<IBudgetItem>;
+      readonly budgetItemsTree: IListResponseStore<IBudgetItemTreeNode>;
+      readonly actuals: IActualsStore;
     }
   }
 
