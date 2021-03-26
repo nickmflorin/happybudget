@@ -19,7 +19,9 @@ import {
   NavigateToNextCellParams,
   ColSpanParams,
   RowClassParams,
-  GridOptions
+  GridOptions,
+  GetContextMenuItemsParams,
+  MenuItemDef
 } from "ag-grid-community";
 
 import { RenderWithSpinner } from "components/display";
@@ -28,7 +30,7 @@ import { downloadAsCsvFile } from "util/files";
 import { generateRandomNumericId } from "util/math";
 import { formatCurrencyWithoutDollarSign } from "util/string";
 
-import { DeleteCell, ExpandCell, IndexCell, ValueCell, UnitCell, IdentifierCell, CalculatedCell } from "./cells";
+import { ExpandCell, IndexCell, ValueCell, UnitCell, IdentifierCell, CalculatedCell } from "./cells";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
 import { IncludeErrorsInCell } from "./Util";
@@ -99,7 +101,6 @@ const BudgetTable = <
       sortable: false,
       filter: false
     },
-    suppressContextMenu: true,
     suppressHorizontalScroll: true
   });
   const [footerGridOptions, setFooterGridOptions] = useState<GridOptions>({
@@ -145,7 +146,7 @@ const BudgetTable = <
     return (row: R) => null;
   }, [groupParams, groupGetter]);
 
-  const baseColumns = useMemo((): ColDef[][] => {
+  const baseColumns = useMemo((): ColDef[] => {
     let baseLeftColumns: ColDef[] = [
       actionCell({
         field: "index",
@@ -188,32 +189,7 @@ const BudgetTable = <
         return 1;
       }
     });
-    return [
-      baseLeftColumns,
-      [
-        {
-          field: "delete",
-          editable: false,
-          headerName: "",
-          resizable: false,
-          width: 25,
-          maxWidth: 30,
-          cellClass: classNames("cell--action", "cell--not-editable"),
-          cellRenderer: "DeleteCell",
-          cellRendererParams: {
-            onClick: (row: R) => {
-              if (row.meta.isGroupFooter === true) {
-                if (!isNil(groupParams) && !isNil(row.group)) {
-                  groupParams.onDeleteGroup(row.group);
-                }
-              } else {
-                onRowDelete(row);
-              }
-            }
-          }
-        }
-      ]
-    ];
+    return baseLeftColumns;
   }, [
     groupParams,
     onRowSelect,
@@ -456,6 +432,34 @@ const BudgetTable = <
     }
   });
 
+  const getContextMenuItems = (params: GetContextMenuItemsParams): MenuItemDef[] => {
+    const row: R = params.node.data;
+    if (row.meta.isTableFooter) {
+      return [];
+    } else if (row.meta.isGroupFooter) {
+      if (!isNil(row.group) && !isNil(groupParams)) {
+        const group: G = row.group;
+        return [
+          {
+            // TODO: We want to change this to the identifier field of the row - but
+            // that requires updating the typings to include an identifier in the row meta.
+            name: `Delete ${group.name}`,
+            action: () => groupParams.onDeleteGroup(group)
+          }
+        ];
+      }
+      return [];
+    }
+    return [
+      {
+        // TODO: We want to change this to the identifier field of the row - but
+        // that requires updating the typings to include an identifier in the row meta.
+        name: `Delete ${row.id}`,
+        action: () => onRowDelete(row)
+      }
+    ];
+  };
+
   useEffect(() => {
     if (!isNil(groupParams)) {
       const rowsWithGroup = filter(table, (row: R) => !isNil(groupValueGetter(row)));
@@ -584,7 +588,7 @@ const BudgetTable = <
     setColDefs(
       map(
         concat(
-          baseColumns[0],
+          baseColumns,
           map(
             bodyColumns,
             (def: ColDef) =>
@@ -604,8 +608,7 @@ const BudgetTable = <
                 cellRendererParams: { formatter: formatCurrencyWithoutDollarSign, renderRedIfNegative: true },
                 ...def
               } as ColDef)
-          ),
-          baseColumns[1]
+          )
         ),
         (col: ColDef) => ({
           ...col,
@@ -740,8 +743,8 @@ const BudgetTable = <
           <div className={"primary-grid"}>
             <AgGridReact
               {...gridOptions}
-              // debug={true}
               columnDefs={colDefs}
+              getContextMenuItems={getContextMenuItems}
               allowContextMenuWithControlKey={true}
               rowData={_table}
               getRowNodeId={(data: any) => data.id}
@@ -763,7 +766,6 @@ const BudgetTable = <
               rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
               enterMovesDown={true}
               frameworkComponents={{
-                DeleteCell: DeleteCell,
                 ExpandCell: ExpandCell,
                 IndexCell: IndexCell,
                 ValueCell: IncludeErrorsInCell<R>(ValueCell),
@@ -779,14 +781,12 @@ const BudgetTable = <
             <AgGridReact
               {...footerGridOptions}
               columnDefs={colDefs}
-              debug={true}
               rowData={[tableFooter]}
               suppressRowClickSelection={true}
               onGridReady={onFooterGridReady}
               headerHeight={0}
               frameworkComponents={{
                 IndexCell: IndexCell,
-                DeleteCell: DeleteCell,
                 ExpandCell: ExpandCell,
                 ValueCell: IncludeErrorsInCell<R>(ValueCell),
                 UnitCell: IncludeErrorsInCell<R>(UnitCell),
