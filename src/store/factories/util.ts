@@ -58,19 +58,19 @@ export const createObjectReducerFromTransformers = <
           newState = { ...newState, ...updateToState };
         }
       }
-      // If key reducers are supplied, indexed by the key in the state they are
-      // updating, apply each key reducer to update the state corresponding to
-      // the associated key.  Note that key reducers can only be used when we
-      // are merging states.
-      if (!isNil(options.keyReducers)) {
-        const subReducers: { [key: string]: Reducer<any, A> } = options.keyReducers;
-        forEach(Object.keys(options.keyReducers), (key: string) => {
-          if (!isNil(newState[key as keyof S])) {
-            const red: Reducer<any, A> = subReducers[key];
-            newState = { ...newState, [key]: red(newState[key as keyof S], action) };
-          }
-        });
-      }
+    }
+    // If key reducers are supplied, indexed by the key in the state they are
+    // updating, apply each key reducer to update the state corresponding to
+    // the associated key.  Note that key reducers can only be used when we
+    // are merging states.
+    if (!isNil(options.keyReducers)) {
+      const subReducers: { [key: string]: Reducer<any, A> } = options.keyReducers;
+      forEach(Object.keys(options.keyReducers), (key: string) => {
+        if (!isNil(newState[key as keyof S])) {
+          const red: Reducer<any, A> = subReducers[key];
+          newState = { ...newState, [key]: red(newState[key as keyof S], action) };
+        }
+      });
     }
     // If the reducer is provided with an extension reducer, apply the entire
     // extension reducer to the action and state.

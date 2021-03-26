@@ -74,9 +74,9 @@ namespace Redux {
     G extends RowGroup = RowGroup,
     C extends RowChild = RowChild
   > {
-    readonly data: IListStore<R>;
+    readonly data: ListStore<R>;
     readonly loading: boolean;
-    readonly rawData: IListStore<M>;
+    readonly rawData: ListStore<M>;
     readonly search: string;
     readonly responseWasReceived: boolean;
   }
@@ -148,6 +148,17 @@ namespace Redux {
       readonly groups: ISubAccountGroupsStore;
     }
 
+    // Temporarily named something more specific so we can gradually separate
+    // the list store from the table store.
+    interface IAccountSubAccountsStore extends IListResponseStore<ISubAccount> {
+      readonly deleting: ListStore<number>;
+      readonly updating: ListStore<number>;
+      readonly creating: boolean;
+      readonly table: ListStore<Table.SubAccountRow>;
+      readonly history: IListResponseStore<IFieldAlterationEvent>;
+      readonly groups: ISubAccountGroupsStore;
+    }
+
     interface IAccountsStore {
       readonly table: ITableStore<Table.AccountRow, IAccount>;
       readonly comments: ICommentsStore;
@@ -167,7 +178,7 @@ namespace Redux {
     interface IAccountStore {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<IAccount>;
-      readonly subaccounts: ISubAccountsStore;
+      readonly subaccounts: IAccountSubAccountsStore;
       readonly comments: ICommentsStore;
     }
 

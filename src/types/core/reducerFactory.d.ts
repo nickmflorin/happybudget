@@ -54,6 +54,24 @@ namespace ReducerFactory {
     UpdateGroup: string;
   };
 
+  type ISimpleTableActionMap = {
+    ClearData: string;
+    SetData: string;
+    Loading: string;
+    AddPlaceholders: string;
+    RemoveRow: string;
+    UpdateRow: string;
+    UpdateInState: string;
+    ActivatePlaceholder: string;
+    SelectRow: string;
+    DeselectRow: string;
+    SelectAllRows: string;
+    AddErrors: string;
+    AddGroup: string;
+    RemoveGroup: string;
+    UpdateGroup: string;
+  };
+
   type IDetailResponseActionMap = {
     Loading: string;
     Response: string;

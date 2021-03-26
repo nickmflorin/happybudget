@@ -13,8 +13,8 @@ import AccountCommentsHistory from "./AccountCommentsHistory";
 const selectAccountDetail = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.account.detail
 );
-const selectSubAccountsTableLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.loading
+const selectSubAccountsLoading = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.loading
 );
 const selectDetailLoading = createSelector(
   selectAccountDetail,
@@ -25,7 +25,7 @@ const selectDeletingGroups = simpleShallowEqualSelector(
 );
 const selectLoading = createSelector(
   selectDetailLoading,
-  selectSubAccountsTableLoading,
+  selectSubAccountsLoading,
   selectDeletingGroups,
   (detailLoading: boolean, tableLoading: boolean, deletingGroups: boolean) =>
     detailLoading || tableLoading || deletingGroups

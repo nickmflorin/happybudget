@@ -38,7 +38,7 @@ export const createDetailResponseReducer = <
     Response: (payload: M) => ({ data: payload, responseWasReceived: true }),
     Loading: (payload: boolean) => ({ loading: payload }),
     RemoveFromState: (payload?: null | undefined) => ({ data: undefined }),
-    UpdateInState: (payload: M) => ({ data: payload }),
+    UpdateInState: (payload: Partial<M>, st: S) => ({ data: { ...st.data, ...payload } }),
     Request: (payload: null) => ({ responseWasReceived: false })
   };
 

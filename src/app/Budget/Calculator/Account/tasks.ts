@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find, concat, map } from "lodash";
+import { isNil, find, concat, map, reduce } from "lodash";
 import { handleRequestError } from "api";
 import { subAccountGroupToSubAccountNestedGroup } from "model/mappings";
 import { SubAccountMapping } from "model/tableMappings";
@@ -49,7 +49,9 @@ import {
   deletingGroupAction,
   removeGroupFromTableAction,
   addGroupToTableAction,
-  updateGroupInTableAction
+  updateGroupInTableAction,
+  updateAccountInStateAction,
+  updateSubAccountInStateAction
 } from "./actions";
 
 export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaIterator {
@@ -181,7 +183,7 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(action.payload) && !isNil(accountId)) {
     const tableData: Table.SubAccountRow[] = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.data
+      (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table
     );
     const existing: Table.SubAccountRow | undefined = find(tableData, { id: action.payload });
     if (isNil(existing)) {
@@ -193,8 +195,8 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
     } else {
       // Dispatch the action to remove the row from the table in the UI.
       yield put(removeTableRowAction(action.payload));
-      // Only make an API request to the server to delete the sub account if the
-      // row was not a placeholder (i.e. the sub account exists in the backend).
+      // Only make an API request to the server to delete the sub account if the  row was not a
+      // placeholder (i.e. the sub account exists in the backend).
       if (existing.meta.isPlaceholder === false) {
         yield put(deletingSubAccountAction({ id: action.payload, value: true }));
         try {
@@ -209,12 +211,43 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
   }
 }
 
+export function* updateSubAccountPostRequestTask(
+  request: Partial<Http.ISubAccountPayload>,
+  subaccount: ISubAccount
+): SagaIterator {
+  // Dispatching this action will trigger the subaccount to update in both the  Redux state for the
+  // table and the list response data.
+  // Since we are using a deep check lodash.isEqual in the selectors, this will only trigger a rerender
+  // if the subaccount has data that differs from that of the current data.
+  yield put(updateSubAccountInStateAction({ id: subaccount.id, data: subaccount }));
+
+  // Determine if the parent account needs to be refreshed due to updates to the underlying account
+  // fields that calculate the values of the parent models.
+  if (SubAccountMapping.patchRequestRequiresRecalculation(request)) {
+    const account: IAccount = yield select((state: Redux.IApplicationStore) => state.calculator.account.detail.data);
+    const subaccounts: ISubAccount[] = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
+    );
+    const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
+    let accountPayload: Partial<IAccount> = { estimated };
+    if (!isNil(account.actual)) {
+      accountPayload = { ...accountPayload, variance: estimated - account.actual };
+    }
+    yield put(updateAccountInStateAction(accountPayload));
+    // Should we remove the group from the table if the response does not have
+    // a group?  Probably - but this will not happen in practice (at least not now).
+    if (!isNil(subaccount.group)) {
+      yield put(updateGroupInTableAction({ groupId: subaccount.group.id, group: subaccount.group }));
+    }
+  }
+}
+
 export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(accountId) && !isNil(action.payload)) {
     const id = action.payload.id;
-    const table = yield select((state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.data);
+    const table = yield select((state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table);
 
     const existing: Table.SubAccountRow = find(table, { id });
     if (isNil(existing)) {
@@ -224,12 +257,11 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
       );
     } else {
-      // There are some cases where we need to update the row in the table before
-      // we make the request, to improve the UI.  This happens for cells where the
-      // value is rendered via an HTML element (i.e. the Unit Cell).  AGGridReact will
-      // not automatically update the cell when the Unit is changed via the dropdown,
-      // so we need to udpate the row in the data used to populate the table.  We could
-      // do this by updating with a payload generated from the response, but it is quicker
+      // There are some cases where we need to update the row in the table before we make the request,
+      // to improve the UI.  This happens for cells where the value is rendered via an HTML element
+      // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
+      // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
+      // We could do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
       const preResponsePayload = SubAccountMapping.preRequestPayload(action.payload);
       if (Object.keys(preResponsePayload).length !== 0) {
@@ -256,8 +288,9 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
               requestPayload as Http.ISubAccountPayload
             );
             yield put(activatePlaceholderAction({ oldId: existing.id, id: response.id }));
-            const responsePayload = SubAccountMapping.modelToRow(response);
-            yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
+            // TODO: We are going to want to eventually do this pre-request, which means manually
+            // updating the SubAccount instead of using the response.
+            yield call(updateSubAccountPostRequestTask, requestPayload, response);
           } catch (e) {
             yield call(
               handleTableErrors,
@@ -275,24 +308,9 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         const requestPayload = SubAccountMapping.patchPayload(action.payload);
         try {
           const response: ISubAccount = yield call(updateSubAccount, existing.id as number, requestPayload);
-          // Since we are using a deep check lodash.isEqual in the selectors, this will only trigger
-          // a rerender if the responsePayload has data that differs from that of the current data.
-          const responsePayload = SubAccountMapping.modelToRow(response);
-          yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
-
-          // Determine if the parent account needs to be refreshed due to updates to the underlying
-          // account fields that calculate the values of the parent models.
-          if (SubAccountMapping.patchRequestRequiresRecalculation(requestPayload)) {
-            // TODO: Instead of refreshing the account, let's update the account in state.
-            yield put(requestAccountAction());
-            // Should we remove the group from the table if the response does not have
-            // a group?  Probably - but this will not happen in practice (at least not now).
-            // TODO: We might want to do this before the request is made to make the table interactions
-            // faster.  This will require calculating the metrics in the front end.
-            if (!isNil(response.group)) {
-              yield put(updateGroupInTableAction({ groupId: response.group.id, group: response.group }));
-            }
-          }
+          // TODO: We are going to want to eventually do this pre-request, which means manually
+          // updating the SubAccount instead of using the response.
+          yield call(updateSubAccountPostRequestTask, requestPayload, response);
         } catch (e) {
           yield call(
             handleTableErrors,
@@ -334,8 +352,14 @@ export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
 export function* getAccountTask(action: Redux.IAction<null>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(accountId)) {
-    yield put(loadingAccountAction(true));
-    yield put(setAncestorsLoadingAction(true));
+    let showLoadingIndicator = true;
+    if (!isNil(action.meta) && action.meta.showLoadingIndicator === false) {
+      showLoadingIndicator = false;
+    }
+    if (showLoadingIndicator) {
+      yield put(loadingAccountAction(true));
+      yield put(setAncestorsLoadingAction(true));
+    }
     try {
       const response: IAccount = yield call(getAccount, accountId);
       yield put(responseAccountAction(response));
@@ -354,8 +378,10 @@ export function* getAccountTask(action: Redux.IAction<null>): SagaIterator {
       handleRequestError(e, "There was an error retrieving the account.");
       yield put(responseAccountAction(undefined, { error: e }));
     } finally {
-      yield put(loadingAccountAction(false));
-      yield put(setAncestorsLoadingAction(false));
+      if (showLoadingIndicator) {
+        yield put(loadingAccountAction(false));
+        yield put(setAncestorsLoadingAction(false));
+      }
     }
   }
 }

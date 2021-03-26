@@ -6,7 +6,8 @@ export const ActionType = {
     Loading: "calculator.account.Loading",
     Response: "calculator.account.Response",
     Request: "calculator.account.Request",
-    Refresh: "calculator.account.Refresh"
+    Refresh: "calculator.account.Refresh",
+    UpdateInState: "calculator.account.UpdateInState"
   },
   Comments: {
     Loading: "calculator.account.comments.Loading",
@@ -41,6 +42,7 @@ export const ActionType = {
     Response: "calculator.account.subaccounts.Response",
     Request: "calculator.account.subaccounts.Request",
     AddErrors: "calculator.account.subaccounts.AddErrors",
+    UpdateInState: "calculator.account.subaccounts.UpdateInState",
     Groups: {
       Delete: "calculator.account.subaccounts.groups.Delete",
       Deleting: "calculator.account.subaccounts.groups.Deleting",
@@ -61,6 +63,7 @@ export const setAccountIdAction = simpleAction<number>(ActionType.Account.SetId)
 export const requestAccountAction = simpleAction<null>(ActionType.Account.Request);
 export const loadingAccountAction = simpleAction<boolean>(ActionType.Account.Loading);
 export const responseAccountAction = simpleAction<IAccount>(ActionType.Account.Response);
+export const updateAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.Account.UpdateInState);
 
 /*
   Actions Pertaining to Account Comments
@@ -111,6 +114,11 @@ export const setSubAccountsSearchAction = simpleAction<string>(ActionType.SubAcc
 export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.SubAccounts.AddErrors
 );
+
+export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<ISubAccount>>(
+  ActionType.SubAccounts.UpdateInState
+);
+
 export const addGroupToStateAction = simpleAction<ISubAccountGroup>(ActionType.SubAccounts.Groups.AddToState);
 export const addGroupToTableAction = simpleAction<{ group: ISubAccountNestedGroup; ids: number[] }>(
   ActionType.SubAccounts.Groups.AddToTable

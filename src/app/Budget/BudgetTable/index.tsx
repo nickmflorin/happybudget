@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
 
 import { AgGridReact } from "ag-grid-react";
+import { ChangeDetectionStrategyType } from "ag-grid-react/lib/changeDetectionService";
 import {
   ColDef,
   CellEditingStoppedEvent,
@@ -445,6 +446,16 @@ const BudgetTable = <
     }
   });
 
+  const getRowClass = useDynamicCallback((params: RowClassParams) => {
+    if (params.node.data.meta.isGroupFooter === true) {
+      let colorClass = params.node.data.group.color;
+      if (colorClass.startsWith("#")) {
+        colorClass = params.node.data.group.color.slice(1);
+      }
+      return classNames("row--group-footer", `bg-${colorClass}`);
+    }
+  });
+
   useEffect(() => {
     if (!isNil(groupParams)) {
       const rowsWithGroup = filter(table, (row: R) => !isNil(groupValueGetter(row)));
@@ -734,18 +745,7 @@ const BudgetTable = <
               allowContextMenuWithControlKey={true}
               rowData={_table}
               getRowNodeId={(data: any) => data.id}
-              getRowClass={(params: RowClassParams) => {
-                if (params.node.group === false) {
-                  if (params.node.data.meta.isGroupFooter === true) {
-                    let colorClass = params.node.data.group.color;
-                    if (colorClass.startsWith("#")) {
-                      colorClass = params.node.data.group.color.slice(1);
-                    }
-                    return classNames("row--group-footer", `bg-${colorClass}`);
-                  }
-                }
-                return "";
-              }}
+              getRowClass={getRowClass}
               immutableData={true}
               suppressRowClickSelection={true}
               onGridReady={onGridReady}
@@ -756,6 +756,11 @@ const BudgetTable = <
               animateRows={true}
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
+              // NOTE: This might not be 100% necessary, because of how efficiently
+              // we are managing the state updates to the data that flows into the table.
+              // However, for now we will leave.  It is important to note that this will
+              // cause the table renders to be slower for large datasets.
+              rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
               enterMovesDown={true}
               frameworkComponents={{
                 DeleteCell: DeleteCell,

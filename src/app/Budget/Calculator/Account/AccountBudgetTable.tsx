@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { isNil, includes, map } from "lodash";
 import classNames from "classnames";
 import { createSelector } from "reselect";
@@ -26,10 +26,10 @@ import {
 } from "./actions";
 
 const selectTableData = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.data
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table
 );
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table.search
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.search
 );
 const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.deleting,
