@@ -466,6 +466,10 @@ const BudgetTable = <
   });
 
   const getContextMenuItems = useDynamicCallback((params: GetContextMenuItemsParams): MenuItemDef[] => {
+    // This can happen in rare cases where you right click outside of a cell.
+    if (isNil(params.node)) {
+      return [];
+    }
     const row: R = params.node.data;
     if (row.meta.isTableFooter) {
       return [];
