@@ -478,9 +478,7 @@ const BudgetTable = <
         const group: G = row.group;
         return [
           {
-            // TODO: We want to change this to the identifier field of the row - but
-            // that requires updating the typings to include an identifier in the row meta.
-            name: `Delete ${group.name}`,
+            name: `Delete Group ${group.name}`,
             action: () => groupParams.onDeleteGroup(group)
           }
         ];
@@ -488,22 +486,26 @@ const BudgetTable = <
       return [];
     } else {
       const deleteRowContextMenuItem: MenuItemDef = {
-        // TODO: We want to change this to the identifier field of the row - but
-        // that requires updating the typings to include an identifier in the row meta.
-        name: `Delete ${row.id}`,
+        name: `Delete ${row.meta.typeLabel} ${row.meta.label}`,
         action: () => onRowDelete(row)
       };
       if (!isNil(row.group) || isNil(groupParams)) {
         return [deleteRowContextMenuItem];
       } else {
+        const groupableNodesAbove = findRowsUpUntilFirstGroupFooterRow(params.node);
+        let label: string;
+        if (groupableNodesAbove.length === 1) {
+          label = `Group ${groupableNodesAbove[0].data.meta.typeLabel} ${groupableNodesAbove[0].data.meta.label}`;
+        } else {
+          label = `Group ${groupableNodesAbove[0].data.meta.typeLabel}s ${
+            groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label
+          } - ${groupableNodesAbove[0].data.meta.label}`;
+        }
         return [
           deleteRowContextMenuItem,
           {
-            name: "Group Including & Above", // TODO: Include more information about what rows we are grouping.
-            action: () => {
-              const groupableNodesAbove = findRowsUpUntilFirstGroupFooterRow(params.node);
-              groupParams.onGroupRows(map(groupableNodesAbove, (node: RowNode) => node.data as R));
-            }
+            name: label,
+            action: () => groupParams.onGroupRows(map(groupableNodesAbove, (node: RowNode) => node.data as R))
           }
         ];
       }

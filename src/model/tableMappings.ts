@@ -18,6 +18,8 @@ interface MappingConfig<
   readonly fields: MappedField<M>[];
   readonly childrenGetter?: ((model: M) => C[]) | string | null;
   readonly groupGetter?: ((model: M) => G | null) | string | null;
+  readonly labelGetter: (model: M) => string;
+  readonly typeLabel: string;
 }
 
 function getProperty<T, K extends keyof T>(obj: T, key: K) {
@@ -34,11 +36,15 @@ class Mapping<
   public fields: MappedField<M>[];
   public childrenGetter?: ((model: M) => C[]) | string | null;
   public groupGetter?: ((model: M) => G | null) | string | null;
+  public labelGetter: (model: M) => string;
+  public typeLabel: string;
 
   constructor(config: MappingConfig<M, G, C>) {
     this.fields = config.fields;
     this.childrenGetter = config.childrenGetter;
     this.groupGetter = config.groupGetter;
+    this.labelGetter = config.labelGetter;
+    this.typeLabel = config.typeLabel;
   }
 
   _getChildren = (model: M): C[] => {
@@ -84,7 +90,9 @@ class Mapping<
       isTableFooter: false,
       selected: false,
       children: [],
-      errors: []
+      errors: [],
+      label: "Placeholder",
+      typeLabel: this.typeLabel
     };
     const obj: { [key: string]: any } = {
       id: generateRandomNumericId(),
@@ -104,7 +112,9 @@ class Mapping<
       isTableFooter: false,
       selected: false,
       children: this._getChildren(model),
-      errors: []
+      errors: [],
+      label: this.labelGetter(model),
+      typeLabel: this.typeLabel
     };
     const obj: { [key: string]: any } = {
       id: model.id,
@@ -197,7 +207,9 @@ export const AccountMapping = new Mapping<Table.AccountRow, IAccount, Http.IAcco
     { field: "variance", calculatedField: true },
     { field: "actual", calculatedField: true }
   ],
-  childrenGetter: (model: IAccount) => model.subaccounts
+  childrenGetter: (model: IAccount) => model.subaccounts,
+  labelGetter: (model: IAccount) => model.identifier,
+  typeLabel: "Account"
 });
 
 export const SubAccountMapping = new Mapping<
@@ -220,7 +232,9 @@ export const SubAccountMapping = new Mapping<
     { field: "actual", calculatedField: true }
   ],
   childrenGetter: (model: ISubAccount) => model.subaccounts,
-  groupGetter: (model: ISubAccount) => model.group
+  groupGetter: (model: ISubAccount) => model.group,
+  labelGetter: (model: ISubAccount) => model.identifier,
+  typeLabel: "Sub Account"
 });
 
 export const ActualMapping = new Mapping<Table.ActualRow, IActual, Http.IActualPayload>({
@@ -244,7 +258,9 @@ export const ActualMapping = new Mapping<Table.ActualRow, IActual, Http.IActualP
     { field: "payment_method", updateBeforeRequest: true },
     { field: "payment_id" },
     { field: "value" }
-  ]
+  ],
+  labelGetter: (model: IActual) => String(model.object_id),
+  typeLabel: "Actual"
 });
 
 export default Mapping;

@@ -18,6 +18,8 @@ namespace Table {
     readonly isGroupFooter?: boolean;
     readonly isTableFooter?: boolean;
     readonly children: C[];
+    readonly label: string;
+    readonly typeLabel: string;
   }
 
   interface RowGroup {

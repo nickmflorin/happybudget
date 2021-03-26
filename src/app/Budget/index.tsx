@@ -5,7 +5,6 @@ import { Route, Switch, useHistory, useLocation, useParams } from "react-router-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faAddressBook,
-  faTrashAlt,
   faRobot,
   faDownload,
   faShareAlt,
