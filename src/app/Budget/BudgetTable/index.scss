@@ -5,22 +5,31 @@
   display: flex;
   // This will align the checkbox in the header with the checkboxes in the
   // rows vertically.
-  padding-left: 6px;
+  padding-left: 2px;
   height: 36px;
 
   .ant-checkbox-wrapper {
     margin-right: 8px;
     .ant-checkbox {
       padding: 10px;
+      padding-left: 0px;
     }
   }
   .btn--icon-only {
-    margin-right: 14px;
+    margin-right: 10px;
   }
   .btn--caret {
     &:not(:last-child) {
       margin-right: 14px;
     }
+  }
+
+  .table-header-left {
+    display: flex;
+    flex-grow: 100;
+  }
+  .table-header-right {
+    display: flex;
   }
 }
 

@@ -285,6 +285,10 @@ const BudgetTable = <
     return footerObj as R;
   }, [useDeepEqualMemo(totals), footerIdentifierValue]);
 
+  /**
+   * Starting at the provided index, either traverses the table upwards or downwards
+   * until a RowNode that is not used as a group footer is found.
+   */
   const findFirstNonGroupFooterRow = useDynamicCallback((startingIndex: number, direction: "asc" | "desc" = "asc"): [
     RowNode | null,
     number,
@@ -293,7 +297,6 @@ const BudgetTable = <
     if (!isNil(gridApi)) {
       let runningIndex = 0;
       let noMoreRows = false;
-      // let nextRowNode: RowNode | null = gridApi.getDisplayedRowAtIndex(startingIndex);
       let nextRowNode: RowNode | null = null;
 
       while (noMoreRows === false) {
@@ -318,6 +321,36 @@ const BudgetTable = <
     } else {
       return [null, startingIndex, 0];
     }
+  });
+
+  /**
+   * Starting at the provided node, traverses the table upwards and collects
+   * all of the RowNode(s) until a RowNode that is the footer for a group above
+   * the provided node is reached.
+   */
+  const findRowsUpUntilFirstGroupFooterRow = useDynamicCallback((node: RowNode): RowNode[] => {
+    const nodes: RowNode[] = [node];
+    if (!isNil(gridApi)) {
+      let currentNode: RowNode | null = node;
+      while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
+        currentNode = gridApi.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
+        if (!isNil(currentNode)) {
+          const row: R = currentNode.data;
+          if (row.meta.isGroupFooter === true) {
+            break;
+          } else {
+            // NOTE: In practice, we will never reach a non-group footer node that belongs to a group
+            // before we reach the group footer node, so as long as the ordering/grouping of rows
+            // is consistent.  However, we will also make sure that the row does not belong to a group
+            // for safety.
+            if (isNil(row.group)) {
+              nodes.push(currentNode);
+            }
+          }
+        }
+      }
+    }
+    return nodes;
   });
 
   const navigateToNextCell = useDynamicCallback(
@@ -432,7 +465,7 @@ const BudgetTable = <
     }
   });
 
-  const getContextMenuItems = (params: GetContextMenuItemsParams): MenuItemDef[] => {
+  const getContextMenuItems = useDynamicCallback((params: GetContextMenuItemsParams): MenuItemDef[] => {
     const row: R = params.node.data;
     if (row.meta.isTableFooter) {
       return [];
@@ -449,16 +482,29 @@ const BudgetTable = <
         ];
       }
       return [];
-    }
-    return [
-      {
+    } else {
+      const deleteRowContextMenuItem: MenuItemDef = {
         // TODO: We want to change this to the identifier field of the row - but
         // that requires updating the typings to include an identifier in the row meta.
         name: `Delete ${row.id}`,
         action: () => onRowDelete(row)
+      };
+      if (!isNil(row.group) || isNil(groupParams)) {
+        return [deleteRowContextMenuItem];
+      } else {
+        return [
+          deleteRowContextMenuItem,
+          {
+            name: "Group Including & Above", // TODO: Include more information about what rows we are grouping.
+            action: () => {
+              const groupableNodesAbove = findRowsUpUntilFirstGroupFooterRow(params.node);
+              groupParams.onGroupRows(map(groupableNodesAbove, (node: RowNode) => node.data as R));
+            }
+          }
+        ];
       }
-    ];
-  };
+    }
+  });
 
   useEffect(() => {
     if (!isNil(groupParams)) {
@@ -650,16 +696,10 @@ const BudgetTable = <
             }
           });
         }}
-        onGroup={() => {
-          if (!isNil(groupParams)) {
-            groupParams.onGroupRows(filter(_table, (row: R) => row.meta.selected === true));
-          }
-        }}
         saving={saving}
         selected={allSelected}
         onSelect={onSelectAll}
         deleteDisabled={filter(_table, (row: R) => row.meta.selected === true).length === 0}
-        groupDisabled={filter(_table, (row: R) => row.meta.selected === true).length === 0}
         onExport={(fields: Field[]) => {
           if (!isNil(gridApi) && !isNil(columnApi)) {
             const includeColumn = (col: Column): boolean => {
