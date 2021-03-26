@@ -5,6 +5,7 @@ import { mergeWithDefaults } from "util/objects";
 import { initialTableState } from "store/initialState";
 import { createListReducerFromTransformers } from "./util";
 import Mapping from "model/tableMappings";
+
 /**
  * A reducer factory that creates a generic reducer to handle the state of the
  * data in a table that is generated from a list response of an API request, where a list
@@ -12,6 +13,8 @@ import Mapping from "model/tableMappings";
  *
  * The reducer has default behavior that is mapped to the action types via
  * the mappings parameter.
+ *
+ * @deprecated
  *
  * @param mappings            Mappings of the standard actions to the specific actions that
  *                            the reducer should listen for.
@@ -241,6 +244,8 @@ export const createTableDataReducer = <
  * The reducer has default behavior that is mapped to the action types via
  * the mappings parameter.
  *
+ * @deprecated
+ *
  * @param mappings            Mappings of the standard actions to the specific actions that
  *                            the reducer should listen for.
  * @param placeholderCreator  A function that returns a placeholder row to be used when
@@ -249,7 +254,7 @@ export const createTableDataReducer = <
  *                            to a row in the table.
  * @param options             Additional options supplied to the reducer factory.
  */
-export const createTableReducer = <
+export const createOldTableReducer = <
   /* eslint-disable indent */
   R extends Table.Row<G, C>,
   M extends Model,
@@ -344,7 +349,23 @@ export const createTableReducer = <
   return reducer;
 };
 
-export const createSimpleTableReducer = <
+/**
+ * A reducer factory that creates a generic reducer to handle the state of a
+ * table that is generated from a list response of an API request, where a list
+ * response might be the response received from submitting an API request to /entity/.
+ *
+ * The reducer has default behavior that is mapped to the action types via
+ * the mappings parameter.
+ *
+ * @param mappings            Mappings of the standard actions to the specific actions that
+ *                            the reducer should listen for.
+ * @param placeholderCreator  A function that returns a placeholder row to be used when
+ *                            adding new rows to the table.
+ * @param modelToRow          A function that converts an entity of the list response
+ *                            to a row in the table.
+ * @param options             Additional options supplied to the reducer factory.
+ */
+export const createTableReducer = <
   /* eslint-disable indent */
   R extends Table.Row<G, C>,
   M extends Model,

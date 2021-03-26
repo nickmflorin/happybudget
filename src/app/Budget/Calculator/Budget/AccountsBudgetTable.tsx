@@ -19,15 +19,15 @@ import {
 } from "./actions";
 
 const selectTableData = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.table.data
+  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.table
 );
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.table.search
+  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.search
 );
 const selectSaving = createSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.deleting,
-  (state: Redux.IApplicationStore) => state.calculator.accounts.updating,
-  (state: Redux.IApplicationStore) => state.calculator.accounts.creating,
+  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.deleting,
+  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.updating,
+  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.creating,
   (deleting: number[], updating: number[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );

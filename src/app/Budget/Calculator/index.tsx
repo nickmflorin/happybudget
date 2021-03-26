@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Redirect, Switch, useRouteMatch } from "react-router-dom";
 
 const Account = React.lazy(() => import("./Account"));
-const Accounts = React.lazy(() => import("./Accounts"));
+const Budget = React.lazy(() => import("./Budget"));
 const SubAccount = React.lazy(() => import("./SubAccount"));
 
 const Calculator = (): JSX.Element => {
@@ -11,7 +11,7 @@ const Calculator = (): JSX.Element => {
     <Switch>
       <Redirect exact from={match.url} to={`${match.url}/accounts`} />
       <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
-      <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
+      <Route path={"/budgets/:budgetId/accounts"} component={Budget} />
       <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
     </Switch>
   );

@@ -68,6 +68,7 @@ namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
+  // NOTE: This will be deprecated.
   interface ITableStore<
     R extends Row<G, C>,
     M extends Model,
@@ -139,18 +140,7 @@ namespace Redux {
       readonly editing: number[];
     }
 
-    interface ISubAccountsStore {
-      readonly deleting: ListStore<number>;
-      readonly updating: ListStore<number>;
-      readonly creating: boolean;
-      readonly table: ITableStore<Table.SubAccountRow, ISubAccount>;
-      readonly history: IListResponseStore<IFieldAlterationEvent>;
-      readonly groups: ISubAccountGroupsStore;
-    }
-
-    // Temporarily named something more specific so we can gradually separate
-    // the list store from the table store.
-    interface IAccountSubAccountsStore extends IListResponseStore<ISubAccount> {
+    interface ISubAccountsStore extends IListResponseStore<ISubAccount> {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
@@ -159,13 +149,12 @@ namespace Redux {
       readonly groups: ISubAccountGroupsStore;
     }
 
-    interface IAccountsStore {
-      readonly table: ITableStore<Table.AccountRow, IAccount>;
-      readonly comments: ICommentsStore;
-      readonly history: IListResponseStore<IFieldAlterationEvent>;
+    interface IAccountsStore extends IListResponseStore<IAccount> {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
+      readonly table: ListStore<Table.AccountRow>;
+      readonly history: IListResponseStore<IFieldAlterationEvent>;
     }
 
     interface ISubAccountStore {
@@ -178,14 +167,19 @@ namespace Redux {
     interface IAccountStore {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<IAccount>;
-      readonly subaccounts: IAccountSubAccountsStore;
+      readonly subaccounts: ISubAccountsStore;
+      readonly comments: ICommentsStore;
+    }
+
+    interface IBudgetStore {
+      readonly accounts: IAccountsStore;
       readonly comments: ICommentsStore;
     }
 
     interface IStore {
       readonly subaccount: ISubAccountStore;
       readonly account: IAccountStore;
-      readonly accounts: IAccountsStore;
+      readonly budget: IBudgetStore;
     }
   }
 

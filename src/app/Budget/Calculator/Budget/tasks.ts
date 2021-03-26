@@ -141,7 +141,7 @@ export function* getCommentsTask(action: Redux.IAction<any>): SagaIterator {
 export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
     const tableData: Table.AccountRow[] = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.accounts.table.data
+      (state: Redux.IApplicationStore) => state.calculator.budget.accounts.table
     );
     const existing: Table.AccountRow | undefined = find(tableData, { id: action.payload });
     if (isNil(existing)) {
@@ -207,7 +207,7 @@ export function* addToHistoryState(
 export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(action.payload) && !isNil(action.payload.id)) {
-    const table = yield select((state: Redux.IApplicationStore) => state.calculator.accounts.table.data);
+    const table = yield select((state: Redux.IApplicationStore) => state.calculator.budget.accounts.table);
 
     const existing: Table.AccountRow = find(table, { id: action.payload.id });
     if (isNil(existing)) {

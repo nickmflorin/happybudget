@@ -26,10 +26,10 @@ import {
 } from "./actions";
 
 const selectTableData = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table.data
+  (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table
 );
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table.search
+  (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.search
 );
 const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.deleting,

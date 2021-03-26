@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import {
   createSimpleBooleanReducer,
   createModelListActionReducer,
-  createTableReducer,
+  createOldTableReducer,
   createListResponseReducer
 } from "store/factories";
 import { ActualMapping } from "model/tableMappings";
@@ -29,7 +29,7 @@ const rootReducer = combineReducers({
     },
     { referenceEntity: "budget item tree node" }
   ),
-  table: createTableReducer<Table.ActualRow, IActual, Http.IActualPayload>(
+  table: createOldTableReducer<Table.ActualRow, IActual, Http.IActualPayload>(
     {
       AddPlaceholders: ActionType.ActualsTable.AddPlaceholders,
       RemoveRow: ActionType.ActualsTable.RemoveRow,

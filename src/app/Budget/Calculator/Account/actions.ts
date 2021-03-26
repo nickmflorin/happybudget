@@ -6,7 +6,6 @@ export const ActionType = {
     Loading: "calculator.account.Loading",
     Response: "calculator.account.Response",
     Request: "calculator.account.Request",
-    Refresh: "calculator.account.Refresh",
     UpdateInState: "calculator.account.UpdateInState"
   },
   Comments: {

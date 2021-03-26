@@ -1,11 +1,11 @@
 import { combineReducers } from "redux";
 
 import accountRootReducer from "./Account/reducer";
-import accountsRootReducer from "./Accounts/reducer";
+import budgetRootReducer from "./Budget/reducer";
 import subAccountRootReducer from "./SubAccount/reducer";
 
 const rootReducer = combineReducers({
-  accounts: accountsRootReducer,
+  budget: budgetRootReducer,
   account: accountRootReducer,
   subaccount: subAccountRootReducer
 });

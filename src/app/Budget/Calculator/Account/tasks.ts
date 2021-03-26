@@ -179,6 +179,8 @@ export function* handleAccountChangedTask(action: Redux.IAction<number>): SagaIt
   yield all([put(requestAccountAction()), put(requestSubAccountsAction())]);
 }
 
+// TODO: We need to also update the estimated, variance and actual values of the parent
+// account when a sub account is removed!
 export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(action.payload) && !isNil(accountId)) {
@@ -216,9 +218,8 @@ export function* updateSubAccountPostRequestTask(
   subaccount: ISubAccount
 ): SagaIterator {
   // Dispatching this action will trigger the subaccount to update in both the  Redux state for the
-  // table and the list response data.
-  // Since we are using a deep check lodash.isEqual in the selectors, this will only trigger a rerender
-  // if the subaccount has data that differs from that of the current data.
+  // table and the list response data.  Since we are using a deep check lodash.isEqual in the selectors,
+  // this will only trigger a rerender if the subaccount has data that differs from that of the current data.
   yield put(updateSubAccountInStateAction({ id: subaccount.id, data: subaccount }));
 
   // Determine if the parent account needs to be refreshed due to updates to the underlying account
@@ -228,16 +229,23 @@ export function* updateSubAccountPostRequestTask(
     const subaccounts: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
-    const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
-    let accountPayload: Partial<IAccount> = { estimated };
-    if (!isNil(account.actual)) {
-      accountPayload = { ...accountPayload, variance: estimated - account.actual };
-    }
-    yield put(updateAccountInStateAction(accountPayload));
-    // Should we remove the group from the table if the response does not have
-    // a group?  Probably - but this will not happen in practice (at least not now).
-    if (!isNil(subaccount.group)) {
-      yield put(updateGroupInTableAction({ groupId: subaccount.group.id, group: subaccount.group }));
+    // Right now, the backend is configured such that the Actual value for the overall Account is
+    // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
+    // in the backend, we need to also make that adjustment here.
+    if (subaccounts.length !== 0) {
+      const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
+      const actual = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0);
+      let accountPayload: Partial<IAccount> = { estimated, actual };
+      if (!isNil(account.actual)) {
+        accountPayload = { ...accountPayload, variance: estimated - actual };
+      }
+      yield put(updateAccountInStateAction(accountPayload));
+      // We should probably remove the group from the table if the response SubAccount does not have
+      // a group - however, that will not happen in practice, because this task just handles the case
+      // where the SubAccount is updated (not removed or added to a group).
+      if (!isNil(subaccount.group)) {
+        yield put(updateGroupInTableAction({ groupId: subaccount.group.id, group: subaccount.group }));
+      }
     }
   }
 }

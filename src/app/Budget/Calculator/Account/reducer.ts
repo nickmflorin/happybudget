@@ -6,7 +6,7 @@ import {
   createSimplePayloadReducer,
   createCommentsListResponseReducer,
   createListResponseReducer,
-  createSimpleTableReducer
+  createTableReducer
 } from "store/factories";
 import { SubAccountMapping } from "model/tableMappings";
 import { ActionType } from "./actions";
@@ -62,7 +62,7 @@ const rootReducer = combineReducers({
           { referenceEntity: "event" }
         ),
         creating: createSimpleBooleanReducer(ActionType.SubAccounts.Creating),
-        table: createSimpleTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload>(
+        table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload>(
           {
             AddPlaceholders: ActionType.SubAccounts.AddPlaceholders,
             RemoveRow: ActionType.SubAccounts.RemoveRow,

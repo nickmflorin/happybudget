@@ -1,11 +1,11 @@
 import initialAccountState from "./Account/initialState";
-import initialAccountsState from "./Accounts/initialState";
+import initialBudgetState from "./Budget/initialState";
 import initialSubAccountState from "./SubAccount/initialState";
 
 const initialState: Redux.Calculator.IStore = {
   subaccount: initialSubAccountState,
   account: initialAccountState,
-  accounts: initialAccountsState
+  budget: initialBudgetState
 };
 
 export default initialState;

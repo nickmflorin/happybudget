@@ -30,44 +30,61 @@ const rootReducer = combineReducers({
     Editing: ActionType.Comments.Editing,
     Replying: ActionType.Comments.Replying
   }),
-  subaccounts: combineReducers({
-    deleting: createModelListActionReducer(ActionType.SubAccounts.Deleting, {
-      referenceEntity: "subaccount"
-    }),
-    updating: createModelListActionReducer(ActionType.SubAccounts.Updating, {
-      referenceEntity: "subaccount"
-    }),
-    creating: createSimpleBooleanReducer(ActionType.SubAccounts.Creating),
-    history: createListResponseReducer<HistoryEvent>(
-      {
-        Response: ActionType.SubAccounts.History.Response,
-        Request: ActionType.SubAccounts.History.Request,
-        Loading: ActionType.SubAccounts.History.Loading
-      },
-      { referenceEntity: "event" }
-    ),
-    table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload>(
-      {
-        AddPlaceholders: ActionType.SubAccounts.AddPlaceholders,
-        RemoveRow: ActionType.SubAccounts.RemoveRow,
-        UpdateRow: ActionType.SubAccounts.UpdateRow,
-        ActivatePlaceholder: ActionType.SubAccounts.ActivatePlaceholder,
-        SelectRow: ActionType.SubAccounts.SelectRow,
-        DeselectRow: ActionType.SubAccounts.DeselectRow,
-        SelectAllRows: ActionType.SubAccounts.SelectAllRows,
-        Response: ActionType.SubAccounts.Response,
-        Request: ActionType.SubAccounts.Request,
-        Loading: ActionType.SubAccounts.Loading,
-        SetSearch: ActionType.SubAccounts.SetSearch,
-        AddErrors: ActionType.SubAccounts.AddErrors,
-        AddGroup: ActionType.SubAccounts.Groups.AddToTable,
-        RemoveGroup: ActionType.SubAccounts.Groups.RemoveFromTable,
-        UpdateGroup: ActionType.SubAccounts.Groups.UpdateInTable
-      },
-      SubAccountMapping,
-      { referenceEntity: "subaccount" }
-    )
-  })
+  subaccounts: createListResponseReducer<ISubAccount>(
+    {
+      Response: ActionType.SubAccounts.Response,
+      Request: ActionType.SubAccounts.Request,
+      Loading: ActionType.SubAccounts.Loading,
+      SetSearch: ActionType.SubAccounts.SetSearch,
+      UpdateInState: ActionType.SubAccounts.UpdateInState
+    },
+    {
+      referenceEntity: "subaccount",
+      keyReducers: {
+        groups: combineReducers({
+          deleting: createModelListActionReducer(ActionType.SubAccounts.Groups.Deleting, {
+            referenceEntity: "group"
+          })
+        }),
+        deleting: createModelListActionReducer(ActionType.SubAccounts.Deleting, {
+          referenceEntity: "subaccount"
+        }),
+        updating: createModelListActionReducer(ActionType.SubAccounts.Updating, {
+          referenceEntity: "subaccount"
+        }),
+        history: createListResponseReducer<HistoryEvent>(
+          {
+            Response: ActionType.SubAccounts.History.Response,
+            Request: ActionType.SubAccounts.History.Request,
+            Loading: ActionType.SubAccounts.History.Loading
+          },
+          { referenceEntity: "event" }
+        ),
+        creating: createSimpleBooleanReducer(ActionType.SubAccounts.Creating),
+        table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload>(
+          {
+            AddPlaceholders: ActionType.SubAccounts.AddPlaceholders,
+            RemoveRow: ActionType.SubAccounts.RemoveRow,
+            UpdateRow: ActionType.SubAccounts.UpdateRow,
+            ActivatePlaceholder: ActionType.SubAccounts.ActivatePlaceholder,
+            SelectRow: ActionType.SubAccounts.SelectRow,
+            DeselectRow: ActionType.SubAccounts.DeselectRow,
+            SelectAllRows: ActionType.SubAccounts.SelectAllRows,
+            SetData: ActionType.SubAccounts.Response,
+            ClearData: ActionType.SubAccounts.Request,
+            Loading: ActionType.SubAccounts.Loading,
+            AddErrors: ActionType.SubAccounts.AddErrors,
+            UpdateInState: ActionType.SubAccounts.UpdateInState,
+            AddGroup: ActionType.SubAccounts.Groups.AddToTable,
+            RemoveGroup: ActionType.SubAccounts.Groups.RemoveFromTable,
+            UpdateGroup: ActionType.SubAccounts.Groups.UpdateInTable
+          },
+          SubAccountMapping,
+          { referenceEntity: "subaccount" }
+        )
+      }
+    }
+  )
 });
 
 export default rootReducer;

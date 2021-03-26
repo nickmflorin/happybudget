@@ -5,7 +5,8 @@ export const ActionType = {
     SetId: "calculator.subaccount.SetId",
     Loading: "calculator.subaccount.Loading",
     Response: "calculator.subaccount.Response",
-    Request: "calculator.subaccount.Request"
+    Request: "calculator.subaccount.Request",
+    UpdateInState: "calculator.account.UpdateInState"
   },
   Comments: {
     Loading: "calculator.subaccount.comments.Loading",
@@ -40,6 +41,7 @@ export const ActionType = {
     Response: "calculator.subaccount.subaccounts.Response",
     Request: "calculator.subaccount.subaccounts.Request",
     AddErrors: "calculator.subaccount.subaccounts.AddErrors",
+    UpdateInState: "calculator.subaccount.subaccounts.UpdateInState",
     Groups: {
       Delete: "calculator.subaccount.subaccounts.groups.Delete",
       Deleting: "calculator.subaccount.subaccounts.groups.Deleting",
@@ -59,6 +61,7 @@ export const setSubAccountIdAction = simpleAction<number>(ActionType.SubAccount.
 export const requestSubAccountAction = simpleAction<null>(ActionType.SubAccount.Request);
 export const loadingSubAccountAction = simpleAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = simpleAction<ISubAccount>(ActionType.SubAccount.Response);
+export const updateParentSubAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.SubAccount.UpdateInState);
 
 /*
   Actions Pertaining to Sub Account Comments
@@ -109,6 +112,11 @@ export const setSubAccountsSearchAction = simpleAction<string>(ActionType.SubAcc
 export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.SubAccounts.AddErrors
 );
+
+export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<ISubAccount>>(
+  ActionType.SubAccounts.UpdateInState
+);
+
 export const addGroupToStateAction = simpleAction<ISubAccountGroup>(ActionType.SubAccounts.Groups.AddToState);
 export const addGroupToTableAction = simpleAction<{ group: ISubAccountNestedGroup; ids: number[] }>(
   ActionType.SubAccounts.Groups.AddToTable

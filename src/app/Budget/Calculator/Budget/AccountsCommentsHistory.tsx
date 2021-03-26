@@ -12,28 +12,28 @@ import {
 } from "./actions";
 
 const selectDeletingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.comments.deleting
+  (state: Redux.IApplicationStore) => state.calculator.budget.comments.deleting
 );
 const selectEditingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.comments.editing
+  (state: Redux.IApplicationStore) => state.calculator.budget.comments.editing
 );
 const selectReplyingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.comments.editing
+  (state: Redux.IApplicationStore) => state.calculator.budget.comments.editing
 );
 const selectCommentsData = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.comments.data
+  (state: Redux.IApplicationStore) => state.calculator.budget.comments.data
 );
 const selectSubmittingComment = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.comments.submitting
+  (state: Redux.IApplicationStore) => state.calculator.budget.comments.submitting
 );
 const selectLoadingComments = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.comments.loading
+  (state: Redux.IApplicationStore) => state.calculator.budget.comments.loading
 );
 const selectLoadingHistory = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.history.loading
+  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.history.loading
 );
 const selectHistory = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.accounts.history.data
+  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.history.data
 );
 
 const AccountCommentsHistory = (): JSX.Element => {
