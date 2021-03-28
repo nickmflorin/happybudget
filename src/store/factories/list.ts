@@ -1,5 +1,5 @@
 import { Reducer } from "redux";
-import { isNil, forEach, find, filter, includes } from "lodash";
+import { isNil, forEach, find, filter, includes, map } from "lodash";
 import { replaceInArray } from "util/arrays";
 import { mergeWithDefaults } from "util/objects";
 import { initialListResponseState } from "store/initialState";
@@ -108,18 +108,51 @@ export const createListResponseReducer = <
       const { id: _, ...withoutId } = payload;
       return { data: replaceInArray<M>(st.data, { id: payload.id }, { ...existing, ...withoutId }) };
     },
-    Select: (payload: number[], st: S) => {
+    Deselect: (payload: number, st: S) => {
+      const element = find(st.data, { id: payload });
+      if (!isNil(element)) {
+        if (!includes(st.selected, payload)) {
+          /* eslint-disable no-console */
+          console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
+          return {};
+        }
+        return { selected: filter(st.selected, (id: number) => id !== payload) };
+      } else {
+        /* eslint-disable no-console */
+        console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
+        return {};
+      }
+    },
+    SelectAll: (payload: undefined | null, st: S) => {
+      if (st.selected.length === st.data.length) {
+        return { selected: [] };
+      } else {
+        return { selected: map(st.data, (model: M) => model.id) };
+      }
+    },
+    Select: (payload: number[] | number, st: S) => {
       const selected: number[] = [];
-      forEach(payload, (id: number) => {
-        const element = find(st.data, { id });
+      if (Array.isArray(payload)) {
+        forEach(payload, (id: number) => {
+          const element = find(st.data, { id });
+          if (!isNil(element)) {
+            selected.push(id);
+          } else {
+            /* eslint-disable no-console */
+            console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${id} not in state!`);
+          }
+        });
+        return { selected };
+      } else {
+        const element = find(st.data, { id: payload });
         if (!isNil(element)) {
-          selected.push(id);
+          return { selected: [...st.selected, payload] };
         } else {
           /* eslint-disable no-console */
-          console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${id} not in state!`);
+          console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
+          return {};
         }
-      });
-      return { selected };
+      }
     }
   };
 

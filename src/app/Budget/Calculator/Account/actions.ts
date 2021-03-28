@@ -32,6 +32,8 @@ export const ActionType = {
     SetSearch: "calculator.account.subaccounts.SetSearch",
     Loading: "calculator.account.subaccounts.Loading",
     Select: "calculator.account.subaccounts.Select",
+    Deselect: "calculator.account.subaccounts.Deselect",
+    SelectAll: "calculator.account.subaccounts.SelectAll",
     Response: "calculator.account.subaccounts.Response",
     Request: "calculator.account.subaccounts.Request",
     UpdateInState: "calculator.account.subaccounts.UpdateInState",
@@ -43,9 +45,7 @@ export const ActionType = {
     RemovePlaceholder: "calculator.account.subaccounts.RemovePlaceholder",
     Table: {
       AddErrors: "calculator.account.subaccounts.table.AddErrors",
-      UpdateRow: "calculator.account.subaccounts.table.UpdateRow",
-      SelectAllRows: "calculator.account.subaccounts.table.SelectAllRows",
-      DeselectRow: "calculator.account.subaccounts.table.DeselectRow"
+      UpdateRow: "calculator.account.subaccounts.table.UpdateRow"
     },
     Groups: {
       Delete: "calculator.account.subaccounts.groups.Delete",
@@ -110,6 +110,8 @@ export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderP
 export const removePlaceholderAction = simpleAction<number>(ActionType.SubAccounts.RemovePlaceholder);
 export const addPlaceholdersAction = simpleAction<number>(ActionType.SubAccounts.AddPlaceholders);
 export const selectSubAccountAction = simpleAction<number>(ActionType.SubAccounts.Select);
+export const deselectSubAccountAction = simpleAction<number>(ActionType.SubAccounts.Deselect);
+export const selectAllSubAccountsAction = simpleAction<null>(ActionType.SubAccounts.SelectAll);
 
 export const addSubAccountToStateAction = simpleAction<ISubAccount>(ActionType.SubAccounts.AddToState);
 export const updateSubAccountInStateAction = simpleAction<ISubAccount>(ActionType.SubAccounts.UpdateInState);
@@ -118,8 +120,6 @@ export const removeSubAccountFromStateAction = simpleAction<number>(ActionType.S
 /*
   Actions Pertaining to Account Sub Accounts Table
 */
-export const deselectSubAccountAction = simpleAction<number>(ActionType.SubAccounts.Table.DeselectRow);
-export const selectAllSubAccountsAction = simpleAction<null>(ActionType.SubAccounts.Table.SelectAllRows);
 export const updateTableRowAction = simpleAction<{
   id: number;
   data: Partial<Table.SubAccountRow>;

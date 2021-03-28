@@ -535,7 +535,7 @@ const BudgetTable = <
       const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
       if (!isNil(group)) {
         const footer: R = createGroupFooter(group);
-        newTable.push(...map(models, (m: M) => mapping.modelToRow(m)), {
+        newTable.push(...map(models, (m: M) => mapping.modelToRow(m, { selected: includes(selected, m.id) })), {
           ...footer,
           group,
           [identifierField]: group.name,
@@ -543,8 +543,12 @@ const BudgetTable = <
         });
       }
     });
-    setTable([...newTable, ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m)), ...placeholders]);
-  }, [useDeepEqualMemo(data), useDeepEqualMemo(placeholders)]);
+    setTable([
+      ...newTable,
+      ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, { selected: includes(selected, m.id) })),
+      ...placeholders
+    ]);
+  }, [useDeepEqualMemo(data), useDeepEqualMemo(placeholders), useDeepEqualMemo(selected)]);
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {

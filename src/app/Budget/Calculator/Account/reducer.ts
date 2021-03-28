@@ -41,7 +41,9 @@ const rootReducer = combineReducers({
       UpdateInState: ActionType.SubAccounts.UpdateInState,
       RemoveFromState: ActionType.SubAccounts.RemoveFromState,
       AddToState: ActionType.SubAccounts.AddToState,
-      Select: ActionType.SubAccounts.Select
+      Select: ActionType.SubAccounts.Select,
+      Deselect: ActionType.SubAccounts.Deselect,
+      SelectAll: ActionType.SubAccounts.SelectAll
     },
     {
       referenceEntity: "subaccount",
@@ -77,18 +79,11 @@ const rootReducer = combineReducers({
         creating: createSimpleBooleanReducer(ActionType.SubAccounts.Creating),
         table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload, ISimpleSubAccount>(
           {
-            // AddPlaceholders: ActionType.SubAccounts.Table.AddPlaceholders,
-            // RemoveRow: ActionType.SubAccounts.Table.RemoveRow,
             UpdateRow: ActionType.SubAccounts.Table.UpdateRow,
-            // SelectRow: ActionType.SubAccounts.Table.SelectRow,
-            DeselectRow: ActionType.SubAccounts.Table.DeselectRow,
-            SelectAllRows: ActionType.SubAccounts.Table.SelectAllRows,
             SetData: ActionType.SubAccounts.Response,
             ClearData: ActionType.SubAccounts.Request,
             Loading: ActionType.SubAccounts.Loading,
             AddErrors: ActionType.SubAccounts.Table.AddErrors,
-            // AddToState: ActionType.SubAccounts.AddToState,
-            // UpdateInState: ActionType.SubAccounts.UpdateInState,
             AddGroup: ActionType.SubAccounts.Groups.AddToTable,
             RemoveGroup: ActionType.SubAccounts.Groups.RemoveFromTable,
             UpdateGroup: ActionType.SubAccounts.Groups.UpdateInTable

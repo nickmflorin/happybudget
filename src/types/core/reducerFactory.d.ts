@@ -73,6 +73,8 @@ namespace ReducerFactory {
     RemoveFromState: string;
     UpdateInState: string;
     Select: string;
+    SelectAll: string;
+    Deselect: string;
     Request: string;
   };
 
