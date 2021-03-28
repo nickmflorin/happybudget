@@ -69,7 +69,7 @@ export const getAccountGroups = async (
 
 export const createAccountGroup = async (
   id: number,
-  payload: Http.IAccountGroupPayload,
+  payload: Http.IGroupPayload,
   options: Http.IRequestOptions = {}
 ): Promise<IGroup<ISimpleAccount>> => {
   const url = URL.v1("budgets", id, "groups");
@@ -78,7 +78,7 @@ export const createAccountGroup = async (
 
 export const updateAccountGroup = async (
   id: number,
-  payload: Partial<Http.IAccountGroupPayload>,
+  payload: Partial<Http.IGroupPayload>,
   options: Http.IRequestOptions = {}
 ): Promise<IGroup<ISimpleAccount>> => {
   const url = URL.v1("accounts", "groups", id);
@@ -87,7 +87,7 @@ export const updateAccountGroup = async (
 
 export const createAccountSubAccountGroup = async (
   accountId: number,
-  payload: Http.ISubAccountGroupPayload,
+  payload: Http.IGroupPayload,
   options: Http.IRequestOptions = {}
 ): Promise<IGroup<ISimpleSubAccount>> => {
   const url = URL.v1("accounts", accountId, "groups");

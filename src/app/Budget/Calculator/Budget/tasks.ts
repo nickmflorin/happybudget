@@ -13,7 +13,8 @@ import {
   deleteComment,
   updateComment,
   replyToComment,
-  getAccountsHistory
+  getAccountsHistory,
+  deleteAccountGroup
 } from "services";
 import { handleTableErrors } from "store/tasks";
 import { userToSimpleUser } from "model/mappings";
@@ -25,11 +26,6 @@ import {
   deletingAccountAction,
   creatingAccountAction,
   updatingAccountAction,
-  updateTableRowAction,
-  activatePlaceholderAction,
-  removeTableRowAction,
-  addErrorsToTableAction,
-  addPlaceholdersAction,
   loadingCommentsAction,
   responseCommentsAction,
   submittingCommentAction,
@@ -41,8 +37,53 @@ import {
   replyingToCommentAction,
   loadingAccountsHistoryAction,
   responseAccountsHistoryAction,
-  addAccountsHistoryToStateAction
+  addAccountsHistoryToStateAction,
+  deletingGroupAction,
+  removeGroupFromStateAction,
+  updateGroupInStateAction,
+  updateAccountInStateAction,
+  removeAccountFromStateAction,
+  addAccountToStateAction,
+  removePlaceholderFromStateAction,
+  addPlaceholdersToStateAction,
+  updatePlaceholderInStateAction,
+  addErrorsToStateAction,
+  activatePlaceholderAction
 } from "./actions";
+
+export function* removeAccountFromGroupTask(action: Redux.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(updatingAccountAction({ id: action.payload, value: true }));
+    try {
+      const account: IAccount = yield call(updateAccount, action.payload, { group: null });
+      yield put(updateAccountInStateAction(account));
+    } catch (e) {
+      yield call(
+        handleTableErrors,
+        e,
+        "There was an error removing the account from the group.",
+        action.payload,
+        (errors: Table.CellError[]) => addErrorsToStateAction(errors)
+      );
+    } finally {
+      yield put(updatingAccountAction({ id: action.payload, value: false }));
+    }
+  }
+}
+
+export function* deleteAccountGroupTask(action: Redux.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(deletingGroupAction({ id: action.payload, value: true }));
+    try {
+      yield call(deleteAccountGroup, action.payload);
+      yield put(removeGroupFromStateAction(action.payload));
+    } catch (e) {
+      handleRequestError(e, "There was an error deleting the account group.");
+    } finally {
+      yield put(deletingGroupAction({ id: action.payload, value: false }));
+    }
+  }
+}
 
 export function* getHistoryTask(action: Redux.IAction<null>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
@@ -56,6 +97,40 @@ export function* getHistoryTask(action: Redux.IAction<null>): SagaIterator {
     } finally {
       yield put(loadingAccountsHistoryAction(false));
     }
+  }
+}
+
+export function* addToHistoryState(
+  account: IAccount,
+  eventType: HistoryEventType,
+  data?: { field: string; newValue: string | number; oldValue: string | number | null }
+): SagaIterator {
+  const user = yield select((state: Redux.IApplicationStore) => state.user);
+  const polymorphicEvent: PolymorphicEvent = {
+    id: generateRandomNumericId(),
+    created_at: nowAsString(),
+    type: eventType,
+    user: userToSimpleUser(user),
+    content_object: {
+      id: account.id,
+      identifier: account.identifier,
+      description: account.description,
+      type: "account"
+    }
+  };
+  if (eventType === "field_alteration") {
+    if (!isNil(data)) {
+      yield put(
+        addAccountsHistoryToStateAction({
+          ...polymorphicEvent,
+          new_value: data.newValue,
+          old_value: data.oldValue,
+          field: data.field
+        })
+      );
+    }
+  } else {
+    yield put(addAccountsHistoryToStateAction(polymorphicEvent as CreateEvent));
   }
 }
 
@@ -138,168 +213,152 @@ export function* getCommentsTask(action: Redux.IAction<any>): SagaIterator {
   }
 }
 
+// TODO: We need to also update the estimated, variance and actual values of the parent
+// budget when an account is removed!
 export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    const tableData: Table.AccountRow[] = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.budget.accounts.table
-    );
-    const existing: Table.AccountRow | undefined = find(tableData, { id: action.payload });
-    if (isNil(existing)) {
-      /* eslint-disable no-console */
-      console.warn(
-        `Inconsistent State!  Inconsistent state noticed when removing an account...
-        The account with ID ${action.payload} does not exist in state when it is expected to.`
+    const models: IAccount[] = yield select((state: Redux.IApplicationStore) => state.calculator.budget.accounts.data);
+    const model: IAccount | undefined = find(models, { id: action.payload });
+    if (isNil(model)) {
+      const placeholders = yield select(
+        (state: Redux.IApplicationStore) => state.calculator.budget.accounts.placeholders
       );
+      const placeholder: Table.AccountRow | undefined = find(placeholders, { id: action.payload });
+      if (isNil(placeholder)) {
+        /* eslint-disable no-console */
+        console.warn(
+          `Inconsistent State!  Inconsistent state noticed when removing account...
+          The account with ID ${action.payload} does not exist in state when it is expected to.`
+        );
+      } else {
+        yield put(removePlaceholderFromStateAction(placeholder.id));
+      }
     } else {
-      // Dispatch the action to remove the row from the table in the UI.
-      yield put(removeTableRowAction(action.payload));
-      // Only make an API request to the server to delete the sub account if the
-      // row was not a placeholder (i.e. the sub account exists in the backend).
-      if (existing.meta.isPlaceholder === false) {
-        yield put(deletingAccountAction({ id: action.payload, value: true }));
-        try {
-          yield call(deleteAccount, action.payload);
-        } catch (e) {
-          // TODO: Should we put the row back in if there was an error?
-          handleRequestError(e, "There was an error deleting the account.");
-        } finally {
-          yield put(deletingAccountAction({ id: action.payload, value: false }));
-        }
+      yield put(removeAccountFromStateAction(model.id));
+      yield put(deletingAccountAction({ id: model.id, value: true }));
+      try {
+        yield call(deleteAccount, model.id);
+      } catch (e) {
+        handleRequestError(e, "There was an error deleting the account.");
+      } finally {
+        yield put(deletingAccountAction({ id: model.id, value: false }));
       }
     }
   }
 }
 
-export function* addToHistoryState(
-  account: IAccount,
-  eventType: HistoryEventType,
-  data?: { field: string; newValue: string | number; oldValue: string | number | null }
+// TODO: We need to update the calculated values on the budget when the account is updated!
+export function* handleAccountUpdatedInStateTask(action: Redux.IAction<IAccount>): SagaIterator {
+  if (!isNil(action.payload)) {
+    const account = action.payload;
+    const budget: IBudget | undefined = yield select(
+      (state: Redux.IApplicationStore) => state.budget.budget.detail.data
+    );
+    // We should probably remove the group from the table if the response Account does not have
+    // a group - however, that will not happen in practice, because this task just handles the case
+    // where the Account is updated (not removed or added to a group).
+    if (!isNil(account.group)) {
+      yield put(updateGroupInStateAction(account.group));
+    }
+  }
+}
+
+// TODO: We need to update the calculated values on the budget when the account is updated!
+export function* handleAccountPlaceholderActivatedTask(
+  action: Redux.IAction<Table.ActivatePlaceholderPayload<IAccount>>
 ): SagaIterator {
-  const user = yield select((state: Redux.IApplicationStore) => state.user);
-  const polymorphicEvent: PolymorphicEvent = {
-    id: generateRandomNumericId(),
-    created_at: nowAsString(),
-    type: eventType,
-    user: userToSimpleUser(user),
-    content_object: {
-      id: account.id,
-      identifier: account.identifier,
-      description: account.description,
-      type: "account"
+  if (!isNil(action.payload)) {
+    const account = action.payload.model;
+
+    // Now that the placeholder is activated, we need to remove the placeholder from state and
+    // insert in the actual Account model into the state.
+    yield put(removePlaceholderFromStateAction(account.id));
+    yield put(addAccountToStateAction(account));
+
+    // We should probably remove the group from the table if the response Account does not have
+    // a group - however, that will not happen in practice, because this task just handles the case
+    // where the Account is updated (not removed or added to a group).
+    if (!isNil(account.group)) {
+      yield put(updateGroupInStateAction(account.group));
     }
-  };
-  if (eventType === "field_alteration") {
-    if (!isNil(data)) {
-      yield put(
-        addAccountsHistoryToStateAction({
-          ...polymorphicEvent,
-          new_value: data.newValue,
-          old_value: data.oldValue,
-          field: data.field
-        })
-      );
-    }
-  } else {
-    yield put(addAccountsHistoryToStateAction(polymorphicEvent as CreateEvent));
   }
 }
 
 export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
-  if (!isNil(action.payload) && !isNil(action.payload.id)) {
-    const table = yield select((state: Redux.IApplicationStore) => state.calculator.budget.accounts.table);
-
-    const existing: Table.AccountRow = find(table, { id: action.payload.id });
-    if (isNil(existing)) {
-      /* eslint-disable no-console */
-      console.error(
-        `Inconsistent State!:  Inconsistent state noticed when updating account in state...
-        the account with ID ${action.payload.id} does not exist in state when it is expected to.`
+  if (!isNil(budgetId) && !isNil(action.payload)) {
+    const id = action.payload.id;
+    const data = yield select((state: Redux.IApplicationStore) => state.calculator.budget.accounts.data);
+    const model: IAccount | undefined = find(data, { id });
+    if (isNil(model)) {
+      const placeholders = yield select(
+        (state: Redux.IApplicationStore) => state.calculator.budget.accounts.placeholders
       );
-    } else {
-      // There are some cases where we need to update the row in the table before
-      // we make the request, to improve the UI.  This happens for cells where the
-      // value is rendered via an HTML element (i.e. the Unit Cell).  AGGridReact will
-      // not automatically update the cell when the Unit is changed via the dropdown,
-      // so we need to udpate the row in the data used to populate the table.  We could
-      // do this by updating with a payload generated from the response, but it is quicker
-      // to do it before hand.
-      const preResponsePayload = AccountMapping.preRequestPayload(action.payload);
-      if (Object.keys(preResponsePayload).length !== 0) {
-        yield put(
-          updateTableRowAction({
-            id: existing.id,
-            data: preResponsePayload
-          })
+      const placeholder: Table.AccountRow | undefined = find(placeholders, { id });
+      if (isNil(placeholder)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when updating account in state...
+          the account with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
-      }
-      if (existing.meta.isPlaceholder === true) {
-        // TODO: Should we be using the payload data here?  Instead of the existing row?
-        // Or we should probably merge them, right?
-        const requestPayload = AccountMapping.postPayload(existing);
+      } else {
+        // There are some cases where we need to update the row in the table before we make the request,
+        // to improve the UI.  This happens for cells where the value is rendered via an HTML element
+        // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
+        // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
+        // We could do this by updating with a payload generated from the response, but it is quicker
+        // to do it before hand.
+        const preResponsePayload = AccountMapping.preRequestPayload(action.payload);
+        yield put(updatePlaceholderInStateAction({ ...placeholder, ...preResponsePayload }));
+
+        const requestPayload = AccountMapping.postPayload(placeholder);
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (AccountMapping.rowHasRequiredFields(existing)) {
+        if (AccountMapping.rowHasRequiredFields(placeholder)) {
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, budgetId, requestPayload as Http.IAccountPayload);
-            yield put(activatePlaceholderAction({ id: existing.id, model: response }));
-
-            // I don't think we have to worry about this anymore because the activation
-            // takes care of that?
-            // const responsePayload = AccountMapping.modelToRow(response);
-            // yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
-
-            // Add an element to the history indicating that the account was created.
-            // This is faster than refreshing the history from the API and is not problematic
-            // because there are no write operations regarding history (i.e. making dummy IDs
-            // is OK).
-            yield call(addToHistoryState, response, "create");
+            yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
           } catch (e) {
             yield call(
               handleTableErrors,
               e,
               "There was an error updating the account.",
-              existing.id,
-              (errors: Table.CellError[]) => addErrorsToTableAction(errors)
+              placeholder.id,
+              (errors: Table.CellError[]) => addErrorsToStateAction(errors)
             );
           } finally {
             yield put(creatingAccountAction(false));
           }
         }
-      } else {
-        yield put(updatingAccountAction({ id: existing.id as number, value: true }));
-        const requestPayload = AccountMapping.patchPayload(action.payload);
-        try {
-          const response: IAccount = yield call(updateAccount, existing.id as number, requestPayload);
-          const responsePayload = AccountMapping.modelToRow(response);
-          yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
+      }
+    } else {
+      // There are some cases where we need to update the row in the table before we make the request,
+      // to improve the UI.  This happens for cells where the value is rendered via an HTML element
+      // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
+      // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
+      // We could do this by updating with a payload generated from the response, but it is quicker
+      // to do it before hand.
+      const preResponsePayload = AccountMapping.preRequestModelPayload(action.payload);
+      yield put(updateAccountInStateAction({ ...model, ...preResponsePayload }));
 
-          // Add elements to the history indicating that the account was updated.
-          // This is faster than refreshing the history from the API and is not problematic
-          // because there are no write operations regarding history (i.e. making dummy IDs
-          // is OK).
-          const fields = Object.keys(action.payload.data);
-          for (let i = 0; i < fields.length; i++) {
-            yield call(addToHistoryState, response, "field_alteration", {
-              field: fields[i],
-              oldValue: action.payload.data[fields[i]].oldValue,
-              newValue: action.payload.data[fields[i]].newValue
-            });
-          }
-        } catch (e) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error updating the account.",
-            existing.id,
-            (errors: Table.CellError[]) => addErrorsToTableAction(errors)
-          );
-        } finally {
-          yield put(updatingAccountAction({ id: existing.id as number, value: false }));
-        }
+      yield put(updatingAccountAction({ id: model.id, value: true }));
+      const requestPayload = AccountMapping.patchPayload(action.payload);
+      try {
+        const response: IAccount = yield call(updateAccount, model.id, requestPayload);
+        yield put(updateAccountInStateAction(response));
+      } catch (e) {
+        yield call(
+          handleTableErrors,
+          e,
+          "There was an error updating the sub account.",
+          model.id,
+          (errors: Table.CellError[]) => addErrorsToStateAction(errors)
+        );
+      } finally {
+        yield put(updatingAccountAction({ id: model.id, value: false }));
       }
     }
   }
@@ -313,7 +372,7 @@ export function* getAccountsTask(action: Redux.IAction<null>): SagaIterator {
       const response = yield call(getAccounts, budgetId, { no_pagination: true });
       yield put(responseAccountsAction(response));
       if (response.data.length === 0) {
-        yield put(addPlaceholdersAction(2));
+        yield put(addPlaceholdersToStateAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's accounts.");

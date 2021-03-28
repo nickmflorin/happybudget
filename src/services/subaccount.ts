@@ -40,7 +40,7 @@ export const updateSubAccount = async (
 
 export const createSubAccountSubAccountGroup = async (
   subaccountId: number,
-  payload: Http.ISubAccountGroupPayload,
+  payload: Http.IGroupPayload,
   options: Http.IRequestOptions = {}
 ): Promise<IGroup<ISimpleSubAccount>> => {
   const url = URL.v1("subaccounts", subaccountId, "groups");
@@ -57,7 +57,7 @@ export const getSubAccountSubAccountGroups = async (
 
 export const updateSubAccountGroup = async (
   id: number,
-  payload: Partial<Http.ISubAccountGroupPayload>,
+  payload: Partial<Http.IGroupPayload>,
   options: Http.IRequestOptions = {}
 ): Promise<IGroup<ISimpleSubAccount>> => {
   const url = URL.v1("subaccounts", "groups", id);

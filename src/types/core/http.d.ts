@@ -75,16 +75,17 @@ namespace Http {
     readonly name: string;
   }
 
+  interface IGroupPayload extends IPayload {
+    readonly name: string;
+    readonly children?: number[];
+    readonly color: string;
+  }
+
   interface IAccountPayload extends IPayload {
     readonly account_number: string;
     readonly description?: string;
     readonly access?: number[];
-  }
-
-  interface IAccountGroupPayload extends IPayload {
-    readonly name: string;
-    readonly children?: number[];
-    readonly color: string;
+    readonly group?: number | null;
   }
 
   interface ISubAccountPayload extends IPayload {
@@ -96,12 +97,6 @@ namespace Http {
     readonly multiplier?: number;
     readonly unit?: Unit;
     readonly group?: number | null;
-  }
-
-  interface ISubAccountGroupPayload extends IPayload {
-    readonly name: string;
-    readonly children?: number[];
-    readonly color: string;
   }
 
   interface IActualPayload extends IPayload {

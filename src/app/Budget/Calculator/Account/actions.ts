@@ -140,8 +140,8 @@ export const deleteGroupAction = simpleAction<number>(ActionType.SubAccounts.Gro
 /*
   Actions Pertaining to Account Sub Accounts History
 */
-export const requestSubAccountsHistoryAction = simpleAction<null>(ActionType.SubAccounts.History.Request);
-export const loadingSubAccountsHistoryAction = simpleAction<boolean>(ActionType.SubAccounts.History.Loading);
-export const responseSubAccountsHistoryAction = simpleAction<Http.IListResponse<HistoryEvent>>(
+export const requestHistoryAction = simpleAction<null>(ActionType.SubAccounts.History.Request);
+export const loadingHistoryAction = simpleAction<boolean>(ActionType.SubAccounts.History.Loading);
+export const responseHistoryAction = simpleAction<Http.IListResponse<HistoryEvent>>(
   ActionType.SubAccounts.History.Response
 );

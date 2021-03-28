@@ -12,7 +12,7 @@ import {
   submitCommentTask,
   deleteCommentTask,
   editAccountCommentTask,
-  getSubAccountsHistoryTask,
+  getHistoryTask,
   deleteSubAccountGroupTask,
   removeSubAccountFromGroupTask,
   handleSubAccountPlaceholderActivatedTask,
@@ -90,14 +90,14 @@ function* watchForEditCommentSaga(): SagaIterator {
   yield takeEvery(ActionType.Comments.Edit, editAccountCommentTask);
 }
 
-function* watchForRequestSubAccountsHistorySaga(): SagaIterator {
+function* watchForRequestHistorySaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.SubAccounts.History.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(getSubAccountsHistoryTask, action);
+    lastTasks = yield call(getHistoryTask, action);
   }
 }
 
@@ -169,7 +169,7 @@ function* watchForRemoveSubAccountFromGroupSaga(): SagaIterator {
 
 export default function* accountSaga(): SagaIterator {
   yield spawn(watchForAccountIdChangedSaga);
-  yield spawn(watchForRequestSubAccountsHistorySaga);
+  yield spawn(watchForRequestHistorySaga);
   yield spawn(watchForRequestAccountSaga);
   yield spawn(watchForRequestSubAccountsSaga);
   yield spawn(watchForRemoveSubAccountSaga);

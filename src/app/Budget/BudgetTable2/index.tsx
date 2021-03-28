@@ -534,12 +534,14 @@ const BudgetTable = <
     );
 
     const allGroups: (G | null)[] = map(modelsWithGroup, (model: M) => mapping.getGroup(model));
+
     const groups: G[] = [];
     forEach(allGroups, (group: G | null) => {
       if (!isNil(group) && isNil(find(groups, { id: group.id }))) {
         groups.push(group);
       }
     });
+
     forEach(groupedModels, (models: M[], groupId: string) => {
       const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
       if (!isNil(group)) {
@@ -601,7 +603,7 @@ const BudgetTable = <
         }
       });
     }
-  }, [table, gridApi]);
+  }, [useDeepEqualMemo(table), gridApi]);
 
   useEffect(() => {
     // Changes to the errors in the rows does not trigger a refresh of those cells
@@ -630,7 +632,7 @@ const BudgetTable = <
         }
       });
     }
-  }, [table, gridApi, columnApi]);
+  }, [useDeepEqualMemo(table), gridApi, columnApi]);
 
   useEffect(() => {
     const mapped = map(table, (row: R) => row.meta.selected);
@@ -640,7 +642,7 @@ const BudgetTable = <
     } else {
       setAllSelected(false);
     }
-  }, [table]);
+  }, [useDeepEqualMemo(table)]);
 
   useEffect(() => {
     setColDefs(

@@ -1,31 +1,6 @@
 import { simpleAction } from "store/actions";
 
 export const ActionType = {
-  Accounts: {
-    Deleting: "calculator.budget.accounts.Deleting",
-    Creating: "calculator.budget.accounts.Creating",
-    Updating: "calculator.budget.accounts.Updating",
-    Update: "calculator.budget.accounts.Update",
-    Remove: "calculator.budget.accounts.Remove",
-    AddPlaceholders: "calculator.budget.accounts.AddPlaceholders",
-    UpdateRow: "calculator.budget.accounts.UpdateRow",
-    ActivatePlaceholder: "calculator.budget.accounts.ActivatePlaceholder",
-    RemoveRow: "calculator.budget.accounts.RemoveRow",
-    SelectRow: "calculator.budget.accounts.SelectRow",
-    SelectAllRows: "calculator.budget.accounts.SelectAllRows",
-    DeselectRow: "calculator.budget.accounts.DeselectRow",
-    Loading: "calculator.budget.accounts.Loading",
-    SetSearch: "calculator.budget.accounts.SetSearch",
-    Response: "calculator.budget.accounts.Response",
-    Request: "calculator.budget.accounts.Request",
-    AddErrors: "calculator.budget.accounts.AddErrors",
-    History: {
-      Loading: "calculator.budget.accounts.history.Loading",
-      Response: "calculator.budget.accounts.history.Response",
-      Request: "calculator.budget.accounts.history.Request",
-      AddToState: "calculator.budget.accounts.history.AddToState"
-    }
-  },
   Comments: {
     Loading: "calculator.budget.comments.Loading",
     Response: "calculator.budget.comments.Response",
@@ -40,6 +15,45 @@ export const ActionType = {
     AddToState: "calculator.budget.comments.AddToState",
     RemoveFromState: "calculator.budget.comments.RemoveFromState",
     UpdateInState: "calculator.budget.comments.UpdateInState"
+  },
+  Accounts: {
+    Deleting: "calculator.budget.accounts.Deleting",
+    Creating: "calculator.budget.accounts.Creating",
+    Updating: "calculator.budget.accounts.Updating",
+    Update: "calculator.budget.accounts.Update",
+    Remove: "calculator.budget.accounts.Remove",
+    SetSearch: "calculator.budget.accounts.SetSearch",
+    Loading: "calculator.budget.accounts.Loading",
+    Select: "calculator.budget.accounts.Select",
+    Deselect: "calculator.budget.accounts.Deselect",
+    SelectAll: "calculator.budget.accounts.SelectAll",
+    Response: "calculator.budget.accounts.Response",
+    Request: "calculator.budget.accounts.Request",
+    UpdateInState: "calculator.budget.accounts.UpdateInState",
+    RemoveFromState: "calculator.budget.accounts.RemoveFromState",
+    AddToState: "calculator.budget.accounts.AddToState",
+    RemoveFromGroup: "calculator.budget.accounts.RemoveFromGroup",
+    // Errors Functionality Needs to be Built Back In
+    AddErrors: "calculator.budget.accounts.AddErrors",
+    Placeholders: {
+      AddToState: "calculator.budget.accounts.placeholders.AddToState",
+      Activate: "calculator.budget.accounts.placeholders.Activate",
+      UpdateInState: "calculator.budget.accounts.placeholders.UpdateInState",
+      RemoveFromState: "calculator.budget.accounts.placeholders.RemoveFromState"
+    },
+    Groups: {
+      Delete: "calculator.budget.accounts.groups.Delete",
+      Deleting: "calculator.budget.accounts.groups.Deleting",
+      AddToState: "calculator.budget.accounts.groups.AddToState",
+      RemoveFromState: "calculator.budget.accounts.groups.RemoveFromState",
+      UpdateInState: "calculator.budget.accounts.groups.UpdateInState"
+    },
+    History: {
+      Loading: "calculator.budget.accounts.history.Loading",
+      Response: "calculator.budget.accounts.history.Response",
+      Request: "calculator.budget.accounts.history.Request",
+      AddToState: "calculator.budget.accounts.history.AddToState"
+    }
   }
 };
 
@@ -69,27 +83,44 @@ export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPa
 /*
   Actions Pertaining to Budget Accounts
 */
-export const addPlaceholdersAction = simpleAction<number>(ActionType.Accounts.AddPlaceholders);
 export const updateAccountAction = simpleAction<Table.RowChange>(ActionType.Accounts.Update);
-export const updateTableRowAction = simpleAction<{ id: number; data: Partial<Table.AccountRow> }>(
-  ActionType.Accounts.UpdateRow
-);
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<IAccount>>(
-  ActionType.Accounts.ActivatePlaceholder
-);
-export const selectAccountAction = simpleAction<number>(ActionType.Accounts.SelectRow);
-export const selectAllAccountsAction = simpleAction<null>(ActionType.Accounts.SelectAllRows);
-export const deselectAccountAction = simpleAction<number>(ActionType.Accounts.DeselectRow);
-export const removeTableRowAction = simpleAction<number>(ActionType.Accounts.RemoveRow);
 export const removeAccountAction = simpleAction<number>(ActionType.Accounts.Remove);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Accounts.Creating);
 export const requestAccountsAction = simpleAction<null>(ActionType.Accounts.Request);
 export const loadingAccountsAction = simpleAction<boolean>(ActionType.Accounts.Loading);
-export const responseAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.Accounts.Response);
+export const responseAccountsAction = simpleAction<Http.IListResponse<IAccount>>(ActionType.Accounts.Response);
 export const setAccountsSearchAction = simpleAction<string>(ActionType.Accounts.SetSearch);
-export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(ActionType.Accounts.AddErrors);
+export const removeAccountFromGroupAction = simpleAction<number>(ActionType.Accounts.RemoveFromGroup);
+export const selectAccountAction = simpleAction<number>(ActionType.Accounts.Select);
+export const deselectAccountAction = simpleAction<number>(ActionType.Accounts.Deselect);
+export const selectAllAccountsAction = simpleAction<null>(ActionType.Accounts.SelectAll);
+
+export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<IAccount>>(
+  ActionType.Accounts.Placeholders.Activate
+);
+export const removePlaceholderFromStateAction = simpleAction<number>(ActionType.Accounts.Placeholders.RemoveFromState);
+export const addPlaceholdersToStateAction = simpleAction<number>(ActionType.Accounts.Placeholders.AddToState);
+export const updatePlaceholderInStateAction = simpleAction<Table.AccountRow>(
+  ActionType.Accounts.Placeholders.UpdateInState
+);
+
+export const addAccountToStateAction = simpleAction<IAccount>(ActionType.Accounts.AddToState);
+export const updateAccountInStateAction = simpleAction<IAccount>(ActionType.Accounts.UpdateInState);
+export const removeAccountFromStateAction = simpleAction<number>(ActionType.Accounts.RemoveFromState);
+
+// Errors Functionality Needs to be Built Back In
+export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(ActionType.Accounts.AddErrors);
+
+/*
+  Actiosn Pertaining to Account Sub Accounts Groups
+*/
+export const addGroupToStateAction = simpleAction<IGroup<ISimpleAccount>>(ActionType.Accounts.Groups.AddToState);
+export const updateGroupInStateAction = simpleAction<INestedGroup>(ActionType.Accounts.Groups.UpdateInState);
+export const removeGroupFromStateAction = simpleAction<number>(ActionType.Accounts.Groups.RemoveFromState);
+export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Groups.Deleting);
+export const deleteGroupAction = simpleAction<number>(ActionType.Accounts.Groups.Delete);
 
 /*
   Actions Pertaining to Budget Accounts History

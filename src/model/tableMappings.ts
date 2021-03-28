@@ -210,15 +210,23 @@ class Mapping<
   };
 }
 
-export const AccountMapping = new Mapping<Table.AccountRow, IAccount, Http.IAccountPayload, ISimpleSubAccount>({
+export const AccountMapping = new Mapping<
+  Table.AccountRow,
+  IAccount,
+  Http.IAccountPayload,
+  ISimpleSubAccount,
+  INestedGroup
+>({
   fields: [
     { field: "description" },
+    { field: "group" },
     { field: "identifier", requiredForPost: true },
     { field: "estimated", calculatedField: true },
     { field: "variance", calculatedField: true },
     { field: "actual", calculatedField: true }
   ],
   childrenGetter: (model: IAccount) => model.subaccounts,
+  groupGetter: (model: IAccount) => model.group,
   labelGetter: (model: IAccount) => model.identifier,
   typeLabel: "Account"
 });

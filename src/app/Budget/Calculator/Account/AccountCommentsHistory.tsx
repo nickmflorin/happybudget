@@ -8,7 +8,7 @@ import {
   submitCommentAction,
   deleteCommentAction,
   editCommentAction,
-  requestSubAccountsHistoryAction
+  requestHistoryAction
 } from "./actions";
 
 const selectDeletingComments = simpleDeepEqualSelector(
@@ -69,7 +69,7 @@ const AccountCommentsHistory = (): JSX.Element => {
       historyProps={{
         history,
         loading: loadingHistory,
-        onRequest: () => dispatch(requestSubAccountsHistoryAction())
+        onRequest: () => dispatch(requestHistoryAction())
       }}
     />
   );

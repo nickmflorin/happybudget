@@ -228,8 +228,6 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
     const parentSubAccount: ISubAccount = yield select(
       (state: Redux.IApplicationStore) => state.calculator.subaccount.detail.data
     );
-    // TODO: This is why we don't want to have multiple sources of truth!  We do not know if the
-    // additional sub account has been added to this state yet - vs. just the table state.
     const subaccounts: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data
     );
@@ -243,12 +241,12 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
         subaccountPayload = { ...subaccountPayload, variance: estimated - parentSubAccount.actual };
       }
       yield put(updateParentSubAccountInStateAction(subaccountPayload));
-      // We should probably remove the group from the table if the response SubAccount does not have
-      // a group - however, that will not happen in practice, because this task just handles the case
-      // where the SubAccount is updated (not removed or added to a group).
-      if (!isNil(subaccount.group)) {
-        yield put(updateGroupInStateAction(subaccount.group));
-      }
+    }
+    // We should probably remove the group from the table if the response SubAccount does not have
+    // a group - however, that will not happen in practice, because this task just handles the case
+    // where the SubAccount is updated (not removed or added to a group).
+    if (!isNil(subaccount.group)) {
+      yield put(updateGroupInStateAction(subaccount.group));
     }
   }
 }
@@ -280,12 +278,13 @@ export function* handleSubAccountPlaceholderActivatedTask(
         subaccountPayload = { ...subaccountPayload, variance: estimated - parentSubAccount.actual };
       }
       yield put(updateParentSubAccountInStateAction(subaccountPayload));
-      // We should probably remove the group from the table if the response SubAccount does not have
-      // a group - however, that will not happen in practice, because this task just handles the case
-      // where the SubAccount is updated (not removed or added to a group).
-      if (!isNil(subaccount.group)) {
-        yield put(updateGroupInStateAction(subaccount.group));
-      }
+    }
+
+    // We should probably remove the group from the table if the response SubAccount does not have
+    // a group - however, that will not happen in practice, because this task just handles the case
+    // where the SubAccount is updated (not removed or added to a group).
+    if (!isNil(subaccount.group)) {
+      yield put(updateGroupInStateAction(subaccount.group));
     }
   }
 }

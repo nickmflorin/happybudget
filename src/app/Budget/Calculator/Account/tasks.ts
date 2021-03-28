@@ -38,8 +38,8 @@ import {
   updateCommentInStateAction,
   editingCommentAction,
   replyingToCommentAction,
-  loadingSubAccountsHistoryAction,
-  responseSubAccountsHistoryAction,
+  loadingHistoryAction,
+  responseHistoryAction,
   deletingGroupAction,
   removeGroupFromStateAction,
   updateGroupInStateAction,
@@ -87,18 +87,18 @@ export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaI
   }
 }
 
-export function* getSubAccountsHistoryTask(action: Redux.IAction<null>): SagaIterator {
+export function* getHistoryTask(action: Redux.IAction<null>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(accountId) && !isNil(budgetId)) {
-    yield put(loadingSubAccountsHistoryAction(true));
+    yield put(loadingHistoryAction(true));
     try {
       const response: Http.IListResponse<HistoryEvent> = yield call(getAccountSubAccountsHistory, accountId, budgetId);
-      yield put(responseSubAccountsHistoryAction(response));
+      yield put(responseHistoryAction(response));
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account's sub accounts history.");
     } finally {
-      yield put(loadingSubAccountsHistoryAction(false));
+      yield put(loadingHistoryAction(false));
     }
   }
 }
@@ -189,8 +189,7 @@ export function* handleAccountChangedTask(action: Redux.IAction<number>): SagaIt
 // TODO: We need to also update the estimated, variance and actual values of the parent
 // account when a sub account is removed!
 export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
-  const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
-  if (!isNil(action.payload) && !isNil(accountId)) {
+  if (!isNil(action.payload)) {
     const models: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
@@ -229,8 +228,6 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
     const account: IAccount | undefined = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.detail.data
     );
-    // TODO: This is why we don't want to have multiple sources of truth!  We do not know if the
-    // additional sub account has been added to this state yet - vs. just the table state.
     const subaccounts: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
@@ -245,12 +242,12 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
         accountPayload = { ...accountPayload, variance: estimated - actual };
       }
       yield put(updateAccountInStateAction(accountPayload));
-      // We should probably remove the group from the table if the response SubAccount does not have
-      // a group - however, that will not happen in practice, because this task just handles the case
-      // where the SubAccount is updated (not removed or added to a group).
-      if (!isNil(subaccount.group)) {
-        yield put(updateGroupInStateAction(subaccount.group));
-      }
+    }
+    // We should probably remove the group from the table if the response SubAccount does not have
+    // a group - however, that will not happen in practice, because this task just handles the case
+    // where the SubAccount is updated (not removed or added to a group).
+    if (!isNil(subaccount.group)) {
+      yield put(updateGroupInStateAction(subaccount.group));
     }
   }
 }
@@ -283,12 +280,12 @@ export function* handleSubAccountPlaceholderActivatedTask(
         accountPayload = { ...accountPayload, variance: estimated - actual };
       }
       yield put(updateAccountInStateAction(accountPayload));
-      // We should probably remove the group from the table if the response SubAccount does not have
-      // a group - however, that will not happen in practice, because this task just handles the case
-      // where the SubAccount is updated (not removed or added to a group).
-      if (!isNil(subaccount.group)) {
-        yield put(updateGroupInStateAction(subaccount.group));
-      }
+    }
+    // We should probably remove the group from the table if the response SubAccount does not have
+    // a group - however, that will not happen in practice, because this task just handles the case
+    // where the SubAccount is updated (not removed or added to a group).
+    if (!isNil(subaccount.group)) {
+      yield put(updateGroupInStateAction(subaccount.group));
     }
   }
 }
