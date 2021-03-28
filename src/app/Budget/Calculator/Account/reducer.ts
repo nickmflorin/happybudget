@@ -6,7 +6,8 @@ import {
   createSimplePayloadReducer,
   createCommentsListResponseReducer,
   createListResponseReducer,
-  createTableReducer
+  createTableReducer,
+  createTablePlaceholdersReducer
 } from "store/factories";
 import { SubAccountMapping } from "model/tableMappings";
 import { ActionType } from "./actions";
@@ -37,11 +38,23 @@ const rootReducer = combineReducers({
       Request: ActionType.SubAccounts.Request,
       Loading: ActionType.SubAccounts.Loading,
       SetSearch: ActionType.SubAccounts.SetSearch,
-      UpdateInState: ActionType.SubAccounts.UpdateInState
+      UpdateInState: ActionType.SubAccounts.UpdateInState,
+      RemoveFromState: ActionType.SubAccounts.RemoveFromState,
+      AddToState: ActionType.SubAccounts.AddToState,
+      Select: ActionType.SubAccounts.Select
     },
     {
       referenceEntity: "subaccount",
       keyReducers: {
+        placeholders: createTablePlaceholdersReducer(
+          {
+            Add: ActionType.SubAccounts.AddPlaceholders,
+            Activate: ActionType.SubAccounts.ActivatePlaceholder,
+            Remove: ActionType.SubAccounts.RemovePlaceholder
+          },
+          SubAccountMapping,
+          { referenceEntity: "subaccount" }
+        ),
         groups: combineReducers({
           deleting: createModelListActionReducer(ActionType.SubAccounts.Groups.Deleting, {
             referenceEntity: "group"
@@ -62,20 +75,20 @@ const rootReducer = combineReducers({
           { referenceEntity: "event" }
         ),
         creating: createSimpleBooleanReducer(ActionType.SubAccounts.Creating),
-        table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload>(
+        table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload, ISimpleSubAccount>(
           {
-            AddPlaceholders: ActionType.SubAccounts.Table.AddPlaceholders,
-            RemoveRow: ActionType.SubAccounts.Table.RemoveRow,
+            // AddPlaceholders: ActionType.SubAccounts.Table.AddPlaceholders,
+            // RemoveRow: ActionType.SubAccounts.Table.RemoveRow,
             UpdateRow: ActionType.SubAccounts.Table.UpdateRow,
-            SelectRow: ActionType.SubAccounts.Table.SelectRow,
+            // SelectRow: ActionType.SubAccounts.Table.SelectRow,
             DeselectRow: ActionType.SubAccounts.Table.DeselectRow,
             SelectAllRows: ActionType.SubAccounts.Table.SelectAllRows,
             SetData: ActionType.SubAccounts.Response,
             ClearData: ActionType.SubAccounts.Request,
             Loading: ActionType.SubAccounts.Loading,
             AddErrors: ActionType.SubAccounts.Table.AddErrors,
-            AddToState: ActionType.SubAccounts.AddToState,
-            UpdateInState: ActionType.SubAccounts.UpdateInState,
+            // AddToState: ActionType.SubAccounts.AddToState,
+            // UpdateInState: ActionType.SubAccounts.UpdateInState,
             AddGroup: ActionType.SubAccounts.Groups.AddToTable,
             RemoveGroup: ActionType.SubAccounts.Groups.RemoveFromTable,
             UpdateGroup: ActionType.SubAccounts.Groups.UpdateInTable

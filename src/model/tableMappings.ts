@@ -47,7 +47,7 @@ class Mapping<
     this.typeLabel = config.typeLabel;
   }
 
-  _getChildren = (model: M): C[] => {
+  getChildren = (model: M): C[] => {
     if (typeof this.childrenGetter === "string") {
       const children: any = model[this.childrenGetter as keyof M];
       if (!isNil(children)) {
@@ -64,7 +64,7 @@ class Mapping<
     }
   };
 
-  _getGroup = (model: M): G | null => {
+  getGroup = (model: M): G | null => {
     if (this.groupGetter === null) {
       return null;
     } else if (typeof this.groupGetter === "string") {
@@ -105,21 +105,22 @@ class Mapping<
     return obj as R;
   };
 
-  modelToRow = (model: M): R => {
-    const meta: Table.RowMeta<C> = {
+  modelToRow = (model: M, meta: Partial<Table.RowMeta<C>> = {}): R => {
+    const fullMeta: Table.RowMeta<C> = {
       isPlaceholder: false,
       isGroupFooter: false,
       isTableFooter: false,
       selected: false,
-      children: this._getChildren(model),
+      children: this.getChildren(model),
       errors: [],
       label: this.labelGetter(model),
-      typeLabel: this.typeLabel
+      typeLabel: this.typeLabel,
+      ...meta
     };
     const obj: { [key: string]: any } = {
       id: model.id,
-      meta,
-      group: this._getGroup(model)
+      meta: fullMeta,
+      group: this.getGroup(model)
     };
     forEach(this.fields, (field: MappedField<M>) => {
       obj[field.field as string] = getProperty<M, keyof M>(model, field.field);

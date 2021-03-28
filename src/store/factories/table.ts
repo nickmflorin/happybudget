@@ -4,6 +4,77 @@ import { mergeWithDefaults } from "util/objects";
 import { createListReducerFromTransformers } from "./util";
 import Mapping from "model/tableMappings";
 
+export const createTablePlaceholdersReducer = <
+  /* eslint-disable indent */
+  R extends Table.Row<G, C>,
+  M extends Model,
+  P extends Http.IPayload,
+  C extends Table.RowChild = Table.RowChild,
+  G extends Table.RowGroup = Table.RowGroup,
+  A extends Redux.IAction<any> = Redux.IAction<any>
+>(
+  mappings: Partial<ReducerFactory.ITablePlaceholdersActionMap>,
+  mapping: Mapping<R, M, P, C, G>,
+  options: Partial<ReducerFactory.IOptions<Redux.ListStore<R>>> = { initialState: [], referenceEntity: "entity" }
+) => {
+  const Options = mergeWithDefaults<ReducerFactory.IOptions<Redux.ListStore<R>>>(options, {
+    referenceEntity: "entity",
+    initialState: []
+  });
+
+  const transformers: ReducerFactory.Transformers<ReducerFactory.ITablePlaceholdersActionMap, Redux.ListStore<R>, A> = {
+    Clear: () => [],
+    Add: (count: number | undefined, st: Redux.ListStore<R>) => {
+      const placeholders: R[] = [];
+      const numPlaceholders = count || 1;
+      for (let i = 0; i < numPlaceholders; i++) {
+        placeholders.push(mapping.createPlaceholder());
+      }
+      return [...st, ...placeholders];
+    },
+    Remove: (id: number, st: Redux.ListStore<R>) => {
+      const row: R | undefined = find(st, { id: id } as any);
+      if (isNil(row)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when removing the ${Options.referenceEntity}
+          placeholder in state... the ${Options.referenceEntity} placeholder row with ID ${id}
+          does not exist in state when it is expected to.`
+        );
+        return st;
+      } else {
+        return filter(st, (r: R) => r.id !== id);
+      }
+    },
+    Activate: (payload: Table.ActivatePlaceholderPayload<M>, st: Redux.ListStore<R>) => {
+      const row: R | undefined = find(st, { id: payload.id } as any);
+      if (isNil(row)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when activating the ${Options.referenceEntity}
+          placeholder in state... the ${Options.referenceEntity} placeholder row with ID ${payload.id}
+          does not exist in state when it is expected to.`
+        );
+        return st;
+      } else {
+        return replaceInArray<R>(
+          st,
+          { id: payload.id },
+          {
+            ...row,
+            ...mapping.modelToRow(payload.model)
+          }
+        );
+      }
+    }
+  };
+  return createListReducerFromTransformers<ReducerFactory.ITablePlaceholdersActionMap, R, A>(
+    mappings,
+    transformers,
+    Options
+  );
+};
+
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
  * table that is generated from a list response of an API request, where a list
@@ -25,7 +96,7 @@ export const createTableReducer = <
   R extends Table.Row<G, C>,
   M extends Model,
   P extends Http.IPayload,
-  C extends Table.RowChild = Table.RowChild,
+  C extends Table.RowChild,
   G extends Table.RowGroup = Table.RowGroup,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(

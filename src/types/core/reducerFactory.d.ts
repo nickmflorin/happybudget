@@ -28,6 +28,13 @@ namespace ReducerFactory {
     Clear: string;
   };
 
+  type ITablePlaceholdersActionMap = {
+    Add: string;
+    Activate: string;
+    Clear: string;
+    Remove: string;
+  };
+
   type ITableActionMap = {
     ClearData: string;
     SetData: string;

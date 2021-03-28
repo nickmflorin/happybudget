@@ -8,8 +8,8 @@ export const initialSubAccountGroupsState: Redux.Calculator.ISubAccountGroupsSto
   deleting: []
 };
 
-export const initialSubAccountsState: Redux.Calculator.ISubAccountsStore = {
-  table: [],
+export const initialSubAccountsState: Redux.Calculator.ISubAccountsStoreNew = {
+  placeholders: [],
   deleting: [],
   updating: [],
   creating: false,

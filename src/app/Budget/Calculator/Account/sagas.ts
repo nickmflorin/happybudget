@@ -16,7 +16,7 @@ import {
   deleteSubAccountGroupTask,
   addSubAccountGroupToStateTask,
   removeSubAccountFromGroupTask,
-  handleSubAccountAddedToStateTask,
+  handleSubAccountPlaceholderActivatedTask,
   handleSubAccountUpdatedInStateTask
 } from "./tasks";
 
@@ -106,7 +106,7 @@ function* watchForSubAccountAddedToStateSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
     const action: Redux.IAction<Table.ActivatePlaceholderPayload<ISubAccount>> = yield take(
-      ActionType.SubAccounts.AddToState
+      ActionType.SubAccounts.ActivatePlaceholder
     );
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload.model.id])) {
@@ -119,7 +119,7 @@ function* watchForSubAccountAddedToStateSaga(): SagaIterator {
         lastTasks = { ...lastTasks, [action.payload.model.id]: [] };
         yield cancel(cancellable);
       }
-      lastTasks[action.payload.model.id].push(yield call(handleSubAccountAddedToStateTask, action));
+      lastTasks[action.payload.model.id].push(yield call(handleSubAccountPlaceholderActivatedTask, action));
     }
   }
 }

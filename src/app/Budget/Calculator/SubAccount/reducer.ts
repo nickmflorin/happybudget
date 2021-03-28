@@ -61,7 +61,7 @@ const rootReducer = combineReducers({
           { referenceEntity: "event" }
         ),
         creating: createSimpleBooleanReducer(ActionType.SubAccounts.Creating),
-        table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload>(
+        table: createTableReducer<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload, ISimpleSubAccount>(
           {
             AddPlaceholders: ActionType.SubAccounts.AddPlaceholders,
             RemoveRow: ActionType.SubAccounts.RemoveRow,

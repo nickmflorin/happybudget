@@ -29,8 +29,6 @@ import {
   creatingSubAccountAction,
   updatingSubAccountAction,
   updateTableRowAction,
-  addSubAccountToStateAction,
-  removeTableRowAction,
   addErrorsToTableAction,
   addPlaceholdersAction,
   requestSubAccountsAction,
@@ -51,7 +49,11 @@ import {
   addGroupToTableAction,
   updateGroupInTableAction,
   updateAccountInStateAction,
-  updateSubAccountInStateAction
+  updateSubAccountInStateAction,
+  removeSubAccountFromStateAction,
+  addSubAccountToStateAction,
+  activatePlaceholderAction,
+  removePlaceholderAction
 } from "./actions";
 
 export function* removeSubAccountFromGroupTask(action: Redux.IAction<number>): SagaIterator {
@@ -204,10 +206,10 @@ export function* handleAccountChangedTask(action: Redux.IAction<number>): SagaIt
 export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(action.payload) && !isNil(accountId)) {
-    const tableData: Table.SubAccountRow[] = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table
+    const models: ISubAccount[] = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
-    const existing: Table.SubAccountRow | undefined = find(tableData, { id: action.payload });
+    const existing: ISubAccount | undefined = find(models, { id: action.payload });
     if (isNil(existing)) {
       /* eslint-disable no-console */
       console.warn(
@@ -215,20 +217,21 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
         The sub account with ID ${action.payload} does not exist in state when it is expected to.`
       );
     } else {
-      // Dispatch the action to remove the row from the table in the UI.
-      yield put(removeTableRowAction(action.payload));
-      // Only make an API request to the server to delete the sub account if the  row was not a
-      // placeholder (i.e. the sub account exists in the backend).
-      if (existing.meta.isPlaceholder === false) {
-        yield put(deletingSubAccountAction({ id: action.payload, value: true }));
-        try {
-          yield call(deleteSubAccount, action.payload);
-        } catch (e) {
-          handleRequestError(e, "There was an error deleting the sub account.");
-        } finally {
-          yield put(deletingSubAccountAction({ id: action.payload, value: false }));
-        }
-      }
+      //   // Dispatch the action to remove the sub account from state and thus remove the row from the
+      //   // table in the UI.
+      //   yield put(removeSubAccountFromStateAction(action.payload));
+      //   // Only make an API request to the server to delete the sub account if the  row was not a
+      //   // placeholder (i.e. the sub account exists in the backend).
+      //   if (existing.meta.isPlaceholder === false) {
+      //     yield put(deletingSubAccountAction({ id: action.payload, value: true }));
+      //     try {
+      //       yield call(deleteSubAccount, action.payload);
+      //     } catch (e) {
+      //       handleRequestError(e, "There was an error deleting the sub account.");
+      //     } finally {
+      //       yield put(deletingSubAccountAction({ id: action.payload, value: false }));
+      //     }
+      //   }
     }
   }
 }
@@ -265,16 +268,20 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
   }
 }
 
-export function* handleSubAccountAddedToStateTask(
+export function* handleSubAccountPlaceholderActivatedTask(
   action: Redux.IAction<Table.ActivatePlaceholderPayload<ISubAccount>>
 ): SagaIterator {
   if (!isNil(action.payload)) {
     const subaccount = action.payload.model;
+
+    // Now that the placeholder is activated, we need to remove the placeholder from state and
+    // insert in the actual SubAccount model into the state.
+    yield put(removePlaceholderAction(subaccount.id));
+    yield put(addSubAccountToStateAction(subaccount));
+
     const account: IAccount | undefined = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.detail.data
     );
-    // TODO: This is why we don't want to have multiple sources of truth!  We do not know if the
-    // additional sub account has been added to this state yet - vs. just the table state.
     const subaccounts: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
@@ -304,15 +311,67 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(accountId) && !isNil(action.payload)) {
     const id = action.payload.id;
-    const table = yield select((state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table);
 
-    const existing: Table.SubAccountRow = find(table, { id });
-    if (isNil(existing)) {
-      /* eslint-disable no-console */
-      console.error(
-        `Inconsistent State!:  Inconsistent state noticed when updating sub account in state...
-        the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
+    const data = yield select((state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data);
+    const model: ISubAccount | undefined = find(data, { id });
+    if (isNil(model)) {
+      const placeholders = yield select(
+        (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.placeholders
       );
+      const placeholder: Table.SubAccountRow | undefined = find(placeholders, { id });
+      console.log(placeholder);
+      if (isNil(placeholder)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when updating sub account in state...
+          the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
+        );
+      } else {
+        // There are some cases where we need to update the row in the table before we make the request,
+        // to improve the UI.  This happens for cells where the value is rendered via an HTML element
+        // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
+        // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
+        // We could do this by updating with a payload generated from the response, but it is quicker
+        // to do it before hand.
+        const preResponsePayload = SubAccountMapping.preRequestPayload(action.payload);
+        if (Object.keys(preResponsePayload).length !== 0) {
+          yield put(
+            updateTableRowAction({
+              id: placeholder.id,
+              data: preResponsePayload
+            })
+          );
+        }
+        const requestPayload = SubAccountMapping.postPayload(placeholder);
+        // Wait until all of the required fields are present before we create the entity in the
+        // backend.  Once the entity is created in the backend, we can remove the placeholder
+        // designation of the row so it will be updated instead of created the next time the row
+        // is changed.
+        if (SubAccountMapping.rowHasRequiredFields(placeholder)) {
+          yield put(creatingSubAccountAction(true));
+          try {
+            const response: ISubAccount = yield call(
+              createAccountSubAccount,
+              accountId,
+              budgetId,
+              requestPayload as Http.ISubAccountPayload
+            );
+            // TODO: Since we are using multiple sources of truth, this bad guy
+            // also needs to add the sub account to the list data state.
+            yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
+          } catch (e) {
+            yield call(
+              handleTableErrors,
+              e,
+              "There was an error updating the sub account.",
+              placeholder.id,
+              (errors: Table.CellError[]) => addErrorsToTableAction(errors)
+            );
+          } finally {
+            yield put(creatingSubAccountAction(false));
+          }
+        }
+      }
     } else {
       // There are some cases where we need to update the row in the table before we make the request,
       // to improve the UI.  This happens for cells where the value is rendered via an HTML element
@@ -324,61 +383,26 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
       if (Object.keys(preResponsePayload).length !== 0) {
         yield put(
           updateTableRowAction({
-            id: existing.id,
+            id: model.id,
             data: preResponsePayload
           })
         );
       }
-      if (existing.meta.isPlaceholder === true) {
-        const requestPayload = SubAccountMapping.postPayload(existing);
-        // Wait until all of the required fields are present before we create the entity in the
-        // backend.  Once the entity is created in the backend, we can remove the placeholder
-        // designation of the row so it will be updated instead of created the next time the row
-        // is changed.
-        if (SubAccountMapping.rowHasRequiredFields(existing)) {
-          yield put(creatingSubAccountAction(true));
-          try {
-            const response: ISubAccount = yield call(
-              createAccountSubAccount,
-              accountId,
-              budgetId,
-              requestPayload as Http.ISubAccountPayload
-            );
-            // TODO: Since we are using multiple sources of truth, this bad guy
-            // also needs to add the sub account to the list data state.
-            yield put(addSubAccountToStateAction({ id: existing.id, model: response }));
-          } catch (e) {
-            yield call(
-              handleTableErrors,
-              e,
-              "There was an error updating the sub account.",
-              existing.id,
-              (errors: Table.CellError[]) => addErrorsToTableAction(errors)
-            );
-          } finally {
-            yield put(creatingSubAccountAction(false));
-          }
-        }
-      } else {
-        yield put(updatingSubAccountAction({ id: existing.id as number, value: true }));
-        const requestPayload = SubAccountMapping.patchPayload(action.payload);
-        try {
-          const response: ISubAccount = yield call(updateSubAccount, existing.id as number, requestPayload);
-          // Dispatching this action will trigger the subaccount to update in both the  Redux state for the
-          // table and the list response data.  Since we are using a deep check lodash.isEqual in the selectors,
-          // this will only trigger a rerender if the subaccount has data that differs from that of the current data.
-          yield put(updateSubAccountInStateAction(response));
-        } catch (e) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error updating the sub account.",
-            existing.id,
-            (errors: Table.CellError[]) => addErrorsToTableAction(errors)
-          );
-        } finally {
-          yield put(updatingSubAccountAction({ id: existing.id as number, value: false }));
-        }
+      yield put(updatingSubAccountAction({ id: model.id, value: true }));
+      const requestPayload = SubAccountMapping.patchPayload(action.payload);
+      try {
+        const response: ISubAccount = yield call(updateSubAccount, model.id, requestPayload);
+        yield put(updateSubAccountInStateAction(response));
+      } catch (e) {
+        yield call(
+          handleTableErrors,
+          e,
+          "There was an error updating the sub account.",
+          model.id,
+          (errors: Table.CellError[]) => addErrorsToTableAction(errors)
+        );
+      } finally {
+        yield put(updatingSubAccountAction({ id: model.id, value: false }));
       }
     }
   }

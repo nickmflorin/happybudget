@@ -43,7 +43,7 @@ const rootReducer = combineReducers({
           referenceEntity: "actual"
         }),
         creating: createSimpleBooleanReducer(ActionType.Actuals.Creating),
-        table: createTableReducer<Table.ActualRow, IActual, Http.IActualPayload>(
+        table: createTableReducer<Table.ActualRow, IActual, Http.IActualPayload, Table.RowChild>(
           {
             AddPlaceholders: ActionType.Actuals.AddPlaceholders,
             RemoveRow: ActionType.Actuals.RemoveRow,

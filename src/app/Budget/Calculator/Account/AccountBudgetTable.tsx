@@ -8,10 +8,11 @@ import { createSelector } from "reselect";
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { CreateSubAccountGroupModal } from "components/modals";
+import { SubAccountMapping } from "model/tableMappings";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
-import BudgetTable from "../../BudgetTable";
+import BudgetTable from "../../BudgetTable2";
 import { selectBudgetId } from "../../selectors";
 import {
   addPlaceholdersAction,
@@ -26,11 +27,17 @@ import {
   removeSubAccountFromGroupAction
 } from "./actions";
 
-const selectTableData = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.table
+const selectSelectedRows = simpleDeepEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.selected
+);
+const selectSubAccounts = simpleDeepEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
 );
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.search
+);
+const selectPlaceholders = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.placeholders
 );
 const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.deleting,
@@ -54,15 +61,20 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
   const history = useHistory();
 
   const budgetId = useSelector(selectBudgetId);
-  const table = useSelector(selectTableData);
+  const data = useSelector(selectSubAccounts);
+  const placeholders = useSelector(selectPlaceholders);
+  const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
 
   return (
     <React.Fragment>
-      <BudgetTable<Table.SubAccountRow, INestedGroup, ISimpleSubAccount>
-        table={table}
+      <BudgetTable<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload, INestedGroup, ISimpleSubAccount>
+        data={data}
+        placeholders={placeholders}
+        mapping={SubAccountMapping}
+        selected={selected}
         identifierField={"identifier"}
         identifierFieldHeader={"Line"}
         isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
