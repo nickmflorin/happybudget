@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find, concat, reduce } from "lodash";
+import { isNil, find, reduce } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountMapping } from "model/tableMappings";
 import {
@@ -18,7 +18,6 @@ import {
   deleteSubAccountGroup
 } from "services";
 import { handleTableErrors } from "store/tasks";
-import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
 import {
   loadingSubAccountAction,
   responseSubAccountAction,
@@ -397,28 +396,17 @@ export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
 export function* getSubAccountTask(action: Redux.IAction<null>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId)) {
-    yield put(setAncestorsLoadingAction(true));
+    // yield put(setAncestorsLoadingAction(true));
     yield put(loadingSubAccountAction(true));
     try {
       const response: ISubAccount = yield call(getSubAccount, subaccountId);
       yield put(responseSubAccountAction(response));
-      yield put(
-        setAncestorsAction(
-          concat(response.ancestors, [
-            {
-              id: response.id,
-              identifier: response.identifier,
-              type: "subaccount"
-            }
-          ])
-        )
-      );
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account.");
       yield put(responseSubAccountAction(undefined, { error: e }));
     } finally {
       yield put(loadingSubAccountAction(false));
-      yield put(setAncestorsLoadingAction(false));
+      // yield put(setAncestorsLoadingAction(false));
     }
   }
 }

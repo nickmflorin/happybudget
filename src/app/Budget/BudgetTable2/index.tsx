@@ -691,7 +691,7 @@ const BudgetTable = <
         })
       )
     );
-  }, [bodyColumns, calculatedColumns]);
+  }, [useDeepEqualMemo(bodyColumns), useDeepEqualMemo(calculatedColumns)]);
 
   return (
     <React.Fragment>

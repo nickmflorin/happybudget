@@ -23,7 +23,8 @@ import {
   updateSubAccountAction,
   selectAllSubAccountsAction,
   deleteGroupAction,
-  addGroupToStateAction
+  addGroupToStateAction,
+  removeSubAccountFromGroupAction
 } from "./actions";
 
 const selectSelectedRows = simpleDeepEqualSelector(
@@ -74,7 +75,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         mapping={SubAccountMapping}
         selected={selected}
         identifierField={"identifier"}
-        identifierFieldHeader={"Account"}
+        identifierFieldHeader={"Line"}
         isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
           if (includes(["estimated", "actual", "variance", "unit"], colDef.field)) {
             return false;
@@ -99,7 +100,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         groupParams={{
           onDeleteGroup: (group: INestedGroup) => dispatch(deleteGroupAction(group.id)),
-          onRowRemoveFromGroup: (row: Table.SubAccountRow) => console.log(row),
+          onRowRemoveFromGroup: (row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id)),
           onGroupRows: (rows: Table.SubAccountRow[]) =>
             setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
         }}

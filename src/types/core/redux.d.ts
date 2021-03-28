@@ -192,7 +192,6 @@ namespace Redux {
     interface IStore {
       readonly budget: IBudgetStore;
       readonly ancestors: ListStore<IAncestor>;
-      readonly ancestorsLoading: boolean;
       readonly commentsHistoryDrawerOpen: boolean;
     }
   }

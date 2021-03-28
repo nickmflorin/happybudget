@@ -2,7 +2,6 @@ import { simpleAction } from "store/actions";
 
 export const ActionType = {
   SetAncestors: "budget.SetAncestors",
-  SetAncestorsLoading: "budget.SetAncestorsLoading",
   SetCommentsHistoryDrawerVisibility: "SetCommentsHistoryDrawerVisibility",
   Budget: {
     SetId: "budget.budget.SetId",
@@ -14,7 +13,6 @@ export const ActionType = {
 
 export const setBudgetIdAction = simpleAction<number>(ActionType.Budget.SetId);
 export const setAncestorsAction = simpleAction<IAncestor[]>(ActionType.SetAncestors);
-export const setAncestorsLoadingAction = simpleAction<boolean>(ActionType.SetAncestorsLoading);
 export const requestBudgetAction = simpleAction<null>(ActionType.Budget.Request);
 export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loading);
 export const responseBudgetAction = simpleAction<IBudget>(ActionType.Budget.Response);

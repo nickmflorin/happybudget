@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find, concat, reduce } from "lodash";
+import { isNil, find, reduce } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountMapping } from "model/tableMappings";
 import {
@@ -18,7 +18,6 @@ import {
   deleteSubAccountGroup
 } from "services";
 import { handleTableErrors } from "store/tasks";
-import { setAncestorsLoadingAction, setAncestorsAction } from "../../actions";
 import {
   loadingAccountAction,
   responseAccountAction,
@@ -412,29 +411,18 @@ export function* getAccountTask(action: Redux.IAction<null>): SagaIterator {
     }
     if (showLoadingIndicator) {
       yield put(loadingAccountAction(true));
-      yield put(setAncestorsLoadingAction(true));
+      // yield put(setAncestorsLoadingAction(true));
     }
     try {
       const response: IAccount = yield call(getAccount, accountId);
       yield put(responseAccountAction(response));
-      yield put(
-        setAncestorsAction(
-          concat(response.ancestors, [
-            {
-              id: response.id,
-              identifier: response.identifier,
-              type: "account"
-            }
-          ])
-        )
-      );
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account.");
       yield put(responseAccountAction(undefined, { error: e }));
     } finally {
       if (showLoadingIndicator) {
         yield put(loadingAccountAction(false));
-        yield put(setAncestorsLoadingAction(false));
+        // yield put(setAncestorsLoadingAction(false));
       }
     }
   }

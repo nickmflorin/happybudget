@@ -15,7 +15,6 @@ const ancestorsReducer: Reducer<Redux.ListStore<IAncestor>, Redux.IAction<any>> 
 
 const rootReducer = combineReducers({
   ancestors: ancestorsReducer,
-  ancestorsLoading: createSimpleBooleanReducer(ActionType.SetAncestorsLoading),
   commentsHistoryDrawerOpen: createSimpleBooleanReducer(ActionType.SetCommentsHistoryDrawerVisibility),
   budget: combineReducers({
     id: createSimplePayloadReducer(ActionType.Budget.SetId),

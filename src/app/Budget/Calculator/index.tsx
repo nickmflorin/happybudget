@@ -1,9 +1,10 @@
 import React from "react";
 import { Route, Redirect, Switch, useRouteMatch } from "react-router-dom";
+import { componentLoader } from "operational";
 
-const Account = React.lazy(() => import("./Account"));
-const Budget = React.lazy(() => import("./Budget"));
-const SubAccount = React.lazy(() => import("./SubAccount"));
+const Account = React.lazy(() => componentLoader(() => import("./Account")));
+const Budget = React.lazy(() => componentLoader(() => import("./Budget")));
+const SubAccount = React.lazy(() => componentLoader(() => import("./SubAccount")));
 
 const Calculator = (): JSX.Element => {
   const match = useRouteMatch();

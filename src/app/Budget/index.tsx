@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Route, Switch, useHistory, useLocation, useParams } from "react-router-dom";
+import { createSelector } from "reselect";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -18,23 +19,44 @@ import {
 
 import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
+import { componentLoader } from "operational";
+import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./actions";
+import { selectBudgetDetailLoading } from "./selectors";
 import "./index.scss";
 
-const Calculator = React.lazy(() => import("./Calculator"));
-const Actuals = React.lazy(() => import("./Actuals"));
+const Calculator = React.lazy(() => componentLoader(() => import("./Calculator")));
+const Actuals = React.lazy(() => componentLoader(() => import("./Actuals")));
+
+const selectSubAccountDetailLoading = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.subaccount.detail.loading
+);
+const selectAccountDetailLoading = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.detail.loading
+);
+const selectAncestorsLoading = createSelector(
+  selectSubAccountDetailLoading,
+  selectAccountDetailLoading,
+  selectBudgetDetailLoading,
+  (subaccountDetailLoading: boolean, accountDetailLoading: boolean, budgetDetailLoading: boolean) =>
+    subaccountDetailLoading || accountDetailLoading || budgetDetailLoading
+);
+const selectCommentsHistoryDrawerOpen = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
+);
+const selectAncestors = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.ancestors);
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
   const { budgetId } = useParams<{ budgetId: string }>();
-  const budget = useSelector((state: Redux.IApplicationStore) => state.budget.budget);
-  const ancestors = useSelector((state: Redux.IApplicationStore) => state.budget.ancestors);
-  const ancestorsLoading = useSelector((state: Redux.IApplicationStore) => state.budget.ancestorsLoading);
-  const commentsHistoryDrawerOpen = useSelector(
-    (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
-  );
+
+  const ancestors = useSelector(selectAncestors);
+  const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
+  const ancestorsLoading = useSelector(selectAncestorsLoading);
+  const budgetLoading = useSelector(selectBudgetDetailLoading);
 
   useEffect(() => {
     if (!isNaN(parseInt(budgetId))) {
@@ -128,7 +150,7 @@ const Budget = (): JSX.Element => {
       ]}
     >
       <RenderIfValidId id={[budgetId]}>
-        <WrapInApplicationSpinner loading={budget.detail.loading}>
+        <WrapInApplicationSpinner loading={budgetLoading}>
           <div className={"budget"}>
             <Switch>
               <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
