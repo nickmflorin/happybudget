@@ -8,15 +8,16 @@ import classNames from "classnames";
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
 import { CreateSubAccountGroupModal } from "components/modals";
+import { SubAccountMapping } from "model/tableMappings";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
-import BudgetTable from "../../BudgetTable";
+import BudgetTable from "../../BudgetTable2";
 import { selectBudgetId } from "../../selectors";
 import {
   setSubAccountsSearchAction,
   selectSubAccountAction,
-  addPlaceholdersAction,
+  addPlaceholdersToStateAction,
   deselectSubAccountAction,
   removeSubAccountAction,
   updateSubAccountAction,
@@ -25,11 +26,17 @@ import {
   addGroupToStateAction
 } from "./actions";
 
-const selectTableData = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.table
+const selectSelectedRows = simpleDeepEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.selected
+);
+const selectSubAccounts = simpleDeepEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data
 );
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.search
+);
+const selectPlaceholders = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.placeholders
 );
 const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.deleting,
@@ -52,17 +59,22 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
   const dispatch = useDispatch();
   const history = useHistory();
   const budgetId = useSelector(selectBudgetId);
-  const table = useSelector(selectTableData);
+  const data = useSelector(selectSubAccounts);
+  const placeholders = useSelector(selectPlaceholders);
+  const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const subaccountDetail = useSelector(selectSubAccountDetail);
 
   return (
     <React.Fragment>
-      <BudgetTable<Table.SubAccountRow, INestedGroup, ISimpleSubAccount>
+      <BudgetTable<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload, INestedGroup, ISimpleSubAccount>
+        data={data}
+        placeholders={placeholders}
+        mapping={SubAccountMapping}
+        selected={selected}
         identifierField={"identifier"}
         identifierFieldHeader={"Account"}
-        table={table}
         isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
           if (includes(["estimated", "actual", "variance", "unit"], colDef.field)) {
             return false;
@@ -79,7 +91,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
         rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
-        onRowAdd={() => dispatch(addPlaceholdersAction(1))}
+        onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: Table.SubAccountRow) => dispatch(removeSubAccountAction(row.id))}

@@ -34,7 +34,7 @@ const rootReducer = combineReducers({
     Editing: ActionType.Comments.Editing,
     Replying: ActionType.Comments.Replying
   }),
-  subaccounts: createListResponseReducer<ISubAccount, Redux.Calculator.ISubAccountsStoreNew>(
+  subaccounts: createListResponseReducer<ISubAccount, Redux.Calculator.ISubAccountsStore>(
     {
       Response: ActionType.SubAccounts.Response,
       Request: ActionType.SubAccounts.Request,
@@ -84,7 +84,7 @@ const rootReducer = combineReducers({
       extensions: {
         [ActionType.SubAccounts.Groups.AddToState]: (
           group: IGroup<ISimpleSubAccount>,
-          st: Redux.Calculator.ISubAccountsStoreNew
+          st: Redux.Calculator.ISubAccountsStore
         ) => {
           let data = [...st.data];
           for (let i = 0; i < group.children.length; i++) {
@@ -106,7 +106,7 @@ const rootReducer = combineReducers({
           }
           return { data };
         },
-        [ActionType.SubAccounts.Groups.RemoveFromState]: (id: number, st: Redux.Calculator.ISubAccountsStoreNew) => {
+        [ActionType.SubAccounts.Groups.RemoveFromState]: (id: number, st: Redux.Calculator.ISubAccountsStore) => {
           let data = [...st.data];
           for (let i = 0; i < data.length; i++) {
             const model: ISubAccount = data[i];
@@ -118,7 +118,7 @@ const rootReducer = combineReducers({
         },
         [ActionType.SubAccounts.Groups.UpdateInState]: (
           group: INestedGroup,
-          st: Redux.Calculator.ISubAccountsStoreNew
+          st: Redux.Calculator.ISubAccountsStore
         ) => {
           let data = [...st.data];
           for (let i = 0; i < data.length; i++) {

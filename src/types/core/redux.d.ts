@@ -130,15 +130,6 @@ namespace Redux {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
-      readonly table: ListStore<Table.SubAccountRow>;
-      readonly history: IListResponseStore<IFieldAlterationEvent>;
-      readonly groups: ISubAccountGroupsStore;
-    }
-
-    interface ISubAccountsStoreNew extends IListResponseStore<ISubAccount> {
-      readonly deleting: ListStore<number>;
-      readonly updating: ListStore<number>;
-      readonly creating: boolean;
       readonly placeholders: ListStore<Table.SubAccountRow>;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
       readonly groups: ISubAccountGroupsStore;
@@ -162,7 +153,7 @@ namespace Redux {
     interface IAccountStore {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<IAccount>;
-      readonly subaccounts: ISubAccountsStoreNew;
+      readonly subaccounts: ISubAccountsStore;
       readonly comments: ICommentsStore;
     }
 

@@ -9,7 +9,7 @@ export const initialSubAccountGroupsState: Redux.Calculator.ISubAccountGroupsSto
 };
 
 export const initialSubAccountsState: Redux.Calculator.ISubAccountsStore = {
-  table: [],
+  placeholders: [],
   deleting: [],
   updating: [],
   creating: false,
