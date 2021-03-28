@@ -58,7 +58,7 @@ const AccountsBudgetTable = (): JSX.Element => {
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const budgetDetail = useSelector(selectBudgetDetail);
-  console.log(data);
+
   return (
     <React.Fragment>
       <BudgetTable<Table.AccountRow, IAccount, Http.IAccountPayload, INestedGroup, ISimpleSubAccount>
