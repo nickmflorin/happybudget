@@ -344,13 +344,15 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
       // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
       // We could do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
-      const preResponsePayload = SubAccountMapping.preRequestModelPayload(action.payload);
-      yield put(updateSubAccountInStateAction({ ...model, ...preResponsePayload }));
+      const updatedModel = SubAccountMapping.newModelWithChanges(model, action.payload);
+      yield put(updateSubAccountInStateAction(updatedModel));
 
       yield put(updatingSubAccountAction({ id: model.id, value: true }));
       const requestPayload = SubAccountMapping.patchPayload(action.payload);
       try {
         const response: ISubAccount = yield call(updateSubAccount, model.id, requestPayload);
+        // TODO: We might want to consider not updating after the response and always relying
+        // on state changing the values in the client.
         yield put(updateSubAccountInStateAction(response));
       } catch (e) {
         yield call(

@@ -6,7 +6,6 @@ export interface MappedField<M extends Model> {
   requiredForPost?: boolean;
   calculatedField?: boolean;
   usedToCalculate?: boolean;
-  updateBeforeRequest?: boolean;
   excludeFromPost?: boolean;
 }
 
@@ -173,28 +172,6 @@ class Mapping<
   };
 
   // Deprecate.
-  preRequestModelPayload = (payload: Table.RowChange): Partial<M> => {
-    const obj: { [key: string]: any } = {};
-    forEach(this.fields, (field: MappedField<M>) => {
-      if (field.updateBeforeRequest === true && !isNil(payload.data[field.field as string])) {
-        obj[field.field as string] = payload.data[field.field as string].newValue;
-      }
-    });
-    return obj as Partial<M>;
-  };
-
-  // Deprecate.
-  preRequestPayload = (payload: Table.RowChange): Partial<R> => {
-    const obj: { [key: string]: any } = {};
-    forEach(this.fields, (field: MappedField<M>) => {
-      if (field.updateBeforeRequest === true && !isNil(payload.data[field.field as string])) {
-        obj[field.field as string] = payload.data[field.field as string].newValue;
-      }
-    });
-    return obj as Partial<R>;
-  };
-
-  // Deprecate.
   patchRequestRequiresRecalculation = (data: Partial<P>): boolean => {
     let recalculationRequired = false;
     const fieldsUsedToCalculate = map(
@@ -260,7 +237,7 @@ export const SubAccountMapping = new Mapping<
     { field: "quantity", usedToCalculate: true },
     { field: "rate", usedToCalculate: true },
     { field: "multiplier", usedToCalculate: true },
-    { field: "unit", updateBeforeRequest: true },
+    { field: "unit" },
     { field: "identifier", requiredForPost: true },
     { field: "estimated", calculatedField: true },
     { field: "variance", calculatedField: true },
@@ -278,19 +255,17 @@ export const ActualMapping = new Mapping<Table.ActualRow, IActual, Http.IActualP
     {
       field: "object_id",
       excludeFromPost: true,
-      requiredForPost: true,
-      updateBeforeRequest: true
+      requiredForPost: true
     },
     {
       field: "parent_type",
       excludeFromPost: true,
-      requiredForPost: true,
-      updateBeforeRequest: true
+      requiredForPost: true
     },
     { field: "vendor" },
     { field: "purchase_order" },
     { field: "date" },
-    { field: "payment_method", updateBeforeRequest: true },
+    { field: "payment_method" },
     { field: "payment_id" },
     { field: "value" }
   ],
