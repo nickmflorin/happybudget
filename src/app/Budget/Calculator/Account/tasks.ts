@@ -54,6 +54,26 @@ import {
   updateSubAccountInStateAction
 } from "./actions";
 
+export function* removeSubAccountFromGroupTask(action: Redux.IAction<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(updatingSubAccountAction({ id: action.payload, value: true }));
+    try {
+      const subaccount: ISubAccount = yield call(updateSubAccount, action.payload, { group: null });
+      yield put(updateSubAccountInStateAction({ id: subaccount.id, data: subaccount }));
+    } catch (e) {
+      yield call(
+        handleTableErrors,
+        e,
+        "There was an error removing the sub account from the group.",
+        action.payload,
+        (errors: Table.CellError[]) => addErrorsToTableAction(errors)
+      );
+    } finally {
+      yield put(updatingSubAccountAction({ id: action.payload, value: false }));
+    }
+  }
+}
+
 export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(deletingGroupAction(true));

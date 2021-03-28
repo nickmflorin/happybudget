@@ -95,6 +95,7 @@ namespace Http {
     readonly rate?: number;
     readonly multiplier?: number;
     readonly unit?: Unit;
+    readonly group?: number | null;
   }
 
   interface ISubAccountGroupPayload extends IPayload {

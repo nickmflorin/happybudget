@@ -222,6 +222,7 @@ export const SubAccountMapping = new Mapping<
   fields: [
     { field: "description" },
     { field: "name" },
+    { field: "group" },
     { field: "quantity", usedToCalculate: true },
     { field: "rate", usedToCalculate: true },
     { field: "multiplier", usedToCalculate: true },

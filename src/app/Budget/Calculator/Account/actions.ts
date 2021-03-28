@@ -40,6 +40,7 @@ export const ActionType = {
     Loading: "calculator.account.subaccounts.Loading",
     Response: "calculator.account.subaccounts.Response",
     Request: "calculator.account.subaccounts.Request",
+    RemoveFromGroup: "calculator.account.subaccounts.RemoveFromGroup",
     AddErrors: "calculator.account.subaccounts.AddErrors",
     UpdateInState: "calculator.account.subaccounts.UpdateInState",
     Groups: {
@@ -113,6 +114,7 @@ export const setSubAccountsSearchAction = simpleAction<string>(ActionType.SubAcc
 export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.SubAccounts.AddErrors
 );
+export const removeSubAccountFromGroupAction = simpleAction<number>(ActionType.SubAccounts.RemoveFromGroup);
 
 export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<ISubAccount>>(
   ActionType.SubAccounts.UpdateInState

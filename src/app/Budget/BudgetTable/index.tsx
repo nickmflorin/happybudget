@@ -489,8 +489,16 @@ const BudgetTable = <
         name: `Delete ${row.meta.typeLabel} ${row.meta.label}`,
         action: () => onRowDelete(row)
       };
-      if (!isNil(row.group) || isNil(groupParams)) {
+      if (isNil(groupParams)) {
         return [deleteRowContextMenuItem];
+      } else if (!isNil(row.group)) {
+        return [
+          deleteRowContextMenuItem,
+          {
+            name: `Remove ${row.meta.typeLabel} ${row.meta.label} from Group ${row.group.name}`,
+            action: () => groupParams.onRowRemoveFromGroup(row)
+          }
+        ];
       } else {
         const groupableNodesAbove = findRowsUpUntilFirstGroupFooterRow(params.node);
         let label: string;

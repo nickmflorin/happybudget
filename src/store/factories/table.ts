@@ -29,7 +29,7 @@ export const createTableReducer = <
   G extends Table.RowGroup = Table.RowGroup,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
-  mappings: Partial<ReducerFactory.ISimpleTableActionMap>,
+  mappings: Partial<ReducerFactory.ITableActionMap>,
   mapping: Mapping<R, M, P, C, G>,
   options: Partial<ReducerFactory.IOptions<Redux.ListStore<R>>> = { initialState: [], referenceEntity: "entity" }
 ) => {
@@ -38,7 +38,7 @@ export const createTableReducer = <
     initialState: []
   });
 
-  const transformers: ReducerFactory.Transformers<ReducerFactory.ISimpleTableActionMap, Redux.ListStore<R>, A> = {
+  const transformers: ReducerFactory.Transformers<ReducerFactory.ITableActionMap, Redux.ListStore<R>, A> = {
     ClearData: () => [],
     SetData: (response: Http.IListResponse<M>) => map(response.data, (model: M) => mapping.modelToRow(model)),
     AddPlaceholders: (numRows: number, st: Redux.ListStore<R>) => {
@@ -77,6 +77,7 @@ export const createTableReducer = <
         return st;
       } else {
         const partialRow: Partial<R> = mapping.partialModelToPartialRow(payload.data);
+        console.log(partialRow);
         return replaceInArray<R>(st, { id: payload.id }, { ...row, ...partialRow });
       }
     },
@@ -243,8 +244,21 @@ export const createTableReducer = <
         }
         return st;
       }
+    },
+    RemoveRowFromGroup: (id: number, st: Redux.ListStore<R>) => {
+      const row = find(st, { id } as any);
+      if (isNil(row)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when removing ${Options.referenceEntity} row from group in state...
+          the ${Options.referenceEntity} row with ID ${id} does not exist in state when it is expected to.`
+        );
+        return st;
+      } else {
+        return replaceInArray<R>(st, { id }, { ...row, group: null });
+      }
     }
   };
 
-  return createListReducerFromTransformers<ReducerFactory.ITableDataActionMap, R, A>(mappings, transformers, Options);
+  return createListReducerFromTransformers<ReducerFactory.ITableActionMap, R, A>(mappings, transformers, Options);
 };

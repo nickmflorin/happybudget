@@ -17,6 +17,7 @@ export interface GroupProps<
   groupGetter?: (row: R) => G | null;
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
+  onRowRemoveFromGroup: (row: R) => void;
 }
 
 export interface BudgetTableProps<

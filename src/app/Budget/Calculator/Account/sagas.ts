@@ -14,7 +14,8 @@ import {
   editAccountCommentTask,
   getSubAccountsHistoryTask,
   deleteSubAccountGroupTask,
-  addSubAccountGroupToStateTask
+  addSubAccountGroupToStateTask,
+  removeSubAccountFromGroupTask
 } from "./tasks";
 
 function* watchForRequestSubAccountsSaga(): SagaIterator {
@@ -139,6 +140,26 @@ function* watchForDeleteGroupSaga(): SagaIterator {
   }
 }
 
+function* watchForRemoveSubAccountFromGroupSaga(): SagaIterator {
+  let lastTasks: { [key: number]: any[] } = {};
+  while (true) {
+    const action: Redux.IAction<number> = yield take(ActionType.SubAccounts.RemoveFromGroup);
+    if (!isNil(action.payload)) {
+      if (isNil(lastTasks[action.payload])) {
+        lastTasks[action.payload] = [];
+      }
+      // If there were any previously submitted tasks to remove the same row,
+      // cancel them.
+      if (lastTasks[action.payload].length !== 0) {
+        const cancellable = lastTasks[action.payload];
+        lastTasks = { ...lastTasks, [action.payload]: [] };
+        yield cancel(cancellable);
+      }
+      lastTasks[action.payload].push(yield call(removeSubAccountFromGroupTask, action));
+    }
+  }
+}
+
 export default function* accountSaga(): SagaIterator {
   yield spawn(watchForAccountIdChangedSaga);
   yield spawn(watchForRequestSubAccountsHistorySaga);
@@ -152,4 +173,5 @@ export default function* accountSaga(): SagaIterator {
   yield spawn(watchForEditCommentSaga);
   yield spawn(watchForDeleteGroupSaga);
   yield spawn(watchForAddGroupToStateSaga);
+  yield spawn(watchForRemoveSubAccountFromGroupSaga);
 }

@@ -21,40 +21,7 @@ namespace ReducerFactory {
 
   type ActionMap = { [key: string]: string };
 
-  type ITableDataActionMap = {
-    SetData: string;
-    AddPlaceholders: string;
-    RemoveRow: string;
-    UpdateRow: string;
-    ActivatePlaceholder: string;
-    SelectRow: string;
-    DeselectRow: string;
-    SelectAllRows: string;
-    AddErrors: string;
-    AddGroup: string;
-    RemoveGroup: string;
-    UpdateGroup: string;
-  };
-
   type ITableActionMap = {
-    Request: string;
-    Response: string;
-    Loading: string;
-    SetSearch: string;
-    AddPlaceholders: string;
-    RemoveRow: string;
-    UpdateRow: string;
-    ActivatePlaceholder: string;
-    SelectRow: string;
-    DeselectRow: string;
-    SelectAllRows: string;
-    AddErrors: string;
-    AddGroup: string;
-    RemoveGroup: string;
-    UpdateGroup: string;
-  };
-
-  type ISimpleTableActionMap = {
     ClearData: string;
     SetData: string;
     Loading: string;
@@ -70,6 +37,7 @@ namespace ReducerFactory {
     AddGroup: string;
     RemoveGroup: string;
     UpdateGroup: string;
+    RemoveRowFromGroup: string;
   };
 
   type IDetailResponseActionMap = {

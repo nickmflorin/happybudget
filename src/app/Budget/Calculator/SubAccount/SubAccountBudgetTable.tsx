@@ -87,6 +87,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         groupParams={{
           onDeleteGroup: (group: INestedGroup) => dispatch(deleteGroupAction(group.id)),
+          onRowRemoveFromGroup: (row: Table.SubAccountRow) => console.log(row),
           onGroupRows: (rows: Table.SubAccountRow[]) =>
             setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
         }}
