@@ -23,6 +23,7 @@ import {
   GetContextMenuItemsParams,
   MenuItemDef
 } from "ag-grid-community";
+import { FirstDataRenderedEvent } from "@ag-grid-community/core";
 
 import { RenderWithSpinner } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
@@ -122,9 +123,17 @@ const BudgetTable = <
   });
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
 
+  const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
+    event.api.sizeColumnsToFit();
+  });
+
   const onGridReady = useDynamicCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
     setColumnApi(event.columnApi);
+  });
+
+  const onFooterFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
+    event.api.sizeColumnsToFit();
   });
 
   const onFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
@@ -568,13 +577,6 @@ const BudgetTable = <
   }, [columnApi, gridApi, focused]);
 
   useEffect(() => {
-    if (!isNil(gridApi) && !isNil(footerGridApi)) {
-      gridApi.sizeColumnsToFit();
-      footerGridApi.sizeColumnsToFit();
-    }
-  }, [table, gridApi, footerGridApi]);
-
-  useEffect(() => {
     if (!isNil(gridApi)) {
       gridApi.setQuickFilter(search);
     }
@@ -809,6 +811,7 @@ const BudgetTable = <
               animateRows={true}
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
+              onFirstDataRendered={onFirstDataRendered}
               // NOTE: This might not be 100% necessary, because of how efficiently
               // we are managing the state updates to the data that flows into the table.
               // However, for now we will leave.  It is important to note that this will
@@ -834,6 +837,7 @@ const BudgetTable = <
               rowData={[tableFooter]}
               suppressRowClickSelection={true}
               onGridReady={onFooterGridReady}
+              onFirstDataRendered={onFooterFirstDataRendered}
               headerHeight={0}
               frameworkComponents={{
                 IndexCell: IndexCell,
