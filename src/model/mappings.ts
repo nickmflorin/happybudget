@@ -9,7 +9,7 @@ export const userToSimpleUser = (user: IUser): ISimpleUser => {
   };
 };
 
-export const subAccountGroupToSubAccountNestedGroup = (group: IGroup<ISimpleSubAccount>): INestedGroup => {
+export const groupToNestedGroup = (group: IGroup<any>): INestedGroup => {
   return {
     id: group.id,
     color: group.color,

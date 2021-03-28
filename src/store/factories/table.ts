@@ -24,7 +24,7 @@ export const createTablePlaceholdersReducer = <
 
   const transformers: ReducerFactory.Transformers<ReducerFactory.ITablePlaceholdersActionMap, Redux.ListStore<R>, A> = {
     Clear: () => [],
-    Add: (count: number | undefined, st: Redux.ListStore<R>) => {
+    AddToState: (count: number | undefined, st: Redux.ListStore<R>) => {
       const placeholders: R[] = [];
       const numPlaceholders = count || 1;
       for (let i = 0; i < numPlaceholders; i++) {
@@ -32,7 +32,7 @@ export const createTablePlaceholdersReducer = <
       }
       return [...st, ...placeholders];
     },
-    Remove: (id: number, st: Redux.ListStore<R>) => {
+    RemoveFromState: (id: number, st: Redux.ListStore<R>) => {
       const row: R | undefined = find(st, { id: id } as any);
       if (isNil(row)) {
         /* eslint-disable no-console */
@@ -66,6 +66,27 @@ export const createTablePlaceholdersReducer = <
           }
         );
       }
+    },
+    UpdateInState: (payload: R, st: Redux.ListStore<R>) => {
+      const row: R | undefined = find(st, { id: payload.id } as any);
+      if (isNil(row)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when updating the ${Options.referenceEntity}
+          placeholder in state... the ${Options.referenceEntity} placeholder row with ID ${payload.id}
+          does not exist in state when it is expected to.`
+        );
+        return st;
+      } else {
+        return replaceInArray<R>(
+          st,
+          { id: payload.id },
+          {
+            ...row,
+            ...payload
+          }
+        );
+      }
     }
   };
   return createListReducerFromTransformers<ReducerFactory.ITablePlaceholdersActionMap, R, A>(
@@ -82,6 +103,8 @@ export const createTablePlaceholdersReducer = <
  *
  * The reducer has default behavior that is mapped to the action types via
  * the mappings parameter.
+ *
+ * @deprecated
  *
  * @param mappings            Mappings of the standard actions to the specific actions that
  *                            the reducer should listen for.

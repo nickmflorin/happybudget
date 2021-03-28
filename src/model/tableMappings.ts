@@ -160,6 +160,16 @@ class Mapping<
     return obj as Partial<P>;
   };
 
+  preRequestModelPayload = (payload: Table.RowChange): Partial<M> => {
+    const obj: { [key: string]: any } = {};
+    forEach(this.fields, (field: MappedField<M>) => {
+      if (field.updateBeforeRequest === true && !isNil(payload.data[field.field as string])) {
+        obj[field.field as string] = payload.data[field.field as string].newValue;
+      }
+    });
+    return obj as Partial<M>;
+  };
+
   preRequestPayload = (payload: Table.RowChange): Partial<R> => {
     const obj: { [key: string]: any } = {};
     forEach(this.fields, (field: MappedField<M>) => {

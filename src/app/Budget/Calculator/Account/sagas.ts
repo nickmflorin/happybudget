@@ -14,7 +14,6 @@ import {
   editAccountCommentTask,
   getSubAccountsHistoryTask,
   deleteSubAccountGroupTask,
-  addSubAccountGroupToStateTask,
   removeSubAccountFromGroupTask,
   handleSubAccountPlaceholderActivatedTask,
   handleSubAccountUpdatedInStateTask
@@ -106,7 +105,7 @@ function* watchForSubAccountAddedToStateSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
     const action: Redux.IAction<Table.ActivatePlaceholderPayload<ISubAccount>> = yield take(
-      ActionType.SubAccounts.ActivatePlaceholder
+      ActionType.SubAccounts.Placeholders.Activate
     );
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload.model.id])) {
@@ -126,26 +125,6 @@ function* watchForSubAccountAddedToStateSaga(): SagaIterator {
 
 function* watchForSubAccountUpdatedInStateSaga(): SagaIterator {
   yield takeEvery(ActionType.SubAccounts.UpdateInState, handleSubAccountUpdatedInStateTask);
-}
-
-function* watchForAddGroupToStateSaga(): SagaIterator {
-  let lastTasks: { [key: number]: any[] } = {};
-  while (true) {
-    const action: Redux.IAction<IGroup<ISimpleSubAccount>> = yield take(ActionType.SubAccounts.Groups.AddToState);
-    if (!isNil(action.payload)) {
-      if (isNil(lastTasks[action.payload.id])) {
-        lastTasks[action.payload.id] = [];
-      }
-      // If there were any previously submitted tasks to add the same group,
-      // cancel them.
-      if (lastTasks[action.payload.id].length !== 0) {
-        const cancellable = lastTasks[action.payload.id];
-        lastTasks = { ...lastTasks, [action.payload.id]: [] };
-        yield cancel(cancellable);
-      }
-      lastTasks[action.payload.id].push(yield call(addSubAccountGroupToStateTask, action));
-    }
-  }
 }
 
 function* watchForDeleteGroupSaga(): SagaIterator {
@@ -200,7 +179,6 @@ export default function* accountSaga(): SagaIterator {
   yield spawn(watchForRemoveCommentSaga);
   yield spawn(watchForEditCommentSaga);
   yield spawn(watchForDeleteGroupSaga);
-  yield spawn(watchForAddGroupToStateSaga);
   yield spawn(watchForRemoveSubAccountFromGroupSaga);
   yield spawn(watchForSubAccountAddedToStateSaga);
   yield spawn(watchForSubAccountUpdatedInStateSaga);

@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
 import { isNil, find, concat, map, reduce } from "lodash";
 import { handleRequestError } from "api";
-import { subAccountGroupToSubAccountNestedGroup } from "model/mappings";
+import { groupToNestedGroup } from "model/mappings";
 import { SubAccountMapping } from "model/tableMappings";
 import {
   getSubAccountSubAccounts,
@@ -70,7 +70,7 @@ export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaI
 
 export function* addSubAccountGroupToStateTask(action: Redux.IAction<IGroup<ISimpleSubAccount>>): SagaIterator {
   if (!isNil(action.payload)) {
-    const nestedGroup = subAccountGroupToSubAccountNestedGroup(action.payload);
+    const nestedGroup = groupToNestedGroup(action.payload);
     yield put(
       addGroupToTableAction({
         group: nestedGroup,

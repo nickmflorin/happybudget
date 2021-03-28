@@ -29,10 +29,11 @@ namespace ReducerFactory {
   };
 
   type ITablePlaceholdersActionMap = {
-    Add: string;
+    AddToState: string;
     Activate: string;
     Clear: string;
-    Remove: string;
+    RemoveFromState: string;
+    UpdateInState: string;
   };
 
   type ITableActionMap = {

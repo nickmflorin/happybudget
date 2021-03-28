@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
 import { isNil, find, concat, map, reduce } from "lodash";
 import { handleRequestError } from "api";
-import { subAccountGroupToSubAccountNestedGroup } from "model/mappings";
+import { groupToNestedGroup } from "model/mappings";
 import { SubAccountMapping } from "model/tableMappings";
 import {
   getAccountSubAccounts,
@@ -28,9 +28,7 @@ import {
   deletingSubAccountAction,
   creatingSubAccountAction,
   updatingSubAccountAction,
-  updateTableRowAction,
-  addErrorsToTableAction,
-  addPlaceholdersAction,
+  addErrorsToStateAction,
   requestSubAccountsAction,
   requestAccountAction,
   loadingCommentsAction,
@@ -45,15 +43,17 @@ import {
   loadingSubAccountsHistoryAction,
   responseSubAccountsHistoryAction,
   deletingGroupAction,
-  removeGroupFromTableAction,
-  addGroupToTableAction,
-  updateGroupInTableAction,
+  removeGroupFromStateAction,
+  addGroupToStateAction,
+  updateGroupInStateAction,
   updateAccountInStateAction,
   updateSubAccountInStateAction,
   removeSubAccountFromStateAction,
   addSubAccountToStateAction,
-  activatePlaceholderAction,
-  removePlaceholderAction
+  removePlaceholderFromStateAction,
+  addPlaceholdersToStateAction,
+  updatePlaceholderInStateAction,
+  activatePlaceholderAction
 } from "./actions";
 
 export function* removeSubAccountFromGroupTask(action: Redux.IAction<number>): SagaIterator {
@@ -68,7 +68,7 @@ export function* removeSubAccountFromGroupTask(action: Redux.IAction<number>): S
         e,
         "There was an error removing the sub account from the group.",
         action.payload,
-        (errors: Table.CellError[]) => addErrorsToTableAction(errors)
+        (errors: Table.CellError[]) => addErrorsToStateAction(errors)
       );
     } finally {
       yield put(updatingSubAccountAction({ id: action.payload, value: false }));
@@ -78,27 +78,15 @@ export function* removeSubAccountFromGroupTask(action: Redux.IAction<number>): S
 
 export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(deletingGroupAction(true));
+    yield put(deletingGroupAction({ id: action.payload, value: true }));
     try {
       yield call(deleteSubAccountGroup, action.payload);
-      yield put(removeGroupFromTableAction(action.payload));
+      yield put(removeGroupFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the sub account group.");
     } finally {
-      yield put(deletingGroupAction(false));
+      yield put(deletingGroupAction({ id: action.payload, value: false }));
     }
-  }
-}
-
-export function* addSubAccountGroupToStateTask(action: Redux.IAction<IGroup<ISimpleSubAccount>>): SagaIterator {
-  if (!isNil(action.payload)) {
-    const nestedGroup = subAccountGroupToSubAccountNestedGroup(action.payload);
-    yield put(
-      addGroupToTableAction({
-        group: nestedGroup,
-        ids: map(action.payload.children, (subaccount: ISimpleSubAccount) => subaccount.id)
-      })
-    );
   }
 }
 
@@ -262,7 +250,7 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
       // a group - however, that will not happen in practice, because this task just handles the case
       // where the SubAccount is updated (not removed or added to a group).
       if (!isNil(subaccount.group)) {
-        yield put(updateGroupInTableAction({ groupId: subaccount.group.id, group: subaccount.group }));
+        yield put(updateGroupInStateAction(subaccount.group));
       }
     }
   }
@@ -276,7 +264,7 @@ export function* handleSubAccountPlaceholderActivatedTask(
 
     // Now that the placeholder is activated, we need to remove the placeholder from state and
     // insert in the actual SubAccount model into the state.
-    yield put(removePlaceholderAction(subaccount.id));
+    yield put(removePlaceholderFromStateAction(subaccount.id));
     yield put(addSubAccountToStateAction(subaccount));
 
     const account: IAccount | undefined = yield select(
@@ -300,7 +288,7 @@ export function* handleSubAccountPlaceholderActivatedTask(
       // a group - however, that will not happen in practice, because this task just handles the case
       // where the SubAccount is updated (not removed or added to a group).
       if (!isNil(subaccount.group)) {
-        yield put(updateGroupInTableAction({ groupId: subaccount.group.id, group: subaccount.group }));
+        yield put(updateGroupInStateAction(subaccount.group));
       }
     }
   }
@@ -319,7 +307,6 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.placeholders
       );
       const placeholder: Table.SubAccountRow | undefined = find(placeholders, { id });
-      console.log(placeholder);
       if (isNil(placeholder)) {
         /* eslint-disable no-console */
         console.error(
@@ -334,14 +321,8 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         // We could do this by updating with a payload generated from the response, but it is quicker
         // to do it before hand.
         const preResponsePayload = SubAccountMapping.preRequestPayload(action.payload);
-        if (Object.keys(preResponsePayload).length !== 0) {
-          yield put(
-            updateTableRowAction({
-              id: placeholder.id,
-              data: preResponsePayload
-            })
-          );
-        }
+        yield put(updatePlaceholderInStateAction({ ...placeholder, ...preResponsePayload }));
+
         const requestPayload = SubAccountMapping.postPayload(placeholder);
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
@@ -356,8 +337,6 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
               budgetId,
               requestPayload as Http.ISubAccountPayload
             );
-            // TODO: Since we are using multiple sources of truth, this bad guy
-            // also needs to add the sub account to the list data state.
             yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
           } catch (e) {
             yield call(
@@ -365,7 +344,7 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
               e,
               "There was an error updating the sub account.",
               placeholder.id,
-              (errors: Table.CellError[]) => addErrorsToTableAction(errors)
+              (errors: Table.CellError[]) => addErrorsToStateAction(errors)
             );
           } finally {
             yield put(creatingSubAccountAction(false));
@@ -379,15 +358,9 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
       // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
       // We could do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
-      const preResponsePayload = SubAccountMapping.preRequestPayload(action.payload);
-      if (Object.keys(preResponsePayload).length !== 0) {
-        yield put(
-          updateTableRowAction({
-            id: model.id,
-            data: preResponsePayload
-          })
-        );
-      }
+      const preResponsePayload = SubAccountMapping.preRequestModelPayload(action.payload);
+      yield put(updateSubAccountInStateAction({ ...model, ...preResponsePayload }));
+
       yield put(updatingSubAccountAction({ id: model.id, value: true }));
       const requestPayload = SubAccountMapping.patchPayload(action.payload);
       try {
@@ -399,7 +372,7 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
           e,
           "There was an error updating the sub account.",
           model.id,
-          (errors: Table.CellError[]) => addErrorsToTableAction(errors)
+          (errors: Table.CellError[]) => addErrorsToStateAction(errors)
         );
       } finally {
         yield put(updatingSubAccountAction({ id: model.id, value: false }));
@@ -419,7 +392,7 @@ export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
       });
       yield put(responseSubAccountsAction(response));
       if (response.data.length === 0) {
-        yield put(addPlaceholdersAction(2));
+        yield put(addPlaceholdersToStateAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the account's sub accounts.");

@@ -15,7 +15,7 @@ import { floatValueSetter, integerValueSetter } from "util/table";
 import BudgetTable from "../../BudgetTable2";
 import { selectBudgetId } from "../../selectors";
 import {
-  addPlaceholdersAction,
+  addPlaceholdersToStateAction,
   deselectSubAccountAction,
   removeSubAccountAction,
   selectSubAccountAction,
@@ -93,7 +93,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
         rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
-        onRowAdd={() => dispatch(addPlaceholdersAction(1))}
+        onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: Table.SubAccountRow) => dispatch(removeSubAccountAction(row.id))}
