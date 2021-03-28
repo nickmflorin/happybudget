@@ -143,6 +143,8 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
       // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
       // We could do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
+      // TODO: We should get rid of the preRequestPayload and just update preemtively with
+      // the entire row.
       const preResponsePayload = ActualMapping.preRequestModelPayload(action.payload);
       yield put(updateActualInStateAction({ ...model, ...preResponsePayload }));
 

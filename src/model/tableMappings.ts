@@ -131,7 +131,19 @@ class Mapping<
   newRowWithChanges = (row: R, change: Table.RowChange): R => {
     const obj: R = { ...row };
     forEach(this.fields, (field: MappedField<M>) => {
-      obj[field.field as keyof R] = change.data[field.field as string].newValue as any;
+      if (change.data[field.field as string] !== undefined) {
+        obj[field.field as keyof R] = change.data[field.field as string].newValue as any;
+      }
+    });
+    return obj;
+  };
+
+  newModelWithChanges = (model: M, change: Table.RowChange): M => {
+    const obj: M = { ...model };
+    forEach(this.fields, (field: MappedField<M>) => {
+      if (change.data[field.field as string] !== undefined) {
+        obj[field.field as keyof M] = change.data[field.field as string].newValue as any;
+      }
     });
     return obj;
   };
@@ -160,6 +172,7 @@ class Mapping<
     return obj as Partial<P>;
   };
 
+  // Deprecate.
   preRequestModelPayload = (payload: Table.RowChange): Partial<M> => {
     const obj: { [key: string]: any } = {};
     forEach(this.fields, (field: MappedField<M>) => {
@@ -170,6 +183,7 @@ class Mapping<
     return obj as Partial<M>;
   };
 
+  // Deprecate.
   preRequestPayload = (payload: Table.RowChange): Partial<R> => {
     const obj: { [key: string]: any } = {};
     forEach(this.fields, (field: MappedField<M>) => {
@@ -180,6 +194,7 @@ class Mapping<
     return obj as Partial<R>;
   };
 
+  // Deprecate.
   patchRequestRequiresRecalculation = (data: Partial<P>): boolean => {
     let recalculationRequired = false;
     const fieldsUsedToCalculate = map(

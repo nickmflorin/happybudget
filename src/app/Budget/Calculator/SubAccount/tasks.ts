@@ -242,9 +242,6 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
       }
       yield put(updateParentSubAccountInStateAction(subaccountPayload));
     }
-    // We should probably remove the group from the table if the response SubAccount does not have
-    // a group - however, that will not happen in practice, because this task just handles the case
-    // where the SubAccount is updated (not removed or added to a group).
     if (!isNil(subaccount.group)) {
       yield put(updateGroupInStateAction(subaccount.group));
     }
@@ -279,10 +276,6 @@ export function* handleSubAccountPlaceholderActivatedTask(
       }
       yield put(updateParentSubAccountInStateAction(subaccountPayload));
     }
-
-    // We should probably remove the group from the table if the response SubAccount does not have
-    // a group - however, that will not happen in practice, because this task just handles the case
-    // where the SubAccount is updated (not removed or added to a group).
     if (!isNil(subaccount.group)) {
       yield put(updateGroupInStateAction(subaccount.group));
     }
@@ -313,19 +306,16 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
         // We could do this by updating with a payload generated from the response, but it is quicker
         // to do it before hand.
-        // TODO: We should remove the preRequest concept and just update the whole row!
-        const preResponsePayload = SubAccountMapping.preRequestPayload(action.payload);
-        yield put(updatePlaceholderInStateAction({ ...placeholder, ...preResponsePayload }));
+        const updatedRow = SubAccountMapping.newRowWithChanges(placeholder, action.payload);
+        yield put(updatePlaceholderInStateAction(updatedRow));
 
-        // TODO: Here, I think we need to incorporate the action.payload data so the payload includes
-        // the updated data!
-        const requestPayload = SubAccountMapping.postPayload(placeholder);
+        const requestPayload = SubAccountMapping.postPayload(updatedRow);
 
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (SubAccountMapping.rowHasRequiredFields(placeholder)) {
+        if (SubAccountMapping.rowHasRequiredFields(updatedRow)) {
           yield put(creatingSubAccountAction(true));
           try {
             const response: ISubAccount = yield call(

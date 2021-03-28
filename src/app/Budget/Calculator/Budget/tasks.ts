@@ -247,27 +247,25 @@ export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIt
   }
 }
 
-// TODO: We need to update the calculated values on the budget when the account is updated!
 export function* handleAccountUpdatedInStateTask(action: Redux.IAction<IAccount>): SagaIterator {
   if (!isNil(action.payload)) {
+    // NOTE: We do not need to update the calculated values of the overall budget when the Account
+    // changes because direct updates to the Account itself do not affect the calculated fields
+    // of the Account - only it's underlying SubAccount(s) do.
     const account = action.payload;
-    const budget: IBudget | undefined = yield select(
-      (state: Redux.IApplicationStore) => state.budget.budget.detail.data
-    );
-    // We should probably remove the group from the table if the response Account does not have
-    // a group - however, that will not happen in practice, because this task just handles the case
-    // where the Account is updated (not removed or added to a group).
     if (!isNil(account.group)) {
       yield put(updateGroupInStateAction(account.group));
     }
   }
 }
 
-// TODO: We need to update the calculated values on the budget when the account is updated!
 export function* handleAccountPlaceholderActivatedTask(
   action: Redux.IAction<Table.ActivatePlaceholderPayload<IAccount>>
 ): SagaIterator {
   if (!isNil(action.payload)) {
+    // NOTE: We do not need to update the calculated values of the overall budget when the Account
+    // changes because direct updates to the Account itself do not affect the calculated fields
+    // of the Account - only it's underlying SubAccount(s) do.
     const account = action.payload.model;
 
     // Now that the placeholder is activated, we need to remove the placeholder from state and
@@ -308,19 +306,16 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
         // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
         // We could do this by updating with a payload generated from the response, but it is quicker
         // to do it before hand.
-        // TODO: We should remove the preRequest concept and just update the whole row!
-        const preResponsePayload = AccountMapping.preRequestPayload(action.payload);
-        yield put(updatePlaceholderInStateAction({ ...placeholder, ...preResponsePayload }));
+        const updatedRow = AccountMapping.newRowWithChanges(placeholder, action.payload);
+        yield put(updatePlaceholderInStateAction(updatedRow));
 
-        // TODO: Here, I think we need to incorporate the action.payload data so the payload includes
-        // the updated data!
-        const requestPayload = AccountMapping.postPayload(placeholder);
+        const requestPayload = AccountMapping.postPayload(updatedRow);
 
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (AccountMapping.rowHasRequiredFields(placeholder)) {
+        if (AccountMapping.rowHasRequiredFields(updatedRow)) {
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, budgetId, requestPayload as Http.IAccountPayload);
@@ -345,14 +340,16 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
       // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
       // We could do this by updating with a payload generated from the response, but it is quicker
       // to do it before hand.
-      const preResponsePayload = AccountMapping.preRequestModelPayload(action.payload);
-      yield put(updateAccountInStateAction({ ...model, ...preResponsePayload }));
+      const updatedModel = AccountMapping.newModelWithChanges(model, action.payload);
+      yield put(updateAccountInStateAction(updatedModel));
 
       yield put(updatingAccountAction({ id: model.id, value: true }));
       const requestPayload = AccountMapping.patchPayload(action.payload);
       try {
-        const response: IAccount = yield call(updateAccount, model.id, requestPayload);
-        yield put(updateAccountInStateAction(response));
+        // NOTE: Since the Account has no direct calculated fields (and we are only applying
+        // direct updates here) we do not need to update the Account in the state from the
+        // response.
+        yield call(updateAccount, model.id, requestPayload);
       } catch (e) {
         yield call(
           handleTableErrors,
