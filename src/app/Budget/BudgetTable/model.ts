@@ -1,4 +1,5 @@
 import { ColDef, CellClassParams, RowNode } from "ag-grid-community";
+import Mapping from "model/tableMappings";
 
 export interface GetExportValueParams {
   node: RowNode;
@@ -22,12 +23,17 @@ export interface GroupProps<
 
 export interface BudgetTableProps<
   R extends Table.Row<G, C>,
+  M extends Model,
+  P extends Http.IPayload,
   G extends Table.RowGroup = Table.RowGroup,
   C extends Table.RowChild = Table.RowChild
 > {
   bodyColumns: ColDef[];
   calculatedColumns?: ColDef[];
-  table: R[];
+  mapping: Mapping<R, M, P, C, G>;
+  data: M[];
+  placeholders?: R[];
+  selected?: number[];
   identifierField: string;
   identifierFieldHeader: string;
   identifierFieldParams?: Partial<ColDef>;

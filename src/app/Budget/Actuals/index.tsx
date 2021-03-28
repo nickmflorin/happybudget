@@ -7,6 +7,7 @@ import { CellClassParams } from "ag-grid-community";
 
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { ActualMapping } from "model/tableMappings";
 
 import { setAncestorsAction } from "../actions";
 import { selectBudgetDetailLoading, selectBudgetDetail } from "../selectors";
@@ -14,17 +15,23 @@ import BudgetTable, { GetExportValueParams } from "../BudgetTable";
 import {
   requestBudgetItemsAction,
   requestActualsAction,
-  setSearchAction,
-  addPlaceholdersAction,
-  deselectRowAction,
-  selectRowAction,
+  setActualsSearchAction,
+  addPlaceholdersToStateAction,
+  deselectActualAction,
+  selectActualAction,
   removeActualAction,
   updateActualAction,
-  selectAllRowsAction,
+  selectAllActualsAction,
   requestBudgetItemsTreeAction
 } from "./actions";
 import { BudgetItemCell, PaymentMethodsCell } from "./cells";
 
+const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.selected);
+const selectActuals = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.data);
+const selectTableSearch = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.search);
+const selectPlaceholders = simpleShallowEqualSelector(
+  (state: Redux.IApplicationStore) => state.actuals.actuals.placeholders
+);
 const selectActualsLoading = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.actuals.actuals.loading
 );
@@ -33,8 +40,6 @@ const selectLoading = createSelector(
   selectActualsLoading,
   (detailLoading: boolean, tableLoading: boolean) => detailLoading || tableLoading
 );
-const selectTableData = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.table);
-const selectTableSearch = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.search);
 const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.actuals.actuals.deleting,
   (state: Redux.IApplicationStore) => state.actuals.actuals.updating,
@@ -48,7 +53,9 @@ const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading);
   const budgetItems = useSelector(selectBudgetItems);
-  const table = useSelector(selectTableData);
+  const data = useSelector(selectActuals);
+  const placeholders = useSelector(selectPlaceholders);
+  const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const budgetDetail = useSelector(selectBudgetDetail);
@@ -75,27 +82,11 @@ const Actuals = (): JSX.Element => {
 
   return (
     <WrapInApplicationSpinner loading={loading}>
-      <BudgetTable<Table.ActualRow>
-        table={table}
-        nonEditableCells={["object_id", "payment_method"]}
-        nonHighlightedNonEditableCells={["payment_method", "object_id"]}
-        search={search}
-        onSearch={(value: string) => dispatch(setSearchAction(value))}
-        saving={saving}
-        onRowAdd={() => dispatch(addPlaceholdersAction(1))}
-        onRowSelect={(id: number) => dispatch(selectRowAction(id))}
-        onRowDeselect={(id: number) => dispatch(deselectRowAction(id))}
-        onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row))}
-        onRowUpdate={(payload: Table.RowChange) => dispatch(updateActualAction(payload))}
-        onSelectAll={() => dispatch(selectAllRowsAction())}
-        frameworkComponents={{ BudgetItemCell, PaymentMethodsCell }}
-        rowRefreshRequired={(existing: Table.ActualRow, row: Table.ActualRow) => {
-          return (
-            existing.object_id !== row.object_id ||
-            existing.parent_type !== row.parent_type ||
-            existing.payment_method !== row.payment_method
-          );
-        }}
+      <BudgetTable<Table.ActualRow, IActual, Http.IActualPayload>
+        data={data}
+        placeholders={placeholders}
+        mapping={ActualMapping}
+        selected={selected}
         identifierField={"object_id"}
         identifierFieldHeader={"Account"}
         identifierFieldParams={{
@@ -115,6 +106,26 @@ const Actuals = (): JSX.Element => {
               );
             }
           }
+        }}
+        nonEditableCells={["object_id", "payment_method"]}
+        nonHighlightedNonEditableCells={["payment_method", "object_id"]}
+        search={search}
+        onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
+        saving={saving}
+        onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
+        onRowSelect={(id: number) => dispatch(selectActualAction(id))}
+        onRowDeselect={(id: number) => dispatch(deselectActualAction(id))}
+        onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row.id))}
+        onRowUpdate={(payload: Table.RowChange) => dispatch(updateActualAction(payload))}
+        onSelectAll={() => dispatch(selectAllActualsAction())}
+        frameworkComponents={{ BudgetItemCell, PaymentMethodsCell }}
+        // TODO: Revisit whether or not this is necessary!
+        rowRefreshRequired={(existing: Table.ActualRow, row: Table.ActualRow) => {
+          return (
+            existing.object_id !== row.object_id ||
+            existing.parent_type !== row.parent_type ||
+            existing.payment_method !== row.payment_method
+          );
         }}
         totals={{
           value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? String(budgetDetail.actual) : "0.00"

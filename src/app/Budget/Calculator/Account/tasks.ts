@@ -316,10 +316,14 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
         // We could do this by updating with a payload generated from the response, but it is quicker
         // to do it before hand.
+        // TODO: We should remove the preRequest concept and just update the whole row!
         const preResponsePayload = SubAccountMapping.preRequestPayload(action.payload);
         yield put(updatePlaceholderInStateAction({ ...placeholder, ...preResponsePayload }));
 
+        // TODO: Here, I think we need to incorporate the action.payload data so the payload includes
+        // the updated data!
         const requestPayload = SubAccountMapping.postPayload(placeholder);
+
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row

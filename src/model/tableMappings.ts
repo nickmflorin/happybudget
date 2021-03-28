@@ -128,12 +128,12 @@ class Mapping<
     return obj as R;
   };
 
-  partialModelToPartialRow = (model: Partial<M>): Partial<R> => {
-    const obj: { [key: string]: any } = {};
+  newRowWithChanges = (row: R, change: Table.RowChange): R => {
+    const obj: R = { ...row };
     forEach(this.fields, (field: MappedField<M>) => {
-      obj[field.field as string] = getProperty<Partial<M>, keyof M>(model, field.field);
+      obj[field.field as keyof R] = change.data[field.field as string].newValue as any;
     });
-    return obj as R;
+    return obj;
   };
 
   postPayload = (row: R): P => {

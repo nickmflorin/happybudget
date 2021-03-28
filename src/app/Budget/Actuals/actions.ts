@@ -17,42 +17,55 @@ export const ActionType = {
     Updating: "actuals.actuals.Updating",
     Update: "actuals.actuals.Update",
     Remove: "actuals.actuals.Remove",
-    AddPlaceholders: "actuals.actuals.AddPlaceholders",
-    UpdateRow: "actuals.actuals.UpdateRow",
-    ActivatePlaceholder: "actuals.actuals.ActivatePlaceholder",
-    RemoveRow: "actuals.actuals.RemoveRow",
-    SelectRow: "actuals.actuals.SelectRow",
-    SelectAllRows: "actuals.actuals.SelectAllRows",
-    DeselectRow: "actuals.actuals.DeselectRow",
+    Select: "calculator.budget.accounts.Select",
+    Deselect: "calculator.actuals.Deselect",
+    SelectAll: "calculator.actuals.SelectAll",
     Loading: "actuals.actuals.Loading",
     SetSearch: "actuals.actuals.SetSearch",
     Response: "actuals.actuals.Response",
     Request: "actuals.actuals.Request",
-    AddErrors: "actuals.actuals.AddErrors"
+    UpdateInState: "calculator.budget.accounts.UpdateInState",
+    RemoveFromState: "calculator.budget.accounts.RemoveFromState",
+    AddToState: "calculator.budget.accounts.AddToState",
+    // Errors Functionality Needs to be Built Back In
+    AddErrors: "actuals.actuals.AddErrors",
+    Placeholders: {
+      AddToState: "calculator.actuals.placeholders.AddToState",
+      Activate: "calculator.actuals.placeholders.Activate",
+      UpdateInState: "calculator.actuals.placeholders.UpdateInState",
+      RemoveFromState: "calculator.actuals.placeholders.RemoveFromState"
+    }
   }
 };
 
-export const addPlaceholdersAction = simpleAction<number>(ActionType.Actuals.AddPlaceholders);
 export const updateActualAction = simpleAction<Table.RowChange>(ActionType.Actuals.Update);
-export const updateTableRowAction = simpleAction<{ id: number; data: Partial<Table.ActualRow> }>(
-  ActionType.Actuals.UpdateRow
-);
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<IActual>>(
-  ActionType.Actuals.ActivatePlaceholder
-);
-export const selectRowAction = simpleAction<number>(ActionType.Actuals.SelectRow);
-export const selectAllRowsAction = simpleAction<null>(ActionType.Actuals.SelectAllRows);
-export const deselectRowAction = simpleAction<number>(ActionType.Actuals.DeselectRow);
-export const removeTableRowAction = simpleAction<Table.ActualRow>(ActionType.Actuals.RemoveRow);
-export const removeActualAction = simpleAction<Table.ActualRow>(ActionType.Actuals.Remove);
+export const removeActualAction = simpleAction<number>(ActionType.Actuals.Remove);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Actuals.Deleting);
 export const updatingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Actuals.Updating);
 export const creatingActualAction = simpleAction<boolean>(ActionType.Actuals.Creating);
 export const requestActualsAction = simpleAction<null>(ActionType.Actuals.Request);
 export const loadingActualsAction = simpleAction<boolean>(ActionType.Actuals.Loading);
 export const responseActualsAction = simpleAction<Http.IListResponse<IActual>>(ActionType.Actuals.Response);
-export const setSearchAction = simpleAction<string>(ActionType.Actuals.SetSearch);
-export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(ActionType.Actuals.AddErrors);
+export const setActualsSearchAction = simpleAction<string>(ActionType.Actuals.SetSearch);
+export const selectActualAction = simpleAction<number>(ActionType.Actuals.Select);
+export const deselectActualAction = simpleAction<number>(ActionType.Actuals.Deselect);
+export const selectAllActualsAction = simpleAction<null>(ActionType.Actuals.SelectAll);
+
+// Errors Functionality Needs to be Built Back In
+export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(ActionType.Actuals.AddErrors);
+
+export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<IActual>>(
+  ActionType.Actuals.Placeholders.Activate
+);
+export const removePlaceholderFromStateAction = simpleAction<number>(ActionType.Actuals.Placeholders.RemoveFromState);
+export const addPlaceholdersToStateAction = simpleAction<number>(ActionType.Actuals.Placeholders.AddToState);
+export const updatePlaceholderInStateAction = simpleAction<Table.ActualRow>(
+  ActionType.Actuals.Placeholders.UpdateInState
+);
+
+export const addActualToStateAction = simpleAction<IActual>(ActionType.Actuals.AddToState);
+export const updateActualInStateAction = simpleAction<IActual>(ActionType.Actuals.UpdateInState);
+export const removeActualFromStateAction = simpleAction<number>(ActionType.Actuals.RemoveFromState);
 
 export const requestBudgetItemsAction = simpleAction<null>(ActionType.BudgetItems.Request);
 export const loadingBudgetItemsAction = simpleAction<boolean>(ActionType.BudgetItems.Loading);

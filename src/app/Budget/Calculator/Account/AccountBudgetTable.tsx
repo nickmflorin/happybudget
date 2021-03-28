@@ -12,7 +12,7 @@ import { SubAccountMapping } from "model/tableMappings";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { floatValueSetter, integerValueSetter } from "util/table";
 
-import BudgetTable from "../../BudgetTable2";
+import BudgetTable from "../../BudgetTable";
 import { selectBudgetId } from "../../selectors";
 import {
   addPlaceholdersToStateAction,

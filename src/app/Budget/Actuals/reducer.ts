@@ -2,12 +2,13 @@ import { combineReducers } from "redux";
 import {
   createSimpleBooleanReducer,
   createModelListActionReducer,
-  createTableReducer,
-  createListResponseReducer
+  createListResponseReducer,
+  createTablePlaceholdersReducer
 } from "store/factories";
 import { ActualMapping } from "model/tableMappings";
 
 import { ActionType } from "./actions";
+import { initialActualsState } from "./initialState";
 
 const rootReducer = combineReducers({
   budgetItems: createListResponseReducer<IBudgetItem>(
@@ -26,40 +27,40 @@ const rootReducer = combineReducers({
     },
     { referenceEntity: "budget item tree node" }
   ),
-  actuals: createListResponseReducer<ISubAccount>(
+  actuals: createListResponseReducer<IActual, Redux.Actuals.IActualsStore>(
     {
       Response: ActionType.Actuals.Response,
       Request: ActionType.Actuals.Request,
       Loading: ActionType.Actuals.Loading,
-      SetSearch: ActionType.Actuals.SetSearch
+      SetSearch: ActionType.Actuals.SetSearch,
+      UpdateInState: ActionType.Actuals.UpdateInState,
+      RemoveFromState: ActionType.Actuals.RemoveFromState,
+      AddToState: ActionType.Actuals.AddToState,
+      Select: ActionType.Actuals.Select,
+      Deselect: ActionType.Actuals.Deselect,
+      SelectAll: ActionType.Actuals.SelectAll
     },
     {
       referenceEntity: "actual",
+      initialState: initialActualsState,
       keyReducers: {
+        placeholders: createTablePlaceholdersReducer(
+          {
+            AddToState: ActionType.Actuals.Placeholders.AddToState,
+            Activate: ActionType.Actuals.Placeholders.Activate,
+            RemoveFromState: ActionType.Actuals.Placeholders.RemoveFromState,
+            UpdateInState: ActionType.Actuals.Placeholders.UpdateInState
+          },
+          ActualMapping,
+          { referenceEntity: "actual" }
+        ),
         deleting: createModelListActionReducer(ActionType.Actuals.Deleting, {
           referenceEntity: "actual"
         }),
         updating: createModelListActionReducer(ActionType.Actuals.Updating, {
           referenceEntity: "actual"
         }),
-        creating: createSimpleBooleanReducer(ActionType.Actuals.Creating),
-        table: createTableReducer<Table.ActualRow, IActual, Http.IActualPayload, Table.RowChild>(
-          {
-            AddPlaceholders: ActionType.Actuals.AddPlaceholders,
-            RemoveRow: ActionType.Actuals.RemoveRow,
-            UpdateRow: ActionType.Actuals.UpdateRow,
-            AddToState: ActionType.Actuals.ActivatePlaceholder,
-            SelectRow: ActionType.Actuals.SelectRow,
-            DeselectRow: ActionType.Actuals.DeselectRow,
-            SelectAllRows: ActionType.Actuals.SelectAllRows,
-            SetData: ActionType.Actuals.Response,
-            ClearData: ActionType.Actuals.Request,
-            Loading: ActionType.Actuals.Loading,
-            AddErrors: ActionType.Actuals.AddErrors
-          },
-          ActualMapping,
-          { referenceEntity: "actual" }
-        )
+        creating: createSimpleBooleanReducer(ActionType.Actuals.Creating)
       }
     }
   )

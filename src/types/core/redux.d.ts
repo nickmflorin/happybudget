@@ -175,7 +175,7 @@ namespace Redux {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
-      readonly table: ListStore<Table.ActualRow>;
+      readonly placeholders: ListStore<Table.ActualRow>;
     }
 
     interface IStore {

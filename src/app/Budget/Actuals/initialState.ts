@@ -1,7 +1,7 @@
 import { initialListResponseState } from "store/initialState";
 
 export const initialActualsState: Redux.Actuals.IActualsStore = {
-  table: [],
+  placeholders: [],
   deleting: [],
   updating: [],
   creating: false,

@@ -10,7 +10,9 @@ import {
 import { groupToNestedGroup } from "model/mappings";
 import { SubAccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
+
 import { ActionType } from "./actions";
+import { initialAccountsState } from "./initialState";
 
 const rootReducer = combineReducers({
   deleting: createModelListActionReducer(ActionType.Accounts.Deleting, { referenceEntity: "account" }),
@@ -52,6 +54,7 @@ const rootReducer = combineReducers({
     },
     {
       referenceEntity: "subaccount",
+      initialState: initialAccountsState,
       keyReducers: {
         placeholders: createTablePlaceholdersReducer(
           {

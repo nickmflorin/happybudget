@@ -13,129 +13,154 @@ import {
   createSubAccountActual
 } from "services";
 import { handleTableErrors } from "store/tasks";
-import { requestBudgetAction } from "../actions";
 import {
   activatePlaceholderAction,
   loadingActualsAction,
   responseActualsAction,
-  updateTableRowAction,
-  addErrorsToTableAction,
-  addPlaceholdersAction,
-  removeTableRowAction,
   deletingActualAction,
   creatingActualAction,
   updatingActualAction,
   loadingBudgetItemsAction,
   responseBudgetItemsAction,
   loadingBudgetItemsTreeAction,
-  responseBudgetItemsTreeAction
+  responseBudgetItemsTreeAction,
+  removePlaceholderFromStateAction,
+  removeActualFromStateAction,
+  addActualToStateAction,
+  updatePlaceholderInStateAction,
+  addPlaceholdersToStateAction,
+  addErrorsToStateAction,
+  updateActualInStateAction
 } from "./actions";
 
-export function* handleActualRemovalTask(action: Redux.IAction<Table.ActualRow>): SagaIterator {
+// TODO: We need to also update the estimated, variance and actual values of the parent
+// budget when an actual is removed!
+export function* handleActualRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(removeTableRowAction(action.payload));
-    // NOTE: We cannot find the existing row from the table in state because the
-    // dispatched action above will remove the row from the table.
-    if (action.payload.meta.isPlaceholder === false) {
-      yield put(deletingActualAction({ id: action.payload.id as number, value: true }));
+    const models: IActual[] = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.data);
+    const model: IActual | undefined = find(models, { id: action.payload });
+    if (isNil(model)) {
+      const placeholders = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.placeholders);
+      const placeholder: Table.ActualRow | undefined = find(placeholders, { id: action.payload });
+      if (isNil(placeholder)) {
+        /* eslint-disable no-console */
+        console.warn(
+          `Inconsistent State!  Inconsistent state noticed when removing actual...
+          The actual with ID ${action.payload} does not exist in state when it is expected to.`
+        );
+      } else {
+        yield put(removePlaceholderFromStateAction(placeholder.id));
+      }
+    } else {
+      yield put(removeActualFromStateAction(model.id));
+      yield put(deletingActualAction({ id: model.id, value: true }));
       try {
-        yield call(deleteActual, action.payload.id as number);
+        yield call(deleteActual, model.id);
       } catch (e) {
         handleRequestError(e, "There was an error deleting the actual.");
       } finally {
-        yield put(deletingActualAction({ id: action.payload.id as number, value: false }));
+        yield put(deletingActualAction({ id: model.id, value: false }));
       }
     }
   }
 }
 
+// TODO: We need to update the calculated values on the budget when the actual is updated!
+export function* handleActualUpdatedInStateTask(action: Redux.IAction<IActual>): SagaIterator {
+  if (!isNil(action.payload)) {
+    const actual = action.payload;
+    const budget: IBudget | undefined = yield select(
+      (state: Redux.IApplicationStore) => state.budget.budget.detail.data
+    );
+  }
+}
+
+// TODO: We need to update the calculated values on the budget when the actual is updated!
+export function* handleActualPlaceholderActivatedTask(
+  action: Redux.IAction<Table.ActivatePlaceholderPayload<IActual>>
+): SagaIterator {
+  if (!isNil(action.payload)) {
+    const account = action.payload.model;
+
+    // Now that the placeholder is activated, we need to remove the placeholder from state and
+    // insert in the actual Actual model into the state.
+    yield put(removePlaceholderFromStateAction(account.id));
+    yield put(addActualToStateAction(account));
+  }
+}
+
 export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
-  if (!isNil(action.payload) && !isNil(budgetId)) {
-    const table: Table.ActualRow[] = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.table);
-
-    const existing: Table.ActualRow | undefined = find(table, { id: action.payload.id });
-    if (isNil(existing)) {
-      /* eslint-disable no-console */
-      console.error(
-        `Inconsistent State!:  Inconsistent state noticed when updating actual in state...
-        the actual with ID ${action.payload.id} does not exist in state when it is expected to.`
-      );
-    } else {
-      // There are some cases where we need to update the row in the table before
-      // we make the request, to improve the UI.  This happens for cells where the
-      // value is rendered via an HTML element (i.e. the Unit Cell).  AGGridReact will
-      // not automatically update the cell when the Unit is changed via the dropdown,
-      // so we need to udpate the row in the data used to populate the table.  We could
-      // do this by updating with a payload generated from the response, but it is quicker
-      // to do it before hand.
-      const preResponsePayload = ActualMapping.preRequestPayload(action.payload);
-      if (Object.keys(preResponsePayload).length !== 0) {
-        yield put(
-          updateTableRowAction({
-            id: existing.id,
-            data: preResponsePayload
-          })
+  if (!isNil(budgetId) && !isNil(action.payload)) {
+    const id = action.payload.id;
+    const data: IActual[] = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.data);
+    const model: IActual | undefined = find(data, { id });
+    if (isNil(model)) {
+      const placeholders = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.placeholders);
+      const placeholder: Table.ActualRow | undefined = find(placeholders, { id });
+      if (isNil(placeholder)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when updating actual in state...
+          the actual with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
-      }
-      if (existing.meta.isPlaceholder === true) {
-        const updatedRow = { ...existing, ...ActualMapping.patchPayload(action.payload) } as Table.ActualRow;
-        // Wait until all of the required fields are present before we create the entity in the
-        // backend.  Once the entity is created in the backend, we can remove the placeholder
-        // designation of the row so it will be updated instead of created the next time the row
-        // is changed.
-        if (ActualMapping.rowHasRequiredFields(updatedRow)) {
-          yield put(creatingActualAction(true));
-          const payload = ActualMapping.postPayload(updatedRow);
-          if (!isNil(updatedRow.object_id)) {
-            let service = createAccountActual;
-            if (updatedRow.parent_type === "subaccount") {
-              service = createSubAccountActual;
-            }
-            try {
-              const response: IActual = yield call(service, updatedRow.object_id, payload);
-              yield put(activatePlaceholderAction({ id: existing.id, model: response }));
-              const responsePayload = ActualMapping.modelToRow(response);
-              if (Object.keys(responsePayload).length !== 0) {
-                yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
-              }
-            } catch (e) {
-              yield call(
-                handleTableErrors,
-                e,
-                "There was an error updating the actual.",
-                existing.id,
-                (errors: Table.CellError[]) => addErrorsToTableAction(errors)
-              );
-            } finally {
-              yield put(creatingActualAction(false));
-            }
-          }
-        }
       } else {
-        yield put(updatingActualAction({ id: existing.id as number, value: true }));
-        const requestPayload = ActualMapping.patchPayload(action.payload);
-        try {
-          const response: IActual = yield call(updateActual, existing.id as number, requestPayload);
-          const responsePayload = ActualMapping.modelToRow(response);
-          yield put(updateTableRowAction({ id: existing.id, data: responsePayload }));
+        // There are some cases where we need to update the row in the table before we make the request,
+        // to improve the UI.  This happens for cells where the value is rendered via an HTML element
+        // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
+        // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
+        // We could do this by updating with a payload generated from the response, but it is quicker
+        // to do it before hand.
+        const updatedRow = ActualMapping.newRowWithChanges(placeholder, action.payload);
+        yield put(updatePlaceholderInStateAction(updatedRow));
 
-          // Determine if the parent budget needs to be refreshed due to updates to the underlying
-          // actual fields that calculate the values of the parent budget.
-          if (ActualMapping.patchRequestRequiresRecalculation(requestPayload)) {
-            yield put(requestBudgetAction());
+        if (ActualMapping.rowHasRequiredFields(updatedRow) && !isNil(updatedRow.object_id)) {
+          let service = createAccountActual;
+          if (updatedRow.parent_type === "subaccount") {
+            service = createSubAccountActual;
           }
-        } catch (e) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error updating the actual.",
-            existing.id,
-            (errors: Table.CellError[]) => addErrorsToTableAction(errors)
-          );
-        } finally {
-          yield put(updatingActualAction({ id: existing.id as number, value: false }));
+          yield put(creatingActualAction(true));
+          try {
+            const response: IActual = yield call(service, updatedRow.object_id, ActualMapping.postPayload(updatedRow));
+            yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
+          } catch (e) {
+            yield call(
+              handleTableErrors,
+              e,
+              "There was an error updating the actual.",
+              placeholder.id,
+              (errors: Table.CellError[]) => addErrorsToStateAction(errors)
+            );
+          } finally {
+            yield put(creatingActualAction(false));
+          }
         }
+      }
+    } else {
+      // There are some cases where we need to update the row in the table before we make the request,
+      // to improve the UI.  This happens for cells where the value is rendered via an HTML element
+      // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
+      // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
+      // We could do this by updating with a payload generated from the response, but it is quicker
+      // to do it before hand.
+      const preResponsePayload = ActualMapping.preRequestModelPayload(action.payload);
+      yield put(updateActualInStateAction({ ...model, ...preResponsePayload }));
+
+      yield put(updatingActualAction({ id: model.id, value: true }));
+      const requestPayload = ActualMapping.patchPayload(action.payload);
+      try {
+        const response: IActual = yield call(updateActual, model.id, requestPayload);
+        yield put(updateActualInStateAction(response));
+      } catch (e) {
+        yield call(
+          handleTableErrors,
+          e,
+          "There was an error updating the actual.",
+          model.id,
+          (errors: Table.CellError[]) => addErrorsToStateAction(errors)
+        );
+      } finally {
+        yield put(updatingActualAction({ id: model.id, value: false }));
       }
     }
   }
@@ -149,7 +174,7 @@ export function* getActualsTask(action: Redux.IAction<null>): SagaIterator {
       const response = yield call(getBudgetActuals, budgetId, { no_pagination: true });
       yield put(responseActualsAction(response));
       if (response.data.length === 0) {
-        yield put(addPlaceholdersAction(2));
+        yield put(addPlaceholdersToStateAction(2));
       }
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget's actuals.");

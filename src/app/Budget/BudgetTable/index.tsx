@@ -23,6 +23,7 @@ import {
   GetContextMenuItemsParams,
   MenuItemDef
 } from "ag-grid-community";
+import { FirstDataRenderedEvent } from "@ag-grid-community/core";
 
 import { RenderWithSpinner } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
@@ -52,13 +53,18 @@ const actionCell = (col: ColDef): ColDef => {
 
 const BudgetTable = <
   R extends Table.Row<G, C>,
+  M extends Model,
+  P extends Http.IPayload,
   G extends Table.RowGroup = Table.RowGroup,
   C extends Table.RowChild = Table.RowChild
 >({
   /* eslint-disable indent */
   bodyColumns,
   calculatedColumns = [],
-  table,
+  data,
+  placeholders = [],
+  selected,
+  mapping,
   search,
   loading,
   saving,
@@ -86,10 +92,10 @@ const BudgetTable = <
   isCellEditable,
   highlightNonEditableCell,
   rowRefreshRequired
-}: BudgetTableProps<R, G, C>) => {
+}: BudgetTableProps<R, M, P, G, C>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
-  const [_table, setTable] = useState<R[]>([]);
+  const [table, setTable] = useState<R[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [footerGridApi, setFooterGridApi] = useState<GridApi | undefined>(undefined);
@@ -117,9 +123,17 @@ const BudgetTable = <
   });
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
 
+  const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
+    event.api.sizeColumnsToFit();
+  });
+
   const onGridReady = useDynamicCallback((event: GridReadyEvent): void => {
     setGridApi(event.api);
     setColumnApi(event.columnApi);
+  });
+
+  const onFooterFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
+    event.api.sizeColumnsToFit();
   });
 
   const onFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
@@ -131,20 +145,6 @@ const BudgetTable = <
     setGridOptions({ ...gridOptions, alignedGrids: [footerGridOptions] });
     setFooterGridOptions({ ...footerGridOptions, alignedGrids: [gridOptions] });
   }, []);
-
-  const groupGetter = useMemo((): ((row: R) => G | null) => {
-    if (!isNil(groupParams)) {
-      return !isNil(groupParams.groupGetter) ? groupParams.groupGetter : (row: R) => row.group;
-    }
-    return (row: R) => null;
-  }, [groupParams]);
-
-  const groupValueGetter = useMemo((): ((row: R) => any | null) => {
-    if (!isNil(groupParams)) {
-      return !isNil(groupParams.valueGetter) ? groupParams.valueGetter : (row: R) => groupGetter(row)?.name;
-    }
-    return (row: R) => null;
-  }, [groupParams, groupGetter]);
 
   const baseColumns = useMemo((): ColDef[] => {
     let baseLeftColumns: ColDef[] = [
@@ -520,39 +520,46 @@ const BudgetTable = <
     }
   });
 
+  // TODO: We need a way to preserve the indices of the existing data that was already there!
+  // This is important for placeholders when they are activated and removed!
   useEffect(() => {
-    if (!isNil(groupParams)) {
-      const rowsWithGroup = filter(table, (row: R) => !isNil(groupValueGetter(row)));
-      const rowsWithoutGroup = filter(table, (row: R) => isNil(groupValueGetter(row)));
+    const modelsWithGroup = filter(data, (model: M) => !isNil(mapping.getGroup(model)));
+    const modelsWithoutGroup = filter(data, (model: M) => isNil(mapping.getGroup(model)));
 
-      const newTable: R[] = [];
+    const newTable: R[] = [];
 
-      const groupedRows: { [key: number]: R[] } = groupBy(rowsWithGroup, (row: R) => (groupGetter(row) as G).id);
+    const groupedModels: { [key: number]: M[] } = groupBy(
+      modelsWithGroup,
+      (model: M) => (mapping.getGroup(model) as G).id
+    );
 
-      const allGroups: (G | null)[] = map(rowsWithGroup, (row: R) => groupGetter(row));
-      const groups: G[] = [];
-      forEach(allGroups, (group: G | null) => {
-        if (!isNil(group) && isNil(find(groups, { id: group.id }))) {
-          groups.push(group);
-        }
-      });
-      forEach(groupedRows, (rows: R[], groupId: string) => {
-        const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
-        if (!isNil(group)) {
-          const footer: R = createGroupFooter(group);
-          newTable.push(...rows, {
-            ...footer,
-            group,
-            [identifierField]: group.name,
-            meta: { ...footer.meta, isGroupFooter: true }
-          });
-        }
-      });
-      setTable([...newTable, ...rowsWithoutGroup]);
-    } else {
-      setTable(table);
-    }
-  }, [useDeepEqualMemo(table)]);
+    const allGroups: (G | null)[] = map(modelsWithGroup, (model: M) => mapping.getGroup(model));
+
+    const groups: G[] = [];
+    forEach(allGroups, (group: G | null) => {
+      if (!isNil(group) && isNil(find(groups, { id: group.id }))) {
+        groups.push(group);
+      }
+    });
+
+    forEach(groupedModels, (models: M[], groupId: string) => {
+      const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
+      if (!isNil(group)) {
+        const footer: R = createGroupFooter(group);
+        newTable.push(...map(models, (m: M) => mapping.modelToRow(m, { selected: includes(selected, m.id) })), {
+          ...footer,
+          group,
+          [identifierField]: group.name,
+          meta: { ...footer.meta, isGroupFooter: true }
+        });
+      }
+    });
+    setTable([
+      ...newTable,
+      ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, { selected: includes(selected, m.id) })),
+      ...placeholders
+    ]);
+  }, [useDeepEqualMemo(data), useDeepEqualMemo(placeholders), useDeepEqualMemo(selected)]);
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {
@@ -572,13 +579,6 @@ const BudgetTable = <
   }, [columnApi, gridApi, focused]);
 
   useEffect(() => {
-    if (!isNil(gridApi) && !isNil(footerGridApi)) {
-      gridApi.sizeColumnsToFit();
-      footerGridApi.sizeColumnsToFit();
-    }
-  }, [_table, gridApi, footerGridApi]);
-
-  useEffect(() => {
     if (!isNil(gridApi)) {
       gridApi.setQuickFilter(search);
     }
@@ -591,7 +591,7 @@ const BudgetTable = <
     if (!isNil(gridApi)) {
       gridApi.forEachNode((node: RowNode) => {
         if (node.group === false) {
-          const existing: R | undefined = find(_table, { id: node.data.id });
+          const existing: R | undefined = find(table, { id: node.data.id });
           if (!isNil(existing)) {
             if (
               existing.meta.selected !== node.data.meta.selected ||
@@ -603,7 +603,7 @@ const BudgetTable = <
         }
       });
     }
-  }, [_table, gridApi]);
+  }, [useDeepEqualMemo(table), gridApi]);
 
   useEffect(() => {
     // Changes to the errors in the rows does not trigger a refresh of those cells
@@ -612,7 +612,7 @@ const BudgetTable = <
     if (!isNil(gridApi) && !isNil(columnApi)) {
       gridApi.forEachNode((node: RowNode) => {
         if (node.group === false) {
-          const existing: R | undefined = find(_table, { id: node.data.id });
+          const existing: R | undefined = find(table, { id: node.data.id });
           if (!isNil(existing)) {
             // TODO: We might want to do a deeper comparison in the future here.
             if (existing.meta.errors.length !== node.data.meta.errors.length) {
@@ -632,17 +632,17 @@ const BudgetTable = <
         }
       });
     }
-  }, [_table, gridApi, columnApi]);
+  }, [useDeepEqualMemo(table), gridApi, columnApi]);
 
   useEffect(() => {
-    const mapped = map(_table, (row: R) => row.meta.selected);
+    const mapped = map(table, (row: R) => row.meta.selected);
     const uniques = uniq(mapped);
     if (uniques.length === 1 && uniques[0] === true) {
       setAllSelected(true);
     } else {
       setAllSelected(false);
     }
-  }, [_table]);
+  }, [useDeepEqualMemo(table)]);
 
   useEffect(() => {
     setColDefs(
@@ -695,7 +695,7 @@ const BudgetTable = <
         })
       )
     );
-  }, [bodyColumns, calculatedColumns]);
+  }, [useDeepEqualMemo(bodyColumns), useDeepEqualMemo(calculatedColumns)]);
 
   return (
     <React.Fragment>
@@ -704,7 +704,7 @@ const BudgetTable = <
         setSearch={(value: string) => onSearch(value)}
         columns={[...bodyColumns, ...calculatedColumns]}
         onDelete={() => {
-          forEach(_table, (row: R) => {
+          forEach(table, (row: R) => {
             if (row.meta.selected === true) {
               onRowDelete(row);
             }
@@ -713,7 +713,7 @@ const BudgetTable = <
         saving={saving}
         selected={allSelected}
         onSelect={onSelectAll}
-        deleteDisabled={filter(_table, (row: R) => row.meta.selected === true).length === 0}
+        deleteDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
         onExport={(fields: Field[]) => {
           if (!isNil(gridApi) && !isNil(columnApi)) {
             const includeColumn = (col: Column): boolean => {
@@ -740,7 +740,7 @@ const BudgetTable = <
               }
             });
 
-            const data: CSVData = [headerRow];
+            const csvData: CSVData = [headerRow];
 
             gridApi.forEachNode((node: RowNode, index: number) => {
               const row: CSVRow = [];
@@ -766,13 +766,13 @@ const BudgetTable = <
                   }
                 }
               });
-              data.push(row);
+              csvData.push(row);
             });
             let fileName = "make-me-current-date";
             if (!isNil(exportFileName)) {
               fileName = exportFileName;
             }
-            downloadAsCsvFile(fileName, data);
+            downloadAsCsvFile(fileName, csvData);
           }
         }}
         onColumnsChange={(fields: Field[]) => {
@@ -800,8 +800,8 @@ const BudgetTable = <
               columnDefs={colDefs}
               getContextMenuItems={getContextMenuItems}
               allowContextMenuWithControlKey={true}
-              rowData={_table}
-              getRowNodeId={(data: any) => data.id}
+              rowData={table}
+              getRowNodeId={(r: any) => r.id}
               getRowClass={getRowClass}
               immutableData={true}
               suppressRowClickSelection={true}
@@ -813,6 +813,7 @@ const BudgetTable = <
               animateRows={true}
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
+              onFirstDataRendered={onFirstDataRendered}
               // NOTE: This might not be 100% necessary, because of how efficiently
               // we are managing the state updates to the data that flows into the table.
               // However, for now we will leave.  It is important to note that this will
@@ -838,6 +839,7 @@ const BudgetTable = <
               rowData={[tableFooter]}
               suppressRowClickSelection={true}
               onGridReady={onFooterGridReady}
+              onFirstDataRendered={onFooterFirstDataRendered}
               headerHeight={0}
               frameworkComponents={{
                 IndexCell: IndexCell,

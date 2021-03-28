@@ -10,7 +10,7 @@ import { CreateAccountGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { AccountMapping } from "model/tableMappings";
 
-import BudgetTable from "../../BudgetTable2";
+import BudgetTable from "../../BudgetTable";
 import { selectBudgetId, selectBudgetDetail } from "../../selectors";
 import {
   setAccountsSearchAction,
