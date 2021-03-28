@@ -42,6 +42,7 @@ const rootReducer = combineReducers({
     },
     {
       referenceEntity: "actual",
+      strictSelect: false,
       initialState: initialActualsState,
       keyReducers: {
         placeholders: createTablePlaceholdersReducer(

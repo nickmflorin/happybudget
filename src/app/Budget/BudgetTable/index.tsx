@@ -557,7 +557,7 @@ const BudgetTable = <
     setTable([
       ...newTable,
       ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, { selected: includes(selected, m.id) })),
-      ...placeholders
+      ...map(placeholders, (r: R) => ({ ...r, meta: { ...r.meta, selected: includes(selected, r.id) } }))
     ]);
   }, [useDeepEqualMemo(data), useDeepEqualMemo(placeholders), useDeepEqualMemo(selected)]);
 

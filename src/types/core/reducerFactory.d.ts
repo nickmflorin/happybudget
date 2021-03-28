@@ -82,11 +82,8 @@ namespace ReducerFactory {
     keyReducers?: { [key: string]: Reducer<any, A> };
   }
 
-  interface ITableReducerOptions<
-    R extends Table.Row<G, C>,
-    M extends Model,
-    G extends Table.RowGroup = Table.RowGroup,
-    C extends Table.RowChild = Table.RowChild,
-    S extends Redux.ITableStore<R, M, G, C> = Redux.ITableStore<R, M, G, C>
-  > extends IOptions<S> {}
+  interface IListTransformerReducerOptions<S, A extends Redux.IAction<any> = Redux.IAction<any>>
+    extends ITransformerReducerOptions<S, A> {
+    strictSelect?: boolean;
+  }
 }

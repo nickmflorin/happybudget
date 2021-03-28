@@ -49,6 +49,7 @@ const rootReducer = combineReducers({
     },
     {
       referenceEntity: "subaccount",
+      strictSelect: false,
       keyReducers: {
         placeholders: createTablePlaceholdersReducer(
           {

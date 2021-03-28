@@ -8,7 +8,7 @@ import {
   createTablePlaceholdersReducer
 } from "store/factories";
 import { groupToNestedGroup } from "model/mappings";
-import { SubAccountMapping } from "model/tableMappings";
+import { AccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
 
 import { ActionType } from "./actions";
@@ -53,8 +53,9 @@ const rootReducer = combineReducers({
       SelectAll: ActionType.Accounts.SelectAll
     },
     {
-      referenceEntity: "subaccount",
+      referenceEntity: "account",
       initialState: initialAccountsState,
+      strictSelect: false,
       keyReducers: {
         placeholders: createTablePlaceholdersReducer(
           {
@@ -63,8 +64,8 @@ const rootReducer = combineReducers({
             RemoveFromState: ActionType.Accounts.Placeholders.RemoveFromState,
             UpdateInState: ActionType.Accounts.Placeholders.UpdateInState
           },
-          SubAccountMapping,
-          { referenceEntity: "subaccount" }
+          AccountMapping,
+          { referenceEntity: "account" }
         ),
         groups: combineReducers({
           deleting: createModelListActionReducer(ActionType.Accounts.Groups.Deleting, {
@@ -72,10 +73,10 @@ const rootReducer = combineReducers({
           })
         }),
         deleting: createModelListActionReducer(ActionType.Accounts.Deleting, {
-          referenceEntity: "subaccount"
+          referenceEntity: "account"
         }),
         updating: createModelListActionReducer(ActionType.Accounts.Updating, {
-          referenceEntity: "subaccount"
+          referenceEntity: "account"
         }),
         history: createListResponseReducer<HistoryEvent>(
           {

@@ -5,6 +5,14 @@ import { mergeWithDefaults } from "util/objects";
 import { initialListResponseState } from "store/initialState";
 import { createObjectReducerFromTransformers } from "./util";
 
+const defaultListResponseReducerOptions = {
+  referenceEntity: "entity",
+  extensions: {},
+  keyReducers: {},
+  excludeActionsFromExtensions: true,
+  strictSelect: true
+};
+
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
  * list response, where a list response might be the response received from
@@ -24,19 +32,18 @@ export const createListResponseReducer = <
 >(
   /* eslint-disable indent */
   mappings: Partial<ReducerFactory.IListResponseActionMap>,
-  options: Partial<ReducerFactory.ITransformerReducerOptions<S, A>> = {
+  options: Partial<ReducerFactory.IListTransformerReducerOptions<S, A>> = {
     initialState: initialListResponseState as S,
-    referenceEntity: "entity"
+    ...defaultListResponseReducerOptions
   }
 ): Reducer<S, A> => {
-  const Options = mergeWithDefaults<ReducerFactory.ITransformerReducerOptions<S, A>>(options, {
-    referenceEntity: "entity",
-    extensions: {},
-    keyReducers: {},
-    initialState: initialListResponseState as S,
-    excludeActionsFromExtensions: true
-  });
-
+  const Options = mergeWithDefaults<ReducerFactory.IListTransformerReducerOptions<S, A>>(
+    { ...options },
+    {
+      initialState: initialListResponseState as S,
+      ...defaultListResponseReducerOptions
+    }
+  );
   const transformers: ReducerFactory.Transformers<ReducerFactory.IListResponseActionMap, S, A> = {
     // We have to reset the page to it's initial state otherwise we run the risk
     // of a 404 with the API request due to the page not being found.
@@ -110,7 +117,7 @@ export const createListResponseReducer = <
     },
     Deselect: (payload: number, st: S) => {
       const element = find(st.data, { id: payload });
-      if (!isNil(element)) {
+      if (!isNil(element) || Options.strictSelect === false) {
         if (!includes(st.selected, payload)) {
           /* eslint-disable no-console */
           console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
@@ -135,20 +142,22 @@ export const createListResponseReducer = <
       if (Array.isArray(payload)) {
         forEach(payload, (id: number) => {
           const element = find(st.data, { id });
-          if (!isNil(element)) {
+          if (!isNil(element) || Options.strictSelect === false) {
             selected.push(id);
           } else {
             /* eslint-disable no-console */
+            console.log(Options);
             console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${id} not in state!`);
           }
         });
         return { selected };
       } else {
         const element = find(st.data, { id: payload });
-        if (!isNil(element)) {
+        if (!isNil(element) || Options.strictSelect === false) {
           return { selected: [...st.selected, payload] };
         } else {
           /* eslint-disable no-console */
+          console.log(Options);
           console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
           return {};
         }
