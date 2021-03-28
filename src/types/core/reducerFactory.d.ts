@@ -36,7 +36,7 @@ namespace ReducerFactory {
     RemoveRow: string;
     UpdateRow: string;
     UpdateInState: string;
-    ActivatePlaceholder: string;
+    AddToState: string;
     SelectRow: string;
     DeselectRow: string;
     SelectAllRows: string;

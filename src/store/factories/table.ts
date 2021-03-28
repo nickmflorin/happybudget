@@ -49,7 +49,7 @@ export const createTableReducer = <
       }
       return [...st, ...placeholders];
     },
-    ActivatePlaceholder: (payload: Table.ActivatePlaceholderPayload<M>, st: Redux.ListStore<R>) => {
+    AddToState: (payload: Table.ActivatePlaceholderPayload<M>, st: Redux.ListStore<R>) => {
       const row: R | undefined = find(st, { id: payload.id } as any);
       if (isNil(row)) {
         /* eslint-disable no-console */

@@ -29,7 +29,7 @@ import {
   creatingSubAccountAction,
   updatingSubAccountAction,
   updateTableRowAction,
-  activatePlaceholderAction,
+  addSubAccountToStateAction,
   removeTableRowAction,
   addErrorsToTableAction,
   addPlaceholdersAction,
@@ -233,21 +233,55 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
   }
 }
 
-export function* updateSubAccountPostRequestTask(
-  request: Partial<Http.ISubAccountPayload>,
-  subaccount: ISubAccount
-): SagaIterator {
-  // Determine if the parent account needs to be refreshed due to updates to the underlying account
-  // fields that calculate the values of the parent models.
-  if (SubAccountMapping.patchRequestRequiresRecalculation(request)) {
-    const account: IAccount = yield select((state: Redux.IApplicationStore) => state.calculator.account.detail.data);
+export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAccount>): SagaIterator {
+  if (!isNil(action.payload)) {
+    const subaccount = action.payload;
+    const account: IAccount | undefined = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.account.detail.data
+    );
+    // TODO: This is why we don't want to have multiple sources of truth!  We do not know if the
+    // additional sub account has been added to this state yet - vs. just the table state.
     const subaccounts: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
     // Right now, the backend is configured such that the Actual value for the overall Account is
     // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
     // in the backend, we need to also make that adjustment here.
-    if (subaccounts.length !== 0) {
+    if (subaccounts.length !== 0 && !isNil(account)) {
+      const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
+      const actual = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0);
+      let accountPayload: Partial<IAccount> = { estimated, actual };
+      if (!isNil(account.actual)) {
+        accountPayload = { ...accountPayload, variance: estimated - actual };
+      }
+      yield put(updateAccountInStateAction(accountPayload));
+      // We should probably remove the group from the table if the response SubAccount does not have
+      // a group - however, that will not happen in practice, because this task just handles the case
+      // where the SubAccount is updated (not removed or added to a group).
+      if (!isNil(subaccount.group)) {
+        yield put(updateGroupInTableAction({ groupId: subaccount.group.id, group: subaccount.group }));
+      }
+    }
+  }
+}
+
+export function* handleSubAccountAddedToStateTask(
+  action: Redux.IAction<Table.ActivatePlaceholderPayload<ISubAccount>>
+): SagaIterator {
+  if (!isNil(action.payload)) {
+    const subaccount = action.payload.model;
+    const account: IAccount | undefined = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.account.detail.data
+    );
+    // TODO: This is why we don't want to have multiple sources of truth!  We do not know if the
+    // additional sub account has been added to this state yet - vs. just the table state.
+    const subaccounts: ISubAccount[] = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
+    );
+    // Right now, the backend is configured such that the Actual value for the overall Account is
+    // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
+    // in the backend, we need to also make that adjustment here.
+    if (subaccounts.length !== 0 && !isNil(account)) {
       const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
       const actual = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0);
       let accountPayload: Partial<IAccount> = { estimated, actual };
@@ -310,8 +344,9 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
               budgetId,
               requestPayload as Http.ISubAccountPayload
             );
-            yield put(activatePlaceholderAction({ id: existing.id, model: response }));
-            yield call(updateSubAccountPostRequestTask, requestPayload, response);
+            // TODO: Since we are using multiple sources of truth, this bad guy
+            // also needs to add the sub account to the list data state.
+            yield put(addSubAccountToStateAction({ id: existing.id, model: response }));
           } catch (e) {
             yield call(
               handleTableErrors,
@@ -333,7 +368,6 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
           // table and the list response data.  Since we are using a deep check lodash.isEqual in the selectors,
           // this will only trigger a rerender if the subaccount has data that differs from that of the current data.
           yield put(updateSubAccountInStateAction(response));
-          yield call(updateSubAccountPostRequestTask, requestPayload, response);
         } catch (e) {
           yield call(
             handleTableErrors,

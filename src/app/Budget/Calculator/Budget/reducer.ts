@@ -66,7 +66,7 @@ const rootReducer = combineReducers({
             AddPlaceholders: ActionType.Accounts.AddPlaceholders,
             RemoveRow: ActionType.Accounts.RemoveRow,
             UpdateRow: ActionType.Accounts.UpdateRow,
-            ActivatePlaceholder: ActionType.Accounts.ActivatePlaceholder,
+            AddToState: ActionType.Accounts.ActivatePlaceholder,
             SelectRow: ActionType.Accounts.SelectRow,
             DeselectRow: ActionType.Accounts.DeselectRow,
             SelectAllRows: ActionType.Accounts.SelectAllRows,

@@ -29,20 +29,22 @@ export const ActionType = {
     Updating: "calculator.account.subaccounts.Updating",
     Update: "calculator.account.subaccounts.Update",
     Remove: "calculator.account.subaccounts.Remove",
-    AddPlaceholders: "calculator.account.subaccounts.AddPlaceholders",
-    UpdateRow: "calculator.account.subaccounts.UpdateRow",
-    ActivatePlaceholder: "calculator.account.subaccounts.ActivatePlaceholder",
-    RemoveRow: "calculator.account.subaccounts.RemoveRow",
-    SelectAllRows: "calculator.account.subaccounts.SelectAllRows",
-    SelectRow: "calculator.account.subaccounts.SelectRow",
-    DeselectRow: "calculator.account.subaccounts.DeselectRow",
     SetSearch: "calculator.account.subaccounts.SetSearch",
     Loading: "calculator.account.subaccounts.Loading",
     Response: "calculator.account.subaccounts.Response",
     Request: "calculator.account.subaccounts.Request",
-    RemoveFromGroup: "calculator.account.subaccounts.RemoveFromGroup",
-    AddErrors: "calculator.account.subaccounts.AddErrors",
     UpdateInState: "calculator.account.subaccounts.UpdateInState",
+    AddToState: "calculator.account.subaccounts.AddToState",
+    RemoveFromGroup: "calculator.account.subaccounts.table.RemoveFromGroup",
+    Table: {
+      AddErrors: "calculator.account.subaccounts.table.AddErrors",
+      AddPlaceholders: "calculator.account.subaccounts.table.AddPlaceholders",
+      UpdateRow: "calculator.account.subaccounts.table.UpdateRow",
+      RemoveRow: "calculator.account.subaccounts.table.RemoveRow",
+      SelectAllRows: "calculator.account.subaccounts.table.SelectAllRows",
+      SelectRow: "calculator.account.subaccounts.table.SelectRow",
+      DeselectRow: "calculator.account.subaccounts.table.DeselectRow"
+    },
     Groups: {
       Delete: "calculator.account.subaccounts.groups.Delete",
       Deleting: "calculator.account.subaccounts.groups.Deleting",
@@ -90,19 +92,7 @@ export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPa
 /*
   Actions Pertaining to Account Sub Accounts
 */
-export const addPlaceholdersAction = simpleAction<number>(ActionType.SubAccounts.AddPlaceholders);
 export const updateSubAccountAction = simpleAction<Table.RowChange>(ActionType.SubAccounts.Update);
-export const selectSubAccountAction = simpleAction<number>(ActionType.SubAccounts.SelectRow);
-export const deselectSubAccountAction = simpleAction<number>(ActionType.SubAccounts.DeselectRow);
-export const selectAllSubAccountsAction = simpleAction<null>(ActionType.SubAccounts.SelectAllRows);
-export const updateTableRowAction = simpleAction<{
-  id: number;
-  data: Partial<Table.SubAccountRow>;
-}>(ActionType.SubAccounts.UpdateRow);
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<ISubAccount>>(
-  ActionType.SubAccounts.ActivatePlaceholder
-);
-export const removeTableRowAction = simpleAction<number>(ActionType.SubAccounts.RemoveRow);
 export const removeSubAccountAction = simpleAction<number>(ActionType.SubAccounts.Remove);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.SubAccounts.Deleting);
 export const updatingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.SubAccounts.Updating);
@@ -111,13 +101,31 @@ export const requestSubAccountsAction = simpleAction<null>(ActionType.SubAccount
 export const loadingSubAccountsAction = simpleAction<boolean>(ActionType.SubAccounts.Loading);
 export const responseSubAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(ActionType.SubAccounts.Response);
 export const setSubAccountsSearchAction = simpleAction<string>(ActionType.SubAccounts.SetSearch);
-export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(
-  ActionType.SubAccounts.AddErrors
-);
 export const removeSubAccountFromGroupAction = simpleAction<number>(ActionType.SubAccounts.RemoveFromGroup);
-
 export const updateSubAccountInStateAction = simpleAction<ISubAccount>(ActionType.SubAccounts.UpdateInState);
+export const addSubAccountToStateAction = simpleAction<Table.ActivatePlaceholderPayload<ISubAccount>>(
+  ActionType.SubAccounts.AddToState
+);
 
+/*
+  Actions Pertaining to Account Sub Accounts Table
+*/
+export const addPlaceholdersAction = simpleAction<number>(ActionType.SubAccounts.Table.AddPlaceholders);
+export const selectSubAccountAction = simpleAction<number>(ActionType.SubAccounts.Table.SelectRow);
+export const deselectSubAccountAction = simpleAction<number>(ActionType.SubAccounts.Table.DeselectRow);
+export const selectAllSubAccountsAction = simpleAction<null>(ActionType.SubAccounts.Table.SelectAllRows);
+export const updateTableRowAction = simpleAction<{
+  id: number;
+  data: Partial<Table.SubAccountRow>;
+}>(ActionType.SubAccounts.Table.UpdateRow);
+export const removeTableRowAction = simpleAction<number>(ActionType.SubAccounts.Table.RemoveRow);
+export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellError[]>(
+  ActionType.SubAccounts.Table.AddErrors
+);
+
+/*
+  Actiosn Pertaining to Account Sub Accounts Groups
+*/
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(ActionType.SubAccounts.Groups.AddToState);
 export const addGroupToTableAction = simpleAction<{ group: INestedGroup; ids: number[] }>(
   ActionType.SubAccounts.Groups.AddToTable
