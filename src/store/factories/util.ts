@@ -27,6 +27,26 @@ const findTransformerForAction = <
   return undefined;
 };
 
+export const createSimpleReducerFromTransformers = <
+  P extends ReducerFactory.ActionMap,
+  S,
+  A extends Redux.IAction<any> = Redux.IAction<any>
+>(
+  /* eslint-disable indent */
+  mappings: Partial<P>,
+  transformers: ReducerFactory.Transformers<P, S, A>,
+  options: ReducerFactory.ITransformerReducerOptions<S, A>
+): Reducer<S, A> => {
+  const reducer: Reducer<S, A> = (state: S = options.initialState, action: A): S => {
+    const transformer = findTransformerForAction<P, S, A>(action, mappings, transformers);
+    if (!isNil(transformer)) {
+      return transformer(action.payload, state, action);
+    }
+    return state;
+  };
+  return reducer;
+};
+
 export const createObjectReducerFromTransformers = <
   P extends ReducerFactory.ActionMap,
   S,

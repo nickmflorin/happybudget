@@ -21,6 +21,13 @@ namespace ReducerFactory {
 
   type ActionMap = { [key: string]: string };
 
+  type ICounterActionMap = {
+    Set: string;
+    Increment: string;
+    Decrement: string;
+    Clear: string;
+  };
+
   type ITableActionMap = {
     ClearData: string;
     SetData: string;

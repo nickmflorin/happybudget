@@ -2,6 +2,7 @@ import { Reducer } from "redux";
 import { isNil, filter, includes } from "lodash";
 import { mergeWithDefaults } from "util/objects";
 
+export * from "./counter";
 export * from "./comments";
 export * from "./table";
 export * from "./list";
