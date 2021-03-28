@@ -68,13 +68,13 @@ export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaI
   }
 }
 
-export function* addSubAccountGroupToStateTask(action: Redux.IAction<ISubAccountGroup>): SagaIterator {
+export function* addSubAccountGroupToStateTask(action: Redux.IAction<IGroup<ISimpleSubAccount>>): SagaIterator {
   if (!isNil(action.payload)) {
     const nestedGroup = subAccountGroupToSubAccountNestedGroup(action.payload);
     yield put(
       addGroupToTableAction({
         group: nestedGroup,
-        ids: map(action.payload.subaccounts, (subaccount: ISimpleSubAccount) => subaccount.id)
+        ids: map(action.payload.children, (subaccount: ISimpleSubAccount) => subaccount.id)
       })
     );
   }

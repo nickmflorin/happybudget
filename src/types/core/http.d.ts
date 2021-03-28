@@ -81,6 +81,12 @@ namespace Http {
     readonly access?: number[];
   }
 
+  interface IAccountGroupPayload extends IPayload {
+    readonly name: string;
+    readonly children?: number[];
+    readonly color: string;
+  }
+
   interface ISubAccountPayload extends IPayload {
     readonly description?: string;
     readonly name: string;
@@ -93,7 +99,7 @@ namespace Http {
 
   interface ISubAccountGroupPayload extends IPayload {
     readonly name: string;
-    readonly subaccounts?: number[];
+    readonly children?: number[];
     readonly color: string;
   }
 

@@ -42,34 +42,37 @@ export const createSubAccountSubAccountGroup = async (
   subaccountId: number,
   payload: Http.ISubAccountGroupPayload,
   options: Http.IRequestOptions = {}
-): Promise<ISubAccountGroup> => {
-  const url = URL.v1("subaccounts", subaccountId, "subaccount-groups");
-  return client.post<ISubAccountGroup>(url, payload, options);
+): Promise<IGroup<ISimpleSubAccount>> => {
+  const url = URL.v1("subaccounts", subaccountId, "groups");
+  return client.post<IGroup<ISimpleSubAccount>>(url, payload, options);
 };
 
 export const getSubAccountSubAccountGroups = async (
   subaccountId: number,
   options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<ISubAccountGroup>> => {
-  const url = URL.v1("subaccounts", subaccountId, "subaccount-groups");
-  return client.list<ISubAccountGroup>(url, options);
+): Promise<Http.IListResponse<IGroup<ISimpleSubAccount>>> => {
+  const url = URL.v1("subaccounts", subaccountId, "groups");
+  return client.list<IGroup<ISimpleSubAccount>>(url, options);
 };
 
 export const updateSubAccountGroup = async (
   id: number,
   payload: Partial<Http.ISubAccountGroupPayload>,
   options: Http.IRequestOptions = {}
-): Promise<ISubAccountGroup> => {
-  const url = URL.v1("subaccounts", "subaccount-groups", id);
-  return client.patch<ISubAccountGroup>(url, payload, options);
+): Promise<IGroup<ISimpleSubAccount>> => {
+  const url = URL.v1("subaccounts", "groups", id);
+  return client.patch<IGroup<ISimpleSubAccount>>(url, payload, options);
 };
 
-export const getSubAccountGroup = async (id: number, options: Http.IRequestOptions = {}): Promise<ISubAccountGroup> => {
-  const url = URL.v1("subaccounts", "subaccount-groups", id);
-  return client.retrieve<ISubAccountGroup>(url, options);
+export const getSubAccountGroup = async (
+  id: number,
+  options: Http.IRequestOptions = {}
+): Promise<IGroup<ISimpleSubAccount>> => {
+  const url = URL.v1("subaccounts", "groups", id);
+  return client.retrieve<IGroup<ISimpleSubAccount>>(url, options);
 };
 
 export const deleteSubAccountGroup = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
-  const url = URL.v1("subaccounts", "subaccount-groups", id);
+  const url = URL.v1("subaccounts", "groups", id);
   return client.delete<null>(url, options);
 };

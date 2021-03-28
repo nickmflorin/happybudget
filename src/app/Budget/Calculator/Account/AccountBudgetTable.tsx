@@ -60,7 +60,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
 
   return (
     <React.Fragment>
-      <BudgetTable<Table.SubAccountRow, ISubAccountNestedGroup, ISimpleSubAccount>
+      <BudgetTable<Table.SubAccountRow, INestedGroup, ISimpleSubAccount>
         table={table}
         identifierField={"identifier"}
         identifierFieldHeader={"Line"}
@@ -87,7 +87,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountAction(payload))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         groupParams={{
-          onDeleteGroup: (group: ISubAccountNestedGroup) => dispatch(deleteGroupAction(group.id)),
+          onDeleteGroup: (group: INestedGroup) => dispatch(deleteGroupAction(group.id)),
           onGroupRows: (rows: Table.SubAccountRow[]) =>
             setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
         }}
@@ -179,7 +179,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
           accountId={accountId}
           subaccounts={groupSubAccounts}
           open={true}
-          onSuccess={(group: ISubAccountGroup) => {
+          onSuccess={(group: IGroup<ISimpleSubAccount>) => {
             setGroupSubAccounts(undefined);
             dispatch(addGroupToStateAction(group));
           }}

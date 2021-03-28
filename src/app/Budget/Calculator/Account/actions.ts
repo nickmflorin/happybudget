@@ -118,13 +118,14 @@ export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActio
   ActionType.SubAccounts.UpdateInState
 );
 
-export const addGroupToStateAction = simpleAction<ISubAccountGroup>(ActionType.SubAccounts.Groups.AddToState);
-export const addGroupToTableAction = simpleAction<{ group: ISubAccountNestedGroup; ids: number[] }>(
+export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(ActionType.SubAccounts.Groups.AddToState);
+export const addGroupToTableAction = simpleAction<{ group: INestedGroup; ids: number[] }>(
   ActionType.SubAccounts.Groups.AddToTable
 );
-export const updateGroupInTableAction = simpleAction<{ groupId: number; group: Partial<ISubAccountNestedGroup> }>(
-  ActionType.SubAccounts.Groups.UpdateInTable
-);
+export const updateGroupInTableAction = simpleAction<{
+  groupId: number;
+  group: Partial<INestedGroup>;
+}>(ActionType.SubAccounts.Groups.UpdateInTable);
 export const removeGroupFromTableAction = simpleAction<number>(ActionType.SubAccounts.Groups.RemoveFromTable);
 export const deletingGroupAction = simpleAction<boolean>(ActionType.SubAccounts.Groups.Deleting);
 export const deleteGroupAction = simpleAction<number>(ActionType.SubAccounts.Groups.Delete);

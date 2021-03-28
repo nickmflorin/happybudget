@@ -217,7 +217,7 @@ export const SubAccountMapping = new Mapping<
   ISubAccount,
   Http.ISubAccountPayload,
   ISimpleSubAccount,
-  ISubAccountNestedGroup
+  INestedGroup
 >({
   fields: [
     { field: "description" },

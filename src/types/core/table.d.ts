@@ -56,7 +56,7 @@ namespace Table {
 
   type RowType = "account" | "subaccount" | "actual";
 
-  interface AccountRow extends Row<ISubAccountNestedGroup, ISimpleSubAccount> {
+  interface AccountRow extends Row<INestedGroup, ISimpleSubAccount> {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
@@ -64,7 +64,7 @@ namespace Table {
     readonly actual: number | null;
   }
 
-  interface SubAccountRow extends Row<ISubAccountNestedGroup, ISimpleSubAccount> {
+  interface SubAccountRow extends Row<INestedGroup, ISimpleSubAccount> {
     readonly identifier: string | null;
     readonly name: string | null;
     readonly description: string | null;

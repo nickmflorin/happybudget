@@ -103,14 +103,29 @@ interface IAncestor {
   type: EntityType;
 }
 
-interface IBudgetItem extends Model {
+interface ISimpleBudgetItem extends Model {
   readonly identifier: string;
+}
+
+interface IBudgetItem extends ISimpleBudgetItem {
   readonly description: string;
   readonly type: BudgetItemType;
 }
 
 interface IBudgetItemNode extends IBudgetItem {
   readonly children: IBudgetItemTreeNode[];
+}
+
+interface INestedGroup extends TrackedModel {
+  readonly name: string;
+  readonly color: string;
+  readonly estimated: number | null;
+  readonly variance: number | null;
+  readonly actual: number | null;
+}
+
+interface IGroup<C extends Model> extends INestedGroup {
+  readonly children: C[];
 }
 
 interface IAccount extends IBudgetItem, TrackedModel {
@@ -122,19 +137,10 @@ interface IAccount extends IBudgetItem, TrackedModel {
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
   readonly type: "account";
+  readonly group: INestedGroup | null;
 }
 
-interface ISubAccountNestedGroup extends TrackedModel {
-  readonly name: string;
-  readonly color: string;
-  readonly estimated: number | null;
-  readonly variance: number | null;
-  readonly actual: number | null;
-}
-
-interface ISubAccountGroup extends ISubAccountNestedGroup {
-  readonly subaccounts: ISimpleSubAccount[];
-}
+interface ISimpleAccount extends ISimpleBudgetItem {}
 
 interface ISimpleSubAccount extends Model {
   readonly name: string;
@@ -157,7 +163,7 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly variance: number | null;
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
-  readonly group: ISubAccountNestedGroup | null;
+  readonly group: INestedGroup | null;
 }
 
 interface IActual extends TrackedModel {

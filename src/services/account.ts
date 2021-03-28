@@ -58,19 +58,51 @@ export const createAccountSubAccount = async (
   return client.post<ISubAccount>(url, payload, options);
 };
 
+export const getAccountGroups = async (
+  id: number,
+  query: Http.IListQuery = {},
+  options: Http.IRequestOptions = {}
+): Promise<Http.IListResponse<IGroup<ISimpleAccount>>> => {
+  const url = URL.v1("budgets", id, "groups");
+  return client.list<IGroup<ISimpleAccount>>(url, options);
+};
+
+export const createAccountGroup = async (
+  id: number,
+  payload: Http.IAccountGroupPayload,
+  options: Http.IRequestOptions = {}
+): Promise<IGroup<ISimpleAccount>> => {
+  const url = URL.v1("budgets", id, "groups");
+  return client.post<IGroup<ISimpleAccount>>(url, payload, options);
+};
+
+export const updateAccountGroup = async (
+  id: number,
+  payload: Partial<Http.IAccountGroupPayload>,
+  options: Http.IRequestOptions = {}
+): Promise<IGroup<ISimpleAccount>> => {
+  const url = URL.v1("accounts", "groups", id);
+  return client.patch<IGroup<ISimpleAccount>>(url, payload, options);
+};
+
 export const createAccountSubAccountGroup = async (
   accountId: number,
   payload: Http.ISubAccountGroupPayload,
   options: Http.IRequestOptions = {}
-): Promise<ISubAccountGroup> => {
-  const url = URL.v1("accounts", accountId, "subaccount-groups");
-  return client.post<ISubAccountGroup>(url, payload, options);
+): Promise<IGroup<ISimpleSubAccount>> => {
+  const url = URL.v1("accounts", accountId, "groups");
+  return client.post<IGroup<ISimpleSubAccount>>(url, payload, options);
 };
 
 export const getAccountSubAccountGroups = async (
   accountId: number,
   options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<ISubAccountGroup>> => {
-  const url = URL.v1("accounts", accountId, "subaccount-groups");
-  return client.list<ISubAccountGroup>(url, options);
+): Promise<Http.IListResponse<IGroup<ISimpleSubAccount>>> => {
+  const url = URL.v1("accounts", accountId, "groups");
+  return client.list<IGroup<ISimpleSubAccount>>(url, options);
+};
+
+export const deleteAccountGroup = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
+  const url = URL.v1("accounts", "groups", id);
+  return client.delete<null>(url, options);
 };

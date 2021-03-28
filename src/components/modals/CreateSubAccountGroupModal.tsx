@@ -11,7 +11,7 @@ import { createAccountSubAccountGroup, createSubAccountSubAccountGroup } from "s
 import Modal from "./Modal";
 
 interface CreateSubAccountGroupModalProps {
-  onSuccess: (group: ISubAccountGroup) => void;
+  onSuccess: (group: IGroup<ISimpleSubAccount>) => void;
   onCancel: () => void;
   accountId?: number;
   subaccountId?: number;
@@ -64,10 +64,10 @@ const CreateSubAccountGroupModal = ({
             if (!isNil(accountId)) {
               createAccountSubAccountGroup(accountId, {
                 name: values.name,
-                subaccounts: subaccounts,
+                children: subaccounts,
                 color: values.color
               })
-                .then((group: ISubAccountGroup) => {
+                .then((group: IGroup<ISimpleSubAccount>) => {
                   form.resetFields();
                   onSuccess(group);
                 })
@@ -76,10 +76,10 @@ const CreateSubAccountGroupModal = ({
             } else if (!isNil(subaccountId)) {
               createSubAccountSubAccountGroup(subaccountId, {
                 name: values.name,
-                subaccounts: subaccounts,
+                children: subaccounts,
                 color: values.color
               })
-                .then((group: ISubAccountGroup) => {
+                .then((group: IGroup<ISimpleSubAccount>) => {
                   form.resetFields();
                   onSuccess(group);
                 })

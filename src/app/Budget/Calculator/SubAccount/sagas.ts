@@ -102,7 +102,7 @@ function* watchForRequestSubAccountsHistorySaga(): SagaIterator {
 function* watchForAddGroupToStateSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action: Redux.IAction<ISubAccountGroup> = yield take(ActionType.SubAccounts.Groups.AddToState);
+    const action: Redux.IAction<IGroup<ISimpleSubAccount>> = yield take(ActionType.SubAccounts.Groups.AddToState);
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload.id])) {
         lastTasks[action.payload.id] = [];
