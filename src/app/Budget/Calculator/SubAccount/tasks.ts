@@ -212,15 +212,7 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
   }
 }
 
-export function* updateSubAccountPostRequestTask(
-  request: Partial<Http.ISubAccountPayload>,
-  subaccount: ISubAccount
-): SagaIterator {
-  // Dispatching this action will trigger the subaccount to update in both the  Redux state for the
-  // table and the list response data.  Since we are using a deep check lodash.isEqual in the selectors
-  // this will only trigger a rerender if the subaccount has data that differs from that of the current data.
-  yield put(updateSubAccountInStateAction({ id: subaccount.id, data: subaccount }));
-
+export function* updateSubAccountPostRequestTask(request: Partial<Http.ISubAccountPayload>): SagaIterator {
   // Determine if the parent account needs to be refreshed due to updates to the underlying account
   // fields that calculate the values of the parent models.
   if (SubAccountMapping.patchRequestRequiresRecalculation(request)) {
@@ -293,10 +285,8 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
               subaccountId,
               requestPayload as Http.ISubAccountPayload
             );
-            yield put(activatePlaceholderAction({ oldId: existing.id, id: response.id }));
-            // TODO: We are going to want to eventually do this pre-request, which means manually
-            // updating the SubAccount instead of using the response.
-            yield call(updateSubAccountPostRequestTask, requestPayload, response);
+            yield put(activatePlaceholderAction({ id: existing.id, model: response }));
+            yield call(updateSubAccountPostRequestTask, requestPayload);
           } catch (e) {
             yield call(
               handleTableErrors,
@@ -314,9 +304,11 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         const requestPayload = SubAccountMapping.patchPayload(action.payload);
         try {
           const response: ISubAccount = yield call(updateSubAccount, existing.id, requestPayload);
-          // TODO: We are going to want to eventually do this pre-request, which means manually
-          // updating the SubAccount instead of using the response.
-          yield call(updateSubAccountPostRequestTask, requestPayload, response);
+          // Dispatching this action will trigger the subaccount to update in both the  Redux state for the
+          // table and the list response data.  Since we are using a deep check lodash.isEqual in the selectors
+          // this will only trigger a rerender if the subaccount has data that differs from that of the current data.
+          yield put(updateSubAccountInStateAction(response));
+          yield call(updateSubAccountPostRequestTask, requestPayload);
         } catch (e) {
           yield call(
             handleTableErrors,

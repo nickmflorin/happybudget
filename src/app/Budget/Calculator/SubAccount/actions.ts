@@ -97,7 +97,7 @@ export const updateTableRowAction = simpleAction<{
   id: number;
   data: Partial<Table.SubAccountRow>;
 }>(ActionType.SubAccounts.UpdateRow);
-export const activatePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
+export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<ISubAccount>>(
   ActionType.SubAccounts.ActivatePlaceholder
 );
 export const removeTableRowAction = simpleAction<number>(ActionType.SubAccounts.RemoveRow);
@@ -113,9 +113,7 @@ export const addErrorsToTableAction = simpleAction<Table.CellError | Table.CellE
   ActionType.SubAccounts.AddErrors
 );
 
-export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<ISubAccount>>(
-  ActionType.SubAccounts.UpdateInState
-);
+export const updateSubAccountInStateAction = simpleAction<ISubAccount>(ActionType.SubAccounts.UpdateInState);
 
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(ActionType.SubAccounts.Groups.AddToState);
 export const addGroupToTableAction = simpleAction<{ group: INestedGroup; ids: number[] }>(

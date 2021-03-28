@@ -245,9 +245,12 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, budgetId, requestPayload as Http.IAccountPayload);
-            yield put(activatePlaceholderAction({ oldId: existing.id, id: response.id }));
-            const responsePayload = AccountMapping.modelToRow(response);
-            yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
+            yield put(activatePlaceholderAction({ id: existing.id, model: response }));
+
+            // I don't think we have to worry about this anymore because the activation
+            // takes care of that?
+            // const responsePayload = AccountMapping.modelToRow(response);
+            // yield put(updateTableRowAction({ id: response.id, data: responsePayload }));
 
             // Add an element to the history indicating that the account was created.
             // This is faster than refreshing the history from the API and is not problematic

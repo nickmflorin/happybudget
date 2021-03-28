@@ -94,7 +94,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
             }
             try {
               const response: IActual = yield call(service, updatedRow.object_id, payload);
-              yield put(activatePlaceholderAction({ oldId: existing.id, id: response.id }));
+              yield put(activatePlaceholderAction({ id: existing.id, model: response }));
               const responsePayload = ActualMapping.modelToRow(response);
               if (Object.keys(responsePayload).length !== 0) {
                 yield put(updateTableRowAction({ id: response.id, data: responsePayload }));

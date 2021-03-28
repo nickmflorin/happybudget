@@ -49,9 +49,9 @@ namespace Table {
     data: { [key: string]: CellChange };
   };
 
-  interface IActivatePlaceholderPayload {
-    readonly oldId: number;
+  interface ActivatePlaceholderPayload<M> {
     readonly id: number;
+    readonly model: M;
   }
 
   type RowType = "account" | "subaccount" | "actual";

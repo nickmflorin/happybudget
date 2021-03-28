@@ -74,7 +74,7 @@ export const updateAccountAction = simpleAction<Table.RowChange>(ActionType.Acco
 export const updateTableRowAction = simpleAction<{ id: number; data: Partial<Table.AccountRow> }>(
   ActionType.Accounts.UpdateRow
 );
-export const activatePlaceholderAction = simpleAction<Table.IActivatePlaceholderPayload>(
+export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<IAccount>>(
   ActionType.Accounts.ActivatePlaceholder
 );
 export const selectAccountAction = simpleAction<number>(ActionType.Accounts.SelectRow);

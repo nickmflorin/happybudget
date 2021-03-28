@@ -49,24 +49,21 @@ export const createTableReducer = <
       }
       return [...st, ...placeholders];
     },
-    ActivatePlaceholder: (payload: Table.IActivatePlaceholderPayload, st: Redux.ListStore<R>) => {
-      const row: R | undefined = find(st, { id: payload.oldId } as any);
+    ActivatePlaceholder: (payload: Table.ActivatePlaceholderPayload<M>, st: Redux.ListStore<R>) => {
+      const row: R | undefined = find(st, { id: payload.id } as any);
       if (isNil(row)) {
         /* eslint-disable no-console */
         console.error(
-          `Inconsistent State!:  Inconsistent state noticed when activating ${Options.referenceEntity} placeholder row in state...
-         the ${Options.referenceEntity} row with ID ${payload.oldId} does not exist in state when it is expected to.`
+          `Inconsistent State!:  Inconsistent state noticed when activating ${Options.referenceEntity}
+          placeholder row in state... the ${Options.referenceEntity} row with ID ${payload.id} does
+          not exist in state when it is expected to.`
         );
         return st;
       } else {
-        return replaceInArray<R>(
-          st,
-          { id: payload.oldId },
-          { ...row, id: payload.id, meta: { ...row.meta, isPlaceholder: false } }
-        );
+        return replaceInArray<R>(st, { id: payload.id }, { ...row, ...mapping.modelToRow(payload.model) });
       }
     },
-    UpdateInState: (payload: Redux.UpdateModelActionPayload<M>, st: Redux.ListStore<R>) => {
+    UpdateInState: (payload: M, st: Redux.ListStore<R>) => {
       const row: R | undefined = find(st, { id: payload.id } as any);
       if (isNil(row)) {
         /* eslint-disable no-console */
@@ -76,9 +73,12 @@ export const createTableReducer = <
         );
         return st;
       } else {
-        const partialRow: Partial<R> = mapping.partialModelToPartialRow(payload.data);
-        console.log(partialRow);
-        return replaceInArray<R>(st, { id: payload.id }, { ...row, ...partialRow });
+        const modelRow: R = mapping.modelToRow(payload);
+        return replaceInArray<R>(
+          st,
+          { id: payload.id },
+          { ...row, ...modelRow, meta: { ...row.meta, ...modelRow.meta } }
+        );
       }
     },
     UpdateRow: (payload: Redux.UpdateModelActionPayload<R>, st: Redux.ListStore<R>) => {
