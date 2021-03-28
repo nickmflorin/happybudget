@@ -1,8 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find, concat, map, reduce } from "lodash";
+import { isNil, find, concat, reduce } from "lodash";
 import { handleRequestError } from "api";
-import { groupToNestedGroup } from "model/mappings";
 import { SubAccountMapping } from "model/tableMappings";
 import {
   getAccountSubAccounts,
@@ -44,7 +43,6 @@ import {
   responseSubAccountsHistoryAction,
   deletingGroupAction,
   removeGroupFromStateAction,
-  addGroupToStateAction,
   updateGroupInStateAction,
   updateAccountInStateAction,
   updateSubAccountInStateAction,
@@ -197,29 +195,31 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
     const models: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
-    const existing: ISubAccount | undefined = find(models, { id: action.payload });
-    if (isNil(existing)) {
-      /* eslint-disable no-console */
-      console.warn(
-        `Inconsistent State!  Inconsistent state noticed when removing an account's sub account...
-        The sub account with ID ${action.payload} does not exist in state when it is expected to.`
+    const model: ISubAccount | undefined = find(models, { id: action.payload });
+    if (isNil(model)) {
+      const placeholders = yield select(
+        (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.placeholders
       );
+      const placeholder: Table.SubAccountRow | undefined = find(placeholders, { id: action.payload });
+      if (isNil(placeholder)) {
+        /* eslint-disable no-console */
+        console.warn(
+          `Inconsistent State!  Inconsistent state noticed when removing sub account...
+          The sub account with ID ${action.payload} does not exist in state when it is expected to.`
+        );
+      } else {
+        yield put(removePlaceholderFromStateAction(placeholder.id));
+      }
     } else {
-      //   // Dispatch the action to remove the sub account from state and thus remove the row from the
-      //   // table in the UI.
-      //   yield put(removeSubAccountFromStateAction(action.payload));
-      //   // Only make an API request to the server to delete the sub account if the  row was not a
-      //   // placeholder (i.e. the sub account exists in the backend).
-      //   if (existing.meta.isPlaceholder === false) {
-      //     yield put(deletingSubAccountAction({ id: action.payload, value: true }));
-      //     try {
-      //       yield call(deleteSubAccount, action.payload);
-      //     } catch (e) {
-      //       handleRequestError(e, "There was an error deleting the sub account.");
-      //     } finally {
-      //       yield put(deletingSubAccountAction({ id: action.payload, value: false }));
-      //     }
-      //   }
+      yield put(removeSubAccountFromStateAction(model.id));
+      yield put(deletingSubAccountAction({ id: model.id, value: true }));
+      try {
+        yield call(deleteSubAccount, model.id);
+      } catch (e) {
+        handleRequestError(e, "There was an error deleting the sub account.");
+      } finally {
+        yield put(deletingSubAccountAction({ id: model.id, value: false }));
+      }
     }
   }
 }
