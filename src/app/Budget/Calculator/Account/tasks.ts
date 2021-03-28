@@ -223,7 +223,7 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
 }
 
 export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAccount>): SagaIterator {
-  if (!isNil(action.payload)) {
+  if (!isNil(action.payload) && !(!isNil(action.meta) && action.meta.triggerTask === false)) {
     const subaccount = action.payload;
     const account: IAccount | undefined = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.detail.data
@@ -231,21 +231,41 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
     const subaccounts: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
-    // Right now, the backend is configured such that the Actual value for the overall Account is
-    // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
-    // in the backend, we need to also make that adjustment here.
-    if (subaccounts.length !== 0 && !isNil(account)) {
-      const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
-      const actual = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0);
-      let accountPayload: Partial<IAccount> = { estimated, actual };
-      if (!isNil(account.actual)) {
-        accountPayload = { ...accountPayload, variance: estimated - actual };
+
+    // Step 1: Apply Potential Changes to Parent Account
+    if (!isNil(account)) {
+      if (subaccounts.length !== 0) {
+        // Right now, the backend is configured such that the Actual value for the overall Account is
+        // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
+        // in the backend, we need to also make that adjustment here.
+        const actual = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0);
+        const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
+        let accountPayload: Partial<IAccount> = { estimated, actual };
+        if (!isNil(account.actual)) {
+          accountPayload = { ...accountPayload, variance: estimated - actual };
+        }
+        yield put(updateAccountInStateAction(accountPayload));
       }
-      yield put(updateAccountInStateAction(accountPayload));
     }
-    // We should probably remove the group from the table if the response SubAccount does not have
-    // a group - however, that will not happen in practice, because this task just handles the case
-    // where the SubAccount is updated (not removed or added to a group).
+
+    // Step 2:  Apply Potential Calculated Changes to Sub Account Itself
+    // In the case that the SubAccount has sub accounts itself, the estimated value is determined
+    // from the accumulation of those individual estimated values.  In this case,  we do not need
+    // to update the SubAccount estimated value in state because it only changes when the estimated
+    // values of it's SubAccount(s) on another page are altered.
+    if (subaccount.subaccounts.length === 0 && !isNil(subaccount.quantity) && !isNil(subaccount.rate)) {
+      const multiplier = subaccount.multiplier || 1.0;
+      let updatedSubAccount: ISubAccount = {
+        ...subaccount,
+        estimated: multiplier * subaccount.quantity * subaccount.rate
+      };
+      if (!isNil(subaccount.actual) && !isNil(subaccount.estimated)) {
+        updatedSubAccount = { ...updatedSubAccount, variance: subaccount.estimated - subaccount.actual };
+      }
+      yield put(updateSubAccountInStateAction(updatedSubAccount, { meta: { triggerTask: false } }));
+    }
+
+    // Step 3:  Update the Sub Account Group in State
     if (!isNil(subaccount.group)) {
       yield put(updateGroupInStateAction(subaccount.group));
     }
@@ -281,9 +301,6 @@ export function* handleSubAccountPlaceholderActivatedTask(
       }
       yield put(updateAccountInStateAction(accountPayload));
     }
-    // We should probably remove the group from the table if the response SubAccount does not have
-    // a group - however, that will not happen in practice, because this task just handles the case
-    // where the SubAccount is updated (not removed or added to a group).
     if (!isNil(subaccount.group)) {
       yield put(updateGroupInStateAction(subaccount.group));
     }
@@ -362,8 +379,9 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
       const requestPayload = SubAccountMapping.patchPayload(action.payload);
       try {
         const response: ISubAccount = yield call(updateSubAccount, model.id, requestPayload);
-        // TODO: We might want to consider not updating after the response and always relying
-        // on state changing the values in the client.
+        // Even though we updated the SubAccount in state pre-request, we want to make sure
+        // the server is relied on as the source of truth, so we update using the server data
+        // to ensure the displayed data is correct.
         yield put(updateSubAccountInStateAction(response));
       } catch (e) {
         yield call(

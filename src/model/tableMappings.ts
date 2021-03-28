@@ -1,25 +1,5 @@
-import { forEach, isNil, map, filter } from "lodash";
+import { forEach, isNil } from "lodash";
 import { generateRandomNumericId } from "util/math";
-
-export interface MappedField<M extends Model> {
-  field: keyof M;
-  requiredForPost?: boolean;
-  calculatedField?: boolean;
-  usedToCalculate?: boolean;
-  excludeFromPost?: boolean;
-}
-
-interface MappingConfig<
-  M extends Model,
-  G extends Table.RowGroup = Table.RowGroup,
-  C extends Table.RowChild = Table.RowChild
-> {
-  readonly fields: MappedField<M>[];
-  readonly childrenGetter?: ((model: M) => C[]) | string | null;
-  readonly groupGetter?: ((model: M) => G | null) | string | null;
-  readonly labelGetter: (model: M) => string;
-  readonly typeLabel: string;
-}
 
 function getProperty<T, K extends keyof T>(obj: T, key: K) {
   return obj[key]; // Inferred type is T[K]
@@ -169,22 +149,6 @@ class Mapping<
       }
     });
     return obj as Partial<P>;
-  };
-
-  // Deprecate.
-  patchRequestRequiresRecalculation = (data: Partial<P>): boolean => {
-    let recalculationRequired = false;
-    const fieldsUsedToCalculate = map(
-      filter(this.fields, (field: MappedField<M>) => field.usedToCalculate === true),
-      (field: MappedField<M>) => field.field
-    );
-    forEach(fieldsUsedToCalculate, (field: keyof M) => {
-      if (!isNil(data[field as keyof Partial<P>])) {
-        recalculationRequired = true;
-        return false;
-      }
-    });
-    return recalculationRequired;
   };
 
   rowHasRequiredFields = (row: R): boolean => {

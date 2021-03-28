@@ -1,6 +1,6 @@
 /// <reference path="redux/index.d.ts" />
 /// <reference path="redux-sagas/index.d.ts" />
-/// <reference path="./main.d.ts" />
+/// <reference path="./modeling.d.ts" />
 /// <reference path="./table.d.ts" />
 
 /* eslint-disable no-unused-vars */
