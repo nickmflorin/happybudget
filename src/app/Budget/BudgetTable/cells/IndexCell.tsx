@@ -13,7 +13,12 @@ interface IndexCellProps extends ICellRendererParams {
   onNew: () => void;
 }
 
-const IndexCell = <R extends Table.Row>({ onSelect, onDeselect, onNew, node }: IndexCellProps): JSX.Element => {
+const IndexCell = <R extends Table.Row<any, any>>({
+  onSelect,
+  onDeselect,
+  onNew,
+  node
+}: IndexCellProps): JSX.Element => {
   // Since the SelectCell is the first cell in the table, group footers will
   // potentially span this cell across the columns - but we never want the group
   // footer row to be selectable.

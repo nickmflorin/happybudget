@@ -42,6 +42,9 @@ export const ActionType = {
       RemoveFromState: "calculator.budget.accounts.placeholders.RemoveFromState"
     },
     Groups: {
+      Response: "calculator.budget.accounts.groups.Response",
+      Request: "calculator.budget.accounts.groups.Request",
+      Loading: "calculator.budget.accounts.groups.Loading",
       Delete: "calculator.budget.accounts.groups.Delete",
       Deleting: "calculator.budget.accounts.groups.Deleting",
       AddToState: "calculator.budget.accounts.groups.AddToState",
@@ -116,6 +119,11 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
 /*
   Actiosn Pertaining to Account Sub Accounts Groups
 */
+export const requestGroupsAction = simpleAction<null>(ActionType.Accounts.Groups.Request);
+export const loadingGroupsAction = simpleAction<boolean>(ActionType.Accounts.Groups.Loading);
+export const responseGroupsAction = simpleAction<Http.IListResponse<IGroup<ISimpleAccount>>>(
+  ActionType.Accounts.Groups.Response
+);
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleAccount>>(ActionType.Accounts.Groups.AddToState);
 export const updateGroupInStateAction = simpleAction<IGroup<ISimpleAccount>>(ActionType.Accounts.Groups.UpdateInState);
 export const removeGroupFromStateAction = simpleAction<number>(ActionType.Accounts.Groups.RemoveFromState);

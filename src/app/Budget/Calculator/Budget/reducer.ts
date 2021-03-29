@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import { isNil, find } from "lodash";
+import { isNil, find, includes, filter, map } from "lodash";
 import {
   createSimpleBooleanReducer,
   createModelListActionReducer,
@@ -66,11 +66,52 @@ const rootReducer = combineReducers({
           AccountMapping,
           { referenceEntity: "account" }
         ),
-        groups: combineReducers({
-          deleting: createModelListActionReducer(ActionType.Accounts.Groups.Deleting, {
-            referenceEntity: "group"
-          })
-        }),
+        groups: createListResponseReducer<IGroup<ISimpleAccount>, Redux.Calculator.IGroupsStore<ISimpleAccount>>(
+          {
+            Response: ActionType.Accounts.Groups.Response,
+            Request: ActionType.Accounts.Groups.Request,
+            Loading: ActionType.Accounts.Groups.Loading,
+            RemoveFromState: ActionType.Accounts.Groups.RemoveFromState,
+            AddToState: ActionType.Accounts.Groups.AddToState
+          },
+          {
+            referenceEntity: "group",
+            keyReducers: {
+              deleting: createModelListActionReducer(ActionType.Accounts.Groups.Deleting, {
+                referenceEntity: "group"
+              })
+            },
+            extensions: {
+              [ActionType.Accounts.RemoveFromGroup]: (
+                id: number,
+                st: Redux.Calculator.IGroupsStore<ISimpleAccount>
+              ) => {
+                const group: IGroup<ISimpleAccount> | undefined = find(st.data, (g: IGroup<ISimpleAccount>) =>
+                  includes(
+                    map(g.children, (child: ISimpleAccount) => child.id),
+                    id
+                  )
+                );
+                if (isNil(group)) {
+                  /* eslint-disable no-console */
+                  console.error(
+                    `Inconsistent State!:  Inconsistent state noticed when removing account from group...
+                    the account with ID ${id} does not exist in a group in state when it is expected to.`
+                  );
+                  return {};
+                } else {
+                  return {
+                    data: replaceInArray<IGroup<ISimpleAccount>>(
+                      st.data,
+                      { id: group.id },
+                      { ...group, children: filter(group.children, (child: ISimpleAccount) => child.id !== id) }
+                    )
+                  };
+                }
+              }
+            }
+          }
+        ),
         deleting: createModelListActionReducer(ActionType.Accounts.Deleting, {
           referenceEntity: "account"
         }),
@@ -86,48 +127,6 @@ const rootReducer = combineReducers({
           { referenceEntity: "event" }
         ),
         creating: createSimpleBooleanReducer(ActionType.Accounts.Creating)
-      },
-      extensions: {
-        // [ActionType.Accounts.Groups.AddToState]: (
-        //   group: IGroup<ISimpleAccount>,
-        //   st: Redux.Calculator.IAccountsStore
-        // ) => {
-        //   let data = [...st.data];
-        //   for (let i = 0; i < group.children.length; i++) {
-        //     const child: ISimpleAccount = group.children[i];
-        //     const model = find(data, { id: child.id });
-        //     if (isNil(model)) {
-        //       /* eslint-disable no-console */
-        //       console.error(
-        //         `Inconsistent State!: Inconsistent state noticed when adding group to state.
-        //         Group has child ${child.id} that does not exist in state when it is expected to.`
-        //       );
-        //     } else {
-        //       data = replaceInArray<IAccount>(data, { id: child.id }, { ...model, group: groupToNestedGroup(group) });
-        //     }
-        //   }
-        //   return { data };
-        // },
-        // [ActionType.Accounts.Groups.RemoveFromState]: (id: number, st: Redux.Calculator.IAccountsStore) => {
-        //   let data = [...st.data];
-        //   for (let i = 0; i < data.length; i++) {
-        //     const model: IAccount = data[i];
-        //     if (!isNil(model.group) && model.group.id === id) {
-        //       data = replaceInArray<IAccount>(data, { id: model.id }, { ...model, group: null });
-        //     }
-        //   }
-        //   return { data };
-        // },
-        // [ActionType.Accounts.Groups.UpdateInState]: (group: INestedGroup, st: Redux.Calculator.IAccountsStore) => {
-        //   let data = [...st.data];
-        //   for (let i = 0; i < data.length; i++) {
-        //     const model: IAccount = data[i];
-        //     if (!isNil(model.group) && model.group.id === group.id) {
-        //       data = replaceInArray<IAccount>(data, { id: model.id }, { ...model, group });
-        //     }
-        //   }
-        //   return { data };
-        // }
       }
     }
   )

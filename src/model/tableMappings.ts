@@ -5,9 +5,13 @@ function getProperty<T, K extends keyof T>(obj: T, key: K) {
   return obj[key]; // Inferred type is T[K]
 }
 
-/* eslint-disable indent */
-class Mapping<R extends Table.Row<C>, M extends Model, P extends Http.IPayload, C extends Model = UnknownModel>
-  implements MappingConfig<M, C> {
+class Mapping<
+  R extends Table.Row<G, C>,
+  M extends Model,
+  G extends IGroup<any>,
+  P extends Http.IPayload,
+  C extends Model = UnknownModel
+> implements MappingConfig<M, C> {
   public fields: MappedField<M>[];
   public childrenGetter?: ((model: M) => C[]) | string | null;
   public groupGetter?: ((model: M) => number | null) | string | null;
@@ -80,7 +84,7 @@ class Mapping<R extends Table.Row<C>, M extends Model, P extends Http.IPayload, 
     return obj as R;
   };
 
-  modelToRow = (model: M, group: IGroup<C> | null, meta: Partial<Table.RowMeta<C>> = {}): R => {
+  modelToRow = (model: M, group: G | null, meta: Partial<Table.RowMeta<C>> = {}): R => {
     const fullMeta: Table.RowMeta<C> = {
       isPlaceholder: false,
       isGroupFooter: false,
@@ -165,7 +169,13 @@ class Mapping<R extends Table.Row<C>, M extends Model, P extends Http.IPayload, 
   };
 }
 
-export const AccountMapping = new Mapping<Table.AccountRow, IAccount, Http.IAccountPayload, ISimpleSubAccount>({
+export const AccountMapping = new Mapping<
+  Table.AccountRow,
+  IAccount,
+  IGroup<ISimpleAccount>,
+  Http.IAccountPayload,
+  ISimpleSubAccount
+>({
   fields: [
     { field: "description" },
     { field: "group" },
@@ -183,6 +193,7 @@ export const AccountMapping = new Mapping<Table.AccountRow, IAccount, Http.IAcco
 export const SubAccountMapping = new Mapping<
   Table.SubAccountRow,
   ISubAccount,
+  IGroup<ISimpleSubAccount>,
   Http.ISubAccountPayload,
   ISimpleSubAccount
 >({
@@ -205,7 +216,7 @@ export const SubAccountMapping = new Mapping<
   typeLabel: "Sub Account"
 });
 
-export const ActualMapping = new Mapping<Table.ActualRow, IActual, Http.IActualPayload>({
+export const ActualMapping = new Mapping<Table.ActualRow, IActual, IGroup<any>, Http.IActualPayload>({
   fields: [
     { field: "description" },
     {

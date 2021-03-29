@@ -23,10 +23,10 @@ namespace Table {
     readonly pageSize: number;
   }
 
-  interface Row<C extends Model = UnknownModel> {
+  interface Row<G extends IGroup<any>, C extends Model = UnknownModel> {
     readonly id: number;
     readonly meta: RowMeta<C>;
-    readonly group: IGroup<C> | null;
+    readonly group: G | null;
   }
 
   interface CellChange {
@@ -46,7 +46,7 @@ namespace Table {
 
   type RowType = "account" | "subaccount" | "actual";
 
-  interface AccountRow extends Row<ISimpleSubAccount> {
+  interface AccountRow extends Row<IGroup<ISimpleAccount>, ISimpleSubAccount> {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
@@ -54,7 +54,7 @@ namespace Table {
     readonly actual: number | null;
   }
 
-  interface SubAccountRow extends Row<ISimpleSubAccount> {
+  interface SubAccountRow extends Row<IGroup<ISimpleSubAccount>, ISimpleSubAccount> {
     readonly identifier: string | null;
     readonly name: string | null;
     readonly description: string | null;
@@ -67,7 +67,7 @@ namespace Table {
     readonly variance: number | null;
   }
 
-  interface ActualRow extends Row {
+  interface ActualRow extends Row<IGroup<any>> {
     readonly object_id: number | null;
     readonly parent_type: BudgetItemType | null;
     readonly description: string | null;

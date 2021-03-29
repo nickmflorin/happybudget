@@ -6,14 +6,15 @@ import Mapping from "model/tableMappings";
 
 export const createTablePlaceholdersReducer = <
   /* eslint-disable indent */
-  R extends Table.Row<C>,
+  R extends Table.Row<G, C>,
   M extends Model,
+  G extends IGroup<any>,
   P extends Http.IPayload,
   C extends Model = UnknownModel,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   mappings: Partial<ReducerFactory.ITablePlaceholdersActionMap>,
-  mapping: Mapping<R, M, P, C>,
+  mapping: Mapping<R, M, G, P, C>,
   options: Partial<ReducerFactory.IOptions<Redux.ListStore<R>>> = { initialState: [], referenceEntity: "entity" }
 ) => {
   const Options = mergeWithDefaults<ReducerFactory.IOptions<Redux.ListStore<R>>>(options, {

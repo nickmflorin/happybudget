@@ -9,25 +9,24 @@ export interface GetExportValueParams {
 
 export type ExportValueGetters = { [key: string]: (params: GetExportValueParams) => string };
 
-export interface GroupProps<R extends Table.Row<C>, C extends Model = UnknownModel> {
-  valueGetter?: (row: R) => any;
-  groupGetter?: (row: R) => IGroup<C> | null;
+export interface GroupProps<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> {
   onGroupRows: (rows: R[]) => void;
-  onDeleteGroup: (group: IGroup<C>) => void;
+  onDeleteGroup: (group: G) => void;
   onRowRemoveFromGroup: (row: R) => void;
 }
 
 export interface BudgetTableProps<
-  R extends Table.Row<C>,
+  R extends Table.Row<G, C>,
   M extends Model,
+  G extends IGroup<any>,
   P extends Http.IPayload = Http.IPayload,
   C extends Model = UnknownModel
 > {
   bodyColumns: ColDef[];
   calculatedColumns?: ColDef[];
-  mapping: Mapping<R, M, P, C>;
+  mapping: Mapping<R, M, G, P, C>;
   data: M[];
-  groups?: IGroup<C>[];
+  groups?: G[];
   placeholders?: R[];
   selected?: number[];
   identifierField: string;
@@ -43,7 +42,7 @@ export interface BudgetTableProps<
   nonEditableCells?: (keyof R)[];
   highlightedNonEditableCells?: (keyof R)[];
   nonHighlightedNonEditableCells?: (keyof R)[];
-  groupParams?: GroupProps<R, C>;
+  groupParams?: GroupProps<R, G, C>;
   loading?: boolean;
   cellClass?: (params: CellClassParams) => string | undefined;
   highlightNonEditableCell?: (row: R, col: ColDef) => boolean;

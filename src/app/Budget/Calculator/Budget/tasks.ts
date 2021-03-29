@@ -14,7 +14,8 @@ import {
   updateComment,
   replyToComment,
   getAccountsHistory,
-  deleteAccountGroup
+  deleteAccountGroup,
+  getAccountGroups
 } from "services";
 import { handleTableErrors } from "store/tasks";
 import { userToSimpleUser } from "model/mappings";
@@ -48,15 +49,18 @@ import {
   addPlaceholdersToStateAction,
   updatePlaceholderInStateAction,
   addErrorsToStateAction,
-  activatePlaceholderAction
+  activatePlaceholderAction,
+  loadingGroupsAction,
+  responseGroupsAction
 } from "./actions";
 
 export function* removeAccountFromGroupTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(updatingAccountAction({ id: action.payload, value: true }));
     try {
-      const account: IAccount = yield call(updateAccount, action.payload, { group: null });
-      yield put(updateAccountInStateAction(account));
+      // NOTE: We do not need to update the Account in state because the reducer will already
+      // disassociate the Account from the group.
+      yield call(updateAccount, action.payload, { group: null });
     } catch (e) {
       yield call(
         handleTableErrors,
@@ -362,6 +366,24 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
       } finally {
         yield put(updatingAccountAction({ id: model.id, value: false }));
       }
+    }
+  }
+}
+
+export function* getGroupsTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId)) {
+    yield put(loadingGroupsAction(true));
+    try {
+      const response: Http.IListResponse<IGroup<IAccount>> = yield call(getAccountGroups, budgetId, {
+        no_pagination: true
+      });
+      yield put(responseGroupsAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the account groups.");
+      yield put(responseGroupsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingGroupsAction(false));
     }
   }
 }

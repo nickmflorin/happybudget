@@ -10,7 +10,7 @@ type Func = (props: any) => JSX.Element;
  *              a group footer.
  * @returns    (props: any) => JSX.Element
  */
-export const HideCellForGroupFooter = <R extends Table.Row>(func: Func): Func => {
+export const HideCellForGroupFooter = <R extends Table.Row<any, any>>(func: Func): Func => {
   return (ps: ICellRendererParams): JSX.Element => {
     const row: R = ps.data;
     if (row.meta.isGroupFooter) {
@@ -21,7 +21,7 @@ export const HideCellForGroupFooter = <R extends Table.Row>(func: Func): Func =>
   };
 };
 
-export const IncludeErrorsInCell = <R extends Table.Row>(func: Func): Func => {
+export const IncludeErrorsInCell = <R extends Table.Row<any, any>>(func: Func): Func => {
   return ({ colDef, data, ...props }: ICellRendererParams): JSX.Element => {
     const row: R = data;
     const Component = func;

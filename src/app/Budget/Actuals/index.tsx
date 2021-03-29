@@ -82,7 +82,7 @@ const Actuals = (): JSX.Element => {
 
   return (
     <WrapInApplicationSpinner loading={loading}>
-      <BudgetTable<Table.ActualRow, IActual, Http.IActualPayload>
+      <BudgetTable<Table.ActualRow, IActual, IGroup<any>, Http.IActualPayload>
         data={data}
         placeholders={placeholders}
         mapping={ActualMapping}

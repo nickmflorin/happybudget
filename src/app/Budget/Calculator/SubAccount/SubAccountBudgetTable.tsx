@@ -73,7 +73,13 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
 
   return (
     <React.Fragment>
-      <BudgetTable<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload, ISimpleSubAccount>
+      <BudgetTable<
+        Table.SubAccountRow,
+        ISubAccount,
+        IGroup<ISimpleSubAccount>,
+        Http.ISubAccountPayload,
+        ISimpleSubAccount
+      >
         data={data}
         groups={groups}
         placeholders={placeholders}

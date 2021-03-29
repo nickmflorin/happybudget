@@ -7,7 +7,7 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleShallowEqualSelector } from "store/selectors";
 
 import { setAncestorsAction } from "../../actions";
-import { requestAccountsAction } from "./actions";
+import { requestAccountsAction, requestGroupsAction } from "./actions";
 import { selectBudgetDetail, selectBudgetDetailLoading } from "../../selectors";
 
 import AccountsBudgetTable from "./AccountsBudgetTable";
@@ -29,6 +29,7 @@ const Accounts = (): JSX.Element => {
 
   useEffect(() => {
     dispatch(requestAccountsAction());
+    dispatch(requestGroupsAction());
   }, []);
 
   useEffect(() => {

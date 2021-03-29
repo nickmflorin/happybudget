@@ -52,8 +52,9 @@ const actionCell = (col: ColDef): ColDef => {
 };
 
 const BudgetTable = <
-  R extends Table.Row<C>,
+  R extends Table.Row<G, C>,
   M extends Model,
+  G extends IGroup<any>,
   P extends Http.IPayload = Http.IPayload,
   C extends Model = UnknownModel
 >({
@@ -92,13 +93,12 @@ const BudgetTable = <
   isCellEditable,
   highlightNonEditableCell,
   rowRefreshRequired
-}: BudgetTableProps<R, M, P, C>) => {
+}: BudgetTableProps<R, M, G, P, C>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
   const [table, setTable] = useState<R[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
-  const [footerGridApi, setFooterGridApi] = useState<GridApi | undefined>(undefined);
   const [footerColumnApi, setFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [gridOptions, setGridOptions] = useState<GridOptions>({
     alignedGrids: [],
@@ -137,7 +137,6 @@ const BudgetTable = <
   });
 
   const onFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
-    setFooterGridApi(event.api);
     setFooterColumnApi(event.columnApi);
   });
 
@@ -234,7 +233,7 @@ const BudgetTable = <
     return false;
   });
 
-  const createGroupFooter = (group: IGroup<C>): R => {
+  const createGroupFooter = (group: G): R => {
     const footerObj: { [key: string]: any } = {
       id: generateRandomNumericId(),
       [identifierField]: group.name,
@@ -253,8 +252,8 @@ const BudgetTable = <
       }
     });
     forEach(calculatedColumns, (col: ColDef) => {
-      if (!isNil(col.field) && !isNil(group[col.field as keyof IGroup<C>])) {
-        footerObj[col.field] = group[col.field as keyof IGroup<C>];
+      if (!isNil(col.field) && !isNil(group[col.field as keyof G])) {
+        footerObj[col.field] = group[col.field as keyof G];
       }
     });
     return footerObj as R;
@@ -527,9 +526,9 @@ const BudgetTable = <
     const newTable: R[] = [];
 
     const getGroupForModel = (model: M): number | null => {
-      const group: IGroup<C> | undefined = find(groups, (g: IGroup<C>) =>
+      const group: G | undefined = find(groups, (g: G) =>
         includes(
-          map(g.children, (child: C) => child.id),
+          map(g.children, (child: any) => child.id),
           model.id
         )
       );
@@ -541,7 +540,7 @@ const BudgetTable = <
     const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
 
     forEach(groupedModels, (models: M[], groupId: string) => {
-      const group: IGroup<C> | undefined = find(groups, { id: parseInt(groupId) } as any);
+      const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
       if (!isNil(group)) {
         const footer: R = createGroupFooter(group);
         newTable.push(...map(models, (m: M) => mapping.modelToRow(m, group, { selected: includes(selected, m.id) })), {

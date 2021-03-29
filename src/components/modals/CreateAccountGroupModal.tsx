@@ -64,6 +64,9 @@ const CreateAccountGroupModal = ({
                 } else {
                   throw e;
                 }
+              })
+              .finally(() => {
+                setLoading(false);
               });
           })
           .catch(info => {
