@@ -2,6 +2,8 @@ import { ReactNode } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
+import { ShowHide } from "components/display";
+
 import Content from "./Content";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -19,6 +21,7 @@ interface LayoutProps {
   breadcrumbs?: ReactNode;
   headerProps?: StandardComponentProps;
   contentProps?: StandardComponentProps;
+  includeFooter?: boolean;
   // The default header height is 70px.  But this only applies when there is
   // not a supplementary header below the default header.  To layout the component
   // hierarchy properly with scrolling and fixed headers, we need to programatically
@@ -36,6 +39,7 @@ const Layout = ({
   sidebar,
   style = {},
   collapsed = false,
+  includeFooter = true,
   headerProps = {},
   headerHeight,
   contentProps = {}
@@ -56,7 +60,9 @@ const Layout = ({
         <Content {...contentProps} headerHeight={headerHeight}>
           {children}
         </Content>
-        <Footer />
+        <ShowHide show={includeFooter}>
+          <Footer />
+        </ShowHide>
       </div>
     </div>
   );
