@@ -9,7 +9,6 @@ import {
   createListResponseReducer,
   createTablePlaceholdersReducer
 } from "store/factories";
-import { groupToNestedGroup } from "model/mappings";
 import { SubAccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
 import { ActionType } from "./actions";
@@ -80,59 +79,60 @@ const rootReducer = combineReducers({
           { referenceEntity: "event" }
         ),
         creating: createSimpleBooleanReducer(ActionType.SubAccounts.Creating)
-      },
-      extensions: {
-        [ActionType.SubAccounts.Groups.AddToState]: (
-          group: IGroup<ISimpleSubAccount>,
-          st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
-        ) => {
-          let data = [...st.data];
-          for (let i = 0; i < group.children.length; i++) {
-            const child: ISimpleSubAccount = group.children[i];
-            const model = find(data, { id: child.id });
-            if (isNil(model)) {
-              /* eslint-disable no-console */
-              console.error(
-                `Inconsistent State!: Inconsistent state noticed when adding group to state.
-                Group has child ${child.id} that does not exist in state when it is expected to.`
-              );
-            } else {
-              data = replaceInArray<ISubAccount>(
-                data,
-                { id: child.id },
-                { ...model, group: groupToNestedGroup(group) }
-              );
-            }
-          }
-          return { data };
-        },
-        [ActionType.SubAccounts.Groups.RemoveFromState]: (
-          id: number,
-          st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
-        ) => {
-          let data = [...st.data];
-          for (let i = 0; i < data.length; i++) {
-            const model: ISubAccount = data[i];
-            if (!isNil(model.group) && model.group.id === id) {
-              data = replaceInArray<ISubAccount>(data, { id: model.id }, { ...model, group: null });
-            }
-          }
-          return { data };
-        },
-        [ActionType.SubAccounts.Groups.UpdateInState]: (
-          group: INestedGroup,
-          st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
-        ) => {
-          let data = [...st.data];
-          for (let i = 0; i < data.length; i++) {
-            const model: ISubAccount = data[i];
-            if (!isNil(model.group) && model.group.id === group.id) {
-              data = replaceInArray<ISubAccount>(data, { id: model.id }, { ...model, group });
-            }
-          }
-          return { data };
-        }
       }
+      //   extensions: {
+      //     [ActionType.SubAccounts.Groups.AddToState]: (
+      //       group: IGroup<ISimpleSubAccount>,
+      //       st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
+      //     ) => {
+      //       let data = [...st.data];
+      //       for (let i = 0; i < group.children.length; i++) {
+      //         const child: ISimpleSubAccount = group.children[i];
+      //         const model = find(data, { id: child.id });
+      //         if (isNil(model)) {
+      //           /* eslint-disable no-console */
+      //           console.error(
+      //             `Inconsistent State!: Inconsistent state noticed when adding group to state.
+      //             Group has child ${child.id} that does not exist in state when it is expected to.`
+      //           );
+      //         } else {
+      //           data = replaceInArray<ISubAccount>(
+      //             data,
+      //             { id: child.id },
+      //             { ...model, group: groupToNestedGroup(group) }
+      //           );
+      //         }
+      //       }
+      //       return { data };
+      //     },
+      //     [ActionType.SubAccounts.Groups.RemoveFromState]: (
+      //       id: number,
+      //       st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
+      //     ) => {
+      //       let data = [...st.data];
+      //       for (let i = 0; i < data.length; i++) {
+      //         const model: ISubAccount = data[i];
+      //         if (!isNil(model.group) && model.group.id === id) {
+      //           data = replaceInArray<ISubAccount>(data, { id: model.id }, { ...model, group: null });
+      //         }
+      //       }
+      //       return { data };
+      //     },
+      //     [ActionType.SubAccounts.Groups.UpdateInState]: (
+      //       group: INestedGroup,
+      //       st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
+      //     ) => {
+      //       let data = [...st.data];
+      //       for (let i = 0; i < data.length; i++) {
+      //         const model: ISubAccount = data[i];
+      //         if (!isNil(model.group) && model.group.id === group.id) {
+      //           data = replaceInArray<ISubAccount>(data, { id: model.id }, { ...model, group });
+      //         }
+      //       }
+      //       return { data };
+      //     }
+      //   }
+      // }
     }
   )
 });

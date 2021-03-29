@@ -7,7 +7,6 @@ import {
   createListResponseReducer,
   createTablePlaceholdersReducer
 } from "store/factories";
-import { groupToNestedGroup } from "model/mappings";
 import { AccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
 
@@ -89,46 +88,46 @@ const rootReducer = combineReducers({
         creating: createSimpleBooleanReducer(ActionType.Accounts.Creating)
       },
       extensions: {
-        [ActionType.Accounts.Groups.AddToState]: (
-          group: IGroup<ISimpleAccount>,
-          st: Redux.Calculator.IAccountsStore
-        ) => {
-          let data = [...st.data];
-          for (let i = 0; i < group.children.length; i++) {
-            const child: ISimpleAccount = group.children[i];
-            const model = find(data, { id: child.id });
-            if (isNil(model)) {
-              /* eslint-disable no-console */
-              console.error(
-                `Inconsistent State!: Inconsistent state noticed when adding group to state.
-                Group has child ${child.id} that does not exist in state when it is expected to.`
-              );
-            } else {
-              data = replaceInArray<IAccount>(data, { id: child.id }, { ...model, group: groupToNestedGroup(group) });
-            }
-          }
-          return { data };
-        },
-        [ActionType.Accounts.Groups.RemoveFromState]: (id: number, st: Redux.Calculator.IAccountsStore) => {
-          let data = [...st.data];
-          for (let i = 0; i < data.length; i++) {
-            const model: IAccount = data[i];
-            if (!isNil(model.group) && model.group.id === id) {
-              data = replaceInArray<IAccount>(data, { id: model.id }, { ...model, group: null });
-            }
-          }
-          return { data };
-        },
-        [ActionType.Accounts.Groups.UpdateInState]: (group: INestedGroup, st: Redux.Calculator.IAccountsStore) => {
-          let data = [...st.data];
-          for (let i = 0; i < data.length; i++) {
-            const model: IAccount = data[i];
-            if (!isNil(model.group) && model.group.id === group.id) {
-              data = replaceInArray<IAccount>(data, { id: model.id }, { ...model, group });
-            }
-          }
-          return { data };
-        }
+        // [ActionType.Accounts.Groups.AddToState]: (
+        //   group: IGroup<ISimpleAccount>,
+        //   st: Redux.Calculator.IAccountsStore
+        // ) => {
+        //   let data = [...st.data];
+        //   for (let i = 0; i < group.children.length; i++) {
+        //     const child: ISimpleAccount = group.children[i];
+        //     const model = find(data, { id: child.id });
+        //     if (isNil(model)) {
+        //       /* eslint-disable no-console */
+        //       console.error(
+        //         `Inconsistent State!: Inconsistent state noticed when adding group to state.
+        //         Group has child ${child.id} that does not exist in state when it is expected to.`
+        //       );
+        //     } else {
+        //       data = replaceInArray<IAccount>(data, { id: child.id }, { ...model, group: groupToNestedGroup(group) });
+        //     }
+        //   }
+        //   return { data };
+        // },
+        // [ActionType.Accounts.Groups.RemoveFromState]: (id: number, st: Redux.Calculator.IAccountsStore) => {
+        //   let data = [...st.data];
+        //   for (let i = 0; i < data.length; i++) {
+        //     const model: IAccount = data[i];
+        //     if (!isNil(model.group) && model.group.id === id) {
+        //       data = replaceInArray<IAccount>(data, { id: model.id }, { ...model, group: null });
+        //     }
+        //   }
+        //   return { data };
+        // },
+        // [ActionType.Accounts.Groups.UpdateInState]: (group: INestedGroup, st: Redux.Calculator.IAccountsStore) => {
+        //   let data = [...st.data];
+        //   for (let i = 0; i < data.length; i++) {
+        //     const model: IAccount = data[i];
+        //     if (!isNil(model.group) && model.group.id === group.id) {
+        //       data = replaceInArray<IAccount>(data, { id: model.id }, { ...model, group });
+        //     }
+        //   }
+        //   return { data };
+        // }
       }
     }
   )

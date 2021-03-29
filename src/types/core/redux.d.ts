@@ -115,7 +115,7 @@ namespace Redux {
   }
 
   namespace Calculator {
-    interface ISubAccountGroupsStore {
+    interface IGroupsStore<M extends Model> extends IListResponseStore<IGroup<M>> {
       deleting: number[];
     }
 
@@ -132,7 +132,7 @@ namespace Redux {
       readonly creating: boolean;
       readonly placeholders: ListStore<R>;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
-      readonly groups: ISubAccountGroupsStore;
+      readonly groups: IGroupsStore<ISimpleSubAccount>;
     }
 
     interface IAccountsStore extends IListResponseStore<IAccount> {
@@ -141,7 +141,7 @@ namespace Redux {
       readonly creating: boolean;
       readonly placeholders: ListStore<Table.AccountRow>;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
-      readonly groups: ISubAccountGroupsStore;
+      readonly groups: IGroupsStore<ISimpleAccount>;
     }
 
     interface ISubAccountStore {

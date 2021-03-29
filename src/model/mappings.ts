@@ -8,18 +8,3 @@ export const userToSimpleUser = (user: IUser): ISimpleUser => {
     profile_image: user.profile_image
   };
 };
-
-export const groupToNestedGroup = (group: IGroup<any>): INestedGroup => {
-  return {
-    id: group.id,
-    color: group.color,
-    name: group.name,
-    estimated: group.estimated,
-    variance: group.variance,
-    actual: group.actual,
-    created_by: group.created_by,
-    updated_by: group.updated_by,
-    created_at: group.created_at,
-    updated_at: group.updated_at
-  };
-};

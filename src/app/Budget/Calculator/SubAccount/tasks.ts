@@ -242,9 +242,9 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
       }
       yield put(updateParentSubAccountInStateAction(subaccountPayload));
     }
-    if (!isNil(subaccount.group)) {
-      yield put(updateGroupInStateAction(subaccount.group));
-    }
+    // if (!isNil(subaccount.group)) {
+    //   yield put(updateGroupInStateAction(subaccount.group));
+    // }
   }
 }
 
@@ -276,9 +276,9 @@ export function* handleSubAccountPlaceholderActivatedTask(
       }
       yield put(updateParentSubAccountInStateAction(subaccountPayload));
     }
-    if (!isNil(subaccount.group)) {
-      yield put(updateGroupInStateAction(subaccount.group));
-    }
+    // if (!isNil(subaccount.group)) {
+    //   yield put(updateGroupInStateAction(subaccount.group));
+    // }
   }
 }
 

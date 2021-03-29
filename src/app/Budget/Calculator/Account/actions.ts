@@ -24,18 +24,18 @@ export const ActionType = {
     UpdateInState: "calculator.account.comments.UpdateInState"
   },
   SubAccounts: {
+    Loading: "calculator.account.subaccounts.Loading",
+    Response: "calculator.account.subaccounts.Response",
+    Request: "calculator.account.subaccounts.Request",
+    Select: "calculator.account.subaccounts.Select",
+    Deselect: "calculator.account.subaccounts.Deselect",
+    SelectAll: "calculator.account.subaccounts.SelectAll",
     Deleting: "calculator.account.subaccounts.Deleting",
     Creating: "calculator.account.subaccounts.Creating",
     Updating: "calculator.account.subaccounts.Updating",
     Update: "calculator.account.subaccounts.Update",
     Remove: "calculator.account.subaccounts.Remove",
     SetSearch: "calculator.account.subaccounts.SetSearch",
-    Loading: "calculator.account.subaccounts.Loading",
-    Select: "calculator.account.subaccounts.Select",
-    Deselect: "calculator.account.subaccounts.Deselect",
-    SelectAll: "calculator.account.subaccounts.SelectAll",
-    Response: "calculator.account.subaccounts.Response",
-    Request: "calculator.account.subaccounts.Request",
     UpdateInState: "calculator.account.subaccounts.UpdateInState",
     RemoveFromState: "calculator.account.subaccounts.RemoveFromState",
     AddToState: "calculator.account.subaccounts.AddToState",
@@ -49,6 +49,9 @@ export const ActionType = {
       RemoveFromState: "calculator.account.subaccounts.placeholders.RemoveFromState"
     },
     Groups: {
+      Response: "calculator.account.subaccounts.groups.Response",
+      Request: "calculator.account.subaccounts.groups.Request",
+      Loading: "calculator.account.subaccounts.groups.Loading",
       Delete: "calculator.account.subaccounts.groups.Delete",
       Deleting: "calculator.account.subaccounts.groups.Deleting",
       AddToState: "calculator.account.subaccounts.groups.AddToState",
@@ -129,10 +132,17 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
 );
 
 /*
-  Actiosn Pertaining to Account Sub Accounts Groups
+  Actions Pertaining to Account Sub Accounts Groups
 */
+export const requestGroupsAction = simpleAction<null>(ActionType.SubAccounts.Groups.Request);
+export const loadingGroupsAction = simpleAction<boolean>(ActionType.SubAccounts.Groups.Loading);
+export const responseGroupsAction = simpleAction<Http.IListResponse<IGroup<ISimpleSubAccount>>>(
+  ActionType.SubAccounts.Groups.Response
+);
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(ActionType.SubAccounts.Groups.AddToState);
-export const updateGroupInStateAction = simpleAction<INestedGroup>(ActionType.SubAccounts.Groups.UpdateInState);
+export const updateGroupInStateAction = simpleAction<IGroup<ISimpleSubAccount>>(
+  ActionType.SubAccounts.Groups.UpdateInState
+);
 export const removeGroupFromStateAction = simpleAction<number>(ActionType.SubAccounts.Groups.RemoveFromState);
 export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(ActionType.SubAccounts.Groups.Deleting);
 export const deleteGroupAction = simpleAction<number>(ActionType.SubAccounts.Groups.Delete);

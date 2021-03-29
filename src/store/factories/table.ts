@@ -6,15 +6,14 @@ import Mapping from "model/tableMappings";
 
 export const createTablePlaceholdersReducer = <
   /* eslint-disable indent */
-  R extends Table.Row<G, C>,
+  R extends Table.Row<C>,
   M extends Model,
   P extends Http.IPayload,
-  C extends Table.RowChild = Table.RowChild,
-  G extends Table.RowGroup = Table.RowGroup,
+  C extends Model = UnknownModel,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   mappings: Partial<ReducerFactory.ITablePlaceholdersActionMap>,
-  mapping: Mapping<R, M, P, C, G>,
+  mapping: Mapping<R, M, P, C>,
   options: Partial<ReducerFactory.IOptions<Redux.ListStore<R>>> = { initialState: [], referenceEntity: "entity" }
 ) => {
   const Options = mergeWithDefaults<ReducerFactory.IOptions<Redux.ListStore<R>>>(options, {
@@ -62,7 +61,8 @@ export const createTablePlaceholdersReducer = <
           { id: payload.id },
           {
             ...row,
-            ...mapping.modelToRow(payload.model)
+            // NOTE: This will be a problem if the placeholder belonged to a group!
+            ...mapping.modelToRow(payload.model, null)
           }
         );
       }

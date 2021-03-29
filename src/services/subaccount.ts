@@ -49,10 +49,11 @@ export const createSubAccountSubAccountGroup = async (
 
 export const getSubAccountSubAccountGroups = async (
   subaccountId: number,
+  query: Http.IListQuery = {},
   options: Http.IRequestOptions = {}
 ): Promise<Http.IListResponse<IGroup<ISimpleSubAccount>>> => {
   const url = URL.v1("subaccounts", subaccountId, "groups");
-  return client.list<IGroup<ISimpleSubAccount>>(url, options);
+  return client.list<IGroup<ISimpleSubAccount>>(url, query, options);
 };
 
 export const updateSubAccountGroup = async (

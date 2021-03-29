@@ -7,11 +7,7 @@ namespace Table {
     readonly error: string;
   }
 
-  interface RowChild {
-    [key: string]: any;
-  }
-
-  interface RowMeta<C extends RowChild = RowChild> {
+  interface RowMeta<C extends Model = UnknownModel> {
     readonly selected: boolean;
     readonly errors: CellError[];
     readonly isPlaceholder?: boolean;
@@ -22,21 +18,15 @@ namespace Table {
     readonly typeLabel: string;
   }
 
-  interface RowGroup {
-    readonly id: number;
-    readonly name: string;
-    readonly color: string;
-  }
-
   interface PageAndSize {
     readonly page: number;
     readonly pageSize: number;
   }
 
-  interface Row<G extends RowGroup = RowGroup, C extends RowChild = RowChild> {
+  interface Row<C extends Model = UnknownModel> {
     readonly id: number;
     readonly meta: RowMeta<C>;
-    readonly group: G | null;
+    readonly group: IGroup<C> | null;
   }
 
   interface CellChange {
@@ -56,7 +46,7 @@ namespace Table {
 
   type RowType = "account" | "subaccount" | "actual";
 
-  interface AccountRow extends Row<INestedGroup, ISimpleSubAccount> {
+  interface AccountRow extends Row<ISimpleSubAccount> {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
@@ -64,7 +54,7 @@ namespace Table {
     readonly actual: number | null;
   }
 
-  interface SubAccountRow extends Row<INestedGroup, ISimpleSubAccount> {
+  interface SubAccountRow extends Row<ISimpleSubAccount> {
     readonly identifier: string | null;
     readonly name: string | null;
     readonly description: string | null;

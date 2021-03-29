@@ -117,7 +117,7 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
   Actiosn Pertaining to Account Sub Accounts Groups
 */
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleAccount>>(ActionType.Accounts.Groups.AddToState);
-export const updateGroupInStateAction = simpleAction<INestedGroup>(ActionType.Accounts.Groups.UpdateInState);
+export const updateGroupInStateAction = simpleAction<IGroup<ISimpleAccount>>(ActionType.Accounts.Groups.UpdateInState);
 export const removeGroupFromStateAction = simpleAction<number>(ActionType.Accounts.Groups.RemoveFromState);
 export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Accounts.Groups.Deleting);
 export const deleteGroupAction = simpleAction<number>(ActionType.Accounts.Groups.Delete);

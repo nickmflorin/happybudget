@@ -27,6 +27,9 @@ import {
   removeSubAccountFromGroupAction
 } from "./actions";
 
+const selectGroups = simpleDeepEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.groups.data
+);
 const selectSelectedRows = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.selected
 );
@@ -67,11 +70,13 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
+  const groups = useSelector(selectGroups);
 
   return (
     <React.Fragment>
-      <BudgetTable<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload, INestedGroup, ISimpleSubAccount>
+      <BudgetTable<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload, ISimpleSubAccount>
         data={data}
+        groups={groups}
         placeholders={placeholders}
         mapping={SubAccountMapping}
         selected={selected}
@@ -100,7 +105,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountAction(payload))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         groupParams={{
-          onDeleteGroup: (group: INestedGroup) => dispatch(deleteGroupAction(group.id)),
+          onDeleteGroup: (group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id)),
           onRowRemoveFromGroup: (row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id)),
           onGroupRows: (rows: Table.SubAccountRow[]) =>
             setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))

@@ -52,17 +52,17 @@ const actionCell = (col: ColDef): ColDef => {
 };
 
 const BudgetTable = <
-  R extends Table.Row<G, C>,
+  R extends Table.Row<C>,
   M extends Model,
-  P extends Http.IPayload,
-  G extends Table.RowGroup = Table.RowGroup,
-  C extends Table.RowChild = Table.RowChild
+  P extends Http.IPayload = Http.IPayload,
+  C extends Model = UnknownModel
 >({
   /* eslint-disable indent */
   bodyColumns,
   calculatedColumns = [],
   data,
   placeholders = [],
+  groups = [],
   selected,
   mapping,
   search,
@@ -92,7 +92,7 @@ const BudgetTable = <
   isCellEditable,
   highlightNonEditableCell,
   rowRefreshRequired
-}: BudgetTableProps<R, M, P, G, C>) => {
+}: BudgetTableProps<R, M, P, C>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
   const [table, setTable] = useState<R[]>([]);
@@ -234,10 +234,11 @@ const BudgetTable = <
     return false;
   });
 
-  const createGroupFooter = (group: G): R => {
+  const createGroupFooter = (group: IGroup<C>): R => {
     const footerObj: { [key: string]: any } = {
       id: generateRandomNumericId(),
       [identifierField]: group.name,
+      group,
       meta: {
         isPlaceholder: true,
         isGroupFooter: true,
@@ -252,8 +253,8 @@ const BudgetTable = <
       }
     });
     forEach(calculatedColumns, (col: ColDef) => {
-      if (!isNil(col.field) && !isNil(group[col.field as keyof G])) {
-        footerObj[col.field] = group[col.field as keyof G];
+      if (!isNil(col.field) && !isNil(group[col.field as keyof IGroup<C>])) {
+        footerObj[col.field] = group[col.field as keyof IGroup<C>];
       }
     });
     return footerObj as R;
@@ -475,7 +476,7 @@ const BudgetTable = <
       return [];
     } else if (row.meta.isGroupFooter) {
       if (!isNil(row.group) && !isNil(groupParams)) {
-        const group: G = row.group;
+        const group: IGroup<C> = row.group;
         return [
           {
             name: `Delete Group ${group.name}`,
@@ -523,43 +524,44 @@ const BudgetTable = <
   // TODO: We need a way to preserve the indices of the existing data that was already there!
   // This is important for placeholders when they are activated and removed!
   useEffect(() => {
-    const modelsWithGroup = filter(data, (model: M) => !isNil(mapping.getGroup(model)));
-    const modelsWithoutGroup = filter(data, (model: M) => isNil(mapping.getGroup(model)));
-
     const newTable: R[] = [];
 
-    const groupedModels: { [key: number]: M[] } = groupBy(
-      modelsWithGroup,
-      (model: M) => (mapping.getGroup(model) as G).id
-    );
+    const getGroupForModel = (model: M): number | null => {
+      const group: IGroup<C> | undefined = find(groups, (g: IGroup<C>) =>
+        includes(
+          map(g.children, (child: C) => child.id),
+          model.id
+        )
+      );
+      return !isNil(group) ? group.id : null;
+    };
 
-    const allGroups: (G | null)[] = map(modelsWithGroup, (model: M) => mapping.getGroup(model));
-
-    const groups: G[] = [];
-    forEach(allGroups, (group: G | null) => {
-      if (!isNil(group) && isNil(find(groups, { id: group.id }))) {
-        groups.push(group);
-      }
-    });
+    const modelsWithGroup = filter(data, (m: M) => !isNil(getGroupForModel(m)));
+    let modelsWithoutGroup = filter(data, (m: M) => isNil(getGroupForModel(m)));
+    const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
 
     forEach(groupedModels, (models: M[], groupId: string) => {
-      const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
+      const group: IGroup<C> | undefined = find(groups, { id: parseInt(groupId) } as any);
       if (!isNil(group)) {
         const footer: R = createGroupFooter(group);
-        newTable.push(...map(models, (m: M) => mapping.modelToRow(m, { selected: includes(selected, m.id) })), {
+        newTable.push(...map(models, (m: M) => mapping.modelToRow(m, group, { selected: includes(selected, m.id) })), {
           ...footer,
           group,
           [identifierField]: group.name,
           meta: { ...footer.meta, isGroupFooter: true }
         });
+      } else {
+        // In the case that the group no longer exists, that means the group was removed from the
+        // state.  In this case, we want to disassociate the rows with the group.
+        modelsWithoutGroup = [...modelsWithoutGroup, ...models];
       }
     });
     setTable([
       ...newTable,
-      ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, { selected: includes(selected, m.id) })),
+      ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, null, { selected: includes(selected, m.id) })),
       ...map(placeholders, (r: R) => ({ ...r, meta: { ...r.meta, selected: includes(selected, r.id) } }))
     ]);
-  }, [useDeepEqualMemo(data), useDeepEqualMemo(placeholders), useDeepEqualMemo(selected)]);
+  }, [useDeepEqualMemo(data), useDeepEqualMemo(placeholders), useDeepEqualMemo(selected), useDeepEqualMemo(groups)]);
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {

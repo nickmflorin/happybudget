@@ -38,6 +38,10 @@ interface Model {
   id: number;
 }
 
+interface UnknownModel extends Model {
+  [key: string]: any;
+}
+
 interface TrackedModel extends Model {
   readonly created_by: ISimpleUser | null;
   readonly updated_by: ISimpleUser | null;
@@ -109,16 +113,13 @@ interface IBudgetItemNode extends IBudgetItem {
   readonly children: IBudgetItemTreeNode[];
 }
 
-interface INestedGroup extends TrackedModel {
+interface IGroup<C extends Model> extends TrackedModel {
+  readonly children: C[];
   readonly name: string;
   readonly color: string;
   readonly estimated: number | null;
   readonly variance: number | null;
   readonly actual: number | null;
-}
-
-interface IGroup<C extends Model> extends INestedGroup {
-  readonly children: C[];
 }
 
 interface IAccount extends IBudgetItem, TrackedModel {
@@ -130,7 +131,7 @@ interface IAccount extends IBudgetItem, TrackedModel {
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
   readonly type: "account";
-  readonly group: INestedGroup | null;
+  readonly group: number | null;
 }
 
 interface ISimpleAccount extends ISimpleBudgetItem {}
@@ -156,7 +157,7 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly variance: number | null;
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
-  readonly group: INestedGroup | null;
+  readonly group: number | null;
 }
 
 interface IActual extends TrackedModel {

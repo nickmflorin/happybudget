@@ -5,20 +5,16 @@ function getProperty<T, K extends keyof T>(obj: T, key: K) {
   return obj[key]; // Inferred type is T[K]
 }
 
-class Mapping<
-  R extends Table.Row<G, C>,
-  M extends Model,
-  P extends Http.IPayload,
-  C extends Table.RowChild = Table.RowChild,
-  G extends Table.RowGroup = Table.RowGroup
-> implements MappingConfig<M, G, C> {
+/* eslint-disable indent */
+class Mapping<R extends Table.Row<C>, M extends Model, P extends Http.IPayload, C extends Model = UnknownModel>
+  implements MappingConfig<M, C> {
   public fields: MappedField<M>[];
   public childrenGetter?: ((model: M) => C[]) | string | null;
-  public groupGetter?: ((model: M) => G | null) | string | null;
+  public groupGetter?: ((model: M) => number | null) | string | null;
   public labelGetter: (model: M) => string;
   public typeLabel: string;
 
-  constructor(config: MappingConfig<M, G, C>) {
+  constructor(config: MappingConfig<M, C>) {
     this.fields = config.fields;
     this.childrenGetter = config.childrenGetter;
     this.groupGetter = config.groupGetter;
@@ -43,13 +39,13 @@ class Mapping<
     }
   };
 
-  getGroup = (model: M): G | null => {
+  getGroup = (model: M): number | null => {
     if (this.groupGetter === null) {
       return null;
     } else if (typeof this.groupGetter === "string") {
       const group: any = model[this.groupGetter as keyof M];
       if (group !== undefined) {
-        return group as G;
+        return group;
       } else {
         /* eslint-disable no-console */
         console.warn(`Could not parse group from model based on model field ${this.groupGetter}!`);
@@ -84,7 +80,7 @@ class Mapping<
     return obj as R;
   };
 
-  modelToRow = (model: M, meta: Partial<Table.RowMeta<C>> = {}): R => {
+  modelToRow = (model: M, group: IGroup<C> | null, meta: Partial<Table.RowMeta<C>> = {}): R => {
     const fullMeta: Table.RowMeta<C> = {
       isPlaceholder: false,
       isGroupFooter: false,
@@ -99,7 +95,7 @@ class Mapping<
     const obj: { [key: string]: any } = {
       id: model.id,
       meta: fullMeta,
-      group: this.getGroup(model)
+      group
     };
     forEach(this.fields, (field: MappedField<M>) => {
       obj[field.field as string] = getProperty<M, keyof M>(model, field.field);
@@ -166,13 +162,7 @@ class Mapping<
   };
 }
 
-export const AccountMapping = new Mapping<
-  Table.AccountRow,
-  IAccount,
-  Http.IAccountPayload,
-  ISimpleSubAccount,
-  INestedGroup
->({
+export const AccountMapping = new Mapping<Table.AccountRow, IAccount, Http.IAccountPayload, ISimpleSubAccount>({
   fields: [
     { field: "description" },
     { field: "group" },
@@ -191,8 +181,7 @@ export const SubAccountMapping = new Mapping<
   Table.SubAccountRow,
   ISubAccount,
   Http.ISubAccountPayload,
-  ISimpleSubAccount,
-  INestedGroup
+  ISimpleSubAccount
 >({
   fields: [
     { field: "description" },

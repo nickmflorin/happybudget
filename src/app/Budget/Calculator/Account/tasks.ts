@@ -15,7 +15,8 @@ import {
   updateComment,
   replyToComment,
   getAccountSubAccountsHistory,
-  deleteSubAccountGroup
+  deleteSubAccountGroup,
+  getAccountSubAccountGroups
 } from "services";
 import { handleTableErrors } from "store/tasks";
 import {
@@ -50,7 +51,10 @@ import {
   removePlaceholderFromStateAction,
   addPlaceholdersToStateAction,
   updatePlaceholderInStateAction,
-  activatePlaceholderAction
+  activatePlaceholderAction,
+  requestGroupsAction,
+  responseGroupsAction,
+  loadingGroupsAction
 } from "./actions";
 
 export function* removeSubAccountFromGroupTask(action: Redux.IAction<number>): SagaIterator {
@@ -183,22 +187,40 @@ export function* getAccountCommentsTask(action: Redux.IAction<any>): SagaIterato
 }
 
 export function* handleAccountChangedTask(action: Redux.IAction<number>): SagaIterator {
-  yield all([put(requestAccountAction()), put(requestSubAccountsAction())]);
+  yield all([put(requestAccountAction()), put(requestSubAccountsAction()), put(requestGroupsAction())]);
 }
 
-// export function* recalculateGroupTask(id: number): SagaIterator {
-//   const models: ISubAccount[] = yield select(
-//     (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
+export function* deleteSubAccountTask(id: number): SagaIterator {
+  yield put(deletingSubAccountAction({ id, value: true }));
+  try {
+    yield call(deleteSubAccount, id);
+  } catch (e) {
+    handleRequestError(e, "There was an error deleting the sub account.");
+  } finally {
+    yield put(deletingSubAccountAction({ id: id, value: false }));
+  }
+}
+
+// export function* removeSubAccountFromGroupInStateTask(id: number, groupId: number): SagaIterator {
+//   const groups: IGroup<ISimpleSubAccount>[] = yield select(
+//     (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.groups.data
 //   );
-//   const modelsWithGroup = filter(models, (model: ISubAccount) => !isNil(model.group) && model.group.id === id);
-//   if (modelsWithGroup.length === 0) {
+//   const model: IGroup<ISimpleSubAccount> | undefined = find(groups, { id: groupId });
+//   if (isNil(model)) {
 //     /* eslint-disable no-console */
-//     console.warn(
-//       `Inconsistent State!  Inconsistent state noticed when recalculating group...
-//       The group with ID ${id} does not exist in state when it is expected to.`
+//     console.error(
+//       `Inconsistent State!  Inconsistent state noticed when removing sub account from group...
+//       The group with ID ${groupId} does not exist in state when it is expected to.`
 //     );
 //   } else {
-//     const
+//   }
+//   yield put(deletingSubAccountAction({ id, value: true }));
+//   try {
+//     yield call(deleteSubAccount, id);
+//   } catch (e) {
+//     handleRequestError(e, "There was an error deleting the sub account.");
+//   } finally {
+//     yield put(deletingSubAccountAction({ id: id, value: false }));
 //   }
 // }
 
@@ -226,14 +248,7 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
       }
     } else {
       yield put(removeSubAccountFromStateAction(model.id));
-      yield put(deletingSubAccountAction({ id: model.id, value: true }));
-      try {
-        yield call(deleteSubAccount, model.id);
-      } catch (e) {
-        handleRequestError(e, "There was an error deleting the sub account.");
-      } finally {
-        yield put(deletingSubAccountAction({ id: model.id, value: false }));
-      }
+      yield call(deleteSubAccountTask, model.id);
     }
   }
 }
@@ -282,9 +297,9 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
       }
     }
     // Step 3:  Update the Sub Account Group in State
-    if (!isNil(subaccount.group)) {
-      yield put(updateGroupInStateAction(subaccount.group));
-    }
+    // if (!isNil(subaccount.group)) {
+    //   yield put(updateGroupInStateAction(subaccount.group));
+    // }
   }
 }
 
@@ -317,9 +332,9 @@ export function* handleSubAccountPlaceholderActivatedTask(
       }
       yield put(updateAccountInStateAction(accountPayload));
     }
-    if (!isNil(subaccount.group)) {
-      yield put(updateGroupInStateAction(subaccount.group));
-    }
+    // if (!isNil(subaccount.group)) {
+    //   yield put(updateGroupInStateAction(subaccount.group));
+    // }
   }
 }
 
@@ -410,6 +425,26 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
       } finally {
         yield put(updatingSubAccountAction({ id: model.id, value: false }));
       }
+    }
+  }
+}
+
+export function* getGroupsTask(action: Redux.IAction<null>): SagaIterator {
+  const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
+  if (!isNil(accountId)) {
+    yield put(loadingGroupsAction(true));
+    try {
+      const response: Http.IListResponse<IGroup<ISimpleSubAccount>> = yield call(
+        getAccountSubAccountGroups,
+        accountId,
+        { no_pagination: true }
+      );
+      yield put(responseGroupsAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the account's sub account groups.");
+      yield put(responseGroupsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingGroupsAction(false));
     }
   }
 }

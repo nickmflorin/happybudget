@@ -1,8 +1,6 @@
 /// <reference path="redux/index.d.ts" />
 /// <reference path="redux-sagas/index.d.ts" />
 
-type Processor<M extends Model> = (model: M) => M;
-
 interface MappedField<M extends Model> {
   field: keyof M;
   requiredForPost?: boolean;
@@ -11,16 +9,11 @@ interface MappedField<M extends Model> {
   excludeFromPost?: boolean;
 }
 
-interface MappingConfig<
-  M extends Model,
-  G extends Table.RowGroup = Table.RowGroup,
-  C extends Table.RowChild = Table.RowChild
-> {
+interface MappingConfig<M extends Model, C extends Model = UnknownModel> {
   readonly fields: MappedField<M>[];
   readonly childrenGetter?: ((model: M) => C[]) | string | null;
-  readonly groupGetter?: ((model: M) => G | null) | string | null;
+  readonly groupGetter?: ((model: M) => number | null) | string | null;
   readonly labelGetter: (model: M) => string;
-  readonly processor?: Processor<M>;
   readonly typeLabel: string;
 }
 

@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { call, put, select } from "redux-saga/effects";
+import { call, cancel, put, select } from "redux-saga/effects";
 import { isNil, find } from "lodash";
 import { handleRequestError } from "api";
 import { AccountMapping } from "model/tableMappings";
@@ -249,13 +249,14 @@ export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIt
 
 export function* handleAccountUpdatedInStateTask(action: Redux.IAction<IAccount>): SagaIterator {
   if (!isNil(action.payload)) {
+    yield cancel();
     // NOTE: We do not need to update the calculated values of the overall budget when the Account
     // changes because direct updates to the Account itself do not affect the calculated fields
     // of the Account - only it's underlying SubAccount(s) do.
     const account = action.payload;
-    if (!isNil(account.group)) {
-      yield put(updateGroupInStateAction(account.group));
-    }
+    // if (!isNil(account.group)) {
+    //   yield put(updateGroupInStateAction(account.group));
+    // }
   }
 }
 
@@ -276,9 +277,9 @@ export function* handleAccountPlaceholderActivatedTask(
     // We should probably remove the group from the table if the response Account does not have
     // a group - however, that will not happen in practice, because this task just handles the case
     // where the Account is updated (not removed or added to a group).
-    if (!isNil(account.group)) {
-      yield put(updateGroupInStateAction(account.group));
-    }
+    // if (!isNil(account.group)) {
+    //   yield put(updateGroupInStateAction(account.group));
+    // }
   }
 }
 

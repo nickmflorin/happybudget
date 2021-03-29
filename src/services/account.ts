@@ -64,7 +64,7 @@ export const getAccountGroups = async (
   options: Http.IRequestOptions = {}
 ): Promise<Http.IListResponse<IGroup<ISimpleAccount>>> => {
   const url = URL.v1("budgets", id, "groups");
-  return client.list<IGroup<ISimpleAccount>>(url, options);
+  return client.list<IGroup<ISimpleAccount>>(url, query, options);
 };
 
 export const createAccountGroup = async (
@@ -96,10 +96,11 @@ export const createAccountSubAccountGroup = async (
 
 export const getAccountSubAccountGroups = async (
   accountId: number,
+  query: Http.IListQuery = {},
   options: Http.IRequestOptions = {}
 ): Promise<Http.IListResponse<IGroup<ISimpleSubAccount>>> => {
   const url = URL.v1("accounts", accountId, "groups");
-  return client.list<IGroup<ISimpleSubAccount>>(url, options);
+  return client.list<IGroup<ISimpleSubAccount>>(url, query, options);
 };
 
 export const deleteAccountGroup = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {

@@ -61,7 +61,7 @@ const AccountsBudgetTable = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <BudgetTable<Table.AccountRow, IAccount, Http.IAccountPayload, INestedGroup, ISimpleSubAccount>
+      <BudgetTable<Table.AccountRow, IAccount, Http.IAccountPayload, ISimpleSubAccount>
         data={data}
         placeholders={placeholders}
         mapping={AccountMapping}
@@ -86,7 +86,7 @@ const AccountsBudgetTable = (): JSX.Element => {
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountAction(payload))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         groupParams={{
-          onDeleteGroup: (group: INestedGroup) => dispatch(deleteGroupAction(group.id)),
+          onDeleteGroup: (group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id)),
           onRowRemoveFromGroup: (row: Table.AccountRow) => dispatch(removeAccountFromGroupAction(row.id)),
           onGroupRows: (rows: Table.AccountRow[]) => setGroupAccounts(map(rows, (row: Table.AccountRow) => row.id))
         }}
