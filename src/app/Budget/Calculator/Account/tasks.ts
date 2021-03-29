@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find, reduce } from "lodash";
+import { isNil, find, reduce, isEqual, filter } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountMapping } from "model/tableMappings";
 import {
@@ -186,6 +186,22 @@ export function* handleAccountChangedTask(action: Redux.IAction<number>): SagaIt
   yield all([put(requestAccountAction()), put(requestSubAccountsAction())]);
 }
 
+// export function* recalculateGroupTask(id: number): SagaIterator {
+//   const models: ISubAccount[] = yield select(
+//     (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
+//   );
+//   const modelsWithGroup = filter(models, (model: ISubAccount) => !isNil(model.group) && model.group.id === id);
+//   if (modelsWithGroup.length === 0) {
+//     /* eslint-disable no-console */
+//     console.warn(
+//       `Inconsistent State!  Inconsistent state noticed when recalculating group...
+//       The group with ID ${id} does not exist in state when it is expected to.`
+//     );
+//   } else {
+//     const
+//   }
+// }
+
 // TODO: We need to also update the estimated, variance and actual values of the parent
 // account when a sub account is removed!
 export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
@@ -231,7 +247,7 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
     const subaccounts: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
-
+    console.log(subaccounts);
     // Step 1: Apply Potential Changes to Parent Account
     if (!isNil(account)) {
       if (subaccounts.length !== 0) {
@@ -247,7 +263,6 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
         yield put(updateAccountInStateAction(accountPayload));
       }
     }
-
     // Step 2:  Apply Potential Calculated Changes to Sub Account Itself
     // In the case that the SubAccount has sub accounts itself, the estimated value is determined
     // from the accumulation of those individual estimated values.  In this case,  we do not need
@@ -262,9 +277,10 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
       if (!isNil(subaccount.actual) && !isNil(subaccount.estimated)) {
         updatedSubAccount = { ...updatedSubAccount, variance: subaccount.estimated - subaccount.actual };
       }
-      yield put(updateSubAccountInStateAction(updatedSubAccount, { meta: { triggerTask: false } }));
+      if (!isEqual(updatedSubAccount, subaccount)) {
+        yield put(updateSubAccountInStateAction(updatedSubAccount, { meta: { triggerTask: false } }));
+      }
     }
-
     // Step 3:  Update the Sub Account Group in State
     if (!isNil(subaccount.group)) {
       yield put(updateGroupInStateAction(subaccount.group));
