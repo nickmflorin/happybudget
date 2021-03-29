@@ -64,35 +64,6 @@ export const createSubAccountsReducer = (): Reducer<
               deleting: createModelListActionReducer(ActionType.SubAccounts.Groups.Deleting, {
                 referenceEntity: "group"
               })
-            },
-            extensions: {
-              [ActionType.SubAccounts.RemoveFromGroup]: (
-                id: number,
-                st: Redux.Calculator.IGroupsStore<ISimpleSubAccount>
-              ) => {
-                const group: IGroup<ISimpleSubAccount> | undefined = find(st.data, (g: IGroup<ISimpleSubAccount>) =>
-                  includes(
-                    map(g.children, (child: ISimpleSubAccount) => child.id),
-                    id
-                  )
-                );
-                if (isNil(group)) {
-                  /* eslint-disable no-console */
-                  console.error(
-                    `Inconsistent State!:  Inconsistent state noticed when removing sub account from group...
-                    the subaccount with ID ${id} does not exist in a group in state when it is expected to.`
-                  );
-                  return {};
-                } else {
-                  return {
-                    data: replaceInArray<IGroup<ISimpleSubAccount>>(
-                      st.data,
-                      { id: group.id },
-                      { ...group, children: filter(group.children, (child: ISimpleSubAccount) => child.id !== id) }
-                    )
-                  };
-                }
-              }
             }
           }
         ),
@@ -163,7 +134,9 @@ export const createSubAccountsReducer = (): Reducer<
       };
     };
 
-    let newState = listResponseReducer(state, action);
+    let newState = { ...state };
+
+    newState = listResponseReducer(newState, action);
 
     // NOTE: The above ListResponseReducer handles updates to the Group itself or the SubAccount itself
     // via these same actions. However, it does not do any recalculation of the group values, because
@@ -178,7 +151,35 @@ export const createSubAccountsReducer = (): Reducer<
       if (!isNil(subAccount.group)) {
         newState = recalculateGroupMetrics(newState, subAccount.group);
       }
+    } else if (action.type === ActionType.SubAccounts.RemoveFromGroup) {
+      const group: IGroup<ISimpleSubAccount> | undefined = find(newState.groups.data, (g: IGroup<ISimpleSubAccount>) =>
+        includes(
+          map(g.children, (child: ISimpleSubAccount) => child.id),
+          action.payload
+        )
+      );
+      if (isNil(group)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!  Inconsistent state noticed when removing sub account from group.
+          A group does not exist for sub account ${action.payload}.`
+        );
+      } else {
+        newState = {
+          ...newState,
+          groups: {
+            ...newState.groups,
+            data: replaceInArray<IGroup<ISimpleSubAccount>>(
+              newState.groups.data,
+              { id: group.id },
+              { ...group, children: filter(group.children, (child: ISimpleSubAccount) => child.id !== action.payload) }
+            )
+          }
+        };
+        newState = recalculateGroupMetrics(newState, group.id);
+      }
     }
+
     return { ...newState };
   };
 };

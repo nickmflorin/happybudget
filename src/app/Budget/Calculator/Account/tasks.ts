@@ -43,7 +43,6 @@ import {
   responseHistoryAction,
   deletingGroupAction,
   removeGroupFromStateAction,
-  updateGroupInStateAction,
   updateAccountInStateAction,
   updateSubAccountInStateAction,
   removeSubAccountFromStateAction,
@@ -202,8 +201,6 @@ export function* deleteSubAccountTask(id: number): SagaIterator {
   }
 }
 
-// TODO: We need to also update the estimated, variance and actual values of the parent
-// account when a sub account is removed!
 export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
     const models: ISubAccount[] = yield select(
