@@ -126,11 +126,11 @@ namespace Redux {
       readonly editing: number[];
     }
 
-    interface ISubAccountsStore<R extends Table.Row> extends IListResponseStore<ISubAccount> {
+    interface ISubAccountsStore extends IListResponseStore<ISubAccount> {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
       readonly creating: boolean;
-      readonly placeholders: ListStore<R>;
+      readonly placeholders: ListStore<Table.SubAccountRow>;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
       readonly groups: IGroupsStore<ISimpleSubAccount>;
     }
