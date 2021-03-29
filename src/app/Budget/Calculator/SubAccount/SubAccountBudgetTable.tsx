@@ -27,6 +27,9 @@ import {
   removeSubAccountFromGroupAction
 } from "./actions";
 
+const selectGroups = simpleDeepEqualSelector(
+  (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.groups.data
+);
 const selectSelectedRows = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.selected
 );
@@ -66,11 +69,13 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const subaccountDetail = useSelector(selectSubAccountDetail);
+  const groups = useSelector(selectGroups);
 
   return (
     <React.Fragment>
       <BudgetTable<Table.SubAccountRow, ISubAccount, Http.ISubAccountPayload, ISimpleSubAccount>
         data={data}
+        groups={groups}
         placeholders={placeholders}
         mapping={SubAccountMapping}
         selected={selected}

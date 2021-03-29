@@ -98,7 +98,10 @@ class Mapping<R extends Table.Row<C>, M extends Model, P extends Http.IPayload, 
       group
     };
     forEach(this.fields, (field: MappedField<M>) => {
-      obj[field.field as string] = getProperty<M, keyof M>(model, field.field);
+      // We want to attribute the full group to the row, not just the ID.
+      if (field.field !== "group") {
+        obj[field.field as string] = getProperty<M, keyof M>(model, field.field);
+      }
     });
     return obj as R;
   };

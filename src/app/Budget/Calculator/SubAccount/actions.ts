@@ -6,7 +6,7 @@ export const ActionType = {
     Loading: "calculator.subaccount.Loading",
     Response: "calculator.subaccount.Response",
     Request: "calculator.subaccount.Request",
-    UpdateInState: "calculator.account.UpdateInState"
+    UpdateInState: "calculator.subaccount.UpdateInState"
   },
   Comments: {
     Loading: "calculator.subaccount.comments.Loading",
@@ -49,6 +49,9 @@ export const ActionType = {
       RemoveFromState: "calculator.subaccount.subaccounts.placeholders.RemoveFromState"
     },
     Groups: {
+      Response: "calculator.subaccount.subaccounts.groups.Response",
+      Request: "calculator.subaccount.subaccounts.groups.Request",
+      Loading: "calculator.subaccount.subaccounts.groups.Loading",
       Delete: "calculator.subaccount.subaccounts.groups.Delete",
       Deleting: "calculator.subaccount.subaccounts.groups.Deleting",
       AddToState: "calculator.subaccount.subaccounts.groups.AddToState",
@@ -130,6 +133,11 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
 /*
   Actiosn Pertaining to Account Sub Accounts Groups
 */
+export const requestGroupsAction = simpleAction<null>(ActionType.SubAccounts.Groups.Request);
+export const loadingGroupsAction = simpleAction<boolean>(ActionType.SubAccounts.Groups.Loading);
+export const responseGroupsAction = simpleAction<Http.IListResponse<IGroup<ISimpleSubAccount>>>(
+  ActionType.SubAccounts.Groups.Response
+);
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(ActionType.SubAccounts.Groups.AddToState);
 export const updateGroupInStateAction = simpleAction<IGroup<ISimpleSubAccount>>(
   ActionType.SubAccounts.Groups.UpdateInState

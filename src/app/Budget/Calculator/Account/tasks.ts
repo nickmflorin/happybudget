@@ -57,12 +57,17 @@ import {
   loadingGroupsAction
 } from "./actions";
 
+export function* handleAccountChangedTask(action: Redux.IAction<number>): SagaIterator {
+  yield all([put(requestAccountAction()), put(requestSubAccountsAction()), put(requestGroupsAction())]);
+}
+
 export function* removeSubAccountFromGroupTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(updatingSubAccountAction({ id: action.payload, value: true }));
     try {
-      const subaccount: ISubAccount = yield call(updateSubAccount, action.payload, { group: null });
-      yield put(updateSubAccountInStateAction(subaccount));
+      // NOTE: We do not need to update the SubAccount in state because the reducer will already
+      // disassociate the SubAccount from the group.
+      yield call(updateSubAccount, action.payload, { group: null });
     } catch (e) {
       yield call(
         handleTableErrors,
@@ -186,10 +191,6 @@ export function* getAccountCommentsTask(action: Redux.IAction<any>): SagaIterato
   }
 }
 
-export function* handleAccountChangedTask(action: Redux.IAction<number>): SagaIterator {
-  yield all([put(requestAccountAction()), put(requestSubAccountsAction()), put(requestGroupsAction())]);
-}
-
 export function* deleteSubAccountTask(id: number): SagaIterator {
   yield put(deletingSubAccountAction({ id, value: true }));
   try {
@@ -200,29 +201,6 @@ export function* deleteSubAccountTask(id: number): SagaIterator {
     yield put(deletingSubAccountAction({ id: id, value: false }));
   }
 }
-
-// export function* removeSubAccountFromGroupInStateTask(id: number, groupId: number): SagaIterator {
-//   const groups: IGroup<ISimpleSubAccount>[] = yield select(
-//     (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.groups.data
-//   );
-//   const model: IGroup<ISimpleSubAccount> | undefined = find(groups, { id: groupId });
-//   if (isNil(model)) {
-//     /* eslint-disable no-console */
-//     console.error(
-//       `Inconsistent State!  Inconsistent state noticed when removing sub account from group...
-//       The group with ID ${groupId} does not exist in state when it is expected to.`
-//     );
-//   } else {
-//   }
-//   yield put(deletingSubAccountAction({ id, value: true }));
-//   try {
-//     yield call(deleteSubAccount, id);
-//   } catch (e) {
-//     handleRequestError(e, "There was an error deleting the sub account.");
-//   } finally {
-//     yield put(deletingSubAccountAction({ id: id, value: false }));
-//   }
-// }
 
 // TODO: We need to also update the estimated, variance and actual values of the parent
 // account when a sub account is removed!
@@ -262,7 +240,6 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
     const subaccounts: ISubAccount[] = yield select(
       (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
     );
-    console.log(subaccounts);
     // Step 1: Apply Potential Changes to Parent Account
     if (!isNil(account)) {
       if (subaccounts.length !== 0) {
@@ -296,10 +273,6 @@ export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAc
         yield put(updateSubAccountInStateAction(updatedSubAccount, { meta: { triggerTask: false } }));
       }
     }
-    // Step 3:  Update the Sub Account Group in State
-    // if (!isNil(subaccount.group)) {
-    //   yield put(updateGroupInStateAction(subaccount.group));
-    // }
   }
 }
 
@@ -332,9 +305,6 @@ export function* handleSubAccountPlaceholderActivatedTask(
       }
       yield put(updateAccountInStateAction(accountPayload));
     }
-    // if (!isNil(subaccount.group)) {
-    //   yield put(updateGroupInStateAction(subaccount.group));
-    // }
   }
 }
 
@@ -480,7 +450,6 @@ export function* getAccountTask(action: Redux.IAction<null>): SagaIterator {
     }
     if (showLoadingIndicator) {
       yield put(loadingAccountAction(true));
-      // yield put(setAncestorsLoadingAction(true));
     }
     try {
       const response: IAccount = yield call(getAccount, accountId);
@@ -491,7 +460,6 @@ export function* getAccountTask(action: Redux.IAction<null>): SagaIterator {
     } finally {
       if (showLoadingIndicator) {
         yield put(loadingAccountAction(false));
-        // yield put(setAncestorsLoadingAction(false));
       }
     }
   }

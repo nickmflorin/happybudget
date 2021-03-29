@@ -476,7 +476,7 @@ const BudgetTable = <
       return [];
     } else if (row.meta.isGroupFooter) {
       if (!isNil(row.group) && !isNil(groupParams)) {
-        const group: IGroup<C> = row.group;
+        const group = row.group;
         return [
           {
             name: `Delete Group ${group.name}`,

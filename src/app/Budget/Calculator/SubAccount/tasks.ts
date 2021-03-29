@@ -15,7 +15,8 @@ import {
   updateComment,
   replyToComment,
   getSubAccountSubAccountsHistory,
-  deleteSubAccountGroup
+  deleteSubAccountGroup,
+  getSubAccountSubAccountGroups
 } from "services";
 import { handleTableErrors } from "store/tasks";
 import {
@@ -50,15 +51,23 @@ import {
   addPlaceholdersToStateAction,
   updatePlaceholderInStateAction,
   activatePlaceholderAction,
-  addErrorsToStateAction
+  addErrorsToStateAction,
+  loadingGroupsAction,
+  responseGroupsAction,
+  requestGroupsAction
 } from "./actions";
+
+export function* handleSubAccountChangedTask(action: Redux.IAction<number>): SagaIterator {
+  yield all([put(requestSubAccountAction()), put(requestSubAccountsAction()), put(requestGroupsAction())]);
+}
 
 export function* removeSubAccountFromGroupTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(updatingSubAccountAction({ id: action.payload, value: true }));
     try {
-      const subaccount: ISubAccount = yield call(updateSubAccount, action.payload, { group: null });
-      yield put(updateSubAccountInStateAction(subaccount));
+      // NOTE: We do not need to update the SubAccount in state because the reducer will already
+      // disassociate the SubAccount from the group.
+      yield call(updateSubAccount, action.payload, { group: null });
     } catch (e) {
       yield call(
         handleTableErrors,
@@ -181,10 +190,6 @@ export function* getCommentsTask(action: Redux.IAction<any>): SagaIterator {
   }
 }
 
-export function* handleSubAccountChangedTask(action: Redux.IAction<number>): SagaIterator {
-  yield all([put(requestSubAccountAction()), put(requestSubAccountsAction())]);
-}
-
 // TODO: We need to also update the estimated, variance and actual values of the parent
 // sub account when a sub account is removed!
 export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
@@ -223,28 +228,22 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
 }
 
 export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAccount>): SagaIterator {
-  if (!isNil(action.payload)) {
-    const subaccount = action.payload;
-    const parentSubAccount: ISubAccount = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.subaccount.detail.data
-    );
-    const subaccounts: ISubAccount[] = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data
-    );
-    // Right now, the backend is configured such that the Actual value for the overall Account is
-    // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
-    // in the backend, we need to also make that adjustment here.
-    if (subaccounts.length !== 0 && !isNil(parentSubAccount)) {
-      const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
-      let subaccountPayload: Partial<IAccount> = { estimated };
-      if (!isNil(parentSubAccount.actual)) {
-        subaccountPayload = { ...subaccountPayload, variance: estimated - parentSubAccount.actual };
-      }
-      yield put(updateParentSubAccountInStateAction(subaccountPayload));
+  const parentSubAccount: ISubAccount = yield select(
+    (state: Redux.IApplicationStore) => state.calculator.subaccount.detail.data
+  );
+  const subaccounts: ISubAccount[] = yield select(
+    (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data
+  );
+  // Right now, the backend is configured such that the Actual value for the overall Account is
+  // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
+  // in the backend, we need to also make that adjustment here.
+  if (subaccounts.length !== 0 && !isNil(parentSubAccount)) {
+    const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
+    let subaccountPayload: Partial<IAccount> = { estimated };
+    if (!isNil(parentSubAccount.actual)) {
+      subaccountPayload = { ...subaccountPayload, variance: estimated - parentSubAccount.actual };
     }
-    // if (!isNil(subaccount.group)) {
-    //   yield put(updateGroupInStateAction(subaccount.group));
-    // }
+    yield put(updateParentSubAccountInStateAction(subaccountPayload));
   }
 }
 
@@ -276,9 +275,6 @@ export function* handleSubAccountPlaceholderActivatedTask(
       }
       yield put(updateParentSubAccountInStateAction(subaccountPayload));
     }
-    // if (!isNil(subaccount.group)) {
-    //   yield put(updateGroupInStateAction(subaccount.group));
-    // }
   }
 }
 
@@ -369,6 +365,26 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
   }
 }
 
+export function* getGroupsTask(action: Redux.IAction<null>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
+  if (!isNil(subaccountId)) {
+    yield put(loadingGroupsAction(true));
+    try {
+      const response: Http.IListResponse<IGroup<ISimpleSubAccount>> = yield call(
+        getSubAccountSubAccountGroups,
+        subaccountId,
+        { no_pagination: true }
+      );
+      yield put(responseGroupsAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the sub account's sub account groups.");
+      yield put(responseGroupsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingGroupsAction(false));
+    }
+  }
+}
+
 export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId)) {
@@ -391,7 +407,6 @@ export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
 export function* getSubAccountTask(action: Redux.IAction<null>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId)) {
-    // yield put(setAncestorsLoadingAction(true));
     yield put(loadingSubAccountAction(true));
     try {
       const response: ISubAccount = yield call(getSubAccount, subaccountId);
@@ -401,7 +416,6 @@ export function* getSubAccountTask(action: Redux.IAction<null>): SagaIterator {
       yield put(responseSubAccountAction(undefined, { error: e }));
     } finally {
       yield put(loadingSubAccountAction(false));
-      // yield put(setAncestorsLoadingAction(false));
     }
   }
 }

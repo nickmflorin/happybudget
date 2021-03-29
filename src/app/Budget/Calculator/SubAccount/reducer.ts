@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import { isNil, find } from "lodash";
+import { isNil, find, includes, map, filter } from "lodash";
 import {
   createDetailResponseReducer,
   createSimpleBooleanReducer,
@@ -59,11 +59,52 @@ const rootReducer = combineReducers({
           SubAccountMapping,
           { referenceEntity: "subaccount" }
         ),
-        groups: combineReducers({
-          deleting: createModelListActionReducer(ActionType.SubAccounts.Groups.Deleting, {
-            referenceEntity: "group"
-          })
-        }),
+        groups: createListResponseReducer<IGroup<ISimpleSubAccount>, Redux.Calculator.IGroupsStore<ISimpleSubAccount>>(
+          {
+            Response: ActionType.SubAccounts.Groups.Response,
+            Request: ActionType.SubAccounts.Groups.Request,
+            Loading: ActionType.SubAccounts.Groups.Loading,
+            RemoveFromState: ActionType.SubAccounts.Groups.RemoveFromState,
+            AddToState: ActionType.SubAccounts.Groups.AddToState
+          },
+          {
+            referenceEntity: "group",
+            keyReducers: {
+              deleting: createModelListActionReducer(ActionType.SubAccounts.Groups.Deleting, {
+                referenceEntity: "group"
+              })
+            },
+            extensions: {
+              [ActionType.SubAccounts.RemoveFromGroup]: (
+                id: number,
+                st: Redux.Calculator.IGroupsStore<ISimpleSubAccount>
+              ) => {
+                const group: IGroup<ISimpleSubAccount> | undefined = find(st.data, (g: IGroup<ISimpleSubAccount>) =>
+                  includes(
+                    map(g.children, (child: ISimpleSubAccount) => child.id),
+                    id
+                  )
+                );
+                if (isNil(group)) {
+                  /* eslint-disable no-console */
+                  console.error(
+                    `Inconsistent State!:  Inconsistent state noticed when removing sub account from group...
+                    the subaccount with ID ${id} does not exist in a group in state when it is expected to.`
+                  );
+                  return {};
+                } else {
+                  return {
+                    data: replaceInArray<IGroup<ISimpleSubAccount>>(
+                      st.data,
+                      { id: group.id },
+                      { ...group, children: filter(group.children, (child: ISimpleSubAccount) => child.id !== id) }
+                    )
+                  };
+                }
+              }
+            }
+          }
+        ),
         deleting: createModelListActionReducer(ActionType.SubAccounts.Deleting, {
           referenceEntity: "subaccount"
         }),
@@ -80,59 +121,6 @@ const rootReducer = combineReducers({
         ),
         creating: createSimpleBooleanReducer(ActionType.SubAccounts.Creating)
       }
-      //   extensions: {
-      //     [ActionType.SubAccounts.Groups.AddToState]: (
-      //       group: IGroup<ISimpleSubAccount>,
-      //       st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
-      //     ) => {
-      //       let data = [...st.data];
-      //       for (let i = 0; i < group.children.length; i++) {
-      //         const child: ISimpleSubAccount = group.children[i];
-      //         const model = find(data, { id: child.id });
-      //         if (isNil(model)) {
-      //           /* eslint-disable no-console */
-      //           console.error(
-      //             `Inconsistent State!: Inconsistent state noticed when adding group to state.
-      //             Group has child ${child.id} that does not exist in state when it is expected to.`
-      //           );
-      //         } else {
-      //           data = replaceInArray<ISubAccount>(
-      //             data,
-      //             { id: child.id },
-      //             { ...model, group: groupToNestedGroup(group) }
-      //           );
-      //         }
-      //       }
-      //       return { data };
-      //     },
-      //     [ActionType.SubAccounts.Groups.RemoveFromState]: (
-      //       id: number,
-      //       st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
-      //     ) => {
-      //       let data = [...st.data];
-      //       for (let i = 0; i < data.length; i++) {
-      //         const model: ISubAccount = data[i];
-      //         if (!isNil(model.group) && model.group.id === id) {
-      //           data = replaceInArray<ISubAccount>(data, { id: model.id }, { ...model, group: null });
-      //         }
-      //       }
-      //       return { data };
-      //     },
-      //     [ActionType.SubAccounts.Groups.UpdateInState]: (
-      //       group: INestedGroup,
-      //       st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
-      //     ) => {
-      //       let data = [...st.data];
-      //       for (let i = 0; i < data.length; i++) {
-      //         const model: ISubAccount = data[i];
-      //         if (!isNil(model.group) && model.group.id === group.id) {
-      //           data = replaceInArray<ISubAccount>(data, { id: model.id }, { ...model, group });
-      //         }
-      //       }
-      //       return { data };
-      //     }
-      //   }
-      // }
     }
   )
 });
