@@ -811,7 +811,9 @@ const BudgetTable = <
               headerHeight={38}
               enableRangeSelection={true}
               clipboardDeliminator={","}
-              animateRows={true}
+              // We want to leave row animation off for now, because whenever updates happen to
+              // the table it causes the colored group footer rows to "flash".
+              animateRows={false}
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
               onFirstDataRendered={onFirstDataRendered}
