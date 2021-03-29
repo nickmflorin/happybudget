@@ -31,10 +31,19 @@ import { downloadAsCsvFile } from "util/files";
 import { generateRandomNumericId } from "util/math";
 import { formatCurrencyWithoutDollarSign } from "util/string";
 
-import { ExpandCell, IndexCell, ValueCell, UnitCell, IdentifierCell, CalculatedCell } from "./cells";
+import {
+  ExpandCell,
+  IndexCell,
+  ValueCell,
+  UnitCell,
+  IdentifierCell,
+  CalculatedCell,
+  PaymentMethodsCell,
+  BudgetItemCell
+} from "./cells";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
-import { IncludeErrorsInCell } from "./Util";
+import { IncludeErrorsInCell, HideCellForTableFooter } from "./Util";
 import "./index.scss";
 
 export * from "./model";
@@ -154,7 +163,10 @@ const BudgetTable = <
         colSpan: (params: ColSpanParams) => {
           const row: R = params.data;
           if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true) {
-            return 2;
+            if (!isNil(onRowExpand)) {
+              return 2;
+            }
+            return 1;
           }
           return 1;
         }
@@ -830,6 +842,8 @@ const BudgetTable = <
                 UnitCell: IncludeErrorsInCell<R>(UnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                 CalculatedCell: CalculatedCell,
+                PaymentMethodsCell: HideCellForTableFooter<R>(PaymentMethodsCell),
+                BudgetItemCell: HideCellForTableFooter<R>(BudgetItemCell),
                 ...frameworkComponents
               }}
               onCellEditingStopped={onCellEditingStopped}
@@ -851,6 +865,8 @@ const BudgetTable = <
                 UnitCell: IncludeErrorsInCell<R>(UnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                 CalculatedCell: CalculatedCell,
+                PaymentMethodsCell: HideCellForTableFooter<R>(PaymentMethodsCell),
+                BudgetItemCell: HideCellForTableFooter<R>(BudgetItemCell),
                 ...frameworkComponents
               }}
             />

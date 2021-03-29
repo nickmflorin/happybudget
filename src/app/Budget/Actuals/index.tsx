@@ -24,7 +24,6 @@ import {
   selectAllActualsAction,
   requestBudgetItemsTreeAction
 } from "./actions";
-import { BudgetItemCell, PaymentMethodsCell } from "./cells";
 
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.selected);
 const selectActuals = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.data);
@@ -118,8 +117,6 @@ const Actuals = (): JSX.Element => {
         onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row.id))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateActualAction(payload))}
         onSelectAll={() => dispatch(selectAllActualsAction())}
-        frameworkComponents={{ BudgetItemCell, PaymentMethodsCell }}
-        // TODO: Revisit whether or not this is necessary!
         rowRefreshRequired={(existing: Table.ActualRow, row: Table.ActualRow) => {
           return (
             existing.object_id !== row.object_id ||

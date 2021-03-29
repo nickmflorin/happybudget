@@ -21,6 +21,23 @@ export const HideCellForGroupFooter = <R extends Table.Row<any, any>>(func: Func
   };
 };
 
+/**
+ * @param func  Wraps a React component for creating a table cell such that the
+ *              cell will only be rendered if the row does not correspond to
+ *              a table footer.
+ * @returns    (props: any) => JSX.Element
+ */
+export const HideCellForTableFooter = <R extends Table.Row<any, any>>(func: Func): Func => {
+  return (ps: ICellRendererParams): JSX.Element => {
+    const row: R = ps.data;
+    if (row.meta.isTableFooter) {
+      return <></>;
+    }
+    const Component = func;
+    return <Component {...ps} />;
+  };
+};
+
 export const IncludeErrorsInCell = <R extends Table.Row<any, any>>(func: Func): Func => {
   return ({ colDef, data, ...props }: ICellRendererParams): JSX.Element => {
     const row: R = data;
