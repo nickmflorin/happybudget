@@ -28,17 +28,13 @@ interface _FormProps extends FormProps {
 }
 
 const Form = ({ globalError, loading, children, className, style = {}, ...props }: _FormProps): JSX.Element => {
-  /* eslint-disable indent */
-  const footer = Array.isArray(children)
-    ? find(children, (child: JSX.Element) => child.type === FormFooter)
-    : children.type === FormFooter
-    ? children
-    : undefined;
+  const childrenArray = Array.isArray(children) ? children : [children];
+  const footer = find(childrenArray, (child: JSX.Element) => child.type === FormFooter);
   return (
     <RootForm {...props} className={classNames(className, "form")} style={style}>
       <RenderWithSpinner loading={loading}>
         {map(
-          filter(children, (child: JSX.Element) => child.type !== FormFooter),
+          filter(childrenArray, (child: JSX.Element) => child.type !== FormFooter),
           (child: JSX.Element) => child
         )}
         <div className={"form-alert-wrapper"}>
