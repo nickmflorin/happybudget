@@ -1,5 +1,6 @@
-import { combineReducers } from "redux";
-import { find, map, includes, isNil, filter } from "lodash";
+import { combineReducers, Reducer } from "redux";
+import { find, map, includes, isNil, filter, reduce } from "lodash";
+
 import {
   createDetailResponseReducer,
   createSimpleBooleanReducer,
@@ -11,29 +12,18 @@ import {
 } from "store/factories";
 import { SubAccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
-import { ActionType } from "./actions";
 
-const rootReducer = combineReducers({
-  id: createSimplePayloadReducer(ActionType.Account.SetId),
-  detail: createDetailResponseReducer<IAccount, Redux.IDetailResponseStore<IAccount>, Redux.IAction>({
-    Response: ActionType.Account.Response,
-    Loading: ActionType.Account.Loading,
-    Request: ActionType.Account.Request,
-    UpdateInState: ActionType.Account.UpdateInState
-  }),
-  comments: createCommentsListResponseReducer({
-    Response: ActionType.Comments.Response,
-    Request: ActionType.Comments.Request,
-    Loading: ActionType.Comments.Loading,
-    AddToState: ActionType.Comments.AddToState,
-    RemoveFromState: ActionType.Comments.RemoveFromState,
-    UpdateInState: ActionType.Comments.UpdateInState,
-    Submitting: ActionType.Comments.Submitting,
-    Deleting: ActionType.Comments.Deleting,
-    Editing: ActionType.Comments.Editing,
-    Replying: ActionType.Comments.Replying
-  }),
-  subaccounts: createListResponseReducer<ISubAccount, Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>>(
+import { ActionType } from "./actions";
+import { initialSubAccountsState } from "./initialState";
+
+export const createSubAccountsReducer = (): Reducer<
+  Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>,
+  Redux.IAction<any>
+> => {
+  const listResponseReducer = createListResponseReducer<
+    ISubAccount,
+    Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
+  >(
     {
       Response: ActionType.SubAccounts.Response,
       Request: ActionType.SubAccounts.Request,
@@ -123,7 +113,97 @@ const rootReducer = combineReducers({
         creating: createSimpleBooleanReducer(ActionType.SubAccounts.Creating)
       }
     }
-  )
+  );
+
+  return (
+    state: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow> = initialSubAccountsState,
+    action: Redux.IAction<any>
+  ): Redux.Calculator.ISubAccountsStore<Table.SubAccountRow> => {
+    const recalculateGroupMetrics = (
+      st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>,
+      groupId: number
+    ): Redux.Calculator.ISubAccountsStore<Table.SubAccountRow> => {
+      // This might not be totally necessary, but it is good practice to not use the entire payload
+      // to update the group (since that is already done by the reducer above) but to instead just
+      // update the parts of the relevant parts of the current group in state (estimated, variance,
+      // actual).
+      const group = find(st.groups.data, { id: groupId });
+      if (isNil(group)) {
+        throw new Error(`The group with ID ${groupId} no longer exists in state!`);
+      }
+      const childrenIds = map(group.children, (child: ISimpleSubAccount) => child.id);
+      const subAccounts = filter(
+        map(childrenIds, (id: number) => {
+          const subAccount = find(st.data, { id });
+          if (!isNil(subAccount)) {
+            return subAccount;
+          } else {
+            /* eslint-disable no-console */
+            console.error(
+              `Inconsistent State: Inconsistent state noticed when updating group in state.  Group child
+            with ID ${id} does not exist in state when it is expected to.`
+            );
+            return null;
+          }
+        }),
+        (child: ISubAccount | null) => child !== null
+      ) as ISubAccount[];
+      const actual = reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0);
+      const estimated = reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
+      return {
+        ...st,
+        groups: {
+          ...st.groups,
+          data: replaceInArray<IGroup<ISimpleSubAccount>>(
+            st.groups.data,
+            { id: group.id },
+            { ...group, ...{ estimated, actual, variance: estimated - actual } }
+          )
+        }
+      };
+    };
+
+    let newState = listResponseReducer(state, action);
+
+    // NOTE: The above ListResponseReducer handles updates to the Group itself or the SubAccount itself
+    // via these same actions. However, it does not do any recalculation of the group values, because
+    // it needs the state of the Group and the state of the SubAccount(s) to do so. This means moving
+    // that logic/recalculation further up the reducer tree where we have access to the SubAccount(s)
+    // in state.
+    if (action.type === ActionType.SubAccounts.Groups.UpdateInState) {
+      const group: IGroup<ISimpleSubAccount> = action.payload;
+      newState = recalculateGroupMetrics(newState, group.id);
+    } else if (action.type === ActionType.SubAccounts.UpdateInState) {
+      const subAccount: ISubAccount = action.payload;
+      if (!isNil(subAccount.group)) {
+        newState = recalculateGroupMetrics(newState, subAccount.group);
+      }
+    }
+    return { ...newState };
+  };
+};
+
+const rootReducer = combineReducers({
+  id: createSimplePayloadReducer(ActionType.Account.SetId),
+  detail: createDetailResponseReducer<IAccount, Redux.IDetailResponseStore<IAccount>, Redux.IAction>({
+    Response: ActionType.Account.Response,
+    Loading: ActionType.Account.Loading,
+    Request: ActionType.Account.Request,
+    UpdateInState: ActionType.Account.UpdateInState
+  }),
+  comments: createCommentsListResponseReducer({
+    Response: ActionType.Comments.Response,
+    Request: ActionType.Comments.Request,
+    Loading: ActionType.Comments.Loading,
+    AddToState: ActionType.Comments.AddToState,
+    RemoveFromState: ActionType.Comments.RemoveFromState,
+    UpdateInState: ActionType.Comments.UpdateInState,
+    Submitting: ActionType.Comments.Submitting,
+    Deleting: ActionType.Comments.Deleting,
+    Editing: ActionType.Comments.Editing,
+    Replying: ActionType.Comments.Replying
+  }),
+  subaccounts: createSubAccountsReducer()
 });
 
 export default rootReducer;
