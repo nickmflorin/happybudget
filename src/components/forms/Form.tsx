@@ -33,10 +33,7 @@ const Form = ({ globalError, loading, children, className, style = {}, ...props 
   return (
     <RootForm {...props} className={classNames(className, "form")} style={style}>
       <RenderWithSpinner loading={loading}>
-        {map(
-          filter(childrenArray, (child: JSX.Element) => child.type !== FormFooter),
-          (child: JSX.Element) => child
-        )}
+        {filter(childrenArray, (child: JSX.Element) => child.type !== FormFooter)}
         <div className={"form-alert-wrapper"}>
           <DisplayAlert>{globalError}</DisplayAlert>
         </div>
