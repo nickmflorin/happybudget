@@ -55,11 +55,8 @@ export interface SubAccountsReducerFactoryActionMap {
 
 export const createSubAccountsReducer = (
   mapping: SubAccountsReducerFactoryActionMap
-): Reducer<Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>, Redux.IAction<any>> => {
-  const listResponseReducer = createListResponseReducer<
-    ISubAccount,
-    Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>
-  >(
+): Reducer<Redux.Calculator.ISubAccountsStore, Redux.IAction<any>> => {
+  const listResponseReducer = createListResponseReducer<ISubAccount, Redux.Calculator.ISubAccountsStore>(
     {
       Response: mapping.Response,
       Request: mapping.Request,
@@ -123,9 +120,9 @@ export const createSubAccountsReducer = (
   );
 
   const recalculateGroupMetrics = (
-    st: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow>,
+    st: Redux.Calculator.ISubAccountsStore,
     groupId: number
-  ): Redux.Calculator.ISubAccountsStore<Table.SubAccountRow> => {
+  ): Redux.Calculator.ISubAccountsStore => {
     // This might not be totally necessary, but it is good practice to not use the entire payload
     // to update the group (since that is already done by the reducer above) but to instead just
     // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -167,9 +164,9 @@ export const createSubAccountsReducer = (
   };
 
   return (
-    state: Redux.Calculator.ISubAccountsStore<Table.SubAccountRow> = initialSubAccountsState,
+    state: Redux.Calculator.ISubAccountsStore = initialSubAccountsState,
     action: Redux.IAction<any>
-  ): Redux.Calculator.ISubAccountsStore<Table.SubAccountRow> => {
+  ): Redux.Calculator.ISubAccountsStore => {
     let newState = { ...state };
 
     newState = listResponseReducer(newState, action);

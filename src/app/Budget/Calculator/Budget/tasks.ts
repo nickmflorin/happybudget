@@ -41,7 +41,6 @@ import {
   addAccountsHistoryToStateAction,
   deletingGroupAction,
   removeGroupFromStateAction,
-  updateGroupInStateAction,
   updateAccountInStateAction,
   removeAccountFromStateAction,
   addAccountToStateAction,
