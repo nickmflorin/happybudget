@@ -140,6 +140,7 @@ export const responseGroupsAction = simpleAction<Http.IListResponse<IGroup<ISimp
   ActionType.SubAccounts.Groups.Response
 );
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(ActionType.SubAccounts.Groups.AddToState);
+// Not currently used, but we may need to use in the near future.
 export const updateGroupInStateAction = simpleAction<IGroup<ISimpleSubAccount>>(
   ActionType.SubAccounts.Groups.UpdateInState
 );

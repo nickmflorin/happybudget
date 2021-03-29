@@ -43,7 +43,6 @@ import {
   responseHistoryAction,
   deletingGroupAction,
   removeGroupFromStateAction,
-  updateGroupInStateAction,
   updateAccountInStateAction,
   updateSubAccountInStateAction,
   removeSubAccountFromStateAction,
@@ -202,8 +201,6 @@ export function* deleteSubAccountTask(id: number): SagaIterator {
   }
 }
 
-// TODO: We need to also update the estimated, variance and actual values of the parent
-// account when a sub account is removed!
 export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
     const models: ISubAccount[] = yield select(
@@ -379,11 +376,9 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
       yield put(updatingSubAccountAction({ id: model.id, value: true }));
       const requestPayload = SubAccountMapping.patchPayload(action.payload);
       try {
-        const response: ISubAccount = yield call(updateSubAccount, model.id, requestPayload);
-        // Even though we updated the SubAccount in state pre-request, we want to make sure
-        // the server is relied on as the source of truth, so we update using the server data
-        // to ensure the displayed data is correct.
-        yield put(updateSubAccountInStateAction(response));
+        // NOTE: We do not need to update the SubAccount in state because the reducer will have
+        // already handled that.
+        yield call(updateSubAccount, model.id, requestPayload);
       } catch (e) {
         yield call(
           handleTableErrors,

@@ -1,6 +1,6 @@
 import {
-  initialDetailResponseState,
   initialListResponseState,
+  initialDetailResponseState,
   initialCommentsListResponseState
 } from "store/initialState";
 
