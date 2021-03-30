@@ -57,8 +57,6 @@ export function* removeAccountFromGroupTask(action: Redux.IAction<number>): Saga
   if (!isNil(action.payload)) {
     yield put(updatingAccountAction({ id: action.payload, value: true }));
     try {
-      // NOTE: We do not need to update the Account in state because the reducer will already
-      // disassociate the Account from the group.
       yield call(updateAccount, action.payload, { group: null });
     } catch (e) {
       yield call(
@@ -216,8 +214,6 @@ export function* getCommentsTask(action: Redux.IAction<any>): SagaIterator {
   }
 }
 
-// TODO: We need to also update the estimated, variance and actual values of the parent
-// budget when an account is removed!
 export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
     const models: IAccount[] = yield select((state: Redux.IApplicationStore) => state.calculator.budget.accounts.data);
@@ -247,22 +243,6 @@ export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIt
         yield put(deletingAccountAction({ id: model.id, value: false }));
       }
     }
-  }
-}
-
-export function* handleAccountPlaceholderActivatedTask(
-  action: Redux.IAction<Table.ActivatePlaceholderPayload<IAccount>>
-): SagaIterator {
-  if (!isNil(action.payload)) {
-    // NOTE: We do not need to update the calculated values of the overall budget when the Account
-    // changes because direct updates to the Account itself do not affect the calculated fields
-    // of the Account - only it's underlying SubAccount(s) do.
-    const account = action.payload.model;
-
-    // Now that the placeholder is activated, we need to remove the placeholder from state and
-    // insert in the actual Account model into the state.
-    yield put(removePlaceholderFromStateAction(account.id));
-    yield put(addAccountToStateAction(account));
   }
 }
 
@@ -297,7 +277,12 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
           yield put(creatingAccountAction(true));
           try {
             const response: IAccount = yield call(createAccount, budgetId, requestPayload as Http.IAccountPayload);
+            // TODO: Combine these actions into a single action that operates in the reducer.
             yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
+            // Now that the placeholder is activated, we need to remove the placeholder from state and
+            // insert in the actual Account model into the state.
+            yield put(removePlaceholderFromStateAction(response.id));
+            yield put(addAccountToStateAction(response));
           } catch (e) {
             yield call(
               handleTableErrors,

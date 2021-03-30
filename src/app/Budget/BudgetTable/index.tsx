@@ -876,7 +876,6 @@ const BudgetTable = <
           <div className={"table-grid"}>
             <AgGridReact
               {...gridOptions}
-              debug={true}
               columnDefs={colDefs}
               getContextMenuItems={getContextMenuItems}
               allowContextMenuWithControlKey={true}

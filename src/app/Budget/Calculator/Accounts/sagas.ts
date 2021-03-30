@@ -12,7 +12,6 @@ import {
   editCommentTask,
   getHistoryTask,
   deleteAccountGroupTask,
-  handleAccountPlaceholderActivatedTask,
   removeAccountFromGroupTask,
   getGroupsTask
 } from "./tasks";
@@ -88,28 +87,6 @@ function* watchForRequestHistorySaga(): SagaIterator {
   }
 }
 
-function* watchForAccountAddedToStateSaga(): SagaIterator {
-  let lastTasks: { [key: number]: any[] } = {};
-  while (true) {
-    const action: Redux.IAction<Table.ActivatePlaceholderPayload<IAccount>> = yield take(
-      ActionType.Accounts.Placeholders.Activate
-    );
-    if (!isNil(action.payload)) {
-      if (isNil(lastTasks[action.payload.model.id])) {
-        lastTasks[action.payload.model.id] = [];
-      }
-      // If there were any previously submitted tasks to add the same group,
-      // cancel them.
-      if (lastTasks[action.payload.model.id].length !== 0) {
-        const cancellable = lastTasks[action.payload.model.id];
-        lastTasks = { ...lastTasks, [action.payload.model.id]: [] };
-        yield cancel(cancellable);
-      }
-      lastTasks[action.payload.model.id].push(yield call(handleAccountPlaceholderActivatedTask, action));
-    }
-  }
-}
-
 function* watchForDeleteGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
@@ -159,7 +136,6 @@ export default function* accountsSaga(): SagaIterator {
   yield spawn(watchForRemoveCommentSaga);
   yield spawn(watchForEditCommentSaga);
   yield spawn(watchForRequestHistorySaga);
-  yield spawn(watchForAccountAddedToStateSaga);
   yield spawn(watchForDeleteGroupSaga);
   yield spawn(watchForRemoveAccountFromGroupSaga);
   yield spawn(watchForRequestGroupsSaga);
