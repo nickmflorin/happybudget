@@ -25,7 +25,7 @@ import {
 } from "ag-grid-community";
 import { FirstDataRenderedEvent } from "@ag-grid-community/core";
 
-import { RenderWithSpinner } from "components/display";
+import { RenderWithSpinner, ShowHide } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
 import { downloadAsCsvFile } from "util/files";
 import { generateRandomNumericId } from "util/math";
@@ -43,7 +43,7 @@ import {
 } from "./cells";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
-import { IncludeErrorsInCell, HideCellForTableFooter } from "./Util";
+import { IncludeErrorsInCell, HideCellForAllFooters } from "./Util";
 import "./index.scss";
 
 export * from "./model";
@@ -88,8 +88,10 @@ const BudgetTable = <
   identifierField,
   identifierFieldHeader,
   identifierFieldParams = {},
-  footerIdentifierValue = "Grand Total",
-  totals,
+  tableFooterIdentifierValue = "Grand Total",
+  budgetFooterIdentifierValue = "Budget Total",
+  tableTotals,
+  budgetTotals,
   cellClass,
   onSearch,
   onSelectAll,
@@ -108,7 +110,9 @@ const BudgetTable = <
   const [table, setTable] = useState<R[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
-  const [footerColumnApi, setFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
+  const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
+  const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [gridOptions, setGridOptions] = useState<GridOptions>({
     alignedGrids: [],
     defaultColDef: {
@@ -118,7 +122,7 @@ const BudgetTable = <
     },
     suppressHorizontalScroll: true
   });
-  const [footerGridOptions, setFooterGridOptions] = useState<GridOptions>({
+  const [tableFooterGridOptions, setTableFooterGridOptions] = useState<GridOptions>({
     alignedGrids: [],
     defaultColDef: {
       resizable: false,
@@ -130,7 +134,18 @@ const BudgetTable = <
     suppressContextMenu: true,
     suppressHorizontalScroll: true
   });
-  const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [budgetFooterGridOptions, setBudgetFooterGridOptions] = useState<GridOptions>({
+    alignedGrids: [],
+    defaultColDef: {
+      resizable: false,
+      sortable: false,
+      filter: false,
+      editable: false,
+      cellClass: "cell--not-editable"
+    },
+    suppressContextMenu: true,
+    suppressHorizontalScroll: true
+  });
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     event.api.sizeColumnsToFit();
@@ -141,17 +156,26 @@ const BudgetTable = <
     setColumnApi(event.columnApi);
   });
 
-  const onFooterFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
+  const onTableFooterFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     event.api.sizeColumnsToFit();
   });
 
-  const onFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
-    setFooterColumnApi(event.columnApi);
+  const onTableFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
+    setTableFooterColumnApi(event.columnApi);
+  });
+
+  const onBudgetFooterFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
+    event.api.sizeColumnsToFit();
+  });
+
+  const onBudgetFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
+    setBudgetFooterColumnApi(event.columnApi);
   });
 
   useEffect(() => {
-    setGridOptions({ ...gridOptions, alignedGrids: [footerGridOptions] });
-    setFooterGridOptions({ ...footerGridOptions, alignedGrids: [gridOptions] });
+    setGridOptions({ ...gridOptions, alignedGrids: [tableFooterGridOptions, budgetFooterGridOptions] });
+    setBudgetFooterGridOptions({ ...budgetFooterGridOptions, alignedGrids: [gridOptions, tableFooterGridOptions] });
+    setTableFooterGridOptions({ ...tableFooterGridOptions, alignedGrids: [gridOptions, budgetFooterGridOptions] });
   }, []);
 
   const baseColumns = useMemo((): ColDef[] => {
@@ -162,7 +186,7 @@ const BudgetTable = <
         cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect, onNew: onRowAdd },
         colSpan: (params: ColSpanParams) => {
           const row: R = params.data;
-          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true) {
+          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
             if (!isNil(onRowExpand)) {
               return 2;
             }
@@ -192,7 +216,7 @@ const BudgetTable = <
       ...identifierFieldParams,
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
-        if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true) {
+        if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
           return bodyColumns.length + 1;
         } else if (!isNil(identifierFieldParams.colSpan)) {
           return identifierFieldParams.colSpan(params);
@@ -217,7 +241,7 @@ const BudgetTable = <
   const _isCellEditable = useDynamicCallback((row: R, colDef: ColDef): boolean => {
     if (includes(["delete", "select", "expand"], colDef.field)) {
       return false;
-    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true) {
+    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
       return false;
     } else if (!isNil(nonEditableCells) && includes(nonEditableCells, colDef.field as keyof R)) {
       return false;
@@ -230,7 +254,7 @@ const BudgetTable = <
   const _isCellNonEditableHighlight = useDynamicCallback((row: R, colDef: ColDef): boolean => {
     if (includes(["delete", "select", "expand"], colDef.field)) {
       return false;
-    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true) {
+    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter === true) {
       return false;
     } else if (!_isCellEditable(row, colDef)) {
       if (!isNil(nonHighlightedNonEditableCells)) {
@@ -271,31 +295,65 @@ const BudgetTable = <
     return footerObj as R;
   };
 
-  const tableFooter = useMemo((): R => {
-    const footerObj: { [key: string]: any } = {
-      id: generateRandomNumericId(),
-      [identifierField]: footerIdentifierValue,
-      meta: {
-        isPlaceholder: false,
-        isGroupFooter: false,
-        isTableFooter: true,
-        selected: false,
-        children: [],
-        errors: []
-      }
-    };
-    forEach(bodyColumns, (col: ColDef) => {
-      if (!isNil(col.field)) {
-        footerObj[col.field] = null;
-      }
-    });
-    forEach(calculatedColumns, (col: ColDef) => {
-      if (!isNil(col.field) && !isNil(totals) && !isNil(totals[col.field])) {
-        footerObj[col.field] = totals[col.field];
-      }
-    });
-    return footerObj as R;
-  }, [useDeepEqualMemo(totals), footerIdentifierValue]);
+  const tableFooter = useMemo((): R | null => {
+    if (!isNil(tableTotals)) {
+      const footerObj: { [key: string]: any } = {
+        id: generateRandomNumericId(),
+        [identifierField]: tableFooterIdentifierValue,
+        meta: {
+          isPlaceholder: false,
+          isGroupFooter: false,
+          isTableFooter: true,
+          isBudgetFooter: false,
+          selected: false,
+          children: [],
+          errors: []
+        }
+      };
+      forEach(bodyColumns, (col: ColDef) => {
+        if (!isNil(col.field)) {
+          footerObj[col.field] = null;
+        }
+      });
+      forEach(calculatedColumns, (col: ColDef) => {
+        if (!isNil(col.field) && !isNil(tableTotals[col.field])) {
+          footerObj[col.field] = tableTotals[col.field];
+        }
+      });
+      return footerObj as R;
+    }
+    return null;
+  }, [useDeepEqualMemo(tableTotals), tableFooterIdentifierValue]);
+
+  const budgetFooter = useMemo((): R | null => {
+    if (!isNil(budgetTotals)) {
+      const footerObj: { [key: string]: any } = {
+        id: generateRandomNumericId(),
+        [identifierField]: budgetFooterIdentifierValue,
+        meta: {
+          isPlaceholder: false,
+          isGroupFooter: false,
+          isTableFooter: false,
+          isBudgetFooter: true,
+          selected: false,
+          children: [],
+          errors: []
+        }
+      };
+      forEach(bodyColumns, (col: ColDef) => {
+        if (!isNil(col.field)) {
+          footerObj[col.field] = null;
+        }
+      });
+      forEach(calculatedColumns, (col: ColDef) => {
+        if (!isNil(col.field) && !isNil(budgetTotals[col.field])) {
+          footerObj[col.field] = budgetTotals[col.field];
+        }
+      });
+      return footerObj as R;
+    }
+    return null;
+  }, [useDeepEqualMemo(budgetTotals), budgetFooterIdentifierValue]);
 
   /**
    * Starting at the provided index, either traverses the table upwards or downwards
@@ -789,16 +847,18 @@ const BudgetTable = <
           }
         }}
         onColumnsChange={(fields: Field[]) => {
-          if (!isNil(columnApi) && !isNil(footerColumnApi)) {
+          if (!isNil(columnApi) && !isNil(tableFooterColumnApi) && !isNil(budgetFooterColumnApi)) {
             forEach([...bodyColumns, ...calculatedColumns], (col: ColDef) => {
               if (!isNil(col.field)) {
                 const associatedField = find(fields, { id: col.field });
                 if (!isNil(associatedField)) {
                   columnApi.setColumnVisible(col.field, true);
-                  footerColumnApi.setColumnVisible(col.field, true);
+                  tableFooterColumnApi.setColumnVisible(col.field, true);
+                  budgetFooterColumnApi.setColumnVisible(col.field, true);
                 } else {
                   columnApi.setColumnVisible(col.field, false);
-                  footerColumnApi.setColumnVisible(col.field, false);
+                  tableFooterColumnApi.setColumnVisible(col.field, false);
+                  budgetFooterColumnApi.setColumnVisible(col.field, false);
                 }
               }
             });
@@ -807,7 +867,7 @@ const BudgetTable = <
       />
       <RenderWithSpinner absolute loading={loading}>
         <div className={"budget-table ag-theme-alpine"}>
-          <div className={"primary-grid"}>
+          <div className={"table-grid"}>
             <AgGridReact
               {...gridOptions}
               columnDefs={colDefs}
@@ -842,35 +902,64 @@ const BudgetTable = <
                 UnitCell: IncludeErrorsInCell<R>(UnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                 CalculatedCell: CalculatedCell,
-                PaymentMethodsCell: HideCellForTableFooter<R>(PaymentMethodsCell),
-                BudgetItemCell: HideCellForTableFooter<R>(BudgetItemCell),
+                PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
+                BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
                 ...frameworkComponents
               }}
               onCellEditingStopped={onCellEditingStopped}
             />
           </div>
-          <div className={"footer-grid"}>
-            <AgGridReact
-              {...footerGridOptions}
-              columnDefs={colDefs}
-              rowData={[tableFooter]}
-              suppressRowClickSelection={true}
-              onGridReady={onFooterGridReady}
-              onFirstDataRendered={onFooterFirstDataRendered}
-              headerHeight={0}
-              frameworkComponents={{
-                IndexCell: IndexCell,
-                ExpandCell: ExpandCell,
-                ValueCell: IncludeErrorsInCell<R>(ValueCell),
-                UnitCell: IncludeErrorsInCell<R>(UnitCell),
-                IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
-                CalculatedCell: CalculatedCell,
-                PaymentMethodsCell: HideCellForTableFooter<R>(PaymentMethodsCell),
-                BudgetItemCell: HideCellForTableFooter<R>(BudgetItemCell),
-                ...frameworkComponents
-              }}
-            />
-          </div>
+          <ShowHide show={!isNil(tableTotals)}>
+            <div className={"table-footer-grid"}>
+              <AgGridReact
+                {...tableFooterGridOptions}
+                columnDefs={colDefs}
+                rowData={[tableFooter]}
+                rowClass={"row--table-footer"}
+                suppressRowClickSelection={true}
+                onGridReady={onTableFooterGridReady}
+                onFirstDataRendered={onTableFooterFirstDataRendered}
+                headerHeight={0}
+                frameworkComponents={{
+                  IndexCell: IndexCell,
+                  ExpandCell: ExpandCell,
+                  ValueCell: IncludeErrorsInCell<R>(ValueCell),
+                  UnitCell: IncludeErrorsInCell<R>(UnitCell),
+                  IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
+                  CalculatedCell: CalculatedCell,
+                  PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
+                  BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
+                  ...frameworkComponents
+                }}
+              />
+            </div>
+          </ShowHide>
+          <ShowHide show={!isNil(budgetTotals)}>
+            <div className={"budget-footer-grid"}>
+              <AgGridReact
+                {...budgetFooterGridOptions}
+                columnDefs={colDefs}
+                rowData={[budgetFooter]}
+                rowClass={"row--budget-footer"}
+                suppressRowClickSelection={true}
+                onGridReady={onBudgetFooterGridReady}
+                onFirstDataRendered={onBudgetFooterFirstDataRendered}
+                headerHeight={0}
+                rowHeight={28}
+                frameworkComponents={{
+                  IndexCell: IndexCell,
+                  ExpandCell: ExpandCell,
+                  ValueCell: IncludeErrorsInCell<R>(ValueCell),
+                  UnitCell: IncludeErrorsInCell<R>(UnitCell),
+                  IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
+                  CalculatedCell: CalculatedCell,
+                  PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
+                  BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
+                  ...frameworkComponents
+                }}
+              />
+            </div>
+          </ShowHide>
         </div>
       </RenderWithSpinner>
     </React.Fragment>

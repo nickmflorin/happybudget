@@ -13,6 +13,7 @@ namespace Table {
     readonly isPlaceholder?: boolean;
     readonly isGroupFooter?: boolean;
     readonly isTableFooter?: boolean;
+    readonly isBudgetFooter?: boolean;
     readonly children: C[];
     readonly label: string;
     readonly typeLabel: string;

@@ -283,10 +283,20 @@ $table-border: 1px solid $table-border-color;
     background: $white !important;
     border: none !important;
 
-    &.ag-row-hover:not(.row--group-footer) {
+    &.ag-row-hover {
       div[role='gridcell'] {
         &:not(.cell--not-editable-highlight) {
           background-color: $gray-highlight !important;
+        }
+      }
+      &.row--table-footer {
+        div[role='gridcell'] {
+          background-color: #f8f8f8 !important;
+        }
+      }
+      &.row--budget-footer {
+        div[role='gridcell'] {
+          background-color: #d3d3d3 !important;
         }
       }
     }
@@ -301,10 +311,54 @@ $table-border: 1px solid $table-border-color;
       }
     }
     &.row {
-      &--group-footer {
+      &--table-footer {
+        border-bottom: none !important;
+
         > div[role='gridcell'], > .ag-cell {
+          background-color: #f8f8f8;
+          font-family: $roboto;
+          font-weight: 400;
+          color: $text-secondary;
           border: none !important;
+
+          &:first-child {
+            border-bottom-left-radius: 8px;
+            border-top-left-radius: 8px;
+          }
+
+          &:last-child {
+            border-bottom-right-radius: 8px;
+            border-top-right-radius: 8px;
+          }
+        }
+      }
+      &--budget-footer {
+        border-bottom: none !important;
+
+        > div[role='gridcell'], > .ag-cell {
+          background-color: #d3d3d3 !important;
+          font-family: $roboto;
+          font-weight: 400;
+          color: $text-secondary;
+          border: none !important;
+
+          &:first-child {
+            border-bottom-left-radius: 8px;
+            border-top-left-radius: 8px;
+          }
+
+          &:last-child {
+            border-bottom-right-radius: 8px;
+            border-top-right-radius: 8px;
+          }
+        }
+      }
+      &--group-footer {
+        border-bottom: none !important;
+
+        > div[role='gridcell'], > .ag-cell {
           font-weight: 400 !important;
+          border: none !important;
 
           &:first-child {
             border-top-left-radius: 8px;

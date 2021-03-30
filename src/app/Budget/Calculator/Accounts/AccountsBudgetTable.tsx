@@ -96,7 +96,7 @@ const AccountsBudgetTable = (): JSX.Element => {
           onGroupRows: (rows: Table.AccountRow[]) => setGroupAccounts(map(rows, (row: Table.AccountRow) => row.id))
         }}
         onSelectAll={() => dispatch(selectAllAccountsAction())}
-        totals={{
+        tableTotals={{
           estimated: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
           variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
           actual: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0

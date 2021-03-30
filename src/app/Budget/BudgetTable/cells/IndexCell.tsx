@@ -23,7 +23,7 @@ const IndexCell = <R extends Table.Row<any, any>>({
   // potentially span this cell across the columns - but we never want the group
   // footer row to be selectable.
   const row: R = node.data;
-  if (row.meta.isGroupFooter === true) {
+  if (row.meta.isGroupFooter === true || row.meta.isBudgetFooter === true) {
     return <></>;
   } else if (row.meta.isTableFooter) {
     return (

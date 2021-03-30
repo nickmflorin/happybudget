@@ -13,7 +13,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { floatValueSetter, integerValueSetter } from "util/table";
 
 import BudgetTable from "../../BudgetTable";
-import { selectBudgetId } from "../../selectors";
+import { selectBudgetId, selectBudgetDetail } from "../../selectors";
 import {
   addPlaceholdersToStateAction,
   deselectSubAccountAction,
@@ -70,6 +70,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
+  const budgetDetail = useSelector(selectBudgetDetail);
   const groups = useSelector(selectGroups);
 
   return (
@@ -117,10 +118,15 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
             setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
         }}
         onSelectAll={() => dispatch(selectAllSubAccountsAction())}
-        totals={{
+        tableTotals={{
           estimated: !isNil(accountDetail) && !isNil(accountDetail.estimated) ? accountDetail.estimated : 0.0,
           variance: !isNil(accountDetail) && !isNil(accountDetail.variance) ? accountDetail.variance : 0.0,
           actual: !isNil(accountDetail) && !isNil(accountDetail.actual) ? accountDetail.actual : 0.0
+        }}
+        budgetTotals={{
+          estimated: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
+          variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
+          actual: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
         }}
         bodyColumns={[
           {

@@ -124,7 +124,7 @@ const Actuals = (): JSX.Element => {
             existing.payment_method !== row.payment_method
           );
         }}
-        totals={{
+        tableTotals={{
           value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? String(budgetDetail.actual) : "0.00"
         }}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}

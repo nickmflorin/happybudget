@@ -36,9 +36,9 @@
 .budget-table {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 116px);
+  height: calc(100vh - 116px - 15px);
 
-  .primary-grid {
+  .table-grid {
     flex: 1 1 auto;
 
     .ag-row:last-child {
@@ -53,32 +53,21 @@
     }
   }
 
-  .footer-grid {
+  .table-footer-grid {
     flex: none;
     height: 60px;
 
     .ag-body-viewport {
       border-radius: 8px;
-      .ag-row {
-        border-bottom: none !important;
+    }
+  }
 
-        div[role='gridcell'] {
-          background-color: #f8f8f8;
-          font-family: $roboto;
-          font-weight: 400;
-          color: $text-secondary;
+  .budget-footer-grid {
+    flex: none;
+    height: 30px;
 
-          &:first-child {
-            border-bottom-left-radius: 8px;
-            border-top-left-radius: 8px;
-          }
-
-          &:last-child {
-            border-bottom-right-radius: 8px;
-            border-top-right-radius: 8px;
-          }
-        }
-      }
+    .ag-body-viewport {
+      border-radius: 8px;
     }
   }
 
