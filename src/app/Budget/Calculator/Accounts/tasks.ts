@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { call, cancel, put, select } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import { isNil, find } from "lodash";
 import { handleRequestError } from "api";
 import { AccountMapping } from "model/tableMappings";
@@ -250,19 +250,6 @@ export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIt
   }
 }
 
-export function* handleAccountUpdatedInStateTask(action: Redux.IAction<IAccount>): SagaIterator {
-  if (!isNil(action.payload)) {
-    yield cancel();
-    // NOTE: We do not need to update the calculated values of the overall budget when the Account
-    // changes because direct updates to the Account itself do not affect the calculated fields
-    // of the Account - only it's underlying SubAccount(s) do.
-    const account = action.payload;
-    // if (!isNil(account.group)) {
-    //   yield put(updateGroupInStateAction(account.group));
-    // }
-  }
-}
-
 export function* handleAccountPlaceholderActivatedTask(
   action: Redux.IAction<Table.ActivatePlaceholderPayload<IAccount>>
 ): SagaIterator {
@@ -276,13 +263,6 @@ export function* handleAccountPlaceholderActivatedTask(
     // insert in the actual Account model into the state.
     yield put(removePlaceholderFromStateAction(account.id));
     yield put(addAccountToStateAction(account));
-
-    // We should probably remove the group from the table if the response Account does not have
-    // a group - however, that will not happen in practice, because this task just handles the case
-    // where the Account is updated (not removed or added to a group).
-    // if (!isNil(account.group)) {
-    //   yield put(updateGroupInStateAction(account.group));
-    // }
   }
 }
 
@@ -304,12 +284,6 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
           the account with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
       } else {
-        // There are some cases where we need to update the row in the table before we make the request,
-        // to improve the UI.  This happens for cells where the value is rendered via an HTML element
-        // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
-        // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
-        // We could do this by updating with a payload generated from the response, but it is quicker
-        // to do it before hand.
         const updatedRow = AccountMapping.newRowWithChanges(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
 
@@ -338,12 +312,6 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
         }
       }
     } else {
-      // There are some cases where we need to update the row in the table before we make the request,
-      // to improve the UI.  This happens for cells where the value is rendered via an HTML element
-      // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
-      // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
-      // We could do this by updating with a payload generated from the response, but it is quicker
-      // to do it before hand.
       const updatedModel = AccountMapping.newModelWithChanges(model, action.payload);
       yield put(updateAccountInStateAction(updatedModel));
 
