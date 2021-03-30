@@ -70,6 +70,7 @@ export const setAccountIdAction = simpleAction<number>(ActionType.Account.SetId)
 export const requestAccountAction = simpleAction<null>(ActionType.Account.Request);
 export const loadingAccountAction = simpleAction<boolean>(ActionType.Account.Loading);
 export const responseAccountAction = simpleAction<IAccount>(ActionType.Account.Response);
+// Not currently used, because the reducer handles the logic.
 export const updateAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.Account.UpdateInState);
 
 /*

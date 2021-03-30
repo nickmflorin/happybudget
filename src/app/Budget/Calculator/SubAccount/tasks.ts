@@ -292,6 +292,10 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
               requestPayload as Http.ISubAccountPayload
             );
             yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
+            // Now that the placeholder is activated, we need to remove the placeholder from state and
+            // insert in the actual SubAccount model into the state.
+            yield put(removePlaceholderFromStateAction(response.id));
+            yield put(addSubAccountToStateAction(response));
           } catch (e) {
             yield call(
               handleTableErrors,

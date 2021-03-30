@@ -4,7 +4,6 @@ import { mergeWithDefaults } from "util/objects";
 
 export * from "./counter";
 export * from "./comments";
-export * from "./table";
 export * from "./list";
 export * from "./detail";
 

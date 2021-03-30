@@ -1,13 +1,10 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce } from "lodash";
-import {
-  createSimpleBooleanReducer,
-  createModelListActionReducer,
-  createListResponseReducer,
-  createTablePlaceholdersReducer
-} from "store/factories";
-import { SubAccountMapping } from "model/tableMappings";
+import { createSimpleBooleanReducer, createModelListActionReducer, createListResponseReducer } from "store/factories";
+import { createListReducerFromTransformers } from "store/factories/util";
+import Mapping, { SubAccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
+import { mergeWithDefaults } from "util/objects";
 import { initialSubAccountsState } from "./initialState";
 
 interface SubAccountsPlaceholdersActionMap {
@@ -52,6 +49,99 @@ export interface SubAccountsReducerFactoryActionMap {
   Groups: SubAccountsGroupsActionMap;
   History: SubAccountsHistoryActionMap;
 }
+
+export const createTablePlaceholdersReducer = <
+  /* eslint-disable indent */
+  R extends Table.Row<G, C>,
+  M extends Model,
+  G extends IGroup<any>,
+  P extends Http.IPayload,
+  C extends Model = UnknownModel,
+  A extends Redux.IAction<any> = Redux.IAction<any>
+>(
+  mappings: Partial<ReducerFactory.ITablePlaceholdersActionMap>,
+  mapping: Mapping<R, M, G, P, C>,
+  options: Partial<ReducerFactory.IOptions<Redux.ListStore<R>>> = { initialState: [], referenceEntity: "entity" }
+) => {
+  const Options = mergeWithDefaults<ReducerFactory.IOptions<Redux.ListStore<R>>>(options, {
+    referenceEntity: "entity",
+    initialState: []
+  });
+
+  const transformers: ReducerFactory.Transformers<ReducerFactory.ITablePlaceholdersActionMap, Redux.ListStore<R>, A> = {
+    Clear: () => [],
+    AddToState: (count: number | undefined, st: Redux.ListStore<R>) => {
+      const placeholders: R[] = [];
+      const numPlaceholders = count || 1;
+      for (let i = 0; i < numPlaceholders; i++) {
+        placeholders.push(mapping.createPlaceholder());
+      }
+      return [...st, ...placeholders];
+    },
+    RemoveFromState: (id: number, st: Redux.ListStore<R>) => {
+      const row: R | undefined = find(st, { id: id } as any);
+      if (isNil(row)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when removing the ${Options.referenceEntity}
+          placeholder in state... the ${Options.referenceEntity} placeholder row with ID ${id}
+          does not exist in state when it is expected to.`
+        );
+        return st;
+      } else {
+        return filter(st, (r: R) => r.id !== id);
+      }
+    },
+    Activate: (payload: Table.ActivatePlaceholderPayload<M>, st: Redux.ListStore<R>) => {
+      const row: R | undefined = find(st, { id: payload.id } as any);
+      if (isNil(row)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when activating the ${Options.referenceEntity}
+          placeholder in state... the ${Options.referenceEntity} placeholder row with ID ${payload.id}
+          does not exist in state when it is expected to.`
+        );
+        return st;
+      } else {
+        return replaceInArray<R>(
+          st,
+          { id: payload.id },
+          {
+            ...row,
+            // NOTE: This will be a problem if the placeholder belonged to a group!
+            ...mapping.modelToRow(payload.model, null)
+          }
+        );
+      }
+    },
+    UpdateInState: (payload: R, st: Redux.ListStore<R>) => {
+      const row: R | undefined = find(st, { id: payload.id } as any);
+      if (isNil(row)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when updating the ${Options.referenceEntity}
+          placeholder in state... the ${Options.referenceEntity} placeholder row with ID ${payload.id}
+          does not exist in state when it is expected to.`
+        );
+        return st;
+      } else {
+        return replaceInArray<R>(
+          st,
+          { id: payload.id },
+          {
+            ...row,
+            ...payload
+          }
+        );
+      }
+    }
+  };
+  return createListReducerFromTransformers<ReducerFactory.ITablePlaceholdersActionMap, R, A>(
+    mappings,
+    transformers,
+    Options
+  );
+};
 
 export const createSubAccountsReducer = (
   mapping: SubAccountsReducerFactoryActionMap
@@ -206,6 +296,42 @@ export const createSubAccountsReducer = (
     }
   };
 
+  const recalculatePlaceholderMetrics = (
+    st: Redux.Calculator.ISubAccountsStore,
+    id: number
+  ): Redux.Calculator.ISubAccountsStore => {
+    const row = find(st.placeholders, { id });
+    if (isNil(row)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State: Inconsistent state noticed when updating placeholder in state. The
+            placeholder with ID ${id} does not exist in state when it is expected to.`
+      );
+      return st;
+    } else {
+      // Since we are dealing with a Placeholder row here, the row cannot have SubAccount(s) - thus
+      // the estimated value cannot be determined from the accumulation of those estimated values.
+      // Additionally, the Placeholder row cannot have an Actual value associated with it, so we
+      // do not need to update the variance.
+      if (!isNil(row.quantity) && !isNil(row.rate)) {
+        const multiplier = row.multiplier || 1.0;
+        return {
+          ...st,
+          placeholders: replaceInArray<Table.SubAccountRow>(
+            st.placeholders,
+            { id: row.id },
+            {
+              ...row,
+              estimated: multiplier * row.quantity * row.rate
+            }
+          )
+        };
+      } else {
+        return st;
+      }
+    }
+  };
+
   return (
     state: Redux.Calculator.ISubAccountsStore = initialSubAccountsState,
     action: Redux.IAction<any>
@@ -255,8 +381,10 @@ export const createSubAccountsReducer = (
         };
         newState = recalculateGroupMetrics(newState, group.id);
       }
+    } else if (action.type === mapping.Placeholders.UpdateInState) {
+      const row: Table.SubAccountRow = action.payload;
+      newState = recalculatePlaceholderMetrics(newState, row.id);
     }
-
-    return { ...newState };
+    return newState;
   };
 };

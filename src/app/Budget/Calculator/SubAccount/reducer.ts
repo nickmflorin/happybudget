@@ -80,15 +80,20 @@ const rootReducer: Reducer<Redux.Calculator.ISubAccountStore, Redux.IAction<any>
   if (
     action.type === ActionType.SubAccounts.UpdateInState ||
     action.type === ActionType.SubAccounts.RemoveFromState ||
-    action.type === ActionType.SubAccounts.AddToState
+    action.type === ActionType.SubAccounts.AddToState ||
+    action.type === ActionType.SubAccounts.Placeholders.UpdateInState
   ) {
-    // Update the overall SubAccount based on the underlying SubAccount(s) present.
+    // Update the overall SubAccount based on the underlying SubAccount(s) present and any potential
+    // placeholders present.
     const subAccounts: ISubAccount[] = newState.subaccounts.data;
+    const placeholders: Table.SubAccountRow[] = newState.subaccounts.placeholders;
     // Right now, the backend is configured such that the Actual value for the overall SubAccount is
     // determined from the Actual values tied to that SubAccount, not the underlying SubAccount(s).
     // If that logic changes in the backend, we need to also make that adjustment here.
     let payload: Partial<ISubAccount> = {
-      estimated: reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0)
+      estimated:
+        reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0) +
+        reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.estimated || 0), 0)
     };
     if (!isNil(newState.detail.data)) {
       if (!isNil(newState.detail.data.actual) && !isNil(payload.estimated)) {

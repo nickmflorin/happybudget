@@ -69,6 +69,7 @@ export const setSubAccountIdAction = simpleAction<number>(ActionType.SubAccount.
 export const requestSubAccountAction = simpleAction<null>(ActionType.SubAccount.Request);
 export const loadingSubAccountAction = simpleAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = simpleAction<ISubAccount>(ActionType.SubAccount.Response);
+// Not currently used, because the reducer handles the logic.
 export const updateParentSubAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.SubAccount.UpdateInState);
 
 /*
@@ -139,6 +140,7 @@ export const responseGroupsAction = simpleAction<Http.IListResponse<IGroup<ISimp
   ActionType.SubAccounts.Groups.Response
 );
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(ActionType.SubAccounts.Groups.AddToState);
+// Not currently used, but we may need to use in the near future.
 export const updateGroupInStateAction = simpleAction<IGroup<ISimpleSubAccount>>(
   ActionType.SubAccounts.Groups.UpdateInState
 );

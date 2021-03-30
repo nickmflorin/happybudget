@@ -4,13 +4,13 @@ import {
   createSimpleBooleanReducer,
   createModelListActionReducer,
   createCommentsListResponseReducer,
-  createListResponseReducer,
-  createTablePlaceholdersReducer
+  createListResponseReducer
 } from "store/factories";
 import { AccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
 
 import { initialAccountsState } from "../initialState";
+import { createTablePlaceholdersReducer } from "../factories";
 import { ActionType } from "./actions";
 
 export const createAccountsReducer = (): Reducer<Redux.Calculator.IAccountsStore, Redux.IAction<any>> => {

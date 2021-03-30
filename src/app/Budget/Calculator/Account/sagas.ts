@@ -15,7 +15,6 @@ import {
   getHistoryTask,
   deleteSubAccountGroupTask,
   removeSubAccountFromGroupTask,
-  handleSubAccountPlaceholderActivatedTask,
   getGroupsTask
 } from "./tasks";
 
@@ -112,26 +111,6 @@ function* watchForRequestHistorySaga(): SagaIterator {
   }
 }
 
-function* watchForSubAccountActivatedInStateSaga(): SagaIterator {
-  let lastTasks: { [key: number]: any[] } = {};
-  while (true) {
-    const action: Redux.IAction<Table.ActivatePlaceholderPayload<ISubAccount>> = yield take(
-      ActionType.SubAccounts.Placeholders.Activate
-    );
-    if (!isNil(action.payload)) {
-      if (isNil(lastTasks[action.payload.model.id])) {
-        lastTasks[action.payload.model.id] = [];
-      }
-      if (lastTasks[action.payload.model.id].length !== 0) {
-        const cancellable = lastTasks[action.payload.model.id];
-        lastTasks = { ...lastTasks, [action.payload.model.id]: [] };
-        yield cancel(cancellable);
-      }
-      lastTasks[action.payload.model.id].push(yield call(handleSubAccountPlaceholderActivatedTask, action));
-    }
-  }
-}
-
 function* watchForDeleteGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
@@ -181,6 +160,5 @@ export default function* accountSaga(): SagaIterator {
   yield spawn(watchForEditCommentSaga);
   yield spawn(watchForDeleteGroupSaga);
   yield spawn(watchForRemoveSubAccountFromGroupSaga);
-  yield spawn(watchForSubAccountActivatedInStateSaga);
   yield spawn(watchForRequestGroupsSaga);
 }

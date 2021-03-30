@@ -1,12 +1,11 @@
 import { combineReducers, Reducer } from "redux";
-import { reduce, isNil, find } from "lodash";
+import { reduce, isNil } from "lodash";
 
 import {
   createDetailResponseReducer,
   createSimplePayloadReducer,
   createCommentsListResponseReducer
 } from "store/factories";
-import { replaceInArray } from "util/arrays";
 
 import { createSubAccountsReducer } from "../factories";
 import { initialAccountState } from "../initialState";
@@ -84,15 +83,22 @@ const rootReducer: Reducer<Redux.Calculator.IAccountStore, Redux.IAction<any>> =
   if (
     action.type === ActionType.SubAccounts.UpdateInState ||
     action.type === ActionType.SubAccounts.RemoveFromState ||
-    action.type === ActionType.SubAccounts.AddToState
+    action.type === ActionType.SubAccounts.AddToState ||
+    action.type === ActionType.SubAccounts.Placeholders.UpdateInState
   ) {
-    // Update the overall Account based on the underlying SubAccount(s) present.
+    // Update the overall Account based on the underlying SubAccount(s) present and any potential
+    // placeholders present.
     const subAccounts: ISubAccount[] = newState.subaccounts.data;
+    const placeholders: Table.SubAccountRow[] = newState.subaccounts.placeholders;
     // Right now, the backend is configured such that the Actual value for the overall Account is
     // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
     // in the backend, we need to also make that adjustment here.
-    const actual = reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0);
-    const estimated = reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
+    const actual =
+      reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0) +
+      reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.actual || 0), 0);
+    const estimated =
+      reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0) +
+      reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.estimated || 0), 0);
     if (!isNil(newState.detail.data)) {
       newState = {
         ...newState,

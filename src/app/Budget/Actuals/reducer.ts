@@ -1,11 +1,7 @@
 import { combineReducers } from "redux";
-import {
-  createSimpleBooleanReducer,
-  createModelListActionReducer,
-  createListResponseReducer,
-  createTablePlaceholdersReducer
-} from "store/factories";
+import { createSimpleBooleanReducer, createModelListActionReducer, createListResponseReducer } from "store/factories";
 import { ActualMapping } from "model/tableMappings";
+import { createTablePlaceholdersReducer } from "../Calculator/factories";
 
 import { ActionType } from "./actions";
 import { initialActualsState } from "./initialState";
