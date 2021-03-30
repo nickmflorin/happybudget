@@ -29,7 +29,7 @@ import { RenderWithSpinner, ShowHide } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
 import { downloadAsCsvFile } from "util/files";
 import { generateRandomNumericId } from "util/math";
-import { formatCurrencyWithoutDollarSign } from "util/string";
+import { formatCurrencyWithoutDollarSign, hashString } from "util/string";
 
 import {
   ExpandCell,
@@ -278,7 +278,7 @@ const BudgetTable = <
 
   const createGroupFooter = (group: G): R => {
     const footerObj: { [key: string]: any } = {
-      id: generateRandomNumericId(),
+      id: hashString(group.name),
       [identifierField]: group.name,
       group,
       meta: {
@@ -305,7 +305,7 @@ const BudgetTable = <
   const tableFooter = useMemo((): R | null => {
     if (!isNil(tableTotals)) {
       const footerObj: { [key: string]: any } = {
-        id: generateRandomNumericId(),
+        id: hashString("tablefooter"),
         [identifierField]: tableFooterIdentifierValue,
         meta: {
           isPlaceholder: false,
@@ -335,7 +335,7 @@ const BudgetTable = <
   const budgetFooter = useMemo((): R | null => {
     if (!isNil(budgetTotals)) {
       const footerObj: { [key: string]: any } = {
-        id: generateRandomNumericId(),
+        id: hashString("budgetfooter"),
         [identifierField]: budgetFooterIdentifierValue,
         meta: {
           isPlaceholder: false,
@@ -877,6 +877,7 @@ const BudgetTable = <
           <div className={"table-grid"}>
             <AgGridReact
               {...gridOptions}
+              debug={true}
               columnDefs={colDefs}
               getContextMenuItems={getContextMenuItems}
               allowContextMenuWithControlKey={true}
@@ -890,9 +891,7 @@ const BudgetTable = <
               headerHeight={38}
               enableRangeSelection={true}
               clipboardDeliminator={","}
-              // We want to leave row animation off for now, because whenever updates happen to
-              // the table it causes the colored group footer rows to "flash".
-              animateRows={false}
+              animateRows={true}
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
               onFirstDataRendered={onFirstDataRendered}
