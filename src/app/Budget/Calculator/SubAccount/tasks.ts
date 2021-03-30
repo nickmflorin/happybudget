@@ -42,8 +42,6 @@ import {
   responseSubAccountsHistoryAction,
   deletingGroupAction,
   removeGroupFromStateAction,
-  updateGroupInStateAction,
-  updateParentSubAccountInStateAction,
   updateSubAccountInStateAction,
   removeSubAccountFromStateAction,
   addSubAccountToStateAction,
@@ -225,37 +223,6 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
   }
 }
 
-export function* handleSubAccountPlaceholderActivatedTask(
-  action: Redux.IAction<Table.ActivatePlaceholderPayload<ISubAccount>>
-): SagaIterator {
-  if (!isNil(action.payload)) {
-    const subaccount = action.payload.model;
-
-    // Now that the placeholder is activated, we need to remove the placeholder from state and
-    // insert in the actual SubAccount model into the state.
-    yield put(removePlaceholderFromStateAction(subaccount.id));
-    yield put(addSubAccountToStateAction(subaccount));
-
-    const parentSubAccount: ISubAccount | undefined = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.subaccount.detail.data
-    );
-    const subaccounts: ISubAccount[] = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data
-    );
-    // Right now, the backend is configured such that the Actual value for the overall Account is
-    // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
-    // in the backend, we need to also make that adjustment here.
-    if (subaccounts.length !== 0 && !isNil(parentSubAccount)) {
-      const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
-      let subaccountPayload: Partial<IAccount> = { estimated };
-      if (!isNil(parentSubAccount.actual)) {
-        subaccountPayload = { ...subaccountPayload, variance: estimated - parentSubAccount.actual };
-      }
-      yield put(updateParentSubAccountInStateAction(subaccountPayload));
-    }
-  }
-}
-
 export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
   const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
   if (!isNil(subaccountId) && !isNil(action.payload)) {
@@ -291,6 +258,7 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
               subaccountId,
               requestPayload as Http.ISubAccountPayload
             );
+            // TODO: Combine these actions into a single action that operates in the reducer.
             yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
             // Now that the placeholder is activated, we need to remove the placeholder from state and
             // insert in the actual SubAccount model into the state.

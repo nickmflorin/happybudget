@@ -265,6 +265,7 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
               budgetId,
               requestPayload as Http.ISubAccountPayload
             );
+            // TODO: Combine these actions into a single action that operates in the reducer.
             yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
             // Now that the placeholder is activated, we need to remove the placeholder from state and
             // insert in the actual SubAccount model into the state.
