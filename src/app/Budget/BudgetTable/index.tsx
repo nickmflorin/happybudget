@@ -21,9 +21,12 @@ import {
   RowClassParams,
   GridOptions,
   GetContextMenuItemsParams,
-  MenuItemDef
+  MenuItemDef,
+  CellValueChangedEvent,
+  PasteEndEvent,
+  PasteStartEvent,
+  FirstDataRenderedEvent
 } from "ag-grid-community";
-import { FirstDataRenderedEvent } from "@ag-grid-community/core";
 
 import { RenderWithSpinner, ShowHide } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
@@ -107,6 +110,7 @@ const BudgetTable = <
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
   const [table, setTable] = useState<R[]>([]);
+  const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
@@ -509,25 +513,54 @@ const BudgetTable = <
     }
   });
 
-  const onCellEditingStopped = useDynamicCallback((event: CellEditingStoppedEvent) => {
+  const getTableChangeFromEvent = (event: CellEditingStoppedEvent | CellValueChangedEvent): Table.RowChange | null => {
     const field = event.column.getColId();
     if (!isNil(event.newValue)) {
       if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
         if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
           const valid = event.colDef.valueSetter({ ...event });
           if (valid === true) {
-            onRowUpdate({
+            return {
               id: event.data.id,
               data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
-            });
+            };
           }
         } else {
-          onRowUpdate({
+          return {
             id: event.data.id,
             data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
-          });
+          };
         }
       }
+    }
+    return null;
+  };
+
+  const onCellEditingStopped = useDynamicCallback((event: CellEditingStoppedEvent) => {
+    const tableChange = getTableChangeFromEvent(event);
+    if (!isNil(tableChange)) {
+      onRowUpdate(tableChange);
+    }
+  });
+
+  const onPasteStart = useDynamicCallback((event: PasteStartEvent) => {
+    setCellChangeEvents([]);
+  });
+
+  const onPasteEnd = useDynamicCallback((event: PasteStartEvent) => {
+    if (cellChangeEvents.length === 1) {
+      const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
+      if (!isNil(tableChange)) {
+        onRowUpdate(tableChange);
+      }
+    } else if (cellChangeEvents.length !== 0) {
+      console.log("Multiple Changes");
+    }
+  });
+
+  const onCellValueChanged = useDynamicCallback((event: CellValueChangedEvent) => {
+    if (event.source === "paste") {
+      setCellChangeEvents([...cellChangeEvents, event]);
     }
   });
 
@@ -911,6 +944,9 @@ const BudgetTable = <
                 ...frameworkComponents
               }}
               onCellEditingStopped={onCellEditingStopped}
+              onPasteStart={onPasteStart}
+              onPasteEnd={onPasteEnd}
+              onCellValueChanged={onCellValueChanged}
             />
           </div>
           <ShowHide show={!isNil(tableTotals)}>
