@@ -8,15 +8,12 @@ export * from "./table";
 export * from "./list";
 export * from "./detail";
 
-export const createSimplePayloadReducer = <P, A extends Redux.IAction<P>>(
+export const createSimplePayloadReducer = <P, A extends Redux.IAction<P> = Redux.IAction<P>>(
   actionType: string,
-  options: Partial<ReducerFactory.IOptions<P>> = { initialState: {} as P, referenceEntity: "entity" }
+  initialState: P,
+  options: Partial<ReducerFactory.IOptions<P>> = { referenceEntity: "entity" }
 ): Reducer<P, A> => {
-  const Options = mergeWithDefaults<ReducerFactory.IOptions<P>>(options, {
-    referenceEntity: "entity",
-    initialState: {} as P
-  });
-  const reducer: Reducer<P, A> = (state: P = Options.initialState, action: A): P => {
+  const reducer: Reducer<P, A> = (state: P = initialState, action: A): P => {
     if (action.type === actionType && !isNil(action.payload)) {
       return action.payload;
     }
@@ -26,7 +23,7 @@ export const createSimplePayloadReducer = <P, A extends Redux.IAction<P>>(
 };
 
 export const createSimpleBooleanReducer = <A extends Redux.IAction<boolean>>(actionType: string): Reducer<boolean, A> =>
-  createSimplePayloadReducer<boolean, A>(actionType, { initialState: false });
+  createSimplePayloadReducer<boolean, A>(actionType, false);
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a

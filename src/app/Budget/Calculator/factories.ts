@@ -164,6 +164,48 @@ export const createSubAccountsReducer = (
     };
   };
 
+  const recalculateSubAccountMetrics = (
+    st: Redux.Calculator.ISubAccountsStore,
+    id: number
+  ): Redux.Calculator.ISubAccountsStore => {
+    const subAccount = find(st.data, { id });
+    if (isNil(subAccount)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State: Inconsistent state noticed when updating sub account in state. The
+          sub account with ID ${id} does not exist in state when it is expected to.`
+      );
+      return st;
+    } else {
+      // In the case that the SubAccount has sub accounts itself, the estimated value is determined
+      // from the accumulation of those individual estimated values.  In this case,  we do not need
+      // to update the SubAccount estimated value in state because it only changes when the estimated
+      // values of it's SubAccount(s) on another page are altered.
+      if (subAccount.subaccounts.length === 0 && !isNil(subAccount.quantity) && !isNil(subAccount.rate)) {
+        const multiplier = subAccount.multiplier || 1.0;
+        let payload: Partial<ISubAccount> = {
+          estimated: multiplier * subAccount.quantity * subAccount.rate
+        };
+        if (!isNil(subAccount.actual) && !isNil(payload.estimated)) {
+          payload = { ...payload, variance: payload.estimated - subAccount.actual };
+        }
+        return {
+          ...st,
+          data: replaceInArray<ISubAccount>(
+            st.data,
+            { id: subAccount.id },
+            {
+              ...subAccount,
+              ...payload
+            }
+          )
+        };
+      } else {
+        return st;
+      }
+    }
+  };
+
   return (
     state: Redux.Calculator.ISubAccountsStore = initialSubAccountsState,
     action: Redux.IAction<any>
@@ -182,6 +224,7 @@ export const createSubAccountsReducer = (
       newState = recalculateGroupMetrics(newState, group.id);
     } else if (action.type === mapping.UpdateInState) {
       const subAccount: ISubAccount = action.payload;
+      newState = recalculateSubAccountMetrics(newState, subAccount.id);
       if (!isNil(subAccount.group)) {
         newState = recalculateGroupMetrics(newState, subAccount.group);
       }

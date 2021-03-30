@@ -190,8 +190,6 @@ export function* getCommentsTask(action: Redux.IAction<any>): SagaIterator {
   }
 }
 
-// TODO: We need to also update the estimated, variance and actual values of the parent
-// sub account when a sub account is removed!
 export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(action.payload) && !isNil(accountId)) {
@@ -224,26 +222,6 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
         yield put(deletingSubAccountAction({ id: model.id, value: false }));
       }
     }
-  }
-}
-
-export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAccount>): SagaIterator {
-  const parentSubAccount: ISubAccount = yield select(
-    (state: Redux.IApplicationStore) => state.calculator.subaccount.detail.data
-  );
-  const subaccounts: ISubAccount[] = yield select(
-    (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data
-  );
-  // Right now, the backend is configured such that the Actual value for the overall Account is
-  // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
-  // in the backend, we need to also make that adjustment here.
-  if (subaccounts.length !== 0 && !isNil(parentSubAccount)) {
-    const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
-    let subaccountPayload: Partial<IAccount> = { estimated };
-    if (!isNil(parentSubAccount.actual)) {
-      subaccountPayload = { ...subaccountPayload, variance: estimated - parentSubAccount.actual };
-    }
-    yield put(updateParentSubAccountInStateAction(subaccountPayload));
   }
 }
 
@@ -296,12 +274,6 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
           the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
       } else {
-        // There are some cases where we need to update the row in the table before we make the request,
-        // to improve the UI.  This happens for cells where the value is rendered via an HTML element
-        // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
-        // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
-        // We could do this by updating with a payload generated from the response, but it is quicker
-        // to do it before hand.
         const updatedRow = SubAccountMapping.newRowWithChanges(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
 
@@ -334,22 +306,15 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         }
       }
     } else {
-      // There are some cases where we need to update the row in the table before we make the request,
-      // to improve the UI.  This happens for cells where the value is rendered via an HTML element
-      // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
-      // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
-      // We could do this by updating with a payload generated from the response, but it is quicker
-      // to do it before hand.
       const updatedModel = SubAccountMapping.newModelWithChanges(model, action.payload);
       yield put(updateSubAccountInStateAction(updatedModel));
 
       yield put(updatingSubAccountAction({ id: model.id, value: true }));
       const requestPayload = SubAccountMapping.patchPayload(action.payload);
       try {
-        const response: ISubAccount = yield call(updateSubAccount, model.id, requestPayload);
-        // TODO: We might want to consider not updating after the response and always relying
-        // on state changing the values in the client.
-        yield put(updateSubAccountInStateAction(response));
+        // NOTE: We do not need to update the SubAccount in state because the reducer will have
+        // already handled that.
+        yield call(updateSubAccount, model.id, requestPayload);
       } catch (e) {
         yield call(
           handleTableErrors,

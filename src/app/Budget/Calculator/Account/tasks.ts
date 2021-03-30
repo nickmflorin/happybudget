@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find, reduce, isEqual, filter } from "lodash";
+import { isNil, find, reduce } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountMapping } from "model/tableMappings";
 import {
@@ -228,51 +228,6 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
   }
 }
 
-export function* handleSubAccountUpdatedInStateTask(action: Redux.IAction<ISubAccount>): SagaIterator {
-  if (!isNil(action.payload) && !(!isNil(action.meta) && action.meta.triggerTask === false)) {
-    const subaccount = action.payload;
-    const account: IAccount | undefined = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.account.detail.data
-    );
-    const subaccounts: ISubAccount[] = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.data
-    );
-    // Step 1: Apply Potential Changes to Parent Account
-    if (!isNil(account)) {
-      if (subaccounts.length !== 0) {
-        // Right now, the backend is configured such that the Actual value for the overall Account is
-        // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
-        // in the backend, we need to also make that adjustment here.
-        const actual = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0);
-        const estimated = reduce(subaccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
-        let accountPayload: Partial<IAccount> = { estimated, actual };
-        if (!isNil(account.actual)) {
-          accountPayload = { ...accountPayload, variance: estimated - actual };
-        }
-        yield put(updateAccountInStateAction(accountPayload));
-      }
-    }
-    // Step 2:  Apply Potential Calculated Changes to Sub Account Itself
-    // In the case that the SubAccount has sub accounts itself, the estimated value is determined
-    // from the accumulation of those individual estimated values.  In this case,  we do not need
-    // to update the SubAccount estimated value in state because it only changes when the estimated
-    // values of it's SubAccount(s) on another page are altered.
-    if (subaccount.subaccounts.length === 0 && !isNil(subaccount.quantity) && !isNil(subaccount.rate)) {
-      const multiplier = subaccount.multiplier || 1.0;
-      let updatedSubAccount: ISubAccount = {
-        ...subaccount,
-        estimated: multiplier * subaccount.quantity * subaccount.rate
-      };
-      if (!isNil(subaccount.actual) && !isNil(subaccount.estimated)) {
-        updatedSubAccount = { ...updatedSubAccount, variance: subaccount.estimated - subaccount.actual };
-      }
-      if (!isEqual(updatedSubAccount, subaccount)) {
-        yield put(updateSubAccountInStateAction(updatedSubAccount, { meta: { triggerTask: false } }));
-      }
-    }
-  }
-}
-
 export function* handleSubAccountPlaceholderActivatedTask(
   action: Redux.IAction<Table.ActivatePlaceholderPayload<ISubAccount>>
 ): SagaIterator {
@@ -325,12 +280,6 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
           the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
       } else {
-        // There are some cases where we need to update the row in the table before we make the request,
-        // to improve the UI.  This happens for cells where the value is rendered via an HTML element
-        // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
-        // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
-        // We could do this by updating with a payload generated from the response, but it is quicker
-        // to do it before hand.
         const updatedRow = SubAccountMapping.newRowWithChanges(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
 
@@ -364,12 +313,6 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
         }
       }
     } else {
-      // There are some cases where we need to update the row in the table before we make the request,
-      // to improve the UI.  This happens for cells where the value is rendered via an HTML element
-      // (i.e. the Unit Cell).  AGGridReact will not automatically update the cell when the Unit is
-      // changed via the dropdown, so we need to udpate the row in the data used to populate the table.
-      // We could do this by updating with a payload generated from the response, but it is quicker
-      // to do it before hand.
       const updatedModel = SubAccountMapping.newModelWithChanges(model, action.payload);
       yield put(updateSubAccountInStateAction(updatedModel));
 

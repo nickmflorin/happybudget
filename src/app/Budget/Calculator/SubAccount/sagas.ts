@@ -16,7 +16,6 @@ import {
   deleteSubAccountGroupTask,
   removeSubAccountFromGroupTask,
   handleSubAccountPlaceholderActivatedTask,
-  handleSubAccountUpdatedInStateTask,
   getGroupsTask
 } from "./tasks";
 
@@ -135,10 +134,6 @@ function* watchForSubAccountAddedToStateSaga(): SagaIterator {
   }
 }
 
-function* watchForSubAccountUpdatedInStateSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccounts.UpdateInState, handleSubAccountUpdatedInStateTask);
-}
-
 function* watchForDeleteGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
@@ -193,6 +188,5 @@ export default function* subAccountSaga(): SagaIterator {
   yield spawn(watchForDeleteGroupSaga);
   yield spawn(watchForRemoveSubAccountFromGroupSaga);
   yield spawn(watchForSubAccountAddedToStateSaga);
-  yield spawn(watchForSubAccountUpdatedInStateSaga);
   yield spawn(watchForRequestGroupsSaga);
 }

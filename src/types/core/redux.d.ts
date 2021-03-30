@@ -154,7 +154,7 @@ namespace Redux {
     interface IAccountStore {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<IAccount>;
-      readonly subaccounts: ISubAccountsStore<Table.IAccountRow>;
+      readonly subaccounts: ISubAccountsStore;
       readonly comments: ICommentsStore;
     }
 

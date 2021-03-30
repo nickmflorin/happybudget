@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
   ancestors: ancestorsReducer,
   commentsHistoryDrawerOpen: createSimpleBooleanReducer(ActionType.SetCommentsHistoryDrawerVisibility),
   budget: combineReducers({
-    id: createSimplePayloadReducer(ActionType.Budget.SetId),
+    id: createSimplePayloadReducer<number | null>(ActionType.Budget.SetId, null),
     detail: createDetailResponseReducer<IBudget, Redux.IDetailResponseStore<IBudget>, Redux.IAction>({
       Response: ActionType.Budget.Response,
       Loading: ActionType.Budget.Loading,

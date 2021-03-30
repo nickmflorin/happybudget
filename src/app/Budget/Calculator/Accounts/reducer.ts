@@ -209,19 +209,7 @@ export const createAccountsReducer = (): Reducer<Redux.Calculator.IAccountsStore
   };
 };
 
-const rootReducer = combineReducers({
-  deleting: createModelListActionReducer(ActionType.Accounts.Deleting, { referenceEntity: "account" }),
-  updating: createModelListActionReducer(ActionType.Accounts.Updating, { referenceEntity: "account" }),
-  creating: createSimpleBooleanReducer(ActionType.Accounts.Creating),
-  history: createListResponseReducer<HistoryEvent>(
-    {
-      Response: ActionType.Accounts.History.Response,
-      Request: ActionType.Accounts.History.Request,
-      Loading: ActionType.Accounts.History.Loading,
-      AddToState: ActionType.Accounts.History.AddToState
-    },
-    { referenceEntity: "event" }
-  ),
+const rootReducer: Reducer<Redux.Calculator.IBudgetStore, Redux.IAction<any>> = combineReducers({
   comments: createCommentsListResponseReducer({
     Response: ActionType.Comments.Response,
     Request: ActionType.Comments.Request,
