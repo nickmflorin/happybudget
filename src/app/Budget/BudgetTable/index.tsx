@@ -245,6 +245,13 @@ const BudgetTable = <
       return false;
     } else if (!isNil(nonEditableCells) && includes(nonEditableCells, colDef.field as keyof R)) {
       return false;
+    } else if (
+      includes(
+        map(calculatedColumns, (col: ColDef) => col.field),
+        colDef.field
+      )
+    ) {
+      return false;
     } else if (!isNil(isCellEditable)) {
       return isCellEditable(row, colDef);
     }

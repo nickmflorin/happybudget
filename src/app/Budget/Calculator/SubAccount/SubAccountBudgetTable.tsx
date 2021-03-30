@@ -89,7 +89,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         identifierField={"identifier"}
         identifierFieldHeader={"Line"}
         isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
-          if (includes(["estimated", "actual", "variance", "unit"], colDef.field)) {
+          if (includes(["unit"], colDef.field)) {
             return false;
           } else if (includes(["identifier", "description", "name"], colDef.field)) {
             return true;

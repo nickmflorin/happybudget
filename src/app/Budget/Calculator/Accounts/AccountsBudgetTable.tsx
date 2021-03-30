@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, includes } from "lodash";
-import { ColDef } from "ag-grid-community";
 import { createSelector } from "reselect";
 import { map } from "lodash";
 
@@ -73,14 +72,6 @@ const AccountsBudgetTable = (): JSX.Element => {
         selected={selected}
         identifierField={"identifier"}
         identifierFieldHeader={"Account"}
-        // TODO: It might make more sense to just treat all of the cells corresponding
-        // to the calculatedColumns as non-editable.
-        isCellEditable={(row: Table.AccountRow, colDef: ColDef) => {
-          if (includes(["estimated", "actual", "variance"], colDef.field)) {
-            return false;
-          }
-          return true;
-        }}
         search={search}
         onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
         saving={saving}
