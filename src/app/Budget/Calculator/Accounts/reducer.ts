@@ -37,7 +37,8 @@ export const createAccountsReducer = (): Reducer<Redux.Calculator.IAccountsStore
             AddToState: ActionType.Accounts.Placeholders.AddToState,
             Activate: ActionType.Accounts.Placeholders.Activate,
             RemoveFromState: ActionType.Accounts.Placeholders.RemoveFromState,
-            UpdateInState: ActionType.Accounts.Placeholders.UpdateInState
+            UpdateInState: ActionType.Accounts.Placeholders.UpdateInState,
+            Clear: ActionType.Accounts.Request
           },
           AccountMapping,
           { referenceEntity: "account" }

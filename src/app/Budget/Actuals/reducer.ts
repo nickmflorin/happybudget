@@ -50,7 +50,8 @@ const rootReducer = combineReducers({
             AddToState: ActionType.Actuals.Placeholders.AddToState,
             Activate: ActionType.Actuals.Placeholders.Activate,
             RemoveFromState: ActionType.Actuals.Placeholders.RemoveFromState,
-            UpdateInState: ActionType.Actuals.Placeholders.UpdateInState
+            UpdateInState: ActionType.Actuals.Placeholders.UpdateInState,
+            Clear: ActionType.Actuals.Request
           },
           ActualMapping,
           { referenceEntity: "actual" }

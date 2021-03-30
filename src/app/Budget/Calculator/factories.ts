@@ -78,7 +78,8 @@ export const createSubAccountsReducer = (
             AddToState: mapping.Placeholders.AddToState,
             Activate: mapping.Placeholders.Activate,
             RemoveFromState: mapping.Placeholders.RemoveFromState,
-            UpdateInState: mapping.Placeholders.UpdateInState
+            UpdateInState: mapping.Placeholders.UpdateInState,
+            Clear: mapping.Request
           },
           SubAccountMapping,
           { referenceEntity: "subaccount" }
