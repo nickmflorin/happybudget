@@ -277,7 +277,7 @@ const BudgetTable = <
 
   const createGroupFooter = (group: G): R => {
     const footerObj: { [key: string]: any } = {
-      id: group.id,
+      id: hashString(group.name),
       [identifierField]: group.name,
       group,
       meta: {
