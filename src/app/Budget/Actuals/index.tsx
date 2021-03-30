@@ -116,6 +116,7 @@ const Actuals = (): JSX.Element => {
         onRowDeselect={(id: number) => dispatch(deselectActualAction(id))}
         onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row.id))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateActualAction(payload))}
+        onRowBulkUpdate={(changes: Table.RowChange[]) => console.log(changes)}
         onSelectAll={() => dispatch(selectAllActualsAction())}
         rowRefreshRequired={(existing: Table.ActualRow, row: Table.ActualRow) => {
           return (

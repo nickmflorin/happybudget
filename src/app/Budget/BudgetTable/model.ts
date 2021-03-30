@@ -53,6 +53,7 @@ export interface BudgetTableProps<
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
   onRowUpdate: (payload: Table.RowChange) => void;
+  onRowBulkUpdate: (payload: Table.RowChange[]) => void;
   onRowAdd: () => void;
   onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;

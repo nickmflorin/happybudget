@@ -98,6 +98,7 @@ const BudgetTable = <
   onSearch,
   onSelectAll,
   onRowUpdate,
+  onRowBulkUpdate,
   onRowSelect,
   onRowDeselect,
   onRowAdd,
@@ -547,14 +548,20 @@ const BudgetTable = <
     setCellChangeEvents([]);
   });
 
-  const onPasteEnd = useDynamicCallback((event: PasteStartEvent) => {
+  const onPasteEnd = useDynamicCallback((event: PasteEndEvent) => {
     if (cellChangeEvents.length === 1) {
       const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
       if (!isNil(tableChange)) {
         onRowUpdate(tableChange);
       }
     } else if (cellChangeEvents.length !== 0) {
-      console.log("Multiple Changes");
+      const changes = filter(
+        map(cellChangeEvents, (e: CellValueChangedEvent) => getTableChangeFromEvent(e)),
+        (change: Table.RowChange | null) => change !== null
+      ) as Table.RowChange[];
+      if (changes.length !== 0) {
+        onRowBulkUpdate(changes);
+      }
     }
   });
 

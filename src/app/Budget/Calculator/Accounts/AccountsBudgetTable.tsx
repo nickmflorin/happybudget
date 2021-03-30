@@ -80,6 +80,7 @@ const AccountsBudgetTable = (): JSX.Element => {
         onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
         onRowDelete={(row: Table.AccountRow) => dispatch(removeAccountAction(row.id))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountAction(payload))}
+        onRowBulkUpdate={(changes: Table.RowChange[]) => console.log(changes)}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         groupParams={{
           onDeleteGroup: (group: IGroup<ISimpleAccount>) => dispatch(deleteGroupAction(group.id)),
