@@ -8,7 +8,7 @@ interface IdentifierCellProps extends ICellRendererParams {
 const IdentifierCell = <R extends Table.Row<any>>({ value, node }: IdentifierCellProps): JSX.Element => {
   const row: R = node.data;
   if (row.meta.isGroupFooter === true && row.group !== null) {
-    return <span>{row.group.name}</span>;
+    return <span>{`${row.group.name} (${row.group.children.length} Line Items)`}</span>;
   }
   return <span>{value}</span>;
 };
