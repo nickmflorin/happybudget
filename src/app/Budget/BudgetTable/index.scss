@@ -55,17 +55,18 @@
 
   .table-footer-grid {
     flex: none;
-    height: 60px;
-
+    height: 44px;
+    margin-top: 0px;
     .ag-body-viewport {
-      border-radius: 8px;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
     }
   }
 
   .budget-footer-grid {
     flex: none;
     height: 30px;
-
+    margin-top: 15px;
     .ag-body-viewport {
       border-radius: 8px;
     }

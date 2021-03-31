@@ -962,6 +962,7 @@ const BudgetTable = <
                 {...tableFooterGridOptions}
                 columnDefs={colDefs}
                 rowData={[tableFooter]}
+                rowHeight={38}
                 rowClass={"row--table-footer"}
                 suppressRowClickSelection={true}
                 onGridReady={onTableFooterGridReady}

@@ -167,7 +167,8 @@ $table-border: 1px solid $table-border-color;
 
   .ag-header {
     border: none;
-    border-radius: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 
     .ag-header-cell {
       .ag-cell-label-container {
@@ -323,12 +324,10 @@ $table-border: 1px solid $table-border-color;
 
           &:first-child {
             border-bottom-left-radius: 8px;
-            border-top-left-radius: 8px;
           }
 
           &:last-child {
             border-bottom-right-radius: 8px;
-            border-top-right-radius: 8px;
           }
         }
       }
