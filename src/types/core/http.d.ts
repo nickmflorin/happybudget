@@ -99,11 +99,11 @@ namespace Http {
     readonly group?: number | null;
   }
 
-  interface IAccountBulkUpdateItem extends Partial<ISubAccountPayload> {
+  interface ISubAccountBulkUpdatePayload extends Partial<ISubAccountPayload> {
     readonly id: number;
   }
 
-  interface IAccountBulkCreateSubAccountsResponse {
+  interface IBulkCreateSubAccountsResponse {
     data: ISubAccount[];
   }
 

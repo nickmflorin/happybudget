@@ -40,7 +40,7 @@ export const updateAccount = async (
 
 export const bulkUpdateAccountSubAccounts = async (
   id: number,
-  data: Http.IAccountBulkUpdateItem[],
+  data: Http.ISubAccountBulkUpdatePayload[],
   options: Http.IRequestOptions = {}
 ): Promise<IAccount> => {
   const url = URL.v1("accounts", id, "bulk-update-subaccounts");
@@ -54,8 +54,8 @@ export const bulkCreateAccountSubAccounts = async (
 ): Promise<ISubAccount[]> => {
   const url = URL.v1("accounts", id, "bulk-create-subaccounts");
   return client
-    .patch<Http.IAccountBulkCreateSubAccountsResponse>(url, { data }, options)
-    .then((response: Http.IAccountBulkCreateSubAccountsResponse) => response.data);
+    .patch<Http.IBulkCreateSubAccountsResponse>(url, { data }, options)
+    .then((response: Http.IBulkCreateSubAccountsResponse) => response.data);
 };
 
 export const getAccountSubAccounts = async (

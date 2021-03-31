@@ -6,7 +6,8 @@ export const ActionType = {
     Loading: "calculator.subaccount.Loading",
     Response: "calculator.subaccount.Response",
     Request: "calculator.subaccount.Request",
-    UpdateInState: "calculator.subaccount.UpdateInState"
+    UpdateInState: "calculator.subaccount.UpdateInState",
+    BulkUpdate: "calculator.subaccount.BulkUpdate"
   },
   Comments: {
     Loading: "calculator.subaccount.comments.Loading",
@@ -71,6 +72,7 @@ export const loadingSubAccountAction = simpleAction<boolean>(ActionType.SubAccou
 export const responseSubAccountAction = simpleAction<ISubAccount>(ActionType.SubAccount.Response);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const updateParentSubAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.SubAccount.UpdateInState);
+export const bulkUpdateSubAccountAction = simpleAction<Table.RowChange[]>(ActionType.SubAccount.BulkUpdate);
 
 /*
   Actions Pertaining to Sub Account Comments

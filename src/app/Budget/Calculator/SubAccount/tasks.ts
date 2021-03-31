@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
-import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find } from "lodash";
+import { call, put, select, all, fork } from "redux-saga/effects";
+import { isNil, find, map, groupBy, uniq, forEach } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountMapping } from "model/tableMappings";
 import {
@@ -16,7 +16,9 @@ import {
   replyToComment,
   getSubAccountSubAccountsHistory,
   deleteSubAccountGroup,
-  getSubAccountSubAccountGroups
+  getSubAccountSubAccountGroups,
+  bulkUpdateSubAccountSubAccounts,
+  bulkCreateSubAccountSubAccounts
 } from "services";
 import { handleTableErrors } from "store/tasks";
 import {
@@ -93,6 +95,87 @@ export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaI
   }
 }
 
+export function* deleteSubAccountTask(id: number): SagaIterator {
+  yield put(deletingSubAccountAction({ id, value: true }));
+  try {
+    yield call(deleteSubAccount, id);
+  } catch (e) {
+    handleRequestError(e, "There was an error deleting the sub account.");
+  } finally {
+    yield put(deletingSubAccountAction({ id: id, value: false }));
+  }
+}
+
+export function* updateSubAccountTask(id: number, change: Table.RowChange): SagaIterator {
+  yield put(updatingSubAccountAction({ id, value: true }));
+  const requestPayload = SubAccountMapping.patchPayload(change);
+  try {
+    yield call(updateSubAccount, id, requestPayload);
+  } catch (e) {
+    yield call(handleTableErrors, e, "There was an error updating the sub account.", id, (errors: Table.CellError[]) =>
+      addErrorsToStateAction(errors)
+    );
+  } finally {
+    yield put(updatingSubAccountAction({ id, value: false }));
+  }
+}
+
+export function* bulkUpdateAccountSubAccountsTask(id: number, changes: Table.RowChange[]): SagaIterator {
+  const requestPayload: Http.ISubAccountBulkUpdatePayload[] = map(changes, (change: Table.RowChange) => ({
+    id: change.id,
+    ...SubAccountMapping.patchPayload(change)
+  }));
+  for (let i = 0; i++; i < changes.length) {
+    yield put(updatingSubAccountAction({ id: changes[i].id, value: true }));
+  }
+  try {
+    yield call(bulkUpdateSubAccountSubAccounts, id, requestPayload);
+  } catch (e) {
+    // Once we rebuild back in the error handling, we will have to be concerned here with the nested
+    // structure of the errors.
+    yield call(handleTableErrors, e, "There was an error updating the sub accounts.", id, (errors: Table.CellError[]) =>
+      addErrorsToStateAction(errors)
+    );
+  } finally {
+    for (let i = 0; i++; i < changes.length) {
+      yield put(updatingSubAccountAction({ id: changes[i].id, value: false }));
+    }
+  }
+}
+
+export function* bulkCreateAccountSubAccountsTask(id: number, rows: Table.SubAccountRow[]): SagaIterator {
+  const requestPayload: Http.ISubAccountPayload[] = map(rows, (row: Table.SubAccountRow) =>
+    SubAccountMapping.postPayload(row)
+  );
+  yield put(creatingSubAccountAction(true));
+  try {
+    const subaccounts: ISubAccount[] = yield call(bulkCreateSubAccountSubAccounts, id, requestPayload);
+    for (let i = 0; i < subaccounts.length; i++) {
+      // It is not ideal that we have to do this, but we have no other way to map a placeholder
+      // to the returned SubAccount when bulk creating.  We can rely on the identifier field being
+      // unique (at least we hope it is) - otherwise the request will fail.
+      const placeholder = find(rows, { identifier: subaccounts[i].identifier });
+      if (isNil(placeholder)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Could not map sub-account ${subaccounts[i].id} to it's previous placeholder via the
+          identifier, ${subaccounts[i].identifier}`
+        );
+      } else {
+        yield put(activatePlaceholderAction({ id: placeholder.id, model: subaccounts[i] }));
+      }
+    }
+  } catch (e) {
+    // Once we rebuild back in the error handling, we will have to be concerned here with the nested
+    // structure of the errors.
+    yield call(handleTableErrors, e, "There was an error updating the sub accounts.", id, (errors: Table.CellError[]) =>
+      addErrorsToStateAction(errors)
+    );
+  } finally {
+    yield put(creatingSubAccountAction(false));
+  }
+}
+
 export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(action.payload) && !isNil(accountId)) {
@@ -116,14 +199,71 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
       }
     } else {
       yield put(removeSubAccountFromStateAction(model.id));
-      yield put(deletingSubAccountAction({ id: model.id, value: true }));
-      try {
-        yield call(deleteSubAccount, model.id);
-      } catch (e) {
-        handleRequestError(e, "There was an error deleting the sub account.");
-      } finally {
-        yield put(deletingSubAccountAction({ id: model.id, value: false }));
+      yield call(deleteSubAccountTask, model.id);
+    }
+  }
+}
+
+const mergeRowChanges = (changes: Table.RowChange[]): Table.RowChange => {
+  if (changes.length !== 0) {
+    if (uniq(map(changes, (change: Table.RowChange) => change.id)).length !== 1) {
+      throw new Error("Cannot merge row changes for different rows!");
+    }
+    const merged: Table.RowChange = { id: changes[0].id, data: {} };
+    forEach(changes, (change: Table.RowChange) => {
+      merged.data = { ...merged.data, ...change.data };
+    });
+    return merged;
+  } else {
+    throw new Error("Must provide at least 1 row change.");
+  }
+};
+
+export function* handleSubAccountBulkUpdateTask(action: Redux.IAction<Table.RowChange[]>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
+  if (!isNil(subaccountId) && !isNil(action.payload)) {
+    const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange[] };
+    const merged: Table.RowChange[] = map(grouped, (changes: Table.RowChange[], id: string) => {
+      return { data: mergeRowChanges(changes).data, id: parseInt(id) };
+    });
+    const data = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data);
+    const placeholders = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.placeholders
+    );
+    console.log(merged);
+    console.log(data);
+
+    const mergedUpdates: Table.RowChange[] = [];
+    const placeholdersToCreate: Table.SubAccountRow[] = [];
+
+    for (let i = 0; i < merged.length; i++) {
+      const model: ISubAccount | undefined = find(data, { id: merged[i].id });
+      if (isNil(model)) {
+        const placeholder: Table.SubAccountRow | undefined = find(placeholders, { id: merged[i].id });
+        if (isNil(placeholder)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when updating sub account in state...
+            the subaccount with ID ${merged[i].id} does not exist in state when it is expected to.`
+          );
+        } else {
+          const updatedRow = SubAccountMapping.newRowWithChanges(placeholder, merged[i]);
+          yield put(updatePlaceholderInStateAction(updatedRow));
+          if (SubAccountMapping.rowHasRequiredFields(updatedRow)) {
+            placeholdersToCreate.push(updatedRow);
+          }
+        }
+      } else {
+        const updatedModel = SubAccountMapping.newModelWithChanges(model, merged[i]);
+        yield put(updateSubAccountInStateAction(updatedModel));
+        mergedUpdates.push(merged[i]);
       }
+    }
+    if (mergedUpdates.length !== 0) {
+      yield fork(bulkUpdateAccountSubAccountsTask, subaccountId, mergedUpdates);
+    }
+    if (placeholdersToCreate.length !== 0) {
+      yield fork(bulkCreateAccountSubAccountsTask, subaccountId, placeholdersToCreate);
     }
   }
 }
@@ -178,21 +318,7 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
     } else {
       const updatedModel = SubAccountMapping.newModelWithChanges(model, action.payload);
       yield put(updateSubAccountInStateAction(updatedModel));
-
-      yield put(updatingSubAccountAction({ id: model.id, value: true }));
-      try {
-        yield call(updateSubAccount, model.id, SubAccountMapping.patchPayload(action.payload));
-      } catch (e) {
-        yield call(
-          handleTableErrors,
-          e,
-          "There was an error updating the sub account.",
-          model.id,
-          (errors: Table.CellError[]) => addErrorsToStateAction(errors)
-        );
-      } finally {
-        yield put(updatingSubAccountAction({ id: model.id, value: false }));
-      }
+      yield call(updateSubAccountTask, model.id, action.payload);
     }
   }
 }

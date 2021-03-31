@@ -21,7 +21,6 @@ export const getAccountHistory = async (
 
 export const getAccountSubAccountsHistory = async (
   accountId: number,
-  budgetId: number,
   query: Http.IListQuery = {},
   options: Http.IRequestOptions = {}
 ): Promise<Http.IListResponse<HistoryEvent>> => {
