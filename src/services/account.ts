@@ -38,6 +38,26 @@ export const updateAccount = async (
   return client.patch<IAccount>(url, payload, options);
 };
 
+export const bulkUpdateAccounts = async (
+  id: number,
+  data: Http.IAccountBulkUpdatePayload[],
+  options: Http.IRequestOptions = {}
+): Promise<IBudget> => {
+  const url = URL.v1("budgets", id, "bulk-update-accounts");
+  return client.patch<IBudget>(url, { data }, options);
+};
+
+export const bulkCreateAccounts = async (
+  id: number,
+  data: Http.IAccountPayload[],
+  options: Http.IRequestOptions = {}
+): Promise<IAccount[]> => {
+  const url = URL.v1("budgets", id, "bulk-create-accounts");
+  return client
+    .patch<Http.IBulkCreateAccountsResponse>(url, { data }, options)
+    .then((response: Http.IBulkCreateAccountsResponse) => response.data);
+};
+
 export const bulkUpdateAccountSubAccounts = async (
   id: number,
   data: Http.ISubAccountBulkUpdatePayload[],

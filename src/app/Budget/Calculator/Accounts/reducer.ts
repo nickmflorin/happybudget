@@ -35,7 +35,6 @@ export const createAccountsReducer = (): Reducer<Redux.Calculator.IAccountsStore
         placeholders: createTablePlaceholdersReducer(
           {
             AddToState: ActionType.Accounts.Placeholders.AddToState,
-            Activate: ActionType.Accounts.Placeholders.Activate,
             RemoveFromState: ActionType.Accounts.Placeholders.RemoveFromState,
             UpdateInState: ActionType.Accounts.Placeholders.UpdateInState,
             Clear: ActionType.Accounts.Request
@@ -203,8 +202,18 @@ export const createAccountsReducer = (): Reducer<Redux.Calculator.IAccountsStore
         };
         newState = recalculateGroupMetrics(newState, group.id);
       }
+    } else if (action.type === ActionType.Accounts.Placeholders.Activate) {
+      // TODO: Do we need to recalculate group metrics here?
+      const payload: Table.ActivatePlaceholderPayload<IAccount> = action.payload;
+      newState = {
+        ...newState,
+        placeholders: filter(
+          newState.placeholders,
+          (placeholder: Table.AccountRow) => placeholder.id !== action.payload.id
+        ),
+        data: [...newState.data, payload.model]
+      };
     }
-
     return { ...newState };
   };
 };

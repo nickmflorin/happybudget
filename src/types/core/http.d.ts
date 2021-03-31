@@ -103,8 +103,16 @@ namespace Http {
     readonly id: number;
   }
 
+  interface IAccountBulkUpdatePayload extends Partial<IAccount> {
+    readonly id: number;
+  }
+
   interface IBulkCreateSubAccountsResponse {
     data: ISubAccount[];
+  }
+
+  interface IBulkCreateAccountsResponse {
+    data: IAccount[];
   }
 
   interface IActualPayload extends IPayload {

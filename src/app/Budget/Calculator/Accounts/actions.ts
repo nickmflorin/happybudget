@@ -1,6 +1,7 @@
 import { simpleAction } from "store/actions";
 
 export const ActionType = {
+  BulkUpdate: "calculator.budget.BulkUpdate",
   Comments: {
     Loading: "calculator.budget.comments.Loading",
     Response: "calculator.budget.comments.Response",
@@ -60,6 +61,8 @@ export const ActionType = {
   }
 };
 
+export const bulkUpdateBudgetAction = simpleAction<Table.RowChange[]>(ActionType.BulkUpdate);
+
 /*
   Actions Pertaining to Budget Comments
 */
@@ -109,9 +112,10 @@ export const updatePlaceholderInStateAction = simpleAction<Table.AccountRow>(
   ActionType.Accounts.Placeholders.UpdateInState
 );
 
-export const addAccountToStateAction = simpleAction<IAccount>(ActionType.Accounts.AddToState);
 export const updateAccountInStateAction = simpleAction<IAccount>(ActionType.Accounts.UpdateInState);
 export const removeAccountFromStateAction = simpleAction<number>(ActionType.Accounts.RemoveFromState);
+// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
+export const addAccountToStateAction = simpleAction<IAccount>(ActionType.Accounts.AddToState);
 
 // Errors Functionality Needs to be Built Back In
 export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(ActionType.Accounts.AddErrors);

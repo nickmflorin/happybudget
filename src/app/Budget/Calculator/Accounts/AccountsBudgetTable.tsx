@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isNil, includes } from "lodash";
+import { isNil } from "lodash";
 import { createSelector } from "reselect";
 import { map } from "lodash";
 
@@ -21,7 +21,8 @@ import {
   selectAllAccountsAction,
   addGroupToStateAction,
   deleteGroupAction,
-  removeAccountFromGroupAction
+  removeAccountFromGroupAction,
+  bulkUpdateBudgetAction
 } from "./actions";
 
 const selectGroups = simpleDeepEqualSelector(
@@ -80,7 +81,7 @@ const AccountsBudgetTable = (): JSX.Element => {
         onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
         onRowDelete={(row: Table.AccountRow) => dispatch(removeAccountAction(row.id))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountAction(payload))}
-        onRowBulkUpdate={(changes: Table.RowChange[]) => console.log(changes)}
+        onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetAction(changes))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         groupParams={{
           onDeleteGroup: (group: IGroup<ISimpleAccount>) => dispatch(deleteGroupAction(group.id)),

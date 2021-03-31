@@ -1,8 +1,9 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all, fork } from "redux-saga/effects";
-import { isNil, find, uniq, forEach, map, groupBy } from "lodash";
+import { isNil, find, map, groupBy } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountMapping } from "model/tableMappings";
+import { mergeRowChanges } from "model/util";
 import {
   getAccountSubAccounts,
   createAccountSubAccount,
@@ -120,6 +121,24 @@ export function* updateSubAccountTask(id: number, change: Table.RowChange): Saga
   }
 }
 
+export function* createSubAccountTask(id: number, row: Table.SubAccountRow): SagaIterator {
+  yield put(creatingSubAccountAction(true));
+  try {
+    const response: ISubAccount = yield call(createAccountSubAccount, id, SubAccountMapping.postPayload(row));
+    yield put(activatePlaceholderAction({ id: row.id, model: response }));
+  } catch (e) {
+    yield call(
+      handleTableErrors,
+      e,
+      "There was an error updating the sub account.",
+      row.id,
+      (errors: Table.CellError[]) => addErrorsToStateAction(errors)
+    );
+  } finally {
+    yield put(creatingSubAccountAction(false));
+  }
+}
+
 export function* bulkUpdateAccountSubAccountsTask(id: number, changes: Table.RowChange[]): SagaIterator {
   const requestPayload: Http.ISubAccountBulkUpdatePayload[] = map(changes, (change: Table.RowChange) => ({
     id: change.id,
@@ -203,21 +222,6 @@ export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): Sag
   }
 }
 
-const mergeRowChanges = (changes: Table.RowChange[]): Table.RowChange => {
-  if (changes.length !== 0) {
-    if (uniq(map(changes, (change: Table.RowChange) => change.id)).length !== 1) {
-      throw new Error("Cannot merge row changes for different rows!");
-    }
-    const merged: Table.RowChange = { id: changes[0].id, data: {} };
-    forEach(changes, (change: Table.RowChange) => {
-      merged.data = { ...merged.data, ...change.data };
-    });
-    return merged;
-  } else {
-    throw new Error("Must provide at least 1 row change.");
-  }
-};
-
 export function* handleAccountBulkUpdateTask(action: Redux.IAction<Table.RowChange[]>): SagaIterator {
   const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
   if (!isNil(accountId) && !isNil(action.payload)) {
@@ -287,31 +291,12 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
       } else {
         const updatedRow = SubAccountMapping.newRowWithChanges(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
-
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
         if (SubAccountMapping.rowHasRequiredFields(updatedRow)) {
-          yield put(creatingSubAccountAction(true));
-          try {
-            const response: ISubAccount = yield call(
-              createAccountSubAccount,
-              accountId,
-              SubAccountMapping.postPayload(updatedRow)
-            );
-            yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
-          } catch (e) {
-            yield call(
-              handleTableErrors,
-              e,
-              "There was an error updating the sub account.",
-              placeholder.id,
-              (errors: Table.CellError[]) => addErrorsToStateAction(errors)
-            );
-          } finally {
-            yield put(creatingSubAccountAction(false));
-          }
+          yield call(createSubAccountTask, accountId, updatedRow);
         }
       }
     } else {

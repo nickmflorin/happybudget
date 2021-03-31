@@ -13,7 +13,8 @@ import {
   getHistoryTask,
   deleteAccountGroupTask,
   removeAccountFromGroupTask,
-  getGroupsTask
+  getGroupsTask,
+  handleAccountsBulkUpdateTask
 } from "./tasks";
 
 function* watchForRequestAccountsSaga(): SagaIterator {
@@ -35,6 +36,17 @@ function* watchForRequestGroupsSaga(): SagaIterator {
       yield cancel(lastTasks);
     }
     lastTasks = yield call(getGroupsTask, action);
+  }
+}
+
+function* watchForBulkUpdateAccountSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.BulkUpdate);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(handleAccountsBulkUpdateTask, action);
   }
 }
 
@@ -139,4 +151,5 @@ export default function* accountsSaga(): SagaIterator {
   yield spawn(watchForDeleteGroupSaga);
   yield spawn(watchForRemoveAccountFromGroupSaga);
   yield spawn(watchForRequestGroupsSaga);
+  yield spawn(watchForBulkUpdateAccountSaga);
 }
