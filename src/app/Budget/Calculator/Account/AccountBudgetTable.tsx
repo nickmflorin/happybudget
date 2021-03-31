@@ -90,6 +90,8 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         selected={selected}
         identifierField={"identifier"}
         identifierFieldHeader={"Line"}
+        tableFooterIdentifierValue={!isNil(accountDetail) ? `${accountDetail.identifier} Total` : "Total"}
+        budgetFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
         isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
           if (includes(["unit"], colDef.field)) {
             return false;

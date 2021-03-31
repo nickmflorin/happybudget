@@ -73,6 +73,7 @@ const AccountsBudgetTable = (): JSX.Element => {
         selected={selected}
         identifierField={"identifier"}
         identifierFieldHeader={"Account"}
+        tableFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
         search={search}
         onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
         saving={saving}
