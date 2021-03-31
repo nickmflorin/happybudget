@@ -6,7 +6,8 @@ export const ActionType = {
     Loading: "calculator.account.Loading",
     Response: "calculator.account.Response",
     Request: "calculator.account.Request",
-    UpdateInState: "calculator.account.UpdateInState"
+    UpdateInState: "calculator.account.UpdateInState",
+    BulkUpdate: "calculator.account.BulkUpdate"
   },
   Comments: {
     Loading: "calculator.account.comments.Loading",
@@ -72,6 +73,7 @@ export const loadingAccountAction = simpleAction<boolean>(ActionType.Account.Loa
 export const responseAccountAction = simpleAction<IAccount>(ActionType.Account.Response);
 // Not currently used, because the reducer handles the logic.
 export const updateAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.Account.UpdateInState);
+export const bulkUpdateAccountAction = simpleAction<Table.RowChange[]>(ActionType.Account.BulkUpdate);
 
 /*
   Actions Pertaining to Account Comments

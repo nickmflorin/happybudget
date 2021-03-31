@@ -135,12 +135,21 @@ class Mapping<
   postPayload = (row: R): P => {
     const obj: { [key: string]: any } = {};
     forEach(this.fields, (field: MappedField<M>) => {
-      if (
-        !(field.calculatedField === true) &&
-        !(field.excludeFromPost === true) &&
-        !isNil(row[field.field as keyof R])
-      ) {
-        obj[field.field as string] = row[field.field as keyof R];
+      if (!(field.http === false) && !(field.excludeFromPost === true)) {
+        const value = row[field.field as keyof R] as any;
+        if (value !== undefined) {
+          if (value === null) {
+            if (field.allowNull === true) {
+              obj[field.field as string] = null;
+            }
+          } else if (value === "") {
+            if (field.allowBlank === true) {
+              obj[field.field as string] = "";
+            }
+          } else {
+            obj[field.field as string] = value;
+          }
+        }
       }
     });
     return obj as P;
@@ -149,8 +158,21 @@ class Mapping<
   patchPayload = (payload: Table.RowChange): Partial<P> => {
     const obj: { [key: string]: any } = {};
     forEach(this.fields, (field: MappedField<M>) => {
-      if (!isNil(payload.data[field.field as string])) {
-        obj[field.field as string] = payload.data[field.field as string].newValue;
+      if (!(field.http === false) && !isNil(payload.data[field.field as string])) {
+        const value = payload.data[field.field as string].newValue;
+        if (value !== undefined) {
+          if (value === null) {
+            if (field.allowNull === true) {
+              obj[field.field as string] = null;
+            }
+          } else if (value === "") {
+            if (field.allowBlank === true) {
+              obj[field.field as string] = "";
+            }
+          } else {
+            obj[field.field as string] = value;
+          }
+        }
       }
     });
     return obj as Partial<P>;
@@ -159,7 +181,7 @@ class Mapping<
   rowHasRequiredFields = (row: R): boolean => {
     let requiredFieldsPresent = true;
     forEach(this.fields, (field: MappedField<M>) => {
-      if (field.requiredForPost === true) {
+      if (field.required === true) {
         const val = row[field.field as keyof R] as any;
         if (isNil(val) || val === "") {
           requiredFieldsPresent = false;
@@ -181,10 +203,10 @@ export const AccountMapping = new Mapping<
   fields: [
     { field: "description" },
     { field: "group" },
-    { field: "identifier", requiredForPost: true },
-    { field: "estimated", calculatedField: true },
-    { field: "variance", calculatedField: true },
-    { field: "actual", calculatedField: true }
+    { field: "identifier", required: true },
+    { field: "estimated", http: false },
+    { field: "variance", http: false },
+    { field: "actual", http: false }
   ],
   childrenGetter: (model: IAccount) => model.subaccounts,
   groupGetter: (model: IAccount) => model.group,
@@ -200,17 +222,17 @@ export const SubAccountMapping = new Mapping<
   ISimpleSubAccount
 >({
   fields: [
-    { field: "description" },
-    { field: "name" },
-    { field: "group" },
-    { field: "quantity", usedToCalculate: true },
-    { field: "rate", usedToCalculate: true },
-    { field: "multiplier", usedToCalculate: true },
-    { field: "unit" },
-    { field: "identifier", requiredForPost: true },
-    { field: "estimated", calculatedField: true },
-    { field: "variance", calculatedField: true },
-    { field: "actual", calculatedField: true }
+    { field: "description", allowBlank: true },
+    { field: "name", allowBlank: true },
+    { field: "group", allowNull: true },
+    { field: "quantity", allowNull: true },
+    { field: "rate", allowNull: true },
+    { field: "multiplier", allowNull: true },
+    { field: "unit", allowNull: true },
+    { field: "identifier", required: true },
+    { field: "estimated", http: false },
+    { field: "variance", http: false },
+    { field: "actual", http: false }
   ],
   childrenGetter: (model: ISubAccount) => model.subaccounts,
   groupGetter: (model: ISubAccount) => model.group,
@@ -224,12 +246,12 @@ export const ActualMapping = new Mapping<Table.ActualRow, IActual, IGroup<any>, 
     {
       field: "object_id",
       excludeFromPost: true,
-      requiredForPost: true
+      required: true
     },
     {
       field: "parent_type",
       excludeFromPost: true,
-      requiredForPost: true
+      required: true
     },
     { field: "vendor" },
     { field: "purchase_order" },

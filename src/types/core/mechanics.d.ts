@@ -3,10 +3,11 @@
 
 interface MappedField<M extends Model> {
   field: keyof M;
-  requiredForPost?: boolean;
-  calculatedField?: boolean;
-  usedToCalculate?: boolean;
+  required?: boolean;
+  allowNull?: boolean;
+  allowBlank?: boolean;
   excludeFromPost?: boolean;
+  http?: boolean;
 }
 
 interface MappingConfig<M extends Model, C extends Model = UnknownModel> {

@@ -99,6 +99,14 @@ namespace Http {
     readonly group?: number | null;
   }
 
+  interface IAccountBulkUpdateItem extends Partial<ISubAccountPayload> {
+    readonly id: number;
+  }
+
+  interface IAccountBulkCreateSubAccountsResponse {
+    data: ISubAccount[];
+  }
+
   interface IActualPayload extends IPayload {
     readonly description?: string;
     readonly date?: string;
