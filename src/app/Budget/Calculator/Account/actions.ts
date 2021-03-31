@@ -71,7 +71,7 @@ export const setAccountIdAction = simpleAction<number>(ActionType.Account.SetId)
 export const requestAccountAction = simpleAction<null>(ActionType.Account.Request);
 export const loadingAccountAction = simpleAction<boolean>(ActionType.Account.Loading);
 export const responseAccountAction = simpleAction<IAccount>(ActionType.Account.Response);
-// Not currently used, because the reducer handles the logic.
+// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const updateAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.Account.UpdateInState);
 export const bulkUpdateAccountAction = simpleAction<Table.RowChange[]>(ActionType.Account.BulkUpdate);
 
@@ -125,9 +125,10 @@ export const updatePlaceholderInStateAction = simpleAction<Table.SubAccountRow>(
   ActionType.SubAccounts.Placeholders.UpdateInState
 );
 
-export const addSubAccountToStateAction = simpleAction<ISubAccount>(ActionType.SubAccounts.AddToState);
 export const updateSubAccountInStateAction = simpleAction<ISubAccount>(ActionType.SubAccounts.UpdateInState);
 export const removeSubAccountFromStateAction = simpleAction<number>(ActionType.SubAccounts.RemoveFromState);
+// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
+export const addSubAccountToStateAction = simpleAction<ISubAccount>(ActionType.SubAccounts.AddToState);
 
 // Errors Functionality Needs to be Built Back In
 export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(
@@ -143,7 +144,7 @@ export const responseGroupsAction = simpleAction<Http.IListResponse<IGroup<ISimp
   ActionType.SubAccounts.Groups.Response
 );
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(ActionType.SubAccounts.Groups.AddToState);
-// Not currently used, but we may need to use in the near future.
+// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const updateGroupInStateAction = simpleAction<IGroup<ISimpleSubAccount>>(
   ActionType.SubAccounts.Groups.UpdateInState
 );

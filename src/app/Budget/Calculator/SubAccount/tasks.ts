@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all } from "redux-saga/effects";
-import { isNil, find, reduce } from "lodash";
+import { isNil, find } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountMapping } from "model/tableMappings";
 import {
@@ -44,7 +44,6 @@ import {
   removeGroupFromStateAction,
   updateSubAccountInStateAction,
   removeSubAccountFromStateAction,
-  addSubAccountToStateAction,
   removePlaceholderFromStateAction,
   addPlaceholdersToStateAction,
   updatePlaceholderInStateAction,
@@ -90,6 +89,165 @@ export function* deleteSubAccountGroupTask(action: Redux.IAction<number>): SagaI
       handleRequestError(e, "There was an error deleting the sub account group.");
     } finally {
       yield put(deletingGroupAction({ id: action.payload, value: false }));
+    }
+  }
+}
+
+export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
+  const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
+  if (!isNil(action.payload) && !isNil(accountId)) {
+    const models: ISubAccount[] = yield select(
+      (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data
+    );
+    const model: ISubAccount | undefined = find(models, { id: action.payload });
+    if (isNil(model)) {
+      const placeholders = yield select(
+        (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.placeholders
+      );
+      const placeholder: Table.SubAccountRow | undefined = find(placeholders, { id: action.payload });
+      if (isNil(placeholder)) {
+        /* eslint-disable no-console */
+        console.warn(
+          `Inconsistent State!  Inconsistent state noticed when removing sub account...
+          The sub account with ID ${action.payload} does not exist in state when it is expected to.`
+        );
+      } else {
+        yield put(removePlaceholderFromStateAction(placeholder.id));
+      }
+    } else {
+      yield put(removeSubAccountFromStateAction(model.id));
+      yield put(deletingSubAccountAction({ id: model.id, value: true }));
+      try {
+        yield call(deleteSubAccount, model.id);
+      } catch (e) {
+        handleRequestError(e, "There was an error deleting the sub account.");
+      } finally {
+        yield put(deletingSubAccountAction({ id: model.id, value: false }));
+      }
+    }
+  }
+}
+
+export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
+  if (!isNil(subaccountId) && !isNil(action.payload)) {
+    const id = action.payload.id;
+    const data = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data);
+    const model: ISubAccount | undefined = find(data, { id });
+    if (isNil(model)) {
+      const placeholders = yield select(
+        (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.placeholders
+      );
+      const placeholder: Table.SubAccountRow | undefined = find(placeholders, { id });
+      if (isNil(placeholder)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State!:  Inconsistent state noticed when updating sub account in state...
+          the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
+        );
+      } else {
+        const updatedRow = SubAccountMapping.newRowWithChanges(placeholder, action.payload);
+        yield put(updatePlaceholderInStateAction(updatedRow));
+
+        // Wait until all of the required fields are present before we create the entity in the
+        // backend.  Once the entity is created in the backend, we can remove the placeholder
+        // designation of the row so it will be updated instead of created the next time the row
+        // is changed.
+        if (SubAccountMapping.rowHasRequiredFields(updatedRow)) {
+          yield put(creatingSubAccountAction(true));
+          try {
+            const response: ISubAccount = yield call(
+              createSubAccountSubAccount,
+              subaccountId,
+              SubAccountMapping.postPayload(updatedRow)
+            );
+            yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
+          } catch (e) {
+            yield call(
+              handleTableErrors,
+              e,
+              "There was an error updating the sub account.",
+              placeholder.id,
+              (errors: Table.CellError[]) => addErrorsToStateAction(errors)
+            );
+          } finally {
+            yield put(creatingSubAccountAction(false));
+          }
+        }
+      }
+    } else {
+      const updatedModel = SubAccountMapping.newModelWithChanges(model, action.payload);
+      yield put(updateSubAccountInStateAction(updatedModel));
+
+      yield put(updatingSubAccountAction({ id: model.id, value: true }));
+      try {
+        yield call(updateSubAccount, model.id, SubAccountMapping.patchPayload(action.payload));
+      } catch (e) {
+        yield call(
+          handleTableErrors,
+          e,
+          "There was an error updating the sub account.",
+          model.id,
+          (errors: Table.CellError[]) => addErrorsToStateAction(errors)
+        );
+      } finally {
+        yield put(updatingSubAccountAction({ id: model.id, value: false }));
+      }
+    }
+  }
+}
+
+export function* getGroupsTask(action: Redux.IAction<null>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
+  if (!isNil(subaccountId)) {
+    yield put(loadingGroupsAction(true));
+    try {
+      const response: Http.IListResponse<IGroup<ISimpleSubAccount>> = yield call(
+        getSubAccountSubAccountGroups,
+        subaccountId,
+        { no_pagination: true }
+      );
+      yield put(responseGroupsAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the sub account's sub account groups.");
+      yield put(responseGroupsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingGroupsAction(false));
+    }
+  }
+}
+
+export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
+  if (!isNil(subaccountId)) {
+    yield put(loadingSubAccountsAction(true));
+    try {
+      const response = yield call(getSubAccountSubAccounts, subaccountId, { no_pagination: true });
+      yield put(responseSubAccountsAction(response));
+      if (response.data.length === 0) {
+        yield put(addPlaceholdersToStateAction(2));
+      }
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the subaccount's sub accounts.");
+      yield put(responseSubAccountsAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingSubAccountsAction(false));
+    }
+  }
+}
+
+export function* getSubAccountTask(action: Redux.IAction<null>): SagaIterator {
+  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
+  if (!isNil(subaccountId)) {
+    yield put(loadingSubAccountAction(true));
+    try {
+      const response: ISubAccount = yield call(getSubAccount, subaccountId);
+      yield put(responseSubAccountAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the account.");
+      yield put(responseSubAccountAction(undefined, { error: e }));
+    } finally {
+      yield put(loadingSubAccountAction(false));
     }
   }
 }
@@ -184,175 +342,6 @@ export function* getCommentsTask(action: Redux.IAction<any>): SagaIterator {
       yield put(responseCommentsAction({ count: 0, data: [] }, { error: e }));
     } finally {
       yield put(loadingCommentsAction(false));
-    }
-  }
-}
-
-export function* handleSubAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
-  const accountId = yield select((state: Redux.IApplicationStore) => state.calculator.account.id);
-  if (!isNil(action.payload) && !isNil(accountId)) {
-    const models: ISubAccount[] = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data
-    );
-    const model: ISubAccount | undefined = find(models, { id: action.payload });
-    if (isNil(model)) {
-      const placeholders = yield select(
-        (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.placeholders
-      );
-      const placeholder: Table.SubAccountRow | undefined = find(placeholders, { id: action.payload });
-      if (isNil(placeholder)) {
-        /* eslint-disable no-console */
-        console.warn(
-          `Inconsistent State!  Inconsistent state noticed when removing sub account...
-          The sub account with ID ${action.payload} does not exist in state when it is expected to.`
-        );
-      } else {
-        yield put(removePlaceholderFromStateAction(placeholder.id));
-      }
-    } else {
-      yield put(removeSubAccountFromStateAction(model.id));
-      yield put(deletingSubAccountAction({ id: model.id, value: true }));
-      try {
-        yield call(deleteSubAccount, model.id);
-      } catch (e) {
-        handleRequestError(e, "There was an error deleting the sub account.");
-      } finally {
-        yield put(deletingSubAccountAction({ id: model.id, value: false }));
-      }
-    }
-  }
-}
-
-export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
-  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
-  if (!isNil(subaccountId) && !isNil(action.payload)) {
-    const id = action.payload.id;
-    const data = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.data);
-    const model: ISubAccount | undefined = find(data, { id });
-    if (isNil(model)) {
-      const placeholders = yield select(
-        (state: Redux.IApplicationStore) => state.calculator.subaccount.subaccounts.placeholders
-      );
-      const placeholder: Table.SubAccountRow | undefined = find(placeholders, { id });
-      if (isNil(placeholder)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when updating sub account in state...
-          the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
-        );
-      } else {
-        const updatedRow = SubAccountMapping.newRowWithChanges(placeholder, action.payload);
-        yield put(updatePlaceholderInStateAction(updatedRow));
-
-        const requestPayload = SubAccountMapping.postPayload(updatedRow);
-
-        // Wait until all of the required fields are present before we create the entity in the
-        // backend.  Once the entity is created in the backend, we can remove the placeholder
-        // designation of the row so it will be updated instead of created the next time the row
-        // is changed.
-        if (SubAccountMapping.rowHasRequiredFields(updatedRow)) {
-          yield put(creatingSubAccountAction(true));
-          try {
-            const response: ISubAccount = yield call(
-              createSubAccountSubAccount,
-              subaccountId,
-              requestPayload as Http.ISubAccountPayload
-            );
-            // TODO: Combine these actions into a single action that operates in the reducer.
-            yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
-            // Now that the placeholder is activated, we need to remove the placeholder from state and
-            // insert in the actual SubAccount model into the state.
-            yield put(removePlaceholderFromStateAction(response.id));
-            yield put(addSubAccountToStateAction(response));
-          } catch (e) {
-            yield call(
-              handleTableErrors,
-              e,
-              "There was an error updating the sub account.",
-              placeholder.id,
-              (errors: Table.CellError[]) => addErrorsToStateAction(errors)
-            );
-          } finally {
-            yield put(creatingSubAccountAction(false));
-          }
-        }
-      }
-    } else {
-      const updatedModel = SubAccountMapping.newModelWithChanges(model, action.payload);
-      yield put(updateSubAccountInStateAction(updatedModel));
-
-      yield put(updatingSubAccountAction({ id: model.id, value: true }));
-      const requestPayload = SubAccountMapping.patchPayload(action.payload);
-      try {
-        // NOTE: We do not need to update the SubAccount in state because the reducer will have
-        // already handled that.
-        yield call(updateSubAccount, model.id, requestPayload);
-      } catch (e) {
-        yield call(
-          handleTableErrors,
-          e,
-          "There was an error updating the sub account.",
-          model.id,
-          (errors: Table.CellError[]) => addErrorsToStateAction(errors)
-        );
-      } finally {
-        yield put(updatingSubAccountAction({ id: model.id, value: false }));
-      }
-    }
-  }
-}
-
-export function* getGroupsTask(action: Redux.IAction<null>): SagaIterator {
-  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
-  if (!isNil(subaccountId)) {
-    yield put(loadingGroupsAction(true));
-    try {
-      const response: Http.IListResponse<IGroup<ISimpleSubAccount>> = yield call(
-        getSubAccountSubAccountGroups,
-        subaccountId,
-        { no_pagination: true }
-      );
-      yield put(responseGroupsAction(response));
-    } catch (e) {
-      handleRequestError(e, "There was an error retrieving the sub account's sub account groups.");
-      yield put(responseGroupsAction({ count: 0, data: [] }, { error: e }));
-    } finally {
-      yield put(loadingGroupsAction(false));
-    }
-  }
-}
-
-export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
-  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
-  if (!isNil(subaccountId)) {
-    yield put(loadingSubAccountsAction(true));
-    try {
-      const response = yield call(getSubAccountSubAccounts, subaccountId, { no_pagination: true });
-      yield put(responseSubAccountsAction(response));
-      if (response.data.length === 0) {
-        yield put(addPlaceholdersToStateAction(2));
-      }
-    } catch (e) {
-      handleRequestError(e, "There was an error retrieving the subaccount's sub accounts.");
-      yield put(responseSubAccountsAction({ count: 0, data: [] }, { error: e }));
-    } finally {
-      yield put(loadingSubAccountsAction(false));
-    }
-  }
-}
-
-export function* getSubAccountTask(action: Redux.IAction<null>): SagaIterator {
-  const subaccountId = yield select((state: Redux.IApplicationStore) => state.calculator.subaccount.id);
-  if (!isNil(subaccountId)) {
-    yield put(loadingSubAccountAction(true));
-    try {
-      const response: ISubAccount = yield call(getSubAccount, subaccountId);
-      yield put(responseSubAccountAction(response));
-    } catch (e) {
-      handleRequestError(e, "There was an error retrieving the account.");
-      yield put(responseSubAccountAction(undefined, { error: e }));
-    } finally {
-      yield put(loadingSubAccountAction(false));
     }
   }
 }

@@ -29,6 +29,8 @@ export function* handleTableErrors(
       /* @ts-ignore 2367 */
       if (DISPLAY_ERRORS_IN_TABLE === true) {
         yield put(action(cellErrors));
+      } else {
+        handleRequestError(e, message);
       }
     }
   } else {

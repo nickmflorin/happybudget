@@ -92,28 +92,6 @@ export const createTablePlaceholdersReducer = <
         return filter(st, (r: R) => r.id !== id);
       }
     },
-    Activate: (payload: Table.ActivatePlaceholderPayload<M>, st: Redux.ListStore<R>) => {
-      const row: R | undefined = find(st, { id: payload.id } as any);
-      if (isNil(row)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when activating the ${Options.referenceEntity}
-          placeholder in state... the ${Options.referenceEntity} placeholder row with ID ${payload.id}
-          does not exist in state when it is expected to.`
-        );
-        return st;
-      } else {
-        return replaceInArray<R>(
-          st,
-          { id: payload.id },
-          {
-            ...row,
-            // NOTE: This will be a problem if the placeholder belonged to a group!
-            ...mapping.modelToRow(payload.model, null)
-          }
-        );
-      }
-    },
     UpdateInState: (payload: R, st: Redux.ListStore<R>) => {
       const row: R | undefined = find(st, { id: payload.id } as any);
       if (isNil(row)) {
@@ -384,6 +362,17 @@ export const createSubAccountsReducer = (
     } else if (action.type === mapping.Placeholders.UpdateInState) {
       const row: Table.SubAccountRow = action.payload;
       newState = recalculatePlaceholderMetrics(newState, row.id);
+    } else if (action.type === mapping.Placeholders.Activate) {
+      // TODO: Do we need to recalculate group metrics here?
+      const payload: Table.ActivatePlaceholderPayload<ISubAccount> = action.payload;
+      newState = {
+        ...newState,
+        placeholders: filter(
+          newState.placeholders,
+          (placeholder: Table.SubAccountRow) => placeholder.id !== action.payload.id
+        ),
+        data: [...newState.data, payload.model]
+      };
     }
     return newState;
   };
