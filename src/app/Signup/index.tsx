@@ -59,7 +59,7 @@ const Signup = (): JSX.Element => {
         onSubmit={(values: ISignupFormValues) => {
           register(values)
             .then(() => {
-              history.push("/login");
+              history.push("/");
             })
             .catch((e: Error) => {
               if (e instanceof ClientError) {
