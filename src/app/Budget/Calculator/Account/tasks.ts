@@ -143,17 +143,13 @@ export function* bulkUpdateAccountSubAccountsTask(id: number, changes: Table.Row
   }
 }
 
-export function* bulkCreateAccountSubAccountsTask(
-  id: number,
-  budgetId: number,
-  rows: Table.SubAccountRow[]
-): SagaIterator {
+export function* bulkCreateAccountSubAccountsTask(id: number, rows: Table.SubAccountRow[]): SagaIterator {
   const requestPayload: Http.ISubAccountPayload[] = map(rows, (row: Table.SubAccountRow) =>
     SubAccountMapping.postPayload(row)
   );
   yield put(creatingSubAccountAction(true));
   try {
-    const subaccounts: ISubAccount[] = yield call(bulkCreateAccountSubAccounts, id, budgetId, requestPayload);
+    const subaccounts: ISubAccount[] = yield call(bulkCreateAccountSubAccounts, id, requestPayload);
     for (let i = 0; i < subaccounts.length; i++) {
       // It is not ideal that we have to do this, but we have no other way to map a placeholder
       // to the returned SubAccount when bulk creating.  We can rely on the identifier field being
@@ -266,7 +262,7 @@ export function* handleAccountBulkUpdateTask(action: Redux.IAction<Table.RowChan
       yield fork(bulkUpdateAccountSubAccountsTask, accountId, mergedUpdates);
     }
     if (placeholdersToCreate.length !== 0) {
-      yield fork(bulkCreateAccountSubAccountsTask, accountId, budgetId, placeholdersToCreate);
+      yield fork(bulkCreateAccountSubAccountsTask, accountId, placeholdersToCreate);
     }
   }
 }
