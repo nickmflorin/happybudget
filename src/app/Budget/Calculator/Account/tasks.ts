@@ -300,7 +300,6 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
             const response: ISubAccount = yield call(
               createAccountSubAccount,
               accountId,
-              budgetId,
               SubAccountMapping.postPayload(updatedRow)
             );
             yield put(activatePlaceholderAction({ id: placeholder.id, model: response }));
@@ -351,7 +350,7 @@ export function* getSubAccountsTask(action: Redux.IAction<null>): SagaIterator {
   if (!isNil(budgetId) && !isNil(accountId)) {
     yield put(loadingSubAccountsAction(true));
     try {
-      const response: Http.IListResponse<ISubAccount> = yield call(getAccountSubAccounts, accountId, budgetId, {
+      const response: Http.IListResponse<ISubAccount> = yield call(getAccountSubAccounts, accountId, {
         no_pagination: true
       });
       yield put(responseSubAccountsAction(response));

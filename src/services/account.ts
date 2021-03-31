@@ -60,21 +60,19 @@ export const bulkCreateAccountSubAccounts = async (
 
 export const getAccountSubAccounts = async (
   accountId: number,
-  budgetId: number,
   query: Http.IListQuery = {},
   options: Http.IRequestOptions = {}
 ): Promise<Http.IListResponse<ISubAccount>> => {
-  const url = URL.v1("budgets", budgetId, "accounts", accountId, "subaccounts");
+  const url = URL.v1("accounts", accountId, "subaccounts");
   return client.list<ISubAccount>(url, query, options);
 };
 
 export const createAccountSubAccount = async (
   accountId: number,
-  budgetId: number,
   payload: Http.ISubAccountPayload,
   options: Http.IRequestOptions = {}
 ): Promise<ISubAccount> => {
-  const url = URL.v1("budgets", budgetId, "accounts", accountId, "subaccounts");
+  const url = URL.v1("accounts", accountId, "subaccounts");
   return client.post<ISubAccount>(url, payload, options);
 };
 

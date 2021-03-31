@@ -25,7 +25,7 @@ export const getAccountSubAccountsHistory = async (
   query: Http.IListQuery = {},
   options: Http.IRequestOptions = {}
 ): Promise<Http.IListResponse<HistoryEvent>> => {
-  const url = URL.v1("budgets", budgetId, "accounts", accountId, "subaccounts", "history");
+  const url = URL.v1("accounts", accountId, "subaccounts", "history");
   return client.list<HistoryEvent>(url, query, options);
 };
 
