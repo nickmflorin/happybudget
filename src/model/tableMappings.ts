@@ -72,7 +72,8 @@ class Mapping<
       children: [],
       errors: [],
       label: "Placeholder",
-      typeLabel: this.typeLabel
+      typeLabel: this.typeLabel,
+      fieldsLoading: []
     };
     const obj: { [key: string]: any } = {
       id: generateRandomNumericId(),
@@ -96,6 +97,7 @@ class Mapping<
       errors: [],
       label: this.labelGetter(model),
       typeLabel: this.typeLabel,
+      fieldsLoading: [],
       ...meta
     };
     const obj: { [key: string]: any } = {

@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { call, put, select, all, fork } from "redux-saga/effects";
+import { CallEffect, call, put, select, all, fork } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountMapping } from "model/tableMappings";
@@ -22,6 +22,8 @@ import {
   bulkCreateAccountSubAccounts
 } from "services";
 import { handleTableErrors } from "store/tasks";
+import { loadingBudgetAction } from "../../actions";
+import { getBudgetTask } from "../../tasks";
 import {
   loadingAccountAction,
   responseAccountAction,
@@ -108,25 +110,41 @@ export function* deleteSubAccountTask(id: number): SagaIterator {
 }
 
 export function* updateSubAccountTask(id: number, change: Table.RowChange): SagaIterator {
+  // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
+  // otherwise, the loading indicators will not appear until `yield call(getBudgetTask)`, and there
+  // is a lag between the time that this task is called and that task is called.
+  yield put(loadingBudgetAction(true));
   yield put(updatingSubAccountAction({ id, value: true }));
-  const requestPayload = SubAccountMapping.patchPayload(change);
+  let success = true;
   try {
-    yield call(updateSubAccount, id, requestPayload);
+    yield call(updateSubAccount, id, SubAccountMapping.patchPayload(change));
   } catch (e) {
+    success = false;
+    yield put(loadingBudgetAction(false));
     yield call(handleTableErrors, e, "There was an error updating the sub account.", id, (errors: Table.CellError[]) =>
       addErrorsToStateAction(errors)
     );
   } finally {
     yield put(updatingSubAccountAction({ id, value: false }));
   }
+  if (success === true) {
+    yield call(getBudgetTask);
+  }
 }
 
 export function* createSubAccountTask(id: number, row: Table.SubAccountRow): SagaIterator {
   yield put(creatingSubAccountAction(true));
+  // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
+  // otherwise, the loading indicators will not appear until `yield call(getBudgetTask)`, and there
+  // is a lag between the time that this task is called and that task is called.
+  yield put(loadingBudgetAction(true));
+  let success = true;
   try {
     const response: ISubAccount = yield call(createAccountSubAccount, id, SubAccountMapping.postPayload(row));
     yield put(activatePlaceholderAction({ id: row.id, model: response }));
   } catch (e) {
+    success = false;
+    yield put(loadingBudgetAction(false));
     yield call(
       handleTableErrors,
       e,
@@ -136,6 +154,9 @@ export function* createSubAccountTask(id: number, row: Table.SubAccountRow): Sag
     );
   } finally {
     yield put(creatingSubAccountAction(false));
+  }
+  if (success === true) {
+    yield call(getBudgetTask);
   }
 }
 
@@ -261,12 +282,15 @@ export function* handleAccountBulkUpdateTask(action: Redux.IAction<Table.RowChan
         mergedUpdates.push(merged[i]);
       }
     }
+    const effects: CallEffect[] = [];
     if (mergedUpdates.length !== 0) {
-      yield fork(bulkUpdateAccountSubAccountsTask, accountId, mergedUpdates);
+      effects.push(call(bulkUpdateAccountSubAccountsTask, accountId, mergedUpdates));
     }
     if (placeholdersToCreate.length !== 0) {
-      yield fork(bulkCreateAccountSubAccountsTask, accountId, placeholdersToCreate);
+      effects.push(call(bulkCreateAccountSubAccountsTask, accountId, placeholdersToCreate));
     }
+    yield all(effects);
+    yield call(getBudgetTask);
   }
 }
 

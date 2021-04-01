@@ -146,7 +146,6 @@ export const createListResponseReducer = <
             selected.push(id);
           } else {
             /* eslint-disable no-console */
-            console.log(Options);
             console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${id} not in state!`);
           }
         });
@@ -157,7 +156,6 @@ export const createListResponseReducer = <
           return { selected: [...st.selected, payload] };
         } else {
           /* eslint-disable no-console */
-          console.log(Options);
           console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
           return {};
         }

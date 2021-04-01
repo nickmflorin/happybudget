@@ -13,7 +13,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { floatValueSetter, integerValueSetter } from "util/table";
 
 import BudgetTable from "../../BudgetTable";
-import { selectBudgetId, selectBudgetDetail } from "../../selectors";
+import { selectBudgetId, selectBudgetDetail, selectBudgetDetailLoading } from "../../selectors";
 import {
   setSubAccountsSearchAction,
   selectSubAccountAction,
@@ -72,6 +72,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const budgetDetail = useSelector(selectBudgetDetail);
   const groups = useSelector(selectGroups);
+  const loadingBudget = useSelector(selectBudgetDetailLoading);
 
   return (
     <React.Fragment>
@@ -87,6 +88,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         placeholders={placeholders}
         mapping={SubAccountMapping}
         selected={selected}
+        loadingBudget={loadingBudget}
         identifierField={"identifier"}
         identifierFieldHeader={"Line"}
         tableFooterIdentifierValue={!isNil(subaccountDetail) ? `${subaccountDetail.identifier} Total` : "Total"}

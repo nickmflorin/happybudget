@@ -17,6 +17,7 @@ namespace Table {
     readonly children: C[];
     readonly label: string;
     readonly typeLabel: string;
+    readonly fieldsLoading: string[];
   }
 
   interface PageAndSize {

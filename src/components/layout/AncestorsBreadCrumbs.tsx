@@ -3,8 +3,7 @@ import { useHistory } from "react-router-dom";
 import { map, isNil } from "lodash";
 import classNames from "classnames";
 
-import { Spin, Select } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
+import { Select } from "antd";
 
 import "./AncestorsBreadCrumbs.scss";
 

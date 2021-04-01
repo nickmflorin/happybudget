@@ -6,22 +6,22 @@ import { getBudgetTask } from "./tasks";
 function* watchForRequestBudgetSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Budget.Request);
+    yield take(ActionType.Budget.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(getBudgetTask, action);
+    lastTasks = yield call(getBudgetTask);
   }
 }
 
 function* watchForBudgetIdChangedSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Budget.SetId);
+    yield take(ActionType.Budget.SetId);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(getBudgetTask, action);
+    lastTasks = yield call(getBudgetTask);
   }
 }
 

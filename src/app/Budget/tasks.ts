@@ -5,7 +5,7 @@ import { handleRequestError } from "api";
 import { getBudget } from "services";
 import { loadingBudgetAction, responseBudgetAction } from "./actions";
 
-export function* getBudgetTask(action: Redux.IAction<null>): SagaIterator {
+export function* getBudgetTask(): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     yield put(loadingBudgetAction(true));

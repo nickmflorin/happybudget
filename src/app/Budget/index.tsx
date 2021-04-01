@@ -16,13 +16,13 @@ import {
   faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 
-import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
+import { RenderIfValidId } from "components/display";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
 import { componentLoader } from "operational";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./actions";
-import { selectBudgetDetailLoading } from "./selectors";
+
 import "./index.scss";
 
 const Calculator = React.lazy(() => componentLoader(() => import("./Calculator")));
@@ -41,7 +41,6 @@ const Budget = (): JSX.Element => {
 
   const ancestors = useSelector(selectAncestors);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
-  const budgetLoading = useSelector(selectBudgetDetailLoading);
 
   useEffect(() => {
     if (!isNaN(parseInt(budgetId))) {
@@ -134,14 +133,12 @@ const Budget = (): JSX.Element => {
       ]}
     >
       <RenderIfValidId id={[budgetId]}>
-        <WrapInApplicationSpinner loading={budgetLoading}>
-          <div className={"budget"}>
-            <Switch>
-              <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
-              <Route path={"/budgets/:budgetId"} component={Calculator} />
-            </Switch>
-          </div>
-        </WrapInApplicationSpinner>
+        <div className={"budget"}>
+          <Switch>
+            <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
+            <Route path={"/budgets/:budgetId"} component={Calculator} />
+          </Switch>
+        </div>
       </RenderIfValidId>
     </Layout>
   );

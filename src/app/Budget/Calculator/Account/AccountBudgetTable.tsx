@@ -13,7 +13,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { floatValueSetter, integerValueSetter } from "util/table";
 
 import BudgetTable from "../../BudgetTable";
-import { selectBudgetId, selectBudgetDetail } from "../../selectors";
+import { selectBudgetId, selectBudgetDetail, selectBudgetDetailLoading } from "../../selectors";
 import {
   addPlaceholdersToStateAction,
   deselectSubAccountAction,
@@ -72,6 +72,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
   const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
   const budgetDetail = useSelector(selectBudgetDetail);
+  const loadingBudget = useSelector(selectBudgetDetailLoading);
   const groups = useSelector(selectGroups);
 
   return (
@@ -88,6 +89,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         placeholders={placeholders}
         mapping={SubAccountMapping}
         selected={selected}
+        loadingBudget={loadingBudget}
         identifierField={"identifier"}
         identifierFieldHeader={"Line"}
         tableFooterIdentifierValue={!isNil(accountDetail) ? `${accountDetail.identifier} Total` : "Total"}

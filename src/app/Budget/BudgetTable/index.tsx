@@ -50,18 +50,6 @@ import "./index.scss";
 
 export * from "./model";
 
-const actionCell = (col: ColDef): ColDef => {
-  return {
-    editable: false,
-    headerName: "",
-    width: 25,
-    maxWidth: 30,
-    resizable: false,
-    cellClass: classNames("cell--action", "cell--not-editable"),
-    ...col
-  };
-};
-
 const BudgetTable = <
   R extends Table.Row<G, C>,
   M extends Model,
@@ -79,6 +67,7 @@ const BudgetTable = <
   mapping,
   search,
   loading,
+  loadingBudget,
   saving,
   frameworkComponents = {},
   exportFileName,
@@ -115,6 +104,8 @@ const BudgetTable = <
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [budgetFooterGridApi, setBudgetFooterGridApi] = useState<GridApi | undefined>(undefined);
+  const [budgetFooterColDefs, setBudgetFooterColDefs] = useState<ColDef[]>([]);
   const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [gridOptions, setGridOptions] = useState<GridOptions>({
@@ -173,6 +164,7 @@ const BudgetTable = <
   });
 
   const onBudgetFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
+    setBudgetFooterGridApi(event.api);
     setBudgetFooterColumnApi(event.columnApi);
   });
 
@@ -181,6 +173,109 @@ const BudgetTable = <
     setBudgetFooterGridOptions({ ...budgetFooterGridOptions, alignedGrids: [gridOptions, tableFooterGridOptions] });
     setTableFooterGridOptions({ ...tableFooterGridOptions, alignedGrids: [gridOptions, budgetFooterGridOptions] });
   }, []);
+
+  // TODO: It might make more sense to just treat all of the cells corresponding
+  // to the calculatedColumns as non-editable.
+  const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
+    if (includes(["delete", "index", "expand"], colDef.field)) {
+      return false;
+    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
+      return false;
+    } else if (!isNil(nonEditableCells) && includes(nonEditableCells, colDef.field as keyof R)) {
+      return false;
+    } else if (
+      includes(
+        map(calculatedColumns, (col: ColDef) => col.field),
+        colDef.field
+      )
+    ) {
+      return false;
+    } else if (!isNil(isCellEditable)) {
+      return isCellEditable(row, colDef);
+    }
+    return true;
+  });
+
+  const _isCellNonEditableHighlight = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
+    if (includes(["delete", "index", "expand"], colDef.field)) {
+      return false;
+    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter === true) {
+      return false;
+    } else if (!_isCellEditable(row, colDef)) {
+      if (!isNil(nonHighlightedNonEditableCells)) {
+        return !includes(nonHighlightedNonEditableCells, colDef.field as keyof R);
+      } else if (!isNil(highlightedNonEditableCells)) {
+        return includes(highlightedNonEditableCells, colDef.field as keyof R);
+      } else if (!isNil(highlightNonEditableCell)) {
+        return highlightNonEditableCell(row, colDef);
+      }
+      return true;
+    }
+    return false;
+  });
+
+  const actionCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef => {
+      return {
+        editable: false,
+        headerName: "",
+        width: 25,
+        maxWidth: 30,
+        resizable: false,
+        cellClass: classNames("cell--action", "cell--not-editable"),
+        ...col
+      };
+    }
+  );
+
+  const calculatedCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef => {
+      return {
+        cellRenderer: "CalculatedCell",
+        minWidth: 100,
+        maxWidth: 125,
+        cellStyle: { textAlign: "right" },
+        cellRendererParams: { formatter: formatCurrencyWithoutDollarSign, renderRedIfNegative: true },
+        ...col
+      };
+    }
+  );
+
+  const bodyCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef => {
+      return {
+        cellRenderer: "ValueCell",
+        ...col
+      };
+    }
+  );
+
+  const universalCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef => {
+      return {
+        ...col,
+        suppressMenu: true,
+        editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
+        cellClass: (params: CellClassParams) => {
+          const row: R = params.node.data;
+          let rootClassNames = undefined;
+          if (!isNil(col.cellClass)) {
+            if (typeof col.cellClass === "string" || Array.isArray(col.cellClass)) {
+              rootClassNames = col.cellClass;
+            } else {
+              rootClassNames = col.cellClass(params);
+            }
+          }
+          // TODO: See if we can move some of these to their specific column
+          // definitions in the map() above.
+          return classNames(col.cellClass, rootClassNames, {
+            "cell--not-editable": !_isCellEditable(row, params.colDef),
+            "cell--not-editable-highlight": _isCellNonEditableHighlight(row, params.colDef)
+          });
+        }
+      };
+    }
+  );
 
   const baseColumns = useMemo((): ColDef[] => {
     let baseLeftColumns: ColDef[] = [
@@ -240,46 +335,6 @@ const BudgetTable = <
     identifierFieldParams
   ]);
 
-  // TODO: It might make more sense to just treat all of the cells corresponding
-  // to the calculatedColumns as non-editable.
-  const _isCellEditable = useDynamicCallback((row: R, colDef: ColDef): boolean => {
-    if (includes(["delete", "select", "expand"], colDef.field)) {
-      return false;
-    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
-      return false;
-    } else if (!isNil(nonEditableCells) && includes(nonEditableCells, colDef.field as keyof R)) {
-      return false;
-    } else if (
-      includes(
-        map(calculatedColumns, (col: ColDef) => col.field),
-        colDef.field
-      )
-    ) {
-      return false;
-    } else if (!isNil(isCellEditable)) {
-      return isCellEditable(row, colDef);
-    }
-    return true;
-  });
-
-  const _isCellNonEditableHighlight = useDynamicCallback((row: R, colDef: ColDef): boolean => {
-    if (includes(["delete", "select", "expand"], colDef.field)) {
-      return false;
-    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter === true) {
-      return false;
-    } else if (!_isCellEditable(row, colDef)) {
-      if (!isNil(nonHighlightedNonEditableCells)) {
-        return !includes(nonHighlightedNonEditableCells, colDef.field as keyof R);
-      } else if (!isNil(highlightedNonEditableCells)) {
-        return includes(highlightedNonEditableCells, colDef.field as keyof R);
-      } else if (!isNil(highlightNonEditableCell)) {
-        return highlightNonEditableCell(row, colDef);
-      }
-      return true;
-    }
-    return false;
-  });
-
   const createGroupFooter = (group: G): R => {
     const footerObj: { [key: string]: any } = {
       id: hashString(group.name),
@@ -338,6 +393,10 @@ const BudgetTable = <
 
   const budgetFooter = useMemo((): R | null => {
     if (!isNil(budgetTotals)) {
+      let fieldsLoading: string[] = [];
+      if (loadingBudget === true) {
+        fieldsLoading = map(calculatedColumns, (col: ColDef) => col.field) as string[];
+      }
       const footerObj: { [key: string]: any } = {
         id: hashString("budgetfooter"),
         [identifierField]: budgetFooterIdentifierValue,
@@ -348,7 +407,8 @@ const BudgetTable = <
           isBudgetFooter: true,
           selected: false,
           children: [],
-          errors: []
+          errors: [],
+          fieldsLoading
         }
       };
       forEach(bodyColumns, (col: ColDef) => {
@@ -364,7 +424,7 @@ const BudgetTable = <
       return footerObj as R;
     }
     return null;
-  }, [useDeepEqualMemo(budgetTotals), budgetFooterIdentifierValue]);
+  }, [useDeepEqualMemo(budgetTotals), budgetFooterIdentifierValue, loadingBudget]);
 
   /**
    * Starting at the provided index, either traverses the table upwards or downwards
@@ -640,7 +700,6 @@ const BudgetTable = <
   // This is important for placeholders when they are activated and removed!
   useEffect(() => {
     const newTable: R[] = [];
-
     const getGroupForModel = (model: M): number | null => {
       const group: G | undefined = find(groups, (g: G) =>
         includes(
@@ -702,49 +761,65 @@ const BudgetTable = <
   }, [search, gridApi]);
 
   useEffect(() => {
-    // Changes to the selected rows and other possible HTML based cells do not trigger
-    // refreshes via AGGrid because AGGrid cannot detect changes to these HTML
-    // based cells.  Therefore, we must trigger the refresh manually.
-    if (!isNil(gridApi)) {
+    if (!isNil(gridApi) && !isNil(rowRefreshRequired)) {
       gridApi.forEachNode((node: RowNode) => {
-        if (node.group === false) {
-          const existing: R | undefined = find(table, { id: node.data.id });
-          if (!isNil(existing)) {
-            if (
-              existing.meta.selected !== node.data.meta.selected ||
-              (!isNil(rowRefreshRequired) && rowRefreshRequired(existing, node.data))
-            ) {
-              gridApi.refreshCells({ force: true, rowNodes: [node] });
+        const existing: R | undefined = find(table, { id: node.data.id });
+        if (!isNil(existing)) {
+          // TODO: We should figure out how to configure the API to just refresh the row at the
+          // relevant column.
+          if (rowRefreshRequired(existing, node.data)) {
+            gridApi.refreshCells({ force: true, rowNodes: [node] });
+          }
+        }
+      });
+    }
+  }, [useDeepEqualMemo(table), gridApi, rowRefreshRequired]);
+
+  useEffect(() => {
+    // Changes to the state of the selected rows does not trigger a refresh of those cells via AG
+    // Grid because AG Grid cannot detect changes to the values of cells when the cell is HTML based.
+    if (!isNil(gridApi) && !isNil(columnApi)) {
+      gridApi.forEachNode((node: RowNode) => {
+        const existing: R | undefined = find(table, { id: node.data.id });
+        if (!isNil(existing)) {
+          if (existing.meta.selected !== node.data.meta.selected) {
+            const cols = columnApi.getAllColumns();
+            const selectCol = find(cols, (col: Column) => {
+              const def = col.getColDef();
+              if (def.field === "index") {
+                return true;
+              }
+              return false;
+            });
+            if (!isNil(selectCol)) {
+              gridApi.refreshCells({ force: true, rowNodes: [node], columns: [selectCol] });
             }
           }
         }
       });
     }
-  }, [useDeepEqualMemo(table), gridApi]);
+  }, [useDeepEqualMemo(table), gridApi, columnApi]);
 
   useEffect(() => {
-    // Changes to the errors in the rows does not trigger a refresh of those cells
-    // via AGGridReact because AGGridReact cannot detect changes in that type of
-    // data structure for the row.
+    // Changes to the errors in the rows does not trigger a refresh of those cells via AG Grid
+    // because AG Grid cannot detect changes in that type of data structure for the row.
     if (!isNil(gridApi) && !isNil(columnApi)) {
       gridApi.forEachNode((node: RowNode) => {
-        if (node.group === false) {
-          const existing: R | undefined = find(table, { id: node.data.id });
-          if (!isNil(existing)) {
-            // TODO: We might want to do a deeper comparison in the future here.
-            if (existing.meta.errors.length !== node.data.meta.errors.length) {
-              const cols = columnApi.getAllColumns();
-              forEach(cols, (col: Column) => {
-                const colDef = col.getColDef();
-                if (!isNil(colDef.field)) {
-                  const cellErrors = filter(existing.meta.errors, { id: node.data.id, field: colDef.field });
-                  if (cellErrors.length !== 0) {
-                    col.setColDef({ ...colDef, cellClass: "cell--error" }, null);
-                    gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] });
-                  }
+        const existing: R | undefined = find(table, { id: node.data.id });
+        if (!isNil(existing)) {
+          // TODO: We might want to do a deeper comparison in the future here.
+          if (existing.meta.errors.length !== node.data.meta.errors.length) {
+            const cols = columnApi.getAllColumns();
+            forEach(cols, (col: Column) => {
+              const colDef = col.getColDef();
+              if (!isNil(colDef.field)) {
+                const cellErrors = filter(existing.meta.errors, { id: node.data.id, field: colDef.field });
+                if (cellErrors.length !== 0) {
+                  col.setColDef({ ...colDef, cellClass: "cell--error" }, null);
+                  gridApi.refreshCells({ force: true, rowNodes: [node], columns: [col] });
                 }
-              });
-            }
+              }
+            });
           }
         }
       });
@@ -766,50 +841,23 @@ const BudgetTable = <
       map(
         concat(
           baseColumns,
-          map(
-            bodyColumns,
-            (def: ColDef) =>
-              ({
-                cellRenderer: "ValueCell",
-                ...def
-              } as ColDef)
-          ),
-          map(
-            calculatedColumns,
-            (def: ColDef) =>
-              ({
-                cellRenderer: "CalculatedCell",
-                minWidth: 100,
-                maxWidth: 125,
-                cellStyle: { textAlign: "right" },
-                cellRendererParams: { formatter: formatCurrencyWithoutDollarSign, renderRedIfNegative: true },
-                ...def
-              } as ColDef)
-          )
+          map(bodyColumns, (def: ColDef) => bodyCell(def)),
+          map(calculatedColumns, (def: ColDef) => calculatedCell(def))
         ),
-        (col: ColDef) => ({
-          ...col,
-          suppressMenu: true,
-          suppressMenuHide: true,
-          editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
-          cellClass: (params: CellClassParams) => {
-            const row: R = params.node.data;
-            let rootClassNames = undefined;
-            if (!isNil(col.cellClass)) {
-              if (typeof col.cellClass === "string" || Array.isArray(col.cellClass)) {
-                rootClassNames = col.cellClass;
-              } else {
-                rootClassNames = col.cellClass(params);
-              }
-            }
-            // TODO: See if we can move some of these to their specific column
-            // definitions in the map() above.
-            return classNames(col.cellClass, rootClassNames, {
-              "cell--not-editable": !_isCellEditable(row, params.colDef),
-              "cell--not-editable-highlight": _isCellNonEditableHighlight(row, params.colDef)
-            });
-          }
-        })
+        (col: ColDef) => universalCell(col)
+      )
+    );
+  }, [useDeepEqualMemo(bodyColumns), useDeepEqualMemo(calculatedColumns)]);
+
+  useEffect(() => {
+    setBudgetFooterColDefs(
+      map(
+        concat(
+          baseColumns,
+          map(bodyColumns, (def: ColDef) => bodyCell(def)),
+          map(calculatedColumns, (def: ColDef) => calculatedCell(def))
+        ),
+        (col: ColDef) => universalCell(col)
       )
     );
   }, [useDeepEqualMemo(bodyColumns), useDeepEqualMemo(calculatedColumns)]);
@@ -986,7 +1034,7 @@ const BudgetTable = <
             <div className={"budget-footer-grid"}>
               <AgGridReact
                 {...budgetFooterGridOptions}
-                columnDefs={colDefs}
+                columnDefs={budgetFooterColDefs}
                 rowData={[budgetFooter]}
                 rowClass={"row--budget-footer"}
                 suppressRowClickSelection={true}

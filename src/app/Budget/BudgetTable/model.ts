@@ -38,6 +38,7 @@ export interface BudgetTableProps<
   budgetTotals?: { [key: string]: any };
   search: string;
   saving: boolean;
+  loadingBudget?: boolean;
   frameworkComponents?: { [key: string]: any };
   getExportValue?: ExportValueGetters;
   exportFileName?: string;

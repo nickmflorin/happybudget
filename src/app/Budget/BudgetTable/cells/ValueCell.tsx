@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
-import { isNil } from "lodash";
+import { isNil, includes } from "lodash";
 
-import { ICellRendererParams } from "ag-grid-community";
+import { ICellRendererParams, RowNode, ColDef } from "ag-grid-community";
+import LoadableCellWrapper from "./LoadableCellWrapper";
 
 interface ValueCellProps extends ICellRendererParams {
   value: string | number | null;
   formatter?: (value: string | number) => string | number | null;
+  node: RowNode;
+  colDef: ColDef;
 }
 
-const ValueCell = ({ value, formatter }: ValueCellProps): JSX.Element => {
+const ValueCell = <R extends Table.Row<any, any>>({ value, node, colDef, formatter }: ValueCellProps): JSX.Element => {
   const [cellValue, setCellValue] = useState<string | number | null>(null);
-
   useEffect(() => {
     if (!isNil(value)) {
       if (!isNil(formatter)) {
@@ -23,7 +25,10 @@ const ValueCell = ({ value, formatter }: ValueCellProps): JSX.Element => {
     }
   }, [value, formatter]);
 
-  return <span>{cellValue}</span>;
+  const row: R = node.data;
+  return (
+    <LoadableCellWrapper loading={includes(row.meta.fieldsLoading, colDef.field)}>{cellValue}</LoadableCellWrapper>
+  );
 };
 
 export default ValueCell;

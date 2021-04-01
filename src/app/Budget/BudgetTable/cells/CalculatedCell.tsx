@@ -1,16 +1,25 @@
 import { useMemo, useState, useEffect } from "react";
 import classNames from "classnames";
-import { isNil } from "lodash";
+import { isNil, includes } from "lodash";
 
-import { ICellRendererParams } from "ag-grid-community";
+import { ICellRendererParams, RowNode, ColDef } from "ag-grid-community";
+import LoadableCellWrapper from "./LoadableCellWrapper";
 
 interface CalculatedCellProps extends ICellRendererParams {
   value: string | number | null;
   formatter?: (value: string | number) => string | number | null;
   renderRedIfNegative?: boolean;
+  node: RowNode;
+  colDef: ColDef;
 }
 
-const CalculatedCell = ({ value, renderRedIfNegative = false, formatter }: CalculatedCellProps): JSX.Element => {
+const CalculatedCell = <R extends Table.Row<any, any>>({
+  value,
+  node,
+  colDef,
+  renderRedIfNegative = false,
+  formatter
+}: CalculatedCellProps): JSX.Element => {
   const [cellValue, setCellValue] = useState<string | number | null>(null);
 
   const renderRed = useMemo(() => {
@@ -40,7 +49,12 @@ const CalculatedCell = ({ value, renderRedIfNegative = false, formatter }: Calcu
     }
   }, [value, formatter]);
 
-  return <span className={classNames({ "color--red": renderRed })}>{cellValue}</span>;
+  const row: R = node.data;
+  return (
+    <LoadableCellWrapper loading={includes(row.meta.fieldsLoading, colDef.field)}>
+      <span className={classNames({ "color--red": renderRed })}>{cellValue}</span>
+    </LoadableCellWrapper>
+  );
 };
 
 export default CalculatedCell;

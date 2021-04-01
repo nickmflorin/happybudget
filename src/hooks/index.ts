@@ -3,10 +3,11 @@ import { isEqual } from "lodash";
 
 export * from "./ui";
 
-export const useDynamicCallback = (callback: any) => {
+export const useDynamicCallback = <T = any>(callback: (...args: any[]) => T) => {
   const ref = useRef<any>();
   ref.current = callback;
-  return useCallback((...args) => ref.current.apply(this, args), []);
+  const func: (...args: any[]) => T = (...args: any[]) => ref.current.apply(this, args);
+  return useCallback(func, []);
 };
 
 export function useDeepEqualMemo<T>(value: T) {
