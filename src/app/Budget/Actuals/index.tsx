@@ -175,9 +175,7 @@ const Actuals = (): JSX.Element => {
           {
             field: "payment_id",
             headerName: "Payment ID"
-          }
-        ]}
-        calculatedColumns={[
+          },
           {
             field: "value",
             headerName: "Actual"
