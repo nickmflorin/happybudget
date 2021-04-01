@@ -52,7 +52,8 @@ const SubAccount = (): JSX.Element => {
             {
               id: detail.id,
               identifier: detail.identifier,
-              type: "subaccount"
+              type: "subaccount",
+              siblings: detail.siblings
             }
           ])
         )

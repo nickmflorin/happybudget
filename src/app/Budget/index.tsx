@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Route, Switch, useHistory, useLocation, useParams } from "react-router-dom";
-import { createSelector } from "reselect";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -29,19 +28,6 @@ import "./index.scss";
 const Calculator = React.lazy(() => componentLoader(() => import("./Calculator")));
 const Actuals = React.lazy(() => componentLoader(() => import("./Actuals")));
 
-const selectSubAccountDetailLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.subaccount.detail.loading
-);
-const selectAccountDetailLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.detail.loading
-);
-const selectAncestorsLoading = createSelector(
-  selectSubAccountDetailLoading,
-  selectAccountDetailLoading,
-  selectBudgetDetailLoading,
-  (subaccountDetailLoading: boolean, accountDetailLoading: boolean, budgetDetailLoading: boolean) =>
-    subaccountDetailLoading || accountDetailLoading || budgetDetailLoading
-);
 const selectCommentsHistoryDrawerOpen = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
 );
@@ -55,7 +41,6 @@ const Budget = (): JSX.Element => {
 
   const ancestors = useSelector(selectAncestors);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
-  const ancestorsLoading = useSelector(selectAncestorsLoading);
   const budgetLoading = useSelector(selectBudgetDetailLoading);
 
   useEffect(() => {
@@ -70,9 +55,7 @@ const Budget = (): JSX.Element => {
       includeFooter={false}
       headerProps={{ style: { height: 70 + 36 } }}
       contentProps={{ style: { marginTop: 70 + 36 + 10, height: "calc(100vh - 116px)" } }}
-      breadcrumbs={
-        <AncestorsBreadCrumbs loading={ancestorsLoading} ancestors={ancestors} budgetId={parseInt(budgetId)} />
-      }
+      breadcrumbs={<AncestorsBreadCrumbs ancestors={ancestors} budgetId={parseInt(budgetId)} />}
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faRobot} />,

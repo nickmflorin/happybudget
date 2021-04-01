@@ -50,7 +50,8 @@ const Account = (): JSX.Element => {
             {
               id: detail.id,
               identifier: detail.identifier,
-              type: "account"
+              type: "account",
+              siblings: detail.siblings
             }
           ])
         )

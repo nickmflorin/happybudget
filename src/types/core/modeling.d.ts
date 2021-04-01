@@ -95,9 +95,10 @@ interface IBudget extends Model {
 }
 
 interface IAncestor {
-  id: number;
-  identifier: string;
-  type: EntityType;
+  readonly id: number;
+  readonly identifier: string;
+  readonly type: EntityType;
+  readonly siblings?: IBudgetItem[];
 }
 
 interface ISimpleBudgetItem extends Model {
@@ -132,6 +133,7 @@ interface IAccount extends IBudgetItem, TrackedModel {
   readonly subaccounts: ISimpleSubAccount[];
   readonly type: "account";
   readonly group: number | null;
+  readonly siblings: IBudgetItem[];
 }
 
 interface ISimpleAccount extends ISimpleBudgetItem {}
@@ -158,6 +160,7 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
   readonly group: number | null;
+  readonly siblings: IBudgetItem[];
 }
 
 interface IActual extends TrackedModel {

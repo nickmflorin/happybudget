@@ -1,31 +1,55 @@
-import { ReactNode } from "react";
+import { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { map, isNil } from "lodash";
 import classNames from "classnames";
 
-import { Spin } from "antd";
+import { Spin, Select } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFileExcel } from "@fortawesome/free-regular-svg-icons";
 
 import "./AncestorsBreadCrumbs.scss";
 
 interface AncestorBreadCrumbItemProps {
-  children: ReactNode;
-  url: string;
+  ancestor: IAncestor;
+  budgetId: number;
   last: boolean;
-  icon?: ReactNode;
 }
 
-const AncestorBreadCrumbItem = ({ url, children, icon, last }: AncestorBreadCrumbItemProps): JSX.Element => {
-  const history = useHistory();
+const AncestorBreadCrumbItem = ({ budgetId, ancestor, last }: AncestorBreadCrumbItemProps): JSX.Element => {
+  /* eslint-disable indent */
+  const URL = useMemo(() => {
+    return ancestor.type === "subaccount"
+      ? `/budgets/${budgetId}/subaccounts/${ancestor.id}`
+      : ancestor.type === "account"
+      ? `/budgets/${budgetId}/accounts/${ancestor.id}`
+      : `/budgets/${budgetId}/accounts`;
+  }, [ancestor, budgetId]);
 
+  const history = useHistory();
+  if (!isNil(ancestor.siblings)) {
+    return (
+      <div className={classNames("ancestors-bread-crumb-item", { last })}>
+        <div className={"select-wrapper"}>
+          <Select className={"select--ancestor"} value={ancestor.id} bordered={false}>
+            {map(ancestor.siblings, (sibling: IBudgetItem) => {
+              return (
+                <Select.Option value={sibling.id}>
+                  <div className={"select-ancestor-option"}>
+                    <span className={"identifier"}>{sibling.identifier}</span>
+                    <span className={"description"}>{sibling.description}</span>
+                  </div>
+                </Select.Option>
+              );
+            })}
+          </Select>
+        </div>
+        {last === false && <span className={"slash"}>{"/"}</span>}
+      </div>
+    );
+  }
   return (
-    <div className={classNames("ancestors-bread-crumb-item", { last })} onClick={() => history.push(url)}>
-      {!isNil(icon) && <div className={"icon-wrapper"}>{icon}</div>}
+    <div className={classNames("ancestors-bread-crumb-item", { last })} onClick={() => history.push(URL)}>
       <div className={"content-wrapper"}>
-        {children}
+        {ancestor.identifier}
         {last === false && <span className={"slash"}>{"/"}</span>}
       </div>
     </div>
@@ -35,18 +59,9 @@ const AncestorBreadCrumbItem = ({ url, children, icon, last }: AncestorBreadCrum
 interface AncestorsBreadCrumbsProps {
   ancestors: IAncestor[];
   budgetId: number;
-  loading: boolean;
 }
 
-const PrimaryAncestorIcon = ({ loading }: { loading: boolean }): JSX.Element => {
-  const loadingIcon = <LoadingOutlined spin />;
-  if (loading === false) {
-    return <FontAwesomeIcon icon={faFileExcel} />;
-  }
-  return <Spin className={"ancestor-spinner"} indicator={loadingIcon} size={"small"} />;
-};
-
-const AncestorsBreadCrumbs = ({ ancestors, budgetId, loading }: AncestorsBreadCrumbsProps): JSX.Element => {
+const AncestorsBreadCrumbs = ({ ancestors, budgetId }: AncestorsBreadCrumbsProps): JSX.Element => {
   return (
     <div className={"ancestors-bread-crumbs"}>
       {map(ancestors, (ancestor: IAncestor, index: number) => {
@@ -54,18 +69,10 @@ const AncestorsBreadCrumbs = ({ ancestors, budgetId, loading }: AncestorsBreadCr
           /* eslint-disable indent */
           <AncestorBreadCrumbItem
             key={index}
-            url={
-              ancestor.type === "subaccount"
-                ? `/budgets/${budgetId}/subaccounts/${ancestor.id}`
-                : ancestor.type === "account"
-                ? `/budgets/${budgetId}/accounts/${ancestor.id}`
-                : `/budgets/${budgetId}/accounts`
-            }
+            ancestor={ancestor}
+            budgetId={budgetId}
             last={index === ancestors.length - 1}
-            icon={ancestor.type === "budget" ? <PrimaryAncestorIcon loading={loading} /> : undefined}
-          >
-            {ancestor.identifier}
-          </AncestorBreadCrumbItem>
+          />
         );
       })}
     </div>
