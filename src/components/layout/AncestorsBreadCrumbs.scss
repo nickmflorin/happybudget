@@ -45,18 +45,14 @@
       }
     }
 
-    .content-wrapper {
-      line-height: 18px;
+    .text-wrapper {
+      line-height: 19px;
+      font-size: 12px;
       padding-top: 9px;
       padding-bottom: 9px;
       font-family: $noto-sans-jp;
-      font-weight: 400;
       color: $text-secondary;
-
-      .slash {
-        margin-left: 4px;
-        color: $text-primary;
-      }
+      font-weight: 500;
     }
 
     &:hover {
@@ -65,16 +61,24 @@
       }
     }
 
-    &.last {
-      .content-wrapper {
-        color: $text-primary;
+    &.budget-ancestor-bread-crumb-item {
+      .text-wrapper {
+        line-height: 18px;
+        color: $green;
+        font-size: 15px;
         font-family: $noto-sans-jp;
-        font-weight: 600;
+        font-weight: 500;
       }
     }
-
-    &:not(:last-child) {
-      margin-right: 6px;
-    }
   }
+    .slash {
+      padding-top: 9px;
+      padding-bottom: 9px;
+      margin-left: 8px;
+      margin-right: 8px;
+      line-height: 18px;
+      font-family: $noto-sans-jp;
+      font-weight: 600;
+      color: $text-primary;
+    }
 }
