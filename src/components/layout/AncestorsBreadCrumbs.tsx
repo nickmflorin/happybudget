@@ -42,7 +42,6 @@ const AncestorBreadCrumbItem = ({ budgetId, ancestor, last }: AncestorBreadCrumb
                 /* eslint-disable no-console */
                 console.error(`The select value corresponds to a sibling ${value} that is not in state!`);
               } else if (sibling.id !== ancestor.id) {
-                console.log(getUrl(sibling));
                 history.push(getUrl(sibling));
               }
             }}

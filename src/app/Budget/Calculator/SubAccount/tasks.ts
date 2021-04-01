@@ -22,8 +22,7 @@ import {
   bulkCreateSubAccountSubAccounts
 } from "services";
 import { handleTableErrors } from "store/tasks";
-import { loadingBudgetAction } from "../../actions";
-import { getBudgetTask } from "../../tasks";
+import { loadingBudgetAction, requestBudgetAction } from "../../actions";
 import {
   loadingSubAccountAction,
   responseSubAccountAction,
@@ -112,7 +111,7 @@ export function* deleteSubAccountTask(id: number): SagaIterator {
 export function* updateSubAccountTask(id: number, change: Table.RowChange): SagaIterator {
   yield put(updatingSubAccountAction({ id, value: true }));
   // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
-  // otherwise, the loading indicators will not appear until `yield call(getBudgetTask)`, and there
+  // otherwise, the loading indicators will not appear until `yield put(requestBudgetAction)`, and there
   // is a lag between the time that this task is called and that task is called.
   yield put(loadingBudgetAction(true));
   let success = true;
@@ -128,14 +127,14 @@ export function* updateSubAccountTask(id: number, change: Table.RowChange): Saga
     yield put(updatingSubAccountAction({ id, value: false }));
   }
   if (success === true) {
-    yield call(getBudgetTask);
+    yield put(requestBudgetAction());
   }
 }
 
 export function* createSubAccountTask(id: number, row: Table.SubAccountRow): SagaIterator {
   yield put(creatingSubAccountAction(true));
   // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
-  // otherwise, the loading indicators will not appear until `yield call(getBudgetTask)`, and there
+  // otherwise, the loading indicators will not appear until `yield put(requestBudgetAction)`, and there
   // is a lag between the time that this task is called and that task is called.
   yield put(loadingBudgetAction(true));
   let success = true;
@@ -156,7 +155,7 @@ export function* createSubAccountTask(id: number, row: Table.SubAccountRow): Sag
     yield put(creatingSubAccountAction(false));
   }
   if (success === true) {
-    yield call(getBudgetTask);
+    yield put(requestBudgetAction());
   }
 }
 
