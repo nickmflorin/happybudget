@@ -107,7 +107,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
             return row.meta.children.length === 0;
           }
         }}
-        highlightNonEditableCell={(row: Table.SubAccountRow, colDef: ColDef) => {
+        isCellNonEditableHighlight={(row: Table.SubAccountRow, colDef: ColDef) => {
           return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
         }}
         search={search}
@@ -167,7 +167,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
           {
             field: "unit",
             headerName: "Unit",
-            cellClass: classNames("cell--centered", "cell--not-editable-bordered"),
+            cellClass: classNames("cell--centered"),
             cellRenderer: "UnitCell",
             width: 20,
             cellRendererParams: {

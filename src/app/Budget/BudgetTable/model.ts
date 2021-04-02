@@ -48,7 +48,6 @@ export interface BudgetTableProps<
   groupParams?: GroupProps<R, G, C>;
   loading?: boolean;
   cellClass?: (params: CellClassParams) => string | undefined;
-  highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
   onSearch: (value: string) => void;
   onRowSelect: (id: number) => void;
@@ -59,5 +58,7 @@ export interface BudgetTableProps<
   onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;
   onSelectAll: () => void;
+  isCellNonEditableHighlight?: (row: R, col: ColDef) => boolean;
   isCellEditable?: (row: R, col: ColDef) => boolean;
+  isCellSelectable?: (row: R, col: ColDef) => boolean;
 }

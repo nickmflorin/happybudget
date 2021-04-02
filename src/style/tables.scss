@@ -258,24 +258,9 @@ $table-border: 1px solid $table-border-color;
     }
 
     &.ag-cell-focus {
-      &:not(.cell--not-editable) {
-        border: 2px solid $green !important;
-        &.cell--action {
-          border: unset !important;
-        }
-      }
-      // This has to be it's own redeclaration of the green border because otherwise
-      // AG Grid will border the cell as if it is being selected in a range.
-      &.cell--not-editable-bordered {
-        border: 2px solid $green !important;
-        border-color: $green !important;
-      }
-      &.cell--not-editable {
-        &:not(.cell--not-editable-highlight) {
-          &:not(.cell--not-editable-bordered) {
-            border: unset !important;
-          }
-        }
+      border: 2px solid $green !important;
+      &.cell--not-selectable {
+        border: unset !important;
       }
     }
   }
@@ -302,12 +287,12 @@ $table-border: 1px solid $table-border-color;
       }
     }
     &:first-child {
-      .ag-cell {
+      .ag-cell:not(.ag-cell-focus) {
         border-top: none !important;
       }
     }
     &:last-child {
-      .ag-cell {
+      .ag-cell:not(.ag-cell-focus) {
         border-bottom: none !important;
       }
     }

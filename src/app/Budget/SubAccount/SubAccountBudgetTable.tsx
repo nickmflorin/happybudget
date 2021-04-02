@@ -106,7 +106,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
             return row.meta.children.length === 0;
           }
         }}
-        highlightNonEditableCell={(row: Table.SubAccountRow, colDef: ColDef) => {
+        isCellNonEditableHighlight={(row: Table.SubAccountRow, colDef: ColDef) => {
           return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
         }}
         search={search}
@@ -165,7 +165,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
           {
             field: "unit",
             headerName: "Unit",
-            cellClass: classNames("cell--centered", "cell--not-editable-bordered"),
+            cellClass: classNames("cell--centered"),
             cellRenderer: "UnitCell",
             width: 20,
             cellRendererParams: {

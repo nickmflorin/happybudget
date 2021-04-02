@@ -94,7 +94,8 @@ const BudgetTable = <
   onRowDelete,
   onRowExpand,
   isCellEditable,
-  highlightNonEditableCell,
+  isCellSelectable,
+  isCellNonEditableHighlight,
   rowRefreshRequired
 }: BudgetTableProps<R, M, G, P, C>) => {
   const [allSelected, setAllSelected] = useState(false);
@@ -104,7 +105,6 @@ const BudgetTable = <
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
-  const [budgetFooterGridApi, setBudgetFooterGridApi] = useState<GridApi | undefined>(undefined);
   const [budgetFooterColDefs, setBudgetFooterColDefs] = useState<ColDef[]>([]);
   const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
@@ -164,7 +164,6 @@ const BudgetTable = <
   });
 
   const onBudgetFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
-    setBudgetFooterGridApi(event.api);
     setBudgetFooterColumnApi(event.columnApi);
   });
 
@@ -174,8 +173,17 @@ const BudgetTable = <
     setTableFooterGridOptions({ ...tableFooterGridOptions, alignedGrids: [gridOptions, budgetFooterGridOptions] });
   }, []);
 
-  // TODO: It might make more sense to just treat all of the cells corresponding
-  // to the calculatedColumns as non-editable.
+  const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
+    if (includes(["delete", "index", "expand"], colDef.field)) {
+      return false;
+    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
+      return false;
+    } else if (!isNil(isCellSelectable)) {
+      return isCellSelectable(row, colDef);
+    }
+    return true;
+  });
+
   const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
     if (includes(["delete", "index", "expand"], colDef.field)) {
       return false;
@@ -206,8 +214,8 @@ const BudgetTable = <
         return !includes(nonHighlightedNonEditableCells, colDef.field as keyof R);
       } else if (!isNil(highlightedNonEditableCells)) {
         return includes(highlightedNonEditableCells, colDef.field as keyof R);
-      } else if (!isNil(highlightNonEditableCell)) {
-        return highlightNonEditableCell(row, colDef);
+      } else if (!isNil(isCellNonEditableHighlight)) {
+        return isCellNonEditableHighlight(row, colDef);
       }
       return true;
     }
@@ -222,7 +230,7 @@ const BudgetTable = <
         width: 25,
         maxWidth: 30,
         resizable: false,
-        cellClass: classNames("cell--action", "cell--not-editable"),
+        cellClass: classNames("cell--action", "cell--not-editable", "cell--not-selectable"),
         ...col
       };
     }
@@ -258,6 +266,16 @@ const BudgetTable = <
         editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
         cellClass: (params: CellClassParams) => {
           const row: R = params.node.data;
+
+          let propClassNames = undefined;
+          if (!isNil(cellClass)) {
+            if (typeof col.cellClass === "string" || Array.isArray(col.cellClass)) {
+              propClassNames = cellClass;
+            } else {
+              propClassNames = cellClass(params);
+            }
+          }
+
           let rootClassNames = undefined;
           if (!isNil(col.cellClass)) {
             if (typeof col.cellClass === "string" || Array.isArray(col.cellClass)) {
@@ -268,7 +286,8 @@ const BudgetTable = <
           }
           // TODO: See if we can move some of these to their specific column
           // definitions in the map() above.
-          return classNames(col.cellClass, rootClassNames, {
+          return classNames(col.cellClass, rootClassNames, propClassNames, {
+            "cell--not-selectable": !_isCellSelectable(row, params.colDef),
             "cell--not-editable": !_isCellEditable(row, params.colDef),
             "cell--not-editable-highlight": _isCellNonEditableHighlight(row, params.colDef)
           });
@@ -518,12 +537,7 @@ const BudgetTable = <
             };
           }
           return params.nextCellPosition;
-        } else if (
-          includes(
-            [calculatedColumns[0].field, "expand", "select", "delete"],
-            params.nextCellPosition.column.getColId()
-          )
-        ) {
+        } else if (includes(["expand", "select"], params.nextCellPosition.column.getColId())) {
           return params.previousCellPosition;
         } else {
           return params.nextCellPosition;
