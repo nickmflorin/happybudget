@@ -37,10 +37,10 @@ import {
 // budget when an actual is removed!
 export function* handleActualRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    const models: IActual[] = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.data);
+    const models: IActual[] = yield select((state: Redux.IApplicationStore) => state.budget.actuals.data);
     const model: IActual | undefined = find(models, { id: action.payload });
     if (isNil(model)) {
-      const placeholders = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.placeholders);
+      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.actuals.placeholders);
       const placeholder: Table.ActualRow | undefined = find(placeholders, { id: action.payload });
       if (isNil(placeholder)) {
         /* eslint-disable no-console */
@@ -93,10 +93,10 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const id = action.payload.id;
-    const data: IActual[] = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.data);
+    const data: IActual[] = yield select((state: Redux.IApplicationStore) => state.budget.actuals.data);
     const model: IActual | undefined = find(data, { id });
     if (isNil(model)) {
-      const placeholders = yield select((state: Redux.IApplicationStore) => state.actuals.actuals.placeholders);
+      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.actuals.placeholders);
       const placeholder: Table.ActualRow | undefined = find(placeholders, { id });
       if (isNil(placeholder)) {
         /* eslint-disable no-console */

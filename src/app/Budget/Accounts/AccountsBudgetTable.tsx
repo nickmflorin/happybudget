@@ -9,8 +9,8 @@ import { CreateAccountGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { AccountMapping } from "model/tableMappings";
 
-import BudgetTable from "../../BudgetTable";
-import { selectBudgetId, selectBudgetDetail } from "../../selectors";
+import BudgetTable from "../BudgetTable";
+import { selectBudgetId, selectBudgetDetail } from "../selectors";
 import {
   setAccountsSearchAction,
   addPlaceholdersToStateAction,
@@ -26,24 +26,22 @@ import {
 } from "./actions";
 
 const selectGroups = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.groups.data
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.groups.data
 );
 const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.selected
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.selected
 );
-const selectAccounts = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.data
-);
+const selectAccounts = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.budget.accounts.data);
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.search
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.search
 );
 const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.placeholders
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.placeholders
 );
 const selectSaving = createSelector(
-  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.deleting,
-  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.updating,
-  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.creating,
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.deleting,
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.updating,
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.creating,
   (deleting: number[], updating: number[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );

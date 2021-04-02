@@ -1,42 +1,5 @@
 import { simpleAction } from "store/actions";
-
-export const ActionType = {
-  BudgetItems: {
-    Loading: "actuals.budgetitems.Loading",
-    Response: "actuals.budgetitems.Response",
-    Request: "actuals.budgetitems.Request"
-  },
-  BudgetItemsTree: {
-    Loading: "actuals.budgetitemstree.Loading",
-    Response: "actuals.budgetitemstree.Response",
-    Request: "actuals.budgetitemstree.Request"
-  },
-  Actuals: {
-    Deleting: "actuals.actuals.Deleting",
-    Creating: "actuals.actuals.Creating",
-    Updating: "actuals.actuals.Updating",
-    Update: "actuals.actuals.Update",
-    Remove: "actuals.actuals.Remove",
-    Select: "calculator.actuals.Select",
-    Deselect: "calculator.actuals.Deselect",
-    SelectAll: "calculator.actuals.SelectAll",
-    Loading: "actuals.actuals.Loading",
-    SetSearch: "actuals.actuals.SetSearch",
-    Response: "actuals.actuals.Response",
-    Request: "actuals.actuals.Request",
-    UpdateInState: "calculator.actuals.UpdateInState",
-    RemoveFromState: "calculator.actuals.RemoveFromState",
-    AddToState: "calculator.actuals.AddToState",
-    // Errors Functionality Needs to be Built Back In
-    AddErrors: "actuals.actuals.AddErrors",
-    Placeholders: {
-      AddToState: "calculator.actuals.placeholders.AddToState",
-      Activate: "calculator.actuals.placeholders.Activate",
-      UpdateInState: "calculator.actuals.placeholders.UpdateInState",
-      RemoveFromState: "calculator.actuals.placeholders.RemoveFromState"
-    }
-  }
-};
+import { ActionType } from "../actions";
 
 export const updateActualAction = simpleAction<Table.RowChange>(ActionType.Actuals.Update);
 export const removeActualAction = simpleAction<number>(ActionType.Actuals.Remove);

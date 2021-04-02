@@ -1,7 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
 import { isNil } from "lodash";
-import { ActionType } from "./actions";
+import { ActionType } from "../actions";
 import {
   getActualsTask,
   handleActualRemovalTask,

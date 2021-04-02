@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Route, Switch, useHistory, useLocation, useParams } from "react-router-dom";
+import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -25,7 +25,9 @@ import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./a
 
 import "./index.scss";
 
-const Calculator = React.lazy(() => componentLoader(() => import("./Calculator")));
+const Account = React.lazy(() => componentLoader(() => import("./Account")));
+const Accounts = React.lazy(() => componentLoader(() => import("./Accounts")));
+const SubAccount = React.lazy(() => componentLoader(() => import("./SubAccount")));
 const Actuals = React.lazy(() => componentLoader(() => import("./Actuals")));
 
 const selectCommentsHistoryDrawerOpen = simpleShallowEqualSelector(
@@ -38,6 +40,7 @@ const Budget = (): JSX.Element => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { budgetId } = useParams<{ budgetId: string }>();
+  const match = useRouteMatch();
 
   const ancestors = useSelector(selectAncestors);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
@@ -135,8 +138,11 @@ const Budget = (): JSX.Element => {
       <RenderIfValidId id={[budgetId]}>
         <div className={"budget"}>
           <Switch>
+            <Redirect exact from={match.url} to={`${match.url}/accounts`} />
             <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
-            <Route path={"/budgets/:budgetId"} component={Calculator} />
+            <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
+            <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
+            <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
           </Switch>
         </div>
       </RenderIfValidId>

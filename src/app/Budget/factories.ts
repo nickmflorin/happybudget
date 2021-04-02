@@ -5,6 +5,7 @@ import { createListReducerFromTransformers } from "store/factories/util";
 import Mapping, { SubAccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
 import { mergeWithDefaults } from "util/objects";
+
 import { initialSubAccountsState } from "./initialState";
 
 interface SubAccountsPlaceholdersActionMap {
@@ -123,8 +124,8 @@ export const createTablePlaceholdersReducer = <
 
 export const createSubAccountsReducer = (
   mapping: SubAccountsReducerFactoryActionMap
-): Reducer<Redux.Calculator.ISubAccountsStore, Redux.IAction<any>> => {
-  const listResponseReducer = createListResponseReducer<ISubAccount, Redux.Calculator.ISubAccountsStore>(
+): Reducer<Redux.Budget.ISubAccountsStore, Redux.IAction<any>> => {
+  const listResponseReducer = createListResponseReducer<ISubAccount, Redux.Budget.ISubAccountsStore>(
     {
       Response: mapping.Response,
       Request: mapping.Request,
@@ -152,7 +153,7 @@ export const createSubAccountsReducer = (
           SubAccountMapping,
           { referenceEntity: "subaccount" }
         ),
-        groups: createListResponseReducer<IGroup<ISimpleSubAccount>, Redux.Calculator.IGroupsStore<ISimpleSubAccount>>(
+        groups: createListResponseReducer<IGroup<ISimpleSubAccount>, Redux.Budget.IGroupsStore<ISimpleSubAccount>>(
           {
             Response: mapping.Groups.Response,
             Request: mapping.Groups.Request,
@@ -189,9 +190,9 @@ export const createSubAccountsReducer = (
   );
 
   const recalculateGroupMetrics = (
-    st: Redux.Calculator.ISubAccountsStore,
+    st: Redux.Budget.ISubAccountsStore,
     groupId: number
-  ): Redux.Calculator.ISubAccountsStore => {
+  ): Redux.Budget.ISubAccountsStore => {
     // This might not be totally necessary, but it is good practice to not use the entire payload
     // to update the group (since that is already done by the reducer above) but to instead just
     // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -233,9 +234,9 @@ export const createSubAccountsReducer = (
   };
 
   const recalculateSubAccountMetrics = (
-    st: Redux.Calculator.ISubAccountsStore,
+    st: Redux.Budget.ISubAccountsStore,
     id: number
-  ): Redux.Calculator.ISubAccountsStore => {
+  ): Redux.Budget.ISubAccountsStore => {
     const subAccount = find(st.data, { id });
     if (isNil(subAccount)) {
       /* eslint-disable no-console */
@@ -275,9 +276,9 @@ export const createSubAccountsReducer = (
   };
 
   const recalculatePlaceholderMetrics = (
-    st: Redux.Calculator.ISubAccountsStore,
+    st: Redux.Budget.ISubAccountsStore,
     id: number
-  ): Redux.Calculator.ISubAccountsStore => {
+  ): Redux.Budget.ISubAccountsStore => {
     const row = find(st.placeholders, { id });
     if (isNil(row)) {
       /* eslint-disable no-console */
@@ -311,9 +312,9 @@ export const createSubAccountsReducer = (
   };
 
   return (
-    state: Redux.Calculator.ISubAccountsStore = initialSubAccountsState,
+    state: Redux.Budget.ISubAccountsStore = initialSubAccountsState,
     action: Redux.IAction<any>
-  ): Redux.Calculator.ISubAccountsStore => {
+  ): Redux.Budget.ISubAccountsStore => {
     let newState = { ...state };
 
     newState = listResponseReducer(newState, action);

@@ -1,7 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
 import { isNil } from "lodash";
-import { ActionType } from "./actions";
+import { ActionType } from "../actions";
 import {
   getAccountsTask,
   handleAccountUpdateTask,
@@ -20,7 +20,7 @@ import {
 function* watchForRequestAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Accounts.Request);
+    const action = yield take(ActionType.Budget.Accounts.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -31,7 +31,7 @@ function* watchForRequestAccountsSaga(): SagaIterator {
 function* watchForRequestGroupsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Accounts.Groups.Request);
+    const action = yield take(ActionType.Budget.Accounts.Groups.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -42,7 +42,7 @@ function* watchForRequestGroupsSaga(): SagaIterator {
 function* watchForBulkUpdateAccountSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.BulkUpdate);
+    const action = yield take(ActionType.Budget.BulkUpdate);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -51,17 +51,17 @@ function* watchForBulkUpdateAccountSaga(): SagaIterator {
 }
 
 function* watchForRemoveAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.Accounts.Remove, handleAccountRemovalTask);
+  yield takeEvery(ActionType.Budget.Accounts.Remove, handleAccountRemovalTask);
 }
 
 function* watchForAccountUpdateSaga(): SagaIterator {
-  yield takeEvery(ActionType.Accounts.Update, handleAccountUpdateTask);
+  yield takeEvery(ActionType.Budget.Accounts.Update, handleAccountUpdateTask);
 }
 
 function* watchForRequestCommentsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Comments.Request);
+    const action = yield take(ActionType.Budget.Comments.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -72,7 +72,7 @@ function* watchForRequestCommentsSaga(): SagaIterator {
 function* watchForSubmitCommentSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Comments.Submit);
+    const action = yield take(ActionType.Budget.Comments.Submit);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -81,17 +81,17 @@ function* watchForSubmitCommentSaga(): SagaIterator {
 }
 
 function* watchForRemoveCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Comments.Delete, deleteCommentTask);
+  yield takeEvery(ActionType.Budget.Comments.Delete, deleteCommentTask);
 }
 
 function* watchForEditCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Comments.Edit, editCommentTask);
+  yield takeEvery(ActionType.Budget.Comments.Edit, editCommentTask);
 }
 
 function* watchForRequestHistorySaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Accounts.History.Request);
+    const action = yield take(ActionType.Budget.Accounts.History.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -102,7 +102,7 @@ function* watchForRequestHistorySaga(): SagaIterator {
 function* watchForDeleteGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action: Redux.IAction<number> = yield take(ActionType.Accounts.Groups.Delete);
+    const action: Redux.IAction<number> = yield take(ActionType.Budget.Accounts.Groups.Delete);
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload])) {
         lastTasks[action.payload] = [];
@@ -122,7 +122,7 @@ function* watchForDeleteGroupSaga(): SagaIterator {
 function* watchForRemoveAccountFromGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action: Redux.IAction<number> = yield take(ActionType.Accounts.RemoveFromGroup);
+    const action: Redux.IAction<number> = yield take(ActionType.Budget.Accounts.RemoveFromGroup);
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload])) {
         lastTasks[action.payload] = [];

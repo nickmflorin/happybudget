@@ -1,7 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
 import { isNil } from "lodash";
-import { ActionType } from "./actions";
+import { ActionType } from "../actions";
 import {
   getSubAccountTask,
   getSubAccountsTask,
@@ -22,7 +22,7 @@ import {
 function* watchForRequestSubAccountsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.SubAccounts.Request);
+    const action = yield take(ActionType.SubAccount.SubAccounts.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -33,7 +33,7 @@ function* watchForRequestSubAccountsSaga(): SagaIterator {
 function* watchForRequestGroupsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.SubAccounts.Groups.Request);
+    const action = yield take(ActionType.SubAccount.SubAccounts.Groups.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -53,11 +53,11 @@ function* watchForBulkUpdateSubAccountSaga(): SagaIterator {
 }
 
 function* watchForRemoveSubAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccounts.Remove, handleSubAccountRemovalTask);
+  yield takeEvery(ActionType.SubAccount.SubAccounts.Remove, handleSubAccountRemovalTask);
 }
 
 function* watchForUpdateSubAccountwSaga(): SagaIterator {
-  yield takeEvery(ActionType.SubAccounts.Update, handleSubAccountUpdateTask);
+  yield takeEvery(ActionType.SubAccount.SubAccounts.Update, handleSubAccountUpdateTask);
 }
 
 function* watchForSubAccountIdChangedSaga(): SagaIterator {
@@ -85,7 +85,7 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
 function* watchForRequestSubAccountCommentsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Comments.Request);
+    const action = yield take(ActionType.SubAccount.Comments.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -96,7 +96,7 @@ function* watchForRequestSubAccountCommentsSaga(): SagaIterator {
 function* watchForSubmitCommentSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Comments.Submit);
+    const action = yield take(ActionType.SubAccount.Comments.Submit);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -105,17 +105,17 @@ function* watchForSubmitCommentSaga(): SagaIterator {
 }
 
 function* watchForRemoveCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Comments.Delete, deleteCommentTask);
+  yield takeEvery(ActionType.SubAccount.Comments.Delete, deleteCommentTask);
 }
 
 function* watchForEditCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Comments.Edit, editCommentTask);
+  yield takeEvery(ActionType.SubAccount.Comments.Edit, editCommentTask);
 }
 
 function* watchForRequestSubAccountsHistorySaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.SubAccounts.History.Request);
+    const action = yield take(ActionType.SubAccount.SubAccounts.History.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -126,7 +126,7 @@ function* watchForRequestSubAccountsHistorySaga(): SagaIterator {
 function* watchForDeleteGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action: Redux.IAction<number> = yield take(ActionType.SubAccounts.Groups.Delete);
+    const action: Redux.IAction<number> = yield take(ActionType.SubAccount.SubAccounts.Groups.Delete);
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload])) {
         lastTasks[action.payload] = [];
@@ -146,7 +146,7 @@ function* watchForDeleteGroupSaga(): SagaIterator {
 function* watchForRemoveSubAccountFromGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action: Redux.IAction<number> = yield take(ActionType.SubAccounts.RemoveFromGroup);
+    const action: Redux.IAction<number> = yield take(ActionType.SubAccount.SubAccounts.RemoveFromGroup);
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload])) {
         lastTasks[action.payload] = [];

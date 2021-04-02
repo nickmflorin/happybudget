@@ -183,12 +183,10 @@ export function* bulkCreateAccountsTask(id: number, rows: Table.AccountRow[]): S
 
 export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    const models: IAccount[] = yield select((state: Redux.IApplicationStore) => state.calculator.budget.accounts.data);
+    const models: IAccount[] = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.data);
     const model: IAccount | undefined = find(models, { id: action.payload });
     if (isNil(model)) {
-      const placeholders = yield select(
-        (state: Redux.IApplicationStore) => state.calculator.budget.accounts.placeholders
-      );
+      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.placeholders);
       const placeholder: Table.AccountRow | undefined = find(placeholders, { id: action.payload });
       if (isNil(placeholder)) {
         /* eslint-disable no-console */
@@ -214,10 +212,8 @@ export function* handleAccountsBulkUpdateTask(action: Redux.IAction<Table.RowCha
       return { data: mergeRowChanges(changes).data, id: parseInt(id) };
     });
 
-    const data = yield select((state: Redux.IApplicationStore) => state.calculator.budget.accounts.data);
-    const placeholders = yield select(
-      (state: Redux.IApplicationStore) => state.calculator.budget.accounts.placeholders
-    );
+    const data = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.data);
+    const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.placeholders);
 
     const mergedUpdates: Table.RowChange[] = [];
     const placeholdersToCreate: Table.AccountRow[] = [];
@@ -258,12 +254,10 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const id = action.payload.id;
-    const data: IAccount[] = yield select((state: Redux.IApplicationStore) => state.calculator.budget.accounts.data);
+    const data: IAccount[] = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.data);
     const model: IAccount | undefined = find(data, { id });
     if (isNil(model)) {
-      const placeholders = yield select(
-        (state: Redux.IApplicationStore) => state.calculator.budget.accounts.placeholders
-      );
+      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.placeholders);
       const placeholder: Table.AccountRow | undefined = find(placeholders, { id });
       if (isNil(placeholder)) {
         /* eslint-disable no-console */

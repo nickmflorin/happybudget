@@ -2,38 +2,38 @@ import { useDispatch, useSelector } from "react-redux";
 import { includes } from "lodash";
 
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import CommentsHistoryDrawer from "../../CommentsHistoryDrawer";
+import CommentsHistoryDrawer from "../CommentsHistoryDrawer";
 import {
-  requestCommentsAction,
   submitCommentAction,
+  requestCommentsAction,
   deleteCommentAction,
   editCommentAction,
-  requestHistoryAction
+  requestAccountsHistoryAction
 } from "./actions";
 
 const selectDeletingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.comments.deleting
+  (state: Redux.IApplicationStore) => state.budget.budget.comments.deleting
 );
 const selectEditingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.comments.editing
+  (state: Redux.IApplicationStore) => state.budget.budget.comments.editing
 );
 const selectReplyingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.comments.editing
+  (state: Redux.IApplicationStore) => state.budget.budget.comments.editing
 );
 const selectCommentsData = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.comments.data
+  (state: Redux.IApplicationStore) => state.budget.budget.comments.data
 );
 const selectSubmittingComment = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.comments.submitting
+  (state: Redux.IApplicationStore) => state.budget.budget.comments.submitting
 );
 const selectLoadingComments = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.comments.loading
+  (state: Redux.IApplicationStore) => state.budget.budget.comments.loading
 );
 const selectLoadingHistory = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.history.loading
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.history.loading
 );
 const selectHistory = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.history.data
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.history.data
 );
 
 const AccountCommentsHistory = (): JSX.Element => {
@@ -69,7 +69,7 @@ const AccountCommentsHistory = (): JSX.Element => {
       historyProps={{
         history,
         loading: loadingHistory,
-        onRequest: () => dispatch(requestHistoryAction())
+        onRequest: () => dispatch(requestAccountsHistoryAction())
       }}
     />
   );

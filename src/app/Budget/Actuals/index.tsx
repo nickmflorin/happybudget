@@ -25,14 +25,14 @@ import {
   requestBudgetItemsTreeAction
 } from "./actions";
 
-const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.selected);
-const selectActuals = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.data);
-const selectTableSearch = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.actuals.actuals.search);
+const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.selected);
+const selectActuals = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.data);
+const selectTableSearch = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.search);
 const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.actuals.actuals.placeholders
+  (state: Redux.IApplicationStore) => state.budget.actuals.placeholders
 );
 const selectActualsLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.actuals.actuals.loading
+  (state: Redux.IApplicationStore) => state.budget.actuals.loading
 );
 const selectLoading = createSelector(
   selectBudgetDetailLoading,
@@ -40,13 +40,13 @@ const selectLoading = createSelector(
   (detailLoading: boolean, tableLoading: boolean) => detailLoading || tableLoading
 );
 const selectSaving = createSelector(
-  (state: Redux.IApplicationStore) => state.actuals.actuals.deleting,
-  (state: Redux.IApplicationStore) => state.actuals.actuals.updating,
-  (state: Redux.IApplicationStore) => state.actuals.actuals.creating,
+  (state: Redux.IApplicationStore) => state.budget.actuals.deleting,
+  (state: Redux.IApplicationStore) => state.budget.actuals.updating,
+  (state: Redux.IApplicationStore) => state.budget.actuals.creating,
   (deleting: number[], updating: number[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
-const selectBudgetItems = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.actuals.budgetItems.data);
+const selectBudgetItems = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.budgetItems.data);
 
 const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();

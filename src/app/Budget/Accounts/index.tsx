@@ -6,15 +6,15 @@ import { createSelector } from "reselect";
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleShallowEqualSelector } from "store/selectors";
 
-import { setAncestorsAction } from "../../actions";
+import { setAncestorsAction } from "../actions";
 import { requestAccountsAction, requestGroupsAction } from "./actions";
-import { selectBudgetDetail, selectBudgetDetailLoading } from "../../selectors";
+import { selectBudgetDetail, selectBudgetDetailLoading } from "../selectors";
 
 import AccountsBudgetTable from "./AccountsBudgetTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
 
 const selectAccountsTableLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.budget.accounts.loading
+  (state: Redux.IApplicationStore) => state.budget.budget.accounts.loading
 );
 const selectLoading = createSelector(
   selectBudgetDetailLoading,

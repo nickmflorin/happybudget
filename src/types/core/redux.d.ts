@@ -10,7 +10,7 @@ namespace Redux {
     [key: string]: any;
   }
 
-  type ModuleLabel = "dashboard" | "budget" | "actuals" | "calculator";
+  type ModuleLabel = "dashboard" | "budget";
 
   type SelectorFunc<T = any> = (state: Redux.IApplicationStore) => T;
 
@@ -114,7 +114,7 @@ namespace Redux {
     }
   }
 
-  namespace Calculator {
+  namespace Budget {
     interface IGroupsStore<M extends Model> extends IListResponseStore<IGroup<M>> {
       deleting: number[];
     }
@@ -159,18 +159,12 @@ namespace Redux {
     }
 
     interface IBudgetStore {
+      readonly id: number | null;
+      readonly detail: IDetailResponseStore<IBudget>;
       readonly accounts: IAccountsStore;
       readonly comments: ICommentsStore;
     }
 
-    interface IStore {
-      readonly subaccount: ISubAccountStore;
-      readonly account: IAccountStore;
-      readonly budget: IBudgetStore;
-    }
-  }
-
-  namespace Actuals {
     interface IActualsStore extends IListResponseStore<IActual> {
       readonly deleting: ListStore<number>;
       readonly updating: ListStore<number>;
@@ -179,21 +173,14 @@ namespace Redux {
     }
 
     interface IStore {
-      readonly budgetItems: IListResponseStore<IBudgetItem>;
-      readonly budgetItemsTree: IListResponseStore<IBudgetItemTreeNode>;
-      readonly actuals: IActualsStore;
-    }
-  }
-
-  namespace Budget {
-    interface IBudgetStore {
-      id: number | null;
-      detail: IDetailResponseStore<IBudget>;
-    }
-    interface IStore {
       readonly budget: IBudgetStore;
       readonly ancestors: ListStore<IAncestor>;
       readonly commentsHistoryDrawerOpen: boolean;
+      readonly budgetItems: IListResponseStore<IBudgetItem>;
+      readonly budgetItemsTree: IListResponseStore<IBudgetItemTreeNode>;
+      readonly actuals: IActualsStore;
+      readonly subaccount: ISubAccountStore;
+      readonly account: IAccountStore;
     }
   }
 
@@ -208,8 +195,6 @@ namespace Redux {
     readonly user: IUserStore;
     readonly dashboard: Dashboard.IStore;
     readonly budget: Budget.IStore;
-    readonly calculator: Calculator.IStore;
-    readonly actuals: Actuals.IStore;
     readonly drawerVisible: boolean;
     readonly loading: ILoadingStore;
   }

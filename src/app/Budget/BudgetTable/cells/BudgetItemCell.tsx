@@ -9,7 +9,7 @@ interface UnitCellProps extends ICellRendererParams {
 }
 
 const BudgetItemCell = ({ node, onChange }: UnitCellProps): JSX.Element => {
-  const budgetItemsTree = useSelector((state: Redux.IApplicationStore) => state.actuals.budgetItemsTree);
+  const budgetItemsTree = useSelector((state: Redux.IApplicationStore) => state.budget.budgetItemsTree);
 
   return (
     <BudgetItemsTreeSelect

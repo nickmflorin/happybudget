@@ -7,17 +7,17 @@ import { isNil, concat } from "lodash";
 import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setAncestorsAction } from "../../actions";
+import { setAncestorsAction } from "../actions";
 import { setAccountIdAction } from "./actions";
 import AccountBudgetTable from "./AccountBudgetTable";
 import AccountCommentsHistory from "./AccountCommentsHistory";
 
-const selectDetail = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.calculator.account.detail.data);
+const selectDetail = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.account.detail.data);
 const selectSubAccountsLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.loading
+  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.loading
 );
 const selectDeletingGroups = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.calculator.account.subaccounts.groups.deleting.length !== 0
+  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.groups.deleting.length !== 0
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,

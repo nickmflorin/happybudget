@@ -3,6 +3,10 @@ import { spawn, take, call, cancel } from "redux-saga/effects";
 import { ActionType } from "./actions";
 import { getBudgetTask } from "./tasks";
 
+import accountSaga from "./Account/sagas";
+import budgetSaga from "./Accounts/sagas";
+import subAccountSaga from "./SubAccount/sagas";
+
 function* watchForRequestBudgetSaga(): SagaIterator {
   let lastTasks;
   while (true) {
@@ -28,4 +32,7 @@ function* watchForBudgetIdChangedSaga(): SagaIterator {
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRequestBudgetSaga);
   yield spawn(watchForBudgetIdChangedSaga);
+  yield spawn(accountSaga);
+  yield spawn(budgetSaga);
+  yield spawn(subAccountSaga);
 }
