@@ -548,7 +548,6 @@ const BudgetTable = <
   );
 
   const onCellKeyDown = useDynamicCallback((event: CellKeyDownEvent) => {
-    // const count = event.api.getDisplayedRowCount();
     if (!isNil(event.rowIndex) && !isNil(event.event)) {
       // I do not understand why AGGrid's Event has an underlying Event that is in
       // reality a KeyboardEvent but does not have any of the properties that a KeyboardEvent
