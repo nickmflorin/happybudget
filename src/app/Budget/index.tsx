@@ -19,21 +19,17 @@ import {
 import { RenderIfValidId } from "components/display";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
 import { componentLoader } from "operational";
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./actions";
+import { selectInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "./selectors";
 
 import "./index.scss";
+import { isNil } from "lodash";
 
 const Account = React.lazy(() => componentLoader(() => import("./Account")));
 const Accounts = React.lazy(() => componentLoader(() => import("./Accounts")));
 const SubAccount = React.lazy(() => componentLoader(() => import("./SubAccount")));
 const Actuals = React.lazy(() => componentLoader(() => import("./Actuals")));
-
-const selectCommentsHistoryDrawerOpen = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
-);
-const selectAncestors = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.ancestors);
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
@@ -42,8 +38,9 @@ const Budget = (): JSX.Element => {
   const { budgetId } = useParams<{ budgetId: string }>();
   const match = useRouteMatch();
 
-  const ancestors = useSelector(selectAncestors);
+  const instance = useSelector(selectInstance);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
+  const budget = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     if (!isNaN(parseInt(budgetId))) {
@@ -57,7 +54,7 @@ const Budget = (): JSX.Element => {
       includeFooter={false}
       headerProps={{ style: { height: 70 + 36 } }}
       contentProps={{ style: { marginTop: 70 + 36 + 10, height: "calc(100vh - 116px)" } }}
-      breadcrumbs={<AncestorsBreadCrumbs ancestors={ancestors} budgetId={parseInt(budgetId)} />}
+      breadcrumbs={!isNil(budget) ? <AncestorsBreadCrumbs instance={instance} budget={budget} /> : <></>}
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faRobot} />,

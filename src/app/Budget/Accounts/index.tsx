@@ -1,14 +1,13 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isNil } from "lodash";
 import { createSelector } from "reselect";
 
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleShallowEqualSelector } from "store/selectors";
 
-import { setAncestorsAction } from "../actions";
+import { setInstanceAction } from "../actions";
 import { requestAccountsAction, requestGroupsAction } from "./actions";
-import { selectBudgetDetail, selectBudgetDetailLoading } from "../selectors";
+import { selectBudgetDetailLoading } from "../selectors";
 
 import AccountsBudgetTable from "./AccountsBudgetTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
@@ -24,27 +23,13 @@ const selectLoading = createSelector(
 
 const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
-  const budgetDetail = useSelector(selectBudgetDetail);
   const loading = useSelector(selectLoading);
 
   useEffect(() => {
+    dispatch(setInstanceAction(null));
     dispatch(requestAccountsAction());
     dispatch(requestGroupsAction());
   }, []);
-
-  useEffect(() => {
-    if (!isNil(budgetDetail)) {
-      dispatch(
-        setAncestorsAction([
-          {
-            id: budgetDetail.id,
-            identifier: budgetDetail.name,
-            type: "budget"
-          }
-        ])
-      );
-    }
-  }, [budgetDetail]);
 
   return (
     <React.Fragment>

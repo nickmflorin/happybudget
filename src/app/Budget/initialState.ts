@@ -60,7 +60,7 @@ export const initialActualsState: Redux.Budget.IActualsStore = {
 
 const initialState: Redux.Budget.IStore = {
   budget: initialBudgetState,
-  ancestors: [],
+  instance: null,
   commentsHistoryDrawerOpen: false,
   account: initialAccountState,
   subaccount: initialSubAccountState,

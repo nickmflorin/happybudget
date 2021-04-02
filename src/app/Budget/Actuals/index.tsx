@@ -9,7 +9,7 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { ActualMapping } from "model/tableMappings";
 
-import { setAncestorsAction, requestBudgetItemsAction, requestBudgetItemsTreeAction } from "../actions";
+import { setInstanceAction, requestBudgetItemsAction, requestBudgetItemsTreeAction } from "../actions";
 import { selectBudgetDetailLoading, selectBudgetDetail } from "../selectors";
 import BudgetTable, { GetExportValueParams } from "../BudgetTable";
 import {
@@ -58,24 +58,11 @@ const Actuals = (): JSX.Element => {
   const budgetDetail = useSelector(selectBudgetDetail);
 
   useEffect(() => {
+    dispatch(setInstanceAction(null));
     dispatch(requestActualsAction());
     dispatch(requestBudgetItemsAction());
     dispatch(requestBudgetItemsTreeAction());
   }, []);
-
-  useEffect(() => {
-    if (!isNil(budgetDetail)) {
-      dispatch(
-        setAncestorsAction([
-          {
-            id: budgetDetail.id,
-            identifier: budgetDetail.name,
-            type: "budget"
-          }
-        ])
-      );
-    }
-  }, [budgetDetail]);
 
   return (
     <WrapInApplicationSpinner loading={loading}>

@@ -13,7 +13,7 @@ export const createSimplePayloadReducer = <P, A extends Redux.IAction<P> = Redux
   options: Partial<ReducerFactory.IOptions<P>> = { referenceEntity: "entity" }
 ): Reducer<P, A> => {
   const reducer: Reducer<P, A> = (state: P = initialState, action: A): P => {
-    if (action.type === actionType && !isNil(action.payload)) {
+    if (action.type === actionType && action.payload !== undefined) {
       return action.payload;
     }
     return state;

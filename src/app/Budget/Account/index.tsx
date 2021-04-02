@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil, concat } from "lodash";
+import { isNil } from "lodash";
 
 import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setAncestorsAction } from "../actions";
+import { setInstanceAction } from "../actions";
 import { setAccountIdAction } from "./actions";
 import AccountBudgetTable from "./AccountBudgetTable";
 import AccountCommentsHistory from "./AccountCommentsHistory";
@@ -39,18 +39,7 @@ const Account = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(detail)) {
-      dispatch(
-        setAncestorsAction(
-          concat(detail.ancestors, [
-            {
-              id: detail.id,
-              identifier: detail.identifier,
-              type: "account",
-              siblings: detail.siblings
-            }
-          ])
-        )
-      );
+      dispatch(setInstanceAction(detail));
     }
   }, [detail]);
 

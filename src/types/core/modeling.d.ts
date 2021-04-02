@@ -42,6 +42,14 @@ interface UnknownModel extends Model {
   [key: string]: any;
 }
 
+interface IEntity extends Model {
+  readonly id: number;
+  readonly identifier: string | null;
+  readonly type: EntityType;
+  readonly name: string | null;
+  readonly description: string | null;
+}
+
 interface TrackedModel extends Model {
   readonly created_by: ISimpleUser | null;
   readonly updated_by: ISimpleUser | null;
@@ -94,13 +102,6 @@ interface IBudget extends Model {
   readonly variance: number | null;
 }
 
-interface IAncestor {
-  readonly id: number;
-  readonly identifier: string;
-  readonly type: EntityType;
-  readonly siblings?: IBudgetItem[];
-}
-
 interface ISimpleBudgetItem extends Model {
   readonly identifier: string;
 }
@@ -126,14 +127,14 @@ interface IGroup<C extends Model> extends TrackedModel {
 interface IAccount extends IBudgetItem, TrackedModel {
   readonly description: string | null;
   readonly access: number[];
-  readonly ancestors: IAncestor[];
+  readonly ancestors: IEntity[];
   readonly estimated: number | null;
   readonly variance: number | null;
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
   readonly type: "account";
   readonly group: number | null;
-  readonly siblings: IBudgetItem[];
+  readonly siblings: IEntity[];
 }
 
 interface ISimpleAccount extends ISimpleBudgetItem {}
@@ -154,13 +155,13 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly object_id: number;
   readonly type: "subaccount";
   readonly parent_type: BudgetItemType;
-  readonly ancestors: IAncestor[];
+  readonly ancestors: IEntity[];
   readonly estimated: number | null;
   readonly variance: number | null;
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
   readonly group: number | null;
-  readonly siblings: IBudgetItem[];
+  readonly siblings: IEntity[];
 }
 
 interface IActual extends TrackedModel {

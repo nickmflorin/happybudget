@@ -1,4 +1,4 @@
-import { Reducer, combineReducers } from "redux";
+import { combineReducers } from "redux";
 import {
   createListResponseReducer,
   createDetailResponseReducer,
@@ -14,19 +14,8 @@ import accountsRootReducer from "./Accounts/reducer";
 import actualsRootReducer from "./Actuals/reducer";
 import subAccountRootReducer from "./SubAccount/reducer";
 
-const ancestorsReducer: Reducer<Redux.ListStore<IAncestor>, Redux.IAction<any>> = (
-  state: Redux.ListStore<IAncestor> = [],
-  action: Redux.IAction<any>
-) => {
-  let newState = [...state];
-  if (action.type === ActionType.SetAncestors) {
-    newState = action.payload;
-  }
-  return newState;
-};
-
 const rootReducer = combineReducers({
-  ancestors: ancestorsReducer,
+  instance: createSimplePayloadReducer<IAccount | ISubAccount | null>(ActionType.SetInstance, null),
   commentsHistoryDrawerOpen: createSimpleBooleanReducer(ActionType.SetCommentsHistoryDrawerVisibility),
   account: accountRootReducer,
   subaccount: subAccountRootReducer,

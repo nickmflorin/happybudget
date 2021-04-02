@@ -174,7 +174,7 @@ namespace Redux {
 
     interface IStore {
       readonly budget: IBudgetStore;
-      readonly ancestors: ListStore<IAncestor>;
+      readonly instance: IAccount | ISubAccount | null;
       readonly commentsHistoryDrawerOpen: boolean;
       readonly budgetItems: IListResponseStore<IBudgetItem>;
       readonly budgetItemsTree: IListResponseStore<IBudgetItemTreeNode>;
