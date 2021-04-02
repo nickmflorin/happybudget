@@ -1,4 +1,5 @@
 import { Reducer } from "redux";
+import { filter } from "lodash";
 import { createSimpleBooleanReducer, createModelListActionReducer, createListResponseReducer } from "store/factories";
 import { ActualMapping } from "model/tableMappings";
 import { ActionType } from "../actions";
@@ -26,7 +27,6 @@ const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IAct
       placeholders: createTablePlaceholdersReducer(
         {
           AddToState: ActionType.Actuals.Placeholders.AddToState,
-          Activate: ActionType.Actuals.Placeholders.Activate,
           RemoveFromState: ActionType.Actuals.Placeholders.RemoveFromState,
           UpdateInState: ActionType.Actuals.Placeholders.UpdateInState,
           Clear: ActionType.Actuals.Request
@@ -52,6 +52,18 @@ const rootReducer: Reducer<Redux.Budget.IActualsStore, Redux.IAction<any>> = (
   let newState = { ...state };
 
   newState = listResponseReducer(newState, action);
+
+  if (action.type === ActionType.Actuals.Placeholders.Activate) {
+    const payload: Table.ActivatePlaceholderPayload<IActual> = action.payload;
+    newState = {
+      ...newState,
+      placeholders: filter(
+        newState.placeholders,
+        (placeholder: Table.ActualRow) => placeholder.id !== action.payload.id
+      ),
+      data: [...newState.data, payload.model]
+    };
+  }
   return newState;
 };
 

@@ -47,7 +47,6 @@ namespace ReducerFactory {
 
   type ITablePlaceholdersActionMap = {
     AddToState: string;
-    Activate: string;
     Clear: string;
     RemoveFromState: string;
     UpdateInState: string;

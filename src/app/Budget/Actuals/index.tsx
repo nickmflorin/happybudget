@@ -9,11 +9,10 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { ActualMapping } from "model/tableMappings";
 
-import { setAncestorsAction } from "../actions";
+import { setAncestorsAction, requestBudgetItemsAction, requestBudgetItemsTreeAction } from "../actions";
 import { selectBudgetDetailLoading, selectBudgetDetail } from "../selectors";
 import BudgetTable, { GetExportValueParams } from "../BudgetTable";
 import {
-  requestBudgetItemsAction,
   requestActualsAction,
   setActualsSearchAction,
   addPlaceholdersToStateAction,
@@ -21,8 +20,7 @@ import {
   selectActualAction,
   removeActualAction,
   updateActualAction,
-  selectAllActualsAction,
-  requestBudgetItemsTreeAction
+  selectAllActualsAction
 } from "./actions";
 
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.selected);

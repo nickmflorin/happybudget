@@ -10,9 +10,9 @@ import { initialSubAccountsState } from "./initialState";
 
 interface SubAccountsPlaceholdersActionMap {
   AddToState: string;
-  Activate: string;
   RemoveFromState: string;
   UpdateInState: string;
+  Activate: string;
 }
 
 interface SubAccountsGroupsActionMap {
@@ -145,7 +145,6 @@ export const createSubAccountsReducer = (
         placeholders: createTablePlaceholdersReducer(
           {
             AddToState: mapping.Placeholders.AddToState,
-            Activate: mapping.Placeholders.Activate,
             RemoveFromState: mapping.Placeholders.RemoveFromState,
             UpdateInState: mapping.Placeholders.UpdateInState,
             Clear: mapping.Request

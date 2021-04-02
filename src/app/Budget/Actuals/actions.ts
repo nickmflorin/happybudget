@@ -26,16 +26,7 @@ export const updatePlaceholderInStateAction = simpleAction<Table.ActualRow>(
   ActionType.Actuals.Placeholders.UpdateInState
 );
 
-export const addActualToStateAction = simpleAction<IActual>(ActionType.Actuals.AddToState);
 export const updateActualInStateAction = simpleAction<IActual>(ActionType.Actuals.UpdateInState);
 export const removeActualFromStateAction = simpleAction<number>(ActionType.Actuals.RemoveFromState);
-
-export const requestBudgetItemsAction = simpleAction<null>(ActionType.BudgetItems.Request);
-export const loadingBudgetItemsAction = simpleAction<boolean>(ActionType.BudgetItems.Loading);
-export const responseBudgetItemsAction = simpleAction<Http.IListResponse<IBudgetItem>>(ActionType.BudgetItems.Response);
-
-export const requestBudgetItemsTreeAction = simpleAction<null>(ActionType.BudgetItemsTree.Request);
-export const loadingBudgetItemsTreeAction = simpleAction<boolean>(ActionType.BudgetItemsTree.Loading);
-export const responseBudgetItemsTreeAction = simpleAction<Http.IListResponse<IBudgetItemNode>>(
-  ActionType.BudgetItemsTree.Response
-);
+// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
+export const addActualToStateAction = simpleAction<IActual>(ActionType.Actuals.AddToState);

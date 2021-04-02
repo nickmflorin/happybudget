@@ -101,9 +101,8 @@ export function* deleteAccountTask(id: number): SagaIterator {
 
 export function* updateAccountTask(id: number, change: Table.RowChange): SagaIterator {
   yield put(updatingAccountAction({ id, value: true }));
-  const requestPayload = AccountMapping.patchPayload(change);
   try {
-    yield call(updateAccount, id, requestPayload);
+    yield call(updateAccount, id, AccountMapping.patchPayload(change));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the sub account.", id, (errors: Table.CellError[]) =>
       addErrorsToStateAction(errors)
