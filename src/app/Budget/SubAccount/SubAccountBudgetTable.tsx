@@ -91,7 +91,11 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         loadingBudget={loadingBudget}
         identifierField={"identifier"}
         identifierFieldHeader={"Line"}
-        tableFooterIdentifierValue={!isNil(subaccountDetail) ? `${subaccountDetail.identifier} Total` : "Total"}
+        tableFooterIdentifierValue={
+          !isNil(subaccountDetail) && !isNil(subaccountDetail.description)
+            ? `${subaccountDetail.description} Total`
+            : "Sub Account Total"
+        }
         budgetFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
         isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
           if (includes(["unit"], colDef.field)) {
