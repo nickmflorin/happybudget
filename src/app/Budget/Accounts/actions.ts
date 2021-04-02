@@ -1,7 +1,7 @@
 import { simpleAction } from "store/actions";
 import { ActionType } from "../actions";
 
-export const bulkUpdateBudgetAction = simpleAction<Table.RowChange[]>(ActionType.Budget.BulkUpdate);
+export const bulkUpdateBudgetAccountsAction = simpleAction<Table.RowChange[]>(ActionType.Budget.BulkUpdateAccounts);
 
 /*
   Actions Pertaining to Budget Comments

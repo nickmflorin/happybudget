@@ -1,6 +1,8 @@
 import { simpleAction } from "store/actions";
 import { ActionType } from "../actions";
 
+export const bulkUpdateBudgetActualsAction = simpleAction<Table.RowChange[]>(ActionType.Budget.BulkUpdateActuals);
+
 export const updateActualAction = simpleAction<Table.RowChange>(ActionType.Actuals.Update);
 export const removeActualAction = simpleAction<number>(ActionType.Actuals.Remove);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Actuals.Deleting);

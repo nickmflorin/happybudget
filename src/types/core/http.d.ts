@@ -103,7 +103,11 @@ namespace Http {
     readonly id: number;
   }
 
-  interface IAccountBulkUpdatePayload extends Partial<IAccount> {
+  interface IAccountBulkUpdatePayload extends Partial<IAccountPayload> {
+    readonly id: number;
+  }
+
+  interface IActualBulkUpdatePayload extends Partial<IActualPayload> {
     readonly id: number;
   }
 

@@ -8,7 +8,8 @@ export const ActionType = {
     Loading: "budget.budget.Loading",
     Response: "budget.budget.Response",
     Request: "budget.budget.Request",
-    BulkUpdate: "budget.budget.BulkUpdate",
+    BulkUpdateAccounts: "budget.budget.BulkUpdateAccounts",
+    BulkUpdateActuals: "budget.budget.BulkUpdateActuals",
     Comments: {
       Loading: "budget.budget.comments.Loading",
       Response: "budget.budget.comments.Response",

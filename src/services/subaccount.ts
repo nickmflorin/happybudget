@@ -97,3 +97,20 @@ export const deleteSubAccountGroup = async (id: number, options: Http.IRequestOp
   const url = URL.v1("subaccounts", "groups", id);
   return client.delete<null>(url, options);
 };
+
+export const getSubAccountActuals = async (
+  id: number,
+  options: Http.IRequestOptions = {}
+): Promise<Http.IListResponse<IActual>> => {
+  const url = URL.v1("subaccounts", id, "actuals");
+  return client.list<IActual>(url, options);
+};
+
+export const createSubAccountActual = async (
+  id: number,
+  payload: Http.IActualPayload,
+  options: Http.IRequestOptions = {}
+): Promise<IActual> => {
+  const url = URL.v1("subaccounts", id, "actuals");
+  return client.post<IActual>(url, payload, options);
+};

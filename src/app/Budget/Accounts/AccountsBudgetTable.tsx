@@ -22,7 +22,7 @@ import {
   addGroupToStateAction,
   deleteGroupAction,
   removeAccountFromGroupAction,
-  bulkUpdateBudgetAction,
+  bulkUpdateBudgetAccountsAction,
   updateGroupInStateAction
 } from "./actions";
 
@@ -82,7 +82,7 @@ const AccountsBudgetTable = (): JSX.Element => {
         onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
         onRowDelete={(row: Table.AccountRow) => dispatch(removeAccountAction(row.id))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateAccountAction(payload))}
-        onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetAction(changes))}
+        onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetAccountsAction(changes))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         groupParams={{
           onDeleteGroup: (group: IGroup<ISimpleAccount>) => dispatch(deleteGroupAction(group.id)),

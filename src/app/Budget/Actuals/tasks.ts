@@ -1,9 +1,17 @@
 import { SagaIterator } from "redux-saga";
-import { call, put, select } from "redux-saga/effects";
-import { isNil, find } from "lodash";
+import { call, put, select, fork } from "redux-saga/effects";
+import { isNil, find, map, groupBy } from "lodash";
 import { handleRequestError } from "api";
 import { ActualMapping } from "model/tableMappings";
-import { getBudgetActuals, deleteActual, updateActual, createAccountActual, createSubAccountActual } from "services";
+import { mergeRowChanges } from "model/util";
+import {
+  getBudgetActuals,
+  deleteActual,
+  updateActual,
+  createAccountActual,
+  createSubAccountActual,
+  bulkUpdateActuals
+} from "services";
 import { handleTableErrors } from "store/tasks";
 import {
   activatePlaceholderAction,
@@ -62,6 +70,29 @@ export function* createActualTask(id: number, row: Table.ActualRow): SagaIterato
   }
 }
 
+export function* bulkUpdateActualsTask(id: number, changes: Table.RowChange[]): SagaIterator {
+  const requestPayload: Http.IActualBulkUpdatePayload[] = map(changes, (change: Table.RowChange) => ({
+    id: change.id,
+    ...ActualMapping.patchPayload(change)
+  }));
+  for (let i = 0; i++; i < changes.length) {
+    yield put(updatingActualAction({ id: changes[i].id, value: true }));
+  }
+  try {
+    yield call(bulkUpdateActuals, id, requestPayload);
+  } catch (e) {
+    // Once we rebuild back in the error handling, we will have to be concerned here with the nested
+    // structure of the errors.
+    yield call(handleTableErrors, e, "There was an error updating the actuals.", id, (errors: Table.CellError[]) =>
+      addErrorsToStateAction(errors)
+    );
+  } finally {
+    for (let i = 0; i++; i < changes.length) {
+      yield put(updatingActualAction({ id: changes[i].id, value: false }));
+    }
+  }
+}
+
 export function* handleActualRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
     const models: IActual[] = yield select((state: Redux.IApplicationStore) => state.budget.actuals.data);
@@ -81,6 +112,48 @@ export function* handleActualRemovalTask(action: Redux.IAction<number>): SagaIte
     } else {
       yield put(removeActualFromStateAction(model.id));
       yield call(deleteActualTask, model.id);
+    }
+  }
+}
+
+export function* handleActualsBulkUpdateTask(action: Redux.IAction<Table.RowChange[]>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId) && !isNil(action.payload)) {
+    const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange[] };
+    const merged: Table.RowChange[] = map(grouped, (changes: Table.RowChange[], id: string) => {
+      return { data: mergeRowChanges(changes).data, id: parseInt(id) };
+    });
+
+    const data = yield select((state: Redux.IApplicationStore) => state.budget.actuals.data);
+    const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.actuals.placeholders);
+
+    const mergedUpdates: Table.RowChange[] = [];
+
+    for (let i = 0; i < merged.length; i++) {
+      const model: IActual | undefined = find(data, { id: merged[i].id });
+      if (isNil(model)) {
+        const placeholder: Table.ActualRow | undefined = find(placeholders, { id: merged[i].id });
+        if (isNil(placeholder)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when updating actual in state...
+            the actual with ID ${merged[i].id} does not exist in state when it is expected to.`
+          );
+        } else {
+          // NOTE: Since the only required field for the Actual is the parent, which is controlled
+          // by the HTML select field, it cannot be copy/pasted and thus we do not have to worry
+          // about the bulk creation of Actual(s) - only the bulk updating.
+          const updatedRow = ActualMapping.newRowWithChanges(placeholder, merged[i]);
+          yield put(updatePlaceholderInStateAction(updatedRow));
+        }
+      } else {
+        const updatedModel = ActualMapping.newModelWithChanges(model, merged[i]);
+        yield put(updateActualInStateAction(updatedModel));
+        mergedUpdates.push(merged[i]);
+      }
+    }
+    if (mergedUpdates.length !== 0) {
+      yield fork(bulkUpdateActualsTask, budgetId, mergedUpdates);
     }
   }
 }

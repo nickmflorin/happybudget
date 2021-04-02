@@ -42,14 +42,7 @@ function* watchForRequestGroupsSaga(): SagaIterator {
 }
 
 function* watchForBulkUpdateSubAccountSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.SubAccount.BulkUpdate);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(handleSubAccountBulkUpdateTask, action);
-  }
+  yield takeEvery(ActionType.SubAccount.BulkUpdate, handleSubAccountBulkUpdateTask);
 }
 
 function* watchForRemoveSubAccountSaga(): SagaIterator {

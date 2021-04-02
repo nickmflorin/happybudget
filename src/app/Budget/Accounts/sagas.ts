@@ -39,15 +39,8 @@ function* watchForRequestGroupsSaga(): SagaIterator {
   }
 }
 
-function* watchForBulkUpdateAccountSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Budget.BulkUpdate);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(handleAccountsBulkUpdateTask, action);
-  }
+function* watchForBulkUpdateAccountsSaga(): SagaIterator {
+  yield takeEvery(ActionType.Budget.BulkUpdateAccounts, handleAccountsBulkUpdateTask);
 }
 
 function* watchForRemoveAccountSaga(): SagaIterator {
@@ -151,5 +144,5 @@ export default function* accountsSaga(): SagaIterator {
   yield spawn(watchForDeleteGroupSaga);
   yield spawn(watchForRemoveAccountFromGroupSaga);
   yield spawn(watchForRequestGroupsSaga);
-  yield spawn(watchForBulkUpdateAccountSaga);
+  yield spawn(watchForBulkUpdateAccountsSaga);
 }
