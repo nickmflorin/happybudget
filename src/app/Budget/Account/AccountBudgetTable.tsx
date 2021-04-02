@@ -236,7 +236,6 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: IGroup<ISimpleSubAccount>) => {
             setGroupToEdit(undefined);
-            console.log(group);
             dispatch(updateGroupInStateAction(group));
           }}
         />

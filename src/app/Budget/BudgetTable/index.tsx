@@ -651,7 +651,7 @@ const BudgetTable = <
     }
   });
 
-  const getRowClass = useDynamicCallback((params: RowClassParams) => {
+  const getRowClass = (params: RowClassParams) => {
     if (params.node.data.meta.isGroupFooter === true) {
       let colorClass = params.node.data.group.color;
       if (colorClass.startsWith("#")) {
@@ -659,7 +659,7 @@ const BudgetTable = <
       }
       return classNames("row--group-footer", `bg-${colorClass}`);
     }
-  });
+  };
 
   const getContextMenuItems = useDynamicCallback((params: GetContextMenuItemsParams): MenuItemDef[] => {
     // This can happen in rare cases where you right click outside of a cell.
