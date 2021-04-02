@@ -157,7 +157,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
           },
           {
             field: "quantity",
-            headerName: "Quantity",
+            headerName: "Qty",
             width: 10,
             cellStyle: { textAlign: "right" },
             valueSetter: integerValueSetter("quantity")

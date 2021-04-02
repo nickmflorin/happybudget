@@ -159,7 +159,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
           },
           {
             field: "quantity",
-            headerName: "Quantity",
+            headerName: "Qty",
             width: 10,
             cellStyle: { textAlign: "right" },
             valueSetter: integerValueSetter("quantity")
