@@ -24,6 +24,7 @@ import { handleTableErrors } from "store/tasks";
 import { userToSimpleUser } from "model/mappings";
 import { nowAsString } from "util/dates";
 import { generateRandomNumericId } from "util/math";
+import { requestBudgetAction, loadingBudgetAction } from "../actions";
 import {
   loadingAccountsAction,
   responseAccountsAction,
@@ -90,12 +91,21 @@ export function* deleteAccountGroupTask(action: Redux.IAction<number>): SagaIter
 
 export function* deleteAccountTask(id: number): SagaIterator {
   yield put(deletingAccountAction({ id, value: true }));
+  // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
+  // otherwise, the loading indicators will not appear until `yield put(requestBudgetAction)`, and there
+  // is a lag between the time that this task is called and that task is called.
+  yield put(loadingBudgetAction(true));
+  let success = true;
   try {
     yield call(deleteAccount, id);
   } catch (e) {
+    success = false;
     handleRequestError(e, "There was an error deleting the account.");
   } finally {
     yield put(deletingAccountAction({ id, value: false }));
+  }
+  if (success === true) {
+    yield put(requestBudgetAction());
   }
 }
 
