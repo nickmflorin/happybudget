@@ -4,36 +4,29 @@ import { isNil } from "lodash";
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
 import { Form, GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
-import { createAccountGroup } from "services";
+import { updateAccountGroup } from "services";
 
 import Modal from "./Modal";
 
-interface CreateAccountGroupModalProps {
+interface EditAccountGroupModalProps {
   onSuccess: (group: IGroup<ISimpleAccount>) => void;
   onCancel: () => void;
-  budgetId: number;
-  accounts: number[];
+  group: IGroup<ISimpleAccount>;
   open: boolean;
 }
 
-const CreateAccountGroupModal = ({
-  budgetId,
-  accounts,
-  open,
-  onSuccess,
-  onCancel
-}: CreateAccountGroupModalProps): JSX.Element => {
+const EditAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditAccountGroupModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
 
   return (
     <Modal
-      title={"Create Group"}
+      title={"Edit Group"}
       visible={open}
       loading={loading}
       onCancel={() => onCancel()}
-      okText={"Create"}
+      okText={"Save"}
       cancelText={"Cancel"}
       onOk={() => {
         form
@@ -41,14 +34,13 @@ const CreateAccountGroupModal = ({
           .then((values: GroupFormValues) => {
             setLoading(true);
 
-            createAccountGroup(budgetId, {
+            updateAccountGroup(group.id, {
               name: values.name,
-              children: accounts,
               color: values.color
             })
-              .then((group: IGroup<ISimpleAccount>) => {
+              .then((response: IGroup<ISimpleAccount>) => {
                 form.resetFields();
-                onSuccess(group);
+                onSuccess(response);
               })
               .catch((e: Error) => {
                 if (e instanceof ClientError) {
@@ -80,4 +72,4 @@ const CreateAccountGroupModal = ({
   );
 };
 
-export default CreateAccountGroupModal;
+export default EditAccountGroupModal;

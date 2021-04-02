@@ -60,6 +60,7 @@ interface SubAccountBudgetTableProps {
 
 const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JSX.Element => {
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<IGroup<ISimpleSubAccount> | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -124,7 +125,8 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
           onDeleteGroup: (group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id)),
           onRowRemoveFromGroup: (row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id)),
           onGroupRows: (rows: Table.SubAccountRow[]) =>
-            setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
+            setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id)),
+          onEditGroup: (group: IGroup<ISimpleSubAccount>) => setGroupToEdit(group)
         }}
         onSelectAll={() => dispatch(selectAllSubAccountsAction())}
         tableTotals={{

@@ -48,6 +48,7 @@ const selectSaving = createSelector(
 
 const AccountsBudgetTable = (): JSX.Element => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<IGroup<ISimpleAccount> | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -85,7 +86,8 @@ const AccountsBudgetTable = (): JSX.Element => {
         groupParams={{
           onDeleteGroup: (group: IGroup<ISimpleAccount>) => dispatch(deleteGroupAction(group.id)),
           onRowRemoveFromGroup: (row: Table.AccountRow) => dispatch(removeAccountFromGroupAction(row.id)),
-          onGroupRows: (rows: Table.AccountRow[]) => setGroupAccounts(map(rows, (row: Table.AccountRow) => row.id))
+          onGroupRows: (rows: Table.AccountRow[]) => setGroupAccounts(map(rows, (row: Table.AccountRow) => row.id)),
+          onEditGroup: (group: IGroup<ISimpleAccount>) => setGroupToEdit(group)
         }}
         onSelectAll={() => dispatch(selectAllAccountsAction())}
         tableTotals={{

@@ -12,6 +12,7 @@ export type ExportValueGetters = { [key: string]: (params: GetExportValueParams)
 export interface GroupProps<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> {
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
+  onEditGroup: (group: G) => void;
   onRowRemoveFromGroup: (row: R) => void;
 }
 

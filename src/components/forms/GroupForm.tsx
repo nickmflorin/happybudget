@@ -4,9 +4,14 @@ import { FormInstance, FormProps } from "antd/lib/form";
 import { ColorSelect } from "components/control";
 import { Form } from "components/forms";
 
+export interface GroupFormValues {
+  name: string;
+  color: string;
+}
+
 interface GroupFormProps extends FormProps {
-  form: FormInstance<Http.IGroupPayload>;
-  initialValues?: Partial<Http.IGroupPayload>;
+  form: FormInstance<GroupFormValues>;
+  initialValues?: Partial<GroupFormValues>;
   globalError?: string;
 }
 

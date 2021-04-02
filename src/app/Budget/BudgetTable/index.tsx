@@ -243,7 +243,11 @@ const BudgetTable = <
         minWidth: 100,
         maxWidth: 125,
         cellStyle: { textAlign: "right" },
-        cellRendererParams: { formatter: formatCurrencyWithoutDollarSign, renderRedIfNegative: true },
+        cellRendererParams: {
+          ...col.cellRendererParams,
+          formatter: formatCurrencyWithoutDollarSign,
+          renderRedIfNegative: true
+        },
         ...col
       };
     }
@@ -340,6 +344,9 @@ const BudgetTable = <
           return identifierFieldParams.colSpan(params);
         }
         return 1;
+      },
+      cellRendererParams: {
+        onGroupEdit: !isNil(groupParams) ? groupParams.onEditGroup : undefined
       }
     });
     return baseLeftColumns;

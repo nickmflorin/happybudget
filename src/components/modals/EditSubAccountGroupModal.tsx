@@ -4,51 +4,39 @@ import { isNil } from "lodash";
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
 import { Form, GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
-import { createAccountGroup } from "services";
+import { updateSubAccountGroup } from "services";
 
 import Modal from "./Modal";
 
-interface CreateAccountGroupModalProps {
-  onSuccess: (group: IGroup<ISimpleAccount>) => void;
+interface EditSubAccountGroupModalProps {
+  onSuccess: (group: IGroup<ISimpleSubAccount>) => void;
   onCancel: () => void;
-  budgetId: number;
-  accounts: number[];
+  group: IGroup<ISimpleSubAccount>;
   open: boolean;
 }
 
-const CreateAccountGroupModal = ({
-  budgetId,
-  accounts,
-  open,
-  onSuccess,
-  onCancel
-}: CreateAccountGroupModalProps): JSX.Element => {
+const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubAccountGroupModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
 
   return (
     <Modal
-      title={"Create Group"}
+      title={"Edit Group"}
       visible={open}
       loading={loading}
       onCancel={() => onCancel()}
-      okText={"Create"}
+      okText={"Save"}
       cancelText={"Cancel"}
       onOk={() => {
         form
           .validateFields()
           .then((values: GroupFormValues) => {
             setLoading(true);
-
-            createAccountGroup(budgetId, {
-              name: values.name,
-              children: accounts,
-              color: values.color
-            })
-              .then((group: IGroup<ISimpleAccount>) => {
+            updateSubAccountGroup(group.id, values)
+              .then((response: IGroup<ISimpleSubAccount>) => {
                 form.resetFields();
-                onSuccess(group);
+                onSuccess(response);
               })
               .catch((e: Error) => {
                 if (e instanceof ClientError) {
@@ -80,4 +68,4 @@ const CreateAccountGroupModal = ({
   );
 };
 
-export default CreateAccountGroupModal;
+export default EditSubAccountGroupModal;

@@ -3,6 +3,7 @@ import { isNil } from "lodash";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
 import { Form, GroupForm } from "components/forms";
+import { GroupFormValues } from "components/forms/GroupForm";
 import { createAccountSubAccountGroup, createSubAccountSubAccountGroup } from "services";
 
 import Modal from "./Modal";
@@ -39,7 +40,7 @@ const CreateSubAccountGroupModal = ({
       onOk={() => {
         form
           .validateFields()
-          .then(values => {
+          .then((values: GroupFormValues) => {
             setLoading(true);
 
             const handleError = (e: Error) => {
