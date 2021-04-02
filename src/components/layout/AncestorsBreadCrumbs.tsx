@@ -48,7 +48,7 @@ const AncestorBreadCrumbItem = ({ budgetId, ancestor, last }: AncestorBreadCrumb
           >
             {map(ancestor.siblings, (sibling: IBudgetItem) => {
               return (
-                <Select.Option value={sibling.id}>
+                <Select.Option value={sibling.id} key={sibling.id}>
                   <div className={"select-ancestor-option"}>
                     <span className={"identifier"}>{sibling.identifier}</span>
                     <span className={"description"}>{sibling.description}</span>
@@ -84,13 +84,8 @@ const AncestorsBreadCrumbs = ({ ancestors, budgetId }: AncestorsBreadCrumbsProps
     <div className={"ancestors-bread-crumbs"}>
       {map(ancestors, (ancestor: IAncestor, index: number) => {
         return (
-          <React.Fragment>
-            <AncestorBreadCrumbItem
-              key={index}
-              ancestor={ancestor}
-              budgetId={budgetId}
-              last={index === ancestors.length - 1}
-            />
+          <React.Fragment key={index}>
+            <AncestorBreadCrumbItem ancestor={ancestor} budgetId={budgetId} last={index === ancestors.length - 1} />
             {index !== ancestors.length - 1 && <span className={"slash"}>{"/"}</span>}
           </React.Fragment>
         );

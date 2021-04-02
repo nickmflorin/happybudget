@@ -12,7 +12,7 @@ import {
   handleActualUpdatedInStateTask
 } from "./tasks";
 
-function* watchForTriggerBudgetActualsSaga(): SagaIterator {
+function* watchForRequestActualsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.Actuals.Request);
@@ -23,7 +23,7 @@ function* watchForTriggerBudgetActualsSaga(): SagaIterator {
   }
 }
 
-function* watchForTriggerBudgetItemsSaga(): SagaIterator {
+function* watchForRequestBudgetItemsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.BudgetItems.Request);
@@ -34,7 +34,7 @@ function* watchForTriggerBudgetItemsSaga(): SagaIterator {
   }
 }
 
-function* watchForTriggerBudgetItemsTreeSaga(): SagaIterator {
+function* watchForRequestBudgetItemsTreeSaga(): SagaIterator {
   let lastTasks;
   while (true) {
     const action = yield take(ActionType.BudgetItemsTree.Request);
@@ -80,11 +80,11 @@ function* watchForActualUpdatedInStateSaga(): SagaIterator {
 }
 
 export default function* rootSaga(): SagaIterator {
-  yield spawn(watchForTriggerBudgetActualsSaga);
+  yield spawn(watchForRequestActualsSaga);
   yield spawn(watchForRemoveActualSaga);
   yield spawn(watchForActualUpdateSaga);
-  yield spawn(watchForTriggerBudgetItemsSaga);
-  yield spawn(watchForTriggerBudgetItemsTreeSaga);
+  yield spawn(watchForRequestBudgetItemsSaga);
+  yield spawn(watchForRequestBudgetItemsTreeSaga);
   yield spawn(watchForActualAddedToStateSaga);
   yield spawn(watchForActualUpdatedInStateSaga);
 }

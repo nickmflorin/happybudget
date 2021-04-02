@@ -5,6 +5,7 @@ import { getBudgetTask } from "./tasks";
 
 import accountSaga from "./Account/sagas";
 import budgetSaga from "./Accounts/sagas";
+import actualsSaga from "./Actuals/sagas";
 import subAccountSaga from "./SubAccount/sagas";
 
 function* watchForRequestBudgetSaga(): SagaIterator {
@@ -34,5 +35,6 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForBudgetIdChangedSaga);
   yield spawn(accountSaga);
   yield spawn(budgetSaga);
+  yield spawn(actualsSaga);
   yield spawn(subAccountSaga);
 }
