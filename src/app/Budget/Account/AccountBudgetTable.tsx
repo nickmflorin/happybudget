@@ -7,7 +7,7 @@ import { createSelector } from "reselect";
 
 import { ColDef, ColSpanParams } from "ag-grid-community";
 
-import { CreateSubAccountGroupModal } from "components/modals";
+import { CreateSubAccountGroupModal, EditSubAccountGroupModal } from "components/modals";
 import { SubAccountMapping } from "model/tableMappings";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { floatValueSetter, integerValueSetter } from "util/table";
@@ -25,7 +25,8 @@ import {
   deleteGroupAction,
   addGroupToStateAction,
   removeSubAccountFromGroupAction,
-  bulkUpdateAccountAction
+  bulkUpdateAccountAction,
+  updateGroupInStateAction
 } from "./actions";
 
 const selectGroups = simpleDeepEqualSelector(
@@ -226,6 +227,18 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
             dispatch(addGroupToStateAction(group));
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
+        />
+      )}
+      {!isNil(groupToEdit) && (
+        <EditSubAccountGroupModal
+          group={groupToEdit}
+          open={true}
+          onCancel={() => setGroupToEdit(undefined)}
+          onSuccess={(group: IGroup<ISimpleSubAccount>) => {
+            setGroupToEdit(undefined);
+            console.log(group);
+            dispatch(updateGroupInStateAction(group));
+          }}
         />
       )}
     </React.Fragment>

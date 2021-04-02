@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import { createSelector } from "reselect";
 import { map } from "lodash";
 
-import { CreateAccountGroupModal } from "components/modals";
+import { CreateAccountGroupModal, EditAccountGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { AccountMapping } from "model/tableMappings";
 
@@ -22,7 +22,8 @@ import {
   addGroupToStateAction,
   deleteGroupAction,
   removeAccountFromGroupAction,
-  bulkUpdateBudgetAction
+  bulkUpdateBudgetAction,
+  updateGroupInStateAction
 } from "./actions";
 
 const selectGroups = simpleDeepEqualSelector(
@@ -126,6 +127,17 @@ const AccountsBudgetTable = (): JSX.Element => {
             dispatch(addGroupToStateAction(group));
           }}
           onCancel={() => setGroupAccounts(undefined)}
+        />
+      )}
+      {!isNil(groupToEdit) && (
+        <EditAccountGroupModal
+          group={groupToEdit}
+          open={true}
+          onCancel={() => setGroupToEdit(undefined)}
+          onSuccess={(group: IGroup<ISimpleAccount>) => {
+            setGroupToEdit(undefined);
+            dispatch(updateGroupInStateAction(group));
+          }}
         />
       )}
     </React.Fragment>

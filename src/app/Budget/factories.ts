@@ -158,7 +158,8 @@ export const createSubAccountsReducer = (
             Request: mapping.Groups.Request,
             Loading: mapping.Groups.Loading,
             RemoveFromState: mapping.Groups.RemoveFromState,
-            AddToState: mapping.Groups.AddToState
+            AddToState: mapping.Groups.AddToState,
+            UpdateInState: mapping.Groups.UpdateInState
           },
           {
             referenceEntity: "group",

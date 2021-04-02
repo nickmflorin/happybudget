@@ -444,16 +444,6 @@ $table-border: 1px solid $table-border-color;
         &.bg-69f0ae {
           div[role='gridcell'] {
             background-color: #69f0ae !important;
-            .btn--edit-group {
-              svg {
-                color: $white !important;
-              }
-              &:hover {
-                svg {
-                  color: #868686 !important;
-                }
-              }
-            }
           }
         }
         &.bg-a1887f {

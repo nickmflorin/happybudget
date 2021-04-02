@@ -90,7 +90,6 @@ export const responseGroupsAction = simpleAction<Http.IListResponse<IGroup<ISimp
 export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(
   ActionType.Account.SubAccounts.Groups.AddToState
 );
-// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const updateGroupInStateAction = simpleAction<IGroup<ISimpleSubAccount>>(
   ActionType.Account.SubAccounts.Groups.UpdateInState
 );

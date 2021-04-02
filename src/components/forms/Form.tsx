@@ -1,4 +1,4 @@
-import { map, filter, isNil, find } from "lodash";
+import { filter, isNil, find } from "lodash";
 import classNames from "classnames";
 
 import { Form as RootForm } from "antd";
@@ -18,20 +18,29 @@ const FormFooter = ({ children, className, style = {} }: FormFooterProps) => {
   );
 };
 
-export interface FormProps extends RootFormProps, StandardComponentProps {
+export interface FormProps<T extends { [key: string]: any } = any> extends RootFormProps, StandardComponentProps {
   globalError?: string;
+  initialValues?: Partial<T>;
   loading?: boolean;
 }
 
-interface _FormProps extends FormProps {
+interface _FormProps<T extends { [key: string]: any } = any> extends FormProps<T> {
   children: JSX.Element[] | JSX.Element;
 }
 
-const Form = ({ globalError, loading, children, className, style = {}, ...props }: _FormProps): JSX.Element => {
+const Form = <T extends { [key: string]: any } = any>({
+  globalError,
+  initialValues,
+  loading,
+  children,
+  className,
+  style = {},
+  ...props
+}: _FormProps<T>): JSX.Element => {
   const childrenArray = Array.isArray(children) ? children : [children];
   const footer = find(childrenArray, (child: JSX.Element) => child.type === FormFooter);
   return (
-    <RootForm {...props} className={classNames(className, "form")} style={style}>
+    <RootForm {...props} initialValues={initialValues} className={classNames(className, "form")} style={style}>
       <RenderWithSpinner loading={loading}>
         {filter(childrenArray, (child: JSX.Element) => child.type !== FormFooter)}
         <div className={"form-alert-wrapper"}>

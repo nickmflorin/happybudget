@@ -63,7 +63,12 @@ const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubA
           });
       }}
     >
-      <GroupForm form={form} name={"form_in_modal"} globalError={globalError} initialValues={{}} />
+      <GroupForm
+        form={form}
+        name={"form_in_modal"}
+        globalError={globalError}
+        initialValues={{ name: group.name, color: group.color }}
+      />
     </Modal>
   );
 };

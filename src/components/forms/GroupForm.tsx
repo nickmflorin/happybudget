@@ -17,7 +17,13 @@ interface GroupFormProps extends FormProps {
 
 const GroupForm = ({ form, initialValues = {}, globalError, ...props }: GroupFormProps): JSX.Element => {
   return (
-    <Form form={form} layout={"vertical"} globalError={globalError} initialValues={initialValues} {...props}>
+    <Form<GroupFormValues>
+      form={form}
+      layout={"vertical"}
+      globalError={globalError}
+      initialValues={initialValues}
+      {...props}
+    >
       <Form.Item
         name={"name"}
         label={"Name"}
