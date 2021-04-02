@@ -253,7 +253,18 @@ $table-border: 1px solid $table-border-color;
       }
       &--not-editable-highlight {
         background-color: #f7fffa !important;
-        border: none !important;
+        &:not(.ag-cell-range-top) {
+          border-top-color: transparent;
+        }
+        &:not(.ag-cell-range-right) {
+          border-right-color: transparent;
+        }
+        &:not(.ag-cell-range-left) {
+          border-left-color: transparent;
+        }
+        &:not(.ag-cell-range-bottom) {
+          border-bottom-color: transparent;
+        }
       }
     }
 
