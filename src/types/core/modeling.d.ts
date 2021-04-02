@@ -51,8 +51,8 @@ interface IEntity extends Model {
 }
 
 interface TrackedModel extends Model {
-  readonly created_by: ISimpleUser | null;
-  readonly updated_by: ISimpleUser | null;
+  readonly created_by: number | null;
+  readonly updated_by: number | null;
   readonly created_at: string;
   readonly updated_at: string;
 }
@@ -84,7 +84,7 @@ interface IUser extends INestedUser {
 interface IBudget extends Model {
   readonly id: number;
   readonly name: string;
-  readonly author: IUser;
+  readonly created_by: number;
   readonly project_number: number;
   readonly production_type: ProductionType;
   readonly production_type_name: ProductionTypeName;
