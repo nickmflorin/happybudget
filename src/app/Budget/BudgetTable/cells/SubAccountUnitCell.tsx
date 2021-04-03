@@ -1,7 +1,7 @@
 import { ICellRendererParams, RowNode } from "ag-grid-community";
 
 import { SubAccountUnitModelsList } from "model";
-import { UnitDropdown } from "components/control/dropdowns";
+import { OptionModelTagsDropdown } from "components/control/dropdowns";
 
 interface SubAccountUnitCellProps extends ICellRendererParams {
   onChange: (id: SubAccountUnit, row: Table.SubAccountRow) => void;
@@ -11,7 +11,7 @@ interface SubAccountUnitCellProps extends ICellRendererParams {
 
 const SubAccountUnitCell = ({ value, node, onChange }: SubAccountUnitCellProps): JSX.Element => {
   return (
-    <UnitDropdown<SubAccountUnit, SubAccountUnitName, SubAccountUnitModel>
+    <OptionModelTagsDropdown<SubAccountUnit, SubAccountUnitName, SubAccountUnitOptionModel>
       value={value}
       models={SubAccountUnitModelsList}
       onChange={(unit: SubAccountUnit) => onChange(unit, node.data)}

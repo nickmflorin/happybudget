@@ -1,7 +1,7 @@
 import { ICellRendererParams, RowNode } from "ag-grid-community";
 
 import { FringeUnitModelsList } from "model";
-import { UnitDropdown } from "components/control/dropdowns";
+import { OptionModelTagsDropdown } from "components/control/dropdowns";
 
 interface FringeUnitCellProps extends ICellRendererParams {
   onChange: (id: FringeUnit, row: Table.FringeRow) => void;
@@ -11,7 +11,7 @@ interface FringeUnitCellProps extends ICellRendererParams {
 
 const FringeUnitCell = ({ value, node, onChange }: FringeUnitCellProps): JSX.Element => {
   return (
-    <UnitDropdown<FringeUnit, FringeUnitName, FringeUnitModel>
+    <OptionModelTagsDropdown<FringeUnit, FringeUnitName, FringeUnitOptionModel>
       value={value}
       models={FringeUnitModelsList}
       onChange={(unit: FringeUnit) => onChange(unit, node.data)}

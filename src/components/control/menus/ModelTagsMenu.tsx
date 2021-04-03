@@ -2,42 +2,42 @@ import { map } from "lodash";
 import classNames from "classnames";
 import { Menu } from "antd";
 import { Tag } from "components/display";
+import { getKeyValue } from "util/objects";
+
 import "./ModelTagsMenu.scss";
 
-export interface ModelsTagMenuProps<I extends number, N extends string, M extends DistinctOptionModel<I, N>>
-  extends StandardComponentProps {
+export interface ModelTagsMenuProps<M extends Model> extends StandardComponentProps {
   models: M[];
-  onChange: (value: I) => void;
+  onChange: (model: M) => void;
+  labelField: keyof M;
+  uppercase?: boolean;
 }
 
-const ModelsTagMenu = <
-  I extends number,
-  N extends string,
-  M extends DistinctOptionModel<I, N> = DistinctOptionModel<I, N>
->({
+const ModelTagsMenu = <M extends Model>({
   /* eslint-disable indent */
   onChange,
   models,
   className,
+  labelField,
+  uppercase = true,
   style = {}
-}: ModelsTagMenuProps<I, N, M>): JSX.Element => {
+}: ModelTagsMenuProps<M>): JSX.Element => {
   return (
     <Menu className={classNames("model-tags-menu", className)} style={style}>
       {map(models, (model: M) => {
-        return (
-          <Menu.Item
-            key={model.id}
-            className={"model-tags-menu-item"}
-            onClick={(info: any) => onChange(parseInt(info.key) as I)}
-          >
-            <Tag colorIndex={model.id} uppercase>
-              {model.name}
-            </Tag>
-          </Menu.Item>
-        );
+        const label = getKeyValue<M, keyof M>(labelField)(model);
+        if (typeof label === "string") {
+          return (
+            <Menu.Item key={model.id} className={"model-tags-menu-item"} onClick={(info: any) => onChange(model)}>
+              <Tag colorIndex={model.id} uppercase={uppercase}>
+                {label}
+              </Tag>
+            </Menu.Item>
+          );
+        }
       })}
     </Menu>
   );
 };
 
-export default ModelsTagMenu;
+export default ModelTagsMenu;

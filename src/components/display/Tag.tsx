@@ -1,24 +1,10 @@
 import { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
+import { DEFAULT_TAG_COLOR_SCHEME } from "config";
 import { selectConsistent } from "util/arrays";
 
 import "./Tag.scss";
-
-export const DEFAULT_TAG_COLOR_SCHEME = [
-  "#797695",
-  "#ff7165",
-  "#80cbc4",
-  "#ce93d8",
-  "#fed835",
-  "#c87987",
-  "#69f0ae",
-  "#a1887f",
-  "#81d4fa",
-  "#f75776",
-  "#66bb6a",
-  "#58add6"
-];
 
 interface TagProps extends StandardComponentProps {
   children: string;

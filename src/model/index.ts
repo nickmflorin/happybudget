@@ -41,7 +41,7 @@ export enum SubAccountUnitNames {
   NIGHTS = "Nights"
 }
 
-export const SubAccountUnitModels: { [key: string]: SubAccountUnitModel } = {
+export const SubAccountUnitModels: { [key: string]: SubAccountUnitOptionModel } = {
   MINUTES: { id: 0, name: SubAccountUnitNames.MINUTES },
   HOURS: { id: 1, name: SubAccountUnitNames.HOURS },
   WEEKS: { id: 2, name: SubAccountUnitNames.WEEKS },
@@ -59,7 +59,7 @@ export enum FringeUnitNames {
   FLAT = "Flat"
 }
 
-export const FringeUnitModels: { [key: string]: FringeUnitModel } = {
+export const FringeUnitModels: { [key: string]: FringeUnitOptionModel } = {
   MINUTES: { id: 0, name: FringeUnitNames.PERCENT },
   HOURS: { id: 1, name: FringeUnitNames.FLAT }
 };
@@ -74,7 +74,7 @@ export enum PaymentMethodNames {
   WIRE = "Wire"
 }
 
-export const PaymentMethodModels: { [key: string]: PaymentMethodModel } = {
+export const PaymentMethodModels: { [key: string]: PaymentMethodOptionModel } = {
   MINUTES: { id: 0, name: PaymentMethodNames.CHECK },
   HOURS: { id: 1, name: PaymentMethodNames.CARD },
   WEEKS: { id: 2, name: PaymentMethodNames.WIRE }

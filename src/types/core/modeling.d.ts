@@ -1,27 +1,27 @@
-interface DistinctOptionModel<I extends number, N extends string> {
+interface OptionModel<I extends number, N extends string> {
   id: I;
   name: N;
 }
 
 type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
 type ProductionType = 0 | 1 | 2 | 3 | 4 | 5;
-type ProductionTypeModel = DistinctOptionModel<ProductionType, ProductionTypeName>;
+type ProductionTypeModel = OptionModel<ProductionType, ProductionTypeName>;
 
 type PaymentMethodName = "Check" | "Card" | "Wire";
 type PaymentMethod = 0 | 1 | 2;
-type PaymentMethodModel = DistinctOptionModel<PaymentMethod, PaymentMethodName>;
+type PaymentMethodOptionModel = OptionModel<PaymentMethod, PaymentMethodName>;
+
+type SubAccountUnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
+type SubAccountUnit = 0 | 1 | 2 | 3 | 4 | 5;
+type SubAccountUnitOptionModel = OptionModel<SubAccountUnit, SubAccountUnitName>;
+
+type FringeUnit = 0 | 1;
+type FringeUnitName = "Percent" | "Flat";
+type FringeUnitOptionModel = OptionModel<FringeUnit, FringeUnitName>;
 
 type EntityType = "budget" | "account" | "subaccount";
 type BudgetItemType = "subaccount" | "account";
 type CommentParentType = "budget" | "account" | "subaccount" | "comment";
-
-type SubAccountUnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
-type SubAccountUnit = 0 | 1 | 2 | 3 | 4 | 5;
-type SubAccountUnitModel = DistinctOptionModel<SubAccountUnit, SubAccountUnitName>;
-
-type FringeUnit = 0 | 1;
-type FringeUnitName = "Percent" | "Flat";
-type FringeUnitModel = DistinctOptionModel<FringeUnit, FringeUnitName>;
 
 type ContactRoleName =
   | "Producer"
