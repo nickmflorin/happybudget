@@ -84,7 +84,10 @@ const BudgetTable = <
   groupParams,
   identifierField,
   identifierFieldHeader,
-  identifierFieldParams = {},
+  identifierColumn = {},
+  actionColumn = {},
+  expandColumn = {},
+  indexColumn = {},
   tableFooterIdentifierValue = "Grand Total",
   budgetFooterIdentifierValue = "Budget Total",
   tableTotals,
@@ -241,15 +244,77 @@ const BudgetTable = <
   const actionCell = useDynamicCallback<ColDef>(
     (col: ColDef): ColDef => {
       return {
-        editable: false,
-        headerName: "",
         width: 20,
         maxWidth: 25,
-        resizable: false,
-        cellClass: classNames("cell--action", "cell--not-editable", "cell--not-selectable"),
-        ...col
+        ...col,
+        cellClass: classNames("cell--action", "cell--not-editable", "cell--not-selectable", col.cellClass),
+        editable: false,
+        headerName: "",
+        resizable: false
       };
     }
+  );
+
+  const indexCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef =>
+      actionCell({
+        ...actionColumn,
+        ...indexColumn,
+        field: "index",
+        cellRenderer: "IndexCell",
+        cellRendererParams: {
+          onSelect: onRowSelect,
+          onDeselect: onRowDeselect,
+          onNew: onRowAdd,
+          ...col.cellRendererParams,
+          ...actionColumn.cellRendererParams,
+          ...indexColumn.cellRendererParams
+        },
+        cellClass: classNames(indexColumn.cellClass, actionColumn.cellClass),
+        colSpan: (params: ColSpanParams) => {
+          const row: R = params.data;
+          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
+            if (!isNil(onRowExpand)) {
+              return 2;
+            }
+            return 1;
+          }
+          return 1;
+        }
+      })
+  );
+
+  const identifierCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef => ({
+      field: identifierField,
+      headerName: identifierFieldHeader,
+      cellRenderer: "IdentifierCell",
+      ...identifierColumn,
+      colSpan: (params: ColSpanParams) => {
+        const row: R = params.data;
+        if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
+          return bodyColumns.length + 1;
+        } else if (!isNil(identifierColumn.colSpan)) {
+          return identifierColumn.colSpan(params);
+        }
+        return 1;
+      },
+      cellRendererParams: {
+        ...identifierColumn.cellRendererParams,
+        onGroupEdit: !isNil(groupParams) ? groupParams.onEditGroup : undefined
+      }
+    })
+  );
+
+  const expandCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef =>
+      actionCell({
+        ...col,
+        field: "expand",
+        cellRenderer: "ExpandCell",
+        cellRendererParams: { onClick: onRowExpand },
+        cellClass: classNames(expandColumn.cellClass, actionColumn.cellClass)
+      })
   );
 
   const calculatedCell = useDynamicCallback<ColDef>(
@@ -317,64 +382,15 @@ const BudgetTable = <
   );
 
   const baseColumns = useMemo((): ColDef[] => {
-    let baseLeftColumns: ColDef[] = [
-      actionCell({
-        field: "index",
-        cellRenderer: "IndexCell",
-        cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect, onNew: onRowAdd },
-        colSpan: (params: ColSpanParams) => {
-          const row: R = params.data;
-          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
-            if (!isNil(onRowExpand)) {
-              return 2;
-            }
-            return 1;
-          }
-          return 1;
-        }
-      })
-    ];
+    let baseLeftColumns: ColDef[] = [indexCell({})];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
-      baseLeftColumns.push(
-        actionCell({
-          field: "expand",
-          cellRenderer: "ExpandCell",
-          cellRendererParams: { onClick: onRowExpand }
-        })
-      );
+      baseLeftColumns.push(expandCell({}));
     }
-    baseLeftColumns.push({
-      field: identifierField,
-      headerName: identifierFieldHeader,
-      cellRenderer: "IdentifierCell",
-      ...identifierFieldParams,
-      colSpan: (params: ColSpanParams) => {
-        const row: R = params.data;
-        if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
-          return bodyColumns.length + 1;
-        } else if (!isNil(identifierFieldParams.colSpan)) {
-          return identifierFieldParams.colSpan(params);
-        }
-        return 1;
-      },
-      cellRendererParams: {
-        ...identifierFieldParams.cellRendererParams,
-        onGroupEdit: !isNil(groupParams) ? groupParams.onEditGroup : undefined
-      }
-    });
+    baseLeftColumns.push(identifierCell({}));
     return baseLeftColumns;
-  }, [
-    groupParams,
-    onRowSelect,
-    onRowDeselect,
-    onRowExpand,
-    onRowDelete,
-    identifierField,
-    identifierFieldHeader,
-    identifierFieldParams
-  ]);
+  }, [onRowExpand]);
 
   const createGroupFooter = (group: G): R => {
     const footerObj: { [key: string]: any } = {

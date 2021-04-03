@@ -32,7 +32,10 @@ export interface BudgetTableProps<
   selected?: number[];
   identifierField: string;
   identifierFieldHeader: string;
-  identifierFieldParams?: Partial<ColDef>;
+  identifierColumn?: Partial<ColDef>;
+  actionColumn?: Partial<ColDef>;
+  indexColumn?: Partial<ColDef>;
+  expandColumn?: Partial<ColDef>;
   tableFooterIdentifierValue?: string | null;
   budgetFooterIdentifierValue?: string | null;
   tableTotals?: { [key: string]: any };

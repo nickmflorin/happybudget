@@ -91,7 +91,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         loadingBudget={loadingBudget}
         identifierField={"identifier"}
         identifierFieldHeader={"Line"}
-        identifierFieldParams={{ width: 70, cellRendererParams: { className: "subaccount-identifier" } }}
+        identifierColumn={{ width: 70, cellRendererParams: { className: "subaccount-identifier" } }}
         sizeColumnsToFit={false}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)

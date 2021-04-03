@@ -69,7 +69,7 @@ const Actuals = (): JSX.Element => {
         selected={selected}
         identifierField={"object_id"}
         identifierFieldHeader={"Account"}
-        identifierFieldParams={{
+        identifierColumn={{
           width: 200,
           cellClass: "borderless",
           cellRenderer: "BudgetItemCell",
@@ -87,6 +87,7 @@ const Actuals = (): JSX.Element => {
             }
           }
         }}
+        indexColumn={{ width: 40, maxWidth: 50 }}
         nonEditableCells={["object_id", "payment_method"]}
         nonHighlightedNonEditableCells={["payment_method", "object_id"]}
         search={search}
