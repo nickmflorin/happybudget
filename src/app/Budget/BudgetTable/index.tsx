@@ -51,6 +51,10 @@ import "./index.scss";
 
 export * from "./model";
 
+// Convenience flag for development to turn off the context menu so we can right-click inspect
+// the cells and turn on debug mode for AG Grid.
+const TABLE_DEBUG = false;
+
 const BudgetTable = <
   R extends Table.Row<G, C>,
   M extends Model,
@@ -84,6 +88,7 @@ const BudgetTable = <
   budgetFooterIdentifierValue = "Budget Total",
   tableTotals,
   budgetTotals,
+  sizeColumnsToFit = true,
   cellClass,
   onSearch,
   onSelectAll,
@@ -118,6 +123,7 @@ const BudgetTable = <
       filter: false
     },
     suppressHorizontalScroll: true,
+    suppressContextMenu: TABLE_DEBUG,
     suppressCopyRowsToClipboard: isNil(onRowBulkUpdate),
     suppressClipboardPaste: isNil(onRowBulkUpdate),
     ...options
@@ -148,7 +154,9 @@ const BudgetTable = <
   });
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    event.api.sizeColumnsToFit();
+    if (sizeColumnsToFit === true) {
+      event.api.sizeColumnsToFit();
+    }
   });
 
   const onGridReady = useDynamicCallback((event: GridReadyEvent): void => {
@@ -157,7 +165,9 @@ const BudgetTable = <
   });
 
   const onTableFooterFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    event.api.sizeColumnsToFit();
+    if (sizeColumnsToFit === true) {
+      event.api.sizeColumnsToFit();
+    }
   });
 
   const onTableFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
@@ -232,8 +242,8 @@ const BudgetTable = <
       return {
         editable: false,
         headerName: "",
-        width: 25,
-        maxWidth: 30,
+        width: 20,
+        maxWidth: 25,
         resizable: false,
         cellClass: classNames("cell--action", "cell--not-editable", "cell--not-selectable"),
         ...col
@@ -338,8 +348,6 @@ const BudgetTable = <
       field: identifierField,
       headerName: identifierFieldHeader,
       cellRenderer: "IdentifierCell",
-      minWidth: 100,
-      maxWidth: 125,
       ...identifierFieldParams,
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
@@ -351,6 +359,7 @@ const BudgetTable = <
         return 1;
       },
       cellRendererParams: {
+        ...identifierFieldParams.cellRendererParams,
         onGroupEdit: !isNil(groupParams) ? groupParams.onEditGroup : undefined
       }
     });
@@ -996,6 +1005,7 @@ const BudgetTable = <
               getContextMenuItems={getContextMenuItems}
               allowContextMenuWithControlKey={true}
               rowData={table}
+              debug={TABLE_DEBUG}
               getRowNodeId={(r: any) => r.id}
               getRowClass={getRowClass}
               immutableData={true}

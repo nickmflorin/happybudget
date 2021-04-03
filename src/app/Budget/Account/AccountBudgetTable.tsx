@@ -91,6 +91,8 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         loadingBudget={loadingBudget}
         identifierField={"identifier"}
         identifierFieldHeader={"Line"}
+        identifierFieldParams={{ width: 70, cellRendererParams: { className: "subaccount-identifier" } }}
+        sizeColumnsToFit={false}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)
             ? `${accountDetail.description} Total`
@@ -155,12 +157,12 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
           {
             field: "name",
             headerName: "Name",
-            width: 15
+            width: 80
           },
           {
             field: "quantity",
             headerName: "Qty",
-            width: 10,
+            width: 60,
             cellStyle: { textAlign: "right" },
             valueSetter: integerValueSetter("quantity")
           },
@@ -169,7 +171,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
             headerName: "Unit",
             cellClass: classNames("cell--centered"),
             cellRenderer: "SubAccountUnitCell",
-            width: 20,
+            width: 80,
             cellRendererParams: {
               onChange: (unit: SubAccountUnit, row: Table.SubAccountRow) =>
                 dispatch(
@@ -188,14 +190,14 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
           {
             field: "multiplier",
             headerName: "X",
-            width: 10,
+            width: 50,
             cellStyle: { textAlign: "right" },
             valueSetter: floatValueSetter("multiplier")
           },
           {
             field: "rate",
             headerName: "Rate",
-            width: 10,
+            width: 70,
             cellStyle: { textAlign: "right" },
             valueSetter: floatValueSetter("rate")
           }

@@ -48,6 +48,7 @@ export interface BudgetTableProps<
   nonHighlightedNonEditableCells?: (keyof R)[];
   groupParams?: GroupProps<R, G, C>;
   loading?: boolean;
+  sizeColumnsToFit?: boolean;
   cellClass?: (params: CellClassParams) => string | undefined;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
   onSearch: (value: string) => void;
