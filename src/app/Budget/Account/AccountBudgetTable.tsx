@@ -1,19 +1,14 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isNil, includes, map } from "lodash";
-import classNames from "classnames";
+import { isNil, map } from "lodash";
 import { createSelector } from "reselect";
 
-import { ColDef, ColSpanParams } from "ag-grid-community";
-
 import { CreateSubAccountGroupModal, EditSubAccountGroupModal } from "components/modals";
-import { SubAccountMapping } from "model/tableMappings";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { floatValueSetter, integerValueSetter, currencyValueFormatter } from "util/table";
 
-import BudgetTable from "../BudgetTable";
-import { selectBudgetId, selectBudgetDetail, selectBudgetDetailLoading } from "../selectors";
+import SubAccountsTable from "../SubAccountsTable";
+import { selectBudgetId } from "../selectors";
 import {
   addPlaceholdersToStateAction,
   deselectSubAccountAction,
@@ -70,51 +65,23 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
-  const budgetDetail = useSelector(selectBudgetDetail);
-  const loadingBudget = useSelector(selectBudgetDetailLoading);
   const groups = useSelector(selectGroups);
 
   return (
     <React.Fragment>
-      <BudgetTable<
-        Table.SubAccountRow,
-        ISubAccount,
-        IGroup<ISimpleSubAccount>,
-        Http.ISubAccountPayload,
-        ISimpleSubAccount
-      >
+      <SubAccountsTable
         data={data}
         groups={groups}
         placeholders={placeholders}
-        mapping={SubAccountMapping}
         selected={selected}
-        loadingBudget={loadingBudget}
-        identifierField={"identifier"}
-        identifierFieldHeader={"Line"}
-        identifierColumn={{ width: 70, cellRendererParams: { className: "subaccount-identifier" } }}
-        sizeColumnsToFit={false}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)
             ? `${accountDetail.description} Total`
             : "Account Total"
         }
-        budgetFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
-        isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
-          if (includes(["unit"], colDef.field)) {
-            return false;
-          } else if (includes(["identifier", "description", "name"], colDef.field)) {
-            return true;
-          } else {
-            return row.meta.children.length === 0;
-          }
-        }}
-        isCellNonEditableHighlight={(row: Table.SubAccountRow, colDef: ColDef) => {
-          return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
-        }}
         search={search}
         onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
-        rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
         onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
@@ -122,101 +89,18 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountAction(payload))}
         onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateAccountAction(changes))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
-        groupParams={{
-          onDeleteGroup: (group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id)),
-          onRowRemoveFromGroup: (row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id)),
-          onGroupRows: (rows: Table.SubAccountRow[]) =>
-            setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id)),
-          onEditGroup: (group: IGroup<ISimpleSubAccount>) => setGroupToEdit(group)
-        }}
+        onDeleteGroup={(group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id))}
+        onRowRemoveFromGroup={(row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id))}
+        onGroupRows={(rows: Table.SubAccountRow[]) =>
+          setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
+        }
+        onEditGroup={(group: IGroup<ISimpleSubAccount>) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllSubAccountsAction())}
         tableTotals={{
           estimated: !isNil(accountDetail) && !isNil(accountDetail.estimated) ? accountDetail.estimated : 0.0,
           variance: !isNil(accountDetail) && !isNil(accountDetail.variance) ? accountDetail.variance : 0.0,
           actual: !isNil(accountDetail) && !isNil(accountDetail.actual) ? accountDetail.actual : 0.0
         }}
-        budgetTotals={{
-          estimated: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
-          variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
-          actual: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
-        }}
-        bodyColumns={[
-          {
-            field: "description",
-            headerName: "Category Description",
-            flex: 100,
-            colSpan: (params: ColSpanParams) => {
-              if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
-                return !isNil(params.data) && !isNil(params.data.meta) && params.data.meta.children.length !== 0
-                  ? 6
-                  : 1;
-              }
-              return 1;
-            }
-          },
-          {
-            field: "name",
-            headerName: "Name",
-            width: 80
-          },
-          {
-            field: "quantity",
-            headerName: "Qty",
-            width: 60,
-            cellStyle: { textAlign: "right" },
-            valueSetter: integerValueSetter("quantity")
-          },
-          {
-            field: "unit",
-            headerName: "Unit",
-            cellClass: classNames("cell--centered"),
-            cellRenderer: "SubAccountUnitCell",
-            width: 80,
-            cellRendererParams: {
-              onChange: (unit: SubAccountUnit, row: Table.SubAccountRow) =>
-                dispatch(
-                  updateSubAccountAction({
-                    id: row.id,
-                    data: {
-                      unit: {
-                        oldValue: row.unit,
-                        newValue: unit
-                      }
-                    }
-                  })
-                )
-            }
-          },
-          {
-            field: "multiplier",
-            headerName: "X",
-            width: 50,
-            cellStyle: { textAlign: "right" },
-            valueSetter: floatValueSetter("multiplier")
-          },
-          {
-            field: "rate",
-            headerName: "Rate",
-            width: 70,
-            cellStyle: { textAlign: "right" },
-            valueFormatter: currencyValueFormatter,
-            valueSetter: floatValueSetter("rate")
-          }
-        ]}
-        calculatedColumns={[
-          {
-            field: "estimated",
-            headerName: "Estimated"
-          },
-          {
-            field: "actual",
-            headerName: "Actual"
-          },
-          {
-            field: "variance",
-            headerName: "Variance"
-          }
-        ]}
       />
       {!isNil(groupSubAccounts) && (
         <CreateSubAccountGroupModal
