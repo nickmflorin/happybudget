@@ -89,7 +89,7 @@ function* watchForRequestCommentsSaga(): SagaIterator {
 function* watchForSubmitCommentSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Account.Comments.Submit);
+    const action = yield take(ActionType.Account.Comments.Create);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -102,7 +102,7 @@ function* watchForRemoveCommentSaga(): SagaIterator {
 }
 
 function* watchForEditCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Account.Comments.Edit, editAccountCommentTask);
+  yield takeEvery(ActionType.Account.Comments.Update, editAccountCommentTask);
 }
 
 function* watchForRequestHistorySaga(): SagaIterator {

@@ -1,4 +1,4 @@
-import { ColDef, CellClassParams, RowNode } from "ag-grid-community";
+import { ColDef, CellClassParams, RowNode, GridOptions } from "ag-grid-community";
 import Mapping from "model/tableMappings";
 
 export interface GetExportValueParams {
@@ -22,7 +22,7 @@ export interface BudgetTableProps<
   G extends IGroup<any>,
   P extends Http.IPayload = Http.IPayload,
   C extends Model = UnknownModel
-> {
+> extends GridOptions {
   bodyColumns: ColDef[];
   calculatedColumns?: ColDef[];
   mapping: Mapping<R, M, G, P, C>;
@@ -54,7 +54,7 @@ export interface BudgetTableProps<
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
   onRowUpdate: (payload: Table.RowChange) => void;
-  onRowBulkUpdate: (payload: Table.RowChange[]) => void;
+  onRowBulkUpdate?: (payload: Table.RowChange[]) => void;
   onRowAdd: () => void;
   onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;

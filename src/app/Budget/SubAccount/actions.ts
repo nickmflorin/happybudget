@@ -17,13 +17,13 @@ export const responseCommentsAction = simpleAction<Http.IListResponse<IComment>>
   ActionType.SubAccount.Comments.Response
 );
 export const loadingCommentsAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Loading);
-export const submitCommentAction = simpleAction<{ parent?: number; data: Http.ICommentPayload }>(
-  ActionType.SubAccount.Comments.Submit
+export const createCommentAction = simpleAction<{ parent?: number; data: Http.ICommentPayload }>(
+  ActionType.SubAccount.Comments.Create
 );
-export const submittingCommentAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Submitting);
+export const creatingCommentAction = simpleAction<boolean>(ActionType.SubAccount.Comments.Creating);
 export const deleteCommentAction = simpleAction<number>(ActionType.SubAccount.Comments.Delete);
-export const editCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
-  ActionType.SubAccount.Comments.Edit
+export const updateCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
+  ActionType.SubAccount.Comments.Update
 );
 export const replyingToCommentAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.SubAccount.Comments.Replying
@@ -31,7 +31,9 @@ export const replyingToCommentAction = simpleAction<Redux.ModelListActionPayload
 export const deletingCommentAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.SubAccount.Comments.Deleting
 );
-export const editingCommentAction = simpleAction<Redux.ModelListActionPayload>(ActionType.SubAccount.Comments.Editing);
+export const updatingCommentAction = simpleAction<Redux.ModelListActionPayload>(
+  ActionType.SubAccount.Comments.Updating
+);
 export const addCommentToStateAction = simpleAction<{ data: IComment; parent?: number }>(
   ActionType.SubAccount.Comments.AddToState
 );

@@ -1,17 +1,8 @@
 import { Reducer } from "redux";
 import { isNil, forEach, find, filter, includes, map } from "lodash";
 import { replaceInArray } from "util/arrays";
-import { mergeWithDefaults } from "util/objects";
 import { initialListResponseState } from "store/initialState";
-import { createObjectReducerFromTransformers } from "./util";
-
-const defaultListResponseReducerOptions = {
-  referenceEntity: "entity",
-  extensions: {},
-  keyReducers: {},
-  excludeActionsFromExtensions: true,
-  strictSelect: true
-};
+import { mergeOptionsWithDefaults, createObjectReducerFromTransformers } from "./util";
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
@@ -32,18 +23,10 @@ export const createListResponseReducer = <
 >(
   /* eslint-disable indent */
   mappings: Partial<ReducerFactory.IListResponseActionMap>,
-  options: Partial<ReducerFactory.IListTransformerReducerOptions<S, A>> = {
-    initialState: initialListResponseState as S,
-    ...defaultListResponseReducerOptions
-  }
+  options: Partial<ReducerFactory.IOptions<S, A>> = {}
 ): Reducer<S, A> => {
-  const Options = mergeWithDefaults<ReducerFactory.IListTransformerReducerOptions<S, A>>(
-    { ...options },
-    {
-      initialState: initialListResponseState as S,
-      ...defaultListResponseReducerOptions
-    }
-  );
+  const Options = mergeOptionsWithDefaults<S, A>(options, initialListResponseState as S);
+
   const transformers: ReducerFactory.Transformers<ReducerFactory.IListResponseActionMap, S, A> = {
     // We have to reset the page to it's initial state otherwise we run the risk
     // of a 404 with the API request due to the page not being found.
@@ -158,6 +141,61 @@ export const createListResponseReducer = <
           /* eslint-disable no-console */
           console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
           return {};
+        }
+      }
+    },
+    Creating: (payload: boolean, st: S) => ({ creating: payload }),
+    Deleting: (payload: Redux.ModelListActionPayload, st: S) => {
+      if (payload.value === true) {
+        if (includes(st.deleting, payload.id)) {
+          /* eslint-disable no-console */
+          console.warn(
+            `Inconsistent State!  Inconsistent state noticed when adding ${Options.referenceEntity}
+            to deleting state... the ${Options.referenceEntity} with ID ${payload.id} already
+            exists in the deleting state when it is not expected to.`
+          );
+          return {};
+        } else {
+          return { deleting: [...st.deleting, payload.id] };
+        }
+      } else {
+        if (!includes(st.deleting, payload.id)) {
+          /* eslint-disable no-console */
+          console.warn(
+            `Inconsistent State!  Inconsistent state noticed when removing ${Options.referenceEntity}
+            from deleting state... the ${Options.referenceEntity} with ID ${payload.id} does
+            not exist in the deleting state when it is expected to.`
+          );
+          return {};
+        } else {
+          return { deleting: filter(st.deleting, (id: number) => id !== payload.id) };
+        }
+      }
+    },
+    Updating: (payload: Redux.ModelListActionPayload, st: S) => {
+      if (payload.value === true) {
+        if (includes(st.updating, payload.id)) {
+          /* eslint-disable no-console */
+          console.warn(
+            `Inconsistent State!  Inconsistent state noticed when adding ${Options.referenceEntity}
+            to updating state... the ${Options.referenceEntity} with ID ${payload.id} already
+            exists in the updating state when it is not expected to.`
+          );
+          return {};
+        } else {
+          return { updating: [...st.updating, payload.id] };
+        }
+      } else {
+        if (!includes(st.updating, payload.id)) {
+          /* eslint-disable no-console */
+          console.warn(
+            `Inconsistent State!  Inconsistent state noticed when removing ${Options.referenceEntity}
+            from updating state... the ${Options.referenceEntity} with ID ${payload.id} does
+            not exist in the updating state when it is expected to.`
+          );
+          return {};
+        } else {
+          return { updating: filter(st.updating, (id: number) => id !== payload.id) };
         }
       }
     }

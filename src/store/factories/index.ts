@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { isNil, filter, includes } from "lodash";
-import { mergeWithDefaults } from "util/objects";
+import { mergeOptionsWithDefaults } from "./util";
 
 export * from "./counter";
 export * from "./comments";
@@ -43,10 +43,8 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
   actionType: string,
   options: Partial<ReducerFactory.IOptions<Redux.ListStore<number>>> = { initialState: [], referenceEntity: "entity" }
 ): Reducer<Redux.ListStore<number>, A> => {
-  const Options = mergeWithDefaults<ReducerFactory.IOptions<Redux.ListStore<number>>>(options, {
-    referenceEntity: "entity",
-    initialState: []
-  });
+  const Options = mergeOptionsWithDefaults<Redux.ListStore<number>, A>(options, []);
+
   const reducer: Reducer<Redux.ListStore<number>, A> = (
     state: Redux.ListStore<number> = Options.initialState,
     action: A

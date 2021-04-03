@@ -8,7 +8,10 @@ export const initialListResponseState: Redux.IListResponseStore<any> = {
   pageSize: 10,
   search: "",
   selected: [],
-  responseWasReceived: false
+  responseWasReceived: false,
+  creating: false,
+  deleting: [],
+  updating: []
 };
 
 export const initialDetailResponseState: Redux.IDetailResponseStore<any> = {
@@ -19,9 +22,6 @@ export const initialDetailResponseState: Redux.IDetailResponseStore<any> = {
 
 export const initialCommentsListResponseState: Redux.ICommentsListResponseStore = {
   ...initialListResponseState,
-  submitting: false,
-  deleting: [],
-  editing: [],
   replying: []
 };
 

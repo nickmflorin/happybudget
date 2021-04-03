@@ -96,7 +96,8 @@ const BudgetTable = <
   isCellEditable,
   isCellSelectable,
   isCellNonEditableHighlight,
-  rowRefreshRequired
+  rowRefreshRequired,
+  ...options
 }: BudgetTableProps<R, M, G, P, C>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -115,7 +116,10 @@ const BudgetTable = <
       sortable: false,
       filter: false
     },
-    suppressHorizontalScroll: true
+    suppressHorizontalScroll: true,
+    suppressCopyRowsToClipboard: isNil(onRowBulkUpdate),
+    suppressClipboardPaste: isNil(onRowBulkUpdate),
+    ...options
   });
   const [tableFooterGridOptions, setTableFooterGridOptions] = useState<GridOptions>({
     alignedGrids: [],
@@ -629,18 +633,20 @@ const BudgetTable = <
   });
 
   const onPasteEnd = useDynamicCallback((event: PasteEndEvent) => {
-    if (cellChangeEvents.length === 1) {
-      const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
-      if (!isNil(tableChange)) {
-        onRowUpdate(tableChange);
-      }
-    } else if (cellChangeEvents.length !== 0) {
-      const changes = filter(
-        map(cellChangeEvents, (e: CellValueChangedEvent) => getTableChangeFromEvent(e)),
-        (change: Table.RowChange | null) => change !== null
-      ) as Table.RowChange[];
-      if (changes.length !== 0) {
-        onRowBulkUpdate(changes);
+    if (!isNil(onRowBulkUpdate)) {
+      if (cellChangeEvents.length === 1) {
+        const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
+        if (!isNil(tableChange)) {
+          onRowUpdate(tableChange);
+        }
+      } else if (cellChangeEvents.length !== 0) {
+        const changes = filter(
+          map(cellChangeEvents, (e: CellValueChangedEvent) => getTableChangeFromEvent(e)),
+          (change: Table.RowChange | null) => change !== null
+        ) as Table.RowChange[];
+        if (changes.length !== 0) {
+          onRowBulkUpdate(changes);
+        }
       }
     }
   });

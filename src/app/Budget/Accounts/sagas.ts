@@ -65,7 +65,7 @@ function* watchForRequestCommentsSaga(): SagaIterator {
 function* watchForSubmitCommentSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Budget.Comments.Submit);
+    const action = yield take(ActionType.Budget.Comments.Create);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
@@ -78,7 +78,7 @@ function* watchForRemoveCommentSaga(): SagaIterator {
 }
 
 function* watchForEditCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Comments.Edit, editCommentTask);
+  yield takeEvery(ActionType.Budget.Comments.Update, editCommentTask);
 }
 
 function* watchForRequestHistorySaga(): SagaIterator {

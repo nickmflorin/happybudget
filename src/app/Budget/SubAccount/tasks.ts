@@ -35,12 +35,12 @@ import {
   requestSubAccountsAction,
   loadingCommentsAction,
   responseCommentsAction,
-  submittingCommentAction,
+  creatingCommentAction,
   addCommentToStateAction,
   deletingCommentAction,
   removeCommentFromStateAction,
   updateCommentInStateAction,
-  editingCommentAction,
+  updatingCommentAction,
   replyingToCommentAction,
   loadingSubAccountsHistoryAction,
   responseSubAccountsHistoryAction,
@@ -414,7 +414,7 @@ export function* submitCommentTask(
     if (!isNil(parent)) {
       yield put(replyingToCommentAction({ id: parent, value: true }));
     } else {
-      yield put(submittingCommentAction(true));
+      yield put(creatingCommentAction(true));
     }
     try {
       let response: IComment;
@@ -430,7 +430,7 @@ export function* submitCommentTask(
       if (!isNil(parent)) {
         yield put(replyingToCommentAction({ id: parent, value: false }));
       } else {
-        yield put(submittingCommentAction(false));
+        yield put(creatingCommentAction(false));
       }
     }
   }
@@ -453,7 +453,7 @@ export function* deleteCommentTask(action: Redux.IAction<number>): SagaIterator 
 export function* editCommentTask(action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>): SagaIterator {
   if (!isNil(action.payload)) {
     const { id, data } = action.payload;
-    yield put(editingCommentAction({ id, value: true }));
+    yield put(updatingCommentAction({ id, value: true }));
     try {
       // Here we are assuming that Partial<IComment> can be mapped to Partial<Http.ICommentPayload>,
       // which is the case right now but may not be in the future.
@@ -462,7 +462,7 @@ export function* editCommentTask(action: Redux.IAction<Redux.UpdateModelActionPa
     } catch (e) {
       handleRequestError(e, "There was an error updating the comment.");
     } finally {
-      yield put(editingCommentAction({ id, value: false }));
+      yield put(updatingCommentAction({ id, value: false }));
     }
   }
 }

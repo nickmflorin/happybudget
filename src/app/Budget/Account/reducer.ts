@@ -26,9 +26,9 @@ const genericReducer: Reducer<Redux.Budget.IAccountStore, Redux.IAction<any>> = 
     AddToState: ActionType.Account.Comments.AddToState,
     RemoveFromState: ActionType.Account.Comments.RemoveFromState,
     UpdateInState: ActionType.Account.Comments.UpdateInState,
-    Submitting: ActionType.Account.Comments.Submitting,
+    Creating: ActionType.Account.Comments.Creating,
     Deleting: ActionType.Account.Comments.Deleting,
-    Editing: ActionType.Account.Comments.Editing,
+    Updating: ActionType.Account.Comments.Updating,
     Replying: ActionType.Account.Comments.Replying
   }),
   subaccounts: createSubAccountsReducer({

@@ -11,7 +11,7 @@ import AccountsBudgetTable from "./AccountsBudgetTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
 
 const selectAccountsTableLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.budget.accounts.loading
+  (state: Redux.IApplicationStore) => state.budget.accounts.loading
 );
 
 const Accounts = (): JSX.Element => {

@@ -20,6 +20,7 @@ const rootReducer = combineReducers({
   account: accountRootReducer,
   subaccount: subAccountRootReducer,
   actuals: actualsRootReducer,
+  accounts: accountsRootReducer,
   budget: combineReducers({
     id: createSimplePayloadReducer<number | null>(ActionType.Budget.SetId, null),
     detail: createDetailResponseReducer<IBudget, Redux.IDetailResponseStore<IBudget>, Redux.IAction>({
@@ -34,12 +35,11 @@ const rootReducer = combineReducers({
       AddToState: ActionType.Budget.Comments.AddToState,
       RemoveFromState: ActionType.Budget.Comments.RemoveFromState,
       UpdateInState: ActionType.Budget.Comments.UpdateInState,
-      Submitting: ActionType.Budget.Comments.Submitting,
+      Creating: ActionType.Budget.Comments.Creating,
       Deleting: ActionType.Budget.Comments.Deleting,
-      Editing: ActionType.Budget.Comments.Editing,
+      Updating: ActionType.Budget.Comments.Updating,
       Replying: ActionType.Budget.Comments.Replying
-    }),
-    accounts: accountsRootReducer
+    })
   }),
   budgetItems: createListResponseReducer<IBudgetItem>(
     {

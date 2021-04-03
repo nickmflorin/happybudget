@@ -1,10 +1,9 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce } from "lodash";
-import { createSimpleBooleanReducer, createModelListActionReducer, createListResponseReducer } from "store/factories";
-import { createListReducerFromTransformers } from "store/factories/util";
+import { createListResponseReducer } from "store/factories";
+import { createListReducerFromTransformers, mergeOptionsWithDefaults } from "store/factories/util";
 import Mapping, { SubAccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
-import { mergeWithDefaults } from "util/objects";
 
 import { initialSubAccountsState } from "./initialState";
 
@@ -64,10 +63,7 @@ export const createTablePlaceholdersReducer = <
   mapping: Mapping<R, M, G, P, C>,
   options: Partial<ReducerFactory.IOptions<Redux.ListStore<R>>> = { initialState: [], referenceEntity: "entity" }
 ) => {
-  const Options = mergeWithDefaults<ReducerFactory.IOptions<Redux.ListStore<R>>>(options, {
-    referenceEntity: "entity",
-    initialState: []
-  });
+  const Options = mergeOptionsWithDefaults<Redux.ListStore<R>>(options, []);
 
   const transformers: ReducerFactory.Transformers<ReducerFactory.ITablePlaceholdersActionMap, Redux.ListStore<R>, A> = {
     Clear: () => [],
@@ -136,7 +132,10 @@ export const createSubAccountsReducer = (
       AddToState: mapping.AddToState,
       Select: mapping.Select,
       Deselect: mapping.Deselect,
-      SelectAll: mapping.SelectAll
+      SelectAll: mapping.SelectAll,
+      Deleting: mapping.Deleting,
+      Updating: mapping.Updating,
+      Creating: mapping.Creating
     },
     {
       referenceEntity: "subaccount",
@@ -152,30 +151,23 @@ export const createSubAccountsReducer = (
           SubAccountMapping,
           { referenceEntity: "subaccount" }
         ),
-        groups: createListResponseReducer<IGroup<ISimpleSubAccount>, Redux.Budget.IGroupsStore<ISimpleSubAccount>>(
+        groups: createListResponseReducer<
+          IGroup<ISimpleSubAccount>,
+          Redux.IListResponseStore<IGroup<ISimpleSubAccount>>
+        >(
           {
             Response: mapping.Groups.Response,
             Request: mapping.Groups.Request,
             Loading: mapping.Groups.Loading,
             RemoveFromState: mapping.Groups.RemoveFromState,
             AddToState: mapping.Groups.AddToState,
-            UpdateInState: mapping.Groups.UpdateInState
+            UpdateInState: mapping.Groups.UpdateInState,
+            Deleting: mapping.Groups.Deleting
           },
           {
-            referenceEntity: "group",
-            keyReducers: {
-              deleting: createModelListActionReducer(mapping.Groups.Deleting, {
-                referenceEntity: "group"
-              })
-            }
+            referenceEntity: "group"
           }
         ),
-        deleting: createModelListActionReducer(mapping.Deleting, {
-          referenceEntity: "subaccount"
-        }),
-        updating: createModelListActionReducer(mapping.Updating, {
-          referenceEntity: "subaccount"
-        }),
         history: createListResponseReducer<HistoryEvent>(
           {
             Response: mapping.History.Response,
@@ -183,8 +175,7 @@ export const createSubAccountsReducer = (
             Loading: mapping.History.Loading
           },
           { referenceEntity: "event" }
-        ),
-        creating: createSimpleBooleanReducer(mapping.Creating)
+        )
       }
     }
   );

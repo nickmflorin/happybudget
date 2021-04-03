@@ -1,7 +1,6 @@
 import { Reducer } from "redux";
-import { mergeWithDefaults } from "util/objects";
 import { initialDetailResponseState } from "store/initialState";
-import { createObjectReducerFromTransformers } from "./util";
+import { mergeOptionsWithDefaults, createObjectReducerFromTransformers } from "./util";
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
@@ -22,17 +21,9 @@ export const createDetailResponseReducer = <
 >(
   /* eslint-disable indent */
   mappings: Partial<ReducerFactory.IDetailResponseActionMap>,
-  options: Partial<ReducerFactory.ITransformerReducerOptions<S, A>> = {
-    initialState: initialDetailResponseState as S,
-    referenceEntity: "entity"
-  }
+  options: Partial<ReducerFactory.IOptions<S, A>> = {}
 ): Reducer<S, A> => {
-  const Options = mergeWithDefaults<ReducerFactory.ITransformerReducerOptions<S, A>>(options, {
-    extensions: {},
-    initialState: initialDetailResponseState as S,
-    excludeActionsFromExtensions: true,
-    referenceEntity: "entity"
-  });
+  const Options = mergeOptionsWithDefaults<S, A>(options, initialDetailResponseState as S);
 
   const transformers: ReducerFactory.Transformers<ReducerFactory.IDetailResponseActionMap, S, A> = {
     Response: (payload: M) => ({ data: payload, responseWasReceived: true }),

@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, filter, map, reduce } from "lodash";
-import { createSimpleBooleanReducer, createModelListActionReducer, createListResponseReducer } from "store/factories";
+import { createListResponseReducer } from "store/factories";
 import { AccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
 
@@ -19,7 +19,10 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
     AddToState: ActionType.Budget.Accounts.AddToState,
     Select: ActionType.Budget.Accounts.Select,
     Deselect: ActionType.Budget.Accounts.Deselect,
-    SelectAll: ActionType.Budget.Accounts.SelectAll
+    SelectAll: ActionType.Budget.Accounts.SelectAll,
+    Deleting: ActionType.Budget.Accounts.Deleting,
+    Updating: ActionType.Budget.Accounts.Updating,
+    Creating: ActionType.Budget.Accounts.Creating
   },
   {
     referenceEntity: "account",
@@ -36,25 +39,21 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
         AccountMapping,
         { referenceEntity: "account" }
       ),
-      groups: createListResponseReducer<IGroup<ISimpleAccount>, Redux.Budget.IGroupsStore<ISimpleAccount>>(
+      groups: createListResponseReducer<IGroup<ISimpleAccount>, Redux.IListResponseStore<IGroup<ISimpleAccount>>>(
         {
           Response: ActionType.Budget.Accounts.Groups.Response,
           Request: ActionType.Budget.Accounts.Groups.Request,
           Loading: ActionType.Budget.Accounts.Groups.Loading,
           RemoveFromState: ActionType.Budget.Accounts.Groups.RemoveFromState,
-          AddToState: ActionType.Budget.Accounts.Groups.AddToState
+          AddToState: ActionType.Budget.Accounts.Groups.AddToState,
+          Deleting: ActionType.Budget.Accounts.Groups.Deleting
         },
         {
           referenceEntity: "group",
-          keyReducers: {
-            deleting: createModelListActionReducer(ActionType.Budget.Accounts.Groups.Deleting, {
-              referenceEntity: "group"
-            })
-          },
-          extensions: {
+          transformers: {
             [ActionType.Budget.Accounts.RemoveFromGroup]: (
               id: number,
-              st: Redux.Budget.IGroupsStore<ISimpleAccount>
+              st: Redux.IListResponseStore<IGroup<ISimpleAccount>>
             ) => {
               const group: IGroup<ISimpleAccount> | undefined = find(st.data, (g: IGroup<ISimpleAccount>) =>
                 includes(
@@ -82,12 +81,6 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           }
         }
       ),
-      deleting: createModelListActionReducer(ActionType.Budget.Accounts.Deleting, {
-        referenceEntity: "account"
-      }),
-      updating: createModelListActionReducer(ActionType.Budget.Accounts.Updating, {
-        referenceEntity: "account"
-      }),
       history: createListResponseReducer<HistoryEvent>(
         {
           Response: ActionType.Budget.Accounts.History.Response,
@@ -95,8 +88,7 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           Loading: ActionType.Budget.Accounts.History.Loading
         },
         { referenceEntity: "event" }
-      ),
-      creating: createSimpleBooleanReducer(ActionType.Budget.Accounts.Creating)
+      )
     }
   }
 );

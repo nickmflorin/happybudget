@@ -26,23 +26,17 @@ import {
   updateGroupInStateAction
 } from "./actions";
 
-const selectGroups = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.budget.accounts.groups.data
-);
-const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.budget.accounts.selected
-);
-const selectAccounts = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.budget.accounts.data);
-const selectTableSearch = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.budget.accounts.search
-);
+const selectGroups = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.groups.data);
+const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.selected);
+const selectAccounts = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.data);
+const selectTableSearch = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.search);
 const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.budget.accounts.placeholders
+  (state: Redux.IApplicationStore) => state.budget.accounts.placeholders
 );
 const selectSaving = createSelector(
-  (state: Redux.IApplicationStore) => state.budget.budget.accounts.deleting,
-  (state: Redux.IApplicationStore) => state.budget.budget.accounts.updating,
-  (state: Redux.IApplicationStore) => state.budget.budget.accounts.creating,
+  (state: Redux.IApplicationStore) => state.budget.accounts.deleting,
+  (state: Redux.IApplicationStore) => state.budget.accounts.updating,
+  (state: Redux.IApplicationStore) => state.budget.accounts.creating,
   (deleting: number[], updating: number[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );

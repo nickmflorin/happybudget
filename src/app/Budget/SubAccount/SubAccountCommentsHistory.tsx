@@ -4,9 +4,9 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import CommentsHistoryDrawer from "../CommentsHistoryDrawer";
 import {
   requestCommentsAction,
-  submitCommentAction,
+  createCommentAction,
   deleteCommentAction,
-  editCommentAction,
+  updateCommentAction,
   requestSubAccountsHistoryAction
 } from "./actions";
 
@@ -14,16 +14,16 @@ const selectDeletingComments = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.comments.deleting
 );
 const selectEditingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.subaccount.comments.editing
+  (state: Redux.IApplicationStore) => state.budget.subaccount.comments.updating
 );
 const selectReplyingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.subaccount.comments.editing
+  (state: Redux.IApplicationStore) => state.budget.subaccount.comments.replying
 );
 const selectCommentsData = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.comments.data
 );
 const selectSubmittingComment = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.subaccount.comments.submitting
+  (state: Redux.IApplicationStore) => state.budget.subaccount.comments.creating
 );
 const selectLoadingComments = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.comments.loading
@@ -57,11 +57,11 @@ const SubAccountCommentsHistory = (): JSX.Element => {
           includes(editingComments, comment.id) ||
           includes(replyingComments, comment.id),
         onRequest: () => dispatch(requestCommentsAction()),
-        onSubmit: (payload: Http.ICommentPayload) => dispatch(submitCommentAction({ data: payload })),
+        onSubmit: (payload: Http.ICommentPayload) => dispatch(createCommentAction({ data: payload })),
         onDoneEditing: (comment: IComment, value: string) =>
-          dispatch(editCommentAction({ id: comment.id, data: { text: value } })),
+          dispatch(updateCommentAction({ id: comment.id, data: { text: value } })),
         onDoneReplying: (comment: IComment, value: string) =>
-          dispatch(submitCommentAction({ parent: comment.id, data: { text: value } })),
+          dispatch(createCommentAction({ parent: comment.id, data: { text: value } })),
         onLike: (comment: IComment) => console.log(comment),
         onDelete: (comment: IComment) => dispatch(deleteCommentAction(comment.id))
       }}

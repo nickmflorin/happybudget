@@ -33,12 +33,12 @@ import {
   updatingAccountAction,
   loadingCommentsAction,
   responseCommentsAction,
-  submittingCommentAction,
+  creatingCommentAction,
   addCommentToStateAction,
   deletingCommentAction,
   removeCommentFromStateAction,
   updateCommentInStateAction,
-  editingCommentAction,
+  updatingCommentAction,
   replyingToCommentAction,
   loadingAccountsHistoryAction,
   responseAccountsHistoryAction,
@@ -192,10 +192,10 @@ export function* bulkCreateAccountsTask(id: number, rows: Table.AccountRow[]): S
 
 export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    const models: IAccount[] = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.data);
+    const models: IAccount[] = yield select((state: Redux.IApplicationStore) => state.budget.accounts.data);
     const model: IAccount | undefined = find(models, { id: action.payload });
     if (isNil(model)) {
-      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.placeholders);
+      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.accounts.placeholders);
       const placeholder: Table.AccountRow | undefined = find(placeholders, { id: action.payload });
       if (isNil(placeholder)) {
         /* eslint-disable no-console */
@@ -221,8 +221,8 @@ export function* handleAccountsBulkUpdateTask(action: Redux.IAction<Table.RowCha
       return { data: mergeRowChanges(changes).data, id: parseInt(id) };
     });
 
-    const data = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.data);
-    const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.placeholders);
+    const data = yield select((state: Redux.IApplicationStore) => state.budget.accounts.data);
+    const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.accounts.placeholders);
 
     const mergedUpdates: Table.RowChange[] = [];
     const placeholdersToCreate: Table.AccountRow[] = [];
@@ -263,10 +263,10 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const id = action.payload.id;
-    const data: IAccount[] = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.data);
+    const data: IAccount[] = yield select((state: Redux.IApplicationStore) => state.budget.accounts.data);
     const model: IAccount | undefined = find(data, { id });
     if (isNil(model)) {
-      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.budget.accounts.placeholders);
+      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.accounts.placeholders);
       const placeholder: Table.AccountRow | undefined = find(placeholders, { id });
       if (isNil(placeholder)) {
         /* eslint-disable no-console */
@@ -356,7 +356,7 @@ export function* submitCommentTask(
     if (!isNil(parent)) {
       yield put(replyingToCommentAction({ id: parent, value: true }));
     } else {
-      yield put(submittingCommentAction(true));
+      yield put(creatingCommentAction(true));
     }
     try {
       let response: IComment;
@@ -372,7 +372,7 @@ export function* submitCommentTask(
       if (!isNil(parent)) {
         yield put(replyingToCommentAction({ id: parent, value: false }));
       } else {
-        yield put(submittingCommentAction(false));
+        yield put(creatingCommentAction(false));
       }
     }
   }
@@ -395,7 +395,7 @@ export function* deleteCommentTask(action: Redux.IAction<number>): SagaIterator 
 export function* editCommentTask(action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>): SagaIterator {
   if (!isNil(action.payload)) {
     const { id, data } = action.payload;
-    yield put(editingCommentAction({ id, value: true }));
+    yield put(updatingCommentAction({ id, value: true }));
     try {
       // Here we are assuming that Partial<IComment> can be mapped to Partial<Http.ICommentPayload>,
       // which is the case right now but may not be in the future.
@@ -404,7 +404,7 @@ export function* editCommentTask(action: Redux.IAction<Redux.UpdateModelActionPa
     } catch (e) {
       handleRequestError(e, "There was an error updating the comment.");
     } finally {
-      yield put(editingCommentAction({ id, value: false }));
+      yield put(updatingCommentAction({ id, value: false }));
     }
   }
 }

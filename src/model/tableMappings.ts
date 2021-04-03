@@ -266,4 +266,16 @@ export const ActualMapping = new Mapping<Table.ActualRow, IActual, IGroup<any>, 
   typeLabel: "Actual"
 });
 
+export const FringeMapping = new Mapping<Table.FringeRow, IFringe, IGroup<any>, Http.IFringePayload>({
+  fields: [
+    { field: "name", required: true },
+    { field: "description", allowNull: true },
+    { field: "cutoff", allowNull: true },
+    { field: "rate", required: true },
+    { field: "unit", allowNull: true }
+  ],
+  labelGetter: (model: IFringe) => String(model.name),
+  typeLabel: "Fringe"
+});
+
 export default Mapping;

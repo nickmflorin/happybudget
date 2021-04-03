@@ -69,6 +69,14 @@ namespace Table {
     readonly variance: number | null;
   }
 
+  interface FringeRow extends Row<IGroup<any>> {
+    readonly name: string | null;
+    readonly description: string | null;
+    readonly cutoff: number | null;
+    readonly rate: number | null;
+    readonly unit: FringeUnit | null;
+  }
+
   interface ActualRow extends Row<IGroup<any>> {
     readonly object_id: number | null;
     readonly parent_type: BudgetItemType | null;

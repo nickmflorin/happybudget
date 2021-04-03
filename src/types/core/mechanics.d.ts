@@ -36,8 +36,6 @@ namespace ReducerFactory {
     Transformer<S, any, A>
   >;
 
-  type ActionMap = { [key: string]: string };
-
   type ICounterActionMap = {
     Set: string;
     Increment: string;
@@ -74,32 +72,38 @@ namespace ReducerFactory {
     SelectAll: string;
     Deselect: string;
     Request: string;
+    Deleting: string;
+    Updating: string;
+    Creating: string;
   };
 
-  interface ICommentsListResponseActionMap extends IListResponseActionMap {
-    Submitting: string;
+  type ICommentsListResponseActionMap = {
+    SetSearch: string;
+    Loading: string;
+    Response: string;
+    SetPage: string;
+    SetPageSize: string;
+    SetPageAndSize: string;
+    AddToState: string;
+    RemoveFromState: string;
+    UpdateInState: string;
+    Select: string;
+    SelectAll: string;
+    Deselect: string;
+    Request: string;
     Deleting: string;
-    Editing: string;
+    Updating: string;
+    Creating: string;
     Replying: string;
-  }
+  };
 
-  interface IOptions<S> {
+  interface IOptions<S, A extends Redux.IAction<any> = Redux.IAction<any>> extends IOptions<S> {
     referenceEntity: string;
     initialState: S;
-  }
-
-  interface ITransformerReducerOptions<S, A extends Redux.IAction<any> = Redux.IAction<any>> extends IOptions<S> {
-    referenceEntity: string;
-    initialState: S;
-    excludeActions?: (action: A, state: S) => boolean | undefined | void;
-    excludeActionsFromExtensions?: boolean;
-    extensions?: TransformerExtensions<S, A>;
-    extension?: Reducer<S, A>;
-    keyReducers?: { [key: string]: Reducer<any, A> };
-  }
-
-  interface IListTransformerReducerOptions<S, A extends Redux.IAction<any> = Redux.IAction<any>>
-    extends ITransformerReducerOptions<S, A> {
-    strictSelect?: boolean;
+    excludeActions: null | ((action: A, state: S) => boolean | undefined | void);
+    transformers: TransformerExtensions<S, A>;
+    extension: Reducer<S, A> | Reducer<S, A>[] | null;
+    keyReducers: { [key: string]: Reducer<any, A> };
+    strictSelect: boolean;
   }
 }

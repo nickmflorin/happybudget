@@ -1,8 +1,24 @@
 import { Reducer } from "redux";
-import { forEach, isNil } from "lodash";
+import { forEach, isNil, reduce } from "lodash";
+
+export const mergeOptionsWithDefaults = <S, A extends Redux.IAction<any> = Redux.IAction<any>>(
+  options: Partial<ReducerFactory.IOptions<S, A>>,
+  initialState: S
+): ReducerFactory.IOptions<S, A> => {
+  return {
+    referenceEntity: "entity",
+    initialState: initialState,
+    transformers: {},
+    keyReducers: {},
+    strictSelect: true,
+    extension: null,
+    excludeActions: null,
+    ...options
+  };
+};
 
 const findTransformerForAction = <
-  P extends ReducerFactory.ActionMap,
+  P extends { [key: string]: any },
   S,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
@@ -27,15 +43,11 @@ const findTransformerForAction = <
   return undefined;
 };
 
-export const createSimpleReducerFromTransformers = <
-  P extends ReducerFactory.ActionMap,
-  S,
-  A extends Redux.IAction<any> = Redux.IAction<any>
->(
+export const createSimpleReducerFromTransformers = <P, S, A extends Redux.IAction<any> = Redux.IAction<any>>(
   /* eslint-disable indent */
   mappings: Partial<P>,
   transformers: ReducerFactory.Transformers<P, S, A>,
-  options: ReducerFactory.ITransformerReducerOptions<S, A>
+  options: ReducerFactory.IOptions<S, A>
 ): Reducer<S, A> => {
   const reducer: Reducer<S, A> = (state: S = options.initialState, action: A): S => {
     const transformer = findTransformerForAction<P, S, A>(action, mappings, transformers);
@@ -47,15 +59,11 @@ export const createSimpleReducerFromTransformers = <
   return reducer;
 };
 
-export const createObjectReducerFromTransformers = <
-  P extends ReducerFactory.ActionMap,
-  S,
-  A extends Redux.IAction<any> = Redux.IAction<any>
->(
+export const createObjectReducerFromTransformers = <P, S, A extends Redux.IAction<any> = Redux.IAction<any>>(
   /* eslint-disable indent */
   mappings: Partial<P>,
   transformers: ReducerFactory.Transformers<P, S, A>,
-  options: ReducerFactory.ITransformerReducerOptions<S, A>
+  options: ReducerFactory.IOptions<S, A>
 ): Reducer<S, A> => {
   const reducer: Reducer<S, A> = (state: S = options.initialState, action: A): S => {
     let newState = { ...state };
@@ -68,13 +76,9 @@ export const createObjectReducerFromTransformers = <
         newState = { ...newState, ...updateToState };
       }
     } else {
-      if (!isNil(options.extensions) && !isNil(options.extensions[action.type])) {
-        if (
-          isNil(options.excludeActions) ||
-          options.excludeActionsFromExtensions !== true ||
-          options.excludeActions(action, state) === false
-        ) {
-          const updateToState = options.extensions[action.type](action.payload, newState, action);
+      if (!isNil(options.transformers[action.type])) {
+        if (isNil(options.excludeActions) || options.excludeActions(action, state) === false) {
+          const updateToState = options.transformers[action.type](action.payload, newState, action);
           newState = { ...newState, ...updateToState };
         }
       }
@@ -95,7 +99,11 @@ export const createObjectReducerFromTransformers = <
     // If the reducer is provided with an extension reducer, apply the entire
     // extension reducer to the action and state.
     if (!isNil(options.extension)) {
-      newState = options.extension(newState, action);
+      if (Array.isArray(options.extension)) {
+        newState = reduce(options.extension, (st: S, ext: Reducer<S, A>) => ext(st, action), newState);
+      } else {
+        newState = options.extension(newState, action);
+      }
     }
     return newState;
   };
@@ -103,14 +111,14 @@ export const createObjectReducerFromTransformers = <
 };
 
 export const createListReducerFromTransformers = <
-  P extends ReducerFactory.ActionMap,
+  P,
   M extends Model,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   /* eslint-disable indent */
   mappings: Partial<P>,
   transformers: ReducerFactory.Transformers<P, Redux.ListStore<M>, A>,
-  options: ReducerFactory.ITransformerReducerOptions<Redux.ListStore<M>, A>
+  options: ReducerFactory.IOptions<Redux.ListStore<M>, A>
 ): Reducer<Redux.ListStore<M>, A> => {
   const reducer: Reducer<Redux.ListStore<M>, A> = (
     state: Redux.ListStore<M> = options.initialState,
@@ -128,20 +136,24 @@ export const createListReducerFromTransformers = <
         }
       }
     } else {
-      if (!isNil(options.extensions) && !isNil(options.extensions[action.type])) {
-        if (
-          isNil(options.excludeActions) ||
-          options.excludeActionsFromExtensions !== true ||
-          options.excludeActions(action, state) === false
-        ) {
-          newState = options.extensions[action.type](action.payload, newState, action);
+      if (!isNil(options.transformers) && !isNil(options.transformers[action.type])) {
+        if (isNil(options.excludeActions) || options.excludeActions(action, state) === false) {
+          newState = options.transformers[action.type](action.payload, newState, action);
         }
       }
     }
     // If the reducer is provided with an extension reducer, apply the entire
     // extension reducer to the action and state.
     if (!isNil(options.extension)) {
-      newState = options.extension(newState, action);
+      if (Array.isArray(options.extension)) {
+        newState = reduce(
+          options.extension,
+          (st: Redux.ListStore<M>, ext: Reducer<Redux.ListStore<M>, A>) => ext(st, action),
+          newState
+        );
+      } else {
+        newState = options.extension(newState, action);
+      }
     }
     return newState;
   };
