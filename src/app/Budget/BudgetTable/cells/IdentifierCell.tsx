@@ -37,7 +37,13 @@ const IdentifierCell = <R extends Table.Row<any>>({
     );
   }
   return (
-    <div className={classNames("cell--identifier", className)} style={style}>
+    <div
+      className={classNames(
+        "cell--identifier",
+        row.meta.isTableFooter === false && row.meta.isBudgetFooter === false ? className : undefined
+      )}
+      style={style}
+    >
       {value}
     </div>
   );
