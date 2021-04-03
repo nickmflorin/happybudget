@@ -8,14 +8,14 @@ import { Tag } from "components/display";
 import { UnitModelsList } from "model";
 
 interface UnitDropdownProps {
-  value: Unit | null;
+  value: SubAccountUnit | null;
   className?: string;
   trigger?: ("click" | "hover" | "contextMenu")[];
-  onChange: (value: Unit) => void;
+  onChange: (value: SubAccountUnit) => void;
 }
 
 const UnitDropdown = ({ value, className, onChange, trigger = ["click"] }: UnitDropdownProps): JSX.Element => {
-  const [model, setModel] = useState<UnitModel | undefined>(undefined);
+  const [model, setModel] = useState<SubAccountUnitModel | undefined>(undefined);
   useEffect(() => {
     if (!isNil(value)) {
       const _item = find(UnitModelsList, { id: value });
@@ -29,7 +29,7 @@ const UnitDropdown = ({ value, className, onChange, trigger = ["click"] }: UnitD
     <Dropdown
       className={classNames("units-dropdown", className)}
       trigger={trigger}
-      overlay={<ModelTagsMenu<Unit, UnitName> models={UnitModelsList} onChange={onChange} />}
+      overlay={<ModelTagsMenu<SubAccountUnit, SubAccountUnitName> models={UnitModelsList} onChange={onChange} />}
     >
       <div className={"unit-dropdown-child"}>
         {!isNil(model) ? (

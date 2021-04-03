@@ -15,9 +15,9 @@ type EntityType = "budget" | "account" | "subaccount";
 type BudgetItemType = "subaccount" | "account";
 type CommentParentType = "budget" | "account" | "subaccount" | "comment";
 
-type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
-type Unit = 0 | 1 | 2 | 3 | 4 | 5;
-type UnitModel = DistinctOptionModel<Unit, UnitName>;
+type SubAccountUnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
+type SubAccountUnit = 0 | 1 | 2 | 3 | 4 | 5;
+type SubAccountUnitModel = DistinctOptionModel<SubAccountUnit, SubAccountUnitName>;
 
 type FringeUnit = 0 | 1;
 type FringeUnitName = "Percent" | "Flat";
@@ -162,8 +162,8 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly quantity: number | null;
   readonly rate: number | null;
   readonly multiplier: number | null;
-  readonly unit: Unit | null;
-  readonly unit_name: UnitName;
+  readonly unit: SubAccountUnit | null;
+  readonly unit_name: SubAccountUnitName;
   readonly account: number;
   readonly object_id: number;
   readonly type: "subaccount";

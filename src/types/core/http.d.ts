@@ -103,7 +103,7 @@ namespace Http {
     readonly quantity?: number;
     readonly rate?: number;
     readonly multiplier?: number;
-    readonly unit?: Unit;
+    readonly unit?: SubAccountUnit;
     readonly group?: number | null;
   }
 

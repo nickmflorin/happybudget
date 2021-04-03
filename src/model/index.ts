@@ -32,7 +32,7 @@ export const ContactRoleModelsList = Object.values(ContactRoleModels);
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
-export enum UnitNames {
+export enum SubAccountUnitNames {
   MINUTES = "Minutes",
   HOURS = "Hours",
   WEEKS = "Weeks",
@@ -41,16 +41,16 @@ export enum UnitNames {
   NIGHTS = "Nights"
 }
 
-export const UnitModels: { [key: string]: UnitModel } = {
-  MINUTES: { id: 0, name: UnitNames.MINUTES },
-  HOURS: { id: 1, name: UnitNames.HOURS },
-  WEEKS: { id: 2, name: UnitNames.WEEKS },
-  MONTHS: { id: 3, name: UnitNames.MONTHS },
-  DAYS: { id: 4, name: UnitNames.DAYS },
-  NIGHTS: { id: 5, name: UnitNames.NIGHTS }
+export const SubAccountUnitModels: { [key: string]: SubAccountUnitModel } = {
+  MINUTES: { id: 0, name: SubAccountUnitNames.MINUTES },
+  HOURS: { id: 1, name: SubAccountUnitNames.HOURS },
+  WEEKS: { id: 2, name: SubAccountUnitNames.WEEKS },
+  MONTHS: { id: 3, name: SubAccountUnitNames.MONTHS },
+  DAYS: { id: 4, name: SubAccountUnitNames.DAYS },
+  NIGHTS: { id: 5, name: SubAccountUnitNames.NIGHTS }
 };
 
-export const UnitModelsList = Object.values(UnitModels);
+export const UnitModelsList = Object.values(SubAccountUnitModels);
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */

@@ -23,7 +23,7 @@ const ModelsTagMenu = <
 }: ModelsTagMenuProps<I, N, M>): JSX.Element => {
   return (
     <Menu className={classNames("model-tags-menu", className)} style={style}>
-      {map(models, (model: UnitModel) => {
+      {map(models, (model: M) => {
         return (
           <Menu.Item
             key={model.id}

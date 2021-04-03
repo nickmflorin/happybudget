@@ -168,10 +168,10 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
             field: "unit",
             headerName: "Unit",
             cellClass: classNames("cell--centered"),
-            cellRenderer: "UnitCell",
+            cellRenderer: "SubAccountUnitCell",
             width: 20,
             cellRendererParams: {
-              onChange: (unit: Unit, row: Table.SubAccountRow) =>
+              onChange: (unit: SubAccountUnit, row: Table.SubAccountRow) =>
                 dispatch(
                   updateSubAccountAction({
                     id: row.id,

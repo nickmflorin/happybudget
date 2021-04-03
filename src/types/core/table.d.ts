@@ -61,7 +61,7 @@ namespace Table {
     readonly name: string | null;
     readonly description: string | null;
     readonly quantity: number | null;
-    readonly unit: Unit | null;
+    readonly unit: SubAccountUnit | null;
     readonly multiplier: number | null;
     readonly rate: number | null;
     readonly actual: number | null;
