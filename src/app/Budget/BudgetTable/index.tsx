@@ -289,7 +289,7 @@ const BudgetTable = <
       field: identifierField,
       headerName: identifierFieldHeader,
       cellRenderer: "IdentifierCell",
-      width: 70,
+      width: 100,
       ...identifierColumn,
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;

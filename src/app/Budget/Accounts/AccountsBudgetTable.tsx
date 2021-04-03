@@ -67,6 +67,7 @@ const AccountsBudgetTable = (): JSX.Element => {
         selected={selected}
         identifierField={"identifier"}
         identifierFieldHeader={"Account"}
+        sizeColumnsToFit={false}
         tableFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
         search={search}
         onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
@@ -93,7 +94,8 @@ const AccountsBudgetTable = (): JSX.Element => {
         bodyColumns={[
           {
             field: "description",
-            headerName: "Category Description"
+            headerName: "Category Description",
+            flex: 100
           }
         ]}
         calculatedColumns={[
