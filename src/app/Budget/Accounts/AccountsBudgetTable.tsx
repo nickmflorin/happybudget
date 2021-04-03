@@ -28,7 +28,7 @@ import {
 
 const selectGroups = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.groups.data);
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.selected);
-const selectAccounts = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.data);
+const selectData = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.data);
 const selectTableSearch = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.search);
 const selectPlaceholders = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.accounts.placeholders
@@ -49,7 +49,7 @@ const AccountsBudgetTable = (): JSX.Element => {
   const history = useHistory();
 
   const budgetId = useSelector(selectBudgetId);
-  const data = useSelector(selectAccounts);
+  const data = useSelector(selectData);
   const placeholders = useSelector(selectPlaceholders);
   const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
