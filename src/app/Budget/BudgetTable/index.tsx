@@ -31,12 +31,13 @@ import {
 import { RenderWithSpinner, ShowHide } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
 import { downloadAsCsvFile } from "util/files";
-import { formatCurrencyWithoutDollarSign, hashString } from "util/string";
+import { hashString } from "util/string";
+import { currencyValueFormatter } from "util/table";
 
 import {
   ExpandCell,
   IndexCell,
-  ValueCell,
+  CellRenderer,
   SubAccountUnitCell,
   IdentifierCell,
   CalculatedCell,
@@ -258,9 +259,9 @@ const BudgetTable = <
         minWidth: 100,
         maxWidth: 125,
         cellStyle: { textAlign: "right" },
+        valueFormatter: currencyValueFormatter,
         cellRendererParams: {
           ...col.cellRendererParams,
-          formatter: formatCurrencyWithoutDollarSign,
           renderRedIfNegative: true
         },
         ...col
@@ -271,7 +272,7 @@ const BudgetTable = <
   const bodyCell = useDynamicCallback<ColDef>(
     (col: ColDef): ColDef => {
       return {
-        cellRenderer: "ValueCell",
+        cellRenderer: "CellRenderer",
         ...col
       };
     }
@@ -1028,7 +1029,7 @@ const BudgetTable = <
               frameworkComponents={{
                 ExpandCell: ExpandCell,
                 IndexCell: IndexCell,
-                ValueCell: IncludeErrorsInCell<R>(ValueCell),
+                CellRenderer: IncludeErrorsInCell<R>(CellRenderer),
                 SubAccountUnitCell: IncludeErrorsInCell<R>(SubAccountUnitCell),
                 FringeUnitCell: IncludeErrorsInCell<R>(FringeUnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
@@ -1056,7 +1057,7 @@ const BudgetTable = <
               headerHeight={0}
               frameworkComponents={{
                 IndexCell: IndexCell,
-                ValueCell: IncludeErrorsInCell<R>(ValueCell),
+                CellRenderer: IncludeErrorsInCell<R>(CellRenderer),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                 CalculatedCell: CalculatedCell,
                 ...frameworkComponents
@@ -1077,7 +1078,7 @@ const BudgetTable = <
                 rowHeight={28}
                 frameworkComponents={{
                   IndexCell: IndexCell,
-                  ValueCell: IncludeErrorsInCell<R>(ValueCell),
+                  CellRenderer: IncludeErrorsInCell<R>(CellRenderer),
                   IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                   CalculatedCell: CalculatedCell,
                   ...frameworkComponents

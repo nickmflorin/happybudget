@@ -1,4 +1,6 @@
-import { ValueSetterParams } from "ag-grid-community";
+import { isNil } from "lodash";
+import { ValueSetterParams, ValueFormatterParams } from "ag-grid-community";
+import { formatCurrencyWithoutDollarSign } from "./string";
 
 export const floatValueSetter = (field: string) => (params: ValueSetterParams): boolean => {
   if (!isNaN(parseFloat(params.newValue))) {
@@ -14,4 +16,11 @@ export const integerValueSetter = (field: string) => (params: ValueSetterParams)
     return true;
   }
   return false;
+};
+
+export const currencyValueFormatter = (params: ValueFormatterParams): any => {
+  if (!isNil(params.value)) {
+    return formatCurrencyWithoutDollarSign(params.value);
+  }
+  return params.value;
 };

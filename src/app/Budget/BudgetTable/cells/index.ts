@@ -1,5 +1,5 @@
 export { default as ExpandCell } from "./ExpandCell";
-export { default as ValueCell } from "./ValueCell";
+export { default as CellRenderer } from "./CellRenderer";
 export { default as SubAccountUnitCell } from "./SubAccountUnitCell";
 export { default as FringeUnitCell } from "./FringeUnitCell";
 export { default as IdentifierCell } from "./IdentifierCell";
