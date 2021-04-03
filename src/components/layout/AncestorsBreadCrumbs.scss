@@ -5,7 +5,7 @@
   .identifier {
     font-family: $noto-sans-jp;
     font-weight: 600;
-    color: #929292;
+    color: #b5b5b5;
   }
   .description {
     font-family: $noto-sans-jp;
@@ -74,7 +74,7 @@
       .entity-text-wrapper {
         .entity-text {
           .identifier {
-            color: darken(#929292, 20%) !important;
+            color: darken(#b5b5b5, 20%) !important;
           }
           .description {
             color: darken($text-secondary, 20%) !important;
