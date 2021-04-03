@@ -199,7 +199,8 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
             headerName: "Rate",
             width: 70,
             cellStyle: { textAlign: "right" },
-            valueFormatter: currencyValueFormatter
+            valueFormatter: currencyValueFormatter,
+            valueSetter: floatValueSetter("rate")
           }
         ]}
         calculatedColumns={[

@@ -10,7 +10,7 @@ import { ColDef, ColSpanParams } from "ag-grid-community";
 import { CreateSubAccountGroupModal, EditSubAccountGroupModal } from "components/modals";
 import { SubAccountMapping } from "model/tableMappings";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { floatValueSetter, integerValueSetter } from "util/table";
+import { floatValueSetter, integerValueSetter, currencyValueFormatter } from "util/table";
 
 import BudgetTable from "../BudgetTable";
 import { selectBudgetId, selectBudgetDetail, selectBudgetDetailLoading } from "../selectors";
@@ -199,6 +199,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
             headerName: "Rate",
             width: 10,
             cellStyle: { textAlign: "right" },
+            valueFormatter: currencyValueFormatter,
             valueSetter: floatValueSetter("rate")
           }
         ]}
