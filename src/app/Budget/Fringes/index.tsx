@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
+import classNames from "classnames";
 
 import { CellClassParams } from "ag-grid-community";
 
@@ -81,7 +82,24 @@ const Fringes = (): JSX.Element => {
           },
           {
             field: "unit",
-            headerName: "Unit"
+            headerName: "Unit",
+            cellClass: classNames("cell--centered"),
+            cellRenderer: "FringeUnitCell",
+            width: 50,
+            cellRendererParams: {
+              onChange: (unit: SubAccountUnit, row: Table.SubAccountRow) =>
+                dispatch(
+                  updateFringeAction({
+                    id: row.id,
+                    data: {
+                      unit: {
+                        oldValue: row.unit,
+                        newValue: unit
+                      }
+                    }
+                  })
+                )
+            }
           },
           {
             field: "cutoff",

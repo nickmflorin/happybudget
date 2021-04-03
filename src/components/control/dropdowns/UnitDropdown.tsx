@@ -5,21 +5,40 @@ import { Dropdown } from "antd";
 
 import { ModelTagsMenu } from "components/control/menus";
 import { Tag } from "components/display";
-import { UnitModelsList } from "model";
 
-interface UnitDropdownProps {
-  value: SubAccountUnit | null;
+interface UnitDropdownProps<
+  I extends number,
+  N extends string,
+  M extends DistinctOptionModel<I, N> = DistinctOptionModel<I, N>
+> {
+  value: I | null;
   className?: string;
   trigger?: ("click" | "hover" | "contextMenu")[];
-  onChange: (value: SubAccountUnit) => void;
+  onChange: (value: I) => void;
+  models: M[];
 }
 
-const UnitDropdown = ({ value, className, onChange, trigger = ["click"] }: UnitDropdownProps): JSX.Element => {
-  const [model, setModel] = useState<SubAccountUnitModel | undefined>(undefined);
+const UnitDropdown = <
+  I extends number,
+  N extends string,
+  M extends DistinctOptionModel<I, N> = DistinctOptionModel<I, N>
+>({
+  /* eslint-disable indent */
+  value,
+  models,
+  className,
+  onChange,
+  trigger = ["click"]
+}: UnitDropdownProps<I, N, M>): JSX.Element => {
+  const [model, setModel] = useState<M | undefined>(undefined);
   useEffect(() => {
     if (!isNil(value)) {
-      const _item = find(UnitModelsList, { id: value });
-      setModel(_item);
+      const _item: M | undefined = find(models, { id: value } as any);
+      if (!isNil(_item)) {
+        setModel(_item);
+      } else {
+        setModel(undefined);
+      }
     } else {
       setModel(undefined);
     }
@@ -29,7 +48,7 @@ const UnitDropdown = ({ value, className, onChange, trigger = ["click"] }: UnitD
     <Dropdown
       className={classNames("units-dropdown", className)}
       trigger={trigger}
-      overlay={<ModelTagsMenu<SubAccountUnit, SubAccountUnitName> models={UnitModelsList} onChange={onChange} />}
+      overlay={<ModelTagsMenu<I, N, M> models={models} onChange={onChange} />}
     >
       <div className={"unit-dropdown-child"}>
         {!isNil(model) ? (

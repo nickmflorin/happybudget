@@ -50,7 +50,21 @@ export const SubAccountUnitModels: { [key: string]: SubAccountUnitModel } = {
   NIGHTS: { id: 5, name: SubAccountUnitNames.NIGHTS }
 };
 
-export const UnitModelsList = Object.values(SubAccountUnitModels);
+export const SubAccountUnitModelsList = Object.values(SubAccountUnitModels);
+
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+export enum FringeUnitNames {
+  PERCENT = "Percent",
+  FLAT = "Flat"
+}
+
+export const FringeUnitModels: { [key: string]: FringeUnitModel } = {
+  MINUTES: { id: 0, name: FringeUnitNames.PERCENT },
+  HOURS: { id: 1, name: FringeUnitNames.FLAT }
+};
+
+export const FringeUnitModelsList = Object.values(FringeUnitModels);
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */

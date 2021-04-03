@@ -41,7 +41,8 @@ import {
   IdentifierCell,
   CalculatedCell,
   PaymentMethodsCell,
-  BudgetItemCell
+  BudgetItemCell,
+  FringeUnitCell
 } from "./cells";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
@@ -1019,6 +1020,7 @@ const BudgetTable = <
                 IndexCell: IndexCell,
                 ValueCell: IncludeErrorsInCell<R>(ValueCell),
                 SubAccountUnitCell: IncludeErrorsInCell<R>(SubAccountUnitCell),
+                FringeUnitCell: IncludeErrorsInCell<R>(FringeUnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                 CalculatedCell: CalculatedCell,
                 PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
@@ -1044,13 +1046,9 @@ const BudgetTable = <
               headerHeight={0}
               frameworkComponents={{
                 IndexCell: IndexCell,
-                ExpandCell: ExpandCell,
                 ValueCell: IncludeErrorsInCell<R>(ValueCell),
-                SubAccountUnitCell: IncludeErrorsInCell<R>(SubAccountUnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                 CalculatedCell: CalculatedCell,
-                PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
-                BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
                 ...frameworkComponents
               }}
             />
@@ -1069,13 +1067,9 @@ const BudgetTable = <
                 rowHeight={28}
                 frameworkComponents={{
                   IndexCell: IndexCell,
-                  ExpandCell: ExpandCell,
                   ValueCell: IncludeErrorsInCell<R>(ValueCell),
-                  UnitCell: IncludeErrorsInCell<R>(SubAccountUnitCell),
                   IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                   CalculatedCell: CalculatedCell,
-                  PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
-                  BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
                   ...frameworkComponents
                 }}
               />
