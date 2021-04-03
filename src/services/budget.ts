@@ -50,6 +50,43 @@ export const permanentlyDeleteBudget = async (id: number, options: Http.IRequest
   return client.delete<null>(url, options);
 };
 
+export const getFringes = async (
+  id: number,
+  query: Http.IListQuery = {},
+  options: Http.IRequestOptions = {}
+): Promise<Http.IListResponse<IFringe>> => {
+  const url = URL.v1("budgets", id, "fringes");
+  return client.list<IFringe>(url, query, options);
+};
+
+export const createFringe = async (
+  id: number,
+  payload: Http.IFringePayload,
+  options: Http.IRequestOptions = {}
+): Promise<IFringe> => {
+  const url = URL.v1("budgets", id, "fringes");
+  return client.post<IFringe>(url, payload, options);
+};
+
+export const getFringe = async (id: number, options: Http.IRequestOptions = {}): Promise<IFringe> => {
+  const url = URL.v1("budgets", "fringes", id);
+  return client.retrieve<IFringe>(url, options);
+};
+
+export const deleteFringe = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
+  const url = URL.v1("budgets", "fringes", id);
+  return client.delete<null>(url, options);
+};
+
+export const updateFringe = async (
+  id: number,
+  payload: Partial<Http.IFringePayload>,
+  options: Http.IRequestOptions = {}
+): Promise<IFringe> => {
+  const url = URL.v1("budgets", "fringes", id);
+  return client.patch<IFringe>(url, payload, options);
+};
+
 export const getBudgetItems = async (
   id: number,
   query: Http.IListQuery = {},

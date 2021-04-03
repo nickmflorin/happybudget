@@ -19,6 +19,10 @@ type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "
 type Unit = 0 | 1 | 2 | 3 | 4 | 5;
 type UnitModel = DistinctOptionModel<Unit, UnitName>;
 
+type FringeUnit = 0 | 1;
+type FringeUnitName = "Percent" | "Flat";
+type FringeUnitModel = DistinctOptionModel<FringeUnit, FringeUnitName>;
+
 type ContactRoleName =
   | "Producer"
   | "Executive Producer"
@@ -79,6 +83,15 @@ interface IUser extends INestedUser {
   readonly created_at: string;
   readonly updated_at: string;
   readonly timezone: string;
+}
+
+interface IFringe extends TrackedModel {
+  readonly name: string;
+  readonly description: string | null;
+  readonly cutoff: number | null;
+  readonly rate: number;
+  readonly unit: FringeUnit;
+  readonly unit_name: FringeUnitName;
 }
 
 interface IBudget extends Model {
@@ -162,6 +175,7 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly subaccounts: ISimpleSubAccount[];
   readonly group: number | null;
   readonly siblings: IEntity[];
+  readonly fringes: number[];
 }
 
 interface IActual extends TrackedModel {

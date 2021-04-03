@@ -70,6 +70,14 @@ namespace Http {
     readonly fileUrl: string;
   }
 
+  interface IFringePayload extends IPayload {
+    readonly name: string;
+    readonly description?: string | null;
+    readonly cutoff?: number | null;
+    readonly rate: number;
+    readonly unit?: FringeUnit;
+  }
+
   interface IBudgetPayload extends IPayload {
     readonly production_type: ProductionType;
     readonly name: string;
