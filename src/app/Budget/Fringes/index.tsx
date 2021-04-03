@@ -71,10 +71,6 @@ const Fringes = (): JSX.Element => {
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         bodyColumns={[
           {
-            field: "name",
-            headerName: "Name"
-          },
-          {
             field: "description",
             headerName: "Description"
           },

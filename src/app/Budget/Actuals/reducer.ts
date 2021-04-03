@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { filter } from "lodash";
-import { createSimpleBooleanReducer, createModelListActionReducer, createListResponseReducer } from "store/factories";
+import { createListResponseReducer } from "store/factories";
 import { ActualMapping } from "model/tableMappings";
 import { ActionType } from "../actions";
 import { createTablePlaceholdersReducer } from "../factories";
@@ -17,7 +17,10 @@ const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IAct
     AddToState: ActionType.Actuals.AddToState,
     Select: ActionType.Actuals.Select,
     Deselect: ActionType.Actuals.Deselect,
-    SelectAll: ActionType.Actuals.SelectAll
+    SelectAll: ActionType.Actuals.SelectAll,
+    Deleting: ActionType.Actuals.Deleting,
+    Updating: ActionType.Actuals.Updating,
+    Creating: ActionType.Actuals.Creating
   },
   {
     referenceEntity: "actual",
@@ -33,14 +36,7 @@ const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IAct
         },
         ActualMapping,
         { referenceEntity: "actual" }
-      ),
-      deleting: createModelListActionReducer(ActionType.Actuals.Deleting, {
-        referenceEntity: "actual"
-      }),
-      updating: createModelListActionReducer(ActionType.Actuals.Updating, {
-        referenceEntity: "actual"
-      }),
-      creating: createSimpleBooleanReducer(ActionType.Actuals.Creating)
+      )
     }
   }
 );

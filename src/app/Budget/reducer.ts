@@ -12,6 +12,7 @@ import { ActionType } from "./actions";
 import accountRootReducer from "./Account/reducer";
 import accountsRootReducer from "./Accounts/reducer";
 import actualsRootReducer from "./Actuals/reducer";
+import fringesRootReducer from "./Fringes/reducer";
 import subAccountRootReducer from "./SubAccount/reducer";
 
 const rootReducer = combineReducers({
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   subaccount: subAccountRootReducer,
   actuals: actualsRootReducer,
   accounts: accountsRootReducer,
+  fringes: fringesRootReducer,
   budget: combineReducers({
     id: createSimplePayloadReducer<number | null>(ActionType.Budget.SetId, null),
     detail: createDetailResponseReducer<IBudget, Redux.IDetailResponseStore<IBudget>, Redux.IAction>({

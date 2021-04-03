@@ -13,6 +13,7 @@ import {
   faFolderOpen,
   faFolderPlus,
   faCalculator,
+  faPercentage,
   faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -30,6 +31,7 @@ const Account = React.lazy(() => componentLoader(() => import("./Account")));
 const Accounts = React.lazy(() => componentLoader(() => import("./Accounts")));
 const SubAccount = React.lazy(() => componentLoader(() => import("./SubAccount")));
 const Actuals = React.lazy(() => componentLoader(() => import("./Actuals")));
+const Fringes = React.lazy(() => componentLoader(() => import("./Fringes")));
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
@@ -95,14 +97,6 @@ const Budget = (): JSX.Element => {
             placement: "right"
           }
         },
-        // {
-        //   icon: <FontAwesomeIcon icon={faTrashAlt} />,
-        //   onClick: () => history.push("/trash"),
-        //   tooltip: {
-        //     title: "Deleted Budgets",
-        //     placement: "right"
-        //   }
-        // },
         {
           icon: <FontAwesomeIcon icon={faAddressBook} />,
           onClick: () => history.push("/contacts"),
@@ -112,10 +106,21 @@ const Budget = (): JSX.Element => {
           }
         },
         {
+          icon: <FontAwesomeIcon icon={faPercentage} />,
+          onClick: () => history.push(`/budgets/${budgetId}/fringes`),
+          active: location.pathname.startsWith(`/budgets/${budgetId}/fringes`),
+          tooltip: {
+            title: "Fringes",
+            placement: "right"
+          }
+        },
+        {
           icon: <FontAwesomeIcon icon={faCalculator} />,
           onClick: () => history.push(`/budgets/${budgetId}`),
           active:
-            location.pathname.startsWith("/budgets") && !location.pathname.startsWith(`/budgets/${budgetId}/actuals`),
+            location.pathname.startsWith("/budgets") &&
+            !location.pathname.startsWith(`/budgets/${budgetId}/actuals`) &&
+            !location.pathname.startsWith(`/budgets/${budgetId}/fringes`),
           tooltip: {
             title: "Budget",
             placement: "right"
@@ -137,6 +142,7 @@ const Budget = (): JSX.Element => {
           <Switch>
             <Redirect exact from={match.url} to={`${match.url}/accounts`} />
             <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
+            <Route path={"/budgets/:budgetId/fringes"} component={Fringes} />
             <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
             <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
             <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
