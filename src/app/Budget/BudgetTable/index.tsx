@@ -392,33 +392,34 @@ const BudgetTable = <
   };
 
   const tableFooter = useMemo((): R | null => {
-    if (!isNil(tableTotals)) {
-      const footerObj: { [key: string]: any } = {
-        id: hashString("tablefooter"),
-        [identifierField]: tableFooterIdentifierValue,
-        meta: {
-          isPlaceholder: false,
-          isGroupFooter: false,
-          isTableFooter: true,
-          isBudgetFooter: false,
-          selected: false,
-          children: [],
-          errors: []
-        }
-      };
-      forEach(bodyColumns, (col: ColDef) => {
-        if (!isNil(col.field)) {
+    const footerObj: { [key: string]: any } = {
+      id: hashString("tablefooter"),
+      [identifierField]: tableFooterIdentifierValue,
+      meta: {
+        isPlaceholder: false,
+        isGroupFooter: false,
+        isTableFooter: true,
+        isBudgetFooter: false,
+        selected: false,
+        children: [],
+        errors: []
+      }
+    };
+    forEach(bodyColumns, (col: ColDef) => {
+      if (!isNil(col.field)) {
+        footerObj[col.field] = null;
+      }
+    });
+    forEach(calculatedColumns, (col: ColDef) => {
+      if (!isNil(col.field)) {
+        if (!isNil(tableTotals) && !isNil(tableTotals[col.field])) {
+          footerObj[col.field] = tableTotals[col.field];
+        } else {
           footerObj[col.field] = null;
         }
-      });
-      forEach(calculatedColumns, (col: ColDef) => {
-        if (!isNil(col.field) && !isNil(tableTotals[col.field])) {
-          footerObj[col.field] = tableTotals[col.field];
-        }
-      });
-      return footerObj as R;
-    }
-    return null;
+      }
+    });
+    return footerObj as R;
   }, [useDeepEqualMemo(tableTotals), tableFooterIdentifierValue]);
 
   const budgetFooter = useMemo((): R | null => {
@@ -1030,32 +1031,30 @@ const BudgetTable = <
               onCellValueChanged={onCellValueChanged}
             />
           </div>
-          <ShowHide show={!isNil(tableTotals)}>
-            <div className={"table-footer-grid"}>
-              <AgGridReact
-                {...tableFooterGridOptions}
-                columnDefs={colDefs}
-                rowData={[tableFooter]}
-                rowHeight={38}
-                rowClass={"row--table-footer"}
-                suppressRowClickSelection={true}
-                onGridReady={onTableFooterGridReady}
-                onFirstDataRendered={onTableFooterFirstDataRendered}
-                headerHeight={0}
-                frameworkComponents={{
-                  IndexCell: IndexCell,
-                  ExpandCell: ExpandCell,
-                  ValueCell: IncludeErrorsInCell<R>(ValueCell),
-                  UnitCell: IncludeErrorsInCell<R>(UnitCell),
-                  IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
-                  CalculatedCell: CalculatedCell,
-                  PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
-                  BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
-                  ...frameworkComponents
-                }}
-              />
-            </div>
-          </ShowHide>
+          <div className={"table-footer-grid"}>
+            <AgGridReact
+              {...tableFooterGridOptions}
+              columnDefs={colDefs}
+              rowData={[tableFooter]}
+              rowHeight={38}
+              rowClass={"row--table-footer"}
+              suppressRowClickSelection={true}
+              onGridReady={onTableFooterGridReady}
+              onFirstDataRendered={onTableFooterFirstDataRendered}
+              headerHeight={0}
+              frameworkComponents={{
+                IndexCell: IndexCell,
+                ExpandCell: ExpandCell,
+                ValueCell: IncludeErrorsInCell<R>(ValueCell),
+                UnitCell: IncludeErrorsInCell<R>(UnitCell),
+                IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
+                CalculatedCell: CalculatedCell,
+                PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
+                BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
+                ...frameworkComponents
+              }}
+            />
+          </div>
           <ShowHide show={!isNil(budgetTotals)}>
             <div className={"budget-footer-grid"}>
               <AgGridReact

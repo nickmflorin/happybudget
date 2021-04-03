@@ -271,7 +271,7 @@ export const FringeMapping = new Mapping<Table.FringeRow, IFringe, IGroup<any>, 
     { field: "name", required: true },
     { field: "description", allowNull: true },
     { field: "cutoff", allowNull: true },
-    { field: "rate", required: true },
+    { field: "rate", allowNull: true },
     { field: "unit", allowNull: true }
   ],
   labelGetter: (model: IFringe) => String(model.name),

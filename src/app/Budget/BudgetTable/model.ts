@@ -33,8 +33,8 @@ export interface BudgetTableProps<
   identifierField: string;
   identifierFieldHeader: string;
   identifierFieldParams?: Partial<ColDef>;
-  tableFooterIdentifierValue?: string;
-  budgetFooterIdentifierValue?: string;
+  tableFooterIdentifierValue?: string | null;
+  budgetFooterIdentifierValue?: string | null;
   tableTotals?: { [key: string]: any };
   budgetTotals?: { [key: string]: any };
   search: string;
