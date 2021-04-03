@@ -17,6 +17,7 @@ class Mapping<
   public groupGetter?: ((model: M) => number | null) | string | null;
   public labelGetter: (model: M) => string;
   public typeLabel: string;
+  public rowType: Table.RowType;
 
   constructor(config: MappingConfig<M, C>) {
     this.fields = config.fields;
@@ -24,6 +25,7 @@ class Mapping<
     this.groupGetter = config.groupGetter;
     this.labelGetter = config.labelGetter;
     this.typeLabel = config.typeLabel;
+    this.rowType = config.rowType;
   }
 
   getChildren = (model: M): C[] => {
@@ -73,7 +75,8 @@ class Mapping<
       errors: [],
       label: "Placeholder",
       typeLabel: this.typeLabel,
-      fieldsLoading: []
+      fieldsLoading: [],
+      type: this.rowType
     };
     const obj: { [key: string]: any } = {
       id: generateRandomNumericId(),
@@ -98,6 +101,7 @@ class Mapping<
       label: this.labelGetter(model),
       typeLabel: this.typeLabel,
       fieldsLoading: [],
+      type: this.rowType,
       ...meta
     };
     const obj: { [key: string]: any } = {
@@ -213,7 +217,8 @@ export const AccountMapping = new Mapping<
   childrenGetter: (model: IAccount) => model.subaccounts,
   groupGetter: (model: IAccount) => model.group,
   labelGetter: (model: IAccount) => model.identifier,
-  typeLabel: "Account"
+  typeLabel: "Account",
+  rowType: "account"
 });
 
 export const SubAccountMapping = new Mapping<
@@ -234,12 +239,14 @@ export const SubAccountMapping = new Mapping<
     { field: "identifier", required: true },
     { field: "estimated", http: false },
     { field: "variance", http: false },
-    { field: "actual", http: false }
+    { field: "actual", http: false },
+    { field: "fringes", allowNull: true }
   ],
   childrenGetter: (model: ISubAccount) => model.subaccounts,
   groupGetter: (model: ISubAccount) => model.group,
   labelGetter: (model: ISubAccount) => model.identifier,
-  typeLabel: "Sub Account"
+  typeLabel: "Sub Account",
+  rowType: "subaccount"
 });
 
 export const ActualMapping = new Mapping<Table.ActualRow, IActual, IGroup<any>, Http.IActualPayload>({
@@ -263,7 +270,8 @@ export const ActualMapping = new Mapping<Table.ActualRow, IActual, IGroup<any>, 
     { field: "value" }
   ],
   labelGetter: (model: IActual) => String(model.object_id),
-  typeLabel: "Actual"
+  typeLabel: "Actual",
+  rowType: "actual"
 });
 
 export const FringeMapping = new Mapping<Table.FringeRow, IFringe, IGroup<any>, Http.IFringePayload>({
@@ -275,7 +283,8 @@ export const FringeMapping = new Mapping<Table.FringeRow, IFringe, IGroup<any>, 
     { field: "unit", allowNull: true }
   ],
   labelGetter: (model: IFringe) => String(model.name),
-  typeLabel: "Fringe"
+  typeLabel: "Fringe",
+  rowType: "fringe"
 });
 
 export default Mapping;

@@ -20,7 +20,7 @@ import {
   removeFringeAction,
   updateFringeAction,
   selectAllFringesAction
-} from "./actions";
+} from "../actions";
 
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.selected);
 const selectData = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.data);

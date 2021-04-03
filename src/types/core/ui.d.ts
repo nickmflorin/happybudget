@@ -24,3 +24,5 @@ interface StandardComponentProps {
   className?: string;
   style?: React.CSSProperties;
 }
+
+type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : never;

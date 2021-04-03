@@ -24,6 +24,7 @@ const OptionsTagDropdown = <I extends number, N extends string, M extends Option
       labelField={"name"}
       trigger={trigger}
       models={models}
+      multiple={false}
     />
   );
 };

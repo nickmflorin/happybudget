@@ -47,8 +47,6 @@ export interface BudgetTableProps<
   getExportValue?: ExportValueGetters;
   exportFileName?: string;
   nonEditableCells?: (keyof R)[];
-  highlightedNonEditableCells?: (keyof R)[];
-  nonHighlightedNonEditableCells?: (keyof R)[];
   groupParams?: GroupProps<R, G, C>;
   loading?: boolean;
   sizeColumnsToFit?: boolean;
@@ -63,7 +61,6 @@ export interface BudgetTableProps<
   onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;
   onSelectAll: () => void;
-  isCellNonEditableHighlight?: (row: R, col: ColDef) => boolean;
   isCellEditable?: (row: R, col: ColDef) => boolean;
   isCellSelectable?: (row: R, col: ColDef) => boolean;
 }

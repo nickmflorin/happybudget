@@ -16,6 +16,7 @@ interface MappingConfig<M extends Model, C extends Model = UnknownModel> {
   readonly groupGetter?: ((model: M) => number | null) | string | null;
   readonly labelGetter: (model: M) => string;
   readonly typeLabel: string;
+  readonly rowType: Table.RowType;
 }
 
 /* eslint-disable no-unused-vars */

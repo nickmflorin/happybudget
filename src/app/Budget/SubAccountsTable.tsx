@@ -80,16 +80,13 @@ const SubAccountsTable = ({
       tableFooterIdentifierValue={tableFooterIdentifierValue}
       budgetFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
       isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
-        if (includes(["unit"], colDef.field)) {
+        if (includes(["unit", "fringes"], colDef.field)) {
           return false;
         } else if (includes(["identifier", "description", "name"], colDef.field)) {
           return true;
         } else {
           return row.meta.children.length === 0;
         }
-      }}
-      isCellNonEditableHighlight={(row: Table.SubAccountRow, colDef: ColDef) => {
-        return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
       }}
       search={search}
       onSearch={onSearch}
@@ -173,6 +170,25 @@ const SubAccountsTable = ({
           cellStyle: { textAlign: "right" },
           valueFormatter: currencyValueFormatter,
           valueSetter: floatValueSetter("rate")
+        },
+        {
+          field: "fringes",
+          headerName: "Fringes",
+          cellClass: classNames("cell--centered"),
+          cellRenderer: "FringesCell",
+          width: 100,
+          cellRendererParams: {
+            onChange: (ids: number[], row: Table.SubAccountRow) =>
+              onRowUpdate({
+                id: row.id,
+                data: {
+                  fringes: {
+                    oldValue: row.fringes,
+                    newValue: ids
+                  }
+                }
+              })
+          }
         }
       ]}
       calculatedColumns={[

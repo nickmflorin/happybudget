@@ -43,18 +43,19 @@ import {
   CalculatedCell,
   PaymentMethodsCell,
   BudgetItemCell,
-  FringeUnitCell
+  FringeUnitCell,
+  FringesCell
 } from "./cells";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
-import { IncludeErrorsInCell, HideCellForAllFooters } from "./Util";
+import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } from "./Util";
 import "./index.scss";
 
 export * from "./model";
 
 // Convenience flag for development to turn off the context menu so we can right-click inspect
 // the cells and turn on debug mode for AG Grid.
-const TABLE_DEBUG = false;
+const TABLE_DEBUG = true;
 
 const BudgetTable = <
   R extends Table.Row<G, C>,
@@ -79,8 +80,6 @@ const BudgetTable = <
   exportFileName,
   getExportValue,
   nonEditableCells,
-  highlightedNonEditableCells,
-  nonHighlightedNonEditableCells,
   groupParams,
   identifierField,
   identifierFieldHeader,
@@ -105,7 +104,6 @@ const BudgetTable = <
   onRowExpand,
   isCellEditable,
   isCellSelectable,
-  isCellNonEditableHighlight,
   rowRefreshRequired,
   ...options
 }: BudgetTableProps<R, M, G, P, C>) => {
@@ -223,24 +221,6 @@ const BudgetTable = <
     return true;
   });
 
-  const _isCellNonEditableHighlight = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
-    if (includes(["delete", "index", "expand"], colDef.field)) {
-      return false;
-    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter === true) {
-      return false;
-    } else if (!_isCellEditable(row, colDef)) {
-      if (!isNil(nonHighlightedNonEditableCells)) {
-        return !includes(nonHighlightedNonEditableCells, colDef.field as keyof R);
-      } else if (!isNil(highlightedNonEditableCells)) {
-        return includes(highlightedNonEditableCells, colDef.field as keyof R);
-      } else if (!isNil(isCellNonEditableHighlight)) {
-        return isCellNonEditableHighlight(row, colDef);
-      }
-      return true;
-    }
-    return false;
-  });
-
   const actionCell = useDynamicCallback<ColDef>(
     (col: ColDef): ColDef => {
       return {
@@ -326,6 +306,7 @@ const BudgetTable = <
         maxWidth: 125,
         cellStyle: { textAlign: "right" },
         valueFormatter: currencyValueFormatter,
+        cellClass: "cell--not-editable-highlight",
         cellRendererParams: {
           ...col.cellRendererParams,
           renderRedIfNegative: true
@@ -374,8 +355,7 @@ const BudgetTable = <
           // definitions in the map() above.
           return classNames(col.cellClass, rootClassNames, propClassNames, {
             "cell--not-selectable": !_isCellSelectable(row, params.colDef),
-            "cell--not-editable": !_isCellEditable(row, params.colDef),
-            "cell--not-editable-highlight": _isCellNonEditableHighlight(row, params.colDef)
+            "cell--not-editable": !_isCellEditable(row, params.colDef)
           });
         }
       };
@@ -1053,6 +1033,7 @@ const BudgetTable = <
                 CalculatedCell: CalculatedCell,
                 PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
                 BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
+                FringesCell: ShowCellOnlyForRowType<R>("subaccount")(IncludeErrorsInCell<R>(FringesCell)),
                 ...frameworkComponents
               }}
               onCellEditingStopped={onCellEditingStopped}

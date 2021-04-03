@@ -8,5 +8,9 @@
     font-family: $nunito !important;
     font-weight: 400 !important;
     margin-bottom: 0px !important;
+
+    &:hover, &.active {
+      background-color: rgba(245, 245, 245, 0.4);
+    }
   }
 }

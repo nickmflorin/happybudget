@@ -89,7 +89,6 @@ const Actuals = (): JSX.Element => {
         }}
         indexColumn={{ width: 40, maxWidth: 50 }}
         nonEditableCells={["object_id", "payment_method"]}
-        nonHighlightedNonEditableCells={["payment_method", "object_id"]}
         search={search}
         onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
         saving={saving}

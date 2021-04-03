@@ -20,6 +20,7 @@ const OptionTagsMenu = <I extends number, N extends string, M extends OptionMode
       className={className}
       style={style}
       labelField={"name"}
+      multiple={false}
     />
   );
 };
