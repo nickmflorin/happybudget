@@ -10,7 +10,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { ActualMapping } from "model/tableMappings";
 
 import { setInstanceAction, requestBudgetItemsAction, requestBudgetItemsTreeAction } from "../actions";
-import { selectBudgetDetailLoading, selectBudgetDetail } from "../selectors";
+import { selectBudgetDetail } from "../selectors";
 import BudgetTable, { GetExportValueParams } from "../BudgetTable";
 import {
   requestActualsAction,
@@ -33,11 +33,6 @@ const selectPlaceholders = simpleShallowEqualSelector(
 const selectActualsLoading = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.actuals.loading
 );
-const selectLoading = createSelector(
-  selectBudgetDetailLoading,
-  selectActualsLoading,
-  (detailLoading: boolean, tableLoading: boolean) => detailLoading || tableLoading
-);
 const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.budget.actuals.deleting,
   (state: Redux.IApplicationStore) => state.budget.actuals.updating,
@@ -49,7 +44,7 @@ const selectBudgetItems = simpleDeepEqualSelector((state: Redux.IApplicationStor
 
 const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
-  const loading = useSelector(selectLoading);
+  const loading = useSelector(selectActualsLoading);
   const budgetItems = useSelector(selectBudgetItems);
   const data = useSelector(selectActuals);
   const placeholders = useSelector(selectPlaceholders);

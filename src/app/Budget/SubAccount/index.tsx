@@ -16,18 +16,13 @@ const selectDetail = simpleDeepEqualSelector((state: Redux.IApplicationStore) =>
 const selectSubAccountsLoading = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.subaccounts.loading
 );
-const selectDetailLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.subaccount.detail.loading
-);
 const selectDeletingGroups = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.subaccounts.groups.deleting.length !== 0
 );
 const selectLoading = createSelector(
-  selectDetailLoading,
   selectSubAccountsLoading,
   selectDeletingGroups,
-  (detailLoading: boolean, tableLoading: boolean, deletingGroups: boolean) =>
-    detailLoading || tableLoading || deletingGroups
+  (tableLoading: boolean, deletingGroups: boolean) => tableLoading || deletingGroups
 );
 
 const SubAccount = (): JSX.Element => {
