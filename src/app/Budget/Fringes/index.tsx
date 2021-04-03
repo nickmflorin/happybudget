@@ -61,6 +61,7 @@ const Fringes = (): JSX.Element => {
         identifierField={"name"}
         identifierFieldHeader={"Name"}
         tableFooterIdentifierValue={null}
+        indexColumn={{ width: 40, maxWidth: 50 }}
         search={search}
         onSearch={(value: string) => dispatch(setFringesSearchAction(value))}
         saving={saving}
