@@ -1,6 +1,5 @@
 import { Reducer, combineReducers } from "redux";
-import { map, isNil, find, filter, reduce } from "lodash";
-import { fringeValue } from "model/util";
+import { isNil, reduce } from "lodash";
 import {
   createListResponseReducer,
   createDetailResponseReducer,
@@ -8,16 +7,15 @@ import {
   createSimplePayloadReducer,
   createCommentsListResponseReducer
 } from "store/factories";
-import { replaceInArray } from "util/arrays";
 
-import { ActionType } from "./actions";
-import initialState from "./initialState";
+import { ActionType } from "../actions";
+import initialState from "../initialState";
 
-import accountRootReducer from "./Account/reducer";
-import accountsRootReducer from "./Accounts/reducer";
-import actualsRootReducer from "./Actuals/reducer";
-import fringesRootReducer from "./Fringes/reducer";
-import subAccountRootReducer from "./SubAccount/reducer";
+import accountRootReducer from "./account";
+import accountsRootReducer from "./accounts";
+import actualsRootReducer from "./actuals";
+import fringesRootReducer from "./fringes";
+import subAccountRootReducer from "./subAccount";
 
 const genericReducer = combineReducers({
   instance: createSimplePayloadReducer<IAccount | ISubAccount | null>(ActionType.SetInstance, null),
@@ -69,31 +67,6 @@ const rootReducer: Reducer<Redux.Budget.IStore> = (
 ): Redux.Budget.IStore => {
   let newState = genericReducer(state, action);
 
-  const recalculateSubAccountFromFringes = (subAccount: ISubAccount): ISubAccount => {
-    if (!isNil(subAccount.estimated)) {
-      const fringes: IFringe[] = filter(
-        map(subAccount.fringes, (id: number) => {
-          const fringe: IFringe | undefined = find(newState.fringes.data, { id });
-          if (!isNil(fringe)) {
-            return fringe;
-          } else {
-            /* eslint-disable no-console */
-            console.error(
-              `Inconsistent State! Inconsistent state noticed when updating sub-account in state...
-            The fringe ${id} for sub-account ${subAccount.id} does not exist in state when it
-            is expected to.`
-            );
-            return null;
-          }
-        }),
-        (fringe: IFringe | null) => fringe !== null
-      ) as IFringe[];
-      return { ...subAccount, estimated: fringeValue(subAccount.estimated, fringes) };
-    } else {
-      return subAccount;
-    }
-  };
-
   if (!isNil(action.payload)) {
     if (
       action.type === ActionType.SubAccount.SubAccounts.UpdateInState ||
@@ -101,35 +74,6 @@ const rootReducer: Reducer<Redux.Budget.IStore> = (
       action.type === ActionType.SubAccount.SubAccounts.AddToState ||
       action.type === ActionType.SubAccount.SubAccounts.Placeholders.UpdateInState
     ) {
-      if (action.type === ActionType.SubAccount.SubAccounts.UpdateInState) {
-        // Recalculate the estimated value of the SubAccount based on the fringes that it is
-        // currently associated with after the update.
-        const subAccount: ISubAccount | undefined = find(newState.subaccount.subaccounts.data, {
-          id: action.payload.id
-        });
-        if (isNil(subAccount)) {
-          /* eslint-disable no-console */
-          console.error(
-            `Inconsistent State: Inconsistent state noticed when updating sub-account in state. The
-            sub-account with ID ${action.payload.id} does not exist in state when it is expected to.`
-          );
-        } else if (subAccount.estimated !== null) {
-          newState = {
-            ...newState,
-            subaccount: {
-              ...newState.subaccount,
-              subaccounts: {
-                ...newState.subaccount.subaccounts,
-                data: replaceInArray<ISubAccount>(
-                  newState.subaccount.subaccounts.data,
-                  { id: subAccount.id },
-                  recalculateSubAccountFromFringes(subAccount)
-                )
-              }
-            }
-          };
-        }
-      }
       // Update the overall SubAccount based on the underlying SubAccount(s) present and any potential
       // placeholders present.
       const subAccounts: ISubAccount[] = newState.subaccount.subaccounts.data;
@@ -165,33 +109,6 @@ const rootReducer: Reducer<Redux.Budget.IStore> = (
       action.type === ActionType.Account.SubAccounts.AddToState ||
       action.type === ActionType.Account.SubAccounts.Placeholders.UpdateInState
     ) {
-      if (action.type === ActionType.Account.SubAccounts.UpdateInState) {
-        // Recalculate the estimated value of the SubAccount based on the fringes that it is
-        // currently associated with after the update.
-        const subAccount: ISubAccount | undefined = find(newState.account.subaccounts.data, { id: action.payload.id });
-        if (isNil(subAccount)) {
-          /* eslint-disable no-console */
-          console.error(
-            `Inconsistent State: Inconsistent state noticed when updating sub-account in state. The
-              sub-account with ID ${action.payload.id} does not exist in state when it is expected to.`
-          );
-        } else if (subAccount.estimated !== null) {
-          newState = {
-            ...newState,
-            account: {
-              ...newState.account,
-              subaccounts: {
-                ...newState.account.subaccounts,
-                data: replaceInArray<ISubAccount>(
-                  newState.account.subaccounts.data,
-                  { id: subAccount.id },
-                  recalculateSubAccountFromFringes(subAccount)
-                )
-              }
-            }
-          };
-        }
-      }
       // Update the overall Account based on the underlying SubAccount(s) present and any potential
       // placeholders present.
       const subAccounts: ISubAccount[] = newState.account.subaccounts.data;

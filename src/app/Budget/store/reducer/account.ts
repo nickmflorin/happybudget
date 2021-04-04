@@ -1,13 +1,11 @@
 import { combineReducers, Reducer } from "redux";
-
 import {
   createDetailResponseReducer,
   createSimplePayloadReducer,
   createCommentsListResponseReducer
 } from "store/factories";
-
 import { ActionType } from "../actions";
-import { createSubAccountsReducer } from "../factories";
+import { createSubAccountsReducer } from "./factories";
 
 const rootReducer: Reducer<Redux.Budget.IAccountStore, Redux.IAction<any>> = combineReducers({
   id: createSimplePayloadReducer<number | null>(ActionType.Account.SetId, null),

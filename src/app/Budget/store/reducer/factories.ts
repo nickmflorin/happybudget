@@ -1,11 +1,12 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce } from "lodash";
-import { createListResponseReducer } from "store/factories";
-import { createListReducerFromTransformers, mergeOptionsWithDefaults } from "store/factories/util";
-import Mapping, { SubAccountMapping } from "model/tableMappings";
+import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
+import { SubAccountMapping } from "model/tableMappings";
+import { fringeValue } from "model/util";
 import { replaceInArray } from "util/arrays";
 
-import { initialSubAccountsState } from "./initialState";
+import { initialSubAccountsState } from "../initialState";
+import fringesRootReducer from "./fringes";
 
 interface SubAccountsPlaceholdersActionMap {
   AddToState: string;
@@ -50,74 +51,6 @@ export interface SubAccountsReducerFactoryActionMap {
   History: SubAccountsHistoryActionMap;
 }
 
-export const createTablePlaceholdersReducer = <
-  /* eslint-disable indent */
-  R extends Table.Row<G, C>,
-  M extends Model,
-  G extends IGroup<any>,
-  P extends Http.IPayload,
-  C extends Model = UnknownModel,
-  A extends Redux.IAction<any> = Redux.IAction<any>
->(
-  mappings: Partial<ReducerFactory.ITablePlaceholdersActionMap>,
-  mapping: Mapping<R, M, G, P, C>,
-  options: Partial<ReducerFactory.IOptions<Redux.ListStore<R>>> = { initialState: [], referenceEntity: "entity" }
-) => {
-  const Options = mergeOptionsWithDefaults<Redux.ListStore<R>>(options, []);
-
-  const transformers: ReducerFactory.Transformers<ReducerFactory.ITablePlaceholdersActionMap, Redux.ListStore<R>, A> = {
-    Clear: () => [],
-    AddToState: (count: number | undefined, st: Redux.ListStore<R>) => {
-      const placeholders: R[] = [];
-      const numPlaceholders = count || 1;
-      for (let i = 0; i < numPlaceholders; i++) {
-        placeholders.push(mapping.createPlaceholder());
-      }
-      return [...st, ...placeholders];
-    },
-    RemoveFromState: (id: number, st: Redux.ListStore<R>) => {
-      const row: R | undefined = find(st, { id: id } as any);
-      if (isNil(row)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when removing the ${Options.referenceEntity}
-          placeholder in state... the ${Options.referenceEntity} placeholder row with ID ${id}
-          does not exist in state when it is expected to.`
-        );
-        return st;
-      } else {
-        return filter(st, (r: R) => r.id !== id);
-      }
-    },
-    UpdateInState: (payload: R, st: Redux.ListStore<R>) => {
-      const row: R | undefined = find(st, { id: payload.id } as any);
-      if (isNil(row)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when updating the ${Options.referenceEntity}
-          placeholder in state... the ${Options.referenceEntity} placeholder row with ID ${payload.id}
-          does not exist in state when it is expected to.`
-        );
-        return st;
-      } else {
-        return replaceInArray<R>(
-          st,
-          { id: payload.id },
-          {
-            ...row,
-            ...payload
-          }
-        );
-      }
-    }
-  };
-  return createListReducerFromTransformers<ReducerFactory.ITablePlaceholdersActionMap, R, A>(
-    mappings,
-    transformers,
-    Options
-  );
-};
-
 export const createSubAccountsReducer = (
   mapping: SubAccountsReducerFactoryActionMap
 ): Reducer<Redux.Budget.ISubAccountsStore, Redux.IAction<any>> => {
@@ -141,6 +74,7 @@ export const createSubAccountsReducer = (
       referenceEntity: "subaccount",
       strictSelect: false,
       keyReducers: {
+        fringes: fringesRootReducer,
         placeholders: createTablePlaceholdersReducer(
           {
             AddToState: mapping.Placeholders.AddToState,
@@ -224,11 +158,39 @@ export const createSubAccountsReducer = (
     };
   };
 
+  const recalculateSubAccountFromFringes = (
+    st: Redux.Budget.ISubAccountsStore,
+    subAccount: ISubAccount
+  ): ISubAccount => {
+    if (!isNil(subAccount.estimated)) {
+      const fringes: IFringe[] = filter(
+        map(subAccount.fringes, (id: number) => {
+          const fringe: IFringe | undefined = find(st.fringes.data, { id });
+          if (!isNil(fringe)) {
+            return fringe;
+          } else {
+            /* eslint-disable no-console */
+            console.error(
+              `Inconsistent State! Inconsistent state noticed when updating sub-account in state...
+            The fringe ${id} for sub-account ${subAccount.id} does not exist in state when it
+            is expected to.`
+            );
+            return null;
+          }
+        }),
+        (fringe: IFringe | null) => fringe !== null
+      ) as IFringe[];
+      return { ...subAccount, estimated: fringeValue(subAccount.estimated, fringes) };
+    } else {
+      return subAccount;
+    }
+  };
+
   const recalculateSubAccountMetrics = (
     st: Redux.Budget.ISubAccountsStore,
     id: number
   ): Redux.Budget.ISubAccountsStore => {
-    const subAccount = find(st.data, { id });
+    let subAccount = find(st.data, { id });
     if (isNil(subAccount)) {
       /* eslint-disable no-console */
       console.error(
@@ -249,16 +211,12 @@ export const createSubAccountsReducer = (
         if (!isNil(subAccount.actual) && !isNil(payload.estimated)) {
           payload = { ...payload, variance: payload.estimated - subAccount.actual };
         }
+        subAccount = { ...subAccount, ...payload };
+        subAccount = recalculateSubAccountFromFringes(st, subAccount);
+
         return {
           ...st,
-          data: replaceInArray<ISubAccount>(
-            st.data,
-            { id: subAccount.id },
-            {
-              ...subAccount,
-              ...payload
-            }
-          )
+          data: replaceInArray<ISubAccount>(st.data, { id: subAccount.id }, subAccount)
         };
       } else {
         return st;
@@ -310,11 +268,6 @@ export const createSubAccountsReducer = (
 
     newState = listResponseReducer(newState, action);
 
-    // NOTE: The above ListResponseReducer handles updates to the Group itself or the SubAccount itself
-    // via these same actions. However, it does not do any recalculation of the group values, because
-    // it needs the state of the Group and the state of the SubAccount(s) to do so. This means moving
-    // that logic/recalculation further up the reducer tree where we have access to the SubAccount(s)
-    // in state.
     if (action.type === mapping.Groups.UpdateInState) {
       const group: IGroup<ISimpleSubAccount> = action.payload;
       newState = recalculateGroupMetrics(newState, group.id);

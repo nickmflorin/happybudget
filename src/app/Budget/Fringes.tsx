@@ -9,8 +9,7 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { FringeMapping } from "model/tableMappings";
 
-import { setInstanceAction, addFringesPlaceholdersToStateAction } from "../actions";
-import BudgetTable from "../BudgetTable";
+import { setInstanceAction, addFringesPlaceholdersToStateAction } from "./store/actions";
 import {
   setFringesSearchAction,
   deselectFringeAction,
@@ -19,7 +18,8 @@ import {
   updateFringeAction,
   selectAllFringesAction,
   bulkUpdateBudgetFringesAction
-} from "./actions";
+} from "./store/actions/fringes";
+import BudgetTable from "./BudgetTable";
 
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.selected);
 const selectData = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.data);

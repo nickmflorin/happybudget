@@ -6,6 +6,7 @@ export * from "./counter";
 export * from "./comments";
 export * from "./list";
 export * from "./detail";
+export * from "./table";
 
 export const createSimplePayloadReducer = <P, A extends Redux.IAction<P> = Redux.IAction<P>>(
   actionType: string,

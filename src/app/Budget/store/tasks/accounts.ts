@@ -54,7 +54,7 @@ import {
   activatePlaceholderAction,
   loadingGroupsAction,
   responseGroupsAction
-} from "./actions";
+} from "../actions/accounts";
 
 export function* removeAccountFromGroupTask(action: Redux.IAction<number>): SagaIterator {
   if (!isNil(action.payload)) {

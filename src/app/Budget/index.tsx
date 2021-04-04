@@ -22,8 +22,8 @@ import { RenderIfValidId } from "components/display";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
 import { componentLoader } from "operational";
 
-import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./actions";
-import { selectInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "./selectors";
+import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./store/actions";
+import { selectInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "./store/selectors";
 
 import "./index.scss";
 

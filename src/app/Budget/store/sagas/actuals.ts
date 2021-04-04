@@ -1,7 +1,12 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
 import { ActionType } from "../actions";
-import { getActualsTask, handleActualRemovalTask, handleActualUpdateTask, handleActualsBulkUpdateTask } from "./tasks";
+import {
+  getActualsTask,
+  handleActualRemovalTask,
+  handleActualUpdateTask,
+  handleActualsBulkUpdateTask
+} from "../tasks/actuals";
 
 function* watchForRequestActualsSaga(): SagaIterator {
   let lastTasks;

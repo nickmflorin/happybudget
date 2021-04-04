@@ -16,7 +16,7 @@ import {
   updatePlaceholderInStateAction,
   addErrorsToStateAction,
   updateFringeInStateAction
-} from "./actions";
+} from "../actions/fringes";
 
 export function* deleteFringeTask(id: number): SagaIterator {
   yield put(deletingFringeAction({ id, value: true }));

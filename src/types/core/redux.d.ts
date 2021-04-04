@@ -112,6 +112,7 @@ namespace Redux {
       readonly placeholders: ListStore<Table.SubAccountRow>;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
       readonly groups: IListResponseStore<IGroup<ISimpleSubAccount>>;
+      readonly fringes: IFringesStore;
     }
 
     interface IAccountsStore extends IListResponseStore<IAccount> {

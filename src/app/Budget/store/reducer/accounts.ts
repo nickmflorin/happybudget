@@ -1,12 +1,11 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, filter, map, reduce } from "lodash";
-import { createListResponseReducer } from "store/factories";
+import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
 import { AccountMapping } from "model/tableMappings";
 import { replaceInArray } from "util/arrays";
 
 import { ActionType } from "../actions";
 import { initialAccountsState } from "../initialState";
-import { createTablePlaceholdersReducer } from "../factories";
 
 const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAccountsStore>(
   {

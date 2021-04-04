@@ -4,8 +4,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction } from "../actions";
-import { requestAccountsAction, requestGroupsAction } from "./actions";
+import { setInstanceAction } from "../store/actions";
+import { requestAccountsAction, requestGroupsAction } from "../store/actions/accounts";
 
 import AccountsBudgetTable from "./AccountsBudgetTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";

@@ -15,7 +15,7 @@ import {
   removeAccountFromGroupTask,
   getGroupsTask,
   handleAccountsBulkUpdateTask
-} from "./tasks";
+} from "../tasks/accounts";
 
 function* watchForRequestAccountsSaga(): SagaIterator {
   let lastTasks;

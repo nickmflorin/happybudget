@@ -10,7 +10,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { AccountMapping } from "model/tableMappings";
 
 import BudgetTable from "../BudgetTable";
-import { selectBudgetId, selectBudgetDetail } from "../selectors";
+import { selectBudgetId, selectBudgetDetail } from "../store/selectors";
 import {
   setAccountsSearchAction,
   addPlaceholdersToStateAction,
@@ -24,7 +24,7 @@ import {
   removeAccountFromGroupAction,
   bulkUpdateBudgetAccountsAction,
   updateGroupInStateAction
-} from "./actions";
+} from "../store/actions/accounts";
 
 const selectGroups = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.groups.data);
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.accounts.selected);

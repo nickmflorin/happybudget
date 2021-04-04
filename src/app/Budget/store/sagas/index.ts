@@ -1,12 +1,14 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel } from "redux-saga/effects";
-import { ActionType } from "./actions";
-import { getBudgetTask, handleBudgetChangedTask } from "./tasks";
-import accountSaga from "./Account/sagas";
-import budgetSaga from "./Accounts/sagas";
-import actualsSaga from "./Actuals/sagas";
-import fringesSaga from "./Fringes/sagas";
-import subAccountSaga from "./SubAccount/sagas";
+
+import { ActionType } from "../actions";
+import { getBudgetTask, handleBudgetChangedTask } from "../tasks";
+
+import accountSaga from "./account";
+import budgetSaga from "./accounts";
+import actualsSaga from "./actuals";
+import fringesSaga from "./fringes";
+import subAccountSaga from "./subAccount";
 
 function* watchForBudgetIdChangedSaga(): SagaIterator {
   let lastTasks;

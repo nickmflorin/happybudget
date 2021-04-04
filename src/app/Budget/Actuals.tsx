@@ -9,9 +9,7 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { ActualMapping } from "model/tableMappings";
 
-import { setInstanceAction } from "../actions";
-import { selectBudgetDetail } from "../selectors";
-import BudgetTable, { GetExportValueParams } from "../BudgetTable";
+import { setInstanceAction } from "./store/actions";
 import {
   requestActualsAction,
   setActualsSearchAction,
@@ -22,7 +20,9 @@ import {
   updateActualAction,
   selectAllActualsAction,
   bulkUpdateBudgetActualsAction
-} from "./actions";
+} from "./store/actions/actuals";
+import { selectBudgetDetail } from "./store/selectors";
+import BudgetTable, { GetExportValueParams } from "./BudgetTable";
 
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.selected);
 const selectActuals = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.data);

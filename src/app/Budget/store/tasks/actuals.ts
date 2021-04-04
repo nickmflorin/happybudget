@@ -26,7 +26,7 @@ import {
   addPlaceholdersToStateAction,
   addErrorsToStateAction,
   updateActualInStateAction
-} from "./actions";
+} from "../actions/actuals";
 
 export function* deleteActualTask(id: number): SagaIterator {
   yield put(deletingActualAction({ id, value: true }));

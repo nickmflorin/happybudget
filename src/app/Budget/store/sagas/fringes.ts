@@ -1,7 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, takeEvery } from "redux-saga/effects";
 import { ActionType } from "../actions";
-import { handleFringeRemovalTask, handleFringeUpdateTask, handleFringesBulkUpdateTask } from "./tasks";
+import { handleFringeRemovalTask, handleFringeUpdateTask, handleFringesBulkUpdateTask } from "../tasks/fringes";
 
 function* watchForRemoveFringeSaga(): SagaIterator {
   yield takeEvery(ActionType.Budget.Fringes.Remove, handleFringeRemovalTask);

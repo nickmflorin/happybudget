@@ -1,5 +1,5 @@
 import { simpleAction } from "store/actions";
-import { ActionType } from "../actions";
+import ActionType from "./ActionType";
 
 export const setAccountIdAction = simpleAction<number>(ActionType.Account.SetId);
 export const requestAccountAction = simpleAction<null>(ActionType.Account.Request);

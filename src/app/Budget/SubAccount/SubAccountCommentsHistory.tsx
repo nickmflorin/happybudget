@@ -8,7 +8,7 @@ import {
   deleteCommentAction,
   updateCommentAction,
   requestSubAccountsHistoryAction
-} from "./actions";
+} from "../store/actions/subAccount";
 
 const selectDeletingComments = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.comments.deleting

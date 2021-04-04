@@ -1,9 +1,8 @@
 import { Reducer } from "redux";
 import { filter } from "lodash";
-import { createListResponseReducer } from "store/factories";
+import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
 import { ActualMapping } from "model/tableMappings";
 import { ActionType } from "../actions";
-import { createTablePlaceholdersReducer } from "../factories";
 import { initialActualsState } from "../initialState";
 
 const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IActualsStore>(

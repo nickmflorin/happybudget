@@ -7,8 +7,8 @@ import { isNil } from "lodash";
 import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction } from "../actions";
-import { setSubAccountIdAction } from "./actions";
+import { setInstanceAction } from "../store/actions";
+import { setSubAccountIdAction } from "../store/actions/subAccount";
 import SubAccountBudgetTable from "./SubAccountBudgetTable";
 import SubAccountCommentsHistory from "./SubAccountCommentsHistory";
 

@@ -4,10 +4,8 @@ import {
   initialCommentsListResponseState
 } from "store/initialState";
 
-export const initialSubAccountsState: Redux.Budget.ISubAccountsStore = {
+export const initialFringesState: Redux.Budget.IFringesStore = {
   placeholders: [],
-  history: initialListResponseState,
-  groups: initialListResponseState,
   ...initialListResponseState
 };
 
@@ -22,6 +20,14 @@ export const initialBudgetState: Redux.Budget.IBudgetStore = {
   id: null,
   detail: initialDetailResponseState,
   comments: initialCommentsListResponseState
+};
+
+export const initialSubAccountsState: Redux.Budget.ISubAccountsStore = {
+  placeholders: [],
+  history: initialListResponseState,
+  groups: initialListResponseState,
+  fringes: initialFringesState,
+  ...initialListResponseState
 };
 
 export const initialSubAccountState: Redux.Budget.ISubAccountStore = {
@@ -39,11 +45,6 @@ export const initialAccountState: Redux.Budget.IAccountStore = {
 };
 
 export const initialActualsState: Redux.Budget.IActualsStore = {
-  placeholders: [],
-  ...initialListResponseState
-};
-
-export const initialFringesState: Redux.Budget.IFringesStore = {
   placeholders: [],
   ...initialListResponseState
 };

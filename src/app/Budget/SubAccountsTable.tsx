@@ -8,7 +8,7 @@ import { SubAccountMapping } from "model/tableMappings";
 import { floatValueSetter, integerValueSetter, currencyValueFormatter } from "util/table";
 
 import BudgetTable from "./BudgetTable";
-import { selectBudgetDetail, selectBudgetDetailLoading } from "./selectors";
+import { selectBudgetDetail, selectBudgetDetailLoading } from "./store/selectors";
 
 interface SubAccountsTableProps {
   data: ISubAccount[];
