@@ -8,6 +8,8 @@ import { Tag } from "components/display";
 import { useDeepEqualMemo } from "hooks";
 import { getKeyValue } from "util/objects";
 
+import "./ModelTagsDropdown.scss";
+
 type SingleModelTagsDropdownProps<M extends Model, V extends number = number> = {
   onChange: (models: M) => void;
   multiple: false;
@@ -64,12 +66,16 @@ const ModelTagsDropdown = <M extends Model, V extends number = number>(
     if (Array.isArray(value)) {
       if (value.length === 0) {
         return (
-          <Tag key={i} uppercase style={{ opacity: 1 }}>
+          <Tag key={i} uppercase style={{ opacity: 0 }}>
             {"None"}
           </Tag>
         );
       }
-      return <div key={i}>{map(value, (v: V, j: number) => child(v, i + j))}</div>;
+      return (
+        <div className={"multiple-tags-wrapper"} key={i}>
+          {map(value, (v: V, j: number) => child(v, i + j))}
+        </div>
+      );
     } else if (value !== null) {
       const mapped = mapping[value];
       if (!isNil(mapped)) {
@@ -80,14 +86,14 @@ const ModelTagsDropdown = <M extends Model, V extends number = number>(
         );
       } else {
         return (
-          <Tag key={i} uppercase style={{ opacity: 1 }}>
+          <Tag key={i} uppercase style={{ opacity: 0 }}>
             {"None"}
           </Tag>
         );
       }
     } else {
       return (
-        <Tag key={i} uppercase style={{ opacity: 1 }}>
+        <Tag key={i} uppercase style={{ opacity: 0 }}>
           {"None"}
         </Tag>
       );

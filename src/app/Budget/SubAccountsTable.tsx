@@ -74,6 +74,7 @@ const SubAccountsTable = ({
       mapping={SubAccountMapping}
       selected={selected}
       loadingBudget={loadingBudget}
+      sizeColumnsToFit={false}
       identifierField={"identifier"}
       identifierFieldHeader={"Line"}
       identifierColumn={{ width: 70, cellRendererParams: { className: "subaccount-identifier" } }}
@@ -128,12 +129,12 @@ const SubAccountsTable = ({
         {
           field: "name",
           headerName: "Name",
-          width: 15
+          width: 80
         },
         {
           field: "quantity",
           headerName: "Qty",
-          width: 10,
+          width: 60,
           cellStyle: { textAlign: "right" },
           valueSetter: integerValueSetter("quantity")
         },
@@ -142,7 +143,7 @@ const SubAccountsTable = ({
           headerName: "Unit",
           cellClass: classNames("cell--centered"),
           cellRenderer: "SubAccountUnitCell",
-          width: 20,
+          width: 100,
           cellRendererParams: {
             onChange: (unit: SubAccountUnit, row: Table.SubAccountRow) =>
               onRowUpdate({
@@ -159,14 +160,14 @@ const SubAccountsTable = ({
         {
           field: "multiplier",
           headerName: "X",
-          width: 10,
+          width: 50,
           cellStyle: { textAlign: "right" },
           valueSetter: floatValueSetter("multiplier")
         },
         {
           field: "rate",
           headerName: "Rate",
-          width: 10,
+          width: 70,
           cellStyle: { textAlign: "right" },
           valueFormatter: currencyValueFormatter,
           valueSetter: floatValueSetter("rate")
@@ -176,7 +177,7 @@ const SubAccountsTable = ({
           headerName: "Fringes",
           cellClass: classNames("cell--centered"),
           cellRenderer: "FringesCell",
-          width: 100,
+          minWidth: 150,
           cellRendererParams: {
             onChange: (ids: number[], row: Table.SubAccountRow) =>
               onRowUpdate({

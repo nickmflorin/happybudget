@@ -26,3 +26,7 @@ export const DEFAULT_TAG_COLOR_SCHEME = [
   "#66bb6a",
   "#58add6"
 ];
+
+// Convenience flag for development to turn off the context menu so we can right-click inspect
+// the cells and turn on debug mode for AG Grid.
+export const TABLE_DEBUG = false;

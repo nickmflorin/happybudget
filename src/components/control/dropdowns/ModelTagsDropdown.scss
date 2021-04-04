@@ -1,0 +1,9 @@
+.multiple-tags-wrapper {
+  display: flex;
+
+  > .tag {
+    &:not(:first-child) {
+      margin-left: -40px;
+    }
+  }
+}

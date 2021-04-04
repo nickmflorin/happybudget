@@ -28,11 +28,12 @@ import {
   FirstDataRenderedEvent
 } from "ag-grid-community";
 
+import { TABLE_DEBUG } from "config";
 import { RenderWithSpinner, ShowHide } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
 import { downloadAsCsvFile } from "util/files";
 import { hashString } from "util/string";
-import { currencyValueFormatter } from "util/table";
+import { currencyValueFormatter, mergeClassNames, mergeClassNamesFn } from "util/table";
 
 import {
   ExpandCell,
@@ -52,10 +53,6 @@ import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } fr
 import "./index.scss";
 
 export * from "./model";
-
-// Convenience flag for development to turn off the context menu so we can right-click inspect
-// the cells and turn on debug mode for AG Grid.
-const TABLE_DEBUG = true;
 
 const BudgetTable = <
   R extends Table.Row<G, C>,
@@ -227,7 +224,7 @@ const BudgetTable = <
         width: 20,
         maxWidth: 25,
         ...col,
-        cellClass: classNames("cell--action", "cell--not-editable", "cell--not-selectable", col.cellClass),
+        cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", col.cellClass),
         editable: false,
         headerName: "",
         resizable: false
@@ -294,24 +291,34 @@ const BudgetTable = <
         field: "expand",
         cellRenderer: "ExpandCell",
         cellRendererParams: { onClick: onRowExpand },
-        cellClass: classNames(expandColumn.cellClass, actionColumn.cellClass)
+        cellClass: mergeClassNamesFn(col.cellClass, expandColumn.cellClass, actionColumn.cellClass)
       })
   );
 
   const calculatedCell = useDynamicCallback<ColDef>(
     (col: ColDef): ColDef => {
       return {
+        width: 100,
+        maxWidth: 100,
+        ...col,
         cellRenderer: "CalculatedCell",
-        minWidth: 100,
-        maxWidth: 125,
         cellStyle: { textAlign: "right" },
         valueFormatter: currencyValueFormatter,
-        cellClass: "cell--not-editable-highlight",
         cellRendererParams: {
           ...col.cellRendererParams,
           renderRedIfNegative: true
         },
-        ...col
+        cellClass: (params: CellClassParams) => {
+          const row: R = params.node.data;
+          if (
+            row.meta.isBudgetFooter === false &&
+            row.meta.isGroupFooter === false &&
+            row.meta.isTableFooter === false
+          ) {
+            return mergeClassNames(params, "cell--not-editable-highlight", col.cellClass);
+          }
+          return mergeClassNames(params, col.cellClass);
+        }
       };
     }
   );
@@ -333,27 +340,7 @@ const BudgetTable = <
         editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
         cellClass: (params: CellClassParams) => {
           const row: R = params.node.data;
-
-          let propClassNames = undefined;
-          if (!isNil(cellClass)) {
-            if (typeof col.cellClass === "string" || Array.isArray(col.cellClass)) {
-              propClassNames = cellClass;
-            } else {
-              propClassNames = cellClass(params);
-            }
-          }
-
-          let rootClassNames = undefined;
-          if (!isNil(col.cellClass)) {
-            if (typeof col.cellClass === "string" || Array.isArray(col.cellClass)) {
-              rootClassNames = col.cellClass;
-            } else {
-              rootClassNames = col.cellClass(params);
-            }
-          }
-          // TODO: See if we can move some of these to their specific column
-          // definitions in the map() above.
-          return classNames(col.cellClass, rootClassNames, propClassNames, {
+          return mergeClassNames(params, cellClass, col.cellClass, {
             "cell--not-selectable": !_isCellSelectable(row, params.colDef),
             "cell--not-editable": !_isCellEditable(row, params.colDef)
           });
