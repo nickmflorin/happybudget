@@ -107,26 +107,6 @@ namespace Http {
     readonly group?: number | null;
   }
 
-  interface ISubAccountBulkUpdatePayload extends Partial<ISubAccountPayload> {
-    readonly id: number;
-  }
-
-  interface IAccountBulkUpdatePayload extends Partial<IAccountPayload> {
-    readonly id: number;
-  }
-
-  interface IActualBulkUpdatePayload extends Partial<IActualPayload> {
-    readonly id: number;
-  }
-
-  interface IBulkCreateSubAccountsResponse {
-    data: ISubAccount[];
-  }
-
-  interface IBulkCreateAccountsResponse {
-    data: IAccount[];
-  }
-
   interface IActualPayload extends IPayload {
     readonly description?: string;
     readonly date?: string;
@@ -153,5 +133,33 @@ namespace Http {
     readonly country: string;
     readonly phone_number: string;
     readonly email: string;
+  }
+
+  interface ISubAccountBulkUpdatePayload extends Partial<ISubAccountPayload> {
+    readonly id: number;
+  }
+
+  interface IAccountBulkUpdatePayload extends Partial<IAccountPayload> {
+    readonly id: number;
+  }
+
+  interface IActualBulkUpdatePayload extends Partial<IActualPayload> {
+    readonly id: number;
+  }
+
+  interface IFringeBulkUpdatePayload extends Partial<IFringePayload> {
+    readonly id: number;
+  }
+
+  interface IBulkCreateSubAccountsResponse {
+    data: ISubAccount[];
+  }
+
+  interface IBulkCreateFringesResponse {
+    data: IFringe[];
+  }
+
+  interface IBulkCreateAccountsResponse {
+    data: IAccount[];
   }
 }

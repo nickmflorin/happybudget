@@ -1,6 +1,8 @@
 import { simpleAction } from "store/actions";
 import { ActionType } from "../actions";
 
+export const bulkUpdateBudgetFringesAction = simpleAction<Table.RowChange[]>(ActionType.Budget.BulkUpdateFringes);
+
 export const updateFringeAction = simpleAction<Table.RowChange>(ActionType.Budget.Fringes.Update);
 export const removeFringeAction = simpleAction<number>(ActionType.Budget.Fringes.Remove);
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Fringes.Deleting);

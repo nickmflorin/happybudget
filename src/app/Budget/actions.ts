@@ -10,6 +10,7 @@ export const ActionType = {
     Request: "budget.budget.Request",
     BulkUpdateAccounts: "budget.budget.BulkUpdateAccounts",
     BulkUpdateActuals: "budget.budget.BulkUpdateActuals",
+    BulkUpdateFringes: "budget.budget.BulkUpdateFringes",
     Comments: {
       Loading: "budget.budget.comments.Loading",
       Response: "budget.budget.comments.Response",

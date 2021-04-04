@@ -142,3 +142,23 @@ export const bulkUpdateActuals = async (
   const url = URL.v1("budgets", id, "bulk-update-actuals");
   return client.patch<IActual>(url, { data }, options);
 };
+
+export const bulkUpdateFringes = async (
+  id: number,
+  data: Http.IFringeBulkUpdatePayload[],
+  options: Http.IRequestOptions = {}
+): Promise<IBudget> => {
+  const url = URL.v1("budgets", id, "bulk-update-fringes");
+  return client.patch<IBudget>(url, { data }, options);
+};
+
+export const bulkCreateFringes = async (
+  id: number,
+  data: Http.IFringePayload[],
+  options: Http.IRequestOptions = {}
+): Promise<IFringe[]> => {
+  const url = URL.v1("budgets", id, "bulk-create-fringes");
+  return client
+    .patch<Http.IBulkCreateFringesResponse>(url, { data }, options)
+    .then((response: Http.IBulkCreateFringesResponse) => response.data);
+};

@@ -17,7 +17,8 @@ import {
   selectFringeAction,
   removeFringeAction,
   updateFringeAction,
-  selectAllFringesAction
+  selectAllFringesAction,
+  bulkUpdateBudgetFringesAction
 } from "./actions";
 
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.selected);
@@ -67,6 +68,7 @@ const Fringes = (): JSX.Element => {
         onRowDeselect={(id: number) => dispatch(deselectFringeAction(id))}
         onRowDelete={(row: Table.FringeRow) => dispatch(removeFringeAction(row.id))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateFringeAction(payload))}
+        onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetFringesAction(changes))}
         onSelectAll={() => dispatch(selectAllFringesAction())}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         bodyColumns={[
