@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
+import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -25,7 +26,6 @@ import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./a
 import { selectInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "./selectors";
 
 import "./index.scss";
-import { isNil } from "lodash";
 
 const Account = React.lazy(() => componentLoader(() => import("./Account")));
 const Accounts = React.lazy(() => componentLoader(() => import("./Accounts")));
