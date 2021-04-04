@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
@@ -8,7 +8,6 @@ import { CreateSubAccountGroupModal, EditSubAccountGroupModal } from "components
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import SubAccountsTable from "../SubAccountsTable";
-import { requestFringesAction } from "../actions";
 import { selectBudgetId } from "../selectors";
 import {
   addPlaceholdersToStateAction,
@@ -67,10 +66,6 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
   const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
   const groups = useSelector(selectGroups);
-
-  useEffect(() => {
-    dispatch(requestFringesAction());
-  }, []);
 
   return (
     <React.Fragment>

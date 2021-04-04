@@ -46,7 +46,6 @@ const rootReducer = combineReducers({
   budgetItems: createListResponseReducer<IBudgetItem>(
     {
       Response: ActionType.BudgetItems.Response,
-      Request: ActionType.BudgetItems.Request,
       Loading: ActionType.BudgetItems.Loading
     },
     { referenceEntity: "budget item" }
@@ -54,7 +53,6 @@ const rootReducer = combineReducers({
   budgetItemsTree: createListResponseReducer<IBudgetItemNode>(
     {
       Response: ActionType.BudgetItemsTree.Response,
-      Request: ActionType.BudgetItemsTree.Request,
       Loading: ActionType.BudgetItemsTree.Loading
     },
     { referenceEntity: "budget item tree node" }

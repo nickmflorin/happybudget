@@ -1,18 +1,8 @@
 import { SagaIterator } from "redux-saga";
-import { call, put, select } from "redux-saga/effects";
-import { isNil, find } from "lodash";
+import { call, put, select, all } from "redux-saga/effects";
+import { isNil } from "lodash";
 import { handleRequestError } from "api";
-import { FringeMapping } from "model/tableMappings";
-import {
-  getBudget,
-  getBudgetItems,
-  getBudgetItemsTree,
-  getFringes,
-  deleteFringe,
-  updateFringe,
-  createFringe
-} from "services";
-import { handleTableErrors } from "store/tasks";
+import { getBudget, getBudgetItems, getBudgetItemsTree, getFringes } from "services";
 import {
   loadingBudgetAction,
   responseBudgetAction,
@@ -22,8 +12,13 @@ import {
   responseBudgetItemsTreeAction,
   loadingFringesAction,
   responseFringesAction,
-  addFringesPlaceholdersToStateAction
+  addFringesPlaceholdersToStateAction,
+  clearFringesPlaceholdersToStateAction
 } from "./actions";
+
+export function* handleBudgetChangedTask(action: Redux.IAction<number>): SagaIterator {
+  yield all([call(getBudgetTask), call(getBudgetItemsTask), call(getBudgetItemsTreeTask), call(getFringesTask)]);
+}
 
 export function* getBudgetTask(): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
@@ -41,7 +36,7 @@ export function* getBudgetTask(): SagaIterator {
   }
 }
 
-export function* getBudgetItemsTask(action: Redux.IAction<null>): SagaIterator {
+export function* getBudgetItemsTask(): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     yield put(loadingBudgetItemsAction(true));
@@ -57,7 +52,7 @@ export function* getBudgetItemsTask(action: Redux.IAction<null>): SagaIterator {
   }
 }
 
-export function* getBudgetItemsTreeTask(action: Redux.IAction<null>): SagaIterator {
+export function* getBudgetItemsTreeTask(): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     yield put(loadingBudgetItemsTreeAction(true));
@@ -73,9 +68,10 @@ export function* getBudgetItemsTreeTask(action: Redux.IAction<null>): SagaIterat
   }
 }
 
-export function* getFringesTask(action: Redux.IAction<null>): SagaIterator {
+export function* getFringesTask(): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
+    yield put(clearFringesPlaceholdersToStateAction());
     yield put(loadingFringesAction(true));
     try {
       const response = yield call(getFringes, budgetId, { no_pagination: true });

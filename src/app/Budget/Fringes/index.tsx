@@ -9,7 +9,7 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { FringeMapping } from "model/tableMappings";
 
-import { setInstanceAction, requestFringesAction, addFringesPlaceholdersToStateAction } from "../actions";
+import { setInstanceAction, addFringesPlaceholdersToStateAction } from "../actions";
 import BudgetTable from "../BudgetTable";
 import {
   setFringesSearchAction,
@@ -46,7 +46,6 @@ const Fringes = (): JSX.Element => {
 
   useEffect(() => {
     dispatch(setInstanceAction(null));
-    dispatch(requestFringesAction());
   }, []);
 
   return (

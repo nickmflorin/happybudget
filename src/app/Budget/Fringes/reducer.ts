@@ -9,7 +9,6 @@ import { initialFringesState } from "../initialState";
 const listResponseReducer = createListResponseReducer<IFringe, Redux.Budget.IFringesStore>(
   {
     Response: ActionType.Budget.Fringes.Response,
-    Request: ActionType.Budget.Fringes.Request,
     Loading: ActionType.Budget.Fringes.Loading,
     SetSearch: ActionType.Budget.Fringes.SetSearch,
     UpdateInState: ActionType.Budget.Fringes.UpdateInState,
@@ -32,7 +31,7 @@ const listResponseReducer = createListResponseReducer<IFringe, Redux.Budget.IFri
           AddToState: ActionType.Budget.Fringes.Placeholders.AddToState,
           RemoveFromState: ActionType.Budget.Fringes.Placeholders.RemoveFromState,
           UpdateInState: ActionType.Budget.Fringes.Placeholders.UpdateInState,
-          Clear: ActionType.Budget.Fringes.Request
+          Clear: ActionType.Budget.Fringes.Placeholders.Clear
         },
         ActualMapping,
         { referenceEntity: "actual" }

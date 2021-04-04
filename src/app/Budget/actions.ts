@@ -31,7 +31,6 @@ export const ActionType = {
       Updating: "budget.budget.fringes.Updating",
       Loading: "budget.budget.fringes.Loading",
       Response: "budget.budget.fringes.Response",
-      Request: "budget.budget.fringes.Request",
       Remove: "budget.budget.fringes.Remove",
       Update: "budget.budget.fringes.Update",
       AddToState: "budget.budget.fringes.AddToState",
@@ -46,6 +45,7 @@ export const ActionType = {
       Placeholders: {
         AddToState: "budget.budget.fringes.placeholders.AddToState",
         Activate: "budget.budget.fringes.placeholders.Activate",
+        Clear: "budget.budget.fringes.placeholders.Clear",
         UpdateInState: "budget.budget.fringes.placeholders.UpdateInState",
         RemoveFromState: "budget.budget.fringes.placeholders.RemoveFromState"
       }
@@ -223,13 +223,11 @@ export const ActionType = {
   },
   BudgetItems: {
     Loading: "budget.budgetitems.Loading",
-    Response: "budget.budgetitems.Response",
-    Request: "budget.budgetitems.Request"
+    Response: "budget.budgetitems.Response"
   },
   BudgetItemsTree: {
     Loading: "budget.budgetitemstree.Loading",
-    Response: "budget.budgetitemstree.Response",
-    Request: "budget.budgetitemstree.Request"
+    Response: "budget.budgetitemstree.Response"
   },
   Actuals: {
     Deleting: "budget.actuals.Deleting",
@@ -267,19 +265,17 @@ export const setCommentsHistoryDrawerVisibilityAction = simpleAction<boolean>(
   ActionType.SetCommentsHistoryDrawerVisibility
 );
 
-export const requestBudgetItemsAction = simpleAction<null>(ActionType.BudgetItems.Request);
 export const loadingBudgetItemsAction = simpleAction<boolean>(ActionType.BudgetItems.Loading);
 export const responseBudgetItemsAction = simpleAction<Http.IListResponse<IBudgetItem>>(ActionType.BudgetItems.Response);
 
-export const requestBudgetItemsTreeAction = simpleAction<null>(ActionType.BudgetItemsTree.Request);
 export const loadingBudgetItemsTreeAction = simpleAction<boolean>(ActionType.BudgetItemsTree.Loading);
 export const responseBudgetItemsTreeAction = simpleAction<Http.IListResponse<IBudgetItemNode>>(
   ActionType.BudgetItemsTree.Response
 );
 
-export const requestFringesAction = simpleAction<null>(ActionType.Budget.Fringes.Request);
 export const loadingFringesAction = simpleAction<boolean>(ActionType.Budget.Fringes.Loading);
 export const responseFringesAction = simpleAction<Http.IListResponse<IFringe>>(ActionType.Budget.Fringes.Response);
+export const clearFringesPlaceholdersToStateAction = simpleAction<null>(ActionType.Budget.Fringes.Placeholders.Clear);
 export const addFringesPlaceholdersToStateAction = simpleAction<number>(
   ActionType.Budget.Fringes.Placeholders.AddToState
 );

@@ -9,7 +9,7 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { ActualMapping } from "model/tableMappings";
 
-import { setInstanceAction, requestBudgetItemsAction, requestBudgetItemsTreeAction } from "../actions";
+import { setInstanceAction } from "../actions";
 import { selectBudgetDetail } from "../selectors";
 import BudgetTable, { GetExportValueParams } from "../BudgetTable";
 import {
@@ -56,8 +56,6 @@ const Actuals = (): JSX.Element => {
   useEffect(() => {
     dispatch(setInstanceAction(null));
     dispatch(requestActualsAction());
-    dispatch(requestBudgetItemsAction());
-    dispatch(requestBudgetItemsTreeAction());
   }, []);
 
   return (
