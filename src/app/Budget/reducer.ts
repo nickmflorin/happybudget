@@ -1,5 +1,5 @@
 import { Reducer, combineReducers } from "redux";
-import { map, isNil, find, filter } from "lodash";
+import { map, isNil, find, filter, reduce } from "lodash";
 import { fringeValue } from "model/util";
 import {
   createListResponseReducer,
@@ -94,54 +94,125 @@ const rootReducer: Reducer<Redux.Budget.IStore> = (
     }
   };
 
-  // NOTE: In order to do recalculation of a SubAccount with it's fringes, we need access to the
-  // Fringes state, which is at the top level of the Redux state tree.  Thus, we have to do this
-  // manipulation in the top level of the Reducer tree.
   if (!isNil(action.payload)) {
-    if (action.type === ActionType.SubAccount.SubAccounts.UpdateInState) {
-      const subAccount: ISubAccount | undefined = find(newState.subaccount.subaccounts.data, { id: action.payload.id });
-      if (isNil(subAccount)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State: Inconsistent state noticed when updating sub-account in state. The
-          sub-account with ID ${action.payload.id} does not exist in state when it is expected to.`
-        );
-      } else if (subAccount.estimated !== null) {
-        newState = {
-          ...newState,
-          subaccount: {
-            ...newState.subaccount,
-            subaccounts: {
-              ...newState.subaccount.subaccounts,
-              data: replaceInArray<ISubAccount>(
-                newState.subaccount.subaccounts.data,
-                { id: subAccount.id },
-                recalculateSubAccountFromFringes(subAccount)
-              )
+    if (
+      action.type === ActionType.SubAccount.SubAccounts.UpdateInState ||
+      action.type === ActionType.SubAccount.SubAccounts.RemoveFromState ||
+      action.type === ActionType.SubAccount.SubAccounts.AddToState ||
+      action.type === ActionType.SubAccount.SubAccounts.Placeholders.UpdateInState
+    ) {
+      if (action.type === ActionType.SubAccount.SubAccounts.UpdateInState) {
+        // Recalculate the estimated value of the SubAccount based on the fringes that it is
+        // currently associated with after the update.
+        const subAccount: ISubAccount | undefined = find(newState.subaccount.subaccounts.data, {
+          id: action.payload.id
+        });
+        if (isNil(subAccount)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State: Inconsistent state noticed when updating sub-account in state. The
+            sub-account with ID ${action.payload.id} does not exist in state when it is expected to.`
+          );
+        } else if (subAccount.estimated !== null) {
+          newState = {
+            ...newState,
+            subaccount: {
+              ...newState.subaccount,
+              subaccounts: {
+                ...newState.subaccount.subaccounts,
+                data: replaceInArray<ISubAccount>(
+                  newState.subaccount.subaccounts.data,
+                  { id: subAccount.id },
+                  recalculateSubAccountFromFringes(subAccount)
+                )
+              }
             }
-          }
-        };
+          };
+        }
       }
-    } else if (action.type === ActionType.Account.SubAccounts.UpdateInState) {
-      const subAccount: ISubAccount | undefined = find(newState.account.subaccounts.data, { id: action.payload.id });
-      if (isNil(subAccount)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State: Inconsistent state noticed when updating sub-account in state. The
-          sub-account with ID ${action.payload.id} does not exist in state when it is expected to.`
-        );
-      } else if (subAccount.estimated !== null) {
+      // Update the overall SubAccount based on the underlying SubAccount(s) present and any potential
+      // placeholders present.
+      const subAccounts: ISubAccount[] = newState.subaccount.subaccounts.data;
+      const placeholders: Table.SubAccountRow[] = newState.subaccount.subaccounts.placeholders;
+      // Right now, the backend is configured such that the Actual value for the overall SubAccount is
+      // determined from the Actual values tied to that SubAccount, not the underlying SubAccount(s).
+      // If that logic changes in the backend, we need to also make that adjustment here.
+      let payload: Partial<ISubAccount> = {
+        estimated:
+          reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0) +
+          reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.estimated || 0), 0)
+      };
+      if (!isNil(newState.subaccount.detail.data)) {
+        if (!isNil(newState.subaccount.detail.data.actual) && !isNil(payload.estimated)) {
+          payload = { ...payload, variance: payload.estimated - newState.subaccount.detail.data.actual };
+        }
+        if (!isNil(newState.subaccount.detail.data)) {
+          newState = {
+            ...newState,
+            subaccount: {
+              ...newState.subaccount,
+              detail: {
+                ...newState.subaccount.detail,
+                data: { ...newState.subaccount.detail.data, ...payload }
+              }
+            }
+          };
+        }
+      }
+    } else if (
+      action.type === ActionType.Account.SubAccounts.UpdateInState ||
+      action.type === ActionType.Account.SubAccounts.RemoveFromState ||
+      action.type === ActionType.Account.SubAccounts.AddToState ||
+      action.type === ActionType.Account.SubAccounts.Placeholders.UpdateInState
+    ) {
+      if (action.type === ActionType.Account.SubAccounts.UpdateInState) {
+        // Recalculate the estimated value of the SubAccount based on the fringes that it is
+        // currently associated with after the update.
+        const subAccount: ISubAccount | undefined = find(newState.account.subaccounts.data, { id: action.payload.id });
+        if (isNil(subAccount)) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State: Inconsistent state noticed when updating sub-account in state. The
+              sub-account with ID ${action.payload.id} does not exist in state when it is expected to.`
+          );
+        } else if (subAccount.estimated !== null) {
+          newState = {
+            ...newState,
+            account: {
+              ...newState.account,
+              subaccounts: {
+                ...newState.account.subaccounts,
+                data: replaceInArray<ISubAccount>(
+                  newState.account.subaccounts.data,
+                  { id: subAccount.id },
+                  recalculateSubAccountFromFringes(subAccount)
+                )
+              }
+            }
+          };
+        }
+      }
+      // Update the overall Account based on the underlying SubAccount(s) present and any potential
+      // placeholders present.
+      const subAccounts: ISubAccount[] = newState.account.subaccounts.data;
+      const placeholders: Table.SubAccountRow[] = newState.account.subaccounts.placeholders;
+      // Right now, the backend is configured such that the Actual value for the overall Account is
+      // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
+      // in the backend, we need to also make that adjustment here.
+      const actual =
+        reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0) +
+        reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.actual || 0), 0);
+      const estimated =
+        reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0) +
+        reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.estimated || 0), 0);
+      if (!isNil(newState.account.detail.data)) {
         newState = {
           ...newState,
           account: {
             ...newState.account,
-            subaccounts: {
-              ...newState.account.subaccounts,
-              data: replaceInArray<ISubAccount>(
-                newState.account.subaccounts.data,
-                { id: subAccount.id },
-                recalculateSubAccountFromFringes(subAccount)
-              )
+            detail: {
+              ...newState.account.detail,
+              data: { ...newState.account.detail.data, actual, estimated, variance: estimated - actual }
             }
           }
         };

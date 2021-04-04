@@ -1,5 +1,4 @@
 import { combineReducers, Reducer } from "redux";
-import { reduce, isNil } from "lodash";
 import {
   createDetailResponseReducer,
   createSimplePayloadReducer,
@@ -8,9 +7,8 @@ import {
 
 import { ActionType } from "../actions";
 import { createSubAccountsReducer } from "../factories";
-import { initialSubAccountState } from "../initialState";
 
-const genericReducer: Reducer<Redux.Budget.ISubAccountStore, Redux.IAction<any>> = combineReducers({
+const rootReducer: Reducer<Redux.Budget.ISubAccountStore, Redux.IAction<any>> = combineReducers({
   id: createSimplePayloadReducer<number | null>(ActionType.SubAccount.SetId, null),
   detail: createDetailResponseReducer<ISubAccount, Redux.IDetailResponseStore<ISubAccount>, Redux.IAction>({
     Response: ActionType.SubAccount.Response,
@@ -66,52 +64,5 @@ const genericReducer: Reducer<Redux.Budget.ISubAccountStore, Redux.IAction<any>>
     }
   })
 });
-
-const rootReducer: Reducer<Redux.Budget.ISubAccountStore, Redux.IAction<any>> = (
-  state: Redux.Budget.ISubAccountStore = initialSubAccountState,
-  action: Redux.IAction<any>
-): Redux.Budget.ISubAccountStore => {
-  let newState = genericReducer(state, action);
-
-  // NOTE: The above reducer handles updates to the Account itself or the SubAccount itself
-  // via some of these same actions. However, it does not do any recalculation of the Account or
-  // SubAccount values, because it needs to access state further up in the reducer tree. This
-  // means moving that logic/recalculation further up the reducer tree where we have access to the
-  // full state to perform the recalculations.
-  if (
-    action.type === ActionType.SubAccount.SubAccounts.UpdateInState ||
-    action.type === ActionType.SubAccount.SubAccounts.RemoveFromState ||
-    action.type === ActionType.SubAccount.SubAccounts.AddToState ||
-    action.type === ActionType.SubAccount.SubAccounts.Placeholders.UpdateInState
-  ) {
-    // Update the overall SubAccount based on the underlying SubAccount(s) present and any potential
-    // placeholders present.
-    const subAccounts: ISubAccount[] = newState.subaccounts.data;
-    const placeholders: Table.SubAccountRow[] = newState.subaccounts.placeholders;
-    // Right now, the backend is configured such that the Actual value for the overall SubAccount is
-    // determined from the Actual values tied to that SubAccount, not the underlying SubAccount(s).
-    // If that logic changes in the backend, we need to also make that adjustment here.
-    let payload: Partial<ISubAccount> = {
-      estimated:
-        reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0) +
-        reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.estimated || 0), 0)
-    };
-    if (!isNil(newState.detail.data)) {
-      if (!isNil(newState.detail.data.actual) && !isNil(payload.estimated)) {
-        payload = { ...payload, variance: payload.estimated - newState.detail.data.actual };
-      }
-      if (!isNil(newState.detail.data)) {
-        newState = {
-          ...newState,
-          detail: {
-            ...newState.detail,
-            data: { ...newState.detail.data, ...payload }
-          }
-        };
-      }
-    }
-  }
-  return newState;
-};
 
 export default rootReducer;
