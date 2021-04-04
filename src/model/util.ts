@@ -1,4 +1,5 @@
-import { forEach, uniq, map } from "lodash";
+import { forEach, uniq, map, isNil, filter, reduce } from "lodash";
+import { FringeUnitModels } from ".";
 
 export const flattenBudgetItemNodes = (nodes: IBudgetItemNode[]): IBudgetItem[] => {
   const flattened: IBudgetItem[] = [];
@@ -31,4 +32,23 @@ export const mergeRowChanges = (changes: Table.RowChange[]): Table.RowChange => 
   } else {
     throw new Error("Must provide at least 1 row change.");
   }
+};
+
+export const fringeValue = (value: number, fringes: IFringe[]): number => {
+  const additionalValues: number[] = [];
+  forEach(
+    filter(fringes, (fringe: IFringe) => !isNil(fringe.rate)),
+    (fringe: IFringe) => {
+      if (fringe.unit === FringeUnitModels.FLAT.id) {
+        additionalValues.push(fringe.rate);
+      } else {
+        if (fringe.cutoff === null || fringe.cutoff >= value) {
+          additionalValues.push(fringe.rate * value);
+        } else {
+          additionalValues.push(fringe.rate * fringe.cutoff);
+        }
+      }
+    }
+  );
+  return value + reduce(additionalValues, (sum: number, val: number) => sum + val, 0);
 };

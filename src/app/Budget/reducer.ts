@@ -1,4 +1,6 @@
-import { combineReducers } from "redux";
+import { Reducer, combineReducers } from "redux";
+import { map, isNil, find, filter } from "lodash";
+import { fringeValue } from "model/util";
 import {
   createListResponseReducer,
   createDetailResponseReducer,
@@ -6,8 +8,10 @@ import {
   createSimplePayloadReducer,
   createCommentsListResponseReducer
 } from "store/factories";
+import { replaceInArray } from "util/arrays";
 
 import { ActionType } from "./actions";
+import initialState from "./initialState";
 
 import accountRootReducer from "./Account/reducer";
 import accountsRootReducer from "./Accounts/reducer";
@@ -15,7 +19,7 @@ import actualsRootReducer from "./Actuals/reducer";
 import fringesRootReducer from "./Fringes/reducer";
 import subAccountRootReducer from "./SubAccount/reducer";
 
-const rootReducer = combineReducers({
+const genericReducer = combineReducers({
   instance: createSimplePayloadReducer<IAccount | ISubAccount | null>(ActionType.SetInstance, null),
   commentsHistoryDrawerOpen: createSimpleBooleanReducer(ActionType.SetCommentsHistoryDrawerVisibility),
   account: accountRootReducer,
@@ -58,5 +62,93 @@ const rootReducer = combineReducers({
     { referenceEntity: "budget item tree node" }
   )
 });
+
+const rootReducer: Reducer<Redux.Budget.IStore> = (
+  state: Redux.Budget.IStore = initialState,
+  action: Redux.IAction<any>
+): Redux.Budget.IStore => {
+  let newState = genericReducer(state, action);
+
+  const recalculateSubAccountFromFringes = (subAccount: ISubAccount): ISubAccount => {
+    if (!isNil(subAccount.estimated)) {
+      const fringes: IFringe[] = filter(
+        map(subAccount.fringes, (id: number) => {
+          const fringe: IFringe | undefined = find(newState.fringes.data, { id });
+          if (!isNil(fringe)) {
+            return fringe;
+          } else {
+            /* eslint-disable no-console */
+            console.error(
+              `Inconsistent State! Inconsistent state noticed when updating sub-account in state...
+            The fringe ${id} for sub-account ${subAccount.id} does not exist in state when it
+            is expected to.`
+            );
+            return null;
+          }
+        }),
+        (fringe: IFringe | null) => fringe !== null
+      ) as IFringe[];
+      return { ...subAccount, estimated: fringeValue(subAccount.estimated, fringes) };
+    } else {
+      return subAccount;
+    }
+  };
+
+  // NOTE: In order to do recalculation of a SubAccount with it's fringes, we need access to the
+  // Fringes state, which is at the top level of the Redux state tree.  Thus, we have to do this
+  // manipulation in the top level of the Reducer tree.
+  if (!isNil(action.payload)) {
+    if (action.type === ActionType.SubAccount.SubAccounts.UpdateInState) {
+      const subAccount: ISubAccount | undefined = find(newState.subaccount.subaccounts.data, { id: action.payload.id });
+      if (isNil(subAccount)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State: Inconsistent state noticed when updating sub-account in state. The
+          sub-account with ID ${action.payload.id} does not exist in state when it is expected to.`
+        );
+      } else if (subAccount.estimated !== null) {
+        newState = {
+          ...newState,
+          subaccount: {
+            ...newState.subaccount,
+            subaccounts: {
+              ...newState.subaccount.subaccounts,
+              data: replaceInArray<ISubAccount>(
+                newState.subaccount.subaccounts.data,
+                { id: subAccount.id },
+                recalculateSubAccountFromFringes(subAccount)
+              )
+            }
+          }
+        };
+      }
+    } else if (action.type === ActionType.Account.SubAccounts.UpdateInState) {
+      const subAccount: ISubAccount | undefined = find(newState.account.subaccounts.data, { id: action.payload.id });
+      if (isNil(subAccount)) {
+        /* eslint-disable no-console */
+        console.error(
+          `Inconsistent State: Inconsistent state noticed when updating sub-account in state. The
+          sub-account with ID ${action.payload.id} does not exist in state when it is expected to.`
+        );
+      } else if (subAccount.estimated !== null) {
+        newState = {
+          ...newState,
+          account: {
+            ...newState.account,
+            subaccounts: {
+              ...newState.account.subaccounts,
+              data: replaceInArray<ISubAccount>(
+                newState.account.subaccounts.data,
+                { id: subAccount.id },
+                recalculateSubAccountFromFringes(subAccount)
+              )
+            }
+          }
+        };
+      }
+    }
+  }
+  return newState;
+};
 
 export default rootReducer;

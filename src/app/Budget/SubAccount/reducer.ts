@@ -74,10 +74,10 @@ const rootReducer: Reducer<Redux.Budget.ISubAccountStore, Redux.IAction<any>> = 
   let newState = genericReducer(state, action);
 
   // NOTE: The above reducer handles updates to the Account itself or the SubAccount itself
-  // via some of these same actions. However, it does not do any recalculation of the account values,
-  // because it needs the state of the Account and the state of the SubAccount(s) to do so. This
-  // means moving that logic/recalculation further up the reducer tree where we have access to both
-  // the SubAccount(s) and the Account in the state.
+  // via some of these same actions. However, it does not do any recalculation of the Account or
+  // SubAccount values, because it needs to access state further up in the reducer tree. This
+  // means moving that logic/recalculation further up the reducer tree where we have access to the
+  // full state to perform the recalculations.
   if (
     action.type === ActionType.SubAccount.SubAccounts.UpdateInState ||
     action.type === ActionType.SubAccount.SubAccounts.RemoveFromState ||

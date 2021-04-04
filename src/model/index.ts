@@ -60,8 +60,8 @@ export enum FringeUnitNames {
 }
 
 export const FringeUnitModels: { [key: string]: FringeUnitOptionModel } = {
-  MINUTES: { id: 0, name: FringeUnitNames.PERCENT },
-  HOURS: { id: 1, name: FringeUnitNames.FLAT }
+  PERCENT: { id: 0, name: FringeUnitNames.PERCENT },
+  FLAT: { id: 1, name: FringeUnitNames.FLAT }
 };
 
 export const FringeUnitModelsList = Object.values(FringeUnitModels);
