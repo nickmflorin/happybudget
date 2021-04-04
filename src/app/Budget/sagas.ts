@@ -1,8 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel } from "redux-saga/effects";
 import { ActionType } from "./actions";
-import { getBudgetTask, getBudgetItemsTask, getBudgetItemsTreeTask } from "./tasks";
-
+import { getBudgetTask, getBudgetItemsTask, getBudgetItemsTreeTask, getFringesTask } from "./tasks";
 import accountSaga from "./Account/sagas";
 import budgetSaga from "./Accounts/sagas";
 import actualsSaga from "./Actuals/sagas";
@@ -53,6 +52,17 @@ function* watchForRequestBudgetItemsTreeSaga(): SagaIterator {
   }
 }
 
+function* watchForRequestFringesSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.Budget.Fringes.Request);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(getFringesTask, action);
+  }
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRequestBudgetSaga);
   yield spawn(watchForBudgetIdChangedSaga);
@@ -63,4 +73,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(actualsSaga);
   yield spawn(subAccountSaga);
   yield spawn(fringesSaga);
+  yield spawn(watchForRequestFringesSaga);
 }

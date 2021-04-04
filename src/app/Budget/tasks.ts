@@ -1,15 +1,28 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
-import { isNil } from "lodash";
+import { isNil, find } from "lodash";
 import { handleRequestError } from "api";
-import { getBudget, getBudgetItems, getBudgetItemsTree } from "services";
+import { FringeMapping } from "model/tableMappings";
+import {
+  getBudget,
+  getBudgetItems,
+  getBudgetItemsTree,
+  getFringes,
+  deleteFringe,
+  updateFringe,
+  createFringe
+} from "services";
+import { handleTableErrors } from "store/tasks";
 import {
   loadingBudgetAction,
   responseBudgetAction,
   loadingBudgetItemsAction,
   responseBudgetItemsAction,
   loadingBudgetItemsTreeAction,
-  responseBudgetItemsTreeAction
+  responseBudgetItemsTreeAction,
+  loadingFringesAction,
+  responseFringesAction,
+  addFringesPlaceholdersToStateAction
 } from "./actions";
 
 export function* getBudgetTask(): SagaIterator {
@@ -56,6 +69,25 @@ export function* getBudgetItemsTreeTask(action: Redux.IAction<null>): SagaIterat
       yield put(responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
     } finally {
       yield put(loadingBudgetItemsTreeAction(false));
+    }
+  }
+}
+
+export function* getFringesTask(action: Redux.IAction<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId)) {
+    yield put(loadingFringesAction(true));
+    try {
+      const response = yield call(getFringes, budgetId, { no_pagination: true });
+      yield put(responseFringesAction(response));
+      if (response.data.length === 0) {
+        yield put(addFringesPlaceholdersToStateAction(2));
+      }
+    } catch (e) {
+      handleRequestError(e, "There was an error retrieving the budget's fringes.");
+      yield put(responseFringesAction({ count: 0, data: [] }, { error: e }));
+    } finally {
+      yield put(loadingFringesAction(false));
     }
   }
 }

@@ -9,18 +9,16 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { FringeMapping } from "model/tableMappings";
 
-import { setInstanceAction } from "../actions";
+import { setInstanceAction, requestFringesAction, addFringesPlaceholdersToStateAction } from "../actions";
 import BudgetTable from "../BudgetTable";
 import {
-  requestFringesAction,
   setFringesSearchAction,
-  addPlaceholdersToStateAction,
   deselectFringeAction,
   selectFringeAction,
   removeFringeAction,
   updateFringeAction,
   selectAllFringesAction
-} from "../actions";
+} from "./actions";
 
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.selected);
 const selectData = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.data);
@@ -65,7 +63,7 @@ const Fringes = (): JSX.Element => {
         search={search}
         onSearch={(value: string) => dispatch(setFringesSearchAction(value))}
         saving={saving}
-        onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
+        onRowAdd={() => dispatch(addFringesPlaceholdersToStateAction(1))}
         onRowSelect={(id: number) => dispatch(selectFringeAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectFringeAction(id))}
         onRowDelete={(row: Table.FringeRow) => dispatch(removeFringeAction(row.id))}

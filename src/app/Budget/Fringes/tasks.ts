@@ -3,22 +3,19 @@ import { call, put, select } from "redux-saga/effects";
 import { isNil, find } from "lodash";
 import { handleRequestError } from "api";
 import { FringeMapping } from "model/tableMappings";
-import { getFringes, deleteFringe, updateFringe, createFringe } from "services";
+import { deleteFringe, updateFringe, createFringe } from "services";
 import { handleTableErrors } from "store/tasks";
 import {
   activatePlaceholderAction,
-  loadingFringesAction,
-  responseFringesAction,
   deletingFringeAction,
   creatingFringeAction,
   updatingFringeAction,
   removePlaceholderFromStateAction,
   removeFringeFromStateAction,
   updatePlaceholderInStateAction,
-  addPlaceholdersToStateAction,
   addErrorsToStateAction,
   updateFringeInStateAction
-} from "../actions";
+} from "./actions";
 
 export function* deleteFringeTask(id: number): SagaIterator {
   yield put(deletingFringeAction({ id, value: true }));
@@ -114,25 +111,6 @@ export function* handleFringeUpdateTask(action: Redux.IAction<Table.RowChange>):
       const updatedModel = FringeMapping.newModelWithChanges(model, action.payload);
       yield put(updateFringeInStateAction(updatedModel));
       yield call(updateFringeTask, model.id, action.payload);
-    }
-  }
-}
-
-export function* getFringesTask(action: Redux.IAction<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
-  if (!isNil(budgetId)) {
-    yield put(loadingFringesAction(true));
-    try {
-      const response = yield call(getFringes, budgetId, { no_pagination: true });
-      yield put(responseFringesAction(response));
-      if (response.data.length === 0) {
-        yield put(addPlaceholdersToStateAction(2));
-      }
-    } catch (e) {
-      handleRequestError(e, "There was an error retrieving the budget's fringes.");
-      yield put(responseFringesAction({ count: 0, data: [] }, { error: e }));
-    } finally {
-      yield put(loadingFringesAction(false));
     }
   }
 }
