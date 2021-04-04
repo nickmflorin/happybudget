@@ -12,3 +12,5 @@ export const selectInstance = (state: Redux.IApplicationStore) => state.budget.i
 export const selectCommentsHistoryDrawerOpen = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
 );
+
+export const selectFringes = (state: Redux.IApplicationStore) => state.budget.fringes.data;

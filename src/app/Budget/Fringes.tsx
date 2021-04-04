@@ -7,7 +7,9 @@ import { CellClassParams } from "ag-grid-community";
 
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { FringeUnitModelsList } from "model";
 import { FringeMapping } from "model/tableMappings";
+import { processOptionModelCellForClipboard } from "util/table";
 
 import { setInstanceAction, addFringesPlaceholdersToStateAction } from "./store/actions";
 import {
@@ -71,6 +73,10 @@ const Fringes = (): JSX.Element => {
         onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetFringesAction(changes))}
         onSelectAll={() => dispatch(selectAllFringesAction())}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
+        processCellForClipboard={processOptionModelCellForClipboard<Table.FringeRow, FringeUnitOptionModel>(
+          "unit",
+          FringeUnitModelsList
+        )}
         bodyColumns={[
           {
             field: "description",

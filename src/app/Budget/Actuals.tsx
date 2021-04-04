@@ -7,7 +7,9 @@ import { CellClassParams } from "ag-grid-community";
 
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { PaymentMethodModelsList } from "model";
 import { ActualMapping } from "model/tableMappings";
+import { processOptionModelCellForClipboard } from "util/table";
 
 import { setInstanceAction } from "./store/actions";
 import {
@@ -109,6 +111,10 @@ const Actuals = (): JSX.Element => {
         }}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         exportFileName={"actuals.csv"}
+        processCellForClipboard={processOptionModelCellForClipboard<Table.ActualRow, PaymentMethodOptionModel>(
+          "payment_method",
+          PaymentMethodModelsList
+        )}
         getExportValue={{
           object_id: ({ node }: GetExportValueParams) => {
             const item = find(budgetItems, { id: node.data.object_id, type: node.data.parent_type });

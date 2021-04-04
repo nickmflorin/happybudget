@@ -63,4 +63,5 @@ export interface BudgetTableProps<
   onSelectAll: () => void;
   isCellEditable?: (row: R, col: ColDef) => boolean;
   isCellSelectable?: (row: R, col: ColDef) => boolean;
+  // processCellForClipboard?: (params: ProcessCellForExportParams) => any;
 }

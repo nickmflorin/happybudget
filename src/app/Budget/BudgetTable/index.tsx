@@ -999,7 +999,6 @@ const BudgetTable = <
               rowHeight={36}
               headerHeight={38}
               enableRangeSelection={true}
-              clipboardDeliminator={","}
               animateRows={true}
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
