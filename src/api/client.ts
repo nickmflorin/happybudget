@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse, AxiosRequestConfig } f
 import axiosRetry from "axios-retry";
 import Cookies from "universal-cookie";
 import { isNil } from "lodash";
-import { addQueryParamsToUrl, convertOrderingQueryToString } from "util/urls";
+import { addQueryParamsToUrl, convertOrderingQueryToString } from "lib/util/urls";
 import { ClientError, NetworkError, ServerError, AuthenticationError } from "./errors";
 
 /* eslint-disable no-shadow */

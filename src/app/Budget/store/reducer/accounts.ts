@@ -1,8 +1,8 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, filter, map, reduce } from "lodash";
 import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
-import { AccountMapping } from "model/tableMappings";
-import { replaceInArray } from "util/arrays";
+import { AccountMapping } from "lib/tabling/mappings";
+import { replaceInArray } from "lib/util";
 
 import { ActionType } from "../actions";
 import { initialAccountsState } from "../initialState";

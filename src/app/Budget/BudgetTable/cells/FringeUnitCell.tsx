@@ -1,6 +1,6 @@
 import { ICellRendererParams, RowNode } from "ag-grid-community";
 
-import { FringeUnitModelsList } from "model";
+import { FringeUnitModelsList } from "lib/model";
 import { OptionModelTagsDropdown } from "components/control/dropdowns";
 
 interface FringeUnitCellProps extends ICellRendererParams {

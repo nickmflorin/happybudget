@@ -11,7 +11,7 @@ import {
   deleteContact,
   updateContact,
   createContact
-} from "services";
+} from "api/services";
 import { handleRequestError } from "api";
 import {
   ActionDomains,

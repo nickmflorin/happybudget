@@ -20,7 +20,7 @@ import {
 
 import { RenderIfValidId } from "components/display";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
-import { componentLoader } from "operational";
+import { componentLoader } from "lib/operational";
 
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./store/actions";
 import { selectInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "./store/selectors";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Redirect } from "react-router-dom";
-import { logout } from "services";
+import { logout } from "api/services";
 
 export const Logout = (): JSX.Element => {
   const [redirect, setRedirect] = useState(false);

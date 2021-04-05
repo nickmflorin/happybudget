@@ -2,9 +2,9 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, fork } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
 import { handleRequestError } from "api";
-import { FringeMapping } from "model/tableMappings";
-import { mergeRowChanges } from "model/util";
-import { deleteFringe, updateFringe, createFringe, bulkUpdateFringes, bulkCreateFringes } from "services";
+import { FringeMapping } from "lib/tabling/mappings";
+import { mergeRowChanges } from "lib/model/util";
+import { deleteFringe, updateFringe, createFringe, bulkUpdateFringes, bulkCreateFringes } from "api/services";
 import { handleTableErrors } from "store/tasks";
 import {
   activatePlaceholderAction,

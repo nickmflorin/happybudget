@@ -8,7 +8,7 @@ import { DropDownProps } from "antd/lib/dropdown";
 import { ModelTagsMenu } from "components/control/menus";
 import { Tag } from "components/display";
 import { useDeepEqualMemo } from "hooks";
-import { getKeyValue } from "util/objects";
+import { getKeyValue } from "lib/util";
 
 import "./ModelTagsDropdown.scss";
 

@@ -6,8 +6,8 @@ import classNames from "classnames";
 import { Dropdown } from "antd";
 
 import { CaretButton } from "components/control/buttons";
-import { flattenBudgetItemNodes } from "model/util";
-import { isNodeDescendantOf } from "util/dom";
+import { flattenBudgetItemNodes } from "lib/model/util";
+import { isNodeDescendantOf } from "lib/util";
 import "./BudgetItemsTreeSelect.scss";
 
 interface MenuItemProps {

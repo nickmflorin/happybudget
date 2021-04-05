@@ -8,7 +8,7 @@ import { faThumbsUp, faEdit, faTrashAlt } from "@fortawesome/free-regular-svg-ic
 import { IconButton } from "components/control/buttons";
 import { AccountCircleLink } from "components/control/links";
 import { ShowHide } from "components/display";
-import { toDisplayTimeSince } from "util/dates";
+import { toDisplayTimeSince } from "lib/util/dates";
 import { useLoggedInUser } from "store/hooks";
 
 import CommentEdit from "./CommentEdit";

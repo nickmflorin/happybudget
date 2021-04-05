@@ -1,9 +1,9 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce } from "lodash";
 import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
-import { SubAccountMapping } from "model/tableMappings";
-import { fringeValue } from "model/util";
-import { replaceInArray } from "util/arrays";
+import { SubAccountMapping } from "lib/tabling/mappings";
+import { fringeValue } from "lib/model/util";
+import { replaceInArray } from "lib/util";
 
 import { initialSubAccountsState } from "../initialState";
 import fringesRootReducer from "./fringes";

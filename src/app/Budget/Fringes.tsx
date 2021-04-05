@@ -7,9 +7,9 @@ import { CellClassParams } from "ag-grid-community";
 
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { FringeUnitModelsList } from "model";
-import { FringeMapping } from "model/tableMappings";
-import { processOptionModelCellForClipboard } from "util/table";
+import { FringeUnitModelsList } from "lib/model";
+import { FringeMapping } from "lib/tabling/mappings";
+import { processOptionModelCellForClipboard } from "lib/tabling/util";
 
 import { setInstanceAction, addFringesPlaceholdersToStateAction } from "./store/actions";
 import {

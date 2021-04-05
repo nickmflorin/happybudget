@@ -3,7 +3,7 @@ import { call, put, select, all, cancelled } from "redux-saga/effects";
 import axios from "axios";
 import { isNil } from "lodash";
 import { handleRequestError } from "api";
-import { getBudget, getBudgetItems, getBudgetItemsTree, getFringes } from "services";
+import { getBudget, getBudgetItems, getBudgetItemsTree, getFringes } from "api/services";
 import {
   loadingBudgetAction,
   responseBudgetAction,

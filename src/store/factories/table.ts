@@ -1,7 +1,7 @@
 import { isNil, find, filter } from "lodash";
 import { createListReducerFromTransformers, mergeOptionsWithDefaults } from "store/factories/util";
-import Mapping from "model/tableMappings";
-import { replaceInArray } from "util/arrays";
+import Mapping from "lib/tabling/mappings";
+import { replaceInArray } from "lib/util";
 
 export const createTablePlaceholdersReducer = <
   /* eslint-disable indent */

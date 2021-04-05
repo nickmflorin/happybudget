@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
 import { Form, GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
-import { createAccountGroup } from "services";
+import { createAccountGroup } from "api/services";
 
 import Modal from "./Modal";
 

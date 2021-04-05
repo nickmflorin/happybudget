@@ -1,7 +1,7 @@
 import { ICellRendererParams, RowNode } from "ag-grid-community";
 
 import { OptionModelTagsDropdown } from "components/control/dropdowns";
-import { PaymentMethodModelsList } from "model";
+import { PaymentMethodModelsList } from "lib/model";
 
 interface PaymentMethodCellProps extends ICellRendererParams {
   onChange: (id: PaymentMethod, row: Table.ActualRow) => void;

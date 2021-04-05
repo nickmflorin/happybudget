@@ -1,9 +1,5 @@
 import { forEach, isNil } from "lodash";
-import { generateRandomNumericId } from "util/math";
-
-function getProperty<T, K extends keyof T>(obj: T, key: K) {
-  return obj[key]; // Inferred type is T[K]
-}
+import { generateRandomNumericId, getKeyValue } from "lib/util";
 
 class Mapping<
   R extends Table.Row<G, C>,
@@ -112,7 +108,7 @@ class Mapping<
     forEach(this.fields, (field: MappedField<M>) => {
       // We want to attribute the full group to the row, not just the ID.
       if (field.field !== "group") {
-        obj[field.field as string] = getProperty<M, keyof M>(model, field.field);
+        obj[field.field as string] = getKeyValue<M, keyof M>(field.field)(model);
       }
     });
     return obj as R;

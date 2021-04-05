@@ -1,7 +1,7 @@
 import { Reducer } from "redux";
 import { isNil, forEach, find, filter, concat } from "lodash";
-import { removeFromArray, replaceInArray } from "util/arrays";
-import { mergeWithDefaults } from "util/objects";
+import { removeFromArray, replaceInArray } from "lib/util";
+import { mergeWithDefaults } from "lib/util";
 import { initialCommentsListResponseState } from "store/initialState";
 
 import { createListResponseReducer } from "./list";

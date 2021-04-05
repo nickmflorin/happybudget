@@ -47,17 +47,3 @@ export const formatCurrency = (value: string | number): string => {
 export const formatCurrencyWithoutDollarSign = (value: string | number): string => {
   return formatCurrency(value).slice(1);
 };
-
-export const sumChars = (val: string): number => {
-  let sum = 0;
-  for (let i = 0; i < val.length; i++) {
-    sum += val.charCodeAt(i);
-  }
-  return sum;
-};
-
-export const hashString = (s: string): number =>
-  s.split("").reduce((a, b) => {
-    a = (a << 5) - a + b.charCodeAt(0);
-    return a & a;
-  }, 0);

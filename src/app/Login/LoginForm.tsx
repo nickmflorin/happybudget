@@ -7,7 +7,7 @@ import { MailOutlined, LockOutlined } from "@ant-design/icons";
 import { RouterLink } from "components/control/links";
 import { Form } from "components/forms";
 
-import { validateEmail } from "util/validate";
+import { validateEmail } from "lib/util/validate";
 import SocialButton from "../SocialButton";
 
 export interface ILoginFormValues {

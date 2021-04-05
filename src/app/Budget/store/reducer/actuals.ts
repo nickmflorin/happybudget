@@ -1,7 +1,7 @@
 import { Reducer } from "redux";
 import { filter } from "lodash";
 import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
-import { ActualMapping } from "model/tableMappings";
+import { ActualMapping } from "lib/tabling/mappings";
 import { ActionType } from "../actions";
 import { initialActualsState } from "../initialState";
 

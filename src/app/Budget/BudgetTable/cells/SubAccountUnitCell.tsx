@@ -1,6 +1,6 @@
 import { ICellRendererParams, RowNode } from "ag-grid-community";
 
-import { SubAccountUnitModelsList } from "model";
+import { SubAccountUnitModelsList } from "lib/model";
 import { OptionModelTagsDropdown } from "components/control/dropdowns";
 
 interface SubAccountUnitCellProps extends ICellRendererParams {

@@ -4,10 +4,10 @@ import classNames from "classnames";
 
 import { ColDef, ColSpanParams, ProcessCellForExportParams } from "ag-grid-community";
 
-import { SubAccountUnitModelsList } from "model";
-import { SubAccountMapping } from "model/tableMappings";
-import { floatValueSetter, integerValueSetter, currencyValueFormatter } from "util/table";
-import { getKeyValue } from "util/objects";
+import { SubAccountUnitModelsList } from "lib/model";
+import { SubAccountMapping } from "lib/tabling/mappings";
+import { floatValueSetter, integerValueSetter, currencyValueFormatter } from "lib/tabling/util";
+import { getKeyValue } from "lib/util";
 
 import BudgetTable from "./BudgetTable";
 import { selectFringes, selectBudgetDetail, selectBudgetDetailLoading } from "./store/selectors";

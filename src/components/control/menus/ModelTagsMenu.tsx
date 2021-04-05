@@ -3,7 +3,7 @@ import { map, isNil, includes, filter, find } from "lodash";
 import classNames from "classnames";
 import { Menu } from "antd";
 import { Tag } from "components/display";
-import { getKeyValue } from "util/objects";
+import { getKeyValue } from "lib/util";
 
 import "./ModelTagsMenu.scss";
 

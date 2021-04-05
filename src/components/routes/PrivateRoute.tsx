@@ -6,7 +6,7 @@ import { Dispatch } from "redux";
 import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
 import { WrapInApplicationSpinner } from "components/display";
 import { updateLoggedInUserAction } from "store/actions";
-import { validateToken } from "services";
+import { validateToken } from "api/services";
 
 const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
   const [redirect, setRedirect] = useState(false);

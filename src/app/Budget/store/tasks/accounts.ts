@@ -2,8 +2,8 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, fork } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
 import { handleRequestError } from "api";
-import { AccountMapping } from "model/tableMappings";
-import { mergeRowChanges } from "model/util";
+import { AccountMapping } from "lib/tabling/mappings";
+import { mergeRowChanges } from "lib/model/util";
 import {
   getAccounts,
   deleteAccount,
@@ -19,11 +19,11 @@ import {
   getAccountGroups,
   bulkUpdateAccounts,
   bulkCreateAccounts
-} from "services";
+} from "api/services";
 import { handleTableErrors } from "store/tasks";
-import { userToSimpleUser } from "model/mappings";
-import { nowAsString } from "util/dates";
-import { generateRandomNumericId } from "util/math";
+import { userToSimpleUser } from "lib/model/mappings";
+import { nowAsString } from "lib/util/dates";
+import { generateRandomNumericId } from "lib/util";
 import { requestBudgetAction, loadingBudgetAction } from "../actions";
 import {
   loadingAccountsAction,

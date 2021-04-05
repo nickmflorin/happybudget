@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Switch } from "react-router-dom";
 
 import { LogoWhite } from "components/svgs";
-import { componentLoader } from "operational";
+import { componentLoader } from "lib/operational";
 
 import "./Landing.scss";
 

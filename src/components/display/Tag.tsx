@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 import { DEFAULT_TAG_COLOR_SCHEME } from "config";
-import { selectConsistent } from "util/arrays";
+import { selectConsistent } from "lib/util";
 
 import "./Tag.scss";
 

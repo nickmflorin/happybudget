@@ -20,7 +20,7 @@ import {
   SoundIcon,
   WriterIcon
 } from "components/svgs";
-import { selectConsistent } from "util/arrays";
+import { selectConsistent } from "lib/util";
 import "./Card.scss";
 
 export const Icons: (() => JSX.Element)[] = [

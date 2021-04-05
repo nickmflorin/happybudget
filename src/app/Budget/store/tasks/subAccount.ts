@@ -2,8 +2,8 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, all, fork } from "redux-saga/effects";
 import { isNil, find, map, groupBy, includes } from "lodash";
 import { handleRequestError } from "api";
-import { SubAccountMapping } from "model/tableMappings";
-import { mergeRowChanges } from "model/util";
+import { SubAccountMapping } from "lib/tabling/mappings";
+import { mergeRowChanges } from "lib/model/util";
 import {
   getSubAccountSubAccounts,
   createSubAccountSubAccount,
@@ -20,7 +20,7 @@ import {
   getSubAccountSubAccountGroups,
   bulkUpdateSubAccountSubAccounts,
   bulkCreateSubAccountSubAccounts
-} from "services";
+} from "api/services";
 import { handleTableErrors } from "store/tasks";
 import { loadingBudgetAction, requestBudgetAction } from "../actions";
 import {

@@ -1,5 +1,5 @@
 import { ColDef, CellClassParams, RowNode, GridOptions } from "ag-grid-community";
-import Mapping from "model/tableMappings";
+import Mapping from "lib/tabling/mappings";
 
 export interface GetExportValueParams {
   node: RowNode;

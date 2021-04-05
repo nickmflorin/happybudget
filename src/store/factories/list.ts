@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { isNil, forEach, find, filter, includes, map } from "lodash";
-import { replaceInArray } from "util/arrays";
+import { replaceInArray } from "lib/util";
 import { initialListResponseState } from "store/initialState";
 import { mergeOptionsWithDefaults, createObjectReducerFromTransformers } from "./util";
 

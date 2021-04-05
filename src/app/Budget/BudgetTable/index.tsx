@@ -31,9 +31,9 @@ import {
 import { TABLE_DEBUG } from "config";
 import { RenderWithSpinner, ShowHide } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
-import { downloadAsCsvFile } from "util/files";
-import { hashString } from "util/string";
-import { currencyValueFormatter, mergeClassNames, mergeClassNamesFn } from "util/table";
+import { downloadAsCsvFile } from "lib/util/files";
+import { hashString } from "lib/util";
+import { currencyValueFormatter, mergeClassNames, mergeClassNamesFn } from "lib/tabling/util";
 
 import {
   ExpandCell,

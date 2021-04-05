@@ -7,7 +7,7 @@ import { map } from "lodash";
 
 import { CreateAccountGroupModal, EditAccountGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { AccountMapping } from "model/tableMappings";
+import { AccountMapping } from "lib/tabling/mappings";
 
 import BudgetTable from "../BudgetTable";
 import { selectBudgetId, selectBudgetDetail } from "../store/selectors";

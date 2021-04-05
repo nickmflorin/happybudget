@@ -6,7 +6,7 @@ import { isNil } from "lodash";
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
 import { Form, ContactForm } from "components/forms";
 import { Modal } from "components/modals";
-import { createContact } from "services";
+import { createContact } from "api/services";
 
 import { addContactToStateAction } from "../actions";
 
