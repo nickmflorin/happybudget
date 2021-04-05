@@ -12,6 +12,7 @@ interface PaymentMethodCellProps extends ICellRendererParams {
 const PaymentMethodCell = ({ value, node, onChange }: PaymentMethodCellProps): JSX.Element => {
   return (
     <OptionModelTagsDropdown<PaymentMethod, PaymentMethodName, PaymentMethodOptionModel>
+      overlayClassName={"cell-dropdown"}
       value={value}
       models={PaymentMethodModelsList}
       onChange={(paymentMethod: PaymentMethod) => onChange(paymentMethod, node.data)}

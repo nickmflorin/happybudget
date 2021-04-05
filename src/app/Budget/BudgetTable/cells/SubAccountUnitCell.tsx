@@ -12,6 +12,7 @@ interface SubAccountUnitCellProps extends ICellRendererParams {
 const SubAccountUnitCell = ({ value, node, onChange }: SubAccountUnitCellProps): JSX.Element => {
   return (
     <OptionModelTagsDropdown<SubAccountUnit, SubAccountUnitName, SubAccountUnitOptionModel>
+      overlayClassName={"cell-dropdown"}
       value={value}
       models={SubAccountUnitModelsList}
       onChange={(unit: SubAccountUnit) => onChange(unit, node.data)}

@@ -12,6 +12,7 @@ interface FringeUnitCellProps extends ICellRendererParams {
 const FringeUnitCell = ({ value, node, onChange }: FringeUnitCellProps): JSX.Element => {
   return (
     <OptionModelTagsDropdown<FringeUnit, FringeUnitName, FringeUnitOptionModel>
+      overlayClassName={"cell-dropdown"}
       value={value}
       models={FringeUnitModelsList}
       onChange={(unit: FringeUnit) => onChange(unit, node.data)}
