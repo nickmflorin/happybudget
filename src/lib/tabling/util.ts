@@ -6,8 +6,8 @@ import {
   CellClassParams,
   ProcessCellForExportParams
 } from "ag-grid-community";
-import { getKeyValue } from "../util";
-import { formatCurrencyWithoutDollarSign } from "../util/formatters";
+import { getKeyValue } from "lib/util";
+import { formatCurrencyWithoutDollarSign, formatPercentage } from "lib/util/formatters";
 
 export const floatValueSetter = (field: string) => (params: ValueSetterParams): boolean => {
   if (!isNaN(parseFloat(params.newValue))) {
@@ -27,7 +27,11 @@ export const integerValueSetter = (field: string) => (params: ValueSetterParams)
 
 export const percentageValueFormatter = (params: ValueFormatterParams): any => {
   if (!isNil(params.value)) {
-    return formatCurrencyWithoutDollarSign(params.value);
+    const numeric = parseFloat(String(params.value));
+    if (!isNaN(numeric)) {
+      return formatPercentage(numeric);
+    }
+    return numeric;
   }
   return params.value;
 };

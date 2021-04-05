@@ -1,6 +1,15 @@
 import { ColDef, CellClassParams, RowNode, GridOptions } from "ag-grid-community";
 import Mapping from "lib/tabling/mappings";
 
+export type CellProcessor<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> = (
+  value: any,
+  row: R,
+  col: ColDef
+) => any;
+export type CellProcessors<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> = {
+  [Property in keyof Partial<R>]: CellProcessor<R, G, C>;
+};
+
 export interface GetExportValueParams {
   node: RowNode;
   colDef: ColDef;
@@ -50,6 +59,7 @@ export interface BudgetTableProps<
   groupParams?: GroupProps<R, G, C>;
   loading?: boolean;
   sizeColumnsToFit?: boolean;
+  processors?: CellProcessors<R, G, C>;
   cellClass?: (params: CellClassParams) => string | undefined;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
   onSearch: (value: string) => void;

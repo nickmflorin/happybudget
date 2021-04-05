@@ -47,3 +47,7 @@ export const formatCurrency = (value: string | number): string => {
 export const formatCurrencyWithoutDollarSign = (value: string | number): string => {
   return formatCurrency(value).slice(1);
 };
+
+export const formatPercentage = (value: number): string => {
+  return Number(value).toLocaleString(undefined, { style: "percent", minimumFractionDigits: 2 });
+};

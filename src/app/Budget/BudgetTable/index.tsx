@@ -89,6 +89,7 @@ const BudgetTable = <
   tableTotals,
   budgetTotals,
   sizeColumnsToFit = true,
+  processors,
   cellClass,
   onSearch,
   onSelectAll,
@@ -594,22 +595,32 @@ const BudgetTable = <
     }
   });
 
+  const processCell = (value: any, field: keyof R, row: R, colDef: ColDef): any => {
+    if (!isNil(processors) && !isNil(processors[field])) {
+      return processors[field](value, row, colDef);
+    }
+    return value;
+  };
+
   const getTableChangeFromEvent = (event: CellEditingStoppedEvent | CellValueChangedEvent): Table.RowChange | null => {
     const field = event.column.getColId();
+    const row: R = event.node.data;
     if (!isNil(event.newValue)) {
       if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
+        let newValue = processCell(event.newValue, field as keyof R, row, event.colDef);
+        let oldValue = processCell(event.oldValue, field as keyof R, row, event.colDef);
         if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
           const valid = event.colDef.valueSetter({ ...event });
           if (valid === true) {
             return {
               id: event.data.id,
-              data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+              data: { [field]: { oldValue, newValue } }
             };
           }
         } else {
           return {
             id: event.data.id,
-            data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+            data: { [field]: { oldValue, newValue } }
           };
         }
       }
