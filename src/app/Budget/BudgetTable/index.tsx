@@ -31,9 +31,11 @@ import {
 import { TABLE_DEBUG } from "config";
 import { RenderWithSpinner, ShowHide } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
-import { downloadAsCsvFile } from "lib/util/files";
 import { hashString } from "lib/util";
-import { currencyValueFormatter, mergeClassNames, mergeClassNamesFn } from "lib/tabling/util";
+import { downloadAsCsvFile } from "lib/util/files";
+import { mergeClassNames, mergeClassNamesFn } from "lib/tabling/util";
+import { currencyValueFormatter } from "lib/tabling/formatters";
+import { processCell } from "lib/tabling/processor";
 
 import {
   ExpandCell,
@@ -595,32 +597,34 @@ const BudgetTable = <
     }
   });
 
-  const processCell = (value: any, field: keyof R, row: R, colDef: ColDef): any => {
-    if (!isNil(processors) && !isNil(processors[field])) {
-      return processors[field](value, row, colDef);
-    }
-    return value;
-  };
-
   const getTableChangeFromEvent = (event: CellEditingStoppedEvent | CellValueChangedEvent): Table.RowChange | null => {
     const field = event.column.getColId();
     const row: R = event.node.data;
     if (!isNil(event.newValue)) {
       if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
-        let newValue = processCell(event.newValue, field as keyof R, row, event.colDef);
-        let oldValue = processCell(event.oldValue, field as keyof R, row, event.colDef);
+        // NOTE: The old value will have already been processed in the HTTP type case.
+        let newValue = event.newValue;
+        if (!isNil(processors)) {
+          newValue = processCell(
+            processors,
+            { type: "http", field: field as keyof R },
+            event.newValue,
+            row,
+            event.colDef
+          );
+        }
         if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
           const valid = event.colDef.valueSetter({ ...event });
           if (valid === true) {
             return {
               id: event.data.id,
-              data: { [field]: { oldValue, newValue } }
+              data: { [field]: { oldValue: event.oldValue, newValue } }
             };
           }
         } else {
           return {
             id: event.data.id,
-            data: { [field]: { oldValue, newValue } }
+            data: { [field]: { oldValue: event.oldValue, newValue } }
           };
         }
       }

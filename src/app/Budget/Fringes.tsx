@@ -9,7 +9,9 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { FringeUnitModelsList } from "lib/model";
 import { FringeMapping } from "lib/tabling/mappings";
-import { processOptionModelCellForClipboard, percentageValueFormatter, floatValueSetter } from "lib/tabling/util";
+import { processOptionModelCellForClipboard } from "lib/tabling/processor";
+import { percentageToDecimalValueSetter } from "lib/tabling/valueSetters";
+import { percentageValueFormatter } from "lib/tabling/formatters";
 
 import { setInstanceAction, addFringesPlaceholdersToStateAction } from "./store/actions";
 import {
@@ -77,14 +79,9 @@ const Fringes = (): JSX.Element => {
           "unit",
           FringeUnitModelsList
         )}
-        processors={{
-          rate: (value: number | null) => {
-            if (value !== null) {
-              return value / 100;
-            }
-            return null;
-          }
-        }}
+        processors={[
+          { field: "rate", type: "http", func: (value: number | null) => (value !== null ? value / 100 : null) }
+        ]}
         bodyColumns={[
           {
             field: "description",
@@ -94,7 +91,7 @@ const Fringes = (): JSX.Element => {
             field: "rate",
             headerName: "Rate",
             valueFormatter: percentageValueFormatter,
-            valueSetter: floatValueSetter("rate")
+            valueSetter: percentageToDecimalValueSetter("rate")
           },
           {
             field: "unit",

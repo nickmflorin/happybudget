@@ -1,14 +1,6 @@
 import { ColDef, CellClassParams, RowNode, GridOptions } from "ag-grid-community";
 import Mapping from "lib/tabling/mappings";
-
-export type CellProcessor<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> = (
-  value: any,
-  row: R,
-  col: ColDef
-) => any;
-export type CellProcessors<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> = {
-  [Property in keyof Partial<R>]: CellProcessor<R, G, C>;
-};
+import { CellProcessors } from "lib/tabling/processor";
 
 export interface GetExportValueParams {
   node: RowNode;

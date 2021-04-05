@@ -9,7 +9,7 @@ import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { PaymentMethodModelsList } from "lib/model";
 import { ActualMapping } from "lib/tabling/mappings";
-import { processOptionModelCellForClipboard } from "lib/tabling/util";
+import { processOptionModelCellForClipboard } from "lib/tabling/processor";
 
 import { setInstanceAction } from "./store/actions";
 import {

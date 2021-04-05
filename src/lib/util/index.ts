@@ -1,4 +1,4 @@
-import { forEach, findIndex, find, isNil, map, filter, reduce } from "lodash";
+import { forEach, findIndex, find, isNil, map, filter, reduce, includes } from "lodash";
 
 export const sumChars = (val: string): number => {
   let sum = 0;
@@ -46,6 +46,20 @@ export const replaceInArray = <T>(
     newArray[index] = newValue;
   }
   return newArray;
+};
+
+export const includesAnyIn = <T = any>(array: T[], anotherArray: T[] | T): boolean => {
+  if (!Array.isArray(anotherArray)) {
+    return includes(array, anotherArray);
+  }
+  let found = false;
+  forEach(anotherArray, (item: T) => {
+    if (includes(array, item)) {
+      found = true;
+      return false;
+    }
+  });
+  return found;
 };
 
 export const selectRandom = <T = any>(array: T[]): T => {
