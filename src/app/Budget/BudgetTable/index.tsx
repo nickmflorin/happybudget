@@ -38,7 +38,7 @@ import { currencyValueFormatter, mergeClassNames, mergeClassNamesFn } from "util
 import {
   ExpandCell,
   IndexCell,
-  CellRenderer,
+  ValueCell,
   SubAccountUnitCell,
   IdentifierCell,
   CalculatedCell,
@@ -326,7 +326,7 @@ const BudgetTable = <
   const bodyCell = useDynamicCallback<ColDef>(
     (col: ColDef): ColDef => {
       return {
-        cellRenderer: "CellRenderer",
+        cellRenderer: "ValueCell",
         ...col
       };
     }
@@ -1012,7 +1012,7 @@ const BudgetTable = <
               frameworkComponents={{
                 ExpandCell: ExpandCell,
                 IndexCell: IndexCell,
-                CellRenderer: IncludeErrorsInCell<R>(CellRenderer),
+                ValueCell: IncludeErrorsInCell<R>(ValueCell),
                 SubAccountUnitCell: IncludeErrorsInCell<R>(SubAccountUnitCell),
                 FringeUnitCell: IncludeErrorsInCell<R>(FringeUnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
@@ -1041,7 +1041,7 @@ const BudgetTable = <
               headerHeight={0}
               frameworkComponents={{
                 IndexCell: IndexCell,
-                CellRenderer: IncludeErrorsInCell<R>(CellRenderer),
+                ValueCell: IncludeErrorsInCell<R>(ValueCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                 CalculatedCell: CalculatedCell,
                 ...frameworkComponents
@@ -1062,7 +1062,7 @@ const BudgetTable = <
                 rowHeight={28}
                 frameworkComponents={{
                   IndexCell: IndexCell,
-                  CellRenderer: IncludeErrorsInCell<R>(CellRenderer),
+                  ValueCell: IncludeErrorsInCell<R>(ValueCell),
                   IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                   CalculatedCell: CalculatedCell,
                   ...frameworkComponents

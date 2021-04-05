@@ -4,48 +4,44 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-regular-svg-icons";
 
-import { ICellRendererParams, RowNode } from "ag-grid-community";
 import { IconButton } from "components/control/buttons";
 
-import "./IdentifierCell.scss";
+import Cell from "./Cell";
+import ValueCell, { ValueCellProps } from "./ValueCell";
 
-interface IdentifierCellProps extends ICellRendererParams, StandardComponentProps {
-  value: string | number | null;
-  node: RowNode;
+import "./index.scss";
+
+interface IdentifierCellProps<R extends Table.Row<any>> extends ValueCellProps<R> {
   onGroupEdit?: (group: IGroup<any>) => void;
 }
 
-const IdentifierCell = <R extends Table.Row<any>>({
-  value,
-  node,
-  className,
-  style = {},
-  onGroupEdit
-}: IdentifierCellProps): JSX.Element => {
-  const row: R = node.data;
+const IdentifierCell = <R extends Table.Row<any>>({ onGroupEdit, ...props }: IdentifierCellProps<R>): JSX.Element => {
+  const row: R = props.node.data;
   if (row.meta.isGroupFooter === true && row.group !== null) {
     return (
-      <div className={"cell--identifier"}>
-        <span>{`${row.group.name} (${row.group.children.length} Line Items)`}</span>
-        <IconButton
-          className={"btn--edit-group"}
-          size={"small"}
-          icon={<FontAwesomeIcon icon={faEdit} />}
-          onClick={() => !isNil(onGroupEdit) && onGroupEdit(row.group)}
-        />
-      </div>
+      <Cell className={"cell--identifier"} {...props}>
+        <div style={{ display: "flex" }}>
+          <span>{`${row.group.name} (${row.group.children.length} Line Items)`}</span>
+          <IconButton
+            className={"btn--edit-group"}
+            size={"small"}
+            icon={<FontAwesomeIcon icon={faEdit} />}
+            onClick={() => !isNil(onGroupEdit) && onGroupEdit(row.group)}
+          />
+        </div>
+      </Cell>
     );
   }
   return (
-    <div
+    <ValueCell
+      {...props}
       className={classNames(
         "cell--identifier",
-        row.meta.isTableFooter === false && row.meta.isBudgetFooter === false ? className : undefined
+        row.meta.isTableFooter === false && row.meta.isBudgetFooter === false ? props.className : undefined
       )}
-      style={style}
     >
-      {value}
-    </div>
+      {props.value}
+    </ValueCell>
   );
 };
 

@@ -2,11 +2,9 @@ import { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { ICellRendererParams } from "ag-grid-community";
-import CellRenderer from "./CellRenderer";
+import ValueCell, { ValueCellProps } from "./ValueCell";
 
-interface CalculatedCellProps extends ICellRendererParams {
-  value: string | number | null;
+interface CalculatedCellProps<R extends Table.Row<any, any>> extends ValueCellProps<R> {
   renderRedIfNegative?: boolean;
 }
 
@@ -14,7 +12,7 @@ const CalculatedCell = <R extends Table.Row<any, any>>({
   value,
   renderRedIfNegative = false,
   ...props
-}: CalculatedCellProps): JSX.Element => {
+}: CalculatedCellProps<R>): JSX.Element => {
   const renderRed = useMemo(() => {
     if (renderRedIfNegative === true && !isNil(value)) {
       if (typeof value === "string") {
@@ -30,7 +28,7 @@ const CalculatedCell = <R extends Table.Row<any, any>>({
     }
   }, [value, renderRedIfNegative]);
 
-  return <CellRenderer<R> className={classNames({ "color--red": renderRed })} value={value} {...props} />;
+  return <ValueCell<R> className={classNames({ "color--red": renderRed })} value={value} {...props} />;
 };
 
 export default CalculatedCell;

@@ -230,6 +230,18 @@ const SubAccountsTable = ({
           cellRenderer: "FringesCell",
           minWidth: 150,
           cellRendererParams: {
+            onClear: (row: Table.SubAccountRow, colDef: ColDef) => {
+              onRowUpdate({
+                id: row.id,
+                data: {
+                  fringes: {
+                    oldValue: row.fringes,
+                    newValue: []
+                  }
+                }
+              });
+            },
+            hideClear: (row: Table.SubAccountRow, colDef: ColDef) => row.fringes.length === 0,
             onChange: (ids: number[], row: Table.SubAccountRow) =>
               onRowUpdate({
                 id: row.id,
