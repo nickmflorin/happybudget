@@ -18,6 +18,7 @@ const FringesCell = ({ value, onChange, ...props }: FringesCellProps): JSX.Eleme
   return (
     <Cell {...props}>
       <ModelTagsDropdown<IFringe>
+        overlayClassName={"cell-dropdown"}
         value={value}
         models={fringes}
         labelField={"name"}

@@ -1,7 +1,9 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { find, forEach, isNil, map } from "lodash";
 import classNames from "classnames";
+
 import { Dropdown } from "antd";
+import { DropDownProps } from "antd/lib/dropdown";
 
 import { ModelTagsMenu } from "components/control/menus";
 import { Tag } from "components/display";
@@ -25,13 +27,14 @@ type MultipleModelTagsDropdownProps<M extends Model, V extends number = number> 
 export type ModelTagsDropdownProps<M extends Model, V extends number = number> = (
   | SingleModelTagsDropdownProps<M, V>
   | MultipleModelTagsDropdownProps<M, V>
-) & {
-  className?: string;
-  trigger?: ("click" | "hover" | "contextMenu")[];
-  labelField: keyof M;
-  models: M[];
-  defaultSelected?: number | number[] | null;
-};
+) &
+  Omit<DropDownProps, "trigger" | "className" | "overlay"> & {
+    className?: string;
+    trigger?: ("click" | "hover" | "contextMenu")[];
+    labelField: keyof M;
+    models: M[];
+    defaultSelected?: number | number[] | null;
+  };
 
 const ModelTagsDropdown = <M extends Model, V extends number = number>(
   props: ModelTagsDropdownProps<M, V>
@@ -109,6 +112,7 @@ const ModelTagsDropdown = <M extends Model, V extends number = number>(
   if (isMultiple(props)) {
     return (
       <Dropdown
+        {...props}
         className={classNames("model-tags-dropdown", props.className)}
         trigger={props.trigger || ["click"]}
         overlay={
@@ -127,6 +131,7 @@ const ModelTagsDropdown = <M extends Model, V extends number = number>(
   } else {
     return (
       <Dropdown
+        {...props}
         className={classNames("model-tags-dropdown", props.className)}
         trigger={props.trigger || ["click"]}
         overlay={

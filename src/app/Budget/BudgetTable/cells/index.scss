@@ -1,5 +1,16 @@
 @import "style/typography";
 
+.cell-dropdown {
+  border-radius: 0px;
+  border: none !important;
+  padding-top: 4px;
+  background-color: transparent;
+
+  .model-tags-menu {
+    border: 1px solid #EFEFEF;
+  }
+}
+
 .cell {
   width: 100%;
 

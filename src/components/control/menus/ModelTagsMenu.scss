@@ -4,13 +4,14 @@
 .model-tags-menu {
   .model-tags-menu-item {
     display: flex;
-    padding: 7px 10px !important;
+    padding: 4px 10px !important;
     font-family: $nunito !important;
     font-weight: 400 !important;
     margin-bottom: 0px !important;
+    height: 32px;
 
     &:hover, &.active {
-      background-color: rgba(245, 245, 245, 0.4);
+      background-color: rgba(212, 212, 212, 0.4);
     }
   }
 }
