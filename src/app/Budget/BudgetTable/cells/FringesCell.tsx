@@ -15,6 +15,7 @@ const FringesCell = ({ value, onChange, ...props }: FringesCellProps): JSX.Eleme
   const fringes = useSelector(selectFringes);
 
   const row: Table.SubAccountRow = props.node.data;
+
   return (
     <Cell {...props}>
       <ModelTagsDropdown<IFringe>
@@ -23,7 +24,7 @@ const FringesCell = ({ value, onChange, ...props }: FringesCellProps): JSX.Eleme
         models={fringes}
         labelField={"name"}
         multiple={true}
-        defaultSelected={row.fringes}
+        selected={row.fringes}
         onChange={(fs: IFringe[]) =>
           onChange(
             map(fs, (f: IFringe) => f.id),

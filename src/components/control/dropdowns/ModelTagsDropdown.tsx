@@ -33,7 +33,7 @@ export type ModelTagsDropdownProps<M extends Model, V extends number = number> =
     trigger?: ("click" | "hover" | "contextMenu")[];
     labelField: keyof M;
     models: M[];
-    defaultSelected?: number | number[] | null;
+    selected?: number | number[] | null;
   };
 
 const ModelTagsDropdown = <M extends Model, V extends number = number>(
@@ -117,7 +117,7 @@ const ModelTagsDropdown = <M extends Model, V extends number = number>(
         trigger={props.trigger || ["click"]}
         overlay={
           <ModelTagsMenu<M>
-            defaultSelected={props.defaultSelected}
+            selected={props.selected}
             models={props.models}
             labelField={props.labelField}
             onChange={props.onChange}
@@ -136,7 +136,7 @@ const ModelTagsDropdown = <M extends Model, V extends number = number>(
         trigger={props.trigger || ["click"]}
         overlay={
           <ModelTagsMenu<M>
-            defaultSelected={props.defaultSelected}
+            selected={props.selected}
             models={props.models}
             labelField={props.labelField}
             onChange={props.onChange}

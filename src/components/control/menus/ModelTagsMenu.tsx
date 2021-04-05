@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { map, isNil, includes, filter, find } from "lodash";
 import classNames from "classnames";
 import { Menu } from "antd";
@@ -21,19 +21,21 @@ export type ModelTagsMenuProps<M extends Model> = (SingleModelTagsMenuProps<M> |
   models: M[];
   labelField: keyof M;
   uppercase?: boolean;
-  defaultSelected?: number | number[] | null;
+  selected?: number | number[] | null;
   className?: string;
   style?: React.CSSProperties;
 };
 
 const ModelTagsMenu = <M extends Model>(props: ModelTagsMenuProps<M>): JSX.Element => {
-  const [selected, setSelected] = useState<number[]>(
-    !isNil(props.defaultSelected)
-      ? Array.isArray(props.defaultSelected)
-        ? props.defaultSelected
-        : [props.defaultSelected]
-      : []
-  );
+  const [selected, setSelected] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (isNil(props.selected)) {
+      setSelected([]);
+    } else {
+      setSelected(Array.isArray(props.selected) ? props.selected : [props.selected]);
+    }
+  }, [props.selected]);
 
   const isMultiple = (
     data: SingleModelTagsMenuProps<M> | MultipleModelTagsMenuProps<M>
