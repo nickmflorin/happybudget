@@ -1,6 +1,8 @@
 @import "style/typography";
 
 .cell {
+  width: 100%;
+
   .loadable-cell-wrapper {
     span {
       position: relative;
