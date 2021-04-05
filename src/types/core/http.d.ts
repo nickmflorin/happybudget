@@ -6,8 +6,8 @@ namespace Http {
   interface IRequestOptions extends AxiosRequestConfig {
     retries?: number;
     headers?: { [key: string]: string };
-    signal?: any;
     redirectOnAuthenticationError?: boolean;
+    cancelToken?: any;
   }
 
   interface IQuery {

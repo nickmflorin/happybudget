@@ -1,6 +1,6 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, select, all, fork } from "redux-saga/effects";
-import { isNil, find, map, groupBy } from "lodash";
+import { isNil, find, map, groupBy, includes } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountMapping } from "model/tableMappings";
 import { mergeRowChanges } from "model/util";
@@ -118,7 +118,11 @@ export function* deleteSubAccountTask(id: number): SagaIterator {
 }
 
 export function* updateSubAccountTask(id: number, change: Table.RowChange): SagaIterator {
-  yield put(updatingSubAccountAction({ id, value: true }));
+  // It is possible that multiple updates are sent while the SubAccount is still updating...
+  const updating = yield select((state: Redux.IApplicationStore) => state.budget.subaccount.subaccounts.updating);
+  if (!includes(updating, id)) {
+    yield put(updatingSubAccountAction({ id, value: true }));
+  }
   // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
   // otherwise, the loading indicators will not appear until `yield put(requestBudgetAction)`, and there
   // is a lag between the time that this task is called and that task is called.

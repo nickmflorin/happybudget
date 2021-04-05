@@ -25,7 +25,7 @@ export enum HttpRequestMethods {
   PATCH = "PATCH"
 }
 
-const instance = axios.create({
+export const instance = axios.create({
   baseURL: process.env.REACT_APP_API_DOMAIN,
   withCredentials: true
 });
@@ -193,7 +193,7 @@ export class ApiClient {
     let response: AxiosResponse<T>;
     try {
       response = await lookup[method](url, payload, {
-        cancelToken: options.signal,
+        cancelToken: options.cancelToken,
         headers: options.headers
       });
       return response.data;
@@ -261,7 +261,7 @@ export class ApiClient {
   ): Promise<AxiosResponse<T>> => {
     url = this._prepare_url(url, {}, HttpRequestMethods.POST);
     return this.instance.post(url, payload, {
-      cancelToken: options.signal,
+      cancelToken: options.cancelToken,
       headers: options.headers
     });
   };
