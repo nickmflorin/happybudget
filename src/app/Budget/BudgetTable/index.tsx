@@ -25,7 +25,8 @@ import {
   CellValueChangedEvent,
   PasteEndEvent,
   PasteStartEvent,
-  FirstDataRenderedEvent
+  FirstDataRenderedEvent,
+  SuppressKeyboardEventParams
 } from "ag-grid-community";
 
 import { RenderWithSpinner, ShowHide } from "components/display";
@@ -93,6 +94,7 @@ const BudgetTable = <
   onRowAdd,
   onRowDelete,
   onRowExpand,
+  onBack,
   isCellEditable,
   highlightNonEditableCell,
   rowRefreshRequired
@@ -143,7 +145,19 @@ const BudgetTable = <
   });
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    event.api.sizeColumnsToFit();
+    const api = event.api;
+    api.sizeColumnsToFit();
+
+    api.ensureIndexVisible(0);
+
+    const cols = event.columnApi.getAllColumns();
+    if (cols) {
+      let identifierCol: Column = cols[2];
+      api.setFocusedCell(0, identifierCol);
+
+      const selectedRow = api.getDisplayedRowAtIndex(0);
+      selectedRow?.setSelected(true);
+    }
   });
 
   const onGridReady = useDynamicCallback((event: GridReadyEvent): void => {
@@ -168,10 +182,36 @@ const BudgetTable = <
     setBudgetFooterColumnApi(event.columnApi);
   });
 
+  const keyListener = useDynamicCallback((e: KeyboardEvent) => {
+    const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+    if (gridApi) {
+      if (e.key === "ArrowDown" && ctrlCmdPressed) {
+        const focusedCell = gridApi.getFocusedCell();
+        if (focusedCell) {
+          const row = gridApi?.getDisplayedRowAtIndex(focusedCell?.rowIndex);
+          if (onRowExpand && !isNil(row?.data.identifier)) {
+            onRowExpand(row?.data.id);
+          }
+        }
+      }
+      if (e.key === "ArrowUp" && ctrlCmdPressed) {
+        if (onBack) {
+          onBack();
+        }
+      }
+    }
+  });
+
   useEffect(() => {
-    setGridOptions({ ...gridOptions, alignedGrids: [tableFooterGridOptions, budgetFooterGridOptions] });
+    setGridOptions({
+      ...gridOptions,
+      defaultColDef: { ...gridOptions.defaultColDef, suppressKeyboardEvent: suppressNavigation },
+      alignedGrids: [tableFooterGridOptions, budgetFooterGridOptions]
+    });
     setBudgetFooterGridOptions({ ...budgetFooterGridOptions, alignedGrids: [gridOptions, tableFooterGridOptions] });
     setTableFooterGridOptions({ ...tableFooterGridOptions, alignedGrids: [gridOptions, budgetFooterGridOptions] });
+    window.addEventListener("keydown", keyListener);
+    return () => window.removeEventListener("keydown", keyListener);
   }, []);
 
   // TODO: It might make more sense to just treat all of the cells corresponding
@@ -276,6 +316,17 @@ const BudgetTable = <
       };
     }
   );
+
+  const suppressNavigation = (params: SuppressKeyboardEventParams) => {
+    const e = params.event;
+    const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+    if (params.api) {
+      if ((e.key === "ArrowDown" || e.key === "ArrowUp") && ctrlCmdPressed) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   const baseColumns = useMemo((): ColDef[] => {
     let baseLeftColumns: ColDef[] = [

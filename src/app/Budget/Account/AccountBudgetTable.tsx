@@ -121,6 +121,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountAction(payload))}
         onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateAccountAction(changes))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
+        onBack={() => history.push(`/budgets/${budgetId}/accounts`)}
         groupParams={{
           onDeleteGroup: (group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id)),
           onRowRemoveFromGroup: (row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id)),

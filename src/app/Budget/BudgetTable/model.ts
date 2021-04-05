@@ -58,6 +58,7 @@ export interface BudgetTableProps<
   onRowAdd: () => void;
   onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;
+  onBack?: () => void;
   onSelectAll: () => void;
   isCellEditable?: (row: R, col: ColDef) => boolean;
 }

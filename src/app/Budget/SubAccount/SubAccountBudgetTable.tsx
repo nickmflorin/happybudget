@@ -53,6 +53,7 @@ const selectSaving = createSelector(
 const selectSubAccountDetail = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.detail.data
 );
+const selectAncestors = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.ancestors);
 
 interface SubAccountBudgetTableProps {
   subaccountId: number;
@@ -73,6 +74,8 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
   const budgetDetail = useSelector(selectBudgetDetail);
   const groups = useSelector(selectGroups);
   const loadingBudget = useSelector(selectBudgetDetailLoading);
+  const ancestors = useSelector(selectAncestors);
+  const ancestor = ancestors[ancestors.length - 2];
 
   return (
     <React.Fragment>
@@ -120,6 +123,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountAction(payload))}
         onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateSubAccountAction(changes))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
+        onBack={() => history.push(`/budgets/${budgetId}/${ancestor.type}s/${ancestor.id}`)}
         groupParams={{
           onDeleteGroup: (group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id)),
           onRowRemoveFromGroup: (row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id)),
