@@ -172,7 +172,7 @@ const SubAccountsTable = ({
           colSpan: (params: ColSpanParams) => {
             const row: Table.SubAccountRow = params.data;
             if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
-              return row.meta.children.length !== 0 ? 6 : 1;
+              return row.meta.children.length !== 0 ? 7 : 1;
             }
             return 1;
           }

@@ -84,7 +84,7 @@ class Mapping<
       group: null
     };
     forEach(this.fields, (field: MappedField<M>) => {
-      obj[field.field as string] = null;
+      obj[field.field as string] = field.placeholderValue || null;
     });
     return obj as R;
   };
@@ -240,7 +240,7 @@ export const SubAccountMapping = new Mapping<
     { field: "estimated", http: false },
     { field: "variance", http: false },
     { field: "actual", http: false },
-    { field: "fringes", allowNull: true }
+    { field: "fringes", allowNull: true, placeholderValue: [] }
   ],
   childrenGetter: (model: ISubAccount) => model.subaccounts,
   groupGetter: (model: ISubAccount) => model.group,

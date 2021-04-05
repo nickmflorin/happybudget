@@ -8,6 +8,7 @@ interface MappedField<M extends Model> {
   allowBlank?: boolean;
   excludeFromPost?: boolean;
   http?: boolean;
+  placeholderValue?: any;
 }
 
 interface MappingConfig<M extends Model, C extends Model = UnknownModel> {
