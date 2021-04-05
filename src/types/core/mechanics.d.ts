@@ -23,11 +23,7 @@ interface MappingConfig<M extends Model, C extends Model = UnknownModel> {
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace ReducerFactory {
-  type Transformer<S, P = any, A extends Redux.IAction<any> = Redux.IAction<any>> = (
-    payload: P,
-    st: S,
-    action: A
-  ) => any;
+  type Transformer<S, P = any, A extends Redux.IAction<P> = Redux.IAction<P>> = (payload: P, st: S, action: A) => any;
 
   type Transformers<O, S, A extends Redux.IAction<any> = Redux.IAction<any>> = Partial<
     Record<keyof O, Transformer<S, any, A>>

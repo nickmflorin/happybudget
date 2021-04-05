@@ -118,7 +118,9 @@ export function* deleteSubAccountTask(id: number): SagaIterator {
 }
 
 export function* updateSubAccountTask(id: number, change: Table.RowChange): SagaIterator {
-  yield put(updatingSubAccountAction({ id, value: true }));
+  // It is possible that multiple updates are sent while the SubAccount is still updating...
+  yield put(updatingSubAccountAction({ id, value: true }, { meta: { ignoreInconsistentState: true } }));
+
   // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
   // otherwise, the loading indicators will not appear until `yield put(requestBudgetAction)`, and there
   // is a lag between the time that this task is called and that task is called.
@@ -133,7 +135,10 @@ export function* updateSubAccountTask(id: number, change: Table.RowChange): Saga
       addErrorsToStateAction(errors)
     );
   } finally {
-    yield put(updatingSubAccountAction({ id, value: false }));
+    // NOTE:  This is something we should address with our reducer factories.  If multiple actions
+    // are submitted consecutively that add the same ID to the updating state, than when one of those
+    // associated tasks finishes it will remove it from state while the other one is still updating it.
+    yield put(updatingSubAccountAction({ id, value: false }, { meta: { ignoreInconsistentState: true } }));
   }
   if (success === true) {
     yield put(requestBudgetAction());

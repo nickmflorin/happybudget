@@ -39,19 +39,21 @@ export const createListResponseReducer = <
         responseWasReceived: true
       };
     },
-    Request: (payload: any) => ({ responseWasReceived: false }),
+    Request: () => ({ responseWasReceived: false }),
     Loading: (payload: boolean) => ({ loading: payload }),
     SetPage: (payload: number) => ({ page: payload, selected: [] }),
     SetPageSize: (payload: number) => ({ pageSize: payload }),
     SetPageAndSize: (payload: { pageSize: number; page: number }) => ({ ...payload }),
-    AddToState: (payload: M, st: S) => {
+    AddToState: (payload: M, st: S, action: Redux.IAction<M>) => {
       const existing = find(st.data, { id: payload.id });
       if (!isNil(existing)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when adding ${Options.referenceEntity} to state...
-         the ${Options.referenceEntity} with ID ${payload.id} already exists in state when it is not expected to.`
-        );
+        if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when adding ${Options.referenceEntity} to state...
+          the ${Options.referenceEntity} with ID ${payload.id} already exists in state when it is not expected to.`
+          );
+        }
         return {};
       } else {
         let pageSize = st.pageSize;
@@ -61,14 +63,16 @@ export const createListResponseReducer = <
         return { data: [...st.data, payload], count: st.count + 1, pageSize };
       }
     },
-    RemoveFromState: (payload: number, st: S) => {
+    RemoveFromState: (payload: number, st: S, action: Redux.IAction<number>) => {
       const existing = find(st.data, { id: payload });
       if (isNil(existing)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when removing ${Options.referenceEntity} from state...
-         the ${Options.referenceEntity} with ID ${payload} does not exist in state when it is expected to.`
-        );
+        if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when removing ${Options.referenceEntity} from state...
+          the ${Options.referenceEntity} with ID ${payload} does not exist in state when it is expected to.`
+          );
+        }
         return {};
       } else {
         const partial = {
@@ -83,33 +87,39 @@ export const createListResponseReducer = <
         return partial;
       }
     },
-    UpdateInState: (payload: M, st: S) => {
+    UpdateInState: (payload: M, st: S, action: Redux.IAction<M>) => {
       const existing: M | undefined = find(st.data, { id: payload.id } as any);
       // TODO: If the entity does not exist in the state when updating, should
       // we auto add it?
       if (isNil(existing)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} in state...
-         the ${Options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
-        );
+        if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} in state...
+          the ${Options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
+          );
+        }
         return {};
       }
       const { id: _, ...withoutId } = payload;
       return { data: replaceInArray<M>(st.data, { id: payload.id }, { ...existing, ...withoutId }) };
     },
-    Deselect: (payload: number, st: S) => {
+    Deselect: (payload: number, st: S, action: Redux.IAction<number>) => {
       const element = find(st.data, { id: payload });
       if (!isNil(element) || Options.strictSelect === false) {
         if (!includes(st.selected, payload)) {
-          /* eslint-disable no-console */
-          console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
+          if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+            /* eslint-disable no-console */
+            console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
+          }
           return {};
         }
         return { selected: filter(st.selected, (id: number) => id !== payload) };
       } else {
-        /* eslint-disable no-console */
-        console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
+        if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+          /* eslint-disable no-console */
+          console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
+        }
         return {};
       }
     },
@@ -120,7 +130,7 @@ export const createListResponseReducer = <
         return { selected: map(st.data, (model: M) => model.id) };
       }
     },
-    Select: (payload: number[] | number, st: S) => {
+    Select: (payload: number[] | number, st: S, action: Redux.IAction<number | number[]>) => {
       const selected: number[] = [];
       if (Array.isArray(payload)) {
         forEach(payload, (id: number) => {
@@ -128,8 +138,10 @@ export const createListResponseReducer = <
           if (!isNil(element) || Options.strictSelect === false) {
             selected.push(id);
           } else {
-            /* eslint-disable no-console */
-            console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${id} not in state!`);
+            if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+              /* eslint-disable no-console */
+              console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${id} not in state!`);
+            }
           }
         });
         return { selected };
@@ -138,61 +150,71 @@ export const createListResponseReducer = <
         if (!isNil(element) || Options.strictSelect === false) {
           return { selected: [...st.selected, payload] };
         } else {
-          /* eslint-disable no-console */
-          console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
+          if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+            /* eslint-disable no-console */
+            console.error(`Inconsistent State!: Selected ${Options.referenceEntity} with ID ${payload} not in state!`);
+          }
           return {};
         }
       }
     },
-    Creating: (payload: boolean, st: S) => ({ creating: payload }),
-    Deleting: (payload: Redux.ModelListActionPayload, st: S) => {
+    Creating: (payload: boolean) => ({ creating: payload }),
+    Deleting: (payload: Redux.ModelListActionPayload, st: S, action: Redux.IAction<boolean>) => {
       if (payload.value === true) {
         if (includes(st.deleting, payload.id)) {
-          /* eslint-disable no-console */
-          console.warn(
-            `Inconsistent State!  Inconsistent state noticed when adding ${Options.referenceEntity}
-            to deleting state... the ${Options.referenceEntity} with ID ${payload.id} already
-            exists in the deleting state when it is not expected to.`
-          );
+          if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+            /* eslint-disable no-console */
+            console.warn(
+              `Inconsistent State!  Inconsistent state noticed when adding ${Options.referenceEntity}
+              to deleting state... the ${Options.referenceEntity} with ID ${payload.id} already
+              exists in the deleting state when it is not expected to.`
+            );
+          }
           return {};
         } else {
           return { deleting: [...st.deleting, payload.id] };
         }
       } else {
         if (!includes(st.deleting, payload.id)) {
-          /* eslint-disable no-console */
-          console.warn(
-            `Inconsistent State!  Inconsistent state noticed when removing ${Options.referenceEntity}
-            from deleting state... the ${Options.referenceEntity} with ID ${payload.id} does
-            not exist in the deleting state when it is expected to.`
-          );
+          if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+            /* eslint-disable no-console */
+            console.warn(
+              `Inconsistent State!  Inconsistent state noticed when removing ${Options.referenceEntity}
+              from deleting state... the ${Options.referenceEntity} with ID ${payload.id} does
+              not exist in the deleting state when it is expected to.`
+            );
+          }
           return {};
         } else {
           return { deleting: filter(st.deleting, (id: number) => id !== payload.id) };
         }
       }
     },
-    Updating: (payload: Redux.ModelListActionPayload, st: S) => {
+    Updating: (payload: Redux.ModelListActionPayload, st: S, action: Redux.IAction<number>) => {
       if (payload.value === true) {
         if (includes(st.updating, payload.id)) {
-          /* eslint-disable no-console */
-          console.warn(
-            `Inconsistent State!  Inconsistent state noticed when adding ${Options.referenceEntity}
+          if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+            /* eslint-disable no-console */
+            console.warn(
+              `Inconsistent State!  Inconsistent state noticed when adding ${Options.referenceEntity}
             to updating state... the ${Options.referenceEntity} with ID ${payload.id} already
             exists in the updating state when it is not expected to.`
-          );
+            );
+          }
           return {};
         } else {
           return { updating: [...st.updating, payload.id] };
         }
       } else {
         if (!includes(st.updating, payload.id)) {
-          /* eslint-disable no-console */
-          console.warn(
-            `Inconsistent State!  Inconsistent state noticed when removing ${Options.referenceEntity}
-            from updating state... the ${Options.referenceEntity} with ID ${payload.id} does
-            not exist in the updating state when it is expected to.`
-          );
+          if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
+            /* eslint-disable no-console */
+            console.warn(
+              `Inconsistent State!  Inconsistent state noticed when removing ${Options.referenceEntity}
+              from updating state... the ${Options.referenceEntity} with ID ${payload.id} does
+              not exist in the updating state when it is expected to.`
+            );
+          }
           return {};
         } else {
           return { updating: filter(st.updating, (id: number) => id !== payload.id) };
