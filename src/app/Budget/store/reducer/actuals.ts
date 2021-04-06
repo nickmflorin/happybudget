@@ -22,7 +22,6 @@ const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IAct
     Creating: ActionType.Actuals.Creating
   },
   {
-    references: { entity: "actual" },
     strictSelect: false,
     initialState: initialActualsState,
     subReducers: {
@@ -33,8 +32,7 @@ const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IAct
           UpdateInState: ActionType.Actuals.Placeholders.UpdateInState,
           Clear: ActionType.Actuals.Request
         },
-        ActualMapping,
-        { references: { entity: "actual" } }
+        ActualMapping
       )
     }
   }

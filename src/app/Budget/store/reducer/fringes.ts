@@ -21,7 +21,6 @@ const listResponseReducer = createListResponseReducer<IFringe, Redux.Budget.IFri
     Creating: ActionType.Budget.Fringes.Creating
   },
   {
-    references: { entity: "fringe" },
     strictSelect: false,
     initialState: initialFringesState,
     subReducers: {
@@ -32,8 +31,7 @@ const listResponseReducer = createListResponseReducer<IFringe, Redux.Budget.IFri
           UpdateInState: ActionType.Budget.Fringes.Placeholders.UpdateInState,
           Clear: ActionType.Budget.Fringes.Placeholders.Clear
         },
-        ActualMapping,
-        { references: { entity: "fringe" } }
+        ActualMapping
       )
     }
   }

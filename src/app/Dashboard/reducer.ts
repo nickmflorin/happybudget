@@ -3,29 +3,26 @@ import { initialListResponseState } from "store/initialState";
 import { createListResponseReducer, createAgnosticModelListActionReducer } from "lib/redux/factories";
 import { ActionType, ActionDomains } from "./actions";
 
-const PermanentlyDeletingReducer = createAgnosticModelListActionReducer({ entity: "budget" });
-const RestoringReducer = createAgnosticModelListActionReducer({ entity: "budget" });
+const PermanentlyDeletingReducer = createAgnosticModelListActionReducer();
+const RestoringReducer = createAgnosticModelListActionReducer();
 
 const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>> = combineReducers({
-  contacts: createListResponseReducer<IContact, Redux.IListResponseStore<IContact>>(
-    {
-      Response: ActionType.Contacts.Response,
-      Request: ActionType.Contacts.Request,
-      Loading: ActionType.Contacts.Loading,
-      Select: ActionType.Contacts.Select,
-      SetSearch: ActionType.Contacts.SetSearch,
-      SetPage: ActionType.Contacts.SetPage,
-      SetPageSize: ActionType.Contacts.SetPageSize,
-      SetPageAndSize: ActionType.Contacts.SetPageAndSize,
-      AddToState: ActionType.Contacts.AddToState,
-      RemoveFromState: ActionType.Contacts.RemoveFromState,
-      UpdateInState: ActionType.Contacts.UpdateInState,
-      Creating: ActionType.Contacts.Creating,
-      Updating: ActionType.Contacts.Updating,
-      Deleting: ActionType.Contacts.Deleting
-    },
-    { references: { entity: "contact" } }
-  ),
+  contacts: createListResponseReducer<IContact, Redux.IListResponseStore<IContact>>({
+    Response: ActionType.Contacts.Response,
+    Request: ActionType.Contacts.Request,
+    Loading: ActionType.Contacts.Loading,
+    Select: ActionType.Contacts.Select,
+    SetSearch: ActionType.Contacts.SetSearch,
+    SetPage: ActionType.Contacts.SetPage,
+    SetPageSize: ActionType.Contacts.SetPageSize,
+    SetPageAndSize: ActionType.Contacts.SetPageAndSize,
+    AddToState: ActionType.Contacts.AddToState,
+    RemoveFromState: ActionType.Contacts.RemoveFromState,
+    UpdateInState: ActionType.Contacts.UpdateInState,
+    Creating: ActionType.Contacts.Creating,
+    Updating: ActionType.Contacts.Updating,
+    Deleting: ActionType.Contacts.Deleting
+  }),
   budgets: combineReducers({
     active: createListResponseReducer<IBudget, Redux.IListResponseStore<IBudget>, Redux.Dashboard.IAction<any>>(
       {
@@ -42,7 +39,6 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
         Deleting: ActionType.Budgets.Deleting
       },
       {
-        references: { entity: "budget" },
         excludeActions: (action: Redux.Dashboard.IAction<any>) => {
           return ActionDomains.ACTIVE !== action.domain;
         }
@@ -62,7 +58,6 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
         UpdateInState: ActionType.Budgets.UpdateInState
       },
       {
-        references: { entity: "budget" },
         excludeActions: (action: Redux.Dashboard.IAction<any>) => {
           return ActionDomains.TRASH !== action.domain;
         },

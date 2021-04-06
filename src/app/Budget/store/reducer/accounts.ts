@@ -1,5 +1,5 @@
 import { Reducer } from "redux";
-import { isNil, find, includes, filter, map, reduce } from "lodash";
+import { isNil, find, includes, filter, map, reduce, forEach } from "lodash";
 import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
 import { AccountMapping } from "lib/tabling/mappings";
 import { replaceInArray } from "lib/util";
@@ -26,7 +26,6 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
     Creating: ActionType.Budget.Accounts.Creating
   },
   {
-    references: { entity: "account" },
     initialState: initialAccountsState,
     strictSelect: false,
     subReducers: {
@@ -37,8 +36,7 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           UpdateInState: ActionType.Budget.Accounts.Placeholders.UpdateInState,
           Clear: ActionType.Budget.Accounts.Request
         },
-        AccountMapping,
-        { references: { entity: "account" } }
+        AccountMapping
       ),
       groups: createListResponseReducer<IGroup<ISimpleAccount>, Redux.IListResponseStore<IGroup<ISimpleAccount>>>(
         {
@@ -50,7 +48,6 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           Deleting: ActionType.Budget.Accounts.Groups.Deleting
         },
         {
-          references: { entity: "account" },
           extensions: {
             [ActionType.Budget.Accounts.RemoveFromGroup]: (
               st: Redux.IListResponseStore<IGroup<ISimpleAccount>> = initialListResponseState,
@@ -86,14 +83,11 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           }
         }
       ),
-      history: createListResponseReducer<HistoryEvent>(
-        {
-          Response: ActionType.Budget.Accounts.History.Response,
-          Request: ActionType.Budget.Accounts.History.Request,
-          Loading: ActionType.Budget.Accounts.History.Loading
-        },
-        { references: { entity: "account" } }
-      )
+      history: createListResponseReducer<HistoryEvent>({
+        Response: ActionType.Budget.Accounts.History.Response,
+        Request: ActionType.Budget.Accounts.History.Request,
+        Loading: ActionType.Budget.Accounts.History.Loading
+      })
     }
   }
 );
@@ -155,6 +149,39 @@ const rootReducer: Reducer<Redux.Budget.IAccountsStore, Redux.IAction<any>> = (
   if (action.type === ActionType.Budget.Accounts.Groups.UpdateInState) {
     const group: IGroup<ISimpleAccount> = action.payload;
     newState = recalculateGroupMetrics(newState, group.id);
+  } else if (action.type === ActionType.Budget.Accounts.Groups.AddToState) {
+    const group: IGroup<ISimpleAccount> = action.payload;
+    forEach(group.children, (simpleAccount: ISimpleAccount) => {
+      const account = find(newState.data, { id: simpleAccount.id });
+      if (isNil(account)) {
+        warnInconsistentState({
+          action: action.type,
+          reason: "Account does not exist in state for group child.",
+          id: simpleAccount.id,
+          groupId: group.id
+        });
+      } else {
+        newState = {
+          ...newState,
+          data: replaceInArray<IAccount>(newState.data, { id: simpleAccount.id }, { ...account, group: group.id })
+        };
+      }
+    });
+  } else if (action.type === ActionType.Budget.Accounts.Groups.RemoveFromState) {
+    // NOTE: Here, we cannot look at the group that was removed from state because the action
+    // only includes the group ID and the group was already removed from state.  Instead, we will
+    // clear the group for any Account that belongs to a group no longer in state.
+    forEach(newState.data, (account: IAccount) => {
+      if (!isNil(account.group)) {
+        const group: IGroup<ISimpleAccount> | undefined = find(newState.groups.data, { id: account.group });
+        if (isNil(group)) {
+          newState = {
+            ...newState,
+            data: replaceInArray<IAccount>(newState.data, { id: account.id }, { ...account, group: null })
+          };
+        }
+      }
+    });
   } else if (action.type === ActionType.Budget.Accounts.UpdateInState) {
     const subAccount: IAccount = action.payload;
     if (!isNil(subAccount.group)) {

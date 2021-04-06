@@ -99,14 +99,11 @@ export const createCommentsListResponseReducer = <
   mappings: Partial<ICommentsListResponseActionMap>,
   options: Partial<FactoryOptions<S, A>> = {}
 ): Reducer<S, A> => {
-  const Options = mergeOptionsWithDefaults<S, A>(
-    { ...options, references: { ...options.references, entity: "commment" } },
-    initialCommentsListResponseState as S
-  );
+  const Options = mergeOptionsWithDefaults<S, A>(options, initialCommentsListResponseState as S);
 
   let subReducers = {};
   if (!isNil(mappings.Replying)) {
-    subReducers = { ...subReducers, replying: createModelListActionReducer(mappings.Replying, Options.references) };
+    subReducers = { ...subReducers, replying: createModelListActionReducer(mappings.Replying) };
   }
   const genericListResponseReducer = createListResponseReducer<IComment, S, A>(
     {
@@ -118,8 +115,7 @@ export const createCommentsListResponseReducer = <
       Updating: mappings.Updating
     },
     {
-      subReducers,
-      references: Options.references
+      subReducers
     }
   );
 
@@ -131,8 +127,7 @@ export const createCommentsListResponseReducer = <
           warnInconsistentState({
             action: action.type,
             reason: "Parent does not exist in state when it is expected to.",
-            parent: action.payload.parent,
-            ...Options.references
+            parent: action.payload.parent
           });
           return st;
         } else {
@@ -149,8 +144,7 @@ export const createCommentsListResponseReducer = <
           warnInconsistentState({
             action: action.type,
             reason: "Entity already exists in state when it is not expected to.",
-            id: action.payload.data.id,
-            ...Options.references
+            id: action.payload.data.id
           });
           return st;
         } else {
@@ -168,8 +162,7 @@ export const createCommentsListResponseReducer = <
         warnInconsistentState({
           action: action.type,
           reason: "Entity does not exist in state when it is expected to.",
-          id: action.payload,
-          ...Options.references
+          id: action.payload
         });
         return st;
       } else {
@@ -192,8 +185,7 @@ export const createCommentsListResponseReducer = <
         warnInconsistentState({
           action: action.type,
           reason: "Entity does not exist in state when it is expected to.",
-          id: action.payload,
-          ...Options.references
+          id: action.payload
         });
         return st;
       } else {

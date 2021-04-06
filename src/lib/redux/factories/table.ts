@@ -23,7 +23,7 @@ export const createTablePlaceholdersReducer = <
 >(
   mappings: Partial<ITablePlaceholdersActionMap>,
   mapping: Mapping<R, M, G, P, C>,
-  options: Partial<FactoryOptions<Redux.ListStore<R>>>
+  options: Partial<FactoryOptions<Redux.ListStore<R>>> = {}
 ) => {
   const Options = mergeOptionsWithDefaults<Redux.ListStore<R>>(options, []);
 
@@ -42,8 +42,7 @@ export const createTablePlaceholdersReducer = <
       if (isNil(row)) {
         warnInconsistentState({
           action: action.type,
-          reason: "Placeholder does not exist in state when it is expected to.",
-          ...Options.references
+          reason: "Placeholder does not exist in state when it is expected to."
         });
         return st;
       } else {
@@ -55,8 +54,7 @@ export const createTablePlaceholdersReducer = <
       if (isNil(row)) {
         warnInconsistentState({
           action: action.type,
-          reason: "Placeholder does not exist in state when it is expected to.",
-          ...Options.references
+          reason: "Placeholder does not exist in state when it is expected to."
         });
         return st;
       } else {

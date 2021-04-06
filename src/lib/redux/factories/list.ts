@@ -49,8 +49,8 @@ export const createListResponseReducer = <
 ): Reducer<S, A> => {
   const Options = mergeOptionsWithDefaults<S, A>(options, initialListResponseState as S);
 
-  const DeletingReducer = createAgnosticModelListActionReducer(Options.references);
-  const UpdatingReducer = createAgnosticModelListActionReducer(Options.references);
+  const DeletingReducer = createAgnosticModelListActionReducer();
+  const UpdatingReducer = createAgnosticModelListActionReducer();
 
   const reducers: MappedReducers<IListResponseActionMap, S, A> = {
     // We have to reset the page to it's initial state otherwise we run the risk
@@ -93,8 +93,7 @@ export const createListResponseReducer = <
         if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
           warnInconsistentState({
             action: action.type,
-            reason: "Instance already exists in state when it is not expected to.",
-            ...Options.references
+            reason: "Instance already exists in state when it is not expected to."
           });
         }
         return st;
@@ -112,8 +111,7 @@ export const createListResponseReducer = <
         if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
           warnInconsistentState({
             action: action.type,
-            reason: "Instance does not exist in state when it is expected to.",
-            ...Options.references
+            reason: "Instance does not exist in state when it is expected to."
           });
         }
         return st;
@@ -138,8 +136,7 @@ export const createListResponseReducer = <
         if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
           warnInconsistentState({
             action: action.type,
-            reason: "Instance does not exist in state when it is expected to.",
-            ...Options.references
+            reason: "Instance does not exist in state when it is expected to."
           });
         }
         return st;
@@ -154,8 +151,7 @@ export const createListResponseReducer = <
           if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
             warnInconsistentState({
               action: action.type,
-              reason: "Instance does not exist in selected state when it is expected to.",
-              ...Options.references
+              reason: "Instance does not exist in selected state when it is expected to."
             });
           }
           return st;
@@ -165,8 +161,7 @@ export const createListResponseReducer = <
         if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
           warnInconsistentState({
             action: action.type,
-            reason: "Instance does not exist in selected state when it is expected to.",
-            ...Options.references
+            reason: "Instance does not exist in selected state when it is expected to."
           });
         }
         return st;
@@ -190,8 +185,7 @@ export const createListResponseReducer = <
             if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
               warnInconsistentState({
                 action: action.type,
-                reason: "Instance exist in selected state when it is not expected to.",
-                ...Options.references
+                reason: "Instance exist in selected state when it is not expected to."
               });
             }
           }
@@ -205,8 +199,7 @@ export const createListResponseReducer = <
           if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
             warnInconsistentState({
               action: action.type,
-              reason: "Instance exists in selected state when it is not expected to.",
-              ...Options.references
+              reason: "Instance exists in selected state when it is not expected to."
             });
           }
           return st;

@@ -1,6 +1,7 @@
 import { Reducer } from "redux";
-import { isNil, find, includes, map, filter, reduce } from "lodash";
+import { isNil, find, includes, map, filter, reduce, forEach } from "lodash";
 import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
+import { warnInconsistentState } from "lib/redux/util";
 import { SubAccountMapping } from "lib/tabling/mappings";
 import { fringeValue } from "lib/model/util";
 import { replaceInArray } from "lib/util";
@@ -71,7 +72,6 @@ export const createSubAccountsReducer = (
       Creating: mapping.Creating
     },
     {
-      references: { entity: "subaccount" },
       strictSelect: false,
       subReducers: {
         fringes: fringesRootReducer,
@@ -82,34 +82,25 @@ export const createSubAccountsReducer = (
             UpdateInState: mapping.Placeholders.UpdateInState,
             Clear: mapping.Request
           },
-          SubAccountMapping,
-          { references: { entity: "subaccount" } }
+          SubAccountMapping
         ),
         groups: createListResponseReducer<
           IGroup<ISimpleSubAccount>,
           Redux.IListResponseStore<IGroup<ISimpleSubAccount>>
-        >(
-          {
-            Response: mapping.Groups.Response,
-            Request: mapping.Groups.Request,
-            Loading: mapping.Groups.Loading,
-            RemoveFromState: mapping.Groups.RemoveFromState,
-            AddToState: mapping.Groups.AddToState,
-            UpdateInState: mapping.Groups.UpdateInState,
-            Deleting: mapping.Groups.Deleting
-          },
-          {
-            references: { entity: "group" }
-          }
-        ),
-        history: createListResponseReducer<HistoryEvent>(
-          {
-            Response: mapping.History.Response,
-            Request: mapping.History.Request,
-            Loading: mapping.History.Loading
-          },
-          { references: { entity: "event" } }
-        )
+        >({
+          Response: mapping.Groups.Response,
+          Request: mapping.Groups.Request,
+          Loading: mapping.Groups.Loading,
+          RemoveFromState: mapping.Groups.RemoveFromState,
+          AddToState: mapping.Groups.AddToState,
+          UpdateInState: mapping.Groups.UpdateInState,
+          Deleting: mapping.Groups.Deleting
+        }),
+        history: createListResponseReducer<HistoryEvent>({
+          Response: mapping.History.Response,
+          Request: mapping.History.Request,
+          Loading: mapping.History.Loading
+        })
       }
     }
   );
@@ -271,6 +262,43 @@ export const createSubAccountsReducer = (
     if (action.type === mapping.Groups.UpdateInState) {
       const group: IGroup<ISimpleSubAccount> = action.payload;
       newState = recalculateGroupMetrics(newState, group.id);
+    } else if (action.type === mapping.Groups.AddToState) {
+      const group: IGroup<ISimpleSubAccount> = action.payload;
+      forEach(group.children, (simpleSubAccount: ISimpleSubAccount) => {
+        const subAccount = find(newState.data, { id: simpleSubAccount.id });
+        if (isNil(subAccount)) {
+          warnInconsistentState({
+            action: action.type,
+            reason: "Sub-account does not exist in state for group child.",
+            id: simpleSubAccount.id,
+            groupId: group.id
+          });
+        } else {
+          newState = {
+            ...newState,
+            data: replaceInArray<ISubAccount>(
+              newState.data,
+              { id: simpleSubAccount.id },
+              { ...subAccount, group: group.id }
+            )
+          };
+        }
+      });
+    } else if (action.type === mapping.Groups.RemoveFromState) {
+      // NOTE: Here, we cannot look at the group that was removed from state because the action
+      // only includes the group ID and the group was already removed from state.  Instead, we will
+      // clear the group for any SubAccount that belongs to a group no longer in state.
+      forEach(newState.data, (subAccount: ISubAccount) => {
+        if (!isNil(subAccount.group)) {
+          const group: IGroup<ISimpleSubAccount> | undefined = find(newState.groups.data, { id: subAccount.group });
+          if (isNil(group)) {
+            newState = {
+              ...newState,
+              data: replaceInArray<ISubAccount>(newState.data, { id: subAccount.id }, { ...subAccount, group: null })
+            };
+          }
+        }
+      });
     } else if (action.type === mapping.UpdateInState) {
       const subAccount: ISubAccount = action.payload;
       newState = recalculateSubAccountMetrics(newState, subAccount.id);
@@ -285,11 +313,11 @@ export const createSubAccountsReducer = (
         )
       );
       if (isNil(group)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!  Inconsistent state noticed when removing sub account from group.
-        A group does not exist for sub account ${action.payload}.`
-        );
+        warnInconsistentState({
+          action: action.type,
+          reason: "Group does not exist for sub-account.",
+          id: action.payload
+        });
       } else {
         newState = {
           ...newState,

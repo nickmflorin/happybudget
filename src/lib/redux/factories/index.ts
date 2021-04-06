@@ -16,7 +16,6 @@ export interface FactoryOptions<S, A extends Redux.IAction<any> = Redux.IAction<
   subReducers: { [Property in keyof Partial<S>]: Reducer<any, A> } | null | {};
   extensions: { [key: string]: Reducer<S, A> } | null;
   strictSelect: boolean;
-  references: { [key: string]: any };
 }
 
 export type MappedReducers<O, S, A extends Redux.IAction<any> = Redux.IAction<any>> = Partial<
@@ -39,7 +38,7 @@ export const createSimplePayloadReducer = <P, A extends Redux.IAction<P> = Redux
 export const createSimpleBooleanReducer = <A extends Redux.IAction<boolean>>(actionType: string): Reducer<boolean, A> =>
   createSimplePayloadReducer<boolean, A>(actionType, false);
 
-export const createAgnosticModelListActionReducer = (references: { [key: string]: any }) => (
+export const createAgnosticModelListActionReducer = () => (
   st: Redux.ModelListActionStore = [],
   action: Redux.IAction<Redux.ModelListActionPayload>
 ): Redux.ModelListActionStore => {
@@ -59,8 +58,7 @@ export const createAgnosticModelListActionReducer = (references: { [key: string]
     if (isNil(instance)) {
       warnInconsistentState({
         action: "Removing from model list action state.",
-        reason: "The instance does not exist in state when it is expected to.",
-        ...references
+        reason: "The instance does not exist in state when it is expected to."
       });
       return st;
     } else {
@@ -92,11 +90,11 @@ export const createAgnosticModelListActionReducer = (references: { [key: string]
  *                  the reducer should listen for.
  * @param options   Additional options supplied to the reducer factory.
  */
-export const createModelListActionReducer = (actionType: string, references: { [key: string]: any }) => (
+export const createModelListActionReducer = (actionType: string) => (
   st: Redux.ModelListActionStore = [],
   action: Redux.IAction<Redux.ModelListActionPayload>
 ) => {
-  const reducer = createAgnosticModelListActionReducer(references);
+  const reducer = createAgnosticModelListActionReducer();
   if (action.type === actionType) {
     return reducer(st, action);
   }

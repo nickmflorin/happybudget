@@ -45,20 +45,14 @@ const genericReducer = combineReducers({
       Replying: ActionType.Budget.Comments.Replying
     })
   }),
-  budgetItems: createListResponseReducer<IBudgetItem>(
-    {
-      Response: ActionType.BudgetItems.Response,
-      Loading: ActionType.BudgetItems.Loading
-    },
-    { references: { entity: "budget-item" } }
-  ),
-  budgetItemsTree: createListResponseReducer<IBudgetItemNode>(
-    {
-      Response: ActionType.BudgetItemsTree.Response,
-      Loading: ActionType.BudgetItemsTree.Loading
-    },
-    { references: { entity: "budget-item-tree-node" } }
-  )
+  budgetItems: createListResponseReducer<IBudgetItem>({
+    Response: ActionType.BudgetItems.Response,
+    Loading: ActionType.BudgetItems.Loading
+  }),
+  budgetItemsTree: createListResponseReducer<IBudgetItemNode>({
+    Response: ActionType.BudgetItemsTree.Response,
+    Loading: ActionType.BudgetItemsTree.Loading
+  })
 });
 
 const rootReducer: Reducer<Redux.Budget.IStore, Redux.IAction<any>> = (

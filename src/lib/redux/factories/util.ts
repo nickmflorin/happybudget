@@ -9,7 +9,6 @@ export const mergeOptionsWithDefaults = <S, A extends Redux.IAction<any> = Redux
 ): FactoryOptions<S, A> => {
   return {
     initialState: initialState,
-    references: {},
     subReducers: null,
     strictSelect: true,
     extension: null,
