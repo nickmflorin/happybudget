@@ -52,3 +52,21 @@ export const fringeValue = (value: number, fringes: IFringe[]): number => {
   );
   return value + reduce(additionalValues, (sum: number, val: number) => sum + val, 0);
 };
+
+export const findOptionModelForName = <M extends OptionModel<number, string>>(models: M[], name: string): M | null => {
+  const found = filter(models, (model: M) => {
+    if (model.name.toLowerCase() === name.toLowerCase()) {
+      return true;
+    }
+    return false;
+  });
+  if (found.length === 1) {
+    return found[0];
+  } else if (found.length !== 0) {
+    /* eslint-disable no-console */
+    console.warn(`Found multiple option models corresponding to name ${name}... returning first.`);
+    return found[0];
+  } else {
+    return null;
+  }
+};

@@ -1,6 +1,10 @@
+import { isNil, find } from "lodash";
 import { ValueSetterParams } from "ag-grid-community";
+import { findOptionModelForName } from "lib/model/util";
 
-export const percentageToDecimalValueSetter = (field: string) => (params: ValueSetterParams): boolean => {
+export const percentageToDecimalValueSetter = <R extends Table.Row<any, any>>(field: keyof R) => (
+  params: ValueSetterParams
+): boolean => {
   if (!isNaN(parseFloat(params.newValue))) {
     params.data[field] = parseFloat(params.newValue) / 100;
     return true;
@@ -8,7 +12,9 @@ export const percentageToDecimalValueSetter = (field: string) => (params: ValueS
   return false;
 };
 
-export const floatValueSetter = (field: string) => (params: ValueSetterParams): boolean => {
+export const floatValueSetter = <R extends Table.Row<any, any>>(field: keyof R) => (
+  params: ValueSetterParams
+): boolean => {
   if (!isNaN(parseFloat(params.newValue))) {
     params.data[field] = parseFloat(params.newValue);
     return true;
@@ -16,10 +22,34 @@ export const floatValueSetter = (field: string) => (params: ValueSetterParams): 
   return false;
 };
 
-export const integerValueSetter = (field: string) => (params: ValueSetterParams): boolean => {
+export const integerValueSetter = <R extends Table.Row<any, any>>(field: keyof R) => (
+  params: ValueSetterParams
+): boolean => {
   if (!isNaN(parseInt(params.newValue))) {
     params.data[field] = parseInt(params.newValue);
     return true;
   }
   return false;
+};
+
+export const optionModelValueSetter = <R extends Table.Row<any, any>, M extends OptionModel<number, string>>(
+  field: keyof R,
+  models: M[]
+) => (params: ValueSetterParams): boolean => {
+  /* eslint-disable indent */
+  if (typeof params.newValue === "string") {
+    const optionModel = findOptionModelForName(models, params.newValue);
+    if (!isNil(optionModel)) {
+      params.data[field] = optionModel.id;
+      return true;
+    }
+    return false;
+  } else {
+    const optionModel = find(models, { id: params.newValue });
+    if (!isNil(optionModel)) {
+      params.data[field] = params.newValue;
+      return true;
+    }
+    return false;
+  }
 };

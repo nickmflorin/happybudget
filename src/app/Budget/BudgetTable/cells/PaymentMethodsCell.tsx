@@ -1,22 +1,21 @@
-import { ICellRendererParams, RowNode } from "ag-grid-community";
-
 import { OptionModelTagsDropdown } from "components/control/dropdowns";
 import { PaymentMethodModelsList } from "lib/model";
+import Cell, { StandardCellProps } from "./Cell";
 
-interface PaymentMethodCellProps extends ICellRendererParams {
-  onChange: (id: PaymentMethod, row: Table.ActualRow) => void;
+interface PaymentMethodCellProps extends StandardCellProps<Table.ActualRow> {
   value: PaymentMethod | null;
-  node: RowNode;
 }
 
-const PaymentMethodCell = ({ value, node, onChange }: PaymentMethodCellProps): JSX.Element => {
+const PaymentMethodCell = ({ ...props }: PaymentMethodCellProps): JSX.Element => {
   return (
-    <OptionModelTagsDropdown<PaymentMethod, PaymentMethodName, PaymentMethodOptionModel>
-      overlayClassName={"cell-dropdown"}
-      value={value}
-      models={PaymentMethodModelsList}
-      onChange={(paymentMethod: PaymentMethod) => onChange(paymentMethod, node.data)}
-    />
+    <Cell {...props}>
+      <OptionModelTagsDropdown<PaymentMethod, PaymentMethodName, PaymentMethodOptionModel>
+        overlayClassName={"cell-dropdown"}
+        value={props.value}
+        models={PaymentMethodModelsList}
+        onChange={(paymentMethod: PaymentMethod) => props.setValue(paymentMethod)}
+      />
+    </Cell>
   );
 };
 

@@ -632,13 +632,6 @@ const BudgetTable = <
     return null;
   };
 
-  const onCellEditingStopped = useDynamicCallback((event: CellEditingStoppedEvent) => {
-    const tableChange = getTableChangeFromEvent(event);
-    if (!isNil(tableChange)) {
-      onRowUpdate(tableChange);
-    }
-  });
-
   const onPasteStart = useDynamicCallback((event: PasteStartEvent) => {
     setCellChangeEvents([]);
   });
@@ -665,6 +658,11 @@ const BudgetTable = <
   const onCellValueChanged = useDynamicCallback((event: CellValueChangedEvent) => {
     if (event.source === "paste") {
       setCellChangeEvents([...cellChangeEvents, event]);
+    } else {
+      const tableChange = getTableChangeFromEvent(event);
+      if (!isNil(tableChange)) {
+        onRowUpdate(tableChange);
+      }
     }
   });
 
@@ -1037,7 +1035,6 @@ const BudgetTable = <
                 FringesCell: ShowCellOnlyForRowType<R>("subaccount")(IncludeErrorsInCell<R>(FringesCell)),
                 ...frameworkComponents
               }}
-              onCellEditingStopped={onCellEditingStopped}
               onPasteStart={onPasteStart}
               onPasteEnd={onPasteEnd}
               onCellValueChanged={onCellValueChanged}

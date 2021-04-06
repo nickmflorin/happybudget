@@ -1,22 +1,21 @@
-import { ICellRendererParams, RowNode } from "ag-grid-community";
-
 import { FringeUnitModelsList } from "lib/model";
 import { OptionModelTagsDropdown } from "components/control/dropdowns";
+import Cell, { StandardCellProps } from "./Cell";
 
-interface FringeUnitCellProps extends ICellRendererParams {
-  onChange: (id: FringeUnit, row: Table.FringeRow) => void;
+interface FringeUnitCellProps extends StandardCellProps<Table.SubAccountRow> {
   value: FringeUnit | null;
-  node: RowNode;
 }
 
-const FringeUnitCell = ({ value, node, onChange }: FringeUnitCellProps): JSX.Element => {
+const FringeUnitCell = ({ ...props }: FringeUnitCellProps): JSX.Element => {
   return (
-    <OptionModelTagsDropdown<FringeUnit, FringeUnitName, FringeUnitOptionModel>
-      overlayClassName={"cell-dropdown"}
-      value={value}
-      models={FringeUnitModelsList}
-      onChange={(unit: FringeUnit) => onChange(unit, node.data)}
-    />
+    <Cell {...props}>
+      <OptionModelTagsDropdown<FringeUnit, FringeUnitName, FringeUnitOptionModel>
+        overlayClassName={"cell-dropdown"}
+        value={props.value}
+        models={FringeUnitModelsList}
+        onChange={(unit: FringeUnit) => props.setValue(unit)}
+      />
+    </Cell>
   );
 };
 

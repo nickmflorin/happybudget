@@ -7,7 +7,7 @@ import { ColDef, ColSpanParams, ProcessCellForExportParams } from "ag-grid-commu
 import { SubAccountUnitModelsList } from "lib/model";
 import { SubAccountMapping } from "lib/tabling/mappings";
 import { currencyValueFormatter } from "lib/tabling/formatters";
-import { floatValueSetter, integerValueSetter } from "lib/tabling/valueSetters";
+import { floatValueSetter, integerValueSetter, optionModelValueSetter } from "lib/tabling/valueSetters";
 import { getKeyValue } from "lib/util";
 
 import BudgetTable from "./BudgetTable";
@@ -85,7 +85,7 @@ const SubAccountsTable = ({
       tableFooterIdentifierValue={tableFooterIdentifierValue}
       budgetFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
       isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
-        if (includes(["unit", "fringes"], colDef.field)) {
+        if (includes(["fringes"], colDef.field)) {
           return false;
         } else if (includes(["identifier", "description", "name"], colDef.field)) {
           return true;
@@ -188,7 +188,7 @@ const SubAccountsTable = ({
           headerName: "Qty",
           width: 60,
           cellStyle: { textAlign: "right" },
-          valueSetter: integerValueSetter("quantity")
+          valueSetter: integerValueSetter<Table.SubAccountRow>("quantity")
         },
         {
           field: "unit",
@@ -196,25 +196,17 @@ const SubAccountsTable = ({
           cellClass: classNames("cell--centered"),
           cellRenderer: "SubAccountUnitCell",
           width: 100,
-          cellRendererParams: {
-            onChange: (unit: SubAccountUnit, row: Table.SubAccountRow) =>
-              onRowUpdate({
-                id: row.id,
-                data: {
-                  unit: {
-                    oldValue: row.unit,
-                    newValue: unit
-                  }
-                }
-              })
-          }
+          valueSetter: optionModelValueSetter<Table.SubAccountRow, SubAccountUnitOptionModel>(
+            "unit",
+            SubAccountUnitModelsList
+          )
         },
         {
           field: "multiplier",
           headerName: "X",
           width: 50,
           cellStyle: { textAlign: "right" },
-          valueSetter: floatValueSetter("multiplier")
+          valueSetter: floatValueSetter<Table.SubAccountRow>("multiplier")
         },
         {
           field: "rate",
@@ -222,7 +214,7 @@ const SubAccountsTable = ({
           width: 70,
           cellStyle: { textAlign: "right" },
           valueFormatter: currencyValueFormatter,
-          valueSetter: floatValueSetter("rate")
+          valueSetter: floatValueSetter<Table.SubAccountRow>("rate")
         },
         {
           field: "fringes",
@@ -243,6 +235,8 @@ const SubAccountsTable = ({
               });
             },
             hideClear: (row: Table.SubAccountRow, colDef: ColDef) => row.fringes.length === 0,
+            // TODO: Do this with setValue() inside the CellRendere so it can accompany intelligent
+            // copy and pasting.
             onChange: (ids: number[], row: Table.SubAccountRow) =>
               onRowUpdate({
                 id: row.id,

@@ -10,7 +10,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { FringeUnitModelsList } from "lib/model";
 import { FringeMapping } from "lib/tabling/mappings";
 import { processOptionModelCellForClipboard } from "lib/tabling/processor";
-import { percentageToDecimalValueSetter } from "lib/tabling/valueSetters";
+import { percentageToDecimalValueSetter, optionModelValueSetter } from "lib/tabling/valueSetters";
 import { percentageValueFormatter } from "lib/tabling/formatters";
 
 import { setInstanceAction, addFringesPlaceholdersToStateAction } from "./store/actions";
@@ -91,7 +91,7 @@ const Fringes = (): JSX.Element => {
             field: "rate",
             headerName: "Rate",
             valueFormatter: percentageValueFormatter,
-            valueSetter: percentageToDecimalValueSetter("rate")
+            valueSetter: percentageToDecimalValueSetter<Table.FringeRow>("rate")
           },
           {
             field: "unit",
@@ -99,20 +99,7 @@ const Fringes = (): JSX.Element => {
             cellClass: classNames("cell--centered"),
             cellRenderer: "FringeUnitCell",
             width: 50,
-            cellRendererParams: {
-              onChange: (unit: SubAccountUnit, row: Table.SubAccountRow) =>
-                dispatch(
-                  updateFringeAction({
-                    id: row.id,
-                    data: {
-                      unit: {
-                        oldValue: row.unit,
-                        newValue: unit
-                      }
-                    }
-                  })
-                )
-            }
+            valueSetter: optionModelValueSetter<Table.FringeRow, FringeUnitOptionModel>("unit", FringeUnitModelsList)
           },
           {
             field: "cutoff",
