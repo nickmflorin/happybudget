@@ -198,11 +198,11 @@ const rootReducer: Reducer<Redux.Budget.IAccountsStore, Redux.IAction<any>> = (
       )
     );
     if (isNil(group)) {
-      /* eslint-disable no-console */
-      console.error(
-        `Inconsistent State!  Inconsistent state noticed when removing account from group.
-        A group does not exist for account ${action.payload}.`
-      );
+      warnInconsistentState({
+        action: action.type,
+        reason: "Group does not exist for account.",
+        id: action.payload
+      });
     } else {
       newState = {
         ...newState,
