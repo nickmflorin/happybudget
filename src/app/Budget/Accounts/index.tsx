@@ -1,14 +1,17 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Cookies from "universal-cookie";
 
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleShallowEqualSelector } from "store/selectors";
 
 import { setInstanceAction } from "../store/actions";
 import { requestAccountsAction, requestGroupsAction } from "../store/actions/accounts";
+import { selectBudgetId } from "../store/selectors";
 
 import AccountsBudgetTable from "./AccountsBudgetTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
+import { isNil } from "lodash";
 
 const selectAccountsTableLoading = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.accounts.loading
@@ -16,6 +19,7 @@ const selectAccountsTableLoading = simpleShallowEqualSelector(
 
 const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
+  const budgetId = useSelector(selectBudgetId);
   const loading = useSelector(selectAccountsTableLoading);
 
   useEffect(() => {
@@ -23,6 +27,13 @@ const Accounts = (): JSX.Element => {
     dispatch(requestAccountsAction(null));
     dispatch(requestGroupsAction(null));
   }, []);
+
+  useEffect(() => {
+    if (!isNil(budgetId)) {
+      const cookies = new Cookies();
+      cookies.set("budget-last-visited", `/budgets/${budgetId}/accounts`);
+    }
+  }, [budgetId]);
 
   return (
     <React.Fragment>

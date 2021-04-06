@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
+import Cookies from "universal-cookie";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -116,7 +117,15 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faCalculator} />,
-          onClick: () => history.push(`/budgets/${budgetId}`),
+          onClick: () => {
+            const cookies = new Cookies();
+            const budgetLastVisited = cookies.get("budget-last-visited");
+            if (!isNil(budgetLastVisited)) {
+              history.push(budgetLastVisited);
+            } else {
+              history.push(`/budgets/${budgetId}`);
+            }
+          },
           active:
             location.pathname.startsWith("/budgets") &&
             !location.pathname.startsWith(`/budgets/${budgetId}/actuals`) &&

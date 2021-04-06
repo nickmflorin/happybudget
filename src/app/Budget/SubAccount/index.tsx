@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import Cookies from "universal-cookie";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
@@ -9,6 +10,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 
 import { setInstanceAction } from "../store/actions";
 import { setSubAccountIdAction } from "../store/actions/subAccount";
+import { selectBudgetId } from "../store/selectors";
 import SubAccountBudgetTable from "./SubAccountBudgetTable";
 import SubAccountCommentsHistory from "./SubAccountCommentsHistory";
 
@@ -28,6 +30,7 @@ const selectLoading = createSelector(
 const SubAccount = (): JSX.Element => {
   const { subaccountId } = useParams<{ budgetId: string; subaccountId: string }>();
   const dispatch = useDispatch();
+  const budgetId = useSelector(selectBudgetId);
   const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
 
@@ -42,6 +45,13 @@ const SubAccount = (): JSX.Element => {
       dispatch(setInstanceAction(detail));
     }
   }, [detail]);
+
+  useEffect(() => {
+    if (!isNil(budgetId) && !isNaN(parseInt(subaccountId))) {
+      const cookies = new Cookies();
+      cookies.set("budget-last-visited", `/budgets/${budgetId}/subaccounts/${subaccountId}`);
+    }
+  }, [budgetId]);
 
   return (
     <RenderIfValidId id={[subaccountId]}>

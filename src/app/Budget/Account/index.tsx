@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import Cookies from "universal-cookie";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
@@ -9,6 +10,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 
 import { setInstanceAction } from "../store/actions";
 import { setAccountIdAction } from "../store/actions/account";
+import { selectBudgetId } from "../store/selectors";
 import AccountBudgetTable from "./AccountBudgetTable";
 import AccountCommentsHistory from "./AccountCommentsHistory";
 
@@ -28,6 +30,7 @@ const selectLoading = createSelector(
 const Account = (): JSX.Element => {
   const { accountId } = useParams<{ budgetId: string; accountId: string }>();
   const dispatch = useDispatch();
+  const budgetId = useSelector(selectBudgetId);
   const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
 
@@ -42,6 +45,13 @@ const Account = (): JSX.Element => {
       dispatch(setInstanceAction(detail));
     }
   }, [detail]);
+
+  useEffect(() => {
+    if (!isNil(budgetId) && !isNaN(parseInt(accountId))) {
+      const cookies = new Cookies();
+      cookies.set("budget-last-visited", `/budgets/${budgetId}/accounts/${accountId}`);
+    }
+  }, [budgetId]);
 
   return (
     <RenderIfValidId id={[accountId]}>
