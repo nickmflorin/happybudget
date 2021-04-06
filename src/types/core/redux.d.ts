@@ -66,12 +66,12 @@ namespace Redux {
     readonly search: string;
     readonly selected: number[];
     readonly responseWasReceived: boolean;
+    readonly deleting: ListStore<number>;
+    readonly updating: ListStore<number>;
+    readonly creating: boolean;
   }
 
   interface ICommentsListResponseStore extends IListResponseStore<IComment> {
-    readonly submitting: boolean;
-    readonly deleting: number[];
-    readonly editing: number[];
     readonly replying: number[];
   }
 
@@ -88,66 +88,47 @@ namespace Redux {
       readonly domain: ActionDomain;
     }
 
-    interface IActiveBudgetsListStore extends IListResponseStore<IBudget> {
-      readonly deleting: number[];
-    }
-
     interface ITrashBudgetsListStore extends IListResponseStore<IBudget> {
-      readonly deleting: number[];
       readonly restoring: number[];
     }
 
     interface IBudgetsStore {
-      readonly active: IActiveBudgetsListStore;
+      readonly active: IListResponseStore<IBudget>;
       readonly trash: ITrashBudgetsListStore;
-    }
-
-    interface IContactsStore extends IListResponseStore<IContact> {
-      readonly deleting: number[];
-      readonly updating: number[];
-      readonly creating: boolean;
     }
 
     interface IStore {
       readonly budgets: IBudgetsStore;
-      readonly contacts: IContactsStore;
+      readonly contacts: IListResponseStore<IContact>;
     }
   }
 
   namespace Budget {
-    interface IGroupsStore<M extends Model> extends IListResponseStore<IGroup<M>> {
-      deleting: number[];
-    }
-
     interface ICommentsStore extends IListResponseStore<IComment> {
-      readonly submitting: boolean;
-      readonly deleting: number[];
       readonly replying: number[];
-      readonly editing: number[];
     }
 
     interface ISubAccountsStore extends IListResponseStore<ISubAccount> {
-      readonly deleting: ListStore<number>;
-      readonly updating: ListStore<number>;
-      readonly creating: boolean;
       readonly placeholders: ListStore<Table.SubAccountRow>;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
-      readonly groups: IGroupsStore<ISimpleSubAccount>;
+      readonly groups: IListResponseStore<IGroup<ISimpleSubAccount>>;
+      readonly fringes: IFringesStore;
     }
 
     interface IAccountsStore extends IListResponseStore<IAccount> {
-      readonly deleting: ListStore<number>;
-      readonly updating: ListStore<number>;
-      readonly creating: boolean;
       readonly placeholders: ListStore<Table.AccountRow>;
       readonly history: IListResponseStore<IFieldAlterationEvent>;
-      readonly groups: IGroupsStore<ISimpleAccount>;
+      readonly groups: IListResponseStore<IGroup<ISimpleAccount>>;
+    }
+
+    interface IFringesStore extends IListResponseStore<IFringe> {
+      readonly placeholders: ListStore<Table.FringeRow>;
     }
 
     interface ISubAccountStore {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<ISubAccount>;
-      readonly subaccounts: ISubAccountsStore<Table.SubAccountRow>;
+      readonly subaccounts: ISubAccountsStore;
       readonly comments: ICommentsStore;
     }
 
@@ -161,26 +142,24 @@ namespace Redux {
     interface IBudgetStore {
       readonly id: number | null;
       readonly detail: IDetailResponseStore<IBudget>;
-      readonly accounts: IAccountsStore;
       readonly comments: ICommentsStore;
     }
 
     interface IActualsStore extends IListResponseStore<IActual> {
-      readonly deleting: ListStore<number>;
-      readonly updating: ListStore<number>;
-      readonly creating: boolean;
       readonly placeholders: ListStore<Table.ActualRow>;
     }
 
     interface IStore {
       readonly budget: IBudgetStore;
-      readonly ancestors: ListStore<IAncestor>;
+      readonly instance: IAccount | ISubAccount | null;
       readonly commentsHistoryDrawerOpen: boolean;
       readonly budgetItems: IListResponseStore<IBudgetItem>;
       readonly budgetItemsTree: IListResponseStore<IBudgetItemTreeNode>;
       readonly actuals: IActualsStore;
       readonly subaccount: ISubAccountStore;
       readonly account: IAccountStore;
+      readonly accounts: IAccountsStore;
+      readonly fringes: IFringesStore;
     }
   }
 

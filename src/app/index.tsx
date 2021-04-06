@@ -5,7 +5,7 @@ import "style/index.scss";
 
 import { ApplicationSpinner } from "components/display";
 import { ReduxRoute } from "components/routes";
-import { componentLoader } from "operational";
+import { componentLoader } from "lib/operational";
 
 const Landing = React.lazy(() => componentLoader(() => import("./Landing")));
 const Application = React.lazy(() => componentLoader(() => import("./Application")));

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
+import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -13,15 +14,16 @@ import {
   faFolderOpen,
   faFolderPlus,
   faCalculator,
+  faPercentage,
   faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 
 import { RenderIfValidId } from "components/display";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
-import { componentLoader } from "operational";
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { componentLoader } from "lib/operational";
 
-import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./actions";
+import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./store/actions";
+import { selectInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "./store/selectors";
 
 import "./index.scss";
 
@@ -29,11 +31,7 @@ const Account = React.lazy(() => componentLoader(() => import("./Account")));
 const Accounts = React.lazy(() => componentLoader(() => import("./Accounts")));
 const SubAccount = React.lazy(() => componentLoader(() => import("./SubAccount")));
 const Actuals = React.lazy(() => componentLoader(() => import("./Actuals")));
-
-const selectCommentsHistoryDrawerOpen = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen
-);
-const selectAncestors = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.ancestors);
+const Fringes = React.lazy(() => componentLoader(() => import("./Fringes")));
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
@@ -42,8 +40,9 @@ const Budget = (): JSX.Element => {
   const { budgetId } = useParams<{ budgetId: string }>();
   const match = useRouteMatch();
 
-  const ancestors = useSelector(selectAncestors);
+  const instance = useSelector(selectInstance);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
+  const budget = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     if (!isNaN(parseInt(budgetId))) {
@@ -57,7 +56,7 @@ const Budget = (): JSX.Element => {
       includeFooter={false}
       headerProps={{ style: { height: 70 + 36 } }}
       contentProps={{ style: { marginTop: 70 + 36 + 10, height: "calc(100vh - 116px)" } }}
-      breadcrumbs={<AncestorsBreadCrumbs ancestors={ancestors} budgetId={parseInt(budgetId)} />}
+      breadcrumbs={!isNil(budget) ? <AncestorsBreadCrumbs instance={instance} budget={budget} /> : <></>}
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faRobot} />,
@@ -98,14 +97,6 @@ const Budget = (): JSX.Element => {
             placement: "right"
           }
         },
-        // {
-        //   icon: <FontAwesomeIcon icon={faTrashAlt} />,
-        //   onClick: () => history.push("/trash"),
-        //   tooltip: {
-        //     title: "Deleted Budgets",
-        //     placement: "right"
-        //   }
-        // },
         {
           icon: <FontAwesomeIcon icon={faAddressBook} />,
           onClick: () => history.push("/contacts"),
@@ -115,10 +106,21 @@ const Budget = (): JSX.Element => {
           }
         },
         {
+          icon: <FontAwesomeIcon icon={faPercentage} />,
+          onClick: () => history.push(`/budgets/${budgetId}/fringes`),
+          active: location.pathname.startsWith(`/budgets/${budgetId}/fringes`),
+          tooltip: {
+            title: "Fringes",
+            placement: "right"
+          }
+        },
+        {
           icon: <FontAwesomeIcon icon={faCalculator} />,
           onClick: () => history.push(`/budgets/${budgetId}`),
           active:
-            location.pathname.startsWith("/budgets") && !location.pathname.startsWith(`/budgets/${budgetId}/actuals`),
+            location.pathname.startsWith("/budgets") &&
+            !location.pathname.startsWith(`/budgets/${budgetId}/actuals`) &&
+            !location.pathname.startsWith(`/budgets/${budgetId}/fringes`),
           tooltip: {
             title: "Budget",
             placement: "right"
@@ -140,6 +142,7 @@ const Budget = (): JSX.Element => {
           <Switch>
             <Redirect exact from={match.url} to={`${match.url}/accounts`} />
             <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
+            <Route path={"/budgets/:budgetId/fringes"} component={Fringes} />
             <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
             <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
             <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />

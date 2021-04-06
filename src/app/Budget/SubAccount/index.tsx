@@ -2,13 +2,13 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil, concat } from "lodash";
+import { isNil } from "lodash";
 
 import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setAncestorsAction } from "../actions";
-import { setSubAccountIdAction } from "./actions";
+import { setInstanceAction } from "../store/actions";
+import { setSubAccountIdAction } from "../store/actions/subAccount";
 import SubAccountBudgetTable from "./SubAccountBudgetTable";
 import SubAccountCommentsHistory from "./SubAccountCommentsHistory";
 
@@ -16,18 +16,13 @@ const selectDetail = simpleDeepEqualSelector((state: Redux.IApplicationStore) =>
 const selectSubAccountsLoading = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.subaccounts.loading
 );
-const selectDetailLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.subaccount.detail.loading
-);
 const selectDeletingGroups = simpleShallowEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.subaccounts.groups.deleting.length !== 0
 );
 const selectLoading = createSelector(
-  selectDetailLoading,
   selectSubAccountsLoading,
   selectDeletingGroups,
-  (detailLoading: boolean, tableLoading: boolean, deletingGroups: boolean) =>
-    detailLoading || tableLoading || deletingGroups
+  (tableLoading: boolean, deletingGroups: boolean) => tableLoading || deletingGroups
 );
 
 const SubAccount = (): JSX.Element => {
@@ -44,18 +39,7 @@ const SubAccount = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(detail)) {
-      dispatch(
-        setAncestorsAction(
-          concat(detail.ancestors, [
-            {
-              id: detail.id,
-              identifier: detail.identifier,
-              type: "subaccount",
-              siblings: detail.siblings
-            }
-          ])
-        )
-      );
+      dispatch(setInstanceAction(detail));
     }
   }, [detail]);
 

@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import "style/index.scss";
 import App from "./app";
-import reportWebVitals from "./operational/reportWebVitals";
+import reportWebVitals from "./lib/operational/reportWebVitals";
 
 import "ag-grid-enterprise";
 

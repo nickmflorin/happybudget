@@ -5,7 +5,7 @@ import { Form, Button, Input } from "antd";
 import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
 
 import { RouterLink } from "components/control/links";
-import { validateEmail, validatePassword } from "util/validate";
+import { validateEmail, validatePassword } from "lib/util/validate";
 import SocialButton from "../SocialButton";
 
 export interface ISignupFormValues {

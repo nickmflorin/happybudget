@@ -2,7 +2,7 @@ import { useHistory } from "react-router-dom";
 
 import { EditOutlined, DeleteOutlined, DownloadOutlined } from "@ant-design/icons";
 import { useLoggedInUser, useTimezone } from "store/hooks";
-import { toAbbvDisplayDateTime } from "util/dates";
+import { toAbbvDisplayDateTime } from "lib/util/dates";
 
 import Card from "./Card";
 

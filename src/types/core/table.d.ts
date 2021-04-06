@@ -7,6 +7,8 @@ namespace Table {
     readonly error: string;
   }
 
+  type RowType = "subaccount" | "account" | "fringe" | "actual";
+
   interface RowMeta<C extends Model = UnknownModel> {
     readonly selected: boolean;
     readonly errors: CellError[];
@@ -18,6 +20,7 @@ namespace Table {
     readonly label: string;
     readonly typeLabel: string;
     readonly fieldsLoading: string[];
+    readonly type: RowType;
   }
 
   interface PageAndSize {
@@ -32,8 +35,8 @@ namespace Table {
   }
 
   interface CellChange {
-    oldValue: string | number | null;
-    newValue: string | number;
+    oldValue: string | number | number[] | string[] | null;
+    newValue: string | number | number[] | string[];
   }
 
   type RowChange = {
@@ -45,8 +48,6 @@ namespace Table {
     readonly id: number;
     readonly model: M;
   }
-
-  type RowType = "account" | "subaccount" | "actual";
 
   interface AccountRow extends Row<IGroup<ISimpleAccount>, ISimpleSubAccount> {
     readonly identifier: string | null;
@@ -61,12 +62,21 @@ namespace Table {
     readonly name: string | null;
     readonly description: string | null;
     readonly quantity: number | null;
-    readonly unit: Unit | null;
+    readonly unit: SubAccountUnit | null;
     readonly multiplier: number | null;
     readonly rate: number | null;
     readonly actual: number | null;
     readonly estimated: number | null;
     readonly variance: number | null;
+    readonly fringes: number[];
+  }
+
+  interface FringeRow extends Row<IGroup<any>> {
+    readonly name: string | null;
+    readonly description: string | null;
+    readonly cutoff: number | null;
+    readonly rate: number | null;
+    readonly unit: FringeUnit | null;
   }
 
   interface ActualRow extends Row<IGroup<any>> {

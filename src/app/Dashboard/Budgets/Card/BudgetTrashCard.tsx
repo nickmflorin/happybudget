@@ -1,6 +1,6 @@
 import { RollbackOutlined, DeleteOutlined, DownloadOutlined } from "@ant-design/icons";
 import { useTimezone } from "store/hooks";
-import { toAbbvDisplayDateTime } from "util/dates";
+import { toAbbvDisplayDateTime } from "lib/util/dates";
 
 import Card from "./Card";
 

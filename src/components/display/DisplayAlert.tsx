@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { ClientError, NetworkError } from "api";
-import { toTitleCase } from "util/string";
+import { toTitleCase } from "lib/util/formatters";
 
 import "./DisplayAlert.scss";
 

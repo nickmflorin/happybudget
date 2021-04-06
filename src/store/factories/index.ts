@@ -1,11 +1,12 @@
 import { Reducer } from "redux";
 import { isNil, filter, includes } from "lodash";
-import { mergeWithDefaults } from "util/objects";
+import { mergeOptionsWithDefaults } from "./util";
 
 export * from "./counter";
 export * from "./comments";
 export * from "./list";
 export * from "./detail";
+export * from "./table";
 
 export const createSimplePayloadReducer = <P, A extends Redux.IAction<P> = Redux.IAction<P>>(
   actionType: string,
@@ -13,7 +14,7 @@ export const createSimplePayloadReducer = <P, A extends Redux.IAction<P> = Redux
   options: Partial<ReducerFactory.IOptions<P>> = { referenceEntity: "entity" }
 ): Reducer<P, A> => {
   const reducer: Reducer<P, A> = (state: P = initialState, action: A): P => {
-    if (action.type === actionType && !isNil(action.payload)) {
+    if (action.type === actionType && action.payload !== undefined) {
       return action.payload;
     }
     return state;
@@ -43,10 +44,8 @@ export const createModelListActionReducer = <A extends Redux.IAction<Redux.Model
   actionType: string,
   options: Partial<ReducerFactory.IOptions<Redux.ListStore<number>>> = { initialState: [], referenceEntity: "entity" }
 ): Reducer<Redux.ListStore<number>, A> => {
-  const Options = mergeWithDefaults<ReducerFactory.IOptions<Redux.ListStore<number>>>(options, {
-    referenceEntity: "entity",
-    initialState: []
-  });
+  const Options = mergeOptionsWithDefaults<Redux.ListStore<number>, A>(options, []);
+
   const reducer: Reducer<Redux.ListStore<number>, A> = (
     state: Redux.ListStore<number> = Options.initialState,
     action: A

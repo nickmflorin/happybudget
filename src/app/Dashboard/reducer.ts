@@ -1,11 +1,10 @@
 import { Reducer, combineReducers } from "redux";
 import { includes, filter } from "lodash";
-import { createListResponseReducer, createSimpleBooleanReducer, createModelListActionReducer } from "store/factories";
+import { createListResponseReducer } from "store/factories";
 import { ActionType, ActionDomains } from "./actions";
-import { initialContactsState } from "./initialState";
 
 const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>> = combineReducers({
-  contacts: createListResponseReducer<IContact, Redux.Dashboard.IContactsStore>(
+  contacts: createListResponseReducer<IContact, Redux.IListResponseStore<IContact>>(
     {
       Response: ActionType.Contacts.Response,
       Request: ActionType.Contacts.Request,
@@ -17,20 +16,17 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
       SetPageAndSize: ActionType.Contacts.SetPageAndSize,
       AddToState: ActionType.Contacts.AddToState,
       RemoveFromState: ActionType.Contacts.RemoveFromState,
-      UpdateInState: ActionType.Contacts.UpdateInState
+      UpdateInState: ActionType.Contacts.UpdateInState,
+      Creating: ActionType.Contacts.Creating,
+      Updating: ActionType.Contacts.Updating,
+      Deleting: ActionType.Contacts.Deleting
     },
     {
-      referenceEntity: "contact",
-      initialState: initialContactsState,
-      keyReducers: {
-        submitting: createSimpleBooleanReducer(ActionType.Contacts.Creating),
-        deleting: createModelListActionReducer(ActionType.Contacts.Deleting),
-        updating: createModelListActionReducer(ActionType.Contacts.Updating)
-      }
+      referenceEntity: "contact"
     }
   ),
   budgets: combineReducers({
-    active: createListResponseReducer<IBudget, Redux.Dashboard.IActiveBudgetsListStore, Redux.Dashboard.IAction<any>>(
+    active: createListResponseReducer<IBudget, Redux.IListResponseStore<IBudget>, Redux.Dashboard.IAction<any>>(
       {
         Response: ActionType.Budgets.Response,
         Loading: ActionType.Budgets.Loading,
@@ -41,34 +37,13 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
         SetPageAndSize: ActionType.Budgets.SetPageAndSize,
         AddToState: ActionType.Budgets.AddToState,
         RemoveFromState: ActionType.Budgets.RemoveFromState,
-        UpdateInState: ActionType.Budgets.UpdateInState
+        UpdateInState: ActionType.Budgets.UpdateInState,
+        Deleting: ActionType.Budgets.Deleting
       },
       {
         referenceEntity: "budget",
         excludeActions: (action: Redux.Dashboard.IAction<any>) => {
           return ActionDomains.ACTIVE !== action.domain;
-        },
-        extensions: {
-          [ActionType.Budgets.Deleting]: (
-            payload: { id: number; value: boolean },
-            st: Redux.Dashboard.IActiveBudgetsListStore
-          ) => {
-            if (payload.value === true) {
-              if (includes(st.deleting, payload.id)) {
-                /* eslint-disable no-console */
-                console.warn(`The budget ${payload.id} is already deleting in state.`);
-              } else {
-                return { deleting: [...st.deleting, payload.id] };
-              }
-            } else {
-              if (!includes(st.deleting, payload.id)) {
-                /* eslint-disable no-console */
-                console.warn(`The budget ${payload.id} is already not deleting in state.`);
-              } else {
-                return { deleting: filter(st.deleting, (id: number) => id !== payload.id) };
-              }
-            }
-          }
         }
       }
     ),
@@ -90,7 +65,7 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
         excludeActions: (action: Redux.Dashboard.IAction<any>) => {
           return ActionDomains.TRASH !== action.domain;
         },
-        extensions: {
+        transformers: {
           [ActionType.Budgets.PermanentlyDeleting]: (
             payload: { id: number; value: boolean },
             st: Redux.Dashboard.ITrashBudgetsListStore

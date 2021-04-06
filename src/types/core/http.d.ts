@@ -6,8 +6,8 @@ namespace Http {
   interface IRequestOptions extends AxiosRequestConfig {
     retries?: number;
     headers?: { [key: string]: string };
-    signal?: any;
     redirectOnAuthenticationError?: boolean;
+    cancelToken?: any;
   }
 
   interface IQuery {
@@ -70,6 +70,14 @@ namespace Http {
     readonly fileUrl: string;
   }
 
+  interface IFringePayload extends IPayload {
+    readonly name: string;
+    readonly description?: string | null;
+    readonly cutoff?: number | null;
+    readonly rate: number;
+    readonly unit?: FringeUnit;
+  }
+
   interface IBudgetPayload extends IPayload {
     readonly production_type: ProductionType;
     readonly name: string;
@@ -95,24 +103,8 @@ namespace Http {
     readonly quantity?: number;
     readonly rate?: number;
     readonly multiplier?: number;
-    readonly unit?: Unit;
+    readonly unit?: SubAccountUnit;
     readonly group?: number | null;
-  }
-
-  interface ISubAccountBulkUpdatePayload extends Partial<ISubAccountPayload> {
-    readonly id: number;
-  }
-
-  interface IAccountBulkUpdatePayload extends Partial<IAccount> {
-    readonly id: number;
-  }
-
-  interface IBulkCreateSubAccountsResponse {
-    data: ISubAccount[];
-  }
-
-  interface IBulkCreateAccountsResponse {
-    data: IAccount[];
   }
 
   interface IActualPayload extends IPayload {
@@ -141,5 +133,33 @@ namespace Http {
     readonly country: string;
     readonly phone_number: string;
     readonly email: string;
+  }
+
+  interface ISubAccountBulkUpdatePayload extends Partial<ISubAccountPayload> {
+    readonly id: number;
+  }
+
+  interface IAccountBulkUpdatePayload extends Partial<IAccountPayload> {
+    readonly id: number;
+  }
+
+  interface IActualBulkUpdatePayload extends Partial<IActualPayload> {
+    readonly id: number;
+  }
+
+  interface IFringeBulkUpdatePayload extends Partial<IFringePayload> {
+    readonly id: number;
+  }
+
+  interface IBulkCreateSubAccountsResponse {
+    data: ISubAccount[];
+  }
+
+  interface IBulkCreateFringesResponse {
+    data: IFringe[];
+  }
+
+  interface IBulkCreateAccountsResponse {
+    data: IAccount[];
   }
 }

@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 
 import { ApplicationSpinner } from "components/display";
 import { PrivateRoute } from "components/routes";
-import { componentLoader } from "operational";
+import { componentLoader } from "lib/operational";
 import Logout from "./Logout";
 
 const Dashboard = React.lazy(() => componentLoader(() => import("./Dashboard")));

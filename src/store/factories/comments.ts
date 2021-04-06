@@ -1,12 +1,12 @@
 import { Reducer } from "redux";
 import { isNil, forEach, find, filter, concat } from "lodash";
-import { removeFromArray, replaceInArray } from "util/arrays";
-import { mergeWithDefaults } from "util/objects";
+import { removeFromArray, replaceInArray } from "lib/util";
+import { mergeWithDefaults } from "lib/util";
 import { initialCommentsListResponseState } from "store/initialState";
 
 import { createListResponseReducer } from "./list";
-import { createSimpleBooleanReducer, createModelListActionReducer } from ".";
-import { createObjectReducerFromTransformers } from "./util";
+import { createModelListActionReducer } from ".";
+import { mergeOptionsWithDefaults, createObjectReducerFromTransformers } from "./util";
 
 const getCommentAtPath = (data: IComment[], pt: number[]) => {
   if (pt.length === 0) {
@@ -77,45 +77,25 @@ export const createCommentsListResponseReducer = <
 >(
   /* eslint-disable indent */
   mappings: Partial<ReducerFactory.ICommentsListResponseActionMap>,
-  options: Partial<ReducerFactory.ITransformerReducerOptions<S, A>> = {
-    initialState: initialCommentsListResponseState as S,
-    referenceEntity: "comment"
-  }
+  options: Partial<ReducerFactory.IOptions<S, A>> = {}
 ): Reducer<S, A> => {
-  const Options = mergeWithDefaults<ReducerFactory.ITransformerReducerOptions<S, A>>(options, {
-    referenceEntity: "comment",
-    extensions: {},
-    keyReducers: {},
-    initialState: initialCommentsListResponseState as S,
-    excludeActionsFromExtensions: true
-  });
-
-  const keyActions: {
-    action: string;
-    key: string;
-    factory: (actionType: string) => Reducer<any, Redux.IAction<any>>;
-  }[] = [
-    { action: "Submitting", key: "submitting", factory: createSimpleBooleanReducer },
-    { action: "Editing", key: "editing", factory: createModelListActionReducer },
-    { action: "Replying", key: "replying", factory: createModelListActionReducer },
-    { action: "Deleting", key: "deleting", factory: createModelListActionReducer }
-  ];
-  const keyReducers: { [key: string]: Reducer<any, Redux.IAction<any>> } = {};
-  forEach(
-    keyActions,
-    (action: { action: string; key: string; factory: (actionType: string) => Reducer<any, Redux.IAction<any>> }) => {
-      const actionType: string | undefined =
-        mappings[action.action as keyof ReducerFactory.ICommentsListResponseActionMap];
-      if (!isNil(actionType)) {
-        keyReducers[action.key] = action.factory(actionType);
-      }
-    }
+  const Options = mergeOptionsWithDefaults<S, A>(
+    { referenceEntity: "comment", ...options },
+    initialCommentsListResponseState as S
   );
+
+  let keyReducers = {};
+  if (!isNil(mappings.Replying)) {
+    keyReducers = { ...keyReducers, replying: createModelListActionReducer(mappings.Replying) };
+  }
   const genericListResponseReducer = createListResponseReducer<IComment, S, A>(
     {
       Response: mappings.Response,
       Request: mappings.Request,
-      Loading: mappings.Loading
+      Loading: mappings.Loading,
+      Deleting: mappings.Deleting,
+      Creating: mappings.Creating,
+      Updating: mappings.Updating
     },
     {
       referenceEntity: "comment",
@@ -210,8 +190,12 @@ export const createCommentsListResponseReducer = <
     }
   };
 
-  return createObjectReducerFromTransformers(mappings, transformers, {
-    ...Options,
-    extension: genericListResponseReducer
-  });
+  return createObjectReducerFromTransformers<ReducerFactory.ICommentsListResponseActionMap, S, A>(
+    mappings,
+    transformers,
+    {
+      ...Options,
+      extension: genericListResponseReducer
+    }
+  );
 };

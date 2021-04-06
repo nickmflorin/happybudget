@@ -3,7 +3,8 @@ import { isNil } from "lodash";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
 import { Form, GroupForm } from "components/forms";
-import { createAccountGroup } from "services";
+import { GroupFormValues } from "components/forms/GroupForm";
+import { createAccountGroup } from "api/services";
 
 import Modal from "./Modal";
 
@@ -37,7 +38,7 @@ const CreateAccountGroupModal = ({
       onOk={() => {
         form
           .validateFields()
-          .then(values => {
+          .then((values: GroupFormValues) => {
             setLoading(true);
 
             createAccountGroup(budgetId, {

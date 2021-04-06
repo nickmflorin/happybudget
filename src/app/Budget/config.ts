@@ -1,6 +1,6 @@
-import initialState from "./initialState";
-import rootReducer from "./reducer";
-import rootSaga from "./sagas";
+import initialState from "./store/initialState";
+import rootReducer from "./store/reducer";
+import rootSaga from "./store/sagas";
 
 const Config: Redux.IModuleConfig<Redux.Budget.IStore, Redux.IAction<any>> = {
   rootReducer: rootReducer,

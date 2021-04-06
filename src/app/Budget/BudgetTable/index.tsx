@@ -29,24 +29,30 @@ import {
   SuppressKeyboardEventParams
 } from "ag-grid-community";
 
+import { TABLE_DEBUG } from "config";
 import { RenderWithSpinner, ShowHide } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "hooks";
-import { downloadAsCsvFile } from "util/files";
-import { formatCurrencyWithoutDollarSign, hashString } from "util/string";
+import { hashString } from "lib/util";
+import { downloadAsCsvFile } from "lib/util/files";
+import { mergeClassNames, mergeClassNamesFn } from "lib/tabling/util";
+import { currencyValueFormatter } from "lib/tabling/formatters";
+import { processCell } from "lib/tabling/processor";
 
 import {
   ExpandCell,
   IndexCell,
   ValueCell,
-  UnitCell,
+  SubAccountUnitCell,
   IdentifierCell,
   CalculatedCell,
   PaymentMethodsCell,
-  BudgetItemCell
+  BudgetItemCell,
+  FringeUnitCell,
+  FringesCell
 } from "./cells";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
-import { IncludeErrorsInCell, HideCellForAllFooters } from "./Util";
+import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } from "./Util";
 import "./index.scss";
 
 export * from "./model";
@@ -74,16 +80,19 @@ const BudgetTable = <
   exportFileName,
   getExportValue,
   nonEditableCells,
-  highlightedNonEditableCells,
-  nonHighlightedNonEditableCells,
   groupParams,
   identifierField,
   identifierFieldHeader,
-  identifierFieldParams = {},
+  identifierColumn = {},
+  actionColumn = {},
+  expandColumn = {},
+  indexColumn = {},
   tableFooterIdentifierValue = "Grand Total",
   budgetFooterIdentifierValue = "Budget Total",
   tableTotals,
   budgetTotals,
+  sizeColumnsToFit = true,
+  processors,
   cellClass,
   onSearch,
   onSelectAll,
@@ -96,8 +105,9 @@ const BudgetTable = <
   onRowExpand,
   onBack,
   isCellEditable,
-  highlightNonEditableCell,
-  rowRefreshRequired
+  isCellSelectable,
+  rowRefreshRequired,
+  ...options
 }: BudgetTableProps<R, M, G, P, C>) => {
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -106,7 +116,6 @@ const BudgetTable = <
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
-  const [budgetFooterGridApi, setBudgetFooterGridApi] = useState<GridApi | undefined>(undefined);
   const [budgetFooterColDefs, setBudgetFooterColDefs] = useState<ColDef[]>([]);
   const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
@@ -117,7 +126,11 @@ const BudgetTable = <
       sortable: false,
       filter: false
     },
-    suppressHorizontalScroll: true
+    suppressHorizontalScroll: true,
+    suppressContextMenu: TABLE_DEBUG,
+    suppressCopyRowsToClipboard: isNil(onRowBulkUpdate),
+    suppressClipboardPaste: isNil(onRowBulkUpdate),
+    ...options
   });
   const [tableFooterGridOptions, setTableFooterGridOptions] = useState<GridOptions>({
     alignedGrids: [],
@@ -146,8 +159,9 @@ const BudgetTable = <
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     const api = event.api;
-    api.sizeColumnsToFit();
-
+    if (sizeColumnsToFit === true) {
+      event.api.sizeColumnsToFit();
+    }
     api.ensureIndexVisible(0);
 
     const cols = event.columnApi.getAllColumns();
@@ -166,7 +180,9 @@ const BudgetTable = <
   });
 
   const onTableFooterFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    event.api.sizeColumnsToFit();
+    if (sizeColumnsToFit === true) {
+      event.api.sizeColumnsToFit();
+    }
   });
 
   const onTableFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
@@ -178,7 +194,6 @@ const BudgetTable = <
   });
 
   const onBudgetFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
-    setBudgetFooterGridApi(event.api);
     setBudgetFooterColumnApi(event.columnApi);
   });
 
@@ -214,8 +229,17 @@ const BudgetTable = <
     return () => window.removeEventListener("keydown", keyListener);
   }, []);
 
-  // TODO: It might make more sense to just treat all of the cells corresponding
-  // to the calculatedColumns as non-editable.
+  const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
+    if (includes(["delete", "index", "expand"], colDef.field)) {
+      return false;
+    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
+      return false;
+    } else if (!isNil(isCellSelectable)) {
+      return isCellSelectable(row, colDef);
+    }
+    return true;
+  });
+
   const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
     if (includes(["delete", "index", "expand"], colDef.field)) {
       return false;
@@ -236,47 +260,107 @@ const BudgetTable = <
     return true;
   });
 
-  const _isCellNonEditableHighlight = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
-    if (includes(["delete", "index", "expand"], colDef.field)) {
-      return false;
-    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter === true) {
-      return false;
-    } else if (!_isCellEditable(row, colDef)) {
-      if (!isNil(nonHighlightedNonEditableCells)) {
-        return !includes(nonHighlightedNonEditableCells, colDef.field as keyof R);
-      } else if (!isNil(highlightedNonEditableCells)) {
-        return includes(highlightedNonEditableCells, colDef.field as keyof R);
-      } else if (!isNil(highlightNonEditableCell)) {
-        return highlightNonEditableCell(row, colDef);
-      }
-      return true;
-    }
-    return false;
-  });
-
   const actionCell = useDynamicCallback<ColDef>(
     (col: ColDef): ColDef => {
       return {
+        width: 20,
+        maxWidth: 25,
+        ...col,
+        cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", col.cellClass),
         editable: false,
         headerName: "",
-        width: 25,
-        maxWidth: 30,
-        resizable: false,
-        cellClass: classNames("cell--action", "cell--not-editable"),
-        ...col
+        resizable: false
       };
     }
+  );
+
+  const indexCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef =>
+      actionCell({
+        ...actionColumn,
+        ...indexColumn,
+        field: "index",
+        cellRenderer: "IndexCell",
+        cellRendererParams: {
+          onSelect: onRowSelect,
+          onDeselect: onRowDeselect,
+          onNew: onRowAdd,
+          ...col.cellRendererParams,
+          ...actionColumn.cellRendererParams,
+          ...indexColumn.cellRendererParams
+        },
+        cellClass: classNames(indexColumn.cellClass, actionColumn.cellClass),
+        colSpan: (params: ColSpanParams) => {
+          const row: R = params.data;
+          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
+            if (!isNil(onRowExpand)) {
+              return 2;
+            }
+            return 1;
+          }
+          return 1;
+        }
+      })
+  );
+
+  const identifierCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef => ({
+      field: identifierField,
+      headerName: identifierFieldHeader,
+      cellRenderer: "IdentifierCell",
+      width: 100,
+      ...identifierColumn,
+      colSpan: (params: ColSpanParams) => {
+        const row: R = params.data;
+        if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
+          return bodyColumns.length + 1;
+        } else if (!isNil(identifierColumn.colSpan)) {
+          return identifierColumn.colSpan(params);
+        }
+        return 1;
+      },
+      cellRendererParams: {
+        ...identifierColumn.cellRendererParams,
+        onGroupEdit: !isNil(groupParams) ? groupParams.onEditGroup : undefined
+      }
+    })
+  );
+
+  const expandCell = useDynamicCallback<ColDef>(
+    (col: ColDef): ColDef =>
+      actionCell({
+        ...col,
+        field: "expand",
+        cellRenderer: "ExpandCell",
+        cellRendererParams: { onClick: onRowExpand },
+        cellClass: mergeClassNamesFn(col.cellClass, expandColumn.cellClass, actionColumn.cellClass)
+      })
   );
 
   const calculatedCell = useDynamicCallback<ColDef>(
     (col: ColDef): ColDef => {
       return {
+        width: 100,
+        maxWidth: 100,
+        ...col,
         cellRenderer: "CalculatedCell",
-        minWidth: 100,
-        maxWidth: 125,
         cellStyle: { textAlign: "right" },
-        cellRendererParams: { formatter: formatCurrencyWithoutDollarSign, renderRedIfNegative: true },
-        ...col
+        valueFormatter: currencyValueFormatter,
+        cellRendererParams: {
+          ...col.cellRendererParams,
+          renderRedIfNegative: true
+        },
+        cellClass: (params: CellClassParams) => {
+          const row: R = params.node.data;
+          if (
+            row.meta.isBudgetFooter === false &&
+            row.meta.isGroupFooter === false &&
+            row.meta.isTableFooter === false
+          ) {
+            return mergeClassNames(params, "cell--not-editable-highlight", col.cellClass);
+          }
+          return mergeClassNames(params, col.cellClass);
+        }
       };
     }
   );
@@ -298,19 +382,9 @@ const BudgetTable = <
         editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
         cellClass: (params: CellClassParams) => {
           const row: R = params.node.data;
-          let rootClassNames = undefined;
-          if (!isNil(col.cellClass)) {
-            if (typeof col.cellClass === "string" || Array.isArray(col.cellClass)) {
-              rootClassNames = col.cellClass;
-            } else {
-              rootClassNames = col.cellClass(params);
-            }
-          }
-          // TODO: See if we can move some of these to their specific column
-          // definitions in the map() above.
-          return classNames(col.cellClass, rootClassNames, {
-            "cell--not-editable": !_isCellEditable(row, params.colDef),
-            "cell--not-editable-highlight": _isCellNonEditableHighlight(row, params.colDef)
+          return mergeClassNames(params, cellClass, col.cellClass, {
+            "cell--not-selectable": !_isCellSelectable(row, params.colDef),
+            "cell--not-editable": !_isCellEditable(row, params.colDef)
           });
         }
       };
@@ -329,62 +403,15 @@ const BudgetTable = <
   };
 
   const baseColumns = useMemo((): ColDef[] => {
-    let baseLeftColumns: ColDef[] = [
-      actionCell({
-        field: "index",
-        cellRenderer: "IndexCell",
-        cellRendererParams: { onSelect: onRowSelect, onDeselect: onRowDeselect, onNew: onRowAdd },
-        colSpan: (params: ColSpanParams) => {
-          const row: R = params.data;
-          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
-            if (!isNil(onRowExpand)) {
-              return 2;
-            }
-            return 1;
-          }
-          return 1;
-        }
-      })
-    ];
+    let baseLeftColumns: ColDef[] = [indexCell({})];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
-      baseLeftColumns.push(
-        actionCell({
-          field: "expand",
-          cellRenderer: "ExpandCell",
-          cellRendererParams: { onClick: onRowExpand }
-        })
-      );
+      baseLeftColumns.push(expandCell({}));
     }
-    baseLeftColumns.push({
-      field: identifierField,
-      headerName: identifierFieldHeader,
-      cellRenderer: "IdentifierCell",
-      minWidth: 100,
-      maxWidth: 125,
-      ...identifierFieldParams,
-      colSpan: (params: ColSpanParams) => {
-        const row: R = params.data;
-        if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
-          return bodyColumns.length + 1;
-        } else if (!isNil(identifierFieldParams.colSpan)) {
-          return identifierFieldParams.colSpan(params);
-        }
-        return 1;
-      }
-    });
+    baseLeftColumns.push(identifierCell({}));
     return baseLeftColumns;
-  }, [
-    groupParams,
-    onRowSelect,
-    onRowDeselect,
-    onRowExpand,
-    onRowDelete,
-    identifierField,
-    identifierFieldHeader,
-    identifierFieldParams
-  ]);
+  }, [onRowExpand]);
 
   const createGroupFooter = (group: G): R => {
     const footerObj: { [key: string]: any } = {
@@ -413,33 +440,34 @@ const BudgetTable = <
   };
 
   const tableFooter = useMemo((): R | null => {
-    if (!isNil(tableTotals)) {
-      const footerObj: { [key: string]: any } = {
-        id: hashString("tablefooter"),
-        [identifierField]: tableFooterIdentifierValue,
-        meta: {
-          isPlaceholder: false,
-          isGroupFooter: false,
-          isTableFooter: true,
-          isBudgetFooter: false,
-          selected: false,
-          children: [],
-          errors: []
-        }
-      };
-      forEach(bodyColumns, (col: ColDef) => {
-        if (!isNil(col.field)) {
+    const footerObj: { [key: string]: any } = {
+      id: hashString("tablefooter"),
+      [identifierField]: tableFooterIdentifierValue,
+      meta: {
+        isPlaceholder: false,
+        isGroupFooter: false,
+        isTableFooter: true,
+        isBudgetFooter: false,
+        selected: false,
+        children: [],
+        errors: []
+      }
+    };
+    forEach(bodyColumns, (col: ColDef) => {
+      if (!isNil(col.field)) {
+        footerObj[col.field] = null;
+      }
+    });
+    forEach(calculatedColumns, (col: ColDef) => {
+      if (!isNil(col.field)) {
+        if (!isNil(tableTotals) && !isNil(tableTotals[col.field])) {
+          footerObj[col.field] = tableTotals[col.field];
+        } else {
           footerObj[col.field] = null;
         }
-      });
-      forEach(calculatedColumns, (col: ColDef) => {
-        if (!isNil(col.field) && !isNil(tableTotals[col.field])) {
-          footerObj[col.field] = tableTotals[col.field];
-        }
-      });
-      return footerObj as R;
-    }
-    return null;
+      }
+    });
+    return footerObj as R;
   }, [useDeepEqualMemo(tableTotals), tableFooterIdentifierValue]);
 
   const budgetFooter = useMemo((): R | null => {
@@ -569,12 +597,7 @@ const BudgetTable = <
             };
           }
           return params.nextCellPosition;
-        } else if (
-          includes(
-            [calculatedColumns[0].field, "expand", "select", "delete"],
-            params.nextCellPosition.column.getColId()
-          )
-        ) {
+        } else if (includes(["expand", "select"], params.nextCellPosition.column.getColId())) {
           return params.previousCellPosition;
         } else {
           return params.nextCellPosition;
@@ -585,7 +608,6 @@ const BudgetTable = <
   );
 
   const onCellKeyDown = useDynamicCallback((event: CellKeyDownEvent) => {
-    // const count = event.api.getDisplayedRowCount();
     if (!isNil(event.rowIndex) && !isNil(event.event)) {
       // I do not understand why AGGrid's Event has an underlying Event that is in
       // reality a KeyboardEvent but does not have any of the properties that a KeyboardEvent
@@ -627,20 +649,32 @@ const BudgetTable = <
 
   const getTableChangeFromEvent = (event: CellEditingStoppedEvent | CellValueChangedEvent): Table.RowChange | null => {
     const field = event.column.getColId();
+    const row: R = event.node.data;
     if (!isNil(event.newValue)) {
       if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
+        // NOTE: The old value will have already been processed in the HTTP type case.
+        let newValue = event.newValue;
+        if (!isNil(processors)) {
+          newValue = processCell(
+            processors,
+            { type: "http", field: field as keyof R },
+            event.newValue,
+            row,
+            event.colDef
+          );
+        }
         if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
           const valid = event.colDef.valueSetter({ ...event });
           if (valid === true) {
             return {
               id: event.data.id,
-              data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+              data: { [field]: { oldValue: event.oldValue, newValue } }
             };
           }
         } else {
           return {
             id: event.data.id,
-            data: { [field]: { oldValue: event.oldValue, newValue: event.newValue } }
+            data: { [field]: { oldValue: event.oldValue, newValue } }
           };
         }
       }
@@ -660,18 +694,20 @@ const BudgetTable = <
   });
 
   const onPasteEnd = useDynamicCallback((event: PasteEndEvent) => {
-    if (cellChangeEvents.length === 1) {
-      const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
-      if (!isNil(tableChange)) {
-        onRowUpdate(tableChange);
-      }
-    } else if (cellChangeEvents.length !== 0) {
-      const changes = filter(
-        map(cellChangeEvents, (e: CellValueChangedEvent) => getTableChangeFromEvent(e)),
-        (change: Table.RowChange | null) => change !== null
-      ) as Table.RowChange[];
-      if (changes.length !== 0) {
-        onRowBulkUpdate(changes);
+    if (!isNil(onRowBulkUpdate)) {
+      if (cellChangeEvents.length === 1) {
+        const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
+        if (!isNil(tableChange)) {
+          onRowUpdate(tableChange);
+        }
+      } else if (cellChangeEvents.length !== 0) {
+        const changes = filter(
+          map(cellChangeEvents, (e: CellValueChangedEvent) => getTableChangeFromEvent(e)),
+          (change: Table.RowChange | null) => change !== null
+        ) as Table.RowChange[];
+        if (changes.length !== 0) {
+          onRowBulkUpdate(changes);
+        }
       }
     }
   });
@@ -682,7 +718,7 @@ const BudgetTable = <
     }
   });
 
-  const getRowClass = useDynamicCallback((params: RowClassParams) => {
+  const getRowClass = (params: RowClassParams) => {
     if (params.node.data.meta.isGroupFooter === true) {
       let colorClass = params.node.data.group.color;
       if (colorClass.startsWith("#")) {
@@ -690,7 +726,7 @@ const BudgetTable = <
       }
       return classNames("row--group-footer", `bg-${colorClass}`);
     }
-  });
+  };
 
   const getContextMenuItems = useDynamicCallback((params: GetContextMenuItemsParams): MenuItemDef[] => {
     // This can happen in rare cases where you right click outside of a cell.
@@ -1019,6 +1055,7 @@ const BudgetTable = <
               getContextMenuItems={getContextMenuItems}
               allowContextMenuWithControlKey={true}
               rowData={table}
+              debug={TABLE_DEBUG}
               getRowNodeId={(r: any) => r.id}
               getRowClass={getRowClass}
               immutableData={true}
@@ -1027,7 +1064,6 @@ const BudgetTable = <
               rowHeight={36}
               headerHeight={38}
               enableRangeSelection={true}
-              clipboardDeliminator={","}
               animateRows={true}
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
@@ -1042,11 +1078,13 @@ const BudgetTable = <
                 ExpandCell: ExpandCell,
                 IndexCell: IndexCell,
                 ValueCell: IncludeErrorsInCell<R>(ValueCell),
-                UnitCell: IncludeErrorsInCell<R>(UnitCell),
+                SubAccountUnitCell: IncludeErrorsInCell<R>(SubAccountUnitCell),
+                FringeUnitCell: IncludeErrorsInCell<R>(FringeUnitCell),
                 IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                 CalculatedCell: CalculatedCell,
                 PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
                 BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
+                FringesCell: ShowCellOnlyForRowType<R>("subaccount")(IncludeErrorsInCell<R>(FringesCell)),
                 ...frameworkComponents
               }}
               onCellEditingStopped={onCellEditingStopped}
@@ -1055,32 +1093,26 @@ const BudgetTable = <
               onCellValueChanged={onCellValueChanged}
             />
           </div>
-          <ShowHide show={!isNil(tableTotals)}>
-            <div className={"table-footer-grid"}>
-              <AgGridReact
-                {...tableFooterGridOptions}
-                columnDefs={colDefs}
-                rowData={[tableFooter]}
-                rowHeight={38}
-                rowClass={"row--table-footer"}
-                suppressRowClickSelection={true}
-                onGridReady={onTableFooterGridReady}
-                onFirstDataRendered={onTableFooterFirstDataRendered}
-                headerHeight={0}
-                frameworkComponents={{
-                  IndexCell: IndexCell,
-                  ExpandCell: ExpandCell,
-                  ValueCell: IncludeErrorsInCell<R>(ValueCell),
-                  UnitCell: IncludeErrorsInCell<R>(UnitCell),
-                  IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
-                  CalculatedCell: CalculatedCell,
-                  PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
-                  BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
-                  ...frameworkComponents
-                }}
-              />
-            </div>
-          </ShowHide>
+          <div className={"table-footer-grid"}>
+            <AgGridReact
+              {...tableFooterGridOptions}
+              columnDefs={colDefs}
+              rowData={[tableFooter]}
+              rowHeight={38}
+              rowClass={"row--table-footer"}
+              suppressRowClickSelection={true}
+              onGridReady={onTableFooterGridReady}
+              onFirstDataRendered={onTableFooterFirstDataRendered}
+              headerHeight={0}
+              frameworkComponents={{
+                IndexCell: IndexCell,
+                ValueCell: IncludeErrorsInCell<R>(ValueCell),
+                IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
+                CalculatedCell: CalculatedCell,
+                ...frameworkComponents
+              }}
+            />
+          </div>
           <ShowHide show={!isNil(budgetTotals)}>
             <div className={"budget-footer-grid"}>
               <AgGridReact
@@ -1095,13 +1127,9 @@ const BudgetTable = <
                 rowHeight={28}
                 frameworkComponents={{
                   IndexCell: IndexCell,
-                  ExpandCell: ExpandCell,
                   ValueCell: IncludeErrorsInCell<R>(ValueCell),
-                  UnitCell: IncludeErrorsInCell<R>(UnitCell),
                   IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
                   CalculatedCell: CalculatedCell,
-                  PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
-                  BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
                   ...frameworkComponents
                 }}
               />

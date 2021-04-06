@@ -1,6 +1,5 @@
 import { isNil } from "lodash";
-import { mergeWithDefaults } from "util/objects";
-import { createSimpleReducerFromTransformers } from "./util";
+import { createSimpleReducerFromTransformers, mergeOptionsWithDefaults } from "./util";
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
@@ -17,10 +16,7 @@ export const createCounterReducer = <A extends Redux.IAction<any> = Redux.IActio
   mappings: Partial<ReducerFactory.ICounterActionMap>,
   options: Partial<ReducerFactory.IOptions<number>> = { initialState: 0, referenceEntity: "entity" }
 ) => {
-  const Options = mergeWithDefaults<ReducerFactory.IOptions<number>>(options, {
-    referenceEntity: "entity",
-    initialState: 0
-  });
+  const Options = mergeOptionsWithDefaults<number, A>(options, 0);
 
   const transformers: ReducerFactory.Transformers<ReducerFactory.ICounterActionMap, number, A> = {
     Clear: () => 0,

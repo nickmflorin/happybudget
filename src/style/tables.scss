@@ -253,29 +253,25 @@ $table-border: 1px solid $table-border-color;
       }
       &--not-editable-highlight {
         background-color: #f7fffa !important;
-        border: none !important;
+        &:not(.ag-cell-range-top) {
+          border-top-color: transparent;
+        }
+        &:not(.ag-cell-range-right) {
+          border-right-color: transparent;
+        }
+        &:not(.ag-cell-range-left) {
+          border-left-color: transparent;
+        }
+        &:not(.ag-cell-range-bottom) {
+          border-bottom-color: transparent;
+        }
       }
     }
 
     &.ag-cell-focus {
-      &:not(.cell--not-editable) {
-        border: 2px solid $green !important;
-        &.cell--action {
-          border: unset !important;
-        }
-      }
-      // This has to be it's own redeclaration of the green border because otherwise
-      // AG Grid will border the cell as if it is being selected in a range.
-      &.cell--not-editable-bordered {
-        border: 2px solid $green !important;
-        border-color: $green !important;
-      }
-      &.cell--not-editable {
-        &:not(.cell--not-editable-highlight) {
-          &:not(.cell--not-editable-bordered) {
-            border: unset !important;
-          }
-        }
+      border: 2px solid $green !important;
+      &.cell--not-selectable {
+        border: unset !important;
       }
     }
   }
@@ -302,12 +298,12 @@ $table-border: 1px solid $table-border-color;
       }
     }
     &:first-child {
-      .ag-cell {
+      .ag-cell:not(.ag-cell-focus) {
         border-top: none !important;
       }
     }
     &:last-child {
-      .ag-cell {
+      .ag-cell:not(.ag-cell-focus) {
         border-bottom: none !important;
       }
     }
@@ -375,24 +371,64 @@ $table-border: 1px solid $table-border-color;
           div[role='gridcell'] {
             color: $white !important;
             background-color: #797695 !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-ff7165 {
           div[role='gridcell'] {
             color: $white !important;
             background-color: #ff7165 !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-80cbc4 {
           div[role='gridcell'] {
             color: $white !important;
             background-color: #80cbc4 !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-ce93d8 {
           div[role='gridcell'] {
             color: $white !important;
             background-color: #ce93d8 !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-fed835 {
@@ -404,6 +440,16 @@ $table-border: 1px solid $table-border-color;
           div[role='gridcell'] {
             color: $white !important;
             background-color: #c87987 !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-69f0ae {
@@ -415,30 +461,80 @@ $table-border: 1px solid $table-border-color;
           div[role='gridcell'] {
             color: $white !important;
             background-color: #a1887f !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-81d4fa {
           div[role='gridcell'] {
             color: $white !important;
             background-color: #81d4fa !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-f75776 {
           div[role='gridcell'] {
             color: $white !important;
             background-color: #f75776 !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-66bb6a {
           div[role='gridcell'] {
             color: $white !important;
             background-color: #66bb6a !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-58add6 {
           div[role='gridcell'] {
             color: $white !important;
             background-color: #58add6 !important;
+            .btn--edit-group {
+              svg {
+                color: $white !important;
+              }
+              &:hover {
+                svg {
+                  color: #868686 !important;
+                }
+              }
+            }
           }
         }
         &.bg-EFEFEF {

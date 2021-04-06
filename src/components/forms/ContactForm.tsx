@@ -5,8 +5,8 @@ import { MailOutlined, UserOutlined } from "@ant-design/icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobeAmericas, faPhone, faUserTag } from "@fortawesome/free-solid-svg-icons";
 
-import { ContactRoleModelsList } from "model";
-import { validateEmail } from "util/validate";
+import { ContactRoleModelsList } from "lib/model";
+import { validateEmail } from "lib/util/validate";
 
 import Form from "./Form";
 

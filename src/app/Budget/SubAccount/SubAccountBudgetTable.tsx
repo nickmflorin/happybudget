@@ -1,19 +1,14 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isNil, includes, map } from "lodash";
+import { isNil, map } from "lodash";
 import { createSelector } from "reselect";
-import classNames from "classnames";
 
-import { ColDef, ColSpanParams } from "ag-grid-community";
-
-import { CreateSubAccountGroupModal } from "components/modals";
-import { SubAccountMapping } from "model/tableMappings";
+import { CreateSubAccountGroupModal, EditSubAccountGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { floatValueSetter, integerValueSetter } from "util/table";
 
-import BudgetTable from "../BudgetTable";
-import { selectBudgetId, selectBudgetDetail, selectBudgetDetailLoading } from "../selectors";
+import SubAccountsTable from "../SubAccountsTable";
+import { selectBudgetId } from "../store/selectors";
 import {
   setSubAccountsSearchAction,
   selectSubAccountAction,
@@ -25,8 +20,9 @@ import {
   deleteGroupAction,
   addGroupToStateAction,
   removeSubAccountFromGroupAction,
-  bulkUpdateSubAccountAction
-} from "./actions";
+  bulkUpdateSubAccountAction,
+  updateGroupInStateAction
+} from "../store/actions/subAccount";
 
 const selectGroups = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.subaccounts.groups.data
@@ -61,6 +57,7 @@ interface SubAccountBudgetTableProps {
 
 const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JSX.Element => {
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<IGroup<ISimpleSubAccount> | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -71,51 +68,25 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const subaccountDetail = useSelector(selectSubAccountDetail);
-  const budgetDetail = useSelector(selectBudgetDetail);
   const groups = useSelector(selectGroups);
-  const loadingBudget = useSelector(selectBudgetDetailLoading);
   const ancestors = useSelector(selectAncestors);
   const ancestor = ancestors[ancestors.length - 2];
 
   return (
     <React.Fragment>
-      <BudgetTable<
-        Table.SubAccountRow,
-        ISubAccount,
-        IGroup<ISimpleSubAccount>,
-        Http.ISubAccountPayload,
-        ISimpleSubAccount
-      >
+      <SubAccountsTable
         data={data}
         groups={groups}
         placeholders={placeholders}
-        mapping={SubAccountMapping}
         selected={selected}
-        loadingBudget={loadingBudget}
-        identifierField={"identifier"}
-        identifierFieldHeader={"Line"}
         tableFooterIdentifierValue={
           !isNil(subaccountDetail) && !isNil(subaccountDetail.description)
             ? `${subaccountDetail.description} Total`
             : "Sub Account Total"
         }
-        budgetFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
-        isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
-          if (includes(["unit"], colDef.field)) {
-            return false;
-          } else if (includes(["identifier", "description", "name"], colDef.field)) {
-            return true;
-          } else {
-            return row.meta.children.length === 0;
-          }
-        }}
-        highlightNonEditableCell={(row: Table.SubAccountRow, colDef: ColDef) => {
-          return !includes(["quantity", "multiplier", "rate", "unit"], colDef.field);
-        }}
         search={search}
         onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
-        rowRefreshRequired={(existing: Table.SubAccountRow, row: Table.SubAccountRow) => existing.unit !== row.unit}
         onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
@@ -124,98 +95,18 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateSubAccountAction(changes))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/${ancestor.type}s/${ancestor.id}`)}
-        groupParams={{
-          onDeleteGroup: (group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id)),
-          onRowRemoveFromGroup: (row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id)),
-          onGroupRows: (rows: Table.SubAccountRow[]) =>
-            setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
-        }}
+        onDeleteGroup={(group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id))}
+        onRowRemoveFromGroup={(row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id))}
+        onGroupRows={(rows: Table.SubAccountRow[]) =>
+          setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
+        }
+        onEditGroup={(group: IGroup<ISimpleSubAccount>) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllSubAccountsAction())}
         tableTotals={{
           estimated: !isNil(subaccountDetail) && !isNil(subaccountDetail.estimated) ? subaccountDetail.estimated : 0.0,
           variance: !isNil(subaccountDetail) && !isNil(subaccountDetail.variance) ? subaccountDetail.variance : 0.0,
           actual: !isNil(subaccountDetail) && !isNil(subaccountDetail.actual) ? subaccountDetail.actual : 0.0
         }}
-        budgetTotals={{
-          estimated: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
-          variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
-          actual: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
-        }}
-        bodyColumns={[
-          {
-            field: "description",
-            headerName: "Category Description",
-            flex: 100,
-            colSpan: (params: ColSpanParams) => {
-              const row: Table.SubAccountRow = params.data;
-              if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
-                return row.meta.children.length !== 0 ? 6 : 1;
-              }
-              return 1;
-            }
-          },
-          {
-            field: "name",
-            headerName: "Name",
-            width: 15
-          },
-          {
-            field: "quantity",
-            headerName: "Quantity",
-            width: 10,
-            cellStyle: { textAlign: "right" },
-            valueSetter: integerValueSetter("quantity")
-          },
-          {
-            field: "unit",
-            headerName: "Unit",
-            cellClass: classNames("cell--centered", "cell--not-editable-bordered"),
-            cellRenderer: "UnitCell",
-            width: 20,
-            cellRendererParams: {
-              onChange: (unit: Unit, row: Table.SubAccountRow) =>
-                dispatch(
-                  updateSubAccountAction({
-                    id: row.id,
-                    data: {
-                      unit: {
-                        oldValue: row.unit,
-                        newValue: unit
-                      }
-                    }
-                  })
-                )
-            }
-          },
-          {
-            field: "multiplier",
-            headerName: "X",
-            width: 10,
-            cellStyle: { textAlign: "right" },
-            valueSetter: floatValueSetter("multiplier")
-          },
-          {
-            field: "rate",
-            headerName: "Rate",
-            width: 10,
-            cellStyle: { textAlign: "right" },
-            valueSetter: floatValueSetter("rate")
-          }
-        ]}
-        calculatedColumns={[
-          {
-            field: "estimated",
-            headerName: "Estimated"
-          },
-          {
-            field: "actual",
-            headerName: "Actual"
-          },
-          {
-            field: "variance",
-            headerName: "Variance"
-          }
-        ]}
       />
       {!isNil(groupSubAccounts) && (
         <CreateSubAccountGroupModal
@@ -227,6 +118,17 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
             dispatch(addGroupToStateAction(group));
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
+        />
+      )}
+      {!isNil(groupToEdit) && (
+        <EditSubAccountGroupModal
+          group={groupToEdit}
+          open={true}
+          onCancel={() => setGroupToEdit(undefined)}
+          onSuccess={(group: IGroup<ISimpleSubAccount>) => {
+            setGroupToEdit(undefined);
+            dispatch(updateGroupInStateAction(group));
+          }}
         />
       )}
     </React.Fragment>

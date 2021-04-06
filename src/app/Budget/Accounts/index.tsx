@@ -1,50 +1,28 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isNil } from "lodash";
-import { createSelector } from "reselect";
 
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleShallowEqualSelector } from "store/selectors";
 
-import { setAncestorsAction } from "../actions";
-import { requestAccountsAction, requestGroupsAction } from "./actions";
-import { selectBudgetDetail, selectBudgetDetailLoading } from "../selectors";
+import { setInstanceAction } from "../store/actions";
+import { requestAccountsAction, requestGroupsAction } from "../store/actions/accounts";
 
 import AccountsBudgetTable from "./AccountsBudgetTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
 
 const selectAccountsTableLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.budget.accounts.loading
-);
-const selectLoading = createSelector(
-  selectBudgetDetailLoading,
-  selectAccountsTableLoading,
-  (detailLoading: boolean, tableLoading: boolean) => detailLoading || tableLoading
+  (state: Redux.IApplicationStore) => state.budget.accounts.loading
 );
 
 const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
-  const budgetDetail = useSelector(selectBudgetDetail);
-  const loading = useSelector(selectLoading);
+  const loading = useSelector(selectAccountsTableLoading);
 
   useEffect(() => {
+    dispatch(setInstanceAction(null));
     dispatch(requestAccountsAction());
     dispatch(requestGroupsAction());
   }, []);
-
-  useEffect(() => {
-    if (!isNil(budgetDetail)) {
-      dispatch(
-        setAncestorsAction([
-          {
-            id: budgetDetail.id,
-            identifier: budgetDetail.name,
-            type: "budget"
-          }
-        ])
-      );
-    }
-  }, [budgetDetail]);
 
   return (
     <React.Fragment>

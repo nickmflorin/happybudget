@@ -1,11 +1,11 @@
 @import "style/typography";
 
-.select-ancestor-option {
+.entity-text {
   font-size: 12px;
   .identifier {
     font-family: $noto-sans-jp;
     font-weight: 600;
-    color: #929292;
+    color: #b5b5b5;
   }
   .description {
     font-family: $noto-sans-jp;
@@ -19,6 +19,17 @@
   display: flex;
   height: 36px;
 
+  .slash {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    margin-left: 8px;
+    margin-right: 8px;
+    line-height: 18px;
+    font-family: $noto-sans-jp;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
   .ancestors-bread-crumb-item {
     display: flex;
     cursor: pointer;
@@ -26,11 +37,6 @@
     .select-wrapper {
       padding-top: 3px;
       padding-bottom: 3px;
-
-      .slash {
-        margin-left: 4px;
-        color: $text-primary;
-      }
 
       .select {
         &--ancestor {
@@ -45,40 +51,36 @@
       }
     }
 
-    .text-wrapper {
-      line-height: 19px;
-      font-size: 12px;
+    .budget-text-wrapper {
       padding-top: 9px;
       padding-bottom: 9px;
+      line-height: 18px;
+      color: $green;
+      font-size: 15px;
       font-family: $noto-sans-jp;
-      color: $text-secondary;
       font-weight: 500;
     }
 
-    &:hover {
-      .content-wrapper {
-        color: $text-primary;
-      }
+    .entity-text-wrapper {
+      padding-top: 9px;
+      padding-bottom: 9px;
+      line-height: 18px;
     }
 
-    &.budget-ancestor-bread-crumb-item {
-      .text-wrapper {
-        line-height: 18px;
-        color: $green;
-        font-size: 15px;
-        font-family: $noto-sans-jp;
-        font-weight: 500;
+    &:hover {
+      .budget-text-wrapper {
+        color: $green-darker !important;
+      }
+      .entity-text-wrapper {
+        .entity-text {
+          .identifier {
+            color: darken(#b5b5b5, 20%) !important;
+          }
+          .description {
+            color: darken($text-secondary, 20%) !important;
+          }
+        }
       }
     }
   }
-    .slash {
-      padding-top: 9px;
-      padding-bottom: 9px;
-      margin-left: 8px;
-      margin-right: 8px;
-      line-height: 18px;
-      font-family: $noto-sans-jp;
-      font-weight: 600;
-      color: $text-primary;
-    }
 }

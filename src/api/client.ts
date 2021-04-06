@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse, AxiosRequestConfig } f
 import axiosRetry from "axios-retry";
 import Cookies from "universal-cookie";
 import { isNil } from "lodash";
-import { addQueryParamsToUrl, convertOrderingQueryToString } from "util/urls";
+import { addQueryParamsToUrl, convertOrderingQueryToString } from "lib/util/urls";
 import { ClientError, NetworkError, ServerError, AuthenticationError } from "./errors";
 
 /* eslint-disable no-shadow */
@@ -25,7 +25,7 @@ export enum HttpRequestMethods {
   PATCH = "PATCH"
 }
 
-const instance = axios.create({
+export const instance = axios.create({
   baseURL: process.env.REACT_APP_API_DOMAIN,
   withCredentials: true
 });
@@ -193,7 +193,7 @@ export class ApiClient {
     let response: AxiosResponse<T>;
     try {
       response = await lookup[method](url, payload, {
-        cancelToken: options.signal,
+        cancelToken: options.cancelToken,
         headers: options.headers
       });
       return response.data;
@@ -261,7 +261,7 @@ export class ApiClient {
   ): Promise<AxiosResponse<T>> => {
     url = this._prepare_url(url, {}, HttpRequestMethods.POST);
     return this.instance.post(url, payload, {
-      cancelToken: options.signal,
+      cancelToken: options.cancelToken,
       headers: options.headers
     });
   };

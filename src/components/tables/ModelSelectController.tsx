@@ -7,7 +7,7 @@ import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { ShowHide } from "components/display";
 import { IconButton } from "components/control/buttons";
-import { toTitleCase } from "util/string";
+import { toTitleCase } from "lib/util/formatters";
 
 export interface ModelSelectControllerItemProps<M extends Model> {
   filterSelected?: (data: M) => boolean;

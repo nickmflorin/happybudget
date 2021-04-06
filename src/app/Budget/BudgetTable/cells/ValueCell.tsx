@@ -1,34 +1,31 @@
-import { useState, useEffect } from "react";
-import { isNil, includes } from "lodash";
+import { useMemo, ReactNode } from "react";
+import { isNil } from "lodash";
 
-import { ICellRendererParams, RowNode, ColDef } from "ag-grid-community";
-import LoadableCellWrapper from "./LoadableCellWrapper";
+import Cell, { CellProps } from "./Cell";
 
-interface ValueCellProps extends ICellRendererParams {
-  value: string | number | null;
-  formatter?: (value: string | number) => string | number | null;
-  node: RowNode;
-  colDef: ColDef;
+export interface ValueCellProps<R extends Table.Row<any, any>> extends CellProps<R> {
+  value: any;
 }
 
-const ValueCell = <R extends Table.Row<any, any>>({ value, node, colDef, formatter }: ValueCellProps): JSX.Element => {
-  const [cellValue, setCellValue] = useState<string | number | null>(null);
-  useEffect(() => {
-    if (!isNil(value)) {
-      if (!isNil(formatter)) {
-        setCellValue(formatter(value));
-      } else {
-        setCellValue(value);
-      }
+const ValueCell = <R extends Table.Row<any, any>>({ ...props }: ValueCellProps<R>): JSX.Element => {
+  const cellValue = useMemo((): ReactNode => {
+    if (!isNil(props.colDef.valueFormatter) && typeof props.colDef.valueFormatter === "function") {
+      return props.colDef.valueFormatter({
+        value: props.value,
+        node: props.node,
+        data: props.node.data,
+        colDef: props.colDef,
+        context: props.context,
+        column: props.column,
+        api: props.api,
+        columnApi: props.columnApi
+      });
     } else {
-      setCellValue(value);
+      return props.value;
     }
-  }, [value, formatter]);
+  }, [props.value, props.colDef.valueFormatter]);
 
-  const row: R = node.data;
-  return (
-    <LoadableCellWrapper loading={includes(row.meta.fieldsLoading, colDef.field)}>{cellValue}</LoadableCellWrapper>
-  );
+  return <Cell<R> {...props}>{cellValue}</Cell>;
 };
 
 export default ValueCell;

@@ -1,5 +1,6 @@
-import { ColDef, CellClassParams, RowNode } from "ag-grid-community";
-import Mapping from "model/tableMappings";
+import { ColDef, CellClassParams, RowNode, GridOptions } from "ag-grid-community";
+import Mapping from "lib/tabling/mappings";
+import { CellProcessors } from "lib/tabling/processor";
 
 export interface GetExportValueParams {
   node: RowNode;
@@ -12,6 +13,7 @@ export type ExportValueGetters = { [key: string]: (params: GetExportValueParams)
 export interface GroupProps<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> {
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
+  onEditGroup: (group: G) => void;
   onRowRemoveFromGroup: (row: R) => void;
 }
 
@@ -21,7 +23,7 @@ export interface BudgetTableProps<
   G extends IGroup<any>,
   P extends Http.IPayload = Http.IPayload,
   C extends Model = UnknownModel
-> {
+> extends GridOptions {
   bodyColumns: ColDef[];
   calculatedColumns?: ColDef[];
   mapping: Mapping<R, M, G, P, C>;
@@ -31,9 +33,12 @@ export interface BudgetTableProps<
   selected?: number[];
   identifierField: string;
   identifierFieldHeader: string;
-  identifierFieldParams?: Partial<ColDef>;
-  tableFooterIdentifierValue?: string;
-  budgetFooterIdentifierValue?: string;
+  identifierColumn?: Partial<ColDef>;
+  actionColumn?: Partial<ColDef>;
+  indexColumn?: Partial<ColDef>;
+  expandColumn?: Partial<ColDef>;
+  tableFooterIdentifierValue?: string | null;
+  budgetFooterIdentifierValue?: string | null;
   tableTotals?: { [key: string]: any };
   budgetTotals?: { [key: string]: any };
   search: string;
@@ -43,22 +48,23 @@ export interface BudgetTableProps<
   getExportValue?: ExportValueGetters;
   exportFileName?: string;
   nonEditableCells?: (keyof R)[];
-  highlightedNonEditableCells?: (keyof R)[];
-  nonHighlightedNonEditableCells?: (keyof R)[];
   groupParams?: GroupProps<R, G, C>;
   loading?: boolean;
+  sizeColumnsToFit?: boolean;
+  processors?: CellProcessors<R, G, C>;
   cellClass?: (params: CellClassParams) => string | undefined;
-  highlightNonEditableCell?: (row: R, col: ColDef) => boolean;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
   onSearch: (value: string) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
   onRowUpdate: (payload: Table.RowChange) => void;
-  onRowBulkUpdate: (payload: Table.RowChange[]) => void;
+  onRowBulkUpdate?: (payload: Table.RowChange[]) => void;
   onRowAdd: () => void;
   onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;
   onBack?: () => void;
   onSelectAll: () => void;
   isCellEditable?: (row: R, col: ColDef) => boolean;
+  isCellSelectable?: (row: R, col: ColDef) => boolean;
+  // processCellForClipboard?: (params: ProcessCellForExportParams) => any;
 }

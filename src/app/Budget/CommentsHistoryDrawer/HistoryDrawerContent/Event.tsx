@@ -7,8 +7,8 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { ShowHide } from "components/display";
 import { AccountCircleLink } from "components/control/links";
 import { SegmentedText } from "components/typography";
-import { isFieldAlterationEvent } from "model/typeguards";
-import { toDisplayTimeSince } from "util/dates";
+import { isFieldAlterationEvent } from "lib/model/typeguards";
+import { toDisplayTimeSince } from "lib/util/dates";
 
 import "./Event.scss";
 

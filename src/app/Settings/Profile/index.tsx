@@ -9,7 +9,7 @@ import { UserProfileForm } from "components/forms";
 import { Page } from "components/layout";
 import { updateLoggedInUserAction } from "store/actions";
 import { useLoggedInUser } from "store/hooks";
-import { payloadToFormData } from "util/forms";
+import { payloadToFormData } from "lib/util/forms";
 
 import "./index.scss";
 

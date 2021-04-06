@@ -6,7 +6,7 @@ import { isNil } from "lodash";
 
 import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
 import { ApplicationSpinner } from "components/display";
-import { validateToken } from "services";
+import { validateToken } from "api/services";
 import configureStore from "store";
 
 interface WrapInApplicationStoreProps {

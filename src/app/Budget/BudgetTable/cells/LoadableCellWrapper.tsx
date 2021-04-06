@@ -4,8 +4,6 @@ import classNames from "classnames";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
-import "./LoadableCell.scss";
-
 interface LoadableCellWrapperProps {
   children: ReactNode;
   loading?: boolean;
@@ -15,10 +13,10 @@ const LoadableCellWrapper = ({ children, loading }: LoadableCellWrapperProps): J
   const loadingIcon = <LoadingOutlined spin />;
 
   return (
-    <div className={classNames("loadable-cell", { loading })}>
+    <div className={classNames("loadable-cell-wrapper", { loading })}>
       <span>
         {loading && <Spin className={"loadable-cell-spinner"} indicator={loadingIcon} size={"small"} />}
-        <span className={"text"}>{children}</span>
+        {children}
       </span>
     </div>
   );

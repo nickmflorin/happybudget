@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import { Typography, Form } from "antd";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
-import { register, socialLogin } from "services";
+import { register, socialLogin } from "api/services";
 
 import SignupForm, { ISignupFormValues } from "./SignupForm";
 

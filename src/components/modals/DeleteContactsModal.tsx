@@ -4,7 +4,7 @@ import { isNil, find, map, includes } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faIdCard } from "@fortawesome/free-solid-svg-icons";
 
-import { removeFromArray } from "util/arrays";
+import { removeFromArray } from "lib/util";
 
 import DeleteModelsModal from "./DeleteModelsModal";
 

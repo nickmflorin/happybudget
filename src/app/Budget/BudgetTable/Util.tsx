@@ -97,9 +97,29 @@ export const IncludeErrorsInCell = <R extends Table.Row<any, any>>(func: Func): 
   };
 };
 
+/**
+ * @param func  Wraps a React component for creating a table cell such that the
+ *              cell will only be rendered if the row has the provided type.
+ * @returns    (props: any) => JSX.Element
+ */
+export const ShowCellOnlyForRowType = <R extends Table.Row<any, any>>(rowType: Table.RowType) => (func: Func): Func => {
+  return (ps: ICellRendererParams): JSX.Element => {
+    const row: R = ps.data;
+    if (row.meta.type !== rowType) {
+      return <></>;
+    }
+    const Component = func;
+    return <Component {...ps} />;
+  };
+};
+
 const defaultExport = {
-  IncludeErrorsInCell: IncludeErrorsInCell,
-  HideCellForGroupFooter: HideCellForGroupFooter
+  IncludeErrorsInCell,
+  HideCellForGroupFooter,
+  HideCellForAllFooters,
+  HideCellForBudgetFooter,
+  HideCellForTableFooter,
+  ShowCellOnlyForRowType
 };
 
 export default defaultExport;

@@ -4,15 +4,26 @@ import { FormInstance, FormProps } from "antd/lib/form";
 import { ColorSelect } from "components/control";
 import { Form } from "components/forms";
 
+export interface GroupFormValues {
+  name: string;
+  color: string;
+}
+
 interface GroupFormProps extends FormProps {
-  form: FormInstance<Http.IGroupPayload>;
-  initialValues?: Partial<Http.IGroupPayload>;
+  form: FormInstance<GroupFormValues>;
+  initialValues?: Partial<GroupFormValues>;
   globalError?: string;
 }
 
 const GroupForm = ({ form, initialValues = {}, globalError, ...props }: GroupFormProps): JSX.Element => {
   return (
-    <Form form={form} layout={"vertical"} globalError={globalError} initialValues={initialValues} {...props}>
+    <Form<GroupFormValues>
+      form={form}
+      layout={"vertical"}
+      globalError={globalError}
+      initialValues={initialValues}
+      {...props}
+    >
       <Form.Item
         name={"name"}
         label={"Name"}

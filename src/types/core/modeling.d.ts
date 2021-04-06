@@ -1,23 +1,27 @@
-interface DistinctOptionModel<I extends number, N extends string> {
+interface OptionModel<I extends number, N extends string> {
   id: I;
   name: N;
 }
 
 type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
 type ProductionType = 0 | 1 | 2 | 3 | 4 | 5;
-type ProductionTypeModel = DistinctOptionModel<ProductionType, ProductionTypeName>;
+type ProductionTypeModel = OptionModel<ProductionType, ProductionTypeName>;
 
 type PaymentMethodName = "Check" | "Card" | "Wire";
 type PaymentMethod = 0 | 1 | 2;
-type PaymentMethodModel = DistinctOptionModel<PaymentMethod, PaymentMethodName>;
+type PaymentMethodOptionModel = OptionModel<PaymentMethod, PaymentMethodName>;
+
+type SubAccountUnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
+type SubAccountUnit = 0 | 1 | 2 | 3 | 4 | 5;
+type SubAccountUnitOptionModel = OptionModel<SubAccountUnit, SubAccountUnitName>;
+
+type FringeUnit = 0 | 1;
+type FringeUnitName = "Percent" | "Flat";
+type FringeUnitOptionModel = OptionModel<FringeUnit, FringeUnitName>;
 
 type EntityType = "budget" | "account" | "subaccount";
 type BudgetItemType = "subaccount" | "account";
 type CommentParentType = "budget" | "account" | "subaccount" | "comment";
-
-type UnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
-type Unit = 0 | 1 | 2 | 3 | 4 | 5;
-type UnitModel = DistinctOptionModel<Unit, UnitName>;
 
 type ContactRoleName =
   | "Producer"
@@ -42,9 +46,17 @@ interface UnknownModel extends Model {
   [key: string]: any;
 }
 
+interface IEntity extends Model {
+  readonly id: number;
+  readonly identifier: string | null;
+  readonly type: EntityType;
+  readonly name: string | null;
+  readonly description: string | null;
+}
+
 interface TrackedModel extends Model {
-  readonly created_by: ISimpleUser | null;
-  readonly updated_by: ISimpleUser | null;
+  readonly created_by: number | null;
+  readonly updated_by: number | null;
   readonly created_at: string;
   readonly updated_at: string;
 }
@@ -73,10 +85,19 @@ interface IUser extends INestedUser {
   readonly timezone: string;
 }
 
+interface IFringe extends TrackedModel {
+  readonly name: string;
+  readonly description: string | null;
+  readonly cutoff: number | null;
+  readonly rate: number;
+  readonly unit: FringeUnit;
+  readonly unit_name: FringeUnitName;
+}
+
 interface IBudget extends Model {
   readonly id: number;
   readonly name: string;
-  readonly author: IUser;
+  readonly created_by: number;
   readonly project_number: number;
   readonly production_type: ProductionType;
   readonly production_type_name: ProductionTypeName;
@@ -92,13 +113,6 @@ interface IBudget extends Model {
   readonly estimated: number | null;
   readonly actual: number | null;
   readonly variance: number | null;
-}
-
-interface IAncestor {
-  readonly id: number;
-  readonly identifier: string;
-  readonly type: EntityType;
-  readonly siblings?: IBudgetItem[];
 }
 
 interface ISimpleBudgetItem extends Model {
@@ -126,14 +140,14 @@ interface IGroup<C extends Model> extends TrackedModel {
 interface IAccount extends IBudgetItem, TrackedModel {
   readonly description: string | null;
   readonly access: number[];
-  readonly ancestors: IAncestor[];
+  readonly ancestors: IEntity[];
   readonly estimated: number | null;
   readonly variance: number | null;
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
   readonly type: "account";
   readonly group: number | null;
-  readonly siblings: IBudgetItem[];
+  readonly siblings: IEntity[];
 }
 
 interface ISimpleAccount extends ISimpleBudgetItem {}
@@ -148,19 +162,20 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly quantity: number | null;
   readonly rate: number | null;
   readonly multiplier: number | null;
-  readonly unit: Unit | null;
-  readonly unit_name: UnitName;
+  readonly unit: SubAccountUnit | null;
+  readonly unit_name: SubAccountUnitName;
   readonly account: number;
   readonly object_id: number;
   readonly type: "subaccount";
   readonly parent_type: BudgetItemType;
-  readonly ancestors: IAncestor[];
+  readonly ancestors: IEntity[];
   readonly estimated: number | null;
   readonly variance: number | null;
   readonly actual: number | null;
   readonly subaccounts: ISimpleSubAccount[];
   readonly group: number | null;
-  readonly siblings: IBudgetItem[];
+  readonly siblings: IEntity[];
+  readonly fringes: number[];
 }
 
 interface IActual extends TrackedModel {
