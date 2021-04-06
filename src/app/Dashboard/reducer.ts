@@ -77,7 +77,7 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
           ) => {
             return {
               ...st,
-              permanentlyDeleting: []
+              permanentlyDeleting: PermanentlyDeletingReducer(st.permanentlyDeleting, action)
             };
           },
           [ActionType.Budgets.Restoring]: (
