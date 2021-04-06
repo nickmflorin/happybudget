@@ -37,7 +37,7 @@ const ContactsTable = (): JSX.Element => {
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(requestContactsAction());
+    dispatch(requestContactsAction(null));
   }, []);
 
   useEffect(() => {
@@ -75,7 +75,16 @@ const ContactsTable = (): JSX.Element => {
         dataSource={data}
         loading={contacts.loading}
         rowClassName={(record: Row, index: number) => {
-          if (includes(contacts.deleting, record.key) || includes(contacts.updating, record.key)) {
+          if (
+            includes(
+              map(contacts.deleting, (instance: Redux.ModelListActionInstance) => instance.id),
+              record.key
+            ) ||
+            includes(
+              map(contacts.updating, (instance: Redux.ModelListActionInstance) => instance.id),
+              record.key
+            )
+          ) {
             return "loading";
           }
         }}

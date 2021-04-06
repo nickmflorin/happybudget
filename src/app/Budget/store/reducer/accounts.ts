@@ -1,8 +1,10 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, filter, map, reduce } from "lodash";
-import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
+import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
 import { AccountMapping } from "lib/tabling/mappings";
 import { replaceInArray } from "lib/util";
+import { warnInconsistentState } from "lib/redux/util";
+import { initialListResponseState } from "store/initialState";
 
 import { ActionType } from "../actions";
 import { initialAccountsState } from "../initialState";
@@ -24,10 +26,10 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
     Creating: ActionType.Budget.Accounts.Creating
   },
   {
-    referenceEntity: "account",
+    references: { entity: "account" },
     initialState: initialAccountsState,
     strictSelect: false,
-    keyReducers: {
+    subReducers: {
       placeholders: createTablePlaceholdersReducer(
         {
           AddToState: ActionType.Budget.Accounts.Placeholders.AddToState,
@@ -36,7 +38,7 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           Clear: ActionType.Budget.Accounts.Request
         },
         AccountMapping,
-        { referenceEntity: "account" }
+        { references: { entity: "account" } }
       ),
       groups: createListResponseReducer<IGroup<ISimpleAccount>, Redux.IListResponseStore<IGroup<ISimpleAccount>>>(
         {
@@ -48,31 +50,35 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           Deleting: ActionType.Budget.Accounts.Groups.Deleting
         },
         {
-          referenceEntity: "group",
-          transformers: {
+          references: { entity: "account" },
+          extensions: {
             [ActionType.Budget.Accounts.RemoveFromGroup]: (
-              id: number,
-              st: Redux.IListResponseStore<IGroup<ISimpleAccount>>
+              st: Redux.IListResponseStore<IGroup<ISimpleAccount>> = initialListResponseState,
+              action: Redux.IAction<number>
             ) => {
               const group: IGroup<ISimpleAccount> | undefined = find(st.data, (g: IGroup<ISimpleAccount>) =>
                 includes(
                   map(g.children, (child: ISimpleAccount) => child.id),
-                  id
+                  action.payload
                 )
               );
               if (isNil(group)) {
-                /* eslint-disable no-console */
-                console.error(
-                  `Inconsistent State!:  Inconsistent state noticed when removing account from group...
-                    the account with ID ${id} does not exist in a group in state when it is expected to.`
-                );
-                return {};
+                warnInconsistentState({
+                  action: action.type,
+                  reason: "Instance does not exist in a group state when it is expected to.",
+                  entity: "account"
+                });
+                return st;
               } else {
                 return {
+                  ...st,
                   data: replaceInArray<IGroup<ISimpleAccount>>(
                     st.data,
                     { id: group.id },
-                    { ...group, children: filter(group.children, (child: ISimpleAccount) => child.id !== id) }
+                    {
+                      ...group,
+                      children: filter(group.children, (child: ISimpleAccount) => child.id !== action.payload)
+                    }
                   )
                 };
               }
@@ -86,7 +92,7 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           Request: ActionType.Budget.Accounts.History.Request,
           Loading: ActionType.Budget.Accounts.History.Loading
         },
-        { referenceEntity: "event" }
+        { references: { entity: "account" } }
       )
     }
   }

@@ -31,12 +31,6 @@ const Dashboard = (): JSX.Element => {
           onClick: () => history.push("/budgets"),
           active: location.pathname.startsWith("/budgets")
         },
-        // {
-        //   text: "Trash",
-        //   icon: <FontAwesomeIcon icon={faTrashAlt} />,
-        //   onClick: () => history.push("/trash"),
-        //   active: location.pathname.startsWith("/trash")
-        // },
         {
           text: "Contacts",
           icon: <FontAwesomeIcon icon={faAddressBook} />,

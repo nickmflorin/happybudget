@@ -3,5 +3,4 @@
 /// <reference path="./ui.d.ts" />
 /// <reference path="./table.d.ts" />
 /// <reference path="./files.d.ts" />
-/// <reference path="./mechanics.d.ts" />
 /// <reference path="./modeling.d.ts" />

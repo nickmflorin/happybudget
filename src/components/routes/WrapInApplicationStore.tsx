@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Store } from "redux";
 import { Provider } from "react-redux";
 import { Redirect } from "react-router-dom";
@@ -18,7 +18,9 @@ const WrapInApplicationStore = ({ children }: WrapInApplicationStoreProps): JSX.
   const [redirect, setRedirect] = useState(false);
   const [user, setUser] = useState<IUser | undefined>(undefined);
   const [authenticating, setAuthenticating] = useState(true);
-  const [reduxStore, setReduxStore] = useState<Store | undefined>(undefined);
+  const [reduxStore, setReduxStore] = useState<Store<Redux.IApplicationStore, Redux.IAction<any>> | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     setAuthenticating(true);

@@ -3,7 +3,7 @@ import {
   createDetailResponseReducer,
   createSimplePayloadReducer,
   createCommentsListResponseReducer
-} from "store/factories";
+} from "lib/redux/factories";
 import { ActionType } from "../actions";
 import { createSubAccountsReducer } from "./factories";
 

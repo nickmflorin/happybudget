@@ -20,8 +20,8 @@ const Accounts = (): JSX.Element => {
 
   useEffect(() => {
     dispatch(setInstanceAction(null));
-    dispatch(requestAccountsAction());
-    dispatch(requestGroupsAction());
+    dispatch(requestAccountsAction(null));
+    dispatch(requestGroupsAction(null));
   }, []);
 
   return (

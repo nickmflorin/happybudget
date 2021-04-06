@@ -37,7 +37,7 @@ const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.budget.accounts.deleting,
   (state: Redux.IApplicationStore) => state.budget.accounts.updating,
   (state: Redux.IApplicationStore) => state.budget.accounts.creating,
-  (deleting: number[], updating: number[], creating: boolean) =>
+  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 
@@ -85,7 +85,7 @@ const AccountsBudgetTable = (): JSX.Element => {
           onGroupRows: (rows: Table.AccountRow[]) => setGroupAccounts(map(rows, (row: Table.AccountRow) => row.id)),
           onEditGroup: (group: IGroup<ISimpleAccount>) => setGroupToEdit(group)
         }}
-        onSelectAll={() => dispatch(selectAllAccountsAction())}
+        onSelectAll={() => dispatch(selectAllAccountsAction(null))}
         tableTotals={{
           estimated: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
           variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,

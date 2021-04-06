@@ -22,7 +22,7 @@ namespace Redux {
 
   interface IAction<P = any> extends Action<string> {
     readonly type: string;
-    readonly payload?: P;
+    readonly payload: P;
     readonly error?: Error | string | undefined;
     readonly meta?: any;
     readonly label?: ModuleLabel | ModuleLabel[] | undefined;
@@ -46,6 +46,9 @@ namespace Redux {
   type ListStore<T> = T[];
 
   type ModelListActionPayload = { id: number; value: boolean };
+  type ModelListActionInstance = { id: number; count: number };
+  type ModelListActionStore = ModelListActionInstance[];
+
   interface UpdateModelActionPayload<M> {
     id: number;
     data: Partial<M>;
@@ -66,8 +69,8 @@ namespace Redux {
     readonly search: string;
     readonly selected: number[];
     readonly responseWasReceived: boolean;
-    readonly deleting: ListStore<number>;
-    readonly updating: ListStore<number>;
+    readonly deleting: ModelListActionStore;
+    readonly updating: ModelListActionStore;
     readonly creating: boolean;
   }
 
@@ -89,7 +92,8 @@ namespace Redux {
     }
 
     interface ITrashBudgetsListStore extends IListResponseStore<IBudget> {
-      readonly restoring: number[];
+      readonly restoring: ModelListActionStore;
+      readonly permanentlyDeleting: ModelListActionStore;
     }
 
     interface IBudgetsStore {

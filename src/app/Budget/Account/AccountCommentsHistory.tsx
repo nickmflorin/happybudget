@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { includes } from "lodash";
+import { includes, map } from "lodash";
 
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import CommentsHistoryDrawer from "../CommentsHistoryDrawer";
@@ -11,11 +11,11 @@ import {
   requestHistoryAction
 } from "../store/actions/account";
 
-const selectDeletingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.comments.deleting
+const selectDeletingComments = simpleDeepEqualSelector((state: Redux.IApplicationStore) =>
+  map(state.budget.account.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
-const selectEditingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.comments.updating
+const selectEditingComments = simpleDeepEqualSelector((state: Redux.IApplicationStore) =>
+  map(state.budget.account.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectReplyingComments = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.account.comments.replying
@@ -57,7 +57,7 @@ const AccountCommentsHistory = (): JSX.Element => {
           includes(editingComments, comment.id) ||
           includes(deletingComments, comment.id) ||
           includes(replyingComments, comment.id),
-        onRequest: () => dispatch(requestCommentsAction()),
+        onRequest: () => dispatch(requestCommentsAction(null)),
         onSubmit: (payload: Http.ICommentPayload) => dispatch(createCommentAction({ data: payload })),
         onDoneEditing: (comment: IComment, value: string) =>
           dispatch(updateCommentAction({ id: comment.id, data: { text: value } })),
@@ -69,7 +69,7 @@ const AccountCommentsHistory = (): JSX.Element => {
       historyProps={{
         history,
         loading: loadingHistory,
-        onRequest: () => dispatch(requestHistoryAction())
+        onRequest: () => dispatch(requestHistoryAction(null))
       }}
     />
   );

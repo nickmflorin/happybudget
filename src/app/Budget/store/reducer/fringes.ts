@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { filter } from "lodash";
-import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
+import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
 import { ActualMapping } from "lib/tabling/mappings";
 import { ActionType } from "../actions";
 import { initialFringesState } from "../initialState";
@@ -21,10 +21,10 @@ const listResponseReducer = createListResponseReducer<IFringe, Redux.Budget.IFri
     Creating: ActionType.Budget.Fringes.Creating
   },
   {
-    referenceEntity: "actual",
+    references: { entity: "fringe" },
     strictSelect: false,
     initialState: initialFringesState,
-    keyReducers: {
+    subReducers: {
       placeholders: createTablePlaceholdersReducer(
         {
           AddToState: ActionType.Budget.Fringes.Placeholders.AddToState,
@@ -33,7 +33,7 @@ const listResponseReducer = createListResponseReducer<IFringe, Redux.Budget.IFri
           Clear: ActionType.Budget.Fringes.Placeholders.Clear
         },
         ActualMapping,
-        { referenceEntity: "actual" }
+        { references: { entity: "fringe" } }
       )
     }
   }

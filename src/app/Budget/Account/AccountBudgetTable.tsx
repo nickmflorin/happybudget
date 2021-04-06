@@ -41,7 +41,7 @@ const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.budget.account.subaccounts.deleting,
   (state: Redux.IApplicationStore) => state.budget.account.subaccounts.updating,
   (state: Redux.IApplicationStore) => state.budget.account.subaccounts.creating,
-  (deleting: number[], updating: number[], creating: boolean) =>
+  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 const selectAccountDetail = simpleDeepEqualSelector(
@@ -95,7 +95,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
           setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
         }
         onEditGroup={(group: IGroup<ISimpleSubAccount>) => setGroupToEdit(group)}
-        onSelectAll={() => dispatch(selectAllSubAccountsAction())}
+        onSelectAll={() => dispatch(selectAllSubAccountsAction(null))}
         tableTotals={{
           estimated: !isNil(accountDetail) && !isNil(accountDetail.estimated) ? accountDetail.estimated : 0.0,
           variance: !isNil(accountDetail) && !isNil(accountDetail.variance) ? accountDetail.variance : 0.0,

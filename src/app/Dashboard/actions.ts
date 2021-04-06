@@ -58,7 +58,7 @@ export const simpleDomainAction = <P = any>(type: string) => {
 };
 
 export const requestBudgetsAction = (domain: Redux.Dashboard.ActionDomain): Redux.Dashboard.IAction<null> => {
-  return { ...createAction(ActionType.Budgets.Request), domain };
+  return { ...createAction(ActionType.Budgets.Request, null), domain };
 };
 export const loadingBudgetsAction = simpleDomainAction<boolean>(ActionType.Budgets.Loading);
 export const responseBudgetsAction = simpleDomainAction<Http.IListResponse<IBudget>>(ActionType.Budgets.Response);

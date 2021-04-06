@@ -39,7 +39,7 @@ const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.budget.actuals.deleting,
   (state: Redux.IApplicationStore) => state.budget.actuals.updating,
   (state: Redux.IApplicationStore) => state.budget.actuals.creating,
-  (deleting: number[], updating: number[], creating: boolean) =>
+  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 const selectBudgetItems = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.budgetItems.data);
@@ -57,7 +57,7 @@ const Actuals = (): JSX.Element => {
 
   useEffect(() => {
     dispatch(setInstanceAction(null));
-    dispatch(requestActualsAction());
+    dispatch(requestActualsAction(null));
   }, []);
 
   return (
@@ -98,7 +98,7 @@ const Actuals = (): JSX.Element => {
         onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row.id))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateActualAction(payload))}
         onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetActualsAction(changes))}
-        onSelectAll={() => dispatch(selectAllActualsAction())}
+        onSelectAll={() => dispatch(selectAllActualsAction(null))}
         rowRefreshRequired={(existing: Table.ActualRow, row: Table.ActualRow) => {
           return (
             existing.object_id !== row.object_id ||

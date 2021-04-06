@@ -1,7 +1,10 @@
 import { Reducer, combineReducers } from "redux";
-import { includes, filter } from "lodash";
-import { createListResponseReducer } from "store/factories";
+import { initialListResponseState } from "store/initialState";
+import { createListResponseReducer, createAgnosticModelListActionReducer } from "lib/redux/factories";
 import { ActionType, ActionDomains } from "./actions";
+
+const PermanentlyDeletingReducer = createAgnosticModelListActionReducer({ entity: "budget" });
+const RestoringReducer = createAgnosticModelListActionReducer({ entity: "budget" });
 
 const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>> = combineReducers({
   contacts: createListResponseReducer<IContact, Redux.IListResponseStore<IContact>>(
@@ -21,9 +24,7 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
       Updating: ActionType.Contacts.Updating,
       Deleting: ActionType.Contacts.Deleting
     },
-    {
-      referenceEntity: "contact"
-    }
+    { references: { entity: "contact" } }
   ),
   budgets: combineReducers({
     active: createListResponseReducer<IBudget, Redux.IListResponseStore<IBudget>, Redux.Dashboard.IAction<any>>(
@@ -41,7 +42,7 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
         Deleting: ActionType.Budgets.Deleting
       },
       {
-        referenceEntity: "budget",
+        references: { entity: "budget" },
         excludeActions: (action: Redux.Dashboard.IAction<any>) => {
           return ActionDomains.ACTIVE !== action.domain;
         }
@@ -61,50 +62,36 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
         UpdateInState: ActionType.Budgets.UpdateInState
       },
       {
-        referenceEntity: "budget",
+        references: { entity: "budget" },
         excludeActions: (action: Redux.Dashboard.IAction<any>) => {
           return ActionDomains.TRASH !== action.domain;
         },
-        transformers: {
+        extensions: {
           [ActionType.Budgets.PermanentlyDeleting]: (
-            payload: { id: number; value: boolean },
-            st: Redux.Dashboard.ITrashBudgetsListStore
+            st: Redux.Dashboard.ITrashBudgetsListStore = {
+              ...initialListResponseState,
+              restoring: [],
+              permanentlyDeleting: []
+            },
+            action: Redux.IAction<Redux.ModelListActionPayload>
           ) => {
-            if (payload.value === true) {
-              if (includes(st.deleting, payload.id)) {
-                /* eslint-disable no-console */
-                console.warn(`The budget ${payload.id} is already deleting in state.`);
-              } else {
-                return { deleting: [...st.deleting, payload.id] };
-              }
-            } else {
-              if (!includes(st.deleting, payload.id)) {
-                /* eslint-disable no-console */
-                console.warn(`The budget ${payload.id} is already not deleting in state.`);
-              } else {
-                return { deleting: filter(st.deleting, (id: number) => id !== payload.id) };
-              }
-            }
+            return {
+              ...st,
+              permanentlyDeleting: []
+            };
           },
           [ActionType.Budgets.Restoring]: (
-            payload: { id: number; value: boolean },
-            st: Redux.Dashboard.ITrashBudgetsListStore
+            st: Redux.Dashboard.ITrashBudgetsListStore = {
+              ...initialListResponseState,
+              restoring: [],
+              permanentlyDeleting: []
+            },
+            action: Redux.IAction<Redux.ModelListActionPayload>
           ) => {
-            if (payload.value === true) {
-              if (includes(st.restoring, payload.id)) {
-                /* eslint-disable no-console */
-                console.warn(`The document ${payload.id} is already restoring in state.`);
-              } else {
-                return { restoring: [...st.restoring, payload.id] };
-              }
-            } else {
-              if (!includes(st.restoring, payload.id)) {
-                /* eslint-disable no-console */
-                console.warn(`The budget ${payload.id} is already not restoring in state.`);
-              } else {
-                return { restoring: filter(st.restoring, (id: number) => id !== payload.id) };
-              }
-            }
+            return {
+              ...st,
+              restoring: RestoringReducer(st.restoring, action)
+            };
           }
         }
       }

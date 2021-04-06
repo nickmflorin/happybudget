@@ -105,7 +105,7 @@ export function* deleteAccountTask(id: number): SagaIterator {
     yield put(deletingAccountAction({ id, value: false }));
   }
   if (success === true) {
-    yield put(requestBudgetAction());
+    yield put(requestBudgetAction(null));
   }
 }
 

@@ -7,7 +7,7 @@ export const setBudgetIdAction = simpleAction<number>(ActionType.Budget.SetId);
 export const setInstanceAction = simpleAction<IAccount | ISubAccount | null>(ActionType.SetInstance);
 export const requestBudgetAction = simpleAction<null>(ActionType.Budget.Request);
 export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loading);
-export const responseBudgetAction = simpleAction<IBudget>(ActionType.Budget.Response);
+export const responseBudgetAction = simpleAction<IBudget | undefined>(ActionType.Budget.Response);
 export const setCommentsHistoryDrawerVisibilityAction = simpleAction<boolean>(
   ActionType.SetCommentsHistoryDrawerVisibility
 );

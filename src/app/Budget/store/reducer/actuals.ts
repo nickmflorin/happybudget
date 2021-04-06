@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { filter } from "lodash";
-import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
+import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
 import { ActualMapping } from "lib/tabling/mappings";
 import { ActionType } from "../actions";
 import { initialActualsState } from "../initialState";
@@ -22,10 +22,10 @@ const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IAct
     Creating: ActionType.Actuals.Creating
   },
   {
-    referenceEntity: "actual",
+    references: { entity: "actual" },
     strictSelect: false,
     initialState: initialActualsState,
-    keyReducers: {
+    subReducers: {
       placeholders: createTablePlaceholdersReducer(
         {
           AddToState: ActionType.Actuals.Placeholders.AddToState,
@@ -34,7 +34,7 @@ const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IAct
           Clear: ActionType.Actuals.Request
         },
         ActualMapping,
-        { referenceEntity: "actual" }
+        { references: { entity: "actual" } }
       )
     }
   }

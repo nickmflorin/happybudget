@@ -1,6 +1,25 @@
 import { forEach, isNil } from "lodash";
 import { generateRandomNumericId, getKeyValue } from "lib/util";
 
+export interface MappedField<M extends Model> {
+  field: keyof M;
+  required?: boolean;
+  allowNull?: boolean;
+  allowBlank?: boolean;
+  excludeFromPost?: boolean;
+  http?: boolean;
+  placeholderValue?: any;
+}
+
+export interface MappingConfig<M extends Model, C extends Model = UnknownModel> {
+  readonly fields: MappedField<M>[];
+  readonly childrenGetter?: ((model: M) => C[]) | string | null;
+  readonly groupGetter?: ((model: M) => number | null) | string | null;
+  readonly labelGetter: (model: M) => string;
+  readonly typeLabel: string;
+  readonly rowType: Table.RowType;
+}
+
 class Mapping<
   R extends Table.Row<G, C>,
   M extends Model,

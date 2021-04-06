@@ -93,7 +93,7 @@ export function* getFringesTask(): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    yield put(clearFringesPlaceholdersToStateAction());
+    yield put(clearFringesPlaceholdersToStateAction(null));
     yield put(loadingFringesAction(true));
     try {
       const response = yield call(getFringes, budgetId, { no_pagination: true }, { cancelToken: source.token });

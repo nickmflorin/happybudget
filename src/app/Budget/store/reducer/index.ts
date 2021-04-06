@@ -6,7 +6,7 @@ import {
   createSimpleBooleanReducer,
   createSimplePayloadReducer,
   createCommentsListResponseReducer
-} from "store/factories";
+} from "lib/redux/factories";
 
 import { ActionType } from "../actions";
 import initialState from "../initialState";
@@ -50,18 +50,18 @@ const genericReducer = combineReducers({
       Response: ActionType.BudgetItems.Response,
       Loading: ActionType.BudgetItems.Loading
     },
-    { referenceEntity: "budget item" }
+    { references: { entity: "budget-item" } }
   ),
   budgetItemsTree: createListResponseReducer<IBudgetItemNode>(
     {
       Response: ActionType.BudgetItemsTree.Response,
       Loading: ActionType.BudgetItemsTree.Loading
     },
-    { referenceEntity: "budget item tree node" }
+    { references: { entity: "budget-item-tree-node" } }
   )
 });
 
-const rootReducer: Reducer<Redux.Budget.IStore> = (
+const rootReducer: Reducer<Redux.Budget.IStore, Redux.IAction<any>> = (
   state: Redux.Budget.IStore = initialState,
   action: Redux.IAction<any>
 ): Redux.Budget.IStore => {

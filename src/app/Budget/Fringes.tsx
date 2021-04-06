@@ -36,7 +36,7 @@ const selectSaving = createSelector(
   (state: Redux.IApplicationStore) => state.budget.fringes.deleting,
   (state: Redux.IApplicationStore) => state.budget.fringes.updating,
   (state: Redux.IApplicationStore) => state.budget.fringes.creating,
-  (deleting: number[], updating: number[], creating: boolean) =>
+  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 
@@ -73,7 +73,7 @@ const Fringes = (): JSX.Element => {
         onRowDelete={(row: Table.FringeRow) => dispatch(removeFringeAction(row.id))}
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateFringeAction(payload))}
         onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetFringesAction(changes))}
-        onSelectAll={() => dispatch(selectAllFringesAction())}
+        onSelectAll={() => dispatch(selectAllFringesAction(null))}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         processCellForClipboard={processOptionModelCellForClipboard<Table.FringeRow, FringeUnitOptionModel>(
           "unit",

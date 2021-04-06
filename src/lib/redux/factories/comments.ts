@@ -1,12 +1,12 @@
 import { Reducer } from "redux";
-import { isNil, forEach, find, filter, concat } from "lodash";
+import { isNil, find, filter, concat } from "lodash";
 import { removeFromArray, replaceInArray } from "lib/util";
-import { mergeWithDefaults } from "lib/util";
 import { initialCommentsListResponseState } from "store/initialState";
 
+import { warnInconsistentState } from "../util";
 import { createListResponseReducer } from "./list";
-import { createModelListActionReducer } from ".";
-import { mergeOptionsWithDefaults, createObjectReducerFromTransformers } from "./util";
+import { mergeOptionsWithDefaults, createObjectReducerFromMap } from "./util";
+import { MappedReducers, FactoryOptions, createModelListActionReducer } from ".";
 
 const getCommentAtPath = (data: IComment[], pt: number[]) => {
   if (pt.length === 0) {
@@ -55,6 +55,26 @@ const findPath = (id: number, data: IComment[], current: number[] = []): number[
   }
 };
 
+export type ICommentsListResponseActionMap = {
+  SetSearch: string;
+  Loading: string;
+  Response: string;
+  SetPage: string;
+  SetPageSize: string;
+  SetPageAndSize: string;
+  AddToState: string;
+  RemoveFromState: string;
+  UpdateInState: string;
+  Select: string;
+  SelectAll: string;
+  Deselect: string;
+  Request: string;
+  Deleting: string;
+  Updating: string;
+  Creating: string;
+  Replying: string;
+};
+
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
  * comments list response, where a list response might be the response received
@@ -76,17 +96,17 @@ export const createCommentsListResponseReducer = <
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   /* eslint-disable indent */
-  mappings: Partial<ReducerFactory.ICommentsListResponseActionMap>,
-  options: Partial<ReducerFactory.IOptions<S, A>> = {}
+  mappings: Partial<ICommentsListResponseActionMap>,
+  options: Partial<FactoryOptions<S, A>> = {}
 ): Reducer<S, A> => {
   const Options = mergeOptionsWithDefaults<S, A>(
-    { referenceEntity: "comment", ...options },
+    { ...options, references: { ...options.references, entity: "commment" } },
     initialCommentsListResponseState as S
   );
 
-  let keyReducers = {};
+  let subReducers = {};
   if (!isNil(mappings.Replying)) {
-    keyReducers = { ...keyReducers, replying: createModelListActionReducer(mappings.Replying) };
+    subReducers = { ...subReducers, replying: createModelListActionReducer(mappings.Replying, Options.references) };
   }
   const genericListResponseReducer = createListResponseReducer<IComment, S, A>(
     {
@@ -98,104 +118,106 @@ export const createCommentsListResponseReducer = <
       Updating: mappings.Updating
     },
     {
-      referenceEntity: "comment",
-      keyReducers
+      subReducers,
+      references: Options.references
     }
   );
 
-  const transformers: ReducerFactory.Transformers<ReducerFactory.ICommentsListResponseActionMap, S, A> = {
-    AddToState: (payload: { data: IComment; parent?: number }, st: S) => {
-      if (!isNil(payload.parent)) {
-        const path = findPath(payload.parent, st.data);
+  const reducers: MappedReducers<ICommentsListResponseActionMap, S, A> = {
+    AddToState: (st: S = Options.initialState, action: Redux.IAction<{ data: IComment; parent?: number }>) => {
+      if (!isNil(action.payload.parent)) {
+        const path = findPath(action.payload.parent, st.data);
         if (isNil(path)) {
-          /* eslint-disable no-console */
-          console.error(
-            `Inconsistent State!:  Inconsistent state noticed when adding ${Options.referenceEntity} to state...
-            the ${Options.referenceEntity} parent with ID ${payload.parent} does not exist in state when it is expected to.`
-          );
-          return {};
+          warnInconsistentState({
+            action: action.type,
+            reason: "Parent does not exist in state when it is expected to.",
+            parent: action.payload.parent,
+            ...Options.references
+          });
+          return st;
         } else {
           const parent = getCommentAtPath(st.data, path);
           const newParent = {
             ...parent,
-            comments: [...parent.comments, payload.data]
+            comments: [...parent.comments, action.payload.data]
           };
-          return { data: insertCommentAtPath(st.data, newParent, path) };
+          return { ...st, data: insertCommentAtPath(st.data, newParent, path) };
         }
       } else {
-        const existing = find(st.data, { id: payload.data.id });
+        const existing = find(st.data, { id: action.payload.data.id });
         if (!isNil(existing)) {
-          /* eslint-disable no-console */
-          console.error(
-            `Inconsistent State!:  Inconsistent state noticed when adding ${Options.referenceEntity} to state...
-        the ${Options.referenceEntity} with ID ${payload.data.id} already exists in state when it is not expected to.`
-          );
-          return {};
+          warnInconsistentState({
+            action: action.type,
+            reason: "Entity already exists in state when it is not expected to.",
+            id: action.payload.data.id,
+            ...Options.references
+          });
+          return st;
         } else {
           let pageSize = st.pageSize;
           if (st.data.length + 1 >= st.pageSize) {
             pageSize = st.pageSize + 1;
           }
-          return { data: [...st.data, payload.data], count: st.count + 1, pageSize };
+          return { ...st, data: [...st.data, action.payload.data], count: st.count + 1, pageSize };
         }
       }
     },
-    RemoveFromState: (id: number, st: S) => {
-      const path = findPath(id, st.data);
+    RemoveFromState: (st: S = Options.initialState, action: Redux.IAction<number>) => {
+      const path = findPath(action.payload, st.data);
       if (isNil(path)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when removing ${Options.referenceEntity} from state...
-          the ${Options.referenceEntity} with ID ${id} does not exist in state when it is expected to.`
-        );
-        return {};
+        warnInconsistentState({
+          action: action.type,
+          reason: "Entity does not exist in state when it is expected to.",
+          id: action.payload,
+          ...Options.references
+        });
+        return st;
       } else {
         if (path.length === 1) {
           return {
-            data: filter(st.data, (cmt: IComment) => cmt.id !== id),
+            ...st,
+            data: filter(st.data, (cmt: IComment) => cmt.id !== action.payload),
             count: st.count - 1
           };
         } else {
           const parent = getCommentAtPath(st.data, path.slice(0, -1));
-          const newParent = { ...parent, comments: removeFromArray(parent.comments, "id", id) };
-          return { data: insertCommentAtPath(st.data, newParent, path.slice(0, -1)) };
+          const newParent = { ...parent, comments: removeFromArray(parent.comments, "id", action.payload) };
+          return { ...st, data: insertCommentAtPath(st.data, newParent, path.slice(0, -1)) };
         }
       }
     },
-    UpdateInState: (payload: Redux.UpdateModelActionPayload<IComment>, st: S) => {
-      const path = findPath(payload.id, st.data);
+    UpdateInState: (st: S = Options.initialState, action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>) => {
+      const path = findPath(action.payload.id, st.data);
       if (isNil(path)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when updating ${Options.referenceEntity} in state...
-          the ${Options.referenceEntity} with ID ${payload.id} does not exist in state when it is expected to.`
-        );
-        return {};
+        warnInconsistentState({
+          action: action.type,
+          reason: "Entity does not exist in state when it is expected to.",
+          id: action.payload,
+          ...Options.references
+        });
+        return st;
       } else {
-        const { id: _, ...withoutId } = payload.data;
+        const { id: _, ...withoutId } = action.payload.data;
         const existing = getCommentAtPath(st.data, path);
         if (path.length === 1) {
           return {
-            data: replaceInArray<IComment>(st.data, { id: payload.id }, { ...existing, ...withoutId })
+            ...st,
+            data: replaceInArray<IComment>(st.data, { id: action.payload.id }, { ...existing, ...withoutId })
           };
         } else {
           const parent = getCommentAtPath(st.data, path.slice(0, -1));
           const newParent = {
             ...parent,
-            comments: replaceInArray(parent.comments, { id: payload.id }, { ...existing, ...withoutId })
+            comments: replaceInArray(parent.comments, { id: action.payload.id }, { ...existing, ...withoutId })
           };
-          return { data: insertCommentAtPath(st.data, newParent, path.slice(0, -1)) };
+          return { ...st, data: insertCommentAtPath(st.data, newParent, path.slice(0, -1)) };
         }
       }
     }
   };
 
-  return createObjectReducerFromTransformers<ReducerFactory.ICommentsListResponseActionMap, S, A>(
-    mappings,
-    transformers,
-    {
-      ...Options,
-      extension: genericListResponseReducer
-    }
-  );
+  return createObjectReducerFromMap<ICommentsListResponseActionMap, S, A>(mappings, reducers, {
+    ...Options,
+    extension: genericListResponseReducer
+  });
 };

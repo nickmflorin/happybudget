@@ -25,7 +25,10 @@ const Budgets = (): JSX.Element => {
             <BudgetCard
               key={index}
               budget={budget}
-              loading={includes(budgets.deleting, budget.id)}
+              loading={includes(
+                map(budgets.deleting, (instance: Redux.ModelListActionInstance) => instance.id),
+                budget.id
+              )}
               selected={includes(budgets.selected, budget.id)}
               onSelect={(checked: boolean) => {
                 if (checked === true) {

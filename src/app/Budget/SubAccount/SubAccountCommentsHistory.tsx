@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { includes } from "lodash";
+import { includes, map } from "lodash";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import CommentsHistoryDrawer from "../CommentsHistoryDrawer";
 import {
@@ -10,12 +10,13 @@ import {
   requestSubAccountsHistoryAction
 } from "../store/actions/subAccount";
 
-const selectDeletingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.subaccount.comments.deleting
+const selectDeletingComments = simpleDeepEqualSelector((state: Redux.IApplicationStore) =>
+  map(state.budget.subaccount.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
-const selectEditingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.subaccount.comments.updating
+const selectEditingComments = simpleDeepEqualSelector((state: Redux.IApplicationStore) =>
+  map(state.budget.subaccount.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
+
 const selectReplyingComments = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.comments.replying
 );
@@ -56,7 +57,7 @@ const SubAccountCommentsHistory = (): JSX.Element => {
           includes(deletingComments, comment.id) ||
           includes(editingComments, comment.id) ||
           includes(replyingComments, comment.id),
-        onRequest: () => dispatch(requestCommentsAction()),
+        onRequest: () => dispatch(requestCommentsAction(null)),
         onSubmit: (payload: Http.ICommentPayload) => dispatch(createCommentAction({ data: payload })),
         onDoneEditing: (comment: IComment, value: string) =>
           dispatch(updateCommentAction({ id: comment.id, data: { text: value } })),
@@ -68,7 +69,7 @@ const SubAccountCommentsHistory = (): JSX.Element => {
       historyProps={{
         history: history,
         loading: loadingHistory,
-        onRequest: () => dispatch(requestSubAccountsHistoryAction())
+        onRequest: () => dispatch(requestSubAccountsHistoryAction(null))
       }}
     />
   );

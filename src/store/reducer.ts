@@ -2,7 +2,7 @@ import { Reducer, combineReducers } from "redux";
 import { forEach, isNil, includes, filter } from "lodash";
 import { ApplicationActionTypes } from "./actions";
 import { createInitialUserState, initialLoadingState } from "./initialState";
-import { createSimpleBooleanReducer } from "./factories";
+import { createSimpleBooleanReducer } from "../lib/redux/factories";
 
 /**
  * Wraps each individual module level reducer so that if any action includes

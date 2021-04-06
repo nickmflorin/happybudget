@@ -4,7 +4,7 @@ import ActionType from "./ActionType";
 export const setAccountIdAction = simpleAction<number>(ActionType.Account.SetId);
 export const requestAccountAction = simpleAction<null>(ActionType.Account.Request);
 export const loadingAccountAction = simpleAction<boolean>(ActionType.Account.Loading);
-export const responseAccountAction = simpleAction<IAccount>(ActionType.Account.Response);
+export const responseAccountAction = simpleAction<IAccount | undefined>(ActionType.Account.Response);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const updateAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.Account.UpdateInState);
 export const bulkUpdateAccountAction = simpleAction<Table.RowChange[]>(ActionType.Account.BulkUpdate);

@@ -1,4 +1,6 @@
 import { AnyAction, Reducer } from "redux";
+import { isNil } from "lodash";
+import { toTitleCase } from "lib/util/formatters";
 
 /**
  * Function to sequentially apply a series of simple reducers of form
@@ -15,4 +17,20 @@ export const composeReducers = <A extends AnyAction = AnyAction>(initialState: a
       {}
     );
   return composed;
+};
+
+interface WarningParams {
+  level?: "error" | "warn";
+  [key: string]: any;
+}
+
+export const warnInconsistentState = ({ level = "warn", ...props }: WarningParams): void => {
+  /* eslint-disable no-console */
+  const method = console[level || "warn"];
+
+  let message = "Inconsistent State!";
+  Object.keys(props).forEach((key: string) => {
+    message = message + `\n\t${toTitleCase(key)}: ${props[key]}`;
+  });
+  method(message);
 };

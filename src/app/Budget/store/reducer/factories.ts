@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce } from "lodash";
-import { createListResponseReducer, createTablePlaceholdersReducer } from "store/factories";
+import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
 import { SubAccountMapping } from "lib/tabling/mappings";
 import { fringeValue } from "lib/model/util";
 import { replaceInArray } from "lib/util";
@@ -71,9 +71,9 @@ export const createSubAccountsReducer = (
       Creating: mapping.Creating
     },
     {
-      referenceEntity: "subaccount",
+      references: { entity: "subaccount" },
       strictSelect: false,
-      keyReducers: {
+      subReducers: {
         fringes: fringesRootReducer,
         placeholders: createTablePlaceholdersReducer(
           {
@@ -83,7 +83,7 @@ export const createSubAccountsReducer = (
             Clear: mapping.Request
           },
           SubAccountMapping,
-          { referenceEntity: "subaccount" }
+          { references: { entity: "subaccount" } }
         ),
         groups: createListResponseReducer<
           IGroup<ISimpleSubAccount>,
@@ -99,7 +99,7 @@ export const createSubAccountsReducer = (
             Deleting: mapping.Groups.Deleting
           },
           {
-            referenceEntity: "group"
+            references: { entity: "group" }
           }
         ),
         history: createListResponseReducer<HistoryEvent>(
@@ -108,7 +108,7 @@ export const createSubAccountsReducer = (
             Request: mapping.History.Request,
             Loading: mapping.History.Loading
           },
-          { referenceEntity: "event" }
+          { references: { entity: "event" } }
         )
       }
     }
