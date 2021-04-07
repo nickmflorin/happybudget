@@ -1,3 +1,4 @@
+import React from "react";
 import { Input } from "antd";
 import { FormInstance, FormProps } from "antd/lib/form";
 
@@ -15,7 +16,7 @@ interface GroupFormProps extends FormProps {
   globalError?: string;
 }
 
-const GroupForm = ({ form, initialValues = {}, globalError, ...props }: GroupFormProps): JSX.Element => {
+const GroupForm: React.FC<GroupFormProps> = ({ form, initialValues = {}, globalError, ...props }) => {
   return (
     <Form<GroupFormValues>
       form={form}

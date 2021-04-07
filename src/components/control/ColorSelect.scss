@@ -1,3 +1,44 @@
-.option-label-item > span {
-  margin-right: 6px;
+@import "style/colors";
+
+.color-select {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 100;
+  height: 36px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+
+  .color-select-item {
+    flex: 1 1 24px;
+    margin-bottom: 12px;
+    max-width: 24px;
+    height: 24px;
+    width: 24px;
+    position: relative;
+
+    &:not(:last-child) {
+      margin-right: 12px;
+    }
+
+    .icon-border {
+      border-radius: 100%;
+      border: 2px solid $white;
+      height: 24px;
+      width: 24px;
+      position: absolute;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    svg {
+      height: 24px;
+      width: 24px;
+    }
+
+    &:hover, &.selected {
+      .icon-border {
+        box-shadow: none !important;
+        border: 2px solid #6eb6ff !important;
+      }
+    }
+  }
 }
