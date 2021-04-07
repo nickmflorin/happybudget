@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { isNil, includes, find, filter, map } from "lodash";
 import classNames from "classnames";
 
-import { ColDef, ColSpanParams, ProcessCellForExportParams } from "ag-grid-community";
+import { ColDef, ColSpanParams, ProcessCellForExportParams, ValueSetterParams } from "ag-grid-community";
 
 import { SubAccountUnitModelsList } from "lib/model";
 import { SubAccountMapping } from "lib/tabling/mappings";
@@ -85,9 +85,7 @@ const SubAccountsTable = ({
       tableFooterIdentifierValue={tableFooterIdentifierValue}
       budgetFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
       isCellEditable={(row: Table.SubAccountRow, colDef: ColDef) => {
-        if (includes(["fringes"], colDef.field)) {
-          return false;
-        } else if (includes(["identifier", "description", "name"], colDef.field)) {
+        if (includes(["identifier", "description", "name"], colDef.field)) {
           return true;
         } else {
           return row.meta.children.length === 0;
@@ -221,7 +219,37 @@ const SubAccountsTable = ({
           headerName: "Fringes",
           cellClass: classNames("cell--centered"),
           cellRenderer: "FringesCell",
-          minWidth: 150
+          minWidth: 150,
+          valueSetter: (params: ValueSetterParams): boolean => {
+            // In the case that the value is an Array, the value will have been  provided as an Array
+            // of IDs from the Fringes dropdown.
+            if (Array.isArray(params.newValue)) {
+              params.data.fringes = params.newValue;
+              return true;
+            } else if (typeof params.newValue === "string") {
+              // In the case that the value is a string, it will have been provided from the user
+              // editing the cell manually or via Copy/Paste, because the processCellForClipboard
+              // formats the value as a comma-separated list of names.
+              const names = params.newValue.split(",");
+              const fringeIds: number[] = filter(
+                map(names, (name: string) => {
+                  const fringe: IFringe | undefined = find(
+                    fringes,
+                    (fr: IFringe) => fr.name.toLowerCase() === name.trim().toLowerCase()
+                  );
+                  if (!isNil(fringe)) {
+                    return fringe.id;
+                  }
+                  return null;
+                }),
+                (value: number | null) => value !== null
+              ) as number[];
+              params.data.fringes = fringeIds;
+              return true;
+            } else {
+              return false;
+            }
+          }
         }
       ]}
       calculatedColumns={[
