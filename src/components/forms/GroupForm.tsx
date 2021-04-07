@@ -24,11 +24,7 @@ const GroupForm = ({ form, initialValues = {}, globalError, ...props }: GroupFor
       initialValues={initialValues}
       {...props}
     >
-      <Form.Item
-        name={"name"}
-        label={"Name"}
-        rules={[{ required: true, message: "Please provide a valid name for the group." }]}
-      >
+      <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the group." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>
       <Form.Item
