@@ -5,6 +5,14 @@ form {
   width: 100%;
 }
 
+.label-base {
+  font-size: 13px;
+  line-height: 22px;
+  color: $text-secondary;
+  font-family: $open-sans;
+  font-weight: 400 !important;
+}
+
 .form {
   .form-alert-wrapper {
     margin-top: 15px;
@@ -23,13 +31,15 @@ form {
   }
 }
 
-label,
+label {
+  @extend .label-base;
+}
+
 .ant-form-item-label {
-  font-family: $nunito !important;
-  font-weight: 600 !important;
-  color: $text-primary;
-  font-size: 13px;
-  line-height: 22px;
+  padding-bottom: 2px !important;
+  label {
+    @extend .label-base;
+  }
 }
 
 .ant-form-vertical .ant-form-item:last-child {
