@@ -2,24 +2,40 @@
 @import "style/typography";
 
 .ant-modal-content {
-  border-radius: 6px;
+  border-radius: 10px;
 
   .ant-modal-header {
-    padding: 16px 24px;
-    background: $green !important;
+    padding-top: 36px;
+    padding-bottom: 24px;
+    padding-left: 36px;
+    padding-right: 36px;
+
+    background: $white !important;
     border-bottom: none !important;
-    border-radius: 6px 6px 0 0;
+    border-radius: 10px 10px 0 0;
 
     .ant-modal-title {
-      font-family: $nunito !important;
-      font-weight: 600 !important;
-      color: $white !important;
+      font-family: $open-sans !important;
+      font-weight: 700 !important;
+      color: $text-secondary !important;
     }
   }
 
   .ant-modal-close-x {
     svg {
-      color: $white !important;
+      color: $text-secondary !important;
     }
+  }
+
+  .ant-modal-body {
+    padding: 10px 36px;
+  }
+
+  .ant-modal-footer {
+    border-top: none !important;
+    padding-top: 24px;
+    padding-right: 36px;
+    padding-bottom: 36px;
+    padding-left: 36px;
   }
 }
