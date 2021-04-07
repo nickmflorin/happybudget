@@ -601,8 +601,10 @@ const BudgetTable = <
   const getTableChangeFromEvent = (event: CellEditingStoppedEvent | CellValueChangedEvent): Table.RowChange | null => {
     const field = event.column.getColId();
     const row: R = event.node.data;
-    if (!isNil(event.newValue)) {
-      if (isNil(event.oldValue) || event.oldValue !== event.newValue) {
+    // NOTE: We want to allow the setting of fields to `null` - so we just have to make sure it is
+    // not `undefined`.
+    if (event.newValue !== undefined) {
+      if (event.oldValue === undefined || event.oldValue !== event.newValue) {
         // NOTE: The old value will have already been processed in the HTTP type case.
         let newValue = event.newValue;
         if (!isNil(processors)) {
@@ -614,20 +616,10 @@ const BudgetTable = <
             event.colDef
           );
         }
-        if (!isNil(event.colDef.valueSetter) && typeof event.colDef.valueSetter !== "string") {
-          const valid = event.colDef.valueSetter({ ...event });
-          if (valid === true) {
-            return {
-              id: event.data.id,
-              data: { [field]: { oldValue: event.oldValue, newValue } }
-            };
-          }
-        } else {
-          return {
-            id: event.data.id,
-            data: { [field]: { oldValue: event.oldValue, newValue } }
-          };
-        }
+        return {
+          id: event.data.id,
+          data: { [field]: { oldValue: event.oldValue, newValue } }
+        };
       }
     }
     return null;

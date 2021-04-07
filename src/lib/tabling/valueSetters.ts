@@ -44,6 +44,9 @@ export const optionModelValueSetter = <R extends Table.Row<any, any>, M extends 
       return true;
     }
     return false;
+  } else if (params.newValue === undefined || params.newValue === null) {
+    params.data[field] = null;
+    return true;
   } else {
     const optionModel = find(models, { id: params.newValue });
     if (!isNil(optionModel)) {

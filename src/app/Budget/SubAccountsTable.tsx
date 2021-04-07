@@ -226,6 +226,10 @@ const SubAccountsTable = ({
             if (Array.isArray(params.newValue)) {
               params.data.fringes = params.newValue;
               return true;
+            } else if (params.newValue === undefined) {
+              // In the case that the user clears the cell via a backspace, the value will be undefined.
+              params.data.fringes = [];
+              return true;
             } else if (typeof params.newValue === "string") {
               // In the case that the value is a string, it will have been provided from the user
               // editing the cell manually or via Copy/Paste, because the processCellForClipboard
