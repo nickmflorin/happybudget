@@ -31,7 +31,7 @@ const CreateSubAccountGroupModal = ({
 
   return (
     <Modal
-      title={"Create Group"}
+      title={"Create Sub-Total"}
       visible={open}
       loading={loading}
       onCancel={() => onCancel()}

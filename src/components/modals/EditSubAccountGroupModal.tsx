@@ -22,7 +22,7 @@ const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubA
 
   return (
     <Modal
-      title={"Edit Group"}
+      title={"Edit Sub-Total"}
       visible={open}
       loading={loading}
       onCancel={() => onCancel()}
