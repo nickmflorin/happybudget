@@ -20,7 +20,7 @@ export interface CellProps<R extends Table.Row<any, any>>
     StandardComponentProps {
   onClear?: (row: R, colDef: ColDef) => void;
   showClear?: (row: R, colDef: ColDef) => boolean;
-  hideClear?: (row: R, colDef: ColDef) => boolean;
+  hideClear?: boolean;
   children: ReactNode;
   hide?: boolean;
   show?: boolean;
@@ -45,7 +45,7 @@ const Cell = <R extends Table.Row<any, any>>({
       if (!isNil(showClear)) {
         return showClear(row, colDef);
       } else if (!isNil(hideClear)) {
-        return !hideClear(row, colDef);
+        return !hideClear;
       } else {
         return true;
       }

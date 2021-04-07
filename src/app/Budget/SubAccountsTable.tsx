@@ -221,33 +221,7 @@ const SubAccountsTable = ({
           headerName: "Fringes",
           cellClass: classNames("cell--centered"),
           cellRenderer: "FringesCell",
-          minWidth: 150,
-          cellRendererParams: {
-            onClear: (row: Table.SubAccountRow, colDef: ColDef) => {
-              onRowUpdate({
-                id: row.id,
-                data: {
-                  fringes: {
-                    oldValue: row.fringes,
-                    newValue: []
-                  }
-                }
-              });
-            },
-            hideClear: (row: Table.SubAccountRow, colDef: ColDef) => row.fringes.length === 0,
-            // TODO: Do this with setValue() inside the CellRendere so it can accompany intelligent
-            // copy and pasting.
-            onChange: (ids: number[], row: Table.SubAccountRow) =>
-              onRowUpdate({
-                id: row.id,
-                data: {
-                  fringes: {
-                    oldValue: row.fringes,
-                    newValue: ids
-                  }
-                }
-              })
-          }
+          minWidth: 150
         }
       ]}
       calculatedColumns={[

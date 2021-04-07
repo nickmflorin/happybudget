@@ -731,8 +731,6 @@ const BudgetTable = <
     }
   });
 
-  // TODO: We need a way to preserve the indices of the existing data that was already there!
-  // This is important for placeholders when they are activated and removed!
   useEffect(() => {
     const newTable: R[] = [];
     const getGroupForModel = (model: M): number | null => {

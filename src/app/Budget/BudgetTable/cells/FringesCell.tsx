@@ -6,10 +6,10 @@ import { selectFringes } from "../../store/selectors";
 import Cell, { StandardCellProps } from "./Cell";
 
 interface FringesCellProps extends StandardCellProps<Table.SubAccountRow> {
-  onChange: (ids: number[], row: Table.SubAccountRow) => void;
+  value: number[];
 }
 
-const FringesCell = ({ value, onChange, ...props }: FringesCellProps): JSX.Element => {
+const FringesCell = ({ value, ...props }: FringesCellProps): JSX.Element => {
   // I am not 100% sure that this will properly update the AG Grid component when
   // the fringes in the state change.
   const fringes = useSelector(selectFringes);
@@ -17,7 +17,7 @@ const FringesCell = ({ value, onChange, ...props }: FringesCellProps): JSX.Eleme
   const row: Table.SubAccountRow = props.node.data;
 
   return (
-    <Cell {...props}>
+    <Cell {...props} onClear={() => props.setValue([])} hideClear={value.length === 0}>
       <ModelTagsDropdown<IFringe>
         overlayClassName={"cell-dropdown"}
         value={value}
@@ -25,12 +25,7 @@ const FringesCell = ({ value, onChange, ...props }: FringesCellProps): JSX.Eleme
         labelField={"name"}
         multiple={true}
         selected={row.fringes}
-        onChange={(fs: IFringe[]) =>
-          onChange(
-            map(fs, (f: IFringe) => f.id),
-            props.node.data
-          )
-        }
+        onChange={(fs: IFringe[]) => props.setValue(map(fs, (f: IFringe) => f.id))}
       />
     </Cell>
   );
