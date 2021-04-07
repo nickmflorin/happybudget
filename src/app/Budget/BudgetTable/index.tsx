@@ -92,6 +92,7 @@ const BudgetTable = <
   budgetTotals,
   sizeColumnsToFit = true,
   processors,
+  renderFlag = true,
   cellClass,
   onSearch,
   onSelectAll,
@@ -732,43 +733,54 @@ const BudgetTable = <
   });
 
   useEffect(() => {
-    const newTable: R[] = [];
-    const getGroupForModel = (model: M): number | null => {
-      const group: G | undefined = find(groups, (g: G) =>
-        includes(
-          map(g.children, (child: any) => child.id),
-          model.id
-        )
-      );
-      return !isNil(group) ? group.id : null;
-    };
+    if (renderFlag === true) {
+      const newTable: R[] = [];
+      const getGroupForModel = (model: M): number | null => {
+        const group: G | undefined = find(groups, (g: G) =>
+          includes(
+            map(g.children, (child: any) => child.id),
+            model.id
+          )
+        );
+        return !isNil(group) ? group.id : null;
+      };
 
-    const modelsWithGroup = filter(data, (m: M) => !isNil(getGroupForModel(m)));
-    let modelsWithoutGroup = filter(data, (m: M) => isNil(getGroupForModel(m)));
-    const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
+      const modelsWithGroup = filter(data, (m: M) => !isNil(getGroupForModel(m)));
+      let modelsWithoutGroup = filter(data, (m: M) => isNil(getGroupForModel(m)));
+      const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
 
-    forEach(groupedModels, (models: M[], groupId: string) => {
-      const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
-      if (!isNil(group)) {
-        const footer: R = createGroupFooter(group);
-        newTable.push(...map(models, (m: M) => mapping.modelToRow(m, group, { selected: includes(selected, m.id) })), {
-          ...footer,
-          group,
-          [identifierField]: group.name,
-          meta: { ...footer.meta, isGroupFooter: true }
-        });
-      } else {
-        // In the case that the group no longer exists, that means the group was removed from the
-        // state.  In this case, we want to disassociate the rows with the group.
-        modelsWithoutGroup = [...modelsWithoutGroup, ...models];
-      }
-    });
-    setTable([
-      ...newTable,
-      ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, null, { selected: includes(selected, m.id) })),
-      ...map(placeholders, (r: R) => ({ ...r, meta: { ...r.meta, selected: includes(selected, r.id) } }))
-    ]);
-  }, [useDeepEqualMemo(data), useDeepEqualMemo(placeholders), useDeepEqualMemo(selected), useDeepEqualMemo(groups)]);
+      forEach(groupedModels, (models: M[], groupId: string) => {
+        const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
+        if (!isNil(group)) {
+          const footer: R = createGroupFooter(group);
+          newTable.push(
+            ...map(models, (m: M) => mapping.modelToRow(m, group, { selected: includes(selected, m.id) })),
+            {
+              ...footer,
+              group,
+              [identifierField]: group.name,
+              meta: { ...footer.meta, isGroupFooter: true }
+            }
+          );
+        } else {
+          // In the case that the group no longer exists, that means the group was removed from the
+          // state.  In this case, we want to disassociate the rows with the group.
+          modelsWithoutGroup = [...modelsWithoutGroup, ...models];
+        }
+      });
+      setTable([
+        ...newTable,
+        ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, null, { selected: includes(selected, m.id) })),
+        ...map(placeholders, (r: R) => ({ ...r, meta: { ...r.meta, selected: includes(selected, r.id) } }))
+      ]);
+    }
+  }, [
+    useDeepEqualMemo(data),
+    useDeepEqualMemo(placeholders),
+    useDeepEqualMemo(selected),
+    useDeepEqualMemo(groups),
+    renderFlag
+  ]);
 
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(gridApi)) {
