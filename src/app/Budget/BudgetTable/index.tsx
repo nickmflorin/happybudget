@@ -221,7 +221,6 @@ const BudgetTable = <
   useEffect(() => {
     setGridOptions({
       ...gridOptions,
-      defaultColDef: { ...gridOptions.defaultColDef, suppressKeyboardEvent: suppressNavigation },
       alignedGrids: [tableFooterGridOptions, budgetFooterGridOptions]
     });
     setBudgetFooterGridOptions({ ...budgetFooterGridOptions, alignedGrids: [gridOptions, tableFooterGridOptions] });
@@ -1069,6 +1068,7 @@ const BudgetTable = <
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
               onFirstDataRendered={onFirstDataRendered}
+              suppressKeyboardEvent={suppressNavigation}
               // NOTE: This might not be 100% necessary, because of how efficiently
               // we are managing the state updates to the data that flows into the table.
               // However, for now we will leave.  It is important to note that this will
