@@ -238,10 +238,7 @@ const SubAccountsTable = ({
               const names = params.newValue.split(",");
               const fringeIds: number[] = filter(
                 map(names, (name: string) => {
-                  const fringe: IFringe | undefined = find(
-                    fringes,
-                    (fr: IFringe) => fr.name.toLowerCase() === name.trim().toLowerCase()
-                  );
+                  const fringe: IFringe | undefined = find(fringes, (fr: IFringe) => fr.name === name.trim());
                   if (!isNil(fringe)) {
                     return fringe.id;
                   }
