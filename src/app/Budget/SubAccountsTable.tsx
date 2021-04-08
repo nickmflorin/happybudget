@@ -54,6 +54,7 @@ const SubAccountsTable = ({
   onRowAdd,
   onRowDelete,
   onRowExpand,
+  onBack,
   onSelectAll,
   onSearch,
   onGroupRows,
@@ -105,6 +106,7 @@ const SubAccountsTable = ({
       onRowUpdate={onRowUpdate}
       onRowBulkUpdate={onRowBulkUpdate}
       onRowExpand={onRowExpand}
+      onBack={onBack}
       groupParams={{
         onDeleteGroup,
         onRowRemoveFromGroup,

@@ -165,12 +165,13 @@ const BudgetTable = <
     api.ensureIndexVisible(0);
 
     const cols = event.columnApi.getAllColumns();
-    if (cols) {
-      let identifierCol: Column = cols[2];
-      api.setFocusedCell(0, identifierCol);
-
-      const selectedRow = api.getDisplayedRowAtIndex(0);
-      selectedRow?.setSelected(true);
+    if (!isNil(cols)) {
+      const identifierCol: Column | undefined = find(cols, obj => obj.getColId() === "identifier");
+      if (!isNil(identifierCol)) {
+        api.setFocusedCell(0, identifierCol);
+        const selectedRow = api.getDisplayedRowAtIndex(0);
+        selectedRow?.setSelected(true);
+      }
     }
   });
 
