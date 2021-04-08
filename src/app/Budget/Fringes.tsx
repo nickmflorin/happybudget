@@ -99,7 +99,9 @@ const Fringes = (): JSX.Element => {
             cellClass: classNames("cell--centered"),
             cellRenderer: "FringeUnitCell",
             width: 50,
-            valueSetter: optionModelValueSetter<Table.FringeRow, FringeUnitOptionModel>("unit", FringeUnitModelsList)
+            valueSetter: optionModelValueSetter<Table.FringeRow, FringeUnitOptionModel>("unit", FringeUnitModelsList, {
+              allowNull: false
+            })
           },
           {
             field: "cutoff",

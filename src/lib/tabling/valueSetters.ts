@@ -32,9 +32,14 @@ export const integerValueSetter = <R extends Table.Row<any, any>>(field: keyof R
   return false;
 };
 
+interface OptionModelValueSetterOptions {
+  allowNull?: boolean;
+}
+
 export const optionModelValueSetter = <R extends Table.Row<any, any>, M extends OptionModel<number, string>>(
   field: keyof R,
-  models: M[]
+  models: M[],
+  options?: OptionModelValueSetterOptions
 ) => (params: ValueSetterParams): boolean => {
   /* eslint-disable indent */
   if (typeof params.newValue === "string") {
@@ -45,8 +50,11 @@ export const optionModelValueSetter = <R extends Table.Row<any, any>, M extends 
     }
     return false;
   } else if (params.newValue === undefined || params.newValue === null) {
-    params.data[field] = null;
-    return true;
+    if (!isNil(options) && options.allowNull === true) {
+      params.data[field] = null;
+      return true;
+    }
+    return false;
   } else {
     const optionModel = find(models, { id: params.newValue });
     if (!isNil(optionModel)) {

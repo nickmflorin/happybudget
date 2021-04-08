@@ -10,6 +10,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { PaymentMethodModelsList } from "lib/model";
 import { ActualMapping } from "lib/tabling/mappings";
 import { processOptionModelCellForClipboard } from "lib/tabling/processor";
+import { optionModelValueSetter } from "lib/tabling/valueSetters";
 
 import { setInstanceAction } from "./store/actions";
 import {
@@ -88,7 +89,7 @@ const Actuals = (): JSX.Element => {
           }
         }}
         indexColumn={{ width: 40, maxWidth: 50 }}
-        nonEditableCells={["object_id", "payment_method"]}
+        nonEditableCells={["object_id"]}
         search={search}
         onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
         saving={saving}
@@ -145,17 +146,14 @@ const Actuals = (): JSX.Element => {
           {
             field: "payment_method",
             headerName: "Payment Method",
-            cellRenderer: "PaymentMethodsCell",
             cellClass: "cell--centered",
-            cellRendererParams: {
-              onChange: (paymentMethod: PaymentMethod, row: Table.ActualRow) =>
-                dispatch(
-                  updateActualAction({
-                    id: row.id,
-                    data: { payment_method: { newValue: paymentMethod, oldValue: row.payment_method } }
-                  })
-                )
-            }
+            cellRenderer: "PaymentMethodsCell",
+            width: 100,
+            valueSetter: optionModelValueSetter<Table.ActualRow, PaymentMethodOptionModel>(
+              "payment_method",
+              PaymentMethodModelsList,
+              { allowNull: true }
+            )
           },
           {
             field: "payment_id",

@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { usePortal } from "hooks";
+import { usePortal } from "lib/hooks";
 import { isNil } from "lodash";
 
 interface PortalProps {

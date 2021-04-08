@@ -76,7 +76,7 @@ namespace Table {
     readonly description: string | null;
     readonly cutoff: number | null;
     readonly rate: number | null;
-    readonly unit: FringeUnit | null;
+    readonly unit: FringeUnit;
   }
 
   interface ActualRow extends Row<IGroup<any>> {

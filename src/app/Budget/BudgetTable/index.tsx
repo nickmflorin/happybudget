@@ -30,7 +30,7 @@ import {
 
 import { TABLE_DEBUG } from "config";
 import { RenderWithSpinner, ShowHide } from "components/display";
-import { useDynamicCallback, useDeepEqualMemo } from "hooks";
+import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { mergeClassNames, mergeClassNamesFn } from "lib/tabling/util";

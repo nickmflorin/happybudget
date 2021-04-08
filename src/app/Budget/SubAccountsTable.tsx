@@ -191,12 +191,13 @@ const SubAccountsTable = ({
         {
           field: "unit",
           headerName: "Unit",
-          cellClass: classNames("cell--centered"),
+          cellClass: "cell--centered",
           cellRenderer: "SubAccountUnitCell",
           width: 100,
           valueSetter: optionModelValueSetter<Table.SubAccountRow, SubAccountUnitOptionModel>(
             "unit",
-            SubAccountUnitModelsList
+            SubAccountUnitModelsList,
+            { allowNull: true }
           )
         },
         {
