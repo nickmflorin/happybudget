@@ -874,15 +874,18 @@ const BudgetTable = <
   }, [useDeepEqualMemo(table)]);
 
   useEffect(() => {
+    const cols = concat(
+      baseColumns,
+      map(bodyColumns, (def: ColDef) => bodyCell(def)),
+      map(calculatedColumns, (def: ColDef) => calculatedCell(def))
+    );
     setColDefs(
-      map(
-        concat(
-          baseColumns,
-          map(bodyColumns, (def: ColDef) => bodyCell(def)),
-          map(calculatedColumns, (def: ColDef) => calculatedCell(def))
-        ),
-        (col: ColDef) => universalCell(col)
-      )
+      map(cols, (col: ColDef, index: number) => {
+        if (index === cols.length - 1) {
+          return universalCell({ ...col, resizable: false });
+        }
+        return universalCell(col);
+      })
     );
   }, [useDeepEqualMemo(bodyColumns), useDeepEqualMemo(calculatedColumns)]);
 

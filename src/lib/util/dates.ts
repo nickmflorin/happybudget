@@ -1,16 +1,18 @@
 import moment from "moment-timezone";
 import { Moment } from "moment";
 import { isNil } from "lodash";
+import { mergeWithDefaults } from "lib/util";
 
 import {
-  MOMENT_DATETIME_FORMAT,
-  MOMENT_DATE_FORMAT,
-  MOMENT_URL_DATETIME_FORMAT,
-  MOMENT_URL_DATE_FORMAT,
+  MOMENT_API_DATETIME_FORMAT,
+  MOMENT_API_DATE_FORMAT,
   DATETIME_DISPLAY_FORMAT,
   DATE_DISPLAY_FORMAT,
   TIME_DISPLAY_FORMAT,
-  DATETIME_ABBV_DISPLAY_FORMAT
+  DATETIME_ABBV_DISPLAY_FORMAT,
+  MOMENT_DATETIME_FORMAT,
+  MOMENT_DATE_FORMAT,
+  DEFAULT_TZ
 } from "config";
 
 export const nowAsString = (): string => {
@@ -18,65 +20,70 @@ export const nowAsString = (): string => {
   return mmt.format(MOMENT_DATETIME_FORMAT);
 };
 
-export const momentToDateTimeUrlString = (mmt: Moment): string => {
-  if (!mmt.isValid()) {
-    throw new Error("Cannot convert invalid moment to string.");
-  }
-  return mmt.format(MOMENT_URL_DATETIME_FORMAT);
-};
-
-export const momentToDateUrlString = (mmt: Moment): string => {
-  if (!mmt.isValid()) {
-    throw new Error("Cannot convert invalid moment to string.");
-  }
-  return mmt.format(MOMENT_URL_DATE_FORMAT);
-};
-
-export const momentToDateString = (mmt: Moment): string => {
-  if (!mmt.isValid()) {
-    throw new Error("Cannot convert invalid moment to string.");
-  }
-  return mmt.format(MOMENT_DATE_FORMAT);
-};
-
-export const momentToDateTimeString = (mmt: Moment): string => {
-  if (!mmt.isValid()) {
-    throw new Error("Cannot convert invalid moment to string.");
-  }
-  return mmt.format(MOMENT_DATETIME_FORMAT);
-};
-
 interface IDateOptions {
-  strict?: boolean;
-  defaultTz?: string;
-  onError?: string;
-  tz?: string | undefined;
+  strict: boolean;
+  onError: string | null;
+  tz: string;
 }
 
-export const toLocalizedMoment = (
-  value: string | Moment,
-  options: IDateOptions = { tz: undefined, strict: false, defaultTz: "America/Toronto" }
-): Moment | undefined => {
+export const toMoment = (value: string | Moment, options?: Partial<IDateOptions>): Moment | undefined => {
+  const Options = mergeWithDefaults<IDateOptions>(options || {}, {
+    strict: false,
+    tz: DEFAULT_TZ,
+    onError: null
+  });
   if (typeof value === "string") {
-    value = moment(moment.utc(value).toDate()) as Moment;
+    value = moment(moment(value).toDate()) as Moment;
     if (!value.isValid()) {
-      if (options.strict === true) {
+      if (Options.strict === true) {
         throw new Error(`Value ${value} could not be converted to a valid date/time.`);
       } else {
         return undefined;
       }
     }
   }
-  let timezone = options.tz;
-  if (isNil(timezone)) {
-    timezone = options.defaultTz;
-  }
-  if (isNil(timezone)) {
-    throw new Error("Cannot determine the timezone.");
-  }
-  return value.tz(timezone);
+  return value;
 };
 
+export const toLocalizedMoment = (value: string | Moment, options?: Partial<IDateOptions>): Moment | undefined => {
+  const Options = mergeWithDefaults<IDateOptions>(options || {}, {
+    strict: false,
+    tz: DEFAULT_TZ,
+    onError: null
+  });
+  if (typeof value === "string") {
+    value = moment(moment(value).toDate()) as Moment;
+    if (!value.isValid()) {
+      if (Options.strict === true) {
+        throw new Error(`Value ${value} could not be converted to a valid date/time.`);
+      } else {
+        return undefined;
+      }
+    }
+  }
+  return value.tz(Options.tz);
+};
+
+const Converter = (formatter: string) => (value: string | Moment, options?: Partial<IDateOptions>) => {
+  const Options = mergeWithDefaults<IDateOptions>(options || {}, {
+    strict: false,
+    tz: DEFAULT_TZ,
+    onError: null
+  });
+  const mmt = toLocalizedMoment(value, Options);
+  if (isNil(mmt)) {
+    if (!isNil(Options.onError)) {
+      return Options.onError;
+    }
+    return undefined;
+  }
+  return mmt.format(formatter);
+};
+
+export const toDate = Converter(MOMENT_DATE_FORMAT);
+export const toDateTime = Converter(MOMENT_DATETIME_FORMAT);
+export const toApiDate = Converter(MOMENT_API_DATE_FORMAT);
+export const toApiDateTime = Converter(MOMENT_API_DATETIME_FORMAT);
 /**
  * Converts a provided string or Moment instance to a standardized
  * string representation of the date and time used for display in the UI.
@@ -84,20 +91,7 @@ export const toLocalizedMoment = (
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a datetime display format.
  */
-export const toDisplayDateTime = (
-  value: string | Moment,
-  options: IDateOptions = { tz: undefined, strict: false, defaultTz: "America/Toronto", onError: "" }
-): string => {
-  const mmt = toLocalizedMoment(value, options);
-  if (isNil(mmt)) {
-    if (!isNil(options.onError)) {
-      return options.onError;
-    }
-    return "";
-  }
-  return mmt.format(DATETIME_DISPLAY_FORMAT);
-};
-
+export const toDisplayDateTime = Converter(DATETIME_DISPLAY_FORMAT);
 /**
  * Converts a provided string or Moment instance to a standardized
  * abbreviated string representation of the date and time used for display in
@@ -106,19 +100,7 @@ export const toDisplayDateTime = (
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a datetime display format.
  */
-export const toAbbvDisplayDateTime = (
-  value: string | Moment,
-  options: IDateOptions = { tz: undefined, strict: false, defaultTz: "America/Toronto", onError: "" }
-): string => {
-  const mmt = toLocalizedMoment(value, options);
-  if (isNil(mmt)) {
-    if (!isNil(options.onError)) {
-      return options.onError;
-    }
-    return "";
-  }
-  return mmt.format(DATETIME_ABBV_DISPLAY_FORMAT);
-};
+export const toAbbvDisplayDateTime = Converter(DATETIME_ABBV_DISPLAY_FORMAT);
 
 /**
  * Converts a provided string or Moment instance to a standardized
@@ -127,20 +109,7 @@ export const toAbbvDisplayDateTime = (
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a date display format.
  */
-export const toDisplayDate = (
-  value: string | Moment,
-  options: IDateOptions = { tz: undefined, strict: false, defaultTz: "America/Toronto", onError: "" }
-): string | undefined => {
-  const mmt = toLocalizedMoment(value, options);
-  if (isNil(mmt)) {
-    if (!isNil(options.onError)) {
-      return options.onError;
-    }
-    return "";
-  }
-  return mmt.format(DATE_DISPLAY_FORMAT);
-};
-
+export const toDisplayDate = Converter(DATE_DISPLAY_FORMAT);
 /**
  * Converts a provided string or Moment instance to a standardized
  * string representation of the time used for display in the UI.
@@ -148,25 +117,15 @@ export const toDisplayDate = (
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a time display format.
  */
-export const toDisplayTime = (
-  value: string | Moment,
-  options: IDateOptions = { tz: undefined, strict: false, defaultTz: "America/Toronto", onError: "" }
-): string | undefined => {
-  const mmt = toLocalizedMoment(value, options);
-  if (isNil(mmt)) {
-    if (!isNil(options.onError)) {
-      return options.onError;
-    }
-    return undefined;
-  }
-  return mmt.format(TIME_DISPLAY_FORMAT);
-};
+export const toDisplayTime = Converter(TIME_DISPLAY_FORMAT);
 
-export const toDisplayTimeSince = (
-  value: string | Moment,
-  options: IDateOptions = { tz: undefined, strict: false, defaultTz: "America/Toronto", onError: "" }
-): string => {
-  const mmt = toLocalizedMoment(value, options);
+export const toDisplayTimeSince = (value: string | Moment, options?: Partial<IDateOptions>): string => {
+  const Options = mergeWithDefaults<IDateOptions>(options || {}, {
+    strict: false,
+    tz: DEFAULT_TZ,
+    onError: null
+  });
+  const mmt = toLocalizedMoment(value, Options);
   const now = moment();
 
   const duration = moment.duration(now.diff(mmt));

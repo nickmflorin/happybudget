@@ -8,9 +8,10 @@ import { CellClassParams } from "ag-grid-community";
 import { WrapInApplicationSpinner } from "components/display";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { PaymentMethodModelsList } from "lib/model";
+import { currencyValueFormatter, dateValueFormatter } from "lib/tabling/formatters";
 import { ActualMapping } from "lib/tabling/mappings";
 import { processOptionModelCellForClipboard } from "lib/tabling/processor";
-import { optionModelValueSetter } from "lib/tabling/valueSetters";
+import { optionModelValueSetter, floatValueSetter, dateTimeValueSetter } from "lib/tabling/valueSetters";
 
 import { setInstanceAction } from "./store/actions";
 import {
@@ -71,7 +72,7 @@ const Actuals = (): JSX.Element => {
         identifierField={"object_id"}
         identifierFieldHeader={"Account"}
         identifierColumn={{
-          width: 200,
+          minWidth: 200,
           cellClass: "borderless",
           cellRenderer: "BudgetItemCell",
           cellRendererParams: {
@@ -128,27 +129,33 @@ const Actuals = (): JSX.Element => {
         bodyColumns={[
           {
             field: "description",
-            headerName: "Description"
+            headerName: "Description",
+            flex: 100
           },
           {
             field: "vendor",
-            headerName: "Vendor"
+            headerName: "Vendor",
+            flex: 1
           },
           {
             field: "purchase_order",
-            headerName: "Purchase Order"
+            headerName: "Purchase Order",
+            flex: 1
           },
           {
             field: "date",
             headerName: "Date",
-            cellStyle: { textAlign: "right" }
+            cellStyle: { textAlign: "right" },
+            flex: 1,
+            valueFormatter: dateValueFormatter,
+            valueSetter: dateTimeValueSetter<Table.ActualRow>("date")
           },
           {
             field: "payment_method",
             headerName: "Payment Method",
             cellClass: "cell--centered",
             cellRenderer: "PaymentMethodsCell",
-            width: 100,
+            flex: 1,
             valueSetter: optionModelValueSetter<Table.ActualRow, PaymentMethodOptionModel>(
               "payment_method",
               PaymentMethodModelsList,
@@ -157,11 +164,15 @@ const Actuals = (): JSX.Element => {
           },
           {
             field: "payment_id",
-            headerName: "Payment ID"
+            headerName: "Payment ID",
+            flex: 1
           },
           {
             field: "value",
-            headerName: "Actual"
+            headerName: "Actual",
+            flex: 1,
+            valueFormatter: currencyValueFormatter,
+            valueSetter: floatValueSetter<Table.ActualRow>("value")
           }
         ]}
       />
