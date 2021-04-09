@@ -1,4 +1,4 @@
-import { find, isNil, filter } from "lodash";
+import { isNil } from "lodash";
 import { AxiosResponse } from "axios";
 
 /* eslint-disable no-shadow */
@@ -29,12 +29,6 @@ export interface IHttpAuthenticationError {
   readonly url: string;
   readonly response: AxiosResponse<any>;
   readonly errors: any;
-}
-
-export interface IHttpErrorDetailLookup {
-  readonly field?: string;
-  readonly code?: string;
-  readonly codes?: string[];
 }
 
 /**
@@ -73,27 +67,15 @@ export class HttpError extends Error {}
  * 99.9% of the time, errors["__all__"] will only contain 1 detail, where as
  * the errors for individual fields have the potential to contain more than 1
  * detail.
- *
- * TODO:
- * ----
- * Some of the logic here for obtaining the pertinent details/messages should
- * be re-thought to some degree.  There may be better ways of doing this,
- * better assumptions to make that makes the implementation easier or more
- * convenient ways of doing things.
  */
 export class ClientError extends HttpError implements IHttpClientError {
   public static type = HttpErrorTypes.CLIENT;
   public status: number;
   public url: string;
-  public response: AxiosResponse<any>;
-  public errors: { [key: string]: Http.IErrorDetail[] };
+  public response: AxiosResponse<Http.IErrorsResponse>;
+  public errors: Http.IErrors;
 
-  constructor(
-    response: AxiosResponse<any>,
-    errors: { [key: string]: Http.IErrorDetail[] },
-    status: number,
-    url: string
-  ) {
+  constructor(response: AxiosResponse<Http.IErrorsResponse>, errors: Http.IErrors, status: number, url: string) {
     super();
     this.url = url;
     this.response = response;
@@ -109,96 +91,6 @@ export class ClientError extends HttpError implements IHttpClientError {
     ${JSON.stringify(this.errors)}
     `;
   }
-
-  /**
-   * Retrieves the detail or details ({ message: ..., code: ... }) for the
-   * provided lookup.
-   *
-   * @param lookup: The field and/or code(s) to filter the details by.
-   *                field:  The field to filter the details by.  If not provided,
-   *                        the global __all__ field will be used.
-   *                code:   The code to find a detail for.
-   *                codes:  The codes to filter the details by.
-   */
-  getDetails = (lookup: IHttpErrorDetailLookup): Http.IErrorDetail[] | undefined => {
-    const field = lookup.field || "__all__";
-    const details = this.errors[field];
-    if (!isNil(details)) {
-      if (!isNil(lookup.code)) {
-        // If the code is provided, return the detail that has the provided code,
-        // if it exists.
-        const detail: Http.IErrorDetail | undefined = find(details, { code: lookup.code });
-        if (!isNil(detail)) {
-          return [detail];
-        }
-        return undefined;
-      } else if (!isNil(lookup.codes)) {
-        // If a set of codes are provided, return the details for which the code
-        // is in the set of provided codes.
-        const codesToFilterBy: string[] = lookup.codes;
-        const filtered = filter(details, (detail: Http.IErrorDetail) => codesToFilterBy.indexOf(detail.code) !== -1);
-        if (filtered.length === 0) {
-          return undefined;
-        }
-        return filtered;
-      } else {
-        // Return the details for all the codes.
-        return details;
-      }
-    } else {
-      return undefined;
-    }
-  };
-
-  /**
-   * Returns the details for the fields in the error, excluding the global
-   * __all__ errors.
-   */
-  getFieldDetails = (): { [key: string]: Http.IErrorDetail[] } | undefined => {
-    const fieldErrors: { [key: string]: Http.IErrorDetail[] } = {};
-    Object.keys(this.errors).forEach((fld: string) => {
-      if (fld !== "__all__") {
-        fieldErrors[fld] = this.errors[fld];
-      }
-    });
-    // Return undefined if there are no field level errors.
-    if (Object.keys(fieldErrors)) {
-      return fieldErrors;
-    }
-    return undefined;
-  };
-
-  /**
-   * Returns the details for the global field, __all__, excluding the field
-   * level errors.
-   */
-  getGlobalDetails = (): Http.IErrorDetail[] | undefined => {
-    return this.errors.__all__;
-  };
-
-  /**
-   * Returns the first global error included on the error.  The vast majority
-   * of the time, when there are global errors in the response indicated with
-   * the __all__ parameter, it will be an array of length-1, so this is usually
-   * safe to assume that it will encapsulate the main error that the response
-   * is communicating.
-   */
-  getFirstGlobalDetail = (): Http.IErrorDetail | undefined => {
-    if (!isNil(this.errors.__all__) && this.errors.__all__.length !== 0) {
-      return this.errors.__all__[0];
-    }
-    return undefined;
-  };
-
-  /**
-   * Returns whether or not there is an error detail for the provided
-   * lookup.
-   * @param lookup  The field and/or code(s) to filter the details by.
-   */
-  hasError = (lookup: IHttpErrorDetailLookup): boolean => {
-    const details: Http.IErrorDetail[] | undefined = this.getDetails(lookup);
-    return details !== undefined;
-  };
 }
 
 export class AuthenticationError extends ClientError implements IHttpAuthenticationError {

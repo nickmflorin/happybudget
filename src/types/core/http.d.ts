@@ -1,5 +1,3 @@
-// import { AxiosRequestConfig } from "axios";
-
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Http {
@@ -15,7 +13,6 @@ namespace Http {
   }
 
   type Order = 1 | -1 | 0;
-
   type Ordering = { [key: string]: Order };
 
   interface IListQuery extends IQuery {
@@ -37,7 +34,18 @@ namespace Http {
 
   interface IErrorDetail {
     readonly message: string;
+    // TODO: We might want to map this to the specific error codes we have defined.
     readonly code: string;
+  }
+
+  interface IErrors {
+    // These are global errors that do not pertain to a specific field of the payload.
+    readonly __all__?: IErrorDetail[];
+    [key: string]: IErrorDetail[];
+  }
+
+  interface IErrorsResponse {
+    errors: IErrors;
   }
 
   interface ITokenValidationResponse {

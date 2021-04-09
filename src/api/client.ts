@@ -51,7 +51,7 @@ instance.interceptors.request.use(
  *
  * @param error The AxiosError that was raised.
  */
-const createClientError = (error: AxiosError): ClientError | undefined => {
+const createClientError = (error: AxiosError<Http.IErrorsResponse>): ClientError | undefined => {
   if (isNil(error.response) || isNil(error.response.data)) {
     return;
   }
@@ -86,9 +86,8 @@ const createClientError = (error: AxiosError): ClientError | undefined => {
     } else {
       /* eslint-disable no-console */
       console.warn(`
-        The response body from the backend does not conform to a
-        standard convention for indicating a client error - the
-        specific type of error cannot be determined.
+        The response body from the backend does not conform to a standard convention for indicating
+        a client error - the specific type of error cannot be determined.
     `);
       return new ClientError(
         response,
@@ -101,10 +100,8 @@ const createClientError = (error: AxiosError): ClientError | undefined => {
 };
 
 instance.interceptors.response.use(
-  (response: AxiosResponse<any>): AxiosResponse<any> => {
-    return response;
-  },
-  (error: AxiosError<any>) => {
+  (response: AxiosResponse<any>): AxiosResponse<any> => response,
+  (error: AxiosError<Http.IErrorsResponse>) => {
     if (!isNil(error.response)) {
       const response = error.response;
       if (response.status >= 400 && response.status < 500) {
