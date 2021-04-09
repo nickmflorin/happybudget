@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 
-import { BudgetItemsTreeSelect } from "components/control/dropdowns";
+import { BudgetItemTreeDropdown } from "components/control/dropdowns";
 import { simpleDeepEqualSelector } from "store/selectors";
 import Cell, { StandardCellProps } from "./Cell";
 
@@ -17,7 +17,7 @@ const BudgetItemCell = ({ onChange, ...props }: BudgetItemCellProps): JSX.Elemen
 
   return (
     <Cell {...props}>
-      <BudgetItemsTreeSelect
+      <BudgetItemTreeDropdown
         value={props.node.data.object_id}
         onChange={(nd: IBudgetItem) => onChange(nd.id, nd.type, props.node.data)}
         nodes={budgetItemsTree.data}

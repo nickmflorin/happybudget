@@ -1,0 +1,17 @@
+@import "style/typography";
+@import "style/colors";
+
+.entity-text {
+  font-size: 12px;
+  .identifier {
+    font-family: $noto-sans-jp;
+    font-weight: 600;
+    color: #b5b5b5;
+  }
+  .description {
+    font-family: $noto-sans-jp;
+    font-weight: 500;
+    color: $text-secondary;
+    margin-left: 5px;
+  }
+}

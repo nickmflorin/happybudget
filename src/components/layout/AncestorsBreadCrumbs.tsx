@@ -1,10 +1,11 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { useHistory } from "react-router-dom";
 import { map, isNil, find } from "lodash";
 import classNames from "classnames";
 
 import { Select } from "antd";
 
+import { EntityText } from "components/typography";
 import "./AncestorsBreadCrumbs.scss";
 
 /* eslint-disable indent */
@@ -14,19 +15,6 @@ const getUrl = (entity: IEntity, budgetId: number): string => {
     : entity.type === "account"
     ? `/budgets/${budgetId}/accounts/${entity.id}`
     : `/budgets/${budgetId}/accounts`;
-};
-
-interface EntityTextProps {
-  children: IEntity | IAccount | ISubAccount;
-}
-
-const EntityText = ({ children }: EntityTextProps): JSX.Element => {
-  return (
-    <div className={"entity-text"}>
-      <span className={"identifier"}>{children.identifier}</span>
-      <span className={"description"}>{children.description}</span>
-    </div>
-  );
 };
 
 interface AncestorBreadCrumbItemProps extends StandardComponentProps {
