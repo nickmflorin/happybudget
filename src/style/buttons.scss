@@ -24,6 +24,36 @@
   }
 }
 
+.icon-holder {
+  min-width: 0px;
+  box-shadow: none !important;
+  border-radius: 100px;
+  border: 1px solid $transparent;
+  background-color: $transparent;
+  padding: 0px;
+  height: 36px;
+  width: 36px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  svg {
+    height: 100%;
+    width: auto !important;
+    color: $icon-color !important;
+  }
+
+  &.small {
+    padding: 10px;
+  }
+  &.medium {
+    padding: 8px;
+  }
+  &.large {
+    padding: 6px;
+  }
+}
+
 .link {
   @extend .btn-link-base;
   color: $blue;

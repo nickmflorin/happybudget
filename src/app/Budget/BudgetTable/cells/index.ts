@@ -8,3 +8,4 @@ export { default as IndexCell } from "./IndexCell";
 export { default as BudgetItemCell } from "./BudgetItemCell";
 export { default as PaymentMethodsCell } from "./PaymentMethodsCell";
 export { default as FringesCell } from "./FringesCell";
+export { default as HeaderCell } from "./HeaderCell";

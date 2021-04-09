@@ -1,4 +1,4 @@
-import { forEach, findIndex, find, isNil, map, filter, reduce, includes } from "lodash";
+import { forEach, findIndex, find, isNil, map, filter, reduce, includes, orderBy } from "lodash";
 
 export const sumChars = (val: string): number => {
   let sum = 0;
@@ -46,6 +46,30 @@ export const replaceInArray = <T>(
     newArray[index] = newValue;
   }
   return newArray;
+};
+
+export const updateFieldOrdering = <T = string>(
+  fieldOrdering: FieldOrdering<T>,
+  field: T,
+  order: Order
+): FieldOrdering<T> => {
+  if (order === 0) {
+    return filter(fieldOrdering, (fieldO: FieldOrder<T>) => fieldO.field !== field);
+  }
+  const fieldOrder = find(fieldOrdering, (fieldO: FieldOrder<T>) => fieldO.field === field);
+  if (!isNil(fieldOrder)) {
+    return replaceInArray<FieldOrder<T>>(fieldOrdering, { field }, { ...fieldOrder, order });
+  } else {
+    return [...fieldOrdering, { field: field, order }];
+  }
+};
+
+export const orderByFieldOrdering = <M = any>(array: M[], fieldOrdering: FieldOrdering<keyof M>): M[] => {
+  return orderBy(
+    array,
+    map(fieldOrdering, (fieldOrder: FieldOrder<keyof M>) => fieldOrder.field),
+    map(fieldOrdering, (fieldOrder: FieldOrder<keyof M>) => (fieldOrder.order === 1 ? "asc" : "desc"))
+  );
 };
 
 export const includesAnyIn = <T = any>(array: T[], anotherArray: T[] | T): boolean => {

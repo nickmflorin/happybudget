@@ -174,6 +174,7 @@ const SubAccountsTable = ({
           field: "description",
           headerName: "Category Description",
           flex: 100,
+          sortable: true,
           colSpan: (params: ColSpanParams) => {
             const row: Table.SubAccountRow = params.data;
             if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {

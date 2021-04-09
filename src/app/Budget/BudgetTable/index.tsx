@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
+import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy, orderBy } from "lodash";
 
 import { AgGridReact } from "ag-grid-react";
 import { ChangeDetectionStrategyType } from "ag-grid-react/lib/changeDetectionService";
@@ -32,7 +32,7 @@ import {
 import { TABLE_DEBUG } from "config";
 import { RenderWithSpinner, ShowHide } from "components/display";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
-import { hashString } from "lib/util";
+import { hashString, updateFieldOrdering, orderByFieldOrdering } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { mergeClassNames, mergeClassNamesFn } from "lib/tabling/util";
 import { currencyValueFormatter } from "lib/tabling/formatters";
@@ -48,7 +48,8 @@ import {
   PaymentMethodsCell,
   BudgetItemCell,
   FringeUnitCell,
-  FringesCell
+  FringesCell,
+  HeaderCell
 } from "./cells";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
@@ -113,6 +114,7 @@ const BudgetTable = <
   const [allSelected, setAllSelected] = useState(false);
   const [focused, setFocused] = useState(false);
   const [table, setTable] = useState<R[]>([]);
+  const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
@@ -370,6 +372,11 @@ const BudgetTable = <
     (col: ColDef): ColDef => {
       return {
         cellRenderer: "ValueCell",
+        headerComponentParams: {
+          onSort: (order: Order, field: keyof R) => {
+            setOrdering(updateFieldOrdering(ordering, field, order));
+          }
+        },
         ...col
       };
     }
@@ -564,7 +571,7 @@ const BudgetTable = <
             // before we reach the group footer node, so as long as the ordering/grouping of rows
             // is consistent.  However, we will also make sure that the row does not belong to a group
             // for safety.
-            if (isNil(row.group)) {
+            if (isNil(row.group) && !(row.meta.isPlaceholder === true)) {
               nodes.push(currentNode);
             }
           }
@@ -776,7 +783,6 @@ const BudgetTable = <
 
   useEffect(() => {
     if (renderFlag === true) {
-      const newTable: R[] = [];
       const getGroupForModel = (model: M): number | null => {
         const group: G | undefined = find(groups, (g: G) =>
           includes(
@@ -791,12 +797,16 @@ const BudgetTable = <
       let modelsWithoutGroup = filter(data, (m: M) => isNil(getGroupForModel(m)));
       const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
 
+      const newTable: R[] = [];
       forEach(groupedModels, (models: M[], groupId: string) => {
         const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
         if (!isNil(group)) {
           const footer: R = createGroupFooter(group);
           newTable.push(
-            ...map(models, (m: M) => mapping.modelToRow(m, group, { selected: includes(selected, m.id) })),
+            ...orderByFieldOrdering(
+              map(models, (m: M) => mapping.modelToRow(m, group, { selected: includes(selected, m.id) })),
+              ordering
+            ),
             {
               ...footer,
               group,
@@ -812,8 +822,13 @@ const BudgetTable = <
       });
       setTable([
         ...newTable,
-        ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, null, { selected: includes(selected, m.id) })),
-        ...map(placeholders, (r: R) => ({ ...r, meta: { ...r.meta, selected: includes(selected, r.id) } }))
+        ...orderByFieldOrdering(
+          [
+            ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, null, { selected: includes(selected, m.id) })),
+            ...map(placeholders, (r: R) => ({ ...r, meta: { ...r.meta, selected: includes(selected, r.id) } }))
+          ],
+          ordering
+        )
       ]);
     }
   }, [
@@ -821,6 +836,7 @@ const BudgetTable = <
     useDeepEqualMemo(placeholders),
     useDeepEqualMemo(selected),
     useDeepEqualMemo(groups),
+    useDeepEqualMemo(ordering),
     renderFlag
   ]);
 
@@ -1089,6 +1105,7 @@ const BudgetTable = <
                 PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
                 BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
                 FringesCell: ShowCellOnlyForRowType<R>("subaccount")(IncludeErrorsInCell<R>(FringesCell)),
+                agColumnHeader: HeaderCell,
                 ...frameworkComponents
               }}
               onPasteStart={onPasteStart}

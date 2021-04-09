@@ -52,6 +52,7 @@ export interface BudgetTableProps<
   loading?: boolean;
   sizeColumnsToFit?: boolean;
   processors?: CellProcessors<R, G, C>;
+  renderFlag?: boolean;
   cellClass?: (params: CellClassParams) => string | undefined;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
   onSearch: (value: string) => void;
@@ -66,5 +67,4 @@ export interface BudgetTableProps<
   onSelectAll: () => void;
   isCellEditable?: (row: R, col: ColDef) => boolean;
   isCellSelectable?: (row: R, col: ColDef) => boolean;
-  renderFlag?: boolean;
 }
