@@ -32,24 +32,24 @@ namespace Http {
     readonly previous?: string | null;
   }
 
-  type IErrorDetail = {
+  type ErrorDetail = {
     readonly message: string;
     // TODO: We might want to map this to the specific error codes we have defined.
     readonly code: string;
   };
 
-  type IFieldErrors = {
-    readonly [key: string]: IErrorDetail[];
+  type FieldErrors = {
+    readonly [key: string]: ErrorDetail[];
   };
 
-  type IErrors = {
+  type Errors = {
     // These are global errors that do not pertain to a specific field of the payload.
-    readonly __all__?: IErrorDetail[];
-    [key: string]: IErrorDetail[] | IFieldErrors;
+    readonly __all__?: ErrorDetail[];
+    [key: string]: ErrorDetail[] | FieldErrors;
   };
 
-  type IErrorsResponse = {
-    errors: IErrors;
+  type ErrorsResponse = {
+    errors: Errors;
   };
 
   interface ITokenValidationResponse {

@@ -13,15 +13,19 @@ export function* handleTableErrors(
 ): SagaIterator {
   if (e instanceof ClientError) {
     const cellErrors: Table.CellError[] = [];
-    forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
-      cellErrors.push({
-        id: id,
-        // TODO: We might want to build in a way to capture multiple errors for the cell.
-        error: errors[0].message,
-        // TODO: Should we make sure the field exists as a cell?  Instead of force
-        // coercing here?
-        field: field
-      });
+    forEach(e.errors, (errors: Http.ErrorDetail[] | Http.FieldErrors, field: string) => {
+      // Just check the first level - subsequent nested levels are usually for errors with M2M fields
+      // which are out of scope for now.
+      if (Array.isArray(errors)) {
+        cellErrors.push({
+          id: id,
+          // TODO: We might want to build in a way to capture multiple errors for the cell.
+          error: errors[0].message,
+          // TODO: Should we make sure the field exists as a cell?  Instead of force
+          // coercing here?
+          field: field
+        });
+      }
     });
     if (cellErrors.length === 0) {
       handleRequestError(e, message);

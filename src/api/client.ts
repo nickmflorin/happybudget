@@ -51,7 +51,7 @@ instance.interceptors.request.use(
  *
  * @param error The AxiosError that was raised.
  */
-const createClientError = (error: AxiosError<Http.IErrorsResponse>): ClientError | undefined => {
+const createClientError = (error: AxiosError<Http.ErrorsResponse>): ClientError | undefined => {
   if (isNil(error.response) || isNil(error.response.data)) {
     return;
   }
@@ -101,7 +101,7 @@ const createClientError = (error: AxiosError<Http.IErrorsResponse>): ClientError
 
 instance.interceptors.response.use(
   (response: AxiosResponse<any>): AxiosResponse<any> => response,
-  (error: AxiosError<Http.IErrorsResponse>) => {
+  (error: AxiosError<Http.ErrorsResponse>) => {
     if (!isNil(error.response)) {
       const response = error.response;
       if (response.status >= 400 && response.status < 500) {

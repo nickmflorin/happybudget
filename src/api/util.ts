@@ -5,11 +5,15 @@ import { ClientError, NetworkError } from "./errors";
 
 export const renderFieldErrorsInForm = (form: any, e: ClientError) => {
   const fieldsWithErrors: { name: string; errors: string[] }[] = [];
-  forEach(e.errors, (errors: Http.IErrorDetail[], field: string) => {
-    fieldsWithErrors.push({
-      name: field,
-      errors: map(errors, (error: Http.IErrorDetail) => error.message)
-    });
+  forEach(e.errors, (errors: Http.ErrorDetail[] | Http.FieldErrors, field: string) => {
+    // Just check the first level - subsequent nested levels are usually for errors with M2M fields
+    // which are out of scope for now.
+    if (Array.isArray(errors)) {
+      fieldsWithErrors.push({
+        name: field,
+        errors: map(errors, (error: Http.ErrorDetail) => error.message)
+      });
+    }
   });
   form.setFields(fieldsWithErrors);
 };
