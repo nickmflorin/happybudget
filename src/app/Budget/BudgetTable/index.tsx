@@ -201,25 +201,29 @@ const BudgetTable = <
     setBudgetFooterColumnApi(event.columnApi);
   });
 
-  const keyListener = useDynamicCallback((e: KeyboardEvent) => {
-    const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-    if (gridApi) {
-      if (e.key === "ArrowDown" && ctrlCmdPressed) {
-        const focusedCell = gridApi.getFocusedCell();
-        if (focusedCell) {
-          const row = gridApi?.getDisplayedRowAtIndex(focusedCell?.rowIndex);
-          if (onRowExpand && !isNil(row?.data.identifier)) {
-            onRowExpand(row?.data.id);
+  useEffect(() => {
+    const keyListener = (e: KeyboardEvent) => {
+      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+      if (gridApi) {
+        if (e.key === "ArrowDown" && ctrlCmdPressed) {
+          const focusedCell = gridApi.getFocusedCell();
+          if (focusedCell) {
+            const row = gridApi?.getDisplayedRowAtIndex(focusedCell?.rowIndex);
+            if (onRowExpand && !isNil(row?.data.identifier)) {
+              onRowExpand(row?.data.id);
+            }
+          }
+        }
+        if (e.key === "ArrowUp" && ctrlCmdPressed) {
+          if (onBack) {
+            onBack();
           }
         }
       }
-      if (e.key === "ArrowUp" && ctrlCmdPressed) {
-        if (onBack) {
-          onBack();
-        }
-      }
-    }
-  });
+    };
+    window.addEventListener("keydown", keyListener);
+    return () => window.removeEventListener("keydown", keyListener);
+  }, [gridApi]);
 
   useEffect(() => {
     setGridOptions({
@@ -228,8 +232,6 @@ const BudgetTable = <
     });
     setBudgetFooterGridOptions({ ...budgetFooterGridOptions, alignedGrids: [gridOptions, tableFooterGridOptions] });
     setTableFooterGridOptions({ ...tableFooterGridOptions, alignedGrids: [gridOptions, budgetFooterGridOptions] });
-    window.addEventListener("keydown", keyListener);
-    return () => window.removeEventListener("keydown", keyListener);
   }, []);
 
   const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
@@ -1093,7 +1095,7 @@ const BudgetTable = <
               // However, for now we will leave.  It is important to note that this will
               // cause the table renders to be slower for large datasets.
               rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
-              enterMovesDown={true}
+              enterMovesDown={false}
               frameworkComponents={{
                 ExpandCell: ExpandCell,
                 IndexCell: IndexCell,
