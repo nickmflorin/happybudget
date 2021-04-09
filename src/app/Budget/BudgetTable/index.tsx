@@ -25,7 +25,8 @@ import {
   CellValueChangedEvent,
   PasteEndEvent,
   PasteStartEvent,
-  FirstDataRenderedEvent
+  FirstDataRenderedEvent,
+  SuppressKeyboardEventParams
 } from "ag-grid-community";
 
 import { TABLE_DEBUG } from "config";
@@ -103,6 +104,7 @@ const BudgetTable = <
   onRowAdd,
   onRowDelete,
   onRowExpand,
+  onBack,
   isCellEditable,
   isCellSelectable,
   rowRefreshRequired,
@@ -157,8 +159,20 @@ const BudgetTable = <
   });
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
+    const api = event.api;
     if (sizeColumnsToFit === true) {
       event.api.sizeColumnsToFit();
+    }
+    api.ensureIndexVisible(0);
+
+    const cols = event.columnApi.getAllColumns();
+    if (!isNil(cols)) {
+      const identifierCol: Column | undefined = find(cols, obj => obj.getColId() === "identifier");
+      if (!isNil(identifierCol)) {
+        api.setFocusedCell(0, identifierCol);
+        const selectedRow = api.getDisplayedRowAtIndex(0);
+        selectedRow?.setSelected(true);
+      }
     }
   });
 
@@ -185,10 +199,35 @@ const BudgetTable = <
     setBudgetFooterColumnApi(event.columnApi);
   });
 
+  const keyListener = useDynamicCallback((e: KeyboardEvent) => {
+    const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+    if (gridApi) {
+      if (e.key === "ArrowDown" && ctrlCmdPressed) {
+        const focusedCell = gridApi.getFocusedCell();
+        if (focusedCell) {
+          const row = gridApi?.getDisplayedRowAtIndex(focusedCell?.rowIndex);
+          if (onRowExpand && !isNil(row?.data.identifier)) {
+            onRowExpand(row?.data.id);
+          }
+        }
+      }
+      if (e.key === "ArrowUp" && ctrlCmdPressed) {
+        if (onBack) {
+          onBack();
+        }
+      }
+    }
+  });
+
   useEffect(() => {
-    setGridOptions({ ...gridOptions, alignedGrids: [tableFooterGridOptions, budgetFooterGridOptions] });
+    setGridOptions({
+      ...gridOptions,
+      alignedGrids: [tableFooterGridOptions, budgetFooterGridOptions]
+    });
     setBudgetFooterGridOptions({ ...budgetFooterGridOptions, alignedGrids: [gridOptions, tableFooterGridOptions] });
     setTableFooterGridOptions({ ...tableFooterGridOptions, alignedGrids: [gridOptions, budgetFooterGridOptions] });
+    window.addEventListener("keydown", keyListener);
+    return () => window.removeEventListener("keydown", keyListener);
   }, []);
 
   const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
@@ -352,6 +391,17 @@ const BudgetTable = <
       };
     }
   );
+
+  const suppressNavigation = (params: SuppressKeyboardEventParams) => {
+    const e = params.event;
+    const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+    if (params.api) {
+      if ((e.key === "ArrowDown" || e.key === "ArrowUp") && ctrlCmdPressed) {
+        return true;
+      }
+    }
+    return false;
+  };
 
   const baseColumns = useMemo((): ColDef[] => {
     let baseLeftColumns: ColDef[] = [indexCell({})];
@@ -1021,6 +1071,7 @@ const BudgetTable = <
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
               onFirstDataRendered={onFirstDataRendered}
+              suppressKeyboardEvent={suppressNavigation}
               // NOTE: This might not be 100% necessary, because of how efficiently
               // we are managing the state updates to the data that flows into the table.
               // However, for now we will leave.  It is important to note that this will

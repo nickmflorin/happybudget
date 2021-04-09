@@ -31,6 +31,7 @@ interface SubAccountsTableProps {
   onRowAdd: () => void;
   onRowDelete: (row: Table.SubAccountRow) => void;
   onRowExpand?: (id: number) => void;
+  onBack: () => void;
   onSelectAll: () => void;
   onGroupRows: (rows: Table.SubAccountRow[]) => void;
   onDeleteGroup: (group: IGroup<ISimpleSubAccount>) => void;
@@ -55,6 +56,7 @@ const SubAccountsTable = ({
   onRowAdd,
   onRowDelete,
   onRowExpand,
+  onBack,
   onSelectAll,
   onSearch,
   onGroupRows,
@@ -105,6 +107,7 @@ const SubAccountsTable = ({
       onRowUpdate={onRowUpdate}
       onRowBulkUpdate={onRowBulkUpdate}
       onRowExpand={onRowExpand}
+      onBack={onBack}
       groupParams={{
         onDeleteGroup,
         onRowRemoveFromGroup,

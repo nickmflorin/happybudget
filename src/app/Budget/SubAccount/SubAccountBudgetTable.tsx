@@ -99,6 +99,13 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         onRowUpdate={(payload: Table.RowChange) => dispatch(updateSubAccountAction(payload))}
         onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateSubAccountAction(changes))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
+        onBack={() => {
+          if (!isNil(subaccountDetail) && !isNil(subaccountDetail.ancestors)) {
+            const ancestors = subaccountDetail.ancestors;
+            const ancestor = ancestors[ancestors.length - 1];
+            history.push(`/budgets/${budgetId}/${ancestor.type}s/${ancestor.id}`);
+          }
+        }}
         onDeleteGroup={(group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id))}
         onRowRemoveFromGroup={(row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id))}
         onGroupRows={(rows: Table.SubAccountRow[]) =>
