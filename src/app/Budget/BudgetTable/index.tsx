@@ -693,7 +693,7 @@ const BudgetTable = <
         name: `Delete ${row.meta.typeLabel} ${row.meta.label}`,
         action: () => onRowDelete(row)
       };
-      if (isNil(groupParams)) {
+      if (isNil(groupParams) || row.meta.isPlaceholder) {
         return [deleteRowContextMenuItem];
       } else if (!isNil(row.group)) {
         return [
