@@ -49,6 +49,12 @@ const selectSaving = createSelector(
 const selectSubAccountDetail = simpleDeepEqualSelector(
   (state: Redux.IApplicationStore) => state.budget.subaccount.detail.data
 );
+const selectReadyToRender = createSelector(
+  (state: Redux.IApplicationStore) => state.budget.subaccount.subaccounts.responseWasReceived,
+  (state: Redux.IApplicationStore) => state.budget.subaccount.subaccounts.groups.responseWasReceived,
+  (accountsResponseReceived: boolean, groupsResponseReceived: boolean) =>
+    accountsResponseReceived === true && groupsResponseReceived === true
+);
 
 interface SubAccountBudgetTableProps {
   subaccountId: number;
@@ -68,6 +74,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
   const saving = useSelector(selectSaving);
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const groups = useSelector(selectGroups);
+  const readyToRender = useSelector(selectReadyToRender);
 
   return (
     <React.Fragment>
@@ -76,6 +83,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         groups={groups}
         placeholders={placeholders}
         selected={selected}
+        renderFlag={readyToRender}
         tableFooterIdentifierValue={
           !isNil(subaccountDetail) && !isNil(subaccountDetail.description)
             ? `${subaccountDetail.description} Total`

@@ -22,6 +22,7 @@ interface SubAccountsTableProps {
   tableTotals?: { [key: string]: any };
   search: string;
   saving: boolean;
+  renderFlag: boolean;
   onSearch: (value: string) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
@@ -46,6 +47,7 @@ const SubAccountsTable = ({
   search,
   saving,
   tableTotals,
+  renderFlag,
   onRowSelect,
   onRowUpdate,
   onRowDeselect,
@@ -78,6 +80,7 @@ const SubAccountsTable = ({
       mapping={SubAccountMapping}
       selected={selected}
       loadingBudget={loadingBudget}
+      renderFlag={renderFlag}
       sizeColumnsToFit={false}
       identifierField={"identifier"}
       identifierFieldHeader={"Line"}
