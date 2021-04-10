@@ -31,6 +31,7 @@ const BudgetTrashCard = ({ budget, onRestore, onDelete }: BudgetTrashCardProps):
         {
           text: "Download",
           icon: <DownloadOutlined className={"icon"} />,
+          /* eslint-disable no-console */
           onClick: () => console.log("Not implemented yet."),
           loading: false
         }

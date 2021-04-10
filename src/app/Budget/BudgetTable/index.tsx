@@ -568,6 +568,8 @@ const BudgetTable = <
         const verticalDescend = params.previousCellPosition.rowIndex > params.nextCellPosition.rowIndex;
 
         if (verticalAscend === true) {
+          /* eslint-disable no-unused-vars */
+          /* eslint-disable @typescript-eslint/no-unused-vars */
           const [rowNode, _, additionalIndex] = findFirstNonGroupFooterRow(params.nextCellPosition.rowIndex);
           if (!isNil(rowNode)) {
             return {

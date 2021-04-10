@@ -13,6 +13,8 @@ import LoadableCellWrapper from "./LoadableCellWrapper";
 
 import "./index.scss";
 
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export type StandardCellProps<R extends Table.Row<any, any>> = ICellRendererParams;
 
 export interface CellProps<R extends Table.Row<any, any>>

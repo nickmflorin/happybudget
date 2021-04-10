@@ -13,6 +13,8 @@ export interface FactoryOptions<S, A extends Redux.IAction<any> = Redux.IAction<
   initialState: S;
   excludeActions: null | ((action: A, state: S) => boolean | undefined | void);
   extension: Reducer<S, A> | Reducer<S, A>[] | null;
+  /* eslint-disable no-unused-vars */
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   subReducers: { [Property in keyof Partial<S>]: Reducer<any, A> } | null | {};
   extensions: { [key: string]: Reducer<S, A> } | null;
   strictSelect: boolean;

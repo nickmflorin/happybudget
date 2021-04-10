@@ -63,6 +63,7 @@ const SubAccountCommentsHistory = (): JSX.Element => {
           dispatch(updateCommentAction({ id: comment.id, data: { text: value } })),
         onDoneReplying: (comment: IComment, value: string) =>
           dispatch(createCommentAction({ parent: comment.id, data: { text: value } })),
+        /* eslint-disable no-console */
         onLike: (comment: IComment) => console.log(comment),
         onDelete: (comment: IComment) => dispatch(deleteCommentAction(comment.id))
       }}

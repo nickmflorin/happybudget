@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { isNil, find } from "lodash";
 import classNames from "classnames";
 
@@ -40,14 +40,20 @@ const HeaderCell = <R extends Table.Row<any, any>>({
   const [order, setOrder] = useState<Order>(0);
   const colDef = column.getColDef();
 
-  const externalOrder = useMemo(() => {
-    if (!isNil(ordering)) {
-      const fieldOrder: FieldOrder<keyof R> | undefined = find(ordering, { field: column.getColDef().field } as any);
-      if (!isNil(fieldOrder)) {
-        return fieldOrder.order;
+  // NOTE: Because of AG Grid's use of references for rendering performance, the `ordering` prop
+  // will not always update in this component when it changes in the parent table component.  This
+  // is used for the initial render when an ordering is present in cookies.  We should figure out
+  // a better way to do this.
+  useEffect(() => {
+    const def = column.getColDef();
+    if (def.sortable === true) {
+      if (!isNil(ordering)) {
+        const fieldOrder: FieldOrder<keyof R> | undefined = find(ordering, { field: column.getColDef().field } as any);
+        if (!isNil(fieldOrder)) {
+          setOrder(fieldOrder.order);
+        }
       }
     }
-    return null;
   }, [ordering]);
 
   return (
@@ -55,12 +61,11 @@ const HeaderCell = <R extends Table.Row<any, any>>({
       className={classNames("header-cell", className)}
       style={style}
       onClick={() => {
-        const baseOrder = externalOrder || order;
-        setOrder(baseOrder === -1 ? 0 : baseOrder === 0 ? 1 : -1);
+        setOrder(order === -1 ? 0 : order === 0 ? 1 : -1);
         !isNil(onSort) &&
           !isNil(colDef.field) &&
           colDef.sortable &&
-          onSort(baseOrder === -1 ? 0 : baseOrder === 0 ? 1 : -1, colDef.field as keyof R, colDef, column);
+          onSort(order === -1 ? 0 : order === 0 ? 1 : -1, colDef.field as keyof R, colDef, column);
       }}
     >
       <div className={"text"}>{displayName}</div>
@@ -68,9 +73,9 @@ const HeaderCell = <R extends Table.Row<any, any>>({
         <IconHolder
           className={"icon-holder--sort"}
           size={"small"}
-          style={(externalOrder || order) === 0 ? { opacity: 0 } : { opacity: 1 }}
+          style={order === 0 ? { opacity: 0 } : { opacity: 1 }}
         >
-          <FontAwesomeIcon icon={(externalOrder || order) === 1 || 0 ? faArrowUp : faArrowDown} />
+          <FontAwesomeIcon icon={order === 1 || 0 ? faArrowUp : faArrowDown} />
         </IconHolder>
       </ShowHide>
     </div>

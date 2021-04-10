@@ -42,6 +42,7 @@ const BudgetCard = ({ budget, loading, selected, onEdit, onDelete, onSelect }: B
         {
           text: "Download",
           icon: <DownloadOutlined className={"icon"} />,
+          /* eslint-disable no-console */
           onClick: () => console.log("Not implemented yet."),
           loading: false
         }

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { map, isNil, find } from "lodash";
+import { map, isNil } from "lodash";
 import classNames from "classnames";
 
 import { Menu, Checkbox } from "antd";

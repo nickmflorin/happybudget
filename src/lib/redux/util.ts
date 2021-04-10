@@ -1,5 +1,4 @@
 import { AnyAction, Reducer } from "redux";
-import { isNil } from "lodash";
 import { toTitleCase } from "lib/util/formatters";
 
 /**

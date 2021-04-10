@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
 import { createSelector } from "reselect";
-import Cookies from "universal-cookie";
 
 import { CreateSubAccountGroupModal, EditSubAccountGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
