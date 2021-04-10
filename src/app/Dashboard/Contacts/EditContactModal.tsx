@@ -4,7 +4,8 @@ import { Dispatch } from "redux";
 import { isNil } from "lodash";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError, standardizeError } from "api";
-import { Form, ContactForm } from "components/forms";
+import { Form } from "components";
+import { ContactForm } from "components/forms";
 import { Modal } from "components/modals";
 import { updateContact } from "api/services";
 
@@ -64,7 +65,7 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
                 setLoading(false);
               });
           })
-          .catch(info => {
+          .catch(() => {
             return;
           });
       }}

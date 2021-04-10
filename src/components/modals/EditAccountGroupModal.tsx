@@ -2,7 +2,8 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
-import { Form, GroupForm } from "components/forms";
+import { Form } from "components";
+import { GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
 import { updateAccountGroup } from "api/services";
 
@@ -62,7 +63,7 @@ const EditAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditAccount
                 setLoading(false);
               });
           })
-          .catch(info => {
+          .catch(() => {
             return;
           });
       }}

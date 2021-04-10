@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
-import { Typography, Form } from "antd";
+import { Typography } from "antd";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
 import { login, socialLogin } from "api/services";
+import { Form } from "components";
 
 import LoginForm, { ILoginFormValues } from "./LoginForm";
 

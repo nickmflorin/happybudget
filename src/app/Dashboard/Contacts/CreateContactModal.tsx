@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { isNil } from "lodash";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError, standardizeError } from "api";
-import { Form, ContactForm } from "components/forms";
+import { Form } from "components";
+import { ContactForm } from "components/forms";
 import { Modal } from "components/modals";
 import { createContact } from "api/services";
 
@@ -23,6 +24,10 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
   const [form] = Form.useForm();
   const dispatch: Dispatch = useDispatch();
 
+  useEffect(() => {
+    form.test("blah");
+  }, []);
+
   return (
     <Modal
       title={"Create a New Contact"}
@@ -34,7 +39,7 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
       onOk={() => {
         form
           .validateFields()
-          .then(values => {
+          .then((values: any) => {
             setLoading(true);
             createContact(values)
               .then((contact: IContact) => {
@@ -63,7 +68,7 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
                 setLoading(false);
               });
           })
-          .catch(info => {
+          .catch(() => {
             return;
           });
       }}

@@ -4,7 +4,8 @@ import { isNil } from "lodash";
 import { Input, Button } from "antd";
 import { FormInstance } from "antd/lib/form";
 
-import Form, { FormProps } from "./Form";
+import { Form } from "components";
+import { FormProps } from "components/Form/model";
 import UploadProfileImage from "./UploadProfileImage";
 
 interface UserProfileFormProps extends FormProps {
@@ -23,7 +24,7 @@ const UserProfileForm = ({
   const [file, setFile] = useState<File | Blob | null>(null);
 
   return (
-    <Form
+    <Form.Form
       form={form}
       globalError={globalError}
       layout={"vertical"}
@@ -57,7 +58,7 @@ const UserProfileForm = ({
           {"Save"}
         </Button>
       </Form.Item>
-    </Form>
+    </Form.Form>
   );
 };
 

@@ -3,7 +3,7 @@ import { Input } from "antd";
 import { FormInstance, FormProps } from "antd/lib/form";
 
 import { ColorSelect } from "components/control";
-import { Form } from "components/forms";
+import { Form } from "components";
 
 export interface GroupFormValues {
   name: string;
@@ -18,13 +18,7 @@ interface GroupFormProps extends FormProps {
 
 const GroupForm: React.FC<GroupFormProps> = ({ form, initialValues = {}, globalError, ...props }) => {
   return (
-    <Form<GroupFormValues>
-      form={form}
-      layout={"vertical"}
-      globalError={globalError}
-      initialValues={initialValues}
-      {...props}
-    >
+    <Form.Form form={form} layout={"vertical"} globalError={globalError} initialValues={initialValues} {...props}>
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the group." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>
@@ -50,7 +44,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ form, initialValues = {}, globalE
           ]}
         />
       </Form.Item>
-    </Form>
+    </Form.Form>
   );
 };
 

@@ -2,7 +2,8 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
-import { Form, GroupForm } from "components/forms";
+import { Form } from "components";
+import { GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
 import { createAccountGroup } from "api/services";
 
@@ -70,7 +71,7 @@ const CreateAccountGroupModal = ({
                 setLoading(false);
               });
           })
-          .catch(info => {
+          .catch(() => {
             return;
           });
       }}

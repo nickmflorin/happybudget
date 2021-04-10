@@ -4,10 +4,11 @@ import classNames from "classnames";
 import { Button, Input } from "antd";
 import { MailOutlined, LockOutlined } from "@ant-design/icons";
 
-import { RouterLink } from "components/control/links";
-import { Form } from "components/forms";
-
 import { validateEmail } from "lib/util/validate";
+
+import { Form } from "components";
+import { RouterLink } from "components/control/links";
+
 import SocialButton from "../SocialButton";
 
 export interface ILoginFormValues {
@@ -37,7 +38,7 @@ const LoginForm = ({
   onGoogleError
 }: LoginFormProps): JSX.Element => {
   return (
-    <Form
+    <Form.Form
       style={style}
       form={form}
       globalError={globalError}
@@ -48,9 +49,9 @@ const LoginForm = ({
         name={"email"}
         rules={[
           { required: true, message: "Please enter an email." },
-          ({ getFieldValue }) => ({
+          () => ({
             validateTrigger: "onSubmit",
-            validator(rule, value) {
+            validator(rule: any, value: string) {
               if (value !== "" && !validateEmail(value)) {
                 return Promise.reject("Please enter a valid email.");
               }
@@ -95,7 +96,7 @@ const LoginForm = ({
           </span>
         </div>
       </Form.Footer>
-    </Form>
+    </Form.Form>
   );
 };
 

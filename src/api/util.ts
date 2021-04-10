@@ -5,6 +5,14 @@ import { replaceInArray } from "lib/util";
 import { ClientError, NetworkError } from "./errors";
 import { standardizeError } from "./standardizer";
 
+export const isHttpError = (error: Http.Error | any): error is Http.Error => {
+  return (
+    (error as Http.Error).message !== undefined &&
+    (error as Http.Error).code !== undefined &&
+    (error as Http.Error).error_type !== undefined
+  );
+};
+
 export const parseErrors = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.Error[] => {
   return error instanceof ClientError ? error.errors : Array.isArray(error) ? error : error.errors;
 };

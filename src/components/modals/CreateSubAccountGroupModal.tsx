@@ -3,7 +3,8 @@ import { isNil } from "lodash";
 
 import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
 import { createAccountSubAccountGroup, createSubAccountSubAccountGroup } from "api/services";
-import { Form, GroupForm } from "components/forms";
+import { Form } from "components";
+import { GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
 
 import Modal from "./Modal";
@@ -83,7 +84,7 @@ const CreateSubAccountGroupModal = ({
                 .finally(() => setLoading(false));
             }
           })
-          .catch(info => {
+          .catch(() => {
             return;
           });
       }}
