@@ -31,6 +31,8 @@ export interface IHttpAuthenticationError {
   readonly errors: any;
 }
 
+export class ForceLogout extends Error {}
+
 /**
  * Base class for all request errors.  Should not be used directly, but rather
  * one of ClientError or NetworkError or ServerError should be used.
@@ -72,10 +74,10 @@ export class ClientError extends HttpError implements IHttpClientError {
   public static type = HttpErrorTypes.CLIENT;
   public status: number;
   public url: string;
-  public response: AxiosResponse<Http.ErrorsResponse>;
-  public errors: Http.Errors;
+  public response: AxiosResponse<Http.ErrorResponse>;
+  public errors: Http.Error[];
 
-  constructor(response: AxiosResponse<Http.ErrorsResponse>, errors: Http.Errors, status: number, url: string) {
+  constructor(response: AxiosResponse<Http.ErrorResponse>, errors: Http.Error[], status: number, url: string) {
     super();
     this.url = url;
     this.response = response;
@@ -94,7 +96,7 @@ export class ClientError extends HttpError implements IHttpClientError {
 }
 
 export class AuthenticationError extends ClientError implements IHttpAuthenticationError {
-  constructor(response: AxiosResponse<any>, errors: Http.Errors, url: string) {
+  constructor(response: AxiosResponse<any>, errors: Http.Error[], url: string) {
     super(response, errors, 403, url);
   }
 }

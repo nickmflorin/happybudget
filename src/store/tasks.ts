@@ -1,8 +1,8 @@
 import { SagaIterator } from "redux-saga";
 import { put } from "redux-saga/effects";
-import { forEach } from "lodash";
+import { forEach, isNil } from "lodash";
 
-import { ClientError, handleRequestError } from "api";
+import { ClientError, handleRequestError, parseGlobalError, parseFieldErrors } from "api";
 import { DISPLAY_ERRORS_IN_TABLE } from "config";
 
 export function* handleTableErrors(
@@ -12,20 +12,17 @@ export function* handleTableErrors(
   action: (errors: Table.CellError[]) => Redux.IAction<any>
 ): SagaIterator {
   if (e instanceof ClientError) {
+    const global = parseGlobalError(e);
+    if (!isNil(global)) {
+      handleRequestError(e, global.message);
+    }
     const cellErrors: Table.CellError[] = [];
-    forEach(e.errors, (errors: Http.ErrorDetail[] | Http.FieldErrors, field: string) => {
-      // Just check the first level - subsequent nested levels are usually for errors with M2M fields
-      // which are out of scope for now.
-      if (Array.isArray(errors)) {
-        cellErrors.push({
-          id: id,
-          // TODO: We might want to build in a way to capture multiple errors for the cell.
-          error: errors[0].message,
-          // TODO: Should we make sure the field exists as a cell?  Instead of force
-          // coercing here?
-          field: field
-        });
-      }
+    forEach(parseFieldErrors(e), (error: Http.FieldError) => {
+      cellErrors.push({
+        id: id,
+        error: error.message,
+        field: error.field
+      });
     });
     if (cellErrors.length === 0) {
       handleRequestError(e, message);

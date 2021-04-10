@@ -3,14 +3,12 @@ import axiosRetry from "axios-retry";
 import Cookies from "universal-cookie";
 import { isNil } from "lodash";
 import { addQueryParamsToUrl, convertOrderingQueryToString } from "lib/util/urls";
-import { ClientError, NetworkError, ServerError, AuthenticationError } from "./errors";
+import { ClientError, NetworkError, ServerError, ForceLogout, AuthenticationError } from "./errors";
+import { parseAuthError } from "./util";
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
 export enum ErrorCodes {
-  EMAIL_DOES_NOT_EXIST = "email_does_not_exist",
-  INVALID_CREDENTIALS = "invalid_credentials",
-  ACCOUNT_DISABLED = "account_disabled",
   UNKNOWN = "unknown",
   NOT_FOUND = "not_found"
 }
@@ -51,20 +49,23 @@ instance.interceptors.request.use(
  *
  * @param error The AxiosError that was raised.
  */
-const createClientError = (error: AxiosError<Http.ErrorsResponse>): ClientError | undefined => {
+const createClientError = (error: AxiosError<Http.ErrorResponse>): ClientError | ForceLogout | undefined => {
   if (isNil(error.response) || isNil(error.response.data)) {
     return;
   }
   const response = error.response;
-  const body = response.data;
   const url = !isNil(error.response.config.url) ? error.response.config.url : "";
 
-  if (response.status === 403) {
-    return new AuthenticationError(response, body.errors, url);
-  }
-
-  if (!isNil(body.errors)) {
-    return new ClientError(response, body.errors, response.status, url);
+  if (!isNil(response.data.errors)) {
+    if (response.status === 403 || response.status === 401) {
+      const authError = parseAuthError(response.data);
+      if (!isNil(authError) && authError.force_logout === true) {
+        return new ForceLogout();
+      } else {
+        return new AuthenticationError(response, response.data.errors, url);
+      }
+    }
+    return new ClientError(response, response.data.errors, response.status, url);
   } else {
     // On 404's Django will sometimes bypass DRF exception handling and
     // return a 404.html template response.  We should bypass this in the
@@ -72,14 +73,13 @@ const createClientError = (error: AxiosError<Http.ErrorsResponse>): ClientError 
     if (error.response.status === 404) {
       return new ClientError(
         response,
-        {
-          __all__: [
-            {
-              message: "The requested resource could not be found.",
-              code: ErrorCodes.NOT_FOUND
-            }
-          ]
-        },
+        [
+          {
+            message: "The requested resource could not be found.",
+            code: ErrorCodes.NOT_FOUND,
+            error_type: "http"
+          }
+        ],
         response.status,
         url
       );
@@ -91,7 +91,7 @@ const createClientError = (error: AxiosError<Http.ErrorsResponse>): ClientError 
     `);
       return new ClientError(
         response,
-        { __all__: [{ message: "Unknown client error.", code: ErrorCodes.UNKNOWN }] },
+        [{ message: "Unknown client error.", error_type: "unknown", code: ErrorCodes.UNKNOWN }],
         response.status,
         url
       );
@@ -101,11 +101,11 @@ const createClientError = (error: AxiosError<Http.ErrorsResponse>): ClientError 
 
 instance.interceptors.response.use(
   (response: AxiosResponse<any>): AxiosResponse<any> => response,
-  (error: AxiosError<Http.ErrorsResponse>) => {
+  (error: AxiosError<Http.ErrorResponse>) => {
     if (!isNil(error.response)) {
       const response = error.response;
       if (response.status >= 400 && response.status < 500) {
-        const clientError: ClientError | undefined = createClientError(error);
+        const clientError: ClientError | ForceLogout | undefined = createClientError(error);
         if (!isNil(clientError)) {
           throw clientError;
         }
@@ -195,7 +195,7 @@ export class ApiClient {
       });
       return response.data;
     } catch (e) {
-      if (e instanceof AuthenticationError && options.redirectOnAuthenticationError !== false) {
+      if (e instanceof ForceLogout) {
         window.location.href = "/login";
       }
       throw e;

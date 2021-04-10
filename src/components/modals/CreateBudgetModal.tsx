@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 
 import { Input } from "antd";
 
-import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
+import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
 import { Form } from "components/forms";
 import { createBudget } from "api/services";
 
@@ -41,14 +41,14 @@ const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: Create
               })
               .catch((e: Error) => {
                 if (e instanceof ClientError) {
-                  if (!isNil(e.errors.__all__)) {
+                  const global = parseGlobalError(e);
+                  if (!isNil(global)) {
                     /* eslint-disable no-console */
-                    console.error(e.errors.__all__);
-                    setGlobalError(e.errors.__all__[0].message);
-                  } else {
-                    // Render the errors for each field next to the form field.
-                    renderFieldErrorsInForm(form, e);
+                    console.error(e.errors);
+                    setGlobalError(global.message);
                   }
+                  // Render the errors for each field next to the form field.
+                  renderFieldErrorsInForm(form, e);
                 } else if (e instanceof NetworkError) {
                   setGlobalError("There was a problem communicating with the server.");
                 } else {

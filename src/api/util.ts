@@ -1,18 +1,42 @@
-import { isNil, map, forEach } from "lodash";
+import { isNil, forEach, find, filter, map } from "lodash";
 import { toast } from "react-toastify";
+import { replaceInArray } from "lib/util";
 
 import { ClientError, NetworkError } from "./errors";
+import { standardizeError } from "./standardizer";
+
+export const parseErrors = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.Error[] => {
+  return error instanceof ClientError ? error.errors : Array.isArray(error) ? error : error.errors;
+};
+
+export const parseFieldErrors = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.FieldError[] => {
+  return map(filter(parseErrors(error), { error_type: "field" }) as Http.FieldError[], (e: Http.FieldError) =>
+    standardizeError(e)
+  );
+};
+
+export const parseAuthError = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.AuthError | null => {
+  const e = filter(parseErrors(error), { error_type: "auth" }) as Http.AuthError[];
+  return e.length === 0 ? null : standardizeError(e[0]); // There will only ever be 1 auth error in a given response.
+};
+
+export const parseGlobalError = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.GlobalError | null => {
+  const e = filter(parseErrors(error), { error_type: "global" }) as Http.GlobalError[];
+  return e.length === 0 ? null : standardizeError(e[0]); // There will only ever be 1 global error in a given response.
+};
 
 export const renderFieldErrorsInForm = (form: any, e: ClientError) => {
-  const fieldsWithErrors: { name: string; errors: string[] }[] = [];
-  forEach(e.errors, (errors: Http.ErrorDetail[] | Http.FieldErrors, field: string) => {
-    // Just check the first level - subsequent nested levels are usually for errors with M2M fields
-    // which are out of scope for now.
-    if (Array.isArray(errors)) {
-      fieldsWithErrors.push({
-        name: field,
-        errors: map(errors, (error: Http.ErrorDetail) => error.message)
-      });
+  let fieldsWithErrors: { name: string; errors: string[] }[] = [];
+  forEach(parseFieldErrors(e), (error: Http.FieldError) => {
+    const existing = find(fieldsWithErrors, { name: error.field });
+    if (!isNil(existing)) {
+      fieldsWithErrors = replaceInArray<{ name: string; errors: string[] }>(
+        fieldsWithErrors,
+        { name: error.field },
+        { ...existing, errors: [...existing.errors, standardizeError(error).message] }
+      );
+    } else {
+      fieldsWithErrors.push({ name: error.field, errors: [standardizeError(error).message] });
     }
   });
   form.setFields(fieldsWithErrors);
@@ -30,13 +54,6 @@ const isErrorHandlers = (handler: RequestErrorHandler | RequestErrorHandlers): h
   );
 };
 
-/**
- * A utility method to be used from within sagas to provide common logic that
- * gets executed when an HTTP error is encountered.
- *
- * @param e        The Error that was caught during a request.
- * @param message  The default message to display.
- */
 export const handleRequestError = (e: Error, message = "", handler?: RequestErrorHandler | RequestErrorHandlers) => {
   const getHandler = (type: "client" | "server"): RequestErrorHandler | undefined => {
     if (!isNil(handler)) {

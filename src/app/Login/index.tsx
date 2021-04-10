@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import { Typography, Form } from "antd";
 
-import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
+import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
 import { login, socialLogin } from "api/services";
 
 import LoginForm, { ILoginFormValues } from "./LoginForm";
@@ -38,12 +38,12 @@ const Login = (): JSX.Element => {
             })
             .catch((e: Error) => {
               if (e instanceof ClientError) {
-                if (!isNil(e.errors.__all__)) {
-                  setGlobalError(e.errors.__all__[0].message);
-                } else {
-                  // Render the errors for each field next to the form field.
-                  renderFieldErrorsInForm(form, e);
+                const global = parseGlobalError(e);
+                if (!isNil(global)) {
+                  setGlobalError(global.message);
                 }
+                // Render the errors for each field next to the form field.
+                renderFieldErrorsInForm(form, e);
               } else if (e instanceof NetworkError) {
                 setGlobalError("There was a problem communicating with the server.");
               } else {
@@ -68,12 +68,12 @@ const Login = (): JSX.Element => {
               })
               .catch((e: Error) => {
                 if (e instanceof ClientError) {
-                  if (!isNil(e.errors.__all__)) {
-                    setGlobalError(e.errors.__all__[0].message);
-                  } else {
-                    // Render the errors for each field next to the form field.
-                    renderFieldErrorsInForm(form, e);
+                  const global = parseGlobalError(e);
+                  if (!isNil(global)) {
+                    setGlobalError(global.message);
                   }
+                  // Render the errors for each field next to the form field.
+                  renderFieldErrorsInForm(form, e);
                 } else if (e instanceof NetworkError) {
                   setGlobalError("There was a problem communicating with the server.");
                 } else {

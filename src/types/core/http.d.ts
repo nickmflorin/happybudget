@@ -4,7 +4,6 @@ namespace Http {
   interface IRequestOptions extends AxiosRequestConfig {
     retries?: number;
     headers?: { [key: string]: string };
-    redirectOnAuthenticationError?: boolean;
     cancelToken?: any;
   }
 
@@ -32,24 +31,47 @@ namespace Http {
     readonly previous?: string | null;
   }
 
-  type ErrorDetail = {
-    readonly message: string;
-    // TODO: We might want to map this to the specific error codes we have defined.
+  type ErrorType = "unknown" | "http" | "field" | "global" | "auth";
+
+  interface ErrorInterface {
+    readonly error_type: ErrorType;
     readonly code: string;
-  };
+    readonly message: string;
+  }
 
-  type FieldErrors = {
-    readonly [key: string]: ErrorDetail[];
-  };
+  interface BaseError {
+    readonly code: string;
+    readonly message: string;
+  }
 
-  type Errors = {
-    // These are global errors that do not pertain to a specific field of the payload.
-    readonly __all__?: ErrorDetail[];
-    [key: string]: ErrorDetail[] | FieldErrors;
-  };
+  interface UnknownError extends BaseError implements ErrorInterface {
+    readonly error_type: "unknown";
+  }
 
-  type ErrorsResponse = {
-    errors: Errors;
+  interface FieldError extends BaseError implements ErrorInterface {
+    readonly error_type: "field";
+    readonly field: string;
+    readonly code: "unique" | "invalid" | "required";
+  }
+
+  interface GlobalError extends BaseError implements ErrorInterface {
+    readonly error_type: "global";
+  }
+
+  interface HttpError extends BaseError implements ErrorInterface {
+    readonly error_type: "http";
+  }
+
+  interface AuthError extends BaseError implements ErrorInterface {
+    readonly error_type: "auth";
+    readonly force_logout?: boolean;
+  }
+
+  type Error = HttpError | UnknownError | FieldError | GlobalError | AuthError;
+
+  type ErrorResponse = {
+    errors: Error[];
+    [key: string]: any;
   };
 
   interface ITokenValidationResponse {

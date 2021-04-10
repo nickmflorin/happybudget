@@ -6,7 +6,6 @@ export const login = async (
   password: string,
   options?: Http.IRequestOptions
 ): Promise<Http.ILoginResponse> => {
-  options = { ...options, redirectOnAuthenticationError: false };
   const url = URL.v1("auth", "login");
   return client.post<Http.ILoginResponse>(url, { email, password }, options);
 };
@@ -15,7 +14,6 @@ export const socialLogin = async (
   payload: Http.ISocialPayload,
   options?: Http.IRequestOptions
 ): Promise<Http.ILoginResponse> => {
-  options = { ...options, redirectOnAuthenticationError: false };
   const url = URL.v1("auth", "social-login");
   return client.post<Http.ILoginResponse>(url, payload, options);
 };

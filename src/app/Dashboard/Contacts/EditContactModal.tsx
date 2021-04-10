@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { isNil } from "lodash";
 
-import { ClientError, NetworkError, renderFieldErrorsInForm } from "api";
+import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError, standardizeError } from "api";
 import { Form, ContactForm } from "components/forms";
 import { Modal } from "components/modals";
 import { updateContact } from "api/services";
@@ -46,14 +46,14 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
               })
               .catch((e: Error) => {
                 if (e instanceof ClientError) {
-                  if (!isNil(e.errors.__all__)) {
+                  const global = parseGlobalError(e);
+                  if (!isNil(global)) {
                     /* eslint-disable no-console */
-                    console.error(e.errors.__all__);
-                    setGlobalError("There was a problem updating the contact.");
-                  } else {
-                    // Render the errors for each field next to the form field.
-                    renderFieldErrorsInForm(form, e);
+                    console.error(e.errors);
+                    setGlobalError(standardizeError(global).message);
                   }
+                  // Render the errors for each field next to the form field.
+                  renderFieldErrorsInForm(form, e);
                 } else if (e instanceof NetworkError) {
                   setGlobalError("There was a problem communicating with the server.");
                 } else {
