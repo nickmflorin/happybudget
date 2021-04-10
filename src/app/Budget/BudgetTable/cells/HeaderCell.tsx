@@ -44,11 +44,11 @@ const HeaderCell = <R extends Table.Row<any, any>>({
       className={classNames("header-cell", className)}
       style={style}
       onClick={() => {
-        setOrder(order === -1 || order === 0 ? 1 : -1);
+        setOrder(order === -1 ? 0 : order === 0 ? 1 : -1);
         !isNil(onSort) &&
           !isNil(colDef.field) &&
           colDef.sortable &&
-          onSort(order === -1 || order === 0 ? 1 : -1, colDef.field as keyof R, colDef, column);
+          onSort(order === -1 ? 0 : order === 0 ? 1 : -1, colDef.field as keyof R, colDef, column);
       }}
     >
       <div className={"text"}>{displayName}</div>
