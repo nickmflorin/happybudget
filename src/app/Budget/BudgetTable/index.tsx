@@ -624,31 +624,31 @@ const BudgetTable = <
       // should have - meaning we have to tell TS to ignore this line.
       /* @ts-ignore */
       if (event.event.keyCode === 13) {
-        event.api.stopEditing(false);
-        event.api.clearFocusedCell();
+        const editing = event.api.getEditingCells();
+        if (editing.length === 0) {
+          const firstEditCol = event.columnApi.getColumn(event.column.getColId());
+          if (!isNil(firstEditCol)) {
+            event.api.ensureColumnVisible(firstEditCol);
 
-        const firstEditCol = event.columnApi.getColumn(event.column.getColId());
-        if (!isNil(firstEditCol)) {
-          event.api.ensureColumnVisible(firstEditCol);
-
-          let foundNonFooterRow = false;
-          let nextRowNode: RowNode | null;
-          let additionalIndex = 1;
-          while (foundNonFooterRow === false) {
-            nextRowNode = event.api.getDisplayedRowAtIndex(event.rowIndex + additionalIndex);
-            if (isNil(nextRowNode)) {
-              onRowAdd();
-              event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
-              event.api.clearRangeSelection();
-              foundNonFooterRow = true;
-            } else {
-              let row: R = nextRowNode.data;
-              if (row.meta.isGroupFooter === false) {
+            let foundNonFooterRow = false;
+            let nextRowNode: RowNode | null;
+            let additionalIndex = 1;
+            while (foundNonFooterRow === false) {
+              nextRowNode = event.api.getDisplayedRowAtIndex(event.rowIndex + additionalIndex);
+              if (isNil(nextRowNode)) {
+                onRowAdd();
                 event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
                 event.api.clearRangeSelection();
                 foundNonFooterRow = true;
               } else {
-                additionalIndex = additionalIndex + 1;
+                let row: R = nextRowNode.data;
+                if (row.meta.isGroupFooter === false) {
+                  event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
+                  event.api.clearRangeSelection();
+                  foundNonFooterRow = true;
+                } else {
+                  additionalIndex = additionalIndex + 1;
+                }
               }
             }
           }
