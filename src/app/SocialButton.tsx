@@ -21,9 +21,12 @@ const isOfflineResponse = (
 
 const SocialButton = ({ provider, text, onGoogleSuccess, onGoogleError }: SocialButtonProps): JSX.Element => {
   if (provider === "google") {
+    if (isNil(process.env.REACT_APP_GOOGLE_CLIENT_KEY)) {
+      return <></>;
+    }
     return (
       <GoogleLogin
-        clientId={!isNil(process.env.REACT_APP_GOOGLE_CLIENT_KEY) ? process.env.REACT_APP_GOOGLE_CLIENT_KEY : ""}
+        clientId={process.env.REACT_APP_GOOGLE_CLIENT_KEY}
         render={(props: { onClick: () => void; disabled?: boolean }) => (
           <GoogleAuthButton text={text} onClick={props.onClick} disabled={props.disabled} />
         )}
