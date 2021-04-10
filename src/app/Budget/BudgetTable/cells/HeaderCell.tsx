@@ -47,6 +47,7 @@ const HeaderCell = <R extends Table.Row<any, any>>({
         setOrder(order === -1 || order === 0 ? 1 : -1);
         !isNil(onSort) &&
           !isNil(colDef.field) &&
+          colDef.sortable &&
           onSort(order === -1 || order === 0 ? 1 : -1, colDef.field as keyof R, colDef, column);
       }}
     >
