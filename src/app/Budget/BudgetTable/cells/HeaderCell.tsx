@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { isNil } from "lodash";
+import { useState, useMemo } from "react";
+import { isNil, find } from "lodash";
 import classNames from "classnames";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,6 +26,7 @@ interface IHeaderCompParams {
 
 export interface HeaderCellProps<R extends Table.Row<any, any>> extends IHeaderCompParams, StandardComponentProps {
   onSort?: (order: Order, field: keyof R, colDef: ColDef, column: Column) => void;
+  ordering?: FieldOrdering<keyof R>;
 }
 
 const HeaderCell = <R extends Table.Row<any, any>>({
@@ -33,22 +34,33 @@ const HeaderCell = <R extends Table.Row<any, any>>({
   displayName,
   onSort,
   className,
+  ordering,
   style = {}
 }: HeaderCellProps<R>): JSX.Element => {
   const [order, setOrder] = useState<Order>(0);
-
   const colDef = column.getColDef();
+
+  const externalOrder = useMemo(() => {
+    if (!isNil(ordering)) {
+      const fieldOrder: FieldOrder<keyof R> | undefined = find(ordering, { field: column.getColDef().field } as any);
+      if (!isNil(fieldOrder)) {
+        return fieldOrder.order;
+      }
+    }
+    return null;
+  }, [ordering]);
 
   return (
     <div
       className={classNames("header-cell", className)}
       style={style}
       onClick={() => {
-        setOrder(order === -1 ? 0 : order === 0 ? 1 : -1);
+        const baseOrder = externalOrder || order;
+        setOrder(baseOrder === -1 ? 0 : baseOrder === 0 ? 1 : -1);
         !isNil(onSort) &&
           !isNil(colDef.field) &&
           colDef.sortable &&
-          onSort(order === -1 ? 0 : order === 0 ? 1 : -1, colDef.field as keyof R, colDef, column);
+          onSort(baseOrder === -1 ? 0 : baseOrder === 0 ? 1 : -1, colDef.field as keyof R, colDef, column);
       }}
     >
       <div className={"text"}>{displayName}</div>
@@ -56,9 +68,9 @@ const HeaderCell = <R extends Table.Row<any, any>>({
         <IconHolder
           className={"icon-holder--sort"}
           size={"small"}
-          style={order === 0 ? { opacity: 0 } : { opacity: 1 }}
+          style={(externalOrder || order) === 0 ? { opacity: 0 } : { opacity: 1 }}
         >
-          <FontAwesomeIcon icon={order === 1 || 0 ? faArrowUp : faArrowDown} />
+          <FontAwesomeIcon icon={(externalOrder || order) === 1 || 0 ? faArrowUp : faArrowDown} />
         </IconHolder>
       </ShowHide>
     </div>

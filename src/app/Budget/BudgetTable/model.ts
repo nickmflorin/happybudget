@@ -17,6 +17,10 @@ export interface GroupProps<R extends Table.Row<G, C>, G extends IGroup<any>, C 
   onRowRemoveFromGroup: (row: R) => void;
 }
 
+export interface CookiesProps {
+  ordering?: string;
+}
+
 export interface BudgetTableProps<
   R extends Table.Row<G, C>,
   M extends Model,
@@ -49,6 +53,7 @@ export interface BudgetTableProps<
   exportFileName?: string;
   nonEditableCells?: (keyof R)[];
   groupParams?: GroupProps<R, G, C>;
+  cookies?: CookiesProps;
   loading?: boolean;
   sizeColumnsToFit?: boolean;
   processors?: CellProcessors<R, G, C>;

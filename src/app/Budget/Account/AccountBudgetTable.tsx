@@ -90,6 +90,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         search={search}
         onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
+        cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
         onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}

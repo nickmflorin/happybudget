@@ -10,7 +10,7 @@ import { currencyValueFormatter } from "lib/tabling/formatters";
 import { floatValueSetter, integerValueSetter, optionModelValueSetter } from "lib/tabling/valueSetters";
 import { getKeyValue } from "lib/util";
 
-import BudgetTable from "./BudgetTable";
+import BudgetTable, { CookiesProps } from "./BudgetTable";
 import { selectFringes, selectBudgetDetail, selectBudgetDetailLoading } from "./store/selectors";
 
 interface SubAccountsTableProps {
@@ -23,6 +23,7 @@ interface SubAccountsTableProps {
   search: string;
   saving: boolean;
   renderFlag: boolean;
+  cookies?: CookiesProps;
   onSearch: (value: string) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
@@ -49,6 +50,7 @@ const SubAccountsTable = ({
   saving,
   tableTotals,
   renderFlag,
+  cookies,
   onRowSelect,
   onRowUpdate,
   onRowDeselect,
@@ -83,6 +85,7 @@ const SubAccountsTable = ({
       selected={selected}
       loadingBudget={loadingBudget}
       renderFlag={renderFlag}
+      cookies={cookies}
       sizeColumnsToFit={false}
       identifierField={"identifier"}
       identifierFieldHeader={"Line"}

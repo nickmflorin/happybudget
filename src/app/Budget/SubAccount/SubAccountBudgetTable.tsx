@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
 import { createSelector } from "reselect";
+import Cookies from "universal-cookie";
 
 import { CreateSubAccountGroupModal, EditSubAccountGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
@@ -109,6 +110,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
             }
           }
         }}
+        cookies={!isNil(subaccountDetail) ? { ordering: `subaccount-${subaccountDetail.id}-table-ordering` } : {}}
         onDeleteGroup={(group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id))}
         onRowRemoveFromGroup={(row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id))}
         onGroupRows={(rows: Table.SubAccountRow[]) =>

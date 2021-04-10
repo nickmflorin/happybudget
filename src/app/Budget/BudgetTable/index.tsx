@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy, orderBy } from "lodash";
+import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
+import Cookies from "universal-cookie";
 
 import { AgGridReact } from "ag-grid-react";
 import { ChangeDetectionStrategyType } from "ag-grid-react/lib/changeDetectionService";
@@ -51,9 +52,10 @@ import {
   FringesCell,
   HeaderCell
 } from "./cells";
+import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } from "./cells/Util";
 import { BudgetTableProps } from "./model";
 import TableHeader from "./TableHeader";
-import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } from "./Util";
+import { validateCookiesOrdering } from "./util";
 import "./index.scss";
 
 export * from "./model";
@@ -82,6 +84,7 @@ const BudgetTable = <
   getExportValue,
   nonEditableCells,
   groupParams,
+  cookies,
   identifierField,
   identifierFieldHeader,
   identifierColumn = {},
@@ -200,39 +203,6 @@ const BudgetTable = <
   const onBudgetFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
     setBudgetFooterColumnApi(event.columnApi);
   });
-
-  useEffect(() => {
-    const keyListener = (e: KeyboardEvent) => {
-      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      if (gridApi) {
-        if (e.key === "ArrowDown" && ctrlCmdPressed) {
-          const focusedCell = gridApi.getFocusedCell();
-          if (focusedCell) {
-            const row = gridApi?.getDisplayedRowAtIndex(focusedCell?.rowIndex);
-            if (onRowExpand && !isNil(row?.data.identifier)) {
-              onRowExpand(row?.data.id);
-            }
-          }
-        }
-        if (e.key === "ArrowUp" && ctrlCmdPressed) {
-          if (onBack) {
-            onBack();
-          }
-        }
-      }
-    };
-    window.addEventListener("keydown", keyListener);
-    return () => window.removeEventListener("keydown", keyListener);
-  }, [gridApi]);
-
-  useEffect(() => {
-    setGridOptions({
-      ...gridOptions,
-      alignedGrids: [tableFooterGridOptions, budgetFooterGridOptions]
-    });
-    setBudgetFooterGridOptions({ ...budgetFooterGridOptions, alignedGrids: [gridOptions, tableFooterGridOptions] });
-    setTableFooterGridOptions({ ...tableFooterGridOptions, alignedGrids: [gridOptions, budgetFooterGridOptions] });
-  }, []);
 
   const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
     if (includes(["delete", "index", "expand"], colDef.field)) {
@@ -370,14 +340,22 @@ const BudgetTable = <
     }
   );
 
+  const onSort = useDynamicCallback<void>((order: Order, field: keyof R) => {
+    const newOrdering = updateFieldOrdering(ordering, field, order);
+    setOrdering(newOrdering);
+    if (!isNil(cookies) && !isNil(cookies.ordering)) {
+      const kookies = new Cookies();
+      kookies.set(cookies.ordering, newOrdering);
+    }
+  });
+
   const bodyCell = useDynamicCallback<ColDef>(
     (col: ColDef): ColDef => {
       return {
         cellRenderer: "ValueCell",
         headerComponentParams: {
-          onSort: (order: Order, field: keyof R) => {
-            setOrdering(updateFieldOrdering(ordering, field, order));
-          }
+          onSort: onSort,
+          ordering
         },
         ...col
       };
@@ -782,6 +760,50 @@ const BudgetTable = <
       }
     }
   });
+
+  useEffect(() => {
+    setGridOptions({
+      ...gridOptions,
+      alignedGrids: [tableFooterGridOptions, budgetFooterGridOptions]
+    });
+    setBudgetFooterGridOptions({ ...budgetFooterGridOptions, alignedGrids: [gridOptions, tableFooterGridOptions] });
+    setTableFooterGridOptions({ ...tableFooterGridOptions, alignedGrids: [gridOptions, budgetFooterGridOptions] });
+  }, []);
+
+  useEffect(() => {
+    if (!isNil(cookies) && !isNil(cookies.ordering)) {
+      const kookies = new Cookies();
+      const cookiesOrdering = kookies.get(cookies.ordering);
+      const validatedOrdering = validateCookiesOrdering(cookiesOrdering, bodyColumns);
+      if (!isNil(validatedOrdering)) {
+        setOrdering(validatedOrdering);
+      }
+    }
+  }, [useDeepEqualMemo(cookies)]);
+
+  useEffect(() => {
+    const keyListener = (e: KeyboardEvent) => {
+      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+      if (gridApi) {
+        if (e.key === "ArrowDown" && ctrlCmdPressed) {
+          const focusedCell = gridApi.getFocusedCell();
+          if (focusedCell) {
+            const row = gridApi?.getDisplayedRowAtIndex(focusedCell?.rowIndex);
+            if (onRowExpand && !isNil(row?.data.identifier)) {
+              onRowExpand(row?.data.id);
+            }
+          }
+        }
+        if (e.key === "ArrowUp" && ctrlCmdPressed) {
+          if (onBack) {
+            onBack();
+          }
+        }
+      }
+    };
+    window.addEventListener("keydown", keyListener);
+    return () => window.removeEventListener("keydown", keyListener);
+  }, [gridApi]);
 
   useEffect(() => {
     if (renderFlag === true) {
