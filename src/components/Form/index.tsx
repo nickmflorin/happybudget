@@ -21,7 +21,6 @@ const _Form = <T extends { [key: string]: any } = any>(
   const childrenArray = Array.isArray(children) ? children : [children];
   const footer = find(childrenArray, (child: JSX.Element) => child.type === Footer);
 
-  console.log(props.form);
   return (
     <RootForm
       {...props}
