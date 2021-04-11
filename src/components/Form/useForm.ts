@@ -8,6 +8,7 @@ type ExtendedForm = FormInstance & {
   handleRequestError: (e: Error) => void;
   renderFieldErrors: (e: ClientError) => void;
   setGlobalError: (e: string) => void;
+  setLoading: (value: boolean) => void;
 };
 
 const useForm = (form?: ExtendedForm | undefined) => {
@@ -15,9 +16,14 @@ const useForm = (form?: ExtendedForm | undefined) => {
   const antdForm = _useAntdForm[0];
 
   const globalError = useRef<string | undefined>(undefined);
+  const loading = useRef<boolean | undefined>(false);
 
   const setGlobalError = (value: string | undefined) => {
     globalError.current = value;
+  };
+
+  const setLoading = (value: boolean) => {
+    loading.current = value;
   };
 
   const renderFieldErrors = (e: ClientError) => {
@@ -48,6 +54,7 @@ const useForm = (form?: ExtendedForm | undefined) => {
         setGlobalError(undefined);
         antdForm.resetFields();
       },
+      setLoading,
       setGlobalError: setGlobalError,
       renderFieldErrors: renderFieldErrors,
       handleRequestError: (e: Error) => {
