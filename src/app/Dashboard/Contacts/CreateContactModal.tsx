@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { isNil } from "lodash";
 
-import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError, standardizeError } from "api";
 import { Form } from "components";
 import { ContactForm } from "components/forms";
 import { Modal } from "components/modals";
@@ -20,13 +18,8 @@ interface CreateContactModalProps {
 // TODO: Create front end validators for phone number, city, and country.
 const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
   const dispatch: Dispatch = useDispatch();
-
-  useEffect(() => {
-    form.test("blah");
-  }, []);
 
   return (
     <Modal
@@ -43,26 +36,12 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
             setLoading(true);
             createContact(values)
               .then((contact: IContact) => {
-                setGlobalError(undefined);
                 form.resetFields();
                 dispatch(addContactToStateAction(contact));
                 onSuccess();
               })
               .catch((e: Error) => {
-                if (e instanceof ClientError) {
-                  const global = parseGlobalError(e);
-                  if (!isNil(global)) {
-                    /* eslint-disable no-console */
-                    console.error(e.errors);
-                    setGlobalError(standardizeError(global).message);
-                  }
-                  // Render the errors for each field next to the form field.
-                  renderFieldErrorsInForm(form, e);
-                } else if (e instanceof NetworkError) {
-                  setGlobalError("There was a problem communicating with the server.");
-                } else {
-                  throw e;
-                }
+                form.handleRequestError(e);
               })
               .finally(() => {
                 setLoading(false);
@@ -73,7 +52,7 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
           });
       }}
     >
-      <ContactForm form={form} globalError={globalError} />
+      <ContactForm form={form} />
     </Modal>
   );
 };

@@ -1,9 +1,7 @@
 import { useState } from "react";
-import { isNil } from "lodash";
 
 import { Input } from "antd";
 
-import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
 import { Form } from "components";
 import { createBudget } from "api/services";
 
@@ -18,7 +16,6 @@ interface CreateBudgetModalProps {
 
 const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: CreateBudgetModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
 
   return (
@@ -40,20 +37,7 @@ const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: Create
                 onSuccess(budget);
               })
               .catch((e: Error) => {
-                if (e instanceof ClientError) {
-                  const global = parseGlobalError(e);
-                  if (!isNil(global)) {
-                    /* eslint-disable no-console */
-                    console.error(e.errors);
-                    setGlobalError(global.message);
-                  }
-                  // Render the errors for each field next to the form field.
-                  renderFieldErrorsInForm(form, e);
-                } else if (e instanceof NetworkError) {
-                  setGlobalError("There was a problem communicating with the server.");
-                } else {
-                  throw e;
-                }
+                form.handleRequestError(e);
               })
               .finally(() => {
                 setLoading(false);
@@ -64,7 +48,7 @@ const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: Create
           });
       }}
     >
-      <Form.Form form={form} layout={"vertical"} name={"form_in_modal"} globalError={globalError} initialValues={{}}>
+      <Form.Form form={form} layout={"vertical"} name={"form_in_modal"} initialValues={{}}>
         <Form.Item
           name={"name"}
           label={"Name"}

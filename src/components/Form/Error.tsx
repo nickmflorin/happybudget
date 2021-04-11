@@ -4,7 +4,6 @@ import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { isHttpError, standardizeError } from "api";
-import "./DisplayAlert.scss";
 
 interface ErrorProps extends StandardComponentProps {
   children?: string | JSX.Element | Http.Error | undefined;

@@ -4,7 +4,8 @@ import classNames from "classnames";
 
 import { Form as RootForm } from "antd";
 
-import { DisplayAlert, RenderWithSpinner } from "components/display";
+import { RenderWithSpinner } from "components/display";
+import Error from "./Error";
 import Footer from "./Footer";
 import { FormProps } from "./model";
 import useForm from "./useForm";
@@ -32,7 +33,7 @@ const _Form = <T extends { [key: string]: any } = any>(
       <RenderWithSpinner loading={loading}>
         {filter(childrenArray, (child: JSX.Element) => child.type !== Footer)}
         <div className={"form-alert-wrapper"}>
-          <DisplayAlert>{(props.form && props.form.globalError.current) || globalError}</DisplayAlert>
+          <Error>{(props.form && props.form.globalError.current) || globalError}</Error>
         </div>
         {!isNil(footer) && footer}
       </RenderWithSpinner>
@@ -44,6 +45,7 @@ const Form = forwardRef(_Form);
 
 const exportable = {
   Form: Form,
+  Error: Error,
   useForm: useForm,
   Footer: Footer,
   Item: RootForm.Item

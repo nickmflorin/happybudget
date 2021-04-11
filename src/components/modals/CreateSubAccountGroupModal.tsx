@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { isNil } from "lodash";
 
-import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
 import { createAccountSubAccountGroup, createSubAccountSubAccountGroup } from "api/services";
 import { Form } from "components";
 import { GroupForm } from "components/forms";
@@ -27,7 +26,6 @@ const CreateSubAccountGroupModal = ({
   onCancel
 }: CreateSubAccountGroupModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
 
   return (
@@ -43,21 +41,6 @@ const CreateSubAccountGroupModal = ({
           .validateFields()
           .then((values: GroupFormValues) => {
             setLoading(true);
-
-            const handleError = (e: Error) => {
-              if (e instanceof ClientError) {
-                const global = parseGlobalError(e);
-                if (!isNil(global)) {
-                  setGlobalError(global.message);
-                }
-                // Render the errors for each field next to the form field.
-                renderFieldErrorsInForm(form, e);
-              } else if (e instanceof NetworkError) {
-                setGlobalError("There was a problem communicating with the server.");
-              } else {
-                throw e;
-              }
-            };
             if (!isNil(accountId)) {
               createAccountSubAccountGroup(accountId, {
                 name: values.name,
@@ -68,7 +51,7 @@ const CreateSubAccountGroupModal = ({
                   form.resetFields();
                   onSuccess(group);
                 })
-                .catch((e: Error) => handleError(e))
+                .catch((e: Error) => form.handleRequestError(e))
                 .finally(() => setLoading(false));
             } else if (!isNil(subaccountId)) {
               createSubAccountSubAccountGroup(subaccountId, {
@@ -80,7 +63,7 @@ const CreateSubAccountGroupModal = ({
                   form.resetFields();
                   onSuccess(group);
                 })
-                .catch((e: Error) => handleError(e))
+                .catch((e: Error) => form.handleRequestError(e))
                 .finally(() => setLoading(false));
             }
           })
@@ -89,7 +72,7 @@ const CreateSubAccountGroupModal = ({
           });
       }}
     >
-      <GroupForm form={form} name={"form_in_modal"} globalError={globalError} initialValues={{}} />
+      <GroupForm form={form} name={"form_in_modal"} initialValues={{}} />
     </Modal>
   );
 };
