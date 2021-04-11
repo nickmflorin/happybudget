@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
 import { Typography } from "antd";
 
-import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
 import { login, socialLogin } from "api/services";
 import { Form } from "components";
 
@@ -14,13 +13,8 @@ import "./index.scss";
 
 const Login = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
   const history = useHistory();
-
-  useEffect(() => {
-    setGlobalError(undefined);
-  }, []);
 
   return (
     <div className={"form-container"}>
@@ -30,7 +24,6 @@ const Login = (): JSX.Element => {
         className={"mb--20 mt--20"}
         form={form}
         loading={loading}
-        globalError={globalError}
         onGoogleSuccess={(token: string) => {
           setLoading(true);
           socialLogin({ token_id: token, provider: "google" })
@@ -38,18 +31,7 @@ const Login = (): JSX.Element => {
               history.push("/");
             })
             .catch((e: Error) => {
-              if (e instanceof ClientError) {
-                const global = parseGlobalError(e);
-                if (!isNil(global)) {
-                  setGlobalError(global.message);
-                }
-                // Render the errors for each field next to the form field.
-                renderFieldErrorsInForm(form, e);
-              } else if (e instanceof NetworkError) {
-                setGlobalError("There was a problem communicating with the server.");
-              } else {
-                throw e;
-              }
+              form.handleRequestError(e);
             })
             .finally(() => {
               setLoading(false);
@@ -59,7 +41,7 @@ const Login = (): JSX.Element => {
           // TODO: Try to do a better job parsing the error.
           /* eslint-disable no-console */
           console.error(error);
-          setGlobalError("There was an error authenticating with Google.");
+          form.setGlobalError("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ILoginFormValues) => {
           if (!isNil(values.email) && !isNil(values.password)) {
@@ -68,18 +50,7 @@ const Login = (): JSX.Element => {
                 history.push("/");
               })
               .catch((e: Error) => {
-                if (e instanceof ClientError) {
-                  const global = parseGlobalError(e);
-                  if (!isNil(global)) {
-                    setGlobalError(global.message);
-                  }
-                  // Render the errors for each field next to the form field.
-                  renderFieldErrorsInForm(form, e);
-                } else if (e instanceof NetworkError) {
-                  setGlobalError("There was a problem communicating with the server.");
-                } else {
-                  throw e;
-                }
+                form.handleRequestError(e);
               })
               .finally(() => {
                 setLoading(false);

@@ -1,6 +1,5 @@
-import { isNil, forEach, find, filter, map } from "lodash";
+import { isNil, filter, map } from "lodash";
 import { toast } from "react-toastify";
-import { replaceInArray } from "lib/util";
 
 import { ClientError, NetworkError } from "./errors";
 import { standardizeError } from "./standardizer";
@@ -32,23 +31,6 @@ export const parseAuthError = (error: ClientError | Http.ErrorResponse | Http.Er
 export const parseGlobalError = (error: ClientError | Http.ErrorResponse | Http.Error[]): Http.GlobalError | null => {
   const e = filter(parseErrors(error), { error_type: "global" }) as Http.GlobalError[];
   return e.length === 0 ? null : standardizeError(e[0]); // There will only ever be 1 global error in a given response.
-};
-
-export const renderFieldErrorsInForm = (form: any, e: ClientError) => {
-  let fieldsWithErrors: { name: string; errors: string[] }[] = [];
-  forEach(parseFieldErrors(e), (error: Http.FieldError) => {
-    const existing = find(fieldsWithErrors, { name: error.field });
-    if (!isNil(existing)) {
-      fieldsWithErrors = replaceInArray<{ name: string; errors: string[] }>(
-        fieldsWithErrors,
-        { name: error.field },
-        { ...existing, errors: [...existing.errors, standardizeError(error).message] }
-      );
-    } else {
-      fieldsWithErrors.push({ name: error.field, errors: [standardizeError(error).message] });
-    }
-  });
-  form.setFields(fieldsWithErrors);
 };
 
 export type RequestErrorHandler = (error: string) => void;

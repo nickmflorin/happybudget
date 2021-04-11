@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { isNil } from "lodash";
 
-import { Typography, Form } from "antd";
+import { Typography } from "antd";
 
-import { ClientError, NetworkError, renderFieldErrorsInForm, parseGlobalError } from "api";
 import { register, socialLogin } from "api/services";
+import { Form } from "components";
 
 import SignupForm, { ISignupFormValues } from "./SignupForm";
 
@@ -13,7 +12,6 @@ import "./index.scss";
 
 const Signup = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
   const history = useHistory();
 
@@ -21,7 +19,6 @@ const Signup = (): JSX.Element => {
     <div className={"form-container"}>
       <Typography.Title className={"title"}>{"Register"}</Typography.Title>
       <Typography.Title className={"sub-title"}>{"Cloud based budgeting at your fingertips."}</Typography.Title>
-      {!isNil(globalError) && <div className={"global-error"}>{globalError}</div>}
       <SignupForm
         className={"mb--20 mt--20"}
         form={form}
@@ -33,18 +30,7 @@ const Signup = (): JSX.Element => {
               history.push("/");
             })
             .catch((e: Error) => {
-              if (e instanceof ClientError) {
-                const global = parseGlobalError(e);
-                if (!isNil(global)) {
-                  setGlobalError(global.message);
-                }
-                // Render the errors for each field next to the form field.
-                renderFieldErrorsInForm(form, e);
-              } else if (e instanceof NetworkError) {
-                setGlobalError("There was a problem communicating with the server.");
-              } else {
-                throw e;
-              }
+              form.handleRequestError(e);
             })
             .finally(() => {
               setLoading(false);
@@ -54,7 +40,7 @@ const Signup = (): JSX.Element => {
           // TODO: Try to do a better job parsing the error.
           /* eslint-disable no-console */
           console.error(error);
-          setGlobalError("There was an error authenticating with Google.");
+          form.setGlobalError("There was an error authenticating with Google.");
         }}
         onSubmit={(values: ISignupFormValues) => {
           register(values)
@@ -62,18 +48,7 @@ const Signup = (): JSX.Element => {
               history.push("/");
             })
             .catch((e: Error) => {
-              if (e instanceof ClientError) {
-                const global = parseGlobalError(e);
-                if (!isNil(global)) {
-                  setGlobalError(global.message);
-                }
-                // Render the errors for each field next to the form field.
-                renderFieldErrorsInForm(form, e);
-              } else if (e instanceof NetworkError) {
-                setGlobalError("There was a problem communicating with the server.");
-              } else {
-                throw e;
-              }
+              form.handleRequestError(e);
             })
             .finally(() => {
               setLoading(false);

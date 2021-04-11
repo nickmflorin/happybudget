@@ -16,10 +16,9 @@ export interface ILoginFormValues {
   password?: string;
 }
 
-interface LoginFormProps {
+interface LoginFormProps extends StandardComponentProps {
   form: any;
   loading: boolean;
-  globalError: string | undefined;
   style?: React.CSSProperties;
   className?: string;
   onSubmit: (values: ILoginFormValues) => void;
@@ -27,12 +26,11 @@ interface LoginFormProps {
   onGoogleError: (error: any) => void;
 }
 
-const LoginForm = ({
+const LoginForm: React.FC<LoginFormProps> = ({
   style,
   className,
   form,
   loading,
-  globalError,
   onSubmit,
   onGoogleSuccess,
   onGoogleError
@@ -41,7 +39,6 @@ const LoginForm = ({
     <Form.Form
       style={style}
       form={form}
-      globalError={globalError}
       className={classNames("login-form", className)}
       onFinish={(values: ILoginFormValues) => onSubmit(values)}
     >
