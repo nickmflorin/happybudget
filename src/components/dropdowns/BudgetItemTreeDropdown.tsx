@@ -6,8 +6,8 @@ import classNames from "classnames";
 import { Dropdown } from "antd";
 import { DropDownProps } from "antd/lib/dropdown";
 
-import { CaretButton } from "components/control/buttons";
-import { BudgetItemTreeMenu } from "components/control/menus";
+import { CaretButton } from "components/buttons";
+import { BudgetItemTreeMenu } from "components/menus";
 import { EntityText } from "components/typography";
 import { flattenBudgetItemNodes } from "lib/model/util";
 import { isNodeDescendantOf } from "lib/util";

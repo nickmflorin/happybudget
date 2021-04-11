@@ -31,7 +31,7 @@ import {
 } from "ag-grid-community";
 
 import { TABLE_DEBUG } from "config";
-import { RenderWithSpinner, ShowHide } from "components/display";
+import { RenderWithSpinner, ShowHide } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString, updateFieldOrdering, orderByFieldOrdering } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";

@@ -5,8 +5,8 @@ import classNames from "classnames";
 import { Dropdown } from "antd";
 import { DropDownProps } from "antd/lib/dropdown";
 
-import { ModelTagsMenu } from "components/control/menus";
-import { Tag } from "components/display";
+import { ModelTagsMenu } from "components/menus";
+import { Tag } from "components";
 import { useDeepEqualMemo } from "lib/hooks";
 import { getKeyValue } from "lib/util";
 

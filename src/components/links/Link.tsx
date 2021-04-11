@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import classNames from "classnames";
-import GenericClickable from "components/control/GenericClickable";
+import { GenericClickable } from "components/util";
 
 interface LinkProps {
   className?: string;

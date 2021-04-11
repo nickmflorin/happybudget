@@ -4,8 +4,8 @@ import { isNil } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 
-import { ShowHide } from "components/display";
-import { AccountCircleLink } from "components/control/links";
+import { ShowHide } from "components";
+import { AccountCircleLink } from "components/links";
 import { SegmentedText } from "components/typography";
 import { isFieldAlterationEvent } from "lib/model/typeguards";
 import { toDisplayTimeSince } from "lib/util/dates";

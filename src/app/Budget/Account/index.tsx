@@ -5,7 +5,7 @@ import Cookies from "universal-cookie";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
-import { RenderIfValidId, WrapInApplicationSpinner } from "components/display";
+import { RenderIfValidId, WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setInstanceAction } from "../store/actions";

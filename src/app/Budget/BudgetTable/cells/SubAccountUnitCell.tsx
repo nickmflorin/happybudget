@@ -1,5 +1,5 @@
 import { SubAccountUnitModelsList } from "lib/model";
-import { OptionModelTagsDropdown } from "components/control/dropdowns";
+import { OptionModelTagsDropdown } from "components/dropdowns";
 import Cell, { StandardCellProps } from "./Cell";
 
 interface SubAccountUnitCellProps extends StandardCellProps<Table.SubAccountRow> {

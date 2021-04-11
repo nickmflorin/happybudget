@@ -1,6 +1,6 @@
 import GoogleLogin, { GoogleLoginResponse, GoogleLoginResponseOffline } from "react-google-login";
 import { isNil } from "lodash";
-import { GoogleAuthButton } from "components/control/buttons";
+import { GoogleAuthButton } from "components/buttons";
 
 interface SocialButtonProps {
   provider: "google";

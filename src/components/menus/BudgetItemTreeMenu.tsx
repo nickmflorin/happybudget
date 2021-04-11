@@ -8,8 +8,8 @@ import { MenuProps, MenuItemProps } from "antd/lib/menu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 
-import { IconButton } from "components/control/buttons";
-import { ShowHide } from "components/display";
+import { IconButton } from "components/buttons";
+import { ShowHide } from "components";
 import { EntityText } from "components/typography";
 
 import "./BudgetItemTreeMenu.scss";

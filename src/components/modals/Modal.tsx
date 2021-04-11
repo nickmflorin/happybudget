@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Modal as RootModal } from "antd";
 import { ModalProps as RootModalProps } from "antd/lib/modal";
-import { RenderWithSpinner } from "components/display";
+import { RenderWithSpinner } from "components";
 
 export interface ModalProps extends RootModalProps {
   loading?: boolean;

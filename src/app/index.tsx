@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "style/index.scss";
 
-import { ApplicationSpinner } from "components/display";
+import { ApplicationSpinner } from "components";
 import { ReduxRoute } from "components/routes";
 import { componentLoader } from "lib/operational";
 

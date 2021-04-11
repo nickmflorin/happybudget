@@ -2,7 +2,7 @@ import React from "react";
 import { Redirect, Switch, Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import { ApplicationSpinner } from "components/display";
+import { ApplicationSpinner } from "components";
 import { PrivateRoute } from "components/routes";
 import { componentLoader } from "lib/operational";
 import Logout from "./Logout";

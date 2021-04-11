@@ -1,7 +1,7 @@
 import { Input } from "antd";
 
-import { ShowHide } from "components/display";
-import { TextWithLink } from "components/control/links";
+import { ShowHide } from "components";
+import { TextWithLink } from "components/links";
 
 import "./CommentEdit.scss";
 

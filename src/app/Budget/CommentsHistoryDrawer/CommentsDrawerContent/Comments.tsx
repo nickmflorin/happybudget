@@ -1,7 +1,7 @@
 import { map } from "lodash";
 import { Empty } from "antd";
 
-import { RenderWithSpinner, ShowHide } from "components/display";
+import { RenderWithSpinner, ShowHide } from "components";
 
 import CommentBlock from "./CommentBlock";
 

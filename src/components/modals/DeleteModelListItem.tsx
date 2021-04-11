@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { isNil } from "lodash";
 import { Checkbox } from "antd";
-import { ShowHide } from "components/display";
+import { ShowHide } from "components";
 
 import "./DeleteModelListItem.scss";
 

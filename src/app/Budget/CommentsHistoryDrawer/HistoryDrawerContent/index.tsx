@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { map } from "lodash";
 import { Empty } from "antd";
 
-import { RenderWithSpinner, ShowHide } from "components/display";
+import { RenderWithSpinner, ShowHide } from "components";
 import { Drawer } from "components/layout";
 
 import Event from "./Event";

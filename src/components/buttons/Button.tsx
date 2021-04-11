@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import classNames from "classnames";
 import { Button as AntDButton } from "antd";
-import GenericClickable from "components/control/GenericClickable";
+import { GenericClickable } from "components/util";
 
 interface ButtonProps {
   className?: string;

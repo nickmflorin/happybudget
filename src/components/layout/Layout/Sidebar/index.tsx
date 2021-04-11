@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { map } from "lodash";
 import classNames from "classnames";
 
-import { ShowHide } from "components/display";
+import { ShowHide } from "components";
 import { SidebarLogo, LeafLogo } from "components/svgs";
 
 import SidebarItem, { ISidebarItem } from "./SidebarItem";

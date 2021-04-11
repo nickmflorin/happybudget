@@ -4,7 +4,7 @@ import { faCheckCircle } from "@fortawesome/free-regular-svg-icons";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
-import { ShowHide } from "components/display";
+import { ShowHide } from "components";
 
 import "./SavingChanges.scss";
 

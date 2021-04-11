@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "universal-cookie";
 
-import { WrapInApplicationSpinner } from "components/display";
+import { WrapInApplicationSpinner } from "components";
 import { simpleShallowEqualSelector } from "store/selectors";
 
 import { setInstanceAction } from "../store/actions";

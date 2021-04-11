@@ -2,11 +2,11 @@ import { ReactNode } from "react";
 import classNames from "classnames";
 import { Dropdown } from "antd";
 
-import { FieldsMenu } from "components/control/menus";
-import { FieldsMenuProps } from "components/control/menus/FieldsMenu";
+import { FieldsMenu } from "components/menus";
+import { FieldsMenuProps } from "components/menus/FieldsMenu";
 
-import { CaretButton } from "components/control/buttons";
-import { CaretButtonProps } from "components/control/buttons/CaretButton";
+import { CaretButton } from "components/buttons";
+import { CaretButtonProps } from "components/buttons/CaretButton";
 
 interface FieldsDropdownProps extends FieldsMenuProps {
   children: ReactNode;

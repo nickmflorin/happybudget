@@ -5,9 +5,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faReply } from "@fortawesome/free-solid-svg-icons";
 import { faThumbsUp, faEdit, faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 
-import { IconButton } from "components/control/buttons";
-import { AccountCircleLink } from "components/control/links";
-import { ShowHide } from "components/display";
+import { IconButton } from "components/buttons";
+import { AccountCircleLink } from "components/links";
+import { ShowHide } from "components";
 import { toDisplayTimeSince } from "lib/util/dates";
 import { useLoggedInUser } from "store/hooks";
 

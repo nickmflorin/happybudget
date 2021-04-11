@@ -1,4 +1,4 @@
-import { OptionModelTagsDropdown } from "components/control/dropdowns";
+import { OptionModelTagsDropdown } from "components/dropdowns";
 import { PaymentMethodModelsList } from "lib/model";
 import Cell, { StandardCellProps } from "./Cell";
 

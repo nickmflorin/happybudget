@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import { List } from "antd";
 import { ModalProps } from "antd/lib/modal";
 
-import { DisplayAlert } from "components/display";
+import { DisplayAlert } from "components";
 import DeleteModelListItem, { DeleteModelListItemProps } from "./DeleteModelListItem";
 import Modal from "./Modal";
 

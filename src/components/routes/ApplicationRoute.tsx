@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Route } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
-import { ShowHide, ApplicationSpinner } from "components/display";
+import { ShowHide, ApplicationSpinner } from "components";
 
 const ApplicationRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
   return (

@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 
-import { TooltipWrapper } from "components/display";
+import { TooltipWrapper } from "components";
 
 interface GenericClickableProps {
   className?: string;

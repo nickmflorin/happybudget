@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { ShowHide } from "components/display";
+import { ShowHide } from "components";
 import Spinner, { SpinnerProps } from "./Spinner";
 
 interface RenderWithSpinnerProps extends SpinnerProps {

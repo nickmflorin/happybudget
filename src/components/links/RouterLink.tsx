@@ -1,7 +1,6 @@
-import React from "react";
 import { Link as ReactLink } from "react-router-dom";
 import classNames from "classnames";
-import GenericClickable from "components/control/GenericClickable";
+import { GenericClickable } from "components/util";
 
 interface RouterLinkProps {
   className?: string;

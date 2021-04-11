@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle } from "@fortawesome/free-solid-svg-icons";
 
-import { ShowHide } from "components/display";
+import { ShowHide } from "components";
 
 import "./AccountCircleLink.scss";
 

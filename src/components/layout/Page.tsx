@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 import { PageHeader } from "antd";
-import { WrapInApplicationSpinner } from "components/display";
+import { WrapInApplicationSpinner } from "components";
 import "./Page.scss";
 
 interface PageProps {

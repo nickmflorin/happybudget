@@ -4,7 +4,7 @@ import { Route, Redirect } from "react-router-dom";
 import { Dispatch } from "redux";
 
 import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
-import { WrapInApplicationSpinner } from "components/display";
+import { WrapInApplicationSpinner } from "components";
 import { updateLoggedInUserAction } from "store/actions";
 import { validateToken } from "api/services";
 

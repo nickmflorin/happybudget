@@ -5,7 +5,7 @@ import classNames from "classnames";
 
 import { CellClassParams } from "ag-grid-community";
 
-import { WrapInApplicationSpinner } from "components/display";
+import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { FringeUnitModelsList } from "lib/model";
 import { FringeMapping } from "lib/tabling/mappings";

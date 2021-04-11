@@ -19,7 +19,7 @@ import {
   faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 
-import { RenderIfValidId } from "components/display";
+import { RenderIfValidId } from "components";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
 import { componentLoader } from "lib/operational";
 

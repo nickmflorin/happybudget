@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { map } from "lodash";
 
-import { ModelTagsDropdown } from "components/control/dropdowns";
+import { ModelTagsDropdown } from "components/dropdowns";
 import { selectFringes } from "../../store/selectors";
 import Cell, { StandardCellProps } from "./Cell";
 

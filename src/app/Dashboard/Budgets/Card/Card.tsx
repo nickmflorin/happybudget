@@ -7,9 +7,9 @@ import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
 import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { Dropdown } from "components/control/dropdowns";
-import { IconButton } from "components/control/buttons";
-import { ShowHide, RenderWithSpinner } from "components/display";
+import { Dropdown } from "components/dropdowns";
+import { IconButton } from "components/buttons";
+import { ShowHide, RenderWithSpinner } from "components";
 import {
   ActorsIcon,
   DirectorIcon,

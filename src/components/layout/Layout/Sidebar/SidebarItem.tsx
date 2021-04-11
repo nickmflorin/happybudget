@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import classNames from "classnames";
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 
-import { ShowHide, TooltipWrapper } from "components/display";
+import { ShowHide, TooltipWrapper } from "components";
 
 export interface ISidebarItem {
   icon?: JSX.Element;

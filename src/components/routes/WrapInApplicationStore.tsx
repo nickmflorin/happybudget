@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import { isNil } from "lodash";
 
 import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
-import { ApplicationSpinner } from "components/display";
+import { ApplicationSpinner } from "components";
 import { validateToken } from "api/services";
 import configureStore from "store";
 

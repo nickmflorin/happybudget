@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { ShowHide } from "components/display";
+import { ShowHide } from "components";
 
 import Content from "./Content";
 import Header from "./Header";

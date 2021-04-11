@@ -9,10 +9,10 @@ import { SearchOutlined } from "@ant-design/icons";
 
 import { ColDef } from "ag-grid-community";
 
-import { IconButton } from "components/control/buttons";
-import { FieldsDropdown } from "components/control/dropdowns";
-import { FieldMenuField } from "components/control/menus/FieldsMenu";
-import { SavingChanges } from "components/display";
+import { IconButton } from "components/buttons";
+import { FieldsDropdown } from "components/dropdowns";
+import { FieldMenuField } from "components/menus/FieldsMenu";
+import { SavingChanges } from "components";
 import { Portal } from "components/layout";
 
 interface TableHeaderProps {

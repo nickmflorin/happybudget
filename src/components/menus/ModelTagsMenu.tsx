@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { map, isNil, includes, filter, find } from "lodash";
 import classNames from "classnames";
 import { Menu } from "antd";
-import { Tag } from "components/display";
+import { Tag } from "components";
 import { getKeyValue } from "lib/util";
 
 import "./ModelTagsMenu.scss";

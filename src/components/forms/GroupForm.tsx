@@ -2,7 +2,7 @@ import React from "react";
 import { Input } from "antd";
 import { FormInstance, FormProps } from "antd/lib/form";
 
-import { ColorSelect } from "components/control";
+import { ColorSelect } from "components/forms";
 import { Form } from "components";
 
 export interface GroupFormValues {

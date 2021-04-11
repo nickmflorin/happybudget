@@ -5,7 +5,7 @@ import { createSelector } from "reselect";
 
 import { CellClassParams } from "ag-grid-community";
 
-import { WrapInApplicationSpinner } from "components/display";
+import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { PaymentMethodModelsList } from "lib/model";
 import { currencyValueFormatter, dateValueFormatter } from "lib/tabling/formatters";

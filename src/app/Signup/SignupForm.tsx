@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { Form, Button, Input } from "antd";
 import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
 
-import { RouterLink } from "components/control/links";
+import { RouterLink } from "components/links";
 import { validateEmail, validatePassword } from "lib/util/validate";
 import SocialButton from "../SocialButton";
 

@@ -7,8 +7,8 @@ import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 
 import { ICellRendererParams, ColDef } from "ag-grid-community";
 
-import { IconButton } from "components/control/buttons";
-import { ShowHide } from "components/display";
+import { IconButton } from "components/buttons";
+import { ShowHide } from "components";
 import LoadableCellWrapper from "./LoadableCellWrapper";
 
 import "./index.scss";

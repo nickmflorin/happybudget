@@ -7,7 +7,7 @@ import { faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
 
 import { Column, ColDef } from "ag-grid-community";
 
-import { ShowHide, IconHolder } from "components/display";
+import { ShowHide, IconHolder } from "components";
 
 import "./index.scss";
 

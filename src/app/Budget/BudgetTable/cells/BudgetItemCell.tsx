@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 
-import { BudgetItemTreeDropdown } from "components/control/dropdowns";
+import { BudgetItemTreeDropdown } from "components/dropdowns";
 import { simpleDeepEqualSelector } from "store/selectors";
 import Cell, { StandardCellProps } from "./Cell";
 

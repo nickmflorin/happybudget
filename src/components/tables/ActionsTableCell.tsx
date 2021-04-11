@@ -1,8 +1,8 @@
 import React, { ReactNode } from "react";
 import { map, isNil } from "lodash";
 import { Tooltip, Divider } from "antd";
-import { IconButton } from "components/control/buttons";
-import { IconRouterLink } from "components/control/links";
+import { IconButton } from "components/buttons";
+import { IconRouterLink } from "components/links";
 
 export interface ITableCellAction {
   tooltip?: string;

@@ -1,7 +1,7 @@
 import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
-import { Spinner } from "components/display";
+import { Spinner } from "components";
 import "./IconOrSpinner.scss";
 
 interface IconOrSpinnerProps {

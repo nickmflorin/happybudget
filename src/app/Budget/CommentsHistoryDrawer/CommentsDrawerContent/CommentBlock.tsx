@@ -1,7 +1,7 @@
 import { useState } from "react";
 import classNames from "classnames";
 
-import { RenderWithSpinner, ShowHide } from "components/display";
+import { RenderWithSpinner, ShowHide } from "components";
 
 import Comment from "./Comment";
 import CommentReply from "./CommentReply";

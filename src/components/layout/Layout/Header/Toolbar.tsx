@@ -1,7 +1,7 @@
 import { map, isNil } from "lodash";
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 
-import { IconButton } from "components/control/buttons";
+import { IconButton } from "components/buttons";
 
 import "./Toolbar.scss";
 

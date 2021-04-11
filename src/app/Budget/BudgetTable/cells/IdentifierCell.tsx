@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-regular-svg-icons";
 
-import { IconButton } from "components/control/buttons";
+import { IconButton } from "components/buttons";
 
 import Cell from "./Cell";
 import ValueCell, { ValueCellProps } from "./ValueCell";

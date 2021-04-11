@@ -5,7 +5,7 @@ import { Dispatch } from "redux";
 import { Input, Button } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 
-import { ActionsMenuBar } from "components/control/menus";
+import { ActionsMenuBar } from "components/menus";
 import { Page } from "components/layout";
 
 import { setContactsSearchAction } from "../actions";

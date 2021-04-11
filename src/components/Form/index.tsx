@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 import { Form as RootForm } from "antd";
 
-import { RenderWithSpinner } from "components/display";
+import { RenderWithSpinner } from "components";
 import Error from "./Error";
 import Footer from "./Footer";
 import { FormProps } from "./model";

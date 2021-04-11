@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
 
-import { ShowHide } from "components/display";
-import { HorizontalMenu } from "components/control/menus";
-import { IHorizontalMenuItem } from "components/control/menus/HorizontalMenu";
+import { ShowHide } from "components";
+import { HorizontalMenu } from "components/menus";
+import { IHorizontalMenuItem } from "components/menus/HorizontalMenu";
 import { Drawer } from "components/layout";
 
 import CommentsDrawerContent, { CommentsDrawerContentProps } from "./CommentsDrawerContent";

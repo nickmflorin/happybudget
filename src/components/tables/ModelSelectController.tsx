@@ -5,8 +5,8 @@ import { map, isNil, find, forEach, filter } from "lodash";
 import { Tooltip, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { ShowHide } from "components/display";
-import { IconButton } from "components/control/buttons";
+import { ShowHide } from "components";
+import { IconButton } from "components/buttons";
 import { toTitleCase } from "lib/util/formatters";
 
 export interface ModelSelectControllerItemProps<M extends Model> {

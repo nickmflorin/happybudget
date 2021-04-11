@@ -8,9 +8,9 @@ import { faSignOutAlt, faAddressCard } from "@fortawesome/free-solid-svg-icons";
 
 import { Layout } from "antd";
 
-import { Dropdown } from "components/control/dropdowns";
-import { AccountCircleLink } from "components/control/links";
-import { ShowHide } from "components/display";
+import { Dropdown } from "components/dropdowns";
+import { AccountCircleLink } from "components/links";
+import { ShowHide } from "components";
 import { useLoggedInUser } from "store/hooks";
 
 import Toolbar, { IToolbarItem } from "./Toolbar";

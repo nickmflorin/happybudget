@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Input } from "antd";
 
-import { ShowHide } from "components/display";
-import { AccountCircleLink } from "components/control/links";
-import { TextWithLink } from "components/control/links";
+import { ShowHide } from "components";
+import { AccountCircleLink } from "components/links";
+import { TextWithLink } from "components/links";
 
 import "./CommentReply.scss";
 
