@@ -7,6 +7,7 @@ import { standardizeError } from "./standardizer";
 
 export const isHttpError = (error: Http.Error | any): error is Http.Error => {
   return (
+    !isNil(error) &&
     (error as Http.Error).message !== undefined &&
     (error as Http.Error).code !== undefined &&
     (error as Http.Error).error_type !== undefined
