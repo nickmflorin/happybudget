@@ -2,8 +2,11 @@ import { DropDownProps } from "antd/lib/dropdown";
 
 import ModelTagsDropdown from "./ModelTagsDropdown";
 
-interface OptionTagsDropdownProps<I extends number, N extends string, M extends OptionModel<I, N> = OptionModel<I, N>>
-  extends Omit<DropDownProps, "trigger" | "className" | "overlay"> {
+interface ChoiceModelTagsDropdownProps<
+  M extends ChoiceModel<I, N>,
+  I extends number = number,
+  N extends string = string
+> extends Omit<DropDownProps, "trigger" | "className" | "overlay"> {
   value: I | null;
   className?: string;
   trigger?: ("click" | "hover" | "contextMenu")[];
@@ -11,7 +14,7 @@ interface OptionTagsDropdownProps<I extends number, N extends string, M extends 
   models: M[];
 }
 
-const OptionsTagDropdown = <I extends number, N extends string, M extends OptionModel<I, N> = OptionModel<I, N>>({
+const ChoiceModelTagsDropdown = <M extends ChoiceModel<I, N>, I extends number = number, N extends string = string>({
   /* eslint-disable indent */
   value,
   models,
@@ -19,9 +22,9 @@ const OptionsTagDropdown = <I extends number, N extends string, M extends Option
   onChange,
   trigger = ["click"],
   ...props
-}: OptionTagsDropdownProps<I, N, M>): JSX.Element => {
+}: ChoiceModelTagsDropdownProps<M, I, N>): JSX.Element => {
   return (
-    <ModelTagsDropdown<M, I>
+    <ModelTagsDropdown<M, number>
       value={value}
       onChange={(v: M) => onChange(v.id)}
       className={className}
@@ -34,4 +37,4 @@ const OptionsTagDropdown = <I extends number, N extends string, M extends Option
   );
 };
 
-export default OptionsTagDropdown;
+export default ChoiceModelTagsDropdown;

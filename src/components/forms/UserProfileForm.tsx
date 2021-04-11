@@ -2,13 +2,12 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import { Input, Button } from "antd";
-import { FormInstance } from "antd/lib/form";
 
 import { Form } from "components";
-import { FormProps } from "components/Form/model";
+import { FormProps, FormInstance } from "components/Form";
 import UploadProfileImage from "./UploadProfileImage";
 
-interface UserProfileFormProps extends FormProps {
+interface UserProfileFormProps extends FormProps<Http.IUserPayload> {
   form: FormInstance<Http.IUserPayload>;
   onSubmit: (payload: Partial<Http.IUserPayload>) => void;
   onUploadError: (error: string) => void;

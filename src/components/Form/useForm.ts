@@ -1,30 +1,16 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useState } from "react";
 import { isNil, forEach, find } from "lodash";
-import { Form as RootForm, FormInstance } from "antd";
+import { Form as RootForm } from "antd";
 import { ClientError, NetworkError, parseGlobalError, parseFieldErrors, standardizeError } from "api";
 import { replaceInArray } from "lib/util";
+import { FormInstance } from "./model";
 
-type ExtendedForm = FormInstance & {
-  handleRequestError: (e: Error) => void;
-  renderFieldErrors: (e: ClientError) => void;
-  setGlobalError: (e: string) => void;
-  setLoading: (value: boolean) => void;
-};
-
-const useForm = (form?: ExtendedForm | undefined) => {
+const useForm = <T extends { [key: string]: any } = { [key: string]: any }>(form?: FormInstance<T> | undefined) => {
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
 
-  const globalError = useRef<string | undefined>(undefined);
-  const loading = useRef<boolean | undefined>(false);
-
-  const setGlobalError = (value: string | undefined) => {
-    globalError.current = value;
-  };
-
-  const setLoading = (value: boolean) => {
-    loading.current = value;
-  };
+  const [globalError, setGlobalError] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
   const renderFieldErrors = (e: ClientError) => {
     let fieldsWithErrors: { name: string; errors: string[] }[] = [];
@@ -47,7 +33,7 @@ const useForm = (form?: ExtendedForm | undefined) => {
     return {
       ...antdForm,
       submit: () => {
-        globalError.current = undefined;
+        setGlobalError(undefined);
         antdForm.submit();
       },
       resetFields: () => {
@@ -63,7 +49,7 @@ const useForm = (form?: ExtendedForm | undefined) => {
           if (!isNil(global)) {
             /* eslint-disable no-console */
             console.error(e.errors);
-            globalError.current = global.message;
+            setGlobalError(global.message);
           }
           // Render the errors for each field next to the form field.
           renderFieldErrors(e);
@@ -73,9 +59,10 @@ const useForm = (form?: ExtendedForm | undefined) => {
           throw e;
         }
       },
-      globalError
+      globalError,
+      loading
     };
-  }, [form, antdForm]);
+  }, [form, antdForm, globalError, loading]);
   return [wrapForm];
 };
 

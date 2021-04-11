@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, all, fork } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
 import { handleRequestError } from "api";
-import { SubAccountMapping } from "lib/tabling/mappings";
+import { SubAccountRowManager } from "lib/tabling/managers";
 import { mergeRowChanges } from "lib/model/util";
 import {
   getSubAccountSubAccounts,
@@ -125,7 +125,7 @@ export function* updateSubAccountTask(id: number, change: Table.RowChange): Saga
   yield put(loadingBudgetAction(true));
   let success = true;
   try {
-    yield call(updateSubAccount, id, SubAccountMapping.patchPayload(change));
+    yield call(updateSubAccount, id, SubAccountRowManager.patchPayload(change));
   } catch (e) {
     success = false;
     yield put(loadingBudgetAction(false));
@@ -148,7 +148,7 @@ export function* createSubAccountTask(id: number, row: Table.SubAccountRow): Sag
   yield put(loadingBudgetAction(true));
   let success = true;
   try {
-    const response: ISubAccount = yield call(createSubAccountSubAccount, id, SubAccountMapping.postPayload(row));
+    const response: ISubAccount = yield call(createSubAccountSubAccount, id, SubAccountRowManager.postPayload(row));
     yield put(activatePlaceholderAction({ id: row.id, model: response }));
   } catch (e) {
     success = false;
@@ -171,7 +171,7 @@ export function* createSubAccountTask(id: number, row: Table.SubAccountRow): Sag
 export function* bulkUpdateAccountSubAccountsTask(id: number, changes: Table.RowChange[]): SagaIterator {
   const requestPayload: Http.ISubAccountBulkUpdatePayload[] = map(changes, (change: Table.RowChange) => ({
     id: change.id,
-    ...SubAccountMapping.patchPayload(change)
+    ...SubAccountRowManager.patchPayload(change)
   }));
   for (let i = 0; i++; i < changes.length) {
     yield put(updatingSubAccountAction({ id: changes[i].id, value: true }));
@@ -193,7 +193,7 @@ export function* bulkUpdateAccountSubAccountsTask(id: number, changes: Table.Row
 
 export function* bulkCreateAccountSubAccountsTask(id: number, rows: Table.SubAccountRow[]): SagaIterator {
   const requestPayload: Http.ISubAccountPayload[] = map(rows, (row: Table.SubAccountRow) =>
-    SubAccountMapping.postPayload(row)
+    SubAccountRowManager.postPayload(row)
   );
   yield put(creatingSubAccountAction(true));
   try {
@@ -278,14 +278,14 @@ export function* handleSubAccountBulkUpdateTask(action: Redux.IAction<Table.RowC
             the subaccount with ID ${merged[i].id} does not exist in state when it is expected to.`
           );
         } else {
-          const updatedRow = SubAccountMapping.newRowWithChanges(placeholder, merged[i]);
+          const updatedRow = SubAccountRowManager.newRowWithChanges(placeholder, merged[i]);
           yield put(updatePlaceholderInStateAction(updatedRow));
-          if (SubAccountMapping.rowHasRequiredFields(updatedRow)) {
+          if (SubAccountRowManager.rowHasRequiredFields(updatedRow)) {
             placeholdersToCreate.push(updatedRow);
           }
         }
       } else {
-        const updatedModel = SubAccountMapping.newModelWithChanges(model, merged[i]);
+        const updatedModel = SubAccountRowManager.newModelWithChanges(model, merged[i]);
         yield put(updateSubAccountInStateAction(updatedModel));
         mergedUpdates.push(merged[i]);
       }
@@ -317,18 +317,18 @@ export function* handleSubAccountUpdateTask(action: Redux.IAction<Table.RowChang
           the subaccount with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
       } else {
-        const updatedRow = SubAccountMapping.newRowWithChanges(placeholder, action.payload);
+        const updatedRow = SubAccountRowManager.newRowWithChanges(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (SubAccountMapping.rowHasRequiredFields(updatedRow)) {
+        if (SubAccountRowManager.rowHasRequiredFields(updatedRow)) {
           yield call(createSubAccountTask, subaccountId, updatedRow);
         }
       }
     } else {
-      const updatedModel = SubAccountMapping.newModelWithChanges(model, action.payload);
+      const updatedModel = SubAccountRowManager.newModelWithChanges(model, action.payload);
       yield put(updateSubAccountInStateAction(updatedModel));
       yield call(updateSubAccountTask, model.id, action.payload);
     }

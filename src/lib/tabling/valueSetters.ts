@@ -1,6 +1,6 @@
 import { isNil, find } from "lodash";
 import { ValueSetterParams } from "ag-grid-community";
-import { findOptionModelForName } from "lib/model/util";
+import { findChoiceModelForName } from "lib/model/util";
 import { toApiDateTime } from "lib/util/dates";
 
 export const percentageToDecimalValueSetter = <R extends Table.Row<any, any>>(field: keyof R) => (
@@ -48,20 +48,20 @@ export const dateTimeValueSetter = <R extends Table.Row<any, any>>(field: keyof 
   return false;
 };
 
-interface OptionModelValueSetterOptions {
+interface choiceModelValueSetterOptions {
   allowNull?: boolean;
 }
 
-export const optionModelValueSetter = <R extends Table.Row<any, any>, M extends OptionModel<number, string>>(
+export const choiceModelValueSetter = <R extends Table.Row<any, any>, M extends ChoiceModel<number, string>>(
   field: keyof R,
   models: M[],
-  options?: OptionModelValueSetterOptions
+  options?: choiceModelValueSetterOptions
 ) => (params: ValueSetterParams): boolean => {
   /* eslint-disable indent */
   if (typeof params.newValue === "string") {
-    const optionModel = findOptionModelForName(models, params.newValue);
+    const optionModel = findChoiceModelForName(models, params.newValue);
     if (!isNil(optionModel)) {
-      params.data[field] = optionModel.id;
+      params.data[field] = optionModel.name;
       return true;
     }
     return false;
@@ -72,9 +72,11 @@ export const optionModelValueSetter = <R extends Table.Row<any, any>, M extends 
     }
     return false;
   } else {
+    // For now - we allow setting the model by the ID - but we will most likely not be needing
+    // this in the future since we are relying more on using string names for the row values.
     const optionModel = find(models, { id: params.newValue });
     if (!isNil(optionModel)) {
-      params.data[field] = params.newValue;
+      params.data[field] = optionModel.name;
       return true;
     }
     return false;

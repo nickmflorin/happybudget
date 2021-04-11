@@ -1,3 +1,5 @@
+/// <reference path="./modeling.d.ts" />
+
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Table {
@@ -62,7 +64,7 @@ namespace Table {
     readonly name: string | null;
     readonly description: string | null;
     readonly quantity: number | null;
-    readonly unit: SubAccountUnit | null;
+    readonly unit: SubAccountUnitName | null;
     readonly multiplier: number | null;
     readonly rate: number | null;
     readonly actual: number | null;

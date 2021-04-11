@@ -7,10 +7,10 @@ import { CellClassParams } from "ag-grid-community";
 
 import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { FringeUnitModelsList } from "lib/model";
-import { FringeMapping } from "lib/tabling/mappings";
+import { FringeUnits } from "lib/model";
+import { FringeRowManager } from "lib/tabling/managers";
 import { processOptionModelCellForClipboard } from "lib/tabling/processor";
-import { percentageToDecimalValueSetter, optionModelValueSetter } from "lib/tabling/valueSetters";
+import { percentageToDecimalValueSetter, choiceModelValueSetter } from "lib/tabling/valueSetters";
 import { percentageValueFormatter } from "lib/tabling/formatters";
 
 import { setInstanceAction, addFringesPlaceholdersToStateAction } from "./store/actions";
@@ -58,7 +58,7 @@ const Fringes = (): JSX.Element => {
       <BudgetTable<Table.FringeRow, IFringe, IGroup<any>, Http.IFringePayload>
         data={data}
         placeholders={placeholders}
-        mapping={FringeMapping}
+        manager={FringeRowManager}
         selected={selected}
         identifierField={"name"}
         identifierFieldHeader={"Name"}
@@ -75,10 +75,7 @@ const Fringes = (): JSX.Element => {
         onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetFringesAction(changes))}
         onSelectAll={() => dispatch(selectAllFringesAction(null))}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
-        processCellForClipboard={processOptionModelCellForClipboard<Table.FringeRow, FringeUnitOptionModel>(
-          "unit",
-          FringeUnitModelsList
-        )}
+        processCellForClipboard={processOptionModelCellForClipboard<Table.FringeRow, FringeUnit>("unit", FringeUnits)}
         processors={[
           { field: "rate", type: "http", func: (value: number | null) => (value !== null ? value / 100 : null) }
         ]}
@@ -99,7 +96,7 @@ const Fringes = (): JSX.Element => {
             cellClass: classNames("cell--centered"),
             cellRenderer: "FringeUnitCell",
             width: 50,
-            valueSetter: optionModelValueSetter<Table.FringeRow, FringeUnitOptionModel>("unit", FringeUnitModelsList, {
+            valueSetter: choiceModelValueSetter<Table.FringeRow, FringeUnit>("unit", FringeUnits, {
               allowNull: false
             })
           },

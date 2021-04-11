@@ -7,11 +7,11 @@ import { CellClassParams } from "ag-grid-community";
 
 import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { PaymentMethodModelsList } from "lib/model";
+import { PaymentMethods } from "lib/model";
 import { currencyValueFormatter, dateValueFormatter } from "lib/tabling/formatters";
-import { ActualMapping } from "lib/tabling/mappings";
+import { ActualRowManager } from "lib/tabling/managers";
 import { processOptionModelCellForClipboard } from "lib/tabling/processor";
-import { optionModelValueSetter, floatValueSetter, dateTimeValueSetter } from "lib/tabling/valueSetters";
+import { choiceModelValueSetter, floatValueSetter, dateTimeValueSetter } from "lib/tabling/valueSetters";
 
 import { setInstanceAction } from "./store/actions";
 import {
@@ -67,7 +67,7 @@ const Actuals = (): JSX.Element => {
       <BudgetTable<Table.ActualRow, IActual, IGroup<any>, Http.IActualPayload>
         data={data}
         placeholders={placeholders}
-        mapping={ActualMapping}
+        manager={ActualRowManager}
         selected={selected}
         identifierField={"object_id"}
         identifierFieldHeader={"Account"}
@@ -113,9 +113,9 @@ const Actuals = (): JSX.Element => {
         }}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         exportFileName={"actuals.csv"}
-        processCellForClipboard={processOptionModelCellForClipboard<Table.ActualRow, PaymentMethodOptionModel>(
+        processCellForClipboard={processOptionModelCellForClipboard<Table.ActualRow, PaymentMethod>(
           "payment_method",
-          PaymentMethodModelsList
+          PaymentMethods
         )}
         getExportValue={{
           object_id: ({ node }: GetExportValueParams) => {
@@ -156,11 +156,9 @@ const Actuals = (): JSX.Element => {
             cellClass: "cell--centered",
             cellRenderer: "PaymentMethodsCell",
             flex: 1,
-            valueSetter: optionModelValueSetter<Table.ActualRow, PaymentMethodOptionModel>(
-              "payment_method",
-              PaymentMethodModelsList,
-              { allowNull: true }
-            )
+            valueSetter: choiceModelValueSetter<Table.ActualRow, PaymentMethod>("payment_method", PaymentMethods, {
+              allowNull: true
+            })
           },
           {
             field: "payment_id",

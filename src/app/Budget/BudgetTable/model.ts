@@ -1,5 +1,5 @@
 import { ColDef, CellClassParams, RowNode, GridOptions } from "ag-grid-community";
-import Mapping from "lib/tabling/mappings";
+import RowManager from "lib/tabling/managers";
 import { CellProcessors } from "lib/tabling/processor";
 
 export interface GetExportValueParams {
@@ -30,7 +30,7 @@ export interface BudgetTableProps<
 > extends GridOptions {
   bodyColumns: ColDef[];
   calculatedColumns?: ColDef[];
-  mapping: Mapping<R, M, G, P, C>;
+  manager: RowManager<R, M, G, P, C>;
   data: M[];
   groups?: G[];
   placeholders?: R[];

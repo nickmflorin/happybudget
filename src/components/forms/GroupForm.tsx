@@ -1,24 +1,18 @@
 import React from "react";
 import { Input } from "antd";
-import { FormInstance, FormProps } from "antd/lib/form";
 
-import { ColorSelect } from "components/forms";
 import { Form } from "components";
+import { FormProps } from "components/Form";
+import { ColorSelect } from "components/forms";
 
 export interface GroupFormValues {
   name: string;
   color: string;
 }
 
-interface GroupFormProps extends FormProps {
-  form: FormInstance<GroupFormValues>;
-  initialValues?: Partial<GroupFormValues>;
-  globalError?: string;
-}
-
-const GroupForm: React.FC<GroupFormProps> = ({ form, initialValues = {}, globalError, ...props }) => {
+const GroupForm: React.FC<FormProps<GroupFormValues>> = ({ ...props }) => {
   return (
-    <Form.Form form={form} layout={"vertical"} globalError={globalError} initialValues={initialValues} {...props}>
+    <Form.Form layout={"vertical"} {...props}>
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the group." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>

@@ -1,7 +1,7 @@
 import { Reducer } from "redux";
 import { filter } from "lodash";
 import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
-import { ActualMapping } from "lib/tabling/mappings";
+import { ActualRowManager } from "lib/tabling/managers";
 import { ActionType } from "../actions";
 import { initialActualsState } from "../initialState";
 
@@ -32,7 +32,7 @@ const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IAct
           UpdateInState: ActionType.Actuals.Placeholders.UpdateInState,
           Clear: ActionType.Actuals.Request
         },
-        ActualMapping
+        ActualRowManager
       )
     }
   }

@@ -1,4 +1,4 @@
-import { forEach, uniq, map, isNil, filter, reduce } from "lodash";
+import { forEach, uniq, map, isNil, filter, reduce, find } from "lodash";
 import { FringeUnitModels } from ".";
 
 export const flattenBudgetItemNodes = (nodes: IBudgetItemNode[]): IBudgetItem[] => {
@@ -39,7 +39,7 @@ export const fringeValue = (value: number, fringes: IFringe[]): number => {
   forEach(
     filter(fringes, (fringe: IFringe) => !isNil(fringe.rate)),
     (fringe: IFringe) => {
-      if (fringe.unit === FringeUnitModels.FLAT.id) {
+      if (fringe.unit.id === FringeUnitModels.FLAT.id) {
         additionalValues.push(fringe.rate);
       } else {
         if (fringe.cutoff === null || fringe.cutoff >= value) {
@@ -53,20 +53,10 @@ export const fringeValue = (value: number, fringes: IFringe[]): number => {
   return value + reduce(additionalValues, (sum: number, val: number) => sum + val, 0);
 };
 
-export const findOptionModelForName = <M extends OptionModel<number, string>>(models: M[], name: string): M | null => {
-  const found = filter(models, (model: M) => {
-    if (model.name.toLowerCase() === name.toLowerCase()) {
-      return true;
-    }
-    return false;
-  });
-  if (found.length === 1) {
-    return found[0];
-  } else if (found.length !== 0) {
-    /* eslint-disable no-console */
-    console.warn(`Found multiple option models corresponding to name ${name}... returning first.`);
-    return found[0];
-  } else {
-    return null;
-  }
+export const findChoiceModelForName = <M extends ChoiceModel<number, string>>(models: M[], name: string): M | null => {
+  return find(models, { name } as any) || null;
+};
+
+export const findChoiceModelForId = <M extends ChoiceModel<number, string>>(models: M[], id: number): M | null => {
+  return find(models, { id } as any) || null;
 };

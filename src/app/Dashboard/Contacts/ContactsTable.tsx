@@ -46,7 +46,7 @@ const ContactsTable = (): JSX.Element => {
       tableData.push({
         key: contact.id,
         name: contact.full_name,
-        role: contact.role_name,
+        role: contact.role.name,
         email: contact.email,
         phone_number: contact.phone_number,
         contact

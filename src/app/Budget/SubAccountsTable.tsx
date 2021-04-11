@@ -2,12 +2,19 @@ import { useSelector } from "react-redux";
 import { isNil, includes, find, filter, map } from "lodash";
 import classNames from "classnames";
 
-import { ColDef, ColSpanParams, ProcessCellForExportParams, ValueSetterParams } from "ag-grid-community";
+import {
+  ColDef,
+  ColSpanParams,
+  ProcessCellForExportParams,
+  ValueSetterParams,
+  ValueGetterParams
+} from "ag-grid-community";
 
-import { SubAccountUnitModelsList } from "lib/model";
-import { SubAccountMapping } from "lib/tabling/mappings";
+import { SubAccountUnits } from "lib/model";
+import { findChoiceModelForName } from "lib/model/util";
+import { SubAccountRowManager } from "lib/tabling/managers";
 import { currencyValueFormatter } from "lib/tabling/formatters";
-import { floatValueSetter, integerValueSetter, optionModelValueSetter } from "lib/tabling/valueSetters";
+import { floatValueSetter, integerValueSetter, choiceModelValueSetter } from "lib/tabling/valueSetters";
 import { getKeyValue } from "lib/util";
 
 import BudgetTable, { CookiesProps } from "./BudgetTable";
@@ -81,7 +88,7 @@ const SubAccountsTable = ({
       data={data}
       groups={groups}
       placeholders={placeholders}
-      mapping={SubAccountMapping}
+      manager={SubAccountRowManager}
       selected={selected}
       loadingBudget={loadingBudget}
       renderFlag={renderFlag}
@@ -124,13 +131,29 @@ const SubAccountsTable = ({
         variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
         actual: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
       }}
+      processors={[
+        {
+          field: "unit",
+          type: "http",
+          func: (value: SubAccountUnitName | null) => {
+            if (!isNil(value)) {
+              const model = findChoiceModelForName(SubAccountUnits, value);
+              if (!isNil(model)) {
+                return model.id;
+              }
+              return null;
+            }
+            return value;
+          }
+        }
+      ]}
       processCellForClipboard={(params: ProcessCellForExportParams) => {
         if (!isNil(params.node)) {
           const row: Table.SubAccountRow = params.node.data;
           const colDef = params.column.getColDef();
           if (!isNil(colDef.field)) {
             if (colDef.field === "unit" && !isNil(row.unit)) {
-              const choiceModel: SubAccountUnitOptionModel | undefined = find(SubAccountUnitModelsList, {
+              const choiceModel: SubAccountUnit | undefined = find(SubAccountUnits, {
                 id: row.unit
               } as any);
               if (!isNil(choiceModel)) {
@@ -204,11 +227,9 @@ const SubAccountsTable = ({
           cellClass: "cell--centered",
           cellRenderer: "SubAccountUnitCell",
           width: 100,
-          valueSetter: optionModelValueSetter<Table.SubAccountRow, SubAccountUnitOptionModel>(
-            "unit",
-            SubAccountUnitModelsList,
-            { allowNull: true }
-          )
+          valueSetter: choiceModelValueSetter<Table.SubAccountRow, SubAccountUnit>("unit", SubAccountUnits, {
+            allowNull: true
+          })
         },
         {
           field: "multiplier",

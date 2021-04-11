@@ -1,5 +1,7 @@
-import { FringeUnitModelsList } from "lib/model";
-import { OptionModelTagsDropdown } from "components/dropdowns";
+import { isNil } from "lodash";
+import { FringeUnits } from "lib/model";
+import { findChoiceModelForId } from "lib/model/util";
+import { ChoiceModelTagsDropdown } from "components/dropdowns";
 import Cell, { StandardCellProps } from "./Cell";
 
 interface FringeUnitCellProps extends StandardCellProps<Table.SubAccountRow> {
@@ -9,11 +11,16 @@ interface FringeUnitCellProps extends StandardCellProps<Table.SubAccountRow> {
 const FringeUnitCell = ({ ...props }: FringeUnitCellProps): JSX.Element => {
   return (
     <Cell {...props}>
-      <OptionModelTagsDropdown<FringeUnit, FringeUnitName, FringeUnitOptionModel>
+      <ChoiceModelTagsDropdown<FringeUnit, FringeUnitId, FringeUnitName>
         overlayClassName={"cell-dropdown"}
-        value={props.value}
-        models={FringeUnitModelsList}
-        onChange={(unit: FringeUnit) => props.setValue(unit)}
+        value={!isNil(props.value) ? props.value.id : null}
+        models={FringeUnits}
+        onChange={(unit: FringeUnitId) => {
+          const model = findChoiceModelForId(FringeUnits, unit);
+          if (!isNil(model)) {
+            props.setValue(model);
+          }
+        }}
       />
     </Cell>
   );

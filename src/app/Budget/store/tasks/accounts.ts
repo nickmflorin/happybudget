@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, fork } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
 import { handleRequestError } from "api";
-import { AccountMapping } from "lib/tabling/mappings";
+import { AccountRowManager } from "lib/tabling/managers";
 import { mergeRowChanges } from "lib/model/util";
 import {
   getAccounts,
@@ -112,7 +112,7 @@ export function* deleteAccountTask(id: number): SagaIterator {
 export function* updateAccountTask(id: number, change: Table.RowChange): SagaIterator {
   yield put(updatingAccountAction({ id, value: true }));
   try {
-    yield call(updateAccount, id, AccountMapping.patchPayload(change));
+    yield call(updateAccount, id, AccountRowManager.patchPayload(change));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the sub account.", id, (errors: Table.CellError[]) =>
       addErrorsToStateAction(errors)
@@ -125,7 +125,7 @@ export function* updateAccountTask(id: number, change: Table.RowChange): SagaIte
 export function* createAccountTask(id: number, row: Table.AccountRow): SagaIterator {
   yield put(creatingAccountAction(true));
   try {
-    const response: IAccount = yield call(createAccount, id, AccountMapping.postPayload(row));
+    const response: IAccount = yield call(createAccount, id, AccountRowManager.postPayload(row));
     yield put(activatePlaceholderAction({ id: row.id, model: response }));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the account.", row.id, (errors: Table.CellError[]) =>
@@ -139,7 +139,7 @@ export function* createAccountTask(id: number, row: Table.AccountRow): SagaItera
 export function* bulkUpdateAccountsTask(id: number, changes: Table.RowChange[]): SagaIterator {
   const requestPayload: Http.IAccountBulkUpdatePayload[] = map(changes, (change: Table.RowChange) => ({
     id: change.id,
-    ...AccountMapping.patchPayload(change)
+    ...AccountRowManager.patchPayload(change)
   }));
   for (let i = 0; i++; i < changes.length) {
     yield put(updatingAccountAction({ id: changes[i].id, value: true }));
@@ -160,7 +160,9 @@ export function* bulkUpdateAccountsTask(id: number, changes: Table.RowChange[]):
 }
 
 export function* bulkCreateAccountsTask(id: number, rows: Table.AccountRow[]): SagaIterator {
-  const requestPayload: Http.IAccountPayload[] = map(rows, (row: Table.AccountRow) => AccountMapping.postPayload(row));
+  const requestPayload: Http.IAccountPayload[] = map(rows, (row: Table.AccountRow) =>
+    AccountRowManager.postPayload(row)
+  );
   yield put(creatingAccountAction(true));
   try {
     const accounts: IAccount[] = yield call(bulkCreateAccounts, id, requestPayload);
@@ -238,14 +240,14 @@ export function* handleAccountsBulkUpdateTask(action: Redux.IAction<Table.RowCha
             the account with ID ${merged[i].id} does not exist in state when it is expected to.`
           );
         } else {
-          const updatedRow = AccountMapping.newRowWithChanges(placeholder, merged[i]);
+          const updatedRow = AccountRowManager.newRowWithChanges(placeholder, merged[i]);
           yield put(updatePlaceholderInStateAction(updatedRow));
-          if (AccountMapping.rowHasRequiredFields(updatedRow)) {
+          if (AccountRowManager.rowHasRequiredFields(updatedRow)) {
             placeholdersToCreate.push(updatedRow);
           }
         }
       } else {
-        const updatedModel = AccountMapping.newModelWithChanges(model, merged[i]);
+        const updatedModel = AccountRowManager.newModelWithChanges(model, merged[i]);
         yield put(updateAccountInStateAction(updatedModel));
         mergedUpdates.push(merged[i]);
       }
@@ -275,18 +277,18 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
           the account with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
       } else {
-        const updatedRow = AccountMapping.newRowWithChanges(placeholder, action.payload);
+        const updatedRow = AccountRowManager.newRowWithChanges(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (AccountMapping.rowHasRequiredFields(updatedRow)) {
+        if (AccountRowManager.rowHasRequiredFields(updatedRow)) {
           yield call(createAccountTask, budgetId, updatedRow);
         }
       }
     } else {
-      const updatedModel = AccountMapping.newModelWithChanges(model, action.payload);
+      const updatedModel = AccountRowManager.newModelWithChanges(model, action.payload);
       yield put(updateAccountInStateAction(updatedModel));
       yield call(updateAccountTask, model.id, action.payload);
     }

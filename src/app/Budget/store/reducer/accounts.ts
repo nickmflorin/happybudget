@@ -1,7 +1,7 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, filter, map, reduce, forEach } from "lodash";
 import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
-import { AccountMapping } from "lib/tabling/mappings";
+import { AccountRowManager } from "lib/tabling/managers";
 import { replaceInArray } from "lib/util";
 import { warnInconsistentState } from "lib/redux/util";
 import { initialListResponseState } from "store/initialState";
@@ -36,7 +36,7 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           UpdateInState: ActionType.Budget.Accounts.Placeholders.UpdateInState,
           Clear: ActionType.Budget.Accounts.Request
         },
-        AccountMapping
+        AccountRowManager
       ),
       groups: createListResponseReducer<IGroup<ISimpleAccount>, Redux.IListResponseStore<IGroup<ISimpleAccount>>>(
         {

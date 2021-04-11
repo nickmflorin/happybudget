@@ -7,7 +7,7 @@ import { map } from "lodash";
 
 import { CreateAccountGroupModal, EditAccountGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { AccountMapping } from "lib/tabling/mappings";
+import { AccountRowManager } from "lib/tabling/managers";
 
 import BudgetTable from "../BudgetTable";
 import { selectBudgetId, selectBudgetDetail } from "../store/selectors";
@@ -70,7 +70,7 @@ const AccountsBudgetTable = (): JSX.Element => {
         data={data}
         groups={groups}
         placeholders={placeholders}
-        mapping={AccountMapping}
+        manager={AccountRowManager}
         selected={selected}
         renderFlag={readyToRender}
         identifierField={"identifier"}

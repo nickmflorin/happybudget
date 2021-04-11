@@ -74,7 +74,7 @@ const BudgetTable = <
   placeholders = [],
   groups = [],
   selected,
-  mapping,
+  manager,
   search,
   loading,
   loadingBudget,
@@ -645,7 +645,9 @@ const BudgetTable = <
     if (event.newValue !== undefined) {
       if (event.oldValue === undefined || event.oldValue !== event.newValue) {
         // NOTE: The old value will have already been processed in the HTTP type case.
+        // WHat? ^^ What was I thinking here.
         let newValue = event.newValue;
+        let oldValue = event.oldValue;
         if (!isNil(processors)) {
           newValue = processCell(
             processors,
@@ -654,10 +656,17 @@ const BudgetTable = <
             row,
             event.colDef
           );
+          oldValue = processCell(
+            processors,
+            { type: "http", field: field as keyof R },
+            event.oldValue,
+            row,
+            event.colDef
+          );
         }
         return {
           id: event.data.id,
-          data: { [field]: { oldValue: event.oldValue, newValue } }
+          data: { [field]: { oldValue, newValue } }
         };
       }
     }
@@ -830,7 +839,7 @@ const BudgetTable = <
           const footer: R = createGroupFooter(group);
           newTable.push(
             ...orderByFieldOrdering(
-              map(models, (m: M) => mapping.modelToRow(m, group, { selected: includes(selected, m.id) })),
+              map(models, (m: M) => manager.modelToRow(m, group, { selected: includes(selected, m.id) })),
               ordering
             ),
             {
@@ -850,7 +859,7 @@ const BudgetTable = <
         ...newTable,
         ...orderByFieldOrdering(
           [
-            ...map(modelsWithoutGroup, (m: M) => mapping.modelToRow(m, null, { selected: includes(selected, m.id) })),
+            ...map(modelsWithoutGroup, (m: M) => manager.modelToRow(m, null, { selected: includes(selected, m.id) })),
             ...map(placeholders, (r: R) => ({ ...r, meta: { ...r.meta, selected: includes(selected, r.id) } }))
           ],
           ordering

@@ -65,7 +65,7 @@ export const processCell = <R extends Table.Row<G, C>, G extends IGroup<any>, C 
 
 export const processOptionModelCellForClipboard = <
   R extends Table.Row<any, any>,
-  M extends OptionModel<number, string>
+  M extends ChoiceModel<number, string>
 >(
   /* eslint-disable indent */
   field: keyof R,

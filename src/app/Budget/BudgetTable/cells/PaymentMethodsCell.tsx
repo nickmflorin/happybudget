@@ -1,5 +1,7 @@
-import { OptionModelTagsDropdown } from "components/dropdowns";
-import { PaymentMethodModelsList } from "lib/model";
+import { isNil } from "lodash";
+import { ChoiceModelTagsDropdown } from "components/dropdowns";
+import { PaymentMethods } from "lib/model";
+import { findChoiceModelForId } from "lib/model/util";
 import Cell, { StandardCellProps } from "./Cell";
 
 interface PaymentMethodCellProps extends StandardCellProps<Table.ActualRow> {
@@ -9,11 +11,16 @@ interface PaymentMethodCellProps extends StandardCellProps<Table.ActualRow> {
 const PaymentMethodCell = ({ ...props }: PaymentMethodCellProps): JSX.Element => {
   return (
     <Cell {...props}>
-      <OptionModelTagsDropdown<PaymentMethod, PaymentMethodName, PaymentMethodOptionModel>
+      <ChoiceModelTagsDropdown<PaymentMethod, PaymentMethodId, PaymentMethodName>
         overlayClassName={"cell-dropdown"}
-        value={props.value}
-        models={PaymentMethodModelsList}
-        onChange={(paymentMethod: PaymentMethod) => props.setValue(paymentMethod)}
+        value={!isNil(props.value) ? props.value.id : null}
+        models={PaymentMethods}
+        onChange={(paymentMethod: PaymentMethodId) => {
+          const model = findChoiceModelForId(PaymentMethods, paymentMethod);
+          if (!isNil(model)) {
+            props.setValue(model);
+          }
+        }}
       />
     </Cell>
   );

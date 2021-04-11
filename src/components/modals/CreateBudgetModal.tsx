@@ -11,7 +11,7 @@ interface CreateBudgetModalProps {
   onSuccess: (budget: IBudget) => void;
   onCancel: () => void;
   open: boolean;
-  productionType: ProductionType;
+  productionType: ProductionTypeId;
 }
 
 const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: CreateBudgetModalProps): JSX.Element => {

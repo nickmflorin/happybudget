@@ -14,7 +14,7 @@ export enum ContactRoleNames {
   OTHER = "Other"
 }
 
-export const ContactRoleModels: { [key: string]: ContactRoleModel } = {
+export const ContactRoleModels: { [key: string]: ContactRole } = {
   PRODUCER: { id: 0, name: ContactRoleNames.PRODUCER },
   EXECUTIVE_PRODUCER: { id: 1, name: ContactRoleNames.EXECUTIVE_PRODUCER },
   PRODUCTION_MANAGER: { id: 2, name: ContactRoleNames.PRODUCTION_MANAGER },
@@ -28,7 +28,7 @@ export const ContactRoleModels: { [key: string]: ContactRoleModel } = {
   OTHER: { id: 10, name: ContactRoleNames.OTHER }
 };
 
-export const ContactRoleModelsList = Object.values(ContactRoleModels);
+export const ContactRoles = Object.values(ContactRoleModels);
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
@@ -41,7 +41,7 @@ export enum SubAccountUnitNames {
   NIGHTS = "Nights"
 }
 
-export const SubAccountUnitModels: { [key: string]: SubAccountUnitOptionModel } = {
+export const SubAccountUnitModels: { [key: string]: SubAccountUnit } = {
   MINUTES: { id: 0, name: SubAccountUnitNames.MINUTES },
   HOURS: { id: 1, name: SubAccountUnitNames.HOURS },
   WEEKS: { id: 2, name: SubAccountUnitNames.WEEKS },
@@ -50,7 +50,7 @@ export const SubAccountUnitModels: { [key: string]: SubAccountUnitOptionModel } 
   NIGHTS: { id: 5, name: SubAccountUnitNames.NIGHTS }
 };
 
-export const SubAccountUnitModelsList = Object.values(SubAccountUnitModels);
+export const SubAccountUnits = Object.values(SubAccountUnitModels);
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
@@ -59,12 +59,12 @@ export enum FringeUnitNames {
   FLAT = "Flat"
 }
 
-export const FringeUnitModels: { [key: string]: FringeUnitOptionModel } = {
+export const FringeUnitModels: { [key: string]: FringeUnit } = {
   PERCENT: { id: 0, name: FringeUnitNames.PERCENT },
   FLAT: { id: 1, name: FringeUnitNames.FLAT }
 };
 
-export const FringeUnitModelsList = Object.values(FringeUnitModels);
+export const FringeUnits = Object.values(FringeUnitModels);
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
@@ -74,10 +74,10 @@ export enum PaymentMethodNames {
   WIRE = "Wire"
 }
 
-export const PaymentMethodModels: { [key: string]: PaymentMethodOptionModel } = {
+export const PaymentMethodModels: { [key: string]: PaymentMethod } = {
   MINUTES: { id: 0, name: PaymentMethodNames.CHECK },
   HOURS: { id: 1, name: PaymentMethodNames.CARD },
   WEEKS: { id: 2, name: PaymentMethodNames.WIRE }
 };
 
-export const PaymentMethodModelsList = Object.values(PaymentMethodModels);
+export const PaymentMethods = Object.values(PaymentMethodModels);

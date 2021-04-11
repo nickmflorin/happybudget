@@ -1,40 +1,78 @@
 import { forEach, isNil } from "lodash";
 import { generateRandomNumericId, getKeyValue } from "lib/util";
 
-export interface MappedField<M extends Model> {
-  field: keyof M;
-  required?: boolean;
-  allowNull?: boolean;
-  allowBlank?: boolean;
-  excludeFromPost?: boolean;
-  http?: boolean;
-  placeholderValue?: any;
+export interface ManagedFieldConfig<R, M extends Model> {
+  readonly field: keyof M;
+  readonly required?: boolean;
+  readonly allowNull?: boolean;
+  readonly allowBlank?: boolean;
+  readonly excludeFromPost?: boolean;
+  readonly http?: boolean;
+  readonly placeholderValue?: any;
+  readonly inRow?: boolean;
+  readonly setter?: (model: M) => R[keyof R];
 }
 
-export interface MappingConfig<M extends Model, C extends Model = UnknownModel> {
-  readonly fields: MappedField<M>[];
+export class ManagedField<R, M extends Model> implements ManagedFieldConfig<R, M> {
+  readonly field: keyof M;
+  readonly required?: boolean;
+  readonly allowNull?: boolean;
+  readonly allowBlank?: boolean;
+  readonly excludeFromPost?: boolean;
+  readonly http?: boolean;
+  readonly placeholderValue?: any;
+  readonly inRow?: boolean;
+  readonly setter?: (model: M) => R[keyof R];
+
+  constructor(config: ManagedFieldConfig<R, M>) {
+    this.field = config.field;
+    this.required = config.required;
+    this.allowBlank = config.allowBlank;
+    this.allowNull = config.allowNull;
+    this.excludeFromPost = config.excludeFromPost;
+    this.http = config.http;
+    this.placeholderValue = config.placeholderValue;
+    this.inRow = config.inRow;
+    this.setter = config.setter;
+  }
+
+  getRowValue = (model: M) => {
+    if (!isNil(this.setter)) {
+      return this.setter(model);
+    }
+    return getKeyValue<M, keyof M>(this.field)(model);
+  };
+}
+
+export interface RowManagerConfig<
+  R extends Table.Row<G, C>,
+  M extends Model,
+  G extends IGroup<any>,
+  C extends Model = UnknownModel
+> {
+  readonly fields: ManagedField<R, M>[];
   readonly childrenGetter?: ((model: M) => C[]) | string | null;
   readonly groupGetter?: ((model: M) => number | null) | string | null;
-  readonly labelGetter: (model: M) => string;
   readonly typeLabel: string;
   readonly rowType: Table.RowType;
+  readonly labelGetter: (model: M) => string;
 }
 
-class Mapping<
+class RowManager<
   R extends Table.Row<G, C>,
   M extends Model,
   G extends IGroup<any>,
   P extends Http.IPayload,
   C extends Model = UnknownModel
-> implements MappingConfig<M, C> {
-  public fields: MappedField<M>[];
+> implements RowManagerConfig<R, M, G, C> {
+  public fields: ManagedField<R, M>[];
   public childrenGetter?: ((model: M) => C[]) | string | null;
   public groupGetter?: ((model: M) => number | null) | string | null;
   public labelGetter: (model: M) => string;
   public typeLabel: string;
   public rowType: Table.RowType;
 
-  constructor(config: MappingConfig<M, C>) {
+  constructor(config: RowManagerConfig<R, M, G, C>) {
     this.fields = config.fields;
     this.childrenGetter = config.childrenGetter;
     this.groupGetter = config.groupGetter;
@@ -98,7 +136,7 @@ class Mapping<
       meta,
       group: null
     };
-    forEach(this.fields, (field: MappedField<M>) => {
+    forEach(this.fields, (field: ManagedField<R, M>) => {
       obj[field.field as string] = field.placeholderValue || null;
     });
     return obj as R;
@@ -124,10 +162,9 @@ class Mapping<
       meta: fullMeta,
       group
     };
-    forEach(this.fields, (field: MappedField<M>) => {
-      // We want to attribute the full group to the row, not just the ID.
-      if (field.field !== "group") {
-        obj[field.field as string] = getKeyValue<M, keyof M>(field.field)(model);
+    forEach(this.fields, (field: ManagedField<R, M>) => {
+      if (field.inRow !== false) {
+        obj[field.field as string] = field.getRowValue(model);
       }
     });
     return obj as R;
@@ -135,7 +172,7 @@ class Mapping<
 
   newRowWithChanges = (row: R, change: Table.RowChange): R => {
     const obj: R = { ...row };
-    forEach(this.fields, (field: MappedField<M>) => {
+    forEach(this.fields, (field: ManagedField<R, M>) => {
       if (change.data[field.field as string] !== undefined) {
         obj[field.field as keyof R] = change.data[field.field as string].newValue as any;
       }
@@ -145,7 +182,7 @@ class Mapping<
 
   newModelWithChanges = (model: M, change: Table.RowChange): M => {
     const obj: M = { ...model };
-    forEach(this.fields, (field: MappedField<M>) => {
+    forEach(this.fields, (field: ManagedField<R, M>) => {
       if (change.data[field.field as string] !== undefined) {
         obj[field.field as keyof M] = change.data[field.field as string].newValue as any;
       }
@@ -155,7 +192,7 @@ class Mapping<
 
   postPayload = (row: R): P => {
     const obj: { [key: string]: any } = {};
-    forEach(this.fields, (field: MappedField<M>) => {
+    forEach(this.fields, (field: ManagedField<R, M>) => {
       if (!(field.http === false) && !(field.excludeFromPost === true)) {
         const value = row[field.field as keyof R] as any;
         if (value !== undefined) {
@@ -178,7 +215,7 @@ class Mapping<
 
   patchPayload = (payload: Table.RowChange): Partial<P> => {
     const obj: { [key: string]: any } = {};
-    forEach(this.fields, (field: MappedField<M>) => {
+    forEach(this.fields, (field: ManagedField<R, M>) => {
       if (!(field.http === false) && !isNil(payload.data[field.field as string])) {
         const value = payload.data[field.field as string].newValue;
         if (value !== undefined) {
@@ -201,7 +238,7 @@ class Mapping<
 
   rowHasRequiredFields = (row: R): boolean => {
     let requiredFieldsPresent = true;
-    forEach(this.fields, (field: MappedField<M>) => {
+    forEach(this.fields, (field: ManagedField<R, M>) => {
       if (field.required === true) {
         const val = row[field.field as keyof R] as any;
         if (isNil(val) || val === "") {
@@ -214,7 +251,7 @@ class Mapping<
   };
 }
 
-export const AccountMapping = new Mapping<
+export const AccountRowManager = new RowManager<
   Table.AccountRow,
   IAccount,
   IGroup<ISimpleAccount>,
@@ -222,12 +259,13 @@ export const AccountMapping = new Mapping<
   ISimpleSubAccount
 >({
   fields: [
-    { field: "description" },
-    { field: "group" },
-    { field: "identifier", required: true },
-    { field: "estimated", http: false },
-    { field: "variance", http: false },
-    { field: "actual", http: false }
+    new ManagedField({ field: "description" }),
+    // We want to attribute the full group to the row, not just the ID.
+    new ManagedField({ field: "group", allowNull: true, inRow: false }),
+    new ManagedField({ field: "identifier", required: true }),
+    new ManagedField({ field: "estimated", http: false }),
+    new ManagedField({ field: "variance", http: false }),
+    new ManagedField({ field: "actual", http: false })
   ],
   childrenGetter: (model: IAccount) => model.subaccounts,
   groupGetter: (model: IAccount) => model.group,
@@ -236,7 +274,7 @@ export const AccountMapping = new Mapping<
   rowType: "account"
 });
 
-export const SubAccountMapping = new Mapping<
+export const SubAccountRowManager = new RowManager<
   Table.SubAccountRow,
   ISubAccount,
   IGroup<ISimpleSubAccount>,
@@ -244,18 +282,23 @@ export const SubAccountMapping = new Mapping<
   ISimpleSubAccount
 >({
   fields: [
-    { field: "description", allowBlank: true },
-    { field: "name", allowBlank: true },
-    { field: "group", allowNull: true },
-    { field: "quantity", allowNull: true },
-    { field: "rate", allowNull: true },
-    { field: "multiplier", allowNull: true },
-    { field: "unit", allowNull: true },
-    { field: "identifier", required: true },
-    { field: "estimated", http: false },
-    { field: "variance", http: false },
-    { field: "actual", http: false },
-    { field: "fringes", allowNull: true, placeholderValue: [] }
+    new ManagedField({ field: "description", allowBlank: true }),
+    new ManagedField({ field: "name", allowBlank: true }),
+    // We want to attribute the full group to the row, not just the ID.
+    new ManagedField({ field: "group", allowNull: true, inRow: false }),
+    new ManagedField({ field: "quantity", allowNull: true }),
+    new ManagedField({ field: "rate", allowNull: true }),
+    new ManagedField({ field: "multiplier", allowNull: true }),
+    new ManagedField({
+      field: "unit",
+      allowNull: true,
+      setter: (model: ISubAccount): SubAccountUnitName | null => (!isNil(model.unit) ? model.unit.name : null)
+    }),
+    new ManagedField({ field: "identifier", required: true }),
+    new ManagedField({ field: "estimated", http: false }),
+    new ManagedField({ field: "variance", http: false }),
+    new ManagedField({ field: "actual", http: false }),
+    new ManagedField({ field: "fringes", allowNull: true, placeholderValue: [] })
   ],
   childrenGetter: (model: ISubAccount) => model.subaccounts,
   groupGetter: (model: ISubAccount) => model.group,
@@ -264,42 +307,42 @@ export const SubAccountMapping = new Mapping<
   rowType: "subaccount"
 });
 
-export const ActualMapping = new Mapping<Table.ActualRow, IActual, IGroup<any>, Http.IActualPayload>({
+export const ActualRowManager = new RowManager<Table.ActualRow, IActual, IGroup<any>, Http.IActualPayload>({
   fields: [
-    { field: "description" },
-    {
+    new ManagedField({ field: "description" }),
+    new ManagedField({
       field: "object_id",
       excludeFromPost: true,
       required: true
-    },
-    {
+    }),
+    new ManagedField({
       field: "parent_type",
       excludeFromPost: true,
       required: true
-    },
-    { field: "vendor" },
-    { field: "purchase_order" },
-    { field: "date" },
-    { field: "payment_method" },
-    { field: "payment_id" },
-    { field: "value" }
+    }),
+    new ManagedField({ field: "vendor" }),
+    new ManagedField({ field: "purchase_order" }),
+    new ManagedField({ field: "date" }),
+    new ManagedField({ field: "payment_method" }),
+    new ManagedField({ field: "payment_id" }),
+    new ManagedField({ field: "value" })
   ],
   labelGetter: (model: IActual) => String(model.object_id),
   typeLabel: "Actual",
   rowType: "actual"
 });
 
-export const FringeMapping = new Mapping<Table.FringeRow, IFringe, IGroup<any>, Http.IFringePayload>({
+export const FringeRowManager = new RowManager<Table.FringeRow, IFringe, IGroup<any>, Http.IFringePayload>({
   fields: [
-    { field: "name", required: true },
-    { field: "description", allowNull: true },
-    { field: "cutoff", allowNull: true },
-    { field: "rate", allowNull: true },
-    { field: "unit", allowNull: true }
+    new ManagedField({ field: "name", required: true }),
+    new ManagedField({ field: "description", allowNull: true }),
+    new ManagedField({ field: "cutoff", allowNull: true }),
+    new ManagedField({ field: "rate", allowNull: true }),
+    new ManagedField({ field: "unit", allowNull: true })
   ],
   labelGetter: (model: IFringe) => String(model.name),
   typeLabel: "Fringe",
   rowType: "fringe"
 });
 
-export default Mapping;
+export default RowManager;

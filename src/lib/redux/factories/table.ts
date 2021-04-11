@@ -1,5 +1,5 @@
 import { isNil, find, filter } from "lodash";
-import Mapping from "lib/tabling/mappings";
+import Mapping from "lib/tabling/managers";
 import { replaceInArray } from "lib/util";
 import { warnInconsistentState } from "../util";
 import { createListReducerFromMap, mergeOptionsWithDefaults } from "./util";

@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, fork } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
 import { handleRequestError } from "api";
-import { ActualMapping } from "lib/tabling/mappings";
+import { ActualRowManager } from "lib/tabling/managers";
 import { mergeRowChanges } from "lib/model/util";
 import {
   getBudgetActuals,
@@ -42,7 +42,7 @@ export function* deleteActualTask(id: number): SagaIterator {
 export function* updateActualTask(id: number, change: Table.RowChange): SagaIterator {
   yield put(updatingActualAction({ id, value: true }));
   try {
-    yield call(updateActual, id, ActualMapping.patchPayload(change));
+    yield call(updateActual, id, ActualRowManager.patchPayload(change));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the actual.", id, (errors: Table.CellError[]) =>
       addErrorsToStateAction(errors)
@@ -59,7 +59,7 @@ export function* createActualTask(id: number, row: Table.ActualRow): SagaIterato
   }
   yield put(creatingActualAction(true));
   try {
-    const response: IActual = yield call(service, id, ActualMapping.postPayload(row));
+    const response: IActual = yield call(service, id, ActualRowManager.postPayload(row));
     yield put(activatePlaceholderAction({ id: row.id, model: response }));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the actual.", row.id, (errors: Table.CellError[]) =>
@@ -73,7 +73,7 @@ export function* createActualTask(id: number, row: Table.ActualRow): SagaIterato
 export function* bulkUpdateActualsTask(id: number, changes: Table.RowChange[]): SagaIterator {
   const requestPayload: Http.IActualBulkUpdatePayload[] = map(changes, (change: Table.RowChange) => ({
     id: change.id,
-    ...ActualMapping.patchPayload(change)
+    ...ActualRowManager.patchPayload(change)
   }));
   for (let i = 0; i++; i < changes.length) {
     yield put(updatingActualAction({ id: changes[i].id, value: true }));
@@ -143,11 +143,11 @@ export function* handleActualsBulkUpdateTask(action: Redux.IAction<Table.RowChan
           // NOTE: Since the only required field for the Actual is the parent, which is controlled
           // by the HTML select field, it cannot be copy/pasted and thus we do not have to worry
           // about the bulk creation of Actual(s) - only the bulk updating.
-          const updatedRow = ActualMapping.newRowWithChanges(placeholder, merged[i]);
+          const updatedRow = ActualRowManager.newRowWithChanges(placeholder, merged[i]);
           yield put(updatePlaceholderInStateAction(updatedRow));
         }
       } else {
-        const updatedModel = ActualMapping.newModelWithChanges(model, merged[i]);
+        const updatedModel = ActualRowManager.newModelWithChanges(model, merged[i]);
         yield put(updateActualInStateAction(updatedModel));
         mergedUpdates.push(merged[i]);
       }
@@ -174,18 +174,18 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
           the actual with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
       } else {
-        const updatedRow = ActualMapping.newRowWithChanges(placeholder, action.payload);
+        const updatedRow = ActualRowManager.newRowWithChanges(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (ActualMapping.rowHasRequiredFields(updatedRow) && !isNil(updatedRow.object_id)) {
+        if (ActualRowManager.rowHasRequiredFields(updatedRow) && !isNil(updatedRow.object_id)) {
           yield call(createActualTask, updatedRow.object_id, updatedRow);
         }
       }
     } else {
-      const updatedModel = ActualMapping.newModelWithChanges(model, action.payload);
+      const updatedModel = ActualRowManager.newModelWithChanges(model, action.payload);
       yield put(updateActualInStateAction(updatedModel));
       yield call(updateActualTask, model.id, action.payload);
     }

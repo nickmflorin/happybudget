@@ -2,7 +2,7 @@ import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce, forEach } from "lodash";
 import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
 import { warnInconsistentState } from "lib/redux/util";
-import { SubAccountMapping } from "lib/tabling/mappings";
+import { SubAccountRowManager } from "lib/tabling/managers";
 import { fringeValue } from "lib/model/util";
 import { replaceInArray } from "lib/util";
 
@@ -82,7 +82,7 @@ export const createSubAccountsReducer = (
             UpdateInState: mapping.Placeholders.UpdateInState,
             Clear: mapping.Request
           },
-          SubAccountMapping
+          SubAccountRowManager
         ),
         groups: createListResponseReducer<
           IGroup<ISimpleSubAccount>,

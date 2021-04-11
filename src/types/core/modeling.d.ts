@@ -1,27 +1,23 @@
-interface OptionModel<I extends number, N extends string> {
+interface ChoiceModel<I extends number, N extends string> {
   id: I;
   name: N;
 }
 
 type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
-type ProductionType = 0 | 1 | 2 | 3 | 4 | 5;
-type ProductionTypeModel = OptionModel<ProductionType, ProductionTypeName>;
+type ProductionTypeId = 0 | 1 | 2 | 3 | 4 | 5;
+type ProductionTypeModel = ChoiceModel<ProductionTypeId, ProductionTypeName>;
 
 type PaymentMethodName = "Check" | "Card" | "Wire";
-type PaymentMethod = 0 | 1 | 2;
-type PaymentMethodOptionModel = OptionModel<PaymentMethod, PaymentMethodName>;
+type PaymentMethodId = 0 | 1 | 2;
+type PaymentMethod = ChoiceModel<PaymentMethodId, PaymentMethodName>;
 
 type SubAccountUnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
-type SubAccountUnit = 0 | 1 | 2 | 3 | 4 | 5;
-type SubAccountUnitOptionModel = OptionModel<SubAccountUnit, SubAccountUnitName>;
+type SubAccountUnitId = 0 | 1 | 2 | 3 | 4 | 5;
+type SubAccountUnit = ChoiceModel<SubAccountUnitId, SubAccountUnitName>;
 
-type FringeUnit = 0 | 1;
+type FringeUnitId = 0 | 1;
 type FringeUnitName = "Percent" | "Flat";
-type FringeUnitOptionModel = OptionModel<FringeUnit, FringeUnitName>;
-
-type EntityType = "budget" | "account" | "subaccount";
-type BudgetItemType = "subaccount" | "account";
-type CommentParentType = "budget" | "account" | "subaccount" | "comment";
+type FringeUnit = ChoiceModel<FringeUnitId, FringeUnitName>;
 
 type ContactRoleName =
   | "Producer"
@@ -35,8 +31,12 @@ type ContactRoleName =
   | "Writer"
   | "Client"
   | "Other";
-type ContactRole = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-type ContactRoleModel = { id: ContactRole; name: ContactRoleName };
+type ContactRoleId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+type ContactRole = ChoiceModel<ContactRoleId, ContactRoleName>;
+
+type EntityType = "budget" | "account" | "subaccount";
+type BudgetItemType = "subaccount" | "account";
+type CommentParentType = "budget" | "account" | "subaccount" | "comment";
 
 interface Model {
   id: number;
@@ -91,7 +91,6 @@ interface IFringe extends TrackedModel {
   readonly cutoff: number | null;
   readonly rate: number;
   readonly unit: FringeUnit;
-  readonly unit_name: FringeUnitName;
 }
 
 interface IBudget extends Model {
@@ -100,7 +99,6 @@ interface IBudget extends Model {
   readonly created_by: number;
   readonly project_number: number;
   readonly production_type: ProductionType;
-  readonly production_type_name: ProductionTypeName;
   readonly created_at: string;
   readonly updated_at: string;
   readonly shoot_date: string;
@@ -163,7 +161,6 @@ interface ISubAccount extends IBudgetItem, TrackedModel {
   readonly rate: number | null;
   readonly multiplier: number | null;
   readonly unit: SubAccountUnit | null;
-  readonly unit_name: SubAccountUnitName;
   readonly account: number;
   readonly object_id: number;
   readonly type: "subaccount";
@@ -185,8 +182,7 @@ interface IActual extends TrackedModel {
   readonly date: string | null;
   readonly payment_id: string | null;
   readonly value: string | null;
-  readonly payment_method: PaymentMethod;
-  readonly payment_method_name: PaymentMethodName;
+  readonly payment_method: PaymentMethod | null;
   readonly object_id: number;
   readonly parent_type: BudgetItemType;
 }
@@ -210,7 +206,6 @@ interface IContact extends Model {
   readonly created_at: string;
   readonly updated_at: string;
   readonly role: ContactRole;
-  readonly role_name: ContactRoleName;
   readonly city: string;
   readonly country: string;
   readonly phone_number: string;
