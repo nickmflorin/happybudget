@@ -21,6 +21,7 @@ const BudgetItemCell = ({ onChange, ...props }: BudgetItemCellProps): JSX.Elemen
         value={props.node.data.object_id}
         onChange={(nd: IBudgetItem) => onChange(nd.id, nd.type, props.node.data)}
         nodes={budgetItemsTree.data}
+        buttonProps={{ style: { width: "100%" }, textProps: { style: { textAlign: "left" } } }}
       />
     </Cell>
   );

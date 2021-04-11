@@ -7,25 +7,28 @@ import { Dropdown } from "antd";
 import { DropDownProps } from "antd/lib/dropdown";
 
 import { CaretButton } from "components/buttons";
+import { CaretButtonProps } from "components/buttons/CaretButton";
 import { BudgetItemTreeMenu } from "components/menus";
 import { EntityText } from "components/typography";
 import { flattenBudgetItemNodes } from "lib/model/util";
 import { isNodeDescendantOf } from "lib/util";
 
-export interface BudgetItemsTreeSelectProps extends Omit<DropDownProps, "overlay"> {
+export interface BudgetItemsTreeDropdownProps extends Omit<DropDownProps, "overlay"> {
   className?: string;
   value?: number;
   placeholderText?: string;
   onChange?: (item: IBudgetItem) => void;
   nodes: IBudgetItemNode[];
+  buttonProps?: CaretButtonProps;
 }
 
-const BudgetItemsTreeSelect: React.FC<BudgetItemsTreeSelectProps> = ({
+const BudgetItemsTreeDropdown: React.FC<BudgetItemsTreeDropdownProps> = ({
   className,
   nodes,
   value,
   placeholderText,
   trigger = ["click"],
+  buttonProps,
   onChange
 }) => {
   const [visible, setVisible] = useState(false);
@@ -73,11 +76,11 @@ const BudgetItemsTreeSelect: React.FC<BudgetItemsTreeSelectProps> = ({
         </ClickAwayListener>
       }
     >
-      <CaretButton id={`#${buttonId}`} onClick={() => setVisible(!visible)}>
+      <CaretButton id={`#${buttonId}`} onClick={() => setVisible(!visible)} {...buttonProps}>
         {!isNil(currentNode) ? <EntityText>{currentNode}</EntityText> : !isNil(placeholderText) ? placeholderText : ""}
       </CaretButton>
     </Dropdown>
   );
 };
 
-export default BudgetItemsTreeSelect;
+export default BudgetItemsTreeDropdown;
