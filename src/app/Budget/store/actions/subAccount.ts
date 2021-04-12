@@ -7,7 +7,9 @@ export const loadingSubAccountAction = simpleAction<boolean>(ActionType.SubAccou
 export const responseSubAccountAction = simpleAction<ISubAccount | undefined>(ActionType.SubAccount.Response);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const updateParentSubAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.SubAccount.UpdateInState);
-export const bulkUpdateSubAccountAction = simpleAction<Table.RowChange[]>(ActionType.SubAccount.BulkUpdate);
+export const bulkUpdateSubAccountAction = simpleAction<Table.RowChange<Table.SubAccountRow>[]>(
+  ActionType.SubAccount.BulkUpdate
+);
 
 /*
   Actions Pertaining to Sub Account Comments
@@ -44,7 +46,9 @@ export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPa
 /*
   Actions Pertaining to Account Sub Accounts
 */
-export const updateSubAccountAction = simpleAction<Table.RowChange>(ActionType.SubAccount.SubAccounts.Update);
+export const updateSubAccountAction = simpleAction<Table.RowChange<Table.SubAccountRow>>(
+  ActionType.SubAccount.SubAccounts.Update
+);
 export const removeSubAccountAction = simpleAction<number>(ActionType.SubAccount.SubAccounts.Remove);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.SubAccount.SubAccounts.Deleting

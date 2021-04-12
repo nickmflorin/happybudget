@@ -109,10 +109,10 @@ export function* deleteAccountTask(id: number): SagaIterator {
   }
 }
 
-export function* updateAccountTask(id: number, change: Table.RowChange): SagaIterator {
+export function* updateAccountTask(id: number, change: Table.RowChange<Table.AccountRow>): SagaIterator {
   yield put(updatingAccountAction({ id, value: true }));
   try {
-    yield call(updateAccount, id, AccountRowManager.patchPayload(change));
+    yield call(updateAccount, id, AccountRowManager.payload(change));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the sub account.", id, (errors: Table.CellError[]) =>
       addErrorsToStateAction(errors)
@@ -125,7 +125,7 @@ export function* updateAccountTask(id: number, change: Table.RowChange): SagaIte
 export function* createAccountTask(id: number, row: Table.AccountRow): SagaIterator {
   yield put(creatingAccountAction(true));
   try {
-    const response: IAccount = yield call(createAccount, id, AccountRowManager.postPayload(row));
+    const response: IAccount = yield call(createAccount, id, AccountRowManager.payload(row));
     yield put(activatePlaceholderAction({ id: row.id, model: response }));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the account.", row.id, (errors: Table.CellError[]) =>
@@ -136,11 +136,14 @@ export function* createAccountTask(id: number, row: Table.AccountRow): SagaItera
   }
 }
 
-export function* bulkUpdateAccountsTask(id: number, changes: Table.RowChange[]): SagaIterator {
-  const requestPayload: Http.IAccountBulkUpdatePayload[] = map(changes, (change: Table.RowChange) => ({
-    id: change.id,
-    ...AccountRowManager.patchPayload(change)
-  }));
+export function* bulkUpdateAccountsTask(id: number, changes: Table.RowChange<Table.AccountRow>[]): SagaIterator {
+  const requestPayload: Http.IAccountBulkUpdatePayload[] = map(
+    changes,
+    (change: Table.RowChange<Table.AccountRow>) => ({
+      id: change.id,
+      ...AccountRowManager.payload(change)
+    })
+  );
   for (let i = 0; i++; i < changes.length) {
     yield put(updatingAccountAction({ id: changes[i].id, value: true }));
   }
@@ -160,9 +163,7 @@ export function* bulkUpdateAccountsTask(id: number, changes: Table.RowChange[]):
 }
 
 export function* bulkCreateAccountsTask(id: number, rows: Table.AccountRow[]): SagaIterator {
-  const requestPayload: Http.IAccountPayload[] = map(rows, (row: Table.AccountRow) =>
-    AccountRowManager.postPayload(row)
-  );
+  const requestPayload: Http.IAccountPayload[] = map(rows, (row: Table.AccountRow) => AccountRowManager.payload(row));
   yield put(creatingAccountAction(true));
   try {
     const accounts: IAccount[] = yield call(bulkCreateAccounts, id, requestPayload);
@@ -215,18 +216,23 @@ export function* handleAccountRemovalTask(action: Redux.IAction<number>): SagaIt
   }
 }
 
-export function* handleAccountsBulkUpdateTask(action: Redux.IAction<Table.RowChange[]>): SagaIterator {
+export function* handleAccountsBulkUpdateTask(
+  action: Redux.IAction<Table.RowChange<Table.AccountRow>[]>
+): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
-    const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange[] };
-    const merged: Table.RowChange[] = map(grouped, (changes: Table.RowChange[], id: string) => {
-      return { data: mergeRowChanges(changes).data, id: parseInt(id) };
-    });
+    const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange<Table.AccountRow>[] };
+    const merged: Table.RowChange<Table.AccountRow>[] = map(
+      grouped,
+      (changes: Table.RowChange<Table.AccountRow>[], id: string) => {
+        return { data: mergeRowChanges(changes).data, id: parseInt(id) };
+      }
+    );
 
     const data = yield select((state: Redux.IApplicationStore) => state.budget.accounts.data);
     const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.accounts.placeholders);
 
-    const mergedUpdates: Table.RowChange[] = [];
+    const mergedUpdates: Table.RowChange<Table.AccountRow>[] = [];
     const placeholdersToCreate: Table.AccountRow[] = [];
 
     for (let i = 0; i < merged.length; i++) {
@@ -240,14 +246,14 @@ export function* handleAccountsBulkUpdateTask(action: Redux.IAction<Table.RowCha
             the account with ID ${merged[i].id} does not exist in state when it is expected to.`
           );
         } else {
-          const updatedRow = AccountRowManager.newRowWithChanges(placeholder, merged[i]);
+          const updatedRow = AccountRowManager.mergeChangesWithRow(placeholder, merged[i]);
           yield put(updatePlaceholderInStateAction(updatedRow));
           if (AccountRowManager.rowHasRequiredFields(updatedRow)) {
             placeholdersToCreate.push(updatedRow);
           }
         }
       } else {
-        const updatedModel = AccountRowManager.newModelWithChanges(model, merged[i]);
+        const updatedModel = AccountRowManager.mergeChangesWithModel(model, merged[i]);
         yield put(updateAccountInStateAction(updatedModel));
         mergedUpdates.push(merged[i]);
       }
@@ -261,7 +267,7 @@ export function* handleAccountsBulkUpdateTask(action: Redux.IAction<Table.RowCha
   }
 }
 
-export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
+export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange<Table.AccountRow>>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const id = action.payload.id;
@@ -277,7 +283,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
           the account with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
       } else {
-        const updatedRow = AccountRowManager.newRowWithChanges(placeholder, action.payload);
+        const updatedRow = AccountRowManager.mergeChangesWithRow(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
@@ -288,7 +294,7 @@ export function* handleAccountUpdateTask(action: Redux.IAction<Table.RowChange>)
         }
       }
     } else {
-      const updatedModel = AccountRowManager.newModelWithChanges(model, action.payload);
+      const updatedModel = AccountRowManager.mergeChangesWithModel(model, action.payload);
       yield put(updateAccountInStateAction(updatedModel));
       yield call(updateAccountTask, model.id, action.payload);
     }

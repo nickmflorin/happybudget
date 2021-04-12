@@ -2,13 +2,7 @@ import { useSelector } from "react-redux";
 import { isNil, includes, find, filter, map } from "lodash";
 import classNames from "classnames";
 
-import {
-  ColDef,
-  ColSpanParams,
-  ProcessCellForExportParams,
-  ValueSetterParams,
-  ValueGetterParams
-} from "ag-grid-community";
+import { ColDef, ColSpanParams, ProcessCellForExportParams, ValueSetterParams } from "ag-grid-community";
 
 import { SubAccountUnits } from "lib/model";
 import { findChoiceModelForName } from "lib/model/util";
@@ -34,8 +28,8 @@ interface SubAccountsTableProps {
   onSearch: (value: string) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
-  onRowUpdate: (payload: Table.RowChange) => void;
-  onRowBulkUpdate?: (payload: Table.RowChange[]) => void;
+  onRowUpdate: (payload: Table.RowChange<Table.SubAccountRow>) => void;
+  onRowBulkUpdate?: (payload: Table.RowChange<Table.SubAccountRow>[]) => void;
   onRowAdd: () => void;
   onRowDelete: (row: Table.SubAccountRow) => void;
   onRowExpand?: (id: number) => void;

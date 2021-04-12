@@ -71,8 +71,10 @@ const Fringes = (): JSX.Element => {
         onRowSelect={(id: number) => dispatch(selectFringeAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectFringeAction(id))}
         onRowDelete={(row: Table.FringeRow) => dispatch(removeFringeAction(row.id))}
-        onRowUpdate={(payload: Table.RowChange) => dispatch(updateFringeAction(payload))}
-        onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetFringesAction(changes))}
+        onRowUpdate={(payload: Table.RowChange<Table.FringeRow>) => dispatch(updateFringeAction(payload))}
+        onRowBulkUpdate={(changes: Table.RowChange<Table.FringeRow>[]) =>
+          dispatch(bulkUpdateBudgetFringesAction(changes))
+        }
         onSelectAll={() => dispatch(selectAllFringesAction(null))}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         processCellForClipboard={processOptionModelCellForClipboard<Table.FringeRow, FringeUnit>("unit", FringeUnits)}

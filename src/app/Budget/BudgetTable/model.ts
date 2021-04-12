@@ -10,7 +10,7 @@ export interface GetExportValueParams {
 
 export type ExportValueGetters = { [key: string]: (params: GetExportValueParams) => string };
 
-export interface GroupProps<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> {
+export interface GroupProps<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = Model> {
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
   onEditGroup: (group: G) => void;
@@ -25,8 +25,8 @@ export interface BudgetTableProps<
   R extends Table.Row<G, C>,
   M extends Model,
   G extends IGroup<any>,
-  P extends Http.IPayload = Http.IPayload,
-  C extends Model = UnknownModel
+  P extends Http.ModelPayload<M> = {},
+  C extends Model = Model
 > extends GridOptions {
   bodyColumns: ColDef[];
   calculatedColumns?: ColDef[];
@@ -63,8 +63,8 @@ export interface BudgetTableProps<
   onSearch: (value: string) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
-  onRowUpdate: (payload: Table.RowChange) => void;
-  onRowBulkUpdate?: (payload: Table.RowChange[]) => void;
+  onRowUpdate: (payload: Table.RowChange<R>) => void;
+  onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
   onRowAdd: () => void;
   onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;

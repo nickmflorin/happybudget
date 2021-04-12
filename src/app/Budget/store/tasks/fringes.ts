@@ -29,10 +29,10 @@ export function* deleteFringeTask(id: number): SagaIterator {
   }
 }
 
-export function* updateFringeTask(id: number, change: Table.RowChange): SagaIterator {
+export function* updateFringeTask(id: number, change: Table.RowChange<Table.FringeRow>): SagaIterator {
   yield put(updatingFringeAction({ id, value: true }));
   try {
-    yield call(updateFringe, id, FringeRowManager.patchPayload(change));
+    yield call(updateFringe, id, FringeRowManager.payload(change));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the fringe.", id, (errors: Table.CellError[]) =>
       addErrorsToStateAction(errors)
@@ -47,7 +47,7 @@ export function* createFringeTask(row: Table.FringeRow): SagaIterator {
   if (!isNil(budgetId)) {
     yield put(creatingFringeAction(true));
     try {
-      const response: IFringe = yield call(createFringe, budgetId, FringeRowManager.postPayload(row));
+      const response: IFringe = yield call(createFringe, budgetId, FringeRowManager.payload(row));
       yield put(activatePlaceholderAction({ id: row.id, model: response }));
     } catch (e) {
       yield call(handleTableErrors, e, "There was an error updating the fringe.", row.id, (errors: Table.CellError[]) =>
@@ -59,10 +59,10 @@ export function* createFringeTask(row: Table.FringeRow): SagaIterator {
   }
 }
 
-export function* bulkUpdateFringesTask(id: number, changes: Table.RowChange[]): SagaIterator {
-  const requestPayload: Http.IFringeBulkUpdatePayload[] = map(changes, (change: Table.RowChange) => ({
+export function* bulkUpdateFringesTask(id: number, changes: Table.RowChange<Table.FringeRow>[]): SagaIterator {
+  const requestPayload: Http.IFringeBulkUpdatePayload[] = map(changes, (change: Table.RowChange<Table.FringeRow>) => ({
     id: change.id,
-    ...FringeRowManager.patchPayload(change)
+    ...FringeRowManager.payload(change)
   }));
   for (let i = 0; i++; i < changes.length) {
     yield put(updatingFringeAction({ id: changes[i].id, value: true }));
@@ -83,7 +83,7 @@ export function* bulkUpdateFringesTask(id: number, changes: Table.RowChange[]): 
 }
 
 export function* bulkCreateFringesTask(id: number, rows: Table.FringeRow[]): SagaIterator {
-  const requestPayload: Http.IFringePayload[] = map(rows, (row: Table.FringeRow) => FringeRowManager.postPayload(row));
+  const requestPayload: Http.IFringePayload[] = map(rows, (row: Table.FringeRow) => FringeRowManager.payload(row));
   yield put(creatingFringeAction(true));
   try {
     const fringes: IFringe[] = yield call(bulkCreateFringes, id, requestPayload);
@@ -136,7 +136,7 @@ export function* handleFringeRemovalTask(action: Redux.IAction<number>): SagaIte
   }
 }
 
-export function* handleFringeUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
+export function* handleFringeUpdateTask(action: Redux.IAction<Table.RowChange<Table.FringeRow>>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const id = action.payload.id;
@@ -152,7 +152,7 @@ export function* handleFringeUpdateTask(action: Redux.IAction<Table.RowChange>):
           the fringe with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
       } else {
-        const updatedRow = FringeRowManager.newRowWithChanges(placeholder, action.payload);
+        const updatedRow = FringeRowManager.mergeChangesWithRow(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
@@ -163,25 +163,28 @@ export function* handleFringeUpdateTask(action: Redux.IAction<Table.RowChange>):
         }
       }
     } else {
-      const updatedModel = FringeRowManager.newModelWithChanges(model, action.payload);
+      const updatedModel = FringeRowManager.mergeChangesWithModel(model, action.payload);
       yield put(updateFringeInStateAction(updatedModel));
       yield call(updateFringeTask, model.id, action.payload);
     }
   }
 }
 
-export function* handleFringesBulkUpdateTask(action: Redux.IAction<Table.RowChange[]>): SagaIterator {
+export function* handleFringesBulkUpdateTask(action: Redux.IAction<Table.RowChange<Table.FringeRow>[]>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
-    const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange[] };
-    const merged: Table.RowChange[] = map(grouped, (changes: Table.RowChange[], id: string) => {
-      return { data: mergeRowChanges(changes).data, id: parseInt(id) };
-    });
+    const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange<Table.FringeRow>[] };
+    const merged: Table.RowChange<Table.FringeRow>[] = map(
+      grouped,
+      (changes: Table.RowChange<Table.FringeRow>[], id: string) => {
+        return { data: mergeRowChanges(changes).data, id: parseInt(id) };
+      }
+    );
 
     const data = yield select((state: Redux.IApplicationStore) => state.budget.fringes.data);
     const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.fringes.placeholders);
 
-    const mergedUpdates: Table.RowChange[] = [];
+    const mergedUpdates: Table.RowChange<Table.FringeRow>[] = [];
     const placeholdersToCreate: Table.FringeRow[] = [];
 
     for (let i = 0; i < merged.length; i++) {
@@ -195,14 +198,14 @@ export function* handleFringesBulkUpdateTask(action: Redux.IAction<Table.RowChan
             the fringe with ID ${merged[i].id} does not exist in state when it is expected to.`
           );
         } else {
-          const updatedRow = FringeRowManager.newRowWithChanges(placeholder, merged[i]);
+          const updatedRow = FringeRowManager.mergeChangesWithRow(placeholder, merged[i]);
           yield put(updatePlaceholderInStateAction(updatedRow));
           if (FringeRowManager.rowHasRequiredFields(updatedRow)) {
             placeholdersToCreate.push(updatedRow);
           }
         }
       } else {
-        const updatedModel = FringeRowManager.newModelWithChanges(model, merged[i]);
+        const updatedModel = FringeRowManager.mergeChangesWithModel(model, merged[i]);
         yield put(updateFringeInStateAction(updatedModel));
         mergedUpdates.push(merged[i]);
       }

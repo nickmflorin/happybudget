@@ -17,8 +17,8 @@ export const createTablePlaceholdersReducer = <
   R extends Table.Row<G, C>,
   M extends Model,
   G extends IGroup<any>,
-  P extends Http.IPayload,
-  C extends Model = UnknownModel,
+  P extends Http.ModelPayload<M>,
+  C extends Model = Model,
   A extends Redux.IAction<any> = Redux.IAction<any>
 >(
   mappings: Partial<ITablePlaceholdersActionMap>,

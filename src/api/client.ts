@@ -174,7 +174,7 @@ export class ApiClient {
       | HttpRequestMethods.PATCH,
     url: string,
     query: Http.IQuery = {},
-    payload: Http.IPayload = {},
+    payload: { [key: string]: any } = {},
     options: Http.IRequestOptions
   ): Promise<T> => {
     axiosRetry(this.instance, { retries: options.retries });
@@ -247,13 +247,17 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  post = async <T>(url: string, payload: Http.IPayload = {}, options: Http.IRequestOptions = {}): Promise<T> => {
+  post = async <T>(
+    url: string,
+    payload: { [key: string]: any } = {},
+    options: Http.IRequestOptions = {}
+  ): Promise<T> => {
     return this.request<T>(HttpRequestMethods.POST, url, {}, payload, options);
   };
 
   upload = async <T>(
     url: string,
-    payload: Http.IPayload = {},
+    payload: { [key: string]: any } = {},
     options: Http.IRequestOptions = {}
   ): Promise<AxiosResponse<T>> => {
     url = this._prepare_url(url, {}, HttpRequestMethods.POST);
@@ -270,7 +274,11 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  put = async <T>(url: string, payload: Http.IPayload = {}, options: Http.IRequestOptions = {}): Promise<T> => {
+  put = async <T>(
+    url: string,
+    payload: { [key: string]: any } = {},
+    options: Http.IRequestOptions = {}
+  ): Promise<T> => {
     return this.request<T>(HttpRequestMethods.PUT, url, {}, payload, options);
   };
 
@@ -292,7 +300,11 @@ export class ApiClient {
    * @param payload    The JSON body of the request.
    * @param options    The options for the request (see IRequestOptions).
    */
-  patch = async <T>(url: string, payload: Http.IPayload = {}, options: Http.IRequestOptions = {}): Promise<T> => {
+  patch = async <T>(
+    url: string,
+    payload: { [key: string]: any } = {},
+    options: Http.IRequestOptions = {}
+  ): Promise<T> => {
     return this.request(HttpRequestMethods.PATCH, url, {}, payload, options);
   };
 }

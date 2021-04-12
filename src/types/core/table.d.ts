@@ -11,7 +11,7 @@ namespace Table {
 
   type RowType = "subaccount" | "account" | "fringe" | "actual";
 
-  interface RowMeta<C extends Model = UnknownModel> {
+  interface RowMeta<C extends Model = Model> {
     readonly selected: boolean;
     readonly errors: CellError[];
     readonly isPlaceholder?: boolean;
@@ -30,20 +30,22 @@ namespace Table {
     readonly pageSize: number;
   }
 
-  interface Row<G extends IGroup<any>, C extends Model = UnknownModel> {
+  interface Row<G extends IGroup<any> = IGroup<any>, C extends Model = Model> {
     readonly id: number;
     readonly meta: RowMeta<C>;
     readonly group: G | null;
   }
 
-  interface CellChange {
-    oldValue: string | number | number[] | string[] | null;
-    newValue: string | number | number[] | string[];
+  interface CellChange<V> {
+    oldValue: V;
+    newValue: V;
   }
 
-  type RowChange = {
+  type RowChangeData<R extends Model> = { [key in keyof R]?: CellChange<R[key]> };
+
+  type RowChange<R extends Model> = {
     id: number;
-    data: { [key: string]: CellChange };
+    data: RowChangeData<R>;
   };
 
   interface ActivatePlaceholderPayload<M> {

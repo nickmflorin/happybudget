@@ -42,10 +42,6 @@ interface Model {
   id: number;
 }
 
-interface UnknownModel extends Model {
-  [key: string]: any;
-}
-
 interface IEntity extends Model {
   readonly id: number;
   readonly identifier: string | null;
@@ -133,6 +129,23 @@ interface IGroup<C extends Model> extends TrackedModel {
   readonly estimated: number | null;
   readonly variance: number | null;
   readonly actual: number | null;
+}
+
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+namespace Acccount {
+  interface M extends IBudgetItem, TrackedModel {
+    readonly description: string | null;
+    readonly access: number[];
+    readonly ancestors: IEntity[];
+    readonly estimated: number | null;
+    readonly variance: number | null;
+    readonly actual: number | null;
+    readonly subaccounts: ISimpleSubAccount[];
+    readonly type: "account";
+    readonly group: number | null;
+    readonly siblings: IEntity[];
+  }
 }
 
 interface IAccount extends IBudgetItem, TrackedModel {

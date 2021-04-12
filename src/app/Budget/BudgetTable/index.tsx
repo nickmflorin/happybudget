@@ -64,8 +64,8 @@ const BudgetTable = <
   R extends Table.Row<G, C>,
   M extends Model,
   G extends IGroup<any>,
-  P extends Http.IPayload = Http.IPayload,
-  C extends Model = UnknownModel
+  P extends Http.ModelPayload<M> = {},
+  C extends Model = Model
 >({
   /* eslint-disable indent */
   bodyColumns,
@@ -637,8 +637,10 @@ const BudgetTable = <
     }
   });
 
-  const getTableChangeFromEvent = (event: CellEditingStoppedEvent | CellValueChangedEvent): Table.RowChange | null => {
-    const field = event.column.getColId();
+  const getTableChangeFromEvent = (
+    event: CellEditingStoppedEvent | CellValueChangedEvent
+  ): Table.RowChange<R> | null => {
+    const field = event.column.getColId() as keyof R;
     const row: R = event.node.data;
     // NOTE: We want to allow the setting of fields to `null` - so we just have to make sure it is
     // not `undefined`.
@@ -648,26 +650,26 @@ const BudgetTable = <
         // WHat? ^^ What was I thinking here.
         let newValue = event.newValue;
         let oldValue = event.oldValue;
-        if (!isNil(processors)) {
-          newValue = processCell(
-            processors,
-            { type: "http", field: field as keyof R },
-            event.newValue,
-            row,
-            event.colDef
-          );
-          oldValue = processCell(
-            processors,
-            { type: "http", field: field as keyof R },
-            event.oldValue,
-            row,
-            event.colDef
-          );
-        }
-        return {
-          id: event.data.id,
-          data: { [field]: { oldValue, newValue } }
-        };
+        // if (!isNil(processors)) {
+        //   newValue = processCell(
+        //     processors,
+        //     { type: "http", field: field as keyof R },
+        //     event.newValue,
+        //     row,
+        //     event.colDef
+        //   );
+        //   oldValue = processCell(
+        //     processors,
+        //     { type: "http", field: field as keyof R },
+        //     event.oldValue,
+        //     row,
+        //     event.colDef
+        //   );
+        // }
+        const change: Table.CellChange<R[keyof R]> = { oldValue, newValue };
+        const d: { [key in keyof R]?: Table.CellChange<R[key]> } = {};
+        d[field as keyof R] = { oldValue, newValue };
+        return { id: event.data.id, data: d };
       }
     }
     return null;
@@ -687,8 +689,8 @@ const BudgetTable = <
       } else if (cellChangeEvents.length !== 0) {
         const changes = filter(
           map(cellChangeEvents, (e: CellValueChangedEvent) => getTableChangeFromEvent(e)),
-          (change: Table.RowChange | null) => change !== null
-        ) as Table.RowChange[];
+          (change: Table.RowChange<R> | null) => change !== null
+        ) as Table.RowChange<R>[];
         if (changes.length !== 0) {
           onRowBulkUpdate(changes);
         }

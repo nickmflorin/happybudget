@@ -98,8 +98,10 @@ const Actuals = (): JSX.Element => {
         onRowSelect={(id: number) => dispatch(selectActualAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectActualAction(id))}
         onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row.id))}
-        onRowUpdate={(payload: Table.RowChange) => dispatch(updateActualAction(payload))}
-        onRowBulkUpdate={(changes: Table.RowChange[]) => dispatch(bulkUpdateBudgetActualsAction(changes))}
+        onRowUpdate={(payload: Table.RowChange<Table.ActualRow>) => dispatch(updateActualAction(payload))}
+        onRowBulkUpdate={(changes: Table.RowChange<Table.ActualRow>[]) =>
+          dispatch(bulkUpdateBudgetActualsAction(changes))
+        }
         onSelectAll={() => dispatch(selectAllActualsAction(null))}
         rowRefreshRequired={(existing: Table.ActualRow, row: Table.ActualRow) => {
           return (

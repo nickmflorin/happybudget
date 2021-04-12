@@ -19,13 +19,13 @@ export const flattenBudgetItemNodes = (nodes: IBudgetItemNode[]): IBudgetItem[] 
   return flattened;
 };
 
-export const mergeRowChanges = (changes: Table.RowChange[]): Table.RowChange => {
+export const mergeRowChanges = (changes: Table.RowChange<any>[]): Table.RowChange<any> => {
   if (changes.length !== 0) {
-    if (uniq(map(changes, (change: Table.RowChange) => change.id)).length !== 1) {
+    if (uniq(map(changes, (change: Table.RowChange<any>) => change.id)).length !== 1) {
       throw new Error("Cannot merge row changes for different rows!");
     }
-    const merged: Table.RowChange = { id: changes[0].id, data: {} };
-    forEach(changes, (change: Table.RowChange) => {
+    const merged: Table.RowChange<any> = { id: changes[0].id, data: {} };
+    forEach(changes, (change: Table.RowChange<any>) => {
       merged.data = { ...merged.data, ...change.data };
     });
     return merged;

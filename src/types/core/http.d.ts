@@ -1,6 +1,11 @@
+/// <reference path="./modeling.d.ts" />
+
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Http {
+
+  type Method = "POST" | "PATCH" | "GET" | "DELETE";
+
   interface IRequestOptions extends AxiosRequestConfig {
     retries?: number;
     headers?: { [key: string]: string };
@@ -22,7 +27,9 @@ namespace Http {
     readonly search?: string;
   }
 
-  interface IPayload {}
+  type ModelPayload<M extends Model> = {
+    [key in keyof Omit<M, "id">]?: any;
+  }
 
   interface IListResponse<T> {
     readonly count: number;
@@ -104,7 +111,7 @@ namespace Http {
     readonly fileUrl: string;
   }
 
-  interface IFringePayload extends IPayload {
+  interface IFringePayload implements ModelPayload<IFringe> {
     readonly name: string;
     readonly description?: string | null;
     readonly cutoff?: number | null;
@@ -112,36 +119,36 @@ namespace Http {
     readonly unit?: FringeUnit;
   }
 
-  interface IBudgetPayload extends IPayload {
+  interface IBudgetPayload implements ModelPayload<IBudget> {
     readonly production_type: ProductionType;
     readonly name: string;
   }
 
-  interface IGroupPayload extends IPayload {
+  interface IGroupPayload implements ModelPayload<IGroup> {
     readonly name: string;
     readonly children?: number[];
     readonly color: string;
   }
 
-  interface IAccountPayload extends IPayload {
+  interface IAccountPayload implements ModelPayload<IAccount> {
     readonly account_number: string;
     readonly description?: string;
     readonly access?: number[];
     readonly group?: number | null;
   }
 
-  interface ISubAccountPayload extends IPayload {
+  interface ISubAccountPayload implements ModelPayload<ISubAccount> {
     readonly description?: string;
     readonly name: string;
     readonly line: string;
     readonly quantity?: number;
     readonly rate?: number;
     readonly multiplier?: number;
-    readonly unit?: SubAccountUnit;
+    readonly unit?: SubAccountUnitId;
     readonly group?: number | null;
   }
 
-  interface IActualPayload extends IPayload {
+  interface IActualPayload implements ModelPayload<IActual> {
     readonly description?: string;
     readonly date?: string;
     readonly vendor?: string;
@@ -153,12 +160,12 @@ namespace Http {
     readonly parent_type?: BudgetItemType;
   }
 
-  interface ICommentPayload extends IPayload {
+  interface ICommentPayload implements ModelPayload<IComment> {
     readonly likes?: number[];
     readonly text: string;
   }
 
-  interface IContactPayload extends IPayload {
+  interface IContactPayload implements ModelPayload<IContact> {
     readonly first_name: string;
     readonly last_name: string;
     readonly email: string;

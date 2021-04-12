@@ -39,10 +39,10 @@ export function* deleteActualTask(id: number): SagaIterator {
   }
 }
 
-export function* updateActualTask(id: number, change: Table.RowChange): SagaIterator {
+export function* updateActualTask(id: number, change: Table.RowChange<Table.ActualRow>): SagaIterator {
   yield put(updatingActualAction({ id, value: true }));
   try {
-    yield call(updateActual, id, ActualRowManager.patchPayload(change));
+    yield call(updateActual, id, ActualRowManager.payload(change));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the actual.", id, (errors: Table.CellError[]) =>
       addErrorsToStateAction(errors)
@@ -59,7 +59,7 @@ export function* createActualTask(id: number, row: Table.ActualRow): SagaIterato
   }
   yield put(creatingActualAction(true));
   try {
-    const response: IActual = yield call(service, id, ActualRowManager.postPayload(row));
+    const response: IActual = yield call(service, id, ActualRowManager.payload(row));
     yield put(activatePlaceholderAction({ id: row.id, model: response }));
   } catch (e) {
     yield call(handleTableErrors, e, "There was an error updating the actual.", row.id, (errors: Table.CellError[]) =>
@@ -70,10 +70,10 @@ export function* createActualTask(id: number, row: Table.ActualRow): SagaIterato
   }
 }
 
-export function* bulkUpdateActualsTask(id: number, changes: Table.RowChange[]): SagaIterator {
-  const requestPayload: Http.IActualBulkUpdatePayload[] = map(changes, (change: Table.RowChange) => ({
+export function* bulkUpdateActualsTask(id: number, changes: Table.RowChange<Table.ActualRow>[]): SagaIterator {
+  const requestPayload: Http.IActualBulkUpdatePayload[] = map(changes, (change: Table.RowChange<Table.ActualRow>) => ({
     id: change.id,
-    ...ActualRowManager.patchPayload(change)
+    ...ActualRowManager.payload(change)
   }));
   for (let i = 0; i++; i < changes.length) {
     yield put(updatingActualAction({ id: changes[i].id, value: true }));
@@ -116,18 +116,21 @@ export function* handleActualRemovalTask(action: Redux.IAction<number>): SagaIte
   }
 }
 
-export function* handleActualsBulkUpdateTask(action: Redux.IAction<Table.RowChange[]>): SagaIterator {
+export function* handleActualsBulkUpdateTask(action: Redux.IAction<Table.RowChange<Table.ActualRow>[]>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
-    const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange[] };
-    const merged: Table.RowChange[] = map(grouped, (changes: Table.RowChange[], id: string) => {
-      return { data: mergeRowChanges(changes).data, id: parseInt(id) };
-    });
+    const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange<Table.ActualRow>[] };
+    const merged: Table.RowChange<Table.ActualRow>[] = map(
+      grouped,
+      (changes: Table.RowChange<Table.ActualRow>[], id: string) => {
+        return { data: mergeRowChanges(changes).data, id: parseInt(id) };
+      }
+    );
 
     const data = yield select((state: Redux.IApplicationStore) => state.budget.actuals.data);
     const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.actuals.placeholders);
 
-    const mergedUpdates: Table.RowChange[] = [];
+    const mergedUpdates: Table.RowChange<Table.ActualRow>[] = [];
 
     for (let i = 0; i < merged.length; i++) {
       const model: IActual | undefined = find(data, { id: merged[i].id });
@@ -143,11 +146,11 @@ export function* handleActualsBulkUpdateTask(action: Redux.IAction<Table.RowChan
           // NOTE: Since the only required field for the Actual is the parent, which is controlled
           // by the HTML select field, it cannot be copy/pasted and thus we do not have to worry
           // about the bulk creation of Actual(s) - only the bulk updating.
-          const updatedRow = ActualRowManager.newRowWithChanges(placeholder, merged[i]);
+          const updatedRow = ActualRowManager.mergeChangesWithRow(placeholder, merged[i]);
           yield put(updatePlaceholderInStateAction(updatedRow));
         }
       } else {
-        const updatedModel = ActualRowManager.newModelWithChanges(model, merged[i]);
+        const updatedModel = ActualRowManager.mergeChangesWithModel(model, merged[i]);
         yield put(updateActualInStateAction(updatedModel));
         mergedUpdates.push(merged[i]);
       }
@@ -158,7 +161,7 @@ export function* handleActualsBulkUpdateTask(action: Redux.IAction<Table.RowChan
   }
 }
 
-export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>): SagaIterator {
+export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange<Table.ActualRow>>): SagaIterator {
   const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const id = action.payload.id;
@@ -174,7 +177,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
           the actual with ID ${action.payload.id} does not exist in state when it is expected to.`
         );
       } else {
-        const updatedRow = ActualRowManager.newRowWithChanges(placeholder, action.payload);
+        const updatedRow = ActualRowManager.mergeChangesWithRow(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction(updatedRow));
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
@@ -185,7 +188,7 @@ export function* handleActualUpdateTask(action: Redux.IAction<Table.RowChange>):
         }
       }
     } else {
-      const updatedModel = ActualRowManager.newModelWithChanges(model, action.payload);
+      const updatedModel = ActualRowManager.mergeChangesWithModel(model, action.payload);
       yield put(updateActualInStateAction(updatedModel));
       yield call(updateActualTask, model.id, action.payload);
     }

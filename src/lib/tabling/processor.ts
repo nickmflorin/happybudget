@@ -2,26 +2,26 @@ import { filter, includes, isNil, forEach, find } from "lodash";
 import { ColDef, ProcessCellForExportParams } from "ag-grid-community";
 import { includesAnyIn, getKeyValue } from "lib/util";
 
-export type ProcessorLookup<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> = {
+export type ProcessorLookup<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = Model> = {
   field: keyof R;
   type?: CellProcessorType | CellProcessorType[];
 };
 
 export type CellProcessorType = "clipboard" | "http";
 
-export type CellProcessor<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel> = {
+export type CellProcessor<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = Model> = {
   func: (value: any, row: R, col: ColDef) => any;
   type: CellProcessorType | CellProcessorType[];
   field: keyof R | (keyof R)[];
 };
 
-export type CellProcessors<
-  R extends Table.Row<G, C>,
-  G extends IGroup<any>,
-  C extends Model = UnknownModel
-> = CellProcessor<R, G, C>[];
+export type CellProcessors<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = Model> = CellProcessor<
+  R,
+  G,
+  C
+>[];
 
-export const findProcessors = <R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel>(
+export const findProcessors = <R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = Model>(
   processors: CellProcessors<R, G, C>,
   lookup: ProcessorLookup<R, G, C>
 ): CellProcessors<R, G, C> => {
@@ -49,7 +49,7 @@ export const findProcessors = <R extends Table.Row<G, C>, G extends IGroup<any>,
   });
 };
 
-export const processCell = <R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = UnknownModel>(
+export const processCell = <R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = Model>(
   processors: CellProcessors<R, G, C>,
   lookup: ProcessorLookup<R, G, C>,
   value: any,
