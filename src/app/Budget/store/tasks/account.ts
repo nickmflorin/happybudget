@@ -3,7 +3,7 @@ import { CallEffect, call, put, select, all } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
 import { handleRequestError } from "api";
 import { SubAccountRowManager } from "lib/tabling/managers";
-import { mergeRowChanges } from "lib/model/util";
+import { mergeRowChanges } from "lib/tabling/util";
 import {
   getAccountSubAccounts,
   createAccountSubAccount,

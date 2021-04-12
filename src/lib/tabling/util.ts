@@ -1,4 +1,4 @@
-import { map } from "lodash";
+import { map, uniq, forEach } from "lodash";
 import classNames from "classnames";
 import { CellClassParams } from "ag-grid-community";
 
@@ -17,4 +17,19 @@ export const mergeClassNames = (params: CellClassParams, ...args: ClassNameConst
 
 export const mergeClassNamesFn = (...args: ClassNameConstruct[]) => (params: CellClassParams) => {
   return mergeClassNames(params, ...args);
+};
+
+export const mergeRowChanges = (changes: Table.RowChange<any>[]): Table.RowChange<any> => {
+  if (changes.length !== 0) {
+    if (uniq(map(changes, (change: Table.RowChange<any>) => change.id)).length !== 1) {
+      throw new Error("Cannot merge row changes for different rows!");
+    }
+    const merged: Table.RowChange<any> = { id: changes[0].id, data: {} };
+    forEach(changes, (change: Table.RowChange<any>) => {
+      merged.data = { ...merged.data, ...change.data };
+    });
+    return merged;
+  } else {
+    throw new Error("Must provide at least 1 row change.");
+  }
 };
