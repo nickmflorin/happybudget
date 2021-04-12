@@ -78,9 +78,6 @@ const Fringes = (): JSX.Element => {
         onSelectAll={() => dispatch(selectAllFringesAction(null))}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         processCellForClipboard={processOptionModelCellForClipboard<Table.FringeRow, FringeUnit>("unit", FringeUnits)}
-        processors={[
-          { field: "rate", type: "http", func: (value: number | null) => (value !== null ? value / 100 : null) }
-        ]}
         bodyColumns={[
           {
             field: "description",

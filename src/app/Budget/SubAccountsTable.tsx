@@ -5,7 +5,6 @@ import classNames from "classnames";
 import { ColDef, ColSpanParams, ProcessCellForExportParams, ValueSetterParams } from "ag-grid-community";
 
 import { SubAccountUnits } from "lib/model";
-import { findChoiceModelForName } from "lib/model/util";
 import { SubAccountRowManager } from "lib/tabling/managers";
 import { currencyValueFormatter } from "lib/tabling/formatters";
 import { floatValueSetter, integerValueSetter, choiceModelValueSetter } from "lib/tabling/valueSetters";
@@ -125,22 +124,6 @@ const SubAccountsTable = ({
         variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
         actual: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
       }}
-      processors={[
-        {
-          field: "unit",
-          type: "http",
-          func: (value: SubAccountUnitName | null) => {
-            if (!isNil(value)) {
-              const model = findChoiceModelForName(SubAccountUnits, value);
-              if (!isNil(model)) {
-                return model.id;
-              }
-              return null;
-            }
-            return value;
-          }
-        }
-      ]}
       processCellForClipboard={(params: ProcessCellForExportParams) => {
         if (!isNil(params.node)) {
           const row: Table.SubAccountRow = params.node.data;

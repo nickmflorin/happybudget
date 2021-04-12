@@ -37,7 +37,6 @@ import { hashString, updateFieldOrdering, orderByFieldOrdering } from "lib/util"
 import { downloadAsCsvFile } from "lib/util/files";
 import { mergeClassNames, mergeClassNamesFn } from "lib/tabling/util";
 import { currencyValueFormatter } from "lib/tabling/formatters";
-import { processCell } from "lib/tabling/processor";
 
 import {
   ExpandCell,
@@ -96,7 +95,6 @@ const BudgetTable = <
   tableTotals,
   budgetTotals,
   sizeColumnsToFit = true,
-  processors,
   renderFlag = true,
   cellClass,
   onSearch,
@@ -646,29 +644,9 @@ const BudgetTable = <
     // not `undefined`.
     if (event.newValue !== undefined) {
       if (event.oldValue === undefined || event.oldValue !== event.newValue) {
-        // NOTE: The old value will have already been processed in the HTTP type case.
-        // WHat? ^^ What was I thinking here.
-        let newValue = event.newValue;
-        let oldValue = event.oldValue;
-        // if (!isNil(processors)) {
-        //   newValue = processCell(
-        //     processors,
-        //     { type: "http", field: field as keyof R },
-        //     event.newValue,
-        //     row,
-        //     event.colDef
-        //   );
-        //   oldValue = processCell(
-        //     processors,
-        //     { type: "http", field: field as keyof R },
-        //     event.oldValue,
-        //     row,
-        //     event.colDef
-        //   );
-        // }
-        const change: Table.CellChange<R[keyof R]> = { oldValue, newValue };
+        const change: Table.CellChange<R[keyof R]> = { oldValue: event.oldValue, newValue: event.newValue };
         const d: { [key in keyof R]?: Table.CellChange<R[key]> } = {};
-        d[field as keyof R] = { oldValue, newValue };
+        d[field as keyof R] = change;
         return { id: event.data.id, data: d };
       }
     }

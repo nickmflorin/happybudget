@@ -1,6 +1,5 @@
 import { ColDef, CellClassParams, RowNode, GridOptions } from "ag-grid-community";
 import RowManager from "lib/tabling/managers";
-import { CellProcessors } from "lib/tabling/processor";
 
 export interface GetExportValueParams {
   node: RowNode;
@@ -56,7 +55,6 @@ export interface BudgetTableProps<
   cookies?: CookiesProps;
   loading?: boolean;
   sizeColumnsToFit?: boolean;
-  processors?: CellProcessors<R, G, C>;
   renderFlag?: boolean;
   cellClass?: (params: CellClassParams) => string | undefined;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
