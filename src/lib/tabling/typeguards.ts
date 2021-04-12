@@ -29,3 +29,9 @@ export const isRowChange = <R extends Table.Row, M extends Model>(
 export const isRow = <R extends Table.Row, M extends Model>(obj: R | M): obj is R => {
   return (obj as R).meta !== undefined;
 };
+
+export const isModel = <R extends Table.Row, M extends Model>(
+  obj: Table.RowChange<R> | Table.RowChangeData<R> | R | M
+): obj is M => {
+  return !isRowChangeData<R, M>(obj) && !isRowChange<R, M>(obj) && !isRow<R, M>(obj);
+};

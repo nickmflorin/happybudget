@@ -2,7 +2,7 @@ import { forEach, isNil, includes } from "lodash";
 import { generateRandomNumericId, getKeyValue } from "lib/util";
 import { SubAccountUnits } from "lib/model";
 import { findChoiceModelForName } from "lib/model/util";
-import { isRowChange, isRow, isRowChangeData } from "./typeguards";
+import { isRowChange, isRow, isRowChangeData, isModel } from "./typeguards";
 
 type BaseFieldConfig<R extends Table.Row, M extends Model> = {
   // Whether or not the field is required to be present for POST requests (i.e.
@@ -29,11 +29,13 @@ type BaseFieldConfig<R extends Table.Row, M extends Model> = {
   // received instance via an HTTP GET request to the corresponding model (M).
   readonly readOnly?: boolean;
   // Used to translate a field-value pair on the model (M) model to a field-value
-  // pair on the row (R) model.
-  readonly setter?: (model: M) => R[keyof R];
+  // pair on the row (R) model.  Note - typing this as (value: M[keyof M]) seems to
+  // cause problems - we should figure that out.
+  readonly modelValueConverter?: (value: any) => R[keyof R];
   // Used to translate a field-value pair on the row (R) model to a field-value
-  // pair on the model (M) model.
-  readonly getter?: (row: R) => M[keyof M];
+  // pair on the model (M) model.  Note - typing this as (value: R[keyof R]) seems to
+  // cause problems - we should figure that out.
+  readonly rowValueConverter?: (value: any) => M[keyof M];
   // Used to transform a value that is on the row (R) model to a value that is
   // included in the HTTP PATCH or POST payloads.
   readonly httpGetter?: (value: R[keyof R]) => M[keyof M] | undefined;
@@ -74,8 +76,8 @@ abstract class BaseManagedField<R extends Table.Row, M extends Model> {
   readonly http: Http.Method[];
   readonly placeholderValue?: any;
   readonly inRow?: boolean;
-  readonly setter?: (model: M) => R[keyof R];
-  readonly getter?: (row: R) => M[keyof M];
+  readonly modelValueConverter?: (value: M[keyof M]) => R[keyof R];
+  readonly rowValueConverter?: (value: R[keyof R]) => M[keyof M];
   readonly httpGetter?: (value: R[keyof R]) => M[keyof M] | undefined;
 
   constructor(config: ManagedFieldConfig<R, M>) {
@@ -86,8 +88,8 @@ abstract class BaseManagedField<R extends Table.Row, M extends Model> {
     this.http = config.http || ["POST", "PATCH"];
     this.placeholderValue = config.placeholderValue;
     this.inRow = config.inRow;
-    this.setter = config.setter;
-    this.getter = config.getter;
+    this.rowValueConverter = config.rowValueConverter;
+    this.modelValueConverter = config.modelValueConverter;
     this.httpGetter = config.httpGetter;
   }
 
@@ -99,7 +101,7 @@ abstract class BaseManagedField<R extends Table.Row, M extends Model> {
     obj: R | M | Table.RowChange<R> | Table.RowChangeData<R>
   ): R[keyof R] | M[keyof M] | undefined;
 
-  getHttpValue = (row: R | Table.RowChange<R>, method?: Http.Method): any => {
+  public getHttpValue = (row: R | Table.RowChange<R>, method?: Http.Method): any => {
     if (!isNil(method) && !includes(this.http, method)) {
       return undefined;
     }
@@ -113,19 +115,43 @@ abstract class BaseManagedField<R extends Table.Row, M extends Model> {
     return value;
   };
 
-  getValueFromModel = (model: M) => {
-    if (!isNil(this.setter)) {
-      return this.setter(model);
-    }
-    return this.getRawValue(model);
-  };
+  /* eslint-disable no-dupe-class-members */
+  public getModelValue(obj: R): M[keyof M] | R[keyof R & keyof M] | undefined;
+  public getModelValue(obj: M): M[keyof M] | R[keyof R & keyof M] | undefined;
+  public getModelValue(obj: Table.RowChange<R>): M[keyof M] | R[keyof R & keyof M] | undefined;
+  public getModelValue(obj: Table.RowChangeData<R>): M[keyof M] | R[keyof R & keyof M] | undefined;
 
-  getValueFromRow = (row: R) => {
-    if (!isNil(this.getter)) {
-      return this.getter(row);
+  public getModelValue(
+    obj: R | M | Table.RowChange<R> | Table.RowChangeData<R>
+  ): M[keyof M] | R[keyof M & keyof R] | undefined {
+    const value = this.getRawValue(obj);
+    if (isModel(obj)) {
+      return value as M[keyof M] | undefined;
     }
-    return this.getRawValue(row);
-  };
+    if (!isNil(this.rowValueConverter) && value !== undefined) {
+      return this.rowValueConverter(value as R[keyof R]);
+    }
+    return value as M[keyof M];
+  }
+
+  /* eslint-disable no-dupe-class-members */
+  public getRowValue(obj: R): R[keyof R] | R[keyof R & keyof M] | undefined;
+  public getRowValue(obj: M): R[keyof R] | R[keyof R & keyof M] | undefined;
+  public getRowValue(obj: Table.RowChange<R>): R[keyof R] | R[keyof R & keyof M] | undefined;
+  public getRowValue(obj: Table.RowChangeData<R>): R[keyof R] | R[keyof R & keyof M] | undefined;
+
+  public getRowValue(
+    obj: R | M | Table.RowChange<R> | Table.RowChangeData<R>
+  ): R[keyof R] | R[keyof M & keyof R] | undefined {
+    const value = this.getRawValue(obj);
+    if (!isModel(obj)) {
+      return value as R[keyof R] | undefined;
+    }
+    if (!isNil(this.modelValueConverter) && value !== undefined) {
+      return this.modelValueConverter(value as M[keyof M]);
+    }
+    return value as R[keyof R];
+  }
 }
 
 export class AgnosticManagedField<R extends Table.Row, M extends Model>
@@ -145,7 +171,9 @@ export class AgnosticManagedField<R extends Table.Row, M extends Model>
   public getRawValue(obj: Table.RowChangeData<R>): R[keyof R] | undefined;
 
   // TODO: Intelligently cast return type to either R[keyof R] | undefined OR M[keyof M] | undefined.
-  public getRawValue(obj: R | M | Table.RowChange<R> | Table.RowChangeData<R>): R[keyof R] | M[keyof M] | undefined {
+  public getRawValue(
+    obj: R | M | Table.RowChange<R> | Table.RowChangeData<R>
+  ): R[keyof R] | M[keyof M] | R[keyof M & keyof R] | undefined {
     if (isRowChange<R, M>(obj)) {
       const data: { [key in keyof R]?: Table.CellChange<R[key]> } = obj.data;
       return this.getRawValue(data);
@@ -346,10 +374,13 @@ class RowManager<
     };
     forEach(this.fields, (field: ManagedField<R, M>) => {
       if (field.inRow !== false) {
-        if (isSplitField(field)) {
-          obj[field.rowField] = field.getValueFromModel(model) as R[keyof R];
-        } else {
-          obj[field.field] = field.getValueFromModel(model) as R[keyof M & keyof R];
+        const v = field.getRowValue(model);
+        if (v !== undefined) {
+          if (isSplitField(field)) {
+            obj[field.rowField] = v;
+          } else {
+            obj[field.field] = v as R[keyof R & keyof M];
+          }
         }
       }
     });
@@ -364,7 +395,7 @@ class RowManager<
       // We have to force coerce R[keyof R] to M[keyof M] because there is no way for TS to
       // understand that the model (M) field name is related to the row (R) field name via the
       // field configurations.
-      const v = field.getRawValue(change) as R[keyof R] | R[keyof M & keyof R] | undefined;
+      const v = field.getRowValue(change) as R[keyof R] | R[keyof M & keyof R] | undefined;
       if (v !== undefined) {
         if (isSplitField(field)) {
           row[field.rowField] = v;
@@ -382,7 +413,7 @@ class RowManager<
       // We have to force coerce R[keyof R] to M[keyof M] because there is no way for TS to
       // understand that the model (M) field name is related to the row (R) field name via the
       // field configurations.
-      const v = field.getRawValue(change) as M[keyof M] | M[keyof M & keyof R] | undefined;
+      const v = field.getModelValue(change) as M[keyof M] | M[keyof M & keyof R] | undefined;
       if (v !== undefined) {
         if (isSplitField(field)) {
           model[field.modelField] = v;
@@ -431,7 +462,7 @@ class RowManager<
     let requiredFieldsPresent = true;
     forEach(this.fields, (field: ManagedField<R, M>) => {
       if (field.required === true) {
-        const value = field.getValueFromRow(row);
+        const value = field.getModelValue(row);
         if (isNil(value) || (value as any) === "") {
           requiredFieldsPresent = false;
           return false;
@@ -483,7 +514,20 @@ export const SubAccountRowManager = new RowManager<
     ManageField({
       field: "unit",
       allowNull: true,
-      setter: (model: ISubAccount): SubAccountUnitName | null => (!isNil(model.unit) ? model.unit.name : null),
+      modelValueConverter: (value: SubAccountUnit | null): SubAccountUnitName | null =>
+        !isNil(value) ? value.name : null,
+      rowValueConverter: (value: SubAccountUnitName | null): SubAccountUnit | null => {
+        if (value !== null) {
+          const model = findChoiceModelForName(SubAccountUnits, value);
+          if (model === null) {
+            /* eslint-disable no-console */
+            console.error(`Found corrupted sub-account unit name ${value} in table data.`);
+            return null;
+          }
+          return model;
+        }
+        return null;
+      },
       httpGetter: (value: any): number | null | undefined => {
         if (value !== null) {
           const model = findChoiceModelForName(SubAccountUnits, value);
