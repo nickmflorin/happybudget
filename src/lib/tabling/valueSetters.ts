@@ -59,7 +59,7 @@ export const choiceModelValueSetter = <R extends Table.Row<any, any>, M extends 
 ) => (params: ValueSetterParams): boolean => {
   /* eslint-disable indent */
   if (typeof params.newValue === "string") {
-    const optionModel = findChoiceModelForName(models, params.newValue);
+    const optionModel = findChoiceModelForName(models, params.newValue, false);
     if (!isNil(optionModel)) {
       params.data[field] = optionModel.name;
       return true;

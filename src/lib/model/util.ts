@@ -38,8 +38,14 @@ export const fringeValue = (value: number, fringes: IFringe[]): number => {
   return value + reduce(additionalValues, (sum: number, val: number) => sum + val, 0);
 };
 
-export const findChoiceModelForName = <M extends ChoiceModel<number, string>>(models: M[], name: string): M | null => {
-  return find(models, { name } as any) || null;
+export const findChoiceModelForName = <M extends ChoiceModel<number, string>>(
+  models: M[],
+  name: string,
+  caseSensitive = true
+): M | null => {
+  return caseSensitive
+    ? find(models, { name } as any) || null
+    : find(models, (model: M) => model.name.toLowerCase() === name.toLowerCase()) || null;
 };
 
 export const findChoiceModelForId = <M extends ChoiceModel<number, string>>(models: M[], id: number): M | null => {
