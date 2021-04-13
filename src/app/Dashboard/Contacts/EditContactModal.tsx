@@ -62,7 +62,7 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
           first_name: contact.first_name,
           last_name: contact.last_name,
           email: contact.email,
-          role: contact.role,
+          role: contact.role.id,
           country: contact.country,
           city: contact.city,
           phone_number: contact.phone_number
