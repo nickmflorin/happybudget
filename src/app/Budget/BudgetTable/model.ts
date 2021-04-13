@@ -26,7 +26,7 @@ export interface BudgetTableProps<
   G extends IGroup<any>,
   P extends Http.ModelPayload<M> = {},
   C extends Model = Model
-> extends GridOptions {
+> extends Omit<GridOptions, "processCellForClipboard"> {
   bodyColumns: ColDef[];
   calculatedColumns?: ColDef[];
   manager: RowManager<R, M, G, P, C>;
@@ -56,6 +56,7 @@ export interface BudgetTableProps<
   loading?: boolean;
   sizeColumnsToFit?: boolean;
   renderFlag?: boolean;
+  processCellForClipboard?: { [key in keyof R]?: (row: R) => any };
   cellClass?: (params: CellClassParams) => string | undefined;
   rowRefreshRequired?: (existing: R, row: R) => boolean;
   onSearch: (value: string) => void;

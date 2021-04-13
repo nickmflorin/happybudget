@@ -80,7 +80,7 @@ namespace Table {
     readonly description: string | null;
     readonly cutoff: number | null;
     readonly rate: number | null;
-    readonly unit: FringeUnit;
+    readonly unit: FringeUnitName;
   }
 
   interface ActualRow extends Row<IGroup<any>> {
@@ -90,7 +90,7 @@ namespace Table {
     readonly vendor: string | null;
     readonly purchase_order: string | null;
     readonly date: string | null;
-    readonly payment_method: PaymentMethod | null;
+    readonly payment_method: PaymentMethodName | null;
     readonly payment_id: string | null;
     readonly value: string | null;
   }

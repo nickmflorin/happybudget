@@ -10,7 +10,6 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { PaymentMethods } from "lib/model";
 import { currencyValueFormatter, dateValueFormatter } from "lib/tabling/formatters";
 import { ActualRowManager } from "lib/tabling/managers";
-import { processOptionModelCellForClipboard } from "lib/tabling/processor";
 import { choiceModelValueSetter, floatValueSetter, dateTimeValueSetter } from "lib/tabling/valueSetters";
 
 import { setInstanceAction } from "./store/actions";
@@ -115,10 +114,6 @@ const Actuals = (): JSX.Element => {
         }}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         exportFileName={"actuals.csv"}
-        processCellForClipboard={processOptionModelCellForClipboard<Table.ActualRow, PaymentMethod>(
-          "payment_method",
-          PaymentMethods
-        )}
         getExportValue={{
           object_id: ({ node }: GetExportValueParams) => {
             const item = find(budgetItems, { id: node.data.object_id, type: node.data.parent_type });

@@ -2,13 +2,12 @@ import { useSelector } from "react-redux";
 import { isNil, includes, find, filter, map } from "lodash";
 import classNames from "classnames";
 
-import { ColDef, ColSpanParams, ProcessCellForExportParams, ValueSetterParams } from "ag-grid-community";
+import { ColDef, ColSpanParams, ValueSetterParams } from "ag-grid-community";
 
 import { SubAccountUnits } from "lib/model";
 import { SubAccountRowManager } from "lib/tabling/managers";
 import { currencyValueFormatter } from "lib/tabling/formatters";
 import { floatValueSetter, integerValueSetter, choiceModelValueSetter } from "lib/tabling/valueSetters";
-import { getKeyValue } from "lib/util";
 
 import BudgetTable, { CookiesProps } from "./BudgetTable";
 import { selectFringes, selectBudgetDetail, selectBudgetDetailLoading } from "./store/selectors";
@@ -124,52 +123,25 @@ const SubAccountsTable = ({
         variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
         actual: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
       }}
-      processCellForClipboard={(params: ProcessCellForExportParams) => {
-        if (!isNil(params.node)) {
-          const row: Table.SubAccountRow = params.node.data;
-          const colDef = params.column.getColDef();
-          if (!isNil(colDef.field)) {
-            if (colDef.field === "unit" && !isNil(row.unit)) {
-              const choiceModel: SubAccountUnit | undefined = find(SubAccountUnits, {
-                id: row.unit
-              } as any);
-              if (!isNil(choiceModel)) {
-                return choiceModel.name;
+      processCellForClipboard={{
+        fringes: (row: Table.SubAccountRow) => {
+          const subAccountFringes: IFringe[] = filter(
+            map(row.fringes, (id: number) => {
+              const fringe: IFringe | undefined = find(fringes, { id });
+              if (!isNil(fringe)) {
+                return fringe;
               } else {
                 /* eslint-disable no-console */
                 console.error(
-                  `Corrupted Cell Found! Could not convert model value ${row.unit} for field ${colDef.field}
+                  `Corrupted Cell Found! Could not convert model value ${id} for field fringes
                   to a name.`
                 );
-                return "";
+                return null;
               }
-            } else if (colDef.field === "fringes") {
-              // TODO: We might need to wrap this method in a useDynamicCallback hook, because
-              // this method is fed directly into AG Grid and we are accessing a part of the state
-              // inside the method.
-              const subAccountFringes: IFringe[] = filter(
-                map(row.fringes, (id: number) => {
-                  const fringe: IFringe | undefined = find(fringes, { id });
-                  if (!isNil(fringe)) {
-                    return fringe;
-                  } else {
-                    /* eslint-disable no-console */
-                    console.error(
-                      `Corrupted Cell Found! Could not convert model value ${id} for field fringes
-                      to a name.`
-                    );
-                    return null;
-                  }
-                }),
-                (fringe: IFringe | null) => fringe !== null
-              ) as IFringe[];
-              return map(subAccountFringes, (fringe: IFringe) => fringe.name).join(", ");
-            } else {
-              return getKeyValue<Table.SubAccountRow, keyof Table.SubAccountRow>(
-                colDef.field as keyof Table.SubAccountRow
-              )(row);
-            }
-          }
+            }),
+            (fringe: IFringe | null) => fringe !== null
+          ) as IFringe[];
+          return map(subAccountFringes, (fringe: IFringe) => fringe.name).join(", ");
         }
       }}
       bodyColumns={[

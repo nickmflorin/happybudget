@@ -27,7 +27,8 @@ import {
   PasteEndEvent,
   PasteStartEvent,
   FirstDataRenderedEvent,
-  SuppressKeyboardEventParams
+  SuppressKeyboardEventParams,
+  ProcessCellForExportParams
 } from "ag-grid-community";
 
 import { TABLE_DEBUG } from "config";
@@ -94,6 +95,7 @@ const BudgetTable = <
   budgetFooterIdentifierValue = "Budget Total",
   tableTotals,
   budgetTotals,
+  processCellForClipboard = {},
   sizeColumnsToFit = true,
   renderFlag = true,
   cellClass,
@@ -1095,6 +1097,24 @@ const BudgetTable = <
               immutableData={true}
               suppressRowClickSelection={true}
               onGridReady={onGridReady}
+              processCellForClipboard={(params: ProcessCellForExportParams) => {
+                if (!isNil(params.node)) {
+                  const row: R = params.node.data;
+                  const colDef = params.column.getColDef();
+                  if (!isNil(colDef.field)) {
+                    const processor = processCellForClipboard[colDef.field as keyof R];
+                    if (!isNil(processor)) {
+                      return processor(row);
+                    } else {
+                      const field = manager.getField(colDef.field as keyof R);
+                      if (field !== null) {
+                        return field.getClipboardValue(row);
+                      }
+                    }
+                  }
+                }
+                return "";
+              }}
               rowHeight={36}
               headerHeight={38}
               enableRangeSelection={true}

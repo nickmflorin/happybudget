@@ -9,7 +9,6 @@ import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { FringeUnits } from "lib/model";
 import { FringeRowManager } from "lib/tabling/managers";
-import { processOptionModelCellForClipboard } from "lib/tabling/processor";
 import { percentageToDecimalValueSetter, choiceModelValueSetter } from "lib/tabling/valueSetters";
 import { percentageValueFormatter } from "lib/tabling/formatters";
 
@@ -77,7 +76,6 @@ const Fringes = (): JSX.Element => {
         }
         onSelectAll={() => dispatch(selectAllFringesAction(null))}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
-        processCellForClipboard={processOptionModelCellForClipboard<Table.FringeRow, FringeUnit>("unit", FringeUnits)}
         bodyColumns={[
           {
             field: "description",
