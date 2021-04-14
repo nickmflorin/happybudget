@@ -11,7 +11,7 @@ import "./AccountCircleLink.scss";
 interface AccountCircleLinkProps {
   className?: string;
   style?: any;
-  user: IUser | ISimpleUser;
+  user: Model.User | Model.SimpleUser;
 }
 
 const AccountCircleLink = ({ className, user, style }: AccountCircleLinkProps): JSX.Element => {

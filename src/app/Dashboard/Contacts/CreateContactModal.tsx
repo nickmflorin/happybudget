@@ -35,7 +35,7 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
           .then((values: any) => {
             setLoading(true);
             createContact(values)
-              .then((contact: IContact) => {
+              .then((contact: Model.Contact) => {
                 form.resetFields();
                 dispatch(addContactToStateAction(contact));
                 onSuccess();

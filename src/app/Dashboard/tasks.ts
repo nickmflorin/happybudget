@@ -31,8 +31,8 @@ import {
   addContactToStateAction
 } from "./actions";
 
-export function* getBudgetsTask(action: Redux.Dashboard.IAction<any>): SagaIterator {
-  const query = yield select((state: Redux.IApplicationStore) => {
+export function* getBudgetsTask(action: Redux.Dashboard.Action<any>): SagaIterator {
+  const query = yield select((state: Redux.ApplicationStore) => {
     if (action.domain === ActionDomains.ACTIVE) {
       return {
         search: state.dashboard.budgets.active.search,
@@ -48,7 +48,7 @@ export function* getBudgetsTask(action: Redux.Dashboard.IAction<any>): SagaItera
   });
   yield put(loadingBudgetsAction(action.domain, true));
   try {
-    let response: Http.IListResponse<IBudget>;
+    let response: Http.ListResponse<Model.Budget>;
     if (action.domain === ActionDomains.ACTIVE) {
       response = yield call(getBudgets, query);
     } else {
@@ -63,7 +63,7 @@ export function* getBudgetsTask(action: Redux.Dashboard.IAction<any>): SagaItera
   }
 }
 
-export function* deleteBudgetTask(action: Redux.Dashboard.IAction<number>): SagaIterator {
+export function* deleteBudgetTask(action: Redux.Dashboard.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(deletingBudgetAction({ id: action.payload, value: true }));
     try {
@@ -78,7 +78,7 @@ export function* deleteBudgetTask(action: Redux.Dashboard.IAction<number>): Saga
   }
 }
 
-export function* restoreBudgetTask(action: Redux.Dashboard.IAction<number>): SagaIterator {
+export function* restoreBudgetTask(action: Redux.Dashboard.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(restoringBudgetAction({ id: action.payload, value: true }));
     try {
@@ -93,7 +93,7 @@ export function* restoreBudgetTask(action: Redux.Dashboard.IAction<number>): Sag
   }
 }
 
-export function* permanentlyDeleteBudgetTask(action: Redux.Dashboard.IAction<number>): SagaIterator {
+export function* permanentlyDeleteBudgetTask(action: Redux.Dashboard.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(permanentlyDeletingBudgetAction({ id: action.payload, value: true }));
     try {
@@ -107,8 +107,8 @@ export function* permanentlyDeleteBudgetTask(action: Redux.Dashboard.IAction<num
   }
 }
 
-export function* getContactsTask(action: Redux.IAction<any>): SagaIterator {
-  const query: Http.IListQuery = yield select((state: Redux.IApplicationStore) => {
+export function* getContactsTask(action: Redux.Action<any>): SagaIterator {
+  const query: Http.ListQuery = yield select((state: Redux.ApplicationStore) => {
     return {
       page: state.dashboard.contacts.page,
       page_size: state.dashboard.contacts.pageSize,
@@ -117,7 +117,7 @@ export function* getContactsTask(action: Redux.IAction<any>): SagaIterator {
   });
   yield put(loadingContactsAction(true));
   try {
-    let response: Http.IListResponse<IContact> = yield call(getContacts, query);
+    let response: Http.ListResponse<Model.Contact> = yield call(getContacts, query);
     yield put(responseContactsAction(response));
   } catch (e) {
     handleRequestError(e, "There was an error retrieving the contacts.");
@@ -127,9 +127,9 @@ export function* getContactsTask(action: Redux.IAction<any>): SagaIterator {
   }
 }
 
-export function* deleteContactTask(action: Redux.IAction<number>): SagaIterator {
+export function* deleteContactTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    const deleting = yield select((state: Redux.IApplicationStore) => state.dashboard.contacts.deleting);
+    const deleting = yield select((state: Redux.ApplicationStore) => state.dashboard.contacts.deleting);
     if (!includes(deleting, action.payload)) {
       yield put(deletingContactAction({ id: action.payload, value: true }));
       try {
@@ -146,12 +146,12 @@ export function* deleteContactTask(action: Redux.IAction<number>): SagaIterator 
 
 // Not currently used, because the updateContact service is used directly in the
 // modal for editing a contact, but we might use in the future.
-export function* updateContactTask(action: Redux.IAction<Redux.UpdateModelActionPayload<IContact>>): SagaIterator {
+export function* updateContactTask(action: Redux.Action<Redux.UpdateModelActionPayload<Model.Contact>>): SagaIterator {
   if (!isNil(action.payload)) {
     const { id, data } = action.payload;
     yield put(updatingContactAction({ id, value: true }));
     try {
-      const response: IContact = yield call(updateContact, id, data);
+      const response: Model.Contact = yield call(updateContact, id, data as Partial<Http.ContactPayload>);
       yield put(updateContactInStateAction({ id, data: response }));
     } catch (e) {
       handleRequestError(e, "There was an error updating the contact.");
@@ -163,11 +163,11 @@ export function* updateContactTask(action: Redux.IAction<Redux.UpdateModelAction
 
 // Not currently used, because the createContact service is used directly in the
 // modal for creating a contact, but we might use in the future.
-export function* createContactTask(action: Redux.IAction<Http.IContactPayload>): SagaIterator {
+export function* createContactTask(action: Redux.Action<Http.ContactPayload>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(creatingContactAction(true));
     try {
-      const response: IContact = yield call(createContact, action.payload);
+      const response: Model.Contact = yield call(createContact, action.payload);
       yield put(addContactToStateAction(response));
     } catch (e) {
       handleRequestError(e, "There was an error creating the contact.");

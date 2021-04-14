@@ -16,11 +16,11 @@ import { createSimpleBooleanReducer } from "../lib/redux/factories";
  * @param config  The module level Redux configuration.
  */
 const createWrappedModuleReducer = (
-  config: Redux.IModuleConfig<any, any>
-): Reducer<Redux.IModuleStore, Redux.IAction<any>> => {
-  const wrapped: Reducer<Redux.IModuleStore, Redux.IAction<any>> = (
-    state: Redux.IModuleStore = config.initialState,
-    action: Redux.IAction<any>
+  config: Redux.ModuleConfig<any, any>
+): Reducer<Redux.ModuleStore, Redux.Action<any>> => {
+  const wrapped: Reducer<Redux.ModuleStore, Redux.Action<any>> = (
+    state: Redux.ModuleStore = config.initialState,
+    action: Redux.Action<any>
   ): any => {
     if (!isNil(action.label)) {
       if (Array.isArray(action.label)) {
@@ -48,12 +48,12 @@ const createWrappedModuleReducer = (
  *
  * @param user   The User object returned from the JWT token validation.
  */
-const createUserReducer = (user: IUser): Reducer<Redux.IUserStore, Redux.IAction<any>> => {
+const createUserReducer = (user: Model.User): Reducer<Redux.UserStore, Redux.Action<any>> => {
   const initialUserState = createInitialUserState(user);
-  const userReducer: Reducer<Redux.IUserStore, Redux.IAction<any>> = (
-    state: Redux.IUserStore = initialUserState,
-    action: Redux.IAction<any>
-  ): Redux.IUserStore => {
+  const userReducer: Reducer<Redux.UserStore, Redux.Action<any>> = (
+    state: Redux.UserStore = initialUserState,
+    action: Redux.Action<any>
+  ): Redux.UserStore => {
     let newState = { ...state };
     if (action.type === ApplicationActionTypes.User.UpdateInState) {
       newState = { ...newState, ...action.payload };
@@ -63,10 +63,10 @@ const createUserReducer = (user: IUser): Reducer<Redux.IUserStore, Redux.IAction
   return userReducer;
 };
 
-const loadingReducer: Reducer<Redux.ILoadingStore, Redux.IAction<any>> = (
-  state: Redux.ILoadingStore = initialLoadingState,
-  action: Redux.IAction<any>
-): Redux.ILoadingStore => {
+const loadingReducer: Reducer<Redux.LoadingStore, Redux.Action<any>> = (
+  state: Redux.LoadingStore = initialLoadingState,
+  action: Redux.Action<any>
+): Redux.LoadingStore => {
   let newState = { ...state };
   if (!isNil(action.payload)) {
     if (action.type === ApplicationActionTypes.SetApplicationLoading) {
@@ -109,9 +109,9 @@ const loadingReducer: Reducer<Redux.ILoadingStore, Redux.IAction<any>> = (
  * @param config  The application Redux configuration.
  * @param user   The User object returned from the JWT token validation.
  */
-const createApplicationReducer = (config: Redux.IApplicationConfig, user: IUser): any => {
-  let moduleReducers: { [key: string]: Reducer<Redux.IModuleStore, Redux.IAction> } = {};
-  forEach(config, (moduleConfig: Redux.IModuleConfig<any, any>) => {
+const createApplicationReducer = (config: Redux.ApplicationConfig, user: Model.User): any => {
+  let moduleReducers: { [key: string]: Reducer<Redux.ModuleStore, Redux.Action> } = {};
+  forEach(config, (moduleConfig: Redux.ModuleConfig<any, any>) => {
     moduleReducers[moduleConfig.label] = createWrappedModuleReducer(moduleConfig);
   });
   return combineReducers({

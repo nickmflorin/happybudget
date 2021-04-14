@@ -8,10 +8,10 @@ import { createBudget } from "api/services";
 import Modal from "./Modal";
 
 interface CreateBudgetModalProps {
-  onSuccess: (budget: IBudget) => void;
+  onSuccess: (budget: Model.Budget) => void;
   onCancel: () => void;
   open: boolean;
-  productionType: ProductionTypeId;
+  productionType: Model.ProductionTypeId;
 }
 
 const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: CreateBudgetModalProps): JSX.Element => {
@@ -32,7 +32,7 @@ const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: Create
           .then((values: any) => {
             setLoading(true);
             createBudget({ name: values.name, production_type: productionType })
-              .then((budget: IBudget) => {
+              .then((budget: Model.Budget) => {
                 form.resetFields();
                 onSuccess(budget);
               })

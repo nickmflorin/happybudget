@@ -2,11 +2,8 @@ import { DropDownProps } from "antd/lib/dropdown";
 
 import ModelTagsDropdown from "./ModelTagsDropdown";
 
-interface ChoiceModelTagsDropdownProps<
-  M extends ChoiceModel<I, N>,
-  I extends number = number,
-  N extends string = string
-> extends Omit<DropDownProps, "trigger" | "className" | "overlay"> {
+interface ChoiceTagsDropdownProps<M extends Model.Choice<I, N>, I extends number = number, N extends string = string>
+  extends Omit<DropDownProps, "trigger" | "className" | "overlay"> {
   value: I | null;
   className?: string;
   trigger?: ("click" | "hover" | "contextMenu")[];
@@ -14,7 +11,7 @@ interface ChoiceModelTagsDropdownProps<
   models: M[];
 }
 
-const ChoiceModelTagsDropdown = <M extends ChoiceModel<I, N>, I extends number = number, N extends string = string>({
+const ChoiceTagsDropdown = <M extends Model.Choice<I, N>, I extends number = number, N extends string = string>({
   /* eslint-disable indent */
   value,
   models,
@@ -22,7 +19,7 @@ const ChoiceModelTagsDropdown = <M extends ChoiceModel<I, N>, I extends number =
   onChange,
   trigger = ["click"],
   ...props
-}: ChoiceModelTagsDropdownProps<M, I, N>): JSX.Element => {
+}: ChoiceTagsDropdownProps<M, I, N>): JSX.Element => {
   return (
     <ModelTagsDropdown<M, number>
       value={value}
@@ -37,4 +34,4 @@ const ChoiceModelTagsDropdown = <M extends ChoiceModel<I, N>, I extends number =
   );
 };
 
-export default ChoiceModelTagsDropdown;
+export default ChoiceTagsDropdown;

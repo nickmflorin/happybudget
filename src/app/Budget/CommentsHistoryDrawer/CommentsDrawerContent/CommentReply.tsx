@@ -9,7 +9,7 @@ import "./CommentReply.scss";
 
 interface CommentReplyProps {
   visible: boolean;
-  comment: IComment;
+  comment: Model.Comment;
   onSubmit: (text: string) => void;
   onClose: () => void;
 }

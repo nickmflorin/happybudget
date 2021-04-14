@@ -9,7 +9,7 @@ import { ShowHide } from "components";
 import { IconButton } from "components/buttons";
 import { toTitleCase } from "lib/util/formatters";
 
-export interface ModelSelectControllerItemProps<M extends Model> {
+export interface ModelSelectControllerItemProps<M extends Model.Model> {
   filterSelected?: (data: M) => boolean;
   tooltip?: boolean | string | ((data: M[]) => string);
   icon: ReactNode;
@@ -20,12 +20,12 @@ export interface ModelSelectControllerItemProps<M extends Model> {
   actionName?: string;
 }
 
-interface _ModelSelectControllerItemProps<M extends Model> extends ModelSelectControllerItemProps<M> {
+interface _ModelSelectControllerItemProps<M extends Model.Model> extends ModelSelectControllerItemProps<M> {
   selectedModels: M[];
   entityName: string;
 }
 
-export const ModelSelectControllerItem = <M extends Model>({
+export const ModelSelectControllerItem = <M extends Model.Model>({
   filterSelected,
   tooltip = true,
   icon,
@@ -90,7 +90,7 @@ export const ModelSelectControllerItem = <M extends Model>({
   }
 };
 
-interface ModelSelectControllerProps<M extends Model> {
+interface ModelSelectControllerProps<M extends Model.Model> {
   className?: string;
   style?: React.CSSProperties;
   selected: number[];
@@ -101,7 +101,7 @@ interface ModelSelectControllerProps<M extends Model> {
   onCheckboxChange?: (checked: boolean) => void;
 }
 
-const ModelSelectController = <M extends Model>({
+const ModelSelectController = <M extends Model.Model>({
   items,
   selected,
   data,

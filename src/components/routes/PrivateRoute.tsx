@@ -16,7 +16,7 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
   useEffect(() => {
     setAuthenticating(true);
     validateToken()
-      .then((response: Http.ITokenValidationResponse) => {
+      .then((response: Http.TokenValidationResponse) => {
         dispatch(updateLoggedInUserAction(response.user));
       })
       .catch((e: Error) => {

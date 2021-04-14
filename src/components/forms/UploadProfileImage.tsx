@@ -36,7 +36,7 @@ const UploadProfileImage = ({ initialValue = undefined, onChange, onError }: Upl
         }
         return isJpgOrPng && isLt2M;
       }}
-      onChange={(info: UploadChangeParam<UploadFile<Http.IFileUploadResponse>>) => {
+      onChange={(info: UploadChangeParam<UploadFile<Http.FileUploadResponse>>) => {
         if (info.file.status === "uploading") {
           setLoading(true);
         } else if (info.file.status === "done") {
@@ -50,8 +50,8 @@ const UploadProfileImage = ({ initialValue = undefined, onChange, onError }: Upl
         const requestBody = new FormData();
         requestBody.append("image", options.file);
         client
-          .upload<Http.IFileUploadResponse>("/v1/users/temp_upload_user_image/", requestBody)
-          .then((response: AxiosResponse<Http.IFileUploadResponse>) => {
+          .upload<Http.FileUploadResponse>("/v1/users/temp_upload_user_image/", requestBody)
+          .then((response: AxiosResponse<Http.FileUploadResponse>) => {
             !isNil(options.onSuccess) && options.onSuccess(response.data, response.request);
           })
           .catch((e: Error) => {

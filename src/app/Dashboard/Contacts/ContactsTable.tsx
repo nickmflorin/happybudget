@@ -23,17 +23,17 @@ import EditContactModal from "./EditContactModal";
 interface Row {
   key: number;
   name: string;
-  role: ContactRoleName;
+  role: Model.ContactRoleName;
   phone_number: string;
   email: string;
-  contact: IContact;
+  contact: Model.Contact;
 }
 
 const ContactsTable = (): JSX.Element => {
-  const [contactToEdit, setContactToEdit] = useState<IContact | undefined>(undefined);
-  const [contactsToDelete, setContactsToDelete] = useState<IContact[] | undefined>(undefined);
+  const [contactToEdit, setContactToEdit] = useState<Model.Contact | undefined>(undefined);
+  const [contactsToDelete, setContactsToDelete] = useState<Model.Contact[] | undefined>(undefined);
   const [data, setData] = useState<any[]>([]);
-  const contacts = useSelector((state: Redux.IApplicationStore) => state.dashboard.contacts);
+  const contacts = useSelector((state: Redux.ApplicationStore) => state.dashboard.contacts);
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const ContactsTable = (): JSX.Element => {
 
   useEffect(() => {
     const tableData: Row[] = [];
-    forEach(contacts.data, (contact: IContact) => {
+    forEach(contacts.data, (contact: Model.Contact) => {
       tableData.push({
         key: contact.id,
         name: contact.full_name,
@@ -57,7 +57,7 @@ const ContactsTable = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <ModelSelectController<IContact>
+      <ModelSelectController<Model.Contact>
         selected={contacts.selected}
         data={contacts.data}
         entityName={"contact"}
@@ -65,7 +65,7 @@ const ContactsTable = (): JSX.Element => {
           {
             actionName: "Delete",
             icon: <FontAwesomeIcon icon={faTrashAlt} />,
-            onClick: (ctcts: IContact[]) => setContactsToDelete(ctcts)
+            onClick: (ctcts: Model.Contact[]) => setContactsToDelete(ctcts)
           }
         ]}
       />
@@ -132,7 +132,7 @@ const ContactsTable = (): JSX.Element => {
             title: "Location",
             key: "location",
             dataIndex: "contact",
-            render: (contact: IContact) => {
+            render: (contact: Model.Contact) => {
               return (
                 <div>
                   <span>{contact.city}</span>
@@ -155,7 +155,7 @@ const ContactsTable = (): JSX.Element => {
           {
             key: "action",
             dataIndex: "contact",
-            render: (contact: IContact) => (
+            render: (contact: Model.Contact) => (
               <ActionsTableCell
                 actions={[
                   {
@@ -179,10 +179,10 @@ const ContactsTable = (): JSX.Element => {
           visible={true}
           contacts={contactsToDelete}
           onCancel={() => setContactsToDelete(undefined)}
-          onOk={(cs: IContact[]) => {
+          onOk={(cs: Model.Contact[]) => {
             setContactsToDelete(undefined);
             if (cs.length !== 0) {
-              dispatch(deleteContactsAction(map(cs, (c: IContact) => c.id)));
+              dispatch(deleteContactsAction(map(cs, (c: Model.Contact) => c.id)));
             }
           }}
         />

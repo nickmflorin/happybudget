@@ -15,7 +15,7 @@ import { EntityText } from "components/typography";
 import "./BudgetItemTreeMenu.scss";
 
 interface BudgetTreeMenuItemProps extends MenuItemProps {
-  node: IBudgetItemNode;
+  node: Model.BudgetItemNode;
   onDelta?: () => void;
   indentIndex: number;
   childrenVisible?: boolean;
@@ -70,7 +70,7 @@ export const BudgetItemMenuItem: React.FC<BudgetTreeMenuItemProps> = ({
 };
 
 interface BudgetItemTreeMenuNodeProps extends MenuItemProps {
-  node: IBudgetItemNode;
+  node: Model.BudgetItemNode;
   indentIndex: number;
   childrenDefaultVisible?: boolean;
   selected?: number | undefined;
@@ -97,7 +97,7 @@ const BudgetItemMenuItemWithChildren: React.FC<BudgetItemTreeMenuNodeProps> = ({
         onToggleChildrenVisibility={() => setChildrenVisible(!childrenVisible)}
       />
       <ShowHide show={childrenVisible}>
-        {map(node.children, (child: IBudgetItemNode) => {
+        {map(node.children, (child: Model.BudgetItemNode) => {
           return (
             <MenuNode
               {...props}
@@ -130,7 +130,7 @@ const MenuNode: React.FC<BudgetItemTreeMenuNodeProps> = ({ node, selected, inden
 };
 
 interface TreeMenuProps extends Omit<MenuProps, "onChange"> {
-  nodes: IBudgetItemNode[];
+  nodes: Model.BudgetItemNode[];
   childrenDefaultVisible?: boolean;
   onChange?: (id: number) => void;
   value?: number;
@@ -155,7 +155,7 @@ const BudgetItemTreeMenu: React.FC<TreeMenuProps> = ({
         !isNil(onChange) && onChange(parseInt(info.key));
       }}
     >
-      {map(nodes, (node: IBudgetItemNode) => {
+      {map(nodes, (node: Model.BudgetItemNode) => {
         return (
           <MenuNode
             key={node.id}

@@ -3,7 +3,7 @@ import classNames from "classnames";
 import "./EntityText.scss";
 
 interface EntityTextProps extends StandardComponentProps {
-  children: IEntity | IAccount | ISubAccount | IBudgetItem | IBudgetItemNode;
+  children: Model.Entity | Model.Account | Model.SubAccount | Model.BudgetItem | Model.BudgetItemNode;
 }
 
 const EntityText: React.FC<EntityTextProps> = ({ children, className, style = {} }) => {

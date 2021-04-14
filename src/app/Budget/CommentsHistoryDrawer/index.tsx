@@ -19,7 +19,7 @@ interface CommentsHistoryDrawerProps {
 
 const CommentsHistoryDrawer = ({ commentsProps, historyProps }: CommentsHistoryDrawerProps): JSX.Element => {
   const [page, setPage] = useState<Page>("comments");
-  const visible = useSelector((state: Redux.IApplicationStore) => state.budget.commentsHistoryDrawerOpen);
+  const visible = useSelector((state: Redux.ApplicationStore) => state.budget.commentsHistoryDrawerOpen);
 
   return (
     <Drawer className={"comments-history-drawer"} visible={visible}>

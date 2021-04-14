@@ -9,7 +9,11 @@ export interface GetExportValueParams {
 
 export type ExportValueGetters = { [key: string]: (params: GetExportValueParams) => string };
 
-export interface GroupProps<R extends Table.Row<G, C>, G extends IGroup<any>, C extends Model = Model> {
+export interface GroupProps<
+  R extends Table.Row<G, C>,
+  G extends Model.Group<any>,
+  C extends Model.Model = Model.Model
+> {
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
   onEditGroup: (group: G) => void;
@@ -22,10 +26,10 @@ export interface CookiesProps {
 
 export interface BudgetTableProps<
   R extends Table.Row<G, C>,
-  M extends Model,
-  G extends IGroup<any>,
+  M extends Model.Model,
+  G extends Model.Group<any>,
   P extends Http.ModelPayload<M> = {},
-  C extends Model = Model
+  C extends Model.Model = Model.Model
 > extends Omit<GridOptions, "processCellForClipboard"> {
   bodyColumns: ColDef[];
   calculatedColumns?: ColDef[];

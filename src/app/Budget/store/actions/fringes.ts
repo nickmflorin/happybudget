@@ -20,7 +20,7 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
   ActionType.Budget.Fringes.AddErrors
 );
 
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<IFringe>>(
+export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.Fringe>>(
   ActionType.Budget.Fringes.Placeholders.Activate
 );
 export const removePlaceholderFromStateAction = simpleAction<number>(
@@ -30,7 +30,7 @@ export const updatePlaceholderInStateAction = simpleAction<Table.FringeRow>(
   ActionType.Budget.Fringes.Placeholders.UpdateInState
 );
 
-export const updateFringeInStateAction = simpleAction<IFringe>(ActionType.Budget.Fringes.UpdateInState);
+export const updateFringeInStateAction = simpleAction<Model.Fringe>(ActionType.Budget.Fringes.UpdateInState);
 export const removeFringeFromStateAction = simpleAction<number>(ActionType.Budget.Fringes.RemoveFromState);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
-export const addFringeToStateAction = simpleAction<IFringe>(ActionType.Budget.Fringes.AddToState);
+export const addFringeToStateAction = simpleAction<Model.Fringe>(ActionType.Budget.Fringes.AddToState);

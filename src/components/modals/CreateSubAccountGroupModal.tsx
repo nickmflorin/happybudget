@@ -9,7 +9,7 @@ import { GroupFormValues } from "components/forms/GroupForm";
 import Modal from "./Modal";
 
 interface CreateSubAccountGroupModalProps {
-  onSuccess: (group: IGroup<ISimpleSubAccount>) => void;
+  onSuccess: (group: Model.Group<Model.SimpleSubAccount>) => void;
   onCancel: () => void;
   accountId?: number;
   subaccountId?: number;
@@ -47,7 +47,7 @@ const CreateSubAccountGroupModal = ({
                 children: subaccounts,
                 color: values.color
               })
-                .then((group: IGroup<ISimpleSubAccount>) => {
+                .then((group: Model.Group<Model.SimpleSubAccount>) => {
                   form.resetFields();
                   onSuccess(group);
                 })
@@ -59,7 +59,7 @@ const CreateSubAccountGroupModal = ({
                 children: subaccounts,
                 color: values.color
               })
-                .then((group: IGroup<ISimpleSubAccount>) => {
+                .then((group: Model.Group<Model.SimpleSubAccount>) => {
                   form.resetFields();
                   onSuccess(group);
                 })

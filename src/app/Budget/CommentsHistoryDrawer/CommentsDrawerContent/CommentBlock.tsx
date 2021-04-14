@@ -10,14 +10,14 @@ import Comments from "./Comments";
 import "./CommentBlock.scss";
 
 interface CommentBlockProps {
-  comment: IComment;
+  comment: Model.Comment;
   nested?: boolean;
   loading: boolean;
-  commentLoading: (comment: IComment) => boolean;
-  onDelete: (comment: IComment) => void;
-  onLike: (comment: IComment) => void;
-  onDoneEditing: (comment: IComment, value: string) => void;
-  onDoneReplying: (comment: IComment, value: string) => void;
+  commentLoading: (comment: Model.Comment) => boolean;
+  onDelete: (comment: Model.Comment) => void;
+  onLike: (comment: Model.Comment) => void;
+  onDoneEditing: (comment: Model.Comment, value: string) => void;
+  onDoneReplying: (comment: Model.Comment, value: string) => void;
 }
 
 const CommentBlock = ({

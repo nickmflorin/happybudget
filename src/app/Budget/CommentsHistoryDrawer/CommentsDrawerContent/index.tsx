@@ -9,15 +9,15 @@ import "./index.scss";
 
 export interface CommentsDrawerContentProps {
   loading: boolean;
-  comments: IComment[];
+  comments: Model.Comment[];
   submitting: boolean;
-  commentLoading: (comment: IComment) => boolean;
-  onSubmit: (payload: Http.ICommentPayload) => void;
+  commentLoading: (comment: Model.Comment) => boolean;
+  onSubmit: (payload: Http.CommentPayload) => void;
   onRequest: () => void;
-  onDelete: (comment: IComment) => void;
-  onLike: (comment: IComment) => void;
-  onDoneEditing: (comment: IComment, value: string) => void;
-  onDoneReplying: (comment: IComment, value: string) => void;
+  onDelete: (comment: Model.Comment) => void;
+  onLike: (comment: Model.Comment) => void;
+  onDoneEditing: (comment: Model.Comment, value: string) => void;
+  onDoneReplying: (comment: Model.Comment, value: string) => void;
 }
 
 const CommentsDrawerContent = ({

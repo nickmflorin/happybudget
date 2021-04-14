@@ -20,7 +20,7 @@ export type ICounterActionMap = {
  *                            the reducer should listen for.
  * @param options             Additional options supplied to the reducer factory.
  */
-export const createCounterReducer = <A extends Redux.IAction<any> = Redux.IAction<any>>(
+export const createCounterReducer = <A extends Redux.Action<any> = Redux.Action<any>>(
   mappings: Partial<ICounterActionMap>,
   options: Partial<FactoryOptions<number>>
 ) => {
@@ -28,11 +28,11 @@ export const createCounterReducer = <A extends Redux.IAction<any> = Redux.IActio
 
   const transformers: MappedReducers<ICounterActionMap, number, A> = {
     Clear: () => 0,
-    Increment: (st: number = 0, action: Redux.IAction<number | null>) =>
+    Increment: (st: number = 0, action: Redux.Action<number | null>) =>
       !isNil(action.payload) ? st + action.payload : st + 1,
-    Decrement: (st: number = 0, action: Redux.IAction<number | null>) =>
+    Decrement: (st: number = 0, action: Redux.Action<number | null>) =>
       !isNil(action.payload) ? Math.max(st - action.payload, 0) : Math.max(st - 1, 0),
-    Set: (st: number = 0, action: Redux.IAction<number>) => action.payload
+    Set: (st: number = 0, action: Redux.Action<number>) => action.payload
   };
   return createSimpleReducerFromMap<ICounterActionMap, number, A>(mappings, transformers, Options);
 };

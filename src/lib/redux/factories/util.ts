@@ -3,7 +3,7 @@ import { forEach, isNil, reduce } from "lodash";
 import { getKeyValue } from "lib/util";
 import { MappedReducers, FactoryOptions } from ".";
 
-export const mergeOptionsWithDefaults = <S, A extends Redux.IAction<any> = Redux.IAction<any>>(
+export const mergeOptionsWithDefaults = <S, A extends Redux.Action<any> = Redux.Action<any>>(
   options: Partial<FactoryOptions<S, A>>,
   initialState: S
 ): FactoryOptions<S, A> => {
@@ -18,7 +18,7 @@ export const mergeOptionsWithDefaults = <S, A extends Redux.IAction<any> = Redux
   };
 };
 
-const findReducerForAction = <P extends { [key: string]: any }, S, A extends Redux.IAction<any> = Redux.IAction<any>>(
+const findReducerForAction = <P extends { [key: string]: any }, S, A extends Redux.Action<any> = Redux.Action<any>>(
   /* eslint-disable indent */
   action: A,
   mappings: Partial<P>,
@@ -40,7 +40,7 @@ const findReducerForAction = <P extends { [key: string]: any }, S, A extends Red
   return undefined;
 };
 
-export const createSimpleReducerFromMap = <P, S, A extends Redux.IAction<any> = Redux.IAction<any>>(
+export const createSimpleReducerFromMap = <P, S, A extends Redux.Action<any> = Redux.Action<any>>(
   /* eslint-disable indent */
   mappings: Partial<P>,
   reducers: MappedReducers<P, S, A>,
@@ -53,7 +53,7 @@ export const createSimpleReducerFromMap = <P, S, A extends Redux.IAction<any> = 
   return state;
 };
 
-export const createObjectReducerFromMap = <P, S extends object, A extends Redux.IAction<any> = Redux.IAction<any>>(
+export const createObjectReducerFromMap = <P, S extends object, A extends Redux.Action<any> = Redux.Action<any>>(
   /* eslint-disable indent */
   mappings: Partial<P>,
   transformers: MappedReducers<P, S, A>,
@@ -97,7 +97,7 @@ export const createObjectReducerFromMap = <P, S extends object, A extends Redux.
   return reducer;
 };
 
-export const createListReducerFromMap = <P, M extends Model, A extends Redux.IAction<any> = Redux.IAction<any>>(
+export const createListReducerFromMap = <P, M extends Model.Model, A extends Redux.Action<any> = Redux.Action<any>>(
   /* eslint-disable indent */
   mappings: Partial<P>,
   transformers: MappedReducers<P, Redux.ListStore<M>, A>,

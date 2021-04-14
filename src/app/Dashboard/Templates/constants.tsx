@@ -3,7 +3,7 @@ import { CommercialIcon, DocumentaryIcon, EpisodicIcon, FilmIcon, MusicVideoIcon
 export interface TemplateConfig {
   icon: JSX.Element;
   text: string;
-  productionType: ProductionTypeId;
+  productionType: Model.ProductionTypeId;
   color: string;
 }
 

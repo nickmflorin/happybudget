@@ -8,9 +8,9 @@ import { updateSubAccountGroup } from "api/services";
 import Modal from "./Modal";
 
 interface EditSubAccountGroupModalProps {
-  onSuccess: (group: IGroup<ISimpleSubAccount>) => void;
+  onSuccess: (group: Model.Group<Model.SimpleSubAccount>) => void;
   onCancel: () => void;
-  group: IGroup<ISimpleSubAccount>;
+  group: Model.Group<Model.SimpleSubAccount>;
   open: boolean;
 }
 
@@ -32,7 +32,7 @@ const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubA
           .then((values: GroupFormValues) => {
             setLoading(true);
             updateSubAccountGroup(group.id, values)
-              .then((response: IGroup<ISimpleSubAccount>) => {
+              .then((response: Model.Group<Model.SimpleSubAccount>) => {
                 form.resetFields();
                 onSuccess(response);
               })

@@ -14,7 +14,7 @@ export enum ContactRoleNames {
   OTHER = "Other"
 }
 
-export const ContactRoleModels: { [key: string]: ContactRole } = {
+export const ContactRoleModels: { [key: string]: Model.ContactRole } = {
   PRODUCER: { id: 0, name: ContactRoleNames.PRODUCER },
   EXECUTIVE_PRODUCER: { id: 1, name: ContactRoleNames.EXECUTIVE_PRODUCER },
   PRODUCTION_MANAGER: { id: 2, name: ContactRoleNames.PRODUCTION_MANAGER },
@@ -41,7 +41,7 @@ export enum SubAccountUnitNames {
   NIGHTS = "Nights"
 }
 
-export const SubAccountUnitModels: { [key: string]: SubAccountUnit } = {
+export const SubAccountUnitModels: { [key: string]: Model.SubAccountUnit } = {
   MINUTES: { id: 0, name: SubAccountUnitNames.MINUTES },
   HOURS: { id: 1, name: SubAccountUnitNames.HOURS },
   WEEKS: { id: 2, name: SubAccountUnitNames.WEEKS },
@@ -59,7 +59,7 @@ export enum FringeUnitNames {
   FLAT = "Flat"
 }
 
-export const FringeUnitModels: { [key: string]: FringeUnit } = {
+export const FringeUnitModels: { [key: string]: Model.FringeUnit } = {
   PERCENT: { id: 0, name: FringeUnitNames.PERCENT },
   FLAT: { id: 1, name: FringeUnitNames.FLAT }
 };
@@ -74,7 +74,7 @@ export enum PaymentMethodNames {
   WIRE = "Wire"
 }
 
-export const PaymentMethodModels: { [key: string]: PaymentMethod } = {
+export const PaymentMethodModels: { [key: string]: Model.PaymentMethod } = {
   MINUTES: { id: 0, name: PaymentMethodNames.CHECK },
   HOURS: { id: 1, name: PaymentMethodNames.CARD },
   WEEKS: { id: 2, name: PaymentMethodNames.WIRE }

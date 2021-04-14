@@ -17,7 +17,7 @@ const WrapInApplicationSpinner = ({
   children,
   hideWhileLoading = false
 }: WrapInApplicationSpinnerProps): JSX.Element => {
-  const loadingState = useSelector((state: Redux.IApplicationStore) => state.loading);
+  const loadingState = useSelector((state: Redux.ApplicationStore) => state.loading);
   const id = useMemo(() => uuidv4(), []);
   const dispatch: Dispatch = useDispatch();
 

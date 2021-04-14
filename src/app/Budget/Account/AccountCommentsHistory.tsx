@@ -11,29 +11,29 @@ import {
   requestHistoryAction
 } from "../store/actions/account";
 
-const selectDeletingComments = simpleDeepEqualSelector((state: Redux.IApplicationStore) =>
+const selectDeletingComments = simpleDeepEqualSelector((state: Redux.ApplicationStore) =>
   map(state.budget.account.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
-const selectEditingComments = simpleDeepEqualSelector((state: Redux.IApplicationStore) =>
+const selectEditingComments = simpleDeepEqualSelector((state: Redux.ApplicationStore) =>
   map(state.budget.account.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectReplyingComments = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.comments.replying
+  (state: Redux.ApplicationStore) => state.budget.account.comments.replying
 );
 const selectCommentsData = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.comments.data
+  (state: Redux.ApplicationStore) => state.budget.account.comments.data
 );
 const selectSubmittingComment = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.comments.creating
+  (state: Redux.ApplicationStore) => state.budget.account.comments.creating
 );
 const selectLoadingComments = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.comments.loading
+  (state: Redux.ApplicationStore) => state.budget.account.comments.loading
 );
 const selectLoadingHistory = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.history.loading
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.history.loading
 );
 const selectHistory = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.history.data
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.history.data
 );
 
 const AccountCommentsHistory = (): JSX.Element => {
@@ -53,19 +53,19 @@ const AccountCommentsHistory = (): JSX.Element => {
         comments: comments,
         loading: loadingComments,
         submitting: submittingComment,
-        commentLoading: (comment: IComment) =>
+        commentLoading: (comment: Model.Comment) =>
           includes(editingComments, comment.id) ||
           includes(deletingComments, comment.id) ||
           includes(replyingComments, comment.id),
         onRequest: () => dispatch(requestCommentsAction(null)),
-        onSubmit: (payload: Http.ICommentPayload) => dispatch(createCommentAction({ data: payload })),
-        onDoneEditing: (comment: IComment, value: string) =>
+        onSubmit: (payload: Http.CommentPayload) => dispatch(createCommentAction({ data: payload })),
+        onDoneEditing: (comment: Model.Comment, value: string) =>
           dispatch(updateCommentAction({ id: comment.id, data: { text: value } })),
-        onDoneReplying: (comment: IComment, value: string) =>
+        onDoneReplying: (comment: Model.Comment, value: string) =>
           dispatch(createCommentAction({ parent: comment.id, data: { text: value } })),
         /* eslint-disable no-console */
-        onLike: (comment: IComment) => console.log(comment),
-        onDelete: (comment: IComment) => dispatch(deleteCommentAction(comment.id))
+        onLike: (comment: Model.Comment) => console.log(comment),
+        onDelete: (comment: Model.Comment) => dispatch(deleteCommentAction(comment.id))
       }}
       historyProps={{
         history,

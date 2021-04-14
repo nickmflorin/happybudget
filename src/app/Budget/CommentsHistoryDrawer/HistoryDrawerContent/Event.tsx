@@ -13,18 +13,18 @@ import { toDisplayTimeSince } from "lib/util/dates";
 import "./Event.scss";
 
 interface FieldAlterationProps {
-  event: FieldAlterationEvent;
+  event: Model.FieldAlterationEvent;
 }
 
 interface EventProps {
-  event: HistoryEvent;
+  event: Model.HistoryEvent;
 }
 
 interface ItemCreatedProps {
-  event: CreateEvent;
+  event: Model.CreateEvent;
 }
 
-const EventHeader = (props: { event: HistoryEvent }): JSX.Element => {
+const EventHeader = (props: { event: Model.HistoryEvent }): JSX.Element => {
   return (
     <div className={"event-header"}>
       <AccountCircleLink user={props.event.user} />

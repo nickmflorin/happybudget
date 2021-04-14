@@ -119,7 +119,7 @@ function* watchForRequestSubAccountsHistorySaga(): SagaIterator {
 function* watchForDeleteGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action: Redux.IAction<number> = yield take(ActionType.SubAccount.SubAccounts.Groups.Delete);
+    const action: Redux.Action<number> = yield take(ActionType.SubAccount.SubAccounts.Groups.Delete);
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload])) {
         lastTasks[action.payload] = [];
@@ -139,7 +139,7 @@ function* watchForDeleteGroupSaga(): SagaIterator {
 function* watchForRemoveSubAccountFromGroupSaga(): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action: Redux.IAction<number> = yield take(ActionType.SubAccount.SubAccounts.RemoveFromGroup);
+    const action: Redux.Action<number> = yield take(ActionType.SubAccount.SubAccounts.RemoveFromGroup);
     if (!isNil(action.payload)) {
       if (isNil(lastTasks[action.payload])) {
         lastTasks[action.payload] = [];

@@ -13,13 +13,13 @@ export interface CommentsProps {
   // the comment itself and it's children) and the specific <Comment />, for a
   // total of 2 loading indicators.
   loading?: boolean;
-  comments: IComment[];
+  comments: Model.Comment[];
   nested?: boolean;
-  commentLoading: (comment: IComment) => boolean;
-  onDelete: (comment: IComment) => void;
-  onLike: (comment: IComment) => void;
-  onDoneEditing: (comment: IComment, value: string) => void;
-  onDoneReplying: (comment: IComment, value: string) => void;
+  commentLoading: (comment: Model.Comment) => boolean;
+  onDelete: (comment: Model.Comment) => void;
+  onLike: (comment: Model.Comment) => void;
+  onDoneEditing: (comment: Model.Comment, value: string) => void;
+  onDoneReplying: (comment: Model.Comment, value: string) => void;
 }
 
 const Comments = ({
@@ -35,7 +35,7 @@ const Comments = ({
   return (
     <RenderWithSpinner absolute size={15} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
       <ShowHide show={comments.length !== 0}>
-        {map(comments, (comment: IComment, index: number) => (
+        {map(comments, (comment: Model.Comment, index: number) => (
           <CommentBlock
             nested={nested}
             comment={comment}

@@ -7,11 +7,11 @@ import { toAbbvDisplayDateTime } from "lib/util/dates";
 import Card from "./Card";
 
 interface BudgetCardProps {
-  budget: IBudget;
+  budget: Model.Budget;
   selected: boolean;
   loading: boolean;
-  onDelete: (budget: IBudget) => void;
-  onEdit: (budget: IBudget) => void;
+  onDelete: (budget: Model.Budget) => void;
+  onEdit: (budget: Model.Budget) => void;
   onSelect: (checked: boolean) => void;
 }
 

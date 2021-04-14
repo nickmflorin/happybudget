@@ -5,7 +5,7 @@ import { ActualRowManager } from "lib/tabling/managers";
 import { ActionType } from "../actions";
 import { initialFringesState } from "../initialState";
 
-const listResponseReducer = createListResponseReducer<IFringe, Redux.Budget.IFringesStore>(
+const listResponseReducer = createListResponseReducer<Model.Fringe, Redux.Budget.FringesStore>(
   {
     Response: ActionType.Budget.Fringes.Response,
     Loading: ActionType.Budget.Fringes.Loading,
@@ -37,16 +37,16 @@ const listResponseReducer = createListResponseReducer<IFringe, Redux.Budget.IFri
   }
 );
 
-const rootReducer: Reducer<Redux.Budget.IFringesStore, Redux.IAction<any>> = (
-  state: Redux.Budget.IFringesStore = initialFringesState,
-  action: Redux.IAction<any>
-): Redux.Budget.IFringesStore => {
+const rootReducer: Reducer<Redux.Budget.FringesStore, Redux.Action<any>> = (
+  state: Redux.Budget.FringesStore = initialFringesState,
+  action: Redux.Action<any>
+): Redux.Budget.FringesStore => {
   let newState = { ...state };
 
   newState = listResponseReducer(newState, action);
 
   if (action.type === ActionType.Budget.Fringes.Placeholders.Activate) {
-    const payload: Table.ActivatePlaceholderPayload<IFringe> = action.payload;
+    const payload: Table.ActivatePlaceholderPayload<Model.Fringe> = action.payload;
     newState = {
       ...newState,
       placeholders: filter(

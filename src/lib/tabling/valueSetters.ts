@@ -1,6 +1,6 @@
 import { isNil, find } from "lodash";
 import { ValueSetterParams } from "ag-grid-community";
-import { findChoiceModelForName } from "lib/model/util";
+import { findChoiceForName } from "lib/model/util";
 import { toApiDateTime } from "lib/util/dates";
 
 export const percentageToDecimalValueSetter = <R extends Table.Row<any, any>>(field: keyof R) => (
@@ -52,14 +52,14 @@ interface choiceModelValueSetterOptions {
   allowNull?: boolean;
 }
 
-export const choiceModelValueSetter = <R extends Table.Row<any, any>, M extends ChoiceModel<number, string>>(
+export const choiceModelValueSetter = <R extends Table.Row<any, any>, M extends Model.Choice<number, string>>(
   field: keyof R,
   models: M[],
   options?: choiceModelValueSetterOptions
 ) => (params: ValueSetterParams): boolean => {
   /* eslint-disable indent */
   if (typeof params.newValue === "string") {
-    const optionModel = findChoiceModelForName(models, params.newValue, false);
+    const optionModel = findChoiceForName(models, params.newValue, false);
     if (!isNil(optionModel)) {
       params.data[field] = optionModel.name;
       return true;

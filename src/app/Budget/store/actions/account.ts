@@ -4,9 +4,9 @@ import ActionType from "./ActionType";
 export const setAccountIdAction = simpleAction<number>(ActionType.Account.SetId);
 export const requestAccountAction = simpleAction<null>(ActionType.Account.Request);
 export const loadingAccountAction = simpleAction<boolean>(ActionType.Account.Loading);
-export const responseAccountAction = simpleAction<IAccount | undefined>(ActionType.Account.Response);
+export const responseAccountAction = simpleAction<Model.Account | undefined>(ActionType.Account.Response);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
-export const updateAccountInStateAction = simpleAction<Partial<IAccount>>(ActionType.Account.UpdateInState);
+export const updateAccountInStateAction = simpleAction<Partial<Model.Account>>(ActionType.Account.UpdateInState);
 export const bulkUpdateAccountAction = simpleAction<Table.RowChange<Table.SubAccountRow>[]>(
   ActionType.Account.BulkUpdate
 );
@@ -15,24 +15,26 @@ export const bulkUpdateAccountAction = simpleAction<Table.RowChange<Table.SubAcc
   Actions Pertaining to Account Comments
 */
 export const requestCommentsAction = simpleAction<null>(ActionType.Account.Comments.Request);
-export const responseCommentsAction = simpleAction<Http.IListResponse<IComment>>(ActionType.Account.Comments.Response);
+export const responseCommentsAction = simpleAction<Http.ListResponse<Model.Comment>>(
+  ActionType.Account.Comments.Response
+);
 export const loadingCommentsAction = simpleAction<boolean>(ActionType.Account.Comments.Loading);
-export const createCommentAction = simpleAction<{ parent?: number; data: Http.ICommentPayload }>(
+export const createCommentAction = simpleAction<{ parent?: number; data: Http.CommentPayload }>(
   ActionType.Account.Comments.Create
 );
 export const creatingCommentAction = simpleAction<boolean>(ActionType.Account.Comments.Creating);
 export const deleteCommentAction = simpleAction<number>(ActionType.Account.Comments.Delete);
-export const updateCommentAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
+export const updateCommentAction = simpleAction<Redux.UpdateModelActionPayload<Model.Comment>>(
   ActionType.Account.Comments.Update
 );
 export const replyingToCommentAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Account.Comments.Replying);
 export const deletingCommentAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Account.Comments.Deleting);
 export const updatingCommentAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Account.Comments.Updating);
-export const addCommentToStateAction = simpleAction<{ data: IComment; parent?: number }>(
+export const addCommentToStateAction = simpleAction<{ data: Comment; parent?: number }>(
   ActionType.Account.Comments.AddToState
 );
 export const removeCommentFromStateAction = simpleAction<number>(ActionType.Account.Comments.RemoveFromState);
-export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<IComment>>(
+export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Comment>>(
   ActionType.Account.Comments.UpdateInState
 );
 /*
@@ -51,7 +53,7 @@ export const updatingSubAccountAction = simpleAction<Redux.ModelListActionPayloa
 export const creatingSubAccountAction = simpleAction<boolean>(ActionType.Account.SubAccounts.Creating);
 export const requestSubAccountsAction = simpleAction<null>(ActionType.Account.SubAccounts.Request);
 export const loadingSubAccountsAction = simpleAction<boolean>(ActionType.Account.SubAccounts.Loading);
-export const responseSubAccountsAction = simpleAction<Http.IListResponse<ISubAccount>>(
+export const responseSubAccountsAction = simpleAction<Http.ListResponse<Model.SubAccount>>(
   ActionType.Account.SubAccounts.Response
 );
 export const setSubAccountsSearchAction = simpleAction<string>(ActionType.Account.SubAccounts.SetSearch);
@@ -60,7 +62,7 @@ export const selectSubAccountAction = simpleAction<number>(ActionType.Account.Su
 export const deselectSubAccountAction = simpleAction<number>(ActionType.Account.SubAccounts.Deselect);
 export const selectAllSubAccountsAction = simpleAction<null>(ActionType.Account.SubAccounts.SelectAll);
 
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<ISubAccount>>(
+export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.SubAccount>>(
   ActionType.Account.SubAccounts.Placeholders.Activate
 );
 export const removePlaceholderFromStateAction = simpleAction<number>(
@@ -73,10 +75,12 @@ export const updatePlaceholderInStateAction = simpleAction<Table.SubAccountRow>(
   ActionType.Account.SubAccounts.Placeholders.UpdateInState
 );
 
-export const updateSubAccountInStateAction = simpleAction<ISubAccount>(ActionType.Account.SubAccounts.UpdateInState);
+export const updateSubAccountInStateAction = simpleAction<Model.SubAccount>(
+  ActionType.Account.SubAccounts.UpdateInState
+);
 export const removeSubAccountFromStateAction = simpleAction<number>(ActionType.Account.SubAccounts.RemoveFromState);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
-export const addSubAccountToStateAction = simpleAction<ISubAccount>(ActionType.Account.SubAccounts.AddToState);
+export const addSubAccountToStateAction = simpleAction<Model.SubAccount>(ActionType.Account.SubAccounts.AddToState);
 
 // Errors Functionality Needs to be Built Back In
 export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(
@@ -88,13 +92,13 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
 */
 export const requestGroupsAction = simpleAction<null>(ActionType.Account.SubAccounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Account.SubAccounts.Groups.Loading);
-export const responseGroupsAction = simpleAction<Http.IListResponse<IGroup<ISimpleSubAccount>>>(
+export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Group<Model.SimpleSubAccount>>>(
   ActionType.Account.SubAccounts.Groups.Response
 );
-export const addGroupToStateAction = simpleAction<IGroup<ISimpleSubAccount>>(
+export const addGroupToStateAction = simpleAction<Model.Group<Model.SimpleSubAccount>>(
   ActionType.Account.SubAccounts.Groups.AddToState
 );
-export const updateGroupInStateAction = simpleAction<IGroup<ISimpleSubAccount>>(
+export const updateGroupInStateAction = simpleAction<Model.Group<Model.SimpleSubAccount>>(
   ActionType.Account.SubAccounts.Groups.UpdateInState
 );
 export const removeGroupFromStateAction = simpleAction<number>(ActionType.Account.SubAccounts.Groups.RemoveFromState);
@@ -108,6 +112,6 @@ export const deleteGroupAction = simpleAction<number>(ActionType.Account.SubAcco
 */
 export const requestHistoryAction = simpleAction<null>(ActionType.Account.SubAccounts.History.Request);
 export const loadingHistoryAction = simpleAction<boolean>(ActionType.Account.SubAccounts.History.Loading);
-export const responseHistoryAction = simpleAction<Http.IListResponse<HistoryEvent>>(
+export const responseHistoryAction = simpleAction<Http.ListResponse<Model.HistoryEvent>>(
   ActionType.Account.SubAccounts.History.Response
 );

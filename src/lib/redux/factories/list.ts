@@ -39,9 +39,9 @@ export type IListResponseActionMap = {
  * @param options   Additional options supplied to the reducer factory.
  */
 export const createListResponseReducer = <
-  M extends Model,
-  S extends Redux.IListResponseStore<M> = Redux.IListResponseStore<M>,
-  A extends Redux.IAction<any> = Redux.IAction<any>
+  M extends Model.Model,
+  S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>,
+  A extends Redux.Action<any> = Redux.Action<any>
 >(
   /* eslint-disable indent */
   mappings: Partial<IListResponseActionMap>,
@@ -55,12 +55,12 @@ export const createListResponseReducer = <
   const reducers: MappedReducers<IListResponseActionMap, S, A> = {
     // We have to reset the page to it's initial state otherwise we run the risk
     // of a 404 with the API request due to the page not being found.
-    SetSearch: (st: S = Options.initialState, action: Redux.IAction<string>) => ({
+    SetSearch: (st: S = Options.initialState, action: Redux.Action<string>) => ({
       ...st,
       page: 1,
       search: action.payload
     }),
-    Response: (st: S = Options.initialState, action: Redux.IAction<Http.IListResponse<M>>) => {
+    Response: (st: S = Options.initialState, action: Redux.Action<Http.ListResponse<M>>) => {
       return {
         ...st,
         data: action.payload.data,
@@ -69,25 +69,25 @@ export const createListResponseReducer = <
         responseWasReceived: true
       };
     },
-    Request: (st: S = Options.initialState, action: Redux.IAction<null>) => ({ ...st, responseWasReceived: false }),
-    Loading: (st: S = Options.initialState, action: Redux.IAction<boolean>) => ({ ...st, loading: action.payload }),
-    SetPage: (st: S = Options.initialState, action: Redux.IAction<number>) => ({
+    Request: (st: S = Options.initialState, action: Redux.Action<null>) => ({ ...st, responseWasReceived: false }),
+    Loading: (st: S = Options.initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload }),
+    SetPage: (st: S = Options.initialState, action: Redux.Action<number>) => ({
       ...st,
       page: action.payload,
       selected: []
     }),
-    SetPageSize: (st: S = Options.initialState, action: Redux.IAction<number>) => ({
+    SetPageSize: (st: S = Options.initialState, action: Redux.Action<number>) => ({
       ...st,
       pageSize: action.payload,
       selected: []
     }),
-    SetPageAndSize: (st: S = Options.initialState, action: Redux.IAction<PageAndSize>) => ({
+    SetPageAndSize: (st: S = Options.initialState, action: Redux.Action<PageAndSize>) => ({
       ...st,
       pageSize: action.payload.pageSize,
       page: action.payload.page,
       selected: []
     }),
-    AddToState: (st: S = Options.initialState, action: Redux.IAction<M>) => {
+    AddToState: (st: S = Options.initialState, action: Redux.Action<M>) => {
       const existing = find(st.data, { id: action.payload.id });
       if (!isNil(existing)) {
         if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
@@ -105,7 +105,7 @@ export const createListResponseReducer = <
         return { ...st, data: [...st.data, action.payload], count: st.count + 1, pageSize };
       }
     },
-    RemoveFromState: (st: S = Options.initialState, action: Redux.IAction<number>) => {
+    RemoveFromState: (st: S = Options.initialState, action: Redux.Action<number>) => {
       const existing = find(st.data, { id: action.payload });
       if (isNil(existing)) {
         if (!isNil(action.meta) && action.meta.ignoreInconsistentState !== true) {
@@ -128,7 +128,7 @@ export const createListResponseReducer = <
         return { ...st, ...partial };
       }
     },
-    UpdateInState: (st: S = Options.initialState, action: Redux.IAction<M>) => {
+    UpdateInState: (st: S = Options.initialState, action: Redux.Action<M>) => {
       const existing: M | undefined = find(st.data, { id: action.payload.id } as any);
       // TODO: If the entity does not exist in the state when updating, should
       // we auto add it?
@@ -144,7 +144,7 @@ export const createListResponseReducer = <
       const { id: _, ...withoutId } = action.payload;
       return { ...st, data: replaceInArray<M>(st.data, { id: action.payload.id }, { ...existing, ...withoutId }) };
     },
-    Deselect: (st: S = Options.initialState, action: Redux.IAction<number>) => {
+    Deselect: (st: S = Options.initialState, action: Redux.Action<number>) => {
       const element = find(st.data, { id: action.payload });
       if (!isNil(element) || Options.strictSelect === false) {
         if (!includes(st.selected, action.payload)) {
@@ -167,14 +167,14 @@ export const createListResponseReducer = <
         return st;
       }
     },
-    SelectAll: (st: S = Options.initialState, action: Redux.IAction<null>) => {
+    SelectAll: (st: S = Options.initialState, action: Redux.Action<null>) => {
       if (st.selected.length === st.data.length) {
         return { ...st, selected: [] };
       } else {
         return { ...st, selected: map(st.data, (model: M) => model.id) };
       }
     },
-    Select: (st: S = Options.initialState, action: Redux.IAction<number | number[]>) => {
+    Select: (st: S = Options.initialState, action: Redux.Action<number | number[]>) => {
       const selected: number[] = [];
       if (Array.isArray(action.payload)) {
         forEach(action.payload, (id: number) => {
@@ -206,14 +206,14 @@ export const createListResponseReducer = <
         }
       }
     },
-    Creating: (st: S = Options.initialState, action: Redux.IAction<boolean>) => ({ ...st, creating: action.payload }),
-    Deleting: (st: S = Options.initialState, action: Redux.IAction<Redux.ModelListActionPayload>) => {
+    Creating: (st: S = Options.initialState, action: Redux.Action<boolean>) => ({ ...st, creating: action.payload }),
+    Deleting: (st: S = Options.initialState, action: Redux.Action<Redux.ModelListActionPayload>) => {
       return {
         ...st,
         deleting: DeletingReducer(st.deleting, action)
       };
     },
-    Updating: (st: S = Options.initialState, action: Redux.IAction<Redux.ModelListActionPayload>) => {
+    Updating: (st: S = Options.initialState, action: Redux.Action<Redux.ModelListActionPayload>) => {
       return {
         ...st,
         updating: UpdatingReducer(st.updating, action)

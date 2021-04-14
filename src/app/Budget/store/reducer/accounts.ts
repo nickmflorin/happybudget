@@ -9,7 +9,7 @@ import { initialListResponseState } from "store/initialState";
 import { ActionType } from "../actions";
 import { initialAccountsState } from "../initialState";
 
-const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAccountsStore>(
+const listResponseReducer = createListResponseReducer<Model.Account, Redux.Budget.AccountsStore>(
   {
     Response: ActionType.Budget.Accounts.Response,
     Request: ActionType.Budget.Accounts.Request,
@@ -38,7 +38,10 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
         },
         AccountRowManager
       ),
-      groups: createListResponseReducer<IGroup<ISimpleAccount>, Redux.IListResponseStore<IGroup<ISimpleAccount>>>(
+      groups: createListResponseReducer<
+        Model.Group<Model.SimpleAccount>,
+        Redux.ListResponseStore<Model.Group<Model.SimpleAccount>>
+      >(
         {
           Response: ActionType.Budget.Accounts.Groups.Response,
           Request: ActionType.Budget.Accounts.Groups.Request,
@@ -50,14 +53,16 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
         {
           extensions: {
             [ActionType.Budget.Accounts.RemoveFromGroup]: (
-              st: Redux.IListResponseStore<IGroup<ISimpleAccount>> = initialListResponseState,
-              action: Redux.IAction<number>
+              st: Redux.ListResponseStore<Model.Group<Model.SimpleAccount>> = initialListResponseState,
+              action: Redux.Action<number>
             ) => {
-              const group: IGroup<ISimpleAccount> | undefined = find(st.data, (g: IGroup<ISimpleAccount>) =>
-                includes(
-                  map(g.children, (child: ISimpleAccount) => child.id),
-                  action.payload
-                )
+              const group: Model.Group<Model.SimpleAccount> | undefined = find(
+                st.data,
+                (g: Model.Group<Model.SimpleAccount>) =>
+                  includes(
+                    map(g.children, (child: Model.SimpleAccount) => child.id),
+                    action.payload
+                  )
               );
               if (isNil(group)) {
                 warnInconsistentState({
@@ -69,12 +74,12 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
               } else {
                 return {
                   ...st,
-                  data: replaceInArray<IGroup<ISimpleAccount>>(
+                  data: replaceInArray<Model.Group<Model.SimpleAccount>>(
                     st.data,
                     { id: group.id },
                     {
                       ...group,
-                      children: filter(group.children, (child: ISimpleAccount) => child.id !== action.payload)
+                      children: filter(group.children, (child: Model.SimpleAccount) => child.id !== action.payload)
                     }
                   )
                 };
@@ -83,7 +88,7 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
           }
         }
       ),
-      history: createListResponseReducer<HistoryEvent>({
+      history: createListResponseReducer<Model.HistoryEvent>({
         Response: ActionType.Budget.Accounts.History.Response,
         Request: ActionType.Budget.Accounts.History.Request,
         Loading: ActionType.Budget.Accounts.History.Loading
@@ -92,7 +97,7 @@ const listResponseReducer = createListResponseReducer<IAccount, Redux.Budget.IAc
   }
 );
 
-const recalculateGroupMetrics = (st: Redux.Budget.IAccountsStore, groupId: number): Redux.Budget.IAccountsStore => {
+const recalculateGroupMetrics = (st: Redux.Budget.AccountsStore, groupId: number): Redux.Budget.AccountsStore => {
   // This might not be totally necessary, but it is good practice to not use the entire payload
   // to update the group (since that is already done by the reducer above) but to instead just
   // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -101,7 +106,7 @@ const recalculateGroupMetrics = (st: Redux.Budget.IAccountsStore, groupId: numbe
   if (isNil(group)) {
     throw new Error(`The group with ID ${groupId} no longer exists in state!`);
   }
-  const childrenIds = map(group.children, (child: ISimpleAccount) => child.id);
+  const childrenIds = map(group.children, (child: Model.SimpleAccount) => child.id);
   const subAccounts = filter(
     map(childrenIds, (id: number) => {
       const subAccount = find(st.data, { id });
@@ -116,15 +121,15 @@ const recalculateGroupMetrics = (st: Redux.Budget.IAccountsStore, groupId: numbe
         return null;
       }
     }),
-    (child: IAccount | null) => child !== null
-  ) as IAccount[];
-  const actual = reduce(subAccounts, (sum: number, s: IAccount) => sum + (s.actual || 0), 0);
-  const estimated = reduce(subAccounts, (sum: number, s: IAccount) => sum + (s.estimated || 0), 0);
+    (child: Model.Account | null) => child !== null
+  ) as Model.Account[];
+  const actual = reduce(subAccounts, (sum: number, s: Model.Account) => sum + (s.actual || 0), 0);
+  const estimated = reduce(subAccounts, (sum: number, s: Model.Account) => sum + (s.estimated || 0), 0);
   return {
     ...st,
     groups: {
       ...st.groups,
-      data: replaceInArray<IGroup<ISimpleAccount>>(
+      data: replaceInArray<Model.Group<Model.SimpleAccount>>(
         st.groups.data,
         { id: group.id },
         { ...group, ...{ estimated, actual, variance: estimated - actual } }
@@ -133,10 +138,10 @@ const recalculateGroupMetrics = (st: Redux.Budget.IAccountsStore, groupId: numbe
   };
 };
 
-const rootReducer: Reducer<Redux.Budget.IAccountsStore, Redux.IAction<any>> = (
-  state: Redux.Budget.IAccountsStore = initialAccountsState,
-  action: Redux.IAction<any>
-): Redux.Budget.IAccountsStore => {
+const rootReducer: Reducer<Redux.Budget.AccountsStore, Redux.Action<any>> = (
+  state: Redux.Budget.AccountsStore = initialAccountsState,
+  action: Redux.Action<any>
+): Redux.Budget.AccountsStore => {
   let newState = { ...state };
 
   newState = listResponseReducer(newState, action);
@@ -147,11 +152,11 @@ const rootReducer: Reducer<Redux.Budget.IAccountsStore, Redux.IAction<any>> = (
   // that logic/recalculation further up the reducer tree where we have access to the SubAccount(s)
   // in state.
   if (action.type === ActionType.Budget.Accounts.Groups.UpdateInState) {
-    const group: IGroup<ISimpleAccount> = action.payload;
+    const group: Model.Group<Model.SimpleAccount> = action.payload;
     newState = recalculateGroupMetrics(newState, group.id);
   } else if (action.type === ActionType.Budget.Accounts.Groups.AddToState) {
-    const group: IGroup<ISimpleAccount> = action.payload;
-    forEach(group.children, (simpleAccount: ISimpleAccount) => {
+    const group: Model.Group<Model.SimpleAccount> = action.payload;
+    forEach(group.children, (simpleAccount: Model.SimpleAccount) => {
       const account = find(newState.data, { id: simpleAccount.id });
       if (isNil(account)) {
         warnInconsistentState({
@@ -163,7 +168,7 @@ const rootReducer: Reducer<Redux.Budget.IAccountsStore, Redux.IAction<any>> = (
       } else {
         newState = {
           ...newState,
-          data: replaceInArray<IAccount>(newState.data, { id: simpleAccount.id }, { ...account, group: group.id })
+          data: replaceInArray<Model.Account>(newState.data, { id: simpleAccount.id }, { ...account, group: group.id })
         };
       }
     });
@@ -171,19 +176,19 @@ const rootReducer: Reducer<Redux.Budget.IAccountsStore, Redux.IAction<any>> = (
     // NOTE: Here, we cannot look at the group that was removed from state because the action
     // only includes the group ID and the group was already removed from state.  Instead, we will
     // clear the group for any Account that belongs to a group no longer in state.
-    forEach(newState.data, (account: IAccount) => {
+    forEach(newState.data, (account: Model.Account) => {
       if (!isNil(account.group)) {
-        const group: IGroup<ISimpleAccount> | undefined = find(newState.groups.data, { id: account.group });
+        const group: Model.Group<Model.SimpleAccount> | undefined = find(newState.groups.data, { id: account.group });
         if (isNil(group)) {
           newState = {
             ...newState,
-            data: replaceInArray<IAccount>(newState.data, { id: account.id }, { ...account, group: null })
+            data: replaceInArray<Model.Account>(newState.data, { id: account.id }, { ...account, group: null })
           };
         }
       }
     });
   } else if (action.type === ActionType.Budget.Accounts.UpdateInState) {
-    const subAccount: IAccount = action.payload;
+    const subAccount: Model.Account = action.payload;
     if (!isNil(subAccount.group)) {
       newState = recalculateGroupMetrics(newState, subAccount.group);
     }
@@ -191,11 +196,13 @@ const rootReducer: Reducer<Redux.Budget.IAccountsStore, Redux.IAction<any>> = (
     action.type === ActionType.Budget.Accounts.RemoveFromGroup ||
     action.type === ActionType.Budget.Accounts.RemoveFromState
   ) {
-    const group: IGroup<ISimpleAccount> | undefined = find(newState.groups.data, (g: IGroup<ISimpleAccount>) =>
-      includes(
-        map(g.children, (child: ISimpleAccount) => child.id),
-        action.payload
-      )
+    const group: Model.Group<Model.SimpleAccount> | undefined = find(
+      newState.groups.data,
+      (g: Model.Group<Model.SimpleAccount>) =>
+        includes(
+          map(g.children, (child: Model.SimpleAccount) => child.id),
+          action.payload
+        )
     );
     if (isNil(group)) {
       warnInconsistentState({
@@ -208,10 +215,10 @@ const rootReducer: Reducer<Redux.Budget.IAccountsStore, Redux.IAction<any>> = (
         ...newState,
         groups: {
           ...newState.groups,
-          data: replaceInArray<IGroup<ISimpleAccount>>(
+          data: replaceInArray<Model.Group<Model.SimpleAccount>>(
             newState.groups.data,
             { id: group.id },
-            { ...group, children: filter(group.children, (child: ISimpleAccount) => child.id !== action.payload) }
+            { ...group, children: filter(group.children, (child: Model.SimpleAccount) => child.id !== action.payload) }
           )
         }
       };
@@ -219,7 +226,7 @@ const rootReducer: Reducer<Redux.Budget.IAccountsStore, Redux.IAction<any>> = (
     }
   } else if (action.type === ActionType.Budget.Accounts.Placeholders.Activate) {
     // TODO: Do we need to recalculate group metrics here?
-    const payload: Table.ActivatePlaceholderPayload<IAccount> = action.payload;
+    const payload: Table.ActivatePlaceholderPayload<Model.Account> = action.payload;
     newState = {
       ...newState,
       placeholders: filter(

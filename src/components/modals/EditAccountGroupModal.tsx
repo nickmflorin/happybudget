@@ -8,9 +8,9 @@ import { updateAccountGroup } from "api/services";
 import Modal from "./Modal";
 
 interface EditAccountGroupModalProps {
-  onSuccess: (group: IGroup<ISimpleAccount>) => void;
+  onSuccess: (group: Model.Group<Model.SimpleAccount>) => void;
   onCancel: () => void;
-  group: IGroup<ISimpleAccount>;
+  group: Model.Group<Model.SimpleAccount>;
   open: boolean;
 }
 
@@ -36,7 +36,7 @@ const EditAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditAccount
               name: values.name,
               color: values.color
             })
-              .then((response: IGroup<ISimpleAccount>) => {
+              .then((response: Model.Group<Model.SimpleAccount>) => {
                 form.resetFields();
                 onSuccess(response);
               })

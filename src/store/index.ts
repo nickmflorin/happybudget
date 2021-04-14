@@ -6,17 +6,17 @@ import createApplicationReducer from "./reducer";
 import createRootSaga from "./sagas";
 import createRootInitialState from "./initialState";
 
-const configureStore = (user: IUser): Store<Redux.IApplicationStore, Redux.IAction<any>> => {
+const configureStore = (user: Model.User): Store<Redux.ApplicationStore, Redux.Action<any>> => {
   const initialState = createRootInitialState(ApplicationReduxConfig, user);
 
   const applicationReducer = createApplicationReducer(ApplicationReduxConfig, user) as Reducer<
-    Redux.IApplicationStore,
-    Redux.IAction
+    Redux.ApplicationStore,
+    Redux.Action
   >;
   const applicationSaga = createRootSaga(ApplicationReduxConfig);
 
   const sagaMiddleware = createSagaMiddleware();
-  const store: Store<Redux.IApplicationStore, Redux.IAction<any>> = createStore(
+  const store: Store<Redux.ApplicationStore, Redux.Action<any>> = createStore(
     applicationReducer,
     initialState,
     applyMiddleware(sagaMiddleware)

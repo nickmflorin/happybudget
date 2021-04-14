@@ -4,10 +4,10 @@ import { isNil } from "lodash";
 
 import { ApplicationActionTypes, setOverallApplicationLoadingAction } from "./actions";
 
-function* handleLoadingTask(action: Redux.IAction<{ id: string; value: boolean }>): SagaIterator {
+function* handleLoadingTask(action: Redux.Action<{ id: string; value: boolean }>): SagaIterator {
   if (!isNil(action.payload)) {
-    const elementsLoading = yield select((state: Redux.IApplicationStore) => state.loading.elements);
-    const loading = yield select((state: Redux.IApplicationStore) => state.loading.loading);
+    const elementsLoading = yield select((state: Redux.ApplicationStore) => state.loading.elements);
+    const loading = yield select((state: Redux.ApplicationStore) => state.loading.loading);
     if (elementsLoading.length === 0 && loading === true) {
       yield put(setOverallApplicationLoadingAction(false));
     } else if (elementsLoading.length !== 0 && loading === false) {
@@ -24,10 +24,10 @@ export function* RootSaga(): SagaIterator {
   yield spawn(watchForLoadingChangedSaga);
 }
 
-const createApplicationSaga = (config: Redux.IApplicationConfig): Saga => {
+const createApplicationSaga = (config: Redux.ApplicationConfig): Saga => {
   function* applicationSaga(): SagaIterator {
     for (var i = 0; i < config.length; i++) {
-      const moduleConfig: Redux.IModuleConfig<any, any> = config[i];
+      const moduleConfig: Redux.ModuleConfig<any, any> = config[i];
       if (!isNil(moduleConfig.rootSaga)) {
         yield spawn(moduleConfig.rootSaga);
       }

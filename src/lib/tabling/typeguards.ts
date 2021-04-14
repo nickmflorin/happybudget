@@ -1,6 +1,6 @@
 import { getKeyValue } from "lib/util";
 
-export const isRowChangeData = <R extends Table.Row, M extends Model>(
+export const isRowChangeData = <R extends Table.Row, M extends Model.Model>(
   obj: Table.RowChange<R> | Table.RowChangeData<R> | R | M
 ): obj is Table.RowChangeData<R> => {
   let hasValues = true;
@@ -16,7 +16,7 @@ export const isRowChangeData = <R extends Table.Row, M extends Model>(
   return hasValues;
 };
 
-export const isRowChange = <R extends Table.Row, M extends Model>(
+export const isRowChange = <R extends Table.Row, M extends Model.Model>(
   obj: Table.RowChange<R> | Table.RowChangeData<R> | R | M
 ): obj is Table.RowChange<R> => {
   const data = (obj as Table.RowChange<R>).data;
@@ -26,11 +26,11 @@ export const isRowChange = <R extends Table.Row, M extends Model>(
   return false;
 };
 
-export const isRow = <R extends Table.Row, M extends Model>(obj: R | M): obj is R => {
+export const isRow = <R extends Table.Row, M extends Model.Model>(obj: R | M): obj is R => {
   return (obj as R).meta !== undefined;
 };
 
-export const isModel = <R extends Table.Row, M extends Model>(
+export const isModel = <R extends Table.Row, M extends Model.Model>(
   obj: Table.RowChange<R> | Table.RowChangeData<R> | R | M
 ): obj is M => {
   return !isRowChangeData<R, M>(obj) && !isRowChange<R, M>(obj) && !isRow<R, M>(obj);

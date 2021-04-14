@@ -11,7 +11,7 @@ import "./index.scss";
 
 const Budgets = (): JSX.Element => {
   const dispatch: Dispatch = useDispatch();
-  const budgets = useSelector((state: Redux.IApplicationStore) => state.dashboard.budgets.active);
+  const budgets = useSelector((state: Redux.ApplicationStore) => state.dashboard.budgets.active);
 
   useEffect(() => {
     dispatch(requestBudgetsAction(ActionDomains.ACTIVE));
@@ -20,7 +20,7 @@ const Budgets = (): JSX.Element => {
   return (
     <Page className={"budgets"} loading={budgets.loading} title={"Budgets"}>
       <div className={"budgets-grid"}>
-        {map(budgets.data, (budget: IBudget, index: number) => {
+        {map(budgets.data, (budget: Model.Budget, index: number) => {
           return (
             <BudgetCard
               key={index}
@@ -54,8 +54,8 @@ const Budgets = (): JSX.Element => {
                   }
                 }
               }}
-              onEdit={(b: IBudget) => console.log(b)}
-              onDelete={(b: IBudget) => dispatch(deleteBudgetAction(b.id))}
+              onEdit={(b: Model.Budget) => console.log(b)}
+              onDelete={(b: Model.Budget) => dispatch(deleteBudgetAction(b.id))}
             />
           );
         })}

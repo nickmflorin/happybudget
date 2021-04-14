@@ -2,40 +2,40 @@ import { client } from "api";
 import { URL } from "./util";
 
 export const getContacts = async (
-  query: Http.IListQuery = {},
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<IContact>> => {
+  query: Http.ListQuery = {},
+  options: Http.RequestOptions = {}
+): Promise<Http.ListResponse<Model.Contact>> => {
   const url = URL.v1("contacts");
-  return client.list<IContact>(url, query, options);
+  return client.list<Model.Contact>(url, query, options);
 };
 
 export const getContact = async (
   id: number,
-  query: Http.IListQuery = {},
-  options: Http.IRequestOptions = {}
-): Promise<IContact> => {
+  query: Http.ListQuery = {},
+  options: Http.RequestOptions = {}
+): Promise<Model.Contact> => {
   const url = URL.v1("contacts", id);
-  return client.retrieve<IContact>(url, options);
+  return client.retrieve<Model.Contact>(url, options);
 };
 
 export const updateContact = async (
   id: number,
-  payload: Partial<Http.IContactPayload>,
-  options: Http.IRequestOptions = {}
-): Promise<IContact> => {
+  payload: Partial<Http.ContactPayload>,
+  options: Http.RequestOptions = {}
+): Promise<Model.Contact> => {
   const url = URL.v1("contacts", id);
-  return client.patch<IContact>(url, payload, options);
+  return client.patch<Model.Contact>(url, payload, options);
 };
 
 export const createContact = async (
-  payload: Http.IContactPayload,
-  options: Http.IRequestOptions = {}
-): Promise<IContact> => {
+  payload: Http.ContactPayload,
+  options: Http.RequestOptions = {}
+): Promise<Model.Contact> => {
   const url = URL.v1("contacts");
-  return client.post<IContact>(url, payload, options);
+  return client.post<Model.Contact>(url, payload, options);
 };
 
-export const deleteContact = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
+export const deleteContact = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("contacts", id);
   return client.delete<null>(url, options);
 };

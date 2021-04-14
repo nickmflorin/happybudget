@@ -28,11 +28,11 @@ const Profile = (): JSX.Element => {
             last_name: user.last_name,
             profile_image: user.profile_image
           }}
-          onSubmit={(payload: Partial<Http.IUserPayload>) => {
-            const formData = payloadToFormData<Partial<Http.IUserPayload>>(payload);
+          onSubmit={(payload: Partial<Http.UserPayload>) => {
+            const formData = payloadToFormData<Partial<Http.UserPayload>>(payload);
             client
-              .patch<IUser>("/v1/users/user/", formData)
-              .then((response: IUser) => {
+              .patch<Model.User>("/v1/users/user/", formData)
+              .then((response: Model.User) => {
                 dispatch(updateLoggedInUserAction(response));
                 toast.success("Your information has been successfully saved.");
               })

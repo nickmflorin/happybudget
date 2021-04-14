@@ -6,8 +6,8 @@ import { ActionType, ActionDomains } from "./actions";
 const PermanentlyDeletingReducer = createAgnosticModelListActionReducer();
 const RestoringReducer = createAgnosticModelListActionReducer();
 
-const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>> = combineReducers({
-  contacts: createListResponseReducer<IContact, Redux.IListResponseStore<IContact>>({
+const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Dashboard.Action<any>> = combineReducers({
+  contacts: createListResponseReducer<Model.Contact, Redux.ListResponseStore<Model.Contact>>({
     Response: ActionType.Contacts.Response,
     Request: ActionType.Contacts.Request,
     Loading: ActionType.Contacts.Loading,
@@ -24,7 +24,7 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
     Deleting: ActionType.Contacts.Deleting
   }),
   budgets: combineReducers({
-    active: createListResponseReducer<IBudget, Redux.IListResponseStore<IBudget>, Redux.Dashboard.IAction<any>>(
+    active: createListResponseReducer<Model.Budget, Redux.ListResponseStore<Model.Budget>, Redux.Dashboard.Action<any>>(
       {
         Response: ActionType.Budgets.Response,
         Loading: ActionType.Budgets.Loading,
@@ -39,12 +39,12 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
         Deleting: ActionType.Budgets.Deleting
       },
       {
-        excludeActions: (action: Redux.Dashboard.IAction<any>) => {
+        excludeActions: (action: Redux.Dashboard.Action<any>) => {
           return ActionDomains.ACTIVE !== action.domain;
         }
       }
     ),
-    trash: createListResponseReducer<IBudget, Redux.Dashboard.ITrashBudgetsListStore, Redux.Dashboard.IAction<any>>(
+    trash: createListResponseReducer<Model.Budget, Redux.Dashboard.TrashBudgetsListStore, Redux.Dashboard.Action<any>>(
       {
         Response: ActionType.Budgets.Response,
         Loading: ActionType.Budgets.Loading,
@@ -58,17 +58,17 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
         UpdateInState: ActionType.Budgets.UpdateInState
       },
       {
-        excludeActions: (action: Redux.Dashboard.IAction<any>) => {
+        excludeActions: (action: Redux.Dashboard.Action<any>) => {
           return ActionDomains.TRASH !== action.domain;
         },
         extensions: {
           [ActionType.Budgets.PermanentlyDeleting]: (
-            st: Redux.Dashboard.ITrashBudgetsListStore = {
+            st: Redux.Dashboard.TrashBudgetsListStore = {
               ...initialListResponseState,
               restoring: [],
               permanentlyDeleting: []
             },
-            action: Redux.IAction<Redux.ModelListActionPayload>
+            action: Redux.Action<Redux.ModelListActionPayload>
           ) => {
             return {
               ...st,
@@ -76,12 +76,12 @@ const rootReducer: Reducer<Redux.Dashboard.IStore, Redux.Dashboard.IAction<any>>
             };
           },
           [ActionType.Budgets.Restoring]: (
-            st: Redux.Dashboard.ITrashBudgetsListStore = {
+            st: Redux.Dashboard.TrashBudgetsListStore = {
               ...initialListResponseState,
               restoring: [],
               permanentlyDeleting: []
             },
-            action: Redux.IAction<Redux.ModelListActionPayload>
+            action: Redux.Action<Redux.ModelListActionPayload>
           ) => {
             return {
               ...st,

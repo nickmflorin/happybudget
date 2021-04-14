@@ -51,26 +51,26 @@ export const simpleDomainAction = <P = any>(type: string) => {
   return (
     domain: Redux.Dashboard.ActionDomain,
     payload: P,
-    options?: Redux.IActionConfig
-  ): Redux.Dashboard.IAction<P> => {
+    options?: Redux.ActionConfig
+  ): Redux.Dashboard.Action<P> => {
     return { ...createAction<P>(type, payload, options), domain };
   };
 };
 
-export const requestBudgetsAction = (domain: Redux.Dashboard.ActionDomain): Redux.Dashboard.IAction<null> => {
+export const requestBudgetsAction = (domain: Redux.Dashboard.ActionDomain): Redux.Dashboard.Action<null> => {
   return { ...createAction(ActionType.Budgets.Request, null), domain };
 };
 export const loadingBudgetsAction = simpleDomainAction<boolean>(ActionType.Budgets.Loading);
-export const responseBudgetsAction = simpleDomainAction<Http.IListResponse<IBudget>>(ActionType.Budgets.Response);
+export const responseBudgetsAction = simpleDomainAction<Http.ListResponse<Model.Budget>>(ActionType.Budgets.Response);
 export const selectBudgetsAction = simpleDomainAction<number[]>(ActionType.Budgets.Select);
 export const setBudgetsSearchAction = simpleDomainAction<string>(ActionType.Budgets.SetSearch);
 export const setBudgetsPageAction = simpleDomainAction<number>(ActionType.Budgets.SetPage);
 export const setBudgetsPageSizeAction = simpleDomainAction<number>(ActionType.Budgets.SetPageSize);
 export const setBudgetsPageAndSizeAction = simpleDomainAction<PageAndSize>(ActionType.Budgets.SetPageAndSize);
-export const updateBudgetInStateAction = simpleDomainAction<Redux.UpdateModelActionPayload<IBudget>>(
+export const updateBudgetInStateAction = simpleDomainAction<Redux.UpdateModelActionPayload<Model.Budget>>(
   ActionType.Budgets.UpdateInState
 );
-export const addBudgetToStateAction = simpleDomainAction<IBudget>(ActionType.Budgets.AddToState);
+export const addBudgetToStateAction = simpleDomainAction<Model.Budget>(ActionType.Budgets.AddToState);
 export const removeBudgetFromStateAction = simpleDomainAction<number>(ActionType.Budgets.RemoveFromState);
 
 export const deleteBudgetAction = simpleAction<number>(ActionType.Budgets.Delete);
@@ -86,7 +86,7 @@ export const restoringBudgetAction = simpleAction<{ id: number; value: boolean }
 
 export const requestContactsAction = simpleAction<null>(ActionType.Contacts.Request);
 export const loadingContactsAction = simpleAction<boolean>(ActionType.Contacts.Loading);
-export const responseContactsAction = simpleAction<Http.IListResponse<IContact>>(ActionType.Contacts.Response);
+export const responseContactsAction = simpleAction<Http.ListResponse<Model.Contact>>(ActionType.Contacts.Response);
 export const selectContactsAction = simpleAction<number[]>(ActionType.Contacts.Select);
 export const setContactsSearchAction = simpleAction<string>(ActionType.Contacts.SetSearch);
 export const setContactsPageSizeAction = simpleAction<number>(ActionType.Contacts.SetPageSize);
@@ -96,17 +96,19 @@ export const deleteContactAction = simpleAction<number>(ActionType.Contacts.Dele
 export const deleteContactsAction = simpleAction<number[]>(ActionType.Contacts.DeleteMultiple);
 export const deletingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Deleting);
 export const removeContactFromStateAction = simpleAction<number>(ActionType.Contacts.RemoveFromState);
-export const updateContactInStateAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(
+export const updateContactInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Contact>>(
   ActionType.Contacts.UpdateInState
 );
-export const addContactToStateAction = simpleAction<IContact>(ActionType.Contacts.AddToState);
+export const addContactToStateAction = simpleAction<Model.Contact>(ActionType.Contacts.AddToState);
 
 // Not currently used, because the updateContact service is used directly in the
 // modal for editing a contact, but we might use in the future.
-export const updateContactAction = simpleAction<Redux.UpdateModelActionPayload<IContact>>(ActionType.Contacts.Update);
+export const updateContactAction = simpleAction<Redux.UpdateModelActionPayload<Model.Contact>>(
+  ActionType.Contacts.Update
+);
 export const updatingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Updating);
 
 // Not currently used, because the createContact service is used directly in the
 // modal for creating a contact, but we might use in the future.
-export const createContactAction = simpleAction<Http.IContactPayload>(ActionType.Contacts.Create);
+export const createContactAction = simpleAction<Http.ContactPayload>(ActionType.Contacts.Create);
 export const creatingContactAction = simpleAction<boolean>(ActionType.Contacts.Creating);

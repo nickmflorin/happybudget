@@ -9,7 +9,7 @@ export * from "./list";
 export * from "./detail";
 export * from "./table";
 
-export interface FactoryOptions<S, A extends Redux.IAction<any> = Redux.IAction<any>> {
+export interface FactoryOptions<S, A extends Redux.Action<any> = Redux.Action<any>> {
   initialState: S;
   excludeActions: null | ((action: A, state: S) => boolean | undefined | void);
   extension: Reducer<S, A> | Reducer<S, A>[] | null;
@@ -20,11 +20,11 @@ export interface FactoryOptions<S, A extends Redux.IAction<any> = Redux.IAction<
   strictSelect: boolean;
 }
 
-export type MappedReducers<O, S, A extends Redux.IAction<any> = Redux.IAction<any>> = Partial<
+export type MappedReducers<O, S, A extends Redux.Action<any> = Redux.Action<any>> = Partial<
   Record<keyof O, Reducer<S, A>>
 >;
 
-export const createSimplePayloadReducer = <P, A extends Redux.IAction<P> = Redux.IAction<P>>(
+export const createSimplePayloadReducer = <P, A extends Redux.Action<P> = Redux.Action<P>>(
   actionType: string,
   initialState: P
 ): Reducer<P, A> => {
@@ -37,12 +37,12 @@ export const createSimplePayloadReducer = <P, A extends Redux.IAction<P> = Redux
   return reducer;
 };
 
-export const createSimpleBooleanReducer = <A extends Redux.IAction<boolean>>(actionType: string): Reducer<boolean, A> =>
+export const createSimpleBooleanReducer = <A extends Redux.Action<boolean>>(actionType: string): Reducer<boolean, A> =>
   createSimplePayloadReducer<boolean, A>(actionType, false);
 
 export const createAgnosticModelListActionReducer = () => (
   st: Redux.ModelListActionStore = [],
-  action: Redux.IAction<Redux.ModelListActionPayload>
+  action: Redux.Action<Redux.ModelListActionPayload>
 ): Redux.ModelListActionStore => {
   if (action.payload.value === true) {
     const instance: Redux.ModelListActionInstance | undefined = find(st, { id: action.payload.id });
@@ -94,7 +94,7 @@ export const createAgnosticModelListActionReducer = () => (
  */
 export const createModelListActionReducer = (actionType: string) => (
   st: Redux.ModelListActionStore = [],
-  action: Redux.IAction<Redux.ModelListActionPayload>
+  action: Redux.Action<Redux.ModelListActionPayload>
 ) => {
   const reducer = createAgnosticModelListActionReducer();
   if (action.type === actionType) {

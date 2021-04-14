@@ -8,7 +8,7 @@ import { createAccountGroup } from "api/services";
 import Modal from "./Modal";
 
 interface CreateAccountGroupModalProps {
-  onSuccess: (group: IGroup<ISimpleAccount>) => void;
+  onSuccess: (group: Model.Group<Model.SimpleAccount>) => void;
   onCancel: () => void;
   budgetId: number;
   accounts: number[];
@@ -44,7 +44,7 @@ const CreateAccountGroupModal = ({
               children: accounts,
               color: values.color
             })
-              .then((group: IGroup<ISimpleAccount>) => {
+              .then((group: Model.Group<Model.SimpleAccount>) => {
                 form.resetFields();
                 onSuccess(group);
               })

@@ -4,25 +4,25 @@ import {
   initialCommentsListResponseState
 } from "store/initialState";
 
-export const initialFringesState: Redux.Budget.IFringesStore = {
+export const initialFringesState: Redux.Budget.FringesStore = {
   placeholders: [],
   ...initialListResponseState
 };
 
-export const initialAccountsState: Redux.Budget.IAccountsStore = {
+export const initialAccountsState: Redux.Budget.AccountsStore = {
   placeholders: [],
   history: initialListResponseState,
   groups: initialListResponseState,
   ...initialListResponseState
 };
 
-export const initialBudgetState: Redux.Budget.IBudgetStore = {
+export const initialBudgetState: Redux.Budget.BudgetStore = {
   id: null,
   detail: initialDetailResponseState,
   comments: initialCommentsListResponseState
 };
 
-export const initialSubAccountsState: Redux.Budget.ISubAccountsStore = {
+export const initialSubAccountsState: Redux.Budget.SubAccountsStore = {
   placeholders: [],
   history: initialListResponseState,
   groups: initialListResponseState,
@@ -30,26 +30,26 @@ export const initialSubAccountsState: Redux.Budget.ISubAccountsStore = {
   ...initialListResponseState
 };
 
-export const initialSubAccountState: Redux.Budget.ISubAccountStore = {
+export const initialSubAccountState: Redux.Budget.SubAccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialSubAccountsState,
   comments: initialCommentsListResponseState
 };
 
-export const initialAccountState: Redux.Budget.IAccountStore = {
+export const initialAccountState: Redux.Budget.AccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialSubAccountsState,
   comments: initialCommentsListResponseState
 };
 
-export const initialActualsState: Redux.Budget.IActualsStore = {
+export const initialActualsState: Redux.Budget.ActualsStore = {
   placeholders: [],
   ...initialListResponseState
 };
 
-const initialState: Redux.Budget.IStore = {
+const initialState: Redux.Budget.Store = {
   budget: initialBudgetState,
   instance: null,
   commentsHistoryDrawerOpen: false,

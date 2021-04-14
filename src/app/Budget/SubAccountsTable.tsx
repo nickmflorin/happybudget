@@ -13,8 +13,8 @@ import BudgetTable, { CookiesProps } from "./BudgetTable";
 import { selectFringes, selectBudgetDetail, selectBudgetDetailLoading } from "./store/selectors";
 
 interface SubAccountsTableProps {
-  data: ISubAccount[];
-  groups?: IGroup<ISimpleSubAccount>[];
+  data: Model.SubAccount[];
+  groups?: Model.Group<Model.SimpleSubAccount>[];
   placeholders?: Table.SubAccountRow[];
   selected?: number[];
   tableFooterIdentifierValue?: string | null;
@@ -34,8 +34,8 @@ interface SubAccountsTableProps {
   onBack: () => void;
   onSelectAll: () => void;
   onGroupRows: (rows: Table.SubAccountRow[]) => void;
-  onDeleteGroup: (group: IGroup<ISimpleSubAccount>) => void;
-  onEditGroup: (group: IGroup<ISimpleSubAccount>) => void;
+  onDeleteGroup: (group: Model.Group<Model.SimpleSubAccount>) => void;
+  onEditGroup: (group: Model.Group<Model.SimpleSubAccount>) => void;
   onRowRemoveFromGroup: (row: Table.SubAccountRow) => void;
 }
 
@@ -72,10 +72,10 @@ const SubAccountsTable = ({
   return (
     <BudgetTable<
       Table.SubAccountRow,
-      ISubAccount,
-      IGroup<ISimpleSubAccount>,
-      Http.ISubAccountPayload,
-      ISimpleSubAccount
+      Model.SubAccount,
+      Model.Group<Model.SimpleSubAccount>,
+      Http.SubAccountPayload,
+      Model.SimpleSubAccount
     >
       data={data}
       groups={groups}
@@ -125,9 +125,9 @@ const SubAccountsTable = ({
       }}
       processCellForClipboard={{
         fringes: (row: Table.SubAccountRow) => {
-          const subAccountFringes: IFringe[] = filter(
+          const subAccountFringes: Model.Fringe[] = filter(
             map(row.fringes, (id: number) => {
-              const fringe: IFringe | undefined = find(fringes, { id });
+              const fringe: Model.Fringe | undefined = find(fringes, { id });
               if (!isNil(fringe)) {
                 return fringe;
               } else {
@@ -139,9 +139,9 @@ const SubAccountsTable = ({
                 return null;
               }
             }),
-            (fringe: IFringe | null) => fringe !== null
-          ) as IFringe[];
-          return map(subAccountFringes, (fringe: IFringe) => fringe.name).join(", ");
+            (fringe: Model.Fringe | null) => fringe !== null
+          ) as Model.Fringe[];
+          return map(subAccountFringes, (fringe: Model.Fringe) => fringe.name).join(", ");
         }
       }}
       bodyColumns={[
@@ -176,7 +176,7 @@ const SubAccountsTable = ({
           cellClass: "cell--centered",
           cellRenderer: "SubAccountUnitCell",
           width: 100,
-          valueSetter: choiceModelValueSetter<Table.SubAccountRow, SubAccountUnit>("unit", SubAccountUnits, {
+          valueSetter: choiceModelValueSetter<Table.SubAccountRow, Model.SubAccountUnit>("unit", SubAccountUnits, {
             allowNull: true
           })
         },
@@ -218,7 +218,7 @@ const SubAccountsTable = ({
               const names = params.newValue.split(",");
               const fringeIds: number[] = filter(
                 map(names, (name: string) => {
-                  const fringe: IFringe | undefined = find(fringes, (fr: IFringe) => fr.name === name.trim());
+                  const fringe: Model.Fringe | undefined = find(fringes, (fr: Model.Fringe) => fr.name === name.trim());
                   if (!isNil(fringe)) {
                     return fringe.id;
                   }

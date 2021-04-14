@@ -11,7 +11,7 @@ import "./index.scss";
 
 const Trash = (): JSX.Element => {
   const dispatch: Dispatch = useDispatch();
-  const budgets = useSelector((state: Redux.IApplicationStore) => state.dashboard.budgets.trash);
+  const budgets = useSelector((state: Redux.ApplicationStore) => state.dashboard.budgets.trash);
 
   useEffect(() => {
     dispatch(requestBudgetsAction(ActionDomains.TRASH));
@@ -20,12 +20,12 @@ const Trash = (): JSX.Element => {
   return (
     <Page className={"budgets"} loading={budgets.loading} title={"Deleted Budgets"}>
       <div className={"budgets-grid"}>
-        {map(budgets.data, (budget: IBudget) => {
+        {map(budgets.data, (budget: Model.Budget) => {
           return (
             <BudgetTrashCard
               budget={budget}
-              onRestore={(b: IBudget) => dispatch(restoreBudgetAction(b.id))}
-              onDelete={(b: IBudget) => dispatch(permanentlyDeleteBudgetAction(b.id))}
+              onRestore={(b: Model.Budget) => dispatch(restoreBudgetAction(b.id))}
+              onDelete={(b: Model.Budget) => dispatch(permanentlyDeleteBudgetAction(b.id))}
             />
           );
         })}

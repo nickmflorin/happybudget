@@ -3,82 +3,82 @@ import { URL } from "./util";
 
 export const getBudgetComments = async (
   id: number,
-  query: Http.IListQuery = {},
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<IComment>> => {
+  query: Http.ListQuery = {},
+  options: Http.RequestOptions = {}
+): Promise<Http.ListResponse<Model.Comment>> => {
   const url = URL.v1("budgets", id, "comments");
-  return client.list<IComment>(url, query, options);
+  return client.list<Model.Comment>(url, query, options);
 };
 
 export const getAccountComments = async (
   id: number,
-  query: Http.IListQuery = {},
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<IComment>> => {
+  query: Http.ListQuery = {},
+  options: Http.RequestOptions = {}
+): Promise<Http.ListResponse<Model.Comment>> => {
   const url = URL.v1("accounts", id, "comments");
-  return client.list<IComment>(url, query, options);
+  return client.list<Model.Comment>(url, query, options);
 };
 
 export const getSubAccountComments = async (
   id: number,
-  query: Http.IListQuery = {},
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<IComment>> => {
+  query: Http.ListQuery = {},
+  options: Http.RequestOptions = {}
+): Promise<Http.ListResponse<Model.Comment>> => {
   const url = URL.v1("subaccounts", id, "comments");
-  return client.list<IComment>(url, query, options);
+  return client.list<Model.Comment>(url, query, options);
 };
 
-export const getComment = async (id: number, options: Http.IRequestOptions = {}): Promise<IComment> => {
+export const getComment = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Comment> => {
   const url = URL.v1("comments", id);
-  return client.retrieve<IComment>(url, options);
+  return client.retrieve<Model.Comment>(url, options);
 };
 
-export const deleteComment = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
+export const deleteComment = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("comments", id);
   return client.delete<null>(url, options);
 };
 
 export const updateComment = async (
   id: number,
-  payload: Partial<Http.ICommentPayload>,
-  options: Http.IRequestOptions = {}
-): Promise<IComment> => {
+  payload: Partial<Http.CommentPayload>,
+  options: Http.RequestOptions = {}
+): Promise<Model.Comment> => {
   const url = URL.v1("comments", id);
-  return client.patch<IComment>(url, payload, options);
+  return client.patch<Model.Comment>(url, payload, options);
 };
 
 export const replyToComment = async (
   id: number,
   text: string,
-  options: Http.IRequestOptions = {}
-): Promise<IComment> => {
+  options: Http.RequestOptions = {}
+): Promise<Model.Comment> => {
   const url = URL.v1("comments", id, "reply");
-  return client.post<IComment>(url, { text }, options);
+  return client.post<Model.Comment>(url, { text }, options);
 };
 
 export const createBudgetComment = async (
   id: number,
-  payload: Http.ICommentPayload,
-  options: Http.IRequestOptions = {}
-): Promise<IComment> => {
+  payload: Http.CommentPayload,
+  options: Http.RequestOptions = {}
+): Promise<Model.Comment> => {
   const url = URL.v1("budgets", id, "comments");
-  return client.post<IComment>(url, payload, options);
+  return client.post<Model.Comment>(url, payload, options);
 };
 
 export const createAccountComment = async (
   id: number,
-  payload: Http.ICommentPayload,
-  options: Http.IRequestOptions = {}
-): Promise<IComment> => {
+  payload: Http.CommentPayload,
+  options: Http.RequestOptions = {}
+): Promise<Model.Comment> => {
   const url = URL.v1("accounts", id, "comments");
-  return client.post<IComment>(url, payload, options);
+  return client.post<Model.Comment>(url, payload, options);
 };
 
 export const createSubAccountComment = async (
   id: number,
-  payload: Http.ICommentPayload,
-  options: Http.IRequestOptions = {}
-): Promise<IComment> => {
+  payload: Http.CommentPayload,
+  options: Http.RequestOptions = {}
+): Promise<Model.Comment> => {
   const url = URL.v1("subaccounts", id, "comments");
-  return client.post<IComment>(url, payload, options);
+  return client.post<Model.Comment>(url, payload, options);
 };

@@ -25,31 +25,31 @@ import {
 } from "../store/actions/account";
 
 const selectGroups = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.groups.data
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.groups.data
 );
 const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.selected
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.selected
 );
-const selectData = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.account.subaccounts.data);
+const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.account.subaccounts.data);
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.search
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.search
 );
 const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.placeholders
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.placeholders
 );
 const selectSaving = createSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.deleting,
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.updating,
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.creating,
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.deleting,
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.updating,
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 const selectAccountDetail = simpleDeepEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.detail.data
+  (state: Redux.ApplicationStore) => state.budget.account.detail.data
 );
 const selectReadyToRender = createSelector(
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.responseWasReceived,
-  (state: Redux.IApplicationStore) => state.budget.account.subaccounts.groups.responseWasReceived,
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.responseWasReceived,
+  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.groups.responseWasReceived,
   (accountsResponseReceived: boolean, groupsResponseReceived: boolean) =>
     accountsResponseReceived === true && groupsResponseReceived === true
 );
@@ -60,7 +60,7 @@ interface AccountBudgetTableProps {
 
 const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element => {
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<IGroup<ISimpleSubAccount> | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<Model.Group<Model.SimpleSubAccount> | undefined>(undefined);
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -101,12 +101,12 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/accounts`)}
-        onDeleteGroup={(group: IGroup<ISimpleSubAccount>) => dispatch(deleteGroupAction(group.id))}
+        onDeleteGroup={(group: Model.Group<Model.SimpleSubAccount>) => dispatch(deleteGroupAction(group.id))}
         onRowRemoveFromGroup={(row: Table.SubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id))}
         onGroupRows={(rows: Table.SubAccountRow[]) =>
           setGroupSubAccounts(map(rows, (row: Table.SubAccountRow) => row.id))
         }
-        onEditGroup={(group: IGroup<ISimpleSubAccount>) => setGroupToEdit(group)}
+        onEditGroup={(group: Model.Group<Model.SimpleSubAccount>) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllSubAccountsAction(null))}
         tableTotals={{
           estimated: !isNil(accountDetail) && !isNil(accountDetail.estimated) ? accountDetail.estimated : 0.0,
@@ -119,7 +119,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
           accountId={accountId}
           subaccounts={groupSubAccounts}
           open={true}
-          onSuccess={(group: IGroup<ISimpleSubAccount>) => {
+          onSuccess={(group: Model.Group<Model.SimpleSubAccount>) => {
             setGroupSubAccounts(undefined);
             dispatch(addGroupToStateAction(group));
           }}
@@ -131,7 +131,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
           group={groupToEdit}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
-          onSuccess={(group: IGroup<ISimpleSubAccount>) => {
+          onSuccess={(group: Model.Group<Model.SimpleSubAccount>) => {
             setGroupToEdit(undefined);
             dispatch(updateGroupInStateAction(group));
           }}

@@ -1,3 +1,5 @@
-export const isFieldAlterationEvent = (event: FieldAlterationEvent | CreateEvent): event is FieldAlterationEvent => {
-  return (event as FieldAlterationEvent).field !== undefined;
+export const isFieldAlterationEvent = (
+  event: Model.FieldAlterationEvent | Model.CreateEvent
+): event is Model.FieldAlterationEvent => {
+  return (event as Model.FieldAlterationEvent).field !== undefined;
 };

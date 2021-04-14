@@ -8,7 +8,7 @@ import { createListResponseReducer } from "./list";
 import { mergeOptionsWithDefaults, createObjectReducerFromMap } from "./util";
 import { MappedReducers, FactoryOptions, createModelListActionReducer } from ".";
 
-const getCommentAtPath = (data: IComment[], pt: number[]) => {
+const getCommentAtPath = (data: Model.Comment[], pt: number[]) => {
   if (pt.length === 0) {
     throw new Error("");
   } else if (pt.length === 1) {
@@ -24,7 +24,7 @@ const getCommentAtPath = (data: IComment[], pt: number[]) => {
   }
 };
 
-const insertCommentAtPath = (data: IComment[], comment: IComment, pt: number[]) => {
+const insertCommentAtPath = (data: Model.Comment[], comment: Model.Comment, pt: number[]) => {
   const newData = [...data];
   if (pt.length === 0) {
     throw new Error("");
@@ -42,7 +42,7 @@ const insertCommentAtPath = (data: IComment[], comment: IComment, pt: number[]) 
   return newData;
 };
 
-const findPath = (id: number, data: IComment[], current: number[] = []): number[] | undefined => {
+const findPath = (id: number, data: Model.Comment[], current: number[] = []): number[] | undefined => {
   for (let i = 0; i < data.length; i++) {
     if (data[i].id === id) {
       return concat(current, [i]);
@@ -55,7 +55,7 @@ const findPath = (id: number, data: IComment[], current: number[] = []): number[
   }
 };
 
-export type ICommentsListResponseActionMap = {
+export type CommentsListResponseActionMap = {
   SetSearch: string;
   Loading: string;
   Response: string;
@@ -92,11 +92,11 @@ export type ICommentsListResponseActionMap = {
  * @param options   Additional options supplied to the reducer factory.
  */
 export const createCommentsListResponseReducer = <
-  S extends Redux.ICommentsListResponseStore = Redux.ICommentsListResponseStore,
-  A extends Redux.IAction<any> = Redux.IAction<any>
+  S extends Redux.CommentsListResponseStore = Redux.CommentsListResponseStore,
+  A extends Redux.Action<any> = Redux.Action<any>
 >(
   /* eslint-disable indent */
-  mappings: Partial<ICommentsListResponseActionMap>,
+  mappings: Partial<CommentsListResponseActionMap>,
   options: Partial<FactoryOptions<S, A>> = {}
 ): Reducer<S, A> => {
   const Options = mergeOptionsWithDefaults<S, A>(options, initialCommentsListResponseState as S);
@@ -105,7 +105,7 @@ export const createCommentsListResponseReducer = <
   if (!isNil(mappings.Replying)) {
     subReducers = { ...subReducers, replying: createModelListActionReducer(mappings.Replying) };
   }
-  const genericListResponseReducer = createListResponseReducer<IComment, S, A>(
+  const genericListResponseReducer = createListResponseReducer<Model.Comment, S, A>(
     {
       Response: mappings.Response,
       Request: mappings.Request,
@@ -119,8 +119,8 @@ export const createCommentsListResponseReducer = <
     }
   );
 
-  const reducers: MappedReducers<ICommentsListResponseActionMap, S, A> = {
-    AddToState: (st: S = Options.initialState, action: Redux.IAction<{ data: IComment; parent?: number }>) => {
+  const reducers: MappedReducers<CommentsListResponseActionMap, S, A> = {
+    AddToState: (st: S = Options.initialState, action: Redux.Action<{ data: Model.Comment; parent?: number }>) => {
       if (!isNil(action.payload.parent)) {
         const path = findPath(action.payload.parent, st.data);
         if (isNil(path)) {
@@ -156,7 +156,7 @@ export const createCommentsListResponseReducer = <
         }
       }
     },
-    RemoveFromState: (st: S = Options.initialState, action: Redux.IAction<number>) => {
+    RemoveFromState: (st: S = Options.initialState, action: Redux.Action<number>) => {
       const path = findPath(action.payload, st.data);
       if (isNil(path)) {
         warnInconsistentState({
@@ -169,7 +169,7 @@ export const createCommentsListResponseReducer = <
         if (path.length === 1) {
           return {
             ...st,
-            data: filter(st.data, (cmt: IComment) => cmt.id !== action.payload),
+            data: filter(st.data, (cmt: Model.Comment) => cmt.id !== action.payload),
             count: st.count - 1
           };
         } else {
@@ -179,7 +179,10 @@ export const createCommentsListResponseReducer = <
         }
       }
     },
-    UpdateInState: (st: S = Options.initialState, action: Redux.IAction<Redux.UpdateModelActionPayload<IComment>>) => {
+    UpdateInState: (
+      st: S = Options.initialState,
+      action: Redux.Action<Redux.UpdateModelActionPayload<Model.Comment>>
+    ) => {
       const path = findPath(action.payload.id, st.data);
       if (isNil(path)) {
         warnInconsistentState({
@@ -194,7 +197,7 @@ export const createCommentsListResponseReducer = <
         if (path.length === 1) {
           return {
             ...st,
-            data: replaceInArray<IComment>(st.data, { id: action.payload.id }, { ...existing, ...withoutId })
+            data: replaceInArray<Model.Comment>(st.data, { id: action.payload.id }, { ...existing, ...withoutId })
           };
         } else {
           const parent = getCommentAtPath(st.data, path.slice(0, -1));
@@ -208,7 +211,7 @@ export const createCommentsListResponseReducer = <
     }
   };
 
-  return createObjectReducerFromMap<ICommentsListResponseActionMap, S, A>(mappings, reducers, {
+  return createObjectReducerFromMap<CommentsListResponseActionMap, S, A>(mappings, reducers, {
     ...Options,
     extension: genericListResponseReducer
   });

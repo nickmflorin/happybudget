@@ -43,11 +43,11 @@ export function* updateFringeTask(id: number, change: Table.RowChange<Table.Frin
 }
 
 export function* createFringeTask(row: Table.FringeRow): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     yield put(creatingFringeAction(true));
     try {
-      const response: IFringe = yield call(createFringe, budgetId, FringeRowManager.payload(row));
+      const response: Model.Fringe = yield call(createFringe, budgetId, FringeRowManager.payload(row));
       yield put(activatePlaceholderAction({ id: row.id, model: response }));
     } catch (e) {
       yield call(handleTableErrors, e, "There was an error updating the fringe.", row.id, (errors: Table.CellError[]) =>
@@ -60,7 +60,7 @@ export function* createFringeTask(row: Table.FringeRow): SagaIterator {
 }
 
 export function* bulkUpdateFringesTask(id: number, changes: Table.RowChange<Table.FringeRow>[]): SagaIterator {
-  const requestPayload: Http.IFringeBulkUpdatePayload[] = map(changes, (change: Table.RowChange<Table.FringeRow>) => ({
+  const requestPayload: Http.FringeBulkUpdatePayload[] = map(changes, (change: Table.RowChange<Table.FringeRow>) => ({
     id: change.id,
     ...FringeRowManager.payload(change)
   }));
@@ -83,10 +83,10 @@ export function* bulkUpdateFringesTask(id: number, changes: Table.RowChange<Tabl
 }
 
 export function* bulkCreateFringesTask(id: number, rows: Table.FringeRow[]): SagaIterator {
-  const requestPayload: Http.IFringePayload[] = map(rows, (row: Table.FringeRow) => FringeRowManager.payload(row));
+  const requestPayload: Http.FringePayload[] = map(rows, (row: Table.FringeRow) => FringeRowManager.payload(row));
   yield put(creatingFringeAction(true));
   try {
-    const fringes: IFringe[] = yield call(bulkCreateFringes, id, requestPayload);
+    const fringes: Model.Fringe[] = yield call(bulkCreateFringes, id, requestPayload);
     for (let i = 0; i < fringes.length; i++) {
       // It is not ideal that we have to do this, but we have no other way to map a placeholder
       // to the returned Fringe when bulk creating.  We can rely on the name field being
@@ -113,12 +113,12 @@ export function* bulkCreateFringesTask(id: number, rows: Table.FringeRow[]): Sag
   }
 }
 
-export function* handleFringeRemovalTask(action: Redux.IAction<number>): SagaIterator {
+export function* handleFringeRemovalTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    const models: IFringe[] = yield select((state: Redux.IApplicationStore) => state.budget.fringes.data);
-    const model: IFringe | undefined = find(models, { id: action.payload });
+    const models: Model.Fringe[] = yield select((state: Redux.ApplicationStore) => state.budget.fringes.data);
+    const model: Model.Fringe | undefined = find(models, { id: action.payload });
     if (isNil(model)) {
-      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.fringes.placeholders);
+      const placeholders = yield select((state: Redux.ApplicationStore) => state.budget.fringes.placeholders);
       const placeholder: Table.FringeRow | undefined = find(placeholders, { id: action.payload });
       if (isNil(placeholder)) {
         /* eslint-disable no-console */
@@ -136,14 +136,14 @@ export function* handleFringeRemovalTask(action: Redux.IAction<number>): SagaIte
   }
 }
 
-export function* handleFringeUpdateTask(action: Redux.IAction<Table.RowChange<Table.FringeRow>>): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+export function* handleFringeUpdateTask(action: Redux.Action<Table.RowChange<Table.FringeRow>>): SagaIterator {
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const id = action.payload.id;
-    const data: IFringe[] = yield select((state: Redux.IApplicationStore) => state.budget.fringes.data);
-    const model: IFringe | undefined = find(data, { id });
+    const data: Model.Fringe[] = yield select((state: Redux.ApplicationStore) => state.budget.fringes.data);
+    const model: Model.Fringe | undefined = find(data, { id });
     if (isNil(model)) {
-      const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.fringes.placeholders);
+      const placeholders = yield select((state: Redux.ApplicationStore) => state.budget.fringes.placeholders);
       const placeholder: Table.FringeRow | undefined = find(placeholders, { id });
       if (isNil(placeholder)) {
         /* eslint-disable no-console */
@@ -170,8 +170,8 @@ export function* handleFringeUpdateTask(action: Redux.IAction<Table.RowChange<Ta
   }
 }
 
-export function* handleFringesBulkUpdateTask(action: Redux.IAction<Table.RowChange<Table.FringeRow>[]>): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+export function* handleFringesBulkUpdateTask(action: Redux.Action<Table.RowChange<Table.FringeRow>[]>): SagaIterator {
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange<Table.FringeRow>[] };
     const merged: Table.RowChange<Table.FringeRow>[] = map(
@@ -181,14 +181,14 @@ export function* handleFringesBulkUpdateTask(action: Redux.IAction<Table.RowChan
       }
     );
 
-    const data = yield select((state: Redux.IApplicationStore) => state.budget.fringes.data);
-    const placeholders = yield select((state: Redux.IApplicationStore) => state.budget.fringes.placeholders);
+    const data = yield select((state: Redux.ApplicationStore) => state.budget.fringes.data);
+    const placeholders = yield select((state: Redux.ApplicationStore) => state.budget.fringes.placeholders);
 
     const mergedUpdates: Table.RowChange<Table.FringeRow>[] = [];
     const placeholdersToCreate: Table.FringeRow[] = [];
 
     for (let i = 0; i < merged.length; i++) {
-      const model: IFringe | undefined = find(data, { id: merged[i].id });
+      const model: Model.Fringe | undefined = find(data, { id: merged[i].id });
       if (isNil(model)) {
         const placeholder: Table.FringeRow | undefined = find(placeholders, { id: merged[i].id });
         if (isNil(placeholder)) {

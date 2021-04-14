@@ -1,6 +1,6 @@
 import { initialListResponseState } from "store/initialState";
 
-const initialState: Redux.Dashboard.IStore = {
+const initialState: Redux.Dashboard.Store = {
   contacts: initialListResponseState,
   budgets: {
     trash: { ...initialListResponseState, restoring: [], permanentlyDeleting: [] },

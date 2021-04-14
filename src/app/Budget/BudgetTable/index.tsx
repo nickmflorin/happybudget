@@ -62,10 +62,10 @@ export * from "./model";
 
 const BudgetTable = <
   R extends Table.Row<G, C>,
-  M extends Model,
-  G extends IGroup<any>,
+  M extends Model.Model,
+  G extends Model.Group<any>,
   P extends Http.ModelPayload<M> = {},
-  C extends Model = Model
+  C extends Model.Model = Model.Model
 >({
   /* eslint-disable indent */
   bodyColumns,

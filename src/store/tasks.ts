@@ -9,7 +9,7 @@ export function* handleTableErrors(
   e: Error,
   message: string,
   id: number,
-  action: (errors: Table.CellError[]) => Redux.IAction<any>
+  action: (errors: Table.CellError[]) => Redux.Action<any>
 ): SagaIterator {
   if (e instanceof ClientError) {
     const global = parseGlobalError(e);

@@ -24,9 +24,9 @@ export type IDetailResponseActionMap = {
  * @param options   Additional options supplied to the reducer factory.
  */
 export const createDetailResponseReducer = <
-  M extends Model,
-  S extends Redux.IDetailResponseStore<M> = Redux.IDetailResponseStore<M>,
-  A extends Redux.IAction<any> = Redux.IAction<any>
+  M extends Model.Model,
+  S extends Redux.DetailResponseStore<M> = Redux.DetailResponseStore<M>,
+  A extends Redux.Action<any> = Redux.Action<any>
 >(
   /* eslint-disable indent */
   mappings: Partial<IDetailResponseActionMap>,
@@ -35,14 +35,14 @@ export const createDetailResponseReducer = <
   const Options = mergeOptionsWithDefaults<S, A>(options, initialDetailResponseState as S);
 
   const transformers: MappedReducers<IDetailResponseActionMap, S, A> = {
-    Response: (st: S = Options.initialState, action: Redux.IAction<M>) => ({
+    Response: (st: S = Options.initialState, action: Redux.Action<M>) => ({
       ...st,
       data: action.payload,
       responseWasReceived: true
     }),
-    Loading: (st: S = Options.initialState, action: Redux.IAction<boolean>) => ({ ...st, loading: action.payload }),
+    Loading: (st: S = Options.initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload }),
     RemoveFromState: (st: S = Options.initialState) => ({ ...st, data: undefined }),
-    UpdateInState: (st: S = Options.initialState, action: Redux.IAction<Partial<M>>) => ({
+    UpdateInState: (st: S = Options.initialState, action: Redux.Action<Partial<M>>) => ({
       ...st,
       data: { ...st.data, ...action.payload }
     }),

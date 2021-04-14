@@ -14,7 +14,7 @@ import AccountsCommentsHistory from "./AccountsCommentsHistory";
 import { isNil } from "lodash";
 
 const selectAccountsTableLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.accounts.loading
+  (state: Redux.ApplicationStore) => state.budget.accounts.loading
 );
 
 const Accounts = (): JSX.Element => {

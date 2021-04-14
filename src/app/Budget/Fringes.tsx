@@ -24,17 +24,17 @@ import {
 } from "./store/actions/fringes";
 import BudgetTable from "./BudgetTable";
 
-const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.selected);
-const selectData = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.data);
-const selectTableSearch = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.budget.fringes.search);
+const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.fringes.selected);
+const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.fringes.data);
+const selectTableSearch = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.budget.fringes.search);
 const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.fringes.placeholders
+  (state: Redux.ApplicationStore) => state.budget.fringes.placeholders
 );
-const selectLoading = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.loading);
+const selectLoading = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.budget.actuals.loading);
 const selectSaving = createSelector(
-  (state: Redux.IApplicationStore) => state.budget.fringes.deleting,
-  (state: Redux.IApplicationStore) => state.budget.fringes.updating,
-  (state: Redux.IApplicationStore) => state.budget.fringes.creating,
+  (state: Redux.ApplicationStore) => state.budget.fringes.deleting,
+  (state: Redux.ApplicationStore) => state.budget.fringes.updating,
+  (state: Redux.ApplicationStore) => state.budget.fringes.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
@@ -54,7 +54,7 @@ const Fringes = (): JSX.Element => {
 
   return (
     <WrapInApplicationSpinner loading={loading}>
-      <BudgetTable<Table.FringeRow, IFringe, IGroup<any>, Http.IFringePayload>
+      <BudgetTable<Table.FringeRow, Model.Fringe, Model.Group<any>, Http.FringePayload>
         data={data}
         placeholders={placeholders}
         manager={FringeRowManager}
@@ -93,7 +93,7 @@ const Fringes = (): JSX.Element => {
             cellClass: classNames("cell--centered"),
             cellRenderer: "FringeUnitCell",
             width: 50,
-            valueSetter: choiceModelValueSetter<Table.FringeRow, FringeUnit>("unit", FringeUnits, {
+            valueSetter: choiceModelValueSetter<Table.FringeRow, Model.FringeUnit>("unit", FringeUnits, {
               allowNull: false
             })
           },

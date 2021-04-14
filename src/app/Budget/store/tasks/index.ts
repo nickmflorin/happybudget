@@ -17,19 +17,19 @@ import {
   clearFringesPlaceholdersToStateAction
 } from "../actions";
 
-export function* handleBudgetChangedTask(action: Redux.IAction<number>): SagaIterator {
+export function* handleBudgetChangedTask(action: Redux.Action<number>): SagaIterator {
   yield all([call(getBudgetTask), call(getBudgetItemsTask), call(getBudgetItemsTreeTask), call(getFringesTask)]);
 }
 
 export function* getBudgetTask(): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
     yield put(loadingBudgetAction(true));
     try {
-      const response: IBudget = yield call(getBudget, budgetId, { cancelToken: source.token });
+      const response: Model.Budget = yield call(getBudget, budgetId, { cancelToken: source.token });
       yield put(responseBudgetAction(response));
     } catch (e) {
       handleRequestError(e, "There was an error retrieving the budget.");
@@ -44,7 +44,7 @@ export function* getBudgetTask(): SagaIterator {
 }
 
 export function* getBudgetItemsTask(): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -66,7 +66,7 @@ export function* getBudgetItemsTask(): SagaIterator {
 }
 
 export function* getBudgetItemsTreeTask(): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -88,7 +88,7 @@ export function* getBudgetItemsTreeTask(): SagaIterator {
 }
 
 export function* getFringesTask(): SagaIterator {
-  const budgetId = yield select((state: Redux.IApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

@@ -5,7 +5,7 @@ import { ActualRowManager } from "lib/tabling/managers";
 import { ActionType } from "../actions";
 import { initialActualsState } from "../initialState";
 
-const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IActualsStore>(
+const listResponseReducer = createListResponseReducer<Model.Actual, Redux.Budget.ActualsStore>(
   {
     Response: ActionType.Actuals.Response,
     Request: ActionType.Actuals.Request,
@@ -38,16 +38,16 @@ const listResponseReducer = createListResponseReducer<IActual, Redux.Budget.IAct
   }
 );
 
-const rootReducer: Reducer<Redux.Budget.IActualsStore, Redux.IAction<any>> = (
-  state: Redux.Budget.IActualsStore = initialActualsState,
-  action: Redux.IAction<any>
-): Redux.Budget.IActualsStore => {
+const rootReducer: Reducer<Redux.Budget.ActualsStore, Redux.Action<any>> = (
+  state: Redux.Budget.ActualsStore = initialActualsState,
+  action: Redux.Action<any>
+): Redux.Budget.ActualsStore => {
   let newState = { ...state };
 
   newState = listResponseReducer(newState, action);
 
   if (action.type === ActionType.Actuals.Placeholders.Activate) {
-    const payload: Table.ActivatePlaceholderPayload<IActual> = action.payload;
+    const payload: Table.ActivatePlaceholderPayload<Model.Actual> = action.payload;
     newState = {
       ...newState,
       placeholders: filter(

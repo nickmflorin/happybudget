@@ -9,7 +9,7 @@ import { EntityText } from "components/typography";
 import "./AncestorsBreadCrumbs.scss";
 
 /* eslint-disable indent */
-const getUrl = (entity: IEntity, budgetId: number): string => {
+const getUrl = (entity: Model.Entity, budgetId: number): string => {
   return entity.type === "subaccount"
     ? `/budgets/${budgetId}/subaccounts/${entity.id}`
     : entity.type === "account"
@@ -37,8 +37,8 @@ const AncestorBreadCrumbItem = ({ className, style = {}, children, url }: Ancest
 };
 
 interface AncestorBreadCrumbSelectItemProps extends StandardComponentProps {
-  instance: IAccount | ISubAccount;
-  budget: IBudget;
+  instance: Model.Account | Model.SubAccount;
+  budget: Model.Budget;
 }
 
 const AncestorBreadCrumbSelectItem = ({
@@ -69,7 +69,7 @@ const AncestorBreadCrumbSelectItem = ({
           <Select.Option value={instance.id}>
             <EntityText>{instance}</EntityText>
           </Select.Option>
-          {map(instance.siblings, (sibling: IEntity) => {
+          {map(instance.siblings, (sibling: Model.Entity) => {
             return (
               <Select.Option value={sibling.id} key={sibling.id}>
                 <EntityText>{sibling}</EntityText>
@@ -83,8 +83,8 @@ const AncestorBreadCrumbSelectItem = ({
 };
 
 interface AncestorBreadCrumbEntityItemProps extends StandardComponentProps {
-  budget: IBudget;
-  children: IEntity;
+  budget: Model.Budget;
+  children: Model.Entity;
 }
 
 const AncestorBreadCrumbEntityItem = ({ children, budget }: AncestorBreadCrumbEntityItemProps): JSX.Element => {
@@ -98,7 +98,7 @@ const AncestorBreadCrumbEntityItem = ({ children, budget }: AncestorBreadCrumbEn
 };
 
 interface AncestorBreadCrumbBudgetItemProps {
-  budget: IBudget;
+  budget: Model.Budget;
 }
 
 const AncestorBreadCrumbBudgetItem = ({ budget }: AncestorBreadCrumbBudgetItemProps): JSX.Element => {
@@ -110,8 +110,8 @@ const AncestorBreadCrumbBudgetItem = ({ budget }: AncestorBreadCrumbBudgetItemPr
 };
 
 interface AncestorsBreadCrumbsProps {
-  instance: IAccount | ISubAccount | null;
-  budget: IBudget;
+  instance: Model.Account | Model.SubAccount | null;
+  budget: Model.Budget;
 }
 
 const AncestorsBreadCrumbs = ({ instance, budget }: AncestorsBreadCrumbsProps): JSX.Element => {
@@ -121,7 +121,7 @@ const AncestorsBreadCrumbs = ({ instance, budget }: AncestorsBreadCrumbsProps): 
       {!isNil(instance) && (
         <React.Fragment>
           <span className={"slash"}>{"/"}</span>
-          {map(instance.ancestors.slice(1), (entity: IEntity, index: number) => {
+          {map(instance.ancestors.slice(1), (entity: Model.Entity, index: number) => {
             return (
               <React.Fragment key={index}>
                 <AncestorBreadCrumbEntityItem budget={budget}>{entity}</AncestorBreadCrumbEntityItem>

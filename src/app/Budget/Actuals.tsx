@@ -27,23 +27,23 @@ import {
 import { selectBudgetDetail } from "./store/selectors";
 import BudgetTable, { GetExportValueParams } from "./BudgetTable";
 
-const selectSelectedRows = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.selected);
-const selectActuals = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.data);
-const selectTableSearch = simpleShallowEqualSelector((state: Redux.IApplicationStore) => state.budget.actuals.search);
+const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.actuals.selected);
+const selectActuals = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.actuals.data);
+const selectTableSearch = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.budget.actuals.search);
 const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.actuals.placeholders
+  (state: Redux.ApplicationStore) => state.budget.actuals.placeholders
 );
 const selectActualsLoading = simpleShallowEqualSelector(
-  (state: Redux.IApplicationStore) => state.budget.actuals.loading
+  (state: Redux.ApplicationStore) => state.budget.actuals.loading
 );
 const selectSaving = createSelector(
-  (state: Redux.IApplicationStore) => state.budget.actuals.deleting,
-  (state: Redux.IApplicationStore) => state.budget.actuals.updating,
-  (state: Redux.IApplicationStore) => state.budget.actuals.creating,
+  (state: Redux.ApplicationStore) => state.budget.actuals.deleting,
+  (state: Redux.ApplicationStore) => state.budget.actuals.updating,
+  (state: Redux.ApplicationStore) => state.budget.actuals.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
-const selectBudgetItems = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.budgetItems.data);
+const selectBudgetItems = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.budgetItems.data);
 
 const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
@@ -63,7 +63,7 @@ const Actuals = (): JSX.Element => {
 
   return (
     <WrapInApplicationSpinner loading={loading}>
-      <BudgetTable<Table.ActualRow, IActual, IGroup<any>, Http.IActualPayload>
+      <BudgetTable<Table.ActualRow, Model.Actual, Model.Group<any>, Http.ActualPayload>
         data={data}
         placeholders={placeholders}
         manager={ActualRowManager}
@@ -75,7 +75,7 @@ const Actuals = (): JSX.Element => {
           cellClass: "borderless",
           cellRenderer: "BudgetItemCell",
           cellRendererParams: {
-            onChange: (object_id: number, parent_type: BudgetItemType, row: Table.ActualRow) => {
+            onChange: (object_id: number, parent_type: Model.BudgetItemType, row: Table.ActualRow) => {
               dispatch(
                 updateActualAction({
                   id: row.id,
@@ -153,9 +153,13 @@ const Actuals = (): JSX.Element => {
             cellClass: "cell--centered",
             cellRenderer: "PaymentMethodsCell",
             flex: 1,
-            valueSetter: choiceModelValueSetter<Table.ActualRow, PaymentMethod>("payment_method", PaymentMethods, {
-              allowNull: true
-            })
+            valueSetter: choiceModelValueSetter<Table.ActualRow, Model.PaymentMethod>(
+              "payment_method",
+              PaymentMethods,
+              {
+                allowNull: true
+              }
+            )
           },
           {
             field: "payment_id",

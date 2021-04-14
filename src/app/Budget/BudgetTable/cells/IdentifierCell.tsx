@@ -12,7 +12,7 @@ import ValueCell, { ValueCellProps } from "./ValueCell";
 import "./index.scss";
 
 interface IdentifierCellProps<R extends Table.Row<any>> extends ValueCellProps<R> {
-  onGroupEdit?: (group: IGroup<any>) => void;
+  onGroupEdit?: (group: Model.Group<any>) => void;
 }
 
 const IdentifierCell = <R extends Table.Row<any>>({ onGroupEdit, ...props }: IdentifierCellProps<R>): JSX.Element => {

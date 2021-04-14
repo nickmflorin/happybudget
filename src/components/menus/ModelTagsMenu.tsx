@@ -7,17 +7,20 @@ import { getKeyValue } from "lib/util";
 
 import "./ModelTagsMenu.scss";
 
-type SingleModelTagsMenuProps<M extends Model> = {
+type SingleModelTagsMenuProps<M extends Model.Model> = {
   onChange: (models: M) => void;
   multiple: false;
 };
 
-type MultipleModelTagsMenuProps<M extends Model> = {
+type MultipleModelTagsMenuProps<M extends Model.Model> = {
   onChange: (models: M[]) => void;
   multiple?: true;
 };
 
-export type ModelTagsMenuProps<M extends Model> = (SingleModelTagsMenuProps<M> | MultipleModelTagsMenuProps<M>) & {
+export type ModelTagsMenuProps<M extends Model.Model> = (
+  | SingleModelTagsMenuProps<M>
+  | MultipleModelTagsMenuProps<M>
+) & {
   models: M[];
   labelField: keyof M;
   uppercase?: boolean;
@@ -26,7 +29,7 @@ export type ModelTagsMenuProps<M extends Model> = (SingleModelTagsMenuProps<M> |
   style?: React.CSSProperties;
 };
 
-const ModelTagsMenu = <M extends Model>(props: ModelTagsMenuProps<M>): JSX.Element => {
+const ModelTagsMenu = <M extends Model.Model>(props: ModelTagsMenuProps<M>): JSX.Element => {
   const [selected, setSelected] = useState<number[]>([]);
 
   useEffect(() => {

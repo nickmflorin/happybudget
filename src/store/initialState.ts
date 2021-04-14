@@ -1,6 +1,6 @@
 import { forEach } from "lodash";
 
-export const initialListResponseState: Redux.IListResponseStore<any> = {
+export const initialListResponseState: Redux.ListResponseStore<any> = {
   loading: false,
   data: [],
   count: 0,
@@ -14,31 +14,31 @@ export const initialListResponseState: Redux.IListResponseStore<any> = {
   updating: []
 };
 
-export const initialDetailResponseState: Redux.IDetailResponseStore<any> = {
+export const initialDetailResponseState: Redux.DetailResponseStore<any> = {
   loading: false,
   data: undefined,
   responseWasReceived: false
 };
 
-export const initialCommentsListResponseState: Redux.ICommentsListResponseStore = {
+export const initialCommentsListResponseState: Redux.CommentsListResponseStore = {
   ...initialListResponseState,
   replying: []
 };
 
-export const initialLoadingState: Redux.ILoadingStore = {
+export const initialLoadingState: Redux.LoadingStore = {
   elements: [],
   loading: false
 };
 
-export const createInitialUserState = (user: IUser): Redux.IUserStore => {
+export const createInitialUserState = (user: Model.User): Redux.UserStore => {
   return {
     ...user
   };
 };
 
-const createApplicationInitialState = (config: Redux.IApplicationConfig, user: IUser): Redux.IApplicationStore => {
-  const moduleInitialStates: { [key: string]: Redux.IModuleStore } = {};
-  forEach(config, (moduleConfig: Redux.IModuleConfig<any, any>) => {
+const createApplicationInitialState = (config: Redux.ApplicationConfig, user: Model.User): Redux.ApplicationStore => {
+  const moduleInitialStates: { [key: string]: Redux.ModuleStore } = {};
+  forEach(config, (moduleConfig: Redux.ModuleConfig<any, any>) => {
     if (typeof moduleConfig.initialState === "function") {
       moduleInitialStates[moduleConfig.label] = moduleConfig.initialState();
     } else {
@@ -48,7 +48,7 @@ const createApplicationInitialState = (config: Redux.IApplicationConfig, user: I
   return {
     user: createInitialUserState(user),
     drawerVisible: false
-  } as Redux.IApplicationStore;
+  } as Redux.ApplicationStore;
 };
 
 export default createApplicationInitialState;

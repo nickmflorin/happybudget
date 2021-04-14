@@ -8,7 +8,7 @@ interface BudgetItemCellProps extends StandardCellProps<Table.ActualRow> {
   onChange: (object_id: number, parent_type: string, row: Table.ActualRow) => void;
 }
 
-const selectBudgetItemsTree = simpleDeepEqualSelector((state: Redux.IApplicationStore) => state.budget.budgetItemsTree);
+const selectBudgetItemsTree = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.budgetItemsTree);
 
 const BudgetItemCell = ({ onChange, ...props }: BudgetItemCellProps): JSX.Element => {
   // I am not 100% sure that this will properly update the AG Grid component when
@@ -19,7 +19,7 @@ const BudgetItemCell = ({ onChange, ...props }: BudgetItemCellProps): JSX.Elemen
     <Cell {...props}>
       <BudgetItemTreeDropdown
         value={props.node.data.object_id}
-        onChange={(nd: IBudgetItem) => onChange(nd.id, nd.type, props.node.data)}
+        onChange={(nd: Model.BudgetItem) => onChange(nd.id, nd.type, props.node.data)}
         nodes={budgetItemsTree.data}
         buttonProps={{ style: { width: "100%" }, textProps: { style: { textAlign: "left" } } }}
       />

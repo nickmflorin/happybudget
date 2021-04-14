@@ -18,7 +18,7 @@ import fringesRootReducer from "./fringes";
 import subAccountRootReducer from "./subAccount";
 
 const genericReducer = combineReducers({
-  instance: createSimplePayloadReducer<IAccount | ISubAccount | null>(ActionType.SetInstance, null),
+  instance: createSimplePayloadReducer<Model.Account | Model.SubAccount | null>(ActionType.SetInstance, null),
   commentsHistoryDrawerOpen: createSimpleBooleanReducer(ActionType.SetCommentsHistoryDrawerVisibility),
   account: accountRootReducer,
   subaccount: subAccountRootReducer,
@@ -27,7 +27,7 @@ const genericReducer = combineReducers({
   fringes: fringesRootReducer,
   budget: combineReducers({
     id: createSimplePayloadReducer<number | null>(ActionType.Budget.SetId, null),
-    detail: createDetailResponseReducer<IBudget, Redux.IDetailResponseStore<IBudget>, Redux.IAction>({
+    detail: createDetailResponseReducer<Model.Budget, Redux.DetailResponseStore<Model.Budget>, Redux.Action>({
       Response: ActionType.Budget.Response,
       Loading: ActionType.Budget.Loading,
       Request: ActionType.Budget.Request
@@ -45,20 +45,20 @@ const genericReducer = combineReducers({
       Replying: ActionType.Budget.Comments.Replying
     })
   }),
-  budgetItems: createListResponseReducer<IBudgetItem>({
+  budgetItems: createListResponseReducer<Model.BudgetItem>({
     Response: ActionType.BudgetItems.Response,
     Loading: ActionType.BudgetItems.Loading
   }),
-  budgetItemsTree: createListResponseReducer<IBudgetItemNode>({
+  budgetItemsTree: createListResponseReducer<Model.BudgetItemNode>({
     Response: ActionType.BudgetItemsTree.Response,
     Loading: ActionType.BudgetItemsTree.Loading
   })
 });
 
-const rootReducer: Reducer<Redux.Budget.IStore, Redux.IAction<any>> = (
-  state: Redux.Budget.IStore = initialState,
-  action: Redux.IAction<any>
-): Redux.Budget.IStore => {
+const rootReducer: Reducer<Redux.Budget.Store, Redux.Action<any>> = (
+  state: Redux.Budget.Store = initialState,
+  action: Redux.Action<any>
+): Redux.Budget.Store => {
   let newState = genericReducer(state, action);
 
   if (!isNil(action.payload)) {
@@ -70,14 +70,14 @@ const rootReducer: Reducer<Redux.Budget.IStore, Redux.IAction<any>> = (
     ) {
       // Update the overall SubAccount based on the underlying SubAccount(s) present and any potential
       // placeholders present.
-      const subAccounts: ISubAccount[] = newState.subaccount.subaccounts.data;
+      const subAccounts: Model.SubAccount[] = newState.subaccount.subaccounts.data;
       const placeholders: Table.SubAccountRow[] = newState.subaccount.subaccounts.placeholders;
       // Right now, the backend is configured such that the Actual value for the overall SubAccount is
       // determined from the Actual values tied to that SubAccount, not the underlying SubAccount(s).
       // If that logic changes in the backend, we need to also make that adjustment here.
-      let payload: Partial<ISubAccount> = {
+      let payload: Partial<Model.SubAccount> = {
         estimated:
-          reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0) +
+          reduce(subAccounts, (sum: number, s: Model.SubAccount) => sum + (s.estimated || 0), 0) +
           reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.estimated || 0), 0)
       };
       if (!isNil(newState.subaccount.detail.data)) {
@@ -105,16 +105,16 @@ const rootReducer: Reducer<Redux.Budget.IStore, Redux.IAction<any>> = (
     ) {
       // Update the overall Account based on the underlying SubAccount(s) present and any potential
       // placeholders present.
-      const subAccounts: ISubAccount[] = newState.account.subaccounts.data;
+      const subAccounts: Model.SubAccount[] = newState.account.subaccounts.data;
       const placeholders: Table.SubAccountRow[] = newState.account.subaccounts.placeholders;
       // Right now, the backend is configured such that the Actual value for the overall Account is
       // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
       // in the backend, we need to also make that adjustment here.
       const actual =
-        reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0) +
+        reduce(subAccounts, (sum: number, s: Model.SubAccount) => sum + (s.actual || 0), 0) +
         reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.actual || 0), 0);
       const estimated =
-        reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0) +
+        reduce(subAccounts, (sum: number, s: Model.SubAccount) => sum + (s.estimated || 0), 0) +
         reduce(placeholders, (sum: number, s: Table.SubAccountRow) => sum + (s.estimated || 0), 0);
       if (!isNil(newState.account.detail.data)) {
         newState = {

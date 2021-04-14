@@ -10,7 +10,7 @@ import { updateContact } from "api/services";
 import { updateContactInStateAction } from "../actions";
 
 interface EditContactModalProps {
-  contact: IContact;
+  contact: Model.Contact;
   visible: boolean;
   onCancel: () => void;
   onSuccess: () => void;
@@ -34,10 +34,10 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
       onOk={() => {
         form
           .validateFields()
-          .then((values: Http.IContactPayload) => {
+          .then((values: Http.ContactPayload) => {
             setLoading(true);
             updateContact(contact.id, values)
-              .then((newContact: IContact) => {
+              .then((newContact: Model.Contact) => {
                 setGlobalError(undefined);
                 form.resetFields();
                 dispatch(updateContactInStateAction({ id: contact.id, data: newContact }));

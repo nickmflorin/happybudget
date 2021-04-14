@@ -12,19 +12,19 @@ import { getKeyValue } from "lib/util";
 
 import "./ModelTagsDropdown.scss";
 
-type SingleModelTagsDropdownProps<M extends Model, V extends number = number> = {
+type SingleModelTagsDropdownProps<M extends Model.Model, V extends number = number> = {
   onChange: (models: M) => void;
   multiple: false;
   value: V | null;
 };
 
-type MultipleModelTagsDropdownProps<M extends Model, V extends number = number> = {
+type MultipleModelTagsDropdownProps<M extends Model.Model, V extends number = number> = {
   onChange: (models: M[]) => void;
   multiple?: true;
   value: V[] | null;
 };
 
-export type ModelTagsDropdownProps<M extends Model, V extends number = number> = (
+export type ModelTagsDropdownProps<M extends Model.Model, V extends number = number> = (
   | SingleModelTagsDropdownProps<M, V>
   | MultipleModelTagsDropdownProps<M, V>
 ) &
@@ -36,7 +36,7 @@ export type ModelTagsDropdownProps<M extends Model, V extends number = number> =
     selected?: number | number[] | null;
   };
 
-const ModelTagsDropdown = <M extends Model, V extends number = number>(
+const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
   props: ModelTagsDropdownProps<M, V>
 ): JSX.Element => {
   const mapping = useMemo((): { [key: number]: { label: string; model: M } } => {

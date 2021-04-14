@@ -7,9 +7,9 @@ import { Form } from "components";
 import { FormProps, FormInstance } from "components/Form";
 import UploadProfileImage from "./UploadProfileImage";
 
-interface UserProfileFormProps extends FormProps<Http.IUserPayload> {
-  form: FormInstance<Http.IUserPayload>;
-  onSubmit: (payload: Partial<Http.IUserPayload>) => void;
+interface UserProfileFormProps extends FormProps<Http.UserPayload> {
+  form: FormInstance<Http.UserPayload>;
+  onSubmit: (payload: Partial<Http.UserPayload>) => void;
   onUploadError: (error: string) => void;
 }
 
@@ -29,7 +29,7 @@ const UserProfileForm = ({
       layout={"vertical"}
       name={"form_in_modal"}
       initialValues={initialValues}
-      onFinish={(values: Partial<Http.IUserPayload>) => onSubmit({ ...values, profile_image: file })}
+      onFinish={(values: Partial<Http.UserPayload>) => onSubmit({ ...values, profile_image: file })}
     >
       <Form.Item
         name={"first_name"}

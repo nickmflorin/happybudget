@@ -1,12 +1,12 @@
 import ModelTagsMenu from "./ModelTagsMenu";
 
-export interface OptionTagsMenuProps<I extends number, N extends string, M extends ChoiceModel<I, N>>
+export interface OptionTagsMenuProps<I extends number, N extends string, M extends Model.Choice<I, N>>
   extends StandardComponentProps {
   models: M[];
   onChange: (value: I) => void;
 }
 
-const OptionTagsMenu = <I extends number, N extends string, M extends ChoiceModel<I, N> = ChoiceModel<I, N>>({
+const OptionTagsMenu = <I extends number, N extends string, M extends Model.Choice<I, N> = Model.Choice<I, N>>({
   /* eslint-disable indent */
   onChange,
   models,

@@ -1,4 +1,4 @@
-export const userToSimpleUser = (user: IUser): ISimpleUser => {
+export const userToSimpleUser = (user: Model.User): Model.SimpleUser => {
   return {
     id: user.id,
     first_name: user.first_name,

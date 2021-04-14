@@ -15,11 +15,11 @@ export type ITablePlaceholdersActionMap = {
 export const createTablePlaceholdersReducer = <
   /* eslint-disable indent */
   R extends Table.Row<G, C>,
-  M extends Model,
-  G extends IGroup<any>,
+  M extends Model.Model,
+  G extends Model.Group<any>,
   P extends Http.ModelPayload<M>,
-  C extends Model = Model,
-  A extends Redux.IAction<any> = Redux.IAction<any>
+  C extends Model.Model = Model.Model,
+  A extends Redux.Action<any> = Redux.Action<any>
 >(
   mappings: Partial<ITablePlaceholdersActionMap>,
   mapping: Mapping<R, M, G, P, C>,
@@ -29,7 +29,7 @@ export const createTablePlaceholdersReducer = <
 
   const transformers: MappedReducers<ITablePlaceholdersActionMap, Redux.ListStore<R>, A> = {
     Clear: () => [],
-    AddToState: (st: Redux.ListStore<R> = [], action: Redux.IAction<number | null>) => {
+    AddToState: (st: Redux.ListStore<R> = [], action: Redux.Action<number | null>) => {
       const placeholders: R[] = [];
       const numPlaceholders = action.payload || 1;
       for (let i = 0; i < numPlaceholders; i++) {
@@ -37,7 +37,7 @@ export const createTablePlaceholdersReducer = <
       }
       return [...st, ...placeholders];
     },
-    RemoveFromState: (st: Redux.ListStore<R> = [], action: Redux.IAction<number>) => {
+    RemoveFromState: (st: Redux.ListStore<R> = [], action: Redux.Action<number>) => {
       const row: R | undefined = find(st, { id: action.payload } as any);
       if (isNil(row)) {
         warnInconsistentState({
@@ -49,7 +49,7 @@ export const createTablePlaceholdersReducer = <
         return filter(st, (r: R) => r.id !== action.payload);
       }
     },
-    UpdateInState: (st: Redux.ListStore<R> = [], action: Redux.IAction<R>) => {
+    UpdateInState: (st: Redux.ListStore<R> = [], action: Redux.Action<R>) => {
       const row: R | undefined = find(st, { id: action.payload.id } as any);
       if (isNil(row)) {
         warnInconsistentState({

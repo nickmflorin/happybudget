@@ -29,7 +29,7 @@ const Template = ({ config }: TemplateProps): JSX.Element => {
         productionType={config.productionType}
         open={createModalOpen}
         onCancel={() => setCreateModalOpen(false)}
-        onSuccess={(budget: IBudget) => {
+        onSuccess={(budget: Model.Budget) => {
           setCreateModalOpen(false);
           dispatch(addBudgetToStateAction(ActionDomains.ACTIVE, budget));
           history.push(`budgets/${budget.id}/accounts`);

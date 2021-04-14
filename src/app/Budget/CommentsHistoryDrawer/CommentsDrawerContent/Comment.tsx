@@ -14,7 +14,7 @@ import { useLoggedInUser } from "store/hooks";
 import CommentEdit from "./CommentEdit";
 import "./Comment.scss";
 
-const CommentHeader = (props: { comment: IComment }): JSX.Element => {
+const CommentHeader = (props: { comment: Model.Comment }): JSX.Element => {
   return (
     <div className={"comment-header"}>
       <AccountCircleLink user={props.comment.user} />
@@ -25,7 +25,7 @@ const CommentHeader = (props: { comment: IComment }): JSX.Element => {
 };
 
 interface CommentBodyProps {
-  comment: IComment;
+  comment: Model.Comment;
   onDoneEditing: (value: string) => void;
   onCancelEditing: () => void;
   editing: boolean;
@@ -51,7 +51,7 @@ const CommentBody = ({ comment, editing, onDoneEditing, onCancelEditing }: Comme
 };
 
 interface CommentFooterProps {
-  comment: IComment;
+  comment: Model.Comment;
   onDelete?: () => void;
   onEdit?: () => void;
   onLike?: () => void;
@@ -98,7 +98,7 @@ const ComentFooter = ({ comment, onDelete, onEdit, onLike, onReply }: CommentFoo
 };
 
 interface CommentProps {
-  comment: IComment;
+  comment: Model.Comment;
   onDelete?: () => void;
   onDoneEditing?: (value: string) => void;
   onLike?: () => void;

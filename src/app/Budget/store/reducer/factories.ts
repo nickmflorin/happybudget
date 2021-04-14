@@ -54,8 +54,8 @@ export interface SubAccountsReducerFactoryActionMap {
 
 export const createSubAccountsReducer = (
   mapping: SubAccountsReducerFactoryActionMap
-): Reducer<Redux.Budget.ISubAccountsStore, Redux.IAction<any>> => {
-  const listResponseReducer = createListResponseReducer<ISubAccount, Redux.Budget.ISubAccountsStore>(
+): Reducer<Redux.Budget.SubAccountsStore, Redux.Action<any>> => {
+  const listResponseReducer = createListResponseReducer<Model.SubAccount, Redux.Budget.SubAccountsStore>(
     {
       Response: mapping.Response,
       Request: mapping.Request,
@@ -85,8 +85,8 @@ export const createSubAccountsReducer = (
           SubAccountRowManager
         ),
         groups: createListResponseReducer<
-          IGroup<ISimpleSubAccount>,
-          Redux.IListResponseStore<IGroup<ISimpleSubAccount>>
+          Model.Group<Model.SimpleSubAccount>,
+          Redux.ListResponseStore<Model.Group<Model.SimpleSubAccount>>
         >({
           Response: mapping.Groups.Response,
           Request: mapping.Groups.Request,
@@ -96,7 +96,7 @@ export const createSubAccountsReducer = (
           UpdateInState: mapping.Groups.UpdateInState,
           Deleting: mapping.Groups.Deleting
         }),
-        history: createListResponseReducer<HistoryEvent>({
+        history: createListResponseReducer<Model.HistoryEvent>({
           Response: mapping.History.Response,
           Request: mapping.History.Request,
           Loading: mapping.History.Loading
@@ -106,9 +106,9 @@ export const createSubAccountsReducer = (
   );
 
   const recalculateGroupMetrics = (
-    st: Redux.Budget.ISubAccountsStore,
+    st: Redux.Budget.SubAccountsStore,
     groupId: number
-  ): Redux.Budget.ISubAccountsStore => {
+  ): Redux.Budget.SubAccountsStore => {
     // This might not be totally necessary, but it is good practice to not use the entire payload
     // to update the group (since that is already done by the reducer above) but to instead just
     // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -117,7 +117,7 @@ export const createSubAccountsReducer = (
     if (isNil(group)) {
       throw new Error(`The group with ID ${groupId} no longer exists in state!`);
     }
-    const childrenIds = map(group.children, (child: ISimpleSubAccount) => child.id);
+    const childrenIds = map(group.children, (child: Model.SimpleSubAccount) => child.id);
     const subAccounts = filter(
       map(childrenIds, (id: number) => {
         const subAccount = find(st.data, { id });
@@ -132,15 +132,15 @@ export const createSubAccountsReducer = (
           return null;
         }
       }),
-      (child: ISubAccount | null) => child !== null
-    ) as ISubAccount[];
-    const actual = reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.actual || 0), 0);
-    const estimated = reduce(subAccounts, (sum: number, s: ISubAccount) => sum + (s.estimated || 0), 0);
+      (child: Model.SubAccount | null) => child !== null
+    ) as Model.SubAccount[];
+    const actual = reduce(subAccounts, (sum: number, s: Model.SubAccount) => sum + (s.actual || 0), 0);
+    const estimated = reduce(subAccounts, (sum: number, s: Model.SubAccount) => sum + (s.estimated || 0), 0);
     return {
       ...st,
       groups: {
         ...st.groups,
-        data: replaceInArray<IGroup<ISimpleSubAccount>>(
+        data: replaceInArray<Model.Group<Model.SimpleSubAccount>>(
           st.groups.data,
           { id: group.id },
           { ...group, ...{ estimated, actual, variance: estimated - actual } }
@@ -150,13 +150,13 @@ export const createSubAccountsReducer = (
   };
 
   const recalculateSubAccountFromFringes = (
-    st: Redux.Budget.ISubAccountsStore,
-    subAccount: ISubAccount
-  ): ISubAccount => {
+    st: Redux.Budget.SubAccountsStore,
+    subAccount: Model.SubAccount
+  ): Model.SubAccount => {
     if (!isNil(subAccount.estimated)) {
-      const fringes: IFringe[] = filter(
+      const fringes: Model.Fringe[] = filter(
         map(subAccount.fringes, (id: number) => {
-          const fringe: IFringe | undefined = find(st.fringes.data, { id });
+          const fringe: Model.Fringe | undefined = find(st.fringes.data, { id });
           if (!isNil(fringe)) {
             return fringe;
           } else {
@@ -169,8 +169,8 @@ export const createSubAccountsReducer = (
             return null;
           }
         }),
-        (fringe: IFringe | null) => fringe !== null
-      ) as IFringe[];
+        (fringe: Model.Fringe | null) => fringe !== null
+      ) as Model.Fringe[];
       return { ...subAccount, estimated: fringeValue(subAccount.estimated, fringes) };
     } else {
       return subAccount;
@@ -178,9 +178,9 @@ export const createSubAccountsReducer = (
   };
 
   const recalculateSubAccountMetrics = (
-    st: Redux.Budget.ISubAccountsStore,
+    st: Redux.Budget.SubAccountsStore,
     id: number
-  ): Redux.Budget.ISubAccountsStore => {
+  ): Redux.Budget.SubAccountsStore => {
     let subAccount = find(st.data, { id });
     if (isNil(subAccount)) {
       /* eslint-disable no-console */
@@ -196,7 +196,7 @@ export const createSubAccountsReducer = (
       // values of it's SubAccount(s) on another page are altered.
       if (subAccount.subaccounts.length === 0 && !isNil(subAccount.quantity) && !isNil(subAccount.rate)) {
         const multiplier = subAccount.multiplier || 1.0;
-        let payload: Partial<ISubAccount> = {
+        let payload: Partial<Model.SubAccount> = {
           estimated: multiplier * subAccount.quantity * subAccount.rate
         };
         if (!isNil(subAccount.actual) && !isNil(payload.estimated)) {
@@ -207,7 +207,7 @@ export const createSubAccountsReducer = (
 
         return {
           ...st,
-          data: replaceInArray<ISubAccount>(st.data, { id: subAccount.id }, subAccount)
+          data: replaceInArray<Model.SubAccount>(st.data, { id: subAccount.id }, subAccount)
         };
       } else {
         return st;
@@ -216,9 +216,9 @@ export const createSubAccountsReducer = (
   };
 
   const recalculatePlaceholderMetrics = (
-    st: Redux.Budget.ISubAccountsStore,
+    st: Redux.Budget.SubAccountsStore,
     id: number
-  ): Redux.Budget.ISubAccountsStore => {
+  ): Redux.Budget.SubAccountsStore => {
     const row = find(st.placeholders, { id });
     if (isNil(row)) {
       /* eslint-disable no-console */
@@ -252,19 +252,19 @@ export const createSubAccountsReducer = (
   };
 
   return (
-    state: Redux.Budget.ISubAccountsStore = initialSubAccountsState,
-    action: Redux.IAction<any>
-  ): Redux.Budget.ISubAccountsStore => {
+    state: Redux.Budget.SubAccountsStore = initialSubAccountsState,
+    action: Redux.Action<any>
+  ): Redux.Budget.SubAccountsStore => {
     let newState = { ...state };
 
     newState = listResponseReducer(newState, action);
 
     if (action.type === mapping.Groups.UpdateInState) {
-      const group: IGroup<ISimpleSubAccount> = action.payload;
+      const group: Model.Group<Model.SimpleSubAccount> = action.payload;
       newState = recalculateGroupMetrics(newState, group.id);
     } else if (action.type === mapping.Groups.AddToState) {
-      const group: IGroup<ISimpleSubAccount> = action.payload;
-      forEach(group.children, (simpleSubAccount: ISimpleSubAccount) => {
+      const group: Model.Group<Model.SimpleSubAccount> = action.payload;
+      forEach(group.children, (simpleSubAccount: Model.SimpleSubAccount) => {
         const subAccount = find(newState.data, { id: simpleSubAccount.id });
         if (isNil(subAccount)) {
           warnInconsistentState({
@@ -276,7 +276,7 @@ export const createSubAccountsReducer = (
         } else {
           newState = {
             ...newState,
-            data: replaceInArray<ISubAccount>(
+            data: replaceInArray<Model.SubAccount>(
               newState.data,
               { id: simpleSubAccount.id },
               { ...subAccount, group: group.id }
@@ -288,29 +288,37 @@ export const createSubAccountsReducer = (
       // NOTE: Here, we cannot look at the group that was removed from state because the action
       // only includes the group ID and the group was already removed from state.  Instead, we will
       // clear the group for any SubAccount that belongs to a group no longer in state.
-      forEach(newState.data, (subAccount: ISubAccount) => {
+      forEach(newState.data, (subAccount: Model.SubAccount) => {
         if (!isNil(subAccount.group)) {
-          const group: IGroup<ISimpleSubAccount> | undefined = find(newState.groups.data, { id: subAccount.group });
+          const group: Model.Group<Model.SimpleSubAccount> | undefined = find(newState.groups.data, {
+            id: subAccount.group
+          });
           if (isNil(group)) {
             newState = {
               ...newState,
-              data: replaceInArray<ISubAccount>(newState.data, { id: subAccount.id }, { ...subAccount, group: null })
+              data: replaceInArray<Model.SubAccount>(
+                newState.data,
+                { id: subAccount.id },
+                { ...subAccount, group: null }
+              )
             };
           }
         }
       });
     } else if (action.type === mapping.UpdateInState) {
-      const subAccount: ISubAccount = action.payload;
+      const subAccount: Model.SubAccount = action.payload;
       newState = recalculateSubAccountMetrics(newState, subAccount.id);
       if (!isNil(subAccount.group)) {
         newState = recalculateGroupMetrics(newState, subAccount.group);
       }
     } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
-      const group: IGroup<ISimpleSubAccount> | undefined = find(newState.groups.data, (g: IGroup<ISimpleSubAccount>) =>
-        includes(
-          map(g.children, (child: ISimpleSubAccount) => child.id),
-          action.payload
-        )
+      const group: Model.Group<Model.SimpleSubAccount> | undefined = find(
+        newState.groups.data,
+        (g: Model.Group<Model.SimpleSubAccount>) =>
+          includes(
+            map(g.children, (child: Model.SimpleSubAccount) => child.id),
+            action.payload
+          )
       );
       if (isNil(group)) {
         warnInconsistentState({
@@ -323,10 +331,13 @@ export const createSubAccountsReducer = (
           ...newState,
           groups: {
             ...newState.groups,
-            data: replaceInArray<IGroup<ISimpleSubAccount>>(
+            data: replaceInArray<Model.Group<Model.SimpleSubAccount>>(
               newState.groups.data,
               { id: group.id },
-              { ...group, children: filter(group.children, (child: ISimpleSubAccount) => child.id !== action.payload) }
+              {
+                ...group,
+                children: filter(group.children, (child: Model.SimpleSubAccount) => child.id !== action.payload)
+              }
             )
           }
         };
@@ -337,7 +348,7 @@ export const createSubAccountsReducer = (
       newState = recalculatePlaceholderMetrics(newState, row.id);
     } else if (action.type === mapping.Placeholders.Activate) {
       // TODO: Do we need to recalculate group metrics here?
-      const payload: Table.ActivatePlaceholderPayload<ISubAccount> = action.payload;
+      const payload: Table.ActivatePlaceholderPayload<Model.SubAccount> = action.payload;
       newState = {
         ...newState,
         placeholders: filter(

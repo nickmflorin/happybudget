@@ -12,7 +12,7 @@ const Budget = React.lazy(() => componentLoader(() => import("./Budget")));
 const Settings = React.lazy(() => componentLoader(() => import("./Settings")));
 
 const Application = (): JSX.Element => {
-  const applicationLoading = useSelector((state: Redux.IApplicationStore) => state.loading.loading);
+  const applicationLoading = useSelector((state: Redux.ApplicationStore) => state.loading.loading);
 
   return (
     <React.Fragment>

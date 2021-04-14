@@ -6,32 +6,32 @@ namespace Http {
 
   type Method = "POST" | "PATCH" | "GET" | "DELETE";
 
-  interface IRequestOptions extends AxiosRequestConfig {
+  interface RequestOptions extends AxiosRequestConfig {
     retries?: number;
     headers?: { [key: string]: string };
     cancelToken?: any;
   }
 
-  interface IQuery {
+  interface Query {
     [key: string]: any;
   }
 
   type Order = 1 | -1 | 0;
-  type Ordering = { [key: string]: Order };
+  type Ordering = { [key: string]: Http.Order };
 
-  interface IListQuery extends IQuery {
-    readonly ordering?: Ordering;
+  interface ListQuery extends Http.Query {
+    readonly ordering?: Http.Ordering;
     readonly page?: number;
     readonly page_size?: number;
     readonly no_pagination?: string | number | boolean;
     readonly search?: string;
   }
 
-  type ModelPayload<M extends Model> = {
+  type ModelPayload<M extends Model.Model> = {
     [key in keyof Omit<M, "id">]?: any;
   }
 
-  interface IListResponse<T> {
+  interface ListResponse<T> {
     readonly count: number;
     readonly data: T[];
     readonly next?: string | null;
@@ -41,7 +41,7 @@ namespace Http {
   type ErrorType = "unknown" | "http" | "field" | "global" | "auth";
 
   interface ErrorInterface {
-    readonly error_type: ErrorType;
+    readonly error_type: Http.ErrorType;
     readonly code: string;
     readonly message: string;
   }
@@ -51,156 +51,156 @@ namespace Http {
     readonly message: string;
   }
 
-  interface UnknownError extends BaseError implements ErrorInterface {
+  interface UnknownError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "unknown";
   }
 
-  interface FieldError extends BaseError implements ErrorInterface {
+  interface FieldError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "field";
     readonly field: string;
     readonly code: "unique" | "invalid" | "required";
   }
 
-  interface GlobalError extends BaseError implements ErrorInterface {
+  interface GlobalError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "global";
   }
 
-  interface HttpError extends BaseError implements ErrorInterface {
+  interface HttpError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "http";
   }
 
-  interface AuthError extends BaseError implements ErrorInterface {
+  interface AuthError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "auth";
     readonly force_logout?: boolean;
   }
 
-  type Error = HttpError | UnknownError | FieldError | GlobalError | AuthError;
+  type Error = Http.HttpError | Http.UnknownError | Http.FieldError | Http.GlobalError | Http.AuthError;
 
   type ErrorResponse = {
-    errors: Error[];
+    errors: Http.Error[];
     [key: string]: any;
   };
 
-  interface ITokenValidationResponse {
-    readonly user: IUser;
+  interface TokenValidationResponse {
+    readonly user: Model.User;
   }
 
-  interface ISocialPayload {
+  interface SocialPayload {
     readonly token_id: string;
     readonly provider: string;
   }
 
-  interface IRegistrationPayload {
+  interface RegistrationPayload {
     readonly first_name: string;
     readonly last_name: string;
     readonly email: string;
     readonly password: string;
   }
 
-  interface IUserPayload {
+  interface UserPayload {
     readonly first_name: string;
     readonly last_name: string;
     readonly profile_image: File | Blob | null;
   }
 
-  interface ILoginResponse {
+  interface LoginResponse {
     readonly detail: string;
   }
 
-  interface IFileUploadResponse {
+  interface FileUploadResponse {
     readonly fileUrl: string;
   }
 
-  interface IFringePayload implements ModelPayload<IFringe> {
+  interface FringePayload implements Http.ModelPayload<Model.Fringe> {
     readonly name: string;
     readonly description?: string | null;
     readonly cutoff?: number | null;
     readonly rate: number;
-    readonly unit?: FringeUnit;
+    readonly unit?: Model.FringeUnit;
   }
 
-  interface IBudgetPayload implements ModelPayload<IBudget> {
-    readonly production_type: ProductionType;
+  interface BudgetPayload implements Http.ModelPayload<Model.Budget> {
+    readonly production_type: Model.ProductionTypeId;
     readonly name: string;
   }
 
-  interface IGroupPayload implements ModelPayload<IGroup> {
+  interface GroupPayload implements Http.ModelPayload<Model.Group> {
     readonly name: string;
     readonly children?: number[];
     readonly color: string;
   }
 
-  interface IAccountPayload implements ModelPayload<IAccount> {
+  interface AccountPayload implements Http.ModelPayload<Model.Account> {
     readonly account_number: string;
     readonly description?: string;
     readonly access?: number[];
     readonly group?: number | null;
   }
 
-  interface ISubAccountPayload implements ModelPayload<ISubAccount> {
+  interface SubAccountPayload implements Http.ModelPayload<Model.SubAccount> {
     readonly description?: string;
     readonly name: string;
     readonly line: string;
     readonly quantity?: number;
     readonly rate?: number;
     readonly multiplier?: number;
-    readonly unit?: SubAccountUnitId;
+    readonly unit?: Model.SubAccountUnitId;
     readonly group?: number | null;
   }
 
-  interface IActualPayload implements ModelPayload<IActual> {
+  interface ActualPayload implements Http.ModelPayload<Model.Actual> {
     readonly description?: string;
     readonly date?: string;
     readonly vendor?: string;
     readonly purchase_order?: string;
     readonly payment_id?: string;
     readonly value?: number;
-    readonly payment_method?: PaymentMethod;
+    readonly payment_method?: Model.PaymentMethod;
     readonly object_id?: number;
-    readonly parent_type?: BudgetItemType;
+    readonly parent_type?: Model.BudgetItemType;
   }
 
-  interface ICommentPayload implements ModelPayload<IComment> {
+  interface CommentPayload implements Http.ModelPayload<Model.Comment> {
     readonly likes?: number[];
     readonly text: string;
   }
 
-  interface IContactPayload implements ModelPayload<IContact> {
+  interface ContactPayload implements Http.ModelPayload<Model.Contact> {
     readonly first_name: string;
     readonly last_name: string;
     readonly email: string;
-    readonly role: Role;
+    readonly role: Model.ContactRoleId;
     readonly city: string;
     readonly country: string;
     readonly phone_number: string;
     readonly email: string;
   }
 
-  interface ISubAccountBulkUpdatePayload extends Partial<ISubAccountPayload> {
+  interface SubAccountBulkUpdatePayload extends Partial<Http.SubAccountPayload> {
     readonly id: number;
   }
 
-  interface IAccountBulkUpdatePayload extends Partial<IAccountPayload> {
+  interface AccountBulkUpdatePayload extends Partial<Http.AccountPayload> {
     readonly id: number;
   }
 
-  interface IActualBulkUpdatePayload extends Partial<IActualPayload> {
+  interface ActualBulkUpdatePayload extends Partial<Http.ActualPayload> {
     readonly id: number;
   }
 
-  interface IFringeBulkUpdatePayload extends Partial<IFringePayload> {
+  interface FringeBulkUpdatePayload extends Partial<Http.FringePayload> {
     readonly id: number;
   }
 
-  interface IBulkCreateSubAccountsResponse {
-    data: ISubAccount[];
+  interface BulkCreateSubAccountsResponse {
+    data: Model.SubAccount[];
   }
 
-  interface IBulkCreateFringesResponse {
-    data: IFringe[];
+  interface BulkCreateFringesResponse {
+    data: Model.Fringe[];
   }
 
-  interface IBulkCreateAccountsResponse {
-    data: IAccount[];
+  interface BulkCreateAccountsResponse {
+    data: Model.Account[];
   }
 }

@@ -6,42 +6,42 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Redux {
-  interface IModuleStore {
+  interface ModuleStore {
     [key: string]: any;
   }
 
   type ModuleLabel = "dashboard" | "budget";
 
-  type SelectorFunc<T = any> = (state: Redux.IApplicationStore) => T;
+  type SelectorFunc<T = any> = (state: Redux.ApplicationStore) => T;
 
-  interface IActionConfig {
+  interface ActionConfig {
     readonly error?: Error | string | undefined;
     readonly meta?: any;
-    readonly label?: ModuleLabel | ModuleLabel[] | undefined;
+    readonly label?: Redux.ModuleLabel | Redux.ModuleLabel[] | undefined;
   }
 
-  interface IAction<P = any> extends Action<string> {
+  interface Action<P = any> extends Action<string> {
     readonly type: string;
     readonly payload: P;
     readonly error?: Error | string | undefined;
     readonly meta?: any;
-    readonly label?: ModuleLabel | ModuleLabel[] | undefined;
+    readonly label?: Redux.ModuleLabel | Redux.ModuleLabel[] | undefined;
   }
 
-  type ActionCreator<P = any, A extends Redux.IAction<P> = Redux.IAction<P>> = (
+  type ActionCreator<P = any, A extends Redux.Action<P> = Redux.Action<P>> = (
     type: string,
     payload?: P,
-    options?: IActionConfig
+    options?: Redux.ActionConfig
   ) => A;
 
-  interface IModuleConfig<S extends IModuleStore, A extends IAction<any>> {
+  interface ModuleConfig<S extends ModuleStore, A extends Redux.Action<any>> {
     readonly rootSaga?: Saga;
     readonly rootReducer: Reducer<S, A>;
     readonly initialState: S | (() => S);
-    readonly label: ModuleLabel;
+    readonly label: Redux.ModuleLabel;
   }
 
-  type IApplicationConfig = IModuleConfig<any, any>[];
+  type ApplicationConfig = Redux.ModuleConfig<any, any>[];
 
   type ListStore<T> = T[];
 
@@ -54,13 +54,13 @@ namespace Redux {
     data: Partial<M>;
   }
 
-  interface IDetailResponseStore<T extends Model> {
+  interface DetailResponseStore<T extends Model.Model> {
     readonly data: T | undefined;
     readonly loading: boolean;
     readonly responseWasReceived: boolean;
   }
 
-  interface IListResponseStore<T extends Model> {
+  interface ListResponseStore<T extends Model.Model> {
     readonly data: T[];
     readonly count: number;
     readonly loading: boolean;
@@ -69,116 +69,116 @@ namespace Redux {
     readonly search: string;
     readonly selected: number[];
     readonly responseWasReceived: boolean;
-    readonly deleting: ModelListActionStore;
-    readonly updating: ModelListActionStore;
+    readonly deleting: Redux.ModelListActionStore;
+    readonly updating: Redux.ModelListActionStore;
     readonly creating: boolean;
   }
 
-  interface ICommentsListResponseStore extends IListResponseStore<IComment> {
+  interface CommentsListResponseStore extends Redux.ListResponseStore<Model.Comment> {
     readonly replying: number[];
   }
 
-  type IIndexedStore<T> = { [key: number]: T };
-  type IIndexedDetailResponseStore<T> = IIndexedStore<IDetailResponseStore<T>>;
+  type IndexedStore<T> = { [key: number]: T };
+  type IndexedDetailResponseStore<T> = IndexedStore<DetailResponseStore<T>>;
 
-  interface IModulesStore {}
+  interface ModulesStore {}
 
   namespace Dashboard {
     type ActionDomain = "trash" | "active";
 
     /* eslint-disable no-shadow */
-    interface IAction<T = any> extends Redux.IAction<T> {
+    interface Action<T = any> extends Redux.Action<T> {
       readonly domain: ActionDomain;
     }
 
-    interface ITrashBudgetsListStore extends IListResponseStore<IBudget> {
-      readonly restoring: ModelListActionStore;
-      readonly permanentlyDeleting: ModelListActionStore;
+    interface TrashBudgetsListStore extends Redux.ListResponseStore<Model.Budget> {
+      readonly restoring: Redux.ModelListActionStore;
+      readonly permanentlyDeleting: Redux.ModelListActionStore;
     }
 
-    interface IBudgetsStore {
-      readonly active: IListResponseStore<IBudget>;
-      readonly trash: ITrashBudgetsListStore;
+    interface BudgetsStore {
+      readonly active: Redux.ListResponseStore<Model.Budget>;
+      readonly trash: TrashBudgetsListStore;
     }
 
-    interface IStore {
-      readonly budgets: IBudgetsStore;
-      readonly contacts: IListResponseStore<IContact>;
+    interface Store {
+      readonly budgets: BudgetsStore;
+      readonly contacts: Redux.ListResponseStore<Model.Contact>;
     }
   }
 
   namespace Budget {
-    interface ICommentsStore extends IListResponseStore<IComment> {
+    interface CommentsStore extends Redux.ListResponseStore<Model.Comment> {
       readonly replying: number[];
     }
 
-    interface ISubAccountsStore extends IListResponseStore<ISubAccount> {
+    interface SubAccountsStore extends Redux.ListResponseStore<Model.SubAccount> {
       readonly placeholders: ListStore<Table.SubAccountRow>;
-      readonly history: IListResponseStore<IFieldAlterationEvent>;
-      readonly groups: IListResponseStore<IGroup<ISimpleSubAccount>>;
-      readonly fringes: IFringesStore;
+      readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
+      readonly groups: Redux.ListResponseStore<Model.Group<Model.SimpleSubAccount>>;
+      readonly fringes: FringesStore;
     }
 
-    interface IAccountsStore extends IListResponseStore<IAccount> {
+    interface AccountsStore extends Redux.ListResponseStore<Model.Account> {
       readonly placeholders: ListStore<Table.AccountRow>;
-      readonly history: IListResponseStore<IFieldAlterationEvent>;
-      readonly groups: IListResponseStore<IGroup<ISimpleAccount>>;
+      readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
+      readonly groups: Redux.ListResponseStore<Model.Group<Model.SimpleAccount>>;
     }
 
-    interface IFringesStore extends IListResponseStore<IFringe> {
+    interface FringesStore extends Redux.ListResponseStore<Model.Fringe> {
       readonly placeholders: ListStore<Table.FringeRow>;
     }
 
-    interface ISubAccountStore {
+    interface SubAccountStore {
       readonly id: number | null;
-      readonly detail: IDetailResponseStore<ISubAccount>;
-      readonly subaccounts: ISubAccountsStore;
-      readonly comments: ICommentsStore;
+      readonly detail: Redux.DetailResponseStore<Model.SubAccount>;
+      readonly subaccounts: SubAccountsStore;
+      readonly comments: CommentsStore;
     }
 
-    interface IAccountStore {
+    interface AccountStore {
       readonly id: number | null;
-      readonly detail: IDetailResponseStore<IAccount>;
-      readonly subaccounts: ISubAccountsStore;
-      readonly comments: ICommentsStore;
+      readonly detail: Redux.DetailResponseStore<Model.Account>;
+      readonly subaccounts: SubAccountsStore;
+      readonly comments: CommentsStore;
     }
 
-    interface IBudgetStore {
+    interface BudgetStore {
       readonly id: number | null;
-      readonly detail: IDetailResponseStore<IBudget>;
-      readonly comments: ICommentsStore;
+      readonly detail: Redux.DetailResponseStore<Model.Budget>;
+      readonly comments: CommentsStore;
     }
 
-    interface IActualsStore extends IListResponseStore<IActual> {
+    interface ActualsStore extends Redux.ListResponseStore<Model.Actual> {
       readonly placeholders: ListStore<Table.ActualRow>;
     }
 
-    interface IStore {
-      readonly budget: IBudgetStore;
-      readonly instance: IAccount | ISubAccount | null;
+    interface Store {
+      readonly budget: BudgetStore;
+      readonly instance: Model.Account | Model.SubAccount | null;
       readonly commentsHistoryDrawerOpen: boolean;
-      readonly budgetItems: IListResponseStore<IBudgetItem>;
-      readonly budgetItemsTree: IListResponseStore<IBudgetItemTreeNode>;
-      readonly actuals: IActualsStore;
-      readonly subaccount: ISubAccountStore;
-      readonly account: IAccountStore;
-      readonly accounts: IAccountsStore;
-      readonly fringes: IFringesStore;
+      readonly budgetItems: Redux.ListResponseStore<Model.BudgetItem>;
+      readonly budgetItemsTree: Redux.ListResponseStore<Model.BudgetItemTreeNode>;
+      readonly actuals: ActualsStore;
+      readonly subaccount: SubAccountStore;
+      readonly account: AccountStore;
+      readonly accounts: AccountsStore;
+      readonly fringes: FringesStore;
     }
   }
 
-  interface IUserStore extends IUser {}
+  interface UserStore extends Model.User {}
 
-  interface ILoadingStore {
+  interface LoadingStore {
     readonly loading: boolean;
     readonly elements: string[];
   }
 
-  interface IApplicationStore extends IModulesStore {
-    readonly user: IUserStore;
-    readonly dashboard: Dashboard.IStore;
-    readonly budget: Budget.IStore;
+  interface ApplicationStore extends ModulesStore {
+    readonly user: UserStore;
+    readonly dashboard: Dashboard.Store;
+    readonly budget: Budget.Store;
     readonly drawerVisible: boolean;
-    readonly loading: ILoadingStore;
+    readonly loading: LoadingStore;
   }
 }

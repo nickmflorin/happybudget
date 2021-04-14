@@ -3,114 +3,114 @@ import { URL } from "./util";
 
 export const getSubAccountSubAccounts = async (
   subaccountId: number,
-  query: Http.IListQuery = {},
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<ISubAccount>> => {
+  query: Http.ListQuery = {},
+  options: Http.RequestOptions = {}
+): Promise<Http.ListResponse<Model.SubAccount>> => {
   const url = URL.v1("subaccounts", subaccountId, "subaccounts");
-  return client.list<ISubAccount>(url, query, options);
+  return client.list<Model.SubAccount>(url, query, options);
 };
 
 export const createSubAccountSubAccount = async (
   subaccountId: number,
-  payload: Http.ISubAccountPayload,
-  options: Http.IRequestOptions = {}
-): Promise<ISubAccount> => {
+  payload: Http.SubAccountPayload,
+  options: Http.RequestOptions = {}
+): Promise<Model.SubAccount> => {
   const url = URL.v1("subaccounts", subaccountId, "subaccounts");
-  return client.post<ISubAccount>(url, payload, options);
+  return client.post<Model.SubAccount>(url, payload, options);
 };
 
-export const getSubAccount = async (id: number, options: Http.IRequestOptions = {}): Promise<ISubAccount> => {
+export const getSubAccount = async (id: number, options: Http.RequestOptions = {}): Promise<Model.SubAccount> => {
   const url = URL.v1("subaccounts", id);
-  return client.retrieve<ISubAccount>(url, options);
+  return client.retrieve<Model.SubAccount>(url, options);
 };
 
-export const deleteSubAccount = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
+export const deleteSubAccount = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("subaccounts", id);
   return client.delete<null>(url, options);
 };
 
 export const updateSubAccount = async (
   id: number,
-  payload: Partial<Http.ISubAccountPayload>,
-  options: Http.IRequestOptions = {}
-): Promise<IAccount> => {
+  payload: Partial<Http.SubAccountPayload>,
+  options: Http.RequestOptions = {}
+): Promise<Model.Account> => {
   const url = URL.v1("subaccounts", id);
-  return client.patch<IAccount>(url, payload, options);
+  return client.patch<Model.Account>(url, payload, options);
 };
 
 export const bulkUpdateSubAccountSubAccounts = async (
   id: number,
-  data: Http.ISubAccountBulkUpdatePayload[],
-  options: Http.IRequestOptions = {}
-): Promise<IAccount> => {
+  data: Http.SubAccountBulkUpdatePayload[],
+  options: Http.RequestOptions = {}
+): Promise<Model.Account> => {
   const url = URL.v1("subaccounts", id, "bulk-update-subaccounts");
-  return client.patch<IAccount>(url, { data }, options);
+  return client.patch<Model.Account>(url, { data }, options);
 };
 
 export const bulkCreateSubAccountSubAccounts = async (
   id: number,
-  data: Http.ISubAccountPayload[],
-  options: Http.IRequestOptions = {}
-): Promise<ISubAccount[]> => {
+  data: Http.SubAccountPayload[],
+  options: Http.RequestOptions = {}
+): Promise<Model.SubAccount[]> => {
   const url = URL.v1("subaccounts", id, "bulk-create-subaccounts");
   return client
-    .patch<Http.IBulkCreateSubAccountsResponse>(url, { data }, options)
-    .then((response: Http.IBulkCreateSubAccountsResponse) => response.data);
+    .patch<Http.BulkCreateSubAccountsResponse>(url, { data }, options)
+    .then((response: Http.BulkCreateSubAccountsResponse) => response.data);
 };
 
 export const createSubAccountSubAccountGroup = async (
   subaccountId: number,
-  payload: Http.IGroupPayload,
-  options: Http.IRequestOptions = {}
-): Promise<IGroup<ISimpleSubAccount>> => {
+  payload: Http.GroupPayload,
+  options: Http.RequestOptions = {}
+): Promise<Model.Group<Model.SimpleSubAccount>> => {
   const url = URL.v1("subaccounts", subaccountId, "groups");
-  return client.post<IGroup<ISimpleSubAccount>>(url, payload, options);
+  return client.post<Model.Group<Model.SimpleSubAccount>>(url, payload, options);
 };
 
 export const getSubAccountSubAccountGroups = async (
   subaccountId: number,
-  query: Http.IListQuery = {},
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<IGroup<ISimpleSubAccount>>> => {
+  query: Http.ListQuery = {},
+  options: Http.RequestOptions = {}
+): Promise<Http.ListResponse<Model.Group<Model.SimpleSubAccount>>> => {
   const url = URL.v1("subaccounts", subaccountId, "groups");
-  return client.list<IGroup<ISimpleSubAccount>>(url, query, options);
+  return client.list<Model.Group<Model.SimpleSubAccount>>(url, query, options);
 };
 
 export const updateSubAccountGroup = async (
   id: number,
-  payload: Partial<Http.IGroupPayload>,
-  options: Http.IRequestOptions = {}
-): Promise<IGroup<ISimpleSubAccount>> => {
+  payload: Partial<Http.GroupPayload>,
+  options: Http.RequestOptions = {}
+): Promise<Model.Group<Model.SimpleSubAccount>> => {
   const url = URL.v1("subaccounts", "groups", id);
-  return client.patch<IGroup<ISimpleSubAccount>>(url, payload, options);
+  return client.patch<Model.Group<Model.SimpleSubAccount>>(url, payload, options);
 };
 
 export const getSubAccountGroup = async (
   id: number,
-  options: Http.IRequestOptions = {}
-): Promise<IGroup<ISimpleSubAccount>> => {
+  options: Http.RequestOptions = {}
+): Promise<Model.Group<Model.SimpleSubAccount>> => {
   const url = URL.v1("subaccounts", "groups", id);
-  return client.retrieve<IGroup<ISimpleSubAccount>>(url, options);
+  return client.retrieve<Model.Group<Model.SimpleSubAccount>>(url, options);
 };
 
-export const deleteSubAccountGroup = async (id: number, options: Http.IRequestOptions = {}): Promise<null> => {
+export const deleteSubAccountGroup = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("subaccounts", "groups", id);
   return client.delete<null>(url, options);
 };
 
 export const getSubAccountActuals = async (
   id: number,
-  options: Http.IRequestOptions = {}
-): Promise<Http.IListResponse<IActual>> => {
+  options: Http.RequestOptions = {}
+): Promise<Http.ListResponse<Model.Actual>> => {
   const url = URL.v1("subaccounts", id, "actuals");
-  return client.list<IActual>(url, options);
+  return client.list<Model.Actual>(url, options);
 };
 
 export const createSubAccountActual = async (
   id: number,
-  payload: Http.IActualPayload,
-  options: Http.IRequestOptions = {}
-): Promise<IActual> => {
+  payload: Http.ActualPayload,
+  options: Http.RequestOptions = {}
+): Promise<Model.Actual> => {
   const url = URL.v1("subaccounts", id, "actuals");
-  return client.post<IActual>(url, payload, options);
+  return client.post<Model.Actual>(url, payload, options);
 };

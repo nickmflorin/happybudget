@@ -17,8 +17,8 @@ export interface BudgetItemsTreeDropdownProps extends Omit<DropDownProps, "overl
   className?: string;
   value?: number;
   placeholderText?: string;
-  onChange?: (item: IBudgetItem) => void;
-  nodes: IBudgetItemNode[];
+  onChange?: (item: Model.BudgetItem) => void;
+  nodes: Model.BudgetItemNode[];
   buttonProps?: CaretButtonProps;
 }
 
@@ -33,7 +33,7 @@ const BudgetItemsTreeDropdown: React.FC<BudgetItemsTreeDropdownProps> = ({
 }) => {
   const [visible, setVisible] = useState(false);
   const [_value, setValue] = useState<number | undefined>(value);
-  const [currentNode, setCurrentNode] = useState<IBudgetItem | undefined>(undefined);
+  const [currentNode, setCurrentNode] = useState<Model.BudgetItem | undefined>(undefined);
   const flattenedBudgetItemTreeNodes = useMemo(() => flattenBudgetItemNodes(nodes), [nodes]);
   const buttonId = useMemo(() => uniqueId("budget-items-tree-select-button-"), []);
 

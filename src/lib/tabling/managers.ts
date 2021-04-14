@@ -1,10 +1,10 @@
 import { forEach, isNil, includes, find } from "lodash";
 import { generateRandomNumericId, getKeyValue } from "lib/util";
 import { SubAccountUnits, PaymentMethods, FringeUnits } from "lib/model";
-import { findChoiceModelForName } from "lib/model/util";
+import { findChoiceForName } from "lib/model/util";
 import { isRowChange, isRow, isRowChangeData, isModel } from "./typeguards";
 
-type BaseFieldConfig<R extends Table.Row, M extends Model> = {
+type BaseFieldConfig<R extends Table.Row, M extends Model.Model> = {
   // Whether or not the field is required to be present for POST requests (i.e.
   // when creating a new instance).  If the field is required, the mechanics will
   // wait until a value is present for the field before creating an instance
@@ -45,7 +45,7 @@ type BaseFieldConfig<R extends Table.Row, M extends Model> = {
   readonly clipboardValueConverter?: (value: any, field: BaseManagedField<R, M>) => any;
 };
 
-type SplitManagedFieldConfig<R extends Table.Row, M extends Model> = BaseFieldConfig<R, M> & {
+type SplitManagedFieldConfig<R extends Table.Row, M extends Model.Model> = BaseFieldConfig<R, M> & {
   // The name of the field on the model (M) model that the field configuration
   // corresponds to.
   readonly modelField: keyof M;
@@ -54,26 +54,26 @@ type SplitManagedFieldConfig<R extends Table.Row, M extends Model> = BaseFieldCo
   readonly rowField: keyof R;
 };
 
-type AgnosticManagedFieldConfig<R extends Table.Row, M extends Model> = BaseFieldConfig<R, M> & {
+type AgnosticManagedFieldConfig<R extends Table.Row, M extends Model.Model> = BaseFieldConfig<R, M> & {
   // The name of the field on both the row (R) model and model (M) model that the
   // field configuration corresponds to.
   readonly field: keyof M & keyof R;
 };
 
-type ManagedFieldConfig<R extends Table.Row, M extends Model> =
+type ManagedFieldConfig<R extends Table.Row, M extends Model.Model> =
   | SplitManagedFieldConfig<R, M>
   | AgnosticManagedFieldConfig<R, M>;
 
-const isSplitConfig = <R extends Table.Row, M extends Model>(
+const isSplitConfig = <R extends Table.Row, M extends Model.Model>(
   config: ManagedFieldConfig<R, M>
 ): config is SplitManagedFieldConfig<R, M> => {
   return (config as SplitManagedFieldConfig<R, M>).modelField !== undefined;
 };
 
 type PayloadType<T, P, R extends Table.Row> = T extends Table.RowChange<R> ? Partial<P> : P;
-type ObjType<R extends Table.Row, M extends Model> = R | M | Table.RowChange<R> | Table.RowChangeData<R>;
+type ObjType<R extends Table.Row, M extends Model.Model> = R | M | Table.RowChange<R> | Table.RowChangeData<R>;
 
-abstract class BaseManagedField<R extends Table.Row, M extends Model> {
+abstract class BaseManagedField<R extends Table.Row, M extends Model.Model> {
   readonly required?: boolean;
   readonly readOnly?: boolean;
   readonly allowNull?: boolean;
@@ -147,7 +147,7 @@ abstract class BaseManagedField<R extends Table.Row, M extends Model> {
   }
 }
 
-export class AgnosticManagedField<R extends Table.Row, M extends Model>
+export class AgnosticManagedField<R extends Table.Row, M extends Model.Model>
   extends BaseManagedField<R, M>
   implements AgnosticManagedFieldConfig<R, M> {
   readonly field: keyof M & keyof R;
@@ -179,7 +179,7 @@ export class AgnosticManagedField<R extends Table.Row, M extends Model>
   }
 }
 
-export class SplitManagedField<R extends Table.Row, M extends Model>
+export class SplitManagedField<R extends Table.Row, M extends Model.Model>
   extends BaseManagedField<R, M>
   implements SplitManagedFieldConfig<R, M> {
   readonly modelField: keyof M;
@@ -213,15 +213,15 @@ export class SplitManagedField<R extends Table.Row, M extends Model>
   }
 }
 
-const isSplitField = <R extends Table.Row, M extends Model>(
+const isSplitField = <R extends Table.Row, M extends Model.Model>(
   field: ManagedField<R, M>
 ): field is SplitManagedField<R, M> => {
   return (field as SplitManagedField<R, M>).modelField !== undefined;
 };
 
-type ManagedField<R extends Table.Row, M extends Model> = SplitManagedField<R, M> | AgnosticManagedField<R, M>;
+type ManagedField<R extends Table.Row, M extends Model.Model> = SplitManagedField<R, M> | AgnosticManagedField<R, M>;
 
-const ManageField = <R extends Table.Row, M extends Model>(config: ManagedFieldConfig<R, M>) => {
+const ManageField = <R extends Table.Row, M extends Model.Model>(config: ManagedFieldConfig<R, M>) => {
   if (isSplitConfig(config)) {
     return new SplitManagedField<R, M>(config);
   }
@@ -230,9 +230,9 @@ const ManageField = <R extends Table.Row, M extends Model>(config: ManagedFieldC
 
 export interface RowManagerConfig<
   R extends Table.Row<G, C>,
-  M extends Model = Model,
-  G extends IGroup<any> = IGroup<any>,
-  C extends Model = Model
+  M extends Model.Model = Model.Model,
+  G extends Model.Group<any> = Model.Group<any>,
+  C extends Model.Model = Model.Model
 > {
   readonly fields: ManagedField<R, M>[];
   readonly childrenGetter?: ((model: M) => C[]) | string | null;
@@ -255,10 +255,10 @@ const defaultRowMeta: Partial<Table.RowMeta> = {
 
 class RowManager<
   R extends Table.Row<G, C>,
-  M extends Model,
-  G extends IGroup<any>,
+  M extends Model.Model,
+  G extends Model.Group<any>,
   P extends Http.ModelPayload<M>,
-  C extends Model = Model
+  C extends Model.Model = Model.Model
 > implements RowManagerConfig<R, M, G, C> {
   public fields: ManagedField<R, M>[];
   public childrenGetter?: ((model: M) => C[]) | string | null;
@@ -466,10 +466,10 @@ class RowManager<
 
 export const AccountRowManager = new RowManager<
   Table.AccountRow,
-  IAccount,
-  IGroup<ISimpleAccount>,
-  Http.IAccountPayload,
-  ISimpleSubAccount
+  Model.Account,
+  Model.Group<Model.SimpleAccount>,
+  Http.AccountPayload,
+  Model.SimpleSubAccount
 >({
   fields: [
     ManageField({ field: "description" }),
@@ -480,19 +480,19 @@ export const AccountRowManager = new RowManager<
     ManageField({ field: "variance", readOnly: true }),
     ManageField({ field: "actual", readOnly: true })
   ],
-  childrenGetter: (model: IAccount) => model.subaccounts,
-  groupGetter: (model: IAccount) => model.group,
-  labelGetter: (model: IAccount) => model.identifier,
+  childrenGetter: (model: Model.Account) => model.subaccounts,
+  groupGetter: (model: Model.Account) => model.group,
+  labelGetter: (model: Model.Account) => model.identifier,
   typeLabel: "Account",
   rowType: "account"
 });
 
 export const SubAccountRowManager = new RowManager<
   Table.SubAccountRow,
-  ISubAccount,
-  IGroup<ISimpleSubAccount>,
-  Http.ISubAccountPayload,
-  ISimpleSubAccount
+  Model.SubAccount,
+  Model.Group<Model.SimpleSubAccount>,
+  Http.SubAccountPayload,
+  Model.SimpleSubAccount
 >({
   fields: [
     ManageField({ field: "description", allowBlank: true }),
@@ -505,11 +505,11 @@ export const SubAccountRowManager = new RowManager<
     ManageField({
       field: "unit",
       allowNull: true,
-      modelValueConverter: (value: SubAccountUnit | null): SubAccountUnitName | null =>
+      modelValueConverter: (value: Model.SubAccountUnit | null): Model.SubAccountUnitName | null =>
         !isNil(value) ? value.name : null,
-      rowValueConverter: (value: SubAccountUnitName | null): SubAccountUnit | null => {
+      rowValueConverter: (value: Model.SubAccountUnitName | null): Model.SubAccountUnit | null => {
         if (value !== null) {
-          const model = findChoiceModelForName(SubAccountUnits, value);
+          const model = findChoiceForName(SubAccountUnits, value);
           if (model === null) {
             /* eslint-disable no-console */
             console.error(`Found corrupted sub-account unit name ${value} in table data.`);
@@ -521,7 +521,7 @@ export const SubAccountRowManager = new RowManager<
       },
       httpValueConverter: (value: any): number | null | undefined => {
         if (value !== null) {
-          const model = findChoiceModelForName(SubAccountUnits, value);
+          const model = findChoiceForName(SubAccountUnits, value);
           if (model === null) {
             /* eslint-disable no-console */
             console.error(`Found corrupted sub-account unit name ${value} in table data.`);
@@ -538,14 +538,14 @@ export const SubAccountRowManager = new RowManager<
     ManageField({ field: "actual", readOnly: true }),
     ManageField({ field: "fringes", allowNull: true, placeholderValue: [] })
   ],
-  childrenGetter: (model: ISubAccount) => model.subaccounts,
-  groupGetter: (model: ISubAccount) => model.group,
-  labelGetter: (model: ISubAccount) => model.identifier,
+  childrenGetter: (model: Model.SubAccount) => model.subaccounts,
+  groupGetter: (model: Model.SubAccount) => model.group,
+  labelGetter: (model: Model.SubAccount) => model.identifier,
   typeLabel: "Sub Account",
   rowType: "subaccount"
 });
 
-export const ActualRowManager = new RowManager<Table.ActualRow, IActual, IGroup<any>, Http.IActualPayload>({
+export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Model.Group<any>, Http.ActualPayload>({
   fields: [
     ManageField({ field: "description" }),
     ManageField({
@@ -563,11 +563,11 @@ export const ActualRowManager = new RowManager<Table.ActualRow, IActual, IGroup<
     ManageField({ field: "date" }),
     ManageField({
       field: "payment_method",
-      modelValueConverter: (value: PaymentMethod | null): PaymentMethodName | null =>
+      modelValueConverter: (value: Model.PaymentMethod | null): Model.PaymentMethodName | null =>
         !isNil(value) ? value.name : null,
-      rowValueConverter: (value: PaymentMethodName | null): PaymentMethod | null => {
+      rowValueConverter: (value: Model.PaymentMethodName | null): Model.PaymentMethod | null => {
         if (value !== null) {
-          const model = findChoiceModelForName(PaymentMethods, value);
+          const model = findChoiceForName(PaymentMethods, value);
           if (model === null) {
             /* eslint-disable no-console */
             console.error(`Found corrupted actual payment method name ${value} in table data.`);
@@ -579,7 +579,7 @@ export const ActualRowManager = new RowManager<Table.ActualRow, IActual, IGroup<
       },
       httpValueConverter: (value: any): number | null | undefined => {
         if (value !== null) {
-          const model = findChoiceModelForName(PaymentMethods, value);
+          const model = findChoiceForName(PaymentMethods, value);
           if (model === null) {
             /* eslint-disable no-console */
             console.error(`Found corrupted actual payment method name ${value} in table data.`);
@@ -593,12 +593,12 @@ export const ActualRowManager = new RowManager<Table.ActualRow, IActual, IGroup<
     ManageField({ field: "payment_id" }),
     ManageField({ field: "value" })
   ],
-  labelGetter: (model: IActual) => String(model.object_id),
+  labelGetter: (model: Model.Actual) => String(model.object_id),
   typeLabel: "Actual",
   rowType: "actual"
 });
 
-export const FringeRowManager = new RowManager<Table.FringeRow, IFringe, IGroup<any>, Http.IFringePayload>({
+export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Model.Group<any>, Http.FringePayload>({
   fields: [
     ManageField({ field: "name", required: true }),
     ManageField({ field: "description", allowNull: true }),
@@ -607,10 +607,11 @@ export const FringeRowManager = new RowManager<Table.FringeRow, IFringe, IGroup<
     ManageField({
       field: "unit",
       allowNull: true,
-      modelValueConverter: (value: FringeUnit | null): FringeUnitName | null => (!isNil(value) ? value.name : null),
-      rowValueConverter: (value: FringeUnitName | null): FringeUnit | null => {
+      modelValueConverter: (value: Model.FringeUnit | null): Model.FringeUnitName | null =>
+        !isNil(value) ? value.name : null,
+      rowValueConverter: (value: Model.FringeUnitName | null): Model.FringeUnit | null => {
         if (value !== null) {
-          const model = findChoiceModelForName(FringeUnits, value);
+          const model = findChoiceForName(FringeUnits, value);
           if (model === null) {
             /* eslint-disable no-console */
             console.error(`Found corrupted fringe unit name ${value} in table data.`);
@@ -622,7 +623,7 @@ export const FringeRowManager = new RowManager<Table.FringeRow, IFringe, IGroup<
       },
       httpValueConverter: (value: any): number | null | undefined => {
         if (value !== null) {
-          const model = findChoiceModelForName(FringeUnits, value);
+          const model = findChoiceForName(FringeUnits, value);
           if (model === null) {
             /* eslint-disable no-console */
             console.error(`Found corrupted fringe unit name ${value} in table data.`);
@@ -634,7 +635,7 @@ export const FringeRowManager = new RowManager<Table.FringeRow, IFringe, IGroup<
       }
     })
   ],
-  labelGetter: (model: IFringe) => String(model.name),
+  labelGetter: (model: Model.Fringe) => String(model.name),
   typeLabel: "Fringe",
   rowType: "fringe"
 });

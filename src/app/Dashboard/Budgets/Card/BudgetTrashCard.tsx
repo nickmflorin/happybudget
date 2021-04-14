@@ -5,9 +5,9 @@ import { toAbbvDisplayDateTime } from "lib/util/dates";
 import Card from "./Card";
 
 interface BudgetTrashCardProps {
-  budget: IBudget;
-  onDelete: (budget: IBudget) => void;
-  onRestore: (budget: IBudget) => void;
+  budget: Model.Budget;
+  onDelete: (budget: Model.Budget) => void;
+  onRestore: (budget: Model.Budget) => void;
 }
 
 const BudgetTrashCard = ({ budget, onRestore, onDelete }: BudgetTrashCardProps): JSX.Element => {

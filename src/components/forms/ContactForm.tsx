@@ -10,7 +10,7 @@ import { validateEmail } from "lib/util/validate";
 import { Form } from "components";
 import { FormProps } from "components/Form";
 
-const ContactForm: React.FC<FormProps<Http.IContactPayload>> = ({ form, initialValues, globalError }) => {
+const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, globalError }) => {
   return (
     <Form.Form
       form={form}
@@ -69,7 +69,7 @@ const ContactForm: React.FC<FormProps<Http.IContactPayload>> = ({ form, initialV
       </Form.Item>
       <Form.Item name={"role"} label={"Role"} rules={[{ required: true }]}>
         <Select suffixIcon={<FontAwesomeIcon icon={faUserTag} />} placeholder={"Producer"}>
-          {ContactRoles.map((model: ContactRole, index: number) => (
+          {ContactRoles.map((model: Model.ContactRole, index: number) => (
             <Select.Option key={index} value={model.id}>
               {model.name}
             </Select.Option>

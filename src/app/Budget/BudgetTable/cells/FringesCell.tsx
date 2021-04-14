@@ -18,14 +18,14 @@ const FringesCell = ({ value, ...props }: FringesCellProps): JSX.Element => {
 
   return (
     <Cell {...props} onClear={() => props.setValue([])} hideClear={value.length === 0}>
-      <ModelTagsDropdown<IFringe>
+      <ModelTagsDropdown<Model.Fringe>
         overlayClassName={"cell-dropdown"}
         value={value}
         models={fringes}
         labelField={"name"}
         multiple={true}
         selected={row.fringes}
-        onChange={(fs: IFringe[]) => props.setValue(map(fs, (f: IFringe) => f.id))}
+        onChange={(fs: Model.Fringe[]) => props.setValue(map(fs, (f: Model.Fringe) => f.id))}
       />
     </Cell>
   );

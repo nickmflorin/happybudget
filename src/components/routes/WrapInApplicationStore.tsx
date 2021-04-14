@@ -16,16 +16,14 @@ interface WrapInApplicationStoreProps {
 
 const WrapInApplicationStore = ({ children }: WrapInApplicationStoreProps): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
-  const [user, setUser] = useState<IUser | undefined>(undefined);
+  const [user, setUser] = useState<Model.User | undefined>(undefined);
   const [authenticating, setAuthenticating] = useState(true);
-  const [reduxStore, setReduxStore] = useState<Store<Redux.IApplicationStore, Redux.IAction<any>> | undefined>(
-    undefined
-  );
+  const [reduxStore, setReduxStore] = useState<Store<Redux.ApplicationStore, Redux.Action<any>> | undefined>(undefined);
 
   useEffect(() => {
     setAuthenticating(true);
     validateToken()
-      .then((response: Http.ITokenValidationResponse) => {
+      .then((response: Http.TokenValidationResponse) => {
         setUser(response.user);
       })
       .catch((e: Error) => {

@@ -9,21 +9,21 @@ import { removeFromArray } from "lib/util";
 import DeleteModelsModal from "./DeleteModelsModal";
 
 interface DeleteContactsModalProps {
-  onOk: (contacts: IContact[]) => void;
+  onOk: (contacts: Model.Contact[]) => void;
   onCancel: () => void;
   visible: boolean;
-  contacts: IContact[];
+  contacts: Model.Contact[];
 }
 
 const DeleteContactsModal = ({ visible, contacts, onOk, onCancel }: DeleteContactsModalProps): JSX.Element => {
-  const [contactsToDelete, setContactsToDelete] = useState<IContact[]>([]);
+  const [contactsToDelete, setContactsToDelete] = useState<Model.Contact[]>([]);
 
   useEffect(() => {
     setContactsToDelete(contacts);
   }, [contacts]);
 
   return (
-    <DeleteModelsModal<IContact>
+    <DeleteModelsModal<Model.Contact>
       title={"Delete Selected Contacts"}
       visible={visible}
       onCancel={() => onCancel()}
@@ -32,11 +32,11 @@ const DeleteContactsModal = ({ visible, contacts, onOk, onCancel }: DeleteContac
       cancelText={"Cancel"}
       confirm={"Please confirm the contacts to delete."}
       dataSource={contacts}
-      itemProps={(contact: IContact) => ({
+      itemProps={(contact: Model.Contact) => ({
         text: contact.full_name,
         icon: <FontAwesomeIcon icon={faIdCard} />,
         checked: includes(
-          map(contactsToDelete, (c: IContact) => c.id),
+          map(contactsToDelete, (c: Model.Contact) => c.id),
           contact.id
         ),
         onToggle: () => {

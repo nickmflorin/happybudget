@@ -11,9 +11,9 @@ namespace Table {
 
   type RowType = "subaccount" | "account" | "fringe" | "actual";
 
-  interface RowMeta<C extends Model = Model> {
+  interface RowMeta<C extends Model.Model = Model.Model> {
     readonly selected: boolean;
-    readonly errors: CellError[];
+    readonly errors: Table.CellError[];
     readonly isPlaceholder?: boolean;
     readonly isGroupFooter?: boolean;
     readonly isTableFooter?: boolean;
@@ -22,7 +22,7 @@ namespace Table {
     readonly label: string;
     readonly typeLabel: string;
     readonly fieldsLoading: string[];
-    readonly type: RowType;
+    readonly type: Table.RowType;
   }
 
   interface PageAndSize {
@@ -30,7 +30,7 @@ namespace Table {
     readonly pageSize: number;
   }
 
-  interface Row<G extends IGroup<any> = IGroup<any>, C extends Model = Model> {
+  interface Row<G extends Model.Group<any> = Group<any>, C extends Model.Model = Model.Model> {
     readonly id: number;
     readonly meta: RowMeta<C>;
     readonly group: G | null;
@@ -41,11 +41,11 @@ namespace Table {
     newValue: V;
   }
 
-  type RowChangeData<R extends Model> = { [key in keyof R]?: CellChange<R[key]> };
+  type RowChangeData<R extends Table.Row> = { [key in keyof R]?: Table.CellChange<R[key]> };
 
-  type RowChange<R extends Model> = {
+  type RowChange<R extends Table.Row> = {
     id: number;
-    data: RowChangeData<R>;
+    data: Table.RowChangeData<R>;
   };
 
   interface ActivatePlaceholderPayload<M> {
@@ -53,7 +53,7 @@ namespace Table {
     readonly model: M;
   }
 
-  interface AccountRow extends Row<IGroup<ISimpleAccount>, ISimpleSubAccount> {
+  interface AccountRow extends Table.Row<Model.Group<Model.SimpleAccount>, Model.SimpleSubAccount> {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
@@ -61,12 +61,12 @@ namespace Table {
     readonly actual: number | null;
   }
 
-  interface SubAccountRow extends Row<IGroup<ISimpleSubAccount>, ISimpleSubAccount> {
+  interface SubAccountRow extends Table.Row<Model.Group<Model.SimpleSubAccount>, Model.SimpleSubAccount> {
     readonly identifier: string | null;
     readonly name: string | null;
     readonly description: string | null;
     readonly quantity: number | null;
-    readonly unit: SubAccountUnitName | null;
+    readonly unit: Model.SubAccountUnitName | null;
     readonly multiplier: number | null;
     readonly rate: number | null;
     readonly actual: number | null;
@@ -75,22 +75,22 @@ namespace Table {
     readonly fringes: number[];
   }
 
-  interface FringeRow extends Row<IGroup<any>> {
+  interface FringeRow extends Table.Row<Model.Group<any>> {
     readonly name: string | null;
     readonly description: string | null;
     readonly cutoff: number | null;
     readonly rate: number | null;
-    readonly unit: FringeUnitName;
+    readonly unit: Model.FringeUnitName;
   }
 
-  interface ActualRow extends Row<IGroup<any>> {
+  interface ActualRow extends Table.Row<Model.Group<any>> {
     readonly object_id: number | null;
-    readonly parent_type: BudgetItemType | null;
+    readonly parent_type: Model.BudgetItemType | null;
     readonly description: string | null;
     readonly vendor: string | null;
     readonly purchase_order: string | null;
     readonly date: string | null;
-    readonly payment_method: PaymentMethodName | null;
+    readonly payment_method: Model.PaymentMethodName | null;
     readonly payment_id: string | null;
     readonly value: string | null;
   }

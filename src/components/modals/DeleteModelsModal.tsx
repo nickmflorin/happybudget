@@ -17,7 +17,7 @@ interface DeleteModelsModalProps<M> extends ModalProps {
   itemProps: (item: M) => DeleteModelListItemProps;
 }
 
-const DeleteModelsModal = <M extends Model>({
+const DeleteModelsModal = <M extends Model.Model>({
   loading,
   info,
   warning,

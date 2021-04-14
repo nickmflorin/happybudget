@@ -4,18 +4,18 @@ import { URL } from "./util";
 export const login = async (
   email: string,
   password: string,
-  options?: Http.IRequestOptions
-): Promise<Http.ILoginResponse> => {
+  options?: Http.RequestOptions
+): Promise<Http.LoginResponse> => {
   const url = URL.v1("auth", "login");
-  return client.post<Http.ILoginResponse>(url, { email, password }, options);
+  return client.post<Http.LoginResponse>(url, { email, password }, options);
 };
 
 export const socialLogin = async (
-  payload: Http.ISocialPayload,
-  options?: Http.IRequestOptions
-): Promise<Http.ILoginResponse> => {
+  payload: Http.SocialPayload,
+  options?: Http.RequestOptions
+): Promise<Http.LoginResponse> => {
   const url = URL.v1("auth", "social-login");
-  return client.post<Http.ILoginResponse>(url, payload, options);
+  return client.post<Http.LoginResponse>(url, payload, options);
 };
 
 export const logout = async (): Promise<null> => {
@@ -23,7 +23,7 @@ export const logout = async (): Promise<null> => {
   return client.post<null>(url);
 };
 
-export const validateToken = async (): Promise<Http.ITokenValidationResponse> => {
+export const validateToken = async (): Promise<Http.TokenValidationResponse> => {
   const url = URL.v1("jwt", "validate");
-  return client.post<Http.ITokenValidationResponse>(url);
+  return client.post<Http.TokenValidationResponse>(url);
 };
