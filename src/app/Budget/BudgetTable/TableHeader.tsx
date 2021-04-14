@@ -13,7 +13,7 @@ import { ColDef } from "ag-grid-community";
 import { IconButton } from "components/buttons";
 import { FieldsDropdown } from "components/dropdowns";
 import { FieldMenuField } from "components/menus/FieldsMenu";
-import { SavingChanges } from "components";
+import { SavingChanges, TooltipWrapper } from "components";
 import { Portal } from "components/layout";
 
 interface TableHeaderProps {
@@ -45,16 +45,26 @@ const TableHeader = ({
     <Portal id={"supplementary-header"} visible={true}>
       <div className={"table-header"}>
         <div className={"table-header-left"}>
-          <Checkbox checked={selected} onChange={(e: CheckboxChangeEvent) => onSelect(e.target.checked)} />
+          <TooltipWrapper title={"Select All"}>
+            <Checkbox checked={selected} onChange={(e: CheckboxChangeEvent) => onSelect(e.target.checked)} />
+          </TooltipWrapper>
           <IconButton
+            tooltip={{ title: "Delete" }}
             className={"dark"}
             size={"large"}
             icon={<FontAwesomeIcon icon={faTrash} />}
             onClick={() => onDelete()}
             disabled={deleteDisabled}
           />
-          <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faSigma} />} />
           <IconButton
+            tooltip={{ title: "Sub Total" }}
+            className={"dark"}
+            size={"large"}
+            disabled={true}
+            icon={<FontAwesomeIcon icon={faSigma} />}
+          />
+          <IconButton
+            tooltip={{ title: "Mark Up" }}
             className={"dark"}
             size={"large"}
             disabled={true}

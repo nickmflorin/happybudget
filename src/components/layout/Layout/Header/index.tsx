@@ -10,7 +10,7 @@ import { Layout } from "antd";
 
 import { Dropdown } from "components/dropdowns";
 import { AccountCircleLink } from "components/links";
-import { ShowHide } from "components";
+import { ShowHide, TooltipWrapper } from "components";
 import { useLoggedInUser } from "store/hooks";
 
 import Toolbar, { IToolbarItem } from "./Toolbar";
@@ -60,7 +60,9 @@ const Header = ({ breadcrumbs, toolbar, className, headerHeight, style = {} }: H
           ]}
         >
           <div className={"account-wrapper"}>
-            <AccountCircleLink user={user} />
+            <TooltipWrapper title={user.username}>
+              <AccountCircleLink user={user} />
+            </TooltipWrapper>
           </div>
         </Dropdown>
       </div>

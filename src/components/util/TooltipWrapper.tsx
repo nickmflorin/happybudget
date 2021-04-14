@@ -11,7 +11,7 @@ const TooltipWrapper = ({ children, ...props }: TooltipWrapperProps): JSX.Elemen
   if (!isNil(props.title)) {
     return (
       <Tooltip title={props.title} {...props}>
-        {children}
+        <div>{children}</div>
       </Tooltip>
     );
   } else {

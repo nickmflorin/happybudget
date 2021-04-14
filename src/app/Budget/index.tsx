@@ -58,6 +58,7 @@ const Budget = (): JSX.Element => {
       breadcrumbs={!isNil(budget) ? <AncestorsBreadCrumbs instance={instance} budget={budget} /> : <></>}
       toolbar={[
         {
+          tooltip: { title: "Bid Assistant" },
           icon: <FontAwesomeIcon icon={faMagic} />,
           disabled: true
         },
@@ -72,14 +73,17 @@ const Budget = (): JSX.Element => {
           }
         },
         {
+          tooltip: { title: "Share" },
           icon: <FontAwesomeIcon icon={faCloud} />,
           disabled: true
         },
         {
+          tooltip: { title: "Settings" },
           icon: <FontAwesomeIcon icon={faCog} />,
           disabled: true
         },
         {
+          tooltip: { title: "Comments" },
           icon: <FontAwesomeIcon icon={faCommentsAlt} />,
           onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen)),
           role: "drawer-toggle"
