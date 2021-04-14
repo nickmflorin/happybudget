@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Cookies from "universal-cookie";
+import { createSelector } from "reselect";
 
 import { WrapInApplicationSpinner } from "components";
 import { simpleShallowEqualSelector } from "store/selectors";
@@ -13,14 +14,22 @@ import AccountsBudgetTable from "./AccountsBudgetTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
 import { isNil } from "lodash";
 
-const selectAccountsTableLoading = simpleShallowEqualSelector(
+const selectAccountsLoading = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budget.accounts.loading
+);
+const selectGroupsLoading = simpleShallowEqualSelector(
+  (state: Redux.ApplicationStore) => state.budget.accounts.groups.loading
+);
+const selectLoading = createSelector(
+  selectAccountsLoading,
+  selectGroupsLoading,
+  (tableLoading: boolean, groupsLoading: boolean) => tableLoading || groupsLoading
 );
 
 const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
   const budgetId = useSelector(selectBudgetId);
-  const loading = useSelector(selectAccountsTableLoading);
+  const loading = useSelector(selectLoading);
 
   useEffect(() => {
     dispatch(setInstanceAction(null));
