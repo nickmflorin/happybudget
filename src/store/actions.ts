@@ -6,7 +6,6 @@ export const ApplicationActionTypes = {
   }
 };
 
-/* eslint-disable indent */
 export const createAction = <P = any>(type: string, payload: P, options?: Redux.ActionConfig): Redux.Action<P> => {
   return { type, payload, ...options };
 };
