@@ -41,9 +41,6 @@ export const BudgetItemMenuItem: React.FC<BudgetTreeMenuItemProps> = ({
       <ShowHide show={!isNil(onToggleChildrenVisibility)}>
         <React.Fragment>
           <div style={{ flexGrow: 100, display: "flex" }}>
-            <div className={"checkbox-wrapper"}>
-              <Checkbox checked={selected === true} />
-            </div>
             <EntityText>{node}</EntityText>
           </div>
           <IconButton
@@ -59,9 +56,6 @@ export const BudgetItemMenuItem: React.FC<BudgetTreeMenuItemProps> = ({
       </ShowHide>
       <ShowHide show={isNil(onToggleChildrenVisibility)}>
         <React.Fragment>
-          <div className={"checkbox-wrapper"}>
-            <Checkbox checked={selected === true} />
-          </div>
           <EntityText>{node}</EntityText>
         </React.Fragment>
       </ShowHide>
