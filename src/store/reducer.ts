@@ -79,9 +79,11 @@ const loadingReducer: Reducer<Redux.LoadingStore, Redux.Action<any>> = (
             state... the element with ID ${id} does not exist in state when it is expected to.`
           );
         } else {
+          const elements = filter(newState.elements, (element: string) => element !== id);
           newState = {
             ...newState,
-            elements: filter(newState.elements, (element: string) => element !== id)
+            elements,
+            loading: elements.length !== 0
           };
         }
       } else {
@@ -92,11 +94,14 @@ const loadingReducer: Reducer<Redux.LoadingStore, Redux.Action<any>> = (
             state... the element with ID ${id} already exists in state when it is not expected to.`
           );
         } else {
-          newState = { ...newState, elements: [...newState.elements, id] };
+          const elements = [...newState.elements, id];
+          newState = {
+            ...newState,
+            elements,
+            loading: elements.length !== 0
+          };
         }
       }
-    } else if (action.type === ApplicationActionTypes.SetOverallApplicationLoading) {
-      newState = { ...newState, loading: action.payload };
     }
   }
   return newState;
