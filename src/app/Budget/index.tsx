@@ -10,7 +10,7 @@ import {
   faFilePlus,
   faCopy,
   faAddressBook,
-  faFileChartLine,
+  faPercentage,
   faFileSpreadsheet,
   faFileInvoice
 } from "@fortawesome/pro-light-svg-icons";
@@ -111,7 +111,7 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon icon={faFileChartLine} />,
+          icon: <FontAwesomeIcon icon={faPercentage} />,
           onClick: () => history.push(`/budgets/${budgetId}/fringes`),
           active: location.pathname.startsWith(`/budgets/${budgetId}/fringes`),
           tooltip: {

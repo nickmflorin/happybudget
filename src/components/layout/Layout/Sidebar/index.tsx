@@ -36,16 +36,14 @@ const Sidebar = ({ sidebarItems = [], collapsed = false }: SidebarProps): JSX.El
       </div>
       <ShowHide show={sidebarItems.length !== 0}>
         <div className={"sidebar-menu"}>
-          {map(sidebarItems.slice(0, sidebarItems.length / 2), (item: ISidebarItem, index: number) => (
-            <SidebarItem key={index} collapsed={collapsed} {...item} />
+          {map(sidebarItems, (item: ISidebarItem, index: number) => (
+            <SidebarItem
+              key={index}
+              separatorAfter={index + 1 === Math.floor(sidebarItems.length / 2)}
+              collapsed={collapsed}
+              {...item}
+            />
           ))}
-          <hr></hr>
-          {map(
-            sidebarItems.slice(sidebarItems.length / 2, sidebarItems.length),
-            (item: ISidebarItem, index: number) => (
-              <SidebarItem key={index} collapsed={collapsed} {...item} />
-            )
-          )}
         </div>
       </ShowHide>
     </div>

@@ -343,7 +343,8 @@
       }
     }
 
-    &.ag-grid-table-action-button {
+    &.ag-grid-table-action-button,
+    &.ag-grid-expand-button {
       width: 100%;
       height: 100%;
       padding: 0px !important;
@@ -355,11 +356,17 @@
         height: 16px;
         width: auto !important;
         color: $icon-color;
+      }
+    }
+
+    &.ag-grid-expand-button {
+      svg {
         &:hover {
           color: $green !important;
         }
       }
-    }
+    }    
+    
 
     &.disabled {
       svg {

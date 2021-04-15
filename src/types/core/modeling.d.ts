@@ -57,45 +57,6 @@ namespace Model {
   type BudgetItemType = "subaccount" | "account";
   type CommentParentType = "budget" | "account" | "subaccount" | "comment";
 
-  interface Model {
-    id: number;
-  }
-
-  type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
-  type ProductionTypeId = 0 | 1 | 2 | 3 | 4 | 5;
-  type ProductionType = Choice<ProductionTypeId, ProductionTypeName>;
-
-  type PaymentMethodName = "Check" | "Card" | "Wire";
-  type PaymentMethodId = 0 | 1 | 2;
-  type PaymentMethod = Choice<PaymentMethodId, PaymentMethodName>;
-
-  type SubAccountUnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
-  type SubAccountUnitId = 0 | 1 | 2 | 3 | 4 | 5;
-  type SubAccountUnit = Choice<SubAccountUnitId, SubAccountUnitName>;
-
-  type FringeUnitId = 0 | 1;
-  type FringeUnitName = "Percent" | "Flat";
-  type FringeUnit = Choice<FringeUnitId, FringeUnitName>;
-
-  type ContactRoleName =
-    | "Producer"
-    | "Executive Producer"
-    | "Production Manager"
-    | "Production Designer"
-    | "Actor"
-    | "Director"
-    | "Medic"
-    | "Wardrobe"
-    | "Writer"
-    | "Client"
-    | "Other";
-  type ContactRoleId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-  type ContactRole = Choice<ContactRoleId, ContactRoleName>;
-
-  type EntityType = "budget" | "account" | "subaccount";
-  type BudgetItemType = "subaccount" | "account";
-  type CommentParentType = "budget" | "account" | "subaccount" | "comment";
-
   interface Entity extends Model.Model {
     readonly identifier: string | null;
     readonly type: Model.EntityType;
