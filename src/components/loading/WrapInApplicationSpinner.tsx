@@ -23,9 +23,7 @@ const WrapInApplicationSpinner = ({
     if (loading === true) {
       dispatch(setApplicationLoadingAction({ id, value: true }));
     } else {
-      // if (includes(loadingState.elements, id)) {
       dispatch(setApplicationLoadingAction({ id, value: false }));
-      // }
     }
   }, [loading, id]);
 

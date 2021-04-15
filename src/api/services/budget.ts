@@ -14,6 +14,11 @@ export const getBudget = async (id: number, options: Http.RequestOptions = {}): 
   return client.retrieve<Model.Budget>(url, options);
 };
 
+export const getBudgetPdf = async (id: number, options: Http.RequestOptions = {}): Promise<any> => {
+  const url = URL.v1("budgets", id, "pdf");
+  return client.get<any>(url, options);
+};
+
 export const createBudget = async (
   payload: Http.BudgetPayload,
   options: Http.RequestOptions = {}

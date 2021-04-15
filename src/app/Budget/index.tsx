@@ -19,9 +19,11 @@ import {
   faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 
+import { getBudgetPdf } from "api/services";
 import { RenderIfValidId } from "components";
 import { Layout, AncestorsBreadCrumbs } from "components/layout";
 import { componentLoader } from "lib/operational";
+import { download } from "lib/util/files";
 
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "./store/actions";
 import { selectInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "./store/selectors";
@@ -65,7 +67,13 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faDownload} />,
-          disabled: true
+          onClick: () => {
+            if (!isNaN(parseInt(budgetId))) {
+              getBudgetPdf(parseInt(budgetId)).then((response: any) => {
+                download(response, !isNil(budget) ? `${budget.name}.pdf` : "budget.pdf");
+              });
+            }
+          }
         },
         {
           icon: <FontAwesomeIcon icon={faShareAlt} />,

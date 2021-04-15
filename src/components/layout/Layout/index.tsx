@@ -57,9 +57,7 @@ const Layout = ({
       )}
       <div className={classNames("application-content", { collapsed })}>
         <Header breadcrumbs={breadcrumbs} toolbar={toolbar} {...headerProps} headerHeight={headerHeight} />
-        <Content {...contentProps} headerHeight={headerHeight}>
-          {children}
-        </Content>
+        <Content {...contentProps}>{children}</Content>
         <ShowHide show={includeFooter}>
           <Footer />
         </ShowHide>
