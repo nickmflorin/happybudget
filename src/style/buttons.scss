@@ -355,6 +355,9 @@
         height: 16px;
         width: auto !important;
         color: $icon-color;
+        &:hover {
+          color: $green !important;
+        }
       }
     }
 

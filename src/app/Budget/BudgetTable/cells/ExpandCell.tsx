@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowsAltV } from "@fortawesome/free-solid-svg-icons";
+import { faExpandAlt } from "@fortawesome/pro-solid-svg-icons";
 
 import { ICellRendererParams } from "ag-grid-community";
 import { IconButton } from "components/buttons";
@@ -14,7 +14,7 @@ const ExpandCell = ({ onClick, node }: ExpandCellProps): JSX.Element => {
       <IconButton
         className={"ag-grid-table-action-button"}
         size={"small"}
-        icon={<FontAwesomeIcon icon={faArrowsAltV} />}
+        icon={<FontAwesomeIcon icon={faExpandAlt} />}
         onClick={() => onClick(node.data.id)}
       />
     );

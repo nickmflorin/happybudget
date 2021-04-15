@@ -5,19 +5,15 @@ import Cookies from "universal-cookie";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagic, faPrint, faCloud, faCog, faCommentsAlt } from "@fortawesome/pro-solid-svg-icons";
 import {
+  faFilePlus,
+  faCopy,
   faAddressBook,
-  faRobot,
-  faDownload,
-  faShareAlt,
-  faCog,
-  faComments,
-  faFolderOpen,
-  faFolderPlus,
-  faCalculator,
-  faPercentage,
-  faDollarSign
-} from "@fortawesome/free-solid-svg-icons";
+  faFileChartLine,
+  faFileSpreadsheet,
+  faFileInvoice
+} from "@fortawesome/pro-light-svg-icons";
 
 import { getBudgetPdf } from "api/services";
 import { RenderIfValidId } from "components";
@@ -62,11 +58,11 @@ const Budget = (): JSX.Element => {
       breadcrumbs={!isNil(budget) ? <AncestorsBreadCrumbs instance={instance} budget={budget} /> : <></>}
       toolbar={[
         {
-          icon: <FontAwesomeIcon icon={faRobot} />,
+          icon: <FontAwesomeIcon icon={faMagic} />,
           disabled: true
         },
         {
-          icon: <FontAwesomeIcon icon={faDownload} />,
+          icon: <FontAwesomeIcon icon={faPrint} />,
           onClick: () => {
             if (!isNaN(parseInt(budgetId))) {
               getBudgetPdf(parseInt(budgetId)).then((response: any) => {
@@ -76,7 +72,7 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon icon={faShareAlt} />,
+          icon: <FontAwesomeIcon icon={faCloud} />,
           disabled: true
         },
         {
@@ -84,14 +80,14 @@ const Budget = (): JSX.Element => {
           disabled: true
         },
         {
-          icon: <FontAwesomeIcon icon={faComments} />,
+          icon: <FontAwesomeIcon icon={faCommentsAlt} />,
           onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen)),
           role: "drawer-toggle"
         }
       ]}
       sidebar={[
         {
-          icon: <FontAwesomeIcon icon={faFolderPlus} />,
+          icon: <FontAwesomeIcon icon={faFilePlus} />,
           onClick: () => history.push("/templates"),
           tooltip: {
             title: "Create New Budget",
@@ -99,7 +95,7 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon icon={faFolderOpen} />,
+          icon: <FontAwesomeIcon icon={faCopy} />,
           onClick: () => history.push("/budgets"),
           tooltip: {
             title: "My Budgets",
@@ -107,7 +103,7 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon icon={faAddressBook} />,
+          icon: <FontAwesomeIcon icon={faAddressBook} flip={"horizontal"} />,
           onClick: () => history.push("/contacts"),
           tooltip: {
             title: "Contacts",
@@ -115,7 +111,7 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon icon={faPercentage} />,
+          icon: <FontAwesomeIcon icon={faFileChartLine} />,
           onClick: () => history.push(`/budgets/${budgetId}/fringes`),
           active: location.pathname.startsWith(`/budgets/${budgetId}/fringes`),
           tooltip: {
@@ -124,7 +120,7 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon icon={faCalculator} />,
+          icon: <FontAwesomeIcon icon={faFileSpreadsheet} />,
           onClick: () => {
             const cookies = new Cookies();
             const budgetLastVisited = cookies.get("budget-last-visited");
@@ -144,7 +140,7 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon icon={faDollarSign} />,
+          icon: <FontAwesomeIcon icon={faFileInvoice} />,
           onClick: () => history.push(`/budgets/${budgetId}/actuals`),
           active: location.pathname.startsWith(`/budgets/${budgetId}/actuals`),
           tooltip: {

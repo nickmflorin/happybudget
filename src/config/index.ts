@@ -14,17 +14,17 @@ export const DEFAULT_TZ = "America/Toronto";
 export const DISPLAY_ERRORS_IN_TABLE = false;
 
 export const DEFAULT_TAG_COLOR_SCHEME = [
-  "#797695",
-  "#ff7165",
-  "#80cbc4",
-  "#ce93d8",
-  "#fed835",
-  "#c87987",
-  "#69f0ae",
-  "#a1887f",
-  "#81d4fa",
-  "#f75776",
-  "#66bb6a",
+  "#d5d5e5",
+  "#ffd2ba",
+  "#ffeda0",
+  "#c8c4ea",
+  "#beebff",
+  "#f8c5cf",
+  "#5ad198",
+  "#5e5e5e",
+  "#b49a85",
+  "#886da8",
+  "#76d0ca",
   "#58add6"
 ];
 

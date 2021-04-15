@@ -184,8 +184,8 @@ $table-border: 1px solid $table-border-color;
   }
 
   div[role='gridcell'] {
-    font-size: 12px;
-    font-weight: 300;
+    font-size: 13px;
+    font-weight: 400;
     background-color: $white;
     border-bottom: none;
     display: flex;
@@ -286,9 +286,7 @@ $table-border: 1px solid $table-border-color;
 
     &.ag-row-hover {
       div[role='gridcell'] {
-        &:not(.cell--not-editable-highlight) {
-          background-color: $gray-highlight !important;
-        }
+        background-color: $gray-highlight !important;
       }
       &.row--table-footer {
         div[role='gridcell'] {

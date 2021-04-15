@@ -29,8 +29,18 @@ const Tag = ({ children, scheme, uppercase, color, colorIndex, className, style 
     return selectConsistent(tagColorScheme, children);
   }, [children, color]);
 
+  const textColor = useMemo(() => {
+    const r = parseInt(tagColor.substring(1, 3), 16) * 0.299;
+    const g = parseInt(tagColor.substring(3, 5), 16) * 0.587;
+    const b = parseInt(tagColor.substring(5, 7), 16) * 0.114;
+    return r + g + b < 200 ? "white" : "black";
+  }, [tagColor]);
+
   return (
-    <div className={classNames("tag", { uppercase }, className)} style={{ ...style, backgroundColor: tagColor }}>
+    <div
+      className={classNames("tag", { uppercase }, className)}
+      style={{ ...style, backgroundColor: tagColor, color: textColor }}
+    >
       {children}
     </div>
   );

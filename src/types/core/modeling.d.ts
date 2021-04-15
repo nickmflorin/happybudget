@@ -10,6 +10,56 @@ namespace Model {
     id: I;
     name: N;
   }
+  type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
+  type ProductionTypeId = 0 | 1 | 2 | 3 | 4 | 5;
+  type ProductionTypeModel = ChoiceModel<ProductionTypeId, ProductionTypeName>;
+
+  type PaymentMethodName = "Check" | "Card" | "Wire";
+  type PaymentMethodId = 0 | 1 | 2;
+  type PaymentMethod = ChoiceModel<PaymentMethodId, PaymentMethodName>;
+
+  type SubAccountUnitName =
+    | "Minutes"
+    | "Hours"
+    | "Weeks"
+    | "Months"
+    | "Days"
+    | "Nights"
+    | "Allow"
+    | "Flat"
+    | "Feet"
+    | "Fare"
+    | "Units"
+    | "";
+  type SubAccountUnitId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  type SubAccountUnit = ChoiceModel<SubAccountUnitId, SubAccountUnitName>;
+
+  type FringeUnitId = 0 | 1;
+  type FringeUnitName = "Percent" | "Flat";
+  type FringeUnit = ChoiceModel<FringeUnitId, FringeUnitName>;
+
+  type ContactRoleName =
+    | "Producer"
+    | "Executive Producer"
+    | "Production Manager"
+    | "Production Designer"
+    | "Actor"
+    | "Director"
+    | "Medic"
+    | "Wardrobe"
+    | "Writer"
+    | "Client"
+    | "Other";
+  type ContactRoleId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+  type ContactRole = ChoiceModel<ContactRoleId, ContactRoleName>;
+
+  type EntityType = "budget" | "account" | "subaccount";
+  type BudgetItemType = "subaccount" | "account";
+  type CommentParentType = "budget" | "account" | "subaccount" | "comment";
+
+  interface Model {
+    id: number;
+  }
 
   type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
   type ProductionTypeId = 0 | 1 | 2 | 3 | 4 | 5;

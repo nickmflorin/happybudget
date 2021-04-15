@@ -38,16 +38,26 @@ export enum SubAccountUnitNames {
   WEEKS = "Weeks",
   MONTHS = "Months",
   DAYS = "Days",
-  NIGHTS = "Nights"
+  NIGHTS = "Nights",
+  ALLOW = "Allow",
+  FLAT = "Flat",
+  FEET = "Feet",
+  FARE = "Fare",
+  UNITS = "Units"
 }
 
 export const SubAccountUnitModels: { [key: string]: Model.SubAccountUnit } = {
   MINUTES: { id: 0, name: SubAccountUnitNames.MINUTES },
   HOURS: { id: 1, name: SubAccountUnitNames.HOURS },
-  WEEKS: { id: 2, name: SubAccountUnitNames.WEEKS },
-  MONTHS: { id: 3, name: SubAccountUnitNames.MONTHS },
-  DAYS: { id: 4, name: SubAccountUnitNames.DAYS },
-  NIGHTS: { id: 5, name: SubAccountUnitNames.NIGHTS }
+  DAYS: { id: 2, name: SubAccountUnitNames.DAYS },
+  NIGHTS: { id: 3, name: SubAccountUnitNames.NIGHTS },
+  WEEKS: { id: 4, name: SubAccountUnitNames.WEEKS },
+  MONTHS: { id: 5, name: SubAccountUnitNames.MONTHS },
+  ALLOW: { id: 6, name: SubAccountUnitNames.ALLOW },
+  FLAT: { id: 7, name: SubAccountUnitNames.FLAT },
+  FEET: { id: 8, name: SubAccountUnitNames.FEET },
+  FARE: { id: 9, name: SubAccountUnitNames.FARE },
+  UNITS: { id: 10, name: SubAccountUnitNames.UNITS }
 };
 
 export const SubAccountUnits = Object.values(SubAccountUnitModels);
