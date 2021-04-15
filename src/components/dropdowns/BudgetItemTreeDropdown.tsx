@@ -39,7 +39,7 @@ const BudgetItemsTreeDropdown: React.FC<BudgetItemsTreeDropdownProps> = ({
 
   useEffect(() => {
     if (!isNil(_value)) {
-      const node = find(flattenedBudgetItemTreeNodes, { id: value });
+      const node = find(flattenedBudgetItemTreeNodes, { id: _value });
       if (!isNil(node)) {
         setCurrentNode(node);
       }

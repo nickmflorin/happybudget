@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { map, isNil } from "lodash";
 import classNames from "classnames";
 
-import { Menu, Checkbox } from "antd";
+import { Menu } from "antd";
 import { MenuProps, MenuItemProps } from "antd/lib/menu";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
