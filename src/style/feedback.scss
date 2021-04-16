@@ -1,7 +1,6 @@
-@import "style/colors";
 @import "style/typography";
 
-.display-alert {
+.alert {
   padding: 8px 20px 8px 50px !important;
   border-radius: 6px;
 
@@ -17,13 +16,13 @@
     line-height: 16px !important;
     margin-bottom: 6px !important;
     color: $text-primary !important;
-    font-family: $noto-sans-jp;
+    font-family: $nunito;
   }
 
   .ant-alert-description {
     font-size: 12px !important;
     line-height: 14px !important;
-    font-family: $noto-sans-jp;
+    font-family: $nunito;
     font-weight: 400;
     color: $text-secondary !important;
   }
