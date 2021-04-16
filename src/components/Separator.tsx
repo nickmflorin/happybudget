@@ -2,14 +2,12 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 import "./Separator.scss";
 
-interface SeparatorProps {
-  className?: string;
-  style?: any;
+interface SeparatorProps extends StandardComponentProps {
   margin?: string | number;
   color?: string;
 }
 
-const Separator = ({ className, style, margin, color }: SeparatorProps): JSX.Element => {
+const Separator: React.FC<SeparatorProps> = ({ className, style, margin, color }) => {
   if (!isNil(margin) || !isNil(color)) {
     style = style || {};
     if (!isNil(margin)) {
@@ -17,7 +15,7 @@ const Separator = ({ className, style, margin, color }: SeparatorProps): JSX.Ele
       style.marginBottom = margin;
     }
     if (!isNil(color)) {
-      style.color = color;
+      style.borderBottom = `1px solid ${color}`;
     }
   }
   return <div className={classNames("separator", className)} style={style}></div>;

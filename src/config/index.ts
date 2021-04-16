@@ -16,10 +16,10 @@ export const DISPLAY_ERRORS_IN_TABLE = false;
 export const DEFAULT_TAG_COLOR_SCHEME = [
   "#d5d5e5",
   "#ffd2ba",
-  "#ffeda0",
-  "#c8c4ea",
   "#beebff",
   "#f8c5cf",
+  "#ffeda0",
+  "#c8c4ea",
   "#5ad198",
   "#5e5e5e",
   "#b49a85",
