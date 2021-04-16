@@ -19,9 +19,10 @@ export interface ISidebarDropdownItem {
 interface SidebarProps {
   sidebarItems?: ISidebarItem[];
   collapsed?: boolean;
+  separatorAfter?: boolean;
 }
 
-const Sidebar = ({ sidebarItems = [], collapsed = false }: SidebarProps): JSX.Element => {
+const Sidebar = ({ sidebarItems = [], collapsed = false, separatorAfter = true }: SidebarProps): JSX.Element => {
   return (
     <div className={classNames("sidebar", { collapsed })}>
       <div className={"logo-container"}>
@@ -39,7 +40,7 @@ const Sidebar = ({ sidebarItems = [], collapsed = false }: SidebarProps): JSX.El
           {map(sidebarItems, (item: ISidebarItem, index: number) => (
             <SidebarItem
               key={index}
-              separatorAfter={index + 1 === Math.floor(sidebarItems.length / 2)}
+              separatorAfter={separatorAfter && index + 1 === Math.floor(sidebarItems.length / 2)}
               collapsed={collapsed}
               {...item}
             />

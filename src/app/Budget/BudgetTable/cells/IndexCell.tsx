@@ -36,16 +36,18 @@ const IndexCell = <R extends Table.Row<any, any>>({
     );
   }
   return (
-    <Checkbox
-      checked={node.data.meta.selected}
-      onChange={(e: CheckboxChangeEvent) => {
-        if (e.target.checked) {
-          onSelect(node.data.id);
-        } else {
-          onDeselect(node.data.id);
-        }
-      }}
-    />
+    <div>
+      <Checkbox
+        checked={node.group === false && node.data.meta.selected}
+        onChange={(e: CheckboxChangeEvent) => {
+          if (e.target.checked) {
+            onSelect(node.data.id);
+          } else {
+            onDeselect(node.data.id);
+          }
+        }}
+      />
+    </div>
   );
 };
 
