@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 import { DEFAULT_TAG_COLOR_SCHEME } from "config";
 import { selectConsistent } from "lib/util";
+import { getTextColor } from "lib/util/colors";
 
 import "./Tag.scss";
 
@@ -29,8 +30,13 @@ const Tag = ({ children, scheme, uppercase, color, colorIndex, className, style 
     return selectConsistent(tagColorScheme, children);
   }, [children, color]);
 
+  const textColor = useMemo(() => getTextColor(tagColor), [tagColor]);
+
   return (
-    <div className={classNames("tag", { uppercase }, className)} style={{ ...style, backgroundColor: tagColor }}>
+    <div
+      className={classNames("tag", { uppercase }, className)}
+      style={{ ...style, backgroundColor: tagColor, color: textColor }}
+    >
       {children}
     </div>
   );

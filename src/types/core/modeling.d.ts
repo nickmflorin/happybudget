@@ -19,8 +19,20 @@ namespace Model {
   type PaymentMethodId = 0 | 1 | 2;
   type PaymentMethod = Choice<PaymentMethodId, PaymentMethodName>;
 
-  type SubAccountUnitName = "Minutes" | "Hours" | "Weeks" | "Months" | "Days" | "Nights" | "";
-  type SubAccountUnitId = 0 | 1 | 2 | 3 | 4 | 5;
+  type SubAccountUnitName =
+    | "Minutes"
+    | "Hours"
+    | "Weeks"
+    | "Months"
+    | "Days"
+    | "Nights"
+    | "Allow"
+    | "Flat"
+    | "Feet"
+    | "Fare"
+    | "Units"
+    | "";
+  type SubAccountUnitId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
   type SubAccountUnit = Choice<SubAccountUnitId, SubAccountUnitName>;
 
   type FringeUnitId = 0 | 1;

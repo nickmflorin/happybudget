@@ -13,6 +13,7 @@ export interface ISidebarItem {
   collapsed?: boolean;
   active?: boolean;
   hidden?: boolean;
+  separatorAfter?: boolean;
   activePathRegexes?: RegExp[];
   children?: ISidebarItem[];
   childrenLoading?: boolean;
@@ -28,6 +29,7 @@ const SidebarItem = ({
   to,
   active,
   hidden,
+  separatorAfter,
   activePathRegexes,
   tooltip,
   collapsed = false,
@@ -93,6 +95,7 @@ const SidebarItem = ({
             <span className={"text-container"}>{text}</span>
           </ShowHide>
         </div>
+        {separatorAfter ? <hr></hr> : <></>}
       </div>
     </TooltipWrapper>
   );

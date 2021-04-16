@@ -37,7 +37,12 @@ const Sidebar = ({ sidebarItems = [], collapsed = false }: SidebarProps): JSX.El
       <ShowHide show={sidebarItems.length !== 0}>
         <div className={"sidebar-menu"}>
           {map(sidebarItems, (item: ISidebarItem, index: number) => (
-            <SidebarItem key={index} collapsed={collapsed} {...item} />
+            <SidebarItem
+              key={index}
+              separatorAfter={index + 1 === Math.floor(sidebarItems.length / 2)}
+              collapsed={collapsed}
+              {...item}
+            />
           ))}
         </div>
       </ShowHide>

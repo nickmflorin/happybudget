@@ -1,7 +1,8 @@
 import { isNil, map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faPlusSquare, faPercentage } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faSigma, faPercentage, faDownload } from "@fortawesome/pro-solid-svg-icons";
 
 import { Input, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -52,24 +53,20 @@ const TableHeader = ({
             onClick={() => onDelete()}
             disabled={deleteDisabled}
           />
-          <IconButton
-            className={"dark"}
-            size={"large"}
-            disabled={true}
-            icon={<FontAwesomeIcon icon={faPlusSquare} />}
-          />
+          <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faSigma} />} />
           <IconButton
             className={"dark"}
             size={"large"}
             disabled={true}
             icon={<FontAwesomeIcon icon={faPercentage} />}
           />
+          <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faDownload} />} />
           <Input
             placeholder={"Search Rows"}
             value={search}
             allowClear={true}
             prefix={<SearchOutlined />}
-            style={{ maxWidth: 500, minWidth: 300 }}
+            style={{ maxWidth: 300, minWidth: 100 }}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSearch(event.target.value)}
           />
         </div>

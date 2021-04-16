@@ -69,7 +69,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
     if (Array.isArray(value)) {
       if (value.length === 0) {
         return (
-          <Tag key={i} uppercase style={{ opacity: 0 }}>
+          <Tag key={i} style={{ opacity: 0 }}>
             {"None"}
           </Tag>
         );
@@ -83,20 +83,20 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
       const mapped = mapping[value];
       if (!isNil(mapped)) {
         return (
-          <Tag colorIndex={mapped.model.id} key={i} uppercase>
+          <Tag colorIndex={mapped.model.id} key={i}>
             {mapped.label}
           </Tag>
         );
       } else {
         return (
-          <Tag key={i} uppercase style={{ opacity: 0 }}>
+          <Tag key={i} style={{ opacity: 0 }}>
             {"None"}
           </Tag>
         );
       }
     } else {
       return (
-        <Tag key={i} uppercase style={{ opacity: 0 }}>
+        <Tag key={i} style={{ opacity: 0 }}>
           {"None"}
         </Tag>
       );
