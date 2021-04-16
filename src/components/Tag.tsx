@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 import { DEFAULT_TAG_COLOR_SCHEME } from "config";
 import { selectConsistent } from "lib/util";
-import getTextColor from "lib/util/colors";
+import { getTextColor } from "lib/util/colors";
 
 import "./Tag.scss";
 
