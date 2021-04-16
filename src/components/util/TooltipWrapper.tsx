@@ -15,7 +15,7 @@ const TooltipWrapper = ({ children, ...props }: TooltipWrapperProps): JSX.Elemen
       </Tooltip>
     );
   } else {
-    return <>{children}</>;
+    return <div>{children}</div>;
   }
 };
 
