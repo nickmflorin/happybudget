@@ -15,7 +15,6 @@ interface LayoutProps {
   className?: string;
   children: any;
   sidebar?: ISidebarItem[] | (() => JSX.Element);
-  separatorAfter?: boolean;
   toolbar?: IToolbarItem[] | (() => JSX.Element);
   style?: React.CSSProperties;
   collapsed?: boolean;
@@ -38,7 +37,6 @@ const Layout = ({
   toolbar,
   breadcrumbs,
   sidebar,
-  separatorAfter,
   style = {},
   collapsed = false,
   includeFooter = true,
@@ -51,7 +49,7 @@ const Layout = ({
       {!isNil(sidebar) && (
         <div className={classNames("sidebar-container", { collapsed })}>
           {Array.isArray(sidebar) ? (
-            <Sidebar collapsed={collapsed} sidebarItems={sidebar as ISidebarItem[]} separatorAfter />
+            <Sidebar collapsed={collapsed} sidebarItems={sidebar as ISidebarItem[]} />
           ) : (
             sidebar()
           )}

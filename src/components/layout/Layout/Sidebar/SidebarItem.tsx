@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import classNames from "classnames";
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 
-import { ShowHide, TooltipWrapper } from "components";
+import { ShowHide, TooltipWrapper, Separator } from "components";
 
 export interface ISidebarItem {
   icon?: JSX.Element;
@@ -95,7 +95,9 @@ const SidebarItem = ({
             <span className={"text-container"}>{text}</span>
           </ShowHide>
         </div>
-        {separatorAfter ? <hr></hr> : <></>}
+        <ShowHide show={separatorAfter === true}>
+          <Separator color={"#3f4252"} style={{ width: "80%" }} />
+        </ShowHide>
       </div>
     </TooltipWrapper>
   );

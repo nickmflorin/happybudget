@@ -68,10 +68,11 @@
         display: flex;
 
         > .icon-container {
-          font-size: 15px;
           margin-right: 25px;
           width: 15px;
-          line-height: 34px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
 
           svg {
             color: $text-secondary;

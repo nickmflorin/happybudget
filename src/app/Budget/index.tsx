@@ -105,6 +105,7 @@ const Budget = (): JSX.Element => {
         {
           icon: <FontAwesomeIcon icon={faAddressBook} flip={"horizontal"} />,
           onClick: () => history.push("/contacts"),
+          separatorAfter: true,
           tooltip: {
             title: "Contacts",
             placement: "right"
