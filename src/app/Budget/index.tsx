@@ -63,6 +63,7 @@ const Budget = (): JSX.Element => {
           disabled: true
         },
         {
+          tooltip: { title: "Export" },
           icon: <FontAwesomeIcon icon={faPrint} />,
           onClick: () => {
             if (!isNaN(parseInt(budgetId))) {

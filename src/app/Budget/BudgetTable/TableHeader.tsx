@@ -70,7 +70,13 @@ const TableHeader = ({
             disabled={true}
             icon={<FontAwesomeIcon icon={faPercentage} />}
           />
-          <IconButton className={"dark"} size={"large"} disabled={true} icon={<FontAwesomeIcon icon={faDownload} />} />
+          <IconButton
+            tooltip={{ title: "Delete" }}
+            className={"dark"}
+            size={"large"}
+            disabled={true}
+            icon={<FontAwesomeIcon icon={faDownload} />}
+          />
           <Input
             placeholder={"Search Rows"}
             value={search}
