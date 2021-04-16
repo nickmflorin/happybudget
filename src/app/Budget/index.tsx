@@ -58,12 +58,12 @@ const Budget = (): JSX.Element => {
       breadcrumbs={!isNil(budget) ? <AncestorsBreadCrumbs instance={instance} budget={budget} /> : <></>}
       toolbar={[
         {
-          tooltip: { title: "Bid Assistant" },
+          tooltip: { title: "Bid Assistant", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faMagic} />,
           disabled: true
         },
         {
-          tooltip: { title: "Export" },
+          tooltip: { title: "Export", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faPrint} />,
           onClick: () => {
             if (!isNaN(parseInt(budgetId))) {
@@ -74,17 +74,17 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          tooltip: { title: "Share" },
+          tooltip: { title: "Share", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faCloud} />,
           disabled: true
         },
         {
-          tooltip: { title: "Settings" },
+          tooltip: { title: "Settings", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faCog} />,
           disabled: true
         },
         {
-          tooltip: { title: "Comments" },
+          tooltip: { title: "Comments", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faCommentsAlt} />,
           onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen)),
           role: "drawer-toggle"

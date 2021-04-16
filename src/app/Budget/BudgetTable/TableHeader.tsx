@@ -49,7 +49,7 @@ const TableHeader = ({
             <Checkbox checked={selected} onChange={(e: CheckboxChangeEvent) => onSelect(e.target.checked)} />
           </TooltipWrapper>
           <IconButton
-            tooltip={{ title: "Delete" }}
+            tooltip={{ title: "Delete", placement: "bottom" }}
             className={"dark"}
             size={"large"}
             icon={<FontAwesomeIcon icon={faTrash} />}
@@ -57,21 +57,21 @@ const TableHeader = ({
             disabled={deleteDisabled}
           />
           <IconButton
-            tooltip={{ title: "Sub Total" }}
+            tooltip={{ title: "Sub Total", placement: "bottom" }}
             className={"dark"}
             size={"large"}
             disabled={true}
             icon={<FontAwesomeIcon icon={faSigma} />}
           />
           <IconButton
-            tooltip={{ title: "Mark Up" }}
+            tooltip={{ title: "Mark Up", placement: "bottom" }}
             className={"dark"}
             size={"large"}
             disabled={true}
             icon={<FontAwesomeIcon icon={faPercentage} />}
           />
           <IconButton
-            tooltip={{ title: "Delete" }}
+            tooltip={{ title: "Delete", placement: "bottom" }}
             className={"dark"}
             size={"large"}
             disabled={true}
