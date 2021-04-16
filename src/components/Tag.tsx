@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 import { DEFAULT_TAG_COLOR_SCHEME } from "config";
 import { selectConsistent } from "lib/util";
-import { getTextColor } from "lib/util/colors";
+import { contrastedForegroundColor } from "lib/util/colors";
 
 import "./Tag.scss";
 
@@ -30,7 +30,7 @@ const Tag = ({ children, scheme, uppercase, color, colorIndex, className, style 
     return selectConsistent(tagColorScheme, children);
   }, [children, color]);
 
-  const textColor = useMemo(() => getTextColor(tagColor), [tagColor]);
+  const textColor = useMemo(() => contrastedForegroundColor(tagColor), [tagColor]);
 
   return (
     <div
