@@ -1,5 +1,5 @@
 import { isNil, find, filter } from "lodash";
-import Mapping from "lib/tabling/managers";
+import RowManager from "lib/tabling/managers";
 import { replaceInArray } from "lib/util";
 import { warnInconsistentState } from "../util";
 import { createListReducerFromMap, mergeOptionsWithDefaults } from "./util";
@@ -14,15 +14,14 @@ export type ITablePlaceholdersActionMap = {
 
 export const createTablePlaceholdersReducer = <
   /* eslint-disable indent */
-  R extends Table.Row<G, C>,
+  R extends Table.Row<G>,
   M extends Model.Model,
-  G extends Model.Group<any>,
-  P extends Http.ModelPayload<M>,
-  C extends Model.Model = Model.Model,
+  G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup,
+  P extends Http.ModelPayload<M> = Http.ModelPayload<M>,
   A extends Redux.Action<any> = Redux.Action<any>
 >(
   mappings: Partial<ITablePlaceholdersActionMap>,
-  mapping: Mapping<R, M, G, P, C>,
+  manager: RowManager<R, M, G, P>,
   options: Partial<FactoryOptions<Redux.ListStore<R>>> = {}
 ) => {
   const Options = mergeOptionsWithDefaults<Redux.ListStore<R>>(options, []);
@@ -33,7 +32,7 @@ export const createTablePlaceholdersReducer = <
       const placeholders: R[] = [];
       const numPlaceholders = action.payload || 1;
       for (let i = 0; i < numPlaceholders; i++) {
-        placeholders.push(mapping.createPlaceholder());
+        placeholders.push(manager.createPlaceholder());
       }
       return [...st, ...placeholders];
     },

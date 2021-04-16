@@ -11,7 +11,7 @@ import Sidebar, { ISidebarItem } from "./Sidebar";
 import { IToolbarItem } from "./Header/Toolbar";
 
 /* eslint-disable no-unused-vars */
-interface LayoutProps {
+export interface LayoutProps {
   className?: string;
   children: any;
   sidebar?: ISidebarItem[] | (() => JSX.Element);

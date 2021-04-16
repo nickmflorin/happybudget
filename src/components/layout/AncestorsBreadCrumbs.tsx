@@ -6,15 +6,21 @@ import classNames from "classnames";
 import { Select } from "antd";
 
 import { EntityText } from "components/typography";
+import { isBudgetForm } from "lib/model/typeguards";
+
 import "./AncestorsBreadCrumbs.scss";
 
 /* eslint-disable indent */
-const getUrl = (entity: Model.Entity, budgetId: number): string => {
+const getUrl = (
+  entity: Model.SimpleAccount | Model.SimpleSubAccount,
+  baseId: number,
+  designation: Model.BudgetType
+): string => {
   return entity.type === "subaccount"
-    ? `/budgets/${budgetId}/subaccounts/${entity.id}`
+    ? `/${designation}s/${baseId}/subaccounts/${entity.id}`
     : entity.type === "account"
-    ? `/budgets/${budgetId}/accounts/${entity.id}`
-    : `/budgets/${budgetId}/accounts`;
+    ? `/${designation}s/${baseId}/accounts/${entity.id}`
+    : `/${designation}s/${baseId}/accounts`;
 };
 
 interface AncestorBreadCrumbItemProps extends StandardComponentProps {
@@ -38,7 +44,7 @@ const AncestorBreadCrumbItem = ({ className, style = {}, children, url }: Ancest
 
 interface AncestorBreadCrumbSelectItemProps extends StandardComponentProps {
   instance: Model.Account | Model.SubAccount;
-  budget: Model.Budget;
+  budget: Model.Budget | Model.Template;
 }
 
 const AncestorBreadCrumbSelectItem = ({
@@ -57,19 +63,21 @@ const AncestorBreadCrumbSelectItem = ({
           value={instance.id}
           bordered={false}
           onChange={(value: number) => {
-            const sibling = find(instance.siblings, { id: value });
+            const sibling: Model.SimpleAccount | Model.SimpleSubAccount | undefined = find(instance.siblings, {
+              id: value
+            } as any);
             if (isNil(sibling)) {
               /* eslint-disable no-console */
               console.error(`The select value corresponds to a sibling ${value} that is not in state!`);
             } else if (sibling.id !== instance.id) {
-              history.push(getUrl(sibling, budget.id));
+              history.push(getUrl(sibling, budget.id, isBudgetForm(budget) ? "budget" : "template"));
             }
           }}
         >
           <Select.Option value={instance.id}>
             <EntityText>{instance}</EntityText>
           </Select.Option>
-          {map(instance.siblings, (sibling: Model.Entity) => {
+          {map(instance.siblings, (sibling: any) => {
             return (
               <Select.Option value={sibling.id} key={sibling.id}>
                 <EntityText>{sibling}</EntityText>
@@ -83,13 +91,13 @@ const AncestorBreadCrumbSelectItem = ({
 };
 
 interface AncestorBreadCrumbEntityItemProps extends StandardComponentProps {
-  budget: Model.Budget;
-  children: Model.Entity;
+  budget: Model.Budget | Model.Template;
+  children: Model.SimpleSubAccount | Model.SimpleAccount;
 }
 
 const AncestorBreadCrumbEntityItem = ({ children, budget }: AncestorBreadCrumbEntityItemProps): JSX.Element => {
   return (
-    <AncestorBreadCrumbItem url={getUrl(children, budget.id)}>
+    <AncestorBreadCrumbItem url={getUrl(children, budget.id, isBudgetForm(budget) ? "budget" : "template")}>
       <div className={"entity-text-wrapper"}>
         <EntityText>{children}</EntityText>
       </div>
@@ -98,7 +106,7 @@ const AncestorBreadCrumbEntityItem = ({ children, budget }: AncestorBreadCrumbEn
 };
 
 interface AncestorBreadCrumbBudgetItemProps {
-  budget: Model.Budget;
+  budget: Model.Budget | Model.Template;
 }
 
 const AncestorBreadCrumbBudgetItem = ({ budget }: AncestorBreadCrumbBudgetItemProps): JSX.Element => {
@@ -111,7 +119,7 @@ const AncestorBreadCrumbBudgetItem = ({ budget }: AncestorBreadCrumbBudgetItemPr
 
 interface AncestorsBreadCrumbsProps {
   instance: Model.Account | Model.SubAccount | null;
-  budget: Model.Budget;
+  budget: Model.Budget | Model.Template;
 }
 
 const AncestorsBreadCrumbs = ({ instance, budget }: AncestorsBreadCrumbsProps): JSX.Element => {
@@ -121,7 +129,7 @@ const AncestorsBreadCrumbs = ({ instance, budget }: AncestorsBreadCrumbsProps): 
       {!isNil(instance) && (
         <React.Fragment>
           <span className={"slash"}>{"/"}</span>
-          {map(instance.ancestors.slice(1), (entity: Model.Entity, index: number) => {
+          {map(instance.ancestors.slice(1), (entity: Model.SimpleSubAccount | Model.SimpleAccount, index: number) => {
             return (
               <React.Fragment key={index}>
                 <AncestorBreadCrumbEntityItem budget={budget}>{entity}</AncestorBreadCrumbEntityItem>

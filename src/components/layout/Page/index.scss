@@ -1,0 +1,20 @@
+@import "style/typography";
+@import "style/colors";
+
+.page {
+  padding: 16px 24px;
+
+  .page-header {
+    margin-bottom: 10px;
+
+    .page-header-title {
+      margin-right: 0px;
+      margin-bottom: 0;
+      color: $text-secondary !important;
+      font-weight: 700;
+      font-family: $roboto;
+      font-size: 28px;
+      line-height: 32px;
+    }
+  }
+}

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { isNil } from "lodash";
 
 import { createAccountSubAccountGroup, createSubAccountSubAccountGroup } from "api/services";
@@ -8,8 +7,8 @@ import { GroupFormValues } from "components/forms/GroupForm";
 
 import Modal from "./Modal";
 
-interface CreateSubAccountGroupModalProps {
-  onSuccess: (group: Model.Group<Model.SimpleSubAccount>) => void;
+interface CreateSubAccountGroupModalProps<G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup> {
+  onSuccess: (group: G) => void;
   onCancel: () => void;
   accountId?: number;
   subaccountId?: number;
@@ -17,22 +16,20 @@ interface CreateSubAccountGroupModalProps {
   open: boolean;
 }
 
-const CreateSubAccountGroupModal = ({
+const CreateSubAccountGroupModal = <G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup>({
   accountId,
   subaccountId,
   open,
   subaccounts,
   onSuccess,
   onCancel
-}: CreateSubAccountGroupModalProps): JSX.Element => {
-  const [loading, setLoading] = useState(false);
+}: CreateSubAccountGroupModalProps<G>): JSX.Element => {
   const [form] = Form.useForm();
 
   return (
     <Modal
       title={"Create Sub-Total"}
       visible={open}
-      loading={loading}
       onCancel={() => onCancel()}
       okText={"Create"}
       cancelText={"Cancel"}
@@ -40,31 +37,31 @@ const CreateSubAccountGroupModal = ({
         form
           .validateFields()
           .then((values: GroupFormValues) => {
-            setLoading(true);
+            form.setLoading(true);
             if (!isNil(accountId)) {
-              createAccountSubAccountGroup(accountId, {
+              createAccountSubAccountGroup<G>(accountId, {
                 name: values.name,
                 children: subaccounts,
                 color: values.color
               })
-                .then((group: Model.Group<Model.SimpleSubAccount>) => {
+                .then((group: G) => {
                   form.resetFields();
                   onSuccess(group);
                 })
                 .catch((e: Error) => form.handleRequestError(e))
-                .finally(() => setLoading(false));
+                .finally(() => form.setLoading(false));
             } else if (!isNil(subaccountId)) {
-              createSubAccountSubAccountGroup(subaccountId, {
+              createSubAccountSubAccountGroup<G>(subaccountId, {
                 name: values.name,
                 children: subaccounts,
                 color: values.color
               })
-                .then((group: Model.Group<Model.SimpleSubAccount>) => {
+                .then((group: G) => {
                   form.resetFields();
                   onSuccess(group);
                 })
                 .catch((e: Error) => form.handleRequestError(e))
-                .finally(() => setLoading(false));
+                .finally(() => form.setLoading(false));
             }
           })
           .catch(() => {

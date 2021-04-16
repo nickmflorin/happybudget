@@ -1,22 +1,33 @@
 import { forEach, isNil, filter, reduce, find } from "lodash";
 import { FringeUnitModels } from ".";
 
-export const flattenBudgetItemNodes = (nodes: Model.BudgetItemNode[]): Model.BudgetItem[] => {
-  const flattened: Model.BudgetItem[] = [];
+export const flattenTreeNodes = (tree: Model.Tree): (Model.SimpleSubAccount | Model.SimpleAccount)[] => {
+  const flattened: (Model.SimpleSubAccount | Model.SimpleAccount)[] = [];
 
-  const addNode = (node: Model.BudgetItemNode): void => {
-    const { children, ...withoutChildren } = node;
-    flattened.push(withoutChildren);
+  const addNode = (node: Model.SubAccountTreeNode): void => {
+    flattened.push(treeNodeWithoutChildren(node));
     if (node.children.length !== 0) {
-      forEach(node.children, (child: Model.BudgetItemNode) => {
+      forEach(node.children, (child: Model.SubAccountTreeNode) => {
         addNode(child);
       });
     }
   };
-  forEach(nodes, (node: Model.BudgetItemNode) => {
-    addNode(node);
+  forEach(tree, (node: Model.AccountTreeNode) => {
+    flattened.push(treeNodeWithoutChildren(node));
+    if (node.children.length !== 0) {
+      forEach(node.children, (child: Model.SubAccountTreeNode) => {
+        addNode(child);
+      });
+    }
   });
   return flattened;
+};
+
+export const treeNodeWithoutChildren = (
+  node: Model.AccountTreeNode | Model.SubAccountTreeNode
+): Model.SimpleSubAccount | Model.SimpleAccount => {
+  const { children, ...withoutChildren } = node;
+  return withoutChildren;
 };
 
 export const fringeValue = (value: number, fringes: Model.Fringe[]): number => {

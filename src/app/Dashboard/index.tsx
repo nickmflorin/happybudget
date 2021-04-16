@@ -4,13 +4,13 @@ import { Switch, useHistory, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFolderOpen, faFolderPlus, faAddressBook } from "@fortawesome/free-solid-svg-icons";
 
+import { componentLoader } from "lib/operational";
 import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
 
-const Contacts = React.lazy(() => import("./Contacts"));
-const Budgets = React.lazy(() => import("./Budgets/Active"));
-const Trash = React.lazy(() => import("./Budgets/Trash"));
-const Templates = React.lazy(() => import("./Templates"));
+const Contacts = React.lazy(() => componentLoader(() => import("./Contacts")));
+const NewProject = React.lazy(() => componentLoader(() => import("./NewProject")));
+const Budgets = React.lazy(() => componentLoader(() => import("./Budgets")));
 
 const Dashboard = (): JSX.Element => {
   const history = useHistory();
@@ -20,13 +20,13 @@ const Dashboard = (): JSX.Element => {
     <Layout
       sidebar={[
         {
-          text: "New Budget",
+          text: "New Project",
           icon: <FontAwesomeIcon icon={faFolderPlus} />,
-          onClick: () => history.push("/templates"),
-          active: location.pathname.startsWith("/templates")
+          onClick: () => history.push("/new"),
+          active: location.pathname.startsWith("/new")
         },
         {
-          text: "Budgets",
+          text: "My Budgets",
           icon: <FontAwesomeIcon icon={faFolderOpen} />,
           onClick: () => history.push("/budgets"),
           active: location.pathname.startsWith("/budgets")
@@ -42,8 +42,7 @@ const Dashboard = (): JSX.Element => {
       <Switch>
         <PrivateRoute exact path={"/contacts"} component={Contacts} />
         <PrivateRoute exact path={"/budgets"} component={Budgets} />
-        <PrivateRoute exact path={"/templates"} component={Templates} />
-        <PrivateRoute exact path={"/trash"} component={Trash} />
+        <PrivateRoute path={"/new"} component={NewProject} />
       </Switch>
     </Layout>
   );

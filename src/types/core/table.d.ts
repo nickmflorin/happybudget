@@ -11,14 +11,14 @@ namespace Table {
 
   type RowType = "subaccount" | "account" | "fringe" | "actual";
 
-  interface RowMeta<C extends Model.Model = Model.Model> {
+  interface RowMeta {
     readonly selected: boolean;
     readonly errors: Table.CellError[];
     readonly isPlaceholder?: boolean;
     readonly isGroupFooter?: boolean;
     readonly isTableFooter?: boolean;
     readonly isBudgetFooter?: boolean;
-    readonly children: C[];
+    readonly children: number[];
     readonly label: string;
     readonly typeLabel: string;
     readonly fieldsLoading: string[];
@@ -30,9 +30,9 @@ namespace Table {
     readonly pageSize: number;
   }
 
-  interface Row<G extends Model.Group<any> = Group<any>, C extends Model.Model = Model.Model> {
+  interface Row<G extends Model.Group = Model.Group> {
     readonly id: number;
-    readonly meta: RowMeta<C>;
+    readonly meta: RowMeta;
     readonly group: G | null;
   }
 
@@ -53,7 +53,7 @@ namespace Table {
     readonly model: M;
   }
 
-  interface AccountRow extends Table.Row<Model.Group<Model.SimpleAccount>, Model.SimpleSubAccount> {
+  interface BudgetAccountRow extends Table.Row<Model.BudgetGroup> {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
@@ -61,7 +61,13 @@ namespace Table {
     readonly actual: number | null;
   }
 
-  interface SubAccountRow extends Table.Row<Model.Group<Model.SimpleSubAccount>, Model.SimpleSubAccount> {
+  interface TemplateAccountRow extends Table.Row<Model.TemplateGroup> {
+    readonly identifier: string | null;
+    readonly description: string | null;
+    readonly estimated: number | null;
+  }
+
+  interface SubAccountRow<G extends Model.Group> extends Table.Row<G> {
     readonly identifier: string | null;
     readonly name: string | null;
     readonly description: string | null;
@@ -69,13 +75,18 @@ namespace Table {
     readonly unit: Model.SubAccountUnitName | null;
     readonly multiplier: number | null;
     readonly rate: number | null;
-    readonly actual: number | null;
     readonly estimated: number | null;
-    readonly variance: number | null;
     readonly fringes: number[];
   }
 
-  interface FringeRow extends Table.Row<Model.Group<any>> {
+  interface BudgetSubAccountRow extends Table.SubAccountRow<Model.BudgetGroup> {
+    readonly actual: number | null;
+    readonly variance: number | null;
+  }
+
+  interface TemplateSubAccountRow extends Table.SubAccountRow<Model.TemplateGroup> {}
+
+  interface FringeRow extends Table.Row<Model.Group> {
     readonly name: string | null;
     readonly description: string | null;
     readonly cutoff: number | null;
@@ -83,7 +94,7 @@ namespace Table {
     readonly unit: Model.FringeUnitName;
   }
 
-  interface ActualRow extends Table.Row<Model.Group<any>> {
+  interface ActualRow extends Table.Row<Model.BudgetGroup> {
     readonly object_id: number | null;
     readonly parent_type: Model.BudgetItemType | null;
     readonly description: string | null;

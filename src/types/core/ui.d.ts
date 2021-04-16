@@ -11,6 +11,8 @@ interface MenuItem {
   disabled?: boolean;
 }
 
+type BudgetViewType = "budget" | "template";
+
 type Order = 1 | -1 | 0;
 type DefinitiveOrder = 1 | -1;
 

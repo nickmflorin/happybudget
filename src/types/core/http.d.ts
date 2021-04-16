@@ -120,7 +120,12 @@ namespace Http {
   }
 
   interface BudgetPayload implements Http.ModelPayload<Model.Budget> {
-    readonly production_type: Model.ProductionTypeId;
+    readonly production_type?: Model.ProductionTypeId;
+    readonly name: string;
+    readonly template?: number;
+  }
+
+  interface TemplatePayload implements Http.ModelPayload<Model.Template> {
     readonly name: string;
   }
 
@@ -131,11 +136,15 @@ namespace Http {
   }
 
   interface AccountPayload implements Http.ModelPayload<Model.Account> {
-    readonly account_number: string;
     readonly description?: string;
-    readonly access?: number[];
     readonly group?: number | null;
   }
+
+  interface BudgetAccountPayload extends AccountPayload {
+    readonly access?: number[];
+  }
+
+  interface TemplateAccountPayload extends AccountPayload {}
 
   interface SubAccountPayload implements Http.ModelPayload<Model.SubAccount> {
     readonly description?: string;
@@ -155,9 +164,9 @@ namespace Http {
     readonly purchase_order?: string;
     readonly payment_id?: string;
     readonly value?: number;
-    readonly payment_method?: Model.PaymentMethod;
+    readonly payment_method?: Model.PaymentMethodId;
     readonly object_id?: number;
-    readonly parent_type?: Model.BudgetItemType;
+    readonly parent_type?: "account" | "subaccount";
   }
 
   interface CommentPayload implements Http.ModelPayload<Model.Comment> {
@@ -176,31 +185,11 @@ namespace Http {
     readonly email: string;
   }
 
-  interface SubAccountBulkUpdatePayload extends Partial<Http.SubAccountPayload> {
+  interface BulkUpdatePayload<T extends Http.ModelPayload> extends Partial<T> {
     readonly id: number;
   }
 
-  interface AccountBulkUpdatePayload extends Partial<Http.AccountPayload> {
-    readonly id: number;
-  }
-
-  interface ActualBulkUpdatePayload extends Partial<Http.ActualPayload> {
-    readonly id: number;
-  }
-
-  interface FringeBulkUpdatePayload extends Partial<Http.FringePayload> {
-    readonly id: number;
-  }
-
-  interface BulkCreateSubAccountsResponse {
-    data: Model.SubAccount[];
-  }
-
-  interface BulkCreateFringesResponse {
-    data: Model.Fringe[];
-  }
-
-  interface BulkCreateAccountsResponse {
-    data: Model.Account[];
+  interface BulkCreateResponse<M extends Model.Model> {
+    data: M[];
   }
 }

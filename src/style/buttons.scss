@@ -364,8 +364,8 @@
           color: $green !important;
         }
       }
-    }    
-    
+    }
+
 
     &.disabled {
       svg {
@@ -456,7 +456,7 @@
     background-color: $green;
     color: $white;
     border: 1px solid transparent;
-    font-family: $noto-sans-jp;
+    font-family: $open-sans;
     font-weight: 500;
 
     .anticon-loading {
@@ -487,7 +487,7 @@
     padding-bottom: 2px !important;
     height: 48px;
     font-size: 14px;
-    font-family: $noto-sans-jp;
+    font-family: $open-sans;
 
     &:hover,
     &:focus {

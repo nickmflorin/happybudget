@@ -18,7 +18,7 @@ $footer-background-color: $white;
   flex-direction: column;
   min-height: 100vh;
   background: $app-background-color;
-  font-family: $noto-sans-jp;
+  font-family: $open-sans;
   font-weight: 400;
   overflow-y: hidden;
 
@@ -135,7 +135,7 @@ $footer-background-color: $white;
 
         .copyright-text {
           padding-right: $sidebar-width;
-          font-family: $noto-sans-jp;
+          font-family: $open-sans;
           font-weight: 400;
           letter-spacing: 0.03rem;
           line-height: 24px;

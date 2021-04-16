@@ -1,9 +1,4 @@
-import { createAction, simpleAction } from "store/actions";
-
-export const ActionDomains: { [key: string]: Redux.Dashboard.ActionDomain } = {
-  TRASH: "trash",
-  ACTIVE: "active"
-};
+import { simpleAction } from "store/actions";
 
 export const ActionType = {
   Budgets: {
@@ -19,11 +14,22 @@ export const ActionType = {
     RemoveFromState: "dashboard.budgets.RemoveFromState",
     AddToState: "dashboard.budgets.AddToState",
     Delete: "dashboard.budgets.Delete",
-    PermanentlyDelete: "dashboard.budgets.PermanentlyDelete",
-    Restore: "dashboard.budgets.Restore",
-    Deleting: "dashboard.budgets.Deleting",
-    PermanentlyDeleting: "dashboard.budgets.PermanentlyDeleting",
-    Restoring: "dashboard.budgets.Restoring"
+    Deleting: "dashboard.budgets.Deleting"
+  },
+  Templates: {
+    Loading: "dashboard.templates.Loading",
+    Response: "dashboard.templates.Response",
+    Request: "dashboard.templates.Request",
+    Select: "dashboard.templates.Select",
+    SetSearch: "dashboard.templates.SetSearch",
+    SetPage: "dashboard.templates.SetPage",
+    SetPageSize: "dashboard.templates.SetPageSize",
+    SetPageAndSize: "dashboard.templates.SetPageAndSize",
+    UpdateInState: "dashboard.templates.UpdateInState",
+    RemoveFromState: "dashboard.templates.RemoveFromState",
+    AddToState: "dashboard.templates.AddToState",
+    Delete: "dashboard.templates.Delete",
+    Deleting: "dashboard.templates.Deleting"
   },
   Contacts: {
     Loading: "dashboard.contacts.Loading",
@@ -47,42 +53,37 @@ export const ActionType = {
   }
 };
 
-export const simpleDomainAction = <P = any>(type: string) => {
-  return (
-    domain: Redux.Dashboard.ActionDomain,
-    payload: P,
-    options?: Redux.ActionConfig
-  ): Redux.Dashboard.Action<P> => {
-    return { ...createAction<P>(type, payload, options), domain };
-  };
-};
-
-export const requestBudgetsAction = (domain: Redux.Dashboard.ActionDomain): Redux.Dashboard.Action<null> => {
-  return { ...createAction(ActionType.Budgets.Request, null), domain };
-};
-export const loadingBudgetsAction = simpleDomainAction<boolean>(ActionType.Budgets.Loading);
-export const responseBudgetsAction = simpleDomainAction<Http.ListResponse<Model.Budget>>(ActionType.Budgets.Response);
-export const selectBudgetsAction = simpleDomainAction<number[]>(ActionType.Budgets.Select);
-export const setBudgetsSearchAction = simpleDomainAction<string>(ActionType.Budgets.SetSearch);
-export const setBudgetsPageAction = simpleDomainAction<number>(ActionType.Budgets.SetPage);
-export const setBudgetsPageSizeAction = simpleDomainAction<number>(ActionType.Budgets.SetPageSize);
-export const setBudgetsPageAndSizeAction = simpleDomainAction<PageAndSize>(ActionType.Budgets.SetPageAndSize);
-export const updateBudgetInStateAction = simpleDomainAction<Redux.UpdateModelActionPayload<Model.Budget>>(
+export const requestBudgetsAction = simpleAction<null>(ActionType.Budgets.Request);
+export const loadingBudgetsAction = simpleAction<boolean>(ActionType.Budgets.Loading);
+export const responseBudgetsAction = simpleAction<Http.ListResponse<Model.Budget>>(ActionType.Budgets.Response);
+export const selectBudgetsAction = simpleAction<number[]>(ActionType.Budgets.Select);
+export const setBudgetsSearchAction = simpleAction<string>(ActionType.Budgets.SetSearch);
+export const setBudgetsPageAction = simpleAction<number>(ActionType.Budgets.SetPage);
+export const setBudgetsPageSizeAction = simpleAction<number>(ActionType.Budgets.SetPageSize);
+export const setBudgetsPageAndSizeAction = simpleAction<PageAndSize>(ActionType.Budgets.SetPageAndSize);
+export const updateBudgetInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Budget>>(
   ActionType.Budgets.UpdateInState
 );
-export const addBudgetToStateAction = simpleDomainAction<Model.Budget>(ActionType.Budgets.AddToState);
-export const removeBudgetFromStateAction = simpleDomainAction<number>(ActionType.Budgets.RemoveFromState);
-
+export const addBudgetToStateAction = simpleAction<Model.Budget>(ActionType.Budgets.AddToState);
+export const removeBudgetFromStateAction = simpleAction<number>(ActionType.Budgets.RemoveFromState);
 export const deleteBudgetAction = simpleAction<number>(ActionType.Budgets.Delete);
 export const deletingBudgetAction = simpleAction<{ id: number; value: boolean }>(ActionType.Budgets.Deleting);
 
-export const permanentlyDeleteBudgetAction = simpleAction<number>(ActionType.Budgets.PermanentlyDelete);
-export const permanentlyDeletingBudgetAction = simpleAction<{ id: number; value: boolean }>(
-  ActionType.Budgets.PermanentlyDeleting
+export const requestTemplatesAction = simpleAction<null>(ActionType.Templates.Request);
+export const loadingTemplatesAction = simpleAction<boolean>(ActionType.Templates.Loading);
+export const responseTemplatesAction = simpleAction<Http.ListResponse<Model.Template>>(ActionType.Templates.Response);
+export const selectTemplatesAction = simpleAction<number[]>(ActionType.Templates.Select);
+export const setTemplatesSearchAction = simpleAction<string>(ActionType.Templates.SetSearch);
+export const setTemplatesPageAction = simpleAction<number>(ActionType.Templates.SetPage);
+export const setTemplatesPageSizeAction = simpleAction<number>(ActionType.Templates.SetPageSize);
+export const setTemplatesPageAndSizeAction = simpleAction<PageAndSize>(ActionType.Templates.SetPageAndSize);
+export const updateTemplateInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Template>>(
+  ActionType.Templates.UpdateInState
 );
-
-export const restoreBudgetAction = simpleAction<number>(ActionType.Budgets.Restore);
-export const restoringBudgetAction = simpleAction<{ id: number; value: boolean }>(ActionType.Budgets.Restoring);
+export const addTemplateToStateAction = simpleAction<Model.Template>(ActionType.Templates.AddToState);
+export const removeTemplateFromStateAction = simpleAction<number>(ActionType.Templates.RemoveFromState);
+export const deleteTemplateAction = simpleAction<number>(ActionType.Templates.Delete);
+export const deletingTemplateAction = simpleAction<{ id: number; value: boolean }>(ActionType.Templates.Deleting);
 
 export const requestContactsAction = simpleAction<null>(ActionType.Contacts.Request);
 export const loadingContactsAction = simpleAction<boolean>(ActionType.Contacts.Loading);

@@ -8,7 +8,8 @@ import { componentLoader } from "lib/operational";
 import Logout from "./Logout";
 
 const Dashboard = React.lazy(() => componentLoader(() => import("./Dashboard")));
-const Budget = React.lazy(() => componentLoader(() => import("./Budget")));
+const Budget = React.lazy(() => componentLoader(() => import("./Budgeting/Budget")));
+const Template = React.lazy(() => componentLoader(() => import("./Budgeting/Template")));
 const Settings = React.lazy(() => componentLoader(() => import("./Settings")));
 
 const Application = (): JSX.Element => {
@@ -20,7 +21,8 @@ const Application = (): JSX.Element => {
       <Switch>
         <Redirect exact from={"/"} to={"/budgets"} />
         <PrivateRoute path={"/budgets/:budgetId"} component={Budget} />
-        <PrivateRoute path={["/budgets", "/contacts", "/templates", "/trash"]} component={Dashboard} />
+        <PrivateRoute path={"/templates/:templateId"} component={Template} />
+        <PrivateRoute path={["/budgets", "/contacts", "/templates", "/trash", "/new"]} component={Dashboard} />
         <PrivateRoute path={["/profile"]} component={Settings} />
         <Route exact path={"/logout"} component={Logout} />
       </Switch>

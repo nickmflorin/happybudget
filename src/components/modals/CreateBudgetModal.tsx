@@ -1,9 +1,8 @@
-import { useState } from "react";
-
-import { Input } from "antd";
-
-import { Form } from "components";
+import { isNil } from "lodash";
 import { createBudget } from "api/services";
+import { Form } from "components";
+import { BudgetForm } from "components/forms";
+import { BudgetFormValues } from "components/forms/BudgetForm";
 
 import Modal from "./Modal";
 
@@ -11,27 +10,29 @@ interface CreateBudgetModalProps {
   onSuccess: (budget: Model.Budget) => void;
   onCancel: () => void;
   open: boolean;
-  productionType: Model.ProductionTypeId;
+  templateId?: number;
 }
 
-const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: CreateBudgetModalProps): JSX.Element => {
-  const [loading, setLoading] = useState(false);
+const CreateBudgetModal = ({ open, templateId, onSuccess, onCancel }: CreateBudgetModalProps): JSX.Element => {
   const [form] = Form.useForm();
 
   return (
     <Modal
       title={"Create Budget"}
       visible={open}
-      loading={loading}
       onCancel={() => onCancel()}
       okText={"Create"}
       cancelText={"Cancel"}
       onOk={() => {
         form
           .validateFields()
-          .then((values: any) => {
-            setLoading(true);
-            createBudget({ name: values.name, production_type: productionType })
+          .then((values: BudgetFormValues) => {
+            form.setLoading(true);
+            let payload: Http.BudgetPayload = { ...values };
+            if (!isNil(templateId)) {
+              payload = { ...payload, template: templateId };
+            }
+            createBudget(payload)
               .then((budget: Model.Budget) => {
                 form.resetFields();
                 onSuccess(budget);
@@ -40,7 +41,7 @@ const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: Create
                 form.handleRequestError(e);
               })
               .finally(() => {
-                setLoading(false);
+                form.setLoading(false);
               });
           })
           .catch(() => {
@@ -48,15 +49,7 @@ const CreateBudgetModal = ({ productionType, open, onSuccess, onCancel }: Create
           });
       }}
     >
-      <Form.Form form={form} layout={"vertical"} name={"form_in_modal"} initialValues={{}}>
-        <Form.Item
-          name={"name"}
-          label={"Name"}
-          rules={[{ required: true, message: "Please provide a valid budget name." }]}
-        >
-          <Input placeholder={"Name"} />
-        </Form.Item>
-      </Form.Form>
+      <BudgetForm form={form} name={"form_in_modal"} initialValues={{}} />
     </Modal>
   );
 };

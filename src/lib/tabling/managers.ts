@@ -229,13 +229,12 @@ const ManageField = <R extends Table.Row, M extends Model.Model>(config: Managed
 };
 
 export interface RowManagerConfig<
-  R extends Table.Row<G, C>,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group<any> = Model.Group<any>,
-  C extends Model.Model = Model.Model
+  R extends Table.Row<G>,
+  M extends Model.Model,
+  G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup
 > {
   readonly fields: ManagedField<R, M>[];
-  readonly childrenGetter?: ((model: M) => C[]) | string | null;
+  readonly childrenGetter?: ((model: M) => number[]) | string | null;
   readonly groupGetter?: ((model: M) => number | null) | string | null;
   readonly typeLabel: string;
   readonly rowType: Table.RowType;
@@ -254,20 +253,19 @@ const defaultRowMeta: Partial<Table.RowMeta> = {
 };
 
 class RowManager<
-  R extends Table.Row<G, C>,
+  R extends Table.Row<G>,
   M extends Model.Model,
-  G extends Model.Group<any>,
-  P extends Http.ModelPayload<M>,
-  C extends Model.Model = Model.Model
-> implements RowManagerConfig<R, M, G, C> {
+  G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup,
+  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
+> implements RowManagerConfig<R, M, G> {
   public fields: ManagedField<R, M>[];
-  public childrenGetter?: ((model: M) => C[]) | string | null;
+  public childrenGetter?: ((model: M) => number[]) | string | null;
   public groupGetter?: ((model: M) => number | null) | string | null;
   public labelGetter: (model: M) => string;
   public typeLabel: string;
   public rowType: Table.RowType;
 
-  constructor(config: RowManagerConfig<R, M, G, C>) {
+  constructor(config: RowManagerConfig<R, M, G>) {
     this.fields = config.fields;
     this.childrenGetter = config.childrenGetter;
     this.groupGetter = config.groupGetter;
@@ -288,11 +286,11 @@ class RowManager<
     );
   };
 
-  public getChildren = (model: M): C[] => {
+  public getChildren = (model: M): number[] => {
     if (typeof this.childrenGetter === "string") {
       const children: any = model[this.childrenGetter as keyof M];
       if (!isNil(children)) {
-        return children as C[];
+        return children;
       } else {
         /* eslint-disable no-console */
         console.warn(`Could not parse children from model based on model field ${this.childrenGetter}!`);
@@ -348,7 +346,7 @@ class RowManager<
     return obj as R;
   };
 
-  public modelToRow = (model: M, group: G | null, meta: Partial<Table.RowMeta<C>> = {}): R => {
+  public modelToRow = (model: M, group: G | null, meta: Partial<Table.RowMeta> = {}): R => {
     let obj: { [key in keyof R]?: R[key] } = {};
     obj = {
       ...obj,
@@ -464,12 +462,11 @@ class RowManager<
   };
 }
 
-export const AccountRowManager = new RowManager<
-  Table.AccountRow,
-  Model.Account,
-  Model.Group<Model.SimpleAccount>,
-  Http.AccountPayload,
-  Model.SimpleSubAccount
+export const BudgetAccountRowManager = new RowManager<
+  Table.BudgetAccountRow,
+  Model.BudgetAccount,
+  Model.BudgetGroup,
+  Http.BudgetAccountPayload
 >({
   fields: [
     ManageField({ field: "description" }),
@@ -487,12 +484,31 @@ export const AccountRowManager = new RowManager<
   rowType: "account"
 });
 
-export const SubAccountRowManager = new RowManager<
-  Table.SubAccountRow,
-  Model.SubAccount,
-  Model.Group<Model.SimpleSubAccount>,
-  Http.SubAccountPayload,
-  Model.SimpleSubAccount
+export const TemplateAccountRowManager = new RowManager<
+  Table.TemplateAccountRow,
+  Model.TemplateAccount,
+  Model.TemplateGroup,
+  Http.TemplateAccountPayload
+>({
+  fields: [
+    ManageField({ field: "description" }),
+    // We want to attribute the full group to the row, not just the ID.
+    ManageField({ field: "group", allowNull: true, inRow: false }),
+    ManageField({ field: "identifier", required: true }),
+    ManageField({ field: "estimated", readOnly: true })
+  ],
+  childrenGetter: (model: Model.TemplateAccount) => model.subaccounts,
+  groupGetter: (model: Model.TemplateAccount) => model.group,
+  labelGetter: (model: Model.TemplateAccount) => model.identifier,
+  typeLabel: "Account",
+  rowType: "account"
+});
+
+export const BudgetSubAccountRowManager = new RowManager<
+  Table.BudgetSubAccountRow,
+  Model.BudgetSubAccount,
+  Model.BudgetGroup,
+  Http.SubAccountPayload
 >({
   fields: [
     ManageField({ field: "description", allowBlank: true }),
@@ -545,7 +561,62 @@ export const SubAccountRowManager = new RowManager<
   rowType: "subaccount"
 });
 
-export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Model.Group<any>, Http.ActualPayload>({
+export const TemplateSubAccountRowManager = new RowManager<
+  Table.TemplateSubAccountRow,
+  Model.TemplateSubAccount,
+  Model.TemplateGroup,
+  Http.SubAccountPayload
+>({
+  fields: [
+    ManageField({ field: "description", allowBlank: true }),
+    ManageField({ field: "name", allowBlank: true }),
+    // We want to attribute the full group to the row, not just the ID.
+    ManageField({ field: "group", allowNull: true, inRow: false }),
+    ManageField({ field: "quantity", allowNull: true }),
+    ManageField({ field: "rate", allowNull: true }),
+    ManageField({ field: "multiplier", allowNull: true }),
+    ManageField({
+      field: "unit",
+      allowNull: true,
+      modelValueConverter: (value: Model.SubAccountUnit | null): Model.SubAccountUnitName | null =>
+        !isNil(value) ? value.name : null,
+      rowValueConverter: (value: Model.SubAccountUnitName | null): Model.SubAccountUnit | null => {
+        if (value !== null) {
+          const model = findChoiceForName(SubAccountUnits, value);
+          if (model === null) {
+            /* eslint-disable no-console */
+            console.error(`Found corrupted sub-account unit name ${value} in table data.`);
+            return null;
+          }
+          return model;
+        }
+        return null;
+      },
+      httpValueConverter: (value: any): number | null | undefined => {
+        if (value !== null) {
+          const model = findChoiceForName(SubAccountUnits, value);
+          if (model === null) {
+            /* eslint-disable no-console */
+            console.error(`Found corrupted sub-account unit name ${value} in table data.`);
+            return undefined;
+          }
+          return model.id;
+        }
+        return null;
+      }
+    }),
+    ManageField({ field: "identifier", required: true }),
+    ManageField({ field: "estimated", readOnly: true }),
+    ManageField({ field: "fringes", allowNull: true, placeholderValue: [] })
+  ],
+  childrenGetter: (model: Model.SubAccount) => model.subaccounts,
+  groupGetter: (model: Model.SubAccount) => model.group,
+  labelGetter: (model: Model.SubAccount) => model.identifier,
+  typeLabel: "Sub Account",
+  rowType: "subaccount"
+});
+
+export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>({
   fields: [
     ManageField({ field: "description" }),
     ManageField({
@@ -598,7 +669,7 @@ export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Mo
   rowType: "actual"
 });
 
-export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Model.Group<any>, Http.FringePayload>({
+export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>({
   fields: [
     ManageField({ field: "name", required: true }),
     ManageField({ field: "description", allowNull: true }),

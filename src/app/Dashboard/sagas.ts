@@ -4,9 +4,9 @@ import { spawn, takeLatest, debounce, takeEvery, select, take, put } from "redux
 import { ActionType, deleteContactAction } from "./actions";
 import {
   getBudgetsTask,
+  getTemplatesTask,
   deleteBudgetTask,
-  restoreBudgetTask,
-  permanentlyDeleteBudgetTask,
+  deleteTemplateTask,
   getContactsTask,
   deleteContactTask,
   updateContactTask,
@@ -68,28 +68,41 @@ function* watchForBudgetsRefreshSaga(): SagaIterator {
   );
 }
 
+function* watchForTemplatesRefreshSaga(): SagaIterator {
+  yield takeLatest(
+    [
+      ActionType.Templates.Request,
+      ActionType.Templates.SetPage,
+      ActionType.Templates.SetPageSize,
+      ActionType.Templates.SetPageAndSize
+    ],
+    getTemplatesTask
+  );
+}
+
 function* watchForSearchBudgetsSaga(): SagaIterator {
   yield debounce(250, ActionType.Budgets.SetSearch, getBudgetsTask);
+}
+
+function* watchForSearchTemplatesSaga(): SagaIterator {
+  yield debounce(250, ActionType.Templates.SetSearch, getTemplatesTask);
 }
 
 function* watchForDeleteBudgetSaga(): SagaIterator {
   yield takeEvery(ActionType.Budgets.Delete, deleteBudgetTask);
 }
 
-function* watchForPermanentlyDeleteBudgetSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budgets.PermanentlyDelete, permanentlyDeleteBudgetTask);
-}
-
-function* watchForRestoreBudgetSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budgets.Restore, restoreBudgetTask);
+function* watchForDeleteTemplateSaga(): SagaIterator {
+  yield takeEvery(ActionType.Templates.Delete, deleteTemplateTask);
 }
 
 export default function* rootSaga(): SagaIterator {
+  yield spawn(watchForTemplatesRefreshSaga);
+  yield spawn(watchForSearchTemplatesSaga);
+  yield spawn(watchForDeleteTemplateSaga);
   yield spawn(watchForBudgetsRefreshSaga);
   yield spawn(watchForSearchBudgetsSaga);
   yield spawn(watchForDeleteBudgetSaga);
-  yield spawn(watchForPermanentlyDeleteBudgetSaga);
-  yield spawn(watchForRestoreBudgetSaga);
   yield spawn(watchForContactsRefreshSaga);
   yield spawn(watchForSearchContactsSaga);
   yield spawn(watchForDeleteContactSaga);

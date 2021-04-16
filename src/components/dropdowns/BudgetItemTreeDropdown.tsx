@@ -10,15 +10,15 @@ import { CaretButton } from "components/buttons";
 import { CaretButtonProps } from "components/buttons/CaretButton";
 import { BudgetItemTreeMenu } from "components/menus";
 import { EntityText } from "components/typography";
-import { flattenBudgetItemNodes } from "lib/model/util";
+import { flattenTreeNodes } from "lib/model/util";
 import { isNodeDescendantOf } from "lib/util";
 
 export interface BudgetItemsTreeDropdownProps extends Omit<DropDownProps, "overlay"> {
   className?: string;
   value?: number;
   placeholderText?: string;
-  onChange?: (item: Model.BudgetItem) => void;
-  nodes: Model.BudgetItemNode[];
+  onChange?: (item: Model.SimpleAccount | Model.SimpleSubAccount) => void;
+  nodes: Model.Tree;
   buttonProps?: CaretButtonProps;
 }
 
@@ -33,13 +33,13 @@ const BudgetItemsTreeDropdown: React.FC<BudgetItemsTreeDropdownProps> = ({
 }) => {
   const [visible, setVisible] = useState(false);
   const [_value, setValue] = useState<number | undefined>(value);
-  const [currentNode, setCurrentNode] = useState<Model.BudgetItem | undefined>(undefined);
-  const flattenedBudgetItemTreeNodes = useMemo(() => flattenBudgetItemNodes(nodes), [nodes]);
+  const [currentNode, setCurrentNode] = useState<Model.SimpleAccount | Model.SimpleSubAccount | undefined>(undefined);
+  const flattenedNodes = useMemo(() => flattenTreeNodes(nodes), [nodes]);
   const buttonId = useMemo(() => uniqueId("budget-items-tree-select-button-"), []);
 
   useEffect(() => {
     if (!isNil(_value)) {
-      const node = find(flattenedBudgetItemTreeNodes, { id: _value });
+      const node: Model.SimpleAccount | Model.SimpleSubAccount | undefined = find(flattenedNodes, { id: _value });
       if (!isNil(node)) {
         setCurrentNode(node);
       }
@@ -66,7 +66,7 @@ const BudgetItemsTreeDropdown: React.FC<BudgetItemsTreeDropdownProps> = ({
             nodes={nodes}
             onChange={(id: number) => {
               setValue(id);
-              const node = find(flattenedBudgetItemTreeNodes, { id });
+              const node = find(flattenedNodes, { id });
               if (!isNil(node) && !isNil(onChange)) {
                 onChange(node);
               }

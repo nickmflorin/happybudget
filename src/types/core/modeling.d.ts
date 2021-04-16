@@ -54,16 +54,8 @@ namespace Model {
   type ContactRoleId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
   type ContactRole = Choice<ContactRoleId, ContactRoleName>;
 
-  type EntityType = "budget" | "account" | "subaccount";
-  type BudgetItemType = "subaccount" | "account";
-  type CommentParentType = "budget" | "account" | "subaccount" | "comment";
-
-  interface Entity extends Model.Model {
-    readonly identifier: string | null;
-    readonly type: Model.EntityType;
-    readonly name: string | null;
-    readonly description: string | null;
-  }
+  type EntityType = "budget" | "template" | "account" | "subaccount";
+  type BudgetType = "budget" | "template";
 
   interface TrackedModel extends Model.Model {
     readonly created_by: number | null;
@@ -104,78 +96,97 @@ namespace Model {
     readonly unit: Model.FringeUnit;
   }
 
-  interface Budget extends Model.Model {
-    readonly id: number;
+  interface BaseBudget extends Model.TrackedModel {
     readonly name: string;
-    readonly created_by: number;
+    readonly estimated: number | null;
+    readonly trash: boolean;
+    readonly type: BudgetType;
+  }
+
+  interface SimpleTemplate extends Model.Model {
+    readonly name: string;
+    readonly type: "template";
+  }
+
+  interface Template extends Model.BaseBudget {
+    readonly type: "template";
+  }
+
+  interface SimpleBudget extends Model.Model {
+    readonly name: string;
+    readonly type: "budget";
+  }
+
+  interface Budget extends Model.BaseBudget {
     readonly project_number: number;
     readonly production_type: Model.ProductionType;
-    readonly created_at: string;
-    readonly updated_at: string;
     readonly shoot_date: string;
     readonly delivery_date: string;
     readonly build_days: number;
     readonly prelight_days: number;
     readonly studio_shoot_days: number;
     readonly location_days: number;
-    readonly trash: boolean;
-    readonly estimated: number | null;
     readonly actual: number | null;
     readonly variance: number | null;
+    readonly type: "budget";
   }
 
-  interface SimpleBudgetItem extends Model.Model {
-    readonly identifier: string;
-  }
-
-  interface BudgetItem extends Model.SimpleBudgetItem {
-    readonly description: string;
-    readonly type: Model.BudgetItemType;
-  }
-
-  interface BudgetItemNode extends Model.BudgetItem {
-    readonly children: Model.BudgetItemTreeNode[];
-  }
-
-  interface Group<C extends Model.Model> extends Model.TrackedModel {
-    readonly children: C[];
+  interface Group extends Model.TrackedModel {
+    readonly children: number[];
     readonly name: string;
     readonly color: string;
     readonly estimated: number | null;
+    readonly children: number[];
+  }
+
+  interface BudgetGroup extends Model.Group {
     readonly variance: number | null;
     readonly actual: number | null;
   }
 
-  interface Account extends Model.Model {
-    readonly description: string;
-    readonly type: Model.BudgetItemType;
-    readonly identifier: string;
-    readonly created_by: number | null;
-    readonly updated_by: number | null;
-    readonly created_at: string;
-    readonly updated_at: string;
+  interface TemplateGroup extends Model.Group {}
 
+  interface SimpleAccount extends Model.Model {
+    readonly identifier: string;
+    readonly type: "account";
     readonly description: string | null;
+  }
+
+  interface SubAccountTreeNode extends Model.SimpleSubAccount {
+    readonly children: SubAccountTreeNode[];
+  }
+
+  interface AccountTreeNode extends Model.SimpleAccount {
+    readonly children: Model.SubAccountTreeNode[];
+  }
+
+  type Tree = Model.AccountTreeNode[];
+
+  interface Account extends Model.SimpleAccount, Model.TrackedModel {
     readonly access: number[];
     readonly ancestors: Model.Entity[];
     readonly estimated: number | null;
+    readonly subaccounts: number[];
+    readonly group: number | null;
+    readonly siblings: Model.SimpleAccount[];
+    readonly budget: number;
+  }
+
+  interface BudgetAccount extends Model.Account {
     readonly variance: number | null;
     readonly actual: number | null;
-    readonly subaccounts: Model.SimpleSubAccount[];
-    readonly type: "account";
-    readonly group: number | null;
-    readonly siblings: Model.Entity[];
   }
 
-  interface SimpleAccount extends Model.SimpleBudgetItem {}
+  interface TemplateAccount extends Model.Account {}
 
   interface SimpleSubAccount extends Model.Model {
-    readonly name: string;
+    readonly name: string | null;
+    readonly type: "subaccount";
+    readonly identifier: string;
+    readonly description: string | null;
   }
 
-  interface SubAccount extends Model.BudgetItem, Model.TrackedModel {
-    readonly description: string | null;
-    readonly name: string | null;
+  interface SubAccount extends Model.SimpleSubAccount, Model.TrackedModel {
     readonly quantity: number | null;
     readonly rate: number | null;
     readonly multiplier: number | null;
@@ -183,16 +194,30 @@ namespace Model {
     readonly account: number;
     readonly object_id: number;
     readonly type: "subaccount";
-    readonly parent_type: Model.BudgetItemType;
-    readonly ancestors: Model.Entity[];
+    readonly parent_type: "account" | "subaccount";
     readonly estimated: number | null;
+    readonly group: number | null;
+    readonly fringes: number[];
+    readonly subaccounts: number[];
+    readonly siblings: Model.SimpleSubAccount[];
+    readonly ancestors: Model.Entity[];
+  }
+
+  interface BudgetSubAccount extends Model.SubAccount {
     readonly variance: number | null;
     readonly actual: number | null;
-    readonly subaccounts: Model.SimpleSubAccount[];
-    readonly group: number | null;
-    readonly siblings: Model.Entity[];
-    readonly fringes: number[];
   }
+
+  interface TemplateSubAccount extends Model.SubAccount {}
+
+  type TemplateForm = Model.Template | Model.SimpleTemplate;
+  type BudgetForm = Model.Budget | Model.SimpleBudget;
+  type SubAccountForm = Model.BudgetSubAccount | Model.TemplateSubAccount | Model.SimpleSubAccount;
+  type AccountForm = Model.BudgetAccount | Model.TemplateAccount | Model.SimpleAccount;
+  type SimpleLineItem = Model.SimpleAccount | Model.SimpleSubAccount;
+  type BudgetLineItem = Model.BudgetAccount | Model.BudgetSubAccount;
+  type SimpleEntity = Model.SimpleAccount | Model.SimpleBudget | Model.SimpleSubAccount | Model.SimpleTemplate;
+  type Entity = Model.Account | Model.Budget | Model.SubAccount | Model.Template;
 
   interface Actual extends Model.TrackedModel {
     readonly vendor: string | null;
@@ -203,7 +228,7 @@ namespace Model {
     readonly value: string | null;
     readonly payment_method: Model.PaymentMethod | null;
     readonly object_id: number;
-    readonly parent_type: Model.BudgetItemType;
+    readonly parent_type: "account" | "subaccount";
   }
 
   interface Comment extends Model.Model {
@@ -213,7 +238,7 @@ namespace Model {
     readonly user: Model.SimpleUser;
     readonly text: string;
     readonly object_id: number;
-    readonly content_object_type: Model.CommentParentType;
+    readonly content_object_type: "budget" | "account" | "subaccount" | "comment";
     readonly comments: Model.Comment[];
   }
 
@@ -232,20 +257,12 @@ namespace Model {
   }
 
   type HistoryEventType = "field_alteration" | "create";
-  type HistoryEventContentObjectType = "account" | "subaccount" | "actual";
-
-  interface HistoryEventContentObject {
-    readonly id: number;
-    readonly identifier?: string;
-    readonly description: string | null;
-    readonly type: Model.HistoryEventContentObjectType;
-  }
 
   interface PolymorphicEvent extends Model.Model {
     readonly created_at: string;
     readonly user: Model.SimpleUser;
     readonly type: Model.HistoryEventType;
-    readonly content_object: Model.HistoryEventContentObject;
+    readonly content_object: Model.SimpleAccount | Model.SimpleSubAccount;
   }
 
   interface FieldAlterationEvent extends Model.PolymorphicEvent {

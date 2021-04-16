@@ -1,50 +1,98 @@
-import { isNil, map, includes } from "lodash";
+import { useState, useCallback } from "react";
+import { isNil, map, includes, filter } from "lodash";
 import classNames from "classnames";
 import "./HorizontalMenu.scss";
 
-export interface IHorizontalMenuItem {
-  id: any;
+export interface IHorizontalMenuItem<I extends string = string> {
+  id: I;
   label: string;
   onClick?: () => void;
 }
 
-interface HorizontalMenuItemProps extends IHorizontalMenuItem {
+interface HorizontalMenuItemProps<I extends string = string> extends IHorizontalMenuItem<I>, StandardComponentProps {
   selected: boolean;
 }
 
-export const HorizontalMenuItem = ({ label, selected, onClick }: HorizontalMenuItemProps): JSX.Element => {
+export const HorizontalMenuItem = <I extends string = string>({
+  label,
+  selected,
+  className,
+  style = {},
+  onClick
+}: HorizontalMenuItemProps<I>): JSX.Element => {
   return (
     <div
       onClick={() => !isNil(onClick) && onClick()}
-      className={classNames("horizontal-menu-item", { "horizontal-menu-item-selected": selected })}
+      className={classNames("horizontal-menu-item", { "horizontal-menu-item-selected": selected }, className)}
+      style={style}
     >
       {label}
     </div>
   );
 };
 
-interface HorizontalMenuProps {
-  onChange: (item: IHorizontalMenuItem) => void;
-  items: IHorizontalMenuItem[];
-  selected?: any | any[];
+interface HorizontalMenuProps<I extends string = string> extends StandardComponentProps {
+  onChange?: (item: IHorizontalMenuItem<I>, selected: boolean) => void;
+  items: IHorizontalMenuItem<I>[];
+  selected?: I | I[];
+  itemProps?: StandardComponentProps;
 }
 
-const HorizontalMenu = ({ items, selected, onChange }: HorizontalMenuProps): JSX.Element => {
+const HorizontalMenu = <I extends string = string>({
+  items,
+  selected,
+  className,
+  style = {},
+  itemProps,
+  onChange
+}: HorizontalMenuProps<I>): JSX.Element => {
+  const [_selected, setSelected] = useState<I | I[]>(selected || items[0].id);
+
+  const isItemSelected = useCallback(
+    (item: IHorizontalMenuItem) => {
+      if (!isNil(selected)) {
+        // In this case, the component is "controlled" (i.e. the selected state is determined from
+        // the passed in selected prop).
+        if (Array.isArray(selected)) {
+          return includes(selected, item.id);
+        }
+        return selected === item.id;
+      } else {
+        // In this case, the component is "uncontrolled" (i.e. the selected state is determined
+        // from internal state).
+        if (Array.isArray(_selected)) {
+          return includes(_selected, item.id);
+        }
+        return _selected === item.id;
+      }
+    },
+    [selected, _selected]
+  );
+
   return (
-    <div className={"horizontal-menu"}>
-      {map(items, (item: IHorizontalMenuItem, index: number) => (
+    <div className={classNames("horizontal-menu", className)} style={style}>
+      {map(items, (item: IHorizontalMenuItem<I>, index: number) => (
         <HorizontalMenuItem
           key={index}
           {...item}
-          selected={
-            !isNil(selected) ? (Array.isArray(selected) ? includes(selected, item.id) : selected === item.id) : false
-          }
+          {...itemProps}
+          selected={isItemSelected(item)}
           onClick={() => {
             if (!isNil(onChange)) {
-              onChange(item);
+              onChange(item, isItemSelected(item));
             }
             if (!isNil(item.onClick)) {
               item.onClick();
+            }
+            // Maintain internal reference to the currently selected items.
+            if (Array.isArray(_selected)) {
+              if (includes(_selected, item.id)) {
+                setSelected(filter(_selected, (id: I) => id !== item.id));
+              } else {
+                setSelected([..._selected, item.id]);
+              }
+            } else {
+              setSelected(item.id);
             }
           }}
         />

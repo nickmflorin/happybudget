@@ -1,12 +1,8 @@
 import { Reducer, combineReducers } from "redux";
-import { initialListResponseState } from "store/initialState";
-import { createListResponseReducer, createAgnosticModelListActionReducer } from "lib/redux/factories";
-import { ActionType, ActionDomains } from "./actions";
+import { createListResponseReducer } from "lib/redux/factories";
+import { ActionType } from "./actions";
 
-const PermanentlyDeletingReducer = createAgnosticModelListActionReducer();
-const RestoringReducer = createAgnosticModelListActionReducer();
-
-const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Dashboard.Action<any>> = combineReducers({
+const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineReducers({
   contacts: createListResponseReducer<Model.Contact, Redux.ListResponseStore<Model.Contact>>({
     Response: ActionType.Contacts.Response,
     Request: ActionType.Contacts.Request,
@@ -23,74 +19,31 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Dashboard.Action<any>> =
     Updating: ActionType.Contacts.Updating,
     Deleting: ActionType.Contacts.Deleting
   }),
-  budgets: combineReducers({
-    active: createListResponseReducer<Model.Budget, Redux.ListResponseStore<Model.Budget>, Redux.Dashboard.Action<any>>(
-      {
-        Response: ActionType.Budgets.Response,
-        Loading: ActionType.Budgets.Loading,
-        Select: ActionType.Budgets.Select,
-        SetSearch: ActionType.Budgets.SetSearch,
-        SetPage: ActionType.Budgets.SetPage,
-        SetPageSize: ActionType.Budgets.SetPageSize,
-        SetPageAndSize: ActionType.Budgets.SetPageAndSize,
-        AddToState: ActionType.Budgets.AddToState,
-        RemoveFromState: ActionType.Budgets.RemoveFromState,
-        UpdateInState: ActionType.Budgets.UpdateInState,
-        Deleting: ActionType.Budgets.Deleting
-      },
-      {
-        excludeActions: (action: Redux.Dashboard.Action<any>) => {
-          return ActionDomains.ACTIVE !== action.domain;
-        }
-      }
-    ),
-    trash: createListResponseReducer<Model.Budget, Redux.Dashboard.TrashBudgetsListStore, Redux.Dashboard.Action<any>>(
-      {
-        Response: ActionType.Budgets.Response,
-        Loading: ActionType.Budgets.Loading,
-        Select: ActionType.Budgets.Select,
-        SetSearch: ActionType.Budgets.SetSearch,
-        SetPage: ActionType.Budgets.SetPage,
-        SetPageSize: ActionType.Budgets.SetPageSize,
-        SetPageAndSize: ActionType.Budgets.SetPageAndSize,
-        AddToState: ActionType.Budgets.AddToState,
-        RemoveFromState: ActionType.Budgets.RemoveFromState,
-        UpdateInState: ActionType.Budgets.UpdateInState
-      },
-      {
-        excludeActions: (action: Redux.Dashboard.Action<any>) => {
-          return ActionDomains.TRASH !== action.domain;
-        },
-        extensions: {
-          [ActionType.Budgets.PermanentlyDeleting]: (
-            st: Redux.Dashboard.TrashBudgetsListStore = {
-              ...initialListResponseState,
-              restoring: [],
-              permanentlyDeleting: []
-            },
-            action: Redux.Action<Redux.ModelListActionPayload>
-          ) => {
-            return {
-              ...st,
-              permanentlyDeleting: PermanentlyDeletingReducer(st.permanentlyDeleting, action)
-            };
-          },
-          [ActionType.Budgets.Restoring]: (
-            st: Redux.Dashboard.TrashBudgetsListStore = {
-              ...initialListResponseState,
-              restoring: [],
-              permanentlyDeleting: []
-            },
-            action: Redux.Action<Redux.ModelListActionPayload>
-          ) => {
-            return {
-              ...st,
-              restoring: RestoringReducer(st.restoring, action)
-            };
-          }
-        }
-      }
-    )
+  templates: createListResponseReducer<Model.Template, Redux.ListResponseStore<Model.Template>, Redux.Action<any>>({
+    Response: ActionType.Templates.Response,
+    Loading: ActionType.Templates.Loading,
+    Select: ActionType.Templates.Select,
+    SetSearch: ActionType.Templates.SetSearch,
+    SetPage: ActionType.Templates.SetPage,
+    SetPageSize: ActionType.Templates.SetPageSize,
+    SetPageAndSize: ActionType.Templates.SetPageAndSize,
+    AddToState: ActionType.Templates.AddToState,
+    RemoveFromState: ActionType.Templates.RemoveFromState,
+    UpdateInState: ActionType.Templates.UpdateInState,
+    Deleting: ActionType.Templates.Deleting
+  }),
+  budgets: createListResponseReducer<Model.Budget, Redux.ListResponseStore<Model.Budget>, Redux.Action<any>>({
+    Response: ActionType.Budgets.Response,
+    Loading: ActionType.Budgets.Loading,
+    Select: ActionType.Budgets.Select,
+    SetSearch: ActionType.Budgets.SetSearch,
+    SetPage: ActionType.Budgets.SetPage,
+    SetPageSize: ActionType.Budgets.SetPageSize,
+    SetPageAndSize: ActionType.Budgets.SetPageAndSize,
+    AddToState: ActionType.Budgets.AddToState,
+    RemoveFromState: ActionType.Budgets.RemoveFromState,
+    UpdateInState: ActionType.Budgets.UpdateInState,
+    Deleting: ActionType.Budgets.Deleting
   })
 });
 

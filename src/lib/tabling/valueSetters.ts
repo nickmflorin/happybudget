@@ -3,7 +3,7 @@ import { ValueSetterParams } from "ag-grid-community";
 import { findChoiceForName } from "lib/model/util";
 import { toApiDateTime } from "lib/util/dates";
 
-export const percentageToDecimalValueSetter = <R extends Table.Row<any, any>>(field: keyof R) => (
+export const percentageToDecimalValueSetter = <R extends Table.Row>(field: keyof R) => (
   params: ValueSetterParams
 ): boolean => {
   if (!isNaN(parseFloat(params.newValue))) {
@@ -13,9 +13,7 @@ export const percentageToDecimalValueSetter = <R extends Table.Row<any, any>>(fi
   return false;
 };
 
-export const floatValueSetter = <R extends Table.Row<any, any>>(field: keyof R) => (
-  params: ValueSetterParams
-): boolean => {
+export const floatValueSetter = <R extends Table.Row>(field: keyof R) => (params: ValueSetterParams): boolean => {
   if (!isNaN(parseFloat(params.newValue))) {
     params.data[field] = parseFloat(params.newValue);
     return true;
@@ -23,9 +21,7 @@ export const floatValueSetter = <R extends Table.Row<any, any>>(field: keyof R) 
   return false;
 };
 
-export const integerValueSetter = <R extends Table.Row<any, any>>(field: keyof R) => (
-  params: ValueSetterParams
-): boolean => {
+export const integerValueSetter = <R extends Table.Row>(field: keyof R) => (params: ValueSetterParams): boolean => {
   if (!isNaN(parseInt(params.newValue))) {
     params.data[field] = parseInt(params.newValue);
     return true;
@@ -33,9 +29,7 @@ export const integerValueSetter = <R extends Table.Row<any, any>>(field: keyof R
   return false;
 };
 
-export const dateTimeValueSetter = <R extends Table.Row<any, any>>(field: keyof R) => (
-  params: ValueSetterParams
-): boolean => {
+export const dateTimeValueSetter = <R extends Table.Row>(field: keyof R) => (params: ValueSetterParams): boolean => {
   if (params.newValue === undefined || params.newValue === null) {
     params.data[field] = null;
     return true;
@@ -52,7 +46,7 @@ interface choiceModelValueSetterOptions {
   allowNull?: boolean;
 }
 
-export const choiceModelValueSetter = <R extends Table.Row<any, any>, M extends Model.Choice<number, string>>(
+export const choiceModelValueSetter = <R extends Table.Row, M extends Model.Choice<number, string>>(
   field: keyof R,
   models: M[],
   options?: choiceModelValueSetterOptions

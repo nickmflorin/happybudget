@@ -3,10 +3,9 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select } from "redux-saga/effects";
 import {
   getBudgets,
-  getBudgetsInTrash,
+  getTemplates,
   deleteBudget,
-  restoreBudget,
-  permanentlyDeleteBudget,
+  deleteTemplate,
   getContacts,
   deleteContact,
   updateContact,
@@ -14,13 +13,14 @@ import {
 } from "api/services";
 import { handleRequestError } from "api";
 import {
-  ActionDomains,
   loadingBudgetsAction,
+  loadingTemplatesAction,
   responseBudgetsAction,
+  responseTemplatesAction,
   deletingBudgetAction,
+  deletingTemplateAction,
   removeBudgetFromStateAction,
-  restoringBudgetAction,
-  permanentlyDeletingBudgetAction,
+  removeTemplateFromStateAction,
   loadingContactsAction,
   responseContactsAction,
   deletingContactAction,
@@ -31,45 +31,53 @@ import {
   addContactToStateAction
 } from "./actions";
 
-export function* getBudgetsTask(action: Redux.Dashboard.Action<any>): SagaIterator {
+export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
   const query = yield select((state: Redux.ApplicationStore) => {
-    if (action.domain === ActionDomains.ACTIVE) {
-      return {
-        search: state.dashboard.budgets.active.search,
-        page_size: state.dashboard.budgets.active.pageSize,
-        page: state.dashboard.budgets.active.page
-      };
-    }
     return {
-      search: state.dashboard.budgets.trash.search,
-      page_size: state.dashboard.budgets.trash.pageSize,
-      page: state.dashboard.budgets.trash.page
+      search: state.dashboard.budgets.search,
+      page_size: state.dashboard.budgets.pageSize,
+      page: state.dashboard.budgets.page
     };
   });
-  yield put(loadingBudgetsAction(action.domain, true));
+  yield put(loadingBudgetsAction(true));
   try {
-    let response: Http.ListResponse<Model.Budget>;
-    if (action.domain === ActionDomains.ACTIVE) {
-      response = yield call(getBudgets, query);
-    } else {
-      response = yield call(getBudgetsInTrash, query);
-    }
-    yield put(responseBudgetsAction(action.domain, response));
+    const response: Http.ListResponse<Model.Budget> = yield call(getBudgets, query);
+    yield put(responseBudgetsAction(response));
   } catch (e) {
     handleRequestError(e, "There was an error retrieving the budgets.");
-    yield put(responseBudgetsAction(action.domain, { count: 0, data: [] }, { error: e }));
+    yield put(responseBudgetsAction({ count: 0, data: [] }, { error: e }));
   } finally {
-    yield put(loadingBudgetsAction(action.domain, false));
+    yield put(loadingBudgetsAction(false));
   }
 }
 
-export function* deleteBudgetTask(action: Redux.Dashboard.Action<number>): SagaIterator {
+export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
+  const query = yield select((state: Redux.ApplicationStore) => {
+    return {
+      search: state.dashboard.templates.search,
+      page_size: state.dashboard.templates.pageSize,
+      page: state.dashboard.templates.page
+    };
+  });
+  yield put(loadingTemplatesAction(true));
+  try {
+    const response: Http.ListResponse<Model.Template> = yield call(getTemplates, query);
+    yield put(responseTemplatesAction(response));
+  } catch (e) {
+    handleRequestError(e, "There was an error retrieving the templates.");
+    yield put(responseTemplatesAction({ count: 0, data: [] }, { error: e }));
+  } finally {
+    yield put(loadingTemplatesAction(false));
+  }
+}
+
+export function* deleteBudgetTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(deletingBudgetAction({ id: action.payload, value: true }));
     try {
-      // TODO: Do we also want to add the deleted budget to the TRASh domain state?
+      // TODO: Do we also want to add the deleted budget to the TRASH domain state?
       yield call(deleteBudget, action.payload);
-      yield put(removeBudgetFromStateAction(ActionDomains.ACTIVE, action.payload));
+      yield put(removeBudgetFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the budget.");
     } finally {
@@ -78,31 +86,17 @@ export function* deleteBudgetTask(action: Redux.Dashboard.Action<number>): SagaI
   }
 }
 
-export function* restoreBudgetTask(action: Redux.Dashboard.Action<number>): SagaIterator {
+export function* deleteTemplateTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(restoringBudgetAction({ id: action.payload, value: true }));
+    yield put(deletingTemplateAction({ id: action.payload, value: true }));
     try {
-      // TODO: Do we also want to add the deleted budget to the ACTIVE domain state?
-      yield call(restoreBudget, action.payload);
-      yield put(removeBudgetFromStateAction(ActionDomains.TRASH, action.payload));
+      // TODO: Do we also want to add the deleted template to the TRASH domain state?
+      yield call(deleteTemplate, action.payload);
+      yield put(removeTemplateFromStateAction(action.payload));
     } catch (e) {
-      handleRequestError(e, "There was an error restoring the budget.");
+      handleRequestError(e, "There was an error deleting the template.");
     } finally {
-      yield put(restoringBudgetAction({ id: action.payload, value: false }));
-    }
-  }
-}
-
-export function* permanentlyDeleteBudgetTask(action: Redux.Dashboard.Action<number>): SagaIterator {
-  if (!isNil(action.payload)) {
-    yield put(permanentlyDeletingBudgetAction({ id: action.payload, value: true }));
-    try {
-      yield call(permanentlyDeleteBudget, action.payload);
-      yield put(removeBudgetFromStateAction(ActionDomains.TRASH, action.payload));
-    } catch (e) {
-      handleRequestError(e, "There was an error deleting the budget.");
-    } finally {
-      yield put(permanentlyDeletingBudgetAction({ id: action.payload, value: false }));
+      yield put(deletingTemplateAction({ id: action.payload, value: false }));
     }
   }
 }
