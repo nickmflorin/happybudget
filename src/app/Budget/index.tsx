@@ -59,7 +59,12 @@ const Budget = (): JSX.Element => {
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faMagic} />,
-          disabled: true
+          disabled: true,
+          tooltip: {
+            title: "Bid Assistant",
+            placement: "bottom",
+            overlayClassName: "disabled"
+          }
         },
         {
           icon: <FontAwesomeIcon icon={faPrint} />,
@@ -69,20 +74,38 @@ const Budget = (): JSX.Element => {
                 download(response, !isNil(budget) ? `${budget.name}.pdf` : "budget.pdf");
               });
             }
+          },
+          tooltip: {
+            title: "Export",
+            placement: "bottom"
           }
         },
         {
           icon: <FontAwesomeIcon icon={faCloud} />,
-          disabled: true
+          disabled: true,
+          tooltip: {
+            title: "Share",
+            placement: "bottom",
+            overlayClassName: "disabled"
+          }
         },
         {
           icon: <FontAwesomeIcon icon={faCog} />,
-          disabled: true
+          disabled: true,
+          tooltip: {
+            title: "Settings",
+            placement: "bottom",
+            overlayClassName: "disabled"
+          }
         },
         {
           icon: <FontAwesomeIcon icon={faCommentsAlt} />,
           onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen)),
-          role: "drawer-toggle"
+          role: "drawer-toggle",
+          tooltip: {
+            title: "Comments",
+            placement: "bottom"
+          }
         }
       ]}
       sidebar={[
