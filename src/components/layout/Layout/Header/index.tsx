@@ -6,11 +6,11 @@ import { isNil } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOutAlt, faAddressCard } from "@fortawesome/free-solid-svg-icons";
 
-import { Layout } from "antd";
+import { Layout, Tooltip } from "antd";
 
 import { Dropdown } from "components/dropdowns";
 import { AccountCircleLink } from "components/links";
-import { ShowHide, TooltipWrapper } from "components";
+import { ShowHide } from "components";
 import { useLoggedInUser } from "store/hooks";
 
 import Toolbar, { IToolbarItem } from "./Toolbar";
@@ -60,9 +60,9 @@ const Header = ({ breadcrumbs, toolbar, className, headerHeight, style = {} }: H
           ]}
         >
           <div className={"account-wrapper"}>
-            <TooltipWrapper title={user.username}>
+            <Tooltip title={user.username}>
               <AccountCircleLink user={user} />
-            </TooltipWrapper>
+            </Tooltip>
           </div>
         </Dropdown>
       </div>
