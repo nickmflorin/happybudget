@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { faSigma, faPercentage, faDownload } from "@fortawesome/pro-solid-svg-icons";
 
-import { Input, Checkbox } from "antd";
+import { Input, Checkbox, Tooltip } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { SearchOutlined } from "@ant-design/icons";
 
@@ -13,7 +13,7 @@ import { ColDef } from "ag-grid-community";
 import { IconButton } from "components/buttons";
 import { FieldsDropdown } from "components/dropdowns";
 import { FieldMenuField } from "components/menus/FieldsMenu";
-import { SavingChanges, TooltipWrapper } from "components";
+import { SavingChanges } from "components";
 import { Portal } from "components/layout";
 
 interface TableHeaderProps {
@@ -45,37 +45,53 @@ const TableHeader = ({
     <Portal id={"supplementary-header"} visible={true}>
       <div className={"table-header"}>
         <div className={"table-header-left"}>
-          <TooltipWrapper title={"Select All"}>
+          <Tooltip title={"Select All"}>
             <Checkbox checked={selected} onChange={(e: CheckboxChangeEvent) => onSelect(e.target.checked)} />
-          </TooltipWrapper>
+          </Tooltip>
           <IconButton
-            tooltip={{ title: "Delete", placement: "bottom" }}
             className={"dark"}
             size={"large"}
-            icon={<FontAwesomeIcon icon={faTrash} />}
             onClick={() => onDelete()}
             disabled={deleteDisabled}
+            icon={<FontAwesomeIcon icon={faTrash} />}
+            tooltip={{
+              title: "Delete",
+              placement: "bottom",
+              overlayClassName: "disabled"
+            }}
           />
           <IconButton
-            tooltip={{ title: "Sub Total", placement: "bottom" }}
             className={"dark"}
             size={"large"}
             disabled={true}
             icon={<FontAwesomeIcon icon={faSigma} />}
+            tooltip={{
+              title: "Sub Total",
+              placement: "bottom",
+              overlayClassName: "disabled"
+            }}
           />
           <IconButton
-            tooltip={{ title: "Mark Up", placement: "bottom" }}
             className={"dark"}
             size={"large"}
             disabled={true}
             icon={<FontAwesomeIcon icon={faPercentage} />}
+            tooltip={{
+              title: "Mark Up",
+              placement: "bottom",
+              overlayClassName: "disabled"
+            }}
           />
           <IconButton
-            tooltip={{ title: "Delete", placement: "bottom" }}
             className={"dark"}
             size={"large"}
             disabled={true}
             icon={<FontAwesomeIcon icon={faDownload} />}
+            tooltip={{
+              title: "Import",
+              placement: "bottom",
+              overlayClassName: "disabled"
+            }}
           />
           <Input
             placeholder={"Search Rows"}

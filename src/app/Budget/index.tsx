@@ -58,12 +58,15 @@ const Budget = (): JSX.Element => {
       breadcrumbs={!isNil(budget) ? <AncestorsBreadCrumbs instance={instance} budget={budget} /> : <></>}
       toolbar={[
         {
-          tooltip: { title: "Bid Assistant", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faMagic} />,
-          disabled: true
+          disabled: true,
+          tooltip: {
+            title: "Bid Assistant",
+            placement: "bottom",
+            overlayClassName: "disabled"
+          }
         },
         {
-          tooltip: { title: "Export", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faPrint} />,
           onClick: () => {
             if (!isNaN(parseInt(budgetId))) {
@@ -71,23 +74,38 @@ const Budget = (): JSX.Element => {
                 download(response, !isNil(budget) ? `${budget.name}.pdf` : "budget.pdf");
               });
             }
+          },
+          tooltip: {
+            title: "Export",
+            placement: "bottom"
           }
         },
         {
-          tooltip: { title: "Share", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faCloud} />,
-          disabled: true
+          disabled: true,
+          tooltip: {
+            title: "Share",
+            placement: "bottom",
+            overlayClassName: "disabled"
+          }
         },
         {
-          tooltip: { title: "Settings", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faCog} />,
-          disabled: true
+          disabled: true,
+          tooltip: {
+            title: "Settings",
+            placement: "bottom",
+            overlayClassName: "disabled"
+          }
         },
         {
-          tooltip: { title: "Comments", placement: "bottom" },
           icon: <FontAwesomeIcon icon={faCommentsAlt} />,
           onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen)),
-          role: "drawer-toggle"
+          role: "drawer-toggle",
+          tooltip: {
+            title: "Comments",
+            placement: "bottom"
+          }
         }
       ]}
       sidebar={[

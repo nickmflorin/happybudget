@@ -11,11 +11,11 @@ const TooltipWrapper = ({ children, ...props }: TooltipWrapperProps): JSX.Elemen
   if (!isNil(props.title)) {
     return (
       <Tooltip title={props.title} {...props}>
-        <div>{children}</div>
+        <span>{children}</span>
       </Tooltip>
     );
   } else {
-    return <div>{children}</div>;
+    return <span>{children}</span>;
   }
 };
 
