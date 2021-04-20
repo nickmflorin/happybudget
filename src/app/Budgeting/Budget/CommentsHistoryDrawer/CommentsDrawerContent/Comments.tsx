@@ -1,7 +1,9 @@
 import { map } from "lodash";
-import { Empty } from "antd";
 
 import { RenderWithSpinner, ShowHide } from "components";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCommentAlt } from "@fortawesome/pro-light-svg-icons";
 
 import CommentBlock from "./CommentBlock";
 
@@ -50,7 +52,8 @@ const Comments = ({
       </ShowHide>
       <ShowHide show={comments.length === 0 && nested === false}>
         <div className={"no-data-wrapper"}>
-          <Empty className={"empty"} description={"No Comments!"} />
+          <FontAwesomeIcon icon={faCommentAlt} size={"6x"} color={"gray"} />
+          <div className={"text-container"}>{"No Comments yet, give some Notes!"}</div>
         </div>
       </ShowHide>
     </RenderWithSpinner>

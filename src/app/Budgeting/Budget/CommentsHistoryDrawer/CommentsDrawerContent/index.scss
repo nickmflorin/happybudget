@@ -28,6 +28,20 @@
       // because then all of the top level comment blocks will be 100% height
       // of the drawer.
       position: absolute;
+
+      * {
+        margin: 0 auto;
+        color: #a3a3a3;;
+      }
+
+      .text-container {
+        margin-top: 25px;
+        text-align: center;
+        font-family: "Open Sans JP", sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+        width: 130px;
+      }
     }
   }
 }
