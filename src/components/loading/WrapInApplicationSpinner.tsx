@@ -1,7 +1,6 @@
-import { ReactNode, useEffect, useMemo } from "react";
+import { ReactNode, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { v4 as uuidv4 } from "uuid";
 
 import { setApplicationLoadingAction } from "store/actions";
 
@@ -11,21 +10,20 @@ interface WrapInApplicationSpinnerProps {
   hideWhileLoading?: boolean;
 }
 
-const WrapInApplicationSpinner = ({
+const WrapInApplicationSpinner: React.FC<WrapInApplicationSpinnerProps> = ({
   loading,
   children,
   hideWhileLoading = false
-}: WrapInApplicationSpinnerProps): JSX.Element => {
-  const id = useMemo(() => uuidv4(), []);
+}) => {
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
     if (loading === true) {
-      dispatch(setApplicationLoadingAction({ id, value: true }));
+      dispatch(setApplicationLoadingAction(true));
     } else {
-      dispatch(setApplicationLoadingAction({ id, value: false }));
+      dispatch(setApplicationLoadingAction(false));
     }
-  }, [loading, id]);
+  }, [loading]);
 
   if (hideWhileLoading && loading === false) {
     return <></>;

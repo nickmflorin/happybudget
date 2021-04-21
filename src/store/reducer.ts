@@ -1,7 +1,7 @@
 import { Reducer, combineReducers } from "redux";
-import { forEach, isNil, includes, filter } from "lodash";
+import { forEach, isNil, includes } from "lodash";
 import { ApplicationActionTypes } from "./actions";
-import { createInitialUserState, initialLoadingState } from "./initialState";
+import { createInitialUserState } from "./initialState";
 import { createSimpleBooleanReducer } from "../lib/redux/factories";
 
 /**
@@ -63,48 +63,14 @@ const createUserReducer = (user: Model.User): Reducer<Redux.UserStore, Redux.Act
   return userReducer;
 };
 
-const loadingReducer: Reducer<Redux.LoadingStore, Redux.Action<any>> = (
-  state: Redux.LoadingStore = initialLoadingState,
+const loadingReducer: Reducer<boolean, Redux.Action<any>> = (
+  state: boolean = false,
   action: Redux.Action<any>
-): Redux.LoadingStore => {
-  let newState = { ...state };
-  if (!isNil(action.payload)) {
-    if (action.type === ApplicationActionTypes.SetApplicationLoading) {
-      const { id, value } = action.payload;
-      if (value === false) {
-        if (!includes(newState.elements, id)) {
-          /* eslint-disable no-console */
-          console.warn(
-            `Inconsistent State!  Inconsistent state noticed when removing element from loading
-            state... the element with ID ${id} does not exist in state when it is expected to.`
-          );
-        } else {
-          const elements = filter(newState.elements, (element: string) => element !== id);
-          newState = {
-            ...newState,
-            elements,
-            loading: elements.length !== 0
-          };
-        }
-      } else {
-        if (includes(newState.elements, id)) {
-          /* eslint-disable no-console */
-          console.warn(
-            `Inconsistent State!  Inconsistent state noticed when adding element to loading
-            state... the element with ID ${id} already exists in state when it is not expected to.`
-          );
-        } else {
-          const elements = [...newState.elements, id];
-          newState = {
-            ...newState,
-            elements,
-            loading: elements.length !== 0
-          };
-        }
-      }
-    }
+): boolean => {
+  if (!isNil(action.payload) && action.type === ApplicationActionTypes.SetApplicationLoading) {
+    return action.payload;
   }
-  return newState;
+  return state;
 };
 
 /**

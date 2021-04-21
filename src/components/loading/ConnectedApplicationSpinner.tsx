@@ -1,0 +1,10 @@
+import { useSelector } from "react-redux";
+import { selectApplicationLoading } from "store/selectors";
+import ApplicationSpinner from "./ApplicationSpinner";
+
+const ConnectedApplicationSpinner = (): JSX.Element => {
+  const applicationLoading = useSelector(selectApplicationLoading);
+  return <ApplicationSpinner visible={applicationLoading} />;
+};
+
+export default ConnectedApplicationSpinner;

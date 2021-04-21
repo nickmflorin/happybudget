@@ -1,8 +1,7 @@
 import React from "react";
 import { Redirect, Switch, Route } from "react-router-dom";
-import { useSelector } from "react-redux";
 
-import { ApplicationSpinner } from "components";
+import { ConnectedApplicationSpinner } from "components";
 import { PrivateRoute } from "components/routes";
 import { componentLoader } from "lib/operational";
 import Logout from "./Logout";
@@ -13,11 +12,9 @@ const Template = React.lazy(() => componentLoader(() => import("./Budgeting/Temp
 const Settings = React.lazy(() => componentLoader(() => import("./Settings")));
 
 const Application = (): JSX.Element => {
-  const applicationLoading = useSelector((state: Redux.ApplicationStore) => state.loading.loading);
-
   return (
     <React.Fragment>
-      <ApplicationSpinner visible={applicationLoading} />
+      <ConnectedApplicationSpinner />
       <Switch>
         <Redirect exact from={"/"} to={"/budgets"} />
         <PrivateRoute path={"/budgets/:budgetId"} component={Budget} />

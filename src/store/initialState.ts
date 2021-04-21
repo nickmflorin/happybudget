@@ -25,11 +25,6 @@ export const initialCommentsListResponseState: Redux.CommentsListResponseStore =
   replying: []
 };
 
-export const initialLoadingState: Redux.LoadingStore = {
-  elements: [],
-  loading: false
-};
-
 export const createInitialUserState = (user: Model.User): Redux.UserStore => {
   return {
     ...user
@@ -47,7 +42,8 @@ const createApplicationInitialState = (config: Redux.ApplicationConfig, user: Mo
   });
   return {
     user: createInitialUserState(user),
-    drawerVisible: false
+    drawerVisible: false,
+    loading: false
   } as Redux.ApplicationStore;
 };
 

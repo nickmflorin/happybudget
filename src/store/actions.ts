@@ -19,8 +19,5 @@ export const simpleAction = <P = any, A extends Redux.Action<P> = Redux.Action<P
 export const updateLoggedInUserAction = (user: Partial<Model.User>) => {
   return createAction<Partial<Model.User>>(ApplicationActionTypes.User.UpdateInState, user);
 };
-
 export const setDrawerVisibilityAction = simpleAction<boolean>(ApplicationActionTypes.SetDrawerVisibility);
-export const setApplicationLoadingAction = simpleAction<{ id: string; value: boolean }>(
-  ApplicationActionTypes.SetApplicationLoading
-);
+export const setApplicationLoadingAction = simpleAction<boolean>(ApplicationActionTypes.SetApplicationLoading);

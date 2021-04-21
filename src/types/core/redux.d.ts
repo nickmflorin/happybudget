@@ -198,17 +198,12 @@ namespace Redux {
 
   interface UserStore extends Model.User {}
 
-  interface LoadingStore {
-    readonly loading: boolean;
-    readonly elements: string[];
-  }
-
   interface ApplicationStore extends ModulesStore {
     readonly user: UserStore;
     readonly dashboard: Dashboard.Store;
     readonly budget: Budget.Store;
     readonly template: Template.Store;
     readonly drawerVisible: boolean;
-    readonly loading: LoadingStore;
+    readonly loading: boolean;
   }
 }
