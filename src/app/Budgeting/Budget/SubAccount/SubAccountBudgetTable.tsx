@@ -144,7 +144,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.BudgetGroup) => {
             setGroupToEdit(undefined);
-            dispatch(updateGroupInStateAction(group));
+            dispatch(updateGroupInStateAction({ id: group.id, data: group }));
           }}
         />
       )}

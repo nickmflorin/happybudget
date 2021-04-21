@@ -150,11 +150,11 @@ export function* handleActualsBulkUpdateTask(action: Redux.Action<Table.RowChang
           // by the HTML select field, it cannot be copy/pasted and thus we do not have to worry
           // about the bulk creation of Actual(s) - only the bulk updating.
           const updatedRow = ActualRowManager.mergeChangesWithRow(placeholder, merged[i]);
-          yield put(updatePlaceholderInStateAction(updatedRow));
+          yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
         }
       } else {
         const updatedModel = ActualRowManager.mergeChangesWithModel(model, merged[i]);
-        yield put(updateActualInStateAction(updatedModel));
+        yield put(updateActualInStateAction({ id: updatedModel.id, data: updatedModel }));
         mergedUpdates.push(merged[i]);
       }
     }
@@ -181,7 +181,7 @@ export function* handleActualUpdateTask(action: Redux.Action<Table.RowChange<Tab
         );
       } else {
         const updatedRow = ActualRowManager.mergeChangesWithRow(placeholder, action.payload);
-        yield put(updatePlaceholderInStateAction(updatedRow));
+        yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
@@ -192,7 +192,7 @@ export function* handleActualUpdateTask(action: Redux.Action<Table.RowChange<Tab
       }
     } else {
       const updatedModel = ActualRowManager.mergeChangesWithModel(model, action.payload);
-      yield put(updateActualInStateAction(updatedModel));
+      yield put(updateActualInStateAction({ id: updatedModel.id, data: updatedModel }));
       yield call(updateActualTask, model.id, action.payload);
     }
   }

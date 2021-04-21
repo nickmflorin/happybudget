@@ -8,7 +8,7 @@ export const responseAccountAction = simpleAction<Model.TemplateAccount | undefi
   ActionType.Template.Account.Response
 );
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
-export const updateAccountInStateAction = simpleAction<Partial<Model.TemplateAccount>>(
+export const updateAccountInStateAction = simpleAction<Partial<Redux.UpdateModelActionPayload<Model.TemplateAccount>>>(
   ActionType.Template.Account.UpdateInState
 );
 export const bulkUpdateAccountAction = simpleAction<Table.RowChange<Table.TemplateSubAccountRow>[]>(
@@ -51,11 +51,11 @@ export const removePlaceholderFromStateAction = simpleAction<number>(
 export const addPlaceholdersToStateAction = simpleAction<number>(
   ActionType.Template.Account.SubAccounts.Placeholders.AddToState
 );
-export const updatePlaceholderInStateAction = simpleAction<Table.TemplateSubAccountRow>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.TemplateSubAccountRow>>(
   ActionType.Template.Account.SubAccounts.Placeholders.UpdateInState
 );
 
-export const updateSubAccountInStateAction = simpleAction<Model.TemplateSubAccount>(
+export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.TemplateSubAccount>>(
   ActionType.Template.Account.SubAccounts.UpdateInState
 );
 export const removeSubAccountFromStateAction = simpleAction<number>(
@@ -82,7 +82,7 @@ export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Templat
 export const addGroupToStateAction = simpleAction<Model.TemplateGroup>(
   ActionType.Template.Account.SubAccounts.Groups.AddToState
 );
-export const updateGroupInStateAction = simpleAction<Model.TemplateGroup>(
+export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.TemplateGroup>>(
   ActionType.Template.Account.SubAccounts.Groups.UpdateInState
 );
 export const removeGroupFromStateAction = simpleAction<number>(

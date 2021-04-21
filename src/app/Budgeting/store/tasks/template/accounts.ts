@@ -238,14 +238,14 @@ export function* handleAccountsBulkUpdateTask(
           );
         } else {
           const updatedRow = TemplateAccountRowManager.mergeChangesWithRow(placeholder, merged[i]);
-          yield put(updatePlaceholderInStateAction(updatedRow));
+          yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
           if (TemplateAccountRowManager.rowHasRequiredFields(updatedRow)) {
             placeholdersToCreate.push(updatedRow);
           }
         }
       } else {
         const updatedModel = TemplateAccountRowManager.mergeChangesWithModel(model, merged[i]);
-        yield put(updateAccountInStateAction(updatedModel));
+        yield put(updateAccountInStateAction({ id: updatedModel.id, data: updatedModel }));
         mergedUpdates.push(merged[i]);
       }
     }
@@ -277,7 +277,7 @@ export function* handleAccountUpdateTask(
         );
       } else {
         const updatedRow = TemplateAccountRowManager.mergeChangesWithRow(placeholder, action.payload);
-        yield put(updatePlaceholderInStateAction(updatedRow));
+        yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
@@ -288,7 +288,7 @@ export function* handleAccountUpdateTask(
       }
     } else {
       const updatedModel = TemplateAccountRowManager.mergeChangesWithModel(model, action.payload);
-      yield put(updateAccountInStateAction(updatedModel));
+      yield put(updateAccountInStateAction({ id: updatedModel.id, data: updatedModel }));
       yield call(updateAccountTask, model.id, action.payload);
     }
   }

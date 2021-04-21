@@ -33,11 +33,11 @@ export const removePlaceholderFromStateAction = simpleAction<number>(
   ActionType.Template.Accounts.Placeholders.RemoveFromState
 );
 export const addPlaceholdersToStateAction = simpleAction<number>(ActionType.Template.Accounts.Placeholders.AddToState);
-export const updatePlaceholderInStateAction = simpleAction<Table.TemplateAccountRow>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.TemplateAccountRow>>(
   ActionType.Template.Accounts.Placeholders.UpdateInState
 );
 
-export const updateAccountInStateAction = simpleAction<Model.TemplateAccount>(
+export const updateAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.TemplateAccount>>(
   ActionType.Template.Accounts.UpdateInState
 );
 export const removeAccountFromStateAction = simpleAction<number>(ActionType.Template.Accounts.RemoveFromState);
@@ -58,7 +58,7 @@ export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Templat
   ActionType.Template.Accounts.Groups.Response
 );
 export const addGroupToStateAction = simpleAction<Model.TemplateGroup>(ActionType.Template.Accounts.Groups.AddToState);
-export const updateGroupInStateAction = simpleAction<Model.TemplateGroup>(
+export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.TemplateGroup>>(
   ActionType.Template.Accounts.Groups.UpdateInState
 );
 export const removeGroupFromStateAction = simpleAction<number>(ActionType.Template.Accounts.Groups.RemoveFromState);

@@ -162,7 +162,7 @@ export function* handleFringeUpdateTask(action: Redux.Action<Table.RowChange<Tab
         );
       } else {
         const updatedRow = FringeRowManager.mergeChangesWithRow(placeholder, action.payload);
-        yield put(updatePlaceholderInStateAction(updatedRow));
+        yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
         // Wait until all of the required fields are present before we create the entity in the
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
@@ -173,7 +173,7 @@ export function* handleFringeUpdateTask(action: Redux.Action<Table.RowChange<Tab
       }
     } else {
       const updatedModel = FringeRowManager.mergeChangesWithModel(model, action.payload);
-      yield put(updateFringeInStateAction(updatedModel));
+      yield put(updateFringeInStateAction({ id: updatedModel.id, data: updatedModel }));
       yield call(updateFringeTask, model.id, action.payload);
     }
   }
@@ -208,14 +208,14 @@ export function* handleFringesBulkUpdateTask(action: Redux.Action<Table.RowChang
           );
         } else {
           const updatedRow = FringeRowManager.mergeChangesWithRow(placeholder, merged[i]);
-          yield put(updatePlaceholderInStateAction(updatedRow));
+          yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
           if (FringeRowManager.rowHasRequiredFields(updatedRow)) {
             placeholdersToCreate.push(updatedRow);
           }
         }
       } else {
         const updatedModel = FringeRowManager.mergeChangesWithModel(model, merged[i]);
-        yield put(updateFringeInStateAction(updatedModel));
+        yield put(updateFringeInStateAction({ id: updatedModel.id, data: updatedModel }));
         mergedUpdates.push(merged[i]);
       }
     }

@@ -6,7 +6,7 @@ export const requestAccountAction = simpleAction<null>(ActionType.Budget.Account
 export const loadingAccountAction = simpleAction<boolean>(ActionType.Budget.Account.Loading);
 export const responseAccountAction = simpleAction<Model.BudgetAccount | undefined>(ActionType.Budget.Account.Response);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
-export const updateAccountInStateAction = simpleAction<Partial<Model.BudgetAccount>>(
+export const updateAccountInStateAction = simpleAction<Partial<Redux.UpdateModelActionPayload<Model.BudgetAccount>>>(
   ActionType.Budget.Account.UpdateInState
 );
 export const bulkUpdateAccountAction = simpleAction<Table.RowChange<Table.BudgetSubAccountRow>[]>(
@@ -42,9 +42,9 @@ export const addCommentToStateAction = simpleAction<{ data: Comment; parent?: nu
   ActionType.Budget.Account.Comments.AddToState
 );
 export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budget.Account.Comments.RemoveFromState);
-export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Comment>>(
-  ActionType.Budget.Account.Comments.UpdateInState
-);
+export const updateCommentInStateAction = simpleAction<
+  Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
+>(ActionType.Budget.Account.Comments.UpdateInState);
 /*
   Actions Pertaining to Account Sub Accounts
 */
@@ -81,11 +81,11 @@ export const removePlaceholderFromStateAction = simpleAction<number>(
 export const addPlaceholdersToStateAction = simpleAction<number>(
   ActionType.Budget.Account.SubAccounts.Placeholders.AddToState
 );
-export const updatePlaceholderInStateAction = simpleAction<Table.BudgetSubAccountRow>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.BudgetSubAccountRow>>(
   ActionType.Budget.Account.SubAccounts.Placeholders.UpdateInState
 );
 
-export const updateSubAccountInStateAction = simpleAction<Model.BudgetSubAccount>(
+export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetSubAccount>>(
   ActionType.Budget.Account.SubAccounts.UpdateInState
 );
 export const removeSubAccountFromStateAction = simpleAction<number>(
@@ -112,7 +112,7 @@ export const responseGroupsAction = simpleAction<Http.ListResponse<Model.BudgetG
 export const addGroupToStateAction = simpleAction<Model.BudgetGroup>(
   ActionType.Budget.Account.SubAccounts.Groups.AddToState
 );
-export const updateGroupInStateAction = simpleAction<Model.BudgetGroup>(
+export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetGroup>>(
   ActionType.Budget.Account.SubAccounts.Groups.UpdateInState
 );
 export const removeGroupFromStateAction = simpleAction<number>(

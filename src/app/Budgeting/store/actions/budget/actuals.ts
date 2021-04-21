@@ -30,11 +30,13 @@ export const removePlaceholderFromStateAction = simpleAction<number>(
   ActionType.Budget.Actuals.Placeholders.RemoveFromState
 );
 export const addPlaceholdersToStateAction = simpleAction<number>(ActionType.Budget.Actuals.Placeholders.AddToState);
-export const updatePlaceholderInStateAction = simpleAction<Table.ActualRow>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.ActualRow>>(
   ActionType.Budget.Actuals.Placeholders.UpdateInState
 );
 
-export const updateActualInStateAction = simpleAction<Model.Actual>(ActionType.Budget.Actuals.UpdateInState);
+export const updateActualInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Actual>>(
+  ActionType.Budget.Actuals.UpdateInState
+);
 export const removeActualFromStateAction = simpleAction<number>(ActionType.Budget.Actuals.RemoveFromState);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const addActualToStateAction = simpleAction<Model.Actual>(ActionType.Budget.Actuals.AddToState);

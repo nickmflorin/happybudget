@@ -144,7 +144,7 @@ const SubAccounttemplateTable = ({ subaccountId }: SubAccounttemplateTableProps)
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.TemplateGroup) => {
             setGroupToEdit(undefined);
-            dispatch(updateGroupInStateAction(group));
+            dispatch(updateGroupInStateAction({ id: group.id, data: group }));
           }}
         />
       )}

@@ -44,9 +44,9 @@ export const addCommentToStateAction = simpleAction<{ data: Model.Comment; paren
   ActionType.Budget.SubAccount.Comments.AddToState
 );
 export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budget.SubAccount.Comments.RemoveFromState);
-export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Comment>>(
-  ActionType.Budget.SubAccount.Comments.UpdateInState
-);
+export const updateCommentInStateAction = simpleAction<
+  Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
+>(ActionType.Budget.SubAccount.Comments.UpdateInState);
 /*
   Actions Pertaining to Account Sub Accounts
 */
@@ -83,11 +83,11 @@ export const removePlaceholderFromStateAction = simpleAction<number>(
 export const addPlaceholdersToStateAction = simpleAction<number>(
   ActionType.Budget.SubAccount.SubAccounts.Placeholders.AddToState
 );
-export const updatePlaceholderInStateAction = simpleAction<Table.BudgetSubAccountRow>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.BudgetSubAccountRow>>(
   ActionType.Budget.SubAccount.SubAccounts.Placeholders.UpdateInState
 );
 
-export const updateSubAccountInStateAction = simpleAction<Model.BudgetSubAccount>(
+export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetSubAccount>>(
   ActionType.Budget.SubAccount.SubAccounts.UpdateInState
 );
 export const removeSubAccountFromStateAction = simpleAction<number>(
@@ -114,7 +114,7 @@ export const responseGroupsAction = simpleAction<Http.ListResponse<Model.BudgetG
 export const addGroupToStateAction = simpleAction<Model.BudgetGroup>(
   ActionType.Budget.SubAccount.SubAccounts.Groups.AddToState
 );
-export const updateGroupInStateAction = simpleAction<Model.BudgetGroup>(
+export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetGroup>>(
   ActionType.Budget.SubAccount.SubAccounts.Groups.UpdateInState
 );
 export const removeGroupFromStateAction = simpleAction<number>(

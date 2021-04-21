@@ -28,9 +28,9 @@ export const addCommentToStateAction = simpleAction<{ data: Comment; parent?: nu
   ActionType.Budget.Comments.AddToState
 );
 export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budget.Comments.RemoveFromState);
-export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Comment>>(
-  ActionType.Budget.Comments.UpdateInState
-);
+export const updateCommentInStateAction = simpleAction<
+  Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
+>(ActionType.Budget.Comments.UpdateInState);
 
 /*
   Actions Pertaining to Budget Accounts
@@ -60,11 +60,13 @@ export const removePlaceholderFromStateAction = simpleAction<number>(
   ActionType.Budget.Accounts.Placeholders.RemoveFromState
 );
 export const addPlaceholdersToStateAction = simpleAction<number>(ActionType.Budget.Accounts.Placeholders.AddToState);
-export const updatePlaceholderInStateAction = simpleAction<Table.BudgetAccountRow>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.BudgetSubAccountRow>>(
   ActionType.Budget.Accounts.Placeholders.UpdateInState
 );
 
-export const updateAccountInStateAction = simpleAction<Model.BudgetAccount>(ActionType.Budget.Accounts.UpdateInState);
+export const updateAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetAccount>>(
+  ActionType.Budget.Accounts.UpdateInState
+);
 export const removeAccountFromStateAction = simpleAction<number>(ActionType.Budget.Accounts.RemoveFromState);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const addAccountToStateAction = simpleAction<Model.BudgetAccount>(ActionType.Budget.Accounts.AddToState);
@@ -83,7 +85,7 @@ export const responseGroupsAction = simpleAction<Http.ListResponse<Model.BudgetG
   ActionType.Budget.Accounts.Groups.Response
 );
 export const addGroupToStateAction = simpleAction<Model.BudgetGroup>(ActionType.Budget.Accounts.Groups.AddToState);
-export const updateGroupInStateAction = simpleAction<Model.BudgetGroup>(
+export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetGroup>>(
   ActionType.Budget.Accounts.Groups.UpdateInState
 );
 export const removeGroupFromStateAction = simpleAction<number>(ActionType.Budget.Accounts.Groups.RemoveFromState);

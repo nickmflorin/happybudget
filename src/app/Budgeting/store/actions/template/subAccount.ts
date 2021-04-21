@@ -7,10 +7,6 @@ export const loadingSubAccountAction = simpleAction<boolean>(ActionType.Template
 export const responseSubAccountAction = simpleAction<Model.TemplateSubAccount | undefined>(
   ActionType.Template.SubAccount.Response
 );
-// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
-export const updateParentSubAccountInStateAction = simpleAction<Partial<Model.TemplateAccount>>(
-  ActionType.Template.SubAccount.UpdateInState
-);
 export const bulkUpdateSubAccountAction = simpleAction<Table.RowChange<Table.TemplateSubAccountRow>[]>(
   ActionType.Template.SubAccount.BulkUpdate
 );
@@ -51,19 +47,15 @@ export const removePlaceholderFromStateAction = simpleAction<number>(
 export const addPlaceholdersToStateAction = simpleAction<number>(
   ActionType.Template.SubAccount.SubAccounts.Placeholders.AddToState
 );
-export const updatePlaceholderInStateAction = simpleAction<Table.TemplateSubAccountRow>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.TemplateSubAccountRow>>(
   ActionType.Template.SubAccount.SubAccounts.Placeholders.UpdateInState
 );
 
-export const updateSubAccountInStateAction = simpleAction<Model.TemplateSubAccount>(
+export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.TemplateSubAccount>>(
   ActionType.Template.SubAccount.SubAccounts.UpdateInState
 );
 export const removeSubAccountFromStateAction = simpleAction<number>(
   ActionType.Template.SubAccount.SubAccounts.RemoveFromState
-);
-// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
-export const addSubAccountToStateAction = simpleAction<Model.TemplateSubAccount>(
-  ActionType.Template.SubAccount.SubAccounts.AddToState
 );
 
 // Errors Functionality Needs to be Built Back In
@@ -72,7 +64,7 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
 );
 
 /*
-  Actiosn Pertaining to Account Sub Accounts Groups
+  Actions Pertaining to Account Sub Accounts Groups
 */
 export const requestGroupsAction = simpleAction<null>(ActionType.Template.SubAccount.SubAccounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Template.SubAccount.SubAccounts.Groups.Loading);
@@ -82,7 +74,7 @@ export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Templat
 export const addGroupToStateAction = simpleAction<Model.TemplateGroup>(
   ActionType.Template.SubAccount.SubAccounts.Groups.AddToState
 );
-export const updateGroupInStateAction = simpleAction<Model.TemplateGroup>(
+export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.TemplateGroup>>(
   ActionType.Template.SubAccount.SubAccounts.Groups.UpdateInState
 );
 export const removeGroupFromStateAction = simpleAction<number>(

@@ -25,11 +25,13 @@ export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderP
 export const removePlaceholderFromStateAction = simpleAction<number>(
   ActionType.Template.Fringes.Placeholders.RemoveFromState
 );
-export const updatePlaceholderInStateAction = simpleAction<Table.FringeRow>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.FringeRow>>(
   ActionType.Template.Fringes.Placeholders.UpdateInState
 );
 
-export const updateFringeInStateAction = simpleAction<Model.Fringe>(ActionType.Template.Fringes.UpdateInState);
+export const updateFringeInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Fringe>>(
+  ActionType.Template.Fringes.UpdateInState
+);
 export const removeFringeFromStateAction = simpleAction<number>(ActionType.Template.Fringes.RemoveFromState);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const addFringeToStateAction = simpleAction<Model.Fringe>(ActionType.Template.Fringes.AddToState);

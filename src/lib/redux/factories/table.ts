@@ -48,7 +48,7 @@ export const createTablePlaceholdersReducer = <
         return filter(st, (r: R) => r.id !== action.payload);
       }
     },
-    UpdateInState: (st: Redux.ListStore<R> = [], action: Redux.Action<R>) => {
+    UpdateInState: (st: Redux.ListStore<R> = [], action: Redux.Action<Redux.UpdateModelActionPayload<R>>) => {
       const row: R | undefined = find(st, { id: action.payload.id } as any);
       if (isNil(row)) {
         warnInconsistentState({
@@ -57,12 +57,13 @@ export const createTablePlaceholdersReducer = <
         });
         return st;
       } else {
+        const { id: _, ...withoutId } = action.payload.data;
         return replaceInArray<R>(
           st,
           { id: action.payload.id },
           {
             ...row,
-            ...action.payload
+            ...withoutId
           }
         );
       }
