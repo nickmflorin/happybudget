@@ -12,4 +12,16 @@
       color: $white !important;
     }
   }
+  &.disabled {
+    color: $disabled-color !important;
+    .ant-tooltip-arrow-content {
+      background-color: $disabled-color !important;
+    }
+    .ant-tooltip-content {
+      .ant-tooltip-inner {
+        background-color: $disabled-color !important;
+        color: $text-secondary !important;
+      }
+    }
+  }
 }

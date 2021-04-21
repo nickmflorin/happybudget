@@ -28,6 +28,7 @@ const Toolbar = ({ items }: ToolbarProps): JSX.Element => {
       {map(items, (item: IToolbarItem, index: number) => {
         return (
           <IconButton
+            tooltip={item.tooltip}
             className={"dark"}
             role={item.role}
             key={index}
