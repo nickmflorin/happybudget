@@ -37,6 +37,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     Response: ActionType.Budgets.Response,
     Loading: ActionType.Budgets.Loading,
     Select: ActionType.Budgets.Select,
+    SelectAll: ActionType.Budgets.SelectAll,
     SetSearch: ActionType.Budgets.SetSearch,
     SetPage: ActionType.Budgets.SetPage,
     SetPageSize: ActionType.Budgets.SetPageSize,

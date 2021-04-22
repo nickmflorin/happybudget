@@ -6,6 +6,7 @@ export const ActionType = {
     Response: "dashboard.budgets.Response",
     Request: "dashboard.budgets.Request",
     Select: "dashboard.budgets.Select",
+    SelectAll: "dashboard.budgets.SelectAll",
     SetSearch: "dashboard.budgets.SetSearch",
     SetPage: "dashboard.budgets.SetPage",
     SetPageSize: "dashboard.budgets.SetPageSize",
@@ -58,6 +59,7 @@ export const requestBudgetsAction = simpleAction<null>(ActionType.Budgets.Reques
 export const loadingBudgetsAction = simpleAction<boolean>(ActionType.Budgets.Loading);
 export const responseBudgetsAction = simpleAction<Http.ListResponse<Model.Budget>>(ActionType.Budgets.Response);
 export const selectBudgetsAction = simpleAction<number[]>(ActionType.Budgets.Select);
+export const selectAllBudgetsAction = simpleAction<null>(ActionType.Budgets.SelectAll);
 export const setBudgetsSearchAction = simpleAction<string>(ActionType.Budgets.SetSearch);
 export const setBudgetsPageAction = simpleAction<number>(ActionType.Budgets.SetPage);
 export const setBudgetsPageSizeAction = simpleAction<number>(ActionType.Budgets.SetPageSize);
