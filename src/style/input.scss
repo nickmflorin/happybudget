@@ -26,6 +26,21 @@ form {
   width: 100%;
 }
 
+.checkbox-wrapper {
+  padding: 10px;
+  .ant-checkbox-wrapper {
+    height: 16px;
+    width: 16px;
+
+    .ant-checkbox {
+      font-size: 16px;
+      line-height: 1;
+      display: block;
+      top: 0;
+    }
+  }
+}
+
 // This class is not meant to be used in the components.
 .input-base {
   border-radius: $input-border-radius;

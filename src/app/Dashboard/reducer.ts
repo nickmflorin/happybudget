@@ -23,6 +23,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     Response: ActionType.Templates.Response,
     Loading: ActionType.Templates.Loading,
     Select: ActionType.Templates.Select,
+    SelectAll: ActionType.Templates.SelectAll,
     SetSearch: ActionType.Templates.SetSearch,
     SetPage: ActionType.Templates.SetPage,
     SetPageSize: ActionType.Templates.SetPageSize,

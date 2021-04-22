@@ -1,0 +1,24 @@
+@import "style/typography";
+@import "style/colors";
+
+.select-controller {
+  display: flex;
+  margin-bottom: 8px;
+  min-height: 36px;
+  height: 36px;
+
+  .select-controller-icon-button {
+    bottom: 1px;
+    :not(:last-child) {
+      margin-right: 12px;
+    }
+  }
+  .select-controller-selected-text {
+    line-height: 36px;
+    margin-left: 6px;
+    font-size: 12px;
+    font-weight: 400;
+    font-family: $roboto;
+    color: $text-secondary;
+  }
+}

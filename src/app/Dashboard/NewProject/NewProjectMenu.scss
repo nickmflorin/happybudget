@@ -16,11 +16,14 @@
   }
 
   .new-project-menu-menu-wrapper {
-    width: 320px;
+    width: 240px;
 
     .new-project-menu-menu {
       .new-project-menu-menu-item {
         padding: 10px !important;
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        flex: unset;
         font-size: 20px;
         line-height: 22px;
         color: $text-secondary;

@@ -141,14 +141,8 @@ export const createListResponseReducer = <
         }
         return st;
       }
-      if (!isNil(action.payload.data.id)) {
-        const { id: _, ...withoutId } = action.payload.data;
-        return { ...st, data: replaceInArray<M>(st.data, { id: action.payload.id }, { ...existing, ...withoutId }) };
-      }
-      return {
-        ...st,
-        data: replaceInArray<M>(st.data, { id: action.payload.id }, { ...existing, ...action.payload.data })
-      };
+      const { id: _, ...withoutId } = action.payload.data;
+      return { ...st, data: replaceInArray<M>(st.data, { id: action.payload.id }, { ...existing, ...withoutId }) };
     },
     Deselect: (st: S = Options.initialState, action: Redux.Action<number>) => {
       const element = find(st.data, { id: action.payload });

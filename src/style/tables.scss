@@ -6,25 +6,6 @@
 $table-border-color: #f7f7f7;
 $table-border: 1px solid $table-border-color;
 
-.select-controller {
-  display: flex;
-  margin-bottom: 8px;
-  min-height: 36px;
-  height: 36px;
-
-  .select-controller-icon-button {
-    bottom: 1px;
-    :not(:last-child) {
-      margin-right: 12px;
-    }
-  }
-  .select-controller-selected-text {
-    line-height: 36px;
-    margin-left: 12px;
-    font-size: 13px;
-  }
-}
-
 .ag-menu-list {
   margin-top: 0px !important;
   margin-bottom: 0px !important;

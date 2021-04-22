@@ -1,13 +1,15 @@
-import React, { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import classNames from "classnames";
 import { map, isNil, find, forEach, filter } from "lodash";
 
 import { Tooltip, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { ShowHide } from "components";
+import { ShowHide, CheckboxWrapper } from "components";
 import { IconButton } from "components/buttons";
 import { toTitleCase } from "lib/util/formatters";
+
+import "./ModelSelectController.scss";
 
 export interface ModelSelectControllerItemProps<M extends Model.Model> {
   filterSelected?: (data: M) => boolean;
@@ -90,9 +92,7 @@ export const ModelSelectControllerItem = <M extends Model.Model>({
   }
 };
 
-interface ModelSelectControllerProps<M extends Model.Model> {
-  className?: string;
-  style?: React.CSSProperties;
+interface ModelSelectControllerProps<M extends Model.Model> extends StandardComponentProps {
   selected: number[];
   data: M[];
   items: ModelSelectControllerItemProps<M>[];
@@ -130,14 +130,16 @@ const ModelSelectController = <M extends Model.Model>({
   return (
     <div className={classNames("select-controller", className)} style={style}>
       <ShowHide show={checkable}>
-        <Checkbox
-          checked={data.length !== 0 && selected.length === data.length}
-          onChange={(e: CheckboxChangeEvent) => {
-            if (!isNil(onCheckboxChange)) {
-              onCheckboxChange(e.target.checked);
-            }
-          }}
-        />
+        <CheckboxWrapper noLeftPadding={true}>
+          <Checkbox
+            checked={data.length !== 0 && selected.length === data.length}
+            onChange={(e: CheckboxChangeEvent) => {
+              if (!isNil(onCheckboxChange)) {
+                onCheckboxChange(e.target.checked);
+              }
+            }}
+          />
+        </CheckboxWrapper>
       </ShowHide>
       {map(items, (item: ModelSelectControllerItemProps<M>, index: number) => {
         return (

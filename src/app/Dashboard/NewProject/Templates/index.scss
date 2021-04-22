@@ -1,19 +1,21 @@
 @import "style/colors";
 @import "style/typography";
 
-.templates-grid {
-  margin-bottom: 15px;
-  display: flex;
-  flex-wrap: wrap;
-  flex-grow: 100;
+.templates {
+  .templates-grid {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 100;
 
-  .template-card {
-    flex: 1 1 300px;
-    margin-bottom: 50px;
-    max-width: 300px;
+    .template-card {
+      flex: 1 1 300px;
+      margin-bottom: 50px;
+      max-width: 300px;
 
-    &:not(:last-child) {
-      margin-right: 50px;
+      &:not(:last-child) {
+        margin-right: 50px;
+      }
     }
   }
 }

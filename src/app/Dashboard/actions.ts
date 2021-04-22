@@ -21,6 +21,7 @@ export const ActionType = {
     Response: "dashboard.templates.Response",
     Request: "dashboard.templates.Request",
     Select: "dashboard.templates.Select",
+    SelectAll: "dashboard.templates.SelectAll",
     SetSearch: "dashboard.templates.SetSearch",
     SetPage: "dashboard.templates.SetPage",
     SetPageSize: "dashboard.templates.SetPageSize",
@@ -73,6 +74,7 @@ export const requestTemplatesAction = simpleAction<null>(ActionType.Templates.Re
 export const loadingTemplatesAction = simpleAction<boolean>(ActionType.Templates.Loading);
 export const responseTemplatesAction = simpleAction<Http.ListResponse<Model.Template>>(ActionType.Templates.Response);
 export const selectTemplatesAction = simpleAction<number[]>(ActionType.Templates.Select);
+export const selectAllTemplatesAction = simpleAction<null>(ActionType.Templates.SelectAll);
 export const setTemplatesSearchAction = simpleAction<string>(ActionType.Templates.SetSearch);
 export const setTemplatesPageAction = simpleAction<number>(ActionType.Templates.SetPage);
 export const setTemplatesPageSizeAction = simpleAction<number>(ActionType.Templates.SetPageSize);
