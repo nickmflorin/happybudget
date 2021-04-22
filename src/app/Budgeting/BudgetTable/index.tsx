@@ -803,7 +803,7 @@ const BudgetTable = <
       const getGroupForModel = (model: M): number | null => {
         const group: G | undefined = find(groups, (g: G) =>
           includes(
-            map(g.children, (child: any) => child.id),
+            map(g.children, (child: number) => child),
             model.id
           )
         );
