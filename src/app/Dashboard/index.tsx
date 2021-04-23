@@ -2,7 +2,7 @@ import React from "react";
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolderOpen, faFolderPlus, faAddressBook } from "@fortawesome/free-solid-svg-icons";
+import { faFolderOpen, faFolderPlus, faAddressBook } from "@fortawesome/pro-light-svg-icons";
 
 import { componentLoader } from "lib/operational";
 import { Layout } from "components/layout";
