@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { isNil } from "lodash";
 
 import { createTemplate } from "api/services";
+import { payloadToFormData } from "lib/util/forms";
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
 import { TemplateFormValues } from "components/forms/TemplateForm";
@@ -14,14 +16,13 @@ interface CreateTemplateModalProps {
 }
 
 const CreateTemplateModal = ({ open, onSuccess, onCancel }: CreateTemplateModalProps): JSX.Element => {
-  const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<File | Blob | null>(null);
   const [form] = Form.useForm();
 
   return (
     <Modal
       title={"Create Template"}
       visible={open}
-      loading={loading}
       onCancel={() => onCancel()}
       okText={"Create"}
       cancelText={"Cancel"}
@@ -29,8 +30,13 @@ const CreateTemplateModal = ({ open, onSuccess, onCancel }: CreateTemplateModalP
         form
           .validateFields()
           .then((values: TemplateFormValues) => {
-            setLoading(true);
-            createTemplate(values)
+            let payload: Http.TemplatePayload = { ...values };
+            if (!isNil(file)) {
+              payload = { ...payload, image: file };
+            }
+            const formData = payloadToFormData<Http.BudgetPayload>(payload);
+            form.setLoading(true);
+            createTemplate(formData)
               .then((template: Model.Template) => {
                 form.resetFields();
                 onSuccess(template);
@@ -39,7 +45,7 @@ const CreateTemplateModal = ({ open, onSuccess, onCancel }: CreateTemplateModalP
                 form.handleRequestError(e);
               })
               .finally(() => {
-                setLoading(false);
+                form.setLoading(false);
               });
           })
           .catch(() => {
@@ -47,7 +53,12 @@ const CreateTemplateModal = ({ open, onSuccess, onCancel }: CreateTemplateModalP
           });
       }}
     >
-      <TemplateForm form={form} name={"form_in_modal"} initialValues={{}} />
+      <TemplateForm
+        form={form}
+        onImageChange={(f: File | Blob) => setFile(f)}
+        name={"form_in_modal"}
+        initialValues={{}}
+      />
     </Modal>
   );
 };

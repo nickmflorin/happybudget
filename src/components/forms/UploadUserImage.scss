@@ -1,0 +1,22 @@
+@import "style/colors";
+@import "style/typography";
+
+.user-image-uploader {
+  .ant-upload.ant-upload-select-picture-card {
+    height: 100%;
+    width: 100%;
+    margin: 0 !important;
+
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+  .upload-indicator {
+    .icon {
+      height: 25px;
+      width: 25px;
+    }
+  }
+}

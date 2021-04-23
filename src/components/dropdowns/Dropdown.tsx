@@ -12,6 +12,7 @@ export interface DropdownProps {
   className?: string;
   menuClassName?: string;
   menuItemClassName?: string;
+  placement?: "bottomRight" | "bottomLeft" | "bottomCenter" | "topLeft" | "topRight" | "topCenter";
   trigger?: ("click" | "hover" | "contextMenu")[];
 }
 
@@ -19,6 +20,7 @@ const Dropdown = ({
   children,
   items,
   className,
+  placement,
   trigger = ["click"],
   menuClassName,
   menuItemClassName
@@ -27,6 +29,7 @@ const Dropdown = ({
     <AntdDropdown
       className={classNames("dropdown", className)}
       trigger={trigger}
+      placement={placement}
       overlay={
         <Menu className={classNames("dropdown-menu", menuClassName)}>
           {map(items, (item: MenuItem, index: number) => {

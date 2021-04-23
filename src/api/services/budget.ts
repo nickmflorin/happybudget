@@ -16,7 +16,7 @@ export const getBudget = async (id: number, options: Http.RequestOptions = {}): 
 
 export const updateBudget = async (
   id: number,
-  payload: Partial<Http.BudgetPayload>,
+  payload: Partial<Http.BudgetPayload> | FormData,
   options: Http.RequestOptions = {}
 ): Promise<Model.Budget> => {
   const url = URL.v1("budgets", id);
@@ -29,7 +29,7 @@ export const getBudgetPdf = async (id: number, options: Http.RequestOptions = {}
 };
 
 export const createBudget = async (
-  payload: Http.BudgetPayload,
+  payload: Http.BudgetPayload | FormData,
   options: Http.RequestOptions = {}
 ): Promise<Model.Budget> => {
   const url = URL.v1("budgets");

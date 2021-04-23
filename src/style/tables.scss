@@ -25,7 +25,7 @@ $table-border: 1px solid $table-border-color;
   thead.ant-table-thead {
     > tr {
       > th {
-        font-family: $nunito;
+        font-family: $open-sans;
         font-weight: 600;
         font-size: 13px;
         color: $text-secondary;
@@ -123,7 +123,7 @@ $table-border: 1px solid $table-border-color;
 }
 
 .ag-theme-alpine {
-  font-family: $nunito;
+  font-family: $open-sans;
 
   .ag-cell, .ag-full-width-row .ag-cell-wrapper.ag-row-group {
       line-height: 36px;

@@ -69,7 +69,7 @@ namespace Model {
     readonly last_name: string;
     readonly full_name: string;
     readonly email: string;
-    readonly profile_image: string;
+    readonly profile_image: string | null;
   }
 
   interface NestedUser extends Model.SimpleUser {
@@ -101,6 +101,7 @@ namespace Model {
     readonly estimated: number | null;
     readonly trash: boolean;
     readonly type: BudgetType;
+    readonly image: string | null;
   }
 
   interface SimpleTemplate extends Model.Model {

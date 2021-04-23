@@ -10,7 +10,7 @@ export const register = async (
 };
 
 export const updateActiveUser = async (
-  payload: Partial<Http.UserPayload>,
+  payload: Partial<Http.UserPayload> | FormData,
   options?: Http.RequestOptions
 ): Promise<Model.User> => {
   const url = URL.v1("users", "user");

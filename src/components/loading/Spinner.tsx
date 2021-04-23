@@ -14,10 +14,7 @@ const DefaultSizeMap = {
 
 export interface SpinnerProps extends StandardComponentProps {
   size?: number | "small" | "medium" | "large";
-  position?: "absolute" | "fixed" | "relative";
   color?: string;
-  fixed?: boolean;
-  absolute?: boolean;
   large?: boolean;
   medium?: boolean;
   small?: boolean;
@@ -25,25 +22,13 @@ export interface SpinnerProps extends StandardComponentProps {
 
 const Spinner = ({
   size = "medium",
-  fixed,
-  absolute,
   className,
   color,
   small,
   medium,
   large,
-  position = "fixed",
   style = {}
 }: SpinnerProps): JSX.Element => {
-  const spinnerPosition = useMemo(() => {
-    if (fixed === true) {
-      return "fixed";
-    } else if (absolute === true) {
-      return "absolute";
-    }
-    return position;
-  }, [position, fixed]);
-
   const numericSize = useMemo(() => {
     let baseSize = size;
     if (large === true) {
@@ -60,29 +45,18 @@ const Spinner = ({
       sizeNumber = size;
     }
     return sizeNumber;
-  }, [position, fixed]);
+  }, []);
 
   const spinnerStyle = useMemo(() => {
     const st: React.CSSProperties = { ...style };
     st.height = `${numericSize}px`;
     st.width = `${numericSize}px`;
-
-    // Don't override any set positions in the style object.
-    if (isNil(st.left) && isNil(st.top) && isNil(st.right) && isNil(st.bottom)) {
-      if (spinnerPosition === "fixed") {
-        style.left = `calc(50vw - ${0.5 * numericSize}px)`;
-        style.top = `calc(50vh - ${0.5 * numericSize}px)`;
-      } else if (spinnerPosition === "absolute") {
-        style.left = `calc(50% - ${0.5 * numericSize}px)`;
-        style.top = `calc(50% - ${0.5 * numericSize}px)`;
-      }
-    }
     return st;
-  }, [numericSize, spinnerPosition]);
+  }, [numericSize]);
 
   return (
     <Spin
-      className={classNames("spinner", position, className)}
+      className={classNames("spinner", className)}
       indicator={<LoadingOutlined style={{ color: color }} spin />}
       style={spinnerStyle}
     />

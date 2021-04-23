@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import { ShowHide } from "components";
 import Spinner, { SpinnerProps } from "./Spinner";
+import SpinnerWrapper from "./SpinnerWrapper";
 
 interface RenderWithSpinnerProps extends SpinnerProps {
   loading?: boolean;
@@ -19,16 +20,24 @@ const RenderWithSpinner = ({
   return (
     <React.Fragment>
       <ShowHide show={toggleOpacity === true}>
-        <div className={className} style={{ position: "relative", height: "100%", width: "100%" }}>
-          {loading === true && <Spinner position={"absolute"} {...props} />}
+        <React.Fragment>
+          {loading === true && (
+            <SpinnerWrapper>
+              <Spinner {...props} />
+            </SpinnerWrapper>
+          )}
           <div style={{ opacity: loading ? 0.3 : 1 }}>{children}</div>
-        </div>
+        </React.Fragment>
       </ShowHide>
       <ShowHide show={toggleOpacity === false}>
-        <div className={className} style={{ position: "relative", height: "100%", width: "100%" }}>
-          {loading === true && <Spinner {...props} />}
+        <React.Fragment>
+          {loading === true && (
+            <SpinnerWrapper>
+              <Spinner {...props} />
+            </SpinnerWrapper>
+          )}
           {children}
-        </div>
+        </React.Fragment>
       </ShowHide>
     </React.Fragment>
   );

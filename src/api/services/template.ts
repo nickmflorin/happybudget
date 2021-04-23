@@ -16,7 +16,7 @@ export const getTemplate = async (id: number, options: Http.RequestOptions = {})
 
 export const updateTemplate = async (
   id: number,
-  payload: Partial<Http.TemplatePayload>,
+  payload: Partial<Http.TemplatePayload> | FormData,
   options: Http.RequestOptions = {}
 ): Promise<Model.Template> => {
   const url = URL.v1("templates", id);
@@ -24,7 +24,7 @@ export const updateTemplate = async (
 };
 
 export const createTemplate = async (
-  payload: Http.TemplatePayload,
+  payload: Http.TemplatePayload | FormData,
   options: Http.RequestOptions = {}
 ): Promise<Model.Template> => {
   const url = URL.v1("templates");

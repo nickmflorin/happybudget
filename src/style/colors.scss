@@ -71,6 +71,7 @@ $separator-color: $gray-light;
 }
 
 .icon {
+  color: $icon-color;
   svg {
     color: $icon-color;
   }

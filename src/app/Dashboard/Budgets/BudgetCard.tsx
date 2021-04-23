@@ -10,14 +10,12 @@ import Card from "../Card";
 
 interface BudgetCardProps {
   budget: Model.Budget;
-  selected: boolean;
   loading: boolean;
   onDelete: () => void;
   onEdit: () => void;
-  onSelect: (checked: boolean) => void;
 }
 
-const BudgetCard = ({ budget, loading, selected, onEdit, onDelete, onSelect }: BudgetCardProps): JSX.Element => {
+const BudgetCard = ({ budget, loading, onEdit, onDelete }: BudgetCardProps): JSX.Element => {
   const history = useHistory();
   const user = useLoggedInUser();
   const tz = useTimezone();
@@ -29,8 +27,7 @@ const BudgetCard = ({ budget, loading, selected, onEdit, onDelete, onSelect }: B
       title={budget.name}
       subTitle={`Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(budget.updated_at, { tz })}`}
       loading={loading}
-      selected={selected}
-      onSelect={onSelect}
+      image={budget.image}
       dropdown={[
         {
           text: "Edit",

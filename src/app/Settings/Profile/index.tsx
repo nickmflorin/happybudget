@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { toast } from "react-toastify";
 
-import { client } from "api";
+import { updateActiveUser } from "api/services";
 import { Form } from "components";
 import { UserProfileForm } from "components/forms";
 import { Page } from "components/layout";
@@ -22,16 +22,14 @@ const Profile = (): JSX.Element => {
       <div className={"profile-form-container"}>
         <UserProfileForm
           form={form}
-          onUploadError={(error: string) => form.setGlobalError(error)}
           initialValues={{
             first_name: user.first_name,
             last_name: user.last_name,
             profile_image: user.profile_image
           }}
-          onSubmit={(payload: Partial<Http.UserPayload>) => {
+          onFinish={(payload: Partial<Http.UserPayload>) => {
             const formData = payloadToFormData<Partial<Http.UserPayload>>(payload);
-            client
-              .patch<Model.User>("/v1/users/user/", formData)
+            updateActiveUser(formData)
               .then((response: Model.User) => {
                 dispatch(updateLoggedInUserAction(response));
                 toast.success("Your information has been successfully saved.");

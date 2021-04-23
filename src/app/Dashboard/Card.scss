@@ -8,26 +8,26 @@
   cursor: pointer;
 
   &:hover {
-    box-shadow: 0px 3px 20px #8E8E8E;
+    box-shadow: 0px 2px 10px #b3b3b3;
   }
 
-  .dashboard-card-checkbox {
-    position: absolute;
-    left: 14px;
-    top: 10px;
-  }
-
-  .dashboard-card-dropdown-ellipsis {
+  .dropdown-ellipsis {
     position: absolute;
     top: 10px;
-    right: 14px;
+    right: 5px;
+    z-index: 1000;
     svg {
-      height: 24px !important;
+      height: 26px !important;
       color: $white !important;
+    }
+    &.for-placeholder {
+      svg {
+        color: #8a8a8a !important;
+      }
     }
   }
 
-  .dashboard-card-icon-wrapper {
+  .image, .image-placeholder {
     height: 150px;
     width: 100%;
     justify-content: center;
@@ -37,6 +37,33 @@
     -webkit-box-pack: center;
     border-top-left-radius: 14px;
     border-top-right-radius: 14px;
+    overflow: hidden;
+  }
+
+  .image {
+    .image-tint {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(15, 15, 15, 0.2);
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+    }
+    img {
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+  }
+  .image-placeholder {
+    background-color: #f9f9f9;
+    svg {
+      height: 40px;
+      width: 40px;
+      color: #cacaca;
+    }
   }
 
   .dashboard-card-footer {
@@ -59,6 +86,9 @@
       font-weight: 600;
       line-height: 20px;
       margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .sub-title {

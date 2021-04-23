@@ -1,60 +1,48 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
-
-import { Checkbox } from "antd";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { faImagePolaroid, faEllipsisV } from "@fortawesome/pro-light-svg-icons";
 
 import { Dropdown } from "components/dropdowns";
 import { IconButton } from "components/buttons";
 import { ShowHide, RenderWithSpinner } from "components";
-import {
-  ActorsIcon,
-  DirectorIcon,
-  DollyIcon,
-  EditorIcon,
-  SceneIcon,
-  SFXIcon,
-  SoundIcon,
-  WriterIcon
-} from "components/svgs";
-import { selectConsistent } from "lib/util";
 import "./Card.scss";
 
-export const Icons: (() => JSX.Element)[] = [
-  ActorsIcon,
-  DirectorIcon,
-  DollyIcon,
-  EditorIcon,
-  SceneIcon,
-  SFXIcon,
-  SoundIcon,
-  WriterIcon
-];
+interface DashboardCardImagePlaceholderProps {
+  onClick?: () => void;
+}
 
-export const Colors: string[] = [
-  "#8688A8",
-  "#8688A8",
-  "#B27FAA",
-  "#57AD71",
-  "#FFD752",
-  "#C17F73",
-  "#AD5757",
-  "#50C4BB",
-  "#80A1DE"
-];
+const DashboardCardImagePlaceholder: React.FC<DashboardCardImagePlaceholderProps> = ({ onClick }) => {
+  return (
+    <div className={"image-placeholder"} onClick={onClick}>
+      <FontAwesomeIcon className={"icon"} icon={faImagePolaroid} />
+    </div>
+  );
+};
+
+interface DashboardCardImageProps {
+  image: string;
+  onClick?: () => void;
+}
+
+const DashboardCardImage: React.FC<DashboardCardImageProps> = ({ image, onClick }) => {
+  return (
+    <div className={"image"} onClick={onClick}>
+      <div className={"image-tint"}></div>
+      <img src={image} alt={"avatar"} />
+    </div>
+  );
+};
 
 interface CardProps extends StandardComponentProps {
   dropdown?: MenuItem[];
-  selected?: boolean;
   title?: string;
   subTitle?: string;
+  image?: string | null;
   loading?: boolean;
   onClick?: () => void;
-  onSelect?: (checked: boolean) => void;
 }
 
 const Card = ({
@@ -63,45 +51,27 @@ const Card = ({
   dropdown,
   onClick,
   loading,
-  selected = false,
+  image,
   style = {},
-  className,
-  onSelect
+  className
 }: CardProps): JSX.Element => {
-  const [color, setColor] = useState<string | undefined>(undefined);
-  const [Icon, setIcon] = useState<(() => JSX.Element) | undefined>(undefined);
-
-  useEffect(() => {
-    if (!isNil(title)) {
-      setColor(selectConsistent(Colors, title));
-      setIcon(selectConsistent(Icons, title));
-    }
-  }, [title]);
-
   return (
     <div className={classNames("dashboard-card", className)} style={style}>
       <RenderWithSpinner loading={loading}>
         <React.Fragment>
-          <Checkbox
-            className={"dashboard-card-checkbox"}
-            checked={selected}
-            onChange={(e: CheckboxChangeEvent) => {
-              if (!isNil(onSelect)) {
-                onSelect(e.target.checked);
-              }
-            }}
-          />
           {!isNil(dropdown) && (
-            <Dropdown items={dropdown}>
+            <Dropdown items={dropdown} placement={"bottomRight"}>
               <IconButton
-                className={"dashboard-card-dropdown-ellipsis"}
+                className={classNames("dropdown-ellipsis", { "for-placeholder": isNil(image) })}
                 icon={<FontAwesomeIcon icon={faEllipsisV} />}
               />
             </Dropdown>
           )}
-          <div className={"dashboard-card-icon-wrapper"} onClick={onClick} style={{ backgroundColor: color }}>
-            {!isNil(Icon) && Icon}
-          </div>
+          {!isNil(image) ? (
+            <DashboardCardImage image={image} onClick={onClick} />
+          ) : (
+            <DashboardCardImagePlaceholder onClick={onClick} />
+          )}
           <div className={"dashboard-card-footer"} onClick={onClick}>
             <ShowHide show={!isNil(title)}>
               <div className={"title"}>{title}</div>

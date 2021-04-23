@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { isNil } from "lodash";
+
 import { createBudget } from "api/services";
+import { payloadToFormData } from "lib/util/forms";
 import { Form } from "components";
 import { BudgetForm } from "components/forms";
 import { BudgetFormValues } from "components/forms/BudgetForm";
@@ -14,6 +17,7 @@ interface CreateBudgetModalProps {
 }
 
 const CreateBudgetModal = ({ open, templateId, onSuccess, onCancel }: CreateBudgetModalProps): JSX.Element => {
+  const [file, setFile] = useState<File | Blob | null>(null);
   const [form] = Form.useForm();
 
   return (
@@ -27,12 +31,16 @@ const CreateBudgetModal = ({ open, templateId, onSuccess, onCancel }: CreateBudg
         form
           .validateFields()
           .then((values: BudgetFormValues) => {
-            form.setLoading(true);
             let payload: Http.BudgetPayload = { ...values };
+            if (!isNil(file)) {
+              payload = { ...payload, image: file };
+            }
             if (!isNil(templateId)) {
               payload = { ...payload, template: templateId };
             }
-            createBudget(payload)
+            const formData = payloadToFormData<Http.BudgetPayload>(payload);
+            form.setLoading(true);
+            createBudget(formData)
               .then((budget: Model.Budget) => {
                 form.resetFields();
                 onSuccess(budget);
@@ -49,7 +57,12 @@ const CreateBudgetModal = ({ open, templateId, onSuccess, onCancel }: CreateBudg
           });
       }}
     >
-      <BudgetForm form={form} name={"form_in_modal"} initialValues={{}} />
+      <BudgetForm
+        form={form}
+        onImageChange={(f: File | Blob) => setFile(f)}
+        name={"form_in_modal"}
+        initialValues={{}}
+      />
     </Modal>
   );
 };

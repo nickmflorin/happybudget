@@ -34,7 +34,6 @@ const CommentBlock = ({
 
   return (
     <RenderWithSpinner
-      absolute
       className={classNames("comment-block", { nested })}
       size={15}
       loading={loading}

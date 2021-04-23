@@ -1,10 +1,8 @@
-import { isNil } from "lodash";
-
 export const payloadToFormData = <T extends { [key: string]: any } = { [key: string]: any }>(data: T): FormData => {
   const formData = new FormData();
   Object.keys(data).forEach((key: string) => {
     const value: any | undefined = data[key as keyof T];
-    if (!isNil(value)) {
+    if (value !== undefined) {
       formData.append(key, value);
     }
   });

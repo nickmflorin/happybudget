@@ -22,8 +22,6 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
   templates: createListResponseReducer<Model.Template, Redux.ListResponseStore<Model.Template>, Redux.Action<any>>({
     Response: ActionType.Templates.Response,
     Loading: ActionType.Templates.Loading,
-    Select: ActionType.Templates.Select,
-    SelectAll: ActionType.Templates.SelectAll,
     SetSearch: ActionType.Templates.SetSearch,
     SetPage: ActionType.Templates.SetPage,
     SetPageSize: ActionType.Templates.SetPageSize,
@@ -36,8 +34,6 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
   budgets: createListResponseReducer<Model.Budget, Redux.ListResponseStore<Model.Budget>, Redux.Action<any>>({
     Response: ActionType.Budgets.Response,
     Loading: ActionType.Budgets.Loading,
-    Select: ActionType.Budgets.Select,
-    SelectAll: ActionType.Budgets.SelectAll,
     SetSearch: ActionType.Budgets.SetSearch,
     SetPage: ActionType.Budgets.SetPage,
     SetPageSize: ActionType.Budgets.SetPageSize,

@@ -5,8 +5,6 @@ export const ActionType = {
     Loading: "dashboard.budgets.Loading",
     Response: "dashboard.budgets.Response",
     Request: "dashboard.budgets.Request",
-    Select: "dashboard.budgets.Select",
-    SelectAll: "dashboard.budgets.SelectAll",
     SetSearch: "dashboard.budgets.SetSearch",
     SetPage: "dashboard.budgets.SetPage",
     SetPageSize: "dashboard.budgets.SetPageSize",
@@ -21,8 +19,6 @@ export const ActionType = {
     Loading: "dashboard.templates.Loading",
     Response: "dashboard.templates.Response",
     Request: "dashboard.templates.Request",
-    Select: "dashboard.templates.Select",
-    SelectAll: "dashboard.templates.SelectAll",
     SetSearch: "dashboard.templates.SetSearch",
     SetPage: "dashboard.templates.SetPage",
     SetPageSize: "dashboard.templates.SetPageSize",
@@ -58,8 +54,6 @@ export const ActionType = {
 export const requestBudgetsAction = simpleAction<null>(ActionType.Budgets.Request);
 export const loadingBudgetsAction = simpleAction<boolean>(ActionType.Budgets.Loading);
 export const responseBudgetsAction = simpleAction<Http.ListResponse<Model.Budget>>(ActionType.Budgets.Response);
-export const selectBudgetsAction = simpleAction<number[]>(ActionType.Budgets.Select);
-export const selectAllBudgetsAction = simpleAction<null>(ActionType.Budgets.SelectAll);
 export const setBudgetsSearchAction = simpleAction<string>(ActionType.Budgets.SetSearch);
 export const setBudgetsPageAction = simpleAction<number>(ActionType.Budgets.SetPage);
 export const setBudgetsPageSizeAction = simpleAction<number>(ActionType.Budgets.SetPageSize);
@@ -75,8 +69,6 @@ export const deletingBudgetAction = simpleAction<{ id: number; value: boolean }>
 export const requestTemplatesAction = simpleAction<null>(ActionType.Templates.Request);
 export const loadingTemplatesAction = simpleAction<boolean>(ActionType.Templates.Loading);
 export const responseTemplatesAction = simpleAction<Http.ListResponse<Model.Template>>(ActionType.Templates.Response);
-export const selectTemplatesAction = simpleAction<number[]>(ActionType.Templates.Select);
-export const selectAllTemplatesAction = simpleAction<null>(ActionType.Templates.SelectAll);
 export const setTemplatesSearchAction = simpleAction<string>(ActionType.Templates.SetSearch);
 export const setTemplatesPageAction = simpleAction<number>(ActionType.Templates.SetPage);
 export const setTemplatesPageSizeAction = simpleAction<number>(ActionType.Templates.SetPageSize);

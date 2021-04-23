@@ -1,29 +1,43 @@
 import { useState } from "react";
+import classNames from "classnames";
 import { AxiosResponse } from "axios";
 import { isNil } from "lodash";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { Upload } from "antd";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUpload } from "@fortawesome/pro-light-svg-icons";
 
 import { client } from "api";
 import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
 
-interface UploadProfileImageProps {
+import { RenderOrSpinner } from "components";
+
+import "./UploadUserImage.scss";
+
+interface UploadUserImageProps extends StandardComponentProps {
   onChange: (file: File | Blob) => void;
   onError: (error: string) => void;
-  initialValue: string | undefined;
+  initialValue?: string | null;
 }
 
-const UploadProfileImage = ({ initialValue = undefined, onChange, onError }: UploadProfileImageProps): JSX.Element => {
+const UploadUserImage = ({
+  initialValue = undefined,
+  className,
+  style = {},
+  onChange,
+  onError
+}: UploadUserImageProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | undefined>(initialValue);
+  const [imageUrl, setImageUrl] = useState<string | null>(initialValue || null);
 
   return (
     <Upload
       name={"avatar"}
       listType={"picture-card"}
-      className={"avatar-uploader"}
+      className={classNames("user-image-uploader", className)}
+      style={style}
       showUploadList={false}
       beforeUpload={(file: File) => {
         const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -63,13 +77,14 @@ const UploadProfileImage = ({ initialValue = undefined, onChange, onError }: Upl
       {imageUrl ? (
         <img src={imageUrl} alt={"avatar"} style={{ width: "100%" }} />
       ) : (
-        <div>
-          {loading ? <LoadingOutlined /> : <PlusOutlined />}
-          <div style={{ marginTop: 8 }}>{"Upload"}</div>
-        </div>
+        <RenderOrSpinner size={24} loading={loading}>
+          <div className={"upload-indicator"}>
+            <FontAwesomeIcon className={"icon"} icon={faUpload} />
+          </div>
+        </RenderOrSpinner>
       )}
     </Upload>
   );
 };
 
-export default UploadProfileImage;
+export default UploadUserImage;

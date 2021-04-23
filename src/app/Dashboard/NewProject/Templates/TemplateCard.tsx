@@ -10,23 +10,13 @@ import Card from "../../Card";
 
 interface TemplateCardProps {
   template: Model.Template;
-  selected: boolean;
   loading: boolean;
   onDelete: () => void;
   onEdit: () => void;
-  onSelect: (checked: boolean) => void;
   onDerive: () => void;
 }
 
-const TemplateCard = ({
-  template,
-  loading,
-  selected,
-  onDerive,
-  onEdit,
-  onDelete,
-  onSelect
-}: TemplateCardProps): JSX.Element => {
+const TemplateCard = ({ template, loading, onDerive, onEdit, onDelete }: TemplateCardProps): JSX.Element => {
   const history = useHistory();
   const user = useLoggedInUser();
   const tz = useTimezone();
@@ -38,8 +28,7 @@ const TemplateCard = ({
       title={template.name}
       subTitle={`Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(template.updated_at, { tz })}`}
       loading={loading}
-      selected={selected}
-      onSelect={onSelect}
+      image={template.image}
       dropdown={[
         {
           text: "Create Budget",

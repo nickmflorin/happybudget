@@ -1082,7 +1082,7 @@ const BudgetTable = <
           }
         }}
       />
-      <RenderWithSpinner absolute loading={loading}>
+      <RenderWithSpinner loading={loading}>
         <div className={"budget-table ag-theme-alpine"}>
           <div className={"table-grid"}>
             <AgGridReact

@@ -123,10 +123,12 @@ namespace Http {
     readonly production_type?: Model.ProductionTypeId;
     readonly name: string;
     readonly template?: number;
+    readonly image?: File | Blob | null;
   }
 
   interface TemplatePayload implements Http.ModelPayload<Model.Template> {
     readonly name: string;
+    readonly image?: File | Blob | null;
   }
 
   interface GroupPayload implements Http.ModelPayload<Model.Group> {

@@ -21,7 +21,7 @@ const HistoryDrawerContent = ({ history, loading, onRequest }: HistoryDrawerCont
 
   return (
     <Drawer.Content className={"history-drawer-content"} noPadding>
-      <RenderWithSpinner absolute size={15} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
+      <RenderWithSpinner size={15} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
         <ShowHide show={history.length !== 0}>
           {map(history, (event: Model.HistoryEvent, index: number) => {
             return <Event key={index} event={event} />;

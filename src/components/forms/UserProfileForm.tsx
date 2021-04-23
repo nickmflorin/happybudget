@@ -4,32 +4,19 @@ import { isNil } from "lodash";
 import { Input, Button } from "antd";
 
 import { Form } from "components";
-import { FormProps, FormInstance } from "components/Form";
-import UploadProfileImage from "./UploadProfileImage";
+import { FormProps } from "components/Form";
+import UploadUserImage from "./UploadUserImage";
 
-interface UserProfileFormProps extends FormProps<Http.UserPayload> {
-  form: FormInstance<Http.UserPayload>;
-  onSubmit: (payload: Partial<Http.UserPayload>) => void;
-  onUploadError: (error: string) => void;
-}
-
-const UserProfileForm = ({
-  form,
-  initialValues,
-  globalError,
-  onSubmit,
-  onUploadError
-}: UserProfileFormProps): JSX.Element => {
+const UserProfileForm = ({ ...props }: FormProps<Http.UserPayload>): JSX.Element => {
   const [file, setFile] = useState<File | Blob | null>(null);
 
   return (
     <Form.Form
-      form={form}
-      globalError={globalError}
-      layout={"vertical"}
       name={"form_in_modal"}
-      initialValues={initialValues}
-      onFinish={(values: Partial<Http.UserPayload>) => onSubmit({ ...values, profile_image: file })}
+      onFinish={(values: Partial<Http.UserPayload>) =>
+        !isNil(props.onFinish) && props.onFinish({ ...values, profile_image: file })
+      }
+      {...props}
     >
       <Form.Item
         name={"first_name"}
@@ -46,10 +33,10 @@ const UserProfileForm = ({
         <Input placeholder={"Last Name"} />
       </Form.Item>
       <Form.Item label={"Avatar"}>
-        <UploadProfileImage
-          initialValue={!isNil(initialValues) ? initialValues.profile_image : undefined}
+        <UploadUserImage
+          initialValue={!isNil(props.initialValues) ? props.initialValues.profile_image : undefined}
           onChange={(f: File | Blob) => setFile(f)}
-          onError={onUploadError}
+          onError={(error: string) => props.form.setGlobalError(error)}
         />
       </Form.Item>
       <Form.Item>

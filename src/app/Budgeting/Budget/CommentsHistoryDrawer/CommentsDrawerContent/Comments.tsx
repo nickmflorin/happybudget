@@ -33,7 +33,7 @@ const Comments = ({
   onDoneReplying
 }: CommentsProps): JSX.Element => {
   return (
-    <RenderWithSpinner absolute size={15} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
+    <RenderWithSpinner size={15} loading={loading} toggleOpacity={true} color={"#b5b5b5"}>
       <ShowHide show={comments.length !== 0}>
         {map(comments, (comment: Model.Comment, index: number) => (
           <CommentBlock
