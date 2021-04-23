@@ -15,9 +15,11 @@
       padding-left: 0px;
     }
   }
-  .btn--icon-only {
-    margin-right: 10px;
+  .toolbar-buttons {
+    display: flex;
+    margin-right: 8px;
   }
+
   .btn--caret {
     &:not(:last-child) {
       margin-right: 14px;

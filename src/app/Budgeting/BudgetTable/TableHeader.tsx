@@ -48,51 +48,53 @@ const TableHeader = ({
           <Tooltip title={"Select All"}>
             <Checkbox checked={selected} onChange={(e: CheckboxChangeEvent) => onSelect(e.target.checked)} />
           </Tooltip>
-          <IconButton
-            className={"dark"}
-            size={"large"}
-            onClick={() => onDelete()}
-            disabled={deleteDisabled}
-            icon={<FontAwesomeIcon icon={faTrash} />}
-            tooltip={{
-              title: "Delete",
-              placement: "bottom",
-              overlayClassName: "disabled"
-            }}
-          />
-          <IconButton
-            className={"dark"}
-            size={"large"}
-            disabled={true}
-            icon={<FontAwesomeIcon icon={faSigma} />}
-            tooltip={{
-              title: "Sub Total",
-              placement: "bottom",
-              overlayClassName: "disabled"
-            }}
-          />
-          <IconButton
-            className={"dark"}
-            size={"large"}
-            disabled={true}
-            icon={<FontAwesomeIcon icon={faPercentage} />}
-            tooltip={{
-              title: "Mark Up",
-              placement: "bottom",
-              overlayClassName: "disabled"
-            }}
-          />
-          <IconButton
-            className={"dark"}
-            size={"large"}
-            disabled={true}
-            icon={<FontAwesomeIcon icon={faDownload} />}
-            tooltip={{
-              title: "Import",
-              placement: "bottom",
-              overlayClassName: "disabled"
-            }}
-          />
+          <div className={"toolbar-buttons"}>
+            <IconButton
+              className={"dark"}
+              size={"large"}
+              onClick={() => onDelete()}
+              disabled={deleteDisabled}
+              icon={<FontAwesomeIcon icon={faTrash} />}
+              tooltip={{
+                title: "Delete",
+                placement: "bottom",
+                overlayClassName: "disabled"
+              }}
+            />
+            <IconButton
+              className={"dark"}
+              size={"large"}
+              disabled={true}
+              icon={<FontAwesomeIcon icon={faSigma} />}
+              tooltip={{
+                title: "Sub Total",
+                placement: "bottom",
+                overlayClassName: "disabled"
+              }}
+            />
+            <IconButton
+              className={"dark"}
+              size={"large"}
+              disabled={true}
+              icon={<FontAwesomeIcon icon={faPercentage} />}
+              tooltip={{
+                title: "Mark Up",
+                placement: "bottom",
+                overlayClassName: "disabled"
+              }}
+            />
+            <IconButton
+              className={"dark"}
+              size={"large"}
+              disabled={true}
+              icon={<FontAwesomeIcon icon={faDownload} />}
+              tooltip={{
+                title: "Import",
+                placement: "bottom",
+                overlayClassName: "disabled"
+              }}
+            />
+          </div>
           <Input
             placeholder={"Search Rows"}
             value={search}
