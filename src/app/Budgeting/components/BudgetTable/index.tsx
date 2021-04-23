@@ -259,6 +259,7 @@ const BudgetTable = <
         ...indexColumn,
         field: "index",
         cellRenderer: "IndexCell",
+        pinned: "left",
         cellRendererParams: {
           onSelect: onRowSelect,
           onDeselect: onRowDeselect,
@@ -308,8 +309,10 @@ const BudgetTable = <
     (col: ColDef): ColDef =>
       actionCell({
         ...col,
+        ...expandColumn,
         field: "expand",
         cellRenderer: "ExpandCell",
+        pinned: "left",
         cellRendererParams: { onClick: onRowExpand },
         cellClass: mergeClassNamesFn(col.cellClass, expandColumn.cellClass, actionColumn.cellClass)
       })
