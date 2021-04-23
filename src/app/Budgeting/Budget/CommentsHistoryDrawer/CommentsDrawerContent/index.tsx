@@ -55,7 +55,8 @@ const CommentsDrawerContent = ({
       </Drawer.Content>
       <Drawer.Footer className={"form-section"}>
         <Input.TextArea
-          style={{ marginBottom: 10 }}
+          style={{ marginBottom: 10, height: "5rem" }}
+          placeholder={"Leave comment here..."}
           maxLength={1028}
           value={text}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
