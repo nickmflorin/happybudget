@@ -692,12 +692,12 @@ const BudgetTable = <
     }
   });
 
-  const fillOperation = useDynamicCallback((event: FillOperationParams) => {
+  const fillOperation = (event: FillOperationParams) => {
     if (event.initialValues.length === 1) {
       return false;
     }
     return event.initialValues[(event.values.length - event.initialValues.length) % event.initialValues.length];
-  });
+  };
 
   const getRowClass = (params: RowClassParams) => {
     if (params.node.data.meta.isGroupFooter === true) {
