@@ -8,9 +8,9 @@ import { componentLoader } from "lib/operational";
 import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
 
-const Contacts = React.lazy(() => componentLoader(() => import("./Contacts")));
-const NewProject = React.lazy(() => componentLoader(() => import("./NewProject")));
-const Budgets = React.lazy(() => componentLoader(() => import("./Budgets")));
+const Contacts = React.lazy(() => componentLoader(() => import("./components/Contacts")));
+const Templates = React.lazy(() => componentLoader(() => import("./components/Templates")));
+const Budgets = React.lazy(() => componentLoader(() => import("./components/Budgets")));
 
 const Dashboard = (): JSX.Element => {
   const history = useHistory();
@@ -20,10 +20,10 @@ const Dashboard = (): JSX.Element => {
     <Layout
       sidebar={[
         {
-          text: "New Project",
+          text: "Templates",
           icon: <FontAwesomeIcon icon={faFolderPlus} />,
-          onClick: () => history.push("/new"),
-          active: location.pathname.startsWith("/new")
+          onClick: () => history.push("/templates"),
+          active: location.pathname.startsWith("/templates")
         },
         {
           text: "My Budgets",
@@ -42,7 +42,7 @@ const Dashboard = (): JSX.Element => {
       <Switch>
         <PrivateRoute exact path={"/contacts"} component={Contacts} />
         <PrivateRoute exact path={"/budgets"} component={Budgets} />
-        <PrivateRoute path={"/new"} component={NewProject} />
+        <PrivateRoute path={["/templates", "/discover"]} component={Templates} />
       </Switch>
     </Layout>
   );

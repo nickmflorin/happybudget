@@ -9,7 +9,8 @@ import { ShowHide, RenderWithSpinner } from "components";
 import { Dropdown } from "components/dropdowns";
 import { IconButton } from "components/buttons";
 import { DropdownMenuItem } from "components/menus/DropdownMenu";
-import "./Card.scss";
+
+import "./index.scss";
 
 interface DashboardCardImagePlaceholderProps {
   onClick?: () => void;

@@ -1,40 +1,34 @@
 import { useHistory } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faEdit, faTrash } from "@fortawesome/pro-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/pro-solid-svg-icons";
 
 import { useLoggedInUser, useTimezone } from "store/hooks";
 import { toAbbvDisplayDateTime } from "lib/util/dates";
 
-import Card from "../../Card";
+import Card from "./Card";
 
-interface TemplateCardProps {
-  template: Model.Template;
+interface BudgetCardProps {
+  budget: Model.Budget;
   loading: boolean;
   onDelete: () => void;
   onEdit: () => void;
-  onDerive: () => void;
 }
 
-const TemplateCard = ({ template, loading, onDerive, onEdit, onDelete }: TemplateCardProps): JSX.Element => {
+const BudgetCard = ({ budget, loading, onEdit, onDelete }: BudgetCardProps): JSX.Element => {
   const history = useHistory();
   const user = useLoggedInUser();
   const tz = useTimezone();
 
   return (
     <Card
-      className={"template-card"}
-      onClick={() => history.push(`/templates/${template.id}`)}
-      title={template.name}
-      subTitle={`Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(template.updated_at, { tz })}`}
+      className={"budget-card"}
+      onClick={() => history.push(`/budgets/${budget.id}`)}
+      title={budget.name}
+      subTitle={`Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(budget.updated_at, { tz })}`}
       loading={loading}
-      image={template.image}
+      image={budget.image}
       dropdown={[
-        {
-          text: "Create Budget",
-          icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />,
-          onClick: () => onDerive()
-        },
         {
           text: "Edit",
           icon: <FontAwesomeIcon className={"icon"} icon={faEdit} />,
@@ -50,4 +44,4 @@ const TemplateCard = ({ template, loading, onDerive, onEdit, onDelete }: Templat
   );
 };
 
-export default TemplateCard;
+export default BudgetCard;

@@ -1,0 +1,8 @@
+@import "style/typography";
+
+.icon {
+  color: $icon-color;
+  svg {
+    color: $icon-color;
+  }
+}

@@ -8,7 +8,7 @@ import { SearchOutlined } from "@ant-design/icons";
 import { ActionsMenuBar } from "components/menus";
 import { Page } from "components/layout";
 
-import { setContactsSearchAction } from "../actions";
+import { setContactsSearchAction } from "../../store/actions";
 import ContactsTable from "./ContactsTable";
 import CreateContactModal from "./CreateContactModal";
 

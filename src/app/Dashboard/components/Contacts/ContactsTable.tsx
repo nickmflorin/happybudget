@@ -17,7 +17,7 @@ import {
   selectContactsAction,
   deleteContactsAction,
   deleteContactAction
-} from "../actions";
+} from "../../store/actions";
 import EditContactModal from "./EditContactModal";
 
 interface Row {

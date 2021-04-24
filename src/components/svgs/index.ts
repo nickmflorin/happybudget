@@ -1,17 +1,4 @@
 export { default as SidebarLogo } from "./SidebarLogo";
 export { default as LogoWhite } from "./LogoWhite";
-export { default as CommercialIcon } from "./CommercialIcon";
-export { default as DocumentaryIcon } from "./DocumentaryIcon";
-export { default as EpisodicIcon } from "./EpisodicIcon";
-export { default as FilmIcon } from "./FilmIcon";
-export { default as MusicVideoIcon } from "./MusicVideoIcon";
-export { default as ActorsIcon } from "./ActorsIcon";
-export { default as DirectorIcon } from "./DirectorIcon";
-export { default as DollyIcon } from "./DollyIcon";
-export { default as EditorIcon } from "./EditorIcon";
-export { default as SceneIcon } from "./SceneIcon";
-export { default as SFXIcon } from "./SFXIcon";
-export { default as SoundIcon } from "./SoundIcon";
-export { default as WriterIcon } from "./WriterIcon";
 export { default as LeafLogo } from "./LeafLogo";
 export { default as GoogleIcon } from "./GoogleIcon";

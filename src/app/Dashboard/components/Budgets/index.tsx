@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
 import { Page } from "components/layout";
-import { EditBudgetModal } from "components/modals";
+import { EditBudgetModal, CreateBudgetModal } from "components/modals";
 
-import { requestBudgetsAction, deleteBudgetAction, updateBudgetInStateAction } from "../actions";
-import BudgetCard from "./BudgetCard";
+import {
+  requestBudgetsAction,
+  deleteBudgetAction,
+  updateBudgetInStateAction,
+  addBudgetToStateAction
+} from "../../store/actions";
+import { EmptyCard, BudgetCard } from "../Card";
 import "./index.scss";
 
 const selectBudgets = (state: Redux.ApplicationStore) => state.dashboard.budgets.data;
@@ -16,6 +22,8 @@ const selectLoadingBudgets = (state: Redux.ApplicationStore) => state.dashboard.
 
 const Budgets = (): JSX.Element => {
   const [budgetToEdit, setBudgetToEdit] = useState<Model.Budget | undefined>(undefined);
+  const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
+  const history = useHistory();
 
   const dispatch: Dispatch = useDispatch();
   const budgets = useSelector(selectBudgets);
@@ -28,7 +36,8 @@ const Budgets = (): JSX.Element => {
 
   return (
     <Page className={"budgets"} loading={loading} title={"Budgets"}>
-      <div className={"budgets-grid"}>
+      <div className={"dashboard-card-grid"}>
+        <EmptyCard title={"New Budget"} icon={"plus"} />
         {map(budgets, (budget: Model.Budget, index: number) => {
           return (
             <BudgetCard
@@ -55,6 +64,15 @@ const Budgets = (): JSX.Element => {
           }}
         />
       )}
+      <CreateBudgetModal
+        open={createBudgetModalOpen}
+        onCancel={() => setCreateBudgetModalOpen(false)}
+        onSuccess={(budget: Model.Budget) => {
+          setCreateBudgetModalOpen(false);
+          dispatch(addBudgetToStateAction(budget));
+          history.push(`/budgets/${budget.id}/accounts`);
+        }}
+      />
     </Page>
   );
 };

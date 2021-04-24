@@ -7,7 +7,7 @@ import { ContactForm } from "components/forms";
 import { Modal } from "components/modals";
 import { updateContact } from "api/services";
 
-import { updateContactInStateAction } from "../actions";
+import { updateContactInStateAction } from "../../store/actions";
 
 interface EditContactModalProps {
   contact: Model.Contact;

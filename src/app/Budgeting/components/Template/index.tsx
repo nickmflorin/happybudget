@@ -58,7 +58,7 @@ const Template = (): JSX.Element => {
       sidebar={[
         {
           icon: <FontAwesomeIcon icon={faCopy} />,
-          onClick: () => history.push("/new/templates"),
+          onClick: () => history.push("/templates"),
           tooltip: {
             title: "My Templates",
             placement: "right"

@@ -5,24 +5,25 @@ import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
 import { RenderWithSpinner } from "components";
-import { CreateBudgetModal, EditTemplateModal } from "components/modals";
+import { CreateBudgetModal, EditTemplateModal, CreateTemplateModal } from "components/modals";
 
 import {
   requestTemplatesAction,
   deleteTemplateAction,
   addBudgetToStateAction,
-  updateTemplateInStateAction
-} from "../../actions";
-import TemplateCard from "./TemplateCard";
-import "./index.scss";
+  updateTemplateInStateAction,
+  addTemplateToStateAction
+} from "../../store/actions";
+import { TemplateCard, EmptyCard } from "../Card";
 
 const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.data;
 const selectDeletingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.deleting;
 const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.loading;
 
-const Templates = (): JSX.Element => {
+const MyTemplates = (): JSX.Element => {
   const [templateToDerive, setTemplateToDerive] = useState<number | undefined>(undefined);
   const [templateToEdit, setTemplateToEdit] = useState<Model.Template | undefined>(undefined);
+  const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
 
   const dispatch: Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
@@ -36,10 +37,11 @@ const Templates = (): JSX.Element => {
   }, []);
 
   return (
-    <div className={"templates"}>
+    <div className={"my-templates"}>
       <RenderWithSpinner loading={loading}>
         <React.Fragment>
-          <div className={"templates-grid"}>
+          <div className={"dashboard-card-grid"}>
+            <EmptyCard title={"New Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
             {map(templates, (template: Model.Template, index: number) => {
               return (
                 <TemplateCard
@@ -81,8 +83,17 @@ const Templates = (): JSX.Element => {
           }}
         />
       )}
+      <CreateTemplateModal
+        open={createTemplateModalOpen}
+        onCancel={() => setCreateTempateModalOpen(false)}
+        onSuccess={(template: Model.Template) => {
+          setCreateTempateModalOpen(false);
+          dispatch(addTemplateToStateAction(template));
+          history.push(`/templates/${template.id}/accounts`);
+        }}
+      />
     </div>
   );
 };
 
-export default Templates;
+export default MyTemplates;
