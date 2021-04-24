@@ -30,6 +30,7 @@ import {
   SuppressKeyboardEventParams,
   ProcessCellForExportParams
 } from "ag-grid-community";
+import { FillOperationParams } from "ag-grid-community/dist/lib/entities/gridOptions";
 
 import { TABLE_DEBUG } from "config";
 import { RenderWithSpinner, ShowHide } from "components";
@@ -136,6 +137,8 @@ const BudgetTable = <
     suppressContextMenu: TABLE_DEBUG,
     suppressCopyRowsToClipboard: isNil(onRowBulkUpdate),
     suppressClipboardPaste: isNil(onRowBulkUpdate),
+    enableFillHandle: true,
+    fillHandleDirection: "y",
     ...options
   });
   const [tableFooterGridOptions, setTableFooterGridOptions] = useState<GridOptions>({
@@ -689,6 +692,13 @@ const BudgetTable = <
     }
   });
 
+  const fillOperation = (event: FillOperationParams) => {
+    if (event.initialValues.length === 1) {
+      return false;
+    }
+    return event.initialValues[(event.values.length - event.initialValues.length) % event.initialValues.length];
+  };
+
   const getRowClass = (params: RowClassParams) => {
     if (params.node.data.meta.isGroupFooter === true) {
       let colorClass = params.node.data.group.color;
@@ -1151,6 +1161,7 @@ const BudgetTable = <
               onPasteStart={onPasteStart}
               onPasteEnd={onPasteEnd}
               onCellValueChanged={onCellValueChanged}
+              fillOperation={fillOperation}
             />
           </div>
           <div className={"table-footer-grid"}>
