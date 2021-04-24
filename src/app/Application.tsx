@@ -19,7 +19,10 @@ const Application = (): JSX.Element => {
         <Redirect exact from={"/"} to={"/budgets"} />
         <PrivateRoute path={"/budgets/:budgetId"} component={Budget} />
         <PrivateRoute path={"/templates/:templateId"} component={Template} />
-        <PrivateRoute path={["/budgets", "/contacts", "/templates", "/trash", "/new"]} component={Dashboard} />
+        <PrivateRoute
+          path={["/budgets", "/contacts", "/templates", "/discover", "/trash", "/new"]}
+          component={Dashboard}
+        />
         <PrivateRoute path={["/profile"]} component={Settings} />
         <Route exact path={"/logout"} component={Logout} />
       </Switch>
