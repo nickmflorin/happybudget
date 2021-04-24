@@ -472,14 +472,14 @@ export const BudgetAccountRowManager = new RowManager<
     ManageField({ field: "description" }),
     // We want to attribute the full group to the row, not just the ID.
     ManageField({ field: "group", allowNull: true, inRow: false }),
-    ManageField({ field: "identifier", required: true }),
+    ManageField({ field: "identifier" }),
     ManageField({ field: "estimated", readOnly: true }),
     ManageField({ field: "variance", readOnly: true }),
     ManageField({ field: "actual", readOnly: true })
   ],
   childrenGetter: (model: Model.Account) => model.subaccounts,
   groupGetter: (model: Model.Account) => model.group,
-  labelGetter: (model: Model.Account) => model.identifier,
+  labelGetter: (model: Model.Account) => (!isNil(model.identifier) ? model.identifier : "Account"),
   typeLabel: "Account",
   rowType: "account"
 });
@@ -494,12 +494,12 @@ export const TemplateAccountRowManager = new RowManager<
     ManageField({ field: "description" }),
     // We want to attribute the full group to the row, not just the ID.
     ManageField({ field: "group", allowNull: true, inRow: false }),
-    ManageField({ field: "identifier", required: true }),
+    ManageField({ field: "identifier" }),
     ManageField({ field: "estimated", readOnly: true })
   ],
   childrenGetter: (model: Model.TemplateAccount) => model.subaccounts,
   groupGetter: (model: Model.TemplateAccount) => model.group,
-  labelGetter: (model: Model.TemplateAccount) => model.identifier,
+  labelGetter: (model: Model.TemplateAccount) => (!isNil(model.identifier) ? model.identifier : "Account"),
   typeLabel: "Account",
   rowType: "account"
 });
@@ -548,7 +548,7 @@ export const BudgetSubAccountRowManager = new RowManager<
         return null;
       }
     }),
-    ManageField({ field: "identifier", required: true }),
+    ManageField({ field: "identifier" }),
     ManageField({ field: "estimated", readOnly: true }),
     ManageField({ field: "variance", readOnly: true }),
     ManageField({ field: "actual", readOnly: true }),
@@ -556,7 +556,7 @@ export const BudgetSubAccountRowManager = new RowManager<
   ],
   childrenGetter: (model: Model.SubAccount) => model.subaccounts,
   groupGetter: (model: Model.SubAccount) => model.group,
-  labelGetter: (model: Model.SubAccount) => model.identifier,
+  labelGetter: (model: Model.SubAccount) => (!isNil(model.identifier) ? model.identifier : "Sub Account"),
   typeLabel: "Sub Account",
   rowType: "subaccount"
 });
@@ -605,13 +605,13 @@ export const TemplateSubAccountRowManager = new RowManager<
         return null;
       }
     }),
-    ManageField({ field: "identifier", required: true }),
+    ManageField({ field: "identifier" }),
     ManageField({ field: "estimated", readOnly: true }),
     ManageField({ field: "fringes", allowNull: true, placeholderValue: [] })
   ],
   childrenGetter: (model: Model.SubAccount) => model.subaccounts,
   groupGetter: (model: Model.SubAccount) => model.group,
-  labelGetter: (model: Model.SubAccount) => model.identifier,
+  labelGetter: (model: Model.SubAccount) => (!isNil(model.identifier) ? model.identifier : "Sub Account"),
   typeLabel: "Sub Account",
   rowType: "subaccount"
 });

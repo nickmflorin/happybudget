@@ -148,7 +148,7 @@ namespace Model {
   interface TemplateGroup extends Model.Group {}
 
   interface SimpleAccount extends Model.Model {
-    readonly identifier: string;
+    readonly identifier: string | null;
     readonly type: "account";
     readonly description: string | null;
   }
@@ -183,7 +183,7 @@ namespace Model {
   interface SimpleSubAccount extends Model.Model {
     readonly name: string | null;
     readonly type: "subaccount";
-    readonly identifier: string;
+    readonly identifier: string | null;
     readonly description: string | null;
   }
 

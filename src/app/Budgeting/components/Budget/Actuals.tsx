@@ -118,7 +118,7 @@ const Actuals = (): JSX.Element => {
           object_id: ({ node }: GetExportValueParams) => {
             const item = find(budgetItems, { id: node.data.object_id, type: node.data.parent_type });
             if (!isNil(item)) {
-              return item.identifier;
+              return item.identifier || "";
             }
             return "";
           }
