@@ -3,14 +3,6 @@ type PageAndSize = {
   pageSize?: number;
 };
 
-interface MenuItem {
-  text: string;
-  loading?: boolean;
-  onClick: () => void;
-  icon?: JSX.Element;
-  disabled?: boolean;
-}
-
 type BudgetViewType = "budget" | "template";
 
 type Order = 1 | -1 | 0;

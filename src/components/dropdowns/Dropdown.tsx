@@ -1,53 +1,43 @@
 import { ReactNode } from "react";
-import { map } from "lodash";
 import classNames from "classnames";
 
-import { Dropdown as AntdDropdown, Menu } from "antd";
+import { Dropdown as AntdDropdown } from "antd";
+import { DropDownProps } from "antd/lib/dropdown";
 
-import { IconOrSpinner } from "components";
+import { DropdownMenu } from "components/menus";
+import { DropdownMenuProps, DropdownMenuItem } from "components/menus/DropdownMenu";
 
-export interface DropdownProps {
+interface BaseDropdownProps extends Omit<DropDownProps, "overlay">, StandardComponentProps {
   children: ReactNode;
-  items: MenuItem[];
-  className?: string;
-  menuClassName?: string;
-  menuItemClassName?: string;
-  placement?: "bottomRight" | "bottomLeft" | "bottomCenter" | "topLeft" | "topRight" | "topCenter";
-  trigger?: ("click" | "hover" | "contextMenu")[];
+  menuProps?: DropdownMenuProps;
 }
 
-const Dropdown = ({
-  children,
-  items,
-  className,
-  placement,
-  trigger = ["click"],
-  menuClassName,
-  menuItemClassName
-}: DropdownProps): JSX.Element => {
+interface DropdownOverlayProps extends BaseDropdownProps {
+  overlay: React.ReactElement | (() => React.ReactElement);
+  items?: undefined;
+}
+
+interface DropdownMenuItemsProps extends BaseDropdownProps {
+  items: DropdownMenuItem[];
+  overlay?: undefined;
+}
+
+export type DropdownProps = DropdownOverlayProps | DropdownMenuItemsProps;
+
+export const includesMenuItems = (
+  obj: DropdownMenuItemsProps | DropdownOverlayProps
+): obj is DropdownMenuItemsProps => {
+  return (obj as DropdownMenuItemsProps).items !== undefined;
+};
+
+const Dropdown: React.FC<DropdownProps> = (props): JSX.Element => {
   return (
     <AntdDropdown
-      className={classNames("dropdown", className)}
-      trigger={trigger}
-      placement={placement}
-      overlay={
-        <Menu className={classNames("dropdown-menu", menuClassName)}>
-          {map(items, (item: MenuItem, index: number) => {
-            return (
-              <Menu.Item
-                key={index}
-                className={classNames("dropdown-menu-item", menuItemClassName, { disabled: item.disabled === true })}
-                onClick={item.disabled === true ? undefined : item.onClick}
-              >
-                <IconOrSpinner size={20} loading={item.loading} icon={item.icon} />
-                {item.text}
-              </Menu.Item>
-            );
-          })}
-        </Menu>
-      }
+      className={classNames("dropdown", props.className)}
+      {...props}
+      overlay={includesMenuItems(props) ? <DropdownMenu {...props.menuProps} items={props.items} /> : props.overlay}
     >
-      {children}
+      {props.children}
     </AntdDropdown>
   );
 };

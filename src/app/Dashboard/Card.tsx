@@ -5,9 +5,10 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImagePolaroid, faEllipsisV } from "@fortawesome/pro-light-svg-icons";
 
+import { ShowHide, RenderWithSpinner } from "components";
 import { Dropdown } from "components/dropdowns";
 import { IconButton } from "components/buttons";
-import { ShowHide, RenderWithSpinner } from "components";
+import { DropdownMenuItem } from "components/menus/DropdownMenu";
 import "./Card.scss";
 
 interface DashboardCardImagePlaceholderProps {
@@ -37,7 +38,7 @@ const DashboardCardImage: React.FC<DashboardCardImageProps> = ({ image, onClick 
 };
 
 interface CardProps extends StandardComponentProps {
-  dropdown?: MenuItem[];
+  dropdown?: DropdownMenuItem[];
   title?: string;
   subTitle?: string;
   image?: string | null;
@@ -60,7 +61,7 @@ const Card = ({
       <RenderWithSpinner loading={loading}>
         <React.Fragment>
           {!isNil(dropdown) && (
-            <Dropdown items={dropdown} placement={"bottomRight"}>
+            <Dropdown items={dropdown} placement={"bottomRight"} trigger={["click"]}>
               <IconButton
                 className={classNames("dropdown-ellipsis", { "for-placeholder": isNil(image) })}
                 icon={<FontAwesomeIcon icon={faEllipsisV} />}

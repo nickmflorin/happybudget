@@ -14,21 +14,25 @@
 
 .menu-item-base {
   margin-top: 0px;
-  margin-bottom: 0px;
   color: $text-secondary !important;
   font-family: $roboto;
   font-weight: 400;
   min-width: 100px;
-  padding: 10px 14px;
+  padding: 6px;
   font-size: 13px;
-  line-height: 20px;
+  line-height: 24px;
+  border-radius: 6px;
+  height: 36px;
+  margin-bottom: 0px !important;
 
   &.ant-menu-item-selected {
     background-color: $white;
   }
+  &.active {
+    background-color: #EFEFEF !important;
+  }
   &:hover {
-    background-color: $gray-highlight;
-    color: $green !important;
+    background-color: #fbfbfb !important;
   }
   &.disabled {
     cursor: not-allowed !important;
