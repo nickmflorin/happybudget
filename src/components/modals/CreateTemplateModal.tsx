@@ -2,7 +2,7 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import { createTemplate } from "api/services";
-import { payloadToFormData } from "lib/util/forms";
+import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
 import { TemplateFormValues } from "components/forms/TemplateForm";
@@ -30,23 +30,28 @@ const CreateTemplateModal = ({ open, onSuccess, onCancel }: CreateTemplateModalP
         form
           .validateFields()
           .then((values: TemplateFormValues) => {
-            let payload: Http.TemplatePayload = { ...values };
+            const submit = (payload: Http.TemplatePayload) => {
+              createTemplate(payload)
+                .then((template: Model.Template) => {
+                  form.resetFields();
+                  onSuccess(template);
+                })
+                .catch((e: Error) => {
+                  form.handleRequestError(e);
+                })
+                .finally(() => {
+                  form.setLoading(false);
+                });
+            };
             if (!isNil(file)) {
-              payload = { ...payload, image: file };
-            }
-            const formData = payloadToFormData<Http.BudgetPayload>(payload);
-            form.setLoading(true);
-            createTemplate(formData)
-              .then((template: Model.Template) => {
-                form.resetFields();
-                onSuccess(template);
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
+              getBase64(file, (result: ArrayBuffer | string | null) => {
+                if (result !== null) {
+                  submit({ ...values, image: result });
+                }
               });
+            } else {
+              submit(values);
+            }
           })
           .catch(() => {
             return;

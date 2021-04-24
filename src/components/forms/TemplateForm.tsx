@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { isNil } from "lodash";
 
 import { Input } from "antd";
@@ -11,7 +11,6 @@ import "./TemplateForm.scss";
 
 export interface TemplateFormValues {
   name: string;
-  image?: Blob | File | undefined;
 }
 
 interface TemplateFormProps extends FormProps<TemplateFormValues> {
@@ -20,23 +19,8 @@ interface TemplateFormProps extends FormProps<TemplateFormValues> {
 }
 
 const TemplateForm: React.FC<TemplateFormProps> = ({ imageUrl, onImageChange, ...props }) => {
-  const [file, setFile] = useState<File | Blob | null>(null);
-
   return (
-    <Form.Form
-      className={"template-form"}
-      layout={"vertical"}
-      {...props}
-      onFinish={(values: TemplateFormValues) => {
-        let payload = { ...values };
-        if (!isNil(file)) {
-          payload = { ...payload, image: file };
-        }
-        if (!isNil(props.onFinish)) {
-          props.onFinish(payload);
-        }
-      }}
-    >
+    <Form.Form className={"template-form"} layout={"vertical"} {...props}>
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the template." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>
@@ -44,7 +28,6 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ imageUrl, onImageChange, ..
         <UploadUserImage
           initialValue={imageUrl}
           onChange={(f: File | Blob) => {
-            setFile(f);
             if (!isNil(onImageChange)) {
               onImageChange(f);
             }

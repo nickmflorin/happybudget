@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { isNil } from "lodash";
 
-import { createBudget } from "api/services";
-import { payloadToFormData } from "lib/util/forms";
+import { createBudget, getTemplates } from "api/services";
+import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { BudgetForm } from "components/forms";
 import { BudgetFormValues } from "components/forms/BudgetForm";
@@ -14,11 +14,41 @@ interface CreateBudgetModalProps {
   onCancel: () => void;
   open: boolean;
   templateId?: number;
+  templates?: Model.Template[];
+  templatesLoading?: boolean;
+  allowTemplateSelection?: boolean;
 }
 
-const CreateBudgetModal = ({ open, templateId, onSuccess, onCancel }: CreateBudgetModalProps): JSX.Element => {
+const CreateBudgetModal = ({
+  open,
+  templateId,
+  templates,
+  templatesLoading,
+  allowTemplateSelection = true,
+  onSuccess,
+  onCancel
+}: CreateBudgetModalProps): JSX.Element => {
+  const [_templatesLoading, setTemplatesLoading] = useState(false);
+  const [_templates, setTemplates] = useState<Model.Template[]>([]);
+
   const [file, setFile] = useState<File | Blob | null>(null);
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    if (allowTemplateSelection === true && isNil(templates) && isNil(templateId)) {
+      setTemplatesLoading(true);
+      getTemplates({ no_pagination: true })
+        .then((response: Http.ListResponse<Model.Template>) => {
+          setTemplates(response.data);
+        })
+        .catch((e: Error) => {
+          form.handleRequestError(e);
+        })
+        .finally(() => {
+          setTemplatesLoading(false);
+        });
+    }
+  }, [allowTemplateSelection, templates]);
 
   return (
     <Modal
@@ -31,26 +61,29 @@ const CreateBudgetModal = ({ open, templateId, onSuccess, onCancel }: CreateBudg
         form
           .validateFields()
           .then((values: BudgetFormValues) => {
-            let payload: Http.BudgetPayload = { ...values };
+            const submit = (payload: Http.BudgetPayload) => {
+              createBudget(payload)
+                .then((budget: Model.Budget) => {
+                  form.resetFields();
+                  onSuccess(budget);
+                })
+                .catch((e: Error) => {
+                  form.handleRequestError(e);
+                })
+                .finally(() => {
+                  form.setLoading(false);
+                });
+            };
+
             if (!isNil(file)) {
-              payload = { ...payload, image: file };
-            }
-            if (!isNil(templateId)) {
-              payload = { ...payload, template: templateId };
-            }
-            const formData = payloadToFormData<Http.BudgetPayload>(payload);
-            form.setLoading(true);
-            createBudget(formData)
-              .then((budget: Model.Budget) => {
-                form.resetFields();
-                onSuccess(budget);
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
+              getBase64(file, (result: ArrayBuffer | string | null) => {
+                if (result !== null) {
+                  submit({ ...values, image: result });
+                }
               });
+            } else {
+              submit(values);
+            }
           })
           .catch(() => {
             return;
@@ -60,6 +93,14 @@ const CreateBudgetModal = ({ open, templateId, onSuccess, onCancel }: CreateBudg
       <BudgetForm
         form={form}
         onImageChange={(f: File | Blob) => setFile(f)}
+        templatesLoading={templatesLoading !== undefined ? templatesLoading : _templatesLoading}
+        templates={
+          allowTemplateSelection === true && isNil(templateId)
+            ? templates !== undefined
+              ? templates
+              : _templates
+            : undefined
+        }
         name={"form_in_modal"}
         initialValues={{}}
       />

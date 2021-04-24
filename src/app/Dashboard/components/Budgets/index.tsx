@@ -37,7 +37,7 @@ const Budgets = (): JSX.Element => {
   return (
     <Page className={"budgets"} loading={loading} title={"Budgets"}>
       <div className={"dashboard-card-grid"}>
-        <EmptyCard title={"New Budget"} icon={"plus"} />
+        <EmptyCard title={"New Budget"} icon={"plus"} onClick={() => setCreateBudgetModalOpen(true)} />
         {map(budgets, (budget: Model.Budget, index: number) => {
           return (
             <BudgetCard
@@ -64,15 +64,18 @@ const Budgets = (): JSX.Element => {
           }}
         />
       )}
-      <CreateBudgetModal
-        open={createBudgetModalOpen}
-        onCancel={() => setCreateBudgetModalOpen(false)}
-        onSuccess={(budget: Model.Budget) => {
-          setCreateBudgetModalOpen(false);
-          dispatch(addBudgetToStateAction(budget));
-          history.push(`/budgets/${budget.id}/accounts`);
-        }}
-      />
+      {createBudgetModalOpen === true && (
+        <CreateBudgetModal
+          open={true}
+          allowTemplateSelection={true}
+          onCancel={() => setCreateBudgetModalOpen(false)}
+          onSuccess={(budget: Model.Budget) => {
+            setCreateBudgetModalOpen(false);
+            dispatch(addBudgetToStateAction(budget));
+            history.push(`/budgets/${budget.id}/accounts`);
+          }}
+        />
+      )}
     </Page>
   );
 };

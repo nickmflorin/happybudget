@@ -2,7 +2,7 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import { updateTemplate } from "api/services";
-import { payloadToFormData } from "lib/util/forms";
+import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
 import { TemplateFormValues } from "components/forms/TemplateForm";
@@ -30,24 +30,28 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
         form
           .validateFields()
           .then((values: TemplateFormValues) => {
-            let payload: Http.TemplatePayload = { ...values };
+            const submit = (payload: Partial<Http.TemplatePayload>) => {
+              updateTemplate(template.id, payload)
+                .then((newTemplate: Model.Template) => {
+                  form.resetFields();
+                  onSuccess(newTemplate);
+                })
+                .catch((e: Error) => {
+                  form.handleRequestError(e);
+                })
+                .finally(() => {
+                  form.setLoading(false);
+                });
+            };
             if (!isNil(file)) {
-              payload = { ...payload, image: file };
-            }
-            console.log(payload);
-            const formData = payloadToFormData<Http.TemplatePayload>(payload);
-            form.setLoading(true);
-            updateTemplate(template.id, formData)
-              .then((newTemplate: Model.Template) => {
-                form.resetFields();
-                onSuccess(newTemplate);
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
+              getBase64(file, (result: ArrayBuffer | string | null) => {
+                if (result !== null) {
+                  submit({ ...values, image: result });
+                }
               });
+            } else {
+              submit(values);
+            }
           })
           .catch(() => {
             return;

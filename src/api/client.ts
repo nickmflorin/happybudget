@@ -43,6 +43,16 @@ instance.interceptors.request.use(
   }
 );
 
+export const filterPayload = <T extends { [key: string]: any } = { [key: string]: any }>(payload: T): T => {
+  const newPayload: { [key: string]: any } = {};
+  Object.keys(payload).forEach((key: string) => {
+    if (payload[key] !== undefined) {
+      newPayload[key] = payload[key];
+    }
+  });
+  return newPayload as T;
+};
+
 /**
  * Parses the error information from the response embedded in an AxiosError
  * and returns an appropriate ClientError to be handled.
@@ -189,7 +199,7 @@ export class ApiClient {
     url = this._prepare_url(url, query, method);
     let response: AxiosResponse<T>;
     try {
-      response = await lookup[method](url, payload, {
+      response = await lookup[method](url, filterPayload(payload), {
         cancelToken: options.cancelToken,
         headers: options.headers
       });

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import { updateBudget } from "api/services";
-import { payloadToFormData } from "lib/util/forms";
+import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { BudgetForm } from "components/forms";
 import { BudgetFormValues } from "components/forms/BudgetForm";
@@ -30,23 +30,29 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
         form
           .validateFields()
           .then((values: BudgetFormValues) => {
-            let payload: Http.BudgetPayload = { ...values };
+            const submit = (payload: Http.BudgetPayload) => {
+              updateBudget(budget.id, payload)
+                .then((newBudget: Model.Budget) => {
+                  form.resetFields();
+                  onSuccess(newBudget);
+                })
+                .catch((e: Error) => {
+                  form.handleRequestError(e);
+                })
+                .finally(() => {
+                  form.setLoading(false);
+                });
+            };
+
             if (!isNil(file)) {
-              payload = { ...payload, image: file };
-            }
-            const formData = payloadToFormData<Http.BudgetPayload>(payload);
-            form.setLoading(true);
-            updateBudget(budget.id, formData)
-              .then((newBudget: Model.Budget) => {
-                form.resetFields();
-                onSuccess(newBudget);
-              })
-              .catch((e: Error) => {
-                form.handleRequestError(e);
-              })
-              .finally(() => {
-                form.setLoading(false);
+              getBase64(file, (result: ArrayBuffer | string | null) => {
+                if (result !== null) {
+                  submit({ ...values, image: result });
+                }
               });
+            } else {
+              submit(values);
+            }
           })
           .catch(() => {
             return;

@@ -43,15 +43,18 @@ const TemplatesMenu = (): JSX.Element => {
           </Button>
         </div>
       </div>
-      <CreateBudgetModal
-        open={createBudgetModalOpen}
-        onCancel={() => setCreateBudgetModalOpen(false)}
-        onSuccess={(budget: Model.Budget) => {
-          setCreateBudgetModalOpen(false);
-          dispatch(addBudgetToStateAction(budget));
-          history.push(`/budgets/${budget.id}/accounts`);
-        }}
-      />
+      {createBudgetModalOpen === true && (
+        <CreateBudgetModal
+          open={true}
+          allowTemplateSelection={false}
+          onCancel={() => setCreateBudgetModalOpen(false)}
+          onSuccess={(budget: Model.Budget) => {
+            setCreateBudgetModalOpen(false);
+            dispatch(addBudgetToStateAction(budget));
+            history.push(`/budgets/${budget.id}/accounts`);
+          }}
+        />
+      )}
     </React.Fragment>
   );
 };

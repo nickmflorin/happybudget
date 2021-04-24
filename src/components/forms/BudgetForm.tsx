@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { isNil } from "lodash";
-import { Input } from "antd";
+import { Input, Select } from "antd";
 
 import { Form } from "components";
 import { FormProps } from "components/Form";
@@ -9,17 +9,17 @@ import "./BudgetForm.scss";
 
 export interface BudgetFormValues {
   name: string;
-  image?: Blob | File | undefined;
+  template?: number;
 }
 
 interface BudgetFormProps extends FormProps<BudgetFormValues> {
   imageUrl?: string | null;
   onImageChange?: (f: File | Blob) => void;
+  templates?: Model.Template[];
+  templatesLoading?: boolean;
 }
 
-const BudgetForm: React.FC<BudgetFormProps> = ({ imageUrl, onImageChange, ...props }) => {
-  const [file, setFile] = useState<File | Blob | null>(null);
-
+const BudgetForm: React.FC<BudgetFormProps> = ({ imageUrl, onImageChange, templates, templatesLoading, ...props }) => {
   return (
     <Form.Form
       className={"budget-form"}
@@ -27,22 +27,42 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ imageUrl, onImageChange, ...pro
       {...props}
       onFinish={(values: BudgetFormValues) => {
         let payload = { ...values };
-        if (!isNil(file)) {
-          payload = { ...payload, image: file };
-        }
-        if (!isNil(props.onFinish)) {
-          props.onFinish(payload);
+        if (payload.template === undefined) {
+          const { template, ...newPayload } = payload;
+          if (!isNil(props.onFinish)) {
+            props.onFinish(newPayload);
+          }
+        } else {
+          if (!isNil(props.onFinish)) {
+            props.onFinish(payload);
+          }
         }
       }}
     >
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the budget." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>
+      {!isNil(templates) ? (
+        <Form.Item name={"template"} label={"Template"} rules={[{ required: false }]}>
+          <Select
+            placeholder={"Choose a template..."}
+            loading={templatesLoading === true}
+            disabled={templatesLoading === true}
+          >
+            {templates.map((template: Model.Template, index: number) => (
+              <Select.Option key={index} value={template.id}>
+                {template.name}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+      ) : (
+        <></>
+      )}
       <Form.Item label={"Avatar"} rules={[{ required: false }]}>
         <UploadUserImage
           initialValue={imageUrl || undefined}
           onChange={(f: File | Blob) => {
-            setFile(f);
             if (!isNil(onImageChange)) {
               onImageChange(f);
             }
