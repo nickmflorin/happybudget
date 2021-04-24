@@ -51,7 +51,7 @@ const TableHeader = ({
           <div className={"toolbar-buttons"}>
             <IconButton
               className={"dark"}
-              size={"medium"}
+              size={"large"}
               onClick={() => onDelete()}
               disabled={deleteDisabled}
               icon={<FontAwesomeIcon icon={faTrash} />}
@@ -85,7 +85,7 @@ const TableHeader = ({
             />
             <IconButton
               className={"dark"}
-              size={"medium"}
+              size={"large"}
               disabled={true}
               icon={<FontAwesomeIcon icon={faDownload} />}
               tooltip={{
