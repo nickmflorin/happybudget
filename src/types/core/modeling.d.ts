@@ -99,7 +99,6 @@ namespace Model {
   interface BaseBudget extends Model.TrackedModel {
     readonly name: string;
     readonly estimated: number | null;
-    readonly trash: boolean;
     readonly type: BudgetType;
     readonly image: string | null;
   }
