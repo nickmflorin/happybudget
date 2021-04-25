@@ -1,5 +1,3 @@
-import { useHistory } from "react-router-dom";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash } from "@fortawesome/pro-solid-svg-icons";
 
@@ -13,24 +11,24 @@ interface BudgetCardProps {
   loading: boolean;
   onDelete: () => void;
   onEdit: () => void;
+  onClick: () => void;
 }
 
-const BudgetCard = ({ budget, loading, onEdit, onDelete }: BudgetCardProps): JSX.Element => {
-  const history = useHistory();
+const BudgetCard = ({ budget, loading, onEdit, onDelete, onClick }: BudgetCardProps): JSX.Element => {
   const user = useLoggedInUser();
   const tz = useTimezone();
 
   return (
     <Card
       className={"budget-card"}
-      onClick={() => history.push(`/budgets/${budget.id}`)}
+      onClick={() => onClick()}
       title={budget.name}
       subTitle={`Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(budget.updated_at, { tz })}`}
       loading={loading}
       image={budget.image}
       dropdown={[
         {
-          text: "Edit",
+          text: "Edit Name/Image",
           icon: <FontAwesomeIcon className={"icon"} icon={faEdit} />,
           onClick: () => onEdit()
         },

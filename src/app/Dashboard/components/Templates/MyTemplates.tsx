@@ -51,9 +51,10 @@ const MyTemplates = (): JSX.Element => {
                     map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
                     template.id
                   )}
-                  onEdit={() => setTemplateToEdit(template)}
+                  onEdit={() => history.push(`/templates/${template.id}/accounts`)}
+                  onEditNameImage={() => setTemplateToEdit(template)}
                   onDelete={() => dispatch(deleteTemplateAction(template.id))}
-                  onDerive={() => setTemplateToDerive(template.id)}
+                  onClick={() => setTemplateToDerive(template.id)}
                 />
               );
             })}

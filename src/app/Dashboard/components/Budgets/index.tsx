@@ -47,6 +47,7 @@ const Budgets = (): JSX.Element => {
                 map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
                 budget.id
               )}
+              onClick={() => history.push(`/budgets/${budget.id}`)}
               onEdit={() => setBudgetToEdit(budget)}
               onDelete={() => dispatch(deleteBudgetAction(budget.id))}
             />
