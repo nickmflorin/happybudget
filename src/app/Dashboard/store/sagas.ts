@@ -10,7 +10,9 @@ import {
   getContactsTask,
   deleteContactTask,
   updateContactTask,
-  createContactTask
+  createContactTask,
+  getCommunityTemplatesTask,
+  deleteCommunityTemplateTask
 } from "./tasks";
 
 function* watchForContactsRefreshSaga(): SagaIterator {
@@ -80,6 +82,18 @@ function* watchForTemplatesRefreshSaga(): SagaIterator {
   );
 }
 
+function* watchForCommunityTemplatesRefreshSaga(): SagaIterator {
+  yield takeLatest(
+    [
+      ActionType.Community.Request,
+      ActionType.Community.SetPage,
+      ActionType.Community.SetPageSize,
+      ActionType.Community.SetPageAndSize
+    ],
+    getCommunityTemplatesTask
+  );
+}
+
 function* watchForSearchBudgetsSaga(): SagaIterator {
   yield debounce(250, ActionType.Budgets.SetSearch, getBudgetsTask);
 }
@@ -88,12 +102,20 @@ function* watchForSearchTemplatesSaga(): SagaIterator {
   yield debounce(250, ActionType.Templates.SetSearch, getTemplatesTask);
 }
 
+function* watchForSearchCommunityTemplatesSaga(): SagaIterator {
+  yield debounce(250, ActionType.Community.SetSearch, getCommunityTemplatesTask);
+}
+
 function* watchForDeleteBudgetSaga(): SagaIterator {
   yield takeEvery(ActionType.Budgets.Delete, deleteBudgetTask);
 }
 
 function* watchForDeleteTemplateSaga(): SagaIterator {
   yield takeEvery(ActionType.Templates.Delete, deleteTemplateTask);
+}
+
+function* watchForDeleteCommunityTemplateSaga(): SagaIterator {
+  yield takeEvery(ActionType.Community.Delete, deleteCommunityTemplateTask);
 }
 
 export default function* rootSaga(): SagaIterator {
@@ -109,4 +131,7 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForUpdateContactSaga);
   yield spawn(watchForCreateContactSaga);
   yield spawn(watchForDeleteContactsSaga);
+  yield spawn(watchForCommunityTemplatesRefreshSaga);
+  yield spawn(watchForSearchCommunityTemplatesSaga);
+  yield spawn(watchForDeleteCommunityTemplateSaga);
 }

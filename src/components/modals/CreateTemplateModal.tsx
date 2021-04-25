@@ -1,21 +1,29 @@
 import { useState } from "react";
 import { isNil } from "lodash";
 
-import { createTemplate } from "api/services";
+import { createTemplate, createCommunityTemplate } from "api/services";
 import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
 import { TemplateFormValues } from "components/forms/TemplateForm";
+import { useLoggedInUser } from "store/hooks";
 
 import Modal from "./Modal";
 
 interface CreateTemplateModalProps {
   onSuccess: (template: Model.Template) => void;
   onCancel: () => void;
+  community?: boolean;
   open: boolean;
 }
 
-const CreateTemplateModal = ({ open, onSuccess, onCancel }: CreateTemplateModalProps): JSX.Element => {
+const CreateTemplateModal = ({
+  open,
+  community = false,
+  onSuccess,
+  onCancel
+}: CreateTemplateModalProps): JSX.Element => {
+  const user = useLoggedInUser();
   const [file, setFile] = useState<File | Blob | null>(null);
   const [form] = Form.useForm();
 
@@ -30,8 +38,12 @@ const CreateTemplateModal = ({ open, onSuccess, onCancel }: CreateTemplateModalP
         form
           .validateFields()
           .then((values: TemplateFormValues) => {
+            let service = createTemplate;
+            if (community === true && user.is_staff === true) {
+              service = createCommunityTemplate;
+            }
             const submit = (payload: Http.TemplatePayload) => {
-              createTemplate(payload)
+              service(payload)
                 .then((template: Model.Template) => {
                   form.resetFields();
                   onSuccess(template);

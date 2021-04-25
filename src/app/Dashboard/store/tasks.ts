@@ -9,14 +9,17 @@ import {
   getContacts,
   deleteContact,
   updateContact,
-  createContact
+  createContact,
+  getCommunityTemplates
 } from "api/services";
 import { handleRequestError } from "api";
 import {
   loadingBudgetsAction,
   loadingTemplatesAction,
+  loadingCommunityTemplatesAction,
   responseBudgetsAction,
   responseTemplatesAction,
+  responseCommunityTemplatesAction,
   deletingBudgetAction,
   deletingTemplateAction,
   removeBudgetFromStateAction,
@@ -28,7 +31,9 @@ import {
   updatingContactAction,
   removeContactFromStateAction,
   updateContactInStateAction,
-  addContactToStateAction
+  addContactToStateAction,
+  deletingCommunityTemplateAction,
+  removeCommunityTemplateFromStateAction
 } from "./actions";
 
 export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
@@ -71,11 +76,30 @@ export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
   }
 }
 
+export function* getCommunityTemplatesTask(action: Redux.Action<any>): SagaIterator {
+  const query = yield select((state: Redux.ApplicationStore) => {
+    return {
+      search: state.dashboard.community.search,
+      page_size: state.dashboard.community.pageSize,
+      page: state.dashboard.community.page
+    };
+  });
+  yield put(loadingCommunityTemplatesAction(true));
+  try {
+    const response: Http.ListResponse<Model.Template> = yield call(getCommunityTemplates, query);
+    yield put(responseCommunityTemplatesAction(response));
+  } catch (e) {
+    handleRequestError(e, "There was an error retrieving the community templates.");
+    yield put(responseCommunityTemplatesAction({ count: 0, data: [] }, { error: e }));
+  } finally {
+    yield put(loadingCommunityTemplatesAction(false));
+  }
+}
+
 export function* deleteBudgetTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
     yield put(deletingBudgetAction({ id: action.payload, value: true }));
     try {
-      // TODO: Do we also want to add the deleted budget to the TRASH domain state?
       yield call(deleteBudget, action.payload);
       yield put(removeBudgetFromStateAction(action.payload));
     } catch (e) {
@@ -90,13 +114,26 @@ export function* deleteTemplateTask(action: Redux.Action<number>): SagaIterator 
   if (!isNil(action.payload)) {
     yield put(deletingTemplateAction({ id: action.payload, value: true }));
     try {
-      // TODO: Do we also want to add the deleted template to the TRASH domain state?
       yield call(deleteTemplate, action.payload);
       yield put(removeTemplateFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the template.");
     } finally {
       yield put(deletingTemplateAction({ id: action.payload, value: false }));
+    }
+  }
+}
+
+export function* deleteCommunityTemplateTask(action: Redux.Action<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(deletingCommunityTemplateAction({ id: action.payload, value: true }));
+    try {
+      yield call(deleteTemplate, action.payload);
+      yield put(removeCommunityTemplateFromStateAction(action.payload));
+    } catch (e) {
+      handleRequestError(e, "There was an error deleting the community template.");
+    } finally {
+      yield put(deletingCommunityTemplateAction({ id: action.payload, value: false }));
     }
   }
 }

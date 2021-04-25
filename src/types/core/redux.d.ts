@@ -88,6 +88,7 @@ namespace Redux {
       readonly budgets: Redux.ListResponseStore<Model.Budget>;
       readonly templates: Redux.ListResponseStore<Model.Template>;
       readonly contacts: Redux.ListResponseStore<Model.Contact>;
+      readonly community: Redux.ListResponseStore<Model.Template>;
     }
   }
 

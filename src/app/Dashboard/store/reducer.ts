@@ -31,6 +31,18 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     UpdateInState: ActionType.Templates.UpdateInState,
     Deleting: ActionType.Templates.Deleting
   }),
+  community: createListResponseReducer<Model.Template, Redux.ListResponseStore<Model.Template>, Redux.Action<any>>({
+    Response: ActionType.Community.Response,
+    Loading: ActionType.Community.Loading,
+    SetSearch: ActionType.Community.SetSearch,
+    SetPage: ActionType.Community.SetPage,
+    SetPageSize: ActionType.Community.SetPageSize,
+    SetPageAndSize: ActionType.Community.SetPageAndSize,
+    AddToState: ActionType.Community.AddToState,
+    RemoveFromState: ActionType.Community.RemoveFromState,
+    UpdateInState: ActionType.Community.UpdateInState,
+    Deleting: ActionType.Community.Deleting
+  }),
   budgets: createListResponseReducer<Model.Budget, Redux.ListResponseStore<Model.Budget>, Redux.Action<any>>({
     Response: ActionType.Budgets.Response,
     Loading: ActionType.Budgets.Loading,

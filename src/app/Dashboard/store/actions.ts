@@ -29,6 +29,20 @@ export const ActionType = {
     Delete: "dashboard.templates.Delete",
     Deleting: "dashboard.templates.Deleting"
   },
+  Community: {
+    Loading: "dashboard.community.Loading",
+    Response: "dashboard.community.Response",
+    Request: "dashboard.community.Request",
+    SetSearch: "dashboard.community.SetSearch",
+    SetPage: "dashboard.community.SetPage",
+    SetPageSize: "dashboard.community.SetPageSize",
+    SetPageAndSize: "dashboard.community.SetPageAndSize",
+    UpdateInState: "dashboard.community.UpdateInState",
+    RemoveFromState: "dashboard.community.RemoveFromState",
+    AddToState: "dashboard.community.AddToState",
+    Delete: "dashboard.community.Delete",
+    Deleting: "dashboard.community.Deleting"
+  },
   Contacts: {
     Loading: "dashboard.contacts.Loading",
     Response: "dashboard.contacts.Response",
@@ -80,6 +94,25 @@ export const addTemplateToStateAction = simpleAction<Model.Template>(ActionType.
 export const removeTemplateFromStateAction = simpleAction<number>(ActionType.Templates.RemoveFromState);
 export const deleteTemplateAction = simpleAction<number>(ActionType.Templates.Delete);
 export const deletingTemplateAction = simpleAction<{ id: number; value: boolean }>(ActionType.Templates.Deleting);
+
+export const requestCommunityTemplatesAction = simpleAction<null>(ActionType.Community.Request);
+export const loadingCommunityTemplatesAction = simpleAction<boolean>(ActionType.Community.Loading);
+export const responseCommunityTemplatesAction = simpleAction<Http.ListResponse<Model.Template>>(
+  ActionType.Community.Response
+);
+export const setCommunityTemplatesSearchAction = simpleAction<string>(ActionType.Community.SetSearch);
+export const setCommunityTemplatesPageAction = simpleAction<number>(ActionType.Community.SetPage);
+export const setCommunityTemplatesPageSizeAction = simpleAction<number>(ActionType.Community.SetPageSize);
+export const setCommunityTemplatesPageAndSizeAction = simpleAction<PageAndSize>(ActionType.Community.SetPageAndSize);
+export const updateCommunityTemplateInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Template>>(
+  ActionType.Community.UpdateInState
+);
+export const addCommunityTemplateToStateAction = simpleAction<Model.Template>(ActionType.Community.AddToState);
+export const removeCommunityTemplateFromStateAction = simpleAction<number>(ActionType.Community.RemoveFromState);
+export const deleteCommunityTemplateAction = simpleAction<number>(ActionType.Community.Delete);
+export const deletingCommunityTemplateAction = simpleAction<{ id: number; value: boolean }>(
+  ActionType.Community.Deleting
+);
 
 export const requestContactsAction = simpleAction<null>(ActionType.Contacts.Request);
 export const loadingContactsAction = simpleAction<boolean>(ActionType.Contacts.Loading);

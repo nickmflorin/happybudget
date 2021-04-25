@@ -23,7 +23,7 @@ const Dashboard = (): JSX.Element => {
           text: "Templates",
           icon: <FontAwesomeIcon icon={faFolderPlus} />,
           onClick: () => history.push("/templates"),
-          active: location.pathname.startsWith("/templates")
+          active: location.pathname.startsWith("/templates") || location.pathname.startsWith("/discover")
         },
         {
           text: "My Budgets",
