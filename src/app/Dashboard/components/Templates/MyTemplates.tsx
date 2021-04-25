@@ -55,6 +55,7 @@ const MyTemplates = (): JSX.Element => {
                   onEditNameImage={() => setTemplateToEdit(template)}
                   onDelete={() => dispatch(deleteTemplateAction(template.id))}
                   onClick={() => setTemplateToDerive(template.id)}
+                  onSaveAsCommunity={() => console.log("Need to implement.")}
                 />
               );
             })}

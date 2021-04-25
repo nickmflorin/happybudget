@@ -1,4 +1,4 @@
-import { map } from "lodash";
+import { map, filter } from "lodash";
 import classNames from "classnames";
 
 import { Menu } from "antd";
@@ -12,6 +12,7 @@ export interface DropdownMenuItem {
   onClick: () => void;
   icon?: JSX.Element;
   disabled?: boolean;
+  visible?: boolean;
 }
 
 export interface DropdownMenuProps extends StandardComponentProps {
@@ -25,22 +26,25 @@ interface _DropdownMenuProps extends DropdownMenuProps {
 const DropdownMenu = ({ items, className, itemProps = {} }: _DropdownMenuProps): JSX.Element => {
   return (
     <Menu className={classNames("dropdown-menu", className)}>
-      {map(items, (item: DropdownMenuItem, index: number) => {
-        return (
-          <Menu.Item
-            key={index}
-            className={classNames("dropdown-menu-item", itemProps.className, item.className, {
-              disabled: item.disabled === true
-            })}
-            onClick={item.disabled === true ? undefined : item.onClick}
-          >
-            <VerticalFlexCenter>
-              <IconOrSpinner size={16} loading={item.loading} icon={item.icon} />
-            </VerticalFlexCenter>
-            {item.text}
-          </Menu.Item>
-        );
-      })}
+      {map(
+        filter(items, (item: DropdownMenuItem) => item.visible !== false),
+        (item: DropdownMenuItem, index: number) => {
+          return (
+            <Menu.Item
+              key={index}
+              className={classNames("dropdown-menu-item", itemProps.className, item.className, {
+                disabled: item.disabled === true
+              })}
+              onClick={item.disabled === true ? undefined : item.onClick}
+            >
+              <VerticalFlexCenter>
+                <IconOrSpinner size={16} loading={item.loading} icon={item.icon} />
+              </VerticalFlexCenter>
+              {item.text}
+            </Menu.Item>
+          );
+        }
+      )}
     </Menu>
   );
 };

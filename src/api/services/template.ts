@@ -9,6 +9,14 @@ export const getTemplates = async (
   return client.list<Model.Template>(url, query, options);
 };
 
+export const getCommunityTemplates = async (
+  query: Http.ListQuery = {},
+  options: Http.RequestOptions = {}
+): Promise<Http.ListResponse<Model.Template>> => {
+  const url = URL.v1("templates", "community");
+  return client.list<Model.Template>(url, query, options);
+};
+
 export const getTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Template> => {
   const url = URL.v1("templates", id);
   return client.retrieve<Model.Template>(url, options);
@@ -28,6 +36,14 @@ export const createTemplate = async (
   options: Http.RequestOptions = {}
 ): Promise<Model.Template> => {
   const url = URL.v1("templates");
+  return client.post<Model.Template>(url, payload, options);
+};
+
+export const createCommunityTemplate = async (
+  payload: Http.TemplatePayload | FormData,
+  options: Http.RequestOptions = {}
+): Promise<Model.Template> => {
+  const url = URL.v1("templates", "community");
   return client.post<Model.Template>(url, payload, options);
 };
 

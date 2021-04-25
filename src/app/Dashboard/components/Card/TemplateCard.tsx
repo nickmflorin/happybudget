@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/pro-solid-svg-icons";
+import { faEdit, faTrash, faUserFriends } from "@fortawesome/pro-solid-svg-icons";
 
 import { useLoggedInUser, useTimezone } from "store/hooks";
 import { toAbbvDisplayDateTime } from "lib/util/dates";
@@ -13,6 +13,7 @@ interface TemplateCardProps {
   onEdit: () => void;
   onEditNameImage: () => void;
   onClick: () => void;
+  onSaveAsCommunity: () => void;
 }
 
 const TemplateCard = ({
@@ -21,7 +22,8 @@ const TemplateCard = ({
   onClick,
   onEditNameImage,
   onEdit,
-  onDelete
+  onDelete,
+  onSaveAsCommunity
 }: TemplateCardProps): JSX.Element => {
   const user = useLoggedInUser();
   const tz = useTimezone();
@@ -43,6 +45,12 @@ const TemplateCard = ({
           text: "Edit Name/Image",
           icon: <FontAwesomeIcon className={"icon"} icon={faEdit} />,
           onClick: () => onEditNameImage()
+        },
+        {
+          text: "Save as Community",
+          icon: <FontAwesomeIcon className={"icon"} icon={faUserFriends} />,
+          onClick: () => onSaveAsCommunity(),
+          visible: user.is_staff === true
         },
         {
           text: "Delete",
