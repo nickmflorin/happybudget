@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/pro-light-svg-icons";
+import { faEdit, faImage, faTrash } from "@fortawesome/pro-light-svg-icons";
 
 import { useLoggedInUser, useTimezone } from "store/hooks";
 import { toAbbvDisplayDateTime } from "lib/util/dates";
@@ -44,7 +44,7 @@ const CommunityTemplateCard = ({
               },
               {
                 text: "Edit Name/Image",
-                icon: <FontAwesomeIcon className={"icon"} icon={faEdit} />,
+                icon: <FontAwesomeIcon className={"icon"} icon={faImage} />,
                 onClick: () => onEditNameImage()
               },
               {

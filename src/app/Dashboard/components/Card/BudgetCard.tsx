@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/pro-light-svg-icons";
+import { faTrash, faImage } from "@fortawesome/pro-light-svg-icons";
 
 import { useLoggedInUser, useTimezone } from "store/hooks";
 import { toAbbvDisplayDateTime } from "lib/util/dates";
@@ -29,7 +29,7 @@ const BudgetCard = ({ budget, loading, onEdit, onDelete, onClick }: BudgetCardPr
       dropdown={[
         {
           text: "Edit Name/Image",
-          icon: <FontAwesomeIcon className={"icon"} icon={faEdit} />,
+          icon: <FontAwesomeIcon className={"icon"} icon={faImage} />,
           onClick: () => onEdit()
         },
         {

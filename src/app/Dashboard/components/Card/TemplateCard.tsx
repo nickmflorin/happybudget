@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClone, faEdit, faTrash, faUserFriends } from "@fortawesome/pro-light-svg-icons";
+import { faClone, faEdit, faImage, faTrash, faUserFriends } from "@fortawesome/pro-light-svg-icons";
 
 import { useLoggedInUser } from "store/hooks";
 
@@ -43,7 +43,7 @@ const TemplateCard = ({
         },
         {
           text: "Edit Name/Image",
-          icon: <FontAwesomeIcon className={"icon"} icon={faEdit} />,
+          icon: <FontAwesomeIcon className={"icon"} icon={faImage} />,
           onClick: () => onEditNameImage()
         },
         {
