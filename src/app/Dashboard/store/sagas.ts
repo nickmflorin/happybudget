@@ -13,7 +13,8 @@ import {
   createContactTask,
   getCommunityTemplatesTask,
   deleteCommunityTemplateTask,
-  moveTemplateToCommunityTask
+  moveTemplateToCommunityTask,
+  duplicateTemplateTask
 } from "./tasks";
 
 function* watchForContactsRefreshSaga(): SagaIterator {
@@ -137,6 +138,24 @@ function* watchForMoveTemplateToCommunitySaga(): SagaIterator {
   }
 }
 
+function* watchForDuplicateTemplateSaga(): SagaIterator {
+  let lastTasks: { [key: number]: any[] } = {};
+  while (true) {
+    const action: Redux.Action<number> = yield take(ActionType.Templates.Duplicate);
+    if (!isNil(action.payload)) {
+      if (isNil(lastTasks[action.payload])) {
+        lastTasks[action.payload] = [];
+      }
+      if (lastTasks[action.payload].length !== 0) {
+        const cancellable = lastTasks[action.payload];
+        lastTasks = { ...lastTasks, [action.payload]: [] };
+        yield cancel(cancellable);
+      }
+      lastTasks[action.payload].push(yield call(duplicateTemplateTask, action));
+    }
+  }
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForTemplatesRefreshSaga);
   yield spawn(watchForSearchTemplatesSaga);
@@ -154,4 +173,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForSearchCommunityTemplatesSaga);
   yield spawn(watchForDeleteCommunityTemplateSaga);
   yield spawn(watchForMoveTemplateToCommunitySaga);
+  yield spawn(watchForDuplicateTemplateSaga);
 }

@@ -14,11 +14,12 @@ import "./index.scss";
 
 interface DashboardCardImagePlaceholderProps {
   onClick?: () => void;
+  titleOnly?: boolean;
 }
 
-const DashboardCardImagePlaceholder: React.FC<DashboardCardImagePlaceholderProps> = ({ onClick }) => {
+const DashboardCardImagePlaceholder: React.FC<DashboardCardImagePlaceholderProps> = ({ titleOnly, onClick }) => {
   return (
-    <div className={"image-placeholder"} onClick={onClick}>
+    <div className={classNames("image-placeholder", { "title-only": titleOnly })} onClick={onClick}>
       <FontAwesomeIcon className={"icon"} icon={faImagePolaroid} />
     </div>
   );
@@ -27,11 +28,12 @@ const DashboardCardImagePlaceholder: React.FC<DashboardCardImagePlaceholderProps
 interface DashboardCardImageProps {
   image: string;
   onClick?: () => void;
+  titleOnly?: boolean;
 }
 
-const DashboardCardImage: React.FC<DashboardCardImageProps> = ({ image, onClick }) => {
+const DashboardCardImage: React.FC<DashboardCardImageProps> = ({ image, onClick, titleOnly }) => {
   return (
-    <div className={"image"} onClick={onClick}>
+    <div className={classNames("image", { "title-only": titleOnly })} onClick={onClick}>
       <div className={"image-tint"}></div>
       <img src={image} alt={"avatar"} />
     </div>
@@ -40,7 +42,7 @@ const DashboardCardImage: React.FC<DashboardCardImageProps> = ({ image, onClick 
 
 interface CardProps extends StandardComponentProps {
   dropdown?: DropdownMenuItem[];
-  title?: string;
+  title: string;
   subTitle?: string;
   image?: string | null;
   loading?: boolean;
@@ -69,14 +71,12 @@ const Card = ({
           </Dropdown>
         )}
         {!isNil(image) ? (
-          <DashboardCardImage image={image} onClick={onClick} />
+          <DashboardCardImage image={image} onClick={onClick} titleOnly={isNil(subTitle)} />
         ) : (
-          <DashboardCardImagePlaceholder onClick={onClick} />
+          <DashboardCardImagePlaceholder onClick={onClick} titleOnly={isNil(subTitle)} />
         )}
-        <div className={"dashboard-card-footer"} onClick={onClick}>
-          <ShowHide show={!isNil(title)}>
-            <div className={"title"}>{title}</div>
-          </ShowHide>
+        <div className={classNames("dashboard-card-footer", { "title-only": isNil(subTitle) })} onClick={onClick}>
+          <div className={"title"}>{title}</div>
           <ShowHide show={!isNil(subTitle)}>
             <div className={"sub-title"}>{subTitle}</div>
           </ShowHide>

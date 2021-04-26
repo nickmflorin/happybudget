@@ -11,7 +11,8 @@ import {
   updateContact,
   createContact,
   getCommunityTemplates,
-  updateTemplate
+  updateTemplate,
+  duplicateTemplate
 } from "api/services";
 import { handleRequestError } from "api";
 import {
@@ -35,7 +36,9 @@ import {
   updateContactInStateAction,
   addContactToStateAction,
   removeCommunityTemplateFromStateAction,
-  addCommunityTemplateToStateAction
+  addCommunityTemplateToStateAction,
+  addTemplateToStateAction,
+  duplicatingTemplateAction
 } from "./actions";
 
 export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
@@ -151,6 +154,20 @@ export function* moveTemplateToCommunityTask(action: Redux.Action<number>): Saga
       handleRequestError(e, "There was an error moving the template to community.");
     } finally {
       yield put(setTemplateLoadingAction({ id: action.payload, value: false }));
+    }
+  }
+}
+
+export function* duplicateTemplateTask(action: Redux.Action<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(duplicatingTemplateAction({ id: action.payload, value: true }));
+    try {
+      const response: Model.Template = yield call(duplicateTemplate, action.payload);
+      yield put(addTemplateToStateAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error duplicating the template.");
+    } finally {
+      yield put(duplicatingTemplateAction({ id: action.payload, value: false }));
     }
   }
 }

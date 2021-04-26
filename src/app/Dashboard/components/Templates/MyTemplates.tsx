@@ -12,13 +12,15 @@ import {
   deleteTemplateAction,
   updateTemplateInStateAction,
   addTemplateToStateAction,
-  moveTemplateToCommunityAction
+  moveTemplateToCommunityAction,
+  duplicateTemplateAction
 } from "../../store/actions";
 import { TemplateCard, EmptyCard } from "../Card";
 
 const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.data;
 const selectObjLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.objLoading;
 const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.loading;
+const selectDuplicatingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.duplicating;
 
 interface MyTemplatesProps {
   setTemplateToDerive: (template: number) => void;
@@ -32,6 +34,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
   const templates = useSelector(selectTemplates);
   const objLoading = useSelector(selectObjLoadingTemplates);
   const loading = useSelector(selectLoadingTemplates);
+  const duplicating = useSelector(selectDuplicatingTemplates);
 
   const history = useHistory();
 
@@ -54,11 +57,16 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                     map(objLoading, (instance: Redux.ModelListActionInstance) => instance.id),
                     template.id
                   )}
+                  duplicating={includes(
+                    map(duplicating, (instance: Redux.ModelListActionInstance) => instance.id),
+                    template.id
+                  )}
                   onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                   onEditNameImage={() => setTemplateToEdit(template)}
                   onDelete={() => dispatch(deleteTemplateAction(template.id))}
                   onClick={() => setTemplateToDerive(template.id)}
                   onMoveToCommunity={() => dispatch(moveTemplateToCommunityAction(template.id))}
+                  onDuplicate={() => dispatch(duplicateTemplateAction(template.id))}
                 />
               );
             })}

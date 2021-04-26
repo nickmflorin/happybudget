@@ -5,11 +5,12 @@
   background-color: $white;
   background-clip: padding-box;
   border: 1px solid rgba(0,0,0,.15);
-  border-radius: 0.25rem;
+  border-radius: 6px;
 }
 
 .menu-base {
   padding: 0;
+  border-radius: 6px;
 }
 
 .menu-item-base {
@@ -18,7 +19,7 @@
   font-family: $roboto;
   font-weight: 400;
   min-width: 100px;
-  padding: 6px;
+  padding: 6px 12px;
   font-size: 13px;
   line-height: 24px;
   border-radius: 6px;

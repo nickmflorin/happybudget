@@ -1,5 +1,5 @@
 import { Reducer, combineReducers } from "redux";
-import { createListResponseReducer } from "lib/redux/factories";
+import { createModelListActionReducer, createListResponseReducer } from "lib/redux/factories";
 import { ActionType } from "./actions";
 
 const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineReducers({
@@ -19,18 +19,25 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     Updating: ActionType.Contacts.Updating,
     Deleting: ActionType.Contacts.Deleting
   }),
-  templates: createListResponseReducer<Model.Template, Redux.ListResponseStore<Model.Template>, Redux.Action<any>>({
-    Response: ActionType.Templates.Response,
-    Loading: ActionType.Templates.Loading,
-    SetSearch: ActionType.Templates.SetSearch,
-    SetPage: ActionType.Templates.SetPage,
-    SetPageSize: ActionType.Templates.SetPageSize,
-    SetPageAndSize: ActionType.Templates.SetPageAndSize,
-    AddToState: ActionType.Templates.AddToState,
-    RemoveFromState: ActionType.Templates.RemoveFromState,
-    UpdateInState: ActionType.Templates.UpdateInState,
-    ObjLoading: ActionType.Templates.ObjLoading
-  }),
+  templates: createListResponseReducer<Model.Template, Redux.Dashboard.TemplatesStore, Redux.Action<any>>(
+    {
+      Response: ActionType.Templates.Response,
+      Loading: ActionType.Templates.Loading,
+      SetSearch: ActionType.Templates.SetSearch,
+      SetPage: ActionType.Templates.SetPage,
+      SetPageSize: ActionType.Templates.SetPageSize,
+      SetPageAndSize: ActionType.Templates.SetPageAndSize,
+      AddToState: ActionType.Templates.AddToState,
+      RemoveFromState: ActionType.Templates.RemoveFromState,
+      UpdateInState: ActionType.Templates.UpdateInState,
+      ObjLoading: ActionType.Templates.ObjLoading
+    },
+    {
+      subReducers: {
+        duplicating: createModelListActionReducer(ActionType.Templates.Duplicating)
+      }
+    }
+  ),
   community: createListResponseReducer<Model.Template, Redux.ListResponseStore<Model.Template>, Redux.Action<any>>({
     Response: ActionType.Community.Response,
     Loading: ActionType.Community.Loading,

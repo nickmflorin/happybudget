@@ -28,7 +28,9 @@ export const ActionType = {
     AddToState: "dashboard.templates.AddToState",
     Delete: "dashboard.templates.Delete",
     ObjLoading: "dashboard.templates.ObjLoading",
-    MoveToCommunity: "dashboard.templates.MoveToCommunity"
+    MoveToCommunity: "dashboard.templates.MoveToCommunity",
+    Duplicate: "dashboard.templates.Duplicate",
+    Duplicating: "dashboard.templates.Duplicating"
   },
   Community: {
     Loading: "dashboard.community.Loading",
@@ -96,6 +98,8 @@ export const removeTemplateFromStateAction = simpleAction<number>(ActionType.Tem
 export const deleteTemplateAction = simpleAction<number>(ActionType.Templates.Delete);
 export const setTemplateLoadingAction = simpleAction<{ id: number; value: boolean }>(ActionType.Templates.ObjLoading);
 export const moveTemplateToCommunityAction = simpleAction<number>(ActionType.Templates.MoveToCommunity);
+export const duplicateTemplateAction = simpleAction<number>(ActionType.Templates.Duplicate);
+export const duplicatingTemplateAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Templates.Duplicating);
 
 export const requestCommunityTemplatesAction = simpleAction<null>(ActionType.Community.Request);
 export const loadingCommunityTemplatesAction = simpleAction<boolean>(ActionType.Community.Loading);

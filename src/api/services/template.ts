@@ -31,6 +31,11 @@ export const updateTemplate = async (
   return client.patch<Model.Template>(url, payload, options);
 };
 
+export const duplicateTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Template> => {
+  const url = URL.v1("templates", id, "duplicate");
+  return client.post<Model.Template>(url, {}, options);
+};
+
 export const createTemplate = async (
   payload: Http.TemplatePayload | FormData,
   options: Http.RequestOptions = {}

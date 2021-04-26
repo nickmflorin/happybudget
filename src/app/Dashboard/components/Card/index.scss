@@ -80,6 +80,10 @@
       border-top-left-radius: 14px;
       border-top-right-radius: 14px;
       overflow: hidden;
+
+      &.title-only {
+        height: 170px;
+      }
     }
 
     .image {
@@ -139,6 +143,11 @@
         font-family: $roboto;
         font-weight: 400;
         line-height: 12px;
+      }
+
+      &.title-only {
+        height: 44px;
+        top: 170px;
       }
     }
   }

@@ -1,36 +1,22 @@
-import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 import { Spinner } from "components";
 import "./IconOrSpinner.scss";
 
-interface IconOrSpinnerProps {
-  hide?: boolean;
+interface IconOrSpinnerProps extends StandardComponentProps {
   loading?: boolean;
   icon?: JSX.Element;
-  className?: string;
-  style?: React.CSSProperties;
   size?: number;
   [key: string]: any;
 }
 
-const IconOrSpinner = ({
-  hide,
-  loading,
-  icon,
-  className,
-  size = 14,
-  style = {},
-  ...props
-}: IconOrSpinnerProps): JSX.Element => {
+const IconOrSpinner = ({ loading, icon, className, size = 14, style = {} }: IconOrSpinnerProps): JSX.Element => {
   style.height = `${size}px`;
-  style.width = `${size}.px`;
+  style.width = `${size}px`;
 
-  if (hide === true) {
-    return <div className={classNames("icon-or-spinner", className)} style={style} {...props}></div>;
-  } else if (loading === true) {
+  if (loading === true) {
     return (
-      <div className={classNames("icon-or-spinner", className)} style={style} {...props}>
+      <div className={classNames("icon-or-spinner", className)} style={style}>
         <div className={"spinner-wrapper"}>
           <Spinner size={size} />
         </div>
@@ -38,14 +24,14 @@ const IconOrSpinner = ({
     );
   } else if (!isNil(icon)) {
     return (
-      <div className={classNames("icon-or-spinner", className)} style={style} {...props}>
+      <div className={classNames("icon-or-spinner", className)} style={style}>
         <div className={"icon-wrapper"}>{icon}</div>
       </div>
     );
   } else {
     // We allow the icon to be null just in case we want to use this component
     // as a smaller spinner to the left of text.
-    return <div className={classNames("icon-or-spinner", className)} style={style} {...props}></div>;
+    return <div className={classNames("icon-or-spinner", className)} style={style}></div>;
   }
 };
 

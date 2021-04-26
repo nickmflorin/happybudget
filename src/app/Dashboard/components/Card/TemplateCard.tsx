@@ -1,24 +1,28 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrash, faUserFriends } from "@fortawesome/pro-solid-svg-icons";
+import { faClone } from "@fortawesome/pro-light-svg-icons";
 
-import { useLoggedInUser, useTimezone } from "store/hooks";
-import { toAbbvDisplayDateTime } from "lib/util/dates";
+import { useLoggedInUser } from "store/hooks";
 
 import Card from "./Card";
 
 interface TemplateCardProps {
   template: Model.Template;
   loading: boolean;
+  duplicating: boolean;
   onDelete: () => void;
   onEdit: () => void;
   onEditNameImage: () => void;
   onClick: () => void;
   onMoveToCommunity: () => void;
+  onDuplicate: () => void;
 }
 
 const TemplateCard = ({
   template,
   loading,
+  duplicating,
+  onDuplicate,
   onClick,
   onEditNameImage,
   onEdit,
@@ -26,13 +30,10 @@ const TemplateCard = ({
   onMoveToCommunity
 }: TemplateCardProps): JSX.Element => {
   const user = useLoggedInUser();
-  const tz = useTimezone();
-
   return (
     <Card
       onClick={() => onClick()}
       title={template.name}
-      subTitle={`Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(template.updated_at, { tz })}`}
       loading={loading}
       image={template.image}
       dropdown={[
@@ -45,6 +46,12 @@ const TemplateCard = ({
           text: "Edit Name/Image",
           icon: <FontAwesomeIcon className={"icon"} icon={faEdit} />,
           onClick: () => onEditNameImage()
+        },
+        {
+          text: "Duplicate",
+          icon: <FontAwesomeIcon className={"icon"} icon={faClone} />,
+          onClick: () => onDuplicate(),
+          loading: duplicating
         },
         {
           text: "Move to Community",
