@@ -12,13 +12,15 @@ import {
   requestCommunityTemplatesAction,
   deleteCommunityTemplateAction,
   updateCommunityTemplateInStateAction,
-  addCommunityTemplateToStateAction
+  addCommunityTemplateToStateAction,
+  duplicateCommunityTemplateAction
 } from "../../store/actions";
 import { CommunityTemplateCard, EmptyCard } from "../Card";
 
 const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.data;
-const selectObjLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.objLoading;
 const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.loading;
+const selectDuplicatingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.duplicating;
+const selectDeletingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.deleting;
 
 interface DiscoverProps {
   setTemplateToDerive: (template: number) => void;
@@ -30,8 +32,9 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
 
   const dispatch: Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
-  const objLoading = useSelector(selectObjLoadingTemplates);
   const loading = useSelector(selectLoadingTemplates);
+  const duplicating = useSelector(selectDuplicatingTemplates);
+  const deleting = useSelector(selectDeletingTemplates);
 
   const history = useHistory();
 
@@ -56,14 +59,19 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                 <CommunityTemplateCard
                   key={index}
                   template={template}
-                  loading={includes(
-                    map(objLoading, (instance: Redux.ModelListActionInstance) => instance.id),
+                  duplicating={includes(
+                    map(duplicating, (instance: Redux.ModelListActionInstance) => instance.id),
+                    template.id
+                  )}
+                  deleting={includes(
+                    map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
                     template.id
                   )}
                   onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                   onEditNameImage={() => setTemplateToEdit(template)}
                   onDelete={() => dispatch(deleteCommunityTemplateAction(template.id))}
                   onClick={() => setTemplateToDerive(template.id)}
+                  onDuplicate={() => dispatch(duplicateCommunityTemplateAction(template.id))}
                 />
               );
             })}

@@ -18,7 +18,6 @@ import {
 import { TemplateCard, EmptyCard } from "../Card";
 
 const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.data;
-const selectObjLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.objLoading;
 const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.loading;
 const selectDuplicatingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.duplicating;
 const selectMovingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.moving;
@@ -34,7 +33,6 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
 
   const dispatch: Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
-  const objLoading = useSelector(selectObjLoadingTemplates);
   const loading = useSelector(selectLoadingTemplates);
   const duplicating = useSelector(selectDuplicatingTemplates);
   const moving = useSelector(selectMovingTemplates);
@@ -57,10 +55,6 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                 <TemplateCard
                   key={index}
                   template={template}
-                  loading={includes(
-                    map(objLoading, (instance: Redux.ModelListActionInstance) => instance.id),
-                    template.id
-                  )}
                   duplicating={includes(
                     map(duplicating, (instance: Redux.ModelListActionInstance) => instance.id),
                     template.id

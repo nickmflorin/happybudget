@@ -91,11 +91,16 @@ namespace Redux {
       readonly deleting: Redux.ModelListActionStore;
     }
 
+    interface CommunityTemplatesStore extends Redux.ListResponseStore<Model.Template> {
+      readonly deleting: Redux.ModelListActionStore;
+      readonly duplicating: Redux.ModelListActionStore;
+    }
+
     interface Store {
       readonly budgets: Redux.ListResponseStore<Model.Budget>;
       readonly templates: TemplatesStore;
       readonly contacts: Redux.ListResponseStore<Model.Contact>;
-      readonly community: Redux.ListResponseStore<Model.Template>;
+      readonly community: CommunityTemplatesStore;
     }
   }
 

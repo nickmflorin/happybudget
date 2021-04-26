@@ -8,13 +8,14 @@ import Card from "./Card";
 
 interface BudgetCardProps {
   budget: Model.Budget;
-  loading: boolean;
+  loading?: boolean;
+  deleting: boolean;
   onDelete: () => void;
   onEdit: () => void;
   onClick: () => void;
 }
 
-const BudgetCard = ({ budget, loading, onEdit, onDelete, onClick }: BudgetCardProps): JSX.Element => {
+const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: BudgetCardProps): JSX.Element => {
   const user = useLoggedInUser();
   const tz = useTimezone();
 
@@ -35,7 +36,8 @@ const BudgetCard = ({ budget, loading, onEdit, onDelete, onClick }: BudgetCardPr
         {
           text: "Delete",
           icon: <FontAwesomeIcon className={"icon"} icon={faTrash} />,
-          onClick: () => onDelete()
+          onClick: () => onDelete(),
+          loading: deleting
         }
       ]}
     />

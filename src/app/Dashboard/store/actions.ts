@@ -13,7 +13,7 @@ export const ActionType = {
     RemoveFromState: "dashboard.budgets.RemoveFromState",
     AddToState: "dashboard.budgets.AddToState",
     Delete: "dashboard.budgets.Delete",
-    ObjLoading: "dashboard.budgets.ObjLoading"
+    Deleting: "dashboard.budgets.Deleting"
   },
   Templates: {
     Loading: "dashboard.templates.Loading",
@@ -45,7 +45,9 @@ export const ActionType = {
     RemoveFromState: "dashboard.community.RemoveFromState",
     AddToState: "dashboard.community.AddToState",
     Delete: "dashboard.community.Delete",
-    ObjLoading: "dashboard.community.ObjLoading"
+    Deleting: "dashboard.community.Deleting",
+    Duplicate: "dashboard.templates.Duplicate",
+    Duplicating: "dashboard.templates.Duplicating"
   },
   Contacts: {
     Loading: "dashboard.contacts.Loading",
@@ -82,7 +84,7 @@ export const updateBudgetInStateAction = simpleAction<Redux.UpdateModelActionPay
 export const addBudgetToStateAction = simpleAction<Model.Budget>(ActionType.Budgets.AddToState);
 export const removeBudgetFromStateAction = simpleAction<number>(ActionType.Budgets.RemoveFromState);
 export const deleteBudgetAction = simpleAction<number>(ActionType.Budgets.Delete);
-export const setBudgetLoadingAction = simpleAction<{ id: number; value: boolean }>(ActionType.Budgets.ObjLoading);
+export const deletingBudgetAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budgets.Deleting);
 
 export const requestTemplatesAction = simpleAction<null>(ActionType.Templates.Request);
 export const loadingTemplatesAction = simpleAction<boolean>(ActionType.Templates.Loading);
@@ -120,8 +122,12 @@ export const updateCommunityTemplateInStateAction = simpleAction<Redux.UpdateMod
 export const addCommunityTemplateToStateAction = simpleAction<Model.Template>(ActionType.Community.AddToState);
 export const removeCommunityTemplateFromStateAction = simpleAction<number>(ActionType.Community.RemoveFromState);
 export const deleteCommunityTemplateAction = simpleAction<number>(ActionType.Community.Delete);
-export const setCommunityTemplateLoadingAction = simpleAction<{ id: number; value: boolean }>(
-  ActionType.Community.ObjLoading
+export const deletingCommunityTemplateAction = simpleAction<Redux.ModelListActionPayload>(
+  ActionType.Community.Deleting
+);
+export const duplicateCommunityTemplateAction = simpleAction<number>(ActionType.Community.Duplicate);
+export const duplicatingCommunityTemplateAction = simpleAction<Redux.ModelListActionPayload>(
+  ActionType.Community.Duplicating
 );
 
 export const requestContactsAction = simpleAction<null>(ActionType.Contacts.Request);

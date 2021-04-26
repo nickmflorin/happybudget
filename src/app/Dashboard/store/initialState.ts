@@ -8,7 +8,10 @@ const initialState: Redux.Dashboard.Store = {
     duplicating: [],
     moving: []
   },
-  community: initialListResponseState
+  community: {
+    ...initialListResponseState,
+    duplicating: []
+  }
 };
 
 export default initialState;

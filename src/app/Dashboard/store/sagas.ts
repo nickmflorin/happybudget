@@ -9,11 +9,11 @@ import {
   deleteTemplateTask,
   getContactsTask,
   deleteContactTask,
-  updateContactTask,
   getCommunityTemplatesTask,
   deleteCommunityTemplateTask,
   moveTemplateToCommunityTask,
-  duplicateTemplateTask
+  duplicateTemplateTask,
+  duplicateCommunityTemplateTask
 } from "./tasks";
 
 function* watchForContactsRefreshSaga(): SagaIterator {
@@ -49,10 +49,6 @@ function* watchForDeleteContactsSaga(): SagaIterator {
       }
     }
   }
-}
-
-function* watchForUpdateContactSaga(): SagaIterator {
-  yield takeEvery(ActionType.Contacts.Update, updateContactTask);
 }
 
 function* watchForBudgetsRefreshSaga(): SagaIterator {
@@ -183,6 +179,25 @@ function* watchForDuplicateTemplateSaga(): SagaIterator {
   }
 }
 
+function* watchForDuplicateCommunityTemplateSaga(): SagaIterator {
+  let lastTasks: { [key: number]: any[] } = {};
+  while (true) {
+    const action: Redux.Action<number> = yield take(ActionType.Community.Duplicate);
+    if (!isNil(action.payload)) {
+      if (isNil(lastTasks[action.payload])) {
+        lastTasks[action.payload] = [];
+      }
+      if (lastTasks[action.payload].length !== 0) {
+        const cancellable = lastTasks[action.payload];
+        lastTasks = { ...lastTasks, [action.payload]: [] };
+        yield cancel(cancellable);
+      }
+      const task = yield fork(duplicateCommunityTemplateTask, action);
+      lastTasks[action.payload].push(task);
+    }
+  }
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForTemplatesRefreshSaga);
   yield spawn(watchForSearchTemplatesSaga);
@@ -193,11 +208,11 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForContactsRefreshSaga);
   yield spawn(watchForSearchContactsSaga);
   yield spawn(watchForDeleteContactSaga);
-  yield spawn(watchForUpdateContactSaga);
   yield spawn(watchForDeleteContactsSaga);
   yield spawn(watchForCommunityTemplatesRefreshSaga);
   yield spawn(watchForSearchCommunityTemplatesSaga);
   yield spawn(watchForDeleteCommunityTemplateSaga);
   yield spawn(watchForMoveTemplateToCommunitySaga);
   yield spawn(watchForDuplicateTemplateSaga);
+  yield spawn(watchForDuplicateCommunityTemplateSaga);
 }

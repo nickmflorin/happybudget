@@ -7,7 +7,7 @@ import Card from "./Card";
 
 interface TemplateCardProps {
   template: Model.Template;
-  loading: boolean;
+  loading?: boolean;
   duplicating: boolean;
   moving: boolean;
   deleting: boolean;

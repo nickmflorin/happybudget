@@ -21,9 +21,9 @@ import { EmptyCard, BudgetCard } from "../Card";
 import "./index.scss";
 
 const selectBudgets = (state: Redux.ApplicationStore) => state.dashboard.budgets.data;
-const selectObjLoadingBudgets = (state: Redux.ApplicationStore) => state.dashboard.budgets.objLoading;
 const selectLoadingBudgets = (state: Redux.ApplicationStore) => state.dashboard.budgets.loading;
 const selectBudgetsSearch = (state: Redux.ApplicationStore) => state.dashboard.budgets.search;
+const selectDeletingBudgets = (state: Redux.ApplicationStore) => state.dashboard.budgets.deleting;
 
 const Budgets = (): JSX.Element => {
   const [budgetToEdit, setBudgetToEdit] = useState<Model.Budget | undefined>(undefined);
@@ -32,7 +32,7 @@ const Budgets = (): JSX.Element => {
 
   const dispatch: Dispatch = useDispatch();
   const budgets = useSelector(selectBudgets);
-  const objLoading = useSelector(selectObjLoadingBudgets);
+  const deleting = useSelector(selectDeletingBudgets);
   const loading = useSelector(selectLoadingBudgets);
   const search = useSelector(selectBudgetsSearch);
 
@@ -64,8 +64,8 @@ const Budgets = (): JSX.Element => {
             <BudgetCard
               key={index}
               budget={budget}
-              loading={includes(
-                map(objLoading, (instance: Redux.ModelListActionInstance) => instance.id),
+              deleting={includes(
+                map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
                 budget.id
               )}
               onClick={() => history.push(`/budgets/${budget.id}`)}
