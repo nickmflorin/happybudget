@@ -64,6 +64,9 @@ const CreateBudgetModal = ({
           .validateFields()
           .then((values: BudgetFormValues) => {
             const submit = (payload: Http.BudgetPayload) => {
+              if (!isNil(templateId)) {
+                payload = { ...payload, template: templateId };
+              }
               createBudget(payload)
                 .then((budget: Model.Budget) => {
                   form.resetFields();
