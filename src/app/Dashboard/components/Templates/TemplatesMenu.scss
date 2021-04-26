@@ -5,13 +5,13 @@
   display: flex;
   margin-bottom: 20px;
 
-  .templates-menu-button-wrapper {
+  .extra-wrapper {
     display: flex;
-    flex-direction: column;
-    justify-content: center;
 
-    &:not(:last-child) {
-      margin-right: 8px;
+    > * {
+      &:not(:last-child) {
+        margin-right: 8px;
+      }
     }
   }
 

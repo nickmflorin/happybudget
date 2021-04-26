@@ -1,21 +1,45 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
+import { Button, Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
+
+import { VerticalFlexCenter } from "components";
 import { HorizontalMenu } from "components/menus";
+import { IHorizontalMenuItem } from "components/menus/HorizontalMenu";
 import { CreateBudgetModal } from "components/modals";
 
-import { addBudgetToStateAction } from "../../store/actions";
+import {
+  addBudgetToStateAction,
+  setTemplatesSearchAction,
+  setCommunityTemplatesSearchAction
+} from "../../store/actions";
 import "./TemplatesMenu.scss";
 
 type TemplatesPage = "my-templates" | "discover";
 
+const selectTemplatesSearch = (state: Redux.ApplicationStore) => state.dashboard.templates.search;
+const selectCommunityTemplatesSearch = (state: Redux.ApplicationStore) => state.dashboard.community.search;
+
 const TemplatesMenu = (): JSX.Element => {
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
+  const [page, setPage] = useState<TemplatesPage | undefined>(undefined);
 
   const history = useHistory();
+  const location = useLocation();
   const dispatch = useDispatch();
+
+  const templatesSearch = useSelector(selectTemplatesSearch);
+  const communitySearch = useSelector(selectCommunityTemplatesSearch);
+
+  useEffect(() => {
+    if (location.pathname.startsWith("/templates")) {
+      setPage("my-templates");
+    } else {
+      setPage("discover");
+    }
+  }, [location.pathname]);
 
   return (
     <React.Fragment>
@@ -25,6 +49,8 @@ const TemplatesMenu = (): JSX.Element => {
             <HorizontalMenu<TemplatesPage>
               className={"templates-menu-menu"}
               itemProps={{ className: "templates-menu-menu-item" }}
+              selected={page}
+              onChange={(item: IHorizontalMenuItem<TemplatesPage>) => setPage(item.id)}
               items={[
                 { id: "my-templates", label: "My Templates", onClick: () => history.push("/templates") },
                 { id: "discover", label: "Discover", onClick: () => history.push("/discover") }
@@ -32,15 +58,32 @@ const TemplatesMenu = (): JSX.Element => {
             />
           </div>
         </div>
-        <div className={"templates-menu-button-wrapper"}>
-          <Button
-            loading={false}
-            className={"btn--primary"}
-            style={{ width: "100%" }}
-            onClick={() => setCreateBudgetModalOpen(true)}
-          >
-            {"Blank Budget"}
-          </Button>
+        <div className={"extra-wrapper"}>
+          <VerticalFlexCenter>
+            <Input
+              placeholder={"Search Templates..."}
+              value={page === "my-templates" ? templatesSearch : communitySearch}
+              allowClear={true}
+              prefix={<SearchOutlined />}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                if (page === "my-templates") {
+                  dispatch(setTemplatesSearchAction(event.target.value));
+                } else {
+                  dispatch(setCommunityTemplatesSearchAction(event.target.value));
+                }
+              }}
+            />
+          </VerticalFlexCenter>
+          <VerticalFlexCenter>
+            <Button
+              loading={false}
+              className={"btn--primary"}
+              style={{ width: "100%" }}
+              onClick={() => setCreateBudgetModalOpen(true)}
+            >
+              {"Blank Budget"}
+            </Button>
+          </VerticalFlexCenter>
         </div>
       </div>
       {createBudgetModalOpen === true && (
