@@ -1,8 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faImage, faTrash } from "@fortawesome/pro-light-svg-icons";
 
-import { useLoggedInUser, useTimezone } from "store/hooks";
-import { toAbbvDisplayDateTime } from "lib/util/dates";
+import { useLoggedInUser } from "store/hooks";
 
 import Card from "./Card";
 
@@ -24,13 +23,11 @@ const CommunityTemplateCard = ({
   onDelete
 }: CommunityTemplateCardProps): JSX.Element => {
   const user = useLoggedInUser();
-  const tz = useTimezone();
 
   return (
     <Card
       onClick={() => onClick()}
       title={template.name}
-      subTitle={`Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(template.updated_at, { tz })}`}
       loading={loading}
       image={template.image}
       dropdown={
