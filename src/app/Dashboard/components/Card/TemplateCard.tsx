@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash, faUserFriends } from "@fortawesome/pro-solid-svg-icons";
-import { faClone } from "@fortawesome/pro-light-svg-icons";
+import { faClone, faEdit, faTrash, faUserFriends } from "@fortawesome/pro-light-svg-icons";
 
 import { useLoggedInUser } from "store/hooks";
 

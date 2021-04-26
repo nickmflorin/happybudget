@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
+import { spawn, take, call, cancel, takeEvery, fork } from "redux-saga/effects";
 import { isNil } from "lodash";
 import { ActionType } from "../../actions";
 import {
@@ -61,7 +61,8 @@ function* watchForDeleteGroupSaga(): SagaIterator {
         lastTasks = { ...lastTasks, [action.payload]: [] };
         yield cancel(cancellable);
       }
-      lastTasks[action.payload].push(yield call(deleteAccountGroupTask, action));
+      const task = yield fork(deleteAccountGroupTask, action);
+      lastTasks[action.payload].push(task);
     }
   }
 }
@@ -81,7 +82,8 @@ function* watchForRemoveAccountFromGroupSaga(): SagaIterator {
         lastTasks = { ...lastTasks, [action.payload]: [] };
         yield cancel(cancellable);
       }
-      lastTasks[action.payload].push(yield call(removeAccountFromGroupTask, action));
+      const task = yield fork(removeAccountFromGroupTask, action);
+      lastTasks[action.payload].push(task);
     }
   }
 }

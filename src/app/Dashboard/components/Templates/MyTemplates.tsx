@@ -41,7 +41,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
   useEffect(() => {
     dispatch(requestTemplatesAction(null));
   }, []);
-
+  console.log(map(templates, (tmp: any) => tmp.id));
   return (
     <div className={"my-templates"}>
       <RenderWithSpinner loading={loading}>

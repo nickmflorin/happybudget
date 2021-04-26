@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/pro-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/pro-light-svg-icons";
 
 import { useLoggedInUser, useTimezone } from "store/hooks";
 import { toAbbvDisplayDateTime } from "lib/util/dates";
