@@ -23,3 +23,12 @@
     padding-bottom: 17px;
   }
 }
+
+.header-dropdown-menu {
+  .dropdown-menu-item {
+    svg {
+      width: 16px;
+      height: auto;
+    }
+  }
+}

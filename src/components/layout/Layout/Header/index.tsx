@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignOutAlt, faAddressCard } from "@fortawesome/free-solid-svg-icons";
+import { faSignOutAlt, faAddressCard } from "@fortawesome/pro-light-svg-icons";
 
 import { Layout, Tooltip } from "antd";
 
@@ -50,6 +50,9 @@ const Header = ({ breadcrumbs, toolbar, className, headerHeight, style = {} }: H
           {!isNil(toolbar) && (Array.isArray(toolbar) ? <Toolbar items={toolbar as IToolbarItem[]} /> : toolbar())}
         </div>
         <Dropdown
+          className={"header-dropdown"}
+          menuProps={{ className: "header-dropdown-menu" }}
+          trigger={["click"]}
           items={[
             {
               text: "Profile",
