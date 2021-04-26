@@ -13,7 +13,7 @@ interface TemplateCardProps {
   onEdit: () => void;
   onEditNameImage: () => void;
   onClick: () => void;
-  onSaveAsCommunity: () => void;
+  onMoveToCommunity: () => void;
 }
 
 const TemplateCard = ({
@@ -23,7 +23,7 @@ const TemplateCard = ({
   onEditNameImage,
   onEdit,
   onDelete,
-  onSaveAsCommunity
+  onMoveToCommunity
 }: TemplateCardProps): JSX.Element => {
   const user = useLoggedInUser();
   const tz = useTimezone();
@@ -47,9 +47,9 @@ const TemplateCard = ({
           onClick: () => onEditNameImage()
         },
         {
-          text: "Save as Community",
+          text: "Move to Community",
           icon: <FontAwesomeIcon className={"icon"} icon={faUserFriends} />,
-          onClick: () => onSaveAsCommunity(),
+          onClick: () => onMoveToCommunity(),
           visible: user.is_staff === true
         },
         {

@@ -10,7 +10,8 @@ import {
   deleteContact,
   updateContact,
   createContact,
-  getCommunityTemplates
+  getCommunityTemplates,
+  updateTemplate
 } from "api/services";
 import { handleRequestError } from "api";
 import {
@@ -20,8 +21,9 @@ import {
   responseBudgetsAction,
   responseTemplatesAction,
   responseCommunityTemplatesAction,
-  deletingBudgetAction,
-  deletingTemplateAction,
+  setBudgetLoadingAction,
+  setTemplateLoadingAction,
+  setCommunityTemplateLoadingAction,
   removeBudgetFromStateAction,
   removeTemplateFromStateAction,
   loadingContactsAction,
@@ -32,8 +34,8 @@ import {
   removeContactFromStateAction,
   updateContactInStateAction,
   addContactToStateAction,
-  deletingCommunityTemplateAction,
-  removeCommunityTemplateFromStateAction
+  removeCommunityTemplateFromStateAction,
+  addCommunityTemplateToStateAction
 } from "./actions";
 
 export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
@@ -98,42 +100,57 @@ export function* getCommunityTemplatesTask(action: Redux.Action<any>): SagaItera
 
 export function* deleteBudgetTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(deletingBudgetAction({ id: action.payload, value: true }));
+    yield put(setBudgetLoadingAction({ id: action.payload, value: true }));
     try {
       yield call(deleteBudget, action.payload);
       yield put(removeBudgetFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the budget.");
     } finally {
-      yield put(deletingBudgetAction({ id: action.payload, value: false }));
+      yield put(setBudgetLoadingAction({ id: action.payload, value: false }));
     }
   }
 }
 
 export function* deleteTemplateTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(deletingTemplateAction({ id: action.payload, value: true }));
+    yield put(setTemplateLoadingAction({ id: action.payload, value: true }));
     try {
       yield call(deleteTemplate, action.payload);
       yield put(removeTemplateFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the template.");
     } finally {
-      yield put(deletingTemplateAction({ id: action.payload, value: false }));
+      yield put(setTemplateLoadingAction({ id: action.payload, value: false }));
     }
   }
 }
 
 export function* deleteCommunityTemplateTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    yield put(deletingCommunityTemplateAction({ id: action.payload, value: true }));
+    yield put(setCommunityTemplateLoadingAction({ id: action.payload, value: true }));
     try {
       yield call(deleteTemplate, action.payload);
       yield put(removeCommunityTemplateFromStateAction(action.payload));
     } catch (e) {
       handleRequestError(e, "There was an error deleting the community template.");
     } finally {
-      yield put(deletingCommunityTemplateAction({ id: action.payload, value: false }));
+      yield put(setCommunityTemplateLoadingAction({ id: action.payload, value: false }));
+    }
+  }
+}
+
+export function* moveTemplateToCommunityTask(action: Redux.Action<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    yield put(setTemplateLoadingAction({ id: action.payload, value: true }));
+    try {
+      const response: Model.Template = yield call(updateTemplate, action.payload, { community: true });
+      yield put(removeTemplateFromStateAction(action.payload));
+      yield put(addCommunityTemplateToStateAction(response));
+    } catch (e) {
+      handleRequestError(e, "There was an error moving the template to community.");
+    } finally {
+      yield put(setTemplateLoadingAction({ id: action.payload, value: false }));
     }
   }
 }

@@ -71,6 +71,7 @@ namespace Redux {
     readonly responseWasReceived: boolean;
     readonly deleting: Redux.ModelListActionStore;
     readonly updating: Redux.ModelListActionStore;
+    readonly objLoading: Redux.ModelListActionStore;
     readonly creating: boolean;
   }
 

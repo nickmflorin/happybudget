@@ -59,30 +59,28 @@ const Card = ({
 }: CardProps): JSX.Element => {
   return (
     <div className={classNames("dashboard-card", className)} style={style}>
-      <RenderWithSpinner loading={loading}>
-        <React.Fragment>
-          {!isNil(dropdown) && (
-            <Dropdown items={dropdown} placement={"bottomRight"} trigger={["click"]}>
-              <IconButton
-                className={classNames("dropdown-ellipsis", { "for-placeholder": isNil(image) })}
-                icon={<FontAwesomeIcon icon={faEllipsisV} />}
-              />
-            </Dropdown>
-          )}
-          {!isNil(image) ? (
-            <DashboardCardImage image={image} onClick={onClick} />
-          ) : (
-            <DashboardCardImagePlaceholder onClick={onClick} />
-          )}
-          <div className={"dashboard-card-footer"} onClick={onClick}>
-            <ShowHide show={!isNil(title)}>
-              <div className={"title"}>{title}</div>
-            </ShowHide>
-            <ShowHide show={!isNil(subTitle)}>
-              <div className={"sub-title"}>{subTitle}</div>
-            </ShowHide>
-          </div>
-        </React.Fragment>
+      <RenderWithSpinner size={18} loading={loading} toggleOpacity={true}>
+        {!isNil(dropdown) && (
+          <Dropdown items={dropdown} placement={"bottomRight"} trigger={["click"]}>
+            <IconButton
+              className={classNames("dropdown-ellipsis", { "for-placeholder": isNil(image) })}
+              icon={<FontAwesomeIcon icon={faEllipsisV} />}
+            />
+          </Dropdown>
+        )}
+        {!isNil(image) ? (
+          <DashboardCardImage image={image} onClick={onClick} />
+        ) : (
+          <DashboardCardImagePlaceholder onClick={onClick} />
+        )}
+        <div className={"dashboard-card-footer"} onClick={onClick}>
+          <ShowHide show={!isNil(title)}>
+            <div className={"title"}>{title}</div>
+          </ShowHide>
+          <ShowHide show={!isNil(subTitle)}>
+            <div className={"sub-title"}>{subTitle}</div>
+          </ShowHide>
+        </div>
       </RenderWithSpinner>
     </div>
   );

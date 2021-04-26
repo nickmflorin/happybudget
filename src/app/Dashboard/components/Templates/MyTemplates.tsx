@@ -12,12 +12,13 @@ import {
   deleteTemplateAction,
   addBudgetToStateAction,
   updateTemplateInStateAction,
-  addTemplateToStateAction
+  addTemplateToStateAction,
+  moveTemplateToCommunityAction
 } from "../../store/actions";
 import { TemplateCard, EmptyCard } from "../Card";
 
 const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.data;
-const selectDeletingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.deleting;
+const selectObjLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.objLoading;
 const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.loading;
 
 const MyTemplates = (): JSX.Element => {
@@ -27,7 +28,7 @@ const MyTemplates = (): JSX.Element => {
 
   const dispatch: Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
-  const deleting = useSelector(selectDeletingTemplates);
+  const objLoading = useSelector(selectObjLoadingTemplates);
   const loading = useSelector(selectLoadingTemplates);
 
   const history = useHistory();
@@ -48,14 +49,14 @@ const MyTemplates = (): JSX.Element => {
                   key={index}
                   template={template}
                   loading={includes(
-                    map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
+                    map(objLoading, (instance: Redux.ModelListActionInstance) => instance.id),
                     template.id
                   )}
                   onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                   onEditNameImage={() => setTemplateToEdit(template)}
                   onDelete={() => dispatch(deleteTemplateAction(template.id))}
                   onClick={() => setTemplateToDerive(template.id)}
-                  onSaveAsCommunity={() => console.log("Need to implement.")}
+                  onMoveToCommunity={() => dispatch(moveTemplateToCommunityAction(template.id))}
                 />
               );
             })}

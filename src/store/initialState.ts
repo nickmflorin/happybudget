@@ -11,7 +11,8 @@ export const initialListResponseState: Redux.ListResponseStore<any> = {
   responseWasReceived: false,
   creating: false,
   deleting: [],
-  updating: []
+  updating: [],
+  objLoading: []
 };
 
 export const initialDetailResponseState: Redux.DetailResponseStore<any> = {

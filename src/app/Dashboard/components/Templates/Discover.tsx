@@ -18,7 +18,7 @@ import {
 import { CommunityTemplateCard, EmptyCard } from "../Card";
 
 const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.data;
-const selectDeletingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.deleting;
+const selectObjLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.objLoading;
 const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.loading;
 
 const Discover = (): JSX.Element => {
@@ -28,7 +28,7 @@ const Discover = (): JSX.Element => {
 
   const dispatch: Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
-  const deleting = useSelector(selectDeletingTemplates);
+  const objLoading = useSelector(selectObjLoadingTemplates);
   const loading = useSelector(selectLoadingTemplates);
 
   const history = useHistory();
@@ -55,7 +55,7 @@ const Discover = (): JSX.Element => {
                   key={index}
                   template={template}
                   loading={includes(
-                    map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
+                    map(objLoading, (instance: Redux.ModelListActionInstance) => instance.id),
                     template.id
                   )}
                   onEdit={() => history.push(`/templates/${template.id}/accounts`)}

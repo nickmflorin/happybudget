@@ -13,7 +13,7 @@ export const ActionType = {
     RemoveFromState: "dashboard.budgets.RemoveFromState",
     AddToState: "dashboard.budgets.AddToState",
     Delete: "dashboard.budgets.Delete",
-    Deleting: "dashboard.budgets.Deleting"
+    ObjLoading: "dashboard.budgets.ObjLoading"
   },
   Templates: {
     Loading: "dashboard.templates.Loading",
@@ -27,7 +27,8 @@ export const ActionType = {
     RemoveFromState: "dashboard.templates.RemoveFromState",
     AddToState: "dashboard.templates.AddToState",
     Delete: "dashboard.templates.Delete",
-    Deleting: "dashboard.templates.Deleting"
+    ObjLoading: "dashboard.templates.ObjLoading",
+    MoveToCommunity: "dashboard.templates.MoveToCommunity"
   },
   Community: {
     Loading: "dashboard.community.Loading",
@@ -41,7 +42,7 @@ export const ActionType = {
     RemoveFromState: "dashboard.community.RemoveFromState",
     AddToState: "dashboard.community.AddToState",
     Delete: "dashboard.community.Delete",
-    Deleting: "dashboard.community.Deleting"
+    ObjLoading: "dashboard.community.ObjLoading"
   },
   Contacts: {
     Loading: "dashboard.contacts.Loading",
@@ -78,7 +79,7 @@ export const updateBudgetInStateAction = simpleAction<Redux.UpdateModelActionPay
 export const addBudgetToStateAction = simpleAction<Model.Budget>(ActionType.Budgets.AddToState);
 export const removeBudgetFromStateAction = simpleAction<number>(ActionType.Budgets.RemoveFromState);
 export const deleteBudgetAction = simpleAction<number>(ActionType.Budgets.Delete);
-export const deletingBudgetAction = simpleAction<{ id: number; value: boolean }>(ActionType.Budgets.Deleting);
+export const setBudgetLoadingAction = simpleAction<{ id: number; value: boolean }>(ActionType.Budgets.ObjLoading);
 
 export const requestTemplatesAction = simpleAction<null>(ActionType.Templates.Request);
 export const loadingTemplatesAction = simpleAction<boolean>(ActionType.Templates.Loading);
@@ -93,7 +94,8 @@ export const updateTemplateInStateAction = simpleAction<Redux.UpdateModelActionP
 export const addTemplateToStateAction = simpleAction<Model.Template>(ActionType.Templates.AddToState);
 export const removeTemplateFromStateAction = simpleAction<number>(ActionType.Templates.RemoveFromState);
 export const deleteTemplateAction = simpleAction<number>(ActionType.Templates.Delete);
-export const deletingTemplateAction = simpleAction<{ id: number; value: boolean }>(ActionType.Templates.Deleting);
+export const setTemplateLoadingAction = simpleAction<{ id: number; value: boolean }>(ActionType.Templates.ObjLoading);
+export const moveTemplateToCommunityAction = simpleAction<number>(ActionType.Templates.MoveToCommunity);
 
 export const requestCommunityTemplatesAction = simpleAction<null>(ActionType.Community.Request);
 export const loadingCommunityTemplatesAction = simpleAction<boolean>(ActionType.Community.Loading);
@@ -110,8 +112,8 @@ export const updateCommunityTemplateInStateAction = simpleAction<Redux.UpdateMod
 export const addCommunityTemplateToStateAction = simpleAction<Model.Template>(ActionType.Community.AddToState);
 export const removeCommunityTemplateFromStateAction = simpleAction<number>(ActionType.Community.RemoveFromState);
 export const deleteCommunityTemplateAction = simpleAction<number>(ActionType.Community.Delete);
-export const deletingCommunityTemplateAction = simpleAction<{ id: number; value: boolean }>(
-  ActionType.Community.Deleting
+export const setCommunityTemplateLoadingAction = simpleAction<{ id: number; value: boolean }>(
+  ActionType.Community.ObjLoading
 );
 
 export const requestContactsAction = simpleAction<null>(ActionType.Contacts.Request);

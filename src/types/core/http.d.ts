@@ -129,6 +129,7 @@ namespace Http {
   interface TemplatePayload implements Http.ModelPayload<Model.Template> {
     readonly name: string;
     readonly image?: string | ArrayBuffer | null;
+    readonly community?: boolean;
   }
 
   interface GroupPayload implements Http.ModelPayload<Model.Group> {

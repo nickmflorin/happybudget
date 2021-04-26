@@ -24,6 +24,7 @@ export type IListResponseActionMap = {
   Deleting: string;
   Updating: string;
   Creating: string;
+  ObjLoading: string;
 };
 
 /**
@@ -51,6 +52,7 @@ export const createListResponseReducer = <
 
   const DeletingReducer = createAgnosticModelListActionReducer();
   const UpdatingReducer = createAgnosticModelListActionReducer();
+  const ObjLoadingReducer = createAgnosticModelListActionReducer();
 
   const reducers: MappedReducers<IListResponseActionMap, S, A> = {
     // We have to reset the page to it's initial state otherwise we run the risk
@@ -211,6 +213,12 @@ export const createListResponseReducer = <
       return {
         ...st,
         deleting: DeletingReducer(st.deleting, action)
+      };
+    },
+    ObjLoading: (st: S = Options.initialState, action: Redux.Action<Redux.ModelListActionPayload>) => {
+      return {
+        ...st,
+        deleting: ObjLoadingReducer(st.objLoading, action)
       };
     },
     Updating: (st: S = Options.initialState, action: Redux.Action<Redux.ModelListActionPayload>) => {

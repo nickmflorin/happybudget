@@ -29,7 +29,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     AddToState: ActionType.Templates.AddToState,
     RemoveFromState: ActionType.Templates.RemoveFromState,
     UpdateInState: ActionType.Templates.UpdateInState,
-    Deleting: ActionType.Templates.Deleting
+    ObjLoading: ActionType.Templates.ObjLoading
   }),
   community: createListResponseReducer<Model.Template, Redux.ListResponseStore<Model.Template>, Redux.Action<any>>({
     Response: ActionType.Community.Response,
@@ -41,7 +41,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     AddToState: ActionType.Community.AddToState,
     RemoveFromState: ActionType.Community.RemoveFromState,
     UpdateInState: ActionType.Community.UpdateInState,
-    Deleting: ActionType.Community.Deleting
+    ObjLoading: ActionType.Community.ObjLoading
   }),
   budgets: createListResponseReducer<Model.Budget, Redux.ListResponseStore<Model.Budget>, Redux.Action<any>>({
     Response: ActionType.Budgets.Response,
@@ -53,7 +53,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     AddToState: ActionType.Budgets.AddToState,
     RemoveFromState: ActionType.Budgets.RemoveFromState,
     UpdateInState: ActionType.Budgets.UpdateInState,
-    Deleting: ActionType.Budgets.Deleting
+    ObjLoading: ActionType.Budgets.ObjLoading
   })
 });
 
