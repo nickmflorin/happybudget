@@ -17,13 +17,12 @@ import {
 
 import { getBudgetPdf } from "api/services";
 import { RenderIfValidId } from "components";
-import { AncestorsBreadCrumbs } from "components/layout";
 import { componentLoader } from "lib/operational";
 import { download } from "lib/util/files";
 
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "../../store/actions/budget";
 import { selectBudgetInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "../../store/selectors";
-
+import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
 import Generic from "../Generic";
 
 const Account = React.lazy(() => componentLoader(() => import("./Account")));

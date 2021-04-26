@@ -9,12 +9,11 @@ import { faMagic, faCloud, faCog } from "@fortawesome/pro-solid-svg-icons";
 import { faCopy, faPercentage, faFileSpreadsheet } from "@fortawesome/pro-light-svg-icons";
 
 import { RenderIfValidId } from "components";
-import { AncestorsBreadCrumbs } from "components/layout";
 import { componentLoader } from "lib/operational";
 
 import { setTemplateIdAction } from "../../store/actions/template";
 import { selectTemplateInstance, selectTemplateDetail } from "../../store/selectors";
-
+import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
 import Generic from "../Generic";
 
 const Account = React.lazy(() => componentLoader(() => import("./Account")));

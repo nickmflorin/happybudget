@@ -6,15 +6,24 @@
 
   .page-header {
     margin-bottom: 10px;
+    display: flex;
 
-    .page-header-title {
-      margin-right: 0px;
-      margin-bottom: 0;
-      color: $text-secondary !important;
-      font-weight: 700;
-      font-family: $roboto;
-      font-size: 28px;
-      line-height: 32px;
+    .title-wrapper {
+      flex-grow: 100;
+
+      .page-header-title {
+        margin-right: 0px;
+        margin-bottom: 0;
+        color: $text-secondary !important;
+        font-weight: 700;
+        font-family: $roboto;
+        font-size: 28px;
+        line-height: 36px;
+      }
+    }
+
+    .extra-wrapper {
+      display: flex;
     }
   }
 }
