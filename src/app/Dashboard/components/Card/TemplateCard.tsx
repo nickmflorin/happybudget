@@ -9,6 +9,8 @@ interface TemplateCardProps {
   template: Model.Template;
   loading: boolean;
   duplicating: boolean;
+  moving: boolean;
+  deleting: boolean;
   onDelete: () => void;
   onEdit: () => void;
   onEditNameImage: () => void;
@@ -21,6 +23,8 @@ const TemplateCard = ({
   template,
   loading,
   duplicating,
+  deleting,
+  moving,
   onDuplicate,
   onClick,
   onEditNameImage,
@@ -56,12 +60,14 @@ const TemplateCard = ({
           text: "Move to Community",
           icon: <FontAwesomeIcon className={"icon"} icon={faUserFriends} />,
           onClick: () => onMoveToCommunity(),
-          visible: user.is_staff === true
+          visible: user.is_staff === true,
+          loading: moving
         },
         {
           text: "Delete",
           icon: <FontAwesomeIcon className={"icon"} icon={faTrash} />,
-          onClick: () => onDelete()
+          onClick: () => onDelete(),
+          loading: deleting
         }
       ]}
     />

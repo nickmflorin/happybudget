@@ -23,7 +23,6 @@ import {
   responseTemplatesAction,
   responseCommunityTemplatesAction,
   setBudgetLoadingAction,
-  setTemplateLoadingAction,
   setCommunityTemplateLoadingAction,
   removeBudgetFromStateAction,
   removeTemplateFromStateAction,
@@ -36,7 +35,9 @@ import {
   removeCommunityTemplateFromStateAction,
   addCommunityTemplateToStateAction,
   addTemplateToStateAction,
-  duplicatingTemplateAction
+  duplicatingTemplateAction,
+  deletingTemplateAction,
+  movingTemplateToCommunityAction
 } from "./actions";
 
 export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
@@ -124,7 +125,7 @@ export function* deleteTemplateTask(action: Redux.Action<number>): SagaIterator 
   if (!isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(setTemplateLoadingAction({ id: action.payload, value: true }));
+    yield put(deletingTemplateAction({ id: action.payload, value: true }));
     try {
       yield call(deleteTemplate, action.payload, { cancelToken: source.token });
       yield put(removeTemplateFromStateAction(action.payload));
@@ -133,7 +134,7 @@ export function* deleteTemplateTask(action: Redux.Action<number>): SagaIterator 
         handleRequestError(e, "There was an error deleting the template.");
       }
     } finally {
-      yield put(setTemplateLoadingAction({ id: action.payload, value: false }));
+      yield put(deletingTemplateAction({ id: action.payload, value: false }));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -166,7 +167,7 @@ export function* moveTemplateToCommunityTask(action: Redux.Action<number>): Saga
   if (!isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(setTemplateLoadingAction({ id: action.payload, value: true }));
+    yield put(movingTemplateToCommunityAction({ id: action.payload, value: true }));
     try {
       const response: Model.Template = yield call(
         updateTemplate,
@@ -181,7 +182,7 @@ export function* moveTemplateToCommunityTask(action: Redux.Action<number>): Saga
         handleRequestError(e, "There was an error moving the template to community.");
       }
     } finally {
-      yield put(setTemplateLoadingAction({ id: action.payload, value: false }));
+      yield put(movingTemplateToCommunityAction({ id: action.payload, value: false }));
       if (yield cancelled()) {
         source.cancel();
       }

@@ -5,7 +5,8 @@ const initialState: Redux.Dashboard.Store = {
   budgets: initialListResponseState,
   templates: {
     ...initialListResponseState,
-    duplicating: []
+    duplicating: [],
+    moving: []
   },
   community: initialListResponseState
 };

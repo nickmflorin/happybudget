@@ -1,6 +1,6 @@
 import { includes, isNil } from "lodash";
 import { SagaIterator } from "redux-saga";
-import { spawn, takeLatest, debounce, takeEvery, select, take, put, cancel, call, fork } from "redux-saga/effects";
+import { spawn, takeLatest, debounce, takeEvery, select, take, put, cancel, fork } from "redux-saga/effects";
 import { ActionType, deleteContactAction } from "./actions";
 import {
   getBudgetsTask,

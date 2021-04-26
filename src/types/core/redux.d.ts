@@ -87,6 +87,8 @@ namespace Redux {
   namespace Dashboard {
     interface TemplatesStore extends Redux.ListResponseStore<Model.Template> {
       readonly duplicating: Redux.ModelListActionStore;
+      readonly moving: Redux.ModelListActionStore;
+      readonly deleting: Redux.ModelListActionStore;
     }
 
     interface Store {

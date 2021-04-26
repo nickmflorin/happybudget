@@ -21,6 +21,8 @@ const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.templ
 const selectObjLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.objLoading;
 const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.loading;
 const selectDuplicatingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.duplicating;
+const selectMovingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.moving;
+const selectDeletingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.deleting;
 
 interface MyTemplatesProps {
   setTemplateToDerive: (template: number) => void;
@@ -35,6 +37,8 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
   const objLoading = useSelector(selectObjLoadingTemplates);
   const loading = useSelector(selectLoadingTemplates);
   const duplicating = useSelector(selectDuplicatingTemplates);
+  const moving = useSelector(selectMovingTemplates);
+  const deleting = useSelector(selectDeletingTemplates);
 
   const history = useHistory();
 
@@ -59,6 +63,14 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                   )}
                   duplicating={includes(
                     map(duplicating, (instance: Redux.ModelListActionInstance) => instance.id),
+                    template.id
+                  )}
+                  moving={includes(
+                    map(moving, (instance: Redux.ModelListActionInstance) => instance.id),
+                    template.id
+                  )}
+                  deleting={includes(
+                    map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
                     template.id
                   )}
                   onEdit={() => history.push(`/templates/${template.id}/accounts`)}

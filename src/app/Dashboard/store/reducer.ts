@@ -29,12 +29,13 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
       SetPageAndSize: ActionType.Templates.SetPageAndSize,
       AddToState: ActionType.Templates.AddToState,
       RemoveFromState: ActionType.Templates.RemoveFromState,
-      UpdateInState: ActionType.Templates.UpdateInState,
-      ObjLoading: ActionType.Templates.ObjLoading
+      UpdateInState: ActionType.Templates.UpdateInState
     },
     {
       subReducers: {
-        duplicating: createModelListActionReducer(ActionType.Templates.Duplicating)
+        duplicating: createModelListActionReducer(ActionType.Templates.Duplicating),
+        moving: createModelListActionReducer(ActionType.Templates.MovingToCommunity),
+        deleting: createModelListActionReducer(ActionType.Templates.Deleting)
       }
     }
   ),
