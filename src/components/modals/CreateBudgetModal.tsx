@@ -17,6 +17,7 @@ interface CreateBudgetModalProps {
   templates?: Model.Template[];
   templatesLoading?: boolean;
   allowTemplateSelection?: boolean;
+  title?: string;
 }
 
 const CreateBudgetModal = ({
@@ -25,6 +26,7 @@ const CreateBudgetModal = ({
   templates,
   templatesLoading,
   allowTemplateSelection = true,
+  title = "Create Budget",
   onSuccess,
   onCancel
 }: CreateBudgetModalProps): JSX.Element => {
@@ -52,7 +54,7 @@ const CreateBudgetModal = ({
 
   return (
     <Modal
-      title={"Create Budget"}
+      title={title}
       visible={open}
       onCancel={() => onCancel()}
       okText={"Create"}

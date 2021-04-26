@@ -5,12 +5,11 @@ import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
 import { RenderWithSpinner } from "components";
-import { CreateBudgetModal, EditTemplateModal, CreateTemplateModal } from "components/modals";
+import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 
 import {
   requestTemplatesAction,
   deleteTemplateAction,
-  addBudgetToStateAction,
   updateTemplateInStateAction,
   addTemplateToStateAction,
   moveTemplateToCommunityAction
@@ -21,8 +20,11 @@ const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.templ
 const selectObjLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.objLoading;
 const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.loading;
 
-const MyTemplates = (): JSX.Element => {
-  const [templateToDerive, setTemplateToDerive] = useState<number | undefined>(undefined);
+interface MyTemplatesProps {
+  setTemplateToDerive: (template: number) => void;
+}
+
+const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<Model.Template | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
 
@@ -63,18 +65,6 @@ const MyTemplates = (): JSX.Element => {
           </div>
         </React.Fragment>
       </RenderWithSpinner>
-      {!isNil(templateToDerive) && (
-        <CreateBudgetModal
-          open={true}
-          templateId={templateToDerive}
-          onCancel={() => setTemplateToDerive(undefined)}
-          onSuccess={(budget: Model.Budget) => {
-            setTemplateToDerive(undefined);
-            dispatch(addBudgetToStateAction(budget));
-            history.push(`/budgets/${budget.id}/accounts`);
-          }}
-        />
-      )}
       {!isNil(templateToEdit) && (
         <EditTemplateModal
           open={true}

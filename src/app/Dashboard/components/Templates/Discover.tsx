@@ -5,13 +5,12 @@ import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
 import { RenderWithSpinner } from "components";
-import { CreateBudgetModal, EditTemplateModal, CreateTemplateModal } from "components/modals";
+import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
 
 import {
   requestCommunityTemplatesAction,
   deleteCommunityTemplateAction,
-  addBudgetToStateAction,
   updateCommunityTemplateInStateAction,
   addCommunityTemplateToStateAction
 } from "../../store/actions";
@@ -21,8 +20,11 @@ const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.commu
 const selectObjLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.objLoading;
 const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.loading;
 
-const Discover = (): JSX.Element => {
-  const [templateToDerive, setTemplateToDerive] = useState<number | undefined>(undefined);
+interface DiscoverProps {
+  setTemplateToDerive: (template: number) => void;
+}
+
+const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<Model.Template | undefined>(undefined);
   const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
 
@@ -68,18 +70,6 @@ const Discover = (): JSX.Element => {
           </div>
         </React.Fragment>
       </RenderWithSpinner>
-      {!isNil(templateToDerive) && (
-        <CreateBudgetModal
-          open={true}
-          templateId={templateToDerive}
-          onCancel={() => setTemplateToDerive(undefined)}
-          onSuccess={(budget: Model.Budget) => {
-            setTemplateToDerive(undefined);
-            dispatch(addBudgetToStateAction(budget));
-            history.push(`/budgets/${budget.id}/accounts`);
-          }}
-        />
-      )}
       {!isNil(templateToEdit) && (
         <IsStaff>
           <EditTemplateModal
