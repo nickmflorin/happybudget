@@ -2,7 +2,7 @@ import React from "react";
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFolderOpen, faFolderPlus, faAddressBook } from "@fortawesome/pro-light-svg-icons";
+import { faCopy, faFilePlus, faAddressBook } from "@fortawesome/pro-light-svg-icons";
 
 import { componentLoader } from "lib/operational";
 import { Layout } from "components/layout";
@@ -21,19 +21,19 @@ const Dashboard = (): JSX.Element => {
       sidebar={[
         {
           text: "Templates",
-          icon: <FontAwesomeIcon icon={faFolderPlus} />,
+          icon: <FontAwesomeIcon icon={faFilePlus} />,
           onClick: () => history.push("/templates"),
           active: location.pathname.startsWith("/templates") || location.pathname.startsWith("/discover")
         },
         {
           text: "My Budgets",
-          icon: <FontAwesomeIcon icon={faFolderOpen} />,
+          icon: <FontAwesomeIcon icon={faCopy} />,
           onClick: () => history.push("/budgets"),
           active: location.pathname.startsWith("/budgets")
         },
         {
           text: "Contacts",
-          icon: <FontAwesomeIcon icon={faAddressBook} />,
+          icon: <FontAwesomeIcon icon={faAddressBook} flip={"horizontal"} />,
           onClick: () => history.push("/contacts"),
           active: location.pathname.startsWith("/contacts")
         }
