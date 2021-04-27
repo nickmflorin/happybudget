@@ -8,6 +8,9 @@ frontend:
       commands:
         - yarn run build
         - REACT_APP_API_DOMAIN=$REACT_APP_API_DOMAIN
+        - REACT_APP_AG_GRID_KEY=$REACT_APP_AG_GRID_KEY
+        - REACT_APP_GOOGLE_CLIENT_KEY=$REACT_APP_GOOGLE_CLIENT_KEY
+        - FONTAWESOME_NPM_AUTH_TOKEN=$FONTAWESOME_NPM_AUTH_TOKEN
   artifacts:
     baseDirectory: build
     files:
