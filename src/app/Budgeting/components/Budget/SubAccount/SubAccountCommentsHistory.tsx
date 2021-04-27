@@ -7,7 +7,7 @@ import {
   createCommentAction,
   deleteCommentAction,
   updateCommentAction,
-  requestSubAccountsHistoryAction
+  requestHistoryAction
 } from "../../../store/actions/budget/subAccount";
 
 const selectDeletingComments = simpleDeepEqualSelector((state: Redux.ApplicationStore) =>
@@ -70,7 +70,7 @@ const SubAccountCommentsHistory = (): JSX.Element => {
       historyProps={{
         history: history,
         loading: loadingHistory,
-        onRequest: () => dispatch(requestSubAccountsHistoryAction(null))
+        onRequest: () => dispatch(requestHistoryAction(null))
       }}
     />
   );

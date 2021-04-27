@@ -1,20 +1,12 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce, forEach } from "lodash";
-import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
+import { createListResponseReducer } from "lib/redux/factories";
 import { warnInconsistentState } from "lib/redux/util";
-import { BudgetSubAccountRowManager } from "lib/tabling/managers";
 import { fringeValue } from "lib/model/util";
 import { replaceInArray } from "lib/util";
 
 import { initialBudgetSubAccountsState, initialTemplateSubAccountsState } from "../initialState";
 import fringesRootReducer from "./fringes";
-
-interface SubAccountsPlaceholdersActionMap {
-  AddToState: string;
-  RemoveFromState: string;
-  UpdateInState: string;
-  Activate: string;
-}
 
 interface SubAccountsGroupsActionMap {
   Response: string;
@@ -47,7 +39,6 @@ export interface TemplateSubAccountsReducerFactoryActionMap {
   Creating: string;
   Updating: string;
   Deleting: string;
-  Placeholders: SubAccountsPlaceholdersActionMap;
   Groups: SubAccountsGroupsActionMap;
 }
 
@@ -66,7 +57,6 @@ export interface BudgetSubAccountsReducerFactoryActionMap {
   Creating: string;
   Updating: string;
   Deleting: string;
-  Placeholders: SubAccountsPlaceholdersActionMap;
   Groups: SubAccountsGroupsActionMap;
   History: SubAccountsHistoryActionMap;
 }
@@ -94,15 +84,6 @@ export const createTemplateSubAccountsReducer = (
       strictSelect: false,
       subReducers: {
         fringes: fringesRootReducer,
-        placeholders: createTablePlaceholdersReducer(
-          {
-            AddToState: mapping.Placeholders.AddToState,
-            RemoveFromState: mapping.Placeholders.RemoveFromState,
-            UpdateInState: mapping.Placeholders.UpdateInState,
-            Clear: mapping.Request
-          },
-          BudgetSubAccountRowManager
-        ),
         groups: createListResponseReducer<Model.BudgetGroup, Redux.ListResponseStore<Model.BudgetGroup>>({
           Response: mapping.Groups.Response,
           Request: mapping.Groups.Request,
@@ -217,42 +198,6 @@ export const createTemplateSubAccountsReducer = (
     }
   };
 
-  const recalculatePlaceholderMetrics = (
-    st: Redux.Template.SubAccountsStore,
-    id: number
-  ): Redux.Template.SubAccountsStore => {
-    const row = find(st.placeholders, { id });
-    if (isNil(row)) {
-      /* eslint-disable no-console */
-      console.error(
-        `Inconsistent State: Inconsistent state noticed when updating placeholder in state. The
-        placeholder with ID ${id} does not exist in state when it is expected to.`
-      );
-      return st;
-    } else {
-      // Since we are dealing with a Placeholder row here, the row cannot have SubAccount(s) - thus
-      // the estimated value cannot be determined from the accumulation of those estimated values.
-      // Additionally, the Placeholder row cannot have an Actual value associated with it, so we
-      // do not need to update the variance.
-      if (!isNil(row.quantity) && !isNil(row.rate)) {
-        const multiplier = row.multiplier || 1.0;
-        return {
-          ...st,
-          placeholders: replaceInArray<Table.TemplateSubAccountRow>(
-            st.placeholders,
-            { id: row.id },
-            {
-              ...row,
-              estimated: multiplier * row.quantity * row.rate
-            }
-          )
-        };
-      } else {
-        return st;
-      }
-    }
-  };
-
   return (
     state: Redux.Template.SubAccountsStore = initialTemplateSubAccountsState,
     action: Redux.Action<any>
@@ -343,20 +288,6 @@ export const createTemplateSubAccountsReducer = (
         };
         newState = recalculateGroupMetrics(newState, group.id);
       }
-    } else if (action.type === mapping.Placeholders.UpdateInState) {
-      const row: Table.TemplateSubAccountRow = action.payload;
-      newState = recalculatePlaceholderMetrics(newState, row.id);
-    } else if (action.type === mapping.Placeholders.Activate) {
-      // TODO: Do we need to recalculate group metrics here?
-      const payload: Table.ActivatePlaceholderPayload<Model.TemplateSubAccount> = action.payload;
-      newState = {
-        ...newState,
-        placeholders: filter(
-          newState.placeholders,
-          (placeholder: Table.TemplateSubAccountRow) => placeholder.id !== action.payload.id
-        ),
-        data: [...newState.data, payload.model]
-      };
     }
     return newState;
   };
@@ -385,15 +316,6 @@ export const createBudgetSubAccountsReducer = (
       strictSelect: false,
       subReducers: {
         fringes: fringesRootReducer,
-        placeholders: createTablePlaceholdersReducer(
-          {
-            AddToState: mapping.Placeholders.AddToState,
-            RemoveFromState: mapping.Placeholders.RemoveFromState,
-            UpdateInState: mapping.Placeholders.UpdateInState,
-            Clear: mapping.Request
-          },
-          BudgetSubAccountRowManager
-        ),
         groups: createListResponseReducer<Model.BudgetGroup, Redux.ListResponseStore<Model.BudgetGroup>>({
           Response: mapping.Groups.Response,
           Request: mapping.Groups.Request,
@@ -521,42 +443,6 @@ export const createBudgetSubAccountsReducer = (
     }
   };
 
-  const recalculatePlaceholderMetrics = (
-    st: Redux.Budget.SubAccountsStore,
-    id: number
-  ): Redux.Budget.SubAccountsStore => {
-    const row = find(st.placeholders, { id });
-    if (isNil(row)) {
-      /* eslint-disable no-console */
-      console.error(
-        `Inconsistent State: Inconsistent state noticed when updating placeholder in state. The
-            placeholder with ID ${id} does not exist in state when it is expected to.`
-      );
-      return st;
-    } else {
-      // Since we are dealing with a Placeholder row here, the row cannot have SubAccount(s) - thus
-      // the estimated value cannot be determined from the accumulation of those estimated values.
-      // Additionally, the Placeholder row cannot have an Actual value associated with it, so we
-      // do not need to update the variance.
-      if (!isNil(row.quantity) && !isNil(row.rate)) {
-        const multiplier = row.multiplier || 1.0;
-        return {
-          ...st,
-          placeholders: replaceInArray<Table.BudgetSubAccountRow>(
-            st.placeholders,
-            { id: row.id },
-            {
-              ...row,
-              estimated: multiplier * row.quantity * row.rate
-            }
-          )
-        };
-      } else {
-        return st;
-      }
-    }
-  };
-
   return (
     state: Redux.Budget.SubAccountsStore = initialBudgetSubAccountsState,
     action: Redux.Action<any>
@@ -647,20 +533,6 @@ export const createBudgetSubAccountsReducer = (
         };
         newState = recalculateGroupMetrics(newState, group.id);
       }
-    } else if (action.type === mapping.Placeholders.UpdateInState) {
-      const row: Table.BudgetSubAccountRow = action.payload;
-      newState = recalculatePlaceholderMetrics(newState, row.id);
-    } else if (action.type === mapping.Placeholders.Activate) {
-      // TODO: Do we need to recalculate group metrics here?
-      const payload: Table.ActivatePlaceholderPayload<Model.BudgetSubAccount> = action.payload;
-      newState = {
-        ...newState,
-        placeholders: filter(
-          newState.placeholders,
-          (placeholder: Table.BudgetSubAccountRow) => placeholder.id !== action.payload.id
-        ),
-        data: [...newState.data, payload.model]
-      };
     }
     return newState;
   };

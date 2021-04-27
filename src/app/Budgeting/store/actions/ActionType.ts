@@ -1,4 +1,4 @@
-const ActionType: { [key: string]: any } = {
+const ActionType = {
   Budget: {
     SetInstance: "budget.SetInstance",
     SetCommentsHistoryDrawerVisibility: "budget.SetCommentsHistoryDrawerVisibility",
@@ -6,7 +6,8 @@ const ActionType: { [key: string]: any } = {
     Loading: "budget.Loading",
     Response: "budget.Response",
     Request: "budget.Request",
-    BulkUpdateAccounts: "budget.BulkUpdateAccounts",
+    BulkUpdate: "budget.BulkUpdate",
+    BulkCreate: "budget.BulkCreate",
     BulkUpdateActuals: "budget.BulkUpdateActuals",
     BulkUpdateFringes: "budget.BulkUpdateFringes",
     Comments: {
@@ -30,7 +31,7 @@ const ActionType: { [key: string]: any } = {
       Updating: "budget.fringes.Updating",
       Loading: "budget.fringes.Loading",
       Response: "budget.fringes.Response",
-      Remove: "budget.fringes.Remove",
+      Delete: "budget.fringes.Delete",
       Update: "budget.fringes.Update",
       AddToState: "budget.fringes.AddToState",
       RemoveFromState: "budget.fringes.RemoveFromState",
@@ -50,11 +51,11 @@ const ActionType: { [key: string]: any } = {
       }
     },
     Accounts: {
+      Delete: "budget.accounts.Delete",
       Deleting: "budget.accounts.Deleting",
       Creating: "budget.accounts.Creating",
-      Updating: "budget.accounts.Updating",
       Update: "budget.accounts.Update",
-      Remove: "budget.accounts.Remove",
+      Updating: "budget.accounts.Updating",
       SetSearch: "budget.accounts.SetSearch",
       Loading: "budget.accounts.Loading",
       Select: "budget.accounts.Select",
@@ -68,12 +69,6 @@ const ActionType: { [key: string]: any } = {
       RemoveFromGroup: "budget.accounts.RemoveFromGroup",
       // Errors Functionality Needs to be Built Back In
       AddErrors: "budget.accounts.AddErrors",
-      Placeholders: {
-        AddToState: "budget.accounts.placeholders.AddToState",
-        Activate: "budget.accounts.placeholders.Activate",
-        UpdateInState: "budget.accounts.placeholders.UpdateInState",
-        RemoveFromState: "budget.accounts.placeholders.RemoveFromState"
-      },
       Groups: {
         Response: "budget.accounts.groups.Response",
         Request: "budget.accounts.groups.Request",
@@ -98,6 +93,7 @@ const ActionType: { [key: string]: any } = {
       Request: "budget.subaccount.Request",
       UpdateInState: "budget.subaccount.UpdateInState",
       BulkUpdate: "budget.subaccount.BulkUpdate",
+      BulkCreate: "budget.subaccount.BulkCreate",
       Comments: {
         Loading: "budget.subaccount.comments.Loading",
         Response: "budget.subaccount.comments.Response",
@@ -118,7 +114,7 @@ const ActionType: { [key: string]: any } = {
         Creating: "budget.subaccount.subaccounts.Creating",
         Updating: "budget.subaccount.subaccounts.Updating",
         Update: "budget.subaccount.subaccounts.Update",
-        Remove: "budget.subaccount.subaccounts.Remove",
+        Delete: "budget.subaccount.subaccounts.Delete",
         SetSearch: "budget.subaccount.subaccounts.SetSearch",
         Loading: "budget.subaccount.subaccounts.Loading",
         Select: "budget.subaccount.subaccounts.Select",
@@ -132,12 +128,6 @@ const ActionType: { [key: string]: any } = {
         RemoveFromGroup: "budget.subaccount.subaccounts.RemoveFromGroup",
         // Errors Functionality Needs to be Built Back In
         AddErrors: "budget.subaccount.subaccounts.AddErrors",
-        Placeholders: {
-          AddToState: "budget.subaccount.subaccounts.placeholders.AddToState",
-          Activate: "budget.subaccount.subaccounts.placeholders.Activate",
-          UpdateInState: "budget.subaccount.subaccounts.placeholders.UpdateInState",
-          RemoveFromState: "budget.subaccount.subaccounts.placeholders.RemoveFromState"
-        },
         Groups: {
           Response: "budget.subaccount.subaccounts.groups.Response",
           Request: "budget.subaccount.subaccounts.groups.Request",
@@ -161,6 +151,7 @@ const ActionType: { [key: string]: any } = {
       Response: "budget.account.Response",
       Request: "budget.account.Request",
       UpdateInState: "budget.account.UpdateInState",
+      BulkCreate: "budget.account.BulkCreate",
       BulkUpdate: "budget.account.BulkUpdate",
       Comments: {
         Loading: "budget.account.comments.Loading",
@@ -178,17 +169,17 @@ const ActionType: { [key: string]: any } = {
         UpdateInState: "budget.account.comments.UpdateInState"
       },
       SubAccounts: {
+        Delete: "budget.account.subaccounts.Delete",
+        Deleting: "budget.account.subaccounts.Deleting",
+        Creating: "budget.account.subaccounts.Creating",
+        Update: "budget.account.subaccounts.Update",
+        Updating: "budget.account.subaccounts.Updating",
         Loading: "budget.account.subaccounts.Loading",
         Response: "budget.account.subaccounts.Response",
         Request: "budget.account.subaccounts.Request",
         Select: "budget.account.subaccounts.Select",
         Deselect: "budget.account.subaccounts.Deselect",
         SelectAll: "budget.account.subaccounts.SelectAll",
-        Deleting: "budget.account.subaccounts.Deleting",
-        Creating: "budget.account.subaccounts.Creating",
-        Updating: "budget.account.subaccounts.Updating",
-        Update: "budget.account.subaccounts.Update",
-        Remove: "budget.account.subaccounts.Remove",
         SetSearch: "budget.account.subaccounts.SetSearch",
         UpdateInState: "budget.account.subaccounts.UpdateInState",
         RemoveFromState: "budget.account.subaccounts.RemoveFromState",
@@ -196,12 +187,6 @@ const ActionType: { [key: string]: any } = {
         RemoveFromGroup: "budget.account.subaccounts.RemoveFromGroup",
         // Errors Functionality Needs to be Built Back In
         AddErrors: "budget.account.subaccounts.AddErrors",
-        Placeholders: {
-          AddToState: "budget.account.subaccounts.placeholders.AddToState",
-          Activate: "budget.account.subaccounts.placeholders.Activate",
-          UpdateInState: "budget.account.subaccounts.placeholders.UpdateInState",
-          RemoveFromState: "budget.account.subaccounts.placeholders.RemoveFromState"
-        },
         Groups: {
           Response: "budget.account.subaccounts.groups.Response",
           Request: "budget.account.subaccounts.groups.Request",
@@ -232,7 +217,7 @@ const ActionType: { [key: string]: any } = {
       Creating: "budget.actuals.Creating",
       Updating: "budget.actuals.Updating",
       Update: "budget.actuals.Update",
-      Remove: "budget.actuals.Remove",
+      Delete: "budget.actuals.Delete",
       Select: "budget.actuals.Select",
       Deselect: "budget.actuals.Deselect",
       SelectAll: "budget.actuals.SelectAll",
@@ -259,8 +244,8 @@ const ActionType: { [key: string]: any } = {
     Loading: "template.Loading",
     Response: "template.Response",
     Request: "template.Request",
-    BulkUpdateAccounts: "template.BulkUpdateAccounts",
-    BulkUpdateActuals: "template.BulkUpdateActuals",
+    BulkUpdate: "template.BulkUpdate",
+    BulkCreate: "template.BulkCreate",
     BulkUpdateFringes: "template.BulkUpdateFringes",
     Fringes: {
       Deleting: "template.fringes.Deleting",
@@ -268,7 +253,7 @@ const ActionType: { [key: string]: any } = {
       Updating: "template.fringes.Updating",
       Loading: "template.fringes.Loading",
       Response: "template.fringes.Response",
-      Remove: "template.fringes.Remove",
+      Delete: "template.fringes.Delete",
       Update: "template.fringes.Update",
       AddToState: "template.fringes.AddToState",
       RemoveFromState: "template.fringes.RemoveFromState",
@@ -292,7 +277,7 @@ const ActionType: { [key: string]: any } = {
       Creating: "template.accounts.Creating",
       Updating: "template.accounts.Updating",
       Update: "template.accounts.Update",
-      Remove: "template.accounts.Remove",
+      Delete: "template.accounts.Delete",
       SetSearch: "template.accounts.SetSearch",
       Loading: "template.accounts.Loading",
       Select: "template.accounts.Select",
@@ -306,12 +291,6 @@ const ActionType: { [key: string]: any } = {
       RemoveFromGroup: "template.accounts.RemoveFromGroup",
       // Errors Functionality Needs to be Built Back In
       AddErrors: "template.accounts.AddErrors",
-      Placeholders: {
-        AddToState: "template.accounts.placeholders.AddToState",
-        Activate: "template.accounts.placeholders.Activate",
-        UpdateInState: "template.accounts.placeholders.UpdateInState",
-        RemoveFromState: "template.accounts.placeholders.RemoveFromState"
-      },
       Groups: {
         Response: "template.accounts.groups.Response",
         Request: "template.accounts.groups.Request",
@@ -330,12 +309,13 @@ const ActionType: { [key: string]: any } = {
       Request: "template.subaccount.Request",
       UpdateInState: "template.subaccount.UpdateInState",
       BulkUpdate: "template.subaccount.BulkUpdate",
+      BulkCreate: "template.subaccount.BulkCreate",
       SubAccounts: {
         Deleting: "template.subaccount.subaccounts.Deleting",
         Creating: "template.subaccount.subaccounts.Creating",
         Updating: "template.subaccount.subaccounts.Updating",
         Update: "template.subaccount.subaccounts.Update",
-        Remove: "template.subaccount.subaccounts.Remove",
+        Delete: "template.subaccount.subaccounts.Delete",
         SetSearch: "template.subaccount.subaccounts.SetSearch",
         Loading: "template.subaccount.subaccounts.Loading",
         Select: "template.subaccount.subaccounts.Select",
@@ -349,12 +329,6 @@ const ActionType: { [key: string]: any } = {
         RemoveFromGroup: "template.subaccount.subaccounts.RemoveFromGroup",
         // Errors Functionality Needs to be Built Back In
         AddErrors: "template.subaccount.subaccounts.AddErrors",
-        Placeholders: {
-          AddToState: "template.subaccount.subaccounts.placeholders.AddToState",
-          Activate: "template.subaccount.subaccounts.placeholders.Activate",
-          UpdateInState: "template.subaccount.subaccounts.placeholders.UpdateInState",
-          RemoveFromState: "template.subaccount.subaccounts.placeholders.RemoveFromState"
-        },
         Groups: {
           Response: "template.subaccount.subaccounts.groups.Response",
           Request: "template.subaccount.subaccounts.groups.Request",
@@ -374,6 +348,7 @@ const ActionType: { [key: string]: any } = {
       Request: "template.account.Request",
       UpdateInState: "template.account.UpdateInState",
       BulkUpdate: "template.account.BulkUpdate",
+      BulkCreate: "template.account.BulkCreate",
       SubAccounts: {
         Loading: "template.account.subaccounts.Loading",
         Response: "template.account.subaccounts.Response",
@@ -385,7 +360,7 @@ const ActionType: { [key: string]: any } = {
         Creating: "template.account.subaccounts.Creating",
         Updating: "template.account.subaccounts.Updating",
         Update: "template.account.subaccounts.Update",
-        Remove: "template.account.subaccounts.Remove",
+        Delete: "template.account.subaccounts.Delete",
         SetSearch: "template.account.subaccounts.SetSearch",
         UpdateInState: "template.account.subaccounts.UpdateInState",
         RemoveFromState: "template.account.subaccounts.RemoveFromState",
@@ -393,12 +368,6 @@ const ActionType: { [key: string]: any } = {
         RemoveFromGroup: "template.account.subaccounts.RemoveFromGroup",
         // Errors Functionality Needs to be Built Back In
         AddErrors: "template.account.subaccounts.AddErrors",
-        Placeholders: {
-          AddToState: "template.account.subaccounts.placeholders.AddToState",
-          Activate: "template.account.subaccounts.placeholders.Activate",
-          UpdateInState: "template.account.subaccounts.placeholders.UpdateInState",
-          RemoveFromState: "template.account.subaccounts.placeholders.RemoveFromState"
-        },
         Groups: {
           Response: "template.account.subaccounts.groups.Response",
           Request: "template.account.subaccounts.groups.Request",

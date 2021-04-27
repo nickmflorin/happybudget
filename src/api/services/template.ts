@@ -145,12 +145,12 @@ export const bulkUpdateTemplateAccounts = async (
 
 export const bulkCreateTemplateAccounts = async (
   id: number,
-  data: Http.TemplateAccountPayload[],
+  payload: Http.BulkCreatePayload<Http.TemplateAccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.TemplateAccount[]> => {
   const url = URL.v1("templates", id, "bulk-create-accounts");
   return client
-    .patch<Http.BulkCreateResponse<Model.TemplateAccount>>(url, { data }, options)
+    .patch<Http.BulkCreateResponse<Model.TemplateAccount>>(url, payload, options)
     .then((response: Http.BulkCreateResponse<Model.TemplateAccount>) => response.data);
 };
 

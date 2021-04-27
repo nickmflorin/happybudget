@@ -156,12 +156,12 @@ export const bulkUpdateBudgetAccounts = async (
 
 export const bulkCreateBudgetAccounts = async (
   id: number,
-  data: Http.BudgetAccountPayload[],
+  payload: Http.BulkCreatePayload<Http.BudgetAccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.BudgetAccount[]> => {
   const url = URL.v1("budgets", id, "bulk-create-accounts");
   return client
-    .patch<Http.BulkCreateResponse<Model.BudgetAccount>>(url, { data }, options)
+    .patch<Http.BulkCreateResponse<Model.BudgetAccount>>(url, payload, options)
     .then((response: Http.BulkCreateResponse<Model.BudgetAccount>) => response.data);
 };
 

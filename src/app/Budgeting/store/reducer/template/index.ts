@@ -39,17 +39,12 @@ const rootReducer: Reducer<Redux.Template.Store, Redux.Action<any>> = (
     if (
       action.type === ActionType.Template.SubAccount.SubAccounts.UpdateInState ||
       action.type === ActionType.Template.SubAccount.SubAccounts.RemoveFromState ||
-      action.type === ActionType.Template.SubAccount.SubAccounts.AddToState ||
-      action.type === ActionType.Template.SubAccount.SubAccounts.Placeholders.UpdateInState
+      action.type === ActionType.Template.SubAccount.SubAccounts.AddToState
     ) {
-      // Update the overall SubAccount based on the underlying SubAccount(s) present and any potential
-      // placeholders present.
+      // Update the overall SubAccount based on the underlying SubAccount(s) present.
       const subAccounts: Model.TemplateSubAccount[] = newState.subaccount.subaccounts.data;
-      const placeholders: Table.TemplateSubAccountRow[] = newState.subaccount.subaccounts.placeholders;
       let payload: Partial<Model.TemplateSubAccount> = {
-        estimated:
-          reduce(subAccounts, (sum: number, s: Model.TemplateSubAccount) => sum + (s.estimated || 0), 0) +
-          reduce(placeholders, (sum: number, s: Table.TemplateSubAccountRow) => sum + (s.estimated || 0), 0)
+        estimated: reduce(subAccounts, (sum: number, s: Model.TemplateSubAccount) => sum + (s.estimated || 0), 0)
       };
       if (!isNil(newState.subaccount.detail.data)) {
         if (!isNil(newState.subaccount.detail.data)) {
@@ -68,16 +63,11 @@ const rootReducer: Reducer<Redux.Template.Store, Redux.Action<any>> = (
     } else if (
       action.type === ActionType.Template.Account.SubAccounts.UpdateInState ||
       action.type === ActionType.Template.Account.SubAccounts.RemoveFromState ||
-      action.type === ActionType.Template.Account.SubAccounts.AddToState ||
-      action.type === ActionType.Template.Account.SubAccounts.Placeholders.UpdateInState
+      action.type === ActionType.Template.Account.SubAccounts.AddToState
     ) {
-      // Update the overall Account based on the underlying SubAccount(s) present and any potential
-      // placeholders present.
+      // Update the overall Account based on the underlying SubAccount(s) present.
       const subAccounts: Model.TemplateSubAccount[] = newState.account.subaccounts.data;
-      const placeholders: Table.TemplateSubAccountRow[] = newState.account.subaccounts.placeholders;
-      const estimated =
-        reduce(subAccounts, (sum: number, s: Model.TemplateSubAccount) => sum + (s.estimated || 0), 0) +
-        reduce(placeholders, (sum: number, s: Table.TemplateSubAccountRow) => sum + (s.estimated || 0), 0);
+      const estimated = reduce(subAccounts, (sum: number, s: Model.TemplateSubAccount) => sum + (s.estimated || 0), 0);
       if (!isNil(newState.account.detail.data)) {
         newState = {
           ...newState,

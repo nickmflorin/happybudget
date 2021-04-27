@@ -14,10 +14,8 @@ export const updateParentSubAccountInStateAction = simpleAction<Partial<Model.Bu
 export const bulkUpdateSubAccountAction = simpleAction<Table.RowChange<Table.BudgetSubAccountRow>[]>(
   ActionType.Budget.SubAccount.BulkUpdate
 );
+export const bulkCreateSubAccountsAction = simpleAction<number>(ActionType.Budget.SubAccount.BulkCreate);
 
-/*
-  Actions Pertaining to Sub Account Comments
-*/
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.SubAccount.Comments.Request);
 export const responseCommentsAction = simpleAction<Http.ListResponse<Model.Comment>>(
   ActionType.Budget.SubAccount.Comments.Response
@@ -47,13 +45,11 @@ export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budg
 export const updateCommentInStateAction = simpleAction<
   Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
 >(ActionType.Budget.SubAccount.Comments.UpdateInState);
-/*
-  Actions Pertaining to Account Sub Accounts
-*/
+
 export const updateSubAccountAction = simpleAction<Table.RowChange<Table.BudgetSubAccountRow>>(
   ActionType.Budget.SubAccount.SubAccounts.Update
 );
-export const removeSubAccountAction = simpleAction<number>(ActionType.Budget.SubAccount.SubAccounts.Remove);
+export const removeSubAccountAction = simpleAction<number>(ActionType.Budget.SubAccount.SubAccounts.Delete);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.SubAccount.SubAccounts.Deleting
 );
@@ -74,26 +70,12 @@ export const selectSubAccountAction = simpleAction<number>(ActionType.Budget.Sub
 export const deselectSubAccountAction = simpleAction<number>(ActionType.Budget.SubAccount.SubAccounts.Deselect);
 export const selectAllSubAccountsAction = simpleAction<null>(ActionType.Budget.SubAccount.SubAccounts.SelectAll);
 
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.BudgetSubAccount>>(
-  ActionType.Budget.SubAccount.SubAccounts.Placeholders.Activate
-);
-export const removePlaceholderFromStateAction = simpleAction<number>(
-  ActionType.Budget.SubAccount.SubAccounts.Placeholders.RemoveFromState
-);
-export const addPlaceholdersToStateAction = simpleAction<number>(
-  ActionType.Budget.SubAccount.SubAccounts.Placeholders.AddToState
-);
-export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.BudgetSubAccountRow>>(
-  ActionType.Budget.SubAccount.SubAccounts.Placeholders.UpdateInState
-);
-
 export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetSubAccount>>(
   ActionType.Budget.SubAccount.SubAccounts.UpdateInState
 );
 export const removeSubAccountFromStateAction = simpleAction<number>(
   ActionType.Budget.SubAccount.SubAccounts.RemoveFromState
 );
-// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const addSubAccountToStateAction = simpleAction<Model.BudgetSubAccount>(
   ActionType.Budget.SubAccount.SubAccounts.AddToState
 );
@@ -103,9 +85,6 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
   ActionType.Budget.SubAccount.SubAccounts.AddErrors
 );
 
-/*
-  Actiosn Pertaining to Account Sub Accounts Groups
-*/
 export const requestGroupsAction = simpleAction<null>(ActionType.Budget.SubAccount.SubAccounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.SubAccount.SubAccounts.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.BudgetGroup>>(
@@ -125,15 +104,8 @@ export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(
 );
 export const deleteGroupAction = simpleAction<number>(ActionType.Budget.SubAccount.SubAccounts.Groups.Delete);
 
-/*
-  Actions Pertaining to Sub Account Sub Accounts History
-*/
-export const requestSubAccountsHistoryAction = simpleAction<null>(
-  ActionType.Budget.SubAccount.SubAccounts.History.Request
-);
-export const loadingSubAccountsHistoryAction = simpleAction<boolean>(
-  ActionType.Budget.SubAccount.SubAccounts.History.Loading
-);
-export const responseSubAccountsHistoryAction = simpleAction<Http.ListResponse<Model.HistoryEvent>>(
+export const requestHistoryAction = simpleAction<null>(ActionType.Budget.SubAccount.SubAccounts.History.Request);
+export const loadingHistoryAction = simpleAction<boolean>(ActionType.Budget.SubAccount.SubAccounts.History.Loading);
+export const responseHistoryAction = simpleAction<Http.ListResponse<Model.HistoryEvent>>(
   ActionType.Budget.SubAccount.SubAccounts.History.Response
 );

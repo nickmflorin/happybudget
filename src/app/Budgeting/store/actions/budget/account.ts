@@ -12,6 +12,7 @@ export const updateAccountInStateAction = simpleAction<Partial<Redux.UpdateModel
 export const bulkUpdateAccountAction = simpleAction<Table.RowChange<Table.BudgetSubAccountRow>[]>(
   ActionType.Budget.Account.BulkUpdate
 );
+export const bulkCreateSubAccountsAction = simpleAction<number>(ActionType.Budget.Account.BulkCreate);
 
 /*
   Actions Pertaining to Account Comments
@@ -51,7 +52,7 @@ export const updateCommentInStateAction = simpleAction<
 export const updateSubAccountAction = simpleAction<Table.RowChange<Table.BudgetSubAccountRow>>(
   ActionType.Budget.Account.SubAccounts.Update
 );
-export const removeSubAccountAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Remove);
+export const removeSubAccountAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Delete);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.Account.SubAccounts.Deleting
 );
@@ -71,27 +72,12 @@ export const removeSubAccountFromGroupAction = simpleAction<number>(
 export const selectSubAccountAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Select);
 export const deselectSubAccountAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Deselect);
 export const selectAllSubAccountsAction = simpleAction<null>(ActionType.Budget.Account.SubAccounts.SelectAll);
-
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.BudgetSubAccount>>(
-  ActionType.Budget.Account.SubAccounts.Placeholders.Activate
-);
-export const removePlaceholderFromStateAction = simpleAction<number>(
-  ActionType.Budget.Account.SubAccounts.Placeholders.RemoveFromState
-);
-export const addPlaceholdersToStateAction = simpleAction<number>(
-  ActionType.Budget.Account.SubAccounts.Placeholders.AddToState
-);
-export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.BudgetSubAccountRow>>(
-  ActionType.Budget.Account.SubAccounts.Placeholders.UpdateInState
-);
-
 export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetSubAccount>>(
   ActionType.Budget.Account.SubAccounts.UpdateInState
 );
 export const removeSubAccountFromStateAction = simpleAction<number>(
   ActionType.Budget.Account.SubAccounts.RemoveFromState
 );
-// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const addSubAccountToStateAction = simpleAction<Model.BudgetSubAccount>(
   ActionType.Budget.Account.SubAccounts.AddToState
 );

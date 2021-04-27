@@ -13,7 +13,6 @@ import BudgetTable from "../../BudgetTable";
 import { selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
 import {
   setAccountsSearchAction,
-  addPlaceholdersToStateAction,
   deselectAccountAction,
   selectAccountAction,
   removeAccountAction,
@@ -23,16 +22,15 @@ import {
   deleteGroupAction,
   removeAccountFromGroupAction,
   bulkUpdateBudgetAccountsAction,
-  updateGroupInStateAction
+  updateGroupInStateAction,
+  bulkCreateAccountsAction
 } from "../../../store/actions/budget/accounts";
 
 const selectGroups = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.accounts.groups.data);
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.accounts.selected);
 const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.accounts.data);
 const selectTableSearch = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.budget.accounts.search);
-const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.accounts.placeholders
-);
+
 const selectSaving = createSelector(
   (state: Redux.ApplicationStore) => state.budget.accounts.deleting,
   (state: Redux.ApplicationStore) => state.budget.accounts.updating,
@@ -56,7 +54,6 @@ const AccountsBudgetTable = (): JSX.Element => {
 
   const budgetId = useSelector(selectBudgetId);
   const data = useSelector(selectData);
-  const placeholders = useSelector(selectPlaceholders);
   const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
@@ -69,7 +66,6 @@ const AccountsBudgetTable = (): JSX.Element => {
       <BudgetTable<Table.BudgetAccountRow, Model.BudgetAccount, Model.BudgetGroup, Http.BudgetAccountPayload>
         data={data}
         groups={groups}
-        placeholders={placeholders}
         manager={BudgetAccountRowManager}
         selected={selected}
         renderFlag={readyToRender}
@@ -80,7 +76,7 @@ const AccountsBudgetTable = (): JSX.Element => {
         search={search}
         onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
         saving={saving}
-        onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
+        onRowAdd={() => dispatch(bulkCreateAccountsAction(1))}
         onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
         onRowDelete={(row: Table.BudgetAccountRow) => dispatch(removeAccountAction(row.id))}

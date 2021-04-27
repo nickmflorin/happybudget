@@ -1,150 +1,45 @@
-import { SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel, takeEvery, fork } from "redux-saga/effects";
-import { isNil } from "lodash";
 import { ActionType } from "../../actions";
+import { createStandardSaga } from "../factories";
 import {
   getAccountsTask,
-  handleAccountUpdateTask,
-  handleAccountRemovalTask,
+  handleUpdateTask,
+  handleRemovalTask,
   getCommentsTask,
   submitCommentTask,
   deleteCommentTask,
   editCommentTask,
   getHistoryTask,
-  deleteAccountGroupTask,
-  removeAccountFromGroupTask,
+  deleteGroupTask,
+  removeFromGroupTask,
   getGroupsTask,
-  handleAccountsBulkUpdateTask
-} from "../../tasks/budget/accounts";
+  handleBulkUpdateTask,
+  bulkCreateTask
+} from "./tasks/accounts";
 
-function* watchForRequestAccountsSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Budget.Accounts.Request);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(getAccountsTask, action);
-  }
-}
-
-function* watchForRequestGroupsSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Budget.Accounts.Groups.Request);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(getGroupsTask, action);
-  }
-}
-
-function* watchForBulkUpdateAccountsSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.BulkUpdateAccounts, handleAccountsBulkUpdateTask);
-}
-
-function* watchForRemoveAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Accounts.Remove, handleAccountRemovalTask);
-}
-
-function* watchForAccountUpdateSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Accounts.Update, handleAccountUpdateTask);
-}
-
-function* watchForRequestCommentsSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Budget.Comments.Request);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(getCommentsTask, action);
-  }
-}
-
-function* watchForSubmitCommentSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Budget.Comments.Create);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(submitCommentTask, action);
-  }
-}
-
-function* watchForRemoveCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Comments.Delete, deleteCommentTask);
-}
-
-function* watchForEditCommentSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Comments.Update, editCommentTask);
-}
-
-function* watchForRequestHistorySaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Budget.Accounts.History.Request);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(getHistoryTask, action);
-  }
-}
-
-function* watchForDeleteGroupSaga(): SagaIterator {
-  let lastTasks: { [key: number]: any[] } = {};
-  while (true) {
-    const action: Redux.Action<number> = yield take(ActionType.Budget.Accounts.Groups.Delete);
-    if (!isNil(action.payload)) {
-      if (isNil(lastTasks[action.payload])) {
-        lastTasks[action.payload] = [];
-      }
-      // If there were any previously submitted tasks to delete the same group,
-      // cancel them.
-      if (lastTasks[action.payload].length !== 0) {
-        const cancellable = lastTasks[action.payload];
-        lastTasks = { ...lastTasks, [action.payload]: [] };
-        yield cancel(cancellable);
-      }
-      const task = yield fork(deleteAccountGroupTask, action);
-      lastTasks[action.payload].push(task);
-    }
-  }
-}
-
-function* watchForRemoveAccountFromGroupSaga(): SagaIterator {
-  let lastTasks: { [key: number]: any[] } = {};
-  while (true) {
-    const action: Redux.Action<number> = yield take(ActionType.Budget.Accounts.RemoveFromGroup);
-    if (!isNil(action.payload)) {
-      if (isNil(lastTasks[action.payload])) {
-        lastTasks[action.payload] = [];
-      }
-      // If there were any previously submitted tasks to remove the same row,
-      // cancel them.
-      if (lastTasks[action.payload].length !== 0) {
-        const cancellable = lastTasks[action.payload];
-        lastTasks = { ...lastTasks, [action.payload]: [] };
-        yield cancel(cancellable);
-      }
-      const task = yield fork(removeAccountFromGroupTask, action);
-      lastTasks[action.payload].push(task);
-    }
-  }
-}
-
-export default function* accountsSaga(): SagaIterator {
-  yield spawn(watchForRequestAccountsSaga);
-  yield spawn(watchForRemoveAccountSaga);
-  yield spawn(watchForAccountUpdateSaga);
-  yield spawn(watchForRequestCommentsSaga);
-  yield spawn(watchForSubmitCommentSaga);
-  yield spawn(watchForRemoveCommentSaga);
-  yield spawn(watchForEditCommentSaga);
-  yield spawn(watchForRequestHistorySaga);
-  yield spawn(watchForDeleteGroupSaga);
-  yield spawn(watchForRemoveAccountFromGroupSaga);
-  yield spawn(watchForRequestGroupsSaga);
-  yield spawn(watchForBulkUpdateAccountsSaga);
-}
+export default createStandardSaga({
+  Request: {
+    actionType: ActionType.Budget.Accounts.Request,
+    task: getAccountsTask
+  },
+  RequestGroups: {
+    actionType: ActionType.Budget.Accounts.Groups.Request,
+    task: getGroupsTask
+  },
+  RequestComments: {
+    actionType: ActionType.Budget.Comments.Request,
+    task: getCommentsTask
+  },
+  RequestHistory: {
+    actionType: ActionType.Budget.Accounts.History.Request,
+    task: getHistoryTask
+  },
+  BulkUpdate: { actionType: ActionType.Budget.BulkUpdate, task: handleBulkUpdateTask },
+  BulkCreate: { actionType: ActionType.Budget.BulkCreate, task: bulkCreateTask },
+  Delete: { actionType: ActionType.Budget.Accounts.Delete, task: handleRemovalTask },
+  Update: { actionType: ActionType.Budget.Accounts.Update, task: handleUpdateTask },
+  SubmitComment: { actionType: ActionType.Budget.Comments.Create, task: submitCommentTask },
+  DeleteComment: { actionType: ActionType.Budget.Comments.Delete, task: deleteCommentTask },
+  EditComment: { actionType: ActionType.Budget.Comments.Update, task: editCommentTask },
+  DeleteGroup: { actionType: ActionType.Budget.Accounts.Groups.Delete, task: deleteGroupTask },
+  RemoveModelFromGroup: { actionType: ActionType.Budget.Accounts.RemoveFromGroup, task: removeFromGroupTask }
+});

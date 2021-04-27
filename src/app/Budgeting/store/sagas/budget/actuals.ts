@@ -1,12 +1,9 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
+
+import { takeWithCancellableById } from "lib/redux/sagas";
 import { ActionType } from "../../actions";
-import {
-  getActualsTask,
-  handleActualRemovalTask,
-  handleActualUpdateTask,
-  handleActualsBulkUpdateTask
-} from "../../tasks/budget/actuals";
+import { getActualsTask, handleRemovalTask, handleUpdateTask, handleBulkUpdateTask } from "./tasks/actuals";
 
 function* watchForRequestActualsSaga(): SagaIterator {
   let lastTasks;
@@ -20,15 +17,15 @@ function* watchForRequestActualsSaga(): SagaIterator {
 }
 
 function* watchForBulkUpdateActualsSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.BulkUpdateActuals, handleActualsBulkUpdateTask);
+  yield takeEvery(ActionType.Budget.BulkUpdateActuals, handleBulkUpdateTask);
 }
 
 function* watchForRemoveActualSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Actuals.Remove, handleActualRemovalTask);
+  yield takeWithCancellableById<number>(ActionType.Budget.Actuals.Delete, handleRemovalTask, (p: number) => p);
 }
 
 function* watchForActualUpdateSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Actuals.Update, handleActualUpdateTask);
+  yield takeEvery(ActionType.Budget.Actuals.Update, handleUpdateTask);
 }
 
 export default function* rootSaga(): SagaIterator {

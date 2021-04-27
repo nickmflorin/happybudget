@@ -68,20 +68,15 @@ const rootReducer: Reducer<Redux.Budget.Store, Redux.Action<any>> = (
     if (
       action.type === ActionType.Budget.SubAccount.SubAccounts.UpdateInState ||
       action.type === ActionType.Budget.SubAccount.SubAccounts.RemoveFromState ||
-      action.type === ActionType.Budget.SubAccount.SubAccounts.AddToState ||
-      action.type === ActionType.Budget.SubAccount.SubAccounts.Placeholders.UpdateInState
+      action.type === ActionType.Budget.SubAccount.SubAccounts.AddToState
     ) {
-      // Update the overall SubAccount based on the underlying SubAccount(s) present and any potential
-      // placeholders present.
+      // Update the overall SubAccount based on the underlying SubAccount(s) present.
       const subAccounts: Model.BudgetSubAccount[] = newState.subaccount.subaccounts.data;
-      const placeholders: Table.BudgetSubAccountRow[] = newState.subaccount.subaccounts.placeholders;
       // Right now, the backend is configured such that the Actual value for the overall SubAccount is
       // determined from the Actual values tied to that SubAccount, not the underlying SubAccount(s).
       // If that logic changes in the backend, we need to also make that adjustment here.
       let payload: Partial<Model.BudgetSubAccount> = {
-        estimated:
-          reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0) +
-          reduce(placeholders, (sum: number, s: Table.BudgetSubAccountRow) => sum + (s.estimated || 0), 0)
+        estimated: reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0)
       };
       if (!isNil(newState.subaccount.detail.data)) {
         if (!isNil(newState.subaccount.detail.data.actual) && !isNil(payload.estimated)) {
@@ -103,22 +98,15 @@ const rootReducer: Reducer<Redux.Budget.Store, Redux.Action<any>> = (
     } else if (
       action.type === ActionType.Budget.Account.SubAccounts.UpdateInState ||
       action.type === ActionType.Budget.Account.SubAccounts.RemoveFromState ||
-      action.type === ActionType.Budget.Account.SubAccounts.AddToState ||
-      action.type === ActionType.Budget.Account.SubAccounts.Placeholders.UpdateInState
+      action.type === ActionType.Budget.Account.SubAccounts.AddToState
     ) {
-      // Update the overall Account based on the underlying SubAccount(s) present and any potential
-      // placeholders present.
+      // Update the overall Account based on the underlying SubAccount(s) present.
       const subAccounts: Model.BudgetSubAccount[] = newState.account.subaccounts.data;
-      const placeholders: Table.BudgetSubAccountRow[] = newState.account.subaccounts.placeholders;
       // Right now, the backend is configured such that the Actual value for the overall Account is
       // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
       // in the backend, we need to also make that adjustment here.
-      const actual =
-        reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.actual || 0), 0) +
-        reduce(placeholders, (sum: number, s: Table.BudgetSubAccountRow) => sum + (s.actual || 0), 0);
-      const estimated =
-        reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0) +
-        reduce(placeholders, (sum: number, s: Table.BudgetSubAccountRow) => sum + (s.estimated || 0), 0);
+      const actual = reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.actual || 0), 0);
+      const estimated = reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0);
       if (!isNil(newState.account.detail.data)) {
         newState = {
           ...newState,

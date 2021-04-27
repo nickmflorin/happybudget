@@ -10,14 +10,12 @@ export const responseSubAccountAction = simpleAction<Model.TemplateSubAccount | 
 export const bulkUpdateSubAccountAction = simpleAction<Table.RowChange<Table.TemplateSubAccountRow>[]>(
   ActionType.Template.SubAccount.BulkUpdate
 );
+export const bulkCreateSubAccountsAction = simpleAction<number>(ActionType.Template.SubAccount.BulkCreate);
 
-/*
-  Actions Pertaining to Account Sub Accounts
-*/
 export const updateSubAccountAction = simpleAction<Table.RowChange<Table.TemplateSubAccountRow>>(
   ActionType.Template.SubAccount.SubAccounts.Update
 );
-export const removeSubAccountAction = simpleAction<number>(ActionType.Template.SubAccount.SubAccounts.Remove);
+export const removeSubAccountAction = simpleAction<number>(ActionType.Template.SubAccount.SubAccounts.Delete);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Template.SubAccount.SubAccounts.Deleting
 );
@@ -38,24 +36,14 @@ export const selectSubAccountAction = simpleAction<number>(ActionType.Template.S
 export const deselectSubAccountAction = simpleAction<number>(ActionType.Template.SubAccount.SubAccounts.Deselect);
 export const selectAllSubAccountsAction = simpleAction<null>(ActionType.Template.SubAccount.SubAccounts.SelectAll);
 
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.TemplateSubAccount>>(
-  ActionType.Template.SubAccount.SubAccounts.Placeholders.Activate
-);
-export const removePlaceholderFromStateAction = simpleAction<number>(
-  ActionType.Template.SubAccount.SubAccounts.Placeholders.RemoveFromState
-);
-export const addPlaceholdersToStateAction = simpleAction<number>(
-  ActionType.Template.SubAccount.SubAccounts.Placeholders.AddToState
-);
-export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.TemplateSubAccountRow>>(
-  ActionType.Template.SubAccount.SubAccounts.Placeholders.UpdateInState
-);
-
 export const updateSubAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.TemplateSubAccount>>(
   ActionType.Template.SubAccount.SubAccounts.UpdateInState
 );
 export const removeSubAccountFromStateAction = simpleAction<number>(
   ActionType.Template.SubAccount.SubAccounts.RemoveFromState
+);
+export const addSubAccountToStateAction = simpleAction<Model.TemplateSubAccount>(
+  ActionType.Template.SubAccount.SubAccounts.AddToState
 );
 
 // Errors Functionality Needs to be Built Back In
@@ -63,9 +51,6 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
   ActionType.Template.SubAccount.SubAccounts.AddErrors
 );
 
-/*
-  Actions Pertaining to Account Sub Accounts Groups
-*/
 export const requestGroupsAction = simpleAction<null>(ActionType.Template.SubAccount.SubAccounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Template.SubAccount.SubAccounts.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.TemplateGroup>>(

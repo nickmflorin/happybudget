@@ -11,7 +11,7 @@ import {
   responseFringesAction,
   addFringesPlaceholdersToStateAction,
   clearFringesPlaceholdersToStateAction
-} from "../../actions/template";
+} from "../../../actions/template";
 
 export function* handleTemplateChangedTask(action: Redux.Action<number>): SagaIterator {
   yield all([call(getTemplateTask), call(getFringesTask)]);
@@ -22,14 +22,15 @@ export function* getTemplateTask(): SagaIterator {
   if (!isNil(templateId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-
     yield put(loadingTemplateAction(true));
     try {
       const response: Model.Template = yield call(getTemplate, templateId, { cancelToken: source.token });
       yield put(responseTemplateAction(response));
     } catch (e) {
-      handleRequestError(e, "There was an error retrieving the template.");
-      yield put(responseTemplateAction(undefined, { error: e }));
+      if (!(yield cancelled())) {
+        handleRequestError(e, "There was an error retrieving the template.");
+        yield put(responseTemplateAction(undefined, { error: e }));
+      }
     } finally {
       yield put(loadingTemplateAction(false));
       if (yield cancelled()) {
@@ -44,7 +45,6 @@ export function* getFringesTask(): SagaIterator {
   if (!isNil(templateId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-
     yield put(clearFringesPlaceholdersToStateAction(null));
     yield put(loadingFringesAction(true));
     try {
@@ -59,8 +59,10 @@ export function* getFringesTask(): SagaIterator {
         yield put(addFringesPlaceholdersToStateAction(2));
       }
     } catch (e) {
-      handleRequestError(e, "There was an error retrieving the template's fringes.");
-      yield put(responseFringesAction({ count: 0, data: [] }, { error: e }));
+      if (!(yield cancelled())) {
+        handleRequestError(e, "There was an error retrieving the template's fringes.");
+        yield put(responseFringesAction({ count: 0, data: [] }, { error: e }));
+      }
     } finally {
       yield put(loadingFringesAction(false));
       if (yield cancelled()) {

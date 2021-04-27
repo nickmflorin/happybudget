@@ -10,7 +10,6 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import BudgetSubAccountsTable from "../SubAccountsTable";
 import { selectBudgetId } from "../../../store/selectors";
 import {
-  addPlaceholdersToStateAction,
   deselectSubAccountAction,
   removeSubAccountAction,
   selectSubAccountAction,
@@ -21,7 +20,8 @@ import {
   addGroupToStateAction,
   removeSubAccountFromGroupAction,
   bulkUpdateAccountAction,
-  updateGroupInStateAction
+  updateGroupInStateAction,
+  bulkCreateSubAccountsAction
 } from "../../../store/actions/budget/account";
 
 const selectGroups = simpleDeepEqualSelector(
@@ -33,9 +33,6 @@ const selectSelectedRows = simpleDeepEqualSelector(
 const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.account.subaccounts.data);
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budget.account.subaccounts.search
-);
-const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.placeholders
 );
 const selectSaving = createSelector(
   (state: Redux.ApplicationStore) => state.budget.account.subaccounts.deleting,
@@ -66,7 +63,6 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
 
   const budgetId = useSelector(selectBudgetId);
   const data = useSelector(selectData);
-  const placeholders = useSelector(selectPlaceholders);
   const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
@@ -79,7 +75,6 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
       <BudgetSubAccountsTable
         data={data}
         groups={groups}
-        placeholders={placeholders}
         selected={selected}
         renderFlag={readyToRender}
         tableFooterIdentifierValue={
@@ -91,7 +86,7 @@ const AccountBudgetTable = ({ accountId }: AccountBudgetTableProps): JSX.Element
         onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
         cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
-        onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
+        onRowAdd={() => dispatch(bulkCreateSubAccountsAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: Table.BudgetSubAccountRow) => dispatch(removeSubAccountAction(row.id))}

@@ -1,17 +1,22 @@
+import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { call, put, select, fork } from "redux-saga/effects";
+import { call, put, select, fork, cancelled } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
+
 import { handleRequestError } from "api";
-import { FringeRowManager } from "lib/tabling/managers";
-import { mergeRowChanges } from "lib/tabling/util";
 import {
   deleteFringe,
   updateFringe,
-  createTemplateFringe,
-  bulkUpdateTemplateFringes,
-  bulkCreateTemplateFringes
+  createBudgetFringe,
+  bulkUpdateBudgetFringes,
+  bulkCreateBudgetFringes
 } from "api/services";
+
+import { warnInconsistentState } from "lib/redux/util";
+import { FringeRowManager } from "lib/tabling/managers";
+import { mergeRowChanges } from "lib/tabling/util";
 import { handleTableErrors } from "store/tasks";
+
 import {
   activatePlaceholderAction,
   deletingFringeAction,
@@ -22,50 +27,79 @@ import {
   updatePlaceholderInStateAction,
   addErrorsToStateAction,
   updateFringeInStateAction
-} from "../../actions/template/fringes";
+} from "../../../actions/budget/fringes";
 
-export function* deleteFringeTask(id: number): SagaIterator {
+export function* deleteTask(id: number): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
   yield put(deletingFringeAction({ id, value: true }));
   try {
-    yield call(deleteFringe, id);
+    yield call(deleteFringe, id, { cancelToken: source.token });
   } catch (e) {
-    handleRequestError(e, "There was an error deleting the fringe.");
+    if (!(yield cancelled())) {
+      handleRequestError(e, "There was an error deleting the fringe.");
+    }
   } finally {
     yield put(deletingFringeAction({ id, value: false }));
-  }
-}
-
-export function* updateFringeTask(id: number, change: Table.RowChange<Table.FringeRow>): SagaIterator {
-  yield put(updatingFringeAction({ id, value: true }));
-  try {
-    yield call(updateFringe, id, FringeRowManager.payload(change));
-  } catch (e) {
-    yield call(handleTableErrors, e, "There was an error updating the fringe.", id, (errors: Table.CellError[]) =>
-      addErrorsToStateAction(errors)
-    );
-  } finally {
-    yield put(updatingFringeAction({ id, value: false }));
-  }
-}
-
-export function* createFringeTask(row: Table.FringeRow): SagaIterator {
-  const templateId = yield select((state: Redux.ApplicationStore) => state.template.template.id);
-  if (!isNil(templateId)) {
-    yield put(creatingFringeAction(true));
-    try {
-      const response: Model.Fringe = yield call(createTemplateFringe, templateId, FringeRowManager.payload(row));
-      yield put(activatePlaceholderAction({ id: row.id, model: response }));
-    } catch (e) {
-      yield call(handleTableErrors, e, "There was an error updating the fringe.", row.id, (errors: Table.CellError[]) =>
-        addErrorsToStateAction(errors)
-      );
-    } finally {
-      yield put(creatingFringeAction(false));
+    if (yield cancelled()) {
+      source.cancel();
     }
   }
 }
 
-export function* bulkUpdateFringesTask(id: number, changes: Table.RowChange<Table.FringeRow>[]): SagaIterator {
+export function* updateTask(id: number, change: Table.RowChange<Table.FringeRow>): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
+  yield put(updatingFringeAction({ id, value: true }));
+  try {
+    yield call(updateFringe, id, FringeRowManager.payload(change), { cancelToken: source.token });
+  } catch (e) {
+    if (!(yield cancelled())) {
+      yield call(handleTableErrors, e, "There was an error updating the fringe.", id, (errors: Table.CellError[]) =>
+        addErrorsToStateAction(errors)
+      );
+    }
+  } finally {
+    yield put(updatingFringeAction({ id, value: false }));
+    if (yield cancelled()) {
+      source.cancel();
+    }
+  }
+}
+
+export function* createTask(row: Table.FringeRow): SagaIterator {
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId)) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    yield put(creatingFringeAction(true));
+    try {
+      const response: Model.Fringe = yield call(createBudgetFringe, budgetId, FringeRowManager.payload(row), {
+        cancelToken: source.token
+      });
+      yield put(activatePlaceholderAction({ id: row.id, model: response }));
+    } catch (e) {
+      if (!(yield cancelled())) {
+        yield call(
+          handleTableErrors,
+          e,
+          "There was an error updating the fringe.",
+          row.id,
+          (errors: Table.CellError[]) => addErrorsToStateAction(errors)
+        );
+      }
+    } finally {
+      yield put(creatingFringeAction(false));
+      if (yield cancelled()) {
+        source.cancel();
+      }
+    }
+  }
+}
+
+export function* bulkUpdateTask(id: number, changes: Table.RowChange<Table.FringeRow>[]): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
   const requestPayload: Http.BulkUpdatePayload<Http.FringePayload>[] = map(
     changes,
     (change: Table.RowChange<Table.FringeRow>) => ({
@@ -77,25 +111,34 @@ export function* bulkUpdateFringesTask(id: number, changes: Table.RowChange<Tabl
     yield put(updatingFringeAction({ id: changes[i].id, value: true }));
   }
   try {
-    yield call(bulkUpdateTemplateFringes, id, requestPayload);
+    yield call(bulkUpdateBudgetFringes, id, requestPayload, { cancelToken: source.token });
   } catch (e) {
     // Once we rebuild back in the error handling, we will have to be concerned here with the nested
     // structure of the errors.
-    yield call(handleTableErrors, e, "There was an error updating the fringes.", id, (errors: Table.CellError[]) =>
-      addErrorsToStateAction(errors)
-    );
+    if (!(yield cancelled())) {
+      yield call(handleTableErrors, e, "There was an error updating the fringes.", id, (errors: Table.CellError[]) =>
+        addErrorsToStateAction(errors)
+      );
+    }
   } finally {
     for (let i = 0; i++; i < changes.length) {
       yield put(updatingFringeAction({ id: changes[i].id, value: false }));
     }
+    if (yield cancelled()) {
+      source.cancel();
+    }
   }
 }
 
-export function* bulkCreateFringesTask(id: number, rows: Table.FringeRow[]): SagaIterator {
+export function* bulkCreateTask(id: number, rows: Table.FringeRow[]): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
   const requestPayload: Http.FringePayload[] = map(rows, (row: Table.FringeRow) => FringeRowManager.payload(row));
   yield put(creatingFringeAction(true));
   try {
-    const fringes: Model.Fringe[] = yield call(bulkCreateTemplateFringes, id, requestPayload);
+    const fringes: Model.Fringe[] = yield call(bulkCreateBudgetFringes, id, requestPayload, {
+      cancelToken: source.token
+    });
     for (let i = 0; i < fringes.length; i++) {
       // It is not ideal that we have to do this, but we have no other way to map a placeholder
       // to the returned Fringe when bulk creating.  We can rely on the name field being
@@ -114,52 +157,57 @@ export function* bulkCreateFringesTask(id: number, rows: Table.FringeRow[]): Sag
   } catch (e) {
     // Once we rebuild back in the error handling, we will have to be concerned here with the nested
     // structure of the errors.
-    yield call(handleTableErrors, e, "There was an error updating the fringes.", id, (errors: Table.CellError[]) =>
-      addErrorsToStateAction(errors)
-    );
+    if (!(yield cancelled())) {
+      yield call(handleTableErrors, e, "There was an error updating the fringes.", id, (errors: Table.CellError[]) =>
+        addErrorsToStateAction(errors)
+      );
+    }
   } finally {
     yield put(creatingFringeAction(false));
+    if (yield cancelled()) {
+      source.cancel();
+    }
   }
 }
 
-export function* handleFringeRemovalTask(action: Redux.Action<number>): SagaIterator {
+export function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    const models: Model.Fringe[] = yield select((state: Redux.ApplicationStore) => state.template.fringes.data);
+    const models: Model.Fringe[] = yield select((state: Redux.ApplicationStore) => state.budget.fringes.data);
     const model: Model.Fringe | undefined = find(models, { id: action.payload });
     if (isNil(model)) {
-      const placeholders = yield select((state: Redux.ApplicationStore) => state.template.fringes.placeholders);
+      const placeholders = yield select((state: Redux.ApplicationStore) => state.budget.fringes.placeholders);
       const placeholder: Table.FringeRow | undefined = find(placeholders, { id: action.payload });
       if (isNil(placeholder)) {
-        /* eslint-disable no-console */
-        console.warn(
-          `Inconsistent State!  Inconsistent state noticed when removing fringe...
-          The fringe with ID ${action.payload} does not exist in state when it is expected to.`
-        );
+        warnInconsistentState({
+          action: action.type,
+          reason: "Fringe does not exist in state when it is expected to.",
+          id: action.payload
+        });
       } else {
         yield put(removePlaceholderFromStateAction(placeholder.id));
       }
     } else {
       yield put(removeFringeFromStateAction(model.id));
-      yield call(deleteFringeTask, model.id);
+      yield call(deleteTask, model.id);
     }
   }
 }
 
-export function* handleFringeUpdateTask(action: Redux.Action<Table.RowChange<Table.FringeRow>>): SagaIterator {
-  const templateId = yield select((state: Redux.ApplicationStore) => state.template.template.id);
-  if (!isNil(templateId) && !isNil(action.payload)) {
+export function* handleUpdateTask(action: Redux.Action<Table.RowChange<Table.FringeRow>>): SagaIterator {
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId) && !isNil(action.payload)) {
     const id = action.payload.id;
-    const data: Model.Fringe[] = yield select((state: Redux.ApplicationStore) => state.template.fringes.data);
+    const data: Model.Fringe[] = yield select((state: Redux.ApplicationStore) => state.budget.fringes.data);
     const model: Model.Fringe | undefined = find(data, { id });
     if (isNil(model)) {
-      const placeholders = yield select((state: Redux.ApplicationStore) => state.template.fringes.placeholders);
+      const placeholders = yield select((state: Redux.ApplicationStore) => state.budget.fringes.placeholders);
       const placeholder: Table.FringeRow | undefined = find(placeholders, { id });
       if (isNil(placeholder)) {
-        /* eslint-disable no-console */
-        console.error(
-          `Inconsistent State!:  Inconsistent state noticed when updating fringe in state...
-          the fringe with ID ${action.payload.id} does not exist in state when it is expected to.`
-        );
+        warnInconsistentState({
+          action: action.type,
+          reason: "Fringe does not exist in state when it is expected to.",
+          id: action.payload
+        });
       } else {
         const updatedRow = FringeRowManager.mergeChangesWithRow(placeholder, action.payload);
         yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
@@ -168,20 +216,20 @@ export function* handleFringeUpdateTask(action: Redux.Action<Table.RowChange<Tab
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
         if (FringeRowManager.rowHasRequiredFields(updatedRow)) {
-          yield call(createFringeTask, updatedRow);
+          yield call(createTask, updatedRow);
         }
       }
     } else {
       const updatedModel = FringeRowManager.mergeChangesWithModel(model, action.payload);
       yield put(updateFringeInStateAction({ id: updatedModel.id, data: updatedModel }));
-      yield call(updateFringeTask, model.id, action.payload);
+      yield call(updateTask, model.id, action.payload);
     }
   }
 }
 
-export function* handleFringesBulkUpdateTask(action: Redux.Action<Table.RowChange<Table.FringeRow>[]>): SagaIterator {
-  const templateId = yield select((state: Redux.ApplicationStore) => state.template.template.id);
-  if (!isNil(templateId) && !isNil(action.payload)) {
+export function* handleBulkUpdateTask(action: Redux.Action<Table.RowChange<Table.FringeRow>[]>): SagaIterator {
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  if (!isNil(budgetId) && !isNil(action.payload)) {
     const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange<Table.FringeRow>[] };
     const merged: Table.RowChange<Table.FringeRow>[] = map(
       grouped,
@@ -190,8 +238,8 @@ export function* handleFringesBulkUpdateTask(action: Redux.Action<Table.RowChang
       }
     );
 
-    const data = yield select((state: Redux.ApplicationStore) => state.template.fringes.data);
-    const placeholders = yield select((state: Redux.ApplicationStore) => state.template.fringes.placeholders);
+    const data = yield select((state: Redux.ApplicationStore) => state.budget.fringes.data);
+    const placeholders = yield select((state: Redux.ApplicationStore) => state.budget.fringes.placeholders);
 
     const mergedUpdates: Table.RowChange<Table.FringeRow>[] = [];
     const placeholdersToCreate: Table.FringeRow[] = [];
@@ -201,11 +249,11 @@ export function* handleFringesBulkUpdateTask(action: Redux.Action<Table.RowChang
       if (isNil(model)) {
         const placeholder: Table.FringeRow | undefined = find(placeholders, { id: merged[i].id });
         if (isNil(placeholder)) {
-          /* eslint-disable no-console */
-          console.error(
-            `Inconsistent State!:  Inconsistent state noticed when updating fringe in state...
-            the fringe with ID ${merged[i].id} does not exist in state when it is expected to.`
-          );
+          warnInconsistentState({
+            action: action.type,
+            reason: "Fringe does not exist in state when it is expected to.",
+            id: action.payload
+          });
         } else {
           const updatedRow = FringeRowManager.mergeChangesWithRow(placeholder, merged[i]);
           yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
@@ -220,10 +268,10 @@ export function* handleFringesBulkUpdateTask(action: Redux.Action<Table.RowChang
       }
     }
     if (mergedUpdates.length !== 0) {
-      yield fork(bulkUpdateFringesTask, templateId, mergedUpdates);
+      yield fork(bulkUpdateTask, budgetId, mergedUpdates);
     }
     if (placeholdersToCreate.length !== 0) {
-      yield fork(bulkCreateFringesTask, templateId, placeholdersToCreate);
+      yield fork(bulkCreateTask, budgetId, placeholdersToCreate);
     }
   }
 }

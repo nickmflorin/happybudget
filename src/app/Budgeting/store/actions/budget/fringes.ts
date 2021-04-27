@@ -6,7 +6,7 @@ export const bulkUpdateBudgetFringesAction = simpleAction<Table.RowChange<Table.
 );
 
 export const updateFringeAction = simpleAction<Table.RowChange<Table.FringeRow>>(ActionType.Budget.Fringes.Update);
-export const removeFringeAction = simpleAction<number>(ActionType.Budget.Fringes.Remove);
+export const removeFringeAction = simpleAction<number>(ActionType.Budget.Fringes.Delete);
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Fringes.Deleting);
 export const updatingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Fringes.Updating);
 export const creatingFringeAction = simpleAction<boolean>(ActionType.Budget.Fringes.Creating);

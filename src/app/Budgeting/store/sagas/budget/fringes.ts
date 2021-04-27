@@ -1,22 +1,20 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, takeEvery } from "redux-saga/effects";
+
+import { takeWithCancellableById } from "lib/redux/sagas";
 import { ActionType } from "../../actions";
-import {
-  handleFringeRemovalTask,
-  handleFringeUpdateTask,
-  handleFringesBulkUpdateTask
-} from "../../tasks/budget/fringes";
+import { handleRemovalTask, handleUpdateTask, handleBulkUpdateTask } from "./tasks/fringes";
 
 function* watchForRemoveFringeSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Fringes.Remove, handleFringeRemovalTask);
+  yield takeWithCancellableById<number>(ActionType.Budget.Fringes.Delete, handleRemovalTask, (p: number) => p);
 }
 
 function* watchForUpdateFringeSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Fringes.Update, handleFringeUpdateTask);
+  yield takeEvery(ActionType.Budget.Fringes.Update, handleUpdateTask);
 }
 
 function* watchForBulkUpdateFringesSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.BulkUpdateFringes, handleFringesBulkUpdateTask);
+  yield takeEvery(ActionType.Budget.BulkUpdateFringes, handleBulkUpdateTask);
 }
 
 export default function* rootSaga(): SagaIterator {

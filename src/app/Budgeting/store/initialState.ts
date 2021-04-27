@@ -10,14 +10,12 @@ export const initialFringesState: Redux.Budget.FringesStore | Redux.Template.Fri
 };
 
 export const initialBudgetAccountsState: Redux.Budget.AccountsStore = {
-  placeholders: [],
   history: initialListResponseState,
   groups: initialListResponseState,
   ...initialListResponseState
 };
 
 export const initialTemplateAccountsState: Redux.Template.AccountsStore = {
-  placeholders: [],
   groups: initialListResponseState,
   ...initialListResponseState
 };
@@ -34,7 +32,6 @@ export const initialTemplateTemplateState: Redux.Template.TemplateStore = {
 };
 
 export const initialBudgetSubAccountsState: Redux.Budget.SubAccountsStore = {
-  placeholders: [],
   history: initialListResponseState,
   groups: initialListResponseState,
   fringes: initialFringesState,
@@ -42,7 +39,6 @@ export const initialBudgetSubAccountsState: Redux.Budget.SubAccountsStore = {
 };
 
 export const initialTemplateSubAccountsState: Redux.Template.SubAccountsStore = {
-  placeholders: [],
   groups: initialListResponseState,
   fringes: initialFringesState,
   ...initialListResponseState
@@ -96,8 +92,8 @@ export const initialTemplateState: Redux.Template.Store = {
   template: initialTemplateTemplateState,
   instance: null,
   fringes: initialFringesState,
-  account: initialBudgetAccountState,
-  subaccount: initialBudgetSubAccountState,
+  account: initialTemplateAccountState,
+  subaccount: initialTemplateSubAccountState,
   accounts: initialTemplateAccountsState
 };
 

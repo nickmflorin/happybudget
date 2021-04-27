@@ -1,52 +1,19 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel, takeEvery, fork } from "redux-saga/effects";
-import { isNil } from "lodash";
+import { take, call, cancel } from "redux-saga/effects";
 import { ActionType } from "../../actions";
+import { createStandardSaga } from "../factories";
 import {
   getAccountTask,
   getSubAccountsTask,
-  handleSubAccountUpdateTask,
-  handleSubAccountRemovalTask,
+  handleUpdateTask,
+  handleRemovalTask,
   handleAccountChangedTask,
-  deleteSubAccountGroupTask,
-  removeSubAccountFromGroupTask,
+  deleteGroupTask,
+  removeFromGroupTask,
+  bulkCreateTask,
   getGroupsTask,
-  handleAccountBulkUpdateTask
-} from "../../tasks/template/account";
-
-function* watchForRequestSubAccountsSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Template.Account.SubAccounts.Request);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(getSubAccountsTask, action);
-  }
-}
-
-function* watchForRequestGroupsSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Template.Account.SubAccounts.Groups.Request);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(getGroupsTask, action);
-  }
-}
-
-function* watchForBulkUpdateAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.Template.Account.BulkUpdate, handleAccountBulkUpdateTask);
-}
-
-function* watchForRemoveSubAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.Template.Account.SubAccounts.Remove, handleSubAccountRemovalTask);
-}
-
-function* watchForUpdateSubAccountSaga(): SagaIterator {
-  yield takeEvery(ActionType.Template.Account.SubAccounts.Update, handleSubAccountUpdateTask);
-}
+  handleBulkUpdateTask
+} from "./tasks/account";
 
 function* watchForRequestAccountSaga(): SagaIterator {
   let lastTasks;
@@ -70,52 +37,26 @@ function* watchForAccountIdChangedSaga(): SagaIterator {
   }
 }
 
-function* watchForDeleteGroupSaga(): SagaIterator {
-  let lastTasks: { [key: number]: any[] } = {};
-  while (true) {
-    const action: Redux.Action<number> = yield take(ActionType.Template.Account.SubAccounts.Groups.Delete);
-    if (!isNil(action.payload)) {
-      if (isNil(lastTasks[action.payload])) {
-        lastTasks[action.payload] = [];
-      }
-      if (lastTasks[action.payload].length !== 0) {
-        const cancellable = lastTasks[action.payload];
-        lastTasks = { ...lastTasks, [action.payload]: [] };
-        yield cancel(cancellable);
-      }
-      const task = yield fork(deleteSubAccountGroupTask, action);
-      lastTasks[action.payload].push(task);
+export default createStandardSaga(
+  {
+    Request: {
+      actionType: ActionType.Template.Account.SubAccounts.Request,
+      task: getSubAccountsTask
+    },
+    RequestGroups: {
+      actionType: ActionType.Template.Account.SubAccounts.Groups.Request,
+      task: getGroupsTask
+    },
+    BulkUpdate: { actionType: ActionType.Template.Account.BulkUpdate, task: handleBulkUpdateTask },
+    BulkCreate: { actionType: ActionType.Template.Account.BulkCreate, task: bulkCreateTask },
+    Delete: { actionType: ActionType.Template.Account.SubAccounts.Delete, task: handleRemovalTask },
+    Update: { actionType: ActionType.Template.Account.SubAccounts.Update, task: handleUpdateTask },
+    DeleteGroup: { actionType: ActionType.Template.Account.SubAccounts.Groups.Delete, task: deleteGroupTask },
+    RemoveModelFromGroup: {
+      actionType: ActionType.Template.Account.SubAccounts.RemoveFromGroup,
+      task: removeFromGroupTask
     }
-  }
-}
-
-function* watchForRemoveSubAccountFromGroupSaga(): SagaIterator {
-  let lastTasks: { [key: number]: any[] } = {};
-  while (true) {
-    const action: Redux.Action<number> = yield take(ActionType.Template.Account.SubAccounts.RemoveFromGroup);
-    if (!isNil(action.payload)) {
-      if (isNil(lastTasks[action.payload])) {
-        lastTasks[action.payload] = [];
-      }
-      if (lastTasks[action.payload].length !== 0) {
-        const cancellable = lastTasks[action.payload];
-        lastTasks = { ...lastTasks, [action.payload]: [] };
-        yield cancel(cancellable);
-      }
-      const task = yield fork(removeSubAccountFromGroupTask, action);
-      lastTasks[action.payload].push(task);
-    }
-  }
-}
-
-export default function* accountSaga(): SagaIterator {
-  yield spawn(watchForAccountIdChangedSaga);
-  yield spawn(watchForBulkUpdateAccountSaga);
-  yield spawn(watchForRequestAccountSaga);
-  yield spawn(watchForRequestSubAccountsSaga);
-  yield spawn(watchForRemoveSubAccountSaga);
-  yield spawn(watchForUpdateSubAccountSaga);
-  yield spawn(watchForDeleteGroupSaga);
-  yield spawn(watchForRemoveSubAccountFromGroupSaga);
-  yield spawn(watchForRequestGroupsSaga);
-}
+  },
+  watchForRequestAccountSaga,
+  watchForAccountIdChangedSaga
+);

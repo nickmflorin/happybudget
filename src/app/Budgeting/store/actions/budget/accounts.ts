@@ -2,12 +2,10 @@ import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
 export const bulkUpdateBudgetAccountsAction = simpleAction<Table.RowChange<Table.BudgetAccountRow>[]>(
-  ActionType.Budget.BulkUpdateAccounts
+  ActionType.Budget.BulkUpdate
 );
+export const bulkCreateAccountsAction = simpleAction<number>(ActionType.Budget.BulkCreate);
 
-/*
-  Actions Pertaining to Budget Comments
-*/
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.Comments.Request);
 export const responseCommentsAction = simpleAction<Http.ListResponse<Model.Comment>>(
   ActionType.Budget.Comments.Response
@@ -32,13 +30,10 @@ export const updateCommentInStateAction = simpleAction<
   Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
 >(ActionType.Budget.Comments.UpdateInState);
 
-/*
-  Actions Pertaining to Budget Accounts
-*/
 export const updateAccountAction = simpleAction<Table.RowChange<Table.BudgetAccountRow>>(
   ActionType.Budget.Accounts.Update
 );
-export const removeAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Remove);
+export const removeAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Delete);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Budget.Accounts.Creating);
@@ -53,22 +48,10 @@ export const selectAccountAction = simpleAction<number>(ActionType.Budget.Accoun
 export const deselectAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Deselect);
 export const selectAllAccountsAction = simpleAction<null>(ActionType.Budget.Accounts.SelectAll);
 
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.BudgetAccount>>(
-  ActionType.Budget.Accounts.Placeholders.Activate
-);
-export const removePlaceholderFromStateAction = simpleAction<number>(
-  ActionType.Budget.Accounts.Placeholders.RemoveFromState
-);
-export const addPlaceholdersToStateAction = simpleAction<number>(ActionType.Budget.Accounts.Placeholders.AddToState);
-export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.BudgetSubAccountRow>>(
-  ActionType.Budget.Accounts.Placeholders.UpdateInState
-);
-
 export const updateAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetAccount>>(
   ActionType.Budget.Accounts.UpdateInState
 );
 export const removeAccountFromStateAction = simpleAction<number>(ActionType.Budget.Accounts.RemoveFromState);
-// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const addAccountToStateAction = simpleAction<Model.BudgetAccount>(ActionType.Budget.Accounts.AddToState);
 
 // Errors Functionality Needs to be Built Back In
@@ -76,9 +59,6 @@ export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellE
   ActionType.Budget.Accounts.AddErrors
 );
 
-/*
-  Actiosn Pertaining to Account Sub Accounts Groups
-*/
 export const requestGroupsAction = simpleAction<null>(ActionType.Budget.Accounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.Accounts.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.BudgetGroup>>(
@@ -94,9 +74,6 @@ export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(
 );
 export const deleteGroupAction = simpleAction<number>(ActionType.Budget.Accounts.Groups.Delete);
 
-/*
-  Actions Pertaining to Budget Accounts History
-*/
 export const requestAccountsHistoryAction = simpleAction<null>(ActionType.Budget.Accounts.History.Request);
 export const loadingAccountsHistoryAction = simpleAction<boolean>(ActionType.Budget.Accounts.History.Loading);
 export const responseAccountsHistoryAction = simpleAction<Http.ListResponse<Model.HistoryEvent>>(

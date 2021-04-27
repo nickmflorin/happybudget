@@ -1,17 +1,15 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
-export const bulkUpdateTemplateAccountsAction = simpleAction<Table.RowChange<Table.TemplateAccountRow>[]>(
-  ActionType.Template.BulkUpdateAccounts
+export const bulkUpdateAccountsAction = simpleAction<Table.RowChange<Table.TemplateAccountRow>[]>(
+  ActionType.Template.BulkUpdate
 );
+export const bulkCreateAccountsAction = simpleAction<number>(ActionType.Template.BulkCreate);
 
-/*
-  Actions Pertaining to Budget Accounts
-*/
 export const updateAccountAction = simpleAction<Table.RowChange<Table.TemplateAccountRow>>(
   ActionType.Template.Accounts.Update
 );
-export const removeAccountAction = simpleAction<number>(ActionType.Template.Accounts.Remove);
+export const removeAccountAction = simpleAction<number>(ActionType.Template.Accounts.Delete);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Template.Accounts.Creating);
@@ -26,32 +24,16 @@ export const selectAccountAction = simpleAction<number>(ActionType.Template.Acco
 export const deselectAccountAction = simpleAction<number>(ActionType.Template.Accounts.Deselect);
 export const selectAllAccountsAction = simpleAction<null>(ActionType.Template.Accounts.SelectAll);
 
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.TemplateAccount>>(
-  ActionType.Template.Accounts.Placeholders.Activate
-);
-export const removePlaceholderFromStateAction = simpleAction<number>(
-  ActionType.Template.Accounts.Placeholders.RemoveFromState
-);
-export const addPlaceholdersToStateAction = simpleAction<number>(ActionType.Template.Accounts.Placeholders.AddToState);
-export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.TemplateAccountRow>>(
-  ActionType.Template.Accounts.Placeholders.UpdateInState
-);
-
 export const updateAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.TemplateAccount>>(
   ActionType.Template.Accounts.UpdateInState
 );
 export const removeAccountFromStateAction = simpleAction<number>(ActionType.Template.Accounts.RemoveFromState);
-// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const addAccountToStateAction = simpleAction<Model.TemplateAccount>(ActionType.Template.Accounts.AddToState);
 
 // Errors Functionality Needs to be Built Back In
 export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.Template.Accounts.AddErrors
 );
-
-/*
-  Actiosn Pertaining to Account Sub Accounts Groups
-*/
 export const requestGroupsAction = simpleAction<null>(ActionType.Template.Accounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Template.Accounts.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.TemplateGroup>>(

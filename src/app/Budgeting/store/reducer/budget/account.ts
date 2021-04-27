@@ -59,12 +59,6 @@ const rootReducer: Reducer<Redux.Budget.AccountStore, Redux.Action<any>> = combi
       UpdateInState: ActionType.Budget.Account.SubAccounts.Groups.UpdateInState,
       AddToState: ActionType.Budget.Account.SubAccounts.Groups.AddToState,
       Deleting: ActionType.Budget.Account.SubAccounts.Groups.Deleting
-    },
-    Placeholders: {
-      AddToState: ActionType.Budget.Account.SubAccounts.Placeholders.AddToState,
-      Activate: ActionType.Budget.Account.SubAccounts.Placeholders.Activate,
-      RemoveFromState: ActionType.Budget.Account.SubAccounts.Placeholders.RemoveFromState,
-      UpdateInState: ActionType.Budget.Account.SubAccounts.Placeholders.UpdateInState
     }
   })
 });

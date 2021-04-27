@@ -2,7 +2,7 @@ import { SagaIterator } from "redux-saga";
 import { spawn, take, cancel, fork } from "redux-saga/effects";
 
 import { ActionType } from "../../actions";
-import { getTemplateTask, handleTemplateChangedTask } from "../../tasks/template";
+import { getTemplateTask, handleTemplateChangedTask } from "./tasks";
 
 import accountSaga from "./account";
 import budgetSaga from "./accounts";

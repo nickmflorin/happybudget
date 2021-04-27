@@ -5,7 +5,7 @@ export const bulkUpdateTemplateFringesAction = simpleAction<Table.RowChange<Tabl
   ActionType.Template.BulkUpdateFringes
 );
 export const updateFringeAction = simpleAction<Table.RowChange<Table.FringeRow>>(ActionType.Template.Fringes.Update);
-export const removeFringeAction = simpleAction<number>(ActionType.Template.Fringes.Remove);
+export const removeFringeAction = simpleAction<number>(ActionType.Template.Fringes.Delete);
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Fringes.Deleting);
 export const updatingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Fringes.Updating);
 export const creatingFringeAction = simpleAction<boolean>(ActionType.Template.Fringes.Creating);

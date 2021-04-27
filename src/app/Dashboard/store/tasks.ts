@@ -39,6 +39,8 @@ import {
 } from "./actions";
 
 export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
   const query = yield select((state: Redux.ApplicationStore) => {
     return {
       search: state.dashboard.budgets.search,
@@ -48,17 +50,24 @@ export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
   });
   yield put(loadingBudgetsAction(true));
   try {
-    const response: Http.ListResponse<Model.Budget> = yield call(getBudgets, query);
+    const response: Http.ListResponse<Model.Budget> = yield call(getBudgets, query, { cancelToken: source.token });
     yield put(responseBudgetsAction(response));
   } catch (e) {
-    handleRequestError(e, "There was an error retrieving the budgets.");
-    yield put(responseBudgetsAction({ count: 0, data: [] }, { error: e }));
+    if (!(yield cancelled())) {
+      handleRequestError(e, "There was an error retrieving the budgets.");
+      yield put(responseBudgetsAction({ count: 0, data: [] }, { error: e }));
+    }
   } finally {
     yield put(loadingBudgetsAction(false));
+    if (yield cancelled()) {
+      source.cancel();
+    }
   }
 }
 
 export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
   const query = yield select((state: Redux.ApplicationStore) => {
     return {
       search: state.dashboard.templates.search,
@@ -68,17 +77,24 @@ export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
   });
   yield put(loadingTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.Template> = yield call(getTemplates, query);
+    const response: Http.ListResponse<Model.Template> = yield call(getTemplates, query, { cancelToken: source.token });
     yield put(responseTemplatesAction(response));
   } catch (e) {
-    handleRequestError(e, "There was an error retrieving the templates.");
-    yield put(responseTemplatesAction({ count: 0, data: [] }, { error: e }));
+    if (!(yield cancelled())) {
+      handleRequestError(e, "There was an error retrieving the templates.");
+      yield put(responseTemplatesAction({ count: 0, data: [] }, { error: e }));
+    }
   } finally {
     yield put(loadingTemplatesAction(false));
+    if (yield cancelled()) {
+      source.cancel();
+    }
   }
 }
 
 export function* getCommunityTemplatesTask(action: Redux.Action<any>): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
   const query = yield select((state: Redux.ApplicationStore) => {
     return {
       search: state.dashboard.community.search,
@@ -88,13 +104,20 @@ export function* getCommunityTemplatesTask(action: Redux.Action<any>): SagaItera
   });
   yield put(loadingCommunityTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.Template> = yield call(getCommunityTemplates, query);
+    const response: Http.ListResponse<Model.Template> = yield call(getCommunityTemplates, query, {
+      cancelToken: source.token
+    });
     yield put(responseCommunityTemplatesAction(response));
   } catch (e) {
-    handleRequestError(e, "There was an error retrieving the community templates.");
-    yield put(responseCommunityTemplatesAction({ count: 0, data: [] }, { error: e }));
+    if (!(yield cancelled())) {
+      handleRequestError(e, "There was an error retrieving the community templates.");
+      yield put(responseCommunityTemplatesAction({ count: 0, data: [] }, { error: e }));
+    }
   } finally {
     yield put(loadingCommunityTemplatesAction(false));
+    if (yield cancelled()) {
+      source.cancel();
+    }
   }
 }
 
@@ -231,6 +254,8 @@ export function* duplicateCommunityTemplateTask(action: Redux.Action<number>): S
 }
 
 export function* getContactsTask(action: Redux.Action<any>): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
   const query: Http.ListQuery = yield select((state: Redux.ApplicationStore) => {
     return {
       page: state.dashboard.contacts.page,
@@ -240,13 +265,18 @@ export function* getContactsTask(action: Redux.Action<any>): SagaIterator {
   });
   yield put(loadingContactsAction(true));
   try {
-    let response: Http.ListResponse<Model.Contact> = yield call(getContacts, query);
+    let response: Http.ListResponse<Model.Contact> = yield call(getContacts, query, { cancelToken: source.token });
     yield put(responseContactsAction(response));
   } catch (e) {
-    handleRequestError(e, "There was an error retrieving the contacts.");
-    yield put(responseContactsAction({ count: 0, data: [] }, { error: e }));
+    if (!(yield cancelled())) {
+      handleRequestError(e, "There was an error retrieving the contacts.");
+      yield put(responseContactsAction({ count: 0, data: [] }, { error: e }));
+    }
   } finally {
     yield put(loadingContactsAction(false));
+    if (yield cancelled()) {
+      source.cancel();
+    }
   }
 }
 

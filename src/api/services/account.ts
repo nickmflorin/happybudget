@@ -38,12 +38,12 @@ export const bulkCreateAccountSubAccounts = async <
   M extends Model.SubAccount = Model.BudgetSubAccount | Model.TemplateSubAccount
 >(
   id: number,
-  data: Http.SubAccountPayload[],
+  payload: Http.BulkCreatePayload<Http.SubAccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<M[]> => {
   const url = URL.v1("accounts", id, "bulk-create-subaccounts");
   return client
-    .patch<Http.BulkCreateResponse<M>>(url, { data }, options)
+    .patch<Http.BulkCreateResponse<M>>(url, payload, options)
     .then((response: Http.BulkCreateResponse<M>) => response.data);
 };
 

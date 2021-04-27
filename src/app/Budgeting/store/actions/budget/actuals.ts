@@ -6,7 +6,7 @@ export const bulkUpdateBudgetActualsAction = simpleAction<Table.RowChange<Table.
 );
 
 export const updateActualAction = simpleAction<Table.RowChange<Table.ActualRow>>(ActionType.Budget.Actuals.Update);
-export const removeActualAction = simpleAction<number>(ActionType.Budget.Actuals.Remove);
+export const removeActualAction = simpleAction<number>(ActionType.Budget.Actuals.Delete);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Actuals.Deleting);
 export const updatingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Actuals.Updating);
 export const creatingActualAction = simpleAction<boolean>(ActionType.Budget.Actuals.Creating);

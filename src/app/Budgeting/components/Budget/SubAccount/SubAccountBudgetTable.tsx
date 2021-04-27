@@ -12,7 +12,6 @@ import { selectBudgetId } from "../../../store/selectors";
 import {
   setSubAccountsSearchAction,
   selectSubAccountAction,
-  addPlaceholdersToStateAction,
   deselectSubAccountAction,
   removeSubAccountAction,
   updateSubAccountAction,
@@ -21,7 +20,8 @@ import {
   addGroupToStateAction,
   removeSubAccountFromGroupAction,
   bulkUpdateSubAccountAction,
-  updateGroupInStateAction
+  updateGroupInStateAction,
+  bulkCreateSubAccountsAction
 } from "../../../store/actions/budget/subAccount";
 
 const selectGroups = simpleDeepEqualSelector(
@@ -35,9 +35,6 @@ const selectSubAccounts = simpleDeepEqualSelector(
 );
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budget.subaccount.subaccounts.search
-);
-const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.subaccount.subaccounts.placeholders
 );
 const selectSaving = createSelector(
   (state: Redux.ApplicationStore) => state.budget.subaccount.subaccounts.deleting,
@@ -68,7 +65,6 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
   const history = useHistory();
   const budgetId = useSelector(selectBudgetId);
   const data = useSelector(selectSubAccounts);
-  const placeholders = useSelector(selectPlaceholders);
   const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
@@ -81,7 +77,6 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
       <SubAccountsTable
         data={data}
         groups={groups}
-        placeholders={placeholders}
         selected={selected}
         renderFlag={readyToRender}
         tableFooterIdentifierValue={
@@ -92,7 +87,7 @@ const SubAccountBudgetTable = ({ subaccountId }: SubAccountBudgetTableProps): JS
         search={search}
         onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
-        onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
+        onRowAdd={() => dispatch(bulkCreateSubAccountsAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: Table.BudgetSubAccountRow) => dispatch(removeSubAccountAction(row.id))}

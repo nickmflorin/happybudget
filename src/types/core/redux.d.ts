@@ -28,6 +28,8 @@ namespace Redux {
     readonly label?: Redux.ModuleLabel | Redux.ModuleLabel[] | undefined;
   }
 
+  type ActionTask<P> = (action: Redux.Action<P>) => SagaIterator;
+
   type ActionCreator<P = any, A extends Redux.Action<P> = Redux.Action<P>> = (
     type: string,
     payload?: P,
@@ -116,14 +118,12 @@ namespace Redux {
     }
 
     interface SubAccountsStore extends Redux.ListResponseStore<Model.BudgetSubAccount> {
-      readonly placeholders: ListStore<Table.BudgetSubAccountRow>;
       readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
       readonly groups: Redux.ListResponseStore<Model.BudgetGroup>;
       readonly fringes: FringesStore;
     }
 
     interface AccountsStore extends Redux.ListResponseStore<Model.BudgetAccount> {
-      readonly placeholders: ListStore<Table.BudgetAccountRow>;
       readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
       readonly groups: Redux.ListResponseStore<Model.BudgetGroup>;
     }
@@ -172,13 +172,11 @@ namespace Redux {
     }
 
     interface SubAccountsStore extends Redux.ListResponseStore<Model.TemplateSubAccount> {
-      readonly placeholders: ListStore<Table.TemplateSubAccountRow>;
       readonly groups: Redux.ListResponseStore<Model.TemplateGroup>;
       readonly fringes: FringesStore;
     }
 
     interface AccountsStore extends Redux.ListResponseStore<Model.TemplateAccount> {
-      readonly placeholders: ListStore<Table.TemplateAccountRow>;
       readonly groups: Redux.ListResponseStore<Model.TemplateGroup>;
     }
 

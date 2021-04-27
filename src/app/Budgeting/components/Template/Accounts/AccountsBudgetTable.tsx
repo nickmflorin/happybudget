@@ -13,7 +13,6 @@ import BudgetTable from "../../BudgetTable";
 import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
 import {
   setAccountsSearchAction,
-  addPlaceholdersToStateAction,
   deselectAccountAction,
   selectAccountAction,
   removeAccountAction,
@@ -22,17 +21,15 @@ import {
   addGroupToStateAction,
   deleteGroupAction,
   removeAccountFromGroupAction,
-  bulkUpdateTemplateAccountsAction,
-  updateGroupInStateAction
+  bulkUpdateAccountsAction,
+  updateGroupInStateAction,
+  bulkCreateAccountsAction
 } from "../../../store/actions/template/accounts";
 
 const selectGroups = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.groups.data);
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.selected);
 const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.data);
 const selectTableSearch = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.search);
-const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.template.accounts.placeholders
-);
 const selectSaving = createSelector(
   (state: Redux.ApplicationStore) => state.template.accounts.deleting,
   (state: Redux.ApplicationStore) => state.template.accounts.updating,
@@ -56,7 +53,6 @@ const AccountsBudgetTable = (): JSX.Element => {
 
   const templateId = useSelector(selectTemplateId);
   const data = useSelector(selectData);
-  const placeholders = useSelector(selectPlaceholders);
   const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
@@ -69,7 +65,6 @@ const AccountsBudgetTable = (): JSX.Element => {
       <BudgetTable<Table.TemplateAccountRow, Model.TemplateAccount, Model.TemplateGroup, Http.TemplateAccountPayload>
         data={data}
         groups={groups}
-        placeholders={placeholders}
         manager={TemplateAccountRowManager}
         selected={selected}
         renderFlag={readyToRender}
@@ -80,13 +75,13 @@ const AccountsBudgetTable = (): JSX.Element => {
         search={search}
         onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
         saving={saving}
-        onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
+        onRowAdd={() => dispatch(bulkCreateAccountsAction(1))}
         onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
         onRowDelete={(row: Table.TemplateAccountRow) => dispatch(removeAccountAction(row.id))}
         onRowUpdate={(payload: Table.RowChange<Table.TemplateAccountRow>) => dispatch(updateAccountAction(payload))}
         onRowBulkUpdate={(changes: Table.RowChange<Table.TemplateAccountRow>[]) =>
-          dispatch(bulkUpdateTemplateAccountsAction(changes))
+          dispatch(bulkUpdateAccountsAction(changes))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
         groupParams={{

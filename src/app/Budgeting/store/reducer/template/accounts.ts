@@ -1,7 +1,6 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, filter, map, reduce, forEach } from "lodash";
-import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
-import { BudgetAccountRowManager } from "lib/tabling/managers";
+import { createListResponseReducer } from "lib/redux/factories";
 import { replaceInArray } from "lib/util";
 import { warnInconsistentState } from "lib/redux/util";
 import { initialListResponseState } from "store/initialState";
@@ -29,15 +28,6 @@ const listResponseReducer = createListResponseReducer<Model.TemplateAccount, Red
     initialState: initialTemplateAccountsState,
     strictSelect: false,
     subReducers: {
-      placeholders: createTablePlaceholdersReducer(
-        {
-          AddToState: ActionType.Template.Accounts.Placeholders.AddToState,
-          RemoveFromState: ActionType.Template.Accounts.Placeholders.RemoveFromState,
-          UpdateInState: ActionType.Template.Accounts.Placeholders.UpdateInState,
-          Clear: ActionType.Template.Accounts.Request
-        },
-        BudgetAccountRowManager
-      ),
       groups: createListResponseReducer<Model.TemplateGroup, Redux.ListResponseStore<Model.TemplateGroup>>(
         {
           Response: ActionType.Template.Accounts.Groups.Response,
@@ -207,17 +197,6 @@ const rootReducer: Reducer<Redux.Template.AccountsStore, Redux.Action<any>> = (
       };
       newState = recalculateGroupMetrics(newState, group.id);
     }
-  } else if (action.type === ActionType.Template.Accounts.Placeholders.Activate) {
-    // TODO: Do we need to recalculate group metrics here?
-    const payload: Table.ActivatePlaceholderPayload<Model.TemplateAccount> = action.payload;
-    newState = {
-      ...newState,
-      placeholders: filter(
-        newState.placeholders,
-        (placeholder: Table.TemplateAccountRow) => placeholder.id !== action.payload.id
-      ),
-      data: [...newState.data, payload.model]
-    };
   }
   return { ...newState };
 };
