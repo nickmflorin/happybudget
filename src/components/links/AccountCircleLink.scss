@@ -20,6 +20,19 @@
     object-fit: contain;
   }
 
+  .user-circle-icon {
+    margin: auto;
+    height: 100%;
+    background-color: #eee;
+    color: #111;
+
+    .user-circle-text {
+      position: relative;
+      top: .41rem;
+      font-weight: 600;
+    }
+  }
+
   svg {
     height: 100%;
     width: auto !important;
