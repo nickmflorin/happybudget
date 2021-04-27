@@ -13,7 +13,9 @@ let agGridKey = process.env.REACT_APP_AG_GRID_KEY;
 if (!isNil(agGridKey)) {
   /* eslint-disable no-console */
   console.info("Setting AG Grid License Key");
-  LicenseManager.setLicenseKey(agGridKey);
+  LicenseManager.setLicenseKey(
+    "For_Trialing_ag-Grid_Only-Not_For_Real_Development_Or_Production_Projects-Valid_Until-15_May_2021_[v2]_MTYyMTAzMzIwMDAwMA==900dc7d0cef292aa92ae47777b3bbdf8"
+  );
 } else {
   /* eslint-disable no-console */
   console.warn("No REACT_APP_AG_GRID_KEY found in environment.  App may not behave as expected.");
