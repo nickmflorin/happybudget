@@ -10,8 +10,6 @@ import reportWebVitals from "./lib/operational/reportWebVitals";
 import "ag-grid-enterprise";
 
 let agGridKey = process.env.REACT_APP_AG_GRID_KEY;
-console.log("KEY");
-console.log(agGridKey);
 if (!isNil(agGridKey)) {
   /* eslint-disable no-console */
   console.info("Setting AG Grid License Key");
