@@ -108,7 +108,7 @@ const Budget = (): JSX.Element => {
           icon: <FontAwesomeIcon icon={faFilePlus} />,
           onClick: () => history.push("/templates"),
           tooltip: {
-            title: "Create New Budget",
+            title: "Templates",
             placement: "right"
           }
         },
