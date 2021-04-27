@@ -6,23 +6,31 @@ import { toApiDateTime } from "lib/util/dates";
 export const percentageToDecimalValueSetter = <R extends Table.Row>(field: keyof R) => (
   params: ValueSetterParams
 ): boolean => {
-  if (!isNaN(parseFloat(params.newValue))) {
+  if (params.newValue === "" || !isNaN(parseFloat(params.newValue))) {
     params.data[field] = parseFloat(params.newValue) / 100;
     return true;
   }
   return false;
 };
 
-export const floatValueSetter = <R extends Table.Row>(field: keyof R) => (params: ValueSetterParams): boolean => {
-  if (!isNaN(parseFloat(params.newValue))) {
+export const floatValueSetter = <R extends Table.Row>(field: keyof R, nullable = true) => (
+  params: ValueSetterParams
+): boolean => {
+  if (params.newValue === undefined && nullable) {
+    params.data[field] = null;
+  } else if (!isNaN(parseFloat(params.newValue))) {
     params.data[field] = parseFloat(params.newValue);
     return true;
   }
   return false;
 };
 
-export const integerValueSetter = <R extends Table.Row>(field: keyof R) => (params: ValueSetterParams): boolean => {
-  if (!isNaN(parseInt(params.newValue))) {
+export const integerValueSetter = <R extends Table.Row>(field: keyof R, nullable = true) => (
+  params: ValueSetterParams
+): boolean => {
+  if (params.newValue === undefined && nullable) {
+    params.data[field] = null;
+  } else if (!isNaN(parseInt(params.newValue))) {
     params.data[field] = parseInt(params.newValue);
     return true;
   }
