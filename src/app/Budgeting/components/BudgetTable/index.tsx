@@ -289,6 +289,7 @@ const BudgetTable = <
       cellRenderer: "IdentifierCell",
       width: 100,
       ...identifierColumn,
+      pinned: "left",
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
         if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
