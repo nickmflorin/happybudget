@@ -100,7 +100,7 @@ namespace Http {
   interface UserPayload {
     readonly first_name: string;
     readonly last_name: string;
-    readonly profile_image: File | Blob | null;
+    readonly profile_image?: string | ArrayBuffer | null;
   }
 
   interface LoginResponse {

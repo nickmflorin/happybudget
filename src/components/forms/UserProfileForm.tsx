@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { isNil } from "lodash";
+import classNames from "classnames";
 
 import { Input, Button } from "antd";
 
@@ -7,17 +7,14 @@ import { Form } from "components";
 import { FormProps } from "components/Form";
 import UploadUserImage from "./UploadUserImage";
 
-const UserProfileForm = ({ ...props }: FormProps<Http.UserPayload>): JSX.Element => {
-  const [file, setFile] = useState<File | Blob | null>(null);
+interface UserProfileFormProps extends FormProps<Http.UserPayload> {
+  imageUrl?: string | null;
+  onImageChange?: (f: File | Blob) => void;
+}
 
+const UserProfileForm: React.FC<UserProfileFormProps> = ({ imageUrl, onImageChange, ...props }): JSX.Element => {
   return (
-    <Form.Form
-      name={"form_in_modal"}
-      onFinish={(values: Partial<Http.UserPayload>) =>
-        !isNil(props.onFinish) && props.onFinish({ ...values, profile_image: file })
-      }
-      {...props}
-    >
+    <Form.Form {...props} className={classNames("user-profile-form", props.className)}>
       <Form.Item
         name={"first_name"}
         label={"First Name"}
@@ -34,8 +31,12 @@ const UserProfileForm = ({ ...props }: FormProps<Http.UserPayload>): JSX.Element
       </Form.Item>
       <Form.Item label={"Avatar"}>
         <UploadUserImage
-          initialValue={!isNil(props.initialValues) ? props.initialValues.profile_image : undefined}
-          onChange={(f: File | Blob) => setFile(f)}
+          initialValue={imageUrl}
+          onChange={(f: File | Blob) => {
+            if (!isNil(onImageChange)) {
+              onImageChange(f);
+            }
+          }}
           onError={(error: string) => props.form.setGlobalError(error)}
         />
       </Form.Item>

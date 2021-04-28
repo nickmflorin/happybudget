@@ -20,7 +20,7 @@ interface TemplateFormProps extends FormProps<TemplateFormValues> {
 
 const TemplateForm: React.FC<TemplateFormProps> = ({ imageUrl, onImageChange, ...props }) => {
   return (
-    <Form.Form className={"template-form"} layout={"vertical"} {...props}>
+    <Form.Form className={"template-form"} {...props}>
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the template." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>
