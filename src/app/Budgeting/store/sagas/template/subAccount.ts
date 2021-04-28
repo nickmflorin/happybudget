@@ -1,20 +1,66 @@
 import { SagaIterator } from "redux-saga";
 import { take, call, cancel } from "redux-saga/effects";
 
+import { TemplateSubAccountRowManager } from "lib/tabling/managers";
+
 import { ActionType } from "../../actions";
-import { createStandardSaga } from "../factories";
+import { loadingTemplateAction, requestTemplateAction } from "../../actions/template";
 import {
-  getSubAccountTask,
-  getSubAccountsTask,
-  handleUpdateTask,
-  handleRemovalTask,
-  handleSubAccountChangedTask,
-  deleteGroupTask,
-  removeFromGroupTask,
-  getGroupsTask,
-  handleBulkUpdateTask,
-  bulkCreateTask
-} from "./tasks/subAccount";
+  loadingSubAccountAction,
+  responseSubAccountAction,
+  requestSubAccountAction,
+  loadingSubAccountsAction,
+  responseSubAccountsAction,
+  deletingSubAccountAction,
+  creatingSubAccountAction,
+  updatingSubAccountAction,
+  requestSubAccountsAction,
+  deletingGroupAction,
+  removeGroupFromStateAction,
+  updateSubAccountInStateAction,
+  removeSubAccountFromStateAction,
+  addErrorsToStateAction,
+  loadingGroupsAction,
+  responseGroupsAction,
+  requestGroupsAction,
+  addSubAccountToStateAction
+} from "../../actions/template/subAccount";
+
+import { createStandardSaga, createSubAccountTaskSet } from "../factories";
+
+const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, Table.TemplateSubAccountRow, Model.TemplateGroup>(
+  {
+    loading: loadingSubAccountsAction,
+    deleting: deletingSubAccountAction,
+    creating: creatingSubAccountAction,
+    updating: updatingSubAccountAction,
+    request: requestSubAccountsAction,
+    response: responseSubAccountsAction,
+    addToState: addSubAccountToStateAction,
+    updateInState: updateSubAccountInStateAction,
+    removeFromState: removeSubAccountFromStateAction,
+    budget: {
+      loading: loadingTemplateAction,
+      request: requestTemplateAction
+    },
+    subaccount: {
+      request: requestSubAccountAction,
+      loading: loadingSubAccountAction,
+      response: responseSubAccountAction
+    },
+    groups: {
+      deleting: deletingGroupAction,
+      removeFromState: removeGroupFromStateAction,
+      loading: loadingGroupsAction,
+      response: responseGroupsAction,
+      request: requestGroupsAction
+    },
+    addErrorsToState: addErrorsToStateAction
+  },
+  TemplateSubAccountRowManager,
+  (state: Redux.ApplicationStore) => state.template.subaccount.id,
+  (state: Redux.ApplicationStore) => state.template.subaccount.subaccounts.data
+);
 
 function* watchForSubAccountIdChangedSaga(): SagaIterator {
   let lastTasks;
@@ -23,7 +69,7 @@ function* watchForSubAccountIdChangedSaga(): SagaIterator {
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(handleSubAccountChangedTask, action);
+    lastTasks = yield call(tasks.handleSubAccountChange, action);
   }
 }
 
@@ -34,7 +80,7 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(getSubAccountTask, action);
+    lastTasks = yield call(tasks.getSubAccount, action);
   }
 }
 
@@ -42,20 +88,20 @@ export default createStandardSaga(
   {
     Request: {
       actionType: ActionType.Template.SubAccount.SubAccounts.Request,
-      task: getSubAccountsTask
+      task: tasks.getSubAccounts
     },
     RequestGroups: {
       actionType: ActionType.Template.SubAccount.SubAccounts.Groups.Request,
-      task: getGroupsTask
+      task: tasks.getGroups
     },
-    BulkUpdate: { actionType: ActionType.Template.SubAccount.BulkUpdate, task: handleBulkUpdateTask },
-    BulkCreate: { actionType: ActionType.Template.SubAccount.BulkCreate, task: bulkCreateTask },
-    Delete: { actionType: ActionType.Template.SubAccount.SubAccounts.Delete, task: handleRemovalTask },
-    Update: { actionType: ActionType.Template.SubAccount.SubAccounts.Update, task: handleUpdateTask },
-    DeleteGroup: { actionType: ActionType.Template.SubAccount.SubAccounts.Groups.Delete, task: deleteGroupTask },
+    BulkUpdate: { actionType: ActionType.Template.SubAccount.BulkUpdate, task: tasks.handleBulkUpdate },
+    BulkCreate: { actionType: ActionType.Template.SubAccount.BulkCreate, task: tasks.bulkCreate },
+    Delete: { actionType: ActionType.Template.SubAccount.SubAccounts.Delete, task: tasks.handleRemoval },
+    Update: { actionType: ActionType.Template.SubAccount.SubAccounts.Update, task: tasks.handleUpdate },
+    DeleteGroup: { actionType: ActionType.Template.SubAccount.SubAccounts.Groups.Delete, task: tasks.deleteGroup },
     RemoveModelFromGroup: {
       actionType: ActionType.Template.Account.SubAccounts.RemoveFromGroup,
-      task: removeFromGroupTask
+      task: tasks.removeFromGroup
     }
   },
   watchForRequestSubAccountSaga,

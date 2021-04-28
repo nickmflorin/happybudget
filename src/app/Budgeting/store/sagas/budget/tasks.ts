@@ -15,7 +15,7 @@ import {
   responseFringesAction,
   addFringesPlaceholdersToStateAction,
   clearFringesPlaceholdersToStateAction
-} from "../../../actions/budget";
+} from "../../actions/budget";
 
 export function* handleBudgetChangedTask(action: Redux.Action<number>): SagaIterator {
   yield all([call(getBudgetTask), call(getBudgetItemsTask), call(getBudgetItemsTreeTask), call(getFringesTask)]);

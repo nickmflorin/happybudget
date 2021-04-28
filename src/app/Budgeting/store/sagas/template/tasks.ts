@@ -11,7 +11,7 @@ import {
   responseFringesAction,
   addFringesPlaceholdersToStateAction,
   clearFringesPlaceholdersToStateAction
-} from "../../../actions/template";
+} from "../../actions/template";
 
 export function* handleTemplateChangedTask(action: Redux.Action<number>): SagaIterator {
   yield all([call(getTemplateTask), call(getFringesTask)]);

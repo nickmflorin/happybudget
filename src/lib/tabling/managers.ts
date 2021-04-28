@@ -255,7 +255,7 @@ const defaultRowMeta: Partial<Table.RowMeta> = {
 class RowManager<
   R extends Table.Row<G>,
   M extends Model.Model,
-  G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup,
+  G extends Model.BudgetGroup | Model.TemplateGroup,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
 > implements RowManagerConfig<R, M, G> {
   public fields: ManagedField<R, M>[];

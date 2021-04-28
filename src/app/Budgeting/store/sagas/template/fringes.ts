@@ -15,7 +15,7 @@ import {
   addErrorsToStateAction,
   updateFringeInStateAction
 } from "../../actions/template/fringes";
-import { createFringeTaskSet } from "../tasks";
+import { createFringeTaskSet } from "../factories";
 
 const tasks = createFringeTaskSet<Model.Template>(
   {
