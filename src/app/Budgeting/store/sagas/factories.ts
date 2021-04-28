@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 import { takeWithCancellableById } from "lib/redux/sagas";
 
 type MapConfig<T> = {
-  task: Redux.ActionTask<T>;
+  task: Redux.Task<T>;
   actionType: string;
 };
 

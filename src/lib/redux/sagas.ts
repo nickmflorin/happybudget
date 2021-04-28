@@ -24,10 +24,6 @@ function* takeWithCancellableByIdSaga(actionType: string, task: any, getId: any)
   }
 }
 
-export function takeWithCancellableById<P>(
-  actionType: string,
-  task: Redux.ActionTask<P>,
-  getId: (payload: P) => number
-) {
+export function takeWithCancellableById<P>(actionType: string, task: Redux.Task<P>, getId: (payload: P) => number) {
   return call(takeWithCancellableByIdSaga, actionType, task, getId);
 }

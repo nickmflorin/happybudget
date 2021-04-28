@@ -28,13 +28,12 @@ namespace Redux {
     readonly label?: Redux.ModuleLabel | Redux.ModuleLabel[] | undefined;
   }
 
-  type ActionTask<P> = (action: Redux.Action<P>) => SagaIterator;
-
   type ActionCreator<P = any, A extends Redux.Action<P> = Redux.Action<P>> = (
-    type: string,
-    payload?: P,
-    options?: Redux.ActionConfig
+    payload: P,
+    options?: Redux.ActionConfig | undefined
   ) => A;
+
+  type Task<P = any, A extends Redux.Action<P> = Redux.Action<P>> = (action: A) => SagaIterator;
 
   interface ModuleConfig<S extends ModuleStore, A extends Redux.Action<any>> {
     readonly rootSaga?: Saga;
