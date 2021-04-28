@@ -4,3 +4,7 @@
 /// <reference path="./table.d.ts" />
 /// <reference path="./files.d.ts" />
 /// <reference path="./modeling.d.ts" />
+
+interface Window {
+  analytics: any;
+}
