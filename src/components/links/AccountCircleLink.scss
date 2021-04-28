@@ -5,7 +5,8 @@
   display: block;
   width: 36px !important;
   height: 36px !important;
-  border-radius: 18px;
+  border-radius: 100%;
+  line-height: 18px;
   overflow: hidden;
   text-align: center;
   border-width: 1px;
@@ -21,16 +22,12 @@
   }
 
   .user-circle-icon {
-    margin: auto;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-weight: 600;
     height: 100%;
     background-color: #eee;
     color: #111;
-
-    .user-circle-text {
-      position: relative;
-      top: .41rem;
-      font-weight: 600;
-    }
   }
 
   svg {
