@@ -5,11 +5,14 @@ import { Dropdown as AntdDropdown } from "antd";
 import { DropDownProps } from "antd/lib/dropdown";
 
 import { DropdownMenu } from "components/menus";
-import { DropdownMenuProps, DropdownMenuItem } from "components/menus/DropdownMenu";
+import { IDropdownMenu, IDropdownMenuItem } from "components/menus/DropdownMenu";
 
-interface BaseDropdownProps extends Omit<DropDownProps, "overlay">, StandardComponentProps {
+interface BaseDropdownProps
+  extends Omit<DropDownProps, "overlay">,
+    StandardComponentProps,
+    Omit<IDropdownMenu, "className" | "style" | "items"> {
   children: ReactNode;
-  menuProps?: DropdownMenuProps;
+  menuProps?: Omit<IDropdownMenu, "onClick" | "onChange" | "items">;
 }
 
 interface DropdownOverlayProps extends BaseDropdownProps {
@@ -18,7 +21,7 @@ interface DropdownOverlayProps extends BaseDropdownProps {
 }
 
 interface DropdownMenuItemsProps extends BaseDropdownProps {
-  items: DropdownMenuItem[];
+  items: IDropdownMenuItem[] | JSX.Element[];
   overlay?: undefined;
 }
 
@@ -30,16 +33,24 @@ export const includesMenuItems = (
   return (obj as DropdownMenuItemsProps).items !== undefined;
 };
 
-const Dropdown: React.FC<DropdownProps> = (props): JSX.Element => {
+const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
   return (
     <AntdDropdown
       className={classNames("dropdown", props.className)}
       {...props}
-      overlay={includesMenuItems(props) ? <DropdownMenu {...props.menuProps} items={props.items} /> : props.overlay}
+      overlay={
+        includesMenuItems(props) ? (
+          <DropdownMenu {...props.menuProps} onClick={props.onClick} onChange={props.onChange} items={props.items} />
+        ) : (
+          props.overlay
+        )
+      }
     >
       {props.children}
     </AntdDropdown>
   );
 };
+
+Dropdown.Menu = DropdownMenu;
 
 export default Dropdown;

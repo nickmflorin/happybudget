@@ -1,52 +1,145 @@
-import { map, filter } from "lodash";
+import React, { ReactNode } from "react";
+import { map, filter, isNil } from "lodash";
 import classNames from "classnames";
 
 import { Menu } from "antd";
 
 import { IconOrSpinner, VerticalFlexCenter } from "components";
 
-export interface DropdownMenuItem {
-  text: string;
+export interface IDropdownMenuItem {
+  id?: any;
+  text?: string;
   className?: string;
+  style?: React.CSSProperties;
   loading?: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   icon?: JSX.Element;
   disabled?: boolean;
   visible?: boolean;
 }
 
-export interface DropdownMenuProps extends StandardComponentProps {
+const isDropdownMenuItemInterface = (obj: IDropdownMenuItem | JSX.Element): obj is IDropdownMenuItem => {
+  return (obj as any).type === undefined;
+};
+
+interface _DropdownItemProps extends IDropdownMenuItem {
+  children?: ReactNode;
+  generalClassName?: string;
+  generalStyle?: React.CSSProperties;
+}
+
+export const DropdownMenuItem: React.FC<_DropdownItemProps> = ({
+  className,
+  disabled,
+  icon,
+  loading,
+  text,
+  children,
+  visible,
+  style = {},
+  generalStyle = {},
+  generalClassName,
+  onClick,
+  ...props
+}: _DropdownItemProps): JSX.Element => {
+  if (visible === false) {
+    return <></>;
+  }
+  return (
+    <Menu.Item
+      {...props}
+      className={classNames("dropdown-menu-item", generalClassName, className, {
+        disabled: disabled === true
+      })}
+      onClick={() => {
+        if (!(disabled === true)) {
+          if (!isNil(onClick)) {
+            onClick();
+          }
+        }
+      }}
+      style={{ ...generalStyle, ...style }}
+    >
+      {!isNil(children) ? (
+        <VerticalFlexCenter>{children}</VerticalFlexCenter>
+      ) : (
+        <React.Fragment>
+          {!isNil(icon) && (
+            <VerticalFlexCenter>
+              <IconOrSpinner size={16} loading={loading} icon={icon} />
+            </VerticalFlexCenter>
+          )}
+          {text}
+        </React.Fragment>
+      )}
+    </Menu.Item>
+  );
+};
+
+export interface IDropdownMenu extends StandardComponentProps {
+  items: IDropdownMenuItem[] | JSX.Element[];
+  onClick?: (id: any) => void;
+  onChange?: (id: any) => void;
   itemProps?: StandardComponentProps;
 }
 
-interface _DropdownMenuProps extends DropdownMenuProps {
-  items: DropdownMenuItem[];
-}
-
-const DropdownMenu = ({ items, className, itemProps = {} }: _DropdownMenuProps): JSX.Element => {
+const DropdownMenu = ({
+  items,
+  onClick,
+  onChange,
+  className,
+  itemProps = {},
+  ...props
+}: IDropdownMenu): JSX.Element => {
   return (
     <Menu className={classNames("dropdown-menu", className)}>
       {map(
-        filter(items, (item: DropdownMenuItem) => item.visible !== false),
-        (item: DropdownMenuItem, index: number) => {
-          return (
-            <Menu.Item
-              key={index}
-              className={classNames("dropdown-menu-item", itemProps.className, item.className, {
-                disabled: item.disabled === true
-              })}
-              onClick={item.disabled === true ? undefined : item.onClick}
-            >
-              <VerticalFlexCenter>
-                <IconOrSpinner size={16} loading={item.loading} icon={item.icon} />
-              </VerticalFlexCenter>
-              {item.text}
-            </Menu.Item>
-          );
+        filter(
+          items,
+          (item: IDropdownMenuItem | JSX.Element) => !isDropdownMenuItemInterface(item) || item.visible !== false
+        ),
+        (item: IDropdownMenuItem | JSX.Element, index: number) => {
+          if (isDropdownMenuItemInterface(item)) {
+            return (
+              <DropdownMenuItem
+                key={index}
+                {...props}
+                generalClassName={classNames("dropdown-menu-item", itemProps.className)}
+                generalStyle={itemProps.style}
+                {...item}
+                onClick={() => {
+                  if (!isNil(item.onClick)) {
+                    item.onClick();
+                  } else if (!isNil(item.id)) {
+                    if (!isNil(onClick)) {
+                      onClick(item.id);
+                    } else if (!isNil(onChange)) {
+                      onChange(item.id);
+                    }
+                  }
+                }}
+              />
+            );
+          } else if (item.type === DropdownMenuItem) {
+            return <React.Fragment key={index}>{item}</React.Fragment>;
+          } else {
+            return (
+              <DropdownMenuItem
+                key={index}
+                {...props}
+                generalClassName={classNames("dropdown-menu-item", itemProps.className)}
+                generalStyle={itemProps.style}
+              >
+                {item}
+              </DropdownMenuItem>
+            );
+          }
         }
       )}
     </Menu>
   );
 };
+
+DropdownMenu.Item = DropdownMenuItem;
 
 export default DropdownMenu;

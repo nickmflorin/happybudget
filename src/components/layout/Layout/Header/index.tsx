@@ -8,7 +8,7 @@ import { faSignOutAlt, faAddressCard } from "@fortawesome/pro-light-svg-icons";
 
 import { Layout, Tooltip } from "antd";
 
-import { Dropdown } from "components/dropdowns";
+import { Dropdown } from "components";
 import { AccountCircleLink } from "components/links";
 import { ShowHide } from "components";
 import { useLoggedInUser } from "store/hooks";

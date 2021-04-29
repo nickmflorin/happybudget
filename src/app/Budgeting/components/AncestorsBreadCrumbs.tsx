@@ -3,8 +3,8 @@ import { useHistory } from "react-router-dom";
 import { map, isNil, find } from "lodash";
 import classNames from "classnames";
 
-import { Select } from "antd";
-
+import { Dropdown } from "components";
+import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
 
 import { getUrl } from "../urls";
@@ -44,35 +44,28 @@ const AncestorBreadCrumbSelectItem = ({
 
   return (
     <AncestorBreadCrumbItem className={className} style={style}>
-      <div className={"select-wrapper"}>
-        <Select
-          className={"select--ancestor"}
-          value={instance.id}
-          bordered={false}
-          onChange={(value: number) => {
-            const sibling: Model.SimpleAccount | Model.SimpleSubAccount | undefined = find(instance.siblings, {
-              id: value
-            } as any);
-            if (isNil(sibling)) {
-              /* eslint-disable no-console */
-              console.error(`The select value corresponds to a sibling ${value} that is not in state!`);
-            } else if (sibling.id !== instance.id) {
-              history.push(getUrl(budget, sibling));
-            }
-          }}
-        >
-          <Select.Option value={instance.id}>
-            <EntityText>{instance}</EntityText>
-          </Select.Option>
-          {map(instance.siblings, (sibling: any) => {
-            return (
-              <Select.Option value={sibling.id} key={sibling.id}>
-                <EntityText>{sibling}</EntityText>
-              </Select.Option>
-            );
-          })}
-        </Select>
-      </div>
+      <Dropdown
+        items={map(instance.siblings, (sibling: any) => {
+          return (
+            <Dropdown.Menu.Item>
+              <EntityText>{sibling}</EntityText>
+            </Dropdown.Menu.Item>
+          );
+        })}
+        onChange={(id: number) => {
+          const sibling: Model.SimpleAccount | Model.SimpleSubAccount | undefined = find(instance.siblings, {
+            id
+          } as any);
+          if (isNil(sibling)) {
+            /* eslint-disable no-console */
+            console.error(`The select value corresponds to a sibling ${id} that is not in state!`);
+          } else if (sibling.id !== instance.id) {
+            history.push(getUrl(budget, sibling));
+          }
+        }}
+      >
+        <EntityTextButton>{instance}</EntityTextButton>
+      </Dropdown>
     </AncestorBreadCrumbItem>
   );
 };

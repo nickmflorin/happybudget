@@ -515,4 +515,18 @@
       }
     }
   }
+  &--entity-text {
+    border: none !important;
+    box-shadow: none !important;
+    min-width: 0px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+
+    .entity-text-button-inner {
+      display: flex;
+      .entity-text-button-caret {
+        margin-left: 8px;
+      }
+    }
+  }
 }

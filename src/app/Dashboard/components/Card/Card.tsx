@@ -5,10 +5,9 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImagePolaroid, faEllipsisV } from "@fortawesome/pro-light-svg-icons";
 
-import { ShowHide, RenderWithSpinner } from "components";
-import { Dropdown } from "components/dropdowns";
+import { ShowHide, RenderWithSpinner, Dropdown } from "components";
 import { IconButton } from "components/buttons";
-import { DropdownMenuItem } from "components/menus/DropdownMenu";
+import { IDropdownMenuItem } from "components/menus/DropdownMenu";
 
 import "./index.scss";
 
@@ -41,7 +40,7 @@ const DashboardCardImage: React.FC<DashboardCardImageProps> = ({ image, onClick,
 };
 
 interface CardProps extends StandardComponentProps {
-  dropdown?: DropdownMenuItem[];
+  dropdown?: IDropdownMenuItem[];
   title: string;
   subTitle?: string;
   image?: string | null;
