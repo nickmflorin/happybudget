@@ -297,7 +297,7 @@ export const createAccountTaskSet = <
         return { data: mergeRowChanges(changes).data, id: parseInt(id) };
       });
 
-      const data = yield select((state: Redux.ApplicationStore) => state.template.account.subaccounts.data);
+      const data = yield select(selectModels);
       const mergedUpdates: Table.RowChange<R>[] = [];
 
       for (let i = 0; i < merged.length; i++) {
@@ -325,7 +325,7 @@ export const createAccountTaskSet = <
     const accountId = yield select(selectAccountId);
     if (!isNil(accountId) && !isNil(action.payload)) {
       const id = action.payload.id;
-      const data = yield select((state: Redux.ApplicationStore) => state.template.account.subaccounts.data);
+      const data = yield select(selectModels);
       const model: SA | undefined = find(data, { id });
       if (isNil(model)) {
         warnInconsistentState({
