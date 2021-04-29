@@ -1159,7 +1159,7 @@ const BudgetTable = <
                 TemplateFringesCell: ShowCellOnlyForRowType<R>("subaccount")(
                   IncludeErrorsInCell<R>(TemplateFringesCell)
                 ),
-                agColumnHeader: HeaderCell,
+                // agColumnHeader: HeaderCell,
                 ...frameworkComponents
               }}
               onPasteStart={onPasteStart}
