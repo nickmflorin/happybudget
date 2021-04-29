@@ -34,6 +34,11 @@ export type ModelTagsDropdownProps<M extends Model.Model, V extends number = num
     labelField: keyof M;
     models: M[];
     selected?: number | number[] | null;
+    emptyItem?: {
+      onClick?: () => void;
+      text: string;
+      icon?: JSX.Element;
+    };
   };
 
 const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
@@ -109,10 +114,12 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
     return (data as MultipleModelTagsDropdownProps<M>).multiple === true;
   };
 
+  const { emptyItem, ...dropdownProps } = props;
+
   if (isMultiple(props)) {
     return (
       <Dropdown
-        {...props}
+        {...dropdownProps}
         className={classNames("model-tags-dropdown", props.className)}
         trigger={props.trigger || ["click"]}
         overlay={
@@ -122,6 +129,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
             labelField={props.labelField}
             onChange={props.onChange}
             multiple={true}
+            emptyItem={emptyItem}
           />
         }
       >
@@ -131,7 +139,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
   } else {
     return (
       <Dropdown
-        {...props}
+        {...dropdownProps}
         className={classNames("model-tags-dropdown", props.className)}
         trigger={props.trigger || ["click"]}
         overlay={
@@ -141,6 +149,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
             labelField={props.labelField}
             onChange={props.onChange}
             multiple={false}
+            emptyItem={emptyItem}
           />
         }
       >

@@ -16,6 +16,9 @@ export interface SubAccountsBudgetTableProps<R extends Table.Row<G>, M extends M
   > {
   fringes: Model.Fringe[];
   fringesCellRenderer: "BudgetFringesCell" | "TemplateFringesCell";
+  fringesCellRendererParams: {
+    onAddFringes: () => void;
+  };
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
   onEditGroup: (group: G) => void;
@@ -25,6 +28,7 @@ export interface SubAccountsBudgetTableProps<R extends Table.Row<G>, M extends M
 const SubAccountsBudgetTable = <R extends Table.SubAccountRow<G>, M extends Model.SubAccount, G extends Model.Group>({
   fringes,
   fringesCellRenderer,
+  fringesCellRendererParams,
   onGroupRows,
   onDeleteGroup,
   onEditGroup,
@@ -132,6 +136,7 @@ const SubAccountsBudgetTable = <R extends Table.SubAccountRow<G>, M extends Mode
           headerName: "Fringes",
           cellClass: classNames("cell--centered"),
           cellRenderer: fringesCellRenderer,
+          cellRendererParams: fringesCellRendererParams,
           minWidth: 150,
           valueSetter: (params: ValueSetterParams): boolean => {
             // In the case that the value is an Array, the value will have been  provided as an Array

@@ -13,5 +13,19 @@
     &:hover, &.active {
       background-color: rgba(212, 212, 212, 0.4);
     }
+
+    &.empty {
+      display: flex;
+      flex-direction: row;
+
+      .icon-container {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        margin-right: 8px;
+        position: relative;
+        bottom: 1px;
+      }
+    }
   }
 }

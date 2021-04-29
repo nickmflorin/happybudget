@@ -1,20 +1,28 @@
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
 import { BudgetSubAccountRowManager } from "lib/tabling/managers";
 
-import { selectBudgetFringes, selectBudgetDetail, selectBudgetDetailLoading } from "../../store/selectors";
+import {
+  selectBudgetFringes,
+  selectBudgetDetail,
+  selectBudgetDetailLoading,
+  selectBudgetId
+} from "../../store/selectors";
 import SubAccountsBudgetTable, { SubAccountsBudgetTableProps } from "../SubAccountsBudgetTable";
 
 const SubAccountsTable = ({
   ...props
 }: Omit<
   SubAccountsBudgetTableProps<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>,
-  "manager" | "fringes" | "fringesCellRenderer"
+  "manager" | "fringes" | "fringesCellRenderer" | "fringesCellRendererParams"
 >): JSX.Element => {
+  const history = useHistory();
   const detail = useSelector(selectBudgetDetail);
   const loadingBudget = useSelector(selectBudgetDetailLoading);
   const fringes = useSelector(selectBudgetFringes);
+  const budgetId = useSelector(selectBudgetId);
 
   return (
     <SubAccountsBudgetTable<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>
@@ -22,6 +30,9 @@ const SubAccountsTable = ({
       loadingBudget={loadingBudget}
       fringes={fringes}
       fringesCellRenderer={"BudgetFringesCell"}
+      fringesCellRendererParams={{
+        onAddFringes: () => history.push(`/budgets/${budgetId}/fringes`)
+      }}
       budgetTotals={{
         estimated: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
         variance: !isNil(detail) && !isNil(detail.variance) ? detail.variance : 0.0,

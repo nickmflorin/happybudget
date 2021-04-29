@@ -27,6 +27,11 @@ export type ModelTagsMenuProps<M extends Model.Model> = (
   selected?: number | number[] | null;
   className?: string;
   style?: React.CSSProperties;
+  emptyItem?: {
+    onClick?: () => void;
+    text: string;
+    icon?: JSX.Element;
+  };
 };
 
 const ModelTagsMenu = <M extends Model.Model>(props: ModelTagsMenuProps<M>): JSX.Element => {
@@ -48,44 +53,56 @@ const ModelTagsMenu = <M extends Model.Model>(props: ModelTagsMenuProps<M>): JSX
 
   return (
     <Menu className={classNames("model-tags-menu", props.className)} style={props.style}>
-      {map(props.models, (model: M) => {
-        const label = getKeyValue<M, keyof M>(props.labelField)(model);
-        if (typeof label === "string") {
-          return (
-            <Menu.Item
-              key={model.id}
-              className={classNames("model-tags-menu-item", { active: includes(selected, model.id) })}
-              onClick={(info: any) => {
-                if (isMultiple(props)) {
-                  const selectedModels = filter(
-                    map(selected, (id: number) => find(props.models, { id })),
-                    (m: M | undefined) => m !== undefined
-                  ) as M[];
-                  if (includes(selected, model.id)) {
-                    setSelected(
-                      map(
-                        filter(selectedModels, (m: M) => m.id !== model.id),
-                        (m: M) => m.id
-                      )
-                    );
-                    props.onChange(filter(selectedModels, (m: M) => m.id !== model.id));
+      {props.models.length !== 0 ? (
+        map(props.models, (model: M) => {
+          const label = getKeyValue<M, keyof M>(props.labelField)(model);
+          if (typeof label === "string") {
+            return (
+              <Menu.Item
+                key={model.id}
+                className={classNames("model-tags-menu-item", { active: includes(selected, model.id) })}
+                onClick={(info: any) => {
+                  if (isMultiple(props)) {
+                    const selectedModels = filter(
+                      map(selected, (id: number) => find(props.models, { id })),
+                      (m: M | undefined) => m !== undefined
+                    ) as M[];
+                    if (includes(selected, model.id)) {
+                      setSelected(
+                        map(
+                          filter(selectedModels, (m: M) => m.id !== model.id),
+                          (m: M) => m.id
+                        )
+                      );
+                      props.onChange(filter(selectedModels, (m: M) => m.id !== model.id));
+                    } else {
+                      setSelected([...selected, model.id]);
+                      props.onChange([...selectedModels, model]);
+                    }
                   } else {
-                    setSelected([...selected, model.id]);
-                    props.onChange([...selectedModels, model]);
+                    setSelected([model.id]);
+                    props.onChange(model);
                   }
-                } else {
-                  setSelected([model.id]);
-                  props.onChange(model);
-                }
-              }}
-            >
-              <Tag colorIndex={model.id} uppercase={props.uppercase}>
-                {label}
-              </Tag>
-            </Menu.Item>
-          );
-        }
-      })}
+                }}
+              >
+                <Tag colorIndex={model.id} uppercase={props.uppercase}>
+                  {label}
+                </Tag>
+              </Menu.Item>
+            );
+          }
+        })
+      ) : !isNil(props.emptyItem) ? (
+        <Menu.Item
+          className={classNames("model-tags-menu-item", "empty")}
+          onClick={() => !isNil(props.emptyItem?.onClick) && props.emptyItem?.onClick()}
+        >
+          {!isNil(props.emptyItem.icon) && <div className={"icon-container"}>{props.emptyItem.icon}</div>}
+          {props.emptyItem.text}
+        </Menu.Item>
+      ) : (
+        <></>
+      )}
     </Menu>
   );
 };
