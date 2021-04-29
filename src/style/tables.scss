@@ -183,7 +183,7 @@ $table-border: 1px solid $table-border-color;
       border-left: $table-border;
     }
 
-    &.ag-cell-last-left-pinned:not(.ag-cell-range-right):not(.ag-cell-range-single-cell) {
+    &.ag-cell-last-left-pinned:not(.ag-cell-range-right):not(.ag-cell-range-single-cell):not(.ag-cell-focus) {
       border-right: unset !important;
       border-right-color: unset !important;
     }
