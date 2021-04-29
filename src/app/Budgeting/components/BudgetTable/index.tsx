@@ -134,7 +134,7 @@ const BudgetTable = <
       filter: false
     },
     suppressHorizontalScroll: true,
-    suppressContextMenu: TABLE_DEBUG,
+    suppressContextMenu: process.env.NODE_ENV === "development" && TABLE_DEBUG,
     suppressCopyRowsToClipboard: isNil(onRowBulkUpdate),
     suppressClipboardPaste: isNil(onRowBulkUpdate),
     enableFillHandle: true,
@@ -1105,7 +1105,7 @@ const BudgetTable = <
               getContextMenuItems={getContextMenuItems}
               allowContextMenuWithControlKey={true}
               rowData={table}
-              debug={TABLE_DEBUG}
+              debug={process.env.NODE_ENV === "development" && TABLE_DEBUG}
               getRowNodeId={(r: any) => r.id}
               getRowClass={getRowClass}
               immutableData={true}
