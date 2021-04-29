@@ -18,10 +18,13 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
     validateToken()
       .then((response: Http.TokenValidationResponse) => {
         dispatch(updateLoggedInUserAction(response.user));
-        window.analytics.identify(response.user.id, {
-          name: response.user.full_name,
-          email: response.user.email
-        });
+        // TODO: Figure out how to do this just on login.
+        if (process.env.NODE_ENV === "production") {
+          window.analytics.identify(response.user.id, {
+            name: response.user.full_name,
+            email: response.user.email
+          });
+        }
       })
       .catch((e: Error) => {
         if (e instanceof AuthenticationError) {
