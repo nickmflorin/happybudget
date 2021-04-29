@@ -6,7 +6,6 @@ export const DATE_DISPLAY_FORMAT = "MM/DD/YYYY";
 export const TIME_DISPLAY_FORMAT = "hh:mm A";
 export const DATETIME_DISPLAY_FORMAT = "LLL";
 export const DATETIME_ABBV_DISPLAY_FORMAT = "lll";
-export const DEFAULT_TZ = "America/Toronto";
 
 // Temporary flag - we don't want to remove all of this behavior that can
 // denote an error in a table cell yet, but we don't want it to currently be
