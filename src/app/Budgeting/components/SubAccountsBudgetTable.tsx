@@ -1,7 +1,7 @@
 import { isNil, includes, find, filter, map } from "lodash";
 import classNames from "classnames";
 
-import { ColDef, ColSpanParams, ValueSetterParams } from "ag-grid-community";
+import { ColDef, ColSpanParams, ValueSetterParams } from "@ag-grid-community/core";
 
 import { SubAccountUnits } from "lib/model";
 import { currencyValueFormatter } from "lib/tabling/formatters";

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 import { createSelector } from "reselect";
 
-import { CellClassParams } from "ag-grid-community";
+import { CellClassParams } from "@ag-grid-community/core";
 
 import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";

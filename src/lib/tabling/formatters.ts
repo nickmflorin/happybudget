@@ -1,5 +1,5 @@
 import { isNil } from "lodash";
-import { ValueFormatterParams } from "ag-grid-community";
+import { ValueFormatterParams } from "@ag-grid-community/core";
 import { formatCurrencyWithoutDollarSign, formatPercentage } from "lib/util/formatters";
 import { toDisplayDate } from "lib/util/dates";
 

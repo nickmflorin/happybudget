@@ -1,4 +1,4 @@
-import { ColDef, CellClassParams, RowNode, GridOptions } from "ag-grid-community";
+import { ColDef, CellClassParams, RowNode, GridOptions } from "@ag-grid-community/core";
 import RowManager from "lib/tabling/managers";
 
 export interface GetExportValueParams {

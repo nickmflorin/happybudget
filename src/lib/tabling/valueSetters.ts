@@ -1,5 +1,5 @@
 import { isNil, find } from "lodash";
-import { ValueSetterParams } from "ag-grid-community";
+import { ValueSetterParams } from "@ag-grid-community/core";
 import { findChoiceForName } from "lib/model/util";
 import { toApiDateTime } from "lib/util/dates";
 

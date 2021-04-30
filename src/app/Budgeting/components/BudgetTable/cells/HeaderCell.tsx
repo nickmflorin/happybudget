@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
 
-import { Column, ColDef } from "ag-grid-community";
+import { Column, ColDef } from "@ag-grid-community/core";
 
 import { ShowHide, IconHolder } from "components";
 

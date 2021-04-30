@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-import { CellClassParams } from "ag-grid-community";
+import { CellClassParams } from "@ag-grid-community/core";
 
 import { FringeUnits } from "lib/model";
 import { FringeRowManager } from "lib/tabling/managers";

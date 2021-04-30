@@ -1,6 +1,6 @@
 import { map, uniq, forEach } from "lodash";
 import classNames from "classnames";
-import { CellClassParams } from "ag-grid-community";
+import { CellClassParams } from "@ag-grid-community/core";
 
 type AGGridCellClassFn = (params: CellClassParams) => string | string[] | undefined;
 type ClassNameConstruct = string | string[] | AGGridCellClassFn | undefined | { [key: string]: boolean };

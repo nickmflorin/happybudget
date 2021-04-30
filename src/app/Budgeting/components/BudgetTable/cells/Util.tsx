@@ -1,5 +1,5 @@
 import { filter } from "lodash";
-import { ICellRendererParams } from "ag-grid-community";
+import { ICellRendererParams } from "@ag-grid-community/core";
 import { CloseCircleOutlined } from "@ant-design/icons";
 
 type Func = (props: any) => JSX.Element;

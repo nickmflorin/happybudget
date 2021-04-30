@@ -1,5 +1,5 @@
 import { forEach, includes, isNil, map } from "lodash";
-import { ColDef } from "ag-grid-community";
+import { ColDef } from "@ag-grid-community/core";
 
 const validateCookiesFieldOrder = <R extends Table.Row>(obj: any, cols: ColDef[]): FieldOrder<keyof R> | null => {
   if (

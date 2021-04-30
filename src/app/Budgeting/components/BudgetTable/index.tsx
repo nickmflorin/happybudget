@@ -3,9 +3,9 @@ import classNames from "classnames";
 import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
 import Cookies from "universal-cookie";
 
-import { AgGridReact } from "ag-grid-react";
+import { AgGridReact } from "@ag-grid-community/react";
 import { AllModules } from "@ag-grid-enterprise/all-modules";
-import { ChangeDetectionStrategyType } from "ag-grid-react/lib/changeDetectionService";
+import { ChangeDetectionStrategyType } from "@ag-grid-community/react/lib/changeDetectionService";
 import {
   ColDef,
   CellEditingStoppedEvent,
@@ -30,8 +30,8 @@ import {
   FirstDataRenderedEvent,
   SuppressKeyboardEventParams,
   ProcessCellForExportParams
-} from "ag-grid-community";
-import { FillOperationParams } from "ag-grid-community/dist/lib/entities/gridOptions";
+} from "@ag-grid-community/core";
+import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import { TABLE_DEBUG } from "config";
 import { RenderWithSpinner, ShowHide } from "components";
@@ -697,13 +697,6 @@ const BudgetTable = <
     }
   });
 
-  const fillOperation = (event: FillOperationParams) => {
-    if (event.initialValues.length === 1) {
-      return false;
-    }
-    return event.initialValues[(event.values.length - event.initialValues.length) % event.initialValues.length];
-  };
-
   const getRowClass = (params: RowClassParams) => {
     if (params.node.data.meta.isGroupFooter === true) {
       let colorClass = params.node.data.group.color;
@@ -1168,7 +1161,14 @@ const BudgetTable = <
               onPasteStart={onPasteStart}
               onPasteEnd={onPasteEnd}
               onCellValueChanged={onCellValueChanged}
-              fillOperation={fillOperation}
+              fillOperation={(params: FillOperationParams) => {
+                if (params.initialValues.length === 1) {
+                  return false;
+                }
+                return params.initialValues[
+                  (params.values.length - params.initialValues.length) % params.initialValues.length
+                ];
+              }}
             />
           </div>
           <div className={"table-footer-grid"}>

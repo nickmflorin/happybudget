@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExpandAlt } from "@fortawesome/pro-solid-svg-icons";
 
-import { ICellRendererParams } from "ag-grid-community";
+import { ICellRendererParams } from "@ag-grid-community/core";
 import { IconButton } from "components/buttons";
 
 interface ExpandCellProps extends ICellRendererParams {

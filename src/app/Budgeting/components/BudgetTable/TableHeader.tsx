@@ -8,7 +8,7 @@ import { Input, Checkbox, Tooltip } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { SearchOutlined } from "@ant-design/icons";
 
-import { ColDef } from "ag-grid-community";
+import { ColDef } from "@ag-grid-community/core";
 
 import { IconButton } from "components/buttons";
 import { FieldsDropdown } from "components/dropdowns";

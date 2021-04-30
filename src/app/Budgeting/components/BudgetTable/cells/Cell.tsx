@@ -5,7 +5,7 @@ import { isNil, includes } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 
-import { ICellRendererParams, ColDef } from "ag-grid-community";
+import { ICellRendererParams, ColDef } from "@ag-grid-community/core";
 
 import { IconButton } from "components/buttons";
 import { ShowHide } from "components";
