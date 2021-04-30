@@ -55,11 +55,17 @@ const Header = ({ breadcrumbs, toolbar, className, headerHeight, style = {} }: H
           trigger={["click"]}
           items={[
             {
+              id: "profile",
               text: "Profile",
               onClick: () => history.push("/profile"),
               icon: <FontAwesomeIcon icon={faAddressCard} />
             },
-            { text: "Logout", onClick: () => history.push("/logout"), icon: <FontAwesomeIcon icon={faSignOutAlt} /> }
+            {
+              id: "logout",
+              text: "Logout",
+              onClick: () => history.push("/logout"),
+              icon: <FontAwesomeIcon icon={faSignOutAlt} />
+            }
           ]}
         >
           <div className={"account-wrapper"}>

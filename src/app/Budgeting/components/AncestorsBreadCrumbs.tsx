@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { map, isNil, find } from "lodash";
 import classNames from "classnames";
 
-import { Dropdown } from "components";
+import { Dropdown, ShowHide } from "components";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
 
@@ -45,24 +45,14 @@ const AncestorBreadCrumbSelectItem = ({
   return (
     <AncestorBreadCrumbItem className={className} style={style}>
       <Dropdown
+        trigger={["click"]}
         items={map(instance.siblings, (sibling: any) => {
           return (
-            <Dropdown.Menu.Item>
-              <EntityText>{sibling}</EntityText>
+            <Dropdown.Menu.Item id={sibling.id} onClick={() => history.push(getUrl(budget, sibling))}>
+              <EntityText fillEmpty={"---------"}>{sibling}</EntityText>
             </Dropdown.Menu.Item>
           );
         })}
-        onChange={(id: number) => {
-          const sibling: Model.SimpleAccount | Model.SimpleSubAccount | undefined = find(instance.siblings, {
-            id
-          } as any);
-          if (isNil(sibling)) {
-            /* eslint-disable no-console */
-            console.error(`The select value corresponds to a sibling ${id} that is not in state!`);
-          } else if (sibling.id !== instance.id) {
-            history.push(getUrl(budget, sibling));
-          }
-        }}
       >
         <EntityTextButton>{instance}</EntityTextButton>
       </Dropdown>
@@ -117,7 +107,12 @@ const AncestorsBreadCrumbs = ({ instance, budget }: AncestorsBreadCrumbsProps): 
               </React.Fragment>
             );
           })}
-          <AncestorBreadCrumbSelectItem instance={instance} budget={budget} />
+          <ShowHide show={instance.siblings.length !== 0}>
+            <AncestorBreadCrumbSelectItem instance={instance} budget={budget} />
+          </ShowHide>
+          <ShowHide show={instance.siblings.length === 0}>
+            <AncestorBreadCrumbEntityItem budget={budget}>{instance}</AncestorBreadCrumbEntityItem>
+          </ShowHide>
         </React.Fragment>
       )}
     </div>

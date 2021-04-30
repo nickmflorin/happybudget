@@ -7,7 +7,7 @@ import { Menu } from "antd";
 import { IconOrSpinner, VerticalFlexCenter } from "components";
 
 export interface IDropdownMenuItem {
-  id?: any;
+  id: any;
   text?: string;
   className?: string;
   style?: React.CSSProperties;
@@ -61,7 +61,7 @@ export const DropdownMenuItem: React.FC<_DropdownItemProps> = ({
       style={{ ...generalStyle, ...style }}
     >
       {!isNil(children) ? (
-        <VerticalFlexCenter>{children}</VerticalFlexCenter>
+        <>{children}</>
       ) : (
         <React.Fragment>
           {!isNil(icon) && (
@@ -110,29 +110,18 @@ const DropdownMenu = ({
                 onClick={() => {
                   if (!isNil(item.onClick)) {
                     item.onClick();
-                  } else if (!isNil(item.id)) {
-                    if (!isNil(onClick)) {
-                      onClick(item.id);
-                    } else if (!isNil(onChange)) {
-                      onChange(item.id);
-                    }
+                  }
+                  if (!isNil(onClick)) {
+                    onClick(item.id);
+                  }
+                  if (!isNil(onChange)) {
+                    onChange(item.id);
                   }
                 }}
               />
             );
-          } else if (item.type === DropdownMenuItem) {
-            return <React.Fragment key={index}>{item}</React.Fragment>;
           } else {
-            return (
-              <DropdownMenuItem
-                key={index}
-                {...props}
-                generalClassName={classNames("dropdown-menu-item", itemProps.className)}
-                generalStyle={itemProps.style}
-              >
-                {item}
-              </DropdownMenuItem>
-            );
+            return <React.Fragment key={index}>{item}</React.Fragment>;
           }
         }
       )}

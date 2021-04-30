@@ -8,9 +8,10 @@ import "./EntityText.scss";
 
 export interface EntityTextProps extends StandardComponentProps {
   children: Model.Entity | Model.SimpleEntity;
+  fillEmpty?: string;
 }
 
-const EntityText: React.FC<EntityTextProps> = ({ children, className, style = {} }) => {
+const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty, style = {} }) => {
   const identifier = useMemo(() => {
     if (isAccountOrSubAccountForm(children)) {
       return children.identifier;
@@ -24,8 +25,13 @@ const EntityText: React.FC<EntityTextProps> = ({ children, className, style = {}
     return undefined;
   }, [children]);
   return (
-    <div className={classNames("entity-text", className)} style={style}>
-      {!isNil(identifier) && <span className={"identifier"}>{identifier}</span>}
+    <div
+      className={classNames("entity-text", className)}
+      style={{ ...style, textAlign: isNil(identifier) && !isNil(fillEmpty) ? "center" : undefined }}
+    >
+      {(!isNil(identifier) || !isNil(fillEmpty)) && (
+        <span className={classNames("identifier")}>{!isNil(identifier) ? identifier : fillEmpty}</span>
+      )}
       {!isNil(description) && <span className={"description"}>{description}</span>}
     </div>
   );

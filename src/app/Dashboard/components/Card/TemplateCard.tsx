@@ -41,22 +41,26 @@ const TemplateCard = ({
       image={template.image}
       dropdown={[
         {
+          id: "edit",
           text: "Edit",
           icon: <FontAwesomeIcon className={"icon"} icon={faEdit} />,
           onClick: () => onEdit()
         },
         {
+          id: "edit_name_image",
           text: "Edit Name/Image",
           icon: <FontAwesomeIcon className={"icon"} icon={faImage} />,
           onClick: () => onEditNameImage()
         },
         {
+          id: "duplicate",
           text: "Duplicate",
           icon: <FontAwesomeIcon className={"icon"} icon={faClone} />,
           onClick: () => onDuplicate(),
           loading: duplicating
         },
         {
+          id: "move",
           text: "Move to Community",
           icon: <FontAwesomeIcon className={"icon"} icon={faUserFriends} />,
           onClick: () => onMoveToCommunity(),
@@ -64,6 +68,7 @@ const TemplateCard = ({
           loading: moving
         },
         {
+          id: "delete",
           text: "Delete",
           icon: <FontAwesomeIcon className={"icon"} icon={faTrash} />,
           onClick: () => onDelete(),

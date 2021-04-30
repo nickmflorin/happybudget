@@ -29,11 +29,13 @@ const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: Bu
       image={budget.image}
       dropdown={[
         {
+          id: "edit",
           text: "Edit Name/Image",
           icon: <FontAwesomeIcon className={"icon"} icon={faImage} />,
           onClick: () => onEdit()
         },
         {
+          id: "delete",
           text: "Delete",
           icon: <FontAwesomeIcon className={"icon"} icon={faTrash} />,
           onClick: () => onDelete(),
