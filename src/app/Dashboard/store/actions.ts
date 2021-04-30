@@ -46,8 +46,8 @@ export const ActionType = {
     AddToState: "dashboard.community.AddToState",
     Delete: "dashboard.community.Delete",
     Deleting: "dashboard.community.Deleting",
-    Duplicate: "dashboard.templates.Duplicate",
-    Duplicating: "dashboard.templates.Duplicating"
+    Duplicate: "dashboard.community.Duplicate",
+    Duplicating: "dashboard.community.Duplicating"
   },
   Contacts: {
     Loading: "dashboard.contacts.Loading",
