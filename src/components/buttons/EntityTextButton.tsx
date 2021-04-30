@@ -9,13 +9,21 @@ import { VerticalFlexCenter } from "components";
 import { EntityText } from "components/typography";
 import { EntityTextProps } from "components/typography/EntityText";
 
-export interface CaretButtonProps extends Omit<EntityTextProps, "className" | "style">, StandardComponentProps {}
+export interface EntityTextButtonProps extends Omit<EntityTextProps, "className" | "style">, StandardComponentProps {
+  fillEmpty?: string;
+}
 
-const EntityTextButton = ({ children, className, style = {}, ...props }: CaretButtonProps): JSX.Element => {
+const EntityTextButton = ({
+  children,
+  className,
+  fillEmpty,
+  style = {},
+  ...props
+}: EntityTextButtonProps): JSX.Element => {
   return (
     <Button className={classNames("btn--entity-text", className)} style={style} {...props}>
       <div className={"entity-text-button-inner"}>
-        <EntityText>{children}</EntityText>
+        <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
         <VerticalFlexCenter className={"entity-text-button-caret"}>
           <FontAwesomeIcon icon={faCaretDown} />
         </VerticalFlexCenter>

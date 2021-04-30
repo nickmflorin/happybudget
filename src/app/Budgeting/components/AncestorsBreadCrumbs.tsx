@@ -54,7 +54,7 @@ const AncestorBreadCrumbSelectItem = ({
           );
         })}
       >
-        <EntityTextButton>{instance}</EntityTextButton>
+        <EntityTextButton fillEmpty={"---------"}>{instance}</EntityTextButton>
       </Dropdown>
     </AncestorBreadCrumbItem>
   );
