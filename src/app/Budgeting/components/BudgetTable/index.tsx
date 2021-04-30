@@ -4,6 +4,7 @@ import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } fr
 import Cookies from "universal-cookie";
 
 import { AgGridReact } from "ag-grid-react";
+import { AllModules } from "@ag-grid-enterprise/all-modules";
 import { ChangeDetectionStrategyType } from "ag-grid-react/lib/changeDetectionService";
 import {
   ColDef,
@@ -1111,6 +1112,8 @@ const BudgetTable = <
               immutableData={true}
               suppressRowClickSelection={true}
               onGridReady={onGridReady}
+              /* @ts-ignore */
+              modules={AllModules}
               processCellForClipboard={(params: ProcessCellForExportParams) => {
                 if (!isNil(params.node)) {
                   const row: R = params.node.data;
