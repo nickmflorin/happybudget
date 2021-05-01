@@ -6,11 +6,11 @@ import { LayoutProps } from "components/layout/Layout";
 
 import "./index.scss";
 
-type GenericProps = {
+type GenericLayoutProps = {
   children: JSX.Element;
 } & Pick<LayoutProps, "sidebar" | "toolbar" | "breadcrumbs">;
 
-const Generic: React.FC<GenericProps> = ({ children, ...props }) => {
+const GenericLayout: React.FC<GenericLayoutProps> = ({ children, ...props }) => {
   return (
     <Layout
       collapsed
@@ -26,4 +26,4 @@ const Generic: React.FC<GenericProps> = ({ children, ...props }) => {
   );
 };
 
-export default Generic;
+export default GenericLayout;

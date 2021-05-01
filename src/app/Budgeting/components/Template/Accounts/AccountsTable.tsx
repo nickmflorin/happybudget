@@ -9,7 +9,6 @@ import { CreateTemplateAccountGroupModal, EditGroupModal } from "components/moda
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { TemplateAccountRowManager } from "lib/tabling/managers";
 
-import BudgetTable from "../../BudgetTable";
 import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
 import {
   setAccountsSearchAction,
@@ -25,6 +24,7 @@ import {
   updateGroupInStateAction,
   bulkCreateAccountsAction
 } from "../../../store/actions/template/accounts";
+import { GenericAccountsTable } from "../../Generic";
 
 const selectGroups = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.groups.data);
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.selected);
@@ -44,7 +44,7 @@ const selectReadyToRender = createSelector(
     accountsResponseReceived === true && groupsResponseReceived === true
 );
 
-const AccountsBudgetTable = (): JSX.Element => {
+const AccountsTable = (): JSX.Element => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Model.TemplateGroup | undefined>(undefined);
 
@@ -62,16 +62,18 @@ const AccountsBudgetTable = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <BudgetTable<Table.TemplateAccountRow, Model.TemplateAccount, Model.TemplateGroup, Http.TemplateAccountPayload>
+      <GenericAccountsTable<
+        Table.TemplateAccountRow,
+        Model.TemplateAccount,
+        Model.TemplateGroup,
+        Http.TemplateAccountPayload
+      >
         data={data}
         groups={groups}
         manager={TemplateAccountRowManager}
         selected={selected}
         renderFlag={readyToRender}
-        identifierField={"identifier"}
-        identifierFieldHeader={"Account"}
-        sizeColumnsToFit={false}
-        tableFooterIdentifierValue={!isNil(templateDetail) ? `${templateDetail.name} Total` : "Total"}
+        detail={templateDetail}
         search={search}
         onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
         saving={saving}
@@ -84,24 +86,16 @@ const AccountsBudgetTable = (): JSX.Element => {
           dispatch(bulkUpdateAccountsAction(changes))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
-        groupParams={{
-          onDeleteGroup: (group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id)),
-          onRowRemoveFromGroup: (row: Table.TemplateAccountRow) => dispatch(removeAccountFromGroupAction(row.id)),
-          onGroupRows: (rows: Table.TemplateAccountRow[]) =>
-            setGroupAccounts(map(rows, (row: Table.TemplateAccountRow) => row.id)),
-          onEditGroup: (group: Model.TemplateGroup) => setGroupToEdit(group)
-        }}
+        onDeleteGroup={(group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id))}
+        onRowRemoveFromGroup={(row: Table.TemplateAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
+        onGroupRows={(rows: Table.TemplateAccountRow[]) =>
+          setGroupAccounts(map(rows, (row: Table.TemplateAccountRow) => row.id))
+        }
+        onEditGroup={(group: Model.TemplateGroup) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllAccountsAction(null))}
         tableTotals={{
           estimated: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
         }}
-        bodyColumns={[
-          {
-            field: "description",
-            headerName: "Category Description",
-            flex: 100
-          }
-        ]}
         calculatedColumns={[
           {
             field: "estimated",
@@ -136,4 +130,4 @@ const AccountsBudgetTable = (): JSX.Element => {
   );
 };
 
-export default AccountsBudgetTable;
+export default AccountsTable;

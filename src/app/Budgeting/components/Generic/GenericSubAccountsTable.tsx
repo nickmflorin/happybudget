@@ -1,15 +1,18 @@
 import { isNil, includes, find, filter, map } from "lodash";
 import classNames from "classnames";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSigma, faPercentage, faUpload, faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
+
 import { ColDef, ColSpanParams, ValueSetterParams } from "@ag-grid-community/core";
 
 import { SubAccountUnits } from "lib/model";
 import { currencyValueFormatter } from "lib/tabling/formatters";
 import { floatValueSetter, integerValueSetter, choiceModelValueSetter } from "lib/tabling/valueSetters";
 
-import BudgetTable, { BudgetTableProps } from "./BudgetTable";
+import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../BudgetTable";
 
-export interface SubAccountsBudgetTableProps<R extends Table.Row<G>, M extends Model.SubAccount, G extends Model.Group>
+export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends Model.SubAccount, G extends Model.Group>
   extends Omit<
     BudgetTableProps<R, M, G, Http.SubAccountPayload>,
     "identifierField" | "identifierFieldHeader" | "bodyColumns" | "groupParams"
@@ -23,9 +26,10 @@ export interface SubAccountsBudgetTableProps<R extends Table.Row<G>, M extends M
   onDeleteGroup: (group: G) => void;
   onEditGroup: (group: G) => void;
   onRowRemoveFromGroup: (row: R) => void;
+  onEditFringes: () => void;
 }
 
-const SubAccountsBudgetTable = <R extends Table.SubAccountRow<G>, M extends Model.SubAccount, G extends Model.Group>({
+const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Model.SubAccount, G extends Model.Group>({
   fringes,
   fringesCellRenderer,
   fringesCellRendererParams,
@@ -33,8 +37,9 @@ const SubAccountsBudgetTable = <R extends Table.SubAccountRow<G>, M extends Mode
   onDeleteGroup,
   onEditGroup,
   onRowRemoveFromGroup,
+  onEditFringes,
   ...props
-}: SubAccountsBudgetTableProps<R, M, G>): JSX.Element => {
+}: GenericSubAccountsTableProps<R, M, G>): JSX.Element => {
   return (
     <BudgetTable<R, M, G, Http.SubAccountPayload>
       sizeColumnsToFit={false}
@@ -76,12 +81,34 @@ const SubAccountsBudgetTable = <R extends Table.SubAccountRow<G>, M extends Mode
           return map(subAccountFringes, (fringe: Model.Fringe) => fringe.name).join(", ");
         }
       }}
+      actions={(params: BudgetTableActionsParams<R, G>) => [
+        {
+          tooltip: "Delete",
+          icon: <FontAwesomeIcon icon={faTrashAlt} />,
+          disabled: params.selectedRows.length === 0,
+          onClick: params.onDelete
+        },
+        {
+          tooltip: "Sub-Total",
+          icon: <FontAwesomeIcon icon={faSigma} />,
+          disabled: true
+        },
+        {
+          tooltip: "Mark Up",
+          icon: <FontAwesomeIcon icon={faPercentage} />,
+          disabled: true
+        },
+        {
+          tooltip: "Import",
+          icon: <FontAwesomeIcon icon={faUpload} />,
+          disabled: true
+        }
+      ]}
       bodyColumns={[
         {
           field: "description",
           headerName: "Category Description",
           flex: 100,
-          sortable: true,
           colSpan: (params: ColSpanParams) => {
             const row: Table.TemplateSubAccountRow = params.data;
             if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
@@ -137,6 +164,9 @@ const SubAccountsBudgetTable = <R extends Table.SubAccountRow<G>, M extends Mode
           cellClass: classNames("cell--centered"),
           cellRenderer: fringesCellRenderer,
           cellRendererParams: fringesCellRendererParams,
+          headerComponentParams: {
+            onEdit: () => onEditFringes()
+          },
           minWidth: 150,
           valueSetter: (params: ValueSetterParams): boolean => {
             // In the case that the value is an Array, the value will have been  provided as an Array
@@ -176,4 +206,4 @@ const SubAccountsBudgetTable = <R extends Table.SubAccountRow<G>, M extends Mode
   );
 };
 
-export default SubAccountsBudgetTable;
+export default GenericSubAccountsTable;

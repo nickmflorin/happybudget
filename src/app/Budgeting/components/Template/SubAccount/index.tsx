@@ -11,7 +11,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { setInstanceAction } from "../../../store/actions/template";
 import { setSubAccountIdAction } from "../../../store/actions/template/subAccount";
 import { selectTemplateId } from "../../../store/selectors";
-import SubAccountBudgetTable from "./SubAccountBudgetTable";
+import SubAccountBudgetTable from "./SubAccountsTable";
 
 const selectDetail = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.subaccount.detail.data);
 const selectSubAccountsLoading = simpleShallowEqualSelector(

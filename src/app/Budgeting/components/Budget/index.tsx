@@ -10,9 +10,9 @@ import {
   faFilePlus,
   faCopy,
   faAddressBook,
-  faPercentage,
   faFileSpreadsheet,
-  faFileInvoice
+  faFileInvoice,
+  faFileChartLine
 } from "@fortawesome/pro-light-svg-icons";
 
 import { getBudgetPdf } from "api/services";
@@ -23,13 +23,13 @@ import { download } from "lib/util/files";
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "../../store/actions/budget";
 import { selectBudgetInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "../../store/selectors";
 import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
-import Generic from "../Generic";
+import { GenericLayout } from "../Generic";
 
 const Account = React.lazy(() => componentLoader(() => import("./Account")));
 const Accounts = React.lazy(() => componentLoader(() => import("./Accounts")));
 const SubAccount = React.lazy(() => componentLoader(() => import("./SubAccount")));
 const Actuals = React.lazy(() => componentLoader(() => import("./Actuals")));
-const Fringes = React.lazy(() => componentLoader(() => import("./Fringes")));
+const Analysis = React.lazy(() => componentLoader(() => import("./Analysis")));
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
@@ -49,7 +49,7 @@ const Budget = (): JSX.Element => {
   }, [budgetId]);
 
   return (
-    <Generic
+    <GenericLayout
       breadcrumbs={!isNil(budget) ? <AncestorsBreadCrumbs instance={instance} budget={budget} /> : <></>}
       toolbar={[
         {
@@ -130,11 +130,11 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon icon={faPercentage} />,
-          onClick: () => history.push(`/budgets/${budgetId}/fringes`),
-          active: location.pathname.startsWith(`/budgets/${budgetId}/fringes`),
+          icon: <FontAwesomeIcon icon={faFileChartLine} />,
+          onClick: () => history.push(`/budgets/${budgetId}/analysis`),
+          active: location.pathname.startsWith(`/budgets/${budgetId}/analysis`),
           tooltip: {
-            title: "Fringes",
+            title: "Analysis",
             placement: "right"
           }
         },
@@ -154,7 +154,8 @@ const Budget = (): JSX.Element => {
           active:
             location.pathname.startsWith("/budgets") &&
             !location.pathname.startsWith(`/budgets/${budgetId}/actuals`) &&
-            !location.pathname.startsWith(`/budgets/${budgetId}/fringes`),
+            !location.pathname.startsWith(`/budgets/${budgetId}/fringes`) &&
+            !location.pathname.startsWith(`/budgets/${budgetId}/analysis`),
           tooltip: {
             title: "Budget",
             placement: "right"
@@ -175,13 +176,13 @@ const Budget = (): JSX.Element => {
         <Switch>
           <Redirect exact from={match.url} to={`${match.url}/accounts`} />
           <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
-          <Route path={"/budgets/:budgetId/fringes"} component={Fringes} />
+          <Route path={"/budgets/:budgetId/analysis"} component={Analysis} />
           <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
           <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
           <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
         </Switch>
       </RenderIfValidId>
-    </Generic>
+    </GenericLayout>
   );
 };
 

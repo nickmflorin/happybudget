@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 import { createSelector } from "reselect";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
+
 import { CellClassParams } from "@ag-grid-community/core";
 
 import { WrapInApplicationSpinner } from "components";
@@ -25,7 +28,7 @@ import {
   bulkUpdateBudgetActualsAction
 } from "../../store/actions/budget/actuals";
 import { selectBudgetDetail } from "../../store/selectors";
-import BudgetTable, { GetExportValueParams } from "../BudgetTable";
+import BudgetTable, { GetExportValueParams, BudgetTableActionsParams } from "../BudgetTable";
 
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.actuals.selected);
 const selectActuals = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.actuals.data);
@@ -123,6 +126,14 @@ const Actuals = (): JSX.Element => {
             return "";
           }
         }}
+        actions={(params: BudgetTableActionsParams<Table.ActualRow, Model.Group>) => [
+          {
+            tooltip: "Delete",
+            icon: <FontAwesomeIcon icon={faTrashAlt} />,
+            disabled: params.selectedRows.length === 0,
+            onClick: params.onDelete
+          }
+        ]}
         bodyColumns={[
           {
             field: "description",

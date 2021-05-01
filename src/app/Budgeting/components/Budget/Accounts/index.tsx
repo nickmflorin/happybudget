@@ -11,7 +11,7 @@ import { setInstanceAction } from "../../../store/actions/budget";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/budget/accounts";
 import { selectBudgetId } from "../../../store/selectors";
 
-import AccountsBudgetTable from "./AccountsBudgetTable";
+import AccountsTable from "./AccountsTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
 
 const selectAccountsLoading = simpleShallowEqualSelector(
@@ -47,7 +47,7 @@ const Accounts = (): JSX.Element => {
   return (
     <React.Fragment>
       <WrapInApplicationSpinner loading={loading}>
-        <AccountsBudgetTable />
+        <AccountsTable />
       </WrapInApplicationSpinner>
       <AccountsCommentsHistory />
     </React.Fragment>

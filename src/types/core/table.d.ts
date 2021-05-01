@@ -53,19 +53,18 @@ namespace Table {
     readonly model: M;
   }
 
-  interface BudgetAccountRow extends Table.Row<Model.BudgetGroup> {
+  interface AccountRow<G extends Model.Group> extends Table.Row<G> {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
+  }
+
+  interface BudgetAccountRow extends Table.AccountRow<Model.BudgetGroup> {
     readonly variance: number | null;
     readonly actual: number | null;
   }
 
-  interface TemplateAccountRow extends Table.Row<Model.TemplateGroup> {
-    readonly identifier: string | null;
-    readonly description: string | null;
-    readonly estimated: number | null;
-  }
+  interface TemplateAccountRow extends Table.AccountRow<Model.TemplateGroup> {}
 
   interface SubAccountRow<G extends Model.Group> extends Table.Row<G> {
     readonly identifier: string | null;

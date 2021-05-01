@@ -1,0 +1,12 @@
+.fringes-modal {
+  min-width: 70vw;
+  top: 180px !important;
+  max-height: calc(100vh - 180px - 180px);
+
+  .fringes-table {
+    // Start of modal is at 0vh + 180px, end of modal is at 100vh - 180px.
+    // Modal header is 84px high.  Table menu is 36px high, plus a 10px margin
+    // below.
+    height: calc(100vh - 360px - 84px - 36px - 10px);
+  }
+}

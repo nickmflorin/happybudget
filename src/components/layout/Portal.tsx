@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { usePortal } from "lib/hooks";
 import { isNil } from "lodash";
 
-interface PortalProps {
+export interface PortalProps {
   id: string | number;
   visible?: boolean;
   children: ReactNode;

@@ -8,6 +8,10 @@
   padding-left: 2px;
   height: 36px;
 
+  &.detached {
+    margin-bottom: 10px;
+  }
+
   .ant-checkbox-wrapper {
     .ant-checkbox {
       padding: 10px;

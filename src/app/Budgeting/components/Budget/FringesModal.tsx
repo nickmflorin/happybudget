@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 
-import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setInstanceAction, addFringesPlaceholdersToStateAction } from "../../store/actions/budget";
@@ -15,8 +14,7 @@ import {
   selectAllFringesAction,
   bulkUpdateBudgetFringesAction
 } from "../../store/actions/budget/fringes";
-
-import FringesBudgetTable from "../FringesBudgetTable";
+import { GenericFringesModal, GenericFringesModalProps } from "../Generic";
 
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.fringes.selected);
 const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.fringes.data);
@@ -33,7 +31,7 @@ const selectSaving = createSelector(
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 
-const Fringes = (): JSX.Element => {
+const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">> = ({ open, onCancel }) => {
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading);
   const data = useSelector(selectData);
@@ -47,26 +45,27 @@ const Fringes = (): JSX.Element => {
   }, []);
 
   return (
-    <WrapInApplicationSpinner loading={loading}>
-      <FringesBudgetTable
-        data={data}
-        placeholders={placeholders}
-        selected={selected}
-        search={search}
-        onSearch={(value: string) => dispatch(setFringesSearchAction(value))}
-        saving={saving}
-        onRowAdd={() => dispatch(addFringesPlaceholdersToStateAction(1))}
-        onRowSelect={(id: number) => dispatch(selectFringeAction(id))}
-        onRowDeselect={(id: number) => dispatch(deselectFringeAction(id))}
-        onRowDelete={(row: Table.FringeRow) => dispatch(removeFringeAction(row.id))}
-        onRowUpdate={(payload: Table.RowChange<Table.FringeRow>) => dispatch(updateFringeAction(payload))}
-        onRowBulkUpdate={(changes: Table.RowChange<Table.FringeRow>[]) =>
-          dispatch(bulkUpdateBudgetFringesAction(changes))
-        }
-        onSelectAll={() => dispatch(selectAllFringesAction(null))}
-      />
-    </WrapInApplicationSpinner>
+    <GenericFringesModal
+      open={open}
+      onCancel={onCancel}
+      loading={loading}
+      data={data}
+      placeholders={placeholders}
+      selected={selected}
+      search={search}
+      onSearch={(value: string) => dispatch(setFringesSearchAction(value))}
+      saving={saving}
+      onRowAdd={() => dispatch(addFringesPlaceholdersToStateAction(1))}
+      onRowSelect={(id: number) => dispatch(selectFringeAction(id))}
+      onRowDeselect={(id: number) => dispatch(deselectFringeAction(id))}
+      onRowDelete={(row: Table.FringeRow) => dispatch(removeFringeAction(row.id))}
+      onRowUpdate={(payload: Table.RowChange<Table.FringeRow>) => dispatch(updateFringeAction(payload))}
+      onRowBulkUpdate={(changes: Table.RowChange<Table.FringeRow>[]) =>
+        dispatch(bulkUpdateBudgetFringesAction(changes))
+      }
+      onSelectAll={() => dispatch(selectAllFringesAction(null))}
+    />
   );
 };
 
-export default Fringes;
+export default FringesModal;

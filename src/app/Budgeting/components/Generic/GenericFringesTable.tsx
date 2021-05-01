@@ -1,31 +1,21 @@
 import classNames from "classnames";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
+
 import { CellClassParams } from "@ag-grid-community/core";
 
 import { FringeUnits } from "lib/model";
 import { FringeRowManager } from "lib/tabling/managers";
 import { percentageToDecimalValueSetter, choiceModelValueSetter } from "lib/tabling/valueSetters";
 import { percentageValueFormatter } from "lib/tabling/formatters";
-import BudgetTable, { BudgetTableProps } from "./BudgetTable";
+import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../BudgetTable";
 
-type PassThroughProps =
-  | "saving"
-  | "search"
-  | "selected"
-  | "placeholders"
-  | "data"
-  | "onRowSelect"
-  | "onRowDeselect"
-  | "onRowUpdate"
-  | "onRowBulkUpdate"
-  | "onRowAdd"
-  | "onRowDelete"
-  | "onRowExpand"
-  | "onSelectAll"
-  | "onSearch";
-
-interface FringesBudgetTableProps
-  extends Pick<BudgetTableProps<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>, PassThroughProps> {
+export interface GenericFringesTableProps
+  extends Omit<
+    BudgetTableProps<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>,
+    "manager" | "identifierField" | "identifierFieldHeader" | "bodyColumns"
+  > {
   saving: boolean;
   search: string;
   selected: number[];
@@ -42,15 +32,27 @@ interface FringesBudgetTableProps
   onSearch: (value: string) => void;
 }
 
-const FringesBudgetTable: React.FC<FringesBudgetTableProps> = ({ ...props }): JSX.Element => {
+const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): JSX.Element => {
   return (
     <BudgetTable<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>
+      className={"fringes-table"}
+      detached={true}
       manager={FringeRowManager}
       identifierField={"name"}
       identifierFieldHeader={"Name"}
       tableFooterIdentifierValue={null}
+      canExport={false}
+      canToggleColumns={false}
       indexColumn={{ width: 40, maxWidth: 50 }}
       cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
+      actions={(params: BudgetTableActionsParams<Table.FringeRow, Model.Group>) => [
+        {
+          tooltip: "Delete",
+          icon: <FontAwesomeIcon icon={faTrashAlt} />,
+          disabled: params.selectedRows.length === 0,
+          onClick: params.onDelete
+        }
+      ]}
       bodyColumns={[
         {
           field: "description",
@@ -82,4 +84,4 @@ const FringesBudgetTable: React.FC<FringesBudgetTableProps> = ({ ...props }): JS
   );
 };
 
-export default FringesBudgetTable;
+export default GenericFringesTable;

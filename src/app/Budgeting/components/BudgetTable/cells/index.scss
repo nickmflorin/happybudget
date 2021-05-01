@@ -16,9 +16,21 @@
   width: 100%;
 
   .text {
-    line-height: 18px;
+    line-height: 36px;
     flex-grow: 100;
     font-weight: 400;
+  }
+
+  .table-header-edit-btn {
+    margin-left: 8px;
+    height: 18px;
+    width: 18px;
+    padding: 2px;
+
+    svg {
+      height: 14px;
+      width: 14px;
+    }
   }
 
   .icon-holder--sort {

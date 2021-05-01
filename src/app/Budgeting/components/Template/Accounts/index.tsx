@@ -11,7 +11,7 @@ import { setInstanceAction } from "../../../store/actions/template";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/template/accounts";
 import { selectTemplateId } from "../../../store/selectors";
 
-import AccountsBudgetTable from "./AccountsBudgetTable";
+import AccountsBudgetTable from "./AccountsTable";
 
 const selectAccountsLoading = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.template.accounts.loading

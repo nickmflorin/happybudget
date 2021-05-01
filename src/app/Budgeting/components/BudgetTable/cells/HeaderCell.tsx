@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Component } from "react";
 import { isNil, find } from "lodash";
 import classNames from "classnames";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
+import { faArrowUp, faArrowDown, faEdit } from "@fortawesome/free-solid-svg-icons";
 
 import { Column, ColDef } from "@ag-grid-community/core";
 
-import { ShowHide, IconHolder } from "components";
+import { ShowHide, IconHolder, VerticalFlexCenter } from "components";
+import { IconButton } from "components/buttons";
 
 import "./index.scss";
 
@@ -26,6 +27,7 @@ interface IHeaderCompParams {
 
 export interface HeaderCellProps<R extends Table.Row> extends IHeaderCompParams, StandardComponentProps {
   onSort?: (order: Order, field: keyof R, colDef: ColDef, column: Column) => void;
+  onEdit?: (field: keyof R, colDef: ColDef, column: Column) => void;
   ordering?: FieldOrdering<keyof R>;
 }
 
@@ -35,7 +37,9 @@ const HeaderCell = <R extends Table.Row>({
   onSort,
   className,
   ordering,
-  style = {}
+  style = {},
+  onEdit,
+  ...props
 }: HeaderCellProps<R>): JSX.Element => {
   const [order, setOrder] = useState<Order>(0);
   const colDef = column.getColDef();
@@ -69,6 +73,16 @@ const HeaderCell = <R extends Table.Row>({
       }}
     >
       <div className={"text"}>{displayName}</div>
+      {!isNil(onEdit) && (
+        <VerticalFlexCenter>
+          <IconButton
+            className={"table-header-edit-btn"}
+            size={"small"}
+            icon={<FontAwesomeIcon className={"icon"} icon={faEdit} />}
+            onClick={() => onEdit(colDef.field as keyof R, colDef, column)}
+          />
+        </VerticalFlexCenter>
+      )}
       <ShowHide show={colDef.sortable === true}>
         <IconHolder
           className={"icon-holder--sort"}

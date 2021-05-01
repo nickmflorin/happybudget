@@ -11,7 +11,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { setInstanceAction } from "../../../store/actions/budget";
 import { setSubAccountIdAction } from "../../../store/actions/budget/subAccount";
 import { selectBudgetId } from "../../../store/selectors";
-import SubAccountBudgetTable from "./SubAccountBudgetTable";
+import SubAccountsTable from "./SubAccountsTable";
 import SubAccountCommentsHistory from "./SubAccountCommentsHistory";
 
 const selectDetail = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.subaccount.detail.data);
@@ -55,7 +55,7 @@ const SubAccount = (): JSX.Element => {
   return (
     <RenderIfValidId id={[subaccountId]}>
       <WrapInApplicationSpinner loading={loading}>
-        <SubAccountBudgetTable subaccountId={parseInt(subaccountId)} />
+        <SubAccountsTable subaccountId={parseInt(subaccountId)} />
       </WrapInApplicationSpinner>
       <SubAccountCommentsHistory />
     </RenderIfValidId>

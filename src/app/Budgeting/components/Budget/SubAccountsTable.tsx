@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
@@ -10,14 +11,17 @@ import {
   selectBudgetDetailLoading,
   selectBudgetId
 } from "../../store/selectors";
-import SubAccountsBudgetTable, { SubAccountsBudgetTableProps } from "../SubAccountsBudgetTable";
+import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
+import FringesModal from "./FringesModal";
 
-const SubAccountsTable = ({
+const BudgetSubAccountsTable = ({
   ...props
 }: Omit<
-  SubAccountsBudgetTableProps<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>,
-  "manager" | "fringes" | "fringesCellRenderer" | "fringesCellRendererParams"
+  GenericSubAccountsTableProps<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>,
+  "manager" | "fringes" | "fringesCellRenderer" | "fringesCellRendererParams" | "onEditFringes"
 >): JSX.Element => {
+  const [fringesModalVisible, setFringesModalVisible] = useState(false);
+
   const history = useHistory();
   const detail = useSelector(selectBudgetDetail);
   const loadingBudget = useSelector(selectBudgetDetailLoading);
@@ -25,36 +29,40 @@ const SubAccountsTable = ({
   const budgetId = useSelector(selectBudgetId);
 
   return (
-    <SubAccountsBudgetTable<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>
-      manager={BudgetSubAccountRowManager}
-      loadingBudget={loadingBudget}
-      fringes={fringes}
-      fringesCellRenderer={"BudgetFringesCell"}
-      fringesCellRendererParams={{
-        onAddFringes: () => history.push(`/budgets/${budgetId}/fringes`)
-      }}
-      budgetTotals={{
-        estimated: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
-        variance: !isNil(detail) && !isNil(detail.variance) ? detail.variance : 0.0,
-        actual: !isNil(detail) && !isNil(detail.actual) ? detail.actual : 0.0
-      }}
-      calculatedColumns={[
-        {
-          field: "estimated",
-          headerName: "Estimated"
-        },
-        {
-          field: "actual",
-          headerName: "Actual"
-        },
-        {
-          field: "variance",
-          headerName: "Variance"
-        }
-      ]}
-      {...props}
-    />
+    <React.Fragment>
+      <GenericSubAccountsTable<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>
+        manager={BudgetSubAccountRowManager}
+        loadingBudget={loadingBudget}
+        fringes={fringes}
+        fringesCellRenderer={"BudgetFringesCell"}
+        onEditFringes={() => setFringesModalVisible(true)}
+        fringesCellRendererParams={{
+          onAddFringes: () => history.push(`/budgets/${budgetId}/fringes`)
+        }}
+        budgetTotals={{
+          estimated: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
+          variance: !isNil(detail) && !isNil(detail.variance) ? detail.variance : 0.0,
+          actual: !isNil(detail) && !isNil(detail.actual) ? detail.actual : 0.0
+        }}
+        calculatedColumns={[
+          {
+            field: "estimated",
+            headerName: "Estimated"
+          },
+          {
+            field: "actual",
+            headerName: "Actual"
+          },
+          {
+            field: "variance",
+            headerName: "Variance"
+          }
+        ]}
+        {...props}
+      />
+      <FringesModal open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
+    </React.Fragment>
   );
 };
 
-export default SubAccountsTable;
+export default BudgetSubAccountsTable;

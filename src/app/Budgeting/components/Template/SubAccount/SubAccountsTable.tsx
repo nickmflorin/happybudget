@@ -7,7 +7,7 @@ import { createSelector } from "reselect";
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import SubAccountsTable from "../SubAccountsTable";
+import TemplateSubAccountsTable from "../SubAccountsTable";
 import { selectTemplateId } from "../../../store/selectors";
 import {
   setSubAccountsSearchAction,
@@ -53,11 +53,11 @@ const selectReadyToRender = createSelector(
     accountsResponseReceived === true && groupsResponseReceived === true
 );
 
-interface SubAccounttemplateTableProps {
+interface SubAccountsTableProps {
   subaccountId: number;
 }
 
-const SubAccounttemplateTable = ({ subaccountId }: SubAccounttemplateTableProps): JSX.Element => {
+const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element => {
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Model.TemplateGroup | undefined>(undefined);
 
@@ -74,7 +74,7 @@ const SubAccounttemplateTable = ({ subaccountId }: SubAccounttemplateTableProps)
 
   return (
     <React.Fragment>
-      <SubAccountsTable
+      <TemplateSubAccountsTable
         data={data}
         groups={groups}
         selected={selected}
@@ -147,4 +147,4 @@ const SubAccounttemplateTable = ({ subaccountId }: SubAccounttemplateTableProps)
   );
 };
 
-export default SubAccounttemplateTable;
+export default SubAccountsTable;

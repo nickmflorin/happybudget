@@ -9,7 +9,6 @@ import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 import { BudgetAccountRowManager } from "lib/tabling/managers";
 
-import BudgetTable from "../../BudgetTable";
 import { selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
 import {
   setAccountsSearchAction,
@@ -25,6 +24,7 @@ import {
   updateGroupInStateAction,
   bulkCreateAccountsAction
 } from "../../../store/actions/budget/accounts";
+import { GenericAccountsTable } from "../../Generic";
 
 const selectGroups = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.accounts.groups.data);
 const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.accounts.selected);
@@ -45,7 +45,7 @@ const selectReadyToRender = createSelector(
     accountsResponseReceived === true && groupsResponseReceived === true
 );
 
-const AccountsBudgetTable = (): JSX.Element => {
+const AccountsTable = (): JSX.Element => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Model.BudgetGroup | undefined>(undefined);
 
@@ -63,16 +63,13 @@ const AccountsBudgetTable = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <BudgetTable<Table.BudgetAccountRow, Model.BudgetAccount, Model.BudgetGroup, Http.BudgetAccountPayload>
+      <GenericAccountsTable<Table.BudgetAccountRow, Model.BudgetAccount, Model.BudgetGroup, Http.BudgetAccountPayload>
         data={data}
         groups={groups}
         manager={BudgetAccountRowManager}
         selected={selected}
         renderFlag={readyToRender}
-        identifierField={"identifier"}
-        identifierFieldHeader={"Account"}
-        sizeColumnsToFit={false}
-        tableFooterIdentifierValue={!isNil(budgetDetail) ? `${budgetDetail.name} Total` : "Total"}
+        detail={budgetDetail}
         search={search}
         onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
         saving={saving}
@@ -85,26 +82,18 @@ const AccountsBudgetTable = (): JSX.Element => {
           dispatch(bulkUpdateBudgetAccountsAction(changes))
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
-        groupParams={{
-          onDeleteGroup: (group: Model.BudgetGroup) => dispatch(deleteGroupAction(group.id)),
-          onRowRemoveFromGroup: (row: Table.BudgetAccountRow) => dispatch(removeAccountFromGroupAction(row.id)),
-          onGroupRows: (rows: Table.BudgetAccountRow[]) =>
-            setGroupAccounts(map(rows, (row: Table.BudgetAccountRow) => row.id)),
-          onEditGroup: (group: Model.BudgetGroup) => setGroupToEdit(group)
-        }}
+        onDeleteGroup={(group: Model.BudgetGroup) => dispatch(deleteGroupAction(group.id))}
+        onRowRemoveFromGroup={(row: Table.BudgetAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
+        onGroupRows={(rows: Table.BudgetAccountRow[]) =>
+          setGroupAccounts(map(rows, (row: Table.BudgetAccountRow) => row.id))
+        }
+        onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllAccountsAction(null))}
         tableTotals={{
           estimated: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
           variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
           actual: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
         }}
-        bodyColumns={[
-          {
-            field: "description",
-            headerName: "Category Description",
-            flex: 100
-          }
-        ]}
         calculatedColumns={[
           {
             field: "estimated",
@@ -147,4 +136,4 @@ const AccountsBudgetTable = (): JSX.Element => {
   );
 };
 
-export default AccountsBudgetTable;
+export default AccountsTable;

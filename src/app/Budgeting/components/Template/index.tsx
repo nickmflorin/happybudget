@@ -6,7 +6,7 @@ import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagic, faCloud, faCog } from "@fortawesome/pro-solid-svg-icons";
-import { faCopy, faPercentage, faFileSpreadsheet } from "@fortawesome/pro-light-svg-icons";
+import { faCopy, faFileSpreadsheet } from "@fortawesome/pro-light-svg-icons";
 
 import { RenderIfValidId } from "components";
 import { componentLoader } from "lib/operational";
@@ -14,12 +14,11 @@ import { componentLoader } from "lib/operational";
 import { setTemplateIdAction } from "../../store/actions/template";
 import { selectTemplateInstance, selectTemplateDetail } from "../../store/selectors";
 import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
-import Generic from "../Generic";
+import { GenericLayout } from "../Generic";
 
 const Account = React.lazy(() => componentLoader(() => import("./Account")));
 const Accounts = React.lazy(() => componentLoader(() => import("./Accounts")));
 const SubAccount = React.lazy(() => componentLoader(() => import("./SubAccount")));
-const Fringes = React.lazy(() => componentLoader(() => import("./Fringes")));
 
 const Template = (): JSX.Element => {
   const history = useHistory();
@@ -38,7 +37,7 @@ const Template = (): JSX.Element => {
   }, [templateId]);
 
   return (
-    <Generic
+    <GenericLayout
       breadcrumbs={!isNil(template) ? <AncestorsBreadCrumbs instance={instance} budget={template} /> : <></>}
       toolbar={[
         {
@@ -60,15 +59,6 @@ const Template = (): JSX.Element => {
           onClick: () => history.push("/templates"),
           tooltip: {
             title: "My Templates",
-            placement: "right"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faPercentage} />,
-          onClick: () => history.push(`/templates/${templateId}/fringes`),
-          active: location.pathname.startsWith(`/templates/${templateId}/fringes`),
-          tooltip: {
-            title: "Fringes",
             placement: "right"
           }
         },
@@ -98,13 +88,12 @@ const Template = (): JSX.Element => {
       <RenderIfValidId id={[templateId]}>
         <Switch>
           <Redirect exact from={match.url} to={`${match.url}/accounts`} />
-          <Route path={"/templates/:templateId/fringes"} component={Fringes} />
           <Route exact path={"/templates/:templateId/accounts/:accountId"} component={Account} />
           <Route path={"/templates/:templateId/accounts"} component={Accounts} />
           <Route path={"/templates/:templateId/subaccounts/:subaccountId"} component={SubAccount} />
         </Switch>
       </RenderIfValidId>
-    </Generic>
+    </GenericLayout>
   );
 };
 

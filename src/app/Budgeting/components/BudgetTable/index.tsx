@@ -57,10 +57,11 @@ import {
 } from "./cells";
 import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } from "./cells/Util";
 import { BudgetTableProps } from "./model";
-import TableHeader from "./TableHeader";
+import BudgetTableMenu from "./Menu";
 import { validateCookiesOrdering } from "./util";
 import "./index.scss";
 
+export * from "./cells";
 export * from "./model";
 
 const BudgetTable = <
@@ -73,6 +74,9 @@ const BudgetTable = <
   bodyColumns,
   calculatedColumns = [],
   data,
+  actions,
+  className,
+  style = {},
   placeholders = [],
   groups = [],
   selected,
@@ -100,6 +104,10 @@ const BudgetTable = <
   processCellForClipboard = {},
   sizeColumnsToFit = true,
   renderFlag = true,
+  canSearch = true,
+  canExport = true,
+  canToggleColumns = true,
+  detached = false,
   cellClass,
   onSearch,
   onSelectAll,
@@ -132,7 +140,8 @@ const BudgetTable = <
     defaultColDef: {
       resizable: true,
       sortable: false,
-      filter: false
+      filter: false,
+      suppressMovable: true
     },
     suppressHorizontalScroll: true,
     suppressContextMenu: process.env.NODE_ENV === "development" && TABLE_DEBUG,
@@ -149,7 +158,8 @@ const BudgetTable = <
       sortable: false,
       filter: false,
       editable: false,
-      cellClass: "cell--not-editable"
+      cellClass: "cell--not-editable",
+      suppressMovable: true
     },
     suppressContextMenu: true,
     suppressHorizontalScroll: true
@@ -161,7 +171,8 @@ const BudgetTable = <
       sortable: false,
       filter: false,
       editable: false,
-      cellClass: "cell--not-editable"
+      cellClass: "cell--not-editable",
+      suppressMovable: true
     },
     suppressContextMenu: true,
     suppressHorizontalScroll: true
@@ -995,9 +1006,13 @@ const BudgetTable = <
 
   return (
     <React.Fragment>
-      <TableHeader
+      <BudgetTableMenu<R, G>
+        actions={actions}
         search={search}
-        setSearch={(value: string) => onSearch(value)}
+        onSearch={onSearch}
+        canSearch={canSearch}
+        canExport={canExport}
+        canToggleColumns={canToggleColumns}
         columns={[...bodyColumns, ...calculatedColumns]}
         onDelete={() => {
           forEach(table, (row: R) => {
@@ -1006,10 +1021,11 @@ const BudgetTable = <
             }
           });
         }}
+        detached={detached}
         saving={saving}
         selected={allSelected}
-        onSelect={onSelectAll}
-        deleteDisabled={filter(table, (row: R) => row.meta.selected === true).length === 0}
+        onSelectAll={onSelectAll}
+        selectedRows={filter(table, (row: R) => row.meta.selected === true)}
         onExport={(fields: Field[]) => {
           if (!isNil(gridApi) && !isNil(columnApi)) {
             const includeColumn = (col: Column): boolean => {
@@ -1091,7 +1107,7 @@ const BudgetTable = <
         }}
       />
       <RenderWithSpinner loading={loading}>
-        <div className={"budget-table ag-theme-alpine"}>
+        <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
           <div className={"table-grid"}>
             <AgGridReact
               {...gridOptions}
@@ -1155,7 +1171,7 @@ const BudgetTable = <
                 TemplateFringesCell: ShowCellOnlyForRowType<R>("subaccount")(
                   IncludeErrorsInCell<R>(TemplateFringesCell)
                 ),
-                // agColumnHeader: HeaderCell,
+                agColumnHeader: HeaderCell,
                 ...frameworkComponents
               }}
               onPasteStart={onPasteStart}
