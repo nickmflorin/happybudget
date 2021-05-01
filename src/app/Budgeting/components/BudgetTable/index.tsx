@@ -33,7 +33,7 @@ import {
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
-import { TABLE_DEBUG } from "config";
+import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
 import { RenderWithSpinner, ShowHide } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString, updateFieldOrdering, orderByFieldOrdering } from "lib/util";
@@ -271,7 +271,7 @@ const BudgetTable = <
         ...indexColumn,
         field: "index",
         cellRenderer: "IndexCell",
-        pinned: "left",
+        pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
         cellRendererParams: {
           onSelect: onRowSelect,
           onDeselect: onRowDeselect,
@@ -301,7 +301,7 @@ const BudgetTable = <
       cellRenderer: "IdentifierCell",
       width: 100,
       ...identifierColumn,
-      pinned: "left",
+      pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
         if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
@@ -325,7 +325,7 @@ const BudgetTable = <
         ...expandColumn,
         field: "expand",
         cellRenderer: "ExpandCell",
-        pinned: "left",
+        pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
         cellRendererParams: { onClick: onRowExpand },
         cellClass: mergeClassNamesFn(col.cellClass, expandColumn.cellClass, actionColumn.cellClass)
       })
