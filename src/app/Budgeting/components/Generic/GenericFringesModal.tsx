@@ -11,7 +11,6 @@ export interface GenericFringesModalProps extends GenericFringesTableProps {
 const GenericFringesModal = ({ open, onCancel, loading, ...props }: GenericFringesModalProps): JSX.Element => {
   return (
     <Modal
-      bodyStyle={{ height: 600 }}
       className={"fringes-modal"}
       title={"Fringes"}
       loading={loading}
