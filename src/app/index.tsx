@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === "production") {
   history.listen(location => {
     if (location.pathname !== prevPath) {
       prevPath = location.pathname;
-      window.analytics.page();
+      // window.analytics.page();
     }
   });
 }
