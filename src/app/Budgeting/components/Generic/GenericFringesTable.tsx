@@ -69,7 +69,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
           headerName: "Unit",
           cellClass: classNames("cell--centered"),
           cellRenderer: "FringeUnitCell",
-          width: 50,
+          width: 100,
           valueSetter: choiceModelValueSetter<Table.FringeRow, Model.FringeUnit>("unit", FringeUnits, {
             allowNull: false
           })
