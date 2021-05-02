@@ -1,11 +1,11 @@
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { filter, includes, map } from "lodash";
+import { map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/pro-light-svg-icons";
 
 import { ModelTagsDropdown } from "components/dropdowns";
+
 import { selectBudgetFringes } from "../../../store/selectors";
 import Cell, { StandardCellProps } from "./Cell";
 
@@ -18,18 +18,10 @@ const BudgetFringesCell = ({ value, onAddFringes, ...props }: BudgetFringesCellP
   // I am not 100% sure that this will properly update the AG Grid component when
   // the fringes in the state change.
   const fringes = useSelector(selectBudgetFringes);
+  // Use a separate selector for the Fringe IDs because we do not want to trigger the below effect
+  // everytime a Fringe changes, just when it is added or removed.
+  // const fringeIds = useSelector(deepSelectFringeIds);
   const row: Table.BudgetSubAccountRow = props.node.data;
-
-  useEffect(() => {
-    props.setValue(
-      filter(value, (id: number) =>
-        includes(
-          map(fringes, (f: Model.Fringe) => f.id),
-          id
-        )
-      )
-    );
-  }, [fringes]);
 
   return (
     <Cell {...props} onClear={() => props.setValue([])} hideClear={value.length === 0}>

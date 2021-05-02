@@ -1,6 +1,5 @@
-import { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { map, filter, includes } from "lodash";
+import { map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/pro-light-svg-icons";
@@ -19,17 +18,6 @@ const TemplateFringesCell = ({ value, onAddFringes, ...props }: TemplateFringesC
   // the fringes in the state change.
   const fringes = useSelector(selectTemplateFringes);
   const row: Table.TemplateSubAccountRow = props.node.data;
-
-  useEffect(() => {
-    props.setValue(
-      filter(value, (id: number) =>
-        includes(
-          map(fringes, (f: Model.Fringe) => f.id),
-          id
-        )
-      )
-    );
-  }, [fringes]);
 
   return (
     <Cell {...props} onClear={() => props.setValue([])} hideClear={value.length === 0}>
