@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignOutAlt, faAddressCard } from "@fortawesome/pro-light-svg-icons";
+import { faSignOutAlt, faAddressCard, faLock } from "@fortawesome/pro-light-svg-icons";
 
 import { Layout, Tooltip } from "antd";
 
@@ -59,6 +59,15 @@ const Header = ({ breadcrumbs, toolbar, className, headerHeight, style = {} }: H
               text: "Profile",
               onClick: () => history.push("/profile"),
               icon: <FontAwesomeIcon icon={faAddressCard} />
+            },
+            {
+              id: "admin",
+              text: "Admin",
+              onClick: () => {
+                window.location.href = `${process.env.REACT_APP_API_DOMAIN}/admin`;
+              },
+              icon: <FontAwesomeIcon icon={faLock} />,
+              visible: user.is_staff === true
             },
             {
               id: "logout",
