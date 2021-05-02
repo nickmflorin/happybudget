@@ -1,16 +1,10 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
 import { BudgetSubAccountRowManager } from "lib/tabling/managers";
 
-import {
-  selectBudgetFringes,
-  selectBudgetDetail,
-  selectBudgetDetailLoading,
-  selectBudgetId
-} from "../../store/selectors";
+import { selectBudgetFringes, selectBudgetDetail, selectBudgetDetailLoading } from "../../store/selectors";
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
 import FringesModal from "./FringesModal";
 
@@ -22,11 +16,9 @@ const BudgetSubAccountsTable = ({
 >): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
-  const history = useHistory();
   const detail = useSelector(selectBudgetDetail);
   const loadingBudget = useSelector(selectBudgetDetailLoading);
   const fringes = useSelector(selectBudgetFringes);
-  const budgetId = useSelector(selectBudgetId);
 
   return (
     <React.Fragment>
@@ -37,7 +29,7 @@ const BudgetSubAccountsTable = ({
         fringesCellRenderer={"BudgetFringesCell"}
         onEditFringes={() => setFringesModalVisible(true)}
         fringesCellRendererParams={{
-          onAddFringes: () => history.push(`/budgets/${budgetId}/fringes`)
+          onAddFringes: () => setFringesModalVisible(true)
         }}
         budgetTotals={{
           estimated: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
