@@ -6,6 +6,7 @@ import { Input, Button } from "antd";
 import { Form } from "components";
 import { FormProps } from "components/Form";
 import UploadUserImage from "./UploadUserImage";
+import TimezoneSelect from "./TimezoneSelect";
 
 interface UserProfileFormProps extends FormProps<Http.UserPayload> {
   imageUrl?: string | null;
@@ -28,6 +29,13 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ imageUrl, onImageChan
         rules={[{ required: true, message: "Please provide your last name." }]}
       >
         <Input placeholder={"Last Name"} />
+      </Form.Item>
+      <Form.Item
+        name={"timezone"}
+        label={"Time Zone"}
+        rules={[{ required: true, message: "Please select a timezone." }]}
+      >
+        <TimezoneSelect />
       </Form.Item>
       <Form.Item label={"Avatar"}>
         <UploadUserImage

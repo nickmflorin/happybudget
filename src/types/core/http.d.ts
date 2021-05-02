@@ -101,6 +101,7 @@ namespace Http {
     readonly first_name: string;
     readonly last_name: string;
     readonly profile_image?: string | ArrayBuffer | null;
+    readonly timezone?: string;
   }
 
   interface LoginResponse {

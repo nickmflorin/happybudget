@@ -27,7 +27,8 @@ const Profile = (): JSX.Element => {
           form={form}
           initialValues={{
             first_name: user.first_name,
-            last_name: user.last_name
+            last_name: user.last_name,
+            timezone: user.timezone
           }}
           onImageChange={(f: File | Blob) => setFile(f)}
           imageUrl={user.profile_image}
