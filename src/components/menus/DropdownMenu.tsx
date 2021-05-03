@@ -16,6 +16,7 @@ export interface IDropdownMenuItem {
   icon?: JSX.Element;
   disabled?: boolean;
   visible?: boolean;
+  selected?: boolean;
 }
 
 const isDropdownMenuItemInterface = (obj: IDropdownMenuItem | JSX.Element): obj is IDropdownMenuItem => {
@@ -39,6 +40,7 @@ export const DropdownMenuItem: React.FC<_DropdownItemProps> = ({
   style = {},
   generalStyle = {},
   generalClassName,
+  selected,
   onClick,
   ...props
 }: _DropdownItemProps): JSX.Element => {
@@ -49,7 +51,8 @@ export const DropdownMenuItem: React.FC<_DropdownItemProps> = ({
     <Menu.Item
       {...props}
       className={classNames("dropdown-menu-item", generalClassName, className, {
-        disabled: disabled === true
+        disabled: disabled === true,
+        active: selected
       })}
       onClick={() => {
         if (!(disabled === true)) {

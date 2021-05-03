@@ -1,6 +1,6 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import { map, isNil, find } from "lodash";
+import { map, isNil, orderBy } from "lodash";
 import classNames from "classnames";
 
 import { Dropdown, ShowHide } from "components";
@@ -46,13 +46,20 @@ const AncestorBreadCrumbSelectItem = ({
     <AncestorBreadCrumbItem className={className} style={style}>
       <Dropdown
         trigger={["click"]}
-        items={map(instance.siblings, (sibling: any) => {
-          return (
-            <Dropdown.Menu.Item id={sibling.id} onClick={() => history.push(getUrl(budget, sibling))}>
-              <EntityText fillEmpty={"---------"}>{sibling}</EntityText>
-            </Dropdown.Menu.Item>
-          );
-        })}
+        items={map(
+          orderBy([instance, ...instance.siblings], (obj: any) => obj.id),
+          (obj: any) => {
+            return (
+              <Dropdown.Menu.Item
+                id={obj.id}
+                selected={obj.id === instance.id}
+                onClick={() => history.push(getUrl(budget, obj))}
+              >
+                <EntityText fillEmpty={"---------"}>{obj}</EntityText>
+              </Dropdown.Menu.Item>
+            );
+          }
+        )}
       >
         <EntityTextButton fillEmpty={"---------"}>{instance}</EntityTextButton>
       </Dropdown>
