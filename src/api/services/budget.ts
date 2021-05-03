@@ -4,9 +4,9 @@ import { URL } from "./util";
 export const getBudgets = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Budget>> => {
+): Promise<Http.ListResponse<Model.SimpleBudget>> => {
   const url = URL.v1("budgets");
-  return client.list<Model.Budget>(url, query, options);
+  return client.list<Model.SimpleBudget>(url, query, options);
 };
 
 export const getBudget = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Budget> => {
@@ -39,7 +39,7 @@ export const createBudget = async (
 export const getBudgetsInTrash = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Budget>> => {
+): Promise<Http.ListResponse<Model.SimpleBudget>> => {
   const url = URL.v1("budgets", "trash");
   return client.list<Model.Budget>(url, query, options);
 };

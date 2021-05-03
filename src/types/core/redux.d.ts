@@ -86,19 +86,19 @@ namespace Redux {
   interface ModulesStore {}
 
   namespace Dashboard {
-    interface TemplatesStore extends Redux.ListResponseStore<Model.Template> {
+    interface TemplatesStore extends Redux.ListResponseStore<Model.SimpleTemplate> {
       readonly duplicating: Redux.ModelListActionStore;
       readonly moving: Redux.ModelListActionStore;
       readonly deleting: Redux.ModelListActionStore;
     }
 
-    interface CommunityTemplatesStore extends Redux.ListResponseStore<Model.Template> {
+    interface CommunityTemplatesStore extends Redux.ListResponseStore<Model.SimpleTemplate> {
       readonly deleting: Redux.ModelListActionStore;
       readonly duplicating: Redux.ModelListActionStore;
     }
 
     interface Store {
-      readonly budgets: Redux.ListResponseStore<Model.Budget>;
+      readonly budgets: Redux.ListResponseStore<Model.SimpleBudget>;
       readonly templates: TemplatesStore;
       readonly contacts: Redux.ListResponseStore<Model.Contact>;
       readonly community: CommunityTemplatesStore;

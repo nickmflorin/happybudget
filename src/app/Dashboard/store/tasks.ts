@@ -50,7 +50,9 @@ export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
   });
   yield put(loadingBudgetsAction(true));
   try {
-    const response: Http.ListResponse<Model.Budget> = yield call(getBudgets, query, { cancelToken: source.token });
+    const response: Http.ListResponse<Model.SimpleBudget> = yield call(getBudgets, query, {
+      cancelToken: source.token
+    });
     yield put(responseBudgetsAction(response));
   } catch (e) {
     if (!(yield cancelled())) {
@@ -77,7 +79,9 @@ export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
   });
   yield put(loadingTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.Template> = yield call(getTemplates, query, { cancelToken: source.token });
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(getTemplates, query, {
+      cancelToken: source.token
+    });
     yield put(responseTemplatesAction(response));
   } catch (e) {
     if (!(yield cancelled())) {
@@ -104,7 +108,7 @@ export function* getCommunityTemplatesTask(action: Redux.Action<any>): SagaItera
   });
   yield put(loadingCommunityTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.Template> = yield call(getCommunityTemplates, query, {
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(getCommunityTemplates, query, {
       cancelToken: source.token
     });
     yield put(responseCommunityTemplatesAction(response));

@@ -96,28 +96,32 @@ namespace Model {
     readonly unit: Model.FringeUnit;
   }
 
-  interface BaseBudget extends Model.TrackedModel {
+  interface BaseBudget extends Model {
     readonly name: string;
-    readonly estimated: number | null;
     readonly type: BudgetType;
+  }
+
+  interface SimpleTemplate extends Model.BaseBudget {
+    readonly type: "template";
+    readonly created_at: string;
+    readonly updated_at: string;
+    readonly created_by: number;
     readonly image: string | null;
   }
 
-  interface SimpleTemplate extends Model.Model {
-    readonly name: string;
-    readonly type: "template";
+  interface Template extends Model.SimpleTemplate {
+    readonly estimated: number | null;
   }
 
-  interface Template extends Model.BaseBudget {
-    readonly type: "template";
-  }
-
-  interface SimpleBudget extends Model.Model {
-    readonly name: string;
+  interface SimpleBudget extends Model.BaseBudget {
     readonly type: "budget";
+    readonly created_at: string;
+    readonly updated_at: string;
+    readonly created_by: number;
+    readonly image: string | null;
   }
 
-  interface Budget extends Model.BaseBudget {
+  interface Budget extends Model.SimpleBudget {
     readonly project_number: number;
     readonly production_type: Model.ProductionType;
     readonly shoot_date: string;
@@ -128,7 +132,7 @@ namespace Model {
     readonly location_days: number;
     readonly actual: number | null;
     readonly variance: number | null;
-    readonly type: "budget";
+    readonly estimated: number | null;
   }
 
   interface Group extends Model.TrackedModel {

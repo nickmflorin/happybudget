@@ -31,7 +31,7 @@ const CreateBudgetModal = ({
   onCancel
 }: CreateBudgetModalProps): JSX.Element => {
   const [_templatesLoading, setTemplatesLoading] = useState(false);
-  const [_templates, setTemplates] = useState<Model.Template[]>([]);
+  const [_templates, setTemplates] = useState<Model.SimpleTemplate[]>([]);
 
   const [file, setFile] = useState<File | Blob | null>(null);
   const [form] = Form.useForm();
@@ -40,7 +40,7 @@ const CreateBudgetModal = ({
     if (allowTemplateSelection === true && isNil(templates) && isNil(templateId)) {
       setTemplatesLoading(true);
       getTemplates({ no_pagination: true })
-        .then((response: Http.ListResponse<Model.Template>) => {
+        .then((response: Http.ListResponse<Model.SimpleTemplate>) => {
           setTemplates(response.data);
         })
         .catch((e: Error) => {

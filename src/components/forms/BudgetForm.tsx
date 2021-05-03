@@ -15,7 +15,7 @@ export interface BudgetFormValues {
 interface BudgetFormProps extends FormProps<BudgetFormValues> {
   imageUrl?: string | null;
   onImageChange?: (f: File | Blob) => void;
-  templates?: Model.Template[];
+  templates?: Model.Template[] | Model.SimpleTemplate[];
   templatesLoading?: boolean;
 }
 
@@ -49,7 +49,7 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ imageUrl, onImageChange, templa
             loading={templatesLoading === true}
             disabled={templatesLoading === true}
           >
-            {templates.map((template: Model.Template, index: number) => (
+            {templates.map((template: Model.Template | Model.SimpleTemplate, index: number) => (
               <Select.Option key={index} value={template.id}>
                 {template.name}
               </Select.Option>

@@ -4,15 +4,15 @@ import { URL } from "./util";
 export const getTemplates = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Template>> => {
+): Promise<Http.ListResponse<Model.SimpleTemplate>> => {
   const url = URL.v1("templates");
-  return client.list<Model.Template>(url, query, options);
+  return client.list<Model.SimpleTemplate>(url, query, options);
 };
 
 export const getCommunityTemplates = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Template>> => {
+): Promise<Http.ListResponse<Model.SimpleTemplate>> => {
   const url = URL.v1("templates", "community");
   return client.list<Model.Template>(url, query, options);
 };
@@ -55,7 +55,7 @@ export const createCommunityTemplate = async (
 export const getTemplatesInTrash = async (
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Template>> => {
+): Promise<Http.ListResponse<Model.SimpleTemplate>> => {
   const url = URL.v1("templates", "trash");
   return client.list<Model.Template>(url, query, options);
 };

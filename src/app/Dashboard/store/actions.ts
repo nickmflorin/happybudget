@@ -73,7 +73,7 @@ export const ActionType = {
 
 export const requestBudgetsAction = simpleAction<null>(ActionType.Budgets.Request);
 export const loadingBudgetsAction = simpleAction<boolean>(ActionType.Budgets.Loading);
-export const responseBudgetsAction = simpleAction<Http.ListResponse<Model.Budget>>(ActionType.Budgets.Response);
+export const responseBudgetsAction = simpleAction<Http.ListResponse<Model.SimpleBudget>>(ActionType.Budgets.Response);
 export const setBudgetsSearchAction = simpleAction<string>(ActionType.Budgets.SetSearch);
 export const setBudgetsPageAction = simpleAction<number>(ActionType.Budgets.SetPage);
 export const setBudgetsPageSizeAction = simpleAction<number>(ActionType.Budgets.SetPageSize);
@@ -88,7 +88,9 @@ export const deletingBudgetAction = simpleAction<Redux.ModelListActionPayload>(A
 
 export const requestTemplatesAction = simpleAction<null>(ActionType.Templates.Request);
 export const loadingTemplatesAction = simpleAction<boolean>(ActionType.Templates.Loading);
-export const responseTemplatesAction = simpleAction<Http.ListResponse<Model.Template>>(ActionType.Templates.Response);
+export const responseTemplatesAction = simpleAction<Http.ListResponse<Model.SimpleTemplate>>(
+  ActionType.Templates.Response
+);
 export const setTemplatesSearchAction = simpleAction<string>(ActionType.Templates.SetSearch);
 export const setTemplatesPageAction = simpleAction<number>(ActionType.Templates.SetPage);
 export const setTemplatesPageSizeAction = simpleAction<number>(ActionType.Templates.SetPageSize);
@@ -109,7 +111,7 @@ export const duplicatingTemplateAction = simpleAction<Redux.ModelListActionPaylo
 
 export const requestCommunityTemplatesAction = simpleAction<null>(ActionType.Community.Request);
 export const loadingCommunityTemplatesAction = simpleAction<boolean>(ActionType.Community.Loading);
-export const responseCommunityTemplatesAction = simpleAction<Http.ListResponse<Model.Template>>(
+export const responseCommunityTemplatesAction = simpleAction<Http.ListResponse<Model.SimpleTemplate>>(
   ActionType.Community.Response
 );
 export const setCommunityTemplatesSearchAction = simpleAction<string>(ActionType.Community.SetSearch);
