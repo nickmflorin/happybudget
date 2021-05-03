@@ -43,7 +43,9 @@ export enum SubAccountUnitNames {
   FLAT = "Flat",
   FEET = "Feet",
   FARE = "Fare",
-  UNITS = "Units"
+  UNITS = "Units",
+  PERSON = "Person",
+  EACH = "Each"
 }
 
 export const SubAccountUnitModels: { [key: string]: Model.SubAccountUnit } = {
@@ -57,7 +59,9 @@ export const SubAccountUnitModels: { [key: string]: Model.SubAccountUnit } = {
   FLAT: { id: 7, name: SubAccountUnitNames.FLAT },
   FEET: { id: 8, name: SubAccountUnitNames.FEET },
   FARE: { id: 9, name: SubAccountUnitNames.FARE },
-  UNITS: { id: 10, name: SubAccountUnitNames.UNITS }
+  UNITS: { id: 10, name: SubAccountUnitNames.UNITS },
+  PERSON: { id: 11, name: SubAccountUnitNames.PERSON },
+  EACH: { id: 12, name: SubAccountUnitNames.EACH }
 };
 
 export const SubAccountUnits = Object.values(SubAccountUnitModels);

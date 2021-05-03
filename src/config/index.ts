@@ -25,7 +25,9 @@ export const DEFAULT_TAG_COLOR_SCHEME = [
   "#b49a85",
   "#886da8",
   "#76d0ca",
-  "#58add6"
+  "#58add6",
+  "#ffd2ba",
+  "#beebff"
 ];
 
 // Convenience flag for development to turn off the context menu so we can right-click inspect
