@@ -80,7 +80,6 @@ export const createAccountTaskSet = <
   selectModels: (state: Redux.ApplicationStore) => SA[]
 ): AccountTaskSet<R, G> => {
   function* handleAccountChangeTask(action: Redux.Action<number>): SagaIterator {
-    console.log("Account Changed");
     yield all([put(actions.account.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);
   }
 

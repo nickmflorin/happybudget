@@ -93,7 +93,6 @@ interface AncestorsBreadCrumbsProps {
 }
 
 const AncestorsBreadCrumbs = ({ instance, budget }: AncestorsBreadCrumbsProps): JSX.Element => {
-  console.log({ instance, ancestors: !isNil(instance) ? instance.ancestors : null });
   return (
     <div className={"ancestors-bread-crumbs"}>
       <AncestorBreadCrumbBudgetItem budget={budget} />

@@ -42,6 +42,8 @@ const SubAccount = (): JSX.Element => {
   useEffect(() => {
     if (!isNil(detail)) {
       dispatch(setInstanceAction(detail));
+    } else {
+      dispatch(setInstanceAction(null));
     }
   }, [detail]);
 

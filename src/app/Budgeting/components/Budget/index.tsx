@@ -44,12 +44,9 @@ const Budget = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNaN(parseInt(budgetId))) {
-      console.log("Setting Budget Id");
       dispatch(setBudgetIdAction(parseInt(budgetId)));
     }
   }, [budgetId]);
-
-  console.log(`Rendering Instance: ${!isNil(instance) ? instance.id : null}`);
 
   return (
     <GenericLayout

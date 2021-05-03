@@ -32,7 +32,6 @@ const Accounts = (): JSX.Element => {
   const loading = useSelector(selectLoading);
 
   useEffect(() => {
-    console.log("SEtting Instance Null");
     dispatch(setInstanceAction(null));
     dispatch(requestAccountsAction(null));
     dispatch(requestGroupsAction(null));
