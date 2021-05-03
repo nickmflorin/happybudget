@@ -69,7 +69,7 @@ const AncestorBreadCrumbEntityItem = ({ children, budget }: AncestorBreadCrumbEn
   return (
     <AncestorBreadCrumbItem url={getUrl(budget, children)}>
       <div className={"entity-text-wrapper"}>
-        <EntityText>{children}</EntityText>
+        <EntityText fillEmpty={"---------"}>{children}</EntityText>
       </div>
     </AncestorBreadCrumbItem>
   );
