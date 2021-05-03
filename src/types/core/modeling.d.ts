@@ -134,7 +134,7 @@ namespace Model {
   interface Group extends Model.TrackedModel {
     readonly children: number[];
     readonly name: string;
-    readonly color: string;
+    readonly color: string | null;
     readonly estimated: number | null;
     readonly children: number[];
   }

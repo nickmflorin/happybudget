@@ -22,3 +22,8 @@ export const getGroup = async <G extends Model.Group = Model.BudgetGroup | Model
   const url = URL.v1("groups", id);
   return client.retrieve<G>(url, options);
 };
+
+export const getGroupColors = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<string>> => {
+  const url = URL.v1("groups", "colors");
+  return client.list<string>(url, { no_pagination: true, ...options });
+};

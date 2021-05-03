@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "antd";
+
+import { useGroupColors } from "lib/hooks";
 
 import { Form } from "components";
 import { FormProps } from "components/Form";
 import { ColorSelect } from "components/forms";
+import { isNil } from "lodash";
 
 export interface GroupFormValues {
   name: string;
@@ -11,6 +14,18 @@ export interface GroupFormValues {
 }
 
 const GroupForm: React.FC<FormProps<GroupFormValues>> = ({ ...props }) => {
+  const [colors, loading, error] = useGroupColors();
+
+  useEffect(() => {
+    props.form.setLoading(loading);
+  }, [loading]);
+
+  useEffect(() => {
+    if (!isNil(error)) {
+      props.form.handleRequestError(error);
+    }
+  }, [error]);
+
   return (
     <Form.Form layout={"vertical"} {...props}>
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the group." }]}>
@@ -21,22 +36,7 @@ const GroupForm: React.FC<FormProps<GroupFormValues>> = ({ ...props }) => {
         label={"Color"}
         rules={[{ required: true, message: "Please select a color for the group." }]}
       >
-        <ColorSelect
-          colors={[
-            "#797695",
-            "#ff7165",
-            "#80cbc4",
-            "#ce93d8",
-            "#fed835",
-            "#c87987",
-            "#69f0ae",
-            "#a1887f",
-            "#81d4fa",
-            "#f75776",
-            "#66bb6a",
-            "#58add6"
-          ]}
-        />
+        <ColorSelect colors={colors} />
       </Form.Item>
     </Form.Form>
   );
