@@ -19,7 +19,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     Updating: ActionType.Contacts.Updating,
     Deleting: ActionType.Contacts.Deleting
   }),
-  templates: createListResponseReducer<Model.Template, Redux.Dashboard.TemplatesStore, Redux.Action<any>>(
+  templates: createListResponseReducer<Model.SimpleTemplate, Redux.Dashboard.TemplatesStore, Redux.Action<any>>(
     {
       Response: ActionType.Templates.Response,
       Loading: ActionType.Templates.Loading,
@@ -39,7 +39,11 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
       }
     }
   ),
-  community: createListResponseReducer<Model.Template, Redux.Dashboard.CommunityTemplatesStore, Redux.Action<any>>(
+  community: createListResponseReducer<
+    Model.SimpleTemplate,
+    Redux.Dashboard.CommunityTemplatesStore,
+    Redux.Action<any>
+  >(
     {
       Response: ActionType.Community.Response,
       Loading: ActionType.Community.Loading,
@@ -58,7 +62,11 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
       }
     }
   ),
-  budgets: createListResponseReducer<Model.Budget, Redux.ListResponseStore<Model.Budget>, Redux.Action<any>>({
+  budgets: createListResponseReducer<
+    Model.SimpleBudget,
+    Redux.ListResponseStore<Model.SimpleBudget>,
+    Redux.Action<any>
+  >({
     Response: ActionType.Budgets.Response,
     Loading: ActionType.Budgets.Loading,
     SetSearch: ActionType.Budgets.SetSearch,

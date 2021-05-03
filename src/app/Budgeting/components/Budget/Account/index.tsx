@@ -42,6 +42,8 @@ const Account = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(detail)) {
+      console.log("Setting INstance");
+      console.log(detail);
       dispatch(setInstanceAction(detail));
     }
   }, [detail]);

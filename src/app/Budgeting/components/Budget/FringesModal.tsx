@@ -1,10 +1,9 @@
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction, addFringesPlaceholdersToStateAction } from "../../store/actions/budget";
+import { addFringesPlaceholdersToStateAction } from "../../store/actions/budget";
 import {
   setFringesSearchAction,
   deselectFringeAction,
@@ -39,10 +38,6 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
   const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
-
-  useEffect(() => {
-    dispatch(setInstanceAction(null));
-  }, []);
 
   return (
     <GenericFringesModal
