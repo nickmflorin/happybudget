@@ -1934,6 +1934,15 @@
     "@sentry/utils" "6.3.3"
     "tslib" "^1.9.3"
 
+"@sentry/hub@6.3.5":
+  "integrity" "sha512-ZYFo7VYKwdPVjuV9BDFiYn+MpANn6eZMz5QDBfZ2dugIvIVbuOyOOLx8PSa3ZXJoVTZZ7s2wD2fi/ZxKjNjZOQ=="
+  "resolved" "https://registry.npmjs.org/@sentry/hub/-/hub-6.3.5.tgz"
+  "version" "6.3.5"
+  dependencies:
+    "@sentry/types" "6.3.5"
+    "@sentry/utils" "6.3.5"
+    "tslib" "^1.9.3"
+
 "@sentry/minimal@6.3.3":
   "integrity" "sha512-MKspEQ5hhTMrbeiNvkRGgm/NX2gM/Mni0vDJjuqQFi2Cd3RwA4ZVO6yRr6XzFPtTGgDsrXg75lQ8rma96Qs8/g=="
   "resolved" "https://registry.npmjs.org/@sentry/minimal/-/minimal-6.3.3.tgz"
@@ -1941,6 +1950,15 @@
   dependencies:
     "@sentry/hub" "6.3.3"
     "@sentry/types" "6.3.3"
+    "tslib" "^1.9.3"
+
+"@sentry/minimal@6.3.5":
+  "integrity" "sha512-4RqIGAU0+8iI/1sw0GYPTr4SUA88/i2+JPjFJ+qloh5ANVaNwhFPRChw+Ys9xpre8LV9JZrEsEf8AvQr4fkNbA=="
+  "resolved" "https://registry.npmjs.org/@sentry/minimal/-/minimal-6.3.5.tgz"
+  "version" "6.3.5"
+  dependencies:
+    "@sentry/hub" "6.3.5"
+    "@sentry/types" "6.3.5"
     "tslib" "^1.9.3"
 
 "@sentry/react@^6.3.3":
@@ -1955,10 +1973,26 @@
     "hoist-non-react-statics" "^3.3.2"
     "tslib" "^1.9.3"
 
+"@sentry/tracing@^6.3.5":
+  "integrity" "sha512-TNKAST1ge2g24BlTfVxNp4gP5t3drbi0OVCh8h8ah+J7UjHSfdiqhd9W2h5qv1GO61gGlpWeN/TyioyQmOxu0Q=="
+  "resolved" "https://registry.npmjs.org/@sentry/tracing/-/tracing-6.3.5.tgz"
+  "version" "6.3.5"
+  dependencies:
+    "@sentry/hub" "6.3.5"
+    "@sentry/minimal" "6.3.5"
+    "@sentry/types" "6.3.5"
+    "@sentry/utils" "6.3.5"
+    "tslib" "^1.9.3"
+
 "@sentry/types@6.3.3":
   "integrity" "sha512-UPHzhwqdjta7LCFfqNvJ5g79lRiXOxtgnIp7zlBkHU6yZs4fPnlBadljyi2gGFguN+C+XAukrbXUAq2mb+Mhdw=="
   "resolved" "https://registry.npmjs.org/@sentry/types/-/types-6.3.3.tgz"
   "version" "6.3.3"
+
+"@sentry/types@6.3.5":
+  "integrity" "sha512-tY/3pkAmGYJ3F0BtwInsdt/uclNvF8aNG7XHsTPQNzk7BkNVWjCXx0sjxi6CILirl5nwNxYxVeTr2ZYAEZ/dSQ=="
+  "resolved" "https://registry.npmjs.org/@sentry/types/-/types-6.3.5.tgz"
+  "version" "6.3.5"
 
 "@sentry/utils@6.3.3":
   "integrity" "sha512-Kz546LeF6Ff/FU53XUVaairMQYFc6sIHBvE5ReZmfDRpaR+qZnfIbWhfoIbSwyBbtF+T8/gcU7mcZpZQmM5jLw=="
@@ -1966,6 +2000,14 @@
   "version" "6.3.3"
   dependencies:
     "@sentry/types" "6.3.3"
+    "tslib" "^1.9.3"
+
+"@sentry/utils@6.3.5":
+  "integrity" "sha512-kHUcZ37QYlNzz7c9LVdApITXHaNmQK7+sw/If3M/qpff1fd5XoecA8laLfcYuz+Cw5mRhVmdhPcCRM3Xi1IGXg=="
+  "resolved" "https://registry.npmjs.org/@sentry/utils/-/utils-6.3.5.tgz"
+  "version" "6.3.5"
+  dependencies:
+    "@sentry/types" "6.3.5"
     "tslib" "^1.9.3"
 
 "@sinonjs/commons@^1.7.0":
