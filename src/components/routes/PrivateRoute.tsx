@@ -19,12 +19,12 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
       .then((response: Http.TokenValidationResponse) => {
         dispatch(updateLoggedInUserAction(response.user));
         // TODO: Figure out how to do this just on login.
-        // if (process.env.NODE_ENV === "production") {
-        //   window.analytics.identify(response.user.id, {
-        //     name: response.user.full_name,
-        //     email: response.user.email
-        //   });
-        // }
+        if (process.env.NODE_ENV !== "development") {
+          window.analytics.identify(response.user.id, {
+            name: response.user.full_name,
+            email: response.user.email
+          });
+        }
       })
       .catch((e: Error) => {
         if (e instanceof AuthenticationError) {

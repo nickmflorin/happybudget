@@ -16,14 +16,17 @@ const history = createBrowserHistory();
 
 let prevPath: string | null = null;
 
-if (process.env.NODE_ENV === "production") {
-  Sentry.init({ dsn: "https://c27df092747b4aae964b2ff6f07c3497@o591585.ingest.sentry.io/5740401" });
+Sentry.init({
+  dsn: "https://c27df092747b4aae964b2ff6f07c3497@o591585.ingest.sentry.io/5740401",
+  environment: process.env.NODE_ENV
+});
 
+if (process.env.NODE_ENV !== "development") {
   // Listen and notify Segment of client-side page updates.
   history.listen(location => {
     if (location.pathname !== prevPath) {
       prevPath = location.pathname;
-      // window.analytics.page();
+      window.analytics.page();
     }
   });
 }
