@@ -88,7 +88,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
       const mapped = mapping[value];
       if (!isNil(mapped)) {
         return (
-          <Tag colorIndex={mapped.model.id} key={i}>
+          <Tag key={i} model={mapped.model}>
             {mapped.label}
           </Tag>
         );

@@ -19,3 +19,8 @@ export const updateFringe = async (
   const url = URL.v1("fringes", id);
   return client.patch<Model.Fringe>(url, payload, options);
 };
+
+export const getFringeColors = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<string>> => {
+  const url = URL.v1("fringes", "colors");
+  return client.list<string>(url, { no_pagination: true, ...options });
+};

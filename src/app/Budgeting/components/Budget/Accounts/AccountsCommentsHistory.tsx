@@ -12,27 +12,29 @@ import {
 } from "../../../store/actions/budget/accounts";
 
 const selectDeletingComments = simpleDeepEqualSelector((state: Redux.ApplicationStore) =>
-  map(state.budget.budget.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
+  map(state.budgeting.budget.budget.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectEditingComments = simpleDeepEqualSelector((state: Redux.ApplicationStore) =>
-  map(state.budget.budget.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
+  map(state.budgeting.budget.budget.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectReplyingComments = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.budget.comments.replying
+  (state: Redux.ApplicationStore) => state.budgeting.budget.budget.comments.replying
 );
 const selectCommentsData = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.budget.comments.data
+  (state: Redux.ApplicationStore) => state.budgeting.budget.budget.comments.data
 );
 const selectSubmittingComment = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.budget.comments.creating
+  (state: Redux.ApplicationStore) => state.budgeting.budget.budget.comments.creating
 );
 const selectLoadingComments = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.budget.comments.loading
+  (state: Redux.ApplicationStore) => state.budgeting.budget.budget.comments.loading
 );
 const selectLoadingHistory = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.accounts.history.loading
+  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.history.loading
 );
-const selectHistory = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.accounts.history.data);
+const selectHistory = simpleDeepEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.history.data
+);
 
 const AccountCommentsHistory = (): JSX.Element => {
   const dispatch = useDispatch();

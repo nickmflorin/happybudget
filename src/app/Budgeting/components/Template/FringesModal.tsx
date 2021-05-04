@@ -16,17 +16,23 @@ import {
 } from "../../store/actions/template/fringes";
 import { GenericFringesModal, GenericFringesModalProps } from "../Generic";
 
-const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.fringes.selected);
-const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.fringes.data);
-const selectTableSearch = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.template.fringes.search);
-const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.template.fringes.placeholders
+const selectSelectedRows = simpleDeepEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.selected
 );
-const selectLoading = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.template.fringes.loading);
+const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budgeting.template.fringes.data);
+const selectTableSearch = simpleShallowEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.search
+);
+const selectPlaceholders = simpleShallowEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.placeholders
+);
+const selectLoading = simpleShallowEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.loading
+);
 const selectSaving = createSelector(
-  (state: Redux.ApplicationStore) => state.template.fringes.deleting,
-  (state: Redux.ApplicationStore) => state.template.fringes.updating,
-  (state: Redux.ApplicationStore) => state.template.fringes.creating,
+  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.deleting,
+  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.updating,
+  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );

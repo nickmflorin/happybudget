@@ -675,6 +675,7 @@ export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Mo
     ManageField({ field: "description", allowNull: false }),
     ManageField({ field: "cutoff", allowNull: false }),
     ManageField({ field: "rate", allowNull: false }),
+    ManageField({ field: "color", allowNull: true }),
     ManageField({
       field: "unit",
       allowNull: false,

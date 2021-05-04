@@ -15,10 +15,10 @@ import AccountsTable from "./AccountsTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
 
 const selectAccountsLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.accounts.loading
+  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.loading
 );
 const selectGroupsLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.accounts.groups.loading
+  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.groups.loading
 );
 const selectLoading = createSelector(
   selectAccountsLoading,

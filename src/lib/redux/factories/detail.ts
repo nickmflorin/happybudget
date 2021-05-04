@@ -25,7 +25,7 @@ export type IDetailResponseActionMap = {
  */
 export const createDetailResponseReducer = <
   M extends Model.Model,
-  S extends Redux.DetailResponseStore<M> = Redux.DetailResponseStore<M>,
+  S extends Redux.ModelDetailResponseStore<M> = Redux.ModelDetailResponseStore<M>,
   A extends Redux.Action<any> = Redux.Action<any>
 >(
   /* eslint-disable indent */

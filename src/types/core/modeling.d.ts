@@ -59,6 +59,9 @@ namespace Model {
   type EntityType = "budget" | "template" | "account" | "subaccount";
   type BudgetType = "budget" | "template";
 
+  type ModelWithColor = Model.Model & { color: string | null };
+  type ModelWithName = Model.Model & { name: string | null };
+
   interface TrackedModel extends Model.Model {
     readonly created_by: number | null;
     readonly updated_by: number | null;
@@ -91,6 +94,7 @@ namespace Model {
   }
 
   interface Fringe extends Model.TrackedModel {
+    readonly color: string | null;
     readonly name: string;
     readonly description: string | null;
     readonly cutoff: number | null;

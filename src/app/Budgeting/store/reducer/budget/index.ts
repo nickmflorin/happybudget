@@ -1,7 +1,7 @@
 import { Reducer, combineReducers } from "redux";
 import { isNil, reduce } from "lodash";
 import {
-  createListResponseReducer,
+  createModelListResponseReducer,
   createDetailResponseReducer,
   createSimpleBooleanReducer,
   createSimplePayloadReducer,
@@ -30,7 +30,7 @@ const genericReducer = combineReducers({
   fringes: createFringesReducer("Budget"),
   budget: combineReducers({
     id: createSimplePayloadReducer<number | null>(ActionType.Budget.SetId, null),
-    detail: createDetailResponseReducer<Model.Budget, Redux.DetailResponseStore<Model.Budget>, Redux.Action>({
+    detail: createDetailResponseReducer<Model.Budget, Redux.ModelDetailResponseStore<Model.Budget>, Redux.Action>({
       Response: ActionType.Budget.Response,
       Loading: ActionType.Budget.Loading,
       Request: ActionType.Budget.Request
@@ -48,20 +48,20 @@ const genericReducer = combineReducers({
       Replying: ActionType.Budget.Comments.Replying
     })
   }),
-  budgetItems: createListResponseReducer<Model.BudgetLineItem>({
+  budgetItems: createModelListResponseReducer<Model.BudgetLineItem>({
     Response: ActionType.Budget.BudgetItems.Response,
     Loading: ActionType.Budget.BudgetItems.Loading
   }),
-  budgetItemsTree: createListResponseReducer<Model.AccountTreeNode>({
+  budgetItemsTree: createModelListResponseReducer<Model.AccountTreeNode>({
     Response: ActionType.Budget.BudgetItemsTree.Response,
     Loading: ActionType.Budget.BudgetItemsTree.Loading
   })
 });
 
-const rootReducer: Reducer<Redux.Budget.Store, Redux.Action<any>> = (
-  state: Redux.Budget.Store = initialState.budget,
+const rootReducer: Reducer<Redux.Budgeting.Budget.Store, Redux.Action<any>> = (
+  state: Redux.Budgeting.Budget.Store = initialState.budget,
   action: Redux.Action<any>
-): Redux.Budget.Store => {
+): Redux.Budgeting.Budget.Store => {
   let newState = genericReducer(state, action);
 
   if (!isNil(action.payload)) {

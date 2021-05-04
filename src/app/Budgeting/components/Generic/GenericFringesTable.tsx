@@ -55,6 +55,13 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
       ]}
       bodyColumns={[
         {
+          field: "color",
+          headerName: "Color",
+          cellClass: classNames("cell--centered"),
+          cellRenderer: "FringeColorCell",
+          width: 100
+        },
+        {
           field: "description",
           headerName: "Description"
         },

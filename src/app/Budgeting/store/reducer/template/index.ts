@@ -21,7 +21,7 @@ const genericReducer = combineReducers({
   fringes: createFringesReducer("Template"),
   template: combineReducers({
     id: createSimplePayloadReducer<number | null>(ActionType.Template.SetId, null),
-    detail: createDetailResponseReducer<Model.Template, Redux.DetailResponseStore<Model.Template>, Redux.Action>({
+    detail: createDetailResponseReducer<Model.Template, Redux.ModelDetailResponseStore<Model.Template>, Redux.Action>({
       Response: ActionType.Template.Response,
       Loading: ActionType.Template.Loading,
       Request: ActionType.Template.Request
@@ -29,10 +29,10 @@ const genericReducer = combineReducers({
   })
 });
 
-const rootReducer: Reducer<Redux.Template.Store, Redux.Action<any>> = (
-  state: Redux.Template.Store = initialState.template,
+const rootReducer: Reducer<Redux.Budgeting.Template.Store, Redux.Action<any>> = (
+  state: Redux.Budgeting.Template.Store = initialState.template,
   action: Redux.Action<any>
-): Redux.Template.Store => {
+): Redux.Budgeting.Template.Store => {
   let newState = genericReducer(state, action);
 
   if (!isNil(action.payload)) {

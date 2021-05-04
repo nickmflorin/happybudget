@@ -54,7 +54,7 @@ import {
 import { createStandardSaga, createAccountsTaskSet } from "../factories";
 
 export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -78,7 +78,7 @@ export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
 }
 
 export function* submitCommentTask(action: Redux.Action<{ parent?: number; data: Http.CommentPayload }>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -161,7 +161,7 @@ export function* editCommentTask(action: Redux.Action<Redux.UpdateModelActionPay
 }
 
 export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -256,8 +256,8 @@ const tasks = createAccountsTaskSet<
     bulkCreate: bulkCreateBudgetAccounts
   },
   BudgetAccountRowManager,
-  (state: Redux.ApplicationStore) => state.budget.budget.id,
-  (state: Redux.ApplicationStore) => state.budget.accounts.data
+  (state: Redux.ApplicationStore) => state.budgeting.budget.budget.id,
+  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.data
 );
 
 export default createStandardSaga({

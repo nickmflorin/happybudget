@@ -1,14 +1,17 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, filter, map, reduce, forEach } from "lodash";
-import { createListResponseReducer } from "lib/redux/factories";
+import { createModelListResponseReducer } from "lib/redux/factories";
 import { replaceInArray } from "lib/util";
 import { warnInconsistentState } from "lib/redux/util";
-import { initialListResponseState } from "store/initialState";
+import { initialModelListResponseState } from "store/initialState";
 
 import { ActionType } from "../../actions";
 import { initialTemplateAccountsState } from "../../initialState";
 
-const listResponseReducer = createListResponseReducer<Model.TemplateAccount, Redux.Template.AccountsStore>(
+const listResponseReducer = createModelListResponseReducer<
+  Model.TemplateAccount,
+  Redux.Budgeting.Template.AccountsStore
+>(
   {
     Response: ActionType.Template.Accounts.Response,
     Request: ActionType.Template.Accounts.Request,
@@ -28,7 +31,7 @@ const listResponseReducer = createListResponseReducer<Model.TemplateAccount, Red
     initialState: initialTemplateAccountsState,
     strictSelect: false,
     subReducers: {
-      groups: createListResponseReducer<Model.TemplateGroup, Redux.ListResponseStore<Model.TemplateGroup>>(
+      groups: createModelListResponseReducer<Model.TemplateGroup, Redux.ModelListResponseStore<Model.TemplateGroup>>(
         {
           Response: ActionType.Template.Accounts.Groups.Response,
           Request: ActionType.Template.Accounts.Groups.Request,
@@ -40,7 +43,7 @@ const listResponseReducer = createListResponseReducer<Model.TemplateAccount, Red
         {
           extensions: {
             [ActionType.Template.Accounts.RemoveFromGroup]: (
-              st: Redux.ListResponseStore<Model.TemplateGroup> = initialListResponseState,
+              st: Redux.ModelListResponseStore<Model.TemplateGroup> = initialModelListResponseState,
               action: Redux.Action<number>
             ) => {
               const group: Model.TemplateGroup | undefined = find(st.data, (g: Model.TemplateGroup) =>
@@ -74,7 +77,10 @@ const listResponseReducer = createListResponseReducer<Model.TemplateAccount, Red
   }
 );
 
-const recalculateGroupMetrics = (st: Redux.Template.AccountsStore, groupId: number): Redux.Template.AccountsStore => {
+const recalculateGroupMetrics = (
+  st: Redux.Budgeting.Template.AccountsStore,
+  groupId: number
+): Redux.Budgeting.Template.AccountsStore => {
   // This might not be totally necessary, but it is good practice to not use the entire payload
   // to update the group (since that is already done by the reducer above) but to instead just
   // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -109,10 +115,10 @@ const recalculateGroupMetrics = (st: Redux.Template.AccountsStore, groupId: numb
   };
 };
 
-const rootReducer: Reducer<Redux.Template.AccountsStore, Redux.Action<any>> = (
-  state: Redux.Template.AccountsStore = initialTemplateAccountsState,
+const rootReducer: Reducer<Redux.Budgeting.Template.AccountsStore, Redux.Action<any>> = (
+  state: Redux.Budgeting.Template.AccountsStore = initialTemplateAccountsState,
   action: Redux.Action<any>
-): Redux.Template.AccountsStore => {
+): Redux.Budgeting.Template.AccountsStore => {
   let newState = { ...state };
 
   newState = listResponseReducer(newState, action);

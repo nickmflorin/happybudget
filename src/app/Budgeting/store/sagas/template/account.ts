@@ -62,8 +62,8 @@ const tasks = createAccountTaskSet<
     addErrorsToState: addErrorsToStateAction
   },
   TemplateSubAccountRowManager,
-  (state: Redux.ApplicationStore) => state.template.account.id,
-  (state: Redux.ApplicationStore) => state.template.account.subaccounts.data
+  (state: Redux.ApplicationStore) => state.budgeting.template.account.id,
+  (state: Redux.ApplicationStore) => state.budgeting.template.account.subaccounts.data
 );
 
 function* watchForRequestAccountSaga(): SagaIterator {

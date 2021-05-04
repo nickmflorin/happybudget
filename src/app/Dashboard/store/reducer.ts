@@ -1,9 +1,9 @@
 import { Reducer, combineReducers } from "redux";
-import { createModelListActionReducer, createListResponseReducer } from "lib/redux/factories";
+import { createModelListActionReducer, createModelListResponseReducer } from "lib/redux/factories";
 import { ActionType } from "./actions";
 
 const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineReducers({
-  contacts: createListResponseReducer<Model.Contact, Redux.ListResponseStore<Model.Contact>>({
+  contacts: createModelListResponseReducer<Model.Contact, Redux.ModelListResponseStore<Model.Contact>>({
     Response: ActionType.Contacts.Response,
     Request: ActionType.Contacts.Request,
     Loading: ActionType.Contacts.Loading,
@@ -19,7 +19,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     Updating: ActionType.Contacts.Updating,
     Deleting: ActionType.Contacts.Deleting
   }),
-  templates: createListResponseReducer<Model.SimpleTemplate, Redux.Dashboard.TemplatesStore, Redux.Action<any>>(
+  templates: createModelListResponseReducer<Model.SimpleTemplate, Redux.Dashboard.TemplatesStore, Redux.Action<any>>(
     {
       Response: ActionType.Templates.Response,
       Loading: ActionType.Templates.Loading,
@@ -39,7 +39,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
       }
     }
   ),
-  community: createListResponseReducer<
+  community: createModelListResponseReducer<
     Model.SimpleTemplate,
     Redux.Dashboard.CommunityTemplatesStore,
     Redux.Action<any>
@@ -62,9 +62,9 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
       }
     }
   ),
-  budgets: createListResponseReducer<
+  budgets: createModelListResponseReducer<
     Model.SimpleBudget,
-    Redux.ListResponseStore<Model.SimpleBudget>,
+    Redux.ModelListResponseStore<Model.SimpleBudget>,
     Redux.Action<any>
   >({
     Response: ActionType.Budgets.Response,

@@ -1,15 +1,15 @@
-import { initialListResponseState } from "store/initialState";
+import { initialModelListResponseState } from "store/initialState";
 
 const initialState: Redux.Dashboard.Store = {
-  contacts: initialListResponseState,
-  budgets: initialListResponseState,
+  contacts: initialModelListResponseState,
+  budgets: initialModelListResponseState,
   templates: {
-    ...initialListResponseState,
+    ...initialModelListResponseState,
     duplicating: [],
     moving: []
   },
   community: {
-    ...initialListResponseState,
+    ...initialModelListResponseState,
     duplicating: []
   }
 };

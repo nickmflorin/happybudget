@@ -2,7 +2,7 @@ import { useRef, useCallback, useEffect } from "react";
 import { isEqual } from "lodash";
 
 export * from "./ui";
-export * from "./group";
+export * from "./tagging";
 
 export const useDynamicCallback = <T = any>(callback: (...args: any[]) => T) => {
   const ref = useRef<any>();

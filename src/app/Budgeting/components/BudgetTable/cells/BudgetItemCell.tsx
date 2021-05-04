@@ -8,7 +8,9 @@ interface BudgetItemCellProps extends StandardCellProps<Table.ActualRow> {
   onChange: (object_id: number, parent_type: string, row: Table.ActualRow) => void;
 }
 
-const selectBudgetItemsTree = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.budgetItemsTree);
+const selectBudgetItemsTree = simpleDeepEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree
+);
 
 const BudgetItemCell = ({ onChange, ...props }: BudgetItemCellProps): JSX.Element => {
   // I am not 100% sure that this will properly update the AG Grid component when

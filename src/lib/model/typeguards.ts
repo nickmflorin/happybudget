@@ -31,3 +31,11 @@ export const isBudgetOrTemplateForm = (
 ): obj is Model.BudgetForm | Model.TemplateForm => {
   return isBudgetForm(obj) || isTemplateForm(obj);
 };
+
+export const isModelWithColor = (model: Model.Model | Model.ModelWithColor): model is Model.ModelWithColor => {
+  return (model as Model.ModelWithColor).color !== undefined;
+};
+
+export const isModelWithName = (model: Model.Model | Model.ModelWithName): model is Model.ModelWithName => {
+  return (model as Model.ModelWithName).name !== undefined;
+};

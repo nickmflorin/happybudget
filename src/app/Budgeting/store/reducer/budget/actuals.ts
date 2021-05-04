@@ -1,11 +1,11 @@
 import { Reducer } from "redux";
 import { filter } from "lodash";
-import { createListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
+import { createModelListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
 import { ActualRowManager } from "lib/tabling/managers";
 import { ActionType } from "../../actions";
 import { initialActualsState } from "../../initialState";
 
-const listResponseReducer = createListResponseReducer<Model.Actual, Redux.Budget.ActualsStore>(
+const listResponseReducer = createModelListResponseReducer<Model.Actual, Redux.Budgeting.Budget.ActualsStore>(
   {
     Response: ActionType.Budget.Actuals.Response,
     Request: ActionType.Budget.Actuals.Request,
@@ -38,10 +38,10 @@ const listResponseReducer = createListResponseReducer<Model.Actual, Redux.Budget
   }
 );
 
-const rootReducer: Reducer<Redux.Budget.ActualsStore, Redux.Action<any>> = (
-  state: Redux.Budget.ActualsStore = initialActualsState,
+const rootReducer: Reducer<Redux.Budgeting.Budget.ActualsStore, Redux.Action<any>> = (
+  state: Redux.Budgeting.Budget.ActualsStore = initialActualsState,
   action: Redux.Action<any>
-): Redux.Budget.ActualsStore => {
+): Redux.Budgeting.Budget.ActualsStore => {
   let newState = { ...state };
 
   newState = listResponseReducer(newState, action);

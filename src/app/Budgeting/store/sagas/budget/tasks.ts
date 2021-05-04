@@ -16,13 +16,20 @@ import {
   addFringesPlaceholdersToStateAction,
   clearFringesPlaceholdersToStateAction
 } from "../../actions/budget";
+import { getFringeColorsTask } from "../tasks";
 
 export function* handleBudgetChangedTask(action: Redux.Action<number>): SagaIterator {
-  yield all([call(getBudgetTask), call(getBudgetItemsTask), call(getBudgetItemsTreeTask), call(getFringesTask)]);
+  yield all([
+    call(getBudgetTask),
+    call(getBudgetItemsTask),
+    call(getBudgetItemsTreeTask),
+    call(getFringesTask),
+    call(getFringeColorsTask)
+  ]);
 }
 
 export function* getBudgetTask(): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -45,7 +52,7 @@ export function* getBudgetTask(): SagaIterator {
 }
 
 export function* getBudgetItemsTask(): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -68,7 +75,7 @@ export function* getBudgetItemsTask(): SagaIterator {
 }
 
 export function* getBudgetItemsTreeTask(): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -91,7 +98,7 @@ export function* getBudgetItemsTreeTask(): SagaIterator {
 }
 
 export function* getFringesTask(): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budget.budget.id);
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

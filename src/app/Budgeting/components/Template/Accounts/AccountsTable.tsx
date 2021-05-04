@@ -26,20 +26,26 @@ import {
 } from "../../../store/actions/template/accounts";
 import { GenericAccountsTable } from "../../Generic";
 
-const selectGroups = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.groups.data);
-const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.selected);
-const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.data);
-const selectTableSearch = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.template.accounts.search);
+const selectGroups = simpleDeepEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.groups.data
+);
+const selectSelectedRows = simpleDeepEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.selected
+);
+const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budgeting.template.accounts.data);
+const selectTableSearch = simpleShallowEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.search
+);
 const selectSaving = createSelector(
-  (state: Redux.ApplicationStore) => state.template.accounts.deleting,
-  (state: Redux.ApplicationStore) => state.template.accounts.updating,
-  (state: Redux.ApplicationStore) => state.template.accounts.creating,
+  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.deleting,
+  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.updating,
+  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 const selectReadyToRender = createSelector(
-  (state: Redux.ApplicationStore) => state.template.accounts.responseWasReceived,
-  (state: Redux.ApplicationStore) => state.template.accounts.groups.responseWasReceived,
+  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.responseWasReceived,
+  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.groups.responseWasReceived,
   (accountsResponseReceived: boolean, groupsResponseReceived: boolean) =>
     accountsResponseReceived === true && groupsResponseReceived === true
 );

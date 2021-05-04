@@ -4,7 +4,7 @@ import { removeFromArray, replaceInArray } from "lib/util";
 import { initialCommentsListResponseState } from "store/initialState";
 
 import { warnInconsistentState } from "../util";
-import { createListResponseReducer } from "./list";
+import { createModelListResponseReducer } from "./list";
 import { mergeOptionsWithDefaults, createObjectReducerFromMap } from "./util";
 import { MappedReducers, FactoryOptions, createModelListActionReducer } from ".";
 
@@ -105,7 +105,7 @@ export const createCommentsListResponseReducer = <
   if (!isNil(mappings.Replying)) {
     subReducers = { ...subReducers, replying: createModelListActionReducer(mappings.Replying) };
   }
-  const genericListResponseReducer = createListResponseReducer<Model.Comment, S, A>(
+  const genericListResponseReducer = createModelListResponseReducer<Model.Comment, S, A>(
     {
       Response: mappings.Response,
       Request: mappings.Request,

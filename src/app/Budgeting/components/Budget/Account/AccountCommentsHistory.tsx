@@ -12,28 +12,28 @@ import {
 } from "../../../store/actions/budget/account";
 
 const selectDeletingComments = simpleDeepEqualSelector((state: Redux.ApplicationStore) =>
-  map(state.budget.account.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
+  map(state.budgeting.budget.account.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectEditingComments = simpleDeepEqualSelector((state: Redux.ApplicationStore) =>
-  map(state.budget.account.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
+  map(state.budgeting.budget.account.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectReplyingComments = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.account.comments.replying
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.comments.replying
 );
 const selectCommentsData = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.account.comments.data
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.comments.data
 );
 const selectSubmittingComment = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.account.comments.creating
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.comments.creating
 );
 const selectLoadingComments = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.account.comments.loading
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.comments.loading
 );
 const selectLoadingHistory = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.history.loading
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.subaccounts.history.loading
 );
 const selectHistory = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.history.data
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.subaccounts.history.data
 );
 
 const AccountCommentsHistory = (): JSX.Element => {

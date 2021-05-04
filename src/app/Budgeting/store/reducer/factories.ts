@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce, forEach } from "lodash";
-import { createListResponseReducer } from "lib/redux/factories";
+import { createModelListResponseReducer } from "lib/redux/factories";
 import { warnInconsistentState } from "lib/redux/util";
 import { fringeValue } from "lib/model/util";
 import { replaceInArray } from "lib/util";
@@ -63,8 +63,11 @@ export interface BudgetSubAccountsReducerFactoryActionMap {
 
 export const createTemplateSubAccountsReducer = (
   mapping: TemplateSubAccountsReducerFactoryActionMap
-): Reducer<Redux.Template.SubAccountsStore, Redux.Action<any>> => {
-  const listResponseReducer = createListResponseReducer<Model.TemplateSubAccount, Redux.Template.SubAccountsStore>(
+): Reducer<Redux.Budgeting.Template.SubAccountsStore, Redux.Action<any>> => {
+  const listResponseReducer = createModelListResponseReducer<
+    Model.TemplateSubAccount,
+    Redux.Budgeting.Template.SubAccountsStore
+  >(
     {
       Response: mapping.Response,
       Request: mapping.Request,
@@ -84,7 +87,7 @@ export const createTemplateSubAccountsReducer = (
       strictSelect: false,
       subReducers: {
         fringes: fringesRootReducer,
-        groups: createListResponseReducer<Model.BudgetGroup, Redux.ListResponseStore<Model.BudgetGroup>>({
+        groups: createModelListResponseReducer<Model.BudgetGroup, Redux.ModelListResponseStore<Model.BudgetGroup>>({
           Response: mapping.Groups.Response,
           Request: mapping.Groups.Request,
           Loading: mapping.Groups.Loading,
@@ -98,9 +101,9 @@ export const createTemplateSubAccountsReducer = (
   );
 
   const recalculateGroupMetrics = (
-    st: Redux.Template.SubAccountsStore,
+    st: Redux.Budgeting.Template.SubAccountsStore,
     groupId: number
-  ): Redux.Template.SubAccountsStore => {
+  ): Redux.Budgeting.Template.SubAccountsStore => {
     // This might not be totally necessary, but it is good practice to not use the entire payload
     // to update the group (since that is already done by the reducer above) but to instead just
     // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -136,7 +139,7 @@ export const createTemplateSubAccountsReducer = (
   };
 
   const recalculateSubAccountFromFringes = (
-    st: Redux.Template.SubAccountsStore,
+    st: Redux.Budgeting.Template.SubAccountsStore,
     subAccount: Model.TemplateSubAccount
   ): Model.TemplateSubAccount => {
     if (!isNil(subAccount.estimated)) {
@@ -164,9 +167,9 @@ export const createTemplateSubAccountsReducer = (
   };
 
   const recalculateSubAccountMetrics = (
-    st: Redux.Template.SubAccountsStore,
+    st: Redux.Budgeting.Template.SubAccountsStore,
     id: number
-  ): Redux.Template.SubAccountsStore => {
+  ): Redux.Budgeting.Template.SubAccountsStore => {
     let subAccount = find(st.data, { id });
     if (isNil(subAccount)) {
       /* eslint-disable no-console */
@@ -199,9 +202,9 @@ export const createTemplateSubAccountsReducer = (
   };
 
   return (
-    state: Redux.Template.SubAccountsStore = initialTemplateSubAccountsState,
+    state: Redux.Budgeting.Template.SubAccountsStore = initialTemplateSubAccountsState,
     action: Redux.Action<any>
-  ): Redux.Template.SubAccountsStore => {
+  ): Redux.Budgeting.Template.SubAccountsStore => {
     let newState = { ...state };
 
     newState = listResponseReducer(newState, action);
@@ -295,8 +298,11 @@ export const createTemplateSubAccountsReducer = (
 
 export const createBudgetSubAccountsReducer = (
   mapping: BudgetSubAccountsReducerFactoryActionMap
-): Reducer<Redux.Budget.SubAccountsStore, Redux.Action<any>> => {
-  const listResponseReducer = createListResponseReducer<Model.BudgetSubAccount, Redux.Budget.SubAccountsStore>(
+): Reducer<Redux.Budgeting.Budget.SubAccountsStore, Redux.Action<any>> => {
+  const listResponseReducer = createModelListResponseReducer<
+    Model.BudgetSubAccount,
+    Redux.Budgeting.Budget.SubAccountsStore
+  >(
     {
       Response: mapping.Response,
       Request: mapping.Request,
@@ -316,7 +322,7 @@ export const createBudgetSubAccountsReducer = (
       strictSelect: false,
       subReducers: {
         fringes: fringesRootReducer,
-        groups: createListResponseReducer<Model.BudgetGroup, Redux.ListResponseStore<Model.BudgetGroup>>({
+        groups: createModelListResponseReducer<Model.BudgetGroup, Redux.ModelListResponseStore<Model.BudgetGroup>>({
           Response: mapping.Groups.Response,
           Request: mapping.Groups.Request,
           Loading: mapping.Groups.Loading,
@@ -325,7 +331,7 @@ export const createBudgetSubAccountsReducer = (
           UpdateInState: mapping.Groups.UpdateInState,
           Deleting: mapping.Groups.Deleting
         }),
-        history: createListResponseReducer<Model.HistoryEvent>({
+        history: createModelListResponseReducer<Model.HistoryEvent>({
           Response: mapping.History.Response,
           Request: mapping.History.Request,
           Loading: mapping.History.Loading
@@ -335,9 +341,9 @@ export const createBudgetSubAccountsReducer = (
   );
 
   const recalculateGroupMetrics = (
-    st: Redux.Budget.SubAccountsStore,
+    st: Redux.Budgeting.Budget.SubAccountsStore,
     groupId: number
-  ): Redux.Budget.SubAccountsStore => {
+  ): Redux.Budgeting.Budget.SubAccountsStore => {
     // This might not be totally necessary, but it is good practice to not use the entire payload
     // to update the group (since that is already done by the reducer above) but to instead just
     // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -378,7 +384,7 @@ export const createBudgetSubAccountsReducer = (
   };
 
   const recalculateSubAccountFromFringes = (
-    st: Redux.Budget.SubAccountsStore,
+    st: Redux.Budgeting.Budget.SubAccountsStore,
     subAccount: Model.BudgetSubAccount
   ): Model.BudgetSubAccount => {
     if (!isNil(subAccount.estimated)) {
@@ -406,9 +412,9 @@ export const createBudgetSubAccountsReducer = (
   };
 
   const recalculateSubAccountMetrics = (
-    st: Redux.Budget.SubAccountsStore,
+    st: Redux.Budgeting.Budget.SubAccountsStore,
     id: number
-  ): Redux.Budget.SubAccountsStore => {
+  ): Redux.Budgeting.Budget.SubAccountsStore => {
     let subAccount = find(st.data, { id });
     if (isNil(subAccount)) {
       /* eslint-disable no-console */
@@ -444,9 +450,9 @@ export const createBudgetSubAccountsReducer = (
   };
 
   return (
-    state: Redux.Budget.SubAccountsStore = initialBudgetSubAccountsState,
+    state: Redux.Budgeting.Budget.SubAccountsStore = initialBudgetSubAccountsState,
     action: Redux.Action<any>
-  ): Redux.Budget.SubAccountsStore => {
+  ): Redux.Budgeting.Budget.SubAccountsStore => {
     let newState = { ...state };
 
     newState = listResponseReducer(newState, action);

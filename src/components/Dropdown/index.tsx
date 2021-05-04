@@ -36,8 +36,9 @@ export const includesMenuItems = (
 const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
   return (
     <AntdDropdown
-      className={classNames("dropdown", props.className)}
       {...props}
+      className={classNames("dropdown", props.className)}
+      trigger={props.trigger || ["click"]}
       overlay={
         includesMenuItems(props) ? (
           <DropdownMenu {...props.menuProps} onClick={props.onClick} onChange={props.onChange} items={props.items} />

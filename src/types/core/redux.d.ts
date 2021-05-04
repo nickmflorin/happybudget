@@ -10,7 +10,7 @@ namespace Redux {
     [key: string]: any;
   }
 
-  type ModuleLabel = "dashboard" | "budget" | "template";
+  type ModuleLabel = "dashboard" | "budgeting";
 
   type SelectorFunc<T = any> = (state: Redux.ApplicationStore) => T;
 
@@ -55,28 +55,31 @@ namespace Redux {
     data: Partial<M>;
   }
 
-  interface DetailResponseStore<T extends Model.Model> {
+  interface ModelDetailResponseStore<T extends Model.Model> {
     readonly data: T | undefined;
     readonly loading: boolean;
     readonly responseWasReceived: boolean;
   }
 
-  interface ListResponseStore<T extends Model.Model> {
+  interface ListResponseStore<T> {
     readonly data: T[];
     readonly count: number;
     readonly loading: boolean;
+    readonly responseWasReceived: boolean;
+  }
+
+  interface ModelListResponseStore<T extends Model.Model> extends Redux.ListResponseStore<T> {
     readonly page: number;
     readonly pageSize: number;
     readonly search: string;
     readonly selected: number[];
-    readonly responseWasReceived: boolean;
     readonly deleting: Redux.ModelListActionStore;
     readonly updating: Redux.ModelListActionStore;
     readonly objLoading: Redux.ModelListActionStore;
     readonly creating: boolean;
   }
 
-  interface CommentsListResponseStore extends Redux.ListResponseStore<Model.Comment> {
+  interface CommentsListResponseStore extends Redux.ModelListResponseStore<Model.Comment> {
     readonly replying: number[];
   }
 
@@ -86,123 +89,130 @@ namespace Redux {
   interface ModulesStore {}
 
   namespace Dashboard {
-    interface TemplatesStore extends Redux.ListResponseStore<Model.SimpleTemplate> {
+    interface TemplatesStore extends Redux.ModelListResponseStore<Model.SimpleTemplate> {
       readonly duplicating: Redux.ModelListActionStore;
       readonly moving: Redux.ModelListActionStore;
       readonly deleting: Redux.ModelListActionStore;
     }
 
-    interface CommunityTemplatesStore extends Redux.ListResponseStore<Model.SimpleTemplate> {
+    interface CommunityTemplatesStore extends Redux.ModelListResponseStore<Model.SimpleTemplate> {
       readonly deleting: Redux.ModelListActionStore;
       readonly duplicating: Redux.ModelListActionStore;
     }
 
     interface Store {
-      readonly budgets: Redux.ListResponseStore<Model.SimpleBudget>;
+      readonly budgets: Redux.ModelListResponseStore<Model.SimpleBudget>;
       readonly templates: TemplatesStore;
-      readonly contacts: Redux.ListResponseStore<Model.Contact>;
+      readonly contacts: Redux.ModelListResponseStore<Model.Contact>;
       readonly community: CommunityTemplatesStore;
     }
   }
 
-  type BudgetDirective = "Budget" | "Template";
+  namespace Budgeting {
+    type BudgetDirective = "Budget" | "Template";
 
-  namespace Budget {
-    interface CommentsStore extends Redux.ListResponseStore<Model.Comment> {
-      readonly replying: number[];
+    namespace Budget {
+      interface CommentsStore extends Redux.ModelListResponseStore<Model.Comment> {
+        readonly replying: number[];
+      }
+
+      interface FringesStore extends Redux.ModelListResponseStore<Model.Fringe> {
+        readonly placeholders: ListStore<Table.FringeRow>;
+      }
+
+      interface SubAccountsStore extends Redux.ModelListResponseStore<Model.BudgetSubAccount> {
+        readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>;
+        readonly groups: Redux.ModelListResponseStore<Model.BudgetGroup>;
+        readonly fringes: FringesStore;
+      }
+
+      interface AccountsStore extends Redux.ModelListResponseStore<Model.BudgetAccount> {
+        readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>;
+        readonly groups: Redux.ModelListResponseStore<Model.BudgetGroup>;
+      }
+
+      interface SubAccountStore {
+        readonly id: number | null;
+        readonly detail: Redux.ModelDetailResponseStore<Model.BudgetSubAccount>;
+        readonly subaccounts: SubAccountsStore;
+        readonly comments: CommentsStore;
+      }
+
+      interface AccountStore {
+        readonly id: number | null;
+        readonly detail: Redux.ModelDetailResponseStore<Model.BudgetAccount>;
+        readonly subaccounts: SubAccountsStore;
+        readonly comments: CommentsStore;
+      }
+
+      interface BudgetStore {
+        readonly id: number | null;
+        readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
+        readonly comments: CommentsStore;
+      }
+
+      interface ActualsStore extends Redux.ModelListResponseStore<Model.Actual> {
+        readonly placeholders: ListStore<Table.ActualRow>;
+      }
+
+      interface Store {
+        readonly budget: BudgetStore;
+        readonly instance: Model.BudgetAccount | Model.BudgetSubAccount | null;
+        readonly commentsHistoryDrawerOpen: boolean;
+        readonly budgetItems: Redux.ModelListResponseStore<Model.BudgetLineItem>;
+        readonly budgetItemsTree: Redux.ModelListResponseStore<Model.TopTreeNode>;
+        readonly actuals: ActualsStore;
+        readonly subaccount: SubAccountStore;
+        readonly account: AccountStore;
+        readonly accounts: AccountsStore;
+        readonly fringes: FringesStore;
+      }
     }
 
-    interface FringesStore extends Redux.ListResponseStore<Model.Fringe> {
-      readonly placeholders: ListStore<Table.FringeRow>;
-    }
+    namespace Template {
+      interface FringesStore extends Redux.ModelListResponseStore<Model.Fringe> {
+        readonly placeholders: ListStore<Table.FringeRow>;
+      }
 
-    interface SubAccountsStore extends Redux.ListResponseStore<Model.BudgetSubAccount> {
-      readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
-      readonly groups: Redux.ListResponseStore<Model.BudgetGroup>;
-      readonly fringes: FringesStore;
-    }
+      interface SubAccountsStore extends Redux.ModelListResponseStore<Model.TemplateSubAccount> {
+        readonly groups: Redux.ModelListResponseStore<Model.TemplateGroup>;
+        readonly fringes: FringesStore;
+      }
 
-    interface AccountsStore extends Redux.ListResponseStore<Model.BudgetAccount> {
-      readonly history: Redux.ListResponseStore<Model.IFieldAlterationEvent>;
-      readonly groups: Redux.ListResponseStore<Model.BudgetGroup>;
-    }
+      interface AccountsStore extends Redux.ModelListResponseStore<Model.TemplateAccount> {
+        readonly groups: Redux.ModelListResponseStore<Model.TemplateGroup>;
+      }
 
-    interface SubAccountStore {
-      readonly id: number | null;
-      readonly detail: Redux.DetailResponseStore<Model.BudgetSubAccount>;
-      readonly subaccounts: SubAccountsStore;
-      readonly comments: CommentsStore;
-    }
+      interface SubAccountStore {
+        readonly id: number | null;
+        readonly detail: Redux.ModelDetailResponseStore<Model.TemplateSubAccount>;
+        readonly subaccounts: SubAccountsStore;
+      }
 
-    interface AccountStore {
-      readonly id: number | null;
-      readonly detail: Redux.DetailResponseStore<Model.BudgetAccount>;
-      readonly subaccounts: SubAccountsStore;
-      readonly comments: CommentsStore;
-    }
+      interface AccountStore {
+        readonly id: number | null;
+        readonly detail: Redux.ModelDetailResponseStore<Model.TemplateAccount>;
+        readonly subaccounts: SubAccountsStore;
+      }
 
-    interface BudgetStore {
-      readonly id: number | null;
-      readonly detail: Redux.DetailResponseStore<Model.Budget>;
-      readonly comments: CommentsStore;
-    }
+      interface TemplateStore {
+        readonly id: number | null;
+        readonly detail: Redux.ModelDetailResponseStore<Model.Template>;
+      }
 
-    interface ActualsStore extends Redux.ListResponseStore<Model.Actual> {
-      readonly placeholders: ListStore<Table.ActualRow>;
+      interface Store {
+        readonly template: TemplateStore;
+        readonly instance: Model.TemplateAccount | Model.TemplateSubAccount | null;
+        readonly subaccount: SubAccountStore;
+        readonly account: AccountStore;
+        readonly accounts: AccountsStore;
+        readonly fringes: FringesStore;
+      }
     }
-
     interface Store {
-      readonly budget: BudgetStore;
-      readonly instance: Model.BudgetAccount | Model.BudgetSubAccount | null;
-      readonly commentsHistoryDrawerOpen: boolean;
-      readonly budgetItems: Redux.ListResponseStore<Model.BudgetLineItem>;
-      readonly budgetItemsTree: Redux.ListResponseStore<Model.TopTreeNode>;
-      readonly actuals: ActualsStore;
-      readonly subaccount: SubAccountStore;
-      readonly account: AccountStore;
-      readonly accounts: AccountsStore;
-      readonly fringes: FringesStore;
-    }
-  }
-
-  namespace Template {
-    interface FringesStore extends Redux.ListResponseStore<Model.Fringe> {
-      readonly placeholders: ListStore<Table.FringeRow>;
-    }
-
-    interface SubAccountsStore extends Redux.ListResponseStore<Model.TemplateSubAccount> {
-      readonly groups: Redux.ListResponseStore<Model.TemplateGroup>;
-      readonly fringes: FringesStore;
-    }
-
-    interface AccountsStore extends Redux.ListResponseStore<Model.TemplateAccount> {
-      readonly groups: Redux.ListResponseStore<Model.TemplateGroup>;
-    }
-
-    interface SubAccountStore {
-      readonly id: number | null;
-      readonly detail: Redux.DetailResponseStore<Model.TemplateSubAccount>;
-      readonly subaccounts: SubAccountsStore;
-    }
-
-    interface AccountStore {
-      readonly id: number | null;
-      readonly detail: Redux.DetailResponseStore<Model.TemplateAccount>;
-      readonly subaccounts: SubAccountsStore;
-    }
-
-    interface TemplateStore {
-      readonly id: number | null;
-      readonly detail: Redux.DetailResponseStore<Model.Template>;
-    }
-
-    interface Store {
-      readonly template: TemplateStore;
-      readonly instance: Model.TemplateAccount | Model.TemplateSubAccount | null;
-      readonly subaccount: SubAccountStore;
-      readonly account: AccountStore;
-      readonly accounts: AccountsStore;
-      readonly fringes: FringesStore;
+      readonly budget: Budget.Store;
+      readonly template: Template.Store;
+      readonly fringeColors: Redux.ListResponseStore<string>;
     }
   }
 
@@ -211,8 +221,7 @@ namespace Redux {
   interface ApplicationStore extends ModulesStore {
     readonly user: UserStore;
     readonly dashboard: Dashboard.Store;
-    readonly budget: Budget.Store;
-    readonly template: Template.Store;
+    readonly budgeting: Budgeting.Store;
     readonly drawerVisible: boolean;
     readonly loading: boolean;
   }

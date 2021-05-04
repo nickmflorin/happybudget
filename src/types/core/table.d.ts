@@ -86,6 +86,7 @@ namespace Table {
   interface TemplateSubAccountRow extends Table.SubAccountRow<Model.TemplateGroup> {}
 
   interface FringeRow extends Table.Row<Model.Group> {
+    readonly color: string | null;
     readonly name: string | null;
     readonly description: string | null;
     readonly cutoff: number | null;

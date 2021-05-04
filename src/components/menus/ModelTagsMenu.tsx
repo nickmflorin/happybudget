@@ -85,7 +85,7 @@ const ModelTagsMenu = <M extends Model.Model>(props: ModelTagsMenuProps<M>): JSX
                   }
                 }}
               >
-                <Tag colorIndex={model.id} uppercase={props.uppercase}>
+                <Tag model={model} uppercase={props.uppercase}>
                   {label}
                 </Tag>
               </Menu.Item>

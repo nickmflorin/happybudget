@@ -1,14 +1,14 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, filter, map, reduce, forEach } from "lodash";
-import { createListResponseReducer } from "lib/redux/factories";
+import { createModelListResponseReducer } from "lib/redux/factories";
 import { replaceInArray } from "lib/util";
 import { warnInconsistentState } from "lib/redux/util";
-import { initialListResponseState } from "store/initialState";
+import { initialModelListResponseState } from "store/initialState";
 
 import { ActionType } from "../../actions";
 import { initialBudgetAccountsState } from "../../initialState";
 
-const listResponseReducer = createListResponseReducer<Model.BudgetAccount, Redux.Budget.AccountsStore>(
+const listResponseReducer = createModelListResponseReducer<Model.BudgetAccount, Redux.Budgeting.Budget.AccountsStore>(
   {
     Response: ActionType.Budget.Accounts.Response,
     Request: ActionType.Budget.Accounts.Request,
@@ -28,7 +28,7 @@ const listResponseReducer = createListResponseReducer<Model.BudgetAccount, Redux
     initialState: initialBudgetAccountsState,
     strictSelect: false,
     subReducers: {
-      groups: createListResponseReducer<Model.BudgetGroup, Redux.ListResponseStore<Model.BudgetGroup>>(
+      groups: createModelListResponseReducer<Model.BudgetGroup, Redux.ModelListResponseStore<Model.BudgetGroup>>(
         {
           Response: ActionType.Budget.Accounts.Groups.Response,
           Request: ActionType.Budget.Accounts.Groups.Request,
@@ -40,7 +40,7 @@ const listResponseReducer = createListResponseReducer<Model.BudgetAccount, Redux
         {
           extensions: {
             [ActionType.Budget.Accounts.RemoveFromGroup]: (
-              st: Redux.ListResponseStore<Model.BudgetGroup> = initialListResponseState,
+              st: Redux.ModelListResponseStore<Model.BudgetGroup> = initialModelListResponseState,
               action: Redux.Action<number>
             ) => {
               const group: Model.BudgetGroup | undefined = find(st.data, (g: Model.BudgetGroup) =>
@@ -70,7 +70,7 @@ const listResponseReducer = createListResponseReducer<Model.BudgetAccount, Redux
           }
         }
       ),
-      history: createListResponseReducer<Model.HistoryEvent>({
+      history: createModelListResponseReducer<Model.HistoryEvent>({
         Response: ActionType.Budget.Accounts.History.Response,
         Request: ActionType.Budget.Accounts.History.Request,
         Loading: ActionType.Budget.Accounts.History.Loading
@@ -79,7 +79,10 @@ const listResponseReducer = createListResponseReducer<Model.BudgetAccount, Redux
   }
 );
 
-const recalculateGroupMetrics = (st: Redux.Budget.AccountsStore, groupId: number): Redux.Budget.AccountsStore => {
+const recalculateGroupMetrics = (
+  st: Redux.Budgeting.Budget.AccountsStore,
+  groupId: number
+): Redux.Budgeting.Budget.AccountsStore => {
   // This might not be totally necessary, but it is good practice to not use the entire payload
   // to update the group (since that is already done by the reducer above) but to instead just
   // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -119,10 +122,10 @@ const recalculateGroupMetrics = (st: Redux.Budget.AccountsStore, groupId: number
   };
 };
 
-const rootReducer: Reducer<Redux.Budget.AccountsStore, Redux.Action<any>> = (
-  state: Redux.Budget.AccountsStore = initialBudgetAccountsState,
+const rootReducer: Reducer<Redux.Budgeting.Budget.AccountsStore, Redux.Action<any>> = (
+  state: Redux.Budgeting.Budget.AccountsStore = initialBudgetAccountsState,
   action: Redux.Action<any>
-): Redux.Budget.AccountsStore => {
+): Redux.Budgeting.Budget.AccountsStore => {
   let newState = { ...state };
 
   newState = listResponseReducer(newState, action);

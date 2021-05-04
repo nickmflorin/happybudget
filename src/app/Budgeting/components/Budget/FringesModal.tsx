@@ -15,17 +15,23 @@ import {
 } from "../../store/actions/budget/fringes";
 import { GenericFringesModal, GenericFringesModalProps } from "../Generic";
 
-const selectSelectedRows = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.fringes.selected);
-const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.fringes.data);
-const selectTableSearch = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.budget.fringes.search);
-const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.fringes.placeholders
+const selectSelectedRows = simpleDeepEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.selected
 );
-const selectLoading = simpleShallowEqualSelector((state: Redux.ApplicationStore) => state.budget.fringes.loading);
+const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budgeting.budget.fringes.data);
+const selectTableSearch = simpleShallowEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.search
+);
+const selectPlaceholders = simpleShallowEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.placeholders
+);
+const selectLoading = simpleShallowEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.loading
+);
 const selectSaving = createSelector(
-  (state: Redux.ApplicationStore) => state.budget.fringes.deleting,
-  (state: Redux.ApplicationStore) => state.budget.fringes.updating,
-  (state: Redux.ApplicationStore) => state.budget.fringes.creating,
+  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.deleting,
+  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.updating,
+  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );

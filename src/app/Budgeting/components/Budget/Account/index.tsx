@@ -14,12 +14,14 @@ import { selectBudgetId } from "../../../store/selectors";
 import SubAccountsTable from "./SubAccountsTable";
 import AccountCommentsHistory from "./AccountCommentsHistory";
 
-const selectDetail = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budget.account.detail.data);
+const selectDetail = simpleDeepEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.detail.data
+);
 const selectSubAccountsLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.loading
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.subaccounts.loading
 );
 const selectGroupsLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budget.account.subaccounts.groups.loading
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.subaccounts.groups.loading
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,

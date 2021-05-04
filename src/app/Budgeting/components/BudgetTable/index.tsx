@@ -53,7 +53,8 @@ import {
   FringeUnitCell,
   BudgetFringesCell,
   TemplateFringesCell,
-  HeaderCell
+  HeaderCell,
+  FringeColorCell
 } from "./cells";
 import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } from "./cells/Util";
 import { BudgetTableProps } from "./model";
@@ -1173,6 +1174,7 @@ const BudgetTable = <
                 TemplateFringesCell: ShowCellOnlyForRowType<R>("subaccount")(
                   IncludeErrorsInCell<R>(TemplateFringesCell)
                 ),
+                FringeColorCell,
                 agColumnHeader: HeaderCell,
                 ...frameworkComponents
               }}

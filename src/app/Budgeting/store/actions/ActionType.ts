@@ -1,4 +1,8 @@
 const ActionType = {
+  FringeColors: {
+    Loading: "fringecolors.Loading",
+    Response: "fringecolors.colors.Response"
+  },
   Budget: {
     SetInstance: "budget.SetInstance",
     SetCommentsHistoryDrawerVisibility: "budget.SetCommentsHistoryDrawerVisibility",

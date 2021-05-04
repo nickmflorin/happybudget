@@ -1514,12 +1514,7 @@
     "minimatch" "^3.0.4"
     "strip-json-comments" "^3.1.1"
 
-"@fortawesome/fontawesome-common-types@^0.2.34":
-  "integrity" "sha512-XcIn3iYbTEzGIxD0/dY5+4f019jIcEIWBiHc3KrmK/ROahwxmZ/s+tdj97p/5K0klz4zZUiMfUlYP0ajhSJjmA=="
-  "resolved" "https://registry.npmjs.org/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.34.tgz"
-  "version" "0.2.34"
-
-"@fortawesome/fontawesome-common-types@^0.2.35":
+"@fortawesome/fontawesome-common-types@^0.2.34", "@fortawesome/fontawesome-common-types@^0.2.35":
   "integrity" "sha512-IHUfxSEDS9dDGqYwIW7wTN6tn/O8E0n5PcAHz9cAaBoZw6UpG20IG/YM3NNLaGPwPqgjBAFjIURzqoQs3rrtuw=="
   "resolved" "https://npm.fontawesome.com/@fortawesome/fontawesome-common-types/-/0.2.35/fontawesome-common-types-0.2.35.tgz"
   "version" "0.2.35"
@@ -1549,6 +1544,13 @@
   "version" "5.15.2"
   dependencies:
     "@fortawesome/fontawesome-common-types" "^0.2.34"
+
+"@fortawesome/pro-duotone-svg-icons@^5.15.3":
+  "integrity" "sha512-D/CmRoX8D5pTWlCbhQRNv5EB9U5gigWQ7jsygZL8o1+Yhr+Sgvgz5g4T+NAig+7fBYQh/iEooxZ2qZikpoKoew=="
+  "resolved" "https://npm.fontawesome.com/@fortawesome/pro-duotone-svg-icons/-/5.15.3/pro-duotone-svg-icons-5.15.3.tgz"
+  "version" "5.15.3"
+  dependencies:
+    "@fortawesome/fontawesome-common-types" "^0.2.35"
 
 "@fortawesome/pro-light-svg-icons@^5.15.3":
   "integrity" "sha512-mAj25a3sgh0i8HkHhmz8Z1bnSsVJ8OwLm2rDDG8HTkOTllmg2WtZZfRhBg0kZcSH7en7BAcIGUh5Rtx/3/NY9w=="

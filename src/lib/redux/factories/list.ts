@@ -1,13 +1,58 @@
 import { Reducer } from "redux";
 import { isNil, forEach, find, filter, includes, map } from "lodash";
 import { replaceInArray } from "lib/util";
-import { initialListResponseState } from "store/initialState";
+import { initialModelListResponseState, initialListResponseState } from "store/initialState";
 
 import { warnInconsistentState } from "../util";
 import { mergeOptionsWithDefaults, createObjectReducerFromMap } from "./util";
 import { MappedReducers, FactoryOptions, createAgnosticModelListActionReducer } from ".";
 
 export type IListResponseActionMap = {
+  Loading: string;
+  Response: string;
+  Request: string;
+};
+
+/**
+ * A reducer factory that creates a generic reducer to handle the state of a
+ * list response, where a list response might be the response received from
+ * submitting an API request to /entity/.
+ *
+ * The reducer has default behavior that is mapped to the action types via
+ * the mappings parameter.
+ *
+ * @param mappings  Mappings of the standard actions to the specific actions that
+ *                  the reducer should listen for.
+ * @param options   Additional options supplied to the reducer factory.
+ */
+export const createListResponseReducer = <
+  M,
+  S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>,
+  A extends Redux.Action<any> = Redux.Action<any>
+>(
+  /* eslint-disable indent */
+  mappings: Partial<IListResponseActionMap>,
+  options: Partial<FactoryOptions<S, A>> = {}
+): Reducer<S, A> => {
+  const Options = mergeOptionsWithDefaults<S, A>(options, initialListResponseState as S);
+
+  const reducers: MappedReducers<IListResponseActionMap, S, A> = {
+    Response: (st: S = Options.initialState, action: Redux.Action<Http.ListResponse<M>>) => {
+      return {
+        ...st,
+        data: action.payload.data,
+        count: action.payload.count,
+        selected: [],
+        responseWasReceived: true
+      };
+    },
+    Request: (st: S = Options.initialState, action: Redux.Action<null>) => ({ ...st, responseWasReceived: false }),
+    Loading: (st: S = Options.initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload })
+  };
+  return createObjectReducerFromMap<IListResponseActionMap, S, A>(mappings, reducers, Options);
+};
+
+export type IModelListResponseActionMap = {
   SetSearch: string;
   Loading: string;
   Response: string;
@@ -29,7 +74,7 @@ export type IListResponseActionMap = {
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
- * list response, where a list response might be the response received from
+ * list response of models, where a list response might be the response received from
  * submitting an API request to /entity/.
  *
  * The reducer has default behavior that is mapped to the action types via
@@ -39,22 +84,22 @@ export type IListResponseActionMap = {
  *                  the reducer should listen for.
  * @param options   Additional options supplied to the reducer factory.
  */
-export const createListResponseReducer = <
+export const createModelListResponseReducer = <
   M extends Model.Model,
-  S extends Redux.ListResponseStore<M> = Redux.ListResponseStore<M>,
+  S extends Redux.ModelListResponseStore<M> = Redux.ModelListResponseStore<M>,
   A extends Redux.Action<any> = Redux.Action<any>
 >(
   /* eslint-disable indent */
-  mappings: Partial<IListResponseActionMap>,
+  mappings: Partial<IModelListResponseActionMap>,
   options: Partial<FactoryOptions<S, A>> = {}
 ): Reducer<S, A> => {
-  const Options = mergeOptionsWithDefaults<S, A>(options, initialListResponseState as S);
+  const Options = mergeOptionsWithDefaults<S, A>(options, initialModelListResponseState as S);
 
   const DeletingReducer = createAgnosticModelListActionReducer();
   const UpdatingReducer = createAgnosticModelListActionReducer();
   const ObjLoadingReducer = createAgnosticModelListActionReducer();
 
-  const reducers: MappedReducers<IListResponseActionMap, S, A> = {
+  const reducers: MappedReducers<IModelListResponseActionMap, S, A> = {
     // We have to reset the page to it's initial state otherwise we run the risk
     // of a 404 with the API request due to the page not being found.
     SetSearch: (st: S = Options.initialState, action: Redux.Action<string>) => ({
@@ -229,5 +274,5 @@ export const createListResponseReducer = <
     }
   };
 
-  return createObjectReducerFromMap<IListResponseActionMap, S, A>(mappings, reducers, Options);
+  return createObjectReducerFromMap<IModelListResponseActionMap, S, A>(mappings, reducers, Options);
 };

@@ -4,25 +4,29 @@ export const initialListResponseState: Redux.ListResponseStore<any> = {
   loading: false,
   data: [],
   count: 0,
+  responseWasReceived: false
+};
+
+export const initialModelListResponseState: Redux.ModelListResponseStore<any> = {
+  ...initialListResponseState,
   page: 1,
   pageSize: 10,
   search: "",
   selected: [],
-  responseWasReceived: false,
   creating: false,
   deleting: [],
   updating: [],
   objLoading: []
 };
 
-export const initialDetailResponseState: Redux.DetailResponseStore<any> = {
+export const initialDetailResponseState: Redux.ModelDetailResponseStore<any> = {
   loading: false,
   data: undefined,
   responseWasReceived: false
 };
 
 export const initialCommentsListResponseState: Redux.CommentsListResponseStore = {
-  ...initialListResponseState,
+  ...initialModelListResponseState,
   replying: []
 };
 

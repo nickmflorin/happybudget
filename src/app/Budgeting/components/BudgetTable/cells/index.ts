@@ -9,4 +9,5 @@ export { default as BudgetItemCell } from "./BudgetItemCell";
 export { default as PaymentMethodsCell } from "./PaymentMethodsCell";
 export { default as BudgetFringesCell } from "./BudgetFringesCell";
 export { default as TemplateFringesCell } from "./TemplateFringesCell";
+export { default as FringeColorCell } from "./FringeColorCell";
 export { default as HeaderCell } from "./HeaderCell";

@@ -12,13 +12,14 @@ import {
   addFringesPlaceholdersToStateAction,
   clearFringesPlaceholdersToStateAction
 } from "../../actions/template";
+import { getFringeColorsTask } from "../tasks";
 
 export function* handleTemplateChangedTask(action: Redux.Action<number>): SagaIterator {
-  yield all([call(getTemplateTask), call(getFringesTask)]);
+  yield all([call(getTemplateTask), call(getFringesTask), call(getFringeColorsTask)]);
 }
 
 export function* getTemplateTask(): SagaIterator {
-  const templateId = yield select((state: Redux.ApplicationStore) => state.template.template.id);
+  const templateId = yield select((state: Redux.ApplicationStore) => state.budgeting.template.template.id);
   if (!isNil(templateId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -41,7 +42,7 @@ export function* getTemplateTask(): SagaIterator {
 }
 
 export function* getFringesTask(): SagaIterator {
-  const templateId = yield select((state: Redux.ApplicationStore) => state.template.template.id);
+  const templateId = yield select((state: Redux.ApplicationStore) => state.budgeting.template.template.id);
   if (!isNil(templateId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

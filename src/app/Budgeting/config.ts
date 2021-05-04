@@ -1,24 +1,12 @@
 import initialState from "./store/initialState";
-import { templateRootReducer, budgetRootReducer } from "./store/reducer";
-import { budgetRootSaga, templateRootSaga } from "./store/sagas";
+import rootReducer from "./store/reducer";
+import rootSaga from "./store/sagas";
 
-const BudgetConfig: Redux.ModuleConfig<Redux.Budget.Store, Redux.Action<any>> = {
-  rootReducer: budgetRootReducer,
-  rootSaga: budgetRootSaga,
-  initialState: initialState.budget,
-  label: "budget"
-};
-
-const TemplateConfig: Redux.ModuleConfig<Redux.Template.Store, Redux.Action<any>> = {
-  rootReducer: templateRootReducer,
-  rootSaga: templateRootSaga,
-  initialState: initialState.template,
-  label: "template"
-};
-
-const Config = {
-  budget: BudgetConfig,
-  template: TemplateConfig
+const Config: Redux.ModuleConfig<Redux.Budgeting.Store, Redux.Action<any>> = {
+  rootReducer,
+  rootSaga,
+  initialState,
+  label: "budgeting"
 };
 
 export default Config;
