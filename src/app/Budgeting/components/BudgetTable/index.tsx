@@ -711,10 +711,12 @@ const BudgetTable = <
   const getRowClass = (params: RowClassParams) => {
     if (params.node.data.meta.isGroupFooter === true) {
       let colorClass = params.node.data.group.color;
-      if (colorClass.startsWith("#")) {
-        colorClass = params.node.data.group.color.slice(1);
+      if (!isNil(colorClass)) {
+        if (colorClass.startsWith("#")) {
+          colorClass = params.node.data.group.color.slice(1);
+        }
+        return classNames("row--group-footer", `bg-${colorClass}`);
       }
-      return classNames("row--group-footer", `bg-${colorClass}`);
     }
   };
 
