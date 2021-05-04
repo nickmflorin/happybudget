@@ -9,7 +9,6 @@ interface FringeColorCellProps extends StandardCellProps<Table.BudgetSubAccountR
 
 const FringeColorCell = ({ value, ...props }: FringeColorCellProps): JSX.Element => {
   const colors = useSelector(selectFringeColors);
-  console.log(value);
   return (
     <Cell {...props}>
       <ColorDropdown colors={colors} value={value} onChange={(color: string) => props.setValue(color)} />
