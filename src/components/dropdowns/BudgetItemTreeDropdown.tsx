@@ -77,7 +77,13 @@ const BudgetItemsTreeDropdown: React.FC<BudgetItemsTreeDropdownProps> = ({
       }
     >
       <CaretButton id={`#${buttonId}`} onClick={() => setVisible(!visible)} {...buttonProps}>
-        {!isNil(currentNode) ? <EntityText>{currentNode}</EntityText> : !isNil(placeholderText) ? placeholderText : ""}
+        {!isNil(currentNode) ? (
+          <EntityText fillEmpty={"---------"}>{currentNode}</EntityText>
+        ) : !isNil(placeholderText) ? (
+          placeholderText
+        ) : (
+          ""
+        )}
       </CaretButton>
     </Dropdown>
   );

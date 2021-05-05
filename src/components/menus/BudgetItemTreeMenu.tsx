@@ -40,7 +40,7 @@ export const BudgetItemMenuItem: React.FC<BudgetTreeMenuItemProps> = ({
       <ShowHide show={!isNil(onToggleChildrenVisibility)}>
         <React.Fragment>
           <div style={{ flexGrow: 100, display: "flex" }}>
-            <EntityText>{node}</EntityText>
+            <EntityText fillEmpty={"---------"}>{node}</EntityText>
           </div>
           <IconButton
             className={"btn--budget-item-menu-caret"}
@@ -55,7 +55,7 @@ export const BudgetItemMenuItem: React.FC<BudgetTreeMenuItemProps> = ({
       </ShowHide>
       <ShowHide show={isNil(onToggleChildrenVisibility)}>
         <React.Fragment>
-          <EntityText>{node}</EntityText>
+          <EntityText fillEmpty={"---------"}>{node}</EntityText>
         </React.Fragment>
       </ShowHide>
     </Menu.Item>
