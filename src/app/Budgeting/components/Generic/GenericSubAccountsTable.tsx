@@ -17,6 +17,7 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
     BudgetTableProps<R, M, G, Http.SubAccountPayload>,
     "identifierField" | "identifierFieldHeader" | "groupParams"
   > {
+  categoryName: "Account" | "Detail";
   fringes: Model.Fringe[];
   fringesCellRenderer: "BudgetFringesCell" | "TemplateFringesCell";
   fringesCellRendererParams: {
@@ -31,6 +32,7 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
 }
 
 const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Model.SubAccount, G extends Model.Group>({
+  categoryName,
   fringes,
   fringesCellRenderer,
   fringesCellRendererParams,
@@ -111,7 +113,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
       columns={[
         {
           field: "description",
-          headerName: "Category Description",
+          headerName: `${categoryName} Description`,
           flex: 100,
           colSpan: (params: ColSpanParams) => {
             const row: Table.TemplateSubAccountRow = params.data;
