@@ -27,6 +27,7 @@ export interface GroupProps<R extends Table.Row<G>, G extends Model.Group = Mode
   onDeleteGroup: (group: G) => void;
   onEditGroup: (group: G) => void;
   onRowRemoveFromGroup: (row: R) => void;
+  onRowAddToGroup: (groupId: number, row: R) => void;
 }
 
 export interface CookiesProps {

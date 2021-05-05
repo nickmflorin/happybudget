@@ -69,6 +69,9 @@ export const setSubAccountsSearchAction = simpleAction<string>(ActionType.Budget
 export const removeSubAccountFromGroupAction = simpleAction<number>(
   ActionType.Budget.Account.SubAccounts.RemoveFromGroup
 );
+export const addSubAccountToGroupAction = simpleAction<{ id: number; group: number }>(
+  ActionType.Budget.Account.SubAccounts.AddToGroup
+);
 export const selectSubAccountAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Select);
 export const deselectSubAccountAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Deselect);
 export const selectAllSubAccountsAction = simpleAction<null>(ActionType.Budget.Account.SubAccounts.SelectAll);

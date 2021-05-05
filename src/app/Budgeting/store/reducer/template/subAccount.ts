@@ -29,6 +29,7 @@ const rootReducer: Reducer<Redux.Budgeting.Template.SubAccountStore, Redux.Actio
     Creating: ActionType.Template.SubAccount.SubAccounts.Creating,
     Updating: ActionType.Template.SubAccount.SubAccounts.Updating,
     RemoveFromGroup: ActionType.Template.SubAccount.SubAccounts.RemoveFromGroup,
+    AddToGroup: ActionType.Template.SubAccount.SubAccounts.AddToGroup,
     Groups: {
       Response: ActionType.Template.SubAccount.SubAccounts.Groups.Response,
       Request: ActionType.Template.SubAccount.SubAccounts.Groups.Request,

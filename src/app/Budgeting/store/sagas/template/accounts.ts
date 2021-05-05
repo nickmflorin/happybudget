@@ -78,5 +78,6 @@ export default createStandardSaga({
   Delete: { actionType: ActionType.Template.Accounts.Delete, task: tasks.handleRemoval },
   Update: { actionType: ActionType.Template.Accounts.Update, task: tasks.handleUpdate },
   DeleteGroup: { actionType: ActionType.Template.Accounts.Groups.Delete, task: tasks.deleteGroup },
-  RemoveModelFromGroup: { actionType: ActionType.Template.Accounts.RemoveFromGroup, task: tasks.removeFromGroup }
+  RemoveModelFromGroup: { actionType: ActionType.Template.Accounts.RemoveFromGroup, task: tasks.removeFromGroup },
+  AddModelToGroup: { actionType: ActionType.Template.Accounts.AddToGroup, task: tasks.addToGroup }
 });

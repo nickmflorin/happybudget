@@ -71,6 +71,7 @@ const ActionType = {
       RemoveFromState: "budget.accounts.RemoveFromState",
       AddToState: "budget.accounts.AddToState",
       RemoveFromGroup: "budget.accounts.RemoveFromGroup",
+      AddToGroup: "budget.accounts.AddToGroup",
       // Errors Functionality Needs to be Built Back In
       AddErrors: "budget.accounts.AddErrors",
       Groups: {
@@ -130,6 +131,7 @@ const ActionType = {
         RemoveFromState: "budget.subaccount.subaccounts.RemoveFromState",
         AddToState: "budget.subaccount.subaccounts.AddToState",
         RemoveFromGroup: "budget.subaccount.subaccounts.RemoveFromGroup",
+        AddToGroup: "budget.subaccount.subaccounts.AddToGroup",
         // Errors Functionality Needs to be Built Back In
         AddErrors: "budget.subaccount.subaccounts.AddErrors",
         Groups: {
@@ -189,6 +191,7 @@ const ActionType = {
         RemoveFromState: "budget.account.subaccounts.RemoveFromState",
         AddToState: "budget.account.subaccounts.AddToState",
         RemoveFromGroup: "budget.account.subaccounts.RemoveFromGroup",
+        AddToGroup: "budget.account.subaccounts.AddToGroup",
         // Errors Functionality Needs to be Built Back In
         AddErrors: "budget.account.subaccounts.AddErrors",
         Groups: {
@@ -293,6 +296,7 @@ const ActionType = {
       RemoveFromState: "template.accounts.RemoveFromState",
       AddToState: "template.accounts.AddToState",
       RemoveFromGroup: "template.accounts.RemoveFromGroup",
+      AddToGroup: "template.accounts.AddToGroup",
       // Errors Functionality Needs to be Built Back In
       AddErrors: "template.accounts.AddErrors",
       Groups: {
@@ -331,6 +335,7 @@ const ActionType = {
         RemoveFromState: "template.subaccount.subaccounts.RemoveFromState",
         AddToState: "template.subaccount.subaccounts.AddToState",
         RemoveFromGroup: "template.subaccount.subaccounts.RemoveFromGroup",
+        AddToGroup: "template.subaccount.subaccounts.AddToGroup",
         // Errors Functionality Needs to be Built Back In
         AddErrors: "template.subaccount.subaccounts.AddErrors",
         Groups: {
@@ -370,6 +375,7 @@ const ActionType = {
         RemoveFromState: "template.account.subaccounts.RemoveFromState",
         AddToState: "template.account.subaccounts.AddToState",
         RemoveFromGroup: "template.account.subaccounts.RemoveFromGroup",
+        AddToGroup: "template.account.subaccounts.AddToGroup",
         // Errors Functionality Needs to be Built Back In
         AddErrors: "template.account.subaccounts.AddErrors",
         Groups: {

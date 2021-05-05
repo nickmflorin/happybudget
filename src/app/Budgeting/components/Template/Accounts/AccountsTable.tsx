@@ -22,7 +22,8 @@ import {
   removeAccountFromGroupAction,
   bulkUpdateAccountsAction,
   updateGroupInStateAction,
-  bulkCreateAccountsAction
+  bulkCreateAccountsAction,
+  addAccountToGroupAction
 } from "../../../store/actions/template/accounts";
 import { GenericAccountsTable } from "../../Generic";
 
@@ -94,6 +95,9 @@ const AccountsTable = (): JSX.Element => {
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
         onDeleteGroup={(group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id))}
         onRowRemoveFromGroup={(row: Table.TemplateAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
+        onRowAddToGroup={(group: number, row: Table.TemplateAccountRow) =>
+          dispatch(addAccountToGroupAction({ id: row.id, group }))
+        }
         onGroupRows={(rows: Table.TemplateAccountRow[]) =>
           setGroupAccounts(map(rows, (row: Table.TemplateAccountRow) => row.id))
         }

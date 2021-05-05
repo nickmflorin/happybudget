@@ -203,6 +203,28 @@ const rootReducer: Reducer<Redux.Budgeting.Template.AccountsStore, Redux.Action<
       };
       newState = recalculateGroupMetrics(newState, group.id);
     }
+  } else if (action.type === ActionType.Template.Accounts.AddToGroup) {
+    const group: Model.TemplateGroup | undefined = find(newState.groups.data, { id: action.payload.group });
+    if (isNil(group)) {
+      warnInconsistentState({
+        action: action.type,
+        reason: "Group does not exist for account.",
+        id: action.payload
+      });
+    } else {
+      newState = {
+        ...newState,
+        groups: {
+          ...newState.groups,
+          data: replaceInArray<Model.TemplateGroup>(
+            newState.groups.data,
+            { id: group.id },
+            { ...group, children: [...group.children, action.payload.id] }
+          )
+        }
+      };
+      newState = recalculateGroupMetrics(newState, group.id);
+    }
   }
   return { ...newState };
 };

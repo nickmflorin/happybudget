@@ -20,6 +20,9 @@ export const responseAccountsAction = simpleAction<Http.ListResponse<Model.Templ
 );
 export const setAccountsSearchAction = simpleAction<string>(ActionType.Template.Accounts.SetSearch);
 export const removeAccountFromGroupAction = simpleAction<number>(ActionType.Template.Accounts.RemoveFromGroup);
+export const addAccountToGroupAction = simpleAction<{ id: number; group: number }>(
+  ActionType.Template.Accounts.AddToGroup
+);
 export const selectAccountAction = simpleAction<number>(ActionType.Template.Accounts.Select);
 export const deselectAccountAction = simpleAction<number>(ActionType.Template.Accounts.Deselect);
 export const selectAllAccountsAction = simpleAction<null>(ActionType.Template.Accounts.SelectAll);

@@ -26,6 +26,7 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
   onDeleteGroup: (group: G) => void;
   onEditGroup: (group: G) => void;
   onRowRemoveFromGroup: (row: R) => void;
+  onRowAddToGroup: (group: number, row: R) => void;
   onEditFringes: () => void;
 }
 
@@ -37,6 +38,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
   onDeleteGroup,
   onEditGroup,
   onRowRemoveFromGroup,
+  onRowAddToGroup,
   onEditFringes,
   ...props
 }: GenericSubAccountsTableProps<R, M, G>): JSX.Element => {
@@ -58,7 +60,8 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
         onDeleteGroup,
         onRowRemoveFromGroup,
         onGroupRows,
-        onEditGroup
+        onEditGroup,
+        onRowAddToGroup
       }}
       processCellForClipboard={{
         fringes: (row: R) => {

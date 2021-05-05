@@ -45,6 +45,7 @@ const rootReducer: Reducer<Redux.Budgeting.Budget.SubAccountStore, Redux.Action<
     Creating: ActionType.Budget.SubAccount.SubAccounts.Creating,
     Updating: ActionType.Budget.SubAccount.SubAccounts.Updating,
     RemoveFromGroup: ActionType.Budget.SubAccount.SubAccounts.RemoveFromGroup,
+    AddToGroup: ActionType.Budget.SubAccount.SubAccounts.AddToGroup,
     History: {
       Response: ActionType.Budget.SubAccount.SubAccounts.History.Response,
       Request: ActionType.Budget.SubAccount.SubAccounts.History.Request,

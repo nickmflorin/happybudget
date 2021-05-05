@@ -22,6 +22,7 @@ interface ActionMap<R extends Table.Row<G>, G extends Model.Group = Model.Group>
   EditComment?: MapConfig<Redux.UpdateModelActionPayload<Model.Comment>>;
   DeleteGroup: MapConfig<number>;
   RemoveModelFromGroup: MapConfig<number>;
+  AddModelToGroup: MapConfig<{ id: number; group: number }>;
 }
 
 export const createStandardSaga = <R extends Table.Row<G>, G extends Model.Group = Model.Group>(
@@ -134,11 +135,19 @@ export const createStandardSaga = <R extends Table.Row<G>, G extends Model.Group
     yield takeWithCancellableById<number>(map.DeleteGroup.actionType, map.DeleteGroup.task, (p: number) => p);
   }
 
-  function* watchForRemoveAccountFromGroupSaga(): SagaIterator {
+  function* watchForRemoveModelFromGroupSaga(): SagaIterator {
     yield takeWithCancellableById<number>(
       map.RemoveModelFromGroup.actionType,
       map.RemoveModelFromGroup.task,
       (p: number) => p
+    );
+  }
+
+  function* watchForAddModelToGroupSaga(): SagaIterator {
+    yield takeWithCancellableById<{ id: number; group: number }>(
+      map.AddModelToGroup.actionType,
+      map.AddModelToGroup.task,
+      (p: { id: number; group: number }) => p.id
     );
   }
 
@@ -155,7 +164,8 @@ export const createStandardSaga = <R extends Table.Row<G>, G extends Model.Group
     yield spawn(watchForBulkCreateModelsSaga);
     yield spawn(watchForRequestHistorySaga);
     yield spawn(watchForDeleteGroupSaga);
-    yield spawn(watchForRemoveAccountFromGroupSaga);
+    yield spawn(watchForRemoveModelFromGroupSaga);
+    yield spawn(watchForAddModelToGroupSaga);
     for (let i = 0; i < args.length; i++) {
       yield spawn(args[i]);
     }

@@ -742,7 +742,7 @@ const BudgetTable = <
       return [];
     } else {
       const deleteRowContextMenuItem: MenuItemDef = {
-        name: `Delete ${row.meta.typeLabel} ${row.meta.label}`,
+        name: `Delete ${row.meta.label}`,
         action: () => onRowDelete(row)
       };
       if (isNil(groupParams) || row.meta.isPlaceholder) {
@@ -751,27 +751,39 @@ const BudgetTable = <
         return [
           deleteRowContextMenuItem,
           {
-            name: `Remove ${row.meta.typeLabel} ${row.meta.label} from Group ${row.group.name}`,
+            name: `Remove ${row.meta.label} from Group ${row.group.name}`,
             action: () => groupParams.onRowRemoveFromGroup(row)
           }
         ];
       } else {
+        const menuItems: MenuItemDef[] = [deleteRowContextMenuItem];
+
         const groupableNodesAbove = findRowsUpUntilFirstGroupFooterRow(params.node);
-        let label: string;
-        if (groupableNodesAbove.length === 1) {
-          label = `Group ${groupableNodesAbove[0].data.meta.typeLabel} ${groupableNodesAbove[0].data.meta.label}`;
-        } else {
-          label = `Group ${groupableNodesAbove[0].data.meta.typeLabel}s ${
-            groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label
-          } - ${groupableNodesAbove[0].data.meta.label}`;
-        }
-        return [
-          deleteRowContextMenuItem,
-          {
-            name: label,
-            action: () => groupParams.onGroupRows(map(groupableNodesAbove, (node: RowNode) => node.data as R))
+        if (groupableNodesAbove.length !== 0) {
+          let label: string;
+          if (groupableNodesAbove.length === 1) {
+            label = `Group ${groupableNodesAbove[0].data.meta.typeLabel} ${groupableNodesAbove[0].data.meta.label}`;
+          } else {
+            label = `Group ${groupableNodesAbove[0].data.meta.typeLabel}s ${
+              groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label
+            } - ${groupableNodesAbove[0].data.meta.label}`;
           }
-        ];
+          menuItems.push({
+            name: label,
+            action: () => groupParams.onGroupRows(map(groupableNodesAbove, (n: RowNode) => n.data as R))
+          });
+        }
+
+        if (groups.length !== 0) {
+          menuItems.push({
+            name: "Add to Group",
+            subMenu: map(groups, (group: G) => ({
+              name: group.name,
+              action: () => groupParams.onRowAddToGroup(group.id, row)
+            }))
+          });
+        }
+        return menuItems;
       }
     }
   });

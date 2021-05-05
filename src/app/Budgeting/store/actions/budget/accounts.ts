@@ -44,6 +44,9 @@ export const responseAccountsAction = simpleAction<Http.ListResponse<Model.Budge
 );
 export const setAccountsSearchAction = simpleAction<string>(ActionType.Budget.Accounts.SetSearch);
 export const removeAccountFromGroupAction = simpleAction<number>(ActionType.Budget.Accounts.RemoveFromGroup);
+export const addAccountToGroupAction = simpleAction<{ id: number; group: number }>(
+  ActionType.Budget.Accounts.AddToGroup
+);
 export const selectAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Select);
 export const deselectAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Deselect);
 export const selectAllAccountsAction = simpleAction<null>(ActionType.Budget.Accounts.SelectAll);

@@ -22,7 +22,8 @@ import {
   removeAccountFromGroupAction,
   bulkUpdateBudgetAccountsAction,
   updateGroupInStateAction,
-  bulkCreateAccountsAction
+  bulkCreateAccountsAction,
+  addAccountToGroupAction
 } from "../../../store/actions/budget/accounts";
 import { GenericAccountsTable } from "../../Generic";
 
@@ -90,6 +91,9 @@ const AccountsTable = (): JSX.Element => {
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         onDeleteGroup={(group: Model.BudgetGroup) => dispatch(deleteGroupAction(group.id))}
         onRowRemoveFromGroup={(row: Table.BudgetAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
+        onRowAddToGroup={(group: number, row: Table.BudgetAccountRow) =>
+          dispatch(addAccountToGroupAction({ id: row.id, group }))
+        }
         onGroupRows={(rows: Table.BudgetAccountRow[]) =>
           setGroupAccounts(map(rows, (row: Table.BudgetAccountRow) => row.id))
         }

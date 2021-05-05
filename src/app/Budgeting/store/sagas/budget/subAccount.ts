@@ -270,7 +270,8 @@ export default createStandardSaga(
     RemoveModelFromGroup: {
       actionType: ActionType.Budget.Account.SubAccounts.RemoveFromGroup,
       task: tasks.removeFromGroup
-    }
+    },
+    AddModelToGroup: { actionType: ActionType.Budget.Account.SubAccounts.AddToGroup, task: tasks.addToGroup }
   },
   watchForRequestSubAccountSaga,
   watchForSubAccountIdChangedSaga

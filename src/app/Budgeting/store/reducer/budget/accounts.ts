@@ -185,10 +185,7 @@ const rootReducer: Reducer<Redux.Budgeting.Budget.AccountsStore, Redux.Action<an
     action.type === ActionType.Budget.Accounts.RemoveFromState
   ) {
     const group: Model.BudgetGroup | undefined = find(newState.groups.data, (g: Model.BudgetGroup) =>
-      includes(
-        map(g.children, (child: Model.SimpleAccount) => child.id),
-        action.payload
-      )
+      includes(g.children, action.payload)
     );
     if (isNil(group)) {
       warnInconsistentState({
@@ -205,6 +202,28 @@ const rootReducer: Reducer<Redux.Budgeting.Budget.AccountsStore, Redux.Action<an
             newState.groups.data,
             { id: group.id },
             { ...group, children: filter(group.children, (child: number) => child !== action.payload) }
+          )
+        }
+      };
+      newState = recalculateGroupMetrics(newState, group.id);
+    }
+  } else if (action.type === ActionType.Budget.Accounts.AddToGroup) {
+    const group: Model.BudgetGroup | undefined = find(newState.groups.data, { id: action.payload.group });
+    if (isNil(group)) {
+      warnInconsistentState({
+        action: action.type,
+        reason: "Group does not exist for account.",
+        id: action.payload
+      });
+    } else {
+      newState = {
+        ...newState,
+        groups: {
+          ...newState.groups,
+          data: replaceInArray<Model.BudgetGroup>(
+            newState.groups.data,
+            { id: group.id },
+            { ...group, children: [...group.children, action.payload.id] }
           )
         }
       };

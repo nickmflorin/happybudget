@@ -18,6 +18,7 @@ export interface GenericAccountsTableProps<
   onDeleteGroup: (group: G) => void;
   onEditGroup: (group: G) => void;
   onRowRemoveFromGroup: (row: R) => void;
+  onRowAddToGroup: (group: number, row: R) => void;
   detail: Model.Template | Model.Budget | undefined;
 }
 
@@ -32,6 +33,7 @@ const GenericAccountsTable = <
   onDeleteGroup,
   onEditGroup,
   onRowRemoveFromGroup,
+  onRowAddToGroup,
   detail,
   ...props
 }: GenericAccountsTableProps<R, M, G, P>): JSX.Element => {
@@ -45,7 +47,8 @@ const GenericAccountsTable = <
         onDeleteGroup,
         onRowRemoveFromGroup,
         onGroupRows,
-        onEditGroup
+        onEditGroup,
+        onRowAddToGroup
       }}
       actions={(params: BudgetTableActionsParams<R, G>) => [
         {

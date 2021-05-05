@@ -50,6 +50,7 @@ export interface AccountsServiceSet<
 }
 
 export interface AccountsTaskSet<R extends Table.Row<G>, G extends Model.TemplateGroup | Model.BudgetGroup> {
+  addToGroup: Redux.Task<{ id: number; group: number }>;
   removeFromGroup: Redux.Task<number>;
   deleteGroup: Redux.Task<number>;
   bulkCreate: Redux.Task<number>;
@@ -93,6 +94,32 @@ export const createAccountsTaskSet = <
         }
       } finally {
         yield put(actions.updating({ id: action.payload, value: false }));
+        if (yield cancelled()) {
+          source.cancel();
+        }
+      }
+    }
+  }
+
+  function* addToGroupTask(action: Redux.Action<{ id: number; group: number }>): SagaIterator {
+    if (!isNil(action.payload)) {
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+      yield put(actions.updating({ id: action.payload.id, value: true }));
+      try {
+        yield call(updateAccount, action.payload.id, { group: action.payload.group }, { cancelToken: source.token });
+      } catch (e) {
+        if (!(yield cancelled())) {
+          yield call(
+            handleTableErrors,
+            e,
+            "There was an error adding the account to the group.",
+            action.payload.id,
+            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
+          );
+        }
+      } finally {
+        yield put(actions.updating({ id: action.payload.id, value: false }));
         if (yield cancelled()) {
           source.cancel();
         }
@@ -372,6 +399,7 @@ export const createAccountsTaskSet = <
     }
   }
   return {
+    addToGroup: addToGroupTask,
     removeFromGroup: removeFromGroupTask,
     deleteGroup: deleteGroupTask,
     bulkCreate: bulkCreateTask,

@@ -285,5 +285,6 @@ export default createStandardSaga({
   DeleteComment: { actionType: ActionType.Budget.Comments.Delete, task: deleteCommentTask },
   EditComment: { actionType: ActionType.Budget.Comments.Update, task: editCommentTask },
   DeleteGroup: { actionType: ActionType.Budget.Accounts.Groups.Delete, task: tasks.deleteGroup },
-  RemoveModelFromGroup: { actionType: ActionType.Budget.Accounts.RemoveFromGroup, task: tasks.removeFromGroup }
+  RemoveModelFromGroup: { actionType: ActionType.Budget.Accounts.RemoveFromGroup, task: tasks.removeFromGroup },
+  AddModelToGroup: { actionType: ActionType.Budget.Accounts.AddToGroup, task: tasks.addToGroup }
 });

@@ -36,6 +36,7 @@ export interface TemplateSubAccountsReducerFactoryActionMap {
   Deselect: string;
   SelectAll: string;
   RemoveFromGroup: string;
+  AddToGroup: string;
   Creating: string;
   Updating: string;
   Deleting: string;
@@ -54,6 +55,7 @@ export interface BudgetSubAccountsReducerFactoryActionMap {
   Deselect: string;
   SelectAll: string;
   RemoveFromGroup: string;
+  AddToGroup: string;
   Creating: string;
   Updating: string;
   Deleting: string;
@@ -61,6 +63,8 @@ export interface BudgetSubAccountsReducerFactoryActionMap {
   History: SubAccountsHistoryActionMap;
 }
 
+// TODO: These two factories (for the budget case and the template case) are nearly identicaly,
+// and should be refactored if possible.
 export const createTemplateSubAccountsReducer = (
   mapping: TemplateSubAccountsReducerFactoryActionMap
 ): Reducer<Redux.Budgeting.Template.SubAccountsStore, Redux.Action<any>> => {
@@ -291,6 +295,31 @@ export const createTemplateSubAccountsReducer = (
         };
         newState = recalculateGroupMetrics(newState, group.id);
       }
+    } else if (action.type === mapping.AddToGroup) {
+      const group: Model.TemplateGroup | undefined = find(newState.groups.data, { id: action.payload.group });
+      if (isNil(group)) {
+        warnInconsistentState({
+          action: action.type,
+          reason: "Group does not exist for sub-account.",
+          id: action.payload
+        });
+      } else {
+        newState = {
+          ...newState,
+          groups: {
+            ...newState.groups,
+            data: replaceInArray<Model.TemplateGroup>(
+              newState.groups.data,
+              { id: group.id },
+              {
+                ...group,
+                children: [...group.children, action.payload.id]
+              }
+            )
+          }
+        };
+        newState = recalculateGroupMetrics(newState, group.id);
+      }
     }
     return newState;
   };
@@ -511,10 +540,7 @@ export const createBudgetSubAccountsReducer = (
       }
     } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
       const group: Model.BudgetGroup | undefined = find(newState.groups.data, (g: Model.BudgetGroup) =>
-        includes(
-          map(g.children, (child: Model.SimpleSubAccount) => child.id),
-          action.payload
-        )
+        includes(g.children, action.payload)
       );
       if (isNil(group)) {
         warnInconsistentState({
@@ -533,6 +559,31 @@ export const createBudgetSubAccountsReducer = (
               {
                 ...group,
                 children: filter(group.children, (child: number) => child !== action.payload)
+              }
+            )
+          }
+        };
+        newState = recalculateGroupMetrics(newState, group.id);
+      }
+    } else if (action.type === mapping.AddToGroup) {
+      const group: Model.BudgetGroup | undefined = find(newState.groups.data, { id: action.payload.group });
+      if (isNil(group)) {
+        warnInconsistentState({
+          action: action.type,
+          reason: "Group does not exist for sub-account.",
+          id: action.payload
+        });
+      } else {
+        newState = {
+          ...newState,
+          groups: {
+            ...newState.groups,
+            data: replaceInArray<Model.BudgetGroup>(
+              newState.groups.data,
+              { id: group.id },
+              {
+                ...group,
+                children: [...group.children, action.payload.id]
               }
             )
           }

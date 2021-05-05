@@ -21,7 +21,8 @@ import {
   removeSubAccountFromGroupAction,
   bulkUpdateAccountAction,
   updateGroupInStateAction,
-  bulkCreateSubAccountsAction
+  bulkCreateSubAccountsAction,
+  addSubAccountToGroupAction
 } from "../../../store/actions/template/account";
 
 const selectGroups = simpleDeepEqualSelector(
@@ -102,6 +103,9 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
         onBack={() => history.push(`/templates/${templateId}/accounts`)}
         onDeleteGroup={(group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id))}
         onRowRemoveFromGroup={(row: Table.TemplateSubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id))}
+        onRowAddToGroup={(group: number, row: Table.TemplateSubAccountRow) =>
+          dispatch(addSubAccountToGroupAction({ id: row.id, group }))
+        }
         onGroupRows={(rows: Table.TemplateSubAccountRow[]) =>
           setGroupSubAccounts(map(rows, (row: Table.TemplateSubAccountRow) => row.id))
         }
