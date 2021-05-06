@@ -10,7 +10,9 @@ import {
   updateActual,
   createAccountActual,
   createSubAccountActual,
-  bulkUpdateBudgetActuals
+  bulkUpdateBudgetActuals,
+  getBudgetItems,
+  getBudgetItemsTree
 } from "api/services";
 
 import { takeWithCancellableById } from "lib/redux/sagas";
@@ -32,7 +34,11 @@ import {
   updatePlaceholderInStateAction,
   addPlaceholdersToStateAction,
   addErrorsToStateAction,
-  updateActualInStateAction
+  updateActualInStateAction,
+  loadingBudgetItemsAction,
+  responseBudgetItemsAction,
+  loadingBudgetItemsTreeAction,
+  responseBudgetItemsTreeAction
 } from "../../actions/budget/actuals";
 
 export function* deleteTask(id: number): SagaIterator {
@@ -259,6 +265,52 @@ export function* getActualsTask(action: Redux.Action<null>): SagaIterator {
   }
 }
 
+export function* getBudgetItemsTask(action: Redux.Action<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  if (!isNil(budgetId)) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    yield put(loadingBudgetItemsAction(true));
+    try {
+      const response = yield call(getBudgetItems, budgetId, { no_pagination: true }, { cancelToken: source.token });
+      yield put(responseBudgetItemsAction(response));
+    } catch (e) {
+      if (!(yield cancelled())) {
+        handleRequestError(e, "There was an error retrieving the budget's items.");
+        yield put(responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
+      }
+    } finally {
+      yield put(loadingBudgetItemsAction(false));
+      if (yield cancelled()) {
+        source.cancel();
+      }
+    }
+  }
+}
+
+export function* getBudgetItemsTreeTask(action: Redux.Action<null>): SagaIterator {
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  if (!isNil(budgetId)) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    yield put(loadingBudgetItemsTreeAction(true));
+    try {
+      const response = yield call(getBudgetItemsTree, budgetId, { no_pagination: true }, { cancelToken: source.token });
+      yield put(responseBudgetItemsTreeAction(response));
+    } catch (e) {
+      if (!(yield cancelled())) {
+        handleRequestError(e, "There was an error retrieving the budget's items.");
+        yield put(responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
+      }
+    } finally {
+      yield put(loadingBudgetItemsTreeAction(false));
+      if (yield cancelled()) {
+        source.cancel();
+      }
+    }
+  }
+}
+
 function* watchForRequestActualsSaga(): SagaIterator {
   let lastTasks;
   while (true) {
@@ -267,6 +319,28 @@ function* watchForRequestActualsSaga(): SagaIterator {
       yield cancel(lastTasks);
     }
     lastTasks = yield call(getActualsTask, action);
+  }
+}
+
+function* watchForRequestBudgetItemsSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.Budget.BudgetItems.Request);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(getBudgetItemsTask, action);
+  }
+}
+
+function* watchForRequestBudgetItemsTreeSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.Budget.BudgetItemsTree.Request);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(getBudgetItemsTreeTask, action);
   }
 }
 
@@ -287,4 +361,6 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRemoveActualSaga);
   yield spawn(watchForActualUpdateSaga);
   yield spawn(watchForBulkUpdateActualsSaga);
+  yield spawn(watchForRequestBudgetItemsSaga);
+  yield spawn(watchForRequestBudgetItemsTreeSaga);
 }

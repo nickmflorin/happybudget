@@ -12,6 +12,10 @@ import { mergeRowChanges } from "lib/tabling/util";
 import { handleTableErrors } from "store/tasks";
 
 export interface FringeTasksActionMap {
+  response: Redux.ActionCreator<Http.ListResponse<Model.Fringe>>;
+  loading: Redux.ActionCreator<boolean>;
+  addPlaceholdersToState: Redux.ActionCreator<number>;
+  clearPlaceholders: Redux.ActionCreator<null>;
   activatePlaceholder: Redux.ActionCreator<Table.ActivatePlaceholderPayload<Model.Fringe>>;
   deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
   creating: Redux.ActionCreator<boolean>;
@@ -24,6 +28,11 @@ export interface FringeTasksActionMap {
 }
 
 export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
+  request: (
+    id: number,
+    query: Http.ListQuery,
+    options: Http.RequestOptions
+  ) => Promise<Http.ListResponse<Model.Fringe>>;
   create: (id: number, payload: Http.FringePayload, options: Http.RequestOptions) => Promise<Model.Fringe>;
   bulkUpdate: (
     id: number,
@@ -34,6 +43,7 @@ export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
 }
 
 export interface FringeTaskSet {
+  getFringes: Redux.Task<null>;
   handleRemoval: Redux.Task<number>;
   handleUpdate: Redux.Task<Table.RowChange<Table.FringeRow>>;
   handleBulkUpdate: Redux.Task<Table.RowChange<Table.FringeRow>[]>;
@@ -293,7 +303,36 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     }
   }
 
+  function* getFringesTask(action: Redux.Action<null>): SagaIterator {
+    const objId = yield select(selectObjId);
+    if (!isNil(objId)) {
+      console.log("Requesting Fringes");
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+      yield put(actions.clearPlaceholders(null));
+      yield put(actions.loading(true));
+      try {
+        const response = yield call(services.request, objId, { no_pagination: true }, { cancelToken: source.token });
+        yield put(actions.response(response));
+        if (response.data.length === 0) {
+          yield put(actions.addPlaceholdersToState(2));
+        }
+      } catch (e) {
+        if (!(yield cancelled())) {
+          handleRequestError(e, "There was an error retrieving fringes.");
+          yield put(actions.response({ count: 0, data: [] }, { error: e }));
+        }
+      } finally {
+        yield put(actions.loading(false));
+        if (yield cancelled()) {
+          source.cancel();
+        }
+      }
+    }
+  }
+
   return {
+    getFringes: getFringesTask,
     handleRemoval: handleRemovalTask,
     handleUpdate: handleUpdateTask,
     handleBulkUpdate: handleBulkUpdateTask

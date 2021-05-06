@@ -1,7 +1,12 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, takeEvery } from "redux-saga/effects";
+import { spawn, takeEvery, take, cancel, call } from "redux-saga/effects";
 
-import { createTemplateFringe, bulkUpdateTemplateFringes, bulkCreateTemplateFringes } from "api/services";
+import {
+  createTemplateFringe,
+  bulkUpdateTemplateFringes,
+  bulkCreateTemplateFringes,
+  getTemplateFringes
+} from "api/services";
 import { takeWithCancellableById } from "lib/redux/sagas";
 import { ActionType } from "../../actions";
 import {
@@ -13,12 +18,20 @@ import {
   removeFringeFromStateAction,
   updatePlaceholderInStateAction,
   addErrorsToStateAction,
-  updateFringeInStateAction
+  updateFringeInStateAction,
+  responseFringesAction,
+  loadingFringesAction,
+  addFringesPlaceholdersToStateAction,
+  clearFringesPlaceholdersToStateAction
 } from "../../actions/template/fringes";
 import { createFringeTaskSet } from "../factories";
 
 const tasks = createFringeTaskSet<Model.Template>(
   {
+    response: responseFringesAction,
+    loading: loadingFringesAction,
+    addPlaceholdersToState: addFringesPlaceholdersToStateAction,
+    clearPlaceholders: clearFringesPlaceholdersToStateAction,
     activatePlaceholder: activatePlaceholderAction,
     deleting: deletingFringeAction,
     creating: creatingFringeAction,
@@ -30,6 +43,7 @@ const tasks = createFringeTaskSet<Model.Template>(
     updateInState: updateFringeInStateAction
   },
   {
+    request: getTemplateFringes,
     create: createTemplateFringe,
     bulkUpdate: bulkUpdateTemplateFringes,
     bulkCreate: bulkCreateTemplateFringes
@@ -51,8 +65,20 @@ function* watchForBulkUpdateFringesSaga(): SagaIterator {
   yield takeEvery(ActionType.Template.BulkUpdateFringes, tasks.handleBulkUpdate);
 }
 
+function* watchForRequestFringesSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action = yield take(ActionType.Template.Fringes.Request);
+    if (lastTasks) {
+      yield cancel(lastTasks);
+    }
+    lastTasks = yield call(tasks.getFringes, action);
+  }
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRemoveFringeSaga);
   yield spawn(watchForUpdateFringeSaga);
   yield spawn(watchForBulkUpdateFringesSaga);
+  yield spawn(watchForRequestFringesSaga);
 }

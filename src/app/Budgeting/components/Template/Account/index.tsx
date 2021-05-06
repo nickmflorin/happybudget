@@ -10,6 +10,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 
 import { setInstanceAction } from "../../../store/actions/template";
 import { setAccountIdAction } from "../../../store/actions/template/account";
+import { requestFringesAction } from "../../../store/actions/template/fringes";
 import { selectTemplateId } from "../../../store/selectors";
 import SubAccountsTable from "./SubAccountsTable";
 
@@ -38,6 +39,10 @@ const Account = (): JSX.Element => {
   useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
       dispatch(setAccountIdAction(parseInt(accountId)));
+      // TODO: It might not be necessary to get a fresh set of fringes everytime the Account changes,
+      // we might be able to move this further up in the tree - but for now it is safer to rely on the
+      // source of truth from the API more often than not.
+      dispatch(requestFringesAction(null));
     }
   }, [accountId]);
 

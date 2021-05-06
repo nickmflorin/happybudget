@@ -4,6 +4,15 @@ import ActionType from "../ActionType";
 export const bulkUpdateTemplateFringesAction = simpleAction<Table.RowChange<Table.FringeRow>[]>(
   ActionType.Template.BulkUpdateFringes
 );
+export const requestFringesAction = simpleAction<null>(ActionType.Template.Fringes.Request);
+export const loadingFringesAction = simpleAction<boolean>(ActionType.Template.Fringes.Loading);
+export const responseFringesAction = simpleAction<Http.ListResponse<Model.Fringe>>(
+  ActionType.Template.Fringes.Response
+);
+export const clearFringesPlaceholdersToStateAction = simpleAction<null>(ActionType.Template.Fringes.Placeholders.Clear);
+export const addFringesPlaceholdersToStateAction = simpleAction<number>(
+  ActionType.Template.Fringes.Placeholders.AddToState
+);
 export const updateFringeAction = simpleAction<Table.RowChange<Table.FringeRow>>(ActionType.Template.Fringes.Update);
 export const removeFringeAction = simpleAction<number>(ActionType.Template.Fringes.Delete);
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Fringes.Deleting);

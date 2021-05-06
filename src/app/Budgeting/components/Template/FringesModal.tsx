@@ -4,7 +4,6 @@ import { createSelector } from "reselect";
 
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction, addFringesPlaceholdersToStateAction } from "../../store/actions/template";
 import {
   setFringesSearchAction,
   deselectFringeAction,
@@ -12,7 +11,9 @@ import {
   removeFringeAction,
   updateFringeAction,
   selectAllFringesAction,
-  bulkUpdateTemplateFringesAction
+  bulkUpdateTemplateFringesAction,
+  requestFringesAction,
+  addFringesPlaceholdersToStateAction
 } from "../../store/actions/template/fringes";
 import { GenericFringesModal, GenericFringesModalProps } from "../Generic";
 
@@ -47,8 +48,12 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
   const saving = useSelector(selectSaving);
 
   useEffect(() => {
-    dispatch(setInstanceAction(null));
-  }, []);
+    // TODO: It might not be necessary to always refresh the Fringes when the modal opens, but it is
+    // safer for now to rely on the API as a source of truth more often than not.
+    if (open === true) {
+      dispatch(requestFringesAction(null));
+    }
+  }, [open]);
 
   return (
     <GenericFringesModal

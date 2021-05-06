@@ -142,7 +142,15 @@ const BudgetTable = <
       resizable: true,
       sortable: false,
       filter: false,
-      suppressMovable: true
+      suppressMovable: true,
+      suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+        if (!params.editing) {
+          if (includes(["Backspace", "Delete"], params.event.code)) {
+            return true;
+          }
+        }
+        return false;
+      }
     },
     suppressHorizontalScroll: true,
     suppressContextMenu: process.env.NODE_ENV === "development" && TABLE_DEBUG,

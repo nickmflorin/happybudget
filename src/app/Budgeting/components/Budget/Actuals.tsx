@@ -25,7 +25,9 @@ import {
   removeActualAction,
   updateActualAction,
   selectAllActualsAction,
-  bulkUpdateBudgetActualsAction
+  bulkUpdateBudgetActualsAction,
+  requestBudgetItemsAction,
+  requestBudgetItemsTreeAction
 } from "../../store/actions/budget/actuals";
 import { selectBudgetDetail } from "../../store/selectors";
 import BudgetTable, { GetExportValueParams, BudgetTableActionsParams } from "../BudgetTable";
@@ -68,6 +70,8 @@ const Actuals = (): JSX.Element => {
   useEffect(() => {
     dispatch(setInstanceAction(null));
     dispatch(requestActualsAction(null));
+    dispatch(requestBudgetItemsAction(null));
+    dispatch(requestBudgetItemsTreeAction(null));
   }, []);
 
   return (

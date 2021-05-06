@@ -35,6 +35,7 @@ const ActionType = {
       Updating: "budget.fringes.Updating",
       Loading: "budget.fringes.Loading",
       Response: "budget.fringes.Response",
+      Request: "budget.fringes.Request",
       Delete: "budget.fringes.Delete",
       Update: "budget.fringes.Update",
       AddToState: "budget.fringes.AddToState",
@@ -212,10 +213,12 @@ const ActionType = {
       }
     },
     BudgetItems: {
+      Request: "budget.budgetitems.Request",
       Loading: "budget.budgetitems.Loading",
       Response: "budget.budgetitems.Response"
     },
     BudgetItemsTree: {
+      Request: "budget.budgetitemstree.Request",
       Loading: "budget.budgetitemstree.Loading",
       Response: "budget.budgetitemstree.Response"
     },
@@ -260,6 +263,7 @@ const ActionType = {
       Updating: "template.fringes.Updating",
       Loading: "template.fringes.Loading",
       Response: "template.fringes.Response",
+      Request: "template.fringes.Request",
       Delete: "template.fringes.Delete",
       Update: "template.fringes.Update",
       AddToState: "template.fringes.AddToState",

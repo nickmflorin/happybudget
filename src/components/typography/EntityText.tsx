@@ -25,10 +25,7 @@ const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty,
     return undefined;
   }, [children]);
   return (
-    <div
-      className={classNames("entity-text", className)}
-      style={{ ...style, textAlign: isNil(identifier) && !isNil(fillEmpty) ? "center" : undefined }}
-    >
+    <div className={classNames("entity-text", className)}>
       {(!isNil(identifier) || !isNil(fillEmpty)) && (
         <span className={classNames("identifier")}>{!isNil(identifier) ? identifier : fillEmpty}</span>
       )}
