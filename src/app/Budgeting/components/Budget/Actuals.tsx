@@ -122,9 +122,6 @@ const Actuals = (): JSX.Element => {
             existing.payment_method !== row.payment_method
           );
         }}
-        tableTotals={{
-          value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? String(budgetDetail.actual) : "0.00"
-        }}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         exportFileName={"actuals.csv"}
         getExportValue={{
@@ -144,7 +141,7 @@ const Actuals = (): JSX.Element => {
             onClick: params.onDelete
           }
         ]}
-        bodyColumns={[
+        columns={[
           {
             field: "description",
             headerName: "Description",
@@ -192,7 +189,8 @@ const Actuals = (): JSX.Element => {
             headerName: "Actual",
             flex: 1,
             valueFormatter: currencyValueFormatter,
-            valueSetter: floatValueSetter<Table.ActualRow>("value")
+            valueSetter: floatValueSetter<Table.ActualRow>("value"),
+            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
           }
         ]}
       />

@@ -15,7 +15,7 @@ import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../Budg
 export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends Model.SubAccount, G extends Model.Group>
   extends Omit<
     BudgetTableProps<R, M, G, Http.SubAccountPayload>,
-    "identifierField" | "identifierFieldHeader" | "bodyColumns" | "groupParams"
+    "identifierField" | "identifierFieldHeader" | "groupParams"
   > {
   fringes: Model.Fringe[];
   fringesCellRenderer: "BudgetFringesCell" | "TemplateFringesCell";
@@ -107,7 +107,8 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           disabled: true
         }
       ]}
-      bodyColumns={[
+      {...props}
+      columns={[
         {
           field: "description",
           headerName: "Category Description",
@@ -203,9 +204,9 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
               return false;
             }
           }
-        }
+        },
+        ...props.columns
       ]}
-      {...props}
     />
   );
 };

@@ -103,13 +103,12 @@ const AccountsTable = (): JSX.Element => {
         }
         onEditGroup={(group: Model.TemplateGroup) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllAccountsAction(null))}
-        tableTotals={{
-          estimated: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
-        }}
-        calculatedColumns={[
+        columns={[
           {
             field: "estimated",
-            headerName: "Estimated"
+            headerName: "Estimated",
+            isCalculated: true,
+            tableTotal: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
           }
         ]}
       />

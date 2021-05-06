@@ -99,23 +99,24 @@ const AccountsTable = (): JSX.Element => {
         }
         onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllAccountsAction(null))}
-        tableTotals={{
-          estimated: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
-          variance: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
-          actual: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
-        }}
-        calculatedColumns={[
+        columns={[
           {
             field: "estimated",
-            headerName: "Estimated"
+            headerName: "Estimated",
+            isCalculated: true,
+            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0
           },
           {
             field: "actual",
-            headerName: "Actual"
+            headerName: "Actual",
+            isCalculated: true,
+            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
           },
           {
             field: "variance",
-            headerName: "Variance"
+            headerName: "Variance",
+            isCalculated: true,
+            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0
           }
         ]}
       />

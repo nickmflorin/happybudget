@@ -8,15 +8,18 @@ import { selectBudgetFringes, selectBudgetDetail, selectBudgetDetailLoading } fr
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
 import FringesModal from "./FringesModal";
 
-const BudgetSubAccountsTable = ({
-  ...props
-}: Omit<
-  GenericSubAccountsTableProps<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>,
-  "manager" | "fringes" | "fringesCellRenderer" | "fringesCellRendererParams" | "onEditFringes"
->): JSX.Element => {
+interface BudgetSubAccountsTableProps
+  extends Omit<
+    GenericSubAccountsTableProps<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>,
+    "manager" | "fringes" | "fringesCellRenderer" | "fringesCellRendererParams" | "onEditFringes" | "columns"
+  > {
+  detail: Model.BudgetAccount | Model.BudgetSubAccount | undefined;
+}
+
+const BudgetSubAccountsTable = ({ detail, ...props }: BudgetSubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
-  const detail = useSelector(selectBudgetDetail);
+  const budgetDetail = useSelector(selectBudgetDetail);
   const loadingBudget = useSelector(selectBudgetDetailLoading);
   const fringes = useSelector(selectBudgetFringes);
 
@@ -31,23 +34,27 @@ const BudgetSubAccountsTable = ({
         fringesCellRendererParams={{
           onAddFringes: () => setFringesModalVisible(true)
         }}
-        budgetTotals={{
-          estimated: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
-          variance: !isNil(detail) && !isNil(detail.variance) ? detail.variance : 0.0,
-          actual: !isNil(detail) && !isNil(detail.actual) ? detail.actual : 0.0
-        }}
-        calculatedColumns={[
+        columns={[
           {
             field: "estimated",
-            headerName: "Estimated"
+            headerName: "Estimated",
+            isCalculated: true,
+            budgetTotal: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
+            tableTotal: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0
           },
           {
             field: "actual",
-            headerName: "Actual"
+            headerName: "Actual",
+            isCalculated: true,
+            budgetTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
+            tableTotal: !isNil(detail) && !isNil(detail.actual) ? detail.actual : 0.0
           },
           {
             field: "variance",
-            headerName: "Variance"
+            headerName: "Variance",
+            isCalculated: true,
+            budgetTotal: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
+            tableTotal: !isNil(detail) && !isNil(detail.variance) ? detail.variance : 0.0
           }
         ]}
         {...props}

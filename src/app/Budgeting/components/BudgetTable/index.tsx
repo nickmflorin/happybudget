@@ -35,7 +35,7 @@ import {
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
-import { RenderWithSpinner, ShowHide } from "components";
+import { RenderWithSpinner } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString, updateFieldOrdering, orderByFieldOrdering } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
@@ -61,6 +61,8 @@ import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } fr
 import { BudgetTableProps, CustomColDef } from "./model";
 import BudgetTableMenu from "./Menu";
 import { validateCookiesOrdering, rangeSelectionIsSingleCell, customColDefToColDef } from "./util";
+import BudgetFooterGrid from "./BudgetFooterGrid";
+import TableFooterGrid from "./TableFooterGrid";
 import "./index.scss";
 
 export * from "./cells";
@@ -73,8 +75,7 @@ const BudgetTable = <
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
 >({
   /* eslint-disable indent */
-  bodyColumns,
-  calculatedColumns = [],
+  columns,
   data,
   actions,
   className,
@@ -101,8 +102,6 @@ const BudgetTable = <
   indexColumn = {},
   tableFooterIdentifierValue = "Grand Total",
   budgetFooterIdentifierValue = "Budget Total",
-  tableTotals,
-  budgetTotals,
   processCellForClipboard = {},
   sizeColumnsToFit = true,
   renderFlag = true,
@@ -134,7 +133,6 @@ const BudgetTable = <
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [colDefs, setColDefs] = useState<CustomColDef<R, G>[]>([]);
-  const [budgetFooterColDefs, setBudgetFooterColDefs] = useState<CustomColDef<R, G>[]>([]);
   const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [gridOptions, setGridOptions] = useState<GridOptions>({
@@ -217,24 +215,6 @@ const BudgetTable = <
     setColumnApi(event.columnApi);
   });
 
-  const onTableFooterFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    if (sizeColumnsToFit === true) {
-      event.api.sizeColumnsToFit();
-    }
-  });
-
-  const onTableFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
-    setTableFooterColumnApi(event.columnApi);
-  });
-
-  const onBudgetFooterFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    event.api.sizeColumnsToFit();
-  });
-
-  const onBudgetFooterGridReady = useDynamicCallback((event: GridReadyEvent): void => {
-    setBudgetFooterColumnApi(event.columnApi);
-  });
-
   const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef | CustomColDef<R, G>): boolean => {
     if (includes(["delete", "index", "expand"], colDef.field)) {
       return false;
@@ -255,7 +235,10 @@ const BudgetTable = <
       return false;
     } else if (
       includes(
-        map(calculatedColumns, (col: CustomColDef<R, G>) => col.field),
+        map(
+          filter(columns, (c: CustomColDef<R, G>) => c.isCalculated === true),
+          (col: CustomColDef<R, G>) => col.field
+        ),
         colDef.field
       )
     ) {
@@ -321,7 +304,7 @@ const BudgetTable = <
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
         if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
-          return bodyColumns.length + 1;
+          return filter(columns, (c: CustomColDef<R, G>) => !(c.isCalculated === true)).length + 1;
         } else if (!isNil(identifierColumn.colSpan)) {
           return identifierColumn.colSpan(params);
         }
@@ -414,17 +397,6 @@ const BudgetTable = <
     }
   );
 
-  const suppressNavigation = (params: SuppressKeyboardEventParams) => {
-    const e = params.event;
-    const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-    if (params.api) {
-      if ((e.key === "ArrowDown" || e.key === "ArrowUp") && ctrlCmdPressed) {
-        return true;
-      }
-    }
-    return false;
-  };
-
   const baseColumns = useMemo((): CustomColDef<R, G>[] => {
     let baseLeftColumns: CustomColDef<R, G>[] = [indexCell({})];
     if (!isNil(onRowExpand)) {
@@ -449,84 +421,24 @@ const BudgetTable = <
         errors: []
       }
     };
-    forEach(bodyColumns, (col: CustomColDef<R, G>) => {
-      if (!isNil(col.field)) {
-        footerObj[col.field] = null;
-      }
-    });
-    forEach(calculatedColumns, (col: CustomColDef<R, G>) => {
-      if (!isNil(col.field) && !isNil(group[col.field as keyof G])) {
-        footerObj[col.field] = group[col.field as keyof G];
-      }
-    });
-    return footerObj as R;
-  };
-
-  const tableFooter = useMemo((): R | null => {
-    const footerObj: { [key: string]: any } = {
-      id: hashString("tablefooter"),
-      [identifierField]: tableFooterIdentifierValue,
-      meta: {
-        isPlaceholder: false,
-        isGroupFooter: false,
-        isTableFooter: true,
-        isBudgetFooter: false,
-        selected: false,
-        children: [],
-        errors: []
-      }
-    };
-    forEach(bodyColumns, (col: CustomColDef<R, G>) => {
-      if (!isNil(col.field)) {
-        footerObj[col.field] = null;
-      }
-    });
-    forEach(calculatedColumns, (col: CustomColDef<R, G>) => {
-      if (!isNil(col.field)) {
-        if (!isNil(tableTotals) && !isNil(tableTotals[col.field])) {
-          footerObj[col.field] = tableTotals[col.field];
-        } else {
-          footerObj[col.field] = null;
-        }
-      }
-    });
-    return footerObj as R;
-  }, [useDeepEqualMemo(tableTotals), tableFooterIdentifierValue]);
-
-  const budgetFooter = useMemo((): R | null => {
-    if (!isNil(budgetTotals)) {
-      let fieldsLoading: string[] = [];
-      if (loadingBudget === true) {
-        fieldsLoading = map(calculatedColumns, (col: CustomColDef<R, G>) => col.field) as string[];
-      }
-      const footerObj: { [key: string]: any } = {
-        id: hashString("budgetfooter"),
-        [identifierField]: budgetFooterIdentifierValue,
-        meta: {
-          isPlaceholder: false,
-          isGroupFooter: false,
-          isTableFooter: false,
-          isBudgetFooter: true,
-          selected: false,
-          children: [],
-          errors: [],
-          fieldsLoading
-        }
-      };
-      forEach(bodyColumns, (col: CustomColDef<R, G>) => {
+    forEach(
+      filter(columns, (col: CustomColDef<R, G>) => !(col.isCalculated === true)),
+      (col: CustomColDef<R, G>) => {
         if (!isNil(col.field)) {
           footerObj[col.field] = null;
         }
-      });
-      forEach(calculatedColumns, (col: CustomColDef<R, G>) => {
-        if (!isNil(col.field) && !isNil(budgetTotals[col.field])) {
-          footerObj[col.field] = budgetTotals[col.field];
+      }
+    );
+    forEach(
+      filter(columns, (col: CustomColDef<R, G>) => col.isCalculated === true),
+      (col: CustomColDef<R, G>) => {
+        if (!isNil(col.field) && !isNil(group[col.field as keyof G])) {
+          footerObj[col.field] = group[col.field as keyof G];
         }
-      });
-      return footerObj as R;
-    }
-    return null;
-  }, [useDeepEqualMemo(budgetTotals), budgetFooterIdentifierValue, loadingBudget]);
+      }
+    );
+    return footerObj as R;
+  };
 
   /**
    * Starting at the provided index, either traverses the table upwards or downwards
@@ -864,7 +776,10 @@ const BudgetTable = <
     if (!isNil(cookies) && !isNil(cookies.ordering)) {
       const kookies = new Cookies();
       const cookiesOrdering = kookies.get(cookies.ordering);
-      const validatedOrdering = validateCookiesOrdering(cookiesOrdering, bodyColumns);
+      const validatedOrdering = validateCookiesOrdering(
+        cookiesOrdering,
+        filter(columns, (col: CustomColDef<R, G>) => !(col.isCalculated === true))
+      );
       if (!isNil(validatedOrdering)) {
         setOrdering(validatedOrdering);
       }
@@ -1056,31 +971,24 @@ const BudgetTable = <
   useEffect(() => {
     const cols = concat(
       baseColumns,
-      map(bodyColumns, (def: ColDef) => bodyCell(def)),
-      map(calculatedColumns, (def: ColDef) => calculatedCell(def))
+      map(
+        filter(columns, (col: CustomColDef<R, G>) => !(col.isCalculated === true)),
+        (def: CustomColDef<R, G>) => bodyCell(def)
+      ),
+      map(
+        filter(columns, (col: CustomColDef<R, G>) => col.isCalculated === true),
+        (def: CustomColDef<R, G>) => calculatedCell(def)
+      )
     );
     setColDefs(
-      map(cols, (col: ColDef, index: number) => {
+      map(cols, (col: CustomColDef<R, G>, index: number) => {
         if (index === cols.length - 1) {
           return universalCell({ ...col, resizable: false });
         }
         return universalCell(col);
       })
     );
-  }, [useDeepEqualMemo(bodyColumns), useDeepEqualMemo(calculatedColumns)]);
-
-  useEffect(() => {
-    setBudgetFooterColDefs(
-      map(
-        concat(
-          baseColumns,
-          map(bodyColumns, (def: ColDef) => bodyCell(def)),
-          map(calculatedColumns, (def: ColDef) => calculatedCell(def))
-        ),
-        (col: ColDef) => universalCell(col)
-      )
-    );
-  }, [useDeepEqualMemo(bodyColumns), useDeepEqualMemo(calculatedColumns)]);
+  }, [useDeepEqualMemo(columns), baseColumns]);
 
   return (
     <React.Fragment>
@@ -1091,7 +999,7 @@ const BudgetTable = <
         canSearch={canSearch}
         canExport={canExport}
         canToggleColumns={canToggleColumns}
-        columns={[...bodyColumns, ...calculatedColumns]}
+        columns={columns}
         onDelete={() => {
           forEach(table, (row: R) => {
             if (row.meta.selected === true) {
@@ -1115,7 +1023,7 @@ const BudgetTable = <
                   colDef.field
                 ) &&
                 includes(
-                  map([...bodyColumns, ...calculatedColumns], (c: ColDef) => c.field),
+                  map(columns, (c: CustomColDef<R, G>) => c.field),
                   colDef.field
                 )
               );
@@ -1167,7 +1075,7 @@ const BudgetTable = <
         }}
         onColumnsChange={(fields: Field[]) => {
           if (!isNil(columnApi) && !isNil(tableFooterColumnApi) && !isNil(budgetFooterColumnApi)) {
-            forEach([...bodyColumns, ...calculatedColumns], (col: ColDef) => {
+            forEach(columns, (col: CustomColDef<R, G>) => {
               if (!isNil(col.field)) {
                 const associatedField = find(fields, { id: col.field });
                 if (!isNil(associatedField)) {
@@ -1228,7 +1136,16 @@ const BudgetTable = <
               navigateToNextCell={navigateToNextCell}
               onCellKeyDown={onCellKeyDown}
               onFirstDataRendered={onFirstDataRendered}
-              suppressKeyboardEvent={suppressNavigation}
+              suppressKeyboardEvent={(params: SuppressKeyboardEventParams) => {
+                const e = params.event;
+                const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+                if (params.api) {
+                  if ((e.key === "ArrowDown" || e.key === "ArrowUp") && ctrlCmdPressed) {
+                    return true;
+                  }
+                }
+                return false;
+              }}
               // NOTE: This might not be 100% necessary, because of how efficiently
               // we are managing the state updates to the data that flows into the table.
               // However, for now we will leave.  It is important to note that this will
@@ -1266,48 +1183,30 @@ const BudgetTable = <
               }}
             />
           </div>
-          <div className={"table-footer-grid"}>
-            <AgGridReact
-              {...tableFooterGridOptions}
-              columnDefs={map(colDefs, (def: CustomColDef<R, G>) => customColDefToColDef(def))}
-              rowData={[tableFooter]}
-              rowHeight={38}
-              rowClass={"row--table-footer"}
-              suppressRowClickSelection={true}
-              onGridReady={onTableFooterGridReady}
-              onFirstDataRendered={onTableFooterFirstDataRendered}
-              headerHeight={0}
-              frameworkComponents={{
-                IndexCell: IndexCell,
-                ValueCell: IncludeErrorsInCell<R>(ValueCell),
-                IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
-                CalculatedCell: CalculatedCell,
-                ...frameworkComponents
-              }}
+          <TableFooterGrid<R, G>
+            options={tableFooterGridOptions}
+            colDefs={colDefs}
+            columns={columns}
+            sizeColumnsToFit={sizeColumnsToFit}
+            frameworkComponents={frameworkComponents}
+            identifierField={identifierField}
+            identifierValue={tableFooterIdentifierValue}
+            setColumnApi={setTableFooterColumnApi}
+          />
+          {filter(columns, (col: CustomColDef<R, G>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !==
+            0 && (
+            <BudgetFooterGrid<R, G>
+              options={budgetFooterGridOptions}
+              colDefs={colDefs}
+              columns={columns}
+              sizeColumnsToFit={sizeColumnsToFit}
+              frameworkComponents={frameworkComponents}
+              identifierField={identifierField}
+              identifierValue={budgetFooterIdentifierValue}
+              loadingBudget={loadingBudget}
+              setColumnApi={setBudgetFooterColumnApi}
             />
-          </div>
-          <ShowHide show={!isNil(budgetTotals)}>
-            <div className={"budget-footer-grid"}>
-              <AgGridReact
-                {...budgetFooterGridOptions}
-                columnDefs={map(budgetFooterColDefs, (def: CustomColDef<R, G>) => customColDefToColDef(def))}
-                rowData={[budgetFooter]}
-                rowClass={"row--budget-footer"}
-                suppressRowClickSelection={true}
-                onGridReady={onBudgetFooterGridReady}
-                onFirstDataRendered={onBudgetFooterFirstDataRendered}
-                headerHeight={0}
-                rowHeight={28}
-                frameworkComponents={{
-                  IndexCell: IndexCell,
-                  ValueCell: IncludeErrorsInCell<R>(ValueCell),
-                  IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
-                  CalculatedCell: CalculatedCell,
-                  ...frameworkComponents
-                }}
-              />
-            </div>
-          </ShowHide>
+          )}
         </div>
       </RenderWithSpinner>
     </React.Fragment>

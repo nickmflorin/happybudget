@@ -14,7 +14,7 @@ import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../Budg
 export interface GenericFringesTableProps
   extends Omit<
     BudgetTableProps<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>,
-    "manager" | "identifierField" | "identifierFieldHeader" | "bodyColumns"
+    "manager" | "identifierField" | "identifierFieldHeader" | "columns"
   > {
   saving: boolean;
   search: string;
@@ -53,7 +53,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
           onClick: params.onDelete
         }
       ]}
-      bodyColumns={[
+      columns={[
         {
           field: "color",
           headerName: "Color",

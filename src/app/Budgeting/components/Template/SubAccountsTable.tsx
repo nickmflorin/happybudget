@@ -8,15 +8,17 @@ import { selectTemplateFringes, selectTemplateDetail, selectTemplateDetailLoadin
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
 import FringesModal from "./FringesModal";
 
-const TemplateSubAccountsTable = ({
-  ...props
-}: Omit<
-  GenericSubAccountsTableProps<Table.TemplateSubAccountRow, Model.TemplateSubAccount, Model.TemplateGroup>,
-  "manager" | "fringes" | "fringesCellRenderer" | "fringesCellRendererParams" | "onEditFringes"
->): JSX.Element => {
-  const [fringesModalVisible, setFringesModalVisible] = useState(false);
+interface TemplateSubAccountsTableProps
+  extends Omit<
+    GenericSubAccountsTableProps<Table.TemplateSubAccountRow, Model.TemplateSubAccount, Model.TemplateGroup>,
+    "manager" | "fringes" | "fringesCellRenderer" | "fringesCellRendererParams" | "onEditFringes" | "columns"
+  > {
+  detail: Model.TemplateAccount | Model.TemplateSubAccount | undefined;
+}
 
-  const detail = useSelector(selectTemplateDetail);
+const TemplateSubAccountsTable = ({ detail, ...props }: TemplateSubAccountsTableProps): JSX.Element => {
+  const [fringesModalVisible, setFringesModalVisible] = useState(false);
+  const templateDetail = useSelector(selectTemplateDetail);
   const loadingTemplate = useSelector(selectTemplateDetailLoading);
   const fringes = useSelector(selectTemplateFringes);
 
@@ -31,13 +33,13 @@ const TemplateSubAccountsTable = ({
           onAddFringes: () => setFringesModalVisible(true)
         }}
         onEditFringes={() => setFringesModalVisible(true)}
-        budgetTotals={{
-          estimated: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0
-        }}
-        calculatedColumns={[
+        columns={[
           {
             field: "estimated",
-            headerName: "Estimated"
+            headerName: "Estimated",
+            isCalculated: true,
+            tableTotal: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
+            budgetTotal: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
           }
         ]}
         {...props}

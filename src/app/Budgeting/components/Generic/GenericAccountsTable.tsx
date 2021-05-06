@@ -12,7 +12,7 @@ export interface GenericAccountsTableProps<
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
 > extends Omit<
     BudgetTableProps<R, M, G, P>,
-    "identifierField" | "identifierFieldHeader" | "bodyColumns" | "groupParams" | "tableFooterIdentifierValue"
+    "identifierField" | "identifierFieldHeader" | "groupParams" | "tableFooterIdentifierValue"
   > {
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
@@ -73,14 +73,15 @@ const GenericAccountsTable = <
           disabled: true
         }
       ]}
-      bodyColumns={[
+      {...props}
+      columns={[
         {
           field: "description",
           headerName: "Category Description",
           flex: 100
-        }
+        },
+        ...props.columns
       ]}
-      {...props}
     />
   );
 };

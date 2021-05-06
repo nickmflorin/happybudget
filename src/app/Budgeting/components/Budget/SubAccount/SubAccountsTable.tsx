@@ -78,6 +78,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
       <BudgetSubAccountsTable
         data={data}
         groups={groups}
+        detail={subaccountDetail}
         selected={selected}
         renderFlag={readyToRender}
         tableFooterIdentifierValue={
@@ -118,11 +119,6 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         }
         onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllSubAccountsAction(null))}
-        tableTotals={{
-          estimated: !isNil(subaccountDetail) && !isNil(subaccountDetail.estimated) ? subaccountDetail.estimated : 0.0,
-          variance: !isNil(subaccountDetail) && !isNil(subaccountDetail.variance) ? subaccountDetail.variance : 0.0,
-          actual: !isNil(subaccountDetail) && !isNil(subaccountDetail.actual) ? subaccountDetail.actual : 0.0
-        }}
       />
       {!isNil(groupSubAccounts) && (
         <CreateSubAccountGroupModal

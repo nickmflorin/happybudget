@@ -1,5 +1,5 @@
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
-import { ColDef, CellClassParams, RowNode, GridOptions } from "@ag-grid-community/core";
+import { ColDef, CellClassParams, RowNode, GridOptions, ColumnApi } from "@ag-grid-community/core";
 import RowManager from "lib/tabling/managers";
 
 export interface GetExportValueParams {
@@ -38,6 +38,10 @@ export interface CustomColDef<R extends Table.Row<G>, G extends Model.Group = Mo
   extends Omit<ColDef, "field"> {
   onClearValue?: any;
   field: keyof R & string;
+  isCalculated?: boolean;
+  budgetTotal?: number;
+  tableTotal?: number;
+  // isBase?: boolean;
 }
 
 export interface BudgetTableMenuProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
@@ -58,6 +62,31 @@ export interface BudgetTableMenuProps<R extends Table.Row<G>, G extends Model.Gr
   onDelete: () => void;
 }
 
+export interface BudgetFooterGridProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+  options: GridOptions;
+  // TODO: Refactor so we only have to provide one of these.
+  columns: CustomColDef<R, G>[];
+  colDefs: CustomColDef<R, G>[];
+  frameworkComponents?: { [key: string]: any };
+  identifierField: string;
+  identifierValue?: string | null;
+  loadingBudget?: boolean | undefined;
+  sizeColumnsToFit?: boolean | undefined;
+  setColumnApi: (api: ColumnApi) => void;
+}
+
+export interface TableFooterGridProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+  options: GridOptions;
+  // TODO: Refactor so we only have to provide one of these.
+  columns: CustomColDef<R, G>[];
+  colDefs: CustomColDef<R, G>[];
+  frameworkComponents?: { [key: string]: any };
+  identifierField: string;
+  identifierValue?: string | null;
+  sizeColumnsToFit?: boolean | undefined;
+  setColumnApi: (api: ColumnApi) => void;
+}
+
 export interface BudgetTableProps<
   R extends Table.Row<G>,
   M extends Model.Model,
@@ -69,8 +98,7 @@ export interface BudgetTableProps<
       "columns" | "onColumnsChange" | "onExport" | "onDelete" | "selected" | "selectedRows"
     >,
     StandardComponentProps {
-  bodyColumns: CustomColDef<R, G>[];
-  calculatedColumns?: CustomColDef<R, G>[];
+  columns: CustomColDef<R, G>[];
   manager: RowManager<R, M, G, P>;
   data: M[];
   groups?: G[];
@@ -84,8 +112,6 @@ export interface BudgetTableProps<
   expandColumn?: Partial<CustomColDef<R, G>>;
   tableFooterIdentifierValue?: string | null;
   budgetFooterIdentifierValue?: string | null;
-  tableTotals?: { [key: string]: any };
-  budgetTotals?: { [key: string]: any };
   search: string;
   saving: boolean;
   loadingBudget?: boolean;
