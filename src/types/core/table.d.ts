@@ -30,7 +30,7 @@ namespace Table {
     readonly pageSize: number;
   }
 
-  interface Row<G extends Model.Group = Model.Group> {
+  interface Row<G extends Model.Group = Model.Group> extends Record<string, any> {
     readonly id: number;
     readonly meta: RowMeta;
     readonly group: G | null;

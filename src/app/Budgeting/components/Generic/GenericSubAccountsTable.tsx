@@ -171,6 +171,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
             onEdit: () => onEditFringes()
           },
           minWidth: 150,
+          onClearValue: [],
           valueSetter: (params: ValueSetterParams): boolean => {
             // In the case that the value is an Array, the value will have been  provided as an Array
             // of IDs from the Fringes dropdown.

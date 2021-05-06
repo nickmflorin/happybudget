@@ -58,9 +58,9 @@ import {
   FringeColorCell
 } from "./cells";
 import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } from "./cells/Util";
-import { BudgetTableProps } from "./model";
+import { BudgetTableProps, CustomColDef } from "./model";
 import BudgetTableMenu from "./Menu";
-import { validateCookiesOrdering, rangeSelectionIsSingleCell } from "./util";
+import { validateCookiesOrdering, rangeSelectionIsSingleCell, customColDefToColDef } from "./util";
 import "./index.scss";
 
 export * from "./cells";
@@ -133,8 +133,8 @@ const BudgetTable = <
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
-  const [colDefs, setColDefs] = useState<ColDef[]>([]);
-  const [budgetFooterColDefs, setBudgetFooterColDefs] = useState<ColDef[]>([]);
+  const [colDefs, setColDefs] = useState<CustomColDef<R, G>[]>([]);
+  const [budgetFooterColDefs, setBudgetFooterColDefs] = useState<CustomColDef<R, G>[]>([]);
   const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [gridOptions, setGridOptions] = useState<GridOptions>({
@@ -235,7 +235,7 @@ const BudgetTable = <
     setBudgetFooterColumnApi(event.columnApi);
   });
 
-  const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
+  const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef | CustomColDef<R, G>): boolean => {
     if (includes(["delete", "index", "expand"], colDef.field)) {
       return false;
     } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
@@ -246,7 +246,7 @@ const BudgetTable = <
     return true;
   });
 
-  const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef): boolean => {
+  const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef | CustomColDef<R, G>): boolean => {
     if (includes(["delete", "index", "expand"], colDef.field)) {
       return false;
     } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
@@ -255,7 +255,7 @@ const BudgetTable = <
       return false;
     } else if (
       includes(
-        map(calculatedColumns, (col: ColDef) => col.field),
+        map(calculatedColumns, (col: CustomColDef<R, G>) => col.field),
         colDef.field
       )
     ) {
@@ -266,8 +266,8 @@ const BudgetTable = <
     return true;
   });
 
-  const actionCell = useDynamicCallback<ColDef>(
-    (col: ColDef): ColDef => {
+  const actionCell = useDynamicCallback<CustomColDef<R, G>>(
+    (col: CustomColDef<R, G>): CustomColDef<R, G> => {
       return {
         width: 20,
         maxWidth: 25,
@@ -280,8 +280,8 @@ const BudgetTable = <
     }
   );
 
-  const indexCell = useDynamicCallback<ColDef>(
-    (col: ColDef): ColDef =>
+  const indexCell = useDynamicCallback<CustomColDef<R, G>>(
+    (col: CustomColDef<R, G>): CustomColDef<R, G> =>
       actionCell({
         ...actionColumn,
         ...indexColumn,
@@ -310,8 +310,8 @@ const BudgetTable = <
       })
   );
 
-  const identifierCell = useDynamicCallback<ColDef>(
-    (col: ColDef): ColDef => ({
+  const identifierCell = useDynamicCallback<CustomColDef<R, G>>(
+    (col: CustomColDef<R, G>): CustomColDef<R, G> => ({
       field: identifierField,
       headerName: identifierFieldHeader,
       cellRenderer: "IdentifierCell",
@@ -334,8 +334,8 @@ const BudgetTable = <
     })
   );
 
-  const expandCell = useDynamicCallback<ColDef>(
-    (col: ColDef): ColDef =>
+  const expandCell = useDynamicCallback<CustomColDef<R, G>>(
+    (col: CustomColDef<R, G>): CustomColDef<R, G> =>
       actionCell({
         ...col,
         ...expandColumn,
@@ -347,8 +347,8 @@ const BudgetTable = <
       })
   );
 
-  const calculatedCell = useDynamicCallback<ColDef>(
-    (col: ColDef): ColDef => {
+  const calculatedCell = useDynamicCallback<CustomColDef<R, G>>(
+    (col: CustomColDef<R, G>): CustomColDef<R, G> => {
       return {
         width: 100,
         maxWidth: 100,
@@ -384,8 +384,8 @@ const BudgetTable = <
     }
   });
 
-  const bodyCell = useDynamicCallback<ColDef>(
-    (col: ColDef): ColDef => {
+  const bodyCell = useDynamicCallback<CustomColDef<R, G>>(
+    (col: CustomColDef<R, G>): CustomColDef<R, G> => {
       return {
         cellRenderer: "ValueCell",
         headerComponentParams: {
@@ -397,8 +397,8 @@ const BudgetTable = <
     }
   );
 
-  const universalCell = useDynamicCallback<ColDef>(
-    (col: ColDef): ColDef => {
+  const universalCell = useDynamicCallback<CustomColDef<R, G>>(
+    (col: CustomColDef<R, G>): CustomColDef<R, G> => {
       return {
         ...col,
         suppressMenu: true,
@@ -425,8 +425,8 @@ const BudgetTable = <
     return false;
   };
 
-  const baseColumns = useMemo((): ColDef[] => {
-    let baseLeftColumns: ColDef[] = [indexCell({})];
+  const baseColumns = useMemo((): CustomColDef<R, G>[] => {
+    let baseLeftColumns: CustomColDef<R, G>[] = [indexCell({})];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
@@ -449,12 +449,12 @@ const BudgetTable = <
         errors: []
       }
     };
-    forEach(bodyColumns, (col: ColDef) => {
+    forEach(bodyColumns, (col: CustomColDef<R, G>) => {
       if (!isNil(col.field)) {
         footerObj[col.field] = null;
       }
     });
-    forEach(calculatedColumns, (col: ColDef) => {
+    forEach(calculatedColumns, (col: CustomColDef<R, G>) => {
       if (!isNil(col.field) && !isNil(group[col.field as keyof G])) {
         footerObj[col.field] = group[col.field as keyof G];
       }
@@ -476,12 +476,12 @@ const BudgetTable = <
         errors: []
       }
     };
-    forEach(bodyColumns, (col: ColDef) => {
+    forEach(bodyColumns, (col: CustomColDef<R, G>) => {
       if (!isNil(col.field)) {
         footerObj[col.field] = null;
       }
     });
-    forEach(calculatedColumns, (col: ColDef) => {
+    forEach(calculatedColumns, (col: CustomColDef<R, G>) => {
       if (!isNil(col.field)) {
         if (!isNil(tableTotals) && !isNil(tableTotals[col.field])) {
           footerObj[col.field] = tableTotals[col.field];
@@ -497,7 +497,7 @@ const BudgetTable = <
     if (!isNil(budgetTotals)) {
       let fieldsLoading: string[] = [];
       if (loadingBudget === true) {
-        fieldsLoading = map(calculatedColumns, (col: ColDef) => col.field) as string[];
+        fieldsLoading = map(calculatedColumns, (col: CustomColDef<R, G>) => col.field) as string[];
       }
       const footerObj: { [key: string]: any } = {
         id: hashString("budgetfooter"),
@@ -513,12 +513,12 @@ const BudgetTable = <
           fieldsLoading
         }
       };
-      forEach(bodyColumns, (col: ColDef) => {
+      forEach(bodyColumns, (col: CustomColDef<R, G>) => {
         if (!isNil(col.field)) {
           footerObj[col.field] = null;
         }
       });
-      forEach(calculatedColumns, (col: ColDef) => {
+      forEach(calculatedColumns, (col: CustomColDef<R, G>) => {
         if (!isNil(col.field) && !isNil(budgetTotals[col.field])) {
           footerObj[col.field] = budgetTotals[col.field];
         }
@@ -683,16 +683,25 @@ const BudgetTable = <
       for (let i = startRowIndex; i <= endRowIndex; i++) {
         const node: RowNode | null = api.getDisplayedRowAtIndex(i);
         if (!isNil(node)) {
-          const row = node.data;
+          const row: R = node.data;
 
           const rowChangeData: Table.RowChangeData<R> = {};
           /* eslint-disable no-loop-func */
           forEach(colIds, (colId: keyof R) => {
-            const change: Table.CellChange<any> = { oldValue: row[colId], newValue: "" };
-            rowChangeData[colId] = change;
+            const customColDef = find(colDefs, { field: colId } as any);
+            // Only clear cells for which an onClear value is specified - otherwise it can cause bugs.
+            if (!isNil(customColDef) && _isCellEditable(row, customColDef)) {
+              const clearValue = customColDef.onClearValue !== undefined ? customColDef.onClearValue : null;
+              if (row[colId] === undefined || row[colId] !== clearValue) {
+                const change: Table.CellChange<any> = { oldValue: row[colId], newValue: clearValue };
+                rowChangeData[colId] = change;
+              }
+            }
           });
-          const rowChange: Table.RowChange<R> = { id: row.id, data: rowChangeData };
-          rowChanges.push(rowChange);
+          if (Object.keys(rowChangeData).length !== 0) {
+            const rowChange: Table.RowChange<R> = { id: row.id, data: rowChangeData };
+            rowChanges.push(rowChange);
+          }
         }
       }
     }
@@ -1180,7 +1189,7 @@ const BudgetTable = <
           <div className={"table-grid"}>
             <AgGridReact
               {...gridOptions}
-              columnDefs={colDefs}
+              columnDefs={map(colDefs, (def: CustomColDef<R, G>) => customColDefToColDef(def))}
               getContextMenuItems={getContextMenuItems}
               allowContextMenuWithControlKey={true}
               rowData={table}
@@ -1260,7 +1269,7 @@ const BudgetTable = <
           <div className={"table-footer-grid"}>
             <AgGridReact
               {...tableFooterGridOptions}
-              columnDefs={colDefs}
+              columnDefs={map(colDefs, (def: CustomColDef<R, G>) => customColDefToColDef(def))}
               rowData={[tableFooter]}
               rowHeight={38}
               rowClass={"row--table-footer"}
@@ -1281,7 +1290,7 @@ const BudgetTable = <
             <div className={"budget-footer-grid"}>
               <AgGridReact
                 {...budgetFooterGridOptions}
-                columnDefs={budgetFooterColDefs}
+                columnDefs={map(budgetFooterColDefs, (def: CustomColDef<R, G>) => customColDefToColDef(def))}
                 rowData={[budgetFooter]}
                 rowClass={"row--budget-footer"}
                 suppressRowClickSelection={true}

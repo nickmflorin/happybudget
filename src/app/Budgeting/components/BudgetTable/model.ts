@@ -34,8 +34,14 @@ export interface CookiesProps {
   ordering?: string;
 }
 
+export interface CustomColDef<R extends Table.Row<G>, G extends Model.Group = Model.Group>
+  extends Omit<ColDef, "field"> {
+  onClearValue?: any;
+  field: keyof R & string;
+}
+
 export interface BudgetTableMenuProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
-  columns: ColDef[];
+  columns: CustomColDef<R, G>[];
   actions?: ((params: BudgetTableActionsParams<R, G>) => BudgetTableMenuAction[]) | BudgetTableMenuAction[];
   saving?: boolean;
   selected?: boolean;
@@ -63,8 +69,8 @@ export interface BudgetTableProps<
       "columns" | "onColumnsChange" | "onExport" | "onDelete" | "selected" | "selectedRows"
     >,
     StandardComponentProps {
-  bodyColumns: ColDef[];
-  calculatedColumns?: ColDef[];
+  bodyColumns: CustomColDef<R, G>[];
+  calculatedColumns?: CustomColDef<R, G>[];
   manager: RowManager<R, M, G, P>;
   data: M[];
   groups?: G[];
@@ -72,10 +78,10 @@ export interface BudgetTableProps<
   selected?: number[];
   identifierField: string;
   identifierFieldHeader: string;
-  identifierColumn?: Partial<ColDef>;
-  actionColumn?: Partial<ColDef>;
-  indexColumn?: Partial<ColDef>;
-  expandColumn?: Partial<ColDef>;
+  identifierColumn?: Partial<CustomColDef<R, G>>;
+  actionColumn?: Partial<CustomColDef<R, G>>;
+  indexColumn?: Partial<CustomColDef<R, G>>;
+  expandColumn?: Partial<CustomColDef<R, G>>;
   tableFooterIdentifierValue?: string | null;
   budgetFooterIdentifierValue?: string | null;
   tableTotals?: { [key: string]: any };

@@ -1,6 +1,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Model {
+  interface StringObj {
+    [key: string]: any;
+  }
+
   /* eslint-disable no-shadow */
   interface Model {
     readonly id: number;
