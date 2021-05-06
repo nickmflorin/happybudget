@@ -1,5 +1,5 @@
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
-import { ColDef, CellClassParams, RowNode, GridOptions, ColumnApi } from "@ag-grid-community/core";
+import { ColDef, CellClassParams, RowNode, GridOptions, ColumnApi, GridApi } from "@ag-grid-community/core";
 import RowManager from "lib/tabling/managers";
 
 export interface GetExportValueParams {
@@ -87,6 +87,43 @@ export interface TableFooterGridProps<R extends Table.Row<G>, G extends Model.Gr
   setColumnApi: (api: ColumnApi) => void;
 }
 
+interface PrimaryGridPassThroughProps<
+  R extends Table.Row<G>,
+  M extends Model.Model,
+  G extends Model.Group = Model.Group,
+  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
+> {
+  manager: RowManager<R, M, G, P>;
+  groups?: G[];
+  groupParams?: GroupProps<R, G>;
+  frameworkComponents?: { [key: string]: any };
+  sizeColumnsToFit?: boolean | undefined;
+  search: string;
+  processCellForClipboard?: { [key in keyof R]?: (row: R) => any };
+  rowRefreshRequired?: (existing: R, row: R) => boolean;
+  onRowUpdate: (payload: Table.RowChange<R>) => void;
+  onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
+  onRowAdd: () => void;
+  onRowDelete: (row: R) => void;
+}
+
+export interface PrimaryGridProps<
+  R extends Table.Row<G>,
+  M extends Model.Model,
+  G extends Model.Group = Model.Group,
+  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
+> extends PrimaryGridPassThroughProps<R, M, G, P> {
+  api: GridApi | undefined;
+  columnApi: ColumnApi | undefined;
+  table: R[];
+  options: GridOptions;
+  colDefs: CustomColDef<R, G>[];
+  setAllSelected: (value: boolean) => void;
+  isCellEditable: (row: R, colDef: ColDef | CustomColDef<R, G>) => boolean;
+  setApi: (api: GridApi) => void;
+  setColumnApi: (api: ColumnApi) => void;
+}
+
 export interface BudgetTableProps<
   R extends Table.Row<G>,
   M extends Model.Model,
@@ -99,9 +136,7 @@ export interface BudgetTableProps<
     >,
     StandardComponentProps {
   columns: CustomColDef<R, G>[];
-  manager: RowManager<R, M, G, P>;
   data: M[];
-  groups?: G[];
   placeholders?: R[];
   selected?: number[];
   identifierField: string;
@@ -112,30 +147,33 @@ export interface BudgetTableProps<
   expandColumn?: Partial<CustomColDef<R, G>>;
   tableFooterIdentifierValue?: string | null;
   budgetFooterIdentifierValue?: string | null;
-  search: string;
   saving: boolean;
   loadingBudget?: boolean;
-  frameworkComponents?: { [key: string]: any };
   getExportValue?: ExportValueGetters;
   exportable?: boolean;
   exportFileName?: string;
   nonEditableCells?: (keyof R)[];
-  groupParams?: GroupProps<R, G>;
   cookies?: CookiesProps;
   loading?: boolean;
-  sizeColumnsToFit?: boolean;
   renderFlag?: boolean;
-  processCellForClipboard?: { [key in keyof R]?: (row: R) => any };
   cellClass?: (params: CellClassParams) => string | undefined;
-  rowRefreshRequired?: (existing: R, row: R) => boolean;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
-  onRowUpdate: (payload: Table.RowChange<R>) => void;
-  onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
-  onRowAdd: () => void;
-  onRowDelete: (row: R) => void;
   onRowExpand?: (id: number) => void;
   onBack?: () => void;
   isCellEditable?: (row: R, col: ColDef) => boolean;
   isCellSelectable?: (row: R, col: ColDef) => boolean;
+  // Props Passed to the Primary Grid
+  manager: RowManager<R, M, G, P>;
+  groups?: G[];
+  groupParams?: GroupProps<R, G>;
+  frameworkComponents?: { [key: string]: any };
+  sizeColumnsToFit?: boolean | undefined;
+  search: string;
+  processCellForClipboard?: { [key in keyof R]?: (row: R) => any };
+  rowRefreshRequired?: (existing: R, row: R) => boolean;
+  onRowUpdate: (payload: Table.RowChange<R>) => void;
+  onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
+  onRowAdd: () => void;
+  onRowDelete: (row: R) => void;
 }
