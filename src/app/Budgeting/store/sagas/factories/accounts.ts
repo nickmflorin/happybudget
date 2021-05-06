@@ -1,6 +1,6 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { call, put, select, fork, cancelled } from "redux-saga/effects";
+import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
 
 import { handleRequestError } from "api";
@@ -207,9 +207,7 @@ export const createAccountsTaskSet = <
         id: change.id,
         ...manager.payload(change)
       }));
-      for (let i = 0; i++; i < changes.length) {
-        yield put(actions.updating({ id: changes[i].id, value: true }));
-      }
+      yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
       try {
         yield call(services.bulkUpdate, objId, requestPayload, { cancelToken: source.token });
       } catch (e) {
@@ -225,9 +223,7 @@ export const createAccountsTaskSet = <
           );
         }
       } finally {
-        for (let i = 0; i++; i < changes.length) {
-          yield put(actions.updating({ id: changes[i].id, value: false }));
-        }
+        yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
         if (yield cancelled()) {
           source.cancel();
         }
@@ -248,9 +244,7 @@ export const createAccountsTaskSet = <
           { count: isAction(action) ? action.payload : action },
           { cancelToken: source.token }
         );
-        for (let i = 0; i < accounts.length; i++) {
-          yield put(actions.addToState(accounts[i]));
-        }
+        yield all(accounts.map((account: A) => put(actions.addToState(account))));
       } catch (e) {
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
@@ -296,10 +290,8 @@ export const createAccountsTaskSet = <
       const merged: Table.RowChange<R>[] = map(grouped, (changes: Table.RowChange<R>[], id: string) => {
         return { data: mergeRowChanges(changes).data, id: parseInt(id) };
       });
-
       const data = yield select(selectModels);
       const mergedUpdates: Table.RowChange<R>[] = [];
-
       for (let i = 0; i < merged.length; i++) {
         const model: A | undefined = find(data, { id: merged[i].id });
         if (isNil(model)) {

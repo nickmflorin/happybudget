@@ -306,7 +306,6 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   function* getFringesTask(action: Redux.Action<null>): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId)) {
-      console.log("Requesting Fringes");
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
       yield put(actions.clearPlaceholders(null));

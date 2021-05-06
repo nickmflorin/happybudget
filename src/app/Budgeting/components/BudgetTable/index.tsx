@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy } from "lodash";
+import { map, isNil, includes, find, concat, uniq, forEach, filter, groupBy, flatten } from "lodash";
 import Cookies from "universal-cookie";
 
 import { AgGridReact } from "@ag-grid-community/react";
@@ -29,7 +29,8 @@ import {
   PasteStartEvent,
   FirstDataRenderedEvent,
   SuppressKeyboardEventParams,
-  ProcessCellForExportParams
+  ProcessCellForExportParams,
+  CellRange
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -59,7 +60,7 @@ import {
 import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } from "./cells/Util";
 import { BudgetTableProps } from "./model";
 import BudgetTableMenu from "./Menu";
-import { validateCookiesOrdering } from "./util";
+import { validateCookiesOrdering, rangeSelectionIsSingleCell } from "./util";
 import "./index.scss";
 
 export * from "./cells";
@@ -144,9 +145,15 @@ const BudgetTable = <
       filter: false,
       suppressMovable: true,
       suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-        if (!params.editing) {
-          if (includes(["Backspace", "Delete"], params.event.code)) {
-            return true;
+        // Suppress Backspace/Delete events when multiple cells are selected in a range.
+        if (!params.editing && includes(["Backspace", "Delete"], params.event.code)) {
+          if (!isNil(params.api)) {
+            const api: GridApi = params.api;
+            const ranges = params.api.getCellRanges();
+            if (!isNil(ranges) && (ranges.length !== 1 || !rangeSelectionIsSingleCell(ranges[0]))) {
+              clearCellsOverRange(ranges, api);
+              return true;
+            }
           }
         }
         return false;
@@ -665,11 +672,37 @@ const BudgetTable = <
     }
   });
 
+  const getTableChangesFromRangeClear = useDynamicCallback((range: CellRange, api?: GridApi): Table.RowChange<R>[] => {
+    const rowChanges: Table.RowChange<R>[] = [];
+    api = isNil(api) ? gridApi : api;
+    if (!isNil(api) && !isNil(range.startRow) && !isNil(range.endRow)) {
+      let colIds: (keyof R)[] = map(range.columns, (col: Column) => col.getColId() as keyof R);
+      let startRowIndex = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
+      let endRowIndex = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
+
+      for (let i = startRowIndex; i <= endRowIndex; i++) {
+        const node: RowNode | null = api.getDisplayedRowAtIndex(i);
+        if (!isNil(node)) {
+          const row = node.data;
+
+          const rowChangeData: Table.RowChangeData<R> = {};
+          /* eslint-disable no-loop-func */
+          forEach(colIds, (colId: keyof R) => {
+            const change: Table.CellChange<any> = { oldValue: row[colId], newValue: "" };
+            rowChangeData[colId] = change;
+          });
+          const rowChange: Table.RowChange<R> = { id: row.id, data: rowChangeData };
+          rowChanges.push(rowChange);
+        }
+      }
+    }
+    return rowChanges;
+  });
+
   const getTableChangeFromEvent = (
     event: CellEditingStoppedEvent | CellValueChangedEvent
   ): Table.RowChange<R> | null => {
     const field = event.column.getColId() as keyof R;
-    const row: R = event.node.data;
     // NOTE: We want to allow the setting of fields to `null` - so we just have to make sure it is
     // not `undefined`.
     if (event.newValue !== undefined) {
@@ -682,6 +715,19 @@ const BudgetTable = <
     }
     return null;
   };
+
+  const clearCellsOverRange = useDynamicCallback((range: CellRange | CellRange[], api?: GridApi) => {
+    if (!isNil(onRowBulkUpdate)) {
+      const rowChanges: Table.RowChange<R>[] = !Array.isArray(range)
+        ? getTableChangesFromRangeClear(range, api)
+        : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, api)));
+      if (rowChanges.length !== 0) {
+        // NOTE: If there are changes corresponding to rows that span multiple ranges, the task
+        // will consolidate/merge these changes to reduce the request payload.
+        onRowBulkUpdate(rowChanges);
+      }
+    }
+  });
 
   const onPasteStart = useDynamicCallback((event: PasteStartEvent) => {
     setCellChangeEvents([]);

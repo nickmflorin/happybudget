@@ -233,9 +233,7 @@ export const createAccountTaskSet = <
           ...manager.payload(change)
         })
       );
-      for (let i = 0; i++; i < changes.length) {
-        yield put(actions.updating({ id: changes[i].id, value: true }));
-      }
+      yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
       try {
         yield call(bulkUpdateAccountSubAccounts, accountId, requestPayload, { cancelToken: source.token });
       } catch (e) {
@@ -251,9 +249,7 @@ export const createAccountTaskSet = <
           );
         }
       } finally {
-        for (let i = 0; i++; i < changes.length) {
-          yield put(actions.updating({ id: changes[i].id, value: false }));
-        }
+        yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
         if (yield cancelled()) {
           source.cancel();
         }
@@ -274,9 +270,7 @@ export const createAccountTaskSet = <
           { count: isAction(action) ? action.payload : action },
           { cancelToken: source.token }
         );
-        for (let i = 0; i < subaccounts.length; i++) {
-          yield put(actions.addToState(subaccounts[i]));
-        }
+        yield all(subaccounts.map((subaccount: SA) => put(actions.addToState(subaccount))));
       } catch (e) {
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
@@ -324,10 +318,8 @@ export const createAccountTaskSet = <
       const merged: Table.RowChange<R>[] = map(grouped, (changes: Table.RowChange<R>[], id: string) => {
         return { data: mergeRowChanges(changes).data, id: parseInt(id) };
       });
-
       const data = yield select(selectModels);
       const mergedUpdates: Table.RowChange<R>[] = [];
-
       for (let i = 0; i < merged.length; i++) {
         const model: SA | undefined = find(data, { id: merged[i].id });
         if (isNil(model)) {

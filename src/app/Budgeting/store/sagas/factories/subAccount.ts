@@ -233,9 +233,7 @@ export const createSubAccountTaskSet = <
           ...manager.payload(change)
         })
       );
-      for (let i = 0; i++; i < changes.length) {
-        yield put(actions.updating({ id: changes[i].id, value: true }));
-      }
+      yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
       try {
         yield call(bulkUpdateSubAccountSubAccounts, subaccountId, requestPayload, { cancelToken: source.token });
       } catch (e) {
@@ -251,9 +249,7 @@ export const createSubAccountTaskSet = <
           );
         }
       } finally {
-        for (let i = 0; i++; i < changes.length) {
-          yield put(actions.updating({ id: changes[i].id, value: false }));
-        }
+        yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
         if (yield cancelled()) {
           source.cancel();
         }

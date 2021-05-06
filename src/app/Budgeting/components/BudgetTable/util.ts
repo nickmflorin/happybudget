@@ -1,5 +1,12 @@
 import { forEach, includes, isNil, map } from "lodash";
-import { ColDef } from "@ag-grid-community/core";
+import { ColDef, CellRange } from "@ag-grid-community/core";
+
+export const rangeSelectionIsSingleCell = (range: CellRange) => {
+  if (range.startRow?.rowIndex === range.endRow?.rowIndex && range.columns.length === 1) {
+    return true;
+  }
+  return false;
+};
 
 const validateCookiesFieldOrder = <R extends Table.Row>(obj: any, cols: ColDef[]): FieldOrder<keyof R> | null => {
   if (
