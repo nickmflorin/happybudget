@@ -671,7 +671,7 @@ export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Mo
 
 export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>({
   fields: [
-    ManageField({ field: "name", required: false }),
+    ManageField({ field: "name", required: true }),
     ManageField({ field: "description", allowNull: false }),
     ManageField({ field: "cutoff", allowNull: false }),
     ManageField({ field: "rate", allowNull: false }),
