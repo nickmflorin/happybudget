@@ -1,8 +1,9 @@
+import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faImage } from "@fortawesome/pro-light-svg-icons";
 
 import { useLoggedInUser, useTimezone } from "store/hooks";
-import { toAbbvDisplayDateTime } from "lib/util/dates";
+import { toAbbvDisplayDateTime, isToday, toDisplayTimeSince } from "lib/util/dates";
 
 import Card from "./Card";
 
@@ -19,12 +20,19 @@ const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: Bu
   const user = useLoggedInUser();
   const tz = useTimezone();
 
+  const subTitle = useMemo(() => {
+    if (isToday(budget.updated_at)) {
+      return `Last edited ${toDisplayTimeSince(budget.updated_at)} ago by ${user.full_name}`;
+    }
+    return `Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(budget.updated_at, { tz })}`;
+  }, [budget.updated_at, user.full_name]);
+
   return (
     <Card
       className={"budget-card"}
       onClick={() => onClick()}
       title={budget.name}
-      subTitle={`Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(budget.updated_at, { tz })}`}
+      subTitle={subTitle}
       loading={loading}
       image={budget.image}
       dropdown={[
