@@ -9,16 +9,15 @@ import { faMagic, faCloud, faCog } from "@fortawesome/pro-solid-svg-icons";
 import { faCopy, faFileSpreadsheet } from "@fortawesome/pro-light-svg-icons";
 
 import { RenderIfValidId } from "components";
-import { componentLoader } from "lib/operational";
 
 import { setTemplateIdAction } from "../../store/actions/template";
 import { selectTemplateInstance, selectTemplateDetail } from "../../store/selectors";
 import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
 import { GenericLayout } from "../Generic";
 
-const Account = React.lazy(() => componentLoader(() => import("./Account")));
-const Accounts = React.lazy(() => componentLoader(() => import("./Accounts")));
-const SubAccount = React.lazy(() => componentLoader(() => import("./SubAccount")));
+import Account from "./Account";
+import Accounts from "./Accounts";
+import SubAccount from "./SubAccount";
 
 const Template = (): JSX.Element => {
   const history = useHistory();

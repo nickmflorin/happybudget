@@ -17,7 +17,6 @@ import {
 
 import { getBudgetPdf } from "api/services";
 import { RenderIfValidId } from "components";
-import { componentLoader } from "lib/operational";
 import { download } from "lib/util/files";
 
 import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "../../store/actions/budget";
@@ -25,11 +24,11 @@ import { selectBudgetInstance, selectCommentsHistoryDrawerOpen, selectBudgetDeta
 import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
 import { GenericLayout } from "../Generic";
 
-const Account = React.lazy(() => componentLoader(() => import("./Account")));
-const Accounts = React.lazy(() => componentLoader(() => import("./Accounts")));
-const SubAccount = React.lazy(() => componentLoader(() => import("./SubAccount")));
-const Actuals = React.lazy(() => componentLoader(() => import("./Actuals")));
-const Analysis = React.lazy(() => componentLoader(() => import("./Analysis")));
+import Account from "./Account";
+import Accounts from "./Accounts";
+import SubAccount from "./SubAccount";
+import Actuals from "./Actuals";
+import Analysis from "./Analysis";
 
 const Budget = (): JSX.Element => {
   const history = useHistory();
