@@ -1,7 +1,5 @@
 import { forEach, isNil, includes, find } from "lodash";
 import { generateRandomNumericId, getKeyValue } from "lib/util";
-import { SubAccountUnits, PaymentMethods, FringeUnits } from "lib/model";
-import { findChoiceForName } from "lib/model/util";
 import { isRowChange, isRow, isRowChangeData, isModel } from "./typeguards";
 
 type BaseFieldConfig<R extends Table.Row, M extends Model.Model> = {
@@ -521,29 +519,9 @@ export const BudgetSubAccountRowManager = new RowManager<
     ManageField({
       field: "unit",
       allowNull: true,
-      modelValueConverter: (value: Model.SubAccountUnit | null): Model.SubAccountUnitName | null =>
-        !isNil(value) ? value.name : null,
-      rowValueConverter: (value: Model.SubAccountUnitName | null): Model.SubAccountUnit | null => {
+      httpValueConverter: (value: Model.SubAccountUnit): number | null | undefined => {
         if (value !== null) {
-          const model = findChoiceForName(SubAccountUnits, value);
-          if (model === null) {
-            /* eslint-disable no-console */
-            console.error(`Found corrupted sub-account unit name ${value} in table data.`);
-            return null;
-          }
-          return model;
-        }
-        return null;
-      },
-      httpValueConverter: (value: any): number | null | undefined => {
-        if (value !== null) {
-          const model = findChoiceForName(SubAccountUnits, value);
-          if (model === null) {
-            /* eslint-disable no-console */
-            console.error(`Found corrupted sub-account unit name ${value} in table data.`);
-            return undefined;
-          }
-          return model.id;
+          return value.id;
         }
         return null;
       }
@@ -578,29 +556,9 @@ export const TemplateSubAccountRowManager = new RowManager<
     ManageField({
       field: "unit",
       allowNull: true,
-      modelValueConverter: (value: Model.SubAccountUnit | null): Model.SubAccountUnitName | null =>
-        !isNil(value) ? value.name : null,
-      rowValueConverter: (value: Model.SubAccountUnitName | null): Model.SubAccountUnit | null => {
-        if (value !== null) {
-          const model = findChoiceForName(SubAccountUnits, value);
-          if (model === null) {
-            /* eslint-disable no-console */
-            console.error(`Found corrupted sub-account unit name ${value} in table data.`);
-            return null;
-          }
-          return model;
-        }
-        return null;
-      },
       httpValueConverter: (value: any): number | null | undefined => {
         if (value !== null) {
-          const model = findChoiceForName(SubAccountUnits, value);
-          if (model === null) {
-            /* eslint-disable no-console */
-            console.error(`Found corrupted sub-account unit name ${value} in table data.`);
-            return undefined;
-          }
-          return model.id;
+          return value.id;
         }
         return null;
       }
@@ -634,29 +592,9 @@ export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Mo
     ManageField({ field: "date" }),
     ManageField({
       field: "payment_method",
-      modelValueConverter: (value: Model.PaymentMethod | null): Model.PaymentMethodName | null =>
-        !isNil(value) ? value.name : null,
-      rowValueConverter: (value: Model.PaymentMethodName | null): Model.PaymentMethod | null => {
+      httpValueConverter: (value: Model.PaymentMethod): number | null | undefined => {
         if (value !== null) {
-          const model = findChoiceForName(PaymentMethods, value);
-          if (model === null) {
-            /* eslint-disable no-console */
-            console.error(`Found corrupted actual payment method name ${value} in table data.`);
-            return null;
-          }
-          return model;
-        }
-        return null;
-      },
-      httpValueConverter: (value: any): number | null | undefined => {
-        if (value !== null) {
-          const model = findChoiceForName(PaymentMethods, value);
-          if (model === null) {
-            /* eslint-disable no-console */
-            console.error(`Found corrupted actual payment method name ${value} in table data.`);
-            return undefined;
-          }
-          return model.id;
+          return value.id;
         }
         return null;
       }
@@ -679,29 +617,9 @@ export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Mo
     ManageField({
       field: "unit",
       allowNull: false,
-      modelValueConverter: (value: Model.FringeUnit | null): Model.FringeUnitName | null =>
-        !isNil(value) ? value.name : null,
-      rowValueConverter: (value: Model.FringeUnitName | null): Model.FringeUnit | null => {
+      httpValueConverter: (value: Model.FringeUnit): number | null | undefined => {
         if (value !== null) {
-          const model = findChoiceForName(FringeUnits, value);
-          if (model === null) {
-            /* eslint-disable no-console */
-            console.error(`Found corrupted fringe unit name ${value} in table data.`);
-            return null;
-          }
-          return model;
-        }
-        return null;
-      },
-      httpValueConverter: (value: any): number | null | undefined => {
-        if (value !== null) {
-          const model = findChoiceForName(FringeUnits, value);
-          if (model === null) {
-            /* eslint-disable no-console */
-            console.error(`Found corrupted fringe unit name ${value} in table data.`);
-            return undefined;
-          }
-          return model.id;
+          return value.id;
         }
         return null;
       }

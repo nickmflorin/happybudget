@@ -20,6 +20,7 @@ export type StandardCellProps<R extends Table.Row> = ICellRendererParams;
 export interface CellProps<R extends Table.Row> extends Omit<ICellRendererParams, "value">, StandardComponentProps {
   onClear?: (row: R, colDef: ColDef) => void;
   showClear?: (row: R, colDef: ColDef) => boolean;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
   hideClear?: boolean;
   children: ReactNode;
   hide?: boolean;
@@ -27,12 +28,14 @@ export interface CellProps<R extends Table.Row> extends Omit<ICellRendererParams
 }
 
 const Cell = <R extends Table.Row>({
+  id,
   children,
   node,
   colDef,
   className,
   style = {},
   hide,
+  onKeyDown,
   show,
   onClear,
   showClear,
@@ -56,7 +59,12 @@ const Cell = <R extends Table.Row>({
 
   return (
     <ShowHide show={show} hide={hide}>
-      <div className={classNames("cell", className)} style={style}>
+      <div
+        id={id}
+        className={classNames("cell", className)}
+        style={style}
+        onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(onKeyDown) && onKeyDown(event)}
+      >
         <LoadableCellWrapper loading={includes(row.meta.fieldsLoading, colDef.field)}>{children}</LoadableCellWrapper>
         {showClearButton && (
           <IconButton

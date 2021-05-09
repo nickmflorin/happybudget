@@ -26,9 +26,7 @@ import { currencyValueFormatter } from "lib/tabling/formatters";
 import { BudgetTableProps, CustomColDef } from "./model";
 import BudgetTableMenu from "./Menu";
 import { validateCookiesOrdering } from "./util";
-import BudgetFooterGrid from "./BudgetFooterGrid";
-import TableFooterGrid from "./TableFooterGrid";
-import PrimaryGrid from "./PrimaryGrid";
+import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
 import "./index.scss";
 
 export * from "./cells";

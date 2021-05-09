@@ -11,7 +11,9 @@ export interface FormInstance<T extends { [key: string]: any } = any> extends Ro
   loading: boolean | undefined;
 }
 
-export interface FormProps<T extends { [key: string]: any } = any> extends RootFormProps, StandardComponentProps {
+export interface FormProps<T extends { [key: string]: any } = any>
+  extends Omit<RootFormProps, "style" | "id" | "className">,
+    StandardComponentProps {
   readonly globalError?: string;
   // readonly initialValues?: Partial<T>;
   readonly loading?: boolean;

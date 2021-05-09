@@ -21,8 +21,9 @@ interface Field {
 }
 
 interface StandardComponentProps {
-  className?: string;
-  style?: React.CSSProperties;
+  readonly id?: any;
+  readonly className?: string;
+  readonly style?: React.CSSProperties;
 }
 
 type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : never;

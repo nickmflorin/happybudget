@@ -9,7 +9,9 @@ export interface IHorizontalMenuItem<I extends string = string> {
   onClick?: () => void;
 }
 
-interface HorizontalMenuItemProps<I extends string = string> extends IHorizontalMenuItem<I>, StandardComponentProps {
+interface HorizontalMenuItemProps<I extends string = string>
+  extends IHorizontalMenuItem<I>,
+    Omit<StandardComponentProps, "id"> {
   selected: boolean;
 }
 

@@ -3,11 +3,10 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
-import { CellClassParams } from "@ag-grid-community/core";
+import { CellClassParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
-import { FringeUnits } from "lib/model";
 import { FringeRowManager } from "lib/tabling/managers";
-import { percentageToDecimalValueSetter, choiceModelValueSetter } from "lib/tabling/valueSetters";
+import { percentageToDecimalValueSetter } from "lib/tabling/valueSetters";
 import { percentageValueFormatter } from "lib/tabling/formatters";
 import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../BudgetTable";
 
@@ -77,9 +76,15 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
           cellClass: classNames("cell--centered"),
           cellRenderer: "FringeUnitCell",
           width: 100,
-          valueSetter: choiceModelValueSetter<Table.FringeRow, Model.FringeUnit>("unit", FringeUnits, {
-            allowNull: false
-          })
+          cellEditor: "FringeUnitCellEditor",
+          clearBeforeEdit: true,
+          // Required to allow the dropdown to be selectable on Enter key.
+          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+            if (params.event.code === "Enter" && params.editing) {
+              return true;
+            }
+            return false;
+          }
         },
         {
           field: "cutoff",

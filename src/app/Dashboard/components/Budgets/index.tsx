@@ -5,7 +5,8 @@ import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
 import { Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
 import { Page } from "components/layout";
 import { EditBudgetModal, CreateBudgetModal } from "components/modals";
@@ -50,7 +51,7 @@ const Budgets = (): JSX.Element => {
           placeholder={"Search Projects..."}
           value={search}
           allowClear={true}
-          prefix={<SearchOutlined />}
+          prefix={<FontAwesomeIcon className={"icon"} icon={faSearch} />}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             dispatch(setBudgetsSearchAction(event.target.value))
           }

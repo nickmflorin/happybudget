@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { map, isNil, reduce } from "lodash";
+import { map, isNil, filter, reduce } from "lodash";
 
 import { AgGridReact } from "@ag-grid-community/react";
 import { GridReadyEvent, FirstDataRenderedEvent } from "@ag-grid-community/core";
@@ -7,23 +7,29 @@ import { GridReadyEvent, FirstDataRenderedEvent } from "@ag-grid-community/core"
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString } from "lib/util";
 
-import { IndexCell, ValueCell, IdentifierCell, CalculatedCell } from "./cells";
-import { IncludeErrorsInCell } from "./cells/Util";
-import { TableFooterGridProps, CustomColDef } from "./model";
-import { customColDefToColDef } from "./util";
-import "./index.scss";
+import { IndexCell, ValueCell, IdentifierCell, CalculatedCell } from "../cells";
+import { BudgetFooterGridProps, CustomColDef } from "../model";
 
-const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
+const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
   identifierField,
   identifierValue,
   options,
   columns,
   colDefs,
   frameworkComponents,
+  loadingBudget,
   sizeColumnsToFit,
   setColumnApi
-}: TableFooterGridProps<R, G>): JSX.Element => {
+}: BudgetFooterGridProps<R, G>): JSX.Element => {
   const rowData = useMemo((): R | null => {
+    let fieldsLoading: string[] = [];
+    if (loadingBudget === true) {
+      const calculatedCols: CustomColDef<R, G>[] = filter(
+        columns,
+        (col: CustomColDef<R, G>) => col.isCalculated === true
+      );
+      fieldsLoading = map(calculatedCols, (col: CustomColDef<R, G>) => col.field) as string[];
+    }
     // TODO: Loop over the colDef's after we attribute the Base Columns with isBase = true, so
     // we can weed those out here.
     return reduce(
@@ -31,8 +37,8 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
       (obj: { [key: string]: any }, col: CustomColDef<R, G>) => {
         if (!isNil(col.field)) {
           if (col.isCalculated === true) {
-            if (!isNil(col.tableTotal)) {
-              obj[col.field] = col.tableTotal;
+            if (!isNil(col.budgetTotal)) {
+              obj[col.field] = col.budgetTotal;
             } else {
               obj[col.field] = null;
             }
@@ -43,20 +49,21 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
         return obj;
       },
       {
-        id: hashString("tablefooter"),
+        id: hashString("budgetfooter"),
         [identifierField]: identifierValue,
         meta: {
           isPlaceholder: false,
           isGroupFooter: false,
-          isTableFooter: true,
-          isBudgetFooter: false,
+          isTableFooter: false,
+          isBudgetFooter: true,
           selected: false,
           children: [],
-          errors: []
+          errors: [],
+          fieldsLoading
         }
       }
     ) as R;
-  }, [useDeepEqualMemo(columns), identifierValue]);
+  }, [useDeepEqualMemo(columns), identifierField, identifierValue, loadingBudget]);
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     if (sizeColumnsToFit === true) {
@@ -69,22 +76,22 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
   });
 
   return (
-    <div className={"table-footer-grid"}>
+    <div className={"budget-footer-grid"}>
       <AgGridReact
         {...options}
-        columnDefs={map(colDefs, (def: CustomColDef<R, G>) => customColDefToColDef(def))}
+        columnDefs={colDefs}
         rowData={[rowData]}
-        rowHeight={38}
-        rowClass={"row--table-footer"}
+        rowClass={"row--budget-footer"}
         suppressRowClickSelection={true}
         onGridReady={onGridReady}
         onFirstDataRendered={onFirstDataRendered}
         headerHeight={0}
+        rowHeight={28}
         frameworkComponents={{
-          IndexCell: IndexCell,
-          ValueCell: IncludeErrorsInCell<R>(ValueCell),
-          IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
-          CalculatedCell: CalculatedCell,
+          IndexCell,
+          ValueCell,
+          IdentifierCell,
+          CalculatedCell,
           ...frameworkComponents
         }}
       />
@@ -92,4 +99,4 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
   );
 };
 
-export default TableFooterGrid;
+export default BudgetFooterGrid;

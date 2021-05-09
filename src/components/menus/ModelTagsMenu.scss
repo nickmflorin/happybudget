@@ -9,8 +9,9 @@
     font-weight: 400 !important;
     margin-bottom: 0px !important;
     height: 32px;
+    justify-content: center;
 
-    &:hover, &.active {
+    &:hover, &.active, &.focus {
       background-color: rgba(212, 212, 212, 0.4);
     }
 

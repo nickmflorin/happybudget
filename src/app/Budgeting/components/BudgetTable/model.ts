@@ -37,6 +37,10 @@ export interface CookiesProps {
 export interface CustomColDef<R extends Table.Row<G>, G extends Model.Group = Model.Group>
   extends Omit<ColDef, "field"> {
   onClearValue?: any;
+  // If true, a Backspace/Delete will cause the cell to clear before going into edit mode.  This
+  // is particularly useful for Dropdowns rendered via a custom Cell Editor (Popup) where we need
+  // to trigger a cell clear without showing the dropdown.
+  clearBeforeEdit?: boolean;
   field: keyof R & string;
   isCalculated?: boolean;
   budgetTotal?: number;

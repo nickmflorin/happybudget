@@ -1,11 +1,5 @@
 import { forEach, includes, isNil, map } from "lodash";
 import { ColDef, CellRange } from "@ag-grid-community/core";
-import { CustomColDef } from "./model";
-
-export const customColDefToColDef = (colDef: CustomColDef<any, any>): ColDef => {
-  const { onClearValue, ...agColDef } = colDef;
-  return agColDef;
-};
 
 export const rangeSelectionIsSingleCell = (range: CellRange) => {
   if (range.startRow?.rowIndex === range.endRow?.rowIndex && range.columns.length === 1) {

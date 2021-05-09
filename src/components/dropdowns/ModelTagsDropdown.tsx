@@ -1,27 +1,28 @@
-import { useMemo } from "react";
-import { find, forEach, isNil, map } from "lodash";
+import { find, isNil, map, filter } from "lodash";
 import classNames from "classnames";
 
 import { Dropdown } from "antd";
 import { DropDownProps } from "antd/lib/dropdown";
 
-import { ModelTagsMenu } from "components/menus";
-import { Tag } from "components";
-import { useDeepEqualMemo } from "lib/hooks";
-import { getKeyValue } from "lib/util";
+import { createModelTagsMenu } from "components/menus";
+import { Tag } from "components/tagging";
+import { EmptyTagProps } from "components/tagging/Tag";
 
 import "./ModelTagsDropdown.scss";
+import { useMemo } from "react";
 
 type SingleModelTagsDropdownProps<M extends Model.Model, V extends number = number> = {
   onChange: (models: M) => void;
   multiple: false;
   value: V | null;
+  selected?: number | null;
 };
 
 type MultipleModelTagsDropdownProps<M extends Model.Model, V extends number = number> = {
   onChange: (models: M[]) => void;
   multiple?: true;
   value: V[] | null;
+  selected?: number[];
 };
 
 export type ModelTagsDropdownProps<M extends Model.Model, V extends number = number> = (
@@ -31,9 +32,10 @@ export type ModelTagsDropdownProps<M extends Model.Model, V extends number = num
   Omit<DropDownProps, "trigger" | "className" | "overlay"> & {
     className?: string;
     trigger?: ("click" | "hover" | "contextMenu")[];
-    labelField: keyof M;
+    modelTextField?: keyof M;
+    modelColorField?: keyof M;
     models: M[];
-    selected?: number | number[] | null;
+    onMissing?: JSX.Element | EmptyTagProps;
     emptyItem?: {
       onClick?: () => void;
       text: string;
@@ -44,70 +46,6 @@ export type ModelTagsDropdownProps<M extends Model.Model, V extends number = num
 const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
   props: ModelTagsDropdownProps<M, V>
 ): JSX.Element => {
-  const mapping = useMemo((): { [key: number]: { label: string; model: M } } => {
-    const mapper: { [key: number]: { label: string; model: M } } = {};
-    if (!isNil(props.value)) {
-      if (Array.isArray(props.value)) {
-        forEach(props.value, (id: number) => {
-          const model = find(props.models, { id } as any);
-          if (!isNil(model)) {
-            const label = getKeyValue<M, keyof M>(props.labelField)(model);
-            if (typeof label === "string") {
-              mapper[model.id] = { label, model };
-            }
-          }
-        });
-      } else {
-        const model = find(props.models, { id: props.value } as any);
-        if (!isNil(model)) {
-          const label = getKeyValue<M, keyof M>(props.labelField)(model);
-          if (typeof label === "string") {
-            mapper[model.id] = { label, model };
-          }
-        }
-      }
-    }
-    return mapper;
-  }, [useDeepEqualMemo(props.value), useDeepEqualMemo(props.models), props.labelField]);
-
-  const child = (value: V | V[] | null, i: number = 0): JSX.Element => {
-    if (Array.isArray(value)) {
-      if (value.length === 0) {
-        return (
-          <Tag key={i} style={{ opacity: 0 }}>
-            {"None"}
-          </Tag>
-        );
-      }
-      return (
-        <div className={"multiple-tags-wrapper"} key={i}>
-          {map(value, (v: V, j: number) => child(v, i + j))}
-        </div>
-      );
-    } else if (value !== null) {
-      const mapped = mapping[value];
-      if (!isNil(mapped)) {
-        return (
-          <Tag key={i} model={mapped.model}>
-            {mapped.label}
-          </Tag>
-        );
-      } else {
-        return (
-          <Tag key={i} style={{ opacity: 0 }}>
-            {"None"}
-          </Tag>
-        );
-      }
-    } else {
-      return (
-        <Tag key={i} style={{ opacity: 0 }}>
-          {"None"}
-        </Tag>
-      );
-    }
-  };
-
   const isMultiple = (
     data: SingleModelTagsDropdownProps<M> | MultipleModelTagsDropdownProps<M>
   ): data is MultipleModelTagsDropdownProps<M> => {
@@ -116,44 +54,71 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
 
   const { emptyItem, ...dropdownProps } = props;
 
+  const ModelTagsMenu = useMemo(() => createModelTagsMenu<M>(), []);
+
   if (isMultiple(props)) {
+    let selectedPresentModels: M[] = [];
+    if (props.value !== null) {
+      const selectedModels: (M | undefined)[] = map(props.value, (value: V) =>
+        find(props.models, { id: value } as any)
+      );
+      selectedPresentModels = filter(selectedModels, (m: M | undefined) => m !== undefined) as M[];
+    }
     return (
       <Dropdown
         {...dropdownProps}
         className={classNames("model-tags-dropdown", props.className)}
         trigger={props.trigger || ["click"]}
         overlay={
-          <ModelTagsMenu<M>
+          <ModelTagsMenu
             selected={props.selected}
             models={props.models}
-            labelField={props.labelField}
+            modelTextField={props.modelTextField}
+            modelColorField={props.modelColorField}
             onChange={props.onChange}
             multiple={true}
             emptyItem={emptyItem}
           />
         }
       >
-        <div className={"model-tags-dropdown-child"}>{child(props.value)}</div>
+        <div className={"model-tags-dropdown-child"}>
+          <Tag.Multiple<M>
+            modelTextField={props.modelTextField}
+            modelColorField={props.modelColorField}
+            models={selectedPresentModels}
+            onMissing={props.onMissing || { visible: false }}
+          />
+        </div>
       </Dropdown>
     );
   } else {
+    const model = find(props.models, { id: props.value } as any);
     return (
       <Dropdown
         {...dropdownProps}
         className={classNames("model-tags-dropdown", props.className)}
         trigger={props.trigger || ["click"]}
         overlay={
-          <ModelTagsMenu<M>
+          <ModelTagsMenu
             selected={props.selected}
             models={props.models}
-            labelField={props.labelField}
+            modelTextField={props.modelTextField}
+            modelColorField={props.modelColorField}
             onChange={props.onChange}
             multiple={false}
             emptyItem={emptyItem}
           />
         }
       >
-        <div className={"model-tags-dropdown-child"}>{child(props.value)}</div>
+        {isNil(model) ? (
+          !isNil(props.onMissing) ? (
+            Tag.emptyTagPropsOrComponent(props.onMissing)
+          ) : (
+            <Tag style={{ opacity: 0 }}>{"None"}</Tag>
+          )
+        ) : (
+          <Tag model={model} modelTextField={props.modelTextField} modelColorField={props.modelColorField} />
+        )}
       </Dropdown>
     );
   }

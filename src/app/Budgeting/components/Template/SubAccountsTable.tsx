@@ -11,7 +11,13 @@ import FringesModal from "./FringesModal";
 interface TemplateSubAccountsTableProps
   extends Omit<
     GenericSubAccountsTableProps<Table.TemplateSubAccountRow, Model.TemplateSubAccount, Model.TemplateGroup>,
-    "manager" | "fringes" | "fringesCellRenderer" | "fringesCellRendererParams" | "onEditFringes" | "columns"
+    | "manager"
+    | "fringes"
+    | "fringesCellRenderer"
+    | "fringesCellEditor"
+    | "fringesCellEditorParams"
+    | "onEditFringes"
+    | "columns"
   > {
   detail: Model.TemplateAccount | Model.TemplateSubAccount | undefined;
 }
@@ -28,8 +34,9 @@ const TemplateSubAccountsTable = ({ detail, ...props }: TemplateSubAccountsTable
         manager={TemplateSubAccountRowManager}
         loadingBudget={loadingTemplate}
         fringes={fringes}
+        fringesCellEditor={"TemplateFringesCellEditor"}
         fringesCellRenderer={"TemplateFringesCell"}
-        fringesCellRendererParams={{
+        fringesCellEditorParams={{
           onAddFringes: () => setFringesModalVisible(true)
         }}
         onEditFringes={() => setFringesModalVisible(true)}

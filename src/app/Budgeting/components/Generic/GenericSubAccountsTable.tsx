@@ -4,11 +4,10 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSigma, faPercentage, faUpload, faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
-import { ColDef, ColSpanParams, ValueSetterParams } from "@ag-grid-community/core";
+import { ColDef, ColSpanParams, SuppressKeyboardEventParams, ValueSetterParams } from "@ag-grid-community/core";
 
-import { SubAccountUnits } from "lib/model";
 import { currencyValueFormatter } from "lib/tabling/formatters";
-import { floatValueSetter, integerValueSetter, choiceModelValueSetter } from "lib/tabling/valueSetters";
+import { floatValueSetter, integerValueSetter } from "lib/tabling/valueSetters";
 
 import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../BudgetTable";
 
@@ -20,7 +19,8 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
   categoryName: "Sub Account" | "Detail";
   fringes: Model.Fringe[];
   fringesCellRenderer: "BudgetFringesCell" | "TemplateFringesCell";
-  fringesCellRendererParams: {
+  fringesCellEditor: "BudgetFringesCellEditor" | "TemplateFringesCellEditor";
+  fringesCellEditorParams: {
     onAddFringes: () => void;
   };
   onGroupRows: (rows: R[]) => void;
@@ -34,8 +34,9 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
 const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Model.SubAccount, G extends Model.Group>({
   categoryName,
   fringes,
+  fringesCellEditor,
   fringesCellRenderer,
-  fringesCellRendererParams,
+  fringesCellEditorParams,
   onGroupRows,
   onDeleteGroup,
   onEditGroup,
@@ -140,14 +141,16 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           headerName: "Unit",
           cellClass: "cell--centered",
           cellRenderer: "SubAccountUnitCell",
-          width: 100,
-          valueSetter: choiceModelValueSetter<Table.TemplateSubAccountRow, Model.SubAccountUnit>(
-            "unit",
-            SubAccountUnits,
-            {
-              allowNull: true
+          width: 160,
+          cellEditor: "SubAccountUnitCellEditor",
+          clearBeforeEdit: true,
+          // Required to allow the dropdown to be selectable on Enter key.
+          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+            if (params.event.code === "Enter" && params.editing) {
+              return true;
             }
-          )
+            return false;
+          }
         },
         {
           field: "multiplier",
@@ -169,12 +172,21 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           headerName: "Fringes",
           cellClass: classNames("cell--centered"),
           cellRenderer: fringesCellRenderer,
-          cellRendererParams: fringesCellRendererParams,
           headerComponentParams: {
             onEdit: () => onEditFringes()
           },
           minWidth: 150,
           onClearValue: [],
+          cellEditor: fringesCellEditor,
+          clearBeforeEdit: true,
+          cellEditorParams: fringesCellEditorParams,
+          // Required to allow the dropdown to be selectable on Enter key.
+          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+            if (params.event.code === "Enter" && params.editing) {
+              return true;
+            }
+            return false;
+          },
           valueSetter: (params: ValueSetterParams): boolean => {
             // In the case that the value is an Array, the value will have been  provided as an Array
             // of IDs from the Fringes dropdown.

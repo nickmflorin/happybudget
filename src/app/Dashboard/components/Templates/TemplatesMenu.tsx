@@ -3,7 +3,8 @@ import { useHistory, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Button, Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
 import { VerticalFlexCenter } from "components";
 import { HorizontalMenu } from "components/menus";
@@ -64,7 +65,7 @@ const TemplatesMenu = (): JSX.Element => {
               placeholder={"Search Templates..."}
               value={page === "my-templates" ? templatesSearch : communitySearch}
               allowClear={true}
-              prefix={<SearchOutlined />}
+              prefix={<FontAwesomeIcon className={"icon"} icon={faSearch} />}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 if (page === "my-templates") {
                   dispatch(setTemplatesSearchAction(event.target.value));

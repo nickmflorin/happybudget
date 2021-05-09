@@ -37,17 +37,23 @@ import {
   SubAccountUnitCell,
   IdentifierCell,
   CalculatedCell,
-  PaymentMethodsCell,
+  PaymentMethodCell,
   BudgetItemCell,
   FringeUnitCell,
   BudgetFringesCell,
   TemplateFringesCell,
   HeaderCell,
   FringeColorCell
-} from "./cells";
-import { IncludeErrorsInCell, HideCellForAllFooters, ShowCellOnlyForRowType } from "./cells/Util";
-import { PrimaryGridProps, CustomColDef } from "./model";
-import { rangeSelectionIsSingleCell, customColDefToColDef } from "./util";
+} from "../cells";
+import {
+  SubAccountUnitCellEditor,
+  BudgetFringesCellEditor,
+  FringeUnitCellEditor,
+  TemplateFringesCellEditor,
+  PaymentMethodCellEditor
+} from "../editors";
+import { PrimaryGridProps, CustomColDef } from "../model";
+import { rangeSelectionIsSingleCell } from "../util";
 
 const PrimaryGrid = <
   R extends Table.Row<G>,
@@ -285,6 +291,22 @@ const PrimaryGrid = <
     }
   );
 
+  const getTableChangesFromCellClear = useDynamicCallback(
+    (row: R, def: CustomColDef<R, G>): Table.RowChange<R> | null => {
+      const clearValue = def.onClearValue !== undefined ? def.onClearValue : null;
+      const colId = def.field;
+      if (row[colId] === undefined || row[colId] !== clearValue) {
+        const change: Table.CellChange<any> = { oldValue: row[colId], newValue: clearValue };
+        const rowChangeData: Table.RowChangeData<R> = {};
+        rowChangeData[colId] = change;
+        const rowChange: Table.RowChange<R> = { id: row.id, data: rowChangeData };
+        return rowChange;
+      } else {
+        return null;
+      }
+    }
+  );
+
   const getTableChangeFromEvent = (
     event: CellEditingStoppedEvent | CellValueChangedEvent
   ): Table.RowChange<R> | null => {
@@ -312,6 +334,13 @@ const PrimaryGrid = <
         // will consolidate/merge these changes to reduce the request payload.
         onRowBulkUpdate(rowChanges);
       }
+    }
+  });
+
+  const clearCell = useDynamicCallback((row: R, def: CustomColDef<R, G>) => {
+    const tableChange = getTableChangesFromCellClear(row, def);
+    if (!isNil(tableChange)) {
+      onRowUpdate(tableChange);
     }
   });
 
@@ -526,11 +555,46 @@ const PrimaryGrid = <
     }
   }, [useDeepEqualMemo(table)]);
 
+  const suppressKeyboardEvent = useDynamicCallback((params: SuppressKeyboardEventParams) => {
+    // Suppress Backspace/Delete events when multiple cells are selected in a range.
+    if (!isNil(params.api) && !params.editing && includes(["Backspace", "Delete"], params.event.code)) {
+      const ranges = params.api.getCellRanges();
+      if (!isNil(ranges) && (ranges.length !== 1 || !rangeSelectionIsSingleCell(ranges[0]))) {
+        clearCellsOverRange(ranges, params.api);
+        return true;
+      } else {
+        const column = params.column;
+        const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === column.getColId());
+        if (!isNil(customColDef)) {
+          // Note:  This is a work around for not being able to clear the values of cells without going
+          // into edit mode.  For custom Cell Editor(s) with a Pop-Up, we don't want to open the Pop-Up
+          // everytime we click Backspace/Delete - so we prevent those key presses from triggering
+          // edit mode in the Cell Editor and clear the value at this level.
+          if (customColDef.clearBeforeEdit === true) {
+            const row: R = params.node.data;
+            clearCell(row, customColDef);
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      }
+    } else if (
+      !isNil(params.api) &&
+      (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
+      (params.event.ctrlKey || params.event.metaKey)
+    ) {
+      return true;
+    }
+    return false;
+  });
   return (
     <div className={"table-grid"}>
       <AgGridReact
         {...options}
-        columnDefs={map(colDefs, (def: CustomColDef<R, G>) => customColDefToColDef(def))}
+        columnDefs={colDefs}
         getContextMenuItems={getContextMenuItems}
         allowContextMenuWithControlKey={true}
         rowData={table}
@@ -542,6 +606,11 @@ const PrimaryGrid = <
         onGridReady={onGridReady}
         /* @ts-ignore */
         modules={AllModules}
+        onCellKeyPress={(event: any) => {
+          if (!isNil(event.event) && event.event.code === "Enter") {
+            event.event.stopImmediatePropagation();
+          }
+        }}
         processCellForClipboard={(params: ProcessCellForExportParams) => {
           if (!isNil(params.node)) {
             const row: R = params.node.data;
@@ -569,25 +638,7 @@ const PrimaryGrid = <
         navigateToNextCell={navigateToNextCell}
         onCellKeyDown={onCellKeyDown}
         onFirstDataRendered={onFirstDataRendered}
-        suppressKeyboardEvent={(params: SuppressKeyboardEventParams) => {
-          // Suppress Backspace/Delete events when multiple cells are selected in a range.
-          if (!isNil(params.api) && !params.editing && includes(["Backspace", "Delete"], params.event.code)) {
-            const ranges = params.api.getCellRanges();
-            if (!isNil(ranges) && (ranges.length !== 1 || !rangeSelectionIsSingleCell(ranges[0]))) {
-              clearCellsOverRange(ranges, params.api);
-              return true;
-            } else {
-              return false;
-            }
-          } else if (
-            !isNil(params.api) &&
-            (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
-            (params.event.ctrlKey || params.event.metaKey)
-          ) {
-            return true;
-          }
-          return false;
-        }}
+        suppressKeyboardEvent={suppressKeyboardEvent}
         // NOTE: This might not be 100% necessary, because of how efficiently
         // we are managing the state updates to the data that flows into the table.
         // However, for now we will leave.  It is important to note that this will
@@ -595,18 +646,23 @@ const PrimaryGrid = <
         rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
         enterMovesDown={false}
         frameworkComponents={{
-          ExpandCell: ExpandCell,
-          IndexCell: IndexCell,
-          ValueCell: IncludeErrorsInCell<R>(ValueCell),
-          SubAccountUnitCell: IncludeErrorsInCell<R>(SubAccountUnitCell),
-          FringeUnitCell: IncludeErrorsInCell<R>(FringeUnitCell),
-          IdentifierCell: IncludeErrorsInCell<R>(IdentifierCell),
-          CalculatedCell: CalculatedCell,
-          PaymentMethodsCell: HideCellForAllFooters<R>(PaymentMethodsCell),
-          BudgetItemCell: HideCellForAllFooters<R>(BudgetItemCell),
-          BudgetFringesCell: ShowCellOnlyForRowType<R>("subaccount")(IncludeErrorsInCell<R>(BudgetFringesCell)),
-          TemplateFringesCell: ShowCellOnlyForRowType<R>("subaccount")(IncludeErrorsInCell<R>(TemplateFringesCell)),
+          ExpandCell,
+          IndexCell,
+          ValueCell,
+          SubAccountUnitCell,
+          FringeUnitCell,
+          IdentifierCell,
+          CalculatedCell,
+          PaymentMethodCell,
+          BudgetItemCell,
+          BudgetFringesCell,
+          TemplateFringesCell,
           FringeColorCell,
+          FringeUnitCellEditor,
+          BudgetFringesCellEditor,
+          TemplateFringesCellEditor,
+          SubAccountUnitCellEditor,
+          PaymentMethodCellEditor,
           agColumnHeader: HeaderCell,
           ...frameworkComponents
         }}

@@ -6,14 +6,13 @@ import { createSelector } from "reselect";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
-import { CellClassParams } from "@ag-grid-community/core";
+import { CellClassParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { PaymentMethods } from "lib/model";
 import { currencyValueFormatter, dateValueFormatter } from "lib/tabling/formatters";
 import { ActualRowManager } from "lib/tabling/managers";
-import { choiceModelValueSetter, floatValueSetter, dateTimeValueSetter } from "lib/tabling/valueSetters";
+import { floatValueSetter, dateTimeValueSetter } from "lib/tabling/valueSetters";
 
 import { setInstanceAction } from "../../store/actions/budget";
 import {
@@ -169,15 +168,17 @@ const Actuals = (): JSX.Element => {
             field: "payment_method",
             headerName: "Payment Method",
             cellClass: "cell--centered",
-            cellRenderer: "PaymentMethodsCell",
+            cellRenderer: "PaymentMethodCell",
             flex: 1,
-            valueSetter: choiceModelValueSetter<Table.ActualRow, Model.PaymentMethod>(
-              "payment_method",
-              PaymentMethods,
-              {
-                allowNull: true
+            cellEditor: "PaymentMethodCellEditor",
+            clearBeforeEdit: true,
+            // Required to allow the dropdown to be selectable on Enter key.
+            suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+              if (params.event.code === "Enter" && params.editing) {
+                return true;
               }
-            )
+              return false;
+            }
           },
           {
             field: "payment_id",

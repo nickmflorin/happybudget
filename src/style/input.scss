@@ -2,6 +2,7 @@
 
 // Input Fields
 $input-border-radius: 8px;
+$input-small-border-radius: 4px;
 
 // This is to get rid of the blue-background that Chrome sometimes sets on
 // auto-fill fields.
@@ -63,17 +64,48 @@ form {
 }
 
 input.ant-input,
-.ant-input-affix-wrapper,
 .input {
   @extend .input-base;
+
+  &--small {
+    padding-top: 4px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 12px;
+    line-height: 15px;
+    border-radius: $input-small-border-radius;
+  }
 }
 
 .ant-input-affix-wrapper {
+  @extend .input-base;
+
   border-radius: $input-border-radius;
   border: none;
   color: rgba(0, 0, 0, 0.25);
   input {
     border-radius: 0px !important;
+  }
+  &.input--small {
+    padding-top: 4px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 12px;
+    line-height: 15px;
+    height: 30px !important;
+    border-radius: $input-small-border-radius;
+
+    input.ant-input, .input {
+      padding-top: 4px;
+      padding-bottom: 6px;
+      padding-left: 8px;
+      padding-right: 8px;
+      font-size: 12px;
+      line-height: 15px;
+      border-radius: $input-small-border-radius;
+    }
   }
 }
 
@@ -94,6 +126,15 @@ input.ant-input,
     input.ant-input {
       border-left: none;
     }
+  }
+  &--small {
+    padding-top: 4px;
+    padding-bottom: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 12px;
+    line-height: 16px;
+    border-radius: $input-small-border-radius;
   }
 }
 

@@ -8,7 +8,7 @@ import { DropdownMenu } from "components/menus";
 import { IDropdownMenu, IDropdownMenuItem } from "components/menus/DropdownMenu";
 
 interface BaseDropdownProps
-  extends Omit<DropDownProps, "overlay">,
+  extends Omit<DropDownProps, "overlay" | "className">,
     StandardComponentProps,
     Omit<IDropdownMenu, "className" | "style" | "items"> {
   children: ReactNode;

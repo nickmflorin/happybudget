@@ -11,7 +11,13 @@ import FringesModal from "./FringesModal";
 interface BudgetSubAccountsTableProps
   extends Omit<
     GenericSubAccountsTableProps<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>,
-    "manager" | "fringes" | "fringesCellRenderer" | "fringesCellRendererParams" | "onEditFringes" | "columns"
+    | "manager"
+    | "fringes"
+    | "fringesCellRenderer"
+    | "fringesCellEditor"
+    | "fringesCellEditorParams"
+    | "onEditFringes"
+    | "columns"
   > {
   detail: Model.BudgetAccount | Model.BudgetSubAccount | undefined;
 }
@@ -30,8 +36,9 @@ const BudgetSubAccountsTable = ({ detail, ...props }: BudgetSubAccountsTableProp
         loadingBudget={loadingBudget}
         fringes={fringes}
         fringesCellRenderer={"BudgetFringesCell"}
+        fringesCellEditor={"BudgetFringesCellEditor"}
         onEditFringes={() => setFringesModalVisible(true)}
-        fringesCellRendererParams={{
+        fringesCellEditorParams={{
           onAddFringes: () => setFringesModalVisible(true)
         }}
         columns={[

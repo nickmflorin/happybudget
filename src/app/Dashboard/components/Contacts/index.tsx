@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 
 import { Input, Button } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
 import { ActionsMenuBar } from "components/menus";
 import { Page } from "components/layout";
@@ -25,7 +26,7 @@ const Contacts = (): JSX.Element => {
             placeholder={"Search Contacts"}
             value={contacts.search}
             allowClear={true}
-            prefix={<SearchOutlined />}
+            prefix={<FontAwesomeIcon className={"icon"} icon={faSearch} />}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
               dispatch(setContactsSearchAction(event.target.value))
             }

@@ -3,7 +3,8 @@ import classNames from "classnames";
 
 import { Input, Checkbox, Tooltip } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
-import { SearchOutlined } from "@ant-design/icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
 import { ColDef } from "@ag-grid-community/core";
 
@@ -80,7 +81,7 @@ const BudgetTableMenu = <R extends Table.Row<G>, G extends Model.Group = Model.G
               placeholder={"Search Rows"}
               value={search}
               allowClear={true}
-              prefix={<SearchOutlined />}
+              prefix={<FontAwesomeIcon className={"icon"} icon={faSearch} />}
               style={{ maxWidth: 300, minWidth: 100 }}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 !isNil(onSearch) && onSearch(event.target.value)

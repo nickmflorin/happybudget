@@ -1,5 +1,10 @@
 import { useRef, useEffect, useState } from "react";
-import { isNil } from "lodash";
+import { forEach, isNil, debounce } from "lodash";
+import * as JsSearch from "js-search";
+import AwesomeDebouncePromise from "awesome-debounce-promise";
+import useConstant from "use-constant";
+import { useAsync, UseAsyncReturn } from "react-async-hook";
+import { useDeepEqualMemo } from "lib/hooks";
 
 const createRootElement = (id: string | number): HTMLElement => {
   const rootContainer = document.createElement("div");
@@ -71,4 +76,115 @@ export const usePortal = (id: string | number) => {
   }, [id]);
 
   return parent;
+};
+
+/**
+ * An awesome, reusable hook that allows asynchronous searching to be
+ * debounced and maintains the relationship between the current search text
+ * and the current search results.
+ *
+ * @param func          The search function which takes the search text and filters the results.
+ * @param debounceTime  The debounce time for the search function.
+ */
+export const useDebouncedFullSearch = <T>(
+  func: (input: string) => T[],
+  debounceTime: number = 300
+): [string, (value: string) => void, UseAsyncReturn<T[]>] => {
+  const [inputText, setInputText] = useState("");
+
+  // Create a debounced asynchronous version of the search function.  Use the
+  // useConstant hook to ensure that the function is only created once.
+  const debounced = useConstant((): ((input: string) => T[]) => AwesomeDebouncePromise(func, debounceTime));
+
+  // Create an asynchronous callback that will call the debounced, async search
+  // function whenever the text changes.
+  const searchResults = useAsync(async () => {
+    if (inputText.length === 0) {
+      return [];
+    } else {
+      const d = debounced(inputText);
+      return d;
+    }
+  }, [debounced, inputText]);
+
+  return [inputText, setInputText, searchResults];
+};
+
+/**
+ * A slightly less powerful version of useDebouncedFullSearch that assumes the
+ * handling of the search text is external and that the only thing that needs
+ * to be done is debounce the actual searching based on this text.
+ *
+ * @param search        The search text to filter the results by.
+ * @param func          The search function which takes the search text and filters the results.
+ * @param debounceTime  The debounce time for the search function.
+ */
+export const useDebouncedSearch = <T>(
+  search: string,
+  func: (input: string) => T[],
+  debounceTime: number = 300
+): UseAsyncReturn<T[]> => {
+  // Create a debounced asynchronous version of the search function.  Use the
+  // useConstant hook to ensure that the function is only created once.
+  const debounced = useConstant((): ((input: string) => T[]) => AwesomeDebouncePromise(func, debounceTime));
+
+  // Create an asynchronous callback that will call the debounced, async search
+  // function whenever the text changes.
+  const searchResults = useAsync(async () => {
+    if (search.length === 0) {
+      return [];
+    } else {
+      const d = debounced(search);
+      return d;
+    }
+  }, [debounced, search]);
+
+  return searchResults;
+};
+
+export interface SearchOptions {
+  readonly indices: (string[] | string)[];
+  readonly debounceTime?: number;
+  readonly idField?: string;
+}
+
+export const useDebouncedJSSearch = <T>(search: string | undefined, models: T[], options: SearchOptions): T[] => {
+  const [jsSearch, setJsSearch] = useState<JsSearch.Search | undefined>(undefined);
+  const [filteredModels, setFilteredModels] = useState<T[]>(models);
+
+  useEffect(() => {
+    const jssearch = new JsSearch.Search(options.idField || "id");
+    jssearch.indexStrategy = new JsSearch.PrefixIndexStrategy();
+    forEach(options.indices, (indice: string | string[]) => {
+      jssearch.addIndex(["name"]);
+    });
+    setJsSearch(jssearch);
+  }, []);
+
+  useEffect(() => {
+    if (!isNil(jsSearch)) {
+      jsSearch.addDocuments(models);
+    }
+  }, [jsSearch, useDeepEqualMemo(models)]);
+
+  const doSearch = (searchValue: string) => {
+    if (!isNil(jsSearch)) {
+      const values = jsSearch.search(searchValue) as T[];
+      setFilteredModels(values);
+    }
+  };
+  const debouncedSearch = debounce(doSearch, options.debounceTime || 300);
+
+  useEffect(() => {
+    if (!isNil(search) && search !== "") {
+      debouncedSearch(search);
+    } else {
+      setFilteredModels(models);
+    }
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [search]);
+
+  return filteredModels;
 };
