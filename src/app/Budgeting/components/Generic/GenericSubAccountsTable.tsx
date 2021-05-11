@@ -17,6 +17,7 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
     "identifierField" | "identifierFieldHeader" | "groupParams"
   > {
   categoryName: "Sub Account" | "Detail";
+  identifierFieldHeader: "Account" | "Line";
   fringes: Model.Fringe[];
   fringesCellRenderer: "BudgetFringesCell" | "TemplateFringesCell";
   fringesCellEditor: "BudgetFringesCellEditor" | "TemplateFringesCellEditor";
@@ -35,6 +36,7 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
 
 const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Model.SubAccount, G extends Model.Group>({
   categoryName,
+  identifierFieldHeader,
   fringes,
   fringesCellEditor,
   fringesCellRenderer,
@@ -51,7 +53,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
     <BudgetTable<R, M, G, Http.SubAccountPayload>
       sizeColumnsToFit={false}
       identifierField={"identifier"}
-      identifierFieldHeader={"Line"}
+      identifierFieldHeader={identifierFieldHeader}
       identifierColumn={{ width: 70, cellRendererParams: { className: "subaccount-identifier" } }}
       isCellEditable={(row: R, colDef: ColDef) => {
         if (includes(["identifier", "description", "name"], colDef.field)) {

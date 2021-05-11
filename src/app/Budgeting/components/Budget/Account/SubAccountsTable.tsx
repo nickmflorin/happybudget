@@ -90,6 +90,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
         saving={saving}
         categoryName={"Sub Account"}
+        identifierFieldHeader={"Account"}
         cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
         onRowAdd={() => dispatch(bulkCreateSubAccountsAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
