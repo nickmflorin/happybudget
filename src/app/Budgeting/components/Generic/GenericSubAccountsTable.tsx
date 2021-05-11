@@ -17,7 +17,7 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
     BudgetTableProps<R, M, G, Http.SubAccountPayload>,
     "identifierField" | "identifierFieldHeader" | "groupParams"
   > {
-  categoryName: "Account" | "Detail";
+  categoryName: "Sub Account" | "Detail";
   fringes: Model.Fringe[];
   fringesCellRenderer: "BudgetFringesCell" | "TemplateFringesCell";
   fringesCellRendererParams: {

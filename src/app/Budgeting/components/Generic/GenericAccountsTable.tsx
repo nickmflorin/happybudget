@@ -77,7 +77,7 @@ const GenericAccountsTable = <
       columns={[
         {
           field: "description",
-          headerName: "Category Description",
+          headerName: "Account Description",
           flex: 100
         },
         ...props.columns
