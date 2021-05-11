@@ -374,7 +374,7 @@ const PrimaryGrid = <
         const group = row.group;
         return [
           {
-            name: `Delete Group ${group.name}`,
+            name: `Ungroup ${group.name}`,
             action: () => groupParams.onDeleteGroup(group)
           }
         ];
