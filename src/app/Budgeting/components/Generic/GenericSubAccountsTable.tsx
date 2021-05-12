@@ -21,7 +21,9 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
   fringesCellRenderer: "BudgetFringesCell" | "TemplateFringesCell";
   fringesCellEditor: "BudgetFringesCellEditor" | "TemplateFringesCellEditor";
   fringesCellEditorParams: {
+    colId: keyof R;
     onAddFringes: () => void;
+    onRowUpdate: (change: Table.RowChange<R>) => void;
   };
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;

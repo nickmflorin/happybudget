@@ -39,7 +39,9 @@ const BudgetSubAccountsTable = ({ detail, ...props }: BudgetSubAccountsTableProp
         fringesCellEditor={"BudgetFringesCellEditor"}
         onEditFringes={() => setFringesModalVisible(true)}
         fringesCellEditorParams={{
-          onAddFringes: () => setFringesModalVisible(true)
+          onAddFringes: () => setFringesModalVisible(true),
+          onRowUpdate: (change: Table.RowChange<Table.BudgetSubAccountRow>) => props.onRowUpdate(change),
+          colId: "fringes"
         }}
         columns={[
           {

@@ -1,17 +1,12 @@
 import { forwardRef } from "react";
 import { useSelector } from "react-redux";
-
-import { ICellEditorParams } from "@ag-grid-community/core";
-
 import { selectTemplateFringes } from "../../../../store/selectors";
+import FringesCellEditor, { FringesCellEditorProps } from "./Generic";
 
-import FringesCellEditor from "./Generic";
-
-interface BudgetFringesCellEditorProps extends ICellEditorParams {
-  onAddFringes: () => void;
-}
-
-const TemplateFringesCellEditor = (props: BudgetFringesCellEditorProps, ref: any) => {
+const TemplateFringesCellEditor = (
+  props: Omit<FringesCellEditorProps<Table.TemplateSubAccountRow, Model.TemplateGroup>, "fringes">,
+  ref: any
+) => {
   const fringes = useSelector(selectTemplateFringes);
   return <FringesCellEditor fringes={fringes} ref={ref} {...props} />;
 };

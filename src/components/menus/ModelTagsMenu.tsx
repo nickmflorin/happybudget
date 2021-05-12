@@ -181,20 +181,20 @@ const ModelTagsMenu = <M extends Model.Model = Model.Model>(props: ModelTagsMenu
                         (m: M | undefined) => m !== undefined
                       ) as M[];
                       if (e.target.checked) {
+                        if (includes(selected, model.id)) {
+                          /* eslint-disable no-console */
+                          console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
+                        } else {
+                          setSelected([...selected, model.id]);
+                          props.onChange([...selectedModels, model]);
+                        }
+                      } else {
                         if (!includes(selected, model.id)) {
                           /* eslint-disable no-console */
                           console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
                         } else {
                           setSelected(filter(selected, (id: number) => id !== model.id));
                           props.onChange(filter(selectedModels, (m: M) => m.id !== model.id));
-                        }
-                      } else {
-                        if (includes(selected, model.id)) {
-                          /* eslint-disable no-console */
-                          console.warn(`Inconsistent State: Model with ID ${model.id} already in deselected state.`);
-                        } else {
-                          setSelected([...selected, model.id]);
-                          props.onChange([...selectedModels, model]);
                         }
                       }
                     }}

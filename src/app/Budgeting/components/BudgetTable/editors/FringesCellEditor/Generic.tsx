@@ -12,12 +12,15 @@ import { ExpandedModelTagsMenuRef } from "components/menus/ExpandedModelTagsMenu
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-interface FringesCellEditorProps extends ICellEditorParams {
+export interface FringesCellEditorProps<R extends Table.Row<G>, G extends Model.Group = Model.Group>
+  extends ICellEditorParams {
   onAddFringes: () => void;
+  onRowUpdate: (payload: any) => void;
+  colId: keyof R;
   fringes: Model.Fringe[];
 }
 
-const FringesCellEditor = (props: FringesCellEditorProps, ref: any) => {
+const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>, ref: any) => {
   const isFirstRender = useRef(true);
   const menuRef = useRef<ExpandedModelTagsMenuRef>(null);
   const [value, setValue] = useState<number[]>(props.value);
@@ -32,10 +35,18 @@ const FringesCellEditor = (props: FringesCellEditorProps, ref: any) => {
   }, [props.charPress, menuRef.current]);
 
   useEffect(() => {
-    // TODO: Eventually we want to make it so that clicking things in this popup does not propmpt
-    // the pop up to close.
+    // TODO: Unfortunately, since this is a pop up editor, AG Grid will not persist the
+    // update to the cell value until the cell editing has stopped.  This is a temporary
+    // attempt at a workaround for that.
     if (!isFirstRender.current) {
-      props.stopEditing();
+      if (!isNil(props.api)) {
+        const row: R = props.node.data;
+        const rowChangeData: Table.RowChangeData<R> = {};
+        const change: Table.CellChange<any> = { oldValue: null, newValue: props.value };
+        rowChangeData[props.colId] = change;
+        const rowChange: Table.RowChange<R> = { id: row.id, data: rowChangeData };
+        props.onRowUpdate(rowChange);
+      }
     }
   }, [value]);
 
