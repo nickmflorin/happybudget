@@ -80,6 +80,9 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         groups={groups}
         selected={selected}
         renderFlag={readyToRender}
+        // Right now, the SubAccount recursion only goes 1 layer deep.
+        // Account -> SubAccount -> Detail (Recrusive SubAccount).
+        onRowExpand={null}
         detail={subaccountDetail}
         tableFooterIdentifierValue={
           !isNil(subaccountDetail) && !isNil(subaccountDetail.description)
@@ -100,7 +103,6 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         onRowBulkUpdate={(changes: Table.RowChange<Table.TemplateSubAccountRow>[]) =>
           dispatch(bulkUpdateSubAccountAction(changes))
         }
-        onRowExpand={(id: number) => history.push(`/templates/${templateId}/subaccounts/${id}`)}
         onBack={() => {
           if (!isNil(subaccountDetail)) {
             const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];

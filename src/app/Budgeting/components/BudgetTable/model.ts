@@ -163,7 +163,7 @@ export interface BudgetTableProps<
   cellClass?: (params: CellClassParams) => string | undefined;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
-  onRowExpand?: (id: number) => void;
+  onRowExpand?: null | ((id: number) => void);
   onBack?: () => void;
   isCellEditable?: (row: R, col: ColDef) => boolean;
   isCellSelectable?: (row: R, col: ColDef) => boolean;

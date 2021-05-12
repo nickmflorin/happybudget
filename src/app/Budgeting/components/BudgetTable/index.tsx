@@ -177,8 +177,6 @@ const BudgetTable = <
   const actionCell = useDynamicCallback<CustomColDef<R, G>>(
     (col: CustomColDef<R, G>): CustomColDef<R, G> => {
       return {
-        width: 20,
-        maxWidth: 25,
         ...col,
         cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", col.cellClass),
         editable: false,
@@ -195,6 +193,8 @@ const BudgetTable = <
         ...indexColumn,
         field: "index",
         cellRenderer: "IndexCell",
+        width: isNil(onRowExpand) ? 40 : 30,
+        maxWidth: isNil(onRowExpand) ? 40 : 30,
         pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
         cellRendererParams: {
           onSelect: onRowSelect,
@@ -248,6 +248,8 @@ const BudgetTable = <
         ...col,
         ...expandColumn,
         field: "expand",
+        width: 30,
+        maxWidth: 30,
         cellRenderer: "ExpandCell",
         pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
         cellRendererParams: { onClick: onRowExpand },
