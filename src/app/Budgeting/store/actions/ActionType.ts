@@ -6,7 +6,8 @@ const ActionType = {
   Budget: {
     SetInstance: "budget.SetInstance",
     SetCommentsHistoryDrawerVisibility: "budget.SetCommentsHistoryDrawerVisibility",
-    SetId: "budget.budget.SetId",
+    SetId: "budget.SetId",
+    SetAutoIndex: "budget.SetAutoIndex",
     Loading: "budget.Loading",
     Response: "budget.Response",
     Request: "budget.Request",
@@ -251,6 +252,7 @@ const ActionType = {
   Template: {
     SetInstance: "template.SetInstance",
     SetId: "template.SetId",
+    SetAutoIndex: "template.SetAutoIndex",
     Loading: "template.Loading",
     Response: "template.Response",
     Request: "template.Request",

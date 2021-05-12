@@ -7,7 +7,7 @@ import { isNil } from "lodash";
 import { WrapInApplicationSpinner } from "components";
 import { simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction } from "../../../store/actions/template";
+import { setInstanceAction, setTemplateAutoIndex } from "../../../store/actions/template";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/template/accounts";
 import { selectTemplateId } from "../../../store/selectors";
 
@@ -29,6 +29,10 @@ const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
   const templateId = useSelector(selectTemplateId);
   const loading = useSelector(selectLoading);
+
+  useEffect(() => {
+    dispatch(setTemplateAutoIndex(false));
+  }, []);
 
   useEffect(() => {
     dispatch(setInstanceAction(null));

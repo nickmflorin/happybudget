@@ -76,6 +76,7 @@ export const initialActualsState: Redux.Budgeting.Budget.ActualsStore = {
 };
 
 export const initialBudgetState: Redux.Budgeting.Budget.Store = {
+  autoIndex: false,
   budget: initialBudgetBudgetState,
   instance: null,
   commentsHistoryDrawerOpen: false,
@@ -89,6 +90,7 @@ export const initialBudgetState: Redux.Budgeting.Budget.Store = {
 };
 
 export const initialTemplateState: Redux.Budgeting.Template.Store = {
+  autoIndex: false,
   template: initialTemplateTemplateState,
   instance: null,
   fringes: initialFringesState,

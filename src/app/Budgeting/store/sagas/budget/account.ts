@@ -220,7 +220,8 @@ const tasks = createAccountTaskSet<
   },
   BudgetSubAccountRowManager,
   (state: Redux.ApplicationStore) => state.budgeting.budget.account.id,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.account.subaccounts.data
+  (state: Redux.ApplicationStore) => state.budgeting.budget.account.subaccounts.data,
+  (state: Redux.ApplicationStore) => state.budgeting.budget.autoIndex
 );
 
 function* watchForRequestAccountSaga(): SagaIterator {

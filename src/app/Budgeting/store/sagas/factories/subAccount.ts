@@ -21,6 +21,8 @@ import RowManager from "lib/tabling/managers";
 import { mergeRowChanges } from "lib/tabling/util";
 import { handleTableErrors } from "store/tasks";
 
+import { createBulkCreatePayload } from "./util";
+
 export interface SubAccountTasksActionMap<
   SA extends Model.TemplateSubAccount | Model.BudgetSubAccount,
   G extends Model.TemplateGroup | Model.BudgetGroup
@@ -76,7 +78,8 @@ export const createSubAccountTaskSet = <
   actions: SubAccountTasksActionMap<SA, G>,
   manager: RowManager<R, SA, G>,
   selectSubAccountId: (state: Redux.ApplicationStore) => number | null,
-  selectModels: (state: Redux.ApplicationStore) => SA[]
+  selectModels: (state: Redux.ApplicationStore) => SA[],
+  selectAutoIndex: (state: Redux.ApplicationStore) => boolean
 ): SubAccountTaskSet<R, G> => {
   function* handleSubAccountChangeTask(action: Redux.Action<number>): SagaIterator {
     yield all([put(actions.subaccount.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);
@@ -263,16 +266,18 @@ export const createSubAccountTaskSet = <
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
       yield put(actions.creating(true));
+
+      const autoIndex = yield select(selectAutoIndex);
+      const count = isAction(action) ? action.payload : action;
+      const data = yield select(selectModels);
+
+      const payload = createBulkCreatePayload(data, count, autoIndex) as Http.BulkCreatePayload<Http.SubAccountPayload>;
+
       try {
-        const subaccounts: SA[] = yield call(
-          bulkCreateSubAccountSubAccounts,
-          subaccountId,
-          { count: isAction(action) ? action.payload : action },
-          { cancelToken: source.token }
-        );
-        for (let i = 0; i < subaccounts.length; i++) {
-          yield put(actions.addToState(subaccounts[i]));
-        }
+        const subaccounts: SA[] = yield call(bulkCreateSubAccountSubAccounts, subaccountId, payload, {
+          cancelToken: source.token
+        });
+        yield all(subaccounts.map((subaccount: SA) => put(actions.addToState(subaccount))));
       } catch (e) {
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.

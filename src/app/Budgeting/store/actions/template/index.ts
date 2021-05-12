@@ -5,6 +5,7 @@ export const setTemplateIdAction = simpleAction<number>(ActionType.Template.SetI
 export const setInstanceAction = simpleAction<Model.TemplateAccount | Model.TemplateSubAccount | null>(
   ActionType.Template.SetInstance
 );
+export const setTemplateAutoIndex = simpleAction<boolean>(ActionType.Template.SetAutoIndex);
 export const requestTemplateAction = simpleAction<null>(ActionType.Template.Request);
 export const loadingTemplateAction = simpleAction<boolean>(ActionType.Template.Loading);
 export const responseTemplateAction = simpleAction<Model.Template | undefined>(ActionType.Template.Response);

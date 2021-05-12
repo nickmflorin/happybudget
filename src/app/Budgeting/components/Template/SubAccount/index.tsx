@@ -8,7 +8,7 @@ import { isNil } from "lodash";
 import { RenderIfValidId, WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction } from "../../../store/actions/template";
+import { setInstanceAction, setTemplateAutoIndex } from "../../../store/actions/template";
 import { setSubAccountIdAction } from "../../../store/actions/template/subAccount";
 import { requestFringesAction } from "../../../store/actions/template/fringes";
 import { selectTemplateId } from "../../../store/selectors";
@@ -34,6 +34,10 @@ const SubAccount = (): JSX.Element => {
   const templateId = useSelector(selectTemplateId);
   const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
+
+  useEffect(() => {
+    dispatch(setTemplateAutoIndex(true));
+  }, []);
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {

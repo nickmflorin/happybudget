@@ -156,6 +156,7 @@ namespace Redux {
       }
 
       interface Store {
+        readonly autoIndex: boolean;
         readonly budget: BudgetStore;
         readonly instance: Model.BudgetAccount | Model.BudgetSubAccount | null;
         readonly commentsHistoryDrawerOpen: boolean;
@@ -201,6 +202,7 @@ namespace Redux {
       }
 
       interface Store {
+        readonly autoIndex: boolean;
         readonly template: TemplateStore;
         readonly instance: Model.TemplateAccount | Model.TemplateSubAccount | null;
         readonly subaccount: SubAccountStore;

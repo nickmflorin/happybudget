@@ -22,6 +22,7 @@ const genericReducer = combineReducers({
     ActionType.Budget.SetInstance,
     null
   ),
+  autoIndex: createSimplePayloadReducer<boolean>(ActionType.Budget.SetAutoIndex, false),
   commentsHistoryDrawerOpen: createSimpleBooleanReducer(ActionType.Budget.SetCommentsHistoryDrawerVisibility),
   account: accountRootReducer,
   subaccount: subAccountRootReducer,

@@ -61,7 +61,8 @@ const tasks = createAccountsTaskSet<
   },
   TemplateAccountRowManager,
   (state: Redux.ApplicationStore) => state.budgeting.template.template.id,
-  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.data
+  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.data,
+  (state: Redux.ApplicationStore) => state.budgeting.template.autoIndex
 );
 
 export default createStandardSaga({

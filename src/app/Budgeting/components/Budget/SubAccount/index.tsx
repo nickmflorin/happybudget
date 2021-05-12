@@ -8,7 +8,7 @@ import { isNil } from "lodash";
 import { RenderIfValidId, WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction } from "../../../store/actions/budget";
+import { setInstanceAction, setBudgetAutoIndex } from "../../../store/actions/budget";
 import { setSubAccountIdAction } from "../../../store/actions/budget/subAccount";
 import { requestFringesAction } from "../../..//store/actions/budget/fringes";
 import { selectBudgetId } from "../../../store/selectors";
@@ -35,6 +35,10 @@ const SubAccount = (): JSX.Element => {
   const budgetId = useSelector(selectBudgetId);
   const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
+
+  useEffect(() => {
+    dispatch(setBudgetAutoIndex(true));
+  }, []);
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {

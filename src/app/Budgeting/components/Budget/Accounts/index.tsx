@@ -7,7 +7,7 @@ import { isNil } from "lodash";
 import { WrapInApplicationSpinner } from "components";
 import { simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction } from "../../../store/actions/budget";
+import { setInstanceAction, setBudgetAutoIndex } from "../../../store/actions/budget";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/budget/accounts";
 import { selectBudgetId } from "../../../store/selectors";
 
@@ -30,6 +30,10 @@ const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
   const budgetId = useSelector(selectBudgetId);
   const loading = useSelector(selectLoading);
+
+  useEffect(() => {
+    dispatch(setBudgetAutoIndex(false));
+  }, []);
 
   useEffect(() => {
     dispatch(setInstanceAction(null));

@@ -12,6 +12,8 @@ import RowManager from "lib/tabling/managers";
 import { mergeRowChanges } from "lib/tabling/util";
 import { handleTableErrors } from "store/tasks";
 
+import { createBulkCreatePayload } from "./util";
+
 export interface AccountsTasksActionMap<
   A extends Model.TemplateAccount | Model.BudgetAccount,
   G extends Model.TemplateGroup | Model.BudgetGroup
@@ -73,7 +75,8 @@ export const createAccountsTaskSet = <
   services: AccountsServiceSet<M, A, G, P>,
   manager: RowManager<R, A, G, P>,
   selectObjId: (state: Redux.ApplicationStore) => number | null,
-  selectModels: (state: Redux.ApplicationStore) => A[]
+  selectModels: (state: Redux.ApplicationStore) => A[],
+  selectAutoIndex: (state: Redux.ApplicationStore) => boolean
 ): AccountsTaskSet<R, G> => {
   function* removeFromGroupTask(action: Redux.Action<number>): SagaIterator {
     if (!isNil(action.payload)) {
@@ -237,13 +240,15 @@ export const createAccountsTaskSet = <
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
       yield put(actions.creating(true));
+
+      const autoIndex = yield select(selectAutoIndex);
+      const count = isAction(action) ? action.payload : action;
+      const data = yield select(selectModels);
+
+      const payload = createBulkCreatePayload(data, count, autoIndex) as Http.BulkCreatePayload<P>;
+
       try {
-        const accounts: A[] = yield call(
-          services.bulkCreate,
-          objId,
-          { count: isAction(action) ? action.payload : action },
-          { cancelToken: source.token }
-        );
+        const accounts: A[] = yield call(services.bulkCreate, objId, payload, { cancelToken: source.token });
         yield all(accounts.map((account: A) => put(actions.addToState(account))));
       } catch (e) {
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested

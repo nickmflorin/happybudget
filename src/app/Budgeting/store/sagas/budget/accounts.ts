@@ -257,7 +257,8 @@ const tasks = createAccountsTaskSet<
   },
   BudgetAccountRowManager,
   (state: Redux.ApplicationStore) => state.budgeting.budget.budget.id,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.data
+  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.data,
+  (state: Redux.ApplicationStore) => state.budgeting.budget.autoIndex
 );
 
 export default createStandardSaga({

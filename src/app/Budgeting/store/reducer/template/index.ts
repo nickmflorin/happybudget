@@ -15,6 +15,7 @@ const genericReducer = combineReducers({
     ActionType.Template.SetInstance,
     null
   ),
+  autoIndex: createSimplePayloadReducer<boolean>(ActionType.Template.SetAutoIndex, false),
   account: accountRootReducer,
   subaccount: subAccountRootReducer,
   accounts: accountsRootReducer,

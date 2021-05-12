@@ -21,6 +21,8 @@ import RowManager from "lib/tabling/managers";
 import { mergeRowChanges } from "lib/tabling/util";
 import { handleTableErrors } from "store/tasks";
 
+import { createBulkCreatePayload } from "./util";
+
 export interface AccountTasksActionMap<
   A extends Model.TemplateAccount | Model.BudgetAccount,
   SA extends Model.TemplateSubAccount | Model.BudgetSubAccount,
@@ -78,7 +80,8 @@ export const createAccountTaskSet = <
   actions: AccountTasksActionMap<A, SA, G>,
   manager: RowManager<R, SA, G>,
   selectAccountId: (state: Redux.ApplicationStore) => number | null,
-  selectModels: (state: Redux.ApplicationStore) => SA[]
+  selectModels: (state: Redux.ApplicationStore) => SA[],
+  selectAutoIndex: (state: Redux.ApplicationStore) => boolean
 ): AccountTaskSet<R, G> => {
   function* handleAccountChangeTask(action: Redux.Action<number>): SagaIterator {
     yield all([put(actions.account.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);
@@ -263,13 +266,16 @@ export const createAccountTaskSet = <
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
       yield put(actions.creating(true));
+
+      const data = yield select(selectModels);
+      const autoIndex = yield select(selectAutoIndex);
+      const count = isAction(action) ? action.payload : action;
+      const payload = createBulkCreatePayload(data, count, autoIndex) as Http.BulkCreatePayload<Http.SubAccountPayload>;
+
       try {
-        const subaccounts: SA[] = yield call(
-          bulkCreateAccountSubAccounts,
-          accountId,
-          { count: isAction(action) ? action.payload : action },
-          { cancelToken: source.token }
-        );
+        const subaccounts: SA[] = yield call(bulkCreateAccountSubAccounts, accountId, payload, {
+          cancelToken: source.token
+        });
         yield all(subaccounts.map((subaccount: SA) => put(actions.addToState(subaccount))));
       } catch (e) {
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
