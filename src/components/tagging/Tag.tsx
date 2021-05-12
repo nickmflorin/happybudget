@@ -280,11 +280,12 @@ export const MultipleTags = <M extends Model.Model = Model.Model>(props: Multipl
       {isMultipleTagsModelsProps(props) &&
         /* eslint-disable indent */
         (props.models.length !== 0 || isNil(props.onMissing)
-          ? map(props.models, (model: M) => {
+          ? map(props.models, (model: M, index: number) => {
               // Here, the props textColor and color will override the color selection (if modelColorField
               // is not provided) and cause the <Tag>(s) to be the same uniform color/background color.
               return (
                 <Tag
+                  key={index}
                   model={model}
                   modelTextField={props.modelTextField}
                   modelColorField={props.modelColorField}
@@ -307,6 +308,7 @@ export const MultipleTags = <M extends Model.Model = Model.Model>(props: Multipl
             // uppercase setting supplied globally as props to this MultipleTags component.
             return (
               <Tag
+                key={index}
                 text={tag.text}
                 color={!isNil(tag.color) ? tag.color : props.color}
                 textColor={!isNil(tag.textColor) ? tag.textColor : props.textColor}
