@@ -1,7 +1,6 @@
-import { forwardRef, useImperativeHandle, useRef, useState, useEffect } from "react";
+import { useImperativeHandle, useRef, useState, useEffect } from "react";
 import { isNil } from "lodash";
 
-import { SubAccountUnits } from "lib/model";
 import { TypeAgnosticExpandedModelTagsMenu } from "components/menus";
 import { ExpandedModelTagsMenuRef } from "components/menus/ExpandedModelTagsMenu";
 
@@ -10,10 +9,15 @@ import { ICellEditorParams } from "@ag-grid-community/core";
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-const SubAccountUnitCellEditor = (props: ICellEditorParams, ref: any) => {
+interface ModelTagCellEditorProps<M extends Model.Model> extends ICellEditorParams {
+  models: M[];
+  forwardedRef: any;
+}
+
+const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProps<M>) => {
   const isFirstRender = useRef(true);
   const menuRef = useRef<ExpandedModelTagsMenuRef>(null);
-  const [value, setValue] = useState<Model.SubAccountUnit | null>(props.value);
+  const [value, setValue] = useState<M | null>(props.value);
 
   useEffect(() => {
     if (!isNil(props.charPress)) {
@@ -34,7 +38,7 @@ const SubAccountUnitCellEditor = (props: ICellEditorParams, ref: any) => {
     isFirstRender.current = false;
   }, []);
 
-  useImperativeHandle(ref, () => {
+  useImperativeHandle(props.forwardedRef, () => {
     return {
       getValue: () => value,
       isCancelBeforeStart() {
@@ -60,8 +64,8 @@ const SubAccountUnitCellEditor = (props: ICellEditorParams, ref: any) => {
     <TypeAgnosticExpandedModelTagsMenu
       style={{ width: 160 }}
       selected={!isNil(value) ? value.id : null}
-      models={SubAccountUnits}
-      onChange={(m: Model.SubAccountUnit) => setValue(m)}
+      models={props.models}
+      onChange={(m: M) => setValue(m)}
       multiple={false}
       tagProps={{ style: { width: "100%", maxWidth: 120 } }}
       ref={menuRef}
@@ -70,4 +74,4 @@ const SubAccountUnitCellEditor = (props: ICellEditorParams, ref: any) => {
   );
 };
 
-export default forwardRef(SubAccountUnitCellEditor);
+export default ModelTagCellEditor;
