@@ -30,6 +30,10 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       const menuRefObj = menuRef.current;
       if (!isNil(menuRefObj)) {
         menuRefObj.focusSearch(true, props.charPress);
+
+        return () => {
+          menuRefObj.focusSearch(false);
+        };
       }
     }
   }, [props.charPress, menuRef.current]);
