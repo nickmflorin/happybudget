@@ -1,14 +1,6 @@
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
-import { ColDef, CellClassParams, RowNode, GridOptions, ColumnApi, GridApi } from "@ag-grid-community/core";
+import { ColDef, CellClassParams, GridOptions, ColumnApi, GridApi, Column } from "@ag-grid-community/core";
 import RowManager from "lib/tabling/managers";
-
-export interface GetExportValueParams {
-  readonly node: RowNode;
-  readonly colDef: ColDef;
-  readonly value: string | undefined;
-}
-
-export type ExportValueGetters = { [key: string]: (params: GetExportValueParams) => string };
 
 export interface BudgetTableMenuAction {
   readonly icon: JSX.Element;
@@ -36,7 +28,7 @@ export interface CookiesProps {
 
 export interface CustomColDef<R extends Table.Row<G>, G extends Model.Group = Model.Group>
   extends Omit<ColDef, "field"> {
-  readonly onClearValue?: any;
+  readonly nullValue?: null | "" | 0 | [];
   // If true, a Backspace/Delete will cause the cell to clear before going into edit mode.  This
   // is particularly useful for Dropdowns rendered via a custom Cell Editor (Popup) where we need
   // to trigger a cell clear without showing the dropdown.
@@ -45,7 +37,13 @@ export interface CustomColDef<R extends Table.Row<G>, G extends Model.Group = Mo
   readonly isCalculated?: boolean;
   readonly budgetTotal?: number;
   readonly tableTotal?: number;
+  readonly excludeFromExport?: boolean;
   // isBase?: boolean;
+  // When exporting, the default will be to use the processCellForClipboard unless
+  // processCellForExport is also provided.
+  readonly processCellForExport?: (row: R) => string;
+  readonly processCellForClipboard?: (row: R) => string;
+  readonly processCellFromClipboard?: (value: string) => any;
 }
 
 export interface BudgetTableMenuProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
@@ -91,19 +89,17 @@ export interface TableFooterGridProps<R extends Table.Row<G>, G extends Model.Gr
   readonly setColumnApi: (api: ColumnApi) => void;
 }
 
-interface PrimaryGridPassThroughProps<
-  R extends Table.Row<G>,
-  M extends Model.Model,
-  G extends Model.Group = Model.Group,
-  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
-> {
-  readonly manager: RowManager<R, M, G, P>;
+// Props provided to the BudgetTable that are passed directly through to the PrimaryGrid.
+interface PrimaryGridPassThroughProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
   readonly groups?: G[];
   readonly groupParams?: GroupProps<R, G>;
   readonly frameworkComponents?: { [key: string]: any };
   readonly sizeColumnsToFit?: boolean | undefined;
-  readonly search: string;
-  readonly processCellForClipboard?: { [key in keyof R]?: (row: R) => any };
+  readonly search?: string;
+  // Manually triggers a refresh to a row when certain changes occur.  Sometimes, a row R can have
+  // fields that are not displayed in the grid but used to generate HTML columns.  Since those fields
+  // are not explicitly displayed in the grid, AG Grid will not automatically refresh the columns
+  // in the case that those fields change.
   readonly rowRefreshRequired?: (existing: R, row: R) => boolean;
   readonly onRowUpdate: (payload: Table.RowChange<R>) => void;
   readonly onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
@@ -111,12 +107,8 @@ interface PrimaryGridPassThroughProps<
   readonly onRowDelete: (row: R) => void;
 }
 
-export interface PrimaryGridProps<
-  R extends Table.Row<G>,
-  M extends Model.Model,
-  G extends Model.Group = Model.Group,
-  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
-> extends PrimaryGridPassThroughProps<R, M, G, P> {
+export interface PrimaryGridProps<R extends Table.Row<G>, G extends Model.Group = Model.Group>
+  extends PrimaryGridPassThroughProps<R, G> {
   readonly api: GridApi | undefined;
   readonly columnApi: ColumnApi | undefined;
   readonly table: R[];
@@ -126,6 +118,8 @@ export interface PrimaryGridProps<
   readonly isCellEditable: (row: R, colDef: ColDef | CustomColDef<R, G>) => boolean;
   readonly setApi: (api: GridApi) => void;
   readonly setColumnApi: (api: ColumnApi) => void;
+  readonly processCellForClipboard: (column: Column, row: R, value: any) => string;
+  readonly processCellFromClipboard: (column: Column, row: R, value: any) => any;
 }
 
 export interface BudgetTableProps<
@@ -133,11 +127,12 @@ export interface BudgetTableProps<
   M extends Model.Model,
   G extends Model.Group = Model.Group,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
-> extends Omit<GridOptions, "processCellForClipboard">,
+> extends Omit<GridOptions, "frameworkComponents">,
     Omit<
       BudgetTableMenuProps<R, G>,
       "columns" | "onColumnsChange" | "onExport" | "onDelete" | "selected" | "selectedRows"
     >,
+    PrimaryGridPassThroughProps<R, G>,
     StandardComponentProps {
   readonly columns: CustomColDef<R, G>[];
   readonly data: M[];
@@ -153,13 +148,16 @@ export interface BudgetTableProps<
   readonly budgetFooterIdentifierValue?: string | null;
   readonly saving: boolean;
   readonly loadingBudget?: boolean;
-  readonly getExportValue?: ExportValueGetters;
   readonly exportable?: boolean;
   readonly exportFileName?: string;
   readonly nonEditableCells?: (keyof R)[];
   readonly cookies?: CookiesProps;
   readonly loading?: boolean;
   readonly renderFlag?: boolean;
+  readonly manager: RowManager<R, M, G, P>;
+  // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
+  // onRowExpand is provided to the BudgetTable.
+  readonly rowCanExpand?: (row: R) => boolean;
   readonly cellClass?: (params: CellClassParams) => string | undefined;
   readonly onRowSelect: (id: number) => void;
   readonly onRowDeselect: (id: number) => void;
@@ -167,17 +165,4 @@ export interface BudgetTableProps<
   readonly onBack?: () => void;
   readonly isCellEditable?: (row: R, col: ColDef) => boolean;
   readonly isCellSelectable?: (row: R, col: ColDef) => boolean;
-  // Props Passed to the Primary Grid
-  readonly manager: RowManager<R, M, G, P>;
-  readonly groups?: G[];
-  readonly groupParams?: GroupProps<R, G>;
-  readonly frameworkComponents?: { [key: string]: any };
-  readonly sizeColumnsToFit?: boolean | undefined;
-  readonly search: string;
-  readonly processCellForClipboard?: { [key in keyof R]?: (row: R) => any };
-  readonly rowRefreshRequired?: (existing: R, row: R) => boolean;
-  readonly onRowUpdate: (payload: Table.RowChange<R>) => void;
-  readonly onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
-  readonly onRowAdd: () => void;
-  readonly onRowDelete: (row: R) => void;
 }

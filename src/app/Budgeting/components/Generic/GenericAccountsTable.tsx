@@ -12,7 +12,7 @@ export interface GenericAccountsTableProps<
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
 > extends Omit<
     BudgetTableProps<R, M, G, P>,
-    "identifierField" | "identifierFieldHeader" | "groupParams" | "tableFooterIdentifierValue"
+    "identifierField" | "identifierFieldHeader" | "groupParams" | "tableFooterIdentifierValue" | "rowCanExpand"
   > {
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
@@ -50,6 +50,7 @@ const GenericAccountsTable = <
         onEditGroup,
         onRowAddToGroup
       }}
+      rowCanExpand={(row: R) => row.identifier !== null}
       actions={(params: BudgetTableActionsParams<R, G>) => [
         {
           tooltip: "Delete",

@@ -18,7 +18,7 @@ import {
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
 import { RenderWithSpinner } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
-import { hashString, updateFieldOrdering, orderByFieldOrdering } from "lib/util";
+import { hashString, updateFieldOrdering, orderByFieldOrdering, getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { mergeClassNames, mergeClassNamesFn } from "lib/tabling/util";
 import { currencyValueFormatter } from "lib/tabling/formatters";
@@ -54,7 +54,6 @@ const BudgetTable = <
   saving,
   frameworkComponents = {},
   exportFileName,
-  getExportValue,
   nonEditableCells,
   groupParams,
   cookies,
@@ -66,13 +65,13 @@ const BudgetTable = <
   indexColumn = {},
   tableFooterIdentifierValue = "Grand Total",
   budgetFooterIdentifierValue = "Budget Total",
-  processCellForClipboard = {},
   sizeColumnsToFit = true,
   renderFlag = true,
   canSearch = true,
   canExport = true,
   canToggleColumns = true,
   detached = false,
+  rowCanExpand,
   cellClass,
   onSearch,
   onSelectAll,
@@ -245,14 +244,19 @@ const BudgetTable = <
   const expandCell = useDynamicCallback<CustomColDef<R, G>>(
     (col: CustomColDef<R, G>): CustomColDef<R, G> =>
       actionCell({
-        ...col,
-        ...expandColumn,
-        field: "expand",
         width: 30,
         maxWidth: 30,
+        ...expandColumn,
+        ...col,
+        field: "expand",
         cellRenderer: "ExpandCell",
         pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
-        cellRendererParams: { onClick: onRowExpand },
+        cellRendererParams: {
+          ...expandColumn.cellRendererParams,
+          ...col.cellRendererParams,
+          onClick: onRowExpand,
+          rowCanExpand
+        },
         cellClass: mergeClassNamesFn(col.cellClass, expandColumn.cellClass, actionColumn.cellClass)
       })
   );
@@ -494,6 +498,64 @@ const BudgetTable = <
     renderFlag
   ]);
 
+  const processCellForClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
+    const colDef = column.getColDef();
+    if (!isNil(colDef.field)) {
+      const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+      if (!isNil(customColDef)) {
+        const processor = customColDef.processCellForClipboard;
+        if (!isNil(processor)) {
+          return processor(row);
+        } else {
+          value = value === undefined ? getKeyValue<R, keyof R>(customColDef.field)(row) : value;
+          // The value should never be undefined at this point.
+          if (value === customColDef.nullValue) {
+            return "";
+          }
+          return value;
+        }
+      }
+    }
+    return "";
+  });
+
+  const processCellForExport = useDynamicCallback((column: Column, row: R, value?: any) => {
+    const colDef = column.getColDef();
+    if (!isNil(colDef.field)) {
+      const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+      if (!isNil(customColDef)) {
+        const processor = customColDef.processCellForExport;
+        if (!isNil(processor)) {
+          return processor(row);
+        } else {
+          return processCellForClipboard(column, row, value);
+        }
+      }
+    }
+    return "";
+  });
+
+  const processCellFromClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
+    const colDef = column.getColDef();
+    if (!isNil(colDef.field)) {
+      const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+      if (!isNil(customColDef)) {
+        const processor = customColDef.processCellFromClipboard;
+        if (!isNil(processor)) {
+          return processor(value);
+        } else {
+          value = value === undefined ? getKeyValue<R, keyof R>(customColDef.field)(row) : value;
+          // The value should never be undefined at this point.
+          if (typeof value === "string" && String(value).trim() === "") {
+            return !isNil(customColDef.nullValue) ? customColDef.nullValue : null;
+          }
+          return value;
+        }
+      }
+    }
+    return "";
+  });
+
   return (
     <React.Fragment>
       <BudgetTableMenu<R, G>
@@ -520,19 +582,20 @@ const BudgetTable = <
           if (!isNil(gridApi) && !isNil(columnApi)) {
             const includeColumn = (col: Column): boolean => {
               const colDef = col.getColDef();
-              return (
-                !isNil(colDef.field) &&
-                includes(
-                  map(fields, (field: Field) => field.id),
-                  colDef.field
-                ) &&
-                includes(
-                  map(columns, (c: CustomColDef<R, G>) => c.field),
-                  colDef.field
-                )
-              );
+              if (!isNil(colDef.field)) {
+                const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+                if (!isNil(customColDef)) {
+                  return (
+                    customColDef.excludeFromExport !== true &&
+                    includes(
+                      map(fields, (field: Field) => field.id),
+                      customColDef.field
+                    )
+                  );
+                }
+              }
+              return false;
             };
-
             const cols = filter(columnApi.getAllColumns(), (col: Column) => includeColumn(col));
             const headerRow: CSVRow = [];
             forEach(cols, (col: Column) => {
@@ -541,31 +604,14 @@ const BudgetTable = <
                 headerRow.push(colDef.headerName);
               }
             });
-
             const csvData: CSVData = [headerRow];
-
             gridApi.forEachNode((node: RowNode, index: number) => {
               const row: CSVRow = [];
               forEach(cols, (col: Column) => {
-                const colDef = col.getColDef();
-                if (!isNil(colDef.field)) {
-                  if (isNil(node.data[colDef.field])) {
-                    row.push("");
-                  } else {
-                    let value = node.data[colDef.field];
-                    if (!isNil(getExportValue) && !isNil(getExportValue[colDef.field])) {
-                      value = getExportValue[colDef.field]({
-                        node,
-                        colDef,
-                        value
-                      });
-                    }
-                    // TODO: Use a valueSetter instead of a formatter on the cell renderer.
-                    if (!isNil(colDef.cellRendererParams) && !isNil(colDef.cellRendererParams.formatter)) {
-                      value = colDef.cellRendererParams.formatter(value);
-                    }
-                    row.push(value);
-                  }
+                if (!isNil(node.data)) {
+                  row.push(processCellForExport(col, node.data as R));
+                } else {
+                  row.push("");
                 }
               });
               csvData.push(row);
@@ -598,23 +644,23 @@ const BudgetTable = <
       />
       <RenderWithSpinner loading={loading}>
         <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
-          <PrimaryGrid<R, M, G, P>
+          <PrimaryGrid<R, G>
             api={gridApi}
             columnApi={columnApi}
             setApi={setGridApi}
             setColumnApi={setColumnApi}
             table={table}
             colDefs={colDefs}
+            processCellForClipboard={processCellForClipboard}
+            processCellFromClipboard={processCellFromClipboard}
             setAllSelected={setAllSelected}
             isCellEditable={_isCellEditable}
             options={gridOptions}
-            manager={manager}
             groups={groups}
             groupParams={groupParams}
             frameworkComponents={frameworkComponents}
             sizeColumnsToFit={sizeColumnsToFit}
             search={search}
-            processCellForClipboard={processCellForClipboard}
             rowRefreshRequired={rowRefreshRequired}
             onRowUpdate={onRowUpdate}
             onRowBulkUpdate={onRowBulkUpdate}

@@ -8,11 +8,15 @@ import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
 import { CellClassParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
-import { WrapInApplicationSpinner } from "components";
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { getKeyValue } from "lib/util";
+import { PaymentMethods } from "lib/model";
+import { findChoiceForName } from "lib/model/util";
 import { currencyValueFormatter, dateValueFormatter } from "lib/tabling/formatters";
 import { ActualRowManager } from "lib/tabling/managers";
 import { floatValueSetter, dateTimeValueSetter } from "lib/tabling/valueSetters";
+
+import { WrapInApplicationSpinner } from "components";
+import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setInstanceAction } from "../../store/actions/budget";
 import {
@@ -29,7 +33,7 @@ import {
   requestBudgetItemsTreeAction
 } from "../../store/actions/budget/actuals";
 import { selectBudgetDetail } from "../../store/selectors";
-import BudgetTable, { GetExportValueParams, BudgetTableActionsParams } from "../BudgetTable";
+import BudgetTable, { BudgetTableActionsParams } from "../BudgetTable";
 
 const selectSelectedRows = simpleDeepEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.selected
@@ -85,6 +89,16 @@ const Actuals = (): JSX.Element => {
         identifierColumn={{
           minWidth: 200,
           cellClass: "borderless",
+          processCellForClipboard: (row: Table.ActualRow) => {
+            const item: Model.BudgetLineItem | undefined = find(budgetItems, {
+              id: row.object_id,
+              type: row.parent_type
+            } as any);
+            if (!isNil(item)) {
+              return item.identifier || "";
+            }
+            return "";
+          },
           cellRenderer: "BudgetItemCell",
           cellRendererParams: {
             onChange: (object_id: number, parent_type: "account" | "subaccount", row: Table.ActualRow) => {
@@ -123,15 +137,6 @@ const Actuals = (): JSX.Element => {
         }}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         exportFileName={"actuals.csv"}
-        getExportValue={{
-          object_id: ({ node }: GetExportValueParams) => {
-            const item = find(budgetItems, { id: node.data.object_id, type: node.data.parent_type });
-            if (!isNil(item)) {
-              return item.identifier || "";
-            }
-            return "";
-          }
-        }}
         actions={(params: BudgetTableActionsParams<Table.ActualRow, Model.Group>) => [
           {
             tooltip: "Delete",
@@ -178,6 +183,23 @@ const Actuals = (): JSX.Element => {
                 return true;
               }
               return false;
+            },
+            processCellForClipboard: (row: Table.ActualRow) => {
+              const payment_method = getKeyValue<Table.ActualRow, keyof Table.ActualRow>("payment_method")(row);
+              if (isNil(payment_method)) {
+                return "";
+              }
+              return payment_method.name;
+            },
+            processCellFromClipboard: (name: string) => {
+              if (name.trim() === "") {
+                return null;
+              }
+              const payment_method = findChoiceForName<Model.PaymentMethod>(PaymentMethods, name);
+              if (!isNil(payment_method)) {
+                return payment_method;
+              }
+              return null;
             }
           },
           {

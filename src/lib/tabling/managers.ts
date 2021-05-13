@@ -37,10 +37,6 @@ type BaseFieldConfig<R extends Table.Row, M extends Model.Model> = {
   // Used to transform a value that is on the row (R) model to a value that is
   // included in the HTTP PATCH or POST payloads.
   readonly httpValueConverter?: (value: R[keyof R], field: BaseManagedField<R, M>) => M[keyof M] | undefined;
-  // Used to transform a value that is on the row (R) model to a value that is
-  // stored in the clipboard on copy operations.  Note - typing this as (value: R[keyof R]) seems to
-  // cause problems - we should figure that out.
-  readonly clipboardValueConverter?: (value: any, field: BaseManagedField<R, M>) => any;
 };
 
 type SplitManagedFieldConfig<R extends Table.Row, M extends Model.Model> = BaseFieldConfig<R, M> & {
@@ -82,7 +78,6 @@ abstract class BaseManagedField<R extends Table.Row, M extends Model.Model> {
   readonly modelValueConverter?: (value: M[keyof M], field: BaseManagedField<R, M>) => R[keyof R];
   readonly rowValueConverter?: (value: R[keyof R], field: BaseManagedField<R, M>) => M[keyof M];
   readonly httpValueConverter?: (value: R[keyof R], field: BaseManagedField<R, M>) => M[keyof M] | undefined;
-  readonly clipboardValueConverter?: (value: R[keyof R], field: BaseManagedField<R, M>) => any;
 
   constructor(config: ManagedFieldConfig<R, M>) {
     this.required = config.required;
@@ -95,18 +90,9 @@ abstract class BaseManagedField<R extends Table.Row, M extends Model.Model> {
     this.rowValueConverter = config.rowValueConverter;
     this.modelValueConverter = config.modelValueConverter;
     this.httpValueConverter = config.httpValueConverter;
-    this.clipboardValueConverter = config.clipboardValueConverter;
   }
 
   public abstract getRawValue(obj: ObjType<R, M>): R[keyof R] | M[keyof M] | undefined;
-
-  public getClipboardValue(row: R): any {
-    const value = this.getRowValue(row) as R[keyof R] | undefined;
-    if (!isNil(this.clipboardValueConverter) && value !== undefined) {
-      return this.clipboardValueConverter(value, this);
-    }
-    return value;
-  }
 
   public getHttpValue(row: R | Table.RowChange<R>, method?: Http.Method): any {
     if (!isNil(method) && !includes(this.http, method)) {

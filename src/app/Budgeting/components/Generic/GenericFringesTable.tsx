@@ -1,10 +1,14 @@
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
 import { CellClassParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
+import { getKeyValue } from "lib/util";
+import { FringeUnits } from "lib/model";
+import { findChoiceForName } from "lib/model/util";
 import { FringeRowManager } from "lib/tabling/managers";
 import { percentageToDecimalValueSetter } from "lib/tabling/valueSetters";
 import { percentageValueFormatter } from "lib/tabling/formatters";
@@ -84,6 +88,23 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
               return true;
             }
             return false;
+          },
+          processCellForClipboard: (row: Table.FringeRow) => {
+            const unit = getKeyValue<Table.FringeRow, keyof Table.FringeRow>("unit")(row);
+            if (isNil(unit)) {
+              return "";
+            }
+            return unit.name;
+          },
+          processCellFromClipboard: (name: string) => {
+            if (name.trim() === "") {
+              return null;
+            }
+            const unit = findChoiceForName<Model.FringeUnit>(FringeUnits, name);
+            if (!isNil(unit)) {
+              return unit;
+            }
+            return null;
           }
         },
         {

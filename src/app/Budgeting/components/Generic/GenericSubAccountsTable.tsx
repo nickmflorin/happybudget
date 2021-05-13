@@ -4,8 +4,11 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSigma, faPercentage, faUpload, faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
-import { ColDef, ColSpanParams, SuppressKeyboardEventParams, ValueSetterParams } from "@ag-grid-community/core";
+import { ColDef, ColSpanParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
+import { getKeyValue } from "lib/util";
+import { SubAccountUnits } from "lib/model";
+import { inferModelFromName, findChoiceForName } from "lib/model/util";
 import { currencyValueFormatter } from "lib/tabling/formatters";
 import { floatValueSetter, integerValueSetter } from "lib/tabling/valueSetters";
 
@@ -14,7 +17,7 @@ import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../Budg
 export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends Model.SubAccount, G extends Model.Group>
   extends Omit<
     BudgetTableProps<R, M, G, Http.SubAccountPayload>,
-    "identifierField" | "identifierFieldHeader" | "groupParams"
+    "identifierField" | "identifierFieldHeader" | "groupParams" | "rowCanExpand"
   > {
   categoryName: "Sub Account" | "Detail";
   identifierFieldHeader: "Account" | "Line";
@@ -70,27 +73,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
         onEditGroup,
         onRowAddToGroup
       }}
-      processCellForClipboard={{
-        fringes: (row: R) => {
-          const subAccountFringes: Model.Fringe[] = filter(
-            map(row.fringes, (id: number) => {
-              const fringe: Model.Fringe | undefined = find(fringes, { id });
-              if (!isNil(fringe)) {
-                return fringe;
-              } else {
-                /* eslint-disable no-console */
-                console.error(
-                  `Corrupted Cell Found! Could not convert model value ${id} for field fringes
-                  to a name.`
-                );
-                return null;
-              }
-            }),
-            (fringe: Model.Fringe | null) => fringe !== null
-          ) as Model.Fringe[];
-          return map(subAccountFringes, (fringe: Model.Fringe) => fringe.name).join(", ");
-        }
-      }}
+      rowCanExpand={(row: R) => row.identifier !== null}
       actions={(params: BudgetTableActionsParams<R, G>) => [
         {
           tooltip: "Delete",
@@ -154,6 +137,23 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
               return true;
             }
             return false;
+          },
+          processCellForClipboard: (row: R) => {
+            const unit = getKeyValue<R, keyof R>("unit")(row);
+            if (isNil(unit)) {
+              return "";
+            }
+            return unit.name;
+          },
+          processCellFromClipboard: (name: string) => {
+            if (name.trim() === "") {
+              return null;
+            }
+            const unit = findChoiceForName<Model.SubAccountUnit>(SubAccountUnits, name);
+            if (!isNil(unit)) {
+              return unit;
+            }
+            return null;
           }
         },
         {
@@ -180,47 +180,47 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
             onEdit: () => onEditFringes()
           },
           minWidth: 150,
-          onClearValue: [],
+          nullValue: [],
           cellEditor: fringesCellEditor,
           clearBeforeEdit: true,
           cellEditorParams: fringesCellEditorParams,
+          processCellFromClipboard: (value: string) => {
+            // NOTE: When pasting from the clipboard, the values will be a comma-separated
+            // list of Fringe Names (assuming a rational user).  Currently, Fringe Names are
+            // enforced to be unique, so we can map the Name back to the ID.  However, this might
+            // not always be the case, in which case this logic breaks down.
+            const names = value.split(",");
+            const fs: Model.Fringe[] = filter(
+              map(names, (name: string) => inferModelFromName<Model.Fringe>(fringes, name)),
+              (f: Model.Fringe | null) => f !== null
+            ) as Model.Fringe[];
+            return map(fs, (f: Model.Fringe) => f.id);
+          },
+          processCellForClipboard: (row: R) => {
+            const subAccountFringes: Model.Fringe[] = filter(
+              map(row.fringes, (id: number) => {
+                const fringe: Model.Fringe | undefined = find(fringes, { id });
+                if (!isNil(fringe)) {
+                  return fringe;
+                } else {
+                  /* eslint-disable no-console */
+                  console.error(
+                    `Corrupted Cell Found! Could not convert model value ${id} for field fringes
+                    to a name.`
+                  );
+                  return null;
+                }
+              }),
+              (fringe: Model.Fringe | null) => fringe !== null
+            ) as Model.Fringe[];
+            return map(subAccountFringes, (fringe: Model.Fringe) => fringe.name).join(", ");
+          },
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
             if (params.event.code === "Enter" && params.editing) {
               return true;
             }
             return false;
-          },
-          valueSetter: (params: ValueSetterParams): boolean => {
-            // In the case that the value is an Array, the value will have been  provided as an Array
-            // of IDs from the Fringes dropdown.
-            if (Array.isArray(params.newValue)) {
-              params.data.fringes = params.newValue;
-              return true;
-            } else if (params.newValue === undefined) {
-              // In the case that the user clears the cell via a backspace, the value will be undefined.
-              params.data.fringes = [];
-              return true;
-            } else if (typeof params.newValue === "string") {
-              // In the case that the value is a string, it will have been provided from the user
-              // editing the cell manually or via Copy/Paste, because the processCellForClipboard
-              // formats the value as a comma-separated list of names.
-              const names = params.newValue.split(",");
-              const fringeIds: number[] = filter(
-                map(names, (name: string) => {
-                  const fringe: Model.Fringe | undefined = find(fringes, (fr: Model.Fringe) => fr.name === name.trim());
-                  if (!isNil(fringe)) {
-                    return fringe.id;
-                  }
-                  return null;
-                }),
-                (value: number | null) => value !== null
-              ) as number[];
-              params.data.fringes = fringeIds;
-              return true;
-            } else {
-              return false;
-            }
           }
         },
         ...props.columns

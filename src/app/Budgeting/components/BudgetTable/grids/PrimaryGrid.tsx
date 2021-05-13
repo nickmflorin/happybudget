@@ -53,19 +53,13 @@ import {
   PaymentMethodCellEditor
 } from "../editors";
 import { PrimaryGridProps, CustomColDef } from "../model";
-import { rangeSelectionIsSingleCell } from "../util";
+import { rangeSelectionIsSingleCell, originalColDef } from "../util";
 
-const PrimaryGrid = <
-  R extends Table.Row<G>,
-  M extends Model.Model,
-  G extends Model.Group = Model.Group,
-  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
->({
+const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
   /* eslint-disable indent */
   api,
   columnApi,
   table,
-  manager,
   groups = [],
   options,
   colDefs,
@@ -73,7 +67,8 @@ const PrimaryGrid = <
   frameworkComponents,
   search,
   sizeColumnsToFit,
-  processCellForClipboard = {},
+  processCellForClipboard,
+  processCellFromClipboard,
   rowRefreshRequired,
   setAllSelected,
   isCellEditable,
@@ -83,7 +78,7 @@ const PrimaryGrid = <
   onRowBulkUpdate,
   onRowAdd,
   onRowDelete
-}: PrimaryGridProps<R, M, G, P>): JSX.Element => {
+}: PrimaryGridProps<R, G>): JSX.Element => {
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
 
@@ -273,7 +268,7 @@ const PrimaryGrid = <
               const customColDef = find(colDefs, { field: colId } as any);
               // Only clear cells for which an onClear value is specified - otherwise it can cause bugs.
               if (!isNil(customColDef) && isCellEditable(row, customColDef)) {
-                const clearValue = customColDef.onClearValue !== undefined ? customColDef.onClearValue : null;
+                const clearValue = customColDef.nullValue !== undefined ? customColDef.nullValue : null;
                 if (row[colId] === undefined || row[colId] !== clearValue) {
                   const change: Table.CellChange<any> = { oldValue: row[colId], newValue: clearValue };
                   rowChangeData[colId] = change;
@@ -293,7 +288,7 @@ const PrimaryGrid = <
 
   const getTableChangesFromCellClear = useDynamicCallback(
     (row: R, def: CustomColDef<R, G>): Table.RowChange<R> | null => {
-      const clearValue = def.onClearValue !== undefined ? def.onClearValue : null;
+      const clearValue = def.nullValue !== undefined ? def.nullValue : null;
       const colId = def.field;
       if (row[colId] === undefined || row[colId] !== clearValue) {
         const change: Table.CellChange<any> = { oldValue: row[colId], newValue: clearValue };
@@ -590,13 +585,16 @@ const PrimaryGrid = <
     }
     return false;
   });
+
   return (
     <div className={"table-grid"}>
       <AgGridReact
         {...options}
-        columnDefs={colDefs}
+        columnDefs={map(colDefs, (colDef: CustomColDef<R, G>) => originalColDef(colDef))}
         getContextMenuItems={getContextMenuItems}
         allowContextMenuWithControlKey={true}
+        // Required to get processCellFromClipboard to work with column spanning.
+        suppressCopyRowsToClipboard={true}
         rowData={table}
         debug={process.env.NODE_ENV === "development" && TABLE_DEBUG}
         getRowNodeId={(r: any) => r.id}
@@ -606,28 +604,15 @@ const PrimaryGrid = <
         onGridReady={onGridReady}
         /* @ts-ignore */
         modules={AllModules}
-        onCellKeyPress={(event: any) => {
-          if (!isNil(event.event) && event.event.code === "Enter") {
-            event.event.stopImmediatePropagation();
-          }
-        }}
         processCellForClipboard={(params: ProcessCellForExportParams) => {
           if (!isNil(params.node)) {
-            const row: R = params.node.data;
-            const colDef = params.column.getColDef();
-            if (!isNil(colDef.field)) {
-              const processor = processCellForClipboard[colDef.field as keyof R];
-              if (!isNil(processor)) {
-                return processor(row);
-              } else {
-                const field = manager.getField(colDef.field as keyof R);
-                if (field !== null) {
-                  return field.getClipboardValue(row);
-                }
-              }
-            }
+            return processCellForClipboard(params.column, params.node.data as R, params.value);
           }
-          return "";
+        }}
+        processCellFromClipboard={(params: ProcessCellForExportParams) => {
+          if (!isNil(params.node)) {
+            return processCellFromClipboard(params.column, params.node.data as R, params.value);
+          }
         }}
         rowHeight={36}
         headerHeight={38}
