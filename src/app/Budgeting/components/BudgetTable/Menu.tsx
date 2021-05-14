@@ -36,7 +36,7 @@ const BudgetTableMenu = <R extends Table.Row<G>, G extends Model.Group = Model.G
     <PortalOrRender id={"supplementary-header"} visible={true} portal={!detached}>
       <div className={classNames("table-header", { detached })}>
         <div className={"table-header-left"}>
-          <Tooltip title={"Select All"}>
+          <Tooltip title={"Select All"} placement={"bottom"}>
             <Checkbox checked={selected} onChange={(e: CheckboxChangeEvent) => onSelectAll(e.target.checked)} />
           </Tooltip>
           {!isNil(actions) && (

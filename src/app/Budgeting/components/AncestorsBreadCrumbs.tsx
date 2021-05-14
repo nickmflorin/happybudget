@@ -1,6 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { map, isNil, orderBy } from "lodash";
+import { Tooltip } from "antd";
 import classNames from "classnames";
 
 import { Dropdown, ShowHide } from "components";
@@ -89,7 +90,9 @@ interface AncestorBreadCrumbBudgetItemProps {
 const AncestorBreadCrumbBudgetItem = ({ budget }: AncestorBreadCrumbBudgetItemProps): JSX.Element => {
   return (
     <AncestorBreadCrumbItem url={getUrl(budget)}>
-      <div className={"budget-text-wrapper"}>{budget.name}</div>
+      <Tooltip title={"Top Sheet"} placement={"bottom"}>
+        <div className={"budget-text-wrapper"}>{budget.name}</div>
+      </Tooltip>
     </AncestorBreadCrumbItem>
   );
 };
