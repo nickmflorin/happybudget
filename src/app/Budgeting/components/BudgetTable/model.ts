@@ -1,6 +1,17 @@
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
-import { ColDef, CellClassParams, GridOptions, ColumnApi, GridApi, Column } from "@ag-grid-community/core";
+import { ColDef, CellClassParams, GridOptions, ColumnApi, GridApi, Column, RowNode } from "@ag-grid-community/core";
 import RowManager from "lib/tabling/managers";
+
+// TODO: Start consolidating with the RowChange related types in the global type set.
+export interface CellValueChangedParams<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+  readonly column: Column;
+  readonly row: R;
+  readonly oldRow: R | null;
+  readonly node: RowNode;
+  readonly oldValue: any;
+  readonly newValue: any;
+  readonly change: Table.RowChange<R>;
+}
 
 export interface BudgetTableMenuAction {
   readonly icon: JSX.Element;
@@ -114,6 +125,7 @@ export interface PrimaryGridProps<R extends Table.Row<G>, G extends Model.Group 
   readonly table: R[];
   readonly options: GridOptions;
   readonly colDefs: CustomColDef<R, G>[];
+  readonly onCellValueChanged: (params: CellValueChangedParams<R, G>) => void;
   readonly setAllSelected: (value: boolean) => void;
   readonly isCellEditable: (row: R, colDef: ColDef | CustomColDef<R, G>) => boolean;
   readonly setApi: (api: GridApi) => void;

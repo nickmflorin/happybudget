@@ -20,12 +20,11 @@ import { RenderWithSpinner } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString, updateFieldOrdering, orderByFieldOrdering, getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
-import { mergeClassNames, mergeClassNamesFn } from "lib/tabling/util";
 import { currencyValueFormatter } from "lib/tabling/formatters";
 
-import { BudgetTableProps, CustomColDef } from "./model";
+import { BudgetTableProps, CellValueChangedParams, CustomColDef } from "./model";
 import BudgetTableMenu from "./Menu";
-import { validateCookiesOrdering } from "./util";
+import { validateCookiesOrdering, mergeClassNames, mergeClassNamesFn } from "./util";
 import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
 import "./index.scss";
 
@@ -556,6 +555,17 @@ const BudgetTable = <
     return "";
   });
 
+  const onCellValueChanged = useDynamicCallback((params: CellValueChangedParams<R, G>) => {
+    if (!isNil(gridApi) && !isNil(columnApi) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
+      const col = columnApi.getColumn("expand");
+      if (!isNil(col)) {
+        if (isNil(params.oldRow) || rowCanExpand(params.oldRow) !== rowCanExpand(params.row)) {
+          gridApi.refreshCells({ force: true, rowNodes: [params.node], columns: [col] });
+        }
+      }
+    }
+  });
+
   return (
     <React.Fragment>
       <BudgetTableMenu<R, G>
@@ -647,6 +657,7 @@ const BudgetTable = <
           <PrimaryGrid<R, G>
             api={gridApi}
             columnApi={columnApi}
+            onCellValueChanged={onCellValueChanged}
             setApi={setGridApi}
             setColumnApi={setColumnApi}
             table={table}

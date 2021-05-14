@@ -84,6 +84,8 @@ const Actuals = (): JSX.Element => {
         placeholders={placeholders}
         manager={ActualRowManager}
         selected={selected}
+        // TODO: Make this field use an object that has the `object_id` and `parent_type`
+        // in it, removing the requirement of the rowRefreshRequired callback.
         identifierField={"object_id"}
         identifierFieldHeader={"Account"}
         identifierColumn={{

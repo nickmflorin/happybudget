@@ -46,6 +46,8 @@ namespace Table {
   type RowChange<R extends Table.Row> = {
     id: number;
     data: Table.RowChangeData<R>;
+    // row: R;
+    // oldRow: R;
   };
 
   interface ActivatePlaceholderPayload<M> {

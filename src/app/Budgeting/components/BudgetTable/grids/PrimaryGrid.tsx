@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import classNames from "classnames";
 import { map, isNil, includes, find, uniq, forEach, filter, flatten } from "lodash";
 
@@ -23,7 +23,8 @@ import {
   FirstDataRenderedEvent,
   SuppressKeyboardEventParams,
   ProcessCellForExportParams,
-  CellRange
+  CellRange,
+  CellEditingStartedEvent
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -70,6 +71,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   processCellForClipboard,
   processCellFromClipboard,
   rowRefreshRequired,
+  onCellValueChanged,
   setAllSelected,
   isCellEditable,
   setApi,
@@ -81,6 +83,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
 }: PrimaryGridProps<R, G>): JSX.Element => {
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
+  const oldRow = useRef<R | null>(null);
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     if (sizeColumnsToFit === true) {
@@ -306,11 +309,15 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     event: CellEditingStoppedEvent | CellValueChangedEvent
   ): Table.RowChange<R> | null => {
     const field = event.column.getColId() as keyof R;
-    // NOTE: We want to allow the setting of fields to `null` - so we just have to make sure it is
-    // not `undefined`.
-    if (event.newValue !== undefined) {
-      if (event.oldValue === undefined || event.oldValue !== event.newValue) {
-        const change: Table.CellChange<R[keyof R]> = { oldValue: event.oldValue, newValue: event.newValue };
+    // AG Grid treats cell values as undefined when they are cleared via edit,
+    // so we need to translate that back into a null representation.
+    const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field } as any);
+    if (!isNil(customColDef)) {
+      const nullValue = customColDef.nullValue === undefined ? null : customColDef.nullValue;
+      const oldValue = event.oldValue === undefined ? nullValue : event.oldValue;
+      const newValue = event.newValue === undefined ? nullValue : event.newValue;
+      if (oldValue !== newValue) {
+        const change: Table.CellChange<R[keyof R]> = { oldValue, newValue };
         const d: { [key in keyof R]?: Table.CellChange<R[key]> } = {};
         d[field as keyof R] = change;
         return { id: event.data.id, data: d };
@@ -362,13 +369,22 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   });
 
-  const onCellValueChanged = useDynamicCallback((event: CellValueChangedEvent) => {
+  const _onCellValueChanged = useDynamicCallback((event: CellValueChangedEvent) => {
     if (event.source === "paste") {
       setCellChangeEvents([...cellChangeEvents, event]);
     } else {
       const tableChange = getTableChangeFromEvent(event);
       if (!isNil(tableChange)) {
         onRowUpdate(tableChange);
+        onCellValueChanged({
+          row: event.node.data as R,
+          oldRow: oldRow.current,
+          column: event.column,
+          oldValue: event.oldValue,
+          newValue: event.newValue,
+          change: tableChange,
+          node: event.node
+        });
       }
     }
   });
@@ -473,21 +489,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       api.setQuickFilter(search);
     }
   }, [search, api]);
-
-  useEffect(() => {
-    if (!isNil(api) && !isNil(rowRefreshRequired)) {
-      api.forEachNode((node: RowNode) => {
-        const existing: R | undefined = find(table, { id: node.data.id });
-        if (!isNil(existing)) {
-          // TODO: We should figure out how to configure the API to just refresh the row at the
-          // relevant column.
-          if (rowRefreshRequired(existing, node.data)) {
-            api.refreshCells({ force: true, rowNodes: [node] });
-          }
-        }
-      });
-    }
-  }, [useDeepEqualMemo(table), api, rowRefreshRequired]);
 
   useEffect(() => {
     // Changes to the state of the selected rows does not trigger a refresh of those cells via AG
@@ -625,6 +626,9 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         onCellKeyDown={onCellKeyDown}
         onFirstDataRendered={onFirstDataRendered}
         suppressKeyboardEvent={suppressKeyboardEvent}
+        onCellEditingStarted={(event: CellEditingStartedEvent) => {
+          oldRow.current = { ...event.node.data };
+        }}
         // NOTE: This might not be 100% necessary, because of how efficiently
         // we are managing the state updates to the data that flows into the table.
         // However, for now we will leave.  It is important to note that this will
@@ -654,7 +658,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         }}
         onPasteStart={onPasteStart}
         onPasteEnd={onPasteEnd}
-        onCellValueChanged={onCellValueChanged}
+        onCellValueChanged={_onCellValueChanged}
         fillOperation={(params: FillOperationParams) => {
           if (params.initialValues.length === 1) {
             return false;

@@ -65,7 +65,6 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           return row.meta.children.length === 0;
         }
       }}
-      rowRefreshRequired={(existing: R, row: R) => existing.unit !== row.unit}
       groupParams={{
         onDeleteGroup,
         onRowRemoveFromGroup,

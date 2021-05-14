@@ -1,6 +1,6 @@
 import { forEach, isNil, includes, find } from "lodash";
 import { generateRandomNumericId, getKeyValue } from "lib/util";
-import { isRowChange, isRow, isRowChangeData, isModel } from "./typeguards";
+import { isRowChange, isRow, isRowChangeData, isModel } from "lib/tabling/typeguards";
 
 type BaseFieldConfig<R extends Table.Row, M extends Model.Model> = {
   // Whether or not the field is required to be present for POST requests (i.e.
@@ -360,6 +360,8 @@ class RowManager<
     return obj as R;
   };
 
+  // TODO: Figure out how to combine mergeChangesWithRow and mergeChangesWithModel into
+  // a single mergeChanges method that is typed with overloads.
   public mergeChangesWithRow = (obj: R, change: Table.RowChange<R>): R => {
     const row: R = { ...obj };
     forEach(this.fields, (field: ManagedField<R, M>) => {
@@ -451,10 +453,10 @@ export const BudgetAccountRowManager = new RowManager<
   Http.BudgetAccountPayload
 >({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
+    ManageField({ field: "description" }),
     // We want to attribute the full group to the row, not just the ID.
     ManageField({ field: "group", allowNull: true, inRow: false }),
-    ManageField({ field: "identifier", allowNull: true }),
+    ManageField({ field: "identifier" }),
     ManageField({ field: "estimated", readOnly: true }),
     ManageField({ field: "variance", readOnly: true }),
     ManageField({ field: "actual", readOnly: true })
@@ -473,10 +475,10 @@ export const TemplateAccountRowManager = new RowManager<
   Http.TemplateAccountPayload
 >({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
+    ManageField({ field: "description" }),
     // We want to attribute the full group to the row, not just the ID.
     ManageField({ field: "group", allowNull: true, inRow: false }),
-    ManageField({ field: "identifier", allowNull: true }),
+    ManageField({ field: "identifier" }),
     ManageField({ field: "estimated", readOnly: true })
   ],
   childrenGetter: (model: Model.TemplateAccount) => model.subaccounts,
@@ -493,8 +495,8 @@ export const BudgetSubAccountRowManager = new RowManager<
   Http.SubAccountPayload
 >({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
-    ManageField({ field: "name", allowNull: true }),
+    ManageField({ field: "description", allowBlank: true }),
+    ManageField({ field: "name", allowBlank: true }),
     // We want to attribute the full group to the row, not just the ID.
     ManageField({ field: "group", allowNull: true, inRow: false }),
     ManageField({ field: "quantity", allowNull: true }),
@@ -510,7 +512,7 @@ export const BudgetSubAccountRowManager = new RowManager<
         return null;
       }
     }),
-    ManageField({ field: "identifier", allowNull: true }),
+    ManageField({ field: "identifier" }),
     ManageField({ field: "estimated", readOnly: true }),
     ManageField({ field: "variance", readOnly: true }),
     ManageField({ field: "actual", readOnly: true }),
@@ -530,8 +532,8 @@ export const TemplateSubAccountRowManager = new RowManager<
   Http.SubAccountPayload
 >({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
-    ManageField({ field: "name", allowNull: true }),
+    ManageField({ field: "description", allowBlank: true }),
+    ManageField({ field: "name", allowBlank: true }),
     // We want to attribute the full group to the row, not just the ID.
     ManageField({ field: "group", allowNull: true, inRow: false }),
     ManageField({ field: "quantity", allowNull: true }),
@@ -547,7 +549,7 @@ export const TemplateSubAccountRowManager = new RowManager<
         return null;
       }
     }),
-    ManageField({ field: "identifier", allowNull: true }),
+    ManageField({ field: "identifier" }),
     ManageField({ field: "estimated", readOnly: true }),
     ManageField({ field: "fringes", allowNull: true, placeholderValue: [] })
   ],
@@ -560,7 +562,7 @@ export const TemplateSubAccountRowManager = new RowManager<
 
 export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
+    ManageField({ field: "description" }),
     ManageField({
       field: "object_id",
       http: ["PATCH"],
@@ -571,12 +573,11 @@ export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Mo
       http: ["PATCH"],
       required: true
     }),
-    ManageField({ field: "vendor", allowNull: true }),
-    ManageField({ field: "purchase_order", allowNull: true }),
-    ManageField({ field: "date", allowNull: true }),
+    ManageField({ field: "vendor" }),
+    ManageField({ field: "purchase_order" }),
+    ManageField({ field: "date" }),
     ManageField({
       field: "payment_method",
-      allowNull: true,
       httpValueConverter: (value: Model.PaymentMethod): number | null | undefined => {
         if (value !== null) {
           return value.id;
@@ -584,8 +585,8 @@ export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Mo
         return null;
       }
     }),
-    ManageField({ field: "payment_id", allowNull: true }),
-    ManageField({ field: "value", allowNull: true })
+    ManageField({ field: "payment_id" }),
+    ManageField({ field: "value" })
   ],
   labelGetter: (model: Model.Actual) => String(model.object_id),
   typeLabel: "Actual",
@@ -595,13 +596,13 @@ export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Mo
 export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>({
   fields: [
     ManageField({ field: "name", required: true }),
-    ManageField({ field: "description", allowNull: true }),
-    ManageField({ field: "cutoff", allowNull: true }),
-    ManageField({ field: "rate", allowNull: true }),
+    ManageField({ field: "description", allowNull: false }),
+    ManageField({ field: "cutoff", allowNull: false }),
+    ManageField({ field: "rate", allowNull: false }),
     ManageField({ field: "color", allowNull: true }),
     ManageField({
       field: "unit",
-      allowNull: true,
+      allowNull: false,
       httpValueConverter: (value: Model.FringeUnit): number | null | undefined => {
         if (value !== null) {
           return value.id;
