@@ -55,7 +55,8 @@ const genericReducer = combineReducers({
   }),
   budgetItemsTree: createModelListResponseReducer<Model.AccountTreeNode>({
     Response: ActionType.Budget.BudgetItemsTree.Response,
-    Loading: ActionType.Budget.BudgetItemsTree.Loading
+    Loading: ActionType.Budget.BudgetItemsTree.Loading,
+    SetSearch: ActionType.Budget.BudgetItemsTree.SetSearch
   })
 });
 

@@ -51,7 +51,8 @@ import {
   BudgetFringesCellEditor,
   FringeUnitCellEditor,
   TemplateFringesCellEditor,
-  PaymentMethodCellEditor
+  PaymentMethodCellEditor,
+  BudgetItemsTreeEditor
 } from "../editors";
 import { PrimaryGridProps, CustomColDef } from "../model";
 import { rangeSelectionIsSingleCell, originalColDef } from "../util";
@@ -70,7 +71,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   sizeColumnsToFit,
   processCellForClipboard,
   processCellFromClipboard,
-  rowRefreshRequired,
   onCellValueChanged,
   setAllSelected,
   isCellEditable,
@@ -653,6 +653,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
           TemplateFringesCellEditor,
           SubAccountUnitCellEditor,
           PaymentMethodCellEditor,
+          BudgetItemsTreeEditor,
           agColumnHeader: HeaderCell,
           ...frameworkComponents
         }}

@@ -12,6 +12,7 @@ export const loadingBudgetItemsTreeAction = simpleAction<boolean>(ActionType.Bud
 export const responseBudgetItemsTreeAction = simpleAction<Http.ListResponse<Model.AccountTreeNode>>(
   ActionType.Budget.BudgetItemsTree.Response
 );
+export const setBudgetItemsTreeSearchAction = simpleAction<string>(ActionType.Budget.BudgetItemsTree.SetSearch);
 
 export const bulkUpdateBudgetActualsAction = simpleAction<Table.RowChange<Table.ActualRow>[]>(
   ActionType.Budget.BulkUpdateActuals

@@ -6,8 +6,7 @@ import { faPlus } from "@fortawesome/pro-light-svg-icons";
 
 import { ICellEditorParams } from "@ag-grid-community/core";
 
-import { TypeAgnosticExpandedModelTagsMenu } from "components/menus";
-import { ExpandedModelTagsMenuRef } from "components/menus/ExpandedModelTagsMenu";
+import { TypeAgnosticExpandedModelTagsMenu, ExpandedModelMenuRef } from "components/menus";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
@@ -22,7 +21,7 @@ export interface FringesCellEditorProps<R extends Table.Row<G>, G extends Model.
 
 const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>, ref: any) => {
   const isFirstRender = useRef(true);
-  const menuRef = useRef<ExpandedModelTagsMenuRef>(null);
+  const menuRef = useRef<ExpandedModelMenuRef<Model.Fringe>>(null);
   const [value, setValue] = useState<number[]>(props.value);
 
   useEffect(() => {

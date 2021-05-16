@@ -32,8 +32,8 @@ export type ModelTagsDropdownProps<M extends Model.Model, V extends number = num
   Omit<DropDownProps, "trigger" | "className" | "overlay"> & {
     className?: string;
     trigger?: ("click" | "hover" | "contextMenu")[];
-    modelTextField?: keyof M;
-    modelColorField?: keyof M;
+    modelTextField?: keyof M & string;
+    modelColorField?: keyof M & string;
     models: M[];
     onMissing?: JSX.Element | EmptyTagProps;
     emptyItem?: {

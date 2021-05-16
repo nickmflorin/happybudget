@@ -21,7 +21,7 @@ export const createTablePlaceholdersReducer = <
   A extends Redux.Action<any> = Redux.Action<any>
 >(
   mappings: Partial<ITablePlaceholdersActionMap>,
-  manager: RowManager<R, M, G, P>,
+  manager: RowManager<R, M, P, G>,
   options: Partial<FactoryOptions<Redux.ListStore<R>>> = {}
 ) => {
   const Options = mergeOptionsWithDefaults<Redux.ListStore<R>>(options, []);

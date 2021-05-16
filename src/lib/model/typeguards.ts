@@ -39,3 +39,15 @@ export const isModelWithColor = (model: Model.Model | Model.ModelWithColor): mod
 export const isModelWithName = (model: Model.Model | Model.ModelWithName): model is Model.ModelWithName => {
   return (model as Model.ModelWithName).name !== undefined;
 };
+
+export const isAccountTreeNode = (
+  node: Model.AccountTreeNode | Model.SubAccountTreeNode
+): node is Model.AccountTreeNode => {
+  return (node as Model.AccountTreeNode).type === "account";
+};
+
+export const isSubAccountTreeNode = (
+  node: Model.AccountTreeNode | Model.SubAccountTreeNode
+): node is Model.SubAccountTreeNode => {
+  return (node as Model.SubAccountTreeNode).type === "subaccount";
+};

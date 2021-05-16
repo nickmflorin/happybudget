@@ -72,7 +72,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
         onEditGroup,
         onRowAddToGroup
       }}
-      rowCanExpand={(row: R) => row.identifier !== null}
+      rowCanExpand={(row: R) => row.identifier !== null || row.meta.children.length !== 0}
       actions={(params: BudgetTableActionsParams<R, G>) => [
         {
           tooltip: "Delete",

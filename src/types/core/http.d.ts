@@ -118,6 +118,7 @@ namespace Http {
     readonly cutoff?: number | null;
     readonly rate: number;
     readonly unit?: Model.FringeUnit;
+    readonly color?: string | null;
   }
 
   interface BudgetPayload implements Http.ModelPayload<Model.Budget> {
@@ -160,6 +161,7 @@ namespace Http {
     readonly multiplier?: number | null;
     readonly unit?: Model.SubAccountUnitId | null;
     readonly group?: number | null;
+    readonly fringes: number[];
   }
 
   interface ActualPayload implements Http.ModelPayload<Model.Actual> {
@@ -169,7 +171,7 @@ namespace Http {
     readonly purchase_order?: string;
     readonly payment_id?: string;
     readonly value?: number;
-    readonly payment_method?: Model.PaymentMethodId;
+    readonly payment_method?: Model.PaymentMethodId | null;
     readonly object_id?: number;
     readonly parent_type?: "account" | "subaccount";
   }

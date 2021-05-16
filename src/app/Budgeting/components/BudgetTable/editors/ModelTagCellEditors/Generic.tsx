@@ -1,8 +1,7 @@
 import { useImperativeHandle, useRef, useState, useEffect } from "react";
 import { isNil } from "lodash";
 
-import { TypeAgnosticExpandedModelTagsMenu } from "components/menus";
-import { ExpandedModelTagsMenuRef } from "components/menus/ExpandedModelTagsMenu";
+import { TypeAgnosticExpandedModelTagsMenu, ExpandedModelMenuRef } from "components/menus";
 
 import { ICellEditorParams } from "@ag-grid-community/core";
 
@@ -16,7 +15,7 @@ interface ModelTagCellEditorProps<M extends Model.Model> extends ICellEditorPara
 
 const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProps<M>) => {
   const isFirstRender = useRef(true);
-  const menuRef = useRef<ExpandedModelTagsMenuRef>(null);
+  const menuRef = useRef<ExpandedModelMenuRef<M>>(null);
   const [value, setValue] = useState<M | null>(props.value);
 
   useEffect(() => {

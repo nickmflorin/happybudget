@@ -1,223 +1,393 @@
-import { forEach, isNil, includes, find } from "lodash";
+import { forEach, isNil, includes, find, filter } from "lodash";
 import { generateRandomNumericId, getKeyValue } from "lib/util";
-import { isRowChange, isRow, isRowChangeData, isModel } from "./typeguards";
+import { isRowChange, isRow, isRowChangeData } from "./typeguards";
 
-type BaseFieldConfig<R extends Table.Row, M extends Model.Model> = {
+type BaseFieldConfig = {
   // Whether or not the field is required to be present for POST requests (i.e.
   // when creating a new instance).  If the field is required, the mechanics will
   // wait until a value is present for the field before creating an instance
   // via an HTTP POST request that is associated with the row (R).
   readonly required?: boolean;
+  // The value that should be included for the field in the Placeholder row.
+  readonly placeholderValue?: any;
+};
+
+type ReadFieldConfig = BaseFieldConfig & {
+  readonly read: true;
+  // Whether or not the model (M) field value should be used to construct the
+  // row (R) model.
+  readonly modelOnly?: boolean;
+  // Whether or not the row (R) field should be used to update the model (M).
+  readonly rowOnly?: boolean;
+};
+
+type WriteFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = BaseFieldConfig & {
+  readonly write: true;
   // Whether or not the field value is allowed to take on null values for HTTP
   // requests.
   readonly allowNull?: boolean;
   // Whether or not the field value is allowed to take on empty string values for
   // HTTP requests.
   readonly allowBlank?: boolean;
-  // The value that should be included for the field in the Placeholder row.
-  readonly placeholderValue?: any;
-  // Whether or not the model (M) field value should be used to construct the
-  // row (R) model.
-  readonly inRow?: boolean;
   // The HTTP methods that the field should be used for.  Defaults to PATCH and
-  // POST requests.  Note that setting http: [] is the same as setting readOnly: true.
+  // POST requests.
   readonly http?: Http.Method[];
-  // If set to True, will not be included in HTTP requests to update or create
-  // the instance associated with the field - but will be used to translate a
-  // received instance via an HTTP GET request to the corresponding model (M).
-  readonly readOnly?: boolean;
-  // Used to translate a field-value pair on the model (M) model to a field-value
-  // pair on the row (R) model.  Note - typing this as (value: M[keyof M]) seems to
-  // cause problems - we should figure that out.
-  readonly modelValueConverter?: (value: any, field: BaseManagedField<R, M>) => R[keyof R];
-  // Used to translate a field-value pair on the row (R) model to a field-value
-  // pair on the model (M) model.  Note - typing this as (value: R[keyof R]) seems to
-  // cause problems - we should figure that out.
-  readonly rowValueConverter?: (value: any, field: BaseManagedField<R, M>) => M[keyof M];
   // Used to transform a value that is on the row (R) model to a value that is
   // included in the HTTP PATCH or POST payloads.
-  readonly httpValueConverter?: (value: R[keyof R], field: BaseManagedField<R, M>) => M[keyof M] | undefined;
+  readonly httpValueConverter?: (value: R[keyof R]) => P[keyof P] | undefined;
 };
 
-type SplitManagedFieldConfig<R extends Table.Row, M extends Model.Model> = BaseFieldConfig<R, M> & {
+type ReadWriteFieldConfig<
+  R extends Table.Row,
+  M extends Model.Model,
+  P extends Http.ModelPayload<M>
+> = WriteFieldConfig<R, M, P> & ReadFieldConfig;
+
+// Field configuration for Field that is included in HTTP requests to update or
+// create the instance but not on the model (M) or row (R).
+type WriteOnlyFieldConfig<
+  R extends Table.Row,
+  M extends Model.Model,
+  P extends Http.ModelPayload<M>
+> = WriteFieldConfig<R, M, P> & {
+  readonly field: keyof P;
+  readonly writeOnly: true;
+  readonly getValueFromRowChangeData: (data: Table.RowChangeData<R>) => P[keyof P] | undefined;
+  readonly getValueFromRow: (row: R) => P[keyof P] | undefined;
+};
+
+// Field configuration for Field that is not included in HTTP requests to update or
+// create the instance but present on the model (M) and row (R).
+type ReadOnlyFieldConfig<R extends Table.Row, M extends Model.Model> = ReadFieldConfig & {
+  readonly field: keyof M & keyof R;
+  readonly readOnly: true;
+};
+
+type SplitReadWriteFieldConfig<
+  R extends Table.Row,
+  M extends Model.Model,
+  P extends Http.ModelPayload<M>
+> = ReadWriteFieldConfig<R, M, P> & {
   // The name of the field on the model (M) model that the field configuration
   // corresponds to.
-  readonly modelField: keyof M;
+  readonly modelField: keyof M & keyof P;
   // The name of the field on the row (R) model that the field configuration
   // corresponds to.
   readonly rowField: keyof R;
 };
 
-type AgnosticManagedFieldConfig<R extends Table.Row, M extends Model.Model> = BaseFieldConfig<R, M> & {
+type AgnosticReadWriteFieldConfig<
+  R extends Table.Row,
+  M extends Model.Model,
+  P extends Http.ModelPayload<M>
+> = ReadWriteFieldConfig<R, M, P> & {
   // The name of the field on both the row (R) model and model (M) model that the
   // field configuration corresponds to.
-  readonly field: keyof M & keyof R;
+  readonly field: keyof M & keyof R & keyof P;
 };
 
-type ManagedFieldConfig<R extends Table.Row, M extends Model.Model> =
-  | SplitManagedFieldConfig<R, M>
-  | AgnosticManagedFieldConfig<R, M>;
-
-const isSplitConfig = <R extends Table.Row, M extends Model.Model>(
-  config: ManagedFieldConfig<R, M>
-): config is SplitManagedFieldConfig<R, M> => {
-  return (config as SplitManagedFieldConfig<R, M>).modelField !== undefined;
+const isSplitConfig = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+  config:
+    | Omit<AgnosticReadWriteFieldConfig<R, M, P>, "read" | "write">
+    | Omit<SplitReadWriteFieldConfig<R, M, P>, "read" | "write">
+): config is Omit<SplitReadWriteFieldConfig<R, M, P>, "read" | "write"> => {
+  return (
+    (config as SplitReadWriteFieldConfig<R, M, P>).modelField !== undefined &&
+    (config as SplitReadWriteFieldConfig<R, M, P>).rowField !== undefined
+  );
 };
 
 type PayloadType<T, P, R extends Table.Row> = T extends Table.RowChange<R> ? Partial<P> : P;
+type RowObjType<R extends Table.Row> = R | Table.RowChange<R> | Table.RowChangeData<R>;
 type ObjType<R extends Table.Row, M extends Model.Model> = R | M | Table.RowChange<R> | Table.RowChangeData<R>;
 
-abstract class BaseManagedField<R extends Table.Row, M extends Model.Model> {
+abstract class BaseField<R extends Table.Row, M extends Model.Model> {
   readonly required?: boolean;
-  readonly readOnly?: boolean;
+  readonly placeholderValue?: any;
+
+  constructor(config: BaseFieldConfig) {
+    this.required = config.required;
+    this.placeholderValue = config.placeholderValue;
+  }
+
+  // public abstract getValue(obj: ObjType<R, M, P>): R[keyof R] | M[keyof M] | undefined;
+  public abstract getValueFromRowChangeData(data: Table.RowChangeData<R>): R[keyof R] | undefined;
+  public abstract getValueFromRow(row: R): R[keyof R] | undefined;
+  public abstract getValue(obj: ObjType<R, M>): R[keyof R] | M[keyof M] | R[keyof M & keyof R] | undefined;
+  public abstract getValue(obj: RowObjType<R>): any;
+}
+
+abstract class WriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> extends BaseField<
+  R,
+  M
+> {
   readonly allowNull?: boolean;
   readonly allowBlank?: boolean;
   readonly http: Http.Method[];
-  readonly placeholderValue?: any;
-  readonly inRow?: boolean;
-  readonly modelValueConverter?: (value: M[keyof M], field: BaseManagedField<R, M>) => R[keyof R];
-  readonly rowValueConverter?: (value: R[keyof R], field: BaseManagedField<R, M>) => M[keyof M];
-  readonly httpValueConverter?: (value: R[keyof R], field: BaseManagedField<R, M>) => M[keyof M] | undefined;
+  readonly httpValueConverter?: (value: R[keyof R]) => P[keyof P] | undefined;
+  readonly write = true;
 
-  constructor(config: ManagedFieldConfig<R, M>) {
-    this.required = config.required;
-    this.readOnly = config.readOnly;
-    this.allowBlank = config.allowBlank;
-    this.allowNull = config.allowNull;
-    this.http = config.http || ["POST", "PATCH"];
-    this.placeholderValue = config.placeholderValue;
-    this.inRow = config.inRow;
-    this.rowValueConverter = config.rowValueConverter;
-    this.modelValueConverter = config.modelValueConverter;
-    this.httpValueConverter = config.httpValueConverter;
+  constructor({
+    allowNull,
+    allowBlank,
+    http,
+    httpValueConverter,
+    ...config
+  }: Omit<WriteFieldConfig<R, M, P>, "write">) {
+    super(config);
+    this.allowBlank = allowBlank;
+    this.allowNull = allowNull;
+    this.http = isNil(http) || http.length === 0 ? ["POST", "PATCH"] : http;
+    this.httpValueConverter = httpValueConverter;
   }
 
-  public abstract getRawValue(obj: ObjType<R, M>): R[keyof R] | M[keyof M] | undefined;
-
-  public getHttpValue(row: R | Table.RowChange<R>, method?: Http.Method): any {
+  public getHttpValue(row: R | Table.RowChange<R>, method?: Http.Method): P[keyof P] | undefined {
     if (!isNil(method) && !includes(this.http, method)) {
       return undefined;
     }
     // TODO: See note below about intelligently casting return type to either
     // R[keyof R] | undefined OR M[keyof M] | undefined.  Once that is established,
     // this force coercion will not be necessary anymore.
-    const value = this.getRowValue(row) as R[keyof R] | undefined;
+    const value = this.getValue(row) as R[keyof R] | undefined;
     if (!isNil(this.httpValueConverter) && value !== undefined) {
-      return this.httpValueConverter(value, this);
+      return this.httpValueConverter(value);
     }
     return value;
   }
-
-  public getModelValue(obj: ObjType<R, M>): M[keyof M] | R[keyof M & keyof R] | undefined {
-    const value = this.getRawValue(obj);
-    if (isModel(obj)) {
-      return value as M[keyof M] | undefined;
-    }
-    if (!isNil(this.rowValueConverter) && value !== undefined) {
-      return this.rowValueConverter(value as R[keyof R], this);
-    }
-    return value as M[keyof M];
-  }
-
-  public getRowValue(obj: ObjType<R, M>): R[keyof R] | R[keyof M & keyof R] | undefined {
-    const value = this.getRawValue(obj);
-    if (!isModel(obj)) {
-      return value as R[keyof R] | undefined;
-    }
-    if (!isNil(this.modelValueConverter) && value !== undefined) {
-      return this.modelValueConverter(value as M[keyof M], this);
-    }
-    return value as R[keyof R];
-  }
 }
 
-export class AgnosticManagedField<R extends Table.Row, M extends Model.Model>
-  extends BaseManagedField<R, M>
-  implements AgnosticManagedFieldConfig<R, M> {
-  readonly field: keyof M & keyof R;
-
-  constructor(config: AgnosticManagedFieldConfig<R, M>) {
-    super(config);
-    this.field = config.field;
-  }
-
-  // TODO: Intelligently cast return type to either R[keyof R] | undefined OR M[keyof M] | undefined.
-  public getRawValue(obj: ObjType<R, M>): R[keyof R] | M[keyof M] | R[keyof M & keyof R] | undefined {
-    if (isRowChange<R, M>(obj)) {
-      const data: { [key in keyof R]?: Table.CellChange<R[key]> } = obj.data;
-      return this.getRawValue(data);
-    } else if (isRowChangeData<R, M>(obj)) {
-      const cellChange: Table.CellChange<R[keyof R]> | undefined = getKeyValue<
-        { [key in keyof R]?: Table.CellChange<R[key]> },
-        keyof R
-      >(this.field)(obj);
-      if (cellChange !== undefined) {
-        return cellChange.newValue;
-      }
-      return undefined;
-    } else if (isRow<R, M>(obj)) {
-      return getKeyValue<R, keyof R>(this.field)(obj);
-    } else {
-      return getKeyValue<M, keyof M>(this.field)(obj);
-    }
-  }
-}
-
-export class SplitManagedField<R extends Table.Row, M extends Model.Model>
-  extends BaseManagedField<R, M>
-  implements SplitManagedFieldConfig<R, M> {
-  readonly modelField: keyof M;
+abstract class ReadField<R extends Table.Row, M extends Model.Model>
+  extends BaseField<R, M>
+  implements ReadFieldConfig {
+  readonly modelOnly?: boolean;
+  readonly rowOnly?: boolean;
+  readonly read = true;
   readonly rowField: keyof R;
 
-  constructor(config: SplitManagedFieldConfig<R, M>) {
+  constructor({ modelOnly, rowOnly, rowField, ...config }: Omit<ReadFieldConfig, "read"> & { rowField: keyof R }) {
     super(config);
-    this.modelField = config.modelField;
-    this.rowField = config.rowField;
+    this.modelOnly = modelOnly;
+    this.rowOnly = rowOnly;
+    this.rowField = rowField;
   }
 
-  // TODO: Intelligently cast return type to either R[keyof R] | undefined OR M[keyof M] | undefined.
-  public getRawValue(obj: ObjType<R, M>): R[keyof R] | M[keyof M] | undefined {
+  public abstract getValueFromModel(model: M): M[keyof M];
+  public getValueFromRow = (row: R) => getKeyValue<R, keyof R>(this.rowField)(row);
+  public getValueFromRowChangeData = (data: Table.RowChangeData<R>) => {
+    const cellChange: Table.CellChange<R[keyof R]> | undefined = getKeyValue<
+      { [key in keyof R]?: Table.CellChange<R[key]> },
+      keyof R
+    >(this.rowField)(data);
+    if (cellChange !== undefined) {
+      return cellChange.newValue;
+    }
+    return undefined;
+  };
+
+  public getValue(obj: ObjType<R, M>): R[keyof R] | M[keyof M] | R[keyof M & keyof R] | undefined {
     if (isRowChange<R, M>(obj)) {
       const data: { [key in keyof R]?: Table.CellChange<R[key]> } = obj.data;
-      return this.getRawValue(data);
+      return this.getValue(data);
     } else if (isRowChangeData<R, M>(obj)) {
-      const cellChange: Table.CellChange<R[keyof R]> | undefined = getKeyValue<
-        { [key in keyof R]?: Table.CellChange<R[key]> },
-        keyof R
-      >(this.rowField)(obj);
-      if (cellChange !== undefined) {
-        return cellChange.newValue;
-      }
-      return undefined;
+      return this.getValueFromRowChangeData(obj);
     } else if (isRow<R, M>(obj)) {
-      return getKeyValue<R, keyof R>(this.rowField)(obj);
+      return this.getValueFromRow(obj);
     } else {
-      return getKeyValue<M, keyof M>(this.modelField)(obj);
+      return this.getValueFromModel(obj);
     }
   }
 }
 
-const isSplitField = <R extends Table.Row, M extends Model.Model>(
-  field: ManagedField<R, M>
-): field is SplitManagedField<R, M> => {
-  return (field as SplitManagedField<R, M>).modelField !== undefined;
+abstract class ReadWriteField<
+  R extends Table.Row,
+  M extends Model.Model,
+  P extends Http.ModelPayload<M>
+> extends ReadField<R, M> {
+  readonly allowNull?: boolean;
+  readonly allowBlank?: boolean;
+  readonly http: Http.Method[];
+  readonly httpValueConverter?: (value: R[keyof R]) => P[keyof P] | undefined;
+  readonly write = true;
+  readonly modelField: keyof M & keyof P;
+
+  constructor({
+    allowNull,
+    allowBlank,
+    http,
+    httpValueConverter,
+    modelField,
+    ...config
+  }: Omit<ReadWriteFieldConfig<R, M, P>, "read" | "write"> & { modelField: keyof M & keyof P; rowField: keyof R }) {
+    super(config);
+    this.modelField = modelField;
+    this.allowBlank = allowBlank;
+    this.allowNull = allowNull;
+    this.http = isNil(http) || http.length === 0 ? ["POST", "PATCH"] : http;
+    this.httpValueConverter = httpValueConverter;
+  }
+
+  public getValueFromModel = (m: M) => getKeyValue<M, keyof M>(this.modelField)(m);
+
+  public getHttpValue(row: R | Table.RowChange<R>, method?: Http.Method): P[keyof P] | undefined {
+    if (!isNil(method) && !includes(this.http, method)) {
+      return undefined;
+    }
+    // TODO: See note below about intelligently casting return type to either
+    // R[keyof R] | undefined OR M[keyof M] | undefined.  Once that is established,
+    // this force coercion will not be necessary anymore.
+    const value = this.getValue(row) as R[keyof R] | undefined;
+    if (!isNil(this.httpValueConverter) && value !== undefined) {
+      return this.httpValueConverter(value);
+    }
+    return value;
+  }
+}
+
+export class AgnosticReadWriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
+  extends ReadWriteField<R, M, P>
+  implements AgnosticReadWriteFieldConfig<R, M, P> {
+  readonly field: keyof M & keyof R & keyof P;
+
+  constructor(config: Omit<AgnosticReadWriteFieldConfig<R, M, P>, "read" | "write">) {
+    super({ modelField: config.field, rowField: config.field, ...config });
+    this.field = config.field;
+  }
+}
+
+export class SplitReadWriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
+  extends ReadWriteField<R, M, P>
+  implements SplitReadWriteFieldConfig<R, M, P> {}
+
+export class WriteOnlyField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
+  extends WriteField<R, M, P>
+  implements WriteOnlyFieldConfig<R, M, P> {
+  readonly field: keyof P;
+  readonly writeOnly = true;
+
+  constructor({
+    field,
+    getValueFromRow,
+    getValueFromRowChangeData,
+    ...config
+  }: Omit<WriteOnlyFieldConfig<R, M, P>, "write" | "writeOnly">) {
+    super(config);
+    this.field = field;
+    this.getValueFromRow = getValueFromRow;
+    this.getValueFromRowChangeData = getValueFromRowChangeData;
+  }
+
+  public getValueFromRow: (row: R) => any;
+  public getValueFromRowChangeData: (data: Table.RowChangeData<R>) => any;
+
+  public getValue(obj: RowObjType<R>): any {
+    if (isRowChange<R, M>(obj)) {
+      const data: { [key in keyof R]?: Table.CellChange<R[key]> } = obj.data;
+      return this.getValue(data);
+    } else if (isRowChangeData<R, M>(obj)) {
+      return this.getValueFromRowChangeData(obj);
+    } else {
+      return this.getValueFromRow(obj);
+    }
+  }
+}
+
+export class ReadOnlyField<R extends Table.Row, M extends Model.Model>
+  extends ReadField<R, M>
+  implements ReadOnlyFieldConfig<R, M> {
+  readonly field: keyof M & keyof R;
+  readonly readOnly = true;
+
+  public getValueFromModel = (m: M) => getKeyValue<M, keyof M>(this.field)(m);
+
+  constructor({ field, ...config }: Omit<ReadOnlyFieldConfig<R, M>, "read" | "readOnly">) {
+    super({ rowField: field, ...config });
+    this.field = field;
+  }
+}
+
+const isReadField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+  field: Field<R, M, P>
+): field is ReadOnlyField<R, M> | AgnosticReadWriteField<R, M, P> | SplitReadWriteField<R, M, P> => {
+  return (field as ReadField<R, M>).read === true;
 };
 
-type ManagedField<R extends Table.Row, M extends Model.Model> = SplitManagedField<R, M> | AgnosticManagedField<R, M>;
+const isWriteField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+  field: Field<R, M, P>
+): field is WriteOnlyField<R, M, P> | AgnosticReadWriteField<R, M, P> | SplitReadWriteField<R, M, P> => {
+  return (field as WriteField<R, M, P>).write === true;
+};
 
-const ManageField = <R extends Table.Row, M extends Model.Model>(config: ManagedFieldConfig<R, M>) => {
+const isSplitField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+  field: Field<R, M, P>
+): field is SplitReadWriteField<R, M, P> => {
+  return (
+    isReadField(field) &&
+    isWriteField(field) &&
+    (field as SplitReadWriteField<R, M, P>).modelField !== undefined &&
+    (field as SplitReadWriteField<R, M, P>).rowField !== undefined
+  );
+};
+
+const isWriteOnlyField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+  field: Field<R, M, P>
+): field is WriteOnlyField<R, M, P> => {
+  return (field as WriteOnlyField<R, M, P>).writeOnly === true;
+};
+
+type WriteableField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> =
+  | SplitReadWriteField<R, M, P>
+  | AgnosticReadWriteField<R, M, P>
+  | WriteOnlyField<R, M, P>;
+
+type Field<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> =
+  | WriteableField<R, M, P>
+  | ReadOnlyField<R, M>;
+
+// const ManageField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+//   config: FieldConfig<R, M, P>
+// ) => {
+//   if (isSplitConfig(config)) {
+//     return new SplitReadWriteField<R, M, P>(config);
+//   } else if (isWriteOnlyConfig(config)) {
+//     return new WriteOnlyField<R, M, P>(config);
+//   } else if (isReadOnlyConfig(config)) {
+//     return new ReadOnlyField<R, M>(config);
+//   } else {
+//     return new AgnosticReadWriteField<R, M, P>(config);
+//   }
+// };
+
+const ReadOnly = <R extends Table.Row, M extends Model.Model>(
+  config: Omit<ReadOnlyFieldConfig<R, M>, "read" | "readOnly">
+) => {
+  return new ReadOnlyField<R, M>(config);
+};
+
+const WriteOnly = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+  config: Omit<WriteOnlyFieldConfig<R, M, P>, "write" | "writeOnly">
+) => {
+  return new WriteOnlyField<R, M, P>(config);
+};
+
+const ReadWrite = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+  config:
+    | Omit<SplitReadWriteFieldConfig<R, M, P>, "read" | "write">
+    | Omit<AgnosticReadWriteFieldConfig<R, M, P>, "read" | "write">
+) => {
   if (isSplitConfig(config)) {
-    return new SplitManagedField<R, M>(config);
+    return new SplitReadWriteField<R, M, P>(config);
+  } else {
+    return new AgnosticReadWriteField<R, M, P>(config);
   }
-  return new AgnosticManagedField<R, M>(config);
 };
 
 export interface RowManagerConfig<
   R extends Table.Row<G>,
   M extends Model.Model,
+  P extends Http.ModelPayload<M>,
   G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup
 > {
-  readonly fields: ManagedField<R, M>[];
+  readonly fields: Field<R, M, P>[];
   readonly childrenGetter?: ((model: M) => number[]) | string | null;
   readonly groupGetter?: ((model: M) => number | null) | string | null;
   readonly typeLabel: string;
@@ -239,17 +409,17 @@ const defaultRowMeta: Partial<Table.RowMeta> = {
 class RowManager<
   R extends Table.Row<G>,
   M extends Model.Model,
-  G extends Model.BudgetGroup | Model.TemplateGroup,
-  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
-> implements RowManagerConfig<R, M, G> {
-  public fields: ManagedField<R, M>[];
+  P extends Http.ModelPayload<M>,
+  G extends Model.BudgetGroup | Model.TemplateGroup
+> implements RowManagerConfig<R, M, P, G> {
+  public fields: Field<R, M, P>[];
   public childrenGetter?: ((model: M) => number[]) | string | null;
   public groupGetter?: ((model: M) => number | null) | string | null;
   public labelGetter: (model: M) => string;
   public typeLabel: string;
   public rowType: Table.RowType;
 
-  constructor(config: RowManagerConfig<R, M, G>) {
+  constructor(config: RowManagerConfig<R, M, P, G>) {
     this.fields = config.fields;
     this.childrenGetter = config.childrenGetter;
     this.groupGetter = config.groupGetter;
@@ -258,9 +428,13 @@ class RowManager<
     this.rowType = config.rowType;
   }
 
-  public getField = (name: keyof R | keyof M): ManagedField<R, M> | null => {
+  public get requiredFields() {
+    return filter(this.fields, (field: Field<R, M, P>) => field.required === true);
+  }
+
+  public getField = (name: keyof R | keyof M): Field<R, M, P> | null => {
     return (
-      find(this.fields, (field: ManagedField<R, M>) => {
+      find(this.fields, (field: Field<R, M, P>) => {
         if (isSplitField(field)) {
           return field.rowField === name;
         } else {
@@ -320,11 +494,13 @@ class RowManager<
         type: this.rowType
       }
     };
-    forEach(this.fields, (field: ManagedField<R, M>) => {
-      if (isSplitField(field)) {
-        obj[field.rowField] = field.placeholderValue || null;
-      } else {
-        obj[field.field] = field.placeholderValue || null;
+    forEach(this.fields, (field: Field<R, M, P>) => {
+      if (!isWriteOnlyField(field)) {
+        if (isSplitField(field)) {
+          obj[field.rowField] = field.placeholderValue || null;
+        } else {
+          obj[field.field] = field.placeholderValue || null;
+        }
       }
     });
     return obj as R;
@@ -345,14 +521,16 @@ class RowManager<
         ...meta
       }
     };
-    forEach(this.fields, (field: ManagedField<R, M>) => {
-      if (field.inRow !== false) {
-        const v = field.getRowValue(model);
-        if (v !== undefined) {
-          if (isSplitField(field)) {
-            obj[field.rowField] = v;
-          } else {
-            obj[field.field] = v as R[keyof R & keyof M];
+    forEach(this.fields, (field: Field<R, M, P>) => {
+      if (!isWriteOnlyField(field)) {
+        if (field.modelOnly !== true) {
+          const v = field.getValue(model) as R[keyof R];
+          if (v !== undefined) {
+            if (isSplitField(field)) {
+              obj[field.rowField] = v;
+            } else {
+              obj[field.field] = v as R[keyof R & keyof M];
+            }
           }
         }
       }
@@ -362,16 +540,18 @@ class RowManager<
 
   public mergeChangesWithRow = (obj: R, change: Table.RowChange<R>): R => {
     const row: R = { ...obj };
-    forEach(this.fields, (field: ManagedField<R, M>) => {
-      // We have to force coerce R[keyof R] to M[keyof M] because there is no way for TS to
-      // understand that the model (M) field name is related to the row (R) field name via the
-      // field configurations.
-      const v = field.getRowValue(change) as R[keyof R] | R[keyof M & keyof R] | undefined;
-      if (v !== undefined) {
-        if (isSplitField(field)) {
-          row[field.rowField] = v;
-        } else {
-          row[field.field] = v as R[keyof R & keyof M];
+    forEach(this.fields, (field: Field<R, M, P>) => {
+      if (!isWriteOnlyField(field)) {
+        // We have to force coerce R[keyof R] to M[keyof M] because there is no way for TS to
+        // understand that the model (M) field name is related to the row (R) field name via the
+        // field configurations.
+        const v = field.getValue(change) as R[keyof R] | R[keyof M & keyof R] | undefined;
+        if (v !== undefined) {
+          if (isSplitField(field)) {
+            row[field.rowField] = v;
+          } else {
+            row[field.field] = v as R[keyof R & keyof M & keyof P];
+          }
         }
       }
     });
@@ -380,16 +560,18 @@ class RowManager<
 
   public mergeChangesWithModel = (obj: M, change: Table.RowChange<R>): M => {
     const model: M = { ...obj };
-    forEach(this.fields, (field: ManagedField<R, M>) => {
+    forEach(this.fields, (field: Field<R, M, P>) => {
       // We have to force coerce R[keyof R] to M[keyof M] because there is no way for TS to
       // understand that the model (M) field name is related to the row (R) field name via the
       // field configurations.
-      const v = field.getModelValue(change) as M[keyof M] | M[keyof M & keyof R] | undefined;
-      if (v !== undefined) {
-        if (isSplitField(field)) {
-          model[field.modelField] = v;
-        } else {
-          model[field.field] = v as M[keyof M & keyof R];
+      if (!isWriteOnlyField(field) && !field.rowOnly) {
+        const v = field.getValue(change);
+        if (v !== undefined) {
+          if (isSplitField(field)) {
+            model[field.modelField] = v as M[keyof M & keyof P];
+          } else {
+            model[field.field] = v as M[keyof M & keyof R & keyof P];
+          }
         }
       }
     });
@@ -397,12 +579,11 @@ class RowManager<
   };
 
   public payload = <T extends R | Table.RowChange<R>>(row: T): PayloadType<T, P, R> => {
-    // TODO: It would be great if we can type this better, but we have to find some relationship
-    // between M & P (I thought that Http.ModelPayload would do the trick).
-    const obj: { [key in keyof M]?: any } = {};
+    /* eslint-disable no-unused-vars */
+    const obj: { [key in keyof P]?: P[keyof P] } = {};
     const method: Http.Method = isRowChange(row) ? "PATCH" : "POST";
 
-    const setValue = (field: ManagedField<R, M>, key: keyof M, value: R[keyof R] | M[keyof M] | undefined): void => {
+    const setValue = (field: WriteableField<R, M, P>, key: keyof P, value: any): void => {
       if (value !== undefined) {
         if (value === null) {
           if (field.allowNull === true) {
@@ -410,20 +591,21 @@ class RowManager<
           }
         } else if ((value as any) === "") {
           if (field.allowBlank === true) {
-            obj[key] = "";
+            obj[key] = "" as P[keyof P];
           }
         } else {
           obj[key] = value;
         }
       }
     };
-    forEach(this.fields, (field: ManagedField<R, M>) => {
-      if (isSplitField(field)) {
+    forEach(this.fields, (field: Field<R, M, P>) => {
+      if (isWriteField(field)) {
         const httpValue = field.getHttpValue(row, method);
-        setValue(field, field.modelField, httpValue);
-      } else {
-        const httpValue = field.getHttpValue(row, method);
-        setValue(field, field.field, httpValue);
+        if (isSplitField(field)) {
+          setValue(field, field.modelField, httpValue);
+        } else {
+          setValue(field, field.field, httpValue);
+        }
       }
     });
     return obj as PayloadType<T, P, R>;
@@ -431,13 +613,22 @@ class RowManager<
 
   rowHasRequiredFields = (row: R): boolean => {
     let requiredFieldsPresent = true;
-    forEach(this.fields, (field: ManagedField<R, M>) => {
-      if (field.required === true) {
-        const value = field.getModelValue(row);
-        if (isNil(value) || (value as any) === "") {
-          requiredFieldsPresent = false;
-          return false;
-        }
+    forEach(this.requiredFields, (field: Field<R, M, P>) => {
+      let value: any;
+      // TODO: Write only fields are not stored on the row (R), so the only associated
+      // value is the HTTP value which is derived from the row (R).  We might want to
+      // only allow the required flag to be set on the underlying row (R) fields and not
+      // on the derived fields.
+      if (isWriteOnlyField(field)) {
+        value = field.getHttpValue(row);
+      } else {
+        value = field.getValue(row);
+      }
+      // TODO: We have to build this out better to check for other data structures
+      // as well - like arrays and things of that nature.
+      if (isNil(value) || (value as any) === "") {
+        requiredFieldsPresent = false;
+        return false;
       }
     });
     return requiredFieldsPresent;
@@ -447,17 +638,17 @@ class RowManager<
 export const BudgetAccountRowManager = new RowManager<
   Table.BudgetAccountRow,
   Model.BudgetAccount,
-  Model.BudgetGroup,
-  Http.BudgetAccountPayload
+  Http.BudgetAccountPayload,
+  Model.BudgetGroup
 >({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
+    ReadWrite({ field: "description", allowNull: true }),
     // We want to attribute the full group to the row, not just the ID.
-    ManageField({ field: "group", allowNull: true, inRow: false }),
-    ManageField({ field: "identifier", allowNull: true }),
-    ManageField({ field: "estimated", readOnly: true }),
-    ManageField({ field: "variance", readOnly: true }),
-    ManageField({ field: "actual", readOnly: true })
+    ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
+    ReadWrite({ field: "identifier", allowNull: true }),
+    ReadOnly({ field: "estimated" }),
+    ReadOnly({ field: "variance" }),
+    ReadOnly({ field: "actual" })
   ],
   childrenGetter: (model: Model.Account) => model.subaccounts,
   groupGetter: (model: Model.Account) => model.group,
@@ -469,15 +660,15 @@ export const BudgetAccountRowManager = new RowManager<
 export const TemplateAccountRowManager = new RowManager<
   Table.TemplateAccountRow,
   Model.TemplateAccount,
-  Model.TemplateGroup,
-  Http.TemplateAccountPayload
+  Http.TemplateAccountPayload,
+  Model.TemplateGroup
 >({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
+    ReadWrite({ field: "description", allowNull: true }),
     // We want to attribute the full group to the row, not just the ID.
-    ManageField({ field: "group", allowNull: true, inRow: false }),
-    ManageField({ field: "identifier", allowNull: true }),
-    ManageField({ field: "estimated", readOnly: true })
+    ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
+    ReadWrite({ field: "identifier", allowNull: true }),
+    ReadOnly({ field: "estimated" })
   ],
   childrenGetter: (model: Model.TemplateAccount) => model.subaccounts,
   groupGetter: (model: Model.TemplateAccount) => model.group,
@@ -489,32 +680,32 @@ export const TemplateAccountRowManager = new RowManager<
 export const BudgetSubAccountRowManager = new RowManager<
   Table.BudgetSubAccountRow,
   Model.BudgetSubAccount,
-  Model.BudgetGroup,
-  Http.SubAccountPayload
+  Http.SubAccountPayload,
+  Model.BudgetGroup
 >({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
-    ManageField({ field: "name", allowNull: true }),
+    ReadWrite({ field: "description", allowNull: true }),
+    ReadWrite({ field: "name", allowNull: true }),
     // We want to attribute the full group to the row, not just the ID.
-    ManageField({ field: "group", allowNull: true, inRow: false }),
-    ManageField({ field: "quantity", allowNull: true }),
-    ManageField({ field: "rate", allowNull: true }),
-    ManageField({ field: "multiplier", allowNull: true }),
-    ManageField({
+    ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
+    ReadWrite({ field: "quantity", allowNull: true }),
+    ReadWrite({ field: "rate", allowNull: true }),
+    ReadWrite({ field: "multiplier", allowNull: true }),
+    ReadWrite({
       field: "unit",
       allowNull: true,
-      httpValueConverter: (value: Model.SubAccountUnit): number | null | undefined => {
-        if (value !== null) {
-          return value.id;
+      httpValueConverter: (unit: Model.SubAccountUnit | null): number | null | undefined => {
+        if (unit !== null) {
+          return unit.id;
         }
         return null;
       }
     }),
-    ManageField({ field: "identifier", allowNull: true }),
-    ManageField({ field: "estimated", readOnly: true }),
-    ManageField({ field: "variance", readOnly: true }),
-    ManageField({ field: "actual", readOnly: true }),
-    ManageField({ field: "fringes", allowNull: true, placeholderValue: [] })
+    ReadWrite({ field: "identifier" }),
+    ReadOnly({ field: "estimated" }),
+    ReadOnly({ field: "variance" }),
+    ReadOnly({ field: "actual" }),
+    ReadWrite({ field: "fringes", allowNull: true, placeholderValue: [] })
   ],
   childrenGetter: (model: Model.SubAccount) => model.subaccounts,
   groupGetter: (model: Model.SubAccount) => model.group,
@@ -526,30 +717,30 @@ export const BudgetSubAccountRowManager = new RowManager<
 export const TemplateSubAccountRowManager = new RowManager<
   Table.TemplateSubAccountRow,
   Model.TemplateSubAccount,
-  Model.TemplateGroup,
-  Http.SubAccountPayload
+  Http.SubAccountPayload,
+  Model.TemplateGroup
 >({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
-    ManageField({ field: "name", allowNull: true }),
+    ReadWrite({ field: "description", allowNull: true }),
+    ReadWrite({ field: "name", allowNull: true }),
     // We want to attribute the full group to the row, not just the ID.
-    ManageField({ field: "group", allowNull: true, inRow: false }),
-    ManageField({ field: "quantity", allowNull: true }),
-    ManageField({ field: "rate", allowNull: true }),
-    ManageField({ field: "multiplier", allowNull: true }),
-    ManageField({
+    ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
+    ReadWrite({ field: "quantity", allowNull: true }),
+    ReadWrite({ field: "rate", allowNull: true }),
+    ReadWrite({ field: "multiplier", allowNull: true }),
+    ReadWrite({
       field: "unit",
       allowNull: true,
-      httpValueConverter: (value: any): number | null | undefined => {
-        if (value !== null) {
-          return value.id;
+      httpValueConverter: (unit: Model.SubAccountUnit | null): number | null | undefined => {
+        if (unit !== null) {
+          return unit.id;
         }
         return null;
       }
     }),
-    ManageField({ field: "identifier", allowNull: true }),
-    ManageField({ field: "estimated", readOnly: true }),
-    ManageField({ field: "fringes", allowNull: true, placeholderValue: [] })
+    ReadWrite({ field: "identifier", allowNull: true }),
+    ReadOnly({ field: "estimated" }),
+    ReadWrite({ field: "fringes", allowNull: true, placeholderValue: [] })
   ],
   childrenGetter: (model: Model.SubAccount) => model.subaccounts,
   groupGetter: (model: Model.SubAccount) => model.group,
@@ -558,53 +749,96 @@ export const TemplateSubAccountRowManager = new RowManager<
   rowType: "subaccount"
 });
 
-export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>({
+export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Http.ActualPayload, Model.Group>({
   fields: [
-    ManageField({ field: "description", allowNull: true }),
-    ManageField({
+    ReadWrite({ field: "description", allowNull: true }),
+    // TODO: Eventually, we need to allow this to be null.
+    WriteOnly({
       field: "object_id",
       http: ["PATCH"],
-      required: true
+      required: true,
+      getValueFromRow: (row: Table.ActualRow) => {
+        if (!isNil(row.account)) {
+          return row.account.id;
+        }
+        return null;
+      },
+      getValueFromRowChangeData: (data: Table.RowChangeData<Table.ActualRow>) => {
+        const cellChange: Table.CellChange<Table.ActualRow[keyof Table.ActualRow]> | undefined = getKeyValue<
+          { [key in keyof Table.ActualRow]?: Table.CellChange<Table.ActualRow[key]> },
+          keyof Table.ActualRow
+        >("account")(data);
+        if (cellChange !== undefined) {
+          const account: Model.SimpleAccount | Model.SimpleSubAccount | null = cellChange.newValue;
+          if (account !== null) {
+            return account.id;
+          }
+          return null;
+        }
+        return undefined;
+      }
     }),
-    ManageField({
+    // TODO: Eventually, we need to allow this to be null.
+    WriteOnly({
       field: "parent_type",
       http: ["PATCH"],
-      required: true
+      required: true,
+      getValueFromRow: (row: Table.ActualRow) => {
+        if (!isNil(row.account)) {
+          return row.account.type;
+        }
+        return null;
+      },
+      getValueFromRowChangeData: (data: Table.RowChangeData<Table.ActualRow>) => {
+        const cellChange: Table.CellChange<Table.ActualRow[keyof Table.ActualRow]> | undefined = getKeyValue<
+          { [key in keyof Table.ActualRow]?: Table.CellChange<Table.ActualRow[key]> },
+          keyof Table.ActualRow
+        >("account")(data);
+        if (cellChange !== undefined) {
+          const account: Model.SimpleAccount | Model.SimpleSubAccount | null = cellChange.newValue;
+          if (account !== null) {
+            return account.type;
+          }
+          return null;
+        }
+        return undefined;
+      }
     }),
-    ManageField({ field: "vendor", allowNull: true }),
-    ManageField({ field: "purchase_order", allowNull: true }),
-    ManageField({ field: "date", allowNull: true }),
-    ManageField({
+    ReadOnly({ field: "account" }),
+    ReadWrite({ field: "vendor", allowNull: true }),
+    ReadWrite({ field: "purchase_order", allowNull: true }),
+    ReadWrite({ field: "date", allowNull: true }),
+    ReadWrite({
       field: "payment_method",
       allowNull: true,
-      httpValueConverter: (value: Model.PaymentMethod): number | null | undefined => {
-        if (value !== null) {
-          return value.id;
+      httpValueConverter: (payment_method: Model.PaymentMethod | null) => {
+        if (payment_method !== null) {
+          return payment_method.id;
         }
         return null;
       }
     }),
-    ManageField({ field: "payment_id", allowNull: true }),
-    ManageField({ field: "value", allowNull: true })
+    ReadWrite({ field: "payment_id", allowNull: true }),
+    ReadWrite({ field: "value", allowNull: true })
   ],
-  labelGetter: (model: Model.Actual) => String(model.object_id),
+  labelGetter: (model: Model.Actual) => String(!isNil(model.account) ? model.account.identifier : ""),
   typeLabel: "Actual",
   rowType: "actual"
 });
 
-export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>({
+export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Http.FringePayload, Model.Group>({
   fields: [
-    ManageField({ field: "name", required: true }),
-    ManageField({ field: "description", allowNull: true }),
-    ManageField({ field: "cutoff", allowNull: true }),
-    ManageField({ field: "rate", allowNull: true }),
-    ManageField({ field: "color", allowNull: true }),
-    ManageField({
+    ReadWrite({ field: "name", required: true }),
+    ReadWrite({ field: "description", allowNull: true }),
+    ReadWrite({ field: "cutoff", allowNull: true }),
+    ReadWrite({ field: "rate", allowNull: true }),
+    ReadWrite({ field: "color", allowNull: true }),
+    ReadWrite({
       field: "unit",
       allowNull: true,
-      httpValueConverter: (value: Model.FringeUnit): number | null | undefined => {
-        if (value !== null) {
-          return value.id;
+      httpValueConverter: (unit: Model.FringeUnit | null) => {
+        if (unit !== null) {
+          return unit.id;
         }
         return null;
       }

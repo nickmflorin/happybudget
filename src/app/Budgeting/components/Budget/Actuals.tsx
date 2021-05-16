@@ -30,7 +30,8 @@ import {
   selectAllActualsAction,
   bulkUpdateBudgetActualsAction,
   requestBudgetItemsAction,
-  requestBudgetItemsTreeAction
+  requestBudgetItemsTreeAction,
+  setBudgetItemsTreeSearchAction
 } from "../../store/actions/budget/actuals";
 import { selectBudgetDetail } from "../../store/selectors";
 import BudgetTable, { BudgetTableActionsParams } from "../BudgetTable";
@@ -86,10 +87,12 @@ const Actuals = (): JSX.Element => {
         selected={selected}
         // TODO: Make this field use an object that has the `object_id` and `parent_type`
         // in it, removing the requirement of the rowRefreshRequired callback.
-        identifierField={"object_id"}
+        identifierField={"account"}
         identifierFieldHeader={"Account"}
         identifierColumn={{
           minWidth: 200,
+          maxWidth: 200,
+          width: 200,
           cellClass: "borderless",
           processCellForClipboard: (row: Table.ActualRow) => {
             const item: Model.BudgetLineItem | undefined = find(budgetItems, {
@@ -102,22 +105,12 @@ const Actuals = (): JSX.Element => {
             return "";
           },
           cellRenderer: "BudgetItemCell",
-          cellRendererParams: {
-            onChange: (object_id: number, parent_type: "account" | "subaccount", row: Table.ActualRow) => {
-              dispatch(
-                updateActualAction({
-                  id: row.id,
-                  data: {
-                    object_id: { newValue: object_id, oldValue: row.object_id },
-                    parent_type: { oldValue: row.parent_type, newValue: parent_type }
-                  }
-                })
-              );
-            }
+          cellEditor: "BudgetItemsTreeEditor",
+          cellEditorParams: {
+            setSearch: (value: string) => dispatch(setBudgetItemsTreeSearchAction(value))
           }
         }}
         indexColumn={{ width: 40, maxWidth: 50 }}
-        nonEditableCells={["object_id"]}
         search={search}
         onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
         saving={saving}
@@ -130,13 +123,6 @@ const Actuals = (): JSX.Element => {
           dispatch(bulkUpdateBudgetActualsAction(changes))
         }
         onSelectAll={() => dispatch(selectAllActualsAction(null))}
-        rowRefreshRequired={(existing: Table.ActualRow, row: Table.ActualRow) => {
-          return (
-            existing.object_id !== row.object_id ||
-            existing.parent_type !== row.parent_type ||
-            existing.payment_method !== row.payment_method
-          );
-        }}
         cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         exportFileName={"actuals.csv"}
         actions={(params: BudgetTableActionsParams<Table.ActualRow, Model.Group>) => [

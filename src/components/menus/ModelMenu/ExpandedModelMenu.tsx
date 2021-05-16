@@ -9,59 +9,23 @@ import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
 import { isCharacterKeyPress, isBackspaceKeyPress } from "lib/util/events";
 
-import createModelTagsMenu, {
-  ModelTagsMenuRef,
-  SingleModelTagsMenuProps,
-  MultipleModelTagsMenuProps
-} from "./ModelTagsMenu";
-import "./ExpandedModelTagsMenu.scss";
+import { ExpandedModelMenuRef, ModelMenuRef, ExpandedModelMenuProps } from "./model";
+import createModelMenu from "./ModelMenu";
+import "./ExpandedModelMenu.scss";
 
-export type ExpandedModelTagsMenuRef<M extends Model.Model = Model.Model> = {
-  readonly focusSearch: (value: boolean, search?: string) => void;
-  readonly incrementMenuFocusedIndex: () => void;
-  readonly decrementMenuFocusedIndex: () => void;
-  readonly focusMenu: (value: boolean) => void;
-  readonly focusMenuAtIndex: (index: number) => void;
-  readonly getModelAtMenuFocusedIndex: () => M | null;
-  readonly selectModelAtMenuFocusedIndex: () => void;
-  readonly menuFocused: boolean;
-  readonly menuFocusedIndex: number | null;
-  readonly menuAllowableFocusedIndexRange: number;
-};
-
-interface _ExpandedModelTagsMenuProps<M extends Model.Model> extends StandardComponentProps {
-  readonly menuClassName?: string;
-  readonly menuStyle?: React.CSSProperties;
-  readonly forwardedRef?: Ref<ExpandedModelTagsMenuRef<M>>;
-  readonly focusSearchOnCharPress?: boolean;
-}
-
-interface SingleExpandedModelTagsMenuProps<M extends Model.Model>
-  extends Omit<SingleModelTagsMenuProps<M>, "className" | "style" | "forwardedRef">,
-    _ExpandedModelTagsMenuProps<M> {}
-
-interface MultipleExpandedModelTagsMenuProps<M extends Model.Model>
-  extends Omit<MultipleModelTagsMenuProps<M>, "className" | "style" | "forwardedRef">,
-    _ExpandedModelTagsMenuProps<M> {}
-
-type ExpandedModelTagsMenuProps<M extends Model.Model> =
-  | SingleExpandedModelTagsMenuProps<M>
-  | MultipleExpandedModelTagsMenuProps<M>;
-
-const ExpandedModelTagsMenu = <M extends Model.Model>({
+const ExpandedModelMenu = <M extends Model.M>({
   className,
-  menuClassName,
-  menuStyle,
   style,
   search,
   forwardedRef,
   focusSearchOnCharPress,
+  onSearch,
   ...props
-}: ExpandedModelTagsMenuProps<M>): JSX.Element => {
-  const [_search, setSearch] = useState("");
-  const menuRef = useRef<ModelTagsMenuRef<M>>(null);
+}: ExpandedModelMenuProps<M>): JSX.Element => {
+  const [_search, _setSearch] = useState("");
+  const menuRef = useRef<ModelMenuRef<M>>(null);
   const searchRef = useRef<Input>(null);
-  const ModelTagsMenu = useMemo(() => createModelTagsMenu<M>(), []);
+  const ModelMenu = useMemo(() => createModelMenu<M>(), []);
 
   const getFromMenuRef = useCallback(
     (getter: string, notSet: any): any => {
@@ -86,13 +50,20 @@ const ExpandedModelTagsMenu = <M extends Model.Model>({
     }
   };
 
+  const setSearch = (value: string) => {
+    _setSearch(value);
+    if (!isNil(onSearch)) {
+      onSearch(value);
+    }
+  };
+
   const focusSearch = (value: boolean, searchValue?: string, timeout?: number) => {
     const searchInput = searchRef.current;
     if (!isNil(searchInput)) {
       if (value === true) {
         setTimeout(() => {
           searchInput.focus();
-        }, timeout || 100);
+        }, timeout || 25);
         if (!isNil(searchValue)) {
           setSearch(searchValue);
         }
@@ -105,7 +76,7 @@ const ExpandedModelTagsMenu = <M extends Model.Model>({
 
   useImperativeHandle(
     forwardedRef,
-    (): ExpandedModelTagsMenuRef<M> => ({
+    (): ExpandedModelMenuRef<M> => ({
       menuFocused: getFromMenuRef("focused", false),
       menuFocusedIndex: getFromMenuRef("focusedIndex", null),
       menuAllowableFocusedIndexRange: getFromMenuRef("allowableFocusedIndexRange", 0),
@@ -168,11 +139,11 @@ const ExpandedModelTagsMenu = <M extends Model.Model>({
   }, [searchRef, menuRef]);
 
   return (
-    <div className={classNames("expanded-model-tags-menu", className)} style={style}>
+    <div className={classNames("expanded-model-menu", className)} style={style}>
       <div className={"search-container"}>
         <Input
           className={"input--small"}
-          placeholder={"Search Rows"}
+          placeholder={props.searchPlaceholder || "Search"}
           autoFocus={true}
           value={isNil(search) ? _search : search}
           ref={searchRef}
@@ -190,27 +161,31 @@ const ExpandedModelTagsMenu = <M extends Model.Model>({
           }}
         />
       </div>
-      <ModelTagsMenu
-        {...props}
-        className={menuClassName}
-        style={menuStyle}
-        search={isNil(search) ? _search : search}
-        ref={menuRef}
-      />
+      {!isNil(props.children) ? (
+        props.children
+      ) : (
+        <ModelMenu
+          {...props}
+          {...props.menuProps}
+          loading={props.menuLoading}
+          search={isNil(search) ? _search : search}
+          ref={menuRef}
+        />
+      )}
     </div>
   );
 };
 
-export const TypeAgnosticExpandedModelTagsMenu = forwardRef(
-  (props: ExpandedModelTagsMenuProps<any>, ref?: Ref<ExpandedModelTagsMenuRef>) => (
-    <ExpandedModelTagsMenu<any> {...props} forwardedRef={ref} />
+export const TypeAgnosticExpandedModelMenu = forwardRef(
+  (props: ExpandedModelMenuProps<any>, ref?: Ref<ExpandedModelMenuRef<any>>) => (
+    <ExpandedModelMenu<any> {...props} forwardedRef={ref} />
   )
 );
 
-const createExpandedModelTagsMenu = <M extends Model.Model>() => {
-  return forwardRef((props: ExpandedModelTagsMenuProps<M>, ref?: Ref<ExpandedModelTagsMenuRef<M>>) => (
-    <ExpandedModelTagsMenu<M> {...props} forwardedRef={ref} />
+const createExpandedModelMenu = <M extends Model.M>() => {
+  return forwardRef((props: ExpandedModelMenuProps<M>, ref?: Ref<ExpandedModelMenuRef<M>>) => (
+    <ExpandedModelMenu<M> {...props} forwardedRef={ref} />
   ));
 };
 
-export default createExpandedModelTagsMenu;
+export default createExpandedModelMenu;

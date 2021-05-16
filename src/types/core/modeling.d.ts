@@ -5,6 +5,10 @@ namespace Model {
     [key: string]: any;
   }
 
+  interface M {
+    readonly id: string | number;
+  }
+
   /* eslint-disable no-shadow */
   interface Model {
     readonly id: number;
@@ -167,7 +171,7 @@ namespace Model {
   }
 
   interface SubAccountTreeNode extends Model.SimpleSubAccount {
-    readonly children: SubAccountTreeNode[];
+    readonly children: Model.SubAccountTreeNode[];
   }
 
   interface AccountTreeNode extends Model.SimpleAccount {
@@ -241,8 +245,7 @@ namespace Model {
     readonly payment_id: string | null;
     readonly value: string | null;
     readonly payment_method: Model.PaymentMethod | null;
-    readonly object_id: number;
-    readonly parent_type: "account" | "subaccount";
+    readonly account: Model.SimpleAccount | Model.SimpleSubAccount | null;
   }
 
   interface Comment extends Model.Model {

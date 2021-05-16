@@ -221,7 +221,8 @@ const ActionType = {
     BudgetItemsTree: {
       Request: "budget.budgetitemstree.Request",
       Loading: "budget.budgetitemstree.Loading",
-      Response: "budget.budgetitemstree.Response"
+      Response: "budget.budgetitemstree.Response",
+      SetSearch: "budget.budgetitemstree.SetSearch"
     },
     Actuals: {
       Deleting: "budget.actuals.Deleting",

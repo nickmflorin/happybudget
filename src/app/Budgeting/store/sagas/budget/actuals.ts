@@ -1,6 +1,6 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { spawn, take, cancel, takeEvery, call, put, select, fork, cancelled } from "redux-saga/effects";
+import { spawn, take, cancel, takeEvery, call, put, select, fork, cancelled, debounce } from "redux-saga/effects";
 import { isNil, find, map, groupBy } from "lodash";
 
 import { handleRequestError } from "api";
@@ -291,11 +291,18 @@ export function* getBudgetItemsTask(action: Redux.Action<null>): SagaIterator {
 export function* getBudgetItemsTreeTask(action: Redux.Action<null>): SagaIterator {
   const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
+    const search = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree.search);
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     yield put(loadingBudgetItemsTreeAction(true));
     try {
-      const response = yield call(getBudgetItemsTree, budgetId, { no_pagination: true }, { cancelToken: source.token });
+      // TODO: Eventually we will want to build in pagination for this.
+      const response = yield call(
+        getBudgetItemsTree,
+        budgetId,
+        { no_pagination: true, search },
+        { cancelToken: source.token }
+      );
       yield put(responseBudgetItemsTreeAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
@@ -344,6 +351,10 @@ function* watchForRequestBudgetItemsTreeSaga(): SagaIterator {
   }
 }
 
+function* watchForSearchBudgetItemsTreeSaga(): SagaIterator {
+  yield debounce(250, ActionType.Budget.BudgetItemsTree.SetSearch, getBudgetItemsTreeTask);
+}
+
 function* watchForBulkUpdateActualsSaga(): SagaIterator {
   yield takeEvery(ActionType.Budget.BulkUpdateActuals, handleBulkUpdateTask);
 }
@@ -363,4 +374,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForBulkUpdateActualsSaga);
   yield spawn(watchForRequestBudgetItemsSaga);
   yield spawn(watchForRequestBudgetItemsTreeSaga);
+  yield spawn(watchForSearchBudgetItemsTreeSaga);
 }

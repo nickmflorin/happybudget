@@ -107,11 +107,6 @@ interface PrimaryGridPassThroughProps<R extends Table.Row<G>, G extends Model.Gr
   readonly frameworkComponents?: { [key: string]: any };
   readonly sizeColumnsToFit?: boolean | undefined;
   readonly search?: string;
-  // Manually triggers a refresh to a row when certain changes occur.  Sometimes, a row R can have
-  // fields that are not displayed in the grid but used to generate HTML columns.  Since those fields
-  // are not explicitly displayed in the grid, AG Grid will not automatically refresh the columns
-  // in the case that those fields change.
-  readonly rowRefreshRequired?: (existing: R, row: R) => boolean;
   readonly onRowUpdate: (payload: Table.RowChange<R>) => void;
   readonly onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
   readonly onRowAdd: () => void;
@@ -166,7 +161,7 @@ export interface BudgetTableProps<
   readonly cookies?: CookiesProps;
   readonly loading?: boolean;
   readonly renderFlag?: boolean;
-  readonly manager: RowManager<R, M, G, P>;
+  readonly manager: RowManager<R, M, P, G>;
   // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
   // onRowExpand is provided to the BudgetTable.
   readonly rowCanExpand?: (row: R) => boolean;

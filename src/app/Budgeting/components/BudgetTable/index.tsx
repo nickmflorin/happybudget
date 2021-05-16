@@ -84,7 +84,6 @@ const BudgetTable = <
   onBack,
   isCellEditable,
   isCellSelectable,
-  rowRefreshRequired,
   ...options
 }: BudgetTableProps<R, M, G, P>) => {
   const [table, setTable] = useState<R[]>([]);
@@ -234,8 +233,8 @@ const BudgetTable = <
         return 1;
       },
       cellRendererParams: {
-        ...identifierColumn.cellRendererParams,
-        onGroupEdit: !isNil(groupParams) ? groupParams.onEditGroup : undefined
+        ...identifierColumn.cellRendererParams
+        // onGroupEdit: !isNil(groupParams) ? groupParams.onEditGroup : undefined
       }
     })
   );
@@ -672,7 +671,6 @@ const BudgetTable = <
             frameworkComponents={frameworkComponents}
             sizeColumnsToFit={sizeColumnsToFit}
             search={search}
-            rowRefreshRequired={rowRefreshRequired}
             onRowUpdate={onRowUpdate}
             onRowBulkUpdate={onRowBulkUpdate}
             onRowAdd={onRowAdd}

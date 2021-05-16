@@ -76,7 +76,7 @@ export const createSubAccountTaskSet = <
 >(
   /* eslint-disable indent */
   actions: SubAccountTasksActionMap<SA, G>,
-  manager: RowManager<R, SA, G>,
+  manager: RowManager<R, SA, Http.SubAccountPayload, G>,
   selectSubAccountId: (state: Redux.ApplicationStore) => number | null,
   selectModels: (state: Redux.ApplicationStore) => SA[],
   selectAutoIndex: (state: Redux.ApplicationStore) => boolean

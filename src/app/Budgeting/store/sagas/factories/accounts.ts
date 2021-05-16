@@ -73,7 +73,7 @@ export const createAccountsTaskSet = <
   /* eslint-disable indent */
   actions: AccountsTasksActionMap<A, G>,
   services: AccountsServiceSet<M, A, G, P>,
-  manager: RowManager<R, A, G, P>,
+  manager: RowManager<R, A, P, G>,
   selectObjId: (state: Redux.ApplicationStore) => number | null,
   selectModels: (state: Redux.ApplicationStore) => A[],
   selectAutoIndex: (state: Redux.ApplicationStore) => boolean

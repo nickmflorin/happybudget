@@ -46,8 +46,6 @@ namespace Table {
   type RowChange<R extends Table.Row> = {
     id: number;
     data: Table.RowChangeData<R>;
-    // row: R;
-    // oldRow: R;
   };
 
   interface ActivatePlaceholderPayload<M> {
@@ -93,17 +91,16 @@ namespace Table {
     readonly description: string | null;
     readonly cutoff: number | null;
     readonly rate: number | null;
-    readonly unit: Model.FringeUnitName;
+    readonly unit: Model.FringeUnit;
   }
 
   interface ActualRow extends Table.Row<Model.BudgetGroup> {
-    readonly object_id: number | null;
-    readonly parent_type: Model.BudgetItemType | null;
     readonly description: string | null;
     readonly vendor: string | null;
     readonly purchase_order: string | null;
     readonly date: string | null;
-    readonly payment_method: Model.PaymentMethodName | null;
+    readonly payment_method: Model.PaymentMethod | null;
+    readonly account: Model.SimpleAccount | Model.SimpleSubAccount;
     readonly payment_id: string | null;
     readonly value: string | null;
   }
