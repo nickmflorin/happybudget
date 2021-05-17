@@ -9,6 +9,7 @@
     .ant-tooltip-inner {
       background-color: $green !important;
       color: $white !important;
+      border-radius: 8px;
     }
   }
   &.disabled {
@@ -20,6 +21,7 @@
       .ant-tooltip-inner {
         background-color: $disabled-color !important;
         color: $text-secondary !important;
+        border-radius: 8px;
       }
     }
   }
