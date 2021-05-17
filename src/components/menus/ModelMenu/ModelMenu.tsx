@@ -12,12 +12,12 @@ import "./ModelMenu.scss";
 export const ModelMenuItem = <M extends Model.M>({
   focused,
   focusedIndex,
-  baseIndex,
   checkbox,
   selected,
   model,
   level,
   levelIndent,
+  indexMap,
   onClick,
   onSelect,
   onDeselect,
@@ -37,7 +37,7 @@ export const ModelMenuItem = <M extends Model.M>({
         {...props}
         className={classNames("model-menu-item", props.className, {
           active: isMenuItemActive(model),
-          focus: focused === true && !isNil(focusedIndex) ? focusedIndex === baseIndex : false
+          focus: focused === true && !isNil(focusedIndex) ? focusedIndex === indexMap[String(model.id)] : false
         })}
         onClick={(info: any) => onClick(model)}
       >
@@ -68,24 +68,24 @@ export const ModelMenuItem = <M extends Model.M>({
                   }
                 }}
               />
-              {renderItem(model, { level, index: baseIndex })}
+              {renderItem(model, { level, index: indexMap[String(model.id)] })}
             </div>
           ) : (
-            renderItem(model, { level, index: baseIndex })
+            renderItem(model, { level, index: indexMap[String(model.id)] })
           )}
         </div>
       </Menu.Item>
       {!isNil(model.children) &&
         model.children.length !== 0 &&
-        map(model.children, (child: ModelItem<M>, index: number) => {
+        map(model.children, (child: ModelItem<M>) => {
           return (
             <ModelMenuItem<M>
               key={child.id}
+              indexMap={indexMap}
               model={child}
               checkbox={checkbox}
               focused={focused}
               focusedIndex={focusedIndex}
-              baseIndex={baseIndex + index}
               level={level + 1}
               selected={selected}
               onClick={onClick}
@@ -113,8 +113,8 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   // to create components, we only create the top level components if the model is a top level
   // model.  The component then recursively creates components for the children.  This ensures that
   // the indexing of the components is correct.
-  const flattenedModels = useMemo(() => {
-    const flattened: M[] = [];
+  const _flattenedModels = useMemo<ModelItem<M>[]>(() => {
+    const flattened: ModelItem<M>[] = [];
 
     const addModel = (m: ModelItem<M>) => {
       if (!isNil(m.children)) {
@@ -128,12 +128,40 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     };
     map(props.models, (model: ModelItem<M>) => addModel(model));
     return flattened;
-  }, [props.models]);
+  }, [useDeepEqualMemo(props.models)]);
 
-  const filteredModels = useDebouncedJSSearch<M>(props.search, flattenedModels, {
+  // This will only perform searching if clientSearching is not false.
+  const _filteredModels = useDebouncedJSSearch<ModelItem<M>>(props.search, _flattenedModels, {
     indices: props.searchIndices || ["id"],
     disabled: props.clientSearching === false
   });
+
+  const models = useMemo<ModelItem<M>[]>(() => {
+    // const indexItem = (m: ModelItem<M>, index: number): ModelItemWithIndex<M> => ({
+    //   ...m,
+    //   index,
+    //   children: map(m.children, (c: ModelItem<M>, i: number) => indexItem(c, index + i + 1))
+    // });
+    if (props.clientSearching === false) {
+      return _flattenedModels;
+      // return map(_flattenedModels, (m: ModelItem<M>, index: number) => indexItem(m, index));
+    }
+    return _filteredModels;
+    // return map(_filteredModels, (m: ModelItem<M>, index: number) => indexItem(m, index));
+  }, [useDeepEqualMemo(_filteredModels), useDeepEqualMemo(_flattenedModels), props.clientSearching]);
+
+  const indexMap = useMemo<{ [key: string]: number }>(() => {
+    const mapping: { [key: string]: number } = {};
+    map(models, (m: ModelItem<M>, index: number) => {
+      mapping[String(m.id)] = index;
+    });
+    return mapping;
+  }, [useDeepEqualMemo(models)]);
+
+  const topLevelModels = useMemo<ModelItem<M>[]>(() => {
+    const topLevelIds: (number | string)[] = map(props.models, (m: M) => m.id);
+    return filter(models, (model: ModelItem<M>) => includes(topLevelIds, model.id)) as ModelItem<M>[];
+  }, [useDeepEqualMemo(models)]);
 
   useEffect(() => {
     if (isNil(props.selected)) {
@@ -145,47 +173,47 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
 
   useEffect(() => {
     if (focusedIndex !== null) {
-      if (isNil(filteredModels[focusedIndex])) {
+      if (isNil(models[focusedIndex])) {
         setFocusedIndex(0);
       }
     }
-  }, [useDeepEqualMemo(filteredModels)]);
+  }, [useDeepEqualMemo(models)]);
 
   useEffect(() => {
-    if (filteredModels.length === 1) {
+    if (models.length === 1) {
       setFocusedIndex(0);
       setFocused(true);
     }
-  }, [useDeepEqualMemo(filteredModels)]);
+  }, [useDeepEqualMemo(models)]);
 
   useImperativeHandle(
     props.menuRef,
     (): ModelMenuRef<M> => ({
       focused,
       focusedIndex,
-      allowableFocusedIndexRange: filteredModels.length,
+      allowableFocusedIndexRange: models.length,
       incrementFocusedIndex: () => {
-        setFocusedIndex(isNil(focusedIndex) ? 0 : Math.min(focusedIndex + 1, filteredModels.length - 1));
+        setFocusedIndex(isNil(focusedIndex) ? 0 : Math.min(focusedIndex + 1, models.length - 1));
       },
       decrementFocusedIndex: () => {
         setFocusedIndex(isNil(focusedIndex) ? 0 : Math.max(focusedIndex - 1, 0));
       },
       focusAtIndex: (index: number) => {
         setFocused(true);
-        setFocusedIndex(Math.min(index, filteredModels.length - 1));
+        setFocusedIndex(Math.min(index, models.length - 1));
       },
       focus: (value: boolean) => {
         setFocused(value);
       },
       getModelAtFocusedIndex: () => {
         if (!isNil(focusedIndex)) {
-          return filteredModels[focusedIndex] || null;
+          return models[focusedIndex] || null;
         }
         return null;
       },
       selectModelAtFocusedIndex: () => {
         if (!isNil(focusedIndex)) {
-          const model = filteredModels[focusedIndex];
+          const model = models[focusedIndex];
           if (!isNil(model)) {
             onMenuItemClick(model);
           }
@@ -249,69 +277,57 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
           // to create components, we only create the top level components if the model is a top level
           // model.  The component then recursively creates components for the children.  This ensures that
           // the indexing of the components is correct.
-          map(filteredModels, (model: M, index: number) => {
-            // Check to see if the model is a top level model and only render the component if it
-            // is.  The subsequent level models will be rendered recursively by the ModelMenuItem
-            // component.
-            if (
-              includes(
-                map(props.models, (m: ModelItem<M>) => m.id),
-                model.id
-              )
-            ) {
-              return (
-                <ModelMenuItem<M>
-                  key={model.id}
-                  model={model}
-                  baseIndex={index}
-                  focused={focused}
-                  focusedIndex={focusedIndex}
-                  level={0}
-                  isMenuItemActive={isMenuItemActive}
-                  isMenuItemVisible={isMenuItemVisible}
-                  checkbox={isMultipleModelMenuProps(props) && props.checkbox === true}
-                  // This callback might be being used for the recursive children, so it might not necessarily
-                  // equal the `model`.
-                  onClick={(m: M) => onMenuItemClick(m)}
-                  selected={selected}
-                  renderItem={props.renderItem}
-                  levelIndent={props.levelIndent}
-                  // This callback might be being used for the recursive children, so it might not necessarily
-                  // equal the `model`.
-                  onSelect={(m: M) => {
-                    if (isMultipleModelMenuProps(props)) {
-                      const selectedModels = filter(
-                        map(selected, (id: number | string) => find(flattenedModels, { id })),
-                        (mi: M | undefined) => mi !== undefined
-                      ) as M[];
-                      setSelected([...selected, model.id]);
-                      props.onChange([...selectedModels, model]);
-                    } else {
-                      setSelected([model.id]);
-                      props.onChange(model);
-                    }
-                  }}
-                  // This callback might be being used for the recursive children, so it might not necessarily
-                  // equal the `model`.
-                  onDeselect={() => {
-                    if (isMultipleModelMenuProps(props)) {
-                      const selectedModels = filter(
-                        map(selected, (id: number | string) => find(flattenedModels, { id })),
-                        (mi: M | undefined) => mi !== undefined
-                      ) as M[];
-                      setSelected(filter(selected, (id: number | string) => id !== model.id));
-                      props.onChange(filter(selectedModels, (m: M) => m.id !== model.id));
-                    } else {
-                      setSelected([model.id]);
-                      props.onChange(model);
-                    }
-                  }}
-                  {...props.itemProps}
-                />
-              );
-            } else {
-              return <></>;
-            }
+          map(topLevelModels, (model: ModelItem<M>) => {
+            return (
+              <ModelMenuItem<M>
+                key={model.id}
+                model={model}
+                focused={focused}
+                focusedIndex={focusedIndex}
+                level={0}
+                indexMap={indexMap}
+                isMenuItemActive={isMenuItemActive}
+                isMenuItemVisible={isMenuItemVisible}
+                checkbox={isMultipleModelMenuProps(props) && props.checkbox === true}
+                // This callback might be being used for the recursive children, so it might not necessarily
+                // equal the `model`.
+                onClick={(m: M) => onMenuItemClick(m)}
+                selected={selected}
+                renderItem={props.renderItem}
+                levelIndent={props.levelIndent}
+                // This callback might be being used for the recursive children, so it might not necessarily
+                // equal the `model`.
+                onSelect={(m: M) => {
+                  if (isMultipleModelMenuProps(props)) {
+                    const selectedModels = filter(
+                      map(selected, (id: number | string) => find(models, { id })),
+                      (mi: M | undefined) => mi !== undefined
+                    ) as M[];
+                    setSelected([...selected, model.id]);
+                    props.onChange([...selectedModels, model]);
+                  } else {
+                    setSelected([model.id]);
+                    props.onChange(model);
+                  }
+                }}
+                // This callback might be being used for the recursive children, so it might not necessarily
+                // equal the `model`.
+                onDeselect={() => {
+                  if (isMultipleModelMenuProps(props)) {
+                    const selectedModels = filter(
+                      map(selected, (id: number | string) => find(models, { id })),
+                      (mi: M | undefined) => mi !== undefined
+                    ) as M[];
+                    setSelected(filter(selected, (id: number | string) => id !== model.id));
+                    props.onChange(filter(selectedModels, (m: M) => m.id !== model.id));
+                  } else {
+                    setSelected([model.id]);
+                    props.onChange(model);
+                  }
+                }}
+                {...props.itemProps}
+              />
+            );
           })
         ) : !isNil(props.emptyItem) ? (
           <Menu.Item

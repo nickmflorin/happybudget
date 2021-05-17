@@ -1,15 +1,15 @@
 import { Ref, ReactNode } from "react";
 
-export type ModelItem<T extends Model.M = Model.M> = T & {
+export type ModelItem<T extends Model.M> = T & {
   readonly children?: ModelItem<T>[];
 };
 
-export type ModelMenuRef<T extends ModelItem> = {
+export type ModelMenuRef<M extends Model.M> = {
   readonly incrementFocusedIndex: () => void;
   readonly decrementFocusedIndex: () => void;
   readonly focus: (value: boolean) => void;
   readonly focusAtIndex: (index: number) => void;
-  readonly getModelAtFocusedIndex: () => T | null;
+  readonly getModelAtFocusedIndex: () => M | null;
   readonly selectModelAtFocusedIndex: () => void;
   readonly focused: boolean;
   readonly focusedIndex: number | null;
@@ -56,9 +56,9 @@ export interface ModelMenuItemProps<M extends Model.M> extends StandardComponent
   readonly checkbox: boolean;
   readonly focused: boolean;
   readonly focusedIndex: number | null;
-  readonly baseIndex: number;
   readonly level: number;
   readonly levelIndent?: number;
+  readonly indexMap: { [key: string]: number };
   readonly isMenuItemVisible: (model: M) => boolean;
   readonly isMenuItemActive: (model: M) => boolean;
   readonly onClick: (model: M) => void;
@@ -76,7 +76,7 @@ export const isMultipleModelMenuProps = <M extends Model.M>(
 export type ModelMenuProps<M extends Model.M> = _ModelMenuProps<M> &
   (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
 
-interface _ModelTagsMenuProps<M extends Model.M = ModelItem> extends Omit<_ModelMenuProps<M>, "renderItem"> {
+interface _ModelTagsMenuProps<M extends Model.M> extends Omit<_ModelMenuProps<M>, "renderItem"> {
   readonly modelTextField?: keyof M & string;
   readonly modelColorField?: keyof M & string;
   readonly tagProps?: any;
