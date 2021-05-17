@@ -5,7 +5,14 @@ import { ICellEditorParams } from "@ag-grid-community/core";
 import ModelTagCellEditor from "./Generic";
 
 const PaymentMethodCellEditor = (props: ICellEditorParams, ref: any) => {
-  return <ModelTagCellEditor<Model.PaymentMethod> models={PaymentMethods} forwardedRef={ref} {...props} />;
+  return (
+    <ModelTagCellEditor<Model.PaymentMethod>
+      searchIndices={["name"]}
+      models={PaymentMethods}
+      forwardedRef={ref}
+      {...props}
+    />
+  );
 };
 
 export default forwardRef(PaymentMethodCellEditor);

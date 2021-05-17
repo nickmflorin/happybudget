@@ -143,7 +143,7 @@ export const useDebouncedSearch = <T>(
 };
 
 export interface SearchOptions {
-  readonly indices: (string[] | string)[];
+  readonly indices: SearchIndicies;
   readonly debounceTime?: number;
   readonly idField?: string;
   readonly disabled?: boolean;
@@ -156,17 +156,12 @@ export const useDebouncedJSSearch = <T>(search: string | undefined, models: T[],
   useEffect(() => {
     const jssearch = new JsSearch.Search(options.idField || "id");
     jssearch.indexStrategy = new JsSearch.PrefixIndexStrategy();
-    forEach(options.indices, (indice: string | string[]) => {
+    forEach(options.indices, (indice: SearchIndex) => {
       jssearch.addIndex(indice);
     });
+    jssearch.addDocuments(models);
     setJsSearch(jssearch);
-  }, [options.indices]);
-
-  useEffect(() => {
-    if (!isNil(jsSearch) && options.disabled !== true) {
-      jsSearch.addDocuments(models);
-    }
-  }, [jsSearch, useDeepEqualMemo(models), options.disabled]);
+  }, []);
 
   const doSearch = (searchValue: string) => {
     if (!isNil(jsSearch)) {
@@ -187,7 +182,7 @@ export const useDebouncedJSSearch = <T>(search: string | undefined, models: T[],
         debouncedSearch.cancel();
       };
     }
-  }, [search, useDeepEqualMemo(models), options.disabled]);
+  }, [search, useDeepEqualMemo(models)]);
 
   return filteredModels;
 };

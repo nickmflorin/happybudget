@@ -23,7 +23,7 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly selected?: number | number[] | null;
   readonly search?: string;
   readonly fillWidth?: boolean;
-  readonly forwardedRef?: Ref<ModelMenuRef<M>>;
+  readonly menuRef?: Ref<ModelMenuRef<M>>;
   readonly highlightActive?: boolean;
   readonly itemProps?: any;
   readonly levelIndent?: number;
@@ -98,10 +98,10 @@ export type ExpandedModelMenuRef<M extends Model.M> = {
   readonly menuAllowableFocusedIndexRange: number;
 };
 
-interface _ExpandedModelMenuProps<M extends Model.M> extends Omit<_ModelMenuProps<M>, "forwardedRef" | "loading"> {
+interface _ExpandedModelMenuProps<M extends Model.M> extends Omit<_ModelMenuProps<M>, "menuRef" | "loading"> {
   readonly menuLoading?: boolean;
   readonly menuProps?: StandardComponentProps;
-  readonly forwardedRef?: Ref<ExpandedModelMenuRef<M>>;
+  readonly menuRef?: Ref<ExpandedModelMenuRef<M>>;
   readonly focusSearchOnCharPress?: boolean;
   readonly searchPlaceholder?: string;
   readonly children?: ReactNode;

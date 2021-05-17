@@ -6,7 +6,7 @@ import { faPlus } from "@fortawesome/pro-light-svg-icons";
 
 import { ICellEditorParams } from "@ag-grid-community/core";
 
-import { TypeAgnosticExpandedModelTagsMenu, ExpandedModelMenuRef } from "components/menus";
+import { ExpandedModelTagsMenu, ExpandedModelMenuRef } from "components/menus";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
@@ -29,7 +29,6 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       const menuRefObj = menuRef.current;
       if (!isNil(menuRefObj)) {
         menuRefObj.focusSearch(true, props.charPress);
-
         return () => {
           menuRefObj.focusSearch(false);
         };
@@ -80,7 +79,7 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
   });
 
   return (
-    <TypeAgnosticExpandedModelTagsMenu
+    <ExpandedModelTagsMenu<Model.Fringe>
       style={{ width: 160 }}
       highlightActive={false}
       checkbox={true}
@@ -89,7 +88,8 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       models={props.fringes}
       onChange={(ms: Model.Fringe[]) => setValue(map(ms, (m: Model.Fringe) => m.id))}
       tagProps={{ style: { width: "100%", maxWidth: 120 } }}
-      ref={menuRef}
+      menuRef={menuRef}
+      searchIndices={["name"]}
       focusSearchOnCharPress={true}
       emptyItem={{
         onClick: () => props.onAddFringes(),

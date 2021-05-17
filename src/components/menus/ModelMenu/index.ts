@@ -1,10 +1,10 @@
 export * from "./model";
-export { default as createModelMenu } from "./ModelMenu";
+export { default as ModelMenu } from "./ModelMenu";
 export * from "./ModelMenu";
-export { default as createModelTagsMenu } from "./ModelTagsMenu";
+export { default as ModelTagsMenu } from "./ModelTagsMenu";
 export * from "./ModelTagsMenu";
-export { default as createExpandedModelMenu } from "./ExpandedModelMenu";
+export { default as ExpandedModelMenu } from "./ExpandedModelMenu";
 export * from "./ExpandedModelMenu";
-export { default as createExpandedModelTagsMenu } from "./ExpandedModelTagsMenu";
+export { default as ExpandedModelTagsMenu } from "./ExpandedModelTagsMenu";
 export * from "./ExpandedModelTagsMenu";
 export { default as BudgetItemTreeMenu } from "./BudgetItemTreeMenu";

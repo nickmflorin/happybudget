@@ -1,7 +1,7 @@
 import { useImperativeHandle, useRef, useState, useEffect } from "react";
 import { isNil } from "lodash";
 
-import { TypeAgnosticExpandedModelTagsMenu, ExpandedModelMenuRef } from "components/menus";
+import { ExpandedModelTagsMenu, ExpandedModelMenuRef } from "components/menus";
 
 import { ICellEditorParams } from "@ag-grid-community/core";
 
@@ -11,6 +11,7 @@ const KEY_DELETE = 46;
 interface ModelTagCellEditorProps<M extends Model.Model> extends ICellEditorParams {
   models: M[];
   forwardedRef: any;
+  searchIndices: SearchIndicies;
 }
 
 const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProps<M>) => {
@@ -60,14 +61,15 @@ const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProp
   });
 
   return (
-    <TypeAgnosticExpandedModelTagsMenu
+    <ExpandedModelTagsMenu<M>
       style={{ width: 160 }}
       selected={!isNil(value) ? value.id : null}
       models={props.models}
+      searchIndices={props.searchIndices}
       onChange={(m: M) => setValue(m)}
       multiple={false}
       tagProps={{ style: { width: "100%", maxWidth: 120 } }}
-      ref={menuRef}
+      menuRef={menuRef}
       focusSearchOnCharPress={true}
     />
   );

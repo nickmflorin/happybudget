@@ -1,4 +1,4 @@
-import React, { Ref, forwardRef, useImperativeHandle, useEffect, useState, useMemo } from "react";
+import React, { useImperativeHandle, useEffect, useState, useMemo } from "react";
 import { map, isNil, includes, filter, find } from "lodash";
 import classNames from "classnames";
 import { Menu, Checkbox } from "antd";
@@ -103,7 +103,7 @@ export const ModelMenuItem = <M extends Model.M>({
   );
 };
 
-export const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => {
+const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => {
   const [focused, setFocused] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [selected, setSelected] = useState<(number | string)[]>([]);
@@ -159,7 +159,7 @@ export const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Elem
   }, [useDeepEqualMemo(filteredModels)]);
 
   useImperativeHandle(
-    props.forwardedRef,
+    props.menuRef,
     (): ModelMenuRef<M> => ({
       focused,
       focusedIndex,
@@ -329,14 +329,4 @@ export const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Elem
   );
 };
 
-export const TypeAgnosticModelMenu = forwardRef((props: ModelMenuProps<any>, ref?: Ref<ModelMenuRef<any>>) => (
-  <ModelMenu<any> {...props} forwardedRef={ref} />
-));
-
-const createModelMenu = <M extends ModelItem>() => {
-  return forwardRef((props: ModelMenuProps<M>, ref?: Ref<ModelMenuRef<M>>) => (
-    <ModelMenu<M> {...props} forwardedRef={ref} />
-  ));
-};
-
-export default createModelMenu;
+export default ModelMenu;

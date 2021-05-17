@@ -82,7 +82,7 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
       selected={!isNil(value) ? value.id : null}
       nodes={budgetItemsTree}
       onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount) => setValue(m)}
-      ref={menuRef}
+      menuRef={menuRef}
       focusSearchOnCharPress={true}
     />
   );

@@ -1,18 +1,12 @@
-import { Ref, forwardRef, useMemo } from "react";
+import { useMemo } from "react";
 import { map } from "lodash";
 
 import { useDeepEqualMemo } from "lib/hooks";
 
 import { EntityText } from "components/typography";
 
-import createExpandedModelMenu from "./ExpandedModelMenu";
-import {
-  BudgetItemTreeMenuProps,
-  ExpandedModelMenuRef,
-  StringSubAccountNode,
-  StringAccountNode,
-  BudgetItemMenuModel
-} from "./model";
+import ExpandedModelMenu from "./ExpandedModelMenu";
+import { BudgetItemTreeMenuProps, StringSubAccountNode, StringAccountNode } from "./model";
 
 import "./BudgetItemTreeMenu.scss";
 
@@ -39,14 +33,12 @@ const convertAccountNodeToStringIdForm = (node: Model.AccountTreeNode): StringAc
 };
 
 const BudgetItemTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: BudgetItemTreeMenuProps) => {
-  const ExpandedModelMenu = createExpandedModelMenu<StringSubAccountNode | StringAccountNode>();
-
   const models: (StringAccountNode | StringSubAccountNode)[] = useMemo(() => {
     return map(nodes, (node: Model.AccountTreeNode) => convertAccountNodeToStringIdForm(node));
   }, [useDeepEqualMemo(nodes)]);
 
   return (
-    <ExpandedModelMenu
+    <ExpandedModelMenu<StringSubAccountNode | StringAccountNode>
       {...props}
       onChange={(model: Omit<StringSubAccountNode, "children"> | Omit<StringAccountNode, "children">) => {
         const { originalId, ...rest } = model;
@@ -70,6 +62,4 @@ const BudgetItemTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
   );
 };
 
-export default forwardRef((props: BudgetItemTreeMenuProps, ref?: Ref<ExpandedModelMenuRef<BudgetItemMenuModel>>) => (
-  <BudgetItemTreeMenu {...props} forwardedRef={ref} />
-));
+export default BudgetItemTreeMenu;

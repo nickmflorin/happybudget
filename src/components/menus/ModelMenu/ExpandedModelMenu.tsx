@@ -1,4 +1,4 @@
-import React, { Ref, forwardRef, useMemo, useImperativeHandle, useCallback, useState, useRef, useEffect } from "react";
+import React, { useImperativeHandle, useCallback, useState, useRef, useEffect } from "react";
 import { isNil, get } from "lodash";
 
 import classNames from "classnames";
@@ -10,27 +10,26 @@ import { faSearch } from "@fortawesome/pro-light-svg-icons";
 import { isCharacterKeyPress, isBackspaceKeyPress } from "lib/util/events";
 
 import { ExpandedModelMenuRef, ModelMenuRef, ExpandedModelMenuProps } from "./model";
-import createModelMenu from "./ModelMenu";
+import ModelMenu from "./ModelMenu";
 import "./ExpandedModelMenu.scss";
 
 const ExpandedModelMenu = <M extends Model.M>({
   className,
   style,
   search,
-  forwardedRef,
+  menuRef,
   focusSearchOnCharPress,
   onSearch,
   ...props
 }: ExpandedModelMenuProps<M>): JSX.Element => {
   const [_search, _setSearch] = useState("");
-  const menuRef = useRef<ModelMenuRef<M>>(null);
+  const _menuRef = useRef<ModelMenuRef<M>>(null);
   const searchRef = useRef<Input>(null);
-  const ModelMenu = useMemo(() => createModelMenu<M>(), []);
 
   const getFromMenuRef = useCallback(
     (getter: string, notSet: any): any => {
-      if (!isNil(menuRef.current)) {
-        return get(menuRef.current, getter);
+      if (!isNil(_menuRef.current)) {
+        return get(_menuRef.current, getter);
       }
       return notSet;
     },
@@ -38,15 +37,15 @@ const ExpandedModelMenu = <M extends Model.M>({
   );
 
   const getModelAtMenuFocusedIndex = () => {
-    if (!isNil(menuRef.current)) {
-      return menuRef.current.getModelAtFocusedIndex();
+    if (!isNil(_menuRef.current)) {
+      return _menuRef.current.getModelAtFocusedIndex();
     }
     return null;
   };
 
   const selectModelAtMenuFocusedIndex = () => {
-    if (!isNil(menuRef.current)) {
-      return menuRef.current.selectModelAtFocusedIndex();
+    if (!isNil(_menuRef.current)) {
+      return _menuRef.current.selectModelAtFocusedIndex();
     }
   };
 
@@ -75,7 +74,7 @@ const ExpandedModelMenu = <M extends Model.M>({
   };
 
   useImperativeHandle(
-    forwardedRef,
+    menuRef,
     (): ExpandedModelMenuRef<M> => ({
       menuFocused: getFromMenuRef("focused", false),
       menuFocusedIndex: getFromMenuRef("focusedIndex", null),
@@ -83,16 +82,16 @@ const ExpandedModelMenu = <M extends Model.M>({
       getModelAtMenuFocusedIndex: getModelAtMenuFocusedIndex,
       selectModelAtMenuFocusedIndex: selectModelAtMenuFocusedIndex,
       incrementMenuFocusedIndex: () => {
-        !isNil(menuRef.current) && menuRef.current.incrementFocusedIndex();
+        !isNil(_menuRef.current) && _menuRef.current.incrementFocusedIndex();
       },
       decrementMenuFocusedIndex: () => {
-        !isNil(menuRef.current) && menuRef.current.decrementFocusedIndex();
+        !isNil(_menuRef.current) && _menuRef.current.decrementFocusedIndex();
       },
       focusMenuAtIndex: (index: number) => {
-        !isNil(menuRef.current) && menuRef.current.focusAtIndex(index);
+        !isNil(_menuRef.current) && _menuRef.current.focusAtIndex(index);
       },
       focusMenu: (value: boolean) => {
-        !isNil(menuRef.current) && menuRef.current.focus(value);
+        !isNil(_menuRef.current) && _menuRef.current.focus(value);
       },
       focusSearch: focusSearch
     })
@@ -108,7 +107,7 @@ const ExpandedModelMenu = <M extends Model.M>({
           }
         }
       } else {
-        const menuRefObj = menuRef.current;
+        const menuRefObj = _menuRef.current;
         if (!isNil(menuRefObj)) {
           if (e.code === "Enter") {
             selectModelAtMenuFocusedIndex();
@@ -148,7 +147,7 @@ const ExpandedModelMenu = <M extends Model.M>({
           value={isNil(search) ? _search : search}
           ref={searchRef}
           onFocus={() => {
-            const menuRefObj = menuRef.current;
+            const menuRefObj = _menuRef.current;
             if (!isNil(menuRefObj)) {
               menuRefObj.focus(false);
             }
@@ -164,28 +163,16 @@ const ExpandedModelMenu = <M extends Model.M>({
       {!isNil(props.children) ? (
         props.children
       ) : (
-        <ModelMenu
+        <ModelMenu<M>
           {...props}
           {...props.menuProps}
           loading={props.menuLoading}
           search={isNil(search) ? _search : search}
-          ref={menuRef}
+          menuRef={_menuRef}
         />
       )}
     </div>
   );
 };
 
-export const TypeAgnosticExpandedModelMenu = forwardRef(
-  (props: ExpandedModelMenuProps<any>, ref?: Ref<ExpandedModelMenuRef<any>>) => (
-    <ExpandedModelMenu<any> {...props} forwardedRef={ref} />
-  )
-);
-
-const createExpandedModelMenu = <M extends Model.M>() => {
-  return forwardRef((props: ExpandedModelMenuProps<M>, ref?: Ref<ExpandedModelMenuRef<M>>) => (
-    <ExpandedModelMenu<M> {...props} forwardedRef={ref} />
-  ));
-};
-
-export default createExpandedModelMenu;
+export default ExpandedModelMenu;

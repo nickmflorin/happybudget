@@ -1,14 +1,12 @@
-import { Ref, useMemo, forwardRef } from "react";
 import { isNil } from "lodash";
 import { Tag } from "components/tagging";
 
-import { ExpandedModelTagsMenuProps, ExpandedModelMenuRef } from "./model";
-import createExpandedModelMenu from "./ExpandedModelMenu";
+import { ExpandedModelTagsMenuProps } from "./model";
+import ExpandedModelMenu from "./ExpandedModelMenu";
 
 const ExpandedModelTagsMenu = <M extends Model.M>(props: ExpandedModelTagsMenuProps<M>): JSX.Element => {
-  const ExpandedModelMenu = useMemo(() => createExpandedModelMenu<M>(), []);
   return (
-    <ExpandedModelMenu
+    <ExpandedModelMenu<M>
       searchIndices={!isNil(props.modelTextField) ? [props.modelTextField] : undefined}
       {...props}
       renderItem={(model: M) => (
@@ -25,16 +23,4 @@ const ExpandedModelTagsMenu = <M extends Model.M>(props: ExpandedModelTagsMenuPr
   );
 };
 
-export const TypeAgnosticExpandedModelTagsMenu = forwardRef(
-  (props: ExpandedModelTagsMenuProps<any>, ref?: Ref<ExpandedModelMenuRef<any>>) => (
-    <ExpandedModelTagsMenu<any> {...props} forwardedRef={ref} />
-  )
-);
-
-const createExpandedModelTagsMenu = <M extends Model.M>() => {
-  return forwardRef((props: ExpandedModelTagsMenuProps<M>, ref?: Ref<ExpandedModelMenuRef<M>>) => (
-    <ExpandedModelTagsMenu<M> {...props} forwardedRef={ref} />
-  ));
-};
-
-export default createExpandedModelTagsMenu;
+export default ExpandedModelTagsMenu;

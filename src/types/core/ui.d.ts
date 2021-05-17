@@ -20,6 +20,9 @@ interface Field {
   label: string;
 }
 
+type SearchIndex = string | string[];
+type SearchIndicies = SearchIndex[];
+
 interface StandardComponentProps {
   readonly id?: any;
   readonly className?: string;

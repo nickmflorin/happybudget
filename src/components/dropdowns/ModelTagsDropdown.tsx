@@ -4,12 +4,11 @@ import classNames from "classnames";
 import { Dropdown } from "antd";
 import { DropDownProps } from "antd/lib/dropdown";
 
-import { createModelTagsMenu } from "components/menus";
+import { ModelTagsMenu } from "components/menus";
 import { Tag } from "components/tagging";
 import { EmptyTagProps } from "components/tagging/Tag";
 
 import "./ModelTagsDropdown.scss";
-import { useMemo } from "react";
 
 type SingleModelTagsDropdownProps<M extends Model.Model, V extends number = number> = {
   onChange: (models: M) => void;
@@ -54,8 +53,6 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
 
   const { emptyItem, ...dropdownProps } = props;
 
-  const ModelTagsMenu = useMemo(() => createModelTagsMenu<M>(), []);
-
   if (isMultiple(props)) {
     let selectedPresentModels: M[] = [];
     if (props.value !== null) {
@@ -70,7 +67,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
         className={classNames("model-tags-dropdown", props.className)}
         trigger={props.trigger || ["click"]}
         overlay={
-          <ModelTagsMenu
+          <ModelTagsMenu<M>
             selected={props.selected}
             models={props.models}
             modelTextField={props.modelTextField}
@@ -99,7 +96,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
         className={classNames("model-tags-dropdown", props.className)}
         trigger={props.trigger || ["click"]}
         overlay={
-          <ModelTagsMenu
+          <ModelTagsMenu<M>
             selected={props.selected}
             models={props.models}
             modelTextField={props.modelTextField}
