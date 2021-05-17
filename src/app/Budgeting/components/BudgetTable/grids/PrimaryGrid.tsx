@@ -615,6 +615,8 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
             return processCellFromClipboard(params.column, params.node.data as R, params.value);
           }
         }}
+        undoRedoCellEditing={true}
+        undoRedoCellEditingLimit={5}
         stopEditingWhenGridLosesFocus={true}
         rowHeight={36}
         headerHeight={38}
