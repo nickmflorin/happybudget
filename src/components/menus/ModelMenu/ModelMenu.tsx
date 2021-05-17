@@ -76,7 +76,7 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
         {...rest} // Required for Antd Menu Item
         {...itemProps}
         onClick={(info: any) => onClick(model)}
-        className={classNames("model-menu-item", itemProps.className, {
+        className={classNames("model-menu-item", !isNil(itemProps) ? itemProps.className : "", {
           active: isActive,
           focus: focused === true && !isNil(focusedIndex) ? focusedIndex === indexMap[String(model.id)] : false
         })}
