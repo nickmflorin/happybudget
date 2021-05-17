@@ -1,10 +1,11 @@
-import { useImperativeHandle, useRef, useState, useEffect, forwardRef } from "react";
+import { useImperativeHandle, useRef, useState, useEffect, forwardRef, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { isNil } from "lodash";
+import { isNil, map, find } from "lodash";
 
 import { ICellEditorParams } from "@ag-grid-community/core";
 
 import { BudgetItemTreeMenu, ExpandedModelMenuRef, BudgetItemMenuModel } from "components/menus";
+import { useDeepEqualMemo } from "lib/hooks";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 const KEY_BACKSPACE = 8;
@@ -22,6 +23,7 @@ const selectBudgetItemsTreeLoading = simpleShallowEqualSelector(
 
 interface BudgetItemsTreeEditorProps extends ICellEditorParams {
   readonly setSearch: (value: string) => void;
+  readonly value: Model.SimpleAccount | Model.SimpleSubAccount;
 }
 
 const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
@@ -30,7 +32,26 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
   const loading = useSelector(selectBudgetItemsTreeLoading);
   const isFirstRender = useRef(true);
   const menuRef = useRef<ExpandedModelMenuRef<BudgetItemMenuModel>>(null);
-  const [value, setValue] = useState<Model.SimpleSubAccount | Model.SimpleAccount | null>(props.value);
+  const [id, setId] = useState<number | null>(!isNil(props.value) ? props.value.id : null);
+  const [type, setType] = useState<"account" | "subaccount" | null>(!isNil(props.value) ? props.value.type : null);
+
+  // This is kind of a pain in the neck, but AG Grid does not seem to work well
+  // with the value change detection when setting the entire
+  // Model.SimpleSubAccount | Model.SimpleAccount object - so we have to set the
+  // ID and the Type individually, and reconstruct the model from the set of
+  // flattened out models.
+  const flattenedModels = useMemo<(Model.SimpleAccount | Model.SimpleSubAccount)[]>(() => {
+    const flattened: (Model.SimpleAccount | Model.SimpleSubAccount)[] = [];
+    const addModel = (m: Model.AccountTreeNode | Model.SubAccountTreeNode) => {
+      const { children, ...rest } = m;
+      flattened.push(rest);
+      for (let i = 0; i < children.length; i++) {
+        addModel(children[i]);
+      }
+    };
+    map(budgetItemsTree, (model: Model.AccountTreeNode | Model.SubAccountTreeNode) => addModel(model));
+    return flattened;
+  }, [useDeepEqualMemo(budgetItemsTree)]);
 
   useEffect(() => {
     if (!isNil(props.charPress)) {
@@ -39,13 +60,13 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
         menuRefObj.focusSearch(true, props.charPress);
       }
     }
-  }, [props.charPress, menuRef.current]);
+  }, [props.charPress]);
 
   useEffect(() => {
     if (!isFirstRender.current) {
       props.stopEditing();
     }
-  }, [value]);
+  }, [id, type]);
 
   useEffect(() => {
     isFirstRender.current = false;
@@ -53,7 +74,16 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
 
   useImperativeHandle(ref, () => {
     return {
-      getValue: () => value,
+      getValue: () => {
+        const model: Model.SimpleSubAccount | Model.SimpleAccount | undefined = find(flattenedModels, {
+          id,
+          type
+        } as any);
+        if (!isNil(model)) {
+          return model;
+        }
+        return props.value;
+      },
       isCancelBeforeStart() {
         // Gets called once before editing starts, which gives us an opportunity
         // to cancel the editing before it even starts.
@@ -79,9 +109,12 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
       menuLoading={loading}
       onSearch={(v: string) => props.setSearch(v)}
       search={search}
-      selected={!isNil(value) ? value.id : null}
+      selected={!isNil(id) && !isNil(type) ? { id, type } : null}
       nodes={budgetItemsTree}
-      onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount) => setValue(m)}
+      onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount) => {
+        setId(m.id);
+        setType(m.type);
+      }}
       menuRef={menuRef}
       focusSearchOnCharPress={true}
     />

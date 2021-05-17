@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { map } from "lodash";
+import { isNil, map } from "lodash";
 
 import { useDeepEqualMemo } from "lib/hooks";
 
@@ -40,11 +40,12 @@ const BudgetItemTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
   return (
     <ExpandedModelMenu<StringSubAccountNode | StringAccountNode>
       {...props}
-      onChange={(model: Omit<StringSubAccountNode, "children"> | Omit<StringAccountNode, "children">) => {
-        const { originalId, ...rest } = model;
+      onChange={(model: StringSubAccountNode | StringAccountNode) => {
+        const { originalId, children, ...rest } = model;
         props.onChange({ ...rest, id: originalId });
       }}
       models={models}
+      selected={!isNil(props.selected) ? [`${props.selected.type}-${props.selected.id}`] : null}
       menuProps={{ className: "budget-item-tree-menu" }}
       itemProps={{ className: "budget-item-tree-menu-item" }}
       levelIndent={10}

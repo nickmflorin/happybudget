@@ -135,7 +135,7 @@ const ExpandedModelMenu = <M extends Model.M>({
     };
     window.addEventListener("keydown", keyListener);
     return () => window.removeEventListener("keydown", keyListener);
-  }, [searchRef, menuRef]);
+  }, []);
 
   return (
     <div className={classNames("expanded-model-menu", className)} style={style}>

@@ -1,9 +1,5 @@
 import { Ref, ReactNode } from "react";
 
-export type ModelItem<T extends Model.M> = T & {
-  readonly children?: ModelItem<T>[];
-};
-
 export type ModelMenuRef<M extends Model.M> = {
   readonly incrementFocusedIndex: () => void;
   readonly decrementFocusedIndex: () => void;
@@ -18,9 +14,9 @@ export type ModelMenuRef<M extends Model.M> = {
 
 interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly loading?: boolean;
-  readonly models: ModelItem<M>[];
+  readonly models: M[];
   readonly uppercase?: boolean;
-  readonly selected?: number | number[] | null;
+  readonly selected?: number | number[] | string | string[] | null;
   readonly search?: string;
   readonly fillWidth?: boolean;
   readonly menuRef?: Ref<ModelMenuRef<M>>;
@@ -33,6 +29,11 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly visible?: number[];
   readonly hidden?: number[];
   readonly emptyItem?: {
+    readonly onClick?: () => void;
+    readonly text: string;
+    readonly icon?: JSX.Element;
+  };
+  readonly noSearchResultsItem?: {
     readonly onClick?: () => void;
     readonly text: string;
     readonly icon?: JSX.Element;
@@ -50,21 +51,28 @@ interface MultipleModelMenuProps<M extends Model.M> {
   readonly checkbox?: boolean;
 }
 
-export interface ModelMenuItemProps<M extends Model.M> extends StandardComponentProps {
-  readonly model: ModelItem<M>;
+export interface ModelMenuItemProps<M extends Model.M> {
+  readonly model: M;
   readonly selected: (number | string)[];
   readonly checkbox: boolean;
   readonly focused: boolean;
   readonly focusedIndex: number | null;
   readonly level: number;
   readonly levelIndent?: number;
+  readonly multiple: boolean;
+  readonly highlightActive: boolean | undefined;
+  readonly hidden: (string | number)[] | undefined;
+  readonly visible: (string | number)[] | undefined;
   readonly indexMap: { [key: string]: number };
-  readonly isMenuItemVisible: (model: M) => boolean;
-  readonly isMenuItemActive: (model: M) => boolean;
+  readonly itemProps?: any;
   readonly onClick: (model: M) => void;
   readonly onSelect: (model: M) => void;
   readonly onDeselect: (model: M) => void;
   readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
+}
+
+export interface ModelMenuItemsProps<M extends Model.M> extends Omit<ModelMenuItemProps<M>, "model"> {
+  readonly models: M[];
 }
 
 export const isMultipleModelMenuProps = <M extends Model.M>(
@@ -134,10 +142,14 @@ export interface StringAccountNode extends Omit<Model.SimpleAccount, "id"> {
 export type BudgetItemMenuModel = StringSubAccountNode | StringAccountNode;
 
 export interface BudgetItemTreeMenuProps
-  extends Omit<ExpandedModelMenuProps<BudgetItemMenuModel>, "renderItem" | "models" | "multiple" | "onChange"> {
+  extends Omit<
+    ExpandedModelMenuProps<BudgetItemMenuModel>,
+    "renderItem" | "models" | "multiple" | "onChange" | "selected"
+  > {
   readonly nodes: Model.Tree;
   readonly onChange: (m: Model.SimpleAccount | Model.SimpleSubAccount) => void;
   readonly onSearch: (value: string) => void;
   readonly search: string;
   readonly childrenDefaultVisible?: boolean;
+  readonly selected: { id: number; type: "subaccount" | "account" } | null;
 }
