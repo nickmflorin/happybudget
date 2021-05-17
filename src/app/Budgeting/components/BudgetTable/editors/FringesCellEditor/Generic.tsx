@@ -96,6 +96,11 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
         text: "Add Fringes",
         icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />
       }}
+      noSearchResultsItem={{
+        onClick: () => props.onAddFringes(),
+        text: "Add Fringes",
+        icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />
+      }}
     />
   );
 };

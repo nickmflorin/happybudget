@@ -6,10 +6,16 @@ export type ModelMenuRef<M extends Model.M> = {
   readonly focus: (value: boolean) => void;
   readonly focusAtIndex: (index: number) => void;
   readonly getModelAtFocusedIndex: () => M | null;
-  readonly selectModelAtFocusedIndex: () => void;
+  readonly performActionAtFocusedIndex: () => void;
   readonly focused: boolean;
   readonly focusedIndex: number | null;
   readonly allowableFocusedIndexRange: number;
+};
+
+export type EmptyItem = {
+  readonly onClick?: () => void;
+  readonly text: string;
+  readonly icon?: JSX.Element;
 };
 
 interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
@@ -28,16 +34,8 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly searchIndices?: (string[] | string)[] | undefined;
   readonly visible?: number[];
   readonly hidden?: number[];
-  readonly emptyItem?: {
-    readonly onClick?: () => void;
-    readonly text: string;
-    readonly icon?: JSX.Element;
-  };
-  readonly noSearchResultsItem?: {
-    readonly onClick?: () => void;
-    readonly text: string;
-    readonly icon?: JSX.Element;
-  };
+  readonly emptyItem?: EmptyItem;
+  readonly noSearchResultsItem?: EmptyItem;
 }
 
 interface SingleModelMenuProps<M extends Model.M> {
@@ -100,7 +98,7 @@ export type ExpandedModelMenuRef<M extends Model.M> = {
   readonly focusMenu: (value: boolean) => void;
   readonly focusMenuAtIndex: (index: number) => void;
   readonly getModelAtMenuFocusedIndex: () => M | null;
-  readonly selectModelAtMenuFocusedIndex: () => void;
+  readonly performActionAtMenuFocusedIndex: () => void;
   readonly menuFocused: boolean;
   readonly menuFocusedIndex: number | null;
   readonly menuAllowableFocusedIndexRange: number;

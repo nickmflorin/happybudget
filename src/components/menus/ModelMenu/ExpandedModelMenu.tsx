@@ -43,9 +43,9 @@ const ExpandedModelMenu = <M extends Model.M>({
     return null;
   };
 
-  const selectModelAtMenuFocusedIndex = () => {
+  const performActionAtMenuFocusedIndex = () => {
     if (!isNil(_menuRef.current)) {
-      return _menuRef.current.selectModelAtFocusedIndex();
+      return _menuRef.current.performActionAtFocusedIndex();
     }
   };
 
@@ -80,7 +80,7 @@ const ExpandedModelMenu = <M extends Model.M>({
       menuFocusedIndex: getFromMenuRef("focusedIndex", null),
       menuAllowableFocusedIndexRange: getFromMenuRef("allowableFocusedIndexRange", 0),
       getModelAtMenuFocusedIndex: getModelAtMenuFocusedIndex,
-      selectModelAtMenuFocusedIndex: selectModelAtMenuFocusedIndex,
+      performActionAtMenuFocusedIndex: performActionAtMenuFocusedIndex,
       incrementMenuFocusedIndex: () => {
         !isNil(_menuRef.current) && _menuRef.current.incrementFocusedIndex();
       },
@@ -110,23 +110,17 @@ const ExpandedModelMenu = <M extends Model.M>({
         const menuRefObj = _menuRef.current;
         if (!isNil(menuRefObj)) {
           if (e.code === "Enter") {
-            selectModelAtMenuFocusedIndex();
+            performActionAtMenuFocusedIndex();
           } else if (e.code === "ArrowDown") {
             e.stopPropagation();
-            if (menuRefObj.focused === true) {
-              menuRefObj.incrementFocusedIndex();
-            } else {
-              menuRefObj.focusAtIndex(0);
-              focusSearch(false);
-            }
+            menuRefObj.incrementFocusedIndex();
+            focusSearch(false);
           } else if (e.code === "ArrowUp") {
             e.stopPropagation();
             if (menuRefObj.focused) {
+              menuRefObj.decrementFocusedIndex();
               if (menuRefObj.focusedIndex === 0) {
-                menuRefObj.focus(false);
                 focusSearch(true);
-              } else {
-                menuRefObj.decrementFocusedIndex();
               }
             }
           }

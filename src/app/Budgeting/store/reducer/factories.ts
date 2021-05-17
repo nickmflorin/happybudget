@@ -6,7 +6,7 @@ import { fringeValue } from "lib/model/util";
 import { replaceInArray } from "lib/util";
 
 import { initialBudgetSubAccountsState, initialTemplateSubAccountsState } from "../initialState";
-import fringesRootReducer from "./fringes";
+import createFringesReducer from "./fringes";
 
 interface SubAccountsGroupsActionMap {
   Response: string;
@@ -90,7 +90,7 @@ export const createTemplateSubAccountsReducer = (
     {
       strictSelect: false,
       subReducers: {
-        fringes: fringesRootReducer,
+        fringes: createFringesReducer("Template"),
         groups: createModelListResponseReducer<Model.BudgetGroup, Redux.ModelListResponseStore<Model.BudgetGroup>>({
           Response: mapping.Groups.Response,
           Request: mapping.Groups.Request,
@@ -350,7 +350,7 @@ export const createBudgetSubAccountsReducer = (
     {
       strictSelect: false,
       subReducers: {
-        fringes: fringesRootReducer,
+        fringes: createFringesReducer("Budget"),
         groups: createModelListResponseReducer<Model.BudgetGroup, Redux.ModelListResponseStore<Model.BudgetGroup>>({
           Response: mapping.Groups.Response,
           Request: mapping.Groups.Request,

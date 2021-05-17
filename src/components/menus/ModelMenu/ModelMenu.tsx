@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useEffect, useState, useMemo } from "react";
+import React, { useImperativeHandle, useEffect, useState, useCallback, useMemo } from "react";
 import { map, isNil, includes, filter, find } from "lodash";
 import classNames from "classnames";
 import { Menu, Checkbox } from "antd";
@@ -137,6 +137,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   const [focused, setFocused] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [selected, setSelected] = useState<(number | string)[]>([]);
+  const [emptyItemActive, setEmptyItemActive] = useState(false);
 
   const _flattenedModels = useMemo<M[]>(() => {
     const flattened: M[] = [];
@@ -204,6 +205,30 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     }
   }, [useDeepEqualMemo(models)]);
 
+  useEffect(() => {
+    if (props.models.length === 0 && !isNil(props.emptyItem)) {
+      setEmptyItemActive(true);
+      setFocusedIndex(null);
+      setFocused(true);
+    }
+  }, [useDeepEqualMemo(props.models)]);
+
+  useEffect(() => {
+    if (topLevelModels.length === 0 && !isNil(props.noSearchResultsItem)) {
+      setEmptyItemActive(true);
+      setFocusedIndex(null);
+      setFocused(true);
+    }
+  }, [useDeepEqualMemo(topLevelModels)]);
+
+  const focusAtIndex = (index: number) => {
+    setFocused(true);
+    if (models.length !== 0) {
+      setEmptyItemActive(false);
+      setFocusedIndex(Math.max(Math.min(index, models.length - 1), 0));
+    }
+  };
+
   useImperativeHandle(
     props.menuRef,
     (): ModelMenuRef<M> => ({
@@ -211,29 +236,44 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
       focusedIndex,
       allowableFocusedIndexRange: models.length,
       incrementFocusedIndex: () => {
-        setFocusedIndex(isNil(focusedIndex) ? 0 : Math.min(focusedIndex + 1, models.length - 1));
+        if (focusedIndex === null) {
+          focusAtIndex(0);
+        } else {
+          focusAtIndex(focusedIndex + 1);
+        }
       },
       decrementFocusedIndex: () => {
-        setFocusedIndex(isNil(focusedIndex) ? 0 : Math.max(focusedIndex - 1, 0));
+        if (focusedIndex === null || focusedIndex === 0) {
+          setFocused(false);
+          setFocusedIndex(null);
+          setEmptyItemActive(false);
+        } else {
+          focusAtIndex(focusedIndex - 1);
+        }
       },
-      focusAtIndex: (index: number) => {
-        setFocused(true);
-        setFocusedIndex(Math.min(index, models.length - 1));
-      },
+      focusAtIndex,
       focus: (value: boolean) => {
         setFocused(value);
       },
       getModelAtFocusedIndex: () => {
-        if (!isNil(focusedIndex)) {
+        if (!isNil(focusedIndex) && focused === true) {
           return models[focusedIndex] || null;
         }
         return null;
       },
-      selectModelAtFocusedIndex: () => {
-        if (!isNil(focusedIndex)) {
-          const model = models[focusedIndex];
-          if (!isNil(model)) {
-            onMenuItemClick(model);
+      performActionAtFocusedIndex: () => {
+        if (focused === true) {
+          if (!isNil(focusedIndex)) {
+            const model = models[focusedIndex];
+            if (!isNil(model)) {
+              onMenuItemClick(model);
+            }
+          } else {
+            if (topLevelModels.length === 0 && !isNil(props.noSearchResultsItem)) {
+              !isNil(props.noSearchResultsItem.onClick) && props.noSearchResultsItem.onClick();
+            } else if (props.models.length === 0 && !isNil(props.emptyItem)) {
+              !isNil(props.emptyItem.onClick) && props.emptyItem.onClick();
+            }
           }
         }
       }
@@ -309,7 +349,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
             />
           ) : (
             <Menu.Item
-              className={classNames("model-menu-item", "empty")}
+              className={classNames("model-menu-item", "empty", { active: emptyItemActive })}
               onClick={() => !isNil(props.emptyItem?.onClick) && props.emptyItem?.onClick()}
             >
               {!isNil(props.noSearchResultsItem.icon) && (
@@ -320,7 +360,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
           )
         ) : !isNil(props.emptyItem) ? (
           <Menu.Item
-            className={classNames("model-menu-item", "empty")}
+            className={classNames("model-menu-item", "empty", { active: emptyItemActive })}
             onClick={() => !isNil(props.emptyItem?.onClick) && props.emptyItem?.onClick()}
           >
             {!isNil(props.emptyItem.icon) && <div className={"icon-container"}>{props.emptyItem.icon}</div>}
