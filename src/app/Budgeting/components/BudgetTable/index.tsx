@@ -234,7 +234,6 @@ const BudgetTable = <
       },
       cellRendererParams: {
         ...identifierColumn.cellRendererParams
-        // onGroupEdit: !isNil(groupParams) ? groupParams.onEditGroup : undefined
       }
     })
   );
@@ -363,20 +362,26 @@ const BudgetTable = <
   useEffect(() => {
     const keyListener = (e: KeyboardEvent) => {
       const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      if (gridApi) {
-        if (e.key === "ArrowDown" && ctrlCmdPressed) {
-          const focusedCell = gridApi.getFocusedCell();
-          if (focusedCell) {
-            const row = gridApi?.getDisplayedRowAtIndex(focusedCell?.rowIndex);
-            if (onRowExpand && !isNil(row?.data.identifier)) {
-              onRowExpand(row?.data.id);
+      const moveDown = e.key === "ArrowDown" && ctrlCmdPressed;
+      const moveUp = e.key === "ArrowUp" && ctrlCmdPressed;
+      if (!isNil(gridApi) && (moveDown || moveUp)) {
+        const focusedCell = gridApi.getFocusedCell();
+        if (!isNil(focusedCell)) {
+          const node = gridApi.getDisplayedRowAtIndex(focusedCell.rowIndex);
+          if (!isNil(node)) {
+            const row: R = node.data;
+            if (moveDown) {
+              if (!isNil(onRowExpand) && (isNil(rowCanExpand) || rowCanExpand(row))) {
+                onRowExpand(row.id);
+              }
+            } else {
+              !isNil(onBack) && onBack();
             }
+          } else {
+            !isNil(onBack) && onBack();
           }
-        }
-        if (e.key === "ArrowUp" && ctrlCmdPressed) {
-          if (onBack) {
-            onBack();
-          }
+        } else {
+          !isNil(onBack) && onBack();
         }
       }
     };
@@ -656,6 +661,7 @@ const BudgetTable = <
           <PrimaryGrid<R, G>
             api={gridApi}
             columnApi={columnApi}
+            identifierField={identifierField}
             onCellValueChanged={onCellValueChanged}
             setApi={setGridApi}
             setColumnApi={setColumnApi}

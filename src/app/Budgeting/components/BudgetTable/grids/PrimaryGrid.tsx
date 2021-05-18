@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import classNames from "classnames";
 import { map, isNil, includes, find, uniq, forEach, filter, flatten } from "lodash";
+import { useLocation } from "react-router-dom";
 
 import { AgGridReact } from "@ag-grid-community/react";
 import { AllModules } from "@ag-grid-enterprise/all-modules";
@@ -24,7 +25,8 @@ import {
   SuppressKeyboardEventParams,
   ProcessCellForExportParams,
   CellRange,
-  CellEditingStartedEvent
+  CellEditingStartedEvent,
+  ColumnApi
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -69,6 +71,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   frameworkComponents,
   search,
   sizeColumnsToFit,
+  identifierField,
   processCellForClipboard,
   processCellFromClipboard,
   onCellValueChanged,
@@ -83,7 +86,9 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
 }: PrimaryGridProps<R, G>): JSX.Element => {
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
+  // TODO: Figure out a better way to do this.
   const oldRow = useRef<R | null>(null);
+  const location = useLocation();
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     if (sizeColumnsToFit === true) {
@@ -91,13 +96,30 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
     event.api.ensureIndexVisible(0);
 
+    const query = new URLSearchParams(location.search);
+    const rowId = query.get("row");
     const cols = event.columnApi.getAllColumns();
+
     if (!isNil(cols)) {
-      const identifierCol: Column | undefined = find(cols, obj => obj.getColId() === "identifier");
+      let identifierCol = event.columnApi.getColumn(identifierField);
+      if (isNil(identifierCol)) {
+        identifierCol = cols[0];
+      }
       if (!isNil(identifierCol)) {
-        event.api.setFocusedCell(0, identifierCol);
-        const selectedRow = event.api.getDisplayedRowAtIndex(0);
-        selectedRow?.setSelected(true);
+        let focusedOnQuery = false;
+        if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
+          const node = event.api.getRowNode(String(rowId));
+          if (!isNil(node) && !isNil(node.rowIndex) && !isNil(identifierCol)) {
+            event.api.setFocusedCell(node.rowIndex, identifierCol);
+            node.setSelected(true);
+            focusedOnQuery = true;
+          }
+        }
+        if (focusedOnQuery === false) {
+          event.api.setFocusedCell(0, identifierCol);
+          const selectedRow = event.api.getDisplayedRowAtIndex(0);
+          selectedRow?.setSelected(true);
+        }
       }
     }
   });

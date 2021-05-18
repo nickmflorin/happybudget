@@ -103,7 +103,7 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
           dispatch(bulkUpdateAccountAction(changes))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/subaccounts/${id}`)}
-        onBack={() => history.push(`/templates/${templateId}/accounts`)}
+        onBack={() => history.push(`/templates/${templateId}/accounts?row=${accountId}`)}
         onDeleteGroup={(group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id))}
         onRowRemoveFromGroup={(row: Table.TemplateSubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id))}
         onRowAddToGroup={(group: number, row: Table.TemplateSubAccountRow) =>

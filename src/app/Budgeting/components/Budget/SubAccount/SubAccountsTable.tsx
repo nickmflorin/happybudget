@@ -102,13 +102,13 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         onRowBulkUpdate={(changes: Table.RowChange<Table.BudgetSubAccountRow>[]) =>
           dispatch(bulkUpdateSubAccountAction(changes))
         }
-        onBack={() => {
+        onBack={(row?: Table.BudgetSubAccountRow) => {
           if (!isNil(subaccountDetail)) {
             const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];
             if (ancestor.type === "subaccount") {
-              history.push(`/budgets/${budgetId}/subaccounts/${ancestor.id}`);
+              history.push(`/budgets/${budgetId}/subaccounts/${ancestor.id}?row=${subaccountId}`);
             } else {
-              history.push(`/budgets/${budgetId}/accounts/${ancestor.id}`);
+              history.push(`/budgets/${budgetId}/accounts/${ancestor.id}?row=${subaccountId}`);
             }
           }
         }}

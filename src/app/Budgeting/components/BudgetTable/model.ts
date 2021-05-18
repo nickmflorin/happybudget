@@ -107,6 +107,7 @@ interface PrimaryGridPassThroughProps<R extends Table.Row<G>, G extends Model.Gr
   readonly frameworkComponents?: { [key: string]: any };
   readonly sizeColumnsToFit?: boolean | undefined;
   readonly search?: string;
+  readonly identifierField: string;
   readonly onRowUpdate: (payload: Table.RowChange<R>) => void;
   readonly onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
   readonly onRowAdd: () => void;
@@ -145,7 +146,6 @@ export interface BudgetTableProps<
   readonly data: M[];
   readonly placeholders?: R[];
   readonly selected?: number[];
-  readonly identifierField: string;
   readonly identifierFieldHeader: string;
   readonly identifierColumn?: Partial<CustomColDef<R, G>>;
   readonly actionColumn?: Partial<CustomColDef<R, G>>;

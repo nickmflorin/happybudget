@@ -108,9 +108,9 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
           if (!isNil(subaccountDetail)) {
             const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];
             if (ancestor.type === "subaccount") {
-              history.push(`/templates/${templateId}/subaccounts/${ancestor.id}`);
+              history.push(`/templates/${templateId}/subaccounts/${ancestor.id}?row=${subaccountId}`);
             } else {
-              history.push(`/templates/${templateId}/accounts/${ancestor.id}`);
+              history.push(`/templates/${templateId}/accounts/${ancestor.id}?row=${subaccountId}`);
             }
           }
         }}
