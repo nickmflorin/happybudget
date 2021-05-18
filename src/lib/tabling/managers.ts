@@ -835,7 +835,7 @@ export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Ht
     ReadWrite({ field: "color", allowNull: true }),
     ReadWrite({
       field: "unit",
-      allowNull: true,
+      allowNull: false,
       httpValueConverter: (unit: Model.FringeUnit | null) => {
         if (unit !== null) {
           return unit.id;
