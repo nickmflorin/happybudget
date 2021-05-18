@@ -91,6 +91,7 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       menuRef={menuRef}
       searchIndices={["name"]}
       focusSearchOnCharPress={true}
+      defaultFocusOnlyItem={true}
       emptyItem={{
         onClick: () => props.onAddFringes(),
         text: "Add Fringes",

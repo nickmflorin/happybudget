@@ -66,6 +66,7 @@ const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProp
       selected={!isNil(value) ? value.id : null}
       models={props.models}
       searchIndices={props.searchIndices}
+      defaultFocusOnlyItem={true}
       onChange={(m: M) => setValue(m)}
       multiple={false}
       tagProps={{ style: { width: "100%", maxWidth: 120 } }}

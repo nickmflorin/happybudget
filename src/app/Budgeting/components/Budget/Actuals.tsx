@@ -108,6 +108,13 @@ const Actuals = (): JSX.Element => {
           cellEditor: "BudgetItemsTreeEditor",
           cellEditorParams: {
             setSearch: (value: string) => dispatch(setBudgetItemsTreeSearchAction(value))
+          },
+          // Required to allow the dropdown to be selectable on Enter key.
+          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+            if (params.event.code === "Enter" && params.editing) {
+              return true;
+            }
+            return false;
           }
         }}
         indexColumn={{ width: 40, maxWidth: 50 }}

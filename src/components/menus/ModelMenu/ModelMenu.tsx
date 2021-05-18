@@ -5,7 +5,7 @@ import { Menu, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { RenderWithSpinner, ShowHide } from "components";
-import { useDeepEqualMemo, useDebouncedJSSearch } from "lib/hooks";
+import { useDeepEqualMemo, useDebouncedJSSearch, useTrackFirstRender } from "lib/hooks";
 import {
   ModelMenuRef,
   ModelMenuItemProps,
@@ -138,6 +138,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [emptyItemActive, setEmptyItemActive] = useState(false);
+  const firstRender = useTrackFirstRender();
 
   const _flattenedModels = useMemo<M[]>(() => {
     const flattened: M[] = [];
@@ -191,6 +192,18 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   }, [props.selected]);
 
   useEffect(() => {
+    if (
+      props.defaultFocusFirstItem === true &&
+      firstRender === true &&
+      models.length !== 0 &&
+      (isNil(props.selected) || (Array.isArray(props.selected) && props.selected.length === 0))
+    ) {
+      setFocusedIndex(0);
+      setFocused(true);
+    }
+  }, [props.defaultFocusFirstItem]);
+
+  useEffect(() => {
     if (focusedIndex !== null) {
       if (isNil(models[focusedIndex])) {
         setFocusedIndex(0);
@@ -198,12 +211,18 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     }
   }, [useDeepEqualMemo(models)]);
 
+  // If there is only one model that is visible, either from a search or from only
+  // 1 model being present, we may want it to be active/selected by default.
   useEffect(() => {
-    if (models.length === 1) {
+    if (
+      ((models.length === 1 && props.defaultFocusOnlyItem === true) ||
+        (props.defaultFocusOnlyItemOnSearch && !isNil(props.search) && props.search !== "")) &&
+      firstRender === false
+    ) {
       setFocusedIndex(0);
       setFocused(true);
     }
-  }, [useDeepEqualMemo(models)]);
+  }, [useDeepEqualMemo(models), props.search, props.defaultFocusOnlyItemOnSearch, props.defaultFocusOnlyItem]);
 
   useEffect(() => {
     if (props.models.length === 0 && !isNil(props.emptyItem)) {

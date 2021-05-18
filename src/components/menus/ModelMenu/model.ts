@@ -30,6 +30,9 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly itemProps?: any;
   readonly levelIndent?: number;
   readonly clientSearching?: boolean;
+  readonly defaultFocusFirstItem?: boolean;
+  readonly defaultFocusOnlyItem?: boolean;
+  readonly defaultFocusOnlyItemOnSearch?: boolean;
   readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
   readonly searchIndices?: (string[] | string)[] | undefined;
   readonly visible?: number[];

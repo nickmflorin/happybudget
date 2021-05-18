@@ -5,7 +5,7 @@ import { isNil, map, find } from "lodash";
 import { ICellEditorParams } from "@ag-grid-community/core";
 
 import { BudgetItemTreeMenu, ExpandedModelMenuRef, BudgetItemMenuModel } from "components/menus";
-import { useDeepEqualMemo } from "lib/hooks";
+import { useDeepEqualMemo, useTrackFirstRender } from "lib/hooks";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 const KEY_BACKSPACE = 8;
@@ -30,7 +30,7 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
   const budgetItemsTree = useSelector(selectBudgetItemsTree);
   const search = useSelector(selectBudgetItemsTreeSearch);
   const loading = useSelector(selectBudgetItemsTreeLoading);
-  const isFirstRender = useRef(true);
+  const isFirstRender = useTrackFirstRender();
   const menuRef = useRef<ExpandedModelMenuRef<BudgetItemMenuModel>>(null);
   const [id, setId] = useState<number | null>(!isNil(props.value) ? props.value.id : null);
   const [type, setType] = useState<"account" | "subaccount" | null>(!isNil(props.value) ? props.value.type : null);
@@ -63,14 +63,12 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
   }, [props.charPress]);
 
   useEffect(() => {
-    if (!isFirstRender.current) {
-      props.stopEditing();
+    if (!isFirstRender) {
+      if ((!isNil(id) && !isNil(type)) || (isNil(id) && isNil(type))) {
+        props.stopEditing();
+      }
     }
   }, [id, type]);
-
-  useEffect(() => {
-    isFirstRender.current = false;
-  }, []);
 
   useImperativeHandle(ref, () => {
     return {
@@ -111,6 +109,7 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
       search={search}
       selected={!isNil(id) && !isNil(type) ? { id, type } : null}
       nodes={budgetItemsTree}
+      defaultFocusOnlyItem={true}
       onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount) => {
         setId(m.id);
         setType(m.type);

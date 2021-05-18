@@ -186,3 +186,11 @@ export const useDebouncedJSSearch = <T>(search: string | undefined, models: T[],
 
   return filteredModels;
 };
+
+export const useTrackFirstRender = (): boolean => {
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    isFirstRender.current = false;
+  }, []);
+  return isFirstRender.current;
+};
