@@ -228,7 +228,27 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     }
   };
 
-  const performActionAtFocusedIndex = () => {
+  const onMenuItemClick = useDynamicCallback((model: M): void => {
+    if (isMultipleModelMenuProps(props)) {
+      const selectedModels = filter(
+        map(selected, (id: number | string) => find(props.models, { id })),
+        (m: M | undefined) => m !== undefined
+      ) as M[];
+      if (includes(selected, model.id)) {
+        setSelected(filter(selected, (id: number | string) => id !== model.id));
+        props.onChange(filter(selectedModels, (m: M) => m.id !== model.id));
+      } else {
+        setSelected([...selected, model.id]);
+        props.onChange([...selectedModels, model]);
+      }
+    } else {
+      setSelected([model.id]);
+      props.onChange(model);
+    }
+  });
+
+  const performActionAtFocusedIndex = useDynamicCallback(() => {
+    console.log({ focused, focusedIndex });
     if (focused === true) {
       if (!isNil(focusedIndex)) {
         if (focusedIndex < models.length - 1) {
@@ -251,7 +271,20 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
         }
       }
     }
-  };
+  });
+
+  const keyListener = useDynamicCallback((e: KeyboardEvent) => {
+    setFocused(true);
+    if (e.code === "Enter") {
+      performActionAtFocusedIndex();
+    } else if (e.code === "ArrowDown") {
+      e.stopPropagation();
+      incrementFocusedIndex();
+    } else if (e.code === "ArrowUp") {
+      e.stopPropagation();
+      decrementFocusedIndex();
+    }
+  });
 
   useEffect(() => {
     if (isNil(props.selected)) {
@@ -342,38 +375,6 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
       performActionAtFocusedIndex
     })
   );
-
-  const onMenuItemClick = (model: M): void => {
-    if (isMultipleModelMenuProps(props)) {
-      const selectedModels = filter(
-        map(selected, (id: number | string) => find(props.models, { id })),
-        (m: M | undefined) => m !== undefined
-      ) as M[];
-      if (includes(selected, model.id)) {
-        setSelected(filter(selected, (id: number | string) => id !== model.id));
-        props.onChange(filter(selectedModels, (m: M) => m.id !== model.id));
-      } else {
-        setSelected([...selected, model.id]);
-        props.onChange([...selectedModels, model]);
-      }
-    } else {
-      setSelected([model.id]);
-      props.onChange(model);
-    }
-  };
-
-  const keyListener = useDynamicCallback((e: KeyboardEvent) => {
-    setFocused(true);
-    if (e.code === "Enter") {
-      performActionAtFocusedIndex();
-    } else if (e.code === "ArrowDown") {
-      e.stopPropagation();
-      incrementFocusedIndex();
-    } else if (e.code === "ArrowUp") {
-      e.stopPropagation();
-      decrementFocusedIndex();
-    }
-  });
 
   useEffect(() => {
     window.addEventListener("keydown", keyListener);
