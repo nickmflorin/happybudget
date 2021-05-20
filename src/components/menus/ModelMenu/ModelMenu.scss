@@ -18,6 +18,8 @@
     &.empty {
       display: flex;
       flex-direction: row;
+      padding: 6px 10px !important;
+      height: 36px;
 
       .icon-container {
         display: flex;
