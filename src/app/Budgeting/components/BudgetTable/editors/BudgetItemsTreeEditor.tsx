@@ -110,6 +110,7 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
       selected={!isNil(id) && !isNil(type) ? { id, type } : null}
       nodes={budgetItemsTree}
       defaultFocusOnlyItem={true}
+      defaultFocusFirstItem={true}
       onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount) => {
         setId(m.id);
         setType(m.type);

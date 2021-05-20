@@ -92,6 +92,12 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       searchIndices={["name"]}
       focusSearchOnCharPress={true}
       defaultFocusOnlyItem={true}
+      defaultFocusFirstItem={true}
+      bottomItem={{
+        onClick: () => props.onAddFringes(),
+        text: "Add Fringes",
+        icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />
+      }}
       emptyItem={{
         onClick: () => props.onAddFringes(),
         text: "Add Fringes",

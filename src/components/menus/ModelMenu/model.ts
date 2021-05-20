@@ -33,12 +33,14 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly defaultFocusFirstItem?: boolean;
   readonly defaultFocusOnlyItem?: boolean;
   readonly defaultFocusOnlyItemOnSearch?: boolean;
-  readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
   readonly searchIndices?: (string[] | string)[] | undefined;
   readonly visible?: number[];
   readonly hidden?: number[];
+  readonly bottomItem?: EmptyItem;
   readonly emptyItem?: EmptyItem;
   readonly noSearchResultsItem?: EmptyItem;
+  readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
+  readonly onFocusCallback?: (focused: boolean) => void;
 }
 
 interface SingleModelMenuProps<M extends Model.M> {
@@ -107,7 +109,8 @@ export type ExpandedModelMenuRef<M extends Model.M> = {
   readonly menuAllowableFocusedIndexRange: number;
 };
 
-interface _ExpandedModelMenuProps<M extends Model.M> extends Omit<_ModelMenuProps<M>, "menuRef" | "loading"> {
+interface _ExpandedModelMenuProps<M extends Model.M>
+  extends Omit<_ModelMenuProps<M>, "menuRef" | "loading" | "onFocusCallback"> {
   readonly menuLoading?: boolean;
   readonly menuProps?: StandardComponentProps;
   readonly menuRef?: Ref<ExpandedModelMenuRef<M>>;

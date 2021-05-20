@@ -25,8 +25,7 @@ import {
   SuppressKeyboardEventParams,
   ProcessCellForExportParams,
   CellRange,
-  CellEditingStartedEvent,
-  ColumnApi
+  CellEditingStartedEvent
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 

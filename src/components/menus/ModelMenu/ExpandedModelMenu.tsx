@@ -101,28 +101,13 @@ const ExpandedModelMenu = <M extends Model.M>({
     const keyListener = (e: KeyboardEvent) => {
       if (isCharacterKeyPress(e) || isBackspaceKeyPress(e)) {
         const searchInput = searchRef.current;
+        const menuRefObj = _menuRef.current;
+        if (!isNil(menuRefObj)) {
+          menuRefObj.focus(false);
+        }
         if (!isNil(searchInput)) {
           if (searchInput.state.focused === false) {
             searchInput.focus();
-          }
-        }
-      } else {
-        const menuRefObj = _menuRef.current;
-        if (!isNil(menuRefObj)) {
-          if (e.code === "Enter") {
-            performActionAtMenuFocusedIndex();
-          } else if (e.code === "ArrowDown") {
-            e.stopPropagation();
-            menuRefObj.incrementFocusedIndex();
-            focusSearch(false);
-          } else if (e.code === "ArrowUp") {
-            e.stopPropagation();
-            if (menuRefObj.focused) {
-              menuRefObj.decrementFocusedIndex();
-              if (menuRefObj.focusedIndex === 0) {
-                focusSearch(true);
-              }
-            }
           }
         }
       }
@@ -163,6 +148,7 @@ const ExpandedModelMenu = <M extends Model.M>({
           loading={props.menuLoading}
           search={isNil(search) ? _search : search}
           menuRef={_menuRef}
+          onFocusCallback={(focused: boolean) => focusSearch(!focused)}
         />
       )}
     </div>
