@@ -233,7 +233,8 @@ const BudgetTable = <
         return 1;
       },
       cellRendererParams: {
-        ...identifierColumn.cellRendererParams
+        ...identifierColumn.cellRendererParams,
+        onGroupEdit: groupParams?.onEditGroup
       }
     })
   );
