@@ -234,11 +234,20 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
 
   const onCellKeyDown = useDynamicCallback((event: CellKeyDownEvent) => {
     if (!isNil(event.rowIndex) && !isNil(event.event)) {
-      // I do not understand why AGGrid's Event has an underlying Event that is in
-      // reality a KeyboardEvent but does not have any of the properties that a KeyboardEvent
-      // should have - meaning we have to tell TS to ignore this line.
+      // NOTE: We have to apply ts-ignore to the following lines because for whatever reason,
+      // AG Grid's Event object's underlying KeyboardEvent does not seem to have any of the
+      // properties that an actual KeyboardEvent has with Typescript.
       /* @ts-ignore */
-      if (event.event.keyCode === 13) {
+      if (event.event.code === "Space") {
+        // AG Grid only enters Edit mode in a cell when a character is pressed, not the Space
+        // key - so we have to do that manually here.
+        event.api.startEditingCell({
+          rowIndex: event.rowIndex,
+          colKey: event.column.getColId(),
+          charPress: " "
+        });
+        /* @ts-ignore */
+      } else if (event.event.keyCode === 13) {
         const editing = event.api.getEditingCells();
         if (editing.length === 0) {
           const firstEditCol = event.columnApi.getColumn(event.column.getColId());
