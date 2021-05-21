@@ -3,7 +3,7 @@
 @import '~ag-grid-community/dist/styles/ag-grid.css';
 @import '~ag-grid-community/dist/styles/ag-theme-alpine.css';
 
-$table-border-color: #f7f7f7;
+$table-border-color: #eeeeee;
 $table-border: 1px solid $table-border-color;
 
 .ag-menu-list {
@@ -308,11 +308,6 @@ $table-border: 1px solid $table-border-color;
     &:first-child {
       .ag-cell:not(.ag-cell-focus) {
         border-top: none !important;
-      }
-    }
-    &:last-child {
-      .ag-cell:not(.ag-cell-focus) {
-        border-bottom: none !important;
       }
     }
     &.row {
