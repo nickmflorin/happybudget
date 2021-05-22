@@ -111,6 +111,7 @@ const BudgetItemsTreeEditor = (props: BudgetItemsTreeEditorProps, ref: any) => {
       nodes={budgetItemsTree}
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}
+      autoFocusMenu={true}
       onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount) => {
         setId(m.id);
         setType(m.type);

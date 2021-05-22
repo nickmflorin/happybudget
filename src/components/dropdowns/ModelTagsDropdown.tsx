@@ -35,10 +35,11 @@ export type ModelTagsDropdownProps<M extends Model.Model, V extends number = num
     modelColorField?: keyof M & string;
     models: M[];
     onMissing?: JSX.Element | EmptyTagProps;
-    emptyItem?: {
+    onNoData?: {
       onClick?: () => void;
       text: string;
       icon?: JSX.Element;
+      defaultFocused?: boolean;
     };
   };
 
@@ -51,7 +52,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
     return (data as MultipleModelTagsDropdownProps<M>).multiple === true;
   };
 
-  const { emptyItem, ...dropdownProps } = props;
+  const { onNoData, ...dropdownProps } = props;
 
   if (isMultiple(props)) {
     let selectedPresentModels: M[] = [];
@@ -74,7 +75,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
             modelColorField={props.modelColorField}
             onChange={props.onChange}
             multiple={true}
-            emptyItem={emptyItem}
+            onNoData={onNoData}
           />
         }
       >
@@ -103,7 +104,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
             modelColorField={props.modelColorField}
             onChange={props.onChange}
             multiple={false}
-            emptyItem={emptyItem}
+            onNoData={onNoData}
           />
         }
       >

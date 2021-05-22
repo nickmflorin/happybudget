@@ -13,6 +13,7 @@ export type EmptyItem = {
   readonly onClick?: () => void;
   readonly text: string;
   readonly icon?: JSX.Element;
+  readonly defaultFocus?: boolean;
 };
 
 interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
@@ -33,9 +34,10 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly searchIndices?: (string[] | string)[] | undefined;
   readonly visible?: number[];
   readonly hidden?: number[];
-  readonly bottomItem?: EmptyItem;
-  readonly emptyItem?: EmptyItem;
-  readonly noSearchResultsItem?: EmptyItem;
+  readonly bottomItem?: Omit<EmptyItem, "defaultFocus">;
+  readonly onNoData?: EmptyItem;
+  readonly onNoSearchResults?: EmptyItem;
+  readonly autoFocus?: boolean;
   readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
   readonly onFocusCallback?: (focused: boolean) => void;
 }
@@ -103,13 +105,14 @@ export type ExpandedModelMenuRef<M extends Model.M> = {
 };
 
 interface _ExpandedModelMenuProps<M extends Model.M>
-  extends Omit<_ModelMenuProps<M>, "menuRef" | "loading" | "onFocusCallback"> {
+  extends Omit<_ModelMenuProps<M>, "menuRef" | "loading" | "onFocusCallback" | "autoFocus"> {
   readonly menuLoading?: boolean;
   readonly menuProps?: StandardComponentProps;
   readonly menuRef?: Ref<ExpandedModelMenuRef<M>>;
   readonly focusSearchOnCharPress?: boolean;
   readonly searchPlaceholder?: string;
   readonly children?: ReactNode;
+  readonly autoFocusMenu?: boolean;
   readonly onSearch?: (value: string) => void;
 }
 

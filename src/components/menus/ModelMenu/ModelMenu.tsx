@@ -268,11 +268,20 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   }, [props.selected]);
 
   useEffect(() => {
-    if (isFocusedState(state)) {
+    if (isFocusedState(state) || props.autoFocus === true) {
       if (props.models.length === 0) {
-        setState({ focused: true, noItems: true, noItemsActive: false });
+        if (!isNil(props.onNoData) && props.onNoData.defaultFocus === true) {
+          setState({ focused: true, noItems: true, noItemsActive: true });
+        } else {
+          setState({ focused: true, noItems: true, noItemsActive: false });
+        }
       } else if (models.length === 0) {
-        setState({ focused: true, noSearchResults: true, noSearchResultsActive: false });
+        console.log(props.onNoSearchResults);
+        if (!isNil(props.onNoSearchResults) && props.onNoSearchResults.defaultFocus === true) {
+          setState({ focused: true, noSearchResults: true, noSearchResultsActive: true });
+        } else {
+          setState({ focused: true, noSearchResults: true, noSearchResultsActive: false });
+        }
       } else {
         if (!isModelIndexFocusedState(state)) {
           setState({ focused: true, index: 0 });
@@ -282,7 +291,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   }, [props.models, models]);
 
   const incrementFocusedIndex = () => {
-    if (isFocusedState(state)) {
+    if (isFocusedState(state) || props.autoFocus === true) {
       if (isModelIndexFocusedState(state)) {
         if (state.index + 1 < models.length) {
           setState({ focused: true, index: state.index + 1 });
@@ -296,7 +305,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   };
 
   const decrementFocusedIndex = () => {
-    if (isFocusedState(state)) {
+    if (isFocusedState(state) || props.autoFocus === true) {
       if (isNoItemsFocusedState(state) && state.noItemsActive === true) {
         setState({ ...state, focused: false, noItemsActive: false });
       } else if (isNoSearchResultsFocusedState(state) && state.noSearchResultsActive === true) {
@@ -337,19 +346,19 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   });
 
   const performActionAtFocusedIndex = useDynamicCallback(() => {
-    if (isFocusedState(state)) {
+    if (isFocusedState(state) || props.autoFocus === true) {
       if (isModelIndexFocusedState(state)) {
         const model = models[state.index];
         if (!isNil(model)) {
           onMenuItemClick(model);
         }
       } else if (isNoItemsFocusedState(state) && state.noItemsActive === true) {
-        if (!isNil(props.emptyItem) && !isNil(props.emptyItem.onClick)) {
-          props.emptyItem.onClick();
+        if (!isNil(props.onNoData) && !isNil(props.onNoData.onClick)) {
+          props.onNoData.onClick();
         }
       } else if (isNoSearchResultsFocusedState(state) && state.noSearchResultsActive === true) {
-        if (!isNil(props.noSearchResultsItem) && !isNil(props.noSearchResultsItem.onClick)) {
-          props.noSearchResultsItem.onClick();
+        if (!isNil(props.onNoSearchResults) && !isNil(props.onNoSearchResults.onClick)) {
+          props.onNoSearchResults.onClick();
         }
       } else if (isBottomItemFocusedState(state)) {
         if (!isNil(props.bottomItem) && !isNil(props.bottomItem.onClick)) {
@@ -493,28 +502,28 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
         )}
         {(isNoSearchResultsFocusedState(state) || isNoSearchResultsUnfocusedState(state)) &&
           /* eslint-disable indent */
-          !isNil(props.noSearchResultsItem) && (
+          !isNil(props.onNoSearchResults) && (
             <Menu.Item
               className={classNames("model-menu-item", "empty", {
                 active: isNoSearchResultsFocusedState(state) && state.noSearchResultsActive === true
               })}
-              onClick={() => !isNil(props.noSearchResultsItem?.onClick) && props.noSearchResultsItem?.onClick()}
+              onClick={() => !isNil(props.onNoSearchResults?.onClick) && props.onNoSearchResults?.onClick()}
             >
-              {!isNil(props.noSearchResultsItem.icon) && (
-                <div className={"icon-container"}>{props.noSearchResultsItem.icon}</div>
+              {!isNil(props.onNoSearchResults.icon) && (
+                <div className={"icon-container"}>{props.onNoSearchResults.icon}</div>
               )}
-              {props.noSearchResultsItem.text}
+              {props.onNoSearchResults.text}
             </Menu.Item>
           )}
-        {(isNoItemsFocusedState(state) || isNoItemsUnfocusedState(state)) && !isNil(props.emptyItem) && (
+        {(isNoItemsFocusedState(state) || isNoItemsUnfocusedState(state)) && !isNil(props.onNoData) && (
           <Menu.Item
             className={classNames("model-menu-item", "empty", {
               active: isNoItemsFocusedState(state) && state.noItemsActive === true
             })}
-            onClick={() => !isNil(props.emptyItem?.onClick) && props.emptyItem?.onClick()}
+            onClick={() => !isNil(props.onNoData?.onClick) && props.onNoData?.onClick()}
           >
-            {!isNil(props.emptyItem.icon) && <div className={"icon-container"}>{props.emptyItem.icon}</div>}
-            {props.emptyItem.text}
+            {!isNil(props.onNoData.icon) && <div className={"icon-container"}>{props.onNoData.icon}</div>}
+            {props.onNoData.text}
           </Menu.Item>
         )}
       </Menu>

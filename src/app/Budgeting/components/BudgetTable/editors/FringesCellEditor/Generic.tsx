@@ -93,20 +93,23 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       focusSearchOnCharPress={true}
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}
+      autoFocusMenu={true}
       bottomItem={{
         onClick: () => props.onAddFringes(),
         text: "Add Fringes",
         icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />
       }}
-      emptyItem={{
+      onNoData={{
         onClick: () => props.onAddFringes(),
         text: "Add Fringes",
-        icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />
+        icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />,
+        defaultFocus: true
       }}
-      noSearchResultsItem={{
+      onNoSearchResults={{
         onClick: () => props.onAddFringes(),
         text: "Add Fringes",
-        icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />
+        icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />,
+        defaultFocus: true
       }}
     />
   );

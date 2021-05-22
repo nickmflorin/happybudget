@@ -71,6 +71,7 @@ const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProp
       multiple={false}
       tagProps={{ style: { width: "100%", maxWidth: 120 } }}
       menuRef={menuRef}
+      autoFocusMenu={true}
       focusSearchOnCharPress={true}
     />
   );
