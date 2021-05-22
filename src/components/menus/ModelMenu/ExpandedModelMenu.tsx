@@ -77,8 +77,6 @@ const ExpandedModelMenu = <M extends Model.M>({
     menuRef,
     (): ExpandedModelMenuRef<M> => ({
       menuFocused: getFromMenuRef("focused", false),
-      menuFocusedIndex: getFromMenuRef("focusedIndex", null),
-      menuAllowableFocusedIndexRange: getFromMenuRef("allowableFocusedIndexRange", 0),
       getModelAtMenuFocusedIndex: getModelAtMenuFocusedIndex,
       performActionAtMenuFocusedIndex: performActionAtMenuFocusedIndex,
       incrementMenuFocusedIndex: () => {
@@ -86,9 +84,6 @@ const ExpandedModelMenu = <M extends Model.M>({
       },
       decrementMenuFocusedIndex: () => {
         !isNil(_menuRef.current) && _menuRef.current.decrementFocusedIndex();
-      },
-      focusMenuAtIndex: (index: number) => {
-        !isNil(_menuRef.current) && _menuRef.current.focusAtIndex(index);
       },
       focusMenu: (value: boolean) => {
         !isNil(_menuRef.current) && _menuRef.current.focus(value);
@@ -109,6 +104,12 @@ const ExpandedModelMenu = <M extends Model.M>({
           if (searchInput.state.focused === false) {
             searchInput.focus();
           }
+        }
+      } else if (e.code === "ArrowDown") {
+        e.stopPropagation();
+        const menuRefObj = _menuRef.current;
+        if (!isNil(menuRefObj)) {
+          menuRefObj.focus(true);
         }
       }
     };

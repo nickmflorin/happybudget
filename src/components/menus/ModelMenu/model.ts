@@ -4,12 +4,9 @@ export type ModelMenuRef<M extends Model.M> = {
   readonly incrementFocusedIndex: () => void;
   readonly decrementFocusedIndex: () => void;
   readonly focus: (value: boolean) => void;
-  readonly focusAtIndex: (index: number) => void;
   readonly getModelAtFocusedIndex: () => M | null;
   readonly performActionAtFocusedIndex: () => void;
   readonly focused: boolean;
-  readonly focusedIndex: number | null;
-  readonly allowableFocusedIndexRange: number;
 };
 
 export type EmptyItem = {
@@ -58,7 +55,6 @@ export interface ModelMenuItemProps<M extends Model.M> {
   readonly model: M;
   readonly selected: (number | string)[];
   readonly checkbox: boolean;
-  readonly focused: boolean;
   readonly focusedIndex: number | null;
   readonly level: number;
   readonly levelIndent?: number;
@@ -101,12 +97,9 @@ export type ExpandedModelMenuRef<M extends Model.M> = {
   readonly incrementMenuFocusedIndex: () => void;
   readonly decrementMenuFocusedIndex: () => void;
   readonly focusMenu: (value: boolean) => void;
-  readonly focusMenuAtIndex: (index: number) => void;
   readonly getModelAtMenuFocusedIndex: () => M | null;
   readonly performActionAtMenuFocusedIndex: () => void;
   readonly menuFocused: boolean;
-  readonly menuFocusedIndex: number | null;
-  readonly menuAllowableFocusedIndexRange: number;
 };
 
 interface _ExpandedModelMenuProps<M extends Model.M>
