@@ -77,42 +77,44 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
         onClick={(info: any) => onClick(model)}
         className={classNames("model-menu-item", !isNil(itemProps) ? itemProps.className : "", {
           active: isActive,
-          focus: !isNil(focusedIndex) ? focusedIndex === indexMap[String(model.id)] : false
+          focus: !isNil(focusedIndex) ? focusedIndex === indexMap[String(model.id)] : false,
+          "left-align": props.leftAlign === true
         })}
+        style={{
+          ...(!isNil(itemProps) ? itemProps.style : {}),
+          ...(!isNil(levelIndent) ? { paddingLeft: 10 + levelIndent * (level - 1) } : { paddingLeft: 10 })
+        }}
       >
-        <div
-          style={!isNil(levelIndent) ? { width: "100%", paddingLeft: levelIndent * (level - 1) } : { width: "100%" }}
-        >
-          {checkbox ? (
-            <div style={{ display: "flex", width: "100%" }}>
-              <Checkbox
-                checked={includes(selected, model.id)}
-                style={{ marginRight: 8 }}
-                onChange={(e: CheckboxChangeEvent) => {
-                  e.preventDefault();
-                  if (e.target.checked) {
-                    if (selected) {
-                      /* eslint-disable no-console */
-                      console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
-                    } else {
-                      onSelect(model);
-                    }
+        {checkbox ? (
+          <div className={"with-checkbox-wrapper"}>
+            <Checkbox
+              checked={includes(selected, model.id)}
+              style={{ marginRight: 8 }}
+              onChange={(e: CheckboxChangeEvent) => {
+                e.preventDefault();
+                if (e.target.checked) {
+                  if (selected) {
+                    /* eslint-disable no-console */
+                    console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
                   } else {
-                    if (!selected) {
-                      /* eslint-disable no-console */
-                      console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
-                    } else {
-                      onDeselect(model);
-                    }
+                    onSelect(model);
                   }
-                }}
-              />
-              {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
-            </div>
-          ) : (
-            renderItem(model, { level: level, index: indexMap[String(model.id)] })
-          )}
-        </div>
+                } else {
+                  if (!selected) {
+                    /* eslint-disable no-console */
+                    console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
+                  } else {
+                    onDeselect(model);
+                  }
+                }
+              }}
+            />
+            {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
+          </div>
+        ) : (
+          renderItem(model, { level: level, index: indexMap[String(model.id)] })
+        )}
+        {/* </div> */}
       </Menu.Item>
       {isModelWithChildren(model) && model.children.length !== 0 && (
         <ModelMenuItems<M> {...primary} models={model.children} level={props.level + 1} />
@@ -459,6 +461,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
               itemProps={props.itemProps}
               indexMap={indexMap}
               highlightActive={props.highlightActive}
+              leftAlign={props.leftAlign}
               hidden={props.hidden}
               visible={props.visible}
               level={0}

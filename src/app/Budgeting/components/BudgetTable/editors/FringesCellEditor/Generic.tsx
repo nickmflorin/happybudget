@@ -87,13 +87,14 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       selected={value}
       models={props.fringes}
       onChange={(ms: Model.Fringe[]) => setValue(map(ms, (m: Model.Fringe) => m.id))}
-      tagProps={{ style: { width: "100%", maxWidth: 120 } }}
       menuRef={menuRef}
       searchIndices={["name"]}
       focusSearchOnCharPress={true}
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}
       autoFocusMenu={true}
+      leftAlign={true}
+      fillWidth={false}
       bottomItem={{
         onClick: () => props.onAddFringes(),
         text: "Add Fringes",

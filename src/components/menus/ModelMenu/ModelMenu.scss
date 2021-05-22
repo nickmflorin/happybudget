@@ -4,15 +4,31 @@
 .model-menu {
   .model-menu-item {
     display: flex;
-    padding: 4px 10px !important;
+    padding: 4px 10px;
     font-family: $open-sans;
     font-weight: 400 !important;
     margin-bottom: 0px !important;
     height: 32px;
     justify-content: center;
 
-    &:hover, &.active, &.focus {
-      background-color: rgba(212, 212, 212, 0.4);
+    &:hover, &.focus {
+      background-color: rgb(33 150 243 / 45%) !important;
+    }
+    &.active {
+      background-color: rgb(33 150 243 / 65%) !important;
+    }
+
+    .with-checkbox-wrapper {
+      width: 100%;
+      justify-content: center;
+      display: flex;
+    }
+
+    &.left-align {
+      justify-content: left;
+      .with-checkbox-wrapper {
+        justify-content: left;
+      }
     }
 
     &.empty {

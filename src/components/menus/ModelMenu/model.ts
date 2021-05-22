@@ -38,6 +38,7 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly onNoData?: EmptyItem;
   readonly onNoSearchResults?: EmptyItem;
   readonly autoFocus?: boolean;
+  readonly leftAlign?: boolean;
   readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
   readonly onFocusCallback?: (focused: boolean) => void;
 }
@@ -62,6 +63,7 @@ export interface ModelMenuItemProps<M extends Model.M> {
   readonly levelIndent?: number;
   readonly multiple: boolean;
   readonly highlightActive: boolean | undefined;
+  readonly leftAlign: boolean | undefined;
   readonly hidden: (string | number)[] | undefined;
   readonly visible: (string | number)[] | undefined;
   readonly indexMap: { [key: string]: number };
