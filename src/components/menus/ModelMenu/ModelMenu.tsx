@@ -35,6 +35,7 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
     focusedIndex,
     indexMap,
     itemProps,
+    leftAlign,
     onSelect,
     onDeselect,
     onClick,
@@ -78,7 +79,7 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
         className={classNames("model-menu-item", !isNil(itemProps) ? itemProps.className : "", {
           active: isActive,
           focus: !isNil(focusedIndex) ? focusedIndex === indexMap[String(model.id)] : false,
-          "left-align": props.leftAlign === true
+          "left-align": leftAlign === true
         })}
         style={{
           ...(!isNil(itemProps) ? itemProps.style : {}),

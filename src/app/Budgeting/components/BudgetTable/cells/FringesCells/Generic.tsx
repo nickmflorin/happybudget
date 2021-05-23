@@ -16,7 +16,7 @@ const FringesCell = <R extends Table.Row>({
 }: FringesCellProps<R>): JSX.Element => {
   return (
     <Cell {...props} onClear={() => props.setValue([])} hideClear={value.length === 0}>
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div style={{ display: "flex", justifyContent: "left" }}>
         <Tag.Multiple<Model.Fringe>
           models={
             filter(
