@@ -112,6 +112,11 @@ interface PrimaryGridPassThroughProps<R extends Table.Row<G>, G extends Model.Gr
   readonly onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
   readonly onRowAdd: () => void;
   readonly onRowDelete: (row: R) => void;
+  // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
+  // onRowExpand is provided to the BudgetTable.
+  readonly rowCanExpand?: (row: R) => boolean;
+  readonly onRowExpand?: null | ((id: number) => void);
+  readonly onBack?: () => void;
 }
 
 export interface PrimaryGridProps<R extends Table.Row<G>, G extends Model.Group = Model.Group>
@@ -162,14 +167,9 @@ export interface BudgetTableProps<
   readonly loading?: boolean;
   readonly renderFlag?: boolean;
   readonly manager: RowManager<R, M, P, G>;
-  // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
-  // onRowExpand is provided to the BudgetTable.
-  readonly rowCanExpand?: (row: R) => boolean;
   readonly cellClass?: (params: CellClassParams) => string | undefined;
   readonly onRowSelect: (id: number) => void;
   readonly onRowDeselect: (id: number) => void;
-  readonly onRowExpand?: null | ((id: number) => void);
-  readonly onBack?: () => void;
   readonly isCellEditable?: (row: R, col: ColDef) => boolean;
   readonly isCellSelectable?: (row: R, col: ColDef) => boolean;
 }

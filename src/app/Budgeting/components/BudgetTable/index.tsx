@@ -361,36 +361,6 @@ const BudgetTable = <
   }, [useDeepEqualMemo(cookies)]);
 
   useEffect(() => {
-    const keyListener = (e: KeyboardEvent) => {
-      const ctrlCmdPressed = e.ctrlKey || e.metaKey;
-      const moveDown = e.key === "ArrowDown" && ctrlCmdPressed;
-      const moveUp = e.key === "ArrowUp" && ctrlCmdPressed;
-      if (!isNil(gridApi) && (moveDown || moveUp)) {
-        const focusedCell = gridApi.getFocusedCell();
-        if (!isNil(focusedCell)) {
-          const node = gridApi.getDisplayedRowAtIndex(focusedCell.rowIndex);
-          if (!isNil(node)) {
-            const row: R = node.data;
-            if (moveDown) {
-              if (!isNil(onRowExpand) && (isNil(rowCanExpand) || rowCanExpand(row))) {
-                onRowExpand(row.id);
-              }
-            } else {
-              !isNil(onBack) && onBack();
-            }
-          } else {
-            !isNil(onBack) && onBack();
-          }
-        } else {
-          !isNil(onBack) && onBack();
-        }
-      }
-    };
-    window.addEventListener("keydown", keyListener);
-    return () => window.removeEventListener("keydown", keyListener);
-  }, [gridApi]);
-
-  useEffect(() => {
     const cols = concat(
       baseColumns,
       map(
@@ -663,25 +633,28 @@ const BudgetTable = <
             api={gridApi}
             columnApi={columnApi}
             identifierField={identifierField}
-            onCellValueChanged={onCellValueChanged}
-            setApi={setGridApi}
-            setColumnApi={setColumnApi}
             table={table}
             colDefs={colDefs}
-            processCellForClipboard={processCellForClipboard}
-            processCellFromClipboard={processCellFromClipboard}
-            setAllSelected={setAllSelected}
-            isCellEditable={_isCellEditable}
             options={gridOptions}
             groups={groups}
             groupParams={groupParams}
             frameworkComponents={frameworkComponents}
             sizeColumnsToFit={sizeColumnsToFit}
             search={search}
+            onCellValueChanged={onCellValueChanged}
+            setApi={setGridApi}
+            setColumnApi={setColumnApi}
+            processCellForClipboard={processCellForClipboard}
+            processCellFromClipboard={processCellFromClipboard}
+            setAllSelected={setAllSelected}
+            isCellEditable={_isCellEditable}
+            onRowExpand={onRowExpand}
+            rowCanExpand={rowCanExpand}
             onRowUpdate={onRowUpdate}
             onRowBulkUpdate={onRowBulkUpdate}
             onRowAdd={onRowAdd}
             onRowDelete={onRowDelete}
+            onBack={onBack}
           />
           <TableFooterGrid<R, G>
             options={tableFooterGridOptions}

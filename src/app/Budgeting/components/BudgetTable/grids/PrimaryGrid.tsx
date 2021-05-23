@@ -78,13 +78,19 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   isCellEditable,
   setApi,
   setColumnApi,
+  rowCanExpand,
+  onRowExpand,
   onRowUpdate,
   onRowBulkUpdate,
   onRowAdd,
-  onRowDelete
+  onRowDelete,
+  onBack
 }: PrimaryGridProps<R, G>): JSX.Element => {
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
+  // Stores the table change that will occur when clearing a value that has been "cut" when the
+  // cell is pasted.
+  const [cutCellChange, setCutCellChange] = useState<Table.RowChange<R> | null>(null);
   // TODO: Figure out a better way to do this.
   const oldRow = useRef<R | null>(null);
   const location = useLocation();
@@ -232,51 +238,86 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   );
 
-  const onCellKeyDown = useDynamicCallback((event: CellKeyDownEvent) => {
-    if (!isNil(event.rowIndex) && !isNil(event.event)) {
-      // NOTE: We have to apply ts-ignore to the following lines because for whatever reason,
-      // AG Grid's Event object's underlying KeyboardEvent does not seem to have any of the
-      // properties that an actual KeyboardEvent has with Typescript.
-      /* @ts-ignore */
-      if (event.event.code === "Space") {
-        // AG Grid only enters Edit mode in a cell when a character is pressed, not the Space
-        // key - so we have to do that manually here.
-        event.api.startEditingCell({
-          rowIndex: event.rowIndex,
-          colKey: event.column.getColId(),
-          charPress: " "
-        });
-        /* @ts-ignore */
-      } else if (event.event.keyCode === 13) {
-        const editing = event.api.getEditingCells();
-        if (editing.length === 0) {
-          const firstEditCol = event.columnApi.getColumn(event.column.getColId());
-          if (!isNil(firstEditCol)) {
-            event.api.ensureColumnVisible(firstEditCol);
+  // AG Grid only enters Edit mode in a cell when a character is pressed, not the Space
+  // key - so we have to do that manually here.
+  const onCellSpaceKey = useDynamicCallback((event: CellKeyDownEvent) => {
+    if (!isNil(event.rowIndex)) {
+      event.api.startEditingCell({
+        rowIndex: event.rowIndex,
+        colKey: event.column.getColId(),
+        charPress: " "
+      });
+    }
+  });
 
-            let foundNonFooterRow = false;
-            let nextRowNode: RowNode | null;
-            let additionalIndex = 1;
-            while (foundNonFooterRow === false) {
-              nextRowNode = event.api.getDisplayedRowAtIndex(event.rowIndex + additionalIndex);
-              if (isNil(nextRowNode)) {
-                onRowAdd();
+  const onCellEnterKey = useDynamicCallback((event: CellKeyDownEvent) => {
+    console.log(event.api);
+    if (!isNil(event.rowIndex)) {
+      const editing = event.api.getEditingCells();
+      if (editing.length === 0) {
+        const firstEditCol = event.columnApi.getColumn(event.column.getColId());
+        if (!isNil(firstEditCol)) {
+          event.api.ensureColumnVisible(firstEditCol);
+
+          let foundNonFooterRow = false;
+          let nextRowNode: RowNode | null;
+          let additionalIndex = 1;
+          while (foundNonFooterRow === false) {
+            nextRowNode = event.api.getDisplayedRowAtIndex(event.rowIndex + additionalIndex);
+            if (isNil(nextRowNode)) {
+              onRowAdd();
+              event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
+              event.api.clearRangeSelection();
+              foundNonFooterRow = true;
+            } else {
+              let row: R = nextRowNode.data;
+              if (row.meta.isGroupFooter === false) {
                 event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
                 event.api.clearRangeSelection();
                 foundNonFooterRow = true;
               } else {
-                let row: R = nextRowNode.data;
-                if (row.meta.isGroupFooter === false) {
-                  event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
-                  event.api.clearRangeSelection();
-                  foundNonFooterRow = true;
-                } else {
-                  additionalIndex = additionalIndex + 1;
-                }
+                additionalIndex = additionalIndex + 1;
               }
             }
           }
         }
+      }
+    }
+  });
+
+  const onCellCut = useDynamicCallback((e: CellKeyDownEvent) => {
+    // For whatever reason, in this specific case, AG Grid does not attach the GridApi to the
+    // event.
+    if (!isNil(api)) {
+      const focusedCell = api.getFocusedCell();
+      if (!isNil(focusedCell)) {
+        const node = api.getDisplayedRowAtIndex(focusedCell.rowIndex);
+        if (!isNil(node)) {
+          const row: R = node.data;
+          const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === focusedCell.column.getColId());
+          if (!isNil(customColDef)) {
+            const change = getTableChangesForCellClear(row, customColDef);
+            if (!isNil(change)) {
+              setCutCellChange(change);
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const onCellKeyDown = useDynamicCallback((event: CellKeyDownEvent) => {
+    if (!isNil(event.event)) {
+      /* @ts-ignore  AG Grid's Event Object is Wrong */
+      if (event.event.code === "Space") {
+        onCellSpaceKey(event);
+        /* @ts-ignore  AG Grid's Event Object is Wrong */
+      } else if (event.event.keyCode === 13) {
+        onCellEnterKey(event);
+        /* @ts-ignore  AG Grid's Event Object is Wrong */
+      } else if (event.event.key === "x" && (event.event.ctrlKey || event.event.metaKey)) {
+        // Need to get this working.
+        // onCellCut(event.event);
       }
     }
   });
@@ -319,7 +360,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   );
 
-  const getTableChangesFromCellClear = useDynamicCallback(
+  const getTableChangesForCellClear = useDynamicCallback(
     (row: R, def: CustomColDef<R, G>): Table.RowChange<R> | null => {
       const clearValue = def.nullValue !== undefined ? def.nullValue : null;
       const colId = def.field;
@@ -370,7 +411,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   });
 
   const clearCell = useDynamicCallback((row: R, def: CustomColDef<R, G>) => {
-    const tableChange = getTableChangesFromCellClear(row, def);
+    const tableChange = getTableChangesForCellClear(row, def);
     if (!isNil(tableChange)) {
       onRowUpdate(tableChange);
     }
@@ -385,7 +426,12 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       if (cellChangeEvents.length === 1) {
         const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
         if (!isNil(tableChange)) {
-          onRowUpdate(tableChange);
+          if (!isNil(cutCellChange)) {
+            onRowBulkUpdate([tableChange, cutCellChange]);
+            setCutCellChange(null);
+          } else {
+            onRowUpdate(tableChange);
+          }
         }
       } else if (cellChangeEvents.length !== 0) {
         const changes = filter(
@@ -393,7 +439,12 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
           (change: Table.RowChange<R> | null) => change !== null
         ) as Table.RowChange<R>[];
         if (changes.length !== 0) {
-          onRowBulkUpdate(changes);
+          if (!isNil(cutCellChange)) {
+            onRowBulkUpdate([...changes, cutCellChange]);
+            setCutCellChange(null);
+          } else {
+            onRowBulkUpdate(changes);
+          }
         }
       }
     }
@@ -497,6 +548,42 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   });
 
+  const suppressKeyboardEvent = useDynamicCallback((params: SuppressKeyboardEventParams) => {
+    // Suppress Backspace/Delete events when multiple cells are selected in a range.
+    if (!isNil(params.api) && !params.editing && includes(["Backspace", "Delete"], params.event.code)) {
+      const ranges = params.api.getCellRanges();
+      if (!isNil(ranges) && (ranges.length !== 1 || !rangeSelectionIsSingleCell(ranges[0]))) {
+        clearCellsOverRange(ranges, params.api);
+        return true;
+      } else {
+        const column = params.column;
+        const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === column.getColId());
+        if (!isNil(customColDef)) {
+          // Note:  This is a work around for not being able to clear the values of cells without going
+          // into edit mode.  For custom Cell Editor(s) with a Pop-Up, we don't want to open the Pop-Up
+          // everytime we click Backspace/Delete - so we prevent those key presses from triggering
+          // edit mode in the Cell Editor and clear the value at this level.
+          if (customColDef.clearBeforeEdit === true) {
+            const row: R = params.node.data;
+            clearCell(row, customColDef);
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      }
+    } else if (
+      !isNil(params.api) &&
+      (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
+      (params.event.ctrlKey || params.event.metaKey)
+    ) {
+      return true;
+    }
+    return false;
+  });
+
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(api)) {
       const firstEditCol = columnApi.getAllDisplayedColumns()[2];
@@ -581,41 +668,45 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   }, [useDeepEqualMemo(table)]);
 
-  const suppressKeyboardEvent = useDynamicCallback((params: SuppressKeyboardEventParams) => {
-    // Suppress Backspace/Delete events when multiple cells are selected in a range.
-    if (!isNil(params.api) && !params.editing && includes(["Backspace", "Delete"], params.event.code)) {
-      const ranges = params.api.getCellRanges();
-      if (!isNil(ranges) && (ranges.length !== 1 || !rangeSelectionIsSingleCell(ranges[0]))) {
-        clearCellsOverRange(ranges, params.api);
-        return true;
-      } else {
-        const column = params.column;
-        const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === column.getColId());
-        if (!isNil(customColDef)) {
-          // Note:  This is a work around for not being able to clear the values of cells without going
-          // into edit mode.  For custom Cell Editor(s) with a Pop-Up, we don't want to open the Pop-Up
-          // everytime we click Backspace/Delete - so we prevent those key presses from triggering
-          // edit mode in the Cell Editor and clear the value at this level.
-          if (customColDef.clearBeforeEdit === true) {
-            const row: R = params.node.data;
-            clearCell(row, customColDef);
-            return true;
-          } else {
-            return false;
+  const moveDownKeyListener = useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
+    const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+    if (e.key === "ArrowDown" && ctrlCmdPressed) {
+      const focusedCell = localApi.getFocusedCell();
+      if (!isNil(focusedCell)) {
+        const node = localApi.getDisplayedRowAtIndex(focusedCell.rowIndex);
+        if (!isNil(node)) {
+          const row: R = node.data;
+          if (!isNil(onRowExpand) && (isNil(rowCanExpand) || rowCanExpand(row))) {
+            onRowExpand(row.id);
           }
-        } else {
-          return false;
         }
       }
-    } else if (
-      !isNil(params.api) &&
-      (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
-      (params.event.ctrlKey || params.event.metaKey)
-    ) {
-      return true;
     }
-    return false;
   });
+
+  const moveUpKeyListener = useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
+    const ctrlCmdPressed = e.ctrlKey || e.metaKey;
+    if (e.key === "ArrowUp" && ctrlCmdPressed) {
+      !isNil(onBack) && onBack();
+    }
+  });
+
+  useEffect(() => {
+    const keyListeners = [moveDownKeyListener, moveUpKeyListener];
+    if (!isNil(api)) {
+      const instantiatedListeners: ((e: KeyboardEvent) => void)[] = [];
+      for (let i = 0; i < keyListeners.length; i++) {
+        const listener = (e: KeyboardEvent) => keyListeners[i](api, e);
+        window.addEventListener("keydown", listener);
+        instantiatedListeners.push(listener);
+      }
+      return () => {
+        for (let i = 0; i < instantiatedListeners.length; i++) {
+          window.removeEventListener("keydown", instantiatedListeners[i]);
+        }
+      };
+    }
+  }, [api]);
 
   return (
     <div className={"table-grid"}>
@@ -637,6 +728,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         modules={AllModules}
         processCellForClipboard={(params: ProcessCellForExportParams) => {
           if (!isNil(params.node)) {
+            setCutCellChange(null);
             return processCellForClipboard(params.column, params.node.data as R, params.value);
           }
         }}
