@@ -71,7 +71,7 @@ namespace Table {
     readonly name: string | null;
     readonly description: string | null;
     readonly quantity: number | null;
-    readonly unit: Model.SubAccountUnit | null;
+    readonly unit: Model.Tag | null;
     readonly multiplier: number | null;
     readonly rate: number | null;
     readonly estimated: number | null;

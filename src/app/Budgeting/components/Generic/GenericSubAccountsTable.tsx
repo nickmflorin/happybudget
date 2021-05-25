@@ -7,8 +7,7 @@ import { faSigma, faPercentage, faUpload, faTrashAlt } from "@fortawesome/pro-so
 import { ColDef, ColSpanParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import { getKeyValue } from "lib/util";
-import { SubAccountUnits } from "lib/model";
-import { inferModelFromName, findChoiceForName } from "lib/model/util";
+import { inferModelFromName } from "lib/model/util";
 import { currencyValueFormatter } from "lib/tabling/formatters";
 import { floatValueSetter, integerValueSetter } from "lib/tabling/valueSetters";
 
@@ -29,6 +28,7 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
     onAddFringes: () => void;
     onRowUpdate: (change: Table.RowChange<R>) => void;
   };
+  subAccountUnits: Model.Tag[];
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
   onEditGroup: (group: G) => void;
@@ -44,6 +44,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
   fringesCellEditor,
   fringesCellRenderer,
   fringesCellEditorParams,
+  subAccountUnits,
   onGroupRows,
   onDeleteGroup,
   onEditGroup,
@@ -147,12 +148,13 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           processCellFromClipboard: (name: string) => {
             if (name.trim() === "") {
               return null;
+            } else {
+              const unit = find(subAccountUnits, { title: name });
+              if (!isNil(unit)) {
+                return unit;
+              }
+              return null;
             }
-            const unit = findChoiceForName<Model.SubAccountUnit>(SubAccountUnits, name);
-            if (!isNil(unit)) {
-              return unit;
-            }
-            return null;
           }
         },
         {

@@ -8,7 +8,7 @@ import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import BudgetSubAccountsTable from "../SubAccountsTable";
-import { selectBudgetId } from "../../../store/selectors";
+import { selectBudgetId, selectSubAccountUnits } from "../../../store/selectors";
 import {
   deselectSubAccountAction,
   removeSubAccountAction,
@@ -72,6 +72,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
   const accountDetail = useSelector(selectAccountDetail);
   const groups = useSelector(selectGroups);
   const readyToRender = useSelector(selectReadyToRender);
+  const subAccountUnits = useSelector(selectSubAccountUnits);
 
   return (
     <React.Fragment>
@@ -81,6 +82,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         detail={accountDetail}
         selected={selected}
         renderFlag={readyToRender}
+        subAccountUnits={subAccountUnits}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)
             ? `${accountDetail.description} Total`

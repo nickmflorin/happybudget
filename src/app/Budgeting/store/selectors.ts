@@ -28,6 +28,12 @@ export const selectTemplateFringes = simpleDeepEqualSelector(
 export const selectFringeColors = simpleDeepEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.fringeColors.data
 );
-export const selectFringeColorsLoading = simpleDeepEqualSelector(
+export const selectFringeColorsLoading = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.fringeColors.loading
+);
+export const selectSubAccountUnits = simpleDeepEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.subaccountUnits.data
+);
+export const selectSubAccountUnitsLoading = simpleShallowEqualSelector(
+  (state: Redux.ApplicationStore) => state.budgeting.subaccountUnits.loading
 );

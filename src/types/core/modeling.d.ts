@@ -27,24 +27,6 @@ namespace Model {
   type PaymentMethodId = 0 | 1 | 2;
   type PaymentMethod = Choice<PaymentMethodId, PaymentMethodName>;
 
-  type SubAccountUnitName =
-    | "Minutes"
-    | "Hours"
-    | "Weeks"
-    | "Months"
-    | "Days"
-    | "Nights"
-    | "Allow"
-    | "Flat"
-    | "Feet"
-    | "Fare"
-    | "Units"
-    | "Person"
-    | "Each"
-    | "";
-  type SubAccountUnitId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-  type SubAccountUnit = Choice<SubAccountUnitId, SubAccountUnitName>;
-
   type FringeUnitId = 0 | 1;
   type FringeUnitName = "Percent" | "Flat";
   type FringeUnit = Choice<FringeUnitId, FringeUnitName>;
@@ -69,6 +51,14 @@ namespace Model {
 
   type ModelWithColor = Model.Model & { color: string | null };
   type ModelWithName = Model.Model & { name: string | null };
+
+  interface Tag extends Model.Model {
+    readonly created_at: string;
+    readonly updated_at: string;
+    readonly title: string;
+    readonly order: number;
+    readonly color: string | null;
+  }
 
   interface TrackedModel extends Model.Model {
     readonly created_by: number | null;
@@ -208,7 +198,7 @@ namespace Model {
     readonly quantity: number | null;
     readonly rate: number | null;
     readonly multiplier: number | null;
-    readonly unit: Model.SubAccountUnit | null;
+    readonly unit: Model.Tag | null;
     readonly account: number;
     readonly object_id: number;
     readonly type: "subaccount";

@@ -32,42 +32,6 @@ export const ContactRoles = Object.values(ContactRoleModels);
 
 /* eslint-disable no-shadow */
 /* eslint-disable no-unused-vars */
-export enum SubAccountUnitNames {
-  MINUTES = "Minutes",
-  HOURS = "Hours",
-  WEEKS = "Weeks",
-  MONTHS = "Months",
-  DAYS = "Days",
-  NIGHTS = "Nights",
-  ALLOW = "Allow",
-  FLAT = "Flat",
-  FEET = "Feet",
-  FARE = "Fare",
-  UNITS = "Units",
-  PERSON = "Person",
-  EACH = "Each"
-}
-
-export const SubAccountUnitModels: { [key: string]: Model.SubAccountUnit } = {
-  MINUTES: { id: 0, name: SubAccountUnitNames.MINUTES },
-  HOURS: { id: 1, name: SubAccountUnitNames.HOURS },
-  WEEKS: { id: 2, name: SubAccountUnitNames.WEEKS },
-  MONTHS: { id: 3, name: SubAccountUnitNames.MONTHS },
-  DAYS: { id: 4, name: SubAccountUnitNames.DAYS },
-  NIGHTS: { id: 5, name: SubAccountUnitNames.NIGHTS },
-  ALLOW: { id: 6, name: SubAccountUnitNames.ALLOW },
-  FLAT: { id: 7, name: SubAccountUnitNames.FLAT },
-  FEET: { id: 8, name: SubAccountUnitNames.FEET },
-  FARE: { id: 9, name: SubAccountUnitNames.FARE },
-  UNITS: { id: 10, name: SubAccountUnitNames.UNITS },
-  PERSON: { id: 11, name: SubAccountUnitNames.PERSON },
-  EACH: { id: 12, name: SubAccountUnitNames.EACH }
-};
-
-export const SubAccountUnits = Object.values(SubAccountUnitModels);
-
-/* eslint-disable no-shadow */
-/* eslint-disable no-unused-vars */
 export enum FringeUnitNames {
   PERCENT = "Percent",
   FLAT = "Flat"

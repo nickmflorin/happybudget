@@ -102,7 +102,8 @@ export const initialTemplateState: Redux.Budgeting.Template.Store = {
 const initialState: Redux.Budgeting.Store = {
   budget: initialBudgetState,
   template: initialTemplateState,
-  fringeColors: initialModelListResponseState
+  fringeColors: initialModelListResponseState,
+  subaccountUnits: initialModelListResponseState
 };
 
 export default initialState;

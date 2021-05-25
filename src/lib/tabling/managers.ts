@@ -694,7 +694,7 @@ export const BudgetSubAccountRowManager = new RowManager<
     ReadWrite({
       field: "unit",
       allowNull: true,
-      httpValueConverter: (unit: Model.SubAccountUnit | null): number | null | undefined => {
+      httpValueConverter: (unit: Model.Tag | null): number | null | undefined => {
         if (unit !== null) {
           return unit.id;
         }
@@ -731,7 +731,7 @@ export const TemplateSubAccountRowManager = new RowManager<
     ReadWrite({
       field: "unit",
       allowNull: true,
-      httpValueConverter: (unit: Model.SubAccountUnit | null): number | null | undefined => {
+      httpValueConverter: (unit: Model.Tag | null): number | null | undefined => {
         if (unit !== null) {
           return unit.id;
         }

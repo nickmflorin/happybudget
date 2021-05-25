@@ -8,7 +8,7 @@ import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import TemplateSubAccountsTable from "../SubAccountsTable";
-import { selectTemplateId } from "../../../store/selectors";
+import { selectTemplateId, selectSubAccountUnits } from "../../../store/selectors";
 import {
   setSubAccountsSearchAction,
   selectSubAccountAction,
@@ -72,6 +72,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const groups = useSelector(selectGroups);
   const readyToRender = useSelector(selectReadyToRender);
+  const subAccountUnits = useSelector(selectSubAccountUnits);
 
   return (
     <React.Fragment>
@@ -80,6 +81,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         groups={groups}
         selected={selected}
         renderFlag={readyToRender}
+        subAccountUnits={subAccountUnits}
         // Right now, the SubAccount recursion only goes 1 layer deep.
         // Account -> SubAccount -> Detail (Recrusive SubAccount).
         onRowExpand={null}

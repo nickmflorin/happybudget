@@ -215,6 +215,7 @@ namespace Redux {
       readonly budget: Budget.Store;
       readonly template: Template.Store;
       readonly fringeColors: Redux.ListResponseStore<string>;
+      readonly subaccountUnits: Redux.ModelListResponseStore<Model.Tag>;
     }
   }
 

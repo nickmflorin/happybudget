@@ -31,6 +31,11 @@ export const getSubAccount = async <M extends Model.SubAccount = Model.BudgetSub
   return client.retrieve<M>(url, options);
 };
 
+export const getSubAccountUnits = async (options: Http.RequestOptions = {}): Promise<Http.ListResponse<Model.Tag>> => {
+  const url = URL.v1("subaccounts", "units");
+  return client.list<Model.Tag>(url, {}, options);
+};
+
 export const deleteSubAccount = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("subaccounts", id);
   return client.delete<null>(url, options);

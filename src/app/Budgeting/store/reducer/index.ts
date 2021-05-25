@@ -1,5 +1,5 @@
 import { Reducer, combineReducers } from "redux";
-import { createListResponseReducer } from "lib/redux/factories";
+import { createListResponseReducer, createModelListResponseReducer } from "lib/redux/factories";
 
 import { ActionType } from "../actions";
 
@@ -12,6 +12,10 @@ const rootReducer: Reducer<Redux.Budgeting.Store, Redux.Action<any>> = combineRe
   fringeColors: createListResponseReducer<string>({
     Response: ActionType.FringeColors.Response,
     Loading: ActionType.FringeColors.Loading
+  }),
+  subaccountUnits: createModelListResponseReducer<Model.Tag>({
+    Response: ActionType.SubAccountUnits.Response,
+    Loading: ActionType.SubAccountUnits.Loading
   })
 });
 

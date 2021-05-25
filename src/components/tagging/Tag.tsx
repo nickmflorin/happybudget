@@ -4,7 +4,7 @@ import { isNil, map } from "lodash";
 import { DEFAULT_TAG_COLOR_SCHEME, DEFAULT_TAG_COLOR, DEFAULT_TAG_TEXT_COLOR } from "config";
 import { selectConsistent, getKeyValue } from "lib/util";
 import { contrastedForegroundColor } from "lib/util/colors";
-import { isModelWithColor, isModelWithName } from "lib/model/typeguards";
+import { isModelWithColor, isModelWithName, isTag } from "lib/model/typeguards";
 
 import "./Tag.scss";
 
@@ -25,7 +25,7 @@ export interface ITag {
 interface PrivateTagProps extends StandardComponentProps {
   readonly children: string;
   readonly color?: string | undefined | null;
-  readonly textColor?: string | undefined | null;
+  readonly textColor: string;
   readonly uppercase?: boolean;
   readonly fillWidth?: boolean;
 }
@@ -46,7 +46,7 @@ const PrivateTag = ({
   return (
     <div
       className={classNames("tag", { uppercase }, { "fill-width": fillWidth }, className)}
-      style={{ ...style, backgroundColor: color || DEFAULT_TAG_COLOR, color: textColor || DEFAULT_TAG_TEXT_COLOR }}
+      style={{ ...style, backgroundColor: color || DEFAULT_TAG_COLOR, color: textColor }}
     >
       {children}
     </div>
@@ -133,7 +133,9 @@ const Tag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.Eleme
     if (isTagTextProps(props)) {
       return props.text;
     } else if (isTagModelProps(props)) {
-      if (!isNil(props.modelTextField) && !isNil(getKeyValue<M, keyof M>(props.modelTextField)(props.model))) {
+      if (isTag(props.model)) {
+        return props.model.title;
+      } else if (!isNil(props.modelTextField) && !isNil(getKeyValue<M, keyof M>(props.modelTextField)(props.model))) {
         return getKeyValue<M, keyof M>(props.modelTextField)(props.model);
       } else if (isModelWithName(props.model)) {
         return props.model.name || "";
@@ -147,16 +149,22 @@ const Tag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.Eleme
 
   const tagColor: string | undefined | null | M[keyof M] = useMemo(() => {
     if (isTagModelProps(props)) {
-      if (!isNil(props.modelColorField) && !isNil(getKeyValue<M, keyof M>(props.modelColorField)(props.model))) {
-        return props.model[props.modelColorField]; // Can be null, the Tag will use the default color.
-      } else if (isModelWithColor(props.model)) {
-        return props.model.color; // Can be null, the Tag will use the default color.
-      } else if (!isNil(props.colorIndex) && !isNil(colorScheme[props.colorIndex])) {
-        return colorScheme[props.colorIndex];
-      } else if (!isNil(colorScheme[props.model.id])) {
-        return colorScheme[props.model.id];
+      if (isTag(props.model)) {
+        // If this is a Tag model, we don't want to infer/guess a color if it is not defined - we
+        // want to use the default color.
+        return props.model.color || DEFAULT_TAG_COLOR;
       } else {
-        return selectConsistent(colorScheme, tagText as string);
+        if (!isNil(props.modelColorField) && !isNil(getKeyValue<M, keyof M>(props.modelColorField)(props.model))) {
+          return props.model[props.modelColorField]; // Can be null, the Tag will use the default color.
+        } else if (isModelWithColor(props.model)) {
+          return props.model.color; // Can be null, the Tag will use the default color.
+        } else if (!isNil(props.colorIndex) && !isNil(colorScheme[props.colorIndex])) {
+          return colorScheme[props.colorIndex];
+        } else if (!isNil(colorScheme[props.model.id])) {
+          return colorScheme[props.model.id];
+        } else {
+          return selectConsistent(colorScheme, tagText as string);
+        }
       }
     } else {
       if (!isNil(props.color)) {
@@ -172,9 +180,14 @@ const Tag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.Eleme
   const tagTextColor = useMemo(() => {
     if (!isNil(props.textColor)) {
       return props.textColor;
+    } else if (isTagModelProps(props) && isTag(props.model)) {
+      if (props.model.color === null) {
+        return DEFAULT_TAG_TEXT_COLOR;
+      }
+      return contrastedForegroundColor(props.model.color);
     }
     return contrastedForegroundColor(tagColor as string);
-  }, [tagColor]);
+  }, [tagColor, props]);
 
   return (
     <PrivateTag

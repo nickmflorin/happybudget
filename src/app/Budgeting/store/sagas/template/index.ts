@@ -7,7 +7,7 @@ import { getTemplate } from "api/services";
 
 import { ActionType } from "../../actions";
 import { loadingTemplateAction, responseTemplateAction } from "../../actions/template";
-import { getFringeColorsTask } from "../tasks";
+import { getFringeColorsTask, getSubAccountUnitsTask } from "../tasks";
 
 import accountSaga from "./account";
 import budgetSaga from "./accounts";
@@ -15,7 +15,9 @@ import fringesSaga from "./fringes";
 import subAccountSaga from "./subAccount";
 
 export function* handleTemplateChangedTask(action: Redux.Action<number>): SagaIterator {
-  yield all([call(getTemplateTask), call(getFringeColorsTask)]);
+  // TODO: Maybe we should not call getFringeColorsTask whenever the template/budget changes but
+  // just once.  Same thing goes for the Sub Account Units.
+  yield all([call(getTemplateTask), call(getFringeColorsTask), call(getSubAccountUnitsTask)]);
 }
 
 export function* getTemplateTask(): SagaIterator {

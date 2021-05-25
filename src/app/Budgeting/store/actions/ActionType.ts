@@ -1,4 +1,8 @@
 const ActionType = {
+  SubAccountUnits: {
+    Response: "subaccountunits.Response",
+    Loading: "subaccountunits.Loading"
+  },
   FringeColors: {
     Loading: "fringecolors.Loading",
     Response: "fringecolors.colors.Response"
