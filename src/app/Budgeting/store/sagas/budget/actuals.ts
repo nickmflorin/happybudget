@@ -79,11 +79,11 @@ export function* updateTask(id: number, change: Table.RowChange<Table.ActualRow>
   }
 }
 
-export function* createTask(id: number, row: Table.ActualRow): SagaIterator {
+export function* createTask(id: number, accountType: "account" | "subaccount", row: Table.ActualRow): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
   let service = createAccountActual;
-  if (row.parent_type === "subaccount") {
+  if (accountType === "subaccount") {
     service = createSubAccountActual;
   }
   yield put(creatingActualAction(true));
@@ -184,8 +184,12 @@ export function* handleUpdateTask(action: Redux.Action<Table.RowChange<Table.Act
         // backend.  Once the entity is created in the backend, we can remove the placeholder
         // designation of the row so it will be updated instead of created the next time the row
         // is changed.
-        if (ActualRowManager.rowHasRequiredFields(updatedRow) && !isNil(updatedRow.object_id)) {
-          yield call(createTask, updatedRow.object_id, updatedRow);
+        if (ActualRowManager.rowHasRequiredFields(updatedRow)) {
+          // The account object should be present on the row, since it is a required field.
+          if (isNil(updatedRow.account)) {
+            throw new Error("The account must be a required field.");
+          }
+          yield call(createTask, updatedRow.account.id, updatedRow.account.type, updatedRow);
         }
       }
     } else {

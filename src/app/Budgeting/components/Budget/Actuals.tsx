@@ -6,7 +6,7 @@ import { createSelector } from "reselect";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
-import { CellClassParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
+import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import { getKeyValue } from "lib/util";
 import { PaymentMethods } from "lib/model";
@@ -85,8 +85,6 @@ const Actuals = (): JSX.Element => {
         placeholders={placeholders}
         manager={ActualRowManager}
         selected={selected}
-        // TODO: Make this field use an object that has the `object_id` and `parent_type`
-        // in it, removing the requirement of the rowRefreshRequired callback.
         identifierField={"account"}
         identifierFieldHeader={"Account"}
         identifierColumn={{
@@ -95,12 +93,14 @@ const Actuals = (): JSX.Element => {
           width: 200,
           cellClass: "borderless",
           processCellForClipboard: (row: Table.ActualRow) => {
-            const item: Model.BudgetLineItem | undefined = find(budgetItems, {
-              id: row.object_id,
-              type: row.parent_type
-            } as any);
-            if (!isNil(item)) {
-              return item.identifier || "";
+            if (!isNil(row.account)) {
+              const item: Model.BudgetLineItem | undefined = find(budgetItems, {
+                id: row.account.id,
+                type: row.account.type
+              } as any);
+              if (!isNil(item)) {
+                return item.identifier || "";
+              }
             }
             return "";
           },
@@ -130,7 +130,6 @@ const Actuals = (): JSX.Element => {
           dispatch(bulkUpdateBudgetActualsAction(changes))
         }
         onSelectAll={() => dispatch(selectAllActualsAction(null))}
-        cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
         exportFileName={"actuals.csv"}
         actions={(params: BudgetTableActionsParams<Table.ActualRow, Model.Group>) => [
           {

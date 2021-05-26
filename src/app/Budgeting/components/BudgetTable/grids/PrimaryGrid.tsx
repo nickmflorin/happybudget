@@ -251,7 +251,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   });
 
   const onCellEnterKey = useDynamicCallback((event: CellKeyDownEvent) => {
-    console.log(event.api);
     if (!isNil(event.rowIndex)) {
       const editing = event.api.getEditingCells();
       if (editing.length === 0) {
