@@ -401,7 +401,9 @@ const BudgetTable = <
           return obj;
         },
         {
-          id: hashString(group.name),
+          // The ID needs to designate that this row refers to a Group because the ID of a Group
+          // might clash with the ID of a SubAccount/Account.
+          id: `group-${group.id}`,
           [identifierField]: group.name,
           group,
           meta: {
