@@ -91,7 +91,6 @@ const Actuals = (): JSX.Element => {
           minWidth: 200,
           maxWidth: 200,
           width: 200,
-          cellClass: "borderless",
           processCellForClipboard: (row: Table.ActualRow) => {
             if (!isNil(row.account)) {
               const item: Model.BudgetLineItem | undefined = find(budgetItems, {
@@ -121,6 +120,7 @@ const Actuals = (): JSX.Element => {
         search={search}
         onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
         saving={saving}
+        sizeColumnsToFit={false}
         onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
         onRowSelect={(id: number) => dispatch(selectActualAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectActualAction(id))}
@@ -143,7 +143,7 @@ const Actuals = (): JSX.Element => {
           {
             field: "description",
             headerName: "Description",
-            flex: 100
+            flex: 3
           },
           {
             field: "vendor",
@@ -165,7 +165,7 @@ const Actuals = (): JSX.Element => {
           },
           {
             field: "payment_method",
-            headerName: "Payment Method",
+            headerName: "Pay Method",
             cellClass: "cell--centered",
             cellRenderer: "PaymentMethodCell",
             flex: 1,
@@ -198,12 +198,12 @@ const Actuals = (): JSX.Element => {
           },
           {
             field: "payment_id",
-            headerName: "Payment ID",
+            headerName: "Pay ID",
             flex: 1
           },
           {
             field: "value",
-            headerName: "Actual",
+            headerName: "Amount",
             flex: 1,
             valueFormatter: currencyValueFormatter,
             valueSetter: floatValueSetter<Table.ActualRow>("value"),
