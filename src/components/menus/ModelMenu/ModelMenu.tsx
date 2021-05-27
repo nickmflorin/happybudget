@@ -286,7 +286,20 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
         }
       } else {
         if (!isModelIndexFocusedState(state)) {
-          setState({ focused: true, index: 0 });
+          let setIndexToModel = false;
+          if (!isNil(props.getFirstSearchResult)) {
+            const firstModel = props.getFirstSearchResult(models);
+            if (!isNil(firstModel)) {
+              const index = models.indexOf(firstModel);
+              if (!isNil(index)) {
+                setIndexToModel = true;
+                setState({ focused: true, index: index });
+              }
+            }
+          }
+          if (setIndexToModel === false) {
+            setState({ focused: true, index: 0 });
+          }
         }
       }
     }

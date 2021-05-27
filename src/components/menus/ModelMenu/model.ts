@@ -39,6 +39,7 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly onNoSearchResults?: EmptyItem;
   readonly autoFocus?: boolean;
   readonly leftAlign?: boolean;
+  readonly getFirstSearchResult?: (models: M[]) => M | null;
   readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
   readonly onFocusCallback?: (focused: boolean) => void;
 }
@@ -130,12 +131,13 @@ interface _ExpandedModelTagsMenuProps<M extends Model.M> extends Omit<_ExpandedM
 export type ExpandedModelTagsMenuProps<M extends Model.M> = _ExpandedModelTagsMenuProps<M> &
   (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
 
-export interface StringSubAccountNode extends Omit<Model.SimpleSubAccount, "id"> {
+export interface StringSubAccountNode extends Omit<Model.SubAccountTreeNode, "id" | "children"> {
   readonly id: string;
   readonly originalId: number;
   readonly children: StringSubAccountNode[];
 }
-export interface StringAccountNode extends Omit<Model.SimpleAccount, "id"> {
+
+export interface StringAccountNode extends Omit<Model.AccountTreeNode, "id" | "children"> {
   readonly id: string;
   readonly originalId: number;
   readonly children: StringSubAccountNode[];

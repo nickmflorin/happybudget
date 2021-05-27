@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { isNil, map } from "lodash";
+import { isNil, map, filter } from "lodash";
 
 import { useDeepEqualMemo } from "lib/hooks";
 
@@ -11,22 +11,24 @@ import { BudgetItemTreeMenuProps, StringSubAccountNode, StringAccountNode } from
 import "./BudgetItemTreeMenu.scss";
 
 const convertSubAccountNodeToStringIdForm = (node: Model.SubAccountTreeNode): StringSubAccountNode => {
-  const { id, children, ...rest } = node;
+  const { id, children, in_search_path, ...rest } = node;
   const m: Omit<Model.SimpleSubAccount, "id"> = rest;
   return {
     ...m,
     originalId: id,
+    in_search_path,
     children: map(children, (child: Model.SubAccountTreeNode) => convertSubAccountNodeToStringIdForm(child)),
     id: `${node.type}-${id}`
   };
 };
 
 const convertAccountNodeToStringIdForm = (node: Model.AccountTreeNode): StringAccountNode => {
-  const { id, children, ...rest } = node;
+  const { id, children, in_search_path, ...rest } = node;
   const m: Omit<Model.SimpleAccount, "id"> = rest;
   return {
     ...m,
     originalId: id,
+    in_search_path,
     children: map(children, (child: Model.SubAccountTreeNode) => convertSubAccountNodeToStringIdForm(child)),
     id: `${node.type}-${id}`
   };
@@ -41,8 +43,15 @@ const BudgetItemTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
     <ExpandedModelMenu<StringSubAccountNode | StringAccountNode>
       {...props}
       onChange={(model: StringSubAccountNode | StringAccountNode) => {
-        const { originalId, children, ...rest } = model;
+        const { originalId, children, in_search_path, ...rest } = model;
         props.onChange({ ...rest, id: originalId });
+      }}
+      getFirstSearchResult={(ms: (StringSubAccountNode | StringAccountNode)[]) => {
+        const inSearchPath = filter(ms, (m: StringSubAccountNode | StringAccountNode) => m.in_search_path === true);
+        if (!isNil(inSearchPath[0])) {
+          return inSearchPath[0];
+        }
+        return null;
       }}
       models={models}
       selected={!isNil(props.selected) ? [`${props.selected.type}-${props.selected.id}`] : null}

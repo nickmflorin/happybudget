@@ -163,10 +163,12 @@ namespace Model {
 
   interface SubAccountTreeNode extends Model.SimpleSubAccount {
     readonly children: Model.SubAccountTreeNode[];
+    readonly in_search_path: boolean;
   }
 
   interface AccountTreeNode extends Model.SimpleAccount {
     readonly children: Model.SubAccountTreeNode[];
+    readonly in_search_path: boolean;
   }
 
   type Tree = Model.AccountTreeNode[];
