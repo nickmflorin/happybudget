@@ -60,6 +60,21 @@ const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProp
     };
   });
 
+  const keyListener = (e: KeyboardEvent) => {
+    if (e.code === "Escape") {
+      e.stopPropagation();
+      props.stopEditing();
+    }
+  };
+
+  useEffect(() => {
+    // By default, AG Grid will exit the edit mode when Escape is clicked and
+    // we are in the search bar.  However, if we are in the menu, this will not
+    // work - so we need to manually stop editing on Escape.
+    window.addEventListener("keydown", keyListener);
+    return () => window.removeEventListener("keydown", keyListener);
+  }, []);
+
   return (
     <ExpandedModelTagsMenu<M>
       style={{ width: 160 }}

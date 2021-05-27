@@ -279,7 +279,6 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
           setState({ focused: true, noItems: true, noItemsActive: false });
         }
       } else if (models.length === 0) {
-        console.log(props.onNoSearchResults);
         if (!isNil(props.onNoSearchResults) && props.onNoSearchResults.defaultFocus === true) {
           setState({ focused: true, noSearchResults: true, noSearchResultsActive: true });
         } else {
@@ -372,7 +371,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   });
 
   const keyListener = useDynamicCallback((e: KeyboardEvent) => {
-    if (e.code === "Enter") {
+    if (e.code === "Enter" || e.code === "Tab") {
       performActionAtFocusedIndex();
     } else if (e.code === "ArrowDown") {
       e.stopPropagation();
