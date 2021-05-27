@@ -26,8 +26,15 @@ const Signup = (): JSX.Element => {
         onGoogleSuccess={(token: string) => {
           setLoading(true);
           socialLogin({ token_id: token, provider: "google" })
-            .then(() => {
-              history.push("/");
+            .then((user: Model.User) => {
+              // It might not be the the case that the User has not already logged in
+              // if doing Social Registration, because the User might already exist
+              // for that Social Account.
+              if (user.is_first_time === true) {
+                history.push("/discover");
+              } else {
+                history.push("/");
+              }
             })
             .catch((e: Error) => {
               form.handleRequestError(e);
@@ -44,8 +51,13 @@ const Signup = (): JSX.Element => {
         }}
         onSubmit={(values: ISignupFormValues) => {
           register(values)
-            .then(() => {
-              history.push("/");
+            .then((user: Model.User) => {
+              console.log(user);
+              if (user.is_first_time === true) {
+                history.push("/discover");
+              } else {
+                history.push("/");
+              }
             })
             .catch((e: Error) => {
               form.handleRequestError(e);

@@ -1,21 +1,14 @@
 import { client } from "api";
 import { URL } from "./util";
 
-export const login = async (
-  email: string,
-  password: string,
-  options?: Http.RequestOptions
-): Promise<Http.LoginResponse> => {
+export const login = async (email: string, password: string, options?: Http.RequestOptions): Promise<Model.User> => {
   const url = URL.v1("auth", "login");
-  return client.post<Http.LoginResponse>(url, { email, password }, options);
+  return client.post<Model.User>(url, { email, password }, options);
 };
 
-export const socialLogin = async (
-  payload: Http.SocialPayload,
-  options?: Http.RequestOptions
-): Promise<Http.LoginResponse> => {
+export const socialLogin = async (payload: Http.SocialPayload, options?: Http.RequestOptions): Promise<Model.User> => {
   const url = URL.v1("auth", "social-login");
-  return client.post<Http.LoginResponse>(url, payload, options);
+  return client.post<Model.User>(url, payload, options);
 };
 
 export const logout = async (): Promise<null> => {

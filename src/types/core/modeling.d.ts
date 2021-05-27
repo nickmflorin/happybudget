@@ -89,6 +89,7 @@ namespace Model {
     readonly created_at: string;
     readonly updated_at: string;
     readonly timezone: string;
+    readonly is_first_time: boolean;
   }
 
   interface Fringe extends Model.TrackedModel {

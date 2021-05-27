@@ -27,8 +27,12 @@ const Login = (): JSX.Element => {
         onGoogleSuccess={(token: string) => {
           setLoading(true);
           socialLogin({ token_id: token, provider: "google" })
-            .then(() => {
-              history.push("/");
+            .then((user: Model.User) => {
+              if (user.is_first_time === true) {
+                history.push("/discover");
+              } else {
+                history.push("/");
+              }
             })
             .catch((e: Error) => {
               form.handleRequestError(e);
@@ -46,8 +50,12 @@ const Login = (): JSX.Element => {
         onSubmit={(values: ILoginFormValues) => {
           if (!isNil(values.email) && !isNil(values.password)) {
             login(values.email.toLowerCase(), values.password)
-              .then(() => {
-                history.push("/");
+              .then((user: Model.User) => {
+                if (user.is_first_time === true) {
+                  history.push("/discover");
+                } else {
+                  history.push("/");
+                }
               })
               .catch((e: Error) => {
                 form.handleRequestError(e);

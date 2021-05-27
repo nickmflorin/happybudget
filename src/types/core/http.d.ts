@@ -104,10 +104,6 @@ namespace Http {
     readonly timezone?: string;
   }
 
-  interface LoginResponse {
-    readonly detail: string;
-  }
-
   interface FileUploadResponse {
     readonly fileUrl: string;
   }
