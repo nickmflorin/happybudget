@@ -68,19 +68,6 @@ const SignupForm = ({
       >
         <Input className={"input"} size={"large"} placeholder={"Email"} prefix={<MailOutlined />} />
       </Form.Item>
-      <div className={"input-group-title"} style={{ marginTop: 20 }}>
-        {"Password"}
-        <VerticalFlexCenter className={"question-icon-container"}>
-          <Tooltip
-            overlayStyle={{ whiteSpace: "pre-line" }}
-            title={
-              "Password must satisfy the following requirements:\n(1) Must contain at least 1 special character (!@#$%^&*).\n(2) Must container at least 1 uppercase letter.\n(3) Must contain at least 1 lowercase letter.\n(4) Must container at least one number.\n(5) Must be at least 8 characters long."
-            }
-          >
-            <FontAwesomeIcon className={"icon"} icon={faQuestionCircle} />
-          </Tooltip>
-        </VerticalFlexCenter>
-      </div>
       <Form.Item
         name={"password"}
         rules={[
@@ -95,7 +82,16 @@ const SignupForm = ({
           })
         ]}
       >
-        <Input.Password className={"input"} size={"large"} placeholder={"Password"} prefix={<LockOutlined />} />
+        <Tooltip
+          overlayStyle={{ whiteSpace: "pre-line" }}
+          trigger={["focus"]}
+          placement={"right"}
+          title={
+            "At least 1 special character (!@#$%^&*)\nAt least 1 uppercase letter\nAt least 1 lowercase letter\nAt least 1 number\nAt least 8 characters long"
+          }
+        >
+          <Input.Password className={"input"} size={"large"} placeholder={"Password"} prefix={<LockOutlined />} />
+        </Tooltip>
       </Form.Item>
       <Form.Item
         name={"confirm"}
