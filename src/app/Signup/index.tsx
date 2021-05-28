@@ -52,7 +52,6 @@ const Signup = (): JSX.Element => {
         onSubmit={(values: ISignupFormValues) => {
           register(values)
             .then((user: Model.User) => {
-              console.log(user);
               if (user.is_first_time === true) {
                 history.push("/discover");
               } else {

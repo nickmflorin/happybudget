@@ -1,4 +1,5 @@
-import { Ref, ReactNode } from "react";
+import { Ref, ReactNode, SyntheticEvent } from "react";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 export type ModelMenuRef<M extends Model.M> = {
   readonly incrementFocusedIndex: () => void;
@@ -10,7 +11,7 @@ export type ModelMenuRef<M extends Model.M> = {
 };
 
 export type EmptyItem = {
-  readonly onClick?: () => void;
+  readonly onClick?: (event: SyntheticEvent | KeyboardEvent) => void;
   readonly text: string;
   readonly icon?: JSX.Element;
   readonly defaultFocus?: boolean;
@@ -45,12 +46,12 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
 }
 
 interface SingleModelMenuProps<M extends Model.M> {
-  readonly onChange: (model: M) => void;
+  readonly onChange: (model: M, e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent) => void;
   readonly multiple?: false;
 }
 
 interface MultipleModelMenuProps<M extends Model.M> {
-  readonly onChange: (models: M[]) => void;
+  readonly onChange: (models: M[], e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent) => void;
   readonly multiple: true;
   readonly checkbox?: boolean;
 }
@@ -69,9 +70,10 @@ export interface ModelMenuItemProps<M extends Model.M> {
   readonly visible: (string | number)[] | undefined;
   readonly indexMap: { [key: string]: number };
   readonly itemProps?: any;
-  readonly onClick: (model: M) => void;
-  readonly onSelect: (model: M) => void;
-  readonly onDeselect: (model: M) => void;
+  // This is intentionally not named onClick because it conflicts with AntD's mechanics.
+  readonly onPress: (model: M, e: SyntheticEvent) => void;
+  readonly onSelect: (model: M, e: CheckboxChangeEvent) => void;
+  readonly onDeselect: (model: M, e: CheckboxChangeEvent) => void;
   readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
 }
 
@@ -103,7 +105,7 @@ export type ExpandedModelMenuRef<M extends Model.M> = {
   readonly decrementMenuFocusedIndex: () => void;
   readonly focusMenu: (value: boolean) => void;
   readonly getModelAtMenuFocusedIndex: () => M | null;
-  readonly performActionAtMenuFocusedIndex: () => void;
+  readonly performActionAtMenuFocusedIndex: (e: KeyboardEvent) => void;
   readonly menuFocused: boolean;
 };
 

@@ -1,6 +1,7 @@
-import { forwardRef, useImperativeHandle, useRef, useState, useEffect } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState, useEffect, SyntheticEvent } from "react";
 import { isNil, map } from "lodash";
 
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/pro-light-svg-icons";
 
@@ -101,7 +102,19 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       multiple={true}
       selected={value}
       models={props.fringes}
-      onChange={(ms: Model.Fringe[]) => setValue(map(ms, (m: Model.Fringe) => m.id))}
+      onChange={(ms: Model.Fringe[], e: KeyboardEvent | SyntheticEvent | CheckboxChangeEvent) => {
+        const isEnterKeyboardEvent = (
+          event: KeyboardEvent | SyntheticEvent | CheckboxChangeEvent
+        ): event is KeyboardEvent => {
+          return (event as KeyboardEvent).code === "Enter";
+        };
+        setValue(map(ms, (m: Model.Fringe) => m.id));
+        // If the selection was made via the keyboard (by clicking enter) we stop
+        // editing.
+        if (isEnterKeyboardEvent(e)) {
+          props.stopEditing();
+        }
+      }}
       menuRef={menuRef}
       searchIndices={["name"]}
       focusSearchOnCharPress={true}

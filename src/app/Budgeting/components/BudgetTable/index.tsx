@@ -18,7 +18,7 @@ import {
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
 import { RenderWithSpinner } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
-import { hashString, updateFieldOrdering, orderByFieldOrdering, getKeyValue } from "lib/util";
+import { updateFieldOrdering, orderByFieldOrdering, getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { currencyValueFormatter } from "lib/tabling/formatters";
 

@@ -1,4 +1,4 @@
-import React, { useImperativeHandle, useEffect, useState, useMemo } from "react";
+import React, { useImperativeHandle, useEffect, useState, useMemo, SyntheticEvent } from "react";
 import { map, isNil, includes, filter, find } from "lodash";
 import classNames from "classnames";
 import { Menu, Checkbox } from "antd";
@@ -38,7 +38,7 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
     leftAlign,
     onSelect,
     onDeselect,
-    onClick,
+    onPress,
     renderItem,
     ...rest
   } = primary;
@@ -75,7 +75,7 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
       <Menu.Item
         {...rest} // Required for Antd Menu Item
         {...itemProps}
-        onClick={(info: any) => onClick(model)}
+        onClick={(info: { domEvent: SyntheticEvent }) => onPress(model, info.domEvent)}
         className={classNames("model-menu-item", !isNil(itemProps) ? itemProps.className : "", {
           active: isActive,
           focus: !isNil(focusedIndex) ? focusedIndex === indexMap[String(model.id)] : false,
@@ -98,14 +98,14 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
                     /* eslint-disable no-console */
                     console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
                   } else {
-                    onSelect(model);
+                    onSelect(model, e);
                   }
                 } else {
                   if (!selected) {
                     /* eslint-disable no-console */
                     console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
                   } else {
-                    onDeselect(model);
+                    onDeselect(model, e);
                   }
                 }
               }}
@@ -341,7 +341,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     }
   };
 
-  const onMenuItemClick = useDynamicCallback((model: M): void => {
+  const onMenuItemClick = useDynamicCallback((model: M, event: SyntheticEvent | KeyboardEvent): void => {
     if (isMultipleModelMenuProps(props)) {
       const selectedModels = filter(
         map(selected, (id: number | string) => find(props.models, { id })),
@@ -349,35 +349,38 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
       ) as M[];
       if (includes(selected, model.id)) {
         setSelected(filter(selected, (id: number | string) => id !== model.id));
-        props.onChange(filter(selectedModels, (m: M) => m.id !== model.id));
+        props.onChange(
+          filter(selectedModels, (m: M) => m.id !== model.id),
+          event
+        );
       } else {
         setSelected([...selected, model.id]);
-        props.onChange([...selectedModels, model]);
+        props.onChange([...selectedModels, model], event);
       }
     } else {
       setSelected([model.id]);
-      props.onChange(model);
+      props.onChange(model, event);
     }
   });
 
-  const performActionAtFocusedIndex = useDynamicCallback(() => {
+  const performActionAtFocusedIndex = useDynamicCallback((event: KeyboardEvent) => {
     if (isFocusedState(state) || props.autoFocus === true) {
       if (isModelIndexFocusedState(state)) {
         const model = models[state.index];
         if (!isNil(model)) {
-          onMenuItemClick(model);
+          onMenuItemClick(model, event);
         }
       } else if (isNoItemsFocusedState(state) && state.noItemsActive === true) {
         if (!isNil(props.onNoData) && !isNil(props.onNoData.onClick)) {
-          props.onNoData.onClick();
+          props.onNoData.onClick(event);
         }
       } else if (isNoSearchResultsFocusedState(state) && state.noSearchResultsActive === true) {
         if (!isNil(props.onNoSearchResults) && !isNil(props.onNoSearchResults.onClick)) {
-          props.onNoSearchResults.onClick();
+          props.onNoSearchResults.onClick(event);
         }
       } else if (isBottomItemFocusedState(state)) {
         if (!isNil(props.bottomItem) && !isNil(props.bottomItem.onClick)) {
-          props.bottomItem.onClick();
+          props.bottomItem.onClick(event);
         }
       }
     }
@@ -385,7 +388,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
 
   const keyListener = useDynamicCallback((e: KeyboardEvent) => {
     if (e.code === "Enter" || e.code === "Tab") {
-      performActionAtFocusedIndex();
+      performActionAtFocusedIndex(e);
     } else if (e.code === "ArrowDown") {
       e.stopPropagation();
       incrementFocusedIndex();
@@ -467,7 +470,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
               focusedIndex={isModelIndexFocusedState(state) ? state.index : null}
               checkbox={isMultipleModelMenuProps(props) && props.checkbox === true}
               multiple={isMultipleModelMenuProps(props)}
-              onClick={(m: M) => onMenuItemClick(m)}
+              onPress={(m: M, e: SyntheticEvent) => onMenuItemClick(m, e)}
               selected={selected}
               renderItem={props.renderItem}
               levelIndent={props.levelIndent}
@@ -478,37 +481,42 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
               hidden={props.hidden}
               visible={props.visible}
               level={0}
-              onSelect={(m: M) => {
+              onSelect={(m: M, e: CheckboxChangeEvent) => {
                 if (isMultipleModelMenuProps(props)) {
                   const selectedModels = filter(
                     map(selected, (id: number | string) => find(models, { id })),
                     (mi: M | undefined) => mi !== undefined
                   ) as M[];
                   setSelected([...selected, m.id]);
-                  props.onChange([...selectedModels, m]);
+                  props.onChange([...selectedModels, m], e);
                 } else {
                   setSelected([m.id]);
-                  props.onChange(m);
+                  props.onChange(m, e);
                 }
               }}
-              onDeselect={(m: M) => {
+              onDeselect={(m: M, e: CheckboxChangeEvent) => {
                 if (isMultipleModelMenuProps(props)) {
                   const selectedModels = filter(
                     map(selected, (id: number | string) => find(models, { id })),
                     (mi: M | undefined) => mi !== undefined
                   ) as M[];
                   setSelected(filter(selected, (id: number | string) => id !== m.id));
-                  props.onChange(filter(selectedModels, (mi: M) => mi.id !== m.id));
+                  props.onChange(
+                    filter(selectedModels, (mi: M) => mi.id !== m.id),
+                    e
+                  );
                 } else {
                   setSelected([m.id]);
-                  props.onChange(m);
+                  props.onChange(m, e);
                 }
               }}
             />
             {!isNil(props.bottomItem) && (
               <Menu.Item
                 className={classNames("model-menu-item", "empty", { active: isBottomItemFocusedState(state) })}
-                onClick={() => !isNil(props.bottomItem?.onClick) && props.bottomItem?.onClick()}
+                onClick={(info: { domEvent: SyntheticEvent }) =>
+                  !isNil(props.bottomItem?.onClick) && props.bottomItem?.onClick(info.domEvent)
+                }
               >
                 {!isNil(props.bottomItem.icon) && <div className={"icon-container"}>{props.bottomItem.icon}</div>}
                 {props.bottomItem.text}
@@ -523,7 +531,9 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
               className={classNames("model-menu-item", "empty", {
                 active: isNoSearchResultsFocusedState(state) && state.noSearchResultsActive === true
               })}
-              onClick={() => !isNil(props.onNoSearchResults?.onClick) && props.onNoSearchResults?.onClick()}
+              onClick={(info: { domEvent: SyntheticEvent }) =>
+                !isNil(props.onNoSearchResults?.onClick) && props.onNoSearchResults?.onClick(info.domEvent)
+              }
             >
               {!isNil(props.onNoSearchResults.icon) && (
                 <div className={"icon-container"}>{props.onNoSearchResults.icon}</div>
@@ -536,7 +546,9 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
             className={classNames("model-menu-item", "empty", {
               active: isNoItemsFocusedState(state) && state.noItemsActive === true
             })}
-            onClick={() => !isNil(props.onNoData?.onClick) && props.onNoData?.onClick()}
+            onClick={(info: { domEvent: SyntheticEvent }) =>
+              !isNil(props.onNoData?.onClick) && props.onNoData?.onClick(info.domEvent)
+            }
           >
             {!isNil(props.onNoData.icon) && <div className={"icon-container"}>{props.onNoData.icon}</div>}
             {props.onNoData.text}
