@@ -1,13 +1,10 @@
 import React from "react";
 import classNames from "classnames";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faQuestionCircle } from "@fortawesome/pro-solid-svg-icons";
-
 import { Button, Input, Tooltip } from "antd";
 import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
 
-import { Form, VerticalFlexCenter } from "components";
+import { Form } from "components";
 import { RouterLink } from "components/links";
 import { validateEmail, validatePassword } from "lib/util/validate";
 import SocialButton from "../SocialButton";
