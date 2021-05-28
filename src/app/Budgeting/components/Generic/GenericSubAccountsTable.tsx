@@ -114,7 +114,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
         {
           field: "name",
           headerName: "Name",
-          width: 80
+          width: 120
         },
         {
           field: "quantity",
@@ -128,7 +128,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           headerName: "Unit",
           cellClass: "cell--centered",
           cellRenderer: "SubAccountUnitCell",
-          width: 160,
+          width: 100,
           cellEditor: "SubAccountUnitCellEditor",
           clearBeforeEdit: true,
           // Required to allow the dropdown to be selectable on Enter key.
@@ -167,7 +167,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
         {
           field: "rate",
           headerName: "Rate",
-          width: 70,
+          width: 100,
           cellStyle: { textAlign: "right" },
           valueFormatter: currencyValueFormatter,
           valueSetter: floatValueSetter<Table.TemplateSubAccountRow>("rate")
