@@ -155,9 +155,11 @@ const Tag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.Eleme
         return props.model.color || DEFAULT_TAG_COLOR;
       } else {
         if (!isNil(props.modelColorField) && !isNil(getKeyValue<M, keyof M>(props.modelColorField)(props.model))) {
-          return props.model[props.modelColorField]; // Can be null, the Tag will use the default color.
+          // Can be null, the Tag will use the default color.
+          return props.model[props.modelColorField] || DEFAULT_TAG_COLOR;
         } else if (isModelWithColor(props.model)) {
-          return props.model.color; // Can be null, the Tag will use the default color.
+          // Can be null, the Tag will use the default color.
+          return props.model.color || DEFAULT_TAG_COLOR;
         } else if (!isNil(props.colorIndex) && !isNil(colorScheme[props.colorIndex])) {
           return colorScheme[props.colorIndex];
         } else if (!isNil(colorScheme[props.model.id])) {
