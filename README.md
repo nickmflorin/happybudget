@@ -60,10 +60,8 @@ This will install the project dependencies in the `package.json` file.
 
 Finally, we need to create and edit a `.env.local` file in the project root to
 include the configuration that the frontend application relies on. This
-file is not version tracked.
-
-You can refer to the `base_env` file, but for a quick look this is generally
-what it should look like to get things running locally:
+file is not version tracked, and you should ask a team member for the values that
+are needed to populate the `.env.local` file.
 
 ## Development
 
@@ -75,3 +73,11 @@ present, all you need to do to start the development server is the following
 ```bash
 $ yarn start
 ```
+
+#### Local Domain Caveat
+
+Our authentication protocols rely on the ability to set cookies in the response that dictate user sessions and
+information.  Recent Google Chrome security improvements have introduced the caveat that the browser no longer
+considers `localhost` a valid domain, so setting cookies in the backend for the frontend application no longer
+works when running the application on `localhost`.  For this reason, the application is configured locally to
+**only** work on `127.0.0.1:3000`, not `localhost:3000`.
