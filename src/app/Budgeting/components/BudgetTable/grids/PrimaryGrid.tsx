@@ -238,6 +238,33 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   );
 
+  const moveToNextRow = useDynamicCallback((rowIndex: number, column: Column, localApi?: GridApi) => {
+    const local = !isNil(localApi) ? localApi : api;
+    if (!isNil(local)) {
+      let foundNonFooterRow = false;
+      let nextRowNode: RowNode | null;
+      let additionalIndex = 1;
+      while (foundNonFooterRow === false) {
+        nextRowNode = local.getDisplayedRowAtIndex(rowIndex + additionalIndex);
+        if (isNil(nextRowNode)) {
+          onRowAdd();
+          local.setFocusedCell(rowIndex + additionalIndex, column);
+          local.clearRangeSelection();
+          foundNonFooterRow = true;
+        } else {
+          let row: R = nextRowNode.data;
+          if (row.meta.isGroupFooter === false) {
+            local.setFocusedCell(rowIndex + additionalIndex, column);
+            local.clearRangeSelection();
+            foundNonFooterRow = true;
+          } else {
+            additionalIndex = additionalIndex + 1;
+          }
+        }
+      }
+    }
+  });
+
   // AG Grid only enters Edit mode in a cell when a character is pressed, not the Space
   // key - so we have to do that manually here.
   const onCellSpaceKey = useDynamicCallback((event: CellKeyDownEvent) => {
@@ -247,40 +274,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         colKey: event.column.getColId(),
         charPress: " "
       });
-    }
-  });
-
-  const onCellEnterKey = useDynamicCallback((event: CellKeyDownEvent) => {
-    if (!isNil(event.rowIndex)) {
-      const editing = event.api.getEditingCells();
-      if (editing.length === 0) {
-        const firstEditCol = event.columnApi.getColumn(event.column.getColId());
-        if (!isNil(firstEditCol)) {
-          event.api.ensureColumnVisible(firstEditCol);
-
-          let foundNonFooterRow = false;
-          let nextRowNode: RowNode | null;
-          let additionalIndex = 1;
-          while (foundNonFooterRow === false) {
-            nextRowNode = event.api.getDisplayedRowAtIndex(event.rowIndex + additionalIndex);
-            if (isNil(nextRowNode)) {
-              onRowAdd();
-              event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
-              event.api.clearRangeSelection();
-              foundNonFooterRow = true;
-            } else {
-              let row: R = nextRowNode.data;
-              if (row.meta.isGroupFooter === false) {
-                event.api.setFocusedCell(event.rowIndex + additionalIndex, firstEditCol);
-                event.api.clearRangeSelection();
-                foundNonFooterRow = true;
-              } else {
-                additionalIndex = additionalIndex + 1;
-              }
-            }
-          }
-        }
-      }
     }
   });
 
@@ -310,9 +303,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       /* @ts-ignore  AG Grid's Event Object is Wrong */
       if (event.event.code === "Space") {
         onCellSpaceKey(event);
-        /* @ts-ignore  AG Grid's Event Object is Wrong */
-      } else if (event.event.keyCode === 13) {
-        onCellEnterKey(event);
         /* @ts-ignore  AG Grid's Event Object is Wrong */
       } else if (event.event.key === "x" && (event.event.ctrlKey || event.event.metaKey)) {
         // Need to get this working.
@@ -746,6 +736,12 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}
         navigateToNextCell={navigateToNextCell}
+        onCellEditingStopped={(e: CellEditingStoppedEvent) => {
+          const focusedCell = e.api.getFocusedCell();
+          if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
+            moveToNextRow(focusedCell.rowIndex, focusedCell.column);
+          }
+        }}
         onCellKeyDown={onCellKeyDown}
         onFirstDataRendered={onFirstDataRendered}
         suppressKeyboardEvent={suppressKeyboardEvent}
