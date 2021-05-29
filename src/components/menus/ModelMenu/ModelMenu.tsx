@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { Menu, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { RenderWithSpinner, ShowHide } from "components";
+import { RenderWithSpinner, ShowHide, VerticalFlexCenter } from "components";
 import { useDeepEqualMemo, useDebouncedJSSearch, useTrackFirstRender, useDynamicCallback } from "lib/hooks";
 import {
   ModelMenuRef,
@@ -110,12 +110,15 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
                 }
               }}
             />
-            {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
+            <VerticalFlexCenter>
+              {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
+            </VerticalFlexCenter>
           </div>
         ) : (
-          renderItem(model, { level: level, index: indexMap[String(model.id)] })
+          <VerticalFlexCenter>
+            {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
+          </VerticalFlexCenter>
         )}
-        {/* </div> */}
       </Menu.Item>
       {isModelWithChildren(model) && model.children.length !== 0 && (
         <ModelMenuItems<M> {...primary} models={model.children} level={props.level + 1} />
@@ -460,70 +463,72 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     }
   }, [state.focused]);
 
+  /* eslint-disable indent */
   return (
     <RenderWithSpinner loading={props.loading} size={22}>
       <Menu className={classNames("model-menu", props.className)} style={props.style} id={props.id}>
-        {(isUnfocusedState(state) || isModelIndexFocusedState(state) || isBottomItemFocusedState(state)) && (
-          <React.Fragment>
-            <ModelMenuItems<M>
-              models={topLevelModels}
-              focusedIndex={isModelIndexFocusedState(state) ? state.index : null}
-              checkbox={isMultipleModelMenuProps(props) && props.checkbox === true}
-              multiple={isMultipleModelMenuProps(props)}
-              onPress={(m: M, e: SyntheticEvent) => onMenuItemClick(m, e)}
-              selected={selected}
-              renderItem={props.renderItem}
-              levelIndent={props.levelIndent}
-              itemProps={props.itemProps}
-              indexMap={indexMap}
-              highlightActive={props.highlightActive}
-              leftAlign={props.leftAlign}
-              hidden={props.hidden}
-              visible={props.visible}
-              level={0}
-              onSelect={(m: M, e: CheckboxChangeEvent) => {
-                if (isMultipleModelMenuProps(props)) {
-                  const selectedModels = filter(
-                    map(selected, (id: number | string) => find(models, { id })),
-                    (mi: M | undefined) => mi !== undefined
-                  ) as M[];
-                  setSelected([...selected, m.id]);
-                  props.onChange([...selectedModels, m], e);
-                } else {
-                  setSelected([m.id]);
-                  props.onChange(m, e);
-                }
-              }}
-              onDeselect={(m: M, e: CheckboxChangeEvent) => {
-                if (isMultipleModelMenuProps(props)) {
-                  const selectedModels = filter(
-                    map(selected, (id: number | string) => find(models, { id })),
-                    (mi: M | undefined) => mi !== undefined
-                  ) as M[];
-                  setSelected(filter(selected, (id: number | string) => id !== m.id));
-                  props.onChange(
-                    filter(selectedModels, (mi: M) => mi.id !== m.id),
-                    e
-                  );
-                } else {
-                  setSelected([m.id]);
-                  props.onChange(m, e);
-                }
-              }}
-            />
-            {!isNil(props.bottomItem) && (
-              <Menu.Item
-                className={classNames("model-menu-item", "empty", { active: isBottomItemFocusedState(state) })}
-                onClick={(info: { domEvent: SyntheticEvent }) =>
-                  !isNil(props.bottomItem?.onClick) && props.bottomItem?.onClick(info.domEvent)
-                }
-              >
-                {!isNil(props.bottomItem.icon) && <div className={"icon-container"}>{props.bottomItem.icon}</div>}
-                {props.bottomItem.text}
-              </Menu.Item>
-            )}
-          </React.Fragment>
-        )}
+        {topLevelModels.length !== 0 &&
+          (isUnfocusedState(state) || isModelIndexFocusedState(state) || isBottomItemFocusedState(state)) && (
+            <React.Fragment>
+              <ModelMenuItems<M>
+                models={topLevelModels}
+                focusedIndex={isModelIndexFocusedState(state) ? state.index : null}
+                checkbox={isMultipleModelMenuProps(props) && props.checkbox === true}
+                multiple={isMultipleModelMenuProps(props)}
+                onPress={(m: M, e: SyntheticEvent) => onMenuItemClick(m, e)}
+                selected={selected}
+                renderItem={props.renderItem}
+                levelIndent={props.levelIndent}
+                itemProps={props.itemProps}
+                indexMap={indexMap}
+                highlightActive={props.highlightActive}
+                leftAlign={props.leftAlign}
+                hidden={props.hidden}
+                visible={props.visible}
+                level={0}
+                onSelect={(m: M, e: CheckboxChangeEvent) => {
+                  if (isMultipleModelMenuProps(props)) {
+                    const selectedModels = filter(
+                      map(selected, (id: number | string) => find(models, { id })),
+                      (mi: M | undefined) => mi !== undefined
+                    ) as M[];
+                    setSelected([...selected, m.id]);
+                    props.onChange([...selectedModels, m], e);
+                  } else {
+                    setSelected([m.id]);
+                    props.onChange(m, e);
+                  }
+                }}
+                onDeselect={(m: M, e: CheckboxChangeEvent) => {
+                  if (isMultipleModelMenuProps(props)) {
+                    const selectedModels = filter(
+                      map(selected, (id: number | string) => find(models, { id })),
+                      (mi: M | undefined) => mi !== undefined
+                    ) as M[];
+                    setSelected(filter(selected, (id: number | string) => id !== m.id));
+                    props.onChange(
+                      filter(selectedModels, (mi: M) => mi.id !== m.id),
+                      e
+                    );
+                  } else {
+                    setSelected([m.id]);
+                    props.onChange(m, e);
+                  }
+                }}
+              />
+              {!isNil(props.bottomItem) && (
+                <Menu.Item
+                  className={classNames("model-menu-item", "empty", { active: isBottomItemFocusedState(state) })}
+                  onClick={(info: { domEvent: SyntheticEvent }) =>
+                    !isNil(props.bottomItem?.onClick) && props.bottomItem?.onClick(info.domEvent)
+                  }
+                >
+                  {!isNil(props.bottomItem.icon) && <div className={"icon-container"}>{props.bottomItem.icon}</div>}
+                  {props.bottomItem.text}
+                </Menu.Item>
+              )}
+            </React.Fragment>
+          )}
         {(isNoSearchResultsFocusedState(state) || isNoSearchResultsUnfocusedState(state)) &&
           /* eslint-disable indent */
           !isNil(props.onNoSearchResults) && (
