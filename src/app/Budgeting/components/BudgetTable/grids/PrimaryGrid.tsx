@@ -57,7 +57,7 @@ import {
   PaymentMethodCellEditor,
   BudgetItemsTreeEditor
 } from "../editors";
-import { PrimaryGridProps, CustomColDef, isKeyboardEvent } from "../model";
+import { PrimaryGridProps, CustomColDef, CellPositionMoveOptions, isKeyboardEvent } from "../model";
 import { rangeSelectionIsSingleCell, originalColDef } from "../util";
 
 const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
@@ -149,7 +149,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       let runningIndex = 0;
       let noMoreRows = false;
       let nextRowNode: RowNode | null = null;
-
       while (noMoreRows === false) {
         if (direction === "desc" && startingIndex - runningIndex < 0) {
           noMoreRows = true;
@@ -168,7 +167,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
           runningIndex = runningIndex + 1;
         }
       }
-      return [nextRowNode, startingIndex + runningIndex, runningIndex];
+      return [nextRowNode === undefined ? null : nextRowNode, startingIndex + runningIndex, runningIndex];
     } else {
       return [null, startingIndex, 0];
     }
@@ -206,7 +205,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
 
   const navigateToNextCell = useDynamicCallback(
     (params: NavigateToNextCellParams): CellPosition => {
-      console.log("Navigating to next cell");
       if (!isNil(params.nextCellPosition)) {
         const verticalAscend = params.previousCellPosition.rowIndex < params.nextCellPosition.rowIndex;
         const verticalDescend = params.previousCellPosition.rowIndex > params.nextCellPosition.rowIndex;
@@ -241,49 +239,36 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   );
 
-  const moveToNextColumn = useDynamicCallback((rowIndex: number, column: Column) => {
-    if (!isNil(api) && !isNil(columnApi)) {
-      const columns = columnApi.getAllColumns();
-      if (!isNil(columns)) {
-        const index = columns.indexOf(column);
-        if (index !== -1) {
-          if (index === columns.length - 1) {
-            // TODO: We need to move to the next row and if it is not present,
-            // we need to add row.
-            const nextColumn = columns[0];
-            api.setFocusedCell(rowIndex, nextColumn);
-            api.clearRangeSelection();
-          } else {
-            const nextColumn = columns[index + 1];
-            api.setFocusedCell(rowIndex, nextColumn);
-            api.clearRangeSelection();
-          }
-        }
+  const moveToLocation = useDynamicCallback((loc: CellPosition, opts: CellPositionMoveOptions = {}) => {
+    if (!isNil(api)) {
+      api.setFocusedCell(loc.rowIndex, loc.column);
+      api.clearRangeSelection();
+      if (opts.startEdit === true) {
+        api.startEditingCell({ rowIndex: loc.rowIndex, colKey: loc.column });
       }
     }
   });
 
-  const moveToNextRow = useDynamicCallback((rowIndex: number, column: Column, localApi?: GridApi) => {
-    const local = !isNil(localApi) ? localApi : api;
-    if (!isNil(local)) {
-      let foundNonFooterRow = false;
-      let nextRowNode: RowNode | null;
-      let additionalIndex = 1;
-      while (foundNonFooterRow === false) {
-        nextRowNode = local.getDisplayedRowAtIndex(rowIndex + additionalIndex);
-        if (isNil(nextRowNode)) {
-          onRowAdd();
-          local.setFocusedCell(rowIndex + additionalIndex, column);
-          local.clearRangeSelection();
-          foundNonFooterRow = true;
-        } else {
-          let row: R = nextRowNode.data;
-          if (row.meta.isGroupFooter === false) {
-            local.setFocusedCell(rowIndex + additionalIndex, column);
-            local.clearRangeSelection();
-            foundNonFooterRow = true;
+  const moveToNextRow = useDynamicCallback((loc: CellPosition, opts: CellPositionMoveOptions = {}) => {
+    if (!isNil(api)) {
+      const [node, rowIndex, _] = findFirstNonGroupFooterRow(loc.rowIndex + 1);
+      if (node === null) {
+        onRowAdd();
+      }
+      moveToLocation({ rowIndex, column: loc.column }, opts);
+    }
+  });
+
+  const moveToNextColumn = useDynamicCallback((loc: CellPosition, opts: CellPositionMoveOptions = {}) => {
+    if (!isNil(api) && !isNil(columnApi)) {
+      const columns = columnApi.getAllColumns();
+      if (!isNil(columns)) {
+        const index = columns.indexOf(loc.column);
+        if (index !== -1) {
+          if (index === columns.length - 1) {
+            moveToNextRow({ rowIndex: loc.rowIndex, column: columns[0] }, opts);
           } else {
-            additionalIndex = additionalIndex + 1;
+            moveToLocation({ rowIndex: loc.rowIndex, column: columns[index + 1] }, opts);
           }
         }
       }
@@ -333,9 +318,9 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       const focusedCell = api.getFocusedCell();
       if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
         if (e.code === "Enter") {
-          moveToNextRow(focusedCell.rowIndex, focusedCell.column);
+          moveToNextRow(focusedCell);
         } else if (e.code === "Tab") {
-          moveToNextColumn(focusedCell.rowIndex, focusedCell.column);
+          moveToNextColumn(focusedCell, { startEdit: true });
         }
       }
     }
@@ -350,6 +335,13 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       } else if (event.event.key === "x" && (event.event.ctrlKey || event.event.metaKey)) {
         // Need to get this working.
         // onCellCut(event.event);
+        /* @ts-ignore  AG Grid's Event Object is Wrong */
+      } else if (event.event.code === "Enter") {
+        // NOTE: If Enter is clicked inside the cell popout, this doesn't get triggered.
+        const editing = event.api.getEditingCells();
+        if (editing.length === 0) {
+          moveToNextRow({ rowIndex: event.rowIndex, column: event.column });
+        }
       }
     }
   });

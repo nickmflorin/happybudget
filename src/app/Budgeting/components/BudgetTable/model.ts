@@ -23,6 +23,10 @@ export interface CellValueChangedParams<R extends Table.Row<G>, G extends Model.
   readonly change: Table.RowChange<R>;
 }
 
+export interface CellPositionMoveOptions {
+  readonly startEdit?: boolean;
+}
+
 export interface BudgetTableMenuAction {
   readonly icon: JSX.Element;
   readonly tooltip?: Partial<TooltipPropsWithTitle> | string;
