@@ -782,12 +782,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}
         navigateToNextCell={navigateToNextCell}
-        // onCellEditingStopped={(e: CellEditingStoppedEvent) => {
-        //   const focusedCell = e.api.getFocusedCell();
-        //   if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
-        //     moveToNextRow(focusedCell.rowIndex, focusedCell.column);
-        //   }
-        // }}
         onCellKeyDown={onCellKeyDown}
         onFirstDataRendered={onFirstDataRendered}
         suppressKeyboardEvent={suppressKeyboardEvent}
