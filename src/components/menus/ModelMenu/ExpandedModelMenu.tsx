@@ -128,7 +128,7 @@ const ExpandedModelMenu = <M extends Model.M>({
           ref={searchRef}
           onFocus={() => {
             const menuRefObj = _menuRef.current;
-            if (!isNil(menuRefObj)) {
+            if (!isNil(menuRefObj) && props.unfocusMenuOnSearchFocus === true) {
               menuRefObj.focus(false);
             }
           }}

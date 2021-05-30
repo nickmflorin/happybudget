@@ -26,7 +26,6 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
   fringesCellEditorParams: {
     colId: keyof R;
     onAddFringes: () => void;
-    onRowUpdate: (change: Table.RowChange<R>) => void;
   };
   subAccountUnits: Model.Tag[];
   onGroupRows: (rows: R[]) => void;
@@ -133,7 +132,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           clearBeforeEdit: true,
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if (params.event.code === "Enter" && params.editing) {
+            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
               return true;
             }
             return false;
@@ -218,7 +217,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           },
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if (params.event.code === "Enter" && params.editing) {
+            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
               return true;
             }
             return false;

@@ -118,6 +118,7 @@ interface _ExpandedModelMenuProps<M extends Model.M>
   readonly searchPlaceholder?: string;
   readonly children?: ReactNode;
   readonly autoFocusMenu?: boolean;
+  readonly unfocusMenuOnSearchFocus?: boolean;
   readonly onSearch?: (value: string) => void;
 }
 

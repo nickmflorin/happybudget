@@ -5,17 +5,15 @@ import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/pro-light-svg-icons";
 
-import { ICellEditorParams } from "@ag-grid-community/core";
-
 import { ExpandedModelTagsMenu, ExpandedModelMenuRef } from "components/menus";
+import { CellDoneEditingEvent, CellEditorParams, isKeyboardEvent } from "../../model";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
 export interface FringesCellEditorProps<R extends Table.Row<G>, G extends Model.Group = Model.Group>
-  extends ICellEditorParams {
+  extends CellEditorParams {
   onAddFringes: () => void;
-  onRowUpdate: (payload: any) => void;
   colId: keyof R;
   fringes: Model.Fringe[];
 }
@@ -24,6 +22,7 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
   const isFirstRender = useRef(true);
   const menuRef = useRef<ExpandedModelMenuRef<Model.Fringe>>(null);
   const [value, setValue] = useState<number[]>(props.value);
+  const [changedEvent, setChangedEvent] = useState<CellDoneEditingEvent | null>(null);
 
   useEffect(() => {
     if (!isNil(props.charPress)) {
@@ -41,20 +40,18 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
     // TODO: Unfortunately, since this is a pop up editor, AG Grid will not persist the
     // update to the cell value until the cell editing has stopped.  This is a temporary
     // attempt at a workaround for that.
-    if (!isFirstRender.current) {
-      if (!isNil(props.api)) {
-        const row: R = props.node.data;
-        const rowChangeData: Table.RowChangeData<R> = {};
-        const change: Table.CellChange<any> = { oldValue: null, newValue: props.value };
-        rowChangeData[props.colId] = change;
-        const rowChange: Table.RowChange<R> = { id: row.id, data: rowChangeData };
-        props.onRowUpdate(rowChange);
+    if (!isFirstRender.current && !isNil(changedEvent)) {
+      if (isKeyboardEvent(changedEvent) && (changedEvent.code === "Enter" || changedEvent.code === "Tab")) {
+        // Suppress keyboard navigation because we handle it ourselves.
+        props.stopEditing(false);
+        props.onDoneEditing(changedEvent);
       }
     }
-  }, [value]);
+  }, [value, changedEvent]);
 
   useEffect(() => {
     isFirstRender.current = false;
+    setChangedEvent(null);
   }, []);
 
   useImperativeHandle(ref, () => {
@@ -103,17 +100,8 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       selected={value}
       models={props.fringes}
       onChange={(ms: Model.Fringe[], e: KeyboardEvent | SyntheticEvent | CheckboxChangeEvent) => {
-        const isEnterKeyboardEvent = (
-          event: KeyboardEvent | SyntheticEvent | CheckboxChangeEvent
-        ): event is KeyboardEvent => {
-          return (event as KeyboardEvent).code === "Enter";
-        };
         setValue(map(ms, (m: Model.Fringe) => m.id));
-        // If the selection was made via the keyboard (by clicking enter) we stop
-        // editing.
-        if (isEnterKeyboardEvent(e)) {
-          props.stopEditing();
-        }
+        setChangedEvent(e);
       }}
       menuRef={menuRef}
       searchIndices={["name"]}

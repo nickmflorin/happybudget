@@ -15,6 +15,7 @@ type FieldOrder<T = string> = {
 };
 type FieldOrdering<T = string> = FieldOrder<T>[];
 
+// TODO: Deprecate me.
 interface Field {
   id: string;
   label: string;

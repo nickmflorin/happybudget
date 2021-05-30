@@ -1,10 +1,9 @@
 import { forwardRef } from "react";
 import { PaymentMethods } from "lib/model";
 
-import { ICellEditorParams } from "@ag-grid-community/core";
-import ModelTagCellEditor from "./Generic";
+import ModelTagCellEditor, { ModelTagCellEditorProps } from "./Generic";
 
-const PaymentMethodCellEditor = (props: ICellEditorParams, ref: any) => {
+const PaymentMethodCellEditor = (props: ModelTagCellEditorProps, ref: any) => {
   return (
     <ModelTagCellEditor<Model.PaymentMethod>
       searchIndices={["name"]}

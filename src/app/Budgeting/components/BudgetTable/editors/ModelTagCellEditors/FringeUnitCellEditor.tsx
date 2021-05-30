@@ -1,10 +1,8 @@
 import { forwardRef } from "react";
 import { FringeUnits } from "lib/model";
+import ModelTagCellEditor, { ModelTagCellEditorProps } from "./Generic";
 
-import { ICellEditorParams } from "@ag-grid-community/core";
-import ModelTagCellEditor from "./Generic";
-
-const FringeUnitCellEditor = (props: ICellEditorParams, ref: any) => {
+const FringeUnitCellEditor = (props: ModelTagCellEditorProps, ref: any) => {
   return (
     <ModelTagCellEditor<Model.FringeUnit> searchIndices={["name"]} models={FringeUnits} forwardedRef={ref} {...props} />
   );

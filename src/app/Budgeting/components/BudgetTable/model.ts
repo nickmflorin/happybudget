@@ -1,6 +1,16 @@
+import { SyntheticEvent } from "react";
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
-import { ColDef, CellClassParams, GridOptions, ColumnApi, GridApi, Column, RowNode } from "@ag-grid-community/core";
-import RowManager from "lib/tabling/managers";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import {
+  ColDef,
+  CellClassParams,
+  GridOptions,
+  ColumnApi,
+  GridApi,
+  Column,
+  RowNode,
+  ICellEditorParams
+} from "@ag-grid-community/core";
 
 // TODO: Start consolidating with the RowChange related types in the global type set.
 export interface CellValueChangedParams<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
@@ -37,6 +47,20 @@ export interface CookiesProps {
   readonly ordering?: string;
 }
 
+export type CellDoneEditingEvent = SyntheticEvent | KeyboardEvent | CheckboxChangeEvent;
+
+export const isKeyboardEvent = (e: CellDoneEditingEvent): e is KeyboardEvent => {
+  return (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;
+};
+
+export interface CellEditorParams extends ICellEditorParams {
+  // When the cell editor finishes editing, the AG Grid callback (onCellDoneEditing)
+  // does not have any context about what event triggered the completion, so we have
+  // to handle that ourselves so we can trigger different behaviors depending on
+  // how the selection was performed.
+  readonly onDoneEditing: (e: CellDoneEditingEvent) => void;
+}
+
 export interface CustomColDef<R extends Table.Row<G>, G extends Model.Group = Model.Group>
   extends Omit<ColDef, "field"> {
   readonly nullValue?: null | "" | 0 | [];
@@ -70,6 +94,7 @@ export interface BudgetTableMenuProps<R extends Table.Row<G>, G extends Model.Gr
   readonly detached?: boolean;
   readonly onSearch?: (value: string) => void;
   readonly onSelectAll: (checked: boolean) => void;
+  // TODO: Stop using Field type.
   readonly onColumnsChange: (fields: Field[]) => void;
   readonly onExport: (fields: Field[]) => void;
   readonly onDelete: () => void;
@@ -166,7 +191,7 @@ export interface BudgetTableProps<
   readonly cookies?: CookiesProps;
   readonly loading?: boolean;
   readonly renderFlag?: boolean;
-  readonly manager: RowManager<R, M, P, G>;
+  readonly manager: Table.IRowManager<R, M, P, G>;
   readonly cellClass?: (params: CellClassParams) => string | undefined;
   readonly onRowSelect: (id: number) => void;
   readonly onRowDeselect: (id: number) => void;
