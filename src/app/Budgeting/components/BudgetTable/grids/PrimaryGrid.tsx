@@ -1,7 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { SyntheticEvent, useState, useEffect, useRef } from "react";
 import classNames from "classnames";
 import { map, isNil, includes, find, uniq, forEach, filter, flatten } from "lodash";
 import { useLocation } from "react-router-dom";
+
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { AgGridReact } from "@ag-grid-community/react";
 import { AllModules } from "@ag-grid-enterprise/all-modules";
@@ -55,7 +57,7 @@ import {
   PaymentMethodCellEditor,
   BudgetItemsTreeEditor
 } from "../editors";
-import { PrimaryGridProps, CustomColDef } from "../model";
+import { PrimaryGridProps, CustomColDef, isKeyboardEvent } from "../model";
 import { rangeSelectionIsSingleCell, originalColDef } from "../util";
 
 const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
@@ -238,6 +240,28 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   );
 
+  const moveToNextColumn = useDynamicCallback((rowIndex: number, column: Column) => {
+    if (!isNil(api) && !isNil(columnApi)) {
+      const columns = columnApi.getAllColumns();
+      if (!isNil(columns)) {
+        const index = columns.indexOf(column);
+        if (index !== -1) {
+          if (index === columns.length - 1) {
+            // TODO: We need to move to the next row and if it is not present,
+            // we need to add row.
+            const nextColumn = columns[0];
+            api.setFocusedCell(rowIndex, nextColumn);
+            api.clearRangeSelection();
+          } else {
+            const nextColumn = columns[index + 1];
+            api.setFocusedCell(rowIndex, nextColumn);
+            api.clearRangeSelection();
+          }
+        }
+      }
+    }
+  });
+
   const moveToNextRow = useDynamicCallback((rowIndex: number, column: Column, localApi?: GridApi) => {
     const local = !isNil(localApi) ? localApi : api;
     if (!isNil(local)) {
@@ -298,8 +322,25 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   });
 
+  // When the cell editor finishes editing, the AG Grid callback (onCellDoneEditing)
+  // does not have any context about what event triggered the completion.  This is
+  // problematic because we need to focus either the cell to the right (on Tab completion)
+  // or the cell below (on Enter completion).  To accomplish this, we use a custom hook
+  // to the CellEditor(s) that is manually called inside the CellEditor.
+  const onDoneEditing = useDynamicCallback((e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent) => {
+    if (isKeyboardEvent(e) && !isNil(api)) {
+      const focusedCell = api.getFocusedCell();
+      if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
+        if (e.code === "Enter") {
+          moveToNextRow(focusedCell.rowIndex, focusedCell.column);
+        } else if (e.code === "Tab") {
+          moveToNextColumn(focusedCell.rowIndex, focusedCell.column);
+        }
+      }
+    }
+  });
+
   const onCellKeyDown = useDynamicCallback((event: CellKeyDownEvent) => {
-    console.log("Cell Key Down Event");
     if (!isNil(event.event)) {
       /* @ts-ignore  AG Grid's Event Object is Wrong */
       if (event.event.code === "Space") {
@@ -699,7 +740,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   }, [api]);
 
   const includeCellEditorParams = (def: CustomColDef<R, G>): CustomColDef<R, G> => {
-    return { ...def, cellEditorParams: { ...def.cellEditorParams, onKeyDown: onCellKeyDown } };
+    return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
   };
 
   return (

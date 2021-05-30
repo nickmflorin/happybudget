@@ -2,11 +2,10 @@ import { useImperativeHandle, useRef, useState, useEffect, forwardRef, useMemo }
 import { useSelector } from "react-redux";
 import { isNil, map, find } from "lodash";
 
-import { ICellEditorParams } from "@ag-grid-community/core";
-
 import { BudgetItemTreeMenu, ExpandedModelMenuRef, BudgetItemMenuModel } from "components/menus";
 import { useDeepEqualMemo, useTrackFirstRender } from "lib/hooks";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { CellEditorParams } from "../model";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
@@ -21,7 +20,7 @@ const selectBudgetItemsTreeLoading = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree.loading
 );
 
-interface BudgetItemsTreeEditorProps extends ICellEditorParams {
+interface BudgetItemsTreeEditorProps extends CellEditorParams {
   readonly setSearch: (value: string) => void;
   readonly value: Model.SimpleAccount | Model.SimpleSubAccount;
 }

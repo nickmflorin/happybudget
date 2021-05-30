@@ -4,7 +4,6 @@
 /// <reference path="./table.d.ts" />
 /// <reference path="./files.d.ts" />
 /// <reference path="./modeling.d.ts" />
-/// <reference path="./budget_table.d.ts" />
 
 interface Window {
   analytics: any;

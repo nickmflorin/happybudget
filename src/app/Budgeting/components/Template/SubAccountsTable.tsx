@@ -38,7 +38,6 @@ const TemplateSubAccountsTable = ({ detail, ...props }: TemplateSubAccountsTable
         fringesCellRenderer={"TemplateFringesCell"}
         fringesCellEditorParams={{
           onAddFringes: () => setFringesModalVisible(true),
-          onRowUpdate: (change: Table.RowChange<Table.TemplateSubAccountRow>) => props.onRowUpdate(change),
           colId: "fringes"
         }}
         onEditFringes={() => setFringesModalVisible(true)}

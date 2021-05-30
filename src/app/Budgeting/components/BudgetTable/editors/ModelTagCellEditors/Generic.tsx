@@ -2,23 +2,24 @@ import { useImperativeHandle, useRef, useState, useEffect } from "react";
 import { isNil } from "lodash";
 
 import { ExpandedModelTagsMenu, ExpandedModelMenuRef } from "components/menus";
-
-import { ICellEditorParams } from "@ag-grid-community/core";
+import { CellEditorParams, CellDoneEditingEvent } from "../../model";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-interface ModelTagCellEditorProps<M extends Model.Model> extends Omit<ICellEditorParams, "onKeyDown"> {
+export interface ModelTagCellEditorProps extends CellEditorParams {}
+
+interface PrivateModelTagCellEditorProps<M extends Model.Model> extends ModelTagCellEditorProps {
   models: M[];
   forwardedRef: any;
   searchIndices: SearchIndicies;
-  onKeyDown: () => void;
 }
 
-const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProps<M>) => {
+const ModelTagCellEditor = <M extends Model.Model>(props: PrivateModelTagCellEditorProps<M>) => {
   const isFirstRender = useRef(true);
   const menuRef = useRef<ExpandedModelMenuRef<M>>(null);
   const [value, setValue] = useState<M | null>(props.value);
+  const [changedEvent, setChangedEvent] = useState<CellDoneEditingEvent | null>(null);
 
   useEffect(() => {
     if (!isNil(props.charPress)) {
@@ -29,14 +30,16 @@ const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProp
     }
   }, [props.charPress, menuRef.current]);
 
-  // useEffect(() => {
-  //   if (!isFirstRender.current) {
-  //     props.stopEditing();
-  //   }
-  // }, [value]);
+  useEffect(() => {
+    if (!isFirstRender.current && !isNil(changedEvent)) {
+      props.stopEditing(true);
+      props.onDoneEditing(changedEvent);
+    }
+  }, [value, changedEvent]);
 
   useEffect(() => {
     isFirstRender.current = false;
+    setChangedEvent(null);
   }, []);
 
   useImperativeHandle(props.forwardedRef, () => {
@@ -83,10 +86,9 @@ const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProp
       models={props.models}
       searchIndices={props.searchIndices}
       defaultFocusOnlyItem={true}
-      onChange={(m: M) => {
+      onChange={(m: M, e: CellDoneEditingEvent) => {
         setValue(m);
-        props.onKeyDown();
-        props.stopEditing();
+        setChangedEvent(e);
       }}
       multiple={false}
       fillWidth={false}
