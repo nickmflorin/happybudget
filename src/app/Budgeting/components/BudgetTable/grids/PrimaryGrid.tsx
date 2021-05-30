@@ -299,6 +299,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   });
 
   const onCellKeyDown = useDynamicCallback((event: CellKeyDownEvent) => {
+    console.log("Cell Key Down Event");
     if (!isNil(event.event)) {
       /* @ts-ignore  AG Grid's Event Object is Wrong */
       if (event.event.code === "Space") {
@@ -697,11 +698,15 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   }, [api]);
 
+  const includeCellEditorParams = (def: CustomColDef<R, G>): CustomColDef<R, G> => {
+    return { ...def, cellEditorParams: { ...def.cellEditorParams, onKeyDown: onCellKeyDown } };
+  };
+
   return (
     <div className={"table-grid"}>
       <AgGridReact
         {...options}
-        columnDefs={map(colDefs, (colDef: CustomColDef<R, G>) => originalColDef(colDef))}
+        columnDefs={map(colDefs, (colDef: CustomColDef<R, G>) => originalColDef(includeCellEditorParams(colDef)))}
         getContextMenuItems={getContextMenuItems}
         allowContextMenuWithControlKey={true}
         // Required to get processCellFromClipboard to work with column spanning.
@@ -736,12 +741,12 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}
         navigateToNextCell={navigateToNextCell}
-        onCellEditingStopped={(e: CellEditingStoppedEvent) => {
-          const focusedCell = e.api.getFocusedCell();
-          if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
-            moveToNextRow(focusedCell.rowIndex, focusedCell.column);
-          }
-        }}
+        // onCellEditingStopped={(e: CellEditingStoppedEvent) => {
+        //   const focusedCell = e.api.getFocusedCell();
+        //   if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
+        //     moveToNextRow(focusedCell.rowIndex, focusedCell.column);
+        //   }
+        // }}
         onCellKeyDown={onCellKeyDown}
         onFirstDataRendered={onFirstDataRendered}
         suppressKeyboardEvent={suppressKeyboardEvent}

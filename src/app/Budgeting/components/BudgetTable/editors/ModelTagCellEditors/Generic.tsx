@@ -8,10 +8,11 @@ import { ICellEditorParams } from "@ag-grid-community/core";
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-interface ModelTagCellEditorProps<M extends Model.Model> extends ICellEditorParams {
+interface ModelTagCellEditorProps<M extends Model.Model> extends Omit<ICellEditorParams, "onKeyDown"> {
   models: M[];
   forwardedRef: any;
   searchIndices: SearchIndicies;
+  onKeyDown: () => void;
 }
 
 const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProps<M>) => {
@@ -28,11 +29,11 @@ const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProp
     }
   }, [props.charPress, menuRef.current]);
 
-  useEffect(() => {
-    if (!isFirstRender.current) {
-      props.stopEditing();
-    }
-  }, [value]);
+  // useEffect(() => {
+  //   if (!isFirstRender.current) {
+  //     props.stopEditing();
+  //   }
+  // }, [value]);
 
   useEffect(() => {
     isFirstRender.current = false;
@@ -82,7 +83,11 @@ const ModelTagCellEditor = <M extends Model.Model>(props: ModelTagCellEditorProp
       models={props.models}
       searchIndices={props.searchIndices}
       defaultFocusOnlyItem={true}
-      onChange={(m: M) => setValue(m)}
+      onChange={(m: M) => {
+        setValue(m);
+        props.onKeyDown();
+        props.stopEditing();
+      }}
       multiple={false}
       fillWidth={false}
       leftAlign={true}
