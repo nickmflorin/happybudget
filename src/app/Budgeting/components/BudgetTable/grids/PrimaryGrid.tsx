@@ -206,6 +206,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
 
   const navigateToNextCell = useDynamicCallback(
     (params: NavigateToNextCellParams): CellPosition => {
+      console.log("Navigating to next cell");
       if (!isNil(params.nextCellPosition)) {
         const verticalAscend = params.previousCellPosition.rowIndex < params.nextCellPosition.rowIndex;
         const verticalDescend = params.previousCellPosition.rowIndex > params.nextCellPosition.rowIndex;
@@ -230,7 +231,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
             };
           }
           return params.nextCellPosition;
-        } else if (includes(["expand", "select"], params.nextCellPosition.column.getColId())) {
+        } else if (includes(["expand", "select", "index"], params.nextCellPosition.column.getColId())) {
           return params.previousCellPosition;
         } else {
           return params.nextCellPosition;
