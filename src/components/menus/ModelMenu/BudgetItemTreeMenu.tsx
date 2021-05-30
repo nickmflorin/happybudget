@@ -1,5 +1,6 @@
-import { useMemo } from "react";
+import { useMemo, SyntheticEvent } from "react";
 import { isNil, map, filter } from "lodash";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { useDeepEqualMemo } from "lib/hooks";
 
@@ -42,9 +43,12 @@ const BudgetItemTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
   return (
     <ExpandedModelMenu<StringSubAccountNode | StringAccountNode>
       {...props}
-      onChange={(model: StringSubAccountNode | StringAccountNode) => {
+      onChange={(
+        model: StringSubAccountNode | StringAccountNode,
+        e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent
+      ) => {
         const { originalId, children, in_search_path, ...rest } = model;
-        props.onChange({ ...rest, id: originalId });
+        props.onChange({ ...rest, id: originalId }, e);
       }}
       getFirstSearchResult={(ms: (StringSubAccountNode | StringAccountNode)[]) => {
         const inSearchPath = filter(ms, (m: StringSubAccountNode | StringAccountNode) => m.in_search_path === true);

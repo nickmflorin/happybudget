@@ -154,7 +154,10 @@ export interface BudgetItemTreeMenuProps
     "renderItem" | "models" | "multiple" | "onChange" | "selected"
   > {
   readonly nodes: Model.Tree;
-  readonly onChange: (m: Model.SimpleAccount | Model.SimpleSubAccount) => void;
+  readonly onChange: (
+    m: Model.SimpleAccount | Model.SimpleSubAccount,
+    e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent
+  ) => void;
   readonly onSearch: (value: string) => void;
   readonly search: string;
   readonly childrenDefaultVisible?: boolean;

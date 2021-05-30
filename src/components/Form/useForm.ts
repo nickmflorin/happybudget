@@ -29,7 +29,7 @@ const useForm = <T extends { [key: string]: any } = { [key: string]: any }>(form
     antdForm.setFields(fieldsWithErrors);
   };
 
-  var wrapForm = useMemo(() => {
+  const wrapForm = useMemo(() => {
     return {
       ...antdForm,
       submit: () => {
