@@ -1,50 +1,33 @@
 import { forEach, isNil, includes, find, filter } from "lodash";
 import { generateRandomNumericId, getKeyValue } from "lib/util";
-import { isRowChange, isRow, isRowChangeData, isSplitField, isWriteField } from "./typeguards";
+import { isRowChange, isRow, isRowChangeData, isSplitField, isWriteField, isWriteOnlyField } from "./typeguards";
 
 type PayloadType<T, P, R extends Table.Row> = T extends Table.RowChange<R> ? Partial<P> : P;
-type RowObjType<R extends Table.Row> = R | Table.RowChange<R> | Table.RowChangeData<R>;
-type ObjType<R extends Table.Row, M extends Model.Model> = R | M | Table.RowChange<R> | Table.RowChangeData<R>;
 
-export const isWriteOnlyField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
-  field: Table.Field<R, M, P>
-): field is Table.IWriteOnlyField<R, M, P> => {
-  return (field as Table.IWriteOnlyField<R, M, P>).writeOnly === true;
-};
-
-abstract class BaseField<R extends Table.Row, M extends Model.Model> {
+abstract class BaseField<R extends Table.Row, M extends Model.Model> implements Table.IBaseField<R, M> {
   readonly required?: boolean;
   readonly placeholderValue?: any;
 
-  constructor(config: Table.IBaseField) {
+  constructor(config: Table.IBaseField<R, M>) {
     this.required = config.required;
     this.placeholderValue = config.placeholderValue;
   }
 
-  // public abstract getValue(obj: ObjType<R, M, P>): R[keyof R] | M[keyof M] | undefined;
   public abstract getValueFromRowChangeData(data: Table.RowChangeData<R>): R[keyof R] | undefined;
   public abstract getValueFromRow(row: R): R[keyof R] | undefined;
-  public abstract getValue(obj: ObjType<R, M>): R[keyof R] | M[keyof M] | R[keyof M & keyof R] | undefined;
-  public abstract getValue(obj: RowObjType<R>): any;
+  public abstract getValue(obj: Table.DataObjType<R, M>): any;
 }
 
-abstract class WriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> extends BaseField<
-  R,
-  M
-> {
+abstract class WriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
+  extends BaseField<R, M>
+  implements Table.IWriteField<R, M, P> {
   readonly allowNull?: boolean;
   readonly allowBlank?: boolean;
   readonly http: Http.Method[];
   readonly httpValueConverter?: (value: R[keyof R]) => P[keyof P] | undefined;
   readonly write = true;
 
-  constructor({
-    allowNull,
-    allowBlank,
-    http,
-    httpValueConverter,
-    ...config
-  }: Omit<Table.IWriteField<R, M, P>, "write">) {
+  constructor({ allowNull, allowBlank, http, httpValueConverter, ...config }: Table.IWriteFieldConfig<R, M, P>) {
     super(config);
     this.allowBlank = allowBlank;
     this.allowNull = allowNull;
@@ -69,13 +52,13 @@ abstract class WriteField<R extends Table.Row, M extends Model.Model, P extends 
 
 abstract class ReadField<R extends Table.Row, M extends Model.Model>
   extends BaseField<R, M>
-  implements Table.IReadField {
+  implements Table.IReadField<R, M> {
   readonly modelOnly?: boolean;
   readonly rowOnly?: boolean;
   readonly read = true;
   readonly rowField: keyof R;
 
-  constructor({ modelOnly, rowOnly, rowField, ...config }: Omit<Table.IReadField, "read"> & { rowField: keyof R }) {
+  constructor({ modelOnly, rowOnly, rowField, ...config }: Table.IReadFieldConfig<R, M> & { rowField: keyof R }) {
     super(config);
     this.modelOnly = modelOnly;
     this.rowOnly = rowOnly;
@@ -95,7 +78,7 @@ abstract class ReadField<R extends Table.Row, M extends Model.Model>
     return undefined;
   };
 
-  public getValue(obj: ObjType<R, M>): R[keyof R] | M[keyof M] | R[keyof M & keyof R] | undefined {
+  public getValue(obj: Table.DataObjType<R, M>): R[keyof R] | M[keyof M] | R[keyof M & keyof R] | undefined {
     if (isRowChange<R, M>(obj)) {
       const data: { [key in keyof R]?: Table.CellChange<R[key]> } = obj.data;
       return this.getValue(data);
@@ -128,7 +111,10 @@ abstract class ReadWriteField<
     httpValueConverter,
     modelField,
     ...config
-  }: Omit<Table.IReadWriteField<R, M, P>, "read" | "write"> & { modelField: keyof M & keyof P; rowField: keyof R }) {
+  }: Table.IReadWriteFieldConfig<R, M, P> & {
+    modelField: keyof M & keyof P;
+    rowField: keyof R;
+  }) {
     super(config);
     this.modelField = modelField;
     this.allowBlank = allowBlank;
@@ -159,7 +145,7 @@ export class AgnosticReadWriteField<R extends Table.Row, M extends Model.Model, 
   implements Table.IAgnosticReadWriteField<R, M, P> {
   readonly field: keyof M & keyof R & keyof P;
 
-  constructor(config: Omit<Table.IAgnosticReadWriteField<R, M, P>, "read" | "write">) {
+  constructor(config: Table.IAgnosticReadWriteFieldConfig<R, M, P>) {
     super({ modelField: config.field, rowField: config.field, ...config });
     this.field = config.field;
   }
@@ -175,12 +161,7 @@ export class WriteOnlyField<R extends Table.Row, M extends Model.Model, P extend
   readonly field: keyof P;
   readonly writeOnly = true;
 
-  constructor({
-    field,
-    getValueFromRow,
-    getValueFromRowChangeData,
-    ...config
-  }: Omit<Table.IWriteOnlyField<R, M, P>, "write" | "writeOnly">) {
+  constructor({ field, getValueFromRow, getValueFromRowChangeData, ...config }: Table.IWriteOnlyFieldConfig<R, M, P>) {
     super(config);
     this.field = field;
     this.getValueFromRow = getValueFromRow;
@@ -190,7 +171,7 @@ export class WriteOnlyField<R extends Table.Row, M extends Model.Model, P extend
   public getValueFromRow: (row: R) => any;
   public getValueFromRowChangeData: (data: Table.RowChangeData<R>) => any;
 
-  public getValue(obj: RowObjType<R>): any {
+  public getValue(obj: Table.RowObjType<R>): any {
     if (isRowChange<R, M>(obj)) {
       const data: { [key in keyof R]?: Table.CellChange<R[key]> } = obj.data;
       return this.getValue(data);
@@ -210,7 +191,7 @@ export class ReadOnlyField<R extends Table.Row, M extends Model.Model>
 
   public getValueFromModel = (m: M) => getKeyValue<M, keyof M>(this.field)(m);
 
-  constructor({ field, ...config }: Omit<Table.IReadOnlyField<R, M>, "read" | "readOnly">) {
+  constructor({ field, ...config }: Omit<Table.IReadOnlyField<R, M>, "read" | "readOnly" | "getValue">) {
     super({ rowField: field, ...config });
     this.field = field;
   }
@@ -240,7 +221,7 @@ export class RowManager<
   public typeLabel: string;
   public rowType: Table.RowType;
 
-  constructor(config: Table.IRowManager<R, M, P, G>) {
+  constructor(config: Table.IRowManagerConfig<R, M, P, G>) {
     this.fields = config.fields;
     this.childrenGetter = config.childrenGetter;
     this.groupGetter = config.groupGetter;
@@ -432,7 +413,7 @@ export class RowManager<
     return obj as PayloadType<T, P, R>;
   };
 
-  rowHasRequiredFields = (row: R): boolean => {
+  public rowHasRequiredFields = (row: R): boolean => {
     let requiredFieldsPresent = true;
     forEach(this.requiredFields, (field: Table.Field<R, M, P>) => {
       let value: any;
@@ -456,24 +437,28 @@ export class RowManager<
   };
 }
 
-export const ReadOnly = <R extends Table.Row, M extends Model.Model>(
-  config: Omit<Table.IReadOnlyField<R, M>, "read" | "readOnly">
-) => {
+export const ReadOnly = <R extends Table.Row, M extends Model.Model>(config: Table.IReadOnlyFieldConfig<R, M>) => {
   return new ReadOnlyField<R, M>(config);
 };
 
 export const WriteOnly = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
-  config: Omit<Table.IWriteOnlyField<R, M, P>, "write" | "writeOnly">
+  config: Table.IWriteOnlyFieldConfig<R, M, P>
 ) => {
   return new WriteOnlyField<R, M, P>(config);
 };
 
 export const ReadWrite = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
-  config:
-    | Omit<Table.ISplitReadWriteField<R, M, P>, "read" | "write">
-    | Omit<Table.IAgnosticReadWriteField<R, M, P>, "read" | "write">
+  config: Table.ISplitReadWriteFieldConfig<R, M, P> | Table.IAgnosticReadWriteFieldConfig<R, M, P>
 ) => {
-  if (isSplitField(config)) {
+  const isSplitNotAgnosticField = (
+    field: Table.ISplitReadWriteFieldConfig<R, M, P> | Table.IAgnosticReadWriteFieldConfig<R, M, P>
+  ): field is Table.ISplitReadWriteFieldConfig<R, M, P> => {
+    return (
+      (field as Table.ISplitReadWriteFieldConfig<R, M, P>).modelField !== undefined &&
+      (field as Table.ISplitReadWriteFieldConfig<R, M, P>).rowField !== undefined
+    );
+  };
+  if (isSplitNotAgnosticField(config)) {
     return new SplitReadWriteField<R, M, P>(config);
   } else {
     return new AgnosticReadWriteField<R, M, P>(config);

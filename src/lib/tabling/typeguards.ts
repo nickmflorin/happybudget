@@ -53,7 +53,7 @@ export const isReadField = <R extends Table.Row, M extends Model.Model, P extend
   | Table.IReadOnlyField<R, M>
   | Table.IAgnosticReadWriteField<R, M, P>
   | Table.ISplitReadWriteField<R, M, P> => {
-  return (field as Table.IReadField).read === true;
+  return (field as Table.IReadField<R, M>).read === true;
 };
 
 export const isWriteField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(

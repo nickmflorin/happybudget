@@ -105,7 +105,10 @@ namespace Table {
     readonly value: string | null;
   }
 
-  type IBaseField = {
+  type DataObjType<R extends Table.Row, M extends Model.Model> = R | M | Table.RowChange<R> | Table.RowChangeData<R>;
+  type RowObjType<R extends Table.Row> = R | Table.RowChange<R> | Table.RowChangeData<R>;
+
+  type IBaseField<R extends Table.Row, M extends Model.Model> = {
     // Whether or not the field is required to be present for POST requests (i.e.
     // when creating a new instance).  If the field is required, the mechanics will
     // wait until a value is present for the field before creating an instance
@@ -115,16 +118,22 @@ namespace Table {
     readonly placeholderValue?: any;
   };
 
-  type IReadField = Table.IBaseField & {
+  type IReadField<R extends Table.Row, M extends Model.Model> = Table.IBaseField<R, M> & {
     readonly read: true;
     // Whether or not the model (M) field value should be used to construct the
     // row (R) model.
     readonly modelOnly?: boolean;
     // Whether or not the row (R) field should be used to update the model (M).
     readonly rowOnly?: boolean;
+    readonly getValue: (obj: Table.DataObjType<R, M>) => any;
   };
 
-  type IWriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Table.IBaseField & {
+  type IReadFieldConfig<R extends Table.Row, M extends Model.Model> = Omit<Table.IReadField<R, M>, "read" | "getValue">;
+
+  type IWriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Table.IBaseField<
+    R,
+    M
+  > & {
     readonly write: true;
     // Whether or not the field value is allowed to take on null values for HTTP
     // requests.
@@ -138,34 +147,56 @@ namespace Table {
     // Used to transform a value that is on the row (R) model to a value that is
     // included in the HTTP PATCH or POST payloads.
     readonly httpValueConverter?: (value: R[keyof R]) => P[keyof P] | undefined;
+    readonly getHttpValue: (row: R | Table.RowChange<R>, method?: Http.Method) => P[keyof P] | undefined;
+    readonly getValue: (obj: Table.DataObjType<R, M>) => any;
   };
+
+  type IWriteFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
+    Table.IWriteField<R, M, P>,
+    "write" | "getHttpValue" | "getValue"
+  >;
 
   type IReadWriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Table.IWriteField<
     R,
     M,
     P
   > &
-    Table.IReadField;
+    Table.IReadField<R, M>;
+
+  type IReadWriteFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
+    Table.IReadWriteField<R, M, P>,
+    "read" | "write" | "getValue" | "getHttpValue"
+  >;
 
   // Field configuration for Field that is included in HTTP requests to update or
   // create the instance but not on the model (M) or row (R).
-  type IWriteOnlyField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Table.IWriteField<
-    R,
-    M,
-    P
+  type IWriteOnlyField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
+    Table.IWriteField<R, M, P>,
+    "getValue"
   > & {
     readonly field: keyof P;
     readonly writeOnly: true;
     readonly getValueFromRowChangeData: (data: Table.RowChangeData<R>) => P[keyof P] | undefined;
     readonly getValueFromRow: (row: R) => P[keyof P] | undefined;
+    readonly getValue: (obj: Table.RowObjType<R>) => any;
   };
+
+  type IWriteOnlyFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
+    Table.IWriteOnlyField<R, M, P>,
+    "write" | "writeOnly" | "getValue" | "getHttpValue"
+  >;
 
   // Field configuration for Field that is not included in HTTP requests to update or
   // create the instance but present on the model (M) and row (R).
-  type IReadOnlyField<R extends Table.Row, M extends Model.Model> = Table.IReadField & {
+  type IReadOnlyField<R extends Table.Row, M extends Model.Model> = Table.IReadField<R, M> & {
     readonly field: keyof M & keyof R;
     readonly readOnly: true;
   };
+
+  type IReadOnlyFieldConfig<R extends Table.Row, M extends Model.Model> = Omit<
+    Table.IReadOnlyField<R, M>,
+    "read" | "readOnly" | "getValue"
+  >;
 
   type ISplitReadWriteField<
     R extends Table.Row,
@@ -180,6 +211,11 @@ namespace Table {
     readonly rowField: keyof R;
   };
 
+  type ISplitReadWriteFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
+    Table.ISplitReadWriteField<R, M, P>,
+    "read" | "write" | "getValue" | "getHttpValue"
+  >;
+
   type IAgnosticReadWriteField<
     R extends Table.Row,
     M extends Model.Model,
@@ -190,16 +226,22 @@ namespace Table {
     readonly field: keyof M & keyof R & keyof P;
   };
 
+  type IAgnosticReadWriteFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
+    Table.IAgnosticReadWriteField<R, M, P>,
+    "read" | "write" | "getValue" | "getHttpValue"
+  >;
+
   type WriteableField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> =
-    | Table.SplitReadWriteField<R, M, P>
-    | Table.AgnosticReadWriteField<R, M, P>
-    | Table.WriteOnlyField<R, M, P>;
+    | Table.ISplitReadWriteField<R, M, P>
+    | Table.IAgnosticReadWriteField<R, M, P>
+    | Table.IWriteOnlyField<R, M, P>;
 
   type Field<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> =
     | Table.WriteableField<R, M, P>
-    | Table.ReadOnlyField<R, M>;
+    | Table.IReadOnlyField<R, M>;
 
-  interface IRowManager<
+  // TODO: This needs to include the methods on the class as well.
+  interface IRowManagerConfig<
     R extends Table.Row<G>,
     M extends Model.Model,
     P extends Http.ModelPayload<M>,
@@ -213,14 +255,21 @@ namespace Table {
     readonly labelGetter: (model: M) => string;
   }
 
-  const defaultRowMeta: Partial<Table.RowMeta> = {
-    isPlaceholder: false,
-    isGroupFooter: false,
-    isTableFooter: false,
-    isBudgetFooter: false,
-    selected: false,
-    children: [],
-    errors: [],
-    fieldsLoading: []
-  };
+  interface IRowManager<
+    R extends Table.Row<G>,
+    M extends Model.Model,
+    P extends Http.ModelPayload<M>,
+    G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup
+  > extends Table.IRowManagerConfig<R, M, P, G> {
+    readonly requiredFields: Table.Field<R, M, P>[];
+    readonly getField: (name: keyof R | keyof M) => Table.Field<R, M, P> | null;
+    readonly getChildren: (model: M) => number[];
+    readonly getGroup: (model: M) => number | null;
+    readonly createPlaceholder: () => R;
+    readonly modelToRow: (model: M, group: G | null, meta: Partial<Table.RowMeta> = {}) => R;
+    readonly mergeChangesWithRow: (obj: R, change: Table.RowChange<R>) => R;
+    readonly mergeChangesWithModel: (obj: M, change: Table.RowChange<R>) => M;
+    readonly payload: (row: R | Table.RowChange<R>) => P | Partial<P>;
+    readonly rowHasRequiredFields: (row: R) => boolean;
+  }
 }
