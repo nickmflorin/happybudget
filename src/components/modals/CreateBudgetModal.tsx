@@ -58,6 +58,7 @@ const CreateBudgetModal = ({
       visible={open}
       onCancel={() => onCancel()}
       okText={"Create"}
+      okButtonProps={{ disabled: form.loading }}
       cancelText={"Cancel"}
       onOk={() => {
         form
@@ -67,6 +68,7 @@ const CreateBudgetModal = ({
               if (!isNil(templateId)) {
                 payload = { ...payload, template: templateId };
               }
+              form.setLoading(true);
               createBudget(payload)
                 .then((budget: Model.Budget) => {
                   form.resetFields();
