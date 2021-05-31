@@ -4,7 +4,7 @@ export { default as IdentifierCell } from "./IdentifierCell";
 export { default as CalculatedCell } from "./CalculatedCell";
 export { default as IndexCell } from "./IndexCell";
 export { default as BudgetItemCell } from "./BudgetItemCell";
-export { default as FringeColorCell } from "./FringeColorCell";
+export { default as ColorCell } from "./ColorCell";
 export { default as HeaderCell } from "./HeaderCell";
 export * from "./FringesCells";
 export * from "./ModelTagCells";

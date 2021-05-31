@@ -61,7 +61,8 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
           field: "color",
           headerName: "Color",
           cellClass: classNames("cell--centered"),
-          cellRenderer: "FringeColorCell",
+          cellRenderer: "ColorCell",
+          cellEditor: "FringesColorEditor",
           width: 100
         },
         {
@@ -84,7 +85,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
           clearBeforeEdit: true,
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if (params.event.code === "Enter" && params.editing) {
+            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
               return true;
             }
             return false;
