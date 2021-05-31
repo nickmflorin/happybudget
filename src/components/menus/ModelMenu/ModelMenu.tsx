@@ -1,5 +1,5 @@
-import React, { useImperativeHandle, useEffect, useState, useMemo, SyntheticEvent } from "react";
-import { map, isNil, includes, filter, find } from "lodash";
+import React, { useImperativeHandle, useEffect, useState, useMemo, useCallback, SyntheticEvent } from "react";
+import { map, isNil, includes, filter, find, forEach } from "lodash";
 import classNames from "classnames";
 import { Menu, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -273,6 +273,38 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     }
   }, [props.selected]);
 
+  const setIndexFromSelectedState = (selectedState: (number | string)[]) => {
+    if (selectedState.length !== 0) {
+      let validSelectedModel: M | null = null;
+      // TODO: In the case that there are multiple selected models (i.e. the Menu
+      // is operating as multiple = true) we should see if there is a way to recover
+      // the last active selection instead of defaulting to the first selected model
+      // in the array.
+      forEach(selectedState, (id: number | string) => {
+        const m = find(models, { id } as any);
+        if (!isNil(m)) {
+          validSelectedModel = m;
+          return false;
+        } else {
+          /* eslint-disable no-console */
+          console.warn(`Inconsistent State: Could not find model for selected ID ${id}.`);
+        }
+      });
+      if (validSelectedModel !== null) {
+        const index = models.indexOf(validSelectedModel);
+        if (!isNil(index)) {
+          setState({ focused: true, index: index });
+          return true;
+        }
+      }
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    setIndexFromSelectedState(selected);
+  }, [selected]);
+
   useEffect(() => {
     if (isFocusedState(state) || props.autoFocus === true) {
       if (props.models.length === 0) {
@@ -289,8 +321,14 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
         }
       } else {
         if (!isModelIndexFocusedState(state)) {
-          let setIndexToModel = false;
-          if (!isNil(props.getFirstSearchResult)) {
+          // If we are not already in the index focused state, first check to see
+          // if there is a selection (i.e. value) - in which case, we will set the
+          // index based on that value.
+          let setIndexToModel = setIndexFromSelectedState(selected);
+
+          // If we cannot set the index based on a selected value, check to see if
+          // there is a prop that returns the first model that we should select.
+          if (setIndexToModel === false && !isNil(props.getFirstSearchResult)) {
             const firstModel = props.getFirstSearchResult(models);
             if (!isNil(firstModel)) {
               const index = models.indexOf(firstModel);
@@ -300,6 +338,9 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
               }
             }
           }
+
+          // If we could not infer the index based on a selected model or the prop callback,
+          // set to the first index.
           if (setIndexToModel === false) {
             setState({ focused: true, index: 0 });
           }
@@ -402,12 +443,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   });
 
   useEffect(() => {
-    if (
-      props.defaultFocusFirstItem === true &&
-      firstRender === true &&
-      models.length !== 0 &&
-      (isNil(props.selected) || (Array.isArray(props.selected) && props.selected.length === 0))
-    ) {
+    if (props.defaultFocusFirstItem === true && firstRender === true && models.length !== 0 && selected.length === 0) {
       setState({ focused: true, index: 0 });
     }
   }, [props.defaultFocusFirstItem, useDeepEqualMemo(models)]);
