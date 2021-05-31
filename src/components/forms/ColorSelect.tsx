@@ -12,7 +12,7 @@ interface ColorSelectProps extends StandardComponentProps {
   itemClassName?: string;
   itemStyle?: React.CSSProperties;
   loading?: boolean;
-  onChange?: (value: string) => void;
+  onChange?: (value: string, e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const ColorSelect: React.FC<ColorSelectProps> = ({
@@ -29,16 +29,17 @@ const ColorSelect: React.FC<ColorSelectProps> = ({
   return (
     <RenderOrSpinner loading={loading}>
       <div className={classNames("color-select", className)} style={style}>
-        {map(colors, (c: string) => {
+        {map(colors, (c: string, index: number) => {
           return (
             <Color
+              key={index}
               color={c || color}
               selected={!isNil(value) ? value === c : color === c}
               className={classNames("color-select-color", itemClassName)}
               style={itemStyle}
-              onClick={() => {
+              onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                 setColor(c);
-                onChange?.(c);
+                onChange?.(c, e);
               }}
             />
           );
