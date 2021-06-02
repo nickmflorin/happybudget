@@ -21,7 +21,7 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
 }: ExpandCellProps<R, G>): JSX.Element => {
   const row: R = node.data;
 
-  const cellIsHovered = () => {
+  const rowIsHovered = () => {
     const parent = props.eGridCell.parentElement;
     if (!isNil(parent)) {
       const cls = parent.getAttribute("class");
@@ -43,7 +43,7 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
         );
       } else {
         return (
-          <ShowHide show={cellIsHovered()}>
+          <ShowHide show={rowIsHovered()}>
             <IconButton
               className={"ag-grid-expand-button"}
               size={"small"}
@@ -55,7 +55,7 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
       }
     } else {
       return (
-        <ShowHide show={cellIsHovered()}>
+        <ShowHide show={rowIsHovered()}>
           <IconButton
             className={"ag-grid-expand-button"}
             size={"small"}
