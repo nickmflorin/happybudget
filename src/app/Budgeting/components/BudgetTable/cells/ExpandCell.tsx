@@ -30,26 +30,37 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
     return false;
   };
 
-  if (row.meta.isPlaceholder === false && (isNil(rowCanExpand) || rowCanExpand(row) === true)) {
-    if (row.meta.children.length !== 0) {
-      return (
-        <IconButton
-          className={"ag-grid-expand-button"}
-          size={"small"}
-          icon={<FontAwesomeIcon icon={faExpandAlt} />}
-          onClick={() => onClick(node.data.id)}
-        />
-      );
-    } else {
-      return (
-        <ShowHide show={cellIsHovered()}>
+  if (row.meta.isPlaceholder === false) {
+    if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
+      if (row.meta.children.length !== 0) {
+        return (
           <IconButton
             className={"ag-grid-expand-button"}
             size={"small"}
             icon={<FontAwesomeIcon icon={faExpandAlt} />}
             onClick={() => onClick(node.data.id)}
           />
-        </ShowHide>
+        );
+      } else {
+        return (
+          <ShowHide show={cellIsHovered()}>
+            <IconButton
+              className={"ag-grid-expand-button"}
+              size={"small"}
+              icon={<FontAwesomeIcon icon={faExpandAlt} />}
+              onClick={() => onClick(node.data.id)}
+            />
+          </ShowHide>
+        );
+      }
+    } else {
+      return (
+        <IconButton
+          className={"ag-grid-expand-button"}
+          size={"small"}
+          disabled={true}
+          icon={<FontAwesomeIcon icon={faExpandAlt} />}
+        />
       );
     }
   } else {
