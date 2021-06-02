@@ -26,11 +26,13 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
       onCancel={() => onCancel()}
       okText={"Save"}
       cancelText={"Cancel"}
+      okButtonProps={{ disabled: form.loading }}
       onOk={() => {
         form
           .validateFields()
           .then((values: TemplateFormValues) => {
             const submit = (payload: Partial<Http.TemplatePayload>) => {
+              form.setLoading(true);
               updateTemplate(template.id, payload)
                 .then((newTemplate: Model.Template) => {
                   form.resetFields();

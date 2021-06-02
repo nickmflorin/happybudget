@@ -26,11 +26,13 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
       onCancel={() => onCancel()}
       okText={"Save"}
       cancelText={"Cancel"}
+      okButtonProps={{ disabled: form.loading }}
       onOk={() => {
         form
           .validateFields()
           .then((values: BudgetFormValues) => {
             const submit = (payload: Http.BudgetPayload) => {
+              form.setLoading(true);
               updateBudget(budget.id, payload)
                 .then((newBudget: Model.Budget) => {
                   form.resetFields();

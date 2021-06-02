@@ -17,6 +17,7 @@
   &.disabled {
     pointer-events: none;
     box-shadow: none;
+    cursor: pointer;
   }
 
   &.no-transform {
@@ -112,9 +113,12 @@
     }
 
     &:hover,
+    &.disabled,
+    &:disabled,
     &:focus {
       color: lighten($icon-color, 20%) !important;
       background-color: rgba(0, 0, 0, 0.015);
+      cursor: pointer;
 
       svg {
         color: $blue !important;
@@ -132,8 +136,12 @@
     text-transform: unset !important;
     padding-left: 4px;
 
-    &:hover {
+    &:hover,
+    &:focus,
+    &.disabled,
+    &:disabled {
       color: #cacaca !important;
+      cursor: pointer;
     }
   }
 }
@@ -155,7 +163,11 @@
     margin-left: 3px;
     color: $blue;
 
-    &:hover {
+    &:hover,
+    &:focus,
+    &:disabled,
+    &.disabled {
+      cursor: pointer;
       color: rgba($blue, 0.6);
     }
   }
@@ -249,15 +261,14 @@
     border-color: #ececec;
 
     &:hover,
+    &:disabled,
+    &.disabled,
     &:focus {
       border-color: transparent !important;
       background-color: darken(#ececec, 10%) !important;
       color: $text-secondary !important;
       box-shadow: none !important;
-    }
-
-    &.disabled {
-      background-color: rgba(0, 0, 0, 0.12);
+      cursor: pointer;
     }
   }
 
@@ -268,15 +279,14 @@
     border-color: $green;
 
     &:hover,
+    &.disabled,
+    &:disabled,
     &:focus {
       border-color: transparent !important;
       background-color: $green-darker !important;
       color: $white !important;
       box-shadow: none !important;
-    }
-
-    &.disabled {
-      background-color: rgba(0, 0, 0, 0.12);
+      cursor: pointer;
     }
   }
 
@@ -286,10 +296,14 @@
     background: $red;
     border-color: $red;
 
-    &:hover {
+    &:hover,
+    &:focus,
+    &.disabled,
+    &:disabled {
       color: $white;
       background: $red-hover;
       border-color: $red;
+      cursor: pointer;
     }
   }
 
@@ -323,9 +337,12 @@
     }
 
     &:hover,
+    &:disabled,
+    &.disabled,
     &:focus {
       border-color: $transparent !important;
       background-color: transparent;
+      cursor: pointer;
       svg {
         color: lighten($icon-color, 20%) !important;
       }
@@ -365,19 +382,6 @@
         }
       }
     }
-
-
-    &.disabled {
-      svg {
-        color: $disabled-color !important;
-      }
-      &:hover,
-      &:focus {
-        svg {
-          color: $disabled-color !important;
-        }
-      }
-    }
   }
 
   &--square {
@@ -409,10 +413,14 @@
     }
 
     &:hover,
+    &:disabled,
+    &.disabled,
     &:focus {
       border-color: transparent !important;
       background-color: $transparent !important;
       box-shadow: none !important;
+      cursor: pointer;
+
       .caret-button-inner {
         .caret-button-text {
           color: lighten($icon-color, 20%);
@@ -431,7 +439,10 @@
       border-color: $green;
 
       &:hover,
+      &:disabled,
+      &.disabled,
       &:focus {
+        cursor: pointer;
         background-color: $green-darker !important;
         .caret-button-inner {
           .caret-button-text {
@@ -443,9 +454,6 @@
             }
           }
         }
-      }
-      &.disabled {
-        background-color: rgba(0, 0, 0, 0.12);
       }
     }
   }
@@ -464,15 +472,14 @@
     }
 
     &:hover,
+    &:disabled,
+    &.disabled,
     &:focus {
       border-color: transparent !important;
       background-color: $green-darker !important;
       color: $white !important;
       box-shadow: none !important;
-    }
-
-    &.disabled {
-      background-color: rgba(0, 0, 0, 0.12);
+      cursor: pointer;
     }
   }
 
@@ -490,10 +497,13 @@
     font-family: $open-sans;
 
     &:hover,
-    &:focus {
+    &:focus,
+    &:disabled,
+    &.disabled {
       border-color: #d9d9d9 !important;
       box-shadow: none !important;
       color: rgba(70, 70, 70, 0.6) !important;
+      cursor: pointer;
     }
 
     .content-wrapper {
