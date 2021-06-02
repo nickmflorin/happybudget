@@ -25,7 +25,7 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
     const parent = props.eGridCell.parentElement;
     if (!isNil(parent)) {
       const cls = parent.getAttribute("class");
-      return cls?.indexOf("ag-row-hover") !== -1 && includes(props.eGridCell.classList, "ag-column-hover");
+      return cls?.indexOf("ag-row-hover") !== -1;
     }
     return false;
   };
@@ -55,12 +55,14 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
       }
     } else {
       return (
-        <IconButton
-          className={"ag-grid-expand-button"}
-          size={"small"}
-          disabled={true}
-          icon={<FontAwesomeIcon icon={faExpandAlt} />}
-        />
+        <ShowHide show={cellIsHovered()}>
+          <IconButton
+            className={"ag-grid-expand-button"}
+            size={"small"}
+            disabled={true}
+            icon={<FontAwesomeIcon icon={faExpandAlt} />}
+          />
+        </ShowHide>
       );
     }
   } else {
