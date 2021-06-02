@@ -27,7 +27,8 @@ import {
   SuppressKeyboardEventParams,
   ProcessCellForExportParams,
   CellRange,
-  CellEditingStartedEvent
+  CellEditingStartedEvent,
+  CellMouseOverEvent
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -788,6 +789,24 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         suppressKeyboardEvent={suppressKeyboardEvent}
         onCellEditingStarted={(event: CellEditingStartedEvent) => {
           oldRow.current = { ...event.node.data };
+        }}
+        onCellMouseOver={(e: CellMouseOverEvent) => {
+          // In order to hide/show the expand button under certain conditions,
+          // we always need to refresh the expand column whenever another cell
+          // is hovered.  We should figure out if there is a way to optimize
+          // this to only refresh under certain circumstances.
+          const nodes: RowNode[] = [];
+          e.api.forEachNode((node: RowNode) => {
+            const row: R = node.data;
+            if (
+              row.meta.isPlaceholder === false &&
+              (isNil(rowCanExpand) || rowCanExpand(row) === true) &&
+              row.meta.children.length === 0
+            ) {
+              nodes.push(node);
+            }
+          });
+          e.api.refreshCells({ force: true, rowNodes: nodes, columns: ["expand"] });
         }}
         // NOTE: This might not be 100% necessary, because of how efficiently
         // we are managing the state updates to the data that flows into the table.

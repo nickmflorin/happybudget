@@ -43,9 +43,10 @@ const BudgetTableMenu = <R extends Table.Row<G>, G extends Model.Group = Model.G
             <div className={"toolbar-buttons"}>
               {map(
                 Array.isArray(actions) ? actions : actions({ onDelete: onDelete, selectedRows }),
-                (action: BudgetTableMenuAction) => {
+                (action: BudgetTableMenuAction, index: number) => {
                   return (
                     <IconButton
+                      key={index}
                       className={"dark"}
                       size={"large"}
                       onClick={() => !isNil(action.onClick) && action.onClick()}

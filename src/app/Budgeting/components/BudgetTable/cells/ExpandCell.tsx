@@ -1,9 +1,11 @@
-import { isNil } from "lodash";
+import { includes, isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExpandAlt } from "@fortawesome/pro-solid-svg-icons";
 
 import { ICellRendererParams } from "@ag-grid-community/core";
+
+import { ShowHide } from "components";
 import { IconButton } from "components/buttons";
 
 interface ExpandCellProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> extends ICellRendererParams {
@@ -14,18 +16,53 @@ interface ExpandCellProps<R extends Table.Row<G>, G extends Model.Group = Model.
 const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
   rowCanExpand,
   onClick,
-  node
+  node,
+  ...props
 }: ExpandCellProps<R, G>): JSX.Element => {
   const row: R = node.data;
-  if (node.data.meta.isPlaceholder === false && (isNil(rowCanExpand) || rowCanExpand(row) === true)) {
-    return (
-      <IconButton
-        className={"ag-grid-expand-button"}
-        size={"small"}
-        icon={<FontAwesomeIcon icon={faExpandAlt} />}
-        onClick={() => onClick(node.data.id)}
-      />
-    );
+
+  const cellIsHovered = () => {
+    const parent = props.eGridCell.parentElement;
+    if (!isNil(parent)) {
+      const cls = parent.getAttribute("class");
+      return cls?.indexOf("ag-row-hover") !== -1 && includes(props.eGridCell.classList, "ag-column-hover");
+    }
+    return false;
+  };
+
+  if (row.meta.isPlaceholder === false) {
+    if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
+      if (row.meta.children.length !== 0) {
+        return (
+          <IconButton
+            className={"ag-grid-expand-button"}
+            size={"small"}
+            icon={<FontAwesomeIcon icon={faExpandAlt} />}
+            onClick={() => onClick(node.data.id)}
+          />
+        );
+      } else {
+        return (
+          <ShowHide show={cellIsHovered()}>
+            <IconButton
+              className={"ag-grid-expand-button"}
+              size={"small"}
+              icon={<FontAwesomeIcon icon={faExpandAlt} />}
+              onClick={() => onClick(node.data.id)}
+            />
+          </ShowHide>
+        );
+      }
+    } else {
+      return (
+        <IconButton
+          className={"ag-grid-expand-button"}
+          size={"small"}
+          disabled={true}
+          icon={<FontAwesomeIcon icon={faExpandAlt} />}
+        />
+      );
+    }
   } else {
     return <></>;
   }

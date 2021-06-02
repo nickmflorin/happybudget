@@ -33,6 +33,7 @@ const CreateTemplateModal = ({
       visible={open}
       onCancel={() => onCancel()}
       okText={"Create"}
+      okButtonProps={{ disabled: form.loading }}
       cancelText={"Cancel"}
       onOk={() => {
         form
@@ -43,6 +44,7 @@ const CreateTemplateModal = ({
               service = createCommunityTemplate;
             }
             const submit = (payload: Http.TemplatePayload) => {
+              form.setLoading(true);
               service(payload)
                 .then((template: Model.Template) => {
                   form.resetFields();

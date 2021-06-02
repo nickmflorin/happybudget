@@ -28,13 +28,13 @@ const CreateBudgetAccountGroupModal = ({
       visible={open}
       onCancel={() => onCancel()}
       okText={"Create"}
+      okButtonProps={{ disabled: form.loading }}
       cancelText={"Cancel"}
       onOk={() => {
         form
           .validateFields()
           .then((values: GroupFormValues) => {
             form.setLoading(true);
-
             createBudgetAccountGroup(budgetId, {
               name: values.name,
               children: accounts,

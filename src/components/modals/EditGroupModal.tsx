@@ -27,6 +27,7 @@ const EditSubAccountGroupModal = <G extends Model.Group = Model.BudgetGroup | Mo
       onCancel={() => onCancel()}
       okText={"Save"}
       cancelText={"Cancel"}
+      okButtonProps={{ disabled: form.loading }}
       onOk={() => {
         form
           .validateFields()

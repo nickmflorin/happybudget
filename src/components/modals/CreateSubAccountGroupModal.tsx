@@ -32,6 +32,7 @@ const CreateSubAccountGroupModal = <G extends Model.Group = Model.BudgetGroup | 
       visible={open}
       onCancel={() => onCancel()}
       okText={"Create"}
+      okButtonProps={{ disabled: form.loading }}
       cancelText={"Cancel"}
       onOk={() => {
         form

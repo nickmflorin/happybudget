@@ -29,6 +29,7 @@ const CreateTemplateAccountGroupModal = ({
       onCancel={() => onCancel()}
       okText={"Create"}
       cancelText={"Cancel"}
+      okButtonProps={{ disabled: form.loading }}
       onOk={() => {
         form
           .validateFields()
