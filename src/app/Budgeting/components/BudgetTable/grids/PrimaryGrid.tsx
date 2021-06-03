@@ -798,11 +798,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
           const nodes: RowNode[] = [];
           e.api.forEachNode((node: RowNode) => {
             const row: R = node.data;
-            if (
-              row.meta.isPlaceholder === false &&
-              (isNil(rowCanExpand) || rowCanExpand(row) === true) &&
-              row.meta.children.length === 0
-            ) {
+            if (row.meta.isPlaceholder === false) {
               nodes.push(node);
             }
           });
