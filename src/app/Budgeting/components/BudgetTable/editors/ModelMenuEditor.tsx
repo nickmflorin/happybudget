@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 
 import { useTrackFirstRender } from "lib/hooks";
 import { ExpandedModelMenuRef } from "components/menus";
-import { CellDoneEditingEvent, CellEditorParams, isKeyboardEvent } from "../model";
+import { CellDoneEditingEvent, CellEditorParams, isKeyboardEvent, isSyntheticClickEvent } from "../model";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
@@ -47,6 +47,9 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
         // Suppress keyboard navigation because we handle it ourselves.
         params.stopEditing(true);
         params.onDoneEditing(changedEvent);
+      } else if (isSyntheticClickEvent(changedEvent)) {
+        params.stopEditing();
+        params.onDoneEditing(changedEvent);
       }
     }
   }, [value, changedEvent]);
@@ -71,6 +74,9 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
       value,
       changedEvent,
       onChange: (model: V | null, e: CellDoneEditingEvent) => {
+        console.log("SETTING VALE");
+        console.log(e);
+        console.log(model);
         setValue(model);
         setChangedEvent(e);
       }

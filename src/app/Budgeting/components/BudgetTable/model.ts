@@ -57,6 +57,10 @@ export const isKeyboardEvent = (e: CellDoneEditingEvent): e is KeyboardEvent => 
   return (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;
 };
 
+export const isSyntheticClickEvent = (e: CellDoneEditingEvent): e is SyntheticEvent => {
+  return (e as SyntheticEvent).type === "click";
+};
+
 export interface CellEditorParams extends ICellEditorParams {
   // When the cell editor finishes editing, the AG Grid callback (onCellDoneEditing)
   // does not have any context about what event triggered the completion, so we have
