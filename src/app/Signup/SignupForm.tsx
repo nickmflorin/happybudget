@@ -79,7 +79,8 @@ const SignupForm = ({
           })
         ]}
       >
-        <Tooltip
+        <Input.Password className={"input"} size={"large"} placeholder={"Password"} prefix={<LockOutlined />} />
+        {/* <Tooltip
           overlayStyle={{ whiteSpace: "pre-line" }}
           trigger={["focus"]}
           placement={"right"}
@@ -88,7 +89,7 @@ const SignupForm = ({
           }
         >
           <Input.Password className={"input"} size={"large"} placeholder={"Password"} prefix={<LockOutlined />} />
-        </Tooltip>
+        </Tooltip> */}
       </Form.Item>
       <Form.Item
         name={"confirm"}
