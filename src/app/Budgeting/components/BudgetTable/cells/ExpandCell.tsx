@@ -1,4 +1,4 @@
-import { includes, isNil } from "lodash";
+import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExpandAlt } from "@fortawesome/pro-solid-svg-icons";
