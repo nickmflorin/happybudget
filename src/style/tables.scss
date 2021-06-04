@@ -46,8 +46,6 @@ $table-border: 1px solid $table-border-color;
   td,
   th {
     overflow: hidden;
-    // text-overflow: ellipsis;
-    // white-space: nowrap;
     max-width: 300px;
   }
 
@@ -126,7 +124,9 @@ $table-border: 1px solid $table-border-color;
   font-family: $roboto;
 
   .ag-cell {
-    white-space: break-spaces;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .ag-cell, .ag-full-width-row .ag-cell-wrapper.ag-row-group {

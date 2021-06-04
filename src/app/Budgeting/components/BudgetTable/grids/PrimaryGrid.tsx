@@ -17,6 +17,7 @@ import {
   CellKeyDownEvent,
   CellPosition,
   NavigateToNextCellParams,
+  TabToNextCellParams,
   RowClassParams,
   GetContextMenuItemsParams,
   MenuItemDef,
@@ -242,7 +243,65 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   );
 
-  const moveToNextColumn = useDynamicCallback((rowIndex: number, column: Column) => {
+  const tabToNextCell = useDynamicCallback((params: TabToNextCellParams) => {
+    if (!params.editing && !isNil(columnApi) && !isNil(api)) {
+      // If the nextCellPosition is null, it means we are at the bottom of the table
+      // all the way in the Column furthest to the right.
+      if (isNil(params.nextCellPosition)) {
+        // TODO: We need to figure out how to move down to the next cell!  This
+        // is tricky, because we have to wait for the row to be present in state.
+        onRowAdd();
+      } else {
+        if (includes(["index", "expand"], params.nextCellPosition.column.getColId())) {
+          let nextCellPosition = { ...params.nextCellPosition };
+
+          // Skip the Group Footer rows.
+          const [rowNode, _, additionalIndex] = findFirstNonGroupFooterRow(params.nextCellPosition.rowIndex);
+          if (!isNil(rowNode)) {
+            nextCellPosition = {
+              ...params.nextCellPosition,
+              rowIndex: params.nextCellPosition.rowIndex + additionalIndex
+            };
+          }
+
+          if (params.backwards === false) {
+            const identifierCol = columnApi.getColumn(identifierField);
+            if (!isNil(identifierCol)) {
+              return { ...nextCellPosition, column: identifierCol };
+            }
+          } else {
+            const columns = columnApi.getAllColumns();
+            if (!isNil(columns)) {
+              return { ...nextCellPosition, column: columns[columns.length - 1] };
+            }
+          }
+        }
+      }
+    }
+    return params.nextCellPosition;
+  });
+
+  const moveToLocation = useDynamicCallback((loc: CellPosition, opts: CellPositionMoveOptions = {}) => {
+    if (!isNil(api)) {
+      api.setFocusedCell(loc.rowIndex, loc.column);
+      api.clearRangeSelection();
+      if (opts.startEdit === true) {
+        api.startEditingCell({ rowIndex: loc.rowIndex, colKey: loc.column });
+      }
+    }
+  });
+
+  const moveToNextRow = useDynamicCallback((loc: CellPosition, opts: CellPositionMoveOptions = {}) => {
+    if (!isNil(api)) {
+      const [node, rowIndex, _] = findFirstNonGroupFooterRow(loc.rowIndex + 1);
+      if (node === null) {
+        onRowAdd();
+      }
+      moveToLocation({ rowIndex, column: loc.column }, opts);
+    }
+  });
+
+  const moveToNextColumn = useDynamicCallback((loc: CellPosition, opts: CellPositionMoveOptions = {}) => {
     if (!isNil(api) && !isNil(columnApi)) {
       const columns = columnApi.getAllColumns();
       if (!isNil(columns)) {
@@ -258,33 +317,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
             const nextColumn = columns[index + 1];
             api.setFocusedCell(rowIndex, nextColumn);
             api.clearRangeSelection();
-          }
-        }
-      }
-    }
-  });
-
-  const moveToNextRow = useDynamicCallback((rowIndex: number, column: Column, localApi?: GridApi) => {
-    const local = !isNil(localApi) ? localApi : api;
-    if (!isNil(local)) {
-      let foundNonFooterRow = false;
-      let nextRowNode: RowNode | null;
-      let additionalIndex = 1;
-      while (foundNonFooterRow === false) {
-        nextRowNode = local.getDisplayedRowAtIndex(rowIndex + additionalIndex);
-        if (isNil(nextRowNode)) {
-          onRowAdd();
-          local.setFocusedCell(rowIndex + additionalIndex, column);
-          local.clearRangeSelection();
-          foundNonFooterRow = true;
-        } else {
-          let row: R = nextRowNode.data;
-          if (row.meta.isGroupFooter === false) {
-            local.setFocusedCell(rowIndex + additionalIndex, column);
-            local.clearRangeSelection();
-            foundNonFooterRow = true;
-          } else {
-            additionalIndex = additionalIndex + 1;
           }
         }
       }
@@ -784,6 +816,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}
         navigateToNextCell={navigateToNextCell}
+        tabToNextCell={tabToNextCell}
         onCellKeyDown={onCellKeyDown}
         onFirstDataRendered={onFirstDataRendered}
         suppressKeyboardEvent={suppressKeyboardEvent}
