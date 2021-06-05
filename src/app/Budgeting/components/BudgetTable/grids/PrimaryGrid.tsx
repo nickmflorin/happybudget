@@ -335,21 +335,19 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   });
 
-  const onCellCut = useDynamicCallback((e: CellKeyDownEvent) => {
-    // For whatever reason, in this specific case, AG Grid does not attach the GridApi to the
-    // event.
-    if (!isNil(api)) {
-      const focusedCell = api.getFocusedCell();
-      if (!isNil(focusedCell)) {
-        const node = api.getDisplayedRowAtIndex(focusedCell.rowIndex);
-        if (!isNil(node)) {
-          const row: R = node.data;
-          const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === focusedCell.column.getColId());
-          if (!isNil(customColDef)) {
-            const change = getTableChangesForCellClear(row, customColDef);
-            if (!isNil(change)) {
-              setCutCellChange(change);
-            }
+  const onCellCut = useDynamicCallback((e: CellKeyDownEvent, local: GridApi) => {
+    const focusedCell = local.getFocusedCell();
+    if (!isNil(focusedCell)) {
+      const node = local.getDisplayedRowAtIndex(focusedCell.rowIndex);
+      if (!isNil(node)) {
+        const row: R = node.data;
+        const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === focusedCell.column.getColId());
+        if (!isNil(customColDef)) {
+          const change = getTableChangesForCellClear(row, customColDef);
+          console.log("Flashing cells!");
+          local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
+          if (!isNil(change)) {
+            setCutCellChange(change);
           }
         }
       }
@@ -381,9 +379,16 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         onCellSpaceKey(event);
         /* @ts-ignore  AG Grid's Event Object is Wrong */
       } else if (event.event.key === "x" && (event.event.ctrlKey || event.event.metaKey)) {
-        // Need to get this working.
-        // onCellCut(event.event);
+        onCellCut(event.event, event.api);
+        /* @ts-ignore  AG Grid's Event Object is Wrong */
+      } else if (event.event.code === "Enter") {
+        // NOTE: If Enter is clicked inside the cell popout, this doesn't get triggered.
+        const editing = event.api.getEditingCells();
+        if (editing.length === 0) {
+          moveToNextRow({ rowIndex: event.rowIndex, column: event.column });
+        }
       }
+      0;
     }
   });
 
@@ -492,6 +497,8 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
         if (!isNil(tableChange)) {
           if (!isNil(cutCellChange)) {
+            console.log("CUT CELL CHANGE");
+            console.log(cutCellChange);
             onRowBulkUpdate([tableChange, cutCellChange]);
             setCutCellChange(null);
           } else {
@@ -698,32 +705,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   }, [useDeepEqualMemo(table), api, columnApi]);
 
   useEffect(() => {
-    // Changes to the errors in the rows does not trigger a refresh of those cells via AG Grid
-    // because AG Grid cannot detect changes in that type of data structure for the row.
-    if (!isNil(api) && !isNil(columnApi)) {
-      api.forEachNode((node: RowNode) => {
-        const existing: R | undefined = find(table, { id: node.data.id });
-        if (!isNil(existing)) {
-          // TODO: We might want to do a deeper comparison in the future here.
-          if (existing.meta.errors.length !== node.data.meta.errors.length) {
-            const cols = columnApi.getAllColumns();
-            forEach(cols, (col: Column) => {
-              const colDef = col.getColDef();
-              if (!isNil(colDef.field)) {
-                const cellErrors = filter(existing.meta.errors, { id: node.data.id, field: colDef.field });
-                if (cellErrors.length !== 0) {
-                  col.setColDef({ ...colDef, cellClass: "cell--error" }, null);
-                  api.refreshCells({ force: true, rowNodes: [node], columns: [col] });
-                }
-              }
-            });
-          }
-        }
-      });
-    }
-  }, [useDeepEqualMemo(table), api, columnApi]);
-
-  useEffect(() => {
     const mapped = map(table, (row: R) => row.meta.selected);
     const uniques = uniq(mapped);
     if (uniques.length === 1 && uniques[0] === true) {
@@ -784,6 +765,8 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         columnDefs={map(colDefs, (colDef: CustomColDef<R, G>) => originalColDef(includeCellEditorParams(colDef)))}
         getContextMenuItems={getContextMenuItems}
         allowContextMenuWithControlKey={true}
+        cellFlashDelay={100}
+        cellFadeDelay={500}
         // Required to get processCellFromClipboard to work with column spanning.
         suppressCopyRowsToClipboard={true}
         rowData={table}
