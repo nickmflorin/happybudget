@@ -2,13 +2,13 @@ import { Input, Select } from "antd";
 import { MailOutlined, UserOutlined } from "@ant-design/icons";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGlobeAmericas, faPhone, faUserTag } from "@fortawesome/free-solid-svg-icons";
+import { faGlobeAmericas, faUserTag } from "@fortawesome/free-solid-svg-icons";
 
 import { ContactRoles } from "lib/model";
-import { validateEmail } from "lib/util/validate";
 
 import { Form } from "components";
 import { FormProps } from "components/Form";
+import PhoneNumberInput from "./PhoneNumberInput";
 
 const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, globalError }) => {
   return (
@@ -19,55 +19,25 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
       name={"form_in_modal"}
       initialValues={initialValues}
     >
-      <Form.Item
-        name={"first_name"}
-        label={"First Name"}
-        rules={[{ required: true, message: "Please enter a valid first name." }]}
-      >
+      <Form.Item name={"first_name"} label={"First Name"}>
         <Input prefix={<UserOutlined />} placeholder={"John"} />
       </Form.Item>
-      <Form.Item
-        name={"last_name"}
-        label={"Last Name"}
-        rules={[{ required: true, message: "Please enter a valid last name." }]}
-      >
+      <Form.Item name={"last_name"} label={"Last Name"}>
         <Input prefix={<UserOutlined />} placeholder={"Smith"} />
       </Form.Item>
-      <Form.Item
-        name={"email"}
-        label={"Email"}
-        rules={[
-          { required: true, message: "Please enter a valid email." },
-          ({ getFieldValue }) => ({
-            validator(rule, value) {
-              if (value !== "" && !validateEmail(value)) {
-                return Promise.reject("Please enter a valid email.");
-              }
-              return Promise.resolve();
-            }
-          })
-        ]}
-      >
+      <Form.Item name={"email"} label={"Email"}>
         <Input prefix={<MailOutlined />} placeholder={"jsmith@gmail.com"} />
       </Form.Item>
-      <Form.Item name={"city"} label={"City"} rules={[{ required: true, message: "Please enter a valid city." }]}>
+      <Form.Item name={"city"} label={"City"}>
         <Input prefix={<FontAwesomeIcon icon={faGlobeAmericas} />} placeholder={"Los Angeles"} />
       </Form.Item>
-      <Form.Item
-        name={"country"}
-        label={"Country"}
-        rules={[{ required: true, message: "Please enter a valid country." }]}
-      >
+      <Form.Item name={"country"} label={"Country"}>
         <Input prefix={<FontAwesomeIcon icon={faGlobeAmericas} />} placeholder={"United States"} />
       </Form.Item>
-      <Form.Item
-        name={"phone_number"}
-        label={"Phone Number"}
-        rules={[{ required: true, message: "Please enter a valid phone number." }]}
-      >
-        <Input prefix={<FontAwesomeIcon icon={faPhone} />} placeholder={"+15551234567"} />
+      <Form.Item name={"phone_number"} label={"Phone Number"}>
+        <PhoneNumberInput placeholder={"+15551234567"} />
       </Form.Item>
-      <Form.Item name={"role"} label={"Role"} rules={[{ required: true }]}>
+      <Form.Item name={"role"} label={"Role"}>
         <Select suffixIcon={<FontAwesomeIcon icon={faUserTag} />} placeholder={"Producer"}>
           {ContactRoles.map((model: Model.ContactRole, index: number) => (
             <Select.Option key={index} value={model.id}>

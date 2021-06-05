@@ -8,6 +8,7 @@ import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 import { DeleteContactsModal } from "components/modals";
 import { Table, ActionsTableCell, ModelSelectController } from "components/tables";
+import { formatAsPhoneNumber } from "lib/util/formatters";
 
 import {
   requestContactsAction,
@@ -23,9 +24,9 @@ import EditContactModal from "./EditContactModal";
 interface Row {
   key: number;
   name: string;
-  role: Model.ContactRoleName;
-  phone_number: string;
-  email: string;
+  role: Model.ContactRoleName | null;
+  phone_number: string | null;
+  email: string | null;
   contact: Model.Contact;
 }
 
@@ -46,7 +47,7 @@ const ContactsTable = (): JSX.Element => {
       tableData.push({
         key: contact.id,
         name: contact.full_name,
-        role: contact.role.name,
+        role: !isNil(contact.role) ? contact.role.name : null,
         email: contact.email,
         phone_number: contact.phone_number,
         contact
@@ -145,7 +146,13 @@ const ContactsTable = (): JSX.Element => {
           {
             title: "Phone",
             key: "phone_number",
-            dataIndex: "phone_number"
+            dataIndex: "phone_number",
+            render: (value: number | null) => {
+              if (!isNil(value)) {
+                return <span>{formatAsPhoneNumber(value)}</span>;
+              }
+              return <span></span>;
+            }
           },
           {
             title: "Email",

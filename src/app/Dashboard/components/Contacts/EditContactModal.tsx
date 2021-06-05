@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
+import { isNil } from "lodash";
 
 import { Form } from "components";
 import { ContactForm } from "components/forms";
@@ -62,7 +63,7 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
           first_name: contact.first_name,
           last_name: contact.last_name,
           email: contact.email,
-          role: contact.role.id,
+          role: !isNil(contact.role) ? contact.role.id : null,
           country: contact.country,
           city: contact.city,
           phone_number: contact.phone_number

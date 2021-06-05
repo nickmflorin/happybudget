@@ -254,16 +254,15 @@ namespace Model {
 
   interface Contact extends Model.Model {
     readonly first_name: string;
-    readonly last_name: string;
+    readonly last_name: string | null;
     readonly full_name: string;
-    readonly email: string;
+    readonly email: string | null;
     readonly created_at: string;
     readonly updated_at: string;
-    readonly role: Model.ContactRole;
-    readonly city: string;
-    readonly country: string;
-    readonly phone_number: string;
-    readonly email: string;
+    readonly role: Model.ContactRole | null;
+    readonly city: string | null;
+    readonly country: string | null;
+    readonly phone_number: string | null;
   }
 
   type HistoryEventType = "field_alteration" | "create";
