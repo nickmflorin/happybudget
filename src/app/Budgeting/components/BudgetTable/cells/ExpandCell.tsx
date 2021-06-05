@@ -1,5 +1,7 @@
 import { isNil } from "lodash";
 
+import { Tooltip } from "antd";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExpandAlt } from "@fortawesome/pro-solid-svg-icons";
 
@@ -34,34 +36,40 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
     if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
       if (row.meta.children.length !== 0) {
         return (
-          <IconButton
-            className={"ag-grid-expand-button"}
-            size={"small"}
-            icon={<FontAwesomeIcon icon={faExpandAlt} />}
-            onClick={() => onClick(node.data.id)}
-          />
-        );
-      } else {
-        return (
-          <ShowHide show={rowIsHovered()}>
+          <Tooltip title={"Expand"}>
             <IconButton
               className={"ag-grid-expand-button"}
               size={"small"}
               icon={<FontAwesomeIcon icon={faExpandAlt} />}
               onClick={() => onClick(node.data.id)}
             />
+          </Tooltip>
+        );
+      } else {
+        return (
+          <ShowHide show={rowIsHovered()}>
+            <Tooltip title={"Expand"}>
+              <IconButton
+                className={"ag-grid-expand-button"}
+                size={"small"}
+                icon={<FontAwesomeIcon icon={faExpandAlt} />}
+                onClick={() => onClick(node.data.id)}
+              />
+            </Tooltip>
           </ShowHide>
         );
       }
     } else {
       return (
         <ShowHide show={rowIsHovered()}>
-          <IconButton
-            className={"ag-grid-expand-button"}
-            size={"small"}
-            disabled={true}
-            icon={<FontAwesomeIcon icon={faExpandAlt} />}
-          />
+          <Tooltip title={"Fill in account to expand"}>
+            <IconButton
+              className={"ag-grid-expand-button fake-disabled"}
+              size={"small"}
+              disabled={false}
+              icon={<FontAwesomeIcon icon={faExpandAlt} />}
+            />
+          </Tooltip>
         </ShowHide>
       );
     }

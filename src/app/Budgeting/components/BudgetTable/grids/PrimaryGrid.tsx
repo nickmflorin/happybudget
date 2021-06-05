@@ -497,8 +497,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
         if (!isNil(tableChange)) {
           if (!isNil(cutCellChange)) {
-            console.log("CUT CELL CHANGE");
-            console.log(cutCellChange);
             onRowBulkUpdate([tableChange, cutCellChange]);
             setCutCellChange(null);
           } else {
@@ -814,7 +812,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
           const nodes: RowNode[] = [];
           e.api.forEachNode((node: RowNode) => {
             const row: R = node.data;
-            if (row.meta.isPlaceholder === false) {
+            if (row.meta.isPlaceholder === false && row.meta.isGroupFooter === false) {
               nodes.push(node);
             }
           });

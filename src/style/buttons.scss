@@ -20,6 +20,11 @@
     cursor: pointer;
   }
 
+  &.fake-disabled {
+    box-shadow: none;
+    cursor: pointer;
+  }
+
   &.no-transform {
     text-transform: unset;
   }
@@ -114,6 +119,7 @@
 
     &:hover,
     &.disabled,
+    &.fake-disabled,
     &:disabled,
     &:focus {
       color: lighten($icon-color, 20%) !important;
@@ -139,6 +145,7 @@
     &:hover,
     &:focus,
     &.disabled,
+    &.fake-disabled,
     &:disabled {
       color: #cacaca !important;
       cursor: pointer;
@@ -166,6 +173,7 @@
     &:hover,
     &:focus,
     &:disabled,
+    &.fake-disabled,
     &.disabled {
       cursor: pointer;
       color: rgba($blue, 0.6);
@@ -263,6 +271,7 @@
     &:hover,
     &:disabled,
     &.disabled,
+    &.fake-disabled,
     &:focus {
       border-color: transparent !important;
       background-color: darken(#ececec, 10%) !important;
@@ -280,6 +289,7 @@
 
     &:hover,
     &.disabled,
+    &.fake-disabled,
     &:disabled,
     &:focus {
       border-color: transparent !important;
@@ -299,6 +309,7 @@
     &:hover,
     &:focus,
     &.disabled,
+    &.fake-disabled,
     &:disabled {
       color: $white;
       background: $red-hover;
@@ -339,6 +350,7 @@
     &:hover,
     &:disabled,
     &.disabled,
+    &.fake-disabled,
     &:focus {
       border-color: $transparent !important;
       background-color: transparent;
@@ -378,7 +390,7 @@
         background-color: rgba($green, 0.3)
       }
 
-      &.disabled, &:disabled {
+      &.disabled, &:disabled, &.fake-disabled {
         svg {
           color: $disabled-color !important;
         }
@@ -420,6 +432,7 @@
     &:hover,
     &:disabled,
     &.disabled,
+    &.fake-disabled,
     &:focus {
       border-color: transparent !important;
       background-color: $transparent !important;
@@ -446,6 +459,7 @@
       &:hover,
       &:disabled,
       &.disabled,
+      &.fake-disabled,
       &:focus {
         cursor: pointer;
         background-color: $green-darker !important;
@@ -479,6 +493,7 @@
     &:hover,
     &:disabled,
     &.disabled,
+    &.fake-disabled,
     &:focus {
       border-color: transparent !important;
       background-color: $green-darker !important;
@@ -504,6 +519,7 @@
     &:hover,
     &:focus,
     &:disabled,
+    &.fake-disabled,
     &.disabled {
       border-color: #d9d9d9 !important;
       box-shadow: none !important;
