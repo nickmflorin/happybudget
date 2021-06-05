@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames";
 
-import { Button, Input, Tooltip } from "antd";
+import { Button, Input } from "antd";
 import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
 
 import { Form } from "components";

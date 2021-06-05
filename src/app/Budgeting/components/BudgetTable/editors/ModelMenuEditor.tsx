@@ -74,9 +74,6 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
       value,
       changedEvent,
       onChange: (model: V | null, e: CellDoneEditingEvent) => {
-        console.log("SETTING VALE");
-        console.log(e);
-        console.log(model);
         setValue(model);
         setChangedEvent(e);
       }

@@ -8,6 +8,7 @@ export interface ModelTagCellEditorProps extends CellEditorParams {}
 
 interface PrivateModelTagCellEditorProps<M extends Model.Model> extends ModelTagCellEditorProps {
   models: M[];
+  /* eslint-disable react/no-unused-prop-types */
   forwardedRef: any;
   searchIndices: SearchIndicies;
 }
