@@ -60,7 +60,7 @@ import {
   BudgetItemsTreeEditor,
   FringesColorEditor
 } from "../editors";
-import { PrimaryGridProps, CustomColDef, isKeyboardEvent } from "../model";
+import { PrimaryGridProps, CustomColDef, CellPositionMoveOptions, isKeyboardEvent } from "../model";
 import { rangeSelectionIsSingleCell, originalColDef } from "../util";
 
 const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
@@ -305,18 +305,12 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     if (!isNil(api) && !isNil(columnApi)) {
       const columns = columnApi.getAllColumns();
       if (!isNil(columns)) {
-        const index = columns.indexOf(column);
+        const index = columns.indexOf(loc.column);
         if (index !== -1) {
           if (index === columns.length - 1) {
-            // TODO: We need to move to the next row and if it is not present,
-            // we need to add row.
-            const nextColumn = columns[0];
-            api.setFocusedCell(rowIndex, nextColumn);
-            api.clearRangeSelection();
+            moveToNextRow({ rowIndex: loc.rowIndex, column: columns[0] }, opts);
           } else {
-            const nextColumn = columns[index + 1];
-            api.setFocusedCell(rowIndex, nextColumn);
-            api.clearRangeSelection();
+            moveToLocation({ rowIndex: loc.rowIndex, column: columns[index + 1] }, opts);
           }
         }
       }
@@ -344,7 +338,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === focusedCell.column.getColId());
         if (!isNil(customColDef)) {
           const change = getTableChangesForCellClear(row, customColDef);
-          console.log("Flashing cells!");
           local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
           if (!isNil(change)) {
             setCutCellChange(change);
@@ -388,7 +381,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
           moveToNextRow({ rowIndex: event.rowIndex, column: event.column });
         }
       }
-      0;
     }
   });
 
