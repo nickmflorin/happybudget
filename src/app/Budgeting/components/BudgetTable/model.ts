@@ -20,7 +20,7 @@ export interface CellValueChangedParams<R extends Table.Row<G>, G extends Model.
   readonly node: RowNode;
   readonly oldValue: any;
   readonly newValue: any;
-  readonly change: Table.RowChange<R>;
+  readonly change: Table.Change<R>;
 }
 
 export interface CellPositionMoveOptions {
@@ -141,8 +141,7 @@ interface PrimaryGridPassThroughProps<R extends Table.Row<G>, G extends Model.Gr
   readonly sizeColumnsToFit?: boolean | undefined;
   readonly search?: string;
   readonly identifierField: string;
-  readonly onRowUpdate: (payload: Table.RowChange<R>) => void;
-  readonly onRowBulkUpdate?: (payload: Table.RowChange<R>[]) => void;
+  readonly onTableChange: (payload: Table.Change<R>) => void;
   readonly onRowAdd: () => void;
   readonly onRowDelete: (row: R) => void;
   // Callback to conditionally set the ability of a row to expand or not.  Only applicable if

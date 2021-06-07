@@ -1,5 +1,25 @@
 import { getKeyValue } from "lib/util";
 
+export const tableChangeIsRowChange = <R extends Table.Row>(change: Table.Change<R>): change is Table.RowChange<R> => {
+  return (
+    !Array.isArray(change) &&
+    (change as Table.RowChange<R>).data !== undefined &&
+    (change as Table.RowChange<R>).id !== undefined
+  );
+};
+
+export const tableChangeIsCellChange = <R extends Table.Row>(
+  change: Table.Change<R>
+): change is Table.CellChange<R> => {
+  return (
+    !Array.isArray(change) &&
+    (change as Table.CellChange<R>).oldValue !== undefined &&
+    (change as Table.CellChange<R>).newValue !== undefined &&
+    (change as Table.CellChange<R>).field !== undefined &&
+    (change as Table.CellChange<R>).id !== undefined
+  );
+};
+
 export const isRowChangeData = <R extends Table.Row, M extends Model.Model>(
   obj: Table.RowChange<R> | Table.RowChangeData<R> | R | M
 ): obj is Table.RowChangeData<R> => {

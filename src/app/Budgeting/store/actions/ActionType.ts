@@ -15,10 +15,7 @@ const ActionType = {
     Loading: "budget.Loading",
     Response: "budget.Response",
     Request: "budget.Request",
-    BulkUpdate: "budget.BulkUpdate",
     BulkCreate: "budget.BulkCreate",
-    BulkUpdateActuals: "budget.BulkUpdateActuals",
-    BulkUpdateFringes: "budget.BulkUpdateFringes",
     Comments: {
       Loading: "budget.comments.Loading",
       Response: "budget.comments.Response",
@@ -35,6 +32,7 @@ const ActionType = {
       UpdateInState: "budget.comments.UpdateInState"
     },
     Fringes: {
+      TableChanged: "budget.fringes.TableChanged",
       Deleting: "budget.fringes.Deleting",
       Creating: "budget.fringes.Creating",
       Updating: "budget.fringes.Updating",
@@ -42,7 +40,6 @@ const ActionType = {
       Response: "budget.fringes.Response",
       Request: "budget.fringes.Request",
       Delete: "budget.fringes.Delete",
-      Update: "budget.fringes.Update",
       AddToState: "budget.fringes.AddToState",
       RemoveFromState: "budget.fringes.RemoveFromState",
       UpdateInState: "budget.fringes.UpdateInState",
@@ -61,10 +58,10 @@ const ActionType = {
       }
     },
     Accounts: {
+      TableChanged: "budget.accounts.TableChanged",
       Delete: "budget.accounts.Delete",
       Deleting: "budget.accounts.Deleting",
       Creating: "budget.accounts.Creating",
-      Update: "budget.accounts.Update",
       Updating: "budget.accounts.Updating",
       SetSearch: "budget.accounts.SetSearch",
       Loading: "budget.accounts.Loading",
@@ -103,7 +100,7 @@ const ActionType = {
       Response: "budget.subaccount.Response",
       Request: "budget.subaccount.Request",
       UpdateInState: "budget.subaccount.UpdateInState",
-      BulkUpdate: "budget.subaccount.BulkUpdate",
+      TableChanged: "budget.subaccount.TableChanged",
       BulkCreate: "budget.subaccount.BulkCreate",
       Comments: {
         Loading: "budget.subaccount.comments.Loading",
@@ -124,7 +121,6 @@ const ActionType = {
         Deleting: "budget.subaccount.subaccounts.Deleting",
         Creating: "budget.subaccount.subaccounts.Creating",
         Updating: "budget.subaccount.subaccounts.Updating",
-        Update: "budget.subaccount.subaccounts.Update",
         Delete: "budget.subaccount.subaccounts.Delete",
         SetSearch: "budget.subaccount.subaccounts.SetSearch",
         Loading: "budget.subaccount.subaccounts.Loading",
@@ -164,7 +160,7 @@ const ActionType = {
       Request: "budget.account.Request",
       UpdateInState: "budget.account.UpdateInState",
       BulkCreate: "budget.account.BulkCreate",
-      BulkUpdate: "budget.account.BulkUpdate",
+      TableChanged: "budget.account.TableChanged",
       Comments: {
         Loading: "budget.account.comments.Loading",
         Response: "budget.account.comments.Response",
@@ -184,7 +180,6 @@ const ActionType = {
         Delete: "budget.account.subaccounts.Delete",
         Deleting: "budget.account.subaccounts.Deleting",
         Creating: "budget.account.subaccounts.Creating",
-        Update: "budget.account.subaccounts.Update",
         Updating: "budget.account.subaccounts.Updating",
         Loading: "budget.account.subaccounts.Loading",
         Response: "budget.account.subaccounts.Response",
@@ -229,10 +224,10 @@ const ActionType = {
       SetSearch: "budget.budgetitemstree.SetSearch"
     },
     Actuals: {
+      TableChanged: "budget.actuals.TableChanged",
       Deleting: "budget.actuals.Deleting",
       Creating: "budget.actuals.Creating",
       Updating: "budget.actuals.Updating",
-      Update: "budget.actuals.Update",
       Delete: "budget.actuals.Delete",
       Select: "budget.actuals.Select",
       Deselect: "budget.actuals.Deselect",
@@ -261,10 +256,9 @@ const ActionType = {
     Loading: "template.Loading",
     Response: "template.Response",
     Request: "template.Request",
-    BulkUpdate: "template.BulkUpdate",
     BulkCreate: "template.BulkCreate",
-    BulkUpdateFringes: "template.BulkUpdateFringes",
     Fringes: {
+      TableChanged: "template.fringes.TableChanged",
       Deleting: "template.fringes.Deleting",
       Creating: "template.fringes.Creating",
       Updating: "template.fringes.Updating",
@@ -272,7 +266,6 @@ const ActionType = {
       Response: "template.fringes.Response",
       Request: "template.fringes.Request",
       Delete: "template.fringes.Delete",
-      Update: "template.fringes.Update",
       AddToState: "template.fringes.AddToState",
       RemoveFromState: "template.fringes.RemoveFromState",
       UpdateInState: "template.fringes.UpdateInState",
@@ -291,10 +284,10 @@ const ActionType = {
       }
     },
     Accounts: {
+      TableChanged: "template.accounts.TableChanged",
       Deleting: "template.accounts.Deleting",
       Creating: "template.accounts.Creating",
       Updating: "template.accounts.Updating",
-      Update: "template.accounts.Update",
       Delete: "template.accounts.Delete",
       SetSearch: "template.accounts.SetSearch",
       Loading: "template.accounts.Loading",
@@ -327,13 +320,12 @@ const ActionType = {
       Response: "template.subaccount.Response",
       Request: "template.subaccount.Request",
       UpdateInState: "template.subaccount.UpdateInState",
-      BulkUpdate: "template.subaccount.BulkUpdate",
       BulkCreate: "template.subaccount.BulkCreate",
+      TableChanged: "template.subaccount.TableChanged",
       SubAccounts: {
         Deleting: "template.subaccount.subaccounts.Deleting",
         Creating: "template.subaccount.subaccounts.Creating",
         Updating: "template.subaccount.subaccounts.Updating",
-        Update: "template.subaccount.subaccounts.Update",
         Delete: "template.subaccount.subaccounts.Delete",
         SetSearch: "template.subaccount.subaccounts.SetSearch",
         Loading: "template.subaccount.subaccounts.Loading",
@@ -367,7 +359,7 @@ const ActionType = {
       Response: "template.account.Response",
       Request: "template.account.Request",
       UpdateInState: "template.account.UpdateInState",
-      BulkUpdate: "template.account.BulkUpdate",
+      TableChanged: "template.account.TableChanged",
       BulkCreate: "template.account.BulkCreate",
       SubAccounts: {
         Loading: "template.account.subaccounts.Loading",
@@ -379,7 +371,6 @@ const ActionType = {
         Deleting: "template.account.subaccounts.Deleting",
         Creating: "template.account.subaccounts.Creating",
         Updating: "template.account.subaccounts.Updating",
-        Update: "template.account.subaccounts.Update",
         Delete: "template.account.subaccounts.Delete",
         SetSearch: "template.account.subaccounts.SetSearch",
         UpdateInState: "template.account.subaccounts.UpdateInState",

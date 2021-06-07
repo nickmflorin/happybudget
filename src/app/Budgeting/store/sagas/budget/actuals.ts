@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { spawn, take, cancel, takeEvery, call, put, select, fork, cancelled, debounce } from "redux-saga/effects";
-import { isNil, find, map, groupBy } from "lodash";
+import { isNil, find, map } from "lodash";
 
 import { handleRequestError } from "api";
 import {
@@ -18,7 +18,7 @@ import {
 import { takeWithCancellableById } from "lib/redux/sagas";
 import { warnInconsistentState } from "lib/redux/util";
 import { ActualRowManager } from "lib/tabling/managers";
-import { mergeRowChanges } from "lib/tabling/util";
+import { consolidateTableChange } from "lib/tabling/util";
 import { handleTableErrors } from "store/tasks";
 
 import { ActionType } from "../../actions";
@@ -200,16 +200,10 @@ export function* handleUpdateTask(action: Redux.Action<Table.RowChange<Table.Act
   }
 }
 
-export function* handleBulkUpdateTask(action: Redux.Action<Table.RowChange<Table.ActualRow>[]>): SagaIterator {
+export function* handleTableChangeTask(action: Redux.Action<Table.Change<Table.ActualRow>>): SagaIterator {
   const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
-    const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange<Table.ActualRow>[] };
-    const merged: Table.RowChange<Table.ActualRow>[] = map(
-      grouped,
-      (changes: Table.RowChange<Table.ActualRow>[], id: string) => {
-        return { data: mergeRowChanges(changes).data, id: parseInt(id) };
-      }
-    );
+    const merged: Table.RowChange<Table.ActualRow>[] = consolidateTableChange<Table.ActualRow>(action.payload);
     const data = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
     const placeholders = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.placeholders);
 
@@ -359,23 +353,18 @@ function* watchForSearchBudgetItemsTreeSaga(): SagaIterator {
   yield debounce(250, ActionType.Budget.BudgetItemsTree.SetSearch, getBudgetItemsTreeTask);
 }
 
-function* watchForBulkUpdateActualsSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.BulkUpdateActuals, handleBulkUpdateTask);
-}
-
 function* watchForRemoveActualSaga(): SagaIterator {
   yield takeWithCancellableById<number>(ActionType.Budget.Actuals.Delete, handleRemovalTask, (p: number) => p);
 }
 
-function* watchForActualUpdateSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Actuals.Update, handleUpdateTask);
+function* watchForTableChangeSaga(): SagaIterator {
+  yield takeEvery(ActionType.Budget.Actuals.TableChanged, handleTableChangeTask);
 }
 
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRequestActualsSaga);
   yield spawn(watchForRemoveActualSaga);
-  yield spawn(watchForActualUpdateSaga);
-  yield spawn(watchForBulkUpdateActualsSaga);
+  yield spawn(watchForTableChangeSaga);
   yield spawn(watchForRequestBudgetItemsSaga);
   yield spawn(watchForRequestBudgetItemsTreeSaga);
   yield spawn(watchForSearchBudgetItemsTreeSaga);

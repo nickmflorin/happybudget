@@ -1,8 +1,8 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
-export const bulkUpdateBudgetAccountsAction = simpleAction<Table.RowChange<Table.BudgetAccountRow>[]>(
-  ActionType.Budget.BulkUpdate
+export const tableChangedAction = simpleAction<Table.Change<Table.BudgetAccountRow>>(
+  ActionType.Budget.Accounts.TableChanged
 );
 export const bulkCreateAccountsAction = simpleAction<number>(ActionType.Budget.BulkCreate);
 
@@ -30,9 +30,6 @@ export const updateCommentInStateAction = simpleAction<
   Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
 >(ActionType.Budget.Comments.UpdateInState);
 
-export const updateAccountAction = simpleAction<Table.RowChange<Table.BudgetAccountRow>>(
-  ActionType.Budget.Accounts.Update
-);
 export const removeAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Delete);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Accounts.Updating);

@@ -7,13 +7,9 @@ export const loadingSubAccountAction = simpleAction<boolean>(ActionType.Template
 export const responseSubAccountAction = simpleAction<Model.TemplateSubAccount | undefined>(
   ActionType.Template.SubAccount.Response
 );
-export const bulkUpdateSubAccountAction = simpleAction<Table.RowChange<Table.TemplateSubAccountRow>[]>(
-  ActionType.Template.SubAccount.BulkUpdate
-);
 export const bulkCreateSubAccountsAction = simpleAction<number>(ActionType.Template.SubAccount.BulkCreate);
-
-export const updateSubAccountAction = simpleAction<Table.RowChange<Table.TemplateSubAccountRow>>(
-  ActionType.Template.SubAccount.SubAccounts.Update
+export const tableChangedAction = simpleAction<Table.Change<Table.TemplateSubAccountRow>>(
+  ActionType.Template.SubAccount.TableChanged
 );
 export const removeSubAccountAction = simpleAction<number>(ActionType.Template.SubAccount.SubAccounts.Delete);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
@@ -48,12 +44,10 @@ export const removeSubAccountFromStateAction = simpleAction<number>(
 export const addSubAccountToStateAction = simpleAction<Model.TemplateSubAccount>(
   ActionType.Template.SubAccount.SubAccounts.AddToState
 );
-
 // Errors Functionality Needs to be Built Back In
 export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(
   ActionType.Template.SubAccount.SubAccounts.AddErrors
 );
-
 export const requestGroupsAction = simpleAction<null>(ActionType.Template.SubAccount.SubAccounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Template.SubAccount.SubAccounts.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.TemplateGroup>>(

@@ -14,12 +14,11 @@ import {
   selectSubAccountAction,
   deselectSubAccountAction,
   removeSubAccountAction,
-  updateSubAccountAction,
   selectAllSubAccountsAction,
   deleteGroupAction,
   addGroupToStateAction,
   removeSubAccountFromGroupAction,
-  bulkUpdateSubAccountAction,
+  tableChangedAction,
   updateGroupInStateAction,
   bulkCreateSubAccountsAction,
   addSubAccountToGroupAction
@@ -100,10 +99,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: Table.BudgetSubAccountRow) => dispatch(removeSubAccountAction(row.id))}
-        onRowUpdate={(payload: Table.RowChange<Table.BudgetSubAccountRow>) => dispatch(updateSubAccountAction(payload))}
-        onRowBulkUpdate={(changes: Table.RowChange<Table.BudgetSubAccountRow>[]) =>
-          dispatch(bulkUpdateSubAccountAction(changes))
-        }
+        onTableChange={(payload: Table.Change<Table.BudgetSubAccountRow>) => dispatch(tableChangedAction(payload))}
         onBack={(row?: Table.BudgetSubAccountRow) => {
           if (!isNil(subaccountDetail)) {
             const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];

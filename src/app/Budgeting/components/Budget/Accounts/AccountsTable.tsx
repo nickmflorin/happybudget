@@ -15,12 +15,11 @@ import {
   deselectAccountAction,
   selectAccountAction,
   removeAccountAction,
-  updateAccountAction,
   selectAllAccountsAction,
   addGroupToStateAction,
   deleteGroupAction,
   removeAccountFromGroupAction,
-  bulkUpdateBudgetAccountsAction,
+  tableChangedAction,
   updateGroupInStateAction,
   bulkCreateAccountsAction,
   addAccountToGroupAction
@@ -84,10 +83,7 @@ const AccountsTable = (): JSX.Element => {
         onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
         onRowDelete={(row: Table.BudgetAccountRow) => dispatch(removeAccountAction(row.id))}
-        onRowUpdate={(payload: Table.RowChange<Table.BudgetAccountRow>) => dispatch(updateAccountAction(payload))}
-        onRowBulkUpdate={(changes: Table.RowChange<Table.BudgetAccountRow>[]) =>
-          dispatch(bulkUpdateBudgetAccountsAction(changes))
-        }
+        onTableChange={(payload: Table.Change<Table.BudgetAccountRow>) => dispatch(tableChangedAction(payload))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         onDeleteGroup={(group: Model.BudgetGroup) => dispatch(deleteGroupAction(group.id))}
         onRowRemoveFromGroup={(row: Table.BudgetAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}

@@ -26,9 +26,8 @@ import {
   deselectActualAction,
   selectActualAction,
   removeActualAction,
-  updateActualAction,
   selectAllActualsAction,
-  bulkUpdateBudgetActualsAction,
+  tableChangedAction,
   requestBudgetItemsAction,
   requestBudgetItemsTreeAction,
   setBudgetItemsTreeSearchAction
@@ -125,10 +124,7 @@ const Actuals = (): JSX.Element => {
         onRowSelect={(id: number) => dispatch(selectActualAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectActualAction(id))}
         onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row.id))}
-        onRowUpdate={(payload: Table.RowChange<Table.ActualRow>) => dispatch(updateActualAction(payload))}
-        onRowBulkUpdate={(changes: Table.RowChange<Table.ActualRow>[]) =>
-          dispatch(bulkUpdateBudgetActualsAction(changes))
-        }
+        onTableChange={(payload: Table.Change<Table.ActualRow>) => dispatch(tableChangedAction(payload))}
         onSelectAll={() => dispatch(selectAllActualsAction(null))}
         exportFileName={"actuals.csv"}
         actions={(params: BudgetTableActionsParams<Table.ActualRow, Model.Group>) => [

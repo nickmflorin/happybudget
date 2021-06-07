@@ -24,10 +24,9 @@ export interface GenericFringesTableProps
   selected: number[];
   placeholders: Table.FringeRow[];
   data: Model.Fringe[];
+  onTableChange: (change: Table.Change<Table.FringeRow>) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
-  onRowUpdate: (payload: Table.RowChange<Table.FringeRow>) => void;
-  onRowBulkUpdate?: (payload: Table.RowChange<Table.FringeRow>[]) => void;
   onRowAdd: () => void;
   onRowDelete: (row: Table.FringeRow) => void;
   onRowExpand?: (id: number) => void;

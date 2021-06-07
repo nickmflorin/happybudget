@@ -14,12 +14,11 @@ import {
   removeSubAccountAction,
   selectSubAccountAction,
   setSubAccountsSearchAction,
-  updateSubAccountAction,
   selectAllSubAccountsAction,
   deleteGroupAction,
   addGroupToStateAction,
   removeSubAccountFromGroupAction,
-  bulkUpdateAccountAction,
+  tableChangedAction,
   updateGroupInStateAction,
   bulkCreateSubAccountsAction,
   addSubAccountToGroupAction
@@ -98,12 +97,7 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: Table.TemplateSubAccountRow) => dispatch(removeSubAccountAction(row.id))}
-        onRowUpdate={(payload: Table.RowChange<Table.TemplateSubAccountRow>) =>
-          dispatch(updateSubAccountAction(payload))
-        }
-        onRowBulkUpdate={(changes: Table.RowChange<Table.TemplateSubAccountRow>[]) =>
-          dispatch(bulkUpdateAccountAction(changes))
-        }
+        onTableChange={(payload: Table.Change<Table.TemplateSubAccountRow>) => dispatch(tableChangedAction(payload))}
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/subaccounts/${id}`)}
         onBack={() => history.push(`/templates/${templateId}/accounts?row=${accountId}`)}
         onDeleteGroup={(group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id))}

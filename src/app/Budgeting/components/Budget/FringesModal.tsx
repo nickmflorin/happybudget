@@ -9,9 +9,8 @@ import {
   deselectFringeAction,
   selectFringeAction,
   removeFringeAction,
-  updateFringeAction,
   selectAllFringesAction,
-  bulkUpdateBudgetFringesAction,
+  tableChangedAction,
   addFringesPlaceholdersToStateAction,
   requestFringesAction
 } from "../../store/actions/budget/fringes";
@@ -70,10 +69,7 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
       onRowSelect={(id: number) => dispatch(selectFringeAction(id))}
       onRowDeselect={(id: number) => dispatch(deselectFringeAction(id))}
       onRowDelete={(row: Table.FringeRow) => dispatch(removeFringeAction(row.id))}
-      onRowUpdate={(payload: Table.RowChange<Table.FringeRow>) => dispatch(updateFringeAction(payload))}
-      onRowBulkUpdate={(changes: Table.RowChange<Table.FringeRow>[]) =>
-        dispatch(bulkUpdateBudgetFringesAction(changes))
-      }
+      onTableChange={(payload: Table.Change<Table.FringeRow>) => dispatch(tableChangedAction(payload))}
       onSelectAll={() => dispatch(selectAllFringesAction(null))}
     />
   );

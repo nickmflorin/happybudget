@@ -95,10 +95,9 @@ export default createStandardSaga(
       actionType: ActionType.Template.SubAccount.SubAccounts.Groups.Request,
       task: tasks.getGroups
     },
-    BulkUpdate: { actionType: ActionType.Template.SubAccount.BulkUpdate, task: tasks.handleBulkUpdate },
+    TableChanged: { actionType: ActionType.Template.SubAccount.TableChanged, task: tasks.handleTableChange },
     BulkCreate: { actionType: ActionType.Template.SubAccount.BulkCreate, task: tasks.bulkCreate },
     Delete: { actionType: ActionType.Template.SubAccount.SubAccounts.Delete, task: tasks.handleRemoval },
-    Update: { actionType: ActionType.Template.SubAccount.SubAccounts.Update, task: tasks.handleUpdate },
     DeleteGroup: { actionType: ActionType.Template.SubAccount.SubAccounts.Groups.Delete, task: tasks.deleteGroup },
     RemoveModelFromGroup: {
       actionType: ActionType.Template.Account.SubAccounts.RemoveFromGroup,

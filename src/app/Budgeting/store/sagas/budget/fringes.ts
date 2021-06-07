@@ -52,12 +52,8 @@ function* watchForRemoveFringeSaga(): SagaIterator {
   yield takeWithCancellableById<number>(ActionType.Budget.Fringes.Delete, tasks.handleRemoval, (p: number) => p);
 }
 
-function* watchForUpdateFringeSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.Fringes.Update, tasks.handleUpdate);
-}
-
-function* watchForBulkUpdateFringesSaga(): SagaIterator {
-  yield takeEvery(ActionType.Budget.BulkUpdateFringes, tasks.handleBulkUpdate);
+function* watchForTableChangeSaga(): SagaIterator {
+  yield takeEvery(ActionType.Budget.Fringes.TableChanged, tasks.handleTableChange);
 }
 
 function* watchForRequestFringesSaga(): SagaIterator {
@@ -74,6 +70,5 @@ function* watchForRequestFringesSaga(): SagaIterator {
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRequestFringesSaga);
   yield spawn(watchForRemoveFringeSaga);
-  yield spawn(watchForUpdateFringeSaga);
-  yield spawn(watchForBulkUpdateFringesSaga);
+  yield spawn(watchForTableChangeSaga);
 }

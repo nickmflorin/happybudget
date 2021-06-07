@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
-import { isNil, find, map, groupBy } from "lodash";
+import { isNil, find, map } from "lodash";
 
 import { handleRequestError } from "api";
 import { deleteAccount, updateAccount, deleteGroup } from "api/services";
@@ -9,7 +9,7 @@ import { deleteAccount, updateAccount, deleteGroup } from "api/services";
 import { isAction } from "lib/redux/typeguards";
 import { warnInconsistentState } from "lib/redux/util";
 import RowManager from "lib/tabling/managers";
-import { mergeRowChanges } from "lib/tabling/util";
+import { consolidateTableChange } from "lib/tabling/util";
 import { handleTableErrors } from "store/tasks";
 
 import { createBulkCreatePayload } from "./util";
@@ -57,8 +57,7 @@ export interface AccountsTaskSet<R extends Table.Row<G>, G extends Model.Templat
   deleteGroup: Redux.Task<number>;
   bulkCreate: Redux.Task<number>;
   handleRemoval: Redux.Task<number>;
-  handleUpdate: Redux.Task<Table.RowChange<R>>;
-  handleBulkUpdate: Redux.Task<Table.RowChange<R>[]>;
+  handleTableChange: Redux.Task<Table.Change<R>>;
   getAccounts: Redux.Task<null>;
   getGroups: Redux.Task<null>;
 }
@@ -177,30 +176,6 @@ export const createAccountsTaskSet = <
     }
   }
 
-  function* updateTask(id: number, change: Table.RowChange<R>): SagaIterator {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-    yield put(actions.updating({ id, value: true }));
-    try {
-      yield call(updateAccount, id, manager.payload(change), { cancelToken: source.token });
-    } catch (e) {
-      if (!(yield cancelled())) {
-        yield call(
-          handleTableErrors,
-          e,
-          "There was an error updating the sub account.",
-          id,
-          (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-        );
-      }
-    } finally {
-      yield put(actions.updating({ id, value: false }));
-      if (yield cancelled()) {
-        source.cancel();
-      }
-    }
-  }
-
   function* bulkUpdateTask(changes: Table.RowChange<R>[]): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId)) {
@@ -288,14 +263,12 @@ export const createAccountsTaskSet = <
     }
   }
 
-  function* handleBulkUpdateTask(action: Redux.Action<Table.RowChange<R>[]>): SagaIterator {
+  function* handleTableChangeTask(action: Redux.Action<Table.Change<R>>): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const grouped = groupBy(action.payload, "id") as { [key: string]: Table.RowChange<R>[] };
-      const merged: Table.RowChange<R>[] = map(grouped, (changes: Table.RowChange<R>[], id: string) => {
-        return { data: mergeRowChanges(changes).data, id: parseInt(id) };
-      });
+      const merged = consolidateTableChange(action.payload);
       const data = yield select(selectModels);
+
       const mergedUpdates: Table.RowChange<R>[] = [];
       for (let i = 0; i < merged.length; i++) {
         const model: A | undefined = find(data, { id: merged[i].id });
@@ -311,28 +284,9 @@ export const createAccountsTaskSet = <
           mergedUpdates.push(merged[i]);
         }
       }
+      yield put(actions.budget.request(null));
       if (mergedUpdates.length !== 0) {
         yield fork(bulkUpdateTask, mergedUpdates);
-      }
-    }
-  }
-
-  function* handleUpdateTask(action: Redux.Action<Table.RowChange<R>>): SagaIterator {
-    const objId = yield select(selectObjId);
-    if (!isNil(objId) && !isNil(action.payload)) {
-      const id = action.payload.id;
-      const data: A[] = yield select(selectModels);
-      const model: A | undefined = find(data, { id } as any);
-      if (isNil(model)) {
-        warnInconsistentState({
-          action: action.type,
-          reason: "Account does not exist in state when it is expected to.",
-          id: action.payload.id
-        });
-      } else {
-        const updatedModel = manager.mergeChangesWithModel(model, action.payload);
-        yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel }));
-        yield call(updateTask, model.id, action.payload);
       }
     }
   }
@@ -401,8 +355,7 @@ export const createAccountsTaskSet = <
     deleteGroup: deleteGroupTask,
     bulkCreate: bulkCreateTask,
     handleRemoval: handleRemovalTask,
-    handleUpdate: handleUpdateTask,
-    handleBulkUpdate: handleBulkUpdateTask,
+    handleTableChange: handleTableChangeTask,
     getAccounts: getAccountsTask,
     getGroups: getGroupsTask
   };

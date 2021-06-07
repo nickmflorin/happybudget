@@ -13,10 +13,9 @@ interface ActionMap<R extends Table.Row<G>, G extends Model.Group = Model.Group>
   RequestGroups: MapConfig<null>;
   RequestComments?: MapConfig<null>;
   RequestHistory?: MapConfig<null>;
-  BulkUpdate: MapConfig<Table.RowChange<R>[]>;
+  TableChanged: MapConfig<Table.Change<R>>;
   BulkCreate: MapConfig<number>;
   Delete: MapConfig<number>;
-  Update: MapConfig<Table.RowChange<R>>;
   SubmitComment?: MapConfig<{ parent?: number; data: Http.CommentPayload }>;
   DeleteComment?: MapConfig<number>;
   EditComment?: MapConfig<Redux.UpdateModelActionPayload<Model.Comment>>;
@@ -51,8 +50,8 @@ export const createStandardSaga = <R extends Table.Row<G>, G extends Model.Group
     }
   }
 
-  function* watchForBulkUpdateModelsSaga(): SagaIterator {
-    yield takeEvery(map.BulkUpdate.actionType, map.BulkUpdate.task);
+  function* watchForTableChangeSaga(): SagaIterator {
+    yield takeEvery(map.TableChanged.actionType, map.TableChanged.task);
   }
 
   function* watchForBulkCreateModelsSaga(): SagaIterator {
@@ -70,10 +69,6 @@ export const createStandardSaga = <R extends Table.Row<G>, G extends Model.Group
 
   function* watchForRemoveModelSaga(): SagaIterator {
     yield takeWithCancellableById<number>(map.Delete.actionType, map.Delete.task, (p: number) => p);
-  }
-
-  function* watchForUpdateModelSaga(): SagaIterator {
-    yield takeEvery(map.Update.actionType, map.Update.task);
   }
 
   function* watchForRequestCommentsSaga(): SagaIterator {
@@ -154,9 +149,8 @@ export const createStandardSaga = <R extends Table.Row<G>, G extends Model.Group
   function* rootSaga(): SagaIterator {
     yield spawn(watchForRequestModelsSaga);
     yield spawn(watchForRequestGroupsSaga);
-    yield spawn(watchForBulkUpdateModelsSaga);
+    yield spawn(watchForTableChangeSaga);
     yield spawn(watchForRemoveModelSaga);
-    yield spawn(watchForUpdateModelSaga);
     yield spawn(watchForRequestCommentsSaga);
     yield spawn(watchForSubmitCommentSaga);
     yield spawn(watchForRemoveCommentSaga);

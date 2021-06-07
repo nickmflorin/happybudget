@@ -85,19 +85,17 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   setColumnApi,
   rowCanExpand,
   onRowExpand,
-  onRowUpdate,
-  onRowBulkUpdate,
+  onTableChange,
   onRowAdd,
   onRowDelete,
   onBack
 }: PrimaryGridProps<R, G>): JSX.Element => {
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
-  // Stores the table change that will occur when clearing a value that has been "cut" when the
-  // cell is pasted.
-  const [cutCellChange, setCutCellChange] = useState<Table.RowChange<R> | null>(null);
-  // TODO: Figure out a better way to do this.
-  const oldRow = useRef<R | null>(null);
+  // Right now, we can only support Cut/Paste for 1 cell at a time.  Multi-cell
+  // cut/paste needs to be built in.
+  const [cutCellChange, setCutCellChange] = useState<Table.CellChange<R> | null>(null);
+  const oldRow = useRef<R | null>(null); // TODO: Figure out a better way to do this.
   const location = useLocation();
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
@@ -337,7 +335,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         const row: R = node.data;
         const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === focusedCell.column.getColId());
         if (!isNil(customColDef)) {
-          const change = getTableChangesForCellClear(row, customColDef);
+          const change = getCellChangeForClear(row, customColDef);
           local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
           if (!isNil(change)) {
             setCutCellChange(change);
@@ -384,63 +382,54 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   });
 
+  const getCellChangeForClear = useDynamicCallback((row: R, def: CustomColDef<R, G>): Table.CellChange<R> | null => {
+    const clearValue = def.nullValue !== undefined ? def.nullValue : null;
+    const colId = def.field;
+    if (row[colId] === undefined || row[colId] !== clearValue) {
+      const change: Table.CellChange<R> = {
+        oldValue: row[colId],
+        newValue: clearValue as R[keyof R],
+        id: row.id,
+        field: colId
+      };
+      return change;
+    } else {
+      return null;
+    }
+  });
+
   const getTableChangesFromRangeClear = useDynamicCallback(
-    (range: CellRange, gridApi?: GridApi): Table.RowChange<R>[] => {
-      const rowChanges: Table.RowChange<R>[] = [];
+    (range: CellRange, gridApi?: GridApi): Table.CellChange<R>[] => {
+      const changes: Table.CellChange<R>[] = [];
       gridApi = isNil(gridApi) ? gridApi : api;
       if (!isNil(api) && !isNil(range.startRow) && !isNil(range.endRow)) {
         let colIds: (keyof R)[] = map(range.columns, (col: Column) => col.getColId() as keyof R);
         let startRowIndex = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
         let endRowIndex = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
-
         for (let i = startRowIndex; i <= endRowIndex; i++) {
           const node: RowNode | null = api.getDisplayedRowAtIndex(i);
           if (!isNil(node)) {
             const row: R = node.data;
-
-            const rowChangeData: Table.RowChangeData<R> = {};
             /* eslint-disable no-loop-func */
             forEach(colIds, (colId: keyof R) => {
               const customColDef = find(colDefs, { field: colId } as any);
-              // Only clear cells for which an onClear value is specified - otherwise it can cause bugs.
               if (!isNil(customColDef) && isCellEditable(row, customColDef)) {
-                const clearValue = customColDef.nullValue !== undefined ? customColDef.nullValue : null;
-                if (row[colId] === undefined || row[colId] !== clearValue) {
-                  const change: Table.CellChange<any> = { oldValue: row[colId], newValue: clearValue };
-                  rowChangeData[colId] = change;
+                const change = getCellChangeForClear(row, customColDef);
+                if (!isNil(change)) {
+                  changes.push(change);
                 }
               }
             });
-            if (Object.keys(rowChangeData).length !== 0) {
-              const rowChange: Table.RowChange<R> = { id: row.id, data: rowChangeData };
-              rowChanges.push(rowChange);
-            }
           }
         }
       }
-      return rowChanges;
+      return changes;
     }
   );
 
-  const getTableChangesForCellClear = useDynamicCallback(
-    (row: R, def: CustomColDef<R, G>): Table.RowChange<R> | null => {
-      const clearValue = def.nullValue !== undefined ? def.nullValue : null;
-      const colId = def.field;
-      if (row[colId] === undefined || row[colId] !== clearValue) {
-        const change: Table.CellChange<any> = { oldValue: row[colId], newValue: clearValue };
-        const rowChangeData: Table.RowChangeData<R> = {};
-        rowChangeData[colId] = change;
-        const rowChange: Table.RowChange<R> = { id: row.id, data: rowChangeData };
-        return rowChange;
-      } else {
-        return null;
-      }
-    }
-  );
-
-  const getTableChangeFromEvent = (
+  const getCellChangeFromEvent = (
     event: CellEditingStoppedEvent | CellValueChangedEvent
-  ): Table.RowChange<R> | null => {
+  ): Table.CellChange<R> | null => {
     const field = event.column.getColId() as keyof R;
     // AG Grid treats cell values as undefined when they are cleared via edit,
     // so we need to translate that back into a null representation.
@@ -450,32 +439,24 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       const oldValue = event.oldValue === undefined ? nullValue : event.oldValue;
       const newValue = event.newValue === undefined ? nullValue : event.newValue;
       if (oldValue !== newValue) {
-        const change: Table.CellChange<R[keyof R]> = { oldValue, newValue };
-        const d: { [key in keyof R]?: Table.CellChange<R[key]> } = {};
-        d[field as keyof R] = change;
-        return { id: event.data.id, data: d };
+        const change: Table.CellChange<R> = { oldValue, newValue, field, id: event.data.id };
+        return change;
       }
     }
     return null;
   };
 
   const clearCellsOverRange = useDynamicCallback((range: CellRange | CellRange[], paramsApi?: GridApi) => {
-    if (!isNil(onRowBulkUpdate)) {
-      const rowChanges: Table.RowChange<R>[] = !Array.isArray(range)
-        ? getTableChangesFromRangeClear(range, paramsApi)
-        : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, paramsApi)));
-      if (rowChanges.length !== 0) {
-        // NOTE: If there are changes corresponding to rows that span multiple ranges, the task
-        // will consolidate/merge these changes to reduce the request payload.
-        onRowBulkUpdate(rowChanges);
-      }
-    }
+    const changes: Table.CellChange<R>[] = !Array.isArray(range)
+      ? getTableChangesFromRangeClear(range, paramsApi)
+      : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, paramsApi)));
+    onTableChange(changes);
   });
 
   const clearCell = useDynamicCallback((row: R, def: CustomColDef<R, G>) => {
-    const tableChange = getTableChangesForCellClear(row, def);
-    if (!isNil(tableChange)) {
-      onRowUpdate(tableChange);
+    const change = getCellChangeForClear(row, def);
+    if (!isNil(change)) {
+      onTableChange(change);
     }
   });
 
@@ -484,48 +465,27 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   });
 
   const onPasteEnd = useDynamicCallback((event: PasteEndEvent) => {
-    if (!isNil(onRowBulkUpdate)) {
-      if (cellChangeEvents.length === 1) {
-        const tableChange = getTableChangeFromEvent(cellChangeEvents[0]);
-        if (!isNil(tableChange)) {
-          if (!isNil(cutCellChange)) {
-            onRowBulkUpdate([tableChange, cutCellChange]);
-            setCutCellChange(null);
-          } else {
-            onRowUpdate(tableChange);
-          }
-        }
-      } else if (cellChangeEvents.length !== 0) {
-        const changes = filter(
-          map(cellChangeEvents, (e: CellValueChangedEvent) => getTableChangeFromEvent(e)),
-          (change: Table.RowChange<R> | null) => change !== null
-        ) as Table.RowChange<R>[];
-        if (changes.length !== 0) {
-          if (!isNil(cutCellChange)) {
-            onRowBulkUpdate([...changes, cutCellChange]);
-            setCutCellChange(null);
-          } else {
-            onRowBulkUpdate(changes);
-          }
-        }
-      }
-    }
+    const changes = filter(
+      map(cellChangeEvents, (e: CellValueChangedEvent) => getCellChangeFromEvent(e)),
+      (change: Table.CellChange<R> | null) => change !== null
+    ) as Table.CellChange<R>[];
+    onTableChange(changes);
   });
 
   const _onCellValueChanged = useDynamicCallback((event: CellValueChangedEvent) => {
     if (event.source === "paste") {
       setCellChangeEvents([...cellChangeEvents, event]);
     } else {
-      const tableChange = getTableChangeFromEvent(event);
-      if (!isNil(tableChange)) {
-        onRowUpdate(tableChange);
+      const change = getCellChangeFromEvent(event);
+      if (!isNil(change)) {
+        onTableChange(change);
         onCellValueChanged({
           row: event.node.data as R,
           oldRow: oldRow.current,
           column: event.column,
           oldValue: event.oldValue,
           newValue: event.newValue,
-          change: tableChange,
+          change: change,
           node: event.node
         });
       }
@@ -748,6 +708,18 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
   };
 
+  const _processCellFromClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
+    if (!isNil(params.node)) {
+      const node: RowNode = params.node;
+      if (!isNil(cutCellChange)) {
+        params = { ...params, value: cutCellChange.oldValue };
+        onTableChange(cutCellChange);
+        setCutCellChange(null);
+      }
+      return processCellFromClipboard(params.column, node.data as R, params.value);
+    }
+  });
+
   return (
     <div className={"table-grid"}>
       <AgGridReact
@@ -774,11 +746,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
             return processCellForClipboard(params.column, params.node.data as R, params.value);
           }
         }}
-        processCellFromClipboard={(params: ProcessCellForExportParams) => {
-          if (!isNil(params.node)) {
-            return processCellFromClipboard(params.column, params.node.data as R, params.value);
-          }
-        }}
+        processCellFromClipboard={_processCellFromClipboard}
         undoRedoCellEditing={true}
         undoRedoCellEditingLimit={5}
         stopEditingWhenGridLosesFocus={true}

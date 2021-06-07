@@ -14,12 +14,11 @@ import {
   removeSubAccountAction,
   selectSubAccountAction,
   setSubAccountsSearchAction,
-  updateSubAccountAction,
   selectAllSubAccountsAction,
   deleteGroupAction,
   addGroupToStateAction,
   removeSubAccountFromGroupAction,
-  bulkUpdateAccountAction,
+  tableChangedAction,
   updateGroupInStateAction,
   bulkCreateSubAccountsAction,
   addSubAccountToGroupAction
@@ -98,10 +97,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: Table.BudgetSubAccountRow) => dispatch(removeSubAccountAction(row.id))}
-        onRowUpdate={(payload: Table.RowChange<Table.BudgetSubAccountRow>) => dispatch(updateSubAccountAction(payload))}
-        onRowBulkUpdate={(changes: Table.RowChange<Table.BudgetSubAccountRow>[]) =>
-          dispatch(bulkUpdateAccountAction(changes))
-        }
+        onTableChange={(payload: Table.Change<Table.BudgetSubAccountRow>) => dispatch(tableChangedAction(payload))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}
         onDeleteGroup={(group: Model.BudgetGroup) => dispatch(deleteGroupAction(group.id))}

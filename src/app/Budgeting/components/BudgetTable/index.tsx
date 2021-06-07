@@ -74,10 +74,9 @@ const BudgetTable = <
   cellClass,
   onSearch,
   onSelectAll,
-  onRowUpdate,
-  onRowBulkUpdate,
   onRowSelect,
   onRowDeselect,
+  onTableChange,
   onRowAdd,
   onRowDelete,
   onRowExpand,
@@ -104,8 +103,10 @@ const BudgetTable = <
     },
     suppressHorizontalScroll: true,
     suppressContextMenu: process.env.NODE_ENV === "development" && TABLE_DEBUG,
-    suppressCopyRowsToClipboard: isNil(onRowBulkUpdate),
-    suppressClipboardPaste: isNil(onRowBulkUpdate),
+    // If for whatever reason, we have a table that cannot support bulk-updating,
+    // these two parameters need to be set to true.
+    suppressCopyRowsToClipboard: false,
+    suppressClipboardPaste: false,
     enableFillHandle: true,
     fillHandleDirection: "y",
     ...options
@@ -652,8 +653,7 @@ const BudgetTable = <
             isCellEditable={_isCellEditable}
             onRowExpand={onRowExpand}
             rowCanExpand={rowCanExpand}
-            onRowUpdate={onRowUpdate}
-            onRowBulkUpdate={onRowBulkUpdate}
+            onTableChange={onTableChange}
             onRowAdd={onRowAdd}
             onRowDelete={onRowDelete}
             onBack={onBack}

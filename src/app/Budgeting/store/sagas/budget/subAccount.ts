@@ -260,10 +260,9 @@ export default createStandardSaga(
       actionType: ActionType.Budget.SubAccount.SubAccounts.History.Request,
       task: getHistoryTask
     },
-    BulkUpdate: { actionType: ActionType.Budget.SubAccount.BulkUpdate, task: tasks.handleBulkUpdate },
+    TableChanged: { actionType: ActionType.Budget.SubAccount.TableChanged, task: tasks.handleTableChange },
     BulkCreate: { actionType: ActionType.Budget.SubAccount.BulkCreate, task: tasks.bulkCreate },
     Delete: { actionType: ActionType.Budget.SubAccount.SubAccounts.Delete, task: tasks.handleRemoval },
-    Update: { actionType: ActionType.Budget.SubAccount.SubAccounts.Update, task: tasks.handleUpdate },
     SubmitComment: { actionType: ActionType.Budget.SubAccount.Comments.Create, task: submitCommentTask },
     DeleteComment: { actionType: ActionType.Budget.SubAccount.Comments.Delete, task: deleteCommentTask },
     EditComment: { actionType: ActionType.Budget.SubAccount.Comments.Update, task: editCommentTask },

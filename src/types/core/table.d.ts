@@ -36,17 +36,28 @@ namespace Table {
     readonly group: G | null;
   }
 
-  interface CellChange<V> {
-    oldValue: V;
-    newValue: V;
-  }
+  type CellChange<R extends Table.Row, V = R[keyof R]> = {
+    readonly oldValue: V;
+    readonly newValue: V;
+    readonly field: keyof R;
+    readonly id: number;
+  };
 
-  type RowChangeData<R extends Table.Row> = { [key in keyof R]?: Table.CellChange<R[key]> };
+  type RowChangeData<R extends Table.Row> = {
+    readonly [key in keyof R]?: Omit<Table.CellChange<R[key]>, "field", "id">;
+  };
 
   type RowChange<R extends Table.Row> = {
-    id: number;
-    data: Table.RowChangeData<R>;
+    readonly id: number;
+    readonly data: RowChangeData<R>;
   };
+
+  type Change<R extends Table.Row> =
+    | Table.RowChange<R>
+    | Table.CellChange<R>
+    | (Table.CellChange<R> | Table.RowChange<R>)[];
+
+  type ConsolidatedChange<R extends Table.Row> = Table.RowChange<R>[];
 
   interface ActivatePlaceholderPayload<M> {
     readonly id: number;

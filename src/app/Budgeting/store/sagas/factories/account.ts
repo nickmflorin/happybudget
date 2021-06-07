@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
-import { isNil, find, map, groupBy } from "lodash";
+import { isNil, find, map } from "lodash";
 
 import { handleRequestError } from "api";
 import {
@@ -18,7 +18,7 @@ import {
 import { isAction } from "lib/redux/typeguards";
 import { warnInconsistentState } from "lib/redux/util";
 import RowManager from "lib/tabling/managers";
-import { mergeRowChanges } from "lib/tabling/util";
+import { consolidateTableChange } from "lib/tabling/util";
 import { handleTableErrors } from "store/tasks";
 
 import { createBulkCreatePayload } from "./util";
@@ -62,8 +62,7 @@ export interface AccountTaskSet<R extends Table.Row<G>, G extends Model.Template
   deleteGroup: Redux.Task<number>;
   bulkCreate: Redux.Task<number>;
   handleRemoval: Redux.Task<number>;
-  handleUpdate: Redux.Task<Table.RowChange<R>>;
-  handleBulkUpdate: Redux.Task<Table.RowChange<R>[]>;
+  handleTableChange: Redux.Task<Table.Change<R>>;
   getSubAccounts: Redux.Task<null>;
   getGroups: Redux.Task<null>;
   getAccount: Redux.Task<null>;
@@ -189,41 +188,6 @@ export const createAccountTaskSet = <
     }
   }
 
-  function* updateTask(id: number, change: Table.RowChange<R>): SagaIterator {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-    yield put(actions.updating({ id, value: true }));
-    // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
-    // otherwise, the loading indicators will not appear until `yield put(requestTemplateAction)`, and there
-    // is a lag between the time that this task is called and that task is called.
-    yield put(actions.budget.loading(true));
-    let success = true;
-    try {
-      yield call(updateSubAccount, id, manager.payload(change), { cancelToken: source.token });
-    } catch (e) {
-      success = false;
-      yield put(actions.budget.loading(false));
-      if (!(yield cancelled())) {
-        yield call(
-          handleTableErrors,
-          e,
-          "There was an error updating the sub account.",
-          id,
-          (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-        );
-      }
-    } finally {
-      yield put(actions.updating({ id, value: false }));
-      if (yield cancelled()) {
-        success = false;
-        source.cancel();
-      }
-    }
-    if (success === true) {
-      yield put(actions.budget.request(null));
-    }
-  }
-
   function* bulkUpdateTask(changes: Table.RowChange<R>[]): SagaIterator {
     const accountId = yield select(selectAccountId);
     if (!isNil(accountId)) {
@@ -315,16 +279,12 @@ export const createAccountTaskSet = <
     }
   }
 
-  function* handleBulkUpdateTask(action: Redux.Action<Table.RowChange<R>[]>): SagaIterator {
+  function* handleTableChangeTask(action: Redux.Action<Table.Change<R>>): SagaIterator {
     const accountId = yield select(selectAccountId);
     if (!isNil(accountId) && !isNil(action.payload)) {
-      const grouped = groupBy(action.payload, "id") as {
-        [key: string]: Table.RowChange<R>[];
-      };
-      const merged: Table.RowChange<R>[] = map(grouped, (changes: Table.RowChange<R>[], id: string) => {
-        return { data: mergeRowChanges(changes).data, id: parseInt(id) };
-      });
+      const merged = consolidateTableChange(action.payload);
       const data = yield select(selectModels);
+
       const mergedUpdates: Table.RowChange<R>[] = [];
       for (let i = 0; i < merged.length; i++) {
         const model: SA | undefined = find(data, { id: merged[i].id });
@@ -343,26 +303,6 @@ export const createAccountTaskSet = <
       yield put(actions.budget.request(null));
       if (mergedUpdates.length !== 0) {
         yield fork(bulkUpdateTask, mergedUpdates);
-      }
-    }
-  }
-
-  function* handleUpdateTask(action: Redux.Action<Table.RowChange<R>>): SagaIterator {
-    const accountId = yield select(selectAccountId);
-    if (!isNil(accountId) && !isNil(action.payload)) {
-      const id = action.payload.id;
-      const data = yield select(selectModels);
-      const model: SA | undefined = find(data, { id });
-      if (isNil(model)) {
-        warnInconsistentState({
-          action: action.type,
-          reason: "Sub Account does not exist in state when it is expected to.",
-          id: action.payload.id
-        });
-      } else {
-        const updatedModel = manager.mergeChangesWithModel(model, action.payload);
-        yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel }));
-        yield call(updateTask, model.id, action.payload);
       }
     }
   }
@@ -463,8 +403,7 @@ export const createAccountTaskSet = <
     deleteGroup: deleteGroupTask,
     bulkCreate: bulkCreateTask,
     handleRemoval: handleRemovalTask,
-    handleUpdate: handleUpdateTask,
-    handleBulkUpdate: handleBulkUpdateTask,
+    handleTableChange: handleTableChangeTask,
     getSubAccounts: getSubAccountsTask,
     getGroups: getGroupsTask,
     getAccount: getAccountTask,
