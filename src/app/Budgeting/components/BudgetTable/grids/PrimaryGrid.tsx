@@ -171,7 +171,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
           runningIndex = runningIndex + 1;
         }
       }
-      return [nextRowNode, startingIndex + runningIndex, runningIndex];
+      return [nextRowNode === undefined ? null : nextRowNode, startingIndex + runningIndex, runningIndex];
     } else {
       return [null, startingIndex, 0];
     }
