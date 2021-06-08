@@ -11,6 +11,7 @@ import {
   RowNode,
   ICellEditorParams
 } from "@ag-grid-community/core";
+import { AgGridReactProps } from "@ag-grid-community/react";
 
 // TODO: Start consolidating with the RowChange related types in the global type set.
 export interface CellValueChangedParams<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
@@ -108,12 +109,20 @@ export interface BudgetTableMenuProps<R extends Table.Row<G>, G extends Model.Gr
   readonly onDelete: () => void;
 }
 
+// The abstract/generic <Grid> component that wraps AG Grid right at the interface.
+export interface GridProps
+  extends Omit<
+    AgGridReactProps,
+    "columnDefs" | "overlayNoRowsTemplate" | "overlayLoadingTemplate" | "modules" | "debug"
+  > {
+  readonly columnDefs: CustomColDef<any, any>[];
+}
+
 export interface BudgetFooterGridProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
   readonly options: GridOptions;
   // TODO: Refactor so we only have to provide one of these.
   readonly columns: CustomColDef<R, G>[];
   readonly colDefs: CustomColDef<R, G>[];
-  readonly frameworkComponents?: { [key: string]: any };
   readonly identifierField: string;
   readonly identifierValue?: string | null;
   readonly loadingBudget?: boolean | undefined;
@@ -126,7 +135,6 @@ export interface TableFooterGridProps<R extends Table.Row<G>, G extends Model.Gr
   // TODO: Refactor so we only have to provide one of these.
   readonly columns: CustomColDef<R, G>[];
   readonly colDefs: CustomColDef<R, G>[];
-  readonly frameworkComponents?: { [key: string]: any };
   readonly identifierField: string;
   readonly identifierValue?: string | null;
   readonly sizeColumnsToFit?: boolean | undefined;

@@ -2,33 +2,38 @@ import { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import ValueCell, { ValueCellProps } from "./ValueCell";
+import BodyCell, { BodyCellProps } from "./BodyCell";
 
-interface CalculatedCellProps<R extends Table.Row> extends ValueCellProps<R> {
-  renderRedIfNegative?: boolean;
+interface CalculatedCellProps<R extends Table.Row> extends BodyCellProps<R> {
+  readonly renderRedIfNegative?: boolean;
+  readonly children: string | number | null;
 }
 
 const CalculatedCell = <R extends Table.Row>({
-  value,
   renderRedIfNegative = false,
+  children,
   ...props
 }: CalculatedCellProps<R>): JSX.Element => {
   const renderRed = useMemo(() => {
-    if (renderRedIfNegative === true && !isNil(value)) {
-      if (typeof value === "string") {
-        const parsed = parseFloat(value);
+    if (renderRedIfNegative === true && !isNil(children)) {
+      if (typeof children === "string") {
+        const parsed = parseFloat(children);
         if (parsed < 0) {
           return true;
         }
         return false;
-      } else if (value < 0) {
+      } else if (children < 0) {
         return true;
       }
       return false;
     }
-  }, [value, renderRedIfNegative]);
+  }, [children, renderRedIfNegative]);
 
-  return <ValueCell<R> className={classNames({ "color--red": renderRed })} value={value} {...props} />;
+  return (
+    <BodyCell<R> className={classNames({ "color--red": renderRed })} {...props}>
+      {children}
+    </BodyCell>
+  );
 };
 
 export default CalculatedCell;

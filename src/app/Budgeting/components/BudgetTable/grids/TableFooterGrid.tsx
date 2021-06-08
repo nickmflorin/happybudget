@@ -1,14 +1,13 @@
 import { useMemo } from "react";
 import { isNil, reduce } from "lodash";
 
-import { AgGridReact } from "@ag-grid-community/react";
 import { GridReadyEvent, FirstDataRenderedEvent } from "@ag-grid-community/core";
 
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString } from "lib/util";
 
-import { IndexCell, ValueCell, IdentifierCell, CalculatedCell } from "../cells";
 import { TableFooterGridProps, CustomColDef } from "../model";
+import Grid from "./Grid";
 
 const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
   identifierField,
@@ -16,7 +15,6 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
   options,
   columns,
   colDefs,
-  frameworkComponents,
   sizeColumnsToFit,
   setColumnApi
 }: TableFooterGridProps<R, G>): JSX.Element => {
@@ -67,7 +65,7 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
 
   return (
     <div className={"table-footer-grid"}>
-      <AgGridReact
+      <Grid
         {...options}
         columnDefs={colDefs}
         rowData={[rowData]}
@@ -77,13 +75,6 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
         onGridReady={onGridReady}
         onFirstDataRendered={onFirstDataRendered}
         headerHeight={0}
-        frameworkComponents={{
-          IndexCell,
-          ValueCell,
-          IdentifierCell,
-          CalculatedCell,
-          ...frameworkComponents
-        }}
       />
     </div>
   );

@@ -172,10 +172,20 @@ const BudgetTable = <
     return true;
   });
 
-  const actionCell = useDynamicCallback<CustomColDef<R, G>>(
+  const onSort = useDynamicCallback<void>((order: Order, field: keyof R) => {
+    const newOrdering = updateFieldOrdering(ordering, field, order);
+    setOrdering(newOrdering);
+    if (!isNil(cookies) && !isNil(cookies.ordering)) {
+      const kookies = new Cookies();
+      kookies.set(cookies.ordering, newOrdering);
+    }
+  });
+
+  const ActionColumn = useDynamicCallback<CustomColDef<R, G>>(
     (col: CustomColDef<R, G>): CustomColDef<R, G> => {
       return {
         ...col,
+        ...actionColumn,
         cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", col.cellClass),
         editable: false,
         headerName: "",
@@ -184,10 +194,9 @@ const BudgetTable = <
     }
   );
 
-  const indexCell = useDynamicCallback<CustomColDef<R, G>>(
+  const IndexColumn = useDynamicCallback<CustomColDef<R, G>>(
     (col: CustomColDef<R, G>): CustomColDef<R, G> =>
-      actionCell({
-        ...actionColumn,
+      ActionColumn({
         ...indexColumn,
         field: "index",
         cellRenderer: "IndexCell",
@@ -216,7 +225,27 @@ const BudgetTable = <
       })
   );
 
-  const identifierCell = useDynamicCallback<CustomColDef<R, G>>(
+  const ExpandColumn = useDynamicCallback<CustomColDef<R, G>>(
+    (col: CustomColDef<R, G>): CustomColDef<R, G> =>
+      ActionColumn({
+        width: 30,
+        maxWidth: 30,
+        ...expandColumn,
+        ...col,
+        field: "expand",
+        cellRenderer: "ExpandCell",
+        pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
+        cellRendererParams: {
+          ...expandColumn.cellRendererParams,
+          ...col.cellRendererParams,
+          onClick: onRowExpand,
+          rowCanExpand
+        },
+        cellClass: mergeClassNamesFn(col.cellClass, expandColumn.cellClass, actionColumn.cellClass)
+      })
+  );
+
+  const IdentifierColumn = useDynamicCallback<CustomColDef<R, G>>(
     (col: CustomColDef<R, G>): CustomColDef<R, G> => ({
       field: identifierField,
       headerName: identifierFieldHeader,
@@ -240,27 +269,7 @@ const BudgetTable = <
     })
   );
 
-  const expandCell = useDynamicCallback<CustomColDef<R, G>>(
-    (col: CustomColDef<R, G>): CustomColDef<R, G> =>
-      actionCell({
-        width: 30,
-        maxWidth: 30,
-        ...expandColumn,
-        ...col,
-        field: "expand",
-        cellRenderer: "ExpandCell",
-        pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
-        cellRendererParams: {
-          ...expandColumn.cellRendererParams,
-          ...col.cellRendererParams,
-          onClick: onRowExpand,
-          rowCanExpand
-        },
-        cellClass: mergeClassNamesFn(col.cellClass, expandColumn.cellClass, actionColumn.cellClass)
-      })
-  );
-
-  const calculatedCell = useDynamicCallback<CustomColDef<R, G>>(
+  const CalculatedColumn = useDynamicCallback<CustomColDef<R, G>>(
     (col: CustomColDef<R, G>): CustomColDef<R, G> => {
       return {
         width: 100,
@@ -288,29 +297,20 @@ const BudgetTable = <
     }
   );
 
-  const onSort = useDynamicCallback<void>((order: Order, field: keyof R) => {
-    const newOrdering = updateFieldOrdering(ordering, field, order);
-    setOrdering(newOrdering);
-    if (!isNil(cookies) && !isNil(cookies.ordering)) {
-      const kookies = new Cookies();
-      kookies.set(cookies.ordering, newOrdering);
-    }
-  });
-
-  const bodyCell = useDynamicCallback<CustomColDef<R, G>>(
+  const BodyColumn = useDynamicCallback<CustomColDef<R, G>>(
     (col: CustomColDef<R, G>): CustomColDef<R, G> => {
       return {
-        cellRenderer: "ValueCell",
+        cellRenderer: "BodyCell",
+        ...col,
         headerComponentParams: {
           onSort: onSort,
           ordering
-        },
-        ...col
+        }
       };
     }
   );
 
-  const universalCell = useDynamicCallback<CustomColDef<R, G>>(
+  const UniversalColumn = useDynamicCallback<CustomColDef<R, G>>(
     (col: CustomColDef<R, G>): CustomColDef<R, G> => {
       return {
         ...col,
@@ -328,13 +328,13 @@ const BudgetTable = <
   );
 
   const baseColumns = useMemo((): CustomColDef<R, G>[] => {
-    let baseLeftColumns: CustomColDef<R, G>[] = [indexCell({})];
+    let baseLeftColumns: CustomColDef<R, G>[] = [IndexColumn({})];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
-      baseLeftColumns.push(expandCell({}));
+      baseLeftColumns.push(ExpandColumn({}));
     }
-    baseLeftColumns.push(identifierCell({}));
+    baseLeftColumns.push(IdentifierColumn({}));
     return baseLeftColumns;
   }, [onRowExpand]);
 
@@ -366,19 +366,19 @@ const BudgetTable = <
       baseColumns,
       map(
         filter(columns, (col: CustomColDef<R, G>) => !(col.isCalculated === true)),
-        (def: CustomColDef<R, G>) => bodyCell(def)
+        (def: CustomColDef<R, G>) => BodyColumn(def)
       ),
       map(
         filter(columns, (col: CustomColDef<R, G>) => col.isCalculated === true),
-        (def: CustomColDef<R, G>) => calculatedCell(def)
+        (def: CustomColDef<R, G>) => CalculatedColumn(def)
       )
     );
     setColDefs(
       map(cols, (col: CustomColDef<R, G>, index: number) => {
         if (index === cols.length - 1) {
-          return universalCell({ ...col, resizable: false });
+          return UniversalColumn({ ...col, resizable: false });
         }
-        return universalCell(col);
+        return UniversalColumn(col);
       })
     );
   }, [useDeepEqualMemo(columns), baseColumns]);
@@ -663,7 +663,6 @@ const BudgetTable = <
             colDefs={colDefs}
             columns={columns}
             sizeColumnsToFit={sizeColumnsToFit}
-            frameworkComponents={frameworkComponents}
             identifierField={identifierField}
             identifierValue={tableFooterIdentifierValue}
             setColumnApi={setTableFooterColumnApi}
@@ -675,7 +674,6 @@ const BudgetTable = <
               colDefs={colDefs}
               columns={columns}
               sizeColumnsToFit={sizeColumnsToFit}
-              frameworkComponents={frameworkComponents}
               identifierField={identifierField}
               identifierValue={budgetFooterIdentifierValue}
               loadingBudget={loadingBudget}

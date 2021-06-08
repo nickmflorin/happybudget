@@ -44,7 +44,7 @@ const IdentifierCell = <R extends Table.Row<G>, G extends Model.Group = Model.Gr
         row.meta.isTableFooter === false && row.meta.isBudgetFooter === false ? props.className : undefined
       )}
     >
-      {props.value}
+      {props.children}
     </ValueCell>
   );
 };

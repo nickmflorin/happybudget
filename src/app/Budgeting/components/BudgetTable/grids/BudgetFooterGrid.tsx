@@ -1,14 +1,13 @@
 import { useMemo } from "react";
 import { map, isNil, filter, reduce } from "lodash";
 
-import { AgGridReact } from "@ag-grid-community/react";
 import { GridReadyEvent, FirstDataRenderedEvent } from "@ag-grid-community/core";
 
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString } from "lib/util";
 
-import { IndexCell, ValueCell, IdentifierCell, CalculatedCell } from "../cells";
 import { BudgetFooterGridProps, CustomColDef } from "../model";
+import Grid from "./Grid";
 
 const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
   identifierField,
@@ -16,7 +15,6 @@ const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.
   options,
   columns,
   colDefs,
-  frameworkComponents,
   loadingBudget,
   sizeColumnsToFit,
   setColumnApi
@@ -77,23 +75,15 @@ const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.
 
   return (
     <div className={"budget-footer-grid"}>
-      <AgGridReact
+      <Grid
         {...options}
         columnDefs={colDefs}
         rowData={[rowData]}
         rowClass={"row--budget-footer"}
-        suppressRowClickSelection={true}
         onGridReady={onGridReady}
         onFirstDataRendered={onFirstDataRendered}
         headerHeight={0}
         rowHeight={28}
-        frameworkComponents={{
-          IndexCell,
-          ValueCell,
-          IdentifierCell,
-          CalculatedCell,
-          ...frameworkComponents
-        }}
       />
     </div>
   );

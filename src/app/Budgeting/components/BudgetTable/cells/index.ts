@@ -1,10 +1,11 @@
 export { default as ExpandCell } from "./ExpandCell";
-export { default as ValueCell } from "./ValueCell";
 export { default as IdentifierCell } from "./IdentifierCell";
 export { default as CalculatedCell } from "./CalculatedCell";
 export { default as IndexCell } from "./IndexCell";
 export { default as BudgetItemCell } from "./BudgetItemCell";
 export { default as ColorCell } from "./ColorCell";
 export { default as HeaderCell } from "./HeaderCell";
+export { default as BodyCell } from "./BodyCell";
 export * from "./FringesCells";
 export * from "./ModelTagCells";
+export { default as withCellPreparations } from "./withCellPreparations";

@@ -5,8 +5,6 @@ import { useLocation } from "react-router-dom";
 
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { AgGridReact } from "@ag-grid-community/react";
-import { AllModules } from "@ag-grid-enterprise/all-modules";
 import { ChangeDetectionStrategyType } from "@ag-grid-community/react/lib/changeDetectionService";
 import {
   CellEditingStoppedEvent,
@@ -33,35 +31,11 @@ import {
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
-import { TABLE_DEBUG } from "config";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 
-import {
-  ExpandCell,
-  IndexCell,
-  ValueCell,
-  SubAccountUnitCell,
-  IdentifierCell,
-  CalculatedCell,
-  PaymentMethodCell,
-  BudgetItemCell,
-  FringeUnitCell,
-  BudgetFringesCell,
-  TemplateFringesCell,
-  HeaderCell,
-  ColorCell
-} from "../cells";
-import {
-  SubAccountUnitCellEditor,
-  BudgetFringesCellEditor,
-  FringeUnitCellEditor,
-  TemplateFringesCellEditor,
-  PaymentMethodCellEditor,
-  BudgetItemsTreeEditor,
-  FringesColorEditor
-} from "../editors";
 import { PrimaryGridProps, CustomColDef, CellPositionMoveOptions, isKeyboardEvent } from "../model";
-import { rangeSelectionIsSingleCell, originalColDef } from "../util";
+import { rangeSelectionIsSingleCell } from "../util";
+import Grid from "./Grid";
 
 const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
   /* eslint-disable indent */
@@ -722,24 +696,15 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
 
   return (
     <div className={"table-grid"}>
-      <AgGridReact
+      <Grid
         {...options}
-        columnDefs={map(colDefs, (colDef: CustomColDef<R, G>) => originalColDef(includeCellEditorParams(colDef)))}
+        columnDefs={map(colDefs, (colDef: CustomColDef<R, G>) => includeCellEditorParams(colDef))}
         getContextMenuItems={getContextMenuItems}
-        allowContextMenuWithControlKey={true}
-        cellFlashDelay={100}
-        cellFadeDelay={500}
-        // Required to get processCellFromClipboard to work with column spanning.
-        suppressCopyRowsToClipboard={true}
         rowData={table}
-        debug={process.env.NODE_ENV === "development" && TABLE_DEBUG}
         getRowNodeId={(r: any) => r.id}
         getRowClass={getRowClass}
         immutableData={true}
-        suppressRowClickSelection={true}
         onGridReady={onGridReady}
-        /* @ts-ignore */
-        modules={AllModules}
         processCellForClipboard={(params: ProcessCellForExportParams) => {
           if (!isNil(params.node)) {
             setCutCellChange(null);
@@ -747,15 +712,6 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
           }
         }}
         processCellFromClipboard={_processCellFromClipboard}
-        undoRedoCellEditing={true}
-        undoRedoCellEditingLimit={5}
-        stopEditingWhenGridLosesFocus={true}
-        rowHeight={36}
-        headerHeight={38}
-        enableRangeSelection={true}
-        animateRows={true}
-        overlayNoRowsTemplate={"<span></span>"}
-        overlayLoadingTemplate={"<span></span>"}
         navigateToNextCell={navigateToNextCell}
         tabToNextCell={tabToNextCell}
         onCellKeyDown={onCellKeyDown}
@@ -783,30 +739,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         // However, for now we will leave.  It is important to note that this will
         // cause the table renders to be slower for large datasets.
         rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
-        enterMovesDown={false}
-        frameworkComponents={{
-          ExpandCell,
-          IndexCell,
-          ValueCell,
-          SubAccountUnitCell,
-          FringeUnitCell,
-          IdentifierCell,
-          CalculatedCell,
-          PaymentMethodCell,
-          BudgetItemCell,
-          BudgetFringesCell,
-          TemplateFringesCell,
-          ColorCell,
-          FringesColorEditor,
-          FringeUnitCellEditor,
-          BudgetFringesCellEditor,
-          TemplateFringesCellEditor,
-          SubAccountUnitCellEditor,
-          PaymentMethodCellEditor,
-          BudgetItemsTreeEditor,
-          agColumnHeader: HeaderCell,
-          ...frameworkComponents
-        }}
+        frameworkComponents={frameworkComponents}
         onPasteStart={onPasteStart}
         onPasteEnd={onPasteEnd}
         onCellValueChanged={_onCellValueChanged}
