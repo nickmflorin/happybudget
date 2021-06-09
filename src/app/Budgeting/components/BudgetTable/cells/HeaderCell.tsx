@@ -31,7 +31,7 @@ export interface HeaderCellProps<R extends Table.Row> extends IHeaderCompParams,
   onSort?: (order: Order, field: keyof R, colDef: ColDef, column: Column) => void;
   onEdit?: (field: keyof R, colDef: ColDef, column: Column) => void;
   ordering?: FieldOrdering<keyof R>;
-  colDef: BudgetTable.ColDef<R>;
+  colDef: Table.Column<R>;
 }
 
 const HeaderCell = <R extends Table.Row>({
@@ -47,7 +47,7 @@ const HeaderCell = <R extends Table.Row>({
 }: HeaderCellProps<R>): JSX.Element => {
   const [order, setOrder] = useState<Order>(0);
 
-  const columnType: BudgetTable.ColumnType | null = useMemo(() => {
+  const columnType: Table.ColumnType | null = useMemo(() => {
     return find(models.ColumnTypes, { id: colDef.type } as any) || null;
   }, [colDef]);
 

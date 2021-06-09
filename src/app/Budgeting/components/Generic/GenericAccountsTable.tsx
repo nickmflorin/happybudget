@@ -6,7 +6,7 @@ import { faSigma, faPercentage, faUpload, faTrashAlt } from "@fortawesome/pro-so
 import BudgetTable from "../BudgetTable";
 
 export interface GenericAccountsTableProps<
-  R extends Table.AccountRow<G>,
+  R extends BudgetTable.AccountRow<G>,
   M extends Model.Account,
   G extends Model.Group,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
@@ -23,7 +23,7 @@ export interface GenericAccountsTableProps<
 }
 
 const GenericAccountsTable = <
-  R extends Table.AccountRow<G>,
+  R extends BudgetTable.AccountRow<G>,
   M extends Model.Account,
   G extends Model.Group,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>

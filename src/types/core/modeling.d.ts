@@ -14,6 +14,16 @@ namespace Model {
     readonly id: number;
   }
 
+  interface IModel<M extends Model.Model> extends M {}
+
+  interface HttpModel extends Model.Model {}
+
+  interface IHttpModel<M extends Model.HttpModel, P extends Http.ModelPayload<M> = Http.ModelPayload<M>> extends M {
+    readonly id: number;
+    refresh: (options: Http.RequestOptions) => Promise<void>;
+    patch: (payload: P | FormData, options: Http.RequestOptions) => Promise<Model.HttpModel>;
+  }
+
   interface Choice<I extends number, N extends string> {
     id: I;
     name: N;
@@ -21,15 +31,15 @@ namespace Model {
 
   type ProductionTypeName = "Film" | "Episodic" | "Music Video" | "Commercial" | "Documentary" | "Custom";
   type ProductionTypeId = 0 | 1 | 2 | 3 | 4 | 5;
-  type ProductionType = Choice<ProductionTypeId, ProductionTypeName>;
+  type ProductionType = Model.Choice<ProductionTypeId, ProductionTypeName>;
 
   type PaymentMethodName = "Check" | "Card" | "Wire";
   type PaymentMethodId = 0 | 1 | 2;
-  type PaymentMethod = Choice<PaymentMethodId, PaymentMethodName>;
+  type PaymentMethod = Model.Choice<PaymentMethodId, PaymentMethodName>;
 
   type FringeUnitId = 0 | 1;
   type FringeUnitName = "Percent" | "Flat";
-  type FringeUnit = Choice<FringeUnitId, FringeUnitName>;
+  type FringeUnit = Model.Choice<FringeUnitId, FringeUnitName>;
 
   type ContactRoleName =
     | "Producer"
@@ -44,7 +54,7 @@ namespace Model {
     | "Client"
     | "Other";
   type ContactRoleId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-  type ContactRole = Choice<ContactRoleId, ContactRoleName>;
+  type ContactRole = Model.Choice<ContactRoleId, ContactRoleName>;
 
   type EntityType = "budget" | "template" | "account" | "subaccount";
   type BudgetType = "budget" | "template";
@@ -58,13 +68,6 @@ namespace Model {
     readonly title: string;
     readonly order: number;
     readonly color: string | null;
-  }
-
-  interface TrackedModel extends Model.Model {
-    readonly created_by: number | null;
-    readonly updated_by: number | null;
-    readonly created_at: string;
-    readonly updated_at: string;
   }
 
   interface SimpleUser extends Model.Model {
@@ -92,39 +95,47 @@ namespace Model {
     readonly is_first_time: boolean;
   }
 
-  interface Fringe extends Model.TrackedModel {
+  interface Fringe extends Model.Model {
     readonly color: string | null;
-    readonly name: string;
+    readonly name: string | null;
     readonly description: string | null;
     readonly cutoff: number | null;
-    readonly rate: number;
-    readonly unit: Model.FringeUnit;
+    readonly rate: number | null;
+    readonly unit: Model.FringeUnit | null;
+    readonly created_by: number | null;
+    readonly updated_by: number | null;
+    readonly created_at: string;
+    readonly updated_at: string;
   }
 
-  interface BaseBudget extends Model {
+  interface BaseBudget extends Model.HttpModel {
     readonly name: string;
     readonly type: BudgetType;
+    readonly created_at: string;
+    readonly updated_at: string;
+    readonly created_by: number;
+    readonly updated_by: number | null;
   }
 
   interface SimpleTemplate extends Model.BaseBudget {
     readonly type: "template";
-    readonly created_at: string;
-    readonly updated_at: string;
-    readonly created_by: number;
     readonly image: string | null;
   }
+
+  interface ISimpleTemplate extends Model.IModel<Model.SimpleTemplate> {}
 
   interface Template extends Model.SimpleTemplate {
     readonly estimated: number | null;
   }
 
+  interface ITemplate extends Model.IHttpModel<Model.Template, Http.TemplatePayload> {}
+
   interface SimpleBudget extends Model.BaseBudget {
     readonly type: "budget";
-    readonly created_at: string;
-    readonly updated_at: string;
-    readonly created_by: number;
     readonly image: string | null;
   }
+
+  interface ISimpleBudget extends Model.IModel<Model.SimpleBudget> {}
 
   interface Budget extends Model.SimpleBudget {
     readonly project_number: number;
@@ -140,12 +151,18 @@ namespace Model {
     readonly estimated: number | null;
   }
 
-  interface Group extends Model.TrackedModel {
+  interface IBudget extends Model.IHttpModel<Model.Budget, Http.BudgetPayload> {}
+
+  interface Group extends Model.Model {
     readonly children: number[];
     readonly name: string;
     readonly color: string | null;
     readonly estimated: number | null;
     readonly children: number[];
+    readonly created_by: number | null;
+    readonly updated_by: number | null;
+    readonly created_at: string;
+    readonly updated_at: string;
   }
 
   interface BudgetGroup extends Model.Group {
@@ -173,7 +190,7 @@ namespace Model {
 
   type Tree = Model.AccountTreeNode[];
 
-  interface Account extends Model.SimpleAccount, Model.TrackedModel {
+  interface Account extends Model.SimpleAccount {
     readonly access: number[];
     readonly ancestors: Model.Entity[];
     readonly estimated: number | null;
@@ -181,6 +198,10 @@ namespace Model {
     readonly group: number | null;
     readonly siblings: Model.SimpleAccount[];
     readonly budget: number;
+    readonly created_by: number | null;
+    readonly updated_by: number | null;
+    readonly created_at: string;
+    readonly updated_at: string;
   }
 
   interface BudgetAccount extends Model.Account {
@@ -197,7 +218,7 @@ namespace Model {
     readonly description: string | null;
   }
 
-  interface SubAccount extends Model.SimpleSubAccount, Model.TrackedModel {
+  interface SubAccount extends Model.SimpleSubAccount {
     readonly quantity: number | null;
     readonly rate: number | null;
     readonly multiplier: number | null;
@@ -212,6 +233,10 @@ namespace Model {
     readonly subaccounts: number[];
     readonly siblings: Model.SimpleSubAccount[];
     readonly ancestors: Model.Entity[];
+    readonly created_by: number | null;
+    readonly updated_by: number | null;
+    readonly created_at: string;
+    readonly updated_at: string;
   }
 
   interface BudgetSubAccount extends Model.SubAccount {
@@ -230,7 +255,7 @@ namespace Model {
   type SimpleEntity = Model.SimpleAccount | Model.SimpleBudget | Model.SimpleSubAccount | Model.SimpleTemplate;
   type Entity = Model.Account | Model.Budget | Model.SubAccount | Model.Template;
 
-  interface Actual extends Model.TrackedModel {
+  interface Actual extends Model.Model {
     readonly vendor: string | null;
     readonly description: string | null;
     readonly purchase_order: string | null;
@@ -239,6 +264,10 @@ namespace Model {
     readonly value: string | null;
     readonly payment_method: Model.PaymentMethod | null;
     readonly account: Model.SimpleAccount | Model.SimpleSubAccount | null;
+    readonly created_by: number | null;
+    readonly updated_by: number | null;
+    readonly created_at: string;
+    readonly updated_at: string;
   }
 
   interface Comment extends Model.Model {

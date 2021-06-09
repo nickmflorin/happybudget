@@ -69,7 +69,12 @@ const AccountsTable = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <GenericAccountsTable<Table.BudgetAccountRow, Model.BudgetAccount, Model.BudgetGroup, Http.BudgetAccountPayload>
+      <GenericAccountsTable<
+        BudgetTable.BudgetAccountRow,
+        Model.BudgetAccount,
+        Model.BudgetGroup,
+        Http.BudgetAccountPayload
+      >
         data={data}
         groups={groups}
         manager={models.BudgetAccountRowManager}
@@ -82,16 +87,16 @@ const AccountsTable = (): JSX.Element => {
         onRowAdd={() => dispatch(bulkCreateAccountsAction(1))}
         onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
-        onRowDelete={(row: Table.BudgetAccountRow) => dispatch(removeAccountAction(row.id))}
-        onTableChange={(payload: Table.Change<Table.BudgetAccountRow>) => dispatch(tableChangedAction(payload))}
+        onRowDelete={(row: BudgetTable.BudgetAccountRow) => dispatch(removeAccountAction(row.id))}
+        onTableChange={(payload: Table.Change<BudgetTable.BudgetAccountRow>) => dispatch(tableChangedAction(payload))}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         onDeleteGroup={(group: Model.BudgetGroup) => dispatch(deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: Table.BudgetAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
-        onRowAddToGroup={(group: number, row: Table.BudgetAccountRow) =>
+        onRowRemoveFromGroup={(row: BudgetTable.BudgetAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
+        onRowAddToGroup={(group: number, row: BudgetTable.BudgetAccountRow) =>
           dispatch(addAccountToGroupAction({ id: row.id, group }))
         }
-        onGroupRows={(rows: Table.BudgetAccountRow[]) =>
-          setGroupAccounts(map(rows, (row: Table.BudgetAccountRow) => row.id))
+        onGroupRows={(rows: BudgetTable.BudgetAccountRow[]) =>
+          setGroupAccounts(map(rows, (row: BudgetTable.BudgetAccountRow) => row.id))
         }
         onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllAccountsAction(null))}

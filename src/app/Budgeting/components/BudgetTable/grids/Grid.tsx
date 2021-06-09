@@ -26,7 +26,7 @@ const Grid = ({ columnDefs, frameworkComponents, ...options }: BudgetTable.GridP
       {...options}
       // Required to get processCellFromClipboard to work with column spanning.
       suppressCopyRowsToClipboard={true}
-      columnDefs={map(columnDefs, (colDef: BudgetTable.ColDef<any, any>) => ({
+      columnDefs={map(columnDefs, (colDef: Table.Column<any, any>) => ({
         ...toAgGridColDef(colDef),
         headerComponentParams: { ...colDef.headerComponentParams, colDef }
       }))}

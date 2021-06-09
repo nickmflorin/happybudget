@@ -49,7 +49,7 @@ export function* deleteTask(id: number): SagaIterator {
   }
 }
 
-export function* updateTask(id: number, change: Table.RowChange<Table.ActualRow>): SagaIterator {
+export function* updateTask(id: number, change: Table.RowChange<BudgetTable.ActualRow>): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
   yield put(updatingActualAction({ id, value: true }));
@@ -69,7 +69,11 @@ export function* updateTask(id: number, change: Table.RowChange<Table.ActualRow>
   }
 }
 
-export function* createTask(id: number, accountType: "account" | "subaccount", row: Table.ActualRow): SagaIterator {
+export function* createTask(
+  id: number,
+  accountType: "account" | "subaccount",
+  row: BudgetTable.ActualRow
+): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
   let service = api.createAccountActual;
@@ -96,12 +100,12 @@ export function* createTask(id: number, accountType: "account" | "subaccount", r
   }
 }
 
-export function* bulkUpdateTask(id: number, changes: Table.RowChange<Table.ActualRow>[]): SagaIterator {
+export function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable.ActualRow>[]): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
   const requestPayload: Http.BulkUpdatePayload<Http.ActualPayload>[] = map(
     changes,
-    (change: Table.RowChange<Table.ActualRow>) => ({
+    (change: Table.RowChange<BudgetTable.ActualRow>) => ({
       id: change.id,
       ...models.ActualRowManager.payload(change)
     })
@@ -135,7 +139,7 @@ export function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
     const model: Model.Actual | undefined = find(ms, { id: action.payload });
     if (isNil(model)) {
       const placeholders = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.placeholders);
-      const placeholder: Table.ActualRow | undefined = find(placeholders, { id: action.payload });
+      const placeholder: BudgetTable.ActualRow | undefined = find(placeholders, { id: action.payload });
       if (isNil(placeholder)) {
         warnInconsistentState({
           action: action.type,
@@ -152,7 +156,7 @@ export function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
   }
 }
 
-export function* handleUpdateTask(action: Redux.Action<Table.RowChange<Table.ActualRow>>): SagaIterator {
+export function* handleUpdateTask(action: Redux.Action<Table.RowChange<BudgetTable.ActualRow>>): SagaIterator {
   const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const id = action.payload.id;
@@ -160,7 +164,7 @@ export function* handleUpdateTask(action: Redux.Action<Table.RowChange<Table.Act
     const model: Model.Actual | undefined = find(data, { id });
     if (isNil(model)) {
       const placeholders = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.placeholders);
-      const placeholder: Table.ActualRow | undefined = find(placeholders, { id });
+      const placeholder: BudgetTable.ActualRow | undefined = find(placeholders, { id });
       if (isNil(placeholder)) {
         warnInconsistentState({
           action: action.type,
@@ -190,18 +194,20 @@ export function* handleUpdateTask(action: Redux.Action<Table.RowChange<Table.Act
   }
 }
 
-export function* handleTableChangeTask(action: Redux.Action<Table.Change<Table.ActualRow>>): SagaIterator {
+export function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetTable.ActualRow>>): SagaIterator {
   const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
-    const merged: Table.RowChange<Table.ActualRow>[] = consolidateTableChange<Table.ActualRow>(action.payload);
+    const merged: Table.RowChange<BudgetTable.ActualRow>[] = consolidateTableChange<BudgetTable.ActualRow>(
+      action.payload
+    );
     const data = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
     const placeholders = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.placeholders);
 
-    const mergedUpdates: Table.RowChange<Table.ActualRow>[] = [];
+    const mergedUpdates: Table.RowChange<BudgetTable.ActualRow>[] = [];
     for (let i = 0; i < merged.length; i++) {
       const model: Model.Actual | undefined = find(data, { id: merged[i].id });
       if (isNil(model)) {
-        const placeholder: Table.ActualRow | undefined = find(placeholders, { id: merged[i].id });
+        const placeholder: BudgetTable.ActualRow | undefined = find(placeholders, { id: merged[i].id });
         if (isNil(placeholder)) {
           warnInconsistentState({
             action: action.type,

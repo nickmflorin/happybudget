@@ -1,7 +1,7 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
-export const tableChangedAction = simpleAction<Table.Change<Table.TemplateAccountRow>>(
+export const tableChangedAction = simpleAction<Table.Change<BudgetTable.TemplateAccountRow>>(
   ActionType.Template.Accounts.TableChanged
 );
 export const bulkCreateAccountsAction = simpleAction<number>(ActionType.Template.BulkCreate);

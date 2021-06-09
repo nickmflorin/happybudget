@@ -11,7 +11,9 @@ export const loadingBudgetItemsTreeAction = simpleAction<boolean>(ActionType.Bud
 export const responseBudgetItemsTreeAction = simpleAction<Http.ListResponse<Model.AccountTreeNode>>(
   ActionType.Budget.BudgetItemsTree.Response
 );
-export const tableChangedAction = simpleAction<Table.Change<Table.ActualRow>>(ActionType.Budget.Actuals.TableChanged);
+export const tableChangedAction = simpleAction<Table.Change<BudgetTable.ActualRow>>(
+  ActionType.Budget.Actuals.TableChanged
+);
 export const setBudgetItemsTreeSearchAction = simpleAction<string>(ActionType.Budget.BudgetItemsTree.SetSearch);
 export const removeActualAction = simpleAction<number>(ActionType.Budget.Actuals.Delete);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Actuals.Deleting);
@@ -35,7 +37,7 @@ export const removePlaceholderFromStateAction = simpleAction<number>(
   ActionType.Budget.Actuals.Placeholders.RemoveFromState
 );
 export const addPlaceholdersToStateAction = simpleAction<number>(ActionType.Budget.Actuals.Placeholders.AddToState);
-export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.ActualRow>>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<BudgetTable.ActualRow>>(
   ActionType.Budget.Actuals.Placeholders.UpdateInState
 );
 export const updateActualInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Actual>>(

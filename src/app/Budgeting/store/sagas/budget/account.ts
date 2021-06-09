@@ -178,7 +178,7 @@ export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
 const tasks = createAccountTaskSet<
   Model.BudgetAccount,
   Model.BudgetSubAccount,
-  Table.BudgetSubAccountRow,
+  BudgetTable.BudgetSubAccountRow,
   Model.BudgetGroup
 >(
   {

@@ -8,7 +8,7 @@ export const responseSubAccountAction = simpleAction<Model.TemplateSubAccount | 
   ActionType.Template.SubAccount.Response
 );
 export const bulkCreateSubAccountsAction = simpleAction<number>(ActionType.Template.SubAccount.BulkCreate);
-export const tableChangedAction = simpleAction<Table.Change<Table.TemplateSubAccountRow>>(
+export const tableChangedAction = simpleAction<Table.Change<BudgetTable.TemplateSubAccountRow>>(
   ActionType.Template.SubAccount.TableChanged
 );
 export const removeSubAccountAction = simpleAction<number>(ActionType.Template.SubAccount.SubAccounts.Delete);

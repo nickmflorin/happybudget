@@ -11,7 +11,7 @@ export const updateAccountInStateAction = simpleAction<Partial<Redux.UpdateModel
   ActionType.Template.Account.UpdateInState
 );
 export const bulkCreateSubAccountsAction = simpleAction<number>(ActionType.Template.Account.BulkCreate);
-export const tableChangedAction = simpleAction<Table.Change<Table.TemplateSubAccountRow>>(
+export const tableChangedAction = simpleAction<Table.Change<BudgetTable.TemplateSubAccountRow>>(
   ActionType.Template.Account.TableChanged
 );
 export const removeSubAccountAction = simpleAction<number>(ActionType.Template.Account.SubAccounts.Delete);

@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 import { ExpandedModelTagsMenu } from "components/menus";
 import useModelMenuEditor from "../ModelMenuEditor";
 
-export interface ModelTagCellEditorProps extends BudgetTable.CellEditorParams {}
+export interface ModelTagCellEditorProps extends Table.CellEditorParams {}
 
 interface PrivateModelTagCellEditorProps<M extends Model.Model> extends ModelTagCellEditorProps {
   models: M[];
@@ -22,7 +22,7 @@ const ModelTagCellEditor = <M extends Model.Model>(props: PrivateModelTagCellEdi
       models={props.models}
       searchIndices={props.searchIndices}
       defaultFocusOnlyItem={true}
-      onChange={(m: M, e: BudgetTable.CellDoneEditingEvent) => editor.onChange(m, e)}
+      onChange={(m: M, e: Table.CellDoneEditingEvent) => editor.onChange(m, e)}
       multiple={false}
       fillWidth={false}
       leftAlign={true}

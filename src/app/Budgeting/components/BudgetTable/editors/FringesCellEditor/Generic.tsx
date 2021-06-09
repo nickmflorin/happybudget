@@ -8,7 +8,7 @@ import { ExpandedModelTagsMenu } from "components/menus";
 import useModelMenuEditor from "../ModelMenuEditor";
 
 export interface FringesCellEditorProps<R extends Table.Row<G>, G extends Model.Group = Model.Group>
-  extends BudgetTable.CellEditorParams {
+  extends Table.CellEditorParams {
   onAddFringes: () => void;
   colId: keyof R;
   fringes: Model.Fringe[];
@@ -25,7 +25,7 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       multiple={true}
       selected={editor.value}
       models={props.fringes}
-      onChange={(ms: Model.Fringe[], e: BudgetTable.CellDoneEditingEvent) => {
+      onChange={(ms: Model.Fringe[], e: Table.CellDoneEditingEvent) => {
         editor.onChange(
           map(ms, (m: Model.Fringe) => m.id),
           e

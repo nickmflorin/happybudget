@@ -35,9 +35,8 @@ export const treeNodeWithoutChildren = (
 
 export const fringeValue = (value: number, fringes: Model.Fringe[]): number => {
   const additionalValues: number[] = [];
-  forEach(
-    filter(fringes, (fringe: Model.Fringe) => !isNil(fringe.rate)),
-    (fringe: Model.Fringe) => {
+  forEach((fringe: Model.Fringe) => {
+    if (!isNil(fringe.unit) && !isNil(fringe.rate)) {
       if (fringe.unit.id === FringeUnitModels.FLAT.id) {
         additionalValues.push(fringe.rate);
       } else {
@@ -48,7 +47,7 @@ export const fringeValue = (value: number, fringes: Model.Fringe[]): number => {
         }
       }
     }
-  );
+  });
   return value + reduce(additionalValues, (sum: number, val: number) => sum + val, 0);
 };
 

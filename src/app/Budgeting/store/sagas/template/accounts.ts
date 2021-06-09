@@ -23,7 +23,7 @@ import { createStandardSaga, createAccountsTaskSet } from "../factories";
 const tasks = createAccountsTaskSet<
   Model.Template,
   Model.TemplateAccount,
-  Table.TemplateAccountRow,
+  BudgetTable.TemplateAccountRow,
   Model.TemplateGroup,
   Http.TemplateAccountPayload
 >(

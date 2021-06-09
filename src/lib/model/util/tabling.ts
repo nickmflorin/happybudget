@@ -2,7 +2,7 @@ import { forEach, groupBy, isNil, reduce, find } from "lodash";
 import * as models from "lib/model";
 import { tableChangeIsCellChange, tableChangeIsRowChange } from "../typeguards/tabling";
 
-export const toAgGridColDef = (colDef: BudgetTable.ColDef<any, any>) => {
+export const toAgGridColDef = (colDef: Table.Column<any, any>) => {
   const {
     nullValue,
     clearBeforeEdit,

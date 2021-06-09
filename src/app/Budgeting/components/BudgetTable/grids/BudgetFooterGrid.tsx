@@ -21,17 +21,17 @@ const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.
   const rowData = useMemo((): R | null => {
     let fieldsLoading: string[] = [];
     if (loadingBudget === true) {
-      const calculatedCols: BudgetTable.ColDef<R, G>[] = filter(
+      const calculatedCols: Table.Column<R, G>[] = filter(
         columns,
-        (col: BudgetTable.ColDef<R, G>) => col.isCalculated === true
+        (col: Table.Column<R, G>) => col.isCalculated === true
       );
-      fieldsLoading = map(calculatedCols, (col: BudgetTable.ColDef<R, G>) => col.field) as string[];
+      fieldsLoading = map(calculatedCols, (col: Table.Column<R, G>) => col.field) as string[];
     }
     // TODO: Loop over the colDef's after we attribute the Base Columns with isBase = true, so
     // we can weed those out here.
     return reduce(
       columns,
-      (obj: { [key: string]: any }, col: BudgetTable.ColDef<R, G>) => {
+      (obj: { [key: string]: any }, col: Table.Column<R, G>) => {
         if (!isNil(col.field)) {
           if (col.isCalculated === true) {
             if (!isNil(col.budgetTotal)) {

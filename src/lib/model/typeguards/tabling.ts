@@ -1,11 +1,11 @@
 import { SyntheticEvent } from "react";
 import { getKeyValue } from "lib/util";
 
-export const isKeyboardEvent = (e: BudgetTable.CellDoneEditingEvent): e is KeyboardEvent => {
+export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEvent => {
   return (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;
 };
 
-export const isSyntheticClickEvent = (e: BudgetTable.CellDoneEditingEvent): e is SyntheticEvent => {
+export const isSyntheticClickEvent = (e: Table.CellDoneEditingEvent): e is SyntheticEvent => {
   return (e as SyntheticEvent).type === "click";
 };
 

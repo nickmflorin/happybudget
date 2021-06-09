@@ -46,7 +46,7 @@ export const updateCommentInStateAction = simpleAction<
 /*
   Actions Pertaining to Account Sub Accounts
 */
-export const tableChangedAction = simpleAction<Table.Change<Table.BudgetSubAccountRow>>(
+export const tableChangedAction = simpleAction<Table.Change<BudgetTable.BudgetSubAccountRow>>(
   ActionType.Budget.Account.TableChanged
 );
 export const removeSubAccountAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Delete);

@@ -22,7 +22,7 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
     // we can weed those out here.
     return reduce(
       columns,
-      (obj: { [key: string]: any }, col: BudgetTable.ColDef<R, G>) => {
+      (obj: { [key: string]: any }, col: Table.Column<R, G>) => {
         if (!isNil(col.field)) {
           if (col.isCalculated === true) {
             if (!isNil(col.tableTotal)) {

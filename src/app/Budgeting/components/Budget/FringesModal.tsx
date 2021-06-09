@@ -68,8 +68,8 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
       onRowAdd={() => dispatch(addFringesPlaceholdersToStateAction(1))}
       onRowSelect={(id: number) => dispatch(selectFringeAction(id))}
       onRowDeselect={(id: number) => dispatch(deselectFringeAction(id))}
-      onRowDelete={(row: Table.FringeRow) => dispatch(removeFringeAction(row.id))}
-      onTableChange={(payload: Table.Change<Table.FringeRow>) => dispatch(tableChangedAction(payload))}
+      onRowDelete={(row: BudgetTable.FringeRow) => dispatch(removeFringeAction(row.id))}
+      onTableChange={(payload: Table.Change<BudgetTable.FringeRow>) => dispatch(tableChangedAction(payload))}
       onSelectAll={() => dispatch(selectAllFringesAction(null))}
     />
   );

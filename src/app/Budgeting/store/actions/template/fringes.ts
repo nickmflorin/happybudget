@@ -10,7 +10,9 @@ export const clearFringesPlaceholdersToStateAction = simpleAction<null>(ActionTy
 export const addFringesPlaceholdersToStateAction = simpleAction<number>(
   ActionType.Template.Fringes.Placeholders.AddToState
 );
-export const tableChangedAction = simpleAction<Table.Change<Table.FringeRow>>(ActionType.Template.Fringes.TableChanged);
+export const tableChangedAction = simpleAction<Table.Change<BudgetTable.FringeRow>>(
+  ActionType.Template.Fringes.TableChanged
+);
 export const removeFringeAction = simpleAction<number>(ActionType.Template.Fringes.Delete);
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Fringes.Deleting);
 export const updatingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Fringes.Updating);
@@ -31,7 +33,7 @@ export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderP
 export const removePlaceholderFromStateAction = simpleAction<number>(
   ActionType.Template.Fringes.Placeholders.RemoveFromState
 );
-export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<Table.FringeRow>>(
+export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<BudgetTable.FringeRow>>(
   ActionType.Template.Fringes.Placeholders.UpdateInState
 );
 

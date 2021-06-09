@@ -12,23 +12,23 @@ import { getKeyValue } from "lib/util";
 import { findChoiceForName } from "lib/model/util";
 import { percentageToDecimalValueSetter } from "lib/model/valueSetters";
 import { percentageValueFormatter } from "lib/model/formatters";
-import BudgetTable from "../BudgetTable";
+import BudgetTableComponent from "../BudgetTable";
 
 export interface GenericFringesTableProps
   extends Omit<
-    BudgetTable.Props<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>,
+    BudgetTable.Props<BudgetTable.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>,
     "manager" | "identifierField" | "identifierFieldHeader" | "columns"
   > {
   saving: boolean;
   search: string;
   selected: number[];
-  placeholders: Table.FringeRow[];
+  placeholders: BudgetTable.FringeRow[];
   data: Model.Fringe[];
-  onTableChange: (change: Table.Change<Table.FringeRow>) => void;
+  onTableChange: (change: Table.Change<BudgetTable.FringeRow>) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
   onRowAdd: () => void;
-  onRowDelete: (row: Table.FringeRow) => void;
+  onRowDelete: (row: BudgetTable.FringeRow) => void;
   onRowExpand?: (id: number) => void;
   onSelectAll: () => void;
   onSearch: (value: string) => void;
@@ -36,7 +36,7 @@ export interface GenericFringesTableProps
 
 const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): JSX.Element => {
   return (
-    <BudgetTable<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>
+    <BudgetTableComponent<BudgetTable.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>
       className={"fringes-table"}
       detached={true}
       manager={models.FringeRowManager}
@@ -47,7 +47,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
       canToggleColumns={false}
       indexColumn={{ width: 40, maxWidth: 50 }}
       cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
-      actions={(params: BudgetTable.MenuActionParams<Table.FringeRow, Model.Group>) => [
+      actions={(params: BudgetTable.MenuActionParams<BudgetTable.FringeRow, Model.Group>) => [
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
@@ -74,7 +74,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
           field: "rate",
           headerName: "Rate",
           valueFormatter: percentageValueFormatter,
-          valueSetter: percentageToDecimalValueSetter<Table.FringeRow>("rate"),
+          valueSetter: percentageToDecimalValueSetter<BudgetTable.FringeRow>("rate"),
           type: "percentage"
         },
         {
@@ -93,8 +93,8 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
             }
             return false;
           },
-          processCellForClipboard: (row: Table.FringeRow) => {
-            const unit = getKeyValue<Table.FringeRow, keyof Table.FringeRow>("unit")(row);
+          processCellForClipboard: (row: BudgetTable.FringeRow) => {
+            const unit = getKeyValue<BudgetTable.FringeRow, keyof BudgetTable.FringeRow>("unit")(row);
             if (isNil(unit)) {
               return "";
             }

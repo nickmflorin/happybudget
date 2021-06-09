@@ -3,7 +3,7 @@ import { getKeyValue } from "lib/util";
 import { RowManager, ReadWrite, ReadOnly, WriteOnly } from "lib/model/models";
 
 export const BudgetAccountRowManager = new RowManager<
-  Table.BudgetAccountRow,
+  BudgetTable.BudgetAccountRow,
   Model.BudgetAccount,
   Http.BudgetAccountPayload,
   Model.BudgetGroup
@@ -25,7 +25,7 @@ export const BudgetAccountRowManager = new RowManager<
 });
 
 export const TemplateAccountRowManager = new RowManager<
-  Table.TemplateAccountRow,
+  BudgetTable.TemplateAccountRow,
   Model.TemplateAccount,
   Http.TemplateAccountPayload,
   Model.TemplateGroup
@@ -45,7 +45,7 @@ export const TemplateAccountRowManager = new RowManager<
 });
 
 export const BudgetSubAccountRowManager = new RowManager<
-  Table.BudgetSubAccountRow,
+  BudgetTable.BudgetSubAccountRow,
   Model.BudgetSubAccount,
   Http.SubAccountPayload,
   Model.BudgetGroup
@@ -82,7 +82,7 @@ export const BudgetSubAccountRowManager = new RowManager<
 });
 
 export const TemplateSubAccountRowManager = new RowManager<
-  Table.TemplateSubAccountRow,
+  BudgetTable.TemplateSubAccountRow,
   Model.TemplateSubAccount,
   Http.SubAccountPayload,
   Model.TemplateGroup
@@ -116,7 +116,7 @@ export const TemplateSubAccountRowManager = new RowManager<
   rowType: "subaccount"
 });
 
-export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Http.ActualPayload, Model.Group>({
+export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actual, Http.ActualPayload, Model.Group>({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
     // TODO: Eventually, we need to allow this to be null.
@@ -124,16 +124,18 @@ export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Ht
       field: "object_id",
       http: ["PATCH"],
       required: true,
-      getValueFromRow: (row: Table.ActualRow) => {
+      getValueFromRow: (row: BudgetTable.ActualRow) => {
         if (!isNil(row.account)) {
           return row.account.id;
         }
         return null;
       },
-      getValueFromRowChangeData: (data: Table.RowChangeData<Table.ActualRow>) => {
-        const cellChange: Table.CellChange<Table.ActualRow[keyof Table.ActualRow]> | undefined = getKeyValue<
-          { [key in keyof Table.ActualRow]?: Table.CellChange<Table.ActualRow[key]> },
-          keyof Table.ActualRow
+      getValueFromRowChangeData: (data: Table.RowChangeData<BudgetTable.ActualRow>) => {
+        const cellChange:
+          | Table.CellChange<BudgetTable.ActualRow[keyof BudgetTable.ActualRow]>
+          | undefined = getKeyValue<
+          { [key in keyof BudgetTable.ActualRow]?: Table.CellChange<BudgetTable.ActualRow[key]> },
+          keyof BudgetTable.ActualRow
         >("account")(data);
         if (cellChange !== undefined) {
           const account: Model.SimpleAccount | Model.SimpleSubAccount | null = cellChange.newValue;
@@ -150,16 +152,18 @@ export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Ht
       field: "parent_type",
       http: ["PATCH"],
       required: true,
-      getValueFromRow: (row: Table.ActualRow) => {
+      getValueFromRow: (row: BudgetTable.ActualRow) => {
         if (!isNil(row.account)) {
           return row.account.type;
         }
         return null;
       },
-      getValueFromRowChangeData: (data: Table.RowChangeData<Table.ActualRow>) => {
-        const cellChange: Table.CellChange<Table.ActualRow[keyof Table.ActualRow]> | undefined = getKeyValue<
-          { [key in keyof Table.ActualRow]?: Table.CellChange<Table.ActualRow[key]> },
-          keyof Table.ActualRow
+      getValueFromRowChangeData: (data: Table.RowChangeData<BudgetTable.ActualRow>) => {
+        const cellChange:
+          | Table.CellChange<BudgetTable.ActualRow[keyof BudgetTable.ActualRow]>
+          | undefined = getKeyValue<
+          { [key in keyof BudgetTable.ActualRow]?: Table.CellChange<BudgetTable.ActualRow[key]> },
+          keyof BudgetTable.ActualRow
         >("account")(data);
         if (cellChange !== undefined) {
           const account: Model.SimpleAccount | Model.SimpleSubAccount | null = cellChange.newValue;
@@ -193,7 +197,7 @@ export const ActualRowManager = new RowManager<Table.ActualRow, Model.Actual, Ht
   rowType: "actual"
 });
 
-export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Http.FringePayload, Model.Group>({
+export const FringeRowManager = new RowManager<BudgetTable.FringeRow, Model.Fringe, Http.FringePayload, Model.Group>({
   fields: [
     ReadWrite({ field: "name", required: true }),
     ReadWrite({ field: "description", allowNull: true }),
@@ -215,14 +219,3 @@ export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Ht
   typeLabel: "Fringe",
   rowType: "fringe"
 });
-
-const RowManagers = {
-  BudgetAccountRowManager,
-  BudgetSubAccountRowManager,
-  TemplateAccountRowManager,
-  TemplateSubAccountRowManager,
-  FringeRowManager,
-  ActualRowManager
-};
-
-export default RowManagers;

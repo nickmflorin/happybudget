@@ -176,7 +176,7 @@ export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
   }
 }
 
-const tasks = createSubAccountTaskSet<Model.BudgetSubAccount, Table.BudgetSubAccountRow, Model.BudgetGroup>(
+const tasks = createSubAccountTaskSet<Model.BudgetSubAccount, BudgetTable.BudgetSubAccountRow, Model.BudgetGroup>(
   {
     loading: loadingSubAccountsAction,
     deleting: deletingSubAccountAction,

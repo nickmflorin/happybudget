@@ -32,7 +32,7 @@ import {
   setBudgetItemsTreeSearchAction
 } from "../../store/actions/budget/actuals";
 import { selectBudgetDetail } from "../../store/selectors";
-import BudgetTable from "../BudgetTable";
+import BudgetTableComponent from "../BudgetTable";
 
 const selectSelectedRows = simpleDeepEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.selected
@@ -78,7 +78,7 @@ const Actuals = (): JSX.Element => {
 
   return (
     <WrapInApplicationSpinner loading={loading}>
-      <BudgetTable<Table.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>
+      <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>
         data={data}
         placeholders={placeholders}
         manager={models.ActualRowManager}
@@ -89,7 +89,7 @@ const Actuals = (): JSX.Element => {
           minWidth: 200,
           maxWidth: 200,
           width: 200,
-          processCellForClipboard: (row: Table.ActualRow) => {
+          processCellForClipboard: (row: BudgetTable.ActualRow) => {
             if (!isNil(row.account)) {
               const item: Model.BudgetLineItem | undefined = find(budgetItems, {
                 id: row.account.id,
@@ -122,11 +122,11 @@ const Actuals = (): JSX.Element => {
         onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
         onRowSelect={(id: number) => dispatch(selectActualAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectActualAction(id))}
-        onRowDelete={(row: Table.ActualRow) => dispatch(removeActualAction(row.id))}
-        onTableChange={(payload: Table.Change<Table.ActualRow>) => dispatch(tableChangedAction(payload))}
+        onRowDelete={(row: BudgetTable.ActualRow) => dispatch(removeActualAction(row.id))}
+        onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) => dispatch(tableChangedAction(payload))}
         onSelectAll={() => dispatch(selectAllActualsAction(null))}
         exportFileName={"actuals.csv"}
-        actions={(params: BudgetTable.MenuActionParams<Table.ActualRow, Model.Group>) => [
+        actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow, Model.Group>) => [
           {
             tooltip: "Delete",
             icon: <FontAwesomeIcon icon={faTrashAlt} />,
@@ -156,10 +156,9 @@ const Actuals = (): JSX.Element => {
           {
             field: "date",
             headerName: "Date",
-            cellStyle: { textAlign: "right" },
             flex: 1,
             valueFormatter: dateValueFormatter,
-            valueSetter: dateTimeValueSetter<Table.ActualRow>("date"),
+            valueSetter: dateTimeValueSetter<BudgetTable.ActualRow>("date"),
             type: "date"
           },
           {
@@ -178,8 +177,10 @@ const Actuals = (): JSX.Element => {
               }
               return false;
             },
-            processCellForClipboard: (row: Table.ActualRow) => {
-              const payment_method = getKeyValue<Table.ActualRow, keyof Table.ActualRow>("payment_method")(row);
+            processCellForClipboard: (row: BudgetTable.ActualRow) => {
+              const payment_method = getKeyValue<BudgetTable.ActualRow, keyof BudgetTable.ActualRow>("payment_method")(
+                row
+              );
               if (isNil(payment_method)) {
                 return "";
               }
@@ -207,7 +208,7 @@ const Actuals = (): JSX.Element => {
             headerName: "Amount",
             flex: 1,
             valueFormatter: currencyValueFormatter,
-            valueSetter: floatValueSetter<Table.ActualRow>("value"),
+            valueSetter: floatValueSetter<BudgetTable.ActualRow>("value"),
             tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
             type: "text"
           }

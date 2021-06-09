@@ -30,7 +30,7 @@ import { createStandardSaga, createAccountTaskSet } from "../factories";
 const tasks = createAccountTaskSet<
   Model.TemplateAccount,
   Model.TemplateSubAccount,
-  Table.TemplateSubAccountRow,
+  BudgetTable.TemplateSubAccountRow,
   Model.TemplateGroup
 >(
   {

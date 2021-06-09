@@ -12,7 +12,7 @@ import {
   faPercentage
 } from "@fortawesome/pro-solid-svg-icons";
 
-const ColumnTypes: BudgetTable.ColumnType[] = [
+const ColumnTypes: Table.ColumnType[] = [
   {
     id: "text",
     icon: faFontCase,

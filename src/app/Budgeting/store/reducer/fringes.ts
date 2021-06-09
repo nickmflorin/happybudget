@@ -56,7 +56,7 @@ const createRootReducer = <
         ...newState,
         placeholders: filter(
           newState.placeholders,
-          (placeholder: Table.FringeRow) => placeholder.id !== action.payload.id
+          (placeholder: BudgetTable.FringeRow) => placeholder.id !== action.payload.id
         ),
         data: [...newState.data, payload.model]
       };

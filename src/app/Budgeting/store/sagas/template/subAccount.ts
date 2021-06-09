@@ -28,7 +28,7 @@ import {
 
 import { createStandardSaga, createSubAccountTaskSet } from "../factories";
 
-const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, Table.TemplateSubAccountRow, Model.TemplateGroup>(
+const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, BudgetTable.TemplateSubAccountRow, Model.TemplateGroup>(
   {
     loading: loadingSubAccountsAction,
     deleting: deletingSubAccountAction,

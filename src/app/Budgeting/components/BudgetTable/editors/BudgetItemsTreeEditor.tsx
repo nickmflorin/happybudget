@@ -17,7 +17,7 @@ const selectBudgetItemsTreeLoading = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree.loading
 );
 
-interface BudgetItemsTreeEditorProps extends BudgetTable.CellEditorParams {
+interface BudgetItemsTreeEditorProps extends Table.CellEditorParams {
   readonly setSearch: (value: string) => void;
   readonly value: Model.SimpleAccount | Model.SimpleSubAccount;
 }
@@ -45,7 +45,7 @@ const BudgetItemsTreeEditor = ({ setSearch, ...props }: BudgetItemsTreeEditorPro
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}
       autoFocusMenu={true}
-      onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount, e: BudgetTable.CellDoneEditingEvent) => {
+      onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount, e: Table.CellDoneEditingEvent) => {
         editor.onChange(m, e);
       }}
       menuRef={menuRef}

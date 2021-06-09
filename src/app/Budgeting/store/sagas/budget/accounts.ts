@@ -212,7 +212,7 @@ export function* addToHistoryState(
 const tasks = createAccountsTaskSet<
   Model.Budget,
   Model.BudgetAccount,
-  Table.BudgetAccountRow,
+  BudgetTable.BudgetAccountRow,
   Model.BudgetGroup,
   Http.BudgetAccountPayload
 >(

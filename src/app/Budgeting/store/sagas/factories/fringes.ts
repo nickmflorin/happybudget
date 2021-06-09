@@ -21,7 +21,7 @@ export interface FringeTasksActionMap {
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
   removePlaceholderFromState: Redux.ActionCreator<number>;
   removeFromState: Redux.ActionCreator<number>;
-  updatePlaceholderInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<Table.FringeRow>>;
+  updatePlaceholderInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<BudgetTable.FringeRow>>;
   addErrorsToState: Redux.ActionCreator<Table.CellError | Table.CellError[]>;
   updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<Model.Fringe>>;
 }
@@ -44,7 +44,7 @@ export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
 export interface FringeTaskSet {
   getFringes: Redux.Task<null>;
   handleRemoval: Redux.Task<number>;
-  handleTableChange: Redux.Task<Table.Change<Table.FringeRow>>;
+  handleTableChange: Redux.Task<Table.Change<BudgetTable.FringeRow>>;
 }
 
 export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
@@ -52,7 +52,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   services: FringeServiceSet<M>,
   selectObjId: (state: Redux.ApplicationStore) => number | null,
   selectFringes: (state: Redux.ApplicationStore) => Model.Fringe[],
-  selectPlaceholders: (state: Redux.ApplicationStore) => Table.FringeRow[]
+  selectPlaceholders: (state: Redux.ApplicationStore) => BudgetTable.FringeRow[]
 ): FringeTaskSet => {
   function* deleteTask(id: number): SagaIterator {
     const CancelToken = axios.CancelToken;
@@ -72,12 +72,12 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     }
   }
 
-  function* bulkUpdateTask(id: number, changes: Table.RowChange<Table.FringeRow>[]): SagaIterator {
+  function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable.FringeRow>[]): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     const requestPayload: Http.BulkUpdatePayload<Http.FringePayload>[] = map(
       changes,
-      (change: Table.RowChange<Table.FringeRow>) => ({
+      (change: Table.RowChange<BudgetTable.FringeRow>) => ({
         id: change.id,
         ...models.FringeRowManager.payload(change)
       })
@@ -105,10 +105,10 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     }
   }
 
-  function* bulkCreateTask(id: number, rows: Table.FringeRow[]): SagaIterator {
+  function* bulkCreateTask(id: number, rows: BudgetTable.FringeRow[]): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    const requestPayload: Http.FringePayload[] = map(rows, (row: Table.FringeRow) =>
+    const requestPayload: Http.FringePayload[] = map(rows, (row: BudgetTable.FringeRow) =>
       models.FringeRowManager.payload(row)
     );
     yield put(actions.creating(true));
@@ -153,7 +153,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
       const model: Model.Fringe | undefined = find(ms, { id: action.payload });
       if (isNil(model)) {
         const placeholders = yield select(selectPlaceholders);
-        const placeholder: Table.FringeRow | undefined = find(placeholders, { id: action.payload });
+        const placeholder: BudgetTable.FringeRow | undefined = find(placeholders, { id: action.payload });
         if (isNil(placeholder)) {
           warnInconsistentState({
             action: action.type,
@@ -170,7 +170,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleTableChangeTask(action: Redux.Action<Table.Change<Table.FringeRow>>): SagaIterator {
+  function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetTable.FringeRow>>): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
       const merged = consolidateTableChange(action.payload);
@@ -178,13 +178,13 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
       const data = yield select(selectFringes);
       const placeholders = yield select(selectPlaceholders);
 
-      const mergedUpdates: Table.RowChange<Table.FringeRow>[] = [];
-      const placeholdersToCreate: Table.FringeRow[] = [];
+      const mergedUpdates: Table.RowChange<BudgetTable.FringeRow>[] = [];
+      const placeholdersToCreate: BudgetTable.FringeRow[] = [];
 
       for (let i = 0; i < merged.length; i++) {
         const model: Model.Fringe | undefined = find(data, { id: merged[i].id });
         if (isNil(model)) {
-          const placeholder: Table.FringeRow | undefined = find(placeholders, { id: merged[i].id });
+          const placeholder: BudgetTable.FringeRow | undefined = find(placeholders, { id: merged[i].id });
           if (isNil(placeholder)) {
             warnInconsistentState({
               action: action.type,

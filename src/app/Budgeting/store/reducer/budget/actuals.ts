@@ -53,7 +53,7 @@ const rootReducer: Reducer<Redux.Budgeting.Budget.ActualsStore, Redux.Action<any
       ...newState,
       placeholders: filter(
         newState.placeholders,
-        (placeholder: Table.ActualRow) => placeholder.id !== action.payload.id
+        (placeholder: BudgetTable.ActualRow) => placeholder.id !== action.payload.id
       ),
       data: [...newState.data, payload.model]
     };

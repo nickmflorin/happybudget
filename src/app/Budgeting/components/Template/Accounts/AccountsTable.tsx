@@ -69,7 +69,7 @@ const AccountsTable = (): JSX.Element => {
   return (
     <React.Fragment>
       <GenericAccountsTable<
-        Table.TemplateAccountRow,
+        BudgetTable.TemplateAccountRow,
         Model.TemplateAccount,
         Model.TemplateGroup,
         Http.TemplateAccountPayload
@@ -86,16 +86,16 @@ const AccountsTable = (): JSX.Element => {
         onRowAdd={() => dispatch(bulkCreateAccountsAction(1))}
         onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
-        onRowDelete={(row: Table.TemplateAccountRow) => dispatch(removeAccountAction(row.id))}
-        onTableChange={(payload: Table.Change<Table.TemplateAccountRow>) => dispatch(tableChangedAction(payload))}
+        onRowDelete={(row: BudgetTable.TemplateAccountRow) => dispatch(removeAccountAction(row.id))}
+        onTableChange={(payload: Table.Change<BudgetTable.TemplateAccountRow>) => dispatch(tableChangedAction(payload))}
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
         onDeleteGroup={(group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: Table.TemplateAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
-        onRowAddToGroup={(group: number, row: Table.TemplateAccountRow) =>
+        onRowRemoveFromGroup={(row: BudgetTable.TemplateAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
+        onRowAddToGroup={(group: number, row: BudgetTable.TemplateAccountRow) =>
           dispatch(addAccountToGroupAction({ id: row.id, group }))
         }
-        onGroupRows={(rows: Table.TemplateAccountRow[]) =>
-          setGroupAccounts(map(rows, (row: Table.TemplateAccountRow) => row.id))
+        onGroupRows={(rows: BudgetTable.TemplateAccountRow[]) =>
+          setGroupAccounts(map(rows, (row: BudgetTable.TemplateAccountRow) => row.id))
         }
         onEditGroup={(group: Model.TemplateGroup) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllAccountsAction(null))}

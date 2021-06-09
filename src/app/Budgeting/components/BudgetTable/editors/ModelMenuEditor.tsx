@@ -9,15 +9,15 @@ const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
 export interface IEditor<M extends Model.Model, V = M> {
-  onChange: (value: V | null, e: BudgetTable.CellDoneEditingEvent) => void;
+  onChange: (value: V | null, e: Table.CellDoneEditingEvent) => void;
   isFirstRender: boolean;
   value: V | null;
-  changedEvent: BudgetTable.CellDoneEditingEvent | null;
+  changedEvent: Table.CellDoneEditingEvent | null;
   menuRef: RefObject<ExpandedModelMenuRef<M>>;
   menu: ExpandedModelMenuRef<M> | null;
 }
 
-interface UseModelMenuEditorParams<V> extends BudgetTable.CellEditorParams {
+interface UseModelMenuEditorParams<V> extends Table.CellEditorParams {
   value: V | null;
   forwardedRef: RefObject<any>;
   menuRef?: RefObject<ExpandedModelMenuRef<any>>;
@@ -27,7 +27,7 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
   const _menuRef = useRef<ExpandedModelMenuRef<M>>(null);
   const isFirstRender = useTrackFirstRender();
   const [value, setValue] = useState<V | null>(params.value);
-  const [changedEvent, setChangedEvent] = useState<BudgetTable.CellDoneEditingEvent | null>(null);
+  const [changedEvent, setChangedEvent] = useState<Table.CellDoneEditingEvent | null>(null);
 
   const menuRef = useMemo(() => {
     if (!isNil(params.menuRef)) {
@@ -73,7 +73,7 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
       isFirstRender,
       value,
       changedEvent,
-      onChange: (model: V | null, e: BudgetTable.CellDoneEditingEvent) => {
+      onChange: (model: V | null, e: Table.CellDoneEditingEvent) => {
         setValue(model);
         setChangedEvent(e);
       }

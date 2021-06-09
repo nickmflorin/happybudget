@@ -2,7 +2,7 @@ import { EntityText } from "components/typography";
 import { isNil } from "lodash";
 import Cell, { StandardCellProps } from "./Cell";
 
-interface BudgetItemCellProps extends StandardCellProps<Table.ActualRow> {
+interface BudgetItemCellProps extends StandardCellProps<BudgetTable.ActualRow> {
   readonly value: Model.SimpleAccount | Model.SimpleSubAccount | null;
 }
 

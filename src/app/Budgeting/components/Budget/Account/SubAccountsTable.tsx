@@ -96,17 +96,21 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         onRowAdd={() => dispatch(bulkCreateSubAccountsAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
-        onRowDelete={(row: Table.BudgetSubAccountRow) => dispatch(removeSubAccountAction(row.id))}
-        onTableChange={(payload: Table.Change<Table.BudgetSubAccountRow>) => dispatch(tableChangedAction(payload))}
+        onRowDelete={(row: BudgetTable.BudgetSubAccountRow) => dispatch(removeSubAccountAction(row.id))}
+        onTableChange={(payload: Table.Change<BudgetTable.BudgetSubAccountRow>) =>
+          dispatch(tableChangedAction(payload))
+        }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}
         onDeleteGroup={(group: Model.BudgetGroup) => dispatch(deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: Table.BudgetSubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id))}
-        onRowAddToGroup={(group: number, row: Table.BudgetSubAccountRow) =>
+        onRowRemoveFromGroup={(row: BudgetTable.BudgetSubAccountRow) =>
+          dispatch(removeSubAccountFromGroupAction(row.id))
+        }
+        onRowAddToGroup={(group: number, row: BudgetTable.BudgetSubAccountRow) =>
           dispatch(addSubAccountToGroupAction({ id: row.id, group }))
         }
-        onGroupRows={(rows: Table.BudgetSubAccountRow[]) =>
-          setGroupSubAccounts(map(rows, (row: Table.BudgetSubAccountRow) => row.id))
+        onGroupRows={(rows: BudgetTable.BudgetSubAccountRow[]) =>
+          setGroupSubAccounts(map(rows, (row: BudgetTable.BudgetSubAccountRow) => row.id))
         }
         onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllSubAccountsAction(null))}

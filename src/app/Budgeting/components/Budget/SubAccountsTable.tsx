@@ -10,7 +10,7 @@ import FringesModal from "./FringesModal";
 
 interface BudgetSubAccountsTableProps
   extends Omit<
-    GenericSubAccountsTableProps<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>,
+    GenericSubAccountsTableProps<BudgetTable.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>,
     | "manager"
     | "fringes"
     | "fringesCellRenderer"
@@ -31,7 +31,7 @@ const BudgetSubAccountsTable = ({ detail, ...props }: BudgetSubAccountsTableProp
 
   return (
     <React.Fragment>
-      <GenericSubAccountsTable<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>
+      <GenericSubAccountsTable<BudgetTable.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>
         manager={models.BudgetSubAccountRowManager}
         loadingBudget={loadingBudget}
         fringes={fringes}

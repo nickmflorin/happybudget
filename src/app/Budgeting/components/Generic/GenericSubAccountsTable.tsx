@@ -11,7 +11,7 @@ import { inferModelFromName } from "lib/model/util";
 import { currencyValueFormatter } from "lib/model/formatters";
 import { floatValueSetter, integerValueSetter } from "lib/model/valueSetters";
 
-import BudgetTable from "../BudgetTable";
+import BudgetTableComponent from "../BudgetTable";
 
 export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends Model.SubAccount, G extends Model.Group>
   extends Omit<
@@ -36,7 +36,12 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
   onEditFringes: () => void;
 }
 
-const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Model.SubAccount, G extends Model.Group>({
+const GenericSubAccountsTable = <
+  R extends BudgetTable.SubAccountRow<G>,
+  M extends Model.SubAccount,
+  G extends Model.Group
+>({
+  /* eslint-disable indent */
   categoryName,
   identifierFieldHeader,
   fringes,
@@ -53,7 +58,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
   ...props
 }: GenericSubAccountsTableProps<R, M, G>): JSX.Element => {
   return (
-    <BudgetTable<R, M, G, Http.SubAccountPayload>
+    <BudgetTableComponent<R, M, G, Http.SubAccountPayload>
       sizeColumnsToFit={false}
       identifierField={"identifier"}
       identifierFieldHeader={identifierFieldHeader}
@@ -104,7 +109,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           flex: 100,
           type: "longText",
           colSpan: (params: ColSpanParams) => {
-            const row: Table.TemplateSubAccountRow = params.data;
+            const row: BudgetTable.TemplateSubAccountRow = params.data;
             if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
               return row.meta.children.length !== 0 ? 7 : 1;
             }
@@ -121,8 +126,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           field: "quantity",
           headerName: "Qty",
           width: 60,
-          cellStyle: { textAlign: "right" },
-          valueSetter: integerValueSetter<Table.TemplateSubAccountRow>("quantity"),
+          valueSetter: integerValueSetter<BudgetTable.TemplateSubAccountRow>("quantity"),
           type: "number"
         },
         {
@@ -164,17 +168,15 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           field: "multiplier",
           headerName: "X",
           width: 50,
-          cellStyle: { textAlign: "right" },
-          valueSetter: floatValueSetter<Table.TemplateSubAccountRow>("multiplier"),
+          valueSetter: floatValueSetter<BudgetTable.TemplateSubAccountRow>("multiplier"),
           type: "number"
         },
         {
           field: "rate",
           headerName: "Rate",
           width: 100,
-          cellStyle: { textAlign: "right" },
           valueFormatter: currencyValueFormatter,
-          valueSetter: floatValueSetter<Table.TemplateSubAccountRow>("rate"),
+          valueSetter: floatValueSetter<BudgetTable.TemplateSubAccountRow>("rate"),
           type: "currency"
         },
         {

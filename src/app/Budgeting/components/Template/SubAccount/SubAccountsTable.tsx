@@ -98,8 +98,10 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         onRowAdd={() => dispatch(bulkCreateSubAccountsAction(1))}
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
-        onRowDelete={(row: Table.TemplateSubAccountRow) => dispatch(removeSubAccountAction(row.id))}
-        onTableChange={(payload: Table.Change<Table.TemplateSubAccountRow>) => dispatch(tableChangedAction(payload))}
+        onRowDelete={(row: BudgetTable.TemplateSubAccountRow) => dispatch(removeSubAccountAction(row.id))}
+        onTableChange={(payload: Table.Change<BudgetTable.TemplateSubAccountRow>) =>
+          dispatch(tableChangedAction(payload))
+        }
         onBack={() => {
           if (!isNil(subaccountDetail)) {
             const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];
@@ -112,12 +114,14 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         }}
         cookies={!isNil(subaccountDetail) ? { ordering: `subaccount-${subaccountDetail.id}-table-ordering` } : {}}
         onDeleteGroup={(group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: Table.TemplateSubAccountRow) => dispatch(removeSubAccountFromGroupAction(row.id))}
-        onRowAddToGroup={(group: number, row: Table.TemplateSubAccountRow) =>
+        onRowRemoveFromGroup={(row: BudgetTable.TemplateSubAccountRow) =>
+          dispatch(removeSubAccountFromGroupAction(row.id))
+        }
+        onRowAddToGroup={(group: number, row: BudgetTable.TemplateSubAccountRow) =>
           dispatch(addSubAccountToGroupAction({ id: row.id, group }))
         }
-        onGroupRows={(rows: Table.TemplateSubAccountRow[]) =>
-          setGroupSubAccounts(map(rows, (row: Table.TemplateSubAccountRow) => row.id))
+        onGroupRows={(rows: BudgetTable.TemplateSubAccountRow[]) =>
+          setGroupSubAccounts(map(rows, (row: BudgetTable.TemplateSubAccountRow) => row.id))
         }
         onEditGroup={(group: Model.TemplateGroup) => setGroupToEdit(group)}
         onSelectAll={() => dispatch(selectAllSubAccountsAction(null))}
