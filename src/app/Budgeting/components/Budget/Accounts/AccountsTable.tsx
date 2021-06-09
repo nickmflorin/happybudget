@@ -101,21 +101,21 @@ const AccountsTable = (): JSX.Element => {
             headerName: "Estimated",
             isCalculated: true,
             tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
-            type: "number"
+            type: "sum"
           },
           {
             field: "actual",
             headerName: "Actual",
             isCalculated: true,
             tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
-            type: "number"
+            type: "sum"
           },
           {
             field: "variance",
             headerName: "Variance",
             isCalculated: true,
             tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
-            type: "number"
+            type: "sum"
           }
         ]}
       />
