@@ -5,11 +5,10 @@ import { AllModules } from "@ag-grid-enterprise/all-modules";
 
 import { TABLE_DEBUG } from "config";
 
-import { GridProps, CustomColDef } from "../model";
-import { originalColDef } from "../util";
+import { toAgGridColDef } from "lib/model/util";
 import FrameworkComponents from "./FrameworkComponents";
 
-const Grid = ({ columnDefs, frameworkComponents, ...options }: GridProps): JSX.Element => {
+const Grid = ({ columnDefs, frameworkComponents, ...options }: BudgetTable.GridProps): JSX.Element => {
   return (
     <AgGridReact
       rowHeight={36}
@@ -27,13 +26,19 @@ const Grid = ({ columnDefs, frameworkComponents, ...options }: GridProps): JSX.E
       {...options}
       // Required to get processCellFromClipboard to work with column spanning.
       suppressCopyRowsToClipboard={true}
-      columnDefs={map(columnDefs, (colDef: CustomColDef<any, any>) => originalColDef(colDef))}
+      columnDefs={map(columnDefs, (colDef: BudgetTable.ColDef<any, any>) => ({
+        ...toAgGridColDef(colDef),
+        headerComponentParams: { ...colDef.headerComponentParams, colDef }
+      }))}
       debug={process.env.NODE_ENV === "development" && TABLE_DEBUG}
       /* @ts-ignore */
       modules={AllModules}
       overlayNoRowsTemplate={"<span></span>"}
       overlayLoadingTemplate={"<span></span>"}
-      frameworkComponents={{ ...FrameworkComponents, ...frameworkComponents }}
+      frameworkComponents={{
+        ...FrameworkComponents,
+        ...frameworkComponents
+      }}
     />
   );
 };

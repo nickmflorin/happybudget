@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 import { getKeyValue } from "lib/util";
-import { RowManager, ReadWrite, ReadOnly, WriteOnly } from "./model";
+import { RowManager, ReadWrite, ReadOnly, WriteOnly } from "lib/model/models";
 
 export const BudgetAccountRowManager = new RowManager<
   Table.BudgetAccountRow,
@@ -216,4 +216,13 @@ export const FringeRowManager = new RowManager<Table.FringeRow, Model.Fringe, Ht
   rowType: "fringe"
 });
 
-export default RowManager;
+const RowManagers = {
+  BudgetAccountRowManager,
+  BudgetSubAccountRowManager,
+  TemplateAccountRowManager,
+  TemplateSubAccountRowManager,
+  FringeRowManager,
+  ActualRowManager
+};
+
+export default RowManagers;

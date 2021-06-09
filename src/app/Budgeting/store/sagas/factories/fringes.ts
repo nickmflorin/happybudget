@@ -3,12 +3,11 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled } from "redux-saga/effects";
 import { isNil, find, map } from "lodash";
 
-import { handleRequestError } from "api";
-import { deleteFringe } from "api/services";
+import * as api from "api";
+import * as models from "lib/model";
 
 import { warnInconsistentState } from "lib/redux/util";
-import { FringeRowManager } from "lib/tabling/managers";
-import { consolidateTableChange } from "lib/tabling/util";
+import { consolidateTableChange } from "lib/model/util";
 import { handleTableErrors } from "store/tasks";
 
 export interface FringeTasksActionMap {
@@ -60,10 +59,10 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     const source = CancelToken.source();
     yield put(actions.deleting({ id, value: true }));
     try {
-      yield call(deleteFringe, id, { cancelToken: source.token });
+      yield call(api.deleteFringe, id, { cancelToken: source.token });
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error deleting the fringe.");
+        api.handleRequestError(e, "There was an error deleting the fringe.");
       }
     } finally {
       yield put(actions.deleting({ id, value: false }));
@@ -80,7 +79,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
       changes,
       (change: Table.RowChange<Table.FringeRow>) => ({
         id: change.id,
-        ...FringeRowManager.payload(change)
+        ...models.FringeRowManager.payload(change)
       })
     );
     for (let i = 0; i++; i < changes.length) {
@@ -109,7 +108,9 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   function* bulkCreateTask(id: number, rows: Table.FringeRow[]): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    const requestPayload: Http.FringePayload[] = map(rows, (row: Table.FringeRow) => FringeRowManager.payload(row));
+    const requestPayload: Http.FringePayload[] = map(rows, (row: Table.FringeRow) =>
+      models.FringeRowManager.payload(row)
+    );
     yield put(actions.creating(true));
     try {
       const fringes: Model.Fringe[] = yield call(services.bulkCreate, id, requestPayload, {
@@ -148,8 +149,8 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
 
   function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
     if (!isNil(action.payload)) {
-      const models: Model.Fringe[] = yield select(selectFringes);
-      const model: Model.Fringe | undefined = find(models, { id: action.payload });
+      const ms: Model.Fringe[] = yield select(selectFringes);
+      const model: Model.Fringe | undefined = find(ms, { id: action.payload });
       if (isNil(model)) {
         const placeholders = yield select(selectPlaceholders);
         const placeholder: Table.FringeRow | undefined = find(placeholders, { id: action.payload });
@@ -191,14 +192,14 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
               id: action.payload
             });
           } else {
-            const updatedRow = FringeRowManager.mergeChangesWithRow(placeholder, merged[i]);
+            const updatedRow = models.FringeRowManager.mergeChangesWithRow(placeholder, merged[i]);
             yield put(actions.updatePlaceholderInState({ id: updatedRow.id, data: updatedRow }));
-            if (FringeRowManager.rowHasRequiredFields(updatedRow)) {
+            if (models.FringeRowManager.rowHasRequiredFields(updatedRow)) {
               placeholdersToCreate.push(updatedRow);
             }
           }
         } else {
-          const updatedModel = FringeRowManager.mergeChangesWithModel(model, merged[i]);
+          const updatedModel = models.FringeRowManager.mergeChangesWithModel(model, merged[i]);
           yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel }));
           mergedUpdates.push(merged[i]);
         }
@@ -227,7 +228,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
         }
       } catch (e) {
         if (!(yield cancelled())) {
-          handleRequestError(e, "There was an error retrieving fringes.");
+          api.handleRequestError(e, "There was an error retrieving fringes.");
           yield put(actions.response({ count: 0, data: [] }, { error: e }));
         }
       } finally {

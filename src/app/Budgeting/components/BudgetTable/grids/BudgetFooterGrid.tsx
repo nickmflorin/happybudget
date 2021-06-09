@@ -6,7 +6,6 @@ import { GridReadyEvent, FirstDataRenderedEvent } from "@ag-grid-community/core"
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString } from "lib/util";
 
-import { BudgetFooterGridProps, CustomColDef } from "../model";
 import Grid from "./Grid";
 
 const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
@@ -18,21 +17,21 @@ const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.
   loadingBudget,
   sizeColumnsToFit,
   setColumnApi
-}: BudgetFooterGridProps<R, G>): JSX.Element => {
+}: BudgetTable.BudgetFooterGridProps<R, G>): JSX.Element => {
   const rowData = useMemo((): R | null => {
     let fieldsLoading: string[] = [];
     if (loadingBudget === true) {
-      const calculatedCols: CustomColDef<R, G>[] = filter(
+      const calculatedCols: BudgetTable.ColDef<R, G>[] = filter(
         columns,
-        (col: CustomColDef<R, G>) => col.isCalculated === true
+        (col: BudgetTable.ColDef<R, G>) => col.isCalculated === true
       );
-      fieldsLoading = map(calculatedCols, (col: CustomColDef<R, G>) => col.field) as string[];
+      fieldsLoading = map(calculatedCols, (col: BudgetTable.ColDef<R, G>) => col.field) as string[];
     }
     // TODO: Loop over the colDef's after we attribute the Base Columns with isBase = true, so
     // we can weed those out here.
     return reduce(
       columns,
-      (obj: { [key: string]: any }, col: CustomColDef<R, G>) => {
+      (obj: { [key: string]: any }, col: BudgetTable.ColDef<R, G>) => {
         if (!isNil(col.field)) {
           if (col.isCalculated === true) {
             if (!isNil(col.budgetTotal)) {

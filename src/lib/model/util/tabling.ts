@@ -1,5 +1,27 @@
-import { forEach, groupBy, isNil, reduce } from "lodash";
-import { tableChangeIsCellChange, tableChangeIsRowChange } from "./typeguards";
+import { forEach, groupBy, isNil, reduce, find } from "lodash";
+import * as models from "lib/model";
+import { tableChangeIsCellChange, tableChangeIsRowChange } from "../typeguards/tabling";
+
+export const toAgGridColDef = (colDef: BudgetTable.ColDef<any, any>) => {
+  const {
+    nullValue,
+    clearBeforeEdit,
+    isCalculated,
+    budgetTotal,
+    tableTotal,
+    processCellForClipboard,
+    processCellFromClipboard,
+    type,
+    ...original
+  } = colDef;
+
+  // TODO: Make the ColDef's an actual Model and have this be a property.
+  const colType = find(models.ColumnTypes, { id: colDef.type } as any);
+  if (!isNil(colType)) {
+    original.cellStyle = { textAlign: colType.align, ...original.cellStyle };
+  }
+  return original;
+};
 
 export const cellChangeToRowChange = <R extends Table.Row>(
   cellChange: Table.CellChange<R, any>

@@ -8,12 +8,11 @@ import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
+import * as models from "lib/model";
 import { getKeyValue } from "lib/util";
-import { PaymentMethods } from "lib/model";
 import { findChoiceForName } from "lib/model/util";
-import { currencyValueFormatter, dateValueFormatter } from "lib/tabling/formatters";
-import { ActualRowManager } from "lib/tabling/managers";
-import { floatValueSetter, dateTimeValueSetter } from "lib/tabling/valueSetters";
+import { currencyValueFormatter, dateValueFormatter } from "lib/model/formatters";
+import { floatValueSetter, dateTimeValueSetter } from "lib/model/valueSetters";
 
 import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
@@ -33,7 +32,7 @@ import {
   setBudgetItemsTreeSearchAction
 } from "../../store/actions/budget/actuals";
 import { selectBudgetDetail } from "../../store/selectors";
-import BudgetTable, { BudgetTableActionsParams } from "../BudgetTable";
+import BudgetTable from "../BudgetTable";
 
 const selectSelectedRows = simpleDeepEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.selected
@@ -82,7 +81,7 @@ const Actuals = (): JSX.Element => {
       <BudgetTable<Table.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>
         data={data}
         placeholders={placeholders}
-        manager={ActualRowManager}
+        manager={models.ActualRowManager}
         selected={selected}
         identifierField={"account"}
         identifierFieldHeader={"Account"}
@@ -127,7 +126,7 @@ const Actuals = (): JSX.Element => {
         onTableChange={(payload: Table.Change<Table.ActualRow>) => dispatch(tableChangedAction(payload))}
         onSelectAll={() => dispatch(selectAllActualsAction(null))}
         exportFileName={"actuals.csv"}
-        actions={(params: BudgetTableActionsParams<Table.ActualRow, Model.Group>) => [
+        actions={(params: BudgetTable.MenuActionParams<Table.ActualRow, Model.Group>) => [
           {
             tooltip: "Delete",
             icon: <FontAwesomeIcon icon={faTrashAlt} />,
@@ -139,17 +138,20 @@ const Actuals = (): JSX.Element => {
           {
             field: "description",
             headerName: "Description",
-            flex: 3
+            flex: 3,
+            type: "longText"
           },
           {
             field: "vendor",
             headerName: "Vendor",
-            flex: 1
+            flex: 1,
+            type: "text"
           },
           {
             field: "purchase_order",
             headerName: "Purchase Order",
-            flex: 1
+            flex: 1,
+            type: "text"
           },
           {
             field: "date",
@@ -157,7 +159,8 @@ const Actuals = (): JSX.Element => {
             cellStyle: { textAlign: "right" },
             flex: 1,
             valueFormatter: dateValueFormatter,
-            valueSetter: dateTimeValueSetter<Table.ActualRow>("date")
+            valueSetter: dateTimeValueSetter<Table.ActualRow>("date"),
+            type: "date"
           },
           {
             field: "payment_method",
@@ -167,6 +170,7 @@ const Actuals = (): JSX.Element => {
             flex: 1,
             cellEditor: "PaymentMethodCellEditor",
             clearBeforeEdit: true,
+            type: "singleSelect",
             // Required to allow the dropdown to be selectable on Enter key.
             suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
               if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
@@ -185,7 +189,7 @@ const Actuals = (): JSX.Element => {
               if (name.trim() === "") {
                 return null;
               }
-              const payment_method = findChoiceForName<Model.PaymentMethod>(PaymentMethods, name);
+              const payment_method = findChoiceForName<Model.PaymentMethod>(models.PaymentMethods, name);
               if (!isNil(payment_method)) {
                 return payment_method;
               }
@@ -195,7 +199,8 @@ const Actuals = (): JSX.Element => {
           {
             field: "payment_id",
             headerName: "Pay ID",
-            flex: 1
+            flex: 1,
+            type: "text"
           },
           {
             field: "value",
@@ -203,7 +208,8 @@ const Actuals = (): JSX.Element => {
             flex: 1,
             valueFormatter: currencyValueFormatter,
             valueSetter: floatValueSetter<Table.ActualRow>("value"),
-            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
+            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
+            type: "text"
           }
         ]}
       />

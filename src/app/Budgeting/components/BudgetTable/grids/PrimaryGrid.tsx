@@ -32,8 +32,7 @@ import {
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
-
-import { PrimaryGridProps, CustomColDef, CellPositionMoveOptions, isKeyboardEvent } from "../model";
+import { isKeyboardEvent } from "lib/model/typeguards";
 import { rangeSelectionIsSingleCell } from "../util";
 import Grid from "./Grid";
 
@@ -63,7 +62,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
   onRowAdd,
   onRowDelete,
   onBack
-}: PrimaryGridProps<R, G>): JSX.Element => {
+}: BudgetTable.PrimaryGridProps<R, G>): JSX.Element => {
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
   // Right now, we can only support Cut/Paste for 1 cell at a time.  Multi-cell
@@ -253,7 +252,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     return params.nextCellPosition;
   });
 
-  const moveToLocation = useDynamicCallback((loc: CellPosition, opts: CellPositionMoveOptions = {}) => {
+  const moveToLocation = useDynamicCallback((loc: CellPosition, opts: BudgetTable.CellPositionMoveOptions = {}) => {
     if (!isNil(api)) {
       api.setFocusedCell(loc.rowIndex, loc.column);
       api.clearRangeSelection();
@@ -263,7 +262,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   });
 
-  const moveToNextRow = useDynamicCallback((loc: CellPosition, opts: CellPositionMoveOptions = {}) => {
+  const moveToNextRow = useDynamicCallback((loc: CellPosition, opts: BudgetTable.CellPositionMoveOptions = {}) => {
     if (!isNil(api)) {
       const [node, rowIndex, _] = findFirstNonGroupFooterRow(loc.rowIndex + 1);
       if (node === null) {
@@ -273,7 +272,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   });
 
-  const moveToNextColumn = useDynamicCallback((loc: CellPosition, opts: CellPositionMoveOptions = {}) => {
+  const moveToNextColumn = useDynamicCallback((loc: CellPosition, opts: BudgetTable.CellPositionMoveOptions = {}) => {
     if (!isNil(api) && !isNil(columnApi)) {
       const columns = columnApi.getAllColumns();
       if (!isNil(columns)) {
@@ -307,7 +306,10 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       const node = local.getDisplayedRowAtIndex(focusedCell.rowIndex);
       if (!isNil(node)) {
         const row: R = node.data;
-        const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === focusedCell.column.getColId());
+        const customColDef = find(
+          colDefs,
+          (def: BudgetTable.ColDef<R, G>) => def.field === focusedCell.column.getColId()
+        );
         if (!isNil(customColDef)) {
           const change = getCellChangeForClear(row, customColDef);
           local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
@@ -356,21 +358,23 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   });
 
-  const getCellChangeForClear = useDynamicCallback((row: R, def: CustomColDef<R, G>): Table.CellChange<R> | null => {
-    const clearValue = def.nullValue !== undefined ? def.nullValue : null;
-    const colId = def.field;
-    if (row[colId] === undefined || row[colId] !== clearValue) {
-      const change: Table.CellChange<R> = {
-        oldValue: row[colId],
-        newValue: clearValue as R[keyof R],
-        id: row.id,
-        field: colId
-      };
-      return change;
-    } else {
-      return null;
+  const getCellChangeForClear = useDynamicCallback(
+    (row: R, def: BudgetTable.ColDef<R, G>): Table.CellChange<R> | null => {
+      const clearValue = def.nullValue !== undefined ? def.nullValue : null;
+      const colId = def.field;
+      if (row[colId] === undefined || row[colId] !== clearValue) {
+        const change: Table.CellChange<R> = {
+          oldValue: row[colId],
+          newValue: clearValue as R[keyof R],
+          id: row.id,
+          field: colId
+        };
+        return change;
+      } else {
+        return null;
+      }
     }
-  });
+  );
 
   const getTableChangesFromRangeClear = useDynamicCallback(
     (range: CellRange, gridApi?: GridApi): Table.CellChange<R>[] => {
@@ -407,7 +411,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     const field = event.column.getColId() as keyof R;
     // AG Grid treats cell values as undefined when they are cleared via edit,
     // so we need to translate that back into a null representation.
-    const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field } as any);
+    const customColDef: BudgetTable.ColDef<R, G> | undefined = find(colDefs, { field } as any);
     if (!isNil(customColDef)) {
       const nullValue = customColDef.nullValue === undefined ? null : customColDef.nullValue;
       const oldValue = event.oldValue === undefined ? nullValue : event.oldValue;
@@ -427,7 +431,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     onTableChange(changes);
   });
 
-  const clearCell = useDynamicCallback((row: R, def: CustomColDef<R, G>) => {
+  const clearCell = useDynamicCallback((row: R, def: BudgetTable.ColDef<R, G>) => {
     const change = getCellChangeForClear(row, def);
     if (!isNil(change)) {
       onTableChange(change);
@@ -553,7 +557,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         return true;
       } else {
         const column = params.column;
-        const customColDef = find(colDefs, (def: CustomColDef<R, G>) => def.field === column.getColId());
+        const customColDef = find(colDefs, (def: BudgetTable.ColDef<R, G>) => def.field === column.getColId());
         if (!isNil(customColDef)) {
           // Note:  This is a work around for not being able to clear the values of cells without going
           // into edit mode.  For custom Cell Editor(s) with a Pop-Up, we don't want to open the Pop-Up
@@ -678,7 +682,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   }, [api]);
 
-  const includeCellEditorParams = (def: CustomColDef<R, G>): CustomColDef<R, G> => {
+  const includeCellEditorParams = (def: BudgetTable.ColDef<R, G>): BudgetTable.ColDef<R, G> => {
     return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
   };
 
@@ -698,7 +702,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     <div className={"table-grid"}>
       <Grid
         {...options}
-        columnDefs={map(colDefs, (colDef: CustomColDef<R, G>) => includeCellEditorParams(colDef))}
+        columnDefs={map(colDefs, (colDef: BudgetTable.ColDef<R, G>) => includeCellEditorParams(colDef))}
         getContextMenuItems={getContextMenuItems}
         rowData={table}
         getRowNodeId={(r: any) => r.id}

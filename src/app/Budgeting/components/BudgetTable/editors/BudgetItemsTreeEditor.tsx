@@ -4,7 +4,6 @@ import { isNil } from "lodash";
 
 import { BudgetItemTreeMenu, ExpandedModelMenuRef, BudgetItemMenuModel } from "components/menus";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { CellEditorParams, CellDoneEditingEvent } from "../model";
 
 import useModelMenuEditor from "./ModelMenuEditor";
 
@@ -18,7 +17,7 @@ const selectBudgetItemsTreeLoading = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree.loading
 );
 
-interface BudgetItemsTreeEditorProps extends CellEditorParams {
+interface BudgetItemsTreeEditorProps extends BudgetTable.CellEditorParams {
   readonly setSearch: (value: string) => void;
   readonly value: Model.SimpleAccount | Model.SimpleSubAccount;
 }
@@ -46,7 +45,7 @@ const BudgetItemsTreeEditor = ({ setSearch, ...props }: BudgetItemsTreeEditorPro
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}
       autoFocusMenu={true}
-      onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount, e: CellDoneEditingEvent) => {
+      onChange={(m: Model.SimpleSubAccount | Model.SimpleAccount, e: BudgetTable.CellDoneEditingEvent) => {
         editor.onChange(m, e);
       }}
       menuRef={menuRef}

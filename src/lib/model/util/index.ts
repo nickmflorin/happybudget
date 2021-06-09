@@ -1,6 +1,8 @@
 import { forEach, isNil, filter, reduce, find } from "lodash";
 import { getKeyValue } from "lib/util";
-import { FringeUnitModels } from ".";
+import { FringeUnitModels } from "lib/model";
+
+export * from "./tabling";
 
 export const flattenTreeNodes = (tree: Model.Tree): (Model.SimpleSubAccount | Model.SimpleAccount)[] => {
   const flattened: (Model.SimpleSubAccount | Model.SimpleAccount)[] = [];

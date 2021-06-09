@@ -6,17 +6,17 @@ import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
 import { CellClassParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
+import * as models from "lib/model";
+
 import { getKeyValue } from "lib/util";
-import { FringeUnits } from "lib/model";
 import { findChoiceForName } from "lib/model/util";
-import { FringeRowManager } from "lib/tabling/managers";
-import { percentageToDecimalValueSetter } from "lib/tabling/valueSetters";
-import { percentageValueFormatter } from "lib/tabling/formatters";
-import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../BudgetTable";
+import { percentageToDecimalValueSetter } from "lib/model/valueSetters";
+import { percentageValueFormatter } from "lib/model/formatters";
+import BudgetTable from "../BudgetTable";
 
 export interface GenericFringesTableProps
   extends Omit<
-    BudgetTableProps<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>,
+    BudgetTable.Props<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>,
     "manager" | "identifierField" | "identifierFieldHeader" | "columns"
   > {
   saving: boolean;
@@ -39,7 +39,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
     <BudgetTable<Table.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>
       className={"fringes-table"}
       detached={true}
-      manager={FringeRowManager}
+      manager={models.FringeRowManager}
       identifierField={"name"}
       identifierFieldHeader={"Name"}
       tableFooterIdentifierValue={null}
@@ -47,7 +47,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
       canToggleColumns={false}
       indexColumn={{ width: 40, maxWidth: 50 }}
       cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
-      actions={(params: BudgetTableActionsParams<Table.FringeRow, Model.Group>) => [
+      actions={(params: BudgetTable.MenuActionParams<Table.FringeRow, Model.Group>) => [
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
@@ -62,17 +62,20 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
           cellClass: classNames("cell--centered"),
           cellRenderer: "ColorCell",
           cellEditor: "FringesColorEditor",
-          width: 100
+          width: 100,
+          type: "singleSelect"
         },
         {
           field: "description",
-          headerName: "Description"
+          headerName: "Description",
+          type: "longText"
         },
         {
           field: "rate",
           headerName: "Rate",
           valueFormatter: percentageValueFormatter,
-          valueSetter: percentageToDecimalValueSetter<Table.FringeRow>("rate")
+          valueSetter: percentageToDecimalValueSetter<Table.FringeRow>("rate"),
+          type: "percentage"
         },
         {
           field: "unit",
@@ -82,6 +85,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
           width: 100,
           cellEditor: "FringeUnitCellEditor",
           clearBeforeEdit: true,
+          type: "singleSelect",
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
             if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
@@ -100,7 +104,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
             if (name.trim() === "") {
               return null;
             }
-            const unit = findChoiceForName<Model.FringeUnit>(FringeUnits, name);
+            const unit = findChoiceForName<Model.FringeUnit>(models.FringeUnits, name);
             if (!isNil(unit)) {
               return unit;
             }
@@ -109,7 +113,8 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
         },
         {
           field: "cutoff",
-          headerName: "Cutoff"
+          headerName: "Cutoff",
+          type: "number"
         }
       ]}
       {...props}

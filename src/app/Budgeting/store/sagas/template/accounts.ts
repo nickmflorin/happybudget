@@ -1,10 +1,5 @@
-import {
-  getTemplateAccounts,
-  getTemplateAccountGroups,
-  bulkUpdateTemplateAccounts,
-  bulkCreateTemplateAccounts
-} from "api/services";
-import { TemplateAccountRowManager } from "lib/tabling/managers";
+import * as api from "api";
+import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
 import { requestTemplateAction, loadingTemplateAction } from "../../actions/template";
@@ -54,12 +49,12 @@ const tasks = createAccountsTaskSet<
     addErrorsToState: addErrorsToStateAction
   },
   {
-    getAccounts: getTemplateAccounts,
-    getGroups: getTemplateAccountGroups,
-    bulkUpdate: bulkUpdateTemplateAccounts,
-    bulkCreate: bulkCreateTemplateAccounts
+    getAccounts: api.getTemplateAccounts,
+    getGroups: api.getTemplateAccountGroups,
+    bulkUpdate: api.bulkUpdateTemplateAccounts,
+    bulkCreate: api.bulkCreateTemplateAccounts
   },
-  TemplateAccountRowManager,
+  models.TemplateAccountRowManager,
   (state: Redux.ApplicationStore) => state.budgeting.template.template.id,
   (state: Redux.ApplicationStore) => state.budgeting.template.accounts.data,
   (state: Redux.ApplicationStore) => state.budgeting.template.autoIndex

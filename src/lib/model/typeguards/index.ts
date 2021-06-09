@@ -1,3 +1,5 @@
+export * from "./tabling";
+
 export const isFieldAlterationEvent = (
   event: Model.FieldAlterationEvent | Model.CreateEvent
 ): event is Model.FieldAlterationEvent => {

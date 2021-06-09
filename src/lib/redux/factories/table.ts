@@ -1,5 +1,5 @@
 import { isNil, find, filter } from "lodash";
-import RowManager from "lib/tabling/managers";
+import { RowManager } from "lib/model";
 import { replaceInArray } from "lib/util";
 import { warnInconsistentState } from "../util";
 import { createListReducerFromMap, mergeOptionsWithDefaults } from "./util";

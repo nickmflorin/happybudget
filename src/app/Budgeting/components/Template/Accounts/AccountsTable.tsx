@@ -5,9 +5,9 @@ import { isNil } from "lodash";
 import { createSelector } from "reselect";
 import { map } from "lodash";
 
+import * as models from "lib/model";
 import { CreateTemplateAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { TemplateAccountRowManager } from "lib/tabling/managers";
 
 import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
 import {
@@ -76,7 +76,7 @@ const AccountsTable = (): JSX.Element => {
       >
         data={data}
         groups={groups}
-        manager={TemplateAccountRowManager}
+        manager={models.TemplateAccountRowManager}
         selected={selected}
         renderFlag={readyToRender}
         detail={templateDetail}
@@ -104,7 +104,8 @@ const AccountsTable = (): JSX.Element => {
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            tableTotal: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
+            tableTotal: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0,
+            type: "sum"
           }
         ]}
       />

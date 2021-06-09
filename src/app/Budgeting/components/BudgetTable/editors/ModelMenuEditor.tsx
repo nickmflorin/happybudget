@@ -2,22 +2,22 @@ import { RefObject, useRef, useImperativeHandle, useState, useEffect, useMemo } 
 import { isNil } from "lodash";
 
 import { useTrackFirstRender } from "lib/hooks";
+import { isKeyboardEvent, isSyntheticClickEvent } from "lib/model/typeguards";
 import { ExpandedModelMenuRef } from "components/menus";
-import { CellDoneEditingEvent, CellEditorParams, isKeyboardEvent, isSyntheticClickEvent } from "../model";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
 export interface IEditor<M extends Model.Model, V = M> {
-  onChange: (value: V | null, e: CellDoneEditingEvent) => void;
+  onChange: (value: V | null, e: BudgetTable.CellDoneEditingEvent) => void;
   isFirstRender: boolean;
   value: V | null;
-  changedEvent: CellDoneEditingEvent | null;
+  changedEvent: BudgetTable.CellDoneEditingEvent | null;
   menuRef: RefObject<ExpandedModelMenuRef<M>>;
   menu: ExpandedModelMenuRef<M> | null;
 }
 
-interface UseModelMenuEditorParams<V> extends CellEditorParams {
+interface UseModelMenuEditorParams<V> extends BudgetTable.CellEditorParams {
   value: V | null;
   forwardedRef: RefObject<any>;
   menuRef?: RefObject<ExpandedModelMenuRef<any>>;
@@ -27,7 +27,7 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
   const _menuRef = useRef<ExpandedModelMenuRef<M>>(null);
   const isFirstRender = useTrackFirstRender();
   const [value, setValue] = useState<V | null>(params.value);
-  const [changedEvent, setChangedEvent] = useState<CellDoneEditingEvent | null>(null);
+  const [changedEvent, setChangedEvent] = useState<BudgetTable.CellDoneEditingEvent | null>(null);
 
   const menuRef = useMemo(() => {
     if (!isNil(params.menuRef)) {
@@ -73,7 +73,7 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
       isFirstRender,
       value,
       changedEvent,
-      onChange: (model: V | null, e: CellDoneEditingEvent) => {
+      onChange: (model: V | null, e: BudgetTable.CellDoneEditingEvent) => {
         setValue(model);
         setChangedEvent(e);
       }

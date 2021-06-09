@@ -1,7 +1,9 @@
 import { Reducer } from "redux";
 import { filter } from "lodash";
+
+import * as models from "lib/model";
+
 import { createModelListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
-import { FringeRowManager } from "lib/tabling/managers";
 import { ActionType } from "../actions";
 import { initialFringesState } from "../initialState";
 
@@ -40,7 +42,7 @@ const createRootReducer = <
             UpdateInState: ActionType[directive].Fringes.Placeholders.UpdateInState,
             Clear: ActionType[directive].Fringes.Placeholders.Clear
           },
-          FringeRowManager
+          models.FringeRowManager
         )
       }
     }

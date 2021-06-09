@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { isNil, find } from "lodash";
 import classNames from "classnames";
 
@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUp, faArrowDown, faEdit } from "@fortawesome/free-solid-svg-icons";
 
 import { Column, ColDef } from "@ag-grid-community/core";
+
+import * as models from "lib/model";
 
 import { ShowHide, IconHolder, VerticalFlexCenter } from "components";
 import { IconButton } from "components/buttons";
@@ -29,6 +31,7 @@ export interface HeaderCellProps<R extends Table.Row> extends IHeaderCompParams,
   onSort?: (order: Order, field: keyof R, colDef: ColDef, column: Column) => void;
   onEdit?: (field: keyof R, colDef: ColDef, column: Column) => void;
   ordering?: FieldOrdering<keyof R>;
+  colDef: BudgetTable.ColDef<R>;
 }
 
 const HeaderCell = <R extends Table.Row>({
@@ -39,18 +42,21 @@ const HeaderCell = <R extends Table.Row>({
   ordering,
   style = {},
   onEdit,
+  colDef,
   ...props
 }: HeaderCellProps<R>): JSX.Element => {
   const [order, setOrder] = useState<Order>(0);
-  const colDef = column.getColDef();
+
+  const columnType: BudgetTable.ColumnType | null = useMemo(() => {
+    return find(models.ColumnTypes, { id: colDef.type } as any) || null;
+  }, [colDef]);
 
   // NOTE: Because of AG Grid's use of references for rendering performance, the `ordering` prop
   // will not always update in this component when it changes in the parent table component.  This
   // is used for the initial render when an ordering is present in cookies.  We should figure out
   // a better way to do this.
   useEffect(() => {
-    const def = column.getColDef();
-    if (def.sortable === true) {
+    if (colDef.sortable === true) {
       if (!isNil(ordering)) {
         const fieldOrder: FieldOrder<keyof R> | undefined = find(ordering, { field: column.getColDef().field } as any);
         if (!isNil(fieldOrder)) {
@@ -58,7 +64,7 @@ const HeaderCell = <R extends Table.Row>({
         }
       }
     }
-  }, [ordering]);
+  }, [ordering, colDef]);
 
   return (
     <div
@@ -72,6 +78,11 @@ const HeaderCell = <R extends Table.Row>({
           onSort(order === -1 ? 0 : order === 0 ? 1 : -1, colDef.field as keyof R, colDef, column);
       }}
     >
+      {!isNil(columnType) && !isNil(columnType.icon) && (
+        <VerticalFlexCenter>
+          <FontAwesomeIcon className={"icon icon--table-header"} icon={columnType.icon} />
+        </VerticalFlexCenter>
+      )}
       <div className={"text"}>{displayName}</div>
       {!isNil(onEdit) && (
         <VerticalFlexCenter>

@@ -15,6 +15,10 @@
   display: flex;
   width: 100%;
 
+  .icon--table-header {
+    margin-right: 8px;
+  }
+
   .text {
     line-height: 36px;
     flex-grow: 100;

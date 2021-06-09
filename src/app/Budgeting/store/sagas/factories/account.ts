@@ -17,8 +17,8 @@ import {
 
 import { isAction } from "lib/redux/typeguards";
 import { warnInconsistentState } from "lib/redux/util";
-import RowManager from "lib/tabling/managers";
-import { consolidateTableChange } from "lib/tabling/util";
+import { RowManager } from "lib/model";
+import { consolidateTableChange } from "lib/model/util";
 import { handleTableErrors } from "store/tasks";
 
 import { createBulkCreatePayload } from "./util";

@@ -1,7 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { take, call, cancel } from "redux-saga/effects";
 
-import { TemplateSubAccountRowManager } from "lib/tabling/managers";
+import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
 import { loadingTemplateAction, requestTemplateAction } from "../../actions/template";
@@ -57,7 +57,7 @@ const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, Table.TemplateSu
     },
     addErrorsToState: addErrorsToStateAction
   },
-  TemplateSubAccountRowManager,
+  models.TemplateSubAccountRowManager,
   (state: Redux.ApplicationStore) => state.budgeting.template.subaccount.id,
   (state: Redux.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.data,
   (state: Redux.ApplicationStore) => state.budgeting.template.autoIndex

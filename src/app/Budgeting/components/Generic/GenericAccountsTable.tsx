@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSigma, faPercentage, faUpload, faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
 
-import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../BudgetTable";
+import BudgetTable from "../BudgetTable";
 
 export interface GenericAccountsTableProps<
   R extends Table.AccountRow<G>,
@@ -11,7 +11,7 @@ export interface GenericAccountsTableProps<
   G extends Model.Group,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
 > extends Omit<
-    BudgetTableProps<R, M, G, P>,
+    BudgetTable.Props<R, M, G, P>,
     "identifierField" | "identifierFieldHeader" | "groupParams" | "tableFooterIdentifierValue" | "rowCanExpand"
   > {
   onGroupRows: (rows: R[]) => void;
@@ -51,7 +51,7 @@ const GenericAccountsTable = <
         onRowAddToGroup
       }}
       rowCanExpand={(row: R) => row.identifier !== null || row.meta.children.length !== 0}
-      actions={(params: BudgetTableActionsParams<R, G>) => [
+      actions={(params: BudgetTable.MenuActionParams<R, G>) => [
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
@@ -79,7 +79,8 @@ const GenericAccountsTable = <
         {
           field: "description",
           headerName: "Account Description",
-          flex: 100
+          flex: 100,
+          type: "longText"
         },
         ...props.columns
       ]}

@@ -5,9 +5,9 @@ import { isNil } from "lodash";
 import { createSelector } from "reselect";
 import { map } from "lodash";
 
+import * as models from "lib/model";
 import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { BudgetAccountRowManager } from "lib/tabling/managers";
 
 import { selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
 import {
@@ -72,7 +72,7 @@ const AccountsTable = (): JSX.Element => {
       <GenericAccountsTable<Table.BudgetAccountRow, Model.BudgetAccount, Model.BudgetGroup, Http.BudgetAccountPayload>
         data={data}
         groups={groups}
-        manager={BudgetAccountRowManager}
+        manager={models.BudgetAccountRowManager}
         selected={selected}
         renderFlag={readyToRender}
         detail={budgetDetail}
@@ -100,19 +100,22 @@ const AccountsTable = (): JSX.Element => {
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0
+            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
+            type: "number"
           },
           {
             field: "actual",
             headerName: "Actual",
             isCalculated: true,
-            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
+            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
+            type: "number"
           },
           {
             field: "variance",
             headerName: "Variance",
             isCalculated: true,
-            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0
+            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
+            type: "number"
           }
         ]}
       />

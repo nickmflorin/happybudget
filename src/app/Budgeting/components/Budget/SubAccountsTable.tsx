@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
 
-import { BudgetSubAccountRowManager } from "lib/tabling/managers";
+import * as models from "lib/model";
 
 import { selectBudgetFringes, selectBudgetDetail, selectBudgetDetailLoading } from "../../store/selectors";
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
@@ -32,7 +32,7 @@ const BudgetSubAccountsTable = ({ detail, ...props }: BudgetSubAccountsTableProp
   return (
     <React.Fragment>
       <GenericSubAccountsTable<Table.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>
-        manager={BudgetSubAccountRowManager}
+        manager={models.BudgetSubAccountRowManager}
         loadingBudget={loadingBudget}
         fringes={fringes}
         fringesCellRenderer={"BudgetFringesCell"}
@@ -48,21 +48,24 @@ const BudgetSubAccountsTable = ({ detail, ...props }: BudgetSubAccountsTableProp
             headerName: "Estimated",
             isCalculated: true,
             budgetTotal: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
-            tableTotal: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0
+            tableTotal: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
+            type: "sum"
           },
           {
             field: "actual",
             headerName: "Actual",
             isCalculated: true,
             budgetTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
-            tableTotal: !isNil(detail) && !isNil(detail.actual) ? detail.actual : 0.0
+            tableTotal: !isNil(detail) && !isNil(detail.actual) ? detail.actual : 0.0,
+            type: "sum"
           },
           {
             field: "variance",
             headerName: "Variance",
             isCalculated: true,
             budgetTotal: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
-            tableTotal: !isNil(detail) && !isNil(detail.variance) ? detail.variance : 0.0
+            tableTotal: !isNil(detail) && !isNil(detail.variance) ? detail.variance : 0.0,
+            type: "sum"
           }
         ]}
         {...props}

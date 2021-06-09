@@ -5,14 +5,13 @@ import { ColorSelect } from "components/forms";
 import { useTrackFirstRender } from "lib/hooks";
 
 import { selectFringeColors } from "../../../store/selectors";
-import { CellEditorParams } from "../model";
 
-export interface ModelTagCellEditorProps extends CellEditorParams {}
+export interface ModelTagCellEditorProps extends BudgetTable.CellEditorParams {}
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-interface FringesColorEditorProps extends CellEditorParams {
+interface FringesColorEditorProps extends BudgetTable.CellEditorParams {
   value: string | null;
 }
 

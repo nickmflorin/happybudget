@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
 
-import { TemplateSubAccountRowManager } from "lib/tabling/managers";
+import * as models from "lib/model";
 
 import { selectTemplateFringes, selectTemplateDetail, selectTemplateDetailLoading } from "../../store/selectors";
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
@@ -31,7 +31,7 @@ const TemplateSubAccountsTable = ({ detail, ...props }: TemplateSubAccountsTable
   return (
     <React.Fragment>
       <GenericSubAccountsTable<Table.TemplateSubAccountRow, Model.TemplateSubAccount, Model.TemplateGroup>
-        manager={TemplateSubAccountRowManager}
+        manager={models.TemplateSubAccountRowManager}
         loadingBudget={loadingTemplate}
         fringes={fringes}
         fringesCellEditor={"TemplateFringesCellEditor"}
@@ -47,7 +47,8 @@ const TemplateSubAccountsTable = ({ detail, ...props }: TemplateSubAccountsTable
             headerName: "Estimated",
             isCalculated: true,
             tableTotal: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
-            budgetTotal: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
+            budgetTotal: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0,
+            type: "sum"
           }
         ]}
         {...props}

@@ -20,16 +20,12 @@ import { RenderWithSpinner } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { updateFieldOrdering, orderByFieldOrdering, getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
-import { currencyValueFormatter } from "lib/tabling/formatters";
+import { currencyValueFormatter } from "lib/model/formatters";
 
-import { BudgetTableProps, CellValueChangedParams, CustomColDef } from "./model";
 import BudgetTableMenu from "./Menu";
 import { validateCookiesOrdering, mergeClassNames, mergeClassNamesFn } from "./util";
 import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
 import "./index.scss";
-
-export * from "./cells";
-export * from "./model";
 
 const BudgetTable = <
   R extends Table.Row<G>,
@@ -84,13 +80,13 @@ const BudgetTable = <
   isCellEditable,
   isCellSelectable,
   ...options
-}: BudgetTableProps<R, M, G, P>) => {
+}: BudgetTable.Props<R, M, G, P>) => {
   const [table, setTable] = useState<R[]>([]);
   const [allSelected, setAllSelected] = useState(false);
   const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
-  const [colDefs, setColDefs] = useState<CustomColDef<R, G>[]>([]);
+  const [colDefs, setColDefs] = useState<BudgetTable.ColDef<R, G>[]>([]);
   const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [gridOptions, setGridOptions] = useState<GridOptions>({
@@ -138,18 +134,20 @@ const BudgetTable = <
     suppressHorizontalScroll: true
   });
 
-  const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef | CustomColDef<R, G>): boolean => {
-    if (includes(["index", "expand"], colDef.field)) {
-      return false;
-    } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
-      return false;
-    } else if (!isNil(isCellSelectable)) {
-      return isCellSelectable(row, colDef);
+  const _isCellSelectable = useDynamicCallback<boolean>(
+    (row: R, colDef: ColDef | BudgetTable.ColDef<R, G>): boolean => {
+      if (includes(["index", "expand"], colDef.field)) {
+        return false;
+      } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
+        return false;
+      } else if (!isNil(isCellSelectable)) {
+        return isCellSelectable(row, colDef);
+      }
+      return true;
     }
-    return true;
-  });
+  );
 
-  const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef | CustomColDef<R, G>): boolean => {
+  const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef | BudgetTable.ColDef<R, G>): boolean => {
     if (includes(["index", "expand"], colDef.field)) {
       return false;
     } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
@@ -159,8 +157,8 @@ const BudgetTable = <
     } else if (
       includes(
         map(
-          filter(columns, (c: CustomColDef<R, G>) => c.isCalculated === true),
-          (col: CustomColDef<R, G>) => col.field
+          filter(columns, (c: BudgetTable.ColDef<R, G>) => c.isCalculated === true),
+          (col: BudgetTable.ColDef<R, G>) => col.field
         ),
         colDef.field
       )
@@ -181,8 +179,8 @@ const BudgetTable = <
     }
   });
 
-  const ActionColumn = useDynamicCallback<CustomColDef<R, G>>(
-    (col: CustomColDef<R, G>): CustomColDef<R, G> => {
+  const ActionColumn = useDynamicCallback<BudgetTable.ColDef<R, G>>(
+    (col: BudgetTable.ColDef<R, G>): BudgetTable.ColDef<R, G> => {
       return {
         ...col,
         ...actionColumn,
@@ -194,8 +192,8 @@ const BudgetTable = <
     }
   );
 
-  const IndexColumn = useDynamicCallback<CustomColDef<R, G>>(
-    (col: CustomColDef<R, G>): CustomColDef<R, G> =>
+  const IndexColumn = useDynamicCallback<BudgetTable.ColDef<R, G>>(
+    (col: BudgetTable.ColDef<R, G>): BudgetTable.ColDef<R, G> =>
       ActionColumn({
         ...indexColumn,
         field: "index",
@@ -225,8 +223,8 @@ const BudgetTable = <
       })
   );
 
-  const ExpandColumn = useDynamicCallback<CustomColDef<R, G>>(
-    (col: CustomColDef<R, G>): CustomColDef<R, G> =>
+  const ExpandColumn = useDynamicCallback<BudgetTable.ColDef<R, G>>(
+    (col: BudgetTable.ColDef<R, G>): BudgetTable.ColDef<R, G> =>
       ActionColumn({
         width: 30,
         maxWidth: 30,
@@ -245,18 +243,19 @@ const BudgetTable = <
       })
   );
 
-  const IdentifierColumn = useDynamicCallback<CustomColDef<R, G>>(
-    (col: CustomColDef<R, G>): CustomColDef<R, G> => ({
+  const IdentifierColumn = useDynamicCallback<BudgetTable.ColDef<R, G>>(
+    (col: BudgetTable.ColDef<R, G>): BudgetTable.ColDef<R, G> => ({
       field: identifierField,
       headerName: identifierFieldHeader,
       cellRenderer: "IdentifierCell",
       width: 100,
+      type: "number",
       ...identifierColumn,
       pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
         if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
-          return filter(columns, (c: CustomColDef<R, G>) => !(c.isCalculated === true)).length + 1;
+          return filter(columns, (c: BudgetTable.ColDef<R, G>) => !(c.isCalculated === true)).length + 1;
         } else if (!isNil(identifierColumn.colSpan)) {
           return identifierColumn.colSpan(params);
         }
@@ -269,14 +268,14 @@ const BudgetTable = <
     })
   );
 
-  const CalculatedColumn = useDynamicCallback<CustomColDef<R, G>>(
-    (col: CustomColDef<R, G>): CustomColDef<R, G> => {
+  const CalculatedColumn = useDynamicCallback<BudgetTable.ColDef<R, G>>(
+    (col: BudgetTable.ColDef<R, G>): BudgetTable.ColDef<R, G> => {
       return {
         width: 100,
         maxWidth: 100,
+        cellStyle: { textAlign: "right", ...col.cellStyle },
         ...col,
         cellRenderer: "CalculatedCell",
-        cellStyle: { textAlign: "right" },
         valueFormatter: currencyValueFormatter,
         cellRendererParams: {
           ...col.cellRendererParams,
@@ -297,8 +296,8 @@ const BudgetTable = <
     }
   );
 
-  const BodyColumn = useDynamicCallback<CustomColDef<R, G>>(
-    (col: CustomColDef<R, G>): CustomColDef<R, G> => {
+  const BodyColumn = useDynamicCallback<BudgetTable.ColDef<R, G>>(
+    (col: BudgetTable.ColDef<R, G>): BudgetTable.ColDef<R, G> => {
       return {
         cellRenderer: "BodyCell",
         ...col,
@@ -310,8 +309,8 @@ const BudgetTable = <
     }
   );
 
-  const UniversalColumn = useDynamicCallback<CustomColDef<R, G>>(
-    (col: CustomColDef<R, G>): CustomColDef<R, G> => {
+  const UniversalColumn = useDynamicCallback<BudgetTable.ColDef<R, G>>(
+    (col: BudgetTable.ColDef<R, G>): BudgetTable.ColDef<R, G> => {
       return {
         ...col,
         suppressMenu: true,
@@ -327,8 +326,8 @@ const BudgetTable = <
     }
   );
 
-  const baseColumns = useMemo((): CustomColDef<R, G>[] => {
-    let baseLeftColumns: CustomColDef<R, G>[] = [IndexColumn({})];
+  const baseColumns = useMemo((): BudgetTable.ColDef<R, G>[] => {
+    let baseLeftColumns: BudgetTable.ColDef<R, G>[] = [IndexColumn({})];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
@@ -353,7 +352,7 @@ const BudgetTable = <
       const cookiesOrdering = kookies.get(cookies.ordering);
       const validatedOrdering = validateCookiesOrdering(
         cookiesOrdering,
-        filter(columns, (col: CustomColDef<R, G>) => !(col.isCalculated === true))
+        filter(columns, (col: BudgetTable.ColDef<R, G>) => !(col.isCalculated === true))
       );
       if (!isNil(validatedOrdering)) {
         setOrdering(validatedOrdering);
@@ -365,16 +364,16 @@ const BudgetTable = <
     const cols = concat(
       baseColumns,
       map(
-        filter(columns, (col: CustomColDef<R, G>) => !(col.isCalculated === true)),
-        (def: CustomColDef<R, G>) => BodyColumn(def)
+        filter(columns, (col: BudgetTable.ColDef<R, G>) => !(col.isCalculated === true)),
+        (def: BudgetTable.ColDef<R, G>) => BodyColumn(def)
       ),
       map(
-        filter(columns, (col: CustomColDef<R, G>) => col.isCalculated === true),
-        (def: CustomColDef<R, G>) => CalculatedColumn(def)
+        filter(columns, (col: BudgetTable.ColDef<R, G>) => col.isCalculated === true),
+        (def: BudgetTable.ColDef<R, G>) => CalculatedColumn(def)
       )
     );
     setColDefs(
-      map(cols, (col: CustomColDef<R, G>, index: number) => {
+      map(cols, (col: BudgetTable.ColDef<R, G>, index: number) => {
         if (index === cols.length - 1) {
           return UniversalColumn({ ...col, resizable: false });
         }
@@ -387,7 +386,7 @@ const BudgetTable = <
     const createGroupFooter = (group: G): R => {
       return reduce(
         columns,
-        (obj: { [key: string]: any }, col: CustomColDef<R, G>) => {
+        (obj: { [key: string]: any }, col: BudgetTable.ColDef<R, G>) => {
           if (!isNil(col.field)) {
             if (col.isCalculated === true) {
               if (!isNil(group[col.field as keyof G])) {
@@ -478,7 +477,7 @@ const BudgetTable = <
   const processCellForClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
-      const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+      const customColDef: BudgetTable.ColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
       if (!isNil(customColDef)) {
         const processor = customColDef.processCellForClipboard;
         if (!isNil(processor)) {
@@ -499,7 +498,7 @@ const BudgetTable = <
   const processCellForExport = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
-      const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+      const customColDef: BudgetTable.ColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
       if (!isNil(customColDef)) {
         const processor = customColDef.processCellForExport;
         if (!isNil(processor)) {
@@ -515,7 +514,7 @@ const BudgetTable = <
   const processCellFromClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
-      const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+      const customColDef: BudgetTable.ColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
       if (!isNil(customColDef)) {
         const processor = customColDef.processCellFromClipboard;
         if (!isNil(processor)) {
@@ -533,7 +532,7 @@ const BudgetTable = <
     return "";
   });
 
-  const onCellValueChanged = useDynamicCallback((params: CellValueChangedParams<R, G>) => {
+  const onCellValueChanged = useDynamicCallback((params: BudgetTable.CellValueChangedParams<R, G>) => {
     if (!isNil(gridApi) && !isNil(columnApi) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
       const col = columnApi.getColumn("expand");
       if (!isNil(col)) {
@@ -571,7 +570,9 @@ const BudgetTable = <
             const includeColumn = (col: Column): boolean => {
               const colDef = col.getColDef();
               if (!isNil(colDef.field)) {
-                const customColDef: CustomColDef<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+                const customColDef: BudgetTable.ColDef<R, G> | undefined = find(colDefs, {
+                  field: colDef.field
+                } as any);
                 if (!isNil(customColDef)) {
                   return (
                     customColDef.excludeFromExport !== true &&
@@ -613,7 +614,7 @@ const BudgetTable = <
         }}
         onColumnsChange={(fields: Field[]) => {
           if (!isNil(columnApi) && !isNil(tableFooterColumnApi) && !isNil(budgetFooterColumnApi)) {
-            forEach(columns, (col: CustomColDef<R, G>) => {
+            forEach(columns, (col: BudgetTable.ColDef<R, G>) => {
               if (!isNil(col.field)) {
                 const associatedField = find(fields, { id: col.field });
                 if (!isNil(associatedField)) {
@@ -667,8 +668,8 @@ const BudgetTable = <
             identifierValue={tableFooterIdentifierValue}
             setColumnApi={setTableFooterColumnApi}
           />
-          {filter(columns, (col: CustomColDef<R, G>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !==
-            0 && (
+          {filter(columns, (col: BudgetTable.ColDef<R, G>) => col.isCalculated === true && !isNil(col.budgetTotal))
+            .length !== 0 && (
             <BudgetFooterGrid<R, G>
               options={budgetFooterGridOptions}
               colDefs={colDefs}

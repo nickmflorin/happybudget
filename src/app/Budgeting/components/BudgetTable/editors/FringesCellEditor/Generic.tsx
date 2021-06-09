@@ -5,11 +5,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/pro-light-svg-icons";
 
 import { ExpandedModelTagsMenu } from "components/menus";
-import { CellEditorParams, CellDoneEditingEvent } from "../../model";
 import useModelMenuEditor from "../ModelMenuEditor";
 
 export interface FringesCellEditorProps<R extends Table.Row<G>, G extends Model.Group = Model.Group>
-  extends CellEditorParams {
+  extends BudgetTable.CellEditorParams {
   onAddFringes: () => void;
   colId: keyof R;
   fringes: Model.Fringe[];
@@ -26,7 +25,7 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       multiple={true}
       selected={editor.value}
       models={props.fringes}
-      onChange={(ms: Model.Fringe[], e: CellDoneEditingEvent) => {
+      onChange={(ms: Model.Fringe[], e: BudgetTable.CellDoneEditingEvent) => {
         editor.onChange(
           map(ms, (m: Model.Fringe) => m.id),
           e

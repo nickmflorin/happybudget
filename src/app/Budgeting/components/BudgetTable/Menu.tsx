@@ -13,7 +13,6 @@ import { IconButton } from "components/buttons";
 import { FieldsDropdown } from "components/dropdowns";
 import { FieldMenuField } from "components/menus/FieldsMenu";
 import { PortalOrRender } from "components/layout";
-import { BudgetTableMenuProps, BudgetTableMenuAction } from "./model";
 
 const BudgetTableMenu = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
   actions,
@@ -31,7 +30,7 @@ const BudgetTableMenu = <R extends Table.Row<G>, G extends Model.Group = Model.G
   onSelectAll,
   onColumnsChange,
   onExport
-}: BudgetTableMenuProps<R, G>) => {
+}: BudgetTable.MenuProps<R, G>) => {
   return (
     <PortalOrRender id={"supplementary-header"} visible={true} portal={!detached}>
       <div className={classNames("table-header", { detached })}>
@@ -43,7 +42,7 @@ const BudgetTableMenu = <R extends Table.Row<G>, G extends Model.Group = Model.G
             <div className={"toolbar-buttons"}>
               {map(
                 Array.isArray(actions) ? actions : actions({ onDelete: onDelete, selectedRows }),
-                (action: BudgetTableMenuAction, index: number) => {
+                (action: BudgetTable.MenuAction, index: number) => {
                   return (
                     <IconButton
                       key={index}

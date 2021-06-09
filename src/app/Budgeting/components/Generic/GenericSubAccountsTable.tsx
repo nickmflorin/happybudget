@@ -8,14 +8,14 @@ import { ColDef, ColSpanParams, SuppressKeyboardEventParams } from "@ag-grid-com
 
 import { getKeyValue } from "lib/util";
 import { inferModelFromName } from "lib/model/util";
-import { currencyValueFormatter } from "lib/tabling/formatters";
-import { floatValueSetter, integerValueSetter } from "lib/tabling/valueSetters";
+import { currencyValueFormatter } from "lib/model/formatters";
+import { floatValueSetter, integerValueSetter } from "lib/model/valueSetters";
 
-import BudgetTable, { BudgetTableProps, BudgetTableActionsParams } from "../BudgetTable";
+import BudgetTable from "../BudgetTable";
 
 export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends Model.SubAccount, G extends Model.Group>
   extends Omit<
-    BudgetTableProps<R, M, G, Http.SubAccountPayload>,
+    BudgetTable.Props<R, M, G, Http.SubAccountPayload>,
     "identifierField" | "identifierFieldHeader" | "groupParams" | "rowCanExpand"
   > {
   categoryName: "Sub Account" | "Detail";
@@ -73,7 +73,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
         onRowAddToGroup
       }}
       rowCanExpand={(row: R) => row.identifier !== null || row.meta.children.length !== 0}
-      actions={(params: BudgetTableActionsParams<R, G>) => [
+      actions={(params: BudgetTable.MenuActionParams<R, G>) => [
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
@@ -102,6 +102,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           field: "description",
           headerName: `${categoryName} Description`,
           flex: 100,
+          type: "longText",
           colSpan: (params: ColSpanParams) => {
             const row: Table.TemplateSubAccountRow = params.data;
             if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
@@ -113,14 +114,16 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
         {
           field: "name",
           headerName: "Name",
-          width: 120
+          width: 120,
+          type: "text"
         },
         {
           field: "quantity",
           headerName: "Qty",
           width: 60,
           cellStyle: { textAlign: "right" },
-          valueSetter: integerValueSetter<Table.TemplateSubAccountRow>("quantity")
+          valueSetter: integerValueSetter<Table.TemplateSubAccountRow>("quantity"),
+          type: "number"
         },
         {
           field: "unit",
@@ -130,6 +133,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           width: 100,
           cellEditor: "SubAccountUnitCellEditor",
           clearBeforeEdit: true,
+          type: "singleSelect",
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
             if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
@@ -161,7 +165,8 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           headerName: "X",
           width: 50,
           cellStyle: { textAlign: "right" },
-          valueSetter: floatValueSetter<Table.TemplateSubAccountRow>("multiplier")
+          valueSetter: floatValueSetter<Table.TemplateSubAccountRow>("multiplier"),
+          type: "number"
         },
         {
           field: "rate",
@@ -169,7 +174,8 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           width: 100,
           cellStyle: { textAlign: "right" },
           valueFormatter: currencyValueFormatter,
-          valueSetter: floatValueSetter<Table.TemplateSubAccountRow>("rate")
+          valueSetter: floatValueSetter<Table.TemplateSubAccountRow>("rate"),
+          type: "currency"
         },
         {
           field: "fringes",
@@ -184,6 +190,7 @@ const GenericSubAccountsTable = <R extends Table.SubAccountRow<G>, M extends Mod
           cellEditor: fringesCellEditor,
           clearBeforeEdit: true,
           cellEditorParams: fringesCellEditorParams,
+          type: "singleSelect",
           processCellFromClipboard: (value: string) => {
             // NOTE: When pasting from the clipboard, the values will be a comma-separated
             // list of Fringe Names (assuming a rational user).  Currently, Fringe Names are

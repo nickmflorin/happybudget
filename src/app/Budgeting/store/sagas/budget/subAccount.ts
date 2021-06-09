@@ -3,17 +3,8 @@ import { SagaIterator } from "redux-saga";
 import { take, call, cancel, put, cancelled, select } from "redux-saga/effects";
 import { isNil } from "lodash";
 
-import { handleRequestError } from "api";
-import {
-  getSubAccountComments,
-  createSubAccountComment,
-  deleteComment,
-  updateComment,
-  replyToComment,
-  getSubAccountSubAccountsHistory
-} from "api/services";
-
-import { BudgetSubAccountRowManager } from "lib/tabling/managers";
+import * as api from "api";
+import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
 import { loadingBudgetAction, requestBudgetAction } from "../../actions/budget";
@@ -59,7 +50,7 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
     yield put(loadingHistoryAction(true));
     try {
       const response: Http.ListResponse<Model.HistoryEvent> = yield call(
-        getSubAccountSubAccountsHistory,
+        api.getSubAccountSubAccountsHistory,
         subaccountId,
         {},
         { cancelToken: source.token }
@@ -67,7 +58,7 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
       yield put(responseHistoryAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error retrieving the sub account's sub accounts history.");
+        api.handleRequestError(e, "There was an error retrieving the sub account's sub accounts history.");
       }
     } finally {
       yield put(loadingHistoryAction(false));
@@ -92,14 +83,14 @@ export function* submitCommentTask(action: Redux.Action<{ parent?: number; data:
     try {
       let response: Model.Comment;
       if (!isNil(parent)) {
-        response = yield call(replyToComment, parent, data.text, { cancelToken: source.token });
+        response = yield call(api.replyToComment, parent, data.text, { cancelToken: source.token });
       } else {
-        response = yield call(createSubAccountComment, subaccountId, data, { cancelToken: source.token });
+        response = yield call(api.createSubAccountComment, subaccountId, data, { cancelToken: source.token });
       }
       yield put(addCommentToStateAction({ data: response, parent }));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error submitting the comment.");
+        api.handleRequestError(e, "There was an error submitting the comment.");
       }
     } finally {
       if (!isNil(parent)) {
@@ -120,11 +111,11 @@ export function* deleteCommentTask(action: Redux.Action<number>): SagaIterator {
     const source = CancelToken.source();
     yield put(deletingCommentAction({ id: action.payload, value: true }));
     try {
-      yield call(deleteComment, action.payload, { cancelToken: source.token });
+      yield call(api.deleteComment, action.payload, { cancelToken: source.token });
       yield put(removeCommentFromStateAction(action.payload));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error deleting the comment.");
+        api.handleRequestError(e, "There was an error deleting the comment.");
       }
     } finally {
       yield put(deletingCommentAction({ id: action.payload, value: false }));
@@ -144,13 +135,13 @@ export function* editCommentTask(action: Redux.Action<Redux.UpdateModelActionPay
     try {
       // Here we are assuming that Partial<Model.Comment> can be mapped to Partial<Http.CommentPayload>,
       // which is the case right now but may not be in the future.
-      const response: Model.Comment = yield call(updateComment, id, data as Partial<Http.CommentPayload>, {
+      const response: Model.Comment = yield call(api.updateComment, id, data as Partial<Http.CommentPayload>, {
         cancelToken: source.token
       });
       yield put(updateCommentInStateAction({ id, data: response }));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error updating the comment.");
+        api.handleRequestError(e, "There was an error updating the comment.");
       }
     } finally {
       yield put(updatingCommentAction({ id, value: false }));
@@ -169,11 +160,11 @@ export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
     yield put(loadingCommentsAction(true));
     try {
       // TODO: We will have to build in pagination.
-      const response = yield call(getSubAccountComments, subaccountId, { cancelToken: source.token });
+      const response = yield call(api.getSubAccountComments, subaccountId, { cancelToken: source.token });
       yield put(responseCommentsAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error retrieving the sub account's comments.");
+        api.handleRequestError(e, "There was an error retrieving the sub account's comments.");
         yield put(responseCommentsAction({ count: 0, data: [] }, { error: e }));
       }
     } finally {
@@ -214,7 +205,7 @@ const tasks = createSubAccountTaskSet<Model.BudgetSubAccount, Table.BudgetSubAcc
     },
     addErrorsToState: addErrorsToStateAction
   },
-  BudgetSubAccountRowManager,
+  models.BudgetSubAccountRowManager,
   (state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.id,
   (state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.data,
   (state: Redux.ApplicationStore) => state.budgeting.budget.autoIndex

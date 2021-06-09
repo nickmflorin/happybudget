@@ -3,13 +3,12 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, find, map } from "lodash";
 
-import { handleRequestError } from "api";
-import { deleteAccount, updateAccount, deleteGroup } from "api/services";
+import * as api from "api";
+import * as models from "lib/model";
 
 import { isAction } from "lib/redux/typeguards";
 import { warnInconsistentState } from "lib/redux/util";
-import RowManager from "lib/tabling/managers";
-import { consolidateTableChange } from "lib/tabling/util";
+import { consolidateTableChange } from "lib/model/util";
 import { handleTableErrors } from "store/tasks";
 
 import { createBulkCreatePayload } from "./util";
@@ -72,7 +71,7 @@ export const createAccountsTaskSet = <
   /* eslint-disable indent */
   actions: AccountsTasksActionMap<A, G>,
   services: AccountsServiceSet<M, A, G, P>,
-  manager: RowManager<R, A, P, G>,
+  manager: models.RowManager<R, A, P, G>,
   selectObjId: (state: Redux.ApplicationStore) => number | null,
   selectModels: (state: Redux.ApplicationStore) => A[],
   selectAutoIndex: (state: Redux.ApplicationStore) => boolean
@@ -83,7 +82,7 @@ export const createAccountsTaskSet = <
       const source = CancelToken.source();
       yield put(actions.updating({ id: action.payload, value: true }));
       try {
-        yield call(updateAccount, action.payload, { group: null }, { cancelToken: source.token });
+        yield call(api.updateAccount, action.payload, { group: null }, { cancelToken: source.token });
       } catch (e) {
         if (!(yield cancelled())) {
           yield call(
@@ -109,7 +108,12 @@ export const createAccountsTaskSet = <
       const source = CancelToken.source();
       yield put(actions.updating({ id: action.payload.id, value: true }));
       try {
-        yield call(updateAccount, action.payload.id, { group: action.payload.group }, { cancelToken: source.token });
+        yield call(
+          api.updateAccount,
+          action.payload.id,
+          { group: action.payload.group },
+          { cancelToken: source.token }
+        );
       } catch (e) {
         if (!(yield cancelled())) {
           yield call(
@@ -135,11 +139,11 @@ export const createAccountsTaskSet = <
       const source = CancelToken.source();
       yield put(actions.groups.deleting({ id: action.payload, value: true }));
       try {
-        yield call(deleteGroup, action.payload, { cancelToken: source.token });
+        yield call(api.deleteGroup, action.payload, { cancelToken: source.token });
         yield put(actions.groups.removeFromState(action.payload));
       } catch (e) {
         if (!(yield cancelled())) {
-          handleRequestError(e, "There was an error deleting the account group.");
+          api.handleRequestError(e, "There was an error deleting the account group.");
         }
       } finally {
         yield put(actions.groups.deleting({ id: action.payload, value: false }));
@@ -157,12 +161,12 @@ export const createAccountsTaskSet = <
     yield put(actions.budget.loading(true));
     let success = true;
     try {
-      yield call(deleteAccount, id, { cancelToken: source.token });
+      yield call(api.deleteAccount, id, { cancelToken: source.token });
     } catch (e) {
       success = false;
       yield put(actions.budget.loading(false));
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error deleting the account.");
+        api.handleRequestError(e, "There was an error deleting the account.");
       }
     } finally {
       yield put(actions.deleting({ id, value: false }));
@@ -248,8 +252,8 @@ export const createAccountsTaskSet = <
 
   function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
     if (!isNil(action.payload) && !(yield cancelled())) {
-      const models: A[] = yield select(selectModels);
-      const model: A | undefined = find(models, { id: action.payload } as any);
+      const ms: A[] = yield select(selectModels);
+      const model: A | undefined = find(ms, { id: action.payload } as any);
       if (isNil(model)) {
         warnInconsistentState({
           action: action.type,
@@ -307,7 +311,7 @@ export const createAccountsTaskSet = <
         yield put(actions.groups.response(response));
       } catch (e) {
         if (!(yield cancelled())) {
-          handleRequestError(e, "There was an error retrieving the account groups.");
+          api.handleRequestError(e, "There was an error retrieving the account groups.");
           yield put(actions.groups.response({ count: 0, data: [] }, { error: e }));
         }
       } finally {
@@ -338,7 +342,7 @@ export const createAccountsTaskSet = <
         }
       } catch (e) {
         if (!(yield cancelled())) {
-          handleRequestError(e, "There was an error retrieving the accounts.");
+          api.handleRequestError(e, "There was an error retrieving the accounts.");
           yield put(actions.response({ count: 0, data: [] }, { error: e }));
         }
       } finally {
