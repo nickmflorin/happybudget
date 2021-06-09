@@ -1,7 +1,7 @@
 import { BaseModel } from "sjs-base-model";
 import { generateRandomNumericId } from "lib/util";
 
-export default class Model extends BaseModel implements Model.M {
+export default class Model extends BaseModel implements Model.Model {
   public readonly id: number;
 
   constructor(data: Partial<Model>) {
