@@ -3,17 +3,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Table {
-  interface CellError {
-    readonly id: number;
-    readonly field: string;
-    readonly error: string;
-  }
-
   type RowType = "subaccount" | "account" | "fringe" | "actual";
 
   interface RowMeta {
     readonly selected: boolean;
-    readonly errors: Table.CellError[];
     readonly isPlaceholder?: boolean;
     readonly isGroupFooter?: boolean;
     readonly isTableFooter?: boolean;

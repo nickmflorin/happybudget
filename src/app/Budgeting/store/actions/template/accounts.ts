@@ -28,11 +28,6 @@ export const updateAccountInStateAction = simpleAction<Redux.UpdateModelActionPa
 );
 export const removeAccountFromStateAction = simpleAction<number>(ActionType.Template.Accounts.RemoveFromState);
 export const addAccountToStateAction = simpleAction<Model.TemplateAccount>(ActionType.Template.Accounts.AddToState);
-
-// Errors Functionality Needs to be Built Back In
-export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(
-  ActionType.Template.Accounts.AddErrors
-);
 export const requestGroupsAction = simpleAction<null>(ActionType.Template.Accounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Template.Accounts.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.TemplateGroup>>(

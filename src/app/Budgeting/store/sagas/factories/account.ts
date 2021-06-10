@@ -3,23 +3,12 @@ import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, find, map } from "lodash";
 
-import { handleRequestError } from "api";
-import {
-  getAccountSubAccounts,
-  updateSubAccount,
-  deleteSubAccount,
-  getAccount,
-  deleteGroup,
-  getAccountSubAccountGroups,
-  bulkUpdateAccountSubAccounts,
-  bulkCreateAccountSubAccounts
-} from "api/services";
+import * as api from "api";
 
 import { isAction } from "lib/redux/typeguards";
 import { warnInconsistentState } from "lib/redux/util";
 import { RowManager } from "lib/model";
 import { consolidateTableChange } from "lib/model/util";
-import { handleTableErrors } from "store/tasks";
 
 import { createBulkCreatePayload } from "./util";
 
@@ -32,7 +21,6 @@ export interface AccountTasksActionMap<
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
   removeFromState: Redux.ActionCreator<number>;
-  addErrorsToState: Redux.ActionCreator<Table.CellError | Table.CellError[]>;
   updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<SA>>;
   addToState: Redux.ActionCreator<SA>;
   loading: Redux.ActionCreator<boolean>;
@@ -92,16 +80,10 @@ export const createAccountTaskSet = <
       const source = CancelToken.source();
       yield put(actions.updating({ id: action.payload, value: true }));
       try {
-        yield call(updateSubAccount, action.payload, { group: null }, { cancelToken: source.token });
+        yield call(api.updateSubAccount, action.payload, { group: null }, { cancelToken: source.token });
       } catch (e) {
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error removing the sub account from the group.",
-            action.payload,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error removing the sub account from the group.");
         }
       } finally {
         yield put(actions.updating({ id: action.payload, value: false }));
@@ -118,16 +100,15 @@ export const createAccountTaskSet = <
       const source = CancelToken.source();
       yield put(actions.updating({ id: action.payload.id, value: true }));
       try {
-        yield call(updateSubAccount, action.payload.id, { group: action.payload.group }, { cancelToken: source.token });
+        yield call(
+          api.updateSubAccount,
+          action.payload.id,
+          { group: action.payload.group },
+          { cancelToken: source.token }
+        );
       } catch (e) {
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error adding the sub account to the the group.",
-            action.payload.id,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error adding the sub account to the the group.");
         }
       } finally {
         yield put(actions.updating({ id: action.payload.id, value: false }));
@@ -144,11 +125,11 @@ export const createAccountTaskSet = <
       const source = CancelToken.source();
       yield put(actions.groups.deleting({ id: action.payload, value: true }));
       try {
-        yield call(deleteGroup, action.payload, { cancelToken: source.token });
+        yield call(api.deleteGroup, action.payload, { cancelToken: source.token });
         yield put(actions.groups.removeFromState(action.payload));
       } catch (e) {
         if (!(yield cancelled())) {
-          handleRequestError(e, "There was an error deleting the sub account group.");
+          api.handleRequestError(e, "There was an error deleting the sub account group.");
         }
       } finally {
         yield put(actions.groups.deleting({ id: action.payload, value: false }));
@@ -169,12 +150,12 @@ export const createAccountTaskSet = <
     yield put(actions.budget.loading(true));
     let success = true;
     try {
-      yield call(deleteSubAccount, id, { cancelToken: source.token });
+      yield call(api.deleteSubAccount, id, { cancelToken: source.token });
     } catch (e) {
       success = false;
       yield put(actions.budget.loading(false));
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error deleting the sub account.");
+        api.handleRequestError(e, "There was an error deleting the sub account.");
       }
     } finally {
       yield put(actions.deleting({ id: id, value: false }));
@@ -202,18 +183,12 @@ export const createAccountTaskSet = <
       );
       yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
       try {
-        yield call(bulkUpdateAccountSubAccounts, accountId, requestPayload, { cancelToken: source.token });
+        yield call(api.bulkUpdateAccountSubAccounts, accountId, requestPayload, { cancelToken: source.token });
       } catch (e) {
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error updating the sub accounts.",
-            accountId,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error updating the sub accounts.");
         }
       } finally {
         yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
@@ -237,7 +212,7 @@ export const createAccountTaskSet = <
       const payload = createBulkCreatePayload(data, count, autoIndex) as Http.BulkCreatePayload<Http.SubAccountPayload>;
 
       try {
-        const subaccounts: SA[] = yield call(bulkCreateAccountSubAccounts, accountId, payload, {
+        const subaccounts: SA[] = yield call(api.bulkCreateAccountSubAccounts, accountId, payload, {
           cancelToken: source.token
         });
         yield all(subaccounts.map((subaccount: SA) => put(actions.addToState(subaccount))));
@@ -245,13 +220,7 @@ export const createAccountTaskSet = <
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error creating the sub accounts.",
-            accountId,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error creating the sub accounts.");
         }
       } finally {
         yield put(actions.creating(false));
@@ -315,7 +284,7 @@ export const createAccountTaskSet = <
       yield put(actions.groups.loading(true));
       try {
         const response: Http.ListResponse<G> = yield call(
-          getAccountSubAccountGroups,
+          api.getAccountSubAccountGroups,
           accountId,
           { no_pagination: true },
           { cancelToken: source.token }
@@ -323,7 +292,7 @@ export const createAccountTaskSet = <
         yield put(actions.groups.response(response));
       } catch (e) {
         if (!(yield cancelled())) {
-          handleRequestError(e, "There was an error retrieving the account's sub account groups.");
+          api.handleRequestError(e, "There was an error retrieving the account's sub account groups.");
           yield put(actions.groups.response({ count: 0, data: [] }, { error: e }));
         }
       } finally {
@@ -343,7 +312,7 @@ export const createAccountTaskSet = <
       yield put(actions.loading(true));
       try {
         const response: Http.ListResponse<SA> = yield call(
-          getAccountSubAccounts,
+          api.getAccountSubAccounts,
           accountId,
           { no_pagination: true },
           { cancelToken: source.token }
@@ -354,7 +323,7 @@ export const createAccountTaskSet = <
         }
       } catch (e) {
         if (!(yield cancelled())) {
-          handleRequestError(e, "There was an error retrieving the account's sub accounts.");
+          api.handleRequestError(e, "There was an error retrieving the account's sub accounts.");
           yield put(actions.response({ count: 0, data: [] }, { error: e }));
         }
       } finally {
@@ -379,11 +348,11 @@ export const createAccountTaskSet = <
         yield put(actions.account.loading(true));
       }
       try {
-        const response: A = yield call(getAccount, accountId, { cancelToken: source.token });
+        const response: A = yield call(api.getAccount, accountId, { cancelToken: source.token });
         yield put(actions.account.response(response));
       } catch (e) {
         if (!(yield cancelled())) {
-          handleRequestError(e, "There was an error retrieving the account.");
+          api.handleRequestError(e, "There was an error retrieving the account.");
           yield put(actions.account.response(undefined, { error: e }));
         }
       } finally {

@@ -34,7 +34,6 @@ import {
   removeGroupFromStateAction,
   updateAccountInStateAction,
   removeAccountFromStateAction,
-  addErrorsToStateAction,
   loadingGroupsAction,
   responseGroupsAction,
   addAccountToStateAction
@@ -234,8 +233,7 @@ const tasks = createAccountsTaskSet<
       removeFromState: removeGroupFromStateAction,
       loading: loadingGroupsAction,
       response: responseGroupsAction
-    },
-    addErrorsToState: addErrorsToStateAction
+    }
   },
   {
     getAccounts: api.getBudgetAccounts,

@@ -9,7 +9,6 @@ import * as models from "lib/model";
 import { isAction } from "lib/redux/typeguards";
 import { warnInconsistentState } from "lib/redux/util";
 import { consolidateTableChange } from "lib/model/util";
-import { handleTableErrors } from "store/tasks";
 
 import { createBulkCreatePayload } from "./util";
 
@@ -21,7 +20,6 @@ export interface SubAccountTasksActionMap<
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
   removeFromState: Redux.ActionCreator<number>;
-  addErrorsToState: Redux.ActionCreator<Table.CellError | Table.CellError[]>;
   updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<SA>>;
   addToState: Redux.ActionCreator<SA>;
   loading: Redux.ActionCreator<boolean>;
@@ -85,13 +83,7 @@ export const createSubAccountTaskSet = <
         yield call(api.updateSubAccount, action.payload, { group: null }, { cancelToken: source.token });
       } catch (e) {
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error removing the sub account from the group.",
-            action.payload,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error removing the sub account from the group.");
         }
       } finally {
         yield put(actions.updating({ id: action.payload, value: false }));
@@ -116,13 +108,7 @@ export const createSubAccountTaskSet = <
         );
       } catch (e) {
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error adding the sub account to the the group.",
-            action.payload.id,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error adding the sub account to the the group.");
         }
       } finally {
         yield put(actions.updating({ id: action.payload.id, value: false }));
@@ -204,13 +190,7 @@ export const createSubAccountTaskSet = <
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error updating the sub accounts.",
-            subaccountId,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error updating the sub accounts.");
         }
       } finally {
         yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
@@ -246,13 +226,7 @@ export const createSubAccountTaskSet = <
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error creating the sub accounts.",
-            subaccountId,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error creating the sub accounts.");
         }
       } finally {
         yield put(actions.creating(false));

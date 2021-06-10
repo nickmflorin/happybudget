@@ -9,7 +9,6 @@ import * as models from "lib/model";
 import { takeWithCancellableById } from "lib/redux/sagas";
 import { warnInconsistentState } from "lib/redux/util";
 import { consolidateTableChange } from "lib/model/util";
-import { handleTableErrors } from "store/tasks";
 
 import { ActionType } from "../../actions";
 import {
@@ -23,7 +22,6 @@ import {
   removeActualFromStateAction,
   updatePlaceholderInStateAction,
   addPlaceholdersToStateAction,
-  addErrorsToStateAction,
   updateActualInStateAction,
   loadingBudgetItemsAction,
   responseBudgetItemsAction,
@@ -57,9 +55,7 @@ export function* updateTask(id: number, change: Table.RowChange<BudgetTable.Actu
     yield call(api.updateActual, id, models.ActualRowManager.payload(change), { cancelToken: source.token });
   } catch (e) {
     if (!(yield cancelled())) {
-      yield call(handleTableErrors, e, "There was an error updating the actual.", id, (errors: Table.CellError[]) =>
-        addErrorsToStateAction(errors)
-      );
+      api.handleRequestError(e, "There was an error updating the actual.");
     }
   } finally {
     yield put(updatingActualAction({ id, value: false }));
@@ -88,9 +84,7 @@ export function* createTask(
     yield put(activatePlaceholderAction({ id: row.id, model: response }));
   } catch (e) {
     if (!(yield cancelled())) {
-      yield call(handleTableErrors, e, "There was an error updating the actual.", row.id, (errors: Table.CellError[]) =>
-        addErrorsToStateAction(errors)
-      );
+      api.handleRequestError(e, "There was an error updating the actual.");
     }
   } finally {
     yield put(creatingActualAction(false));
@@ -119,9 +113,7 @@ export function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable
     // Once we rebuild back in the error handling, we will have to be concerned here with the nested
     // structure of the errors.
     if (!(yield cancelled())) {
-      yield call(handleTableErrors, e, "There was an error updating the actuals.", id, (errors: Table.CellError[]) =>
-        addErrorsToStateAction(errors)
-      );
+      api.handleRequestError(e, "There was an error updating the actuals.");
     }
   } finally {
     for (let i = 0; i++; i < changes.length) {

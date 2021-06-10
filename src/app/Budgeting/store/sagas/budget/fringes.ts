@@ -1,7 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, takeEvery, take, cancel, call } from "redux-saga/effects";
 
-import { createBudgetFringe, bulkUpdateBudgetFringes, bulkCreateBudgetFringes, getBudgetFringes } from "api/services";
+import * as api from "api";
 import { takeWithCancellableById } from "lib/redux/sagas";
 import { ActionType } from "../../actions";
 import {
@@ -13,7 +13,6 @@ import {
   removePlaceholderFromStateAction,
   removeFringeFromStateAction,
   updatePlaceholderInStateAction,
-  addErrorsToStateAction,
   updateFringeInStateAction,
   responseFringesAction,
   loadingFringesAction,
@@ -34,14 +33,13 @@ const tasks = createFringeTaskSet<Model.Budget>(
     removePlaceholderFromState: removePlaceholderFromStateAction,
     removeFromState: removeFringeFromStateAction,
     updatePlaceholderInState: updatePlaceholderInStateAction,
-    addErrorsToState: addErrorsToStateAction,
     updateInState: updateFringeInStateAction
   },
   {
-    request: getBudgetFringes,
-    create: createBudgetFringe,
-    bulkUpdate: bulkUpdateBudgetFringes,
-    bulkCreate: bulkCreateBudgetFringes
+    request: api.getBudgetFringes,
+    create: api.createBudgetFringe,
+    bulkUpdate: api.bulkUpdateBudgetFringes,
+    bulkCreate: api.bulkCreateBudgetFringes
   },
   (state: Redux.ApplicationStore) => state.budgeting.budget.budget.id,
   (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.data,

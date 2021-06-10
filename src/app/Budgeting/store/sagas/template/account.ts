@@ -13,7 +13,6 @@ import {
   deletingSubAccountAction,
   creatingSubAccountAction,
   updatingSubAccountAction,
-  addErrorsToStateAction,
   requestSubAccountsAction,
   requestAccountAction,
   deletingGroupAction,
@@ -58,8 +57,7 @@ const tasks = createAccountTaskSet<
       loading: loadingGroupsAction,
       response: responseGroupsAction,
       request: requestGroupsAction
-    },
-    addErrorsToState: addErrorsToStateAction
+    }
   },
   models.TemplateSubAccountRowManager,
   (state: Redux.ApplicationStore) => state.budgeting.template.account.id,

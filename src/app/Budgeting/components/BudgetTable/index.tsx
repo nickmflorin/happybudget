@@ -408,8 +408,7 @@ const BudgetTable = <
             isPlaceholder: true,
             isGroupFooter: true,
             selected: false,
-            children: [],
-            errors: []
+            children: []
           }
         }
       ) as R;

@@ -19,7 +19,6 @@ import {
   removeGroupFromStateAction,
   updateSubAccountInStateAction,
   removeSubAccountFromStateAction,
-  addErrorsToStateAction,
   loadingGroupsAction,
   responseGroupsAction,
   requestGroupsAction,
@@ -54,8 +53,7 @@ const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, BudgetTable.Temp
       loading: loadingGroupsAction,
       response: responseGroupsAction,
       request: requestGroupsAction
-    },
-    addErrorsToState: addErrorsToStateAction
+    }
   },
   models.TemplateSubAccountRowManager,
   (state: Redux.ApplicationStore) => state.budgeting.template.subaccount.id,

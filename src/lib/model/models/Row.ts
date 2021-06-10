@@ -61,7 +61,6 @@ interface ModelRowInitData<M extends Model.Model> extends RowInitData<"model", I
 
 class ModelRow<M extends Model.Model> extends Row<"model", ModelRowConfig<M>> implements IModelRow<M> {
   public readonly model: M;
-  public readonly errors: Table.CellError[] = [];
   public readonly type: "model" = "model";
 
   constructor(data: Omit<ModelRowInitData<M>, "type">) {

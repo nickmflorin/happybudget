@@ -9,7 +9,6 @@ const defaultRowMeta: Partial<Table.RowMeta> = {
   isBudgetFooter: false,
   selected: false,
   children: [],
-  errors: [],
   fieldsLoading: []
 };
 

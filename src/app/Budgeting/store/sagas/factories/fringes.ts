@@ -8,7 +8,6 @@ import * as models from "lib/model";
 
 import { warnInconsistentState } from "lib/redux/util";
 import { consolidateTableChange } from "lib/model/util";
-import { handleTableErrors } from "store/tasks";
 
 export interface FringeTasksActionMap {
   response: Redux.ActionCreator<Http.ListResponse<Model.Fringe>>;
@@ -22,7 +21,6 @@ export interface FringeTasksActionMap {
   removePlaceholderFromState: Redux.ActionCreator<number>;
   removeFromState: Redux.ActionCreator<number>;
   updatePlaceholderInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<BudgetTable.FringeRow>>;
-  addErrorsToState: Redux.ActionCreator<Table.CellError | Table.CellError[]>;
   updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<Model.Fringe>>;
 }
 
@@ -91,9 +89,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
       // Once we rebuild back in the error handling, we will have to be concerned here with the nested
       // structure of the errors.
       if (!(yield cancelled())) {
-        yield call(handleTableErrors, e, "There was an error updating the fringes.", id, (errors: Table.CellError[]) =>
-          actions.addErrorsToState(errors)
-        );
+        api.handleRequestError(e, "There was an error updating the fringes.");
       }
     } finally {
       for (let i = 0; i++; i < changes.length) {
@@ -135,9 +131,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
       // Once we rebuild back in the error handling, we will have to be concerned here with the nested
       // structure of the errors.
       if (!(yield cancelled())) {
-        yield call(handleTableErrors, e, "There was an error updating the fringes.", id, (errors: Table.CellError[]) =>
-          actions.addErrorsToState(errors)
-        );
+        api.handleRequestError(e, "There was an error updating the fringes.");
       }
     } finally {
       yield put(actions.creating(false));

@@ -19,10 +19,6 @@ export const setFringesSearchAction = simpleAction<string>(ActionType.Budget.Fri
 export const selectFringeAction = simpleAction<number>(ActionType.Budget.Fringes.Select);
 export const deselectFringeAction = simpleAction<number>(ActionType.Budget.Fringes.Deselect);
 export const selectAllFringesAction = simpleAction<null>(ActionType.Budget.Fringes.SelectAll);
-// Errors Functionality Needs to be Built Back In
-export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(
-  ActionType.Budget.Fringes.AddErrors
-);
 export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.Fringe>>(
   ActionType.Budget.Fringes.Placeholders.Activate
 );

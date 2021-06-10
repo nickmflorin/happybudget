@@ -26,10 +26,6 @@ export const setActualsSearchAction = simpleAction<string>(ActionType.Budget.Act
 export const selectActualAction = simpleAction<number>(ActionType.Budget.Actuals.Select);
 export const deselectActualAction = simpleAction<number>(ActionType.Budget.Actuals.Deselect);
 export const selectAllActualsAction = simpleAction<null>(ActionType.Budget.Actuals.SelectAll);
-// Errors Functionality Needs to be Built Back In
-export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(
-  ActionType.Budget.Actuals.AddErrors
-);
 export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.Actual>>(
   ActionType.Budget.Actuals.Placeholders.Activate
 );

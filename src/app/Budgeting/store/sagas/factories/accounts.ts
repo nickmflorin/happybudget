@@ -9,7 +9,6 @@ import * as models from "lib/model";
 import { isAction } from "lib/redux/typeguards";
 import { warnInconsistentState } from "lib/redux/util";
 import { consolidateTableChange } from "lib/model/util";
-import { handleTableErrors } from "store/tasks";
 
 import { createBulkCreatePayload } from "./util";
 
@@ -21,7 +20,6 @@ export interface AccountsTasksActionMap<
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
   removeFromState: Redux.ActionCreator<number>;
-  addErrorsToState: Redux.ActionCreator<Table.CellError | Table.CellError[]>;
   updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<A>>;
   addToState: Redux.ActionCreator<A>;
   loading: Redux.ActionCreator<boolean>;
@@ -85,13 +83,7 @@ export const createAccountsTaskSet = <
         yield call(api.updateAccount, action.payload, { group: null }, { cancelToken: source.token });
       } catch (e) {
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error removing the account from the group.",
-            action.payload,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error removing the account from the group.");
         }
       } finally {
         yield put(actions.updating({ id: action.payload, value: false }));
@@ -116,13 +108,7 @@ export const createAccountsTaskSet = <
         );
       } catch (e) {
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error adding the account to the group.",
-            action.payload.id,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error adding the account to the group.");
         }
       } finally {
         yield put(actions.updating({ id: action.payload.id, value: false }));
@@ -196,13 +182,7 @@ export const createAccountsTaskSet = <
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error updating the accounts.",
-            objId,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error updating the accounts.");
         }
       } finally {
         yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
@@ -233,13 +213,7 @@ export const createAccountsTaskSet = <
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
         if (!(yield cancelled())) {
-          yield call(
-            handleTableErrors,
-            e,
-            "There was an error creating the accounts.",
-            objId,
-            (errors: Table.CellError[]) => actions.addErrorsToState(errors)
-          );
+          api.handleRequestError(e, "There was an error creating the accounts.");
         }
       } finally {
         yield put(actions.creating(false));

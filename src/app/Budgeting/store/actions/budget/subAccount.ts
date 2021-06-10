@@ -76,10 +76,6 @@ export const removeSubAccountFromStateAction = simpleAction<number>(
 export const addSubAccountToStateAction = simpleAction<Model.BudgetSubAccount>(
   ActionType.Budget.SubAccount.SubAccounts.AddToState
 );
-// Errors Functionality Needs to be Built Back In
-export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(
-  ActionType.Budget.SubAccount.SubAccounts.AddErrors
-);
 export const requestGroupsAction = simpleAction<null>(ActionType.Budget.SubAccount.SubAccounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.SubAccount.SubAccounts.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.BudgetGroup>>(

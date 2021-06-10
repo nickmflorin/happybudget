@@ -81,12 +81,6 @@ export const removeSubAccountFromStateAction = simpleAction<number>(
 export const addSubAccountToStateAction = simpleAction<Model.BudgetSubAccount>(
   ActionType.Budget.Account.SubAccounts.AddToState
 );
-
-// Errors Functionality Needs to be Built Back In
-export const addErrorsToStateAction = simpleAction<Table.CellError | Table.CellError[]>(
-  ActionType.Budget.Account.SubAccounts.AddErrors
-);
-
 /*
   Actions Pertaining to Account Sub Accounts Groups
 */
@@ -108,7 +102,6 @@ export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.Account.SubAccounts.Groups.Deleting
 );
 export const deleteGroupAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Groups.Delete);
-
 /*
   Actions Pertaining to Account Sub Accounts History
 */
