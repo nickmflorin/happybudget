@@ -47,8 +47,6 @@ const ActionType = {
       Select: "budget.fringes.Select",
       Deselect: "budget.fringes.Deselect",
       SelectAll: "budget.fringes.SelectAll",
-      // Errors Functionality Needs to be Built Back In
-      AddErrors: "budget.fringes.AddErrors",
       Placeholders: {
         AddToState: "budget.fringes.placeholders.AddToState",
         Activate: "budget.fringes.placeholders.Activate",
@@ -75,8 +73,6 @@ const ActionType = {
       AddToState: "budget.accounts.AddToState",
       RemoveFromGroup: "budget.accounts.RemoveFromGroup",
       AddToGroup: "budget.accounts.AddToGroup",
-      // Errors Functionality Needs to be Built Back In
-      AddErrors: "budget.accounts.AddErrors",
       Groups: {
         Response: "budget.accounts.groups.Response",
         Request: "budget.accounts.groups.Request",
@@ -134,8 +130,6 @@ const ActionType = {
         AddToState: "budget.subaccount.subaccounts.AddToState",
         RemoveFromGroup: "budget.subaccount.subaccounts.RemoveFromGroup",
         AddToGroup: "budget.subaccount.subaccounts.AddToGroup",
-        // Errors Functionality Needs to be Built Back In
-        AddErrors: "budget.subaccount.subaccounts.AddErrors",
         Groups: {
           Response: "budget.subaccount.subaccounts.groups.Response",
           Request: "budget.subaccount.subaccounts.groups.Request",
@@ -193,8 +187,6 @@ const ActionType = {
         AddToState: "budget.account.subaccounts.AddToState",
         RemoveFromGroup: "budget.account.subaccounts.RemoveFromGroup",
         AddToGroup: "budget.account.subaccounts.AddToGroup",
-        // Errors Functionality Needs to be Built Back In
-        AddErrors: "budget.account.subaccounts.AddErrors",
         Groups: {
           Response: "budget.account.subaccounts.groups.Response",
           Request: "budget.account.subaccounts.groups.Request",
@@ -239,8 +231,6 @@ const ActionType = {
       UpdateInState: "budget.actuals.UpdateInState",
       RemoveFromState: "budget.actuals.RemoveFromState",
       AddToState: "budget.actuals.AddToState",
-      // Errors Functionality Needs to be Built Back In
-      AddErrors: "budget.actuals.AddErrors",
       Placeholders: {
         AddToState: "budget.actuals.placeholders.AddToState",
         Activate: "budget.actuals.placeholders.Activate",
@@ -273,8 +263,6 @@ const ActionType = {
       Select: "template.fringes.Select",
       Deselect: "template.fringes.Deselect",
       SelectAll: "template.fringes.SelectAll",
-      // Errors Functionality Needs to be Built Back In
-      AddErrors: "template.fringes.AddErrors",
       Placeholders: {
         AddToState: "template.fringes.placeholders.AddToState",
         Activate: "template.fringes.placeholders.Activate",
@@ -301,8 +289,6 @@ const ActionType = {
       AddToState: "template.accounts.AddToState",
       RemoveFromGroup: "template.accounts.RemoveFromGroup",
       AddToGroup: "template.accounts.AddToGroup",
-      // Errors Functionality Needs to be Built Back In
-      AddErrors: "template.accounts.AddErrors",
       Groups: {
         Response: "template.accounts.groups.Response",
         Request: "template.accounts.groups.Request",
@@ -339,8 +325,6 @@ const ActionType = {
         AddToState: "template.subaccount.subaccounts.AddToState",
         RemoveFromGroup: "template.subaccount.subaccounts.RemoveFromGroup",
         AddToGroup: "template.subaccount.subaccounts.AddToGroup",
-        // Errors Functionality Needs to be Built Back In
-        AddErrors: "template.subaccount.subaccounts.AddErrors",
         Groups: {
           Response: "template.subaccount.subaccounts.groups.Response",
           Request: "template.subaccount.subaccounts.groups.Request",
@@ -378,8 +362,6 @@ const ActionType = {
         AddToState: "template.account.subaccounts.AddToState",
         RemoveFromGroup: "template.account.subaccounts.RemoveFromGroup",
         AddToGroup: "template.account.subaccounts.AddToGroup",
-        // Errors Functionality Needs to be Built Back In
-        AddErrors: "template.account.subaccounts.AddErrors",
         Groups: {
           Response: "template.account.subaccounts.groups.Response",
           Request: "template.account.subaccounts.groups.Request",
