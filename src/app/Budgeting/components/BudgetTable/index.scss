@@ -45,6 +45,7 @@
 
   .table-grid {
     flex: 1 1 auto;
+    height: 100%;  // Required to render correctly in Safari.
 
     .ag-row:last-child {
       border-bottom: none !important;
