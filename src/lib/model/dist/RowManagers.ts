@@ -122,7 +122,6 @@ export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actu
     // TODO: Eventually, we need to allow this to be null.
     WriteOnly({
       field: "object_id",
-      http: ["PATCH"],
       required: true,
       getValueFromRow: (row: BudgetTable.ActualRow) => {
         if (!isNil(row.account)) {
@@ -150,7 +149,6 @@ export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actu
     // TODO: Eventually, we need to allow this to be null.
     WriteOnly({
       field: "parent_type",
-      http: ["PATCH"],
       required: true,
       getValueFromRow: (row: BudgetTable.ActualRow) => {
         if (!isNil(row.account)) {

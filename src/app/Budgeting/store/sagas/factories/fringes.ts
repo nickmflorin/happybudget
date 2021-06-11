@@ -1,6 +1,6 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { call, put, select, fork, cancelled } from "redux-saga/effects";
+import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, find, map } from "lodash";
 
 import * as api from "api";
@@ -36,7 +36,11 @@ export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
     data: Http.BulkUpdatePayload<Http.FringePayload>[],
     options: Http.RequestOptions
   ) => Promise<M>;
-  bulkCreate: (id: number, data: Http.FringePayload[], options: Http.RequestOptions) => Promise<Model.Fringe[]>;
+  bulkCreate: (
+    id: number,
+    payload: Http.BulkCreatePayload<Http.FringePayload>,
+    options: Http.RequestOptions
+  ) => Promise<Model.Fringe[]>;
 }
 
 export interface FringeTaskSet {
@@ -104,29 +108,21 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   function* bulkCreateTask(id: number, rows: BudgetTable.FringeRow[]): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    const requestPayload: Http.FringePayload[] = map(rows, (row: BudgetTable.FringeRow) =>
-      models.FringeRowManager.payload(row)
-    );
+    const requestPayload: Http.BulkCreatePayload<Http.FringePayload> = {
+      data: map(rows, (row: BudgetTable.FringeRow) => models.FringeRowManager.payload(row))
+    };
     yield put(actions.creating(true));
     try {
-      const fringes: Model.Fringe[] = yield call(services.bulkCreate, id, requestPayload, {
+      // NOTE: This assumes that the fringes in the response are in the same order as the
+      // placeholder rows passed in.
+      const response: Model.Fringe[] = yield call(services.bulkCreate, id, requestPayload, {
         cancelToken: source.token
       });
-      for (let i = 0; i < fringes.length; i++) {
-        // It is not ideal that we have to do this, but we have no other way to map a placeholder
-        // to the returned Fringe when bulk creating.  We can rely on the name field being
-        // unique (at least we hope it is) - otherwise the request will fail.
-        const placeholder = find(rows, { name: fringes[i].name });
-        if (isNil(placeholder)) {
-          /* eslint-disable no-console */
-          console.error(
-            `Could not map fringe ${fringes[i].id} to it's previous placeholder via the
-          name, ${fringes[i].name}`
-          );
-        } else {
-          yield put(actions.activatePlaceholder({ id: placeholder.id, model: fringes[i] }));
-        }
-      }
+      yield all(
+        map(response, (fringe: Model.Fringe, index: number) =>
+          put(actions.activatePlaceholder({ id: rows[index].id, model: fringe }))
+        )
+      );
     } catch (e) {
       // Once we rebuild back in the error handling, we will have to be concerned here with the nested
       // structure of the errors.

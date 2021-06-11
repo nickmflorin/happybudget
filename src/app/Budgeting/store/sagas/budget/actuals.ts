@@ -1,6 +1,6 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { spawn, take, cancel, takeEvery, call, put, select, fork, cancelled, debounce } from "redux-saga/effects";
+import { spawn, take, cancel, takeEvery, call, put, select, fork, cancelled, debounce, all } from "redux-saga/effects";
 import { isNil, find, map } from "lodash";
 
 import * as api from "api";
@@ -65,26 +65,29 @@ export function* updateTask(id: number, change: Table.RowChange<BudgetTable.Actu
   }
 }
 
-export function* createTask(
-  id: number,
-  accountType: "account" | "subaccount",
-  row: BudgetTable.ActualRow
-): SagaIterator {
+export function* bulkCreateTask(id: number, rows: BudgetTable.ActualRow[]): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  let service = api.createAccountActual;
-  if (accountType === "subaccount") {
-    service = api.createSubAccountActual;
-  }
+  const requestPayload: Http.BulkCreatePayload<Http.ActualPayload> = {
+    data: map(rows, (row: BudgetTable.ActualRow) => models.ActualRowManager.payload(row))
+  };
   yield put(creatingActualAction(true));
   try {
-    const response: Model.Actual = yield call(service, id, models.ActualRowManager.payload(row), {
+    // NOTE: This assumes that the actuals in the response are in the same order as the
+    // placeholder rows passed in.
+    const response: Model.Actual[] = yield call(api.bulkCreateBudgetActuals, id, requestPayload, {
       cancelToken: source.token
     });
-    yield put(activatePlaceholderAction({ id: row.id, model: response }));
+    yield all(
+      map(response, (actual: Model.Actual, index: number) =>
+        put(activatePlaceholderAction({ id: rows[index].id, model: actual }))
+      )
+    );
   } catch (e) {
+    // Once we rebuild back in the error handling, we will have to be concerned here with the nested
+    // structure of the errors.
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error updating the actual.");
+      api.handleRequestError(e, "There was an error updating the actuals.");
     }
   } finally {
     yield put(creatingActualAction(false));
@@ -104,9 +107,11 @@ export function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable
       ...models.ActualRowManager.payload(change)
     })
   );
-  for (let i = 0; i++; i < changes.length) {
-    yield put(updatingActualAction({ id: changes[i].id, value: true }));
-  }
+  yield all(
+    changes.map((change: Table.RowChange<BudgetTable.ActualRow>) =>
+      put(updatingActualAction({ id: change.id, value: true }))
+    )
+  );
   try {
     yield call(api.bulkUpdateBudgetActuals, id, requestPayload, { cancelToken: source.token });
   } catch (e) {
@@ -116,9 +121,11 @@ export function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable
       api.handleRequestError(e, "There was an error updating the actuals.");
     }
   } finally {
-    for (let i = 0; i++; i < changes.length) {
-      yield put(updatingActualAction({ id: changes[i].id, value: false }));
-    }
+    yield all(
+      changes.map((change: Table.RowChange<BudgetTable.ActualRow>) =>
+        put(updatingActualAction({ id: change.id, value: false }))
+      )
+    );
     if (yield cancelled()) {
       source.cancel();
     }
@@ -148,44 +155,6 @@ export function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
   }
 }
 
-export function* handleUpdateTask(action: Redux.Action<Table.RowChange<BudgetTable.ActualRow>>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
-  if (!isNil(budgetId) && !isNil(action.payload)) {
-    const id = action.payload.id;
-    const data: Model.Actual[] = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
-    const model: Model.Actual | undefined = find(data, { id });
-    if (isNil(model)) {
-      const placeholders = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.placeholders);
-      const placeholder: BudgetTable.ActualRow | undefined = find(placeholders, { id });
-      if (isNil(placeholder)) {
-        warnInconsistentState({
-          action: action.type,
-          reason: "Actual does not exist in state when it is expected to.",
-          id: action.payload
-        });
-      } else {
-        const updatedRow = models.ActualRowManager.mergeChangesWithRow(placeholder, action.payload);
-        yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
-        // Wait until all of the required fields are present before we create the entity in the
-        // backend.  Once the entity is created in the backend, we can remove the placeholder
-        // designation of the row so it will be updated instead of created the next time the row
-        // is changed.
-        if (models.ActualRowManager.rowHasRequiredFields(updatedRow)) {
-          // The account object should be present on the row, since it is a required field.
-          if (isNil(updatedRow.account)) {
-            throw new Error("The account must be a required field.");
-          }
-          yield call(createTask, updatedRow.account.id, updatedRow.account.type, updatedRow);
-        }
-      }
-    } else {
-      const updatedModel = models.ActualRowManager.mergeChangesWithModel(model, action.payload);
-      yield put(updateActualInStateAction({ id: updatedModel.id, data: updatedModel }));
-      yield call(updateTask, model.id, action.payload);
-    }
-  }
-}
-
 export function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetTable.ActualRow>>): SagaIterator {
   const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
@@ -195,7 +164,9 @@ export function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetT
     const data = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
     const placeholders = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.placeholders);
 
-    const mergedUpdates: Table.RowChange<BudgetTable.ActualRow>[] = [];
+    const updatesToPerform: Table.RowChange<BudgetTable.ActualRow>[] = [];
+    const createsToPerform: BudgetTable.ActualRow[] = [];
+
     for (let i = 0; i < merged.length; i++) {
       const model: Model.Actual | undefined = find(data, { id: merged[i].id });
       if (isNil(model)) {
@@ -207,20 +178,27 @@ export function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetT
             id: action.payload
           });
         } else {
-          // NOTE: Since the only required field for the Actual is the account, which is controlled
-          // by the HTML select field, it cannot be copy/pasted and thus we do not have to worry
-          // about the bulk creation of Actual(s) - only the bulk updating.
           const updatedRow = models.ActualRowManager.mergeChangesWithRow(placeholder, merged[i]);
           yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
+          // Wait until all of the required fields are present before we create the entity in the
+          // backend.  Once the entity is created in the backend, we can remove the placeholder
+          // designation of the row so it will be updated instead of created the next time the row
+          // is changed.
+          if (models.ActualRowManager.rowHasRequiredFields(updatedRow)) {
+            createsToPerform.push(updatedRow);
+          }
         }
       } else {
         const updatedModel = models.ActualRowManager.mergeChangesWithModel(model, merged[i]);
         yield put(updateActualInStateAction({ id: updatedModel.id, data: updatedModel }));
-        mergedUpdates.push(merged[i]);
+        updatesToPerform.push(merged[i]);
       }
     }
-    if (mergedUpdates.length !== 0) {
-      yield fork(bulkUpdateTask, budgetId, mergedUpdates);
+    if (updatesToPerform.length !== 0) {
+      yield fork(bulkUpdateTask, budgetId, updatesToPerform);
+    }
+    if (createsToPerform.length !== 0) {
+      yield fork(bulkCreateTask, budgetId, createsToPerform);
     }
   }
 }

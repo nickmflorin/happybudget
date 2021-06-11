@@ -165,11 +165,11 @@ export const bulkUpdateTemplateFringes = async (
 
 export const bulkCreateTemplateFringes = async (
   id: number,
-  data: Http.FringePayload[],
+  payload: Http.BulkCreatePayload<Http.FringePayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.Fringe[]> => {
   const url = URL.v1("templates", id, "bulk-create-fringes");
   return client
-    .patch<Http.BulkCreateResponse<Model.Fringe>>(url, { data }, options)
+    .patch<Http.BulkCreateResponse<Model.Fringe>>(url, payload, options)
     .then((response: Http.BulkCreateResponse<Model.Fringe>) => response.data);
 };

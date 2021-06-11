@@ -174,6 +174,17 @@ export const bulkUpdateBudgetActuals = async (
   return client.patch<Model.Actual>(url, { data }, options);
 };
 
+export const bulkCreateBudgetActuals = async (
+  id: number,
+  payload: Http.BulkCreatePayload<Http.ActualPayload>,
+  options: Http.RequestOptions = {}
+): Promise<Model.Actual[]> => {
+  const url = URL.v1("budgets", id, "bulk-create-actuals");
+  return client
+    .patch<Http.BulkCreateResponse<Model.Actual>>(url, payload, options)
+    .then((response: Http.BulkCreateResponse<Model.Actual>) => response.data);
+};
+
 export const bulkUpdateBudgetFringes = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.FringePayload>[],
@@ -185,11 +196,11 @@ export const bulkUpdateBudgetFringes = async (
 
 export const bulkCreateBudgetFringes = async (
   id: number,
-  data: Http.FringePayload[],
+  payload: Http.BulkCreatePayload<Http.FringePayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.Fringe[]> => {
   const url = URL.v1("budgets", id, "bulk-create-fringes");
   return client
-    .patch<Http.BulkCreateResponse<Model.Fringe>>(url, { data }, options)
+    .patch<Http.BulkCreateResponse<Model.Fringe>>(url, payload, options)
     .then((response: Http.BulkCreateResponse<Model.Fringe>) => response.data);
 };
