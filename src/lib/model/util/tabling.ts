@@ -30,12 +30,14 @@ export const cellChangeToRowChange = <R extends Table.Row>(
     id: cellChange.id,
     data: {}
   };
+  let rowChangeData: Table.RowChangeData<R> = {};
+  rowChangeData = {
+    ...rowChangeData,
+    [cellChange.field]: { oldValue: cellChange.oldValue, newValue: cellChange.newValue }
+  };
   rowChange = {
     ...rowChange,
-    // Note: We have to use Object.create to avoid TS compilation errors, because
-    // TS will assume that the object is of type {[x: string]: {...}} when the key
-    // is actually keyof R.
-    data: Object.create({ [cellChange.field]: { oldValue: cellChange.oldValue, newValue: cellChange.newValue } })
+    data: rowChangeData
   };
   return rowChange;
 };

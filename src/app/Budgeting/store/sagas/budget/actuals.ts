@@ -207,7 +207,7 @@ export function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetT
             id: action.payload
           });
         } else {
-          // NOTE: Since the only required field for the Actual is the parent, which is controlled
+          // NOTE: Since the only required field for the Actual is the account, which is controlled
           // by the HTML select field, it cannot be copy/pasted and thus we do not have to worry
           // about the bulk creation of Actual(s) - only the bulk updating.
           const updatedRow = models.ActualRowManager.mergeChangesWithRow(placeholder, merged[i]);
