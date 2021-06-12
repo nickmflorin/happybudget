@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import Cookies from "universal-cookie";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
@@ -12,6 +11,8 @@ import { setInstanceAction, setTemplateAutoIndex } from "../../../store/actions/
 import { setAccountIdAction } from "../../../store/actions/template/account";
 import { requestFringesAction } from "../../../store/actions/template/fringes";
 import { selectTemplateId } from "../../../store/selectors";
+import { setTemplateLastVisited } from "../../../urls";
+
 import SubAccountsTable from "./SubAccountsTable";
 
 const selectDetail = simpleDeepEqualSelector(
@@ -58,8 +59,7 @@ const Account = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(templateId) && !isNaN(parseInt(accountId))) {
-      const cookies = new Cookies();
-      cookies.set("template-last-visited", `/templates/${templateId}/accounts/${accountId}`);
+      setTemplateLastVisited(templateId, `/templates/${templateId}/accounts/${accountId}`);
     }
   }, [templateId]);
 

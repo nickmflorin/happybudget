@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import Cookies from "universal-cookie";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
@@ -12,6 +11,8 @@ import { setInstanceAction, setBudgetAutoIndex } from "../../../store/actions/bu
 import { setAccountIdAction } from "../../../store/actions/budget/account";
 import { requestFringesAction } from "../../../store/actions/budget/fringes";
 import { selectBudgetId } from "../../../store/selectors";
+import { setBudgetLastVisited } from "../../../urls";
+
 import SubAccountsTable from "./SubAccountsTable";
 import AccountCommentsHistory from "./AccountCommentsHistory";
 
@@ -61,8 +62,7 @@ const Account = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(budgetId) && !isNaN(parseInt(accountId))) {
-      const cookies = new Cookies();
-      cookies.set("budget-last-visited", `/budgets/${budgetId}/accounts/${accountId}`);
+      setBudgetLastVisited(budgetId, `/budgets/${budgetId}/accounts/${accountId}`);
     }
   }, [budgetId]);
 

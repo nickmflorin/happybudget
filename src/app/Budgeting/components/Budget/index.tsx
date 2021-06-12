@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
-import Cookies from "universal-cookie";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -23,6 +22,7 @@ import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "../
 import { selectBudgetInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "../../store/selectors";
 import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
 import { GenericLayout } from "../Generic";
+import { getBudgetLastVisited, isBudgetRelatedUrl } from "../../urls";
 
 import Account from "./Account";
 import Accounts from "./Accounts";
@@ -140,21 +140,16 @@ const Budget = (): JSX.Element => {
         {
           icon: <FontAwesomeIcon icon={faFileSpreadsheet} />,
           onClick: () => {
-            const cookies = new Cookies();
-            // TODO: Only do this if the budgetId refers to the current budgetId the view is
-            // rendered for!
-            const budgetLastVisited = cookies.get("budget-last-visited");
-            if (!isNil(budgetLastVisited)) {
-              history.push(budgetLastVisited);
-            } else {
-              history.push(`/budgets/${budgetId}`);
+            if (!isNaN(parseInt(budgetId)) && !isBudgetRelatedUrl(location.pathname)) {
+              const budgetLastVisited = getBudgetLastVisited(parseInt(budgetId));
+              if (!isNil(budgetLastVisited)) {
+                history.push(budgetLastVisited);
+              } else {
+                history.push(`/budgets/${budgetId}`);
+              }
             }
           },
-          active:
-            location.pathname.startsWith("/budgets") &&
-            !location.pathname.startsWith(`/budgets/${budgetId}/actuals`) &&
-            !location.pathname.startsWith(`/budgets/${budgetId}/fringes`) &&
-            !location.pathname.startsWith(`/budgets/${budgetId}/analysis`),
+          active: isBudgetRelatedUrl(location.pathname),
           tooltip: {
             title: "Budget",
             placement: "right"

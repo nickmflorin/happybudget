@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Cookies from "universal-cookie";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
@@ -10,6 +9,7 @@ import { simpleShallowEqualSelector } from "store/selectors";
 import { setInstanceAction, setTemplateAutoIndex } from "../../../store/actions/template";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/template/accounts";
 import { selectTemplateId } from "../../../store/selectors";
+import { setTemplateLastVisited } from "../../../urls";
 
 import AccountsBudgetTable from "./AccountsTable";
 
@@ -42,8 +42,7 @@ const Accounts = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(templateId)) {
-      const cookies = new Cookies();
-      cookies.set("template-last-visited", `/templates/${templateId}/accounts`);
+      setTemplateLastVisited(templateId, `/templates/${templateId}/accounts`);
     }
   }, [templateId]);
 

@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Cookies from "universal-cookie";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
@@ -10,6 +9,7 @@ import { simpleShallowEqualSelector } from "store/selectors";
 import { setInstanceAction, setBudgetAutoIndex } from "../../../store/actions/budget";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/budget/accounts";
 import { selectBudgetId } from "../../../store/selectors";
+import { setBudgetLastVisited } from "../../../urls";
 
 import AccountsTable from "./AccountsTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
@@ -43,8 +43,7 @@ const Accounts = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(budgetId)) {
-      const cookies = new Cookies();
-      cookies.set("budget-last-visited", `/budgets/${budgetId}/accounts`);
+      setBudgetLastVisited(budgetId, `/budgets/${budgetId}/accounts`);
     }
   }, [budgetId]);
 

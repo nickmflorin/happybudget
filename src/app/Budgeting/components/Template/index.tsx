@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
-import Cookies from "universal-cookie";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,6 +13,7 @@ import { setTemplateIdAction } from "../../store/actions/template";
 import { selectTemplateInstance, selectTemplateDetail } from "../../store/selectors";
 import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
 import { GenericLayout } from "../Generic";
+import { getTemplateLastVisited } from "../../urls";
 
 import Account from "./Account";
 import Accounts from "./Accounts";
@@ -64,14 +64,13 @@ const Template = (): JSX.Element => {
         {
           icon: <FontAwesomeIcon icon={faFileSpreadsheet} />,
           onClick: () => {
-            const cookies = new Cookies();
-            // TODO: Only do this if the templateId refers to the current templateId the view is
-            // rendered for!
-            const templateLastVisited = cookies.get("template-last-visited");
-            if (!isNil(templateLastVisited)) {
-              history.push(templateLastVisited);
-            } else {
-              history.push(`/templates/${templateId}`);
+            if (!isNaN(parseInt(templateId))) {
+              const templateLastVisited = getTemplateLastVisited(parseInt(templateId));
+              if (!isNil(templateLastVisited)) {
+                history.push(templateLastVisited);
+              } else {
+                history.push(`/templates/${templateId}`);
+              }
             }
           },
           active:
