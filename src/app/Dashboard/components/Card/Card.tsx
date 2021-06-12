@@ -3,6 +3,7 @@ import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEyeSlash } from "@fortawesome/pro-solid-svg-icons";
 import { faImagePolaroid, faEllipsisV } from "@fortawesome/pro-light-svg-icons";
 
 import { ShowHide, RenderWithSpinner, Dropdown } from "components";
@@ -46,6 +47,7 @@ interface CardProps extends StandardComponentProps {
   image?: string | null;
   loading?: boolean;
   onClick?: () => void;
+  hidden?: boolean;
 }
 
 const Card = ({
@@ -55,12 +57,16 @@ const Card = ({
   onClick,
   loading,
   image,
+  hidden = false,
   style = {},
   className
 }: CardProps): JSX.Element => {
   return (
-    <div className={classNames("dashboard-card", className)} style={style}>
+    <div className={classNames("dashboard-card", className, { hidden })} style={style}>
       <RenderWithSpinner size={18} loading={loading} toggleOpacity={true}>
+        <ShowHide show={hidden}>
+          <FontAwesomeIcon className={"icon icon--hidden"} icon={faEyeSlash} />
+        </ShowHide>
         {!isNil(dropdown) && (
           <Dropdown items={dropdown} placement={"bottomRight"} trigger={["click"]}>
             <IconButton

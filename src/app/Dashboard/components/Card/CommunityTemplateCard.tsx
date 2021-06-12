@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faImage, faTrash, faClone } from "@fortawesome/pro-light-svg-icons";
+import { faEdit, faImage, faTrash, faClone, faEyeSlash, faEye } from "@fortawesome/pro-light-svg-icons";
 
 import { useLoggedInUser } from "store/hooks";
 
@@ -9,7 +9,9 @@ interface CommunityTemplateCardProps {
   template: Model.Template;
   loading?: boolean;
   duplicating: boolean;
+  hidingOrShowing: boolean;
   deleting: boolean;
+  onToggleVisibility: () => void;
   onDelete: () => void;
   onEdit: () => void;
   onEditNameImage: () => void;
@@ -22,6 +24,8 @@ const CommunityTemplateCard = ({
   loading,
   duplicating,
   deleting,
+  hidingOrShowing,
+  onToggleVisibility,
   onDuplicate,
   onClick,
   onEditNameImage,
@@ -36,6 +40,7 @@ const CommunityTemplateCard = ({
       title={template.name}
       loading={loading}
       image={template.image}
+      hidden={user.is_staff === true && template.hidden === true}
       dropdown={
         /* eslint-disable indent */
         user.is_staff
@@ -58,6 +63,13 @@ const CommunityTemplateCard = ({
                 icon: <FontAwesomeIcon className={"icon"} icon={faClone} />,
                 onClick: () => onDuplicate(),
                 loading: duplicating
+              },
+              {
+                id: "hide_show",
+                text: template.hidden === true ? "Show" : "Hide",
+                icon: <FontAwesomeIcon className={"icon"} icon={template.hidden === true ? faEye : faEyeSlash} />,
+                onClick: () => onToggleVisibility(),
+                loading: hidingOrShowing
               },
               {
                 id: "delete",

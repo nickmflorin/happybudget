@@ -2,41 +2,9 @@ import axios from "axios";
 import { isNil, includes } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, cancelled } from "redux-saga/effects";
-import {
-  getBudgets,
-  getTemplates,
-  deleteBudget,
-  deleteTemplate,
-  getContacts,
-  deleteContact,
-  getCommunityTemplates,
-  updateTemplate,
-  duplicateTemplate
-} from "api/services";
-import { handleRequestError } from "api";
-import {
-  loadingBudgetsAction,
-  loadingTemplatesAction,
-  loadingCommunityTemplatesAction,
-  responseBudgetsAction,
-  responseTemplatesAction,
-  responseCommunityTemplatesAction,
-  removeBudgetFromStateAction,
-  removeTemplateFromStateAction,
-  loadingContactsAction,
-  responseContactsAction,
-  deletingContactAction,
-  removeContactFromStateAction,
-  removeCommunityTemplateFromStateAction,
-  addCommunityTemplateToStateAction,
-  addTemplateToStateAction,
-  duplicatingTemplateAction,
-  duplicatingCommunityTemplateAction,
-  deletingBudgetAction,
-  deletingTemplateAction,
-  deletingCommunityTemplateAction,
-  movingTemplateToCommunityAction
-} from "./actions";
+
+import * as api from "api";
+import * as actions from "./actions";
 
 export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
   const CancelToken = axios.CancelToken;
@@ -48,19 +16,19 @@ export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
       page: state.dashboard.budgets.page
     };
   });
-  yield put(loadingBudgetsAction(true));
+  yield put(actions.loadingBudgetsAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleBudget> = yield call(getBudgets, query, {
+    const response: Http.ListResponse<Model.SimpleBudget> = yield call(api.getBudgets, query, {
       cancelToken: source.token
     });
-    yield put(responseBudgetsAction(response));
+    yield put(actions.responseBudgetsAction(response));
   } catch (e) {
     if (!(yield cancelled())) {
-      handleRequestError(e, "There was an error retrieving the budgets.");
-      yield put(responseBudgetsAction({ count: 0, data: [] }, { error: e }));
+      api.handleRequestError(e, "There was an error retrieving the budgets.");
+      yield put(actions.responseBudgetsAction({ count: 0, data: [] }, { error: e }));
     }
   } finally {
-    yield put(loadingBudgetsAction(false));
+    yield put(actions.loadingBudgetsAction(false));
     if (yield cancelled()) {
       source.cancel();
     }
@@ -77,19 +45,19 @@ export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
       page: state.dashboard.templates.page
     };
   });
-  yield put(loadingTemplatesAction(true));
+  yield put(actions.loadingTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(getTemplates, query, {
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(api.getTemplates, query, {
       cancelToken: source.token
     });
-    yield put(responseTemplatesAction(response));
+    yield put(actions.responseTemplatesAction(response));
   } catch (e) {
     if (!(yield cancelled())) {
-      handleRequestError(e, "There was an error retrieving the templates.");
-      yield put(responseTemplatesAction({ count: 0, data: [] }, { error: e }));
+      api.handleRequestError(e, "There was an error retrieving the templates.");
+      yield put(actions.responseTemplatesAction({ count: 0, data: [] }, { error: e }));
     }
   } finally {
-    yield put(loadingTemplatesAction(false));
+    yield put(actions.loadingTemplatesAction(false));
     if (yield cancelled()) {
       source.cancel();
     }
@@ -106,19 +74,19 @@ export function* getCommunityTemplatesTask(action: Redux.Action<any>): SagaItera
       page: state.dashboard.community.page
     };
   });
-  yield put(loadingCommunityTemplatesAction(true));
+  yield put(actions.loadingCommunityTemplatesAction(true));
   try {
-    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(getCommunityTemplates, query, {
+    const response: Http.ListResponse<Model.SimpleTemplate> = yield call(api.getCommunityTemplates, query, {
       cancelToken: source.token
     });
-    yield put(responseCommunityTemplatesAction(response));
+    yield put(actions.responseCommunityTemplatesAction(response));
   } catch (e) {
     if (!(yield cancelled())) {
-      handleRequestError(e, "There was an error retrieving the community templates.");
-      yield put(responseCommunityTemplatesAction({ count: 0, data: [] }, { error: e }));
+      api.handleRequestError(e, "There was an error retrieving the community templates.");
+      yield put(actions.responseCommunityTemplatesAction({ count: 0, data: [] }, { error: e }));
     }
   } finally {
-    yield put(loadingCommunityTemplatesAction(false));
+    yield put(actions.loadingCommunityTemplatesAction(false));
     if (yield cancelled()) {
       source.cancel();
     }
@@ -129,16 +97,16 @@ export function* deleteBudgetTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(deletingBudgetAction({ id: action.payload, value: true }));
+    yield put(actions.deletingBudgetAction({ id: action.payload, value: true }));
     try {
-      yield call(deleteBudget, action.payload, { cancelToken: source.token });
-      yield put(removeBudgetFromStateAction(action.payload));
+      yield call(api.deleteBudget, action.payload, { cancelToken: source.token });
+      yield put(actions.removeBudgetFromStateAction(action.payload));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error deleting the budget.");
+        api.handleRequestError(e, "There was an error deleting the budget.");
       }
     } finally {
-      yield put(deletingBudgetAction({ id: action.payload, value: false }));
+      yield put(actions.deletingBudgetAction({ id: action.payload, value: false }));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -150,16 +118,16 @@ export function* deleteTemplateTask(action: Redux.Action<number>): SagaIterator 
   if (!isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(deletingTemplateAction({ id: action.payload, value: true }));
+    yield put(actions.deletingTemplateAction({ id: action.payload, value: true }));
     try {
-      yield call(deleteTemplate, action.payload, { cancelToken: source.token });
-      yield put(removeTemplateFromStateAction(action.payload));
+      yield call(api.deleteTemplate, action.payload, { cancelToken: source.token });
+      yield put(actions.removeTemplateFromStateAction(action.payload));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error deleting the template.");
+        api.handleRequestError(e, "There was an error deleting the template.");
       }
     } finally {
-      yield put(deletingTemplateAction({ id: action.payload, value: false }));
+      yield put(actions.deletingTemplateAction({ id: action.payload, value: false }));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -171,16 +139,16 @@ export function* deleteCommunityTemplateTask(action: Redux.Action<number>): Saga
   if (!isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(deletingCommunityTemplateAction({ id: action.payload, value: true }));
+    yield put(actions.deletingCommunityTemplateAction({ id: action.payload, value: true }));
     try {
-      yield call(deleteTemplate, action.payload, { cancelToken: source.token });
-      yield put(removeCommunityTemplateFromStateAction(action.payload));
+      yield call(api.deleteTemplate, action.payload, { cancelToken: source.token });
+      yield put(actions.removeCommunityTemplateFromStateAction(action.payload));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error deleting the community template.");
+        api.handleRequestError(e, "There was an error deleting the community template.");
       }
     } finally {
-      yield put(deletingCommunityTemplateAction({ id: action.payload, value: false }));
+      yield put(actions.deletingCommunityTemplateAction({ id: action.payload, value: false }));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -192,22 +160,22 @@ export function* moveTemplateToCommunityTask(action: Redux.Action<number>): Saga
   if (!isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(movingTemplateToCommunityAction({ id: action.payload, value: true }));
+    yield put(actions.movingTemplateToCommunityAction({ id: action.payload, value: true }));
     try {
       const response: Model.Template = yield call(
-        updateTemplate,
+        api.updateTemplate,
         action.payload,
         { community: true },
         { cancelToken: source.token }
       );
-      yield put(removeTemplateFromStateAction(action.payload));
-      yield put(addCommunityTemplateToStateAction(response));
+      yield put(actions.removeTemplateFromStateAction(action.payload));
+      yield put(actions.addCommunityTemplateToStateAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error moving the template to community.");
+        api.handleRequestError(e, "There was an error moving the template to community.");
       }
     } finally {
-      yield put(movingTemplateToCommunityAction({ id: action.payload, value: false }));
+      yield put(actions.movingTemplateToCommunityAction({ id: action.payload, value: false }));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -219,16 +187,16 @@ export function* duplicateTemplateTask(action: Redux.Action<number>): SagaIterat
   if (!isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(duplicatingTemplateAction({ id: action.payload, value: true }));
+    yield put(actions.duplicatingTemplateAction({ id: action.payload, value: true }));
     try {
-      const response: Model.Template = yield call(duplicateTemplate, action.payload, { cancelToken: source.token });
-      yield put(addTemplateToStateAction(response));
+      const response: Model.Template = yield call(api.duplicateTemplate, action.payload, { cancelToken: source.token });
+      yield put(actions.addTemplateToStateAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error duplicating the template.");
+        api.handleRequestError(e, "There was an error duplicating the template.");
       }
     } finally {
-      yield put(duplicatingTemplateAction({ id: action.payload, value: false }));
+      yield put(actions.duplicatingTemplateAction({ id: action.payload, value: false }));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -240,16 +208,68 @@ export function* duplicateCommunityTemplateTask(action: Redux.Action<number>): S
   if (!isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(duplicatingCommunityTemplateAction({ id: action.payload, value: true }));
+    yield put(actions.duplicatingCommunityTemplateAction({ id: action.payload, value: true }));
     try {
-      const response: Model.Template = yield call(duplicateTemplate, action.payload, { cancelToken: source.token });
-      yield put(addTemplateToStateAction(response));
+      const response: Model.Template = yield call(api.duplicateTemplate, action.payload, { cancelToken: source.token });
+      yield put(actions.addTemplateToStateAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error duplicating the template.");
+        api.handleRequestError(e, "There was an error duplicating the template.");
       }
     } finally {
-      yield put(duplicatingCommunityTemplateAction({ id: action.payload, value: false }));
+      yield put(actions.duplicatingCommunityTemplateAction({ id: action.payload, value: false }));
+      if (yield cancelled()) {
+        source.cancel();
+      }
+    }
+  }
+}
+
+export function* hideCommunityTemplateTask(action: Redux.Action<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    yield put(actions.hidingCommunityTemplateAction({ id: action.payload, value: true }));
+    try {
+      const response: Model.Template = yield call(
+        api.updateTemplate,
+        action.payload,
+        { hidden: true },
+        { cancelToken: source.token }
+      );
+      yield put(actions.updateCommunityTemplateInStateAction({ id: action.payload, data: response }));
+    } catch (e) {
+      if (!(yield cancelled())) {
+        api.handleRequestError(e, "There was an error hiding the community template.");
+      }
+    } finally {
+      yield put(actions.hidingCommunityTemplateAction({ id: action.payload, value: false }));
+      if (yield cancelled()) {
+        source.cancel();
+      }
+    }
+  }
+}
+
+export function* showCommunityTemplateAction(action: Redux.Action<number>): SagaIterator {
+  if (!isNil(action.payload)) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    yield put(actions.showingCommunityTemplateAction({ id: action.payload, value: true }));
+    try {
+      const response: Model.Template = yield call(
+        api.updateTemplate,
+        action.payload,
+        { hidden: false },
+        { cancelToken: source.token }
+      );
+      yield put(actions.updateCommunityTemplateInStateAction({ id: action.payload, data: response }));
+    } catch (e) {
+      if (!(yield cancelled())) {
+        api.handleRequestError(e, "There was an error showing the community template.");
+      }
+    } finally {
+      yield put(actions.showingCommunityTemplateAction({ id: action.payload, value: false }));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -267,17 +287,17 @@ export function* getContactsTask(action: Redux.Action<any>): SagaIterator {
       search: state.dashboard.contacts.search
     };
   });
-  yield put(loadingContactsAction(true));
+  yield put(actions.loadingContactsAction(true));
   try {
-    let response: Http.ListResponse<Model.Contact> = yield call(getContacts, query, { cancelToken: source.token });
-    yield put(responseContactsAction(response));
+    let response: Http.ListResponse<Model.Contact> = yield call(api.getContacts, query, { cancelToken: source.token });
+    yield put(actions.responseContactsAction(response));
   } catch (e) {
     if (!(yield cancelled())) {
-      handleRequestError(e, "There was an error retrieving the contacts.");
-      yield put(responseContactsAction({ count: 0, data: [] }, { error: e }));
+      api.handleRequestError(e, "There was an error retrieving the contacts.");
+      yield put(actions.responseContactsAction({ count: 0, data: [] }, { error: e }));
     }
   } finally {
-    yield put(loadingContactsAction(false));
+    yield put(actions.loadingContactsAction(false));
     if (yield cancelled()) {
       source.cancel();
     }
@@ -290,16 +310,16 @@ export function* deleteContactTask(action: Redux.Action<number>): SagaIterator {
     const source = CancelToken.source();
     const deleting = yield select((state: Redux.ApplicationStore) => state.dashboard.contacts.deleting);
     if (!includes(deleting, action.payload)) {
-      yield put(deletingContactAction({ id: action.payload, value: true }));
+      yield put(actions.deletingContactAction({ id: action.payload, value: true }));
       try {
-        yield call(deleteContact, action.payload, { cancelToken: source.token });
-        yield put(removeContactFromStateAction(action.payload));
+        yield call(api.deleteContact, action.payload, { cancelToken: source.token });
+        yield put(actions.removeContactFromStateAction(action.payload));
       } catch (e) {
         if (!(yield cancelled())) {
-          handleRequestError(e, "There was an error deleting the contact.");
+          api.handleRequestError(e, "There was an error deleting the contact.");
         }
       } finally {
-        yield put(deletingContactAction({ id: action.payload, value: false }));
+        yield put(actions.deletingContactAction({ id: action.payload, value: false }));
         if (yield cancelled()) {
           source.cancel();
         }

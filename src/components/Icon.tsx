@@ -9,6 +9,7 @@ import { isNil } from "lodash";
 export type IconName = "plus";
 export type IconType = IconDefinition | IconName;
 
+/* eslint-disable no-unused-vars */
 const Icons: { [key in IconName]: IconDefinition } = { plus: faPlus };
 
 const isIconDefinition = (name: IconType): name is IconDefinition => {

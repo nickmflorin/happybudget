@@ -58,7 +58,9 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     },
     {
       subReducers: {
-        duplicating: createModelListActionReducer(ActionType.Community.Duplicating)
+        duplicating: createModelListActionReducer(ActionType.Community.Duplicating),
+        hiding: createModelListActionReducer(ActionType.Community.Hiding),
+        showing: createModelListActionReducer(ActionType.Community.Showing)
       }
     }
   ),

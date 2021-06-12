@@ -2,19 +2,7 @@ import { includes, isNil } from "lodash";
 import { SagaIterator } from "redux-saga";
 import { spawn, takeLatest, debounce, takeEvery, select, take, put, cancel, fork } from "redux-saga/effects";
 import { ActionType, deleteContactAction } from "./actions";
-import {
-  getBudgetsTask,
-  getTemplatesTask,
-  deleteBudgetTask,
-  deleteTemplateTask,
-  getContactsTask,
-  deleteContactTask,
-  getCommunityTemplatesTask,
-  deleteCommunityTemplateTask,
-  moveTemplateToCommunityTask,
-  duplicateTemplateTask,
-  duplicateCommunityTemplateTask
-} from "./tasks";
+import * as tasks from "./tasks";
 
 function* watchForContactsRefreshSaga(): SagaIterator {
   yield takeLatest(
@@ -24,22 +12,23 @@ function* watchForContactsRefreshSaga(): SagaIterator {
       ActionType.Contacts.SetPageSize,
       ActionType.Contacts.SetPageAndSize
     ],
-    getContactsTask
+    tasks.getContactsTask
   );
 }
 
 function* watchForSearchContactsSaga(): SagaIterator {
-  yield debounce(250, ActionType.Contacts.SetSearch, getContactsTask);
+  yield debounce(250, ActionType.Contacts.SetSearch, tasks.getContactsTask);
 }
 
 function* watchForDeleteContactSaga(): SagaIterator {
-  yield takeEvery(ActionType.Contacts.Delete, deleteContactTask);
+  yield takeEvery(ActionType.Contacts.Delete, tasks.deleteContactTask);
 }
 
 function* watchForDeleteContactsSaga(): SagaIterator {
   while (true) {
     const action: Redux.Action<number[]> = yield take(ActionType.Contacts.DeleteMultiple);
     if (!isNil(action.payload)) {
+      /* eslint-disable no-loop-func */
       const deleting = yield select((state: Redux.ApplicationStore) => state.dashboard.contacts.deleting);
       for (let i = 0; i < action.payload.length; i++) {
         const id: number = action.payload[i];
@@ -59,7 +48,7 @@ function* watchForBudgetsRefreshSaga(): SagaIterator {
       ActionType.Budgets.SetPageSize,
       ActionType.Budgets.SetPageAndSize
     ],
-    getBudgetsTask
+    tasks.getBudgetsTask
   );
 }
 
@@ -71,7 +60,7 @@ function* watchForTemplatesRefreshSaga(): SagaIterator {
       ActionType.Templates.SetPageSize,
       ActionType.Templates.SetPageAndSize
     ],
-    getTemplatesTask
+    tasks.getTemplatesTask
   );
 }
 
@@ -83,20 +72,20 @@ function* watchForCommunityTemplatesRefreshSaga(): SagaIterator {
       ActionType.Community.SetPageSize,
       ActionType.Community.SetPageAndSize
     ],
-    getCommunityTemplatesTask
+    tasks.getCommunityTemplatesTask
   );
 }
 
 function* watchForSearchBudgetsSaga(): SagaIterator {
-  yield debounce(250, ActionType.Budgets.SetSearch, getBudgetsTask);
+  yield debounce(250, ActionType.Budgets.SetSearch, tasks.getBudgetsTask);
 }
 
 function* watchForSearchTemplatesSaga(): SagaIterator {
-  yield debounce(250, ActionType.Templates.SetSearch, getTemplatesTask);
+  yield debounce(250, ActionType.Templates.SetSearch, tasks.getTemplatesTask);
 }
 
 function* watchForSearchCommunityTemplatesSaga(): SagaIterator {
-  yield debounce(250, ActionType.Community.SetSearch, getCommunityTemplatesTask);
+  yield debounce(250, ActionType.Community.SetSearch, tasks.getCommunityTemplatesTask);
 }
 
 function* watchForDeleteBudgetSaga(): SagaIterator {
@@ -112,7 +101,7 @@ function* watchForDeleteBudgetSaga(): SagaIterator {
         lastTasks = { ...lastTasks, [action.payload]: [] };
         yield cancel(cancellable);
       }
-      const task = yield fork(deleteBudgetTask, action);
+      const task = yield fork(tasks.deleteBudgetTask, action);
       lastTasks[action.payload].push(task);
     }
   }
@@ -131,14 +120,14 @@ function* watchForDeleteTemplateSaga(): SagaIterator {
         lastTasks = { ...lastTasks, [action.payload]: [] };
         yield cancel(cancellable);
       }
-      const task = yield fork(deleteTemplateTask, action);
+      const task = yield fork(tasks.deleteTemplateTask, action);
       lastTasks[action.payload].push(task);
     }
   }
 }
 
 function* watchForDeleteCommunityTemplateSaga(): SagaIterator {
-  yield takeEvery(ActionType.Community.Delete, deleteCommunityTemplateTask);
+  yield takeEvery(ActionType.Community.Delete, tasks.deleteCommunityTemplateTask);
 }
 
 function* watchForMoveTemplateToCommunitySaga(): SagaIterator {
@@ -154,7 +143,7 @@ function* watchForMoveTemplateToCommunitySaga(): SagaIterator {
         lastTasks = { ...lastTasks, [action.payload]: [] };
         yield cancel(cancellable);
       }
-      const task = yield fork(moveTemplateToCommunityTask, action);
+      const task = yield fork(tasks.moveTemplateToCommunityTask, action);
       lastTasks[action.payload].push(task);
     }
   }
@@ -173,7 +162,7 @@ function* watchForDuplicateTemplateSaga(): SagaIterator {
         lastTasks = { ...lastTasks, [action.payload]: [] };
         yield cancel(cancellable);
       }
-      const task = yield fork(duplicateTemplateTask, action);
+      const task = yield fork(tasks.duplicateTemplateTask, action);
       lastTasks[action.payload].push(task);
     }
   }
@@ -192,7 +181,45 @@ function* watchForDuplicateCommunityTemplateSaga(): SagaIterator {
         lastTasks = { ...lastTasks, [action.payload]: [] };
         yield cancel(cancellable);
       }
-      const task = yield fork(duplicateCommunityTemplateTask, action);
+      const task = yield fork(tasks.duplicateCommunityTemplateTask, action);
+      lastTasks[action.payload].push(task);
+    }
+  }
+}
+
+function* watchForHideCommunityTemplateSaga(): SagaIterator {
+  let lastTasks: { [key: number]: any[] } = {};
+  while (true) {
+    const action: Redux.Action<number> = yield take(ActionType.Community.Hide);
+    if (!isNil(action.payload)) {
+      if (isNil(lastTasks[action.payload])) {
+        lastTasks[action.payload] = [];
+      }
+      if (lastTasks[action.payload].length !== 0) {
+        const cancellable = lastTasks[action.payload];
+        lastTasks = { ...lastTasks, [action.payload]: [] };
+        yield cancel(cancellable);
+      }
+      const task = yield fork(tasks.hideCommunityTemplateTask, action);
+      lastTasks[action.payload].push(task);
+    }
+  }
+}
+
+function* watchForShowCommunityTemplateSaga(): SagaIterator {
+  let lastTasks: { [key: number]: any[] } = {};
+  while (true) {
+    const action: Redux.Action<number> = yield take(ActionType.Community.Show);
+    if (!isNil(action.payload)) {
+      if (isNil(lastTasks[action.payload])) {
+        lastTasks[action.payload] = [];
+      }
+      if (lastTasks[action.payload].length !== 0) {
+        const cancellable = lastTasks[action.payload];
+        lastTasks = { ...lastTasks, [action.payload]: [] };
+        yield cancel(cancellable);
+      }
+      const task = yield fork(tasks.showCommunityTemplateAction, action);
       lastTasks[action.payload].push(task);
     }
   }
@@ -215,4 +242,6 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForMoveTemplateToCommunitySaga);
   yield spawn(watchForDuplicateTemplateSaga);
   yield spawn(watchForDuplicateCommunityTemplateSaga);
+  yield spawn(watchForHideCommunityTemplateSaga);
+  yield spawn(watchForShowCommunityTemplateSaga);
 }

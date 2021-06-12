@@ -10,7 +10,9 @@ const initialState: Redux.Dashboard.Store = {
   },
   community: {
     ...initialModelListResponseState,
-    duplicating: []
+    duplicating: [],
+    hiding: [],
+    showing: []
   }
 };
 

@@ -47,7 +47,11 @@ export const ActionType = {
     Delete: "dashboard.community.Delete",
     Deleting: "dashboard.community.Deleting",
     Duplicate: "dashboard.community.Duplicate",
-    Duplicating: "dashboard.community.Duplicating"
+    Duplicating: "dashboard.community.Duplicating",
+    Hide: "dashboard.community.Hide",
+    Hiding: "dashboard.community.Hiding",
+    Show: "dashboard.community.Show",
+    Showing: "dashboard.community.Showing"
   },
   Contacts: {
     Loading: "dashboard.contacts.Loading",
@@ -131,6 +135,10 @@ export const duplicateCommunityTemplateAction = simpleAction<number>(ActionType.
 export const duplicatingCommunityTemplateAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Community.Duplicating
 );
+export const hideCommunityTemplateAction = simpleAction<number>(ActionType.Community.Hide);
+export const hidingCommunityTemplateAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Community.Hiding);
+export const showCommunityTemplateAction = simpleAction<number>(ActionType.Community.Show);
+export const showingCommunityTemplateAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Community.Showing);
 
 export const requestContactsAction = simpleAction<null>(ActionType.Contacts.Request);
 export const loadingContactsAction = simpleAction<boolean>(ActionType.Contacts.Loading);

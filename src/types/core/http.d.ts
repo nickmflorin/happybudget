@@ -128,6 +128,7 @@ namespace Http {
     readonly name: string;
     readonly image?: string | ArrayBuffer | null;
     readonly community?: boolean;
+    readonly hidden?: boolean;
   }
 
   interface GroupPayload implements Http.ModelPayload<Model.Group> {

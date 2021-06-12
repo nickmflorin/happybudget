@@ -120,6 +120,8 @@ namespace Model {
   interface SimpleTemplate extends Model.BaseBudget {
     readonly type: "template";
     readonly image: string | null;
+    // The hidden attribute will not be present for non-community templates.
+    readonly hidden?: boolean;
   }
 
   interface ISimpleTemplate extends Model.IModel<Model.SimpleTemplate> {}
