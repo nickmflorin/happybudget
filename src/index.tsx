@@ -1,13 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import "ag-grid-enterprise";
 import { LicenseManager } from "@ag-grid-enterprise/core";
 import { isNil } from "lodash";
 
 import "style/index.scss";
 import App from "./app";
 import reportWebVitals from "./lib/operational/reportWebVitals";
-
-import "ag-grid-enterprise";
 
 let agGridKey = process.env.REACT_APP_AG_GRID_KEY;
 if (!isNil(agGridKey)) {
