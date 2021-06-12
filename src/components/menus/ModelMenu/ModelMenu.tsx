@@ -282,12 +282,12 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
       // in the array.
       forEach(selectedState, (id: number | string) => {
         const m = find(models, { id } as any);
+        // It might be the case that the selected model does not exist in the
+        // models, beacuse the models are filtered based on the search and the
+        // search might exclude the selection.
         if (!isNil(m)) {
           validSelectedModel = m;
           return false;
-        } else {
-          /* eslint-disable no-console */
-          console.warn(`Inconsistent State: Could not find model for selected ID ${id}.`);
         }
       });
       if (validSelectedModel !== null) {
@@ -303,7 +303,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
 
   useEffect(() => {
     setIndexFromSelectedState(selected);
-  }, [selected]);
+  }, [useDeepEqualMemo(selected)]);
 
   useEffect(() => {
     if (isFocusedState(state) || props.autoFocus === true) {
