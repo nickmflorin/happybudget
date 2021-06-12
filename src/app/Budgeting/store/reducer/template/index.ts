@@ -34,7 +34,13 @@ const rootReducer: Reducer<Redux.Budgeting.Template.Store, Redux.Action<any>> = 
   state: Redux.Budgeting.Template.Store = initialState.template,
   action: Redux.Action<any>
 ): Redux.Budgeting.Template.Store => {
-  let newState = genericReducer(state, action);
+  let newState = { ...state };
+
+  if (action.type === ActionType.Template.WipeState) {
+    newState = initialState.template;
+  }
+
+  newState = genericReducer(newState, action);
 
   if (!isNil(action.payload)) {
     if (

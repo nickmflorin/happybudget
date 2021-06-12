@@ -1,6 +1,7 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
+export const wipeStateAction = simpleAction<null>(ActionType.Budget.WipeState);
 export const setBudgetIdAction = simpleAction<number>(ActionType.Budget.SetId);
 export const setInstanceAction = simpleAction<Model.BudgetAccount | Model.BudgetSubAccount | null>(
   ActionType.Budget.SetInstance

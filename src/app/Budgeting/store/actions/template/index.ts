@@ -1,6 +1,7 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
+export const wipeStateAction = simpleAction<null>(ActionType.Template.WipeState);
 export const setTemplateIdAction = simpleAction<number>(ActionType.Template.SetId);
 export const setInstanceAction = simpleAction<Model.TemplateAccount | Model.TemplateSubAccount | null>(
   ActionType.Template.SetInstance

@@ -8,6 +8,7 @@ const ActionType = {
     Response: "fringecolors.colors.Response"
   },
   Budget: {
+    WipeState: "budget.WipeState",
     SetInstance: "budget.SetInstance",
     SetCommentsHistoryDrawerVisibility: "budget.SetCommentsHistoryDrawerVisibility",
     SetId: "budget.SetId",
@@ -240,6 +241,7 @@ const ActionType = {
     }
   },
   Template: {
+    WipeState: "template.WipeState",
     SetInstance: "template.SetInstance",
     SetId: "template.SetId",
     SetAutoIndex: "template.SetAutoIndex",

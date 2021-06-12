@@ -18,7 +18,11 @@ import { getBudgetPdf } from "api/services";
 import { RenderIfValidId } from "components";
 import { download } from "lib/util/files";
 
-import { setBudgetIdAction, setCommentsHistoryDrawerVisibilityAction } from "../../store/actions/budget";
+import {
+  wipeStateAction,
+  setBudgetIdAction,
+  setCommentsHistoryDrawerVisibilityAction
+} from "../../store/actions/budget";
 import { selectBudgetInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "../../store/selectors";
 import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
 import { GenericLayout } from "../Generic";
@@ -42,6 +46,7 @@ const Budget = (): JSX.Element => {
   const budget = useSelector(selectBudgetDetail);
 
   useEffect(() => {
+    dispatch(wipeStateAction(null));
     if (!isNaN(parseInt(budgetId))) {
       dispatch(setBudgetIdAction(parseInt(budgetId)));
     }

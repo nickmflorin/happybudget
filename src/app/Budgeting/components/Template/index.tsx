@@ -9,7 +9,7 @@ import { faCopy, faFileSpreadsheet } from "@fortawesome/pro-light-svg-icons";
 
 import { RenderIfValidId } from "components";
 
-import { setTemplateIdAction } from "../../store/actions/template";
+import { wipeStateAction, setTemplateIdAction } from "../../store/actions/template";
 import { selectTemplateInstance, selectTemplateDetail } from "../../store/selectors";
 import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
 import { GenericLayout } from "../Generic";
@@ -30,6 +30,7 @@ const Template = (): JSX.Element => {
   const template = useSelector(selectTemplateDetail);
 
   useEffect(() => {
+    dispatch(wipeStateAction(null));
     if (!isNaN(parseInt(templateId))) {
       dispatch(setTemplateIdAction(parseInt(templateId)));
     }

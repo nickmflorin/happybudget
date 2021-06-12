@@ -64,7 +64,13 @@ const rootReducer: Reducer<Redux.Budgeting.Budget.Store, Redux.Action<any>> = (
   state: Redux.Budgeting.Budget.Store = initialState.budget,
   action: Redux.Action<any>
 ): Redux.Budgeting.Budget.Store => {
-  let newState = genericReducer(state, action);
+  let newState = { ...state };
+
+  if (action.type === ActionType.Budget.WipeState) {
+    newState = initialState.budget;
+  }
+
+  newState = genericReducer(newState, action);
 
   if (!isNil(action.payload)) {
     if (
