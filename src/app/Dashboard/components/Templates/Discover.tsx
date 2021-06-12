@@ -66,7 +66,6 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
               }
               const card = (
                 <CommunityTemplateCard
-                  key={index}
                   template={template}
                   hidingOrShowing={
                     includes(
@@ -104,9 +103,9 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
                 />
               );
               if (template.hidden === true) {
-                return <IsStaff>{card}</IsStaff>;
+                return <IsStaff key={index}>{card}</IsStaff>;
               }
-              return card;
+              return <React.Fragment key={index}>{card}</React.Fragment>;
             })}
           </div>
         </React.Fragment>
