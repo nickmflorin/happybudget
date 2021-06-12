@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <!-- Caching the index.html file in the browser can cause issues with lazy loading of components. -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <script>

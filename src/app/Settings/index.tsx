@@ -1,4 +1,3 @@
-import React from "react";
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -6,8 +5,9 @@ import { faAddressCard } from "@fortawesome/free-solid-svg-icons";
 
 import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
+import { lazyWithRetry } from "lib/operational";
 
-const Profile = React.lazy(() => import("./Profile"));
+const Profile = lazyWithRetry(() => import("./Profile"));
 
 const Settings = (): JSX.Element => {
   const history = useHistory();

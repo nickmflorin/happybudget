@@ -3,13 +3,13 @@ import { Redirect, Switch, Route } from "react-router-dom";
 
 import { ConnectedApplicationSpinner } from "components";
 import { PrivateRoute } from "components/routes";
-import { componentLoader } from "lib/operational";
+import { lazyWithRetry } from "lib/operational";
 import Logout from "./Logout";
 
-const Dashboard = React.lazy(() => componentLoader(() => import("./Dashboard")));
-const Budget = React.lazy(() => componentLoader(() => import("./Budgeting/components/Budget")));
-const Template = React.lazy(() => componentLoader(() => import("./Budgeting/components/Template")));
-const Settings = React.lazy(() => componentLoader(() => import("./Settings")));
+const Dashboard = lazyWithRetry(() => import("./Dashboard"));
+const Budget = lazyWithRetry(() => import("./Budgeting/components/Budget"));
+const Template = lazyWithRetry(() => import("./Budgeting/components/Template"));
+const Settings = lazyWithRetry(() => import("./Settings"));
 
 const Application = (): JSX.Element => {
   return (

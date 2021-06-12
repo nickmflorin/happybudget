@@ -1,13 +1,12 @@
-import React from "react";
 import { Route, Switch } from "react-router-dom";
 
 import { LogoWhite } from "components/svgs";
-import { componentLoader } from "lib/operational";
+import { lazyWithRetry } from "lib/operational";
 
 import "./Landing.scss";
 
-const Login = React.lazy(() => componentLoader(() => import("./Login")));
-const Signup = React.lazy(() => componentLoader(() => import("./Signup")));
+const Login = lazyWithRetry(() => import("./Login"));
+const Signup = lazyWithRetry(() => import("./Signup"));
 
 const Landing = (): JSX.Element => {
   return (
