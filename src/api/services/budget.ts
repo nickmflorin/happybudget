@@ -23,9 +23,9 @@ export const updateBudget = async (
   return client.patch<Model.Budget>(url, payload, options);
 };
 
-export const getBudgetPdf = async (id: number, options: Http.RequestOptions = {}): Promise<any> => {
+export const getBudgetPdf = async (id: number, options: Http.RequestOptions = {}): Promise<Model.PdfBudget> => {
   const url = URL.v1("budgets", id, "pdf");
-  return client.get<any>(url, options);
+  return client.get<Model.PdfBudget>(url, options);
 };
 
 export const createBudget = async (

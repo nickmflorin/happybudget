@@ -1,3 +1,4 @@
+import React from "react";
 import { forEach, groupBy, isNil, reduce, find } from "lodash";
 import { ColDef } from "@ag-grid-community/core";
 
@@ -21,6 +22,35 @@ export const getGroupColorDefinition = (group: Model.Group): Table.RowColorDefin
   return {};
 };
 
+type ColumnTypeVariantOptions = {
+  header?: boolean;
+  pdf?: boolean;
+};
+
+export const getColumnTypeCSSStyle = (
+  type: Table.ColumnTypeId | Table.ColumnType,
+  options: ColumnTypeVariantOptions = { header: false, pdf: false }
+): React.CSSProperties => {
+  let colType: Table.ColumnType;
+  if (typeof type === "string") {
+    const ct: Table.ColumnType | undefined = find(models.ColumnTypes, { id: type } as any);
+    if (isNil(ct)) {
+      return {};
+    }
+    colType = ct;
+  } else {
+    colType = type;
+  }
+  let style = colType.style || {};
+  if (options.header === true && !isNil(colType.headerOverrides)) {
+    style = { ...style, ...(colType.headerOverrides.style || {}) };
+  }
+  if (options.pdf === true && !isNil(colType.pdfOverrides)) {
+    style = { ...style, ...(colType.pdfOverrides.style || {}) };
+  }
+  return style;
+};
+
 export const toAgGridColDef = <R extends Table.Row = Table.Row>(colDef: Table.Column<R>): ColDef => {
   const {
     nullValue,
@@ -32,12 +62,7 @@ export const toAgGridColDef = <R extends Table.Row = Table.Row>(colDef: Table.Co
     footer,
     ...original
   } = colDef;
-
-  // TODO: Make the ColDef's an actual Model and have this be a property.
-  const colType = find(models.ColumnTypes, { id: colDef.type } as any);
-  if (!isNil(colType)) {
-    original.cellStyle = { textAlign: colType.align, ...original.cellStyle };
-  }
+  original.cellStyle = { ...getColumnTypeCSSStyle(colDef.type), ...original.cellStyle };
   return original;
 };
 

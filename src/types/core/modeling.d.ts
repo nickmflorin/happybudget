@@ -155,6 +155,15 @@ namespace Model {
 
   interface IBudget extends Model.IHttpModel<Model.Budget, Http.BudgetPayload> {}
 
+  interface PdfBudget {
+    readonly name: string;
+    readonly estimated: number | null;
+    readonly actual: number | null;
+    readonly variance: number | null;
+    readonly accounts: Model.PdfAccount[];
+    readonly groups: Model.BudgetGroup[];
+  }
+
   interface Group extends Model.Model {
     readonly children: number[];
     readonly name: string;
@@ -208,6 +217,19 @@ namespace Model {
 
   interface TemplateAccount extends Model.Account {}
 
+  interface PdfAccount {
+    readonly id: number;
+    readonly identifier: string | null;
+    readonly type: "account";
+    readonly description: string | null;
+    readonly estimated: number | null;
+    readonly variance: number | null;
+    readonly actual: number | null;
+    readonly subaccounts: Model.PdfSubAccount[];
+    readonly group: number | null;
+    readonly groups: Model.BudgetGroup[];
+  }
+
   interface SimpleSubAccount extends Model.Model {
     readonly name: string | null;
     readonly type: "subaccount";
@@ -234,6 +256,23 @@ namespace Model {
     // Only included for detail endpoints.
     readonly siblings?: Model.SimpleSubAccount[];
     readonly ancestors?: Model.Entity[];
+  }
+
+  interface PdfSubAccount {
+    readonly id: number;
+    readonly name: string | null;
+    readonly identifier: string | null;
+    readonly description: string | null;
+    readonly quantity: number | null;
+    readonly rate: number | null;
+    readonly multiplier: number | null;
+    readonly unit: Model.Tag | null;
+    readonly estimated: number | null;
+    readonly variance: number | null;
+    readonly actual: number | null;
+    readonly group: number | null;
+    readonly subaccounts: PdfSubAccount[];
+    readonly groups: Model.BudgetGroup[];
   }
 
   interface BudgetSubAccount extends Model.SubAccount {

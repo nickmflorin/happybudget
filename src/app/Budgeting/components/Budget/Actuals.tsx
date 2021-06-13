@@ -10,7 +10,7 @@ import * as models from "lib/model";
 import { getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { findChoiceForName, inferModelFromName } from "lib/model/util";
-import { currencyValueFormatter, dateValueFormatter } from "lib/model/formatters";
+import { agCurrencyValueFormatter, agDateValueFormatter } from "lib/model/formatters";
 import { floatValueSetter, dateTimeValueSetter } from "lib/model/valueSetters";
 
 import { WrapInApplicationSpinner } from "components";
@@ -217,7 +217,7 @@ const Actuals = (): JSX.Element => {
               field: "date",
               headerName: "Date",
               flex: 1,
-              valueFormatter: dateValueFormatter,
+              valueFormatter: agDateValueFormatter,
               valueSetter: dateTimeValueSetter<BudgetTable.ActualRow>("date"),
               type: "date"
             },
@@ -266,7 +266,7 @@ const Actuals = (): JSX.Element => {
               field: "value",
               headerName: "Amount",
               flex: 1,
-              valueFormatter: currencyValueFormatter,
+              valueFormatter: agCurrencyValueFormatter,
               valueSetter: floatValueSetter<BudgetTable.ActualRow>("value"),
               cellRenderer: "BodyCell",
               type: "currency",

@@ -14,7 +14,7 @@ import { getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { findChoiceForName } from "lib/model/util";
 import { percentageToDecimalValueSetter } from "lib/model/valueSetters";
-import { percentageValueFormatter } from "lib/model/formatters";
+import { agPercentageValueFormatter } from "lib/model/formatters";
 import BudgetTableComponent from "../BudgetTable";
 
 export interface GenericFringesTableProps
@@ -112,7 +112,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
         {
           field: "rate",
           headerName: "Rate",
-          valueFormatter: percentageValueFormatter,
+          valueFormatter: agPercentageValueFormatter,
           valueSetter: percentageToDecimalValueSetter<BudgetTable.FringeRow>("rate"),
           type: "percentage"
         },

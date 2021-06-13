@@ -1,10 +1,15 @@
 @import "./colors";
+@import "./typography";
 
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-alpine.css";
 
 $table-border-color: #eeeeee;
 $table-border: 1px solid $table-border-color;
+
+:export {
+  table-border-color: $table-border-color;
+}
 
 .ag-menu-list {
   margin-top: 0px !important;

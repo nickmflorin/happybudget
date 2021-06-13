@@ -1,5 +1,101 @@
 import { forEach, isNil, find, filter } from "lodash";
-import { isRowChange, isSplitField, isWriteField, isWriteOnlyField } from "lib/model/typeguards/tabling";
+import * as typeguards from "lib/model/typeguards";
+
+type PayloadType<T, P, R extends Table.Row> = T extends Table.RowChange<R> ? Partial<P> : P;
+
+const defaultPdfRowMeta: Partial<Table.PdfRowMeta<any>> = {
+  children: []
+};
+
+export class PdfRowManager<R extends Table.PdfRow<C>, M extends Model.Model, C extends Model.Model>
+/* eslint-disable indent */
+  implements Table.IPdfRowManager<R, M, C>
+{
+  public fields: Table.IReadOnlyField<R, M>[];
+  public childrenGetter?: ((model: M) => C[]) | string | null;
+  public groupGetter?: ((model: M) => number | null) | string | null;
+
+  constructor(config: Table.IPdfRowManagerConfig<R, M, C>) {
+    this.fields = config.fields;
+    this.childrenGetter = config.childrenGetter;
+    this.groupGetter = config.groupGetter;
+  }
+
+  public getField = (name: keyof R | keyof M): Table.IReadOnlyField<R, M> | null => {
+    return (
+      find(this.fields, (field: Table.IReadOnlyField<R, M>) => {
+        if (typeguards.isSplitField<R, M>(field)) {
+          return field.rowField === name;
+        } else {
+          return field.field === name;
+        }
+      }) || null
+    );
+  };
+
+  public getChildren = (model: M): C[] => {
+    if (typeof this.childrenGetter === "string") {
+      const children: any = model[this.childrenGetter as keyof M];
+      if (!isNil(children)) {
+        return children;
+      } else {
+        /* eslint-disable no-console */
+        console.warn(`Could not parse children from model based on model field ${this.childrenGetter}!`);
+        return [];
+      }
+    } else if (!isNil(this.childrenGetter)) {
+      return this.childrenGetter(model);
+    } else {
+      return [];
+    }
+  };
+
+  public getGroup = (model: M): number | null => {
+    if (this.groupGetter === null) {
+      return null;
+    } else if (typeof this.groupGetter === "string") {
+      const group: any = model[this.groupGetter as keyof M];
+      if (group !== undefined) {
+        return group;
+      } else {
+        /* eslint-disable no-console */
+        console.warn(`Could not parse group from model based on model field ${this.groupGetter}!`);
+        return null;
+      }
+    } else if (!isNil(this.groupGetter)) {
+      return this.groupGetter(model);
+    } else {
+      return null;
+    }
+  };
+
+  public modelToRow = (model: M, meta: Partial<Table.RowMeta> = {}): R => {
+    let obj: { [key in keyof R]?: R[key] } = {};
+    obj = {
+      ...obj,
+      id: model.id,
+      group: this.getGroup(model),
+      meta: {
+        ...defaultPdfRowMeta,
+        children: this.getChildren(model),
+        ...meta
+      }
+    };
+    forEach(this.fields, (field: Table.IReadOnlyField<R, M>) => {
+      if (field.modelOnly !== true) {
+        const v = field.getValue(model) as R[keyof R];
+        if (v !== undefined) {
+          if (typeguards.isSplitField<R, M>(field)) {
+            obj[field.rowField] = v;
+          } else {
+            obj[field.field] = v as R[keyof R & keyof M];
+          }
+        }
+      }
+    });
+    return obj as R;
+  };
+}
 
 const defaultRowMeta: Partial<Table.RowMeta> = {
   isGroupFooter: false,
@@ -8,8 +104,6 @@ const defaultRowMeta: Partial<Table.RowMeta> = {
   children: [],
   fieldsLoading: []
 };
-
-type PayloadType<T, P, R extends Table.Row> = T extends Table.RowChange<R> ? Partial<P> : P;
 
 export class RowManager<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
 /* eslint-disable indent */
@@ -38,7 +132,7 @@ export class RowManager<R extends Table.Row, M extends Model.Model, P extends Ht
   public getField = (name: keyof R | keyof M): Table.Field<R, M, P> | null => {
     return (
       find(this.fields, (field: Table.Field<R, M, P>) => {
-        if (isSplitField(field)) {
+        if (typeguards.isSplitField(field)) {
           return field.rowField === name;
         } else {
           return field.field === name;
@@ -99,11 +193,11 @@ export class RowManager<R extends Table.Row, M extends Model.Model, P extends Ht
       }
     };
     forEach(this.fields, (field: Table.Field<R, M, P>) => {
-      if (!isWriteOnlyField(field)) {
+      if (!typeguards.isWriteOnlyField(field)) {
         if (field.modelOnly !== true) {
           const v = field.getValue(model) as R[keyof R];
           if (v !== undefined) {
-            if (isSplitField(field)) {
+            if (typeguards.isSplitField(field)) {
               obj[field.rowField] = v;
             } else {
               obj[field.field] = v as R[keyof R & keyof M];
@@ -118,13 +212,13 @@ export class RowManager<R extends Table.Row, M extends Model.Model, P extends Ht
   public mergeChangesWithRow = (obj: R, change: Table.RowChange<R>): R => {
     const row: R = { ...obj };
     forEach(this.fields, (field: Table.Field<R, M, P>) => {
-      if (!isWriteOnlyField(field)) {
+      if (!typeguards.isWriteOnlyField(field)) {
         // We have to force coerce R[keyof R] to M[keyof M] because there is no way for TS to
         // understand that the model (M) field name is related to the row (R) field name via the
         // field configurations.
         const v = field.getValue(change) as R[keyof R] | R[keyof M & keyof R] | undefined;
         if (v !== undefined) {
-          if (isSplitField(field)) {
+          if (typeguards.isSplitField(field)) {
             row[field.rowField] = v;
           } else {
             row[field.field] = v as R[keyof R & keyof M & keyof P];
@@ -141,10 +235,10 @@ export class RowManager<R extends Table.Row, M extends Model.Model, P extends Ht
       // We have to force coerce R[keyof R] to M[keyof M] because there is no way for TS to
       // understand that the model (M) field name is related to the row (R) field name via the
       // field configurations.
-      if (!isWriteOnlyField(field) && !field.rowOnly) {
+      if (!typeguards.isWriteOnlyField(field) && !field.rowOnly) {
         const v = field.getValue(change);
         if (v !== undefined) {
-          if (isSplitField(field)) {
+          if (typeguards.isSplitField(field)) {
             model[field.modelField] = v as M[keyof M & keyof P];
           } else {
             model[field.field] = v as M[keyof M & keyof R & keyof P];
@@ -158,7 +252,7 @@ export class RowManager<R extends Table.Row, M extends Model.Model, P extends Ht
   public payload = <T extends R | Table.RowChange<R> | Partial<R>>(row: T): PayloadType<T, P, R> => {
     /* eslint-disable no-unused-vars */
     const obj: { [key in keyof P]?: P[keyof P] } = {};
-    const method: Http.Method = isRowChange(row) ? "PATCH" : "POST";
+    const method: Http.Method = typeguards.isRowChange(row) ? "PATCH" : "POST";
 
     const setValue = (field: Table.WriteableField<R, M, P>, key: keyof P, value: any): void => {
       if (value === null) {
@@ -174,14 +268,12 @@ export class RowManager<R extends Table.Row, M extends Model.Model, P extends Ht
       }
     };
     forEach(this.fields, (field: Table.Field<R, M, P>) => {
-      if (isWriteField(field)) {
+      if (typeguards.isWriteField(field)) {
         const httpValue = field.getHttpValue(row, method);
-        if (httpValue !== undefined) {
-          if (isSplitField(field)) {
-            setValue(field, field.modelField, httpValue);
-          } else {
-            setValue(field, field.field, httpValue);
-          }
+        if (typeguards.isSplitField(field)) {
+          setValue(field, field.modelField, httpValue);
+        } else {
+          setValue(field, field.field, httpValue);
         }
       }
     });

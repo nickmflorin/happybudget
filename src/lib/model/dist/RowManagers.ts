@@ -1,5 +1,17 @@
 import { isNil } from "lodash";
-import { RowManager, ReadWrite, ReadOnly } from "lib/model/models";
+import { RowManager, PdfRowManager, ReadWrite, ReadOnly } from "lib/model/models";
+
+export const PdfAccountRowManager = new PdfRowManager<BudgetPdf.AccountRow, Model.PdfAccount, Model.PdfSubAccount>({
+  fields: [
+    ReadOnly({ field: "description" }),
+    ReadOnly({ field: "identifier" }),
+    ReadOnly({ field: "estimated" }),
+    ReadOnly({ field: "variance" }),
+    ReadOnly({ field: "actual" })
+  ],
+  childrenGetter: (model: Model.PdfAccount) => model.subaccounts,
+  groupGetter: (model: Model.PdfAccount) => model.group
+});
 
 export const BudgetAccountRowManager = new RowManager<
   BudgetTable.BudgetAccountRow,
@@ -37,6 +49,27 @@ export const TemplateAccountRowManager = new RowManager<
   labelGetter: (model: Model.TemplateAccount) => (!isNil(model.identifier) ? model.identifier : "Account"),
   typeLabel: "Account",
   rowType: "account"
+});
+
+export const PdfSubAccountRowManager = new PdfRowManager<
+  BudgetPdf.SubAccountRow,
+  Model.PdfSubAccount,
+  Model.PdfSubAccount
+>({
+  fields: [
+    ReadOnly({ field: "description" }),
+    ReadOnly({ field: "identifier" }),
+    ReadOnly({ field: "name" }),
+    ReadOnly({ field: "quantity" }),
+    ReadOnly({ field: "rate" }),
+    ReadOnly({ field: "multiplier" }),
+    ReadOnly({ field: "unit" }),
+    ReadOnly({ field: "estimated" }),
+    ReadOnly({ field: "variance" }),
+    ReadOnly({ field: "actual" })
+  ],
+  childrenGetter: (model: Model.PdfSubAccount) => model.subaccounts,
+  groupGetter: (model: Model.PdfSubAccount) => model.group
 });
 
 export const BudgetSubAccountRowManager = new RowManager<

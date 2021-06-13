@@ -16,14 +16,18 @@ namespace Table {
     readonly type: Table.RowType;
   }
 
+  interface PdfRowMeta<C extends Model.Model> {
+    readonly children: C[];
+  }
+
   interface PageAndSize {
     readonly page: number;
     readonly pageSize: number;
   }
 
-  interface Row extends Record<string, any> {
+  interface Row<RE = RowMeta> extends Record<string, any> {
     readonly id: number;
-    readonly meta: RowMeta;
+    readonly meta: RE;
     readonly group: number | null;
   }
 
@@ -31,6 +35,8 @@ namespace Table {
     readonly backgroundColor?: string;
     readonly color?: string;
   }
+
+  type PdfRow<C extends Model.Model> = Table.Row<PdfRowMeta<C>>;
 
   type ColumnTypeId =
     | "text"
@@ -47,13 +53,16 @@ namespace Table {
     | "percentage"
     | "date"
     | "action";
+
   type ColumnAlignment = "right" | "left" | null;
 
   interface ColumnType {
     readonly id: ColumnTypeId;
-    readonly align?: ColumnAlignment;
+    readonly style?: React.CSSProperties;
     readonly icon?: any;
     readonly editorIsPopup?: boolean;
+    readonly pdfOverrides?: Omit<Partial<ColumnType>, "id" | "editorIsPopup">;
+    readonly headerOverrides?: Omit<Partial<ColumnType>, "id" | "editorIsPopup" | "icon" | "pdfOverrides">;
   }
 
   type APIs = {
@@ -66,8 +75,33 @@ namespace Table {
     readonly visible: boolean;
   }
 
+  type Formatter = (value: string | number) => string;
+
   interface FooterColumn<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field" | "headerName"> {
     readonly value?: any;
+  }
+
+  type PdfCellStandardProps = {
+    readonly style?: Table.OptionalPdfCellCallback<R, M, C, import("@react-pdf/types").Style>;
+    readonly className?: Table.OptionalPdfCellCallback<R, M, C, string>;
+    readonly textStyle?: Table.OptionalPdfCellCallback<R, M, C, import("@react-pdf/types").Style>;
+    readonly textClassName?: Table.OptionalPdfCellCallback<R, M, C, string>;
+  }
+  type PdfCellLocation = { index: number, colIndex: number };
+  type PdfCellCallbackParams<R extends Table.PdfRow<C>, M extends Model.Model, C extends Model.Model> = {
+    readonly location: PdfCellLocation;
+    readonly column: Table.PdfColumm<R, M, C>;
+    readonly row: R;
+    readonly isHeader: boolean;
+    readonly rawValue: any;
+    readonly value: any;
+  }
+  type PdfCellCallback<R extends Table.PdfRow<C>, M extends Model.Model, C extends Model.Model, V = any> = (params: PdfCellCallbackParams<R, M, C>) => V;
+  type OptionalPdfCellCallback<R extends Table.PdfRow<C>, M extends Model.Model, C extends Model.Model, V = any> = V | Table.PdfCellCallback<R, M, C, V>;
+
+  interface FooterPdfColumn {
+    readonly value?: any;
+    readonly textStyle?: import("@react-pdf/types").Style;
   }
 
   interface Column<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
@@ -80,6 +114,23 @@ namespace Table {
     readonly processCellFromClipboard?: (value: string) => any;
     readonly budget?: FooterColumn<R>;
     readonly footer?: FooterColumn<R>;
+  }
+
+  interface PdfColumn<R extends Table.PdfRow<C>, M extends Model.Model, C extends Model.Model> {
+    readonly field: keyof R & string;
+    readonly headerName: string;
+    readonly isCalculated?: boolean;
+    readonly type: Table.ColumnTypeId;
+    readonly formatter?: Formatter;
+    readonly width?: string | number;
+    readonly cellProps?: PdfCellStandardProps;
+    readonly headerCellProps?: PdfCellStandardProps;
+    readonly footer?: Table.FooterPdfColumn;
+    readonly cellContentsVisible?: Table.OptionalPdfCellCallback<R, M, C, boolean>;
+    readonly cellRenderer?: (params: PdfCellCallbackParams<R, M, C>) => JSX.Element;
+    // NOTE: This only applies for the individual Account tables, not the overall
+    // Accounts table.
+    readonly childFooter?: (s: M) => Table.FooterPdfColumn;
   }
 
   type CellChange<R extends Table.Row, V = R[keyof R]> = {
@@ -259,7 +310,7 @@ namespace Table {
 
   // Field configuration for Field that is not included in HTTP requests to update or
   // create the instance but present on the model (M) and row (R).
-  type IReadOnlyField<R extends Table.Row, M extends Model.Model> = Table.IReadField<R, M> & {
+  type IReadOnlyField<R extends Table.GenericRow, M extends Model.Model> = Table.IReadField<R, M> & {
     readonly field: keyof M & keyof R;
     readonly readOnly: true;
   };
@@ -307,7 +358,7 @@ namespace Table {
     | Table.IAgnosticReadWriteField<R, M, P>
     | Table.IWriteOnlyField<R, M, P>;
 
-  type Field<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> =
+  type Field<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M> = Http.ModelPayload<M>> =
     | Table.WriteableField<R, M, P>
     | Table.IReadOnlyField<R, M>;
 
@@ -321,6 +372,12 @@ namespace Table {
     readonly labelGetter: (model: M) => string;
   }
 
+  interface IPdfRowManagerConfig<R extends Table.PdfRow, M extends Model.Model, C extends Model.Model> {
+    readonly fields: Table.IReadOnlyField<R, M>[];
+    readonly childrenGetter?: ((model: M) => C[]) | string | null;
+    readonly groupGetter?: ((model: M) => number | null) | string | null;
+  }
+
   interface IRowManager<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
     extends Table.IRowManagerConfig<R, M, P> {
     readonly requiredFields: Table.Field<R, M, P>[];
@@ -331,6 +388,14 @@ namespace Table {
     readonly mergeChangesWithRow: (obj: R, change: Table.RowChange<R>) => R;
     readonly mergeChangesWithModel: (obj: M, change: Table.RowChange<R>) => M;
     readonly payload: (row: R | Partial<R> | Table.RowChange<R>) => P | Partial<P>;
+  }
+
+  interface IPdfRowManager<R extends Table.PdfRow, M extends Model.Model, C extends Model.Model>
+    extends Table.IPdfRowManagerConfig<R, M, C> {
+    readonly getField: (name: keyof R | keyof M) => Table.IReadOnlyField<R, M> | null;
+    readonly getChildren: (model: M) => C[];
+    readonly getGroup: (model: M) => number | null;
+    readonly modelToRow: (model: M, meta: Partial<Table.PdfRowMeta> = {}) => R;
   }
 }
 
@@ -514,5 +579,57 @@ namespace BudgetTable {
     readonly subaccount: Model.SimpleAccount;
     readonly payment_id: string | null;
     readonly value: string | null;
+  }
+}
+
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+namespace BudgetPdf {
+  interface Options {
+    readonly excludeZeroTotals?: boolean;
+  }
+
+  interface SubAccountRow extends Table.PdfRow<Model.PdfSubAccount> {
+    readonly identifier: string | null;
+    readonly name: string | null;
+    readonly description: string | null;
+    readonly quantity: number | null;
+    readonly unit: Model.Tag | null;
+    readonly multiplier: number | null;
+    readonly rate: number | null;
+    readonly estimated: number | null;
+  }
+
+  interface AccountRow extends Table.PdfRow<Model.PdfSubAccount> {
+    readonly identifier: string | null;
+    readonly description: string | null;
+    readonly estimated: number | null;
+    readonly variance: number | null;
+    readonly actual: number | null;
+  }
+
+  interface AccountRowGroup {
+    readonly group: Model.BudgetGroup | null;
+    readonly rows: BudgetPdf.AccountRow[];
+  }
+
+  interface TableProps<R extends Table.PdfRow<C>, M extends Model.Model, C extends Model.Model> {
+    readonly columns: Table.PdfColumn<R, M, C>[];
+    readonly manager: Table.IPdfRowManager<R, M, C>;
+    readonly options: BudgetPdf.Options;
+  }
+
+  type AccountsTableProps = TableProps<BudgetPdf.AccountRow, Model.PdfAccount, Model.PdfSubAccount> & {
+    readonly data: M[];
+    readonly groups: Model.BudgetGroup[];
+  }
+
+  type AccountTableProps = TableProps<BudgetPdf.SubAccountRow, Model.PdfSubAccount, Model.PdfSubAccount> & {
+    readonly account: Model.PdfAccount;
+  }
+
+  type SubAccountBlockProps = TableProps<BudgetPdf.SubAccountRow, Model.PdfSubAccount, Model.PdfSubAccount> & {
+    readonly subaccount: Model.PdfSubAccount;
+    readonly isLast?: boolean;
   }
 }

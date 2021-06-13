@@ -34,7 +34,7 @@ export const isBase64 = (value: string): boolean => {
   }
 };
 
-export const download = async (file_obj: string, name: string, ext?: string) => {
+export const download = async (fileObj: string | Blob, name: string, ext?: string) => {
   if (!isNil(ext)) {
     if (ext.startsWith(".")) {
       ext = ext.slice(1);
@@ -55,12 +55,17 @@ export const download = async (file_obj: string, name: string, ext?: string) => 
     name = `${name}.${extension}`;
   }
   let blob: Blob;
-  if (isBase64(file_obj)) {
-    const bytes = base64ToArrayBuffer(file_obj);
-    blob = new Blob([bytes], { type: "application/" + extension });
+  if (!(fileObj instanceof Blob)) {
+    if (isBase64(fileObj)) {
+      const bytes = base64ToArrayBuffer(fileObj);
+      blob = new Blob([bytes], { type: "application/" + extension });
+    } else {
+      blob = new Blob([fileObj], { type: "application/" + extension });
+    }
   } else {
-    blob = new Blob([file_obj], { type: "application/" + extension });
+    blob = fileObj;
   }
+
   const blobUrl = URL.createObjectURL(blob);
   if (!isNil(blobUrl)) {
     const link = document.createElement("a");

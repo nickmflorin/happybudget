@@ -21,7 +21,7 @@ import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
 import { WrapInApplicationSpinner, ShowHide } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { updateFieldOrdering } from "lib/util";
-import { currencyValueFormatter } from "lib/model/formatters";
+import { agCurrencyValueFormatter } from "lib/model/formatters";
 
 import { validateCookiesOrdering, mergeClassNames, mergeClassNamesFn } from "./util";
 import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
@@ -329,7 +329,7 @@ const BudgetTable = <
       cellRenderer: "CalculatedCell",
       suppressSizeToFit: true,
       minWidth: 100,
-      valueFormatter: currencyValueFormatter,
+      valueFormatter: agCurrencyValueFormatter,
       cellRendererParams: {
         ...col.cellRendererParams,
         renderRedIfNegative: true

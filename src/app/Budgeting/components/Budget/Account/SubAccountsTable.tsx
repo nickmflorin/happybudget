@@ -5,7 +5,6 @@ import { isNil, map } from "lodash";
 
 import { faCommentsAlt, faPrint } from "@fortawesome/pro-solid-svg-icons";
 
-import * as api from "api";
 import { download } from "lib/util/files";
 
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
@@ -20,6 +19,7 @@ import {
   selectSubAccountUnits
 } from "../../../store/selectors";
 import * as actions from "../../../store/actions/budget/account";
+import { generatePdf } from "../../../pdf";
 
 const selectGroups = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.groups.data
@@ -99,7 +99,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
             text: "Export PDF",
             onClick: () => {
               if (!isNil(budgetId)) {
-                api.getBudgetPdf(budgetId).then((response: any) => {
+                generatePdf(budgetId).then((response: Blob) => {
                   download(response, !isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf");
                 });
               }

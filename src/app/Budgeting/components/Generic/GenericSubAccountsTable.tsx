@@ -11,7 +11,7 @@ import { FieldsDropdown } from "components/dropdowns";
 import { getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { inferModelFromName } from "lib/model/util";
-import { currencyValueFormatter } from "lib/model/formatters";
+import { agCurrencyValueFormatter } from "lib/model/formatters";
 import { floatValueSetter, integerValueSetter } from "lib/model/valueSetters";
 
 import BudgetTableComponent from "../BudgetTable";
@@ -250,7 +250,7 @@ const GenericSubAccountsTable = <
           field: "rate",
           headerName: "Rate",
           width: 100,
-          valueFormatter: currencyValueFormatter,
+          valueFormatter: agCurrencyValueFormatter,
           valueSetter: floatValueSetter<BudgetTable.TemplateSubAccountRow>("rate"),
           type: "currency"
         },

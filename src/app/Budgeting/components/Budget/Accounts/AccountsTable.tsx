@@ -6,7 +6,6 @@ import { map } from "lodash";
 
 import { faCommentsAlt, faPrint } from "@fortawesome/pro-solid-svg-icons";
 
-import * as api from "api";
 import { download } from "lib/util/files";
 
 import * as models from "lib/model";
@@ -16,6 +15,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
 import { selectCommentsHistoryDrawerOpen, selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
 import * as actions from "../../../store/actions/budget/accounts";
+import { generatePdf } from "../../../pdf";
 import { GenericAccountsTable } from "../../Generic";
 
 const selectGroups = simpleDeepEqualSelector(
@@ -106,7 +106,7 @@ const AccountsTable = (): JSX.Element => {
             text: "Export PDF",
             onClick: () => {
               if (!isNil(budgetId)) {
-                api.getBudgetPdf(budgetId).then((response: any) => {
+                generatePdf(budgetId).then((response: Blob) => {
                   download(response, !isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf");
                 });
               }

@@ -19,58 +19,68 @@ const ColumnTypes: Table.ColumnType[] = [
   {
     id: "text",
     icon: faFontCase,
-    align: "left"
+    style: { textAlign: "left" },
+    headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "longText",
     icon: faAlignLeft,
-    align: "left"
+    style: { textAlign: "left" }
   },
   {
     id: "singleSelect",
     icon: faCaretCircleDown,
-    align: "left",
+    style: { textAlign: "left" },
+    headerOverrides: { style: { textAlign: "center" } },
     editorIsPopup: true
   },
   {
     id: "contact",
     icon: faUser,
-    align: "left"
+    style: { textAlign: "left" },
+    headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "phone",
     icon: faPhone,
-    align: "left"
+    style: { textAlign: "left" },
+    headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "email",
     icon: faEnvelope,
-    align: "left"
+    style: { textAlign: "left" },
+    headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "number",
     icon: faHashtag,
-    align: "right"
+    style: { textAlign: "right" },
+    headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "currency",
     icon: faDollarSign,
-    align: "right"
+    style: { textAlign: "right" },
+    headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "sum",
     icon: faEquals,
-    align: "right"
+    style: { textAlign: "right" },
+    headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "date",
     icon: faCalendarDay,
-    align: "right"
+    style: { textAlign: "right" },
+    headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "percentage",
     icon: faPercentage,
-    align: "right"
+    style: { textAlign: "right" },
+    headerOverrides: { style: { textAlign: "center" } }
   }
 ];
 

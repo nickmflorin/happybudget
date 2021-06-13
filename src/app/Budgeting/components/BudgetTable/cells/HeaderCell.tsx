@@ -8,6 +8,7 @@ import { faArrowUp, faArrowDown, faEdit } from "@fortawesome/free-solid-svg-icon
 import { Column } from "@ag-grid-community/core";
 
 import * as models from "lib/model";
+import { getColumnTypeCSSStyle } from "lib/model/util";
 
 import { ShowHide, IconHolder, VerticalFlexCenter } from "components";
 import { IconButton } from "components/buttons";
@@ -52,6 +53,13 @@ const HeaderCell = <R extends Table.Row>({
     return find(models.ColumnTypes, { id: column.type } as any) || null;
   }, [column]);
 
+  const columnStyle = useMemo(() => {
+    if (!isNil(columnType)) {
+      return getColumnTypeCSSStyle(columnType, { header: true });
+    }
+    return {};
+  }, [columnType]);
+
   // NOTE: Because of AG Grid's use of references for rendering performance, the `ordering` prop
   // will not always update in this component when it changes in the parent table component.  This
   // is used for the initial render when an ordering is present in cookies.  We should figure out
@@ -70,7 +78,7 @@ const HeaderCell = <R extends Table.Row>({
   return (
     <div
       className={classNames("header-cell", className)}
-      style={style}
+      style={{ ...columnStyle, ...style }}
       onClick={() => {
         setOrder(order === -1 ? 0 : order === 0 ? 1 : -1);
         !isNil(onSort) &&

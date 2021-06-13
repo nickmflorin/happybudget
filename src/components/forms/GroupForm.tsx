@@ -31,11 +31,7 @@ const GroupForm: React.FC<FormProps<GroupFormValues>> = ({ ...props }) => {
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the group." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>
-      <Form.Item
-        name={"color"}
-        label={"Color"}
-        rules={[{ required: true, message: "Please select a color for the group." }]}
-      >
+      <Form.Item name={"color"} label={"Color"}>
         <ColorSelect colors={colors} />
       </Form.Item>
     </Form.Form>

@@ -30,7 +30,7 @@ export const tableChangeIsRowChange = <R extends Table.Row>(change: Table.Change
   );
 };
 
-export const tableChangeIsCellChange = <R extends Table.Row>(
+export const tableChangeIsCellChange = <R extends Table.Row<any>>(
   change: Table.Change<R>
 ): change is Table.CellChange<R> => {
   return (
@@ -42,7 +42,7 @@ export const tableChangeIsCellChange = <R extends Table.Row>(
   );
 };
 
-export const isRowChangeData = <R extends Table.Row, M extends Model.Model>(
+export const isRowChangeData = <R extends Table.Row<any>, M extends Model.Model>(
   obj: Table.RowChange<R> | Table.RowChangeData<R> | R | M
 ): obj is Table.RowChangeData<R> => {
   let hasValues = true;
@@ -63,7 +63,7 @@ export const isRowChangeData = <R extends Table.Row, M extends Model.Model>(
   return hasValues;
 };
 
-export const isRowChange = <R extends Table.Row, M extends Model.Model>(
+export const isRowChange = <R extends Table.Row<any>, M extends Model.Model>(
   obj: Table.RowChange<R> | Table.RowChangeData<R> | R | M
 ): obj is Table.RowChange<R> => {
   const data = (obj as Table.RowChange<R>).data;
@@ -73,58 +73,59 @@ export const isRowChange = <R extends Table.Row, M extends Model.Model>(
   return false;
 };
 
-export const isRow = <R extends Table.Row, M extends Model.Model>(obj: R | M): obj is R => {
+export const isRow = <R extends Table.Row<any>, M extends Model.Model>(obj: R | M): obj is R => {
   return (obj as R).meta !== undefined;
 };
 
-export const isModel = <R extends Table.Row, M extends Model.Model>(
+export const isModel = <R extends Table.Row<any>, M extends Model.Model>(
   obj: Table.RowChange<R> | Table.RowChangeData<R> | R | M
 ): obj is M => {
   return !isRowChangeData<R, M>(obj) && !isRowChange<R, M>(obj) && !isRow<R, M>(obj);
 };
 
-export const isSplitConfig = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+export const isSplitConfig = <R extends Table.Row<any>, M extends Model.Model>(
   config:
-    | Omit<Table.IAgnosticReadWriteField<R, M, P>, "read" | "write">
-    | Omit<Table.ISplitReadWriteField<R, M, P>, "read" | "write">
-): config is Omit<Table.ISplitReadWriteField<R, M, P>, "read" | "write"> => {
+    | Omit<Table.IAgnosticReadWriteField<R, M, any>, "read" | "write">
+    | Omit<Table.ISplitReadWriteField<R, M, any>, "read" | "write">
+): config is Omit<Table.ISplitReadWriteField<R, M, any>, "read" | "write"> => {
   return (
-    (config as Table.ISplitReadWriteField<R, M, P>).modelField !== undefined &&
-    (config as Table.ISplitReadWriteField<R, M, P>).rowField !== undefined
+    (config as Table.ISplitReadWriteField<R, M, any>).modelField !== undefined &&
+    (config as Table.ISplitReadWriteField<R, M, any>).rowField !== undefined
   );
 };
 
-export const isReadField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
-  field: Table.Field<R, M, P>
+export const isReadField = <R extends Table.Row<any>, M extends Model.Model>(
+  field: Table.Field<R, M, any>
 ): field is
   | Table.IReadOnlyField<R, M>
-  | Table.IAgnosticReadWriteField<R, M, P>
-  | Table.ISplitReadWriteField<R, M, P> => {
+  | Table.IAgnosticReadWriteField<R, M, any>
+  | Table.ISplitReadWriteField<R, M, any> => {
   return (field as Table.IReadField<R, M>).read === true;
 };
 
-export const isWriteField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
-  field: Table.Field<R, M, P>
+export const isWriteField = <R extends Table.Row<any>, M extends Model.Model>(
+  field: Table.Field<R, M, any>
 ): field is
-  | Table.IWriteOnlyField<R, M, P>
-  | Table.IAgnosticReadWriteField<R, M, P>
-  | Table.ISplitReadWriteField<R, M, P> => {
-  return (field as Table.IWriteField<R, M, P>).write === true;
+  | Table.IWriteOnlyField<R, M, any>
+  | Table.IAgnosticReadWriteField<R, M, any>
+  | Table.ISplitReadWriteField<R, M, any> => {
+  return (field as Table.IWriteField<R, M, any>).write === true;
 };
 
-export const isSplitField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
-  field: Table.Field<R, M, P>
-): field is Table.ISplitReadWriteField<R, M, P> => {
+export const isSplitField = <R extends Table.Row<any>, M extends Model.Model>(
+  /* eslint-disable indent */
+  field: Table.Field<R, M, any>
+): field is Table.ISplitReadWriteField<R, M, any> => {
   return (
     isReadField(field) &&
     isWriteField(field) &&
-    (field as Table.ISplitReadWriteField<R, M, P>).modelField !== undefined &&
-    (field as Table.ISplitReadWriteField<R, M, P>).rowField !== undefined
+    (field as Table.ISplitReadWriteField<R, M, any>).modelField !== undefined &&
+    (field as Table.ISplitReadWriteField<R, M, any>).rowField !== undefined
   );
 };
 
-export const isWriteOnlyField = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
-  field: Table.Field<R, M, P>
-): field is Table.IWriteOnlyField<R, M, P> => {
-  return (field as Table.IWriteOnlyField<R, M, P>).writeOnly === true;
+export const isWriteOnlyField = <R extends Table.Row<any>, M extends Model.Model>(
+  field: Table.Field<R, M, any>
+): field is Table.IWriteOnlyField<R, M, any> => {
+  return (field as Table.IWriteOnlyField<R, M, any>).writeOnly === true;
 };

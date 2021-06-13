@@ -8,47 +8,13 @@ import { isModelWithColor, isModelWithName, isTag } from "lib/model/typeguards";
 
 import "./Tag.scss";
 
-/**
- * Represents the required data in it's most basic form that is used to create a Tag component.
- * This is meant to be used for creating MultipleTags components, when we want to provide the
- * data used to create the tags as a series of objects:
- *
- * <MultipleTags tags={[{ text: "foo", color: "red" }]} />
- */
-export interface ITag {
-  readonly color?: string | undefined | null;
-  readonly textColor?: string | undefined | null;
-  readonly uppercase?: boolean;
-  readonly text: string;
-}
-
-interface PrivateTagProps extends StandardComponentProps {
-  readonly children: string;
-  readonly color?: string | undefined | null;
-  readonly textColor: string;
-  readonly uppercase?: boolean;
-  readonly fillWidth?: boolean;
-}
-
-/**
- * A Tag component in it's base level form.  This is not meant to be used externally to this
- * module, but only internally.
- */
-const PrivateTag = ({
-  children,
-  color,
-  fillWidth,
-  textColor,
-  uppercase,
-  style = {},
-  className
-}: PrivateTagProps): JSX.Element => {
+const TagRenderer = (props: ITagRenderParams): JSX.Element => {
   return (
     <div
-      className={classNames("tag", { uppercase }, { "fill-width": fillWidth }, className)}
-      style={{ ...style, backgroundColor: color || DEFAULT_TAG_COLOR, color: textColor }}
+      className={classNames("tag", { uppercase: props.uppercase }, { "fill-width": props.fillWidth }, props.className)}
+      style={{ ...props.style, backgroundColor: props.color, color: props.textColor }}
     >
-      {children}
+      {props.text}
     </div>
   );
 };
@@ -77,32 +43,6 @@ export const EmptyTag: React.FC<EmptyTagProps> = (props: EmptyTagProps) => {
     </Tag>
   );
 };
-
-interface _TagCommonProps extends StandardComponentProps {
-  readonly textColor?: string;
-  readonly scheme?: string[];
-  readonly uppercase?: boolean;
-  readonly colorIndex?: number;
-  readonly fillWidth?: boolean;
-}
-
-interface _TagModelProps<M extends Model.Model = Model.Model> extends _TagCommonProps {
-  readonly model: M;
-  readonly modelTextField?: keyof M;
-  readonly modelColorField?: keyof M;
-}
-
-interface _TagTextProps extends _TagCommonProps {
-  readonly text: string;
-  readonly color?: string;
-}
-
-interface _TagChildrenProps extends _TagCommonProps {
-  readonly children: string;
-  readonly color?: string;
-}
-
-type TagProps<M extends Model.Model = Model.Model> = _TagModelProps<M> | _TagTextProps | _TagChildrenProps;
 
 const isTagTextProps = (props: TagProps<any>): props is _TagTextProps => {
   return (
@@ -191,67 +131,26 @@ const Tag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.Eleme
     return contrastedForegroundColor(tagColor as string);
   }, [tagColor, props]);
 
-  return (
-    <PrivateTag
-      className={props.className}
-      uppercase={props.uppercase}
-      color={tagColor as string}
-      textColor={tagTextColor}
-      style={props.style}
-      fillWidth={props.fillWidth}
-    >
-      {tagText as string}
-    </PrivateTag>
-  );
+  const renderParams = useMemo((): ITagRenderParams => {
+    return {
+      className: props.className,
+      uppercase: props.uppercase || false,
+      color: (tagColor as string) || DEFAULT_TAG_COLOR,
+      textColor: tagTextColor || DEFAULT_TAG_TEXT_COLOR,
+      text: tagText as string,
+      fillWidth: props.fillWidth || false
+    };
+  }, []);
+
+  if (!isNil(props.render)) {
+    return props.render(renderParams);
+  }
+  return <TagRenderer {...renderParams} />;
 };
-
-// Common props used in all 3 different ways of instantiating a <MultipleTags> component.
-interface _MultipleTagsProps extends StandardComponentProps {
-  // Globally provided color - will be set on all created <Tag> components if the color is not
-  // explicitly provided to that <Tag> component (either by means of the ITag object or the
-  // model M used to generate the <Tag> component).
-  color?: string;
-  // Globally provided textColor - will be set on all created <Tag> components if the textColor is not
-  // explicitly provided to that <Tag> component (either by means of the ITag object or the
-  // model M used to generate the <Tag> component).
-  textColor?: string;
-  scheme?: string[];
-  // Globally provided uppercase setting - will be set on all created <Tag> components if the uppercase
-  // setting is not explicitly provided to the <Tag> component (by means of the ITag object only).
-  uppercase?: boolean;
-  // If the list of Models (M) or list of ITag objects or Array of Children <Tag> components is empty,
-  // this will either render the component provided by onMissingList or create an <EmptyTag> component
-  // with props populated from this attribute.
-  onMissing?: JSX.Element | EmptyTagProps;
-}
-
-// <Tag> components are provided as children to the component:
-// <MultipleTags><Tag /><Tag /></MultipleTags>
-interface _MultipleTagsChildrenProps extends _MultipleTagsProps {
-  children: typeof Tag[];
-}
-
-// <Tag> components should be generated based on a set of provided models M.
-interface _MultipleTagsModelsProps<M extends Model.Model = Model.Model> extends _MultipleTagsProps {
-  models: M[];
-  modelTextField?: keyof M;
-  modelColorField?: keyof M;
-}
-
-// <Tag> components should be generated based on a provided Array of objects (ITag), each of which
-// contains the properties necessary to create a <Tag> component.
-interface _MultipleTagsExplicitProps extends _MultipleTagsProps {
-  tags: ITag[];
-}
 
 const isEmptyTagsPropsNotComponent = (props: EmptyTagProps | JSX.Element): props is EmptyTagProps => {
   return typeof props === "object";
 };
-
-export type MultipleTagsProps<M extends Model.Model = Model.Model> =
-  | _MultipleTagsChildrenProps
-  | _MultipleTagsModelsProps<M>
-  | _MultipleTagsExplicitProps;
 
 const isMultipleTagsModelsProps = <M extends Model.Model = Model.Model>(
   props: MultipleTagsProps<M>
@@ -348,7 +247,6 @@ export const MultipleTags = <M extends Model.Model = Model.Model>(props: Multipl
 };
 
 Tag.emptyTagPropsOrComponent = emptyTagPropsOrComponent;
-
 Tag.Empty = EmptyTag;
 Tag.Multiple = MultipleTags;
 export default Tag;
