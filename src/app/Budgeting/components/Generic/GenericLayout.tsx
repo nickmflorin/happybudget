@@ -15,8 +15,8 @@ const GenericLayout: React.FC<GenericLayoutProps> = ({ children, ...props }) => 
     <Layout
       collapsed
       includeFooter={false}
-      headerProps={{ style: { height: 70 + 36 } }}
-      contentProps={{ style: { marginTop: 70 + 36 + 10, height: "calc(100vh - 116px)" } }}
+      headerProps={{ style: { height: 56 + 36 } }}
+      contentProps={{ style: { marginTop: 56 + 36 + 10, height: "calc(100vh - 102px)" } }}
       {...props}
     >
       <div className={"budget"}>
