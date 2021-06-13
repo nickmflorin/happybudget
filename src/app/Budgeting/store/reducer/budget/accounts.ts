@@ -8,7 +8,7 @@ import { initialModelListResponseState } from "store/initialState";
 import { ActionType } from "../../actions";
 import { initialBudgetAccountsState } from "../../initialState";
 
-const listResponseReducer = createModelListResponseReducer<Model.BudgetAccount, Redux.Budgeting.Budget.AccountsStore>(
+const listResponseReducer = createModelListResponseReducer<Model.BudgetAccount, Modules.Budgeting.Budget.AccountsStore>(
   {
     Response: ActionType.Budget.Accounts.Response,
     Request: ActionType.Budget.Accounts.Request,
@@ -80,9 +80,9 @@ const listResponseReducer = createModelListResponseReducer<Model.BudgetAccount, 
 );
 
 const recalculateGroupMetrics = (
-  st: Redux.Budgeting.Budget.AccountsStore,
+  st: Modules.Budgeting.Budget.AccountsStore,
   groupId: number
-): Redux.Budgeting.Budget.AccountsStore => {
+): Modules.Budgeting.Budget.AccountsStore => {
   // This might not be totally necessary, but it is good practice to not use the entire payload
   // to update the group (since that is already done by the reducer above) but to instead just
   // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -122,10 +122,10 @@ const recalculateGroupMetrics = (
   };
 };
 
-const rootReducer: Reducer<Redux.Budgeting.Budget.AccountsStore, Redux.Action<any>> = (
-  state: Redux.Budgeting.Budget.AccountsStore = initialBudgetAccountsState,
+const rootReducer: Reducer<Modules.Budgeting.Budget.AccountsStore, Redux.Action<any>> = (
+  state: Modules.Budgeting.Budget.AccountsStore = initialBudgetAccountsState,
   action: Redux.Action<any>
-): Redux.Budgeting.Budget.AccountsStore => {
+): Modules.Budgeting.Budget.AccountsStore => {
   let newState = { ...state };
 
   newState = listResponseReducer(newState, action);

@@ -56,9 +56,9 @@ const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, BudgetTable.Temp
     }
   },
   models.TemplateSubAccountRowManager,
-  (state: Redux.ApplicationStore) => state.budgeting.template.subaccount.id,
-  (state: Redux.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.data,
-  (state: Redux.ApplicationStore) => state.budgeting.template.autoIndex
+  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.id,
+  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.data,
+  (state: Modules.ApplicationStore) => state.budgeting.template.autoIndex
 );
 
 function* watchForSubAccountIdChangedSaga(): SagaIterator {

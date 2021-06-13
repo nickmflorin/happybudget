@@ -21,7 +21,7 @@ export function* handleTemplateChangedTask(action: Redux.Action<number>): SagaIt
 }
 
 export function* getTemplateTask(): SagaIterator {
-  const templateId = yield select((state: Redux.ApplicationStore) => state.budgeting.template.template.id);
+  const templateId = yield select((state: Modules.ApplicationStore) => state.budgeting.template.template.id);
   if (!isNil(templateId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

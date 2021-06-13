@@ -4,68 +4,68 @@ import {
   initialCommentsListResponseState
 } from "store/initialState";
 
-export const initialBudgetAccountsState: Redux.Budgeting.Budget.AccountsStore = {
+export const initialBudgetAccountsState: Modules.Budgeting.Budget.AccountsStore = {
   history: initialModelListResponseState,
   groups: initialModelListResponseState,
   ...initialModelListResponseState
 };
 
-export const initialTemplateAccountsState: Redux.Budgeting.Template.AccountsStore = {
+export const initialTemplateAccountsState: Modules.Budgeting.Template.AccountsStore = {
   groups: initialModelListResponseState,
   ...initialModelListResponseState
 };
 
-export const initialBudgetBudgetState: Redux.Budgeting.Budget.BudgetStore = {
+export const initialBudgetBudgetState: Modules.Budgeting.Budget.BudgetStore = {
   id: null,
   detail: initialDetailResponseState,
   comments: initialCommentsListResponseState
 };
 
-export const initialTemplateTemplateState: Redux.Budgeting.Template.TemplateStore = {
+export const initialTemplateTemplateState: Modules.Budgeting.Template.TemplateStore = {
   id: null,
   detail: initialDetailResponseState
 };
 
-export const initialBudgetSubAccountsState: Redux.Budgeting.Budget.SubAccountsStore = {
+export const initialBudgetSubAccountsState: Modules.Budgeting.Budget.SubAccountsStore = {
   history: initialModelListResponseState,
   groups: initialModelListResponseState,
   fringes: initialModelListResponseState,
   ...initialModelListResponseState
 };
 
-export const initialTemplateSubAccountsState: Redux.Budgeting.Template.SubAccountsStore = {
+export const initialTemplateSubAccountsState: Modules.Budgeting.Template.SubAccountsStore = {
   groups: initialModelListResponseState,
   fringes: initialModelListResponseState,
   ...initialModelListResponseState
 };
 
-export const initialBudgetSubAccountState: Redux.Budgeting.Budget.SubAccountStore = {
+export const initialBudgetSubAccountState: Modules.Budgeting.Budget.SubAccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialBudgetSubAccountsState,
   comments: initialCommentsListResponseState
 };
 
-export const initialTemplateSubAccountState: Redux.Budgeting.Template.SubAccountStore = {
+export const initialTemplateSubAccountState: Modules.Budgeting.Template.SubAccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialTemplateSubAccountsState
 };
 
-export const initialBudgetAccountState: Redux.Budgeting.Budget.AccountStore = {
+export const initialBudgetAccountState: Modules.Budgeting.Budget.AccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialBudgetSubAccountsState,
   comments: initialCommentsListResponseState
 };
 
-export const initialTemplateAccountState: Redux.Budgeting.Template.AccountStore = {
+export const initialTemplateAccountState: Modules.Budgeting.Template.AccountStore = {
   id: null,
   detail: initialDetailResponseState,
   subaccounts: initialTemplateSubAccountsState
 };
 
-export const initialBudgetState: Redux.Budgeting.Budget.Store = {
+export const initialBudgetState: Modules.Budgeting.Budget.Store = {
   autoIndex: false,
   budget: initialBudgetBudgetState,
   instance: null,
@@ -79,7 +79,7 @@ export const initialBudgetState: Redux.Budgeting.Budget.Store = {
   budgetItemsTree: initialModelListResponseState
 };
 
-export const initialTemplateState: Redux.Budgeting.Template.Store = {
+export const initialTemplateState: Modules.Budgeting.Template.Store = {
   autoIndex: false,
   template: initialTemplateTemplateState,
   instance: null,
@@ -89,7 +89,7 @@ export const initialTemplateState: Redux.Budgeting.Template.Store = {
   accounts: initialTemplateAccountsState
 };
 
-const initialState: Redux.Budgeting.Store = {
+const initialState: Modules.Budgeting.Store = {
   budget: initialBudgetState,
   template: initialTemplateState,
   fringeColors: initialModelListResponseState,

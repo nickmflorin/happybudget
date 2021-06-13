@@ -18,7 +18,9 @@ const WrapInApplicationStore = ({ children }: WrapInApplicationStoreProps): JSX.
   const [redirect, setRedirect] = useState(false);
   const [user, setUser] = useState<Model.User | undefined>(undefined);
   const [authenticating, setAuthenticating] = useState(true);
-  const [reduxStore, setReduxStore] = useState<Store<Redux.ApplicationStore, Redux.Action<any>> | undefined>(undefined);
+  const [reduxStore, setReduxStore] = useState<Store<Modules.ApplicationStore, Redux.Action<any>> | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     setAuthenticating(true);

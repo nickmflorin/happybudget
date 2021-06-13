@@ -64,9 +64,9 @@ export const createSubAccountTaskSet = <
   /* eslint-disable indent */
   actions: SubAccountTasksActionMap<SA, G>,
   manager: models.RowManager<R, SA, Http.SubAccountPayload, G>,
-  selectSubAccountId: (state: Redux.ApplicationStore) => number | null,
-  selectModels: (state: Redux.ApplicationStore) => SA[],
-  selectAutoIndex: (state: Redux.ApplicationStore) => boolean
+  selectSubAccountId: (state: Modules.ApplicationStore) => number | null,
+  selectModels: (state: Modules.ApplicationStore) => SA[],
+  selectAutoIndex: (state: Modules.ApplicationStore) => boolean
 ): SubAccountTaskSet<R, G> => {
   function* handleSubAccountChangeTask(action: Redux.Action<number>): SagaIterator {
     yield all([put(actions.subaccount.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);

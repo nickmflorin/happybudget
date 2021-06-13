@@ -1,6 +1,6 @@
 import { initialModelListResponseState } from "store/initialState";
 
-const initialState: Redux.Dashboard.Store = {
+const initialState: Modules.Dashboard.Store = {
   contacts: initialModelListResponseState,
   budgets: initialModelListResponseState,
   templates: {

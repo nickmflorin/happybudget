@@ -3,7 +3,7 @@ import { createDetailResponseReducer, createSimplePayloadReducer } from "lib/red
 import { ActionType } from "../../actions";
 import { createTemplateSubAccountsReducer } from "../factories";
 
-const rootReducer: Reducer<Redux.Budgeting.Template.AccountStore, Redux.Action<any>> = combineReducers({
+const rootReducer: Reducer<Modules.Budgeting.Template.AccountStore, Redux.Action<any>> = combineReducers({
   id: createSimplePayloadReducer<number | null>(ActionType.Template.Account.SetId, null),
   detail: createDetailResponseReducer<
     Model.TemplateAccount,

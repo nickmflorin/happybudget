@@ -29,7 +29,7 @@ function* watchForDeleteContactsSaga(): SagaIterator {
     const action: Redux.Action<number[]> = yield take(ActionType.Contacts.DeleteMultiple);
     if (!isNil(action.payload)) {
       /* eslint-disable no-loop-func */
-      const deleting = yield select((state: Redux.ApplicationStore) => state.dashboard.contacts.deleting);
+      const deleting = yield select((state: Modules.ApplicationStore) => state.dashboard.contacts.deleting);
       for (let i = 0; i < action.payload.length; i++) {
         const id: number = action.payload[i];
         if (!includes(deleting, id)) {

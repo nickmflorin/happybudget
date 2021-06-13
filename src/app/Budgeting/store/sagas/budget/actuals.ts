@@ -33,7 +33,7 @@ function* deleteTask(id: number): SagaIterator {
 }
 
 function* bulkCreateTask(action: Redux.Action<number> | number): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId) && (!isAction(action) || !isNil(action.payload))) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -99,7 +99,7 @@ function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable.Actual
 
 function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
-    const ms: Model.Actual[] = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
+    const ms: Model.Actual[] = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.actuals.data);
     const model: Model.Actual | undefined = find(ms, { id: action.payload });
     if (isNil(model)) {
       warnInconsistentState({
@@ -115,10 +115,10 @@ function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
 }
 
 function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetTable.ActualRow>>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const merged = consolidateTableChange(action.payload);
-    const data = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
+    const data = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.actuals.data);
 
     const updatesToPerform: Table.RowChange<BudgetTable.ActualRow>[] = [];
     for (let i = 0; i < merged.length; i++) {
@@ -142,7 +142,7 @@ function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetTable.Ac
 }
 
 function* getActualsTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -173,7 +173,7 @@ function* getActualsTask(action: Redux.Action<null>): SagaIterator {
 }
 
 function* getBudgetItemsTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -196,9 +196,9 @@ function* getBudgetItemsTask(action: Redux.Action<null>): SagaIterator {
 }
 
 function* getBudgetItemsTreeTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
-    const search = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree.search);
+    const search = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budgetItemsTree.search);
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     yield put(actions.loadingBudgetItemsTreeAction(true));

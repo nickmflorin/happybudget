@@ -9,7 +9,7 @@ import * as actions from "./actions";
 export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Redux.ApplicationStore) => {
+  const query = yield select((state: Modules.ApplicationStore) => {
     return {
       search: state.dashboard.budgets.search,
       page_size: state.dashboard.budgets.pageSize,
@@ -38,7 +38,7 @@ export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
 export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Redux.ApplicationStore) => {
+  const query = yield select((state: Modules.ApplicationStore) => {
     return {
       search: state.dashboard.templates.search,
       page_size: state.dashboard.templates.pageSize,
@@ -67,7 +67,7 @@ export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
 export function* getCommunityTemplatesTask(action: Redux.Action<any>): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Redux.ApplicationStore) => {
+  const query = yield select((state: Modules.ApplicationStore) => {
     return {
       search: state.dashboard.community.search,
       page_size: state.dashboard.community.pageSize,
@@ -280,7 +280,7 @@ export function* showCommunityTemplateAction(action: Redux.Action<number>): Saga
 export function* getContactsTask(action: Redux.Action<any>): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query: Http.ListQuery = yield select((state: Redux.ApplicationStore) => {
+  const query: Http.ListQuery = yield select((state: Modules.ApplicationStore) => {
     return {
       page: state.dashboard.contacts.page,
       page_size: state.dashboard.contacts.pageSize,
@@ -308,7 +308,7 @@ export function* deleteContactTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    const deleting = yield select((state: Redux.ApplicationStore) => state.dashboard.contacts.deleting);
+    const deleting = yield select((state: Modules.ApplicationStore) => state.dashboard.contacts.deleting);
     if (!includes(deleting, action.payload)) {
       yield put(actions.deletingContactAction({ id: action.payload, value: true }));
       try {

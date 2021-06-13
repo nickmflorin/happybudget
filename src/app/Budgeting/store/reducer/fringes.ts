@@ -4,7 +4,7 @@ import { createModelListResponseReducer } from "lib/redux/factories";
 import { initialModelListResponseState } from "store/initialState";
 import { ActionType } from "../actions";
 
-const createRootReducer = <D extends Redux.Budgeting.BudgetDirective>(
+const createRootReducer = <D extends Modules.Budgeting.BudgetDirective>(
   /* eslint-disable indent */
   directive: D
 ): Reducer<Redux.ModelListResponseStore<Model.Fringe>, Redux.Action<any>> => {

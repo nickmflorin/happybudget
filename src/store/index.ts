@@ -7,20 +7,20 @@ import createApplicationReducer from "./reducer";
 import createRootSaga from "./sagas";
 import createRootInitialState from "./initialState";
 
-const configureStore = (user: Model.User): Store<Redux.ApplicationStore, Redux.Action<any>> => {
+const configureStore = (user: Model.User): Store<Modules.ApplicationStore, Redux.Action<any>> => {
   const initialState = createRootInitialState(ApplicationReduxConfig, user);
 
   const sentryReduxEnhancer = Sentry.createReduxEnhancer();
 
   const applicationReducer = createApplicationReducer(ApplicationReduxConfig, user) as Reducer<
-    Redux.ApplicationStore,
+    Modules.ApplicationStore,
     Redux.Action
   >;
   const applicationSaga = createRootSaga(ApplicationReduxConfig);
 
   const sagaMiddleware = createSagaMiddleware();
 
-  const store: Store<Redux.ApplicationStore, Redux.Action<any>> = createStore(
+  const store: Store<Modules.ApplicationStore, Redux.Action<any>> = createStore(
     applicationReducer,
     initialState,
     compose(applyMiddleware(sagaMiddleware), sentryReduxEnhancer)

@@ -16,7 +16,7 @@ import CreateContactModal from "./CreateContactModal";
 const Contacts = (): JSX.Element => {
   const [newContactModalOpen, setNewContactModalOpen] = useState(false);
   const dispatch: Dispatch = useDispatch();
-  const contacts = useSelector((state: Redux.ApplicationStore) => state.dashboard.contacts);
+  const contacts = useSelector((state: Modules.ApplicationStore) => state.dashboard.contacts);
 
   return (
     <React.Fragment>

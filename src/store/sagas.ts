@@ -4,10 +4,10 @@ import { isNil } from "lodash";
 
 export function* RootSaga(): SagaIterator {}
 
-const createApplicationSaga = (config: Redux.ApplicationConfig): Saga => {
+const createApplicationSaga = (config: Modules.ApplicationConfig): Saga => {
   function* applicationSaga(): SagaIterator {
     for (var i = 0; i < config.length; i++) {
-      const moduleConfig: Redux.ModuleConfig<any, any> = config[i];
+      const moduleConfig: Modules.ModuleConfig<any, any> = config[i];
       if (!isNil(moduleConfig.rootSaga)) {
         yield spawn(moduleConfig.rootSaga);
       }

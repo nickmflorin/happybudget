@@ -41,7 +41,7 @@ import {
 import { createStandardSaga, createAccountsTaskSet } from "../factories";
 
 export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -65,7 +65,7 @@ export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
 }
 
 export function* submitCommentTask(action: Redux.Action<{ parent?: number; data: Http.CommentPayload }>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -148,7 +148,7 @@ export function* editCommentTask(action: Redux.Action<Redux.UpdateModelActionPay
 }
 
 export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -179,7 +179,7 @@ export function* addToHistoryState(
   eventType: Model.HistoryEventType,
   data?: { field: string; newValue: string | number; oldValue: string | number | null }
 ): SagaIterator {
-  const user = yield select((state: Redux.ApplicationStore) => state.user);
+  const user = yield select((state: Modules.ApplicationStore) => state.user);
   const polymorphicEvent: Model.PolymorphicEvent = {
     id: generateRandomNumericId(),
     created_at: nowAsString(),
@@ -242,9 +242,9 @@ const tasks = createAccountsTaskSet<
     bulkCreate: api.bulkCreateBudgetAccounts
   },
   models.BudgetAccountRowManager,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.budget.id,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.data,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.autoIndex
+  (state: Modules.ApplicationStore) => state.budgeting.budget.budget.id,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.data,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.autoIndex
 );
 
 export default createStandardSaga({

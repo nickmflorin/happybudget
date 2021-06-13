@@ -10,7 +10,7 @@ import { initialTemplateAccountsState } from "../../initialState";
 
 const listResponseReducer = createModelListResponseReducer<
   Model.TemplateAccount,
-  Redux.Budgeting.Template.AccountsStore
+  Modules.Budgeting.Template.AccountsStore
 >(
   {
     Response: ActionType.Template.Accounts.Response,
@@ -78,9 +78,9 @@ const listResponseReducer = createModelListResponseReducer<
 );
 
 const recalculateGroupMetrics = (
-  st: Redux.Budgeting.Template.AccountsStore,
+  st: Modules.Budgeting.Template.AccountsStore,
   groupId: number
-): Redux.Budgeting.Template.AccountsStore => {
+): Modules.Budgeting.Template.AccountsStore => {
   // This might not be totally necessary, but it is good practice to not use the entire payload
   // to update the group (since that is already done by the reducer above) but to instead just
   // update the parts of the relevant parts of the current group in state (estimated, variance,
@@ -115,10 +115,10 @@ const recalculateGroupMetrics = (
   };
 };
 
-const rootReducer: Reducer<Redux.Budgeting.Template.AccountsStore, Redux.Action<any>> = (
-  state: Redux.Budgeting.Template.AccountsStore = initialTemplateAccountsState,
+const rootReducer: Reducer<Modules.Budgeting.Template.AccountsStore, Redux.Action<any>> = (
+  state: Modules.Budgeting.Template.AccountsStore = initialTemplateAccountsState,
   action: Redux.Action<any>
-): Redux.Budgeting.Template.AccountsStore => {
+): Modules.Budgeting.Template.AccountsStore => {
   let newState = { ...state };
 
   newState = listResponseReducer(newState, action);

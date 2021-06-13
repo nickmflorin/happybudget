@@ -23,24 +23,24 @@ import { selectBudgetDetail } from "../../store/selectors";
 import BudgetTableComponent from "../BudgetTable";
 
 const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.selected
+  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.selected
 );
-const selectActuals = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
+const selectActuals = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.budget.actuals.data);
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.search
+  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.search
 );
 const selectActualsLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.loading
+  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.loading
 );
 const selectSaving = createSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.deleting,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.updating,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.creating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 const selectBudgetItems = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.budgetItems.data
+  (state: Modules.ApplicationStore) => state.budgeting.budget.budgetItems.data
 );
 
 const Actuals = (): JSX.Element => {

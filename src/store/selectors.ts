@@ -13,4 +13,4 @@ export const simpleShallowEqualSelector = <T = any>(func: Redux.SelectorFunc<T>)
   return createShallowEqualSelector(func, (data: T) => data);
 };
 
-export const selectApplicationLoading = (state: Redux.ApplicationStore) => state.loading;
+export const selectApplicationLoading = (state: Modules.ApplicationStore) => state.loading;

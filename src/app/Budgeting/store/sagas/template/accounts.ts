@@ -53,9 +53,9 @@ const tasks = createAccountsTaskSet<
     bulkCreate: api.bulkCreateTemplateAccounts
   },
   models.TemplateAccountRowManager,
-  (state: Redux.ApplicationStore) => state.budgeting.template.template.id,
-  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.data,
-  (state: Redux.ApplicationStore) => state.budgeting.template.autoIndex
+  (state: Modules.ApplicationStore) => state.budgeting.template.template.id,
+  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.data,
+  (state: Modules.ApplicationStore) => state.budgeting.template.autoIndex
 );
 
 export default createStandardSaga({

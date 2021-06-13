@@ -21,10 +21,10 @@ import {
 import { EmptyCard, BudgetCard } from "../Card";
 import "./index.scss";
 
-const selectBudgets = (state: Redux.ApplicationStore) => state.dashboard.budgets.data;
-const selectLoadingBudgets = (state: Redux.ApplicationStore) => state.dashboard.budgets.loading;
-const selectBudgetsSearch = (state: Redux.ApplicationStore) => state.dashboard.budgets.search;
-const selectDeletingBudgets = (state: Redux.ApplicationStore) => state.dashboard.budgets.deleting;
+const selectBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.data;
+const selectLoadingBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.loading;
+const selectBudgetsSearch = (state: Modules.ApplicationStore) => state.dashboard.budgets.search;
+const selectDeletingBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.deleting;
 
 const Budgets = (): JSX.Element => {
   const [budgetToEdit, setBudgetToEdit] = useState<Model.Budget | undefined>(undefined);

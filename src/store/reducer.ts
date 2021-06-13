@@ -16,10 +16,10 @@ import { createSimpleBooleanReducer } from "../lib/redux/factories";
  * @param config  The module level Redux configuration.
  */
 const createWrappedModuleReducer = (
-  config: Redux.ModuleConfig<any, any>
-): Reducer<Redux.ModuleStore, Redux.Action<any>> => {
-  const wrapped: Reducer<Redux.ModuleStore, Redux.Action<any>> = (
-    state: Redux.ModuleStore = config.initialState,
+  config: Modules.ModuleConfig<any, any>
+): Reducer<Modules.ModuleStore, Redux.Action<any>> => {
+  const wrapped: Reducer<Modules.ModuleStore, Redux.Action<any>> = (
+    state: Modules.ModuleStore = config.initialState,
     action: Redux.Action<any>
   ): any => {
     if (!isNil(action.label)) {
@@ -48,12 +48,12 @@ const createWrappedModuleReducer = (
  *
  * @param user   The User object returned from the JWT token validation.
  */
-const createUserReducer = (user: Model.User): Reducer<Redux.UserStore, Redux.Action<any>> => {
+const createUserReducer = (user: Model.User): Reducer<Modules.UserStore, Redux.Action<any>> => {
   const initialUserState = createInitialUserState(user);
-  const userReducer: Reducer<Redux.UserStore, Redux.Action<any>> = (
-    state: Redux.UserStore = initialUserState,
+  const userReducer: Reducer<Modules.UserStore, Redux.Action<any>> = (
+    state: Modules.UserStore = initialUserState,
     action: Redux.Action<any>
-  ): Redux.UserStore => {
+  ): Modules.UserStore => {
     let newState = { ...state };
     if (action.type === ApplicationActionTypes.User.UpdateInState) {
       newState = { ...newState, ...action.payload };
@@ -80,9 +80,9 @@ const loadingReducer: Reducer<boolean, Redux.Action<any>> = (
  * @param config  The application Redux configuration.
  * @param user   The User object returned from the JWT token validation.
  */
-const createApplicationReducer = (config: Redux.ApplicationConfig, user: Model.User): any => {
-  let moduleReducers: { [key: string]: Reducer<Redux.ModuleStore, Redux.Action> } = {};
-  forEach(config, (moduleConfig: Redux.ModuleConfig<any, any>) => {
+const createApplicationReducer = (config: Modules.ApplicationConfig, user: Model.User): any => {
+  let moduleReducers: { [key: string]: Reducer<Modules.ModuleStore, Redux.Action> } = {};
+  forEach(config, (moduleConfig: Modules.ModuleConfig<any, any>) => {
     moduleReducers[moduleConfig.label] = createWrappedModuleReducer(moduleConfig);
   });
   return combineReducers({

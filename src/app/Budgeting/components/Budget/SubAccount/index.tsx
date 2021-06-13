@@ -16,13 +16,13 @@ import SubAccountsTable from "./SubAccountsTable";
 import SubAccountCommentsHistory from "./SubAccountCommentsHistory";
 
 const selectDetail = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.detail.data
+  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.detail.data
 );
 const selectSubAccountsLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.loading
+  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.loading
 );
 const selectGroupsLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.groups.loading
+  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.groups.loading
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,

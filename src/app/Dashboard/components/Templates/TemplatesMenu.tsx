@@ -20,8 +20,8 @@ import "./TemplatesMenu.scss";
 
 type TemplatesPage = "my-templates" | "discover";
 
-const selectTemplatesSearch = (state: Redux.ApplicationStore) => state.dashboard.templates.search;
-const selectCommunityTemplatesSearch = (state: Redux.ApplicationStore) => state.dashboard.community.search;
+const selectTemplatesSearch = (state: Modules.ApplicationStore) => state.dashboard.templates.search;
+const selectCommunityTemplatesSearch = (state: Modules.ApplicationStore) => state.dashboard.community.search;
 
 const TemplatesMenu = (): JSX.Element => {
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);

@@ -17,11 +17,11 @@ import {
 } from "../../store/actions";
 import { TemplateCard, EmptyCard } from "../Card";
 
-const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.data;
-const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.loading;
-const selectDuplicatingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.duplicating;
-const selectMovingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.moving;
-const selectDeletingTemplates = (state: Redux.ApplicationStore) => state.dashboard.templates.deleting;
+const selectTemplates = (state: Modules.ApplicationStore) => state.dashboard.templates.data;
+const selectLoadingTemplates = (state: Modules.ApplicationStore) => state.dashboard.templates.loading;
+const selectDuplicatingTemplates = (state: Modules.ApplicationStore) => state.dashboard.templates.duplicating;
+const selectMovingTemplates = (state: Modules.ApplicationStore) => state.dashboard.templates.moving;
+const selectDeletingTemplates = (state: Modules.ApplicationStore) => state.dashboard.templates.deleting;
 
 interface MyTemplatesProps {
   setTemplateToDerive: (template: number) => void;

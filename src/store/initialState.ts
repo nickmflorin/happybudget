@@ -30,15 +30,18 @@ export const initialCommentsListResponseState: Redux.CommentsListResponseStore =
   replying: []
 };
 
-export const createInitialUserState = (user: Model.User): Redux.UserStore => {
+export const createInitialUserState = (user: Model.User): Modules.UserStore => {
   return {
     ...user
   };
 };
 
-const createApplicationInitialState = (config: Redux.ApplicationConfig, user: Model.User): Redux.ApplicationStore => {
-  const moduleInitialStates: { [key: string]: Redux.ModuleStore } = {};
-  forEach(config, (moduleConfig: Redux.ModuleConfig<any, any>) => {
+const createApplicationInitialState = (
+  config: Modules.ApplicationConfig,
+  user: Model.User
+): Modules.ApplicationStore => {
+  const moduleInitialStates: { [key: string]: Modules.ModuleStore } = {};
+  forEach(config, (moduleConfig: Modules.ModuleConfig<any, any>) => {
     if (typeof moduleConfig.initialState === "function") {
       moduleInitialStates[moduleConfig.label] = moduleConfig.initialState();
     } else {
@@ -49,7 +52,7 @@ const createApplicationInitialState = (config: Redux.ApplicationConfig, user: Mo
     user: createInitialUserState(user),
     drawerVisible: false,
     loading: false
-  } as Redux.ApplicationStore;
+  } as Modules.ApplicationStore;
 };
 
 export default createApplicationInitialState;

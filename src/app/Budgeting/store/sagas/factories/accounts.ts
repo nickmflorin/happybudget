@@ -70,9 +70,9 @@ export const createAccountsTaskSet = <
   actions: AccountsTasksActionMap<A, G>,
   services: AccountsServiceSet<M, A, G, P>,
   manager: models.RowManager<R, A, P, G>,
-  selectObjId: (state: Redux.ApplicationStore) => number | null,
-  selectModels: (state: Redux.ApplicationStore) => A[],
-  selectAutoIndex: (state: Redux.ApplicationStore) => boolean
+  selectObjId: (state: Modules.ApplicationStore) => number | null,
+  selectModels: (state: Modules.ApplicationStore) => A[],
+  selectAutoIndex: (state: Modules.ApplicationStore) => boolean
 ): AccountsTaskSet<R, G> => {
   function* removeFromGroupTask(action: Redux.Action<number>): SagaIterator {
     if (!isNil(action.payload)) {

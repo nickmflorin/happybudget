@@ -24,8 +24,8 @@ const tasks = createFringeTaskSet<Model.Budget>(
     bulkUpdate: api.bulkUpdateBudgetFringes,
     bulkCreate: api.bulkCreateBudgetFringes
   },
-  (state: Redux.ApplicationStore) => state.budgeting.budget.budget.id,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.data
+  (state: Modules.ApplicationStore) => state.budgeting.budget.budget.id,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.fringes.data
 );
 
 function* watchForRemoveFringeSaga(): SagaIterator {

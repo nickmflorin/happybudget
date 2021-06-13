@@ -7,7 +7,7 @@ import {
 import { ActionType } from "../../actions";
 import { createBudgetSubAccountsReducer } from "../factories";
 
-const rootReducer: Reducer<Redux.Budgeting.Budget.AccountStore, Redux.Action<any>> = combineReducers({
+const rootReducer: Reducer<Modules.Budgeting.Budget.AccountStore, Redux.Action<any>> = combineReducers({
   id: createSimplePayloadReducer<number | null>(ActionType.Budget.Account.SetId, null),
   detail: createDetailResponseReducer<
     Model.BudgetAccount,

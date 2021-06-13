@@ -34,7 +34,7 @@ const ContactsTable = (): JSX.Element => {
   const [contactToEdit, setContactToEdit] = useState<Model.Contact | undefined>(undefined);
   const [contactsToDelete, setContactsToDelete] = useState<Model.Contact[] | undefined>(undefined);
   const [data, setData] = useState<any[]>([]);
-  const contacts = useSelector((state: Redux.ApplicationStore) => state.dashboard.contacts);
+  const contacts = useSelector((state: Modules.ApplicationStore) => state.dashboard.contacts);
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {

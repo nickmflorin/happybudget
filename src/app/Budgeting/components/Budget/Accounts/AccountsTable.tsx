@@ -27,26 +27,26 @@ import {
 import { GenericAccountsTable } from "../../Generic";
 
 const selectGroups = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.groups.data
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.groups.data
 );
 const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.selected
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.selected
 );
-const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budgeting.budget.accounts.data);
+const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.budget.accounts.data);
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.search
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.search
 );
 
 const selectSaving = createSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.deleting,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.updating,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.creating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 const selectReadyToRender = createSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.responseWasReceived,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.accounts.groups.responseWasReceived,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.responseWasReceived,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.groups.responseWasReceived,
   (accountsResponseReceived: boolean, groupsResponseReceived: boolean) =>
     accountsResponseReceived === true && groupsResponseReceived === true
 );

@@ -49,8 +49,8 @@ export interface FringeTaskSet {
 export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   actions: FringeTasksActionMap,
   services: FringeServiceSet<M>,
-  selectObjId: (state: Redux.ApplicationStore) => number | null,
-  selectFringes: (state: Redux.ApplicationStore) => Model.Fringe[]
+  selectObjId: (state: Modules.ApplicationStore) => number | null,
+  selectFringes: (state: Modules.ApplicationStore) => Model.Fringe[]
 ): FringeTaskSet => {
   function* deleteTask(id: number): SagaIterator {
     const CancelToken = axios.CancelToken;
@@ -102,7 +102,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   }
 
   function* bulkCreateTask(action: Redux.Action<number> | number): SagaIterator {
-    const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+    const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
     if (!isNil(budgetId) && (!isAction(action) || !isNil(action.payload))) {
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();

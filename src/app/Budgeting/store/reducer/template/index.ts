@@ -30,10 +30,10 @@ const genericReducer = combineReducers({
   })
 });
 
-const rootReducer: Reducer<Redux.Budgeting.Template.Store, Redux.Action<any>> = (
-  state: Redux.Budgeting.Template.Store = initialState.template,
+const rootReducer: Reducer<Modules.Budgeting.Template.Store, Redux.Action<any>> = (
+  state: Modules.Budgeting.Template.Store = initialState.template,
   action: Redux.Action<any>
-): Redux.Budgeting.Template.Store => {
+): Modules.Budgeting.Template.Store => {
   let newState = { ...state };
 
   if (action.type === ActionType.Template.WipeState) {

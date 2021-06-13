@@ -42,7 +42,7 @@ import {
 import { createStandardSaga, createSubAccountTaskSet } from "../factories";
 
 export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
-  const subaccountId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.id);
+  const subaccountId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.id);
   if (!isNil(subaccountId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -69,7 +69,7 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
 }
 
 export function* submitCommentTask(action: Redux.Action<{ parent?: number; data: Http.CommentPayload }>): SagaIterator {
-  const subaccountId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.id);
+  const subaccountId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.id);
   if (!isNil(subaccountId) && !isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -152,7 +152,7 @@ export function* editCommentTask(action: Redux.Action<Redux.UpdateModelActionPay
 }
 
 export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
-  const subaccountId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.id);
+  const subaccountId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.id);
   if (!isNil(subaccountId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -204,9 +204,9 @@ const tasks = createSubAccountTaskSet<Model.BudgetSubAccount, BudgetTable.Budget
     }
   },
   models.BudgetSubAccountRowManager,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.id,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.data,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.autoIndex
+  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.id,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.data,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.autoIndex
 );
 
 function* watchForSubAccountIdChangedSaga(): SagaIterator {

@@ -2,7 +2,7 @@ import { Reducer, combineReducers } from "redux";
 import { createModelListActionReducer, createModelListResponseReducer } from "lib/redux/factories";
 import { ActionType } from "./actions";
 
-const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineReducers({
+const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combineReducers({
   contacts: createModelListResponseReducer<Model.Contact, Redux.ModelListResponseStore<Model.Contact>>({
     Response: ActionType.Contacts.Response,
     Request: ActionType.Contacts.Request,
@@ -19,7 +19,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
     Updating: ActionType.Contacts.Updating,
     Deleting: ActionType.Contacts.Deleting
   }),
-  templates: createModelListResponseReducer<Model.SimpleTemplate, Redux.Dashboard.TemplatesStore, Redux.Action<any>>(
+  templates: createModelListResponseReducer<Model.SimpleTemplate, Modules.Dashboard.TemplatesStore, Redux.Action<any>>(
     {
       Response: ActionType.Templates.Response,
       Loading: ActionType.Templates.Loading,
@@ -41,7 +41,7 @@ const rootReducer: Reducer<Redux.Dashboard.Store, Redux.Action<any>> = combineRe
   ),
   community: createModelListResponseReducer<
     Model.SimpleTemplate,
-    Redux.Dashboard.CommunityTemplatesStore,
+    Modules.Dashboard.CommunityTemplatesStore,
     Redux.Action<any>
   >(
     {

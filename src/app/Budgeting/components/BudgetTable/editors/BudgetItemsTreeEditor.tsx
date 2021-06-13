@@ -8,13 +8,13 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import useModelMenuEditor from "./ModelMenuEditor";
 
 const selectBudgetItemsTree = simpleDeepEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree.data
+  (state: Modules.ApplicationStore) => state.budgeting.budget.budgetItemsTree.data
 );
 const selectBudgetItemsTreeSearch = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree.search
+  (state: Modules.ApplicationStore) => state.budgeting.budget.budgetItemsTree.search
 );
 const selectBudgetItemsTreeLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree.loading
+  (state: Modules.ApplicationStore) => state.budgeting.budget.budgetItemsTree.loading
 );
 
 interface BudgetItemsTreeEditorProps extends Table.CellEditorParams {

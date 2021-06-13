@@ -14,10 +14,10 @@ import { setTemplateLastVisited } from "../../../urls";
 import AccountsBudgetTable from "./AccountsTable";
 
 const selectAccountsLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.loading
+  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.loading
 );
 const selectGroupsLoading = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.template.accounts.groups.loading
+  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.groups.loading
 );
 const selectLoading = createSelector(
   selectAccountsLoading,

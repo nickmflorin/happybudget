@@ -12,12 +12,12 @@ import { useLoggedInUser } from "store/hooks";
 import * as actions from "../../store/actions";
 import { CommunityTemplateCard, EmptyCard } from "../Card";
 
-const selectTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.data;
-const selectLoadingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.loading;
-const selectDuplicatingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.duplicating;
-const selectDeletingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.deleting;
-const selectHidingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.hiding;
-const selectShowingTemplates = (state: Redux.ApplicationStore) => state.dashboard.community.showing;
+const selectTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.data;
+const selectLoadingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.loading;
+const selectDuplicatingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.duplicating;
+const selectDeletingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.deleting;
+const selectHidingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.hiding;
+const selectShowingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.showing;
 
 interface DiscoverProps {
   setTemplateToDerive: (template: number) => void;
