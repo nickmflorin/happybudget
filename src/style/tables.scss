@@ -157,6 +157,8 @@ $table-border: 1px solid $table-border-color;
 
     .ag-header-row {
       > .ag-header-cell {
+        padding-left: 10px;
+        padding-right: 10px;
         letter-spacing: 0.045em;
         font-size: 12px;
         font-weight: 400;

@@ -3,7 +3,7 @@
 .ant-tooltip {
   color: $green !important;
   .ant-tooltip-arrow-content {
-    background-color: $green !important;
+    background-color: transparent !important;
   }
   .ant-tooltip-content {
     .ant-tooltip-inner {
@@ -24,5 +24,8 @@
         border-radius: 8px;
       }
     }
+  }
+  &.tooltip-lower {
+    padding-top: 10px;
   }
 }

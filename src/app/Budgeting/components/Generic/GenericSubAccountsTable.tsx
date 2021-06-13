@@ -118,9 +118,9 @@ const GenericSubAccountsTable = <
         },
         {
           field: "name",
-          headerName: "Name",
+          headerName: "Contact",
           width: 120,
-          type: "text"
+          type: "contact"
         },
         {
           field: "quantity",

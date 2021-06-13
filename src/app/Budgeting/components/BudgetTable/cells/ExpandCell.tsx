@@ -36,7 +36,7 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
     if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
       if (row.meta.children.length !== 0) {
         return (
-          <Tooltip title={"Expand"}>
+          <Tooltip title={"Expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
             <IconButton
               className={"ag-grid-expand-button"}
               size={"small"}
@@ -48,7 +48,7 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
       } else {
         return (
           <ShowHide show={rowIsHovered()}>
-            <Tooltip title={"Expand"}>
+            <Tooltip title={"Expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
               <IconButton
                 className={"ag-grid-expand-button"}
                 size={"small"}
@@ -62,7 +62,7 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
     } else {
       return (
         <ShowHide show={rowIsHovered()}>
-          <Tooltip title={"Fill in account to expand"}>
+          <Tooltip title={"Fill in account to expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
             <IconButton
               className={"ag-grid-expand-button fake-disabled"}
               size={"small"}
