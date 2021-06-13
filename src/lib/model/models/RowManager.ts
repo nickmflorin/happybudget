@@ -86,12 +86,12 @@ export class RowManager<
     }
   };
 
-  public modelToRow = (model: M, group: G | null, meta: Partial<Table.RowMeta> = {}): R => {
+  public modelToRow = (model: M, meta: Partial<Table.RowMeta> = {}): R => {
     let obj: { [key in keyof R]?: R[key] } = {};
     obj = {
       ...obj,
       id: model.id,
-      group,
+      group: this.getGroup(model),
       meta: {
         ...defaultRowMeta,
         children: this.getChildren(model),

@@ -10,7 +10,6 @@ export const BudgetAccountRowManager = new RowManager<
 >({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
-    // We want to attribute the full group to the row, not just the ID.
     ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
     ReadWrite({ field: "identifier", allowNull: true }),
     ReadOnly({ field: "estimated" }),
@@ -32,7 +31,6 @@ export const TemplateAccountRowManager = new RowManager<
 >({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
-    // We want to attribute the full group to the row, not just the ID.
     ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
     ReadWrite({ field: "identifier", allowNull: true }),
     ReadOnly({ field: "estimated" })
@@ -53,7 +51,6 @@ export const BudgetSubAccountRowManager = new RowManager<
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
     ReadWrite({ field: "name", allowNull: true }),
-    // We want to attribute the full group to the row, not just the ID.
     ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
     ReadWrite({ field: "quantity", allowNull: true }),
     ReadWrite({ field: "rate", allowNull: true }),
@@ -90,7 +87,6 @@ export const TemplateSubAccountRowManager = new RowManager<
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
     ReadWrite({ field: "name", allowNull: true }),
-    // We want to attribute the full group to the row, not just the ID.
     ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
     ReadWrite({ field: "quantity", allowNull: true }),
     ReadWrite({ field: "rate", allowNull: true }),

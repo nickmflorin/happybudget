@@ -487,13 +487,15 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       return [];
     } else if (row.meta.isGroupFooter) {
       if (!isNil(row.group) && !isNil(groupParams)) {
-        const group = row.group;
-        return [
-          {
-            name: `Ungroup ${group.name}`,
-            action: () => groupParams.onDeleteGroup(group)
-          }
-        ];
+        const group: G | undefined = find(groups, { id: row.group } as any);
+        if (!isNil(group)) {
+          return [
+            {
+              name: `Ungroup ${group.name}`,
+              action: () => groupParams.onDeleteGroup(group)
+            }
+          ];
+        }
       }
       return [];
     } else {
@@ -504,13 +506,17 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       if (isNil(groupParams)) {
         return [deleteRowContextMenuItem];
       } else if (!isNil(row.group)) {
-        return [
-          deleteRowContextMenuItem,
-          {
-            name: `Remove ${row.meta.label} from Group ${row.group.name}`,
-            action: () => groupParams.onRowRemoveFromGroup(row)
-          }
-        ];
+        const group: G | undefined = find(groups, { id: row.group } as any);
+        if (!isNil(group)) {
+          return [
+            deleteRowContextMenuItem,
+            {
+              name: `Remove ${row.meta.label} from Group ${group.name}`,
+              action: () => groupParams.onRowRemoveFromGroup(row)
+            }
+          ];
+        }
+        return [deleteRowContextMenuItem];
       } else {
         const menuItems: MenuItemDef[] = [deleteRowContextMenuItem];
 

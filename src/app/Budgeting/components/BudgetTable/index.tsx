@@ -260,7 +260,8 @@ const BudgetTable = <
       },
       cellRendererParams: {
         ...identifierColumn.cellRendererParams,
-        onGroupEdit: groupParams?.onEditGroup
+        onGroupEdit: groupParams?.onEditGroup,
+        groups
       }
     })
   );
@@ -434,7 +435,7 @@ const BudgetTable = <
           const footer: R = createGroupFooter(group);
           newTable.push(
             ...orderByFieldOrdering(
-              map(models, (m: M) => manager.modelToRow(m, group, { selected: includes(selected, m.id) })),
+              map(models, (m: M) => manager.modelToRow(m, { selected: includes(selected, m.id) })),
               ordering
             ),
             {
@@ -453,7 +454,7 @@ const BudgetTable = <
       setTable([
         ...newTable,
         ...orderByFieldOrdering(
-          map(modelsWithoutGroup, (m: M) => manager.modelToRow(m, null, { selected: includes(selected, m.id) })),
+          map(modelsWithoutGroup, (m: M) => manager.modelToRow(m, { selected: includes(selected, m.id) })),
           ordering
         )
       ]);

@@ -25,7 +25,7 @@ namespace Table {
   interface Row<G extends Model.Group = Model.Group> extends Record<string, any> {
     readonly id: number;
     readonly meta: RowMeta;
-    readonly group: G | null;
+    readonly group: number | null;
   }
 
   type ColumnTypeId =
@@ -298,7 +298,7 @@ namespace Table {
     readonly getField: (name: keyof R | keyof M) => Table.Field<R, M, P> | null;
     readonly getChildren: (model: M) => number[];
     readonly getGroup: (model: M) => number | null;
-    readonly modelToRow: (model: M, group: G | null, meta: Partial<Table.RowMeta> = {}) => R;
+    readonly modelToRow: (model: M, meta: Partial<Table.RowMeta> = {}) => R;
     readonly mergeChangesWithRow: (obj: R, change: Table.RowChange<R>) => R;
     readonly mergeChangesWithModel: (obj: M, change: Table.RowChange<R>) => M;
     readonly payload: (row: R | Table.RowChange<R>) => P | Partial<P>;
