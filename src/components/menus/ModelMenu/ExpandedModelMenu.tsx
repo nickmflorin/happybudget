@@ -100,11 +100,13 @@ const ExpandedModelMenu = <M extends Model.M>({
           searchInput.focus();
         }
       } else if (e.code === "ArrowDown") {
-        e.stopPropagation();
+        e.preventDefault();
         const menuRefObj = _menuRef.current;
         if (!isNil(menuRefObj)) {
           menuRefObj.focus(true);
         }
+      } else if (e.code === "ArrowUp") {
+        e.preventDefault();
       }
     };
     window.addEventListener("keydown", keyListener);
@@ -120,12 +122,6 @@ const ExpandedModelMenu = <M extends Model.M>({
           autoFocus={true}
           value={isNil(search) ? _search : search}
           ref={searchRef}
-          onFocus={() => {
-            const menuRefObj = _menuRef.current;
-            if (!isNil(menuRefObj) && props.unfocusMenuOnSearchFocus === true) {
-              menuRefObj.focus(false);
-            }
-          }}
           prefix={<FontAwesomeIcon className={"icon"} icon={faSearch} />}
           allowClear={true}
           style={{ maxWidth: 300, minWidth: 100 }}
