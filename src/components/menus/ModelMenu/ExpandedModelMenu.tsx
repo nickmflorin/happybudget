@@ -96,14 +96,8 @@ const ExpandedModelMenu = <M extends Model.M>({
     const keyListener = (e: KeyboardEvent) => {
       if (isCharacterKeyPress(e) || isBackspaceKeyPress(e)) {
         const searchInput = searchRef.current;
-        const menuRefObj = _menuRef.current;
-        if (!isNil(menuRefObj)) {
-          menuRefObj.focus(false);
-        }
         if (!isNil(searchInput)) {
-          if (searchInput.state.focused === false) {
-            searchInput.focus();
-          }
+          searchInput.focus();
         }
       } else if (e.code === "ArrowDown") {
         e.stopPropagation();

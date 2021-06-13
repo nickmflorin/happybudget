@@ -353,13 +353,14 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   }, [props.models, models]);
 
   const scrollIndexIntoView = (index: number) => {
+    // TODO: We have to account for the non-model items.
     const model: M = models[index];
     const menu = document.getElementById(menuId);
-    if (!isNil(menu)) {
-      const top = menu.scrollTop;
-      const bottom = menu.scrollTop + menu.clientHeight;
+    if (!isNil(menu) && !isNil(model)) {
       const item = document.getElementById(`model-menu-${menuId}-item-${model.id}`);
       if (!isNil(item)) {
+        const top = menu.scrollTop;
+        const bottom = menu.scrollTop + menu.clientHeight;
         const itemTop = item.offsetTop;
         const itemBottom = item.offsetTop + item.clientHeight;
         if (itemTop < top) {
