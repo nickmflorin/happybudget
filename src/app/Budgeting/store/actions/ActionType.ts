@@ -16,7 +16,6 @@ const ActionType = {
     Loading: "budget.Loading",
     Response: "budget.Response",
     Request: "budget.Request",
-    BulkCreate: "budget.BulkCreate",
     Comments: {
       Loading: "budget.comments.Loading",
       Response: "budget.comments.Response",
@@ -34,6 +33,7 @@ const ActionType = {
     },
     Fringes: {
       TableChanged: "budget.fringes.TableChanged",
+      BulkCreate: "budget.fringes.BulkCreate",
       Deleting: "budget.fringes.Deleting",
       Creating: "budget.fringes.Creating",
       Updating: "budget.fringes.Updating",
@@ -47,17 +47,11 @@ const ActionType = {
       SetSearch: "budget.fringes.SetSearch",
       Select: "budget.fringes.Select",
       Deselect: "budget.fringes.Deselect",
-      SelectAll: "budget.fringes.SelectAll",
-      Placeholders: {
-        AddToState: "budget.fringes.placeholders.AddToState",
-        Activate: "budget.fringes.placeholders.Activate",
-        Clear: "budget.fringes.placeholders.Clear",
-        UpdateInState: "budget.fringes.placeholders.UpdateInState",
-        RemoveFromState: "budget.fringes.placeholders.RemoveFromState"
-      }
+      SelectAll: "budget.fringes.SelectAll"
     },
     Accounts: {
       TableChanged: "budget.accounts.TableChanged",
+      BulkCreate: "budget.accounts.BulkCreate",
       Delete: "budget.accounts.Delete",
       Deleting: "budget.accounts.Deleting",
       Creating: "budget.accounts.Creating",
@@ -218,6 +212,7 @@ const ActionType = {
     },
     Actuals: {
       TableChanged: "budget.actuals.TableChanged",
+      BulkCreate: "budget.actuals.BulkCreate",
       Deleting: "budget.actuals.Deleting",
       Creating: "budget.actuals.Creating",
       Updating: "budget.actuals.Updating",
@@ -231,13 +226,7 @@ const ActionType = {
       Request: "budget.actuals.Request",
       UpdateInState: "budget.actuals.UpdateInState",
       RemoveFromState: "budget.actuals.RemoveFromState",
-      AddToState: "budget.actuals.AddToState",
-      Placeholders: {
-        AddToState: "budget.actuals.placeholders.AddToState",
-        Activate: "budget.actuals.placeholders.Activate",
-        UpdateInState: "budget.actuals.placeholders.UpdateInState",
-        RemoveFromState: "budget.actuals.placeholders.RemoveFromState"
-      }
+      AddToState: "budget.actuals.AddToState"
     }
   },
   Template: {
@@ -248,9 +237,9 @@ const ActionType = {
     Loading: "template.Loading",
     Response: "template.Response",
     Request: "template.Request",
-    BulkCreate: "template.BulkCreate",
     Fringes: {
       TableChanged: "template.fringes.TableChanged",
+      BulkCreate: "template.fringes.BulkCreate",
       Deleting: "template.fringes.Deleting",
       Creating: "template.fringes.Creating",
       Updating: "template.fringes.Updating",
@@ -264,17 +253,11 @@ const ActionType = {
       SetSearch: "template.fringes.SetSearch",
       Select: "template.fringes.Select",
       Deselect: "template.fringes.Deselect",
-      SelectAll: "template.fringes.SelectAll",
-      Placeholders: {
-        AddToState: "template.fringes.placeholders.AddToState",
-        Activate: "template.fringes.placeholders.Activate",
-        Clear: "template.fringes.placeholders.Clear",
-        UpdateInState: "template.fringes.placeholders.UpdateInState",
-        RemoveFromState: "template.fringes.placeholders.RemoveFromState"
-      }
+      SelectAll: "template.fringes.SelectAll"
     },
     Accounts: {
       TableChanged: "template.accounts.TableChanged",
+      BulkCreate: "template.accounts.BulkCreate",
       Deleting: "template.accounts.Deleting",
       Creating: "template.accounts.Creating",
       Updating: "template.accounts.Updating",

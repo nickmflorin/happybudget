@@ -39,7 +39,6 @@ const BudgetTable = <
   actions,
   className,
   style = {},
-  placeholders = [],
   groups = [],
   selected,
   manager,
@@ -454,17 +453,13 @@ const BudgetTable = <
       setTable([
         ...newTable,
         ...orderByFieldOrdering(
-          [
-            ...map(modelsWithoutGroup, (m: M) => manager.modelToRow(m, null, { selected: includes(selected, m.id) })),
-            ...map(placeholders, (r: R) => ({ ...r, meta: { ...r.meta, selected: includes(selected, r.id) } }))
-          ],
+          map(modelsWithoutGroup, (m: M) => manager.modelToRow(m, null, { selected: includes(selected, m.id) })),
           ordering
         )
       ]);
     }
   }, [
     useDeepEqualMemo(data),
-    useDeepEqualMemo(placeholders),
     useDeepEqualMemo(selected),
     useDeepEqualMemo(groups),
     useDeepEqualMemo(ordering),

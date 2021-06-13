@@ -14,6 +14,7 @@ export const responseBudgetItemsTreeAction = simpleAction<Http.ListResponse<Mode
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.ActualRow>>(
   ActionType.Budget.Actuals.TableChanged
 );
+export const bulkCreateActualsAction = simpleAction<number>(ActionType.Budget.Actuals.BulkCreate);
 export const setBudgetItemsTreeSearchAction = simpleAction<string>(ActionType.Budget.BudgetItemsTree.SetSearch);
 export const removeActualAction = simpleAction<number>(ActionType.Budget.Actuals.Delete);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Actuals.Deleting);
@@ -26,16 +27,6 @@ export const setActualsSearchAction = simpleAction<string>(ActionType.Budget.Act
 export const selectActualAction = simpleAction<number>(ActionType.Budget.Actuals.Select);
 export const deselectActualAction = simpleAction<number>(ActionType.Budget.Actuals.Deselect);
 export const selectAllActualsAction = simpleAction<null>(ActionType.Budget.Actuals.SelectAll);
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.Actual>>(
-  ActionType.Budget.Actuals.Placeholders.Activate
-);
-export const removePlaceholderFromStateAction = simpleAction<number>(
-  ActionType.Budget.Actuals.Placeholders.RemoveFromState
-);
-export const addPlaceholdersToStateAction = simpleAction<number>(ActionType.Budget.Actuals.Placeholders.AddToState);
-export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<BudgetTable.ActualRow>>(
-  ActionType.Budget.Actuals.Placeholders.UpdateInState
-);
 export const updateActualInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Actual>>(
   ActionType.Budget.Actuals.UpdateInState
 );

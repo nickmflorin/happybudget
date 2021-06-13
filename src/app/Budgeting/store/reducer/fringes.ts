@@ -1,22 +1,14 @@
 import { Reducer } from "redux";
-import { filter } from "lodash";
 
-import * as models from "lib/model";
-
-import { createModelListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
+import { createModelListResponseReducer } from "lib/redux/factories";
+import { initialModelListResponseState } from "store/initialState";
 import { ActionType } from "../actions";
-import { initialFringesState } from "../initialState";
 
-const createRootReducer = <
-  D extends Redux.Budgeting.BudgetDirective,
-  S extends Redux.Budgeting.Budget.FringesStore | Redux.Budgeting.Template.FringesStore = D extends "Budget"
-    ? Redux.Budgeting.Budget.FringesStore
-    : Redux.Budgeting.Template.FringesStore
->(
+const createRootReducer = <D extends Redux.Budgeting.BudgetDirective>(
   /* eslint-disable indent */
   directive: D
-): Reducer<S, Redux.Action<any>> => {
-  const listResponseReducer = createModelListResponseReducer<Model.Fringe, S>(
+): Reducer<Redux.ModelListResponseStore<Model.Fringe>, Redux.Action<any>> => {
+  const listResponseReducer = createModelListResponseReducer<Model.Fringe, Redux.ModelListResponseStore<Model.Fringe>>(
     {
       Response: ActionType[directive].Fringes.Response,
       Loading: ActionType[directive].Fringes.Loading,
@@ -33,35 +25,14 @@ const createRootReducer = <
     },
     {
       strictSelect: false,
-      initialState: initialFringesState as S,
-      subReducers: {
-        placeholders: createTablePlaceholdersReducer(
-          {
-            AddToState: ActionType[directive].Fringes.Placeholders.AddToState,
-            RemoveFromState: ActionType[directive].Fringes.Placeholders.RemoveFromState,
-            UpdateInState: ActionType[directive].Fringes.Placeholders.UpdateInState,
-            Clear: ActionType[directive].Fringes.Placeholders.Clear
-          },
-          models.FringeRowManager
-        )
-      }
+      initialState: initialModelListResponseState
     }
   );
-  return (state: S = initialFringesState as S, action: Redux.Action<any>): S => {
-    let newState = listResponseReducer(state, action);
-
-    if (action.type === ActionType[directive].Fringes.Placeholders.Activate) {
-      const payload: Table.ActivatePlaceholderPayload<Model.Fringe> = action.payload;
-      newState = {
-        ...newState,
-        placeholders: filter(
-          newState.placeholders,
-          (placeholder: BudgetTable.FringeRow) => placeholder.id !== action.payload.id
-        ),
-        data: [...newState.data, payload.model]
-      };
-    }
-    return newState;
+  return (
+    state: Redux.ModelListResponseStore<Model.Fringe> = initialModelListResponseState,
+    action: Redux.Action<any>
+  ): Redux.ModelListResponseStore<Model.Fringe> => {
+    return listResponseReducer(state, action);
   };
 };
 

@@ -443,7 +443,6 @@ namespace BudgetTable {
       StandardComponentProps {
     readonly columns: Table.Column<R, G>[];
     readonly data: M[];
-    readonly placeholders?: R[];
     readonly selected?: number[];
     readonly identifierFieldHeader: string;
     readonly identifierColumn?: Partial<Table.Column<R, G>>;

@@ -7,21 +7,18 @@ import * as api from "api";
 import * as models from "lib/model";
 
 import { warnInconsistentState } from "lib/redux/util";
+import { isAction } from "lib/redux/typeguards";
 import { consolidateTableChange } from "lib/model/util";
 
 export interface FringeTasksActionMap {
   response: Redux.ActionCreator<Http.ListResponse<Model.Fringe>>;
   loading: Redux.ActionCreator<boolean>;
-  addPlaceholdersToState: Redux.ActionCreator<number>;
-  clearPlaceholders: Redux.ActionCreator<null>;
-  activatePlaceholder: Redux.ActionCreator<Table.ActivatePlaceholderPayload<Model.Fringe>>;
   deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  removePlaceholderFromState: Redux.ActionCreator<number>;
   removeFromState: Redux.ActionCreator<number>;
-  updatePlaceholderInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<BudgetTable.FringeRow>>;
   updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<Model.Fringe>>;
+  addToState: Redux.ActionCreator<Model.Fringe>;
 }
 
 export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
@@ -53,8 +50,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   actions: FringeTasksActionMap,
   services: FringeServiceSet<M>,
   selectObjId: (state: Redux.ApplicationStore) => number | null,
-  selectFringes: (state: Redux.ApplicationStore) => Model.Fringe[],
-  selectPlaceholders: (state: Redux.ApplicationStore) => BudgetTable.FringeRow[]
+  selectFringes: (state: Redux.ApplicationStore) => Model.Fringe[]
 ): FringeTaskSet => {
   function* deleteTask(id: number): SagaIterator {
     const CancelToken = axios.CancelToken;
@@ -105,34 +101,32 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     }
   }
 
-  function* bulkCreateTask(id: number, rows: BudgetTable.FringeRow[]): SagaIterator {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-    const requestPayload: Http.BulkCreatePayload<Http.FringePayload> = {
-      data: map(rows, (row: BudgetTable.FringeRow) => models.FringeRowManager.payload(row))
-    };
-    yield put(actions.creating(true));
-    try {
-      // NOTE: This assumes that the fringes in the response are in the same order as the
-      // placeholder rows passed in.
-      const response: Model.Fringe[] = yield call(services.bulkCreate, id, requestPayload, {
-        cancelToken: source.token
-      });
-      yield all(
-        map(response, (fringe: Model.Fringe, index: number) =>
-          put(actions.activatePlaceholder({ id: rows[index].id, model: fringe }))
-        )
-      );
-    } catch (e) {
-      // Once we rebuild back in the error handling, we will have to be concerned here with the nested
-      // structure of the errors.
-      if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error updating the fringes.");
-      }
-    } finally {
-      yield put(actions.creating(false));
-      if (yield cancelled()) {
-        source.cancel();
+  function* bulkCreateTask(action: Redux.Action<number> | number): SagaIterator {
+    const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+    if (!isNil(budgetId) && (!isAction(action) || !isNil(action.payload))) {
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+      yield put(actions.creating(true));
+
+      const count = isAction(action) ? action.payload : action;
+      const payload: Http.BulkCreatePayload<Http.ActualPayload> = { count };
+
+      try {
+        const fringes: Model.Fringe[] = yield call(services.bulkCreate, budgetId, payload, {
+          cancelToken: source.token
+        });
+        yield all(fringes.map((fringe: Model.Fringe) => put(actions.addToState(fringe))));
+      } catch (e) {
+        // Once we rebuild back in the error handling, we will have to be concerned here with the nested
+        // structure of the errors.
+        if (!(yield cancelled())) {
+          api.handleRequestError(e, "There was an error creating the fringes.");
+        }
+      } finally {
+        yield put(actions.creating(false));
+        if (yield cancelled()) {
+          source.cancel();
+        }
       }
     }
   }
@@ -142,17 +136,11 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
       const ms: Model.Fringe[] = yield select(selectFringes);
       const model: Model.Fringe | undefined = find(ms, { id: action.payload });
       if (isNil(model)) {
-        const placeholders = yield select(selectPlaceholders);
-        const placeholder: BudgetTable.FringeRow | undefined = find(placeholders, { id: action.payload });
-        if (isNil(placeholder)) {
-          warnInconsistentState({
-            action: action.type,
-            reason: "Fringe does not exist in state when it is expected to.",
-            id: action.payload
-          });
-        } else {
-          yield put(actions.removePlaceholderFromState(placeholder.id));
-        }
+        warnInconsistentState({
+          action: action.type,
+          reason: "Fringe does not exist in state when it is expected to.",
+          id: action.payload
+        });
       } else {
         yield put(actions.removeFromState(model.id));
         yield call(deleteTask, model.id);
@@ -166,39 +154,24 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
       const merged = consolidateTableChange(action.payload);
 
       const data = yield select(selectFringes);
-      const placeholders = yield select(selectPlaceholders);
-
-      const mergedUpdates: Table.RowChange<BudgetTable.FringeRow>[] = [];
-      const placeholdersToCreate: BudgetTable.FringeRow[] = [];
+      const updatesToPerform: Table.RowChange<BudgetTable.FringeRow>[] = [];
 
       for (let i = 0; i < merged.length; i++) {
         const model: Model.Fringe | undefined = find(data, { id: merged[i].id });
         if (isNil(model)) {
-          const placeholder: BudgetTable.FringeRow | undefined = find(placeholders, { id: merged[i].id });
-          if (isNil(placeholder)) {
-            warnInconsistentState({
-              action: action.type,
-              reason: "Fringe does not exist in state when it is expected to.",
-              id: action.payload
-            });
-          } else {
-            const updatedRow = models.FringeRowManager.mergeChangesWithRow(placeholder, merged[i]);
-            yield put(actions.updatePlaceholderInState({ id: updatedRow.id, data: updatedRow }));
-            if (models.FringeRowManager.rowHasRequiredFields(updatedRow)) {
-              placeholdersToCreate.push(updatedRow);
-            }
-          }
+          warnInconsistentState({
+            action: action.type,
+            reason: "Fringe does not exist in state when it is expected to.",
+            id: action.payload
+          });
         } else {
           const updatedModel = models.FringeRowManager.mergeChangesWithModel(model, merged[i]);
           yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel }));
-          mergedUpdates.push(merged[i]);
+          updatesToPerform.push(merged[i]);
         }
       }
-      if (mergedUpdates.length !== 0) {
-        yield fork(bulkUpdateTask, objId, mergedUpdates);
-      }
-      if (placeholdersToCreate.length !== 0) {
-        yield fork(bulkCreateTask, objId, placeholdersToCreate);
+      if (updatesToPerform.length !== 0) {
+        yield fork(bulkUpdateTask, objId, updatesToPerform);
       }
     }
   }
@@ -208,13 +181,12 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     if (!isNil(objId)) {
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
-      yield put(actions.clearPlaceholders(null));
       yield put(actions.loading(true));
       try {
         const response = yield call(services.request, objId, { no_pagination: true }, { cancelToken: source.token });
         yield put(actions.response(response));
         if (response.data.length === 0) {
-          yield put(actions.addPlaceholdersToState(2));
+          yield call(bulkCreateTask, 2);
         }
       } catch (e) {
         if (!(yield cancelled())) {

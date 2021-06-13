@@ -4,36 +4,19 @@ import { spawn, takeEvery, take, cancel, call } from "redux-saga/effects";
 import * as api from "api";
 import { takeWithCancellableById } from "lib/redux/sagas";
 import { ActionType } from "../../actions";
-import {
-  activatePlaceholderAction,
-  deletingFringeAction,
-  creatingFringeAction,
-  updatingFringeAction,
-  removePlaceholderFromStateAction,
-  removeFringeFromStateAction,
-  updatePlaceholderInStateAction,
-  updateFringeInStateAction,
-  responseFringesAction,
-  loadingFringesAction,
-  addFringesPlaceholdersToStateAction,
-  clearFringesPlaceholdersToStateAction
-} from "../../actions/template/fringes";
+import * as actions from "../../actions/template/fringes";
 import { createFringeTaskSet } from "../factories";
 
 const tasks = createFringeTaskSet<Model.Template>(
   {
-    response: responseFringesAction,
-    loading: loadingFringesAction,
-    addPlaceholdersToState: addFringesPlaceholdersToStateAction,
-    clearPlaceholders: clearFringesPlaceholdersToStateAction,
-    activatePlaceholder: activatePlaceholderAction,
-    deleting: deletingFringeAction,
-    creating: creatingFringeAction,
-    updating: updatingFringeAction,
-    removePlaceholderFromState: removePlaceholderFromStateAction,
-    removeFromState: removeFringeFromStateAction,
-    updatePlaceholderInState: updatePlaceholderInStateAction,
-    updateInState: updateFringeInStateAction
+    response: actions.responseFringesAction,
+    loading: actions.loadingFringesAction,
+    deleting: actions.deletingFringeAction,
+    creating: actions.creatingFringeAction,
+    updating: actions.updatingFringeAction,
+    removeFromState: actions.removeFringeFromStateAction,
+    addToState: actions.addFringeToStateAction,
+    updateInState: actions.updateFringeInStateAction
   },
   {
     request: api.getTemplateFringes,
@@ -42,8 +25,7 @@ const tasks = createFringeTaskSet<Model.Template>(
     bulkCreate: api.bulkCreateTemplateFringes
   },
   (state: Redux.ApplicationStore) => state.budgeting.template.template.id,
-  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.data,
-  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.placeholders
+  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.data
 );
 
 function* watchForRemoveFringeSaga(): SagaIterator {

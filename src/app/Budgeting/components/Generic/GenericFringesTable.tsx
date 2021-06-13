@@ -22,7 +22,6 @@ export interface GenericFringesTableProps
   saving: boolean;
   search: string;
   selected: number[];
-  placeholders: BudgetTable.FringeRow[];
   data: Model.Fringe[];
   onTableChange: (change: Table.Change<BudgetTable.FringeRow>) => void;
   onRowSelect: (id: number) => void;

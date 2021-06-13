@@ -68,7 +68,7 @@ export default createStandardSaga({
     task: tasks.getGroups
   },
   TableChanged: { actionType: ActionType.Template.Accounts.TableChanged, task: tasks.handleTableChange },
-  BulkCreate: { actionType: ActionType.Template.BulkCreate, task: tasks.bulkCreate },
+  BulkCreate: { actionType: ActionType.Template.Accounts.BulkCreate, task: tasks.bulkCreate },
   Delete: { actionType: ActionType.Template.Accounts.Delete, task: tasks.handleRemoval },
   DeleteGroup: { actionType: ActionType.Template.Accounts.Groups.Delete, task: tasks.deleteGroup },
   RemoveModelFromGroup: { actionType: ActionType.Template.Accounts.RemoveFromGroup, task: tasks.removeFromGroup },

@@ -8,31 +8,16 @@ import * as models from "lib/model";
 
 import { takeWithCancellableById } from "lib/redux/sagas";
 import { warnInconsistentState } from "lib/redux/util";
+import { isAction } from "lib/redux/typeguards";
 import { consolidateTableChange } from "lib/model/util";
 
 import { ActionType } from "../../actions";
-import {
-  activatePlaceholderAction,
-  loadingActualsAction,
-  responseActualsAction,
-  deletingActualAction,
-  creatingActualAction,
-  updatingActualAction,
-  removePlaceholderFromStateAction,
-  removeActualFromStateAction,
-  updatePlaceholderInStateAction,
-  addPlaceholdersToStateAction,
-  updateActualInStateAction,
-  loadingBudgetItemsAction,
-  responseBudgetItemsAction,
-  loadingBudgetItemsTreeAction,
-  responseBudgetItemsTreeAction
-} from "../../actions/budget/actuals";
+import * as actions from "../../actions/budget/actuals";
 
-export function* deleteTask(id: number): SagaIterator {
+function* deleteTask(id: number): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  yield put(deletingActualAction({ id, value: true }));
+  yield put(actions.deletingActualAction({ id, value: true }));
   try {
     yield call(api.deleteActual, id, { cancelToken: source.token });
   } catch (e) {
@@ -40,64 +25,44 @@ export function* deleteTask(id: number): SagaIterator {
       api.handleRequestError(e, "There was an error deleting the actual.");
     }
   } finally {
-    yield put(deletingActualAction({ id, value: false }));
+    yield put(actions.deletingActualAction({ id, value: false }));
     if (yield cancelled()) {
       source.cancel();
     }
   }
 }
 
-export function* updateTask(id: number, change: Table.RowChange<BudgetTable.ActualRow>): SagaIterator {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
-  yield put(updatingActualAction({ id, value: true }));
-  try {
-    yield call(api.updateActual, id, models.ActualRowManager.payload(change), { cancelToken: source.token });
-  } catch (e) {
-    if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error updating the actual.");
-    }
-  } finally {
-    yield put(updatingActualAction({ id, value: false }));
-    if (yield cancelled()) {
-      source.cancel();
+function* bulkCreateTask(action: Redux.Action<number> | number): SagaIterator {
+  const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
+  if (!isNil(budgetId) && (!isAction(action) || !isNil(action.payload))) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    yield put(actions.creatingActualAction(true));
+
+    const count = isAction(action) ? action.payload : action;
+    const payload: Http.BulkCreatePayload<Http.ActualPayload> = { count };
+
+    try {
+      const actuals: Model.Actual[] = yield call(api.bulkCreateBudgetActuals, budgetId, payload, {
+        cancelToken: source.token
+      });
+      yield all(actuals.map((actual: Model.Actual) => put(actions.addActualToStateAction(actual))));
+    } catch (e) {
+      // Once we rebuild back in the error handling, we will have to be concerned here with the nested
+      // structure of the errors.
+      if (!(yield cancelled())) {
+        api.handleRequestError(e, "There was an error creating the actuals.");
+      }
+    } finally {
+      yield put(actions.creatingActualAction(false));
+      if (yield cancelled()) {
+        source.cancel();
+      }
     }
   }
 }
 
-export function* bulkCreateTask(id: number, rows: BudgetTable.ActualRow[]): SagaIterator {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
-  const requestPayload: Http.BulkCreatePayload<Http.ActualPayload> = {
-    data: map(rows, (row: BudgetTable.ActualRow) => models.ActualRowManager.payload(row))
-  };
-  yield put(creatingActualAction(true));
-  try {
-    // NOTE: This assumes that the actuals in the response are in the same order as the
-    // placeholder rows passed in.
-    const response: Model.Actual[] = yield call(api.bulkCreateBudgetActuals, id, requestPayload, {
-      cancelToken: source.token
-    });
-    yield all(
-      map(response, (actual: Model.Actual, index: number) =>
-        put(activatePlaceholderAction({ id: rows[index].id, model: actual }))
-      )
-    );
-  } catch (e) {
-    // Once we rebuild back in the error handling, we will have to be concerned here with the nested
-    // structure of the errors.
-    if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error updating the actuals.");
-    }
-  } finally {
-    yield put(creatingActualAction(false));
-    if (yield cancelled()) {
-      source.cancel();
-    }
-  }
-}
-
-export function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable.ActualRow>[]): SagaIterator {
+function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable.ActualRow>[]): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
   const requestPayload: Http.BulkUpdatePayload<Http.ActualPayload>[] = map(
@@ -109,7 +74,7 @@ export function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable
   );
   yield all(
     changes.map((change: Table.RowChange<BudgetTable.ActualRow>) =>
-      put(updatingActualAction({ id: change.id, value: true }))
+      put(actions.updatingActualAction({ id: change.id, value: true }))
     )
   );
   try {
@@ -123,7 +88,7 @@ export function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable
   } finally {
     yield all(
       changes.map((change: Table.RowChange<BudgetTable.ActualRow>) =>
-        put(updatingActualAction({ id: change.id, value: false }))
+        put(actions.updatingActualAction({ id: change.id, value: false }))
       )
     );
     if (yield cancelled()) {
@@ -132,83 +97,56 @@ export function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable
   }
 }
 
-export function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
+function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
   if (!isNil(action.payload)) {
     const ms: Model.Actual[] = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
     const model: Model.Actual | undefined = find(ms, { id: action.payload });
     if (isNil(model)) {
-      const placeholders = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.placeholders);
-      const placeholder: BudgetTable.ActualRow | undefined = find(placeholders, { id: action.payload });
-      if (isNil(placeholder)) {
-        warnInconsistentState({
-          action: action.type,
-          reason: "Actual does not exist in state when it is expected to.",
-          id: action.payload
-        });
-      } else {
-        yield put(removePlaceholderFromStateAction(placeholder.id));
-      }
+      warnInconsistentState({
+        action: action.type,
+        reason: "Actual does not exist in state when it is expected to.",
+        id: action.payload
+      });
     } else {
-      yield put(removeActualFromStateAction(model.id));
+      yield put(actions.removeActualFromStateAction(model.id));
       yield call(deleteTask, model.id);
     }
   }
 }
 
-export function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetTable.ActualRow>>): SagaIterator {
+function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetTable.ActualRow>>): SagaIterator {
   const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
-    const merged: Table.RowChange<BudgetTable.ActualRow>[] = consolidateTableChange<BudgetTable.ActualRow>(
-      action.payload
-    );
+    const merged = consolidateTableChange(action.payload);
     const data = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
-    const placeholders = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.placeholders);
 
     const updatesToPerform: Table.RowChange<BudgetTable.ActualRow>[] = [];
-    const createsToPerform: BudgetTable.ActualRow[] = [];
-
     for (let i = 0; i < merged.length; i++) {
       const model: Model.Actual | undefined = find(data, { id: merged[i].id });
       if (isNil(model)) {
-        const placeholder: BudgetTable.ActualRow | undefined = find(placeholders, { id: merged[i].id });
-        if (isNil(placeholder)) {
-          warnInconsistentState({
-            action: action.type,
-            reason: "Actual does not exist in state when it is expected to.",
-            id: action.payload
-          });
-        } else {
-          const updatedRow = models.ActualRowManager.mergeChangesWithRow(placeholder, merged[i]);
-          yield put(updatePlaceholderInStateAction({ id: updatedRow.id, data: updatedRow }));
-          // Wait until all of the required fields are present before we create the entity in the
-          // backend.  Once the entity is created in the backend, we can remove the placeholder
-          // designation of the row so it will be updated instead of created the next time the row
-          // is changed.
-          if (models.ActualRowManager.rowHasRequiredFields(updatedRow)) {
-            createsToPerform.push(updatedRow);
-          }
-        }
+        warnInconsistentState({
+          action: action.type,
+          reason: "Actual does not exist in state when it is expected to.",
+          id: merged[i].id
+        });
       } else {
         const updatedModel = models.ActualRowManager.mergeChangesWithModel(model, merged[i]);
-        yield put(updateActualInStateAction({ id: updatedModel.id, data: updatedModel }));
+        yield put(actions.updateActualInStateAction({ id: updatedModel.id, data: updatedModel }));
         updatesToPerform.push(merged[i]);
       }
     }
     if (updatesToPerform.length !== 0) {
       yield fork(bulkUpdateTask, budgetId, updatesToPerform);
     }
-    if (createsToPerform.length !== 0) {
-      yield fork(bulkCreateTask, budgetId, createsToPerform);
-    }
   }
 }
 
-export function* getActualsTask(action: Redux.Action<null>): SagaIterator {
+function* getActualsTask(action: Redux.Action<null>): SagaIterator {
   const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(loadingActualsAction(true));
+    yield put(actions.loadingActualsAction(true));
     try {
       const response = yield call(
         api.getBudgetActuals,
@@ -216,17 +154,17 @@ export function* getActualsTask(action: Redux.Action<null>): SagaIterator {
         { no_pagination: true },
         { cancelToken: source.token }
       );
-      yield put(responseActualsAction(response));
+      yield put(actions.responseActualsAction(response));
       if (response.data.length === 0) {
-        yield put(addPlaceholdersToStateAction(2));
+        yield call(bulkCreateTask, 2);
       }
     } catch (e) {
       if (!(yield cancelled())) {
         api.handleRequestError(e, "There was an error retrieving the budget's actuals.");
-        yield put(responseActualsAction({ count: 0, data: [] }, { error: e }));
+        yield put(actions.responseActualsAction({ count: 0, data: [] }, { error: e }));
       }
     } finally {
-      yield put(loadingActualsAction(false));
+      yield put(actions.loadingActualsAction(false));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -234,22 +172,22 @@ export function* getActualsTask(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-export function* getBudgetItemsTask(action: Redux.Action<null>): SagaIterator {
+function* getBudgetItemsTask(action: Redux.Action<null>): SagaIterator {
   const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(loadingBudgetItemsAction(true));
+    yield put(actions.loadingBudgetItemsAction(true));
     try {
       const response = yield call(api.getBudgetItems, budgetId, { no_pagination: true }, { cancelToken: source.token });
-      yield put(responseBudgetItemsAction(response));
+      yield put(actions.responseBudgetItemsAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
         api.handleRequestError(e, "There was an error retrieving the budget's items.");
-        yield put(responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
+        yield put(actions.responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
       }
     } finally {
-      yield put(loadingBudgetItemsAction(false));
+      yield put(actions.loadingBudgetItemsAction(false));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -257,13 +195,13 @@ export function* getBudgetItemsTask(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-export function* getBudgetItemsTreeTask(action: Redux.Action<null>): SagaIterator {
+function* getBudgetItemsTreeTask(action: Redux.Action<null>): SagaIterator {
   const budgetId = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const search = yield select((state: Redux.ApplicationStore) => state.budgeting.budget.budgetItemsTree.search);
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(loadingBudgetItemsTreeAction(true));
+    yield put(actions.loadingBudgetItemsTreeAction(true));
     try {
       // TODO: Eventually we will want to build in pagination for this.
       const response = yield call(
@@ -272,14 +210,14 @@ export function* getBudgetItemsTreeTask(action: Redux.Action<null>): SagaIterato
         { no_pagination: true, search },
         { cancelToken: source.token }
       );
-      yield put(responseBudgetItemsTreeAction(response));
+      yield put(actions.responseBudgetItemsTreeAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
         api.handleRequestError(e, "There was an error retrieving the budget's items.");
-        yield put(responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
+        yield put(actions.responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
       }
     } finally {
-      yield put(loadingBudgetItemsTreeAction(false));
+      yield put(actions.loadingBudgetItemsTreeAction(false));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -332,6 +270,19 @@ function* watchForTableChangeSaga(): SagaIterator {
   yield takeEvery(ActionType.Budget.Actuals.TableChanged, handleTableChangeTask);
 }
 
+function* watchForBulkCreateActualsSaga(): SagaIterator {
+  let lastTasks;
+  while (true) {
+    const action: Redux.Action<number> = yield take(ActionType.Budget.Actuals.BulkCreate);
+    if (!isNil(action.payload)) {
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(bulkCreateTask, action);
+    }
+  }
+}
+
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRequestActualsSaga);
   yield spawn(watchForRemoveActualSaga);
@@ -339,4 +290,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRequestBudgetItemsSaga);
   yield spawn(watchForRequestBudgetItemsTreeSaga);
   yield spawn(watchForSearchBudgetItemsTreeSaga);
+  yield spawn(watchForBulkCreateActualsSaga);
 }

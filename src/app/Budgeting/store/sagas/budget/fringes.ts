@@ -4,36 +4,19 @@ import { spawn, takeEvery, take, cancel, call } from "redux-saga/effects";
 import * as api from "api";
 import { takeWithCancellableById } from "lib/redux/sagas";
 import { ActionType } from "../../actions";
-import {
-  activatePlaceholderAction,
-  addFringesPlaceholdersToStateAction,
-  deletingFringeAction,
-  creatingFringeAction,
-  updatingFringeAction,
-  removePlaceholderFromStateAction,
-  removeFringeFromStateAction,
-  updatePlaceholderInStateAction,
-  updateFringeInStateAction,
-  responseFringesAction,
-  loadingFringesAction,
-  clearFringesPlaceholdersToStateAction
-} from "../../actions/budget/fringes";
+import * as actions from "../../actions/budget/fringes";
 import { createFringeTaskSet } from "../factories";
 
 const tasks = createFringeTaskSet<Model.Budget>(
   {
-    response: responseFringesAction,
-    loading: loadingFringesAction,
-    addPlaceholdersToState: addFringesPlaceholdersToStateAction,
-    clearPlaceholders: clearFringesPlaceholdersToStateAction,
-    activatePlaceholder: activatePlaceholderAction,
-    deleting: deletingFringeAction,
-    creating: creatingFringeAction,
-    updating: updatingFringeAction,
-    removePlaceholderFromState: removePlaceholderFromStateAction,
-    removeFromState: removeFringeFromStateAction,
-    updatePlaceholderInState: updatePlaceholderInStateAction,
-    updateInState: updateFringeInStateAction
+    response: actions.responseFringesAction,
+    loading: actions.loadingFringesAction,
+    addToState: actions.addFringeToStateAction,
+    deleting: actions.deletingFringeAction,
+    creating: actions.creatingFringeAction,
+    updating: actions.updatingFringeAction,
+    removeFromState: actions.removeFringeFromStateAction,
+    updateInState: actions.updateFringeInStateAction
   },
   {
     request: api.getBudgetFringes,
@@ -42,8 +25,7 @@ const tasks = createFringeTaskSet<Model.Budget>(
     bulkCreate: api.bulkCreateBudgetFringes
   },
   (state: Redux.ApplicationStore) => state.budgeting.budget.budget.id,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.data,
-  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.placeholders
+  (state: Redux.ApplicationStore) => state.budgeting.budget.fringes.data
 );
 
 function* watchForRemoveFringeSaga(): SagaIterator {

@@ -4,11 +4,6 @@ import {
   initialCommentsListResponseState
 } from "store/initialState";
 
-export const initialFringesState: Redux.Budgeting.Budget.FringesStore | Redux.Budgeting.Template.FringesStore = {
-  placeholders: [],
-  ...initialModelListResponseState
-};
-
 export const initialBudgetAccountsState: Redux.Budgeting.Budget.AccountsStore = {
   history: initialModelListResponseState,
   groups: initialModelListResponseState,
@@ -34,13 +29,13 @@ export const initialTemplateTemplateState: Redux.Budgeting.Template.TemplateStor
 export const initialBudgetSubAccountsState: Redux.Budgeting.Budget.SubAccountsStore = {
   history: initialModelListResponseState,
   groups: initialModelListResponseState,
-  fringes: initialFringesState,
+  fringes: initialModelListResponseState,
   ...initialModelListResponseState
 };
 
 export const initialTemplateSubAccountsState: Redux.Budgeting.Template.SubAccountsStore = {
   groups: initialModelListResponseState,
-  fringes: initialFringesState,
+  fringes: initialModelListResponseState,
   ...initialModelListResponseState
 };
 
@@ -70,20 +65,15 @@ export const initialTemplateAccountState: Redux.Budgeting.Template.AccountStore 
   subaccounts: initialTemplateSubAccountsState
 };
 
-export const initialActualsState: Redux.Budgeting.Budget.ActualsStore = {
-  placeholders: [],
-  ...initialModelListResponseState
-};
-
 export const initialBudgetState: Redux.Budgeting.Budget.Store = {
   autoIndex: false,
   budget: initialBudgetBudgetState,
   instance: null,
   commentsHistoryDrawerOpen: false,
-  fringes: initialFringesState,
+  fringes: initialModelListResponseState,
   account: initialBudgetAccountState,
   subaccount: initialBudgetSubAccountState,
-  actuals: initialActualsState,
+  actuals: initialModelListResponseState,
   accounts: initialBudgetAccountsState,
   budgetItems: initialModelListResponseState,
   budgetItemsTree: initialModelListResponseState
@@ -93,7 +83,7 @@ export const initialTemplateState: Redux.Budgeting.Template.Store = {
   autoIndex: false,
   template: initialTemplateTemplateState,
   instance: null,
-  fringes: initialFringesState,
+  fringes: initialModelListResponseState,
   account: initialTemplateAccountState,
   subaccount: initialTemplateSubAccountState,
   accounts: initialTemplateAccountsState

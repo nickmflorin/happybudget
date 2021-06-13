@@ -7,7 +7,6 @@ export * from "./counter";
 export * from "./comments";
 export * from "./list";
 export * from "./detail";
-export * from "./table";
 
 export interface FactoryOptions<S, A extends Redux.Action<any> = Redux.Action<any>> {
   initialState: S;

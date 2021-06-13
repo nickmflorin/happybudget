@@ -4,7 +4,7 @@ import ActionType from "../ActionType";
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.TemplateAccountRow>>(
   ActionType.Template.Accounts.TableChanged
 );
-export const bulkCreateAccountsAction = simpleAction<number>(ActionType.Template.BulkCreate);
+export const bulkCreateAccountsAction = simpleAction<number>(ActionType.Template.Accounts.BulkCreate);
 export const removeAccountAction = simpleAction<number>(ActionType.Template.Accounts.Delete);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Accounts.Updating);

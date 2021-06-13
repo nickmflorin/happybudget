@@ -6,13 +6,10 @@ export const loadingFringesAction = simpleAction<boolean>(ActionType.Template.Fr
 export const responseFringesAction = simpleAction<Http.ListResponse<Model.Fringe>>(
   ActionType.Template.Fringes.Response
 );
-export const clearFringesPlaceholdersToStateAction = simpleAction<null>(ActionType.Template.Fringes.Placeholders.Clear);
-export const addFringesPlaceholdersToStateAction = simpleAction<number>(
-  ActionType.Template.Fringes.Placeholders.AddToState
-);
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.FringeRow>>(
   ActionType.Template.Fringes.TableChanged
 );
+export const bulkCreateFringesAction = simpleAction<number>(ActionType.Template.Fringes.BulkCreate);
 export const removeFringeAction = simpleAction<number>(ActionType.Template.Fringes.Delete);
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Fringes.Deleting);
 export const updatingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Fringes.Updating);
@@ -21,16 +18,6 @@ export const setFringesSearchAction = simpleAction<string>(ActionType.Template.F
 export const selectFringeAction = simpleAction<number>(ActionType.Template.Fringes.Select);
 export const deselectFringeAction = simpleAction<number>(ActionType.Template.Fringes.Deselect);
 export const selectAllFringesAction = simpleAction<null>(ActionType.Template.Fringes.SelectAll);
-export const activatePlaceholderAction = simpleAction<Table.ActivatePlaceholderPayload<Model.Fringe>>(
-  ActionType.Template.Fringes.Placeholders.Activate
-);
-export const removePlaceholderFromStateAction = simpleAction<number>(
-  ActionType.Template.Fringes.Placeholders.RemoveFromState
-);
-export const updatePlaceholderInStateAction = simpleAction<Redux.UpdateModelActionPayload<BudgetTable.FringeRow>>(
-  ActionType.Template.Fringes.Placeholders.UpdateInState
-);
-
 export const updateFringeInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Fringe>>(
   ActionType.Template.Fringes.UpdateInState
 );

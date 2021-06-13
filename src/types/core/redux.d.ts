@@ -118,14 +118,10 @@ namespace Redux {
         readonly replying: number[];
       }
 
-      interface FringesStore extends Redux.ModelListResponseStore<Model.Fringe> {
-        readonly placeholders: ListStore<Table.FringeRow>;
-      }
-
       interface SubAccountsStore extends Redux.ModelListResponseStore<Model.BudgetSubAccount> {
         readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>;
         readonly groups: Redux.ModelListResponseStore<Model.BudgetGroup>;
-        readonly fringes: FringesStore;
+        readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
       }
 
       interface AccountsStore extends Redux.ModelListResponseStore<Model.BudgetAccount> {
@@ -153,10 +149,6 @@ namespace Redux {
         readonly comments: CommentsStore;
       }
 
-      interface ActualsStore extends Redux.ModelListResponseStore<Model.Actual> {
-        readonly placeholders: ListStore<Table.ActualRow>;
-      }
-
       interface Store {
         readonly autoIndex: boolean;
         readonly budget: BudgetStore;
@@ -164,22 +156,18 @@ namespace Redux {
         readonly commentsHistoryDrawerOpen: boolean;
         readonly budgetItems: Redux.ModelListResponseStore<Model.BudgetLineItem>;
         readonly budgetItemsTree: Redux.ModelListResponseStore<Model.TopTreeNode>;
-        readonly actuals: ActualsStore;
+        readonly actuals: Redux.ModelListResponseStore<Model.Actual>;
         readonly subaccount: SubAccountStore;
         readonly account: AccountStore;
         readonly accounts: AccountsStore;
-        readonly fringes: FringesStore;
+        readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
       }
     }
 
     namespace Template {
-      interface FringesStore extends Redux.ModelListResponseStore<Model.Fringe> {
-        readonly placeholders: ListStore<Table.FringeRow>;
-      }
-
       interface SubAccountsStore extends Redux.ModelListResponseStore<Model.TemplateSubAccount> {
         readonly groups: Redux.ModelListResponseStore<Model.TemplateGroup>;
-        readonly fringes: FringesStore;
+        readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
       }
 
       interface AccountsStore extends Redux.ModelListResponseStore<Model.TemplateAccount> {
@@ -210,7 +198,7 @@ namespace Redux {
         readonly subaccount: SubAccountStore;
         readonly account: AccountStore;
         readonly accounts: AccountsStore;
-        readonly fringes: FringesStore;
+        readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
       }
     }
     interface Store {

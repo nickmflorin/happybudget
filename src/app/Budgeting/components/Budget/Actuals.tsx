@@ -18,19 +18,7 @@ import { WrapInApplicationSpinner } from "components";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setInstanceAction } from "../../store/actions/budget";
-import {
-  requestActualsAction,
-  setActualsSearchAction,
-  addPlaceholdersToStateAction,
-  deselectActualAction,
-  selectActualAction,
-  removeActualAction,
-  selectAllActualsAction,
-  tableChangedAction,
-  requestBudgetItemsAction,
-  requestBudgetItemsTreeAction,
-  setBudgetItemsTreeSearchAction
-} from "../../store/actions/budget/actuals";
+import * as actions from "../../store/actions/budget/actuals";
 import { selectBudgetDetail } from "../../store/selectors";
 import BudgetTableComponent from "../BudgetTable";
 
@@ -40,9 +28,6 @@ const selectSelectedRows = simpleDeepEqualSelector(
 const selectActuals = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budgeting.budget.actuals.data);
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.search
-);
-const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.placeholders
 );
 const selectActualsLoading = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.budget.actuals.loading
@@ -63,7 +48,6 @@ const Actuals = (): JSX.Element => {
   const loading = useSelector(selectActualsLoading);
   const budgetItems = useSelector(selectBudgetItems);
   const data = useSelector(selectActuals);
-  const placeholders = useSelector(selectPlaceholders);
   const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
@@ -71,16 +55,15 @@ const Actuals = (): JSX.Element => {
 
   useEffect(() => {
     dispatch(setInstanceAction(null));
-    dispatch(requestActualsAction(null));
-    dispatch(requestBudgetItemsAction(null));
-    dispatch(requestBudgetItemsTreeAction(null));
+    dispatch(actions.requestActualsAction(null));
+    dispatch(actions.requestBudgetItemsAction(null));
+    dispatch(actions.requestBudgetItemsTreeAction(null));
   }, []);
 
   return (
     <WrapInApplicationSpinner loading={loading}>
       <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>
         data={data}
-        placeholders={placeholders}
         manager={models.ActualRowManager}
         selected={selected}
         identifierField={"account"}
@@ -104,7 +87,7 @@ const Actuals = (): JSX.Element => {
           cellRenderer: "BudgetItemCell",
           cellEditor: "BudgetItemsTreeEditor",
           cellEditorParams: {
-            setSearch: (value: string) => dispatch(setBudgetItemsTreeSearchAction(value))
+            setSearch: (value: string) => dispatch(actions.setBudgetItemsTreeSearchAction(value))
           },
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
@@ -116,15 +99,15 @@ const Actuals = (): JSX.Element => {
         }}
         indexColumn={{ width: 40, maxWidth: 50 }}
         search={search}
-        onSearch={(value: string) => dispatch(setActualsSearchAction(value))}
+        onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
         saving={saving}
         sizeColumnsToFit={false}
-        onRowAdd={() => dispatch(addPlaceholdersToStateAction(1))}
-        onRowSelect={(id: number) => dispatch(selectActualAction(id))}
-        onRowDeselect={(id: number) => dispatch(deselectActualAction(id))}
-        onRowDelete={(row: BudgetTable.ActualRow) => dispatch(removeActualAction(row.id))}
-        onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) => dispatch(tableChangedAction(payload))}
-        onSelectAll={() => dispatch(selectAllActualsAction(null))}
+        onRowAdd={() => dispatch(actions.bulkCreateActualsAction(1))}
+        onRowSelect={(id: number) => dispatch(actions.selectActualAction(id))}
+        onRowDeselect={(id: number) => dispatch(actions.deselectActualAction(id))}
+        onRowDelete={(row: BudgetTable.ActualRow) => dispatch(actions.removeActualAction(row.id))}
+        onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) => dispatch(actions.tableChangedAction(payload))}
+        onSelectAll={() => dispatch(actions.selectAllActualsAction(null))}
         exportFileName={"actuals.csv"}
         actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow, Model.Group>) => [
           {

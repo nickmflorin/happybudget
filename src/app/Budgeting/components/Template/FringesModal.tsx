@@ -4,16 +4,7 @@ import { createSelector } from "reselect";
 
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import {
-  setFringesSearchAction,
-  deselectFringeAction,
-  selectFringeAction,
-  removeFringeAction,
-  selectAllFringesAction,
-  tableChangedAction,
-  requestFringesAction,
-  addFringesPlaceholdersToStateAction
-} from "../../store/actions/template/fringes";
+import * as actions from "../../store/actions/template/fringes";
 import { GenericFringesModal, GenericFringesModalProps } from "../Generic";
 
 const selectSelectedRows = simpleDeepEqualSelector(
@@ -22,9 +13,6 @@ const selectSelectedRows = simpleDeepEqualSelector(
 const selectData = simpleDeepEqualSelector((state: Redux.ApplicationStore) => state.budgeting.template.fringes.data);
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.template.fringes.search
-);
-const selectPlaceholders = simpleShallowEqualSelector(
-  (state: Redux.ApplicationStore) => state.budgeting.template.fringes.placeholders
 );
 const selectLoading = simpleShallowEqualSelector(
   (state: Redux.ApplicationStore) => state.budgeting.template.fringes.loading
@@ -41,7 +29,6 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading);
   const data = useSelector(selectData);
-  const placeholders = useSelector(selectPlaceholders);
   const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
@@ -50,7 +37,7 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
     // TODO: It might not be necessary to always refresh the Fringes when the modal opens, but it is
     // safer for now to rely on the API as a source of truth more often than not.
     if (open === true) {
-      dispatch(requestFringesAction(null));
+      dispatch(actions.requestFringesAction(null));
     }
   }, [open]);
 
@@ -60,17 +47,16 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
       onCancel={onCancel}
       loading={loading}
       data={data}
-      placeholders={placeholders}
       selected={selected}
       search={search}
-      onSearch={(value: string) => dispatch(setFringesSearchAction(value))}
+      onSearch={(value: string) => dispatch(actions.setFringesSearchAction(value))}
       saving={saving}
-      onRowAdd={() => dispatch(addFringesPlaceholdersToStateAction(1))}
-      onRowSelect={(id: number) => dispatch(selectFringeAction(id))}
-      onRowDeselect={(id: number) => dispatch(deselectFringeAction(id))}
-      onRowDelete={(row: BudgetTable.FringeRow) => dispatch(removeFringeAction(row.id))}
-      onTableChange={(payload: Table.Change<BudgetTable.FringeRow>) => dispatch(tableChangedAction(payload))}
-      onSelectAll={() => dispatch(selectAllFringesAction(null))}
+      onRowAdd={() => dispatch(actions.bulkCreateFringesAction(1))}
+      onRowSelect={(id: number) => dispatch(actions.selectFringeAction(id))}
+      onRowDeselect={(id: number) => dispatch(actions.deselectFringeAction(id))}
+      onRowDelete={(row: BudgetTable.FringeRow) => dispatch(actions.removeFringeAction(row.id))}
+      onTableChange={(payload: Table.Change<BudgetTable.FringeRow>) => dispatch(actions.tableChangedAction(payload))}
+      onSelectAll={() => dispatch(actions.selectAllFringesAction(null))}
     />
   );
 };

@@ -1,12 +1,10 @@
 import { Reducer } from "redux";
-import { filter } from "lodash";
 
-import * as models from "lib/model";
-import { createModelListResponseReducer, createTablePlaceholdersReducer } from "lib/redux/factories";
+import { createModelListResponseReducer } from "lib/redux/factories";
+import { initialModelListResponseState } from "store/initialState";
 import { ActionType } from "../../actions";
-import { initialActualsState } from "../../initialState";
 
-const listResponseReducer = createModelListResponseReducer<Model.Actual, Redux.Budgeting.Budget.ActualsStore>(
+const listResponseReducer = createModelListResponseReducer<Model.Actual, Redux.ModelListResponseStore<Model.Actual>>(
   {
     Response: ActionType.Budget.Actuals.Response,
     Request: ActionType.Budget.Actuals.Request,
@@ -24,41 +22,15 @@ const listResponseReducer = createModelListResponseReducer<Model.Actual, Redux.B
   },
   {
     strictSelect: false,
-    initialState: initialActualsState,
-    subReducers: {
-      placeholders: createTablePlaceholdersReducer(
-        {
-          AddToState: ActionType.Budget.Actuals.Placeholders.AddToState,
-          RemoveFromState: ActionType.Budget.Actuals.Placeholders.RemoveFromState,
-          UpdateInState: ActionType.Budget.Actuals.Placeholders.UpdateInState,
-          Clear: ActionType.Budget.Actuals.Request
-        },
-        models.ActualRowManager
-      )
-    }
+    initialState: initialModelListResponseState
   }
 );
 
-const rootReducer: Reducer<Redux.Budgeting.Budget.ActualsStore, Redux.Action<any>> = (
-  state: Redux.Budgeting.Budget.ActualsStore = initialActualsState,
+const rootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Redux.Action<any>> = (
+  state: Redux.ModelListResponseStore<Model.Actual> = initialModelListResponseState,
   action: Redux.Action<any>
-): Redux.Budgeting.Budget.ActualsStore => {
-  let newState = { ...state };
-
-  newState = listResponseReducer(newState, action);
-
-  if (action.type === ActionType.Budget.Actuals.Placeholders.Activate) {
-    const payload: Table.ActivatePlaceholderPayload<Model.Actual> = action.payload;
-    newState = {
-      ...newState,
-      placeholders: filter(
-        newState.placeholders,
-        (placeholder: BudgetTable.ActualRow) => placeholder.id !== action.payload.id
-      ),
-      data: [...newState.data, payload.model]
-    };
-  }
-  return newState;
+): Redux.ModelListResponseStore<Model.Actual> => {
+  return listResponseReducer(state, action);
 };
 
 export default rootReducer;
