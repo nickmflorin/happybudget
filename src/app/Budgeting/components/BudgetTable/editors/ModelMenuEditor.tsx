@@ -63,8 +63,13 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
           menuRefObj.focusSearch(false);
         };
       }
+    } else {
+      const menuRefObj = menuRef.current;
+      if (!isNil(menuRefObj)) {
+        menuRefObj.focusSearch(true, "");
+      }
     }
-  }, [params.charPress, menuRef.current]);
+  }, [params.charPress]);
 
   const wrapEditor = useMemo(() => {
     return {
