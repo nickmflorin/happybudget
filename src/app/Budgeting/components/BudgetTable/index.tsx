@@ -299,6 +299,7 @@ const BudgetTable = <
         cellRenderer: "BodyCell",
         ...col,
         headerComponentParams: {
+          ...col.headerComponentParams,
           onSort: onSort,
           ordering
         }
