@@ -57,6 +57,7 @@ interface MultipleModelMenuProps<M extends Model.M> {
 }
 
 export interface ModelMenuItemProps<M extends Model.M> {
+  readonly menuId: number;
   readonly model: M;
   readonly selected: (number | string)[];
   readonly checkbox: boolean;

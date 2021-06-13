@@ -2,6 +2,11 @@
 @import "style/typography";
 
 .model-menu {
+  // The menu needs to have position relative so that we can detect where the
+  // children menu items are relative to the parent container, which is used
+  // for automatically scrolling them into view.
+  position: relative;
+
   .model-menu-item {
     display: flex;
     padding: 4px 10px;
@@ -9,7 +14,7 @@
     font-weight: 400 !important;
     margin-bottom: 0px !important;
     height: 32px;
-    justify-content: center;
+    justify-content: left;
 
     &:hover, &.focus {
       background-color: rgb(33 150 243 / 45%) !important;

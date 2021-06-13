@@ -1,5 +1,5 @@
 import React, { useImperativeHandle, useEffect, useState, useMemo, SyntheticEvent } from "react";
-import { map, isNil, includes, filter, find, forEach } from "lodash";
+import { map, isNil, includes, filter, find, forEach, uniqueId } from "lodash";
 import classNames from "classnames";
 import { Menu, Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -24,6 +24,7 @@ const isModelWithChildren = <M extends Model.M>(model: M): model is M & { childr
 export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): JSX.Element => {
   const { model, ...primary } = props;
   const {
+    menuId,
     highlightActive,
     multiple,
     selected,
@@ -75,6 +76,7 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
       <Menu.Item
         {...rest} // Required for Antd Menu Item
         {...itemProps}
+        id={`model-menu-${menuId}-item-${model.id}`}
         onClick={(info: { domEvent: SyntheticEvent }) => onPress(model, info.domEvent)}
         className={classNames("model-menu-item", !isNil(itemProps) ? itemProps.className : "", {
           active: isActive,
@@ -221,6 +223,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [state, setState] = useState<MenuState>({ focused: false });
   const firstRender = useTrackFirstRender();
+  const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("model-menu-")), [props.id]);
 
   const _flattenedModels = useMemo<M[]>(() => {
     const flattened: M[] = [];
@@ -348,6 +351,31 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
       }
     }
   }, [props.models, models]);
+
+  const scrollIndexIntoView = (index: number) => {
+    const model: M = models[index];
+    const menu = document.getElementById(menuId);
+    if (!isNil(menu)) {
+      const top = menu.scrollTop;
+      const bottom = menu.scrollTop + menu.clientHeight;
+      const item = document.getElementById(`model-menu-${menuId}-item-${model.id}`);
+      if (!isNil(item)) {
+        const itemTop = item.offsetTop;
+        const itemBottom = item.offsetTop + item.clientHeight;
+        if (itemTop < top) {
+          menu.scrollTop -= top - itemTop;
+        } else if (itemBottom > bottom) {
+          menu.scrollTop += itemBottom - bottom;
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (isModelIndexFocusedState(state)) {
+      scrollIndexIntoView(state.index);
+    }
+  }, [state]);
 
   const incrementFocusedIndex = () => {
     if (isFocusedState(state) || props.autoFocus === true) {
@@ -502,11 +530,16 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   /* eslint-disable indent */
   return (
     <RenderWithSpinner loading={props.loading} size={22}>
-      <Menu className={classNames("model-menu", props.className)} style={props.style} id={props.id}>
+      <Menu
+        className={classNames("model-menu", props.className)}
+        id={!isNil(props.id) ? props.id : menuId}
+        style={props.style}
+      >
         {topLevelModels.length !== 0 &&
           (isUnfocusedState(state) || isModelIndexFocusedState(state) || isBottomItemFocusedState(state)) && (
             <React.Fragment>
               <ModelMenuItems<M>
+                menuId={menuId}
                 models={topLevelModels}
                 focusedIndex={isModelIndexFocusedState(state) ? state.index : null}
                 checkbox={isMultipleModelMenuProps(props) && props.checkbox === true}
