@@ -8,6 +8,7 @@ import { ShowHide, TooltipWrapper, Separator } from "components";
 
 export interface ISidebarItem {
   icon?: JSX.Element;
+  activeIcon?: JSX.Element;
   text?: string;
   to?: string;
   collapsed?: boolean;
@@ -25,6 +26,7 @@ export interface ISidebarItem {
 
 const SidebarItem = ({
   icon,
+  activeIcon,
   text,
   to,
   active,
@@ -89,7 +91,7 @@ const SidebarItem = ({
           }}
         >
           <ShowHide show={!isNil(icon)}>
-            <div className={"icon-container"}>{icon}</div>
+            <div className={"icon-container"}>{isActive && !isNil(activeIcon) ? activeIcon : icon}</div>
           </ShowHide>
           <ShowHide show={collapsed === false && !isNil(text)}>
             <span className={"text-container"}>{text}</span>

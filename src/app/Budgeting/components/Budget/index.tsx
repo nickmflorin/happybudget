@@ -4,7 +4,19 @@ import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMa
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagic, faPrint, faCloud, faCog, faCommentsAlt } from "@fortawesome/pro-solid-svg-icons";
+import {
+  faMagic,
+  faPrint,
+  faCloud,
+  faCog,
+  faCommentsAlt,
+  faFilePlus as faFilePlusSolid,
+  faCopy as faCopySolid,
+  faAddressBook as faAddressBookSolid,
+  faFileSpreadsheet as faFileSpreadsheetSolid,
+  faFileInvoice as faFileInvoiceSolid,
+  faFileChartLine as faFileChartLineSolid
+} from "@fortawesome/pro-solid-svg-icons";
 import {
   faFilePlus,
   faCopy,
@@ -110,6 +122,7 @@ const Budget = (): JSX.Element => {
       sidebar={[
         {
           icon: <FontAwesomeIcon icon={faFilePlus} />,
+          activeIcon: <FontAwesomeIcon icon={faFilePlusSolid} />,
           onClick: () => history.push("/templates"),
           tooltip: {
             title: "Templates",
@@ -118,6 +131,7 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faCopy} />,
+          activeIcon: <FontAwesomeIcon icon={faCopySolid} />,
           onClick: () => history.push("/budgets"),
           tooltip: {
             title: "My Budgets",
@@ -126,6 +140,7 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faAddressBook} flip={"horizontal"} />,
+          activeIcon: <FontAwesomeIcon icon={faAddressBookSolid} flip={"horizontal"} />,
           onClick: () => history.push("/contacts"),
           separatorAfter: true,
           tooltip: {
@@ -135,6 +150,7 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faFileChartLine} />,
+          activeIcon: <FontAwesomeIcon icon={faFileChartLineSolid} />,
           onClick: () => history.push(`/budgets/${budgetId}/analysis`),
           active: location.pathname.startsWith(`/budgets/${budgetId}/analysis`),
           tooltip: {
@@ -144,6 +160,7 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faFileSpreadsheet} />,
+          activeIcon: <FontAwesomeIcon icon={faFileSpreadsheetSolid} />,
           onClick: () => {
             if (!isNaN(parseInt(budgetId)) && !isBudgetRelatedUrl(location.pathname)) {
               const budgetLastVisited = getBudgetLastVisited(parseInt(budgetId));
@@ -162,6 +179,7 @@ const Budget = (): JSX.Element => {
         },
         {
           icon: <FontAwesomeIcon icon={faFileInvoice} />,
+          activeIcon: <FontAwesomeIcon icon={faFileInvoiceSolid} />,
           onClick: () => history.push(`/budgets/${budgetId}/actuals`),
           active: location.pathname.startsWith(`/budgets/${budgetId}/actuals`),
           tooltip: {

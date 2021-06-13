@@ -126,15 +126,15 @@ const Actuals = (): JSX.Element => {
           },
           {
             field: "vendor",
-            headerName: "Vendor",
+            headerName: "Contact",
             flex: 1,
-            type: "text"
+            type: "contact"
           },
           {
             field: "purchase_order",
             headerName: "Purchase Order",
             flex: 1,
-            type: "text"
+            type: "number"
           },
           {
             field: "date",
@@ -184,7 +184,7 @@ const Actuals = (): JSX.Element => {
             field: "payment_id",
             headerName: "Pay ID",
             flex: 1,
-            type: "text"
+            type: "number"
           },
           {
             field: "value",
@@ -193,7 +193,7 @@ const Actuals = (): JSX.Element => {
             valueFormatter: currencyValueFormatter,
             valueSetter: floatValueSetter<BudgetTable.ActualRow>("value"),
             tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
-            type: "text"
+            type: "currency"
           }
         ]}
       />
