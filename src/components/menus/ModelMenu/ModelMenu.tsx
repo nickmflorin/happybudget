@@ -323,30 +323,28 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
           setState({ focused: true, noSearchResults: true, noSearchResultsActive: false });
         }
       } else {
-        if (!isModelIndexFocusedState(state)) {
-          // If we are not already in the index focused state, first check to see
-          // if there is a selection (i.e. value) - in which case, we will set the
-          // index based on that value.
-          let setIndexToModel = setIndexFromSelectedState(selected);
+        // If we are not already in the index focused state, first check to see
+        // if there is a selection (i.e. value) - in which case, we will set the
+        // index based on that value.
+        let setIndexToModel = setIndexFromSelectedState(selected);
 
-          // If we cannot set the index based on a selected value, check to see if
-          // there is a prop that returns the first model that we should select.
-          if (setIndexToModel === false && !isNil(props.getFirstSearchResult)) {
-            const firstModel = props.getFirstSearchResult(models);
-            if (!isNil(firstModel)) {
-              const index = models.indexOf(firstModel);
-              if (!isNil(index)) {
-                setIndexToModel = true;
-                setState({ focused: true, index: index });
-              }
+        // If we cannot set the index based on a selected value, check to see if
+        // there is a prop that returns the first model that we should select.
+        if (setIndexToModel === false && !isNil(props.getFirstSearchResult)) {
+          const firstModel = props.getFirstSearchResult(models);
+          if (!isNil(firstModel)) {
+            const index = models.indexOf(firstModel);
+            if (!isNil(index)) {
+              setIndexToModel = true;
+              setState({ focused: true, index: index });
             }
           }
+        }
 
-          // If we could not infer the index based on a selected model or the prop callback,
-          // set to the first index.
-          if (setIndexToModel === false) {
-            setState({ focused: true, index: 0 });
-          }
+        // If we could not infer the index based on a selected model or the prop callback,
+        // set to the first index.
+        if (setIndexToModel === false) {
+          setState({ focused: true, index: 0 });
         }
       }
     }
