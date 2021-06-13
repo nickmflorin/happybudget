@@ -1,9 +1,7 @@
 import { forEach, isNil, find, filter } from "lodash";
-import { generateRandomNumericId } from "lib/util";
 import { isRowChange, isSplitField, isWriteField, isWriteOnlyField } from "lib/model/typeguards/tabling";
 
 const defaultRowMeta: Partial<Table.RowMeta> = {
-  isPlaceholder: false,
   isGroupFooter: false,
   isTableFooter: false,
   isBudgetFooter: false,
@@ -86,32 +84,6 @@ export class RowManager<
     } else {
       return null;
     }
-  };
-
-  public createPlaceholder = (): R => {
-    let obj: { [key in keyof R]?: R[key] } = {};
-    obj = {
-      ...obj,
-      id: generateRandomNumericId(),
-      group: null,
-      meta: {
-        ...defaultRowMeta,
-        isPlaceholder: true,
-        label: "Placeholder",
-        typeLabel: this.typeLabel,
-        type: this.rowType
-      }
-    };
-    forEach(this.fields, (field: Table.Field<R, M, P>) => {
-      if (!isWriteOnlyField(field)) {
-        if (isSplitField(field)) {
-          obj[field.rowField] = field.placeholderValue || null;
-        } else {
-          obj[field.field] = field.placeholderValue || null;
-        }
-      }
-    });
-    return obj as R;
   };
 
   public modelToRow = (model: M, group: G | null, meta: Partial<Table.RowMeta> = {}): R => {

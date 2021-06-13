@@ -4,11 +4,9 @@ import { isRowChange, isRow, isRowChangeData } from "lib/model/typeguards/tablin
 
 abstract class BaseField<R extends Table.Row, M extends Model.Model> implements Table.IBaseField<R, M> {
   readonly required?: boolean;
-  readonly placeholderValue?: any;
 
   constructor(config: Table.IBaseField<R, M>) {
     this.required = config.required;
-    this.placeholderValue = config.placeholderValue;
   }
 
   public abstract getValueFromRowChangeData(data: Table.RowChangeData<R>): R[keyof R] | undefined;

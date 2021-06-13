@@ -49,7 +49,6 @@ const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.
         id: hashString("budgetfooter"),
         [identifierField]: identifierValue,
         meta: {
-          isPlaceholder: false,
           isGroupFooter: false,
           isTableFooter: false,
           isBudgetFooter: true,

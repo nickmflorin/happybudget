@@ -72,7 +72,7 @@ export const BudgetSubAccountRowManager = new RowManager<
     ReadOnly({ field: "estimated" }),
     ReadOnly({ field: "variance" }),
     ReadOnly({ field: "actual" }),
-    ReadWrite({ field: "fringes", allowNull: true, placeholderValue: [] })
+    ReadWrite({ field: "fringes", allowNull: true })
   ],
   childrenGetter: (model: Model.SubAccount) => model.subaccounts,
   groupGetter: (model: Model.SubAccount) => model.group,
@@ -107,7 +107,7 @@ export const TemplateSubAccountRowManager = new RowManager<
     }),
     ReadWrite({ field: "identifier", allowNull: true }),
     ReadOnly({ field: "estimated" }),
-    ReadWrite({ field: "fringes", allowNull: true, placeholderValue: [] })
+    ReadWrite({ field: "fringes", allowNull: true })
   ],
   childrenGetter: (model: Model.SubAccount) => model.subaccounts,
   groupGetter: (model: Model.SubAccount) => model.group,

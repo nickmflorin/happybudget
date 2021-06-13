@@ -168,7 +168,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
             // before we reach the group footer node, so as long as the ordering/grouping of rows
             // is consistent.  However, we will also make sure that the row does not belong to a group
             // for safety.
-            if (isNil(row.group) && !(row.meta.isPlaceholder === true)) {
+            if (isNil(row.group)) {
               nodes.push(currentNode);
             }
           }
@@ -501,7 +501,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         name: `Delete ${row.meta.label}`,
         action: () => onRowDelete(row)
       };
-      if (isNil(groupParams) || row.meta.isPlaceholder) {
+      if (isNil(groupParams)) {
         return [deleteRowContextMenuItem];
       } else if (!isNil(row.group)) {
         return [
@@ -727,7 +727,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
           const nodes: RowNode[] = [];
           e.api.forEachNode((node: RowNode) => {
             const row: R = node.data;
-            if (row.meta.isPlaceholder === false && row.meta.isGroupFooter === false) {
+            if (row.meta.isGroupFooter === false) {
               nodes.push(node);
             }
           });

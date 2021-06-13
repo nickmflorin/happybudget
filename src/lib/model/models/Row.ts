@@ -18,8 +18,6 @@ interface IModelRow<M extends Model.Model> extends IRow {
   readonly getModelChildren: () => number[];
 }
 
-class PlaceholderRow extends BaseModel {}
-
 class RowConfig {}
 
 class ModelRowConfig<M extends Model.Model> extends RowConfig implements IModelRowConfig<M> {

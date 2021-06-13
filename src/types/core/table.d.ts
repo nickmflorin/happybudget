@@ -7,7 +7,6 @@ namespace Table {
 
   interface RowMeta {
     readonly selected: boolean;
-    readonly isPlaceholder?: boolean;
     readonly isGroupFooter?: boolean;
     readonly isTableFooter?: boolean;
     readonly isBudgetFooter?: boolean;
@@ -141,11 +140,6 @@ namespace Table {
     readonly processCellFromClipboard?: (value: string) => any;
   }
 
-  interface ActivatePlaceholderPayload<M> {
-    readonly id: number;
-    readonly model: M;
-  }
-
   type DataObjType<R extends Table.Row, M extends Model.Model> = R | M | Table.RowChange<R> | Table.RowChangeData<R>;
   type RowObjType<R extends Table.Row> = R | Table.RowChange<R> | Table.RowChangeData<R>;
 
@@ -155,8 +149,6 @@ namespace Table {
     // wait until a value is present for the field before creating an instance
     // via an HTTP POST request that is associated with the row (R).
     readonly required?: boolean;
-    // The value that should be included for the field in the Placeholder row.
-    readonly placeholderValue?: any;
   };
 
   type IReadField<R extends Table.Row, M extends Model.Model> = Table.IBaseField<R, M> & {
@@ -306,7 +298,6 @@ namespace Table {
     readonly getField: (name: keyof R | keyof M) => Table.Field<R, M, P> | null;
     readonly getChildren: (model: M) => number[];
     readonly getGroup: (model: M) => number | null;
-    readonly createPlaceholder: () => R;
     readonly modelToRow: (model: M, group: G | null, meta: Partial<Table.RowMeta> = {}) => R;
     readonly mergeChangesWithRow: (obj: R, change: Table.RowChange<R>) => R;
     readonly mergeChangesWithModel: (obj: M, change: Table.RowChange<R>) => M;

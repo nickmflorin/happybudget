@@ -405,7 +405,6 @@ const BudgetTable = <
           [identifierField]: group.name,
           group,
           meta: {
-            isPlaceholder: true,
             isGroupFooter: true,
             selected: false,
             children: []

@@ -40,7 +40,6 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
         id: hashString("tablefooter"),
         [identifierField]: identifierValue,
         meta: {
-          isPlaceholder: false,
           isGroupFooter: false,
           isTableFooter: true,
           isBudgetFooter: false,

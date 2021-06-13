@@ -32,10 +32,21 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
     return false;
   };
 
-  if (row.meta.isPlaceholder === false) {
-    if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
-      if (row.meta.children.length !== 0) {
-        return (
+  if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
+    if (row.meta.children.length !== 0) {
+      return (
+        <Tooltip title={"Expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
+          <IconButton
+            className={"ag-grid-expand-button"}
+            size={"small"}
+            icon={<FontAwesomeIcon icon={faExpandAlt} />}
+            onClick={() => onClick(node.data.id)}
+          />
+        </Tooltip>
+      );
+    } else {
+      return (
+        <ShowHide show={rowIsHovered()}>
           <Tooltip title={"Expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
             <IconButton
               className={"ag-grid-expand-button"}
@@ -44,37 +55,22 @@ const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>
               onClick={() => onClick(node.data.id)}
             />
           </Tooltip>
-        );
-      } else {
-        return (
-          <ShowHide show={rowIsHovered()}>
-            <Tooltip title={"Expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
-              <IconButton
-                className={"ag-grid-expand-button"}
-                size={"small"}
-                icon={<FontAwesomeIcon icon={faExpandAlt} />}
-                onClick={() => onClick(node.data.id)}
-              />
-            </Tooltip>
-          </ShowHide>
-        );
-      }
-    } else {
-      return (
-        <ShowHide show={rowIsHovered()}>
-          <Tooltip title={"Fill in account to expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
-            <IconButton
-              className={"ag-grid-expand-button fake-disabled"}
-              size={"small"}
-              disabled={false}
-              icon={<FontAwesomeIcon icon={faExpandAlt} />}
-            />
-          </Tooltip>
         </ShowHide>
       );
     }
   } else {
-    return <></>;
+    return (
+      <ShowHide show={rowIsHovered()}>
+        <Tooltip title={"Fill in account to expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
+          <IconButton
+            className={"ag-grid-expand-button fake-disabled"}
+            size={"small"}
+            disabled={false}
+            icon={<FontAwesomeIcon icon={faExpandAlt} />}
+          />
+        </Tooltip>
+      </ShowHide>
+    );
   }
 };
 
