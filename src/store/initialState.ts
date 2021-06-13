@@ -16,7 +16,8 @@ export const initialModelListResponseState: Redux.ModelListResponseStore<any> = 
   creating: false,
   deleting: [],
   updating: [],
-  objLoading: []
+  objLoading: [],
+  cache: {}
 };
 
 export const initialDetailResponseState: Redux.ModelDetailResponseStore<any> = {

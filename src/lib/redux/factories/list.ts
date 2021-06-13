@@ -70,6 +70,7 @@ export type IModelListResponseActionMap = {
   Updating: string;
   Creating: string;
   ObjLoading: string;
+  RestoreSearchCache?: string;
 };
 
 /**
@@ -113,8 +114,28 @@ export const createModelListResponseReducer = <
         data: action.payload.data,
         count: action.payload.count,
         selected: [],
-        responseWasReceived: true
+        responseWasReceived: true,
+        cache: {
+          ...st.cache,
+          [st.search]: {
+            data: action.payload.data,
+            count: action.payload.count,
+            next: action.payload.next,
+            previous: action.payload.previous
+          }
+        }
       };
+    },
+    RestoreSearchCache: (st: S = Options.initialState, action: Redux.Action<null>) => {
+      const cachedResponse: Http.ListResponse<M> = st.cache[st.search];
+      if (!isNil(cachedResponse)) {
+        return {
+          ...st,
+          data: cachedResponse.data,
+          count: cachedResponse.count
+        };
+      }
+      return st;
     },
     Request: (st: S = Options.initialState, action: Redux.Action<null>) => ({ ...st, responseWasReceived: false }),
     Loading: (st: S = Options.initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload }),

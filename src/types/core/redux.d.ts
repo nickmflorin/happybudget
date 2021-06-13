@@ -53,6 +53,11 @@ namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
+  // Holds previously searched for results.  Note that this may not play well
+  // with pagination, in which case we will have to adjust (but we are currently
+  // not using pagination anywhere that we are using this cache).
+  type SearchCache<T extends Model.Model> = { [key: string]: Http.ListResponse<T> };
+
   interface ModelListResponseStore<T extends Model.Model> extends Redux.ListResponseStore<T> {
     readonly page: number;
     readonly pageSize: number;
@@ -62,6 +67,7 @@ namespace Redux {
     readonly updating: Redux.ModelListActionStore;
     readonly objLoading: Redux.ModelListActionStore;
     readonly creating: boolean;
+    readonly cache: SearchCache;
   }
 
   interface CommentsListResponseStore extends Redux.ModelListResponseStore<Model.Comment> {

@@ -208,7 +208,8 @@ const ActionType = {
       Request: "budget.budgetitemstree.Request",
       Loading: "budget.budgetitemstree.Loading",
       Response: "budget.budgetitemstree.Response",
-      SetSearch: "budget.budgetitemstree.SetSearch"
+      SetSearch: "budget.budgetitemstree.SetSearch",
+      RestoreSearchCache: "budget.budgetitemstree.RestoreSearchCache"
     },
     Actuals: {
       TableChanged: "budget.actuals.TableChanged",

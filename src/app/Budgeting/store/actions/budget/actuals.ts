@@ -11,6 +11,9 @@ export const loadingBudgetItemsTreeAction = simpleAction<boolean>(ActionType.Bud
 export const responseBudgetItemsTreeAction = simpleAction<Http.ListResponse<Model.AccountTreeNode>>(
   ActionType.Budget.BudgetItemsTree.Response
 );
+export const restoreBudgetItemsTreeSearchCacheAction = simpleAction<null>(
+  ActionType.Budget.BudgetItemsTree.RestoreSearchCache
+);
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.ActualRow>>(
   ActionType.Budget.Actuals.TableChanged
 );

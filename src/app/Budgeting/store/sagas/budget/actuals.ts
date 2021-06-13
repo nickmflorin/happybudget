@@ -199,27 +199,32 @@ function* getBudgetItemsTreeTask(action: Redux.Action<null>): SagaIterator {
   const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
     const search = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budgetItemsTree.search);
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-    yield put(actions.loadingBudgetItemsTreeAction(true));
-    try {
-      // TODO: Eventually we will want to build in pagination for this.
-      const response = yield call(
-        api.getBudgetItemsTree,
-        budgetId,
-        { no_pagination: true, search },
-        { cancelToken: source.token }
-      );
-      yield put(actions.responseBudgetItemsTreeAction(response));
-    } catch (e) {
-      if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error retrieving the budget's items.");
-        yield put(actions.responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
-      }
-    } finally {
-      yield put(actions.loadingBudgetItemsTreeAction(false));
-      if (yield cancelled()) {
-        source.cancel();
+    const cache = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budgetItemsTree.cache);
+    if (!isNil(cache[search])) {
+      yield put(actions.restoreBudgetItemsTreeSearchCacheAction(null));
+    } else {
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+      yield put(actions.loadingBudgetItemsTreeAction(true));
+      try {
+        // TODO: Eventually we will want to build in pagination for this.
+        const response = yield call(
+          api.getBudgetItemsTree,
+          budgetId,
+          { no_pagination: true, search },
+          { cancelToken: source.token }
+        );
+        yield put(actions.responseBudgetItemsTreeAction(response));
+      } catch (e) {
+        if (!(yield cancelled())) {
+          api.handleRequestError(e, "There was an error retrieving the budget's items.");
+          yield put(actions.responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
+        }
+      } finally {
+        yield put(actions.loadingBudgetItemsTreeAction(false));
+        if (yield cancelled()) {
+          source.cancel();
+        }
       }
     }
   }
