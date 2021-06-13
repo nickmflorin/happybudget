@@ -1,8 +1,10 @@
 import { forEach, groupBy, isNil, reduce, find } from "lodash";
+import { ColDef } from "@ag-grid-community/core";
+
 import * as models from "lib/model";
 import { tableChangeIsCellChange, tableChangeIsRowChange } from "../typeguards/tabling";
 
-export const toAgGridColDef = (colDef: Table.Column<any, any>) => {
+export const toAgGridColDef = <R extends Table.Row = Table.Row>(colDef: Table.Column<R>): ColDef => {
   const {
     nullValue,
     clearBeforeEdit,

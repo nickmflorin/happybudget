@@ -12,12 +12,9 @@ const defaultRowMeta: Partial<Table.RowMeta> = {
 
 type PayloadType<T, P, R extends Table.Row> = T extends Table.RowChange<R> ? Partial<P> : P;
 
-export class RowManager<
-  R extends Table.Row<G>,
-  M extends Model.Model,
-  P extends Http.ModelPayload<M>,
-  G extends Model.BudgetGroup | Model.TemplateGroup
-> implements Table.IRowManager<R, M, P, G> {
+export class RowManager<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
+/* eslint-disable indent */
+  implements Table.IRowManager<R, M, P> {
   public fields: Table.Field<R, M, P>[];
   public childrenGetter?: ((model: M) => number[]) | string | null;
   public groupGetter?: ((model: M) => number | null) | string | null;
@@ -25,7 +22,7 @@ export class RowManager<
   public typeLabel: string;
   public rowType: Table.RowType;
 
-  constructor(config: Table.IRowManagerConfig<R, M, P, G>) {
+  constructor(config: Table.IRowManagerConfig<R, M, P>) {
     this.fields = config.fields;
     this.childrenGetter = config.childrenGetter;
     this.groupGetter = config.groupGetter;

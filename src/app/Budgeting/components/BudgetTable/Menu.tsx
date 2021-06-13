@@ -14,7 +14,7 @@ import { FieldsDropdown } from "components/dropdowns";
 import { FieldMenuField } from "components/menus/FieldsMenu";
 import { PortalOrRender } from "components/layout";
 
-const BudgetTableMenu = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
+const BudgetTableMenu = <R extends Table.Row>({
   actions,
   search,
   selected = false,
@@ -30,7 +30,7 @@ const BudgetTableMenu = <R extends Table.Row<G>, G extends Model.Group = Model.G
   onSelectAll,
   onColumnsChange,
   onExport
-}: BudgetTable.MenuProps<R, G>) => {
+}: BudgetTable.MenuProps<R>) => {
   return (
     <PortalOrRender id={"supplementary-header"} visible={true} portal={!detached}>
       <div className={classNames("table-header", { detached })}>

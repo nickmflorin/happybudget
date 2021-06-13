@@ -46,7 +46,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
       canToggleColumns={false}
       indexColumn={{ width: 40, maxWidth: 50 }}
       cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
-      actions={(params: BudgetTable.MenuActionParams<BudgetTable.FringeRow, Model.Group>) => [
+      actions={(params: BudgetTable.MenuActionParams<BudgetTable.FringeRow>) => [
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,

@@ -109,7 +109,7 @@ const Actuals = (): JSX.Element => {
         onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) => dispatch(actions.tableChangedAction(payload))}
         onSelectAll={() => dispatch(actions.selectAllActualsAction(null))}
         exportFileName={"actuals.csv"}
-        actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow, Model.Group>) => [
+        actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow>) => [
           {
             tooltip: "Delete",
             icon: <FontAwesomeIcon icon={faTrashAlt} />,

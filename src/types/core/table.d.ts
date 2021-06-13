@@ -22,7 +22,7 @@ namespace Table {
     readonly pageSize: number;
   }
 
-  interface Row<G extends Model.Group = Model.Group> extends Record<string, any> {
+  interface Row extends Record<string, any> {
     readonly id: number;
     readonly meta: RowMeta;
     readonly group: number | null;
@@ -74,7 +74,7 @@ namespace Table {
   type ConsolidatedChange<R extends Table.Row> = Table.RowChange<R>[];
 
   // TODO: We need to merge this together with other mechanics.
-  interface CellValueChangedParams<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+  interface CellValueChangedParams<R extends Table.Row> {
     readonly column: import("@ag-grid-community/core").Column;
     readonly row: R;
     readonly oldRow: R | null;
@@ -120,8 +120,7 @@ namespace Table {
     readonly onDoneEditing: (e: Table.CellDoneEditingEvent) => void;
   }
 
-  interface Column<R extends Table.Row<G>, G extends Model.Group = Model.Group>
-    extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
+  interface Column<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
     readonly type: ColumnTypeId;
     readonly nullValue?: null | "" | 0 | [];
     // If true, a Backspace/Delete will cause the cell to clear before going into edit mode.  This
@@ -274,12 +273,7 @@ namespace Table {
     | Table.IReadOnlyField<R, M>;
 
   // TODO: This needs to include the methods on the class as well.
-  interface IRowManagerConfig<
-    R extends Table.Row<G>,
-    M extends Model.Model,
-    P extends Http.ModelPayload<M>,
-    G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup
-  > {
+  interface IRowManagerConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> {
     readonly fields: Table.Field<R, M, P>[];
     readonly childrenGetter?: ((model: M) => number[]) | string | null;
     readonly groupGetter?: ((model: M) => number | null) | string | null;
@@ -288,12 +282,8 @@ namespace Table {
     readonly labelGetter: (model: M) => string;
   }
 
-  interface IRowManager<
-    R extends Table.Row<G>,
-    M extends Model.Model,
-    P extends Http.ModelPayload<M>,
-    G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup
-  > extends Table.IRowManagerConfig<R, M, P, G> {
+  interface IRowManager<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
+    extends Table.IRowManagerConfig<R, M, P> {
     readonly requiredFields: Table.Field<R, M, P>[];
     readonly getField: (name: keyof R | keyof M) => Table.Field<R, M, P> | null;
     readonly getChildren: (model: M) => number[];
@@ -309,7 +299,7 @@ namespace Table {
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace BudgetTable {
-  interface GroupProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+  interface GroupProps<R extends Table.Row, G extends Model.Group = Model.Group> {
     readonly onGroupRows: (rows: R[]) => void;
     readonly onDeleteGroup: (group: G) => void;
     readonly onEditGroup: (group: G) => void;
@@ -328,15 +318,15 @@ namespace BudgetTable {
     readonly disabled?: boolean;
   }
 
-  interface MenuActionParams<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+  interface MenuActionParams<R extends Table.Row> {
     readonly onDelete: () => void;
     readonly selectedRows: R[];
   }
 
-  interface MenuProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
-    readonly columns: Table.Column<R, G>[];
+  interface MenuProps<R extends Table.Row> {
+    readonly columns: Table.Column<R>[];
     readonly actions?:
-      | ((params: BudgetTable.MenuActionParams<R, G>) => BudgetTable.MenuAction[])
+      | ((params: BudgetTable.MenuActionParams<R>) => BudgetTable.MenuAction[])
       | BudgetTable.MenuAction[];
     readonly saving?: boolean;
     readonly selected?: boolean;
@@ -355,19 +345,19 @@ namespace BudgetTable {
   }
 
   // The abstract/generic <Grid> component that wraps AG Grid right at the interface.
-  interface GridProps
+  interface GridProps<R extends Table.Row = Table.Row>
     extends Omit<
       import("@ag-grid-community/react").AGGridReactProps,
       "columnDefs" | "overlayNoRowsTemplate" | "overlayLoadingTemplate" | "modules" | "debug"
     > {
-    readonly columnDefs: Table.Column<any, any>[];
+    readonly columnDefs: Table.Column<R>[];
   }
 
-  interface BudgetFooterGridProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+  interface BudgetFooterGridProps<R extends Table.Row> {
     readonly options: GridOptions;
     // TODO: Refactor so we only have to provide one of these.
-    readonly columns: Table.Column<R, G>[];
-    readonly colDefs: Table.Column<R, G>[];
+    readonly columns: Table.Column<R>[];
+    readonly colDefs: Table.Column<R>[];
     readonly identifierField: string;
     readonly identifierValue?: string | null;
     readonly loadingBudget?: boolean | undefined;
@@ -375,11 +365,11 @@ namespace BudgetTable {
     readonly setColumnApi: (api: import("@ag-grid-community/core").ColumnApi) => void;
   }
 
-  interface TableFooterGridProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+  interface TableFooterGridProps<R extends Table.Row> {
     readonly options: import("@ag-grid-community/core").GridOptions;
     // TODO: Refactor so we only have to provide one of these.
-    readonly columns: Table.Column<R, G>[];
-    readonly colDefs: Table.Column<R, G>[];
+    readonly columns: Table.Column<R>[];
+    readonly colDefs: Table.Column<R>[];
     readonly identifierField: string;
     readonly identifierValue?: string | null;
     readonly sizeColumnsToFit?: boolean | undefined;
@@ -387,7 +377,7 @@ namespace BudgetTable {
   }
 
   // Props provided to the BudgetTable that are passed directly through to the PrimaryGrid.
-  interface PrimaryGridPassThroughProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+  interface PrimaryGridPassThroughProps<R extends Table.Row, G extends Model.Group = Model.Group> {
     readonly groups?: G[];
     readonly groupParams?: BudgetTable.GroupProps<R, G>;
     readonly frameworkComponents?: { [key: string]: any };
@@ -404,16 +394,16 @@ namespace BudgetTable {
     readonly onBack?: () => void;
   }
 
-  interface PrimaryGridProps<R extends Table.Row<G>, G extends Model.Group = Model.Group>
+  interface PrimaryGridProps<R extends Table.Row, G extends Model.Group = Model.Group>
     extends PrimaryGridPassThroughProps<R, G> {
     readonly api: import("@ag-grid-community/core").GridApi | undefined;
     readonly columnApi: import("@ag-grid-community/core").ColumnApi | undefined;
     readonly table: R[];
     readonly options: import("@ag-grid-community/core").GridOptions;
-    readonly colDefs: Table.Column<R, G>[];
-    readonly onCellValueChanged: (params: Table.CellValueChangedParams<R, G>) => void;
+    readonly colDefs: Table.Column<R>[];
+    readonly onCellValueChanged: (params: Table.CellValueChangedParams<R>) => void;
     readonly setAllSelected: (value: boolean) => void;
-    readonly isCellEditable: (row: R, colDef: Table.Column<R, G>) => boolean;
+    readonly isCellEditable: (row: R, colDef: Table.Column<R>) => boolean;
     readonly setApi: (api: import("@ag-grid-community/core").GridApi) => void;
     readonly setColumnApi: (api: import("@ag-grid-community/core").ColumnApi) => void;
     readonly processCellForClipboard: (column: import("@ag-grid-community/core").Column, row: R, value: any) => string;
@@ -421,25 +411,25 @@ namespace BudgetTable {
   }
 
   interface Props<
-    R extends Table.Row<G>,
+    R extends Table.Row,
     M extends Model.Model,
     G extends Model.Group = Model.Group,
     P extends Http.ModelPayload<M> = Http.ModelPayload<M>
   > extends Omit<import("@ag-grid-community/core").GridOptions, "frameworkComponents">,
       Omit<
-        BudgetTable.MenuProps<R, G>,
+        BudgetTable.MenuProps<R>,
         "columns" | "onColumnsChange" | "onExport" | "onDelete" | "selected" | "selectedRows"
       >,
       BudgetTable.PrimaryGridPassThroughProps<R, G>,
       StandardComponentProps {
-    readonly columns: Table.Column<R, G>[];
+    readonly columns: Table.Column<R>[];
     readonly data: M[];
     readonly selected?: number[];
     readonly identifierFieldHeader: string;
-    readonly identifierColumn?: Partial<Table.Column<R, G>>;
-    readonly actionColumn?: Partial<Table.Column<R, G>>;
-    readonly indexColumn?: Partial<Table.Column<R, G>>;
-    readonly expandColumn?: Partial<Table.Column<R, G>>;
+    readonly identifierColumn?: Partial<Table.Column<R>>;
+    readonly actionColumn?: Partial<Table.Column<R>>;
+    readonly indexColumn?: Partial<Table.Column<R>>;
+    readonly expandColumn?: Partial<Table.Column<R>>;
     readonly tableFooterIdentifierValue?: string | null;
     readonly budgetFooterIdentifierValue?: string | null;
     readonly saving: boolean;
@@ -450,7 +440,7 @@ namespace BudgetTable {
     readonly cookies?: BudgetTable.CookiesProps;
     readonly loading?: boolean;
     readonly renderFlag?: boolean;
-    readonly manager: Table.IRowManager<R, M, P, G>;
+    readonly manager: Table.IRowManager<R, M, P>;
     readonly cellClass?: (params: import("@ag-grid-community/core").CellClassParams) => string | undefined;
     readonly onRowSelect: (id: number) => void;
     readonly onRowDeselect: (id: number) => void;
@@ -458,20 +448,20 @@ namespace BudgetTable {
     readonly isCellSelectable?: (row: R, col: Table.Column) => boolean;
   }
 
-  interface AccountRow<G extends Model.Group> extends Table.Row<G> {
+  interface AccountRow extends Table.Row {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
   }
 
-  interface BudgetAccountRow extends BudgetTable.AccountRow<Model.BudgetGroup> {
+  interface BudgetAccountRow extends BudgetTable.AccountRow {
     readonly variance: number | null;
     readonly actual: number | null;
   }
 
-  interface TemplateAccountRow extends BudgetTable.AccountRow<Model.TemplateGroup> {}
+  interface TemplateAccountRow extends BudgetTable.AccountRow {}
 
-  interface SubAccountRow<G extends Model.Group> extends Table.Row<G> {
+  interface SubAccountRow extends Table.Row {
     readonly identifier: string | null;
     readonly name: string | null;
     readonly description: string | null;
@@ -483,14 +473,14 @@ namespace BudgetTable {
     readonly fringes: number[];
   }
 
-  interface BudgetSubAccountRow extends BudgetTable.SubAccountRow<Model.BudgetGroup> {
+  interface BudgetSubAccountRow extends BudgetTable.SubAccountRow {
     readonly actual: number | null;
     readonly variance: number | null;
   }
 
-  interface TemplateSubAccountRow extends BudgetTable.SubAccountRow<Model.TemplateGroup> {}
+  interface TemplateSubAccountRow extends BudgetTable.SubAccountRow {}
 
-  interface FringeRow extends Table.Row<Model.Group> {
+  interface FringeRow extends Table.Row {
     readonly color: string | null;
     readonly name: string | null;
     readonly description: string | null;
@@ -499,7 +489,7 @@ namespace BudgetTable {
     readonly unit: Model.FringeUnit;
   }
 
-  interface ActualRow extends Table.Row<Model.BudgetGroup> {
+  interface ActualRow extends Table.Row {
     readonly description: string | null;
     readonly vendor: string | null;
     readonly purchase_order: string | null;

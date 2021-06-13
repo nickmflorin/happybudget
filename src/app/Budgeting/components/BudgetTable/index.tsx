@@ -28,7 +28,7 @@ import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
 import "./index.scss";
 
 const BudgetTable = <
-  R extends Table.Row<G>,
+  R extends Table.Row,
   M extends Model.Model,
   G extends Model.Group = Model.Group,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
@@ -85,7 +85,7 @@ const BudgetTable = <
   const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
-  const [colDefs, setColDefs] = useState<Table.Column<R, G>[]>([]);
+  const [colDefs, setColDefs] = useState<Table.Column<R>[]>([]);
   const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [gridOptions, setGridOptions] = useState<GridOptions>({
@@ -133,7 +133,7 @@ const BudgetTable = <
     suppressHorizontalScroll: true
   });
 
-  const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R, G>): boolean => {
+  const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R>): boolean => {
     if (includes(["index", "expand"], colDef.field)) {
       return false;
     } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
@@ -144,7 +144,7 @@ const BudgetTable = <
     return true;
   });
 
-  const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R, G>): boolean => {
+  const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R>): boolean => {
     if (includes(["index", "expand"], colDef.field)) {
       return false;
     } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
@@ -154,8 +154,8 @@ const BudgetTable = <
     } else if (
       includes(
         map(
-          filter(columns, (c: Table.Column<R, G>) => c.isCalculated === true),
-          (col: Table.Column<R, G>) => col.field
+          filter(columns, (c: Table.Column<R>) => c.isCalculated === true),
+          (col: Table.Column<R>) => col.field
         ),
         colDef.field
       )
@@ -176,8 +176,8 @@ const BudgetTable = <
     }
   });
 
-  const ActionColumn = useDynamicCallback<Table.Column<R, G>>(
-    (col: Table.Column<R, G>): Table.Column<R, G> => {
+  const ActionColumn = useDynamicCallback<Table.Column<R>>(
+    (col: Table.Column<R>): Table.Column<R> => {
       return {
         ...col,
         ...actionColumn,
@@ -189,8 +189,8 @@ const BudgetTable = <
     }
   );
 
-  const IndexColumn = useDynamicCallback<Table.Column<R, G>>(
-    (col: Table.Column<R, G>): Table.Column<R, G> =>
+  const IndexColumn = useDynamicCallback<Table.Column<R>>(
+    (col: Table.Column<R>): Table.Column<R> =>
       ActionColumn({
         ...indexColumn,
         field: "index",
@@ -220,8 +220,8 @@ const BudgetTable = <
       })
   );
 
-  const ExpandColumn = useDynamicCallback<Table.Column<R, G>>(
-    (col: Table.Column<R, G>): Table.Column<R, G> =>
+  const ExpandColumn = useDynamicCallback<Table.Column<R>>(
+    (col: Table.Column<R>): Table.Column<R> =>
       ActionColumn({
         width: 30,
         maxWidth: 30,
@@ -240,8 +240,8 @@ const BudgetTable = <
       })
   );
 
-  const IdentifierColumn = useDynamicCallback<Table.Column<R, G>>(
-    (col: Table.Column<R, G>): Table.Column<R, G> => ({
+  const IdentifierColumn = useDynamicCallback<Table.Column<R>>(
+    (col: Table.Column<R>): Table.Column<R> => ({
       field: identifierField,
       headerName: identifierFieldHeader,
       cellRenderer: "IdentifierCell",
@@ -252,7 +252,7 @@ const BudgetTable = <
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
         if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
-          return filter(columns, (c: Table.Column<R, G>) => !(c.isCalculated === true)).length + 1;
+          return filter(columns, (c: Table.Column<R>) => !(c.isCalculated === true)).length + 1;
         } else if (!isNil(identifierColumn.colSpan)) {
           return identifierColumn.colSpan(params);
         }
@@ -266,8 +266,8 @@ const BudgetTable = <
     })
   );
 
-  const CalculatedColumn = useDynamicCallback<Table.Column<R, G>>(
-    (col: Table.Column<R, G>): Table.Column<R, G> => {
+  const CalculatedColumn = useDynamicCallback<Table.Column<R>>(
+    (col: Table.Column<R>): Table.Column<R> => {
       return {
         width: 100,
         maxWidth: 100,
@@ -294,8 +294,8 @@ const BudgetTable = <
     }
   );
 
-  const BodyColumn = useDynamicCallback<Table.Column<R, G>>(
-    (col: Table.Column<R, G>): Table.Column<R, G> => {
+  const BodyColumn = useDynamicCallback<Table.Column<R>>(
+    (col: Table.Column<R>): Table.Column<R> => {
       return {
         cellRenderer: "BodyCell",
         ...col,
@@ -308,8 +308,8 @@ const BudgetTable = <
     }
   );
 
-  const UniversalColumn = useDynamicCallback<Table.Column<R, G>>(
-    (col: Table.Column<R, G>): Table.Column<R, G> => {
+  const UniversalColumn = useDynamicCallback<Table.Column<R>>(
+    (col: Table.Column<R>): Table.Column<R> => {
       return {
         ...col,
         suppressMenu: true,
@@ -325,8 +325,8 @@ const BudgetTable = <
     }
   );
 
-  const baseColumns = useMemo((): Table.Column<R, G>[] => {
-    let baseLeftColumns: Table.Column<R, G>[] = [IndexColumn({})];
+  const baseColumns = useMemo((): Table.Column<R>[] => {
+    let baseLeftColumns: Table.Column<R>[] = [IndexColumn({})];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
@@ -351,7 +351,7 @@ const BudgetTable = <
       const cookiesOrdering = kookies.get(cookies.ordering);
       const validatedOrdering = validateCookiesOrdering(
         cookiesOrdering,
-        filter(columns, (col: Table.Column<R, G>) => !(col.isCalculated === true))
+        filter(columns, (col: Table.Column<R>) => !(col.isCalculated === true))
       );
       if (!isNil(validatedOrdering)) {
         setOrdering(validatedOrdering);
@@ -363,16 +363,16 @@ const BudgetTable = <
     const cols = concat(
       baseColumns,
       map(
-        filter(columns, (col: Table.Column<R, G>) => !(col.isCalculated === true)),
-        (def: Table.Column<R, G>) => BodyColumn(def)
+        filter(columns, (col: Table.Column<R>) => !(col.isCalculated === true)),
+        (def: Table.Column<R>) => BodyColumn(def)
       ),
       map(
-        filter(columns, (col: Table.Column<R, G>) => col.isCalculated === true),
-        (def: Table.Column<R, G>) => CalculatedColumn(def)
+        filter(columns, (col: Table.Column<R>) => col.isCalculated === true),
+        (def: Table.Column<R>) => CalculatedColumn(def)
       )
     );
     setColDefs(
-      map(cols, (col: Table.Column<R, G>, index: number) => {
+      map(cols, (col: Table.Column<R>, index: number) => {
         if (index === cols.length - 1) {
           return UniversalColumn({ ...col, resizable: false });
         }
@@ -385,7 +385,7 @@ const BudgetTable = <
     const createGroupFooter = (group: G): R => {
       return reduce(
         columns,
-        (obj: { [key: string]: any }, col: Table.Column<R, G>) => {
+        (obj: { [key: string]: any }, col: Table.Column<R>) => {
           if (!isNil(col.field)) {
             if (col.isCalculated === true) {
               if (!isNil(group[col.field as keyof G])) {
@@ -470,7 +470,7 @@ const BudgetTable = <
   const processCellForClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
-      const customColDef: Table.Column<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+      const customColDef: Table.Column<R> | undefined = find(colDefs, { field: colDef.field } as any);
       if (!isNil(customColDef)) {
         const processor = customColDef.processCellForClipboard;
         if (!isNil(processor)) {
@@ -491,7 +491,7 @@ const BudgetTable = <
   const processCellForExport = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
-      const customColDef: Table.Column<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+      const customColDef: Table.Column<R> | undefined = find(colDefs, { field: colDef.field } as any);
       if (!isNil(customColDef)) {
         const processor = customColDef.processCellForExport;
         if (!isNil(processor)) {
@@ -507,7 +507,7 @@ const BudgetTable = <
   const processCellFromClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
-      const customColDef: Table.Column<R, G> | undefined = find(colDefs, { field: colDef.field } as any);
+      const customColDef: Table.Column<R> | undefined = find(colDefs, { field: colDef.field } as any);
       if (!isNil(customColDef)) {
         const processor = customColDef.processCellFromClipboard;
         if (!isNil(processor)) {
@@ -525,7 +525,7 @@ const BudgetTable = <
     return "";
   });
 
-  const onCellValueChanged = useDynamicCallback((params: Table.CellValueChangedParams<R, G>) => {
+  const onCellValueChanged = useDynamicCallback((params: Table.CellValueChangedParams<R>) => {
     if (!isNil(gridApi) && !isNil(columnApi) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
       const col = columnApi.getColumn("expand");
       if (!isNil(col)) {
@@ -538,7 +538,7 @@ const BudgetTable = <
 
   return (
     <React.Fragment>
-      <BudgetTableMenu<R, G>
+      <BudgetTableMenu<R>
         actions={actions}
         search={search}
         onSearch={onSearch}
@@ -563,7 +563,7 @@ const BudgetTable = <
             const includeColumn = (col: Column): boolean => {
               const colDef = col.getColDef();
               if (!isNil(colDef.field)) {
-                const customColDef: Table.Column<R, G> | undefined = find(colDefs, {
+                const customColDef: Table.Column<R> | undefined = find(colDefs, {
                   field: colDef.field
                 } as any);
                 if (!isNil(customColDef)) {
@@ -607,7 +607,7 @@ const BudgetTable = <
         }}
         onColumnsChange={(fields: Field[]) => {
           if (!isNil(columnApi) && !isNil(tableFooterColumnApi) && !isNil(budgetFooterColumnApi)) {
-            forEach(columns, (col: Table.Column<R, G>) => {
+            forEach(columns, (col: Table.Column<R>) => {
               if (!isNil(col.field)) {
                 const associatedField = find(fields, { id: col.field });
                 if (!isNil(associatedField)) {
@@ -652,7 +652,7 @@ const BudgetTable = <
             onRowDelete={onRowDelete}
             onBack={onBack}
           />
-          <TableFooterGrid<R, G>
+          <TableFooterGrid<R>
             options={tableFooterGridOptions}
             colDefs={colDefs}
             columns={columns}
@@ -661,9 +661,9 @@ const BudgetTable = <
             identifierValue={tableFooterIdentifierValue}
             setColumnApi={setTableFooterColumnApi}
           />
-          {filter(columns, (col: Table.Column<R, G>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !==
+          {filter(columns, (col: Table.Column<R>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !==
             0 && (
-            <BudgetFooterGrid<R, G>
+            <BudgetFooterGrid<R>
               options={budgetFooterGridOptions}
               colDefs={colDefs}
               columns={columns}

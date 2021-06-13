@@ -8,7 +8,7 @@ import { hashString } from "lib/util";
 
 import Grid from "./Grid";
 
-const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
+const TableFooterGrid = <R extends Table.Row>({
   identifierField,
   identifierValue,
   options,
@@ -16,13 +16,13 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
   colDefs,
   sizeColumnsToFit,
   setColumnApi
-}: BudgetTable.TableFooterGridProps<R, G>): JSX.Element => {
+}: BudgetTable.TableFooterGridProps<R>): JSX.Element => {
   const rowData = useMemo((): R | null => {
     // TODO: Loop over the colDef's after we attribute the Base Columns with isBase = true, so
     // we can weed those out here.
     return reduce(
       columns,
-      (obj: { [key: string]: any }, col: Table.Column<R, G>) => {
+      (obj: { [key: string]: any }, col: Table.Column<R>) => {
         if (!isNil(col.field)) {
           if (col.isCalculated === true) {
             if (!isNil(col.tableTotal)) {
@@ -63,7 +63,7 @@ const TableFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.G
 
   return (
     <div className={"table-footer-grid"}>
-      <Grid
+      <Grid<R>
         {...options}
         columnDefs={colDefs}
         rowData={[rowData]}

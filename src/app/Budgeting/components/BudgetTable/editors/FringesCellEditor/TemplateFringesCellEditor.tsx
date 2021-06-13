@@ -4,7 +4,7 @@ import { selectTemplateFringes } from "../../../../store/selectors";
 import FringesCellEditor, { FringesCellEditorProps } from "./Generic";
 
 const TemplateFringesCellEditor = (
-  props: Omit<FringesCellEditorProps<BudgetTable.TemplateSubAccountRow, Model.TemplateGroup>, "fringes">,
+  props: Omit<FringesCellEditorProps<BudgetTable.TemplateSubAccountRow>, "fringes">,
   ref: any
 ) => {
   const fringes = useSelector(selectTemplateFringes);

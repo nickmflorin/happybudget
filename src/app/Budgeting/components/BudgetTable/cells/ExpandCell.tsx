@@ -10,17 +10,17 @@ import { ICellRendererParams } from "@ag-grid-community/core";
 import { ShowHide } from "components";
 import { IconButton } from "components/buttons";
 
-interface ExpandCellProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> extends ICellRendererParams {
+interface ExpandCellProps<R extends Table.Row> extends ICellRendererParams {
   onClick: (id: number) => void;
   rowCanExpand?: (row: R) => boolean;
 }
 
-const ExpandCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
+const ExpandCell = <R extends Table.Row>({
   rowCanExpand,
   onClick,
   node,
   ...props
-}: ExpandCellProps<R, G>): JSX.Element => {
+}: ExpandCellProps<R>): JSX.Element => {
   const row: R = node.data;
 
   const rowIsHovered = () => {

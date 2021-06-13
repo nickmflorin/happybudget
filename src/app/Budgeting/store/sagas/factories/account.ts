@@ -44,7 +44,7 @@ export interface AccountTasksActionMap<
   };
 }
 
-export interface AccountTaskSet<R extends Table.Row<G>, G extends Model.TemplateGroup | Model.BudgetGroup> {
+export interface AccountTaskSet<R extends Table.Row> {
   addToGroup: Redux.Task<{ id: number; group: number }>;
   removeFromGroup: Redux.Task<number>;
   deleteGroup: Redux.Task<number>;
@@ -60,16 +60,16 @@ export interface AccountTaskSet<R extends Table.Row<G>, G extends Model.Template
 export const createAccountTaskSet = <
   A extends Model.TemplateAccount | Model.BudgetAccount,
   SA extends Model.TemplateSubAccount | Model.BudgetSubAccount,
-  R extends Table.Row<G>,
+  R extends Table.Row,
   G extends Model.TemplateGroup | Model.BudgetGroup
 >(
   /* eslint-disable indent */
   actions: AccountTasksActionMap<A, SA, G>,
-  manager: RowManager<R, SA, Http.SubAccountPayload, G>,
+  manager: RowManager<R, SA, Http.SubAccountPayload>,
   selectAccountId: (state: Modules.ApplicationStore) => number | null,
   selectModels: (state: Modules.ApplicationStore) => SA[],
   selectAutoIndex: (state: Modules.ApplicationStore) => boolean
-): AccountTaskSet<R, G> => {
+): AccountTaskSet<R> => {
   function* handleAccountChangeTask(action: Redux.Action<number>): SagaIterator {
     yield all([put(actions.account.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);
   }

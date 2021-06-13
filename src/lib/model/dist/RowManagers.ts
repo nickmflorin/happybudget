@@ -5,8 +5,7 @@ import { RowManager, ReadWrite, ReadOnly, WriteOnly } from "lib/model/models";
 export const BudgetAccountRowManager = new RowManager<
   BudgetTable.BudgetAccountRow,
   Model.BudgetAccount,
-  Http.BudgetAccountPayload,
-  Model.BudgetGroup
+  Http.BudgetAccountPayload
 >({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
@@ -26,8 +25,7 @@ export const BudgetAccountRowManager = new RowManager<
 export const TemplateAccountRowManager = new RowManager<
   BudgetTable.TemplateAccountRow,
   Model.TemplateAccount,
-  Http.TemplateAccountPayload,
-  Model.TemplateGroup
+  Http.TemplateAccountPayload
 >({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
@@ -45,8 +43,7 @@ export const TemplateAccountRowManager = new RowManager<
 export const BudgetSubAccountRowManager = new RowManager<
   BudgetTable.BudgetSubAccountRow,
   Model.BudgetSubAccount,
-  Http.SubAccountPayload,
-  Model.BudgetGroup
+  Http.SubAccountPayload
 >({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
@@ -81,8 +78,7 @@ export const BudgetSubAccountRowManager = new RowManager<
 export const TemplateSubAccountRowManager = new RowManager<
   BudgetTable.TemplateSubAccountRow,
   Model.TemplateSubAccount,
-  Http.SubAccountPayload,
-  Model.TemplateGroup
+  Http.SubAccountPayload
 >({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
@@ -112,7 +108,7 @@ export const TemplateSubAccountRowManager = new RowManager<
   rowType: "subaccount"
 });
 
-export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actual, Http.ActualPayload, Model.Group>({
+export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actual, Http.ActualPayload>({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
     // TODO: Eventually, we need to allow this to be null.
@@ -191,7 +187,7 @@ export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actu
   rowType: "actual"
 });
 
-export const FringeRowManager = new RowManager<BudgetTable.FringeRow, Model.Fringe, Http.FringePayload, Model.Group>({
+export const FringeRowManager = new RowManager<BudgetTable.FringeRow, Model.Fringe, Http.FringePayload>({
   fields: [
     ReadWrite({ field: "name", required: true }),
     ReadWrite({ field: "description", allowNull: true }),

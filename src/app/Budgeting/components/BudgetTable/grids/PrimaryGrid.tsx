@@ -36,7 +36,7 @@ import { isKeyboardEvent } from "lib/model/typeguards";
 import { rangeSelectionIsSingleCell } from "../util";
 import Grid from "./Grid";
 
-const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
+const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
   /* eslint-disable indent */
   api,
   columnApi,
@@ -306,7 +306,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
       const node = local.getDisplayedRowAtIndex(focusedCell.rowIndex);
       if (!isNil(node)) {
         const row: R = node.data;
-        const customColDef = find(colDefs, (def: Table.Column<R, G>) => def.field === focusedCell.column.getColId());
+        const customColDef = find(colDefs, (def: Table.Column<R>) => def.field === focusedCell.column.getColId());
         if (!isNil(customColDef)) {
           const change = getCellChangeForClear(row, customColDef);
           local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
@@ -355,7 +355,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   });
 
-  const getCellChangeForClear = useDynamicCallback((row: R, def: Table.Column<R, G>): Table.CellChange<R> | null => {
+  const getCellChangeForClear = useDynamicCallback((row: R, def: Table.Column<R>): Table.CellChange<R> | null => {
     const clearValue = def.nullValue !== undefined ? def.nullValue : null;
     const colId = def.field;
     if (row[colId] === undefined || row[colId] !== clearValue) {
@@ -406,7 +406,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     const field = event.column.getColId() as keyof R;
     // AG Grid treats cell values as undefined when they are cleared via edit,
     // so we need to translate that back into a null representation.
-    const customColDef: Table.Column<R, G> | undefined = find(colDefs, { field } as any);
+    const customColDef: Table.Column<R> | undefined = find(colDefs, { field } as any);
     if (!isNil(customColDef)) {
       const nullValue = customColDef.nullValue === undefined ? null : customColDef.nullValue;
       const oldValue = event.oldValue === undefined ? nullValue : event.oldValue;
@@ -426,7 +426,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     onTableChange(changes);
   });
 
-  const clearCell = useDynamicCallback((row: R, def: Table.Column<R, G>) => {
+  const clearCell = useDynamicCallback((row: R, def: Table.Column<R>) => {
     const change = getCellChangeForClear(row, def);
     if (!isNil(change)) {
       onTableChange(change);
@@ -558,7 +558,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
         return true;
       } else {
         const column = params.column;
-        const customColDef = find(colDefs, (def: Table.Column<R, G>) => def.field === column.getColId());
+        const customColDef = find(colDefs, (def: Table.Column<R>) => def.field === column.getColId());
         if (!isNil(customColDef)) {
           // Note:  This is a work around for not being able to clear the values of cells without going
           // into edit mode.  For custom Cell Editor(s) with a Pop-Up, we don't want to open the Pop-Up
@@ -683,7 +683,7 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
     }
   }, [api]);
 
-  const includeCellEditorParams = (def: Table.Column<R, G>): Table.Column<R, G> => {
+  const includeCellEditorParams = (def: Table.Column<R>): Table.Column<R> => {
     return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
   };
 
@@ -701,9 +701,9 @@ const PrimaryGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group
 
   return (
     <div className={"table-grid"}>
-      <Grid
+      <Grid<R>
         {...options}
-        columnDefs={map(colDefs, (colDef: Table.Column<R, G>) => includeCellEditorParams(colDef))}
+        columnDefs={map(colDefs, (colDef: Table.Column<R>) => includeCellEditorParams(colDef))}
         getContextMenuItems={getContextMenuItems}
         rowData={table}
         getRowNodeId={(r: any) => r.id}

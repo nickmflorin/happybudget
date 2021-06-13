@@ -6,7 +6,7 @@ import { faSigma, faPercentage, faUpload, faTrashAlt } from "@fortawesome/pro-so
 import BudgetTable from "../BudgetTable";
 
 export interface GenericAccountsTableProps<
-  R extends BudgetTable.AccountRow<G>,
+  R extends BudgetTable.AccountRow,
   M extends Model.Account,
   G extends Model.Group,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
@@ -23,7 +23,7 @@ export interface GenericAccountsTableProps<
 }
 
 const GenericAccountsTable = <
-  R extends BudgetTable.AccountRow<G>,
+  R extends BudgetTable.AccountRow,
   M extends Model.Account,
   G extends Model.Group,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
@@ -51,7 +51,7 @@ const GenericAccountsTable = <
         onRowAddToGroup
       }}
       rowCanExpand={(row: R) => row.identifier !== null || row.meta.children.length !== 0}
-      actions={(params: BudgetTable.MenuActionParams<R, G>) => [
+      actions={(params: BudgetTable.MenuActionParams<R>) => [
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,

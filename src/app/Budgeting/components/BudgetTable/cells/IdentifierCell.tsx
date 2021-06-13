@@ -11,12 +11,12 @@ import ValueCell, { ValueCellProps } from "./ValueCell";
 
 import "./index.scss";
 
-interface IdentifierCellProps<R extends Table.Row<G>, G extends Model.Group = Model.Group> extends ValueCellProps<R> {
+interface IdentifierCellProps<R extends Table.Row, G extends Model.Group = Model.Group> extends ValueCellProps<R> {
   readonly onGroupEdit?: (group: G) => void;
   readonly groups: G[];
 }
 
-const IdentifierCell = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
+const IdentifierCell = <R extends Table.Row, G extends Model.Group = Model.Group>({
   onGroupEdit,
   groups,
   ...props

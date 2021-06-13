@@ -48,7 +48,7 @@ export interface AccountsServiceSet<
   getGroups: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<G>>;
 }
 
-export interface AccountsTaskSet<R extends Table.Row<G>, G extends Model.TemplateGroup | Model.BudgetGroup> {
+export interface AccountsTaskSet<R extends Table.Row> {
   addToGroup: Redux.Task<{ id: number; group: number }>;
   removeFromGroup: Redux.Task<number>;
   deleteGroup: Redux.Task<number>;
@@ -62,18 +62,18 @@ export interface AccountsTaskSet<R extends Table.Row<G>, G extends Model.Templat
 export const createAccountsTaskSet = <
   M extends Model.Template | Model.Budget,
   A extends Model.TemplateAccount | Model.BudgetAccount,
-  R extends Table.Row<G>,
+  R extends Table.Row,
   G extends Model.TemplateGroup | Model.BudgetGroup,
   P extends Http.TemplateAccountPayload | Http.BudgetAccountPayload
 >(
   /* eslint-disable indent */
   actions: AccountsTasksActionMap<A, G>,
   services: AccountsServiceSet<M, A, G, P>,
-  manager: models.RowManager<R, A, P, G>,
+  manager: models.RowManager<R, A, P>,
   selectObjId: (state: Modules.ApplicationStore) => number | null,
   selectModels: (state: Modules.ApplicationStore) => A[],
   selectAutoIndex: (state: Modules.ApplicationStore) => boolean
-): AccountsTaskSet<R, G> => {
+): AccountsTaskSet<R> => {
   function* removeFromGroupTask(action: Redux.Action<number>): SagaIterator {
     if (!isNil(action.payload)) {
       const CancelToken = axios.CancelToken;

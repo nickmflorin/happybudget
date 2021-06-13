@@ -13,7 +13,7 @@ import { floatValueSetter, integerValueSetter } from "lib/model/valueSetters";
 
 import BudgetTableComponent from "../BudgetTable";
 
-export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends Model.SubAccount, G extends Model.Group>
+export interface GenericSubAccountsTableProps<R extends Table.Row, M extends Model.SubAccount, G extends Model.Group>
   extends Omit<
     BudgetTable.Props<R, M, G, Http.SubAccountPayload>,
     "identifierField" | "identifierFieldHeader" | "groupParams" | "rowCanExpand"
@@ -37,7 +37,7 @@ export interface GenericSubAccountsTableProps<R extends Table.Row<G>, M extends 
 }
 
 const GenericSubAccountsTable = <
-  R extends BudgetTable.SubAccountRow<G>,
+  R extends BudgetTable.SubAccountRow,
   M extends Model.SubAccount,
   G extends Model.Group
 >({
@@ -78,7 +78,7 @@ const GenericSubAccountsTable = <
         onRowAddToGroup
       }}
       rowCanExpand={(row: R) => row.identifier !== null || row.meta.children.length !== 0}
-      actions={(params: BudgetTable.MenuActionParams<R, G>) => [
+      actions={(params: BudgetTable.MenuActionParams<R>) => [
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,

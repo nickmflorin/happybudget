@@ -8,7 +8,7 @@ type MapConfig<T> = {
   actionType: string;
 };
 
-interface ActionMap<R extends Table.Row<G>, G extends Model.Group = Model.Group> {
+interface ActionMap<R extends Table.Row> {
   Request: MapConfig<null>;
   RequestGroups: MapConfig<null>;
   RequestComments?: MapConfig<null>;
@@ -24,10 +24,7 @@ interface ActionMap<R extends Table.Row<G>, G extends Model.Group = Model.Group>
   AddModelToGroup: MapConfig<{ id: number; group: number }>;
 }
 
-export const createStandardSaga = <R extends Table.Row<G>, G extends Model.Group = Model.Group>(
-  map: ActionMap<R, G>,
-  ...args: (() => SagaIterator)[]
-) => {
+export const createStandardSaga = <R extends Table.Row>(map: ActionMap<R>, ...args: (() => SagaIterator)[]) => {
   function* watchForRequestModelsSaga(): SagaIterator {
     let lastTasks;
     while (true) {

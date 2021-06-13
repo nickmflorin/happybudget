@@ -8,7 +8,7 @@ import { hashString } from "lib/util";
 
 import Grid from "./Grid";
 
-const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.Group>({
+const BudgetFooterGrid = <R extends Table.Row>({
   identifierField,
   identifierValue,
   options,
@@ -17,21 +17,18 @@ const BudgetFooterGrid = <R extends Table.Row<G>, G extends Model.Group = Model.
   loadingBudget,
   sizeColumnsToFit,
   setColumnApi
-}: BudgetTable.BudgetFooterGridProps<R, G>): JSX.Element => {
+}: BudgetTable.BudgetFooterGridProps<R>): JSX.Element => {
   const rowData = useMemo((): R | null => {
     let fieldsLoading: string[] = [];
     if (loadingBudget === true) {
-      const calculatedCols: Table.Column<R, G>[] = filter(
-        columns,
-        (col: Table.Column<R, G>) => col.isCalculated === true
-      );
-      fieldsLoading = map(calculatedCols, (col: Table.Column<R, G>) => col.field) as string[];
+      const calculatedCols: Table.Column<R>[] = filter(columns, (col: Table.Column<R>) => col.isCalculated === true);
+      fieldsLoading = map(calculatedCols, (col: Table.Column<R>) => col.field) as string[];
     }
     // TODO: Loop over the colDef's after we attribute the Base Columns with isBase = true, so
     // we can weed those out here.
     return reduce(
       columns,
-      (obj: { [key: string]: any }, col: Table.Column<R, G>) => {
+      (obj: { [key: string]: any }, col: Table.Column<R>) => {
         if (!isNil(col.field)) {
           if (col.isCalculated === true) {
             if (!isNil(col.budgetTotal)) {

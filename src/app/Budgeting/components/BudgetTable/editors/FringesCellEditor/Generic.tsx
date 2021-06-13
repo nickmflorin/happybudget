@@ -7,8 +7,7 @@ import { faPlus } from "@fortawesome/pro-light-svg-icons";
 import { ExpandedModelTagsMenu } from "components/menus";
 import useModelMenuEditor from "../ModelMenuEditor";
 
-export interface FringesCellEditorProps<R extends Table.Row<G>, G extends Model.Group = Model.Group>
-  extends Table.CellEditorParams {
+export interface FringesCellEditorProps<R extends Table.Row> extends Table.CellEditorParams {
   onAddFringes: () => void;
   colId: keyof R;
   fringes: Model.Fringe[];
