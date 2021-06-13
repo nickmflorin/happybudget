@@ -69,6 +69,7 @@ const Actuals = (): JSX.Element => {
         identifierField={"account"}
         identifierFieldHeader={"Account"}
         identifierColumn={{
+          type: "singleSelect",
           minWidth: 200,
           maxWidth: 200,
           width: 200,
