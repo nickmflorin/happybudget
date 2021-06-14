@@ -8,6 +8,7 @@ import { initialModelListResponseState } from "store/initialState";
 import { ActionType } from "../../actions";
 import { initialTemplateAccountsState } from "../../initialState";
 
+// TODO: Refactor code with budget forms into common factories.
 const listResponseReducer = createModelListResponseReducer<
   Model.TemplateAccount,
   Modules.Budgeting.Template.AccountsStore
