@@ -36,6 +36,10 @@ function* watchForTableChangeSaga(): SagaIterator {
   yield takeEvery(ActionType.Template.Fringes.TableChanged, tasks.handleTableChange);
 }
 
+function* watchForBulkCreateFringesSaga(): SagaIterator {
+  yield takeEvery(ActionType.Template.Fringes.BulkCreate, tasks.bulkCreate);
+}
+
 function* watchForRequestFringesSaga(): SagaIterator {
   let lastTasks;
   while (true) {
@@ -51,4 +55,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRemoveFringeSaga);
   yield spawn(watchForTableChangeSaga);
   yield spawn(watchForRequestFringesSaga);
+  yield spawn(watchForBulkCreateFringesSaga);
 }

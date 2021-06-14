@@ -42,6 +42,7 @@ export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
 
 export interface FringeTaskSet {
   getFringes: Redux.Task<null>;
+  bulkCreate: Redux.Task<number>;
   handleRemoval: Redux.Task<number>;
   handleTableChange: Redux.Task<Table.Change<BudgetTable.FringeRow>>;
 }
@@ -204,6 +205,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
 
   return {
     getFringes: getFringesTask,
+    bulkCreate: bulkCreateTask,
     handleRemoval: handleRemovalTask,
     handleTableChange: handleTableChangeTask
   };
