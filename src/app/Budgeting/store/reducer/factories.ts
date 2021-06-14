@@ -29,7 +29,7 @@ interface SubAccountsFringesActionMap {
   UpdateInState: string;
 }
 
-export interface TemplateSubAccountsReducerFactoryActionMap {
+interface SubAccountsReducerFactoryActionMap {
   Response: string;
   Request: string;
   Loading: string;
@@ -49,26 +49,72 @@ export interface TemplateSubAccountsReducerFactoryActionMap {
   Fringes: SubAccountsFringesActionMap;
 }
 
-export interface BudgetSubAccountsReducerFactoryActionMap {
-  Response: string;
-  Request: string;
-  Loading: string;
-  SetSearch: string;
-  UpdateInState: string;
-  RemoveFromState: string;
-  AddToState: string;
-  Select: string;
-  Deselect: string;
-  SelectAll: string;
-  RemoveFromGroup: string;
-  AddToGroup: string;
-  Creating: string;
-  Updating: string;
-  Deleting: string;
-  Groups: SubAccountsGroupsActionMap;
+export interface TemplateSubAccountsReducerFactoryActionMap extends SubAccountsReducerFactoryActionMap {}
+
+export interface BudgetSubAccountsReducerFactoryActionMap extends SubAccountsReducerFactoryActionMap {
   History: SubAccountsHistoryActionMap;
-  Fringes: SubAccountsFringesActionMap;
 }
+
+const recalculateGroupMetrics = <
+  G extends Model.BudgetGroup | Model.TemplateGroup,
+  SA extends Model.BudgetSubAccount | Model.TemplateSubAccount = G extends Model.BudgetGroup
+    ? Model.BudgetSubAccount
+    : Model.TemplateSubAccount,
+  S extends Modules.Budgeting.SubAccountsStore<any, any> = G extends Model.BudgetGroup
+    ? Modules.Budgeting.Budget.SubAccountsStore
+    : Modules.Budgeting.Template.SubAccountsStore
+>(
+  /* eslint-disable indent */
+  action: Redux.Action<any>,
+  st: S,
+  groupId: number
+): S => {
+  // This might not be totally necessary, but it is good practice to not use the entire payload
+  // to update the group (since that is already done by the reducer above) but to instead just
+  // update the parts of the relevant parts of the current group in state (estimated, variance,
+  // actual).
+  const group = find(st.groups.data, { id: groupId });
+  if (isNil(group)) {
+    warnInconsistentState({
+      action: action.type,
+      reason: "Group does not exist in state when it is expected to.",
+      id: groupId
+    });
+    return st;
+  }
+  const subAccounts = filter(
+    map(group.children, (id: number) => {
+      const subAccount = find(st.data, { id });
+      if (!isNil(subAccount)) {
+        return subAccount;
+      } else {
+        warnInconsistentState({
+          action: action.type,
+          reason: "Group child sub-account does not exist in state when it is expected to.",
+          id: id,
+          groupId: group.id
+        });
+        return null;
+      }
+    }),
+    (child: SA | null) => child !== null
+  ) as SA[];
+  let payload: any = {
+    estimated: reduce(subAccounts, (sum: number, s: SA) => sum + (s.estimated || 0), 0)
+  };
+  if (typeguards.isBudgetGroup(group)) {
+    const budgetSubAccounts = subAccounts as Model.BudgetSubAccount[];
+    const actual = reduce(budgetSubAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.actual || 0), 0);
+    payload = { ...payload, actual, variance: payload.estimated - actual };
+  }
+  return {
+    ...st,
+    groups: {
+      ...st.groups,
+      data: replaceInArray<G>(st.groups.data, { id: group.id }, { ...group, ...payload })
+    }
+  };
+};
 
 const recalculateSubAccountFromFringes = <
   D extends Modules.Budgeting.BudgetDirective,
@@ -80,6 +126,7 @@ const recalculateSubAccountFromFringes = <
     : Modules.Budgeting.Template.SubAccountsStore
 >(
   /* eslint-disable indent */
+  action: Redux.Action<any>,
   st: S,
   subAccount: SA
 ): SA => {
@@ -90,12 +137,12 @@ const recalculateSubAccountFromFringes = <
         if (!isNil(fringe)) {
           return fringe;
         } else {
-          /* eslint-disable no-console */
-          console.error(
-            `Inconsistent State! Inconsistent state noticed when updating sub-account in state...
-          The fringe ${id} for sub-account ${subAccount.id} does not exist in state when it
-          is expected to.`
-          );
+          warnInconsistentState({
+            action: action.type,
+            reason: "Fringe for sub-account does not exist in state when it is expected to.",
+            id: id,
+            subaccountId: subAccount.id
+          });
           return null;
         }
       }),
@@ -117,6 +164,7 @@ const recalculateSubAccountMetrics = <
     : Modules.Budgeting.Template.SubAccountsStore
 >(
   /* eslint-disable indent */
+  action: Redux.Action<any>,
   st: S,
   sub: number | SA
 ): S => {
@@ -124,11 +172,11 @@ const recalculateSubAccountMetrics = <
   if (typeof sub === "number") {
     const foundSubAccount: SA | null = find(st.data, { id: sub }) || null;
     if (isNil(foundSubAccount)) {
-      /* eslint-disable no-console */
-      console.error(
-        `Inconsistent State: Inconsistent state noticed when updating sub account in state. The
-          sub account with ID ${sub} does not exist in state when it is expected to.`
-      );
+      warnInconsistentState({
+        action: action.type,
+        reason: "Sub-account does not exist in state when it is expected to.",
+        id: sub
+      });
       return st;
     }
     subAccount = foundSubAccount;
@@ -150,7 +198,7 @@ const recalculateSubAccountMetrics = <
       }
     }
     subAccount = { ...subAccount, ...payload };
-    subAccount = recalculateSubAccountFromFringes<D, SA, S>(st, subAccount);
+    subAccount = recalculateSubAccountFromFringes<D, SA, S>(action, st, subAccount);
 
     return {
       ...st,
@@ -202,44 +250,6 @@ export const createTemplateSubAccountsReducer = (
     }
   );
 
-  const recalculateGroupMetrics = (
-    st: Modules.Budgeting.Template.SubAccountsStore,
-    groupId: number
-  ): Modules.Budgeting.Template.SubAccountsStore => {
-    // This might not be totally necessary, but it is good practice to not use the entire payload
-    // to update the group (since that is already done by the reducer above) but to instead just
-    // update the parts of the relevant parts of the current group in state (estimated, variance,
-    // actual).
-    const group = find(st.groups.data, { id: groupId });
-    if (isNil(group)) {
-      throw new Error(`The group with ID ${groupId} no longer exists in state!`);
-    }
-    const subAccounts = filter(
-      map(group.children, (id: number) => {
-        const subAccount = find(st.data, { id });
-        if (!isNil(subAccount)) {
-          return subAccount;
-        } else {
-          /* eslint-disable no-console */
-          console.error(
-            `Inconsistent State: Inconsistent state noticed when updating group in state.  Group child
-            with ID ${id} does not exist in state when it is expected to.`
-          );
-          return null;
-        }
-      }),
-      (child: Model.TemplateSubAccount | null) => child !== null
-    ) as Model.TemplateSubAccount[];
-    const estimated = reduce(subAccounts, (sum: number, s: Model.TemplateSubAccount) => sum + (s.estimated || 0), 0);
-    return {
-      ...st,
-      groups: {
-        ...st.groups,
-        data: replaceInArray<Model.TemplateGroup>(st.groups.data, { id: group.id }, { ...group, ...{ estimated } })
-      }
-    };
-  };
-
   return (
     state: Modules.Budgeting.Template.SubAccountsStore = initialTemplateSubAccountsState,
     action: Redux.Action<any>
@@ -250,7 +260,7 @@ export const createTemplateSubAccountsReducer = (
 
     if (action.type === mapping.Groups.UpdateInState) {
       const group: Model.BudgetGroup = action.payload;
-      newState = recalculateGroupMetrics(newState, group.id);
+      newState = recalculateGroupMetrics<Model.TemplateGroup>(action, newState, group.id);
     } else if (action.type === mapping.Groups.AddToState) {
       const group: Model.BudgetGroup = action.payload;
       forEach(group.children, (simpleSubAccount: number) => {
@@ -296,9 +306,9 @@ export const createTemplateSubAccountsReducer = (
       });
     } else if (action.type === mapping.UpdateInState) {
       const subAccount: Model.TemplateSubAccount = action.payload;
-      newState = recalculateSubAccountMetrics<"Template">(newState, subAccount.id);
+      newState = recalculateSubAccountMetrics<"Template">(action, newState, subAccount.id);
       if (!isNil(subAccount.group)) {
-        newState = recalculateGroupMetrics(newState, subAccount.group);
+        newState = recalculateGroupMetrics<Model.TemplateGroup>(action, newState, subAccount.group);
       }
     } else if (action.type === mapping.Fringes.UpdateInState) {
       // Since the Fringes are displayed in a modal and not on a separate page, when a Fringe is
@@ -320,7 +330,7 @@ export const createTemplateSubAccountsReducer = (
           // the value, because the current estimated value on the SubAccount already has fringes
           // applied, and there is no way to refringe an already fringed value if we do not know
           // what the previous fringes were.
-          newState = recalculateSubAccountMetrics<"Template">(newState, subAccountsWithFringe[i]);
+          newState = recalculateSubAccountMetrics<"Template">(action, newState, subAccountsWithFringe[i]);
         }
       }
     } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
@@ -351,7 +361,7 @@ export const createTemplateSubAccountsReducer = (
             )
           }
         };
-        newState = recalculateGroupMetrics(newState, group.id);
+        newState = recalculateGroupMetrics<Model.TemplateGroup>(action, newState, group.id);
       }
     } else if (action.type === mapping.AddToGroup) {
       const group: Model.TemplateGroup | undefined = find(newState.groups.data, { id: action.payload.group });
@@ -376,7 +386,7 @@ export const createTemplateSubAccountsReducer = (
             )
           }
         };
-        newState = recalculateGroupMetrics(newState, group.id);
+        newState = recalculateGroupMetrics<Model.TemplateGroup>(action, newState, group.id);
       }
     }
     return newState;
@@ -427,49 +437,6 @@ export const createBudgetSubAccountsReducer = (
     }
   );
 
-  const recalculateGroupMetrics = (
-    st: Modules.Budgeting.Budget.SubAccountsStore,
-    groupId: number
-  ): Modules.Budgeting.Budget.SubAccountsStore => {
-    // This might not be totally necessary, but it is good practice to not use the entire payload
-    // to update the group (since that is already done by the reducer above) but to instead just
-    // update the parts of the relevant parts of the current group in state (estimated, variance,
-    // actual).
-    const group = find(st.groups.data, { id: groupId });
-    if (isNil(group)) {
-      throw new Error(`The group with ID ${groupId} no longer exists in state!`);
-    }
-    const subAccounts = filter(
-      map(group.children, (id: number) => {
-        const subAccount = find(st.data, { id });
-        if (!isNil(subAccount)) {
-          return subAccount;
-        } else {
-          /* eslint-disable no-console */
-          console.error(
-            `Inconsistent State: Inconsistent state noticed when updating group in state.  Group child
-        with ID ${id} does not exist in state when it is expected to.`
-          );
-          return null;
-        }
-      }),
-      (child: Model.BudgetSubAccount | null) => child !== null
-    ) as Model.BudgetSubAccount[];
-    const actual = reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.actual || 0), 0);
-    const estimated = reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0);
-    return {
-      ...st,
-      groups: {
-        ...st.groups,
-        data: replaceInArray<Model.BudgetGroup>(
-          st.groups.data,
-          { id: group.id },
-          { ...group, ...{ estimated, actual, variance: estimated - actual } }
-        )
-      }
-    };
-  };
-
   return (
     state: Modules.Budgeting.Budget.SubAccountsStore = initialBudgetSubAccountsState,
     action: Redux.Action<any>
@@ -480,7 +447,7 @@ export const createBudgetSubAccountsReducer = (
 
     if (action.type === mapping.Groups.UpdateInState) {
       const group: Model.BudgetGroup = action.payload;
-      newState = recalculateGroupMetrics(newState, group.id);
+      newState = recalculateGroupMetrics<Model.BudgetGroup>(action, newState, group.id);
     } else if (action.type === mapping.Groups.AddToState) {
       const group: Model.BudgetGroup = action.payload;
       forEach(group.children, (simpleSubAccount: number) => {
@@ -526,9 +493,9 @@ export const createBudgetSubAccountsReducer = (
       });
     } else if (action.type === mapping.UpdateInState) {
       const subAccount: Model.BudgetSubAccount = action.payload;
-      newState = recalculateSubAccountMetrics<"Budget">(newState, subAccount.id);
+      newState = recalculateSubAccountMetrics<"Budget">(action, newState, subAccount.id);
       if (!isNil(subAccount.group)) {
-        newState = recalculateGroupMetrics(newState, subAccount.group);
+        newState = recalculateGroupMetrics<Model.BudgetGroup>(action, newState, subAccount.group);
       }
     } else if (action.type === mapping.Fringes.UpdateInState) {
       // Since the Fringes are displayed in a modal and not on a separate page, when a Fringe is
@@ -550,7 +517,7 @@ export const createBudgetSubAccountsReducer = (
           // the value, because the current estimated value on the SubAccount already has fringes
           // applied, and there is no way to refringe an already fringed value if we do not know
           // what the previous fringes were.
-          newState = recalculateSubAccountMetrics<"Budget">(newState, subAccountsWithFringe[i]);
+          newState = recalculateSubAccountMetrics<"Budget">(action, newState, subAccountsWithFringe[i]);
         }
       }
     } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
@@ -578,7 +545,7 @@ export const createBudgetSubAccountsReducer = (
             )
           }
         };
-        newState = recalculateGroupMetrics(newState, group.id);
+        newState = recalculateGroupMetrics<Model.BudgetGroup>(action, newState, group.id);
       }
     } else if (action.type === mapping.AddToGroup) {
       const group: Model.BudgetGroup | undefined = find(newState.groups.data, { id: action.payload.group });
@@ -603,7 +570,7 @@ export const createBudgetSubAccountsReducer = (
             )
           }
         };
-        newState = recalculateGroupMetrics(newState, group.id);
+        newState = recalculateGroupMetrics<Model.BudgetGroup>(action, newState, group.id);
       }
     }
     return newState;

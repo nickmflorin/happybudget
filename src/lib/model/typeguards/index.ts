@@ -40,6 +40,10 @@ export const isBudgetSubAccount = (
   return Object.prototype.hasOwnProperty.call(obj, "variance") && Object.prototype.hasOwnProperty.call(obj, "actual");
 };
 
+export const isBudgetGroup = (obj: Model.BudgetGroup | Model.TemplateGroup): obj is Model.BudgetGroup => {
+  return Object.prototype.hasOwnProperty.call(obj, "variance") && Object.prototype.hasOwnProperty.call(obj, "actual");
+};
+
 export const isModelWithColor = (model: Model.Model | Model.ModelWithColor): model is Model.ModelWithColor => {
   return (model as Model.ModelWithColor).color !== undefined;
 };
