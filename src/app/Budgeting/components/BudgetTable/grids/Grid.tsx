@@ -10,7 +10,7 @@ import { toAgGridColDef } from "lib/model/util";
 import FrameworkComponents from "./FrameworkComponents";
 
 const Grid = <R extends Table.Row = Table.Row>({
-  columnDefs,
+  columns,
   frameworkComponents,
   ...options
 }: BudgetTable.GridProps<R>): JSX.Element => {
@@ -31,9 +31,9 @@ const Grid = <R extends Table.Row = Table.Row>({
       {...options}
       // Required to get processCellFromClipboard to work with column spanning.
       suppressCopyRowsToClipboard={true}
-      columnDefs={map(columnDefs, (colDef: Table.Column<R>) => {
-        let original: ColDef = toAgGridColDef<R>(colDef);
-        original = { ...original, headerComponentParams: { ...colDef.headerComponentParams, colDef } };
+      columnDefs={map(columns, (col: Table.Column<R>) => {
+        let original: ColDef = toAgGridColDef<R>(col);
+        original = { ...original, headerComponentParams: { ...col.headerComponentParams, column: col } };
         return original;
       })}
       debug={process.env.NODE_ENV === "development" && TABLE_DEBUG}

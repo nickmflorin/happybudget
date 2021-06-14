@@ -152,7 +152,6 @@ const Actuals = (): JSX.Element => {
             cellRenderer: "PaymentMethodCell",
             flex: 1,
             cellEditor: "PaymentMethodCellEditor",
-            clearBeforeEdit: true,
             type: "singleSelect",
             // Required to allow the dropdown to be selectable on Enter key.
             suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {

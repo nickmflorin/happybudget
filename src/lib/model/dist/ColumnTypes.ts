@@ -26,7 +26,8 @@ const ColumnTypes: Table.ColumnType[] = [
   {
     id: "singleSelect",
     icon: faCaretCircleDown,
-    align: "left"
+    align: "left",
+    editorIsPopup: true
   },
   {
     id: "contact",

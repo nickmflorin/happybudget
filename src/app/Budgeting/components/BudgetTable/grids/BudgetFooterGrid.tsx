@@ -13,7 +13,6 @@ const BudgetFooterGrid = <R extends Table.Row>({
   identifierValue,
   options,
   columns,
-  colDefs,
   loadingBudget,
   sizeColumnsToFit,
   setColumnApi
@@ -27,7 +26,7 @@ const BudgetFooterGrid = <R extends Table.Row>({
     // TODO: Loop over the colDef's after we attribute the Base Columns with isBase = true, so
     // we can weed those out here.
     return reduce(
-      columns,
+      filter(columns, (col: Table.Column<R>) => col.field !== identifierField),
       (obj: { [key: string]: any }, col: Table.Column<R>) => {
         if (!isNil(col.field)) {
           if (col.isCalculated === true) {
@@ -72,7 +71,7 @@ const BudgetFooterGrid = <R extends Table.Row>({
     <div className={"budget-footer-grid"}>
       <Grid
         {...options}
-        columnDefs={colDefs}
+        columns={columns}
         rowData={[rowData]}
         rowClass={"row--budget-footer"}
         onGridReady={onGridReady}

@@ -48,6 +48,22 @@ namespace Table {
     readonly id: ColumnTypeId;
     readonly align?: ColumnAlignment;
     readonly icon?: any;
+    readonly editorIsPopup?: boolean;
+  }
+
+  interface Column<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
+    readonly type: ColumnTypeId;
+    readonly nullValue?: null | "" | 0 | [];
+    readonly field: keyof R & string;
+    readonly isCalculated?: boolean;
+    readonly budgetTotal?: number;
+    readonly tableTotal?: number;
+    readonly excludeFromExport?: boolean;
+    // When exporting, the default will be to use the processCellForClipboard unless
+    // processCellForExport is also provided.
+    readonly processCellForExport?: (row: R) => string;
+    readonly processCellForClipboard?: (row: R) => string;
+    readonly processCellFromClipboard?: (value: string) => any;
   }
 
   type CellChange<R extends Table.Row, V = R[keyof R]> = {
@@ -118,25 +134,6 @@ namespace Table {
     // to handle that ourselves so we can trigger different behaviors depending on
     // how the selection was performed.
     readonly onDoneEditing: (e: Table.CellDoneEditingEvent) => void;
-  }
-
-  interface Column<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
-    readonly type: ColumnTypeId;
-    readonly nullValue?: null | "" | 0 | [];
-    // If true, a Backspace/Delete will cause the cell to clear before going into edit mode.  This
-    // is particularly useful for Dropdowns rendered via a custom Cell Editor (Popup) where we need
-    // to trigger a cell clear without showing the dropdown.
-    readonly clearBeforeEdit?: boolean;
-    readonly field: keyof R & string;
-    readonly isCalculated?: boolean;
-    readonly budgetTotal?: number;
-    readonly tableTotal?: number;
-    readonly excludeFromExport?: boolean;
-    // When exporting, the default will be to use the processCellForClipboard unless
-    // processCellForExport is also provided.
-    readonly processCellForExport?: (row: R) => string;
-    readonly processCellForClipboard?: (row: R) => string;
-    readonly processCellFromClipboard?: (value: string) => any;
   }
 
   type DataObjType<R extends Table.Row, M extends Model.Model> = R | M | Table.RowChange<R> | Table.RowChangeData<R>;
@@ -350,14 +347,12 @@ namespace BudgetTable {
       import("@ag-grid-community/react").AGGridReactProps,
       "columnDefs" | "overlayNoRowsTemplate" | "overlayLoadingTemplate" | "modules" | "debug"
     > {
-    readonly columnDefs: Table.Column<R>[];
+    readonly columns: Table.Column<R>[];
   }
 
   interface BudgetFooterGridProps<R extends Table.Row> {
     readonly options: GridOptions;
-    // TODO: Refactor so we only have to provide one of these.
     readonly columns: Table.Column<R>[];
-    readonly colDefs: Table.Column<R>[];
     readonly identifierField: string;
     readonly identifierValue?: string | null;
     readonly loadingBudget?: boolean | undefined;
@@ -367,9 +362,7 @@ namespace BudgetTable {
 
   interface TableFooterGridProps<R extends Table.Row> {
     readonly options: import("@ag-grid-community/core").GridOptions;
-    // TODO: Refactor so we only have to provide one of these.
     readonly columns: Table.Column<R>[];
-    readonly colDefs: Table.Column<R>[];
     readonly identifierField: string;
     readonly identifierValue?: string | null;
     readonly sizeColumnsToFit?: boolean | undefined;
@@ -384,6 +377,7 @@ namespace BudgetTable {
     readonly sizeColumnsToFit?: boolean | undefined;
     readonly search?: string;
     readonly identifierField: string;
+    readonly columns: Table.Column<R>[];
     readonly onTableChange: (payload: Table.Change<R>) => void;
     readonly onRowAdd: () => void;
     readonly onRowDelete: (row: R) => void;
@@ -400,7 +394,6 @@ namespace BudgetTable {
     readonly columnApi: import("@ag-grid-community/core").ColumnApi | undefined;
     readonly table: R[];
     readonly options: import("@ag-grid-community/core").GridOptions;
-    readonly colDefs: Table.Column<R>[];
     readonly onCellValueChanged: (params: Table.CellValueChangedParams<R>) => void;
     readonly setAllSelected: (value: boolean) => void;
     readonly isCellEditable: (row: R, colDef: Table.Column<R>) => boolean;
@@ -422,7 +415,6 @@ namespace BudgetTable {
       >,
       BudgetTable.PrimaryGridPassThroughProps<R, G>,
       StandardComponentProps {
-    readonly columns: Table.Column<R>[];
     readonly data: M[];
     readonly selected?: number[];
     readonly identifierFieldHeader: string;

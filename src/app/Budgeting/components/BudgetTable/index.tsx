@@ -85,7 +85,7 @@ const BudgetTable = <
   const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
-  const [colDefs, setColDefs] = useState<Table.Column<R>[]>([]);
+  const [cols, setCols] = useState<Table.Column<R>[]>([]);
   const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [gridOptions, setGridOptions] = useState<GridOptions>({
@@ -326,14 +326,14 @@ const BudgetTable = <
   );
 
   const baseColumns = useMemo((): Table.Column<R>[] => {
-    let baseLeftColumns: Table.Column<R>[] = [IndexColumn({})];
+    let base: Table.Column<R>[] = [IndexColumn({})];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
-      baseLeftColumns.push(ExpandColumn({}));
+      base.push(ExpandColumn({}));
     }
-    baseLeftColumns.push(IdentifierColumn({}));
-    return baseLeftColumns;
+    base.push(IdentifierColumn({}));
+    return base;
   }, [onRowExpand]);
 
   useEffect(() => {
@@ -360,7 +360,7 @@ const BudgetTable = <
   }, [useDeepEqualMemo(cookies)]);
 
   useEffect(() => {
-    const cols = concat(
+    const cs = concat(
       baseColumns,
       map(
         filter(columns, (col: Table.Column<R>) => !(col.isCalculated === true)),
@@ -371,9 +371,9 @@ const BudgetTable = <
         (def: Table.Column<R>) => CalculatedColumn(def)
       )
     );
-    setColDefs(
-      map(cols, (col: Table.Column<R>, index: number) => {
-        if (index === cols.length - 1) {
+    setCols(
+      map(cs, (col: Table.Column<R>, index: number) => {
+        if (index === cs.length - 1) {
           return UniversalColumn({ ...col, resizable: false });
         }
         return UniversalColumn(col);
@@ -470,15 +470,15 @@ const BudgetTable = <
   const processCellForClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
-      const customColDef: Table.Column<R> | undefined = find(colDefs, { field: colDef.field } as any);
-      if (!isNil(customColDef)) {
-        const processor = customColDef.processCellForClipboard;
+      const customCol: Table.Column<R> | undefined = find(cols, { field: colDef.field } as any);
+      if (!isNil(customCol)) {
+        const processor = customCol.processCellForClipboard;
         if (!isNil(processor)) {
           return processor(row);
         } else {
-          value = value === undefined ? getKeyValue<R, keyof R>(customColDef.field)(row) : value;
+          value = value === undefined ? getKeyValue<R, keyof R>(customCol.field)(row) : value;
           // The value should never be undefined at this point.
-          if (value === customColDef.nullValue) {
+          if (value === customCol.nullValue) {
             return "";
           }
           return value;
@@ -491,9 +491,9 @@ const BudgetTable = <
   const processCellForExport = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
-      const customColDef: Table.Column<R> | undefined = find(colDefs, { field: colDef.field } as any);
-      if (!isNil(customColDef)) {
-        const processor = customColDef.processCellForExport;
+      const customCol: Table.Column<R> | undefined = find(cols, { field: colDef.field } as any);
+      if (!isNil(customCol)) {
+        const processor = customCol.processCellForExport;
         if (!isNil(processor)) {
           return processor(row);
         } else {
@@ -507,16 +507,16 @@ const BudgetTable = <
   const processCellFromClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
-      const customColDef: Table.Column<R> | undefined = find(colDefs, { field: colDef.field } as any);
-      if (!isNil(customColDef)) {
-        const processor = customColDef.processCellFromClipboard;
+      const customCol: Table.Column<R> | undefined = find(cols, { field: colDef.field } as any);
+      if (!isNil(customCol)) {
+        const processor = customCol.processCellFromClipboard;
         if (!isNil(processor)) {
           return processor(value);
         } else {
-          value = value === undefined ? getKeyValue<R, keyof R>(customColDef.field)(row) : value;
+          value = value === undefined ? getKeyValue<R, keyof R>(customCol.field)(row) : value;
           // The value should never be undefined at this point.
           if (typeof value === "string" && String(value).trim() === "") {
-            return !isNil(customColDef.nullValue) ? customColDef.nullValue : null;
+            return !isNil(customCol.nullValue) ? customCol.nullValue : null;
           }
           return value;
         }
@@ -563,24 +563,24 @@ const BudgetTable = <
             const includeColumn = (col: Column): boolean => {
               const colDef = col.getColDef();
               if (!isNil(colDef.field)) {
-                const customColDef: Table.Column<R> | undefined = find(colDefs, {
+                const customCol: Table.Column<R> | undefined = find(cols, {
                   field: colDef.field
                 } as any);
-                if (!isNil(customColDef)) {
+                if (!isNil(customCol)) {
                   return (
-                    customColDef.excludeFromExport !== true &&
+                    customCol.excludeFromExport !== true &&
                     includes(
                       map(fields, (field: Field) => field.id),
-                      customColDef.field
+                      customCol.field
                     )
                   );
                 }
               }
               return false;
             };
-            const cols = filter(columnApi.getAllColumns(), (col: Column) => includeColumn(col));
+            const cs = filter(columnApi.getAllColumns(), (col: Column) => includeColumn(col));
             const headerRow: CSVRow = [];
-            forEach(cols, (col: Column) => {
+            forEach(cs, (col: Column) => {
               const colDef = col.getColDef();
               if (!isNil(colDef.field)) {
                 headerRow.push(colDef.headerName);
@@ -589,7 +589,7 @@ const BudgetTable = <
             const csvData: CSVData = [headerRow];
             gridApi.forEachNode((node: RowNode, index: number) => {
               const row: CSVRow = [];
-              forEach(cols, (col: Column) => {
+              forEach(cs, (col: Column) => {
                 if (!isNil(node.data)) {
                   row.push(processCellForExport(col, node.data as R));
                 } else {
@@ -631,7 +631,7 @@ const BudgetTable = <
             columnApi={columnApi}
             identifierField={identifierField}
             table={table}
-            colDefs={colDefs}
+            columns={cols}
             options={gridOptions}
             groups={groups}
             groupParams={groupParams}
@@ -654,8 +654,7 @@ const BudgetTable = <
           />
           <TableFooterGrid<R>
             options={tableFooterGridOptions}
-            colDefs={colDefs}
-            columns={columns}
+            columns={cols}
             sizeColumnsToFit={sizeColumnsToFit}
             identifierField={identifierField}
             identifierValue={tableFooterIdentifierValue}
@@ -665,8 +664,7 @@ const BudgetTable = <
             0 && (
             <BudgetFooterGrid<R>
               options={budgetFooterGridOptions}
-              colDefs={colDefs}
-              columns={columns}
+              columns={cols}
               sizeColumnsToFit={sizeColumnsToFit}
               identifierField={identifierField}
               identifierValue={budgetFooterIdentifierValue}

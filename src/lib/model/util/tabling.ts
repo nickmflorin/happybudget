@@ -7,7 +7,6 @@ import { tableChangeIsCellChange, tableChangeIsRowChange } from "../typeguards/t
 export const toAgGridColDef = <R extends Table.Row = Table.Row>(colDef: Table.Column<R>): ColDef => {
   const {
     nullValue,
-    clearBeforeEdit,
     isCalculated,
     budgetTotal,
     tableTotal,

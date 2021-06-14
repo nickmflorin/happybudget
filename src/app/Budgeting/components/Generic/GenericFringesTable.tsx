@@ -83,7 +83,6 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
           cellRenderer: "FringeUnitCell",
           width: 100,
           cellEditor: "FringeUnitCellEditor",
-          clearBeforeEdit: true,
           type: "singleSelect",
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {

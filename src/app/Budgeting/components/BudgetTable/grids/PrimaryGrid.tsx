@@ -31,6 +31,7 @@ import {
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
+import * as models from "lib/model";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { isKeyboardEvent } from "lib/model/typeguards";
 import { rangeSelectionIsSingleCell } from "../util";
@@ -43,7 +44,7 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
   table,
   groups = [],
   options,
-  colDefs,
+  columns,
   groupParams,
   frameworkComponents,
   search,
@@ -241,9 +242,9 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
               return { ...nextCellPosition, column: identifierCol };
             }
           } else {
-            const columns = columnApi.getAllColumns();
-            if (!isNil(columns)) {
-              return { ...nextCellPosition, column: columns[columns.length - 1] };
+            const agColumns = columnApi.getAllColumns();
+            if (!isNil(agColumns)) {
+              return { ...nextCellPosition, column: agColumns[agColumns.length - 1] };
             }
           }
         }
@@ -274,14 +275,14 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
 
   const moveToNextColumn = useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
     if (!isNil(api) && !isNil(columnApi)) {
-      const columns = columnApi.getAllColumns();
-      if (!isNil(columns)) {
-        const index = columns.indexOf(loc.column);
+      const agColumns = columnApi.getAllColumns();
+      if (!isNil(agColumns)) {
+        const index = agColumns.indexOf(loc.column);
         if (index !== -1) {
-          if (index === columns.length - 1) {
-            moveToNextRow({ rowIndex: loc.rowIndex, column: columns[0] }, opts);
+          if (index === agColumns.length - 1) {
+            moveToNextRow({ rowIndex: loc.rowIndex, column: agColumns[0] }, opts);
           } else {
-            moveToLocation({ rowIndex: loc.rowIndex, column: columns[index + 1] }, opts);
+            moveToLocation({ rowIndex: loc.rowIndex, column: agColumns[index + 1] }, opts);
           }
         }
       }
@@ -306,9 +307,9 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
       const node = local.getDisplayedRowAtIndex(focusedCell.rowIndex);
       if (!isNil(node)) {
         const row: R = node.data;
-        const customColDef = find(colDefs, (def: Table.Column<R>) => def.field === focusedCell.column.getColId());
-        if (!isNil(customColDef)) {
-          const change = getCellChangeForClear(row, customColDef);
+        const customCol = find(columns, (def: Table.Column<R>) => def.field === focusedCell.column.getColId());
+        if (!isNil(customCol)) {
+          const change = getCellChangeForClear(row, customCol);
           local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
           if (!isNil(change)) {
             setCutCellChange(change);
@@ -385,9 +386,9 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
             const row: R = node.data;
             /* eslint-disable no-loop-func */
             forEach(colIds, (colId: keyof R) => {
-              const customColDef = find(colDefs, { field: colId } as any);
-              if (!isNil(customColDef) && isCellEditable(row, customColDef)) {
-                const change = getCellChangeForClear(row, customColDef);
+              const customCol = find(columns, { field: colId } as any);
+              if (!isNil(customCol) && isCellEditable(row, customCol)) {
+                const change = getCellChangeForClear(row, customCol);
                 if (!isNil(change)) {
                   changes.push(change);
                 }
@@ -406,9 +407,9 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     const field = event.column.getColId() as keyof R;
     // AG Grid treats cell values as undefined when they are cleared via edit,
     // so we need to translate that back into a null representation.
-    const customColDef: Table.Column<R> | undefined = find(colDefs, { field } as any);
-    if (!isNil(customColDef)) {
-      const nullValue = customColDef.nullValue === undefined ? null : customColDef.nullValue;
+    const customCol: Table.Column<R> | undefined = find(columns, { field } as any);
+    if (!isNil(customCol)) {
+      const nullValue = customCol.nullValue === undefined ? null : customCol.nullValue;
       const oldValue = event.oldValue === undefined ? nullValue : event.oldValue;
       const newValue = event.newValue === undefined ? nullValue : event.newValue;
       if (oldValue !== newValue) {
@@ -550,27 +551,30 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
   });
 
   const suppressKeyboardEvent = useDynamicCallback((params: SuppressKeyboardEventParams) => {
-    // Suppress Backspace/Delete events when multiple cells are selected in a range.
     if (!isNil(params.api) && !params.editing && includes(["Backspace", "Delete"], params.event.code)) {
+      // Suppress Backspace/Delete events when multiple cells are selected in a range.
       const ranges = params.api.getCellRanges();
       if (!isNil(ranges) && (ranges.length !== 1 || !rangeSelectionIsSingleCell(ranges[0]))) {
         clearCellsOverRange(ranges, params.api);
         return true;
       } else {
+        // For custom Cell Editor(s) with a Pop-Up, we do not want Backspace/Delete to go into
+        // edit mode but instead want to clear the values of the cells - so we prevent those key
+        // presses from triggering edit mode in the Cell Editor and clear the value at this level.
         const column = params.column;
-        const customColDef = find(colDefs, (def: Table.Column<R>) => def.field === column.getColId());
-        if (!isNil(customColDef)) {
-          // Note:  This is a work around for not being able to clear the values of cells without going
-          // into edit mode.  For custom Cell Editor(s) with a Pop-Up, we don't want to open the Pop-Up
-          // everytime we click Backspace/Delete - so we prevent those key presses from triggering
-          // edit mode in the Cell Editor and clear the value at this level.
-          if (customColDef.clearBeforeEdit === true) {
-            const row: R = params.node.data;
-            clearCell(row, customColDef);
-            return true;
-          } else {
-            return false;
+        const customCol = find(columns, (def: Table.Column<R>) => def.field === column.getColId());
+        if (!isNil(customCol)) {
+          const columnType: Table.ColumnType | undefined = find(models.ColumnTypes, { id: customCol.type });
+          if (!isNil(columnType)) {
+            if (columnType.editorIsPopup === true) {
+              const row: R = params.node.data;
+              clearCell(row, customCol);
+              return true;
+            } else {
+              return false;
+            }
           }
+          return false;
         } else {
           return false;
         }
@@ -683,10 +687,6 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     }
   }, [api]);
 
-  const includeCellEditorParams = (def: Table.Column<R>): Table.Column<R> => {
-    return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
-  };
-
   const _processCellFromClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
     if (!isNil(params.node)) {
       const node: RowNode = params.node;
@@ -699,11 +699,15 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     }
   });
 
+  const includeCellEditorParams = (def: Table.Column<R>): Table.Column<R> => {
+    return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
+  };
+
   return (
     <div className={"table-grid"}>
       <Grid<R>
         {...options}
-        columnDefs={map(colDefs, (colDef: Table.Column<R>) => includeCellEditorParams(colDef))}
+        columns={map(columns, (col: Table.Column<R>) => includeCellEditorParams(col))}
         getContextMenuItems={getContextMenuItems}
         rowData={table}
         getRowNodeId={(r: any) => r.id}

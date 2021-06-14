@@ -111,10 +111,9 @@ export const TemplateSubAccountRowManager = new RowManager<
 export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actual, Http.ActualPayload>({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
-    // TODO: Eventually, we need to allow this to be null.
     WriteOnly({
       field: "object_id",
-      required: true,
+      allowNull: true,
       getValueFromRow: (row: BudgetTable.ActualRow) => {
         if (!isNil(row.account)) {
           return row.account.id;
@@ -138,10 +137,9 @@ export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actu
         return undefined;
       }
     }),
-    // TODO: Eventually, we need to allow this to be null.
     WriteOnly({
       field: "parent_type",
-      required: true,
+      allowNull: true,
       getValueFromRow: (row: BudgetTable.ActualRow) => {
         if (!isNil(row.account)) {
           return row.account.type;
@@ -189,7 +187,7 @@ export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actu
 
 export const FringeRowManager = new RowManager<BudgetTable.FringeRow, Model.Fringe, Http.FringePayload>({
   fields: [
-    ReadWrite({ field: "name", required: true }),
+    ReadWrite({ field: "name" }),
     ReadWrite({ field: "description", allowNull: true }),
     ReadWrite({ field: "cutoff", allowNull: true }),
     ReadWrite({ field: "rate", allowNull: true }),

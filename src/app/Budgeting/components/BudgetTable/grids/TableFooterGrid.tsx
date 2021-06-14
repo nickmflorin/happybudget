@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { isNil, reduce } from "lodash";
+import { isNil, reduce, filter } from "lodash";
 
 import { GridReadyEvent, FirstDataRenderedEvent } from "@ag-grid-community/core";
 
@@ -13,7 +13,6 @@ const TableFooterGrid = <R extends Table.Row>({
   identifierValue,
   options,
   columns,
-  colDefs,
   sizeColumnsToFit,
   setColumnApi
 }: BudgetTable.TableFooterGridProps<R>): JSX.Element => {
@@ -21,7 +20,7 @@ const TableFooterGrid = <R extends Table.Row>({
     // TODO: Loop over the colDef's after we attribute the Base Columns with isBase = true, so
     // we can weed those out here.
     return reduce(
-      columns,
+      filter(columns, (col: Table.Column<R>) => col.field !== identifierField),
       (obj: { [key: string]: any }, col: Table.Column<R>) => {
         if (!isNil(col.field)) {
           if (col.isCalculated === true) {
@@ -65,7 +64,7 @@ const TableFooterGrid = <R extends Table.Row>({
     <div className={"table-footer-grid"}>
       <Grid<R>
         {...options}
-        columnDefs={colDefs}
+        columns={columns}
         rowData={[rowData]}
         rowHeight={38}
         rowClass={"row--table-footer"}

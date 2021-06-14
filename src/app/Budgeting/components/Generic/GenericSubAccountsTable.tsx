@@ -136,7 +136,6 @@ const GenericSubAccountsTable = <
           cellRenderer: "SubAccountUnitCell",
           width: 100,
           cellEditor: "SubAccountUnitCellEditor",
-          clearBeforeEdit: true,
           type: "singleSelect",
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
@@ -190,7 +189,6 @@ const GenericSubAccountsTable = <
           minWidth: 150,
           nullValue: [],
           cellEditor: fringesCellEditor,
-          clearBeforeEdit: true,
           cellEditorParams: fringesCellEditorParams,
           type: "singleSelect",
           processCellFromClipboard: (value: string) => {
