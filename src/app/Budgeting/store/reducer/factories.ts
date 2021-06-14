@@ -2,6 +2,7 @@ import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce, forEach } from "lodash";
 import { createModelListResponseReducer } from "lib/redux/factories";
 import { warnInconsistentState } from "lib/redux/util";
+import * as typeguards from "lib/model/typeguards";
 import { fringeValue } from "lib/model/util";
 import { replaceInArray } from "lib/util";
 
@@ -24,6 +25,10 @@ interface SubAccountsHistoryActionMap {
   Loading: string;
 }
 
+interface SubAccountsFringesActionMap {
+  UpdateInState: string;
+}
+
 export interface TemplateSubAccountsReducerFactoryActionMap {
   Response: string;
   Request: string;
@@ -41,6 +46,7 @@ export interface TemplateSubAccountsReducerFactoryActionMap {
   Updating: string;
   Deleting: string;
   Groups: SubAccountsGroupsActionMap;
+  Fringes: SubAccountsFringesActionMap;
 }
 
 export interface BudgetSubAccountsReducerFactoryActionMap {
@@ -61,7 +67,99 @@ export interface BudgetSubAccountsReducerFactoryActionMap {
   Deleting: string;
   Groups: SubAccountsGroupsActionMap;
   History: SubAccountsHistoryActionMap;
+  Fringes: SubAccountsFringesActionMap;
 }
+
+const recalculateSubAccountFromFringes = <
+  D extends Modules.Budgeting.BudgetDirective,
+  SA extends Model.BudgetSubAccount | Model.TemplateSubAccount = D extends "Budget"
+    ? Model.BudgetSubAccount
+    : Model.TemplateSubAccount,
+  S extends Modules.Budgeting.SubAccountsStore<any, any> = D extends "Budget"
+    ? Modules.Budgeting.Budget.SubAccountsStore
+    : Modules.Budgeting.Template.SubAccountsStore
+>(
+  /* eslint-disable indent */
+  st: S,
+  subAccount: SA
+): SA => {
+  if (!isNil(subAccount.estimated)) {
+    const fringes: Model.Fringe[] = filter(
+      map(subAccount.fringes, (id: number) => {
+        const fringe: Model.Fringe | undefined = find(st.fringes.data, { id });
+        if (!isNil(fringe)) {
+          return fringe;
+        } else {
+          /* eslint-disable no-console */
+          console.error(
+            `Inconsistent State! Inconsistent state noticed when updating sub-account in state...
+          The fringe ${id} for sub-account ${subAccount.id} does not exist in state when it
+          is expected to.`
+          );
+          return null;
+        }
+      }),
+      (fringe: Model.Fringe | null) => fringe !== null
+    ) as Model.Fringe[];
+    return { ...subAccount, estimated: fringeValue(subAccount.estimated, fringes) };
+  } else {
+    return subAccount;
+  }
+};
+
+const recalculateSubAccountMetrics = <
+  D extends Modules.Budgeting.BudgetDirective,
+  SA extends Model.BudgetSubAccount | Model.TemplateSubAccount = D extends "Budget"
+    ? Model.BudgetSubAccount
+    : Model.TemplateSubAccount,
+  S extends Modules.Budgeting.SubAccountsStore<any, any> = D extends "Budget"
+    ? Modules.Budgeting.Budget.SubAccountsStore
+    : Modules.Budgeting.Template.SubAccountsStore
+>(
+  /* eslint-disable indent */
+  st: S,
+  sub: number | SA
+): S => {
+  let subAccount: SA;
+  if (typeof sub === "number") {
+    const foundSubAccount: SA | null = find(st.data, { id: sub }) || null;
+    if (isNil(foundSubAccount)) {
+      /* eslint-disable no-console */
+      console.error(
+        `Inconsistent State: Inconsistent state noticed when updating sub account in state. The
+          sub account with ID ${sub} does not exist in state when it is expected to.`
+      );
+      return st;
+    }
+    subAccount = foundSubAccount;
+  } else {
+    subAccount = sub;
+  }
+  // In the case that the SubAccount has sub accounts itself, the estimated value is determined
+  // from the accumulation of those individual estimated values.  In this case,  we do not need
+  // to update the SubAccount estimated value in state because it only changes when the estimated
+  // values of it's SubAccount(s) on another page are altered.
+  if (subAccount.subaccounts.length === 0 && !isNil(subAccount.quantity) && !isNil(subAccount.rate)) {
+    const multiplier = subAccount.multiplier || 1.0;
+    let payload: any = {
+      estimated: multiplier * subAccount.quantity * subAccount.rate
+    };
+    if (typeguards.isBudgetSubAccount(subAccount)) {
+      if (!isNil(subAccount.actual) && !isNil(payload.estimated)) {
+        payload = { ...payload, variance: payload.estimated - subAccount.actual };
+      }
+    }
+    subAccount = { ...subAccount, ...payload };
+    subAccount = recalculateSubAccountFromFringes<D, SA, S>(st, subAccount);
+
+    return {
+      ...st,
+      data: replaceInArray<SA>(st.data, { id: subAccount.id }, subAccount)
+    };
+  } else {
+    return st;
+  }
+};
 
 // TODO: These two factories (for the budget case and the template case) are nearly identicaly,
 // and should be refactored if possible.
@@ -142,69 +240,6 @@ export const createTemplateSubAccountsReducer = (
     };
   };
 
-  const recalculateSubAccountFromFringes = (
-    st: Modules.Budgeting.Template.SubAccountsStore,
-    subAccount: Model.TemplateSubAccount
-  ): Model.TemplateSubAccount => {
-    if (!isNil(subAccount.estimated)) {
-      const fringes: Model.Fringe[] = filter(
-        map(subAccount.fringes, (id: number) => {
-          const fringe: Model.Fringe | undefined = find(st.fringes.data, { id });
-          if (!isNil(fringe)) {
-            return fringe;
-          } else {
-            /* eslint-disable no-console */
-            console.error(
-              `Inconsistent State! Inconsistent state noticed when updating sub-account in state...
-            The fringe ${id} for sub-account ${subAccount.id} does not exist in state when it
-            is expected to.`
-            );
-            return null;
-          }
-        }),
-        (fringe: Model.Fringe | null) => fringe !== null
-      ) as Model.Fringe[];
-      return { ...subAccount, estimated: fringeValue(subAccount.estimated, fringes) };
-    } else {
-      return subAccount;
-    }
-  };
-
-  const recalculateSubAccountMetrics = (
-    st: Modules.Budgeting.Template.SubAccountsStore,
-    id: number
-  ): Modules.Budgeting.Template.SubAccountsStore => {
-    let subAccount = find(st.data, { id });
-    if (isNil(subAccount)) {
-      /* eslint-disable no-console */
-      console.error(
-        `Inconsistent State: Inconsistent state noticed when updating sub account in state. The
-          sub account with ID ${id} does not exist in state when it is expected to.`
-      );
-      return st;
-    } else {
-      // In the case that the SubAccount has sub accounts itself, the estimated value is determined
-      // from the accumulation of those individual estimated values.  In this case,  we do not need
-      // to update the SubAccount estimated value in state because it only changes when the estimated
-      // values of it's SubAccount(s) on another page are altered.
-      if (subAccount.subaccounts.length === 0 && !isNil(subAccount.quantity) && !isNil(subAccount.rate)) {
-        const multiplier = subAccount.multiplier || 1.0;
-        let payload: Partial<Model.TemplateSubAccount> = {
-          estimated: multiplier * subAccount.quantity * subAccount.rate
-        };
-        subAccount = { ...subAccount, ...payload };
-        subAccount = recalculateSubAccountFromFringes(st, subAccount);
-
-        return {
-          ...st,
-          data: replaceInArray<Model.TemplateSubAccount>(st.data, { id: subAccount.id }, subAccount)
-        };
-      } else {
-        return st;
-      }
-    }
-  };
-
   return (
     state: Modules.Budgeting.Template.SubAccountsStore = initialTemplateSubAccountsState,
     action: Redux.Action<any>
@@ -261,9 +296,32 @@ export const createTemplateSubAccountsReducer = (
       });
     } else if (action.type === mapping.UpdateInState) {
       const subAccount: Model.TemplateSubAccount = action.payload;
-      newState = recalculateSubAccountMetrics(newState, subAccount.id);
+      newState = recalculateSubAccountMetrics<"Template">(newState, subAccount.id);
       if (!isNil(subAccount.group)) {
         newState = recalculateGroupMetrics(newState, subAccount.group);
+      }
+    } else if (action.type === mapping.Fringes.UpdateInState) {
+      // Since the Fringes are displayed in a modal and not on a separate page, when a Fringe is
+      // changed we need to recalculate the SubAcccount(s) that have that Fringe so they display
+      // estimated values that are consistent with the change to the Fringe.
+      const fringe: Model.Fringe | undefined = find(newState.fringes.data, { id: action.payload.id });
+      if (isNil(fringe)) {
+        warnInconsistentState({
+          action: action.type,
+          reason: "Fringe does not exist in state when it is expected to.",
+          id: action.payload
+        });
+      } else {
+        const subAccountsWithFringe = filter(newState.data, (subaccount: Model.TemplateSubAccount) =>
+          includes(subaccount.fringes, fringe.id)
+        );
+        for (let i = 0; i < subAccountsWithFringe.length; i++) {
+          // NOTE: We have to recalculate the SubAccount metrics, instead of just refringing
+          // the value, because the current estimated value on the SubAccount already has fringes
+          // applied, and there is no way to refringe an already fringed value if we do not know
+          // what the previous fringes were.
+          newState = recalculateSubAccountMetrics<"Template">(newState, subAccountsWithFringe[i]);
+        }
       }
     } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
       const group: Model.TemplateGroup | undefined = find(newState.groups.data, (g: Model.TemplateGroup) =>
@@ -412,72 +470,6 @@ export const createBudgetSubAccountsReducer = (
     };
   };
 
-  const recalculateSubAccountFromFringes = (
-    st: Modules.Budgeting.Budget.SubAccountsStore,
-    subAccount: Model.BudgetSubAccount
-  ): Model.BudgetSubAccount => {
-    if (!isNil(subAccount.estimated)) {
-      const fringes: Model.Fringe[] = filter(
-        map(subAccount.fringes, (id: number) => {
-          const fringe: Model.Fringe | undefined = find(st.fringes.data, { id });
-          if (!isNil(fringe)) {
-            return fringe;
-          } else {
-            /* eslint-disable no-console */
-            console.error(
-              `Inconsistent State! Inconsistent state noticed when updating sub-account in state...
-            The fringe ${id} for sub-account ${subAccount.id} does not exist in state when it
-            is expected to.`
-            );
-            return null;
-          }
-        }),
-        (fringe: Model.Fringe | null) => fringe !== null
-      ) as Model.Fringe[];
-      return { ...subAccount, estimated: fringeValue(subAccount.estimated, fringes) };
-    } else {
-      return subAccount;
-    }
-  };
-
-  const recalculateSubAccountMetrics = (
-    st: Modules.Budgeting.Budget.SubAccountsStore,
-    id: number
-  ): Modules.Budgeting.Budget.SubAccountsStore => {
-    let subAccount = find(st.data, { id });
-    if (isNil(subAccount)) {
-      /* eslint-disable no-console */
-      console.error(
-        `Inconsistent State: Inconsistent state noticed when updating sub account in state. The
-          sub account with ID ${id} does not exist in state when it is expected to.`
-      );
-      return st;
-    } else {
-      // In the case that the SubAccount has sub accounts itself, the estimated value is determined
-      // from the accumulation of those individual estimated values.  In this case,  we do not need
-      // to update the SubAccount estimated value in state because it only changes when the estimated
-      // values of it's SubAccount(s) on another page are altered.
-      if (subAccount.subaccounts.length === 0 && !isNil(subAccount.quantity) && !isNil(subAccount.rate)) {
-        const multiplier = subAccount.multiplier || 1.0;
-        let payload: Partial<Model.BudgetSubAccount> = {
-          estimated: multiplier * subAccount.quantity * subAccount.rate
-        };
-        if (!isNil(subAccount.actual) && !isNil(payload.estimated)) {
-          payload = { ...payload, variance: payload.estimated - subAccount.actual };
-        }
-        subAccount = { ...subAccount, ...payload };
-        subAccount = recalculateSubAccountFromFringes(st, subAccount);
-
-        return {
-          ...st,
-          data: replaceInArray<Model.BudgetSubAccount>(st.data, { id: subAccount.id }, subAccount)
-        };
-      } else {
-        return st;
-      }
-    }
-  };
-
   return (
     state: Modules.Budgeting.Budget.SubAccountsStore = initialBudgetSubAccountsState,
     action: Redux.Action<any>
@@ -534,9 +526,32 @@ export const createBudgetSubAccountsReducer = (
       });
     } else if (action.type === mapping.UpdateInState) {
       const subAccount: Model.BudgetSubAccount = action.payload;
-      newState = recalculateSubAccountMetrics(newState, subAccount.id);
+      newState = recalculateSubAccountMetrics<"Budget">(newState, subAccount.id);
       if (!isNil(subAccount.group)) {
         newState = recalculateGroupMetrics(newState, subAccount.group);
+      }
+    } else if (action.type === mapping.Fringes.UpdateInState) {
+      // Since the Fringes are displayed in a modal and not on a separate page, when a Fringe is
+      // changed we need to recalculate the SubAcccount(s) that have that Fringe so they display
+      // estimated values that are consistent with the change to the Fringe.
+      const fringe: Model.Fringe | undefined = find(newState.fringes.data, { id: action.payload.id });
+      if (isNil(fringe)) {
+        warnInconsistentState({
+          action: action.type,
+          reason: "Fringe does not exist in state when it is expected to.",
+          id: action.payload
+        });
+      } else {
+        const subAccountsWithFringe = filter(newState.data, (subaccount: Model.BudgetSubAccount) =>
+          includes(subaccount.fringes, fringe.id)
+        );
+        for (let i = 0; i < subAccountsWithFringe.length; i++) {
+          // NOTE: We have to recalculate the SubAccount metrics, instead of just refringing
+          // the value, because the current estimated value on the SubAccount already has fringes
+          // applied, and there is no way to refringe an already fringed value if we do not know
+          // what the previous fringes were.
+          newState = recalculateSubAccountMetrics<"Budget">(newState, subAccountsWithFringe[i]);
+        }
       }
     } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
       const group: Model.BudgetGroup | undefined = find(newState.groups.data, (g: Model.BudgetGroup) =>

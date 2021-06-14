@@ -33,9 +33,9 @@ export const treeNodeWithoutChildren = (
   return withoutChildren;
 };
 
-export const fringeValue = (value: number, fringes: Model.Fringe[]): number => {
+export const getFringesNominalAdditions = (value: number, fringes: Model.Fringe[]): number[] => {
   const additionalValues: number[] = [];
-  forEach((fringe: Model.Fringe) => {
+  forEach(fringes, (fringe: Model.Fringe) => {
     if (!isNil(fringe.unit) && !isNil(fringe.rate)) {
       if (fringe.unit.id === FringeUnitModels.FLAT.id) {
         additionalValues.push(fringe.rate);
@@ -48,7 +48,30 @@ export const fringeValue = (value: number, fringes: Model.Fringe[]): number => {
       }
     }
   });
+  return additionalValues;
+};
+
+export const fringeValue = (value: number, fringes: Model.Fringe[]): number => {
+  const additionalValues: number[] = getFringesNominalAdditions(value, fringes);
   return value + reduce(additionalValues, (sum: number, val: number) => sum + val, 0);
+};
+
+export const unfringeValue = (value: number, fringes: Model.Fringe[]): number => {
+  const additionalValues: number[] = [];
+  forEach(fringes, (fringe: Model.Fringe) => {
+    if (!isNil(fringe.unit) && !isNil(fringe.rate)) {
+      if (fringe.unit.id === FringeUnitModels.FLAT.id) {
+        additionalValues.push(fringe.rate);
+      } else {
+        if (fringe.cutoff === null || fringe.cutoff >= value) {
+          additionalValues.push(fringe.rate * value);
+        } else {
+          additionalValues.push(fringe.rate * fringe.cutoff);
+        }
+      }
+    }
+  });
+  return value - reduce(additionalValues, (sum: number, val: number) => sum + val, 0);
 };
 
 export const findChoiceForName = <M extends Model.Choice<number, string>>(

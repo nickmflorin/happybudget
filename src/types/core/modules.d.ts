@@ -49,15 +49,19 @@ namespace Modules {
   namespace Budgeting {
     type BudgetDirective = "Budget" | "Template";
 
+    interface SubAccountsStore<SA, G extends Model.Group> extends Redux.ModelListResponseStore<SA> {
+      readonly groups: Redux.ModelListResponseStore<G>;
+      readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
+    }
+
     namespace Budget {
       interface CommentsStore extends Redux.ModelListResponseStore<Model.Comment> {
         readonly replying: number[];
       }
 
-      interface SubAccountsStore extends Redux.ModelListResponseStore<Model.BudgetSubAccount> {
+      /* eslint-disable no-shadow */
+      interface SubAccountsStore extends Modules.Budgeting.SubAccountsStore<Model.BudgetSubAccount, Model.BudgetGroup> {
         readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>;
-        readonly groups: Redux.ModelListResponseStore<Model.BudgetGroup>;
-        readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
       }
 
       interface AccountsStore extends Redux.ModelListResponseStore<Model.BudgetAccount> {
@@ -101,14 +105,12 @@ namespace Modules {
     }
 
     namespace Template {
-      interface SubAccountsStore extends Redux.ModelListResponseStore<Model.TemplateSubAccount> {
-        readonly groups: Redux.ModelListResponseStore<Model.TemplateGroup>;
-        readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
-      }
-
       interface AccountsStore extends Redux.ModelListResponseStore<Model.TemplateAccount> {
         readonly groups: Redux.ModelListResponseStore<Model.TemplateGroup>;
       }
+
+      interface SubAccountsStore
+        extends Modules.Budgeting.SubAccountsStore<Model.TemplateSubAccount, Model.TemplateGroup> {}
 
       interface SubAccountStore {
         readonly id: number | null;

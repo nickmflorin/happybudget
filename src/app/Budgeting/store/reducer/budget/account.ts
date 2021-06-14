@@ -47,6 +47,13 @@ const rootReducer: Reducer<Modules.Budgeting.Budget.AccountStore, Redux.Action<a
     Updating: ActionType.Budget.Account.SubAccounts.Updating,
     RemoveFromGroup: ActionType.Budget.Account.SubAccounts.RemoveFromGroup,
     AddToGroup: ActionType.Budget.Account.SubAccounts.AddToGroup,
+    // NOTE: This will cause updates to both the Account and SubAccount level when
+    // fringes change, even though only one level is visible at any given time.  We
+    // should adjust this, so that it only updates the Account SubAccount(s) or the
+    // SubAccount SubAccount(s) when Fringes change.
+    Fringes: {
+      UpdateInState: ActionType.Budget.Fringes.UpdateInState
+    },
     History: {
       Response: ActionType.Budget.Account.SubAccounts.History.Response,
       Request: ActionType.Budget.Account.SubAccounts.History.Request,
