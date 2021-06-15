@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import Spinner, { SpinnerProps } from "./Spinner";
 
 import SpinnerWrapper from "./SpinnerWrapper";

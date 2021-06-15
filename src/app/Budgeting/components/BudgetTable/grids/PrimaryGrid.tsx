@@ -1,5 +1,4 @@
 import { SyntheticEvent, useState, useEffect, useRef } from "react";
-import classNames from "classnames";
 import { map, isNil, includes, find, uniq, forEach, filter, flatten } from "lodash";
 import { useLocation } from "react-router-dom";
 
@@ -33,6 +32,7 @@ import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/g
 
 import * as models from "lib/model";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
+import { getGroupColorDefinition } from "lib/model/util";
 import { isKeyboardEvent } from "lib/model/typeguards";
 import { rangeSelectionIsSingleCell } from "../util";
 import Grid from "./Grid";
@@ -466,17 +466,27 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     }
   });
 
-  const getRowClass = (params: RowClassParams) => {
-    if (params.node.data.meta.isGroupFooter === true) {
-      let colorClass = params.node.data.group.color;
-      if (!isNil(colorClass)) {
-        if (colorClass.startsWith("#")) {
-          colorClass = params.node.data.group.color.slice(1);
-        }
-        return classNames("row--group-footer", `bg-${colorClass}`);
-      }
+  const getRowClass = useDynamicCallback((params: RowClassParams) => {
+    const row: R = params.node.data;
+    if (row.meta.isGroupFooter === true) {
+      return "row--group-footer";
     }
-  };
+  });
+
+  const getRowStyle = useDynamicCallback((params: RowClassParams) => {
+    const row: R = params.node.data;
+    if (row.meta.isGroupFooter === true) {
+      const group: G | undefined = find(groups, { id: row.group } as any);
+      if (isNil(group)) {
+        return {};
+      }
+      const colorDef = getGroupColorDefinition(group);
+      return {
+        color: !isNil(colorDef.color) ? `${colorDef.color} !important` : undefined,
+        backgroundColor: !isNil(colorDef.backgroundColor) ? `${colorDef.backgroundColor} !important` : undefined
+      };
+    }
+  });
 
   const getContextMenuItems = useDynamicCallback((params: GetContextMenuItemsParams): MenuItemDef[] => {
     // This can happen in rare cases where you right click outside of a cell.
@@ -613,10 +623,39 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
   }, [search, api]);
 
   useEffect(() => {
+    // When first rendering, it is possible that the groups are not present from
+    // the API response yet, in which case, the cellRenderer will think there are
+    // no groups and not allow the group to be edited.  We need to force refresh
+    // the identifier column when the groups change, so that those cell renderers
+    // have access to the groups when they populate.
+    if (!isNil(api) && !isNil(columnApi)) {
+      const nodes: RowNode[] = [];
+      api.forEachNode((node: RowNode) => {
+        const row: R = node.data;
+        if (row.meta.isGroupFooter === true) {
+          nodes.push(node);
+        }
+      });
+      const cols = columnApi.getAllColumns();
+      const identifierCol = find(cols, (col: Column) => {
+        const def = col.getColDef();
+        if (def.field === identifierField) {
+          return true;
+        }
+        return false;
+      });
+      if (nodes.length !== 0 && !isNil(identifierCol)) {
+        api.refreshCells({ force: true, rowNodes: nodes, columns: [identifierCol] });
+      }
+    }
+  }, [useDeepEqualMemo(groups), api, columnApi]);
+
+  useEffect(() => {
     // Changes to the state of the selected rows does not trigger a refresh of those cells via AG
     // Grid because AG Grid cannot detect changes to the values of cells when the cell is HTML based.
     if (!isNil(api) && !isNil(columnApi)) {
       api.forEachNode((node: RowNode) => {
+        const row: R = node.data;
         const existing: R | undefined = find(table, { id: node.data.id });
         if (!isNil(existing)) {
           if (existing.meta.selected !== node.data.meta.selected) {
@@ -712,6 +751,7 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
         rowData={table}
         getRowNodeId={(r: any) => r.id}
         getRowClass={getRowClass}
+        getRowStyle={getRowStyle}
         immutableData={true}
         onGridReady={onGridReady}
         processCellForClipboard={(params: ProcessCellForExportParams) => {

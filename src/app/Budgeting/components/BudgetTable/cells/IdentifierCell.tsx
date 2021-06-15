@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit } from "@fortawesome/free-regular-svg-icons";
 
 import { IconButton } from "components/buttons";
+import { getGroupColorDefinition } from "lib/model/util";
 
 import Cell from "./Cell";
 import ValueCell, { ValueCellProps } from "./ValueCell";
@@ -25,6 +26,7 @@ const IdentifierCell = <R extends Table.Row, G extends Model.Group = Model.Group
   if (row.meta.isGroupFooter === true && row.group !== null) {
     const group: G | undefined = find(groups, { id: row.group } as any);
     if (!isNil(group)) {
+      const colorDef = getGroupColorDefinition(group);
       return (
         <Cell className={"cell--identifier"} {...props}>
           <div style={{ display: "flex" }}>
@@ -32,8 +34,15 @@ const IdentifierCell = <R extends Table.Row, G extends Model.Group = Model.Group
             <IconButton
               className={"btn--edit-group"}
               size={"small"}
-              icon={<FontAwesomeIcon icon={faEdit} />}
+              icon={
+                <FontAwesomeIcon
+                  color={colorDef.color}
+                  style={!isNil(colorDef.color) ? { color: colorDef.color } : {}}
+                  icon={faEdit}
+                />
+              }
               onClick={() => !isNil(onGroupEdit) && onGroupEdit(group)}
+              style={!isNil(colorDef.color) ? { color: colorDef.color } : {}}
             />
           </div>
         </Cell>

@@ -28,6 +28,11 @@ namespace Table {
     readonly group: number | null;
   }
 
+  interface RowColorDefinition {
+    readonly backgroundColor?: string;
+    readonly color?: string;
+  }
+
   type ColumnTypeId =
     | "text"
     | "longText"
@@ -424,6 +429,7 @@ namespace BudgetTable {
     readonly expandColumn?: Partial<Table.Column<R>>;
     readonly tableFooterIdentifierValue?: string | null;
     readonly budgetFooterIdentifierValue?: string | null;
+    readonly renderFlag?: boolean;
     readonly saving: boolean;
     readonly loadingBudget?: boolean;
     readonly exportable?: boolean;
@@ -431,7 +437,6 @@ namespace BudgetTable {
     readonly nonEditableCells?: (keyof R)[];
     readonly cookies?: BudgetTable.CookiesProps;
     readonly loading?: boolean;
-    readonly renderFlag?: boolean;
     readonly manager: Table.IRowManager<R, M, P>;
     readonly cellClass?: (params: import("@ag-grid-community/core").CellClassParams) => string | undefined;
     readonly onRowSelect: (id: number) => void;

@@ -7,8 +7,7 @@ import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 
 import { TooltipWrapper } from "components";
 
-interface GenericClickableProps {
-  className?: string;
+interface GenericClickableProps extends StandardComponentProps {
   disabled?: boolean;
   tooltip?: Partial<TooltipPropsWithTitle>;
   component: ElementType;
@@ -24,7 +23,6 @@ interface GenericClickableProps {
  */
 const GenericClickable = ({
   children,
-  className,
   tooltip,
   disabled = false,
   icon,
@@ -35,7 +33,7 @@ const GenericClickable = ({
   if (!isNil(icon)) {
     return (
       <TooltipWrapper {...tooltip}>
-        <ClickableBase {...props} className={classNames(className, { disabled: disabled })}>
+        <ClickableBase {...props} className={classNames(props.className, { disabled: disabled })}>
           {icon}
           {children}
         </ClickableBase>
@@ -44,7 +42,7 @@ const GenericClickable = ({
   } else {
     return (
       <TooltipWrapper {...tooltip}>
-        <ClickableBase {...props} className={classNames(className, { disabled: disabled })}>
+        <ClickableBase {...props} className={classNames(props.className, { disabled: disabled })}>
           {children}
         </ClickableBase>
       </TooltipWrapper>

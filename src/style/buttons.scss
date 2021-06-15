@@ -114,7 +114,7 @@
     svg {
       height: 18px;
       width: 18px;
-      color: $icon-color !important;
+      color: $icon-color;
     }
 
     &:hover,
@@ -331,10 +331,19 @@
     flex-direction: column;
     justify-content: center;
 
+    // For whatever reason, applying the styling to the edit group button in
+    // the AG Grid table is not respecting CSS inheritance rules and is not
+    // allowing us to dynamically change the color unless this is unset.  We
+    // should eventually figure that out, but for now - AG Grid is a pain.
+    &:not(.btn--edit-group) {
+      svg {
+        color: $icon-color;
+      }
+    }
+
     svg {
       height: 100%;
       width: auto !important;
-      color: $icon-color !important;
     }
 
     &.small {

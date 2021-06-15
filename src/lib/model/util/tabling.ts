@@ -2,7 +2,24 @@ import { forEach, groupBy, isNil, reduce, find } from "lodash";
 import { ColDef } from "@ag-grid-community/core";
 
 import * as models from "lib/model";
+import { contrastedForegroundColor } from "lib/util/colors";
 import { tableChangeIsCellChange, tableChangeIsRowChange } from "../typeguards/tabling";
+
+export const getGroupColorDefinition = (group: Model.Group): Table.RowColorDefinition => {
+  if (!isNil(group) && !isNil(group.color)) {
+    let backgroundColor = group.color;
+    if (!isNil(backgroundColor)) {
+      if (!backgroundColor.startsWith("#")) {
+        backgroundColor = `#${group.color}`;
+      }
+      return {
+        backgroundColor,
+        color: contrastedForegroundColor(backgroundColor)
+      };
+    }
+  }
+  return {};
+};
 
 export const toAgGridColDef = <R extends Table.Row = Table.Row>(colDef: Table.Column<R>): ColDef => {
   const {

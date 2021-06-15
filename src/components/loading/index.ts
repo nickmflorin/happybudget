@@ -6,3 +6,4 @@ export { default as SavingChanges } from "./SavingChanges";
 export { default as ApplicationSpinner } from "./ApplicationSpinner";
 export { default as ConnectedApplicationSpinner } from "./ConnectedApplicationSpinner";
 export { default as WrapInApplicationSpinner } from "./WrapInApplicationSpinner";
+export { default as WaitToRender } from "./WaitToRender";

@@ -2,8 +2,7 @@ import { ReactNode } from "react";
 import classNames from "classnames";
 import Button from "./Button";
 
-interface IconButtonProps {
-  className?: string;
+interface IconButtonProps extends StandardComponentProps {
   icon: ReactNode;
   children?: ReactNode;
   size?: "small" | "medium" | "large";
@@ -14,16 +13,10 @@ interface IconButtonProps {
 /**
  * A consistently styled Button component for buttons that contain just an Icon.
  */
-const IconButton = ({
-  className,
-  children,
-  disabled = false,
-  icon,
-  size = "medium",
-  ...props
-}: IconButtonProps): JSX.Element => (
+const IconButton = ({ children, disabled = false, icon, size = "medium", ...props }: IconButtonProps): JSX.Element => (
   <Button
-    className={classNames("btn--icon-only", className, {
+    {...props}
+    className={classNames("btn--icon-only", props.className, {
       medium: size === "medium",
       small: size === "small",
       large: size === "large",
@@ -31,7 +24,7 @@ const IconButton = ({
     })}
     icon={icon}
     children={children}
-    {...props}
+    style={props.style}
   />
 );
 
