@@ -839,13 +839,15 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
           // is hovered.  We should figure out if there is a way to optimize
           // this to only refresh under certain circumstances.
           const nodes: RowNode[] = [];
-          e.api.forEachNode((node: RowNode) => {
-            const row: R = node.data;
-            if (row.meta.isGroupFooter === false) {
-              nodes.push(node);
-            }
-          });
-          e.api.refreshCells({ force: true, rowNodes: nodes, columns: ["expand"] });
+          if (includes(["index", "expand", identifierField], e.colDef.field)) {
+            e.api.forEachNode((node: RowNode) => {
+              const row: R = node.data;
+              if (row.meta.isGroupFooter === false) {
+                nodes.push(node);
+              }
+            });
+            e.api.refreshCells({ force: true, rowNodes: nodes, columns: ["expand"] });
+          }
         }}
         // NOTE: This might not be 100% necessary, because of how efficiently
         // we are managing the state updates to the data that flows into the table.
