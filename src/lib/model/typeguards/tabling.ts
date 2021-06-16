@@ -44,6 +44,8 @@ export const isRowChangeData = <R extends Table.Row, M extends Model.Model>(
         hasValues = false;
         break;
       }
+    } else {
+      return false;
     }
   }
   return hasValues;
