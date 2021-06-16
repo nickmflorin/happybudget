@@ -644,13 +644,30 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     return params.data;
   });
 
+  const getFirstEditableDisplayedColumn = useDynamicCallback((): Column | null => {
+    if (!isNil(columnApi)) {
+      const displayedColumns = columnApi.getAllDisplayedColumns();
+      for (let i = 0; i < displayedColumns.length; i++) {
+        const displayedColumn = displayedColumns[i];
+        const field = displayedColumn.getColDef().field;
+        if (!isNil(field)) {
+          const customCol = find(columns, { field } as any);
+          if (!isNil(customCol) && customCol.editable !== false) {
+            return displayedColumn;
+          }
+        }
+      }
+    }
+    return null;
+  });
+
   useEffect(() => {
-    if (!isNil(columnApi) && !isNil(api)) {
-      const firstEditCol = columnApi.getAllDisplayedColumns()[2];
-      if (!isNil(firstEditCol) && focused === false) {
+    if (focused === false && !isNil(api)) {
+      const firstEditableCol = getFirstEditableDisplayedColumn();
+      if (!isNil(firstEditableCol)) {
         api.ensureIndexVisible(0);
-        api.ensureColumnVisible(firstEditCol);
-        setTimeout(() => api.setFocusedCell(0, firstEditCol), 500);
+        api.ensureColumnVisible(firstEditableCol);
+        setTimeout(() => api.setFocusedCell(0, firstEditableCol), 0);
         // TODO: Investigate if there is a better way to do this - currently,
         // this hook is getting triggered numerous times when it shouldn't be.
         // It is because the of the `columns` in the dependency array, which

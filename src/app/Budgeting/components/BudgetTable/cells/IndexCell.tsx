@@ -10,10 +10,10 @@ import { IconButton } from "components/buttons";
 interface IndexCellProps extends ICellRendererParams {
   onSelect: (id: number | string) => void;
   onDeselect: (id: number | string) => void;
-  onNew: () => void;
+  onRowAdd: (payload: Table.RowAddPayload<any>) => void;
 }
 
-const IndexCell = <R extends Table.Row>({ onSelect, onDeselect, onNew, node }: IndexCellProps): JSX.Element => {
+const IndexCell = <R extends Table.Row>({ onSelect, onDeselect, onRowAdd, node }: IndexCellProps): JSX.Element => {
   // Since the SelectCell is the first cell in the table, group footers will
   // potentially span this cell across the columns - but we never want the group
   // footer row to be selectable.
@@ -26,7 +26,7 @@ const IndexCell = <R extends Table.Row>({ onSelect, onDeselect, onNew, node }: I
         className={"green"}
         size={"medium"}
         icon={<FontAwesomeIcon icon={faPlusCircle} />}
-        onClick={() => onNew()}
+        onClick={() => onRowAdd(1)}
       />
     );
   }

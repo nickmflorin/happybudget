@@ -201,7 +201,7 @@ const BudgetTable = <
         cellRendererParams: {
           onSelect: onRowSelect,
           onDeselect: onRowDeselect,
-          onNew: onRowAdd,
+          onRowAdd: onRowAdd,
           ...col.cellRendererParams,
           ...actionColumn.cellRendererParams,
           ...indexColumn.cellRendererParams
