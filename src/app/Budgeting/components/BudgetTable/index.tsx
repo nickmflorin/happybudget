@@ -16,7 +16,7 @@ import {
 } from "@ag-grid-community/core";
 
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
-import { RenderOrSpinner } from "components";
+import { WrapInApplicationSpinner } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { updateFieldOrdering, orderByFieldOrdering, getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
@@ -624,7 +624,7 @@ const BudgetTable = <
           }
         }}
       />
-      <RenderOrSpinner loading={loading || renderFlag === false}>
+      <WrapInApplicationSpinner hideWhileLoading={true} loading={loading || renderFlag === false}>
         <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
           <PrimaryGrid<R, G>
             api={gridApi}
@@ -673,7 +673,7 @@ const BudgetTable = <
             />
           )}
         </div>
-      </RenderOrSpinner>
+      </WrapInApplicationSpinner>
     </React.Fragment>
   );
 };

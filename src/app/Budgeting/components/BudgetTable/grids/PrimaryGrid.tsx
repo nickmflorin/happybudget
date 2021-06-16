@@ -748,7 +748,8 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
         {...options}
         columns={map(columns, (col: Table.Column<R>) => includeCellEditorParams(col))}
         getContextMenuItems={getContextMenuItems}
-        rowData={table}
+        // This is the same as checking if the onGridReady event has fired.
+        rowData={!isNil(api) ? table : []}
         getRowNodeId={(r: any) => r.id}
         getRowClass={getRowClass}
         getRowStyle={getRowStyle}

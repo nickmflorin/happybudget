@@ -25,7 +25,7 @@ const WrapInApplicationSpinner: React.FC<WrapInApplicationSpinnerProps> = ({
     }
   }, [loading]);
 
-  if (hideWhileLoading && loading === false) {
+  if (hideWhileLoading && loading === true) {
     return <></>;
   }
   return <>{children}</>;
