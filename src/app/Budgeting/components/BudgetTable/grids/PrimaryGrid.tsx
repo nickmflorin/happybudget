@@ -647,13 +647,15 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
   const getFirstEditableDisplayedColumn = useDynamicCallback((): Column | null => {
     if (!isNil(columnApi)) {
       const displayedColumns = columnApi.getAllDisplayedColumns();
-      for (let i = 0; i < displayedColumns.length; i++) {
-        const displayedColumn = displayedColumns[i];
-        const field = displayedColumn.getColDef().field;
-        if (!isNil(field)) {
-          const customCol = find(columns, { field } as any);
-          if (!isNil(customCol) && customCol.editable !== false) {
-            return displayedColumn;
+      if (!isNil(displayedColumns)) {
+        for (let i = 0; i < displayedColumns.length; i++) {
+          const displayedColumn = displayedColumns[i];
+          const field = displayedColumn.getColDef().field;
+          if (!isNil(field)) {
+            const customCol = find(columns, { field } as any);
+            if (!isNil(customCol) && customCol.editable !== false) {
+              return displayedColumn;
+            }
           }
         }
       }
