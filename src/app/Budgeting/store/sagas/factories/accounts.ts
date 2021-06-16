@@ -201,10 +201,13 @@ export const createAccountsTaskSet = <
       yield put(actions.creating(true));
 
       const autoIndex = yield select(selectAutoIndex);
-      const count = isAction(action) ? action.payload : action;
       const data = yield select(selectModels);
+      const actionPayload = isAction(action) ? action.payload : action;
 
-      const payload = createBulkCreatePayload(data, count, autoIndex) as Http.BulkCreatePayload<P>;
+      const payload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, P, A>(actionPayload, manager, {
+        autoIndex,
+        models: data
+      });
 
       try {
         const accounts: A[] = yield call(services.bulkCreate, objId, payload, { cancelToken: source.token });

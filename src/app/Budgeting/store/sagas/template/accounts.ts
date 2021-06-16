@@ -3,20 +3,7 @@ import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
 import { requestTemplateAction, loadingTemplateAction } from "../../actions/template";
-import {
-  loadingAccountsAction,
-  responseAccountsAction,
-  deletingAccountAction,
-  creatingAccountAction,
-  updatingAccountAction,
-  deletingGroupAction,
-  removeGroupFromStateAction,
-  updateAccountInStateAction,
-  removeAccountFromStateAction,
-  loadingGroupsAction,
-  responseGroupsAction,
-  addAccountToStateAction
-} from "../../actions/template/accounts";
+import * as actions from "../../actions/template/accounts";
 import { createStandardSaga, createAccountsTaskSet } from "../factories";
 
 const tasks = createAccountsTaskSet<
@@ -27,23 +14,23 @@ const tasks = createAccountsTaskSet<
   Http.TemplateAccountPayload
 >(
   {
-    loading: loadingAccountsAction,
-    deleting: deletingAccountAction,
-    creating: creatingAccountAction,
-    updating: updatingAccountAction,
-    response: responseAccountsAction,
-    addToState: addAccountToStateAction,
-    updateInState: updateAccountInStateAction,
-    removeFromState: removeAccountFromStateAction,
+    loading: actions.loadingAccountsAction,
+    deleting: actions.deletingAccountAction,
+    creating: actions.creatingAccountAction,
+    updating: actions.updatingAccountAction,
+    response: actions.responseAccountsAction,
+    addToState: actions.addAccountToStateAction,
+    updateInState: actions.updateAccountInStateAction,
+    removeFromState: actions.removeAccountFromStateAction,
     budget: {
       loading: loadingTemplateAction,
       request: requestTemplateAction
     },
     groups: {
-      deleting: deletingGroupAction,
-      removeFromState: removeGroupFromStateAction,
-      loading: loadingGroupsAction,
-      response: responseGroupsAction
+      deleting: actions.deletingGroupAction,
+      removeFromState: actions.removeGroupFromStateAction,
+      loading: actions.loadingGroupsAction,
+      response: actions.responseGroupsAction
     }
   },
   {

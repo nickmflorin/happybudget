@@ -199,7 +199,7 @@ export const createAccountTaskSet = <
     }
   }
 
-  function* bulkCreateTask(action: Redux.Action<number> | number): SagaIterator {
+  function* bulkCreateTask(action: Redux.Action<Table.RowAddPayload<R>> | number): SagaIterator {
     const accountId = yield select(selectAccountId);
     if (!isNil(accountId) && (!isAction(action) || !isNil(action.payload))) {
       const CancelToken = axios.CancelToken;
@@ -208,8 +208,16 @@ export const createAccountTaskSet = <
 
       const data = yield select(selectModels);
       const autoIndex = yield select(selectAutoIndex);
-      const count = isAction(action) ? action.payload : action;
-      const payload = createBulkCreatePayload(data, count, autoIndex) as Http.BulkCreatePayload<Http.SubAccountPayload>;
+      const actionPayload = isAction(action) ? action.payload : action;
+
+      const payload: Http.BulkCreatePayload<Http.SubAccountPayload> = createBulkCreatePayload<
+        R,
+        Http.SubAccountPayload,
+        SA
+      >(actionPayload, manager, {
+        autoIndex,
+        models: data
+      });
 
       try {
         const subaccounts: SA[] = yield call(api.bulkCreateAccountSubAccounts, accountId, payload, {

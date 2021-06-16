@@ -1,5 +1,6 @@
 import { SyntheticEvent } from "react";
 import { getKeyValue } from "lib/util";
+import { isNil } from "lodash";
 
 export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEvent => {
   return (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;
@@ -34,12 +35,15 @@ export const isRowChangeData = <R extends Table.Row, M extends Model.Model>(
 ): obj is Table.RowChangeData<R> => {
   let hasValues = true;
   for (const key in obj) {
-    if (
-      !Object.prototype.hasOwnProperty.call(getKeyValue<any, any>(key)(obj), "newValue") ||
-      !Object.prototype.hasOwnProperty.call(getKeyValue<any, any>(key)(obj), "oldValue")
-    ) {
-      hasValues = false;
-      break;
+    const value = getKeyValue<any, any>(key)(obj);
+    if (!isNil(value)) {
+      if (
+        !Object.prototype.hasOwnProperty.call(getKeyValue<any, any>(key)(obj), "newValue") ||
+        !Object.prototype.hasOwnProperty.call(getKeyValue<any, any>(key)(obj), "oldValue")
+      ) {
+        hasValues = false;
+        break;
+      }
     }
   }
   return hasValues;
@@ -49,7 +53,7 @@ export const isRowChange = <R extends Table.Row, M extends Model.Model>(
   obj: Table.RowChange<R> | Table.RowChangeData<R> | R | M
 ): obj is Table.RowChange<R> => {
   const data = (obj as Table.RowChange<R>).data;
-  if (typeof data === "object" && data !== undefined) {
+  if (data !== undefined && typeof data === "object") {
     return isRowChangeData(data);
   }
   return false;

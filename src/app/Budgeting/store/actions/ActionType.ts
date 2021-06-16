@@ -92,7 +92,6 @@ const ActionType = {
       Request: "budget.subaccount.Request",
       UpdateInState: "budget.subaccount.UpdateInState",
       TableChanged: "budget.subaccount.TableChanged",
-      BulkCreate: "budget.subaccount.BulkCreate",
       Comments: {
         Loading: "budget.subaccount.comments.Loading",
         Response: "budget.subaccount.comments.Response",
@@ -109,6 +108,7 @@ const ActionType = {
         UpdateInState: "budget.subaccount.comments.UpdateInState"
       },
       SubAccounts: {
+        BulkCreate: "budget.subaccount.subaccounts.BulkCreate",
         Deleting: "budget.subaccount.subaccounts.Deleting",
         Creating: "budget.subaccount.subaccounts.Creating",
         Updating: "budget.subaccount.subaccounts.Updating",
@@ -148,7 +148,6 @@ const ActionType = {
       Response: "budget.account.Response",
       Request: "budget.account.Request",
       UpdateInState: "budget.account.UpdateInState",
-      BulkCreate: "budget.account.BulkCreate",
       TableChanged: "budget.account.TableChanged",
       Comments: {
         Loading: "budget.account.comments.Loading",
@@ -166,6 +165,7 @@ const ActionType = {
         UpdateInState: "budget.account.comments.UpdateInState"
       },
       SubAccounts: {
+        BulkCreate: "budget.account.subaccounts.BulkCreate",
         Delete: "budget.account.subaccounts.Delete",
         Deleting: "budget.account.subaccounts.Deleting",
         Creating: "budget.account.subaccounts.Creating",
@@ -292,9 +292,9 @@ const ActionType = {
       Response: "template.subaccount.Response",
       Request: "template.subaccount.Request",
       UpdateInState: "template.subaccount.UpdateInState",
-      BulkCreate: "template.subaccount.BulkCreate",
       TableChanged: "template.subaccount.TableChanged",
       SubAccounts: {
+        BulkCreate: "template.subaccount.subaccounts.BulkCreate",
         Deleting: "template.subaccount.subaccounts.Deleting",
         Creating: "template.subaccount.subaccounts.Creating",
         Updating: "template.subaccount.subaccounts.Updating",
@@ -330,8 +330,8 @@ const ActionType = {
       Request: "template.account.Request",
       UpdateInState: "template.account.UpdateInState",
       TableChanged: "template.account.TableChanged",
-      BulkCreate: "template.account.BulkCreate",
       SubAccounts: {
+        BulkCreate: "template.account.subaccounts.BulkCreate",
         Loading: "template.account.subaccounts.Loading",
         Response: "template.account.subaccounts.Response",
         Request: "template.account.subaccounts.Request",

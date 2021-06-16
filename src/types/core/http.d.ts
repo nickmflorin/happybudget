@@ -137,11 +137,7 @@ namespace Http {
     readonly color: string;
   }
 
-  interface AccountPayload implements Http.ModelPayload<Model.Account> {
-    readonly description?: string | null;
-    readonly group?: number | null;
-    readonly identifier?: string | null;
-  }
+  interface AccountPayload extends Http.ModelPayload<Model.Account> {}
 
   interface BudgetAccountPayload extends AccountPayload {
     readonly access?: number[];
@@ -149,25 +145,11 @@ namespace Http {
 
   interface TemplateAccountPayload extends AccountPayload {}
 
-  interface SubAccountPayload implements Http.ModelPayload<Model.SubAccount> {
-    readonly description?: string | null;
-    readonly identifier?: string | null;
-    readonly name?: string | null;
-    readonly quantity?: number | null;
-    readonly rate?: number | null;
-    readonly multiplier?: number | null;
+  interface SubAccountPayload extends Http.ModelPayload<Model.SubAccount> {
     readonly unit?: Model.SubAccountUnitId | null;
-    readonly group?: number | null;
-    readonly fringes: number[];
   }
 
-  interface ActualPayload implements Http.ModelPayload<Model.Actual> {
-    readonly description?: string;
-    readonly date?: string;
-    readonly vendor?: string;
-    readonly purchase_order?: string;
-    readonly payment_id?: string;
-    readonly value?: number;
+  interface ActualPayload extends Omit<Http.ModelPayload<Model.Actual>, "account"> {
     readonly payment_method?: Model.PaymentMethodId | null;
     readonly object_id?: number;
     readonly parent_type?: "account" | "subaccount";
@@ -190,7 +172,7 @@ namespace Http {
   }
 
   type _BulkCreateCountPayload = { count: number };
-  type _BulkCreateDataPayload<T extends Http.ModelPayload> = { data: T[]};
+  type _BulkCreateDataPayload<T extends Http.ModelPayload> = { data: Partial<T>[]};
   type BulkCreatePayload<T extends Http.ModelPayload> = _BulkCreateDataPayload<T> | _BulkCreateCountPayload;
 
   interface BulkUpdatePayload<T extends Http.ModelPayload> extends Partial<T> {

@@ -8,6 +8,7 @@ import { ChangeDetectionStrategyType } from "@ag-grid-community/react/lib/change
 import {
   CellEditingStoppedEvent,
   GridApi,
+  ColumnApi,
   GridReadyEvent,
   RowNode,
   Column,
@@ -24,6 +25,7 @@ import {
   FirstDataRenderedEvent,
   SuppressKeyboardEventParams,
   ProcessCellForExportParams,
+  ProcessDataFromClipboardParams,
   CellRange,
   CellEditingStartedEvent,
   CellMouseOverEvent
@@ -222,7 +224,7 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
       if (isNil(params.nextCellPosition)) {
         // TODO: We need to figure out how to move down to the next cell!  This
         // is tricky, because we have to wait for the row to be present in state.
-        onRowAdd();
+        onRowAdd(1);
       } else {
         if (includes(["index", "expand"], params.nextCellPosition.column.getColId())) {
           let nextCellPosition = { ...params.nextCellPosition };
@@ -267,7 +269,7 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     if (!isNil(api)) {
       const [node, rowIndex, _] = findFirstNonGroupFooterRow(loc.rowIndex + 1);
       if (node === null) {
-        onRowAdd();
+        onRowAdd(1);
       }
       moveToLocation({ rowIndex, column: loc.column }, opts);
     }
@@ -599,6 +601,49 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     return false;
   });
 
+  const recreateRowFromDataArray = (local: ColumnApi, data: any[], startingColumn: Column): R => {
+    const row: any = {};
+    let currentColumn: Column = startingColumn;
+    map(data, (value: any) => {
+      const field = currentColumn.getColDef().field;
+      if (!isNil(field)) {
+        row[field] = processCellFromClipboard(currentColumn, row, value);
+      }
+      const nextColumn = local.getDisplayedColAfter(currentColumn);
+      if (isNil(nextColumn)) {
+        return false;
+      }
+      currentColumn = nextColumn;
+    });
+    return row as R;
+  };
+
+  const processDataFromClipboard = useDynamicCallback((params: ProcessDataFromClipboardParams) => {
+    if (!isNil(api) && !isNil(columnApi)) {
+      const lastIndex = api.getDisplayedRowCount();
+      const focusedCell = api.getFocusedCell();
+      if (!isNil(focusedCell)) {
+        if (focusedCell.rowIndex + params.data.length - 1 > lastIndex) {
+          const resultLastIndex = focusedCell.rowIndex + params.data.length;
+          const addRowCount = resultLastIndex - lastIndex;
+
+          let rowsToAdd = [];
+          let addedRows = 0;
+          let currIndex = params.data.length - 1;
+          while (addedRows < addRowCount) {
+            rowsToAdd.push(params.data.splice(currIndex, 1)[0]);
+            addedRows++;
+            currIndex--;
+          }
+          rowsToAdd = rowsToAdd.reverse();
+          const newRows: R[] = map(rowsToAdd, (r: any[]) => recreateRowFromDataArray(columnApi, r, focusedCell.column));
+          onRowAdd(newRows);
+        }
+      }
+    }
+    return params.data;
+  });
+
   useEffect(() => {
     if (!isNil(columnApi) && !isNil(api)) {
       const firstEditCol = columnApi.getAllDisplayedColumns()[2];
@@ -755,6 +800,7 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
         getRowStyle={getRowStyle}
         immutableData={true}
         onGridReady={onGridReady}
+        processDataFromClipboard={processDataFromClipboard}
         processCellForClipboard={(params: ProcessCellForExportParams) => {
           if (!isNil(params.node)) {
             setCutCellChange(null);

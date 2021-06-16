@@ -95,7 +95,9 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         saving={saving}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
-        onRowAdd={() => dispatch(bulkCreateSubAccountsAction(1))}
+        onRowAdd={(payload: Table.RowAddPayload<BudgetTable.BudgetSubAccountRow>) =>
+          dispatch(bulkCreateSubAccountsAction(payload))
+        }
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: BudgetTable.BudgetSubAccountRow) => dispatch(removeSubAccountAction(row.id))}

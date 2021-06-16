@@ -4,7 +4,9 @@ import ActionType from "../ActionType";
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.BudgetAccountRow>>(
   ActionType.Budget.Accounts.TableChanged
 );
-export const bulkCreateAccountsAction = simpleAction<number>(ActionType.Budget.Accounts.BulkCreate);
+export const bulkCreateAccountsAction = simpleAction<Table.RowAddPayload<BudgetTable.BudgetAccountRow>>(
+  ActionType.Budget.Accounts.BulkCreate
+);
 
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.Comments.Request);
 export const responseCommentsAction = simpleAction<Http.ListResponse<Model.Comment>>(

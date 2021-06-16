@@ -103,7 +103,9 @@ const Actuals = (): JSX.Element => {
         onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
         saving={saving}
         sizeColumnsToFit={false}
-        onRowAdd={() => dispatch(actions.bulkCreateActualsAction(1))}
+        onRowAdd={(payload: Table.RowAddPayload<BudgetTable.ActualRow>) =>
+          dispatch(actions.bulkCreateActualsAction(payload))
+        }
         onRowSelect={(id: number) => dispatch(actions.selectActualAction(id))}
         onRowDeselect={(id: number) => dispatch(actions.deselectActualAction(id))}
         onRowDelete={(row: BudgetTable.ActualRow) => dispatch(actions.removeActualAction(row.id))}

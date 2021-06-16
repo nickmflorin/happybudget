@@ -10,6 +10,8 @@ import { warnInconsistentState } from "lib/redux/util";
 import { isAction } from "lib/redux/typeguards";
 import { consolidateTableChange } from "lib/model/util";
 
+import { createBulkCreatePayload } from "./util";
+
 export interface FringeTasksActionMap {
   response: Redux.ActionCreator<Http.ListResponse<Model.Fringe>>;
   loading: Redux.ActionCreator<boolean>;
@@ -109,8 +111,12 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
       const source = CancelToken.source();
       yield put(actions.creating(true));
 
-      const count = isAction(action) ? action.payload : action;
-      const payload: Http.BulkCreatePayload<Http.ActualPayload> = { count };
+      const actionPayload = isAction(action) ? action.payload : action;
+
+      const payload: Http.BulkCreatePayload<Http.FringePayload> = createBulkCreatePayload<
+        BudgetTable.FringeRow,
+        Http.FringePayload
+      >(actionPayload, models.FringeRowManager);
 
       try {
         const fringes: Model.Fringe[] = yield call(services.bulkCreate, budgetId, payload, {

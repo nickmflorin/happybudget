@@ -31,7 +31,7 @@ abstract class WriteField<R extends Table.Row, M extends Model.Model, P extends 
     this.httpValueConverter = httpValueConverter;
   }
 
-  public getHttpValue(row: R | Table.RowChange<R>, method?: Http.Method): P[keyof P] | undefined {
+  public getHttpValue(row: R | Partial<R> | Table.RowChange<R>, method?: Http.Method): P[keyof P] | undefined {
     if (!isNil(method) && !includes(this.http, method)) {
       return undefined;
     }
@@ -121,7 +121,7 @@ abstract class ReadWriteField<
 
   public getValueFromModel = (m: M) => getKeyValue<M, keyof M>(this.modelField)(m);
 
-  public getHttpValue(row: R | Table.RowChange<R>, method?: Http.Method): P[keyof P] | undefined {
+  public getHttpValue(row: R | Partial<R> | Table.RowChange<R>, method?: Http.Method): P[keyof P] | undefined {
     if (!isNil(method) && !includes(this.http, method)) {
       return undefined;
     }

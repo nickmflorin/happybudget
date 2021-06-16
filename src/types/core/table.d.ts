@@ -94,6 +94,9 @@ namespace Table {
 
   type ConsolidatedChange<R extends Table.Row> = Table.RowChange<R>[];
 
+  type RowAddPayload<R extends Table.Row> = number | Partial<R> | Partial<R>[];
+  type RowAddFunc<R extends Table.Row> = (payload: RowAddPayload<R>) => void;
+
   // TODO: We need to merge this together with other mechanics.
   interface CellValueChangedParams<R extends Table.Row> {
     readonly column: import("@ag-grid-community/core").Column;
@@ -181,7 +184,7 @@ namespace Table {
     // Used to transform a value that is on the row (R) model to a value that is
     // included in the HTTP PATCH or POST payloads.
     readonly httpValueConverter?: (value: R[keyof R]) => P[keyof P] | undefined;
-    readonly getHttpValue: (row: R | Table.RowChange<R>, method?: Http.Method) => P[keyof P] | undefined;
+    readonly getHttpValue: (row: R | Partial<R> | Table.RowChange<R>, method?: Http.Method) => P[keyof P] | undefined;
     readonly getValue: (obj: Table.DataObjType<R, M>) => any;
   };
 
@@ -293,8 +296,7 @@ namespace Table {
     readonly modelToRow: (model: M, meta: Partial<Table.RowMeta> = {}) => R;
     readonly mergeChangesWithRow: (obj: R, change: Table.RowChange<R>) => R;
     readonly mergeChangesWithModel: (obj: M, change: Table.RowChange<R>) => M;
-    readonly payload: (row: R | Table.RowChange<R>) => P | Partial<P>;
-    readonly rowHasRequiredFields: (row: R) => boolean;
+    readonly payload: (row: R | Partial<R> | Table.RowChange<R>) => P | Partial<P>;
   }
 }
 
@@ -384,7 +386,7 @@ namespace BudgetTable {
     readonly identifierField: string;
     readonly columns: Table.Column<R>[];
     readonly onTableChange: (payload: Table.Change<R>) => void;
-    readonly onRowAdd: () => void;
+    readonly onRowAdd: Table.RowAddFunc<R>;
     readonly onRowDelete: (row: R) => void;
     // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
     // onRowExpand is provided to the BudgetTable.

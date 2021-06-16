@@ -155,59 +155,36 @@ export class RowManager<R extends Table.Row, M extends Model.Model, P extends Ht
     return model;
   };
 
-  public payload = <T extends R | Table.RowChange<R>>(row: T): PayloadType<T, P, R> => {
+  public payload = <T extends R | Table.RowChange<R> | Partial<R>>(row: T): PayloadType<T, P, R> => {
     /* eslint-disable no-unused-vars */
     const obj: { [key in keyof P]?: P[keyof P] } = {};
     const method: Http.Method = isRowChange(row) ? "PATCH" : "POST";
 
     const setValue = (field: Table.WriteableField<R, M, P>, key: keyof P, value: any): void => {
-      if (value !== undefined) {
-        if (value === null) {
-          if (field.allowNull === true) {
-            obj[key] = value;
-          }
-        } else if ((value as any) === "") {
-          if (field.allowBlank === true) {
-            obj[key] = "" as P[keyof P];
-          }
-        } else {
+      if (value === null) {
+        if (field.allowNull === true) {
           obj[key] = value;
         }
+      } else if ((value as any) === "") {
+        if (field.allowBlank === true) {
+          obj[key] = "" as P[keyof P];
+        }
+      } else {
+        obj[key] = value;
       }
     };
     forEach(this.fields, (field: Table.Field<R, M, P>) => {
       if (isWriteField(field)) {
         const httpValue = field.getHttpValue(row, method);
-        if (isSplitField(field)) {
-          setValue(field, field.modelField, httpValue);
-        } else {
-          setValue(field, field.field, httpValue);
+        if (httpValue !== undefined) {
+          if (isSplitField(field)) {
+            setValue(field, field.modelField, httpValue);
+          } else {
+            setValue(field, field.field, httpValue);
+          }
         }
       }
     });
     return obj as PayloadType<T, P, R>;
-  };
-
-  public rowHasRequiredFields = (row: R): boolean => {
-    let requiredFieldsPresent = true;
-    forEach(this.requiredFields, (field: Table.Field<R, M, P>) => {
-      let value: any;
-      // TODO: Write only fields are not stored on the row (R), so the only associated
-      // value is the HTTP value which is derived from the row (R).  We might want to
-      // only allow the required flag to be set on the underlying row (R) fields and not
-      // on the derived fields.
-      if (isWriteOnlyField(field)) {
-        value = field.getHttpValue(row);
-      } else {
-        value = field.getValue(row);
-      }
-      // TODO: We have to build this out better to check for other data structures
-      // as well - like arrays and things of that nature.
-      if (isNil(value) || (value as any) === "") {
-        requiredFieldsPresent = false;
-        return false;
-      }
-    });
-    return requiredFieldsPresent;
   };
 }

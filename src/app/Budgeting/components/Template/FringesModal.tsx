@@ -51,7 +51,9 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
       search={search}
       onSearch={(value: string) => dispatch(actions.setFringesSearchAction(value))}
       saving={saving}
-      onRowAdd={() => dispatch(actions.bulkCreateFringesAction(1))}
+      onRowAdd={(payload: Table.RowAddPayload<BudgetTable.FringeRow>) =>
+        dispatch(actions.bulkCreateFringesAction(payload))
+      }
       onRowSelect={(id: number) => dispatch(actions.selectFringeAction(id))}
       onRowDeselect={(id: number) => dispatch(actions.deselectFringeAction(id))}
       onRowDelete={(row: BudgetTable.FringeRow) => dispatch(actions.removeFringeAction(row.id))}

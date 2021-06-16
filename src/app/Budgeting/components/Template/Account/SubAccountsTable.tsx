@@ -93,7 +93,9 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
         cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
-        onRowAdd={() => dispatch(bulkCreateSubAccountsAction(1))}
+        onRowAdd={(payload: Table.RowAddPayload<BudgetTable.TemplateSubAccountRow>) =>
+          dispatch(bulkCreateSubAccountsAction(payload))
+        }
         onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
         onRowDelete={(row: BudgetTable.TemplateSubAccountRow) => dispatch(removeSubAccountAction(row.id))}

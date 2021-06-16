@@ -7,7 +7,9 @@ export const responseFringesAction = simpleAction<Http.ListResponse<Model.Fringe
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.FringeRow>>(
   ActionType.Budget.Fringes.TableChanged
 );
-export const bulkCreateFringesAction = simpleAction<number>(ActionType.Budget.Fringes.BulkCreate);
+export const bulkCreateFringesAction = simpleAction<Table.RowAddPayload<BudgetTable.FringeRow>>(
+  ActionType.Budget.Fringes.BulkCreate
+);
 export const removeFringeAction = simpleAction<number>(ActionType.Budget.Fringes.Delete);
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Fringes.Deleting);
 export const updatingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Fringes.Updating);

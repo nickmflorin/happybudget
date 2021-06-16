@@ -7,13 +7,15 @@ export const loadingSubAccountAction = simpleAction<boolean>(ActionType.Template
 export const responseSubAccountAction = simpleAction<Model.TemplateSubAccount | undefined>(
   ActionType.Template.SubAccount.Response
 );
-export const bulkCreateSubAccountsAction = simpleAction<number>(ActionType.Template.SubAccount.BulkCreate);
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.TemplateSubAccountRow>>(
   ActionType.Template.SubAccount.TableChanged
 );
 export const removeSubAccountAction = simpleAction<number>(ActionType.Template.SubAccount.SubAccounts.Delete);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Template.SubAccount.SubAccounts.Deleting
+);
+export const bulkCreateSubAccountsAction = simpleAction<Table.RowAddPayload<BudgetTable.TemplateSubAccountRow>>(
+  ActionType.Template.SubAccount.SubAccounts.BulkCreate
 );
 export const updatingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Template.SubAccount.SubAccounts.Updating

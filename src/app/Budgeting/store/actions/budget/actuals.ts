@@ -17,7 +17,9 @@ export const restoreBudgetItemsTreeSearchCacheAction = simpleAction<null>(
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.ActualRow>>(
   ActionType.Budget.Actuals.TableChanged
 );
-export const bulkCreateActualsAction = simpleAction<number>(ActionType.Budget.Actuals.BulkCreate);
+export const bulkCreateActualsAction = simpleAction<Table.RowAddPayload<BudgetTable.ActualRow>>(
+  ActionType.Budget.Actuals.BulkCreate
+);
 export const setBudgetItemsTreeSearchAction = simpleAction<string>(ActionType.Budget.BudgetItemsTree.SetSearch);
 export const removeActualAction = simpleAction<number>(ActionType.Budget.Actuals.Delete);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Actuals.Deleting);

@@ -26,7 +26,7 @@ export interface GenericFringesTableProps
   onTableChange: (change: Table.Change<BudgetTable.FringeRow>) => void;
   onRowSelect: (id: number) => void;
   onRowDeselect: (id: number) => void;
-  onRowAdd: () => void;
+  onRowAdd: Table.RowAddFunc<BudgetTable.FringeRow>;
   onRowDelete: (row: BudgetTable.FringeRow) => void;
   onRowExpand?: (id: number) => void;
   onSelectAll: () => void;

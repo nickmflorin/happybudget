@@ -5,15 +5,12 @@ export const setAccountIdAction = simpleAction<number>(ActionType.Budget.Account
 export const requestAccountAction = simpleAction<null>(ActionType.Budget.Account.Request);
 export const loadingAccountAction = simpleAction<boolean>(ActionType.Budget.Account.Loading);
 export const responseAccountAction = simpleAction<Model.BudgetAccount | undefined>(ActionType.Budget.Account.Response);
-// Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const updateAccountInStateAction = simpleAction<Partial<Redux.UpdateModelActionPayload<Model.BudgetAccount>>>(
   ActionType.Budget.Account.UpdateInState
 );
-export const bulkCreateSubAccountsAction = simpleAction<number>(ActionType.Budget.Account.BulkCreate);
-
-/*
-  Actions Pertaining to Account Comments
-*/
+export const bulkCreateSubAccountsAction = simpleAction<Table.RowAddPayload<BudgetTable.BudgetSubAccountRow>>(
+  ActionType.Budget.Account.SubAccounts.BulkCreate
+);
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.Account.Comments.Request);
 export const responseCommentsAction = simpleAction<Http.ListResponse<Model.Comment>>(
   ActionType.Budget.Account.Comments.Response
@@ -43,9 +40,6 @@ export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budg
 export const updateCommentInStateAction = simpleAction<
   Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
 >(ActionType.Budget.Account.Comments.UpdateInState);
-/*
-  Actions Pertaining to Account Sub Accounts
-*/
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.BudgetSubAccountRow>>(
   ActionType.Budget.Account.TableChanged
 );
@@ -81,9 +75,6 @@ export const removeSubAccountFromStateAction = simpleAction<number>(
 export const addSubAccountToStateAction = simpleAction<Model.BudgetSubAccount>(
   ActionType.Budget.Account.SubAccounts.AddToState
 );
-/*
-  Actions Pertaining to Account Sub Accounts Groups
-*/
 export const requestGroupsAction = simpleAction<null>(ActionType.Budget.Account.SubAccounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.Account.SubAccounts.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.BudgetGroup>>(
@@ -102,9 +93,6 @@ export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.Account.SubAccounts.Groups.Deleting
 );
 export const deleteGroupAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Groups.Delete);
-/*
-  Actions Pertaining to Account Sub Accounts History
-*/
 export const requestHistoryAction = simpleAction<null>(ActionType.Budget.Account.SubAccounts.History.Request);
 export const loadingHistoryAction = simpleAction<boolean>(ActionType.Budget.Account.SubAccounts.History.Loading);
 export const responseHistoryAction = simpleAction<Http.ListResponse<Model.HistoryEvent>>(

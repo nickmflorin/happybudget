@@ -84,7 +84,9 @@ const AccountsTable = (): JSX.Element => {
         search={search}
         onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
         saving={saving}
-        onRowAdd={() => dispatch(bulkCreateAccountsAction(1))}
+        onRowAdd={(payload: Table.RowAddPayload<BudgetTable.BudgetAccountRow>) =>
+          dispatch(bulkCreateAccountsAction(payload))
+        }
         onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
         onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
         onRowDelete={(row: BudgetTable.BudgetAccountRow) => dispatch(removeAccountAction(row.id))}

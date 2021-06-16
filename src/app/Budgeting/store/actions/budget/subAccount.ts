@@ -11,9 +11,11 @@ export const responseSubAccountAction = simpleAction<Model.BudgetSubAccount | un
 export const updateParentSubAccountInStateAction = simpleAction<Partial<Model.BudgetAccount>>(
   ActionType.Budget.SubAccount.UpdateInState
 );
-export const bulkCreateSubAccountsAction = simpleAction<number>(ActionType.Budget.SubAccount.BulkCreate);
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.BudgetSubAccountRow>>(
   ActionType.Budget.SubAccount.TableChanged
+);
+export const bulkCreateSubAccountsAction = simpleAction<Table.RowAddPayload<BudgetTable.BudgetSubAccountRow>>(
+  ActionType.Budget.SubAccount.SubAccounts.BulkCreate
 );
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.SubAccount.Comments.Request);
 export const responseCommentsAction = simpleAction<Http.ListResponse<Model.Comment>>(

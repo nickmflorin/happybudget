@@ -211,11 +211,18 @@ export const createSubAccountTaskSet = <
       const source = CancelToken.source();
       yield put(actions.creating(true));
 
-      const autoIndex = yield select(selectAutoIndex);
-      const count = isAction(action) ? action.payload : action;
       const data = yield select(selectModels);
+      const autoIndex = yield select(selectAutoIndex);
+      const actionPayload = isAction(action) ? action.payload : action;
 
-      const payload = createBulkCreatePayload(data, count, autoIndex) as Http.BulkCreatePayload<Http.SubAccountPayload>;
+      const payload: Http.BulkCreatePayload<Http.SubAccountPayload> = createBulkCreatePayload<
+        R,
+        Http.SubAccountPayload,
+        SA
+      >(actionPayload, manager, {
+        autoIndex,
+        models: data
+      });
 
       try {
         const subaccounts: SA[] = yield call(api.bulkCreateSubAccountSubAccounts, subaccountId, payload, {

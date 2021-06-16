@@ -5,25 +5,7 @@ import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
 import { loadingTemplateAction, requestTemplateAction } from "../../actions/template";
-import {
-  loadingAccountAction,
-  responseAccountAction,
-  loadingSubAccountsAction,
-  responseSubAccountsAction,
-  deletingSubAccountAction,
-  creatingSubAccountAction,
-  updatingSubAccountAction,
-  requestSubAccountsAction,
-  requestAccountAction,
-  deletingGroupAction,
-  removeGroupFromStateAction,
-  updateSubAccountInStateAction,
-  removeSubAccountFromStateAction,
-  requestGroupsAction,
-  responseGroupsAction,
-  loadingGroupsAction,
-  addSubAccountToStateAction
-} from "../../actions/template/account";
+import * as actions from "../../actions/template/account";
 import { createStandardSaga, createAccountTaskSet } from "../factories";
 
 const tasks = createAccountTaskSet<
@@ -33,30 +15,30 @@ const tasks = createAccountTaskSet<
   Model.TemplateGroup
 >(
   {
-    loading: loadingSubAccountsAction,
-    deleting: deletingSubAccountAction,
-    creating: creatingSubAccountAction,
-    updating: updatingSubAccountAction,
-    request: requestSubAccountsAction,
-    response: responseSubAccountsAction,
-    addToState: addSubAccountToStateAction,
-    updateInState: updateSubAccountInStateAction,
-    removeFromState: removeSubAccountFromStateAction,
+    loading: actions.loadingSubAccountsAction,
+    deleting: actions.deletingSubAccountAction,
+    creating: actions.creatingSubAccountAction,
+    updating: actions.updatingSubAccountAction,
+    request: actions.requestSubAccountsAction,
+    response: actions.responseSubAccountsAction,
+    addToState: actions.addSubAccountToStateAction,
+    updateInState: actions.updateSubAccountInStateAction,
+    removeFromState: actions.removeSubAccountFromStateAction,
     budget: {
       loading: loadingTemplateAction,
       request: requestTemplateAction
     },
     account: {
-      request: requestAccountAction,
-      loading: loadingAccountAction,
-      response: responseAccountAction
+      request: actions.requestAccountAction,
+      loading: actions.loadingAccountAction,
+      response: actions.responseAccountAction
     },
     groups: {
-      deleting: deletingGroupAction,
-      removeFromState: removeGroupFromStateAction,
-      loading: loadingGroupsAction,
-      response: responseGroupsAction,
-      request: requestGroupsAction
+      deleting: actions.deletingGroupAction,
+      removeFromState: actions.removeGroupFromStateAction,
+      loading: actions.loadingGroupsAction,
+      response: actions.responseGroupsAction,
+      request: actions.requestGroupsAction
     }
   },
   models.TemplateSubAccountRowManager,
@@ -98,7 +80,7 @@ export default createStandardSaga(
       task: tasks.getGroups
     },
     TableChanged: { actionType: ActionType.Template.Account.TableChanged, task: tasks.handleTableChange },
-    BulkCreate: { actionType: ActionType.Template.Account.BulkCreate, task: tasks.bulkCreate },
+    BulkCreate: { actionType: ActionType.Template.Account.SubAccounts.BulkCreate, task: tasks.bulkCreate },
     Delete: { actionType: ActionType.Template.Account.SubAccounts.Delete, task: tasks.handleRemoval },
     DeleteGroup: { actionType: ActionType.Template.Account.SubAccounts.Groups.Delete, task: tasks.deleteGroup },
     RemoveModelFromGroup: {
