@@ -49,8 +49,54 @@ namespace Modules {
   namespace Budgeting {
     type BudgetDirective = "Budget" | "Template";
 
-    interface SubAccountsStore<SA, G extends Model.Group> extends Redux.ModelListResponseStore<SA> {
+    interface SubAccountsStore<SA extends Model.Model, G extends Model.Group> extends Redux.ModelListResponseStore<SA> {
       readonly groups: Redux.ModelListResponseStore<G>;
+      readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
+    }
+
+    interface AccountsStore<A extends Model.Model, G extends Model.Group> extends Redux.ModelListResponseStore<A> {
+      readonly groups: Redux.ModelListResponseStore<G>;
+    }
+
+    interface SubAccountStore<
+      SA extends Model.Model,
+      G extends Model.Group,
+      SASS extends Modules.Budgeting.SubAccountsStore<SA, G>
+    > {
+      readonly id: number | null;
+      readonly detail: Redux.ModelDetailResponseStore<SA>;
+      readonly subaccounts: SASS;
+    }
+
+    interface AccountStore<
+      A extends Model.Model,
+      G extends Model.Group,
+      SASS extends Modules.Budgeting.SubAccountsStore<SA, G>
+    > {
+      readonly id: number | null;
+      readonly detail: Redux.ModelDetailResponseStore<A>;
+      readonly subaccounts: SASS;
+    }
+
+    interface BaseBudgetStore<M extends Model.Model> {
+      readonly id: number | null;
+      readonly detail: Redux.ModelDetailResponseStore<M>;
+    }
+
+    interface BaseBudgetModuleStore<
+      A extends Model.Model,
+      SA extends Model.Model,
+      G extends Model.Group,
+      ASS extends Modules.Budgeting.AccountsStore<A, G>,
+      SASS extends Modules.Budgeting.SubAccountsStore<SA, G>,
+      AS extends Modules.Budgeting.AccountStore<A, G, SASS>,
+      SAS extends Modules.Budgeting.SubACcountStore<SA, G, SASS>
+    > {
+      readonly autoIndex: boolean;
+      readonly instance: A | S | null;
+      readonly subaccount: SAS;
+      readonly account: AS;
+      readonly accounts: ASS;
       readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
     }
 
@@ -64,43 +110,49 @@ namespace Modules {
         readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>;
       }
 
-      interface AccountsStore extends Redux.ModelListResponseStore<Model.BudgetAccount> {
+      /* eslint-disable no-shadow */
+      interface AccountsStore extends Modules.Budgeting.AccountsStore<Model.BudgetAccount, Model.BudgetGroup> {
         readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>;
-        readonly groups: Redux.ModelListResponseStore<Model.BudgetGroup>;
       }
 
-      interface SubAccountStore {
-        readonly id: number | null;
-        readonly detail: Redux.ModelDetailResponseStore<Model.BudgetSubAccount>;
-        readonly subaccounts: SubAccountsStore;
+      /* eslint-disable no-shadow */
+      interface SubAccountStore
+        extends Modules.Budgeting.SubAccountStore<
+          Model.BudgetSubAccount,
+          Model.BudgetGroup,
+          Modules.Budgeting.Budget.SubAccountsStore
+        > {
         readonly comments: CommentsStore;
       }
 
-      interface AccountStore {
-        readonly id: number | null;
-        readonly detail: Redux.ModelDetailResponseStore<Model.BudgetAccount>;
-        readonly subaccounts: SubAccountsStore;
+      /* eslint-disable no-shadow */
+      interface AccountStore
+        extends Modules.Budgeting.AccountStore<
+          Model.BudgetAccount,
+          Model.BudgetGroup,
+          Modules.Budgeting.Budget.SubAccountsStore
+        > {
         readonly comments: CommentsStore;
       }
 
-      interface BudgetStore {
-        readonly id: number | null;
-        readonly detail: Redux.ModelDetailResponseStore<Model.Budget>;
+      interface BudgetStore extends Modules.Budgeting.BaseBudgetStore<Model.Budget> {
         readonly comments: CommentsStore;
       }
 
-      interface Store {
-        readonly autoIndex: boolean;
+      interface Store
+        extends Modules.Budgeting.BaseBudgetModuleStore<
+          Model.BudgetAccount,
+          Model.BudgetSubAccount,
+          Model.BudgetGroup,
+          Modules.Budgeting.Budget.AccountsStore,
+          Modules.Budgeting.Budget.SubAccountsStore,
+          Modules.Budgeting.Budget.AccountStore,
+          Modules.Budgeting.Budget.SubAccountStore
+        > {
         readonly budget: BudgetStore;
-        readonly instance: Model.BudgetAccount | Model.BudgetSubAccount | null;
         readonly commentsHistoryDrawerOpen: boolean;
-        // readonly allSubAccounts: Redux.ModelListResponseStore<Model.SimpleSubAccount>;
         readonly subAccountsTree: Redux.ModelListResponseStore<Model.SubAccountTreeNode>;
         readonly actuals: Redux.ModelListResponseStore<Model.Actual>;
-        readonly subaccount: SubAccountStore;
-        readonly account: AccountStore;
-        readonly accounts: AccountsStore;
-        readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
       }
     }
 
@@ -112,31 +164,34 @@ namespace Modules {
       interface SubAccountsStore
         extends Modules.Budgeting.SubAccountsStore<Model.TemplateSubAccount, Model.TemplateGroup> {}
 
-      interface SubAccountStore {
-        readonly id: number | null;
-        readonly detail: Redux.ModelDetailResponseStore<Model.TemplateSubAccount>;
-        readonly subaccounts: SubAccountsStore;
-      }
+      interface SubAccountStore
+        extends Modules.Budgeting.SubAccountStore<
+          Model.TemplateSubAccount,
+          Model.TemplateGroup,
+          Modules.Budgeting.Template.SubAccountsStore
+        > {}
 
-      interface AccountStore {
-        readonly id: number | null;
-        readonly detail: Redux.ModelDetailResponseStore<Model.TemplateAccount>;
-        readonly subaccounts: SubAccountsStore;
-      }
+      /* eslint-disable no-shadow */
+      interface AccountStore
+        extends Modules.Budgeting.AccountStore<
+          Model.TemplateAccount,
+          Model.TemplateGroup,
+          Modules.Budgeting.Template.SubAccountsStore
+        > {}
 
-      interface TemplateStore {
-        readonly id: number | null;
-        readonly detail: Redux.ModelDetailResponseStore<Model.Template>;
-      }
+      interface TemplateStore extends Modules.Budgeting.BaseBudgetStore<Model.Template> {}
 
-      interface Store {
-        readonly autoIndex: boolean;
+      interface Store
+        extends Modules.Budgeting.BaseBudgetModuleStore<
+          Model.TemplateAccount,
+          Model.TemplateSubAccount,
+          Model.TemplateGroup,
+          Modules.Budgeting.Template.AccountsStore,
+          Modules.Budgeting.Template.SubAccountsStore,
+          Modules.Budgeting.Template.AccountStore,
+          Modules.Budgeting.Template.SubAccountStore
+        > {
         readonly template: TemplateStore;
-        readonly instance: Model.TemplateAccount | Model.TemplateSubAccount | null;
-        readonly subaccount: SubAccountStore;
-        readonly account: AccountStore;
-        readonly accounts: AccountsStore;
-        readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
       }
     }
     interface Store {

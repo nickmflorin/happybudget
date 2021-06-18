@@ -1,12 +1,296 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce, forEach } from "lodash";
+
 import { createModelListResponseReducer } from "lib/redux/factories";
 import { warnInconsistentState } from "lib/redux/util";
 import * as typeguards from "lib/model/typeguards";
 import { fringeValue } from "lib/model/util";
 import { replaceInArray } from "lib/util";
 
-import createFringesReducer from "./fringes";
+import { initialModelListResponseState } from "store/initialState";
+import { ActionType } from "../actions";
+
+export const createFringesReducer = <D extends Modules.Budgeting.BudgetDirective>(
+  /* eslint-disable indent */
+  directive: D
+): Reducer<Redux.ModelListResponseStore<Model.Fringe>, Redux.Action<any>> => {
+  const listResponseReducer = createModelListResponseReducer<Model.Fringe, Redux.ModelListResponseStore<Model.Fringe>>(
+    {
+      Response: ActionType[directive].Fringes.Response,
+      Loading: ActionType[directive].Fringes.Loading,
+      SetSearch: ActionType[directive].Fringes.SetSearch,
+      UpdateInState: ActionType[directive].Fringes.UpdateInState,
+      RemoveFromState: ActionType[directive].Fringes.RemoveFromState,
+      AddToState: ActionType[directive].Fringes.AddToState,
+      Select: ActionType[directive].Fringes.Select,
+      Deselect: ActionType[directive].Fringes.Deselect,
+      SelectAll: ActionType[directive].Fringes.SelectAll,
+      Deleting: ActionType[directive].Fringes.Deleting,
+      Updating: ActionType[directive].Fringes.Updating,
+      Creating: ActionType[directive].Fringes.Creating
+    },
+    {
+      strictSelect: false,
+      initialState: initialModelListResponseState
+    }
+  );
+  return (
+    state: Redux.ModelListResponseStore<Model.Fringe> = initialModelListResponseState,
+    action: Redux.Action<any>
+  ): Redux.ModelListResponseStore<Model.Fringe> => {
+    return listResponseReducer(state, action);
+  };
+};
+
+interface AccountsGroupsActionMap {
+  Response: string;
+  Request: string;
+  Loading: string;
+  RemoveFromState: string;
+  UpdateInState: string;
+  AddToState: string;
+  Deleting: string;
+}
+
+interface AccountsHistoryActionMap {
+  Response: string;
+  Request: string;
+  Loading: string;
+}
+
+interface AccountsReducerFactoryActionMap {
+  Response: string;
+  Request: string;
+  Loading: string;
+  SetSearch: string;
+  UpdateInState: string;
+  RemoveFromState: string;
+  AddToState: string;
+  Select: string;
+  Deselect: string;
+  SelectAll: string;
+  RemoveFromGroup: string;
+  AddToGroup: string;
+  Creating: string;
+  Updating: string;
+  Deleting: string;
+  Groups: AccountsGroupsActionMap;
+  History?: AccountsHistoryActionMap;
+}
+
+const recalculateGroupMetrics = <
+  S extends Modules.Budgeting.AccountsStore<M, G> | Modules.Budgeting.SubAccountsStore<M, G>,
+  M extends Model.BudgetAccount | Model.TemplateAccount | Model.BudgetSubAccount | Model.TemplateSubAccount,
+  G extends Model.Group
+>(
+  /* eslint-disable indent */
+  action: Redux.Action<any>,
+  st: S,
+  groupId: number
+): S => {
+  // This might not be totally necessary, but it is good practice to not use the entire payload
+  // to update the group (since that is already done by the reducer above) but to instead just
+  // update the parts of the relevant parts of the current group in state (estimated, variance,
+  // actual).
+  const group: G | undefined = find(st.groups.data, { id: groupId } as any);
+  if (isNil(group)) {
+    warnInconsistentState({
+      action: action.type,
+      reason: "Group does not exist in state when it is expected to.",
+      id: groupId
+    });
+    return st;
+  }
+  const objs = filter(
+    map(group.children, (id: number) => {
+      const obj = find(st.data, { id });
+      if (!isNil(obj)) {
+        return obj;
+      } else {
+        warnInconsistentState({
+          action: action.type,
+          reason: "Group child account/sub-account does not exist in state when it is expected to.",
+          id: id,
+          groupId: group.id
+        });
+        return null;
+      }
+    }),
+    (child: M | null) => child !== null
+  ) as M[];
+  let payload: any = {
+    estimated: reduce(objs, (sum: number, s: M) => sum + (s.estimated || 0), 0)
+  };
+  if (typeguards.isBudgetGroup(group)) {
+    const budgetAccounts = objs as (Model.BudgetAccount | Model.BudgetSubAccount)[];
+    const actual = reduce(
+      budgetAccounts,
+      (sum: number, s: Model.BudgetAccount | Model.BudgetSubAccount) => sum + (s.actual || 0),
+      0
+    );
+    payload = { ...payload, actual, variance: payload.estimated - actual };
+  }
+  return {
+    ...st,
+    groups: {
+      ...st.groups,
+      data: replaceInArray<G>(st.groups.data, { id: group.id }, { ...group, ...payload })
+    }
+  };
+};
+
+export const createAccountsReducer = <
+  S extends Modules.Budgeting.AccountsStore<A, G>,
+  A extends Model.BudgetAccount | Model.TemplateAccount,
+  G extends Model.Group
+>(
+  /* eslint-disable indent */
+  mapping: AccountsReducerFactoryActionMap,
+  initialState: S
+): Reducer<S, Redux.Action<any>> => {
+  let historySubReducers = {};
+  if (!isNil(mapping.History)) {
+    historySubReducers = {
+      history: createModelListResponseReducer<Model.HistoryEvent>({
+        Response: mapping.History.Response,
+        Request: mapping.History.Request,
+        Loading: mapping.History.Loading
+      })
+    };
+  }
+  const listResponseReducer = createModelListResponseReducer<A, S>(
+    {
+      Response: mapping.Response,
+      Request: mapping.Request,
+      Loading: mapping.Loading,
+      SetSearch: mapping.SetSearch,
+      UpdateInState: mapping.UpdateInState,
+      RemoveFromState: mapping.RemoveFromState,
+      AddToState: mapping.AddToState,
+      Select: mapping.Select,
+      Deselect: mapping.Deselect,
+      SelectAll: mapping.SelectAll,
+      Deleting: mapping.Deleting,
+      Updating: mapping.Updating,
+      Creating: mapping.Creating
+    },
+    {
+      initialState,
+      strictSelect: false,
+      subReducers: {
+        ...historySubReducers,
+        groups: createModelListResponseReducer<G, Redux.ModelListResponseStore<G>>({
+          Response: mapping.Groups.Response,
+          Request: mapping.Groups.Request,
+          Loading: mapping.Groups.Loading,
+          RemoveFromState: mapping.Groups.RemoveFromState,
+          AddToState: mapping.Groups.AddToState,
+          UpdateInState: mapping.Groups.UpdateInState,
+          Deleting: mapping.Groups.Deleting
+        })
+      }
+    }
+  );
+
+  return (state: S = initialState, action: Redux.Action<any>): S => {
+    let newState = { ...state };
+
+    newState = listResponseReducer(newState, action);
+
+    // NOTE: The above ListResponseReducer handles updates to the Group itself or the SubAccount itself
+    // via these same actions. However, it does not do any recalculation of the group values, because
+    // it needs the state of the Group and the state of the SubAccount(s) to do so. This means moving
+    // that logic/recalculation further up the reducer tree where we have access to the SubAccount(s)
+    // in state.
+    if (action.type === mapping.Groups.UpdateInState) {
+      const group: G = action.payload;
+      newState = recalculateGroupMetrics<S, A, G>(action, newState, group.id);
+    } else if (action.type === mapping.Groups.AddToState) {
+      const group: G = action.payload;
+      forEach(group.children, (simpleAccount: number) => {
+        const account: A | undefined = find(newState.data, { id: simpleAccount } as any);
+        if (isNil(account)) {
+          warnInconsistentState({
+            action: action.type,
+            reason: "Account does not exist in state for group child.",
+            id: simpleAccount,
+            groupId: group.id
+          });
+        } else {
+          newState = {
+            ...newState,
+            data: replaceInArray<A>(newState.data, { id: simpleAccount }, { ...account, group: group.id })
+          };
+        }
+      });
+    } else if (action.type === mapping.Groups.RemoveFromState) {
+      // NOTE: Here, we cannot look at the group that was removed from state because the action
+      // only includes the group ID and the group was already removed from state.  Instead, we will
+      // clear the group for any Account that belongs to a group no longer in state.
+      forEach(newState.data, (account: A) => {
+        if (!isNil(account.group)) {
+          const group: G | undefined = find(newState.groups.data, { id: account.group } as any);
+          if (isNil(group)) {
+            newState = {
+              ...newState,
+              data: replaceInArray<A>(newState.data, { id: account.id }, { ...account, group: null })
+            };
+          }
+        }
+      });
+    } else if (action.type === mapping.UpdateInState) {
+      const subAccount: A = action.payload;
+      if (!isNil(subAccount.group)) {
+        newState = recalculateGroupMetrics<S, A, G>(action, newState, subAccount.group);
+      }
+    } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
+      const group: G | undefined = find(newState.groups.data, (g: G) => includes(g.children, action.payload));
+      if (isNil(group)) {
+        warnInconsistentState({
+          action: action.type,
+          reason: "Group does not exist for account.",
+          id: action.payload
+        });
+      } else {
+        newState = {
+          ...newState,
+          groups: {
+            ...newState.groups,
+            data: replaceInArray<G>(
+              newState.groups.data,
+              { id: group.id },
+              { ...group, children: filter(group.children, (child: number) => child !== action.payload) }
+            )
+          }
+        };
+        newState = recalculateGroupMetrics<S, A, G>(action, newState, group.id);
+      }
+    } else if (action.type === mapping.AddToGroup) {
+      const group: G | undefined = find(newState.groups.data, { id: action.payload.group });
+      if (isNil(group)) {
+        warnInconsistentState({
+          action: action.type,
+          reason: "Group does not exist for account.",
+          id: action.payload
+        });
+      } else {
+        newState = {
+          ...newState,
+          groups: {
+            ...newState.groups,
+            data: replaceInArray<G>(
+              newState.groups.data,
+              { id: group.id },
+              { ...group, children: [...group.children, action.payload.id] }
+            )
+          }
+        };
+        newState = recalculateGroupMetrics<S, A, G>(action, newState, group.id);
+      }
+    }
+    return { ...newState };
+  };
+};
 
 interface SubAccountsGroupsActionMap {
   Response: string;
@@ -48,63 +332,6 @@ interface SubAccountsReducerFactoryActionMap {
   Fringes: SubAccountsFringesActionMap;
   History?: SubAccountsHistoryActionMap;
 }
-
-const recalculateGroupMetrics = <
-  S extends Modules.Budgeting.SubAccountsStore<SA, G>,
-  SA extends Model.BudgetSubAccount | Model.TemplateSubAccount,
-  G extends Model.Group
->(
-  /* eslint-disable indent */
-  action: Redux.Action<any>,
-  st: S,
-  groupId: number
-): S => {
-  // This might not be totally necessary, but it is good practice to not use the entire payload
-  // to update the group (since that is already done by the reducer above) but to instead just
-  // update the parts of the relevant parts of the current group in state (estimated, variance,
-  // actual).
-  const group: G | undefined = find(st.groups.data, { id: groupId } as any);
-  if (isNil(group)) {
-    warnInconsistentState({
-      action: action.type,
-      reason: "Group does not exist in state when it is expected to.",
-      id: groupId
-    });
-    return st;
-  }
-  const subAccounts = filter(
-    map(group.children, (id: number) => {
-      const subAccount = find(st.data, { id });
-      if (!isNil(subAccount)) {
-        return subAccount;
-      } else {
-        warnInconsistentState({
-          action: action.type,
-          reason: "Group child sub-account does not exist in state when it is expected to.",
-          id: id,
-          groupId: group.id
-        });
-        return null;
-      }
-    }),
-    (child: SA | null) => child !== null
-  ) as SA[];
-  let payload: any = {
-    estimated: reduce(subAccounts, (sum: number, s: SA) => sum + (s.estimated || 0), 0)
-  };
-  if (typeguards.isBudgetGroup(group)) {
-    const budgetSubAccounts = subAccounts as Model.BudgetSubAccount[];
-    const actual = reduce(budgetSubAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.actual || 0), 0);
-    payload = { ...payload, actual, variance: payload.estimated - actual };
-  }
-  return {
-    ...st,
-    groups: {
-      ...st.groups,
-      data: replaceInArray<G>(st.groups.data, { id: group.id }, { ...group, ...payload })
-    }
-  };
-};
 
 const recalculateSubAccountFromFringes = <
   S extends Modules.Budgeting.SubAccountsStore<SA, G>,
@@ -230,7 +457,7 @@ export const createSubAccountsReducer = <
       strictSelect: false,
       subReducers: {
         fringes: createFringesReducer(directive),
-        groups: createModelListResponseReducer<Model.BudgetGroup, Redux.ModelListResponseStore<Model.BudgetGroup>>({
+        groups: createModelListResponseReducer<G, Redux.ModelListResponseStore<G>>({
           Response: mapping.Groups.Response,
           Request: mapping.Groups.Request,
           Loading: mapping.Groups.Loading,
