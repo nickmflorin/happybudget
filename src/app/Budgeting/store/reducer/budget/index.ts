@@ -49,15 +49,15 @@ const genericReducer = combineReducers({
       Replying: ActionType.Budget.Comments.Replying
     })
   }),
-  budgetItems: createModelListResponseReducer<Model.BudgetLineItem>({
-    Response: ActionType.Budget.BudgetItems.Response,
-    Loading: ActionType.Budget.BudgetItems.Loading
-  }),
-  budgetItemsTree: createModelListResponseReducer<Model.AccountTreeNode>({
-    Response: ActionType.Budget.BudgetItemsTree.Response,
-    Loading: ActionType.Budget.BudgetItemsTree.Loading,
-    SetSearch: ActionType.Budget.BudgetItemsTree.SetSearch,
-    RestoreSearchCache: ActionType.Budget.BudgetItemsTree.RestoreSearchCache
+  // budgetItems: createModelListResponseReducer<Model.BudgetLineItem>({
+  //   Response: ActionType.Budget.BudgetItems.Response,
+  //   Loading: ActionType.Budget.BudgetItems.Loading
+  // }),
+  subAccountsTree: createModelListResponseReducer<Model.SubAccountTreeNode>({
+    Response: ActionType.Budget.SubAccountsTree.Response,
+    Loading: ActionType.Budget.SubAccountsTree.Loading,
+    SetSearch: ActionType.Budget.SubAccountsTree.SetSearch,
+    RestoreSearchCache: ActionType.Budget.SubAccountsTree.RestoreSearchCache
   })
 });
 

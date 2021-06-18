@@ -199,17 +199,17 @@ const ActionType = {
         }
       }
     },
-    BudgetItems: {
-      Request: "budget.budgetitems.Request",
-      Loading: "budget.budgetitems.Loading",
-      Response: "budget.budgetitems.Response"
-    },
-    BudgetItemsTree: {
-      Request: "budget.budgetitemstree.Request",
-      Loading: "budget.budgetitemstree.Loading",
-      Response: "budget.budgetitemstree.Response",
-      SetSearch: "budget.budgetitemstree.SetSearch",
-      RestoreSearchCache: "budget.budgetitemstree.RestoreSearchCache"
+    // AllSubAccounts: {
+    //   Request: "budget.allsubaccounts.Request",
+    //   Loading: "budget.allsubaccounts.Loading",
+    //   Response: "budget.allsubaccounts.Response"
+    // },
+    SubAccountsTree: {
+      Request: "budget.subaccountstree.Request",
+      Loading: "budget.subaccountstree.Loading",
+      Response: "budget.subaccountstree.Response",
+      SetSearch: "budget.subaccountstree.SetSearch",
+      RestoreSearchCache: "budget.subaccountstree.RestoreSearchCache"
     },
     Actuals: {
       TableChanged: "budget.actuals.TableChanged",

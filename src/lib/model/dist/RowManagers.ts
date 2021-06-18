@@ -1,6 +1,5 @@
 import { isNil } from "lodash";
-import { getKeyValue } from "lib/util";
-import { RowManager, ReadWrite, ReadOnly, WriteOnly } from "lib/model/models";
+import { RowManager, ReadWrite, ReadOnly } from "lib/model/models";
 
 export const BudgetAccountRowManager = new RowManager<
   BudgetTable.BudgetAccountRow,
@@ -111,59 +110,16 @@ export const TemplateSubAccountRowManager = new RowManager<
 export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actual, Http.ActualPayload>({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
-    WriteOnly({
-      field: "object_id",
+    ReadWrite({
+      field: "subaccount",
       allowNull: true,
-      getValueFromRow: (row: BudgetTable.ActualRow) => {
-        if (!isNil(row.account)) {
-          return row.account.id;
+      httpValueConverter: (value: Model.SimpleSubAccount | null) => {
+        if (!isNil(value)) {
+          return value.id;
         }
         return null;
-      },
-      getValueFromRowChangeData: (data: Table.RowChangeData<BudgetTable.ActualRow>) => {
-        const cellChange:
-          | Table.CellChange<BudgetTable.ActualRow[keyof BudgetTable.ActualRow]>
-          | undefined = getKeyValue<
-          { [key in keyof BudgetTable.ActualRow]?: Table.CellChange<BudgetTable.ActualRow[key]> },
-          keyof BudgetTable.ActualRow
-        >("account")(data);
-        if (cellChange !== undefined) {
-          const account: Model.SimpleAccount | Model.SimpleSubAccount | null = cellChange.newValue;
-          if (account !== null) {
-            return account.id;
-          }
-          return null;
-        }
-        return undefined;
       }
     }),
-    WriteOnly({
-      field: "parent_type",
-      allowNull: true,
-      getValueFromRow: (row: BudgetTable.ActualRow) => {
-        if (!isNil(row.account)) {
-          return row.account.type;
-        }
-        return null;
-      },
-      getValueFromRowChangeData: (data: Table.RowChangeData<BudgetTable.ActualRow>) => {
-        const cellChange:
-          | Table.CellChange<BudgetTable.ActualRow[keyof BudgetTable.ActualRow]>
-          | undefined = getKeyValue<
-          { [key in keyof BudgetTable.ActualRow]?: Table.CellChange<BudgetTable.ActualRow[key]> },
-          keyof BudgetTable.ActualRow
-        >("account")(data);
-        if (cellChange !== undefined) {
-          const account: Model.SimpleAccount | Model.SimpleSubAccount | null = cellChange.newValue;
-          if (account !== null) {
-            return account.type;
-          }
-          return null;
-        }
-        return undefined;
-      }
-    }),
-    ReadOnly({ field: "account" }),
     ReadWrite({ field: "vendor", allowNull: true }),
     ReadWrite({ field: "purchase_order", allowNull: true }),
     ReadWrite({ field: "date", allowNull: true }),
@@ -180,7 +136,7 @@ export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actu
     ReadWrite({ field: "payment_id", allowNull: true }),
     ReadWrite({ field: "value", allowNull: true })
   ],
-  labelGetter: (model: Model.Actual) => String(!isNil(model.account) ? model.account.identifier : ""),
+  labelGetter: (model: Model.Actual) => String(!isNil(model.subaccount) ? model.subaccount.identifier : ""),
   typeLabel: "Actual",
   rowType: "actual"
 });

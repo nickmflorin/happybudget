@@ -149,10 +149,9 @@ namespace Http {
     readonly unit?: Model.SubAccountUnitId | null;
   }
 
-  interface ActualPayload extends Omit<Http.ModelPayload<Model.Actual>, "account"> {
+  interface ActualPayload extends Omit<Http.ModelPayload<Model.Actual>, "subaccount" | "payment_method"> {
     readonly payment_method?: Model.PaymentMethodId | null;
-    readonly object_id?: number;
-    readonly parent_type?: "account" | "subaccount";
+    readonly subaccount?: number | null;
   }
 
   interface CommentPayload implements Http.ModelPayload<Model.Comment> {

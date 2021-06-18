@@ -185,11 +185,6 @@ namespace Model {
     readonly in_search_path: boolean;
   }
 
-  interface AccountTreeNode extends Model.SimpleAccount {
-    readonly children: Model.SubAccountTreeNode[];
-    readonly in_search_path: boolean;
-  }
-
   type Tree = Model.AccountTreeNode[];
 
   interface Account extends Model.SimpleAccount {
@@ -265,7 +260,7 @@ namespace Model {
     readonly payment_id: string | null;
     readonly value: string | null;
     readonly payment_method: Model.PaymentMethod | null;
-    readonly account: Model.SimpleAccount | Model.SimpleSubAccount | null;
+    readonly subaccount: Model.SimpleSubAccount | null;
     readonly created_by: number | null;
     readonly updated_by: number | null;
     readonly created_at: string;

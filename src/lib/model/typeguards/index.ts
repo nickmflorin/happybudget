@@ -55,15 +55,3 @@ export const isModelWithName = (model: Model.Model | Model.ModelWithName): model
 export const isTag = (model: Model.Model | Model.Tag): model is Model.Tag => {
   return (model as Model.Tag).title !== undefined && (model as Model.Tag).color !== undefined;
 };
-
-export const isAccountTreeNode = (
-  node: Model.AccountTreeNode | Model.SubAccountTreeNode
-): node is Model.AccountTreeNode => {
-  return (node as Model.AccountTreeNode).type === "account";
-};
-
-export const isSubAccountTreeNode = (
-  node: Model.AccountTreeNode | Model.SubAccountTreeNode
-): node is Model.SubAccountTreeNode => {
-  return (node as Model.SubAccountTreeNode).type === "subaccount";
-};

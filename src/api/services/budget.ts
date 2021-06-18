@@ -118,22 +118,22 @@ export const createBudgetFringe = async (
   return client.post<Model.Fringe>(url, payload, options);
 };
 
-export const getBudgetItems = async (
+export const getBudgetSubAccounts = async (
   id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SimpleLineItem>> => {
-  const url = URL.v1("budgets", id, "items");
-  return client.list<Model.SimpleLineItem>(url, query, options);
+): Promise<Http.ListResponse<Model.SimpleSubAccount>> => {
+  const url = URL.v1("budgets", id, "subaccounts");
+  return client.list<Model.SimpleSubAccount>(url, query, options);
 };
 
-export const getBudgetItemsTree = async (
+export const getBudgetSubAccountsTree = async (
   id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.AccountTreeNode>> => {
-  const url = URL.v1("budgets", id, "items", "tree");
-  return client.list<Model.AccountTreeNode>(url, query, options);
+): Promise<Http.ListResponse<Model.SubAccountTreeNode>> => {
+  const url = URL.v1("budgets", id, "subaccounts", "tree");
+  return client.list<Model.SubAccountTreeNode>(url, query, options);
 };
 
 export const getBudgetActuals = async (

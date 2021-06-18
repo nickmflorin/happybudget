@@ -172,56 +172,33 @@ function* getActualsTask(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-function* getBudgetItemsTask(action: Redux.Action<null>): SagaIterator {
+function* getSubAccountsTreeTask(action: Redux.Action<null>): SagaIterator {
   const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
   if (!isNil(budgetId)) {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-    yield put(actions.loadingBudgetItemsAction(true));
-    try {
-      const response = yield call(api.getBudgetItems, budgetId, { no_pagination: true }, { cancelToken: source.token });
-      yield put(actions.responseBudgetItemsAction(response));
-    } catch (e) {
-      if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error retrieving the budget's items.");
-        yield put(actions.responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
-      }
-    } finally {
-      yield put(actions.loadingBudgetItemsAction(false));
-      if (yield cancelled()) {
-        source.cancel();
-      }
-    }
-  }
-}
-
-function* getBudgetItemsTreeTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
-  if (!isNil(budgetId)) {
-    const search = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budgetItemsTree.search);
-    const cache = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budgetItemsTree.cache);
+    const search = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.subAccountsTree.search);
+    const cache = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.subAccountsTree.cache);
     if (!isNil(cache[search])) {
-      yield put(actions.restoreBudgetItemsTreeSearchCacheAction(null));
+      yield put(actions.restoreSubAccountsTreeSearchCacheAction(null));
     } else {
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
-      yield put(actions.loadingBudgetItemsTreeAction(true));
+      yield put(actions.loadingSubAccountsTreeAction(true));
       try {
         // TODO: Eventually we will want to build in pagination for this.
         const response = yield call(
-          api.getBudgetItemsTree,
+          api.getBudgetSubAccountsTree,
           budgetId,
           { no_pagination: true, search },
           { cancelToken: source.token }
         );
-        yield put(actions.responseBudgetItemsTreeAction(response));
+        yield put(actions.responseSubAccountsTreeAction(response));
       } catch (e) {
         if (!(yield cancelled())) {
           api.handleRequestError(e, "There was an error retrieving the budget's items.");
-          yield put(actions.responseBudgetItemsAction({ count: 0, data: [] }, { error: e }));
+          yield put(actions.responseSubAccountsTreeAction({ count: 0, data: [] }, { error: e }));
         }
       } finally {
-        yield put(actions.loadingBudgetItemsTreeAction(false));
+        yield put(actions.loadingSubAccountsTreeAction(false));
         if (yield cancelled()) {
           source.cancel();
         }
@@ -241,30 +218,19 @@ function* watchForRequestActualsSaga(): SagaIterator {
   }
 }
 
-function* watchForRequestBudgetItemsSaga(): SagaIterator {
+function* watchForRequestSubAccountsTreeSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Budget.BudgetItems.Request);
+    const action = yield take(ActionType.Budget.SubAccountsTree.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
-    lastTasks = yield call(getBudgetItemsTask, action);
+    lastTasks = yield call(getSubAccountsTreeTask, action);
   }
 }
 
-function* watchForRequestBudgetItemsTreeSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Budget.BudgetItemsTree.Request);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(getBudgetItemsTreeTask, action);
-  }
-}
-
-function* watchForSearchBudgetItemsTreeSaga(): SagaIterator {
-  yield debounce(250, ActionType.Budget.BudgetItemsTree.SetSearch, getBudgetItemsTreeTask);
+function* watchForSearchSubAccountsTreeSaga(): SagaIterator {
+  yield debounce(250, ActionType.Budget.SubAccountsTree.SetSearch, getSubAccountsTreeTask);
 }
 
 function* watchForRemoveActualSaga(): SagaIterator {
@@ -292,8 +258,7 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(watchForRequestActualsSaga);
   yield spawn(watchForRemoveActualSaga);
   yield spawn(watchForTableChangeSaga);
-  yield spawn(watchForRequestBudgetItemsSaga);
-  yield spawn(watchForRequestBudgetItemsTreeSaga);
-  yield spawn(watchForSearchBudgetItemsTreeSaga);
+  yield spawn(watchForRequestSubAccountsTreeSaga);
+  yield spawn(watchForSearchSubAccountsTreeSaga);
   yield spawn(watchForBulkCreateActualsSaga);
 }

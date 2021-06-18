@@ -135,30 +135,13 @@ interface _ExpandedModelTagsMenuProps<M extends Model.M> extends Omit<_ExpandedM
 export type ExpandedModelTagsMenuProps<M extends Model.M> = _ExpandedModelTagsMenuProps<M> &
   (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
 
-export interface StringSubAccountNode extends Omit<Model.SubAccountTreeNode, "id" | "children"> {
-  readonly id: string;
-  readonly originalId: number;
-  readonly children: StringSubAccountNode[];
-}
-
-export interface StringAccountNode extends Omit<Model.AccountTreeNode, "id" | "children"> {
-  readonly id: string;
-  readonly originalId: number;
-  readonly children: StringSubAccountNode[];
-}
-
-export type BudgetItemMenuModel = StringSubAccountNode | StringAccountNode;
-
-export interface BudgetItemTreeMenuProps
+export interface SubAccountTreeMenuProps
   extends Omit<
-    ExpandedModelMenuProps<BudgetItemMenuModel>,
+    ExpandedModelMenuProps<Model.SubAccountTreeNode>,
     "renderItem" | "models" | "multiple" | "onChange" | "selected"
   > {
   readonly nodes: Model.Tree;
-  readonly onChange: (
-    m: Model.SimpleAccount | Model.SimpleSubAccount,
-    e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent
-  ) => void;
+  readonly onChange: (m: Model.SimpleSubAccount, e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent) => void;
   readonly onSearch: (value: string) => void;
   readonly search: string;
   readonly childrenDefaultVisible?: boolean;

@@ -1,18 +1,13 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
-export const requestBudgetItemsAction = simpleAction<null>(ActionType.Budget.BudgetItems.Request);
-export const loadingBudgetItemsAction = simpleAction<boolean>(ActionType.Budget.BudgetItems.Loading);
-export const responseBudgetItemsAction = simpleAction<Http.ListResponse<Model.BudgetLineItem>>(
-  ActionType.Budget.BudgetItems.Response
+export const requestSubAccountsTreeAction = simpleAction<null>(ActionType.Budget.SubAccountsTree.Request);
+export const loadingSubAccountsTreeAction = simpleAction<boolean>(ActionType.Budget.SubAccountsTree.Loading);
+export const responseSubAccountsTreeAction = simpleAction<Http.ListResponse<Model.SubAccountTreeNode>>(
+  ActionType.Budget.SubAccountsTree.Response
 );
-export const requestBudgetItemsTreeAction = simpleAction<null>(ActionType.Budget.BudgetItemsTree.Request);
-export const loadingBudgetItemsTreeAction = simpleAction<boolean>(ActionType.Budget.BudgetItemsTree.Loading);
-export const responseBudgetItemsTreeAction = simpleAction<Http.ListResponse<Model.AccountTreeNode>>(
-  ActionType.Budget.BudgetItemsTree.Response
-);
-export const restoreBudgetItemsTreeSearchCacheAction = simpleAction<null>(
-  ActionType.Budget.BudgetItemsTree.RestoreSearchCache
+export const restoreSubAccountsTreeSearchCacheAction = simpleAction<null>(
+  ActionType.Budget.SubAccountsTree.RestoreSearchCache
 );
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.ActualRow>>(
   ActionType.Budget.Actuals.TableChanged
@@ -20,7 +15,7 @@ export const tableChangedAction = simpleAction<Table.Change<BudgetTable.ActualRo
 export const bulkCreateActualsAction = simpleAction<Table.RowAddPayload<BudgetTable.ActualRow>>(
   ActionType.Budget.Actuals.BulkCreate
 );
-export const setBudgetItemsTreeSearchAction = simpleAction<string>(ActionType.Budget.BudgetItemsTree.SetSearch);
+export const setSubAccountsTreeSearchAction = simpleAction<string>(ActionType.Budget.SubAccountsTree.SetSearch);
 export const removeActualAction = simpleAction<number>(ActionType.Budget.Actuals.Delete);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Actuals.Deleting);
 export const updatingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Actuals.Updating);

@@ -24,7 +24,7 @@ export const Editors = {
   TemplateFringesCellEditor: editors.TemplateFringesCellEditor,
   SubAccountUnitCellEditor: editors.SubAccountUnitCellEditor,
   PaymentMethodCellEditor: editors.PaymentMethodCellEditor,
-  BudgetItemsTreeEditor: editors.BudgetItemsTreeEditor
+  SubAccountsTreeEditor: editors.SubAccountsTreeEditor
 };
 
 const FrameworkComponents = {

@@ -4,35 +4,6 @@ import { FringeUnitModels } from "lib/model";
 
 export * from "./tabling";
 
-export const flattenTreeNodes = (tree: Model.Tree): (Model.SimpleSubAccount | Model.SimpleAccount)[] => {
-  const flattened: (Model.SimpleSubAccount | Model.SimpleAccount)[] = [];
-
-  const addNode = (node: Model.SubAccountTreeNode): void => {
-    flattened.push(treeNodeWithoutChildren(node));
-    if (node.children.length !== 0) {
-      forEach(node.children, (child: Model.SubAccountTreeNode) => {
-        addNode(child);
-      });
-    }
-  };
-  forEach(tree, (node: Model.AccountTreeNode) => {
-    flattened.push(treeNodeWithoutChildren(node));
-    if (node.children.length !== 0) {
-      forEach(node.children, (child: Model.SubAccountTreeNode) => {
-        addNode(child);
-      });
-    }
-  });
-  return flattened;
-};
-
-export const treeNodeWithoutChildren = (
-  node: Model.AccountTreeNode | Model.SubAccountTreeNode
-): Model.SimpleSubAccount | Model.SimpleAccount => {
-  const { children, ...withoutChildren } = node;
-  return withoutChildren;
-};
-
 export const getFringesNominalAdditions = (value: number, fringes: Model.Fringe[]): number[] => {
   const additionalValues: number[] = [];
   forEach(fringes, (fringe: Model.Fringe) => {
@@ -154,7 +125,7 @@ export const inferModelFromName = <M extends Model.Model>(
           throw new Error(`Multiple models exist for field=${nameField} value=${value}.`);
         } else {
           /* eslint-disable no-console */
-          console.error(`Multiple models exist for field=${nameField} value=${value}.`);
+          console.warn(`Multiple models exist for field=${nameField} value=${value}.`);
           return msCaseSensitive[0];
         }
       }

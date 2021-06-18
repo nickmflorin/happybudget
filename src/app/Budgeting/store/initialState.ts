@@ -75,8 +75,8 @@ export const initialBudgetState: Modules.Budgeting.Budget.Store = {
   subaccount: initialBudgetSubAccountState,
   actuals: initialModelListResponseState,
   accounts: initialBudgetAccountsState,
-  budgetItems: initialModelListResponseState,
-  budgetItemsTree: initialModelListResponseState
+  // allSubAccounts: initialModelListResponseState,
+  subAccountsTree: initialModelListResponseState
 };
 
 export const initialTemplateState: Modules.Budgeting.Template.Store = {

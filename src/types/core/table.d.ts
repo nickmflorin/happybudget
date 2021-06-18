@@ -494,7 +494,7 @@ namespace BudgetTable {
     readonly purchase_order: string | null;
     readonly date: string | null;
     readonly payment_method: Model.PaymentMethod | null;
-    readonly account: Model.SimpleAccount | Model.SimpleSubAccount;
+    readonly subaccount: Model.SimpleAccount;
     readonly payment_id: string | null;
     readonly value: string | null;
   }

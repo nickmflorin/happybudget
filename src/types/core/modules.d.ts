@@ -94,8 +94,8 @@ namespace Modules {
         readonly budget: BudgetStore;
         readonly instance: Model.BudgetAccount | Model.BudgetSubAccount | null;
         readonly commentsHistoryDrawerOpen: boolean;
-        readonly budgetItems: Redux.ModelListResponseStore<Model.BudgetLineItem>;
-        readonly budgetItemsTree: Redux.ModelListResponseStore<Model.TopTreeNode>;
+        // readonly allSubAccounts: Redux.ModelListResponseStore<Model.SimpleSubAccount>;
+        readonly subAccountsTree: Redux.ModelListResponseStore<Model.SubAccountTreeNode>;
         readonly actuals: Redux.ModelListResponseStore<Model.Actual>;
         readonly subaccount: SubAccountStore;
         readonly account: AccountStore;
