@@ -258,7 +258,7 @@ namespace Model {
     readonly purchase_order: string | null;
     readonly date: string | null;
     readonly payment_id: string | null;
-    readonly value: string | null;
+    readonly value: number | null;
     readonly payment_method: Model.PaymentMethod | null;
     readonly subaccount: Model.SimpleSubAccount | null;
     readonly created_by: number | null;

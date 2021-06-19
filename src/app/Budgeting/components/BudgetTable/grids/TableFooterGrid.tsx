@@ -23,12 +23,8 @@ const TableFooterGrid = <R extends Table.Row>({
       filter(columns, (col: Table.Column<R>) => col.field !== identifierField),
       (obj: { [key: string]: any }, col: Table.Column<R>) => {
         if (!isNil(col.field)) {
-          if (col.isCalculated === true) {
-            if (!isNil(col.tableTotal)) {
-              obj[col.field] = col.tableTotal;
-            } else {
-              obj[col.field] = null;
-            }
+          if (!isNil(col.tableTotal)) {
+            obj[col.field] = col.tableTotal;
           } else {
             obj[col.field] = null;
           }
@@ -48,7 +44,7 @@ const TableFooterGrid = <R extends Table.Row>({
         }
       }
     ) as R;
-  }, [useDeepEqualMemo(columns), identifierValue]);
+  }, [useDeepEqualMemo(columns), identifierValue, identifierField]);
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     if (sizeColumnsToFit === true) {

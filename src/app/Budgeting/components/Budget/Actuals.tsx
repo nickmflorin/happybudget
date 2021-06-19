@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isNil, map, filter } from "lodash";
+import { isNil, map, filter, reduce } from "lodash";
 import { createSelector } from "reselect";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,8 +19,8 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 
 import { setInstanceAction } from "../../store/actions/budget";
 import * as actions from "../../store/actions/budget/actuals";
-import { selectBudgetDetail } from "../../store/selectors";
 import BudgetTableComponent from "../BudgetTable";
+import { useDeepEqualMemo } from "lib/hooks";
 
 const selectSelectedRows = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.selected
@@ -47,12 +47,18 @@ const Actuals = (): JSX.Element => {
   const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
-  const budgetDetail = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     dispatch(setInstanceAction(null));
     dispatch(actions.requestActualsAction(null));
   }, []);
+
+  // NOTE: Right now, the total actual value for a budget can differ from totaling the actual
+  // rows of the actuals table.  This can occur if the actual is not yet assigned to a
+  // subaccount.  For now, we will not worry about that.
+  const actualsTableTotal = useMemo(() => {
+    return reduce(data, (sum: number, s: Model.Actual) => sum + (s.value || 0), 0);
+  }, [useDeepEqualMemo(data)]);
 
   return (
     <WrapInApplicationSpinner loading={loading}>
@@ -62,6 +68,7 @@ const Actuals = (): JSX.Element => {
         selected={selected}
         identifierField={"subaccount"}
         identifierFieldHeader={"Account"}
+        tableFooterIdentifierValue={"Actuals Total"}
         identifierColumn={{
           type: "singleSelect",
           minWidth: 200,
@@ -197,8 +204,8 @@ const Actuals = (): JSX.Element => {
             flex: 1,
             valueFormatter: currencyValueFormatter,
             valueSetter: floatValueSetter<BudgetTable.ActualRow>("value"),
-            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
-            type: "currency"
+            type: "currency",
+            tableTotal: actualsTableTotal
           }
         ]}
       />

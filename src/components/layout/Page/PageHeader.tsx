@@ -27,8 +27,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       </div>
       {!isNil(extra) && (
         <div className={"extra-wrapper"}>
-          {map(extra, (item: JSX.Element) => {
-            return <VerticalFlexCenter>{item}</VerticalFlexCenter>;
+          {map(extra, (item: JSX.Element, index: number) => {
+            return <VerticalFlexCenter key={index}>{item}</VerticalFlexCenter>;
           })}
         </div>
       )}

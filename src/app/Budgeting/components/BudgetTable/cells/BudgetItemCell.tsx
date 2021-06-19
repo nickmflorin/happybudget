@@ -7,6 +7,10 @@ interface BudgetItemCellProps extends StandardCellProps<BudgetTable.ActualRow> {
 }
 
 const BudgetItemCell = (props: BudgetItemCellProps): JSX.Element => {
+  const row: BudgetTable.ActualRow = props.node.data;
+  if (row.meta.isTableFooter === true) {
+    return <Cell {...props}>{props.children}</Cell>;
+  }
   return (
     <Cell {...props}>
       {!isNil(props.children) && <EntityText fillEmpty={"---------"}>{props.children}</EntityText>}

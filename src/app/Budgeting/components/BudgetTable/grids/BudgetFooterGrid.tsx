@@ -29,12 +29,8 @@ const BudgetFooterGrid = <R extends Table.Row>({
       filter(columns, (col: Table.Column<R>) => col.field !== identifierField),
       (obj: { [key: string]: any }, col: Table.Column<R>) => {
         if (!isNil(col.field)) {
-          if (col.isCalculated === true) {
-            if (!isNil(col.budgetTotal)) {
-              obj[col.field] = col.budgetTotal;
-            } else {
-              obj[col.field] = null;
-            }
+          if (!isNil(col.budgetTotal)) {
+            obj[col.field] = col.budgetTotal;
           } else {
             obj[col.field] = null;
           }
