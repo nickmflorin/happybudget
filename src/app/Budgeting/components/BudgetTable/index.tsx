@@ -249,19 +249,19 @@ const BudgetTable = <
       type: "number",
       ...identifierColumn,
       pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
+      cellRendererParams: {
+        ...identifierColumn.cellRendererParams,
+        onGroupEdit: groupParams?.onEditGroup,
+        groups
+      },
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
-        if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter) {
+        if (row.meta.isGroupFooter === true) {
           return filter(columns, (c: Table.Column<R>) => !(c.isCalculated === true)).length + 1;
         } else if (!isNil(identifierColumn.colSpan)) {
           return identifierColumn.colSpan(params);
         }
         return 1;
-      },
-      cellRendererParams: {
-        ...identifierColumn.cellRendererParams,
-        onGroupEdit: groupParams?.onEditGroup,
-        groups
       }
     })
   );

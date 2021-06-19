@@ -204,6 +204,7 @@ const Actuals = (): JSX.Element => {
             flex: 1,
             valueFormatter: currencyValueFormatter,
             valueSetter: floatValueSetter<BudgetTable.ActualRow>("value"),
+            cellRenderer: "BodyCell",
             type: "currency",
             tableTotal: actualsTableTotal
           }
