@@ -3,9 +3,6 @@ import ActionType from "../ActionType";
 
 export const wipeStateAction = simpleAction<null>(ActionType.Template.WipeState);
 export const setTemplateIdAction = simpleAction<number>(ActionType.Template.SetId);
-export const setInstanceAction = simpleAction<Model.TemplateAccount | Model.TemplateSubAccount | null>(
-  ActionType.Template.SetInstance
-);
 export const setTemplateAutoIndex = simpleAction<boolean>(ActionType.Template.SetAutoIndex);
 export const requestTemplateAction = simpleAction<null>(ActionType.Template.Request);
 export const loadingTemplateAction = simpleAction<boolean>(ActionType.Template.Loading);

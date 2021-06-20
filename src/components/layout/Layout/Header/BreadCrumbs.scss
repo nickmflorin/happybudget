@@ -1,0 +1,73 @@
+@import "style/typography";
+
+.bread-crumbs {
+  display: flex;
+  height: 36px;
+
+  .slash {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    margin-left: 8px;
+    margin-right: 8px;
+    line-height: 18px;
+    font-family: $open-sans;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .bread-crumb-item {
+    display: flex;
+    cursor: pointer;
+
+    .select-wrapper {
+      padding-top: 3px;
+      padding-bottom: 3px;
+
+      .select {
+        &--siblings {
+          min-width: 200px;
+          .ant-select-selector {
+            padding: 0px !important;
+          }
+          .ant-select-arrow {
+            right: 24px;
+          }
+        }
+      }
+    }
+
+    .text-wrapper {
+      padding-top: 9px;
+      padding-bottom: 9px;
+      line-height: 18px;
+    }
+
+    &:hover {
+      .text-wrapper {
+        color: darken(#b5b5b5, 20%) !important;
+        .entity-text {
+          .identifier {
+            color: darken(#b5b5b5, 20%) !important;
+          }
+          .description {
+            color: darken($text-secondary, 20%) !important;
+          }
+        }
+      }
+    }
+
+    &.primary {
+      .text-wrapper {
+        color: $green;
+        font-size: 15px;
+        font-family: $open-sans;
+        font-weight: 600;
+      }
+      &:hover {
+        .text-wrapper {
+          color: $green-darker !important;
+        }
+      }
+    }
+  }
+}

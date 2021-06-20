@@ -4,12 +4,13 @@ import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
 import { WrapInApplicationSpinner } from "components";
+import { Portal, BreadCrumbs } from "components/layout";
 import { simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction, setTemplateAutoIndex } from "../../../store/actions/template";
+import { setTemplateAutoIndex } from "../../../store/actions/template";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/template/accounts";
-import { selectTemplateId } from "../../../store/selectors";
-import { setTemplateLastVisited } from "../../../urls";
+import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
+import { setTemplateLastVisited, getUrl } from "../../../urls";
 
 import AccountsBudgetTable from "./AccountsTable";
 
@@ -29,13 +30,13 @@ const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
   const templateId = useSelector(selectTemplateId);
   const loading = useSelector(selectLoading);
+  const templateDetail = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     dispatch(setTemplateAutoIndex(false));
   }, []);
 
   useEffect(() => {
-    dispatch(setInstanceAction(null));
     dispatch(requestAccountsAction(null));
     dispatch(requestGroupsAction(null));
   }, []);
@@ -48,6 +49,23 @@ const Accounts = (): JSX.Element => {
 
   return (
     <React.Fragment>
+      <Portal id={"breadcrumbs"}>
+        <BreadCrumbs
+          params={{ template: templateDetail }}
+          items={[
+            {
+              requiredParams: ["template"],
+              func: ({ template }: { template: Model.Template }) => ({
+                id: template.id,
+                primary: true,
+                text: template.name,
+                tooltip: { title: "Top Sheet", placement: "bottom" },
+                url: getUrl(template)
+              })
+            }
+          ]}
+        />
+      </Portal>
       <WrapInApplicationSpinner loading={loading}>
         <AccountsBudgetTable />
       </WrapInApplicationSpinner>

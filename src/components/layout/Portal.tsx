@@ -11,7 +11,7 @@ export interface PortalProps {
 
 const Portal = ({ id, children, visible }: PortalProps): JSX.Element => {
   const target = usePortal(id);
-  if (!isNil(target) && visible === true) {
+  if (!isNil(target) && visible !== false) {
     return createPortal(children, target);
   }
   return <></>;

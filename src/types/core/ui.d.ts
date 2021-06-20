@@ -31,3 +31,30 @@ interface StandardComponentProps {
 }
 
 type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : never;
+
+interface IBreadCrumbItemRenderParams {
+  readonly setDropdownVisible: (value: boolean) => void;
+}
+
+interface IBreadCrumbItemOption {
+  readonly id: number;
+  readonly url?: string;
+  readonly text?: string;
+  readonly render?: () => JSX.Element;
+}
+
+interface ILazyBreadCrumbItem {
+  readonly requiredParams: string[];
+  readonly func: (params: any) => IBreadCrumbItem | IBreadCrumbItem[];
+}
+
+interface IBreadCrumbItem {
+  readonly id: number | string;
+  readonly url?: string;
+  readonly tooltip?: import("antd/lib/tooltip").TooltipPropsWithTitle;
+  readonly text?: string;
+  readonly render?: (params: IBreadCrumbItemRenderParams) => JSX.Element | null | undefined;
+  readonly options?: IBreadCrumbItemOption[];
+  readonly visible?: boolean;
+  readonly primary?: boolean;
+}

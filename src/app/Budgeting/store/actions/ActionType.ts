@@ -9,7 +9,6 @@ const ActionType = {
   },
   Budget: {
     WipeState: "budget.WipeState",
-    SetInstance: "budget.SetInstance",
     SetCommentsHistoryDrawerVisibility: "budget.SetCommentsHistoryDrawerVisibility",
     SetId: "budget.SetId",
     SetAutoIndex: "budget.SetAutoIndex",
@@ -199,11 +198,6 @@ const ActionType = {
         }
       }
     },
-    // AllSubAccounts: {
-    //   Request: "budget.allsubaccounts.Request",
-    //   Loading: "budget.allsubaccounts.Loading",
-    //   Response: "budget.allsubaccounts.Response"
-    // },
     SubAccountsTree: {
       Request: "budget.subaccountstree.Request",
       Loading: "budget.subaccountstree.Loading",
@@ -232,7 +226,6 @@ const ActionType = {
   },
   Template: {
     WipeState: "template.WipeState",
-    SetInstance: "template.SetInstance",
     SetId: "template.SetId",
     SetAutoIndex: "template.SetAutoIndex",
     Loading: "template.Loading",

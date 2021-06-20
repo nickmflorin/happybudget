@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import classNames from "classnames";
 import { isNil } from "lodash";
@@ -10,7 +10,6 @@ import { Layout, Tooltip } from "antd";
 
 import { Dropdown } from "components";
 import { AccountCircleLink } from "components/links";
-import { ShowHide } from "components";
 import { useLoggedInUser } from "store/hooks";
 
 import Toolbar, { IToolbarItem } from "./Toolbar";
@@ -19,7 +18,6 @@ import "./index.scss";
 
 interface HeaderProps extends StandardComponentProps {
   toolbar?: IToolbarItem[] | (() => JSX.Element);
-  breadcrumbs?: ReactNode;
   // The default header height is 70px.  But this only applies when there is
   // not a supplementary header below the default header.  To layout the component
   // hierarchy properly with scrolling and fixed headers, we need to programatically
@@ -29,7 +27,7 @@ interface HeaderProps extends StandardComponentProps {
   headerHeight?: number;
 }
 
-const Header = ({ breadcrumbs, toolbar, className, headerHeight, style = {} }: HeaderProps): JSX.Element => {
+const Header = ({ toolbar, className, headerHeight, style = {} }: HeaderProps): JSX.Element => {
   const user = useLoggedInUser();
   const history = useHistory();
 
@@ -44,7 +42,7 @@ const Header = ({ breadcrumbs, toolbar, className, headerHeight, style = {} }: H
     <Layout.Header className={classNames("header", className)} style={headerStyle}>
       <div className={"primary-header"}>
         <div className={"breadcrumb-wrapper"}>
-          <ShowHide show={!isNil(breadcrumbs)}>{breadcrumbs}</ShowHide>
+          <div id={"breadcrumbs"}></div>
         </div>
         <div className={"toolbar-wrapper"}>
           {!isNil(toolbar) && (Array.isArray(toolbar) ? <Toolbar items={toolbar as IToolbarItem[]} /> : toolbar())}

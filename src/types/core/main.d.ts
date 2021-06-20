@@ -8,3 +8,5 @@
 interface Window {
   analytics: any;
 }
+
+type NonNullable<T> = Exclude<T, null | undefined>;

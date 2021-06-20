@@ -7,7 +7,6 @@ export const selectBudgetDetail = simpleDeepEqualSelector(
 export const selectBudgetDetailLoading = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.budget.detail.loading
 );
-export const selectBudgetInstance = (state: Modules.ApplicationStore) => state.budgeting.budget.instance;
 export const selectCommentsHistoryDrawerOpen = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.commentsHistoryDrawerOpen
 );
@@ -21,7 +20,6 @@ export const selectTemplateDetail = simpleDeepEqualSelector(
 export const selectTemplateDetailLoading = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.template.detail.loading
 );
-export const selectTemplateInstance = (state: Modules.ApplicationStore) => state.budgeting.template.instance;
 export const selectTemplateFringes = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.fringes.data
 );

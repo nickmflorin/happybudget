@@ -8,7 +8,7 @@ import "./index.scss";
 
 type GenericLayoutProps = {
   children: JSX.Element;
-} & Pick<LayoutProps, "sidebar" | "toolbar" | "breadcrumbs">;
+} & Pick<LayoutProps, "sidebar" | "toolbar">;
 
 const GenericLayout: React.FC<GenericLayoutProps> = ({ children, ...props }) => {
   return (

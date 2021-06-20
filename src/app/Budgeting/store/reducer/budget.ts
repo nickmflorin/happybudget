@@ -42,10 +42,6 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
 };
 
 const genericReducer = combineReducers({
-  instance: createSimplePayloadReducer<Model.BudgetAccount | Model.BudgetSubAccount | null>(
-    ActionType.Budget.SetInstance,
-    null
-  ),
   autoIndex: createSimplePayloadReducer<boolean>(ActionType.Budget.SetAutoIndex, false),
   commentsHistoryDrawerOpen: createSimpleBooleanReducer(ActionType.Budget.SetCommentsHistoryDrawerVisibility),
   account: combineReducers({

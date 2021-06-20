@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil, map, filter, reduce } from "lodash";
 import { createSelector } from "reselect";
@@ -15,9 +15,9 @@ import { currencyValueFormatter, dateValueFormatter } from "lib/model/formatters
 import { floatValueSetter, dateTimeValueSetter } from "lib/model/valueSetters";
 
 import { WrapInApplicationSpinner } from "components";
+import { Portal, BreadCrumbs } from "components/layout";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction } from "../../store/actions/budget";
 import * as actions from "../../store/actions/budget/actuals";
 import BudgetTableComponent from "../BudgetTable";
 import { useDeepEqualMemo } from "lib/hooks";
@@ -49,7 +49,6 @@ const Actuals = (): JSX.Element => {
   const saving = useSelector(selectSaving);
 
   useEffect(() => {
-    dispatch(setInstanceAction(null));
     dispatch(actions.requestActualsAction(null));
   }, []);
 
@@ -61,156 +60,172 @@ const Actuals = (): JSX.Element => {
   }, [useDeepEqualMemo(data)]);
 
   return (
-    <WrapInApplicationSpinner loading={loading}>
-      <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>
-        data={data}
-        manager={models.ActualRowManager}
-        selected={selected}
-        identifierField={"subaccount"}
-        identifierFieldHeader={"Account"}
-        tableFooterIdentifierValue={"Actuals Total"}
-        identifierColumn={{
-          type: "singleSelect",
-          minWidth: 200,
-          maxWidth: 200,
-          width: 200,
-          processCellForClipboard: (row: BudgetTable.ActualRow) => {
-            if (!isNil(row.subaccount)) {
-              return row.subaccount.identifier || "";
+    <React.Fragment>
+      <Portal id={"breadcrumbs"}>
+        <BreadCrumbs
+          items={[
+            {
+              id: "actuals",
+              primary: true,
+              text: "Actuals Log",
+              tooltip: { title: "Actuals Log", placement: "bottom" }
             }
-            return "";
-          },
-          processCellFromClipboard: (name: string) => {
-            if (name.trim() === "") {
-              return null;
-            }
-            const availableSubAccounts: Model.SimpleSubAccount[] = filter(
-              map(data, (actual: Model.Actual) => actual.subaccount),
-              (sub: Model.SimpleSubAccount | null) => sub !== null && sub.identifier !== null
-            ) as Model.SimpleSubAccount[];
-            // NOTE: If there are multiple sub accounts with the same identifier, this will
-            // return the first and issue a warning.
-            const subaccount = inferModelFromName<Model.SimpleSubAccount>(availableSubAccounts, name, {
-              nameField: "identifier"
-            });
-            return subaccount;
-          },
-          cellRenderer: "BudgetItemCell",
-          cellEditor: "SubAccountsTreeEditor",
-          cellEditorParams: {
-            setSearch: (value: string) => dispatch(actions.setSubAccountsTreeSearchAction(value))
-          },
-          // Required to allow the dropdown to be selectable on Enter key.
-          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-              return true;
-            }
-            return false;
-          }
-        }}
-        indexColumn={{ width: 40, maxWidth: 50 }}
-        search={search}
-        onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
-        saving={saving}
-        sizeColumnsToFit={false}
-        onRowAdd={(payload: Table.RowAddPayload<BudgetTable.ActualRow>) =>
-          dispatch(actions.bulkCreateActualsAction(payload))
-        }
-        onRowSelect={(id: number) => dispatch(actions.selectActualAction(id))}
-        onRowDeselect={(id: number) => dispatch(actions.deselectActualAction(id))}
-        onRowDelete={(row: BudgetTable.ActualRow) => dispatch(actions.removeActualAction(row.id))}
-        onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) => dispatch(actions.tableChangedAction(payload))}
-        onSelectAll={() => dispatch(actions.selectAllActualsAction(null))}
-        exportFileName={"actuals.csv"}
-        actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow>) => [
-          {
-            tooltip: "Delete",
-            icon: <FontAwesomeIcon icon={faTrashAlt} />,
-            disabled: params.selectedRows.length === 0,
-            onClick: params.onDelete
-          }
-        ]}
-        columns={[
-          {
-            field: "description",
-            headerName: "Description",
-            flex: 3,
-            type: "longText"
-          },
-          {
-            field: "vendor",
-            headerName: "Contact",
-            flex: 1,
-            type: "contact"
-          },
-          {
-            field: "purchase_order",
-            headerName: "Purchase Order",
-            flex: 1,
-            type: "number"
-          },
-          {
-            field: "date",
-            headerName: "Date",
-            flex: 1,
-            valueFormatter: dateValueFormatter,
-            valueSetter: dateTimeValueSetter<BudgetTable.ActualRow>("date"),
-            type: "date"
-          },
-          {
-            field: "payment_method",
-            headerName: "Pay Method",
-            cellClass: "cell--centered",
-            cellRenderer: "PaymentMethodCell",
-            flex: 1,
-            cellEditor: "PaymentMethodCellEditor",
+          ]}
+        />
+      </Portal>
+      <WrapInApplicationSpinner loading={loading}>
+        <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>
+          data={data}
+          manager={models.ActualRowManager}
+          selected={selected}
+          identifierField={"subaccount"}
+          identifierFieldHeader={"Account"}
+          tableFooterIdentifierValue={"Actuals Total"}
+          identifierColumn={{
             type: "singleSelect",
+            minWidth: 200,
+            maxWidth: 200,
+            width: 200,
+            processCellForClipboard: (row: BudgetTable.ActualRow) => {
+              if (!isNil(row.subaccount)) {
+                return row.subaccount.identifier || "";
+              }
+              return "";
+            },
+            processCellFromClipboard: (name: string) => {
+              if (name.trim() === "") {
+                return null;
+              }
+              const availableSubAccounts: Model.SimpleSubAccount[] = filter(
+                map(data, (actual: Model.Actual) => actual.subaccount),
+                (sub: Model.SimpleSubAccount | null) => sub !== null && sub.identifier !== null
+              ) as Model.SimpleSubAccount[];
+              // NOTE: If there are multiple sub accounts with the same identifier, this will
+              // return the first and issue a warning.
+              const subaccount = inferModelFromName<Model.SimpleSubAccount>(availableSubAccounts, name, {
+                nameField: "identifier"
+              });
+              return subaccount;
+            },
+            cellRenderer: "BudgetItemCell",
+            cellEditor: "SubAccountsTreeEditor",
+            cellEditorParams: {
+              setSearch: (value: string) => dispatch(actions.setSubAccountsTreeSearchAction(value))
+            },
             // Required to allow the dropdown to be selectable on Enter key.
             suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
               if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
                 return true;
               }
               return false;
+            }
+          }}
+          indexColumn={{ width: 40, maxWidth: 50 }}
+          search={search}
+          onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
+          saving={saving}
+          sizeColumnsToFit={false}
+          onRowAdd={(payload: Table.RowAddPayload<BudgetTable.ActualRow>) =>
+            dispatch(actions.bulkCreateActualsAction(payload))
+          }
+          onRowSelect={(id: number) => dispatch(actions.selectActualAction(id))}
+          onRowDeselect={(id: number) => dispatch(actions.deselectActualAction(id))}
+          onRowDelete={(row: BudgetTable.ActualRow) => dispatch(actions.removeActualAction(row.id))}
+          onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) =>
+            dispatch(actions.tableChangedAction(payload))
+          }
+          onSelectAll={() => dispatch(actions.selectAllActualsAction(null))}
+          exportFileName={"actuals.csv"}
+          actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow>) => [
+            {
+              tooltip: "Delete",
+              icon: <FontAwesomeIcon icon={faTrashAlt} />,
+              disabled: params.selectedRows.length === 0,
+              onClick: params.onDelete
+            }
+          ]}
+          columns={[
+            {
+              field: "description",
+              headerName: "Description",
+              flex: 3,
+              type: "longText"
             },
-            processCellForClipboard: (row: BudgetTable.ActualRow) => {
-              const payment_method = getKeyValue<BudgetTable.ActualRow, keyof BudgetTable.ActualRow>("payment_method")(
-                row
-              );
-              if (isNil(payment_method)) {
-                return "";
-              }
-              return payment_method.name;
+            {
+              field: "vendor",
+              headerName: "Contact",
+              flex: 1,
+              type: "contact"
             },
-            processCellFromClipboard: (name: string) => {
-              if (name.trim() === "") {
+            {
+              field: "purchase_order",
+              headerName: "Purchase Order",
+              flex: 1,
+              type: "number"
+            },
+            {
+              field: "date",
+              headerName: "Date",
+              flex: 1,
+              valueFormatter: dateValueFormatter,
+              valueSetter: dateTimeValueSetter<BudgetTable.ActualRow>("date"),
+              type: "date"
+            },
+            {
+              field: "payment_method",
+              headerName: "Pay Method",
+              cellClass: "cell--centered",
+              cellRenderer: "PaymentMethodCell",
+              flex: 1,
+              cellEditor: "PaymentMethodCellEditor",
+              type: "singleSelect",
+              // Required to allow the dropdown to be selectable on Enter key.
+              suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+                if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
+                  return true;
+                }
+                return false;
+              },
+              processCellForClipboard: (row: BudgetTable.ActualRow) => {
+                const payment_method = getKeyValue<BudgetTable.ActualRow, keyof BudgetTable.ActualRow>(
+                  "payment_method"
+                )(row);
+                if (isNil(payment_method)) {
+                  return "";
+                }
+                return payment_method.name;
+              },
+              processCellFromClipboard: (name: string) => {
+                if (name.trim() === "") {
+                  return null;
+                }
+                const payment_method = findChoiceForName<Model.PaymentMethod>(models.PaymentMethods, name);
+                if (!isNil(payment_method)) {
+                  return payment_method;
+                }
                 return null;
               }
-              const payment_method = findChoiceForName<Model.PaymentMethod>(models.PaymentMethods, name);
-              if (!isNil(payment_method)) {
-                return payment_method;
-              }
-              return null;
+            },
+            {
+              field: "payment_id",
+              headerName: "Pay ID",
+              flex: 1,
+              type: "number"
+            },
+            {
+              field: "value",
+              headerName: "Amount",
+              flex: 1,
+              valueFormatter: currencyValueFormatter,
+              valueSetter: floatValueSetter<BudgetTable.ActualRow>("value"),
+              cellRenderer: "BodyCell",
+              type: "currency",
+              tableTotal: actualsTableTotal
             }
-          },
-          {
-            field: "payment_id",
-            headerName: "Pay ID",
-            flex: 1,
-            type: "number"
-          },
-          {
-            field: "value",
-            headerName: "Amount",
-            flex: 1,
-            valueFormatter: currencyValueFormatter,
-            valueSetter: floatValueSetter<BudgetTable.ActualRow>("value"),
-            cellRenderer: "BodyCell",
-            type: "currency",
-            tableTotal: actualsTableTotal
-          }
-        ]}
-      />
-    </WrapInApplicationSpinner>
+          ]}
+        />
+      </WrapInApplicationSpinner>
+    </React.Fragment>
   );
 };
 

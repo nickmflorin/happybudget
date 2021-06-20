@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
 import { isNil } from "lodash";
 
@@ -10,8 +10,6 @@ import { faCopy, faFileSpreadsheet } from "@fortawesome/pro-light-svg-icons";
 import { RenderIfValidId } from "components";
 
 import { wipeStateAction, setTemplateIdAction } from "../../store/actions/template";
-import { selectTemplateInstance, selectTemplateDetail } from "../../store/selectors";
-import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
 import { GenericLayout } from "../Generic";
 import { getTemplateLastVisited } from "../../urls";
 
@@ -26,8 +24,8 @@ const Template = (): JSX.Element => {
   const { templateId } = useParams<{ templateId: string }>();
   const match = useRouteMatch();
 
-  const instance = useSelector(selectTemplateInstance);
-  const template = useSelector(selectTemplateDetail);
+  // const instance = useSelector(selectTemplateInstance);
+  // const template = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     dispatch(wipeStateAction(null));
@@ -38,7 +36,6 @@ const Template = (): JSX.Element => {
 
   return (
     <GenericLayout
-      breadcrumbs={!isNil(template) ? <AncestorsBreadCrumbs instance={instance} budget={template} /> : <></>}
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faMagic} />,

@@ -2,16 +2,19 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 
 import { RenderIfValidId, WrapInApplicationSpinner } from "components";
+import { Portal, BreadCrumbs } from "components/layout";
+import { EntityTextButton } from "components/buttons";
+import { EntityText } from "components/typography";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction, setTemplateAutoIndex } from "../../../store/actions/template";
+import { setTemplateAutoIndex } from "../../../store/actions/template";
 import { setAccountIdAction } from "../../../store/actions/template/account";
 import { requestFringesAction } from "../../../store/actions/template/fringes";
-import { selectTemplateId } from "../../../store/selectors";
-import { setTemplateLastVisited } from "../../../urls";
+import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
+import { setTemplateLastVisited, getUrl } from "../../../urls";
 
 import SubAccountsTable from "./SubAccountsTable";
 
@@ -36,6 +39,7 @@ const Account = (): JSX.Element => {
   const templateId = useSelector(selectTemplateId);
   const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
+  const templateDetail = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     dispatch(setTemplateAutoIndex(false));
@@ -52,12 +56,6 @@ const Account = (): JSX.Element => {
   }, [accountId]);
 
   useEffect(() => {
-    if (!isNil(detail)) {
-      dispatch(setInstanceAction(detail));
-    }
-  }, [detail]);
-
-  useEffect(() => {
     if (!isNil(templateId) && !isNaN(parseInt(accountId))) {
       setTemplateLastVisited(templateId, `/templates/${templateId}/accounts/${accountId}`);
     }
@@ -65,6 +63,46 @@ const Account = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={[accountId]}>
+      <Portal id={"breadcrumbs"}>
+        <BreadCrumbs
+          params={{ template: templateDetail, account: detail }}
+          items={[
+            {
+              requiredParams: ["template"],
+              func: ({ template }: { template: Model.Template }) => ({
+                id: template.id,
+                primary: true,
+                text: template.name,
+                tooltip: { title: "Top Sheet", placement: "bottom" },
+                url: getUrl(template)
+              })
+            },
+            {
+              requiredParams: ["template", "account"],
+              func: ({ template, account }: { template: Model.Template; account: Model.TemplateAccount }) => ({
+                id: account.id,
+                primary: true,
+                url: getUrl(template, account),
+                render: (params: IBreadCrumbItemRenderParams) => {
+                  if (account.siblings.length !== 0) {
+                    return (
+                      <EntityTextButton onClick={() => params.setDropdownVisible(true)} fillEmpty={"---------"}>
+                        {account}
+                      </EntityTextButton>
+                    );
+                  }
+                  return <EntityText fillEmpty={"---------"}>{account}</EntityText>;
+                },
+                options: map(account.siblings, (option: Model.SimpleAccount) => ({
+                  id: option.id,
+                  url: getUrl(template, option),
+                  render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
+                }))
+              })
+            }
+          ]}
+        />
+      </Portal>
       <WrapInApplicationSpinner loading={loading}>
         <SubAccountsTable accountId={parseInt(accountId)} />
       </WrapInApplicationSpinner>

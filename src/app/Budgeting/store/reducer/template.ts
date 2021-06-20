@@ -8,10 +8,6 @@ import initialState, { initialTemplateAccountsState, initialTemplateSubAccountsS
 import * as factories from "./factories";
 
 const genericReducer = combineReducers({
-  instance: createSimplePayloadReducer<Model.TemplateAccount | Model.TemplateSubAccount | null>(
-    ActionType.Template.SetInstance,
-    null
-  ),
   autoIndex: createSimplePayloadReducer<boolean>(ActionType.Template.SetAutoIndex, false),
   account: combineReducers({
     id: createSimplePayloadReducer<number | null>(ActionType.Template.Account.SetId, null),

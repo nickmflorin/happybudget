@@ -2,16 +2,19 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 
 import { RenderIfValidId, WrapInApplicationSpinner } from "components";
+import { Portal, BreadCrumbs } from "components/layout";
+import { EntityTextButton } from "components/buttons";
+import { EntityText } from "components/typography";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction, setTemplateAutoIndex } from "../../../store/actions/template";
+import { setTemplateAutoIndex } from "../../../store/actions/template";
 import { setSubAccountIdAction } from "../../../store/actions/template/subAccount";
 import { requestFringesAction } from "../../../store/actions/template/fringes";
-import { selectTemplateId } from "../../../store/selectors";
-import { setTemplateLastVisited } from "../../../urls";
+import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
+import { setTemplateLastVisited, getUrl } from "../../../urls";
 
 import SubAccountBudgetTable from "./SubAccountsTable";
 
@@ -35,6 +38,7 @@ const SubAccount = (): JSX.Element => {
   const templateId = useSelector(selectTemplateId);
   const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
+  const templateDetail = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     dispatch(setTemplateAutoIndex(true));
@@ -51,12 +55,6 @@ const SubAccount = (): JSX.Element => {
   }, [subaccountId]);
 
   useEffect(() => {
-    if (!isNil(detail)) {
-      dispatch(setInstanceAction(detail));
-    }
-  }, [detail]);
-
-  useEffect(() => {
     if (!isNil(templateId) && !isNaN(parseInt(subaccountId))) {
       setTemplateLastVisited(templateId, `/templates/${templateId}/subaccounts/${subaccountId}`);
     }
@@ -64,6 +62,56 @@ const SubAccount = (): JSX.Element => {
 
   return (
     <RenderIfValidId id={[subaccountId]}>
+      <Portal id={"breadcrumbs"}>
+        <BreadCrumbs
+          params={{ template: templateDetail, subaccount: detail }}
+          items={[
+            {
+              requiredParams: ["template"],
+              func: ({ template }: { template: Model.Template }) => ({
+                id: template.id,
+                primary: true,
+                text: template.name,
+                tooltip: { title: "Top Sheet", placement: "bottom" },
+                url: getUrl(template)
+              })
+            },
+            {
+              requiredParams: ["template", "subaccount"],
+              func: ({ template, subaccount }: { template: Model.Template; subaccount: Model.TemplateSubAccount }) => {
+                return [
+                  ...map(subaccount.ancestors.slice(1), (ancestor: Model.Entity) => {
+                    return {
+                      id: ancestor.id,
+                      render: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,
+                      url: getUrl(template, ancestor)
+                    };
+                  }),
+                  {
+                    id: subaccount.id,
+                    url: getUrl(template, subaccount),
+                    render: (params: IBreadCrumbItemRenderParams) => {
+                      if (subaccount.siblings.length !== 0) {
+                        return (
+                          <EntityTextButton onClick={() => params.setDropdownVisible(true)} fillEmpty={"---------"}>
+                            {subaccount}
+                          </EntityTextButton>
+                        );
+                      }
+                      return <EntityText fillEmpty={"---------"}>{subaccount}</EntityText>;
+                    },
+                    options: map(subaccount.siblings, (option: Model.SimpleSubAccount) => ({
+                      id: option.id,
+                      url: getUrl(template, option),
+                      render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
+                    }))
+                  }
+                ];
+              }
+            }
+          ]}
+        />
+      </Portal>
       <WrapInApplicationSpinner loading={loading}>
         <SubAccountBudgetTable subaccountId={parseInt(subaccountId)} />
       </WrapInApplicationSpinner>

@@ -35,8 +35,7 @@ import {
   setBudgetIdAction,
   setCommentsHistoryDrawerVisibilityAction
 } from "../../store/actions/budget";
-import { selectBudgetInstance, selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "../../store/selectors";
-import AncestorsBreadCrumbs from "../AncestorsBreadCrumbs";
+import { selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "../../store/selectors";
 import { GenericLayout } from "../Generic";
 import { getBudgetLastVisited, isBudgetRelatedUrl } from "../../urls";
 
@@ -53,7 +52,6 @@ const Budget = (): JSX.Element => {
   const { budgetId } = useParams<{ budgetId: string }>();
   const match = useRouteMatch();
 
-  const instance = useSelector(selectBudgetInstance);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
   const budget = useSelector(selectBudgetDetail);
 
@@ -66,7 +64,6 @@ const Budget = (): JSX.Element => {
 
   return (
     <GenericLayout
-      breadcrumbs={!isNil(budget) ? <AncestorsBreadCrumbs instance={instance} budget={budget} /> : <></>}
       toolbar={[
         {
           icon: <FontAwesomeIcon icon={faMagic} />,

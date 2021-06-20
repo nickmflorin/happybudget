@@ -68,21 +68,18 @@ export const initialTemplateAccountState: Modules.Budgeting.Template.AccountStor
 export const initialBudgetState: Modules.Budgeting.Budget.Store = {
   autoIndex: false,
   budget: initialBudgetBudgetState,
-  instance: null,
   commentsHistoryDrawerOpen: false,
   fringes: initialModelListResponseState,
   account: initialBudgetAccountState,
   subaccount: initialBudgetSubAccountState,
   actuals: initialModelListResponseState,
   accounts: initialBudgetAccountsState,
-  // allSubAccounts: initialModelListResponseState,
   subAccountsTree: initialModelListResponseState
 };
 
 export const initialTemplateState: Modules.Budgeting.Template.Store = {
   autoIndex: false,
   template: initialTemplateTemplateState,
-  instance: null,
   fringes: initialModelListResponseState,
   account: initialTemplateAccountState,
   subaccount: initialTemplateSubAccountState,

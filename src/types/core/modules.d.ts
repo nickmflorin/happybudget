@@ -93,7 +93,6 @@ namespace Modules {
       SAS extends Modules.Budgeting.SubACcountStore<SA, G, SASS>
     > {
       readonly autoIndex: boolean;
-      readonly instance: A | S | null;
       readonly subaccount: SAS;
       readonly account: AS;
       readonly accounts: ASS;

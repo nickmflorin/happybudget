@@ -4,12 +4,13 @@ import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
 import { WrapInApplicationSpinner } from "components";
+import { Portal, BreadCrumbs } from "components/layout";
 import { simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction, setBudgetAutoIndex } from "../../../store/actions/budget";
+import { setBudgetAutoIndex } from "../../../store/actions/budget";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/budget/accounts";
-import { selectBudgetId } from "../../../store/selectors";
-import { setBudgetLastVisited } from "../../../urls";
+import { selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
+import { setBudgetLastVisited, getUrl } from "../../../urls";
 
 import AccountsTable from "./AccountsTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
@@ -30,13 +31,13 @@ const Accounts = (): JSX.Element => {
   const dispatch = useDispatch();
   const budgetId = useSelector(selectBudgetId);
   const loading = useSelector(selectLoading);
+  const budgetDetail = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     dispatch(setBudgetAutoIndex(false));
   }, []);
 
   useEffect(() => {
-    dispatch(setInstanceAction(null));
     dispatch(requestAccountsAction(null));
     dispatch(requestGroupsAction(null));
   }, []);
@@ -49,6 +50,23 @@ const Accounts = (): JSX.Element => {
 
   return (
     <React.Fragment>
+      <Portal id={"breadcrumbs"}>
+        <BreadCrumbs
+          params={{ budget: budgetDetail }}
+          items={[
+            {
+              requiredParams: ["budget"],
+              func: ({ budget }: { budget: Model.Budget }) => ({
+                id: budget.id,
+                primary: true,
+                text: budget.name,
+                tooltip: { title: "Top Sheet", placement: "bottom" },
+                url: getUrl(budget)
+              })
+            }
+          ]}
+        />
+      </Portal>
       <WrapInApplicationSpinner loading={loading}>
         <AccountsTable />
       </WrapInApplicationSpinner>

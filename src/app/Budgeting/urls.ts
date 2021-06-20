@@ -1,10 +1,7 @@
 import { isNil } from "lodash";
 import Cookies from "universal-cookie";
 
-export const getUrl = (
-  budget: Model.Budget | Model.Template,
-  entity?: Model.SimpleAccount | Model.SimpleSubAccount
-): string => {
+export const getUrl = (budget: Model.Budget | Model.Template, entity?: Model.Entity | Model.SimpleEntity): string => {
   const designation = budget.type;
   if (isNil(entity)) {
     return `/${designation}s/${budget.id}/accounts`;

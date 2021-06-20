@@ -2,16 +2,19 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 
 import { RenderIfValidId, WrapInApplicationSpinner } from "components";
+import { Portal, BreadCrumbs } from "components/layout";
+import { EntityTextButton } from "components/buttons";
+import { EntityText } from "components/typography";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { setInstanceAction, setBudgetAutoIndex } from "../../../store/actions/budget";
+import { setBudgetAutoIndex } from "../../../store/actions/budget";
 import { setAccountIdAction } from "../../../store/actions/budget/account";
 import { requestFringesAction } from "../../../store/actions/budget/fringes";
-import { selectBudgetId } from "../../../store/selectors";
-import { setBudgetLastVisited } from "../../../urls";
+import { selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
+import { getUrl, setBudgetLastVisited } from "../../../urls";
 
 import SubAccountsTable from "./SubAccountsTable";
 import AccountCommentsHistory from "./AccountCommentsHistory";
@@ -37,6 +40,7 @@ const Account = (): JSX.Element => {
   const budgetId = useSelector(selectBudgetId);
   const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
+  const budgetDetail = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     dispatch(setBudgetAutoIndex(false));
@@ -53,21 +57,53 @@ const Account = (): JSX.Element => {
   }, [accountId]);
 
   useEffect(() => {
-    if (!isNil(detail)) {
-      dispatch(setInstanceAction(detail));
-    } else {
-      dispatch(setInstanceAction(null));
-    }
-  }, [detail]);
-
-  useEffect(() => {
     if (!isNil(budgetId) && !isNaN(parseInt(accountId))) {
       setBudgetLastVisited(budgetId, `/budgets/${budgetId}/accounts/${accountId}`);
     }
-  }, [budgetId]);
+  }, [budgetId, accountId]);
 
   return (
     <RenderIfValidId id={[accountId]}>
+      <Portal id={"breadcrumbs"}>
+        <BreadCrumbs
+          params={{ budget: budgetDetail, account: detail }}
+          items={[
+            {
+              requiredParams: ["budget"],
+              func: ({ budget }: { budget: Model.Budget }) => ({
+                id: budget.id,
+                primary: true,
+                text: budget.name,
+                tooltip: { title: "Top Sheet", placement: "bottom" },
+                url: getUrl(budget)
+              })
+            },
+            {
+              requiredParams: ["budget", "account"],
+              func: ({ budget, account }: { budget: Model.Budget; account: Model.BudgetAccount }) => ({
+                id: account.id,
+                primary: true,
+                url: getUrl(budget, account),
+                render: (params: IBreadCrumbItemRenderParams) => {
+                  if (account.siblings.length !== 0) {
+                    return (
+                      <EntityTextButton onClick={() => params.setDropdownVisible(true)} fillEmpty={"---------"}>
+                        {account}
+                      </EntityTextButton>
+                    );
+                  }
+                  return <EntityText fillEmpty={"---------"}>{account}</EntityText>;
+                },
+                options: map(account.siblings, (option: Model.SimpleAccount) => ({
+                  id: option.id,
+                  url: getUrl(budget, option),
+                  render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
+                }))
+              })
+            }
+          ]}
+        />
+      </Portal>
       <WrapInApplicationSpinner loading={loading}>
         <SubAccountsTable accountId={parseInt(accountId)} />
       </WrapInApplicationSpinner>
