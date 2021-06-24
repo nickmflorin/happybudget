@@ -12,7 +12,7 @@
 Clone this repository locally and `cd` into the directory.
 
 ```bash
-$ git clone https://<user>@bitbucket.org/Saturation-IO/greenbudget-frontend.git
+$ git clone https://github.com/Saturation-IO/greenbudget-frontend.git
 ```
 
 #### Step 2: Environment
