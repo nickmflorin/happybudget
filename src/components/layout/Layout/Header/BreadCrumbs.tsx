@@ -62,12 +62,13 @@ interface BreadCrumbItemProps extends StandardComponentProps {
 const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const history = useHistory();
+  console.log(dropdownVisible);
 
   const renderItem = (i: IBreadCrumbItem) => {
     if (!isNil(i.text)) {
       return i.text;
     } else if (!isNil(i.render)) {
-      return i.render({ setDropdownVisible });
+      return i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) });
     }
     return <></>;
   };
@@ -80,7 +81,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
         </Button>
       );
     } else if (!isNil(i.render)) {
-      return i.render({ setDropdownVisible });
+      return i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) });
     }
     return <></>;
   };

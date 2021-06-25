@@ -33,7 +33,7 @@ interface StandardComponentProps {
 type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : never;
 
 interface IBreadCrumbItemRenderParams {
-  readonly setDropdownVisible: (value: boolean) => void;
+  readonly toggleDropdownVisible: () => void;
 }
 
 interface IBreadCrumbItemOption {

@@ -86,7 +86,7 @@ const Account = (): JSX.Element => {
                 render: (params: IBreadCrumbItemRenderParams) => {
                   if (account.siblings.length !== 0) {
                     return (
-                      <EntityTextButton onClick={() => params.setDropdownVisible(true)} fillEmpty={"---------"}>
+                      <EntityTextButton onClick={() => params.toggleDropdownVisible()} fillEmpty={"---------"}>
                         {account}
                       </EntityTextButton>
                     );

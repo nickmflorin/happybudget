@@ -94,7 +94,7 @@ const SubAccount = (): JSX.Element => {
                     render: (params: IBreadCrumbItemRenderParams) => {
                       if (subaccount.siblings.length !== 0) {
                         return (
-                          <EntityTextButton onClick={() => params.setDropdownVisible(true)} fillEmpty={"---------"}>
+                          <EntityTextButton onClick={() => params.toggleDropdownVisible()} fillEmpty={"---------"}>
                             {subaccount}
                           </EntityTextButton>
                         );
