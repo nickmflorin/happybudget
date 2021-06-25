@@ -3,6 +3,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Http {
+
   type Method = "POST" | "PATCH" | "GET" | "DELETE";
 
   interface RequestOptions extends AxiosRequestConfig {
@@ -28,7 +29,7 @@ namespace Http {
 
   type ModelPayload<M extends Model.Model> = {
     [key in keyof Omit<M, "id">]?: any;
-  };
+  }
 
   interface ListResponse<T> {
     readonly count: number;
@@ -50,25 +51,25 @@ namespace Http {
     readonly message: string;
   }
 
-  interface UnknownError extends BaseError {
+  interface UnknownError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "unknown";
   }
 
-  interface FieldError extends BaseError {
+  interface FieldError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "field";
     readonly field: string;
     readonly code: "unique" | "invalid" | "required";
   }
 
-  interface GlobalError extends BaseError {
+  interface GlobalError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "global";
   }
 
-  interface HttpError extends BaseError {
+  interface HttpError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "http";
   }
 
-  interface AuthError extends BaseError {
+  interface AuthError extends BaseError implements Http.ErrorInterface {
     readonly error_type: "auth";
     readonly force_logout?: boolean;
   }
@@ -107,7 +108,7 @@ namespace Http {
     readonly fileUrl: string;
   }
 
-  interface FringePayload {
+  interface FringePayload implements Http.ModelPayload<Model.Fringe> {
     readonly name: string;
     readonly description?: string | null;
     readonly cutoff?: number | null;
@@ -116,21 +117,21 @@ namespace Http {
     readonly color?: string | null;
   }
 
-  interface BudgetPayload {
+  interface BudgetPayload implements Http.ModelPayload<Model.Budget> {
     readonly production_type?: Model.ProductionTypeId;
     readonly name: string;
     readonly template?: number;
     readonly image?: string | ArrayBuffer | null;
   }
 
-  interface TemplatePayload {
+  interface TemplatePayload implements Http.ModelPayload<Model.Template> {
     readonly name: string;
     readonly image?: string | ArrayBuffer | null;
     readonly community?: boolean;
     readonly hidden?: boolean;
   }
 
-  interface GroupPayload {
+  interface GroupPayload implements Http.ModelPayload<Model.Group> {
     readonly name: string;
     readonly children?: number[];
     readonly color: string;
@@ -153,12 +154,12 @@ namespace Http {
     readonly subaccount?: number | null;
   }
 
-  interface CommentPayload {
+  interface CommentPayload implements Http.ModelPayload<Model.Comment> {
     readonly likes?: number[];
     readonly text: string;
   }
 
-  interface ContactPayload {
+  interface ContactPayload implements Http.ModelPayload<Model.Contact> {
     readonly first_name: string;
     readonly last_name: string;
     readonly email: string;
@@ -170,7 +171,7 @@ namespace Http {
   }
 
   type _BulkCreateCountPayload = { count: number };
-  type _BulkCreateDataPayload<T extends Http.ModelPayload> = { data: Partial<T>[] };
+  type _BulkCreateDataPayload<T extends Http.ModelPayload> = { data: Partial<T>[]};
   type BulkCreatePayload<T extends Http.ModelPayload> = _BulkCreateDataPayload<T> | _BulkCreateCountPayload;
 
   interface BulkUpdatePayload<T extends Http.ModelPayload> extends Partial<T> {
