@@ -1,7 +1,7 @@
-@import './colors';
+@import "./colors";
 
-@import '~ag-grid-community/dist/styles/ag-grid.css';
-@import '~ag-grid-community/dist/styles/ag-theme-alpine.css';
+@import "~ag-grid-community/dist/styles/ag-grid.css";
+@import "~ag-grid-community/dist/styles/ag-theme-alpine.css";
 
 $table-border-color: #eeeeee;
 $table-border: 1px solid $table-border-color;
@@ -17,7 +17,6 @@ $table-border: 1px solid $table-border-color;
 }
 
 .ant-table {
-
   .ant-table-cell {
     padding: 6px;
   }
@@ -129,11 +128,12 @@ $table-border: 1px solid $table-border-color;
     white-space: nowrap;
   }
 
-  .ag-cell, .ag-full-width-row .ag-cell-wrapper.ag-row-group {
-      line-height: 36px;
-      padding-left: 6px;
-      padding-right: 6px;
-      -webkit-font-smoothing: subpixel-antialiased;
+  .ag-cell,
+  .ag-full-width-row .ag-cell-wrapper.ag-row-group {
+    line-height: 36px;
+    padding-left: 6px;
+    padding-right: 6px;
+    -webkit-font-smoothing: subpixel-antialiased;
   }
 
   .ag-right-aligned-header div.ag-header-cell-label {
@@ -175,7 +175,7 @@ $table-border: 1px solid $table-border-color;
     border-right-color: unset !important;
   }
 
-  div[role='gridcell'] {
+  div[role="gridcell"] {
     font-size: 13px;
     font-weight: 400;
     background-color: $white;
@@ -264,22 +264,22 @@ $table-border: 1px solid $table-border-color;
 
     &.ag-row-hover {
       background-color: $gray-highlight !important;
-      div[role='gridcell'] {
+      div[role="gridcell"] {
         background-color: $gray-highlight;
       }
       &.row--table-footer {
-        div[role='gridcell'] {
+        div[role="gridcell"] {
           background-color: #f8f8f8 !important;
         }
       }
       &.row--budget-footer {
-        div[role='gridcell'] {
+        div[role="gridcell"] {
           background-color: #d3d3d3 !important;
         }
       }
       &.row--group-footer {
         background-color: unset !important;
-        div[role='gridcell'] {
+        div[role="gridcell"] {
           background-color: inherit !important;
         }
       }
@@ -294,7 +294,8 @@ $table-border: 1px solid $table-border-color;
       &--table-footer {
         border-bottom: none !important;
 
-        > div[role='gridcell'], > .ag-cell {
+        > div[role="gridcell"],
+        > .ag-cell {
           background-color: #f8f8f8;
           font-family: $roboto;
           font-weight: 400;
@@ -312,7 +313,8 @@ $table-border: 1px solid $table-border-color;
       &--budget-footer {
         border-bottom: none !important;
 
-        > div[role='gridcell'], > .ag-cell {
+        > div[role="gridcell"],
+        > .ag-cell {
           background-color: #d3d3d3 !important;
           font-family: $roboto;
           font-weight: 400;
@@ -337,7 +339,8 @@ $table-border: 1px solid $table-border-color;
         // curved radii of the first and last cells will not be seen.
         border-radius: 10px !important;
 
-        > div[role='gridcell'], > .ag-cell {
+        > div[role="gridcell"],
+        > .ag-cell {
           font-weight: 400 !important;
           border: none !important;
           background-color: inherit !important;
@@ -359,11 +362,19 @@ $table-border: 1px solid $table-border-color;
     height: 36px;
     border-radius: 0px !important;
 
-    .ag-input-field-input, .ag-text-field-input {
+    .ag-input-field-input,
+    .ag-text-field-input {
       padding: 0px !important;
       border: none !important;
       box-shadow: none !important;
       background-color: transparent !important;
     }
+  }
+
+  .ag-menu {
+    border: none;
+    background-color: $white;
+    border-radius: 10px;
+    box-shadow: 0px 3px 20px #00000029;
   }
 }
