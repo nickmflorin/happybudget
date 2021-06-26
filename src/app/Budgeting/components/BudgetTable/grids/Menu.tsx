@@ -30,7 +30,7 @@ const BudgetTableMenu = <R extends Table.Row>({
   onExport
 }: BudgetTable.MenuProps<R>) => {
   return (
-    <PortalOrRender id={"supplementary-header"} visible={true} portal={!detached}>
+    <PortalOrRender id={"supplementary-header"} portal={!detached}>
       <div className={classNames("table-header", { detached })}>
         <div className={"table-header-left"}>
           <Tooltip title={"Select All"} placement={"bottom"}>

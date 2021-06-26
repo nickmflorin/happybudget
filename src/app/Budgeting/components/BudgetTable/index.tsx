@@ -429,6 +429,7 @@ const BudgetTable = <
           saving={saving}
           manager={manager}
           columns={cols}
+          detached={detached}
           options={gridOptions}
           groups={groups}
           ordering={ordering}
