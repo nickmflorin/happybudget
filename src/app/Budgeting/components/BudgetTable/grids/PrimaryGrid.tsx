@@ -944,7 +944,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           getContextMenuItems={getContextMenuItems}
           // This is the same as checking if the onGridReady event has fired.
           rowData={!isNil(api) ? table : []}
-          suppressRowClickSelection={false}
           getRowNodeId={(r: any) => r.id}
           getRowClass={getRowClass}
           getRowStyle={getRowStyle}
