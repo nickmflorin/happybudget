@@ -36,7 +36,8 @@ const tasks = createAccountsTaskSet<
     getAccounts: api.getTemplateAccounts,
     getGroups: api.getTemplateAccountGroups,
     bulkUpdate: api.bulkUpdateTemplateAccounts,
-    bulkCreate: api.bulkCreateTemplateAccounts
+    bulkCreate: api.bulkCreateTemplateAccounts,
+    bulkDelete: api.bulkDeleteTemplateAccounts
   },
   models.TemplateAccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.template.template.id,

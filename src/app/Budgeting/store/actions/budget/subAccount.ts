@@ -46,7 +46,7 @@ export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budg
 export const updateCommentInStateAction = simpleAction<
   Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
 >(ActionType.Budget.SubAccount.Comments.UpdateInState);
-export const removeSubAccountAction = simpleAction<number>(ActionType.Budget.SubAccount.SubAccounts.Delete);
+export const deleteSubAccountsAction = simpleAction<number | number[]>(ActionType.Budget.SubAccount.SubAccounts.Delete);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.SubAccount.SubAccounts.Deleting
 );

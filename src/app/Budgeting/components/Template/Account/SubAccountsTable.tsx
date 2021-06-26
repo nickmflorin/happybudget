@@ -70,7 +70,7 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
         onRowAdd={(payload: Table.RowAddPayload<BudgetTable.TemplateSubAccountRow>) =>
           dispatch(actions.bulkCreateSubAccountsAction(payload))
         }
-        onRowDelete={(row: BudgetTable.TemplateSubAccountRow) => dispatch(actions.removeSubAccountAction(row.id))}
+        onRowDelete={(ids: number | number[]) => dispatch(actions.deleteSubAccountsAction(ids))}
         onTableChange={(payload: Table.Change<BudgetTable.TemplateSubAccountRow>) =>
           dispatch(actions.tableChangedAction(payload))
         }

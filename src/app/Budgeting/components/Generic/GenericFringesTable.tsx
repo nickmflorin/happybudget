@@ -24,7 +24,7 @@ export interface GenericFringesTableProps
   data: Model.Fringe[];
   onTableChange: (change: Table.Change<BudgetTable.FringeRow>) => void;
   onRowAdd: Table.RowAddFunc<BudgetTable.FringeRow>;
-  onRowDelete: (row: BudgetTable.FringeRow) => void;
+  onRowDelete: (ids: number | number[]) => void;
   onRowExpand?: (id: number) => void;
   onSearch: (value: string) => void;
 }
@@ -48,7 +48,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
           onClick: () => {
             const rows: BudgetTable.FringeRow[] = params.api.getSelectedRows();
-            map(rows, (row: BudgetTable.FringeRow) => props.onRowDelete(row));
+            props.onRowDelete(map(rows, (row: BudgetTable.FringeRow) => row.id));
           }
         }
       ]}

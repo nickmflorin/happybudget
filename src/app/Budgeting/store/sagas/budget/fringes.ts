@@ -22,7 +22,8 @@ const tasks = createFringeTaskSet<Model.Budget>(
     request: api.getBudgetFringes,
     create: api.createBudgetFringe,
     bulkUpdate: api.bulkUpdateBudgetFringes,
-    bulkCreate: api.bulkCreateBudgetFringes
+    bulkCreate: api.bulkCreateBudgetFringes,
+    bulkDelete: api.bulkDeleteBudgetFringes
   },
   (state: Modules.ApplicationStore) => state.budgeting.budget.budget.id,
   (state: Modules.ApplicationStore) => state.budgeting.budget.fringes.data

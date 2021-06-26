@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { spawn, take, cancel, takeEvery, call, put, select, fork, cancelled, debounce, all } from "redux-saga/effects";
-import { isNil, find, map } from "lodash";
+import { isNil, find, map, filter, includes } from "lodash";
 
 import * as api from "api";
 import * as models from "lib/model";
@@ -14,20 +14,26 @@ import { consolidateTableChange } from "lib/model/util";
 import { ActionType } from "../../actions";
 import * as actions from "../../actions/budget/actuals";
 
-function* deleteTask(id: number): SagaIterator {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
-  yield put(actions.deletingActualAction({ id, value: true }));
-  try {
-    yield call(api.deleteActual, id, { cancelToken: source.token });
-  } catch (e) {
-    if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error deleting the actual.");
-    }
-  } finally {
-    yield put(actions.deletingActualAction({ id, value: false }));
-    if (yield cancelled()) {
-      source.cancel();
+function* bulkDeleteTask(ids: number[]): SagaIterator {
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.budget.id);
+  if (!isNil(budgetId)) {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+
+    if (ids.length !== 0) {
+      yield all(ids.map((id: number) => put(actions.deletingActualAction({ id, value: true }))));
+      try {
+        yield call(api.bulkDeleteBudgetActuals, budgetId, ids, { cancelToken: source.token });
+      } catch (e) {
+        if (!(yield cancelled())) {
+          api.handleRequestError(e, "There was an error deleting the actuals.");
+        }
+      } finally {
+        yield all(ids.map((id: number) => put(actions.deletingActualAction({ id, value: false }))));
+        if (yield cancelled()) {
+          source.cancel();
+        }
+      }
     }
   }
 }
@@ -97,20 +103,18 @@ function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable.Actual
   }
 }
 
-function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
+function* handleRemovalTask(action: Redux.Action<number | number[]>): SagaIterator {
   if (!isNil(action.payload)) {
     const ms: Model.Actual[] = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.actuals.data);
-    const model: Model.Actual | undefined = find(ms, { id: action.payload });
-    if (isNil(model)) {
-      warnInconsistentState({
-        action: action.type,
-        reason: "Actual does not exist in state when it is expected to.",
-        id: action.payload
-      });
-    } else {
-      yield put(actions.removeActualFromStateAction(model.id));
-      yield call(deleteTask, model.id);
-    }
+    let ids = Array.isArray(action.payload) ? action.payload : [action.payload];
+    ids = filter(ids, (id: number) =>
+      includes(
+        map(ms, (m: Model.Actual) => m.id),
+        id
+      )
+    );
+    yield fork(bulkDeleteTask, ids);
+    yield all(ids.map((id: number) => put(actions.removeActualFromStateAction(id))));
   }
 }
 

@@ -65,7 +65,12 @@ export const createStandardSaga = <R extends Table.Row>(map: ActionMap<R>, ...ar
   }
 
   function* watchForRemoveModelSaga(): SagaIterator {
-    yield takeWithCancellableById<number>(map.Delete.actionType, map.Delete.task, (p: number) => p);
+    // NOTE:  Since we are doing bulk deletes, we can't really check if a previous
+    // task with the same ID was submitted - beause a previous task may have a set
+    // of IDs where only a few match the set of IDs for the new task.  We try
+    // to handle those cases (to prevent server errors trying to delete something
+    // that was already deleted) in the task itself.
+    yield takeEvery(map.Delete.actionType, map.Delete.task);
   }
 
   function* watchForRequestCommentsSaga(): SagaIterator {

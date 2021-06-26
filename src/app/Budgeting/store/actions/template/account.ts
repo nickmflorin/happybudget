@@ -16,7 +16,7 @@ export const tableChangedAction = simpleAction<Table.Change<BudgetTable.Template
 export const bulkCreateSubAccountsAction = simpleAction<Table.RowAddPayload<BudgetTable.TemplateSubAccountRow>>(
   ActionType.Template.Account.SubAccounts.BulkCreate
 );
-export const removeSubAccountAction = simpleAction<number>(ActionType.Template.Account.SubAccounts.Delete);
+export const deleteSubAccountsAction = simpleAction<number | number[]>(ActionType.Template.Account.SubAccounts.Delete);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Template.Account.SubAccounts.Deleting
 );

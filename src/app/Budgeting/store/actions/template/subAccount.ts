@@ -10,7 +10,9 @@ export const responseSubAccountAction = simpleAction<Model.TemplateSubAccount | 
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.TemplateSubAccountRow>>(
   ActionType.Template.SubAccount.TableChanged
 );
-export const removeSubAccountAction = simpleAction<number>(ActionType.Template.SubAccount.SubAccounts.Delete);
+export const deleteSubAccountsAction = simpleAction<number | number[]>(
+  ActionType.Template.SubAccount.SubAccounts.Delete
+);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Template.SubAccount.SubAccounts.Deleting
 );

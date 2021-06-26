@@ -34,6 +34,17 @@ export const bulkUpdateAccountSubAccounts = async <
   return client.patch<M>(url, { data }, options);
 };
 
+export const bulkDeleteAccountSubAccounts = async <
+  M extends Model.Account = Model.BudgetAccount | Model.TemplateAccount
+>(
+  id: number,
+  ids: number[],
+  options: Http.RequestOptions = {}
+): Promise<M> => {
+  const url = URL.v1("accounts", id, "bulk-delete-subaccounts");
+  return client.patch<M>(url, { ids }, options);
+};
+
 export const bulkCreateAccountSubAccounts = async <
   M extends Model.SubAccount = Model.BudgetSubAccount | Model.TemplateSubAccount
 >(

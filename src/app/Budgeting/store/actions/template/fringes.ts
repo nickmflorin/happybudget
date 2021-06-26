@@ -12,7 +12,7 @@ export const tableChangedAction = simpleAction<Table.Change<BudgetTable.FringeRo
 export const bulkCreateFringesAction = simpleAction<Table.RowAddPayload<BudgetTable.FringeRow>>(
   ActionType.Template.Fringes.BulkCreate
 );
-export const removeFringeAction = simpleAction<number>(ActionType.Template.Fringes.Delete);
+export const deleteFringesAction = simpleAction<number | number[]>(ActionType.Template.Fringes.Delete);
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Fringes.Deleting);
 export const updatingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Fringes.Updating);
 export const creatingFringeAction = simpleAction<boolean>(ActionType.Template.Fringes.Creating);

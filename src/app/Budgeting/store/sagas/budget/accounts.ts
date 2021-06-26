@@ -213,7 +213,8 @@ const tasks = createAccountsTaskSet<
     getAccounts: api.getBudgetAccounts,
     getGroups: api.getBudgetAccountGroups,
     bulkUpdate: api.bulkUpdateBudgetAccounts,
-    bulkCreate: api.bulkCreateBudgetAccounts
+    bulkCreate: api.bulkCreateBudgetAccounts,
+    bulkDelete: api.bulkDeleteBudgetAccounts
   },
   models.BudgetAccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.budget.budget.id,

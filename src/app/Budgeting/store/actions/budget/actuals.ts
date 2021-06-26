@@ -16,7 +16,7 @@ export const bulkCreateActualsAction = simpleAction<Table.RowAddPayload<BudgetTa
   ActionType.Budget.Actuals.BulkCreate
 );
 export const setSubAccountsTreeSearchAction = simpleAction<string>(ActionType.Budget.SubAccountsTree.SetSearch);
-export const removeActualAction = simpleAction<number>(ActionType.Budget.Actuals.Delete);
+export const deleteActualsAction = simpleAction<number | number[]>(ActionType.Budget.Actuals.Delete);
 export const deletingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Actuals.Deleting);
 export const updatingActualAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Actuals.Updating);
 export const creatingActualAction = simpleAction<boolean>(ActionType.Budget.Actuals.Creating);

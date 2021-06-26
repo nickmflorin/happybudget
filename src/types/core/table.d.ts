@@ -392,7 +392,7 @@ namespace BudgetTable {
     readonly exportFileName?: string;
     readonly onTableChange: (payload: Table.Change<R>) => void;
     readonly onRowAdd: Table.RowAddFunc<R>;
-    readonly onRowDelete: (row: R) => void;
+    readonly onRowDelete: (ids: number | number[]) => void;
     // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
     // onRowExpand is provided to the BudgetTable.
     readonly rowCanExpand?: (row: R) => boolean;

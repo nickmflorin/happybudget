@@ -1,13 +1,12 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
-import { isNil, find, map } from "lodash";
+import { isNil, filter, includes, map } from "lodash";
 
 import * as api from "api";
 import * as models from "lib/model";
 
 import { isAction } from "lib/redux/typeguards";
-import { warnInconsistentState } from "lib/redux/util";
 import { consolidateTableChange } from "lib/model/util";
 
 import { createBulkCreatePayload } from "./util";
@@ -139,32 +138,39 @@ export const createSubAccountTaskSet = <
     }
   }
 
-  function* deleteTask(id: number): SagaIterator {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-    yield put(actions.deleting({ id, value: true }));
-    // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
-    // otherwise, the loading indicators will not appear until `yield put(actions.budget.request)`, and there
-    // is a lag between the time that this task is called and that task is called.
-    yield put(actions.budget.loading(true));
-    let success = true;
-    try {
-      yield call(api.deleteSubAccount, id, { cancelToken: source.token });
-    } catch (e) {
-      success = false;
-      yield put(actions.budget.loading(false));
-      if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error deleting the sub account.");
+  function* bulkDeleteTask(ids: number[]): SagaIterator {
+    const subaccountId = yield select(selectSubAccountId);
+    if (!isNil(subaccountId)) {
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+
+      if (ids.length !== 0) {
+        yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
+
+        // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
+        // otherwise, the loading indicators will not appear until `yield put(requestTemplateAction)`, and there
+        // is a lag between the time that this task is called and that task is called.
+        yield put(actions.budget.loading(true));
+        let success = true;
+        try {
+          yield call(api.bulkDeleteSubAccountSubAccounts, subaccountId, ids, { cancelToken: source.token });
+        } catch (e) {
+          success = false;
+          yield put(actions.budget.loading(false));
+          if (!(yield cancelled())) {
+            api.handleRequestError(e, "There was an error deleting the sub accounts.");
+          }
+        } finally {
+          yield all(ids.map((id: number) => put(actions.deleting({ id, value: false }))));
+          if (yield cancelled()) {
+            success = false;
+            source.cancel();
+          }
+        }
+        if (success === true) {
+          yield put(actions.budget.request(null));
+        }
       }
-    } finally {
-      yield put(actions.deleting({ id: id, value: false }));
-      if (yield cancelled()) {
-        success = false;
-        source.cancel();
-      }
-    }
-    if (success === true) {
-      yield put(actions.budget.request(null));
     }
   }
 
@@ -243,20 +249,18 @@ export const createSubAccountTaskSet = <
     }
   }
 
-  function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
+  function* handleRemovalTask(action: Redux.Action<number | number[]>): SagaIterator {
     if (!isNil(action.payload)) {
       const ms: SA[] = yield select(selectModels);
-      const model: SA | undefined = find(ms, { id: action.payload } as any);
-      if (isNil(model)) {
-        warnInconsistentState({
-          action: action.type,
-          reason: "Sub Account does not exist in state when it is expected to.",
-          id: action.payload
-        });
-      } else {
-        yield put(actions.removeFromState(model.id));
-        yield call(deleteTask, model.id);
-      }
+      let ids = Array.isArray(action.payload) ? action.payload : [action.payload];
+      ids = filter(ids, (id: number) =>
+        includes(
+          map(ms, (m: SA) => m.id),
+          id
+        )
+      );
+      yield fork(bulkDeleteTask, ids);
+      yield all(ids.map((id: number) => put(actions.removeFromState(id))));
     }
   }
 

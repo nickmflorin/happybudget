@@ -61,7 +61,7 @@ const AccountsTable = (): JSX.Element => {
         onRowAdd={(payload: Table.RowAddPayload<BudgetTable.BudgetAccountRow>) =>
           dispatch(actions.bulkCreateAccountsAction(payload))
         }
-        onRowDelete={(row: BudgetTable.BudgetAccountRow) => dispatch(actions.removeAccountAction(row.id))}
+        onRowDelete={(ids: number | number[]) => dispatch(actions.deleteAccountsAction(ids))}
         onTableChange={(payload: Table.Change<BudgetTable.BudgetAccountRow>) =>
           dispatch(actions.tableChangedAction(payload))
         }

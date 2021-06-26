@@ -123,7 +123,7 @@ const Actuals = (): JSX.Element => {
           onRowAdd={(payload: Table.RowAddPayload<BudgetTable.ActualRow>) =>
             dispatch(actions.bulkCreateActualsAction(payload))
           }
-          onRowDelete={(row: BudgetTable.ActualRow) => dispatch(actions.removeActualAction(row.id))}
+          onRowDelete={(ids: number | number[]) => dispatch(actions.deleteActualsAction(ids))}
           onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) =>
             dispatch(actions.tableChangedAction(payload))
           }
@@ -134,7 +134,7 @@ const Actuals = (): JSX.Element => {
               icon: <FontAwesomeIcon icon={faTrashAlt} />,
               onClick: () => {
                 const rows: BudgetTable.ActualRow[] = params.api.getSelectedRows();
-                map(rows, (row: BudgetTable.ActualRow) => dispatch(actions.removeActualAction(row.id)));
+                dispatch(actions.deleteActualsAction(map(rows, (row: BudgetTable.ActualRow) => row.id)));
               }
             }
           ]}

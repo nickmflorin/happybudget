@@ -43,7 +43,7 @@ export const updateCommentInStateAction = simpleAction<
 export const tableChangedAction = simpleAction<Table.Change<BudgetTable.BudgetSubAccountRow>>(
   ActionType.Budget.Account.TableChanged
 );
-export const removeSubAccountAction = simpleAction<number>(ActionType.Budget.Account.SubAccounts.Delete);
+export const deleteSubAccountsAction = simpleAction<number | number[]>(ActionType.Budget.Account.SubAccounts.Delete);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.Account.SubAccounts.Deleting
 );

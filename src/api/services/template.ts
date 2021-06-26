@@ -125,6 +125,15 @@ export const getTemplateFringes = async (
   return client.list<Model.Fringe>(url, query, options);
 };
 
+export const bulkDeleteTemplateFringes = async (
+  id: number,
+  ids: number[],
+  options: Http.RequestOptions = {}
+): Promise<Model.Template> => {
+  const url = URL.v1("templates", id, "bulk-delete-fringes");
+  return client.patch<Model.Template>(url, { ids }, options);
+};
+
 export const createTemplateFringe = async (
   id: number,
   payload: Http.FringePayload,
@@ -141,6 +150,15 @@ export const bulkUpdateTemplateAccounts = async (
 ): Promise<Model.Template> => {
   const url = URL.v1("templates", id, "bulk-update-accounts");
   return client.patch<Model.Template>(url, { data }, options);
+};
+
+export const bulkDeleteTemplateAccounts = async (
+  id: number,
+  ids: number[],
+  options: Http.RequestOptions = {}
+): Promise<Model.Template> => {
+  const url = URL.v1("templates", id, "bulk-delete-accounts");
+  return client.patch<Model.Template>(url, { ids }, options);
 };
 
 export const bulkCreateTemplateAccounts = async (

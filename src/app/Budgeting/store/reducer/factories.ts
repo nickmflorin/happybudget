@@ -256,11 +256,15 @@ export const createAccountsReducer = <
     } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
       const group: G | undefined = find(newState.groups.data, (g: G) => includes(g.children, action.payload));
       if (isNil(group)) {
-        warnInconsistentState({
-          action: action.type,
-          reason: "Group does not exist for account.",
-          id: action.payload
-        });
+        // In the case that we are just removing the model from the state, it is possible that
+        // the group never existed to begin with.
+        if (action.type === mapping.RemoveFromGroup) {
+          warnInconsistentState({
+            action: action.type,
+            reason: "Group does not exist for account in state when it is expected to.",
+            id: action.payload
+          });
+        }
       } else {
         newState = {
           ...newState,
@@ -561,11 +565,15 @@ export const createSubAccountsReducer = <
     } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
       const group: G | undefined = find(newState.groups.data, (g: G) => includes(g.children, action.payload));
       if (isNil(group)) {
-        warnInconsistentState({
-          action: action.type,
-          reason: "Group does not exist for sub-account.",
-          id: action.payload
-        });
+        // In the case that we are just removing the model from the state, it is possible that
+        // the group never existed to begin with.
+        if (action.type === mapping.RemoveFromGroup) {
+          warnInconsistentState({
+            action: action.type,
+            reason: "Group does not exist for sub-account in state when it is expected to.",
+            id: action.payload
+          });
+        }
       } else {
         newState = {
           ...newState,

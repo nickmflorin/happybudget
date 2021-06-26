@@ -1,13 +1,12 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
-import { isNil, find, map } from "lodash";
+import { isNil, map, filter, includes } from "lodash";
 
 import * as api from "api";
 import * as models from "lib/model";
 
 import { isAction } from "lib/redux/typeguards";
-import { warnInconsistentState } from "lib/redux/util";
 import { consolidateTableChange } from "lib/model/util";
 
 import { createBulkCreatePayload } from "./util";
@@ -41,6 +40,7 @@ export interface AccountsServiceSet<
   G extends Model.TemplateGroup | Model.BudgetGroup,
   P extends Http.TemplateAccountPayload | Http.BudgetAccountPayload
 > {
+  bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<M>;
   bulkUpdate: (id: number, data: Http.BulkUpdatePayload<P>[], options: Http.RequestOptions) => Promise<M>;
   bulkCreate: (id: number, payload: Http.BulkCreatePayload<P>, options: Http.RequestOptions) => Promise<A[]>;
   getAccounts: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<A>>;
@@ -139,29 +139,39 @@ export const createAccountsTaskSet = <
     }
   }
 
-  function* deleteTask(id: number): SagaIterator {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-    yield put(actions.deleting({ id, value: true }));
-    yield put(actions.budget.loading(true));
-    let success = true;
-    try {
-      yield call(api.deleteAccount, id, { cancelToken: source.token });
-    } catch (e) {
-      success = false;
-      yield put(actions.budget.loading(false));
-      if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error deleting the account.");
+  function* bulkDeleteTask(ids: number[]): SagaIterator {
+    const objId = yield select(selectObjId);
+    if (!isNil(objId)) {
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+
+      if (ids.length !== 0) {
+        yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
+        // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
+        // otherwise, the loading indicators will not appear until `yield put(requestTemplateAction)`, and there
+        // is a lag between the time that this task is called and that task is called.
+        yield put(actions.budget.loading(true));
+        let success = true;
+
+        try {
+          yield call(services.bulkDelete, objId, ids, { cancelToken: source.token });
+        } catch (e) {
+          success = false;
+          yield put(actions.budget.loading(false));
+          if (!(yield cancelled())) {
+            api.handleRequestError(e, "There was an error deleting the accounts.");
+          }
+        } finally {
+          yield all(ids.map((id: number) => put(actions.deleting({ id, value: false }))));
+          if (yield cancelled()) {
+            success = false;
+            source.cancel();
+          }
+        }
+        if (success === true) {
+          yield put(actions.budget.request(null));
+        }
       }
-    } finally {
-      yield put(actions.deleting({ id, value: false }));
-      if (yield cancelled()) {
-        success = false;
-        source.cancel();
-      }
-    }
-    if (success === true) {
-      yield put(actions.budget.request(null));
     }
   }
 
@@ -231,20 +241,18 @@ export const createAccountsTaskSet = <
     }
   }
 
-  function* handleRemovalTask(action: Redux.Action<number>): SagaIterator {
-    if (!isNil(action.payload) && !(yield cancelled())) {
+  function* handleRemovalTask(action: Redux.Action<number | number[]>): SagaIterator {
+    if (!isNil(action.payload)) {
       const ms: A[] = yield select(selectModels);
-      const model: A | undefined = find(ms, { id: action.payload } as any);
-      if (isNil(model)) {
-        warnInconsistentState({
-          action: action.type,
-          reason: "Account does not exist in state when it is expected to.",
-          id: action.payload
-        });
-      } else {
-        yield put(actions.removeFromState(model.id));
-        yield call(deleteTask, model.id);
-      }
+      let ids = Array.isArray(action.payload) ? action.payload : [action.payload];
+      ids = filter(ids, (id: number) =>
+        includes(
+          map(ms, (m: A) => m.id),
+          id
+        )
+      );
+      yield fork(bulkDeleteTask, ids);
+      yield all(ids.map((id: number) => put(actions.removeFromState(id))));
     }
   }
 

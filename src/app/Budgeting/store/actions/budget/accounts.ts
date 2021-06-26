@@ -32,7 +32,7 @@ export const updateCommentInStateAction = simpleAction<
   Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
 >(ActionType.Budget.Comments.UpdateInState);
 
-export const removeAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Delete);
+export const deleteAccountsAction = simpleAction<number | number[]>(ActionType.Budget.Accounts.Delete);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Budget.Accounts.Creating);
