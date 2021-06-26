@@ -248,7 +248,9 @@ const BudgetTable = <
       headerName: identifierFieldHeader,
       cellRenderer: "IdentifierCell",
       type: "number",
+      width: 100,
       ...identifierColumn,
+      suppressSizeToFit: true,
       pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
       cellRendererParams: {
         ...identifierColumn.cellRendererParams,
@@ -273,6 +275,7 @@ const BudgetTable = <
       cellStyle: { textAlign: "right", ...col.cellStyle },
       ...col,
       cellRenderer: "CalculatedCell",
+      suppressSizeToFit: true,
       minWidth: 100,
       valueFormatter: currencyValueFormatter,
       cellRendererParams: {
