@@ -1,5 +1,5 @@
-@import './colors';
-@import './typography';
+@import "./colors";
+@import "./typography";
 
 // This class is not meant to be used in the components.
 .btn-link-base {
@@ -180,7 +180,6 @@
     }
   }
 }
-
 
 .btn,
 .ant-btn {
@@ -396,10 +395,12 @@
       }
 
       &:hover {
-        background-color: rgba($green, 0.3)
+        background-color: rgba($green, 0.3);
       }
 
-      &.disabled, &:disabled, &.fake-disabled {
+      &.disabled,
+      &:disabled,
+      &.fake-disabled {
         svg {
           color: $disabled-color !important;
         }

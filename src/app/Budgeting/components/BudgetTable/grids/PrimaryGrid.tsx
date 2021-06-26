@@ -117,39 +117,37 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
    * Starting at the provided index, either traverses the table upwards or downwards
    * until a RowNode that is not used as a group footer is found.
    */
-  const findFirstNonGroupFooterRow = useDynamicCallback((startingIndex: number, direction: "asc" | "desc" = "asc"): [
-    RowNode | null,
-    number,
-    number
-  ] => {
-    if (!isNil(api)) {
-      let runningIndex = 0;
-      let noMoreRows = false;
-      let nextRowNode: RowNode | null = null;
+  const findFirstNonGroupFooterRow = useDynamicCallback(
+    (startingIndex: number, direction: "asc" | "desc" = "asc"): [RowNode | null, number, number] => {
+      if (!isNil(api)) {
+        let runningIndex = 0;
+        let noMoreRows = false;
+        let nextRowNode: RowNode | null = null;
 
-      while (noMoreRows === false) {
-        if (direction === "desc" && startingIndex - runningIndex < 0) {
-          noMoreRows = true;
-          break;
-        }
-        nextRowNode = api.getDisplayedRowAtIndex(
-          direction === "asc" ? startingIndex + runningIndex : startingIndex - runningIndex
-        );
-        if (isNil(nextRowNode)) {
-          noMoreRows = true;
-        } else {
-          const row: R = nextRowNode.data;
-          if (row.meta.isGroupFooter === false) {
-            return [nextRowNode, startingIndex + runningIndex, runningIndex];
+        while (noMoreRows === false) {
+          if (direction === "desc" && startingIndex - runningIndex < 0) {
+            noMoreRows = true;
+            break;
           }
-          runningIndex = runningIndex + 1;
+          nextRowNode = api.getDisplayedRowAtIndex(
+            direction === "asc" ? startingIndex + runningIndex : startingIndex - runningIndex
+          );
+          if (isNil(nextRowNode)) {
+            noMoreRows = true;
+          } else {
+            const row: R = nextRowNode.data;
+            if (row.meta.isGroupFooter === false) {
+              return [nextRowNode, startingIndex + runningIndex, runningIndex];
+            }
+            runningIndex = runningIndex + 1;
+          }
         }
+        return [nextRowNode === undefined ? null : nextRowNode, startingIndex + runningIndex, runningIndex];
+      } else {
+        return [null, startingIndex, 0];
       }
-      return [nextRowNode === undefined ? null : nextRowNode, startingIndex + runningIndex, runningIndex];
-    } else {
-      return [null, startingIndex, 0];
     }
-  });
+  );
 
   /**
    * Starting at the provided node, traverses the table upwards and collects
@@ -181,41 +179,39 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     return nodes;
   });
 
-  const navigateToNextCell = useDynamicCallback(
-    (params: NavigateToNextCellParams): CellPosition => {
-      if (!isNil(params.nextCellPosition)) {
-        const verticalAscend = params.previousCellPosition.rowIndex < params.nextCellPosition.rowIndex;
-        const verticalDescend = params.previousCellPosition.rowIndex > params.nextCellPosition.rowIndex;
+  const navigateToNextCell = useDynamicCallback((params: NavigateToNextCellParams): CellPosition => {
+    if (!isNil(params.nextCellPosition)) {
+      const verticalAscend = params.previousCellPosition.rowIndex < params.nextCellPosition.rowIndex;
+      const verticalDescend = params.previousCellPosition.rowIndex > params.nextCellPosition.rowIndex;
 
-        if (verticalAscend === true) {
-          /* eslint-disable no-unused-vars */
-          /* eslint-disable @typescript-eslint/no-unused-vars */
-          const [rowNode, _, additionalIndex] = findFirstNonGroupFooterRow(params.nextCellPosition.rowIndex);
-          if (!isNil(rowNode)) {
-            return {
-              ...params.nextCellPosition,
-              rowIndex: params.nextCellPosition.rowIndex + additionalIndex
-            };
-          }
-          return params.nextCellPosition;
-        } else if (verticalDescend === true) {
-          const [rowNode, _, additionalIndex] = findFirstNonGroupFooterRow(params.nextCellPosition.rowIndex, "desc");
-          if (!isNil(rowNode)) {
-            return {
-              ...params.nextCellPosition,
-              rowIndex: params.nextCellPosition.rowIndex - additionalIndex
-            };
-          }
-          return params.nextCellPosition;
-        } else if (includes(["expand", "select"], params.nextCellPosition.column.getColId())) {
-          return params.previousCellPosition;
-        } else {
-          return params.nextCellPosition;
+      if (verticalAscend === true) {
+        /* eslint-disable no-unused-vars */
+        /* eslint-disable @typescript-eslint/no-unused-vars */
+        const [rowNode, _, additionalIndex] = findFirstNonGroupFooterRow(params.nextCellPosition.rowIndex);
+        if (!isNil(rowNode)) {
+          return {
+            ...params.nextCellPosition,
+            rowIndex: params.nextCellPosition.rowIndex + additionalIndex
+          };
         }
+        return params.nextCellPosition;
+      } else if (verticalDescend === true) {
+        const [rowNode, _, additionalIndex] = findFirstNonGroupFooterRow(params.nextCellPosition.rowIndex, "desc");
+        if (!isNil(rowNode)) {
+          return {
+            ...params.nextCellPosition,
+            rowIndex: params.nextCellPosition.rowIndex - additionalIndex
+          };
+        }
+        return params.nextCellPosition;
+      } else if (includes(["expand", "select"], params.nextCellPosition.column.getColId())) {
+        return params.previousCellPosition;
+      } else {
+        return params.nextCellPosition;
       }
-      return params.previousCellPosition;
     }
-  );
+    return params.previousCellPosition;
+  });
 
   const tabToNextCell = useDynamicCallback((params: TabToNextCellParams) => {
     if (!params.editing && !isNil(columnApi) && !isNil(api)) {

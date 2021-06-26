@@ -19,7 +19,8 @@
     width: 24px !important;
   }
 
-  &:hover, &.selected {
+  &:hover,
+  &.selected {
     .icon-border {
       box-shadow: none !important;
       border: 2px solid #6eb6ff !important;

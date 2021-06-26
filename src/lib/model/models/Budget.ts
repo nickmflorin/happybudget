@@ -49,9 +49,9 @@ export default class Budget extends SimpleBudget implements Model.IBudget {
   public readonly prelight_days: number = 0;
   public readonly studio_shoot_days: number = 0;
   public readonly location_days: number = 0;
-  public readonly actual: number | null = null;
-  public readonly variance: number | null = null;
-  public readonly estimated: number | null = null;
+  public readonly actual: number = 0.0;
+  public readonly variance: number = 0.0;
+  public readonly estimated: number = 0.0;
 
   constructor(data: Model.Budget) {
     super(data);
@@ -168,7 +168,7 @@ export class Template extends SimpleTemplate implements Model.ITemplate {
   public readonly updated_at: string = "";
   public readonly created_by: number;
   public readonly image: string | null = null;
-  public readonly estimated: number | null = null;
+  public readonly estimated: number = 0.0;
 
   constructor(data: Model.Template) {
     super(data);

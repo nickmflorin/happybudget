@@ -40,18 +40,20 @@ const findReducerForAction = <P extends { [key: string]: any }, S, A extends Red
   return undefined;
 };
 
-export const createSimpleReducerFromMap = <P, S, A extends Redux.Action<any> = Redux.Action<any>>(
-  /* eslint-disable indent */
-  mappings: Partial<P>,
-  reducers: MappedReducers<P, S, A>,
-  options: FactoryOptions<S, A>
-): Reducer<S, A> => (state: S = options.initialState, action: A): S => {
-  const actionReducer = findReducerForAction<P, S, A>(action, mappings, reducers);
-  if (!isNil(actionReducer)) {
-    return actionReducer(state, action);
-  }
-  return state;
-};
+export const createSimpleReducerFromMap =
+  <P, S, A extends Redux.Action<any> = Redux.Action<any>>(
+    /* eslint-disable indent */
+    mappings: Partial<P>,
+    reducers: MappedReducers<P, S, A>,
+    options: FactoryOptions<S, A>
+  ): Reducer<S, A> =>
+  (state: S = options.initialState, action: A): S => {
+    const actionReducer = findReducerForAction<P, S, A>(action, mappings, reducers);
+    if (!isNil(actionReducer)) {
+      return actionReducer(state, action);
+    }
+    return state;
+  };
 
 export const createObjectReducerFromMap = <P, S extends object, A extends Redux.Action<any> = Redux.Action<any>>(
   /* eslint-disable indent */

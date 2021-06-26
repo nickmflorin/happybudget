@@ -261,7 +261,7 @@ export const createAccountsTaskSet = <
           });
         } else {
           const updatedModel = manager.mergeChangesWithModel(model, merged[i]);
-          yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel }));
+          yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel as Partial<A> }));
           mergedUpdates.push(merged[i]);
         }
       }

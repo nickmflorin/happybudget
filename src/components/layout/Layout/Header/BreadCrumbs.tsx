@@ -62,7 +62,6 @@ interface BreadCrumbItemProps extends StandardComponentProps {
 const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const history = useHistory();
-  console.log(dropdownVisible);
 
   const renderItem = (i: IBreadCrumbItem) => {
     if (!isNil(i.text)) {

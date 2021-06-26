@@ -4,7 +4,7 @@ abstract class Group extends Model implements Model.Group {
   public readonly children: number[] = [];
   public readonly name: string = "";
   public readonly color: string | null = null;
-  public readonly estimated: number | null = null;
+  public readonly estimated: number = 0.0;
   public readonly created_at: string = "";
   public readonly updated_at: string = "";
   public readonly created_by: number | null = null;
@@ -24,8 +24,8 @@ export class TemplateGroup extends Group implements Model.TemplateGroup {
 }
 
 export default class BudgetGroup extends Group implements Model.BudgetGroup {
-  public readonly variance: number | null = null;
-  public readonly actual: number | null = null;
+  public readonly variance: number = 0.0;
+  public readonly actual: number = 0.0;
 
   constructor(data: Model.BudgetGroup) {
     super(data);

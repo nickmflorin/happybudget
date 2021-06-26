@@ -176,18 +176,16 @@ const BudgetTable = <
     }
   });
 
-  const ActionColumn = useDynamicCallback<Table.Column<R>>(
-    (col: Table.Column<R>): Table.Column<R> => {
-      return {
-        ...col,
-        ...actionColumn,
-        cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", col.cellClass),
-        editable: false,
-        headerName: "",
-        resizable: false
-      };
-    }
-  );
+  const ActionColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
+    return {
+      ...col,
+      ...actionColumn,
+      cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", col.cellClass),
+      editable: false,
+      headerName: "",
+      resizable: false
+    };
+  });
 
   const IndexColumn = useDynamicCallback<Table.Column<R>>(
     (col: Table.Column<R>): Table.Column<R> =>
@@ -266,64 +264,54 @@ const BudgetTable = <
     })
   );
 
-  const CalculatedColumn = useDynamicCallback<Table.Column<R>>(
-    (col: Table.Column<R>): Table.Column<R> => {
-      return {
-        width: 100,
-        maxWidth: 100,
-        cellStyle: { textAlign: "right", ...col.cellStyle },
-        ...col,
-        cellRenderer: "CalculatedCell",
-        valueFormatter: currencyValueFormatter,
-        cellRendererParams: {
-          ...col.cellRendererParams,
-          renderRedIfNegative: true
-        },
-        cellClass: (params: CellClassParams) => {
-          const row: R = params.node.data;
-          if (
-            row.meta.isBudgetFooter === false &&
-            row.meta.isGroupFooter === false &&
-            row.meta.isTableFooter === false
-          ) {
-            return mergeClassNames(params, "cell--not-editable-highlight", col.cellClass);
-          }
-          return mergeClassNames(params, col.cellClass);
+  const CalculatedColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
+    return {
+      width: 100,
+      maxWidth: 100,
+      cellStyle: { textAlign: "right", ...col.cellStyle },
+      ...col,
+      cellRenderer: "CalculatedCell",
+      valueFormatter: currencyValueFormatter,
+      cellRendererParams: {
+        ...col.cellRendererParams,
+        renderRedIfNegative: true
+      },
+      cellClass: (params: CellClassParams) => {
+        const row: R = params.node.data;
+        if (row.meta.isBudgetFooter === false && row.meta.isGroupFooter === false && row.meta.isTableFooter === false) {
+          return mergeClassNames(params, "cell--not-editable-highlight", col.cellClass);
         }
-      };
-    }
-  );
+        return mergeClassNames(params, col.cellClass);
+      }
+    };
+  });
 
-  const BodyColumn = useDynamicCallback<Table.Column<R>>(
-    (col: Table.Column<R>): Table.Column<R> => {
-      return {
-        cellRenderer: "BodyCell",
-        ...col,
-        headerComponentParams: {
-          ...col.headerComponentParams,
-          onSort: onSort,
-          ordering
-        }
-      };
-    }
-  );
+  const BodyColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
+    return {
+      cellRenderer: "BodyCell",
+      ...col,
+      headerComponentParams: {
+        ...col.headerComponentParams,
+        onSort: onSort,
+        ordering
+      }
+    };
+  });
 
-  const UniversalColumn = useDynamicCallback<Table.Column<R>>(
-    (col: Table.Column<R>): Table.Column<R> => {
-      return {
-        ...col,
-        suppressMenu: true,
-        editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
-        cellClass: (params: CellClassParams) => {
-          const row: R = params.node.data;
-          return mergeClassNames(params, cellClass, col.cellClass, {
-            "cell--not-selectable": !_isCellSelectable(row, params.colDef),
-            "cell--not-editable": !_isCellEditable(row, params.colDef)
-          });
-        }
-      };
-    }
-  );
+  const UniversalColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
+    return {
+      ...col,
+      suppressMenu: true,
+      editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
+      cellClass: (params: CellClassParams) => {
+        const row: R = params.node.data;
+        return mergeClassNames(params, cellClass, col.cellClass, {
+          "cell--not-selectable": !_isCellSelectable(row, params.colDef),
+          "cell--not-editable": !_isCellEditable(row, params.colDef)
+        });
+      }
+    };
+  });
 
   const baseColumns = useMemo((): Table.Column<R>[] => {
     let base: Table.Column<R>[] = [IndexColumn({})];

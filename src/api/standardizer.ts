@@ -6,16 +6,15 @@ export type ErrorStandardizer<T> = (error: T) => T;
 const testError = (filt: ErrorFilter, error: Http.Error): boolean =>
   typeof filt === "function" ? filt(error) : isMatch(error, filt);
 
-export const Standard = <T extends Http.Error = Http.Error>(
-  filter: ErrorFilter,
-  standardizer: ErrorStandardizer<T>
-): ErrorStandardizer<T> => (error: T): T => {
-  /* eslint-disable indent */
-  if (testError(filter, error)) {
-    return standardizer(error);
-  }
-  return error;
-};
+/* prettier-ignore */
+export const Standard =
+  <T extends Http.Error = Http.Error>(filter: ErrorFilter, standardizer: ErrorStandardizer<T>): ErrorStandardizer<T> =>
+    (error: T): T => {
+      if (testError(filter, error)) {
+        return standardizer(error);
+      }
+      return error;
+    };
 
 export const STANDARDS: ErrorStandardizer<any>[] = [
   Standard<Http.FieldError>(

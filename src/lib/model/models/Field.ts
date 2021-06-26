@@ -16,7 +16,8 @@ abstract class BaseField<R extends Table.Row, M extends Model.Model> implements 
 
 abstract class WriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
   extends BaseField<R, M>
-  implements Table.IWriteField<R, M, P> {
+  implements Table.IWriteField<R, M, P>
+{
   readonly allowNull?: boolean;
   readonly allowBlank?: boolean;
   readonly http: Http.Method[];
@@ -48,7 +49,8 @@ abstract class WriteField<R extends Table.Row, M extends Model.Model, P extends 
 
 abstract class ReadField<R extends Table.Row, M extends Model.Model>
   extends BaseField<R, M>
-  implements Table.IReadField<R, M> {
+  implements Table.IReadField<R, M>
+{
   readonly modelOnly?: boolean;
   readonly rowOnly?: boolean;
   readonly read = true;
@@ -138,7 +140,8 @@ abstract class ReadWriteField<
 
 export class AgnosticReadWriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
   extends ReadWriteField<R, M, P>
-  implements Table.IAgnosticReadWriteField<R, M, P> {
+  implements Table.IAgnosticReadWriteField<R, M, P>
+{
   readonly field: keyof M & keyof R & keyof P;
 
   constructor(config: Table.IAgnosticReadWriteFieldConfig<R, M, P>) {
@@ -153,7 +156,8 @@ export class SplitReadWriteField<R extends Table.Row, M extends Model.Model, P e
 
 export class WriteOnlyField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
   extends WriteField<R, M, P>
-  implements Table.IWriteOnlyField<R, M, P> {
+  implements Table.IWriteOnlyField<R, M, P>
+{
   readonly field: keyof P;
   readonly writeOnly = true;
 
@@ -181,7 +185,8 @@ export class WriteOnlyField<R extends Table.Row, M extends Model.Model, P extend
 
 export class ReadOnlyField<R extends Table.Row, M extends Model.Model>
   extends ReadField<R, M>
-  implements Table.IReadOnlyField<R, M> {
+  implements Table.IReadOnlyField<R, M>
+{
   readonly field: keyof M & keyof R;
   readonly readOnly = true;
 

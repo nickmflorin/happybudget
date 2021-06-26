@@ -1,5 +1,5 @@
-@import 'style/colors';
-@import 'style/typography';
+@import "style/colors";
+@import "style/typography";
 
 .table-header {
   display: flex;
@@ -50,12 +50,12 @@
 
   .table-grid {
     flex: 1 1 auto;
-    height: 100%;  // Required to render correctly in Safari.
+    height: 100%; // Required to render correctly in Safari.
 
     .ag-row:last-child {
       border-bottom: none !important;
     }
-    div[role='gridcell'].unit-cell {
+    div[role="gridcell"].unit-cell {
       // This padding is an attempt to vertically align the tag in the cell.  It
       // is not the best way, since the height of the cell can cause the vertical
       // alignment to become skewed.  We should figure out the right way to do this.

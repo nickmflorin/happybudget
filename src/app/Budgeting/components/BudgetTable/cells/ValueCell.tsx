@@ -9,7 +9,12 @@ export interface ValueCellProps<R extends Table.Row> extends CellProps<R> {
 
 const ValueCell = <R extends Table.Row>({ ...props }: ValueCellProps<R>): JSX.Element => {
   const cellValue = useMemo((): ReactNode => {
-    if (!isNil(props.colDef.valueFormatter) && typeof props.colDef.valueFormatter === "function") {
+    if (
+      !isNil(props.colDef) &&
+      !isNil(props.column) &&
+      !isNil(props.colDef.valueFormatter) &&
+      typeof props.colDef.valueFormatter === "function"
+    ) {
       return props.colDef.valueFormatter({
         value: props.children,
         node: props.node,
@@ -23,7 +28,7 @@ const ValueCell = <R extends Table.Row>({ ...props }: ValueCellProps<R>): JSX.El
     } else {
       return props.children;
     }
-  }, [props.children, props.colDef.valueFormatter]);
+  }, [props.children, props.colDef]);
 
   return <Cell<R> {...props}>{cellValue}</Cell>;
 };

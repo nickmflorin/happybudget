@@ -127,7 +127,7 @@ namespace Model {
   interface ISimpleTemplate extends Model.IModel<Model.SimpleTemplate> {}
 
   interface Template extends Model.SimpleTemplate {
-    readonly estimated: number | null;
+    readonly estimated: number;
   }
 
   interface ITemplate extends Model.IHttpModel<Model.Template, Http.TemplatePayload> {}
@@ -148,9 +148,9 @@ namespace Model {
     readonly prelight_days: number;
     readonly studio_shoot_days: number;
     readonly location_days: number;
-    readonly actual: number | null;
-    readonly variance: number | null;
-    readonly estimated: number | null;
+    readonly actual: number;
+    readonly variance: number;
+    readonly estimated: number;
   }
 
   interface IBudget extends Model.IHttpModel<Model.Budget, Http.BudgetPayload> {}
@@ -159,7 +159,7 @@ namespace Model {
     readonly children: number[];
     readonly name: string;
     readonly color: string | null;
-    readonly estimated: number | null;
+    readonly estimated: number;
     readonly children: number[];
     readonly created_by: number | null;
     readonly updated_by: number | null;
@@ -168,8 +168,8 @@ namespace Model {
   }
 
   interface BudgetGroup extends Model.Group {
-    readonly variance: number | null;
-    readonly actual: number | null;
+    readonly variance: number;
+    readonly actual: number;
   }
 
   interface TemplateGroup extends Model.Group {}
@@ -190,7 +190,7 @@ namespace Model {
   interface Account extends Model.SimpleAccount {
     readonly access: number[];
     readonly ancestors: Model.Entity[];
-    readonly estimated: number | null;
+    readonly estimated: number;
     readonly subaccounts: number[];
     readonly group: number | null;
     readonly siblings: Model.SimpleAccount[];
@@ -202,8 +202,8 @@ namespace Model {
   }
 
   interface BudgetAccount extends Model.Account {
-    readonly variance: number | null;
-    readonly actual: number | null;
+    readonly variance: number;
+    readonly actual: number;
   }
 
   interface TemplateAccount extends Model.Account {}
@@ -224,7 +224,7 @@ namespace Model {
     readonly object_id: number;
     readonly type: "subaccount";
     readonly parent_type: "account" | "subaccount";
-    readonly estimated: number | null;
+    readonly estimated: number;
     readonly group: number | null;
     readonly fringes: number[];
     readonly subaccounts: number[];
@@ -237,8 +237,8 @@ namespace Model {
   }
 
   interface BudgetSubAccount extends Model.SubAccount {
-    readonly variance: number | null;
-    readonly actual: number | null;
+    readonly variance: number;
+    readonly actual: number;
   }
 
   interface TemplateSubAccount extends Model.SubAccount {}

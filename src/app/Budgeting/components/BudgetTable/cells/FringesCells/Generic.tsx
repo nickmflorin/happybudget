@@ -1,4 +1,4 @@
-import { map, find, filter } from "lodash";
+import { map, find, filter, isNil } from "lodash";
 import { Tag } from "components/tagging";
 import Cell, { StandardCellProps } from "../Cell";
 
@@ -15,7 +15,7 @@ const FringesCell = <R extends Table.Row>({
   ...props
 }: FringesCellProps<R>): JSX.Element => {
   return (
-    <Cell {...props} onClear={() => props.setValue([])} hideClear={children.length === 0}>
+    <Cell {...props} onClear={() => !isNil(props.setValue) && props.setValue([])} hideClear={children.length === 0}>
       <div style={{ display: "flex", justifyContent: "left" }}>
         <Tag.Multiple<Model.Fringe>
           models={

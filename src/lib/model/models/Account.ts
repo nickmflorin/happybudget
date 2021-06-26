@@ -14,7 +14,7 @@ export class SimpleAccount extends Model implements Model.SimpleAccount {
 export class Account extends SimpleAccount implements Model.Account {
   public readonly access: number[] = [];
   public readonly ancestors: Model.Entity[] = [];
-  public readonly estimated: number | null = null;
+  public readonly estimated: number = 0.0;
   public readonly subaccounts: number[] = [];
   public readonly group: number | null = null;
   public readonly siblings: Model.SimpleAccount[] = [];
@@ -39,8 +39,8 @@ export class TemplateAccount extends Account implements Model.TemplateAccount {
 }
 
 export default class BudgetAccount extends Account implements Model.BudgetAccount {
-  public readonly variance: number | null = null;
-  public readonly actual: number | null = null;
+  public readonly variance: number = 0.0;
+  public readonly actual: number = 0.0;
 
   constructor(data: Model.BudgetAccount) {
     super(data);

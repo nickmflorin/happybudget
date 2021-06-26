@@ -67,6 +67,9 @@ export const mergeClassNames = (params: CellClassParams, ...args: ClassNameConst
   return classNames(stringClassNames);
 };
 
-export const mergeClassNamesFn = (...args: ClassNameConstruct[]) => (params: CellClassParams) => {
-  return mergeClassNames(params, ...args);
-};
+/* prettier-ignore */
+export const mergeClassNamesFn =
+  (...args: ClassNameConstruct[]) =>
+    (params: CellClassParams) => {
+      return mergeClassNames(params, ...args);
+    };

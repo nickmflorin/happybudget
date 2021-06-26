@@ -20,7 +20,7 @@ export class SubAccount extends SimpleSubAccount implements Model.SubAccount {
   public readonly account: number;
   public readonly object_id: number;
   public readonly parent_type: "account" | "subaccount";
-  public readonly estimated: number | null = null;
+  public readonly estimated: number = 0.0;
   public readonly group: number | null = null;
   public readonly fringes: number[] = [];
   public readonly subaccounts: number[] = [];
@@ -48,8 +48,8 @@ export class TemplateSubAccount extends SubAccount implements Model.TemplateSubA
 }
 
 export default class BudgetSubAccount extends SubAccount implements Model.BudgetSubAccount {
-  public readonly variance: number | null = null;
-  public readonly actual: number | null = null;
+  public readonly variance: number = 0.0;
+  public readonly actual: number = 0.0;
 
   constructor(data: Model.BudgetSubAccount) {
     super(data);

@@ -1,4 +1,4 @@
-@import './colors';
+@import "./colors";
 
 // Input Fields
 $input-border-radius: 8px;
@@ -97,7 +97,8 @@ input.ant-input,
     height: 30px !important;
     border-radius: $input-small-border-radius;
 
-    input.ant-input, .input {
+    input.ant-input,
+    .input {
       padding-top: 4px;
       padding-bottom: 6px;
       padding-left: 8px;

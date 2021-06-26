@@ -34,7 +34,7 @@
     "ag-grid-community": "^25.1.0",
     "ag-grid-enterprise": "^25.1.0",
     "ag-grid-react": "^25.1.0",
-    "antd": "^4.12.3",
+    "antd": "^4.16.5",
     "awesome-debounce-promise": "^2.1.0",
     "axios": "^0.21.1",
     "axios-retry": "^3.1.9",
@@ -73,7 +73,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "pretty": "prettier --write \"./**/*.{ts,tsx,js,jsx,json}\""
+    "pretty": "prettier --write \"./**/*.{ts,tsx,json,scss}\""
   },
   "eslintConfig": {
     "extends": [

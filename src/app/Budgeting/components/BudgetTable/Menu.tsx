@@ -93,16 +93,13 @@ const BudgetTableMenu = <R extends Table.Row>({
           {!isNil(saving) && <SavingChanges saving={saving} />}
           <ShowHide show={canToggleColumns}>
             <FieldsDropdown
-              fields={map(
-                columns,
-                (col: ColDef): FieldMenuField => {
-                  return {
-                    id: col.field as string,
-                    label: col.headerName as string,
-                    defaultChecked: true
-                  };
-                }
-              )}
+              fields={map(columns, (col: ColDef): FieldMenuField => {
+                return {
+                  id: col.field as string,
+                  label: col.headerName as string,
+                  defaultChecked: true
+                };
+              })}
               buttonProps={{ style: { minWidth: 90 } }}
               onChange={(fields: Field[]) => onColumnsChange(fields)}
             >
@@ -111,16 +108,13 @@ const BudgetTableMenu = <R extends Table.Row>({
           </ShowHide>
           <ShowHide show={canExport}>
             <FieldsDropdown
-              fields={map(
-                columns,
-                (col: ColDef): FieldMenuField => {
-                  return {
-                    id: col.field as string,
-                    label: col.headerName as string,
-                    defaultChecked: true
-                  };
-                }
-              )}
+              fields={map(columns, (col: ColDef): FieldMenuField => {
+                return {
+                  id: col.field as string,
+                  label: col.headerName as string,
+                  defaultChecked: true
+                };
+              })}
               buttons={[
                 {
                   onClick: (fields: Field[]) => onExport(fields),

@@ -1,5 +1,5 @@
-@import 'style/colors';
-@import 'style/typography';
+@import "style/colors";
+@import "style/typography";
 
 .form-container {
   padding: 80px;
@@ -22,7 +22,7 @@
   }
 
   .signup-form {
-    button[type='submit'] {
+    button[type="submit"] {
       margin-top: 15px;
       width: 100%;
       &:not(:last-child) {

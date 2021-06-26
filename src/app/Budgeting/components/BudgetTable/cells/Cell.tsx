@@ -45,7 +45,7 @@ const Cell = <R extends Table.Row>({
 
   const showClearButton = useMemo(() => {
     if (!isNil(onClear)) {
-      if (!isNil(showClear)) {
+      if (!isNil(showClear) && !isNil(colDef)) {
         return showClear(row, colDef);
       } else if (!isNil(hideClear)) {
         return !hideClear;
@@ -65,7 +65,9 @@ const Cell = <R extends Table.Row>({
         style={style}
         onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(onKeyDown) && onKeyDown(event)}
       >
-        <LoadableCellWrapper loading={includes(row.meta.fieldsLoading, colDef.field)}>{children}</LoadableCellWrapper>
+        <LoadableCellWrapper loading={!isNil(colDef) && includes(row.meta.fieldsLoading, colDef.field)}>
+          {children}
+        </LoadableCellWrapper>
         {showClearButton && (
           <IconButton
             className={"btn--clear-cell"}
@@ -73,7 +75,7 @@ const Cell = <R extends Table.Row>({
             icon={<FontAwesomeIcon icon={faTimesCircle} />}
             onClick={(event: React.MouseEventHandler<HTMLElement>) => {
               // TODO: Figure out how to stop propogation!
-              !isNil(onClear) && onClear(row, colDef);
+              !isNil(onClear) && !isNil(colDef) && onClear(row, colDef);
             }}
           />
         )}

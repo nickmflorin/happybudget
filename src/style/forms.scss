@@ -1,5 +1,5 @@
-@import './colors';
-@import './typography';
+@import "./colors";
+@import "./typography";
 
 form {
   width: 100%;
@@ -101,7 +101,7 @@ label {
       margin-left: -3px;
 
       &:before {
-        content: '';
+        content: "";
       }
     }
   }
@@ -126,7 +126,7 @@ label {
     // Alerts/feedback that go underneath the form control.
     .ant-form-item-explain {
       min-height: 12px;
-      div[role='alert'] {
+      div[role="alert"] {
         margin-top: 5px;
         font-size: 11px;
         line-height: 12px;

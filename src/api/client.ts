@@ -28,20 +28,18 @@ export const instance = axios.create({
   withCredentials: true
 });
 
-instance.interceptors.request.use(
-  (config: AxiosRequestConfig): AxiosRequestConfig => {
-    config = config || {};
-    const cookies = new Cookies();
-    // The CSRF Token needs to be set as a header for POST/PATCH/PUT requests
-    // with Django - unfortunately, we cannot include it as a cookie only
-    // because their middleware looks for it in the headers.
-    const csrfToken: string = cookies.get("greenbudgetcsrftoken");
-    if (!isNil(csrfToken)) {
-      config.headers["X-CSRFToken"] = csrfToken;
-    }
-    return config;
+instance.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
+  config = config || {};
+  const cookies = new Cookies();
+  // The CSRF Token needs to be set as a header for POST/PATCH/PUT requests
+  // with Django - unfortunately, we cannot include it as a cookie only
+  // because their middleware looks for it in the headers.
+  const csrfToken: string = cookies.get("greenbudgetcsrftoken");
+  if (!isNil(csrfToken)) {
+    config.headers["X-CSRFToken"] = csrfToken;
   }
-);
+  return config;
+});
 
 export const filterPayload = <T extends { [key: string]: any } = { [key: string]: any }>(payload: T): T => {
   const newPayload: { [key: string]: any } = {};

@@ -16,7 +16,8 @@
     height: 32px;
     justify-content: left;
 
-    &:hover, &.focus {
+    &:hover,
+    &.focus {
       background-color: rgb(33 150 243 / 45%) !important;
     }
     &.active {
