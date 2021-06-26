@@ -32,7 +32,7 @@ import {
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import * as models from "lib/model";
-import { orderByFieldOrdering } from "lib/util";
+import { orderByFieldOrdering, getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { getGroupColorDefinition } from "lib/model/util";
@@ -65,9 +65,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   exportFileName,
   onSearch,
   onColumnsChange,
-  processCellForClipboard,
-  processCellFromClipboard,
-  onCellValueChanged,
   isCellEditable,
   setApi,
   setColumnApi,
@@ -108,14 +105,11 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           const node = event.api.getRowNode(String(rowId));
           if (!isNil(node) && !isNil(node.rowIndex) && !isNil(identifierCol)) {
             event.api.setFocusedCell(node.rowIndex, identifierCol);
-            node.setSelected(true);
             focusedOnQuery = true;
           }
         }
         if (focusedOnQuery === false) {
           event.api.setFocusedCell(0, identifierCol);
-          const selectedRow = event.api.getDisplayedRowAtIndex(0);
-          selectedRow?.setSelected(true);
         }
       }
     }
@@ -866,6 +860,59 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       }
     }
     return "";
+  });
+
+  const processCellForClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
+    const colDef = column.getColDef();
+    if (!isNil(colDef.field)) {
+      const customCol: Table.Column<R> | undefined = find(columns, { field: colDef.field } as any);
+      if (!isNil(customCol)) {
+        const processor = customCol.processCellForClipboard;
+        if (!isNil(processor)) {
+          return processor(row);
+        } else {
+          value = value === undefined ? getKeyValue<R, keyof R>(customCol.field)(row) : value;
+          // The value should never be undefined at this point.
+          if (value === customCol.nullValue) {
+            return "";
+          }
+          return value;
+        }
+      }
+    }
+    return "";
+  });
+
+  const processCellFromClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
+    const colDef = column.getColDef();
+    if (!isNil(colDef.field)) {
+      const customCol: Table.Column<R> | undefined = find(columns, { field: colDef.field } as any);
+      if (!isNil(customCol)) {
+        const processor = customCol.processCellFromClipboard;
+        if (!isNil(processor)) {
+          return processor(value);
+        } else {
+          value = value === undefined ? getKeyValue<R, keyof R>(customCol.field)(row) : value;
+          // The value should never be undefined at this point.
+          if (typeof value === "string" && String(value).trim() === "") {
+            return !isNil(customCol.nullValue) ? customCol.nullValue : null;
+          }
+          return value;
+        }
+      }
+    }
+    return "";
+  });
+
+  const onCellValueChanged = useDynamicCallback((params: Table.CellValueChangedParams<R>) => {
+    if (!isNil(api) && !isNil(columnApi) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
+      const col = columnApi.getColumn("expand");
+      if (!isNil(col)) {
+        if (isNil(params.oldRow) || rowCanExpand(params.oldRow) !== rowCanExpand(params.row)) {
+          api.refreshCells({ force: true, rowNodes: [params.node], columns: [col] });
+        }
+      }
+    }
   });
 
   const includeCellEditorParams = (def: Table.Column<R>): Table.Column<R> => {

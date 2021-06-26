@@ -410,12 +410,9 @@ namespace BudgetTable {
     readonly columnApi: import("@ag-grid-community/core").ColumnApi | undefined;
     readonly options: import("@ag-grid-community/core").GridOptions;
     readonly ordering: FieldOrder<keyof R>[];
-    readonly onCellValueChanged: (params: Table.CellValueChangedParams<R>) => void;
     readonly isCellEditable: (row: R, colDef: Table.Column<R>) => boolean;
     readonly setApi: (api: import("@ag-grid-community/core").GridApi) => void;
     readonly setColumnApi: (api: import("@ag-grid-community/core").ColumnApi) => void;
-    readonly processCellForClipboard: (column: import("@ag-grid-community/core").Column, row: R, value: any) => string;
-    readonly processCellFromClipboard: (column: import("@ag-grid-community/core").Column, row: R, value: any) => any;
   }
 
   interface Props<

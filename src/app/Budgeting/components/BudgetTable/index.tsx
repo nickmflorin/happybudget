@@ -9,7 +9,6 @@ import {
   GridApi,
   EditableCallbackParams,
   ColumnApi,
-  Column,
   ColSpanParams,
   GridOptions,
   CheckboxSelectionCallbackParams
@@ -18,7 +17,7 @@ import {
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
 import { WrapInApplicationSpinner } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
-import { updateFieldOrdering, getKeyValue } from "lib/util";
+import { updateFieldOrdering } from "lib/util";
 import { currencyValueFormatter } from "lib/model/formatters";
 
 import { validateCookiesOrdering, mergeClassNames, mergeClassNamesFn } from "./util";
@@ -364,59 +363,6 @@ const BudgetTable = <
     );
   }, [useDeepEqualMemo(columns), baseColumns]);
 
-  const processCellForClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
-    const colDef = column.getColDef();
-    if (!isNil(colDef.field)) {
-      const customCol: Table.Column<R> | undefined = find(cols, { field: colDef.field } as any);
-      if (!isNil(customCol)) {
-        const processor = customCol.processCellForClipboard;
-        if (!isNil(processor)) {
-          return processor(row);
-        } else {
-          value = value === undefined ? getKeyValue<R, keyof R>(customCol.field)(row) : value;
-          // The value should never be undefined at this point.
-          if (value === customCol.nullValue) {
-            return "";
-          }
-          return value;
-        }
-      }
-    }
-    return "";
-  });
-
-  const processCellFromClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
-    const colDef = column.getColDef();
-    if (!isNil(colDef.field)) {
-      const customCol: Table.Column<R> | undefined = find(cols, { field: colDef.field } as any);
-      if (!isNil(customCol)) {
-        const processor = customCol.processCellFromClipboard;
-        if (!isNil(processor)) {
-          return processor(value);
-        } else {
-          value = value === undefined ? getKeyValue<R, keyof R>(customCol.field)(row) : value;
-          // The value should never be undefined at this point.
-          if (typeof value === "string" && String(value).trim() === "") {
-            return !isNil(customCol.nullValue) ? customCol.nullValue : null;
-          }
-          return value;
-        }
-      }
-    }
-    return "";
-  });
-
-  const onCellValueChanged = useDynamicCallback((params: Table.CellValueChangedParams<R>) => {
-    if (!isNil(gridApi) && !isNil(columnApi) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
-      const col = columnApi.getColumn("expand");
-      if (!isNil(col)) {
-        if (isNil(params.oldRow) || rowCanExpand(params.oldRow) !== rowCanExpand(params.row)) {
-          gridApi.refreshCells({ force: true, rowNodes: [params.node], columns: [col] });
-        }
-      }
-    }
-  });
-
   return (
     <WrapInApplicationSpinner hideWhileLoading={false} loading={loading}>
       <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
@@ -441,11 +387,8 @@ const BudgetTable = <
           canSearch={canSearch}
           canToggleColumns={canToggleColumns}
           onSearch={onSearch}
-          onCellValueChanged={onCellValueChanged}
           setApi={setGridApi}
           setColumnApi={setColumnApi}
-          processCellForClipboard={processCellForClipboard}
-          processCellFromClipboard={processCellFromClipboard}
           isCellEditable={_isCellEditable}
           onRowExpand={onRowExpand}
           rowCanExpand={rowCanExpand}
