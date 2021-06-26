@@ -302,6 +302,9 @@ namespace Table {
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace BudgetTable {
+  type GridId = "primary" | "tableFooter" | "budgetFooter";
+  type GridSet<T> = { primary: T; tableFooter: T; budgetFooter: T };
+
   interface GroupProps<R extends Table.Row, G extends Model.Group = Model.Group> {
     readonly onGroupRows: (rows: R[]) => void;
     readonly onDeleteGroup: (group: G) => void;

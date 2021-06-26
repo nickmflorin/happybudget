@@ -62,7 +62,11 @@ const GenericSubAccountsTable = <
       sizeColumnsToFit={false}
       identifierField={"identifier"}
       identifierFieldHeader={identifierFieldHeader}
-      identifierColumn={{ width: 70, cellRendererParams: { className: "subaccount-identifier" } }}
+      identifierColumn={{
+        ...props.identifierColumn,
+        width: 90,
+        cellRendererParams: { className: "subaccount-identifier" }
+      }}
       isCellEditable={(row: R, colDef: ColDef) => {
         if (includes(["identifier", "description", "name"], colDef.field)) {
           return true;

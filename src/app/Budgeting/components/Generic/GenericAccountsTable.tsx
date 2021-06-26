@@ -41,8 +41,8 @@ const GenericAccountsTable = <
     <BudgetTable<R, M, G, P>
       identifierField={"identifier"}
       identifierFieldHeader={"Account"}
+      identifierColumn={{ ...props.identifierColumn, width: 90 }}
       tableFooterIdentifierValue={!isNil(detail) ? `${detail.name} Total` : "Total"}
-      sizeColumnsToFit={false}
       groupParams={{
         onDeleteGroup,
         onRowRemoveFromGroup,

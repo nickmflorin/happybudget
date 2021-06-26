@@ -1,20 +1,20 @@
 import * as cells from "../cells";
-import { withCellPreparations } from "../cells";
+import { withCellPreparations, withPrimaryGrid } from "../cells";
 import * as editors from "../editors";
 
 export const Cells = {
   ExpandCell: withCellPreparations(cells.ExpandCell),
   IndexCell: withCellPreparations(cells.IndexCell),
   BodyCell: withCellPreparations(cells.BodyCell),
-  SubAccountUnitCell: withCellPreparations(cells.SubAccountUnitCell),
-  FringeUnitCell: withCellPreparations(cells.FringeUnitCell),
+  SubAccountUnitCell: withPrimaryGrid(withCellPreparations(cells.SubAccountUnitCell)),
+  FringeUnitCell: withPrimaryGrid(withCellPreparations(cells.FringeUnitCell)),
   IdentifierCell: withCellPreparations(cells.IdentifierCell),
   CalculatedCell: withCellPreparations(cells.CalculatedCell),
-  PaymentMethodCell: withCellPreparations(cells.PaymentMethodCell),
+  PaymentMethodCell: withPrimaryGrid(withCellPreparations(cells.PaymentMethodCell)),
   BudgetItemCell: withCellPreparations(cells.BudgetItemCell),
-  BudgetFringesCell: withCellPreparations(cells.BudgetFringesCell),
-  TemplateFringesCell: withCellPreparations(cells.TemplateFringesCell),
-  ColorCell: withCellPreparations(cells.ColorCell)
+  BudgetFringesCell: withPrimaryGrid(withCellPreparations(cells.BudgetFringesCell)),
+  TemplateFringesCell: withPrimaryGrid(withCellPreparations(cells.TemplateFringesCell)),
+  ColorCell: withPrimaryGrid(withCellPreparations(cells.ColorCell))
 };
 
 export const Editors = {

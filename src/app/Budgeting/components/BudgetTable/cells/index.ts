@@ -9,3 +9,4 @@ export { default as BodyCell } from "./BodyCell";
 export * from "./FringesCells";
 export * from "./ModelTagCells";
 export { default as withCellPreparations } from "./withCellPreparations";
+export { default as withPrimaryGrid } from "./withPrimaryGrid";

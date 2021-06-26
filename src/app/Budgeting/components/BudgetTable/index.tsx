@@ -25,6 +25,49 @@ import { validateCookiesOrdering, mergeClassNames, mergeClassNamesFn } from "./u
 import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
 import "./index.scss";
 
+const DefaultGridOptions: GridOptions = {
+  defaultColDef: {
+    resizable: true,
+    sortable: false,
+    filter: false,
+    suppressMovable: true
+  },
+  suppressHorizontalScroll: true,
+  suppressContextMenu: process.env.NODE_ENV === "development" && TABLE_DEBUG,
+  // If for whatever reason, we have a table that cannot support bulk-updating,
+  // these two parameters need to be set to true.
+  suppressCopyRowsToClipboard: false,
+  suppressClipboardPaste: false,
+  enableFillHandle: true,
+  fillHandleDirection: "y"
+};
+
+const DefaultTableFooterGridOptions: GridOptions = {
+  defaultColDef: {
+    resizable: false,
+    sortable: false,
+    filter: false,
+    editable: false,
+    cellClass: "cell--not-editable",
+    suppressMovable: true
+  },
+  suppressContextMenu: true,
+  suppressHorizontalScroll: true
+};
+
+const DefaultBudgetFooterGridOptions: GridOptions = {
+  defaultColDef: {
+    resizable: false,
+    sortable: false,
+    filter: false,
+    editable: false,
+    cellClass: "cell--not-editable",
+    suppressMovable: true
+  },
+  suppressContextMenu: true,
+  suppressHorizontalScroll: true
+};
+
 const BudgetTable = <
   R extends Table.Row,
   M extends Model.Model,
@@ -79,50 +122,16 @@ const BudgetTable = <
   const [cols, setCols] = useState<Table.Column<R>[]>([]);
   const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
   const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
-  const [gridOptions, setGridOptions] = useState<GridOptions>({
-    alignedGrids: [],
-    defaultColDef: {
-      resizable: true,
-      sortable: false,
-      filter: false,
-      suppressMovable: true
-    },
-    suppressHorizontalScroll: true,
-    suppressContextMenu: process.env.NODE_ENV === "development" && TABLE_DEBUG,
-    // If for whatever reason, we have a table that cannot support bulk-updating,
-    // these two parameters need to be set to true.
-    suppressCopyRowsToClipboard: false,
-    suppressClipboardPaste: false,
-    enableFillHandle: true,
-    fillHandleDirection: "y",
-    ...options
-  });
-  const [tableFooterGridOptions, setTableFooterGridOptions] = useState<GridOptions>({
-    alignedGrids: [],
-    defaultColDef: {
-      resizable: false,
-      sortable: false,
-      filter: false,
-      editable: false,
-      cellClass: "cell--not-editable",
-      suppressMovable: true
-    },
-    suppressContextMenu: true,
-    suppressHorizontalScroll: true
-  });
-  const [budgetFooterGridOptions, setBudgetFooterGridOptions] = useState<GridOptions>({
-    alignedGrids: [],
-    defaultColDef: {
-      resizable: false,
-      sortable: false,
-      filter: false,
-      editable: false,
-      cellClass: "cell--not-editable",
-      suppressMovable: true
-    },
-    suppressContextMenu: true,
-    suppressHorizontalScroll: true
-  });
+
+  const gridOptions = useMemo((): BudgetTable.GridSet<GridOptions> => {
+    let budgetFooter: GridOptions = { ...DefaultBudgetFooterGridOptions, alignedGrids: [] };
+    let tableFooter: GridOptions = { ...DefaultTableFooterGridOptions, alignedGrids: [] };
+    const primary: GridOptions = { ...DefaultGridOptions, ...options, alignedGrids: [budgetFooter, tableFooter] };
+
+    tableFooter = { ...tableFooter, alignedGrids: [budgetFooter, primary] };
+    budgetFooter = { ...tableFooter, alignedGrids: [tableFooter, primary] };
+    return { primary, tableFooter, budgetFooter };
+  }, [options]);
 
   const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R>): boolean => {
     if (includes(["index", "expand"], colDef.field)) {
@@ -239,7 +248,6 @@ const BudgetTable = <
       field: identifierField,
       headerName: identifierFieldHeader,
       cellRenderer: "IdentifierCell",
-      width: 100,
       type: "number",
       ...identifierColumn,
       pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
@@ -262,11 +270,11 @@ const BudgetTable = <
 
   const CalculatedColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
     return {
-      width: 100,
-      maxWidth: 100,
+      flex: 1,
       cellStyle: { textAlign: "right", ...col.cellStyle },
       ...col,
       cellRenderer: "CalculatedCell",
+      minWidth: 100,
       valueFormatter: currencyValueFormatter,
       cellRendererParams: {
         ...col.cellRendererParams,
@@ -319,15 +327,6 @@ const BudgetTable = <
     base.push(IdentifierColumn({}));
     return base;
   }, [onRowExpand]);
-
-  useEffect(() => {
-    setGridOptions({
-      ...gridOptions,
-      alignedGrids: [tableFooterGridOptions, budgetFooterGridOptions]
-    });
-    setBudgetFooterGridOptions({ ...budgetFooterGridOptions, alignedGrids: [gridOptions, tableFooterGridOptions] });
-    setTableFooterGridOptions({ ...tableFooterGridOptions, alignedGrids: [gridOptions, budgetFooterGridOptions] });
-  }, []);
 
   useEffect(() => {
     if (!isNil(cookies) && !isNil(cookies.ordering)) {
@@ -430,7 +429,7 @@ const BudgetTable = <
           manager={manager}
           columns={cols}
           detached={detached}
-          options={gridOptions}
+          options={gridOptions.primary}
           groups={groups}
           ordering={ordering}
           groupParams={groupParams}
@@ -470,11 +469,14 @@ const BudgetTable = <
                   }
                 }
               });
+              if (!isNil(gridApi)) {
+                gridApi.sizeColumnsToFit();
+              }
             }
           }}
         />
         <TableFooterGrid<R>
-          options={tableFooterGridOptions}
+          options={gridOptions.tableFooter}
           columns={cols}
           sizeColumnsToFit={sizeColumnsToFit}
           identifierField={identifierField}
@@ -484,7 +486,7 @@ const BudgetTable = <
         {filter(columns, (col: Table.Column<R>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !==
           0 && (
           <BudgetFooterGrid<R>
-            options={budgetFooterGridOptions}
+            options={gridOptions.budgetFooter}
             columns={cols}
             sizeColumnsToFit={sizeColumnsToFit}
             identifierField={identifierField}

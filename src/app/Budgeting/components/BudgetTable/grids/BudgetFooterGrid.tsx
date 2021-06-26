@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { map, isNil, filter, reduce, includes, findIndex } from "lodash";
+import { map, isNil, filter, reduce } from "lodash";
 
-import { GridReadyEvent, FirstDataRenderedEvent, ColSpanParams } from "@ag-grid-community/core";
+import { GridReadyEvent, FirstDataRenderedEvent } from "@ag-grid-community/core";
 
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString } from "lib/util";
@@ -55,33 +55,7 @@ const BudgetFooterGrid = <R extends Table.Row>({
 
   const BudgetFooterGridColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
     return {
-      ...col,
-      colSpan: (params: ColSpanParams) => {
-        const field = params.column.getColId();
-        if (isNil(field) || includes(["index", "expand"], field)) {
-          return 1;
-        }
-        let startingIndex = 0;
-        if (field !== identifierField) {
-          startingIndex = findIndex(columns, { field } as any);
-          if (startingIndex === -1) {
-            /* eslint-disable no-console */
-            console.error(`Suspicious behavior:  Could not find column for field ${field}.`);
-            return 1;
-          }
-        }
-        // Columns to the right of the identifier column (including the identifier
-        // column).
-        const identifierToRightColumns = filter(
-          columns,
-          (c: Table.Column<R>) => !includes(["index", "expand"], c.field)
-        );
-        const rightIndex = findIndex(identifierToRightColumns, (c: Table.Column<R>) => !isNil(c.tableTotal));
-        if (rightIndex !== -1) {
-          return rightIndex - startingIndex;
-        }
-        return columns.length - startingIndex;
-      }
+      ...col
     };
   });
 
