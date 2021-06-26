@@ -203,6 +203,11 @@ $table-border: 1px solid $table-border-color;
       justify-content: center;
     }
 
+    .ag-selection-checkbox {
+      height: 16px;
+      margin-right: 0px;
+    }
+
     &.cell {
       &--action {
         border: unset !important;

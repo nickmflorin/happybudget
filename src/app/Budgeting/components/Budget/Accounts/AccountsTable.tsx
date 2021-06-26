@@ -10,27 +10,11 @@ import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
-import {
-  setAccountsSearchAction,
-  deselectAccountAction,
-  selectAccountAction,
-  removeAccountAction,
-  selectAllAccountsAction,
-  addGroupToStateAction,
-  deleteGroupAction,
-  removeAccountFromGroupAction,
-  tableChangedAction,
-  updateGroupInStateAction,
-  bulkCreateAccountsAction,
-  addAccountToGroupAction
-} from "../../../store/actions/budget/accounts";
+import * as actions from "../../../store/actions/budget/accounts";
 import { GenericAccountsTable } from "../../Generic";
 
 const selectGroups = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.groups.data
-);
-const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.selected
 );
 const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.budget.accounts.data);
 const selectTableSearch = simpleShallowEqualSelector(
@@ -54,7 +38,6 @@ const AccountsTable = (): JSX.Element => {
 
   const budgetId = useSelector(selectBudgetId);
   const data = useSelector(selectData);
-  const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const budgetDetail = useSelector(selectBudgetDetail);
@@ -71,29 +54,29 @@ const AccountsTable = (): JSX.Element => {
         data={data}
         groups={groups}
         manager={models.BudgetAccountRowManager}
-        selected={selected}
         detail={budgetDetail}
         search={search}
-        onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
+        onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
         saving={saving}
         onRowAdd={(payload: Table.RowAddPayload<BudgetTable.BudgetAccountRow>) =>
-          dispatch(bulkCreateAccountsAction(payload))
+          dispatch(actions.bulkCreateAccountsAction(payload))
         }
-        onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
-        onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
-        onRowDelete={(row: BudgetTable.BudgetAccountRow) => dispatch(removeAccountAction(row.id))}
-        onTableChange={(payload: Table.Change<BudgetTable.BudgetAccountRow>) => dispatch(tableChangedAction(payload))}
+        onRowDelete={(row: BudgetTable.BudgetAccountRow) => dispatch(actions.removeAccountAction(row.id))}
+        onTableChange={(payload: Table.Change<BudgetTable.BudgetAccountRow>) =>
+          dispatch(actions.tableChangedAction(payload))
+        }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
-        onDeleteGroup={(group: Model.BudgetGroup) => dispatch(deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: BudgetTable.BudgetAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
+        onDeleteGroup={(group: Model.BudgetGroup) => dispatch(actions.deleteGroupAction(group.id))}
+        onRowRemoveFromGroup={(row: BudgetTable.BudgetAccountRow) =>
+          dispatch(actions.removeAccountFromGroupAction(row.id))
+        }
         onRowAddToGroup={(group: number, row: BudgetTable.BudgetAccountRow) =>
-          dispatch(addAccountToGroupAction({ id: row.id, group }))
+          dispatch(actions.addAccountToGroupAction({ id: row.id, group }))
         }
         onGroupRows={(rows: BudgetTable.BudgetAccountRow[]) =>
           setGroupAccounts(map(rows, (row: BudgetTable.BudgetAccountRow) => row.id))
         }
         onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
-        onSelectAll={() => dispatch(selectAllAccountsAction(null))}
         columns={[
           {
             field: "estimated",
@@ -125,7 +108,7 @@ const AccountsTable = (): JSX.Element => {
           open={true}
           onSuccess={(group: Model.BudgetGroup) => {
             setGroupAccounts(undefined);
-            dispatch(addGroupToStateAction(group));
+            dispatch(actions.addGroupToStateAction(group));
           }}
           onCancel={() => setGroupAccounts(undefined)}
         />
@@ -137,7 +120,7 @@ const AccountsTable = (): JSX.Element => {
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.BudgetGroup) => {
             setGroupToEdit(undefined);
-            dispatch(updateGroupInStateAction({ id: group.id, data: group }));
+            dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
           }}
         />
       )}

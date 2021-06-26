@@ -1,4 +1,4 @@
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSigma, faPercentage, faUpload, faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
@@ -55,8 +55,10 @@ const GenericAccountsTable = <
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
-          disabled: params.selectedRows.length === 0,
-          onClick: params.onDelete
+          onClick: () => {
+            const rows: R[] = params.api.getSelectedRows();
+            map(rows, (row: R) => props.onRowDelete(row));
+          }
         },
         {
           tooltip: "Sub-Total",

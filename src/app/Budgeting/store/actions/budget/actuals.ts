@@ -24,9 +24,6 @@ export const requestActualsAction = simpleAction<null>(ActionType.Budget.Actuals
 export const loadingActualsAction = simpleAction<boolean>(ActionType.Budget.Actuals.Loading);
 export const responseActualsAction = simpleAction<Http.ListResponse<Model.Actual>>(ActionType.Budget.Actuals.Response);
 export const setActualsSearchAction = simpleAction<string>(ActionType.Budget.Actuals.SetSearch);
-export const selectActualAction = simpleAction<number>(ActionType.Budget.Actuals.Select);
-export const deselectActualAction = simpleAction<number>(ActionType.Budget.Actuals.Deselect);
-export const selectAllActualsAction = simpleAction<null>(ActionType.Budget.Actuals.SelectAll);
 export const updateActualInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Actual>>(
   ActionType.Budget.Actuals.UpdateInState
 );

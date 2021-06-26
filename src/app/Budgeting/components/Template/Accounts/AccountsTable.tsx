@@ -10,27 +10,11 @@ import { CreateTemplateAccountGroupModal, EditGroupModal } from "components/moda
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
-import {
-  setAccountsSearchAction,
-  deselectAccountAction,
-  selectAccountAction,
-  removeAccountAction,
-  selectAllAccountsAction,
-  addGroupToStateAction,
-  deleteGroupAction,
-  removeAccountFromGroupAction,
-  tableChangedAction,
-  updateGroupInStateAction,
-  bulkCreateAccountsAction,
-  addAccountToGroupAction
-} from "../../../store/actions/template/accounts";
+import * as actions from "../../../store/actions/template/accounts";
 import { GenericAccountsTable } from "../../Generic";
 
 const selectGroups = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.accounts.groups.data
-);
-const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.selected
 );
 const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.template.accounts.data);
 const selectTableSearch = simpleShallowEqualSelector(
@@ -53,7 +37,6 @@ const AccountsTable = (): JSX.Element => {
 
   const templateId = useSelector(selectTemplateId);
   const data = useSelector(selectData);
-  const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const templateDetail = useSelector(selectTemplateDetail);
@@ -70,29 +53,29 @@ const AccountsTable = (): JSX.Element => {
         data={data}
         groups={groups}
         manager={models.TemplateAccountRowManager}
-        selected={selected}
         detail={templateDetail}
         search={search}
-        onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}
+        onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
         saving={saving}
         onRowAdd={(payload: Table.RowAddPayload<BudgetTable.TemplateAccountRow>) =>
-          dispatch(bulkCreateAccountsAction(payload))
+          dispatch(actions.bulkCreateAccountsAction(payload))
         }
-        onRowSelect={(id: number) => dispatch(selectAccountAction(id))}
-        onRowDeselect={(id: number) => dispatch(deselectAccountAction(id))}
-        onRowDelete={(row: BudgetTable.TemplateAccountRow) => dispatch(removeAccountAction(row.id))}
-        onTableChange={(payload: Table.Change<BudgetTable.TemplateAccountRow>) => dispatch(tableChangedAction(payload))}
+        onRowDelete={(row: BudgetTable.TemplateAccountRow) => dispatch(actions.removeAccountAction(row.id))}
+        onTableChange={(payload: Table.Change<BudgetTable.TemplateAccountRow>) =>
+          dispatch(actions.tableChangedAction(payload))
+        }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
-        onDeleteGroup={(group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: BudgetTable.TemplateAccountRow) => dispatch(removeAccountFromGroupAction(row.id))}
+        onDeleteGroup={(group: Model.TemplateGroup) => dispatch(actions.deleteGroupAction(group.id))}
+        onRowRemoveFromGroup={(row: BudgetTable.TemplateAccountRow) =>
+          dispatch(actions.removeAccountFromGroupAction(row.id))
+        }
         onRowAddToGroup={(group: number, row: BudgetTable.TemplateAccountRow) =>
-          dispatch(addAccountToGroupAction({ id: row.id, group }))
+          dispatch(actions.addAccountToGroupAction({ id: row.id, group }))
         }
         onGroupRows={(rows: BudgetTable.TemplateAccountRow[]) =>
           setGroupAccounts(map(rows, (row: BudgetTable.TemplateAccountRow) => row.id))
         }
         onEditGroup={(group: Model.TemplateGroup) => setGroupToEdit(group)}
-        onSelectAll={() => dispatch(selectAllAccountsAction(null))}
         columns={[
           {
             field: "estimated",
@@ -110,7 +93,7 @@ const AccountsTable = (): JSX.Element => {
           open={true}
           onSuccess={(group: Model.TemplateGroup) => {
             setGroupAccounts(undefined);
-            dispatch(addGroupToStateAction(group));
+            dispatch(actions.addGroupToStateAction(group));
           }}
           onCancel={() => setGroupAccounts(undefined)}
         />
@@ -122,7 +105,7 @@ const AccountsTable = (): JSX.Element => {
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.TemplateGroup) => {
             setGroupToEdit(undefined);
-            dispatch(updateGroupInStateAction({ id: group.id, data: group }));
+            dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
           }}
         />
       )}

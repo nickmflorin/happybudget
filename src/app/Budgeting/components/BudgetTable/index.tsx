@@ -11,7 +11,8 @@ import {
   ColumnApi,
   Column,
   ColSpanParams,
-  GridOptions
+  GridOptions,
+  CheckboxSelectionCallbackParams
 } from "@ag-grid-community/core";
 
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
@@ -37,7 +38,6 @@ const BudgetTable = <
   className,
   style = {},
   groups = [],
-  selected,
   manager,
   search,
   loading,
@@ -64,9 +64,6 @@ const BudgetTable = <
   rowCanExpand,
   cellClass,
   onSearch,
-  onSelectAll,
-  onRowSelect,
-  onRowDeselect,
   onTableChange,
   onRowAdd,
   onRowDelete,
@@ -187,12 +184,17 @@ const BudgetTable = <
         ...indexColumn,
         field: "index",
         cellRenderer: "IndexCell",
-        width: isNil(onRowExpand) ? 40 : 30,
-        maxWidth: isNil(onRowExpand) ? 40 : 30,
+        checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
+          const row: R = params.data;
+          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
+            return false;
+          }
+          return true;
+        },
+        width: isNil(onRowExpand) ? 40 : 25,
+        maxWidth: isNil(onRowExpand) ? 40 : 25,
         pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
         cellRendererParams: {
-          onSelect: onRowSelect,
-          onDeselect: onRowDeselect,
           onRowAdd: onRowAdd,
           ...col.cellRendererParams,
           ...actionColumn.cellRendererParams,
@@ -426,7 +428,6 @@ const BudgetTable = <
           data={data}
           saving={saving}
           manager={manager}
-          selected={selected}
           columns={cols}
           options={gridOptions}
           groups={groups}
@@ -434,11 +435,11 @@ const BudgetTable = <
           groupParams={groupParams}
           frameworkComponents={frameworkComponents}
           sizeColumnsToFit={sizeColumnsToFit}
+          actions={actions}
           search={search}
           canExport={canExport}
           canSearch={canSearch}
           canToggleColumns={canToggleColumns}
-          onSelectAll={onSelectAll}
           onSearch={onSearch}
           onCellValueChanged={onCellValueChanged}
           setApi={setGridApi}

@@ -9,26 +9,10 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 
 import TemplateSubAccountsTable from "../SubAccountsTable";
 import { selectTemplateId, selectSubAccountUnits } from "../../../store/selectors";
-import {
-  deselectSubAccountAction,
-  removeSubAccountAction,
-  selectSubAccountAction,
-  setSubAccountsSearchAction,
-  selectAllSubAccountsAction,
-  deleteGroupAction,
-  addGroupToStateAction,
-  removeSubAccountFromGroupAction,
-  tableChangedAction,
-  updateGroupInStateAction,
-  bulkCreateSubAccountsAction,
-  addSubAccountToGroupAction
-} from "../../../store/actions/template/account";
+import * as actions from "../../../store/actions/template/account";
 
 const selectGroups = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.groups.data
-);
-const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.selected
 );
 const selectData = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.data
@@ -59,7 +43,6 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
 
   const templateId = useSelector(selectTemplateId);
   const data = useSelector(selectData);
-  const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
@@ -71,7 +54,6 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
       <TemplateSubAccountsTable
         data={data}
         groups={groups}
-        selected={selected}
         detail={accountDetail}
         subAccountUnits={subAccountUnits}
         tableFooterIdentifierValue={
@@ -80,34 +62,31 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
             : "Account Total"
         }
         search={search}
-        onSearch={(value: string) => dispatch(setSubAccountsSearchAction(value))}
+        onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
         saving={saving}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
         cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
         onRowAdd={(payload: Table.RowAddPayload<BudgetTable.TemplateSubAccountRow>) =>
-          dispatch(bulkCreateSubAccountsAction(payload))
+          dispatch(actions.bulkCreateSubAccountsAction(payload))
         }
-        onRowSelect={(id: number) => dispatch(selectSubAccountAction(id))}
-        onRowDeselect={(id: number) => dispatch(deselectSubAccountAction(id))}
-        onRowDelete={(row: BudgetTable.TemplateSubAccountRow) => dispatch(removeSubAccountAction(row.id))}
+        onRowDelete={(row: BudgetTable.TemplateSubAccountRow) => dispatch(actions.removeSubAccountAction(row.id))}
         onTableChange={(payload: Table.Change<BudgetTable.TemplateSubAccountRow>) =>
-          dispatch(tableChangedAction(payload))
+          dispatch(actions.tableChangedAction(payload))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/subaccounts/${id}`)}
         onBack={() => history.push(`/templates/${templateId}/accounts?row=${accountId}`)}
-        onDeleteGroup={(group: Model.TemplateGroup) => dispatch(deleteGroupAction(group.id))}
+        onDeleteGroup={(group: Model.TemplateGroup) => dispatch(actions.deleteGroupAction(group.id))}
         onRowRemoveFromGroup={(row: BudgetTable.TemplateSubAccountRow) =>
-          dispatch(removeSubAccountFromGroupAction(row.id))
+          dispatch(actions.removeSubAccountFromGroupAction(row.id))
         }
         onRowAddToGroup={(group: number, row: BudgetTable.TemplateSubAccountRow) =>
-          dispatch(addSubAccountToGroupAction({ id: row.id, group }))
+          dispatch(actions.addSubAccountToGroupAction({ id: row.id, group }))
         }
         onGroupRows={(rows: BudgetTable.TemplateSubAccountRow[]) =>
           setGroupSubAccounts(map(rows, (row: BudgetTable.TemplateSubAccountRow) => row.id))
         }
         onEditGroup={(group: Model.TemplateGroup) => setGroupToEdit(group)}
-        onSelectAll={() => dispatch(selectAllSubAccountsAction(null))}
       />
       {!isNil(groupSubAccounts) && (
         <CreateSubAccountGroupModal
@@ -116,7 +95,7 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
           open={true}
           onSuccess={(group: Model.TemplateGroup) => {
             setGroupSubAccounts(undefined);
-            dispatch(addGroupToStateAction(group));
+            dispatch(actions.addGroupToStateAction(group));
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
         />
@@ -128,7 +107,7 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.TemplateGroup) => {
             setGroupToEdit(undefined);
-            dispatch(updateGroupInStateAction({ id: group.id, data: group }));
+            dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
           }}
         />
       )}

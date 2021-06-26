@@ -15,9 +15,6 @@ export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(A
 export const updatingFringeAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Fringes.Updating);
 export const creatingFringeAction = simpleAction<boolean>(ActionType.Budget.Fringes.Creating);
 export const setFringesSearchAction = simpleAction<string>(ActionType.Budget.Fringes.SetSearch);
-export const selectFringeAction = simpleAction<number>(ActionType.Budget.Fringes.Select);
-export const deselectFringeAction = simpleAction<number>(ActionType.Budget.Fringes.Deselect);
-export const selectAllFringesAction = simpleAction<null>(ActionType.Budget.Fringes.SelectAll);
 export const updateFringeInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Fringe>>(
   ActionType.Budget.Fringes.UpdateInState
 );

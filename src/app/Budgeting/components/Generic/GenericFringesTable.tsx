@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { isNil } from "lodash";
+import { isNil, map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
@@ -21,19 +21,15 @@ export interface GenericFringesTableProps
   > {
   saving: boolean;
   search: string;
-  selected: number[];
   data: Model.Fringe[];
   onTableChange: (change: Table.Change<BudgetTable.FringeRow>) => void;
-  onRowSelect: (id: number) => void;
-  onRowDeselect: (id: number) => void;
   onRowAdd: Table.RowAddFunc<BudgetTable.FringeRow>;
   onRowDelete: (row: BudgetTable.FringeRow) => void;
   onRowExpand?: (id: number) => void;
-  onSelectAll: () => void;
   onSearch: (value: string) => void;
 }
 
-const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): JSX.Element => {
+const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Element => {
   return (
     <BudgetTableComponent<BudgetTable.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>
       className={"fringes-table"}
@@ -50,8 +46,10 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = ({ ...props }): 
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
-          disabled: params.selectedRows.length === 0,
-          onClick: params.onDelete
+          onClick: () => {
+            const rows: BudgetTable.FringeRow[] = params.api.getSelectedRows();
+            map(rows, (row: BudgetTable.FringeRow) => props.onRowDelete(row));
+          }
         }
       ]}
       columns={[

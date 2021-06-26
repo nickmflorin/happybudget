@@ -23,9 +23,6 @@ export const createFringesReducer = <D extends Modules.Budgeting.BudgetDirective
       UpdateInState: ActionType[directive].Fringes.UpdateInState,
       RemoveFromState: ActionType[directive].Fringes.RemoveFromState,
       AddToState: ActionType[directive].Fringes.AddToState,
-      Select: ActionType[directive].Fringes.Select,
-      Deselect: ActionType[directive].Fringes.Deselect,
-      SelectAll: ActionType[directive].Fringes.SelectAll,
       Deleting: ActionType[directive].Fringes.Deleting,
       Updating: ActionType[directive].Fringes.Updating,
       Creating: ActionType[directive].Fringes.Creating
@@ -67,9 +64,6 @@ interface AccountsReducerFactoryActionMap {
   SetSearch: string;
   RemoveFromState: string;
   AddToState: string;
-  Select: string;
-  Deselect: string;
-  SelectAll: string;
   RemoveFromGroup: string;
   AddToGroup: string;
   Creating: string;
@@ -169,9 +163,6 @@ export const createAccountsReducer = <
       SetSearch: mapping.SetSearch,
       RemoveFromState: mapping.RemoveFromState,
       AddToState: mapping.AddToState,
-      Select: mapping.Select,
-      Deselect: mapping.Deselect,
-      SelectAll: mapping.SelectAll,
       Deleting: mapping.Deleting,
       Updating: mapping.Updating,
       Creating: mapping.Creating
@@ -339,9 +330,6 @@ interface SubAccountsReducerFactoryActionMap {
   SetSearch: string;
   RemoveFromState: string;
   AddToState: string;
-  Select: string;
-  Deselect: string;
-  SelectAll: string;
   RemoveFromGroup: string;
   AddToGroup: string;
   Creating: string;
@@ -465,9 +453,6 @@ export const createSubAccountsReducer = <
       SetSearch: mapping.SetSearch,
       RemoveFromState: mapping.RemoveFromState,
       AddToState: mapping.AddToState,
-      Select: mapping.Select,
-      Deselect: mapping.Deselect,
-      SelectAll: mapping.SelectAll,
       Deleting: mapping.Deleting,
       Updating: mapping.Updating,
       Creating: mapping.Creating

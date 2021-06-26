@@ -22,9 +22,6 @@ import * as actions from "../../store/actions/budget/actuals";
 import BudgetTableComponent from "../BudgetTable";
 import { useDeepEqualMemo } from "lib/hooks";
 
-const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.selected
-);
 const selectActuals = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.budget.actuals.data);
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.search
@@ -44,7 +41,6 @@ const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
   const loading = useSelector(selectActualsLoading);
   const data = useSelector(selectActuals);
-  const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
 
@@ -77,7 +73,6 @@ const Actuals = (): JSX.Element => {
         <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>
           data={data}
           manager={models.ActualRowManager}
-          selected={selected}
           identifierField={"subaccount"}
           identifierFieldHeader={"Account"}
           tableFooterIdentifierValue={"Actuals Total"}
@@ -128,20 +123,19 @@ const Actuals = (): JSX.Element => {
           onRowAdd={(payload: Table.RowAddPayload<BudgetTable.ActualRow>) =>
             dispatch(actions.bulkCreateActualsAction(payload))
           }
-          onRowSelect={(id: number) => dispatch(actions.selectActualAction(id))}
-          onRowDeselect={(id: number) => dispatch(actions.deselectActualAction(id))}
           onRowDelete={(row: BudgetTable.ActualRow) => dispatch(actions.removeActualAction(row.id))}
           onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) =>
             dispatch(actions.tableChangedAction(payload))
           }
-          onSelectAll={() => dispatch(actions.selectAllActualsAction(null))}
           exportFileName={"actuals.csv"}
           actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow>) => [
             {
               tooltip: "Delete",
               icon: <FontAwesomeIcon icon={faTrashAlt} />,
-              disabled: params.selectedRows.length === 0,
-              onClick: params.onDelete
+              onClick: () => {
+                const rows: BudgetTable.ActualRow[] = params.api.getSelectedRows();
+                map(rows, (row: BudgetTable.ActualRow) => dispatch(actions.removeActualAction(row.id)));
+              }
             }
           ]}
           columns={[

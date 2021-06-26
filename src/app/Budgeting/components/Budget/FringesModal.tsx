@@ -7,9 +7,6 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import * as actions from "../../store/actions/budget/fringes";
 import { GenericFringesModal, GenericFringesModalProps } from "../Generic";
 
-const selectSelectedRows = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.fringes.selected
-);
 const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.budget.fringes.data);
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.fringes.search
@@ -29,7 +26,6 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading);
   const data = useSelector(selectData);
-  const selected = useSelector(selectSelectedRows);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
 
@@ -47,18 +43,14 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
       onCancel={onCancel}
       loading={loading}
       data={data}
-      selected={selected}
       search={search}
       onSearch={(value: string) => dispatch(actions.setFringesSearchAction(value))}
       saving={saving}
       onRowAdd={(payload: Table.RowAddPayload<BudgetTable.FringeRow>) =>
         dispatch(actions.bulkCreateFringesAction(payload))
       }
-      onRowSelect={(id: number) => dispatch(actions.selectFringeAction(id))}
-      onRowDeselect={(id: number) => dispatch(actions.deselectFringeAction(id))}
       onRowDelete={(row: BudgetTable.FringeRow) => dispatch(actions.removeFringeAction(row.id))}
       onTableChange={(payload: Table.Change<BudgetTable.FringeRow>) => dispatch(actions.tableChangedAction(payload))}
-      onSelectAll={() => dispatch(actions.selectAllFringesAction(null))}
     />
   );
 };

@@ -1,5 +1,5 @@
 import React, { SyntheticEvent, useState, useEffect, useRef } from "react";
-import { map, isNil, includes, find, uniq, forEach, filter, flatten, reduce, groupBy } from "lodash";
+import { map, isNil, includes, find, forEach, filter, flatten, reduce, groupBy } from "lodash";
 import { useLocation } from "react-router-dom";
 
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
@@ -38,7 +38,7 @@ import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { getGroupColorDefinition } from "lib/model/util";
 import { isKeyboardEvent } from "lib/model/typeguards";
 import { rangeSelectionIsSingleCell } from "../util";
-import BudgetTableMenu from "../Menu";
+import BudgetTableMenu from "./Menu";
 import Grid from "./Grid";
 
 const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>({
@@ -46,7 +46,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   api,
   columnApi,
   data,
-  selected,
   manager,
   ordering,
   groups = [],
@@ -64,7 +63,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   detached,
   saving,
   exportFileName,
-  onSelectAll,
   onSearch,
   onColumnsChange,
   processCellForClipboard,
@@ -88,7 +86,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   const oldRow = useRef<R | null>(null); // TODO: Figure out a better way to do this.
   const location = useLocation();
   const [table, setTable] = useState<R[]>([]);
-  const [allSelected, setAllSelected] = useState(false);
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     if (sizeColumnsToFit === true) {
@@ -701,7 +698,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           group,
           meta: {
             isGroupFooter: true,
-            selected: false,
             children: []
           }
         }
@@ -728,7 +724,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
         const footer: R = createGroupFooter(group);
         newTable.push(
           ...orderByFieldOrdering(
-            map(ms, (m: M) => manager.modelToRow(m, { selected: includes(selected, m.id) })),
+            map(ms, (m: M) => manager.modelToRow(m)),
             ordering
           ),
           {
@@ -747,11 +743,11 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     setTable([
       ...newTable,
       ...orderByFieldOrdering(
-        map(modelsWithoutGroup, (m: M) => manager.modelToRow(m, { selected: includes(selected, m.id) })),
+        map(modelsWithoutGroup, (m: M) => manager.modelToRow(m)),
         ordering
       )
     ]);
-  }, [data, selected, groups, ordering]);
+  }, [data, groups, ordering]);
 
   useEffect(() => {
     if (focused === false && !isNil(api)) {
@@ -803,42 +799,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       }
     }
   }, [useDeepEqualMemo(groups), api, columnApi]);
-
-  useEffect(() => {
-    // Changes to the state of the selected rows does not trigger a refresh of those cells via AG
-    // Grid because AG Grid cannot detect changes to the values of cells when the cell is HTML based.
-    if (!isNil(api) && !isNil(columnApi)) {
-      api.forEachNode((node: RowNode) => {
-        const row: R = node.data;
-        const existing: R | undefined = find(table, { id: node.data.id });
-        if (!isNil(existing)) {
-          if (existing.meta.selected !== node.data.meta.selected) {
-            const cols = columnApi.getAllColumns();
-            const selectCol = find(cols, (col: Column) => {
-              const def = col.getColDef();
-              if (def.field === "index") {
-                return true;
-              }
-              return false;
-            });
-            if (!isNil(selectCol)) {
-              api.refreshCells({ force: true, rowNodes: [node], columns: [selectCol] });
-            }
-          }
-        }
-      });
-    }
-  }, [useDeepEqualMemo(table), api, columnApi]);
-
-  useEffect(() => {
-    const mapped = map(table, (row: R) => row.meta.selected);
-    const uniques = uniq(mapped);
-    if (uniques.length === 1 && uniques[0] === true) {
-      setAllSelected(true);
-    } else {
-      setAllSelected(false);
-    }
-  }, [useDeepEqualMemo(table)]);
 
   const moveDownKeyListener = useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
     const ctrlCmdPressed = e.ctrlKey || e.metaKey;
@@ -914,75 +874,69 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
 
   return (
     <React.Fragment>
-      <BudgetTableMenu<R>
-        actions={actions}
-        search={search}
-        onSearch={onSearch}
-        canSearch={canSearch}
-        canExport={canExport}
-        canToggleColumns={canToggleColumns}
-        columns={columns}
-        onDelete={() => {
-          forEach(table, (row: R) => {
-            if (row.meta.selected === true) {
-              onRowDelete(row);
-            }
-          });
-        }}
-        detached={detached}
-        saving={saving}
-        selected={allSelected}
-        onSelectAll={onSelectAll}
-        selectedRows={filter(table, (row: R) => row.meta.selected === true)}
-        onExport={(fields: Field[]) => {
-          if (!isNil(api) && !isNil(columnApi)) {
-            const includeColumn = (col: Column): boolean => {
-              const colDef = col.getColDef();
-              if (!isNil(colDef.field)) {
-                const customCol: Table.Column<R> | undefined = find(columns, {
-                  field: colDef.field
-                } as any);
-                if (!isNil(customCol)) {
-                  return (
-                    customCol.excludeFromExport !== true &&
-                    includes(
-                      map(fields, (field: Field) => field.id),
-                      customCol.field
-                    )
-                  );
+      {!isNil(api) && !isNil(columnApi) && (
+        <BudgetTableMenu<R>
+          api={api}
+          columnApi={columnApi}
+          actions={actions}
+          search={search}
+          onSearch={onSearch}
+          canSearch={canSearch}
+          canExport={canExport}
+          canToggleColumns={canToggleColumns}
+          columns={columns}
+          detached={detached}
+          saving={saving}
+          onExport={(fields: Field[]) => {
+            if (!isNil(api) && !isNil(columnApi)) {
+              const includeColumn = (col: Column): boolean => {
+                const colDef = col.getColDef();
+                if (!isNil(colDef.field)) {
+                  const customCol: Table.Column<R> | undefined = find(columns, {
+                    field: colDef.field
+                  } as any);
+                  if (!isNil(customCol)) {
+                    return (
+                      customCol.excludeFromExport !== true &&
+                      includes(
+                        map(fields, (field: Field) => field.id),
+                        customCol.field
+                      )
+                    );
+                  }
                 }
-              }
-              return false;
-            };
-            const cs = filter(columnApi.getAllColumns(), (col: Column) => includeColumn(col));
-            const headerRow: CSVRow = [];
-            forEach(cs, (col: Column) => {
-              const colDef = col.getColDef();
-              if (!isNil(colDef.field)) {
-                headerRow.push(colDef.headerName);
-              }
-            });
-            const csvData: CSVData = [headerRow];
-            api.forEachNode((node: RowNode, index: number) => {
-              const row: CSVRow = [];
+                return false;
+              };
+              const cs = filter(columnApi.getAllColumns(), (col: Column) => includeColumn(col));
+              const headerRow: CSVRow = [];
               forEach(cs, (col: Column) => {
-                if (!isNil(node.data)) {
-                  row.push(processCellForExport(col, node.data as R));
-                } else {
-                  row.push("");
+                const colDef = col.getColDef();
+                if (!isNil(colDef.field)) {
+                  headerRow.push(colDef.headerName);
                 }
               });
-              csvData.push(row);
-            });
-            let fileName = "make-me-current-date";
-            if (!isNil(exportFileName)) {
-              fileName = exportFileName;
+              const csvData: CSVData = [headerRow];
+              api.forEachNode((node: RowNode, index: number) => {
+                const row: CSVRow = [];
+                forEach(cs, (col: Column) => {
+                  if (!isNil(node.data)) {
+                    row.push(processCellForExport(col, node.data as R));
+                  } else {
+                    row.push("");
+                  }
+                });
+                csvData.push(row);
+              });
+              let fileName = "make-me-current-date";
+              if (!isNil(exportFileName)) {
+                fileName = exportFileName;
+              }
+              downloadAsCsvFile(fileName, csvData);
             }
-            downloadAsCsvFile(fileName, csvData);
-          }
-        }}
-        onColumnsChange={onColumnsChange}
-      />
+          }}
+          onColumnsChange={onColumnsChange}
+        />
+      )}
       <div className={"table-grid"}>
         <Grid<R>
           {...options}
@@ -990,9 +944,11 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           getContextMenuItems={getContextMenuItems}
           // This is the same as checking if the onGridReady event has fired.
           rowData={!isNil(api) ? table : []}
+          suppressRowClickSelection={false}
           getRowNodeId={(r: any) => r.id}
           getRowClass={getRowClass}
           getRowStyle={getRowStyle}
+          rowSelection={"multiple"}
           immutableData={true}
           onGridReady={onGridReady}
           processDataFromClipboard={processDataFromClipboard}

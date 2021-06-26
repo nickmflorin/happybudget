@@ -46,9 +46,6 @@ export const removeAccountFromGroupAction = simpleAction<number>(ActionType.Budg
 export const addAccountToGroupAction = simpleAction<{ id: number; group: number }>(
   ActionType.Budget.Accounts.AddToGroup
 );
-export const selectAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Select);
-export const deselectAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Deselect);
-export const selectAllAccountsAction = simpleAction<null>(ActionType.Budget.Accounts.SelectAll);
 export const removeAccountFromStateAction = simpleAction<number>(ActionType.Budget.Accounts.RemoveFromState);
 export const addAccountToStateAction = simpleAction<Model.BudgetAccount>(ActionType.Budget.Accounts.AddToState);
 export const requestGroupsAction = simpleAction<null>(ActionType.Budget.Accounts.Groups.Request);

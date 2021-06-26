@@ -6,7 +6,6 @@ namespace Table {
   type RowType = "subaccount" | "account" | "fringe" | "actual";
 
   interface RowMeta {
-    readonly selected: boolean;
     readonly isGroupFooter?: boolean;
     readonly isTableFooter?: boolean;
     readonly isBudgetFooter?: boolean;
@@ -323,29 +322,28 @@ namespace BudgetTable {
   }
 
   interface MenuActionParams<R extends Table.Row> {
-    readonly onDelete: () => void;
-    readonly selectedRows: R[];
+    readonly api: import("@ag-grid-community/core").GridApi;
+    readonly columnApi: import("@ag-grid-community/core").ColumnApi;
+    readonly columns: Table.Column<R>[];
   }
 
   interface MenuProps<R extends Table.Row> {
+    readonly api: import("@ag-grid-community/core").GridApi;
+    readonly columnApi: import("@ag-grid-community/core").ColumnApi;
     readonly columns: Table.Column<R>[];
     readonly actions?:
       | ((params: BudgetTable.MenuActionParams<R>) => BudgetTable.MenuAction[])
       | BudgetTable.MenuAction[];
     readonly saving?: boolean;
-    readonly selected?: boolean;
     readonly search?: string;
     readonly canExport?: boolean;
     readonly canToggleColumns?: boolean;
     readonly canSearch?: boolean;
-    readonly selectedRows: R[];
     readonly detached?: boolean;
     readonly onSearch?: (value: string) => void;
-    readonly onSelectAll: (checked: boolean) => void;
     // TODO: Stop using Field type.
     readonly onColumnsChange: (fields: Field[]) => void;
     readonly onExport: (fields: Field[]) => void;
-    readonly onDelete: () => void;
   }
 
   // The abstract/generic <Grid> component that wraps AG Grid right at the interface.
@@ -383,7 +381,6 @@ namespace BudgetTable {
     G extends Model.Group = Model.Group
   > {
     readonly data: M[];
-    readonly selected?: number[];
     readonly groups?: G[];
     readonly groupParams?: BudgetTable.GroupProps<R, G>;
     readonly frameworkComponents?: { [key: string]: any };
@@ -405,7 +402,7 @@ namespace BudgetTable {
 
   interface PrimaryGridProps<R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>
     extends BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
-      Omit<BudgetTable.MenuProps<R>, "columns" | "onExport" | "onDelete" | "selected" | "selectedRows"> {
+      Omit<BudgetTable.MenuProps<R>, "columns" | "onExport" | "onDelete"> {
     readonly api: import("@ag-grid-community/core").GridApi | undefined;
     readonly columnApi: import("@ag-grid-community/core").ColumnApi | undefined;
     readonly options: import("@ag-grid-community/core").GridOptions;
@@ -424,10 +421,7 @@ namespace BudgetTable {
     G extends Model.Group = Model.Group,
     P extends Http.ModelPayload<M> = Http.ModelPayload<M>
   > extends Omit<import("@ag-grid-community/core").GridOptions, "frameworkComponents">,
-      Omit<
-        BudgetTable.MenuProps<R>,
-        "columns" | "onColumnsChange" | "onExport" | "onDelete" | "selected" | "selectedRows"
-      >,
+      Omit<BudgetTable.MenuProps<R>, "columns" | "onColumnsChange" | "onExport" | "onDelete">,
       BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
       StandardComponentProps {
     readonly identifierFieldHeader: string;
@@ -444,8 +438,6 @@ namespace BudgetTable {
     readonly cookies?: BudgetTable.CookiesProps;
     readonly loading?: boolean;
     readonly cellClass?: (params: import("@ag-grid-community/core").CellClassParams) => string | undefined;
-    readonly onRowSelect: (id: number) => void;
-    readonly onRowDeselect: (id: number) => void;
     readonly isCellEditable?: (row: R, col: Table.Column) => boolean;
     readonly isCellSelectable?: (row: R, col: Table.Column) => boolean;
   }

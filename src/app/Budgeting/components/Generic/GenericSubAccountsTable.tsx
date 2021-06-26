@@ -82,8 +82,10 @@ const GenericSubAccountsTable = <
         {
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
-          disabled: params.selectedRows.length === 0,
-          onClick: params.onDelete
+          onClick: () => {
+            const rows: R[] = params.api.getSelectedRows();
+            map(rows, (row: R) => props.onRowDelete(row));
+          }
         },
         {
           tooltip: "Sub-Total",

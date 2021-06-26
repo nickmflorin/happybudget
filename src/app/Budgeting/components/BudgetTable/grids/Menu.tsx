@@ -6,7 +6,7 @@ import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
-import { ColDef } from "@ag-grid-community/core";
+import { ColDef, RowNode } from "@ag-grid-community/core";
 
 import { SavingChanges, ShowHide } from "components";
 import { IconButton } from "components/buttons";
@@ -15,19 +15,17 @@ import { FieldMenuField } from "components/menus/FieldsMenu";
 import { PortalOrRender } from "components/layout";
 
 const BudgetTableMenu = <R extends Table.Row>({
+  api,
+  columnApi,
   actions,
   search,
-  selected = false,
   saving = false,
   canSearch = true,
   canExport = true,
   canToggleColumns = true,
   detached = false,
   columns,
-  selectedRows,
   onSearch,
-  onDelete,
-  onSelectAll,
   onColumnsChange,
   onExport
 }: BudgetTable.MenuProps<R>) => {
@@ -36,12 +34,25 @@ const BudgetTableMenu = <R extends Table.Row>({
       <div className={classNames("table-header", { detached })}>
         <div className={"table-header-left"}>
           <Tooltip title={"Select All"} placement={"bottom"}>
-            <Checkbox checked={selected} onChange={(e: CheckboxChangeEvent) => onSelectAll(e.target.checked)} />
+            <Checkbox
+              onChange={(e: CheckboxChangeEvent) => {
+                api.forEachNode((node: RowNode) => {
+                  const row: R = node.data;
+                  if (
+                    row.meta.isGroupFooter === false &&
+                    row.meta.isTableFooter === false &&
+                    row.meta.isBudgetFooter === false
+                  ) {
+                    node.setSelected(e.target.checked);
+                  }
+                });
+              }}
+            />
           </Tooltip>
           {!isNil(actions) && (
             <div className={"toolbar-buttons"}>
               {map(
-                Array.isArray(actions) ? actions : actions({ onDelete: onDelete, selectedRows }),
+                Array.isArray(actions) ? actions : actions({ api, columnApi, columns }),
                 (action: BudgetTable.MenuAction, index: number) => {
                   return (
                     <IconButton

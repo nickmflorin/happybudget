@@ -5,7 +5,6 @@ const defaultRowMeta: Partial<Table.RowMeta> = {
   isGroupFooter: false,
   isTableFooter: false,
   isBudgetFooter: false,
-  selected: false,
   children: [],
   fieldsLoading: []
 };
