@@ -1,5 +1,6 @@
 import { Reducer, combineReducers } from "redux";
 import { isNil, reduce } from "lodash";
+import * as models from "lib/model";
 import {
   createModelListResponseReducer,
   createDetailResponseReducer,
@@ -70,16 +71,17 @@ const genericReducer = combineReducers({
     }),
     subaccounts: factories.createSubAccountsReducer<
       Modules.Budgeting.Budget.SubAccountsStore,
+      BudgetTable.BudgetSubAccountRow,
       Model.BudgetSubAccount,
       Model.BudgetGroup
     >(
       "Budget",
       {
+        TableChanged: ActionType.Budget.Account.TableChanged,
         Response: ActionType.Budget.Account.SubAccounts.Response,
         Request: ActionType.Budget.Account.SubAccounts.Request,
         Loading: ActionType.Budget.Account.SubAccounts.Loading,
         SetSearch: ActionType.Budget.Account.SubAccounts.SetSearch,
-        UpdateInState: ActionType.Budget.Account.SubAccounts.UpdateInState,
         RemoveFromState: ActionType.Budget.Account.SubAccounts.RemoveFromState,
         AddToState: ActionType.Budget.Account.SubAccounts.AddToState,
         Select: ActionType.Budget.Account.SubAccounts.Select,
@@ -112,6 +114,7 @@ const genericReducer = combineReducers({
           Deleting: ActionType.Budget.Account.SubAccounts.Groups.Deleting
         }
       },
+      models.BudgetSubAccountRowManager,
       initialBudgetSubAccountsState
     )
   }),
@@ -140,16 +143,17 @@ const genericReducer = combineReducers({
     }),
     subaccounts: factories.createSubAccountsReducer<
       Modules.Budgeting.Budget.SubAccountsStore,
+      BudgetTable.BudgetSubAccountRow,
       Model.BudgetSubAccount,
       Model.BudgetGroup
     >(
       "Budget",
       {
+        TableChanged: ActionType.Budget.SubAccount.TableChanged,
         Response: ActionType.Budget.SubAccount.SubAccounts.Response,
         Request: ActionType.Budget.SubAccount.SubAccounts.Request,
         Loading: ActionType.Budget.SubAccount.SubAccounts.Loading,
         SetSearch: ActionType.Budget.SubAccount.SubAccounts.SetSearch,
-        UpdateInState: ActionType.Budget.SubAccount.SubAccounts.UpdateInState,
         RemoveFromState: ActionType.Budget.SubAccount.SubAccounts.RemoveFromState,
         AddToState: ActionType.Budget.SubAccount.SubAccounts.AddToState,
         Select: ActionType.Budget.SubAccount.SubAccounts.Select,
@@ -182,21 +186,23 @@ const genericReducer = combineReducers({
           Deleting: ActionType.Budget.SubAccount.SubAccounts.Groups.Deleting
         }
       },
+      models.BudgetSubAccountRowManager,
       initialBudgetSubAccountsState
     )
   }),
   actuals: actualsRootReducer,
   accounts: factories.createAccountsReducer<
     Modules.Budgeting.Budget.AccountsStore,
+    BudgetTable.BudgetAccountRow,
     Model.BudgetAccount,
     Model.BudgetGroup
   >(
     {
+      TableChanged: ActionType.Budget.Accounts.TableChanged,
       Response: ActionType.Budget.Accounts.Response,
       Request: ActionType.Budget.Accounts.Request,
       Loading: ActionType.Budget.Accounts.Loading,
       SetSearch: ActionType.Budget.Accounts.SetSearch,
-      UpdateInState: ActionType.Budget.Accounts.UpdateInState,
       RemoveFromState: ActionType.Budget.Accounts.RemoveFromState,
       AddToState: ActionType.Budget.Accounts.AddToState,
       Select: ActionType.Budget.Accounts.Select,
@@ -222,6 +228,7 @@ const genericReducer = combineReducers({
         Deleting: ActionType.Budget.Accounts.Groups.Deleting
       }
     },
+    models.BudgetAccountRowManager,
     initialBudgetAccountsState
   ),
   fringes: factories.createFringesReducer("Budget"),
@@ -267,7 +274,6 @@ const rootReducer: Reducer<Modules.Budgeting.Budget.Store, Redux.Action<any>> = 
 
   if (!isNil(action.payload)) {
     if (
-      action.type === ActionType.Budget.SubAccount.SubAccounts.UpdateInState ||
       action.type === ActionType.Budget.SubAccount.SubAccounts.RemoveFromState ||
       action.type === ActionType.Budget.SubAccount.SubAccounts.AddToState
     ) {
@@ -297,7 +303,6 @@ const rootReducer: Reducer<Modules.Budgeting.Budget.Store, Redux.Action<any>> = 
         }
       }
     } else if (
-      action.type === ActionType.Budget.Account.SubAccounts.UpdateInState ||
       action.type === ActionType.Budget.Account.SubAccounts.RemoveFromState ||
       action.type === ActionType.Budget.Account.SubAccounts.AddToState
     ) {

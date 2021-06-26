@@ -46,12 +46,6 @@ const selectSaving = createSelector(
 const selectAccountDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.account.detail.data
 );
-const selectReadyToRender = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.responseWasReceived,
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.groups.responseWasReceived,
-  (accountsResponseReceived: boolean, groupsResponseReceived: boolean) =>
-    accountsResponseReceived === true && groupsResponseReceived === true
-);
 
 interface SubAccountsTableProps {
   accountId: number;
@@ -70,7 +64,6 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
   const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
   const groups = useSelector(selectGroups);
-  const readyToRender = useSelector(selectReadyToRender);
   const subAccountUnits = useSelector(selectSubAccountUnits);
 
   return (
@@ -81,7 +74,6 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
         selected={selected}
         detail={accountDetail}
         subAccountUnits={subAccountUnits}
-        renderFlag={readyToRender}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)
             ? `${accountDetail.description} Total`

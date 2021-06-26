@@ -44,12 +44,6 @@ const selectSaving = createSelector(
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
-const selectReadyToRender = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.responseWasReceived,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.groups.responseWasReceived,
-  (accountsResponseReceived: boolean, groupsResponseReceived: boolean) =>
-    accountsResponseReceived === true && groupsResponseReceived === true
-);
 
 const AccountsTable = (): JSX.Element => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
@@ -65,7 +59,6 @@ const AccountsTable = (): JSX.Element => {
   const saving = useSelector(selectSaving);
   const budgetDetail = useSelector(selectBudgetDetail);
   const groups = useSelector(selectGroups);
-  const readyToRender = useSelector(selectReadyToRender);
 
   return (
     <React.Fragment>
@@ -79,7 +72,6 @@ const AccountsTable = (): JSX.Element => {
         groups={groups}
         manager={models.BudgetAccountRowManager}
         selected={selected}
-        renderFlag={readyToRender}
         detail={budgetDetail}
         search={search}
         onSearch={(value: string) => dispatch(setAccountsSearchAction(value))}

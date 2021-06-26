@@ -1,5 +1,7 @@
 import { Reducer, combineReducers } from "redux";
 import { isNil, reduce } from "lodash";
+
+import * as models from "lib/model";
 import { createDetailResponseReducer, createSimplePayloadReducer } from "lib/redux/factories";
 
 import { ActionType } from "../actions";
@@ -23,16 +25,17 @@ const genericReducer = combineReducers({
     }),
     subaccounts: factories.createSubAccountsReducer<
       Modules.Budgeting.Template.SubAccountsStore,
+      BudgetTable.TemplateSubAccountRow,
       Model.TemplateSubAccount,
       Model.TemplateGroup
     >(
       "Template",
       {
+        TableChanged: ActionType.Template.Account.TableChanged,
         Response: ActionType.Template.Account.SubAccounts.Response,
         Request: ActionType.Template.Account.SubAccounts.Request,
         Loading: ActionType.Template.Account.SubAccounts.Loading,
         SetSearch: ActionType.Template.Account.SubAccounts.SetSearch,
-        UpdateInState: ActionType.Template.Account.SubAccounts.UpdateInState,
         RemoveFromState: ActionType.Template.Account.SubAccounts.RemoveFromState,
         AddToState: ActionType.Template.Account.SubAccounts.AddToState,
         Select: ActionType.Template.Account.SubAccounts.Select,
@@ -60,6 +63,7 @@ const genericReducer = combineReducers({
           Deleting: ActionType.Template.Account.SubAccounts.Groups.Deleting
         }
       },
+      models.TemplateSubAccountRowManager,
       initialTemplateSubAccountsState
     )
   }),
@@ -76,16 +80,17 @@ const genericReducer = combineReducers({
     }),
     subaccounts: factories.createSubAccountsReducer<
       Modules.Budgeting.Template.SubAccountsStore,
+      BudgetTable.TemplateSubAccountRow,
       Model.TemplateSubAccount,
       Model.TemplateGroup
     >(
       "Template",
       {
+        TableChanged: ActionType.Template.SubAccount.TableChanged,
         Response: ActionType.Template.SubAccount.SubAccounts.Response,
         Request: ActionType.Template.SubAccount.SubAccounts.Request,
         Loading: ActionType.Template.SubAccount.SubAccounts.Loading,
         SetSearch: ActionType.Template.SubAccount.SubAccounts.SetSearch,
-        UpdateInState: ActionType.Template.SubAccount.SubAccounts.UpdateInState,
         RemoveFromState: ActionType.Template.SubAccount.SubAccounts.RemoveFromState,
         AddToState: ActionType.Template.SubAccount.SubAccounts.AddToState,
         Select: ActionType.Template.SubAccount.SubAccounts.Select,
@@ -113,20 +118,22 @@ const genericReducer = combineReducers({
           Deleting: ActionType.Template.SubAccount.SubAccounts.Groups.Deleting
         }
       },
+      models.TemplateSubAccountRowManager,
       initialTemplateSubAccountsState
     )
   }),
   accounts: factories.createAccountsReducer<
     Modules.Budgeting.Template.AccountsStore,
+    BudgetTable.TemplateAccountRow,
     Model.TemplateAccount,
     Model.TemplateGroup
   >(
     {
+      TableChanged: ActionType.Template.Accounts.TableChanged,
       Response: ActionType.Template.Accounts.Response,
       Request: ActionType.Template.Accounts.Request,
       Loading: ActionType.Template.Accounts.Loading,
       SetSearch: ActionType.Template.Accounts.SetSearch,
-      UpdateInState: ActionType.Template.Accounts.UpdateInState,
       RemoveFromState: ActionType.Template.Accounts.RemoveFromState,
       AddToState: ActionType.Template.Accounts.AddToState,
       Select: ActionType.Template.Accounts.Select,
@@ -147,6 +154,7 @@ const genericReducer = combineReducers({
         Deleting: ActionType.Template.Accounts.Groups.Deleting
       }
     },
+    models.TemplateAccountRowManager,
     initialTemplateAccountsState
   ),
   fringes: factories.createFringesReducer("Template"),
@@ -174,7 +182,6 @@ const rootReducer: Reducer<Modules.Budgeting.Template.Store, Redux.Action<any>> 
 
   if (!isNil(action.payload)) {
     if (
-      action.type === ActionType.Template.SubAccount.SubAccounts.UpdateInState ||
       action.type === ActionType.Template.SubAccount.SubAccounts.RemoveFromState ||
       action.type === ActionType.Template.SubAccount.SubAccounts.AddToState
     ) {
@@ -198,7 +205,6 @@ const rootReducer: Reducer<Modules.Budgeting.Template.Store, Redux.Action<any>> 
         }
       }
     } else if (
-      action.type === ActionType.Template.Account.SubAccounts.UpdateInState ||
       action.type === ActionType.Template.Account.SubAccounts.RemoveFromState ||
       action.type === ActionType.Template.Account.SubAccounts.AddToState
     ) {

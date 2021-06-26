@@ -1,10 +1,11 @@
 import { Reducer } from "redux";
 import { isNil, find, includes, map, filter, reduce, forEach } from "lodash";
 
+import * as models from "lib/model";
 import { createModelListResponseReducer } from "lib/redux/factories";
 import { warnInconsistentState } from "lib/redux/util";
 import * as typeguards from "lib/model/typeguards";
-import { fringeValue } from "lib/model/util";
+import { fringeValue, consolidateTableChange } from "lib/model/util";
 import { replaceInArray } from "lib/util";
 
 import { initialModelListResponseState } from "store/initialState";
@@ -59,11 +60,11 @@ interface AccountsHistoryActionMap {
 }
 
 interface AccountsReducerFactoryActionMap {
+  TableChanged: string;
   Response: string;
   Request: string;
   Loading: string;
   SetSearch: string;
-  UpdateInState: string;
   RemoveFromState: string;
   AddToState: string;
   Select: string;
@@ -141,11 +142,13 @@ const recalculateGroupMetrics = <
 
 export const createAccountsReducer = <
   S extends Modules.Budgeting.AccountsStore<A, G>,
+  R extends Table.Row,
   A extends Model.BudgetAccount | Model.TemplateAccount,
   G extends Model.Group
 >(
   /* eslint-disable indent */
   mapping: AccountsReducerFactoryActionMap,
+  manager: models.RowManager<R, A, Http.SubAccountPayload>,
   initialState: S
 ): Reducer<S, Redux.Action<any>> => {
   let historySubReducers = {};
@@ -164,7 +167,6 @@ export const createAccountsReducer = <
       Request: mapping.Request,
       Loading: mapping.Loading,
       SetSearch: mapping.SetSearch,
-      UpdateInState: mapping.UpdateInState,
       RemoveFromState: mapping.RemoveFromState,
       AddToState: mapping.AddToState,
       Select: mapping.Select,
@@ -205,6 +207,28 @@ export const createAccountsReducer = <
     if (action.type === mapping.Groups.UpdateInState) {
       const group: G = action.payload;
       newState = recalculateGroupMetrics<S, A, G>(action, newState, group.id);
+    } else if (action.type === mapping.TableChanged) {
+      const consolidated = consolidateTableChange(action.payload);
+      for (let i = 0; i < consolidated.length; i++) {
+        let account: A | null = find(newState.data, { id: consolidated[i].id } as any) || null;
+        if (isNil(account)) {
+          warnInconsistentState({
+            action: action.type,
+            reason: "Account does not exist in state when it is expected to.",
+            id: consolidated[i].id
+          });
+        } else {
+          account = manager.mergeChangesWithModel(account, consolidated[i]);
+          if (!isNil(account.group)) {
+            newState = recalculateGroupMetrics<S, A, G>(action, newState, account.group);
+          } else {
+            newState = {
+              ...newState,
+              data: replaceInArray<A>(newState.data, { id: account.id }, account)
+            };
+          }
+        }
+      }
     } else if (action.type === mapping.Groups.AddToState) {
       const group: G = action.payload;
       forEach(group.children, (simpleAccount: number) => {
@@ -238,11 +262,6 @@ export const createAccountsReducer = <
           }
         }
       });
-    } else if (action.type === mapping.UpdateInState) {
-      const subAccount: A = action.payload;
-      if (!isNil(subAccount.group)) {
-        newState = recalculateGroupMetrics<S, A, G>(action, newState, subAccount.group);
-      }
     } else if (action.type === mapping.RemoveFromGroup || action.type === mapping.RemoveFromState) {
       const group: G | undefined = find(newState.groups.data, (g: G) => includes(g.children, action.payload));
       if (isNil(group)) {
@@ -313,11 +332,11 @@ interface SubAccountsFringesActionMap {
 }
 
 interface SubAccountsReducerFactoryActionMap {
+  TableChanged: string;
   Response: string;
   Request: string;
   Loading: string;
   SetSearch: string;
-  UpdateInState: string;
   RemoveFromState: string;
   AddToState: string;
   Select: string;
@@ -408,7 +427,6 @@ const recalculateSubAccountMetrics = <
     }
     subAccount = { ...subAccount, ...payload };
     subAccount = recalculateSubAccountFromFringes<S, SA, G>(action, st, subAccount);
-
     return {
       ...st,
       data: replaceInArray<SA>(st.data, { id: subAccount.id }, subAccount)
@@ -420,11 +438,13 @@ const recalculateSubAccountMetrics = <
 
 export const createSubAccountsReducer = <
   S extends Modules.Budgeting.SubAccountsStore<SA, G>,
+  R extends Table.Row,
   SA extends Model.BudgetSubAccount | Model.TemplateSubAccount,
   G extends Model.Group
 >(
   directive: Modules.Budgeting.BudgetDirective,
   mapping: SubAccountsReducerFactoryActionMap,
+  manager: models.RowManager<R, SA, Http.SubAccountPayload>,
   initialState: S
 ): Reducer<S, Redux.Action<any>> => {
   let historySubReducers = {};
@@ -443,7 +463,6 @@ export const createSubAccountsReducer = <
       Request: mapping.Request,
       Loading: mapping.Loading,
       SetSearch: mapping.SetSearch,
-      UpdateInState: mapping.UpdateInState,
       RemoveFromState: mapping.RemoveFromState,
       AddToState: mapping.AddToState,
       Select: mapping.Select,
@@ -513,11 +532,23 @@ export const createSubAccountsReducer = <
           }
         }
       });
-    } else if (action.type === mapping.UpdateInState) {
-      const subAccount: SA = action.payload;
-      newState = recalculateSubAccountMetrics<S, SA, G>(action, newState, subAccount.id);
-      if (!isNil(subAccount.group)) {
-        newState = recalculateGroupMetrics<S, SA, G>(action, newState, subAccount.group);
+    } else if (action.type === mapping.TableChanged) {
+      const consolidated = consolidateTableChange(action.payload);
+      for (let i = 0; i < consolidated.length; i++) {
+        let subAccount: SA | null = find(newState.data, { id: consolidated[i].id } as any) || null;
+        if (isNil(subAccount)) {
+          warnInconsistentState({
+            action: action.type,
+            reason: "Sub-account does not exist in state when it is expected to.",
+            id: consolidated[i].id
+          });
+        } else {
+          subAccount = manager.mergeChangesWithModel(subAccount, consolidated[i]);
+          newState = recalculateSubAccountMetrics<S, SA, G>(action, newState, subAccount);
+          if (!isNil(subAccount.group)) {
+            newState = recalculateGroupMetrics<S, SA, G>(action, newState, subAccount.group);
+          }
+        }
       }
     } else if (action.type === mapping.Fringes.UpdateInState) {
       // Since the Fringes are displayed in a modal and not on a separate page, when a Fringe is

@@ -377,7 +377,13 @@ namespace BudgetTable {
   }
 
   // Props provided to the BudgetTable that are passed directly through to the PrimaryGrid.
-  interface PrimaryGridPassThroughProps<R extends Table.Row, G extends Model.Group = Model.Group> {
+  interface PrimaryGridPassThroughProps<
+    R extends Table.Row,
+    M extends Model.Model,
+    G extends Model.Group = Model.Group
+  > {
+    readonly data: M[];
+    readonly selected?: number[];
     readonly groups?: G[];
     readonly groupParams?: BudgetTable.GroupProps<R, G>;
     readonly frameworkComponents?: { [key: string]: any };
@@ -385,6 +391,8 @@ namespace BudgetTable {
     readonly search?: string;
     readonly identifierField: string;
     readonly columns: Table.Column<R>[];
+    readonly manager: Table.IRowManager<R, M, P>;
+    readonly exportFileName?: string;
     readonly onTableChange: (payload: Table.Change<R>) => void;
     readonly onRowAdd: Table.RowAddFunc<R>;
     readonly onRowDelete: (row: R) => void;
@@ -395,14 +403,14 @@ namespace BudgetTable {
     readonly onBack?: () => void;
   }
 
-  interface PrimaryGridProps<R extends Table.Row, G extends Model.Group = Model.Group>
-    extends PrimaryGridPassThroughProps<R, G> {
+  interface PrimaryGridProps<R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>
+    extends BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
+      Omit<BudgetTable.MenuProps<R>, "columns" | "onExport" | "onDelete" | "selected" | "selectedRows"> {
     readonly api: import("@ag-grid-community/core").GridApi | undefined;
     readonly columnApi: import("@ag-grid-community/core").ColumnApi | undefined;
-    readonly table: R[];
     readonly options: import("@ag-grid-community/core").GridOptions;
+    readonly ordering: FieldOrder<keyof R>[];
     readonly onCellValueChanged: (params: Table.CellValueChangedParams<R>) => void;
-    readonly setAllSelected: (value: boolean) => void;
     readonly isCellEditable: (row: R, colDef: Table.Column<R>) => boolean;
     readonly setApi: (api: import("@ag-grid-community/core").GridApi) => void;
     readonly setColumnApi: (api: import("@ag-grid-community/core").ColumnApi) => void;
@@ -420,10 +428,8 @@ namespace BudgetTable {
         BudgetTable.MenuProps<R>,
         "columns" | "onColumnsChange" | "onExport" | "onDelete" | "selected" | "selectedRows"
       >,
-      BudgetTable.PrimaryGridPassThroughProps<R, G>,
+      BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
       StandardComponentProps {
-    readonly data: M[];
-    readonly selected?: number[];
     readonly identifierFieldHeader: string;
     readonly identifierColumn?: Partial<Table.Column<R>>;
     readonly actionColumn?: Partial<Table.Column<R>>;
@@ -431,15 +437,12 @@ namespace BudgetTable {
     readonly expandColumn?: Partial<Table.Column<R>>;
     readonly tableFooterIdentifierValue?: string | null;
     readonly budgetFooterIdentifierValue?: string | null;
-    readonly renderFlag?: boolean;
     readonly saving: boolean;
     readonly loadingBudget?: boolean;
     readonly exportable?: boolean;
-    readonly exportFileName?: string;
     readonly nonEditableCells?: (keyof R)[];
     readonly cookies?: BudgetTable.CookiesProps;
     readonly loading?: boolean;
-    readonly manager: Table.IRowManager<R, M, P>;
     readonly cellClass?: (params: import("@ag-grid-community/core").CellClassParams) => string | undefined;
     readonly onRowSelect: (id: number) => void;
     readonly onRowDeselect: (id: number) => void;

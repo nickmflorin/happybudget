@@ -20,7 +20,6 @@ export interface AccountsTasksActionMap<
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
   removeFromState: Redux.ActionCreator<number>;
-  updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<A>>;
   addToState: Redux.ActionCreator<A>;
   loading: Redux.ActionCreator<boolean>;
   response: Redux.ActionCreator<Http.ListResponse<A>>;
@@ -175,10 +174,12 @@ export const createAccountsTaskSet = <
         id: change.id,
         ...manager.payload(change)
       }));
+      let success = true;
       yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
       try {
         yield call(services.bulkUpdate, objId, requestPayload, { cancelToken: source.token });
       } catch (e) {
+        success = false;
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
         if (!(yield cancelled())) {
@@ -189,6 +190,9 @@ export const createAccountsTaskSet = <
         if (yield cancelled()) {
           source.cancel();
         }
+      }
+      if (success === true) {
+        yield put(actions.budget.request(null));
       }
     }
   }
@@ -248,26 +252,8 @@ export const createAccountsTaskSet = <
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
       const merged = consolidateTableChange(action.payload);
-      const data = yield select(selectModels);
-
-      const mergedUpdates: Table.RowChange<R>[] = [];
-      for (let i = 0; i < merged.length; i++) {
-        const model: A | undefined = find(data, { id: merged[i].id });
-        if (isNil(model)) {
-          warnInconsistentState({
-            action: action.type,
-            reason: "Account does not exist in state when it is expected to.",
-            id: merged[i].id
-          });
-        } else {
-          const updatedModel = manager.mergeChangesWithModel(model, merged[i]);
-          yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel as Partial<A> }));
-          mergedUpdates.push(merged[i]);
-        }
-      }
-      yield put(actions.budget.request(null));
-      if (mergedUpdates.length !== 0) {
-        yield fork(bulkUpdateTask, mergedUpdates);
+      if (merged.length !== 0) {
+        yield fork(bulkUpdateTask, merged);
       }
     }
   }

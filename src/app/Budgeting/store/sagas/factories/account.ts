@@ -21,7 +21,6 @@ export interface AccountTasksActionMap<
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
   removeFromState: Redux.ActionCreator<number>;
-  updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<SA>>;
   addToState: Redux.ActionCreator<SA>;
   loading: Redux.ActionCreator<boolean>;
   response: Redux.ActionCreator<Http.ListResponse<SA>>;
@@ -181,12 +180,14 @@ export const createAccountTaskSet = <
           ...manager.payload(change)
         })
       );
+      let success = true;
       yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
       try {
         yield call(api.bulkUpdateAccountSubAccounts, accountId, requestPayload, { cancelToken: source.token });
       } catch (e) {
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
+        success = false;
         if (!(yield cancelled())) {
           api.handleRequestError(e, "There was an error updating the sub accounts.");
         }
@@ -195,6 +196,9 @@ export const createAccountTaskSet = <
         if (yield cancelled()) {
           source.cancel();
         }
+      }
+      if (success === true) {
+        yield put(actions.budget.request(null));
       }
     }
   }
@@ -260,26 +264,8 @@ export const createAccountTaskSet = <
     const accountId = yield select(selectAccountId);
     if (!isNil(accountId) && !isNil(action.payload)) {
       const merged = consolidateTableChange(action.payload);
-      const data = yield select(selectModels);
-
-      const mergedUpdates: Table.RowChange<R>[] = [];
-      for (let i = 0; i < merged.length; i++) {
-        const model: SA | undefined = find(data, { id: merged[i].id });
-        if (isNil(model)) {
-          warnInconsistentState({
-            action: action.type,
-            reason: "Sub Account does not exist in state when it is expected to.",
-            id: merged[i].id
-          });
-        } else {
-          const updatedModel = manager.mergeChangesWithModel(model, merged[i]);
-          yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel as Partial<SA> }));
-          mergedUpdates.push(merged[i]);
-        }
-      }
-      yield put(actions.budget.request(null));
-      if (mergedUpdates.length !== 0) {
-        yield fork(bulkUpdateTask, mergedUpdates);
+      if (merged.length !== 0) {
+        yield fork(bulkUpdateTask, merged);
       }
     }
   }

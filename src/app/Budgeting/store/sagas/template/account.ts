@@ -22,7 +22,6 @@ const tasks = createAccountTaskSet<
     request: actions.requestSubAccountsAction,
     response: actions.responseSubAccountsAction,
     addToState: actions.addSubAccountToStateAction,
-    updateInState: actions.updateSubAccountInStateAction,
     removeFromState: actions.removeSubAccountFromStateAction,
     budget: {
       loading: loadingTemplateAction,

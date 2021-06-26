@@ -46,12 +46,6 @@ const selectSaving = createSelector(
 const selectSubAccountDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.detail.data
 );
-const selectReadyToRender = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.responseWasReceived,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.groups.responseWasReceived,
-  (accountsResponseReceived: boolean, groupsResponseReceived: boolean) =>
-    accountsResponseReceived === true && groupsResponseReceived === true
-);
 
 interface SubAccountsTableProps {
   subaccountId: number;
@@ -70,7 +64,6 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
   const saving = useSelector(selectSaving);
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const groups = useSelector(selectGroups);
-  const readyToRender = useSelector(selectReadyToRender);
   const subAccountUnits = useSelector(selectSubAccountUnits);
 
   return (
@@ -80,7 +73,6 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         groups={groups}
         detail={subaccountDetail}
         selected={selected}
-        renderFlag={readyToRender}
         subAccountUnits={subAccountUnits}
         // Right now, the SubAccount recursion only goes 1 layer deep.
         // Account -> SubAccount -> Detail (Recrusive SubAccount).

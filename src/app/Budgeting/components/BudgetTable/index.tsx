@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, reduce, forEach, filter, groupBy } from "lodash";
+import { map, isNil, includes, find, concat, forEach, filter } from "lodash";
 import Cookies from "universal-cookie";
 
 import {
   ColDef,
   CellClassParams,
   GridApi,
-  RowNode,
   EditableCallbackParams,
   ColumnApi,
   Column,
@@ -18,11 +17,9 @@ import {
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
 import { WrapInApplicationSpinner } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
-import { updateFieldOrdering, orderByFieldOrdering, getKeyValue } from "lib/util";
-import { downloadAsCsvFile } from "lib/util/files";
+import { updateFieldOrdering, getKeyValue } from "lib/util";
 import { currencyValueFormatter } from "lib/model/formatters";
 
-import BudgetTableMenu from "./Menu";
 import { validateCookiesOrdering, mergeClassNames, mergeClassNamesFn } from "./util";
 import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
 import "./index.scss";
@@ -60,7 +57,6 @@ const BudgetTable = <
   tableFooterIdentifierValue = "Grand Total",
   budgetFooterIdentifierValue = "Budget Total",
   sizeColumnsToFit = true,
-  renderFlag = true,
   canSearch = true,
   canExport = true,
   canToggleColumns = true,
@@ -80,8 +76,6 @@ const BudgetTable = <
   isCellSelectable,
   ...options
 }: BudgetTable.Props<R, M, G, P>) => {
-  const [table, setTable] = useState<R[]>([]);
-  const [allSelected, setAllSelected] = useState(false);
   const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
   const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
   const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
@@ -369,92 +363,6 @@ const BudgetTable = <
     );
   }, [useDeepEqualMemo(columns), baseColumns]);
 
-  useEffect(() => {
-    const createGroupFooter = (group: G): R => {
-      return reduce(
-        columns,
-        (obj: { [key: string]: any }, col: Table.Column<R>) => {
-          if (!isNil(col.field)) {
-            if (col.isCalculated === true) {
-              if (!isNil(group[col.field as keyof G])) {
-                obj[col.field] = group[col.field as keyof G];
-              } else {
-                obj[col.field] = null;
-              }
-            } else {
-              obj[col.field] = null;
-            }
-          }
-          return obj;
-        },
-        {
-          // The ID needs to designate that this row refers to a Group because the ID of a Group
-          // might clash with the ID of a SubAccount/Account.
-          id: `group-${group.id}`,
-          [identifierField]: group.name,
-          group,
-          meta: {
-            isGroupFooter: true,
-            selected: false,
-            children: []
-          }
-        }
-      ) as R;
-    };
-    if (renderFlag === true) {
-      const getGroupForModel = (model: M): number | null => {
-        const group: G | undefined = find(groups, (g: G) =>
-          includes(
-            map(g.children, (child: number) => child),
-            model.id
-          )
-        );
-        return !isNil(group) ? group.id : null;
-      };
-
-      const modelsWithGroup = filter(data, (m: M) => !isNil(getGroupForModel(m)));
-      let modelsWithoutGroup = filter(data, (m: M) => isNil(getGroupForModel(m)));
-      const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
-
-      const newTable: R[] = [];
-      forEach(groupedModels, (models: M[], groupId: string) => {
-        const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
-        if (!isNil(group)) {
-          const footer: R = createGroupFooter(group);
-          newTable.push(
-            ...orderByFieldOrdering(
-              map(models, (m: M) => manager.modelToRow(m, { selected: includes(selected, m.id) })),
-              ordering
-            ),
-            {
-              ...footer,
-              group: group.id,
-              [identifierField]: group.name,
-              meta: { ...footer.meta, isGroupFooter: true }
-            }
-          );
-        } else {
-          // In the case that the group no longer exists, that means the group was removed from the
-          // state.  In this case, we want to disassociate the rows with the group.
-          modelsWithoutGroup = [...modelsWithoutGroup, ...models];
-        }
-      });
-      setTable([
-        ...newTable,
-        ...orderByFieldOrdering(
-          map(modelsWithoutGroup, (m: M) => manager.modelToRow(m, { selected: includes(selected, m.id) })),
-          ordering
-        )
-      ]);
-    }
-  }, [
-    useDeepEqualMemo(data),
-    useDeepEqualMemo(selected),
-    useDeepEqualMemo(groups),
-    useDeepEqualMemo(ordering),
-    renderFlag
-  ]);
-
   const processCellForClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
     const colDef = column.getColDef();
     if (!isNil(colDef.field)) {
@@ -470,22 +378,6 @@ const BudgetTable = <
             return "";
           }
           return value;
-        }
-      }
-    }
-    return "";
-  });
-
-  const processCellForExport = useDynamicCallback((column: Column, row: R, value?: any) => {
-    const colDef = column.getColDef();
-    if (!isNil(colDef.field)) {
-      const customCol: Table.Column<R> | undefined = find(cols, { field: colDef.field } as any);
-      if (!isNil(customCol)) {
-        const processor = customCol.processCellForExport;
-        if (!isNil(processor)) {
-          return processor(row);
-        } else {
-          return processCellForClipboard(column, row, value);
         }
       }
     }
@@ -525,144 +417,82 @@ const BudgetTable = <
   });
 
   return (
-    <React.Fragment>
-      <BudgetTableMenu<R>
-        actions={actions}
-        search={search}
-        onSearch={onSearch}
-        canSearch={canSearch}
-        canExport={canExport}
-        canToggleColumns={canToggleColumns}
-        columns={columns}
-        onDelete={() => {
-          forEach(table, (row: R) => {
-            if (row.meta.selected === true) {
-              onRowDelete(row);
-            }
-          });
-        }}
-        detached={detached}
-        saving={saving}
-        selected={allSelected}
-        onSelectAll={onSelectAll}
-        selectedRows={filter(table, (row: R) => row.meta.selected === true)}
-        onExport={(fields: Field[]) => {
-          if (!isNil(gridApi) && !isNil(columnApi)) {
-            const includeColumn = (col: Column): boolean => {
-              const colDef = col.getColDef();
-              if (!isNil(colDef.field)) {
-                const customCol: Table.Column<R> | undefined = find(cols, {
-                  field: colDef.field
-                } as any);
-                if (!isNil(customCol)) {
-                  return (
-                    customCol.excludeFromExport !== true &&
-                    includes(
-                      map(fields, (field: Field) => field.id),
-                      customCol.field
-                    )
-                  );
-                }
-              }
-              return false;
-            };
-            const cs = filter(columnApi.getAllColumns(), (col: Column) => includeColumn(col));
-            const headerRow: CSVRow = [];
-            forEach(cs, (col: Column) => {
-              const colDef = col.getColDef();
-              if (!isNil(colDef.field)) {
-                headerRow.push(colDef.headerName);
-              }
-            });
-            const csvData: CSVData = [headerRow];
-            gridApi.forEachNode((node: RowNode, index: number) => {
-              const row: CSVRow = [];
-              forEach(cs, (col: Column) => {
-                if (!isNil(node.data)) {
-                  row.push(processCellForExport(col, node.data as R));
-                } else {
-                  row.push("");
+    <WrapInApplicationSpinner hideWhileLoading={false} loading={loading}>
+      <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
+        <PrimaryGrid<R, M, G>
+          api={gridApi}
+          columnApi={columnApi}
+          identifierField={identifierField}
+          data={data}
+          saving={saving}
+          manager={manager}
+          selected={selected}
+          columns={cols}
+          options={gridOptions}
+          groups={groups}
+          ordering={ordering}
+          groupParams={groupParams}
+          frameworkComponents={frameworkComponents}
+          sizeColumnsToFit={sizeColumnsToFit}
+          search={search}
+          canExport={canExport}
+          canSearch={canSearch}
+          canToggleColumns={canToggleColumns}
+          onSelectAll={onSelectAll}
+          onSearch={onSearch}
+          onCellValueChanged={onCellValueChanged}
+          setApi={setGridApi}
+          setColumnApi={setColumnApi}
+          processCellForClipboard={processCellForClipboard}
+          processCellFromClipboard={processCellFromClipboard}
+          isCellEditable={_isCellEditable}
+          onRowExpand={onRowExpand}
+          rowCanExpand={rowCanExpand}
+          onTableChange={onTableChange}
+          onRowAdd={onRowAdd}
+          onRowDelete={onRowDelete}
+          onBack={onBack}
+          onColumnsChange={(fields: Field[]) => {
+            if (!isNil(columnApi) && !isNil(tableFooterColumnApi) && !isNil(budgetFooterColumnApi)) {
+              forEach(columns, (col: Table.Column<R>) => {
+                if (!isNil(col.field)) {
+                  const associatedField = find(fields, { id: col.field });
+                  if (!isNil(associatedField)) {
+                    columnApi.setColumnVisible(col.field, true);
+                    tableFooterColumnApi.setColumnVisible(col.field, true);
+                    budgetFooterColumnApi.setColumnVisible(col.field, true);
+                  } else {
+                    columnApi.setColumnVisible(col.field, false);
+                    tableFooterColumnApi.setColumnVisible(col.field, false);
+                    budgetFooterColumnApi.setColumnVisible(col.field, false);
+                  }
                 }
               });
-              csvData.push(row);
-            });
-            let fileName = "make-me-current-date";
-            if (!isNil(exportFileName)) {
-              fileName = exportFileName;
             }
-            downloadAsCsvFile(fileName, csvData);
-          }
-        }}
-        onColumnsChange={(fields: Field[]) => {
-          if (!isNil(columnApi) && !isNil(tableFooterColumnApi) && !isNil(budgetFooterColumnApi)) {
-            forEach(columns, (col: Table.Column<R>) => {
-              if (!isNil(col.field)) {
-                const associatedField = find(fields, { id: col.field });
-                if (!isNil(associatedField)) {
-                  columnApi.setColumnVisible(col.field, true);
-                  tableFooterColumnApi.setColumnVisible(col.field, true);
-                  budgetFooterColumnApi.setColumnVisible(col.field, true);
-                } else {
-                  columnApi.setColumnVisible(col.field, false);
-                  tableFooterColumnApi.setColumnVisible(col.field, false);
-                  budgetFooterColumnApi.setColumnVisible(col.field, false);
-                }
-              }
-            });
-          }
-        }}
-      />
-      <WrapInApplicationSpinner hideWhileLoading={true} loading={loading || renderFlag === false}>
-        <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
-          <PrimaryGrid<R, G>
-            api={gridApi}
-            columnApi={columnApi}
-            identifierField={identifierField}
-            table={table}
-            columns={cols}
-            options={gridOptions}
-            groups={groups}
-            groupParams={groupParams}
-            frameworkComponents={frameworkComponents}
-            sizeColumnsToFit={sizeColumnsToFit}
-            search={search}
-            onCellValueChanged={onCellValueChanged}
-            setApi={setGridApi}
-            setColumnApi={setColumnApi}
-            processCellForClipboard={processCellForClipboard}
-            processCellFromClipboard={processCellFromClipboard}
-            setAllSelected={setAllSelected}
-            isCellEditable={_isCellEditable}
-            onRowExpand={onRowExpand}
-            rowCanExpand={rowCanExpand}
-            onTableChange={onTableChange}
-            onRowAdd={onRowAdd}
-            onRowDelete={onRowDelete}
-            onBack={onBack}
-          />
-          <TableFooterGrid<R>
-            options={tableFooterGridOptions}
+          }}
+        />
+        <TableFooterGrid<R>
+          options={tableFooterGridOptions}
+          columns={cols}
+          sizeColumnsToFit={sizeColumnsToFit}
+          identifierField={identifierField}
+          identifierValue={tableFooterIdentifierValue}
+          setColumnApi={setTableFooterColumnApi}
+        />
+        {filter(columns, (col: Table.Column<R>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !==
+          0 && (
+          <BudgetFooterGrid<R>
+            options={budgetFooterGridOptions}
             columns={cols}
             sizeColumnsToFit={sizeColumnsToFit}
             identifierField={identifierField}
-            identifierValue={tableFooterIdentifierValue}
-            setColumnApi={setTableFooterColumnApi}
+            identifierValue={budgetFooterIdentifierValue}
+            loadingBudget={loadingBudget}
+            setColumnApi={setBudgetFooterColumnApi}
           />
-          {filter(columns, (col: Table.Column<R>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !==
-            0 && (
-            <BudgetFooterGrid<R>
-              options={budgetFooterGridOptions}
-              columns={cols}
-              sizeColumnsToFit={sizeColumnsToFit}
-              identifierField={identifierField}
-              identifierValue={budgetFooterIdentifierValue}
-              loadingBudget={loadingBudget}
-              setColumnApi={setBudgetFooterColumnApi}
-            />
-          )}
-        </div>
-      </WrapInApplicationSpinner>
-    </React.Fragment>
+        )}
+      </div>
+    </WrapInApplicationSpinner>
   );
 };
 

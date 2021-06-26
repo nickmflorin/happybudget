@@ -17,7 +17,6 @@ import { selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
 import { setBudgetLastVisited, getUrl } from "../../../urls";
 import SubAccountsTable from "./SubAccountsTable";
 import SubAccountCommentsHistory from "./SubAccountCommentsHistory";
-import Model from "lib/model/models/Model";
 
 const selectDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.detail.data

@@ -18,7 +18,6 @@ const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, BudgetTable.Temp
     request: actions.requestSubAccountsAction,
     response: actions.responseSubAccountsAction,
     addToState: actions.addSubAccountToStateAction,
-    updateInState: actions.updateSubAccountInStateAction,
     removeFromState: actions.removeSubAccountFromStateAction,
     budget: {
       loading: loadingTemplateAction,

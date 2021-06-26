@@ -49,10 +49,6 @@ export const addAccountToGroupAction = simpleAction<{ id: number; group: number 
 export const selectAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Select);
 export const deselectAccountAction = simpleAction<number>(ActionType.Budget.Accounts.Deselect);
 export const selectAllAccountsAction = simpleAction<null>(ActionType.Budget.Accounts.SelectAll);
-
-export const updateAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetAccount>>(
-  ActionType.Budget.Accounts.UpdateInState
-);
 export const removeAccountFromStateAction = simpleAction<number>(ActionType.Budget.Accounts.RemoveFromState);
 export const addAccountToStateAction = simpleAction<Model.BudgetAccount>(ActionType.Budget.Accounts.AddToState);
 export const requestGroupsAction = simpleAction<null>(ActionType.Budget.Accounts.Groups.Request);

@@ -1,10 +1,9 @@
-import { SyntheticEvent, useState, useEffect, useRef } from "react";
-import { map, isNil, includes, find, uniq, forEach, filter, flatten } from "lodash";
+import React, { SyntheticEvent, useState, useEffect, useRef } from "react";
+import { map, isNil, includes, find, uniq, forEach, filter, flatten, reduce, groupBy } from "lodash";
 import { useLocation } from "react-router-dom";
 
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { ChangeDetectionStrategyType } from "@ag-grid-community/react/lib/changeDetectionService";
 import {
   CellEditingStoppedEvent,
   GridApi,
@@ -33,17 +32,23 @@ import {
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import * as models from "lib/model";
+import { orderByFieldOrdering } from "lib/util";
+import { downloadAsCsvFile } from "lib/util/files";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { getGroupColorDefinition } from "lib/model/util";
 import { isKeyboardEvent } from "lib/model/typeguards";
 import { rangeSelectionIsSingleCell } from "../util";
+import BudgetTableMenu from "../Menu";
 import Grid from "./Grid";
 
-const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
+const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>({
   /* eslint-disable indent */
   api,
   columnApi,
-  table,
+  data,
+  selected,
+  manager,
+  ordering,
   groups = [],
   options,
   columns,
@@ -52,10 +57,19 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
   search,
   sizeColumnsToFit,
   identifierField,
+  actions,
+  canSearch,
+  canExport,
+  canToggleColumns,
+  detached,
+  saving,
+  exportFileName,
+  onSelectAll,
+  onSearch,
+  onColumnsChange,
   processCellForClipboard,
   processCellFromClipboard,
   onCellValueChanged,
-  setAllSelected,
   isCellEditable,
   setApi,
   setColumnApi,
@@ -65,7 +79,7 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
   onRowAdd,
   onRowDelete,
   onBack
-}: BudgetTable.PrimaryGridProps<R, G>): JSX.Element => {
+}: BudgetTable.PrimaryGridProps<R, M, G>): JSX.Element => {
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
   // Right now, we can only support Cut/Paste for 1 cell at a time.  Multi-cell
@@ -73,6 +87,8 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
   const [cutCellChange, setCutCellChange] = useState<Table.CellChange<R> | null>(null);
   const oldRow = useRef<R | null>(null); // TODO: Figure out a better way to do this.
   const location = useLocation();
+  const [table, setTable] = useState<R[]>([]);
+  const [allSelected, setAllSelected] = useState(false);
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     if (sizeColumnsToFit === true) {
@@ -597,10 +613,10 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     return false;
   });
 
-  const recreateRowFromDataArray = (local: ColumnApi, data: any[], startingColumn: Column): R => {
+  const recreateRowFromDataArray = (local: ColumnApi, array: any[], startingColumn: Column): R => {
     const row: any = {};
     let currentColumn: Column = startingColumn;
-    map(data, (value: any) => {
+    map(array, (value: any) => {
       const field = currentColumn.getColDef().field;
       if (!isNil(field)) {
         row[field] = processCellFromClipboard(currentColumn, row, value);
@@ -658,6 +674,84 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     }
     return null;
   });
+
+  useEffect(() => {
+    const createGroupFooter = (group: G): R => {
+      return reduce(
+        columns,
+        (obj: { [key: string]: any }, col: Table.Column<R>) => {
+          if (!isNil(col.field)) {
+            if (col.isCalculated === true) {
+              if (!isNil(group[col.field as keyof G])) {
+                obj[col.field] = group[col.field as keyof G];
+              } else {
+                obj[col.field] = null;
+              }
+            } else {
+              obj[col.field] = null;
+            }
+          }
+          return obj;
+        },
+        {
+          // The ID needs to designate that this row refers to a Group because the ID of a Group
+          // might clash with the ID of a SubAccount/Account.
+          id: `group-${group.id}`,
+          [identifierField]: group.name,
+          group,
+          meta: {
+            isGroupFooter: true,
+            selected: false,
+            children: []
+          }
+        }
+      ) as R;
+    };
+    const getGroupForModel = (model: M): number | null => {
+      const group: G | undefined = find(groups, (g: G) =>
+        includes(
+          map(g.children, (child: number) => child),
+          model.id
+        )
+      );
+      return !isNil(group) ? group.id : null;
+    };
+
+    const modelsWithGroup = filter(data, (m: M) => !isNil(getGroupForModel(m)));
+    let modelsWithoutGroup = filter(data, (m: M) => isNil(getGroupForModel(m)));
+    const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
+
+    const newTable: R[] = [];
+    forEach(groupedModels, (ms: M[], groupId: string) => {
+      const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
+      if (!isNil(group)) {
+        const footer: R = createGroupFooter(group);
+        newTable.push(
+          ...orderByFieldOrdering(
+            map(ms, (m: M) => manager.modelToRow(m, { selected: includes(selected, m.id) })),
+            ordering
+          ),
+          {
+            ...footer,
+            group: group.id,
+            [identifierField]: group.name,
+            meta: { ...footer.meta, isGroupFooter: true }
+          }
+        );
+      } else {
+        // In the case that the group no longer exists, that means the group was removed from the
+        // state.  In this case, we want to disassociate the rows with the group.
+        modelsWithoutGroup = [...modelsWithoutGroup, ...ms];
+      }
+    });
+    setTable([
+      ...newTable,
+      ...orderByFieldOrdering(
+        map(modelsWithoutGroup, (m: M) => manager.modelToRow(m, { selected: includes(selected, m.id) })),
+        ordering
+      )
+    ]);
+  }, [data, selected, groups, ordering]);
 
   useEffect(() => {
     if (focused === false && !isNil(api)) {
@@ -798,74 +892,156 @@ const PrimaryGrid = <R extends Table.Row, G extends Model.Group = Model.Group>({
     }
   });
 
+  const processCellForExport = useDynamicCallback((column: Column, row: R, value?: any) => {
+    const colDef = column.getColDef();
+    if (!isNil(colDef.field)) {
+      const customCol: Table.Column<R> | undefined = find(columns, { field: colDef.field } as any);
+      if (!isNil(customCol)) {
+        const processor = customCol.processCellForExport;
+        if (!isNil(processor)) {
+          return processor(row);
+        } else {
+          return processCellForClipboard(column, row, value);
+        }
+      }
+    }
+    return "";
+  });
+
   const includeCellEditorParams = (def: Table.Column<R>): Table.Column<R> => {
     return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
   };
 
   return (
-    <div className={"table-grid"}>
-      <Grid<R>
-        {...options}
-        columns={map(columns, (col: Table.Column<R>) => includeCellEditorParams(col))}
-        getContextMenuItems={getContextMenuItems}
-        // This is the same as checking if the onGridReady event has fired.
-        rowData={!isNil(api) ? table : []}
-        getRowNodeId={(r: any) => r.id}
-        getRowClass={getRowClass}
-        getRowStyle={getRowStyle}
-        immutableData={true}
-        onGridReady={onGridReady}
-        processDataFromClipboard={processDataFromClipboard}
-        processCellForClipboard={(params: ProcessCellForExportParams) => {
-          if (!isNil(params.node)) {
-            setCutCellChange(null);
-            return processCellForClipboard(params.column, params.node.data as R, params.value);
-          }
+    <React.Fragment>
+      <BudgetTableMenu<R>
+        actions={actions}
+        search={search}
+        onSearch={onSearch}
+        canSearch={canSearch}
+        canExport={canExport}
+        canToggleColumns={canToggleColumns}
+        columns={columns}
+        onDelete={() => {
+          forEach(table, (row: R) => {
+            if (row.meta.selected === true) {
+              onRowDelete(row);
+            }
+          });
         }}
-        processCellFromClipboard={_processCellFromClipboard}
-        navigateToNextCell={navigateToNextCell}
-        tabToNextCell={tabToNextCell}
-        onCellKeyDown={onCellKeyDown}
-        onFirstDataRendered={onFirstDataRendered}
-        suppressKeyboardEvent={suppressKeyboardEvent}
-        onCellEditingStarted={(event: CellEditingStartedEvent) => {
-          oldRow.current = { ...event.node.data };
-        }}
-        onCellMouseOver={(e: CellMouseOverEvent) => {
-          // In order to hide/show the expand button under certain conditions,
-          // we always need to refresh the expand column whenever another cell
-          // is hovered.  We should figure out if there is a way to optimize
-          // this to only refresh under certain circumstances.
-          const nodes: RowNode[] = [];
-          if (includes(["index", "expand", identifierField], e.colDef.field)) {
-            e.api.forEachNode((node: RowNode) => {
-              const row: R = node.data;
-              if (row.meta.isGroupFooter === false) {
-                nodes.push(node);
+        detached={detached}
+        saving={saving}
+        selected={allSelected}
+        onSelectAll={onSelectAll}
+        selectedRows={filter(table, (row: R) => row.meta.selected === true)}
+        onExport={(fields: Field[]) => {
+          if (!isNil(api) && !isNil(columnApi)) {
+            const includeColumn = (col: Column): boolean => {
+              const colDef = col.getColDef();
+              if (!isNil(colDef.field)) {
+                const customCol: Table.Column<R> | undefined = find(columns, {
+                  field: colDef.field
+                } as any);
+                if (!isNil(customCol)) {
+                  return (
+                    customCol.excludeFromExport !== true &&
+                    includes(
+                      map(fields, (field: Field) => field.id),
+                      customCol.field
+                    )
+                  );
+                }
+              }
+              return false;
+            };
+            const cs = filter(columnApi.getAllColumns(), (col: Column) => includeColumn(col));
+            const headerRow: CSVRow = [];
+            forEach(cs, (col: Column) => {
+              const colDef = col.getColDef();
+              if (!isNil(colDef.field)) {
+                headerRow.push(colDef.headerName);
               }
             });
-            e.api.refreshCells({ force: true, rowNodes: nodes, columns: ["expand"] });
+            const csvData: CSVData = [headerRow];
+            api.forEachNode((node: RowNode, index: number) => {
+              const row: CSVRow = [];
+              forEach(cs, (col: Column) => {
+                if (!isNil(node.data)) {
+                  row.push(processCellForExport(col, node.data as R));
+                } else {
+                  row.push("");
+                }
+              });
+              csvData.push(row);
+            });
+            let fileName = "make-me-current-date";
+            if (!isNil(exportFileName)) {
+              fileName = exportFileName;
+            }
+            downloadAsCsvFile(fileName, csvData);
           }
         }}
-        // NOTE: This might not be 100% necessary, because of how efficiently
-        // we are managing the state updates to the data that flows into the table.
-        // However, for now we will leave.  It is important to note that this will
-        // cause the table renders to be slower for large datasets.
-        rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
-        frameworkComponents={frameworkComponents}
-        onPasteStart={onPasteStart}
-        onPasteEnd={onPasteEnd}
-        onCellValueChanged={_onCellValueChanged}
-        fillOperation={(params: FillOperationParams) => {
-          if (params.initialValues.length === 1) {
-            return false;
-          }
-          return params.initialValues[
-            (params.values.length - params.initialValues.length) % params.initialValues.length
-          ];
-        }}
+        onColumnsChange={onColumnsChange}
       />
-    </div>
+      <div className={"table-grid"}>
+        <Grid<R>
+          {...options}
+          columns={map(columns, (col: Table.Column<R>) => includeCellEditorParams(col))}
+          getContextMenuItems={getContextMenuItems}
+          // This is the same as checking if the onGridReady event has fired.
+          rowData={!isNil(api) ? table : []}
+          getRowNodeId={(r: any) => r.id}
+          getRowClass={getRowClass}
+          getRowStyle={getRowStyle}
+          immutableData={true}
+          onGridReady={onGridReady}
+          processDataFromClipboard={processDataFromClipboard}
+          processCellForClipboard={(params: ProcessCellForExportParams) => {
+            if (!isNil(params.node)) {
+              setCutCellChange(null);
+              return processCellForClipboard(params.column, params.node.data as R, params.value);
+            }
+          }}
+          processCellFromClipboard={_processCellFromClipboard}
+          navigateToNextCell={navigateToNextCell}
+          tabToNextCell={tabToNextCell}
+          onCellKeyDown={onCellKeyDown}
+          onFirstDataRendered={onFirstDataRendered}
+          suppressKeyboardEvent={suppressKeyboardEvent}
+          onCellEditingStarted={(event: CellEditingStartedEvent) => {
+            oldRow.current = { ...event.node.data };
+          }}
+          onCellMouseOver={(e: CellMouseOverEvent) => {
+            // In order to hide/show the expand button under certain conditions,
+            // we always need to refresh the expand column whenever another cell
+            // is hovered.  We should figure out if there is a way to optimize
+            // this to only refresh under certain circumstances.
+            const nodes: RowNode[] = [];
+            if (includes(["index", "expand", identifierField], e.colDef.field)) {
+              e.api.forEachNode((node: RowNode) => {
+                const row: R = node.data;
+                if (row.meta.isGroupFooter === false) {
+                  nodes.push(node);
+                }
+              });
+              e.api.refreshCells({ force: true, rowNodes: nodes, columns: ["expand"] });
+            }
+          }}
+          frameworkComponents={frameworkComponents}
+          onPasteStart={onPasteStart}
+          onPasteEnd={onPasteEnd}
+          onCellValueChanged={_onCellValueChanged}
+          fillOperation={(params: FillOperationParams) => {
+            if (params.initialValues.length === 1) {
+              return false;
+            }
+            return params.initialValues[
+              (params.values.length - params.initialValues.length) % params.initialValues.length
+            ];
+          }}
+        />
+      </div>
+    </React.Fragment>
   );
 };
 

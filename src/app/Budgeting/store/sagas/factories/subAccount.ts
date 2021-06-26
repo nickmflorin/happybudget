@@ -20,7 +20,6 @@ export interface SubAccountTasksActionMap<
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
   removeFromState: Redux.ActionCreator<number>;
-  updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<SA>>;
   addToState: Redux.ActionCreator<SA>;
   loading: Redux.ActionCreator<boolean>;
   response: Redux.ActionCreator<Http.ListResponse<SA>>;
@@ -265,26 +264,8 @@ export const createSubAccountTaskSet = <
     const subaccountId = yield select(selectSubAccountId);
     if (!isNil(subaccountId) && !isNil(action.payload)) {
       const merged = consolidateTableChange(action.payload);
-      const data = yield select(selectModels);
-
-      const mergedUpdates: Table.RowChange<R>[] = [];
-      for (let i = 0; i < merged.length; i++) {
-        const model: SA | undefined = find(data, { id: merged[i].id });
-        if (isNil(model)) {
-          warnInconsistentState({
-            action: action.type,
-            reason: "Sub Account does not exist in state when it is expected to.",
-            id: merged[i].id
-          });
-        } else {
-          const updatedModel = manager.mergeChangesWithModel(model, merged[i]);
-          yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel as Partial<SA> }));
-          mergedUpdates.push(merged[i]);
-        }
-      }
-      yield put(actions.budget.request(null));
-      if (mergedUpdates.length !== 0) {
-        yield fork(bulkUpdateTask, mergedUpdates);
+      if (merged.length !== 0) {
+        yield fork(bulkUpdateTask, merged);
       }
     }
   }
