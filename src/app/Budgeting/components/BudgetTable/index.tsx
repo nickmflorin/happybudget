@@ -364,26 +364,10 @@ const BudgetTable = <
 
   const onColumnsChange = useDynamicCallback((fields: Field[]) => {
     if (!isNil(apis.primary) && !isNil(apis.tableFooter) && (!showBudgetFooterGrid || !isNil(apis.budgetFooter))) {
-      // if (!isNil())
-      // if (!isNil(columnApi) && !isNil(tableFooterColumnApi) && (!showBudgetFooterGrid || !isNil(budgetFooterColumnApi))) {
-      //   const cs = tableFooterColumnApi.getAllDisplayedColumns();
-
-      //   forEach(cs, (c: Column) => {
-      //     const def = c.getColSpan(null);
-
-      //     const span = c.colSpan({
-      //       node: null,
-      //       data: {},
-      //       colDef: c.getColDef(),
-      //       column: c,
-      //       api: gridApi,
-      //       columnApi: tableFooterColumnApi,
-      //       context: {}
-      //     });
-      //     console.log(span);
-      //   });
-      //   console.log(tableFooterColumnApi.getAllGridColumns());
-      //   return;
+      // TODO: We need to take into consideration the column spanning, which is what
+      // is causing things to act funky.  To fix this, we should check how the column
+      // spans in each grid and make the decision on setting the visibility based
+      // on that.
       let columnApis = [apis.primary.column, apis.tableFooter.column];
       let gridApis = [apis.primary.grid, apis.tableFooter.grid];
       if (!isNil(apis.budgetFooter)) {
