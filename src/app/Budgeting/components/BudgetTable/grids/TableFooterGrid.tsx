@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { isNil, reduce, filter, map } from "lodash";
+import { isNil, reduce, filter, map, findIndex, includes } from "lodash";
 
-import { GridReadyEvent, FirstDataRenderedEvent } from "@ag-grid-community/core";
+import { ColSpanParams } from "@ag-grid-community/core";
 
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString } from "lib/util";
@@ -9,12 +9,12 @@ import { hashString } from "lib/util";
 import Grid from "./Grid";
 
 const TableFooterGrid = <R extends Table.Row>({
+  onGridReady,
+  onFirstDataRendered,
   identifierField,
   identifierValue,
   options,
-  columns,
-  sizeColumnsToFit,
-  setColumnApi
+  columns
 }: BudgetTable.TableFooterGridProps<R>): JSX.Element => {
   const rowData = useMemo((): R | null => {
     // TODO: Loop over the colDef's after we attribute the Base Columns with isBase = true, so
@@ -48,18 +48,34 @@ const TableFooterGrid = <R extends Table.Row>({
 
   const TableFooterGridColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
     return {
-      ...col
+      ...col,
+      colSpan: (params: ColSpanParams) => {
+        const field = params.column.getColId();
+        if (isNil(field) || includes(["index", "expand"], field)) {
+          return !isNil(col.colSpan) ? col.colSpan(params) : 1;
+        }
+        let startingIndex = 0;
+        if (field !== identifierField) {
+          startingIndex = findIndex(columns, { field } as any);
+          if (startingIndex === -1) {
+            /* eslint-disable no-console */
+            console.error(`Suspicious behavior:  Could not find column for field ${field}.`);
+            return 1;
+          }
+        }
+        // Columns to the right of the identifier column (including the identifier
+        // column).
+        const identifierToRightColumns = filter(
+          columns,
+          (c: Table.Column<R>) => !includes(["index", "expand"], c.field)
+        );
+        const rightIndex = findIndex(identifierToRightColumns, (c: Table.Column<R>) => !isNil(c.tableTotal));
+        if (rightIndex !== -1) {
+          return rightIndex - startingIndex;
+        }
+        return columns.length - startingIndex;
+      }
     };
-  });
-
-  const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    if (sizeColumnsToFit === true) {
-      event.api.sizeColumnsToFit();
-    }
-  });
-
-  const onGridReady = useDynamicCallback((event: GridReadyEvent): void => {
-    setColumnApi(event.columnApi);
   });
 
   return (

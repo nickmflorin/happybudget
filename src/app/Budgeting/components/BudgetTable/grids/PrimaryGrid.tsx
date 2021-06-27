@@ -8,7 +8,6 @@ import {
   CellEditingStoppedEvent,
   GridApi,
   ColumnApi,
-  GridReadyEvent,
   RowNode,
   Column,
   CellKeyDownEvent,
@@ -43,18 +42,16 @@ import Grid from "./Grid";
 
 const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>({
   /* eslint-disable indent */
-  api,
-  columnApi,
+  apis,
+  options,
   data,
   manager,
   ordering,
   groups = [],
-  options,
   columns,
   groupParams,
   frameworkComponents,
   search,
-  sizeColumnsToFit,
   identifierField,
   actions,
   canSearch,
@@ -63,17 +60,17 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   detached,
   saving,
   exportFileName,
+  onGridReady,
   onSearch,
   onColumnsChange,
   isCellEditable,
-  setApi,
-  setColumnApi,
   rowCanExpand,
   onRowExpand,
   onTableChange,
   onRowAdd,
   onRowDelete,
-  onBack
+  onBack,
+  ...props
 }: BudgetTable.PrimaryGridProps<R, M, G>): JSX.Element => {
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
@@ -85,9 +82,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   const [table, setTable] = useState<R[]>([]);
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    if (sizeColumnsToFit === true) {
-      event.api.sizeColumnsToFit();
-    }
+    props.onFirstDataRendered(event);
+
     event.api.ensureIndexVisible(0);
 
     const query = new URLSearchParams(location.search);
@@ -115,18 +111,13 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     }
   });
 
-  const onGridReady = useDynamicCallback((event: GridReadyEvent): void => {
-    setApi(event.api);
-    setColumnApi(event.columnApi);
-  });
-
   /**
    * Starting at the provided index, either traverses the table upwards or downwards
    * until a RowNode that is not used as a group footer is found.
    */
   const findFirstNonGroupFooterRow = useDynamicCallback(
     (startingIndex: number, direction: "asc" | "desc" = "asc"): [RowNode | null, number, number] => {
-      if (!isNil(api)) {
+      if (!isNil(apis)) {
         let runningIndex = 0;
         let noMoreRows = false;
         let nextRowNode: RowNode | null = null;
@@ -136,7 +127,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
             noMoreRows = true;
             break;
           }
-          nextRowNode = api.getDisplayedRowAtIndex(
+          nextRowNode = apis.grid.getDisplayedRowAtIndex(
             direction === "asc" ? startingIndex + runningIndex : startingIndex - runningIndex
           );
           if (isNil(nextRowNode)) {
@@ -163,10 +154,10 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
    */
   const findRowsUpUntilFirstGroupFooterRow = useDynamicCallback((node: RowNode): RowNode[] => {
     const nodes: RowNode[] = [node];
-    if (!isNil(api)) {
+    if (!isNil(apis)) {
       let currentNode: RowNode | null = node;
       while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
-        currentNode = api.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
+        currentNode = apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
         if (!isNil(currentNode)) {
           const row: R = currentNode.data;
           if (row.meta.isGroupFooter === true) {
@@ -221,7 +212,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   });
 
   const tabToNextCell = useDynamicCallback((params: TabToNextCellParams) => {
-    if (!params.editing && !isNil(columnApi) && !isNil(api)) {
+    if (!params.editing && !isNil(apis)) {
       // If the nextCellPosition is null, it means we are at the bottom of the table
       // all the way in the Column furthest to the right.
       if (isNil(params.nextCellPosition)) {
@@ -242,12 +233,12 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           }
 
           if (params.backwards === false) {
-            const identifierCol = columnApi.getColumn(identifierField);
+            const identifierCol = apis.column.getColumn(identifierField);
             if (!isNil(identifierCol)) {
               return { ...nextCellPosition, column: identifierCol };
             }
           } else {
-            const agColumns = columnApi.getAllColumns();
+            const agColumns = apis.column.getAllColumns();
             if (!isNil(agColumns)) {
               return { ...nextCellPosition, column: agColumns[agColumns.length - 1] };
             }
@@ -259,17 +250,17 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   });
 
   const moveToLocation = useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
-    if (!isNil(api)) {
-      api.setFocusedCell(loc.rowIndex, loc.column);
-      api.clearRangeSelection();
+    if (!isNil(apis)) {
+      apis.grid.setFocusedCell(loc.rowIndex, loc.column);
+      apis.grid.clearRangeSelection();
       if (opts.startEdit === true) {
-        api.startEditingCell({ rowIndex: loc.rowIndex, colKey: loc.column });
+        apis.grid.startEditingCell({ rowIndex: loc.rowIndex, colKey: loc.column });
       }
     }
   });
 
   const moveToNextRow = useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
-    if (!isNil(api)) {
+    if (!isNil(apis)) {
       const [node, rowIndex, _] = findFirstNonGroupFooterRow(loc.rowIndex + 1);
       if (node === null) {
         onRowAdd(1);
@@ -279,8 +270,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   });
 
   const moveToNextColumn = useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
-    if (!isNil(api) && !isNil(columnApi)) {
-      const agColumns = columnApi.getAllColumns();
+    if (!isNil(apis)) {
+      const agColumns = apis.column.getAllColumns();
       if (!isNil(agColumns)) {
         const index = agColumns.indexOf(loc.column);
         if (index !== -1) {
@@ -330,8 +321,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   // or the cell below (on Enter completion).  To accomplish this, we use a custom hook
   // to the CellEditor(s) that is manually called inside the CellEditor.
   const onDoneEditing = useDynamicCallback((e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent) => {
-    if (isKeyboardEvent(e) && !isNil(api)) {
-      const focusedCell = api.getFocusedCell();
+    if (isKeyboardEvent(e) && !isNil(apis)) {
+      const focusedCell = apis.grid.getFocusedCell();
       if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
         if (e.code === "Enter") {
           moveToNextRow(focusedCell.rowIndex, focusedCell.column);
@@ -380,13 +371,13 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   const getTableChangesFromRangeClear = useDynamicCallback(
     (range: CellRange, gridApi?: GridApi): Table.CellChange<R>[] => {
       const changes: Table.CellChange<R>[] = [];
-      gridApi = isNil(gridApi) ? gridApi : api;
-      if (!isNil(api) && !isNil(range.startRow) && !isNil(range.endRow)) {
+      if (!isNil(apis) && !isNil(range.startRow) && !isNil(range.endRow)) {
+        gridApi = isNil(gridApi) ? gridApi : apis.grid;
         let colIds: (keyof R)[] = map(range.columns, (col: Column) => col.getColId() as keyof R);
         let startRowIndex = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
         let endRowIndex = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
         for (let i = startRowIndex; i <= endRowIndex; i++) {
-          const node: RowNode | null = api.getDisplayedRowAtIndex(i);
+          const node: RowNode | null = apis.grid.getDisplayedRowAtIndex(i);
           if (!isNil(node)) {
             const row: R = node.data;
             /* eslint-disable no-loop-func */
@@ -622,9 +613,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   };
 
   const processDataFromClipboard = useDynamicCallback((params: ProcessDataFromClipboardParams) => {
-    if (!isNil(api) && !isNil(columnApi)) {
-      const lastIndex = api.getDisplayedRowCount();
-      const focusedCell = api.getFocusedCell();
+    if (!isNil(apis)) {
+      const lastIndex = apis.grid.getDisplayedRowCount();
+      const focusedCell = apis.grid.getFocusedCell();
       if (!isNil(focusedCell)) {
         if (focusedCell.rowIndex + params.data.length - 1 > lastIndex) {
           const resultLastIndex = focusedCell.rowIndex + params.data.length;
@@ -639,7 +630,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
             currIndex--;
           }
           rowsToAdd = rowsToAdd.reverse();
-          const newRows: R[] = map(rowsToAdd, (r: any[]) => recreateRowFromDataArray(columnApi, r, focusedCell.column));
+          const newRows: R[] = map(rowsToAdd, (r: any[]) =>
+            recreateRowFromDataArray(apis.column, r, focusedCell.column)
+          );
           onRowAdd(newRows);
         }
       }
@@ -648,8 +641,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   });
 
   const getFirstEditableDisplayedColumn = useDynamicCallback((): Column | null => {
-    if (!isNil(columnApi)) {
-      const displayedColumns = columnApi.getAllDisplayedColumns();
+    if (!isNil(apis)) {
+      const displayedColumns = apis.column.getAllDisplayedColumns();
       if (!isNil(displayedColumns)) {
         for (let i = 0; i < displayedColumns.length; i++) {
           const displayedColumn = displayedColumns[i];
@@ -744,12 +737,12 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   }, [data, groups, ordering]);
 
   useEffect(() => {
-    if (focused === false && !isNil(api)) {
+    if (focused === false && !isNil(apis)) {
       const firstEditableCol = getFirstEditableDisplayedColumn();
       if (!isNil(firstEditableCol)) {
-        api.ensureIndexVisible(0);
-        api.ensureColumnVisible(firstEditableCol);
-        setTimeout(() => api.setFocusedCell(0, firstEditableCol), 0);
+        apis.grid.ensureIndexVisible(0);
+        apis.grid.ensureColumnVisible(firstEditableCol);
+        setTimeout(() => apis.grid.setFocusedCell(0, firstEditableCol), 0);
         // TODO: Investigate if there is a better way to do this - currently,
         // this hook is getting triggered numerous times when it shouldn't be.
         // It is because the of the `columns` in the dependency array, which
@@ -758,13 +751,13 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
         setFocused(true);
       }
     }
-  }, [columnApi, api, focused]);
+  }, [apis, focused]);
 
   useEffect(() => {
-    if (!isNil(api)) {
-      api.setQuickFilter(search);
+    if (!isNil(apis)) {
+      apis.grid.setQuickFilter(search);
     }
-  }, [search, api]);
+  }, [search, apis]);
 
   useEffect(() => {
     // When first rendering, it is possible that the groups are not present from
@@ -772,15 +765,15 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     // no groups and not allow the group to be edited.  We need to force refresh
     // the identifier column when the groups change, so that those cell renderers
     // have access to the groups when they populate.
-    if (!isNil(api) && !isNil(columnApi)) {
+    if (!isNil(apis)) {
       const nodes: RowNode[] = [];
-      api.forEachNode((node: RowNode) => {
+      apis.grid.forEachNode((node: RowNode) => {
         const row: R = node.data;
         if (row.meta.isGroupFooter === true) {
           nodes.push(node);
         }
       });
-      const cols = columnApi.getAllColumns();
+      const cols = apis.column.getAllColumns();
       const identifierCol = find(cols, (col: Column) => {
         const def = col.getColDef();
         if (def.field === identifierField) {
@@ -789,10 +782,10 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
         return false;
       });
       if (nodes.length !== 0 && !isNil(identifierCol)) {
-        api.refreshCells({ force: true, rowNodes: nodes, columns: [identifierCol] });
+        apis.grid.refreshCells({ force: true, rowNodes: nodes, columns: [identifierCol] });
       }
     }
-  }, [useDeepEqualMemo(groups), api, columnApi]);
+  }, [useDeepEqualMemo(groups), apis]);
 
   const moveDownKeyListener = useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
     const ctrlCmdPressed = e.ctrlKey || e.metaKey;
@@ -819,10 +812,10 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
 
   useEffect(() => {
     const keyListeners = [moveDownKeyListener, moveUpKeyListener];
-    if (!isNil(api)) {
+    if (!isNil(apis)) {
       const instantiatedListeners: ((e: KeyboardEvent) => void)[] = [];
       for (let i = 0; i < keyListeners.length; i++) {
-        const listener = (e: KeyboardEvent) => keyListeners[i](api, e);
+        const listener = (e: KeyboardEvent) => keyListeners[i](apis.grid, e);
         window.addEventListener("keydown", listener);
         instantiatedListeners.push(listener);
       }
@@ -832,7 +825,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
         }
       };
     }
-  }, [api]);
+  }, [apis]);
 
   const _processCellFromClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
     if (!isNil(params.node)) {
@@ -905,11 +898,11 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   });
 
   const onCellValueChanged = useDynamicCallback((params: Table.CellValueChangedParams<R>) => {
-    if (!isNil(api) && !isNil(columnApi) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
-      const col = columnApi.getColumn("expand");
+    if (!isNil(apis) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
+      const col = apis.column.getColumn("expand");
       if (!isNil(col)) {
         if (isNil(params.oldRow) || rowCanExpand(params.oldRow) !== rowCanExpand(params.row)) {
-          api.refreshCells({ force: true, rowNodes: [params.node], columns: [col] });
+          apis.grid.refreshCells({ force: true, rowNodes: [params.node], columns: [col] });
         }
       }
     }
@@ -921,10 +914,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
 
   return (
     <React.Fragment>
-      {!isNil(api) && !isNil(columnApi) && (
+      {!isNil(apis) && (
         <BudgetTableMenu<R>
-          api={api}
-          columnApi={columnApi}
+          apis={apis}
           actions={actions}
           search={search}
           onSearch={onSearch}
@@ -935,7 +927,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           detached={detached}
           saving={saving}
           onExport={(fields: Field[]) => {
-            if (!isNil(api) && !isNil(columnApi)) {
+            if (!isNil(apis)) {
               const includeColumn = (col: Column): boolean => {
                 const colDef = col.getColDef();
                 if (!isNil(colDef.field)) {
@@ -954,7 +946,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
                 }
                 return false;
               };
-              const cs = filter(columnApi.getAllColumns(), (col: Column) => includeColumn(col));
+              const cs = filter(apis.column.getAllColumns(), (col: Column) => includeColumn(col));
               const headerRow: CSVRow = [];
               forEach(cs, (col: Column) => {
                 const colDef = col.getColDef();
@@ -963,7 +955,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
                 }
               });
               const csvData: CSVData = [headerRow];
-              api.forEachNode((node: RowNode, index: number) => {
+              apis.grid.forEachNode((node: RowNode, index: number) => {
                 const row: CSVRow = [];
                 forEach(cs, (col: Column) => {
                   if (!isNil(node.data)) {
@@ -990,7 +982,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           columns={map(columns, (col: Table.Column<R>) => includeCellEditorParams(col))}
           getContextMenuItems={getContextMenuItems}
           // This is the same as checking if the onGridReady event has fired.
-          rowData={!isNil(api) ? table : []}
+          rowData={!isNil(apis) ? table : []}
           getRowNodeId={(r: any) => r.id}
           getRowClass={getRowClass}
           getRowStyle={getRowStyle}

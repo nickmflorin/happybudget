@@ -55,6 +55,11 @@ namespace Table {
     readonly editorIsPopup?: boolean;
   }
 
+  type APIs = {
+    readonly grid: import("@ag-grid-community/core").GridApi;
+    readonly column: import("@ag-grid-community/core").ColumnApi;
+  };
+
   interface Column<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
     readonly type: ColumnTypeId;
     readonly nullValue?: null | "" | 0 | [];
@@ -325,14 +330,12 @@ namespace BudgetTable {
   }
 
   interface MenuActionParams<R extends Table.Row> {
-    readonly api: import("@ag-grid-community/core").GridApi;
-    readonly columnApi: import("@ag-grid-community/core").ColumnApi;
+    readonly apis: Table.APIs;
     readonly columns: Table.Column<R>[];
   }
 
   interface MenuProps<R extends Table.Row> {
-    readonly api: import("@ag-grid-community/core").GridApi;
-    readonly columnApi: import("@ag-grid-community/core").ColumnApi;
+    readonly apis: Table.APIs;
     readonly columns: Table.Column<R>[];
     readonly actions?:
       | ((params: BudgetTable.MenuActionParams<R>) => BudgetTable.MenuAction[])
@@ -358,23 +361,23 @@ namespace BudgetTable {
     readonly columns: Table.Column<R>[];
   }
 
-  interface BudgetFooterGridProps<R extends Table.Row> {
-    readonly options: GridOptions;
+  interface SpecificGridProps {
+    readonly apis: Table.APIs | null;
+    readonly onFirstDataRendered: (e: import("ag-grid-community/core").FirstDataRenderedEvent) => void;
+    readonly onGridReady: (event: import("@ag-grid-community/core").GridReadyEvent) => void;
+    readonly options?: import("@ag-grid-community/core").GridOptions;
     readonly columns: Table.Column<R>[];
+  }
+
+  interface BudgetFooterGridProps<R extends Table.Row> extends SpecificGridProps {
     readonly identifierField: string;
     readonly identifierValue?: string | null;
     readonly loadingBudget?: boolean | undefined;
-    readonly sizeColumnsToFit?: boolean | undefined;
-    readonly setColumnApi: (api: import("@ag-grid-community/core").ColumnApi) => void;
   }
 
-  interface TableFooterGridProps<R extends Table.Row> {
-    readonly options: import("@ag-grid-community/core").GridOptions;
-    readonly columns: Table.Column<R>[];
+  interface TableFooterGridProps<R extends Table.Row> extends SpecificGridProps {
     readonly identifierField: string;
     readonly identifierValue?: string | null;
-    readonly sizeColumnsToFit?: boolean | undefined;
-    readonly setColumnApi: (api: import("@ag-grid-community/core").ColumnApi) => void;
   }
 
   // Props provided to the BudgetTable that are passed directly through to the PrimaryGrid.
@@ -387,7 +390,6 @@ namespace BudgetTable {
     readonly groups?: G[];
     readonly groupParams?: BudgetTable.GroupProps<R, G>;
     readonly frameworkComponents?: { [key: string]: any };
-    readonly sizeColumnsToFit?: boolean | undefined;
     readonly search?: string;
     readonly identifierField: string;
     readonly columns: Table.Column<R>[];
@@ -405,14 +407,10 @@ namespace BudgetTable {
 
   interface PrimaryGridProps<R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>
     extends BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
-      Omit<BudgetTable.MenuProps<R>, "columns" | "onExport" | "onDelete"> {
-    readonly api: import("@ag-grid-community/core").GridApi | undefined;
-    readonly columnApi: import("@ag-grid-community/core").ColumnApi | undefined;
-    readonly options: import("@ag-grid-community/core").GridOptions;
+      Omit<BudgetTable.MenuProps<R>, "columns" | "onExport" | "onDelete" | "apis">,
+      SpecificGridProps {
     readonly ordering: FieldOrder<keyof R>[];
     readonly isCellEditable: (row: R, colDef: Table.Column<R>) => boolean;
-    readonly setApi: (api: import("@ag-grid-community/core").GridApi) => void;
-    readonly setColumnApi: (api: import("@ag-grid-community/core").ColumnApi) => void;
   }
 
   interface Props<
@@ -420,8 +418,7 @@ namespace BudgetTable {
     M extends Model.Model,
     G extends Model.Group = Model.Group,
     P extends Http.ModelPayload<M> = Http.ModelPayload<M>
-  > extends Omit<import("@ag-grid-community/core").GridOptions, "frameworkComponents">,
-      Omit<BudgetTable.MenuProps<R>, "columns" | "onColumnsChange" | "onExport" | "onDelete">,
+  > extends Omit<BudgetTable.MenuProps<R>, "columns" | "onColumnsChange" | "onExport" | "onDelete" | "apis">,
       BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
       StandardComponentProps {
     readonly identifierFieldHeader: string;

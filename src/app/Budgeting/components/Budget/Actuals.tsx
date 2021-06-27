@@ -132,7 +132,7 @@ const Actuals = (): JSX.Element => {
               tooltip: "Delete",
               icon: <FontAwesomeIcon icon={faTrashAlt} />,
               onClick: () => {
-                const rows: BudgetTable.ActualRow[] = params.api.getSelectedRows();
+                const rows: BudgetTable.ActualRow[] = params.apis.grid.getSelectedRows();
                 dispatch(actions.deleteActualsAction(map(rows, (row: BudgetTable.ActualRow) => row.id)));
               }
             }

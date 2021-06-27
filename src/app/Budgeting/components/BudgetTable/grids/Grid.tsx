@@ -37,7 +37,6 @@ const Grid = <R extends Table.Row = Table.Row>({
         return original;
       })}
       debug={process.env.NODE_ENV === "development" && TABLE_DEBUG}
-      /* @ts-ignore */
       modules={AllModules}
       overlayNoRowsTemplate={"<span></span>"}
       overlayLoadingTemplate={"<span></span>"}

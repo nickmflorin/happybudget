@@ -15,8 +15,7 @@ import { FieldMenuField } from "components/menus/FieldsMenu";
 import { PortalOrRender } from "components/layout";
 
 const BudgetTableMenu = <R extends Table.Row>({
-  api,
-  columnApi,
+  apis,
   actions,
   search,
   saving = false,
@@ -36,7 +35,7 @@ const BudgetTableMenu = <R extends Table.Row>({
           <Tooltip title={"Select All"} placement={"bottom"}>
             <Checkbox
               onChange={(e: CheckboxChangeEvent) => {
-                api.forEachNode((node: RowNode) => {
+                apis.grid.forEachNode((node: RowNode) => {
                   const row: R = node.data;
                   if (
                     row.meta.isGroupFooter === false &&
@@ -52,7 +51,7 @@ const BudgetTableMenu = <R extends Table.Row>({
           {!isNil(actions) && (
             <div className={"toolbar-buttons"}>
               {map(
-                Array.isArray(actions) ? actions : actions({ api, columnApi, columns }),
+                Array.isArray(actions) ? actions : actions({ apis, columns }),
                 (action: BudgetTable.MenuAction, index: number) => {
                   return (
                     <IconButton

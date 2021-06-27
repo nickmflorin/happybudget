@@ -59,7 +59,6 @@ const GenericSubAccountsTable = <
 }: GenericSubAccountsTableProps<R, M, G>): JSX.Element => {
   return (
     <BudgetTableComponent<R, M, G, Http.SubAccountPayload>
-      sizeColumnsToFit={false}
       identifierField={"identifier"}
       identifierFieldHeader={identifierFieldHeader}
       identifierColumn={{
@@ -87,7 +86,7 @@ const GenericSubAccountsTable = <
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
           onClick: () => {
-            const rows: R[] = params.api.getSelectedRows();
+            const rows: R[] = params.apis.grid.getSelectedRows();
             props.onRowDelete(map(rows, (row: R) => row.id));
           }
         },

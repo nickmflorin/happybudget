@@ -1,21 +1,23 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, forEach, filter } from "lodash";
+import { map, isNil, includes, find, concat, filter } from "lodash";
 import Cookies from "universal-cookie";
 
 import {
   ColDef,
   CellClassParams,
-  GridApi,
   EditableCallbackParams,
+  GridReadyEvent,
   ColumnApi,
   ColSpanParams,
   GridOptions,
-  CheckboxSelectionCallbackParams
+  GridApi,
+  CheckboxSelectionCallbackParams,
+  FirstDataRenderedEvent
 } from "@ag-grid-community/core";
 
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
-import { WrapInApplicationSpinner } from "components";
+import { WrapInApplicationSpinner, ShowHide } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { updateFieldOrdering } from "lib/util";
 import { currencyValueFormatter } from "lib/model/formatters";
@@ -75,20 +77,14 @@ const BudgetTable = <
 >({
   /* eslint-disable indent */
   columns,
-  data,
-  actions,
   className,
   style = {},
+  groupParams,
   groups = [],
-  manager,
-  search,
   loading,
   loadingBudget,
-  saving,
-  frameworkComponents = {},
   exportFileName,
   nonEditableCells,
-  groupParams,
   cookies,
   identifierField,
   identifierFieldHeader,
@@ -98,39 +94,35 @@ const BudgetTable = <
   indexColumn = {},
   tableFooterIdentifierValue = "Grand Total",
   budgetFooterIdentifierValue = "Budget Total",
-  sizeColumnsToFit = true,
-  canSearch = true,
-  canExport = true,
-  canToggleColumns = true,
-  detached = false,
   rowCanExpand,
   cellClass,
-  onSearch,
-  onTableChange,
   onRowAdd,
-  onRowDelete,
   onRowExpand,
-  onBack,
   isCellEditable,
   isCellSelectable,
-  ...options
+  ...props
 }: BudgetTable.Props<R, M, G, P>) => {
   const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
-  const [gridApi, setGridApi] = useState<GridApi | undefined>(undefined);
-  const [columnApi, setColumnApi] = useState<ColumnApi | undefined>(undefined);
+  const [apis, _setApis] = useState<BudgetTable.GridSet<Table.APIs | null>>({
+    primary: null,
+    tableFooter: null,
+    budgetFooter: null
+  });
+  const setApis = (id: BudgetTable.GridId) => (gridApis: Table.APIs) => {
+    _setApis({ ...apis, [id]: gridApis });
+  };
+
   const [cols, setCols] = useState<Table.Column<R>[]>([]);
-  const [tableFooterColumnApi, setTableFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
-  const [budgetFooterColumnApi, setBudgetFooterColumnApi] = useState<ColumnApi | undefined>(undefined);
 
   const gridOptions = useMemo((): BudgetTable.GridSet<GridOptions> => {
     let budgetFooter: GridOptions = { ...DefaultBudgetFooterGridOptions, alignedGrids: [] };
     let tableFooter: GridOptions = { ...DefaultTableFooterGridOptions, alignedGrids: [] };
-    const primary: GridOptions = { ...DefaultGridOptions, ...options, alignedGrids: [budgetFooter, tableFooter] };
+    const primary: GridOptions = { ...DefaultGridOptions, alignedGrids: [budgetFooter, tableFooter] };
 
     tableFooter = { ...tableFooter, alignedGrids: [budgetFooter, primary] };
     budgetFooter = { ...tableFooter, alignedGrids: [tableFooter, primary] };
     return { primary, tableFooter, budgetFooter };
-  }, [options]);
+  }, []);
 
   const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R>): boolean => {
     if (includes(["index", "expand"], colDef.field)) {
@@ -165,6 +157,10 @@ const BudgetTable = <
     }
     return true;
   });
+
+  const showBudgetFooterGrid = useMemo(() => {
+    return filter(columns, (col: Table.Column<R>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !== 0;
+  }, []);
 
   const onSort = useDynamicCallback<void>((order: Order, field: keyof R) => {
     const newOrdering = updateFieldOrdering(ordering, field, order);
@@ -366,81 +362,95 @@ const BudgetTable = <
     );
   }, [useDeepEqualMemo(columns), baseColumns]);
 
+  const onColumnsChange = useDynamicCallback((fields: Field[]) => {
+    if (!isNil(apis.primary) && !isNil(apis.tableFooter) && (!showBudgetFooterGrid || !isNil(apis.budgetFooter))) {
+      // if (!isNil())
+      // if (!isNil(columnApi) && !isNil(tableFooterColumnApi) && (!showBudgetFooterGrid || !isNil(budgetFooterColumnApi))) {
+      //   const cs = tableFooterColumnApi.getAllDisplayedColumns();
+
+      //   forEach(cs, (c: Column) => {
+      //     const def = c.getColSpan(null);
+
+      //     const span = c.colSpan({
+      //       node: null,
+      //       data: {},
+      //       colDef: c.getColDef(),
+      //       column: c,
+      //       api: gridApi,
+      //       columnApi: tableFooterColumnApi,
+      //       context: {}
+      //     });
+      //     console.log(span);
+      //   });
+      //   console.log(tableFooterColumnApi.getAllGridColumns());
+      //   return;
+      let columnApis = [apis.primary.column, apis.tableFooter.column];
+      let gridApis = [apis.primary.grid, apis.tableFooter.grid];
+      if (!isNil(apis.budgetFooter)) {
+        columnApis = [...columnApis, apis.budgetFooter.column];
+        gridApis = [...gridApis, apis.budgetFooter.grid];
+      }
+      map(columns, (col: Table.Column<R>) => {
+        let visible = false;
+        const associatedField = find(fields, { id: col.field });
+        if (!isNil(associatedField)) {
+          visible = true;
+        }
+        map(columnApis, (api: ColumnApi) => api.setColumnVisible(col.field, visible));
+      });
+      map(gridApis, (api: GridApi) => api.sizeColumnsToFit());
+    }
+  });
+
+  const onGridReady = useDynamicCallback((id: BudgetTable.GridId, gridApis: Table.APIs) => {
+    setApis(id)(gridApis);
+  });
+
+  const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
+    event.api.sizeColumnsToFit();
+  });
+
   return (
     <WrapInApplicationSpinner hideWhileLoading={false} loading={loading}>
       <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
         <PrimaryGrid<R, M, G>
-          api={gridApi}
-          columnApi={columnApi}
+          apis={apis.primary}
+          onGridReady={(e: GridReadyEvent) => onGridReady("primary", { grid: e.api, column: e.columnApi })}
+          onFirstDataRendered={onFirstDataRendered}
           identifierField={identifierField}
-          data={data}
-          saving={saving}
-          manager={manager}
           columns={cols}
-          detached={detached}
           options={gridOptions.primary}
-          groups={groups}
           ordering={ordering}
-          groupParams={groupParams}
-          frameworkComponents={frameworkComponents}
-          sizeColumnsToFit={sizeColumnsToFit}
-          actions={actions}
-          search={search}
-          canExport={canExport}
-          canSearch={canSearch}
-          canToggleColumns={canToggleColumns}
-          onSearch={onSearch}
-          setApi={setGridApi}
-          setColumnApi={setColumnApi}
           isCellEditable={_isCellEditable}
           onRowExpand={onRowExpand}
           rowCanExpand={rowCanExpand}
-          onTableChange={onTableChange}
           onRowAdd={onRowAdd}
-          onRowDelete={onRowDelete}
-          onBack={onBack}
-          onColumnsChange={(fields: Field[]) => {
-            if (!isNil(columnApi) && !isNil(tableFooterColumnApi) && !isNil(budgetFooterColumnApi)) {
-              forEach(columns, (col: Table.Column<R>) => {
-                if (!isNil(col.field)) {
-                  const associatedField = find(fields, { id: col.field });
-                  if (!isNil(associatedField)) {
-                    columnApi.setColumnVisible(col.field, true);
-                    tableFooterColumnApi.setColumnVisible(col.field, true);
-                    budgetFooterColumnApi.setColumnVisible(col.field, true);
-                  } else {
-                    columnApi.setColumnVisible(col.field, false);
-                    tableFooterColumnApi.setColumnVisible(col.field, false);
-                    budgetFooterColumnApi.setColumnVisible(col.field, false);
-                  }
-                }
-              });
-              if (!isNil(gridApi)) {
-                gridApi.sizeColumnsToFit();
-              }
-            }
-          }}
+          groups={groups}
+          groupParams={groupParams}
+          onColumnsChange={onColumnsChange}
+          {...props}
         />
         <TableFooterGrid<R>
+          apis={apis.tableFooter}
+          onGridReady={(e: GridReadyEvent) => onGridReady("tableFooter", { grid: e.api, column: e.columnApi })}
+          onFirstDataRendered={onFirstDataRendered}
           options={gridOptions.tableFooter}
           columns={cols}
-          sizeColumnsToFit={sizeColumnsToFit}
           identifierField={identifierField}
           identifierValue={tableFooterIdentifierValue}
-          setColumnApi={setTableFooterColumnApi}
         />
-        {filter(columns, (col: Table.Column<R>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !==
-          0 && (
+        <ShowHide show={showBudgetFooterGrid}>
           <BudgetFooterGrid<R>
+            apis={apis.budgetFooter}
+            onGridReady={(e: GridReadyEvent) => onGridReady("budgetFooter", { grid: e.api, column: e.columnApi })}
+            onFirstDataRendered={onFirstDataRendered}
             options={gridOptions.budgetFooter}
             columns={cols}
-            sizeColumnsToFit={sizeColumnsToFit}
             identifierField={identifierField}
             identifierValue={budgetFooterIdentifierValue}
             loadingBudget={loadingBudget}
-            setColumnApi={setBudgetFooterColumnApi}
           />
-        )}
+        </ShowHide>
       </div>
     </WrapInApplicationSpinner>
   );

@@ -56,7 +56,7 @@ const GenericAccountsTable = <
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
           onClick: () => {
-            const rows: R[] = params.api.getSelectedRows();
+            const rows: R[] = params.apis.grid.getSelectedRows();
             props.onRowDelete(map(rows, (row: R) => row.id));
           }
         },

@@ -1,8 +1,6 @@
 import { useMemo } from "react";
 import { map, isNil, filter, reduce } from "lodash";
 
-import { GridReadyEvent, FirstDataRenderedEvent } from "@ag-grid-community/core";
-
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { hashString } from "lib/util";
 
@@ -14,8 +12,8 @@ const BudgetFooterGrid = <R extends Table.Row>({
   options,
   columns,
   loadingBudget,
-  sizeColumnsToFit,
-  setColumnApi
+  onGridReady,
+  onFirstDataRendered
 }: BudgetTable.BudgetFooterGridProps<R>): JSX.Element => {
   const rowData = useMemo((): R | null => {
     let fieldsLoading: string[] = [];
@@ -57,16 +55,6 @@ const BudgetFooterGrid = <R extends Table.Row>({
     return {
       ...col
     };
-  });
-
-  const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    if (sizeColumnsToFit === true) {
-      event.api.sizeColumnsToFit();
-    }
-  });
-
-  const onGridReady = useDynamicCallback((event: GridReadyEvent): void => {
-    setColumnApi(event.columnApi);
   });
 
   return (

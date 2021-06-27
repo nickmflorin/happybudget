@@ -47,7 +47,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
           tooltip: "Delete",
           icon: <FontAwesomeIcon icon={faTrashAlt} />,
           onClick: () => {
-            const rows: BudgetTable.FringeRow[] = params.api.getSelectedRows();
+            const rows: BudgetTable.FringeRow[] = params.apis.grid.getSelectedRows();
             props.onRowDelete(map(rows, (row: BudgetTable.FringeRow) => row.id));
           }
         }
