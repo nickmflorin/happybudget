@@ -73,6 +73,9 @@ $dropdown-border-radius: 8px;
       padding-right: 0px;
     }
   }
+  .ant-menu-title-content {
+    display: flex;
+  }
 }
 
 .ag-theme-alpine .ag-popup-editor {
@@ -94,10 +97,11 @@ $dropdown-border-radius: 8px;
 
 .dropdown-menu {
   @extend .menu-base;
+  display: flex;
+  flex-direction: column;
 
   .dropdown-menu-item {
     @extend .menu-item-base;
-    display: flex;
 
     .icon {
       display: block;
