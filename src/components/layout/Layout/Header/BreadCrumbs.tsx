@@ -97,6 +97,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
         <Dropdown
           visible={dropdownVisible}
           trigger={["click"]}
+          overlayClassName={"bread-crumb-dropdown"}
           items={map(
             orderBy(item.options, (obj: IBreadCrumbItemOption) => obj.id),
             (obj: any) => {
