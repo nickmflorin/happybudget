@@ -271,6 +271,9 @@ $table-border: 1px solid $table-border-color;
       background-color: $gray-highlight !important;
       div[role="gridcell"] {
         background-color: $gray-highlight;
+        &.cell--not-editable-highlight {
+          background-color: $gray-highlight !important;
+        }
       }
       &.row--table-footer {
         div[role="gridcell"] {
