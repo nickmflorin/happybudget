@@ -45,6 +45,12 @@ export const formatCurrency = (value: string | number): string => {
 };
 
 export const formatCurrencyWithoutDollarSign = (value: string | number): string => {
+  if (Math.sign(value as number) < 0) {
+    const removeAllSymbols = formatCurrency(value).slice(2);
+    const negativeValue = `-${removeAllSymbols}`;
+    return negativeValue;
+    // return removeSymbols;
+  }
   return formatCurrency(value).slice(1);
 };
 
