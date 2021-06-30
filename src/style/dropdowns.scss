@@ -6,6 +6,8 @@ $dropdown-border-radius: 8px;
 .dropdown-base {
   border: none;
   background-clip: padding-box !important;
+  background-color: $white;
+  // border-radius: $dropdown-border-radius;
 }
 
 .menu-base {
@@ -24,14 +26,6 @@ $dropdown-border-radius: 8px;
   line-height: 24px;
   height: 36px;
   margin-bottom: 0px !important;
-
-  &:first-child {
-    border-radius: $dropdown-border-radius $dropdown-border-radius 0 0;
-  }
-
-  &:last-child {
-    border-radius: 0 0 $dropdown-border-radius $dropdown-border-radius;
-  }
 
   &.ant-menu-item-selected {
     background-color: $white;
@@ -64,6 +58,11 @@ $dropdown-border-radius: 8px;
   @extend .menu-base;
   .ant-menu-item {
     @extend .menu-item-base;
+
+    .ant-menu-title-content {
+      display: flex;
+      flex-direction: row;
+    }
   }
 }
 
@@ -74,7 +73,7 @@ $dropdown-border-radius: 8px;
   border: 1px solid #efefef !important;
 
   .ant-menu {
-    // border-radius: 0px !important;
+    border-radius: 0px !important;
 
     &.ant-menu-inline,
     &.ant-menu-vertical,
