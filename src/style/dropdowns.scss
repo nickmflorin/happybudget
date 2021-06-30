@@ -63,6 +63,15 @@ $dropdown-border-radius: 8px;
       display: flex;
       flex-direction: row;
     }
+
+    .ant-checkbox-wrapper {
+      height: 24px;
+      width: 24px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      padding-left: 0px;
+      padding-right: 0px;
+    }
   }
 }
 
