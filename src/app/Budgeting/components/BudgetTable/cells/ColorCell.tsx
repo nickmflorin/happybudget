@@ -2,13 +2,13 @@ import { Color } from "components/tagging";
 import Cell, { StandardCellProps } from "./Cell";
 
 interface ColorCellProps extends StandardCellProps<any> {
-  value: string | null;
+  children: string | null;
 }
 
-const ColorCell = ({ value, ...props }: ColorCellProps): JSX.Element => {
+const ColorCell = ({ children, ...props }: ColorCellProps): JSX.Element => {
   return (
     <Cell {...props}>
-      <Color color={value} />
+      <Color color={children} />
     </Cell>
   );
 };
