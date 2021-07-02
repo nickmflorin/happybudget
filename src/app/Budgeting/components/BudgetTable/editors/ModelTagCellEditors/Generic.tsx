@@ -29,6 +29,7 @@ const ModelTagCellEditor = <M extends Model.Model>(props: PrivateModelTagCellEdi
       menuRef={editor.menuRef}
       autoFocusMenu={true}
       focusSearchOnCharPress={true}
+      defaultFocusFirstItem={false}
     />
   );
 };

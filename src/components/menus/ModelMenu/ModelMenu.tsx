@@ -326,29 +326,71 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
         // If we are not already in the index focused state, first check to see
         // if there is a selection (i.e. value) - in which case, we will set the
         // index based on that value.
-        let setIndexToModel = setIndexFromSelectedState(selected);
+        let setIndexFromSelected = setIndexFromSelectedState(selected);
 
-        // If we cannot set the index based on a selected value, check to see if
-        // there is a prop that returns the first model that we should select.
-        if (setIndexToModel === false && !isNil(props.getFirstSearchResult)) {
-          const firstModel = props.getFirstSearchResult(models);
-          if (!isNil(firstModel)) {
-            const index = models.indexOf(firstModel);
-            if (!isNil(index)) {
-              setIndexToModel = true;
-              setState({ focused: true, index: index });
+        if (setIndexFromSelected === false) {
+          // If we cannot set the index based on a selected value, check to see if
+          // there is a prop that returns the first model that we should select.
+          let setIndexFromSearch = false;
+          if (!isNil(props.getFirstSearchResult)) {
+            const firstModel = props.getFirstSearchResult(models);
+            if (!isNil(firstModel)) {
+              const index = models.indexOf(firstModel);
+              if (!isNil(index)) {
+                setIndexFromSearch = true;
+                setState({ focused: true, index: index });
+              }
             }
           }
-        }
-
-        // If we could not infer the index based on a selected model or the prop callback,
-        // set to the first index.
-        if (setIndexToModel === false) {
-          setState({ focused: true, index: 0 });
+          // If we could not infer the index based on a selected model or the prop callback,
+          // set to the first index if there is a search.
+          if (setIndexFromSearch === false && props.search !== "") {
+            setState({ focused: true, index: 0 });
+          } else {
+            setState({ focused: false });
+          }
         }
       }
     }
-  }, [props.models, models]);
+  }, [props.models, models, props.search]);
+
+  useEffect(() => {
+    if (isModelIndexFocusedState(state)) {
+      scrollIndexIntoView(state.index);
+    }
+  }, [state]);
+
+  useEffect(() => {
+    if (props.defaultFocusFirstItem === true && firstRender === true && models.length !== 0 && selected.length === 0) {
+      setState({ focused: true, index: 0 });
+    }
+  }, [props.defaultFocusFirstItem, useDeepEqualMemo(models)]);
+
+  // If there is only one model that is visible, either from a search or from only
+  // 1 model being present, we may want it to be active/selected by default.
+  useEffect(() => {
+    if (
+      ((models.length === 1 && props.defaultFocusOnlyItem === true) ||
+        (props.defaultFocusOnlyItemOnSearch && !isNil(props.search) && props.search !== "")) &&
+      firstRender === false
+    ) {
+      setState({ focused: true, index: 0 });
+    }
+  }, [useDeepEqualMemo(models), props.search, props.defaultFocusOnlyItemOnSearch, props.defaultFocusOnlyItem]);
+
+  const incrementFocusedIndex = () => {
+    if (isFocusedState(state) || props.autoFocus === true) {
+      if (isModelIndexFocusedState(state)) {
+        if (state.index + 1 < models.length) {
+          setState({ focused: true, index: state.index + 1 });
+        } else {
+          if (!isNil(props.bottomItem)) {
+            setState({ focused: true, bottomItemActive: true });
+          }
+        }
+      }
+    }
+  };
 
   const scrollIndexIntoView = (index: number) => {
     // TODO: We have to account for the non-model items.
@@ -365,26 +407,6 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
           menu.scrollTop -= top - itemTop;
         } else if (itemBottom > bottom) {
           menu.scrollTop += itemBottom - bottom;
-        }
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (isModelIndexFocusedState(state)) {
-      scrollIndexIntoView(state.index);
-    }
-  }, [state]);
-
-  const incrementFocusedIndex = () => {
-    if (isFocusedState(state) || props.autoFocus === true) {
-      if (isModelIndexFocusedState(state)) {
-        if (state.index + 1 < models.length) {
-          setState({ focused: true, index: state.index + 1 });
-        } else {
-          if (!isNil(props.bottomItem)) {
-            setState({ focused: true, bottomItemActive: true });
-          }
         }
       }
     }
@@ -468,24 +490,6 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
       decrementFocusedIndex();
     }
   });
-
-  useEffect(() => {
-    if (props.defaultFocusFirstItem === true && firstRender === true && models.length !== 0 && selected.length === 0) {
-      setState({ focused: true, index: 0 });
-    }
-  }, [props.defaultFocusFirstItem, useDeepEqualMemo(models)]);
-
-  // If there is only one model that is visible, either from a search or from only
-  // 1 model being present, we may want it to be active/selected by default.
-  useEffect(() => {
-    if (
-      ((models.length === 1 && props.defaultFocusOnlyItem === true) ||
-        (props.defaultFocusOnlyItemOnSearch && !isNil(props.search) && props.search !== "")) &&
-      firstRender === false
-    ) {
-      setState({ focused: true, index: 0 });
-    }
-  }, [useDeepEqualMemo(models), props.search, props.defaultFocusOnlyItemOnSearch, props.defaultFocusOnlyItem]);
 
   useImperativeHandle(
     props.menuRef,
