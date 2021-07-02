@@ -200,24 +200,48 @@ export const createAccountsReducer = <
       newState = recalculateGroupMetrics<S, A, G>(action, newState, group.id);
     } else if (action.type === mapping.TableChanged) {
       const consolidated = consolidateTableChange(action.payload);
+
+      // The consolidated changes should contain one change per sub account, but
+      // just in case we apply that grouping logic here.
+      let changesPerAccount: { [key: number]: { changes: Table.RowChange<R>[]; model: A } } = {};
       for (let i = 0; i < consolidated.length; i++) {
-        let account: A | null = find(newState.data, { id: consolidated[i].id } as any) || null;
-        if (isNil(account)) {
-          warnInconsistentState({
-            action: action.type,
-            reason: "Account does not exist in state when it is expected to.",
-            id: consolidated[i].id
-          });
-        } else {
-          account = manager.mergeChangesWithModel(account, consolidated[i]);
-          if (!isNil(account.group)) {
-            newState = recalculateGroupMetrics<S, A, G>(action, newState, account.group);
+        if (isNil(changesPerAccount[consolidated[i].id])) {
+          const account: A | null = find(newState.data, { id: consolidated[i].id } as any) || null;
+          if (isNil(account)) {
+            warnInconsistentState({
+              action: action.type,
+              reason: "Account does not exist in state when it is expected to.",
+              id: consolidated[i].id
+            });
           } else {
-            newState = {
-              ...newState,
-              data: replaceInArray<A>(newState.data, { id: account.id }, account)
-            };
+            changesPerAccount[consolidated[i].id] = { changes: [], model: account };
           }
+        }
+        if (!isNil(changesPerAccount[consolidated[i].id])) {
+          changesPerAccount[consolidated[i].id] = {
+            ...changesPerAccount[consolidated[i].id],
+            changes: [...changesPerAccount[consolidated[i].id].changes, consolidated[i]]
+          };
+        }
+      }
+
+      // For each of the SubAccount(s) that were changed, apply those changes to the current
+      // SubAccount model in state.
+      for (let k = 0; k < Object.keys(changesPerAccount).length; k++) {
+        const id = parseInt(Object.keys(changesPerAccount)[k]);
+        const changesObj = changesPerAccount[id];
+
+        // Apply each relevant change before performing recalculations.
+        let account = changesObj.model;
+        for (let j = 0; j < changesObj.changes.length; j++) {
+          account = manager.mergeChangesWithModel(account, changesObj.changes[j]);
+        }
+        newState = {
+          ...newState,
+          data: replaceInArray<A>(newState.data, { id: account.id }, account)
+        };
+        if (!isNil(account.group)) {
+          newState = recalculateGroupMetrics<S, A, G>(action, newState, account.group);
         }
       }
     } else if (action.type === mapping.Groups.AddToState) {
@@ -523,20 +547,49 @@ export const createSubAccountsReducer = <
       });
     } else if (action.type === mapping.TableChanged) {
       const consolidated = consolidateTableChange(action.payload);
+
+      // The consolidated changes should contain one change per sub account, but
+      // just in case we apply that grouping logic here.
+      let changesPerSubAccount: { [key: number]: { changes: Table.RowChange<R>[]; model: SA } } = {};
       for (let i = 0; i < consolidated.length; i++) {
-        let subAccount: SA | null = find(newState.data, { id: consolidated[i].id } as any) || null;
-        if (isNil(subAccount)) {
-          warnInconsistentState({
-            action: action.type,
-            reason: "Sub-account does not exist in state when it is expected to.",
-            id: consolidated[i].id
-          });
-        } else {
-          subAccount = manager.mergeChangesWithModel(subAccount, consolidated[i]);
-          newState = recalculateSubAccountMetrics<S, SA, G>(action, newState, subAccount);
-          if (!isNil(subAccount.group)) {
-            newState = recalculateGroupMetrics<S, SA, G>(action, newState, subAccount.group);
+        if (isNil(changesPerSubAccount[consolidated[i].id])) {
+          const subAccount: SA | null = find(newState.data, { id: consolidated[i].id } as any) || null;
+          if (isNil(subAccount)) {
+            warnInconsistentState({
+              action: action.type,
+              reason: "Sub-account does not exist in state when it is expected to.",
+              id: consolidated[i].id
+            });
+          } else {
+            changesPerSubAccount[consolidated[i].id] = { changes: [], model: subAccount };
           }
+        }
+        if (!isNil(changesPerSubAccount[consolidated[i].id])) {
+          changesPerSubAccount[consolidated[i].id] = {
+            ...changesPerSubAccount[consolidated[i].id],
+            changes: [...changesPerSubAccount[consolidated[i].id].changes, consolidated[i]]
+          };
+        }
+      }
+
+      // For each of the SubAccount(s) that were changed, apply those changes to the current
+      // SubAccount model in state.
+      for (let k = 0; k < Object.keys(changesPerSubAccount).length; k++) {
+        const id = parseInt(Object.keys(changesPerSubAccount)[k]);
+        const changesObj = changesPerSubAccount[id];
+
+        // Apply each relevant change before performing recalculations.
+        let subAccount = changesObj.model;
+        for (let j = 0; j < changesObj.changes.length; j++) {
+          subAccount = manager.mergeChangesWithModel(subAccount, changesObj.changes[j]);
+        }
+        newState = {
+          ...newState,
+          data: replaceInArray<SA>(newState.data, { id: subAccount.id }, subAccount)
+        };
+        newState = recalculateSubAccountMetrics<S, SA, G>(action, newState, subAccount);
+        if (!isNil(subAccount.group)) {
+          newState = recalculateGroupMetrics<S, SA, G>(action, newState, subAccount.group);
         }
       }
     } else if (action.type === mapping.Fringes.UpdateInState) {

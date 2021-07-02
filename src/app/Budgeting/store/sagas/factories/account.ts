@@ -228,7 +228,6 @@ export const createAccountTaskSet = <
         autoIndex,
         models: data
       });
-
       try {
         const subaccounts: SA[] = yield call(api.bulkCreateAccountSubAccounts, accountId, payload, {
           cancelToken: source.token
