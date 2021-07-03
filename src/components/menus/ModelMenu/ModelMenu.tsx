@@ -87,7 +87,10 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
         style={{
           ...(!isNil(itemProps) ? itemProps.style : {}),
           ...(!isNil(levelIndent) ? { paddingLeft: 10 + levelIndent * level } : { paddingLeft: 10 }),
-          borderTop: level === 0 && bordersForLevels === true ? "1px solid #EFEFEF" : "none"
+          borderTop: level === 0 && bordersForLevels === true ? "1px solid #EFEFEF" : "none",
+          paddingTop: level === 0 ? 4 : 2,
+          paddingBottom: level === 0 ? 4 : 2,
+          height: level === 0 ? "32px" : "28px"
         }}
       >
         {checkbox ? (
