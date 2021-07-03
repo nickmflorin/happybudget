@@ -36,7 +36,7 @@ const SubAccountsTreeEditor = ({ setSearch, ...props }: SubAccountsTreeEditorPro
 
   return (
     <SubAccountTreeMenu
-      style={{ width: "auto" }}
+      style={{ width: 200 }}
       menuLoading={loading}
       onSearch={(v: string) => setSearch(v)}
       search={search}

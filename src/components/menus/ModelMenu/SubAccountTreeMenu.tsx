@@ -2,6 +2,10 @@ import { SyntheticEvent } from "react";
 import { isNil, filter } from "lodash";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faNeuter } from "@fortawesome/pro-light-svg-icons";
+
+import { VerticalFlexCenter } from "components";
 import { EntityText } from "components/typography";
 
 import ExpandedModelMenu from "./ExpandedModelMenu";
@@ -28,11 +32,23 @@ const SubAccountTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
       selected={!isNil(props.selected) ? [`${props.selected.type}-${props.selected.id}`] : null}
       menuProps={{ className: "subaccount-item-tree-menu" }}
       itemProps={{ className: "subaccount-item-tree-menu-item" }}
-      levelIndent={10}
+      levelIndent={15}
+      bordersForLevels={true}
       searchIndices={["description", "identifier"]}
       clientSearching={false}
       renderItem={(model: Model.SimpleSubAccount, context: { level: number; index: number }) => {
-        return <EntityText fillEmpty={"---------"}>{model}</EntityText>;
+        if (context.level !== 0) {
+          return (
+            <div className={"with-neuter-wrapper"}>
+              <VerticalFlexCenter>
+                <FontAwesomeIcon className={"icon fa-rotate-270"} icon={faNeuter} />
+              </VerticalFlexCenter>
+              <EntityText fillEmpty={"---------"}>{model}</EntityText>
+            </div>
+          );
+        } else {
+          return <EntityText fillEmpty={"---------"}>{model}</EntityText>;
+        }
       }}
     />
   );

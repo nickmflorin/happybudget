@@ -1,7 +1,8 @@
 .expanded-model-menu {
-  width: auto;
-
   .search-container {
     padding: 6px;
+  }
+  .ant-menu {
+    border-top: none !important;
   }
 }

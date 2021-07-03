@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { isNil, map } from "lodash";
+import { filter, includes, isNil, map } from "lodash";
 import classNames from "classnames";
 
 import { Input, Checkbox, Tooltip } from "antd";
@@ -120,7 +120,12 @@ const BudgetTableMenu = <R extends Table.Row>({
           {!isNil(actions) && (
             <div className={"toolbar-buttons"}>
               {map(
-                Array.isArray(actions) ? actions : actions({ apis, columns }),
+                Array.isArray(actions)
+                  ? actions
+                  : actions({
+                      apis,
+                      columns: filter(columns, (col: Table.Column<R>) => !includes(["index", "expand"], col.field))
+                    }),
                 (action: BudgetTable.MenuAction, index: number) => (
                   <BudgetTableMenuAction key={index} action={action} />
                 )

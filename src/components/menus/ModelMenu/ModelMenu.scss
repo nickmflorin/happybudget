@@ -16,6 +16,10 @@
     height: 32px;
     justify-content: left;
 
+    &:first-child {
+      border-top: none !important;
+    }
+
     &:hover,
     &.focus {
       background-color: rgb(33 150 243 / 45%) !important;

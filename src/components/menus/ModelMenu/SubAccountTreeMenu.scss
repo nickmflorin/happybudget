@@ -4,4 +4,15 @@
 .subaccount-item-tree-menu {
   max-height: 320px;
   overflow: auto;
+
+  .with-neuter-wrapper {
+    display: flex;
+
+    svg {
+      height: 1.2em;
+      width: 1.2em;
+      margin-left: -15px;
+      margin-right: 5px;
+    }
+  }
 }

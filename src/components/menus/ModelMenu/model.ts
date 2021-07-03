@@ -40,6 +40,7 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly onNoSearchResults?: EmptyItem;
   readonly autoFocus?: boolean;
   readonly leftAlign?: boolean;
+  readonly bordersForLevels?: boolean;
   readonly getFirstSearchResult?: (models: M[]) => M | null;
   readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
   readonly onFocusCallback?: (focused: boolean) => void;
@@ -71,6 +72,7 @@ export interface ModelMenuItemProps<M extends Model.M> {
   readonly visible: (string | number)[] | undefined;
   readonly indexMap: { [key: string]: number };
   readonly itemProps?: any;
+  readonly bordersForLevels?: boolean;
   // This is intentionally not named onClick because it conflicts with AntD's mechanics.
   readonly onPress: (model: M, e: SyntheticEvent) => void;
   readonly onSelect: (model: M, e: CheckboxChangeEvent) => void;
@@ -120,6 +122,7 @@ interface _ExpandedModelMenuProps<M extends Model.M>
   readonly children?: ReactNode;
   readonly autoFocusMenu?: boolean;
   readonly unfocusMenuOnSearchFocus?: boolean;
+  readonly bordersForLevels?: boolean;
   readonly onSearch?: (value: string) => void;
 }
 

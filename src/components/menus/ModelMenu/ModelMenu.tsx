@@ -37,6 +37,7 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
     indexMap,
     itemProps,
     leftAlign,
+    bordersForLevels,
     onSelect,
     onDeselect,
     onPress,
@@ -85,7 +86,8 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
         })}
         style={{
           ...(!isNil(itemProps) ? itemProps.style : {}),
-          ...(!isNil(levelIndent) ? { paddingLeft: 10 + levelIndent * (level - 1) } : { paddingLeft: 10 })
+          ...(!isNil(levelIndent) ? { paddingLeft: 10 + levelIndent * level } : { paddingLeft: 10 }),
+          borderTop: level === 0 && bordersForLevels === true ? "1px solid #EFEFEF" : "none"
         }}
       >
         {checkbox ? (
@@ -557,6 +559,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
                 leftAlign={props.leftAlign}
                 hidden={props.hidden}
                 visible={props.visible}
+                bordersForLevels={props.bordersForLevels}
                 level={0}
                 onSelect={(m: M, e: CheckboxChangeEvent) => {
                   if (isMultipleModelMenuProps(props)) {
