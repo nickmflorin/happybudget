@@ -3,7 +3,7 @@ import { isNil, filter } from "lodash";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faNeuter } from "@fortawesome/pro-light-svg-icons";
+import { faLongArrowAltRight } from "@fortawesome/pro-light-svg-icons";
 
 import { VerticalFlexCenter } from "components";
 import { EntityText } from "components/typography";
@@ -41,7 +41,7 @@ const SubAccountTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
           return (
             <div className={"with-neuter-wrapper"}>
               <VerticalFlexCenter>
-                <FontAwesomeIcon className={"icon fa-rotate-270"} icon={faNeuter} />
+                <FontAwesomeIcon className={"icon"} icon={faLongArrowAltRight} />
               </VerticalFlexCenter>
               <EntityText fillEmpty={"---------"}>{model}</EntityText>
             </div>
