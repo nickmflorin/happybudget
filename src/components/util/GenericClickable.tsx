@@ -33,7 +33,14 @@ const GenericClickable = ({
   if (!isNil(icon)) {
     return (
       <TooltipWrapper {...tooltip}>
-        <ClickableBase {...props} className={classNames(props.className, { disabled: disabled })}>
+        <ClickableBase
+          {...props}
+          className={classNames(props.className, {
+            disabled: disabled === true && isNil(tooltip),
+            "fake-disabled": disabled === true && !isNil(tooltip)
+          })}
+          disabled={disabled === true && isNil(tooltip)}
+        >
           {icon}
           {children}
         </ClickableBase>
@@ -42,7 +49,14 @@ const GenericClickable = ({
   } else {
     return (
       <TooltipWrapper {...tooltip}>
-        <ClickableBase {...props} className={classNames(props.className, { disabled: disabled })}>
+        <ClickableBase
+          {...props}
+          className={classNames(props.className, {
+            disabled: disabled === true && isNil(tooltip),
+            "fake-disabled": disabled === true && !isNil(tooltip)
+          })}
+          disabled={disabled === true && isNil(tooltip)}
+        >
           {children}
         </ClickableBase>
       </TooltipWrapper>

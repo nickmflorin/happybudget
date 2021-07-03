@@ -585,30 +585,38 @@
   }
 
   &--budget-table-menu {
-    $budget-table-menu-btn-color: rgba(70, 70, 70, 0.85);
-
     font-weight: 500;
     border: none !important;
     box-shadow: none !important;
-    color: $budget-table-menu-btn-color;
+    color: $text-tertiary;
+    padding: 6px 8px;
 
     svg {
       height: 1.2rem !important;
       margin-right: 0.5rem;
-      color: $budget-table-menu-btn-color;
+      color: $text-tertiary;
     }
 
     &:hover,
-    &:disabled,
-    &.disabled,
-    &.fake-disabled,
     &:focus {
-      color: lighten($budget-table-menu-btn-color, 20%) !important;
+      color: lighten($text-tertiary, 20%) !important;
       border-color: $transparent !important;
       background-color: transparent;
       cursor: pointer;
       svg {
-        color: lighten($budget-table-menu-btn-color, 20%) !important;
+        color: lighten($text-tertiary, 20%) !important;
+      }
+    }
+
+    &:disabled,
+    &.disabled,
+    &.fake-disabled {
+      color: $disabled-color !important;
+      border-color: $transparent !important;
+      background-color: transparent;
+      cursor: pointer;
+      svg {
+        color: $disabled-color !important;
       }
     }
   }

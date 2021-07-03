@@ -3,42 +3,42 @@
 
 .saving-changes {
   display: flex;
-  width: 150px;
+  width: 129px;
   height: 36px;
 
-  .indicator-container {
-    padding: 7px;
+  .spinner-wrapper {
+    height: 22px;
+    width: 22px;
+    margin-right: 2px;
     position: relative;
 
-    .spinner-wrapper {
+    .saving-changes-spinner {
       height: 22px;
       width: 22px;
-
-      .saving-changes-spinner {
-        height: 22px;
-        width: 22px;
-      }
+      color: $text-tertiary;
     }
+  }
 
-    .check-wrapper {
-      height: 22px;
-      width: 22px;
-      padding: 2px;
+  .check-wrapper {
+    height: 22px;
+    width: 22px;
+    padding: 3px;
+    margin-right: 2px;
 
-      svg {
-        height: auto;
-        width: 18px;
-        color: $green;
-      }
+    svg {
+      height: auto;
+      width: 16px;
+      color: $green;
     }
   }
 
   .text-container {
-    font-family: $open-sans;
-    font-size: 13px;
-    font-weight: 400;
-    color: $text-secondary;
+    font-family: $roboto;
+    font-size: 12px;
+    font-weight: 500;
+    color: $text-tertiary;
     line-height: 36px;
     width: 105px;
+    text-transform: uppercase;
   }
 }

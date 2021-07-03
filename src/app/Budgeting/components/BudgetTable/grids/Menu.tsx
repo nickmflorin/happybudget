@@ -26,6 +26,7 @@ const BudgetTableMenuAction = ({ action }: BudgetTableMenuActionProps): JSX.Elem
         <Button
           onClick={() => !isNil(action.onClick) && action.onClick()}
           className={"btn--budget-table-menu"}
+          disabled={action.disabled}
           icon={<FontAwesomeIcon className={"icon"} icon={action.icon} />}
           tooltip={
             /* eslint-disable indent */
