@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
-import { createSelector } from "reselect";
 
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
@@ -19,13 +18,6 @@ const selectSubAccounts = simpleDeepEqualSelector(
 );
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.search
-);
-const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.deleting,
-  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.updating,
-  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.creating,
-  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
-    deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 const selectSubAccountDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.detail.data
@@ -44,7 +36,6 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
   const templateId = useSelector(selectTemplateId);
   const data = useSelector(selectSubAccounts);
   const search = useSelector(selectTableSearch);
-  const saving = useSelector(selectSaving);
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const groups = useSelector(selectGroups);
   const subAccountUnits = useSelector(selectSubAccountUnits);
@@ -64,9 +55,9 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
             ? `${subaccountDetail.description} Total`
             : "Sub Account Total"
         }
+        exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
         search={search}
         onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
-        saving={saving}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
         onRowAdd={(payload: Table.RowAddPayload<BudgetTable.TemplateSubAccountRow>) =>

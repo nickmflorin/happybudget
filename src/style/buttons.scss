@@ -380,6 +380,10 @@
       }
     }
 
+    &.btn--icon-only-budget-table-menu {
+      padding: 8.5px;
+    }
+
     &.ag-grid-expand-button {
       height: 26px;
       width: 26px;
@@ -576,6 +580,35 @@
       display: flex;
       .entity-text-button-caret {
         margin-left: 8px;
+      }
+    }
+  }
+
+  &--budget-table-menu {
+    $budget-table-menu-btn-color: rgba(70, 70, 70, 0.85);
+
+    font-weight: 500;
+    border: none !important;
+    box-shadow: none !important;
+    color: $budget-table-menu-btn-color;
+
+    svg {
+      height: 1.2rem !important;
+      margin-right: 0.5rem;
+      color: $budget-table-menu-btn-color;
+    }
+
+    &:hover,
+    &:disabled,
+    &.disabled,
+    &.fake-disabled,
+    &:focus {
+      color: lighten($budget-table-menu-btn-color, 20%) !important;
+      border-color: $transparent !important;
+      background-color: transparent;
+      cursor: pointer;
+      svg {
+        color: lighten($budget-table-menu-btn-color, 20%) !important;
       }
     }
   }

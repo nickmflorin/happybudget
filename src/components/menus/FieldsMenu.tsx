@@ -5,53 +5,29 @@ import classNames from "classnames";
 import { Menu, Checkbox, Button } from "antd";
 
 import "./FieldsMenu.scss";
+import { useEffect } from "react";
 
 export interface FieldMenuField extends Field {
   defaultChecked?: boolean;
 }
 
 export interface IFieldMenuButton {
-  text: string;
-  onClick?: (fields: Field[]) => void;
-  className?: string;
-  style?: React.CSSProperties;
+  readonly text: string;
+  readonly className?: string;
+  readonly style?: React.CSSProperties;
+  readonly onClick?: (state: FieldCheck[]) => void;
 }
 
 interface FieldsMenuItemProps {
-  field: Field;
-  onChange?: (fields: Field[]) => void;
-  selected: Field[];
-  setSelected: (fields: Field[]) => void;
-  checked: boolean;
+  readonly field: Field;
+  readonly checked: boolean;
+  readonly onClick?: () => void;
   [key: string]: any;
 }
 
-const FieldsMenuItem = ({
-  field,
-  checked,
-  selected,
-  setSelected,
-  onChange,
-  ...props
-}: FieldsMenuItemProps): JSX.Element => {
+const FieldsMenuItem = ({ field, checked, onClick, ...props }: FieldsMenuItemProps): JSX.Element => {
   return (
-    <Menu.Item
-      {...props}
-      className={"fields-menu-menu-item"}
-      onClick={() => {
-        if (checked === false) {
-          setSelected([...selected, field]);
-          if (!isNil(onChange)) {
-            onChange([...selected, field]);
-          }
-        } else {
-          setSelected(filter(selected, (fld: Field) => fld.id !== field.id));
-          if (!isNil(onChange)) {
-            onChange(filter(selected, (fld: Field) => fld.id !== field.id));
-          }
-        }
-      }}
-    >
+    <Menu.Item {...props} className={"fields-menu-menu-item"} onClick={onClick}>
       <Checkbox checked={checked} />
       <span className={"text-container"}>{field.label}</span>
     </Menu.Item>
@@ -61,13 +37,20 @@ const FieldsMenuItem = ({
 export interface FieldsMenuProps {
   fields: FieldMenuField[];
   buttons?: IFieldMenuButton[];
-  onChange?: (fields: Field[]) => void;
+  onChange?: (change: FieldCheck) => void;
 }
 
 const FieldsMenu = ({ fields, buttons, onChange }: FieldsMenuProps): JSX.Element => {
-  const [selected, setSelected] = useState<Field[]>(
-    filter(fields, (field: FieldMenuField) => field.defaultChecked !== false)
-  );
+  const [selected, setSelected] = useState<string[]>([]);
+
+  useEffect(() => {
+    const defaultCheckedFields: FieldMenuField[] = filter(
+      fields,
+      (field: FieldMenuField) => field.defaultChecked !== false
+    );
+    const defaultCheckedFieldIds = map(defaultCheckedFields, (field: FieldMenuField) => field.id);
+    setSelected(defaultCheckedFieldIds);
+  }, [fields]);
 
   return (
     <div className={"fields-menu"}>
@@ -77,13 +60,16 @@ const FieldsMenu = ({ fields, buttons, onChange }: FieldsMenuProps): JSX.Element
             <FieldsMenuItem
               key={index}
               field={field}
-              onChange={onChange}
-              selected={selected}
-              setSelected={setSelected}
-              checked={includes(
-                map(selected, (fld: Field) => fld.id),
-                field.id
-              )}
+              onClick={() => {
+                const checked = includes(selected, field.id);
+                if (checked === false) {
+                  setSelected([...selected, field.id]);
+                } else {
+                  setSelected(filter(selected, (id: string) => id !== field.id));
+                }
+                !isNil(onChange) && onChange({ id: field.id, checked: !checked });
+              }}
+              checked={includes(selected, field.id)}
             />
           );
         })}
@@ -96,7 +82,12 @@ const FieldsMenu = ({ fields, buttons, onChange }: FieldsMenuProps): JSX.Element
                 key={index}
                 className={classNames("btn--field-menu", btn.className)}
                 style={btn.style}
-                onClick={() => !isNil(btn.onClick) && btn.onClick(selected)}
+                onClick={() =>
+                  !isNil(btn.onClick) &&
+                  btn.onClick(
+                    map(fields, (field: FieldMenuField) => ({ id: field.id, checked: includes(selected, field.id) }))
+                  )
+                }
               >
                 {btn.text}
               </Button>

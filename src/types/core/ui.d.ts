@@ -15,10 +15,14 @@ type FieldOrder<T = string> = {
 };
 type FieldOrdering<T = string> = FieldOrder<T>[];
 
-// TODO: Deprecate me.
 interface Field {
   id: string;
   label: string;
+}
+
+interface FieldCheck {
+  id: string;
+  checked: boolean;
 }
 
 type SearchIndex = string | string[];
@@ -31,6 +35,8 @@ interface StandardComponentProps {
 }
 
 type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : never;
+
+type RenderFunc = () => JSX.Element;
 
 interface IBreadCrumbItemRenderParams {
   readonly toggleDropdownVisible: () => void;

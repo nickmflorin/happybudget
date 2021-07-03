@@ -2,13 +2,23 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
-import { createSelector } from "reselect";
+
+import { faCommentsAlt, faPrint } from "@fortawesome/pro-solid-svg-icons";
+
+import * as api from "api";
+import { download } from "lib/util/files";
 
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import BudgetSubAccountsTable from "../SubAccountsTable";
-import { selectBudgetId, selectSubAccountUnits } from "../../../store/selectors";
+import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
+import {
+  selectBudgetDetail,
+  selectCommentsHistoryDrawerOpen,
+  selectBudgetId,
+  selectSubAccountUnits
+} from "../../../store/selectors";
 import * as actions from "../../../store/actions/budget/account";
 
 const selectGroups = simpleDeepEqualSelector(
@@ -19,13 +29,6 @@ const selectData = simpleDeepEqualSelector(
 );
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.search
-);
-const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.deleting,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.updating,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.creating,
-  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
-    deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 const selectAccountDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.account.detail.data
@@ -42,12 +45,13 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
   const history = useHistory();
 
   const budgetId = useSelector(selectBudgetId);
+  const budgetDetail = useSelector(selectBudgetDetail);
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
-  const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
   const groups = useSelector(selectGroups);
   const subAccountUnits = useSelector(selectSubAccountUnits);
+  const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
 
   return (
     <React.Fragment>
@@ -61,9 +65,9 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
             ? `${accountDetail.description} Total`
             : "Account Total"
         }
+        exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
         search={search}
         onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
-        saving={saving}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
         cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
@@ -87,6 +91,26 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
           setGroupSubAccounts(map(rows, (row: BudgetTable.BudgetSubAccountRow) => row.id))
         }
         onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
+        actions={[
+          {
+            tooltip: "Export as PDF",
+            icon: faPrint,
+            text: "Export PDF",
+            onClick: () => {
+              if (!isNil(budgetId)) {
+                api.getBudgetPdf(budgetId).then((response: any) => {
+                  download(response, !isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf");
+                });
+              }
+            }
+          },
+          {
+            tooltip: "Comments",
+            text: "Comments",
+            icon: faCommentsAlt,
+            onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
+          }
+        ]}
       />
       {!isNil(groupSubAccounts) && (
         <CreateSubAccountGroupModal

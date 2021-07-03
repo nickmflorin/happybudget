@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useImperativeHandle, useRef } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, find, concat, filter } from "lodash";
+import { map, isNil, includes, concat, filter, reduce } from "lodash";
 import Cookies from "universal-cookie";
 
 import {
@@ -69,6 +69,60 @@ const DefaultBudgetFooterGridOptions: GridOptions = {
   suppressHorizontalScroll: true
 };
 
+class BudgetTableApis implements BudgetTable.GridSet<Table.APIs | null> {
+  public primary: Table.APIs | null = null;
+  public tableFooter: Table.APIs | null = null;
+  public budgetFooter: Table.APIs | null = null;
+
+  constructor(config: Partial<BudgetTable.GridSet<Table.APIs | null>>) {
+    this.primary = config.primary || null;
+    this.tableFooter = config.tableFooter || null;
+    this.budgetFooter = config.budgetFooter || null;
+  }
+
+  public set = (id: BudgetTable.GridId, apis: Table.APIs) => {
+    this[id] = apis;
+  };
+
+  public clone = () =>
+    new BudgetTableApis({ primary: this.primary, tableFooter: this.tableFooter, budgetFooter: this.budgetFooter });
+
+  public gridMap = (callback: (api: GridApi) => any) => map(this.gridApis, (api: GridApi) => callback(api));
+  public columnMap = (callback: (api: ColumnApi) => any) => map(this.columnApis, (api: ColumnApi) => callback(api));
+
+  public get gridApis() {
+    const budgetIds: BudgetTable.GridId[] = ["primary", "tableFooter", "budgetFooter"];
+    const self = this;
+    return reduce(
+      budgetIds,
+      (grids: GridApi[], id: BudgetTable.GridId) => {
+        const apis: Table.APIs | null = self[id];
+        if (!isNil(apis)) {
+          return [...grids, apis.grid];
+        }
+        return grids;
+      },
+      []
+    );
+  }
+
+  public get columnApis() {
+    const budgetIds: BudgetTable.GridId[] = ["primary", "tableFooter", "budgetFooter"];
+    const self = this;
+    return reduce(
+      budgetIds,
+      (columns: ColumnApi[], id: BudgetTable.GridId) => {
+        const apis: Table.APIs | null = self[id];
+        if (!isNil(apis)) {
+          return [...columns, apis.column];
+        }
+        return columns;
+      },
+      []
+    );
+  }
+}
+
 const BudgetTable = <
   R extends Table.Row,
   M extends Model.Model,
@@ -76,6 +130,7 @@ const BudgetTable = <
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
 >({
   /* eslint-disable indent */
+  tableRef,
   columns,
   className,
   style = {},
@@ -83,7 +138,6 @@ const BudgetTable = <
   groups = [],
   loading,
   loadingBudget,
-  exportFileName,
   nonEditableCells,
   cookies,
   identifierField,
@@ -103,13 +157,13 @@ const BudgetTable = <
   ...props
 }: BudgetTable.Props<R, M, G, P>) => {
   const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
-  const [apis, _setApis] = useState<BudgetTable.GridSet<Table.APIs | null>>({
-    primary: null,
-    tableFooter: null,
-    budgetFooter: null
-  });
+  const [apis, _setApis] = useState<BudgetTableApis>(new BudgetTableApis({}));
+  const gridRef = useRef<BudgetTable.PrimaryGridRef>(null);
+
   const setApis = (id: BudgetTable.GridId) => (gridApis: Table.APIs) => {
-    _setApis({ ...apis, [id]: gridApis });
+    const newApis = apis.clone();
+    newApis.set(id, gridApis);
+    _setApis(newApis);
   };
 
   const [cols, setCols] = useState<Table.Column<R>[]>([]);
@@ -362,29 +416,26 @@ const BudgetTable = <
     );
   }, [useDeepEqualMemo(columns), baseColumns]);
 
-  const onColumnsChange = useDynamicCallback((fields: Field[]) => {
-    if (!isNil(apis.primary) && !isNil(apis.tableFooter) && (!showBudgetFooterGrid || !isNil(apis.budgetFooter))) {
-      // TODO: We need to take into consideration the column spanning, which is what
-      // is causing things to act funky.  To fix this, we should check how the column
-      // spans in each grid and make the decision on setting the visibility based
-      // on that.
-      let columnApis = [apis.primary.column, apis.tableFooter.column];
-      let gridApis = [apis.primary.grid, apis.tableFooter.grid];
-      if (!isNil(apis.budgetFooter)) {
-        columnApis = [...columnApis, apis.budgetFooter.column];
-        gridApis = [...gridApis, apis.budgetFooter.grid];
-      }
-      map(columns, (col: Table.Column<R>) => {
-        let visible = false;
-        const associatedField = find(fields, { id: col.field });
-        if (!isNil(associatedField)) {
-          visible = true;
-        }
-        map(columnApis, (api: ColumnApi) => api.setColumnVisible(col.field, visible));
-      });
-      map(gridApis, (api: GridApi) => api.sizeColumnsToFit());
-    }
+  const setColumnVisibility = useDynamicCallback((change: Table.ColumnVisibilityChange) => {
+    apis.columnMap((api: ColumnApi) => api.setColumnVisible(change.field, change.visible));
   });
+
+  const changeColumnVisibility = useDynamicCallback((changes: Table.ColumnVisibilityChange[]) => {
+    map(changes, (change: { field: string; visible: boolean }) => setColumnVisibility(change.field, change.visible));
+    apis.gridMap((api: GridApi) => api.sizeColumnsToFit());
+  });
+
+  useImperativeHandle(tableRef, () => ({
+    setColumnVisibility,
+    changeColumnVisibility,
+    getCSVData: (fields?: string[]) => {
+      const primaryGridRefObj = gridRef.current;
+      if (!isNil(primaryGridRefObj)) {
+        return primaryGridRefObj.getCSVData(fields);
+      }
+      return [];
+    }
+  }));
 
   const onGridReady = useDynamicCallback((id: BudgetTable.GridId, gridApis: Table.APIs) => {
     setApis(id)(gridApis);
@@ -399,6 +450,7 @@ const BudgetTable = <
       <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
         <PrimaryGrid<R, M, G>
           apis={apis.primary}
+          gridRef={gridRef}
           onGridReady={(e: GridReadyEvent) => onGridReady("primary", { grid: e.api, column: e.columnApi })}
           onFirstDataRendered={onFirstDataRendered}
           identifierField={identifierField}
@@ -411,7 +463,6 @@ const BudgetTable = <
           onRowAdd={onRowAdd}
           groups={groups}
           groupParams={groupParams}
-          onColumnsChange={onColumnsChange}
           {...props}
         />
         <TableFooterGrid<R>

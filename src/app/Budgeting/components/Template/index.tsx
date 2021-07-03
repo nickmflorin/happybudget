@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
-import { isNil } from "lodash";
+import { isNil, filter, map } from "lodash";
+import { createSelector } from "reselect";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagic, faCloud, faCog } from "@fortawesome/pro-solid-svg-icons";
 import { faCopy, faFileSpreadsheet } from "@fortawesome/pro-light-svg-icons";
 
-import { RenderIfValidId } from "components";
+import { RenderIfValidId, SavingChanges } from "components";
 
 import { wipeStateAction, setTemplateIdAction } from "../../store/actions/template";
 import { GenericLayout } from "../Generic";
@@ -17,15 +17,35 @@ import Account from "./Account";
 import Accounts from "./Accounts";
 import SubAccount from "./SubAccount";
 
+const selectSaving = createSelector(
+  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.creating,
+  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.creating,
+  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.creating,
+  (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
+    return (
+      filter(
+        map(args, (arg: Redux.ModelListActionInstance[] | boolean) =>
+          Array.isArray(arg) ? arg.length !== 0 : arg === true
+        ),
+        (value: boolean) => value === true
+      ).length !== 0
+    );
+  }
+);
+
 const Template = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
   const { templateId } = useParams<{ templateId: string }>();
   const match = useRouteMatch();
-
-  // const instance = useSelector(selectTemplateInstance);
-  // const template = useSelector(selectTemplateDetail);
+  const saving = useSelector(selectSaving);
 
   useEffect(() => {
     dispatch(wipeStateAction(null));
@@ -36,20 +56,7 @@ const Template = (): JSX.Element => {
 
   return (
     <GenericLayout
-      toolbar={[
-        {
-          icon: <FontAwesomeIcon icon={faMagic} />,
-          disabled: true
-        },
-        {
-          icon: <FontAwesomeIcon icon={faCloud} />,
-          disabled: true
-        },
-        {
-          icon: <FontAwesomeIcon icon={faCog} />,
-          disabled: true
-        }
-      ]}
+      toolbar={() => <SavingChanges saving={saving} />}
       sidebar={[
         {
           icon: <FontAwesomeIcon icon={faCopy} />,

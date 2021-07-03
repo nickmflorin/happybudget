@@ -1,14 +1,17 @@
+import { useRef, ReactNode } from "react";
 import classNames from "classnames";
-import { isNil, map } from "lodash";
+import { isNil, map, filter } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
+import { faTrashAlt, faFileCsv } from "@fortawesome/pro-solid-svg-icons";
 
 import { CellClassParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import * as models from "lib/model";
 
+import { FieldsDropdown } from "components/dropdowns";
+
 import { getKeyValue } from "lib/util";
+import { downloadAsCsvFile } from "lib/util/files";
 import { findChoiceForName } from "lib/model/util";
 import { percentageToDecimalValueSetter } from "lib/model/valueSetters";
 import { percentageValueFormatter } from "lib/model/formatters";
@@ -17,8 +20,9 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericFringesTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>,
-    "manager" | "identifierField" | "identifierFieldHeader" | "columns"
+    "manager" | "identifierField" | "identifierFieldHeader" | "columns" | "tableRef"
   > {
+  exportFileName: string;
   saving: boolean;
   search: string;
   data: Model.Fringe[];
@@ -30,25 +34,61 @@ export interface GenericFringesTableProps
 }
 
 const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Element => {
+  const tableRef = useRef<BudgetTable.Ref>(null);
+
   return (
     <BudgetTableComponent<BudgetTable.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>
       className={"fringes-table"}
+      tableRef={tableRef}
       detached={true}
       manager={models.FringeRowManager}
       identifierField={"name"}
       identifierFieldHeader={"Name"}
       tableFooterIdentifierValue={null}
-      canExport={false}
-      canToggleColumns={false}
       indexColumn={{ width: 40, maxWidth: 50 }}
       cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
       actions={(params: BudgetTable.MenuActionParams<BudgetTable.FringeRow>) => [
         {
           tooltip: "Delete",
-          icon: <FontAwesomeIcon icon={faTrashAlt} />,
+          icon: faTrashAlt,
           onClick: () => {
             const rows: BudgetTable.FringeRow[] = params.apis.grid.getSelectedRows();
             props.onRowDelete(map(rows, (row: BudgetTable.FringeRow) => row.id));
+          }
+        },
+        {
+          text: "Export CSV",
+          icon: faFileCsv,
+          tooltip: "Export as CSV",
+          wrap: (children: ReactNode) => {
+            return (
+              <FieldsDropdown
+                fields={map(params.columns, (col: Table.Column<BudgetTable.FringeRow>) => ({
+                  id: col.field as string,
+                  label: col.headerName as string,
+                  defaultChecked: true
+                }))}
+                buttons={[
+                  {
+                    onClick: (checks: FieldCheck[]) => {
+                      const tableRefObj = tableRef.current;
+                      const fields = map(
+                        filter(checks, (field: FieldCheck) => field.checked === true),
+                        (field: FieldCheck) => field.id
+                      );
+                      if (fields.length !== 0 && !isNil(tableRefObj)) {
+                        const csvData = tableRefObj.getCSVData(fields);
+                        downloadAsCsvFile(props.exportFileName, csvData);
+                      }
+                    },
+                    text: "Download",
+                    className: "btn--primary"
+                  }
+                ]}
+              >
+                {children}
+              </FieldsDropdown>
+            );
           }
         }
       ]}

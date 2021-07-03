@@ -1,24 +1,25 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil, map, filter, reduce } from "lodash";
-import { createSelector } from "reselect";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
+import { faTrashAlt, faFileCsv, faLineColumns } from "@fortawesome/pro-solid-svg-icons";
 
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import * as models from "lib/model";
 import { getKeyValue } from "lib/util";
+import { downloadAsCsvFile } from "lib/util/files";
 import { findChoiceForName, inferModelFromName } from "lib/model/util";
 import { currencyValueFormatter, dateValueFormatter } from "lib/model/formatters";
 import { floatValueSetter, dateTimeValueSetter } from "lib/model/valueSetters";
 
 import { WrapInApplicationSpinner } from "components";
+import { FieldsDropdown } from "components/dropdowns";
 import { Portal, BreadCrumbs } from "components/layout";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import * as actions from "../../store/actions/budget/actuals";
+import { selectBudgetDetail } from "../../store/selectors";
 import BudgetTableComponent from "../BudgetTable";
 import { useDeepEqualMemo } from "lib/hooks";
 
@@ -29,20 +30,14 @@ const selectTableSearch = simpleShallowEqualSelector(
 const selectActualsLoading = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.loading
 );
-const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.deleting,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.updating,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.creating,
-  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
-    deleting.length !== 0 || updating.length !== 0 || creating === true
-);
 
 const Actuals = (): JSX.Element => {
   const dispatch = useDispatch();
   const loading = useSelector(selectActualsLoading);
   const data = useSelector(selectActuals);
   const search = useSelector(selectTableSearch);
-  const saving = useSelector(selectSaving);
+  const tableRef = useRef<BudgetTable.Ref>(null);
+  const budgetDetail = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     dispatch(actions.requestActualsAction(null));
@@ -72,6 +67,7 @@ const Actuals = (): JSX.Element => {
       <WrapInApplicationSpinner loading={loading}>
         <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>
           data={data}
+          tableRef={tableRef}
           manager={models.ActualRowManager}
           identifierField={"subaccount"}
           identifierFieldHeader={"Account"}
@@ -118,7 +114,6 @@ const Actuals = (): JSX.Element => {
           indexColumn={{ width: 40, maxWidth: 50 }}
           search={search}
           onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
-          saving={saving}
           onRowAdd={(payload: Table.RowAddPayload<BudgetTable.ActualRow>) =>
             dispatch(actions.bulkCreateActualsAction(payload))
           }
@@ -126,14 +121,73 @@ const Actuals = (): JSX.Element => {
           onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) =>
             dispatch(actions.tableChangedAction(payload))
           }
-          exportFileName={"actuals.csv"}
           actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow>) => [
             {
               tooltip: "Delete",
-              icon: <FontAwesomeIcon icon={faTrashAlt} />,
+              icon: faTrashAlt,
               onClick: () => {
                 const rows: BudgetTable.ActualRow[] = params.apis.grid.getSelectedRows();
                 dispatch(actions.deleteActualsAction(map(rows, (row: BudgetTable.ActualRow) => row.id)));
+              }
+            },
+            {
+              text: "Columns",
+              icon: faLineColumns,
+              wrap: (children: ReactNode) => {
+                return (
+                  <FieldsDropdown
+                    fields={map(params.columns, (col: Table.Column<BudgetTable.ActualRow>) => ({
+                      id: col.field as string,
+                      label: col.headerName as string,
+                      defaultChecked: true
+                    }))}
+                    onChange={(change: FieldCheck) => {
+                      const tableRefObj = tableRef.current;
+                      if (!isNil(tableRefObj)) {
+                        tableRefObj.setColumnVisibility({ field: change.id, visible: change.checked });
+                      }
+                    }}
+                  >
+                    {children}
+                  </FieldsDropdown>
+                );
+              }
+            },
+            {
+              text: "Export CSV",
+              icon: faFileCsv,
+              wrap: (children: ReactNode) => {
+                return (
+                  <FieldsDropdown
+                    fields={map(params.columns, (col: Table.Column<BudgetTable.ActualRow>) => ({
+                      id: col.field as string,
+                      label: col.headerName as string,
+                      defaultChecked: true
+                    }))}
+                    buttons={[
+                      {
+                        onClick: (checks: FieldCheck[]) => {
+                          const tableRefObj = tableRef.current;
+                          const fields = map(
+                            filter(checks, (field: FieldCheck) => field.checked === true),
+                            (field: FieldCheck) => field.id
+                          );
+                          if (fields.length !== 0 && !isNil(tableRefObj)) {
+                            const csvData = tableRefObj.getCSVData(fields);
+                            downloadAsCsvFile(
+                              !isNil(budgetDetail) ? `${budgetDetail.name}_actuals` : "actuals",
+                              csvData
+                            );
+                          }
+                        },
+                        text: "Download",
+                        className: "btn--primary"
+                      }
+                    ]}
+                  >
+                    {children}
+                  </FieldsDropdown>
+                );
               }
             }
           ]}

@@ -8,7 +8,7 @@ import { faSignOutAlt, faAddressCard, faLock } from "@fortawesome/pro-light-svg-
 
 import { Layout, Tooltip } from "antd";
 
-import { Dropdown } from "components";
+import { Dropdown, VerticalFlexCenter } from "components";
 import { AccountCircleLink } from "components/links";
 import { useLoggedInUser } from "store/hooks";
 
@@ -45,7 +45,12 @@ const Header = ({ toolbar, className, headerHeight, style = {} }: HeaderProps): 
           <div id={"breadcrumbs"}></div>
         </div>
         <div className={"toolbar-wrapper"}>
-          {!isNil(toolbar) && (Array.isArray(toolbar) ? <Toolbar items={toolbar as IToolbarItem[]} /> : toolbar())}
+          {!isNil(toolbar) &&
+            (Array.isArray(toolbar) ? (
+              <Toolbar items={toolbar as IToolbarItem[]} />
+            ) : (
+              <VerticalFlexCenter>{toolbar()}</VerticalFlexCenter>
+            ))}
         </div>
         <Dropdown
           className={"header-dropdown"}

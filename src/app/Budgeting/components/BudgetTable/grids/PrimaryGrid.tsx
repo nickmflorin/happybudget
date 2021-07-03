@@ -1,4 +1,5 @@
-import React, { SyntheticEvent, useState, useEffect, useRef } from "react";
+import React from "react";
+import { SyntheticEvent, useState, useEffect, useRef, useImperativeHandle } from "react";
 import { map, isNil, includes, find, forEach, filter, flatten, reduce, groupBy } from "lodash";
 import { useLocation } from "react-router-dom";
 
@@ -32,7 +33,6 @@ import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/g
 
 import * as models from "lib/model";
 import { orderByFieldOrdering, getKeyValue } from "lib/util";
-import { downloadAsCsvFile } from "lib/util/files";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { getGroupColorDefinition } from "lib/model/util";
 import { isKeyboardEvent } from "lib/model/typeguards";
@@ -43,6 +43,7 @@ import Grid from "./Grid";
 const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>({
   /* eslint-disable indent */
   apis,
+  gridRef,
   options,
   data,
   manager,
@@ -54,15 +55,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   search,
   identifierField,
   actions,
-  canSearch,
-  canExport,
-  canToggleColumns,
   detached,
-  saving,
-  exportFileName,
   onGridReady,
   onSearch,
-  onColumnsChange,
   isCellEditable,
   rowCanExpand,
   onRowExpand,
@@ -830,72 +825,70 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   const _processCellFromClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
     if (!isNil(params.node)) {
       const node: RowNode = params.node;
-      if (!isNil(cutCellChange)) {
-        params = { ...params, value: cutCellChange.oldValue };
-        onTableChange(cutCellChange);
-        setCutCellChange(null);
+      const customCol: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+      if (!isNil(customCol)) {
+        if (!isNil(cutCellChange)) {
+          params = { ...params, value: cutCellChange.oldValue };
+          onTableChange(cutCellChange);
+          setCutCellChange(null);
+        }
+        return processCellFromClipboard(customCol, node.data as R, params.value);
       }
-      return processCellFromClipboard(params.column, node.data as R, params.value);
     }
   });
 
-  const processCellForExport = useDynamicCallback((column: Column, row: R, value?: any) => {
-    const colDef = column.getColDef();
-    if (!isNil(colDef.field)) {
-      const customCol: Table.Column<R> | undefined = find(columns, { field: colDef.field } as any);
-      if (!isNil(customCol)) {
-        const processor = customCol.processCellForExport;
-        if (!isNil(processor)) {
-          return processor(row);
-        } else {
-          return processCellForClipboard(column, row, value);
-        }
+  const processCellForClipboard = useDynamicCallback((column: Table.Column<R>, row: R, value?: any) => {
+    const processor = column.processCellForClipboard;
+    if (!isNil(processor)) {
+      return processor(row);
+    } else {
+      value = value === undefined ? getKeyValue<R, keyof R>(column.field)(row) : value;
+      // The value should never be undefined at this point.
+      if (value === column.nullValue) {
+        return "";
       }
+      return value;
     }
-    return "";
   });
 
-  const processCellForClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
-    const colDef = column.getColDef();
-    if (!isNil(colDef.field)) {
-      const customCol: Table.Column<R> | undefined = find(columns, { field: colDef.field } as any);
-      if (!isNil(customCol)) {
-        const processor = customCol.processCellForClipboard;
-        if (!isNil(processor)) {
-          return processor(row);
-        } else {
-          value = value === undefined ? getKeyValue<R, keyof R>(customCol.field)(row) : value;
-          // The value should never be undefined at this point.
-          if (value === customCol.nullValue) {
-            return "";
-          }
-          return value;
-        }
+  const processCellFromClipboard = useDynamicCallback((column: Table.Column<R>, row: R, value?: any) => {
+    const processor = column.processCellFromClipboard;
+    if (!isNil(processor)) {
+      return processor(value);
+    } else {
+      value = value === undefined ? getKeyValue<R, keyof R>(column.field)(row) : value;
+      // The value should never be undefined at this point.
+      if (typeof value === "string" && String(value).trim() === "") {
+        return !isNil(column.nullValue) ? column.nullValue : null;
       }
+      return value;
     }
-    return "";
   });
 
-  const processCellFromClipboard = useDynamicCallback((column: Column, row: R, value?: any) => {
-    const colDef = column.getColDef();
-    if (!isNil(colDef.field)) {
-      const customCol: Table.Column<R> | undefined = find(columns, { field: colDef.field } as any);
-      if (!isNil(customCol)) {
-        const processor = customCol.processCellFromClipboard;
-        if (!isNil(processor)) {
-          return processor(value);
-        } else {
-          value = value === undefined ? getKeyValue<R, keyof R>(customCol.field)(row) : value;
-          // The value should never be undefined at this point.
-          if (typeof value === "string" && String(value).trim() === "") {
-            return !isNil(customCol.nullValue) ? customCol.nullValue : null;
-          }
-          return value;
-        }
+  useImperativeHandle(gridRef, () => ({
+    getCSVData: (fields?: string[]) => {
+      if (!isNil(apis)) {
+        const cs: Table.Column<R>[] = filter(
+          columns,
+          (column: Table.Column<R>) =>
+            column.excludeFromExport !== true && (isNil(fields) || includes(fields, column.field))
+        );
+        const csvData: CSVData = [map(cs, (col: Table.Column<R>) => col.headerName || "")];
+        apis.grid.forEachNode((node: RowNode, index: number) => {
+          const row: R = node.data;
+          csvData.push(
+            reduce(
+              cs,
+              (current: CSVRow, column: Table.Column<R>) => [...current, processCellForClipboard(column, row)],
+              []
+            )
+          );
+        });
+        return csvData;
       }
+      return [];
     }
-    return "";
-  });
+  }));
 
   const onCellValueChanged = useDynamicCallback((params: Table.CellValueChangedParams<R>) => {
     if (!isNil(apis) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
@@ -920,60 +913,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           actions={actions}
           search={search}
           onSearch={onSearch}
-          canSearch={canSearch}
-          canExport={canExport}
-          canToggleColumns={canToggleColumns}
           columns={columns}
           detached={detached}
-          saving={saving}
-          onExport={(fields: Field[]) => {
-            if (!isNil(apis)) {
-              const includeColumn = (col: Column): boolean => {
-                const colDef = col.getColDef();
-                if (!isNil(colDef.field)) {
-                  const customCol: Table.Column<R> | undefined = find(columns, {
-                    field: colDef.field
-                  } as any);
-                  if (!isNil(customCol)) {
-                    return (
-                      customCol.excludeFromExport !== true &&
-                      includes(
-                        map(fields, (field: Field) => field.id),
-                        customCol.field
-                      )
-                    );
-                  }
-                }
-                return false;
-              };
-              const cs = filter(apis.column.getAllColumns(), (col: Column) => includeColumn(col));
-              const headerRow: CSVRow = [];
-              forEach(cs, (col: Column) => {
-                const colDef = col.getColDef();
-                if (!isNil(colDef.field)) {
-                  headerRow.push(colDef.headerName);
-                }
-              });
-              const csvData: CSVData = [headerRow];
-              apis.grid.forEachNode((node: RowNode, index: number) => {
-                const row: CSVRow = [];
-                forEach(cs, (col: Column) => {
-                  if (!isNil(node.data)) {
-                    row.push(processCellForExport(col, node.data as R));
-                  } else {
-                    row.push("");
-                  }
-                });
-                csvData.push(row);
-              });
-              let fileName = "make-me-current-date";
-              if (!isNil(exportFileName)) {
-                fileName = exportFileName;
-              }
-              downloadAsCsvFile(fileName, csvData);
-            }
-          }}
-          onColumnsChange={onColumnsChange}
         />
       )}
       <div className={"table-grid"}>
@@ -992,8 +933,11 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           processDataFromClipboard={processDataFromClipboard}
           processCellForClipboard={(params: ProcessCellForExportParams) => {
             if (!isNil(params.node)) {
-              setCutCellChange(null);
-              return processCellForClipboard(params.column, params.node.data as R, params.value);
+              const customCol: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+              if (!isNil(customCol)) {
+                setCutCellChange(null);
+                return processCellForClipboard(customCol, params.node.data as R, params.value);
+              }
             }
           }}
           processCellFromClipboard={_processCellFromClipboard}

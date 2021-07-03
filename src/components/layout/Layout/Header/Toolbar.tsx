@@ -1,6 +1,7 @@
 import { map, isNil } from "lodash";
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 
+import { VerticalFlexCenter } from "components";
 import { IconButton } from "components/buttons";
 
 import "./Toolbar.scss";
@@ -27,20 +28,21 @@ const Toolbar = ({ items }: ToolbarProps): JSX.Element => {
     <div className={"toolbar"}>
       {map(items, (item: IToolbarItem, index: number) => {
         return (
-          <IconButton
-            tooltip={item.tooltip}
-            className={"dark"}
-            role={item.role}
-            key={index}
-            size={"large"}
-            icon={item.icon}
-            disabled={item.disabled}
-            onClick={() => {
-              if (!isNil(item.onClick)) {
-                item.onClick();
-              }
-            }}
-          />
+          <VerticalFlexCenter key={index}>
+            <IconButton
+              tooltip={item.tooltip}
+              className={"dark"}
+              role={item.role}
+              size={"large"}
+              icon={item.icon}
+              disabled={item.disabled}
+              onClick={() => {
+                if (!isNil(item.onClick)) {
+                  item.onClick();
+                }
+              }}
+            />
+          </VerticalFlexCenter>
         );
       })}
     </div>

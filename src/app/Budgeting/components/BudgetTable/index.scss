@@ -35,6 +35,8 @@
   }
   .table-header-right {
     display: flex;
+    min-width: 300px;
+    max-width: 500px;
   }
 }
 

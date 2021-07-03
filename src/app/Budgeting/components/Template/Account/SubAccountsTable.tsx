@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
-import { createSelector } from "reselect";
 
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
@@ -19,13 +18,6 @@ const selectData = simpleDeepEqualSelector(
 );
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.search
-);
-const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.deleting,
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.updating,
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.creating,
-  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
-    deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 const selectAccountDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.account.detail.data
@@ -44,7 +36,6 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
   const templateId = useSelector(selectTemplateId);
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
-  const saving = useSelector(selectSaving);
   const accountDetail = useSelector(selectAccountDetail);
   const groups = useSelector(selectGroups);
   const subAccountUnits = useSelector(selectSubAccountUnits);
@@ -61,9 +52,9 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
             ? `${accountDetail.description} Total`
             : "Account Total"
         }
+        exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
         search={search}
         onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
-        saving={saving}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
         cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}

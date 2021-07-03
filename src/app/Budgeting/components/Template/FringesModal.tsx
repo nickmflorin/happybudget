@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
+import { isNil } from "lodash";
 
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import * as actions from "../../store/actions/template/fringes";
+import { selectTemplateDetail } from "../..//store/selectors";
 import { GenericFringesModal, GenericFringesModalProps } from "../Generic";
 
 const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.template.fringes.data);
@@ -28,6 +30,7 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
+  const templateDetail = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     // TODO: It might not be necessary to always refresh the Fringes when the modal opens, but it is
@@ -39,6 +42,7 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
 
   return (
     <GenericFringesModal
+      exportFileName={!isNil(templateDetail) ? `${templateDetail.name}_fringes` : "fringes"}
       open={open}
       onCancel={onCancel}
       loading={loading}

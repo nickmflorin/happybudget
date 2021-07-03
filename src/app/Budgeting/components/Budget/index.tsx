@@ -1,15 +1,11 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
-import { isNil } from "lodash";
+import { filter, isNil, map } from "lodash";
+import { createSelector } from "reselect";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faMagic,
-  faPrint,
-  faCloud,
-  faCog,
-  faCommentsAlt,
   faFilePlus as faFilePlusSolid,
   faCopy as faCopySolid,
   faAddressBook as faAddressBookSolid,
@@ -26,16 +22,9 @@ import {
   faFileChartLine
 } from "@fortawesome/pro-light-svg-icons";
 
-import { getBudgetPdf } from "api/services";
-import { RenderIfValidId } from "components";
-import { download } from "lib/util/files";
+import { RenderIfValidId, SavingChanges } from "components";
 
-import {
-  wipeStateAction,
-  setBudgetIdAction,
-  setCommentsHistoryDrawerVisibilityAction
-} from "../../store/actions/budget";
-import { selectCommentsHistoryDrawerOpen, selectBudgetDetail } from "../../store/selectors";
+import { wipeStateAction, setBudgetIdAction } from "../../store/actions/budget";
 import { GenericLayout } from "../Generic";
 import { getBudgetLastVisited, isBudgetRelatedUrl } from "../../urls";
 
@@ -45,15 +34,38 @@ import SubAccount from "./SubAccount";
 import Actuals from "./Actuals";
 import Analysis from "./Analysis";
 
+const selectSaving = createSelector(
+  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.creating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.creating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.creating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.creating,
+  (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
+    return (
+      filter(
+        map(args, (arg: Redux.ModelListActionInstance[] | boolean) =>
+          Array.isArray(arg) ? arg.length !== 0 : arg === true
+        ),
+        (value: boolean) => value === true
+      ).length !== 0
+    );
+  }
+);
+
 const Budget = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
   const { budgetId } = useParams<{ budgetId: string }>();
   const match = useRouteMatch();
-
-  const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
-  const budget = useSelector(selectBudgetDetail);
+  const saving = useSelector(selectSaving);
 
   useEffect(() => {
     dispatch(wipeStateAction(null));
@@ -64,58 +76,7 @@ const Budget = (): JSX.Element => {
 
   return (
     <GenericLayout
-      toolbar={[
-        {
-          icon: <FontAwesomeIcon icon={faMagic} />,
-          disabled: true,
-          tooltip: {
-            title: "Bid Assistant",
-            placement: "bottom",
-            overlayClassName: "disabled"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faPrint} />,
-          onClick: () => {
-            if (!isNaN(parseInt(budgetId))) {
-              getBudgetPdf(parseInt(budgetId)).then((response: any) => {
-                download(response, !isNil(budget) ? `${budget.name}.pdf` : "budget.pdf");
-              });
-            }
-          },
-          tooltip: {
-            title: "Export",
-            placement: "bottom"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faCloud} />,
-          disabled: true,
-          tooltip: {
-            title: "Share",
-            placement: "bottom",
-            overlayClassName: "disabled"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faCog} />,
-          disabled: true,
-          tooltip: {
-            title: "Settings",
-            placement: "bottom",
-            overlayClassName: "disabled"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faCommentsAlt} />,
-          onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen)),
-          role: "drawer-toggle",
-          tooltip: {
-            title: "Comments",
-            placement: "bottom"
-          }
-        }
-      ]}
+      toolbar={() => <SavingChanges saving={saving} />}
       sidebar={[
         {
           icon: <FontAwesomeIcon icon={faFilePlus} />,

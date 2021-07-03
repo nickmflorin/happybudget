@@ -2,14 +2,19 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
-import { createSelector } from "reselect";
 import { map } from "lodash";
+
+import { faCommentsAlt, faPrint } from "@fortawesome/pro-solid-svg-icons";
+
+import * as api from "api";
+import { download } from "lib/util/files";
 
 import * as models from "lib/model";
 import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import { selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
+import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
+import { selectCommentsHistoryDrawerOpen, selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
 import * as actions from "../../../store/actions/budget/accounts";
 import { GenericAccountsTable } from "../../Generic";
 
@@ -19,14 +24,6 @@ const selectGroups = simpleDeepEqualSelector(
 const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.budget.accounts.data);
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.search
-);
-
-const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.deleting,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.updating,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.creating,
-  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
-    deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 
 const AccountsTable = (): JSX.Element => {
@@ -39,9 +36,9 @@ const AccountsTable = (): JSX.Element => {
   const budgetId = useSelector(selectBudgetId);
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
-  const saving = useSelector(selectSaving);
   const budgetDetail = useSelector(selectBudgetDetail);
   const groups = useSelector(selectGroups);
+  const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
 
   return (
     <React.Fragment>
@@ -57,7 +54,7 @@ const AccountsTable = (): JSX.Element => {
         detail={budgetDetail}
         search={search}
         onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
-        saving={saving}
+        exportFileName={!isNil(budgetDetail) ? `budget_${budgetDetail.name}_accounts` : ""}
         onRowAdd={(payload: Table.RowAddPayload<BudgetTable.BudgetAccountRow>) =>
           dispatch(actions.bulkCreateAccountsAction(payload))
         }
@@ -98,6 +95,26 @@ const AccountsTable = (): JSX.Element => {
             isCalculated: true,
             tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
             type: "sum"
+          }
+        ]}
+        actions={[
+          {
+            tooltip: "Export as PDF",
+            icon: faPrint,
+            text: "Export PDF",
+            onClick: () => {
+              if (!isNil(budgetId)) {
+                api.getBudgetPdf(budgetId).then((response: any) => {
+                  download(response, !isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf");
+                });
+              }
+            }
+          },
+          {
+            tooltip: "Comments",
+            text: "Comments",
+            icon: faCommentsAlt,
+            onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
           }
         ]}
       />

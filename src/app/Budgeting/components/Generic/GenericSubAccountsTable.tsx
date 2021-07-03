@@ -1,12 +1,15 @@
+import { useRef, ReactNode } from "react";
 import { isNil, includes, find, filter, map } from "lodash";
 import classNames from "classnames";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSigma, faPercentage, faUpload, faTrashAlt } from "@fortawesome/pro-solid-svg-icons";
+import { faSigma, faPercentage, faTrashAlt, faLineColumns, faFileCsv } from "@fortawesome/pro-solid-svg-icons";
 
 import { ColDef, ColSpanParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
+import { FieldsDropdown } from "components/dropdowns";
+
 import { getKeyValue } from "lib/util";
+import { downloadAsCsvFile } from "lib/util/files";
 import { inferModelFromName } from "lib/model/util";
 import { currencyValueFormatter } from "lib/model/formatters";
 import { floatValueSetter, integerValueSetter } from "lib/model/valueSetters";
@@ -16,8 +19,9 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericSubAccountsTableProps<R extends Table.Row, M extends Model.SubAccount, G extends Model.Group>
   extends Omit<
     BudgetTable.Props<R, M, G, Http.SubAccountPayload>,
-    "identifierField" | "identifierFieldHeader" | "groupParams" | "rowCanExpand"
+    "identifierField" | "identifierFieldHeader" | "groupParams" | "rowCanExpand" | "tableRef"
   > {
+  exportFileName: string;
   categoryName: "Sub Account" | "Detail";
   identifierFieldHeader: "Account" | "Line";
   fringes: Model.Fringe[];
@@ -49,6 +53,7 @@ const GenericSubAccountsTable = <
   fringesCellRenderer,
   fringesCellEditorParams,
   subAccountUnits,
+  exportFileName,
   onGroupRows,
   onDeleteGroup,
   onEditGroup,
@@ -57,8 +62,11 @@ const GenericSubAccountsTable = <
   onEditFringes,
   ...props
 }: GenericSubAccountsTableProps<R, M, G>): JSX.Element => {
+  const tableRef = useRef<BudgetTable.Ref>(null);
+
   return (
     <BudgetTableComponent<R, M, G, Http.SubAccountPayload>
+      tableRef={tableRef}
       identifierField={"identifier"}
       identifierFieldHeader={identifierFieldHeader}
       identifierColumn={{
@@ -81,32 +89,89 @@ const GenericSubAccountsTable = <
         onRowAddToGroup
       }}
       rowCanExpand={(row: R) => row.identifier !== null || row.meta.children.length !== 0}
+      {...props}
       actions={(params: BudgetTable.MenuActionParams<R>) => [
         {
           tooltip: "Delete",
-          icon: <FontAwesomeIcon icon={faTrashAlt} />,
+          icon: faTrashAlt,
           onClick: () => {
             const rows: R[] = params.apis.grid.getSelectedRows();
             props.onRowDelete(map(rows, (row: R) => row.id));
           }
         },
         {
-          tooltip: "Sub-Total",
-          icon: <FontAwesomeIcon icon={faSigma} />,
-          disabled: true
+          tooltip: "Group",
+          icon: faSigma,
+          disabled: true,
+          text: "Group"
         },
         {
           tooltip: "Mark Up",
-          icon: <FontAwesomeIcon icon={faPercentage} />,
-          disabled: true
+          icon: faPercentage,
+          disabled: true,
+          text: "Mark Up"
         },
         {
-          tooltip: "Import",
-          icon: <FontAwesomeIcon icon={faUpload} />,
-          disabled: true
-        }
+          text: "Columns",
+          icon: faLineColumns,
+          tooltip: "Toggle Visibility",
+          wrap: (children: ReactNode) => {
+            return (
+              <FieldsDropdown
+                fields={map(params.columns, (col: Table.Column<R>) => ({
+                  id: col.field as string,
+                  label: col.headerName as string,
+                  defaultChecked: true
+                }))}
+                onChange={(change: FieldCheck) => {
+                  const tableRefObj = tableRef.current;
+                  if (!isNil(tableRefObj)) {
+                    tableRefObj.setColumnVisibility({ field: change.id, visible: change.checked });
+                  }
+                }}
+              >
+                {children}
+              </FieldsDropdown>
+            );
+          }
+        },
+        {
+          text: "Export CSV",
+          icon: faFileCsv,
+          tooltip: "Export as CSV",
+          wrap: (children: ReactNode) => {
+            return (
+              <FieldsDropdown
+                fields={map(params.columns, (col: Table.Column<R>) => ({
+                  id: col.field as string,
+                  label: col.headerName as string,
+                  defaultChecked: true
+                }))}
+                buttons={[
+                  {
+                    onClick: (checks: FieldCheck[]) => {
+                      const tableRefObj = tableRef.current;
+                      const fields = map(
+                        filter(checks, (field: FieldCheck) => field.checked === true),
+                        (field: FieldCheck) => field.id
+                      );
+                      if (fields.length !== 0 && !isNil(tableRefObj)) {
+                        const csvData = tableRefObj.getCSVData(fields);
+                        downloadAsCsvFile(exportFileName, csvData);
+                      }
+                    },
+                    text: "Download",
+                    className: "btn--primary"
+                  }
+                ]}
+              >
+                {children}
+              </FieldsDropdown>
+            );
+          }
+        },
+        ...(!isNil(props.actions) ? (Array.isArray(props.actions) ? props.actions : props.actions(params)) : [])
       ]}
-      {...props}
       columns={[
         {
           field: "description",

@@ -60,6 +60,11 @@ namespace Table {
     readonly column: import("@ag-grid-community/core").ColumnApi;
   };
 
+  interface ColumnVisibilityChange {
+    readonly field: string;
+    readonly visible: boolean;
+  }
+
   interface Column<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
     readonly type: ColumnTypeId;
     readonly nullValue?: null | "" | 0 | [];
@@ -68,9 +73,6 @@ namespace Table {
     readonly budgetTotal?: number;
     readonly tableTotal?: number;
     readonly excludeFromExport?: boolean;
-    // When exporting, the default will be to use the processCellForClipboard unless
-    // processCellForExport is also provided.
-    readonly processCellForExport?: (row: R) => string;
     readonly processCellForClipboard?: (row: R) => string;
     readonly processCellFromClipboard?: (value: string) => any;
   }
@@ -322,11 +324,14 @@ namespace BudgetTable {
     readonly ordering?: string;
   }
 
-  interface MenuAction {
-    readonly icon: JSX.Element;
+  type MenuAction = {
+    readonly icon: import("@fortawesome/fontawesome-svg-core").IconProp;
     readonly tooltip?: Partial<import("antd/lib/tooltip").TooltipPropsWithTitle> | string;
     readonly onClick?: () => void;
     readonly disabled?: boolean;
+    readonly text?: string;
+    readonly render?: RenderFunc;
+    readonly wrap?: (children: ReactNode) => JSX.Element;
   }
 
   interface MenuActionParams<R extends Table.Row> {
@@ -340,16 +345,9 @@ namespace BudgetTable {
     readonly actions?:
       | ((params: BudgetTable.MenuActionParams<R>) => BudgetTable.MenuAction[])
       | BudgetTable.MenuAction[];
-    readonly saving?: boolean;
     readonly search?: string;
-    readonly canExport?: boolean;
-    readonly canToggleColumns?: boolean;
-    readonly canSearch?: boolean;
     readonly detached?: boolean;
     readonly onSearch?: (value: string) => void;
-    // TODO: Stop using Field type.
-    readonly onColumnsChange: (fields: Field[]) => void;
-    readonly onExport: (fields: Field[]) => void;
   }
 
   // The abstract/generic <Grid> component that wraps AG Grid right at the interface.
@@ -394,7 +392,6 @@ namespace BudgetTable {
     readonly identifierField: string;
     readonly columns: Table.Column<R>[];
     readonly manager: Table.IRowManager<R, M, P>;
-    readonly exportFileName?: string;
     readonly onTableChange: (payload: Table.Change<R>) => void;
     readonly onRowAdd: Table.RowAddFunc<R>;
     readonly onRowDelete: (ids: number | number[]) => void;
@@ -405,12 +402,22 @@ namespace BudgetTable {
     readonly onBack?: () => void;
   }
 
+  interface PrimaryGridRef {
+    readonly getCSVData: (fields?: string[]) => CSVData;
+  }
+
   interface PrimaryGridProps<R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>
     extends BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
       Omit<BudgetTable.MenuProps<R>, "columns" | "onExport" | "onDelete" | "apis">,
       SpecificGridProps {
+    readonly gridRef: import("react").RefObject<PrimaryGridRef>;
     readonly ordering: FieldOrder<keyof R>[];
     readonly isCellEditable: (row: R, colDef: Table.Column<R>) => boolean;
+  }
+
+  interface Ref extends PrimaryGridRef {
+    readonly changeColumnVisibility: (changes: Table.ColumnVisibilityChange[]) => void;
+    readonly setColumnVisibility: (change: Table.ColumnVisibilityChange) => void;
   }
 
   interface Props<
@@ -421,6 +428,7 @@ namespace BudgetTable {
   > extends Omit<BudgetTable.MenuProps<R>, "columns" | "onColumnsChange" | "onExport" | "onDelete" | "apis">,
       BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
       StandardComponentProps {
+    readonly tableRef: import("react").RefObject<BudgetTable.Ref>;
     readonly identifierFieldHeader: string;
     readonly identifierColumn?: Partial<Table.Column<R>>;
     readonly actionColumn?: Partial<Table.Column<R>>;
@@ -428,7 +436,6 @@ namespace BudgetTable {
     readonly expandColumn?: Partial<Table.Column<R>>;
     readonly tableFooterIdentifierValue?: string | null;
     readonly budgetFooterIdentifierValue?: string | null;
-    readonly saving: boolean;
     readonly loadingBudget?: boolean;
     readonly exportable?: boolean;
     readonly nonEditableCells?: (keyof R)[];

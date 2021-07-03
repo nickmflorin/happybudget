@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
-import { createSelector } from "reselect";
 import { map } from "lodash";
 
 import * as models from "lib/model";
@@ -20,13 +19,6 @@ const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => 
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.accounts.search
 );
-const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.deleting,
-  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.updating,
-  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.creating,
-  (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
-    deleting.length !== 0 || updating.length !== 0 || creating === true
-);
 
 const AccountsTable = (): JSX.Element => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
@@ -38,7 +30,6 @@ const AccountsTable = (): JSX.Element => {
   const templateId = useSelector(selectTemplateId);
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
-  const saving = useSelector(selectSaving);
   const templateDetail = useSelector(selectTemplateDetail);
   const groups = useSelector(selectGroups);
 
@@ -56,7 +47,7 @@ const AccountsTable = (): JSX.Element => {
         detail={templateDetail}
         search={search}
         onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
-        saving={saving}
+        exportFileName={!isNil(templateDetail) ? `template_${templateDetail.name}_accounts` : ""}
         onRowAdd={(payload: Table.RowAddPayload<BudgetTable.TemplateAccountRow>) =>
           dispatch(actions.bulkCreateAccountsAction(payload))
         }
