@@ -45,7 +45,8 @@ namespace Table {
     | "currency"
     | "sum"
     | "percentage"
-    | "date";
+    | "date"
+    | "action";
   type ColumnAlignment = "right" | "left" | null;
 
   interface ColumnType {
@@ -368,13 +369,11 @@ namespace BudgetTable {
   }
 
   interface BudgetFooterGridProps<R extends Table.Row> extends SpecificGridProps {
-    readonly identifierField: string;
     readonly identifierValue?: string | null;
     readonly loadingBudget?: boolean | undefined;
   }
 
   interface TableFooterGridProps<R extends Table.Row> extends SpecificGridProps {
-    readonly identifierField: string;
     readonly identifierValue?: string | null;
   }
 
@@ -389,7 +388,6 @@ namespace BudgetTable {
     readonly groupParams?: BudgetTable.GroupProps<R, G>;
     readonly frameworkComponents?: { [key: string]: any };
     readonly search?: string;
-    readonly identifierField: string;
     readonly columns: Table.Column<R>[];
     readonly manager: Table.IRowManager<R, M, P>;
     readonly onTableChange: (payload: Table.Change<R>) => void;
@@ -429,9 +427,6 @@ namespace BudgetTable {
       BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
       StandardComponentProps {
     readonly tableRef: import("react").RefObject<BudgetTable.Ref>;
-    readonly identifierFieldHeader: string;
-    readonly identifierColumn?: Partial<Table.Column<R>>;
-    readonly actionColumn?: Partial<Table.Column<R>>;
     readonly indexColumn?: Partial<Table.Column<R>>;
     readonly expandColumn?: Partial<Table.Column<R>>;
     readonly tableFooterIdentifierValue?: string | null;

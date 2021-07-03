@@ -69,48 +69,7 @@ const Actuals = (): JSX.Element => {
           data={data}
           tableRef={tableRef}
           manager={models.ActualRowManager}
-          identifierField={"subaccount"}
-          identifierFieldHeader={"Account"}
           tableFooterIdentifierValue={"Actuals Total"}
-          identifierColumn={{
-            type: "singleSelect",
-            minWidth: 200,
-            maxWidth: 200,
-            width: 200,
-            processCellForClipboard: (row: BudgetTable.ActualRow) => {
-              if (!isNil(row.subaccount)) {
-                return row.subaccount.identifier || "";
-              }
-              return "";
-            },
-            processCellFromClipboard: (name: string) => {
-              if (name.trim() === "") {
-                return null;
-              }
-              const availableSubAccounts: Model.SimpleSubAccount[] = filter(
-                map(data, (actual: Model.Actual) => actual.subaccount),
-                (sub: Model.SimpleSubAccount | null) => sub !== null && sub.identifier !== null
-              ) as Model.SimpleSubAccount[];
-              // NOTE: If there are multiple sub accounts with the same identifier, this will
-              // return the first and issue a warning.
-              const subaccount = inferModelFromName<Model.SimpleSubAccount>(availableSubAccounts, name, {
-                nameField: "identifier"
-              });
-              return subaccount;
-            },
-            cellRenderer: "BudgetItemCell",
-            cellEditor: "SubAccountsTreeEditor",
-            cellEditorParams: {
-              setSearch: (value: string) => dispatch(actions.setSubAccountsTreeSearchAction(value))
-            },
-            // Required to allow the dropdown to be selectable on Enter key.
-            suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-              if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-                return true;
-              }
-              return false;
-            }
-          }}
           indexColumn={{ width: 40, maxWidth: 50 }}
           search={search}
           onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
@@ -192,6 +151,47 @@ const Actuals = (): JSX.Element => {
             }
           ]}
           columns={[
+            {
+              field: "subaccount",
+              headerName: "Sub-Account",
+              type: "singleSelect",
+              minWidth: 200,
+              maxWidth: 200,
+              width: 200,
+              processCellForClipboard: (row: BudgetTable.ActualRow) => {
+                if (!isNil(row.subaccount)) {
+                  return row.subaccount.identifier || "";
+                }
+                return "";
+              },
+              processCellFromClipboard: (name: string) => {
+                if (name.trim() === "") {
+                  return null;
+                }
+                const availableSubAccounts: Model.SimpleSubAccount[] = filter(
+                  map(data, (actual: Model.Actual) => actual.subaccount),
+                  (sub: Model.SimpleSubAccount | null) => sub !== null && sub.identifier !== null
+                ) as Model.SimpleSubAccount[];
+                // NOTE: If there are multiple sub accounts with the same identifier, this will
+                // return the first and issue a warning.
+                const subaccount = inferModelFromName<Model.SimpleSubAccount>(availableSubAccounts, name, {
+                  nameField: "identifier"
+                });
+                return subaccount;
+              },
+              cellRenderer: "BudgetItemCell",
+              cellEditor: "SubAccountsTreeEditor",
+              cellEditorParams: {
+                setSearch: (value: string) => dispatch(actions.setSubAccountsTreeSearchAction(value))
+              },
+              // Required to allow the dropdown to be selectable on Enter key.
+              suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+                if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
+                  return true;
+                }
+                return false;
+              }
+            },
             {
               field: "description",
               headerName: "Description",

@@ -140,10 +140,6 @@ const BudgetTable = <
   loadingBudget,
   nonEditableCells,
   cookies,
-  identifierField,
-  identifierFieldHeader,
-  identifierColumn = {},
-  actionColumn = {},
   expandColumn = {},
   indexColumn = {},
   tableFooterIdentifierValue = "Grand Total",
@@ -225,85 +221,74 @@ const BudgetTable = <
     }
   });
 
-  const ActionColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
-    return {
-      ...col,
-      ...actionColumn,
-      cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", col.cellClass),
+  const IndexColumn = useDynamicCallback<Table.Column<R>>(
+    (): Table.Column<R> => ({
+      ...indexColumn,
+      type: "action",
       editable: false,
       headerName: "",
-      resizable: false
-    };
-  });
-
-  const IndexColumn = useDynamicCallback<Table.Column<R>>(
-    (col: Table.Column<R>): Table.Column<R> =>
-      ActionColumn({
-        ...indexColumn,
-        field: "index",
-        cellRenderer: "IndexCell",
-        checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
-          const row: R = params.data;
-          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
-            return false;
-          }
-          return true;
-        },
-        width: isNil(onRowExpand) ? 40 : 25,
-        maxWidth: isNil(onRowExpand) ? 40 : 25,
-        pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
-        cellRendererParams: {
-          onRowAdd: onRowAdd,
-          ...col.cellRendererParams,
-          ...actionColumn.cellRendererParams,
-          ...indexColumn.cellRendererParams
-        },
-        cellClass: classNames(indexColumn.cellClass, actionColumn.cellClass),
-        colSpan: (params: ColSpanParams) => {
-          const row: R = params.data;
-          if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
-            if (!isNil(onRowExpand)) {
-              return 2;
-            }
-            return 1;
+      resizable: false,
+      field: "index",
+      cellRenderer: "IndexCell",
+      checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
+        const row: R = params.data;
+        if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
+          return false;
+        }
+        return true;
+      },
+      width: isNil(onRowExpand) ? 40 : 25,
+      maxWidth: isNil(onRowExpand) ? 40 : 25,
+      pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
+      cellRendererParams: {
+        onRowAdd: onRowAdd,
+        ...indexColumn.cellRendererParams
+      },
+      cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", indexColumn.cellClass),
+      colSpan: (params: ColSpanParams) => {
+        const row: R = params.data;
+        if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
+          if (!isNil(onRowExpand)) {
+            return 2;
           }
           return 1;
         }
-      })
+        return 1;
+      }
+    })
   );
 
   const ExpandColumn = useDynamicCallback<Table.Column<R>>(
-    (col: Table.Column<R>): Table.Column<R> =>
-      ActionColumn({
-        width: 30,
-        maxWidth: 30,
-        ...expandColumn,
-        ...col,
-        field: "expand",
-        cellRenderer: "ExpandCell",
-        pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
-        cellRendererParams: {
-          ...expandColumn.cellRendererParams,
-          ...col.cellRendererParams,
-          onClick: onRowExpand,
-          rowCanExpand
-        },
-        cellClass: mergeClassNamesFn(col.cellClass, expandColumn.cellClass, actionColumn.cellClass)
-      })
+    (): Table.Column<R> => ({
+      width: 30,
+      maxWidth: 30,
+      ...expandColumn,
+      type: "action",
+      headerName: "",
+      field: "expand",
+      editable: false,
+      resizable: false,
+      cellRenderer: "ExpandCell",
+      pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
+      cellRendererParams: {
+        ...expandColumn.cellRendererParams,
+        onClick: onRowExpand,
+        rowCanExpand
+      },
+      cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", expandColumn.cellClass)
+    })
   );
 
   const IdentifierColumn = useDynamicCallback<Table.Column<R>>(
-    (col: Table.Column<R>): Table.Column<R> => ({
-      field: identifierField,
-      headerName: identifierFieldHeader,
+    (col: Partial<Table.Column<R>> & { field: keyof R & string }): Table.Column<R> => ({
       cellRenderer: "IdentifierCell",
       type: "number",
       width: 100,
-      ...identifierColumn,
+      ...col,
       suppressSizeToFit: true,
       pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
       cellRendererParams: {
-        ...identifierColumn.cellRendererParams,
+        ...col.cellRendererParams,
         onGroupEdit: groupParams?.onEditGroup,
         groups
       },
@@ -311,8 +296,8 @@ const BudgetTable = <
         const row: R = params.data;
         if (row.meta.isGroupFooter === true) {
           return filter(columns, (c: Table.Column<R>) => !(c.isCalculated === true)).length + 1;
-        } else if (!isNil(identifierColumn.colSpan)) {
-          return identifierColumn.colSpan(params);
+        } else if (!isNil(col.colSpan)) {
+          return col.colSpan(params);
         }
         return 1;
       }
@@ -369,17 +354,6 @@ const BudgetTable = <
     };
   });
 
-  const baseColumns = useMemo((): Table.Column<R>[] => {
-    let base: Table.Column<R>[] = [IndexColumn({})];
-    if (!isNil(onRowExpand)) {
-      // This cell will be hidden for the table footer since the previous index
-      // cell will span over this column.
-      base.push(ExpandColumn({}));
-    }
-    base.push(IdentifierColumn({}));
-    return base;
-  }, [onRowExpand]);
-
   useEffect(() => {
     if (!isNil(cookies) && !isNil(cookies.ordering)) {
       const kookies = new Cookies();
@@ -395,26 +369,37 @@ const BudgetTable = <
   }, [useDeepEqualMemo(cookies)]);
 
   useEffect(() => {
-    const cs = concat(
-      baseColumns,
-      map(
-        filter(columns, (col: Table.Column<R>) => !(col.isCalculated === true)),
-        (def: Table.Column<R>) => BodyColumn(def)
-      ),
-      map(
-        filter(columns, (col: Table.Column<R>) => col.isCalculated === true),
-        (def: Table.Column<R>) => CalculatedColumn(def)
-      )
-    );
-    setCols(
-      map(cs, (col: Table.Column<R>, index: number) => {
-        if (index === cs.length - 1) {
-          return UniversalColumn({ ...col, resizable: false });
-        }
-        return UniversalColumn(col);
-      })
-    );
-  }, [useDeepEqualMemo(columns), baseColumns]);
+    let base: Table.Column<R>[] = [IndexColumn()];
+    if (!isNil(onRowExpand)) {
+      // This cell will be hidden for the table footer since the previous index
+      // cell will span over this column.
+      base.push(ExpandColumn());
+    }
+    if (columns.length !== 0) {
+      base.push(IdentifierColumn(columns[0]));
+      const cs = concat(
+        base,
+        map(
+          filter(columns.slice(1), (col: Table.Column<R>) => !(col.isCalculated === true)),
+          (def: Table.Column<R>) => BodyColumn(def)
+        ),
+        map(
+          filter(columns.slice(1), (col: Table.Column<R>) => col.isCalculated === true),
+          (def: Table.Column<R>) => CalculatedColumn(def)
+        )
+      );
+      setCols(
+        map(cs, (col: Table.Column<R>, index: number) => {
+          if (index === cs.length - 1) {
+            return UniversalColumn({ ...col, resizable: false });
+          }
+          return UniversalColumn(col);
+        })
+      );
+    } else {
+      setCols(base);
+    }
+  }, [columns, onRowExpand]);
 
   const setColumnVisibility = useDynamicCallback((change: Table.ColumnVisibilityChange) => {
     apis.columnMap((api: ColumnApi) => api.setColumnVisible(change.field, change.visible));
@@ -453,7 +438,6 @@ const BudgetTable = <
           gridRef={gridRef}
           onGridReady={(e: GridReadyEvent) => onGridReady("primary", { grid: e.api, column: e.columnApi })}
           onFirstDataRendered={onFirstDataRendered}
-          identifierField={identifierField}
           columns={cols}
           options={gridOptions.primary}
           ordering={ordering}
@@ -471,7 +455,6 @@ const BudgetTable = <
           onFirstDataRendered={onFirstDataRendered}
           options={gridOptions.tableFooter}
           columns={cols}
-          identifierField={identifierField}
           identifierValue={tableFooterIdentifierValue}
         />
         <ShowHide show={showBudgetFooterGrid}>
@@ -481,7 +464,6 @@ const BudgetTable = <
             onFirstDataRendered={onFirstDataRendered}
             options={gridOptions.budgetFooter}
             columns={cols}
-            identifierField={identifierField}
             identifierValue={budgetFooterIdentifierValue}
             loadingBudget={loadingBudget}
           />

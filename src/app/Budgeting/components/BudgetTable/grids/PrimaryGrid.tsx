@@ -53,7 +53,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   groupParams,
   frameworkComponents,
   search,
-  identifierField,
   actions,
   detached,
   onGridReady,
@@ -85,23 +84,18 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     const rowId = query.get("row");
     const cols = event.columnApi.getAllColumns();
 
-    if (!isNil(cols)) {
-      let identifierCol = event.columnApi.getColumn(identifierField);
-      if (isNil(identifierCol)) {
-        identifierCol = cols[0];
+    if (!isNil(cols) && cols.length >= 3) {
+      let identifierCol = cols[2];
+      let focusedOnQuery = false;
+      if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
+        const node = event.api.getRowNode(String(rowId));
+        if (!isNil(node) && !isNil(node.rowIndex) && !isNil(identifierCol)) {
+          event.api.setFocusedCell(node.rowIndex, identifierCol);
+          focusedOnQuery = true;
+        }
       }
-      if (!isNil(identifierCol)) {
-        let focusedOnQuery = false;
-        if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
-          const node = event.api.getRowNode(String(rowId));
-          if (!isNil(node) && !isNil(node.rowIndex) && !isNil(identifierCol)) {
-            event.api.setFocusedCell(node.rowIndex, identifierCol);
-            focusedOnQuery = true;
-          }
-        }
-        if (focusedOnQuery === false) {
-          event.api.setFocusedCell(0, identifierCol);
-        }
+      if (focusedOnQuery === false) {
+        event.api.setFocusedCell(0, identifierCol);
       }
     }
   });
@@ -217,7 +211,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       } else {
         if (includes(["index", "expand"], params.nextCellPosition.column.getColId())) {
           let nextCellPosition = { ...params.nextCellPosition };
-
           // Skip the Group Footer rows.
           const [rowNode, _, additionalIndex] = findFirstNonGroupFooterRow(params.nextCellPosition.rowIndex);
           if (!isNil(rowNode)) {
@@ -226,12 +219,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
               rowIndex: params.nextCellPosition.rowIndex + additionalIndex
             };
           }
-
-          if (params.backwards === false) {
-            const identifierCol = apis.column.getColumn(identifierField);
-            if (!isNil(identifierCol)) {
-              return { ...nextCellPosition, column: identifierCol };
-            }
+          const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
+          if (params.backwards === false && columns.length > baseColumns.length) {
+            return { ...nextCellPosition, column: columns[baseColumns.length] };
           } else {
             const agColumns = apis.column.getAllColumns();
             if (!isNil(agColumns)) {
@@ -655,35 +645,39 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   });
 
   useEffect(() => {
-    const createGroupFooter = (group: G): R => {
-      return reduce(
-        columns,
-        (obj: { [key: string]: any }, col: Table.Column<R>) => {
-          if (!isNil(col.field)) {
-            if (col.isCalculated === true) {
-              if (!isNil(group[col.field as keyof G])) {
-                obj[col.field] = group[col.field as keyof G];
+    const createGroupFooter = (group: G): R | null => {
+      const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
+      if (columns.length > baseColumns.length) {
+        return reduce(
+          [...columns.slice(0, baseColumns.length), ...columns.slice(baseColumns.length + 1)],
+          (obj: { [key: string]: any }, col: Table.Column<R>) => {
+            if (!isNil(col.field)) {
+              if (col.isCalculated === true) {
+                if (!isNil(group[col.field as keyof G])) {
+                  obj[col.field] = group[col.field as keyof G];
+                } else {
+                  obj[col.field] = null;
+                }
               } else {
                 obj[col.field] = null;
               }
-            } else {
-              obj[col.field] = null;
+            }
+            return obj;
+          },
+          {
+            // The ID needs to designate that this row refers to a Group because the ID of a Group
+            // might clash with the ID of a SubAccount/Account.
+            id: `group-${group.id}`,
+            [columns[baseColumns.length].field]: group.name,
+            group: group.id,
+            meta: {
+              isGroupFooter: true,
+              children: []
             }
           }
-          return obj;
-        },
-        {
-          // The ID needs to designate that this row refers to a Group because the ID of a Group
-          // might clash with the ID of a SubAccount/Account.
-          id: `group-${group.id}`,
-          [identifierField]: group.name,
-          group,
-          meta: {
-            isGroupFooter: true,
-            children: []
-          }
-        }
-      ) as R;
+        ) as R;
+      }
+      return null;
     };
     const getGroupForModel = (model: M): number | null => {
       const group: G | undefined = find(groups, (g: G) =>
@@ -703,19 +697,16 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     forEach(groupedModels, (ms: M[], groupId: string) => {
       const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
       if (!isNil(group)) {
-        const footer: R = createGroupFooter(group);
         newTable.push(
           ...orderByFieldOrdering(
             map(ms, (m: M) => manager.modelToRow(m)),
             ordering
-          ),
-          {
-            ...footer,
-            group: group.id,
-            [identifierField]: group.name,
-            meta: { ...footer.meta, isGroupFooter: true }
-          }
+          )
         );
+        const footer: R | null = createGroupFooter(group);
+        if (!isNil(footer)) {
+          newTable.push(footer);
+        }
       } else {
         // In the case that the group no longer exists, that means the group was removed from the
         // state.  In this case, we want to disassociate the rows with the group.
@@ -769,15 +760,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
         }
       });
       const cols = apis.column.getAllColumns();
-      const identifierCol = find(cols, (col: Column) => {
-        const def = col.getColDef();
-        if (def.field === identifierField) {
-          return true;
-        }
-        return false;
-      });
-      if (nodes.length !== 0 && !isNil(identifierCol)) {
-        apis.grid.refreshCells({ force: true, rowNodes: nodes, columns: [identifierCol] });
+      if (!isNil(cols) && cols.length >= 3 && nodes.length !== 0) {
+        apis.grid.refreshCells({ force: true, rowNodes: nodes, columns: [cols[2]] });
       }
     }
   }, [useDeepEqualMemo(groups), apis]);
@@ -954,8 +938,13 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
             // we always need to refresh the expand column whenever another cell
             // is hovered.  We should figure out if there is a way to optimize
             // this to only refresh under certain circumstances.
-            const nodes: RowNode[] = [];
-            if (includes(["index", "expand", identifierField], e.colDef.field)) {
+            if (
+              includes(
+                map(columns.slice(3), (col: Table.Column<R>) => col.field),
+                e.colDef.field
+              )
+            ) {
+              const nodes: RowNode[] = [];
               e.api.forEachNode((node: RowNode) => {
                 const row: R = node.data;
                 if (row.meta.isGroupFooter === false) {

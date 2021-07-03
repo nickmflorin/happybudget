@@ -11,40 +11,41 @@ import Grid from "./Grid";
 const TableFooterGrid = <R extends Table.Row>({
   onGridReady,
   onFirstDataRendered,
-  identifierField,
   identifierValue,
   options,
   columns
 }: BudgetTable.TableFooterGridProps<R>): JSX.Element => {
   const rowData = useMemo((): R | null => {
-    // TODO: Loop over the colDef's after we attribute the Base Columns with isBase = true, so
-    // we can weed those out here.
-    return reduce(
-      filter(columns, (col: Table.Column<R>) => col.field !== identifierField),
-      (obj: { [key: string]: any }, col: Table.Column<R>) => {
-        if (!isNil(col.field)) {
-          if (!isNil(col.tableTotal)) {
-            obj[col.field] = col.tableTotal;
-          } else {
-            obj[col.field] = null;
+    const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
+    if (columns.length > baseColumns.length) {
+      return reduce(
+        [...columns.slice(0, baseColumns.length), ...columns.slice(baseColumns.length + 1)],
+        (obj: { [key: string]: any }, col: Table.Column<R>) => {
+          if (!isNil(col.field)) {
+            if (!isNil(col.tableTotal)) {
+              obj[col.field] = col.tableTotal;
+            } else {
+              obj[col.field] = null;
+            }
+          }
+          return obj;
+        },
+        {
+          id: hashString("tablefooter"),
+          [columns[baseColumns.length].field]: identifierValue,
+          meta: {
+            isGroupFooter: false,
+            isTableFooter: true,
+            isBudgetFooter: false,
+            selected: false,
+            children: [],
+            errors: []
           }
         }
-        return obj;
-      },
-      {
-        id: hashString("tablefooter"),
-        [identifierField]: identifierValue,
-        meta: {
-          isGroupFooter: false,
-          isTableFooter: true,
-          isBudgetFooter: false,
-          selected: false,
-          children: [],
-          errors: []
-        }
-      }
-    ) as R;
-  }, [useDeepEqualMemo(columns), identifierValue, identifierField]);
+      ) as R;
+    }
+    return null;
+  }, [useDeepEqualMemo(columns), identifierValue]);
 
   const TableFooterGridColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
     return {
@@ -54,22 +55,26 @@ const TableFooterGrid = <R extends Table.Row>({
         if (isNil(field) || includes(["index", "expand"], field)) {
           return !isNil(col.colSpan) ? col.colSpan(params) : 1;
         }
+
         let startingIndex = 0;
-        if (field !== identifierField) {
-          startingIndex = findIndex(columns, { field } as any);
-          if (startingIndex === -1) {
-            /* eslint-disable no-console */
-            console.error(`Suspicious behavior:  Could not find column for field ${field}.`);
+        const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
+        if (columns.length > baseColumns.length) {
+          const identifierCol = columns[baseColumns.length];
+          if (field !== identifierCol.field) {
+            startingIndex = findIndex(columns, { field } as any);
+            if (startingIndex === -1) {
+              /* eslint-disable no-console */
+              console.error(`Suspicious behavior:  Could not find column for field ${field}.`);
+              return 1;
+            }
+          } else {
             return 1;
           }
+        } else {
+          return 1;
         }
-        // Columns to the right of the identifier column (including the identifier
-        // column).
-        const identifierToRightColumns = filter(
-          columns,
-          (c: Table.Column<R>) => !includes(["index", "expand"], c.field)
-        );
-        const rightIndex = findIndex(identifierToRightColumns, (c: Table.Column<R>) => !isNil(c.tableTotal));
+        // Columns to the right of the index and expand columns.
+        const rightIndex = findIndex(columns.slice(baseColumns.length), (c: Table.Column<R>) => !isNil(c.tableTotal));
         if (rightIndex !== -1) {
           return rightIndex - startingIndex;
         }
@@ -83,7 +88,7 @@ const TableFooterGrid = <R extends Table.Row>({
       <Grid<R>
         {...options}
         columns={map(columns, (col: Table.Column<R>) => TableFooterGridColumn(col))}
-        rowData={[rowData]}
+        rowData={!isNil(rowData) ? [rowData] : []}
         rowHeight={38}
         rowClass={"row--table-footer"}
         suppressRowClickSelection={true}

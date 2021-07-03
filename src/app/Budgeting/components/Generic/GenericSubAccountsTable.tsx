@@ -17,10 +17,7 @@ import { floatValueSetter, integerValueSetter } from "lib/model/valueSetters";
 import BudgetTableComponent from "../BudgetTable";
 
 export interface GenericSubAccountsTableProps<R extends Table.Row, M extends Model.SubAccount, G extends Model.Group>
-  extends Omit<
-    BudgetTable.Props<R, M, G, Http.SubAccountPayload>,
-    "identifierField" | "identifierFieldHeader" | "groupParams" | "rowCanExpand" | "tableRef"
-  > {
+  extends Omit<BudgetTable.Props<R, M, G, Http.SubAccountPayload>, "groupParams" | "rowCanExpand" | "tableRef"> {
   exportFileName: string;
   categoryName: "Sub Account" | "Detail";
   identifierFieldHeader: "Account" | "Line";
@@ -67,13 +64,6 @@ const GenericSubAccountsTable = <
   return (
     <BudgetTableComponent<R, M, G, Http.SubAccountPayload>
       tableRef={tableRef}
-      identifierField={"identifier"}
-      identifierFieldHeader={identifierFieldHeader}
-      identifierColumn={{
-        ...props.identifierColumn,
-        width: 90,
-        cellRendererParams: { className: "subaccount-identifier" }
-      }}
       isCellEditable={(row: R, colDef: ColDef) => {
         if (includes(["identifier", "description", "name"], colDef.field)) {
           return true;
@@ -173,6 +163,13 @@ const GenericSubAccountsTable = <
         ...(!isNil(props.actions) ? (Array.isArray(props.actions) ? props.actions : props.actions(params)) : [])
       ]}
       columns={[
+        {
+          field: "identifier",
+          type: "number",
+          headerName: identifierFieldHeader,
+          width: 90,
+          cellRendererParams: { className: "subaccount-identifier" }
+        },
         {
           field: "description",
           headerName: `${categoryName} Description`,

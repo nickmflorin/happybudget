@@ -14,12 +14,7 @@ export interface GenericAccountsTableProps<
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
 > extends Omit<
     BudgetTable.Props<R, M, G, P>,
-    | "identifierField"
-    | "identifierFieldHeader"
-    | "groupParams"
-    | "tableFooterIdentifierValue"
-    | "rowCanExpand"
-    | "tableRef"
+    "groupParams" | "tableFooterIdentifierValue" | "rowCanExpand" | "tableRef"
   > {
   exportFileName: string;
   onGroupRows: (rows: R[]) => void;
@@ -51,9 +46,6 @@ const GenericAccountsTable = <
   return (
     <BudgetTableComponent<R, M, G, P>
       tableRef={tableRef}
-      identifierField={"identifier"}
-      identifierFieldHeader={"Account"}
-      identifierColumn={{ ...props.identifierColumn, width: 90 }}
       tableFooterIdentifierValue={!isNil(detail) ? `${detail.name} Total` : "Total"}
       groupParams={{
         onDeleteGroup,
@@ -147,6 +139,12 @@ const GenericAccountsTable = <
         ...(!isNil(props.actions) ? (Array.isArray(props.actions) ? props.actions : props.actions(params)) : [])
       ]}
       columns={[
+        {
+          field: "identifier",
+          type: "number",
+          headerName: "Account",
+          width: 90
+        },
         {
           field: "description",
           headerName: "Account Description",

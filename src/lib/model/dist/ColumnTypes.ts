@@ -14,6 +14,9 @@ import {
 
 const ColumnTypes: Table.ColumnType[] = [
   {
+    id: "action"
+  },
+  {
     id: "text",
     icon: faFontCase,
     align: "left"

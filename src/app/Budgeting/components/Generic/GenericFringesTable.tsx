@@ -20,7 +20,7 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericFringesTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>,
-    "manager" | "identifierField" | "identifierFieldHeader" | "columns" | "tableRef"
+    "manager" | "columns" | "tableRef"
   > {
   exportFileName: string;
   saving: boolean;
@@ -42,8 +42,6 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
       tableRef={tableRef}
       detached={true}
       manager={models.FringeRowManager}
-      identifierField={"name"}
-      identifierFieldHeader={"Name"}
       tableFooterIdentifierValue={null}
       indexColumn={{ width: 40, maxWidth: 50 }}
       cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
@@ -93,6 +91,11 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
         }
       ]}
       columns={[
+        {
+          field: "name",
+          type: "text",
+          headerName: "Name"
+        },
         {
           field: "color",
           headerName: "Color",
