@@ -22,6 +22,9 @@ const selectTableSearch = simpleShallowEqualSelector(
 const selectSubAccountDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.detail.data
 );
+const selectLoadingSubAcount = simpleShallowEqualSelector(
+  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.detail.loading
+);
 
 interface SubAccountsTableProps {
   subaccountId: number;
@@ -37,6 +40,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
   const data = useSelector(selectSubAccounts);
   const search = useSelector(selectTableSearch);
   const subaccountDetail = useSelector(selectSubAccountDetail);
+  const subAccountLoading = useSelector(selectLoadingSubAcount);
   const groups = useSelector(selectGroups);
   const subAccountUnits = useSelector(selectSubAccountUnits);
 
@@ -46,6 +50,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         data={data}
         groups={groups}
         subAccountUnits={subAccountUnits}
+        loadingParent={subAccountLoading}
         // Right now, the SubAccount recursion only goes 1 layer deep.
         // Account -> SubAccount -> Detail (Recrusive SubAccount).
         onRowExpand={null}

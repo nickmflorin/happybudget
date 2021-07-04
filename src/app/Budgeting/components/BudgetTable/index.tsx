@@ -138,6 +138,7 @@ const BudgetTable = <
   groups = [],
   loading,
   loadingBudget,
+  loadingParent,
   nonEditableCells,
   cookies,
   expandColumn = {},
@@ -456,6 +457,7 @@ const BudgetTable = <
           options={gridOptions.tableFooter}
           columns={cols}
           identifierValue={tableFooterIdentifierValue}
+          loadingParent={loadingParent}
         />
         <ShowHide show={showBudgetFooterGrid}>
           <BudgetFooterGrid<R>

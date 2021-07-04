@@ -22,6 +22,9 @@ const selectTableSearch = simpleShallowEqualSelector(
 const selectAccountDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.account.detail.data
 );
+const selectAccountLoading = simpleDeepEqualSelector(
+  (state: Modules.ApplicationStore) => state.budgeting.template.account.detail.loading
+);
 
 interface SubAccountsTableProps {
   accountId: number;
@@ -37,6 +40,7 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
   const accountDetail = useSelector(selectAccountDetail);
+  const accountLoading = useSelector(selectAccountLoading);
   const groups = useSelector(selectGroups);
   const subAccountUnits = useSelector(selectSubAccountUnits);
 
@@ -47,6 +51,7 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
         groups={groups}
         detail={accountDetail}
         subAccountUnits={subAccountUnits}
+        loadingParent={accountLoading}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)
             ? `${accountDetail.description} Total`

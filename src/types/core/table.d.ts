@@ -375,6 +375,7 @@ namespace BudgetTable {
 
   interface TableFooterGridProps<R extends Table.Row> extends SpecificGridProps {
     readonly identifierValue?: string | null;
+    readonly loadingParent?: boolean;
   }
 
   // Props provided to the BudgetTable that are passed directly through to the PrimaryGrid.
@@ -432,6 +433,7 @@ namespace BudgetTable {
     readonly tableFooterIdentifierValue?: string | null;
     readonly budgetFooterIdentifierValue?: string | null;
     readonly loadingBudget?: boolean;
+    readonly loadingParent?: boolean;
     readonly exportable?: boolean;
     readonly nonEditableCells?: (keyof R)[];
     readonly cookies?: BudgetTable.CookiesProps;

@@ -147,16 +147,17 @@ export const createSubAccountTaskSet = <
       if (ids.length !== 0) {
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
 
-        // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
-        // otherwise, the loading indicators will not appear until `yield put(requestTemplateAction)`, and there
-        // is a lag between the time that this task is called and that task is called.
-        yield put(actions.budget.loading(true));
+        // We do this to show the loading indicator next to the calculated fields of the footers,
+        // otherwise, the loading indicators will not appear until the first API request
+        // succeeds and we refresh the parent state.
+        yield all([put(actions.budget.loading(true)), put(actions.subaccount.loading(true))]);
+
         let success = true;
         try {
           yield call(api.bulkDeleteSubAccountSubAccounts, subaccountId, ids, { cancelToken: source.token });
         } catch (e) {
           success = false;
-          yield put(actions.budget.loading(false));
+          yield all([put(actions.budget.loading(false)), put(actions.subaccount.loading(false))]);
           if (!(yield cancelled())) {
             api.handleRequestError(e, "There was an error deleting the sub accounts.");
           }
@@ -168,7 +169,7 @@ export const createSubAccountTaskSet = <
           }
         }
         if (success === true) {
-          yield put(actions.budget.request(null));
+          yield all([put(actions.budget.request(null)), put(actions.subaccount.request(null))]);
         }
       }
     }
@@ -187,13 +188,18 @@ export const createSubAccountTaskSet = <
         })
       );
       let success = true;
+
+      // We do this to show the loading indicator next to the calculated fields of the footers,
+      // otherwise, the loading indicators will not appear until the first API request
+      // succeeds and we refresh the parent state.
+      yield all([put(actions.budget.loading(true)), put(actions.subaccount.loading(true))]);
+
       yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
       try {
         yield call(api.bulkUpdateSubAccountSubAccounts, subaccountId, requestPayload, { cancelToken: source.token });
       } catch (e) {
         success = false;
-        // Once we rebuild back in the error handling, we will have to be concerned here with the nested
-        // structure of the errors.
+        yield all([put(actions.budget.loading(false)), put(actions.subaccount.loading(false))]);
         if (!(yield cancelled())) {
           api.handleRequestError(e, "There was an error updating the sub accounts.");
         }
@@ -204,7 +210,7 @@ export const createSubAccountTaskSet = <
         }
       }
       if (success === true) {
-        yield put(actions.budget.request(null));
+        yield all([put(actions.budget.request(null)), put(actions.subaccount.request(null))]);
       }
     }
   }
@@ -229,14 +235,20 @@ export const createSubAccountTaskSet = <
         models: data
       });
 
+      // We do this to show the loading indicator next to the calculated fields of the footers,
+      // otherwise, the loading indicators will not appear until the first API request
+      // succeeds and we refresh the parent state.
+      yield all([put(actions.budget.loading(true)), put(actions.subaccount.loading(true))]);
+
+      let success = true;
       try {
         const subaccounts: SA[] = yield call(api.bulkCreateSubAccountSubAccounts, subaccountId, payload, {
           cancelToken: source.token
         });
         yield all(subaccounts.map((subaccount: SA) => put(actions.addToState(subaccount))));
       } catch (e) {
-        // Once we rebuild back in the error handling, we will have to be concerned here with the nested
-        // structure of the errors.
+        success = false;
+        yield all([put(actions.budget.loading(false)), put(actions.subaccount.loading(false))]);
         if (!(yield cancelled())) {
           api.handleRequestError(e, "There was an error creating the sub accounts.");
         }
@@ -245,6 +257,9 @@ export const createSubAccountTaskSet = <
         if (yield cancelled()) {
           source.cancel();
         }
+      }
+      if (success === true) {
+        yield all([put(actions.budget.request(null)), put(actions.subaccount.request(null))]);
       }
     }
   }

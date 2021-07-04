@@ -7,7 +7,7 @@ import * as api from "api";
 import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
-import { loadingTemplateAction, requestTemplateAction } from "../../actions/template";
+import { loadingBudgetAction, requestBudgetAction } from "../../actions/budget";
 import * as actions from "../../actions/budget/account";
 import { createStandardSaga, createAccountTaskSet } from "../factories";
 
@@ -161,8 +161,8 @@ const tasks = createAccountTaskSet<
     addToState: actions.addSubAccountToStateAction,
     removeFromState: actions.removeSubAccountFromStateAction,
     budget: {
-      loading: loadingTemplateAction,
-      request: requestTemplateAction
+      loading: loadingBudgetAction,
+      request: requestBudgetAction
     },
     account: {
       request: actions.requestAccountAction,

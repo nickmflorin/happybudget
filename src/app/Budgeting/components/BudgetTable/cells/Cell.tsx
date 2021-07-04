@@ -5,7 +5,7 @@ import { isNil, includes } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
 
-import { ICellRendererParams, ColDef } from "@ag-grid-community/core";
+import { ICellRendererParams, ColDef, Column } from "@ag-grid-community/core";
 
 import { IconButton } from "components/buttons";
 import { ShowHide } from "components";
@@ -17,7 +17,9 @@ import "./index.scss";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export type StandardCellProps<R extends Table.Row> = ICellRendererParams;
 
-export interface CellProps<R extends Table.Row> extends Omit<ICellRendererParams, "value">, StandardComponentProps {
+export interface CellProps<R extends Table.Row>
+  extends Omit<ICellRendererParams, "value" | "column">,
+    StandardComponentProps {
   onClear?: (row: R, colDef: ColDef) => void;
   showClear?: (row: R, colDef: ColDef) => boolean;
   onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
@@ -25,48 +27,36 @@ export interface CellProps<R extends Table.Row> extends Omit<ICellRendererParams
   children: ReactNode;
   hide?: boolean;
   show?: boolean;
+  column: Column;
 }
 
-const Cell = <R extends Table.Row>({
-  id,
-  children,
-  node,
-  colDef,
-  className,
-  style = {},
-  hide,
-  onKeyDown,
-  show,
-  onClear,
-  showClear,
-  hideClear
-}: CellProps<R>): JSX.Element => {
-  const row: R = node.data;
+const Cell = <R extends Table.Row>(props: CellProps<R>): JSX.Element => {
+  const row: R = props.node.data;
 
   const showClearButton = useMemo(() => {
-    if (!isNil(onClear)) {
-      if (!isNil(showClear) && !isNil(colDef)) {
-        return showClear(row, colDef);
-      } else if (!isNil(hideClear)) {
-        return !hideClear;
+    if (!isNil(props.onClear)) {
+      if (!isNil(props.showClear) && !isNil(props.colDef)) {
+        return props.showClear(row, props.colDef);
+      } else if (!isNil(props.hideClear)) {
+        return !props.hideClear;
       } else {
         return true;
       }
     } else {
       return false;
     }
-  }, [onClear, showClear, hideClear, row, colDef]);
+  }, [props.onClear, props.showClear, props.hideClear, row, props.colDef]);
 
   return (
-    <ShowHide show={show} hide={hide}>
+    <ShowHide show={props.show} hide={props.hide}>
       <div
-        id={id}
-        className={classNames("cell", className)}
-        style={style}
-        onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(onKeyDown) && onKeyDown(event)}
+        id={props.id}
+        className={classNames("cell", props.className)}
+        style={props.style}
+        onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(props.onKeyDown) && props.onKeyDown(event)}
       >
-        <LoadableCellWrapper loading={!isNil(colDef) && includes(row.meta.fieldsLoading, colDef.field)}>
-          {children}
+        <LoadableCellWrapper loading={includes(row.meta.fieldsLoading, props.column.getColId())}>
+          <span className={"cell-content"}>{props.children}</span>
         </LoadableCellWrapper>
         {showClearButton && (
           <IconButton
@@ -75,7 +65,7 @@ const Cell = <R extends Table.Row>({
             icon={<FontAwesomeIcon icon={faTimesCircle} />}
             onClick={(event: React.MouseEventHandler<HTMLElement>) => {
               // TODO: Figure out how to stop propogation!
-              !isNil(onClear) && !isNil(colDef) && onClear(row, colDef);
+              !isNil(props.onClear) && !isNil(props.colDef) && props.onClear(row, props.colDef);
             }}
           />
         )}

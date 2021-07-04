@@ -33,6 +33,9 @@ const selectTableSearch = simpleShallowEqualSelector(
 const selectAccountDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.account.detail.data
 );
+const selectAccountLoading = simpleDeepEqualSelector(
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.detail.loading
+);
 
 interface AccountBudgetTableProps {
   accountId: number;
@@ -52,6 +55,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
   const groups = useSelector(selectGroups);
   const subAccountUnits = useSelector(selectSubAccountUnits);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
+  const accountLoading = useSelector(selectAccountLoading);
 
   return (
     <React.Fragment>
@@ -60,6 +64,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         groups={groups}
         detail={accountDetail}
         subAccountUnits={subAccountUnits}
+        loadingParent={accountLoading}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)
             ? `${accountDetail.description} Total`

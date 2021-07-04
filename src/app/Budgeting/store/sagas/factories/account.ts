@@ -147,16 +147,17 @@ export const createAccountTaskSet = <
       if (ids.length !== 0) {
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
 
-        // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
-        // otherwise, the loading indicators will not appear until `yield put(requestTemplateAction)`, and there
-        // is a lag between the time that this task is called and that task is called.
-        yield put(actions.budget.loading(true));
+        // We do this to show the loading indicator next to the calculated fields of the footers,
+        // otherwise, the loading indicators will not appear until the first API request
+        // succeeds and we refresh the parent state.
+        yield all([put(actions.budget.loading(true)), put(actions.account.loading(true))]);
+
         let success = true;
         try {
           yield call(api.bulkDeleteAccountSubAccounts, accountId, ids, { cancelToken: source.token });
         } catch (e) {
           success = false;
-          yield put(actions.budget.loading(false));
+          yield all([put(actions.budget.loading(false)), put(actions.account.loading(false))]);
           if (!(yield cancelled())) {
             api.handleRequestError(e, "There was an error deleting the sub accounts.");
           }
@@ -168,7 +169,7 @@ export const createAccountTaskSet = <
           }
         }
         if (success === true) {
-          yield put(actions.budget.request(null));
+          yield all([put(actions.budget.request(null)), put(actions.account.request(null))]);
         }
       }
     }
@@ -186,6 +187,12 @@ export const createAccountTaskSet = <
           ...manager.payload(change)
         })
       );
+
+      // We do this to show the loading indicator next to the calculated fields of the footers,
+      // otherwise, the loading indicators will not appear until the first API request
+      // succeeds and we refresh the parent state.
+      yield all([put(actions.budget.loading(true)), put(actions.account.loading(true))]);
+
       let success = true;
       yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
       try {
@@ -194,6 +201,7 @@ export const createAccountTaskSet = <
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
         success = false;
+        yield all([put(actions.budget.loading(false)), put(actions.account.loading(false))]);
         if (!(yield cancelled())) {
           api.handleRequestError(e, "There was an error updating the sub accounts.");
         }
@@ -204,7 +212,7 @@ export const createAccountTaskSet = <
         }
       }
       if (success === true) {
-        yield put(actions.budget.request(null));
+        yield all([put(actions.budget.request(null)), put(actions.account.request(null))]);
       }
     }
   }
@@ -228,6 +236,13 @@ export const createAccountTaskSet = <
         autoIndex,
         models: data
       });
+      let success = true;
+
+      // We do this to show the loading indicator next to the calculated fields of the footers,
+      // otherwise, the loading indicators will not appear until the first API request
+      // succeeds and we refresh the parent state.
+      yield all([put(actions.budget.loading(true)), put(actions.account.loading(true))]);
+
       try {
         const subaccounts: SA[] = yield call(api.bulkCreateAccountSubAccounts, accountId, payload, {
           cancelToken: source.token
@@ -236,6 +251,8 @@ export const createAccountTaskSet = <
       } catch (e) {
         // Once we rebuild back in the error handling, we will have to be concerned here with the nested
         // structure of the errors.
+        success = false;
+        yield all([put(actions.budget.loading(false)), put(actions.account.loading(false))]);
         if (!(yield cancelled())) {
           api.handleRequestError(e, "There was an error creating the sub accounts.");
         }
@@ -244,6 +261,9 @@ export const createAccountTaskSet = <
         if (yield cancelled()) {
           source.cancel();
         }
+      }
+      if (success === true) {
+        yield all([put(actions.budget.request(null)), put(actions.account.request(null))]);
       }
     }
   }

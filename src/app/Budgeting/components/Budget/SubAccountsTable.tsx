@@ -20,9 +20,10 @@ interface BudgetSubAccountsTableProps
     | "columns"
   > {
   detail: Model.BudgetAccount | Model.BudgetSubAccount | undefined;
+  loadingParent: boolean;
 }
 
-const BudgetSubAccountsTable = ({ detail, ...props }: BudgetSubAccountsTableProps): JSX.Element => {
+const BudgetSubAccountsTable = ({ loadingParent, detail, ...props }: BudgetSubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
   const budgetDetail = useSelector(selectBudgetDetail);
@@ -34,6 +35,7 @@ const BudgetSubAccountsTable = ({ detail, ...props }: BudgetSubAccountsTableProp
       <GenericSubAccountsTable<BudgetTable.BudgetSubAccountRow, Model.BudgetSubAccount, Model.BudgetGroup>
         manager={models.BudgetSubAccountRowManager}
         loadingBudget={loadingBudget}
+        loadingParent={loadingParent}
         fringes={fringes}
         fringesCellRenderer={"BudgetFringesCell"}
         fringesCellEditor={"BudgetFringesCellEditor"}

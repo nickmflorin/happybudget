@@ -908,11 +908,11 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           getContextMenuItems={getContextMenuItems}
           // This is the same as checking if the onGridReady event has fired.
           rowData={!isNil(apis) ? table : []}
-          getRowNodeId={(r: any) => r.id}
           getRowClass={getRowClass}
           getRowStyle={getRowStyle}
           rowSelection={"multiple"}
           immutableData={true}
+          getRowNodeId={(r: any) => r.id}
           onGridReady={onGridReady}
           processDataFromClipboard={processDataFromClipboard}
           processCellForClipboard={(params: ProcessCellForExportParams) => {

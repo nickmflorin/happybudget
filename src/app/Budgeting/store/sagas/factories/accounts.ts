@@ -184,14 +184,19 @@ export const createAccountsTaskSet = <
         id: change.id,
         ...manager.payload(change)
       }));
+
+      // We do this to show the loading indicator next to the calculated fields of the footers,
+      // otherwise, the loading indicators will not appear until the first API request
+      // succeeds and we refresh the parent state.
+      yield put(actions.budget.loading(true));
+
       let success = true;
       yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
       try {
         yield call(services.bulkUpdate, objId, requestPayload, { cancelToken: source.token });
       } catch (e) {
         success = false;
-        // Once we rebuild back in the error handling, we will have to be concerned here with the nested
-        // structure of the errors.
+        yield put(actions.budget.loading(false));
         if (!(yield cancelled())) {
           api.handleRequestError(e, "There was an error updating the accounts.");
         }
@@ -223,12 +228,18 @@ export const createAccountsTaskSet = <
         models: data
       });
 
+      // We do this to show the loading indicator next to the calculated fields of the footers,
+      // otherwise, the loading indicators will not appear until the first API request
+      // succeeds and we refresh the parent state.
+      yield put(actions.budget.loading(true));
+
+      let success = true;
       try {
         const accounts: A[] = yield call(services.bulkCreate, objId, payload, { cancelToken: source.token });
         yield all(accounts.map((account: A) => put(actions.addToState(account))));
       } catch (e) {
-        // Once we rebuild back in the error handling, we will have to be concerned here with the nested
-        // structure of the errors.
+        success = false;
+        yield put(actions.budget.loading(false));
         if (!(yield cancelled())) {
           api.handleRequestError(e, "There was an error creating the accounts.");
         }
@@ -237,6 +248,9 @@ export const createAccountsTaskSet = <
         if (yield cancelled()) {
           source.cancel();
         }
+      }
+      if (success === true) {
+        yield put(actions.budget.request(null));
       }
     }
   }
