@@ -59,7 +59,7 @@ interface IBreadCrumbItem {
   readonly url?: string;
   readonly tooltip?: import("antd/lib/tooltip").TooltipPropsWithTitle;
   readonly text?: string;
-  readonly render?: (params: IBreadCrumbItemRenderParams) => JSX.Element | null | undefined;
+  readonly render?: (params: IBreadCrumbItemRenderParams) => React.ReactChild;
   readonly options?: IBreadCrumbItemOption[];
   readonly visible?: boolean;
   readonly primary?: boolean;

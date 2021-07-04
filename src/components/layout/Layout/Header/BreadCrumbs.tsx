@@ -72,7 +72,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
     return <></>;
   };
 
-  const renderDropdownButton = (i: IBreadCrumbItem) => {
+  const renderDropdownButton = (i: IBreadCrumbItem): React.ReactChild => {
     if (!isNil(i.text)) {
       return (
         <Button className={"btn--caret-simple"} onClick={() => setDropdownVisible(true)}>
@@ -80,7 +80,11 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
         </Button>
       );
     } else if (!isNil(i.render)) {
-      return i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) });
+      return (
+        <React.Fragment>
+          {i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) })}
+        </React.Fragment>
+      );
     }
     return <></>;
   };
@@ -98,6 +102,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
           visible={dropdownVisible}
           trigger={["click"]}
           overlayClassName={"bread-crumb-dropdown"}
+          onClickAway={() => setDropdownVisible(false)}
           items={map(
             orderBy(item.options, (obj: IBreadCrumbItemOption) => obj.id),
             (obj: any, index: number) => {
