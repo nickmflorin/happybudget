@@ -137,7 +137,14 @@ export const createModelListResponseReducer = <
       }
       return st;
     },
-    Request: (st: S = Options.initialState, action: Redux.Action<null>) => ({ ...st, responseWasReceived: false }),
+    Request: (st: S = Options.initialState, action: Redux.Action<null>) => ({
+      ...st,
+      responseWasReceived: false,
+      data: [],
+      count: 0,
+      selected: [],
+      cache: {}
+    }),
     Loading: (st: S = Options.initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload }),
     SetPage: (st: S = Options.initialState, action: Redux.Action<number>) => ({
       ...st,
