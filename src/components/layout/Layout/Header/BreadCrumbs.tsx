@@ -100,10 +100,11 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
           overlayClassName={"bread-crumb-dropdown"}
           items={map(
             orderBy(item.options, (obj: IBreadCrumbItemOption) => obj.id),
-            (obj: any) => {
+            (obj: any, index: number) => {
               return (
                 <Dropdown.Menu.Item
                   id={obj.id}
+                  key={index}
                   selected={obj.id === item.id}
                   onClick={() => {
                     setDropdownVisible(false);

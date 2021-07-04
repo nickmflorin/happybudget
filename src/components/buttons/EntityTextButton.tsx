@@ -1,5 +1,5 @@
+import { forwardRef } from "react";
 import classNames from "classnames";
-import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/pro-solid-svg-icons";
@@ -15,21 +15,12 @@ export interface EntityTextButtonProps extends Omit<EntityTextProps, "className"
   onClick?: () => void;
 }
 
-const EntityTextButton = ({
-  children,
-  className,
-  onClick,
-  fillEmpty,
-  style = {},
-  ...props
-}: EntityTextButtonProps): JSX.Element => {
+const EntityTextButton = (
+  { children, className, fillEmpty, style = {}, ...props }: EntityTextButtonProps,
+  ref: any
+): JSX.Element => {
   return (
-    <Button
-      className={classNames("btn--entity-text", className)}
-      style={style}
-      {...props}
-      onClick={() => !isNil(onClick) && onClick()}
-    >
+    <Button className={classNames("btn--entity-text", className)} style={style} {...props} ref={ref}>
       <div className={"entity-text-button-inner"}>
         <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
         <VerticalFlexCenter className={"entity-text-button-caret"}>
@@ -40,4 +31,4 @@ const EntityTextButton = ({
   );
 };
 
-export default EntityTextButton;
+export default forwardRef(EntityTextButton);
