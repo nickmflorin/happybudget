@@ -136,6 +136,7 @@ const BudgetTableMenu = <R extends Table.Row>({
         <div className={"table-header-right"}>
           <ShowHide show={!isNil(search)}>
             <Input
+              className={"input--small"}
               placeholder={"Search Rows"}
               value={search}
               allowClear={true}

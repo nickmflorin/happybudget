@@ -381,7 +381,9 @@
     }
 
     &.btn--icon-only-budget-table-menu {
-      padding: 8.5px;
+      padding: 6px;
+      height: 30px;
+      width: 30px;
     }
 
     &.ag-grid-expand-button {
@@ -590,6 +592,9 @@
     box-shadow: none !important;
     color: $text-tertiary;
     padding: 6px 8px;
+    line-height: 18px;
+    height: 30px;
+    min-width: 0px;
 
     svg {
       height: 1.2rem !important;

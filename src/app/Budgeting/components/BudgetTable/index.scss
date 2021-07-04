@@ -6,7 +6,7 @@
   // This will align the checkbox in the header with the checkboxes in the
   // rows vertically.
   padding-left: 2px;
-  height: 36px;
+  height: 30px;
 
   &.detached {
     margin-bottom: 10px;
@@ -14,8 +14,11 @@
 
   .ant-checkbox-wrapper {
     .ant-checkbox {
-      padding: 10px;
+      padding: 7px;
       padding-left: 0px;
+      .ant-checkbox-inner {
+        top: 0.05rem;
+      }
     }
   }
   .toolbar-buttons {
@@ -43,12 +46,12 @@
 .budget-table {
   display: flex;
   flex-direction: column;
-  // The overall header height for the page is 56px for the primary header
-  // and 36px for the supplementary header.  56px + 36px = 92px.  Then there
+  // The overall header height for the page is 50px for the primary header
+  // and 36px for the supplementary header.  50px + 30px = 80px.  Then there
   // is 10px of margin between the overall header and the top of the table,
-  // giving us the 102px.  Then, we have to subtract 10px for the margin at
+  // giving us the 90px.  Then, we have to subtract 10px for the margin at
   // the bottom page between the bottom of the table and the end of the page.
-  height: calc(100vh - 102px - 10px);
+  height: calc(100vh - 90px - 10px);
 
   .table-grid {
     flex: 1 1 auto;
