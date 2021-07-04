@@ -80,11 +80,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
         </Button>
       );
     } else if (!isNil(i.render)) {
-      return (
-        <React.Fragment>
-          {i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) })}
-        </React.Fragment>
-      );
+      return i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) });
     }
     return <></>;
   };

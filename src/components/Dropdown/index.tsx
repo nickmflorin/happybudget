@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import ClickAwayListener from "react-click-away-listener";
+import { uniqueId } from "lodash";
 
 import { Dropdown as AntdDropdown } from "antd";
 import { DropDownProps } from "antd/lib/dropdown";
@@ -39,6 +40,8 @@ export const includesMenuItems = (
 };
 
 const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
+  const buttonId = useMemo(() => uniqueId(), []);
+
   return (
     <AntdDropdown
       {...props}
@@ -61,7 +64,11 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
                   break;
                 }
               }
-              if (clickInsideMenu === false) {
+              // Since the dropdown button (props.children) is rendered outside
+              // of the menu (where the ClickAway is detected), clicking the
+              // button will also trigger the ClickAway, so we need to avoid it.
+              const button = document.getElementById(buttonId);
+              if (!isNil(button) && !isNodeDescendantOf(button, e.target) && clickInsideMenu === false) {
                 props.onClickAway();
               }
             }
@@ -82,7 +89,9 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
         </ClickAwayListener>
       }
     >
-      {props.children}
+      {React.Children.only(props.children) && React.isValidElement(props.children)
+        ? React.cloneElement(props.children, { id: buttonId })
+        : props.children}
     </AntdDropdown>
   );
 };
