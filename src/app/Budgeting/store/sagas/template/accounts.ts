@@ -20,7 +20,6 @@ const tasks = createAccountsTaskSet<
     updating: actions.updatingAccountAction,
     response: actions.responseAccountsAction,
     addToState: actions.addAccountToStateAction,
-    removeFromState: actions.removeAccountFromStateAction,
     budget: {
       loading: loadingTemplateAction,
       request: requestTemplateAction
@@ -45,19 +44,27 @@ const tasks = createAccountsTaskSet<
   (state: Modules.ApplicationStore) => state.budgeting.template.autoIndex
 );
 
-export default createStandardSaga({
-  Request: {
-    actionType: ActionType.Template.Accounts.Request,
-    task: tasks.getAccounts
+export default createStandardSaga(
+  {
+    Request: ActionType.Template.Accounts.Request,
+    TableChange: ActionType.Template.SubAccount.TableChanged,
+    Groups: {
+      Request: ActionType.Template.Accounts.Groups.Request,
+      RemoveModel: ActionType.Template.Accounts.RemoveFromGroup,
+      AddModel: ActionType.Template.Accounts.AddToGroup,
+      Delete: ActionType.Template.Accounts.Groups.Delete
+    }
   },
-  RequestGroups: {
-    actionType: ActionType.Template.Accounts.Groups.Request,
-    task: tasks.getGroups
-  },
-  TableChanged: { actionType: ActionType.Template.Accounts.TableChanged, task: tasks.handleTableChange },
-  BulkCreate: { actionType: ActionType.Template.Accounts.BulkCreate, task: tasks.bulkCreate },
-  Delete: { actionType: ActionType.Template.Accounts.Delete, task: tasks.handleRemoval },
-  DeleteGroup: { actionType: ActionType.Template.Accounts.Groups.Delete, task: tasks.deleteGroup },
-  RemoveModelFromGroup: { actionType: ActionType.Template.Accounts.RemoveFromGroup, task: tasks.removeFromGroup },
-  AddModelToGroup: { actionType: ActionType.Template.Accounts.AddToGroup, task: tasks.addToGroup }
-});
+  {
+    Request: tasks.getAccounts,
+    HandleDataChangeEvent: tasks.handleDataChangeEvent,
+    HandleRowAddEvent: tasks.handleRowAddEvent,
+    HandleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    Groups: {
+      Request: tasks.getGroups,
+      RemoveModel: tasks.removeFromGroup,
+      AddModel: tasks.addToGroup,
+      Delete: tasks.deleteGroup
+    }
+  }
+);

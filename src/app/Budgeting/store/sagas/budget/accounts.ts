@@ -197,7 +197,6 @@ const tasks = createAccountsTaskSet<
     updating: actions.updatingAccountAction,
     response: actions.responseAccountsAction,
     addToState: actions.addAccountToStateAction,
-    removeFromState: actions.removeAccountFromStateAction,
     budget: {
       loading: loadingBudgetAction,
       request: requestBudgetAction
@@ -222,30 +221,45 @@ const tasks = createAccountsTaskSet<
   (state: Modules.ApplicationStore) => state.budgeting.budget.autoIndex
 );
 
-export default createStandardSaga({
-  Request: {
-    actionType: ActionType.Budget.Accounts.Request,
-    task: tasks.getAccounts
+export default createStandardSaga(
+  {
+    Request: ActionType.Budget.Accounts.Request,
+    TableChange: ActionType.Budget.Accounts.TableChanged,
+    Groups: {
+      Request: ActionType.Budget.Accounts.Groups.Request,
+      RemoveModel: ActionType.Budget.Accounts.RemoveFromGroup,
+      AddModel: ActionType.Budget.Accounts.AddToGroup,
+      Delete: ActionType.Budget.Accounts.Groups.Delete
+    },
+    Comments: {
+      Request: ActionType.Budget.Comments.Request,
+      Submit: ActionType.Budget.Comments.Create,
+      Delete: ActionType.Budget.Comments.Delete,
+      Edit: ActionType.Budget.Comments.Update
+    },
+    History: {
+      Request: ActionType.Budget.Accounts.History.Request
+    }
   },
-  RequestGroups: {
-    actionType: ActionType.Budget.Accounts.Groups.Request,
-    task: tasks.getGroups
-  },
-  RequestComments: {
-    actionType: ActionType.Budget.Comments.Request,
-    task: getCommentsTask
-  },
-  RequestHistory: {
-    actionType: ActionType.Budget.Accounts.History.Request,
-    task: getHistoryTask
-  },
-  TableChanged: { actionType: ActionType.Budget.Accounts.TableChanged, task: tasks.handleTableChange },
-  BulkCreate: { actionType: ActionType.Budget.Accounts.BulkCreate, task: tasks.bulkCreate },
-  Delete: { actionType: ActionType.Budget.Accounts.Delete, task: tasks.handleRemoval },
-  SubmitComment: { actionType: ActionType.Budget.Comments.Create, task: submitCommentTask },
-  DeleteComment: { actionType: ActionType.Budget.Comments.Delete, task: deleteCommentTask },
-  EditComment: { actionType: ActionType.Budget.Comments.Update, task: editCommentTask },
-  DeleteGroup: { actionType: ActionType.Budget.Accounts.Groups.Delete, task: tasks.deleteGroup },
-  RemoveModelFromGroup: { actionType: ActionType.Budget.Accounts.RemoveFromGroup, task: tasks.removeFromGroup },
-  AddModelToGroup: { actionType: ActionType.Budget.Accounts.AddToGroup, task: tasks.addToGroup }
-});
+  {
+    Request: tasks.getAccounts,
+    HandleDataChangeEvent: tasks.handleDataChangeEvent,
+    HandleRowAddEvent: tasks.handleRowAddEvent,
+    HandleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    Groups: {
+      Request: tasks.getGroups,
+      RemoveModel: tasks.removeFromGroup,
+      AddModel: tasks.addToGroup,
+      Delete: tasks.deleteGroup
+    },
+    Comments: {
+      Request: getCommentsTask,
+      Submit: submitCommentTask,
+      Delete: deleteCommentTask,
+      Edit: editCommentTask
+    },
+    History: {
+      Request: getHistoryTask
+    }
+  }
+);

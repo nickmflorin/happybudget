@@ -18,7 +18,6 @@ const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, BudgetTable.Temp
     request: actions.requestSubAccountsAction,
     response: actions.responseSubAccountsAction,
     addToState: actions.addSubAccountToStateAction,
-    removeFromState: actions.removeSubAccountFromStateAction,
     budget: {
       loading: loadingTemplateAction,
       request: requestTemplateAction
@@ -66,23 +65,26 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
 
 export default createStandardSaga(
   {
-    Request: {
-      actionType: ActionType.Template.SubAccount.SubAccounts.Request,
-      task: tasks.getSubAccounts
-    },
-    RequestGroups: {
-      actionType: ActionType.Template.SubAccount.SubAccounts.Groups.Request,
-      task: tasks.getGroups
-    },
-    TableChanged: { actionType: ActionType.Template.SubAccount.TableChanged, task: tasks.handleTableChange },
-    BulkCreate: { actionType: ActionType.Template.SubAccount.SubAccounts.BulkCreate, task: tasks.bulkCreate },
-    Delete: { actionType: ActionType.Template.SubAccount.SubAccounts.Delete, task: tasks.handleRemoval },
-    DeleteGroup: { actionType: ActionType.Template.SubAccount.SubAccounts.Groups.Delete, task: tasks.deleteGroup },
-    RemoveModelFromGroup: {
-      actionType: ActionType.Template.Account.SubAccounts.RemoveFromGroup,
-      task: tasks.removeFromGroup
-    },
-    AddModelToGroup: { actionType: ActionType.Template.Account.SubAccounts.AddToGroup, task: tasks.addToGroup }
+    Request: ActionType.Template.SubAccount.SubAccounts.Request,
+    TableChange: ActionType.Template.SubAccount.TableChanged,
+    Groups: {
+      Request: ActionType.Template.SubAccount.SubAccounts.Groups.Request,
+      RemoveModel: ActionType.Template.SubAccount.SubAccounts.RemoveFromGroup,
+      AddModel: ActionType.Template.SubAccount.SubAccounts.AddToGroup,
+      Delete: ActionType.Template.SubAccount.SubAccounts.Groups.Delete
+    }
+  },
+  {
+    Request: tasks.getSubAccounts,
+    HandleDataChangeEvent: tasks.handleDataChangeEvent,
+    HandleRowAddEvent: tasks.handleRowAddEvent,
+    HandleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    Groups: {
+      Request: tasks.getGroups,
+      RemoveModel: tasks.removeFromGroup,
+      AddModel: tasks.addToGroup,
+      Delete: tasks.deleteGroup
+    }
   },
   watchForRequestSubAccountSaga,
   watchForSubAccountIdChangedSaga

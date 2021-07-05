@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useImperativeHandle, useRef } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, concat, filter, reduce } from "lodash";
+import { map, isNil, includes, concat, filter, reduce, find } from "lodash";
 import Cookies from "universal-cookie";
 
 import {
@@ -13,7 +13,8 @@ import {
   GridOptions,
   GridApi,
   CheckboxSelectionCallbackParams,
-  FirstDataRenderedEvent
+  FirstDataRenderedEvent,
+  ValueSetterParams
 } from "@ag-grid-community/core";
 
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
@@ -145,7 +146,7 @@ const BudgetTable = <
   indexColumn = {},
   rowCanExpand,
   cellClass,
-  onRowAdd,
+  onChangeEvent,
   onRowExpand,
   isCellEditable,
   isCellSelectable,
@@ -240,7 +241,7 @@ const BudgetTable = <
       maxWidth: isNil(onRowExpand) ? 40 : 25,
       pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
       cellRendererParams: {
-        onRowAdd: onRowAdd,
+        onChangeEvent: onChangeEvent,
         ...indexColumn.cellRendererParams
       },
       cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", indexColumn.cellClass),
@@ -299,6 +300,23 @@ const BudgetTable = <
           return col.colSpan(params);
         }
         return 1;
+      },
+      valueSetter: (params: ValueSetterParams) => {
+        // By default, AG Grid treats Backspace clearing the cell as setting the
+        // value to undefined - but we have to set it to the null value associated
+        // with the column.
+        if (params.newValue === undefined) {
+          const column: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+          if (!isNil(column)) {
+            params.newValue = column.nullValue === undefined ? null : column.nullValue;
+          }
+          params.newValue = null;
+        }
+        if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
+          return col.valueSetter(params);
+        }
+        params.data[params.column.getColId()] = params.newValue;
+        return true;
       }
     })
   );
@@ -334,6 +352,23 @@ const BudgetTable = <
         ...col.headerComponentParams,
         onSort: onSort,
         ordering
+      },
+      valueSetter: (params: ValueSetterParams) => {
+        // By default, AG Grid treats Backspace clearing the cell as setting the
+        // value to undefined - but we have to set it to the null value associated
+        // with the column.
+        if (params.newValue === undefined) {
+          const column: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+          if (!isNil(column)) {
+            params.newValue = column.nullValue === undefined ? null : column.nullValue;
+          }
+          params.newValue = null;
+        }
+        if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
+          return col.valueSetter(params);
+        }
+        params.data[params.column.getColId()] = params.newValue;
+        return true;
       }
     };
   });
@@ -443,7 +478,7 @@ const BudgetTable = <
           isCellEditable={_isCellEditable}
           onRowExpand={onRowExpand}
           rowCanExpand={rowCanExpand}
-          onRowAdd={onRowAdd}
+          onChangeEvent={onChangeEvent}
           groups={groups}
           groupParams={groupParams}
           {...props}

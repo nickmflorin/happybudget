@@ -10,6 +10,18 @@ export const isSyntheticClickEvent = (e: Table.CellDoneEditingEvent): e is Synth
   return (e as SyntheticEvent).type === "click";
 };
 
+export const isDataChangeEvent = <R extends Table.Row>(e: Table.ChangeEvent<R>): e is Table.DataChangeEvent<R> => {
+  return (e as Table.DataChangeEvent<R>).type === "dataChange";
+};
+
+export const isRowAddEvent = <R extends Table.Row>(e: Table.ChangeEvent<R>): e is Table.RowAddEvent<R> => {
+  return (e as Table.RowAddEvent<R>).type === "rowAdd";
+};
+
+export const isRowDeleteEvent = <R extends Table.Row>(e: Table.ChangeEvent<R>): e is Table.RowDeleteEvent => {
+  return (e as Table.RowDeleteEvent).type === "rowDelete";
+};
+
 export const tableChangeIsRowChange = <R extends Table.Row>(change: Table.Change<R>): change is Table.RowChange<R> => {
   return (
     !Array.isArray(change) &&

@@ -65,12 +65,8 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
-        onRowAdd={(payload: Table.RowAddPayload<BudgetTable.TemplateSubAccountRow>) =>
-          dispatch(actions.bulkCreateSubAccountsAction(payload))
-        }
-        onRowDelete={(ids: number | number[]) => dispatch(actions.deleteSubAccountsAction(ids))}
-        onTableChange={(payload: Table.Change<BudgetTable.TemplateSubAccountRow>) =>
-          dispatch(actions.tableChangedAction(payload))
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.TemplateSubAccountRow>) =>
+          dispatch(actions.handleTableChangeEventAction(e))
         }
         onBack={() => {
           if (!isNil(subaccountDetail)) {

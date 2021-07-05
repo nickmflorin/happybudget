@@ -72,12 +72,8 @@ const Actuals = (): JSX.Element => {
           indexColumn={{ width: 40, maxWidth: 50 }}
           search={search}
           onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
-          onRowAdd={(payload: Table.RowAddPayload<BudgetTable.ActualRow>) =>
-            dispatch(actions.bulkCreateActualsAction(payload))
-          }
-          onRowDelete={(ids: number | number[]) => dispatch(actions.deleteActualsAction(ids))}
-          onTableChange={(payload: Table.Change<BudgetTable.ActualRow>) =>
-            dispatch(actions.tableChangedAction(payload))
+          onChangeEvent={(e: Table.ChangeEvent<BudgetTable.ActualRow>) =>
+            dispatch(actions.handleTableChangeEventAction(e))
           }
           actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow>) => [
             {
@@ -85,7 +81,12 @@ const Actuals = (): JSX.Element => {
               icon: faTrashAlt,
               onClick: () => {
                 const rows: BudgetTable.ActualRow[] = params.apis.grid.getSelectedRows();
-                dispatch(actions.deleteActualsAction(map(rows, (row: BudgetTable.ActualRow) => row.id)));
+                dispatch(
+                  actions.handleTableChangeEventAction({
+                    type: "rowDelete",
+                    payload: map(rows, (row: BudgetTable.ActualRow) => row.id)
+                  })
+                );
               }
             },
             {

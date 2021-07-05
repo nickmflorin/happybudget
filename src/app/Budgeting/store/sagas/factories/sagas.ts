@@ -1,169 +1,226 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, take, call, cancel, takeEvery } from "redux-saga/effects";
+import { spawn, take, call, cancel, actionChannel } from "redux-saga/effects";
 import { isNil } from "lodash";
+
+import * as typeguards from "lib/model/typeguards";
 import { takeWithCancellableById } from "lib/redux/sagas";
 
-type MapConfig<T> = {
-  task: Redux.Task<T>;
-  actionType: string;
-};
-
-interface ActionMap<R extends Table.Row> {
-  Request: MapConfig<null>;
-  RequestGroups: MapConfig<null>;
-  RequestComments?: MapConfig<null>;
-  RequestHistory?: MapConfig<null>;
-  TableChanged: MapConfig<Table.Change<R>>;
-  BulkCreate: MapConfig<number>;
-  Delete: MapConfig<number>;
-  SubmitComment?: MapConfig<{ parent?: number; data: Http.CommentPayload }>;
-  DeleteComment?: MapConfig<number>;
-  EditComment?: MapConfig<Redux.UpdateModelActionPayload<Model.Comment>>;
-  DeleteGroup: MapConfig<number>;
-  RemoveModelFromGroup: MapConfig<number>;
-  AddModelToGroup: MapConfig<{ id: number; group: number }>;
+interface CommentsActionMap {
+  Request: string;
+  Submit: string;
+  Delete: string;
+  Edit: string;
 }
 
-export const createStandardSaga = <R extends Table.Row>(map: ActionMap<R>, ...args: (() => SagaIterator)[]) => {
-  function* watchForRequestModelsSaga(): SagaIterator {
+interface HistoryActionMap {
+  Request: string;
+}
+
+interface GroupsActionMap {
+  Request: string;
+  Delete: string;
+  RemoveModel: string;
+  AddModel: string;
+}
+
+interface ActionMap {
+  Comments?: CommentsActionMap;
+  History?: HistoryActionMap;
+  Groups: GroupsActionMap;
+  Request: string;
+  TableChange: string;
+}
+
+interface CommentsTaskMap {
+  Request: Redux.Task<null>;
+  Submit: Redux.Task<{ parent?: number; data: Http.CommentPayload }>;
+  Delete: Redux.Task<number>;
+  Edit: Redux.Task<Redux.UpdateModelActionPayload<Model.Comment>>;
+}
+
+interface HistoryTasMap {
+  Request: Redux.Task<null>;
+}
+
+interface GroupsTaskMap {
+  Request: Redux.Task<null>;
+  Delete: Redux.Task<number>;
+  RemoveModel: Redux.Task<number>;
+  AddModel: Redux.Task<{ id: number; group: number }>;
+}
+
+interface TaskMap<R extends Table.Row> {
+  Comments?: CommentsTaskMap;
+  History?: HistoryTasMap;
+  Groups: GroupsTaskMap;
+  Request: Redux.Task<null>;
+  HandleRowAddEvent: Redux.Task<Table.RowAddEvent<R>>;
+  HandleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
+  HandleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R>>;
+}
+
+const createStandardHistorySaga = (actions: HistoryActionMap, tasks: HistoryTasMap) => {
+  function* requestSaga(): SagaIterator {
     let lastTasks;
     while (true) {
-      const action = yield take(map.Request.actionType);
+      const action = yield take(actions.Request);
       if (lastTasks) {
         yield cancel(lastTasks);
       }
-      lastTasks = yield call(map.Request.task, action);
+      lastTasks = yield call(tasks.Request, action);
     }
   }
 
-  function* watchForRequestGroupsSaga(): SagaIterator {
-    let lastTasks;
-    while (true) {
-      const action = yield take(map.RequestGroups.actionType);
-      if (lastTasks) {
-        yield cancel(lastTasks);
-      }
-      lastTasks = yield call(map.RequestGroups.task, action);
-    }
+  function* rootSaga(): SagaIterator {
+    yield spawn(requestSaga);
   }
+  return rootSaga;
+};
 
-  function* watchForTableChangeSaga(): SagaIterator {
-    yield takeEvery(map.TableChanged.actionType, map.TableChanged.task);
-  }
-
-  function* watchForBulkCreateModelsSaga(): SagaIterator {
-    let lastTasks;
-    while (true) {
-      const action: Redux.Action<number> = yield take(map.BulkCreate.actionType);
-      if (!isNil(action.payload)) {
-        if (lastTasks) {
-          yield cancel(lastTasks);
-        }
-        lastTasks = yield call(map.BulkCreate.task, action);
-      }
-    }
-  }
-
-  function* watchForRemoveModelSaga(): SagaIterator {
-    // NOTE:  Since we are doing bulk deletes, we can't really check if a previous
-    // task with the same ID was submitted - beause a previous task may have a set
-    // of IDs where only a few match the set of IDs for the new task.  We try
-    // to handle those cases (to prevent server errors trying to delete something
-    // that was already deleted) in the task itself.
-    yield takeEvery(map.Delete.actionType, map.Delete.task);
-  }
-
-  function* watchForRequestCommentsSaga(): SagaIterator {
-    if (!isNil(map.RequestComments)) {
+const createStandardCommentsSaga = (actions: CommentsActionMap, tasks: CommentsTaskMap) => {
+  function* requestSaga(): SagaIterator {
+    if (!isNil(actions.Request)) {
       let lastTasks;
       while (true) {
-        const action = yield take(map.RequestComments.actionType);
+        const action = yield take(actions.Request);
         if (lastTasks) {
           yield cancel(lastTasks);
         }
-        lastTasks = yield call(map.RequestComments.task, action);
+        lastTasks = yield call(tasks.Request, action);
       }
     }
   }
 
-  function* watchForSubmitCommentSaga(): SagaIterator {
-    if (!isNil(map.SubmitComment)) {
+  function* submitSaga(): SagaIterator {
+    if (!isNil(actions.Submit)) {
       let lastTasks;
       while (true) {
-        const action = yield take(map.SubmitComment.actionType);
+        const action = yield take(actions.Submit);
         if (lastTasks) {
           yield cancel(lastTasks);
         }
-        lastTasks = yield call(map.SubmitComment.task, action);
+        lastTasks = yield call(tasks.Submit, action);
       }
     }
   }
 
-  function* watchForRemoveCommentSaga(): SagaIterator {
-    if (!isNil(map.DeleteComment)) {
-      yield takeWithCancellableById<number>(map.DeleteComment.actionType, map.DeleteComment.task, (p: number) => p);
+  function* deleteSaga(): SagaIterator {
+    if (!isNil(actions.Delete)) {
+      yield takeWithCancellableById<number>(actions.Delete, tasks.Delete, (p: number) => p);
     }
   }
 
-  function* watchForEditCommentSaga(): SagaIterator {
-    if (!isNil(map.EditComment)) {
+  function* editSaga(): SagaIterator {
+    if (!isNil(actions.Edit)) {
       yield takeWithCancellableById<Redux.UpdateModelActionPayload<Model.Comment>>(
-        map.EditComment.actionType,
-        map.EditComment.task,
+        actions.Edit,
+        tasks.Edit,
         (p: Redux.UpdateModelActionPayload<Model.Comment>) => p.id
       );
     }
   }
 
-  function* watchForRequestHistorySaga(): SagaIterator {
-    if (!isNil(map.RequestHistory)) {
-      let lastTasks;
-      while (true) {
-        const action = yield take(map.RequestHistory.actionType);
-        if (lastTasks) {
-          yield cancel(lastTasks);
-        }
-        lastTasks = yield call(map.RequestHistory.task, action);
+  function* rootSaga(): SagaIterator {
+    yield spawn(requestSaga);
+    yield spawn(submitSaga);
+    yield spawn(deleteSaga);
+    yield spawn(editSaga);
+  }
+  return rootSaga;
+};
+
+const createStandardGroupsSaga = (actions: GroupsActionMap, tasks: GroupsTaskMap) => {
+  function* requestSaga(): SagaIterator {
+    let lastTasks;
+    while (true) {
+      const action = yield take(actions.Request);
+      if (lastTasks) {
+        yield cancel(lastTasks);
       }
+      lastTasks = yield call(tasks.Request, action);
     }
   }
 
-  function* watchForDeleteGroupSaga(): SagaIterator {
-    yield takeWithCancellableById<number>(map.DeleteGroup.actionType, map.DeleteGroup.task, (p: number) => p);
+  function* deleteSaga(): SagaIterator {
+    yield takeWithCancellableById<number>(actions.Delete, tasks.Delete, (p: number) => p);
   }
 
-  function* watchForRemoveModelFromGroupSaga(): SagaIterator {
-    yield takeWithCancellableById<number>(
-      map.RemoveModelFromGroup.actionType,
-      map.RemoveModelFromGroup.task,
-      (p: number) => p
-    );
+  function* removeModelSaga(): SagaIterator {
+    yield takeWithCancellableById<number>(actions.RemoveModel, tasks.RemoveModel, (p: number) => p);
   }
 
-  function* watchForAddModelToGroupSaga(): SagaIterator {
+  function* addModelSaga(): SagaIterator {
     yield takeWithCancellableById<{ id: number; group: number }>(
-      map.AddModelToGroup.actionType,
-      map.AddModelToGroup.task,
+      actions.AddModel,
+      tasks.AddModel,
       (p: { id: number; group: number }) => p.id
     );
   }
 
   function* rootSaga(): SagaIterator {
-    yield spawn(watchForRequestModelsSaga);
-    yield spawn(watchForRequestGroupsSaga);
-    yield spawn(watchForTableChangeSaga);
-    yield spawn(watchForRemoveModelSaga);
-    yield spawn(watchForRequestCommentsSaga);
-    yield spawn(watchForSubmitCommentSaga);
-    yield spawn(watchForRemoveCommentSaga);
-    yield spawn(watchForEditCommentSaga);
-    yield spawn(watchForBulkCreateModelsSaga);
-    yield spawn(watchForRequestHistorySaga);
-    yield spawn(watchForDeleteGroupSaga);
-    yield spawn(watchForRemoveModelFromGroupSaga);
-    yield spawn(watchForAddModelToGroupSaga);
+    yield spawn(requestSaga);
+    yield spawn(removeModelSaga);
+    yield spawn(deleteSaga);
+    yield spawn(addModelSaga);
+  }
+  return rootSaga;
+};
+
+export const createStandardSaga = <R extends Table.Row>(
+  actions: ActionMap,
+  tasks: TaskMap<R>,
+  ...args: (() => SagaIterator)[]
+) => {
+  function* requestSaga(): SagaIterator {
+    let lastTasks;
+    while (true) {
+      const action = yield take(actions.Request);
+      if (lastTasks) {
+        yield cancel(lastTasks);
+      }
+      lastTasks = yield call(tasks.Request, action);
+    }
+  }
+
+  function* tableChangeEventSaga(): SagaIterator {
+    // TODO: We probably want a way to prevent duplicate events that can cause
+    // backend errors from occurring.  This would include things like trying to
+    // delete the same row twice.
+    const changeChannel = yield actionChannel(actions.TableChange);
+    while (true) {
+      const action: Redux.Action<Table.ChangeEvent<any>> = yield take(changeChannel);
+      if (!isNil(action.payload)) {
+        const event: Table.ChangeEvent<any> = action.payload;
+        if (typeguards.isDataChangeEvent(event)) {
+          // Blocking call so that table changes happen sequentially.
+          yield call(tasks.HandleDataChangeEvent, action as Redux.Action<Table.DataChangeEvent<any>>);
+        } else if (typeguards.isRowAddEvent(event)) {
+          // Blocking call so that table changes happen sequentially.
+          yield call(tasks.HandleRowAddEvent, action as Redux.Action<Table.RowAddEvent<any>>);
+        } else if (typeguards.isRowDeleteEvent(event)) {
+          // Blocking call so that table changes happen sequentially.
+          yield call(tasks.HandleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent>);
+        }
+      }
+    }
+  }
+
+  const groupsSaga = createStandardGroupsSaga(actions.Groups, tasks.Groups);
+
+  function* rootSaga(): SagaIterator {
+    yield spawn(requestSaga);
+    yield spawn(groupsSaga);
+    yield spawn(tableChangeEventSaga);
     for (let i = 0; i < args.length; i++) {
       yield spawn(args[i]);
+    }
+    if (!isNil(actions.History) && !isNil(tasks.History)) {
+      const historySaga = createStandardHistorySaga(actions.History, tasks.History);
+      yield spawn(historySaga);
+    }
+    if (!isNil(actions.Comments) && !isNil(tasks.Comments)) {
+      const commentsSaga = createStandardCommentsSaga(actions.Comments, tasks.Comments);
+      yield spawn(commentsSaga);
     }
   }
   return rootSaga;

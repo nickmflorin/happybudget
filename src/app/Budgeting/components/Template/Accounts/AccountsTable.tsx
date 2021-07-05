@@ -48,12 +48,8 @@ const AccountsTable = (): JSX.Element => {
         search={search}
         onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
         exportFileName={!isNil(templateDetail) ? `template_${templateDetail.name}_accounts` : ""}
-        onRowAdd={(payload: Table.RowAddPayload<BudgetTable.TemplateAccountRow>) =>
-          dispatch(actions.bulkCreateAccountsAction(payload))
-        }
-        onRowDelete={(ids: number | number[]) => dispatch(actions.deleteAccountsAction(ids))}
-        onTableChange={(payload: Table.Change<BudgetTable.TemplateAccountRow>) =>
-          dispatch(actions.tableChangedAction(payload))
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.TemplateAccountRow>) =>
+          dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
         onDeleteGroup={(group: Model.TemplateGroup) => dispatch(actions.deleteGroupAction(group.id))}

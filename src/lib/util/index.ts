@@ -86,6 +86,14 @@ export const includesAnyIn = <T = any>(array: T[], anotherArray: T[] | T): boole
   return found;
 };
 
+export const mapWithoutVoid = <T = any, R = T>(collection: T[], predicate: (obj: T, index: number) => R | void) => {
+  return filterOutVoid<R>(map(collection, (obj: T, index: number) => predicate(obj, index)));
+};
+
+export const filterOutVoid = <T = any>(collection: (T | void)[]): T[] => {
+  return filter(collection, (obj: T | void) => obj !== undefined) as T[];
+};
+
 export const selectRandom = <T = any>(array: T[]): T => {
   return array[Math.floor(Math.random() * array.length)];
 };

@@ -155,7 +155,6 @@ const tasks = createSubAccountTaskSet<Model.BudgetSubAccount, BudgetTable.Budget
     request: actions.requestSubAccountsAction,
     response: actions.responseSubAccountsAction,
     addToState: actions.addSubAccountToStateAction,
-    removeFromState: actions.removeSubAccountFromStateAction,
     budget: {
       loading: loadingBudgetAction,
       request: requestBudgetAction
@@ -203,34 +202,44 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
 
 export default createStandardSaga(
   {
-    Request: {
-      actionType: ActionType.Budget.SubAccount.SubAccounts.Request,
-      task: tasks.getSubAccounts
+    Request: ActionType.Budget.SubAccount.SubAccounts.Request,
+    TableChange: ActionType.Budget.SubAccount.TableChanged,
+    Groups: {
+      Request: ActionType.Budget.SubAccount.SubAccounts.Groups.Request,
+      RemoveModel: ActionType.Budget.SubAccount.SubAccounts.RemoveFromGroup,
+      AddModel: ActionType.Budget.SubAccount.SubAccounts.AddToGroup,
+      Delete: ActionType.Budget.SubAccount.SubAccounts.Groups.Delete
     },
-    RequestGroups: {
-      actionType: ActionType.Budget.SubAccount.SubAccounts.Groups.Request,
-      task: tasks.getGroups
+    Comments: {
+      Request: ActionType.Budget.SubAccount.Comments.Request,
+      Submit: ActionType.Budget.SubAccount.Comments.Create,
+      Delete: ActionType.Budget.SubAccount.Comments.Delete,
+      Edit: ActionType.Budget.SubAccount.Comments.Update
     },
-    RequestComments: {
-      actionType: ActionType.Budget.SubAccount.Comments.Request,
-      task: getCommentsTask
+    History: {
+      Request: ActionType.Budget.SubAccount.SubAccounts.History.Request
+    }
+  },
+  {
+    Request: tasks.getSubAccounts,
+    HandleDataChangeEvent: tasks.handleDataChangeEvent,
+    HandleRowAddEvent: tasks.handleRowAddEvent,
+    HandleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    Groups: {
+      Request: tasks.getGroups,
+      RemoveModel: tasks.removeFromGroup,
+      AddModel: tasks.addToGroup,
+      Delete: tasks.deleteGroup
     },
-    RequestHistory: {
-      actionType: ActionType.Budget.SubAccount.SubAccounts.History.Request,
-      task: getHistoryTask
+    Comments: {
+      Request: getCommentsTask,
+      Submit: submitCommentTask,
+      Delete: deleteCommentTask,
+      Edit: editCommentTask
     },
-    TableChanged: { actionType: ActionType.Budget.SubAccount.TableChanged, task: tasks.handleTableChange },
-    BulkCreate: { actionType: ActionType.Budget.SubAccount.SubAccounts.BulkCreate, task: tasks.bulkCreate },
-    Delete: { actionType: ActionType.Budget.SubAccount.SubAccounts.Delete, task: tasks.handleRemoval },
-    SubmitComment: { actionType: ActionType.Budget.SubAccount.Comments.Create, task: submitCommentTask },
-    DeleteComment: { actionType: ActionType.Budget.SubAccount.Comments.Delete, task: deleteCommentTask },
-    EditComment: { actionType: ActionType.Budget.SubAccount.Comments.Update, task: editCommentTask },
-    DeleteGroup: { actionType: ActionType.Budget.SubAccount.SubAccounts.Groups.Delete, task: tasks.deleteGroup },
-    RemoveModelFromGroup: {
-      actionType: ActionType.Budget.Account.SubAccounts.RemoveFromGroup,
-      task: tasks.removeFromGroup
-    },
-    AddModelToGroup: { actionType: ActionType.Budget.Account.SubAccounts.AddToGroup, task: tasks.addToGroup }
+    History: {
+      Request: getHistoryTask
+    }
   },
   watchForRequestSubAccountSaga,
   watchForSubAccountIdChangedSaga

@@ -60,9 +60,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   isCellEditable,
   rowCanExpand,
   onRowExpand,
-  onTableChange,
-  onRowAdd,
-  onRowDelete,
+  onChangeEvent,
   onBack,
   ...props
 }: BudgetTable.PrimaryGridProps<R, M, G>): JSX.Element => {
@@ -207,7 +205,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       if (isNil(params.nextCellPosition)) {
         // TODO: We need to figure out how to move down to the next cell!  This
         // is tricky, because we have to wait for the row to be present in state.
-        onRowAdd(1);
+        onChangeEvent({ type: "rowAdd", payload: 1 });
       } else {
         if (includes(["index", "expand"], params.nextCellPosition.column.getColId())) {
           let nextCellPosition = { ...params.nextCellPosition };
@@ -248,7 +246,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     if (!isNil(apis)) {
       const [node, rowIndex, _] = findFirstNonGroupFooterRow(loc.rowIndex + 1);
       if (node === null) {
-        onRowAdd(1);
+        onChangeEvent({ type: "rowAdd", payload: 1 });
       }
       moveToLocation({ rowIndex, column: loc.column }, opts);
     }
@@ -310,7 +308,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       const focusedCell = apis.grid.getFocusedCell();
       if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
         if (e.code === "Enter") {
-          moveToNextRow(focusedCell.rowIndex, focusedCell.column);
+          moveToNextRow({ rowIndex: focusedCell.rowIndex, column: focusedCell.column });
         } else if (e.code === "Tab") {
           moveToNextColumn(focusedCell.rowIndex, focusedCell.column);
         }
@@ -405,13 +403,19 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     const changes: Table.CellChange<R>[] = !Array.isArray(range)
       ? getTableChangesFromRangeClear(range, paramsApi)
       : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, paramsApi)));
-    onTableChange(changes);
+    onChangeEvent({
+      type: "dataChange",
+      payload: changes
+    });
   });
 
   const clearCell = useDynamicCallback((row: R, def: Table.Column<R>) => {
     const change = getCellChangeForClear(row, def);
     if (!isNil(change)) {
-      onTableChange(change);
+      onChangeEvent({
+        type: "dataChange",
+        payload: change
+      });
     }
   });
 
@@ -424,27 +428,10 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       map(cellChangeEvents, (e: CellValueChangedEvent) => getCellChangeFromEvent(e)),
       (change: Table.CellChange<R> | null) => change !== null
     ) as Table.CellChange<R>[];
-    onTableChange(changes);
-  });
-
-  const _onCellValueChanged = useDynamicCallback((event: CellValueChangedEvent) => {
-    if (event.source === "paste") {
-      setCellChangeEvents([...cellChangeEvents, event]);
-    } else {
-      const change = getCellChangeFromEvent(event);
-      if (!isNil(change)) {
-        onTableChange(change);
-        onCellValueChanged({
-          row: event.node.data as R,
-          oldRow: oldRow.current,
-          column: event.column,
-          oldValue: event.oldValue,
-          newValue: event.newValue,
-          change: change,
-          node: event.node
-        });
-      }
-    }
+    onChangeEvent({
+      type: "dataChange",
+      payload: changes
+    });
   });
 
   const getRowClass = useDynamicCallback((params: RowClassParams) => {
@@ -493,7 +480,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     } else {
       const deleteRowContextMenuItem: MenuItemDef = {
         name: `Delete ${row.meta.label}`,
-        action: () => onRowDelete(row.id)
+        action: () => onChangeEvent({ payload: row.id, type: "rowDelete" })
       };
       if (isNil(groupParams)) {
         return [deleteRowContextMenuItem];
@@ -556,19 +543,13 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
         const customCol = find(columns, (def: Table.Column<R>) => def.field === column.getColId());
         if (!isNil(customCol)) {
           const columnType: Table.ColumnType | undefined = find(models.ColumnTypes, { id: customCol.type });
-          if (!isNil(columnType)) {
-            if (columnType.editorIsPopup === true) {
-              const row: R = params.node.data;
-              clearCell(row, customCol);
-              return true;
-            } else {
-              return false;
-            }
+          if (!isNil(columnType) && columnType.editorIsPopup === true) {
+            const row: R = params.node.data;
+            clearCell(row, customCol);
+            return true;
           }
-          return false;
-        } else {
-          return false;
         }
+        return false;
       }
     } else if (
       !isNil(params.api) &&
@@ -618,7 +599,10 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           const newRows: R[] = map(rowsToAdd, (r: any[]) =>
             recreateRowFromDataArray(apis.column, r, focusedCell.column)
           );
-          onRowAdd(newRows);
+          onChangeEvent({
+            type: "rowAdd",
+            payload: newRows
+          });
         }
       }
     }
@@ -813,7 +797,10 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       if (!isNil(customCol)) {
         if (!isNil(cutCellChange)) {
           params = { ...params, value: cutCellChange.oldValue };
-          onTableChange(cutCellChange);
+          onChangeEvent({
+            type: "dataChange",
+            payload: cutCellChange
+          });
           setCutCellChange(null);
         }
         return processCellFromClipboard(customCol, node.data as R, params.value);
@@ -874,12 +861,19 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     }
   }));
 
-  const onCellValueChanged = useDynamicCallback((params: Table.CellValueChangedParams<R>) => {
-    if (!isNil(apis) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
-      const col = apis.column.getColumn("expand");
-      if (!isNil(col)) {
-        if (isNil(params.oldRow) || rowCanExpand(params.oldRow) !== rowCanExpand(params.row)) {
-          apis.grid.refreshCells({ force: true, rowNodes: [params.node], columns: [col] });
+  const onCellValueChanged = useDynamicCallback((e: CellValueChangedEvent) => {
+    if (e.source === "paste") {
+      setCellChangeEvents([...cellChangeEvents, e]);
+    } else {
+      const change = getCellChangeFromEvent(e);
+      if (!isNil(change)) {
+        onChangeEvent({ type: "dataChange", payload: change });
+        if (!isNil(apis) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
+          const col = apis.column.getColumn("expand");
+          const row: R = e.node.data;
+          if (!isNil(col) && (isNil(oldRow.current) || rowCanExpand(oldRow.current) !== rowCanExpand(row))) {
+            apis.grid.refreshCells({ force: true, rowNodes: [e.node], columns: [col] });
+          }
         }
       }
     }
@@ -957,7 +951,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           frameworkComponents={frameworkComponents}
           onPasteStart={onPasteStart}
           onPasteEnd={onPasteEnd}
-          onCellValueChanged={_onCellValueChanged}
+          onCellValueChanged={onCellValueChanged}
           fillOperation={(params: FillOperationParams) => {
             if (params.initialValues.length === 1) {
               return false;

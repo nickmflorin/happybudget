@@ -55,12 +55,8 @@ const AccountsTable = (): JSX.Element => {
         search={search}
         onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
         exportFileName={!isNil(budgetDetail) ? `budget_${budgetDetail.name}_accounts` : ""}
-        onRowAdd={(payload: Table.RowAddPayload<BudgetTable.BudgetAccountRow>) =>
-          dispatch(actions.bulkCreateAccountsAction(payload))
-        }
-        onRowDelete={(ids: number | number[]) => dispatch(actions.deleteAccountsAction(ids))}
-        onTableChange={(payload: Table.Change<BudgetTable.BudgetAccountRow>) =>
-          dispatch(actions.tableChangedAction(payload))
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.BudgetAccountRow>) =>
+          dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         onDeleteGroup={(group: Model.BudgetGroup) => dispatch(actions.deleteGroupAction(group.id))}

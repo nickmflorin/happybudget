@@ -1,6 +1,6 @@
 import { Reducer, combineReducers } from "redux";
-import { isNil, reduce } from "lodash";
-import * as models from "lib/model";
+import { isNil, reduce, find, filter } from "lodash";
+
 import {
   createModelListResponseReducer,
   createDetailResponseReducer,
@@ -9,6 +9,11 @@ import {
   createCommentsListResponseReducer
 } from "lib/redux/factories";
 import { initialModelListResponseState } from "store/initialState";
+import { warnInconsistentState } from "lib/redux/util";
+import { replaceInArray } from "lib/util";
+import * as models from "lib/model";
+import { consolidateTableChange } from "lib/model/util";
+import * as typeguards from "lib/model/typeguards";
 
 import { ActionType } from "../actions";
 import initialState, { initialBudgetAccountsState, initialBudgetSubAccountsState } from "../initialState";
@@ -24,8 +29,8 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
       Request: ActionType.Budget.Actuals.Request,
       Loading: ActionType.Budget.Actuals.Loading,
       SetSearch: ActionType.Budget.Actuals.SetSearch,
-      UpdateInState: ActionType.Budget.Actuals.UpdateInState,
-      RemoveFromState: ActionType.Budget.Actuals.RemoveFromState,
+      // This will eventually be removed when we let the reducer respond to
+      // the RowAddEvent directly.
       AddToState: ActionType.Budget.Actuals.AddToState,
       Deleting: ActionType.Budget.Actuals.Deleting,
       Updating: ActionType.Budget.Actuals.Updating,
@@ -36,7 +41,68 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
       initialState: initialModelListResponseState
     }
   );
-  return listResponseReducer(state, action);
+  let newState = listResponseReducer(state, action);
+  if (action.type === ActionType.Budget.Actuals.TableChanged) {
+    const event: Table.ChangeEvent<BudgetTable.ActualRow> = action.payload;
+
+    if (typeguards.isDataChangeEvent(event)) {
+      const consolidated = consolidateTableChange(event.payload);
+
+      // The consolidated changes should contain one change per actual, but
+      // just in case we apply that grouping logic here.
+      let changesPerActual: {
+        [key: number]: { changes: Table.RowChange<BudgetTable.ActualRow>[]; model: Model.Actual };
+      } = {};
+      for (let i = 0; i < consolidated.length; i++) {
+        if (isNil(changesPerActual[consolidated[i].id])) {
+          const actual: Model.Actual | undefined = find(newState.data, { id: consolidated[i].id } as any);
+          if (isNil(actual)) {
+            warnInconsistentState({
+              action: action.type,
+              reason: "Actual does not exist in state when it is expected to.",
+              id: consolidated[i].id
+            });
+          } else {
+            changesPerActual[consolidated[i].id] = { changes: [], model: actual };
+          }
+        }
+        if (!isNil(changesPerActual[consolidated[i].id])) {
+          changesPerActual[consolidated[i].id] = {
+            ...changesPerActual[consolidated[i].id],
+            changes: [...changesPerActual[consolidated[i].id].changes, consolidated[i]]
+          };
+        }
+      }
+      // For each of the SubAccount(s) that were changed, apply those changes to the current
+      // SubAccount model in state.
+      for (let k = 0; k < Object.keys(changesPerActual).length; k++) {
+        const id = parseInt(Object.keys(changesPerActual)[k]);
+        const changesObj = changesPerActual[id];
+        let actual = changesObj.model;
+        for (let j = 0; j < changesObj.changes.length; j++) {
+          actual = models.ActualRowManager.mergeChangesWithModel(changesObj.model, changesObj.changes[j]);
+        }
+        newState = {
+          ...newState,
+          data: replaceInArray<Model.Actual>(newState.data, { id: actual.id }, actual)
+        };
+      }
+    } else if (typeguards.isRowAddEvent(event)) {
+      // Eventually, we will want to implement this - so we do not have to rely on waiting
+      // for the response of the API request.
+    } else if (typeguards.isRowDeleteEvent(event)) {
+      const ids = Array.isArray(event.payload) ? event.payload : [event.payload];
+      for (let i = 0; i < ids.length; i++) {
+        newState = {
+          ...newState,
+          /* eslint-disable no-loop-func */
+          data: filter(newState.data, (m: Model.Actual) => m.id !== ids[i]),
+          count: newState.count - 1
+        };
+      }
+    }
+  }
+  return newState;
 };
 
 const genericReducer = combineReducers({
@@ -79,7 +145,6 @@ const genericReducer = combineReducers({
         Request: ActionType.Budget.Account.SubAccounts.Request,
         Loading: ActionType.Budget.Account.SubAccounts.Loading,
         SetSearch: ActionType.Budget.Account.SubAccounts.SetSearch,
-        RemoveFromState: ActionType.Budget.Account.SubAccounts.RemoveFromState,
         AddToState: ActionType.Budget.Account.SubAccounts.AddToState,
         Deleting: ActionType.Budget.Account.SubAccounts.Deleting,
         Creating: ActionType.Budget.Account.SubAccounts.Creating,
@@ -91,7 +156,7 @@ const genericReducer = combineReducers({
         // should adjust this, so that it only updates the Account SubAccount(s) or the
         // SubAccount SubAccount(s) when Fringes change.
         Fringes: {
-          UpdateInState: ActionType.Budget.Fringes.UpdateInState
+          TableChanged: ActionType.Budget.Fringes.TableChanged
         },
         History: {
           Response: ActionType.Budget.Account.SubAccounts.History.Response,
@@ -148,7 +213,6 @@ const genericReducer = combineReducers({
         Request: ActionType.Budget.SubAccount.SubAccounts.Request,
         Loading: ActionType.Budget.SubAccount.SubAccounts.Loading,
         SetSearch: ActionType.Budget.SubAccount.SubAccounts.SetSearch,
-        RemoveFromState: ActionType.Budget.SubAccount.SubAccounts.RemoveFromState,
         AddToState: ActionType.Budget.SubAccount.SubAccounts.AddToState,
         Deleting: ActionType.Budget.SubAccount.SubAccounts.Deleting,
         Creating: ActionType.Budget.SubAccount.SubAccounts.Creating,
@@ -160,7 +224,7 @@ const genericReducer = combineReducers({
         // should adjust this, so that it only updates the Account SubAccount(s) or the
         // SubAccount SubAccount(s) when Fringes change.
         Fringes: {
-          UpdateInState: ActionType.Budget.Fringes.UpdateInState
+          TableChanged: ActionType.Budget.Fringes.TableChanged
         },
         History: {
           Response: ActionType.Budget.SubAccount.SubAccounts.History.Response,
@@ -194,7 +258,6 @@ const genericReducer = combineReducers({
       Request: ActionType.Budget.Accounts.Request,
       Loading: ActionType.Budget.Accounts.Loading,
       SetSearch: ActionType.Budget.Accounts.SetSearch,
-      RemoveFromState: ActionType.Budget.Accounts.RemoveFromState,
       AddToState: ActionType.Budget.Accounts.AddToState,
       Deleting: ActionType.Budget.Accounts.Deleting,
       Creating: ActionType.Budget.Accounts.Creating,
@@ -260,16 +323,12 @@ const rootReducer: Reducer<Modules.Budgeting.Budget.Store, Redux.Action<any>> = 
 
   newState = genericReducer(newState, action);
 
+  // When the underlying account or subaccounts are removed, updated or added,
+  // we need to also update the parent account or subaccount.
   if (!isNil(action.payload)) {
-    if (
-      action.type === ActionType.Budget.SubAccount.SubAccounts.RemoveFromState ||
-      action.type === ActionType.Budget.SubAccount.SubAccounts.AddToState
-    ) {
+    if (action.type === ActionType.Budget.SubAccount.TableChanged) {
       // Update the overall SubAccount based on the underlying SubAccount(s) present.
       const subAccounts: Model.BudgetSubAccount[] = newState.subaccount.subaccounts.data;
-      // Right now, the backend is configured such that the Actual value for the overall SubAccount is
-      // determined from the Actual values tied to that SubAccount, not the underlying SubAccount(s).
-      // If that logic changes in the backend, we need to also make that adjustment here.
       let payload: Partial<Model.BudgetSubAccount> = {
         estimated: reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0)
       };
@@ -290,10 +349,7 @@ const rootReducer: Reducer<Modules.Budgeting.Budget.Store, Redux.Action<any>> = 
           };
         }
       }
-    } else if (
-      action.type === ActionType.Budget.Account.SubAccounts.RemoveFromState ||
-      action.type === ActionType.Budget.Account.SubAccounts.AddToState
-    ) {
+    } else if (action.type === ActionType.Budget.Account.TableChanged) {
       // Update the overall Account based on the underlying SubAccount(s) present.
       const subAccounts: Model.BudgetSubAccount[] = newState.account.subaccounts.data;
       // Right now, the backend is configured such that the Actual value for the overall Account is

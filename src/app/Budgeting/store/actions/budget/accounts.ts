@@ -1,13 +1,9 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
-export const tableChangedAction = simpleAction<Table.Change<BudgetTable.BudgetAccountRow>>(
+export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.BudgetAccountRow>>(
   ActionType.Budget.Accounts.TableChanged
 );
-export const bulkCreateAccountsAction = simpleAction<Table.RowAddPayload<BudgetTable.BudgetAccountRow>>(
-  ActionType.Budget.Accounts.BulkCreate
-);
-
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.Comments.Request);
 export const responseCommentsAction = simpleAction<Http.ListResponse<Model.Comment>>(
   ActionType.Budget.Comments.Response
@@ -31,8 +27,6 @@ export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budg
 export const updateCommentInStateAction = simpleAction<
   Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
 >(ActionType.Budget.Comments.UpdateInState);
-
-export const deleteAccountsAction = simpleAction<number | number[]>(ActionType.Budget.Accounts.Delete);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Budget.Accounts.Creating);
@@ -46,7 +40,6 @@ export const removeAccountFromGroupAction = simpleAction<number>(ActionType.Budg
 export const addAccountToGroupAction = simpleAction<{ id: number; group: number }>(
   ActionType.Budget.Accounts.AddToGroup
 );
-export const removeAccountFromStateAction = simpleAction<number>(ActionType.Budget.Accounts.RemoveFromState);
 export const addAccountToStateAction = simpleAction<Model.BudgetAccount>(ActionType.Budget.Accounts.AddToState);
 export const requestGroupsAction = simpleAction<null>(ActionType.Budget.Accounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.Accounts.Groups.Loading);

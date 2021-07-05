@@ -76,12 +76,8 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
         cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
-        onRowAdd={(payload: Table.RowAddPayload<BudgetTable.BudgetSubAccountRow>) =>
-          dispatch(actions.bulkCreateSubAccountsAction(payload))
-        }
-        onRowDelete={(ids: number | number[]) => dispatch(actions.deleteSubAccountsAction(ids))}
-        onTableChange={(payload: Table.Change<BudgetTable.BudgetSubAccountRow>) =>
-          dispatch(actions.tableChangedAction(payload))
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.BudgetSubAccountRow>) =>
+          dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}

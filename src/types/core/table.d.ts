@@ -108,6 +108,29 @@ namespace Table {
   type RowAddPayload<R extends Table.Row> = number | Partial<R> | Partial<R>[];
   type RowAddFunc<R extends Table.Row> = (payload: RowAddPayload<R>) => void;
 
+  type ChangeEventId = "dataChange" | "rowAdd" | "rowDelete";
+
+  type BaseChangeEvent = {
+    readonly type: ChangeEventId;
+  }
+
+  type DataChangeEvent<R extends Table.Row> = Table.BaseChangeEvent & {
+    readonly type: "dataChange";
+    readonly payload: Table.Change<R>
+  }
+
+  type RowAddEvent<R extends Table.Row> = Table.BaseChangeEvent & {
+    readonly type: "rowAdd";
+    readonly payload: Table.RowAddPayload<R>;
+  }
+
+  type RowDeleteEvent = Table.BaseChangeEvent & {
+    readonly type: "rowDelete";
+    readonly payload: number[] | number;
+  }
+
+  type ChangeEvent<R extends Table.Row> = DataChangeEvent<R> | RowAddEvent<R> | RowDeleteEvent;
+
   // TODO: We need to merge this together with other mechanics.
   interface CellValueChangedParams<R extends Table.Row> {
     readonly column: import("@ag-grid-community/core").Column;
@@ -393,9 +416,7 @@ namespace BudgetTable {
     readonly search?: string;
     readonly columns: Table.Column<R>[];
     readonly manager: Table.IRowManager<R, M, P>;
-    readonly onTableChange: (payload: Table.Change<R>) => void;
-    readonly onRowAdd: Table.RowAddFunc<R>;
-    readonly onRowDelete: (ids: number | number[]) => void;
+    readonly onChangeEvent: (event: Table.ChangeEvent<R>) => void;
     // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
     // onRowExpand is provided to the BudgetTable.
     readonly rowCanExpand?: (row: R) => boolean;

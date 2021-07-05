@@ -6,7 +6,6 @@ import { isNil, map, filter, includes } from "lodash";
 import * as api from "api";
 import * as models from "lib/model";
 
-import { isAction } from "lib/redux/typeguards";
 import { consolidateTableChange } from "lib/model/util";
 
 import { createBulkCreatePayload } from "./util";
@@ -18,7 +17,6 @@ export interface AccountsTasksActionMap<
   deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  removeFromState: Redux.ActionCreator<number>;
   addToState: Redux.ActionCreator<A>;
   loading: Redux.ActionCreator<boolean>;
   response: Redux.ActionCreator<Http.ListResponse<A>>;
@@ -51,11 +49,11 @@ export interface AccountsTaskSet<R extends Table.Row> {
   addToGroup: Redux.Task<{ id: number; group: number }>;
   removeFromGroup: Redux.Task<number>;
   deleteGroup: Redux.Task<number>;
-  bulkCreate: Redux.Task<number>;
-  handleRemoval: Redux.Task<number>;
-  handleTableChange: Redux.Task<Table.Change<R>>;
   getAccounts: Redux.Task<null>;
   getGroups: Redux.Task<null>;
+  handleRowAddEvent: Redux.Task<Table.RowAddEvent<R>>;
+  handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
+  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R>>;
 }
 
 export const createAccountsTaskSet = <
@@ -139,19 +137,78 @@ export const createAccountsTaskSet = <
     }
   }
 
-  function* bulkDeleteTask(ids: number[]): SagaIterator {
+  function* bulkCreateTask(payload: Table.RowAddPayload<R>): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId)) {
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
+      yield put(actions.creating(true));
 
+      const autoIndex = yield select(selectAutoIndex);
+      const data = yield select(selectModels);
+
+      const requestPayload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, P, A>(payload, manager, {
+        autoIndex,
+        models: data
+      });
+      // We do this to show the loading indicator next to the calculated fields of the footers,
+      // otherwise, the loading indicators will not appear until the first API request
+      // succeeds and we refresh the parent state.
+      yield put(actions.budget.loading(true));
+      let success = true;
+      try {
+        const accounts: A[] = yield call(services.bulkCreate, objId, requestPayload, { cancelToken: source.token });
+        yield all(accounts.map((account: A) => put(actions.addToState(account))));
+      } catch (e) {
+        success = false;
+        yield put(actions.budget.loading(false));
+        if (!(yield cancelled())) {
+          api.handleRequestError(e, "There was an error creating the accounts.");
+        }
+      } finally {
+        yield put(actions.creating(false));
+        if (yield cancelled()) {
+          success = false;
+          source.cancel();
+        }
+      }
+      if (success === true) {
+        yield put(actions.budget.request(null));
+      }
+    }
+  }
+
+  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
+    const objId = yield select(selectObjId);
+    if (!isNil(objId) && !isNil(action.payload)) {
+      const event: Table.RowAddEvent<R> = action.payload;
+      yield fork(bulkCreateTask, event.payload);
+    }
+  }
+
+  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent>): SagaIterator {
+    const objId = yield select(selectObjId);
+    if (!isNil(objId) && !isNil(action.payload)) {
+      const event: Table.RowDeleteEvent = action.payload;
+
+      const ms: A[] = yield select(selectModels);
+      let ids = Array.isArray(event.payload) ? event.payload : [event.payload];
+      ids = filter(ids, (id: number) =>
+        includes(
+          map(ms, (m: A) => m.id),
+          id
+        )
+      );
       if (ids.length !== 0) {
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
-        // We do this to show the loading indicator next to the calculated fields of the Budget Footer Row,
-        // otherwise, the loading indicators will not appear until `yield put(requestTemplateAction)`, and there
-        // is a lag between the time that this task is called and that task is called.
+        // We do this to show the loading indicator next to the calculated fields of the footers,
+        // otherwise, the loading indicators will not appear until the first API request
+        // succeeds and we refresh the parent state.
         yield put(actions.budget.loading(true));
+
         let success = true;
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
 
         try {
           yield call(services.bulkDelete, objId, ids, { cancelToken: source.token });
@@ -175,107 +232,46 @@ export const createAccountsTaskSet = <
     }
   }
 
-  function* bulkUpdateTask(changes: Table.RowChange<R>[]): SagaIterator {
-    const objId = yield select(selectObjId);
-    if (!isNil(objId)) {
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
-      const requestPayload: Http.BulkUpdatePayload<P>[] = map(changes, (change: Table.RowChange<R>) => ({
-        id: change.id,
-        ...manager.payload(change)
-      }));
-
-      // We do this to show the loading indicator next to the calculated fields of the footers,
-      // otherwise, the loading indicators will not appear until the first API request
-      // succeeds and we refresh the parent state.
-      yield put(actions.budget.loading(true));
-
-      let success = true;
-      yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
-      try {
-        yield call(services.bulkUpdate, objId, requestPayload, { cancelToken: source.token });
-      } catch (e) {
-        success = false;
-        yield put(actions.budget.loading(false));
-        if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error updating the accounts.");
-        }
-      } finally {
-        yield all(changes.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
-        if (yield cancelled()) {
-          source.cancel();
-        }
-      }
-      if (success === true) {
-        yield put(actions.budget.request(null));
-      }
-    }
-  }
-
-  function* bulkCreateTask(action: Redux.Action<number> | number): SagaIterator {
-    const objId = yield select(selectObjId);
-    if (!isNil(objId) && (!isAction(action) || !isNil(action.payload))) {
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
-      yield put(actions.creating(true));
-
-      const autoIndex = yield select(selectAutoIndex);
-      const data = yield select(selectModels);
-      const actionPayload = isAction(action) ? action.payload : action;
-
-      const payload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, P, A>(actionPayload, manager, {
-        autoIndex,
-        models: data
-      });
-
-      // We do this to show the loading indicator next to the calculated fields of the footers,
-      // otherwise, the loading indicators will not appear until the first API request
-      // succeeds and we refresh the parent state.
-      yield put(actions.budget.loading(true));
-
-      let success = true;
-      try {
-        const accounts: A[] = yield call(services.bulkCreate, objId, payload, { cancelToken: source.token });
-        yield all(accounts.map((account: A) => put(actions.addToState(account))));
-      } catch (e) {
-        success = false;
-        yield put(actions.budget.loading(false));
-        if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error creating the accounts.");
-        }
-      } finally {
-        yield put(actions.creating(false));
-        if (yield cancelled()) {
-          source.cancel();
-        }
-      }
-      if (success === true) {
-        yield put(actions.budget.request(null));
-      }
-    }
-  }
-
-  function* handleRemovalTask(action: Redux.Action<number | number[]>): SagaIterator {
-    if (!isNil(action.payload)) {
-      const ms: A[] = yield select(selectModels);
-      let ids = Array.isArray(action.payload) ? action.payload : [action.payload];
-      ids = filter(ids, (id: number) =>
-        includes(
-          map(ms, (m: A) => m.id),
-          id
-        )
-      );
-      yield fork(bulkDeleteTask, ids);
-      yield all(ids.map((id: number) => put(actions.removeFromState(id))));
-    }
-  }
-
-  function* handleTableChangeTask(action: Redux.Action<Table.Change<R>>): SagaIterator {
+  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const merged = consolidateTableChange(action.payload);
+      const event: Table.DataChangeEvent<R> = action.payload;
+
+      const merged = consolidateTableChange(event.payload);
       if (merged.length !== 0) {
-        yield fork(bulkUpdateTask, merged);
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
+        const requestPayload: Http.BulkUpdatePayload<Http.AccountPayload>[] = map(
+          merged,
+          (change: Table.RowChange<R>) => ({
+            id: change.id,
+            ...manager.payload(change)
+          })
+        );
+        // We do this to show the loading indicator next to the calculated fields of the footers,
+        // otherwise, the loading indicators will not appear until the first API request
+        // succeeds and we refresh the parent state.
+        yield put(actions.budget.loading(true));
+        let success = true;
+        yield all(merged.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
+        try {
+          yield call(services.bulkUpdate, objId, requestPayload, { cancelToken: source.token });
+        } catch (e) {
+          success = false;
+          yield put(actions.budget.loading(false));
+          if (!(yield cancelled())) {
+            api.handleRequestError(e, "There was an error updating the accounts.");
+          }
+        } finally {
+          yield all(merged.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
+          if (yield cancelled()) {
+            success = false;
+            source.cancel();
+          }
+        }
+        if (success === true) {
+          yield put(actions.budget.request(null));
+        }
       }
     }
   }
@@ -342,9 +338,9 @@ export const createAccountsTaskSet = <
     addToGroup: addToGroupTask,
     removeFromGroup: removeFromGroupTask,
     deleteGroup: deleteGroupTask,
-    bulkCreate: bulkCreateTask,
-    handleRemoval: handleRemovalTask,
-    handleTableChange: handleTableChangeTask,
+    handleDataChangeEvent: handleDataChangeEvent,
+    handleRowAddEvent: handleRowAddEvent,
+    handleRowDeleteEvent: handleRowDeleteEvent,
     getAccounts: getAccountsTask,
     getGroups: getGroupsTask
   };

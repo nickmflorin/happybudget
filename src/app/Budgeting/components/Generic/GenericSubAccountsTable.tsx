@@ -82,7 +82,7 @@ const GenericSubAccountsTable = <
         onEditGroup,
         onRowAddToGroup
       }}
-      rowCanExpand={(row: R) => row.identifier !== null || row.meta.children.length !== 0}
+      rowCanExpand={(row: R) => !isNil(row.identifier) || row.meta.children.length !== 0}
       {...props}
       actions={(params: BudgetTable.MenuActionParams<R>) => [
         {
@@ -90,7 +90,10 @@ const GenericSubAccountsTable = <
           icon: faTrashAlt,
           onClick: () => {
             const rows: R[] = params.apis.grid.getSelectedRows();
-            props.onRowDelete(map(rows, (row: R) => row.id));
+            props.onChangeEvent({
+              payload: map(rows, (row: R) => row.id),
+              type: "rowDelete"
+            });
           }
         },
         {

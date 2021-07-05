@@ -1,15 +1,12 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
-import { isNil, find, filter, includes, map } from "lodash";
+import { isNil, filter, includes, map } from "lodash";
 
 import * as api from "api";
 import * as models from "lib/model";
 
-import { warnInconsistentState } from "lib/redux/util";
-import { isAction } from "lib/redux/typeguards";
 import { consolidateTableChange } from "lib/model/util";
-
 import { createBulkCreatePayload } from "./util";
 
 export interface FringeTasksActionMap {
@@ -18,8 +15,6 @@ export interface FringeTasksActionMap {
   deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  removeFromState: Redux.ActionCreator<number>;
-  updateInState: Redux.ActionCreator<Redux.UpdateModelActionPayload<Model.Fringe>>;
   addToState: Redux.ActionCreator<Model.Fringe>;
 }
 
@@ -45,30 +40,74 @@ export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
 
 export interface FringeTaskSet {
   getFringes: Redux.Task<null>;
-  bulkCreate: Redux.Task<number>;
-  handleRemoval: Redux.Task<number>;
-  handleTableChange: Redux.Task<Table.Change<BudgetTable.FringeRow>>;
+  handleRowAddEvent: Redux.Task<Table.RowAddEvent<BudgetTable.FringeRow>>;
+  handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
+  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<BudgetTable.FringeRow>>;
 }
 
 export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   actions: FringeTasksActionMap,
   services: FringeServiceSet<M>,
   selectObjId: (state: Modules.ApplicationStore) => number | null,
-  selectFringes: (state: Modules.ApplicationStore) => Model.Fringe[]
+  selectFringes: (state: Modules.ApplicationStore) => Model.Fringe[],
+  selectFringe: (id: number, action: Redux.Action<any>) => (state: Modules.ApplicationStore) => Model.Fringe | null
 ): FringeTaskSet => {
-  function* bulkDeleteTask(ids: number[]): SagaIterator {
-    const objId = yield select(selectObjId);
-    if (!isNil(objId)) {
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
+  function* bulkCreateTask(objId: number, payload: Table.RowAddPayload<BudgetTable.FringeRow>): SagaIterator {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    yield put(actions.creating(true));
 
+    const requestPayload: Http.BulkCreatePayload<Http.FringePayload> = createBulkCreatePayload<
+      BudgetTable.FringeRow,
+      Http.FringePayload
+    >(payload, models.FringeRowManager);
+
+    try {
+      const fringes: Model.Fringe[] = yield call(services.bulkCreate, objId, requestPayload, {
+        cancelToken: source.token
+      });
+      yield all(fringes.map((fringe: Model.Fringe) => put(actions.addToState(fringe))));
+    } catch (e) {
+      if (!(yield cancelled())) {
+        api.handleRequestError(e, "There was an error creating the fringes.");
+      }
+    } finally {
+      yield put(actions.creating(false));
+      if (yield cancelled()) {
+        source.cancel();
+      }
+    }
+  }
+
+  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<BudgetTable.FringeRow>>): SagaIterator {
+    const objId = yield select(selectObjId);
+    if (!isNil(objId) && !isNil(action.payload)) {
+      const event: Table.RowAddEvent<BudgetTable.FringeRow> = action.payload;
+      yield fork(bulkCreateTask, objId, event.payload);
+    }
+  }
+
+  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent>): SagaIterator {
+    const objId = yield select(selectObjId);
+    if (!isNil(objId) && !isNil(action.payload)) {
+      const event: Table.RowDeleteEvent = action.payload;
+      const ms: Model.Fringe[] = yield select(selectFringes);
+      let ids = Array.isArray(event.payload) ? event.payload : [event.payload];
+      ids = filter(ids, (id: number) =>
+        includes(
+          map(ms, (m: Model.Fringe) => m.id),
+          id
+        )
+      );
       if (ids.length !== 0) {
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
         try {
           yield call(services.bulkDelete, objId, ids, { cancelToken: source.token });
         } catch (e) {
           if (!(yield cancelled())) {
-            api.handleRequestError(e, "There was an error deleting the accounts.");
+            api.handleRequestError(e, "There was an error deleting the fringes.");
           }
         } finally {
           yield all(ids.map((id: number) => put(actions.deleting({ id, value: false }))));
@@ -80,114 +119,44 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     }
   }
 
-  function* bulkUpdateTask(id: number, changes: Table.RowChange<BudgetTable.FringeRow>[]): SagaIterator {
-    const CancelToken = axios.CancelToken;
-    const source = CancelToken.source();
-    const requestPayload: Http.BulkUpdatePayload<Http.FringePayload>[] = map(
-      changes,
-      (change: Table.RowChange<BudgetTable.FringeRow>) => ({
-        id: change.id,
-        ...models.FringeRowManager.payload(change)
-      })
-    );
-    yield all(
-      changes.map((change: Table.RowChange<BudgetTable.FringeRow>) =>
-        put(actions.updating({ id: change.id, value: true }))
-      )
-    );
-    try {
-      yield call(services.bulkUpdate, id, requestPayload, { cancelToken: source.token });
-    } catch (e) {
-      // Once we rebuild back in the error handling, we will have to be concerned here with the nested
-      // structure of the errors.
-      if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error updating the fringes.");
-      }
-    } finally {
-      yield all(
-        changes.map((change: Table.RowChange<BudgetTable.FringeRow>) =>
-          put(actions.updating({ id: change.id, value: false }))
-        )
-      );
-      if (yield cancelled()) {
-        source.cancel();
-      }
-    }
-  }
-
-  function* bulkCreateTask(action: Redux.Action<number> | number): SagaIterator {
-    const objId = yield select(selectObjId);
-    if (!isNil(objId) && (!isAction(action) || !isNil(action.payload))) {
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
-      yield put(actions.creating(true));
-
-      const actionPayload = isAction(action) ? action.payload : action;
-
-      const payload: Http.BulkCreatePayload<Http.FringePayload> = createBulkCreatePayload<
-        BudgetTable.FringeRow,
-        Http.FringePayload
-      >(actionPayload, models.FringeRowManager);
-
-      try {
-        const fringes: Model.Fringe[] = yield call(services.bulkCreate, objId, payload, {
-          cancelToken: source.token
-        });
-        yield all(fringes.map((fringe: Model.Fringe) => put(actions.addToState(fringe))));
-      } catch (e) {
-        // Once we rebuild back in the error handling, we will have to be concerned here with the nested
-        // structure of the errors.
-        if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error creating the fringes.");
-        }
-      } finally {
-        yield put(actions.creating(false));
-        if (yield cancelled()) {
-          source.cancel();
-        }
-      }
-    }
-  }
-
-  function* handleRemovalTask(action: Redux.Action<number | number[]>): SagaIterator {
-    if (!isNil(action.payload)) {
-      const ms: Model.Fringe[] = yield select(selectFringes);
-      let ids = Array.isArray(action.payload) ? action.payload : [action.payload];
-      ids = filter(ids, (id: number) =>
-        includes(
-          map(ms, (m: Model.Fringe) => m.id),
-          id
-        )
-      );
-      yield fork(bulkDeleteTask, ids);
-      yield all(ids.map((id: number) => put(actions.removeFromState(id))));
-    }
-  }
-
-  function* handleTableChangeTask(action: Redux.Action<Table.Change<BudgetTable.FringeRow>>): SagaIterator {
+  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<BudgetTable.FringeRow>>): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const merged = consolidateTableChange(action.payload);
+      const event: Table.DataChangeEvent<BudgetTable.FringeRow> = action.payload;
 
-      const data = yield select(selectFringes);
-      const updatesToPerform: Table.RowChange<BudgetTable.FringeRow>[] = [];
+      const merged = consolidateTableChange(event.payload);
+      if (merged.length !== 0) {
+        const CancelToken = axios.CancelToken;
+        const source = CancelToken.source();
 
-      for (let i = 0; i < merged.length; i++) {
-        const model: Model.Fringe | undefined = find(data, { id: merged[i].id });
-        if (isNil(model)) {
-          warnInconsistentState({
-            action: action.type,
-            reason: "Fringe does not exist in state when it is expected to.",
-            id: action.payload
-          });
-        } else {
-          const updatedModel = models.FringeRowManager.mergeChangesWithModel(model, merged[i]);
-          yield put(actions.updateInState({ id: updatedModel.id, data: updatedModel }));
-          updatesToPerform.push(merged[i]);
+        const requestPayload: Http.BulkUpdatePayload<Http.FringePayload>[] = map(
+          merged,
+          (change: Table.RowChange<BudgetTable.FringeRow>) => ({
+            id: change.id,
+            ...models.FringeRowManager.payload(change)
+          })
+        );
+        yield all(
+          merged.map((change: Table.RowChange<BudgetTable.FringeRow>) =>
+            put(actions.updating({ id: change.id, value: true }))
+          )
+        );
+        try {
+          yield call(services.bulkUpdate, objId, requestPayload, { cancelToken: source.token });
+        } catch (e) {
+          if (!(yield cancelled())) {
+            api.handleRequestError(e, "There was an error updating the fringes.");
+          }
+        } finally {
+          yield all(
+            merged.map((change: Table.RowChange<BudgetTable.FringeRow>) =>
+              put(actions.updating({ id: change.id, value: false }))
+            )
+          );
+          if (yield cancelled()) {
+            source.cancel();
+          }
         }
-      }
-      if (updatesToPerform.length !== 0) {
-        yield fork(bulkUpdateTask, objId, updatesToPerform);
       }
     }
   }
@@ -202,7 +171,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
         const response = yield call(services.request, objId, { no_pagination: true }, { cancelToken: source.token });
         yield put(actions.response(response));
         if (response.data.length === 0) {
-          yield call(bulkCreateTask, 2);
+          yield call(bulkCreateTask, objId, 2);
         }
       } catch (e) {
         if (!(yield cancelled())) {
@@ -220,8 +189,8 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
 
   return {
     getFringes: getFringesTask,
-    bulkCreate: bulkCreateTask,
-    handleRemoval: handleRemovalTask,
-    handleTableChange: handleTableChangeTask
+    handleDataChangeEvent: handleDataChangeEvent,
+    handleRowAddEvent: handleRowAddEvent,
+    handleRowDeleteEvent: handleRowDeleteEvent
   };
 };

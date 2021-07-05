@@ -10,13 +10,9 @@ export const responseAccountAction = simpleAction<Model.TemplateAccount | undefi
 export const updateAccountInStateAction = simpleAction<Partial<Redux.UpdateModelActionPayload<Model.TemplateAccount>>>(
   ActionType.Template.Account.UpdateInState
 );
-export const tableChangedAction = simpleAction<Table.Change<BudgetTable.TemplateSubAccountRow>>(
+export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.TemplateSubAccountRow>>(
   ActionType.Template.Account.TableChanged
 );
-export const bulkCreateSubAccountsAction = simpleAction<Table.RowAddPayload<BudgetTable.TemplateSubAccountRow>>(
-  ActionType.Template.Account.SubAccounts.BulkCreate
-);
-export const deleteSubAccountsAction = simpleAction<number | number[]>(ActionType.Template.Account.SubAccounts.Delete);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Template.Account.SubAccounts.Deleting
 );
@@ -35,9 +31,6 @@ export const removeSubAccountFromGroupAction = simpleAction<number>(
 );
 export const addSubAccountToGroupAction = simpleAction<{ id: number; group: number }>(
   ActionType.Template.Account.SubAccounts.AddToGroup
-);
-export const removeSubAccountFromStateAction = simpleAction<number>(
-  ActionType.Template.Account.SubAccounts.RemoveFromState
 );
 export const addSubAccountToStateAction = simpleAction<Model.TemplateSubAccount>(
   ActionType.Template.Account.SubAccounts.AddToState

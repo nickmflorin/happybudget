@@ -5,10 +5,10 @@ import { ICellRendererParams } from "@ag-grid-community/core";
 import { IconButton } from "components/buttons";
 
 interface IndexCellProps extends ICellRendererParams {
-  onRowAdd: (payload: Table.RowAddPayload<any>) => void;
+  onChangeEvent: (e: Table.ChangeEvent<any>) => void;
 }
 
-const IndexCell = <R extends Table.Row>({ onRowAdd, node }: IndexCellProps): JSX.Element => {
+const IndexCell = <R extends Table.Row>({ onChangeEvent, node }: IndexCellProps): JSX.Element => {
   // Since the SelectCell is the first cell in the table, group footers will
   // potentially span this cell across the columns - but we never want the group
   // footer row to be selectable.
@@ -21,7 +21,12 @@ const IndexCell = <R extends Table.Row>({ onRowAdd, node }: IndexCellProps): JSX
         className={"green"}
         size={"medium"}
         icon={<FontAwesomeIcon icon={faPlusCircle} />}
-        onClick={() => onRowAdd(1)}
+        onClick={() =>
+          onChangeEvent({
+            type: "rowAdd",
+            payload: 1
+          })
+        }
       />
     );
   }

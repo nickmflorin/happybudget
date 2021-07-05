@@ -1,13 +1,9 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
-export const tableChangedAction = simpleAction<Table.Change<BudgetTable.TemplateAccountRow>>(
+export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.TemplateAccountRow>>(
   ActionType.Template.Accounts.TableChanged
 );
-export const bulkCreateAccountsAction = simpleAction<Table.RowAddPayload<BudgetTable.TemplateAccountRow>>(
-  ActionType.Template.Accounts.BulkCreate
-);
-export const deleteAccountsAction = simpleAction<number | number[]>(ActionType.Template.Accounts.Delete);
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Accounts.Deleting);
 export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Accounts.Updating);
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Template.Accounts.Creating);
@@ -21,7 +17,6 @@ export const removeAccountFromGroupAction = simpleAction<number>(ActionType.Temp
 export const addAccountToGroupAction = simpleAction<{ id: number; group: number }>(
   ActionType.Template.Accounts.AddToGroup
 );
-export const removeAccountFromStateAction = simpleAction<number>(ActionType.Template.Accounts.RemoveFromState);
 export const addAccountToStateAction = simpleAction<Model.TemplateAccount>(ActionType.Template.Accounts.AddToState);
 export const requestGroupsAction = simpleAction<null>(ActionType.Template.Accounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Template.Accounts.Groups.Loading);

@@ -22,7 +22,6 @@ const tasks = createAccountTaskSet<
     request: actions.requestSubAccountsAction,
     response: actions.responseSubAccountsAction,
     addToState: actions.addSubAccountToStateAction,
-    removeFromState: actions.removeSubAccountFromStateAction,
     budget: {
       loading: loadingTemplateAction,
       request: requestTemplateAction
@@ -70,23 +69,26 @@ function* watchForAccountIdChangedSaga(): SagaIterator {
 
 export default createStandardSaga(
   {
-    Request: {
-      actionType: ActionType.Template.Account.SubAccounts.Request,
-      task: tasks.getSubAccounts
-    },
-    RequestGroups: {
-      actionType: ActionType.Template.Account.SubAccounts.Groups.Request,
-      task: tasks.getGroups
-    },
-    TableChanged: { actionType: ActionType.Template.Account.TableChanged, task: tasks.handleTableChange },
-    BulkCreate: { actionType: ActionType.Template.Account.SubAccounts.BulkCreate, task: tasks.bulkCreate },
-    Delete: { actionType: ActionType.Template.Account.SubAccounts.Delete, task: tasks.handleRemoval },
-    DeleteGroup: { actionType: ActionType.Template.Account.SubAccounts.Groups.Delete, task: tasks.deleteGroup },
-    RemoveModelFromGroup: {
-      actionType: ActionType.Template.Account.SubAccounts.RemoveFromGroup,
-      task: tasks.removeFromGroup
-    },
-    AddModelToGroup: { actionType: ActionType.Template.Account.SubAccounts.AddToGroup, task: tasks.addToGroup }
+    Request: ActionType.Template.Account.SubAccounts.Request,
+    TableChange: ActionType.Template.Account.TableChanged,
+    Groups: {
+      Request: ActionType.Template.Account.SubAccounts.Groups.Request,
+      RemoveModel: ActionType.Template.Account.SubAccounts.RemoveFromGroup,
+      AddModel: ActionType.Template.Account.SubAccounts.AddToGroup,
+      Delete: ActionType.Template.Account.SubAccounts.Groups.Delete
+    }
+  },
+  {
+    Request: tasks.getSubAccounts,
+    HandleDataChangeEvent: tasks.handleDataChangeEvent,
+    HandleRowAddEvent: tasks.handleRowAddEvent,
+    HandleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    Groups: {
+      Request: tasks.getGroups,
+      RemoveModel: tasks.removeFromGroup,
+      AddModel: tasks.addToGroup,
+      Delete: tasks.deleteGroup
+    }
   },
   watchForRequestAccountSaga,
   watchForAccountIdChangedSaga

@@ -36,7 +36,6 @@ const genericReducer = combineReducers({
         Request: ActionType.Template.Account.SubAccounts.Request,
         Loading: ActionType.Template.Account.SubAccounts.Loading,
         SetSearch: ActionType.Template.Account.SubAccounts.SetSearch,
-        RemoveFromState: ActionType.Template.Account.SubAccounts.RemoveFromState,
         AddToState: ActionType.Template.Account.SubAccounts.AddToState,
         Deleting: ActionType.Template.Account.SubAccounts.Deleting,
         Creating: ActionType.Template.Account.SubAccounts.Creating,
@@ -48,7 +47,7 @@ const genericReducer = combineReducers({
         // should adjust this, so that it only updates the Account SubAccount(s) or the
         // SubAccount SubAccount(s) when Fringes change.
         Fringes: {
-          UpdateInState: ActionType.Template.Fringes.UpdateInState
+          TableChanged: ActionType.Template.Fringes.TableChanged
         },
         Groups: {
           Response: ActionType.Template.Account.SubAccounts.Groups.Response,
@@ -88,7 +87,6 @@ const genericReducer = combineReducers({
         Request: ActionType.Template.SubAccount.SubAccounts.Request,
         Loading: ActionType.Template.SubAccount.SubAccounts.Loading,
         SetSearch: ActionType.Template.SubAccount.SubAccounts.SetSearch,
-        RemoveFromState: ActionType.Template.SubAccount.SubAccounts.RemoveFromState,
         AddToState: ActionType.Template.SubAccount.SubAccounts.AddToState,
         Deleting: ActionType.Template.SubAccount.SubAccounts.Deleting,
         Creating: ActionType.Template.SubAccount.SubAccounts.Creating,
@@ -100,7 +98,7 @@ const genericReducer = combineReducers({
         // should adjust this, so that it only updates the Account SubAccount(s) or the
         // SubAccount SubAccount(s) when Fringes change.
         Fringes: {
-          UpdateInState: ActionType.Template.Fringes.UpdateInState
+          TableChanged: ActionType.Template.Fringes.TableChanged
         },
         Groups: {
           Response: ActionType.Template.SubAccount.SubAccounts.Groups.Response,
@@ -128,7 +126,6 @@ const genericReducer = combineReducers({
       Request: ActionType.Template.Accounts.Request,
       Loading: ActionType.Template.Accounts.Loading,
       SetSearch: ActionType.Template.Accounts.SetSearch,
-      RemoveFromState: ActionType.Template.Accounts.RemoveFromState,
       AddToState: ActionType.Template.Accounts.AddToState,
       Deleting: ActionType.Template.Accounts.Deleting,
       Creating: ActionType.Template.Accounts.Creating,
@@ -171,11 +168,10 @@ const rootReducer: Reducer<Modules.Budgeting.Template.Store, Redux.Action<any>> 
 
   newState = genericReducer(newState, action);
 
+  // When the underlying account or subaccounts are removed, updated or added,
+  // we need to also update the parent account or subaccount.
   if (!isNil(action.payload)) {
-    if (
-      action.type === ActionType.Template.SubAccount.SubAccounts.RemoveFromState ||
-      action.type === ActionType.Template.SubAccount.SubAccounts.AddToState
-    ) {
+    if (action.type === ActionType.Template.SubAccount.TableChanged) {
       // Update the overall SubAccount based on the underlying SubAccount(s) present.
       const subAccounts: Model.TemplateSubAccount[] = newState.subaccount.subaccounts.data;
       let payload: Partial<Model.TemplateSubAccount> = {
@@ -195,10 +191,7 @@ const rootReducer: Reducer<Modules.Budgeting.Template.Store, Redux.Action<any>> 
           };
         }
       }
-    } else if (
-      action.type === ActionType.Template.Account.SubAccounts.RemoveFromState ||
-      action.type === ActionType.Template.Account.SubAccounts.AddToState
-    ) {
+    } else if (action.type === ActionType.Template.Account.TableChanged) {
       // Update the overall Account based on the underlying SubAccount(s) present.
       const subAccounts: Model.TemplateSubAccount[] = newState.account.subaccounts.data;
       const estimated = reduce(subAccounts, (sum: number, s: Model.TemplateSubAccount) => sum + (s.estimated || 0), 0);

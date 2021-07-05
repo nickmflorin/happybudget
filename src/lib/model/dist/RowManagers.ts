@@ -61,7 +61,7 @@ export const BudgetSubAccountRowManager = new RowManager<
         return null;
       }
     }),
-    ReadWrite({ field: "identifier" }),
+    ReadWrite({ field: "identifier", allowNull: true }),
     ReadOnly({ field: "estimated" }),
     ReadOnly({ field: "variance" }),
     ReadOnly({ field: "actual" }),
