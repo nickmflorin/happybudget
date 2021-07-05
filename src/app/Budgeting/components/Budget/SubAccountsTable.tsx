@@ -49,25 +49,37 @@ const BudgetSubAccountsTable = ({ loadingParent, detail, ...props }: BudgetSubAc
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            budgetTotal: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
-            tableTotal: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
-            type: "sum"
+            type: "sum",
+            budget: {
+              value: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0
+            },
+            footer: {
+              value: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0
+            }
           },
           {
             field: "actual",
             headerName: "Actual",
             isCalculated: true,
-            budgetTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
-            tableTotal: !isNil(detail) && !isNil(detail.actual) ? detail.actual : 0.0,
-            type: "sum"
+            type: "sum",
+            budget: {
+              value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
+            },
+            footer: {
+              value: !isNil(detail) && !isNil(detail.actual) ? detail.actual : 0.0
+            }
           },
           {
             field: "variance",
             headerName: "Variance",
             isCalculated: true,
-            budgetTotal: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
-            tableTotal: !isNil(detail) && !isNil(detail.variance) ? detail.variance : 0.0,
-            type: "sum"
+            type: "sum",
+            budget: {
+              value: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0
+            },
+            footer: {
+              value: !isNil(detail) && !isNil(detail.variance) ? detail.variance : 0.0
+            }
           }
         ]}
         {...props}

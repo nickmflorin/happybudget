@@ -66,16 +66,20 @@ namespace Table {
     readonly visible: boolean;
   }
 
+  interface FooterColumn<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field" | "headerName"> {
+    readonly value?: any;
+  }
+
   interface Column<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
     readonly type: ColumnTypeId;
     readonly nullValue?: null | "" | 0 | [];
     readonly field: keyof R & string;
     readonly isCalculated?: boolean;
-    readonly budgetTotal?: number;
-    readonly tableTotal?: number;
     readonly excludeFromExport?: boolean;
     readonly processCellForClipboard?: (row: R) => string;
     readonly processCellFromClipboard?: (value: string) => any;
+    readonly budget?: FooterColumn<R>;
+    readonly footer?: FooterColumn<R>;
   }
 
   type CellChange<R extends Table.Row, V = R[keyof R]> = {
@@ -369,12 +373,10 @@ namespace BudgetTable {
   }
 
   interface BudgetFooterGridProps<R extends Table.Row> extends SpecificGridProps {
-    readonly identifierValue?: string | null;
     readonly loadingBudget?: boolean | undefined;
   }
 
   interface TableFooterGridProps<R extends Table.Row> extends SpecificGridProps {
-    readonly identifierValue?: string | null;
     readonly loadingParent?: boolean;
   }
 
@@ -430,8 +432,6 @@ namespace BudgetTable {
     readonly tableRef: import("react").RefObject<BudgetTable.Ref>;
     readonly indexColumn?: Partial<Table.Column<R>>;
     readonly expandColumn?: Partial<Table.Column<R>>;
-    readonly tableFooterIdentifierValue?: string | null;
-    readonly budgetFooterIdentifierValue?: string | null;
     readonly loadingBudget?: boolean;
     readonly loadingParent?: boolean;
     readonly exportable?: boolean;

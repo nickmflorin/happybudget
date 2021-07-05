@@ -28,6 +28,8 @@ export interface GenericSubAccountsTableProps<R extends Table.Row, M extends Mod
     colId: keyof R;
     onAddFringes: () => void;
   };
+  tableFooterIdentifierValue: string;
+  budgetFooterIdentifierValue?: string;
   subAccountUnits: Model.Tag[];
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
@@ -51,6 +53,8 @@ const GenericSubAccountsTable = <
   fringesCellEditorParams,
   subAccountUnits,
   exportFileName,
+  budgetFooterIdentifierValue = "Budget Total",
+  tableFooterIdentifierValue,
   onGroupRows,
   onDeleteGroup,
   onEditGroup,
@@ -168,7 +172,9 @@ const GenericSubAccountsTable = <
           type: "number",
           headerName: identifierFieldHeader,
           width: 90,
-          cellRendererParams: { className: "subaccount-identifier" }
+          cellRendererParams: { className: "subaccount-identifier" },
+          footer: { value: tableFooterIdentifierValue, colSpan: (params: ColSpanParams) => 2 },
+          budget: { value: budgetFooterIdentifierValue, colSpan: (params: ColSpanParams) => 2 }
         },
         {
           field: "description",

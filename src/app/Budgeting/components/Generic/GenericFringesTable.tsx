@@ -42,7 +42,6 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
       tableRef={tableRef}
       detached={true}
       manager={models.FringeRowManager}
-      tableFooterIdentifierValue={null}
       indexColumn={{ width: 40, maxWidth: 50 }}
       cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
       actions={(params: BudgetTable.MenuActionParams<BudgetTable.FringeRow>) => [

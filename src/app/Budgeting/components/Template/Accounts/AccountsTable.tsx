@@ -72,8 +72,10 @@ const AccountsTable = (): JSX.Element => {
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            tableTotal: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0,
-            type: "sum"
+            type: "sum",
+            footer: {
+              value: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
+            }
           }
         ]}
       />

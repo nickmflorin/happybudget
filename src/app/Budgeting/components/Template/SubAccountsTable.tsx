@@ -46,9 +46,13 @@ const TemplateSubAccountsTable = ({ detail, ...props }: TemplateSubAccountsTable
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            tableTotal: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0,
-            budgetTotal: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0,
-            type: "sum"
+            type: "sum",
+            budget: {
+              value: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
+            },
+            footer: {
+              value: !isNil(detail) && !isNil(detail.estimated) ? detail.estimated : 0.0
+            }
           }
         ]}
         {...props}

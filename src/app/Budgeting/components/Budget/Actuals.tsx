@@ -69,7 +69,6 @@ const Actuals = (): JSX.Element => {
           data={data}
           tableRef={tableRef}
           manager={models.ActualRowManager}
-          tableFooterIdentifierValue={"Actuals Total"}
           indexColumn={{ width: 40, maxWidth: 50 }}
           search={search}
           onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
@@ -190,6 +189,9 @@ const Actuals = (): JSX.Element => {
                   return true;
                 }
                 return false;
+              },
+              footer: {
+                value: "Actuals Total"
               }
             },
             {
@@ -267,7 +269,7 @@ const Actuals = (): JSX.Element => {
               valueSetter: floatValueSetter<BudgetTable.ActualRow>("value"),
               cellRenderer: "BodyCell",
               type: "currency",
-              tableTotal: actualsTableTotal
+              footer: { value: actualsTableTotal }
             }
           ]}
         />

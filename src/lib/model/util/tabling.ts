@@ -25,11 +25,11 @@ export const toAgGridColDef = <R extends Table.Row = Table.Row>(colDef: Table.Co
   const {
     nullValue,
     isCalculated,
-    budgetTotal,
-    tableTotal,
     processCellForClipboard,
     processCellFromClipboard,
     type,
+    budget,
+    footer,
     ...original
   } = colDef;
 

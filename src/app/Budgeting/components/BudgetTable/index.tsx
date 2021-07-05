@@ -143,8 +143,6 @@ const BudgetTable = <
   cookies,
   expandColumn = {},
   indexColumn = {},
-  tableFooterIdentifierValue = "Grand Total",
-  budgetFooterIdentifierValue = "Budget Total",
   rowCanExpand,
   cellClass,
   onRowAdd,
@@ -210,7 +208,7 @@ const BudgetTable = <
   });
 
   const showBudgetFooterGrid = useMemo(() => {
-    return filter(columns, (col: Table.Column<R>) => col.isCalculated === true && !isNil(col.budgetTotal)).length !== 0;
+    return filter(columns, (col: Table.Column<R>) => col.isCalculated === true && !isNil(col.budget)).length !== 0;
   }, []);
 
   const onSort = useDynamicCallback<void>((order: Order, field: keyof R) => {
@@ -456,7 +454,6 @@ const BudgetTable = <
           onFirstDataRendered={onFirstDataRendered}
           options={gridOptions.tableFooter}
           columns={cols}
-          identifierValue={tableFooterIdentifierValue}
           loadingParent={loadingParent}
         />
         <ShowHide show={showBudgetFooterGrid}>
@@ -466,7 +463,6 @@ const BudgetTable = <
             onFirstDataRendered={onFirstDataRendered}
             options={gridOptions.budgetFooter}
             columns={cols}
-            identifierValue={budgetFooterIdentifierValue}
             loadingBudget={loadingBudget}
           />
         </ShowHide>

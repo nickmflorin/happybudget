@@ -3,6 +3,8 @@ import { isNil, map, filter } from "lodash";
 
 import { faSigma, faPercentage, faTrashAlt, faLineColumns, faFileCsv } from "@fortawesome/pro-solid-svg-icons";
 
+import { ColSpanParams } from "@ag-grid-community/core";
+
 import { FieldsDropdown } from "components/dropdowns";
 import { downloadAsCsvFile } from "lib/util/files";
 import BudgetTableComponent from "../BudgetTable";
@@ -12,10 +14,7 @@ export interface GenericAccountsTableProps<
   M extends Model.Account,
   G extends Model.Group,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
-> extends Omit<
-    BudgetTable.Props<R, M, G, P>,
-    "groupParams" | "tableFooterIdentifierValue" | "rowCanExpand" | "tableRef"
-  > {
+> extends Omit<BudgetTable.Props<R, M, G, P>, "groupParams" | "rowCanExpand" | "tableRef"> {
   exportFileName: string;
   onGroupRows: (rows: R[]) => void;
   onDeleteGroup: (group: G) => void;
@@ -46,7 +45,6 @@ const GenericAccountsTable = <
   return (
     <BudgetTableComponent<R, M, G, P>
       tableRef={tableRef}
-      tableFooterIdentifierValue={!isNil(detail) ? `${detail.name} Total` : "Total"}
       groupParams={{
         onDeleteGroup,
         onRowRemoveFromGroup,
@@ -143,7 +141,8 @@ const GenericAccountsTable = <
           field: "identifier",
           type: "number",
           headerName: "Account",
-          width: 90
+          width: 90,
+          footer: { value: !isNil(detail) ? `${detail.name} Total` : "Total", colSpan: (params: ColSpanParams) => 2 }
         },
         {
           field: "description",

@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { map, isNil, filter, reduce, includes, forEach, find } from "lodash";
 
-import { Column } from "@ag-grid-community/core";
+import { Column, ColSpanParams } from "@ag-grid-community/core";
 
 import { useDeepEqualMemo } from "lib/hooks";
 
@@ -9,7 +9,6 @@ import Grid from "./Grid";
 
 const BudgetFooterGrid = <R extends Table.Row>({
   apis,
-  identifierValue,
   options,
   columns,
   loadingBudget,
@@ -19,26 +18,35 @@ const BudgetFooterGrid = <R extends Table.Row>({
   const dataWasRendered = useRef(false);
   const [data, setData] = useState<R[]>([]);
 
+  const transformColumn = (column: Table.Column<R>): Table.Column<R> => {
+    return {
+      ...column,
+      colSpan: (params: ColSpanParams) => {
+        if (!isNil(column.budget) && !isNil(column.budget.colSpan)) {
+          return column.budget.colSpan(params);
+        }
+        return !isNil(column.colSpan) ? column.colSpan(params) : 1;
+      }
+    };
+  };
+
   useEffect(() => {
     const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
     if (columns.length > baseColumns.length) {
       const calculatedColumns = filter(columns, (col: Table.Column<R>) => col.isCalculated === true);
       setData([
         reduce(
-          [...columns.slice(0, baseColumns.length), ...columns.slice(baseColumns.length + 1)],
+          columns,
           (obj: { [key: string]: any }, col: Table.Column<R>) => {
-            if (!isNil(col.field)) {
-              if (!isNil(col.budgetTotal)) {
-                obj[col.field] = col.budgetTotal;
-              } else {
-                obj[col.field] = null;
-              }
+            if (!isNil(col.budget) && !isNil(col.budget.value)) {
+              obj[col.field] = col.budget.value;
+            } else {
+              obj[col.field] = null;
             }
             return obj;
           },
           {
             id: "budget_footer_row",
-            [columns[baseColumns.length].field]: identifierValue,
             meta: {
               isGroupFooter: false,
               isTableFooter: false,
@@ -56,7 +64,7 @@ const BudgetFooterGrid = <R extends Table.Row>({
       ]);
       dataWasRendered.current = true;
     }
-  }, [useDeepEqualMemo(columns), loadingBudget, identifierValue]);
+  }, [useDeepEqualMemo(columns), loadingBudget]);
 
   useEffect(() => {
     if (!isNil(apis) && data.length !== 0) {
@@ -96,7 +104,7 @@ const BudgetFooterGrid = <R extends Table.Row>({
     <div className={"budget-footer-grid"}>
       <Grid
         {...options}
-        columns={columns}
+        columns={map(columns, (col: Table.Column<R>) => transformColumn(col))}
         rowData={data}
         rowClass={"row--budget-footer"}
         onGridReady={onGridReady}

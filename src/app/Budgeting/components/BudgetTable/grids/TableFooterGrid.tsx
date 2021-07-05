@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { isNil, reduce, filter, map, findIndex, includes, forEach, find } from "lodash";
+import { isNil, reduce, filter, map, includes, forEach, find } from "lodash";
 
 import { ColSpanParams, Column } from "@ag-grid-community/core";
 
@@ -11,64 +11,23 @@ const TableFooterGrid = <R extends Table.Row>({
   onGridReady,
   onFirstDataRendered,
   loadingParent,
-  identifierValue,
   options,
   columns
 }: BudgetTable.TableFooterGridProps<R>): JSX.Element => {
-  const columnsWereRendered = useRef(false);
   const dataWasRendered = useRef(false);
-  const [cols, setCols] = useState<Table.Column<R>[]>([]);
   const [data, setData] = useState<R[]>([]);
 
-  useEffect(() => {
-    if (columnsWereRendered.current === false) {
-      const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
-      if (columns.length > baseColumns.length) {
-        const TableFooterGridColumn = (col: Table.Column<R>): Table.Column<R> => {
-          return {
-            ...col,
-            cellRendererParams: {
-              ...col.cellRendererParams
-            },
-            colSpan: (params: ColSpanParams) => {
-              const field = params.column.getColId();
-              if (isNil(field) || includes(["index", "expand"], field)) {
-                return !isNil(col.colSpan) ? col.colSpan(params) : 1;
-              }
-
-              let startingIndex = 0;
-              if (columns.length > baseColumns.length) {
-                const identifierCol = columns[baseColumns.length];
-                if (field !== identifierCol.field) {
-                  startingIndex = findIndex(columns, { field } as any);
-                  if (startingIndex === -1) {
-                    /* eslint-disable no-console */
-                    console.error(`Suspicious behavior:  Could not find column for field ${field}.`);
-                    return 1;
-                  }
-                } else {
-                  return 1;
-                }
-              } else {
-                return 1;
-              }
-              // Columns to the right of the index and expand columns.
-              const rightIndex = findIndex(
-                columns.slice(baseColumns.length),
-                (c: Table.Column<R>) => !isNil(c.tableTotal)
-              );
-              if (rightIndex !== -1) {
-                return rightIndex - startingIndex;
-              }
-              return columns.length - startingIndex;
-            }
-          };
-        };
-        setCols(map(columns, (col: Table.Column<R>) => TableFooterGridColumn(col)));
-        columnsWereRendered.current = true;
+  const transformColumn = (column: Table.Column<R>): Table.Column<R> => {
+    return {
+      ...column,
+      colSpan: (params: ColSpanParams) => {
+        if (!isNil(column.footer) && !isNil(column.footer.colSpan)) {
+          return column.footer.colSpan(params);
+        }
+        return !isNil(column.colSpan) ? column.colSpan(params) : 1;
       }
-    }
-  }, [useDeepEqualMemo(columns)]);
+    };
+  };
 
   useEffect(() => {
     const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
@@ -76,20 +35,17 @@ const TableFooterGrid = <R extends Table.Row>({
       const calculatedColumns = filter(columns, (col: Table.Column<R>) => col.isCalculated === true);
       setData([
         reduce(
-          [...columns.slice(0, baseColumns.length), ...columns.slice(baseColumns.length + 1)],
+          columns,
           (obj: { [key: string]: any }, col: Table.Column<R>) => {
-            if (!isNil(col.field)) {
-              if (!isNil(col.tableTotal)) {
-                obj[col.field] = col.tableTotal;
-              } else {
-                obj[col.field] = null;
-              }
+            if (!isNil(col.footer) && !isNil(col.footer.value)) {
+              obj[col.field] = col.footer.value;
+            } else {
+              obj[col.field] = null;
             }
             return obj;
           },
           {
             id: "table_footer_row",
-            [columns[baseColumns.length].field]: identifierValue,
             meta: {
               isGroupFooter: false,
               isTableFooter: true,
@@ -107,7 +63,7 @@ const TableFooterGrid = <R extends Table.Row>({
       ]);
       dataWasRendered.current = true;
     }
-  }, [useDeepEqualMemo(columns), loadingParent, identifierValue]);
+  }, [useDeepEqualMemo(columns), loadingParent]);
 
   useEffect(() => {
     if (!isNil(apis) && data.length !== 0) {
@@ -147,7 +103,7 @@ const TableFooterGrid = <R extends Table.Row>({
     <div className={"table-footer-grid"}>
       <Grid<R>
         {...options}
-        columns={cols}
+        columns={map(columns, (col: Table.Column<R>) => transformColumn(col))}
         rowData={data}
         rowHeight={38}
         rowClass={"row--table-footer"}

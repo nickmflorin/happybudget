@@ -79,22 +79,28 @@ const AccountsTable = (): JSX.Element => {
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0,
-            type: "sum"
+            type: "sum",
+            footer: {
+              value: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0
+            }
           },
           {
             field: "actual",
             headerName: "Actual",
             isCalculated: true,
-            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0,
-            type: "sum"
+            type: "sum",
+            footer: {
+              value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
+            }
           },
           {
             field: "variance",
             headerName: "Variance",
             isCalculated: true,
-            tableTotal: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0,
-            type: "sum"
+            type: "sum",
+            footer: {
+              value: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0
+            }
           }
         ]}
         actions={[
