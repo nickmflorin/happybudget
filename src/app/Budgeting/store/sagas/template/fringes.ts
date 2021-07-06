@@ -1,12 +1,12 @@
 import { SagaIterator } from "redux-saga";
 import { spawn, actionChannel, take, cancel, call } from "redux-saga/effects";
-import { isNil, find } from "lodash";
+import { isNil } from "lodash";
 
 import * as api from "api";
 import * as typeguards from "lib/model/typeguards";
-import { warnInconsistentState } from "lib/redux/util";
 
 import { ActionType } from "../../actions";
+import { requestTemplateAction } from "../../actions/template";
 import * as actions from "../../actions/template/fringes";
 import { createFringeTaskSet } from "../factories";
 
@@ -17,7 +17,8 @@ const tasks = createFringeTaskSet<Model.Template>(
     deleting: actions.deletingFringeAction,
     creating: actions.creatingFringeAction,
     updating: actions.updatingFringeAction,
-    addToState: actions.addFringeToStateAction
+    addToState: actions.addFringeToStateAction,
+    requestBudget: requestTemplateAction
   },
   {
     request: api.getTemplateFringes,
@@ -27,20 +28,7 @@ const tasks = createFringeTaskSet<Model.Template>(
     bulkDelete: api.bulkDeleteTemplateFringes
   },
   (state: Modules.ApplicationStore) => state.budgeting.template.template.id,
-  (state: Modules.ApplicationStore) => state.budgeting.template.fringes.data,
-  (id: number, action: Redux.Action<any>) => (state: Modules.ApplicationStore) => {
-    const model: Model.Fringe | undefined = find(state.budgeting.template.fringes.data, { id });
-    if (isNil(model)) {
-      warnInconsistentState({
-        action: action.type,
-        reason: "Fringe does not exist in state when it is expected to.",
-        id
-      });
-      return null;
-    } else {
-      return model;
-    }
-  }
+  (state: Modules.ApplicationStore) => state.budgeting.template.fringes.data
 );
 
 function* tableChangeEventSaga(): SagaIterator {

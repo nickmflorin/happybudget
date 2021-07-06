@@ -16,6 +16,7 @@ export interface FringeTasksActionMap {
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
   addToState: Redux.ActionCreator<Model.Fringe>;
+  requestBudget: Redux.ActionCreator<null>;
 }
 
 export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
@@ -49,8 +50,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   actions: FringeTasksActionMap,
   services: FringeServiceSet<M>,
   selectObjId: (state: Modules.ApplicationStore) => number | null,
-  selectFringes: (state: Modules.ApplicationStore) => Model.Fringe[],
-  selectFringe: (id: number, action: Redux.Action<any>) => (state: Modules.ApplicationStore) => Model.Fringe | null
+  selectFringes: (state: Modules.ApplicationStore) => Model.Fringe[]
 ): FringeTaskSet => {
   function* bulkCreateTask(objId: number, payload: Table.RowAddPayload<BudgetTable.FringeRow>): SagaIterator {
     const CancelToken = axios.CancelToken;
@@ -100,12 +100,14 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
         )
       );
       if (ids.length !== 0) {
+        let success = true;
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
         const CancelToken = axios.CancelToken;
         const source = CancelToken.source();
         try {
           yield call(services.bulkDelete, objId, ids, { cancelToken: source.token });
         } catch (e) {
+          success = false;
           if (!(yield cancelled())) {
             api.handleRequestError(e, "There was an error deleting the fringes.");
           }
@@ -114,6 +116,9 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
           if (yield cancelled()) {
             source.cancel();
           }
+        }
+        if (success === true) {
+          yield put(actions.requestBudget(null));
         }
       }
     }
@@ -141,9 +146,11 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
             put(actions.updating({ id: change.id, value: true }))
           )
         );
+        let success = true;
         try {
           yield call(services.bulkUpdate, objId, requestPayload, { cancelToken: source.token });
         } catch (e) {
+          success = false;
           if (!(yield cancelled())) {
             api.handleRequestError(e, "There was an error updating the fringes.");
           }
@@ -156,6 +163,9 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
           if (yield cancelled()) {
             source.cancel();
           }
+        }
+        if (success === true) {
+          yield put(actions.requestBudget(null));
         }
       }
     }

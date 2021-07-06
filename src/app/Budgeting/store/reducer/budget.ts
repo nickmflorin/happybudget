@@ -324,57 +324,60 @@ const rootReducer: Reducer<Modules.Budgeting.Budget.Store, Redux.Action<any>> = 
   newState = genericReducer(newState, action);
 
   // When the underlying account or subaccounts are removed, updated or added,
-  // we need to also update the parent account or subaccount.
-  if (!isNil(action.payload)) {
-    if (
-      action.type === ActionType.Budget.SubAccount.TableChanged ||
-      action.type === ActionType.Budget.Fringes.TableChanged
-    ) {
-      // Update the overall SubAccount based on the underlying SubAccount(s) present.
-      const subAccounts: Model.BudgetSubAccount[] = newState.subaccount.subaccounts.data;
-      let payload: Partial<Model.BudgetSubAccount> = {
-        estimated: reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0)
-      };
-      if (!isNil(newState.subaccount.detail.data)) {
-        if (!isNil(newState.subaccount.detail.data.actual) && !isNil(payload.estimated)) {
-          payload = { ...payload, variance: payload.estimated - newState.subaccount.detail.data.actual };
-        }
-        if (!isNil(newState.subaccount.detail.data)) {
-          newState = {
-            ...newState,
-            subaccount: {
-              ...newState.subaccount,
-              detail: {
-                ...newState.subaccount.detail,
-                data: { ...newState.subaccount.detail.data, ...payload }
-              }
-            }
-          };
-        }
+  // we need to also update the parent account or subaccount.  We also need to
+  // do this when Fringes change.
+  // TODO: Move the Fringes down to the individual SubAccount or Account levels.
+  // Currently, this has to update both the Account SubAccount(s) and the SubAccount
+  // SubAccounts(s) because it cannot differentiate between which view we are in.
+  if (
+    action.type === ActionType.Budget.SubAccount.TableChanged ||
+    action.type === ActionType.Budget.Fringes.TableChanged
+  ) {
+    // Update the overall SubAccount based on the underlying SubAccount(s) present.
+    const subAccounts: Model.BudgetSubAccount[] = newState.subaccount.subaccounts.data;
+    let payload: Partial<Model.BudgetSubAccount> = {
+      estimated: reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0)
+    };
+    if (!isNil(newState.subaccount.detail.data)) {
+      if (!isNil(newState.subaccount.detail.data.actual) && !isNil(payload.estimated)) {
+        payload = { ...payload, variance: payload.estimated - newState.subaccount.detail.data.actual };
       }
-    } else if (
-      action.type === ActionType.Budget.Account.TableChanged ||
-      action.type === ActionType.Budget.Fringes.TableChanged
-    ) {
-      // Update the overall Account based on the underlying SubAccount(s) present.
-      const subAccounts: Model.BudgetSubAccount[] = newState.account.subaccounts.data;
-      // Right now, the backend is configured such that the Actual value for the overall Account is
-      // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
-      // in the backend, we need to also make that adjustment here.
-      const actual = reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.actual || 0), 0);
-      const estimated = reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0);
-      if (!isNil(newState.account.detail.data)) {
+      if (!isNil(newState.subaccount.detail.data)) {
         newState = {
           ...newState,
-          account: {
-            ...newState.account,
+          subaccount: {
+            ...newState.subaccount,
             detail: {
-              ...newState.account.detail,
-              data: { ...newState.account.detail.data, actual, estimated, variance: estimated - actual }
+              ...newState.subaccount.detail,
+              data: { ...newState.subaccount.detail.data, ...payload }
             }
           }
         };
       }
+    }
+  }
+  if (
+    action.type === ActionType.Budget.Account.TableChanged ||
+    action.type === ActionType.Budget.Fringes.TableChanged
+  ) {
+    // Update the overall Account based on the underlying SubAccount(s) present.
+    const subAccounts: Model.BudgetSubAccount[] = newState.account.subaccounts.data;
+    // Right now, the backend is configured such that the Actual value for the overall Account is
+    // determined from the Actual values of the underlying SubAccount(s).  If that logic changes
+    // in the backend, we need to also make that adjustment here.
+    const actual = reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.actual || 0), 0);
+    const estimated = reduce(subAccounts, (sum: number, s: Model.BudgetSubAccount) => sum + (s.estimated || 0), 0);
+    if (!isNil(newState.account.detail.data)) {
+      newState = {
+        ...newState,
+        account: {
+          ...newState.account,
+          detail: {
+            ...newState.account.detail,
+            data: { ...newState.account.detail.data, actual, estimated, variance: estimated - actual }
+          }
+        }
+      };
     }
   }
   return newState;
