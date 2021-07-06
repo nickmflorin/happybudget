@@ -220,7 +220,6 @@ namespace Model {
     readonly rate: number | null;
     readonly multiplier: number | null;
     readonly unit: Model.Tag | null;
-    readonly account: number;
     readonly object_id: number;
     readonly type: "subaccount";
     readonly parent_type: "account" | "subaccount";
@@ -228,12 +227,13 @@ namespace Model {
     readonly group: number | null;
     readonly fringes: number[];
     readonly subaccounts: number[];
-    readonly siblings: Model.SimpleSubAccount[];
-    readonly ancestors: Model.Entity[];
     readonly created_by: number | null;
     readonly updated_by: number | null;
     readonly created_at: string;
     readonly updated_at: string;
+    // Only included for detail endpoints.
+    readonly siblings?: Model.SimpleSubAccount[];
+    readonly ancestors?: Model.Entity[];
   }
 
   interface BudgetSubAccount extends Model.SubAccount {

@@ -17,7 +17,6 @@ export class SubAccount extends SimpleSubAccount implements Model.SubAccount {
   public readonly rate: number | null = null;
   public readonly multiplier: number | null = null;
   public readonly unit: Model.Tag | null = null;
-  public readonly account: number;
   public readonly object_id: number;
   public readonly parent_type: "account" | "subaccount";
   public readonly estimated: number = 0.0;
@@ -34,7 +33,6 @@ export class SubAccount extends SimpleSubAccount implements Model.SubAccount {
   constructor(data: Model.SubAccount) {
     super(data);
     this.parent_type = data.parent_type;
-    this.account = data.account;
     this.object_id = data.object_id;
     this.update(data);
   }

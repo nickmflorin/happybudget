@@ -84,7 +84,11 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onBack={(row?: BudgetTable.FringeRow) => {
-          if (!isNil(subaccountDetail)) {
+          if (
+            !isNil(subaccountDetail) &&
+            !isNil(subaccountDetail.ancestors) &&
+            subaccountDetail.ancestors.length !== 0
+          ) {
             const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];
             if (ancestor.type === "subaccount") {
               history.push(`/budgets/${budgetId}/subaccounts/${ancestor.id}?row=${subaccountId}`);

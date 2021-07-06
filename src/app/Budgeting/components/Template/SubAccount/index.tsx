@@ -79,8 +79,10 @@ const SubAccount = (): JSX.Element => {
             {
               requiredParams: ["template", "subaccount"],
               func: ({ template, subaccount }: { template: Model.Template; subaccount: Model.TemplateSubAccount }) => {
+                const siblings = subaccount.siblings || [];
+                const ancestors = subaccount.ancestors || [];
                 return [
-                  ...map(subaccount.ancestors.slice(1), (ancestor: Model.Entity) => {
+                  ...map(ancestors.slice(1), (ancestor: Model.Entity) => {
                     return {
                       id: ancestor.id,
                       render: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,
@@ -91,7 +93,7 @@ const SubAccount = (): JSX.Element => {
                     id: subaccount.id,
                     url: getUrl(template, subaccount),
                     render: (params: IBreadCrumbItemRenderParams) => {
-                      if (subaccount.siblings.length !== 0) {
+                      if (siblings.length !== 0) {
                         return (
                           <EntityTextButton onClick={() => params.toggleDropdownVisible()} fillEmpty={"---------"}>
                             {subaccount}
@@ -100,7 +102,7 @@ const SubAccount = (): JSX.Element => {
                       }
                       return <EntityText fillEmpty={"---------"}>{subaccount}</EntityText>;
                     },
-                    options: map(subaccount.siblings, (option: Model.SimpleSubAccount) => ({
+                    options: map(siblings, (option: Model.SimpleSubAccount) => ({
                       id: option.id,
                       url: getUrl(template, option),
                       render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
