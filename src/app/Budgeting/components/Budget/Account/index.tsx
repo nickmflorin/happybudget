@@ -80,26 +80,29 @@ const Account = (): JSX.Element => {
             },
             {
               requiredParams: ["budget", "account"],
-              func: ({ budget, account }: { budget: Model.Budget; account: Model.BudgetAccount }) => ({
-                id: account.id,
-                primary: true,
-                url: getUrl(budget, account),
-                render: (params: IBreadCrumbItemRenderParams) => {
-                  if (account.siblings.length !== 0) {
-                    return (
-                      <EntityTextButton onClick={() => params.toggleDropdownVisible()} fillEmpty={"---------"}>
-                        {account}
-                      </EntityTextButton>
-                    );
-                  }
-                  return <EntityText fillEmpty={"---------"}>{account}</EntityText>;
-                },
-                options: map(account.siblings, (option: Model.SimpleAccount) => ({
-                  id: option.id,
-                  url: getUrl(budget, option),
-                  render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
-                }))
-              })
+              func: ({ budget, account }: { budget: Model.Budget; account: Model.BudgetAccount }) => {
+                const siblings = account.siblings || [];
+                return {
+                  id: account.id,
+                  primary: true,
+                  url: getUrl(budget, account),
+                  render: (params: IBreadCrumbItemRenderParams) => {
+                    if (siblings.length !== 0) {
+                      return (
+                        <EntityTextButton onClick={() => params.toggleDropdownVisible()} fillEmpty={"---------"}>
+                          {account}
+                        </EntityTextButton>
+                      );
+                    }
+                    return <EntityText fillEmpty={"---------"}>{account}</EntityText>;
+                  },
+                  options: map(siblings, (option: Model.SimpleAccount) => ({
+                    id: option.id,
+                    url: getUrl(budget, option),
+                    render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
+                  }))
+                };
+              }
             }
           ]}
         />

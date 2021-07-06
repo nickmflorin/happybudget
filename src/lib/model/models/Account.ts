@@ -18,7 +18,6 @@ export class Account extends SimpleAccount implements Model.Account {
   public readonly subaccounts: number[] = [];
   public readonly group: number | null = null;
   public readonly siblings: Model.SimpleAccount[] = [];
-  public readonly budget: number;
   public readonly created_at: string = "";
   public readonly updated_at: string = "";
   public readonly created_by: number | null = null;
@@ -26,7 +25,6 @@ export class Account extends SimpleAccount implements Model.Account {
 
   constructor(data: Model.Account) {
     super(data);
-    this.budget = data.budget;
     this.update(data);
   }
 }

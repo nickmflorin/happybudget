@@ -189,16 +189,16 @@ namespace Model {
 
   interface Account extends Model.SimpleAccount {
     readonly access: number[];
-    readonly ancestors: Model.Entity[];
     readonly estimated: number;
     readonly subaccounts: number[];
     readonly group: number | null;
-    readonly siblings: Model.SimpleAccount[];
-    readonly budget: number;
     readonly created_by: number | null;
     readonly updated_by: number | null;
     readonly created_at: string;
     readonly updated_at: string;
+    // Only included for detail endpoints.
+    readonly siblings?: Model.SimpleAccount[];
+    readonly ancestors?: Model.Entity[];
   }
 
   interface BudgetAccount extends Model.Account {

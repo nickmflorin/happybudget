@@ -79,26 +79,29 @@ const Account = (): JSX.Element => {
             },
             {
               requiredParams: ["template", "account"],
-              func: ({ template, account }: { template: Model.Template; account: Model.TemplateAccount }) => ({
-                id: account.id,
-                primary: true,
-                url: getUrl(template, account),
-                render: (params: IBreadCrumbItemRenderParams) => {
-                  if (account.siblings.length !== 0) {
-                    return (
-                      <EntityTextButton onClick={() => params.toggleDropdownVisible()} fillEmpty={"---------"}>
-                        {account}
-                      </EntityTextButton>
-                    );
-                  }
-                  return <EntityText fillEmpty={"---------"}>{account}</EntityText>;
-                },
-                options: map(account.siblings, (option: Model.SimpleAccount) => ({
-                  id: option.id,
-                  url: getUrl(template, option),
-                  render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
-                }))
-              })
+              func: ({ template, account }: { template: Model.Template; account: Model.TemplateAccount }) => {
+                const siblings = account.siblings || [];
+                return {
+                  id: account.id,
+                  primary: true,
+                  url: getUrl(template, account),
+                  render: (params: IBreadCrumbItemRenderParams) => {
+                    if (siblings.length !== 0) {
+                      return (
+                        <EntityTextButton onClick={() => params.toggleDropdownVisible()} fillEmpty={"---------"}>
+                          {account}
+                        </EntityTextButton>
+                      );
+                    }
+                    return <EntityText fillEmpty={"---------"}>{account}</EntityText>;
+                  },
+                  options: map(siblings, (option: Model.SimpleAccount) => ({
+                    id: option.id,
+                    url: getUrl(template, option),
+                    render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
+                  }))
+                };
+              }
             }
           ]}
         />
