@@ -10,6 +10,14 @@
   margin-bottom: 50px;
   max-width: 300px;
 
+  /* 11in 2020 iPad Pro - Landscape */
+  /* Declare the same value for min- and max-width to avoid colliding with desktops */
+  /* Source: https://medium.com/connect-the-dots/css-media-queries-for-ipad-pro-8cad10e17106*/
+  @media only screen and (min-device-width: 1194px) and (max-device-width: 1194px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
+    flex: 1 1;
+    max-width: none;
+  }
+
   &:not(:last-child) {
     margin-right: 50px;
   }
