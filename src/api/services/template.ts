@@ -52,31 +52,8 @@ export const createCommunityTemplate = async (
   return client.post<Model.Template>(url, payload, options);
 };
 
-export const getTemplatesInTrash = async (
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SimpleTemplate>> => {
-  const url = URL.v1("templates", "trash");
-  return client.list<Model.Template>(url, query, options);
-};
-
-export const getTemplateInTrash = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Template> => {
-  const url = URL.v1("templates", "trash", id);
-  return client.retrieve<Model.Template>(url, options);
-};
-
 export const deleteTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("templates", id);
-  return client.delete<null>(url, options);
-};
-
-export const restoreTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Template> => {
-  const url = URL.v1("templates", "trash", id, "restore");
-  return client.patch<Model.Template>(url, options);
-};
-
-export const permanentlyDeleteTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
-  const url = URL.v1("templates", "trash", id);
   return client.delete<null>(url, options);
 };
 

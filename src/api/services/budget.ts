@@ -36,31 +36,8 @@ export const createBudget = async (
   return client.post<Model.Budget>(url, payload, options);
 };
 
-export const getBudgetsInTrash = async (
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.SimpleBudget>> => {
-  const url = URL.v1("budgets", "trash");
-  return client.list<Model.Budget>(url, query, options);
-};
-
-export const getBudgetInTrash = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Budget> => {
-  const url = URL.v1("budgets", "trash", id);
-  return client.retrieve<Model.Budget>(url, options);
-};
-
 export const deleteBudget = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("budgets", id);
-  return client.delete<null>(url, options);
-};
-
-export const restoreBudget = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Budget> => {
-  const url = URL.v1("budgets", "trash", id, "restore");
-  return client.patch<Model.Budget>(url, options);
-};
-
-export const permanentlyDeleteBudget = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
-  const url = URL.v1("budgets", "trash", id);
   return client.delete<null>(url, options);
 };
 
