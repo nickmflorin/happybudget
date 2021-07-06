@@ -1,9 +1,13 @@
 @import "style/colors";
 @import "style/typography";
+@import "style/breakpoints";
 
 .form-container {
   padding: 80px;
-  width: 100%;
+
+  @include media("<=medium") {
+    padding: 80px 20px;
+  }
 
   .title {
     font-size: 28px;

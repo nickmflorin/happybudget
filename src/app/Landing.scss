@@ -1,31 +1,57 @@
 @import "style/colors";
 @import "style/typography";
+@import "style/breakpoints";
 
 .landing-page {
   display: flex;
+  justify-content: center;
+  align-items: center;
   height: 100vh;
 
   .landing-page-left {
-    max-width: 700px;
-    min-width: 600px;
-    justify-content: center;
-    align-items: center;
+    flex-grow: 1;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
     -webkit-box-pack: center;
     -webkit-box-align: center;
+
+    @include media(">=xxl") {
+      min-width: 600px;
+      max-width: 700px;
+    }
+
+    .logo {
+      display: inline-block;
+      margin-top: 80px;
+
+      @include media("<=medium") {
+        width: 70%;
+      }
+
+      @include media(">=xl") {
+        display: none;
+      }
+    }
   }
 
   .landing-page-right {
+    display: none;
     flex-grow: 100;
-    justify-content: center;
-    align-items: center;
+    height: 100vh;
     background-color: $green;
-    display: flex;
     -webkit-box-pack: center;
     -webkit-box-align: center;
 
-    .logo-container {
-      text-align: center;
+    @include media(">=xl") {
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
+  }
+
+  .logo-container {
+    text-align: center;
   }
 }

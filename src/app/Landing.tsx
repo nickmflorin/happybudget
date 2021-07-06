@@ -1,6 +1,6 @@
 import { Route, Switch } from "react-router-dom";
 
-import { LogoWhite } from "components/svgs";
+import { Logo } from "components/svgs";
 import { lazyWithRetry } from "lib/operational";
 
 import "./Landing.scss";
@@ -19,7 +19,7 @@ const Landing = (): JSX.Element => {
       </div>
       <div className={"landing-page-right"}>
         <div className={"logo-container"}>
-          <LogoWhite />
+          <Logo color={"white"} />
         </div>
       </div>
     </div>
