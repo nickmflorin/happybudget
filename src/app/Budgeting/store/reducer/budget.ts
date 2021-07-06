@@ -326,7 +326,10 @@ const rootReducer: Reducer<Modules.Budgeting.Budget.Store, Redux.Action<any>> = 
   // When the underlying account or subaccounts are removed, updated or added,
   // we need to also update the parent account or subaccount.
   if (!isNil(action.payload)) {
-    if (action.type === ActionType.Budget.SubAccount.TableChanged) {
+    if (
+      action.type === ActionType.Budget.SubAccount.TableChanged ||
+      action.type === ActionType.Budget.Fringes.TableChanged
+    ) {
       // Update the overall SubAccount based on the underlying SubAccount(s) present.
       const subAccounts: Model.BudgetSubAccount[] = newState.subaccount.subaccounts.data;
       let payload: Partial<Model.BudgetSubAccount> = {
@@ -349,7 +352,10 @@ const rootReducer: Reducer<Modules.Budgeting.Budget.Store, Redux.Action<any>> = 
           };
         }
       }
-    } else if (action.type === ActionType.Budget.Account.TableChanged) {
+    } else if (
+      action.type === ActionType.Budget.Account.TableChanged ||
+      action.type === ActionType.Budget.Fringes.TableChanged
+    ) {
       // Update the overall Account based on the underlying SubAccount(s) present.
       const subAccounts: Model.BudgetSubAccount[] = newState.account.subaccounts.data;
       // Right now, the backend is configured such that the Actual value for the overall Account is

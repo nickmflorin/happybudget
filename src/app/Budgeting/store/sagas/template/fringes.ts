@@ -47,7 +47,7 @@ function* tableChangeEventSaga(): SagaIterator {
   // TODO: We probably want a way to prevent duplicate events that can cause
   // backend errors from occurring.  This would include things like trying to
   // delete the same row twice.
-  const changeChannel = yield actionChannel(ActionType.Budget.Fringes.TableChanged);
+  const changeChannel = yield actionChannel(ActionType.Template.Fringes.TableChanged);
   while (true) {
     const action: Redux.Action<Table.ChangeEvent<any>> = yield take(changeChannel);
     if (!isNil(action.payload)) {
@@ -69,7 +69,7 @@ function* tableChangeEventSaga(): SagaIterator {
 function* requestSaga(): SagaIterator {
   let lastTasks;
   while (true) {
-    const action = yield take(ActionType.Budget.Fringes.Request);
+    const action = yield take(ActionType.Template.Fringes.Request);
     if (lastTasks) {
       yield cancel(lastTasks);
     }
