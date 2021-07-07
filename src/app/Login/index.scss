@@ -3,10 +3,10 @@
 @import "style/breakpoints";
 
 .form-container {
-  padding: 80px;
+  padding: 20px 80px;
 
   @include media("<=medium") {
-    padding: 80px 20px;
+    padding: 20px;
   }
 
   .title {

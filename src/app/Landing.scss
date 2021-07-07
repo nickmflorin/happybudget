@@ -24,7 +24,6 @@
 
     .logo {
       display: inline-block;
-      margin-top: 80px;
 
       @include media("<=medium") {
         width: 70%;
