@@ -1,10 +1,10 @@
-interface Props {
+interface LogoProps {
   color: string;
   symbolColor?: string;
   accentColor?: string;
   subTextColor?: string;
 }
-const Logo = ({ color, symbolColor, accentColor, subTextColor }: Props): JSX.Element => {
+const Logo = ({ color, symbolColor, accentColor, subTextColor }: LogoProps): JSX.Element => {
   return (
     <svg
       xmlns={"http://www.w3.org/2000/svg"}
