@@ -141,6 +141,9 @@ const ExpandedModelMenu = <M extends Model.M>({
           search={isNil(search) ? _search : search}
           menuRef={_menuRef}
           onFocusCallback={(focused: boolean) => focusSearch(!focused)}
+          onNoData={{
+            text: "No Sub-Accounts or Details"
+          }}
         />
       )}
     </div>

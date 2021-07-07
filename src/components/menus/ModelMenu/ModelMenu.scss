@@ -48,6 +48,12 @@
       height: 36px;
       font-family: $roboto !important;
 
+      &:hover,
+      &.focus {
+        background-color: transparent !important;
+        cursor: default;
+      }
+
       .icon-container {
         display: flex;
         justify-content: center;
