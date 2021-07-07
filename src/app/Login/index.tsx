@@ -20,7 +20,7 @@ const Login = (): JSX.Element => {
   return (
     <>
       <div className={"logo-container"}>
-        <Logo color={"black"} />
+        <Logo color={"green"} />
       </div>
       <div className={"form-container"}>
         <Typography.Title className={"title"}>{"Sign In"}</Typography.Title>
