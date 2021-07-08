@@ -2,7 +2,7 @@ import { Input, Select } from "antd";
 import { MailOutlined, UserOutlined } from "@ant-design/icons";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGlobeAmericas, faUserTag } from "@fortawesome/free-solid-svg-icons";
+import { faGlobeAmericas, faUserTag, faDollarSign, faBuilding } from "@fortawesome/free-solid-svg-icons";
 
 import { ContactRoles } from "lib/model";
 
@@ -25,17 +25,20 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
       <Form.Item name={"last_name"} label={"Last Name"}>
         <Input prefix={<UserOutlined />} placeholder={"Smith"} />
       </Form.Item>
+      <Form.Item name={"company"} label={"Company"}>
+        <Input prefix={<FontAwesomeIcon icon={faBuilding} />} placeholder={"ACME Corporation"} />
+      </Form.Item>
       <Form.Item name={"email"} label={"Email"}>
         <Input prefix={<MailOutlined />} placeholder={"jsmith@gmail.com"} />
       </Form.Item>
       <Form.Item name={"city"} label={"City"}>
         <Input prefix={<FontAwesomeIcon icon={faGlobeAmericas} />} placeholder={"Los Angeles"} />
       </Form.Item>
-      <Form.Item name={"country"} label={"Country"}>
+      {/* <Form.Item name={"country"} label={"Country"}>
         <Input prefix={<FontAwesomeIcon icon={faGlobeAmericas} />} placeholder={"United States"} />
-      </Form.Item>
+      </Form.Item> */}
       <Form.Item name={"phone_number"} label={"Phone Number"}>
-        <PhoneNumberInput placeholder={"+15551234567"} />
+        <PhoneNumberInput placeholder={"(123) 456-7890"} />
       </Form.Item>
       <Form.Item name={"role"} label={"Role"}>
         <Select suffixIcon={<FontAwesomeIcon icon={faUserTag} />} placeholder={"Producer"}>
@@ -45,6 +48,9 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
             </Select.Option>
           ))}
         </Select>
+      </Form.Item>
+      <Form.Item name={"rate"} label={"Rate"}>
+        <Input prefix={<FontAwesomeIcon icon={faDollarSign} />} placeholder={"100 /hr"} />
       </Form.Item>
     </Form.Form>
   );

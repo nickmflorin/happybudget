@@ -279,15 +279,16 @@ namespace Model {
   }
 
   interface Contact extends Model.Model {
-    readonly first_name: string;
+    readonly first_name: string | null;
     readonly last_name: string | null;
     readonly full_name: string;
+    readonly company: string | null;
     readonly email: string | null;
     readonly created_at: string;
     readonly updated_at: string;
     readonly role: Model.ContactRole | null;
+    readonly rate: number | null;
     readonly city: string | null;
-    readonly country: string | null;
     readonly phone_number: string | null;
   }
 

@@ -24,7 +24,9 @@ import EditContactModal from "./EditContactModal";
 interface Row {
   key: number;
   name: string;
+  company: string | null;
   role: Model.ContactRoleName | null;
+  rate: number | null;
   phone_number: string | null;
   email: string | null;
   contact: Model.Contact;
@@ -47,7 +49,9 @@ const ContactsTable = (): JSX.Element => {
       tableData.push({
         key: contact.id,
         name: contact.full_name,
+        company: contact.company,
         role: !isNil(contact.role) ? contact.role.name : null,
+        rate: contact.rate,
         email: contact.email,
         phone_number: contact.phone_number,
         contact
@@ -125,9 +129,19 @@ const ContactsTable = (): JSX.Element => {
             dataIndex: "name"
           },
           {
+            title: "Company",
+            key: "company",
+            dataIndex: "company"
+          },
+          {
             title: "Role",
             key: "role",
             dataIndex: "role"
+          },
+          {
+            title: "Rate",
+            key: "rate",
+            dataIndex: "rate"
           },
           {
             title: "Location",
@@ -137,8 +151,6 @@ const ContactsTable = (): JSX.Element => {
               return (
                 <div>
                   <span>{contact.city}</span>
-                  <span>{","}</span>
-                  <span>{contact.country}</span>
                 </div>
               );
             }
@@ -149,7 +161,7 @@ const ContactsTable = (): JSX.Element => {
             dataIndex: "phone_number",
             render: (value: number | null) => {
               if (!isNil(value)) {
-                return <span>{formatAsPhoneNumber(value)}</span>;
+                return <a href={`tel:${formatAsPhoneNumber(value)}`}>{formatAsPhoneNumber(value)}</a>;
               }
               return <span></span>;
             }
@@ -157,7 +169,13 @@ const ContactsTable = (): JSX.Element => {
           {
             title: "Email",
             key: "email",
-            dataIndex: "email"
+            dataIndex: "email",
+            render: (value: string | null) => {
+              if (!isNil(value)) {
+                return <a href={`mailto:${value}`}>{value}</a>;
+              }
+              return <span></span>;
+            }
           },
           {
             key: "action",

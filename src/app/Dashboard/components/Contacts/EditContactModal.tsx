@@ -62,9 +62,10 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
         initialValues={{
           first_name: contact.first_name,
           last_name: contact.last_name,
+          company: contact.company,
           email: contact.email,
           role: !isNil(contact.role) ? contact.role.id : null,
-          country: contact.country,
+          rate: contact.rate,
           city: contact.city,
           phone_number: contact.phone_number
         }}
