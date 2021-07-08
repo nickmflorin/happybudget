@@ -34,9 +34,6 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
       <Form.Item name={"city"} label={"City"}>
         <Input prefix={<FontAwesomeIcon icon={faGlobeAmericas} />} placeholder={"Los Angeles"} />
       </Form.Item>
-      {/* <Form.Item name={"country"} label={"Country"}>
-        <Input prefix={<FontAwesomeIcon icon={faGlobeAmericas} />} placeholder={"United States"} />
-      </Form.Item> */}
       <Form.Item name={"phone_number"} label={"Phone Number"}>
         <PhoneNumberInput placeholder={"(123) 456-7890"} />
       </Form.Item>
