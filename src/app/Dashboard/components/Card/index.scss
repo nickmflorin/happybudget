@@ -14,8 +14,13 @@
   /* Declare the same value for min- and max-width to avoid colliding with desktops */
   /* Source: https://medium.com/connect-the-dots/css-media-queries-for-ipad-pro-8cad10e17106*/
   @media only screen and (min-device-width: 1194px) and (max-device-width: 1194px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
-    flex: 1 1;
-    max-width: none;
+    // flex: 1 1;
+    max-width: 245px;
+  }
+
+  @media only screen and (min-device-width: 834px) and (max-device-width: 834px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
+    // flex: 1 1;
+    max-width: 213px;
   }
 
   &:not(:last-child) {
@@ -135,7 +140,7 @@
     .dashboard-card-footer {
       position: absolute;
       top: 150px;
-      height: 64px;
+      min-height: 64px;
       width: 100%;
       padding-top: 12px;
       padding-bottom: 12px;
@@ -158,10 +163,10 @@
       }
 
       .sub-title {
-        font-size: 11px;
+        font-size: 10px;
         font-family: $roboto;
         font-weight: 400;
-        line-height: 12px;
+        line-height: 16px;
       }
 
       &.title-only {
