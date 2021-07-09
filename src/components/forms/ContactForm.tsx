@@ -37,7 +37,7 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
       <Form.Item name={"phone_number"} label={"Phone Number"}>
         <PhoneNumberInput placeholder={"(123) 456-7890"} />
       </Form.Item>
-      <Form.Item name={"role"} label={"Role"}>
+      <Form.Item name={"role"} label={"Job Title"}>
         <Select suffixIcon={<FontAwesomeIcon icon={faUserTag} />} placeholder={"Producer"}>
           {ContactRoles.map((model: Model.ContactRole, index: number) => (
             <Select.Option key={index} value={model.id}>

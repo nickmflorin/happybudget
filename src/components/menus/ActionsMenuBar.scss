@@ -1,5 +1,6 @@
 .actions-menu-bar {
   display: flex;
+  justify-content: space-between;
   height: 36px;
 
   > .actions-menu-bar-item {
@@ -8,6 +9,10 @@
     justify-content: center;
     height: 100%;
     position: relative;
+
+    .ant-input {
+      min-width: 200px;
+    }
 
     &.expand {
       flex-grow: 100;

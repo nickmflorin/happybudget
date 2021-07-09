@@ -1,0 +1,28 @@
+@import "style/typography";
+
+.contacts {
+  .ant-table {
+    min-width: 1000px;
+
+    .ant-table-thead .ant-table-cell {
+      font-weight: 500;
+    }
+
+    .ant-table-row {
+      height: 50px;
+      min-height: 50px;
+
+      .btn--icon-only {
+        display: none;
+      }
+
+      &:hover {
+        .ant-table-cell .actions-table-cell {
+          .btn--icon-only {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+}

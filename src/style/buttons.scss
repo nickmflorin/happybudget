@@ -338,6 +338,12 @@
       svg {
         color: $icon-color;
       }
+      &:hover,
+      &:focus {
+        svg {
+          color: $green-darker !important;
+        }
+      }
     }
 
     svg {

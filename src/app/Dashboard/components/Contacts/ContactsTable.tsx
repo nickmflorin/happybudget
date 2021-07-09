@@ -10,14 +10,15 @@ import { DeleteContactsModal } from "components/modals";
 import { Table, ActionsTableCell, ModelSelectController } from "components/tables";
 import { formatAsPhoneNumber } from "lib/util/formatters";
 
+import "./ContactsTable.scss";
+
 import {
   requestContactsAction,
   setContactsPageAction,
   setContactsPageSizeAction,
   setContactsPageAndSizeAction,
   selectContactsAction,
-  deleteContactsAction,
-  deleteContactAction
+  deleteContactsAction
 } from "../../store/actions";
 import EditContactModal from "./EditContactModal";
 
@@ -134,7 +135,7 @@ const ContactsTable = (): JSX.Element => {
             dataIndex: "company"
           },
           {
-            title: "Role",
+            title: "Job Title",
             key: "role",
             dataIndex: "role"
           },
@@ -144,7 +145,8 @@ const ContactsTable = (): JSX.Element => {
             dataIndex: "rate"
           },
           {
-            title: "Location",
+            // TODO: abstract just city and state from location
+            title: "Address",
             key: "location",
             dataIndex: "contact",
             render: (contact: Model.Contact) => {
@@ -172,7 +174,13 @@ const ContactsTable = (): JSX.Element => {
             dataIndex: "email",
             render: (value: string | null) => {
               if (!isNil(value)) {
-                return <a href={`mailto:${value}`}>{value}</a>;
+                return (
+                  <div className={"truncate truncate--link"}>
+                    <a href={`mailto:${value}`} target={"_blank"} rel={"noreferrer"}>
+                      {value}
+                    </a>
+                  </div>
+                );
               }
               return <span></span>;
             }
@@ -187,11 +195,6 @@ const ContactsTable = (): JSX.Element => {
                     tooltip: `Edit ${contact.full_name}`,
                     onClick: () => setContactToEdit(contact),
                     icon: <FontAwesomeIcon icon={faEdit} />
-                  },
-                  {
-                    tooltip: `Delete ${contact.full_name}`,
-                    onClick: () => dispatch(deleteContactAction(contact.id)),
-                    icon: <FontAwesomeIcon icon={faTrashAlt} />
                   }
                 ]}
               />

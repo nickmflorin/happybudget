@@ -147,9 +147,8 @@ const ModelSelectController = <M extends Model.Model>({
         );
       })}
       <div className={"select-controller-selected-text"}>
-        {selected.length !== 0
-          ? `Selected ${selected.length} ${toTitleCase(entityName)}${selected.length === 1 ? "" : "s"}`
-          : `No ${toTitleCase(entityName)}s Selected`}
+        {selected.length !== 0 &&
+          `Selected ${selected.length} ${toTitleCase(entityName)}${selected.length === 1 ? "" : "s"}`}
       </div>
     </div>
   );

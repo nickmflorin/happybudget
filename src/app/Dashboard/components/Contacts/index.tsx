@@ -20,8 +20,8 @@ const Contacts = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <Page title={"My Contacts"}>
-        <ActionsMenuBar expand={0} className={"mb--15"}>
+      <Page className={"contacts"} title={"My Contacts"}>
+        <ActionsMenuBar className={"mb--15"}>
           <Input
             placeholder={"Search Contacts"}
             value={contacts.search}
