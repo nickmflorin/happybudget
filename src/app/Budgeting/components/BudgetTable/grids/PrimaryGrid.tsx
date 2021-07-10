@@ -443,10 +443,12 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       map(cellChangeEvents, (e: CellValueChangedEvent) => getCellChangeFromEvent(e)),
       (change: Table.CellChange<R> | null) => change !== null
     ) as Table.CellChange<R>[];
-    onChangeEvent({
-      type: "dataChange",
-      payload: changes
-    });
+    if (changes.length !== 0) {
+      onChangeEvent({
+        type: "dataChange",
+        payload: changes
+      });
+    }
   });
 
   const getRowClass = useDynamicCallback((params: RowClassParams) => {
@@ -833,6 +835,16 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     }
   });
 
+  const _processCellForClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
+    if (!isNil(params.node)) {
+      const customCol: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+      if (!isNil(customCol)) {
+        setCutCellChange(null);
+        return processCellForClipboard(customCol, params.node.data as R, params.value);
+      }
+    }
+  });
+
   const _processCellFromClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
     if (!isNil(params.node)) {
       const node: RowNode = params.node;
@@ -924,15 +936,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           getRowNodeId={(r: any) => r.id}
           onGridReady={onGridReady}
           processDataFromClipboard={processDataFromClipboard}
-          processCellForClipboard={(params: ProcessCellForExportParams) => {
-            if (!isNil(params.node)) {
-              const customCol: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
-              if (!isNil(customCol)) {
-                setCutCellChange(null);
-                return processCellForClipboard(customCol, params.node.data as R, params.value);
-              }
-            }
-          }}
+          processCellForClipboard={_processCellForClipboard}
           processCellFromClipboard={_processCellFromClipboard}
           navigateToNextCell={navigateToNextCell}
           tabToNextCell={tabToNextCell}
