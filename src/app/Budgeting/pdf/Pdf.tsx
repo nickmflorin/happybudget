@@ -109,13 +109,8 @@ const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
                     headerName: "Unit",
                     type: "singleSelect",
                     width: "10%",
-                    cellRenderer: (
-                      params: Table.PdfCellCallbackParams<
-                        BudgetPdf.SubAccountRow,
-                        Model.PdfSubAccount,
-                        Model.PdfSubAccount
-                      >
-                    ) => (params.rawValue !== null ? <PdfTag model={params.rawValue} /> : <span></span>)
+                    cellRenderer: (params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount>) =>
+                      params.rawValue !== null ? <PdfTag model={params.rawValue} /> : <span></span>
                   },
                   {
                     field: "multiplier",

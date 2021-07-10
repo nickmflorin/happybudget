@@ -1,6 +1,6 @@
 import { Tag } from "components/tagging";
 import classNames from "classnames";
-import { Text } from "./Base";
+import { View, Text } from "./Base";
 
 const PdfTag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.Element => {
   return (
@@ -8,17 +8,17 @@ const PdfTag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.El
       {...props}
       render={(params: ITagRenderParams) => {
         return (
-          <Text
+          <View
             className={classNames(
-              "tag-text",
+              "tag",
               { uppercase: props.uppercase },
               { "fill-width": props.fillWidth },
               props.className
             )}
             style={{ ...props.style, backgroundColor: params.color, color: params.textColor }}
           >
-            {params.text}
-          </Text>
+            <Text className={"tag-text"}>{params.text}</Text>
+          </View>
         );
       }}
     />

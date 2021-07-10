@@ -135,12 +135,12 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   "cell-text": { margin: "auto", width: "100%" },
   "th-text": { marginTop: 6, fontSize: 8, color: "#595959", fontWeight: 700 },
   "td-text": { marginTop: 5, fontSize: 9, color: "#1F1F1F", fontWeight: 600 },
+  tag: { height: 14, paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1, borderRadius: 20, marginTop: 5 },
   "tag-text": {
-    marginTop: 5,
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: 400,
     textAlign: "center",
-    borderRadius: 20
+    textTransform: "uppercase"
   },
   uppercase: { textTransform: "uppercase" },
   "fill-width": { textAlign: "center", width: "100%" },

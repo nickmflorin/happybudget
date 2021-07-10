@@ -5,7 +5,7 @@ import { useDynamicCallback } from "lib/hooks";
 import Table from "./Table";
 import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../Rows";
 
-type ColumnType = Table.PdfColumn<BudgetPdf.AccountRow, Model.PdfAccount, Model.PdfSubAccount>;
+type ColumnType = Table.PdfColumn<BudgetPdf.AccountRow, Model.PdfAccount>;
 
 const AccountsTable = ({
   /* eslint-disable indent */

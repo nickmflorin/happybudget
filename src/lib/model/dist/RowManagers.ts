@@ -1,7 +1,7 @@
 import { isNil } from "lodash";
 import { RowManager, PdfRowManager, ReadWrite, ReadOnly } from "lib/model/models";
 
-export const PdfAccountRowManager = new PdfRowManager<BudgetPdf.AccountRow, Model.PdfAccount, Model.PdfSubAccount>({
+export const PdfAccountRowManager = new PdfRowManager<BudgetPdf.AccountRow, Model.PdfAccount>({
   fields: [
     ReadOnly({ field: "description" }),
     ReadOnly({ field: "identifier" }),
@@ -9,7 +9,6 @@ export const PdfAccountRowManager = new PdfRowManager<BudgetPdf.AccountRow, Mode
     ReadOnly({ field: "variance" }),
     ReadOnly({ field: "actual" })
   ],
-  childrenGetter: (model: Model.PdfAccount) => model.subaccounts,
   groupGetter: (model: Model.PdfAccount) => model.group
 });
 
@@ -51,11 +50,7 @@ export const TemplateAccountRowManager = new RowManager<
   rowType: "account"
 });
 
-export const PdfSubAccountRowManager = new PdfRowManager<
-  BudgetPdf.SubAccountRow,
-  Model.PdfSubAccount,
-  Model.PdfSubAccount
->({
+export const PdfSubAccountRowManager = new PdfRowManager<BudgetPdf.SubAccountRow, Model.PdfSubAccount>({
   fields: [
     ReadOnly({ field: "description" }),
     ReadOnly({ field: "identifier" }),
@@ -68,7 +63,6 @@ export const PdfSubAccountRowManager = new PdfRowManager<
     ReadOnly({ field: "variance" }),
     ReadOnly({ field: "actual" })
   ],
-  childrenGetter: (model: Model.PdfSubAccount) => model.subaccounts,
   groupGetter: (model: Model.PdfSubAccount) => model.group
 });
 

@@ -3,21 +3,15 @@ import * as typeguards from "lib/model/typeguards";
 
 type PayloadType<T, P, R extends Table.Row> = T extends Table.RowChange<R> ? Partial<P> : P;
 
-const defaultPdfRowMeta: Partial<Table.PdfRowMeta<any>> = {
-  children: []
-};
-
-export class PdfRowManager<R extends Table.PdfRow<C>, M extends Model.Model, C extends Model.Model>
+export class PdfRowManager<R extends Table.PdfRow, M extends Model.Model>
 /* eslint-disable indent */
-  implements Table.IPdfRowManager<R, M, C>
+  implements Table.IPdfRowManager<R, M>
 {
   public fields: Table.IReadOnlyField<R, M>[];
-  public childrenGetter?: ((model: M) => C[]) | string | null;
   public groupGetter?: ((model: M) => number | null) | string | null;
 
-  constructor(config: Table.IPdfRowManagerConfig<R, M, C>) {
+  constructor(config: Table.IPdfRowManagerConfig<R, M>) {
     this.fields = config.fields;
-    this.childrenGetter = config.childrenGetter;
     this.groupGetter = config.groupGetter;
   }
 
@@ -31,23 +25,6 @@ export class PdfRowManager<R extends Table.PdfRow<C>, M extends Model.Model, C e
         }
       }) || null
     );
-  };
-
-  public getChildren = (model: M): C[] => {
-    if (typeof this.childrenGetter === "string") {
-      const children: any = model[this.childrenGetter as keyof M];
-      if (!isNil(children)) {
-        return children;
-      } else {
-        /* eslint-disable no-console */
-        console.warn(`Could not parse children from model based on model field ${this.childrenGetter}!`);
-        return [];
-      }
-    } else if (!isNil(this.childrenGetter)) {
-      return this.childrenGetter(model);
-    } else {
-      return [];
-    }
   };
 
   public getGroup = (model: M): number | null => {
@@ -69,17 +46,13 @@ export class PdfRowManager<R extends Table.PdfRow<C>, M extends Model.Model, C e
     }
   };
 
-  public modelToRow = (model: M, meta: Partial<Table.RowMeta> = {}): R => {
+  public modelToRow = (model: M): R => {
     let obj: { [key in keyof R]?: R[key] } = {};
     obj = {
       ...obj,
       id: model.id,
       group: this.getGroup(model),
-      meta: {
-        ...defaultPdfRowMeta,
-        children: this.getChildren(model),
-        ...meta
-      }
+      meta: {}
     };
     forEach(this.fields, (field: Table.IReadOnlyField<R, M>) => {
       if (field.modelOnly !== true) {

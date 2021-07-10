@@ -6,14 +6,14 @@ import { CellProps } from "../Cells/Cell";
 import HeaderCell from "../Cells/HeaderCell";
 import Row, { RowProps } from "./Row";
 
-const HeaderRow = <R extends Table.PdfRow<C>, M extends Model.Model, C extends Model.Model>({
+const HeaderRow = <R extends Table.PdfRow, M extends Model.Model>({
   cellProps,
   ...props
-}: Omit<RowProps<R, M, C>, "row"> & { readonly cellProps?: CellProps<R, M, C> }): JSX.Element => {
+}: Omit<RowProps<R, M>, "row"> & { readonly cellProps?: CellProps<R, M> }): JSX.Element => {
   const headerRow = useMemo(() => {
     return reduce(
       props.columns,
-      (obj: { [key: string]: any }, col: Table.PdfColumn<R, M, C>) => {
+      (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>) => {
         obj[col.field] = col.headerName;
         return obj;
       },
@@ -25,9 +25,9 @@ const HeaderRow = <R extends Table.PdfRow<C>, M extends Model.Model, C extends M
       {...props}
       className={classNames("header-tr", props.className)}
       row={headerRow}
-      renderCell={(params: { column: Table.PdfColumn<R, M, C>; location: Table.PdfCellLocation }) => {
+      renderCell={(params: { column: Table.PdfColumn<R, M>; location: Table.PdfCellLocation }) => {
         return (
-          <HeaderCell<R, M, C>
+          <HeaderCell<R, M>
             key={`header-${params.location.index}-${params.location.colIndex}`}
             location={params.location}
             column={params.column}

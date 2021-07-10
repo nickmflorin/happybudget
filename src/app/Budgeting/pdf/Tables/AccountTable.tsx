@@ -7,7 +7,7 @@ import { useDynamicCallback } from "lib/hooks";
 import Table from "./Table";
 import { BodyRow, HeaderRow, FooterRow } from "../Rows";
 
-type ColumnType = Table.PdfColumn<BudgetPdf.SubAccountRow, Model.PdfSubAccount, Model.PdfSubAccount>;
+type ColumnType = Table.PdfColumn<BudgetPdf.SubAccountRow, Model.PdfSubAccount>;
 
 const AccountTable = ({
   /* eslint-disable indent */
@@ -35,7 +35,7 @@ const AccountTable = ({
   const generateRows = useDynamicCallback((): JSX.Element[] => {
     let rows: JSX.Element[] = [
       <HeaderRow className={"account-header-tr"} columns={columns} index={0} key={0} />,
-      <BodyRow<BudgetPdf.SubAccountRow, Model.PdfSubAccount, Model.PdfSubAccount>
+      <BodyRow<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
         key={1}
         index={1}
         className={"account-sub-header-tr"}
@@ -51,6 +51,14 @@ const AccountTable = ({
       (subaccount: Model.PdfSubAccount) => !(options.excludeZeroTotals === true) || subaccount.estimated !== 0
     );
     forEach(subaccounts, (subaccount: Model.PdfSubAccount, i: number) => {
+      const details = filter(
+        subaccount.subaccounts,
+        (detail: Model.PdfSubAccount) => !(options.excludeZeroTotals === true) || detail.estimated !== 0
+      );
+      const showSubAccountFooterRow =
+        filter(columns, (column: ColumnType) => !isNil(column.childFooter)).length !== 0 && details.length !== 0;
+      const isLastSubAccount = i === subaccounts.length - 1;
+
       // NOTE: While we should be using manager.modelToRow() to stay consistent,
       // we want to exclude calculated fields here - which the manager does not
       // do.  We need to deprecate the manager.modelToRow() method.
@@ -58,7 +66,10 @@ const AccountTable = ({
       const subaccountRow = reduce(
         columns,
         (obj: { [key: string]: any }, col: ColumnType) => {
-          if (!isNil(subaccount[col.field as keyof Model.PdfSubAccount]) && col.isCalculated !== true) {
+          if (
+            !isNil(subaccount[col.field as keyof Model.PdfSubAccount]) &&
+            (details.length === 0 || col.isCalculated !== true)
+          ) {
             obj[col.field] = subaccount[col.field as keyof Model.PdfSubAccount];
           } else {
             obj[col.field] = null;
@@ -80,17 +91,10 @@ const AccountTable = ({
       );
       runningIndex += 1;
 
-      const showSubAccountFooterRow = filter(columns, (column: ColumnType) => !isNil(column.childFooter)).length !== 0;
-      const isLastSubAccount = i === account.subaccounts.length - 1;
-
-      const details = filter(
-        subaccount.subaccounts,
-        (detail: Model.PdfSubAccount) => !(options.excludeZeroTotals === true) || detail.estimated !== 0
-      );
       forEach(details, (detail: Model.PdfSubAccount, j: number) => {
         const detailRow = manager.modelToRow(detail);
         rows.push(
-          <BodyRow<BudgetPdf.SubAccountRow, Model.PdfSubAccount, Model.PdfSubAccount>
+          <BodyRow<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
             key={runningIndex}
             index={runningIndex}
             columns={columns}
@@ -98,13 +102,11 @@ const AccountTable = ({
             row={detailRow}
             cellProps={{
               cellContentsVisible: (
-                params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount, Model.PdfSubAccount>
+                params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
               ) => (params.column.field === "identifier" ? false : true),
               textClassName: "detail-tr-td-text",
-              className: (
-                params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount, Model.PdfSubAccount>
-              ) => {
-                if (params.location.colIndex === 1) {
+              className: (params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount>) => {
+                if (params.column.field === "description") {
                   return classNames("detail-td", "indent-td");
                 }
                 return "detail-td";
