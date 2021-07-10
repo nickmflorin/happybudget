@@ -60,7 +60,10 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     fontWeight: 600,
     fontSize: 14
   },
-  content: {},
+  "page-content": {
+    flexGrow: 100
+  },
+  "page-footer": {},
   table: {
     // Note: react-pdf does not "support" display: table, even though it works fine,
     // their TS bindings disallow it.

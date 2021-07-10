@@ -26,7 +26,8 @@ const Page = (props: PageProps): JSX.Element => {
         <Text className={"page-header-title"}>{props.title}</Text>
         <Text className={"page-header-subtitle"}>{props.subTitle}</Text>
       </View>
-      <View className={"content"}>{props.children}</View>
+      <View className={"page-content"}>{props.children}</View>
+      <View className={"page-footer"}></View>
     </ReactPDFPage>
   );
 };
