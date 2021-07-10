@@ -30,6 +30,11 @@ const GroupRow = <R extends Table.PdfRow, M extends Model.Model>(
       (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>, index: number) => {
         if (props.columns.length === 1 || index === 1) {
           obj[col.field] = props.group.name;
+        } else if (col.isCalculated === true) {
+          obj[col.field] = null;
+          if (!isNil(props.group[col.field as keyof Model.BudgetGroup])) {
+            obj[col.field] = props.group[col.field as keyof Model.BudgetGroup];
+          }
         } else {
           obj[col.field] = null;
         }
@@ -45,7 +50,7 @@ const GroupRow = <R extends Table.PdfRow, M extends Model.Model>(
       row={groupRow}
       style={{ ...rowStyle, ...props.style }}
       className={classNames("group-tr", props.className)}
-      cellProps={{ formatting: false, border: false, textClassName: "group-tr-td-text", textStyle: cellTextStyle }}
+      cellProps={{ border: false, textClassName: "group-tr-td-text", textStyle: cellTextStyle }}
     />
   );
 };
