@@ -9,7 +9,6 @@ import { AccountsTable, AccountTable } from "./Tables";
 import PdfTag from "./PdfTag";
 
 const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
-  console.log(budget);
   return (
     <Document>
       <Page title={budget.name} subTitle={"Cost Summary"}>

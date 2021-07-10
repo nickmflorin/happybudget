@@ -6,10 +6,12 @@ import { map } from "lodash";
 
 import { faCommentsAlt, faPrint } from "@fortawesome/pro-solid-svg-icons";
 
+import * as api from "api";
 import { download } from "lib/util/files";
 
 import * as models from "lib/model";
 import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals";
+import { setApplicationLoadingAction } from "store/actions";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
@@ -106,9 +108,13 @@ const AccountsTable = (): JSX.Element => {
             text: "Export PDF",
             onClick: () => {
               if (!isNil(budgetId)) {
-                generatePdf(budgetId).then((response: Blob) => {
-                  download(response, !isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf");
-                });
+                dispatch(setApplicationLoadingAction(true));
+                generatePdf(budgetId)
+                  .then((response: Blob) => {
+                    download(response, !isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf");
+                  })
+                  .catch((e: Error) => api.handleRequestError(e))
+                  .finally(() => dispatch(setApplicationLoadingAction(false)));
               }
             }
           },
