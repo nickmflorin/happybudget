@@ -53,8 +53,8 @@ const SignupForm = ({
         name={"email"}
         rules={[
           { required: true, message: "Please enter an email." },
-          ({ getFieldValue }) => ({
-            validator(rule, value) {
+          ({ getFieldValue }: { getFieldValue: any }) => ({
+            validator(rule: any, value: string) {
               if (value !== "" && !validateEmail(value)) {
                 return Promise.reject("Please enter a valid email.");
               }
@@ -69,8 +69,8 @@ const SignupForm = ({
         name={"password"}
         rules={[
           { required: true, message: "Please enter a valid password.", min: 8 },
-          ({ getFieldValue }) => ({
-            validator(rule, value) {
+          ({ getFieldValue }: { getFieldValue: any }) => ({
+            validator(rule: any, value: string) {
               if (value !== "" && !validatePassword(value)) {
                 return Promise.reject("The password does not meet our requirements.");
               }
@@ -95,8 +95,8 @@ const SignupForm = ({
         name={"confirm"}
         rules={[
           { required: true, message: "Please confirm your password.", min: 8 },
-          ({ getFieldValue }) => ({
-            validator(rule, value) {
+          ({ getFieldValue }: { getFieldValue: any }) => ({
+            validator(rule: any, value: string) {
               if (value !== "" && !validatePassword(value)) {
                 return Promise.reject("The password does not meet our requirements.");
               }

@@ -1,8 +1,8 @@
 import classNames from "classnames";
 
 import { Dropdown, Color } from "components";
-import { DropdownProps } from "components/Dropdown";
-import { ColorSelect } from "components/forms";
+import { DropdownProps } from "components/dropdowns/Dropdown";
+import { ColorSelect } from "components/forms/fields";
 
 import "./ColorDropdown.scss";
 

@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
-import { ColorSelect } from "components/forms";
+import { ColorSelect } from "components/forms/fields";
 import { useTrackFirstRender } from "lib/hooks";
 
 import { selectFringeColors } from "../../../store/selectors";

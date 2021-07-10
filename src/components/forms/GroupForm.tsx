@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
+import { isNil } from "lodash";
 import { Input } from "antd";
 
 import { useGroupColors } from "lib/hooks";
 
 import { Form } from "components";
-import { FormProps } from "components/Form";
-import { ColorSelect } from "components/forms";
-import { isNil } from "lodash";
+import { FormProps } from "components/forms/Form";
+import { ColorSelect } from "./fields";
 
 export interface GroupFormValues {
   name: string;

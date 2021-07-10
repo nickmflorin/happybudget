@@ -4,9 +4,9 @@ import { isNil } from "lodash";
 import { Input } from "antd";
 
 import { Form } from "components";
-import { FormProps } from "components/Form";
+import { FormProps } from "components/forms/Form";
 
-import UploadUserImage from "./UploadUserImage";
+import { UploadUserImage } from "./fields";
 import "./TemplateForm.scss";
 
 export interface TemplateFormValues {

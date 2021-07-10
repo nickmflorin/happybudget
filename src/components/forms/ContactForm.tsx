@@ -7,8 +7,8 @@ import { faGlobeAmericas, faUserTag, faDollarSign, faBuilding } from "@fortaweso
 import { ContactRoles } from "lib/model";
 
 import { Form } from "components";
-import { FormProps } from "components/Form";
-import PhoneNumberInput from "./PhoneNumberInput";
+import { FormProps } from "components/forms/Form";
+import { PhoneNumberInput } from "./fields";
 
 const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, globalError }) => {
   return (

@@ -3,8 +3,8 @@ import { isNil } from "lodash";
 import { Input, Select } from "antd";
 
 import { Form } from "components";
-import { FormProps } from "components/Form";
-import UploadUserImage from "./UploadUserImage";
+import { FormProps } from "components/forms/Form";
+import { UploadUserImage } from "./fields";
 import "./BudgetForm.scss";
 
 export interface BudgetFormValues {

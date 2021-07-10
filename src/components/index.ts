@@ -1,5 +1,5 @@
-export { default as Form } from "./Form";
-export { default as Dropdown } from "./Dropdown";
+export { default as Form } from "./forms/Form";
+export { default as Dropdown } from "./dropdowns/Dropdown";
 export * from "./loading";
 export * from "./util";
 export { default as Separator } from "./Separator";

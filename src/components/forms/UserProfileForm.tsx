@@ -4,9 +4,8 @@ import classNames from "classnames";
 import { Input, Button } from "antd";
 
 import { Form } from "components";
-import { FormProps } from "components/Form";
-import UploadUserImage from "./UploadUserImage";
-import TimezoneSelect from "./TimezoneSelect";
+import { FormProps } from "components/forms/Form";
+import { UploadUserImage, TimezoneSelect } from "./fields";
 
 interface UserProfileFormProps extends FormProps<Http.UserPayload> {
   imageUrl?: string | null;
