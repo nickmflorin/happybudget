@@ -27,7 +27,15 @@ const Page = (props: PageProps): JSX.Element => {
         <Text className={"page-header-subtitle"}>{props.subTitle}</Text>
       </View>
       <View className={"page-content"}>{props.children}</View>
-      <View className={"page-footer"}></View>
+      <View className={"page-footer"}>
+        <Text
+          fixed={true}
+          className={"page-footer-page-no-text"}
+          render={(params: { pageNumber: number; totalPages: number }) => {
+            return `Page ${params.pageNumber}`;
+          }}
+        />
+      </View>
     </ReactPDFPage>
   );
 };
