@@ -388,10 +388,25 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     // so we need to translate that back into a null representation.
     const customCol: Table.Column<R> | undefined = find(columns, { field } as any);
     if (!isNil(customCol)) {
+      // Note: Converting undefined values back to the column's corresponding null
+      // values may now be handled by the valueSetter on the Table.Column object.
+      // We may be able to remove - but leave now for safety.
       const nullValue = customCol.nullValue === undefined ? null : customCol.nullValue;
       const oldValue = event.oldValue === undefined ? nullValue : event.oldValue;
-      const newValue = event.newValue === undefined ? nullValue : event.newValue;
+      let newValue = event.newValue === undefined ? nullValue : event.newValue;
       if (oldValue !== newValue) {
+        // The logic inside this conditional is 100% a HACK - and this type of
+        // programming should not be encouraged.  However, in this case, it is
+        // a HACK to get around AG Grid nonsense.  It appears to be a bug with
+        // AG Grid, but if you have data stored for a cell that is an Array of
+        // length 1, when you drag the cell contents to fill other cells, AG Grid
+        // will pass the data to the onCellValueChanged handler as only the
+        // first element (i.e. [4] becomes 4).  This is problematic for Fringes,
+        // since the cell value corresponds to a list of Fringe IDs, so we need
+        // to make that adjustment here.
+        if (field === "fringes" && !Array.isArray(newValue)) {
+          newValue = [newValue];
+        }
         const change: Table.CellChange<R> = { oldValue, newValue, field, id: event.data.id };
         return change;
       }
@@ -790,24 +805,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
     }
   }, [apis]);
 
-  const _processCellFromClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
-    if (!isNil(params.node)) {
-      const node: RowNode = params.node;
-      const customCol: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
-      if (!isNil(customCol)) {
-        if (!isNil(cutCellChange)) {
-          params = { ...params, value: cutCellChange.oldValue };
-          onChangeEvent({
-            type: "dataChange",
-            payload: cutCellChange
-          });
-          setCutCellChange(null);
-        }
-        return processCellFromClipboard(customCol, node.data as R, params.value);
-      }
-    }
-  });
-
   const processCellForClipboard = useDynamicCallback((column: Table.Column<R>, row: R, value?: any) => {
     const processor = column.processCellForClipboard;
     if (!isNil(processor)) {
@@ -833,6 +830,24 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
         return !isNil(column.nullValue) ? column.nullValue : null;
       }
       return value;
+    }
+  });
+
+  const _processCellFromClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
+    if (!isNil(params.node)) {
+      const node: RowNode = params.node;
+      const customCol: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+      if (!isNil(customCol)) {
+        if (!isNil(cutCellChange)) {
+          params = { ...params, value: cutCellChange.oldValue };
+          onChangeEvent({
+            type: "dataChange",
+            payload: cutCellChange
+          });
+          setCutCellChange(null);
+        }
+        return processCellFromClipboard(customCol, node.data as R, params.value);
+      }
     }
   });
 
