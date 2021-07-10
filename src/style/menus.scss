@@ -1,0 +1,120 @@
+@import "style/colors";
+
+.menu-base {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-variant: tabular-nums;
+  font-feature-settings: "tnum";
+  margin-bottom: 0;
+  padding-left: 0;
+  color: $text-secondary;
+  font-size: 14px;
+  line-height: 0;
+  text-align: left;
+  list-style: none;
+  background: $white;
+  outline: none;
+  box-shadow: none !important;
+  transition: background 0.3s, width 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
+  width: 100%;
+}
+
+.menu-item-base {
+  margin-top: 0px;
+  color: $text-secondary !important;
+  font-family: $roboto;
+  font-weight: 400;
+  min-width: 100px;
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 24px;
+  height: 36px;
+  margin-bottom: 0px !important;
+
+  &.ant-menu-item-selected {
+    background-color: $white;
+  }
+  &.active {
+    background-color: #efefef !important;
+  }
+  &:hover {
+    background-color: #fbfbfb !important;
+  }
+  &.disabled {
+    cursor: not-allowed !important;
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.menu {
+  @extend .menu-base;
+}
+
+.menu-item {
+  @extend .menu-item-base;
+}
+
+.ant-dropdown-menu {
+  @extend .menu-base;
+
+  .ant-dropdown-menu-item {
+    @extend .menu-item-base;
+  }
+}
+
+.ant-menu {
+  @extend .menu-base;
+  .ant-menu-item {
+    @extend .menu-item-base;
+
+    .ant-menu-title-content {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .ant-checkbox-wrapper {
+      height: 24px;
+      width: 24px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+  }
+}
+
+.ag-theme-alpine .ag-popup-editor {
+  @extend .dropdown-base;
+  background-clip: unset !important;
+  border-color: #efefef !important;
+  border: 1px solid #efefef !important;
+  box-shadow: none !important;
+
+  .ant-menu {
+    border-radius: 0px !important;
+
+    &.ant-menu-inline,
+    &.ant-menu-vertical,
+    &.ant-menu-vertical-left {
+      border-right: none !important;
+    }
+  }
+}
+
+.dropdown-menu {
+  @extend .menu-base;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #efefef !important;
+
+  .dropdown-menu-item {
+    @extend .menu-item-base;
+
+    .icon {
+      display: block;
+      height: 100%;
+      width: 100%;
+    }
+  }
+}

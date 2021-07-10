@@ -1,10 +1,10 @@
 import React, { useImperativeHandle, useEffect, useState, useMemo, SyntheticEvent } from "react";
 import { map, isNil, includes, filter, find, forEach, uniqueId } from "lodash";
 import classNames from "classnames";
-import { Menu, Checkbox } from "antd";
+import { Checkbox } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
-import { RenderWithSpinner, ShowHide, VerticalFlexCenter } from "components";
+import { RenderWithSpinner, VerticalFlexCenter, Menu } from "components";
 import { useDeepEqualMemo, useDebouncedJSSearch, useTrackFirstRender, useDynamicCallback } from "lib/hooks";
 import {
   ModelMenuRef,
@@ -72,66 +72,70 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
     }
   }, [visible, hidden, model]);
 
-  return (
-    <ShowHide show={!(isVisible === false)}>
-      <Menu.Item
-        {...rest} // Required for Antd Menu Item
-        {...itemProps}
-        id={`model-menu-${menuId}-item-${model.id}`}
-        onClick={(info: { domEvent: SyntheticEvent }) => onPress(model, info.domEvent)}
-        className={classNames("model-menu-item", !isNil(itemProps) ? itemProps.className : "", {
-          active: isActive,
-          focus: !isNil(focusedIndex) ? focusedIndex === indexMap[String(model.id)] : false,
-          "left-align": leftAlign === true
-        })}
-        style={{
-          ...(!isNil(itemProps) ? itemProps.style : {}),
-          ...(!isNil(levelIndent) ? { paddingLeft: 10 + levelIndent * level } : { paddingLeft: 10 }),
-          borderTop: level === 0 && bordersForLevels === true ? "1px solid #EFEFEF" : "none",
-          paddingTop: level === 0 ? 4 : 2,
-          paddingBottom: level === 0 ? 4 : 2,
-          height: level === 0 ? "32px" : "28px"
-        }}
-      >
-        {checkbox ? (
-          <div className={"with-checkbox-wrapper"}>
-            <Checkbox
-              checked={includes(selected, model.id)}
-              style={{ marginRight: 8 }}
-              onChange={(e: CheckboxChangeEvent) => {
-                e.preventDefault();
-                if (e.target.checked) {
-                  if (selected) {
-                    /* eslint-disable no-console */
-                    console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
+  if (!isVisible === false) {
+    return (
+      <React.Fragment>
+        <Menu.MenuItem
+          {...rest} // Required for Antd Menu Item
+          {...itemProps}
+          key={model.id}
+          id={`model-menu-${menuId}-item-${model.id}`}
+          onClick={(e: React.MouseEvent<HTMLLIElement>) => onPress(model, e)}
+          className={classNames("model-menu-item", !isNil(itemProps) ? itemProps.className : "", {
+            active: isActive,
+            focus: !isNil(focusedIndex) ? focusedIndex === indexMap[String(model.id)] : false,
+            "left-align": leftAlign === true
+          })}
+          style={{
+            ...(!isNil(itemProps) ? itemProps.style : {}),
+            ...(!isNil(levelIndent) ? { paddingLeft: 10 + levelIndent * level } : { paddingLeft: 10 }),
+            borderTop: level === 0 && bordersForLevels === true ? "1px solid #EFEFEF" : "none",
+            paddingTop: level === 0 ? 4 : 2,
+            paddingBottom: level === 0 ? 4 : 2,
+            height: level === 0 ? "32px" : "28px"
+          }}
+        >
+          {checkbox ? (
+            <div className={"with-checkbox-wrapper"}>
+              <Checkbox
+                checked={includes(selected, model.id)}
+                style={{ marginRight: 8 }}
+                onChange={(e: CheckboxChangeEvent) => {
+                  e.preventDefault();
+                  if (e.target.checked) {
+                    if (selected) {
+                      /* eslint-disable no-console */
+                      console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
+                    } else {
+                      onSelect(model, e);
+                    }
                   } else {
-                    onSelect(model, e);
+                    if (!selected) {
+                      /* eslint-disable no-console */
+                      console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
+                    } else {
+                      onDeselect(model, e);
+                    }
                   }
-                } else {
-                  if (!selected) {
-                    /* eslint-disable no-console */
-                    console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
-                  } else {
-                    onDeselect(model, e);
-                  }
-                }
-              }}
-            />
+                }}
+              />
+              <VerticalFlexCenter>
+                {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
+              </VerticalFlexCenter>
+            </div>
+          ) : (
             <VerticalFlexCenter>
               {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
             </VerticalFlexCenter>
-          </div>
-        ) : (
-          <VerticalFlexCenter>
-            {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
-          </VerticalFlexCenter>
+          )}
+        </Menu.MenuItem>
+        {isModelWithChildren(model) && model.children.length !== 0 && (
+          <ModelMenuItems<M> {...primary} models={model.children} level={props.level + 1} />
         )}
-      </Menu.Item>
-      {isModelWithChildren(model) && model.children.length !== 0 && (
-        <ModelMenuItems<M> {...primary} models={model.children} level={props.level + 1} />
-      )}
-    </ShowHide>
-  );
+      </React.Fragment>
+    );
+  }
+  return <></>;
 };
 
 const ModelMenuItems = <M extends Model.M>(props: ModelMenuItemsProps<M>): JSX.Element => {
@@ -538,7 +542,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   /* eslint-disable indent */
   return (
     <RenderWithSpinner loading={props.loading} size={22}>
-      <Menu
+      <Menu.Menu
         className={classNames("model-menu", props.className)}
         id={!isNil(props.id) ? props.id : menuId}
         style={props.style}
@@ -595,49 +599,49 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
                 }}
               />
               {!isNil(props.bottomItem) && (
-                <Menu.Item
+                <Menu.MenuItem
                   className={classNames("model-menu-item", "empty", { active: isBottomItemFocusedState(state) })}
-                  onClick={(info: { domEvent: SyntheticEvent }) =>
-                    !isNil(props.bottomItem?.onClick) && props.bottomItem?.onClick(info.domEvent)
+                  onClick={(e: React.MouseEvent<HTMLLIElement>) =>
+                    !isNil(props.bottomItem?.onClick) && props.bottomItem?.onClick(e)
                   }
                 >
                   {!isNil(props.bottomItem.icon) && <div className={"icon-container"}>{props.bottomItem.icon}</div>}
                   {props.bottomItem.text}
-                </Menu.Item>
+                </Menu.MenuItem>
               )}
             </React.Fragment>
           )}
         {(isNoSearchResultsFocusedState(state) || isNoSearchResultsUnfocusedState(state)) &&
           /* eslint-disable indent */
           !isNil(props.onNoSearchResults) && (
-            <Menu.Item
+            <Menu.MenuItem
               className={classNames("model-menu-item", "empty", {
                 active: isNoSearchResultsFocusedState(state) && state.noSearchResultsActive === true
               })}
-              onClick={(info: { domEvent: SyntheticEvent }) =>
-                !isNil(props.onNoSearchResults?.onClick) && props.onNoSearchResults?.onClick(info.domEvent)
+              onClick={(e: React.MouseEvent<HTMLLIElement>) =>
+                !isNil(props.onNoSearchResults?.onClick) && props.onNoSearchResults?.onClick(e)
               }
             >
               {!isNil(props.onNoSearchResults.icon) && (
                 <div className={"icon-container"}>{props.onNoSearchResults.icon}</div>
               )}
               {props.onNoSearchResults.text}
-            </Menu.Item>
+            </Menu.MenuItem>
           )}
         {(isNoItemsFocusedState(state) || isNoItemsUnfocusedState(state)) && !isNil(props.onNoData) && (
-          <Menu.Item
+          <Menu.MenuItem
             className={classNames("model-menu-item", "empty", {
               active: isNoItemsFocusedState(state) && state.noItemsActive === true
             })}
-            onClick={(info: { domEvent: SyntheticEvent }) =>
-              !isNil(props.onNoData?.onClick) && props.onNoData?.onClick(info.domEvent)
+            onClick={(e: React.MouseEvent<HTMLLIElement>) =>
+              !isNil(props.onNoData?.onClick) && props.onNoData?.onClick(e)
             }
           >
             {!isNil(props.onNoData.icon) && <div className={"icon-container"}>{props.onNoData.icon}</div>}
             {props.onNoData.text}
-          </Menu.Item>
+          </Menu.MenuItem>
         )}
-      </Menu>
+      </Menu.Menu>
     </RenderWithSpinner>
   );
 };

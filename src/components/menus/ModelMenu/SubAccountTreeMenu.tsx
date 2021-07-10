@@ -36,6 +36,9 @@ const SubAccountTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
       bordersForLevels={true}
       searchIndices={["description", "identifier"]}
       clientSearching={false}
+      onNoData={{
+        text: "No Sub-Accounts or Details"
+      }}
       renderItem={(model: Model.SimpleSubAccount, context: { level: number; index: number }) => {
         if (context.level !== 0) {
           return (

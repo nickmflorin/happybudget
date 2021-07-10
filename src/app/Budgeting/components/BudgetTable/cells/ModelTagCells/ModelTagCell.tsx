@@ -15,7 +15,7 @@ const ModelTagCell = <M extends Model.Model, R extends Table.Row>({
   return (
     <Cell {...props} onClear={() => !isNil(props.setValue) && props.setValue(null)} hideClear={children === null}>
       <div style={{ display: "flex", justifyContent: leftAlign === true ? "left" : "center" }}>
-        {!isNil(children) ? <Tag model={children} /> : <Tag.Empty visible={false} />}
+        {!isNil(children) ? <Tag model={children} /> : <></>}
       </div>
     </Cell>
   );
