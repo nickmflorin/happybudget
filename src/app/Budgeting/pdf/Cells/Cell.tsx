@@ -102,6 +102,18 @@ const Cell = <R extends Table.PdfRow, M extends Model.Model>(props: CellProps<R,
     };
   }, [props.column]);
 
+  if (props.border === false) {
+    console.log(
+      classNames(
+        evaluateOptionalCallbackProp<R, M, string>(
+          props.isHeader === true ? props.column.headerCellProps?.className : props.column.cellProps?.className,
+          fullCallbackParams
+        ),
+        evaluateClassName<R, M>(props.className, fullCallbackParams),
+        { "no-border": props.border === false }
+      )
+    );
+  }
   return (
     <View
       className={classNames(

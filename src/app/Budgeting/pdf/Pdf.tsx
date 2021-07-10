@@ -24,7 +24,7 @@ const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
                 headerName: "Acct #",
                 type: "text",
                 width: "10%",
-                cellProps: { textStyle: { textAlign: "center" } }
+                cellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
               },
               {
                 field: "description",

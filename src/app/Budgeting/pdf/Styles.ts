@@ -129,8 +129,8 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     borderRightWidth: 0,
     borderColor: TABLE_BORDER_COLOR
   },
-  "td-no-border": {
-    border: "none"
+  "no-border": {
+    border: "none !important"
   },
   "indent-td": {
     paddingLeft: 18

@@ -28,7 +28,7 @@ const GroupRow = <R extends Table.PdfRow, M extends Model.Model>(
     return reduce(
       props.columns,
       (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>, index: number) => {
-        if (props.columns.length === 1 || index === 2) {
+        if (props.columns.length === 1 || index === 1) {
           obj[col.field] = props.group.name;
         } else {
           obj[col.field] = null;
