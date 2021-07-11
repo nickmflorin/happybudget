@@ -10,10 +10,7 @@ import { consolidateTableChange } from "lib/model/util";
 
 import { createBulkCreatePayload } from "./util";
 
-export interface AccountsTasksActionMap<
-  A extends Model.TemplateAccount | Model.BudgetAccount,
-  G extends Model.TemplateGroup | Model.BudgetGroup
-> {
+export interface AccountsTasksActionMap<A extends Model.Account | Model.Account, G extends Model.Group | Model.Group> {
   deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
@@ -34,9 +31,9 @@ export interface AccountsTasksActionMap<
 
 export interface AccountsServiceSet<
   M extends Model.Template | Model.Budget,
-  A extends Model.TemplateAccount | Model.BudgetAccount,
-  G extends Model.TemplateGroup | Model.BudgetGroup,
-  P extends Http.TemplateAccountPayload | Http.BudgetAccountPayload
+  A extends Model.Account | Model.Account,
+  G extends Model.Group | Model.Group,
+  P extends Http.AccountPayload | Http.AccountPayload
 > {
   bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<M>;
   bulkUpdate: (id: number, data: Http.BulkUpdatePayload<P>[], options: Http.RequestOptions) => Promise<M>;
@@ -58,10 +55,10 @@ export interface AccountsTaskSet<R extends Table.Row> {
 
 export const createAccountsTaskSet = <
   M extends Model.Template | Model.Budget,
-  A extends Model.TemplateAccount | Model.BudgetAccount,
+  A extends Model.Account | Model.Account,
   R extends Table.Row,
-  G extends Model.TemplateGroup | Model.BudgetGroup,
-  P extends Http.TemplateAccountPayload | Http.BudgetAccountPayload
+  G extends Model.Group | Model.Group,
+  P extends Http.AccountPayload | Http.AccountPayload
 >(
   /* eslint-disable indent */
   actions: AccountsTasksActionMap<A, G>,

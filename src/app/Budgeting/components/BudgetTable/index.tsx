@@ -127,7 +127,6 @@ class BudgetTableApis implements BudgetTable.GridSet<Table.APIs | null> {
 const BudgetTable = <
   R extends Table.Row,
   M extends Model.Model,
-  G extends Model.Group = Model.Group,
   P extends Http.ModelPayload<M> = Http.ModelPayload<M>
 >({
   /* eslint-disable indent */
@@ -151,7 +150,7 @@ const BudgetTable = <
   isCellEditable,
   isCellSelectable,
   ...props
-}: BudgetTable.Props<R, M, G, P>) => {
+}: BudgetTable.Props<R, M, P>) => {
   const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
   const [apis, _setApis] = useState<BudgetTableApis>(new BudgetTableApis({}));
   const gridRef = useRef<BudgetTable.PrimaryGridRef>(null);
@@ -467,7 +466,7 @@ const BudgetTable = <
   return (
     <WrapInApplicationSpinner hideWhileLoading={false} loading={loading}>
       <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
-        <PrimaryGrid<R, M, G>
+        <PrimaryGrid<R, M>
           apis={apis.primary}
           gridRef={gridRef}
           onGridReady={(e: GridReadyEvent) => onGridReady("primary", { grid: e.api, column: e.columnApi })}

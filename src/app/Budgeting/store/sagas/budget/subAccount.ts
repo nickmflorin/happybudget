@@ -1,6 +1,6 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { take, call, cancel, put, cancelled, select } from "redux-saga/effects";
+import { call, put, select, cancelled, take, cancel, spawn } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -9,8 +9,12 @@ import * as models from "lib/model";
 import { ActionType } from "../../actions";
 import { loadingBudgetAction, requestBudgetAction } from "../../actions/budget";
 import * as actions from "../../actions/budget/subAccount";
-
-import { createStandardSaga, createSubAccountTaskSet } from "../factories";
+import {
+  createStandardSaga,
+  createStandardFringesSaga,
+  createSubAccountTaskSet,
+  createFringeTaskSet
+} from "../factories";
 
 export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
   const subaccountId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.id);
@@ -146,7 +150,36 @@ export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
   }
 }
 
-const tasks = createSubAccountTaskSet<Model.BudgetSubAccount, BudgetTable.BudgetSubAccountRow, Model.BudgetGroup>(
+const fringeTasks = createFringeTaskSet<Model.Budget>(
+  {
+    response: actions.responseFringesAction,
+    loading: actions.loadingFringesAction,
+    addToState: actions.addFringeToStateAction,
+    deleting: actions.deletingFringeAction,
+    creating: actions.creatingFringeAction,
+    updating: actions.updatingFringeAction,
+    requestBudget: requestBudgetAction
+  },
+  {
+    request: api.getBudgetFringes,
+    create: api.createBudgetFringe,
+    bulkUpdate: api.bulkUpdateBudgetFringes,
+    bulkCreate: api.bulkCreateBudgetFringes,
+    bulkDelete: api.bulkDeleteBudgetFringes
+  },
+  (state: Modules.ApplicationStore) => state.budgeting.budget.budget.id,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.fringes.data
+);
+
+const fringesRootSaga = createStandardFringesSaga(
+  {
+    Request: ActionType.Budget.SubAccount.Fringes.Request,
+    TableChanged: ActionType.Budget.SubAccount.Fringes.TableChanged
+  },
+  fringeTasks
+);
+
+const tasks = createSubAccountTaskSet<Model.SubAccount, BudgetTable.SubAccountRow, Model.Group>(
   {
     loading: actions.loadingSubAccountsAction,
     deleting: actions.deletingSubAccountAction,
@@ -172,7 +205,7 @@ const tasks = createSubAccountTaskSet<Model.BudgetSubAccount, BudgetTable.Budget
       request: actions.requestGroupsAction
     }
   },
-  models.BudgetSubAccountRowManager,
+  models.SubAccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.id,
   (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.subaccounts.data,
   (state: Modules.ApplicationStore) => state.budgeting.budget.autoIndex
@@ -200,7 +233,7 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
   }
 }
 
-export default createStandardSaga(
+const rootSubAccountSaga = createStandardSaga(
   {
     Request: ActionType.Budget.SubAccount.SubAccounts.Request,
     TableChange: ActionType.Budget.SubAccount.TableChanged,
@@ -244,3 +277,8 @@ export default createStandardSaga(
   watchForRequestSubAccountSaga,
   watchForSubAccountIdChangedSaga
 );
+
+export default function* rootSaga(): SagaIterator {
+  yield spawn(rootSubAccountSaga);
+  yield spawn(fringesRootSaga);
+}

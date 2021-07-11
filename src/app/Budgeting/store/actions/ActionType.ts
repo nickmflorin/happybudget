@@ -30,17 +30,6 @@ const ActionType = {
       RemoveFromState: "budget.comments.RemoveFromState",
       UpdateInState: "budget.comments.UpdateInState"
     },
-    Fringes: {
-      TableChanged: "budget.fringes.TableChanged",
-      Deleting: "budget.fringes.Deleting",
-      Creating: "budget.fringes.Creating",
-      Updating: "budget.fringes.Updating",
-      Loading: "budget.fringes.Loading",
-      Response: "budget.fringes.Response",
-      Request: "budget.fringes.Request",
-      AddToState: "budget.fringes.AddToState",
-      SetSearch: "budget.fringes.SetSearch"
-    },
     Accounts: {
       TableChanged: "budget.accounts.TableChanged",
       Deleting: "budget.accounts.Deleting",
@@ -92,6 +81,17 @@ const ActionType = {
         RemoveFromState: "budget.subaccount.comments.RemoveFromState",
         UpdateInState: "budget.subaccount.comments.UpdateInState"
       },
+      Fringes: {
+        TableChanged: "budget.subaccount.fringes.TableChanged",
+        Deleting: "budget.subaccount.fringes.Deleting",
+        Creating: "budget.subaccount.fringes.Creating",
+        Updating: "budget.subaccount.fringes.Updating",
+        Loading: "budget.subaccount.fringes.Loading",
+        Response: "budget.subaccount.fringes.Response",
+        Request: "budget.subaccount.fringes.Request",
+        AddToState: "budget.subaccount.fringes.AddToState",
+        SetSearch: "budget.subaccount.fringes.SetSearch"
+      },
       SubAccounts: {
         Deleting: "budget.subaccount.subaccounts.Deleting",
         Creating: "budget.subaccount.subaccounts.Creating",
@@ -141,6 +141,17 @@ const ActionType = {
         AddToState: "budget.account.comments.AddToState",
         RemoveFromState: "budget.account.comments.RemoveFromState",
         UpdateInState: "budget.account.comments.UpdateInState"
+      },
+      Fringes: {
+        TableChanged: "budget.account.fringes.TableChanged",
+        Deleting: "budget.account.fringes.Deleting",
+        Creating: "budget.account.fringes.Creating",
+        Updating: "budget.account.fringes.Updating",
+        Loading: "budget.account.fringes.Loading",
+        Response: "budget.account.fringes.Response",
+        Request: "budget.account.fringes.Request",
+        AddToState: "budget.account.fringes.AddToState",
+        SetSearch: "budget.account.fringes.SetSearch"
       },
       SubAccounts: {
         Deleting: "budget.account.subaccounts.Deleting",
@@ -196,17 +207,6 @@ const ActionType = {
     Loading: "template.Loading",
     Response: "template.Response",
     Request: "template.Request",
-    Fringes: {
-      TableChanged: "template.fringes.TableChanged",
-      Deleting: "template.fringes.Deleting",
-      Creating: "template.fringes.Creating",
-      Updating: "template.fringes.Updating",
-      Loading: "template.fringes.Loading",
-      Response: "template.fringes.Response",
-      Request: "template.fringes.Request",
-      AddToState: "template.fringes.AddToState",
-      SetSearch: "template.fringes.SetSearch"
-    },
     Accounts: {
       TableChanged: "template.accounts.TableChanged",
       Deleting: "template.accounts.Deleting",
@@ -237,6 +237,17 @@ const ActionType = {
       Request: "template.subaccount.Request",
       UpdateInState: "template.subaccount.UpdateInState",
       TableChanged: "template.subaccount.TableChanged",
+      Fringes: {
+        TableChanged: "template.subaccount.fringes.TableChanged",
+        Deleting: "template.subaccount.fringes.Deleting",
+        Creating: "template.subaccount.fringes.Creating",
+        Updating: "template.subaccount.fringes.Updating",
+        Loading: "template.subaccount.fringes.Loading",
+        Response: "template.subaccount.fringes.Response",
+        Request: "template.subaccount.fringes.Request",
+        AddToState: "template.subaccount.fringes.AddToState",
+        SetSearch: "template.subaccount.fringes.SetSearch"
+      },
       SubAccounts: {
         Deleting: "template.subaccount.subaccounts.Deleting",
         Creating: "template.subaccount.subaccounts.Creating",
@@ -267,6 +278,17 @@ const ActionType = {
       Request: "template.account.Request",
       UpdateInState: "template.account.UpdateInState",
       TableChanged: "template.account.TableChanged",
+      Fringes: {
+        TableChanged: "template.account.fringes.TableChanged",
+        Deleting: "template.account.fringes.Deleting",
+        Creating: "template.account.fringes.Creating",
+        Updating: "template.account.fringes.Updating",
+        Loading: "template.account.fringes.Loading",
+        Response: "template.account.fringes.Response",
+        Request: "template.account.fringes.Request",
+        AddToState: "template.account.fringes.AddToState",
+        SetSearch: "template.account.fringes.SetSearch"
+      },
       SubAccounts: {
         Loading: "template.account.subaccounts.Loading",
         Response: "template.account.subaccounts.Response",

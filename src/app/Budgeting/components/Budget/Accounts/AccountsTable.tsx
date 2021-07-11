@@ -9,7 +9,6 @@ import { faCommentsAlt, faPrint } from "@fortawesome/pro-solid-svg-icons";
 import * as api from "api";
 import { download } from "lib/util/files";
 
-import * as models from "lib/model";
 import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals";
 import { setApplicationLoadingAction } from "store/actions";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
@@ -30,7 +29,7 @@ const selectTableSearch = simpleShallowEqualSelector(
 
 const AccountsTable = (): JSX.Element => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<Model.BudgetGroup | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<Model.Group | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -44,34 +43,26 @@ const AccountsTable = (): JSX.Element => {
 
   return (
     <React.Fragment>
-      <GenericAccountsTable<
-        BudgetTable.BudgetAccountRow,
-        Model.BudgetAccount,
-        Model.BudgetGroup,
-        Http.BudgetAccountPayload
-      >
+      <GenericAccountsTable
         data={data}
         groups={groups}
-        manager={models.BudgetAccountRowManager}
         detail={budgetDetail}
         search={search}
         onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
         exportFileName={!isNil(budgetDetail) ? `budget_${budgetDetail.name}_accounts` : ""}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.BudgetAccountRow>) =>
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.AccountRow>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
-        onDeleteGroup={(group: Model.BudgetGroup) => dispatch(actions.deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: BudgetTable.BudgetAccountRow) =>
-          dispatch(actions.removeAccountFromGroupAction(row.id))
-        }
-        onRowAddToGroup={(group: number, row: BudgetTable.BudgetAccountRow) =>
+        onDeleteGroup={(group: Model.Group) => dispatch(actions.deleteGroupAction(group.id))}
+        onRowRemoveFromGroup={(row: BudgetTable.AccountRow) => dispatch(actions.removeAccountFromGroupAction(row.id))}
+        onRowAddToGroup={(group: number, row: BudgetTable.AccountRow) =>
           dispatch(actions.addAccountToGroupAction({ id: row.id, group }))
         }
-        onGroupRows={(rows: BudgetTable.BudgetAccountRow[]) =>
-          setGroupAccounts(map(rows, (row: BudgetTable.BudgetAccountRow) => row.id))
+        onGroupRows={(rows: BudgetTable.AccountRow[]) =>
+          setGroupAccounts(map(rows, (row: BudgetTable.AccountRow) => row.id))
         }
-        onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
+        onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
         columns={[
           {
             field: "estimated",
@@ -131,7 +122,7 @@ const AccountsTable = (): JSX.Element => {
           budgetId={budgetId}
           accounts={groupAccounts}
           open={true}
-          onSuccess={(group: Model.BudgetGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupAccounts(undefined);
             dispatch(actions.addGroupToStateAction(group));
           }}
@@ -139,11 +130,11 @@ const AccountsTable = (): JSX.Element => {
         />
       )}
       {!isNil(groupToEdit) && (
-        <EditGroupModal<Model.BudgetGroup>
+        <EditGroupModal
           group={groupToEdit}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
-          onSuccess={(group: Model.BudgetGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
           }}

@@ -1,12 +1,13 @@
+import * as api from "api";
+
 import { Form } from "components";
 import { GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
-import { createTemplateAccountGroup } from "api/services";
 
 import Modal from "./Modal";
 
 interface CreateTemplateAccountGroupModalProps {
-  onSuccess: (group: Model.TemplateGroup) => void;
+  onSuccess: (group: Model.Group) => void;
   onCancel: () => void;
   templateId: number;
   accounts: number[];
@@ -36,12 +37,13 @@ const CreateTemplateAccountGroupModal = ({
           .then((values: GroupFormValues) => {
             form.setLoading(true);
 
-            createTemplateAccountGroup(templateId, {
-              name: values.name,
-              children: accounts,
-              color: values.color
-            })
-              .then((group: Model.TemplateGroup) => {
+            api
+              .createTemplateAccountGroup(templateId, {
+                name: values.name,
+                children: accounts,
+                color: values.color
+              })
+              .then((group: Model.Group) => {
                 form.resetFields();
                 onSuccess(group);
               })

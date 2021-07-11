@@ -47,35 +47,32 @@ namespace Modules {
   }
 
   namespace Budgeting {
-    type BudgetDirective = "Budget" | "Template";
+    type AccountStoreType = { type: "account" }
+    type SubAccountStoreType = { type: "subaccount" }
+    type StoreType = AccountStoreType | SubAccountStoreType;
 
-    interface SubAccountsStore<SA extends Model.Model, G extends Model.Group> extends Redux.ModelListResponseStore<SA> {
-      readonly groups: Redux.ModelListResponseStore<G>;
+    type SubAccountsStore = Redux.ModelListResponseStore<Model.SubAccount> & SubAccountStoreType & {
+      // TODO: Move me to the SubAccountStore (singular).
+      readonly groups: Redux.ModelListResponseStore<Model.Group>;
+    }
+
+    type AccountsStore = Redux.ModelListResponseStore<Model.Account> & AccountStoreType & {
+      // TODO: Move me to the AccountStore (singular).
+      readonly groups: Redux.ModelListResponseStore<Model.Group>;
+    }
+
+    type SubAccountStore<SASS extends Modules.Budgeting.SubAccountsStore> = SubAccountStoreType & {
+      readonly id: number | null;
+      readonly detail: Redux.ModelDetailResponseStore<Model.SubAccount>;
+      readonly subaccounts: SASS;
       readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
     }
 
-    interface AccountsStore<A extends Model.Model, G extends Model.Group> extends Redux.ModelListResponseStore<A> {
-      readonly groups: Redux.ModelListResponseStore<G>;
-    }
-
-    interface SubAccountStore<
-      SA extends Model.Model,
-      G extends Model.Group,
-      SASS extends Modules.Budgeting.SubAccountsStore<SA, G>
-    > {
+    type AccountStore<SASS extends Modules.Budgeting.SubAccountsStore> = AccountStoreType & {
       readonly id: number | null;
-      readonly detail: Redux.ModelDetailResponseStore<SA>;
+      readonly detail: Redux.ModelDetailResponseStore<Model.Account>;
       readonly subaccounts: SASS;
-    }
-
-    interface AccountStore<
-      A extends Model.Model,
-      G extends Model.Group,
-      SASS extends Modules.Budgeting.SubAccountsStore<SA, G>
-    > {
-      readonly id: number | null;
-      readonly detail: Redux.ModelDetailResponseStore<A>;
-      readonly subaccounts: SASS;
+      readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
     }
 
     interface BaseBudgetStore<M extends Model.Model> {
@@ -84,19 +81,15 @@ namespace Modules {
     }
 
     interface BaseBudgetModuleStore<
-      A extends Model.Model,
-      SA extends Model.Model,
-      G extends Model.Group,
-      ASS extends Modules.Budgeting.AccountsStore<A, G>,
-      SASS extends Modules.Budgeting.SubAccountsStore<SA, G>,
-      AS extends Modules.Budgeting.AccountStore<A, G, SASS>,
-      SAS extends Modules.Budgeting.SubACcountStore<SA, G, SASS>
+      ASS extends Modules.Budgeting.AccountsStore,
+      SASS extends Modules.Budgeting.SubAccountsStore,
+      AS extends Modules.Budgeting.AccountStore<SASS>,
+      SAS extends Modules.Budgeting.SubAccountStore<SASS>
     > {
       readonly autoIndex: boolean;
       readonly subaccount: SAS;
       readonly account: AS;
       readonly accounts: ASS;
-      readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
     }
 
     namespace Budget {
@@ -105,32 +98,22 @@ namespace Modules {
       }
 
       /* eslint-disable no-shadow */
-      interface SubAccountsStore extends Modules.Budgeting.SubAccountsStore<Model.BudgetSubAccount, Model.BudgetGroup> {
+      type SubAccountsStore = Modules.Budgeting.SubAccountsStore & {
         readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>;
       }
 
       /* eslint-disable no-shadow */
-      interface AccountsStore extends Modules.Budgeting.AccountsStore<Model.BudgetAccount, Model.BudgetGroup> {
+      type AccountsStore = Modules.Budgeting.AccountsStore & {
         readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>;
       }
 
       /* eslint-disable no-shadow */
-      interface SubAccountStore
-        extends Modules.Budgeting.SubAccountStore<
-          Model.BudgetSubAccount,
-          Model.BudgetGroup,
-          Modules.Budgeting.Budget.SubAccountsStore
-        > {
+      type SubAccountStore = Modules.Budgeting.SubAccountStore<Modules.Budgeting.Budget.SubAccountsStore> & {
         readonly comments: CommentsStore;
       }
 
       /* eslint-disable no-shadow */
-      interface AccountStore
-        extends Modules.Budgeting.AccountStore<
-          Model.BudgetAccount,
-          Model.BudgetGroup,
-          Modules.Budgeting.Budget.SubAccountsStore
-        > {
+      type AccountStore = Modules.Budgeting.AccountStore<Modules.Budgeting.Budget.SubAccountsStore> & {
         readonly comments: CommentsStore;
       }
 
@@ -140,9 +123,6 @@ namespace Modules {
 
       interface Store
         extends Modules.Budgeting.BaseBudgetModuleStore<
-          Model.BudgetAccount,
-          Model.BudgetSubAccount,
-          Model.BudgetGroup,
           Modules.Budgeting.Budget.AccountsStore,
           Modules.Budgeting.Budget.SubAccountsStore,
           Modules.Budgeting.Budget.AccountStore,
@@ -156,35 +136,21 @@ namespace Modules {
     }
 
     namespace Template {
-      interface AccountsStore extends Redux.ModelListResponseStore<Model.TemplateAccount> {
-        readonly groups: Redux.ModelListResponseStore<Model.TemplateGroup>;
-      }
-
-      interface SubAccountsStore
-        extends Modules.Budgeting.SubAccountsStore<Model.TemplateSubAccount, Model.TemplateGroup> {}
-
-      interface SubAccountStore
-        extends Modules.Budgeting.SubAccountStore<
-          Model.TemplateSubAccount,
-          Model.TemplateGroup,
-          Modules.Budgeting.Template.SubAccountsStore
-        > {}
+      /* eslint-disable no-shadow */
+      type AccountsStore = Modules.Budgeting.AccountsStore;
 
       /* eslint-disable no-shadow */
-      interface AccountStore
-        extends Modules.Budgeting.AccountStore<
-          Model.TemplateAccount,
-          Model.TemplateGroup,
-          Modules.Budgeting.Template.SubAccountsStore
-        > {}
+      type SubAccountsStore = Modules.Budgeting.SubAccountsStore;
+
+      type SubAccountStore = Modules.Budgeting.SubAccountStore<Modules.Budgeting.Template.SubAccountsStore>;
+
+      /* eslint-disable no-shadow */
+      type AccountStore = Modules.Budgeting.AccountStore<Modules.Budgeting.Template.SubAccountsStore>;
 
       interface TemplateStore extends Modules.Budgeting.BaseBudgetStore<Model.Template> {}
 
       interface Store
         extends Modules.Budgeting.BaseBudgetModuleStore<
-          Model.TemplateAccount,
-          Model.TemplateSubAccount,
-          Model.TemplateGroup,
           Modules.Budgeting.Template.AccountsStore,
           Modules.Budgeting.Template.SubAccountsStore,
           Modules.Budgeting.Template.AccountStore,

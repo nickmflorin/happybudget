@@ -40,7 +40,7 @@ import { rangeSelectionIsSingleCell } from "../util";
 import BudgetTableMenu from "./Menu";
 import Grid from "./Grid";
 
-const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>({
+const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   /* eslint-disable indent */
   apis,
   gridRef,
@@ -63,7 +63,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   onChangeEvent,
   onBack,
   ...props
-}: BudgetTable.PrimaryGridProps<R, M, G>): JSX.Element => {
+}: BudgetTable.PrimaryGridProps<R, M>): JSX.Element => {
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
   // Right now, we can only support Cut/Paste for 1 cell at a time.  Multi-cell
@@ -461,7 +461,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   const getRowStyle = useDynamicCallback((params: RowClassParams) => {
     const row: R = params.node.data;
     if (row.meta.isGroupFooter === true) {
-      const group: G | undefined = find(groups, { id: row.group } as any);
+      const group: Model.Group | undefined = find(groups, { id: row.group } as any);
       if (isNil(group)) {
         return {};
       }
@@ -483,7 +483,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       return [];
     } else if (row.meta.isGroupFooter) {
       if (!isNil(row.group) && !isNil(groupParams)) {
-        const group: G | undefined = find(groups, { id: row.group } as any);
+        const group: Model.Group | undefined = find(groups, { id: row.group } as any);
         if (!isNil(group)) {
           return [
             {
@@ -502,7 +502,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       if (isNil(groupParams)) {
         return [deleteRowContextMenuItem];
       } else if (!isNil(row.group)) {
-        const group: G | undefined = find(groups, { id: row.group } as any);
+        const group: Model.Group | undefined = find(groups, { id: row.group } as any);
         if (!isNil(group)) {
           return [
             deleteRowContextMenuItem,
@@ -534,7 +534,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
         if (groups.length !== 0) {
           menuItems.push({
             name: "Add to Group",
-            subMenu: map(groups, (group: G) => ({
+            subMenu: map(groups, (group: Model.Group) => ({
               name: group.name,
               action: () => groupParams.onRowAddToGroup(group.id, row)
             }))
@@ -646,7 +646,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
   });
 
   useEffect(() => {
-    const createGroupFooter = (group: G): R | null => {
+    const createGroupFooter = (group: Model.Group): R | null => {
       const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
       if (columns.length > baseColumns.length) {
         return reduce(
@@ -654,8 +654,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
           (obj: { [key: string]: any }, col: Table.Column<R>) => {
             if (!isNil(col.field)) {
               if (col.isCalculated === true) {
-                if (!isNil(group[col.field as keyof G])) {
-                  obj[col.field] = group[col.field as keyof G];
+                if (!isNil(group[col.field as keyof Model.Group])) {
+                  obj[col.field] = group[col.field as keyof Model.Group];
                 } else {
                   obj[col.field] = null;
                 }
@@ -681,7 +681,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
       return null;
     };
     const getGroupForModel = (model: M): number | null => {
-      const group: G | undefined = find(groups, (g: G) =>
+      const group: Model.Group | undefined = find(groups, (g: Model.Group) =>
         includes(
           map(g.children, (child: number) => child),
           model.id
@@ -696,7 +696,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model, G extends Model
 
     const newTable: R[] = [];
     forEach(groupedModels, (ms: M[], groupId: string) => {
-      const group: G | undefined = find(groups, { id: parseInt(groupId) } as any);
+      const group: Model.Group | undefined = find(groups, { id: parseInt(groupId) } as any);
       if (!isNil(group)) {
         newTable.push(
           ...orderByFieldOrdering(

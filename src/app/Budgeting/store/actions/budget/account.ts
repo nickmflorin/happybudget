@@ -4,8 +4,8 @@ import ActionType from "../ActionType";
 export const setAccountIdAction = simpleAction<number>(ActionType.Budget.Account.SetId);
 export const requestAccountAction = simpleAction<null>(ActionType.Budget.Account.Request);
 export const loadingAccountAction = simpleAction<boolean>(ActionType.Budget.Account.Loading);
-export const responseAccountAction = simpleAction<Model.BudgetAccount | undefined>(ActionType.Budget.Account.Response);
-export const updateAccountInStateAction = simpleAction<Partial<Redux.UpdateModelActionPayload<Model.BudgetAccount>>>(
+export const responseAccountAction = simpleAction<Model.Account | undefined>(ActionType.Budget.Account.Response);
+export const updateAccountInStateAction = simpleAction<Partial<Redux.UpdateModelActionPayload<Model.Account>>>(
   ActionType.Budget.Account.UpdateInState
 );
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.Account.Comments.Request);
@@ -37,7 +37,7 @@ export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budg
 export const updateCommentInStateAction = simpleAction<
   Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
 >(ActionType.Budget.Account.Comments.UpdateInState);
-export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.BudgetSubAccountRow>>(
+export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.SubAccountRow>>(
   ActionType.Budget.Account.TableChanged
 );
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
@@ -49,7 +49,7 @@ export const updatingSubAccountAction = simpleAction<Redux.ModelListActionPayloa
 export const creatingSubAccountAction = simpleAction<boolean>(ActionType.Budget.Account.SubAccounts.Creating);
 export const requestSubAccountsAction = simpleAction<null>(ActionType.Budget.Account.SubAccounts.Request);
 export const loadingSubAccountsAction = simpleAction<boolean>(ActionType.Budget.Account.SubAccounts.Loading);
-export const responseSubAccountsAction = simpleAction<Http.ListResponse<Model.BudgetSubAccount>>(
+export const responseSubAccountsAction = simpleAction<Http.ListResponse<Model.SubAccount>>(
   ActionType.Budget.Account.SubAccounts.Response
 );
 export const setSubAccountsSearchAction = simpleAction<string>(ActionType.Budget.Account.SubAccounts.SetSearch);
@@ -59,18 +59,16 @@ export const removeSubAccountFromGroupAction = simpleAction<number>(
 export const addSubAccountToGroupAction = simpleAction<{ id: number; group: number }>(
   ActionType.Budget.Account.SubAccounts.AddToGroup
 );
-export const addSubAccountToStateAction = simpleAction<Model.BudgetSubAccount>(
+export const addSubAccountToStateAction = simpleAction<Model.SubAccount>(
   ActionType.Budget.Account.SubAccounts.AddToState
 );
 export const requestGroupsAction = simpleAction<null>(ActionType.Budget.Account.SubAccounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.Account.SubAccounts.Groups.Loading);
-export const responseGroupsAction = simpleAction<Http.ListResponse<Model.BudgetGroup>>(
+export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Group>>(
   ActionType.Budget.Account.SubAccounts.Groups.Response
 );
-export const addGroupToStateAction = simpleAction<Model.BudgetGroup>(
-  ActionType.Budget.Account.SubAccounts.Groups.AddToState
-);
-export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetGroup>>(
+export const addGroupToStateAction = simpleAction<Model.Group>(ActionType.Budget.Account.SubAccounts.Groups.AddToState);
+export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Group>>(
   ActionType.Budget.Account.SubAccounts.Groups.UpdateInState
 );
 export const removeGroupFromStateAction = simpleAction<number>(
@@ -85,3 +83,20 @@ export const loadingHistoryAction = simpleAction<boolean>(ActionType.Budget.Acco
 export const responseHistoryAction = simpleAction<Http.ListResponse<Model.HistoryEvent>>(
   ActionType.Budget.Account.SubAccounts.History.Response
 );
+export const requestFringesAction = simpleAction<null>(ActionType.Budget.Account.Fringes.Request);
+export const loadingFringesAction = simpleAction<boolean>(ActionType.Budget.Account.Fringes.Loading);
+export const responseFringesAction = simpleAction<Http.ListResponse<Model.Fringe>>(
+  ActionType.Budget.Account.Fringes.Response
+);
+export const handleFringesTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.FringeRow>>(
+  ActionType.Budget.Account.Fringes.TableChanged
+);
+export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(
+  ActionType.Budget.Account.Fringes.Deleting
+);
+export const updatingFringeAction = simpleAction<Redux.ModelListActionPayload>(
+  ActionType.Budget.Account.Fringes.Updating
+);
+export const creatingFringeAction = simpleAction<boolean>(ActionType.Budget.Account.Fringes.Creating);
+export const setFringesSearchAction = simpleAction<string>(ActionType.Budget.Account.Fringes.SetSearch);
+export const addFringeToStateAction = simpleAction<Model.Fringe>(ActionType.Budget.Account.Fringes.AddToState);

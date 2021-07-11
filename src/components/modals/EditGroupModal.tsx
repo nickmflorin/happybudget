@@ -1,23 +1,19 @@
+import * as api from "api";
+
 import { Form } from "components";
 import { GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
-import { updateGroup } from "api/services";
 
 import Modal from "./Modal";
 
-interface EditSubAccountGroupModalProps<G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup> {
-  onSuccess: (group: G) => void;
+interface EditSubAccountGroupModalProps {
+  onSuccess: (group: Model.Group) => void;
   onCancel: () => void;
-  group: G;
+  group: Model.Group;
   open: boolean;
 }
 
-const EditSubAccountGroupModal = <G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup>({
-  group,
-  open,
-  onSuccess,
-  onCancel
-}: EditSubAccountGroupModalProps<G>): JSX.Element => {
+const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubAccountGroupModalProps): JSX.Element => {
   const [form] = Form.useForm();
 
   return (
@@ -33,8 +29,9 @@ const EditSubAccountGroupModal = <G extends Model.Group = Model.BudgetGroup | Mo
           .validateFields()
           .then((values: GroupFormValues) => {
             form.setLoading(true);
-            updateGroup<G>(group.id, values)
-              .then((response: G) => {
+            api
+              .updateGroup(group.id, values)
+              .then((response: Model.Group) => {
                 form.resetFields();
                 onSuccess(response);
               })

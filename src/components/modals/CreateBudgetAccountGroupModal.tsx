@@ -1,12 +1,13 @@
+import * as api from "api";
+
 import { Form } from "components";
 import { GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
-import { createBudgetAccountGroup } from "api/services";
 
 import Modal from "./Modal";
 
 interface CreateBudgetAccountGroupModalProps {
-  onSuccess: (group: Model.BudgetGroup) => void;
+  onSuccess: (group: Model.Group) => void;
   onCancel: () => void;
   budgetId: number;
   accounts: number[];
@@ -35,12 +36,13 @@ const CreateBudgetAccountGroupModal = ({
           .validateFields()
           .then((values: GroupFormValues) => {
             form.setLoading(true);
-            createBudgetAccountGroup(budgetId, {
-              name: values.name,
-              children: accounts,
-              color: values.color
-            })
-              .then((group: Model.BudgetGroup) => {
+            api
+              .createBudgetAccountGroup(budgetId, {
+                name: values.name,
+                children: accounts,
+                color: values.color
+              })
+              .then((group: Model.Group) => {
                 form.resetFields();
                 onSuccess(group);
               })

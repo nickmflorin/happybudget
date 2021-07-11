@@ -2,45 +2,23 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
 
-import * as models from "lib/model";
-
-import { selectTemplateFringes, selectTemplateDetail, selectTemplateDetailLoading } from "../../store/selectors";
+import { selectTemplateDetail, selectTemplateDetailLoading } from "../../store/selectors";
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
-import FringesModal from "./FringesModal";
+import FringesModal from "./SubAccount/FringesModal";
 
-interface TemplateSubAccountsTableProps
-  extends Omit<
-    GenericSubAccountsTableProps<BudgetTable.TemplateSubAccountRow, Model.TemplateSubAccount, Model.TemplateGroup>,
-    | "manager"
-    | "fringes"
-    | "fringesCellRenderer"
-    | "fringesCellEditor"
-    | "fringesCellEditorParams"
-    | "onEditFringes"
-    | "columns"
-  > {
-  detail: Model.TemplateAccount | Model.TemplateSubAccount | undefined;
+interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "manager" | "columns"> {
+  detail: Model.Account | Model.SubAccount | undefined;
 }
 
-const TemplateSubAccountsTable = ({ detail, ...props }: TemplateSubAccountsTableProps): JSX.Element => {
+const SubAccountsTable = ({ detail, ...props }: SubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const templateDetail = useSelector(selectTemplateDetail);
   const loadingTemplate = useSelector(selectTemplateDetailLoading);
-  const fringes = useSelector(selectTemplateFringes);
 
   return (
     <React.Fragment>
-      <GenericSubAccountsTable<BudgetTable.TemplateSubAccountRow, Model.TemplateSubAccount, Model.TemplateGroup>
-        manager={models.TemplateSubAccountRowManager}
+      <GenericSubAccountsTable
         loadingBudget={loadingTemplate}
-        fringes={fringes}
-        fringesCellEditor={"TemplateFringesCellEditor"}
-        fringesCellRenderer={"TemplateFringesCell"}
-        fringesCellEditorParams={{
-          onAddFringes: () => setFringesModalVisible(true),
-          colId: "fringes"
-        }}
-        onEditFringes={() => setFringesModalVisible(true)}
         columns={[
           {
             field: "estimated",
@@ -62,4 +40,4 @@ const TemplateSubAccountsTable = ({ detail, ...props }: TemplateSubAccountsTable
   );
 };
 
-export default TemplateSubAccountsTable;
+export default SubAccountsTable;

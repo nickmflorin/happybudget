@@ -5,21 +5,23 @@ import { isNil } from "lodash";
 
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import * as actions from "../../store/actions/template/fringes";
-import { selectTemplateDetail } from "../..//store/selectors";
-import { GenericFringesModal, GenericFringesModalProps } from "../Generic";
+import * as actions from "../../../store/actions/budget/account";
+import { selectBudgetDetail } from "../../../store/selectors";
+import { GenericFringesModal, GenericFringesModalProps } from "../../Generic";
 
-const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.template.fringes.data);
+const selectData = simpleDeepEqualSelector(
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.fringes.data
+);
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.fringes.search
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.fringes.search
 );
 const selectLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.fringes.loading
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.fringes.loading
 );
 const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.fringes.deleting,
-  (state: Modules.ApplicationStore) => state.budgeting.template.fringes.updating,
-  (state: Modules.ApplicationStore) => state.budgeting.template.fringes.creating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.fringes.deleting,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.fringes.updating,
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.fringes.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
@@ -30,7 +32,7 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
   const saving = useSelector(selectSaving);
-  const templateDetail = useSelector(selectTemplateDetail);
+  const budgetDetail = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     // TODO: It might not be necessary to always refresh the Fringes when the modal opens, but it is
@@ -42,7 +44,7 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
 
   return (
     <GenericFringesModal
-      exportFileName={!isNil(templateDetail) ? `${templateDetail.name}_fringes` : "fringes"}
+      exportFileName={!isNil(budgetDetail) ? `${budgetDetail.name}_fringes` : "fringes"}
       open={open}
       onCancel={onCancel}
       loading={loading}
@@ -50,7 +52,9 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
       search={search}
       onSearch={(value: string) => dispatch(actions.setFringesSearchAction(value))}
       saving={saving}
-      onChangeEvent={(e: Table.ChangeEvent<BudgetTable.FringeRow>) => dispatch(actions.handleTableChangeEventAction(e))}
+      onChangeEvent={(e: Table.ChangeEvent<BudgetTable.FringeRow>) =>
+        dispatch(actions.handleFringesTableChangeEventAction(e))
+      }
     />
   );
 };

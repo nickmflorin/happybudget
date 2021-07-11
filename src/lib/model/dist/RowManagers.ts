@@ -12,11 +12,7 @@ export const PdfAccountRowManager = new PdfRowManager<BudgetPdf.AccountRow, Mode
   groupGetter: (model: Model.PdfAccount) => model.group
 });
 
-export const BudgetAccountRowManager = new RowManager<
-  BudgetTable.BudgetAccountRow,
-  Model.BudgetAccount,
-  Http.BudgetAccountPayload
->({
+export const AccountRowManager = new RowManager<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>({
   fields: [
     ReadWrite({ field: "description", allowNull: true }),
     ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
@@ -28,24 +24,6 @@ export const BudgetAccountRowManager = new RowManager<
   childrenGetter: (model: Model.Account) => model.subaccounts,
   groupGetter: (model: Model.Account) => model.group,
   labelGetter: (model: Model.Account) => (!isNil(model.identifier) ? model.identifier : "Account"),
-  typeLabel: "Account",
-  rowType: "account"
-});
-
-export const TemplateAccountRowManager = new RowManager<
-  BudgetTable.TemplateAccountRow,
-  Model.TemplateAccount,
-  Http.TemplateAccountPayload
->({
-  fields: [
-    ReadWrite({ field: "description", allowNull: true }),
-    ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
-    ReadWrite({ field: "identifier", allowNull: true }),
-    ReadOnly({ field: "estimated" })
-  ],
-  childrenGetter: (model: Model.TemplateAccount) => model.subaccounts,
-  groupGetter: (model: Model.TemplateAccount) => model.group,
-  labelGetter: (model: Model.TemplateAccount) => (!isNil(model.identifier) ? model.identifier : "Account"),
   typeLabel: "Account",
   rowType: "account"
 });
@@ -66,73 +44,38 @@ export const PdfSubAccountRowManager = new PdfRowManager<BudgetPdf.SubAccountRow
   groupGetter: (model: Model.PdfSubAccount) => model.group
 });
 
-export const BudgetSubAccountRowManager = new RowManager<
-  BudgetTable.BudgetSubAccountRow,
-  Model.BudgetSubAccount,
-  Http.SubAccountPayload
->({
-  fields: [
-    ReadWrite({ field: "description", allowNull: true }),
-    ReadWrite({ field: "name", allowNull: true }),
-    ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
-    ReadWrite({ field: "quantity", allowNull: true }),
-    ReadWrite({ field: "rate", allowNull: true }),
-    ReadWrite({ field: "multiplier", allowNull: true }),
-    ReadWrite({
-      field: "unit",
-      allowNull: true,
-      httpValueConverter: (unit: Model.Tag | null): number | null | undefined => {
-        if (unit !== null) {
-          return unit.id;
+export const SubAccountRowManager = new RowManager<BudgetTable.SubAccountRow, Model.SubAccount, Http.SubAccountPayload>(
+  {
+    fields: [
+      ReadWrite({ field: "description", allowNull: true }),
+      ReadWrite({ field: "name", allowNull: true }),
+      ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
+      ReadWrite({ field: "quantity", allowNull: true }),
+      ReadWrite({ field: "rate", allowNull: true }),
+      ReadWrite({ field: "multiplier", allowNull: true }),
+      ReadWrite({
+        field: "unit",
+        allowNull: true,
+        httpValueConverter: (unit: Model.Tag | null): number | null | undefined => {
+          if (unit !== null) {
+            return unit.id;
+          }
+          return null;
         }
-        return null;
-      }
-    }),
-    ReadWrite({ field: "identifier", allowNull: true }),
-    ReadOnly({ field: "estimated" }),
-    ReadOnly({ field: "variance" }),
-    ReadOnly({ field: "actual" }),
-    ReadWrite({ field: "fringes", allowNull: true })
-  ],
-  childrenGetter: (model: Model.SubAccount) => model.subaccounts,
-  groupGetter: (model: Model.SubAccount) => model.group,
-  labelGetter: (model: Model.SubAccount) => (!isNil(model.identifier) ? model.identifier : "Sub Account"),
-  typeLabel: "Sub Account",
-  rowType: "subaccount"
-});
-
-export const TemplateSubAccountRowManager = new RowManager<
-  BudgetTable.TemplateSubAccountRow,
-  Model.TemplateSubAccount,
-  Http.SubAccountPayload
->({
-  fields: [
-    ReadWrite({ field: "description", allowNull: true }),
-    ReadWrite({ field: "name", allowNull: true }),
-    ReadWrite({ field: "group", allowNull: true, modelOnly: true }),
-    ReadWrite({ field: "quantity", allowNull: true }),
-    ReadWrite({ field: "rate", allowNull: true }),
-    ReadWrite({ field: "multiplier", allowNull: true }),
-    ReadWrite({
-      field: "unit",
-      allowNull: true,
-      httpValueConverter: (unit: Model.Tag | null): number | null | undefined => {
-        if (unit !== null) {
-          return unit.id;
-        }
-        return null;
-      }
-    }),
-    ReadWrite({ field: "identifier", allowNull: true }),
-    ReadOnly({ field: "estimated" }),
-    ReadWrite({ field: "fringes", allowNull: true })
-  ],
-  childrenGetter: (model: Model.SubAccount) => model.subaccounts,
-  groupGetter: (model: Model.SubAccount) => model.group,
-  labelGetter: (model: Model.SubAccount) => (!isNil(model.identifier) ? model.identifier : "Sub Account"),
-  typeLabel: "Sub Account",
-  rowType: "subaccount"
-});
+      }),
+      ReadWrite({ field: "identifier", allowNull: true }),
+      ReadOnly({ field: "estimated" }),
+      ReadOnly({ field: "variance" }),
+      ReadOnly({ field: "actual" }),
+      ReadWrite({ field: "fringes", allowNull: true })
+    ],
+    childrenGetter: (model: Model.SubAccount) => model.subaccounts,
+    groupGetter: (model: Model.SubAccount) => model.group,
+    labelGetter: (model: Model.SubAccount) => (!isNil(model.identifier) ? model.identifier : "Sub Account"),
+    typeLabel: "Sub Account",
+    rowType: "subaccount"
+  }
+);
 
 export const ActualRowManager = new RowManager<BudgetTable.ActualRow, Model.Actual, Http.ActualPayload>({
   fields: [

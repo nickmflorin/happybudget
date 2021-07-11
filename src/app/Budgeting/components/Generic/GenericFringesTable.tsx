@@ -19,7 +19,7 @@ import BudgetTableComponent from "../BudgetTable";
 
 export interface GenericFringesTableProps
   extends Omit<
-    BudgetTable.Props<BudgetTable.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>,
+    BudgetTable.Props<BudgetTable.FringeRow, Model.Fringe, Http.FringePayload>,
     "manager" | "columns" | "tableRef"
   > {
   exportFileName: string;
@@ -34,7 +34,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
   const tableRef = useRef<BudgetTable.Ref>(null);
 
   return (
-    <BudgetTableComponent<BudgetTable.FringeRow, Model.Fringe, Model.Group, Http.FringePayload>
+    <BudgetTableComponent<BudgetTable.FringeRow, Model.Fringe, Http.FringePayload>
       className={"fringes-table"}
       tableRef={tableRef}
       detached={true}

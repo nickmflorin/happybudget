@@ -138,12 +138,6 @@ namespace Http {
 
   interface AccountPayload extends Http.ModelPayload<Model.Account> {}
 
-  interface BudgetAccountPayload extends AccountPayload {
-    readonly access?: number[];
-  }
-
-  interface TemplateAccountPayload extends AccountPayload {}
-
   interface SubAccountPayload extends Http.ModelPayload<Model.SubAccount> {
     readonly unit?: Model.SubAccountUnitId | null;
   }

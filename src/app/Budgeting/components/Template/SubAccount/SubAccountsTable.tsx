@@ -6,9 +6,10 @@ import { isNil, map } from "lodash";
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import TemplateSubAccountsTable from "../SubAccountsTable";
 import { selectTemplateId, selectSubAccountUnits } from "../../../store/selectors";
 import * as actions from "../../../store/actions/template/subAccount";
+import TemplateSubAccountsTable from "../SubAccountsTable";
+import FringesModal from "./FringesModal";
 
 const selectGroups = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.groups.data
@@ -25,14 +26,18 @@ const selectSubAccountDetail = simpleDeepEqualSelector(
 const selectLoadingSubAcount = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.detail.loading
 );
+const selectFringes = simpleDeepEqualSelector(
+  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.fringes.data
+);
 
 interface SubAccountsTableProps {
   subaccountId: number;
 }
 
 const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element => {
+  const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<Model.TemplateGroup | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<Model.Group | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -42,6 +47,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const subAccountLoading = useSelector(selectLoadingSubAcount);
   const groups = useSelector(selectGroups);
+  const fringes = useSelector(selectFringes);
   const subAccountUnits = useSelector(selectSubAccountUnits);
 
   return (
@@ -50,6 +56,14 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         data={data}
         groups={groups}
         subAccountUnits={subAccountUnits}
+        fringes={fringes}
+        fringesCellEditorParams={{
+          onAddFringes: () => setFringesModalVisible(true),
+          colId: "fringes"
+        }}
+        onEditFringes={() => setFringesModalVisible(true)}
+        fringesCellEditor={"TemplateSubAccountFringesCellEditor"}
+        fringesCellRenderer={"TemplateSubAccountFringesCell"}
         loadingParent={subAccountLoading}
         // Right now, the SubAccount recursion only goes 1 layer deep.
         // Account -> SubAccount -> Detail (Recrusive SubAccount).
@@ -65,7 +79,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.TemplateSubAccountRow>) =>
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.SubAccountRow>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onBack={() => {
@@ -83,24 +97,24 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
           }
         }}
         cookies={!isNil(subaccountDetail) ? { ordering: `subaccount-${subaccountDetail.id}-table-ordering` } : {}}
-        onDeleteGroup={(group: Model.TemplateGroup) => dispatch(actions.deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: BudgetTable.TemplateSubAccountRow) =>
+        onDeleteGroup={(group: Model.Group) => dispatch(actions.deleteGroupAction(group.id))}
+        onRowRemoveFromGroup={(row: BudgetTable.SubAccountRow) =>
           dispatch(actions.removeSubAccountFromGroupAction(row.id))
         }
-        onRowAddToGroup={(group: number, row: BudgetTable.TemplateSubAccountRow) =>
+        onRowAddToGroup={(group: number, row: BudgetTable.SubAccountRow) =>
           dispatch(actions.addSubAccountToGroupAction({ id: row.id, group }))
         }
-        onGroupRows={(rows: BudgetTable.TemplateSubAccountRow[]) =>
-          setGroupSubAccounts(map(rows, (row: BudgetTable.TemplateSubAccountRow) => row.id))
+        onGroupRows={(rows: BudgetTable.SubAccountRow[]) =>
+          setGroupSubAccounts(map(rows, (row: BudgetTable.SubAccountRow) => row.id))
         }
-        onEditGroup={(group: Model.TemplateGroup) => setGroupToEdit(group)}
+        onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
       />
       {!isNil(groupSubAccounts) && (
-        <CreateSubAccountGroupModal<Model.TemplateGroup>
+        <CreateSubAccountGroupModal
           subaccountId={subaccountId}
           subaccounts={groupSubAccounts}
           open={true}
-          onSuccess={(group: Model.TemplateGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
             dispatch(actions.addGroupToStateAction(group));
           }}
@@ -108,16 +122,17 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         />
       )}
       {!isNil(groupToEdit) && (
-        <EditGroupModal<Model.TemplateGroup>
+        <EditGroupModal
           group={groupToEdit}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
-          onSuccess={(group: Model.TemplateGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
           }}
         />
       )}
+      <FringesModal open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
     </React.Fragment>
   );
 };

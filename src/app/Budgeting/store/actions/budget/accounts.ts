@@ -1,7 +1,7 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
-export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.BudgetAccountRow>>(
+export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.AccountRow>>(
   ActionType.Budget.Accounts.TableChanged
 );
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.Comments.Request);
@@ -32,7 +32,7 @@ export const updatingAccountAction = simpleAction<Redux.ModelListActionPayload>(
 export const creatingAccountAction = simpleAction<boolean>(ActionType.Budget.Accounts.Creating);
 export const requestAccountsAction = simpleAction<null>(ActionType.Budget.Accounts.Request);
 export const loadingAccountsAction = simpleAction<boolean>(ActionType.Budget.Accounts.Loading);
-export const responseAccountsAction = simpleAction<Http.ListResponse<Model.BudgetAccount>>(
+export const responseAccountsAction = simpleAction<Http.ListResponse<Model.Account>>(
   ActionType.Budget.Accounts.Response
 );
 export const setAccountsSearchAction = simpleAction<string>(ActionType.Budget.Accounts.SetSearch);
@@ -40,14 +40,14 @@ export const removeAccountFromGroupAction = simpleAction<number>(ActionType.Budg
 export const addAccountToGroupAction = simpleAction<{ id: number; group: number }>(
   ActionType.Budget.Accounts.AddToGroup
 );
-export const addAccountToStateAction = simpleAction<Model.BudgetAccount>(ActionType.Budget.Accounts.AddToState);
+export const addAccountToStateAction = simpleAction<Model.Account>(ActionType.Budget.Accounts.AddToState);
 export const requestGroupsAction = simpleAction<null>(ActionType.Budget.Accounts.Groups.Request);
 export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.Accounts.Groups.Loading);
-export const responseGroupsAction = simpleAction<Http.ListResponse<Model.BudgetGroup>>(
+export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Group>>(
   ActionType.Budget.Accounts.Groups.Response
 );
-export const addGroupToStateAction = simpleAction<Model.BudgetGroup>(ActionType.Budget.Accounts.Groups.AddToState);
-export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.BudgetGroup>>(
+export const addGroupToStateAction = simpleAction<Model.Group>(ActionType.Budget.Accounts.Groups.AddToState);
+export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Group>>(
   ActionType.Budget.Accounts.Groups.UpdateInState
 );
 export const removeGroupFromStateAction = simpleAction<number>(ActionType.Budget.Accounts.Groups.RemoveFromState);

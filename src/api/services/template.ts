@@ -61,36 +61,36 @@ export const getTemplateAccounts = async (
   id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.TemplateAccount>> => {
+): Promise<Http.ListResponse<Model.Account>> => {
   const url = URL.v1("templates", id, "accounts");
-  return client.list<Model.TemplateAccount>(url, query, options);
+  return client.list<Model.Account>(url, query, options);
 };
 
 export const createTemplateAccount = async (
   id: number,
-  payload: Http.TemplateAccountPayload,
+  payload: Http.AccountPayload,
   options: Http.RequestOptions = {}
-): Promise<Model.TemplateAccount> => {
+): Promise<Model.Account> => {
   const url = URL.v1("templates", id, "accounts");
-  return client.post<Model.TemplateAccount>(url, payload, options);
+  return client.post<Model.Account>(url, payload, options);
 };
 
 export const getTemplateAccountGroups = async (
   id: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.TemplateGroup>> => {
+): Promise<Http.ListResponse<Model.Group>> => {
   const url = URL.v1("templates", id, "groups");
-  return client.list<Model.TemplateGroup>(url, query, options);
+  return client.list<Model.Group>(url, query, options);
 };
 
 export const createTemplateAccountGroup = async (
   id: number,
   payload: Http.GroupPayload,
   options: Http.RequestOptions = {}
-): Promise<Model.TemplateGroup> => {
+): Promise<Model.Group> => {
   const url = URL.v1("templates", id, "groups");
-  return client.post<Model.TemplateGroup>(url, payload, options);
+  return client.post<Model.Group>(url, payload, options);
 };
 
 export const getTemplateFringes = async (
@@ -122,7 +122,7 @@ export const createTemplateFringe = async (
 
 export const bulkUpdateTemplateAccounts = async (
   id: number,
-  data: Http.BulkUpdatePayload<Http.TemplateAccountPayload>[],
+  data: Http.BulkUpdatePayload<Http.AccountPayload>[],
   options: Http.RequestOptions = {}
 ): Promise<Model.Template> => {
   const url = URL.v1("templates", id, "bulk-update-accounts");
@@ -140,13 +140,13 @@ export const bulkDeleteTemplateAccounts = async (
 
 export const bulkCreateTemplateAccounts = async (
   id: number,
-  payload: Http.BulkCreatePayload<Http.TemplateAccountPayload>,
+  payload: Http.BulkCreatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
-): Promise<Model.TemplateAccount[]> => {
+): Promise<Model.Account[]> => {
   const url = URL.v1("templates", id, "bulk-create-accounts");
   return client
-    .patch<Http.BulkCreateResponse<Model.TemplateAccount>>(url, payload, options)
-    .then((response: Http.BulkCreateResponse<Model.TemplateAccount>) => response.data);
+    .patch<Http.BulkCreateResponse<Model.Account>>(url, payload, options)
+    .then((response: Http.BulkCreateResponse<Model.Account>) => response.data);
 };
 
 export const bulkUpdateTemplateFringes = async (

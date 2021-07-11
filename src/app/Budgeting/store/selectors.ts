@@ -10,18 +10,12 @@ export const selectBudgetDetailLoading = simpleShallowEqualSelector(
 export const selectCommentsHistoryDrawerOpen = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.commentsHistoryDrawerOpen
 );
-export const selectBudgetFringes = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.fringes.data
-);
 export const selectTemplateId = (state: Modules.ApplicationStore) => state.budgeting.template.template.id;
 export const selectTemplateDetail = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.template.detail.data
 );
 export const selectTemplateDetailLoading = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.template.template.detail.loading
-);
-export const selectTemplateFringes = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.fringes.data
 );
 export const selectFringeColors = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.fringeColors.data

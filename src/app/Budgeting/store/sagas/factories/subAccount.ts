@@ -11,8 +11,8 @@ import { consolidateTableChange } from "lib/model/util";
 import { createBulkCreatePayload } from "./util";
 
 export interface SubAccountTasksActionMap<
-  SA extends Model.TemplateSubAccount | Model.BudgetSubAccount,
-  G extends Model.TemplateGroup | Model.BudgetGroup
+  SA extends Model.SubAccount | Model.SubAccount,
+  G extends Model.Group | Model.Group
 > {
   deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
   creating: Redux.ActionCreator<boolean>;
@@ -53,9 +53,9 @@ export interface SubAccountTaskSet<R extends Table.Row> {
 }
 
 export const createSubAccountTaskSet = <
-  SA extends Model.TemplateSubAccount | Model.BudgetSubAccount,
+  SA extends Model.SubAccount | Model.SubAccount,
   R extends Table.Row,
-  G extends Model.TemplateGroup | Model.BudgetGroup
+  G extends Model.Group | Model.Group
 >(
   /* eslint-disable indent */
   actions: SubAccountTasksActionMap<SA, G>,

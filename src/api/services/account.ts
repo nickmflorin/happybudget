@@ -1,12 +1,9 @@
 import { client } from "api";
 import { URL } from "./util";
 
-export const getAccount = async <M extends Model.Account = Model.BudgetAccount | Model.TemplateAccount>(
-  id: number,
-  options: Http.RequestOptions = {}
-): Promise<M> => {
+export const getAccount = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Account> => {
   const url = URL.v1("accounts", id);
-  return client.retrieve<M>(url, options);
+  return client.retrieve<Model.Account>(url, options);
 };
 
 export const deleteAccount = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
@@ -14,88 +11,78 @@ export const deleteAccount = async (id: number, options: Http.RequestOptions = {
   return client.delete<null>(url, options);
 };
 
-export const updateAccount = async <M extends Model.Account = Model.BudgetAccount | Model.TemplateAccount>(
+export const updateAccount = async (
   id: number,
   payload: Partial<Http.AccountPayload>,
   options: Http.RequestOptions = {}
-): Promise<M> => {
+): Promise<Model.Account> => {
   const url = URL.v1("accounts", id);
-  return client.patch<M>(url, payload, options);
+  return client.patch<Model.Account>(url, payload, options);
 };
 
-export const bulkUpdateAccountSubAccounts = async <
-  M extends Model.Account = Model.BudgetAccount | Model.TemplateAccount
->(
+export const bulkUpdateAccountSubAccounts = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.SubAccountPayload>[],
   options: Http.RequestOptions = {}
-): Promise<M> => {
+): Promise<Model.Account> => {
   const url = URL.v1("accounts", id, "bulk-update-subaccounts");
-  return client.patch<M>(url, { data }, options);
+  return client.patch<Model.Account>(url, { data }, options);
 };
 
-export const bulkDeleteAccountSubAccounts = async <
-  M extends Model.Account = Model.BudgetAccount | Model.TemplateAccount
->(
+export const bulkDeleteAccountSubAccounts = async (
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
-): Promise<M> => {
+): Promise<Model.Account> => {
   const url = URL.v1("accounts", id, "bulk-delete-subaccounts");
-  return client.patch<M>(url, { ids }, options);
+  return client.patch<Model.Account>(url, { ids }, options);
 };
 
-export const bulkCreateAccountSubAccounts = async <
-  M extends Model.SubAccount = Model.BudgetSubAccount | Model.TemplateSubAccount
->(
+export const bulkCreateAccountSubAccounts = async (
   id: number,
   payload: Http.BulkCreatePayload<Http.SubAccountPayload>,
   options: Http.RequestOptions = {}
-): Promise<M[]> => {
+): Promise<Model.SubAccount[]> => {
   const url = URL.v1("accounts", id, "bulk-create-subaccounts");
   return client
-    .patch<Http.BulkCreateResponse<M>>(url, payload, options)
-    .then((response: Http.BulkCreateResponse<M>) => response.data);
+    .patch<Http.BulkCreateResponse<Model.SubAccount>>(url, payload, options)
+    .then((response: Http.BulkCreateResponse<Model.SubAccount>) => response.data);
 };
 
-export const getAccountSubAccounts = async <
-  M extends Model.SubAccount = Model.BudgetSubAccount | Model.TemplateSubAccount
->(
+export const getAccountSubAccounts = async (
   accountId: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<M>> => {
+): Promise<Http.ListResponse<Model.SubAccount>> => {
   const url = URL.v1("accounts", accountId, "subaccounts");
-  return client.list<M>(url, query, options);
+  return client.list<Model.SubAccount>(url, query, options);
 };
 
-export const createAccountSubAccount = async <
-  M extends Model.SubAccount = Model.BudgetSubAccount | Model.TemplateSubAccount
->(
+export const createAccountSubAccount = async (
   accountId: number,
   payload: Http.SubAccountPayload,
   options: Http.RequestOptions = {}
-): Promise<M> => {
+): Promise<Model.SubAccount> => {
   const url = URL.v1("accounts", accountId, "subaccounts");
-  return client.post<M>(url, payload, options);
+  return client.post<Model.SubAccount>(url, payload, options);
 };
 
-export const createAccountSubAccountGroup = async <G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup>(
+export const createAccountSubAccountGroup = async (
   accountId: number,
   payload: Http.GroupPayload,
   options: Http.RequestOptions = {}
-): Promise<G> => {
+): Promise<Model.Group> => {
   const url = URL.v1("accounts", accountId, "groups");
-  return client.post<G>(url, payload, options);
+  return client.post<Model.Group>(url, payload, options);
 };
 
-export const getAccountSubAccountGroups = async <G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup>(
+export const getAccountSubAccountGroups = async (
   accountId: number,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<G>> => {
+): Promise<Http.ListResponse<Model.Group>> => {
   const url = URL.v1("accounts", accountId, "groups");
-  return client.list<G>(url, query, options);
+  return client.list<Model.Group>(url, query, options);
 };
 
 export const getAccountActuals = async (

@@ -403,10 +403,10 @@ namespace BudgetTable {
   type GridId = "primary" | "tableFooter" | "budgetFooter";
   type GridSet<T> = { primary: T; tableFooter: T; budgetFooter: T };
 
-  interface GroupProps<R extends Table.Row, G extends Model.Group = Model.Group> {
+  interface GroupProps<R extends Table.Row> {
     readonly onGroupRows: (rows: R[]) => void;
-    readonly onDeleteGroup: (group: G) => void;
-    readonly onEditGroup: (group: G) => void;
+    readonly onDeleteGroup: (group: Model.Group) => void;
+    readonly onEditGroup: (group: Model.Group) => void;
     readonly onRowRemoveFromGroup: (row: R) => void;
     readonly onRowAddToGroup: (groupId: number, row: R) => void;
   }
@@ -469,12 +469,11 @@ namespace BudgetTable {
   // Props provided to the BudgetTable that are passed directly through to the PrimaryGrid.
   interface PrimaryGridPassThroughProps<
     R extends Table.Row,
-    M extends Model.Model,
-    G extends Model.Group = Model.Group
+    M extends Model.Model
   > {
     readonly data: M[];
-    readonly groups?: G[];
-    readonly groupParams?: BudgetTable.GroupProps<R, G>;
+    readonly groups?: Model.Group[];
+    readonly groupParams?: BudgetTable.GroupProps<R, Model.Group>;
     readonly frameworkComponents?: { [key: string]: any };
     readonly search?: string;
     readonly columns: Table.Column<R>[];
@@ -491,8 +490,8 @@ namespace BudgetTable {
     readonly getCSVData: (fields?: string[]) => CSVData;
   }
 
-  interface PrimaryGridProps<R extends Table.Row, M extends Model.Model, G extends Model.Group = Model.Group>
-    extends BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
+  interface PrimaryGridProps<R extends Table.Row, M extends Model.Model>
+    extends BudgetTable.PrimaryGridPassThroughProps<R, M>,
       Omit<BudgetTable.MenuProps<R>, "columns" | "onExport" | "onDelete" | "apis">,
       SpecificGridProps {
     readonly gridRef: import("react").RefObject<PrimaryGridRef>;
@@ -508,10 +507,9 @@ namespace BudgetTable {
   interface Props<
     R extends Table.Row,
     M extends Model.Model,
-    G extends Model.Group = Model.Group,
     P extends Http.ModelPayload<M> = Http.ModelPayload<M>
   > extends Omit<BudgetTable.MenuProps<R>, "columns" | "onColumnsChange" | "onExport" | "onDelete" | "apis">,
-      BudgetTable.PrimaryGridPassThroughProps<R, M, G>,
+      BudgetTable.PrimaryGridPassThroughProps<R, M>,
       StandardComponentProps {
     readonly tableRef: import("react").RefObject<BudgetTable.Ref>;
     readonly indexColumn?: Partial<Table.Column<R>>;
@@ -531,14 +529,10 @@ namespace BudgetTable {
     readonly identifier: string | null;
     readonly description: string | null;
     readonly estimated: number | null;
+    // Only defined for non-Template cases.
+    readonly variance?: number | null;
+    readonly actual?: number | null;
   }
-
-  interface BudgetAccountRow extends BudgetTable.AccountRow {
-    readonly variance: number | null;
-    readonly actual: number | null;
-  }
-
-  interface TemplateAccountRow extends BudgetTable.AccountRow {}
 
   interface SubAccountRow extends Table.Row {
     readonly identifier: string | null;
@@ -550,14 +544,10 @@ namespace BudgetTable {
     readonly rate: number | null;
     readonly estimated: number | null;
     readonly fringes: number[];
+    // Only defined for non-Template cases.
+    readonly variance?: number | null;
+    readonly actual?: number | null;
   }
-
-  interface BudgetSubAccountRow extends BudgetTable.SubAccountRow {
-    readonly actual: number | null;
-    readonly variance: number | null;
-  }
-
-  interface TemplateSubAccountRow extends BudgetTable.SubAccountRow {}
 
   interface FringeRow extends Table.Row {
     readonly color: string | null;
@@ -607,7 +597,7 @@ namespace BudgetPdf {
   }
 
   interface AccountRowGroup {
-    readonly group: Model.BudgetGroup | null;
+    readonly group: Model.Group | null;
     readonly rows: BudgetPdf.AccountRow[];
   }
 
@@ -619,7 +609,7 @@ namespace BudgetPdf {
 
   type AccountsTableProps = TableProps<BudgetPdf.AccountRow, Model.PdfAccount> & {
     readonly data: Model.PdfAccount[];
-    readonly groups: Model.BudgetGroup[];
+    readonly groups: Model.Group[];
   }
 
   type AccountTableProps = TableProps<BudgetPdf.SubAccountRow, Model.PdfSubAccount> & {

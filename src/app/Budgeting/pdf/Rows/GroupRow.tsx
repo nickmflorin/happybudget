@@ -8,7 +8,7 @@ import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
 const GroupRow = <R extends Table.PdfRow, M extends Model.Model>(
-  props: Omit<RowProps<R, M>, "row"> & { group: Model.BudgetGroup }
+  props: Omit<RowProps<R, M>, "row"> & { group: Model.Group }
 ): JSX.Element => {
   const rowStyle = useMemo(() => {
     const colorDef = getGroupColorDefinition(props.group);
@@ -32,8 +32,8 @@ const GroupRow = <R extends Table.PdfRow, M extends Model.Model>(
           obj[col.field] = props.group.name;
         } else if (col.isCalculated === true) {
           obj[col.field] = null;
-          if (!isNil(props.group[col.field as keyof Model.BudgetGroup])) {
-            obj[col.field] = props.group[col.field as keyof Model.BudgetGroup];
+          if (!isNil(props.group[col.field as keyof Model.Group])) {
+            obj[col.field] = props.group[col.field as keyof Model.Group];
           }
         } else {
           obj[col.field] = null;

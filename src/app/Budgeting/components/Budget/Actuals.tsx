@@ -7,6 +7,7 @@ import { faTrashAlt, faFileCsv, faLineColumns } from "@fortawesome/pro-solid-svg
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import * as models from "lib/model";
+import { useDeepEqualMemo } from "lib/hooks";
 import { getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { findChoiceForName, inferModelFromName } from "lib/model/util";
@@ -21,7 +22,6 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import * as actions from "../../store/actions/budget/actuals";
 import { selectBudgetDetail } from "../../store/selectors";
 import BudgetTableComponent from "../BudgetTable";
-import { useDeepEqualMemo } from "lib/hooks";
 
 const selectActuals = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.budget.actuals.data);
 const selectTableSearch = simpleShallowEqualSelector(
@@ -65,7 +65,7 @@ const Actuals = (): JSX.Element => {
         />
       </Portal>
       <WrapInApplicationSpinner loading={loading}>
-        <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Model.Group, Http.ActualPayload>
+        <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Http.ActualPayload>
           data={data}
           tableRef={tableRef}
           manager={models.ActualRowManager}

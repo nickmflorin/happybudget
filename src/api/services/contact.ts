@@ -9,11 +9,7 @@ export const getContacts = async (
   return client.list<Model.Contact>(url, query, options);
 };
 
-export const getContact = async (
-  id: number,
-  query: Http.ListQuery = {},
-  options: Http.RequestOptions = {}
-): Promise<Model.Contact> => {
+export const getContact = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Contact> => {
   const url = URL.v1("contacts", id);
   return client.retrieve<Model.Contact>(url, options);
 };

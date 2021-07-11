@@ -34,13 +34,7 @@ export const isBudgetOrTemplateForm = (
   return isBudgetForm(obj) || isTemplateForm(obj);
 };
 
-export const isBudgetSubAccount = (
-  obj: Model.BudgetSubAccount | Model.TemplateSubAccount
-): obj is Model.BudgetSubAccount => {
-  return Object.prototype.hasOwnProperty.call(obj, "variance") && Object.prototype.hasOwnProperty.call(obj, "actual");
-};
-
-export const isBudgetGroup = (obj: Model.BudgetGroup | Model.TemplateGroup): obj is Model.BudgetGroup => {
+export const isSubAccount = (obj: Model.SubAccount | Model.SubAccount): obj is Model.SubAccount => {
   return Object.prototype.hasOwnProperty.call(obj, "variance") && Object.prototype.hasOwnProperty.call(obj, "actual");
 };
 

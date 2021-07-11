@@ -1,15 +1,21 @@
 import { SagaIterator } from "redux-saga";
-import { take, call, cancel } from "redux-saga/effects";
+import { take, call, cancel, spawn } from "redux-saga/effects";
 
+import * as api from "api";
 import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
 import { loadingTemplateAction, requestTemplateAction } from "../../actions/template";
 import * as actions from "../../actions/template/subAccount";
 
-import { createStandardSaga, createSubAccountTaskSet } from "../factories";
+import {
+  createStandardSaga,
+  createStandardFringesSaga,
+  createSubAccountTaskSet,
+  createFringeTaskSet
+} from "../factories";
 
-const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, BudgetTable.TemplateSubAccountRow, Model.TemplateGroup>(
+const tasks = createSubAccountTaskSet<Model.SubAccount, BudgetTable.SubAccountRow, Model.Group>(
   {
     loading: actions.loadingSubAccountsAction,
     deleting: actions.deletingSubAccountAction,
@@ -35,7 +41,7 @@ const tasks = createSubAccountTaskSet<Model.TemplateSubAccount, BudgetTable.Temp
       request: actions.requestGroupsAction
     }
   },
-  models.TemplateSubAccountRowManager,
+  models.SubAccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.id,
   (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.data,
   (state: Modules.ApplicationStore) => state.budgeting.template.autoIndex
@@ -63,7 +69,36 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
   }
 }
 
-export default createStandardSaga(
+const fringeTasks = createFringeTaskSet<Model.Template>(
+  {
+    response: actions.responseFringesAction,
+    loading: actions.loadingFringesAction,
+    addToState: actions.addFringeToStateAction,
+    deleting: actions.deletingFringeAction,
+    creating: actions.creatingFringeAction,
+    updating: actions.updatingFringeAction,
+    requestBudget: requestTemplateAction
+  },
+  {
+    request: api.getTemplateFringes,
+    create: api.createTemplateFringe,
+    bulkUpdate: api.bulkUpdateTemplateFringes,
+    bulkCreate: api.bulkCreateTemplateFringes,
+    bulkDelete: api.bulkDeleteTemplateFringes
+  },
+  (state: Modules.ApplicationStore) => state.budgeting.template.template.id,
+  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.fringes.data
+);
+
+const fringesRootSaga = createStandardFringesSaga(
+  {
+    Request: ActionType.Template.SubAccount.Fringes.Request,
+    TableChanged: ActionType.Template.SubAccount.Fringes.TableChanged
+  },
+  fringeTasks
+);
+
+const rootSubAccountSaga = createStandardSaga(
   {
     Request: ActionType.Template.SubAccount.SubAccounts.Request,
     TableChange: ActionType.Template.SubAccount.TableChanged,
@@ -89,3 +124,8 @@ export default createStandardSaga(
   watchForRequestSubAccountSaga,
   watchForSubAccountIdChangedSaga
 );
+
+export default function* rootSaga(): SagaIterator {
+  yield spawn(rootSubAccountSaga);
+  yield spawn(fringesRootSaga);
+}

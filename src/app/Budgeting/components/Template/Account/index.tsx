@@ -11,8 +11,7 @@ import { EntityText } from "components/typography";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setTemplateAutoIndex } from "../../../store/actions/template";
-import { setAccountIdAction } from "../../../store/actions/template/account";
-import { requestFringesAction } from "../../../store/actions/template/fringes";
+import * as actions from "../../../store/actions/template/account";
 import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
 import { setTemplateLastVisited, getUrl } from "../../../urls";
 
@@ -47,11 +46,11 @@ const Account = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
-      dispatch(setAccountIdAction(parseInt(accountId)));
+      dispatch(actions.setAccountIdAction(parseInt(accountId)));
       // TODO: It might not be necessary to get a fresh set of fringes everytime the Account changes,
       // we might be able to move this further up in the tree - but for now it is safer to rely on the
       // source of truth from the API more often than not.
-      dispatch(requestFringesAction(null));
+      dispatch(actions.requestFringesAction(null));
     }
   }, [accountId]);
 
@@ -79,7 +78,7 @@ const Account = (): JSX.Element => {
             },
             {
               requiredParams: ["template", "account"],
-              func: ({ template, account }: { template: Model.Template; account: Model.TemplateAccount }) => {
+              func: ({ template, account }: { template: Model.Template; account: Model.Account }) => {
                 const siblings = account.siblings || [];
                 return {
                   id: account.id,

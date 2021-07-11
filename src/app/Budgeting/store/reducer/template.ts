@@ -1,37 +1,24 @@
 import { Reducer, combineReducers } from "redux";
-import { isNil, reduce } from "lodash";
-
-import * as models from "lib/model";
 import { createDetailResponseReducer, createSimplePayloadReducer } from "lib/redux/factories";
-
 import { ActionType } from "../actions";
-import initialState, { initialTemplateAccountsState, initialTemplateSubAccountsState } from "../initialState";
-
+import initialState, {
+  initialTemplateAccountState,
+  initialTemplateSubAccountState,
+  initialTemplateAccountsState
+} from "../initialState";
 import * as factories from "./factories";
 
 const genericReducer = combineReducers({
   autoIndex: createSimplePayloadReducer<boolean>(ActionType.Template.SetAutoIndex, false),
-  account: combineReducers({
-    id: createSimplePayloadReducer<number | null>(ActionType.Template.Account.SetId, null),
-    detail: createDetailResponseReducer<
-      Model.TemplateAccount,
-      Redux.ModelDetailResponseStore<Model.TemplateAccount>,
-      Redux.Action
-    >({
+  account: factories.createAccountReducer<Modules.Budgeting.Template.AccountStore>(
+    {
+      SetId: ActionType.Template.Account.SetId,
       Response: ActionType.Template.Account.Response,
       Loading: ActionType.Template.Account.Loading,
       Request: ActionType.Template.Account.Request,
-      UpdateInState: ActionType.Template.Account.UpdateInState
-    }),
-    subaccounts: factories.createSubAccountsReducer<
-      Modules.Budgeting.Template.SubAccountsStore,
-      BudgetTable.TemplateSubAccountRow,
-      Model.TemplateSubAccount,
-      Model.TemplateGroup
-    >(
-      "Template",
-      {
-        TableChanged: ActionType.Template.Account.TableChanged,
+      UpdateInState: ActionType.Template.Account.UpdateInState,
+      TableChanged: ActionType.Template.Account.TableChanged,
+      SubAccounts: {
         Response: ActionType.Template.Account.SubAccounts.Response,
         Request: ActionType.Template.Account.SubAccounts.Request,
         Loading: ActionType.Template.Account.SubAccounts.Loading,
@@ -42,13 +29,6 @@ const genericReducer = combineReducers({
         Updating: ActionType.Template.Account.SubAccounts.Updating,
         RemoveFromGroup: ActionType.Template.Account.SubAccounts.RemoveFromGroup,
         AddToGroup: ActionType.Template.Account.SubAccounts.AddToGroup,
-        // NOTE: This will cause updates to both the Account and SubAccount level when
-        // fringes change, even though only one level is visible at any given time.  We
-        // should adjust this, so that it only updates the Account SubAccount(s) or the
-        // SubAccount SubAccount(s) when Fringes change.
-        Fringes: {
-          TableChanged: ActionType.Template.Fringes.TableChanged
-        },
         Groups: {
           Response: ActionType.Template.Account.SubAccounts.Groups.Response,
           Request: ActionType.Template.Account.SubAccounts.Groups.Request,
@@ -59,30 +39,29 @@ const genericReducer = combineReducers({
           Deleting: ActionType.Template.Account.SubAccounts.Groups.Deleting
         }
       },
-      models.TemplateSubAccountRowManager,
-      initialTemplateSubAccountsState
-    )
-  }),
-  subaccount: combineReducers({
-    id: createSimplePayloadReducer<number | null>(ActionType.Template.SubAccount.SetId, null),
-    detail: createDetailResponseReducer<
-      Model.TemplateSubAccount,
-      Redux.ModelDetailResponseStore<Model.TemplateSubAccount>,
-      Redux.Action
-    >({
+      Fringes: {
+        TableChanged: ActionType.Template.Account.Fringes.TableChanged,
+        Response: ActionType.Template.Account.Fringes.Response,
+        Request: ActionType.Template.Account.Fringes.Request,
+        Loading: ActionType.Template.Account.Fringes.Loading,
+        AddToState: ActionType.Template.Account.Fringes.AddToState,
+        SetSearch: ActionType.Template.Account.Fringes.SetSearch,
+        Deleting: ActionType.Template.Account.Fringes.Deleting,
+        Creating: ActionType.Template.Account.Fringes.Creating,
+        Updating: ActionType.Template.Account.Fringes.Updating
+      }
+    },
+    initialTemplateAccountState
+  ),
+  subaccount: factories.createSubAccountReducer<Modules.Budgeting.Template.SubAccountStore>(
+    {
+      SetId: ActionType.Template.SubAccount.SetId,
       Response: ActionType.Template.SubAccount.Response,
       Loading: ActionType.Template.SubAccount.Loading,
-      Request: ActionType.Template.SubAccount.Request
-    }),
-    subaccounts: factories.createSubAccountsReducer<
-      Modules.Budgeting.Template.SubAccountsStore,
-      BudgetTable.TemplateSubAccountRow,
-      Model.TemplateSubAccount,
-      Model.TemplateGroup
-    >(
-      "Template",
-      {
-        TableChanged: ActionType.Template.SubAccount.TableChanged,
+      Request: ActionType.Template.SubAccount.Request,
+      UpdateInState: ActionType.Template.SubAccount.UpdateInState,
+      TableChanged: ActionType.Template.SubAccount.TableChanged,
+      SubAccounts: {
         Response: ActionType.Template.SubAccount.SubAccounts.Response,
         Request: ActionType.Template.SubAccount.SubAccounts.Request,
         Loading: ActionType.Template.SubAccount.SubAccounts.Loading,
@@ -93,13 +72,6 @@ const genericReducer = combineReducers({
         Updating: ActionType.Template.SubAccount.SubAccounts.Updating,
         RemoveFromGroup: ActionType.Template.SubAccount.SubAccounts.RemoveFromGroup,
         AddToGroup: ActionType.Template.SubAccount.SubAccounts.AddToGroup,
-        // NOTE: This will cause updates to both the Account and SubAccount level when
-        // fringes change, even though only one level is visible at any given time.  We
-        // should adjust this, so that it only updates the Account SubAccount(s) or the
-        // SubAccount SubAccount(s) when Fringes change.
-        Fringes: {
-          TableChanged: ActionType.Template.Fringes.TableChanged
-        },
         Groups: {
           Response: ActionType.Template.SubAccount.SubAccounts.Groups.Response,
           Request: ActionType.Template.SubAccount.SubAccounts.Groups.Request,
@@ -110,16 +82,21 @@ const genericReducer = combineReducers({
           Deleting: ActionType.Template.SubAccount.SubAccounts.Groups.Deleting
         }
       },
-      models.TemplateSubAccountRowManager,
-      initialTemplateSubAccountsState
-    )
-  }),
-  accounts: factories.createAccountsReducer<
-    Modules.Budgeting.Template.AccountsStore,
-    BudgetTable.TemplateAccountRow,
-    Model.TemplateAccount,
-    Model.TemplateGroup
-  >(
+      Fringes: {
+        TableChanged: ActionType.Template.SubAccount.Fringes.TableChanged,
+        Response: ActionType.Template.SubAccount.Fringes.Response,
+        Request: ActionType.Template.SubAccount.Fringes.Request,
+        Loading: ActionType.Template.SubAccount.Fringes.Loading,
+        AddToState: ActionType.Template.SubAccount.Fringes.AddToState,
+        SetSearch: ActionType.Template.SubAccount.Fringes.SetSearch,
+        Deleting: ActionType.Template.SubAccount.Fringes.Deleting,
+        Creating: ActionType.Template.SubAccount.Fringes.Creating,
+        Updating: ActionType.Template.SubAccount.Fringes.Updating
+      }
+    },
+    initialTemplateSubAccountState
+  ),
+  accounts: factories.createAccountsReducer<Modules.Budgeting.Template.AccountsStore>(
     {
       TableChanged: ActionType.Template.Accounts.TableChanged,
       Response: ActionType.Template.Accounts.Response,
@@ -142,10 +119,8 @@ const genericReducer = combineReducers({
         Deleting: ActionType.Template.Accounts.Groups.Deleting
       }
     },
-    models.TemplateAccountRowManager,
     initialTemplateAccountsState
   ),
-  fringes: factories.createFringesReducer("Template"),
   template: combineReducers({
     id: createSimplePayloadReducer<number | null>(ActionType.Template.SetId, null),
     detail: createDetailResponseReducer<Model.Template, Redux.ModelDetailResponseStore<Model.Template>, Redux.Action>({
@@ -161,55 +136,10 @@ const rootReducer: Reducer<Modules.Budgeting.Template.Store, Redux.Action<any>> 
   action: Redux.Action<any>
 ): Modules.Budgeting.Template.Store => {
   let newState = { ...state };
-
   if (action.type === ActionType.Template.WipeState) {
     newState = initialState.template;
   }
-
-  newState = genericReducer(newState, action);
-
-  // When the underlying account or subaccounts are removed, updated or added,
-  // we need to also update the parent account or subaccount.
-  if (!isNil(action.payload)) {
-    if (action.type === ActionType.Template.SubAccount.TableChanged) {
-      // Update the overall SubAccount based on the underlying SubAccount(s) present.
-      const subAccounts: Model.TemplateSubAccount[] = newState.subaccount.subaccounts.data;
-      let payload: Partial<Model.TemplateSubAccount> = {
-        estimated: reduce(subAccounts, (sum: number, s: Model.TemplateSubAccount) => sum + (s.estimated || 0), 0)
-      };
-      if (!isNil(newState.subaccount.detail.data)) {
-        if (!isNil(newState.subaccount.detail.data)) {
-          newState = {
-            ...newState,
-            subaccount: {
-              ...newState.subaccount,
-              detail: {
-                ...newState.subaccount.detail,
-                data: { ...newState.subaccount.detail.data, ...payload }
-              }
-            }
-          };
-        }
-      }
-    } else if (action.type === ActionType.Template.Account.TableChanged) {
-      // Update the overall Account based on the underlying SubAccount(s) present.
-      const subAccounts: Model.TemplateSubAccount[] = newState.account.subaccounts.data;
-      const estimated = reduce(subAccounts, (sum: number, s: Model.TemplateSubAccount) => sum + (s.estimated || 0), 0);
-      if (!isNil(newState.account.detail.data)) {
-        newState = {
-          ...newState,
-          account: {
-            ...newState.account,
-            detail: {
-              ...newState.account.detail,
-              data: { ...newState.account.detail.data, estimated }
-            }
-          }
-        };
-      }
-    }
-  }
-  return newState;
+  return genericReducer(newState, action);
 };
 
 export default rootReducer;

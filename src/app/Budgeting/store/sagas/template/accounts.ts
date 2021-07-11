@@ -8,10 +8,10 @@ import { createStandardSaga, createAccountsTaskSet } from "../factories";
 
 const tasks = createAccountsTaskSet<
   Model.Template,
-  Model.TemplateAccount,
-  BudgetTable.TemplateAccountRow,
-  Model.TemplateGroup,
-  Http.TemplateAccountPayload
+  Model.Account,
+  BudgetTable.AccountRow,
+  Model.Group,
+  Http.AccountPayload
 >(
   {
     loading: actions.loadingAccountsAction,
@@ -38,7 +38,7 @@ const tasks = createAccountsTaskSet<
     bulkCreate: api.bulkCreateTemplateAccounts,
     bulkDelete: api.bulkDeleteTemplateAccounts
   },
-  models.TemplateAccountRowManager,
+  models.AccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.template.template.id,
   (state: Modules.ApplicationStore) => state.budgeting.template.accounts.data,
   (state: Modules.ApplicationStore) => state.budgeting.template.autoIndex

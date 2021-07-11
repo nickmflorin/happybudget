@@ -14,16 +14,6 @@ namespace Model {
     readonly id: number;
   }
 
-  interface IModel<M extends Model.Model> extends M {}
-
-  interface HttpModel extends Model.Model {}
-
-  interface IHttpModel<M extends Model.HttpModel, P extends Http.ModelPayload<M> = Http.ModelPayload<M>> extends M {
-    readonly id: number;
-    refresh: (options: Http.RequestOptions) => Promise<void>;
-    patch: (payload: P | FormData, options: Http.RequestOptions) => Promise<Model.HttpModel>;
-  }
-
   interface Choice<I extends number, N extends string> {
     id: I;
     name: N;
@@ -108,7 +98,7 @@ namespace Model {
     readonly updated_at: string;
   }
 
-  interface BaseBudget extends Model.HttpModel {
+  interface BaseBudget extends Model.Model {
     readonly name: string;
     readonly type: BudgetType;
     readonly created_at: string;
@@ -124,13 +114,9 @@ namespace Model {
     readonly hidden?: boolean;
   }
 
-  interface ISimpleTemplate extends Model.IModel<Model.SimpleTemplate> {}
-
   interface Template extends Model.SimpleTemplate {
     readonly estimated: number;
   }
-
-  interface ITemplate extends Model.IHttpModel<Model.Template, Http.TemplatePayload> {}
 
   interface SimpleBudget extends Model.BaseBudget {
     readonly type: "budget";
@@ -153,15 +139,13 @@ namespace Model {
     readonly estimated: number;
   }
 
-  interface IBudget extends Model.IHttpModel<Model.Budget, Http.BudgetPayload> {}
-
   interface PdfBudget {
     readonly name: string;
     readonly estimated: number | null;
     readonly actual: number | null;
     readonly variance: number | null;
     readonly accounts: Model.PdfAccount[];
-    readonly groups: Model.BudgetGroup[];
+    readonly groups: Model.Group[];
   }
 
   interface Group extends Model.Model {
@@ -174,14 +158,10 @@ namespace Model {
     readonly updated_by: number | null;
     readonly created_at: string;
     readonly updated_at: string;
+    // Will be undefined for Template Account(s).
+    readonly variance?: number;
+    readonly actual?: number;
   }
-
-  interface BudgetGroup extends Model.Group {
-    readonly variance: number;
-    readonly actual: number;
-  }
-
-  interface TemplateGroup extends Model.Group {}
 
   interface SimpleAccount extends Model.Model {
     readonly identifier: string | null;
@@ -208,14 +188,10 @@ namespace Model {
     // Only included for detail endpoints.
     readonly siblings?: Model.SimpleAccount[];
     readonly ancestors?: Model.Entity[];
+    // Will be undefined for Template Account(s).
+    readonly variance?: number;
+    readonly actual?: number;
   }
-
-  interface BudgetAccount extends Model.Account {
-    readonly variance: number;
-    readonly actual: number;
-  }
-
-  interface TemplateAccount extends Model.Account {}
 
   interface PdfAccount {
     readonly id: number;
@@ -227,7 +203,7 @@ namespace Model {
     readonly actual: number | null;
     readonly subaccounts: Model.PdfSubAccount[];
     readonly group: number | null;
-    readonly groups: Model.BudgetGroup[];
+    readonly groups: Model.Group[];
   }
 
   interface SimpleSubAccount extends Model.Model {
@@ -238,6 +214,10 @@ namespace Model {
   }
 
   interface SubAccount extends Model.SimpleSubAccount {
+    readonly created_by: number | null;
+    readonly updated_by: number | null;
+    readonly created_at: string;
+    readonly updated_at: string;
     readonly quantity: number | null;
     readonly rate: number | null;
     readonly multiplier: number | null;
@@ -245,17 +225,16 @@ namespace Model {
     readonly object_id: number;
     readonly type: "subaccount";
     readonly parent_type: "account" | "subaccount";
-    readonly estimated: number;
     readonly group: number | null;
     readonly fringes: number[];
     readonly subaccounts: number[];
-    readonly created_by: number | null;
-    readonly updated_by: number | null;
-    readonly created_at: string;
-    readonly updated_at: string;
+    readonly estimated: number;
     // Only included for detail endpoints.
     readonly siblings?: Model.SimpleSubAccount[];
     readonly ancestors?: Model.Entity[];
+    // Will be undefined for Template SubAccount(s).
+    readonly variance?: number;
+    readonly actual?: number;
   }
 
   interface PdfSubAccount {
@@ -272,24 +251,17 @@ namespace Model {
     readonly actual: number | null;
     readonly group: number | null;
     readonly subaccounts: PdfSubAccount[];
-    readonly groups: Model.BudgetGroup[];
+    readonly groups: Model.Group[];
   }
-
-  interface BudgetSubAccount extends Model.SubAccount {
-    readonly variance: number;
-    readonly actual: number;
-  }
-
-  interface TemplateSubAccount extends Model.SubAccount {}
 
   type TemplateForm = Model.Template | Model.SimpleTemplate;
   type BudgetForm = Model.Budget | Model.SimpleBudget;
-  type SubAccountForm = Model.BudgetSubAccount | Model.TemplateSubAccount | Model.SimpleSubAccount;
-  type AccountForm = Model.BudgetAccount | Model.TemplateAccount | Model.SimpleAccount;
   type SimpleLineItem = Model.SimpleAccount | Model.SimpleSubAccount;
-  type BudgetLineItem = Model.BudgetAccount | Model.BudgetSubAccount;
+  type LineItem = Model.Account | Model.SubAccount;
   type SimpleEntity = Model.SimpleAccount | Model.SimpleBudget | Model.SimpleSubAccount | Model.SimpleTemplate;
   type Entity = Model.Account | Model.Budget | Model.SubAccount | Model.Template;
+  type AccountForm = Model.Account | Model.SimpleAccount;
+  type SubAccountForm = Model.SubAccount | Model.SimpleSubAccount;
 
   interface Actual extends Model.Model {
     readonly vendor: string | null;

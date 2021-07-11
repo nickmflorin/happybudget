@@ -34,6 +34,57 @@ export const removeFromArray = (items: any[], key: any, value: any) => {
   return newItems;
 };
 
+export const conditionalCheckObj = <T extends { [key: string]: any }>(
+  obj: T,
+  check: { [key: string]: any }
+): boolean => {
+  let allEqual = true;
+  Object.keys(check).forEach((k: string) => {
+    if (check[k] !== obj[k]) {
+      allEqual = true;
+      return false;
+    }
+  });
+  return allEqual;
+};
+
+export const findWithDistributedTypes = <M, A extends Array<any> = Array<M>>(
+  array: A,
+  predicate: ((i: M) => boolean) | { [key: string]: any }
+): M | null => {
+  for (let i = 0; i < array.length; i++) {
+    const m = array[i] as M;
+    if (typeof predicate === "function") {
+      if (predicate(m)) {
+        return m;
+      }
+    } else {
+      if (conditionalCheckObj(m, predicate)) {
+        return m;
+      }
+    }
+  }
+  return null;
+};
+
+// TODO: It would be nice if we could figure out a pure TS solution for this.
+// The problem is that sometimes, when we call replaceInArray with a union,
+// we don't want it to be distributed.
+// replaceInArray<Cat | Dog> => (Cat | Dog) != Cat[] | Dog[]
+export const replaceInArrayDistributedTypes = <M, A extends Array<any> = Array<M>>(
+  array: A,
+  predicate: ((i: M) => boolean) | { [key: string]: any },
+  newValue: M
+): A => {
+  const currentValue = findWithDistributedTypes<M, A>(array, predicate) as M | null;
+  const newArray = [...array];
+  if (!isNil(currentValue)) {
+    const index = findIndex<M>(array, currentValue);
+    newArray[index] = newValue;
+  }
+  return newArray as A;
+};
+
 export const replaceInArray = <T>(
   array: T[],
   predicate: ((i: T) => boolean) | { [key: string]: any },

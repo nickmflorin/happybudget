@@ -1,14 +1,15 @@
 import { isNil } from "lodash";
 
-import { createAccountSubAccountGroup, createSubAccountSubAccountGroup } from "api/services";
+import * as api from "api";
+
 import { Form } from "components";
 import { GroupForm } from "components/forms";
 import { GroupFormValues } from "components/forms/GroupForm";
 
 import Modal from "./Modal";
 
-interface CreateSubAccountGroupModalProps<G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup> {
-  onSuccess: (group: G) => void;
+interface CreateSubAccountGroupModalProps {
+  onSuccess: (group: Model.Group) => void;
   onCancel: () => void;
   accountId?: number;
   subaccountId?: number;
@@ -16,14 +17,14 @@ interface CreateSubAccountGroupModalProps<G extends Model.Group = Model.BudgetGr
   open: boolean;
 }
 
-const CreateSubAccountGroupModal = <G extends Model.Group = Model.BudgetGroup | Model.TemplateGroup>({
+const CreateSubAccountGroupModal = ({
   accountId,
   subaccountId,
   open,
   subaccounts,
   onSuccess,
   onCancel
-}: CreateSubAccountGroupModalProps<G>): JSX.Element => {
+}: CreateSubAccountGroupModalProps): JSX.Element => {
   const [form] = Form.useForm();
 
   return (
@@ -40,24 +41,26 @@ const CreateSubAccountGroupModal = <G extends Model.Group = Model.BudgetGroup | 
           .then((values: GroupFormValues) => {
             form.setLoading(true);
             if (!isNil(accountId)) {
-              createAccountSubAccountGroup<G>(accountId, {
-                name: values.name,
-                children: subaccounts,
-                color: values.color
-              })
-                .then((group: G) => {
+              api
+                .createAccountSubAccountGroup(accountId, {
+                  name: values.name,
+                  children: subaccounts,
+                  color: values.color
+                })
+                .then((group: Model.Group) => {
                   form.resetFields();
                   onSuccess(group);
                 })
                 .catch((e: Error) => form.handleRequestError(e))
                 .finally(() => form.setLoading(false));
             } else if (!isNil(subaccountId)) {
-              createSubAccountSubAccountGroup<G>(subaccountId, {
-                name: values.name,
-                children: subaccounts,
-                color: values.color
-              })
-                .then((group: G) => {
+              api
+                .createSubAccountSubAccountGroup(subaccountId, {
+                  name: values.name,
+                  children: subaccounts,
+                  color: values.color
+                })
+                .then((group: Model.Group) => {
                   form.resetFields();
                   onSuccess(group);
                 })

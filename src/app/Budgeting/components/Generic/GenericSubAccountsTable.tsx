@@ -8,6 +8,7 @@ import { ColDef, ColSpanParams, SuppressKeyboardEventParams } from "@ag-grid-com
 
 import { FieldsDropdown } from "components/dropdowns";
 
+import * as models from "lib/model";
 import { getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { inferModelFromName } from "lib/model/util";
@@ -16,34 +17,41 @@ import { floatValueSetter, integerValueSetter } from "lib/model/valueSetters";
 
 import BudgetTableComponent from "../BudgetTable";
 
-export interface GenericSubAccountsTableProps<R extends Table.Row, M extends Model.SubAccount, G extends Model.Group>
-  extends Omit<BudgetTable.Props<R, M, G, Http.SubAccountPayload>, "groupParams" | "rowCanExpand" | "tableRef"> {
+export interface GenericSubAccountsTableProps
+  extends Omit<
+    BudgetTable.Props<BudgetTable.SubAccountRow, Model.SubAccount, Http.SubAccountPayload>,
+    "groupParams" | "rowCanExpand" | "tableRef" | "manager"
+  > {
   exportFileName: string;
   categoryName: "Sub Account" | "Detail";
   identifierFieldHeader: "Account" | "Line";
   fringes: Model.Fringe[];
-  fringesCellRenderer: "BudgetFringesCell" | "TemplateFringesCell";
-  fringesCellEditor: "BudgetFringesCellEditor" | "TemplateFringesCellEditor";
+  fringesCellRenderer:
+    | "BudgetAccountFringesCell"
+    | "TemplateAccountFringesCell"
+    | "BudgetSubAccountFringesCell"
+    | "TemplateSubAccountFringesCell";
+  fringesCellEditor:
+    | "BudgetAccountFringesCellEditor"
+    | "TemplateAccountFringesCellEditor"
+    | "BudgetSubAccountFringesCellEditor"
+    | "TemplateSubAccountFringesCellEditor";
   fringesCellEditorParams: {
-    colId: keyof R;
+    colId: keyof BudgetTable.SubAccountRow;
     onAddFringes: () => void;
   };
   tableFooterIdentifierValue: string;
   budgetFooterIdentifierValue?: string;
   subAccountUnits: Model.Tag[];
-  onGroupRows: (rows: R[]) => void;
-  onDeleteGroup: (group: G) => void;
-  onEditGroup: (group: G) => void;
-  onRowRemoveFromGroup: (row: R) => void;
-  onRowAddToGroup: (group: number, row: R) => void;
+  onGroupRows: (rows: BudgetTable.SubAccountRow[]) => void;
+  onDeleteGroup: (group: Model.Group) => void;
+  onEditGroup: (group: Model.Group) => void;
+  onRowRemoveFromGroup: (row: BudgetTable.SubAccountRow) => void;
+  onRowAddToGroup: (group: number, row: BudgetTable.SubAccountRow) => void;
   onEditFringes: () => void;
 }
 
-const GenericSubAccountsTable = <
-  R extends BudgetTable.SubAccountRow,
-  M extends Model.SubAccount,
-  G extends Model.Group
->({
+const GenericSubAccountsTable = ({
   /* eslint-disable indent */
   categoryName,
   identifierFieldHeader,
@@ -62,13 +70,14 @@ const GenericSubAccountsTable = <
   onRowAddToGroup,
   onEditFringes,
   ...props
-}: GenericSubAccountsTableProps<R, M, G>): JSX.Element => {
+}: GenericSubAccountsTableProps): JSX.Element => {
   const tableRef = useRef<BudgetTable.Ref>(null);
 
   return (
-    <BudgetTableComponent<R, M, G, Http.SubAccountPayload>
+    <BudgetTableComponent<BudgetTable.SubAccountRow, Model.SubAccount, Http.SubAccountPayload>
+      manager={models.SubAccountRowManager}
       tableRef={tableRef}
-      isCellEditable={(row: R, colDef: ColDef) => {
+      isCellEditable={(row: BudgetTable.SubAccountRow, colDef: ColDef) => {
         if (includes(["identifier", "description", "name"], colDef.field)) {
           return true;
         } else {
@@ -82,16 +91,16 @@ const GenericSubAccountsTable = <
         onEditGroup,
         onRowAddToGroup
       }}
-      rowCanExpand={(row: R) => !isNil(row.identifier) || row.meta.children.length !== 0}
+      rowCanExpand={(row: BudgetTable.SubAccountRow) => !isNil(row.identifier) || row.meta.children.length !== 0}
       {...props}
-      actions={(params: BudgetTable.MenuActionParams<R>) => [
+      actions={(params: BudgetTable.MenuActionParams<BudgetTable.SubAccountRow>) => [
         {
           tooltip: "Delete",
           icon: faTrashAlt,
           onClick: () => {
-            const rows: R[] = params.apis.grid.getSelectedRows();
+            const rows: BudgetTable.SubAccountRow[] = params.apis.grid.getSelectedRows();
             props.onChangeEvent({
-              payload: map(rows, (row: R) => row.id),
+              payload: map(rows, (row: BudgetTable.SubAccountRow) => row.id),
               type: "rowDelete"
             });
           }
@@ -115,7 +124,7 @@ const GenericSubAccountsTable = <
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
-                fields={map(params.columns, (col: Table.Column<R>) => ({
+                fields={map(params.columns, (col: Table.Column<BudgetTable.SubAccountRow>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
                   defaultChecked: true
@@ -139,7 +148,7 @@ const GenericSubAccountsTable = <
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
-                fields={map(params.columns, (col: Table.Column<R>) => ({
+                fields={map(params.columns, (col: Table.Column<BudgetTable.SubAccountRow>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
                   defaultChecked: true
@@ -185,7 +194,7 @@ const GenericSubAccountsTable = <
           flex: 100,
           type: "longText",
           colSpan: (params: ColSpanParams) => {
-            const row: BudgetTable.TemplateSubAccountRow = params.data;
+            const row: BudgetTable.SubAccountRow = params.data;
             if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
               return row.meta.children.length !== 0 ? 7 : 1;
             }
@@ -202,7 +211,7 @@ const GenericSubAccountsTable = <
           field: "quantity",
           headerName: "Qty",
           width: 60,
-          valueSetter: integerValueSetter<BudgetTable.TemplateSubAccountRow>("quantity"),
+          valueSetter: integerValueSetter<BudgetTable.SubAccountRow>("quantity"),
           type: "number"
         },
         {
@@ -220,8 +229,8 @@ const GenericSubAccountsTable = <
             }
             return false;
           },
-          processCellForClipboard: (row: R) => {
-            const unit = getKeyValue<R, keyof R>("unit")(row);
+          processCellForClipboard: (row: BudgetTable.SubAccountRow) => {
+            const unit = getKeyValue<BudgetTable.SubAccountRow, keyof BudgetTable.SubAccountRow>("unit")(row);
             if (isNil(unit)) {
               return "";
             }
@@ -243,7 +252,7 @@ const GenericSubAccountsTable = <
           field: "multiplier",
           headerName: "X",
           width: 50,
-          valueSetter: floatValueSetter<BudgetTable.TemplateSubAccountRow>("multiplier"),
+          valueSetter: floatValueSetter<BudgetTable.SubAccountRow>("multiplier"),
           type: "number"
         },
         {
@@ -251,7 +260,7 @@ const GenericSubAccountsTable = <
           headerName: "Rate",
           width: 100,
           valueFormatter: agCurrencyValueFormatter,
-          valueSetter: floatValueSetter<BudgetTable.TemplateSubAccountRow>("rate"),
+          valueSetter: floatValueSetter<BudgetTable.SubAccountRow>("rate"),
           type: "currency"
         },
         {
@@ -279,7 +288,7 @@ const GenericSubAccountsTable = <
             ) as Model.Fringe[];
             return map(fs, (f: Model.Fringe) => f.id);
           },
-          processCellForClipboard: (row: R) => {
+          processCellForClipboard: (row: BudgetTable.SubAccountRow) => {
             const subAccountFringes: Model.Fringe[] = filter(
               map(row.fringes, (id: number) => {
                 const fringe: Model.Fringe | undefined = find(fringes, { id });

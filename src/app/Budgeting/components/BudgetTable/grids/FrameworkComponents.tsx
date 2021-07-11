@@ -12,16 +12,20 @@ export const Cells = {
   CalculatedCell: withCellPreparations(cells.CalculatedCell),
   PaymentMethodCell: withPrimaryGrid(withCellPreparations(cells.PaymentMethodCell)),
   BudgetItemCell: withCellPreparations(cells.BudgetItemCell),
-  BudgetFringesCell: withPrimaryGrid(withCellPreparations(cells.BudgetFringesCell)),
-  TemplateFringesCell: withPrimaryGrid(withCellPreparations(cells.TemplateFringesCell)),
+  BudgetAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.BudgetAccountFringesCell)),
+  BudgetSubAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.BudgetSubAccountFringesCell)),
+  TemplateAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.TemplateAccountFringesCell)),
+  TemplateSubAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.TemplateSubAccountFringesCell)),
   ColorCell: withPrimaryGrid(withCellPreparations(cells.ColorCell))
 };
 
 export const Editors = {
   FringesColorEditor: editors.FringesColorEditor,
   FringeUnitCellEditor: editors.FringeUnitCellEditor,
-  BudgetFringesCellEditor: editors.BudgetFringesCellEditor,
-  TemplateFringesCellEditor: editors.TemplateFringesCellEditor,
+  BudgetAccountFringesCellEditor: editors.BudgetAccountFringesCellEditor,
+  BudgetSubAccountFringesCellEditor: editors.BudgetSubAccountFringesCellEditor,
+  TemplateAccountFringesCellEditor: editors.TemplateAccountFringesCellEditor,
+  TemplateSubAccountFringesCellEditor: editors.TemplateSubAccountFringesCellEditor,
   SubAccountUnitCellEditor: editors.SubAccountUnitCellEditor,
   PaymentMethodCellEditor: editors.PaymentMethodCellEditor,
   SubAccountsTreeEditor: editors.SubAccountsTreeEditor

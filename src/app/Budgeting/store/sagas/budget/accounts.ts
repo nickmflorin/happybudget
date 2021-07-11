@@ -150,7 +150,7 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
 }
 
 export function* addToHistoryState(
-  account: Model.BudgetAccount,
+  account: Model.Account,
   eventType: Model.HistoryEventType,
   data?: { field: string; newValue: string | number; oldValue: string | number | null }
 ): SagaIterator {
@@ -185,10 +185,10 @@ export function* addToHistoryState(
 
 const tasks = createAccountsTaskSet<
   Model.Budget,
-  Model.BudgetAccount,
-  BudgetTable.BudgetAccountRow,
-  Model.BudgetGroup,
-  Http.BudgetAccountPayload
+  Model.Account,
+  BudgetTable.AccountRow,
+  Model.Group,
+  Http.AccountPayload
 >(
   {
     loading: actions.loadingAccountsAction,
@@ -215,7 +215,7 @@ const tasks = createAccountsTaskSet<
     bulkCreate: api.bulkCreateBudgetAccounts,
     bulkDelete: api.bulkDeleteBudgetAccounts
   },
-  models.BudgetAccountRowManager,
+  models.AccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.budget.budget.id,
   (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.data,
   (state: Modules.ApplicationStore) => state.budgeting.budget.autoIndex

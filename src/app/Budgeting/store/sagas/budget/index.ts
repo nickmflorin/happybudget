@@ -13,7 +13,6 @@ import { getFringeColorsTask, getSubAccountUnitsTask } from "../tasks";
 import accountSaga from "./account";
 import accountsSaga from "./accounts";
 import actualsSaga from "./actuals";
-import fringesSaga from "./fringes";
 import subAccountSaga from "./subAccount";
 
 export function* handleBudgetChangedTask(action: Redux.Action<number>): SagaIterator {
@@ -74,5 +73,4 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(accountsSaga);
   yield spawn(actualsSaga);
   yield spawn(subAccountSaga);
-  yield spawn(fringesSaga);
 }

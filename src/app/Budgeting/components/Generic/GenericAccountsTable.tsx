@@ -5,31 +5,26 @@ import { faSigma, faPercentage, faTrashAlt, faLineColumns, faFileCsv } from "@fo
 
 import { ColSpanParams } from "@ag-grid-community/core";
 
+import * as models from "lib/model";
 import { FieldsDropdown } from "components/dropdowns";
 import { downloadAsCsvFile } from "lib/util/files";
 import BudgetTableComponent from "../BudgetTable";
 
-export interface GenericAccountsTableProps<
-  R extends BudgetTable.AccountRow,
-  M extends Model.Account,
-  G extends Model.Group,
-  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
-> extends Omit<BudgetTable.Props<R, M, G, P>, "groupParams" | "rowCanExpand" | "tableRef"> {
+export interface GenericAccountsTableProps
+  extends Omit<
+    BudgetTable.Props<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>,
+    "groupParams" | "rowCanExpand" | "tableRef" | "manager"
+  > {
   exportFileName: string;
-  onGroupRows: (rows: R[]) => void;
-  onDeleteGroup: (group: G) => void;
-  onEditGroup: (group: G) => void;
-  onRowRemoveFromGroup: (row: R) => void;
-  onRowAddToGroup: (group: number, row: R) => void;
+  onGroupRows: (rows: BudgetTable.AccountRow[]) => void;
+  onDeleteGroup: (group: Model.Group) => void;
+  onEditGroup: (group: Model.Group) => void;
+  onRowRemoveFromGroup: (row: BudgetTable.AccountRow) => void;
+  onRowAddToGroup: (group: number, row: BudgetTable.AccountRow) => void;
   detail: Model.Template | Model.Budget | undefined;
 }
 
-const GenericAccountsTable = <
-  R extends BudgetTable.AccountRow,
-  M extends Model.Account,
-  G extends Model.Group,
-  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
->({
+const GenericAccountsTable = ({
   /* eslint-disable indent */
   onGroupRows,
   onDeleteGroup,
@@ -39,11 +34,11 @@ const GenericAccountsTable = <
   exportFileName,
   detail,
   ...props
-}: GenericAccountsTableProps<R, M, G, P>): JSX.Element => {
+}: GenericAccountsTableProps): JSX.Element => {
   const tableRef = useRef<BudgetTable.Ref>(null);
 
   return (
-    <BudgetTableComponent<R, M, G, P>
+    <BudgetTableComponent<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>
       tableRef={tableRef}
       groupParams={{
         onDeleteGroup,
@@ -52,16 +47,17 @@ const GenericAccountsTable = <
         onEditGroup,
         onRowAddToGroup
       }}
-      rowCanExpand={(row: R) => !isNil(row.identifier) || row.meta.children.length !== 0}
+      manager={models.AccountRowManager}
+      rowCanExpand={(row: BudgetTable.AccountRow) => !isNil(row.identifier) || row.meta.children.length !== 0}
       {...props}
-      actions={(params: BudgetTable.MenuActionParams<R>) => [
+      actions={(params: BudgetTable.MenuActionParams<BudgetTable.AccountRow>) => [
         {
           tooltip: "Delete",
           icon: faTrashAlt,
           onClick: () => {
-            const rows: R[] = params.apis.grid.getSelectedRows();
+            const rows: BudgetTable.AccountRow[] = params.apis.grid.getSelectedRows();
             props.onChangeEvent({
-              payload: map(rows, (row: R) => row.id),
+              payload: map(rows, (row: BudgetTable.AccountRow) => row.id),
               type: "rowDelete"
             });
           }
@@ -85,7 +81,7 @@ const GenericAccountsTable = <
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
-                fields={map(params.columns, (col: Table.Column<R>) => ({
+                fields={map(params.columns, (col: Table.Column<BudgetTable.AccountRow>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
                   defaultChecked: true
@@ -109,7 +105,7 @@ const GenericAccountsTable = <
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
-                fields={map(params.columns, (col: Table.Column<R>) => ({
+                fields={map(params.columns, (col: Table.Column<BudgetTable.AccountRow>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
                   defaultChecked: true

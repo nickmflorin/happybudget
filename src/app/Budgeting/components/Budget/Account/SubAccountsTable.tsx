@@ -12,7 +12,6 @@ import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { setApplicationLoadingAction } from "store/actions";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
-import BudgetSubAccountsTable from "../SubAccountsTable";
 import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
 import {
   selectBudgetDetail,
@@ -22,6 +21,8 @@ import {
 } from "../../../store/selectors";
 import * as actions from "../../../store/actions/budget/account";
 import { generatePdf } from "../../../pdf";
+import BudgetSubAccountsTable from "../SubAccountsTable";
+import FringesModal from "./FringesModal";
 
 const selectGroups = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.groups.data
@@ -38,6 +39,9 @@ const selectAccountDetail = simpleDeepEqualSelector(
 const selectAccountLoading = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.account.detail.loading
 );
+const selectFringes = simpleDeepEqualSelector(
+  (state: Modules.ApplicationStore) => state.budgeting.budget.account.fringes.data
+);
 
 interface AccountBudgetTableProps {
   accountId: number;
@@ -45,7 +49,9 @@ interface AccountBudgetTableProps {
 
 const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element => {
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<Model.BudgetGroup | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<Model.Group | undefined>(undefined);
+  const [fringesModalVisible, setFringesModalVisible] = useState(false);
+
   const dispatch = useDispatch();
   const history = useHistory();
 
@@ -56,6 +62,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
   const accountDetail = useSelector(selectAccountDetail);
   const groups = useSelector(selectGroups);
   const subAccountUnits = useSelector(selectSubAccountUnits);
+  const fringes = useSelector(selectFringes);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
   const accountLoading = useSelector(selectAccountLoading);
 
@@ -66,6 +73,14 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         groups={groups}
         detail={accountDetail}
         subAccountUnits={subAccountUnits}
+        fringes={fringes}
+        fringesCellEditorParams={{
+          onAddFringes: () => setFringesModalVisible(true),
+          colId: "fringes"
+        }}
+        onEditFringes={() => setFringesModalVisible(true)}
+        fringesCellEditor={"BudgetAccountFringesCellEditor"}
+        fringesCellRenderer={"BudgetAccountFringesCell"}
         loadingParent={accountLoading}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)
@@ -78,22 +93,22 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
         cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.BudgetSubAccountRow>) =>
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.SubAccountRow>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}
-        onDeleteGroup={(group: Model.BudgetGroup) => dispatch(actions.deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: BudgetTable.BudgetSubAccountRow) =>
+        onDeleteGroup={(group: Model.Group) => dispatch(actions.deleteGroupAction(group.id))}
+        onRowRemoveFromGroup={(row: BudgetTable.SubAccountRow) =>
           dispatch(actions.removeSubAccountFromGroupAction(row.id))
         }
-        onRowAddToGroup={(group: number, row: BudgetTable.BudgetSubAccountRow) =>
+        onRowAddToGroup={(group: number, row: BudgetTable.SubAccountRow) =>
           dispatch(actions.addSubAccountToGroupAction({ id: row.id, group }))
         }
-        onGroupRows={(rows: BudgetTable.BudgetSubAccountRow[]) =>
-          setGroupSubAccounts(map(rows, (row: BudgetTable.BudgetSubAccountRow) => row.id))
+        onGroupRows={(rows: BudgetTable.SubAccountRow[]) =>
+          setGroupSubAccounts(map(rows, (row: BudgetTable.SubAccountRow) => row.id))
         }
-        onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
+        onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
         actions={[
           {
             tooltip: "Export as PDF",
@@ -124,7 +139,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
           accountId={accountId}
           subaccounts={groupSubAccounts}
           open={true}
-          onSuccess={(group: Model.BudgetGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
             dispatch(actions.addGroupToStateAction(group));
           }}
@@ -132,16 +147,17 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         />
       )}
       {!isNil(groupToEdit) && (
-        <EditGroupModal<Model.BudgetGroup>
+        <EditGroupModal
           group={groupToEdit}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
-          onSuccess={(group: Model.BudgetGroup) => {
+          onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
           }}
         />
       )}
+      <FringesModal open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
     </React.Fragment>
   );
 };

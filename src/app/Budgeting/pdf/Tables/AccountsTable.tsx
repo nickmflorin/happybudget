@@ -20,7 +20,7 @@ const AccountsTable = ({
 
   const table: BudgetPdf.AccountRowGroup[] = useMemo(() => {
     const getGroupForModel = (model: Model.PdfAccount): number | null => {
-      const group: Model.BudgetGroup | undefined = find(groups, (g: Model.BudgetGroup) =>
+      const group: Model.Group | undefined = find(groups, (g: Model.Group) =>
         includes(
           map(g.children, (child: number) => child),
           model.id
@@ -42,7 +42,7 @@ const AccountsTable = ({
       getGroupForModel(model)
     );
     forEach(groupedModels, (models: Model.PdfAccount[], groupId: string) => {
-      const group: Model.BudgetGroup | undefined = find(groups, { id: parseInt(groupId) } as any);
+      const group: Model.Group | undefined = find(groups, { id: parseInt(groupId) } as any);
       if (!isNil(group)) {
         newTable.push({
           group,
