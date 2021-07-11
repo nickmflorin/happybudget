@@ -1,7 +1,7 @@
 import { Color } from "components/tagging";
 import Cell, { StandardCellProps } from "./Cell";
 
-interface ColorCellProps extends StandardCellProps<any> {
+interface ColorCellProps extends StandardCellProps {
   children: string | null;
 }
 

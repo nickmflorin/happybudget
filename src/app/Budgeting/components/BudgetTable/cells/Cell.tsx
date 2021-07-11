@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import classNames from "classnames";
-import { isNil, includes } from "lodash";
+import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
@@ -15,14 +15,15 @@ import "./index.scss";
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-export type StandardCellProps<R extends Table.Row> = ICellRendererParams;
+export type StandardCellProps = ICellRendererParams;
 
 export interface CellProps<R extends Table.Row>
-  extends Omit<ICellRendererParams, "value" | "column">,
+  extends Omit<StandardCellProps, "value" | "column">,
     StandardComponentProps {
   onClear?: (row: R, colDef: ColDef) => void;
   showClear?: (row: R, colDef: ColDef) => boolean;
   onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
+  loading?: boolean;
   hideClear?: boolean;
   children: ReactNode;
   hide?: boolean;
@@ -55,7 +56,7 @@ const Cell = <R extends Table.Row>(props: CellProps<R>): JSX.Element => {
         style={props.style}
         onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(props.onKeyDown) && props.onKeyDown(event)}
       >
-        <LoadableCellWrapper loading={includes(row.meta.fieldsLoading, props.column.getColId())}>
+        <LoadableCellWrapper loading={props.loading}>
           <span className={"cell-content"}>{props.children}</span>
         </LoadableCellWrapper>
         {showClearButton && (

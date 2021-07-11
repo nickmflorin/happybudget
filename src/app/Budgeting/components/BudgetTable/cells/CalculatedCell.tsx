@@ -4,7 +4,7 @@ import { isNil } from "lodash";
 
 import BodyCell, { BodyCellProps } from "./BodyCell";
 
-interface CalculatedCellProps<R extends Table.Row> extends BodyCellProps<R> {
+export interface CalculatedCellProps<R extends Table.Row> extends BodyCellProps<R> {
   readonly renderRedIfNegative?: boolean;
   readonly children: string | number | null;
 }

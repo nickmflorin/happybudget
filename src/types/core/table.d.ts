@@ -12,7 +12,6 @@ namespace Table {
     readonly children: number[];
     readonly label: string;
     readonly typeLabel: string;
-    readonly fieldsLoading: string[];
     readonly type: Table.RowType;
   }
 
@@ -128,7 +127,7 @@ namespace Table {
     readonly footer?: Table.FooterPdfColumn;
     readonly cellContentsVisible?: Table.OptionalPdfCellCallback<R, M, boolean>;
     readonly cellRenderer?: (params: PdfCellCallbackParams<R, M>) => JSX.Element;
-    // NOTE: This only applies for the individual Account tables, not the overall
+    // NOTE: This only applies for the individual Account tables, not gf the overall
     // Accounts table.
     readonly childFooter?: (s: M) => Table.FooterPdfColumn;
   }

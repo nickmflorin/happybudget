@@ -74,8 +74,7 @@ const defaultRowMeta: Partial<Table.RowMeta> = {
   isGroupFooter: false,
   isTableFooter: false,
   isBudgetFooter: false,
-  children: [],
-  fieldsLoading: []
+  children: []
 };
 
 export class RowManager<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>

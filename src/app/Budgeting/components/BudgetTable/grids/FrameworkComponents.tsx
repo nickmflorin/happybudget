@@ -16,7 +16,8 @@ export const Cells = {
   BudgetSubAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.BudgetSubAccountFringesCell)),
   TemplateAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.TemplateAccountFringesCell)),
   TemplateSubAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.TemplateSubAccountFringesCell)),
-  ColorCell: withPrimaryGrid(withCellPreparations(cells.ColorCell))
+  ColorCell: withPrimaryGrid(withCellPreparations(cells.ColorCell)),
+  BudgetFooterCalculatedCell: withCellPreparations(cells.BudgetFooterCalculatedCell)
 };
 
 export const Editors = {

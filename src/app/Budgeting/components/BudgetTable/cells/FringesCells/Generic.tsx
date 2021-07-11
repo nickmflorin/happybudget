@@ -2,18 +2,13 @@ import { map, find, filter, isNil } from "lodash";
 import { Tag } from "components/tagging";
 import Cell, { StandardCellProps } from "../Cell";
 
-export interface FringesCellProps<R extends Table.Row> extends StandardCellProps<R> {
+export interface FringesCellProps extends StandardCellProps {
   children: number[];
   onAddFringes: () => void;
   fringes: Model.Fringe[];
 }
 
-const FringesCell = <R extends Table.Row>({
-  fringes,
-  children,
-  onAddFringes,
-  ...props
-}: FringesCellProps<R>): JSX.Element => {
+const FringesCell = ({ fringes, children, onAddFringes, ...props }: FringesCellProps): JSX.Element => {
   return (
     <Cell {...props} onClear={() => !isNil(props.setValue) && props.setValue([])} hideClear={children.length === 0}>
       <div style={{ display: "flex", justifyContent: "left" }}>

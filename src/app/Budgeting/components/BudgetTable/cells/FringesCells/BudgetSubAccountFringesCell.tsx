@@ -7,9 +7,7 @@ const selectFringes = simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.fringes.data
 );
 
-const BudgetSubAccountFringesCell = (
-  props: Omit<FringesCellProps<BudgetTable.SubAccountRow>, "fringes">
-): JSX.Element => {
+const BudgetSubAccountFringesCell = (props: Omit<FringesCellProps, "fringes">): JSX.Element => {
   const fringes = useSelector(selectFringes);
   return <FringesCell fringes={fringes} {...props} />;
 };
