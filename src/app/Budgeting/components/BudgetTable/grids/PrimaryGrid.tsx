@@ -953,15 +953,21 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
             // this to only refresh under certain circumstances.
             if (
               includes(
-                map(columns.slice(3), (col: Table.Column<R>) => col.field),
+                map(columns, (col: Table.Column<R>) => col.field),
                 e.colDef.field
               )
             ) {
               const nodes: RowNode[] = [];
-              e.api.forEachNode((node: RowNode) => {
-                const row: R = node.data;
-                if (row.meta.isGroupFooter === false) {
-                  nodes.push(node);
+
+              const firstRow = e.api.getFirstDisplayedRow();
+              const lastRow = e.api.getLastDisplayedRow();
+
+              e.api.forEachNodeAfterFilter((node: RowNode, index: number) => {
+                if (index >= firstRow && index <= lastRow) {
+                  const row: R = node.data;
+                  if (row.meta.isGroupFooter === false) {
+                    nodes.push(node);
+                  }
                 }
               });
               e.api.refreshCells({ force: true, rowNodes: nodes, columns: ["expand"] });
