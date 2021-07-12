@@ -15,7 +15,10 @@ const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
         <View style={{ marginTop: 20 }}>
           <AccountsTable
             options={options}
-            data={budget.accounts}
+            data={filter(
+              budget.accounts,
+              (account: Model.PdfAccount) => !(options.excludeZeroTotals === true) || account.estimated !== 0
+            )}
             groups={budget.groups}
             manager={models.PdfAccountRowManager}
             columns={[
