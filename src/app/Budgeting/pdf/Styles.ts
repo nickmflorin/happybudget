@@ -6,20 +6,25 @@ import { forEach, isNil, map } from "lodash";
 const TABLE_BORDER_COLOR = "#F7F7F7";
 const TABLE_BORDER_RADIUS = 8;
 
-type FontVariant = "Bold" | "Regular" | "Light" | "SemiBold";
+type FontVariant = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";
 type PdfFont = { family: string; variants: FontVariant[] };
 
 const FontVariantMap = {
   Bold: 700,
   Regular: 400,
   Light: 300,
-  SemiBold: 600
+  SemiBold: 600,
+  Medium: 600
 };
 
 export const PdfFonts: PdfFont[] = [
   {
     family: "OpenSans",
     variants: ["Regular", "Light", "SemiBold", "Bold"]
+  },
+  {
+    family: "Roboto",
+    variants: ["Regular", "Light", "Medium", "Bold"]
   }
 ];
 
@@ -77,7 +82,7 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     display: "table",
     width: "auto",
     backgroundColor: "white",
-    fontFamily: "OpenSans"
+    fontFamily: "Roboto"
   },
   tr: {
     flexDirection: "row",
@@ -148,7 +153,8 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   "tag-text": {
     fontSize: 8,
     fontWeight: 400,
-    textAlign: "center"
+    textAlign: "center",
+    marginTop: 1
   },
   uppercase: { textTransform: "uppercase" },
   "fill-width": { textAlign: "center", width: "100%" },
