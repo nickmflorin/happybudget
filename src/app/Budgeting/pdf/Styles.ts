@@ -148,8 +148,7 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   "tag-text": {
     fontSize: 8,
     fontWeight: 400,
-    textAlign: "center",
-    textTransform: "uppercase"
+    textAlign: "center"
   },
   uppercase: { textTransform: "uppercase" },
   "fill-width": { textAlign: "center", width: "100%" },
