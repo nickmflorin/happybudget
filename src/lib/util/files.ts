@@ -34,25 +34,40 @@ export const isBase64 = (value: string): boolean => {
   }
 };
 
-export const download = async (fileObj: string | Blob, name: string, ext?: string) => {
-  if (!isNil(ext)) {
-    if (ext.startsWith(".")) {
-      ext = ext.slice(1);
+type DownloadOptions = {
+  readonly ext?: string;
+  readonly includeExtensionInName?: boolean;
+};
+
+export const download = async (
+  fileObj: string | Blob,
+  name: string,
+  options: DownloadOptions = { includeExtensionInName: true }
+) => {
+  let extension: string;
+
+  let explicitExtension: string | null = null;
+  if (!isNil(options.ext)) {
+    if (options.ext.startsWith(".")) {
+      explicitExtension = options.ext.slice(1);
     }
   }
-  let extension = getFileType(name);
-  if (isNil(extension)) {
-    if (isNil(ext)) {
+  let extensionFromName = getFileType(name);
+  if (isNil(extensionFromName)) {
+    if (isNil(explicitExtension)) {
       throw new Error(`Could not determine file type from file name ${name}.`);
     }
-    extension = ext;
+    extension = explicitExtension;
   } else {
-    if (!isNil(ext) && ext !== extension) {
-      throw new Error(`Invalid extension ${ext} for file name ${name}.`);
+    if (!isNil(explicitExtension) && explicitExtension !== extensionFromName) {
+      throw new Error(`Invalid extension ${explicitExtension} for file name ${name}.`);
     }
+    extension = extensionFromName;
   }
-  if (name.endsWith(extension)) {
+  if (!name.endsWith(extension) && options.includeExtensionInName === true) {
     name = `${name}.${extension}`;
+  } else if (name.endsWith(extension) && options.includeExtensionInName === false) {
+    name = name.slice(0, name.indexOf(extension) - 1);
   }
   let blob: Blob;
   if (!(fileObj instanceof Blob)) {

@@ -102,7 +102,9 @@ const AccountsTable = (): JSX.Element => {
                 dispatch(setApplicationLoadingAction(true));
                 generatePdf(budgetId)
                   .then((response: Blob) => {
-                    download(response, !isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf");
+                    download(response, !isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf", {
+                      includeExtensionInName: false
+                    });
                   })
                   .catch((e: Error) => api.handleRequestError(e))
                   .finally(() => dispatch(setApplicationLoadingAction(false)));
