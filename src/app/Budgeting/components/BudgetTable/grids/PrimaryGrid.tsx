@@ -768,7 +768,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         ordering
       )
     ]);
-  }, [data, groups, ordering]);
+  }, [useDeepEqualMemo(data), useDeepEqualMemo(groups), ordering]);
 
   useEffect(() => {
     if (focused === false && !isNil(apis)) {
@@ -792,27 +792,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       apis.grid.setQuickFilter(search);
     }
   }, [search, apis]);
-
-  useEffect(() => {
-    // When first rendering, it is possible that the groups are not present from
-    // the API response yet, in which case, the cellRenderer will think there are
-    // no groups and not allow the group to be edited.  We need to force refresh
-    // the identifier column when the groups change, so that those cell renderers
-    // have access to the groups when they populate.
-    if (!isNil(apis)) {
-      const nodes: RowNode[] = [];
-      apis.grid.forEachNode((node: RowNode) => {
-        const row: R = node.data;
-        if (row.meta.isGroupFooter === true) {
-          nodes.push(node);
-        }
-      });
-      const cols = apis.column.getAllColumns();
-      if (!isNil(cols) && cols.length >= 3 && nodes.length !== 0) {
-        apis.grid.refreshCells({ force: true, rowNodes: nodes, columns: [cols[2]] });
-      }
-    }
-  }, [useDeepEqualMemo(groups), apis]);
 
   const moveDownKeyListener = useDynamicCallback((localApi: GridApi, e: KeyboardEvent) => {
     const ctrlCmdPressed = e.ctrlKey || e.metaKey;
