@@ -29,7 +29,6 @@ import {
   CellEditingStartedEvent,
   CellMouseOverEvent
 } from "@ag-grid-community/core";
-import { ChangeDetectionStrategyType } from "@ag-grid-community/react";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import * as models from "lib/model";
