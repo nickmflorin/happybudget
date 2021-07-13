@@ -140,7 +140,7 @@ const Tag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.Eleme
       text: tagText as string,
       fillWidth: props.fillWidth || false
     };
-  }, []);
+  }, [props.className, props.uppercase, tagColor, tagTextColor, tagText, props.fillWidth]);
 
   if (!isNil(props.render)) {
     return props.render(renderParams);
