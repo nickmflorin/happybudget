@@ -1,8 +1,12 @@
 @import "style/typography";
+@import "style/breakpoints";
 
 .contacts {
   .ant-table {
-    min-width: 1000px;
+    // this min-width allows the table to be scrolled horizontally on a small screen
+    @include media("<=large") {
+      min-width: 1000px;
+    }
 
     .ant-table-thead .ant-table-cell {
       font-weight: 500;

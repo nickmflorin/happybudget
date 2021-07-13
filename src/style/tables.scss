@@ -393,12 +393,7 @@ $table-border: 1px solid $table-border-color;
 }
 
 .truncate {
-  width: 100px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  &--link {
-    color: $link-color;
-  }
 }

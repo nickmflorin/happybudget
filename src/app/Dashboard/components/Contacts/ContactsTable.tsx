@@ -175,7 +175,7 @@ const ContactsTable = (): JSX.Element => {
             render: (value: string | null) => {
               if (!isNil(value)) {
                 return (
-                  <div className={"truncate truncate--link"}>
+                  <div className={"truncate link"} style={{ width: "100px" }}>
                     <a href={`mailto:${value}`} target={"_blank"} rel={"noreferrer"}>
                       {value}
                     </a>
