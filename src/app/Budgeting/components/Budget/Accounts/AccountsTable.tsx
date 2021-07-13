@@ -50,7 +50,7 @@ const AccountsTable = (): JSX.Element => {
         search={search}
         onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
         exportFileName={!isNil(budgetDetail) ? `budget_${budgetDetail.name}_accounts` : ""}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.AccountRow>) =>
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.AccountRow, Model.Account>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
@@ -69,6 +69,7 @@ const AccountsTable = (): JSX.Element => {
             headerName: "Estimated",
             isCalculated: true,
             type: "sum",
+            fieldBehavior: ["read"],
             footer: {
               value: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0
             }
@@ -78,6 +79,7 @@ const AccountsTable = (): JSX.Element => {
             headerName: "Actual",
             isCalculated: true,
             type: "sum",
+            fieldBehavior: ["read"],
             footer: {
               value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
             }
@@ -87,6 +89,7 @@ const AccountsTable = (): JSX.Element => {
             headerName: "Variance",
             isCalculated: true,
             type: "sum",
+            fieldBehavior: ["read"],
             footer: {
               value: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0
             }

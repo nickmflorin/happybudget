@@ -4,7 +4,6 @@ import { call, put, select, cancelled } from "redux-saga/effects";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import * as models from "lib/model";
 
 import { userToSimpleUser } from "lib/model/mappings";
 import { nowAsString } from "lib/util/dates";
@@ -183,13 +182,7 @@ export function* addToHistoryState(
   }
 }
 
-const tasks = createAccountsTaskSet<
-  Model.Budget,
-  Model.Account,
-  BudgetTable.AccountRow,
-  Model.Group,
-  Http.AccountPayload
->(
+const tasks = createAccountsTaskSet<Model.Budget>(
   {
     loading: actions.loadingAccountsAction,
     deleting: actions.deletingAccountAction,
@@ -215,7 +208,6 @@ const tasks = createAccountsTaskSet<
     bulkCreate: api.bulkCreateBudgetAccounts,
     bulkDelete: api.bulkDeleteBudgetAccounts
   },
-  models.AccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.budget.budget.id,
   (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.data,
   (state: Modules.ApplicationStore) => state.budgeting.budget.autoIndex

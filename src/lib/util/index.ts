@@ -195,5 +195,5 @@ export const conditionalObj = <T = any>(obj: T, condition: boolean): Partial<T> 
 /* prettier-ignore */
 export const getKeyValue =
   <T extends object, U extends keyof T>(key: U) =>
-    (obj: T) =>
+    (obj: T): T[U] =>
       obj[key];

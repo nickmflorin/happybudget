@@ -52,7 +52,7 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
       search={search}
       onSearch={(value: string) => dispatch(actions.setFringesSearchAction(value))}
       saving={saving}
-      onChangeEvent={(e: Table.ChangeEvent<BudgetTable.FringeRow>) =>
+      onChangeEvent={(e: Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe>) =>
         dispatch(actions.handleFringesTableChangeEventAction(e))
       }
     />

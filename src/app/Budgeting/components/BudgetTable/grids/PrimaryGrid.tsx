@@ -29,6 +29,7 @@ import {
   CellEditingStartedEvent,
   CellMouseOverEvent
 } from "@ag-grid-community/core";
+import { ChangeDetectionStrategyType } from "@ag-grid-community/react";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import * as models from "lib/model";
@@ -46,7 +47,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   gridRef,
   options,
   data,
-  manager,
   ordering,
   groups = [],
   columns,
@@ -55,6 +55,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   search,
   actions,
   detached,
+  modelToRow,
+  getModelChildren,
   onGridReady,
   onSearch,
   isCellEditable,
@@ -68,7 +70,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   const [focused, setFocused] = useState(false);
   // Right now, we can only support Cut/Paste for 1 cell at a time.  Multi-cell
   // cut/paste needs to be built in.
-  const [cutCellChange, setCutCellChange] = useState<Table.CellChange<R> | null>(null);
+  const [cutCellChange, setCutCellChange] = useState<Table.CellChange<R, M> | null>(null);
   const oldRow = useRef<R | null>(null); // TODO: Figure out a better way to do this.
   const location = useLocation();
   const [table, setTable] = useState<R[]>([]);
@@ -198,7 +200,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     return params.previousCellPosition;
   });
 
-  const tabToNextCell = useDynamicCallback((params: TabToNextCellParams) => {
+  const tabToNextCell = useDynamicCallback((params: TabToNextCellParams): CellPosition => {
     if (!params.editing && !isNil(apis)) {
       // If the nextCellPosition is null, it means we are at the bottom of the table
       // all the way in the Column furthest to the right.
@@ -217,12 +219,13 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
               rowIndex: params.nextCellPosition.rowIndex + additionalIndex
             };
           }
-          const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
-          if (params.backwards === false && columns.length > baseColumns.length) {
-            return { ...nextCellPosition, column: columns[baseColumns.length] };
-          } else {
-            const agColumns = apis.column.getAllColumns();
-            if (!isNil(agColumns)) {
+
+          const agColumns = apis.column.getAllColumns();
+          if (!isNil(agColumns)) {
+            const baseColumns = filter(agColumns, (c: Column) => includes(["index", "expand"], c.getColId()));
+            if (params.backwards === false && columns.length > baseColumns.length) {
+              return { ...nextCellPosition, column: agColumns[baseColumns.length] };
+            } else {
               return { ...nextCellPosition, column: agColumns[agColumns.length - 1] };
             }
           }
@@ -286,7 +289,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       const node = local.getDisplayedRowAtIndex(focusedCell.rowIndex);
       if (!isNil(node)) {
         const row: R = node.data;
-        const customCol = find(columns, (def: Table.Column<R>) => def.field === focusedCell.column.getColId());
+        const customCol = find(columns, (def: Table.Column<R, M>) => def.field === focusedCell.column.getColId());
         if (!isNil(customCol)) {
           const change = getCellChangeForClear(row, customCol);
           local.flashCells({ columns: [focusedCell.column], rowNodes: [node] });
@@ -335,15 +338,16 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     }
   });
 
-  const getCellChangeForClear = useDynamicCallback((row: R, def: Table.Column<R>): Table.CellChange<R> | null => {
-    const clearValue = def.nullValue !== undefined ? def.nullValue : null;
-    const colId = def.field;
-    if (row[colId] === undefined || row[colId] !== clearValue) {
-      const change: Table.CellChange<R> = {
-        oldValue: row[colId],
+  const getCellChangeForClear = useDynamicCallback((row: R, col: Table.Column<R, M>): Table.CellChange<R, M> | null => {
+    const clearValue = col.nullValue !== undefined ? col.nullValue : null;
+    const colId = col.field;
+    if (row[col.field as string] === undefined || row[col.field as string] !== clearValue) {
+      const change: Table.CellChange<R, M> = {
+        oldValue: row[col.field as string],
         newValue: clearValue as R[keyof R],
         id: row.id,
-        field: colId
+        field: colId,
+        column: col
       };
       return change;
     } else {
@@ -352,8 +356,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   });
 
   const getTableChangesFromRangeClear = useDynamicCallback(
-    (range: CellRange, gridApi?: GridApi): Table.CellChange<R>[] => {
-      const changes: Table.CellChange<R>[] = [];
+    (range: CellRange, gridApi?: GridApi): Table.CellChange<R, M>[] => {
+      const changes: Table.CellChange<R, M>[] = [];
       if (!isNil(apis) && !isNil(range.startRow) && !isNil(range.endRow)) {
         gridApi = isNil(gridApi) ? gridApi : apis.grid;
         let colIds: (keyof R)[] = map(range.columns, (col: Column) => col.getColId() as keyof R);
@@ -382,11 +386,11 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
 
   const getCellChangeFromEvent = (
     event: CellEditingStoppedEvent | CellValueChangedEvent
-  ): Table.CellChange<R> | null => {
-    const field = event.column.getColId() as keyof R;
+  ): Table.CellChange<R, M> | null => {
+    const field = event.column.getColId() as Table.Field<R, M>;
     // AG Grid treats cell values as undefined when they are cleared via edit,
     // so we need to translate that back into a null representation.
-    const customCol: Table.Column<R> | undefined = find(columns, { field } as any);
+    const customCol: Table.Column<R, M> | undefined = find(columns, { field } as any);
     if (!isNil(customCol)) {
       // Note: Converting undefined values back to the column's corresponding null
       // values may now be handled by the valueSetter on the Table.Column object.
@@ -407,7 +411,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         if (field === "fringes" && !Array.isArray(newValue)) {
           newValue = [newValue];
         }
-        const change: Table.CellChange<R> = { oldValue, newValue, field, id: event.data.id };
+        const change: Table.CellChange<R, M> = { oldValue, newValue, field, id: event.data.id, column: customCol };
         return change;
       }
     }
@@ -415,7 +419,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   };
 
   const clearCellsOverRange = useDynamicCallback((range: CellRange | CellRange[], paramsApi?: GridApi) => {
-    const changes: Table.CellChange<R>[] = !Array.isArray(range)
+    const changes: Table.CellChange<R, M>[] = !Array.isArray(range)
       ? getTableChangesFromRangeClear(range, paramsApi)
       : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, paramsApi)));
     onChangeEvent({
@@ -424,7 +428,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     });
   });
 
-  const clearCell = useDynamicCallback((row: R, def: Table.Column<R>) => {
+  const clearCell = useDynamicCallback((row: R, def: Table.Column<R, M>) => {
     const change = getCellChangeForClear(row, def);
     if (!isNil(change)) {
       onChangeEvent({
@@ -441,8 +445,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   const onPasteEnd = useDynamicCallback((event: PasteEndEvent) => {
     const changes = filter(
       map(cellChangeEvents, (e: CellValueChangedEvent) => getCellChangeFromEvent(e)),
-      (change: Table.CellChange<R> | null) => change !== null
-    ) as Table.CellChange<R>[];
+      (change: Table.CellChange<R, M> | null) => change !== null
+    ) as Table.CellChange<R, M>[];
     if (changes.length !== 0) {
       onChangeEvent({
         type: "dataChange",
@@ -456,6 +460,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     if (row.meta.isGroupFooter === true) {
       return "row--group-footer";
     }
+    return "";
   });
 
   const getRowStyle = useDynamicCallback((params: RowClassParams) => {
@@ -557,7 +562,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         // edit mode but instead want to clear the values of the cells - so we prevent those key
         // presses from triggering edit mode in the Cell Editor and clear the value at this level.
         const column = params.column;
-        const customCol = find(columns, (def: Table.Column<R>) => def.field === column.getColId());
+        const customCol = find(columns, (def: Table.Column<R, M>) => def.field === column.getColId());
         if (!isNil(customCol)) {
           const columnType: Table.ColumnType | undefined = find(models.ColumnTypes, { id: customCol.type });
           if (!isNil(columnType) && columnType.editorIsPopup === true) {
@@ -578,13 +583,28 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     return false;
   });
 
-  const recreateRowFromDataArray = (local: ColumnApi, array: any[], startingColumn: Column): R => {
-    const row: any = {};
+  const createRowAddFromDataArray = (local: ColumnApi, array: any[], startingColumn: Column): Table.RowAdd<R, M> => {
+    let rowAdd: Table.RowAdd<R, M> = { data: {} };
     let currentColumn: Column = startingColumn;
     map(array, (value: any) => {
       const field = currentColumn.getColDef().field;
       if (!isNil(field)) {
-        row[field] = processCellFromClipboard(currentColumn, row, value);
+        const column: Table.Column<R, M> | undefined = find(columns, { field } as any);
+        if (!isNil(column)) {
+          const fieldBehavior = column.fieldBehavior || ["read", "write"];
+          if (includes(fieldBehavior, "write")) {
+            rowAdd = {
+              ...rowAdd,
+              data: {
+                ...rowAdd.data,
+                [column.field as string]: {
+                  value: processCellValueFromClipboard(currentColumn, value),
+                  column
+                }
+              }
+            };
+          }
+        }
       }
       const nextColumn = local.getDisplayedColAfter(currentColumn);
       if (isNil(nextColumn)) {
@@ -592,7 +612,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       }
       currentColumn = nextColumn;
     });
-    return row as R;
+    return rowAdd;
   };
 
   const processDataFromClipboard = useDynamicCallback((params: ProcessDataFromClipboardParams) => {
@@ -613,8 +633,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
             currIndex--;
           }
           rowsToAdd = rowsToAdd.reverse();
-          const newRows: R[] = map(rowsToAdd, (r: any[]) =>
-            recreateRowFromDataArray(apis.column, r, focusedCell.column)
+          const newRows: Table.RowAdd<R, M>[] = map(rowsToAdd, (r: any[]) =>
+            createRowAddFromDataArray(apis.column, r, focusedCell.column)
           );
           onChangeEvent({
             type: "rowAdd",
@@ -647,20 +667,20 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
 
   useEffect(() => {
     const createGroupFooter = (group: Model.Group): R | null => {
-      const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
+      const baseColumns = filter(columns, (c: Table.Column<R, M>) => includes(["index", "expand"], c.field));
       if (columns.length > baseColumns.length) {
         return reduce(
           [...columns.slice(0, baseColumns.length), ...columns.slice(baseColumns.length + 1)],
-          (obj: { [key: string]: any }, col: Table.Column<R>) => {
+          (obj: { [key: string]: any }, col: Table.Column<R, M>) => {
             if (!isNil(col.field)) {
               if (col.isCalculated === true) {
                 if (!isNil(group[col.field as keyof Model.Group])) {
-                  obj[col.field] = group[col.field as keyof Model.Group];
+                  obj[col.field as string] = group[col.field as keyof Model.Group];
                 } else {
-                  obj[col.field] = null;
+                  obj[col.field as string] = null;
                 }
               } else {
-                obj[col.field] = null;
+                obj[col.field as string] = null;
               }
             }
             return obj;
@@ -669,7 +689,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
             // The ID needs to designate that this row refers to a Group because the ID of a Group
             // might clash with the ID of a SubAccount/Account.
             id: `group-${group.id}`,
-            [columns[baseColumns.length].field]: group.name,
+            [columns[baseColumns.length].field as string]: group.name,
             group: group.id,
             meta: {
               isGroupFooter: true,
@@ -690,6 +710,34 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       return !isNil(group) ? group.id : null;
     };
 
+    const convertModelToRow = (model: M): R => {
+      if (!isNil(modelToRow)) {
+        return modelToRow(model);
+      }
+      return reduce(
+        columns,
+        (obj: { [key: string]: any }, col: Table.Column<R, M>) => {
+          const fieldBehavior: Table.FieldBehavior[] = col.fieldBehavior || ["read", "write"];
+          if (includes(fieldBehavior, "read")) {
+            const nullValue = col.nullValue === undefined ? null : col.nullValue;
+            if (model[col.field as keyof M] !== undefined) {
+              obj[col.field as string] = model[col.field as keyof M];
+            } else {
+              obj[col.field as string] = nullValue;
+            }
+          }
+          return obj;
+        },
+        {
+          id: model.id,
+          meta: {
+            ...models.DefaultRowMeta,
+            children: !isNil(getModelChildren) ? getModelChildren(model) : []
+          }
+        }
+      ) as R;
+    };
+
     const modelsWithGroup = filter(data, (m: M) => !isNil(getGroupForModel(m)));
     let modelsWithoutGroup = filter(data, (m: M) => isNil(getGroupForModel(m)));
     const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
@@ -700,7 +748,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       if (!isNil(group)) {
         newTable.push(
           ...orderByFieldOrdering(
-            map(ms, (m: M) => manager.modelToRow(m)),
+            map(ms, (m: M) => convertModelToRow(m)),
             ordering
           )
         );
@@ -717,7 +765,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     setTable([
       ...newTable,
       ...orderByFieldOrdering(
-        map(modelsWithoutGroup, (m: M) => manager.modelToRow(m)),
+        map(modelsWithoutGroup, (m: M) => convertModelToRow(m)),
         ordering
       )
     ]);
@@ -807,12 +855,12 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     }
   }, [apis]);
 
-  const processCellForClipboard = useDynamicCallback((column: Table.Column<R>, row: R, value?: any) => {
+  const processCellForClipboard = useDynamicCallback((column: Table.Column<R, M>, row: R, value?: any) => {
     const processor = column.processCellForClipboard;
     if (!isNil(processor)) {
       return processor(row);
     } else {
-      value = value === undefined ? getKeyValue<R, keyof R>(column.field)(row) : value;
+      value = value === undefined ? getKeyValue<R, keyof R>(column.field as keyof R)(row) : value;
       // The value should never be undefined at this point.
       if (value === column.nullValue) {
         return "";
@@ -821,12 +869,11 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     }
   });
 
-  const processCellFromClipboard = useDynamicCallback((column: Table.Column<R>, row: R, value?: any) => {
+  const processCellValueFromClipboard = useDynamicCallback((column: Table.Column<R, M>, value: any) => {
     const processor = column.processCellFromClipboard;
     if (!isNil(processor)) {
       return processor(value);
     } else {
-      value = value === undefined ? getKeyValue<R, keyof R>(column.field)(row) : value;
       // The value should never be undefined at this point.
       if (typeof value === "string" && String(value).trim() === "") {
         return !isNil(column.nullValue) ? column.nullValue : null;
@@ -835,9 +882,14 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     }
   });
 
+  const processCellFromClipboard = useDynamicCallback((column: Table.Column<R, M>, row: R, value?: any) => {
+    value = value === undefined ? getKeyValue<R, keyof R>(column.field as keyof R)(row) : value;
+    return processCellValueFromClipboard(column, value);
+  });
+
   const _processCellForClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
     if (!isNil(params.node)) {
-      const customCol: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+      const customCol: Table.Column<R, M> | undefined = find(columns, { field: params.column.getColId() } as any);
       if (!isNil(customCol)) {
         setCutCellChange(null);
         return processCellForClipboard(customCol, params.node.data as R, params.value);
@@ -848,7 +900,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   const _processCellFromClipboard = useDynamicCallback((params: ProcessCellForExportParams) => {
     if (!isNil(params.node)) {
       const node: RowNode = params.node;
-      const customCol: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+      const customCol: Table.Column<R, M> | undefined = find(columns, { field: params.column.getColId() } as any);
       if (!isNil(customCol)) {
         if (!isNil(cutCellChange)) {
           params = { ...params, value: cutCellChange.oldValue };
@@ -866,18 +918,18 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   useImperativeHandle(gridRef, () => ({
     getCSVData: (fields?: string[]) => {
       if (!isNil(apis)) {
-        const cs: Table.Column<R>[] = filter(
+        const cs: Table.Column<R, M>[] = filter(
           columns,
-          (column: Table.Column<R>) =>
+          (column: Table.Column<R, M>) =>
             column.excludeFromExport !== true && (isNil(fields) || includes(fields, column.field))
         );
-        const csvData: CSVData = [map(cs, (col: Table.Column<R>) => col.headerName || "")];
+        const csvData: CSVData = [map(cs, (col: Table.Column<R, M>) => col.headerName || "")];
         apis.grid.forEachNode((node: RowNode, index: number) => {
           const row: R = node.data;
           csvData.push(
             reduce(
               cs,
-              (current: CSVRow, column: Table.Column<R>) => [...current, processCellForClipboard(column, row)],
+              (current: CSVRow, column: Table.Column<R, M>) => [...current, processCellForClipboard(column, row)],
               []
             )
           );
@@ -906,14 +958,14 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     }
   });
 
-  const includeCellEditorParams = (def: Table.Column<R>): Table.Column<R> => {
+  const includeCellEditorParams = (def: Table.Column<R, M>): Table.Column<R, M> => {
     return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
   };
 
   return (
     <React.Fragment>
       {!isNil(apis) && (
-        <BudgetTableMenu<R>
+        <BudgetTableMenu<R, M>
           apis={apis}
           actions={actions}
           search={search}
@@ -923,9 +975,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         />
       )}
       <div className={"table-grid"}>
-        <Grid<R>
+        <Grid<R, M>
           {...options}
-          columns={map(columns, (col: Table.Column<R>) => includeCellEditorParams(col))}
+          columns={map(columns, (col: Table.Column<R, M>) => includeCellEditorParams(col))}
           getContextMenuItems={getContextMenuItems}
           // This is the same as checking if the onGridReady event has fired.
           rowData={!isNil(apis) ? table : []}
@@ -943,6 +995,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           onCellKeyDown={onCellKeyDown}
           onFirstDataRendered={onFirstDataRendered}
           suppressKeyboardEvent={suppressKeyboardEvent}
+          // rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
           onCellEditingStarted={(event: CellEditingStartedEvent) => {
             oldRow.current = { ...event.node.data };
           }}
@@ -953,7 +1006,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
             // this to only refresh under certain circumstances.
             if (
               includes(
-                map(columns, (col: Table.Column<R>) => col.field),
+                map(columns, (col: Table.Column<R, M>) => col.field),
                 e.colDef.field
               )
             ) {

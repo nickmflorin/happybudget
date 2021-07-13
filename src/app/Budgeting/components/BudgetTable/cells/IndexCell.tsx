@@ -5,7 +5,7 @@ import { ICellRendererParams } from "@ag-grid-community/core";
 import { IconButton } from "components/buttons";
 
 interface IndexCellProps extends ICellRendererParams {
-  onChangeEvent: (e: Table.ChangeEvent<any>) => void;
+  onChangeEvent: (e: Table.ChangeEvent<any, any>) => void;
 }
 
 const IndexCell = <R extends Table.Row>({ onChangeEvent, node }: IndexCellProps): JSX.Element => {

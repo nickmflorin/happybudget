@@ -1,18 +1,11 @@
 import * as api from "api";
-import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
 import { requestTemplateAction, loadingTemplateAction } from "../../actions/template";
 import * as actions from "../../actions/template/accounts";
 import { createStandardSaga, createAccountsTaskSet } from "../factories";
 
-const tasks = createAccountsTaskSet<
-  Model.Template,
-  Model.Account,
-  BudgetTable.AccountRow,
-  Model.Group,
-  Http.AccountPayload
->(
+const tasks = createAccountsTaskSet<Model.Template>(
   {
     loading: actions.loadingAccountsAction,
     deleting: actions.deletingAccountAction,
@@ -38,7 +31,6 @@ const tasks = createAccountsTaskSet<
     bulkCreate: api.bulkCreateTemplateAccounts,
     bulkDelete: api.bulkDeleteTemplateAccounts
   },
-  models.AccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.template.template.id,
   (state: Modules.ApplicationStore) => state.budgeting.template.accounts.data,
   (state: Modules.ApplicationStore) => state.budgeting.template.autoIndex

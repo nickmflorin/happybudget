@@ -5,7 +5,6 @@ import { faSigma, faPercentage, faTrashAlt, faLineColumns, faFileCsv } from "@fo
 
 import { ColSpanParams } from "@ag-grid-community/core";
 
-import * as models from "lib/model";
 import { FieldsDropdown } from "components/dropdowns";
 import { downloadAsCsvFile } from "lib/util/files";
 import BudgetTableComponent from "../BudgetTable";
@@ -47,10 +46,10 @@ const GenericAccountsTable = ({
         onEditGroup,
         onRowAddToGroup
       }}
-      manager={models.AccountRowManager}
       rowCanExpand={(row: BudgetTable.AccountRow) => !isNil(row.identifier) || row.meta.children.length !== 0}
+      getModelChildren={(model: Model.Account) => model.subaccounts}
       {...props}
-      actions={(params: BudgetTable.MenuActionParams<BudgetTable.AccountRow>) => [
+      actions={(params: BudgetTable.MenuActionParams<BudgetTable.AccountRow, Model.Account>) => [
         {
           tooltip: "Delete",
           icon: faTrashAlt,
@@ -81,7 +80,7 @@ const GenericAccountsTable = ({
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
-                fields={map(params.columns, (col: Table.Column<BudgetTable.AccountRow>) => ({
+                fields={map(params.columns, (col: Table.Column<BudgetTable.AccountRow, Model.Account>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
                   defaultChecked: true
@@ -105,7 +104,7 @@ const GenericAccountsTable = ({
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
-                fields={map(params.columns, (col: Table.Column<BudgetTable.AccountRow>) => ({
+                fields={map(params.columns, (col: Table.Column<BudgetTable.AccountRow, Model.Account>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
                   defaultChecked: true

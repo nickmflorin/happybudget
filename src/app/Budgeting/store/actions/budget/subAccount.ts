@@ -11,9 +11,9 @@ export const responseSubAccountAction = simpleAction<Model.SubAccount | undefine
 export const updateParentSubAccountInStateAction = simpleAction<Partial<Model.Account>>(
   ActionType.Budget.SubAccount.UpdateInState
 );
-export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.SubAccountRow>>(
-  ActionType.Budget.SubAccount.TableChanged
-);
+export const handleTableChangeEventAction = simpleAction<
+  Table.ChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount>
+>(ActionType.Budget.SubAccount.TableChanged);
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.SubAccount.Comments.Request);
 export const responseCommentsAction = simpleAction<Http.ListResponse<Model.Comment>>(
   ActionType.Budget.SubAccount.Comments.Response
@@ -93,7 +93,7 @@ export const loadingFringesAction = simpleAction<boolean>(ActionType.Budget.SubA
 export const responseFringesAction = simpleAction<Http.ListResponse<Model.Fringe>>(
   ActionType.Budget.SubAccount.Fringes.Response
 );
-export const handleFringesTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.FringeRow>>(
+export const handleFringesTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe>>(
   ActionType.Budget.SubAccount.Fringes.TableChanged
 );
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(

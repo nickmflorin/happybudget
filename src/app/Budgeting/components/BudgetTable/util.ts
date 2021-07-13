@@ -1,6 +1,6 @@
 import { forEach, includes, isNil, map } from "lodash";
 import classNames from "classnames";
-import { ColDef, CellRange, CellClassParams } from "@ag-grid-community/core";
+import { CellRange, CellClassParams } from "@ag-grid-community/core";
 
 export const rangeSelectionIsSingleCell = (range: CellRange) => {
   if (range.startRow?.rowIndex === range.endRow?.rowIndex && range.columns.length === 1) {
@@ -9,7 +9,10 @@ export const rangeSelectionIsSingleCell = (range: CellRange) => {
   return false;
 };
 
-const validateCookiesFieldOrder = <R extends Table.Row>(obj: any, cols: ColDef[]): FieldOrder<keyof R> | null => {
+const validateCookiesFieldOrder = <R extends Table.Row, M extends Model.Model>(
+  obj: any,
+  cols: Table.Column<R, M>[]
+): FieldOrder<keyof R> | null => {
   if (
     typeof obj === "object" &&
     !isNil(obj.field) &&
@@ -17,7 +20,7 @@ const validateCookiesFieldOrder = <R extends Table.Row>(obj: any, cols: ColDef[]
     typeof obj.field === "string" &&
     includes([-1, 0, 1], obj.order) &&
     includes(
-      map(cols, (col: ColDef) => col.field),
+      map(cols, (col: Table.Column<R, M>) => col.field),
       obj.field
     )
   ) {
@@ -29,9 +32,9 @@ const validateCookiesFieldOrder = <R extends Table.Row>(obj: any, cols: ColDef[]
   return null;
 };
 
-export const validateCookiesOrdering = <R extends Table.Row>(
+export const validateCookiesOrdering = <R extends Table.Row, M extends Model.Model>(
   obj: any,
-  cols: ColDef[]
+  cols: Table.Column<R, M>[]
 ): FieldOrder<keyof R>[] | null => {
   if (Array.isArray(obj)) {
     if (obj.length === 0) {

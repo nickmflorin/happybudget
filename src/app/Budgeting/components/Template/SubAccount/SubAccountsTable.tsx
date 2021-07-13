@@ -79,7 +79,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.SubAccountRow>) =>
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onBack={() => {

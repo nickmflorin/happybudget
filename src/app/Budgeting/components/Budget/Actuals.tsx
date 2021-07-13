@@ -68,14 +68,13 @@ const Actuals = (): JSX.Element => {
         <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Http.ActualPayload>
           data={data}
           tableRef={tableRef}
-          manager={models.ActualRowManager}
           indexColumn={{ width: 40, maxWidth: 50 }}
           search={search}
           onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
-          onChangeEvent={(e: Table.ChangeEvent<BudgetTable.ActualRow>) =>
+          onChangeEvent={(e: Table.ChangeEvent<BudgetTable.ActualRow, Model.Actual>) =>
             dispatch(actions.handleTableChangeEventAction(e))
           }
-          actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow>) => [
+          actions={(params: BudgetTable.MenuActionParams<BudgetTable.ActualRow, Model.Actual>) => [
             {
               tooltip: "Delete",
               icon: faTrashAlt,
@@ -95,7 +94,7 @@ const Actuals = (): JSX.Element => {
               wrap: (children: ReactNode) => {
                 return (
                   <FieldsDropdown
-                    fields={map(params.columns, (col: Table.Column<BudgetTable.ActualRow>) => ({
+                    fields={map(params.columns, (col: Table.Column<BudgetTable.ActualRow, Model.Actual>) => ({
                       id: col.field as string,
                       label: col.headerName as string,
                       defaultChecked: true
@@ -118,7 +117,7 @@ const Actuals = (): JSX.Element => {
               wrap: (children: ReactNode) => {
                 return (
                   <FieldsDropdown
-                    fields={map(params.columns, (col: Table.Column<BudgetTable.ActualRow>) => ({
+                    fields={map(params.columns, (col: Table.Column<BudgetTable.ActualRow, Model.Actual>) => ({
                       id: col.field as string,
                       label: col.headerName as string,
                       defaultChecked: true
@@ -229,6 +228,12 @@ const Actuals = (): JSX.Element => {
               flex: 1,
               cellEditor: "PaymentMethodCellEditor",
               type: "singleSelect",
+              httpValueConverter: (payment_method: Model.PaymentMethod | null) => {
+                if (payment_method !== null) {
+                  return payment_method.id;
+                }
+                return null;
+              },
               // Required to allow the dropdown to be selectable on Enter key.
               suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
                 if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {

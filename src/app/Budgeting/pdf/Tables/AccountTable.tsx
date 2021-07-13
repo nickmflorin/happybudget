@@ -13,7 +13,6 @@ const AccountTable = ({
   /* eslint-disable indent */
   columns,
   account,
-  manager,
   options
 }: BudgetPdf.AccountTableProps): JSX.Element => {
   const showFooterRow = useMemo(() => {
@@ -24,15 +23,29 @@ const AccountTable = ({
     const row: { [key: string]: any } = {};
     forEach(columns, (column: ColumnType) => {
       if (!isNil(account[column.field as keyof Model.PdfAccount]) && column.isCalculated !== true) {
-        row[column.field] = account[column.field as keyof Model.PdfAccount];
+        row[column.field as keyof Model.PdfAccount] = account[column.field as keyof Model.PdfAccount];
       } else {
-        row[column.field] = null;
+        row[column.field as keyof Model.PdfAccount] = null;
       }
     });
     return row as BudgetPdf.SubAccountRow;
   }, [account, columns]);
 
   const generateRows = useDynamicCallback((): JSX.Element[] => {
+    const convertModelToRow = (model: Model.PdfSubAccount): BudgetPdf.SubAccountRow => {
+      return reduce(
+        columns,
+        (obj: { [key: string]: any }, col: Table.PdfColumn<BudgetPdf.SubAccountRow, Model.PdfSubAccount>) => {
+          if (model[col.field as keyof Model.PdfSubAccount] !== undefined) {
+            obj[col.field as string] = model[col.field as keyof Model.PdfSubAccount];
+          } else {
+            obj[col.field as string] = "";
+          }
+          return obj;
+        },
+        { id: model.id, meta: {} }
+      ) as BudgetPdf.SubAccountRow;
+    };
     let rows: JSX.Element[] = [
       <HeaderRow className={"account-header-tr"} columns={columns} index={0} key={0} />,
       <BodyRow<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
@@ -70,9 +83,9 @@ const AccountTable = ({
             !isNil(subaccount[col.field as keyof Model.PdfSubAccount]) &&
             (details.length === 0 || col.isCalculated !== true)
           ) {
-            obj[col.field] = subaccount[col.field as keyof Model.PdfSubAccount];
+            obj[col.field as string] = subaccount[col.field as keyof Model.PdfSubAccount];
           } else {
-            obj[col.field] = null;
+            obj[col.field as string] = null;
           }
           return obj;
         },
@@ -92,7 +105,7 @@ const AccountTable = ({
       runningIndex += 1;
 
       forEach(details, (detail: Model.PdfSubAccount, j: number) => {
-        const detailRow = manager.modelToRow(detail);
+        const detailRow = convertModelToRow(detail);
         rows.push(
           <BodyRow<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
             key={runningIndex}
@@ -122,9 +135,9 @@ const AccountTable = ({
           columns,
           (obj: { [key: string]: any }, col: ColumnType) => {
             if (!isNil(col.childFooter) && !isNil(col.childFooter(subaccount).value)) {
-              obj[col.field] = col.childFooter(subaccount).value;
+              obj[col.field as string] = col.childFooter(subaccount).value;
             } else {
-              obj[col.field] = null;
+              obj[col.field as string] = null;
             }
             return obj;
           },

@@ -1,22 +1,23 @@
 import { useEffect, useState } from "react";
-import { map, isNil, filter, reduce, includes } from "lodash";
+import { map, isNil, reduce, includes } from "lodash";
 
 import { ColSpanParams } from "@ag-grid-community/core";
 
+import * as models from "lib/model";
 import { useDeepEqualMemo } from "lib/hooks";
 
 import Grid from "./Grid";
 
-const BudgetFooterGrid = <R extends Table.Row>({
+const BudgetFooterGrid = <R extends Table.Row, M extends Model.Model>({
   options,
   columns,
   loadingBudget,
   onGridReady,
   onFirstDataRendered
-}: BudgetTable.BudgetFooterGridProps<R>): JSX.Element => {
+}: BudgetTable.BudgetFooterGridProps<R, M>): JSX.Element => {
   const [data, setData] = useState<R[]>([]);
 
-  const transformColumn = (column: Table.Column<R>): Table.Column<R> => {
+  const transformColumn = (column: Table.Column<R, M>): Table.Column<R, M> => {
     return {
       ...column,
       cellRenderer: column.isCalculated === true ? "BudgetFooterCalculatedCell" : column.cellRenderer,
@@ -30,40 +31,36 @@ const BudgetFooterGrid = <R extends Table.Row>({
   };
 
   useEffect(() => {
-    const baseColumns = filter(columns, (c: Table.Column<R>) => includes(["index", "expand"], c.field));
-    if (columns.length > baseColumns.length) {
-      setData([
-        reduce(
-          columns,
-          (obj: { [key: string]: any }, col: Table.Column<R>) => {
+    setData([
+      reduce(
+        columns,
+        (obj: { [key: string]: any }, col: Table.Column<R, M>) => {
+          const fieldBehavior: Table.FieldBehavior[] = col.fieldBehavior || ["read", "write"];
+          if (includes(fieldBehavior, "read")) {
             if (!isNil(col.budget) && !isNil(col.budget.value)) {
-              obj[col.field] = col.budget.value;
+              obj[col.field as string] = col.budget.value;
             } else {
-              obj[col.field] = null;
-            }
-            return obj;
-          },
-          {
-            id: "budget_footer_row",
-            meta: {
-              isGroupFooter: false,
-              isTableFooter: false,
-              isBudgetFooter: true,
-              selected: false,
-              children: [],
-              errors: []
+              obj[col.field as string] = null;
             }
           }
-        ) as R
-      ]);
-    }
+          return obj;
+        },
+        {
+          id: "budget_footer_row",
+          meta: {
+            ...models.DefaultRowMeta,
+            isBudgetFooter: true
+          }
+        }
+      ) as R
+    ]);
   }, [useDeepEqualMemo(columns), loadingBudget]);
 
   return (
     <div className={"budget-footer-grid"}>
-      <Grid
+      <Grid<R, M>
         {...options}
-        columns={map(columns, (col: Table.Column<R>) => transformColumn(col))}
+        columns={map(columns, (col: Table.Column<R, M>) => transformColumn(col))}
         rowData={data}
         rowClass={"row--budget-footer"}
         onGridReady={onGridReady}

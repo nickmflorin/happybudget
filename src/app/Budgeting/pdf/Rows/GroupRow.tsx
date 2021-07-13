@@ -29,14 +29,14 @@ const GroupRow = <R extends Table.PdfRow, M extends Model.Model>(
       props.columns,
       (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>, index: number) => {
         if (props.columns.length === 1 || index === 1) {
-          obj[col.field] = props.group.name;
+          obj[col.field as string] = props.group.name;
         } else if (col.isCalculated === true) {
-          obj[col.field] = null;
+          obj[col.field as string] = null;
           if (!isNil(props.group[col.field as keyof Model.Group])) {
-            obj[col.field] = props.group[col.field as keyof Model.Group];
+            obj[col.field as string] = props.group[col.field as keyof Model.Group];
           }
         } else {
-          obj[col.field] = null;
+          obj[col.field as string] = null;
         }
         return obj;
       },

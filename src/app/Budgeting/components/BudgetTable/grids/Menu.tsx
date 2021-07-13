@@ -89,14 +89,14 @@ const BudgetTableMenuAction = ({ action }: BudgetTableMenuActionProps): JSX.Elem
   return innerElement;
 };
 
-const BudgetTableMenu = <R extends Table.Row>({
+const BudgetTableMenu = <R extends Table.Row, M extends Model.Model>({
   apis,
   actions,
   search,
   detached = false,
   columns,
   onSearch
-}: BudgetTable.MenuProps<R>) => {
+}: BudgetTable.MenuProps<R, M>) => {
   return (
     <PortalOrRender id={"supplementary-header"} portal={!detached}>
       <div className={classNames("table-header", { detached })}>
@@ -124,7 +124,7 @@ const BudgetTableMenu = <R extends Table.Row>({
                   ? actions
                   : actions({
                       apis,
-                      columns: filter(columns, (col: Table.Column<R>) => !includes(["index", "expand"], col.field))
+                      columns: filter(columns, (col: Table.Column<R, M>) => !includes(["index", "expand"], col.field))
                     }),
                 (action: BudgetTable.MenuAction, index: number) => (
                   <BudgetTableMenuAction key={index} action={action} />

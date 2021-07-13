@@ -1,7 +1,7 @@
 import { simpleAction } from "store/actions";
 import ActionType from "../ActionType";
 
-export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.AccountRow>>(
+export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.AccountRow, Model.Account>>(
   ActionType.Template.Accounts.TableChanged
 );
 export const deletingAccountAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Template.Accounts.Deleting);

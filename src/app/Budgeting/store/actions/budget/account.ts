@@ -37,9 +37,9 @@ export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budg
 export const updateCommentInStateAction = simpleAction<
   Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
 >(ActionType.Budget.Account.Comments.UpdateInState);
-export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.SubAccountRow>>(
-  ActionType.Budget.Account.TableChanged
-);
+export const handleTableChangeEventAction = simpleAction<
+  Table.ChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount>
+>(ActionType.Budget.Account.TableChanged);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.Account.SubAccounts.Deleting
 );
@@ -88,7 +88,7 @@ export const loadingFringesAction = simpleAction<boolean>(ActionType.Budget.Acco
 export const responseFringesAction = simpleAction<Http.ListResponse<Model.Fringe>>(
   ActionType.Budget.Account.Fringes.Response
 );
-export const handleFringesTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.FringeRow>>(
+export const handleFringesTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe>>(
   ActionType.Budget.Account.Fringes.TableChanged
 );
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(

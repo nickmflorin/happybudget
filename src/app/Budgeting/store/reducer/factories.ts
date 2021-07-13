@@ -1,7 +1,6 @@
 import { Reducer, combineReducers } from "redux";
 import { isNil, includes, map, filter, reduce, forEach, uniq } from "lodash";
 
-import * as models from "lib/model";
 import {
   createModelListResponseReducer,
   createDetailResponseReducer,
@@ -11,7 +10,7 @@ import {
 import { CommentsListResponseActionMap } from "lib/redux/factories/comments";
 import { warnInconsistentState } from "lib/redux/util";
 import * as typeguards from "lib/model/typeguards";
-import { fringeValue, consolidateTableChange } from "lib/model/util";
+import { fringeValue, consolidateTableChange, mergeChangesWithModel } from "lib/model/util";
 import { replaceInArray, replaceInArrayDistributedTypes, findWithDistributedTypes } from "lib/util";
 
 import { initialModelListResponseState } from "store/initialState";
@@ -105,7 +104,7 @@ export const createFringesReducer = (
   ): Redux.ModelListResponseStore<Model.Fringe> => {
     let newState = listResponseReducer(state, action);
     if (action.type === mapping.TableChanged) {
-      const event: Table.ChangeEvent<BudgetTable.FringeRow> = action.payload;
+      const event: Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe> = action.payload;
 
       if (typeguards.isDataChangeEvent(event)) {
         const consolidated = consolidateTableChange(event.payload);
@@ -113,7 +112,7 @@ export const createFringesReducer = (
         // The consolidateTableChange method should return changes that are grouped by SubAccount,
         // but just in case we apply grouping logic here.
         let changesPerFringe: {
-          [key: number]: { changes: Table.RowChange<BudgetTable.FringeRow>[]; model: Model.Fringe };
+          [key: number]: { changes: Table.RowChange<BudgetTable.FringeRow, Model.Fringe>[]; model: Model.Fringe };
         } = {};
         for (let i = 0; i < consolidated.length; i++) {
           if (isNil(changesPerFringe[consolidated[i].id])) {
@@ -141,7 +140,7 @@ export const createFringesReducer = (
           const changesObj = changesPerFringe[id];
           let fringe = changesObj.model;
           for (let j = 0; j < changesObj.changes.length; j++) {
-            fringe = models.FringeRowManager.mergeChangesWithModel(changesObj.model, changesObj.changes[j]);
+            fringe = mergeChangesWithModel(changesObj.model, changesObj.changes[j]);
           }
           newState = {
             ...newState,
@@ -408,12 +407,12 @@ const updateAccountInState = <S extends Modules.Budgeting.AccountsStore>(
   action: Redux.Action<any>,
   st: S,
   id: number | Model.Account,
-  changes: Table.RowChange<BudgetTable.AccountRow>[]
+  changes: Table.RowChange<BudgetTable.AccountRow, Model.Account>[]
 ): S => {
   let account = modelFromState<Model.Account>(action, st.data, id);
   if (!isNil(account)) {
     for (let j = 0; j < changes.length; j++) {
-      account = models.AccountRowManager.mergeChangesWithModel(account, changes[j]);
+      account = mergeChangesWithModel(account, changes[j]);
     }
     st = {
       ...st,
@@ -487,7 +486,7 @@ export const createAccountsReducer = <S extends Modules.Budgeting.AccountsStore>
     } else if (action.type === mapping.Groups.RemoveFromState) {
       newState = removeGroupFromState<S>(action, newState, action.payload);
     } else if (action.type === mapping.TableChanged) {
-      const event: Table.ChangeEvent<BudgetTable.AccountRow> = action.payload;
+      const event: Table.ChangeEvent<BudgetTable.AccountRow, Model.Account> = action.payload;
 
       if (typeguards.isDataChangeEvent(event)) {
         const consolidated = consolidateTableChange(event.payload);
@@ -495,7 +494,7 @@ export const createAccountsReducer = <S extends Modules.Budgeting.AccountsStore>
         // The consolidated changes should contain one change per account, but
         // just in case we apply that grouping logic here.
         let changesPerAccount: {
-          [key: number]: { changes: Table.RowChange<BudgetTable.AccountRow>[]; model: Model.Account };
+          [key: number]: { changes: Table.RowChange<BudgetTable.AccountRow, Model.Account>[]; model: Model.Account };
         } = {};
         for (let i = 0; i < consolidated.length; i++) {
           if (isNil(changesPerAccount[consolidated[i].id])) {
@@ -620,12 +619,12 @@ const updateSubAccountInState = <S extends Modules.Budgeting.SubAccountsStore>(
   st: S,
   fringesState: Redux.ModelListResponseStore<Model.Fringe>,
   id: number | Model.SubAccount,
-  changes: Table.RowChange<BudgetTable.SubAccountRow>[]
+  changes: Table.RowChange<BudgetTable.SubAccountRow, Model.SubAccount>[]
 ) => {
   let subAccount: Model.SubAccount | null = modelFromState<Model.SubAccount>(action, st.data, id);
   if (!isNil(subAccount)) {
     for (let j = 0; j < changes.length; j++) {
-      subAccount = models.SubAccountRowManager.mergeChangesWithModel(subAccount, changes[j]);
+      subAccount = mergeChangesWithModel(subAccount, changes[j]);
     }
     st = {
       ...st,
@@ -749,14 +748,17 @@ export const createAccountReducer = <
       // If the table change referred to a change to a SubAccount in the table, then we need to
       // update that SubAccount in state.
       if (action.type === mapping.TableChanged) {
-        const event: Table.ChangeEvent<BudgetTable.AccountRow> = action.payload;
+        const event: Table.ChangeEvent<BudgetTable.AccountRow, Model.Account> = action.payload;
         if (typeguards.isDataChangeEvent(event)) {
           const consolidated = consolidateTableChange(event.payload);
 
           // The consolidated changes should contain one change per sub account, but
           // just in case we apply that grouping logic here.
           let changesPerSubAccount: {
-            [key: number]: { changes: Table.RowChange<BudgetTable.AccountRow>[]; model: Model.SubAccount };
+            [key: number]: {
+              changes: Table.RowChange<BudgetTable.AccountRow, Model.Account>[];
+              model: Model.SubAccount;
+            };
           } = {};
           for (let i = 0; i < consolidated.length; i++) {
             if (isNil(changesPerSubAccount[consolidated[i].id])) {
@@ -809,14 +811,16 @@ export const createAccountReducer = <
         // Since the Fringes are displayed in a modal and not on a separate page, when a Fringe is
         // changed we need to recalculate the SubAcccount(s) that have that Fringe so they display
         // estimated values that are consistent with the change to the Fringe.
-        const event: Table.ChangeEvent<BudgetTable.FringeRow> = action.payload;
+        const event: Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe> = action.payload;
 
         if (typeguards.isDataChangeEvent(event)) {
           // We don't have to be concerned with the individual changes for each Fringe,
           // just the Fringe IDs of the Fringes that changed.  This is because the changes
           // will have already been applied to the individual Fringe(s).
           const consolidated = consolidateTableChange(event.payload);
-          const ids = uniq(map(consolidated, (change: Table.RowChange<BudgetTable.FringeRow>) => change.id));
+          const ids = uniq(
+            map(consolidated, (change: Table.RowChange<BudgetTable.FringeRow, Model.Fringe>) => change.id)
+          );
           map(ids, (id: number) => {
             map(
               filter(newState.subaccounts.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),
@@ -936,14 +940,17 @@ export const createSubAccountReducer = <
       // If the table change referred to a change to a SubAccount in the table, then we need to
       // update that SubAccount in state.
       if (action.type === mapping.TableChanged) {
-        const event: Table.ChangeEvent<BudgetTable.SubAccountRow> = action.payload;
+        const event: Table.ChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount> = action.payload;
         if (typeguards.isDataChangeEvent(event)) {
           const consolidated = consolidateTableChange(event.payload);
 
           // The consolidated changes should contain one change per sub account, but
           // just in case we apply that grouping logic here.
           let changesPerSubAccount: {
-            [key: number]: { changes: Table.RowChange<BudgetTable.SubAccountRow>[]; model: Model.SubAccount };
+            [key: number]: {
+              changes: Table.RowChange<BudgetTable.SubAccountRow, Model.SubAccount>[];
+              model: Model.SubAccount;
+            };
           } = {};
           for (let i = 0; i < consolidated.length; i++) {
             if (isNil(changesPerSubAccount[consolidated[i].id])) {
@@ -996,14 +1003,16 @@ export const createSubAccountReducer = <
         // Since the Fringes are displayed in a modal and not on a separate page, when a Fringe is
         // changed we need to recalculate the SubAcccount(s) that have that Fringe so they display
         // estimated values that are consistent with the change to the Fringe.
-        const event: Table.ChangeEvent<BudgetTable.FringeRow> = action.payload;
+        const event: Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe> = action.payload;
 
         if (typeguards.isDataChangeEvent(event)) {
           // We don't have to be concerned with the individual changes for each Fringe,
           // just the Fringe IDs of the Fringes that changed.  This is because the changes
           // will have already been applied to the individual Fringe(s).
           const consolidated = consolidateTableChange(event.payload);
-          const ids = uniq(map(consolidated, (change: Table.RowChange<BudgetTable.FringeRow>) => change.id));
+          const ids = uniq(
+            map(consolidated, (change: Table.RowChange<BudgetTable.FringeRow, Model.Fringe>) => change.id)
+          );
           map(ids, (id: number) => {
             map(
               filter(newState.subaccounts.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),

@@ -23,6 +23,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
           headerName: "Estimated",
           isCalculated: true,
           type: "sum",
+          fieldBehavior: ["read"],
           budget: {
             value: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0
           },
@@ -35,6 +36,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
           headerName: "Actual",
           isCalculated: true,
           type: "sum",
+          fieldBehavior: ["read"],
           budget: {
             value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
           },
@@ -47,6 +49,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
           headerName: "Variance",
           isCalculated: true,
           type: "sum",
+          fieldBehavior: ["read"],
           budget: {
             value: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0
           },

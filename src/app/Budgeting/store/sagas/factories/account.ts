@@ -5,22 +5,15 @@ import { isNil, map } from "lodash";
 
 import * as api from "api";
 
-import { RowManager } from "lib/model";
-import { consolidateTableChange } from "lib/model/util";
+import { consolidateTableChange, createBulkCreatePayload, payload } from "lib/model/util";
 
-import { createBulkCreatePayload } from "./util";
-
-export interface AccountTasksActionMap<
-  A extends Model.Account | Model.Account,
-  SA extends Model.SubAccount | Model.SubAccount,
-  G extends Model.Group | Model.Group
-> {
+export interface AccountTasksActionMap {
   deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  addToState: Redux.ActionCreator<SA>;
+  addToState: Redux.ActionCreator<Model.SubAccount>;
   loading: Redux.ActionCreator<boolean>;
-  response: Redux.ActionCreator<Http.ListResponse<SA>>;
+  response: Redux.ActionCreator<Http.ListResponse<Model.SubAccount>>;
   request: Redux.ActionCreator<null>;
   budget: {
     loading: Redux.ActionCreator<boolean>;
@@ -29,43 +22,37 @@ export interface AccountTasksActionMap<
   account: {
     loading: Redux.ActionCreator<boolean>;
     request: Redux.ActionCreator<null>;
-    response: Redux.ActionCreator<A | undefined>;
+    response: Redux.ActionCreator<Model.Account | undefined>;
   };
   groups: {
     removeFromState: Redux.ActionCreator<number>;
     deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
     loading: Redux.ActionCreator<boolean>;
-    response: Redux.ActionCreator<Http.ListResponse<G>>;
+    response: Redux.ActionCreator<Http.ListResponse<Model.Group>>;
     request: Redux.ActionCreator<null>;
   };
 }
 
-export interface AccountTaskSet<R extends Table.Row> {
+export interface AccountTaskSet {
   addToGroup: Redux.Task<{ id: number; group: number }>;
   removeFromGroup: Redux.Task<number>;
   deleteGroup: Redux.Task<number>;
-  handleRowAddEvent: Redux.Task<Table.RowAddEvent<R>>;
+  handleRowAddEvent: Redux.Task<Table.RowAddEvent<BudgetTable.SubAccountRow, Model.SubAccount>>;
   handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
-  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R>>;
+  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount>>;
   getSubAccounts: Redux.Task<null>;
   getGroups: Redux.Task<null>;
   getAccount: Redux.Task<null>;
   handleAccountChange: Redux.Task<number>;
 }
 
-export const createAccountTaskSet = <
-  A extends Model.Account | Model.Account,
-  SA extends Model.SubAccount | Model.SubAccount,
-  R extends Table.Row,
-  G extends Model.Group | Model.Group
->(
+export const createAccountTaskSet = (
   /* eslint-disable indent */
-  actions: AccountTasksActionMap<A, SA, G>,
-  manager: RowManager<R, SA, Http.SubAccountPayload>,
+  actions: AccountTasksActionMap,
   selectAccountId: (state: Modules.ApplicationStore) => number | null,
-  selectModels: (state: Modules.ApplicationStore) => SA[],
+  selectModels: (state: Modules.ApplicationStore) => Model.SubAccount[],
   selectAutoIndex: (state: Modules.ApplicationStore) => boolean
-): AccountTaskSet<R> => {
+): AccountTaskSet => {
   function* handleAccountChangeTask(action: Redux.Action<number>): SagaIterator {
     yield all([put(actions.account.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);
   }
@@ -136,7 +123,7 @@ export const createAccountTaskSet = <
     }
   }
 
-  function* bulkCreateTask(payload: Table.RowAddPayload<R>): SagaIterator {
+  function* bulkCreateTask(p: Table.RowAddPayload<BudgetTable.SubAccountRow, Model.SubAccount>): SagaIterator {
     const accountId = yield select(selectAccountId);
     if (!isNil(accountId)) {
       const CancelToken = axios.CancelToken;
@@ -147,12 +134,13 @@ export const createAccountTaskSet = <
       const autoIndex = yield select(selectAutoIndex);
 
       const requestPayload: Http.BulkCreatePayload<Http.SubAccountPayload> = createBulkCreatePayload<
-        R,
-        Http.SubAccountPayload,
-        SA
-      >(payload, manager, {
+        BudgetTable.SubAccountRow,
+        Model.SubAccount,
+        Http.SubAccountPayload
+      >(p, {
         autoIndex,
-        models: data
+        models: data,
+        field: "identifier"
       });
       let success = true;
 
@@ -162,10 +150,15 @@ export const createAccountTaskSet = <
       yield put(actions.budget.loading(true));
 
       try {
-        const subaccounts: SA[] = yield call(api.bulkCreateAccountSubAccounts, accountId, requestPayload, {
-          cancelToken: source.token
-        });
-        yield all(subaccounts.map((subaccount: SA) => put(actions.addToState(subaccount))));
+        const subaccounts: Model.SubAccount[] = yield call(
+          api.bulkCreateAccountSubAccounts,
+          accountId,
+          requestPayload,
+          {
+            cancelToken: source.token
+          }
+        );
+        yield all(subaccounts.map((subaccount: Model.SubAccount) => put(actions.addToState(subaccount))));
       } catch (e) {
         success = false;
         yield put(actions.budget.loading(false));
@@ -186,10 +179,12 @@ export const createAccountTaskSet = <
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
+  function* handleRowAddEvent(
+    action: Redux.Action<Table.RowAddEvent<BudgetTable.SubAccountRow, Model.SubAccount>>
+  ): SagaIterator {
     const accountId = yield select(selectAccountId);
     if (!isNil(accountId) && !isNil(action.payload)) {
-      const event: Table.RowAddEvent<R> = action.payload;
+      const event: Table.RowAddEvent<BudgetTable.SubAccountRow, Model.SubAccount> = action.payload;
       yield fork(bulkCreateTask, event.payload);
     }
   }
@@ -231,19 +226,21 @@ export const createAccountTaskSet = <
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
+  function* handleDataChangeEvent(
+    action: Redux.Action<Table.DataChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount>>
+  ): SagaIterator {
     const accountId = yield select(selectAccountId);
     if (!isNil(accountId) && !isNil(action.payload)) {
-      const event: Table.DataChangeEvent<R> = action.payload;
+      const event: Table.DataChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount> = action.payload;
       const merged = consolidateTableChange(event.payload);
       if (merged.length !== 0) {
         const CancelToken = axios.CancelToken;
         const source = CancelToken.source();
         const requestPayload: Http.BulkUpdatePayload<Http.SubAccountPayload>[] = map(
           merged,
-          (change: Table.RowChange<R>) => ({
+          (change: Table.RowChange<BudgetTable.SubAccountRow, Model.SubAccount>) => ({
             id: change.id,
-            ...manager.payload(change)
+            ...payload(change)
           })
         );
         // We do this to show the loading indicator next to the calculated fields of the footers,
@@ -251,7 +248,11 @@ export const createAccountTaskSet = <
         // succeeds and we refresh the parent state.
         yield put(actions.budget.loading(true));
         let success = true;
-        yield all(merged.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
+        yield all(
+          merged.map((change: Table.RowChange<BudgetTable.SubAccountRow, Model.SubAccount>) =>
+            put(actions.updating({ id: change.id, value: true }))
+          )
+        );
         try {
           yield call(api.bulkUpdateAccountSubAccounts, accountId, requestPayload, { cancelToken: source.token });
         } catch (e) {
@@ -261,7 +262,11 @@ export const createAccountTaskSet = <
             api.handleRequestError(e, "There was an error updating the sub accounts.");
           }
         } finally {
-          yield all(merged.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
+          yield all(
+            merged.map((change: Table.RowChange<BudgetTable.SubAccountRow, Model.SubAccount>) =>
+              put(actions.updating({ id: change.id, value: false }))
+            )
+          );
           if (yield cancelled()) {
             success = false;
             source.cancel();
@@ -282,7 +287,7 @@ export const createAccountTaskSet = <
       const source = CancelToken.source();
       yield put(actions.groups.loading(true));
       try {
-        const response: Http.ListResponse<G> = yield call(
+        const response: Http.ListResponse<Model.Group> = yield call(
           api.getAccountSubAccountGroups,
           accountId,
           { no_pagination: true },
@@ -310,7 +315,7 @@ export const createAccountTaskSet = <
       const source = CancelToken.source();
       yield put(actions.loading(true));
       try {
-        const response: Http.ListResponse<SA> = yield call(
+        const response: Http.ListResponse<Model.SubAccount> = yield call(
           api.getAccountSubAccounts,
           accountId,
           { no_pagination: true },
@@ -347,7 +352,7 @@ export const createAccountTaskSet = <
         yield put(actions.account.loading(true));
       }
       try {
-        const response: A = yield call(api.getAccount, accountId, { cancelToken: source.token });
+        const response: Model.Account = yield call(api.getAccount, accountId, { cancelToken: source.token });
         yield put(actions.account.response(response));
       } catch (e) {
         if (!(yield cancelled())) {

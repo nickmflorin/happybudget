@@ -4,19 +4,16 @@ import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, map, filter, includes } from "lodash";
 
 import * as api from "api";
-import * as models from "lib/model";
 
-import { consolidateTableChange } from "lib/model/util";
+import { consolidateTableChange, createBulkCreatePayload, payload } from "lib/model/util";
 
-import { createBulkCreatePayload } from "./util";
-
-export interface AccountsTasksActionMap<A extends Model.Account | Model.Account, G extends Model.Group | Model.Group> {
+export interface AccountsTasksActionMap {
   deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  addToState: Redux.ActionCreator<A>;
+  addToState: Redux.ActionCreator<Model.Account>;
   loading: Redux.ActionCreator<boolean>;
-  response: Redux.ActionCreator<Http.ListResponse<A>>;
+  response: Redux.ActionCreator<Http.ListResponse<Model.Account>>;
   budget: {
     loading: Redux.ActionCreator<boolean>;
     request: Redux.ActionCreator<null>;
@@ -25,49 +22,53 @@ export interface AccountsTasksActionMap<A extends Model.Account | Model.Account,
     removeFromState: Redux.ActionCreator<number>;
     deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
     loading: Redux.ActionCreator<boolean>;
-    response: Redux.ActionCreator<Http.ListResponse<G>>;
+    response: Redux.ActionCreator<Http.ListResponse<Model.Group>>;
   };
 }
 
-export interface AccountsServiceSet<
-  M extends Model.Template | Model.Budget,
-  A extends Model.Account | Model.Account,
-  G extends Model.Group | Model.Group,
-  P extends Http.AccountPayload | Http.AccountPayload
-> {
+export interface AccountsServiceSet<M extends Model.Model> {
   bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<M>;
-  bulkUpdate: (id: number, data: Http.BulkUpdatePayload<P>[], options: Http.RequestOptions) => Promise<M>;
-  bulkCreate: (id: number, payload: Http.BulkCreatePayload<P>, options: Http.RequestOptions) => Promise<A[]>;
-  getAccounts: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<A>>;
-  getGroups: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<G>>;
+  bulkUpdate: (
+    id: number,
+    data: Http.BulkUpdatePayload<Http.AccountPayload>[],
+    options: Http.RequestOptions
+  ) => Promise<M>;
+  bulkCreate: (
+    id: number,
+    p: Http.BulkCreatePayload<Http.AccountPayload>,
+    options: Http.RequestOptions
+  ) => Promise<Model.Account[]>;
+  getAccounts: (
+    id: number,
+    query: Http.ListQuery,
+    options: Http.RequestOptions
+  ) => Promise<Http.ListResponse<Model.Account>>;
+  getGroups: (
+    id: number,
+    query: Http.ListQuery,
+    options: Http.RequestOptions
+  ) => Promise<Http.ListResponse<Model.Group>>;
 }
 
-export interface AccountsTaskSet<R extends Table.Row> {
+export interface AccountsTaskSet {
   addToGroup: Redux.Task<{ id: number; group: number }>;
   removeFromGroup: Redux.Task<number>;
   deleteGroup: Redux.Task<number>;
   getAccounts: Redux.Task<null>;
   getGroups: Redux.Task<null>;
-  handleRowAddEvent: Redux.Task<Table.RowAddEvent<R>>;
+  handleRowAddEvent: Redux.Task<Table.RowAddEvent<BudgetTable.AccountRow, Model.Account>>;
   handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
-  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R>>;
+  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<BudgetTable.AccountRow, Model.Account>>;
 }
 
-export const createAccountsTaskSet = <
-  M extends Model.Template | Model.Budget,
-  A extends Model.Account | Model.Account,
-  R extends Table.Row,
-  G extends Model.Group | Model.Group,
-  P extends Http.AccountPayload | Http.AccountPayload
->(
+export const createAccountsTaskSet = <M extends Model.Model>(
   /* eslint-disable indent */
-  actions: AccountsTasksActionMap<A, G>,
-  services: AccountsServiceSet<M, A, G, P>,
-  manager: models.RowManager<R, A, P>,
+  actions: AccountsTasksActionMap,
+  services: AccountsServiceSet<M>,
   selectObjId: (state: Modules.ApplicationStore) => number | null,
-  selectModels: (state: Modules.ApplicationStore) => A[],
+  selectModels: (state: Modules.ApplicationStore) => Model.Account[],
   selectAutoIndex: (state: Modules.ApplicationStore) => boolean
-): AccountsTaskSet<R> => {
+): AccountsTaskSet => {
   function* removeFromGroupTask(action: Redux.Action<number>): SagaIterator {
     if (!isNil(action.payload)) {
       const CancelToken = axios.CancelToken;
@@ -134,7 +135,7 @@ export const createAccountsTaskSet = <
     }
   }
 
-  function* bulkCreateTask(payload: Table.RowAddPayload<R>): SagaIterator {
+  function* bulkCreateTask(p: Table.RowAddPayload<BudgetTable.AccountRow, Model.Account>): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId)) {
       const CancelToken = axios.CancelToken;
@@ -144,9 +145,14 @@ export const createAccountsTaskSet = <
       const autoIndex = yield select(selectAutoIndex);
       const data = yield select(selectModels);
 
-      const requestPayload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, P, A>(payload, manager, {
+      const requestPayload: Http.BulkCreatePayload<Http.AccountPayload> = createBulkCreatePayload<
+        BudgetTable.AccountRow,
+        Model.Account,
+        Http.AccountPayload
+      >(p, {
         autoIndex,
-        models: data
+        models: data,
+        field: "identifier"
       });
       // We do this to show the loading indicator next to the calculated fields of the footers,
       // otherwise, the loading indicators will not appear until the first API request
@@ -154,8 +160,10 @@ export const createAccountsTaskSet = <
       yield put(actions.budget.loading(true));
       let success = true;
       try {
-        const accounts: A[] = yield call(services.bulkCreate, objId, requestPayload, { cancelToken: source.token });
-        yield all(accounts.map((account: A) => put(actions.addToState(account))));
+        const accounts: Model.Account[] = yield call(services.bulkCreate, objId, requestPayload, {
+          cancelToken: source.token
+        });
+        yield all(accounts.map((account: Model.Account) => put(actions.addToState(account))));
       } catch (e) {
         success = false;
         yield put(actions.budget.loading(false));
@@ -175,10 +183,12 @@ export const createAccountsTaskSet = <
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
+  function* handleRowAddEvent(
+    action: Redux.Action<Table.RowAddEvent<BudgetTable.AccountRow, Model.Account>>
+  ): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const event: Table.RowAddEvent<R> = action.payload;
+      const event: Table.RowAddEvent<BudgetTable.AccountRow, Model.Account> = action.payload;
       yield fork(bulkCreateTask, event.payload);
     }
   }
@@ -188,11 +198,11 @@ export const createAccountsTaskSet = <
     if (!isNil(objId) && !isNil(action.payload)) {
       const event: Table.RowDeleteEvent = action.payload;
 
-      const ms: A[] = yield select(selectModels);
+      const ms: Model.Account[] = yield select(selectModels);
       let ids = Array.isArray(event.payload) ? event.payload : [event.payload];
       ids = filter(ids, (id: number) =>
         includes(
-          map(ms, (m: A) => m.id),
+          map(ms, (m: Model.Account) => m.id),
           id
         )
       );
@@ -229,10 +239,12 @@ export const createAccountsTaskSet = <
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R>>): SagaIterator {
+  function* handleDataChangeEvent(
+    action: Redux.Action<Table.DataChangeEvent<BudgetTable.AccountRow, Model.Account>>
+  ): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const event: Table.DataChangeEvent<R> = action.payload;
+      const event: Table.DataChangeEvent<BudgetTable.AccountRow, Model.Account> = action.payload;
 
       const merged = consolidateTableChange(event.payload);
       if (merged.length !== 0) {
@@ -240,9 +252,9 @@ export const createAccountsTaskSet = <
         const source = CancelToken.source();
         const requestPayload: Http.BulkUpdatePayload<Http.AccountPayload>[] = map(
           merged,
-          (change: Table.RowChange<R>) => ({
+          (change: Table.RowChange<BudgetTable.AccountRow, Model.Account>) => ({
             id: change.id,
-            ...manager.payload(change)
+            ...payload(change)
           })
         );
         // We do this to show the loading indicator next to the calculated fields of the footers,
@@ -250,7 +262,11 @@ export const createAccountsTaskSet = <
         // succeeds and we refresh the parent state.
         yield put(actions.budget.loading(true));
         let success = true;
-        yield all(merged.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: true }))));
+        yield all(
+          merged.map((change: Table.RowChange<BudgetTable.AccountRow, Model.Account>) =>
+            put(actions.updating({ id: change.id, value: true }))
+          )
+        );
         try {
           yield call(services.bulkUpdate, objId, requestPayload, { cancelToken: source.token });
         } catch (e) {
@@ -260,7 +276,11 @@ export const createAccountsTaskSet = <
             api.handleRequestError(e, "There was an error updating the accounts.");
           }
         } finally {
-          yield all(merged.map((change: Table.RowChange<R>) => put(actions.updating({ id: change.id, value: false }))));
+          yield all(
+            merged.map((change: Table.RowChange<BudgetTable.AccountRow, Model.Account>) =>
+              put(actions.updating({ id: change.id, value: false }))
+            )
+          );
           if (yield cancelled()) {
             success = false;
             source.cancel();
@@ -280,7 +300,7 @@ export const createAccountsTaskSet = <
       const source = CancelToken.source();
       yield put(actions.groups.loading(true));
       try {
-        const response: Http.ListResponse<G> = yield call(
+        const response: Http.ListResponse<Model.Group> = yield call(
           services.getGroups,
           objId,
           { no_pagination: true },

@@ -14,7 +14,7 @@ const HeaderRow = <R extends Table.PdfRow, M extends Model.Model>({
     return reduce(
       props.columns,
       (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>) => {
-        obj[col.field] = col.headerName;
+        obj[col.field as string] = col.headerName;
         return obj;
       },
       {}

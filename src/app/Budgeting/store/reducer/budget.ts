@@ -11,8 +11,7 @@ import {
 import { initialModelListResponseState } from "store/initialState";
 import { warnInconsistentState } from "lib/redux/util";
 import { replaceInArray } from "lib/util";
-import * as models from "lib/model";
-import { consolidateTableChange } from "lib/model/util";
+import { consolidateTableChange, mergeChangesWithModel } from "lib/model/util";
 import * as typeguards from "lib/model/typeguards";
 
 import { ActionType } from "../actions";
@@ -47,7 +46,7 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
   );
   let newState = listResponseReducer(state, action);
   if (action.type === ActionType.Budget.Actuals.TableChanged) {
-    const event: Table.ChangeEvent<BudgetTable.ActualRow> = action.payload;
+    const event: Table.ChangeEvent<BudgetTable.ActualRow, Model.Actual> = action.payload;
 
     if (typeguards.isDataChangeEvent(event)) {
       const consolidated = consolidateTableChange(event.payload);
@@ -55,7 +54,7 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
       // The consolidated changes should contain one change per actual, but
       // just in case we apply that grouping logic here.
       let changesPerActual: {
-        [key: number]: { changes: Table.RowChange<BudgetTable.ActualRow>[]; model: Model.Actual };
+        [key: number]: { changes: Table.RowChange<BudgetTable.ActualRow, Model.Actual>[]; model: Model.Actual };
       } = {};
       for (let i = 0; i < consolidated.length; i++) {
         if (isNil(changesPerActual[consolidated[i].id])) {
@@ -84,7 +83,7 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
         const changesObj = changesPerActual[id];
         let actual = changesObj.model;
         for (let j = 0; j < changesObj.changes.length; j++) {
-          actual = models.ActualRowManager.mergeChangesWithModel(changesObj.model, changesObj.changes[j]);
+          actual = mergeChangesWithModel(changesObj.model, changesObj.changes[j]);
         }
         newState = {
           ...newState,

@@ -4,7 +4,6 @@ import { call, put, select, cancelled, take, cancel, spawn } from "redux-saga/ef
 import { isNil } from "lodash";
 
 import * as api from "api";
-import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
 import { loadingBudgetAction, requestBudgetAction } from "../../actions/budget";
@@ -174,7 +173,7 @@ const fringesRootSaga = createStandardFringesSaga(
   fringeTasks
 );
 
-const tasks = createAccountTaskSet<Model.Account, Model.SubAccount, BudgetTable.SubAccountRow, Model.Group>(
+const tasks = createAccountTaskSet(
   {
     loading: actions.loadingSubAccountsAction,
     deleting: actions.deletingSubAccountAction,
@@ -200,7 +199,6 @@ const tasks = createAccountTaskSet<Model.Account, Model.SubAccount, BudgetTable.
       request: actions.requestGroupsAction
     }
   },
-  models.SubAccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.budget.account.id,
   (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.data,
   (state: Modules.ApplicationStore) => state.budgeting.budget.autoIndex

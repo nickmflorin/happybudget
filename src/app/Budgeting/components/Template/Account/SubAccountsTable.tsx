@@ -78,7 +78,7 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
         cookies={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.SubAccountRow>) =>
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/subaccounts/${id}`)}

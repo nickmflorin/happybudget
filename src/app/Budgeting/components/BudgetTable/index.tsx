@@ -161,7 +161,7 @@ const BudgetTable = <
     _setApis(newApis);
   };
 
-  const [cols, setCols] = useState<Table.Column<R>[]>([]);
+  const [cols, setCols] = useState<Table.Column<R, M>[]>([]);
 
   const gridOptions = useMemo((): BudgetTable.GridSet<GridOptions> => {
     let budgetFooter: GridOptions = { ...DefaultBudgetFooterGridOptions, alignedGrids: [] };
@@ -173,7 +173,7 @@ const BudgetTable = <
     return { primary, tableFooter, budgetFooter };
   }, []);
 
-  const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R>): boolean => {
+  const _isCellSelectable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R, M>): boolean => {
     if (includes(["index", "expand"], colDef.field)) {
       return false;
     } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
@@ -184,7 +184,7 @@ const BudgetTable = <
     return true;
   });
 
-  const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R>): boolean => {
+  const _isCellEditable = useDynamicCallback<boolean>((row: R, colDef: ColDef | Table.Column<R, M>): boolean => {
     if (includes(["index", "expand"], colDef.field)) {
       return false;
     } else if (row.meta.isTableFooter === true || row.meta.isGroupFooter === true || row.meta.isBudgetFooter) {
@@ -194,8 +194,8 @@ const BudgetTable = <
     } else if (
       includes(
         map(
-          filter(columns, (c: Table.Column<R>) => c.isCalculated === true),
-          (col: Table.Column<R>) => col.field
+          filter(columns, (c: Table.Column<R, M>) => c.isCalculated === true),
+          (col: Table.Column<R, M>) => col.field
         ),
         colDef.field
       )
@@ -208,7 +208,7 @@ const BudgetTable = <
   });
 
   const showBudgetFooterGrid = useMemo(() => {
-    return filter(columns, (col: Table.Column<R>) => col.isCalculated === true && !isNil(col.budget)).length !== 0;
+    return filter(columns, (col: Table.Column<R, M>) => col.isCalculated === true && !isNil(col.budget)).length !== 0;
   }, []);
 
   const onSort = useDynamicCallback<void>((order: Order, field: keyof R) => {
@@ -220,15 +220,16 @@ const BudgetTable = <
     }
   });
 
-  const IndexColumn = useDynamicCallback<Table.Column<R>>(
-    (): Table.Column<R> => ({
+  const IndexColumn = useDynamicCallback<Table.Column<R, M>>(
+    (): Table.Column<R, M> => ({
       ...indexColumn,
       type: "action",
       editable: false,
       headerName: "",
       resizable: false,
-      field: "index",
+      field: "index" as keyof M & keyof R & string,
       cellRenderer: "IndexCell",
+      fieldBehavior: [],
       checkboxSelection: (params: CheckboxSelectionCallbackParams) => {
         const row: R = params.data;
         if (row.meta.isGroupFooter === true || row.meta.isTableFooter === true || row.meta.isBudgetFooter === true) {
@@ -257,14 +258,15 @@ const BudgetTable = <
     })
   );
 
-  const ExpandColumn = useDynamicCallback<Table.Column<R>>(
-    (): Table.Column<R> => ({
+  const ExpandColumn = useDynamicCallback<Table.Column<R, M>>(
+    (): Table.Column<R, M> => ({
       width: 30,
       maxWidth: 30,
       ...expandColumn,
       type: "action",
+      fieldBehavior: [],
       headerName: "",
-      field: "expand",
+      field: "expand" as keyof M & keyof R & string,
       editable: false,
       resizable: false,
       cellRenderer: "ExpandCell",
@@ -278,12 +280,13 @@ const BudgetTable = <
     })
   );
 
-  const IdentifierColumn = useDynamicCallback<Table.Column<R>>(
-    (col: Partial<Table.Column<R>> & { field: keyof R & string }): Table.Column<R> => ({
+  const IdentifierColumn = useDynamicCallback<Table.Column<R, M>>(
+    (col: Partial<Table.Column<R, M>> & { field: keyof R & string }): Table.Column<R, M> => ({
       cellRenderer: "IdentifierCell",
       type: "number",
       width: 100,
       ...col,
+      fieldBehavior: ["read", "write"],
       suppressSizeToFit: true,
       pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
       cellRendererParams: {
@@ -294,7 +297,7 @@ const BudgetTable = <
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
         if (row.meta.isGroupFooter === true) {
-          return filter(columns, (c: Table.Column<R>) => !(c.isCalculated === true)).length + 1;
+          return filter(columns, (c: Table.Column<R, M>) => !(c.isCalculated === true)).length + 1;
         } else if (!isNil(col.colSpan)) {
           return col.colSpan(params);
         }
@@ -305,7 +308,7 @@ const BudgetTable = <
         // value to undefined - but we have to set it to the null value associated
         // with the column.
         if (params.newValue === undefined) {
-          const column: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+          const column: Table.Column<R, M> | undefined = find(columns, { field: params.column.getColId() } as any);
           if (!isNil(column)) {
             params.newValue = column.nullValue === undefined ? null : column.nullValue;
           }
@@ -320,7 +323,7 @@ const BudgetTable = <
     })
   );
 
-  const CalculatedColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
+  const CalculatedColumn = useDynamicCallback<Table.Column<R, M>>((col: Table.Column<R, M>): Table.Column<R, M> => {
     return {
       flex: 1,
       cellStyle: { textAlign: "right", ...col.cellStyle },
@@ -343,7 +346,7 @@ const BudgetTable = <
     };
   });
 
-  const BodyColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
+  const BodyColumn = useDynamicCallback<Table.Column<R, M>>((col: Table.Column<R, M>): Table.Column<R, M> => {
     return {
       cellRenderer: "BodyCell",
       ...col,
@@ -357,7 +360,7 @@ const BudgetTable = <
         // value to undefined - but we have to set it to the null value associated
         // with the column.
         if (params.newValue === undefined) {
-          const column: Table.Column<R> | undefined = find(columns, { field: params.column.getColId() } as any);
+          const column: Table.Column<R, M> | undefined = find(columns, { field: params.column.getColId() } as any);
           if (!isNil(column)) {
             params.newValue = column.nullValue === undefined ? null : column.nullValue;
           }
@@ -372,7 +375,7 @@ const BudgetTable = <
     };
   });
 
-  const UniversalColumn = useDynamicCallback<Table.Column<R>>((col: Table.Column<R>): Table.Column<R> => {
+  const UniversalColumn = useDynamicCallback<Table.Column<R, M>>((col: Table.Column<R, M>): Table.Column<R, M> => {
     return {
       ...col,
       suppressMenu: true,
@@ -393,7 +396,7 @@ const BudgetTable = <
       const cookiesOrdering = kookies.get(cookies.ordering);
       const validatedOrdering = validateCookiesOrdering(
         cookiesOrdering,
-        filter(columns, (col: Table.Column<R>) => !(col.isCalculated === true))
+        filter(columns, (col: Table.Column<R, M>) => !(col.isCalculated === true))
       );
       if (!isNil(validatedOrdering)) {
         setOrdering(validatedOrdering);
@@ -402,7 +405,7 @@ const BudgetTable = <
   }, [useDeepEqualMemo(cookies)]);
 
   useEffect(() => {
-    let base: Table.Column<R>[] = [IndexColumn()];
+    let base: Table.Column<R, M>[] = [IndexColumn()];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
@@ -413,16 +416,16 @@ const BudgetTable = <
       const cs = concat(
         base,
         map(
-          filter(columns.slice(1), (col: Table.Column<R>) => !(col.isCalculated === true)),
-          (def: Table.Column<R>) => BodyColumn(def)
+          filter(columns.slice(1), (col: Table.Column<R, M>) => !(col.isCalculated === true)),
+          (def: Table.Column<R, M>) => BodyColumn(def)
         ),
         map(
-          filter(columns.slice(1), (col: Table.Column<R>) => col.isCalculated === true),
-          (def: Table.Column<R>) => CalculatedColumn(def)
+          filter(columns.slice(1), (col: Table.Column<R, M>) => col.isCalculated === true),
+          (def: Table.Column<R, M>) => CalculatedColumn(def)
         )
       );
       setCols(
-        map(cs, (col: Table.Column<R>, index: number) => {
+        map(cs, (col: Table.Column<R, M>, index: number) => {
           if (index === cs.length - 1) {
             return UniversalColumn({ ...col, resizable: false });
           }
@@ -482,7 +485,7 @@ const BudgetTable = <
           groupParams={groupParams}
           {...props}
         />
-        <TableFooterGrid<R>
+        <TableFooterGrid<R, M>
           apis={apis.tableFooter}
           onGridReady={(e: GridReadyEvent) => onGridReady("tableFooter", { grid: e.api, column: e.columnApi })}
           onFirstDataRendered={onFirstDataRendered}
@@ -491,7 +494,7 @@ const BudgetTable = <
           loadingParent={loadingParent}
         />
         <ShowHide show={showBudgetFooterGrid}>
-          <BudgetFooterGrid<R>
+          <BudgetFooterGrid<R, M>
             apis={apis.budgetFooter}
             onGridReady={(e: GridReadyEvent) => onGridReady("budgetFooter", { grid: e.api, column: e.columnApi })}
             onFirstDataRendered={onFirstDataRendered}

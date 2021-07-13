@@ -1,7 +1,6 @@
 import { Document } from "@react-pdf/renderer";
 import { isNil, map, filter } from "lodash";
 
-import * as models from "lib/model";
 import * as formatters from "lib/model/formatters";
 
 import { View, Page } from "./Base";
@@ -20,7 +19,6 @@ const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
               (account: Model.PdfAccount) => !(options.excludeZeroTotals === true) || account.estimated !== 0
             )}
             groups={budget.groups}
-            manager={models.PdfAccountRowManager}
             columns={[
               {
                 field: "identifier",
@@ -64,7 +62,6 @@ const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
               <AccountTable
                 account={account}
                 options={options}
-                manager={models.PdfSubAccountRowManager}
                 columns={[
                   {
                     field: "identifier",

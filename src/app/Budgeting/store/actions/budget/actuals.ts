@@ -9,7 +9,7 @@ export const responseSubAccountsTreeAction = simpleAction<Http.ListResponse<Mode
 export const restoreSubAccountsTreeSearchCacheAction = simpleAction<null>(
   ActionType.Budget.SubAccountsTree.RestoreSearchCache
 );
-export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.ActualRow>>(
+export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.ActualRow, Model.Actual>>(
   ActionType.Budget.Actuals.TableChanged
 );
 export const setSubAccountsTreeSearchAction = simpleAction<string>(ActionType.Budget.SubAccountsTree.SetSearch);

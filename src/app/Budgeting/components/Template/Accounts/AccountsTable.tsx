@@ -41,7 +41,7 @@ const AccountsTable = (): JSX.Element => {
         search={search}
         onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
         exportFileName={!isNil(templateDetail) ? `template_${templateDetail.name}_accounts` : ""}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.AccountRow>) =>
+        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.AccountRow, Model.Account>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
@@ -60,6 +60,7 @@ const AccountsTable = (): JSX.Element => {
             headerName: "Estimated",
             isCalculated: true,
             type: "sum",
+            fieldBehavior: ["read"],
             footer: {
               value: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
             }

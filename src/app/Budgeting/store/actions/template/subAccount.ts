@@ -7,9 +7,9 @@ export const loadingSubAccountAction = simpleAction<boolean>(ActionType.Template
 export const responseSubAccountAction = simpleAction<Model.SubAccount | undefined>(
   ActionType.Template.SubAccount.Response
 );
-export const handleTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.SubAccountRow>>(
-  ActionType.Template.SubAccount.TableChanged
-);
+export const handleTableChangeEventAction = simpleAction<
+  Table.ChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount>
+>(ActionType.Template.SubAccount.TableChanged);
 export const deletingSubAccountAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Template.SubAccount.SubAccounts.Deleting
 );
@@ -55,7 +55,7 @@ export const loadingFringesAction = simpleAction<boolean>(ActionType.Template.Su
 export const responseFringesAction = simpleAction<Http.ListResponse<Model.Fringe>>(
   ActionType.Template.SubAccount.Fringes.Response
 );
-export const handleFringesTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.FringeRow>>(
+export const handleFringesTableChangeEventAction = simpleAction<Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe>>(
   ActionType.Template.SubAccount.Fringes.TableChanged
 );
 export const deletingFringeAction = simpleAction<Redux.ModelListActionPayload>(

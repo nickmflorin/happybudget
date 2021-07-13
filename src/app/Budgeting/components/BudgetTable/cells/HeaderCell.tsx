@@ -28,16 +28,16 @@ interface IHeaderCompParams {
   api: any;
 }
 
-export interface HeaderCellProps<R extends Table.Row>
+export interface HeaderCellProps<R extends Table.Row, M extends Model.Model>
   extends Omit<IHeaderCompParams, "column">,
     StandardComponentProps {
-  onSort?: (order: Order, field: keyof R, column: Table.Column<R>) => void;
-  onEdit?: (field: keyof R, column: Table.Column<R>) => void;
-  ordering?: FieldOrdering<keyof R>;
-  column: Table.Column<R>;
+  onSort?: (order: Order, field: Table.Field<R, M>, column: Table.Column<R, M>) => void;
+  onEdit?: (field: Table.Field<R, M>, column: Table.Column<R, M>) => void;
+  ordering?: FieldOrdering<Table.Field<R, M>>;
+  column: Table.Column<R, M>;
 }
 
-const HeaderCell = <R extends Table.Row>({
+const HeaderCell = <R extends Table.Row, M extends Model.Model>({
   column,
   displayName,
   onSort,
@@ -46,7 +46,7 @@ const HeaderCell = <R extends Table.Row>({
   style = {},
   onEdit,
   ...props
-}: HeaderCellProps<R>): JSX.Element => {
+}: HeaderCellProps<R, M>): JSX.Element => {
   const [order, setOrder] = useState<Order>(0);
 
   const columnType: Table.ColumnType | null = useMemo(() => {
@@ -67,7 +67,7 @@ const HeaderCell = <R extends Table.Row>({
   useEffect(() => {
     if (column.sortable === true) {
       if (!isNil(ordering)) {
-        const fieldOrder: FieldOrder<keyof R> | undefined = find(ordering, { field: column.field } as any);
+        const fieldOrder: FieldOrder<Table.Field<R, M>> | undefined = find(ordering, { field: column.field } as any);
         if (!isNil(fieldOrder)) {
           setOrder(fieldOrder.order);
         }

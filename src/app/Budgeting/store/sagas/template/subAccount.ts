@@ -2,7 +2,6 @@ import { SagaIterator } from "redux-saga";
 import { take, call, cancel, spawn } from "redux-saga/effects";
 
 import * as api from "api";
-import * as models from "lib/model";
 
 import { ActionType } from "../../actions";
 import { loadingTemplateAction, requestTemplateAction } from "../../actions/template";
@@ -15,7 +14,7 @@ import {
   createFringeTaskSet
 } from "../factories";
 
-const tasks = createSubAccountTaskSet<Model.SubAccount, BudgetTable.SubAccountRow, Model.Group>(
+const tasks = createSubAccountTaskSet(
   {
     loading: actions.loadingSubAccountsAction,
     deleting: actions.deletingSubAccountAction,
@@ -41,7 +40,6 @@ const tasks = createSubAccountTaskSet<Model.SubAccount, BudgetTable.SubAccountRo
       request: actions.requestGroupsAction
     }
   },
-  models.SubAccountRowManager,
   (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.id,
   (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.data,
   (state: Modules.ApplicationStore) => state.budgeting.template.autoIndex

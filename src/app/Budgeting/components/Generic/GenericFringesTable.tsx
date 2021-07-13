@@ -38,10 +38,9 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
       className={"fringes-table"}
       tableRef={tableRef}
       detached={true}
-      manager={models.FringeRowManager}
       indexColumn={{ width: 40, maxWidth: 50 }}
       cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
-      actions={(params: BudgetTable.MenuActionParams<BudgetTable.FringeRow>) => [
+      actions={(params: BudgetTable.MenuActionParams<BudgetTable.FringeRow, Model.Fringe>) => [
         {
           tooltip: "Delete",
           icon: faTrashAlt,
@@ -60,7 +59,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
-                fields={map(params.columns, (col: Table.Column<BudgetTable.FringeRow>) => ({
+                fields={map(params.columns, (col: Table.Column<BudgetTable.FringeRow, Model.Fringe>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
                   defaultChecked: true
@@ -124,6 +123,12 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
           width: 100,
           cellEditor: "FringeUnitCellEditor",
           type: "singleSelect",
+          httpValueConverter: (unit: Model.FringeUnit | null) => {
+            if (unit !== null) {
+              return unit.id;
+            }
+            return null;
+          },
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
             if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {

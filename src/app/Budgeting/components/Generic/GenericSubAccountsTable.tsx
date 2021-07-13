@@ -8,7 +8,6 @@ import { ColDef, ColSpanParams, SuppressKeyboardEventParams } from "@ag-grid-com
 
 import { FieldsDropdown } from "components/dropdowns";
 
-import * as models from "lib/model";
 import { getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
 import { inferModelFromName } from "lib/model/util";
@@ -75,7 +74,6 @@ const GenericSubAccountsTable = ({
 
   return (
     <BudgetTableComponent<BudgetTable.SubAccountRow, Model.SubAccount, Http.SubAccountPayload>
-      manager={models.SubAccountRowManager}
       tableRef={tableRef}
       isCellEditable={(row: BudgetTable.SubAccountRow, colDef: ColDef) => {
         if (includes(["identifier", "description", "name"], colDef.field)) {
@@ -92,8 +90,9 @@ const GenericSubAccountsTable = ({
         onRowAddToGroup
       }}
       rowCanExpand={(row: BudgetTable.SubAccountRow) => !isNil(row.identifier) || row.meta.children.length !== 0}
+      getModelChildren={(model: Model.SubAccount) => model.subaccounts}
       {...props}
-      actions={(params: BudgetTable.MenuActionParams<BudgetTable.SubAccountRow>) => [
+      actions={(params: BudgetTable.MenuActionParams<BudgetTable.SubAccountRow, Model.SubAccount>) => [
         {
           tooltip: "Delete",
           icon: faTrashAlt,
@@ -124,7 +123,7 @@ const GenericSubAccountsTable = ({
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
-                fields={map(params.columns, (col: Table.Column<BudgetTable.SubAccountRow>) => ({
+                fields={map(params.columns, (col: Table.Column<BudgetTable.SubAccountRow, Model.SubAccount>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
                   defaultChecked: true
@@ -148,7 +147,7 @@ const GenericSubAccountsTable = ({
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
-                fields={map(params.columns, (col: Table.Column<BudgetTable.SubAccountRow>) => ({
+                fields={map(params.columns, (col: Table.Column<BudgetTable.SubAccountRow, Model.SubAccount>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
                   defaultChecked: true
@@ -222,6 +221,12 @@ const GenericSubAccountsTable = ({
           width: 100,
           cellEditor: "SubAccountUnitCellEditor",
           type: "singleSelect",
+          httpValueConverter: (unit: Model.Tag | null): number | null | undefined => {
+            if (unit !== null) {
+              return unit.id;
+            }
+            return null;
+          },
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
             if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {

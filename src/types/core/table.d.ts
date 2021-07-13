@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Table {
   type RowType = "subaccount" | "account" | "fringe" | "actual";
+  type FieldBehavior = "read" | "write";
 
   interface RowMeta {
     readonly isGroupFooter?: boolean;
@@ -15,17 +16,14 @@ namespace Table {
     readonly type: Table.RowType;
   }
 
-  interface PdfRowMeta {}
-
   interface PageAndSize {
     readonly page: number;
     readonly pageSize: number;
   }
 
-  interface Row<RE = RowMeta> extends Record<string, any> {
+  interface Row extends Record<string, any> {
     readonly id: number;
-    readonly meta: RE;
-    readonly group: number | null;
+    readonly meta: RowMeta;
   }
 
   interface RowColorDefinition {
@@ -33,7 +31,9 @@ namespace Table {
     readonly color?: string;
   }
 
-  type PdfRow = Table.Row<PdfRowMeta>;
+  type PdfRow = {
+    readonly id: number;
+  }
 
   type ColumnTypeId =
     | "text"
@@ -103,60 +103,81 @@ namespace Table {
     readonly textStyle?: import("@react-pdf/types").Style;
   }
 
-  interface Column<R extends Table.Row> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
+  type Field<R extends Table.Row, M extends Model.Model> = Omit<keyof R & keyof M & string, "id">;
+
+  interface Column<R extends Table.Row, M extends Model.Model, V = any> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
     readonly type: ColumnTypeId;
     readonly nullValue?: null | "" | 0 | [];
-    readonly field: keyof R & string;
+    readonly field: Field<R, M>;
+    readonly fieldBehavior?: FieldBehavior[]; // Defaults to ["read", "write"]
     readonly isCalculated?: boolean;
     readonly excludeFromExport?: boolean;
-    readonly processCellForClipboard?: (row: R) => string;
-    readonly processCellFromClipboard?: (value: string) => any;
     readonly budget?: FooterColumn<R>;
     readonly footer?: FooterColumn<R>;
+    readonly processCellForClipboard?: (row: R) => string;
+    readonly processCellFromClipboard?: (value: string) => any;
+    readonly httpValueConverter?: (value: V) => any;
   }
 
   interface PdfColumn<R extends Table.PdfRow, M extends Model.Model> {
-    readonly field: keyof R & string;
+    readonly field: Field<R, M>;
     readonly headerName: string;
     readonly isCalculated?: boolean;
     readonly type: Table.ColumnTypeId;
-    readonly formatter?: Formatter;
     readonly width?: string | number;
     readonly cellProps?: PdfCellStandardProps;
     readonly headerCellProps?: PdfCellStandardProps;
     readonly footer?: Table.FooterPdfColumn;
     readonly cellContentsVisible?: Table.OptionalPdfCellCallback<R, M, boolean>;
+    readonly formatter?: Formatter;
     readonly cellRenderer?: (params: PdfCellCallbackParams<R, M>) => JSX.Element;
     // NOTE: This only applies for the individual Account tables, not gf the overall
     // Accounts table.
     readonly childFooter?: (s: M) => Table.FooterPdfColumn;
   }
 
-  type CellChange<R extends Table.Row, V = R[keyof R]> = {
+  type CellChange<R extends Table.Row, M extends Model.Model, V = any> = {
     readonly oldValue: V;
     readonly newValue: V;
-    readonly field: keyof R;
+    readonly field: Field<R, M>;
+    readonly column: Table.Column<R, M, V>;
     readonly id: number;
   };
 
-  type RowChangeData<R extends Table.Row> = {
-    readonly [key in keyof R]?: Omit<Table.CellChange<R[key]>, "field", "id">;
+  type NestedCellChange<R extends Table.Row, M extends Model.Model, V = any> = Omit<Table.CellChange<R, M, V>, "field" | "id">;
+  type CellAdd<R extends Table.Row, M extends Model.Model, V = any> = {
+    readonly value: V;
+    readonly field: Field<R, M>;
+    readonly column: Table.Column<R, M, V>;
+  };
+  type NestedCellAdd<R extends Table.Row, M extends Model.Model, V = any> = Omit<Table.CellAdd<R, M, V>, "field">;
+
+  type RowChangeData<R extends Table.Row, M extends Model.Model> = {
+    readonly [key in Table.Field<R, M>]?: Table.NestedCellChange<R, M>;
   };
 
-  type RowChange<R extends Table.Row> = {
+  type RowChange<R extends Table.Row, M extends Model.Model> = {
     readonly id: number;
-    readonly data: RowChangeData<R>;
+    readonly data: RowChangeData<R, M>;
   };
 
-  type Change<R extends Table.Row> =
-    | Table.RowChange<R>
-    | Table.CellChange<R>
-    | (Table.CellChange<R> | Table.RowChange<R>)[];
+  type RowAddData<R extends Table.Row, M extends Model.Model> = {
+    readonly [key in Table.Field<R, M>]?: Table.NestedCellAdd<R, M>;
+  };
 
-  type ConsolidatedChange<R extends Table.Row> = Table.RowChange<R>[];
+  type RowAdd<R extends Table.Row, M extends Model.Model> = {
+    readonly data: RowAddData<R, M>;
+  }
 
-  type RowAddPayload<R extends Table.Row> = number | Partial<R> | Partial<R>[];
-  type RowAddFunc<R extends Table.Row> = (payload: RowAddPayload<R>) => void;
+  type Change<R extends Table.Row, M extends Model.Model, V = any> =
+    | Table.RowChange<R, M>
+    | Table.CellChange<R, M, V>
+    | (Table.CellChange<R, M, V> | Table.RowChange<R, M>)[];
+
+  type ConsolidatedChange<R extends Table.Row, M extends Model.Model> = Table.RowChange<R, M>[];
+
+  type RowAddPayload<R extends Table.Row, M extends Model.Model> = number | Table.RowAdd<R, M> | Table.RowAdd<R, M>[];
+  type RowAddFunc<R extends Table.Row, M extends Model.Model> = (payload: RowAddPayload<R, M>) => void;
 
   type ChangeEventId = "dataChange" | "rowAdd" | "rowDelete";
 
@@ -164,14 +185,14 @@ namespace Table {
     readonly type: ChangeEventId;
   }
 
-  type DataChangeEvent<R extends Table.Row> = Table.BaseChangeEvent & {
+  type DataChangeEvent<R extends Table.Row, M extends Model.Model> = Table.BaseChangeEvent & {
     readonly type: "dataChange";
-    readonly payload: Table.Change<R>
+    readonly payload: Table.Change<R, M>
   }
 
-  type RowAddEvent<R extends Table.Row> = Table.BaseChangeEvent & {
+  type RowAddEvent<R extends Table.Row, M extends Model.Model> = Table.BaseChangeEvent & {
     readonly type: "rowAdd";
-    readonly payload: Table.RowAddPayload<R>;
+    readonly payload: Table.RowAddPayload<R, M>;
   }
 
   type RowDeleteEvent = Table.BaseChangeEvent & {
@@ -179,18 +200,7 @@ namespace Table {
     readonly payload: number[] | number;
   }
 
-  type ChangeEvent<R extends Table.Row> = DataChangeEvent<R> | RowAddEvent<R> | RowDeleteEvent;
-
-  // TODO: We need to merge this together with other mechanics.
-  interface CellValueChangedParams<R extends Table.Row> {
-    readonly column: import("@ag-grid-community/core").Column;
-    readonly row: R;
-    readonly oldRow: R | null;
-    readonly node: import("@ag-grid-community/core").RowNode;
-    readonly oldValue: any;
-    readonly newValue: any;
-    readonly change: Table.Change<R>;
-  }
+  type ChangeEvent<R extends Table.Row, M extends Model.Model> = Table.DataChangeEvent<R, M> | Table.RowAddEvent<R, M> | Table.RowDeleteEvent;
 
   interface CellPositionMoveOptions {
     readonly startEdit?: boolean;
@@ -227,173 +237,6 @@ namespace Table {
     // how the selection was performed.
     readonly onDoneEditing: (e: Table.CellDoneEditingEvent) => void;
   }
-
-  type DataObjType<R extends Table.Row, M extends Model.Model> = R | M | Table.RowChange<R> | Table.RowChangeData<R>;
-  type RowObjType<R extends Table.Row> = R | Table.RowChange<R> | Table.RowChangeData<R>;
-
-  type IBaseField<R extends Table.Row, M extends Model.Model> = {
-    // Whether or not the field is required to be present for POST requests (i.e.
-    // when creating a new instance).  If the field is required, the mechanics will
-    // wait until a value is present for the field before creating an instance
-    // via an HTTP POST request that is associated with the row (R).
-    readonly required?: boolean;
-  };
-
-  type IReadField<R extends Table.Row, M extends Model.Model> = Table.IBaseField<R, M> & {
-    readonly read: true;
-    // Whether or not the model (M) field value should be used to construct the
-    // row (R) model.
-    readonly modelOnly?: boolean;
-    // Whether or not the row (R) field should be used to update the model (M).
-    readonly rowOnly?: boolean;
-    readonly getValue: (obj: Table.DataObjType<R, M>) => any;
-  };
-
-  type IReadFieldConfig<R extends Table.Row, M extends Model.Model> = Omit<Table.IReadField<R, M>, "read" | "getValue">;
-
-  type IWriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Table.IBaseField<
-    R,
-    M
-  > & {
-    readonly write: true;
-    // Whether or not the field value is allowed to take on null values for HTTP
-    // requests.
-    readonly allowNull?: boolean;
-    // Whether or not the field value is allowed to take on empty string values for
-    // HTTP requests.
-    readonly allowBlank?: boolean;
-    // The HTTP methods that the field should be used for.  Defaults to PATCH and
-    // POST requests.
-    readonly http?: Http.Method[];
-    // Used to transform a value that is on the row (R) model to a value that is
-    // included in the HTTP PATCH or POST payloads.
-    readonly httpValueConverter?: (value: R[keyof R]) => P[keyof P] | undefined;
-    readonly getHttpValue: (row: R | Partial<R> | Table.RowChange<R>, method?: Http.Method) => P[keyof P] | undefined;
-    readonly getValue: (obj: Table.DataObjType<R, M>) => any;
-  };
-
-  type IWriteFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
-    Table.IWriteField<R, M, P>,
-    "write" | "getHttpValue" | "getValue"
-  >;
-
-  type IReadWriteField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Table.IWriteField<
-    R,
-    M,
-    P
-  > &
-    Table.IReadField<R, M>;
-
-  type IReadWriteFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
-    Table.IReadWriteField<R, M, P>,
-    "read" | "write" | "getValue" | "getHttpValue"
-  >;
-
-  // Field configuration for Field that is included in HTTP requests to update or
-  // create the instance but not on the model (M) or row (R).
-  type IWriteOnlyField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
-    Table.IWriteField<R, M, P>,
-    "getValue"
-  > & {
-    readonly field: keyof P;
-    readonly writeOnly: true;
-    readonly getValueFromRowChangeData: (data: Table.RowChangeData<R>) => P[keyof P] | undefined;
-    readonly getValueFromRow: (row: R) => P[keyof P] | undefined;
-    readonly getValue: (obj: Table.RowObjType<R>) => any;
-  };
-
-  type IWriteOnlyFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
-    Table.IWriteOnlyField<R, M, P>,
-    "write" | "writeOnly" | "getValue" | "getHttpValue"
-  >;
-
-  // Field configuration for Field that is not included in HTTP requests to update or
-  // create the instance but present on the model (M) and row (R).
-  type IReadOnlyField<R extends Table.GenericRow, M extends Model.Model> = Table.IReadField<R, M> & {
-    readonly field: keyof M & keyof R;
-    readonly readOnly: true;
-  };
-
-  type IReadOnlyFieldConfig<R extends Table.Row, M extends Model.Model> = Omit<
-    Table.IReadOnlyField<R, M>,
-    "read" | "readOnly" | "getValue"
-  >;
-
-  type ISplitReadWriteField<
-    R extends Table.Row,
-    M extends Model.Model,
-    P extends Http.ModelPayload<M>
-  > = Table.IReadWriteField<R, M, P> & {
-    // The name of the field on the model (M) model that the field configuration
-    // corresponds to.
-    readonly modelField: keyof M & keyof P;
-    // The name of the field on the row (R) model that the field configuration
-    // corresponds to.
-    readonly rowField: keyof R;
-  };
-
-  type ISplitReadWriteFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
-    Table.ISplitReadWriteField<R, M, P>,
-    "read" | "write" | "getValue" | "getHttpValue"
-  >;
-
-  type IAgnosticReadWriteField<
-    R extends Table.Row,
-    M extends Model.Model,
-    P extends Http.ModelPayload<M>
-  > = Table.IReadWriteField<R, M, P> & {
-    // The name of the field on both the row (R) model and model (M) model that the
-    // field configuration corresponds to.
-    readonly field: keyof M & keyof R & keyof P;
-  };
-
-  type IAgnosticReadWriteFieldConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> = Omit<
-    Table.IAgnosticReadWriteField<R, M, P>,
-    "read" | "write" | "getValue" | "getHttpValue"
-  >;
-
-  type WriteableField<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> =
-    | Table.ISplitReadWriteField<R, M, P>
-    | Table.IAgnosticReadWriteField<R, M, P>
-    | Table.IWriteOnlyField<R, M, P>;
-
-  type Field<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M> = Http.ModelPayload<M>> =
-    | Table.WriteableField<R, M, P>
-    | Table.IReadOnlyField<R, M>;
-
-  // TODO: This needs to include the methods on the class as well.
-  interface IRowManagerConfig<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>> {
-    readonly fields: Table.Field<R, M, P>[];
-    readonly childrenGetter?: ((model: M) => number[]) | string | null;
-    readonly groupGetter?: ((model: M) => number | null) | string | null;
-    readonly typeLabel: string;
-    readonly rowType: Table.RowType;
-    readonly labelGetter: (model: M) => string;
-  }
-
-  interface IPdfRowManagerConfig<R extends Table.PdfRow, M extends Model.Model> {
-    readonly fields: Table.IReadOnlyField<R, M>[];
-    readonly groupGetter?: ((model: M) => number | null) | string | null;
-  }
-
-  interface IRowManager<R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>
-    extends Table.IRowManagerConfig<R, M, P> {
-    readonly requiredFields: Table.Field<R, M, P>[];
-    readonly getField: (name: keyof R | keyof M) => Table.Field<R, M, P> | null;
-    readonly getChildren: (model: M) => number[];
-    readonly getGroup: (model: M) => number | null;
-    readonly modelToRow: (model: M, meta: Partial<Table.RowMeta> = {}) => R;
-    readonly mergeChangesWithRow: (obj: R, change: Table.RowChange<R>) => R;
-    readonly mergeChangesWithModel: (obj: M, change: Table.RowChange<R>) => M;
-    readonly payload: (row: R | Partial<R> | Table.RowChange<R>) => P | Partial<P>;
-  }
-
-  interface IPdfRowManager<R extends Table.PdfRow, M extends Model.Model>
-    extends Table.IPdfRowManagerConfig<R, M> {
-    readonly getField: (name: keyof R | keyof M) => Table.IReadOnlyField<R, M> | null;
-    readonly getGroup: (model: M) => number | null;
-    readonly modelToRow: (model: M, meta: Partial<Table.PdfRowMeta> = {}) => R;
-  }
 }
 
 /* eslint-disable no-unused-vars */
@@ -403,6 +246,7 @@ namespace BudgetTable {
   type GridSet<T> = { primary: T; tableFooter: T; budgetFooter: T };
 
   interface GroupProps<R extends Table.Row> {
+    // readonly getGroup: keyof M | ((model: M) => number | null);
     readonly onGroupRows: (rows: R[]) => void;
     readonly onDeleteGroup: (group: Model.Group) => void;
     readonly onEditGroup: (group: Model.Group) => void;
@@ -424,14 +268,14 @@ namespace BudgetTable {
     readonly wrap?: (children: ReactNode) => JSX.Element;
   }
 
-  interface MenuActionParams<R extends Table.Row> {
+  interface MenuActionParams<R extends Table.Row, M extends Model.Model> {
     readonly apis: Table.APIs;
-    readonly columns: Table.Column<R>[];
+    readonly columns: Table.Column<R, M>[];
   }
 
-  interface MenuProps<R extends Table.Row> {
+  interface MenuProps<R extends Table.Row, M extends Model.Model> {
     readonly apis: Table.APIs;
-    readonly columns: Table.Column<R>[];
+    readonly columns: Table.Column<R, M>[];
     readonly actions?:
       | ((params: BudgetTable.MenuActionParams<R>) => BudgetTable.MenuAction[])
       | BudgetTable.MenuAction[];
@@ -441,27 +285,27 @@ namespace BudgetTable {
   }
 
   // The abstract/generic <Grid> component that wraps AG Grid right at the interface.
-  interface GridProps<R extends Table.Row = Table.Row>
+  interface GridProps<R extends Table.Row = Table.Row, M extends Model.Model>
     extends Omit<
-      import("@ag-grid-community/react").AGGridReactProps,
+      import("@ag-grid-community/react").AgGridReactProps,
       "columnDefs" | "overlayNoRowsTemplate" | "overlayLoadingTemplate" | "modules" | "debug"
     > {
-    readonly columns: Table.Column<R>[];
+    readonly columns: Table.Column<R, M>[];
   }
 
-  interface SpecificGridProps {
+  interface SpecificGridProps<R extends Table.Row = Table.Row, M extends Model.Model> {
     readonly apis: Table.APIs | null;
     readonly onFirstDataRendered: (e: import("ag-grid-community/core").FirstDataRenderedEvent) => void;
     readonly onGridReady: (event: import("@ag-grid-community/core").GridReadyEvent) => void;
     readonly options?: import("@ag-grid-community/core").GridOptions;
-    readonly columns: Table.Column<R>[];
+    readonly columns: Table.Column<R, M>[];
   }
 
-  interface BudgetFooterGridProps<R extends Table.Row> extends SpecificGridProps {
+  interface BudgetFooterGridProps<R extends Table.Row = Table.Row, M extends Model.Model> extends SpecificGridProps<R, M> {
     readonly loadingBudget?: boolean | undefined;
   }
 
-  interface TableFooterGridProps<R extends Table.Row> extends SpecificGridProps {
+  interface TableFooterGridProps<R extends Table.Row = Table.Row, M extends Model.Model> extends SpecificGridProps<R, M> {
     readonly loadingParent?: boolean;
   }
 
@@ -472,17 +316,18 @@ namespace BudgetTable {
   > {
     readonly data: M[];
     readonly groups?: Model.Group[];
-    readonly groupParams?: BudgetTable.GroupProps<R, Model.Group>;
+    readonly groupParams?: BudgetTable.GroupProps<R>;
     readonly frameworkComponents?: { [key: string]: any };
     readonly search?: string;
-    readonly columns: Table.Column<R>[];
-    readonly manager: Table.IRowManager<R, M, P>;
-    readonly onChangeEvent: (event: Table.ChangeEvent<R>) => void;
+    readonly columns: Table.Column<R, M>[];
+    readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
     // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
     // onRowExpand is provided to the BudgetTable.
     readonly rowCanExpand?: (row: R) => boolean;
     readonly onRowExpand?: null | ((id: number) => void);
     readonly onBack?: () => void;
+    readonly modelToRow?: (m: M) => R;
+    readonly getModelChildren?: (m: M) => number[];
   }
 
   interface PrimaryGridRef {
@@ -491,11 +336,11 @@ namespace BudgetTable {
 
   interface PrimaryGridProps<R extends Table.Row, M extends Model.Model>
     extends BudgetTable.PrimaryGridPassThroughProps<R, M>,
-      Omit<BudgetTable.MenuProps<R>, "columns" | "onExport" | "onDelete" | "apis">,
-      SpecificGridProps {
+      Omit<BudgetTable.MenuProps<R, M>, "columns" | "apis">,
+      SpecificGridProps<R, M> {
     readonly gridRef: import("react").RefObject<PrimaryGridRef>;
     readonly ordering: FieldOrder<keyof R>[];
-    readonly isCellEditable: (row: R, colDef: Table.Column<R>) => boolean;
+    readonly isCellEditable: (row: R, colDef: Table.Column<R, M>) => boolean;
   }
 
   interface Ref extends PrimaryGridRef {
@@ -507,12 +352,12 @@ namespace BudgetTable {
     R extends Table.Row,
     M extends Model.Model,
     P extends Http.ModelPayload<M> = Http.ModelPayload<M>
-  > extends Omit<BudgetTable.MenuProps<R>, "columns" | "onColumnsChange" | "onExport" | "onDelete" | "apis">,
+  > extends Omit<BudgetTable.MenuProps<R, M>, "columns" | "apis">,
       BudgetTable.PrimaryGridPassThroughProps<R, M>,
       StandardComponentProps {
     readonly tableRef: import("react").RefObject<BudgetTable.Ref>;
-    readonly indexColumn?: Partial<Table.Column<R>>;
-    readonly expandColumn?: Partial<Table.Column<R>>;
+    readonly indexColumn?: Partial<Table.Column<R, M>>;
+    readonly expandColumn?: Partial<Table.Column<R, M>>;
     readonly loadingBudget?: boolean;
     readonly loadingParent?: boolean;
     readonly exportable?: boolean;
@@ -602,7 +447,6 @@ namespace BudgetPdf {
 
   interface TableProps<R extends Table.PdfRow, M extends Model.Model> {
     readonly columns: Table.PdfColumn<R, M>[];
-    readonly manager: Table.IPdfRowManager<R, M>;
     readonly options: BudgetPdf.Options;
   }
 
@@ -613,10 +457,5 @@ namespace BudgetPdf {
 
   type AccountTableProps = TableProps<BudgetPdf.SubAccountRow, Model.PdfSubAccount> & {
     readonly account: Model.PdfAccount;
-  }
-
-  type SubAccountBlockProps = TableProps<BudgetPdf.SubAccountRow, Model.PdfSubAccount> & {
-    readonly subaccount: Model.PdfSubAccount;
-    readonly isLast?: boolean;
   }
 }

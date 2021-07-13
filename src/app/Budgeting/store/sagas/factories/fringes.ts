@@ -4,10 +4,8 @@ import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, filter, includes, map } from "lodash";
 
 import * as api from "api";
-import * as models from "lib/model";
 
-import { consolidateTableChange } from "lib/model/util";
-import { createBulkCreatePayload } from "./util";
+import { consolidateTableChange, createBulkCreatePayload, payload } from "lib/model/util";
 
 export interface FringeTasksActionMap {
   response: Redux.ActionCreator<Http.ListResponse<Model.Fringe>>;
@@ -25,7 +23,7 @@ export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
     query: Http.ListQuery,
     options: Http.RequestOptions
   ) => Promise<Http.ListResponse<Model.Fringe>>;
-  create: (id: number, payload: Http.FringePayload, options: Http.RequestOptions) => Promise<Model.Fringe>;
+  create: (id: number, p: Http.FringePayload, options: Http.RequestOptions) => Promise<Model.Fringe>;
   bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<M>;
   bulkUpdate: (
     id: number,
@@ -34,16 +32,16 @@ export interface FringeServiceSet<M extends Model.Template | Model.Budget> {
   ) => Promise<M>;
   bulkCreate: (
     id: number,
-    payload: Http.BulkCreatePayload<Http.FringePayload>,
+    p: Http.BulkCreatePayload<Http.FringePayload>,
     options: Http.RequestOptions
   ) => Promise<Model.Fringe[]>;
 }
 
 export interface FringeTaskSet {
   getFringes: Redux.Task<null>;
-  handleRowAddEvent: Redux.Task<Table.RowAddEvent<BudgetTable.FringeRow>>;
+  handleRowAddEvent: Redux.Task<Table.RowAddEvent<BudgetTable.FringeRow, Model.Fringe>>;
   handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
-  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<BudgetTable.FringeRow>>;
+  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<BudgetTable.FringeRow, Model.Fringe>>;
 }
 
 export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
@@ -52,15 +50,16 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
   selectObjId: (state: Modules.ApplicationStore) => number | null,
   selectFringes: (state: Modules.ApplicationStore) => Model.Fringe[]
 ): FringeTaskSet => {
-  function* bulkCreateTask(objId: number, payload: Table.RowAddPayload<BudgetTable.FringeRow>): SagaIterator {
+  function* bulkCreateTask(objId: number, p: Table.RowAddPayload<BudgetTable.FringeRow, Model.Fringe>): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     yield put(actions.creating(true));
 
     const requestPayload: Http.BulkCreatePayload<Http.FringePayload> = createBulkCreatePayload<
       BudgetTable.FringeRow,
+      Model.Fringe,
       Http.FringePayload
-    >(payload, models.FringeRowManager);
+    >(p);
 
     try {
       const fringes: Model.Fringe[] = yield call(services.bulkCreate, objId, requestPayload, {
@@ -79,10 +78,12 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<BudgetTable.FringeRow>>): SagaIterator {
+  function* handleRowAddEvent(
+    action: Redux.Action<Table.RowAddEvent<BudgetTable.FringeRow, Model.Fringe>>
+  ): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const event: Table.RowAddEvent<BudgetTable.FringeRow> = action.payload;
+      const event: Table.RowAddEvent<BudgetTable.FringeRow, Model.Fringe> = action.payload;
       yield fork(bulkCreateTask, objId, event.payload);
     }
   }
@@ -124,10 +125,12 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<BudgetTable.FringeRow>>): SagaIterator {
+  function* handleDataChangeEvent(
+    action: Redux.Action<Table.DataChangeEvent<BudgetTable.FringeRow, Model.Fringe>>
+  ): SagaIterator {
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const event: Table.DataChangeEvent<BudgetTable.FringeRow> = action.payload;
+      const event: Table.DataChangeEvent<BudgetTable.FringeRow, Model.Fringe> = action.payload;
 
       const merged = consolidateTableChange(event.payload);
       if (merged.length !== 0) {
@@ -136,13 +139,13 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
 
         const requestPayload: Http.BulkUpdatePayload<Http.FringePayload>[] = map(
           merged,
-          (change: Table.RowChange<BudgetTable.FringeRow>) => ({
+          (change: Table.RowChange<BudgetTable.FringeRow, Model.Fringe>) => ({
             id: change.id,
-            ...models.FringeRowManager.payload(change)
+            ...payload(change)
           })
         );
         yield all(
-          merged.map((change: Table.RowChange<BudgetTable.FringeRow>) =>
+          merged.map((change: Table.RowChange<BudgetTable.FringeRow, Model.Fringe>) =>
             put(actions.updating({ id: change.id, value: true }))
           )
         );
@@ -156,7 +159,7 @@ export const createFringeTaskSet = <M extends Model.Template | Model.Budget>(
           }
         } finally {
           yield all(
-            merged.map((change: Table.RowChange<BudgetTable.FringeRow>) =>
+            merged.map((change: Table.RowChange<BudgetTable.FringeRow, Model.Fringe>) =>
               put(actions.updating({ id: change.id, value: false }))
             )
           );

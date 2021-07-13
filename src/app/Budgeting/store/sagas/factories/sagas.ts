@@ -56,19 +56,19 @@ interface GroupsTaskMap {
 
 interface FringeTaskMap {
   getFringes: Redux.Task<null>;
-  handleRowAddEvent: Redux.Task<Table.RowAddEvent<BudgetTable.FringeRow>>;
+  handleRowAddEvent: Redux.Task<Table.RowAddEvent<BudgetTable.FringeRow, Model.Fringe>>;
   handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
-  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<BudgetTable.FringeRow>>;
+  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<BudgetTable.FringeRow, Model.Fringe>>;
 }
 
-interface TaskMap<R extends Table.Row> {
+interface TaskMap<R extends Table.Row, M extends Model.Model> {
   Comments?: CommentsTaskMap;
   History?: HistoryTasMap;
   Groups: GroupsTaskMap;
   Request: Redux.Task<null>;
-  HandleRowAddEvent: Redux.Task<Table.RowAddEvent<R>>;
+  HandleRowAddEvent: Redux.Task<Table.RowAddEvent<R, M>>;
   HandleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
-  HandleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R>>;
+  HandleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R, M>>;
 }
 
 const createStandardHistorySaga = (actions: HistoryActionMap, tasks: HistoryTasMap) => {
@@ -185,15 +185,21 @@ export const createStandardFringesSaga = (actions: FringesActionMap, tasks: Frin
     // delete the same row twice.
     const changeChannel = yield actionChannel(actions.TableChanged);
     while (true) {
-      const action: Redux.Action<Table.ChangeEvent<any>> = yield take(changeChannel);
+      const action: Redux.Action<Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe>> = yield take(changeChannel);
       if (!isNil(action.payload)) {
-        const event: Table.ChangeEvent<any> = action.payload;
+        const event: Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe> = action.payload;
         if (typeguards.isDataChangeEvent(event)) {
           // Blocking call so that table changes happen sequentially.
-          yield call(tasks.handleDataChangeEvent, action as Redux.Action<Table.DataChangeEvent<any>>);
+          yield call(
+            tasks.handleDataChangeEvent,
+            action as Redux.Action<Table.DataChangeEvent<BudgetTable.FringeRow, Model.Fringe>>
+          );
         } else if (typeguards.isRowAddEvent(event)) {
           // Blocking call so that table changes happen sequentially.
-          yield call(tasks.handleRowAddEvent, action as Redux.Action<Table.RowAddEvent<any>>);
+          yield call(
+            tasks.handleRowAddEvent,
+            action as Redux.Action<Table.RowAddEvent<BudgetTable.FringeRow, Model.Fringe>>
+          );
         } else if (typeguards.isRowDeleteEvent(event)) {
           // Blocking call so that table changes happen sequentially.
           yield call(tasks.handleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent>);
@@ -221,9 +227,9 @@ export const createStandardFringesSaga = (actions: FringesActionMap, tasks: Frin
   return fringesRootSaga;
 };
 
-export const createStandardSaga = <R extends Table.Row>(
+export const createStandardSaga = <R extends Table.Row, M extends Model.Model>(
   actions: ActionMap,
-  tasks: TaskMap<R>,
+  tasks: TaskMap<R, M>,
   ...args: (() => SagaIterator)[]
 ) => {
   function* requestSaga(): SagaIterator {
@@ -243,15 +249,15 @@ export const createStandardSaga = <R extends Table.Row>(
     // delete the same row twice.
     const changeChannel = yield actionChannel(actions.TableChange);
     while (true) {
-      const action: Redux.Action<Table.ChangeEvent<any>> = yield take(changeChannel);
+      const action: Redux.Action<Table.ChangeEvent<R, M>> = yield take(changeChannel);
       if (!isNil(action.payload)) {
-        const event: Table.ChangeEvent<any> = action.payload;
+        const event: Table.ChangeEvent<R, M> = action.payload;
         if (typeguards.isDataChangeEvent(event)) {
           // Blocking call so that table changes happen sequentially.
-          yield call(tasks.HandleDataChangeEvent, action as Redux.Action<Table.DataChangeEvent<any>>);
+          yield call(tasks.HandleDataChangeEvent, action as Redux.Action<Table.DataChangeEvent<R, M>>);
         } else if (typeguards.isRowAddEvent(event)) {
           // Blocking call so that table changes happen sequentially.
-          yield call(tasks.HandleRowAddEvent, action as Redux.Action<Table.RowAddEvent<any>>);
+          yield call(tasks.HandleRowAddEvent, action as Redux.Action<Table.RowAddEvent<R, M>>);
         } else if (typeguards.isRowDeleteEvent(event)) {
           // Blocking call so that table changes happen sequentially.
           yield call(tasks.HandleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent>);

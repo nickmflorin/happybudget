@@ -11,9 +11,9 @@ const FooterRow = <R extends Table.PdfRow, M extends Model.Model>(props: Omit<Ro
       props.columns,
       (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>) => {
         if (!isNil(col.footer) && !isNil(col.footer.value)) {
-          obj[col.field] = col.footer.value;
+          obj[col.field as string] = col.footer.value;
         } else {
-          obj[col.field] = null;
+          obj[col.field as string] = null;
         }
         return obj;
       },

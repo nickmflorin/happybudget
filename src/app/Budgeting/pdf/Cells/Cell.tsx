@@ -68,7 +68,7 @@ const Cell = <R extends Table.PdfRow, M extends Model.Model>(props: CellProps<R,
   }, [props.location, props.row, props.column, props.isHeader]);
 
   const rawValue = useMemo(() => {
-    return !isNil(props.valueCallback) ? props.valueCallback(callbackParams) : props.row[props.column.field];
+    return !isNil(props.valueCallback) ? props.valueCallback(callbackParams) : props.row[props.column.field as keyof R];
   }, [callbackParams, props.row, props.column]);
 
   const value = useMemo(() => {

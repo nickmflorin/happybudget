@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { find, includes, map, isNil, filter, groupBy, forEach } from "lodash";
+import { find, includes, map, isNil, filter, groupBy, forEach, reduce } from "lodash";
 
 import { useDynamicCallback } from "lib/hooks";
 import Table from "./Table";
@@ -11,8 +11,7 @@ const AccountsTable = ({
   /* eslint-disable indent */
   columns,
   data,
-  groups,
-  manager
+  groups
 }: BudgetPdf.AccountsTableProps): JSX.Element => {
   const showFooterRow = useMemo(() => {
     return filter(columns, (column: ColumnType) => !isNil(column.footer)).length !== 0;
@@ -28,6 +27,20 @@ const AccountsTable = ({
       );
       return !isNil(group) ? group.id : null;
     };
+    const convertModelToRow = (model: Model.PdfAccount): BudgetPdf.AccountRow => {
+      return reduce(
+        columns,
+        (obj: { [key: string]: any }, col: Table.PdfColumn<BudgetPdf.AccountRow, Model.PdfAccount>) => {
+          if (model[col.field as keyof Model.PdfAccount] !== undefined) {
+            obj[col.field as keyof Model.PdfAccount] = model[col.field as keyof Model.PdfAccount];
+          } else {
+            obj[col.field as keyof Model.PdfAccount] = "";
+          }
+          return obj;
+        },
+        { id: model.id, meta: {} }
+      ) as BudgetPdf.AccountRow;
+    };
     const modelsWithGroup: Model.PdfAccount[] = filter(data, (m: Model.PdfAccount) => !isNil(getGroupForModel(m)));
     let modelsWithoutGroup: Model.PdfAccount[] = filter(data, (m: Model.PdfAccount) => isNil(getGroupForModel(m)));
 
@@ -35,7 +48,7 @@ const AccountsTable = ({
 
     let groupWithoutGroup: BudgetPdf.AccountRowGroup = {
       group: null,
-      rows: map(modelsWithoutGroup, (m: Model.PdfAccount) => manager.modelToRow(m))
+      rows: map(modelsWithoutGroup, (m: Model.PdfAccount) => convertModelToRow(m))
     };
 
     const groupedModels: { [key: number]: Model.PdfAccount[] } = groupBy(modelsWithGroup, (model: Model.PdfAccount) =>
@@ -46,14 +59,14 @@ const AccountsTable = ({
       if (!isNil(group)) {
         newTable.push({
           group,
-          rows: map(models, (m: Model.PdfAccount) => manager.modelToRow(m))
+          rows: map(models, (m: Model.PdfAccount) => convertModelToRow(m))
         });
       } else {
         // In the case that the group no longer exists, that means the group was removed from the
         // state.  In this case, we want to disassociate the rows with the group.
         groupWithoutGroup = {
           ...groupWithoutGroup,
-          rows: [...groupWithoutGroup.rows, ...map(models, (m: Model.PdfAccount) => manager.modelToRow(m))]
+          rows: [...groupWithoutGroup.rows, ...map(models, (m: Model.PdfAccount) => convertModelToRow(m))]
         };
       }
     });
