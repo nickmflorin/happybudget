@@ -14,7 +14,7 @@ export interface FringesCellEditorProps<R extends Table.Row> extends Table.CellE
 }
 
 const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>, ref: any) => {
-  const [editor] = useModelMenuEditor<Model.Fringe, number[]>({ ...props, forwardedRef: ref });
+  const [editor] = useModelMenuEditor<Model.Fringe, Model.Fringe[]>({ ...props, forwardedRef: ref });
 
   return (
     <ExpandedModelTagsMenu<Model.Fringe>
@@ -22,14 +22,9 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       highlightActive={false}
       checkbox={true}
       multiple={true}
-      selected={editor.value}
+      selected={map(editor.value, (v: Model.Fringe) => v.id)}
       models={props.fringes}
-      onChange={(ms: Model.Fringe[], e: Table.CellDoneEditingEvent) => {
-        editor.onChange(
-          map(ms, (m: Model.Fringe) => m.id),
-          e
-        );
-      }}
+      onChange={(ms: Model.Fringe[], e: Table.CellDoneEditingEvent) => editor.onChange(ms, e)}
       menuRef={editor.menuRef}
       searchIndices={["name"]}
       focusSearchOnCharPress={true}

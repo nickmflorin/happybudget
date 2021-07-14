@@ -346,7 +346,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         newValue: clearValue as R[keyof R],
         id: row.id,
         field: colId,
-        column: col
+        column: col,
+        row: row
       };
       return change;
     } else {
@@ -410,7 +411,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         if (field === "fringes" && !Array.isArray(newValue)) {
           newValue = [newValue];
         }
-        const change: Table.CellChange<R, M> = { oldValue, newValue, field, id: event.data.id, column: customCol };
+        const row: R = event.node.data;
+        const change: Table.CellChange<R, M> = { oldValue, newValue, field, id: event.data.id, column: customCol, row };
         return change;
       }
     }
@@ -719,8 +721,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           const fieldBehavior: Table.FieldBehavior[] = col.fieldBehavior || ["read", "write"];
           if (includes(fieldBehavior, "read")) {
             const nullValue = col.nullValue === undefined ? null : col.nullValue;
-            if (model[col.field as keyof M] !== undefined) {
-              obj[col.field as string] = model[col.field as keyof M];
+            const modelValue = !isNil(col.getRowValue) ? col.getRowValue(model) : model[col.field as keyof M];
+            if (modelValue !== undefined) {
+              obj[col.field as string] = modelValue;
             } else {
               obj[col.field as string] = nullValue;
             }
@@ -768,7 +771,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         ordering
       )
     ]);
-  }, [useDeepEqualMemo(data), useDeepEqualMemo(groups), ordering]);
+  }, [useDeepEqualMemo(data), useDeepEqualMemo(columns), useDeepEqualMemo(groups), ordering]);
 
   useEffect(() => {
     if (focused === false && !isNil(apis)) {

@@ -12,10 +12,7 @@ export const Cells = {
   CalculatedCell: withCellPreparations(cells.CalculatedCell),
   PaymentMethodCell: withPrimaryGrid(withCellPreparations(cells.PaymentMethodCell)),
   BudgetItemCell: withCellPreparations(cells.BudgetItemCell),
-  BudgetAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.BudgetAccountFringesCell)),
-  BudgetSubAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.BudgetSubAccountFringesCell)),
-  TemplateAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.TemplateAccountFringesCell)),
-  TemplateSubAccountFringesCell: withPrimaryGrid(withCellPreparations(cells.TemplateSubAccountFringesCell)),
+  FringesCell: withPrimaryGrid(withCellPreparations(cells.FringesCell)),
   ColorCell: withPrimaryGrid(withCellPreparations(cells.ColorCell)),
   BudgetFooterCalculatedCell: withCellPreparations(cells.BudgetFooterCalculatedCell)
 };

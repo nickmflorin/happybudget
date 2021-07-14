@@ -80,7 +80,6 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         }}
         onEditFringes={() => setFringesModalVisible(true)}
         fringesCellEditor={"BudgetAccountFringesCellEditor"}
-        fringesCellRenderer={"BudgetAccountFringesCell"}
         loadingParent={accountLoading}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)

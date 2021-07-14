@@ -63,7 +63,6 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         }}
         onEditFringes={() => setFringesModalVisible(true)}
         fringesCellEditor={"TemplateSubAccountFringesCellEditor"}
-        fringesCellRenderer={"TemplateSubAccountFringesCell"}
         loadingParent={subAccountLoading}
         // Right now, the SubAccount recursion only goes 1 layer deep.
         // Account -> SubAccount -> Detail (Recrusive SubAccount).

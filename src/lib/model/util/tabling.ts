@@ -69,6 +69,17 @@ export const toAgGridColDef = <R extends Table.Row = Table.Row, M extends Model.
   return original as ColDef;
 };
 
+export const cellChangeToNestedCellChange = <R extends Table.Row, M extends Model.Model>(
+  cellChange: Table.CellChange<R, M>
+): Table.NestedCellChange<R, M> => {
+  return {
+    oldValue: cellChange.oldValue,
+    newValue: cellChange.newValue,
+    column: cellChange.column,
+    row: cellChange.row
+  };
+};
+
 export const cellChangeToRowChange = <R extends Table.Row, M extends Model.Model>(
   cellChange: Table.CellChange<R, M>
 ): Table.RowChange<R, M> => {
@@ -79,11 +90,7 @@ export const cellChangeToRowChange = <R extends Table.Row, M extends Model.Model
   let rowChangeData: Table.RowChangeData<R, M> = {};
   rowChangeData = {
     ...rowChangeData,
-    [cellChange.field as string]: {
-      oldValue: cellChange.oldValue,
-      newValue: cellChange.newValue,
-      column: cellChange.column
-    }
+    [cellChange.field as string]: cellChangeToNestedCellChange(cellChange)
   };
   rowChange = {
     ...rowChange,
@@ -105,11 +112,7 @@ export const addCellChangeToRowChange = <R extends Table.Row, M extends Model.Mo
       ...newRowChange,
       data: {
         ...newRowChange.data,
-        [cellChange.field as string]: {
-          oldValue: cellChange.oldValue,
-          newValue: cellChange.newValue,
-          column: cellChange.column
-        }
+        [cellChange.field as string]: cellChangeToNestedCellChange(cellChange)
       }
     };
   } else {
@@ -186,7 +189,11 @@ export const mergeChangesWithModel = <R extends Table.Row, M extends Model.Model
       const cellChange = getKeyValue<Table.RowChangeData<R, M>, Table.Field<R, M>>(key)(
         change.data
       ) as Table.NestedCellChange<R, M>;
-      newModel = { ...newModel, [key as string]: cellChange.newValue };
+      let value = cellChange.newValue;
+      if (!isNil(cellChange.column.getModelValue)) {
+        value = cellChange.column.getModelValue(cellChange.row);
+      }
+      newModel = { ...newModel, [key as string]: value };
     });
   });
   return newModel;
@@ -196,7 +203,7 @@ export const payload = <R extends Table.Row, M extends Model.Model, P extends Ht
   p: Table.RowChange<R, M> | Table.RowAdd<R, M>
 ): Partial<P> => {
   /* eslint-disable no-unused-vars */
-  const payloadObj: { [key in keyof P]?: P[keyof P] } = {};
+  const payloadObj: { [key: string]: any } = {};
 
   const isCellAdd = (
     obj: Table.NestedCellChange<R, M> | Table.NestedCellAdd<R, M>
@@ -211,16 +218,20 @@ export const payload = <R extends Table.Row, M extends Model.Model, P extends Ht
 
     const fieldBehavor: Table.FieldBehavior[] = cellDelta.column.fieldBehavior || ["read", "write"];
     if (includes(fieldBehavor, "write")) {
-      let httpValue: P[keyof P];
+      let httpValue: any;
       if (isCellAdd(cellDelta)) {
         httpValue = cellDelta.value;
       } else {
-        httpValue = cellDelta.newValue;
+        if (!isNil(cellDelta.column.getModelValue)) {
+          httpValue = cellDelta.column.getModelValue(cellDelta.row);
+        } else {
+          httpValue = cellDelta.newValue;
+        }
       }
-      if (!isNil(cellDelta.column.httpValueConverter)) {
-        httpValue = cellDelta.column.httpValueConverter(httpValue);
+      if (!isNil(cellDelta.column.getHttpValue)) {
+        httpValue = cellDelta.column.getHttpValue(httpValue);
       }
-      payloadObj[key as keyof P] = httpValue;
+      payloadObj[key as string] = httpValue;
     }
   });
   return payloadObj as Partial<P>;

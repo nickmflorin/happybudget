@@ -6,7 +6,7 @@ export { default as BudgetItemCell } from "./BudgetItemCell";
 export { default as ColorCell } from "./ColorCell";
 export { default as HeaderCell } from "./HeaderCell";
 export { default as BodyCell } from "./BodyCell";
-export * from "./FringesCells";
+export { default as FringesCell } from "./FringesCell";
 export * from "./ModelTagCells";
 export { default as withCellPreparations } from "./withCellPreparations";
 export { default as withPrimaryGrid } from "./withPrimaryGrid";

@@ -114,9 +114,11 @@ namespace Table {
     readonly excludeFromExport?: boolean;
     readonly budget?: FooterColumn<R>;
     readonly footer?: FooterColumn<R>;
+    readonly getModelValue?: (row: R) => M[keyof M];
+    readonly getRowValue?: (m: M) => R[keyof R];
     readonly processCellForClipboard?: (row: R) => string;
     readonly processCellFromClipboard?: (value: string) => any;
-    readonly httpValueConverter?: (value: V) => any;
+    readonly getHttpValue?: (value: V) => any;
   }
 
   interface PdfColumn<R extends Table.PdfRow, M extends Model.Model> {
@@ -141,6 +143,7 @@ namespace Table {
     readonly newValue: V;
     readonly field: Field<R, M>;
     readonly column: Table.Column<R, M, V>;
+    readonly row: R;
     readonly id: number;
   };
 
@@ -387,7 +390,7 @@ namespace BudgetTable {
     readonly multiplier: number | null;
     readonly rate: number | null;
     readonly estimated: number | null;
-    readonly fringes: number[];
+    readonly fringes: Model.Fringe[];
     // Only defined for non-Template cases.
     readonly variance?: number | null;
     readonly actual?: number | null;

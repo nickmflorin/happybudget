@@ -228,12 +228,8 @@ const Actuals = (): JSX.Element => {
               flex: 1,
               cellEditor: "PaymentMethodCellEditor",
               type: "singleSelect",
-              httpValueConverter: (payment_method: Model.PaymentMethod | null) => {
-                if (payment_method !== null) {
-                  return payment_method.id;
-                }
-                return null;
-              },
+              getModelValue: (row: BudgetTable.ActualRow): number | null =>
+                !isNil(row.payment_method) ? row.payment_method.id : null,
               // Required to allow the dropdown to be selectable on Enter key.
               suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
                 if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {

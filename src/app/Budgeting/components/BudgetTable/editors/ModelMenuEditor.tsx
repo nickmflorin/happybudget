@@ -1,7 +1,7 @@
 import { RefObject, useRef, useImperativeHandle, useState, useEffect, useMemo } from "react";
 import { isNil } from "lodash";
 
-import { useTrackFirstRender } from "lib/hooks";
+import { useTrackFirstRender, useDeepEqualMemo } from "lib/hooks";
 import { isKeyboardEvent, isSyntheticClickEvent } from "lib/model/typeguards";
 import { ExpandedModelMenuRef } from "components/menus";
 
@@ -52,7 +52,7 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
         params.onDoneEditing(changedEvent);
       }
     }
-  }, [value, changedEvent]);
+  }, [useDeepEqualMemo(value), changedEvent]);
 
   useEffect(() => {
     if (!isNil(params.charPress)) {
@@ -83,7 +83,7 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
         setChangedEvent(e);
       }
     };
-  }, []);
+  }, [value]);
 
   useImperativeHandle(params.forwardedRef, () => {
     return {

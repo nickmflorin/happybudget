@@ -1,4 +1,4 @@
-import { forEach, isNil, filter, reduce, find } from "lodash";
+import { forEach, isNil, filter, reduce, find, map } from "lodash";
 import { getKeyValue } from "lib/util";
 import { FringeUnitModels } from "lib/model";
 
@@ -131,4 +131,40 @@ export const inferModelFromName = <M extends Model.Model>(
       }
     }
   }
+};
+
+type GetModelsByIdOptions = {
+  readonly throwOnMissing?: boolean;
+  readonly warnOnMissing?: boolean;
+  readonly modelName?: string;
+};
+
+export const getModelById = <M extends Model.Model>(
+  models: M[],
+  id: number,
+  options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
+): M | null => {
+  const model: M | undefined = find(models, { id } as any);
+  if (isNil(model)) {
+    if (options.throwOnMissing === true) {
+      throw new Error(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
+    } else if (options.warnOnMissing === true) {
+      /* eslint-disable no-console */
+      console.warn(`Cannot find ${options.modelName || "model"} with ID ${id} in provided models!`);
+    }
+    return null;
+  } else {
+    return model;
+  }
+};
+
+export const getModelsByIds = <M extends Model.Model>(
+  models: M[],
+  ids: number[],
+  options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
+): M[] => {
+  return filter(
+    map(ids, (id: number) => getModelById(models, id, options)),
+    (m: M | null) => !isNil(m)
+  ) as M[];
 };

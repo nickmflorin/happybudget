@@ -10,7 +10,7 @@ import { FieldsDropdown } from "components/dropdowns";
 
 import { getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
-import { inferModelFromName } from "lib/model/util";
+import { inferModelFromName, getModelsByIds } from "lib/model/util";
 import { agCurrencyValueFormatter } from "lib/model/formatters";
 import { floatValueSetter, integerValueSetter } from "lib/model/valueSetters";
 
@@ -25,11 +25,6 @@ export interface GenericSubAccountsTableProps
   categoryName: "Sub Account" | "Detail";
   identifierFieldHeader: "Account" | "Line";
   fringes: Model.Fringe[];
-  fringesCellRenderer:
-    | "BudgetAccountFringesCell"
-    | "TemplateAccountFringesCell"
-    | "BudgetSubAccountFringesCell"
-    | "TemplateSubAccountFringesCell";
   fringesCellEditor:
     | "BudgetAccountFringesCellEditor"
     | "TemplateAccountFringesCellEditor"
@@ -56,7 +51,6 @@ const GenericSubAccountsTable = ({
   identifierFieldHeader,
   fringes,
   fringesCellEditor,
-  fringesCellRenderer,
   fringesCellEditorParams,
   subAccountUnits,
   exportFileName,
@@ -221,12 +215,7 @@ const GenericSubAccountsTable = ({
           width: 100,
           cellEditor: "SubAccountUnitCellEditor",
           type: "singleSelect",
-          httpValueConverter: (unit: Model.Tag | null): number | null | undefined => {
-            if (unit !== null) {
-              return unit.id;
-            }
-            return null;
-          },
+          getModelValue: (row: BudgetTable.SubAccountRow): number | null => (!isNil(row.unit) ? row.unit.id : null),
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
             if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
@@ -272,7 +261,7 @@ const GenericSubAccountsTable = ({
           field: "fringes",
           headerName: "Fringes",
           cellClass: classNames("cell--centered"),
-          cellRenderer: fringesCellRenderer,
+          cellRenderer: "FringesCell",
           headerComponentParams: {
             onEdit: () => onEditFringes()
           },
@@ -281,6 +270,8 @@ const GenericSubAccountsTable = ({
           cellEditor: fringesCellEditor,
           cellEditorParams: fringesCellEditorParams,
           type: "singleSelect",
+          getRowValue: (m: Model.SubAccount): Model.Fringe[] => getModelsByIds(fringes, m.fringes),
+          getModelValue: (row: BudgetTable.SubAccountRow): number[] => map(row.fringes, (f: Model.Fringe) => f.id),
           processCellFromClipboard: (value: string) => {
             // NOTE: When pasting from the clipboard, the values will be a comma-separated
             // list of Fringe Names (assuming a rational user).  Currently, Fringe Names are
@@ -294,23 +285,7 @@ const GenericSubAccountsTable = ({
             return map(fs, (f: Model.Fringe) => f.id);
           },
           processCellForClipboard: (row: BudgetTable.SubAccountRow) => {
-            const subAccountFringes: Model.Fringe[] = filter(
-              map(row.fringes, (id: number) => {
-                const fringe: Model.Fringe | undefined = find(fringes, { id });
-                if (!isNil(fringe)) {
-                  return fringe;
-                } else {
-                  /* eslint-disable no-console */
-                  console.error(
-                    `Corrupted Cell Found! Could not convert model value ${id} for field fringes
-                    to a name.`
-                  );
-                  return null;
-                }
-              }),
-              (fringe: Model.Fringe | null) => fringe !== null
-            ) as Model.Fringe[];
-            return map(subAccountFringes, (fringe: Model.Fringe) => fringe.name).join(", ");
+            return map(row.fringes, (fringe: Model.Fringe) => fringe.name).join(", ");
           },
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
