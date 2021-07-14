@@ -99,7 +99,6 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
             <div className={"with-checkbox-wrapper"}>
               <Checkbox
                 checked={includes(selected, model.id)}
-                style={{ marginRight: 8 }}
                 onChange={(e: CheckboxChangeEvent) => {
                   e.preventDefault();
                   if (e.target.checked) {
@@ -600,7 +599,9 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
               />
               {!isNil(props.bottomItem) && (
                 <Menu.MenuItem
-                  className={classNames("model-menu-item", "empty", { active: isBottomItemFocusedState(state) })}
+                  className={classNames("model-menu-item", "model-menu-item--empty", {
+                    active: isBottomItemFocusedState(state)
+                  })}
                   onClick={(e: React.MouseEvent<HTMLLIElement>) =>
                     !isNil(props.bottomItem?.onClick) && props.bottomItem?.onClick(e)
                   }
@@ -615,7 +616,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
           /* eslint-disable indent */
           !isNil(props.onNoSearchResults) && (
             <Menu.MenuItem
-              className={classNames("model-menu-item", "empty", {
+              className={classNames("model-menu-item", "model-menu-item--empty", {
                 active: isNoSearchResultsFocusedState(state) && state.noSearchResultsActive === true
               })}
               onClick={(e: React.MouseEvent<HTMLLIElement>) =>
@@ -630,7 +631,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
           )}
         {(isNoItemsFocusedState(state) || isNoItemsUnfocusedState(state)) && !isNil(props.onNoData) && (
           <Menu.MenuItem
-            className={classNames("model-menu-item", "empty", {
+            className={classNames("model-menu-item", "model-menu-item--empty", {
               active: isNoItemsFocusedState(state) && state.noItemsActive === true
             })}
             onClick={(e: React.MouseEvent<HTMLLIElement>) =>
