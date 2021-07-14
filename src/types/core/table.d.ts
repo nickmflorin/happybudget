@@ -384,7 +384,6 @@ namespace BudgetTable {
 
   interface SubAccountRow extends Table.Row {
     readonly identifier: string | null;
-    readonly name: string | null;
     readonly description: string | null;
     readonly quantity: number | null;
     readonly unit: Model.Tag | null;
@@ -427,7 +426,6 @@ namespace BudgetPdf {
 
   interface SubAccountRow extends Table.PdfRow {
     readonly identifier: string | null;
-    readonly name: string | null;
     readonly description: string | null;
     readonly quantity: number | null;
     readonly unit: Model.Tag | null;

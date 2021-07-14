@@ -72,9 +72,6 @@ const AccountTable = ({
         filter(columns, (column: ColumnType) => !isNil(column.childFooter)).length !== 0 && details.length !== 0;
       const isLastSubAccount = i === subaccounts.length - 1;
 
-      // NOTE: While we should be using manager.modelToRow() to stay consistent,
-      // we want to exclude calculated fields here - which the manager does not
-      // do.  We need to deprecate the manager.modelToRow() method.
       /* eslint-disable no-loop-func */
       const subaccountRow = reduce(
         columns,

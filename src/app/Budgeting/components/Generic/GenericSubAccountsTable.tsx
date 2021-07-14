@@ -195,12 +195,12 @@ const GenericSubAccountsTable = ({
             return 1;
           }
         },
-        {
-          field: "name",
-          headerName: "Contact",
-          width: 120,
-          type: "contact"
-        },
+        // {
+        //   field: "name",
+        //   headerName: "Contact",
+        //   width: 120,
+        //   type: "contact"
+        // },
         {
           field: "quantity",
           headerName: "Qty",

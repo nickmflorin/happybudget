@@ -92,12 +92,12 @@ const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
                       return { value: "Total" };
                     }
                   },
-                  {
-                    field: "name",
-                    headerName: "Contact",
-                    type: "contact",
-                    width: "10%"
-                  },
+                  // {
+                  //   field: "name",
+                  //   headerName: "Contact",
+                  //   type: "contact",
+                  //   width: "10%"
+                  // },
                   {
                     field: "quantity",
                     headerName: "Qty",
