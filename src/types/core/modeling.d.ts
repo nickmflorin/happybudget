@@ -93,7 +93,7 @@ namespace Model {
     readonly rate: number | null;
     readonly unit: Model.FringeUnit | null;
     readonly created_by: number;
-    readonly updated_by: number | null;
+    readonly updated_by: number;
     readonly created_at: string;
     readonly updated_at: string;
   }
@@ -104,7 +104,7 @@ namespace Model {
     readonly created_at: string;
     readonly updated_at: string;
     readonly created_by: number;
-    readonly updated_by: number | null;
+    readonly updated_by: number;
   }
 
   interface SimpleTemplate extends Model.BaseBudget {
@@ -155,7 +155,7 @@ namespace Model {
     readonly estimated: number;
     readonly children: number[];
     readonly created_by: number;
-    readonly updated_by: number | null;
+    readonly updated_by: number;
     readonly created_at: string;
     readonly updated_at: string;
     // Will be undefined for Template Account(s).
@@ -181,7 +181,7 @@ namespace Model {
     readonly estimated: number;
     readonly subaccounts: number[];
     readonly created_by: number;
-    readonly updated_by: number | null;
+    readonly updated_by: number;
     readonly created_at: string;
     readonly updated_at: string;
     // Only included for detail endpoints.
@@ -213,7 +213,7 @@ namespace Model {
 
   interface SubAccount extends Model.SimpleSubAccount {
     readonly created_by: number;
-    readonly updated_by: number | null;
+    readonly updated_by: number;
     readonly created_at: string;
     readonly updated_at: string;
     readonly quantity: number | null;
@@ -269,7 +269,7 @@ namespace Model {
     readonly payment_method: Model.PaymentMethod | null;
     readonly subaccount: Model.SimpleSubAccount | null;
     readonly created_by: number;
-    readonly updated_by: number | null;
+    readonly updated_by: number;
     readonly created_at: string;
     readonly updated_at: string;
   }
