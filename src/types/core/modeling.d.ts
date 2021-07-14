@@ -92,7 +92,7 @@ namespace Model {
     readonly cutoff: number | null;
     readonly rate: number | null;
     readonly unit: Model.FringeUnit | null;
-    readonly created_by: number | null;
+    readonly created_by: number;
     readonly updated_by: number | null;
     readonly created_at: string;
     readonly updated_at: string;
@@ -154,7 +154,7 @@ namespace Model {
     readonly color: string | null;
     readonly estimated: number;
     readonly children: number[];
-    readonly created_by: number | null;
+    readonly created_by: number;
     readonly updated_by: number | null;
     readonly created_at: string;
     readonly updated_at: string;
@@ -180,7 +180,7 @@ namespace Model {
     readonly access: number[];
     readonly estimated: number;
     readonly subaccounts: number[];
-    readonly created_by: number | null;
+    readonly created_by: number;
     readonly updated_by: number | null;
     readonly created_at: string;
     readonly updated_at: string;
@@ -212,7 +212,7 @@ namespace Model {
   }
 
   interface SubAccount extends Model.SimpleSubAccount {
-    readonly created_by: number | null;
+    readonly created_by: number;
     readonly updated_by: number | null;
     readonly created_at: string;
     readonly updated_at: string;
@@ -268,7 +268,7 @@ namespace Model {
     readonly value: number | null;
     readonly payment_method: Model.PaymentMethod | null;
     readonly subaccount: Model.SimpleSubAccount | null;
-    readonly created_by: number | null;
+    readonly created_by: number;
     readonly updated_by: number | null;
     readonly created_at: string;
     readonly updated_at: string;
