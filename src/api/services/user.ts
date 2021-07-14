@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { client } from "api";
 import { URL } from "./util";
 
@@ -15,4 +16,12 @@ export const updateActiveUser = async (
 ): Promise<Model.User> => {
   const url = URL.v1("users", "user");
   return client.patch<Model.User>(url, payload, options);
+};
+
+export const tempUploadImage = async (
+  data: FormData,
+  options?: Http.RequestOptions
+): Promise<AxiosResponse<Http.FileUploadResponse>> => {
+  const url = URL.v1("users", "temp_upload_user_image");
+  return client.upload<Http.FileUploadResponse>(url, data, options);
 };
