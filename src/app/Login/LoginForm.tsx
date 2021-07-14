@@ -39,7 +39,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
     <Form.Form
       style={style}
       form={form}
-      className={classNames("login-form", className)}
+      className={classNames("landing-form", className)}
       onFinish={(values: ILoginFormValues) => onSubmit(values)}
     >
       <Form.Item
@@ -84,13 +84,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}
         />
-        <div className={"signup-text"}>
+        <div className={"switch-text"}>
           {"Don't have an account yet?"}
-          <span>
-            <RouterLink to={"/signup"} className={"signup-link"}>
-              {"Sign up"}
-            </RouterLink>
-          </span>
+          <RouterLink to={"/signup"}>{"Sign up"}</RouterLink>
         </div>
       </Form.Footer>
     </Form.Form>

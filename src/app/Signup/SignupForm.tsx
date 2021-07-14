@@ -39,10 +39,9 @@ const SignupForm = ({
     <Form.Form
       style={style}
       form={form}
-      className={classNames("signup-form", className)}
+      className={classNames("landing-form", className)}
       onFinish={(values: ISignupFormValues) => onSubmit(values)}
     >
-      <div className={"input-group-title"}>{"Profile"}</div>
       <Form.Item name={"first_name"} rules={[{ required: true, message: "Please enter a valid first name." }]}>
         <Input className={"input"} size={"large"} prefix={<UserOutlined />} placeholder={"First name"} />
       </Form.Item>
@@ -80,16 +79,6 @@ const SignupForm = ({
         ]}
       >
         <Input.Password className={"input"} size={"large"} placeholder={"Password"} prefix={<LockOutlined />} />
-        {/* <Tooltip
-          overlayStyle={{ whiteSpace: "pre-line" }}
-          trigger={["focus"]}
-          placement={"right"}
-          title={
-            "At least 1 special character (!@#$%^&*)\nAt least 1 uppercase letter\nAt least 1 lowercase letter\nAt least 1 number\nAt least 8 characters long"
-          }
-        >
-          <Input.Password className={"input"} size={"large"} placeholder={"Password"} prefix={<LockOutlined />} />
-        </Tooltip> */}
       </Form.Item>
       <Form.Item
         name={"confirm"}
@@ -117,13 +106,9 @@ const SignupForm = ({
           onGoogleSuccess={onGoogleSuccess}
           onGoogleError={onGoogleError}
         />
-        <div className={"login-text"}>
+        <div className={"switch-text"}>
           {"Already have an account?"}
-          <span>
-            <RouterLink to={"/login"} className={"login-link"}>
-              {"Log in"}
-            </RouterLink>
-          </span>
+          <RouterLink to={"/login"}>{"Log in"}</RouterLink>
         </div>
       </Form.Footer>
     </Form.Form>

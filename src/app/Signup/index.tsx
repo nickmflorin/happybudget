@@ -8,19 +8,16 @@ import { Form } from "components";
 
 import SignupForm, { ISignupFormValues } from "./SignupForm";
 
-import "./index.scss";
-
 const Signup = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const history = useHistory();
 
   return (
-    <div className={"form-container"}>
+    <div className={"landing-form-container"}>
       <Typography.Title className={"title"}>{"Register"}</Typography.Title>
       <Typography.Title className={"sub-title"}>{"Cloud based budgeting at your fingertips."}</Typography.Title>
       <SignupForm
-        className={"mb--20 mt--20"}
         form={form}
         loading={loading}
         onGoogleSuccess={(token: string) => {

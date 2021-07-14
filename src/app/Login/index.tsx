@@ -10,8 +10,6 @@ import { Logo } from "components/svgs";
 
 import LoginForm, { ILoginFormValues } from "./LoginForm";
 
-import "./index.scss";
-
 const Login = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -22,7 +20,7 @@ const Login = (): JSX.Element => {
       <div className={"logo-container"}>
         <Logo color={"green"} />
       </div>
-      <div className={"form-container"}>
+      <div className={"landing-form-container"}>
         <Typography.Title className={"title"}>{"Sign In"}</Typography.Title>
         <Typography.Title className={"sub-title"}>{"Cloud based budgeting at your fingertips."}</Typography.Title>
         <LoginForm
