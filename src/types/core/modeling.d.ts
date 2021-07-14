@@ -206,7 +206,6 @@ namespace Model {
   }
 
   interface SimpleSubAccount extends Model.Model {
-    readonly name: string | null;
     readonly type: "subaccount";
     readonly identifier: string | null;
     readonly description: string | null;
@@ -237,7 +236,6 @@ namespace Model {
 
   interface PdfSubAccount {
     readonly id: number;
-    readonly name: string | null;
     readonly identifier: string | null;
     readonly description: string | null;
     readonly quantity: number | null;
