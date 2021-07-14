@@ -1,5 +1,5 @@
-export * from "./ContactRoles";
-export { default as ContactRoles } from "./ContactRoles";
+export * from "./ContactTypes";
+export { default as ContactTypes } from "./ContactTypes";
 export * from "./FringeUnits";
 export { default as FringeUnits } from "./FringeUnits";
 export * from "./PaymentMethods";

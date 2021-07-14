@@ -43,20 +43,12 @@ namespace Model {
   type FringeUnitName = "Percent" | "Flat";
   type FringeUnit = Model.Choice<FringeUnitId, FringeUnitName>;
 
-  type ContactRoleName =
-    | "Producer"
-    | "Executive Producer"
-    | "Production Manager"
-    | "Production Designer"
-    | "Actor"
-    | "Director"
-    | "Medic"
-    | "Wardrobe"
-    | "Writer"
-    | "Client"
-    | "Other";
-  type ContactRoleId = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
-  type ContactRole = Model.Choice<ContactRoleId, ContactRoleName>;
+  type ContactTypeName =
+    | "Contractor"
+    | "Employee"
+    | "Vendor"
+  type ContactTypeId = 0 | 1 | 2;
+  type ContactType = Model.Choice<ContactTypeId, ContactTypeName>;
 
   type LineType = "account" | "subaccount";
   type SimpleLineItem = Model.SimpleAccount | Model.SimpleSubAccount;
@@ -267,16 +259,20 @@ namespace Model {
     readonly first_name: string | null;
 =======
   interface Contact extends Model.TimestampTrackedModel {
+    readonly type: Model.ContactType | null;
     readonly first_name: string | null
 >>>>>>> 16a1e50... Update typings
     readonly last_name: string | null;
     readonly full_name: string;
     readonly company: string | null;
-    readonly email: string | null;
-    readonly role: Model.ContactRole | null;
+    readonly position: string | null;
     readonly rate: number | null;
     readonly city: string | null;
+    readonly email: string | null;
     readonly phone_number: string | null;
+    readonly rate: number | null;
+    readonly created_at: string;
+    readonly updated_at: string;
   }
 
   type HistoryEventType = "field_alteration" | "create";

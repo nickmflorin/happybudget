@@ -1,8 +1,5 @@
+@import "./variables";
 @import "./colors";
-
-// Input Fields
-$input-border-radius: 8px;
-$input-small-border-radius: 4px;
 
 // This is to get rid of the blue-background that Chrome sometimes sets on
 // auto-fill fields.
@@ -118,7 +115,7 @@ input.ant-input,
 .input {
   .ant-input-wrapper {
     .ant-input-group-addon {
-      background-color: #f7f7f7 !important;
+      background-color: $gray-light !important;
       border: none;
       .anticon {
         color: $text-secondary;

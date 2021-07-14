@@ -25,9 +25,10 @@ import "./ContactsTable.scss";
 
 interface Row {
   key: number;
+  type: Model.ContactTypeName | null;
   name: string;
   company: string | null;
-  role: Model.ContactRoleName | null;
+  position: string | null;
   phone_number: string | null;
   email: string | null;
   contact: Model.Contact;
@@ -91,9 +92,10 @@ const ContactsTable = (): JSX.Element => {
     forEach(contacts, (contact: Model.Contact) => {
       tableData.push({
         key: contact.id,
+        type: !isNil(contact.type) ? contact.type.name : null,
         name: contact.full_name,
         company: contact.company,
-        role: !isNil(contact.role) ? contact.role.name : null,
+        position: contact.position,
         email: contact.email,
         phone_number: contact.phone_number,
         contact
@@ -177,8 +179,8 @@ const ContactsTable = (): JSX.Element => {
           },
           {
             title: "Job Title",
-            key: "role",
-            dataIndex: "role"
+            key: "position",
+            dataIndex: "position"
           },
           {
             // TODO: abstract just city and state from location

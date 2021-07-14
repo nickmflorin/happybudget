@@ -4,9 +4,6 @@ import { isNil } from "lodash";
 import { Input } from "antd";
 import { InputProps } from "antd/lib/input";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPhoneAlt } from "@fortawesome/pro-solid-svg-icons";
-
 import { formatAsPhoneNumber } from "lib/util/formatters";
 
 interface PhoneNumberInputProps extends Omit<InputProps, "onChange"> {
@@ -24,7 +21,6 @@ const PhoneNumberInput = ({ displayFormattedValue = true, onChange, ...props }: 
         className={"input"}
         size={"large"}
         placeholder={"Phone number"}
-        prefix={<FontAwesomeIcon className={"icon"} icon={faPhoneAlt} />}
         {...props}
         value={!isNil(props.value) ? formatAsPhoneNumber(props.value) : formatAsPhoneNumber(_value)}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

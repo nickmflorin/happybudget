@@ -160,14 +160,15 @@ namespace Http {
   }
 
   interface ContactPayload {
+    readonly type?: Model.ContactTypeId | null;
     readonly first_name?: string | null;
     readonly last_name?: string | null;
     readonly company?: string | null;
-    readonly email?: string | null;
-    readonly role?: Model.ContactRoleId | null;
-    readonly rate?: number | null;
+    readonly position?: string | null;
     readonly city?: string | null;
+    readonly email?: string | null;
     readonly phone_number?: string | null;
+    readonly rate?: number | null;
   }
 
   type _BulkCreateCountPayload = { count: number };

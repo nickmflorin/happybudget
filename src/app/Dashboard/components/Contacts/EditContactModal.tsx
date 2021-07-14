@@ -11,6 +11,10 @@ import { Modal } from "components/modals";
 
 import { updateContactInStateAction } from "store/actions";
 
+import "./ContactForm.scss";
+
+import "./ContactModal.scss";
+
 interface EditContactModalProps {
   contact: Model.Contact;
   visible: boolean;
@@ -26,6 +30,7 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
 
   return (
     <Modal
+      className={"contact-modal"}
       title={`Edit Contact: ${contact.full_name}`}
       visible={visible}
       onCancel={() => onCancel()}
@@ -61,11 +66,12 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
         form={form}
         globalError={globalError}
         initialValues={{
+          type: !isNil(contact.type) ? contact.type : null,
           first_name: contact.first_name,
           last_name: contact.last_name,
           company: contact.company,
           email: contact.email,
-          role: !isNil(contact.role) ? contact.role.id : null,
+          position: contact.position,
           rate: contact.rate,
           city: contact.city,
           phone_number: contact.phone_number

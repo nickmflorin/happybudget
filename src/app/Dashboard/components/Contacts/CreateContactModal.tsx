@@ -10,6 +10,8 @@ import { Modal } from "components/modals";
 
 import { addContactToStateAction } from "store/actions";
 
+import "./ContactModal.scss";
+
 interface CreateContactModalProps {
   open: boolean;
   onCancel: () => void;
@@ -23,6 +25,7 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
 
   return (
     <Modal
+      className={"contact-modal"}
       title={"Create a New Contact"}
       visible={open}
       onCancel={() => onCancel()}
