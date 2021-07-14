@@ -341,7 +341,7 @@
       &:hover,
       &:focus {
         svg {
-          color: $green-darker !important;
+          color: lighten($icon-color, 20%) !important;
         }
       }
     }
