@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Dispatch } from "redux";
 import { forEach, includes, isNil, map } from "lodash";
+import { createSelector } from "reselect";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
@@ -18,6 +19,7 @@ import {
   deleteContactsAction
 } from "store/actions";
 import { useContacts } from "store/hooks";
+import { selectContactsStore } from "store/selectors";
 import EditContactModal from "./EditContactModal";
 import "./ContactsTable.scss";
 
@@ -32,11 +34,53 @@ interface Row {
   contact: Model.Contact;
 }
 
+const selectContactsLoading = createSelector(
+  selectContactsStore,
+  (data: Redux.ModelListResponseStore<Model.Contact>) => data.loading
+);
+
+const selectSelectedContacts = createSelector(
+  selectContactsStore,
+  (data: Redux.ModelListResponseStore<Model.Contact>) => data.selected
+);
+
+const selectContactsPageSize = createSelector(
+  selectContactsStore,
+  (data: Redux.ModelListResponseStore<Model.Contact>) => data.pageSize
+);
+
+const selectContactsPage = createSelector(
+  selectContactsStore,
+  (data: Redux.ModelListResponseStore<Model.Contact>) => data.page
+);
+
+const selectContactsCount = createSelector(
+  selectContactsStore,
+  (data: Redux.ModelListResponseStore<Model.Contact>) => data.count
+);
+
+const selectContactsUpdating = createSelector(
+  selectContactsStore,
+  (data: Redux.ModelListResponseStore<Model.Contact>) => data.updating
+);
+
+const selectContactsDeleting = createSelector(
+  selectContactsStore,
+  (data: Redux.ModelListResponseStore<Model.Contact>) => data.deleting
+);
+
 const ContactsTable = (): JSX.Element => {
   const [contactToEdit, setContactToEdit] = useState<Model.Contact | undefined>(undefined);
   const [contactsToDelete, setContactsToDelete] = useState<Model.Contact[] | undefined>(undefined);
   const [data, setData] = useState<any[]>([]);
   const contacts = useContacts();
+  const count = useSelector(selectContactsCount);
+  const deleting = useSelector(selectContactsDeleting);
+  const updating = useSelector(selectContactsUpdating);
+  const pageSize = useSelector(selectContactsPageSize);
+  const page = useSelector(selectContactsPage);
+  const contactsLoading = useSelector(selectContactsLoading);
+  const selectedContacts = useSelector(selectSelectedContacts);
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
@@ -45,7 +89,7 @@ const ContactsTable = (): JSX.Element => {
 
   useEffect(() => {
     const tableData: Row[] = [];
-    forEach(contacts.data, (contact: Model.Contact) => {
+    forEach(contacts, (contact: Model.Contact) => {
       tableData.push({
         key: contact.id,
         name: contact.full_name,
@@ -58,13 +102,13 @@ const ContactsTable = (): JSX.Element => {
       });
     });
     setData(tableData);
-  }, [contacts.data]);
+  }, [contacts]);
 
   return (
     <React.Fragment>
       <ModelSelectController<Model.Contact>
-        selected={contacts.selected}
-        data={contacts.data}
+        selected={selectedContacts}
+        data={contacts}
         entityName={"contact"}
         items={[
           {
@@ -78,15 +122,15 @@ const ContactsTable = (): JSX.Element => {
         className={"admin-table"}
         tableLayout={"fixed"}
         dataSource={data}
-        loading={contacts.loading}
+        loading={contactsLoading}
         rowClassName={(record: Row, index: number) => {
           if (
             includes(
-              map(contacts.deleting, (instance: Redux.ModelListActionInstance) => instance.id),
+              map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
               record.key
             ) ||
             includes(
-              map(contacts.updating, (instance: Redux.ModelListActionInstance) => instance.id),
+              map(updating, (instance: Redux.ModelListActionInstance) => instance.id),
               record.key
             )
           ) {
@@ -94,10 +138,10 @@ const ContactsTable = (): JSX.Element => {
           }
         }}
         rowSelection={{
-          selectedRowKeys: contacts.selected,
+          selectedRowKeys: selectedContacts,
           onChange: (selectedKeys: React.ReactText[]) => {
             const selectedCs = map(selectedKeys, (key: React.ReactText) => String(key));
-            if (selectedCs.length === contacts.selected.length) {
+            if (selectedCs.length === selectedContacts.length) {
               dispatch(selectContactsAction([]));
             } else {
               const selectedContactIds = map(selectedCs, (c: string) => parseInt(c));
@@ -108,10 +152,10 @@ const ContactsTable = (): JSX.Element => {
         pagination={{
           hideOnSinglePage: true,
           defaultPageSize: 10,
-          pageSize: contacts.pageSize,
-          current: contacts.page,
+          pageSize: pageSize,
+          current: page,
           showSizeChanger: true,
-          total: contacts.count,
+          total: count,
           onChange: (pg: number, size: number | undefined) => {
             dispatch(setContactsPageAction(pg));
             if (!isNil(size)) {

@@ -96,7 +96,16 @@ const Tag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.Eleme
       } else {
         if (!isNil(props.modelColorField) && !isNil(getKeyValue<M, keyof M>(props.modelColorField)(props.model))) {
           // Can be null, the Tag will use the default color.
-          return props.model[props.modelColorField] || DEFAULT_TAG_COLOR;
+          const colorFromField = props.model[props.modelColorField];
+          if (isNil(colorFromField)) {
+            return DEFAULT_TAG_COLOR;
+          } else if (typeof colorFromField === "string") {
+            return colorFromField;
+          } else {
+            /* eslint-disable no-console */
+            console.error(`The field ${props.modelColorField} did not return a string color.`);
+            return DEFAULT_TAG_COLOR;
+          }
         } else if (isModelWithColor(props.model)) {
           // Can be null, the Tag will use the default color.
           return props.model.color || DEFAULT_TAG_COLOR;
@@ -127,8 +136,10 @@ const Tag = <M extends Model.Model = Model.Model>(props: TagProps<M>): JSX.Eleme
         return DEFAULT_TAG_TEXT_COLOR;
       }
       return contrastedForegroundColor(props.model.color);
+    } else if (!isNil(tagColor)) {
+      return contrastedForegroundColor(tagColor as string);
     }
-    return contrastedForegroundColor(tagColor as string);
+    return DEFAULT_TAG_TEXT_COLOR;
   }, [tagColor, props]);
 
   const renderParams = useMemo((): ITagRenderParams => {

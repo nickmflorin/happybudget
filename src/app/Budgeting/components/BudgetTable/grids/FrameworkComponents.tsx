@@ -14,6 +14,7 @@ export const Cells = {
   BudgetItemCell: withCellPreparations(cells.BudgetItemCell),
   FringesCell: withPrimaryGrid(withCellPreparations(cells.FringesCell)),
   ColorCell: withPrimaryGrid(withCellPreparations(cells.ColorCell)),
+  ContactCell: withPrimaryGrid(withCellPreparations(cells.ContactCell)),
   BudgetFooterCalculatedCell: withCellPreparations(cells.BudgetFooterCalculatedCell)
 };
 
@@ -26,7 +27,8 @@ export const Editors = {
   TemplateSubAccountFringesCellEditor: editors.TemplateSubAccountFringesCellEditor,
   SubAccountUnitCellEditor: editors.SubAccountUnitCellEditor,
   PaymentMethodCellEditor: editors.PaymentMethodCellEditor,
-  SubAccountsTreeEditor: editors.SubAccountsTreeEditor
+  SubAccountsTreeEditor: editors.SubAccountsTreeEditor,
+  ContactCellEditor: editors.ContactCellEditor
 };
 
 const FrameworkComponents = {

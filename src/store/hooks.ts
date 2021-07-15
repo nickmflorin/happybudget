@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
-import { selectContacts } from "./selectors";
+import { selectContacts, selectContactsStore } from "./selectors";
 
 export const useLoggedInUser = (): Model.User => {
   const value = useSelector((state: Modules.ApplicationStore) => {
@@ -9,7 +9,11 @@ export const useLoggedInUser = (): Model.User => {
   return value;
 };
 
-export const useContacts = (): Redux.ModelListResponseStore<Model.Contact> => {
+export const useContactsStore = (): Redux.ModelListResponseStore<Model.Contact> => {
+  return useSelector(selectContactsStore);
+};
+
+export const useContacts = (): Model.Contact[] => {
   return useSelector(selectContacts);
 };
 

@@ -1,11 +1,14 @@
 import { forwardRef } from "react";
 import { PaymentMethods } from "lib/model";
 
-import ModelTagCellEditor, { ModelTagCellEditorProps } from "./Generic";
+import ChoiceCellEditor, { ChoiceCellEditorProps } from "./Generic";
 
-const PaymentMethodCellEditor = (props: ModelTagCellEditorProps, ref: any) => {
+const PaymentMethodCellEditor = (
+  props: Omit<ChoiceCellEditorProps<Model.PaymentMethod>, "models" | "searchIndices">,
+  ref: any
+) => {
   return (
-    <ModelTagCellEditor<Model.PaymentMethod>
+    <ChoiceCellEditor<Model.PaymentMethod>
       searchIndices={["name"]}
       models={PaymentMethods}
       forwardedRef={ref}

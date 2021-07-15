@@ -6,14 +6,13 @@ import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { RenderWithSpinner, VerticalFlexCenter, Menu } from "components";
 import { useDeepEqualMemo, useDebouncedJSSearch, useTrackFirstRender, useDynamicCallback } from "lib/hooks";
-import {
-  ModelMenuRef,
-  ModelMenuItemProps,
-  ModelMenuProps,
-  isMultipleModelMenuProps,
-  ModelMenuItemsProps
-} from "./model";
 import "./ModelMenu.scss";
+
+const isMultipleModelMenuProps = <M extends Model.M>(
+  data: ModelMenuProps<M>
+): data is MultipleModelMenuProps<M> & _ModelMenuProps<M> => {
+  return (data as MultipleModelMenuProps<M> & _ModelMenuProps<M>).multiple === true;
+};
 
 const isModelWithChildren = <M extends Model.M>(model: M): model is M & { children: M[] } => {
   return (

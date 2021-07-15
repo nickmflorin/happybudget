@@ -3,7 +3,6 @@ import { isNil } from "lodash";
 
 import { useTrackFirstRender, useDeepEqualMemo } from "lib/hooks";
 import { isKeyboardEvent, isSyntheticClickEvent } from "lib/model/typeguards";
-import { ExpandedModelMenuRef } from "components/menus";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;

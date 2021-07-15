@@ -9,7 +9,6 @@ import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
 import { isCharacterKeyPress, isBackspaceKeyPress } from "lib/util/events";
 
-import { ExpandedModelMenuRef, ModelMenuRef, ExpandedModelMenuProps } from "./model";
 import ModelMenu from "./ModelMenu";
 import "./ExpandedModelMenu.scss";
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useImperativeHandle, useRef } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, concat, filter, reduce, find } from "lodash";
+import { map, isNil, includes, concat, filter, reduce, find, orderBy } from "lodash";
 import Cookies from "universal-cookie";
 
 import {
@@ -405,22 +405,37 @@ const BudgetTable = <
   }, [useDeepEqualMemo(cookies)]);
 
   useEffect(() => {
+    const columnsWithIndex = filter(columns, (col: Table.Column<R, M>) => !isNil(col.index));
+    const columnsWithoutIndexNotCalculated = filter(
+      columns,
+      (col: Table.Column<R, M>) => isNil(col.index) && col.isCalculated !== true
+    );
+    const columnsWithoutIndexCalculated = filter(
+      columns,
+      (col: Table.Column<R, M>) => isNil(col.index) && col.isCalculated === true
+    );
+    const orderedColumns = [
+      ...orderBy(columnsWithIndex, ["index"], ["asc"]),
+      ...columnsWithoutIndexNotCalculated,
+      ...columnsWithoutIndexCalculated
+    ];
+
     let base: Table.Column<R, M>[] = [IndexColumn()];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
       base.push(ExpandColumn());
     }
-    if (columns.length !== 0) {
-      base.push(IdentifierColumn(columns[0]));
+    if (orderedColumns.length !== 0) {
+      base.push(IdentifierColumn(orderedColumns[0]));
       const cs = concat(
         base,
         map(
-          filter(columns.slice(1), (col: Table.Column<R, M>) => !(col.isCalculated === true)),
+          filter(orderedColumns.slice(1), (col: Table.Column<R, M>) => !(col.isCalculated === true)),
           (def: Table.Column<R, M>) => BodyColumn(def)
         ),
         map(
-          filter(columns.slice(1), (col: Table.Column<R, M>) => col.isCalculated === true),
+          filter(orderedColumns.slice(1), (col: Table.Column<R, M>) => col.isCalculated === true),
           (def: Table.Column<R, M>) => CalculatedColumn(def)
         )
       );

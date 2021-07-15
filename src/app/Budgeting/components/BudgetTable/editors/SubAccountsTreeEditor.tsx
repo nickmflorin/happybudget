@@ -2,7 +2,7 @@ import { useRef, forwardRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
 
-import { SubAccountTreeMenu, ExpandedModelMenuRef } from "components/menus";
+import { SubAccountTreeMenu } from "components/menus";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import useModelMenuEditor from "./ModelMenuEditor";

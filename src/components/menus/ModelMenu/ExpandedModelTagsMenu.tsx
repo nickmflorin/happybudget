@@ -1,7 +1,6 @@
 import { isNil } from "lodash";
 import { Tag } from "components/tagging";
 
-import { ExpandedModelTagsMenuProps } from "./model";
 import ExpandedModelMenu from "./ExpandedModelMenu";
 
 const ExpandedModelTagsMenu = <M extends Model.M>(props: ExpandedModelTagsMenuProps<M>): JSX.Element => {

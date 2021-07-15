@@ -180,13 +180,15 @@ const GenericSubAccountsTable = ({
           width: 90,
           cellRendererParams: { className: "subaccount-identifier" },
           footer: { value: tableFooterIdentifierValue, colSpan: (params: ColSpanParams) => 2 },
-          budget: { value: budgetFooterIdentifierValue, colSpan: (params: ColSpanParams) => 2 }
+          budget: { value: budgetFooterIdentifierValue, colSpan: (params: ColSpanParams) => 2 },
+          index: 0
         },
         {
           field: "description",
           headerName: `${categoryName} Description`,
           flex: 100,
           type: "longText",
+          index: 1,
           colSpan: (params: ColSpanParams) => {
             const row: BudgetTable.SubAccountRow = params.data;
             if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
@@ -195,12 +197,6 @@ const GenericSubAccountsTable = ({
             return 1;
           }
         },
-        // {
-        //   field: "name",
-        //   headerName: "Contact",
-        //   width: 120,
-        //   type: "contact"
-        // },
         {
           field: "quantity",
           headerName: "Qty",

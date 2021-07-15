@@ -113,6 +113,7 @@ namespace Table {
     readonly excludeFromExport?: boolean;
     readonly budget?: FooterColumn<R>;
     readonly footer?: FooterColumn<R>;
+    readonly index?: number;
     readonly getModelValue?: (row: R) => M[keyof M];
     readonly getRowValue?: (m: M) => R[keyof R];
     readonly processCellForClipboard?: (row: R) => string;
@@ -392,6 +393,7 @@ namespace BudgetTable {
     readonly estimated: number | null;
     readonly fringes: Model.Fringe[];
     // Only defined for non-Template cases.
+    readonly contact?: number | null;
     readonly variance?: number | null;
     readonly actual?: number | null;
   }

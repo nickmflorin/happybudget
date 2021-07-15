@@ -9,7 +9,6 @@ import { VerticalFlexCenter } from "components";
 import { EntityText } from "components/typography";
 
 import ExpandedModelMenu from "./ExpandedModelMenu";
-import { SubAccountTreeMenuProps } from "./model";
 
 import "./SubAccountTreeMenu.scss";
 

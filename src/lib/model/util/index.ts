@@ -133,6 +133,17 @@ export const inferModelFromName = <M extends Model.Model>(
   }
 };
 
+export const parseFirstAndLastName = (name: string): [string | null, string | null] => {
+  if (name.trim() === "") {
+    return [null, null];
+  }
+  const split = name.split(" ");
+  if (split.length === 1) {
+    return [split[0].trim(), null];
+  }
+  return [split[0].trim(), map(split.slice(1), (comp: string) => comp.trim()).join(" ")];
+};
+
 type GetModelsByIdOptions = {
   readonly throwOnMissing?: boolean;
   readonly warnOnMissing?: boolean;
