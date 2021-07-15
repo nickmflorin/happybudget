@@ -6,7 +6,6 @@ import { DropDownProps } from "antd/lib/dropdown";
 
 import { ModelTagsMenu } from "components/menus";
 import { Tag } from "components/tagging";
-import { EmptyTagProps } from "components/tagging/Tag";
 
 import "./ModelTagsDropdown.scss";
 
@@ -31,8 +30,7 @@ export type ModelTagsDropdownProps<M extends Model.Model, V extends number = num
   Omit<DropDownProps, "trigger" | "className" | "overlay"> & {
     className?: string;
     trigger?: ("click" | "hover" | "contextMenu")[];
-    modelTextField?: keyof M & string;
-    modelColorField?: keyof M & string;
+    tagProps?: TagProps<M>;
     models: M[];
     onMissing?: JSX.Element | EmptyTagProps;
     onNoData?: {
@@ -71,8 +69,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
           <ModelTagsMenu<M>
             selected={props.selected}
             models={props.models}
-            modelTextField={props.modelTextField}
-            modelColorField={props.modelColorField}
+            tagProps={props.tagProps}
             onChange={props.onChange}
             multiple={true}
             onNoData={onNoData}
@@ -81,8 +78,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
       >
         <div className={"model-tags-dropdown-child"}>
           <Tag.Multiple<M>
-            modelTextField={props.modelTextField}
-            modelColorField={props.modelColorField}
+            tagProps={props.tagProps}
             models={selectedPresentModels}
             onMissing={props.onMissing || { visible: false }}
           />
@@ -100,8 +96,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
           <ModelTagsMenu<M>
             selected={props.selected}
             models={props.models}
-            modelTextField={props.modelTextField}
-            modelColorField={props.modelColorField}
+            tagProps={props.tagProps}
             onChange={props.onChange}
             multiple={false}
             onNoData={onNoData}
@@ -115,7 +110,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
             <Tag style={{ opacity: 0 }}>{"None"}</Tag>
           )
         ) : (
-          <Tag model={model} modelTextField={props.modelTextField} modelColorField={props.modelColorField} />
+          <Tag model={model} {...props.tagProps} />
         )}
       </Dropdown>
     );

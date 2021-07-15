@@ -17,8 +17,7 @@ const ContactCellEditor = (props: Table.CellEditorParams, ref: any) => {
       models={contacts}
       onChange={(m: Model.Contact, e: Table.CellDoneEditingEvent) => editor.onChange(m.id, e)}
       searchIndices={["first_name", "last_name"]}
-      modelColorField={"id"}
-      modelTextField={"full_name"}
+      tagProps={{ color: "#EFEFEF", textColor: "#2182e4", modelTextField: "full_name" }}
     />
   );
 };

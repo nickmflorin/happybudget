@@ -11,3 +11,4 @@ export * from "./ModelTagCells";
 export { default as withCellPreparations } from "./withCellPreparations";
 export { default as withPrimaryGrid } from "./withPrimaryGrid";
 export { default as BudgetFooterCalculatedCell } from "./BudgetFooterCalculatedCell";
+export { default as ContactCell } from "./ContactCell";

@@ -93,8 +93,14 @@ interface ITagRenderParams extends StandardComponentProps {
   readonly text: string;
 }
 
-interface _TagCommonProps extends StandardComponentProps {
+type TagProps<M extends Model.M = Model.M> = StandardComponentProps & {
+  readonly children?: string | M | null;
+  readonly text?: string | null;
   readonly textColor?: string;
+  readonly color?: string;
+  readonly model?: M | null;
+  readonly modelTextField?: keyof M;
+  readonly modelColorField?: keyof M;
   readonly scheme?: string[];
   readonly uppercase?: boolean;
   readonly colorIndex?: number;
@@ -103,67 +109,32 @@ interface _TagCommonProps extends StandardComponentProps {
   readonly render?: (params: ITagRenderParams) => JSX.Element;
 }
 
-interface _TagModelProps<M extends Model.Model = Model.Model> extends _TagCommonProps {
-  readonly model: M;
-  readonly modelTextField?: keyof M;
-  readonly modelColorField?: keyof M;
-}
-
-interface _TagTextProps extends _TagCommonProps {
+interface VisibleEmptyTagProps extends StandardComponentProps {
+  readonly visible?: true;
   readonly text: string;
-  readonly color?: string;
 }
 
-interface _TagChildrenProps extends _TagCommonProps {
-  readonly children: string;
-  readonly color?: string;
+interface InvisibleEmptyTagProps extends StandardComponentProps {
+  readonly visible: false;
 }
 
-type TagProps<M extends Model.Model = Model.Model> = _TagModelProps<M> | _TagTextProps | _TagChildrenProps;
+type EmptyTagProps = VisibleEmptyTagProps | InvisibleEmptyTagProps;
 
-// Common props used in all 3 different ways of instantiating a <MultipleTags> component.
-interface _MultipleTagsProps extends StandardComponentProps {
-  // Globally provided color - will be set on all created <Tag> components if the color is not
-  // explicitly provided to that <Tag> component (either by means of the ITag object or the
-  // model M used to generate the <Tag> component).
-  color?: string;
-  // Globally provided textColor - will be set on all created <Tag> components if the textColor is not
-  // explicitly provided to that <Tag> component (either by means of the ITag object or the
-  // model M used to generate the <Tag> component).
-  textColor?: string;
-  scheme?: string[];
-  // Globally provided uppercase setting - will be set on all created <Tag> components if the uppercase
-  // setting is not explicitly provided to the <Tag> component (by means of the ITag object only).
-  uppercase?: boolean;
+type MultipleTagsProps<M extends Model.M = Model.M> = StandardComponentProps & {
+  // <Tag> components should be generated based on a set of provided models M.
+  readonly models?: M[];
+  // <Tag> components are provided as children to the component:
+  // <MultipleTags><Tag /><Tag /></MultipleTags>
+  readonly children?: JSX.Element[];
+  // <Tag> components should be generated based on a provided Array of objects (ITag), each of which
+  // contains the properties necessary to create a <Tag> component.
+  readonly tags?: ITag[];
+  readonly tagProps?: Omit<TagProps<M>, "children" | "model" | "text">;
   // If the list of Models (M) or list of ITag objects or Array of Children <Tag> components is empty,
   // this will either render the component provided by onMissingList or create an <EmptyTag> component
   // with props populated from this attribute.
-  onMissing?: JSX.Element | EmptyTagProps;
+  readonly onMissing?: JSX.Element | EmptyTagProps;
 }
-
-// <Tag> components are provided as children to the component:
-// <MultipleTags><Tag /><Tag /></MultipleTags>
-interface _MultipleTagsChildrenProps extends _MultipleTagsProps {
-  children: typeof Tag[];
-}
-
-// <Tag> components should be generated based on a set of provided models M.
-interface _MultipleTagsModelsProps<M extends Model.Model = Model.Model> extends _MultipleTagsProps {
-  models: M[];
-  modelTextField?: keyof M;
-  modelColorField?: keyof M;
-}
-
-// <Tag> components should be generated based on a provided Array of objects (ITag), each of which
-// contains the properties necessary to create a <Tag> component.
-interface _MultipleTagsExplicitProps extends _MultipleTagsProps {
-  tags: ITag[];
-}
-
-type MultipleTagsProps<M extends Model.Model = Model.Model> =
-  | _MultipleTagsChildrenProps
-  | _MultipleTagsModelsProps<M>
-  | _MultipleTagsExplicitProps;
 
 type ModelMenuRef<M extends Model.M> = {
     readonly incrementFocusedIndex: () => void;
@@ -175,87 +146,85 @@ type ModelMenuRef<M extends Model.M> = {
   };
 
 type EmptyItem = {
-    readonly onClick?: (event: import("react").SyntheticEvent | KeyboardEvent) => void;
-    readonly text: string;
-    readonly icon?: JSX.Element;
-    readonly defaultFocus?: boolean;
-  };
+  readonly onClick?: (event: import("react").SyntheticEvent | KeyboardEvent) => void;
+  readonly text: string;
+  readonly icon?: JSX.Element;
+  readonly defaultFocus?: boolean;
+};
 
-  interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
-    readonly loading?: boolean;
-    readonly models: M[];
-    readonly uppercase?: boolean;
-    readonly selected?: number | number[] | string | string[] | null;
-    readonly search?: string;
-    readonly fillWidth?: boolean;
-    readonly menuRef?: Ref<ModelMenuRef<M>>;
-    readonly highlightActive?: boolean;
-    readonly itemProps?: any;
-    readonly levelIndent?: number;
-    readonly clientSearching?: boolean;
-    readonly defaultFocusFirstItem?: boolean;
-    readonly defaultFocusOnlyItem?: boolean;
-    readonly defaultFocusOnlyItemOnSearch?: boolean;
-    readonly searchIndices?: (string[] | string)[] | undefined;
-    readonly visible?: number[];
-    readonly hidden?: number[];
-    readonly bottomItem?: Omit<EmptyItem, "defaultFocus">;
-    readonly onNoData?: EmptyItem;
-    readonly onNoSearchResults?: EmptyItem;
-    readonly autoFocus?: boolean;
-    readonly leftAlign?: boolean;
-    readonly bordersForLevels?: boolean;
-    readonly getFirstSearchResult?: (models: M[]) => M | null;
-    readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
-    readonly onFocusCallback?: (focused: boolean) => void;
-  }
+interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
+  readonly loading?: boolean;
+  readonly models: M[];
+  readonly uppercase?: boolean;
+  readonly selected?: number | number[] | string | string[] | null;
+  readonly search?: string;
+  readonly fillWidth?: boolean;
+  readonly menuRef?: Ref<ModelMenuRef<M>>;
+  readonly highlightActive?: boolean;
+  readonly itemProps?: any;
+  readonly levelIndent?: number;
+  readonly clientSearching?: boolean;
+  readonly defaultFocusFirstItem?: boolean;
+  readonly defaultFocusOnlyItem?: boolean;
+  readonly defaultFocusOnlyItemOnSearch?: boolean;
+  readonly searchIndices?: (string[] | string)[] | undefined;
+  readonly visible?: number[];
+  readonly hidden?: number[];
+  readonly bottomItem?: Omit<EmptyItem, "defaultFocus">;
+  readonly onNoData?: EmptyItem;
+  readonly onNoSearchResults?: EmptyItem;
+  readonly autoFocus?: boolean;
+  readonly leftAlign?: boolean;
+  readonly bordersForLevels?: boolean;
+  readonly getFirstSearchResult?: (models: M[]) => M | null;
+  readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
+  readonly onFocusCallback?: (focused: boolean) => void;
+}
 
-  interface SingleModelMenuProps<M extends Model.M> {
-    readonly onChange: (model: M, e: import("react").SyntheticEvent | KeyboardEvent | import("antd/lib/checkbox").CheckboxChangeEvent) => void;
-    readonly multiple?: false;
-  }
+interface SingleModelMenuProps<M extends Model.M> {
+  readonly onChange: (model: M, e: import("react").SyntheticEvent | KeyboardEvent | import("antd/lib/checkbox").CheckboxChangeEvent) => void;
+  readonly multiple?: false;
+}
 
-  interface MultipleModelMenuProps<M extends Model.M> {
-    readonly onChange: (models: M[], e: import("react").SyntheticEvent | KeyboardEvent | import("antd/lib/checkbox").CheckboxChangeEvent) => void;
-    readonly multiple: true;
-    readonly checkbox?: boolean;
-  }
+interface MultipleModelMenuProps<M extends Model.M> {
+  readonly onChange: (models: M[], e: import("react").SyntheticEvent | KeyboardEvent | import("antd/lib/checkbox").CheckboxChangeEvent) => void;
+  readonly multiple: true;
+  readonly checkbox?: boolean;
+}
 
 interface ModelMenuItemProps<M extends Model.M> {
-    readonly menuId: number;
-    readonly model: M;
-    readonly selected: (number | string)[];
-    readonly checkbox: boolean;
-    readonly focusedIndex: number | null;
-    readonly level: number;
-    readonly levelIndent?: number;
-    readonly multiple: boolean;
-    readonly highlightActive: boolean | undefined;
-    readonly leftAlign: boolean | undefined;
-    readonly hidden: (string | number)[] | undefined;
-    readonly visible: (string | number)[] | undefined;
-    readonly indexMap: { [key: string]: number };
-    readonly itemProps?: any;
-    readonly bordersForLevels?: boolean;
-    // This is intentionally not named onClick because it conflicts with AntD's mechanics.
-    readonly onPress: (model: M, e: import("react").SyntheticEvent) => void;
-    readonly onSelect: (model: M, e: import("antd/lib/checkbox").CheckboxChangeEvent) => void;
-    readonly onDeselect: (model: M, e: import("antd/lib/checkbox").CheckboxChangeEvent) => void;
-    readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
-  }
+  readonly menuId: number;
+  readonly model: M;
+  readonly selected: (number | string)[];
+  readonly checkbox: boolean;
+  readonly focusedIndex: number | null;
+  readonly level: number;
+  readonly levelIndent?: number;
+  readonly multiple: boolean;
+  readonly highlightActive: boolean | undefined;
+  readonly leftAlign: boolean | undefined;
+  readonly hidden: (string | number)[] | undefined;
+  readonly visible: (string | number)[] | undefined;
+  readonly indexMap: { [key: string]: number };
+  readonly itemProps?: any;
+  readonly bordersForLevels?: boolean;
+  // This is intentionally not named onClick because it conflicts with AntD's mechanics.
+  readonly onPress: (model: M, e: import("react").SyntheticEvent) => void;
+  readonly onSelect: (model: M, e: import("antd/lib/checkbox").CheckboxChangeEvent) => void;
+  readonly onDeselect: (model: M, e: import("antd/lib/checkbox").CheckboxChangeEvent) => void;
+  readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
+}
 
 interface ModelMenuItemsProps<M extends Model.M> extends Omit<ModelMenuItemProps<M>, "model"> {
-    readonly models: M[];
-  }
+  readonly models: M[];
+}
 
 type ModelMenuProps<M extends Model.M> = _ModelMenuProps<M> &
     (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
 
-  interface _ModelTagsMenuProps<M extends Model.M> extends Omit<_ModelMenuProps<M>, "renderItem"> {
-    readonly modelTextField?: keyof M & string;
-    readonly modelColorField?: keyof M & string;
-    readonly tagProps?: any;
-  }
+interface _ModelTagsMenuProps<M extends Model.M> extends Omit<_ModelMenuProps<M>, "renderItem"> {
+  readonly tagProps?: Omit<TagProps<M>, "model" | "children">;
+}
 
 type ModelTagsMenuProps<M extends Model.M> = _ModelTagsMenuProps<M> &
     (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
@@ -287,24 +256,22 @@ interface _ExpandedModelMenuProps<M extends Model.M>
 type ExpandedModelMenuProps<M extends Model.M> = _ExpandedModelMenuProps<M> &
     (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
 
-  interface _ExpandedModelTagsMenuProps<M extends Model.M> extends Omit<_ExpandedModelMenuProps<M>, "renderItem"> {
-    readonly modelTextField?: keyof M & string;
-    readonly modelColorField?: keyof M & string;
-    readonly tagProps?: any;
-  }
+interface _ExpandedModelTagsMenuProps<M extends Model.M> extends Omit<_ExpandedModelMenuProps<M>, "renderItem"> {
+  readonly tagProps?: Omit<TagProps<M>, "model" | "children">;
+}
 
 type ExpandedModelTagsMenuProps<M extends Model.M> = _ExpandedModelTagsMenuProps<M> &
     (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
 
 interface SubAccountTreeMenuProps
-    extends Omit<
-      ExpandedModelMenuProps<Model.SubAccountTreeNode>,
-      "renderItem" | "models" | "multiple" | "onChange" | "selected"
-    > {
-    readonly nodes: Model.Tree;
-    readonly onChange: (m: Model.SimpleSubAccount, e: import("react").SyntheticEvent | KeyboardEvent | import("antd/lib/checkbox").CheckboxChangeEvent) => void;
-    readonly onSearch: (value: string) => void;
-    readonly search: string;
-    readonly childrenDefaultVisible?: boolean;
-    readonly selected: { id: number; type: "subaccount" | "account" } | null;
-  }
+  extends Omit<
+    ExpandedModelMenuProps<Model.SubAccountTreeNode>,
+    "renderItem" | "models" | "multiple" | "onChange" | "selected"
+  > {
+  readonly nodes: Model.Tree;
+  readonly onChange: (m: Model.SimpleSubAccount, e: import("react").SyntheticEvent | KeyboardEvent | import("antd/lib/checkbox").CheckboxChangeEvent) => void;
+  readonly onSearch: (value: string) => void;
+  readonly search: string;
+  readonly childrenDefaultVisible?: boolean;
+  readonly selected: { id: number; type: "subaccount" | "account" } | null;
+}
