@@ -8,13 +8,21 @@ import { selectConsistent, getKeyValue } from "lib/util";
 import { contrastedForegroundColor } from "lib/util/colors";
 import { isModelWithColor, isModelWithName, isTag } from "lib/model/typeguards";
 
-const TagRenderer = (props: ITagRenderParams): JSX.Element => {
+const TagRenderer = ({
+  contentRender,
+  ...params
+}: ITagRenderParams & { contentRender?: (p: ITagRenderParams) => JSX.Element }): JSX.Element => {
   return (
     <div
-      className={classNames("tag", { uppercase: props.uppercase }, { "fill-width": props.fillWidth }, props.className)}
-      style={{ ...props.style, backgroundColor: props.color, color: props.textColor }}
+      className={classNames(
+        "tag",
+        { uppercase: params.uppercase },
+        { "fill-width": params.fillWidth },
+        params.className
+      )}
+      style={{ ...params.style, backgroundColor: params.color, color: params.textColor }}
     >
-      {props.text}
+      {!isNil(contentRender) ? contentRender(params) : params.text}
     </div>
   );
 };
@@ -140,7 +148,7 @@ const Tag = <M extends Model.M = Model.M>(props: TagProps<M>): JSX.Element => {
   if (!isNil(props.render)) {
     return props.render(renderParams);
   }
-  return <TagRenderer {...renderParams} />;
+  return <TagRenderer contentRender={props.contentRender} {...renderParams} />;
 };
 
 const isEmptyTagsPropsNotComponent = (props: EmptyTagProps | JSX.Element): props is EmptyTagProps => {

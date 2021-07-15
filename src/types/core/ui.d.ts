@@ -107,6 +107,8 @@ type TagProps<M extends Model.M = Model.M> = StandardComponentProps & {
   readonly fillWidth?: boolean;
   // Used for custom rendering of the tag - mostly applicable for PDF purposes.
   readonly render?: (params: ITagRenderParams) => JSX.Element;
+  // Used for custom rendering of the tag content.
+  readonly contentRender?: (params: ITagRenderParams) => JSX.Element;
 }
 
 interface VisibleEmptyTagProps extends StandardComponentProps {

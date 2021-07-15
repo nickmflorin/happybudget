@@ -4,13 +4,13 @@
 .tag {
   height: 20px;
   text-align: center;
-  line-height: 21px;
-  font-size: 13px;
+  line-height: 20.5px;
+  font-size: 12px;
   padding-top: 0px !important;
   padding-bottom: 0px !important;
   padding-left: 8px;
   padding-right: 8px;
-  font-family: "Nunito", sans-serif;
+  font-family: $open-sans;
   font-weight: 400;
   width: -moz-fit-content;
   width: fit-content;
@@ -30,6 +30,26 @@
 
   &--contact {
     border-radius: 4px;
+
+    &:hover,
+    &:focus {
+      cursor: pointer;
+    }
+  }
+
+  .btn {
+    display: block;
+    font-family: $open-sans;
+    line-height: 20.5px;
+    font-size: 12px;
+    font-weight: 400;
+    color: $blue !important;
+    height: 20px;
+
+    &:hover,
+    &:focus {
+      color: $blue !important;
+    }
   }
 }
 
