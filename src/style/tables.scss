@@ -7,10 +7,6 @@
 $table-border-color: #eeeeee;
 $table-border: 1px solid $table-border-color;
 
-:export {
-  table-border-color: $table-border-color;
-}
-
 .ag-menu-list {
   margin-top: 0px !important;
   margin-bottom: 0px !important;
