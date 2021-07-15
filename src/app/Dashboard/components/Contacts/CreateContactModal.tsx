@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 
+import * as api from "api";
+
 import { Form } from "components";
 import { ContactForm } from "components/forms";
 import { Modal } from "components/modals";
-import { createContact } from "api/services";
 
-import { addContactToStateAction } from "../../store/actions";
+import { addContactToStateAction } from "store/actions";
 
 interface CreateContactModalProps {
   open: boolean;
@@ -15,7 +16,6 @@ interface CreateContactModalProps {
   onSuccess: () => void;
 }
 
-// TODO: Create front end validators for phone number, city, and country.
 const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -34,7 +34,8 @@ const CreateContactModal = ({ open, onCancel, onSuccess }: CreateContactModalPro
           .validateFields()
           .then((values: any) => {
             setLoading(true);
-            createContact(values)
+            api
+              .createContact(values)
               .then((contact: Model.Contact) => {
                 form.resetFields();
                 dispatch(addContactToStateAction(contact));

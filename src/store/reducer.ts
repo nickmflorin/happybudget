@@ -1,8 +1,8 @@
 import { Reducer, combineReducers } from "redux";
 import { forEach, isNil, includes } from "lodash";
+import { createSimpleBooleanReducer, createModelListResponseReducer } from "lib/redux/factories";
 import { ApplicationActionTypes } from "./actions";
 import { createInitialUserState } from "./initialState";
-import { createSimpleBooleanReducer } from "../lib/redux/factories";
 
 /**
  * Wraps each individual module level reducer so that if any action includes
@@ -50,17 +50,32 @@ const createWrappedModuleReducer = (
  */
 const createUserReducer = (user: Model.User): Reducer<Modules.UserStore, Redux.Action<any>> => {
   const initialUserState = createInitialUserState(user);
-  const userReducer: Reducer<Modules.UserStore, Redux.Action<any>> = (
-    state: Modules.UserStore = initialUserState,
-    action: Redux.Action<any>
-  ): Modules.UserStore => {
+
+  const contactsReducer = createModelListResponseReducer<Model.Contact, Redux.ModelListResponseStore<Model.Contact>>({
+    Response: ApplicationActionTypes.User.Contacts.Response,
+    Request: ApplicationActionTypes.User.Contacts.Request,
+    Loading: ApplicationActionTypes.User.Contacts.Loading,
+    Select: ApplicationActionTypes.User.Contacts.Select,
+    SetSearch: ApplicationActionTypes.User.Contacts.SetSearch,
+    SetPage: ApplicationActionTypes.User.Contacts.SetPage,
+    SetPageSize: ApplicationActionTypes.User.Contacts.SetPageSize,
+    SetPageAndSize: ApplicationActionTypes.User.Contacts.SetPageAndSize,
+    AddToState: ApplicationActionTypes.User.Contacts.AddToState,
+    RemoveFromState: ApplicationActionTypes.User.Contacts.RemoveFromState,
+    UpdateInState: ApplicationActionTypes.User.Contacts.UpdateInState,
+    Creating: ApplicationActionTypes.User.Contacts.Creating,
+    Updating: ApplicationActionTypes.User.Contacts.Updating,
+    Deleting: ApplicationActionTypes.User.Contacts.Deleting
+  });
+
+  return (state: Modules.UserStore = initialUserState, action: Redux.Action<any>): Modules.UserStore => {
     let newState = { ...state };
     if (action.type === ApplicationActionTypes.User.UpdateInState) {
       newState = { ...newState, ...action.payload };
     }
+    newState = { ...newState, contacts: contactsReducer(newState.contacts, action) };
     return newState;
   };
-  return userReducer;
 };
 
 const loadingReducer: Reducer<boolean, Redux.Action<any>> = (

@@ -9,14 +9,14 @@ import { faSearch } from "@fortawesome/pro-light-svg-icons";
 import { ActionsMenuBar } from "components/menus";
 import { Page } from "components/layout";
 
-import { setContactsSearchAction } from "../../store/actions";
+import { setContactsSearchAction } from "store/actions";
 import ContactsTable from "./ContactsTable";
 import CreateContactModal from "./CreateContactModal";
 
 const Contacts = (): JSX.Element => {
   const [newContactModalOpen, setNewContactModalOpen] = useState(false);
   const dispatch: Dispatch = useDispatch();
-  const contacts = useSelector((state: Modules.ApplicationStore) => state.dashboard.contacts);
+  const contacts = useSelector((state: Modules.ApplicationStore) => state.user.contacts);
 
   return (
     <React.Fragment>

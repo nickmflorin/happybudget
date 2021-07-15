@@ -52,26 +52,6 @@ export const ActionType = {
     Hiding: "dashboard.community.Hiding",
     Show: "dashboard.community.Show",
     Showing: "dashboard.community.Showing"
-  },
-  Contacts: {
-    Loading: "dashboard.contacts.Loading",
-    Response: "dashboard.contacts.Response",
-    Request: "dashboard.contacts.Request",
-    Select: "dashboard.contacts.Select",
-    SetSearch: "dashboard.contacts.SetSearch",
-    SetPage: "dashboard.contacts.SetPage",
-    SetPageSize: "dashboard.contacts.SetPageSize",
-    SetPageAndSize: "dashboard.contacts.SetPageAndSize",
-    UpdateInState: "dashboard.contacts.UpdateInState",
-    RemoveFromState: "dashboard.contacts.RemoveFromState",
-    AddToState: "dashboard.contacts.AddToState",
-    Delete: "dashboard.contacts.Delete",
-    DeleteMultiple: "dashboard.contacts.DeleteMultiple",
-    Deleting: "dashboard.contacts.Deleting",
-    Update: "dashboard.contacts.Update",
-    Updating: "dashboard.contacts.Updating",
-    Create: "dashboard.contacts.Create",
-    Creating: "dashboard.contacts.Creating"
   }
 };
 
@@ -139,32 +119,3 @@ export const hideCommunityTemplateAction = simpleAction<number>(ActionType.Commu
 export const hidingCommunityTemplateAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Community.Hiding);
 export const showCommunityTemplateAction = simpleAction<number>(ActionType.Community.Show);
 export const showingCommunityTemplateAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Community.Showing);
-
-export const requestContactsAction = simpleAction<null>(ActionType.Contacts.Request);
-export const loadingContactsAction = simpleAction<boolean>(ActionType.Contacts.Loading);
-export const responseContactsAction = simpleAction<Http.ListResponse<Model.Contact>>(ActionType.Contacts.Response);
-export const selectContactsAction = simpleAction<number[]>(ActionType.Contacts.Select);
-export const setContactsSearchAction = simpleAction<string>(ActionType.Contacts.SetSearch);
-export const setContactsPageSizeAction = simpleAction<number>(ActionType.Contacts.SetPageSize);
-export const setContactsPageAction = simpleAction<number>(ActionType.Contacts.SetPage);
-export const setContactsPageAndSizeAction = simpleAction<PageAndSize>(ActionType.Contacts.SetPageAndSize);
-export const deleteContactAction = simpleAction<number>(ActionType.Contacts.Delete);
-export const deleteContactsAction = simpleAction<number[]>(ActionType.Contacts.DeleteMultiple);
-export const deletingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Deleting);
-export const removeContactFromStateAction = simpleAction<number>(ActionType.Contacts.RemoveFromState);
-export const updateContactInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Contact>>(
-  ActionType.Contacts.UpdateInState
-);
-export const addContactToStateAction = simpleAction<Model.Contact>(ActionType.Contacts.AddToState);
-
-// Not currently used, because the updateContact service is used directly in the
-// modal for editing a contact, but we might use in the future.
-export const updateContactAction = simpleAction<Redux.UpdateModelActionPayload<Model.Contact>>(
-  ActionType.Contacts.Update
-);
-export const updatingContactAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Contacts.Updating);
-
-// Not currently used, because the createContact service is used directly in the
-// modal for creating a contact, but we might use in the future.
-export const createContactAction = simpleAction<Http.ContactPayload>(ActionType.Contacts.Create);
-export const creatingContactAction = simpleAction<boolean>(ActionType.Contacts.Creating);

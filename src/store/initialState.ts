@@ -33,7 +33,8 @@ export const initialCommentsListResponseState: Redux.CommentsListResponseStore =
 
 export const createInitialUserState = (user: Model.User): Modules.UserStore => {
   return {
-    ...user
+    ...user,
+    contacts: initialModelListResponseState
   };
 };
 

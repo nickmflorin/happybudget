@@ -3,12 +3,13 @@ import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { isNil } from "lodash";
 
+import * as api from "api";
+
 import { Form } from "components";
 import { ContactForm } from "components/forms";
 import { Modal } from "components/modals";
-import { updateContact } from "api/services";
 
-import { updateContactInStateAction } from "../../store/actions";
+import { updateContactInStateAction } from "store/actions";
 
 interface EditContactModalProps {
   contact: Model.Contact;
@@ -17,7 +18,6 @@ interface EditContactModalProps {
   onSuccess: () => void;
 }
 
-// TODO: Create front end validators for phone number, city, and country.
 const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContactModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
@@ -37,7 +37,8 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
           .validateFields()
           .then((values: Http.ContactPayload) => {
             setLoading(true);
-            updateContact(contact.id, values)
+            api
+              .updateContact(contact.id, values)
               .then((newContact: Model.Contact) => {
                 setGlobalError(undefined);
                 form.resetFields();

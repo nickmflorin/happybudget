@@ -41,7 +41,6 @@ namespace Modules {
     interface Store {
       readonly budgets: Redux.ModelListResponseStore<Model.SimpleBudget>;
       readonly templates: TemplatesStore;
-      readonly contacts: Redux.ModelListResponseStore<Model.Contact>;
       readonly community: CommunityTemplatesStore;
     }
   }
@@ -167,7 +166,9 @@ namespace Modules {
     }
   }
 
-  interface UserStore extends Model.User {}
+  interface UserStore extends Model.User {
+    readonly contacts: Redux.ModelListResponseStore<Model.Contact>;
+  }
 
   interface ApplicationStore extends ModulesStore {
     readonly user: UserStore;

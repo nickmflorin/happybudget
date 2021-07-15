@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { forEach, includes, isNil, map } from "lodash";
 
@@ -9,9 +9,6 @@ import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { DeleteContactsModal } from "components/modals";
 import { Table, ActionsTableCell, ModelSelectController } from "components/tables";
 import { formatAsPhoneNumber } from "lib/util/formatters";
-
-import "./ContactsTable.scss";
-
 import {
   requestContactsAction,
   setContactsPageAction,
@@ -19,8 +16,10 @@ import {
   setContactsPageAndSizeAction,
   selectContactsAction,
   deleteContactsAction
-} from "../../store/actions";
+} from "store/actions";
+import { useContacts } from "store/hooks";
 import EditContactModal from "./EditContactModal";
+import "./ContactsTable.scss";
 
 interface Row {
   key: number;
@@ -37,7 +36,7 @@ const ContactsTable = (): JSX.Element => {
   const [contactToEdit, setContactToEdit] = useState<Model.Contact | undefined>(undefined);
   const [contactsToDelete, setContactsToDelete] = useState<Model.Contact[] | undefined>(undefined);
   const [data, setData] = useState<any[]>([]);
-  const contacts = useSelector((state: Modules.ApplicationStore) => state.dashboard.contacts);
+  const contacts = useContacts();
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {

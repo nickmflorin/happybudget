@@ -1,7 +1,6 @@
 import { initialModelListResponseState } from "store/initialState";
 
 const initialState: Modules.Dashboard.Store = {
-  contacts: initialModelListResponseState,
   budgets: initialModelListResponseState,
   templates: {
     ...initialModelListResponseState,

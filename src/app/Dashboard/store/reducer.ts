@@ -3,22 +3,6 @@ import { createModelListActionReducer, createModelListResponseReducer } from "li
 import { ActionType } from "./actions";
 
 const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combineReducers({
-  contacts: createModelListResponseReducer<Model.Contact, Redux.ModelListResponseStore<Model.Contact>>({
-    Response: ActionType.Contacts.Response,
-    Request: ActionType.Contacts.Request,
-    Loading: ActionType.Contacts.Loading,
-    Select: ActionType.Contacts.Select,
-    SetSearch: ActionType.Contacts.SetSearch,
-    SetPage: ActionType.Contacts.SetPage,
-    SetPageSize: ActionType.Contacts.SetPageSize,
-    SetPageAndSize: ActionType.Contacts.SetPageAndSize,
-    AddToState: ActionType.Contacts.AddToState,
-    RemoveFromState: ActionType.Contacts.RemoveFromState,
-    UpdateInState: ActionType.Contacts.UpdateInState,
-    Creating: ActionType.Contacts.Creating,
-    Updating: ActionType.Contacts.Updating,
-    Deleting: ActionType.Contacts.Deleting
-  }),
   templates: createModelListResponseReducer<Model.SimpleTemplate, Modules.Dashboard.TemplatesStore, Redux.Action<any>>(
     {
       Response: ActionType.Templates.Response,
