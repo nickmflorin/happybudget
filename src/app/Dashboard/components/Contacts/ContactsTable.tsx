@@ -28,7 +28,6 @@ interface Row {
   name: string;
   company: string | null;
   role: Model.ContactRoleName | null;
-  rate: number | null;
   phone_number: string | null;
   email: string | null;
   contact: Model.Contact;
@@ -95,7 +94,6 @@ const ContactsTable = (): JSX.Element => {
         name: contact.full_name,
         company: contact.company,
         role: !isNil(contact.role) ? contact.role.name : null,
-        rate: contact.rate,
         email: contact.email,
         phone_number: contact.phone_number,
         contact
@@ -181,11 +179,6 @@ const ContactsTable = (): JSX.Element => {
             title: "Job Title",
             key: "role",
             dataIndex: "role"
-          },
-          {
-            title: "Rate",
-            key: "rate",
-            dataIndex: "rate"
           },
           {
             // TODO: abstract just city and state from location
