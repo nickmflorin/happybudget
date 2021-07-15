@@ -215,7 +215,7 @@ const GenericSubAccountsTable = ({
           width: 100,
           cellEditor: "SubAccountUnitCellEditor",
           type: "singleSelect",
-          getModelValue: (row: BudgetTable.SubAccountRow): number | null => (!isNil(row.unit) ? row.unit.id : null),
+          getHttpValue: (row: BudgetTable.SubAccountRow): number | null => (!isNil(row.unit) ? row.unit.id : null),
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
             if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
