@@ -12,7 +12,11 @@ const ContactCell = (props: CellProps<BudgetTable.SubAccountRow>): JSX.Element =
   return (
     <Cell {...props} onClear={() => !isNil(props.setValue) && props.setValue(null)} hideClear={props.children === null}>
       <div style={{ display: "flex", justifyContent: "left" }}>
-        {!isNil(model) ? <Tag color={"#EFEFEF"} textColor={"#2182e4"} text={model.full_name} /> : <></>}
+        {!isNil(model) ? (
+          <Tag className={"tag--contact"} color={"#EFEFEF"} textColor={"#2182e4"} text={model.full_name} />
+        ) : (
+          <></>
+        )}
       </div>
     </Cell>
   );

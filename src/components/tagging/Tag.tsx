@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import classNames from "classnames";
 import { isNil, map } from "lodash";
+
 import { DEFAULT_TAG_COLOR_SCHEME, DEFAULT_TAG_COLOR, DEFAULT_TAG_TEXT_COLOR } from "config";
+
 import { selectConsistent, getKeyValue } from "lib/util";
 import { contrastedForegroundColor } from "lib/util/colors";
 import { isModelWithColor, isModelWithName, isTag } from "lib/model/typeguards";
-
-import "./Tag.scss";
 
 const TagRenderer = (props: ITagRenderParams): JSX.Element => {
   return (

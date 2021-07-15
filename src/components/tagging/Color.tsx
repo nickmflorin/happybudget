@@ -1,12 +1,10 @@
+import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle } from "@fortawesome/pro-solid-svg-icons";
 import { faCircle as faCircleOpen } from "@fortawesome/pro-light-svg-icons";
-
-import "./Color.scss";
-import React from "react";
 
 interface ColorProps extends StandardComponentProps {
   color?: string | null | undefined;

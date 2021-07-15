@@ -1,4 +1,5 @@
 @import "style/typography";
+@import "style/colors";
 
 .tag {
   height: 20px;
@@ -16,13 +17,19 @@
   margin-right: 0.2rem;
   color: #ffffff;
   border-radius: 20px;
+
   &.uppercase {
     text-transform: uppercase;
     font-size: 11px;
   }
+
   &.fill-width {
     text-align: center;
     width: 100%;
+  }
+
+  &--contact {
+    border-radius: 4px;
   }
 }
 
@@ -37,6 +44,34 @@
     // of each tag.  It should also be done programatically.
     &:not(:first-child) {
       margin-left: -10px;
+    }
+  }
+}
+
+.color {
+  height: 24px;
+  width: 24px;
+  position: relative;
+
+  .icon-border {
+    border-radius: 100%;
+    border: 2px solid $white;
+    height: 24px;
+    width: 24px;
+    position: absolute;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  svg {
+    height: 24px !important;
+    width: 24px !important;
+  }
+
+  &:hover,
+  &.selected {
+    .icon-border {
+      box-shadow: none !important;
+      border: 2px solid #6eb6ff !important;
     }
   }
 }
