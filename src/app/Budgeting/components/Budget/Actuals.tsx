@@ -41,6 +41,7 @@ const Actuals = (): JSX.Element => {
 
   useEffect(() => {
     dispatch(actions.requestActualsAction(null));
+    dispatch(actions.requestSubAccountsTreeAction(null));
   }, []);
 
   // NOTE: Right now, the total actual value for a budget can differ from totaling the actual

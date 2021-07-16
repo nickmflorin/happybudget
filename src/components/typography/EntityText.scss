@@ -4,11 +4,16 @@
 .entity-text {
   font-size: 12px;
   width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
   .identifier {
     font-family: $open-sans;
     font-weight: 600;
     color: #b5b5b5;
   }
+
   .description {
     font-family: $open-sans;
     font-weight: 600;

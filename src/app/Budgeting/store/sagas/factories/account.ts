@@ -232,6 +232,7 @@ export const createAccountTaskSet = (
     const accountId = yield select(selectAccountId);
     if (!isNil(accountId) && !isNil(action.payload)) {
       const event: Table.DataChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount> = action.payload;
+      console.log({ event });
       const merged = consolidateTableChange(event.payload);
       if (merged.length !== 0) {
         const CancelToken = axios.CancelToken;

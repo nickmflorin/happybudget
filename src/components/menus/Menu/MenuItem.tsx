@@ -8,7 +8,7 @@ export interface MenuItemProps extends StandardComponentProps {
 
 const MenuItem = (props: MenuItemProps): JSX.Element => {
   return (
-    <li className={classNames("menu-item", props.className)} style={props.style} onClick={props.onClick}>
+    <li className={classNames("menu-item", props.className)} style={props.style} onClick={props.onClick} id={props.id}>
       {props.children}
     </li>
   );

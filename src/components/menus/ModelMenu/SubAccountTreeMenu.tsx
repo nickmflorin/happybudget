@@ -3,7 +3,6 @@ import { isNil, filter } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLongArrowAltRight } from "@fortawesome/pro-light-svg-icons";
 
-import { VerticalFlexCenter } from "components";
 import { EntityText } from "components/typography";
 
 import ExpandedModelMenu from "./ExpandedModelMenu";
@@ -29,7 +28,7 @@ const SubAccountTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
       selected={!isNil(props.selected) ? [`${props.selected.type}-${props.selected.id}`] : null}
       menuProps={{ className: "subaccount-item-tree-menu" }}
       itemProps={{ className: "subaccount-item-tree-menu-item" }}
-      levelIndent={15}
+      levelIndent={6}
       bordersForLevels={true}
       searchIndices={["description", "identifier"]}
       clientSearching={false}
@@ -40,9 +39,9 @@ const SubAccountTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
         if (context.level !== 0) {
           return (
             <div className={"with-neuter-wrapper"}>
-              <VerticalFlexCenter>
+              <div className={"icon-wrapper"}>
                 <FontAwesomeIcon className={"icon"} icon={faLongArrowAltRight} />
-              </VerticalFlexCenter>
+              </div>
               <EntityText fillEmpty={"---------"}>{model}</EntityText>
             </div>
           );
