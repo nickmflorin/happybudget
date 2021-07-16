@@ -158,6 +158,12 @@ const Actuals = (): JSX.Element => {
               minWidth: 200,
               maxWidth: 200,
               width: 200,
+              getHttpValue: (value: Model.SimpleSubAccount | null): number | null => {
+                if (!isNil(value)) {
+                  return value.id;
+                }
+                return value;
+              },
               processCellForClipboard: (row: BudgetTable.ActualRow) => {
                 if (!isNil(row.subaccount)) {
                   return row.subaccount.identifier || "";

@@ -142,7 +142,7 @@ namespace Http {
     readonly group?: number | null;
   }
 
-  interface SubAccountPayload extends Http.ModelPayload<Model.SubAccount> {
+  interface SubAccountPayload extends Omit<Http.ModelPayload<Model.SubAccount>, "unit"> {
     readonly unit?: Model.SubAccountUnitId | null;
     // This is a write-only field in the backend, so we have to explicitly include
     // in the payload.
