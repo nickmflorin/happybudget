@@ -6,7 +6,7 @@ import { isNil } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSignOutAlt, faAddressCard, faLock } from "@fortawesome/pro-light-svg-icons";
 
-import { Layout, Tooltip } from "antd";
+import { Layout } from "antd";
 
 import { Dropdown, VerticalFlexCenter } from "components";
 import { AccountCircleLink } from "components/links";
@@ -81,9 +81,7 @@ const Header = ({ toolbar, className, headerHeight, style = {} }: HeaderProps): 
           ]}
         >
           <div className={"account-wrapper"}>
-            <Tooltip title={user.username}>
-              <AccountCircleLink user={user} />
-            </Tooltip>
+            <AccountCircleLink user={user} />
           </div>
         </Dropdown>
       </div>

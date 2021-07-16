@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { isNil, map } from "lodash";
 import classNames from "classnames";
 
-import { RenderOrSpinner, Color } from "components";
+import { RenderOrSpinner } from "components";
+import { Color } from "components/tagging";
 
 import "./ColorSelect.scss";
 

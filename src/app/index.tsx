@@ -17,21 +17,20 @@ const history = createBrowserHistory();
 
 let prevPath: string | null = null;
 
-Sentry.init({
-  dsn: "https://c27df092747b4aae964b2ff6f07c3497@o591585.ingest.sentry.io/5740401",
-  environment: process.env.NODE_ENV,
-  // By default Sentry SDKs normalize any context to a depth of 3, which in the case of sending
-  // Redux state you probably will want to increase that.
-  normalizeDepth: 10,
-  integrations: [
-    new Integrations.BrowserTracing({
-      routingInstrumentation: Sentry.reactRouterV5Instrumentation(history)
-    })
-  ],
-  tracesSampleRate: 1.0
-});
-
 if (process.env.NODE_ENV !== "development") {
+  Sentry.init({
+    dsn: "https://c27df092747b4aae964b2ff6f07c3497@o591585.ingest.sentry.io/5740401",
+    environment: process.env.NODE_ENV,
+    // By default Sentry SDKs normalize any context to a depth of 3, which in the case of sending
+    // Redux state you probably will want to increase that.
+    normalizeDepth: 10,
+    integrations: [
+      new Integrations.BrowserTracing({
+        routingInstrumentation: Sentry.reactRouterV5Instrumentation(history)
+      })
+    ],
+    tracesSampleRate: 1.0
+  });
   // Listen and notify Segment of client-side page updates.
   history.listen(location => {
     if (location.pathname !== prevPath) {
