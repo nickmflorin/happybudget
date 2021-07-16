@@ -8,13 +8,13 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import useModelMenuEditor from "./ModelMenuEditor";
 
 const selectSubAccountsTree = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subAccountsTree.data
+  (state: Modules.ApplicationStore) => state.budget.budget.subAccountsTree.data
 );
 const selectSubAccountsTreeSearch = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subAccountsTree.search
+  (state: Modules.ApplicationStore) => state.budget.budget.subAccountsTree.search
 );
 const selectSubAccountsTreeLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subAccountsTree.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.subAccountsTree.loading
 );
 
 interface SubAccountsTreeEditorProps extends Table.CellEditorParams {

@@ -23,12 +23,12 @@ import * as actions from "../../store/actions/budget/actuals";
 import { selectBudgetDetail } from "../../store/selectors";
 import BudgetTableComponent from "../BudgetTable";
 
-const selectActuals = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.budget.actuals.data);
+const selectActuals = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budget.budget.actuals.data);
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.search
+  (state: Modules.ApplicationStore) => state.budget.budget.actuals.search
 );
 const selectActualsLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.actuals.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.actuals.loading
 );
 
 const Actuals = (): JSX.Element => {

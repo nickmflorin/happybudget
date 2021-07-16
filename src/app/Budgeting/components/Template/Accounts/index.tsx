@@ -15,10 +15,10 @@ import { setTemplateLastVisited, getUrl } from "../../../urls";
 import AccountsBudgetTable from "./AccountsTable";
 
 const selectAccountsLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.loading
+  (state: Modules.ApplicationStore) => state.budget.template.budget.children.loading
 );
 const selectGroupsLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.groups.loading
+  (state: Modules.ApplicationStore) => state.budget.template.budget.groups.loading
 );
 const selectLoading = createSelector(
   selectAccountsLoading,

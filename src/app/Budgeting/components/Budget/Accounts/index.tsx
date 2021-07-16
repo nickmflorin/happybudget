@@ -16,10 +16,10 @@ import AccountsTable from "./AccountsTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
 
 const selectAccountsLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.children.loading
 );
 const selectGroupsLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.groups.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.groups.loading
 );
 const selectLoading = createSelector(
   selectAccountsLoading,

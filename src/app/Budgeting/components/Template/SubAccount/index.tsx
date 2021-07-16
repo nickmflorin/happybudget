@@ -18,13 +18,13 @@ import { setTemplateLastVisited, getUrl } from "../../../urls";
 import SubAccountBudgetTable from "./SubAccountsTable";
 
 const selectDetail = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.detail.data
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.detail.data
 );
 const selectSubAccountsLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.loading
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.children.loading
 );
 const selectGroupsLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.groups.loading
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.groups.loading
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,

@@ -12,22 +12,22 @@ import TemplateSubAccountsTable from "../SubAccountsTable";
 import FringesModal from "./FringesModal";
 
 const selectGroups = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.groups.data
+  (state: Modules.ApplicationStore) => state.budget.template.account.groups.data
 );
 const selectData = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.data
+  (state: Modules.ApplicationStore) => state.budget.template.account.children.data
 );
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.subaccounts.search
+  (state: Modules.ApplicationStore) => state.budget.template.account.children.search
 );
 const selectAccountDetail = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.detail.data
+  (state: Modules.ApplicationStore) => state.budget.template.account.detail.data
 );
 const selectAccountLoading = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.detail.loading
+  (state: Modules.ApplicationStore) => state.budget.template.account.detail.loading
 );
 const selectFringes = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.template.account.fringes.data
 );
 
 interface SubAccountsTableProps {

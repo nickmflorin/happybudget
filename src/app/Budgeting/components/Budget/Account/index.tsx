@@ -19,13 +19,13 @@ import SubAccountsTable from "./SubAccountsTable";
 import AccountCommentsHistory from "./AccountCommentsHistory";
 
 const selectDetail = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.detail.data
+  (state: Modules.ApplicationStore) => state.budget.budget.account.detail.data
 );
 const selectSubAccountsLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.account.children.loading
 );
 const selectGroupsLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.groups.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.account.groups.loading
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,

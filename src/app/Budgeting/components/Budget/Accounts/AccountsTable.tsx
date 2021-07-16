@@ -20,11 +20,13 @@ import { generatePdf } from "../../../pdf";
 import { GenericAccountsTable } from "../../Generic";
 
 const selectGroups = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.groups.data
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.groups.data
 );
-const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.budget.accounts.data);
+const selectData = simpleDeepEqualSelector(
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.children.data
+);
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.search
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.children.search
 );
 
 const AccountsTable = (): JSX.Element => {

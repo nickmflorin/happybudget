@@ -12,28 +12,28 @@ import {
 } from "../../../store/actions/budget/accounts";
 
 const selectDeletingComments = simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
-  map(state.budgeting.budget.budget.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
+  map(state.budget.budget.budget.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectEditingComments = simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
-  map(state.budgeting.budget.budget.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
+  map(state.budget.budget.budget.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectReplyingComments = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.budget.comments.replying
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.comments.replying
 );
 const selectCommentsData = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.budget.comments.data
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.comments.data
 );
 const selectSubmittingComment = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.budget.comments.creating
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.comments.creating
 );
 const selectLoadingComments = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.budget.comments.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.comments.loading
 );
 const selectLoadingHistory = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.history.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.history.loading
 );
 const selectHistory = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.accounts.history.data
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.history.data
 );
 
 const AccountCommentsHistory = (): JSX.Element => {

@@ -8,33 +8,43 @@ import {
   createCommentsListResponseReducer
 } from "lib/redux/factories";
 import { CommentsListResponseActionMap } from "lib/redux/factories/comments";
-import { warnInconsistentState } from "lib/redux/util";
+import { warnInconsistentState, identityReducer } from "lib/redux/util";
 import * as typeguards from "lib/model/typeguards";
 import { fringeValue, consolidateTableChange, mergeChangesWithModel } from "lib/model/util";
 import { replaceInArray, findWithDistributedTypes } from "lib/util";
 
 import { initialModelListResponseState } from "store/initialState";
 
+type EntityStore<M extends Model.Model = Model.Budget | Model.Template> =
+  | Modules.Budget.BudgetStore<M>
+  | Modules.Budget.AccountStore
+  | Modules.Budget.SubAccountStore;
+
 type ModelLookup<M extends Model.Model> = number | ((m: M) => boolean);
-type MSA<S extends Modules.Budgeting.AccountStoreType | Modules.Budgeting.SubAccountStoreType> =
-  S extends Modules.Budgeting.AccountStoreType ? Model.Account : Model.SubAccount;
+
+type FindModelOptions = {
+  readonly warnIfMissing?: boolean;
+  readonly name?: string;
+};
 
 const findModelInData = <M extends Model.Model, A extends Array<any> = M[]>(
   action: Redux.Action<any>,
   data: A,
   id: ModelLookup<M>,
-  name = "Model"
+  options: FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M | null => {
   const predicate = typeof id === "number" ? (m: M) => m.id === id : id;
   const model = findWithDistributedTypes<M, A>(data, predicate);
   if (!isNil(model)) {
     return model;
   } else {
-    warnInconsistentState({
-      action: action.type,
-      reason: `${name} does not exist in state when it is expected to.`,
-      id: id
-    });
+    if (options.warnIfMissing !== false) {
+      warnInconsistentState({
+        action: action.type,
+        reason: `${options.name || "Model"} does not exist in state when it is expected to.`,
+        id: id
+      });
+    }
     return null;
   }
 };
@@ -43,10 +53,10 @@ const findModelsInData = <M extends Model.Model, A extends Array<any> = M[]>(
   action: Redux.Action<any>,
   data: A,
   ids: ModelLookup<M>[],
-  name = "Model"
+  options: FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M[] =>
   filter(
-    map(ids, (predicate: ModelLookup<M>) => findModelInData(action, data, predicate, name)),
+    map(ids, (predicate: ModelLookup<M>) => findModelInData(action, data, predicate, options)),
     (model: M | null) => model !== null
   ) as M[];
 
@@ -55,10 +65,10 @@ const modelFromState = <M extends Model.Model, A extends Array<any> = M[]>(
   action: Redux.Action<any>,
   data: A,
   id: ModelLookup<M> | M,
-  name = "Model"
+  options: FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M | null => {
   if (typeof id === "number" || typeof id === "function") {
-    return findModelInData<M, A>(action, data, id, name);
+    return findModelInData<M, A>(action, data, id, options);
   }
   return id;
 };
@@ -120,7 +130,7 @@ export const createFringesReducer = (
               action,
               newState.data,
               consolidated[i].id,
-              "Fringe"
+              { name: "Fringe" }
             );
             if (!isNil(fringe)) {
               changesPerFringe[consolidated[i].id] = { changes: [], model: fringe };
@@ -166,78 +176,46 @@ export const createFringesReducer = (
   };
 };
 
-interface AccountsGroupsActionMap {
-  Response: string;
-  Request: string;
-  Loading: string;
-  RemoveFromState: string;
-  UpdateInState: string;
-  AddToState: string;
-  Deleting: string;
-}
-
-interface AccountsHistoryActionMap {
-  Response: string;
-  Request: string;
-  Loading: string;
-}
-
-interface AccountsReducerFactoryActionMap {
-  TableChanged: string;
-  Response: string;
-  Request: string;
-  Loading: string;
-  SetSearch: string;
-  // This will eventually be removed when we let the reducer respond to
-  // the RowAddEvent directly.
-  AddToState: string;
-  RemoveFromGroup: string;
-  AddToGroup: string;
-  Creating: string;
-  Updating: string;
-  Deleting: string;
-  Groups: AccountsGroupsActionMap;
-  History?: AccountsHistoryActionMap;
-}
-
-const groupFromState = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
+const groupFromState = <S extends EntityStore>(
   action: Redux.Action<any>,
   st: S,
   id: Model.Group | number,
-  lineId?: number
+  lineId?: number,
+  options: FindModelOptions = { name: "Group", warnIfMissing: true }
 ): Model.Group | null => {
   if (typeof id === "number") {
     let predicate = (g: Model.Group) => g.id === id;
     if (!isNil(lineId)) {
       predicate = (g: Model.Group) => g.id === id && includes(g.children, lineId);
     }
-    return modelFromState<Model.Group>(action, st.groups.data, predicate, "Group");
+    return modelFromState<Model.Group>(action, st.groups.data, predicate, options);
   }
   return id;
 };
 
-const modelGroupFromState = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
+const modelGroupFromState = <S extends EntityStore>(
   action: Redux.Action<any>,
   st: S,
-  lineId: number
+  lineId: number,
+  options: FindModelOptions = { name: "Group", warnIfMissing: true }
 ): Model.Group | null => {
   const predicate = (g: Model.Group) => includes(g.children, lineId);
-  return modelFromState<Model.Group>(action, st.groups.data, predicate, "Group");
+  return modelFromState<Model.Group>(action, st.groups.data, predicate, options);
 };
 
-const recalculateGroupMetrics = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
+const recalculateGroupMetrics = <S extends EntityStore>(
   /* eslint-disable indent */
   action: Redux.Action<any>,
   st: S,
   group: Model.Group | number
 ): S => {
-  const stateGroup = groupFromState(action, st, group);
+  const stateGroup = groupFromState<S>(action, st, group);
   if (!isNil(stateGroup)) {
     const objs = findModelsInData<Model.Account | Model.SubAccount, Model.Account[] | Model.SubAccount[]>(
       action,
-      st.data,
+      st.children.data,
       stateGroup.children,
-      "Group child account/sub-account"
+      { name: "Group child account/sub-account" }
     );
     let payload: any = {
       estimated: reduce(objs, (sum: number, s: Model.Account | Model.SubAccount) => sum + (s.estimated || 0), 0)
@@ -255,15 +233,15 @@ const recalculateGroupMetrics = <S extends Modules.Budgeting.AccountsStore | Mod
   return st;
 };
 
-const removeModelFromGroup = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
+const removeModelFromGroup = <S extends EntityStore>(
   action: Redux.Action<any>,
   st: S,
-  model: number | MSA<S>,
+  model: number | Model.Account | Model.SubAccount,
   group?: number | Model.Group
 ): S => {
   const stateModel = modelFromState<Model.Account | Model.SubAccount, Model.Account[] | Model.SubAccount[]>(
     action,
-    st.data,
+    st.children.data,
     model
   );
   if (!isNil(stateModel)) {
@@ -271,48 +249,44 @@ const removeModelFromGroup = <S extends Modules.Budgeting.AccountsStore | Module
       ? modelGroupFromState<S>(action, st, stateModel.id)
       : groupFromState<S>(action, st, group, stateModel.id);
     if (!isNil(stateGroup)) {
+      const newGroup = {
+        ...stateGroup,
+        children: filter(stateGroup.children, (child: number) => child !== stateModel.id)
+      };
       st = {
         ...st,
         groups: {
           ...st.groups,
-          data: replaceInArray<Model.Group>(
-            st.groups.data,
-            { id: stateGroup.id },
-            {
-              ...stateGroup,
-              children: filter(stateGroup.children, (child: number) => child !== stateModel.id)
-            }
-          )
+          data: replaceInArray<Model.Group>(st.groups.data, { id: stateGroup.id }, newGroup)
         }
       };
-      return recalculateGroupMetrics<S>(action, st, stateGroup);
+      return recalculateGroupMetrics<S>(action, st, newGroup);
     }
   }
   return st;
 };
 
-const removeModelFromState = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
-  action: Redux.Action<any>,
-  st: S,
-  id: number
-) => {
+const removeModelFromState = <S extends EntityStore>(action: Redux.Action<any>, st: S, id: number) => {
   st = removeModelFromGroup<S>(action, st, id);
   return {
     ...st,
-    data: filter(st.data, (m: MSA<S>) => m.id !== id),
-    count: st.count - 1
+    children: {
+      ...st.children,
+      data: filter(st.children.data, (m: Model.Account | Model.SubAccount) => m.id !== id),
+      count: st.children.count - 1
+    }
   };
 };
 
-const addModelToGroup = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
+const addModelToGroup = <S extends EntityStore>(
   action: Redux.Action<any>,
   st: S,
-  model: number | MSA<S>,
+  model: number | Model.Account | Model.SubAccount,
   group: number | Model.Group
 ): S => {
   const stateModel = modelFromState<Model.Account | Model.SubAccount, Model.Account[] | Model.SubAccount[]>(
     action,
-    st.data,
+    st.children.data,
     model
   );
   if (!isNil(stateModel)) {
@@ -347,11 +321,7 @@ const addModelToGroup = <S extends Modules.Budgeting.AccountsStore | Modules.Bud
   return st;
 };
 
-const removeGroupFromState = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
-  action: Redux.Action<any>,
-  st: S,
-  id: number
-): S => {
+const removeGroupFromState = <S extends EntityStore>(action: Redux.Action<any>, st: S, id: number): S => {
   const group: Model.Group | null = groupFromState<S>(action, st, id);
   if (!isNil(group)) {
     forEach(group.children, (child: number) => {
@@ -369,181 +339,13 @@ const removeGroupFromState = <S extends Modules.Budgeting.AccountsStore | Module
   return st;
 };
 
-const updateAccountInState = <S extends Modules.Budgeting.AccountsStore>(
-  action: Redux.Action<any>,
-  st: S,
-  id: number | Model.Account,
-  changes: Table.RowChange<BudgetTable.AccountRow, Model.Account>[]
-): S => {
-  let account = modelFromState<Model.Account>(action, st.data, id);
-  if (!isNil(account)) {
-    for (let j = 0; j < changes.length; j++) {
-      account = mergeChangesWithModel(account, changes[j]);
-    }
-    st = {
-      ...st,
-      data: replaceInArray<Model.Account>(st.data, { id: account.id }, account)
-    };
-    // NOTE: We do not need to update the metrics for the account because there
-    // are no changes to an account that would warrant recalculations of the
-    // account on the page.
-    const accountGroup = modelGroupFromState(action, st, account.id);
-    if (!isNil(accountGroup)) {
-      st = recalculateGroupMetrics<S>(action, st, accountGroup);
-    }
-  }
-  return st;
-};
-
-export const createAccountsReducer = <S extends Modules.Budgeting.AccountsStore>(
-  /* eslint-disable indent */
-  mapping: AccountsReducerFactoryActionMap,
-  initialState: S
-): Reducer<S, Redux.Action<any>> => {
-  let historySubReducers = {};
-  if (!isNil(mapping.History)) {
-    historySubReducers = {
-      history: createModelListResponseReducer<Model.HistoryEvent>({
-        Response: mapping.History.Response,
-        Request: mapping.History.Request,
-        Loading: mapping.History.Loading
-      })
-    };
-  }
-  const listResponseReducer = createModelListResponseReducer<Model.Account, S>(
-    {
-      Response: mapping.Response,
-      Request: mapping.Request,
-      Loading: mapping.Loading,
-      SetSearch: mapping.SetSearch,
-      // This will eventually be removed when we let the reducer respond to
-      // the RowAddEvent directly.
-      AddToState: mapping.AddToState,
-      Deleting: mapping.Deleting,
-      Updating: mapping.Updating,
-      Creating: mapping.Creating
-    },
-    {
-      initialState,
-      strictSelect: false,
-      subReducers: {
-        ...historySubReducers,
-        groups: createModelListResponseReducer<Model.Group, Redux.ModelListResponseStore<Model.Group>>({
-          Response: mapping.Groups.Response,
-          Request: mapping.Groups.Request,
-          Loading: mapping.Groups.Loading,
-          UpdateInState: mapping.Groups.UpdateInState,
-          Deleting: mapping.Groups.Deleting,
-          AddToState: mapping.Groups.AddToState
-        })
-      }
-    }
-  );
-
-  return (state: S = initialState, action: Redux.Action<any>): S => {
-    let newState = { ...state };
-
-    newState = listResponseReducer(newState, action);
-
-    if (action.type === mapping.Groups.UpdateInState) {
-      const group: Model.Group = action.payload;
-      newState = recalculateGroupMetrics<S>(action, newState, group.id);
-    } else if (action.type === mapping.Groups.RemoveFromState) {
-      newState = removeGroupFromState<S>(action, newState, action.payload);
-    } else if (action.type === mapping.TableChanged) {
-      const event: Table.ChangeEvent<BudgetTable.AccountRow, Model.Account> = action.payload;
-
-      if (typeguards.isDataChangeEvent(event)) {
-        const consolidated = consolidateTableChange(event.payload);
-
-        // The consolidated changes should contain one change per account, but
-        // just in case we apply that grouping logic here.
-        let changesPerAccount: {
-          [key: number]: { changes: Table.RowChange<BudgetTable.AccountRow, Model.Account>[]; model: Model.Account };
-        } = {};
-        for (let i = 0; i < consolidated.length; i++) {
-          if (isNil(changesPerAccount[consolidated[i].id])) {
-            const account: Model.Account | null = modelFromState<Model.Account>(
-              action,
-              newState.data,
-              consolidated[i].id
-            );
-            if (!isNil(account)) {
-              changesPerAccount[consolidated[i].id] = { changes: [], model: account };
-            }
-          }
-          if (!isNil(changesPerAccount[consolidated[i].id])) {
-            changesPerAccount[consolidated[i].id] = {
-              ...changesPerAccount[consolidated[i].id],
-              changes: [...changesPerAccount[consolidated[i].id].changes, consolidated[i]]
-            };
-          }
-        }
-        // For each of the Account(s) that were changed, apply those changes to the current
-        // Account model in state.
-        for (let k = 0; k < Object.keys(changesPerAccount).length; k++) {
-          const id = parseInt(Object.keys(changesPerAccount)[k]);
-          const changesObj = changesPerAccount[id];
-          // Apply each relevant change before performing recalculations.
-          newState = updateAccountInState<S>(action, newState, changesObj.model, changesObj.changes);
-        }
-      } else if (typeguards.isRowAddEvent(event)) {
-        // Eventually, we will want to implement this - so we do not have to rely on waiting
-        // for the response of the API request.
-      } else if (typeguards.isRowDeleteEvent(event)) {
-        const ids = Array.isArray(event.payload) ? event.payload : [event.payload];
-        for (let i = 0; i < ids.length; i++) {
-          newState = removeModelFromState<S>(action, newState, ids[i]);
-        }
-      }
-    } else if (action.type === mapping.RemoveFromGroup) {
-      newState = removeModelFromGroup<S>(action, newState, action.payload);
-    } else if (action.type === mapping.AddToGroup) {
-      newState = addModelToGroup<S>(action, newState, action.payload.id, action.payload.group);
-    }
-    return { ...newState };
-  };
-};
-
-interface SubAccountsGroupsActionMap {
-  Response: string;
-  Request: string;
-  Loading: string;
-  RemoveFromState: string;
-  UpdateInState: string;
-  AddToState: string;
-  Deleting: string;
-}
-
-interface SubAccountsHistoryActionMap {
-  Response: string;
-  Request: string;
-  Loading: string;
-}
-
-interface SubAccountsReducerFactoryActionMap {
-  Response: string;
-  Request: string;
-  Loading: string;
-  SetSearch: string;
-  AddToState: string;
-  RemoveFromGroup: string;
-  AddToGroup: string;
-  Creating: string;
-  Updating: string;
-  Deleting: string;
-  Groups: SubAccountsGroupsActionMap;
-  History?: SubAccountsHistoryActionMap;
-}
-
-const recalculateSubAccountMetrics = <S extends Modules.Budgeting.SubAccountsStore>(
+const recalculateSubAccountMetrics = <S extends Modules.Budget.SubAccountStore | Modules.Budget.AccountStore>(
   /* eslint-disable indent */
   action: Redux.Action<any>,
   st: S,
-  fringesState: Redux.ModelListResponseStore<Model.Fringe>,
   sub: Model.SubAccount
 ): S => {
-  const subAccount: Model.SubAccount | null = modelFromState<Model.SubAccount>(action, st.data, sub);
+  const subAccount: Model.SubAccount | null = modelFromState<Model.SubAccount>(action, st.children.data, sub);
   if (!isNil(subAccount)) {
     let newSubAccount = { ...subAccount };
     /*
@@ -567,36 +369,42 @@ const recalculateSubAccountMetrics = <S extends Modules.Budgeting.SubAccountsSto
         ...newSubAccount,
         estimated: fringeValue(
           newSubAccount.estimated,
-          findModelsInData(action, fringesState.data, newSubAccount.fringes, "Fringe")
+          findModelsInData(action, st.fringes.data, newSubAccount.fringes, { name: "Fringe" })
         )
       };
       return {
         ...st,
-        data: replaceInArray<Model.SubAccount>(st.data, { id: newSubAccount.id }, newSubAccount)
+        children: {
+          ...st.children,
+          data: replaceInArray<Model.SubAccount>(st.children.data, { id: newSubAccount.id }, newSubAccount)
+        }
       };
     }
   }
   return st;
 };
 
-const updateSubAccountInState = <S extends Modules.Budgeting.SubAccountsStore>(
+const updateSubAccountInState = <S extends Modules.Budget.SubAccountStore | Modules.Budget.AccountStore>(
   action: Redux.Action<any>,
   st: S,
-  fringesState: Redux.ModelListResponseStore<Model.Fringe>,
   id: number | Model.SubAccount,
   changes: Table.RowChange<BudgetTable.SubAccountRow, Model.SubAccount>[]
-) => {
-  let subAccount: Model.SubAccount | null = modelFromState<Model.SubAccount>(action, st.data, id);
+): S => {
+  let subAccount: Model.SubAccount | null = modelFromState<Model.SubAccount>(action, st.children.data, id);
   if (!isNil(subAccount)) {
     for (let j = 0; j < changes.length; j++) {
       subAccount = mergeChangesWithModel(subAccount, changes[j]);
     }
     st = {
       ...st,
-      data: replaceInArray<Model.SubAccount>(st.data, { id: subAccount.id }, subAccount)
+      children: {
+        ...st.children,
+        data: replaceInArray<Model.SubAccount>(st.children.data, { id: subAccount.id }, subAccount)
+      }
     };
-    st = recalculateSubAccountMetrics<S>(action, st, fringesState, subAccount);
-    const subAccountGroup = modelGroupFromState<S>(action, st, subAccount.id);
+    st = recalculateSubAccountMetrics(action, st, subAccount);
+    // The Group might not necessarily exist.
+    const subAccountGroup = modelGroupFromState<S>(action, st, subAccount.id, { name: "Group", warnIfMissing: false });
     if (!isNil(subAccountGroup)) {
       st = recalculateGroupMetrics<S>(action, st, subAccountGroup);
     }
@@ -604,89 +412,202 @@ const updateSubAccountInState = <S extends Modules.Budgeting.SubAccountsStore>(
   return st;
 };
 
-export const createSubAccountsReducer = <S extends Modules.Budgeting.SubAccountsStore>(
-  mapping: SubAccountsReducerFactoryActionMap,
-  initialState: S
-): Reducer<S, Redux.Action<any>> => {
-  let historySubReducers = {};
-  if (!isNil(mapping.History)) {
-    historySubReducers = {
-      history: createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
-    };
-  }
-  const listResponseReducer = createModelListResponseReducer<Model.SubAccount, S>(
-    {
-      Response: mapping.Response,
-      Request: mapping.Request,
-      Loading: mapping.Loading,
-      SetSearch: mapping.SetSearch,
-      AddToState: mapping.AddToState,
-      Deleting: mapping.Deleting,
-      Updating: mapping.Updating,
-      Creating: mapping.Creating
-    },
-    {
-      strictSelect: false,
-      subReducers: {
-        groups: createModelListResponseReducer<Model.Group>({
-          Response: mapping.Groups.Response,
-          Loading: mapping.Groups.Loading,
-          Request: mapping.Groups.Request,
-          UpdateInState: mapping.Groups.UpdateInState,
-          AddToState: mapping.Groups.AddToState,
-          Deleting: mapping.Groups.Deleting
-        }),
-        ...historySubReducers
+const updateAccountInState = <S extends Modules.Budget.BudgetStore<Model.Template | Model.Budget>>(
+  action: Redux.Action<any>,
+  st: S,
+  id: number | Model.Account,
+  changes: Table.RowChange<BudgetTable.AccountRow, Model.Account>[]
+): S => {
+  let account = modelFromState<Model.Account>(action, st.children.data, id);
+  if (!isNil(account)) {
+    for (let j = 0; j < changes.length; j++) {
+      account = mergeChangesWithModel(account, changes[j]);
+    }
+    st = {
+      ...st,
+      children: {
+        ...st.children,
+        data: replaceInArray<Model.Account>(st.children.data, { id: account.id }, account)
       }
+    };
+    // NOTE: We do not need to update the metrics for the account because there
+    // are no changes to an account that would warrant recalculations of the
+    // account on the page.
+    // The Group might not necessarily exist.
+    const accountGroup = modelGroupFromState<S>(action, st, account.id, { name: "Group", warnIfMissing: false });
+    if (!isNil(accountGroup)) {
+      st = recalculateGroupMetrics<S>(action, st, accountGroup);
     }
-  );
-  return (state: S = initialState, action: Redux.Action<any>): S => {
-    let newState = { ...state };
-
-    newState = listResponseReducer(newState, action);
-
-    if (action.type === mapping.Groups.UpdateInState) {
-      const group: Model.Group = action.payload;
-      newState = recalculateGroupMetrics<S>(action, newState, group.id);
-    } else if (action.type === mapping.Groups.RemoveFromState) {
-      newState = removeGroupFromState<S>(action, newState, action.payload);
-    } else if (action.type === mapping.RemoveFromGroup) {
-      newState = removeModelFromGroup<S>(action, newState, action.payload);
-    } else if (action.type === mapping.AddToGroup) {
-      newState = addModelToGroup<S>(action, newState, action.payload.id, action.payload.group);
-    }
-    return newState;
-  };
+  }
+  return st;
 };
 
-interface AccountSubAccountReducerFactoryActionMap {
+interface GroupsActionMap {
+  Response: string;
+  Request: string;
+  Loading: string;
+  RemoveFromState: string;
+  UpdateInState: string;
+  AddToState: string;
+  Deleting: string;
+}
+
+interface HistoryActionMap {
+  Response: string;
+  Request: string;
+  Loading: string;
+}
+
+interface AccountsSubAccountsActionMap {
+  Response: string;
+  Request: string;
+  Loading: string;
+  SetSearch: string;
+  AddToState: string;
+  RemoveFromGroup: string;
+  AddToGroup: string;
+  Creating: string;
+  Updating: string;
+  Deleting: string;
+}
+
+type BudgetTemplateReducerFactoryActionMap = {
   SetId: string;
   Request: string;
   Response: string;
   Loading: string;
-  UpdateInState: string;
   TableChanged: string;
-  SubAccounts: SubAccountsReducerFactoryActionMap;
-  Fringes: FringesReducerFactoryActionMap;
+  Accounts: AccountsSubAccountsActionMap;
+  Groups: GroupsActionMap;
+  // History only applicable in the Budget case (not the Template case).
+  History?: HistoryActionMap;
   // Comments only applicable in the Budget case (not the Template case).
   Comments?: Partial<CommentsListResponseActionMap>;
-}
+};
 
-export const createAccountReducer = <
-  S extends Modules.Budgeting.Budget.AccountStore | Modules.Budgeting.Template.AccountStore
->(
-  mapping: AccountSubAccountReducerFactoryActionMap,
-  initialState: S
-): Reducer<S, Redux.Action<any>> => {
-  type SASS = Modules.Budgeting.Budget.SubAccountsStore | Modules.Budgeting.Template.SubAccountsStore;
+type AccountSubAccountReducerFactoryActionMap = Omit<BudgetTemplateReducerFactoryActionMap, "Accounts"> & {
+  UpdateInState: string;
+  SubAccounts: AccountsSubAccountsActionMap;
+  Fringes: FringesReducerFactoryActionMap;
+};
 
-  const isBudgetAccountStore = (
-    store: Modules.Budgeting.Budget.AccountStore | Modules.Budgeting.Template.AccountStore
-  ): store is Modules.Budgeting.Budget.AccountStore => {
-    return (store as Modules.Budgeting.Budget.AccountStore).comments !== undefined;
+export const createBudgetReducer = <M extends Model.Budget | Model.Template>(
+  mapping: BudgetTemplateReducerFactoryActionMap,
+  initialState: Modules.Budget.BudgetStore<M>
+): Reducer<Modules.Budget.BudgetStore<M>, Redux.Action<any>> => {
+  const genericReducer: Reducer<Modules.Budget.BudgetStore<M>, Redux.Action<any>> = combineReducers({
+    id: createSimplePayloadReducer<number | null>(mapping.SetId, null),
+    detail: createDetailResponseReducer<M, Redux.ModelDetailResponseStore<M>, Redux.Action>({
+      Response: mapping.Response,
+      Loading: mapping.Loading,
+      Request: mapping.Request
+    }),
+    children: createModelListResponseReducer<Model.Account>({
+      Response: mapping.Accounts.Response,
+      Request: mapping.Accounts.Request,
+      Loading: mapping.Accounts.Loading,
+      SetSearch: mapping.Accounts.SetSearch,
+      // This will eventually be removed when we let the reducer respond to
+      // the RowAddEvent directly.
+      AddToState: mapping.Accounts.AddToState,
+      Deleting: mapping.Accounts.Deleting,
+      Updating: mapping.Accounts.Updating,
+      Creating: mapping.Accounts.Creating
+    }),
+    groups: createModelListResponseReducer<Model.Group>({
+      Response: mapping.Groups.Response,
+      Loading: mapping.Groups.Loading,
+      Request: mapping.Groups.Request,
+      UpdateInState: mapping.Groups.UpdateInState,
+      AddToState: mapping.Groups.AddToState,
+      Deleting: mapping.Groups.Deleting
+    }),
+    comments: !isNil(mapping.Comments)
+      ? createCommentsListResponseReducer(mapping.Comments)
+      : identityReducer<Redux.ModelListResponseStore<Model.Comment>>(initialModelListResponseState),
+    history: !isNil(mapping.History)
+      ? createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
+      : identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(initialModelListResponseState)
+  });
+
+  return (state: Modules.Budget.BudgetStore<M> = initialState, action: Redux.Action<any>) => {
+    let newState: Modules.Budget.BudgetStore<M> = genericReducer(state, action);
+    if (action.type === mapping.Groups.UpdateInState) {
+      const group: Model.Group = action.payload;
+      newState = recalculateGroupMetrics<Modules.Budget.BudgetStore<M>>(action, newState, group.id);
+    } else if (action.type === mapping.Groups.RemoveFromState) {
+      newState = removeGroupFromState<Modules.Budget.BudgetStore<M>>(action, newState, action.payload);
+    } else if (action.type === mapping.TableChanged) {
+      const event: Table.ChangeEvent<BudgetTable.AccountRow, Model.Account> = action.payload;
+
+      if (typeguards.isDataChangeEvent(event)) {
+        const consolidated = consolidateTableChange(event.payload);
+
+        // The consolidated changes should contain one change per account, but
+        // just in case we apply that grouping logic here.
+        let changesPerAccount: {
+          [key: number]: { changes: Table.RowChange<BudgetTable.AccountRow, Model.Account>[]; model: Model.Account };
+        } = {};
+        for (let i = 0; i < consolidated.length; i++) {
+          if (isNil(changesPerAccount[consolidated[i].id])) {
+            const account: Model.Account | null = modelFromState<Model.Account>(
+              action,
+              newState.children.data,
+              consolidated[i].id
+            );
+            if (!isNil(account)) {
+              changesPerAccount[consolidated[i].id] = { changes: [], model: account };
+            }
+          }
+          if (!isNil(changesPerAccount[consolidated[i].id])) {
+            changesPerAccount[consolidated[i].id] = {
+              ...changesPerAccount[consolidated[i].id],
+              changes: [...changesPerAccount[consolidated[i].id].changes, consolidated[i]]
+            };
+          }
+        }
+        // For each of the Account(s) that were changed, apply those changes to the current
+        // Account model in state.
+        for (let k = 0; k < Object.keys(changesPerAccount).length; k++) {
+          const id = parseInt(Object.keys(changesPerAccount)[k]);
+          const changesObj = changesPerAccount[id];
+          // Apply each relevant change before performing recalculations.
+          newState = updateAccountInState<Modules.Budget.BudgetStore<M>>(
+            action,
+            newState,
+            changesObj.model,
+            changesObj.changes
+          );
+        }
+      } else if (typeguards.isRowAddEvent(event)) {
+        // Eventually, we will want to implement this - so we do not have to rely on waiting
+        // for the response of the API request.
+      } else if (typeguards.isRowDeleteEvent(event)) {
+        const ids = Array.isArray(event.payload) ? event.payload : [event.payload];
+        for (let i = 0; i < ids.length; i++) {
+          newState = removeModelFromState<Modules.Budget.BudgetStore<M>>(action, newState, ids[i]);
+        }
+      }
+    } else if (action.type === mapping.Accounts.RemoveFromGroup) {
+      newState = removeModelFromGroup<Modules.Budget.BudgetStore<M>>(action, newState, action.payload);
+    } else if (action.type === mapping.Accounts.AddToGroup) {
+      newState = addModelToGroup<Modules.Budget.BudgetStore<M>>(
+        action,
+        newState,
+        action.payload.id,
+        action.payload.group
+      );
+    }
+
+    return newState;
   };
+};
 
-  let reducers: { [key: string]: Reducer<any, Redux.Action<any>> } = {
+export const createAccountReducer = (
+  mapping: AccountSubAccountReducerFactoryActionMap,
+  initialState: Modules.Budget.AccountStore
+): Reducer<Modules.Budget.AccountStore, Redux.Action<any>> => {
+  const genericReducer: Reducer<Modules.Budget.AccountStore, Redux.Action<any>> = combineReducers({
     id: createSimplePayloadReducer<number | null>(mapping.SetId, null),
     detail: createDetailResponseReducer<Model.Account, Redux.ModelDetailResponseStore<Model.Account>, Redux.Action>({
       Response: mapping.Response,
@@ -695,26 +616,53 @@ export const createAccountReducer = <
       UpdateInState: mapping.UpdateInState
     }),
     fringes: createFringesReducer(mapping.Fringes),
-    subaccounts: createSubAccountsReducer<SASS>(mapping.SubAccounts, initialState.subaccounts),
-    type: (s: S = initialState, action: Redux.Action<any>) => s // Identity Reducer
-  };
-  if (!isNil(mapping.Comments) && isBudgetAccountStore(initialState)) {
-    reducers = { ...reducers, comments: createCommentsListResponseReducer(mapping.Comments) };
-  }
-  /*
-    NOTE: Because of the typing around the difference between the Modules.Budgeting.Budget.AccountStore
-    and Modules.Budgeting.Template.AccountStore, in regard specifically to the comments
-    and the fact that we are optionally providing them in the Mapping, we have to type this
-    Reducer with generic parameter S = any, which isn't ideal.
-  */
-  const genericReducer: Reducer<any, Redux.Action<any>> = combineReducers(reducers);
+    children: createModelListResponseReducer<Model.SubAccount>({
+      Response: mapping.SubAccounts.Response,
+      Request: mapping.SubAccounts.Request,
+      Loading: mapping.SubAccounts.Loading,
+      SetSearch: mapping.SubAccounts.SetSearch,
+      AddToState: mapping.SubAccounts.AddToState,
+      Deleting: mapping.SubAccounts.Deleting,
+      Updating: mapping.SubAccounts.Updating,
+      Creating: mapping.SubAccounts.Creating
+    }),
+    groups: createModelListResponseReducer<Model.Group>({
+      Response: mapping.Groups.Response,
+      Loading: mapping.Groups.Loading,
+      Request: mapping.Groups.Request,
+      UpdateInState: mapping.Groups.UpdateInState,
+      AddToState: mapping.Groups.AddToState,
+      Deleting: mapping.Groups.Deleting
+    }),
+    comments: !isNil(mapping.Comments)
+      ? createCommentsListResponseReducer(mapping.Comments)
+      : identityReducer<Redux.ModelListResponseStore<Model.Comment>>(initialModelListResponseState),
+    history: !isNil(mapping.History)
+      ? createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
+      : identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(initialModelListResponseState)
+  });
 
-  return (state: S = initialState, action: Redux.Action<any>) => {
-    let newState: S = genericReducer(state, action);
+  return (state: Modules.Budget.AccountStore = initialState, action: Redux.Action<any>) => {
+    let newState: Modules.Budget.AccountStore = genericReducer(state, action);
 
+    if (action.type === mapping.Groups.UpdateInState) {
+      const group: Model.Group = action.payload;
+      newState = recalculateGroupMetrics<Modules.Budget.AccountStore>(action, newState, group.id);
+    } else if (action.type === mapping.Groups.RemoveFromState) {
+      newState = removeGroupFromState<Modules.Budget.AccountStore>(action, newState, action.payload);
+    } else if (action.type === mapping.SubAccounts.RemoveFromGroup) {
+      newState = removeModelFromGroup<Modules.Budget.AccountStore>(action, newState, action.payload);
+    } else if (action.type === mapping.SubAccounts.AddToGroup) {
+      newState = addModelToGroup<Modules.Budget.AccountStore>(
+        action,
+        newState,
+        action.payload.id,
+        action.payload.group
+      );
+    }
     // When an Account's underlying subaccounts are removed, updated or added,
     // or the Fringes are changed, we need to update/recalculate the Account.
-    if (action.type === mapping.TableChanged || action.type === mapping.Fringes.TableChanged) {
+    else if (action.type === mapping.TableChanged || action.type === mapping.Fringes.TableChanged) {
       // If the table change referred to a change to a SubAccount in the table, then we need to
       // update that SubAccount in state.
       if (action.type === mapping.TableChanged) {
@@ -734,7 +682,7 @@ export const createAccountReducer = <
             if (isNil(changesPerSubAccount[consolidated[i].id])) {
               const subAccount: Model.SubAccount | null = modelFromState<Model.SubAccount>(
                 action,
-                newState.subaccounts.data,
+                newState.children.data,
                 consolidated[i].id
               );
               if (!isNil(subAccount)) {
@@ -754,16 +702,12 @@ export const createAccountReducer = <
             const id = parseInt(Object.keys(changesPerSubAccount)[k]);
             const changesObj = changesPerSubAccount[id];
             // Apply each relevant change, performing recalculations
-            newState = {
-              ...newState,
-              subaccounts: updateSubAccountInState<SASS>(
-                action,
-                newState.subaccounts,
-                newState.fringes,
-                changesObj.model,
-                changesObj.changes
-              )
-            };
+            newState = updateSubAccountInState<Modules.Budget.AccountStore>(
+              action,
+              newState,
+              changesObj.model,
+              changesObj.changes
+            );
           }
         } else if (typeguards.isRowAddEvent(event)) {
           // Eventually, we will want to implement this - so we do not have to rely on waiting
@@ -771,10 +715,7 @@ export const createAccountReducer = <
         } else if (typeguards.isRowDeleteEvent(event)) {
           const ids = Array.isArray(event.payload) ? event.payload : [event.payload];
           for (let i = 0; i < ids.length; i++) {
-            newState = {
-              ...newState,
-              subaccounts: removeModelFromState<SASS>(action, newState.subaccounts, ids[i])
-            };
+            newState = removeModelFromState<Modules.Budget.AccountStore>(action, newState, ids[i]);
           }
         }
       } else if (action.type === mapping.Fringes.TableChanged) {
@@ -793,21 +734,13 @@ export const createAccountReducer = <
           );
           map(ids, (id: number) => {
             map(
-              filter(newState.subaccounts.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),
+              filter(newState.children.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),
               (subaccount: Model.SubAccount) => {
                 // NOTE: We have to recalculate the SubAccount metrics, instead of just refringing
                 // the value, because the current estimated value on the SubAccount already has fringes
                 // applied, and there is no way to refringe an already fringed value if we do not know
                 // what the previous fringes were.
-                newState = {
-                  ...newState,
-                  subaccounts: recalculateSubAccountMetrics<SASS>(
-                    action,
-                    newState.subaccounts,
-                    newState.fringes,
-                    subaccount
-                  )
-                };
+                newState = recalculateSubAccountMetrics<Modules.Budget.AccountStore>(action, newState, subaccount);
               }
             );
           });
@@ -818,24 +751,16 @@ export const createAccountReducer = <
           const ids = Array.isArray(event.payload) ? event.payload : [event.payload];
           map(ids, (id: number) => {
             map(
-              filter(newState.subaccounts.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),
+              filter(newState.children.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),
               (subaccount: Model.SubAccount) => {
-                newState = {
-                  ...newState,
-                  subaccounts: recalculateSubAccountMetrics<SASS>(
-                    action,
-                    newState.subaccounts,
-                    newState.fringes,
-                    subaccount
-                  )
-                };
+                newState = recalculateSubAccountMetrics<Modules.Budget.AccountStore>(action, newState, subaccount);
               }
             );
           });
         }
       }
       // Update the overall Account based on the underlying SubAccount(s) present.
-      let subAccounts: Model.SubAccount[] = newState.subaccounts.data;
+      let subAccounts: Model.SubAccount[] = newState.children.data;
       let newData: { estimated: number; actual?: number; variance?: number } = {
         estimated: reduce(subAccounts, (sum: number, s: Model.SubAccount) => sum + (s.estimated || 0), 0)
       };
@@ -860,21 +785,11 @@ export const createAccountReducer = <
   };
 };
 
-export const createSubAccountReducer = <
-  S extends Modules.Budgeting.Budget.SubAccountStore | Modules.Budgeting.Template.SubAccountStore
->(
+export const createSubAccountReducer = (
   mapping: AccountSubAccountReducerFactoryActionMap,
-  initialState: S
-): Reducer<S, Redux.Action<any>> => {
-  type SASS = Modules.Budgeting.Budget.SubAccountsStore | Modules.Budgeting.Template.SubAccountsStore;
-
-  const isBudgetSubAccountStore = (
-    store: Modules.Budgeting.Budget.SubAccountStore | Modules.Budgeting.Template.SubAccountStore
-  ): store is Modules.Budgeting.Budget.SubAccountStore => {
-    return (store as Modules.Budgeting.Budget.SubAccountStore).comments !== undefined;
-  };
-
-  let reducers: { [key: string]: Reducer<any, Redux.Action<any>> } = {
+  initialState: Modules.Budget.SubAccountStore
+): Reducer<Modules.Budget.SubAccountStore, Redux.Action<any>> => {
+  const genericReducer: Reducer<Modules.Budget.SubAccountStore, Redux.Action<any>> = combineReducers({
     id: createSimplePayloadReducer<number | null>(mapping.SetId, null),
     detail: createDetailResponseReducer<
       Model.SubAccount,
@@ -887,26 +802,53 @@ export const createSubAccountReducer = <
       UpdateInState: mapping.UpdateInState
     }),
     fringes: createFringesReducer(mapping.Fringes),
-    subaccounts: createSubAccountsReducer<SASS>(mapping.SubAccounts, initialState.subaccounts),
-    type: (s: S = initialState, action: Redux.Action<any>) => s // Identity Reducer
-  };
-  if (!isNil(mapping.Comments) && isBudgetSubAccountStore(initialState)) {
-    reducers = { ...reducers, comments: createCommentsListResponseReducer(mapping.Comments) };
-  }
-  /*
-    NOTE: Because of the typing around the difference between the Modules.Budgeting.Budget.AccountStore
-    and Modules.Budgeting.Template.AccountStore, in regard specifically to the comments
-    and the fact that we are optionally providing them in the Mapping, we have to type this
-    Reducer with generic parameter S = any, which isn't ideal.
-  */
-  const genericReducer: Reducer<any, Redux.Action<any>> = combineReducers(reducers);
+    children: createModelListResponseReducer<Model.SubAccount>({
+      Response: mapping.SubAccounts.Response,
+      Request: mapping.SubAccounts.Request,
+      Loading: mapping.SubAccounts.Loading,
+      SetSearch: mapping.SubAccounts.SetSearch,
+      AddToState: mapping.SubAccounts.AddToState,
+      Deleting: mapping.SubAccounts.Deleting,
+      Updating: mapping.SubAccounts.Updating,
+      Creating: mapping.SubAccounts.Creating
+    }),
+    groups: createModelListResponseReducer<Model.Group>({
+      Response: mapping.Groups.Response,
+      Loading: mapping.Groups.Loading,
+      Request: mapping.Groups.Request,
+      UpdateInState: mapping.Groups.UpdateInState,
+      AddToState: mapping.Groups.AddToState,
+      Deleting: mapping.Groups.Deleting
+    }),
+    comments: !isNil(mapping.Comments)
+      ? createCommentsListResponseReducer(mapping.Comments)
+      : identityReducer<Redux.ModelListResponseStore<Model.Comment>>(initialModelListResponseState),
+    history: !isNil(mapping.History)
+      ? createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
+      : identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(initialModelListResponseState)
+  });
 
-  return (state: S = initialState, action: Redux.Action<any>) => {
-    let newState: S = genericReducer(state, action);
+  return (state: Modules.Budget.SubAccountStore = initialState, action: Redux.Action<any>) => {
+    let newState: Modules.Budget.SubAccountStore = genericReducer(state, action);
 
+    if (action.type === mapping.Groups.UpdateInState) {
+      const group: Model.Group = action.payload;
+      newState = recalculateGroupMetrics<Modules.Budget.SubAccountStore>(action, newState, group.id);
+    } else if (action.type === mapping.Groups.RemoveFromState) {
+      newState = removeGroupFromState<Modules.Budget.SubAccountStore>(action, newState, action.payload);
+    } else if (action.type === mapping.SubAccounts.RemoveFromGroup) {
+      newState = removeModelFromGroup<Modules.Budget.SubAccountStore>(action, newState, action.payload);
+    } else if (action.type === mapping.SubAccounts.AddToGroup) {
+      newState = addModelToGroup<Modules.Budget.SubAccountStore>(
+        action,
+        newState,
+        action.payload.id,
+        action.payload.group
+      );
+    }
     // When a SubAccount's underlying subaccounts are removed, updated or added,
     // or the Fringes are changed, we need to update/recalculate the SubAccount.
-    if (action.type === mapping.TableChanged || action.type === mapping.Fringes.TableChanged) {
+    else if (action.type === mapping.TableChanged || action.type === mapping.Fringes.TableChanged) {
       // If the table change referred to a change to a SubAccount in the table, then we need to
       // update that SubAccount in state.
       if (action.type === mapping.TableChanged) {
@@ -926,7 +868,7 @@ export const createSubAccountReducer = <
             if (isNil(changesPerSubAccount[consolidated[i].id])) {
               const subAccount: Model.SubAccount | null = modelFromState<Model.SubAccount>(
                 action,
-                newState.subaccounts.data,
+                newState.children.data,
                 consolidated[i].id
               );
               if (!isNil(subAccount)) {
@@ -946,16 +888,12 @@ export const createSubAccountReducer = <
             const id = parseInt(Object.keys(changesPerSubAccount)[k]);
             const changesObj = changesPerSubAccount[id];
             // Apply each relevant change, performing recalculations
-            newState = {
-              ...newState,
-              subaccounts: updateSubAccountInState<SASS>(
-                action,
-                newState.subaccounts,
-                newState.fringes,
-                changesObj.model,
-                changesObj.changes
-              )
-            };
+            newState = updateSubAccountInState<Modules.Budget.SubAccountStore>(
+              action,
+              newState,
+              changesObj.model,
+              changesObj.changes
+            );
           }
         } else if (typeguards.isRowAddEvent(event)) {
           // Eventually, we will want to implement this - so we do not have to rely on waiting
@@ -963,10 +901,7 @@ export const createSubAccountReducer = <
         } else if (typeguards.isRowDeleteEvent(event)) {
           const ids = Array.isArray(event.payload) ? event.payload : [event.payload];
           for (let i = 0; i < ids.length; i++) {
-            newState = {
-              ...newState,
-              subaccounts: removeModelFromState<SASS>(action, newState.subaccounts, ids[i])
-            };
+            newState = removeModelFromState<Modules.Budget.SubAccountStore>(action, newState, ids[i]);
           }
         }
       } else if (action.type === mapping.Fringes.TableChanged) {
@@ -985,21 +920,13 @@ export const createSubAccountReducer = <
           );
           map(ids, (id: number) => {
             map(
-              filter(newState.subaccounts.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),
+              filter(newState.children.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),
               (subaccount: Model.SubAccount) => {
                 // NOTE: We have to recalculate the SubAccount metrics, instead of just refringing
                 // the value, because the current estimated value on the SubAccount already has fringes
                 // applied, and there is no way to refringe an already fringed value if we do not know
                 // what the previous fringes were.
-                newState = {
-                  ...newState,
-                  subaccounts: recalculateSubAccountMetrics<SASS>(
-                    action,
-                    newState.subaccounts,
-                    newState.fringes,
-                    subaccount
-                  )
-                };
+                newState = recalculateSubAccountMetrics<Modules.Budget.SubAccountStore>(action, newState, subaccount);
               }
             );
           });
@@ -1010,24 +937,16 @@ export const createSubAccountReducer = <
           const ids = Array.isArray(event.payload) ? event.payload : [event.payload];
           map(ids, (id: number) => {
             map(
-              filter(newState.subaccounts.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),
+              filter(newState.children.data, (subaccount: Model.SubAccount) => includes(subaccount.fringes, id)),
               (subaccount: Model.SubAccount) => {
-                newState = {
-                  ...newState,
-                  subaccounts: recalculateSubAccountMetrics<SASS>(
-                    action,
-                    newState.subaccounts,
-                    newState.fringes,
-                    subaccount
-                  )
-                };
+                newState = recalculateSubAccountMetrics<Modules.Budget.SubAccountStore>(action, newState, subaccount);
               }
             );
           });
         }
       }
       // Update the overall Account based on the underlying SubAccount(s) present.
-      let subAccounts: Model.SubAccount[] = newState.subaccounts.data;
+      let subAccounts: Model.SubAccount[] = newState.children.data;
       let newData: { estimated: number; actual?: number; variance?: number } = {
         estimated: reduce(subAccounts, (sum: number, s: Model.SubAccount) => sum + (s.estimated || 0), 0)
       };

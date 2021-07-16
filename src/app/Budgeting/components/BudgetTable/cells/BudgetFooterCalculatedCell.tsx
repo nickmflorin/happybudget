@@ -4,7 +4,7 @@ import { simpleDeepEqualSelector } from "store/selectors";
 import CalculatedCell, { CalculatedCellProps } from "./CalculatedCell";
 
 const selectBudgetLoading = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.budget.detail.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.detail.loading
 );
 
 const BudgetFooterCalculatedCell = <R extends Table.Row>({

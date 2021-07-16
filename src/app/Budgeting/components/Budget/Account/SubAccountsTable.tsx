@@ -25,22 +25,22 @@ import BudgetSubAccountsTable from "../SubAccountsTable";
 import FringesModal from "./FringesModal";
 
 const selectGroups = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.groups.data
+  (state: Modules.ApplicationStore) => state.budget.budget.account.groups.data
 );
 const selectData = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.data
+  (state: Modules.ApplicationStore) => state.budget.budget.account.children.data
 );
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.search
+  (state: Modules.ApplicationStore) => state.budget.budget.account.children.search
 );
 const selectAccountDetail = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.detail.data
+  (state: Modules.ApplicationStore) => state.budget.budget.account.detail.data
 );
 const selectAccountLoading = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.detail.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.account.detail.loading
 );
 const selectFringes = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.budget.account.fringes.data
 );
 
 interface AccountBudgetTableProps {

@@ -4,7 +4,7 @@ import { simpleDeepEqualSelector } from "store/selectors";
 import FringesCellEditor, { FringesCellEditorProps } from "./Generic";
 
 const selectFringes = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.account.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.template.account.fringes.data
 );
 
 const TemplateAccountFringesCellEditor = (

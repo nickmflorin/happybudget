@@ -40,9 +40,9 @@ const tasks = createSubAccountTaskSet(
       request: actions.requestGroupsAction
     }
   },
-  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.id,
-  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.subaccounts.data,
-  (state: Modules.ApplicationStore) => state.budgeting.template.autoIndex
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.id,
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.children.data,
+  (state: Modules.ApplicationStore) => state.budget.template.autoIndex
 );
 
 function* watchForSubAccountIdChangedSaga(): SagaIterator {
@@ -84,8 +84,8 @@ const fringeTasks = createFringeTaskSet<Model.Template>(
     bulkCreate: api.bulkCreateTemplateFringes,
     bulkDelete: api.bulkDeleteTemplateFringes
   },
-  (state: Modules.ApplicationStore) => state.budgeting.template.template.id,
-  (state: Modules.ApplicationStore) => state.budgeting.template.subaccount.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.template.budget.id,
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.fringes.data
 );
 
 const fringesRootSaga = createStandardFringesSaga(
@@ -101,10 +101,10 @@ const rootSubAccountSaga = createStandardSaga(
     Request: ActionType.Template.SubAccount.SubAccounts.Request,
     TableChange: ActionType.Template.SubAccount.TableChanged,
     Groups: {
-      Request: ActionType.Template.SubAccount.SubAccounts.Groups.Request,
+      Request: ActionType.Template.SubAccount.Groups.Request,
       RemoveModel: ActionType.Template.SubAccount.SubAccounts.RemoveFromGroup,
       AddModel: ActionType.Template.SubAccount.SubAccounts.AddToGroup,
-      Delete: ActionType.Template.SubAccount.SubAccounts.Groups.Delete
+      Delete: ActionType.Template.SubAccount.Groups.Delete
     }
   },
   {

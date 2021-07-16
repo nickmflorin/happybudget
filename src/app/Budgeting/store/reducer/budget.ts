@@ -3,10 +3,8 @@ import { isNil, find, filter } from "lodash";
 
 import {
   createModelListResponseReducer,
-  createDetailResponseReducer,
   createSimpleBooleanReducer,
-  createSimplePayloadReducer,
-  createCommentsListResponseReducer
+  createSimplePayloadReducer
 } from "lib/redux/factories";
 import { initialModelListResponseState } from "store/initialState";
 import { warnInconsistentState } from "lib/redux/util";
@@ -15,11 +13,7 @@ import { consolidateTableChange, mergeChangesWithModel } from "lib/model/util";
 import * as typeguards from "lib/model/typeguards";
 
 import { ActionType } from "../actions";
-import initialState, {
-  initialBudgetAccountState,
-  initialBudgetSubAccountState,
-  initialBudgetAccountsState
-} from "../initialState";
+import initialState, { initialAccountState, initialSubAccountState, initialBudgetBudgetState } from "../initialState";
 import * as factories from "./factories";
 
 const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Redux.Action<any>> = (
@@ -40,7 +34,6 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
       Creating: ActionType.Budget.Actuals.Creating
     },
     {
-      strictSelect: false,
       initialState: initialModelListResponseState
     }
   );
@@ -111,7 +104,7 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
 const genericReducer = combineReducers({
   autoIndex: createSimplePayloadReducer<boolean>(ActionType.Budget.SetAutoIndex, false),
   commentsHistoryDrawerOpen: createSimpleBooleanReducer(ActionType.Budget.SetCommentsHistoryDrawerVisibility),
-  account: factories.createAccountReducer<Modules.Budgeting.Budget.AccountStore>(
+  account: factories.createAccountReducer(
     {
       SetId: ActionType.Budget.Account.SetId,
       Response: ActionType.Budget.Account.Response,
@@ -129,21 +122,21 @@ const genericReducer = combineReducers({
         Creating: ActionType.Budget.Account.SubAccounts.Creating,
         Updating: ActionType.Budget.Account.SubAccounts.Updating,
         RemoveFromGroup: ActionType.Budget.Account.SubAccounts.RemoveFromGroup,
-        AddToGroup: ActionType.Budget.Account.SubAccounts.AddToGroup,
-        History: {
-          Response: ActionType.Budget.Account.SubAccounts.History.Response,
-          Request: ActionType.Budget.Account.SubAccounts.History.Request,
-          Loading: ActionType.Budget.Account.SubAccounts.History.Loading
-        },
-        Groups: {
-          Response: ActionType.Budget.Account.SubAccounts.Groups.Response,
-          Request: ActionType.Budget.Account.SubAccounts.Groups.Request,
-          Loading: ActionType.Budget.Account.SubAccounts.Groups.Loading,
-          RemoveFromState: ActionType.Budget.Account.SubAccounts.Groups.RemoveFromState,
-          UpdateInState: ActionType.Budget.Account.SubAccounts.Groups.UpdateInState,
-          AddToState: ActionType.Budget.Account.SubAccounts.Groups.AddToState,
-          Deleting: ActionType.Budget.Account.SubAccounts.Groups.Deleting
-        }
+        AddToGroup: ActionType.Budget.Account.SubAccounts.AddToGroup
+      },
+      History: {
+        Response: ActionType.Budget.Account.History.Response,
+        Request: ActionType.Budget.Account.History.Request,
+        Loading: ActionType.Budget.Account.History.Loading
+      },
+      Groups: {
+        Response: ActionType.Budget.Account.Groups.Response,
+        Request: ActionType.Budget.Account.Groups.Request,
+        Loading: ActionType.Budget.Account.Groups.Loading,
+        RemoveFromState: ActionType.Budget.Account.Groups.RemoveFromState,
+        UpdateInState: ActionType.Budget.Account.Groups.UpdateInState,
+        AddToState: ActionType.Budget.Account.Groups.AddToState,
+        Deleting: ActionType.Budget.Account.Groups.Deleting
       },
       Fringes: {
         TableChanged: ActionType.Budget.Account.Fringes.TableChanged,
@@ -169,9 +162,9 @@ const genericReducer = combineReducers({
         Replying: ActionType.Budget.Account.Comments.Replying
       }
     },
-    initialBudgetAccountState
+    initialAccountState
   ),
-  subaccount: factories.createSubAccountReducer<Modules.Budgeting.Budget.SubAccountStore>(
+  subaccount: factories.createSubAccountReducer(
     {
       SetId: ActionType.Budget.SubAccount.SetId,
       Response: ActionType.Budget.SubAccount.Response,
@@ -189,21 +182,21 @@ const genericReducer = combineReducers({
         Creating: ActionType.Budget.SubAccount.SubAccounts.Creating,
         Updating: ActionType.Budget.SubAccount.SubAccounts.Updating,
         RemoveFromGroup: ActionType.Budget.SubAccount.SubAccounts.RemoveFromGroup,
-        AddToGroup: ActionType.Budget.SubAccount.SubAccounts.AddToGroup,
-        History: {
-          Response: ActionType.Budget.SubAccount.SubAccounts.History.Response,
-          Request: ActionType.Budget.SubAccount.SubAccounts.History.Request,
-          Loading: ActionType.Budget.SubAccount.SubAccounts.History.Loading
-        },
-        Groups: {
-          Response: ActionType.Budget.SubAccount.SubAccounts.Groups.Response,
-          Request: ActionType.Budget.SubAccount.SubAccounts.Groups.Request,
-          Loading: ActionType.Budget.SubAccount.SubAccounts.Groups.Loading,
-          RemoveFromState: ActionType.Budget.SubAccount.SubAccounts.Groups.RemoveFromState,
-          UpdateInState: ActionType.Budget.SubAccount.SubAccounts.Groups.UpdateInState,
-          AddToState: ActionType.Budget.SubAccount.SubAccounts.Groups.AddToState,
-          Deleting: ActionType.Budget.SubAccount.SubAccounts.Groups.Deleting
-        }
+        AddToGroup: ActionType.Budget.SubAccount.SubAccounts.AddToGroup
+      },
+      History: {
+        Response: ActionType.Budget.SubAccount.History.Response,
+        Request: ActionType.Budget.SubAccount.History.Request,
+        Loading: ActionType.Budget.SubAccount.History.Loading
+      },
+      Groups: {
+        Response: ActionType.Budget.SubAccount.Groups.Response,
+        Request: ActionType.Budget.SubAccount.Groups.Request,
+        Loading: ActionType.Budget.SubAccount.Groups.Loading,
+        RemoveFromState: ActionType.Budget.SubAccount.Groups.RemoveFromState,
+        UpdateInState: ActionType.Budget.SubAccount.Groups.UpdateInState,
+        AddToState: ActionType.Budget.SubAccount.Groups.AddToState,
+        Deleting: ActionType.Budget.SubAccount.Groups.Deleting
       },
       Fringes: {
         TableChanged: ActionType.Budget.SubAccount.Fringes.TableChanged,
@@ -229,59 +222,57 @@ const genericReducer = combineReducers({
         Replying: ActionType.Budget.SubAccount.Comments.Replying
       }
     },
-    initialBudgetSubAccountState
+    initialSubAccountState
   ),
   actuals: actualsRootReducer,
-  accounts: factories.createAccountsReducer<Modules.Budgeting.Budget.AccountsStore>(
+  budget: factories.createBudgetReducer<Model.Budget>(
     {
       TableChanged: ActionType.Budget.Accounts.TableChanged,
-      Response: ActionType.Budget.Accounts.Response,
-      Request: ActionType.Budget.Accounts.Request,
-      Loading: ActionType.Budget.Accounts.Loading,
-      SetSearch: ActionType.Budget.Accounts.SetSearch,
-      AddToState: ActionType.Budget.Accounts.AddToState,
-      Deleting: ActionType.Budget.Accounts.Deleting,
-      Creating: ActionType.Budget.Accounts.Creating,
-      Updating: ActionType.Budget.Accounts.Updating,
-      RemoveFromGroup: ActionType.Budget.Accounts.RemoveFromGroup,
-      AddToGroup: ActionType.Budget.Accounts.AddToGroup,
-      History: {
-        Response: ActionType.Budget.Accounts.History.Response,
-        Request: ActionType.Budget.Accounts.History.Request,
-        Loading: ActionType.Budget.Accounts.History.Loading
-      },
-      Groups: {
-        Response: ActionType.Budget.Accounts.Groups.Response,
-        Request: ActionType.Budget.Accounts.Groups.Request,
-        Loading: ActionType.Budget.Accounts.Groups.Loading,
-        RemoveFromState: ActionType.Budget.Accounts.Groups.RemoveFromState,
-        UpdateInState: ActionType.Budget.Accounts.Groups.UpdateInState,
-        AddToState: ActionType.Budget.Accounts.Groups.AddToState,
-        Deleting: ActionType.Budget.Accounts.Groups.Deleting
-      }
-    },
-    initialBudgetAccountsState
-  ),
-  budget: combineReducers({
-    id: createSimplePayloadReducer<number | null>(ActionType.Budget.SetId, null),
-    detail: createDetailResponseReducer<Model.Budget, Redux.ModelDetailResponseStore<Model.Budget>, Redux.Action>({
       Response: ActionType.Budget.Response,
       Loading: ActionType.Budget.Loading,
-      Request: ActionType.Budget.Request
-    }),
-    comments: createCommentsListResponseReducer({
-      Response: ActionType.Budget.Comments.Response,
-      Request: ActionType.Budget.Comments.Request,
-      Loading: ActionType.Budget.Comments.Loading,
-      AddToState: ActionType.Budget.Comments.AddToState,
-      RemoveFromState: ActionType.Budget.Comments.RemoveFromState,
-      UpdateInState: ActionType.Budget.Comments.UpdateInState,
-      Creating: ActionType.Budget.Comments.Creating,
-      Deleting: ActionType.Budget.Comments.Deleting,
-      Updating: ActionType.Budget.Comments.Updating,
-      Replying: ActionType.Budget.Comments.Replying
-    })
-  }),
+      Request: ActionType.Budget.Request,
+      SetId: ActionType.Budget.SetId,
+      Accounts: {
+        Response: ActionType.Budget.Accounts.Response,
+        Request: ActionType.Budget.Accounts.Request,
+        Loading: ActionType.Budget.Accounts.Loading,
+        SetSearch: ActionType.Budget.Accounts.SetSearch,
+        AddToState: ActionType.Budget.Accounts.AddToState,
+        Deleting: ActionType.Budget.Accounts.Deleting,
+        Creating: ActionType.Budget.Accounts.Creating,
+        Updating: ActionType.Budget.Accounts.Updating,
+        RemoveFromGroup: ActionType.Budget.Accounts.RemoveFromGroup,
+        AddToGroup: ActionType.Budget.Accounts.AddToGroup
+      },
+      Groups: {
+        Response: ActionType.Budget.Groups.Response,
+        Request: ActionType.Budget.Groups.Request,
+        Loading: ActionType.Budget.Groups.Loading,
+        RemoveFromState: ActionType.Budget.Groups.RemoveFromState,
+        UpdateInState: ActionType.Budget.Groups.UpdateInState,
+        AddToState: ActionType.Budget.Groups.AddToState,
+        Deleting: ActionType.Budget.Groups.Deleting
+      },
+      History: {
+        Response: ActionType.Budget.History.Response,
+        Request: ActionType.Budget.History.Request,
+        Loading: ActionType.Budget.History.Loading
+      },
+      Comments: {
+        Response: ActionType.Budget.Comments.Response,
+        Request: ActionType.Budget.Comments.Request,
+        Loading: ActionType.Budget.Comments.Loading,
+        AddToState: ActionType.Budget.Comments.AddToState,
+        RemoveFromState: ActionType.Budget.Comments.RemoveFromState,
+        UpdateInState: ActionType.Budget.Comments.UpdateInState,
+        Creating: ActionType.Budget.Comments.Creating,
+        Deleting: ActionType.Budget.Comments.Deleting,
+        Updating: ActionType.Budget.Comments.Updating,
+        Replying: ActionType.Budget.Comments.Replying
+      }
+    },
+    initialBudgetBudgetState
+  ),
   subAccountsTree: createModelListResponseReducer<Model.SubAccountTreeNode>({
     Response: ActionType.Budget.SubAccountsTree.Response,
     Loading: ActionType.Budget.SubAccountsTree.Loading,
@@ -290,10 +281,10 @@ const genericReducer = combineReducers({
   })
 });
 
-const rootReducer: Reducer<Modules.Budgeting.Budget.Store, Redux.Action<any>> = (
-  state: Modules.Budgeting.Budget.Store = initialState.budget,
+const rootReducer: Reducer<Modules.Budget.ModuleStore<Model.Budget>, Redux.Action<any>> = (
+  state: Modules.Budget.ModuleStore<Model.Budget> = initialState.budget,
   action: Redux.Action<any>
-): Modules.Budgeting.Budget.Store => {
+): Modules.Budget.ModuleStore<Model.Budget> => {
   let newState = { ...state };
   if (action.type === ActionType.Budget.WipeState) {
     newState = initialState.budget;

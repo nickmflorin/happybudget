@@ -41,23 +41,23 @@ const ActionType = {
       Request: "budget.accounts.Request",
       AddToState: "budget.accounts.AddToState",
       RemoveFromGroup: "budget.accounts.RemoveFromGroup",
-      AddToGroup: "budget.accounts.AddToGroup",
-      Groups: {
-        Response: "budget.accounts.groups.Response",
-        Request: "budget.accounts.groups.Request",
-        Loading: "budget.accounts.groups.Loading",
-        Delete: "budget.accounts.groups.Delete",
-        Deleting: "budget.accounts.groups.Deleting",
-        AddToState: "budget.accounts.groups.AddToState",
-        RemoveFromState: "budget.accounts.groups.RemoveFromState",
-        UpdateInState: "budget.accounts.groups.UpdateInState"
-      },
-      History: {
-        Loading: "budget.accounts.history.Loading",
-        Response: "budget.accounts.history.Response",
-        Request: "budget.accounts.history.Request",
-        AddToState: "budget.accounts.history.AddToState"
-      }
+      AddToGroup: "budget.accounts.AddToGroup"
+    },
+    Groups: {
+      Response: "budget.groups.Response",
+      Request: "budget.groups.Request",
+      Loading: "budget.groups.Loading",
+      Delete: "budget.groups.Delete",
+      Deleting: "budget.groups.Deleting",
+      AddToState: "budget.groups.AddToState",
+      RemoveFromState: "budget.groups.RemoveFromState",
+      UpdateInState: "budget.groups.UpdateInState"
+    },
+    History: {
+      Loading: "budget.history.Loading",
+      Response: "budget.history.Response",
+      Request: "budget.history.Request",
+      AddToState: "budget.history.AddToState"
     },
     SubAccount: {
       SetId: "budget.subaccount.SetId",
@@ -102,22 +102,22 @@ const ActionType = {
         Request: "budget.subaccount.subaccounts.Request",
         AddToState: "budget.subaccount.subaccounts.AddToState",
         RemoveFromGroup: "budget.subaccount.subaccounts.RemoveFromGroup",
-        AddToGroup: "budget.subaccount.subaccounts.AddToGroup",
-        Groups: {
-          Response: "budget.subaccount.subaccounts.groups.Response",
-          Request: "budget.subaccount.subaccounts.groups.Request",
-          Loading: "budget.subaccount.subaccounts.groups.Loading",
-          Delete: "budget.subaccount.subaccounts.groups.Delete",
-          Deleting: "budget.subaccount.subaccounts.groups.Deleting",
-          AddToState: "budget.subaccount.subaccounts.groups.AddToState",
-          RemoveFromState: "budget.subaccount.subaccounts.groups.RemoveFromState",
-          UpdateInState: "budget.subaccount.subaccounts.groups.UpdateInState"
-        },
-        History: {
-          Loading: "budget.subaccount.subaccounts.history.Loading",
-          Response: "budget.subaccount.subaccounts.history.Response",
-          Request: "budget.subaccount.subaccounts.history.Request"
-        }
+        AddToGroup: "budget.subaccount.subaccounts.AddToGroup"
+      },
+      Groups: {
+        Response: "budget.subaccount.groups.Response",
+        Request: "budget.subaccount.groups.Request",
+        Loading: "budget.subaccount.groups.Loading",
+        Delete: "budget.subaccount.groups.Delete",
+        Deleting: "budget.subaccount.groups.Deleting",
+        AddToState: "budget.subaccount.groups.AddToState",
+        RemoveFromState: "budget.subaccount.groups.RemoveFromState",
+        UpdateInState: "budget.subaccount.groups.UpdateInState"
+      },
+      History: {
+        Loading: "budget.subaccount.history.Loading",
+        Response: "budget.subaccount.history.Response",
+        Request: "budget.subaccount.history.Request"
       }
     },
     Account: {
@@ -163,22 +163,22 @@ const ActionType = {
         SetSearch: "budget.account.subaccounts.SetSearch",
         AddToState: "budget.account.subaccounts.AddToState",
         RemoveFromGroup: "budget.account.subaccounts.RemoveFromGroup",
-        AddToGroup: "budget.account.subaccounts.AddToGroup",
-        Groups: {
-          Response: "budget.account.subaccounts.groups.Response",
-          Request: "budget.account.subaccounts.groups.Request",
-          Loading: "budget.account.subaccounts.groups.Loading",
-          Delete: "budget.account.subaccounts.groups.Delete",
-          Deleting: "budget.account.subaccounts.groups.Deleting",
-          AddToState: "budget.account.subaccounts.groups.AddToState",
-          RemoveFromState: "budget.account.subaccounts.groups.RemoveFromState",
-          UpdateInState: "budget.account.subaccounts.groups.UpdateInState"
-        },
-        History: {
-          Loading: "budget.account.subaccounts.history.Loading",
-          Response: "budget.account.subaccounts.history.Response",
-          Request: "budget.account.subaccounts.history.Request"
-        }
+        AddToGroup: "budget.account.subaccounts.AddToGroup"
+      },
+      Groups: {
+        Response: "budget.account.groups.Response",
+        Request: "budget.account.groups.Request",
+        Loading: "budget.account.groups.Loading",
+        Delete: "budget.account.groups.Delete",
+        Deleting: "budget.account.groups.Deleting",
+        AddToState: "budget.account.groups.AddToState",
+        RemoveFromState: "budget.account.groups.RemoveFromState",
+        UpdateInState: "budget.account.groups.UpdateInState"
+      },
+      History: {
+        Loading: "budget.account.history.Loading",
+        Response: "budget.account.history.Response",
+        Request: "budget.account.history.Request"
       }
     },
     SubAccountsTree: {
@@ -218,17 +218,17 @@ const ActionType = {
       Request: "template.accounts.Request",
       AddToState: "template.accounts.AddToState",
       RemoveFromGroup: "template.accounts.RemoveFromGroup",
-      AddToGroup: "template.accounts.AddToGroup",
-      Groups: {
-        Response: "template.accounts.groups.Response",
-        Request: "template.accounts.groups.Request",
-        Loading: "template.accounts.groups.Loading",
-        Delete: "template.accounts.groups.Delete",
-        Deleting: "template.accounts.groups.Deleting",
-        AddToState: "template.accounts.groups.AddToState",
-        RemoveFromState: "template.accounts.groups.RemoveFromState",
-        UpdateInState: "template.accounts.groups.UpdateInState"
-      }
+      AddToGroup: "template.accounts.AddToGroup"
+    },
+    Groups: {
+      Response: "template.groups.Response",
+      Request: "template.groups.Request",
+      Loading: "template.groups.Loading",
+      Delete: "template.groups.Delete",
+      Deleting: "template.groups.Deleting",
+      AddToState: "template.groups.AddToState",
+      RemoveFromState: "template.groups.RemoveFromState",
+      UpdateInState: "template.groups.UpdateInState"
     },
     SubAccount: {
       SetId: "template.subaccount.SetId",
@@ -258,17 +258,17 @@ const ActionType = {
         Request: "template.subaccount.subaccounts.Request",
         AddToState: "template.subaccount.subaccounts.AddToState",
         RemoveFromGroup: "template.subaccount.subaccounts.RemoveFromGroup",
-        AddToGroup: "template.subaccount.subaccounts.AddToGroup",
-        Groups: {
-          Response: "template.subaccount.subaccounts.groups.Response",
-          Request: "template.subaccount.subaccounts.groups.Request",
-          Loading: "template.subaccount.subaccounts.groups.Loading",
-          Delete: "template.subaccount.subaccounts.groups.Delete",
-          Deleting: "template.subaccount.subaccounts.groups.Deleting",
-          AddToState: "template.subaccount.subaccounts.groups.AddToState",
-          RemoveFromState: "template.subaccount.subaccounts.groups.RemoveFromState",
-          UpdateInState: "template.subaccount.subaccounts.groups.UpdateInState"
-        }
+        AddToGroup: "template.subaccount.subaccounts.AddToGroup"
+      },
+      Groups: {
+        Response: "template.subaccount.groups.Response",
+        Request: "template.subaccount.groups.Request",
+        Loading: "template.subaccount.groups.Loading",
+        Delete: "template.subaccount.groups.Delete",
+        Deleting: "template.subaccount.groups.Deleting",
+        AddToState: "template.subaccount.groups.AddToState",
+        RemoveFromState: "template.subaccount.groups.RemoveFromState",
+        UpdateInState: "template.subaccount.groups.UpdateInState"
       }
     },
     Account: {
@@ -299,17 +299,17 @@ const ActionType = {
         SetSearch: "template.account.subaccounts.SetSearch",
         AddToState: "template.account.subaccounts.AddToState",
         RemoveFromGroup: "template.account.subaccounts.RemoveFromGroup",
-        AddToGroup: "template.account.subaccounts.AddToGroup",
-        Groups: {
-          Response: "template.account.subaccounts.groups.Response",
-          Request: "template.account.subaccounts.groups.Request",
-          Loading: "template.account.subaccounts.groups.Loading",
-          Delete: "template.account.subaccounts.groups.Delete",
-          Deleting: "template.account.subaccounts.groups.Deleting",
-          AddToState: "template.account.subaccounts.groups.AddToState",
-          RemoveFromState: "template.account.subaccounts.groups.RemoveFromState",
-          UpdateInState: "template.account.subaccounts.groups.UpdateInState"
-        }
+        AddToGroup: "template.account.subaccounts.AddToGroup"
+      },
+      Groups: {
+        Response: "template.account.groups.Response",
+        Request: "template.account.groups.Request",
+        Loading: "template.account.groups.Loading",
+        Delete: "template.account.groups.Delete",
+        Deleting: "template.account.groups.Deleting",
+        AddToState: "template.account.groups.AddToState",
+        RemoveFromState: "template.account.groups.RemoveFromState",
+        UpdateInState: "template.account.groups.UpdateInState"
       }
     }
   }

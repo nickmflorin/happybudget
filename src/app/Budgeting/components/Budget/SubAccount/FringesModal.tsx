@@ -10,18 +10,18 @@ import { selectBudgetDetail } from "../../../store/selectors";
 import { GenericFringesModal, GenericFringesModalProps } from "../../Generic";
 
 const selectData = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.data
 );
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.fringes.search
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.search
 );
 const selectLoading = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.fringes.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.loading
 );
 const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.fringes.deleting,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.fringes.updating,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.subaccount.fringes.creating,
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.deleting,
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.updating,
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );

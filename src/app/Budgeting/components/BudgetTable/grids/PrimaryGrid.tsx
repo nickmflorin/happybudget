@@ -754,6 +754,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
 
     const modelsWithGroup = filter(data, (m: M) => !isNil(getGroupForModel(m)));
     let modelsWithoutGroup = filter(data, (m: M) => isNil(getGroupForModel(m)));
+
     const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
 
     const newTable: R[] = [];

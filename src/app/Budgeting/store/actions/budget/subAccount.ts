@@ -65,28 +65,24 @@ export const addSubAccountToGroupAction = simpleAction<{ id: number; group: numb
 export const addSubAccountToStateAction = simpleAction<Model.SubAccount>(
   ActionType.Budget.SubAccount.SubAccounts.AddToState
 );
-export const requestGroupsAction = simpleAction<null>(ActionType.Budget.SubAccount.SubAccounts.Groups.Request);
-export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.SubAccount.SubAccounts.Groups.Loading);
+export const requestGroupsAction = simpleAction<null>(ActionType.Budget.SubAccount.Groups.Request);
+export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.SubAccount.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Group>>(
-  ActionType.Budget.SubAccount.SubAccounts.Groups.Response
+  ActionType.Budget.SubAccount.Groups.Response
 );
-export const addGroupToStateAction = simpleAction<Model.Group>(
-  ActionType.Budget.SubAccount.SubAccounts.Groups.AddToState
-);
+export const addGroupToStateAction = simpleAction<Model.Group>(ActionType.Budget.SubAccount.Groups.AddToState);
 export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Group>>(
-  ActionType.Budget.SubAccount.SubAccounts.Groups.UpdateInState
+  ActionType.Budget.SubAccount.Groups.UpdateInState
 );
-export const removeGroupFromStateAction = simpleAction<number>(
-  ActionType.Budget.SubAccount.SubAccounts.Groups.RemoveFromState
-);
+export const removeGroupFromStateAction = simpleAction<number>(ActionType.Budget.SubAccount.Groups.RemoveFromState);
 export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(
-  ActionType.Budget.SubAccount.SubAccounts.Groups.Deleting
+  ActionType.Budget.SubAccount.Groups.Deleting
 );
-export const deleteGroupAction = simpleAction<number>(ActionType.Budget.SubAccount.SubAccounts.Groups.Delete);
-export const requestHistoryAction = simpleAction<null>(ActionType.Budget.SubAccount.SubAccounts.History.Request);
-export const loadingHistoryAction = simpleAction<boolean>(ActionType.Budget.SubAccount.SubAccounts.History.Loading);
+export const deleteGroupAction = simpleAction<number>(ActionType.Budget.SubAccount.Groups.Delete);
+export const requestHistoryAction = simpleAction<null>(ActionType.Budget.SubAccount.History.Request);
+export const loadingHistoryAction = simpleAction<boolean>(ActionType.Budget.SubAccount.History.Loading);
 export const responseHistoryAction = simpleAction<Http.ListResponse<Model.HistoryEvent>>(
-  ActionType.Budget.SubAccount.SubAccounts.History.Response
+  ActionType.Budget.SubAccount.History.Response
 );
 export const requestFringesAction = simpleAction<null>(ActionType.Budget.SubAccount.Fringes.Request);
 export const loadingFringesAction = simpleAction<boolean>(ActionType.Budget.SubAccount.Fringes.Loading);

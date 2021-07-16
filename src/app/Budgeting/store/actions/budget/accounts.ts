@@ -41,26 +41,20 @@ export const addAccountToGroupAction = simpleAction<{ id: number; group: number 
   ActionType.Budget.Accounts.AddToGroup
 );
 export const addAccountToStateAction = simpleAction<Model.Account>(ActionType.Budget.Accounts.AddToState);
-export const requestGroupsAction = simpleAction<null>(ActionType.Budget.Accounts.Groups.Request);
-export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.Accounts.Groups.Loading);
-export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Group>>(
-  ActionType.Budget.Accounts.Groups.Response
-);
-export const addGroupToStateAction = simpleAction<Model.Group>(ActionType.Budget.Accounts.Groups.AddToState);
+export const requestGroupsAction = simpleAction<null>(ActionType.Budget.Groups.Request);
+export const loadingGroupsAction = simpleAction<boolean>(ActionType.Budget.Groups.Loading);
+export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Group>>(ActionType.Budget.Groups.Response);
+export const addGroupToStateAction = simpleAction<Model.Group>(ActionType.Budget.Groups.AddToState);
 export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Group>>(
-  ActionType.Budget.Accounts.Groups.UpdateInState
+  ActionType.Budget.Groups.UpdateInState
 );
-export const removeGroupFromStateAction = simpleAction<number>(ActionType.Budget.Accounts.Groups.RemoveFromState);
-export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(
-  ActionType.Budget.Accounts.Groups.Deleting
-);
-export const deleteGroupAction = simpleAction<number>(ActionType.Budget.Accounts.Groups.Delete);
+export const removeGroupFromStateAction = simpleAction<number>(ActionType.Budget.Groups.RemoveFromState);
+export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(ActionType.Budget.Groups.Deleting);
+export const deleteGroupAction = simpleAction<number>(ActionType.Budget.Groups.Delete);
 
-export const requestAccountsHistoryAction = simpleAction<null>(ActionType.Budget.Accounts.History.Request);
-export const loadingAccountsHistoryAction = simpleAction<boolean>(ActionType.Budget.Accounts.History.Loading);
+export const requestAccountsHistoryAction = simpleAction<null>(ActionType.Budget.History.Request);
+export const loadingAccountsHistoryAction = simpleAction<boolean>(ActionType.Budget.History.Loading);
 export const responseAccountsHistoryAction = simpleAction<Http.ListResponse<Model.HistoryEvent>>(
-  ActionType.Budget.Accounts.History.Response
+  ActionType.Budget.History.Response
 );
-export const addAccountsHistoryToStateAction = simpleAction<Model.HistoryEvent>(
-  ActionType.Budget.Accounts.History.AddToState
-);
+export const addAccountsHistoryToStateAction = simpleAction<Model.HistoryEvent>(ActionType.Budget.History.AddToState);

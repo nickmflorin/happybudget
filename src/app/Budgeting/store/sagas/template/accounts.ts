@@ -31,9 +31,9 @@ const tasks = createAccountsTaskSet<Model.Template>(
     bulkCreate: api.bulkCreateTemplateAccounts,
     bulkDelete: api.bulkDeleteTemplateAccounts
   },
-  (state: Modules.ApplicationStore) => state.budgeting.template.template.id,
-  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.data,
-  (state: Modules.ApplicationStore) => state.budgeting.template.autoIndex
+  (state: Modules.ApplicationStore) => state.budget.template.budget.id,
+  (state: Modules.ApplicationStore) => state.budget.template.budget.children.data,
+  (state: Modules.ApplicationStore) => state.budget.template.autoIndex
 );
 
 export default createStandardSaga(
@@ -41,10 +41,10 @@ export default createStandardSaga(
     Request: ActionType.Template.Accounts.Request,
     TableChange: ActionType.Template.SubAccount.TableChanged,
     Groups: {
-      Request: ActionType.Template.Accounts.Groups.Request,
+      Request: ActionType.Template.Groups.Request,
       RemoveModel: ActionType.Template.Accounts.RemoveFromGroup,
       AddModel: ActionType.Template.Accounts.AddToGroup,
-      Delete: ActionType.Template.Accounts.Groups.Delete
+      Delete: ActionType.Template.Groups.Delete
     }
   },
   {

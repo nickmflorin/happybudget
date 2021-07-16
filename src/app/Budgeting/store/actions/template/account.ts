@@ -33,24 +33,20 @@ export const addSubAccountToGroupAction = simpleAction<{ id: number; group: numb
 export const addSubAccountToStateAction = simpleAction<Model.SubAccount>(
   ActionType.Template.Account.SubAccounts.AddToState
 );
-export const requestGroupsAction = simpleAction<null>(ActionType.Template.Account.SubAccounts.Groups.Request);
-export const loadingGroupsAction = simpleAction<boolean>(ActionType.Template.Account.SubAccounts.Groups.Loading);
+export const requestGroupsAction = simpleAction<null>(ActionType.Template.Account.Groups.Request);
+export const loadingGroupsAction = simpleAction<boolean>(ActionType.Template.Account.Groups.Loading);
 export const responseGroupsAction = simpleAction<Http.ListResponse<Model.Group>>(
-  ActionType.Template.Account.SubAccounts.Groups.Response
+  ActionType.Template.Account.Groups.Response
 );
-export const addGroupToStateAction = simpleAction<Model.Group>(
-  ActionType.Template.Account.SubAccounts.Groups.AddToState
-);
+export const addGroupToStateAction = simpleAction<Model.Group>(ActionType.Template.Account.Groups.AddToState);
 export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Group>>(
-  ActionType.Template.Account.SubAccounts.Groups.UpdateInState
+  ActionType.Template.Account.Groups.UpdateInState
 );
-export const removeGroupFromStateAction = simpleAction<number>(
-  ActionType.Template.Account.SubAccounts.Groups.RemoveFromState
-);
+export const removeGroupFromStateAction = simpleAction<number>(ActionType.Template.Account.Groups.RemoveFromState);
 export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(
-  ActionType.Template.Account.SubAccounts.Groups.Deleting
+  ActionType.Template.Account.Groups.Deleting
 );
-export const deleteGroupAction = simpleAction<number>(ActionType.Template.Account.SubAccounts.Groups.Delete);
+export const deleteGroupAction = simpleAction<number>(ActionType.Template.Account.Groups.Delete);
 export const requestFringesAction = simpleAction<null>(ActionType.Template.Account.Fringes.Request);
 export const loadingFringesAction = simpleAction<boolean>(ActionType.Template.Account.Fringes.Loading);
 export const responseFringesAction = simpleAction<Http.ListResponse<Model.Fringe>>(

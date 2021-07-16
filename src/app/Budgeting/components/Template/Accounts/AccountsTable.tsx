@@ -12,11 +12,13 @@ import * as actions from "../../../store/actions/template/accounts";
 import { GenericAccountsTable } from "../../Generic";
 
 const selectGroups = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.groups.data
+  (state: Modules.ApplicationStore) => state.budget.template.budget.groups.data
 );
-const selectData = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budgeting.template.accounts.data);
+const selectData = simpleDeepEqualSelector(
+  (state: Modules.ApplicationStore) => state.budget.template.budget.children.data
+);
 const selectTableSearch = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.template.accounts.search
+  (state: Modules.ApplicationStore) => state.budget.template.budget.children.search
 );
 
 const AccountsTable = (): JSX.Element => {

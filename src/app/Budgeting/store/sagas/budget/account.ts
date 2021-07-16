@@ -11,7 +11,7 @@ import * as actions from "../../actions/budget/account";
 import { createStandardSaga, createStandardFringesSaga, createAccountTaskSet, createFringeTaskSet } from "../factories";
 
 export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
-  const accountId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.account.id);
+  const accountId = yield select((state: Modules.ApplicationStore) => state.budget.budget.account.id);
   if (!isNil(accountId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -38,7 +38,7 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
 }
 
 export function* submitCommentTask(action: Redux.Action<{ parent?: number; data: Http.CommentPayload }>): SagaIterator {
-  const accountId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.account.id);
+  const accountId = yield select((state: Modules.ApplicationStore) => state.budget.budget.account.id);
   if (!isNil(accountId) && !isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -121,7 +121,7 @@ export function* editCommentTask(action: Redux.Action<Redux.UpdateModelActionPay
 }
 
 export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
-  const accountId = yield select((state: Modules.ApplicationStore) => state.budgeting.budget.account.id);
+  const accountId = yield select((state: Modules.ApplicationStore) => state.budget.budget.account.id);
   if (!isNil(accountId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -161,8 +161,8 @@ const fringeTasks = createFringeTaskSet<Model.Budget>(
     bulkCreate: api.bulkCreateBudgetFringes,
     bulkDelete: api.bulkDeleteBudgetFringes
   },
-  (state: Modules.ApplicationStore) => state.budgeting.budget.budget.id,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.id,
+  (state: Modules.ApplicationStore) => state.budget.budget.account.fringes.data
 );
 
 const fringesRootSaga = createStandardFringesSaga(
@@ -199,9 +199,9 @@ const tasks = createAccountTaskSet(
       request: actions.requestGroupsAction
     }
   },
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.id,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.data,
-  (state: Modules.ApplicationStore) => state.budgeting.budget.autoIndex
+  (state: Modules.ApplicationStore) => state.budget.budget.account.id,
+  (state: Modules.ApplicationStore) => state.budget.budget.account.children.data,
+  (state: Modules.ApplicationStore) => state.budget.budget.autoIndex
 );
 
 function* watchForRequestAccountSaga(): SagaIterator {
@@ -231,10 +231,10 @@ const rootAccountSaga = createStandardSaga(
     Request: ActionType.Budget.Account.SubAccounts.Request,
     TableChange: ActionType.Budget.Account.TableChanged,
     Groups: {
-      Request: ActionType.Budget.Account.SubAccounts.Groups.Request,
+      Request: ActionType.Budget.Account.Groups.Request,
       RemoveModel: ActionType.Budget.Account.SubAccounts.RemoveFromGroup,
       AddModel: ActionType.Budget.Account.SubAccounts.AddToGroup,
-      Delete: ActionType.Budget.Account.SubAccounts.Groups.Delete
+      Delete: ActionType.Budget.Account.Groups.Delete
     },
     Comments: {
       Request: ActionType.Budget.Account.Comments.Request,
@@ -243,7 +243,7 @@ const rootAccountSaga = createStandardSaga(
       Edit: ActionType.Budget.Account.Comments.Update
     },
     History: {
-      Request: ActionType.Budget.Account.SubAccounts.History.Request
+      Request: ActionType.Budget.Account.History.Request
     }
   },
   {

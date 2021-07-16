@@ -12,28 +12,28 @@ import {
 } from "../../../store/actions/budget/account";
 
 const selectDeletingComments = simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
-  map(state.budgeting.budget.account.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
+  map(state.budget.budget.account.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectEditingComments = simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
-  map(state.budgeting.budget.account.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
+  map(state.budget.budget.account.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectReplyingComments = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.comments.replying
+  (state: Modules.ApplicationStore) => state.budget.budget.account.comments.replying
 );
 const selectCommentsData = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.comments.data
+  (state: Modules.ApplicationStore) => state.budget.budget.account.comments.data
 );
 const selectSubmittingComment = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.comments.creating
+  (state: Modules.ApplicationStore) => state.budget.budget.account.comments.creating
 );
 const selectLoadingComments = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.comments.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.account.comments.loading
 );
 const selectLoadingHistory = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.history.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.account.history.loading
 );
 const selectHistory = simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budgeting.budget.account.subaccounts.history.data
+  (state: Modules.ApplicationStore) => state.budget.budget.account.history.data
 );
 
 const AccountCommentsHistory = (): JSX.Element => {

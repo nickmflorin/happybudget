@@ -4,99 +4,48 @@ import {
   initialCommentsListResponseState
 } from "store/initialState";
 
-export const initialBudgetAccountsState: Modules.Budgeting.Budget.AccountsStore = {
-  history: initialModelListResponseState,
-  groups: initialModelListResponseState,
-  type: "account",
-  ...initialModelListResponseState
-};
-
-export const initialTemplateAccountsState: Modules.Budgeting.Template.AccountsStore = {
-  groups: initialModelListResponseState,
-  type: "account",
-  ...initialModelListResponseState
-};
-
-export const initialBudgetBudgetState: Modules.Budgeting.Budget.BudgetStore = {
+export const initialBudgetBudgetState: Modules.Budget.BudgetStore<any> = {
   id: null,
   detail: initialDetailResponseState,
-  comments: initialCommentsListResponseState
-};
-
-export const initialTemplateTemplateState: Modules.Budgeting.Template.TemplateStore = {
-  id: null,
-  detail: initialDetailResponseState
-};
-
-export const initialBudgetSubAccountsState: Modules.Budgeting.Budget.SubAccountsStore = {
-  history: initialModelListResponseState,
+  children: initialModelListResponseState,
   groups: initialModelListResponseState,
-  type: "subaccount",
-  ...initialModelListResponseState
-};
-
-export const initialTemplateSubAccountsState: Modules.Budgeting.Template.SubAccountsStore = {
-  groups: initialModelListResponseState,
-  type: "subaccount",
-  ...initialModelListResponseState
-};
-
-export const initialBudgetSubAccountState: Modules.Budgeting.Budget.SubAccountStore = {
-  id: null,
-  detail: initialDetailResponseState,
-  subaccounts: initialBudgetSubAccountsState,
-  type: "subaccount",
   comments: initialCommentsListResponseState,
-  fringes: initialModelListResponseState
+  history: initialModelListResponseState
 };
 
-export const initialTemplateSubAccountState: Modules.Budgeting.Template.SubAccountStore = {
+export const initialSubAccountState: Modules.Budget.SubAccountStore = {
   id: null,
   detail: initialDetailResponseState,
-  type: "subaccount",
-  subaccounts: initialTemplateSubAccountsState,
-  fringes: initialModelListResponseState
-};
-
-export const initialBudgetAccountState: Modules.Budgeting.Budget.AccountStore = {
-  id: null,
-  detail: initialDetailResponseState,
-  subaccounts: initialBudgetSubAccountsState,
-  type: "account",
+  children: initialModelListResponseState,
+  fringes: initialModelListResponseState,
+  groups: initialModelListResponseState,
   comments: initialCommentsListResponseState,
-  fringes: initialModelListResponseState
+  history: initialModelListResponseState
 };
 
-export const initialTemplateAccountState: Modules.Budgeting.Template.AccountStore = {
+export const initialAccountState: Modules.Budget.AccountStore = {
   id: null,
   detail: initialDetailResponseState,
-  type: "account",
-  subaccounts: initialTemplateSubAccountsState,
-  fringes: initialModelListResponseState
+  children: initialModelListResponseState,
+  fringes: initialModelListResponseState,
+  groups: initialModelListResponseState,
+  comments: initialCommentsListResponseState,
+  history: initialModelListResponseState
 };
 
-export const initialBudgetState: Modules.Budgeting.Budget.Store = {
+export const initialBudgetModuleState: Modules.Budget.ModuleStore<any> = {
   autoIndex: false,
   budget: initialBudgetBudgetState,
   commentsHistoryDrawerOpen: false,
-  account: initialBudgetAccountState,
-  subaccount: initialBudgetSubAccountState,
+  account: initialAccountState,
+  subaccount: initialSubAccountState,
   actuals: initialModelListResponseState,
-  accounts: initialBudgetAccountsState,
   subAccountsTree: initialModelListResponseState
 };
 
-export const initialTemplateState: Modules.Budgeting.Template.Store = {
-  autoIndex: false,
-  template: initialTemplateTemplateState,
-  account: initialTemplateAccountState,
-  subaccount: initialTemplateSubAccountState,
-  accounts: initialTemplateAccountsState
-};
-
-const initialState: Modules.Budgeting.Store = {
-  budget: initialBudgetState,
-  template: initialTemplateState,
+const initialState: Modules.Budget.Store = {
+  budget: initialBudgetModuleState,
+  template: initialBudgetModuleState,
   fringeColors: initialModelListResponseState,
   subaccountUnits: initialModelListResponseState
 };
