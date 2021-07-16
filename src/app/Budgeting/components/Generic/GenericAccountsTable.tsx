@@ -48,6 +48,7 @@ const GenericAccountsTable = ({
       }}
       rowCanExpand={(row: BudgetTable.AccountRow) => !isNil(row.identifier) || row.meta.children.length !== 0}
       getModelChildren={(model: Model.Account) => model.subaccounts}
+      getModelLabel={(model: Model.Account) => model.identifier || model.description}
       {...props}
       actions={(params: BudgetTable.MenuActionParams<BudgetTable.AccountRow, Model.Account>) => [
         {

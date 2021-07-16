@@ -136,10 +136,17 @@ namespace Http {
     readonly color: string;
   }
 
-  interface AccountPayload extends Http.ModelPayload<Model.Account> {}
+  interface AccountPayload extends Http.ModelPayload<Model.Account> {
+    // This is a write-only field in the backend, so we have to explicitly include
+    // in the payload.
+    readonly group?: number | null;
+  }
 
   interface SubAccountPayload extends Http.ModelPayload<Model.SubAccount> {
     readonly unit?: Model.SubAccountUnitId | null;
+    // This is a write-only field in the backend, so we have to explicitly include
+    // in the payload.
+    readonly group?: number | null;
   }
 
   interface ActualPayload extends Omit<Http.ModelPayload<Model.Actual>, "subaccount" | "payment_method"> {

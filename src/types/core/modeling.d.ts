@@ -180,7 +180,6 @@ namespace Model {
     readonly access: number[];
     readonly estimated: number;
     readonly subaccounts: number[];
-    readonly group: number | null;
     readonly created_by: number | null;
     readonly updated_by: number | null;
     readonly created_at: string;
@@ -225,7 +224,6 @@ namespace Model {
     readonly object_id: number;
     readonly type: "subaccount";
     readonly parent_type: "account" | "subaccount";
-    readonly group: number | null;
     readonly fringes: number[];
     readonly subaccounts: number[];
     readonly estimated: number;

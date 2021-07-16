@@ -54,7 +54,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   search,
   actions,
   detached,
+  rowLabel = "Row",
   modelToRow,
+  getModelLabel,
   getModelChildren,
   onGridReady,
   onSearch,
@@ -502,18 +504,18 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       return [];
     } else {
       const deleteRowContextMenuItem: MenuItemDef = {
-        name: `Delete ${row.meta.label}`,
+        name: `Delete ${row.meta.label || "Row"}`,
         action: () => onChangeEvent({ payload: row.id, type: "rowDelete" })
       };
       if (isNil(groupParams)) {
         return [deleteRowContextMenuItem];
-      } else if (!isNil(row.group)) {
-        const group: Model.Group | undefined = find(groups, { id: row.group } as any);
+      } else if (!isNil(row.meta.group)) {
+        const group: Model.Group | undefined = find(groups, { id: row.meta.group } as any);
         if (!isNil(group)) {
           return [
             deleteRowContextMenuItem,
             {
-              name: `Remove ${row.meta.label} from Group ${group.name}`,
+              name: `Remove ${row.meta.label || "Row"} from Group ${group.name}`,
               action: () => groupParams.onRowRemoveFromGroup(row)
             }
           ];
@@ -526,11 +528,20 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         if (groupableNodesAbove.length !== 0) {
           let label: string;
           if (groupableNodesAbove.length === 1) {
-            label = `Group ${groupableNodesAbove[0].data.meta.typeLabel} ${groupableNodesAbove[0].data.meta.label}`;
+            label = `Group ${rowLabel}`;
+            if (!isNil(groupableNodesAbove[0].data.meta.label)) {
+              label = `Group ${rowLabel} ${groupableNodesAbove[0].data.meta.label}`;
+            }
           } else {
-            label = `Group ${groupableNodesAbove[0].data.meta.typeLabel}s ${
-              groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label
-            } - ${groupableNodesAbove[0].data.meta.label}`;
+            label = `Group ${rowLabel}s`;
+            if (
+              !isNil(groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label) &&
+              !isNil(groupableNodesAbove[0].data.meta.label)
+            ) {
+              label = `Group ${rowLabel}s ${groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label} - ${
+                groupableNodesAbove[0].data.meta.label
+              }`;
+            }
           }
           menuItems.push({
             name: label,
@@ -734,7 +745,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           id: model.id,
           meta: {
             ...models.DefaultRowMeta,
-            children: !isNil(getModelChildren) ? getModelChildren(model) : []
+            children: !isNil(getModelChildren) ? getModelChildren(model) : [],
+            group: getGroupForModel(model),
+            label: !isNil(getModelLabel) ? getModelLabel(model) : model.id
           }
         }
       ) as R;

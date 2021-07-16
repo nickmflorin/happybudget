@@ -11,7 +11,7 @@ import { CommentsListResponseActionMap } from "lib/redux/factories/comments";
 import { warnInconsistentState } from "lib/redux/util";
 import * as typeguards from "lib/model/typeguards";
 import { fringeValue, consolidateTableChange, mergeChangesWithModel } from "lib/model/util";
-import { replaceInArray, replaceInArrayDistributedTypes, findWithDistributedTypes } from "lib/util";
+import { replaceInArray, findWithDistributedTypes } from "lib/util";
 
 import { initialModelListResponseState } from "store/initialState";
 
@@ -204,16 +204,25 @@ const groupFromState = <S extends Modules.Budgeting.AccountsStore | Modules.Budg
   action: Redux.Action<any>,
   st: S,
   id: Model.Group | number,
-  subaccountId?: number
+  lineId?: number
 ): Model.Group | null => {
   if (typeof id === "number") {
     let predicate = (g: Model.Group) => g.id === id;
-    if (!isNil(subaccountId)) {
-      predicate = (g: Model.Group) => g.id === id && includes(g.children, subaccountId);
+    if (!isNil(lineId)) {
+      predicate = (g: Model.Group) => g.id === id && includes(g.children, lineId);
     }
     return modelFromState<Model.Group>(action, st.groups.data, predicate, "Group");
   }
   return id;
+};
+
+const modelGroupFromState = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
+  action: Redux.Action<any>,
+  st: S,
+  lineId: number
+): Model.Group | null => {
+  const predicate = (g: Model.Group) => includes(g.children, lineId);
+  return modelFromState<Model.Group>(action, st.groups.data, predicate, "Group");
 };
 
 const recalculateGroupMetrics = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
@@ -257,21 +266,13 @@ const removeModelFromGroup = <S extends Modules.Budgeting.AccountsStore | Module
     st.data,
     model
   );
-  if (!isNil(stateModel) && !isNil(stateModel.group)) {
-    let stateGroup: Model.Group | null;
-    if (!isNil(group)) {
-      stateGroup = groupFromState<S>(action, st, group, stateModel.id);
-    } else {
-      stateGroup = groupFromState<S>(action, st, stateModel.group, stateModel.id);
-    }
+  if (!isNil(stateModel)) {
+    const stateGroup: Model.Group | null = isNil(group)
+      ? modelGroupFromState<S>(action, st, stateModel.id)
+      : groupFromState<S>(action, st, group, stateModel.id);
     if (!isNil(stateGroup)) {
       st = {
         ...st,
-        data: replaceInArrayDistributedTypes<Model.Account | Model.SubAccount, Model.Account[] | Model.SubAccount[]>(
-          st.data,
-          { id: stateModel.id },
-          { ...stateModel, group: null }
-        ),
         groups: {
           ...st.groups,
           data: replaceInArray<Model.Group>(
@@ -327,11 +328,6 @@ const addModelToGroup = <S extends Modules.Budgeting.AccountsStore | Modules.Bud
       } else {
         st = {
           ...st,
-          data: replaceInArrayDistributedTypes<Model.Account | Model.SubAccount, Model.Account[] | Model.SubAccount[]>(
-            st.data,
-            { id: stateModel.id },
-            { ...stateModel, group: stateGroup.id }
-          ),
           groups: {
             ...st.groups,
             data: replaceInArray<Model.Group>(
@@ -348,36 +344,6 @@ const addModelToGroup = <S extends Modules.Budgeting.AccountsStore | Modules.Bud
       }
     }
   }
-  return st;
-};
-
-const addGroupToState = <S extends Modules.Budgeting.AccountsStore | Modules.Budgeting.SubAccountsStore>(
-  action: Redux.Action<any>,
-  st: S,
-  group: Model.Group
-): S => {
-  forEach(group.children, (id: number) => {
-    const model = modelFromState<Model.Account | Model.SubAccount, Model.Account[] | Model.SubAccount[]>(
-      action,
-      st.data,
-      id
-    );
-    if (!isNil(model)) {
-      st = {
-        ...st,
-        data: replaceInArrayDistributedTypes<Model.Account | Model.SubAccount, Model.Account[] | Model.SubAccount[]>(
-          st.data,
-          { id: model.id },
-          { ...model, group: group.id }
-        ),
-        groups: {
-          ...st.groups,
-          data: [...st.groups.data, group],
-          count: st.groups.count + 1
-        }
-      };
-    }
-  });
   return st;
 };
 
@@ -421,8 +387,9 @@ const updateAccountInState = <S extends Modules.Budgeting.AccountsStore>(
     // NOTE: We do not need to update the metrics for the account because there
     // are no changes to an account that would warrant recalculations of the
     // account on the page.
-    if (!isNil(account.group)) {
-      st = recalculateGroupMetrics<S>(action, st, account.group);
+    const accountGroup = modelGroupFromState(action, st, account.id);
+    if (!isNil(accountGroup)) {
+      st = recalculateGroupMetrics<S>(action, st, accountGroup);
     }
   }
   return st;
@@ -466,7 +433,8 @@ export const createAccountsReducer = <S extends Modules.Budgeting.AccountsStore>
           Request: mapping.Groups.Request,
           Loading: mapping.Groups.Loading,
           UpdateInState: mapping.Groups.UpdateInState,
-          Deleting: mapping.Groups.Deleting
+          Deleting: mapping.Groups.Deleting,
+          AddToState: mapping.Groups.AddToState
         })
       }
     }
@@ -480,9 +448,6 @@ export const createAccountsReducer = <S extends Modules.Budgeting.AccountsStore>
     if (action.type === mapping.Groups.UpdateInState) {
       const group: Model.Group = action.payload;
       newState = recalculateGroupMetrics<S>(action, newState, group.id);
-    } else if (action.type === mapping.Groups.AddToState) {
-      const group: Model.Group = action.payload;
-      newState = addGroupToState<S>(action, newState, group);
     } else if (action.type === mapping.Groups.RemoveFromState) {
       newState = removeGroupFromState<S>(action, newState, action.payload);
     } else if (action.type === mapping.TableChanged) {
@@ -631,8 +596,9 @@ const updateSubAccountInState = <S extends Modules.Budgeting.SubAccountsStore>(
       data: replaceInArray<Model.SubAccount>(st.data, { id: subAccount.id }, subAccount)
     };
     st = recalculateSubAccountMetrics<S>(action, st, fringesState, subAccount);
-    if (!isNil(subAccount.group)) {
-      st = recalculateGroupMetrics<S>(action, st, subAccount.group);
+    const subAccountGroup = modelGroupFromState<S>(action, st, subAccount.id);
+    if (!isNil(subAccountGroup)) {
+      st = recalculateGroupMetrics<S>(action, st, subAccountGroup);
     }
   }
   return st;
@@ -662,7 +628,14 @@ export const createSubAccountsReducer = <S extends Modules.Budgeting.SubAccounts
     {
       strictSelect: false,
       subReducers: {
-        groups: createModelListResponseReducer<Model.Group>(mapping.Groups),
+        groups: createModelListResponseReducer<Model.Group>({
+          Response: mapping.Groups.Response,
+          Loading: mapping.Groups.Loading,
+          Request: mapping.Groups.Request,
+          UpdateInState: mapping.Groups.UpdateInState,
+          AddToState: mapping.Groups.AddToState,
+          Deleting: mapping.Groups.Deleting
+        }),
         ...historySubReducers
       }
     }
@@ -675,9 +648,6 @@ export const createSubAccountsReducer = <S extends Modules.Budgeting.SubAccounts
     if (action.type === mapping.Groups.UpdateInState) {
       const group: Model.Group = action.payload;
       newState = recalculateGroupMetrics<S>(action, newState, group.id);
-    } else if (action.type === mapping.Groups.AddToState) {
-      const group: Model.Group = action.payload;
-      newState = addGroupToState<S>(action, newState, group);
     } else if (action.type === mapping.Groups.RemoveFromState) {
       newState = removeGroupFromState<S>(action, newState, action.payload);
     } else if (action.type === mapping.RemoveFromGroup) {

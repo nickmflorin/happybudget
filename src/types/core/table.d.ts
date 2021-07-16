@@ -11,9 +11,8 @@ namespace Table {
     readonly isTableFooter?: boolean;
     readonly isBudgetFooter?: boolean;
     readonly children: number[];
-    readonly label: string;
-    readonly typeLabel: string;
-    readonly type: Table.RowType;
+    readonly label?: string | null;
+    readonly group?: number | null;
   }
 
   interface PageAndSize {
@@ -323,6 +322,7 @@ namespace BudgetTable {
     readonly frameworkComponents?: { [key: string]: any };
     readonly search?: string;
     readonly columns: Table.Column<R, M>[];
+    readonly rowLabel?: string;
     readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
     // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
     // onRowExpand is provided to the BudgetTable.
@@ -330,6 +330,7 @@ namespace BudgetTable {
     readonly onRowExpand?: null | ((id: number) => void);
     readonly onBack?: () => void;
     readonly modelToRow?: (m: M) => R;
+    readonly getModelLabel?: (m: M) => string | null;
     readonly getModelChildren?: (m: M) => number[];
   }
 
