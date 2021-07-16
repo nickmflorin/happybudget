@@ -11,8 +11,6 @@ import { Modal } from "components/modals";
 
 import { updateContactInStateAction } from "store/actions";
 
-import "./ContactForm.scss";
-
 import "./ContactModal.scss";
 
 interface EditContactModalProps {
