@@ -7,6 +7,7 @@ import { createSelector } from "reselect";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
+import { EditContactModal } from "app/modals";
 import { DeleteContactsModal } from "components/modals";
 import { Table, ActionsTableCell, ModelSelectController } from "components/tables";
 import { formatAsPhoneNumber } from "lib/util/formatters";
@@ -20,7 +21,6 @@ import {
 } from "store/actions";
 import { useContacts } from "store/hooks";
 import { selectContactsStore } from "store/selectors";
-import EditContactModal from "./EditContactModal";
 import "./ContactsTable.scss";
 
 interface Row {

@@ -4,11 +4,11 @@ import { isNil, find } from "lodash";
 
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
+import { EditContactModal } from "app/modals";
 import { getKeyValue } from "lib/util";
 import { parseFirstAndLastName } from "lib/model/util";
 import { useContacts } from "store/hooks";
 
-import EditContactModal from "../../../Dashboard/components/Contacts/EditContactModal";
 import { selectBudgetDetail, selectBudgetDetailLoading } from "../../store/selectors";
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
 

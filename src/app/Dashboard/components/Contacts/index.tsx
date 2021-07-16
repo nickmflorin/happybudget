@@ -6,12 +6,12 @@ import { Input, Button } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
+import { CreateContactModal } from "app/modals";
 import { ActionsMenuBar } from "components/menus";
 import { Page } from "components/layout";
 
 import { setContactsSearchAction } from "store/actions";
 import ContactsTable from "./ContactsTable";
-import CreateContactModal from "./CreateContactModal";
 
 const Contacts = (): JSX.Element => {
   const [newContactModalOpen, setNewContactModalOpen] = useState(false);
