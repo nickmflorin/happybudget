@@ -19,6 +19,10 @@ export const floatValueSetter =
     (params: ValueSetterParams): boolean => {
       if (params.newValue === undefined && nullable) {
         params.data[field] = null;
+        return true;
+      } else if (params.newValue === null && nullable) {
+        params.data[field] = null;
+        return true;
       } else if (!isNaN(parseFloat(params.newValue))) {
         params.data[field] = parseFloat(params.newValue);
         return true;
@@ -32,6 +36,10 @@ export const integerValueSetter =
     (params: ValueSetterParams): boolean => {
       if (params.newValue === undefined && nullable) {
         params.data[field] = null;
+        return true;
+      } else if (params.newValue === null && nullable) {
+        params.data[field] = null;
+        return true;
       } else if (!isNaN(parseInt(params.newValue))) {
         params.data[field] = parseInt(params.newValue);
         return true;
