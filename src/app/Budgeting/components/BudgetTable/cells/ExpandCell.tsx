@@ -33,7 +33,7 @@ const ExpandCell = <R extends Table.Row>({
   };
 
   if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
-    if (row.meta.children.length !== 0) {
+    if (!isNil(row.meta.children) && row.meta.children.length !== 0) {
       return (
         <Tooltip title={"Expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
           <IconButton

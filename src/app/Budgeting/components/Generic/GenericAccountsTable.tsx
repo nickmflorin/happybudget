@@ -46,7 +46,9 @@ const GenericAccountsTable = ({
         onEditGroup,
         onRowAddToGroup
       }}
-      rowCanExpand={(row: BudgetTable.AccountRow) => !isNil(row.identifier) || row.meta.children.length !== 0}
+      rowCanExpand={(row: BudgetTable.AccountRow) =>
+        !isNil(row.identifier) || (!isNil(row.meta.children) && row.meta.children.length !== 0)
+      }
       getModelChildren={(model: Model.Account) => model.subaccounts}
       getModelLabel={(model: Model.Account) => model.identifier || model.description}
       {...props}

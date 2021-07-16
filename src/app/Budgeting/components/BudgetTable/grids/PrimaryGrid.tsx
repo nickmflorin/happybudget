@@ -678,21 +678,28 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   });
 
   useEffect(() => {
+    const readColumns = filter(columns, (c: Table.Column<R, M>) => {
+      const fieldBehavior: Table.FieldBehavior[] = c.fieldBehavior || ["read", "write"];
+      return includes(fieldBehavior, "read");
+    });
+
     const createGroupFooter = (group: Model.Group): R | null => {
-      const baseColumns = filter(columns, (c: Table.Column<R, M>) => includes(["index", "expand"], c.field));
-      if (columns.length > baseColumns.length) {
+      if (readColumns.length !== 0) {
         return reduce(
-          [...columns.slice(0, baseColumns.length), ...columns.slice(baseColumns.length + 1)],
+          columns,
           (obj: { [key: string]: any }, col: Table.Column<R, M>) => {
-            if (!isNil(col.field)) {
-              if (col.isCalculated === true) {
-                if (!isNil(group[col.field as keyof Model.Group])) {
-                  obj[col.field as string] = group[col.field as keyof Model.Group];
+            const fieldBehavior: Table.FieldBehavior[] = col.fieldBehavior || ["read", "write"];
+            if (includes(fieldBehavior, "read")) {
+              if (!isNil(col.field)) {
+                if (col.isCalculated === true) {
+                  if (!isNil(group[col.field as keyof Model.Group])) {
+                    obj[col.field as string] = group[col.field as keyof Model.Group];
+                  } else {
+                    obj[col.field as string] = null;
+                  }
                 } else {
                   obj[col.field as string] = null;
                 }
-              } else {
-                obj[col.field as string] = null;
               }
             }
             return obj;
@@ -701,12 +708,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
             // The ID needs to designate that this row refers to a Group because the ID of a Group
             // might clash with the ID of a SubAccount/Account.
             id: `group-${group.id}`,
-            [columns[baseColumns.length].field as string]: group.name,
+            [readColumns[0].field as string]: group.name,
             group: group.id,
-            meta: {
-              isGroupFooter: true,
-              children: []
-            }
+            meta: { ...models.DefaultRowMeta, isGroupFooter: true }
           }
         ) as R;
       }
@@ -727,17 +731,14 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         return modelToRow(model);
       }
       return reduce(
-        columns,
+        readColumns,
         (obj: { [key: string]: any }, col: Table.Column<R, M>) => {
-          const fieldBehavior: Table.FieldBehavior[] = col.fieldBehavior || ["read", "write"];
-          if (includes(fieldBehavior, "read")) {
-            const nullValue = col.nullValue === undefined ? null : col.nullValue;
-            const modelValue = !isNil(col.getRowValue) ? col.getRowValue(model) : model[col.field as keyof M];
-            if (modelValue !== undefined) {
-              obj[col.field as string] = modelValue;
-            } else {
-              obj[col.field as string] = nullValue;
-            }
+          const nullValue = col.nullValue === undefined ? null : col.nullValue;
+          const modelValue = !isNil(col.getRowValue) ? col.getRowValue(model) : model[col.field as keyof M];
+          if (modelValue !== undefined) {
+            obj[col.field as string] = modelValue;
+          } else {
+            obj[col.field as string] = nullValue;
           }
           return obj;
         },

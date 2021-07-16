@@ -10,7 +10,7 @@ namespace Table {
     readonly isGroupFooter?: boolean;
     readonly isTableFooter?: boolean;
     readonly isBudgetFooter?: boolean;
-    readonly children: number[];
+    readonly children?: number[];
     readonly label?: string | null;
     readonly group?: number | null;
   }

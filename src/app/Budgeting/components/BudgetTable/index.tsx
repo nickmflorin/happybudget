@@ -297,7 +297,11 @@ const BudgetTable = <
       colSpan: (params: ColSpanParams) => {
         const row: R = params.data;
         if (row.meta.isGroupFooter === true) {
-          return filter(columns, (c: Table.Column<R, M>) => !(c.isCalculated === true)).length + 1;
+          const readColumns = filter(cols, (c: Table.Column<R, M>) => {
+            const fieldBehavior: Table.FieldBehavior[] = c.fieldBehavior || ["read", "write"];
+            return includes(fieldBehavior, "read") && c.isCalculated !== true;
+          });
+          return readColumns.length;
         } else if (!isNil(col.colSpan)) {
           return col.colSpan(params);
         }

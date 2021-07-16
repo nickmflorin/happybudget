@@ -73,7 +73,7 @@ const GenericSubAccountsTable = ({
         if (includes(["identifier", "description", "name"], colDef.field)) {
           return true;
         } else {
-          return row.meta.children.length === 0;
+          return !isNil(row.meta.children) && row.meta.children.length === 0;
         }
       }}
       groupParams={{
@@ -83,7 +83,9 @@ const GenericSubAccountsTable = ({
         onEditGroup,
         onRowAddToGroup
       }}
-      rowCanExpand={(row: BudgetTable.SubAccountRow) => !isNil(row.identifier) || row.meta.children.length !== 0}
+      rowCanExpand={(row: BudgetTable.SubAccountRow) =>
+        !isNil(row.identifier) || (!isNil(row.meta.children) && row.meta.children.length !== 0)
+      }
       getModelChildren={(model: Model.SubAccount) => model.subaccounts}
       getModelLabel={(model: Model.SubAccount) => model.identifier || model.description}
       {...props}
@@ -192,7 +194,7 @@ const GenericSubAccountsTable = ({
           colSpan: (params: ColSpanParams) => {
             const row: BudgetTable.SubAccountRow = params.data;
             if (!isNil(params.data.meta) && !isNil(params.data.meta.children)) {
-              return row.meta.children.length !== 0 ? 7 : 1;
+              return !isNil(row.meta.children) && row.meta.children.length !== 0 ? 7 : 1;
             }
             return 1;
           }
