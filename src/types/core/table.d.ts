@@ -211,8 +211,7 @@ namespace Table {
 
   type CellDoneEditingEvent =
     | import("react").SyntheticEvent
-    | KeyboardEvent
-    | import("antd/lib/checkbox").CheckboxChangeEvent;
+    | KeyboardEvent;
 
   // I really don't know why, but extending import("@ag-grid-community/core").ICellEditorParams
   // does not work here.

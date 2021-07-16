@@ -184,12 +184,12 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
 }
 
 interface SingleModelMenuProps<M extends Model.M> {
-  readonly onChange: (model: M, e: import("react").SyntheticEvent | KeyboardEvent | import("antd/lib/checkbox").CheckboxChangeEvent) => void;
+  readonly onChange: (model: M, e: Table.CellDoneEditingEvent) => void;
   readonly multiple?: false;
 }
 
 interface MultipleModelMenuProps<M extends Model.M> {
-  readonly onChange: (models: M[], e: import("react").SyntheticEvent | KeyboardEvent | import("antd/lib/checkbox").CheckboxChangeEvent) => void;
+  readonly onChange: (models: M[], e: Table.CellDoneEditingEvent) => void;
   readonly multiple: true;
   readonly checkbox?: boolean;
 }
@@ -212,8 +212,6 @@ interface ModelMenuItemProps<M extends Model.M> {
   readonly bordersForLevels?: boolean;
   // This is intentionally not named onClick because it conflicts with AntD's mechanics.
   readonly onPress: (model: M, e: import("react").SyntheticEvent) => void;
-  readonly onSelect: (model: M, e: import("antd/lib/checkbox").CheckboxChangeEvent) => void;
-  readonly onDeselect: (model: M, e: import("antd/lib/checkbox").CheckboxChangeEvent) => void;
   readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
 }
 
@@ -271,7 +269,7 @@ interface SubAccountTreeMenuProps
     "renderItem" | "models" | "multiple" | "onChange" | "selected"
   > {
   readonly nodes: Model.Tree;
-  readonly onChange: (m: Model.SimpleSubAccount, e: import("react").SyntheticEvent | KeyboardEvent | import("antd/lib/checkbox").CheckboxChangeEvent) => void;
+  readonly onChange: (m: Model.SimpleSubAccount, e: Table.CellDoneEditingEvent) => void;
   readonly onSearch: (value: string) => void;
   readonly search: string;
   readonly childrenDefaultVisible?: boolean;

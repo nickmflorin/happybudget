@@ -2,7 +2,6 @@ import React, { useImperativeHandle, useEffect, useState, useMemo, SyntheticEven
 import { map, isNil, includes, filter, find, forEach, uniqueId } from "lodash";
 import classNames from "classnames";
 import { Checkbox } from "antd";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { RenderWithSpinner, VerticalFlexCenter, Menu } from "components";
 import { useDeepEqualMemo, useDebouncedJSSearch, useTrackFirstRender, useDynamicCallback } from "lib/hooks";
@@ -37,8 +36,6 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
     itemProps,
     leftAlign,
     bordersForLevels,
-    onSelect,
-    onDeselect,
     onPress,
     renderItem,
     ...rest
@@ -79,7 +76,10 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
           {...itemProps}
           key={model.id}
           id={`model-menu-${menuId}-item-${model.id}`}
-          onClick={(e: React.MouseEvent<HTMLLIElement>) => onPress(model, e)}
+          onClick={(e: React.MouseEvent<HTMLLIElement>) => {
+            e.stopPropagation();
+            onPress(model, e);
+          }}
           className={classNames("model-menu-item", !isNil(itemProps) ? itemProps.className : "", {
             active: isActive,
             focus: !isNil(focusedIndex) ? focusedIndex === indexMap[String(model.id)] : false,
@@ -96,27 +96,7 @@ export const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): 
         >
           {checkbox ? (
             <div className={"with-checkbox-wrapper"}>
-              <Checkbox
-                checked={includes(selected, model.id)}
-                onChange={(e: CheckboxChangeEvent) => {
-                  e.preventDefault();
-                  if (e.target.checked) {
-                    if (selected) {
-                      /* eslint-disable no-console */
-                      console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
-                    } else {
-                      onSelect(model, e);
-                    }
-                  } else {
-                    if (!selected) {
-                      /* eslint-disable no-console */
-                      console.warn(`Inconsistent State: Model with ID ${model.id} already in selected state.`);
-                    } else {
-                      onDeselect(model, e);
-                    }
-                  }
-                }}
-              />
+              <Checkbox checked={includes(selected, model.id)} />
               <VerticalFlexCenter>
                 {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
               </VerticalFlexCenter>
@@ -566,35 +546,6 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
                 visible={props.visible}
                 bordersForLevels={props.bordersForLevels}
                 level={0}
-                onSelect={(m: M, e: CheckboxChangeEvent) => {
-                  if (isMultipleModelMenuProps(props)) {
-                    const selectedModels = filter(
-                      map(selected, (id: number | string) => find(models, { id })),
-                      (mi: M | undefined) => mi !== undefined
-                    ) as M[];
-                    setSelected([...selected, m.id]);
-                    props.onChange([...selectedModels, m], e);
-                  } else {
-                    setSelected([m.id]);
-                    props.onChange(m, e);
-                  }
-                }}
-                onDeselect={(m: M, e: CheckboxChangeEvent) => {
-                  if (isMultipleModelMenuProps(props)) {
-                    const selectedModels = filter(
-                      map(selected, (id: number | string) => find(models, { id })),
-                      (mi: M | undefined) => mi !== undefined
-                    ) as M[];
-                    setSelected(filter(selected, (id: number | string) => id !== m.id));
-                    props.onChange(
-                      filter(selectedModels, (mi: M) => mi.id !== m.id),
-                      e
-                    );
-                  } else {
-                    setSelected([m.id]);
-                    props.onChange(m, e);
-                  }
-                }}
               />
               {!isNil(props.bottomItem) && (
                 <Menu.MenuItem
