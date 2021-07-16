@@ -1,6 +1,4 @@
-import { SyntheticEvent } from "react";
 import { isNil, filter } from "lodash";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLongArrowAltRight } from "@fortawesome/pro-light-svg-icons";
@@ -16,7 +14,7 @@ const SubAccountTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
   return (
     <ExpandedModelMenu<Model.SubAccountTreeNode>
       {...props}
-      onChange={(model: Model.SubAccountTreeNode, e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent) => {
+      onChange={(model: Model.SubAccountTreeNode, e: Table.CellDoneEditingEvent) => {
         const { children, in_search_path, ...rest } = model;
         props.onChange(rest, e);
       }}

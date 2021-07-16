@@ -1,9 +1,7 @@
 import React from "react";
-import { SyntheticEvent, useState, useEffect, useRef, useImperativeHandle } from "react";
+import { useState, useEffect, useRef, useImperativeHandle } from "react";
 import { map, isNil, includes, find, forEach, filter, flatten, reduce, groupBy } from "lodash";
 import { useLocation } from "react-router-dom";
-
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 import {
   CellEditingStoppedEvent,
@@ -307,7 +305,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   // problematic because we need to focus either the cell to the right (on Tab completion)
   // or the cell below (on Enter completion).  To accomplish this, we use a custom hook
   // to the CellEditor(s) that is manually called inside the CellEditor.
-  const onDoneEditing = useDynamicCallback((e: SyntheticEvent | KeyboardEvent | CheckboxChangeEvent) => {
+  const onDoneEditing = useDynamicCallback((e: Table.CellDoneEditingEvent) => {
     if (isKeyboardEvent(e) && !isNil(apis)) {
       const focusedCell = apis.grid.getFocusedCell();
       if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {

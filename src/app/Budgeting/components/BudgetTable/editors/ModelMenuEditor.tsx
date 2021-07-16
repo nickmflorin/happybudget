@@ -8,7 +8,7 @@ const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
 export interface IEditor<M extends Model.Model, V = M> {
-  onChange: (value: V | null, e: Table.CellDoneEditingEvent) => void;
+  onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
   isFirstRender: boolean;
   value: V | null;
   changedEvent: Table.CellDoneEditingEvent | null;
@@ -27,6 +27,7 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
   const isFirstRender = useTrackFirstRender();
   const [value, setValue] = useState<V | null>(params.value);
   const [changedEvent, setChangedEvent] = useState<Table.CellDoneEditingEvent | null>(null);
+  const [stopEditingOnChangeEvent, setStopEditingOnChangeEvent] = useState(true);
 
   const menuRef = useMemo(() => {
     if (!isNil(params.menuRef)) {
@@ -42,13 +43,18 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
   useEffect(() => {
     if (!isFirstRender && !isNil(changedEvent)) {
       setChangedEvent(null);
+      setStopEditingOnChangeEvent(true);
       if (isKeyboardEvent(changedEvent) && (changedEvent.code === "Enter" || changedEvent.code === "Tab")) {
         // Suppress keyboard navigation because we handle it ourselves.
-        params.stopEditing(true);
-        params.onDoneEditing(changedEvent);
+        if (stopEditingOnChangeEvent === true) {
+          params.stopEditing(true);
+          params.onDoneEditing(changedEvent);
+        }
       } else if (isSyntheticClickEvent(changedEvent)) {
-        params.stopEditing();
-        params.onDoneEditing(changedEvent);
+        if (stopEditingOnChangeEvent === true) {
+          params.stopEditing();
+          params.onDoneEditing(changedEvent);
+        }
       }
     }
   }, [useDeepEqualMemo(value), changedEvent]);
@@ -77,7 +83,8 @@ const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEd
       isFirstRender,
       value,
       changedEvent,
-      onChange: (model: V | null, e: Table.CellDoneEditingEvent) => {
+      onChange: (model: V | null, e: Table.CellDoneEditingEvent, stopEditing = true) => {
+        setStopEditingOnChangeEvent(stopEditing);
         setValue(model);
         setChangedEvent(e);
       }

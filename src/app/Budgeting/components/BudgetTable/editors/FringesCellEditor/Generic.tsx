@@ -24,7 +24,7 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       multiple={true}
       selected={map(editor.value, (v: Model.Fringe) => v.id)}
       models={props.fringes}
-      onChange={(ms: Model.Fringe[], e: Table.CellDoneEditingEvent) => editor.onChange(ms, e)}
+      onChange={(ms: Model.Fringe[], e: Table.CellDoneEditingEvent) => editor.onChange(ms, e, false)}
       menuRef={editor.menuRef}
       searchIndices={["name"]}
       focusSearchOnCharPress={true}
