@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { isNil } from "lodash";
@@ -25,6 +25,10 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
   const dispatch: Dispatch = useDispatch();
+
+  useEffect(() => {
+    form.resetFields();
+  }, [visible]);
 
   return (
     <Modal

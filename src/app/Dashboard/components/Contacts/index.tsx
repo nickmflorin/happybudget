@@ -38,7 +38,7 @@ const Contacts = (): JSX.Element => {
         <ContactsTable />
       </Page>
       <CreateContactModal
-        open={newContactModalOpen}
+        visible={newContactModalOpen}
         onCancel={() => setNewContactModalOpen(false)}
         onSuccess={() => setNewContactModalOpen(false)}
       />

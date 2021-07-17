@@ -4,7 +4,7 @@ import { isNil, find } from "lodash";
 
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
-import { EditContactModal } from "app/modals";
+import { EditContactModal, CreateContactModal } from "app/modals";
 import { getKeyValue } from "lib/util";
 import { parseFirstAndLastName } from "lib/model/util";
 import { useContacts } from "store/hooks";
@@ -19,6 +19,7 @@ interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "mana
 
 const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableProps): JSX.Element => {
   const [contactToEdit, setContactToEdit] = useState<Model.Contact | null>(null);
+  const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
   const contacts = useContacts();
   const budgetDetail = useSelector(selectBudgetDetail);
@@ -41,6 +42,9 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
             index: 2,
             cellRendererParams: {
               onEditContact: (contact: Model.Contact) => setContactToEdit(contact)
+            },
+            cellEditorParams: {
+              onNewContact: () => setCreateContactModalVisible(true)
             },
             // Required to allow the dropdown to be selectable on Enter key.
             suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
@@ -120,6 +124,11 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
           onCancel={() => setContactToEdit(null)}
         />
       )}
+      <CreateContactModal
+        visible={createContactModalVisible}
+        onSuccess={() => setCreateContactModalVisible(false)}
+        onCancel={() => setCreateContactModalVisible(false)}
+      />
     </React.Fragment>
   );
 };
