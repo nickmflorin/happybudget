@@ -2,8 +2,8 @@ import { Tag as ReactTag } from "components/tagging";
 import classNames from "classnames";
 import { isNil } from "lodash";
 import { Style } from "@react-pdf/types";
-import View from "./View";
-import Text from "./Text";
+import View from "./primitive/View";
+import Text from "./primitive/Text";
 
 const Tag = <M extends Model.Model = Model.Model>(params: TagProps<M, Style>): JSX.Element => {
   return (

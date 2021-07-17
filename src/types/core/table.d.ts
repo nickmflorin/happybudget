@@ -1,12 +1,5 @@
 /// <reference path="./modeling.d.ts" />
-
-
-type Animal = {
-  name: string;
-  color: string;
-}
-
-type Dog = Animal & { legs: number };
+/// <reference path="./ui.d.ts" />
 
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -76,6 +69,7 @@ namespace GenericTable {
     readonly isCalculated?: boolean;
     readonly columnType: GenericTable.ColumnTypeId;
     readonly nullValue?: GenericTable.NullValue;
+    readonly index?: number;
     readonly getRowValue?: (m: M) => R[keyof R];
   }
 
@@ -103,7 +97,6 @@ namespace Table {
     readonly excludeFromExport?: boolean;
     readonly budget?: FooterColumn<R>;
     readonly footer?: FooterColumn<R>;
-    readonly index?: number;
     readonly isCalculating?: boolean;
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
@@ -507,8 +500,21 @@ namespace BudgetTable {
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace PdfBudgetTable {
+
+  // Either the TopSheet page or an ID of the account.
+  type TableOption = "topsheet" | number;
+
   interface Options {
-    readonly excludeZeroTotals?: boolean;
+    readonly header: RichText.Block[];
+    readonly leftImage: File | Blob | null;
+    readonly leftInfo: RichText.Block[];
+    readonly rightImage: File | Blob | null;
+    readonly rightInfo: RichText.Block[];
+    readonly columns: GenericTable.Field<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>[];
+    readonly tables?: TableOption[] | null | undefined;
+    readonly excludeZeroTotals: boolean;
+    readonly notes?: RichText.Block[];
+    readonly includeNotes: boolean;
   }
 
   interface SubAccountRow extends PdfTable.Row {

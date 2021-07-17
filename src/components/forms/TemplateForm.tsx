@@ -11,7 +11,7 @@ import "./TemplateForm.scss";
 
 interface TemplateFormProps extends FormProps<Http.TemplatePayload> {
   imageUrl?: string | null;
-  onImageChange?: (f: File | Blob) => void;
+  onImageChange?: (f: File | Blob | null) => void;
 }
 
 const TemplateForm: React.FC<TemplateFormProps> = ({ imageUrl, onImageChange, ...props }) => {
@@ -23,12 +23,12 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ imageUrl, onImageChange, ..
       <Form.Item label={"Avatar"}>
         <UploadUserImage
           initialValue={imageUrl}
-          onChange={(f: File | Blob) => {
+          onChange={(f: UploadedData | null) => {
             if (!isNil(onImageChange)) {
-              onImageChange(f);
+              onImageChange(!isNil(f) ? f.file : null);
             }
           }}
-          onError={(error: string) => props.form.setGlobalError(error)}
+          onError={(error: Error | string) => props.form.setGlobalError(error)}
         />
       </Form.Item>
     </Form.Form>

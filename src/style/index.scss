@@ -52,8 +52,25 @@ code {
   }
 }
 
+.disabled {
+  pointer-events: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.fake-disabled {
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
 .ant-checkbox {
   top: 0rem !important;
+}
+
+form {
+  .ant-checkbox {
+    top: 0.3rem !important;
+  }
 }
 
 .ant-spin {

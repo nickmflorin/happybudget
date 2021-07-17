@@ -1,19 +1,23 @@
 import { useMemo } from "react";
 import classNames from "classnames";
-import { isNil } from "lodash";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
 import "./Spinner.scss";
 
-const DefaultSizeMap = {
-  small: 25,
-  medium: 35,
-  large: 45
+type SpinnerSize = "xsmall" | "small" | "medium" | "large" | "xlarge";
+
+/* eslint-disable no-unused-vars */
+const DefaultSizeMap: { [key in SpinnerSize]: number } = {
+  xsmall: 15,
+  small: 20,
+  medium: 25,
+  large: 30,
+  xlarge: 35
 };
 
 export interface SpinnerProps extends StandardComponentProps {
-  size?: number | "small" | "medium" | "large";
+  size?: number | SpinnerSize;
   color?: string;
   large?: boolean;
   medium?: boolean;
@@ -29,23 +33,24 @@ const Spinner = ({
   large,
   style = {}
 }: SpinnerProps): JSX.Element => {
-  const numericSize = useMemo(() => {
-    let baseSize = size;
+  const baseSize = useMemo<number | SpinnerSize>(() => {
     if (large === true) {
-      baseSize = "large";
+      return "large";
     } else if (medium === true) {
-      baseSize = "medium";
+      return "medium";
     } else if (small === true) {
-      baseSize = "small";
+      return "small";
     }
-    let sizeNumber: number = 25;
-    if (typeof baseSize === "string" && !isNil(DefaultSizeMap[baseSize])) {
-      sizeNumber = DefaultSizeMap[baseSize];
-    } else if (!isNil(size) && typeof size === "number") {
-      sizeNumber = size;
+    return size;
+  }, [size, small, medium, large]);
+
+  const numericSize = useMemo(() => {
+    if (typeof baseSize === "number") {
+      return baseSize;
+    } else {
+      return DefaultSizeMap[baseSize];
     }
-    return sizeNumber;
-  }, []);
+  }, [baseSize]);
 
   const spinnerStyle = useMemo(() => {
     const st: React.CSSProperties = { ...style };

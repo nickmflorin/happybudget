@@ -7,9 +7,49 @@ import { isAccountOrSubAccountForm } from "lib/model/typeguards";
 import "./EntityText.scss";
 
 export interface EntityTextProps extends StandardComponentProps {
-  children: Model.Entity | Model.SimpleEntity;
-  fillEmpty?: string;
+  readonly children: Model.Entity | Model.PdfEntity | Model.SimpleEntity;
+  readonly fillEmpty?: boolean | string;
 }
+
+interface TextProps extends StandardComponentProps {
+  readonly children?: string | undefined | null;
+  readonly fillEmpty?: boolean | string;
+}
+
+export const EntityTextDescription = ({ className, style, ...props }: TextProps): JSX.Element => {
+  const children = useMemo(() => {
+    if (!isNil(props.children)) {
+      return props.children;
+    } else if (props.fillEmpty === false) {
+      return "";
+    } else {
+      return props.fillEmpty === true ? "----" : props.fillEmpty;
+    }
+  }, [props.children, props.fillEmpty]);
+
+  return (
+    <span className={classNames("entity-text-description", className)} style={style}>
+      {children}
+    </span>
+  );
+};
+
+export const EntityTextIdentifier = ({ className, style, ...props }: TextProps): JSX.Element => {
+  const children = useMemo(() => {
+    if (!isNil(props.children)) {
+      return props.children;
+    } else if (props.fillEmpty === false) {
+      return "";
+    } else {
+      return props.fillEmpty === true ? "----" : props.fillEmpty;
+    }
+  }, [props.children, props.fillEmpty]);
+  return (
+    <span className={classNames("entity-text-identifier", className)} style={style}>
+      {children}
+    </span>
+  );
+};
 
 const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty, style = {} }) => {
   const identifier = useMemo(() => {
@@ -24,12 +64,17 @@ const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty,
     }
     return undefined;
   }, [children]);
+
   return (
-    <div className={classNames("entity-text", className)}>
+    <div className={classNames("entity-text", className)} style={style}>
       {(!isNil(identifier) || !isNil(fillEmpty)) && (
-        <span className={classNames("identifier")}>{!isNil(identifier) ? identifier : fillEmpty}</span>
+        <EntityTextIdentifier fillEmpty={fillEmpty}>{identifier}</EntityTextIdentifier>
       )}
-      {!isNil(description) && <span className={"description"}>{description}</span>}
+      {!isNil(description) && (
+        <EntityTextDescription className={classNames({ "with-identifier": !isNil(identifier) || !isNil(fillEmpty) })}>
+          {description}
+        </EntityTextDescription>
+      )}
     </div>
   );
 };

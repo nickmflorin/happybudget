@@ -6,11 +6,12 @@ form {
 }
 
 .label-base {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 22px;
   color: $text-secondary;
   font-family: $open-sans;
   font-weight: 600 !important;
+  height: 36px !important;
 }
 
 .form {
@@ -58,14 +59,30 @@ form {
   }
 }
 
-label {
+label,
+.label {
   @extend .label-base;
+
+  &--section {
+    font-size: 13px;
+    color: $text-primary;
+  }
 }
 
 .ant-form-item-label {
-  padding-bottom: 2px !important;
-  label {
+  padding-bottom: 0px !important;
+  height: 36px;
+
+  label,
+  .label {
     @extend .label-base;
+    margin-bottom: 2px;
+
+    &--section {
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: $text-primary;
+    }
   }
 }
 
@@ -73,8 +90,14 @@ label {
   margin-bottom: 0px !important;
 }
 
-.ant-form-item {
-  margin-bottom: 10px;
+.form-item {
+  margin-bottom: 5px;
+
+  &.form-item-section {
+    .form-item {
+      margin-bottom: 0px;
+    }
+  }
 
   // When a text field in a form has an error, do not give the text field a
   // red border and highlight the prefix icon red.
@@ -86,6 +109,10 @@ label {
         color: unset !important;
       }
     }
+  }
+
+  *:last-child {
+    margin-bottom: 0px !important;
   }
 
   .ant-form-item-extra {
@@ -108,6 +135,8 @@ label {
   }
 
   .ant-form-item-control {
+    width: 100%;
+
     .ant-form-item-extra {
       font-size: 12px;
       line-height: 12px;
@@ -157,6 +186,23 @@ label {
     }
     .ant-form-item-explain.ant-form-item-explain-error {
       color: $red;
+    }
+  }
+}
+
+.ant-switch {
+  background-color: $gray-light;
+  .ant-switch-inner {
+    color: $black;
+    font-size: 8px;
+    font-weight: bold;
+  }
+
+  &.ant-switch-checked {
+    background-color: $green;
+
+    .ant-switch-inner {
+      color: $white;
     }
   }
 }

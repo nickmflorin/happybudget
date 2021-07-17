@@ -1,22 +1,16 @@
-import { ReactNode } from "react";
-import Spinner, { SpinnerProps } from "./Spinner";
+import React, { ReactNode } from "react";
+import WrappedSpinner, { WrappedSpinnerProps } from "./WrappedSpinner";
 
-import SpinnerWrapper from "./SpinnerWrapper";
-
-interface RenderOrSpinnerProps extends SpinnerProps {
-  loading?: boolean;
-  children: ReactNode;
+interface RenderOrSpinnerProps extends WrappedSpinnerProps {
+  readonly loading?: boolean;
+  readonly children: ReactNode | JSX.Element | JSX.Element;
 }
 
-const RenderOrSpinner = ({ loading, className, style = {}, children, ...props }: RenderOrSpinnerProps): JSX.Element => {
+const RenderOrSpinner = ({ children, loading, ...props }: RenderOrSpinnerProps): JSX.Element => {
   if (loading === true) {
-    return (
-      <SpinnerWrapper className={className} style={style}>
-        <Spinner {...props} />
-      </SpinnerWrapper>
-    );
+    return <WrappedSpinner {...props} />;
   }
-  return <>{children}</>;
+  return <React.Fragment>{children}</React.Fragment>;
 };
 
 export default RenderOrSpinner;

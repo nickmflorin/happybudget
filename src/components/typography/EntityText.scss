@@ -7,17 +7,20 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
 
-  .identifier {
-    font-family: $open-sans;
-    font-weight: 600;
-    color: #b5b5b5;
-  }
+.entity-text-identifier {
+  font-family: $open-sans;
+  font-weight: 600;
+  color: #b5b5b5;
+}
 
-  .description {
-    font-family: $open-sans;
-    font-weight: 600;
-    color: $text-secondary;
+.entity-text-description {
+  font-family: $open-sans;
+  font-weight: 600;
+  color: $text-secondary;
+
+  &.with-identifier {
     margin-left: 5px;
   }
 }

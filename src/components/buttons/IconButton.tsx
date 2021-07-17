@@ -1,30 +1,24 @@
 import { ReactNode } from "react";
 import classNames from "classnames";
-import Button from "./Button";
+import Button, { ButtonProps } from "./Button";
 
-interface IconButtonProps extends StandardComponentProps {
+export interface IconButtonProps extends Omit<ButtonProps, "size" | "icon"> {
   icon: ReactNode;
-  children?: ReactNode;
   size?: "small" | "medium" | "large";
-  disabled?: boolean;
-  [key: string]: any;
 }
 
 /**
  * A consistently styled Button component for buttons that contain just an Icon.
  */
-const IconButton = ({ children, disabled = false, icon, size = "medium", ...props }: IconButtonProps): JSX.Element => (
+const IconButton = ({ icon, size = "medium", ...props }: IconButtonProps): JSX.Element => (
   <Button
     {...props}
+    icon={icon}
     className={classNames("btn--icon-only", props.className, {
       medium: size === "medium",
       small: size === "small",
-      large: size === "large",
-      disabled
+      large: size === "large"
     })}
-    icon={icon}
-    children={children}
-    style={props.style}
   />
 );
 

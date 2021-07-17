@@ -5,7 +5,7 @@ import { ClientError } from "api";
 export interface FormInstance<T> extends RootFormInstance<T> {
   readonly handleRequestError: (e: Error) => void;
   readonly renderFieldErrors: (e: ClientError) => void;
-  readonly setGlobalError: (e: string) => void;
+  readonly setGlobalError: (e: Error | string) => void;
   readonly setLoading: (value: boolean) => void;
   readonly globalError: string | undefined;
   readonly loading: boolean | undefined;

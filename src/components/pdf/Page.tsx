@@ -1,39 +1,40 @@
-import { ReactNode } from "react";
-import { Page as ReactPDFPage } from "@react-pdf/renderer";
-import classNames from "classnames";
-import { PageSize } from "@react-pdf/types";
+import { isNil } from "lodash";
 
-import { mergeStylesFromClassName } from "style/pdf";
-import Text from "./Text";
-import View from "./View";
+import { View, BasePage } from "./primitive";
+import { BasePageProps } from "./primitive/Page";
+import { Label } from "./text";
 
-interface PageProps extends StandardPdfComponentProps {
-  readonly size?: PageSize;
-  readonly children: ReactNode;
-  readonly debug?: boolean;
-  readonly title?: string;
-  readonly subTitle?: string;
+interface PageProps extends BasePageProps {
+  readonly header?: JSX.Element | null;
+  readonly footer?: JSX.Element | null;
 }
 
-const Page = (props: PageProps): JSX.Element => {
+const Page = ({ header, footer, children, ...props }: PageProps): JSX.Element => {
   return (
-    <ReactPDFPage
-      size={props.size || "A4"}
-      debug={props.debug}
-      style={{ ...mergeStylesFromClassName(classNames("page", props.className)), ...props.style }}
-      wrap={true}
-    >
-      <View className={"page-header"} fixed={true}>
-        <Text className={"page-header-title"}>{props.title}</Text>
-        <Text className={"page-header-subtitle"}>{props.subTitle}</Text>
+    <BasePage {...props}>
+      {!isNil(header) ? (
+        <View className={"page-header"} wrap={false}>
+          {header}
+        </View>
+      ) : (
+        <></>
+      )}
+      <View className={"page-content"}>{!isNil(children) ? children : <></>}</View>
+      {!isNil(footer) ? (
+        <View className={"page-footer"} wrap={false}>
+          {footer}
+        </View>
+      ) : (
+        <></>
+      )}
+      <View className={"page-footer"} wrap={false}>
+        <Label
+          fixed={true}
+          className={"page-number"}
+          render={(params: Pdf.PageRenderParams) => `Page ${params.pageNumber}`}
+        />
       </View>
-      <View className={"page-content"}>{props.children}</View>
-      <Text
-        fixed={true}
-        className={"page-footer-page-no-text"}
-        render={(params: { pageNumber: number }) => `Page ${params.pageNumber}`}
-      />
-    </ReactPDFPage>
+    </BasePage>
   );
 };
 

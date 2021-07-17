@@ -30,7 +30,7 @@ const Profile = (): JSX.Element => {
             last_name: user.last_name,
             timezone: user.timezone
           }}
-          onImageChange={(f: File | Blob) => setFile(f)}
+          onImageChange={(f: File | Blob | null) => setFile(f)}
           imageUrl={user.profile_image}
           onFinish={(values: Partial<Http.UserPayload>) => {
             const submit = (payload: Partial<Http.UserPayload>) => {
@@ -48,11 +48,14 @@ const Profile = (): JSX.Element => {
                 });
             };
             if (!isNil(file)) {
-              getBase64(file, (result: ArrayBuffer | string | null) => {
-                if (result !== null) {
+              getBase64(file)
+                .then((result: ArrayBuffer | string) => {
                   submit({ ...values, profile_image: result });
-                }
-              });
+                })
+                .catch((e: Error) => {
+                  /* eslint-disable no-console */
+                  console.error(e);
+                });
             } else {
               submit(values);
             }

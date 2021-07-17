@@ -5,11 +5,7 @@ import { isNil, map } from "lodash";
 
 import { faCommentsAlt, faPrint } from "@fortawesome/pro-solid-svg-icons";
 
-import * as api from "api";
-import { download } from "lib/util/files";
-
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
-import { setApplicationLoadingAction } from "store/actions";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
@@ -20,7 +16,7 @@ import {
   selectSubAccountUnits
 } from "../../../store/selectors";
 import * as actions from "../../../store/actions/budget/subAccount";
-import { generatePdf } from "../../../pdf";
+import { PreviewModal } from "../../../pdf";
 import BudgetSubAccountsTable from "../SubAccountsTable";
 import FringesModal from "./FringesModal";
 
@@ -48,6 +44,7 @@ interface SubAccountsTableProps {
 }
 
 const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element => {
+  const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Model.Group | undefined>(undefined);
@@ -121,19 +118,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
             tooltip: "Export as PDF",
             icon: faPrint,
             text: "Export PDF",
-            onClick: () => {
-              if (!isNil(budgetId)) {
-                dispatch(setApplicationLoadingAction(true));
-                generatePdf(budgetId)
-                  .then((response: Blob) => {
-                    download(response, !isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf", {
-                      includeExtensionInName: false
-                    });
-                  })
-                  .catch((e: Error) => api.handleRequestError(e))
-                  .finally(() => dispatch(setApplicationLoadingAction(false)));
-              }
-            }
+            onClick: () => setPreviewModalVisible(true)
           },
           {
             tooltip: "Comments",
@@ -167,6 +152,14 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         />
       )}
       <FringesModal open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
+      {!isNil(budgetId) && (
+        <PreviewModal
+          visible={previewModalVisible}
+          onCancel={() => setPreviewModalVisible(false)}
+          budgetId={budgetId}
+          filename={!isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf"}
+        />
+      )}
     </React.Fragment>
   );
 };

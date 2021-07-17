@@ -3,8 +3,7 @@ import { StyleSheet, Font } from "@react-pdf/renderer";
 import { Style } from "@react-pdf/types";
 import { forEach, isNil, map } from "lodash";
 
-const TABLE_BORDER_COLOR = "#F7F7F7";
-const TABLE_BORDER_RADIUS = 8;
+import { Colors, TABLE_BORDER_RADIUS } from "./constants";
 
 type FontVariant = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";
 type PdfFont = { family: string; variants: FontVariant[] };
@@ -42,39 +41,135 @@ export const registerFonts = () => {
   map(PdfFonts, (font: PdfFont) => registerFont(font));
 };
 
-// TODO: We might have to fork @react-pdf so that display: table works,
-// because theirs disallows it.
-// TODO: Eventually, we want to figure out a way to load our SCSS files and
-// pull constants from there.
+const StyleMixins: ReactPDF.Styles = StyleSheet.create({
+  header: {
+    fontFamily: "OpenSans"
+  }
+});
+
+// TODO: It would be nice to reference constants from SCSS files.
 const Styles: ReactPDF.Styles = StyleSheet.create({
   page: {
     flexDirection: "column",
     backgroundColor: "white",
     padding: 25
   },
-  "page-header": {},
-  "page-header-title": {
-    fontFamily: "OpenSans",
-    color: "#404152",
-    fontWeight: 700,
-    fontSize: 24
+  "page-header": {
+    marginBottom: 20
   },
-  "page-header-subtitle": {
-    fontFamily: "OpenSans",
-    color: "#000000",
-    fontWeight: 600,
-    fontSize: 14
+  "budget-page-header": {},
+  "budget-page-primary-header": {},
+  "budget-page-sub-header": {
+    display: "flex",
+    minHeight: 70,
+    marginTop: 20,
+    flexDirection: "row"
+  },
+  "budget-page-sub-header-left": {
+    width: "50%",
+    display: "flex",
+    flexDirection: "row"
+  },
+  "budget-page-sub-header-right": {
+    width: "50%",
+    display: "flex",
+    flexDirection: "row"
+  },
+  "budget-page-sub-header-image": {
+    width: 70,
+    height: 70,
+    objectFit: "contain",
+    marginRight: 15,
+    borderRadius: 10
+  },
+  "budget-page-sub-header-rich-text": {
+    flexGrow: 100
   },
   "page-content": {
     flexGrow: 100
   },
-  "page-footer-page-no-text": {
+  // Used to display a blank page when the PDF has no valid pages to render.
+  "page-no-data-content": {
+    display: "flex",
+    justifyContent: "center",
+    flexDirection: "column",
+    height: "100%"
+  },
+  "page-no-data-text": {
+    textAlign: "center",
     fontFamily: "OpenSans",
-    color: "#000000",
-    fontWeight: 600,
+    color: "#404152",
+    fontWeight: 700,
+    fontSize: 20
+  },
+  "page-footer": {
+    marginTop: 15
+  },
+  notes: {},
+  "notes-container": {
+    border: `1px solid ${Colors.TABLE_BORDER}`,
+    borderRadius: 10,
+    padding: 15,
+    minHeight: "50pt"
+  },
+  "notes-text": {},
+  "page-number": {
     fontSize: 10,
     textAlign: "right",
-    width: "100%"
+    width: "100%",
+    marginTop: 4
+  },
+  paragraph: {
+    fontFamily: "Roboto",
+    fontSize: 11,
+    color: Colors.TEXT_PRIMARY,
+    lineHeight: "1.5pt"
+  },
+  label: {
+    fontFamily: "OpenSans",
+    fontSize: 12,
+    fontWeight: 600,
+    color: Colors.TEXT_PRIMARY,
+    lineHeight: "1.5pt",
+    marginBottom: 4
+  },
+  bold: { fontWeight: 700 },
+  italic: { fontStyle: "italic" },
+  h1: {
+    ...StyleMixins.header,
+    fontWeight: 700,
+    fontSize: 24,
+    color: Colors.TEXT_SECONDARY
+  },
+  h2: {
+    ...StyleMixins.header,
+    fontWeight: 700,
+    fontSize: 20,
+    color: Colors.TEXT_SECONDARY
+  },
+  h3: {
+    ...StyleMixins.header,
+    fontWeight: 600,
+    fontSize: 16,
+    color: Colors.TEXT_PRIMARY
+  },
+  h4: {
+    ...StyleMixins.header,
+    fontWeight: 600,
+    fontSize: 14,
+    color: Colors.TEXT_PRIMARY
+  },
+  h5: {
+    ...StyleMixins.header,
+    fontWeight: 400,
+    fontSize: 12,
+    color: Colors.TEXT_PRIMARY
+  },
+  h6: {
+    ...StyleMixins.header,
+    fontWeight: 400,
+    fontSize: 10,
+    color: Colors.TEXT_PRIMARY
   },
   table: {
     // Note: react-pdf does not "support" display: table, even though it works fine,
@@ -93,12 +188,12 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     borderRightWidth: 1,
     borderTopWidth: 0,
     borderBottomWidth: 0,
-    borderColor: TABLE_BORDER_COLOR
+    borderColor: Colors.TABLE_BORDER
   },
   "body-tr": { height: "20pt", backgroundColor: "white" },
   "header-tr": {
     height: "22pt",
-    backgroundColor: TABLE_BORDER_COLOR,
+    backgroundColor: Colors.TABLE_BORDER,
     borderTopLeftRadius: TABLE_BORDER_RADIUS,
     borderTopRightRadius: TABLE_BORDER_RADIUS,
     border: "none"
@@ -107,10 +202,13 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     borderLeftWidth: 0,
     borderRightWidth: 0
   },
+  "subaccount-tr": {},
+  "detail-tr": {},
+  "subaccount-footer-tr": {},
   "detail-group-tr": {},
   "footer-tr": {
     height: "22pt",
-    backgroundColor: TABLE_BORDER_COLOR,
+    backgroundColor: Colors.TABLE_BORDER,
     borderBottomRightRadius: TABLE_BORDER_RADIUS,
     borderBottomLeftRadius: TABLE_BORDER_RADIUS,
     border: "none"
@@ -120,7 +218,7 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   },
   "account-sub-header-tr": {
     height: "22pt",
-    backgroundColor: TABLE_BORDER_COLOR,
+    backgroundColor: Colors.TABLE_BORDER,
     border: "none"
   },
   th: {
@@ -140,7 +238,7 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     borderTopWidth: 0,
     borderBottomWidth: 0,
     borderRightWidth: 0,
-    borderColor: TABLE_BORDER_COLOR
+    borderColor: Colors.TABLE_BORDER
   },
   "td-border-right": {
     borderRightWidth: 1
@@ -168,6 +266,9 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   "indent-td": {
     paddingLeft: 18
   },
+  "detail-td": {},
+  "subaccount-td": {},
+  "subaccount-footer-td": {},
   "detail-group-indent-td": {
     paddingLeft: 14
   },
@@ -202,6 +303,9 @@ export const mergeStylesFromClassName = (className: string | undefined): Style =
     const classStyles: Style | undefined = Styles[csName.trim()];
     if (!isNil(classStyles)) {
       mergedStyle = { ...mergedStyle, ...classStyles };
+    } else {
+      /* eslint-disable no-console */
+      console.warn(`Unrecognized class name ${csName}`);
     }
   });
   return mergedStyle;

@@ -1,46 +1,24 @@
-import React, { ReactNode } from "react";
-import { ShowHide } from "components";
-import Spinner, { SpinnerProps } from "./Spinner";
-import SpinnerWrapper from "./SpinnerWrapper";
+import { ReactNode, useMemo } from "react";
+import WrappedSpinner, { WrappedSpinnerProps } from "./WrappedSpinner";
 
-interface RenderWithSpinnerProps extends SpinnerProps {
-  loading?: boolean;
-  toggleOpacity?: boolean;
-  children: ReactNode;
-  className?: string;
+interface RenderWithSpinnerProps extends WrappedSpinnerProps {
+  readonly loading?: boolean;
+  readonly toggleOpacity?: boolean;
+  readonly children: ReactNode | JSX.Element | JSX.Element[];
 }
 
-const RenderWithSpinner = ({
-  loading,
-  className,
-  toggleOpacity = false,
-  children,
-  ...props
-}: RenderWithSpinnerProps): JSX.Element => {
-  return (
-    <React.Fragment>
-      <ShowHide show={toggleOpacity === true}>
-        <React.Fragment>
-          {loading === true && (
-            <SpinnerWrapper>
-              <Spinner {...props} />
-            </SpinnerWrapper>
-          )}
-          <div style={{ opacity: loading ? 0.3 : 1 }}>{children}</div>
-        </React.Fragment>
-      </ShowHide>
-      <ShowHide show={toggleOpacity === false}>
-        <React.Fragment>
-          {loading === true && (
-            <SpinnerWrapper>
-              <Spinner {...props} />
-            </SpinnerWrapper>
-          )}
-          {children}
-        </React.Fragment>
-      </ShowHide>
-    </React.Fragment>
-  );
+const RenderWithSpinner = ({ loading, toggleOpacity = false, ...props }: RenderWithSpinnerProps): JSX.Element => {
+  const children = useMemo(() => {
+    if (toggleOpacity === true) {
+      return <div style={{ opacity: loading ? 0.3 : 1 }}>{props.children}</div>;
+    }
+    return props.children;
+  }, [props.children, toggleOpacity]);
+
+  if (loading === true) {
+    return <WrappedSpinner {...props}>{children}</WrappedSpinner>;
+  }
+  return <>{children}</>;
 };
 
 export default RenderWithSpinner;

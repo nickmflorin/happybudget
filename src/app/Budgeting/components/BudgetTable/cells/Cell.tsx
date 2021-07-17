@@ -2,12 +2,9 @@ import React, { ReactNode, useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-
 import { ICellRendererParams, ColDef, Column } from "@ag-grid-community/core";
 
-import { IconButton } from "components/buttons";
+import { ClearButton } from "components/buttons";
 import { ShowHide } from "components";
 import LoadableCellWrapper from "./LoadableCellWrapper";
 
@@ -60,11 +57,8 @@ const Cell = <R extends Table.Row>(props: CellProps<R>): JSX.Element => {
           <span className={"cell-content"}>{props.children}</span>
         </LoadableCellWrapper>
         {showClearButton && (
-          <IconButton
-            className={"btn--clear-cell"}
-            size={"small"}
-            icon={<FontAwesomeIcon icon={faTimesCircle} />}
-            onClick={(event: React.MouseEventHandler<HTMLElement>) => {
+          <ClearButton
+            onClick={(event: React.MouseEvent<HTMLElement>) => {
               // TODO: Figure out how to stop propogation!
               !isNil(props.onClear) && !isNil(props.colDef) && props.onClear(row, props.colDef);
             }}

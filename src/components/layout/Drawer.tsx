@@ -3,10 +3,11 @@ import { Dispatch } from "redux";
 import ClickAwayListener from "react-click-away-listener";
 import { useDispatch } from "react-redux";
 import classNames from "classnames";
-import { setDrawerVisibilityAction } from "store/actions";
-import { isNodeDescendantOf } from "lib/util";
-import Portal from "./Portal";
 import { isNil } from "lodash";
+
+import { setDrawerVisibilityAction } from "store/actions";
+import { isNodeDescendantOf } from "lib/util/html";
+import Portal from "./Portal";
 
 interface DrawerSectionProps {
   children: ReactNode;

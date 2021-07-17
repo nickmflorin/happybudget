@@ -1,8 +1,8 @@
 import { ReactNode } from "react";
 import { Text as ReactPDFText } from "@react-pdf/renderer";
-import createPdfComponent, { PdfComponentProps } from "./createPdfComponent";
+import createPdfComponent from "./createPdfComponent";
 
-interface TextPdfComponentProps extends PdfComponentProps {
+export interface TextProps extends StandardPdfComponentProps {
   readonly render?: (params: {
     pageNumber: number;
     totalPages: number;
@@ -11,6 +11,6 @@ interface TextPdfComponentProps extends PdfComponentProps {
   }) => ReactNode;
 }
 
-const Text = createPdfComponent<TextPdfComponentProps>(ReactPDFText);
+const Text = createPdfComponent<TextProps>(ReactPDFText);
 
 export default Text;

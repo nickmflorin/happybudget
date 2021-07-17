@@ -3,6 +3,7 @@ import { getKeyValue } from "lib/util";
 import { FringeUnitModels } from "lib/model";
 
 export * from "./tabling";
+export * from "./richtext";
 
 export const getFringesNominalAdditions = (value: number, fringes: Model.Fringe[]): number[] => {
   const additionalValues: number[] = [];

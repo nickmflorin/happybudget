@@ -1,4 +1,5 @@
 export * from "./tabling";
+export * from "./richtext";
 
 export const isFieldAlterationEvent = (
   event: Model.FieldAlterationEvent | Model.CreateEvent
@@ -14,16 +15,18 @@ export const isTemplateForm = (obj: Model.Entity | Model.SimpleEntity): obj is M
   return (obj as Model.TemplateForm).type === "template";
 };
 
-export const isAccountForm = (obj: Model.Entity | Model.SimpleEntity): obj is Model.AccountForm => {
+export const isAccountForm = (obj: Model.Entity | Model.PdfEntity | Model.SimpleEntity): obj is Model.AccountForm => {
   return (obj as Model.AccountForm).type === "account";
 };
 
-export const isSubAccountForm = (obj: Model.Entity | Model.SimpleEntity): obj is Model.SubAccountForm => {
+export const isSubAccountForm = (
+  obj: Model.Entity | Model.PdfEntity | Model.SimpleEntity
+): obj is Model.SubAccountForm => {
   return (obj as Model.SubAccountForm).type === "subaccount";
 };
 
 export const isAccountOrSubAccountForm = (
-  obj: Model.Entity | Model.SimpleEntity
+  obj: Model.Entity | Model.PdfEntity | Model.SimpleEntity
 ): obj is Model.AccountForm | Model.SubAccountForm => {
   return isAccountForm(obj) || isSubAccountForm(obj);
 };
@@ -57,3 +60,11 @@ export const isUserWithImage = (user: Model.User | Model.SimpleUser | Model.Cont
   isContact(user)
     ? (user as Model.Contact).image !== null
     : (user as Model.User | Model.SimpleUser).profile_image !== null;
+
+export const isUploadParamsWithError = (params: UploadFileParams): params is UploadFileParamsWithError => {
+  return (params as UploadFileParamsWithError).error !== undefined;
+};
+
+export const isUploadParamsWithData = (params: UploadFileParams): params is UploadFileParamsWithData => {
+  return (params as UploadFileParamsWithData).data !== undefined;
+};

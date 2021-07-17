@@ -53,16 +53,18 @@ namespace Model {
   type LineType = "account" | "subaccount";
   type SimpleLineItem = Model.SimpleAccount | Model.SimpleSubAccount;
   type LineItem = Model.Account | Model.SubAccount;
+  type PdfLineItem = Model.PdfAccount | Model.PdfSubAccount;
 
   type BudgetType = "budget" | "template";
   type EntityType = BudgetType | LineType;
   type Entity = Model.LineItem | Model.Budget | Model.Template;
   type SimpleEntity = Model.SimpleLineItem | Model.SimpleBudget | Model.SimpleTemplate;
+  type PdfEntity = Model.PdfLineItem | Model.PdfBudget;
 
   type TemplateForm = Model.Template | Model.SimpleTemplate;
   type BudgetForm = Model.Budget | Model.SimpleBudget;
-  type AccountForm = Model.Account | Model.SimpleAccount;
-  type SubAccountForm = Model.SubAccount | Model.SimpleSubAccount;
+  type AccountForm = Model.Account | Model.SimpleAccount | Model.PdfAccount;
+  type SubAccountForm = Model.SubAccount | Model.SimpleSubAccount | Model.PdfSubAccount;
 
   type ModelWithColor = Model.Model & { color: string | null };
   type ModelWithName = Model.Model & { name: string | null };

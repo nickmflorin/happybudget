@@ -76,6 +76,19 @@ export const toAgGridColDef = <R extends Table.Row = Table.Row, M extends Model.
   return original as ColDef;
 };
 
+export const orderColumns = <C extends GenericTable.Column<R, M>, R extends Table.Row, M extends Model.Model>(
+  columns: C[]
+): C[] => {
+  const columnsWithIndex = filter(columns, (col: C) => !isNil(col.index));
+  const columnsWithoutIndexNotCalculated = filter(columns, (col: C) => isNil(col.index) && col.isCalculated !== true);
+  const columnsWithoutIndexCalculated = filter(columns, (col: C) => isNil(col.index) && col.isCalculated === true);
+  return [
+    ...orderBy(columnsWithIndex, ["index"], ["asc"]),
+    ...columnsWithoutIndexNotCalculated,
+    ...columnsWithoutIndexCalculated
+  ];
+};
+
 export const cellChangeToNestedCellChange = <R extends Table.Row, M extends Model.Model>(
   cellChange: Table.CellChange<R, M>
 ): Table.NestedCellChange<R, M> => {

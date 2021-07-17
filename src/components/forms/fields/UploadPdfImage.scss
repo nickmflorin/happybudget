@@ -1,0 +1,29 @@
+@import "style/colors";
+@import "style/variables";
+@import "style/typography";
+
+.pdf-image-uploader {
+  border: 1px dashed $gray-light;
+  border-radius: $input-border-radius;
+  max-width: 100%;
+  min-width: 200px;
+  height: 32px;
+  width: 50%;
+  display: flex;
+
+  .ant-upload {
+    justify-content: left !important;
+    text-align: left !important;
+  }
+
+  svg {
+    margin-left: 10px;
+  }
+
+  .upload-text {
+    font-family: $roboto;
+    font-size: 12px;
+    margin-left: 10px;
+    flex-grow: 100;
+  }
+}

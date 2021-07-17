@@ -9,7 +9,7 @@ import "./BudgetForm.scss";
 
 interface BudgetFormProps extends FormProps<Http.BudgetPayload> {
   imageUrl?: string | null;
-  onImageChange?: (f: File | Blob) => void;
+  onImageChange?: (f: File | Blob | null) => void;
   templates?: Model.Template[] | Model.SimpleTemplate[];
   templatesLoading?: boolean;
 }
@@ -57,12 +57,12 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ imageUrl, onImageChange, templa
       <Form.Item label={"Avatar"} rules={[{ required: false }]}>
         <UploadUserImage
           initialValue={imageUrl || undefined}
-          onChange={(f: File | Blob) => {
+          onChange={(f: UploadedData | null) => {
             if (!isNil(onImageChange)) {
-              onImageChange(f);
+              onImageChange(!isNil(f) ? f.file : null);
             }
           }}
-          onError={(error: string) => props.form.setGlobalError(error)}
+          onError={(error: Error | string) => props.form.setGlobalError(error)}
         />
       </Form.Item>
     </Form.Form>

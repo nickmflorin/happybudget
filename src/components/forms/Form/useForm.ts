@@ -41,7 +41,13 @@ const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
         antdForm.resetFields();
       },
       setLoading,
-      setGlobalError: setGlobalError,
+      setGlobalError: (e: Error | string) => {
+        if (typeof e === "string") {
+          setGlobalError(e);
+        } else {
+          setGlobalError(!isNil(e.message) ? e.message : `${e}`);
+        }
+      },
       renderFieldErrors: renderFieldErrors,
       handleRequestError: (e: Error) => {
         if (e instanceof ClientError) {

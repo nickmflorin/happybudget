@@ -84,11 +84,12 @@ const CreateBudgetModal = ({
             };
 
             if (!isNil(file)) {
-              getBase64(file, (result: ArrayBuffer | string | null) => {
-                if (result !== null) {
-                  submit({ ...values, image: result });
-                }
-              });
+              getBase64(file)
+                .then((result: ArrayBuffer | string) => submit({ ...values, image: result }))
+                .catch((e: Error) => {
+                  /* eslint-disable no-console */
+                  console.error(e);
+                });
             } else {
               submit(values);
             }
@@ -100,7 +101,7 @@ const CreateBudgetModal = ({
     >
       <BudgetForm
         form={form}
-        onImageChange={(f: File | Blob) => setFile(f)}
+        onImageChange={(f: File | Blob | null) => setFile(f)}
         templatesLoading={templatesLoading !== undefined ? templatesLoading : _templatesLoading}
         templates={
           allowTemplateSelection === true && isNil(templateId)

@@ -14,17 +14,6 @@ export const hashString = (s: string): number =>
     return a & a;
   }, 0);
 
-export const isNodeDescendantOf = (parent: HTMLElement | Element, child: HTMLElement | Element) => {
-  var node = child.parentNode;
-  while (node != null) {
-    if (node === parent) {
-      return true;
-    }
-    node = node.parentNode;
-  }
-  return false;
-};
-
 export const removeFromArray = (items: any[], key: any, value: any) => {
   const newItems = [...items];
   const index = findIndex(newItems, [key, value]);

@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo } from "react";
+import React, { useEffect, forwardRef, useMemo } from "react";
 import { filter, isNil, find, indexOf, map } from "lodash";
 import classNames from "classnames";
 
@@ -9,7 +9,10 @@ import Error from "./Error";
 import Footer from "./Footer";
 import { FormProps } from "./model";
 import useForm from "./useForm";
-import { useEffect } from "react";
+import FormItemStyle from "./FormItemStyle";
+import FormItemSection from "./FormItemSection";
+import FormItemComp from "./FormItem";
+import FormLabel from "./FormLabel";
 
 export * from "./model";
 
@@ -209,7 +212,10 @@ const exportable = {
   Error: Error,
   useForm: useForm,
   Footer: Footer,
-  Item: RootForm.Item
+  Item: FormItemComp,
+  ItemStyle: FormItemStyle,
+  ItemSection: FormItemSection,
+  Label: FormLabel
 };
 
 export default exportable;

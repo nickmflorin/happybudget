@@ -105,14 +105,14 @@ const AccountTable = ({
                 >(columns, details, subaccountRow.model.groups, {
                   defaultNullValue: ""
                 });
-
                 runningIndex = runningIndex + 1;
                 let subRows: JSX.Element[] = reduce(
                   subTable,
-                  (subRws: JSX.Element[], detailRowGroup: RowGroupType, detailRowGroupIndex: number) => {
+                  (subRws: JSX.Element[], detailRowGroup: RowGroupType) => {
                     const newSubTableRows = [
                       ...subRws,
-                      ...map(detailRowGroup.rows, (detailRow: ModelWithRowType, j: number): JSX.Element => {
+                      ...map(detailRowGroup.rows, (detailRow: ModelWithRowType): JSX.Element => {
+                        runningIndex = runningIndex + 1;
                         const element = (
                           <BodyRow<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>
                             key={runningIndex}
@@ -136,11 +136,11 @@ const AccountTable = ({
                             }}
                           />
                         );
-                        runningIndex = runningIndex + 1;
                         return element;
                       })
                     ];
                     if (!isNil(detailRowGroup.group)) {
+                      runningIndex = runningIndex + 1;
                       newSubTableRows.push(
                         <GroupRow
                           className={"detail-group-tr"}
@@ -161,7 +161,6 @@ const AccountTable = ({
                           }}
                         />
                       );
-                      runningIndex = runningIndex + 1;
                     }
                     return newSubTableRows;
                   },
@@ -179,6 +178,7 @@ const AccountTable = ({
 
                 if (showSubAccountFooterRow === true) {
                   const footerRow: PdfBudgetTable.SubAccountRow = createSubAccountFooterRow(subaccountRow.model);
+                  runningIndex = runningIndex + 1;
                   subRows = [
                     ...subRows,
                     <BodyRow
@@ -191,19 +191,17 @@ const AccountTable = ({
                       style={!isLastSubAccount ? { borderBottomWidth: 1 } : {}}
                     />
                   ];
-                  runningIndex += 1;
                 }
-
                 return subRows;
               }
             )
           )
         ];
         if (!isNil(subaccountRowGroup.group)) {
+          runningIndex = runningIndex + 1;
           newRows.push(
             <GroupRow group={subaccountRowGroup.group} index={runningIndex} key={runningIndex} columns={columns} />
           );
-          runningIndex = runningIndex + 1;
         }
         return newRows;
       },
@@ -220,6 +218,7 @@ const AccountTable = ({
       ]
     );
     if (showFooterRow === true) {
+      runningIndex = runningIndex + 1;
       rows = [...rows, <FooterRow index={runningIndex} key={runningIndex} columns={columns} />];
     }
     return rows;

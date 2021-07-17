@@ -1,5 +1,6 @@
 @import "./variables";
 @import "./colors";
+@import "./typography";
 
 // This is to get rid of the blue-background that Chrome sometimes sets on
 // auto-fill fields.
@@ -145,4 +146,61 @@ textarea {
   border: 1px solid transparent !important;
   min-height: 36px !important;
   font-size: 12px;
+}
+
+.ant-select-multiple {
+  .ant-select-selection-item-remove > .anticon {
+    vertical-align: -0.1em;
+  }
+  .ant-select-selection-item-content {
+    font-size: 11px;
+    color: $text-primary;
+    font-family: $roboto;
+  }
+}
+
+.select-base {
+  font-size: 12px;
+  width: 100%;
+  border-radius: $input-border-radius;
+}
+
+.select-disabled-base {
+  background-color: $gray-light;
+}
+
+.select {
+  @extend .select-base;
+  &.disabled {
+    @extend .select-disabled-base;
+  }
+}
+
+.ant-select-item-option {
+  color: $text-secondary;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: $roboto;
+  min-height: 32px;
+  height: 32px;
+
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    color: $text-secondary;
+    font-weight: 600;
+    background-color: #e6f7ff;
+  }
+}
+
+.ant-select {
+  .ant-select-selector {
+    @extend .select-base;
+  }
+  &.ant-select-open .ant-select-arrow svg {
+    color: $black;
+  }
+  &.disabled {
+    .ant-select-selector {
+      @extend .select-disabled-base;
+    }
+  }
 }

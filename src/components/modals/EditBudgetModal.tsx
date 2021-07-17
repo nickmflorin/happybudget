@@ -47,11 +47,12 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
             };
 
             if (!isNil(file)) {
-              getBase64(file, (result: ArrayBuffer | string | null) => {
-                if (result !== null) {
-                  submit({ ...values, image: result });
-                }
-              });
+              getBase64(file)
+                .then((result: ArrayBuffer | string) => submit({ ...values, image: result }))
+                .catch((e: Error) => {
+                  /* eslint-disable no-console */
+                  console.error(e);
+                });
             } else {
               submit(values);
             }
@@ -63,7 +64,7 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
     >
       <BudgetForm
         form={form}
-        onImageChange={(f: File | Blob) => setFile(f)}
+        onImageChange={(f: File | Blob | null) => setFile(f)}
         imageUrl={budget.image}
         initialValues={{ name: budget.name }}
       />

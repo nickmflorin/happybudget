@@ -42,6 +42,10 @@ interface StandardPdfComponentProps {
   readonly className?: string;
   readonly style?: import("@react-pdf/renderer").Styles;
   readonly debug?: boolean;
+  readonly children?: ReactNode;
+  readonly debug?: boolean;
+  readonly fixed?: boolean;
+  readonly wrap?: boolean;
 }
 
 type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : never;
@@ -296,4 +300,10 @@ interface SubAccountTreeMenuProps
   readonly onSearch: (value: string) => void;
   readonly search: string;
   readonly childrenDefaultVisible?: boolean;
+}
+
+interface ClickableProps extends StandardComponentProps {
+  readonly disabled?: boolean;
+  readonly tooltip?: Partial<TooltipPropsWithTitle>;
+  readonly icon?: ReactNode;
 }

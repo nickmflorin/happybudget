@@ -1,0 +1,90 @@
+@import "style/colors";
+
+.export-preview-modal {
+  overflow: hidden;
+  width: 90vw !important;
+  height: 80vh;
+  // 769 comes from the height of the modal-body plus the 70px height of the modal
+  // header.
+  //
+  // Modal Header:     70px
+  // Modal Body:       699px
+  //                      =  653px (Previewer)
+  //                          = 36px (Label)
+  //                          = 36px (Pagination)
+  //                          = 571px (Renderer - Set from Aspect Ratio)
+  //                          = 10px (Margin)
+  //                      =  36px (Padding Bottom)
+  //                      =  10px (Padding Top)
+  // ------------------------
+  //                    769px
+  max-height: 769px;
+
+  .ant-modal-header {
+    height: 70px;
+    padding-top: 24px;
+    padding-bottom: 12px;
+
+    .ant-modal-title {
+      font-size: 32px;
+      line-height: 34px;
+    }
+  }
+
+  .ant-modal-close {
+    .ant-modal-close-x {
+      padding-left: 36px;
+      padding-right: 36px;
+      height: 70px;
+      width: 70px;
+      position: relative;
+    }
+  }
+
+  .ant-modal-content {
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+
+    .ant-modal-body {
+      padding-bottom: 36px;
+      height: calc(80vh - 70px);
+      // 699 comes from the 653 height of the previewer plus the 36px padding
+      // on the bottom of the modal body and 10px padding on the top of the
+      // modal body.
+      //
+      // Previewer:        653px
+      //                      = 36px (Label)
+      //                      = 36px (Pagination)
+      //                      = 571px (Renderer - Set from Aspect Ratio)
+      //                      = 10px (Margin)
+      // Padding Bottom:   36px
+      // Padding Top:      10px
+      // ------------------------
+      //                    699px
+      max-height: 699px;
+      overflow-y: hidden;
+
+      .export-preview-modal-body {
+        display: flex;
+        height: 100%;
+
+        .form-container {
+          flex-grow: 100;
+          max-height: 100%;
+          overflow-y: scroll;
+          margin-right: 10px;
+          padding-right: 20px;
+
+          .export-form {
+            max-height: 100%;
+          }
+        }
+        .preview-container {
+          width: 404px !important;
+          max-height: 100%;
+        }
+      }
+    }
+  }
+}

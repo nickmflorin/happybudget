@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useImperativeHandle, useRef } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, concat, filter, reduce, find, orderBy } from "lodash";
+import { map, isNil, includes, concat, filter, reduce, find } from "lodash";
 import Cookies from "universal-cookie";
 
 import {
@@ -22,6 +22,7 @@ import { WrapInApplicationSpinner, ShowHide } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { updateFieldOrdering } from "lib/util";
 import { agCurrencyValueFormatter } from "lib/model/formatters";
+import { orderColumns } from "lib/model/util";
 
 import { validateCookiesOrdering, mergeClassNames, mergeClassNamesFn } from "./util";
 import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
@@ -409,20 +410,7 @@ const BudgetTable = <
   }, [useDeepEqualMemo(cookies)]);
 
   useEffect(() => {
-    const columnsWithIndex = filter(columns, (col: Table.Column<R, M>) => !isNil(col.index));
-    const columnsWithoutIndexNotCalculated = filter(
-      columns,
-      (col: Table.Column<R, M>) => isNil(col.index) && col.isCalculated !== true
-    );
-    const columnsWithoutIndexCalculated = filter(
-      columns,
-      (col: Table.Column<R, M>) => isNil(col.index) && col.isCalculated === true
-    );
-    const orderedColumns = [
-      ...orderBy(columnsWithIndex, ["index"], ["asc"]),
-      ...columnsWithoutIndexNotCalculated,
-      ...columnsWithoutIndexCalculated
-    ];
+    const orderedColumns = orderColumns<Table.Column<R, M>, R, M>(columns);
 
     let base: Table.Column<R, M>[] = [IndexColumn()];
     if (!isNil(onRowExpand)) {

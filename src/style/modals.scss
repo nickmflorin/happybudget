@@ -1,6 +1,10 @@
 @import "style/colors";
 @import "style/typography";
 
+.ant-modal {
+  padding-bottom: 0px;
+}
+
 .ant-modal-content {
   border-radius: 10px;
 
@@ -24,22 +28,30 @@
     }
   }
 
-  .ant-modal-close-x {
-    padding-top: 40px;
-    padding-bottom: 28px;
-    padding-left: 36px;
-    padding-right: 36px;
-    height: 84px;
-    width: 88px;
-    position: relative;
+  .ant-modal-close {
+    .ant-modal-close-x {
+      padding-left: 36px;
+      padding-right: 36px;
+      height: 84px;
+      width: 88px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
 
-    > * {
-      display: block;
-    }
-    svg {
-      height: 16px;
-      width: 16px;
-      color: $text-secondary !important;
+      > * {
+        display: block;
+      }
+      .ant-modal-close-icon {
+        height: 16px;
+        width: 16px;
+
+        svg {
+          height: 16px;
+          width: 16px;
+          color: $text-secondary !important;
+        }
+      }
     }
   }
 

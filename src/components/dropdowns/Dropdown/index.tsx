@@ -6,7 +6,7 @@ import { uniqueId } from "lodash";
 import { Dropdown as AntdDropdown } from "antd";
 import { DropDownProps } from "antd/lib/dropdown";
 
-import { isNodeDescendantOf } from "lib/util";
+import { isNodeDescendantOf } from "lib/util/html";
 
 import { DropdownMenu } from "components/menus";
 import { IDropdownMenu, IDropdownMenuItem } from "components/menus/DropdownMenu";

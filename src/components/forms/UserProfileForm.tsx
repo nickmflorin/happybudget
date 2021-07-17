@@ -4,6 +4,8 @@ import classNames from "classnames";
 
 import { Input, Button } from "antd";
 
+import * as typeguards from "lib/model/typeguards";
+
 import { Form } from "components";
 import { UserImageOrInitials, EditImageOverlay } from "components/images";
 import { FormProps } from "components/forms/Form";
@@ -11,7 +13,7 @@ import { UploadUserImage, TimezoneSelect } from "./fields";
 
 interface UserProfileFormProps extends FormProps<Http.UserPayload> {
   imageUrl?: string | null;
-  onImageChange?: (f: File | Blob) => void;
+  onImageChange?: (f: File | Blob | null) => void;
 }
 
 const UserProfileForm: React.FC<UserProfileFormProps> = ({ imageUrl, onImageChange, ...props }): JSX.Element => {
@@ -50,17 +52,17 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ imageUrl, onImageChan
       <Form.Item label={"Avatar"}>
         <UploadUserImage
           initialValue={imageUrl}
-          onChange={(f: File | Blob) => {
+          onChange={(f: UploadedData | null) => {
             if (!isNil(onImageChange)) {
-              onImageChange(f);
+              onImageChange(!isNil(f) ? f.file : null);
             }
           }}
-          onError={(error: string) => props.form.setGlobalError(error)}
-          renderContent={(url: string | null) => {
+          onError={(error: Error | string) => props.form.setGlobalError(error)}
+          renderContentNoError={(params: UploadFileParamsNoError) => {
             return (
               <UserImageOrInitials
                 circle={true}
-                src={url}
+                src={typeguards.isUploadParamsWithData(params) ? params.data.url : undefined}
                 firstName={firstName}
                 lastName={lastName}
                 overlay={() => <EditImageOverlay visible={true} />}

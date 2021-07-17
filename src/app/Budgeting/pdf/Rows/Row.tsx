@@ -19,7 +19,7 @@ const Row = <R extends PdfTable.Row, M extends Model.Model>(
   }
 ): JSX.Element => {
   return (
-    <View style={props.style} className={classNames("tr", props.className)}>
+    <View style={props.style} className={classNames("tr", props.className)} wrap={false}>
       {map(props.columns, (column: PdfTable.Column<R, M>, colIndex: number) => {
         return props.renderCell({
           column,

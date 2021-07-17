@@ -57,11 +57,12 @@ const CreateTemplateModal = ({
                 });
             };
             if (!isNil(file)) {
-              getBase64(file, (result: ArrayBuffer | string | null) => {
-                if (result !== null) {
-                  submit({ ...values, image: result });
-                }
-              });
+              getBase64(file)
+                .then((result: ArrayBuffer | string) => submit({ ...values, image: result }))
+                .catch((e: Error) => {
+                  /* eslint-disable no-console */
+                  console.error(e);
+                });
             } else {
               submit(values);
             }
@@ -71,7 +72,7 @@ const CreateTemplateModal = ({
           });
       }}
     >
-      <TemplateForm form={form} onImageChange={(f: File | Blob) => setFile(f)} initialValues={{}} />
+      <TemplateForm form={form} onImageChange={(f: File | Blob | null) => setFile(f)} initialValues={{}} />
     </Modal>
   );
 };
