@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { isNil } from "lodash";
 
-import { updateBudget } from "api/services";
+import * as api from "api";
 import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { BudgetForm } from "components/forms";
-import { BudgetFormValues } from "components/forms/BudgetForm";
 import Modal from "./Modal";
 
 interface EditBudgetModalProps {
@@ -17,7 +16,7 @@ interface EditBudgetModalProps {
 
 const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalProps): JSX.Element => {
   const [file, setFile] = useState<File | Blob | null>(null);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Http.BudgetPayload>({ isInModal: true });
 
   return (
     <Modal
@@ -30,10 +29,11 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
       onOk={() => {
         form
           .validateFields()
-          .then((values: BudgetFormValues) => {
+          .then((values: Http.BudgetPayload) => {
             const submit = (payload: Http.BudgetPayload) => {
               form.setLoading(true);
-              updateBudget(budget.id, payload)
+              api
+                .updateBudget(budget.id, payload)
                 .then((newBudget: Model.Budget) => {
                   form.resetFields();
                   onSuccess(newBudget);
@@ -63,7 +63,6 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
     >
       <BudgetForm
         form={form}
-        name={"form_in_modal"}
         onImageChange={(f: File | Blob) => setFile(f)}
         imageUrl={budget.image}
         initialValues={{ name: budget.name }}

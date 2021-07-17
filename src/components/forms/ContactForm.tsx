@@ -8,17 +8,18 @@ import { ContactTypes } from "lib/model";
 import { Form } from "components";
 import { FormProps } from "components/forms/Form";
 import { PhoneNumberInput } from "./fields";
+import "./ContactForm.scss";
 
 const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, globalError }) => {
   return (
     <Form.Form
+      className={"contact-form"}
       form={form}
       globalError={globalError}
       layout={"vertical"}
-      name={"form_in_modal"}
       initialValues={initialValues}
     >
-      <Form.Item name={"type"} label={"Type"} className={"type-select"}>
+      <Form.Item name={"type"} label={"Type"}>
         <Select suffixIcon={<FontAwesomeIcon icon={faCaretDown} />} placeholder={"Contractor"}>
           {ContactTypes.map((model: Model.ContactType, index: number) => (
             <Select.Option key={index} value={model.id}>

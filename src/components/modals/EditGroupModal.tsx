@@ -2,7 +2,6 @@ import * as api from "api";
 
 import { Form } from "components";
 import { GroupForm } from "components/forms";
-import { GroupFormValues } from "components/forms/GroupForm";
 
 import Modal from "./Modal";
 
@@ -14,7 +13,7 @@ interface EditSubAccountGroupModalProps {
 }
 
 const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubAccountGroupModalProps): JSX.Element => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Http.GroupPayload>({ isInModal: true });
 
   return (
     <Modal
@@ -27,7 +26,7 @@ const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubA
       onOk={() => {
         form
           .validateFields()
-          .then((values: GroupFormValues) => {
+          .then((values: Http.GroupPayload) => {
             form.setLoading(true);
             api
               .updateGroup(group.id, values)
@@ -47,7 +46,7 @@ const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubA
           });
       }}
     >
-      <GroupForm form={form} name={"form_in_modal"} initialValues={{ name: group.name, color: group.color }} />
+      <GroupForm form={form} initialValues={{ name: group.name, color: group.color }} />
     </Modal>
   );
 };

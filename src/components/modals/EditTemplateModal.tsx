@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { isNil } from "lodash";
 
-import { updateTemplate } from "api/services";
+import * as api from "api";
 import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
-import { TemplateFormValues } from "components/forms/TemplateForm";
 import Modal from "./Modal";
 
 interface EditTemplateModalProps {
@@ -17,7 +16,7 @@ interface EditTemplateModalProps {
 
 const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplateModalProps): JSX.Element => {
   const [file, setFile] = useState<File | Blob | null>(null);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
 
   return (
     <Modal
@@ -30,10 +29,11 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
       onOk={() => {
         form
           .validateFields()
-          .then((values: TemplateFormValues) => {
+          .then((values: Http.TemplatePayload) => {
             const submit = (payload: Partial<Http.TemplatePayload>) => {
               form.setLoading(true);
-              updateTemplate(template.id, payload)
+              api
+                .updateTemplate(template.id, payload)
                 .then((newTemplate: Model.Template) => {
                   form.resetFields();
                   onSuccess(newTemplate);
@@ -62,7 +62,6 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
     >
       <TemplateForm
         form={form}
-        name={"form_in_modal"}
         onImageChange={(f: File | Blob) => setFile(f)}
         imageUrl={template.image}
         initialValues={{ name: template.name }}

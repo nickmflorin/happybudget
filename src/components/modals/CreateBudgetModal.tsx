@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { isNil } from "lodash";
 
-import { createBudget, getTemplates } from "api/services";
+import * as api from "api";
 import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { BudgetForm } from "components/forms";
-import { BudgetFormValues } from "components/forms/BudgetForm";
 
 import Modal from "./Modal";
 
@@ -34,12 +33,13 @@ const CreateBudgetModal = ({
   const [_templates, setTemplates] = useState<Model.SimpleTemplate[]>([]);
 
   const [file, setFile] = useState<File | Blob | null>(null);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Http.BudgetPayload>({ isInModal: true });
 
   useEffect(() => {
     if (allowTemplateSelection === true && isNil(templates) && isNil(templateId)) {
       setTemplatesLoading(true);
-      getTemplates({ no_pagination: true })
+      api
+        .getTemplates({ no_pagination: true })
         .then((response: Http.ListResponse<Model.SimpleTemplate>) => {
           setTemplates(response.data);
         })
@@ -63,13 +63,14 @@ const CreateBudgetModal = ({
       onOk={() => {
         form
           .validateFields()
-          .then((values: BudgetFormValues) => {
+          .then((values: Http.BudgetPayload) => {
             const submit = (payload: Http.BudgetPayload) => {
               if (!isNil(templateId)) {
                 payload = { ...payload, template: templateId };
               }
               form.setLoading(true);
-              createBudget(payload)
+              api
+                .createBudget(payload)
                 .then((budget: Model.Budget) => {
                   form.resetFields();
                   onSuccess(budget);
@@ -108,7 +109,6 @@ const CreateBudgetModal = ({
               : _templates
             : undefined
         }
-        name={"form_in_modal"}
         initialValues={{}}
       />
     </Modal>

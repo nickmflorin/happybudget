@@ -2,7 +2,6 @@ import * as api from "api";
 
 import { Form } from "components";
 import { GroupForm } from "components/forms";
-import { GroupFormValues } from "components/forms/GroupForm";
 
 import Modal from "./Modal";
 
@@ -21,7 +20,7 @@ const CreateTemplateAccountGroupModal = ({
   onSuccess,
   onCancel
 }: CreateTemplateAccountGroupModalProps): JSX.Element => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Http.GroupPayload>({ isInModal: true });
 
   return (
     <Modal
@@ -34,7 +33,7 @@ const CreateTemplateAccountGroupModal = ({
       onOk={() => {
         form
           .validateFields()
-          .then((values: GroupFormValues) => {
+          .then((values: Http.GroupPayload) => {
             form.setLoading(true);
 
             api
@@ -59,7 +58,7 @@ const CreateTemplateAccountGroupModal = ({
           });
       }}
     >
-      <GroupForm form={form} name={"form_in_modal"} initialValues={{}} />
+      <GroupForm form={form} initialValues={{}} />
     </Modal>
   );
 };

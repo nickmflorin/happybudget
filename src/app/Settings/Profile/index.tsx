@@ -16,7 +16,7 @@ import "./index.scss";
 
 const Profile = (): JSX.Element => {
   const [file, setFile] = useState<File | Blob | null>(null);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Http.UserPayload>();
   const user = useLoggedInUser();
   const dispatch: Dispatch = useDispatch();
 

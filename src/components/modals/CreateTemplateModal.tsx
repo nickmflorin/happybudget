@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { isNil } from "lodash";
 
-import { createTemplate, createCommunityTemplate } from "api/services";
+import * as api from "api";
 import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
-import { TemplateFormValues } from "components/forms/TemplateForm";
 import { useLoggedInUser } from "store/hooks";
 
 import Modal from "./Modal";
@@ -25,7 +24,7 @@ const CreateTemplateModal = ({
 }: CreateTemplateModalProps): JSX.Element => {
   const user = useLoggedInUser();
   const [file, setFile] = useState<File | Blob | null>(null);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
 
   return (
     <Modal
@@ -38,10 +37,10 @@ const CreateTemplateModal = ({
       onOk={() => {
         form
           .validateFields()
-          .then((values: TemplateFormValues) => {
-            let service = createTemplate;
+          .then((values: Http.TemplatePayload) => {
+            let service = api.createTemplate;
             if (community === true && user.is_staff === true) {
-              service = createCommunityTemplate;
+              service = api.createCommunityTemplate;
             }
             const submit = (payload: Http.TemplatePayload) => {
               form.setLoading(true);
@@ -72,12 +71,7 @@ const CreateTemplateModal = ({
           });
       }}
     >
-      <TemplateForm
-        form={form}
-        onImageChange={(f: File | Blob) => setFile(f)}
-        name={"form_in_modal"}
-        initialValues={{}}
-      />
+      <TemplateForm form={form} onImageChange={(f: File | Blob) => setFile(f)} initialValues={{}} />
     </Modal>
   );
 };

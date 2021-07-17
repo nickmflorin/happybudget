@@ -7,12 +7,7 @@ import { FormProps } from "components/forms/Form";
 import { UploadUserImage } from "./fields";
 import "./BudgetForm.scss";
 
-export interface BudgetFormValues {
-  name: string;
-  template?: number;
-}
-
-interface BudgetFormProps extends FormProps<BudgetFormValues> {
+interface BudgetFormProps extends FormProps<Http.BudgetPayload> {
   imageUrl?: string | null;
   onImageChange?: (f: File | Blob) => void;
   templates?: Model.Template[] | Model.SimpleTemplate[];
@@ -25,7 +20,7 @@ const BudgetForm: React.FC<BudgetFormProps> = ({ imageUrl, onImageChange, templa
       className={"budget-form"}
       layout={"vertical"}
       {...props}
-      onFinish={(values: BudgetFormValues) => {
+      onFinish={(values: Http.BudgetPayload) => {
         let payload = { ...values };
         if (payload.template === undefined) {
           const { template, ...newPayload } = payload;

@@ -9,11 +9,7 @@ import { FormProps } from "components/forms/Form";
 import { UploadUserImage } from "./fields";
 import "./TemplateForm.scss";
 
-export interface TemplateFormValues {
-  name: string;
-}
-
-interface TemplateFormProps extends FormProps<TemplateFormValues> {
+interface TemplateFormProps extends FormProps<Http.TemplatePayload> {
   imageUrl?: string | null;
   onImageChange?: (f: File | Blob) => void;
 }

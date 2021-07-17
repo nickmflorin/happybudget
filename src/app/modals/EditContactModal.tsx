@@ -11,8 +11,6 @@ import { Modal } from "components/modals";
 
 import { updateContactInStateAction } from "store/actions";
 
-import "./ContactModal.scss";
-
 interface EditContactModalProps {
   contact: Model.Contact;
   visible: boolean;
@@ -23,7 +21,7 @@ interface EditContactModalProps {
 const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContactModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true });
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
@@ -32,7 +30,6 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
 
   return (
     <Modal
-      className={"contact-modal"}
       title={`Edit Contact: ${contact.full_name}`}
       visible={visible}
       onCancel={() => onCancel()}

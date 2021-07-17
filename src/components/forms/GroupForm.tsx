@@ -8,12 +8,7 @@ import { Form } from "components";
 import { FormProps } from "components/forms/Form";
 import { ColorSelect } from "./fields";
 
-export interface GroupFormValues {
-  name: string;
-  color: string;
-}
-
-const GroupForm: React.FC<FormProps<GroupFormValues>> = ({ ...props }) => {
+const GroupForm: React.FC<FormProps<Http.GroupPayload>> = ({ ...props }) => {
   const [colors, loading, error] = useGroupColors();
 
   useEffect(() => {

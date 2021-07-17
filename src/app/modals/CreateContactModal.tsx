@@ -10,8 +10,6 @@ import { Modal } from "components/modals";
 
 import { addContactToStateAction } from "store/actions";
 
-import "./ContactModal.scss";
-
 interface CreateContactModalProps {
   visible: boolean;
   onCancel: () => void;
@@ -20,7 +18,7 @@ interface CreateContactModalProps {
 
 const CreateContactModal = ({ visible, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true });
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
@@ -29,7 +27,6 @@ const CreateContactModal = ({ visible, onCancel, onSuccess }: CreateContactModal
 
   return (
     <Modal
-      className={"contact-modal"}
       title={"Create a New Contact"}
       visible={visible}
       onCancel={() => onCancel()}
@@ -39,7 +36,7 @@ const CreateContactModal = ({ visible, onCancel, onSuccess }: CreateContactModal
       onOk={() => {
         form
           .validateFields()
-          .then((values: any) => {
+          .then((values: Http.ContactPayload) => {
             setLoading(true);
             api
               .createContact(values)

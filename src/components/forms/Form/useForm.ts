@@ -5,7 +5,7 @@ import { ClientError, NetworkError, parseGlobalError, parseFieldErrors, standard
 import { replaceInArray } from "lib/util";
 import { FormInstance } from "./model";
 
-const useForm = <T extends { [key: string]: any } = { [key: string]: any }>(form?: FormInstance<T> | undefined) => {
+const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
   const _useAntdForm = RootForm.useForm();
   const antdForm = _useAntdForm[0];
 
@@ -29,7 +29,7 @@ const useForm = <T extends { [key: string]: any } = { [key: string]: any }>(form
     antdForm.setFields(fieldsWithErrors);
   };
 
-  const wrapForm = useMemo(() => {
+  const wrapForm = useMemo<FormInstance<T>>(() => {
     return {
       ...antdForm,
       submit: () => {
@@ -60,7 +60,8 @@ const useForm = <T extends { [key: string]: any } = { [key: string]: any }>(form
         }
       },
       globalError,
-      loading
+      loading,
+      ...form
     };
   }, [form, antdForm, globalError, loading]);
   return [wrapForm];
