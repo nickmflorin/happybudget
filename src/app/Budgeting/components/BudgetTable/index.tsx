@@ -352,7 +352,6 @@ const BudgetTable = <
 
   const BodyColumn = useDynamicCallback<Table.Column<R, M>>((col: Table.Column<R, M>): Table.Column<R, M> => {
     return {
-      cellRenderer: "BodyCell",
       ...col,
       headerComponentParams: {
         ...col.headerComponentParams,
