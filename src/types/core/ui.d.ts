@@ -139,19 +139,23 @@ type MultipleTagsProps<M extends Model.M = Model.M> = StandardComponentProps & {
 }
 
 type ModelMenuRef<M extends Model.M> = {
-    readonly incrementFocusedIndex: () => void;
-    readonly decrementFocusedIndex: () => void;
-    readonly focus: (value: boolean) => void;
-    readonly getModelAtFocusedIndex: () => M | null;
-    readonly performActionAtFocusedIndex: () => void;
-    readonly focused: boolean;
-  };
+  readonly incrementFocusedIndex: () => void;
+  readonly decrementFocusedIndex: () => void;
+  readonly focus: (value: boolean) => void;
+  readonly getModelAtFocusedIndex: () => M | null;
+  readonly performActionAtFocusedIndex: () => void;
+  readonly focused: boolean;
+};
 
-type EmptyItem = {
-  readonly onClick?: (event: import("react").SyntheticEvent | KeyboardEvent) => void;
+type IExtraModelMenuItem = {
+  readonly onClick?: (e: Table.CellDoneEditingEvent) => void;
   readonly text: string;
   readonly icon?: JSX.Element;
-  readonly defaultFocus?: boolean;
+  readonly showOnNoSearchResults?: boolean;
+  readonly focusOnNoSearchResults?: boolean;
+  readonly leaveAtBottom?: boolean;
+  readonly showOnNoData?: boolean;
+  readonly focusOnNoData?: boolean;
 };
 
 interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
@@ -172,9 +176,7 @@ interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
   readonly searchIndices?: (string[] | string)[] | undefined;
   readonly visible?: number[];
   readonly hidden?: number[];
-  readonly bottomItem?: Omit<EmptyItem, "defaultFocus">;
-  readonly onNoData?: EmptyItem;
-  readonly onNoSearchResults?: EmptyItem;
+  readonly extra?: IExtraModelMenuItem[];
   readonly autoFocus?: boolean;
   readonly leftAlign?: boolean;
   readonly bordersForLevels?: boolean;

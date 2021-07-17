@@ -33,23 +33,18 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
       autoFocusMenu={true}
       leftAlign={true}
       fillWidth={false}
-      bottomItem={{
-        onClick: () => props.onAddFringes(),
-        text: "Add Fringes",
-        icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />
-      }}
-      onNoData={{
-        onClick: () => props.onAddFringes(),
-        text: "Add Fringes",
-        icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />,
-        defaultFocus: true
-      }}
-      onNoSearchResults={{
-        onClick: () => props.onAddFringes(),
-        text: "Add Fringes",
-        icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />,
-        defaultFocus: true
-      }}
+      extra={[
+        {
+          onClick: () => props.onAddFringes(),
+          text: "Add Fringes",
+          icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />,
+          showOnNoSearchResults: true,
+          showOnNoData: true,
+          focusOnNoSearchResults: true,
+          focusOnNoData: true,
+          leaveAtBottom: true
+        }
+      ]}
     />
   );
 };

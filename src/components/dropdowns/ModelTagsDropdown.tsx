@@ -33,12 +33,7 @@ export type ModelTagsDropdownProps<M extends Model.Model, V extends number = num
     tagProps?: TagProps<M>;
     models: M[];
     onMissing?: JSX.Element | EmptyTagProps;
-    onNoData?: {
-      onClick?: () => void;
-      text: string;
-      icon?: JSX.Element;
-      defaultFocused?: boolean;
-    };
+    extra?: IExtraModelMenuItem[];
   };
 
 const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
@@ -50,7 +45,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
     return (data as MultipleModelTagsDropdownProps<M>).multiple === true;
   };
 
-  const { onNoData, ...dropdownProps } = props;
+  const { extra, ...dropdownProps } = props;
 
   if (isMultiple(props)) {
     let selectedPresentModels: M[] = [];
@@ -72,7 +67,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
             tagProps={props.tagProps}
             onChange={props.onChange}
             multiple={true}
-            onNoData={onNoData}
+            extra={extra}
           />
         }
       >
@@ -99,7 +94,7 @@ const ModelTagsDropdown = <M extends Model.Model, V extends number = number>(
             tagProps={props.tagProps}
             onChange={props.onChange}
             multiple={false}
-            onNoData={onNoData}
+            extra={extra}
           />
         }
       >

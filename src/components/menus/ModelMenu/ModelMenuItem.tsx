@@ -18,6 +18,18 @@ export const ModelMenuItems = <M extends Model.M>(props: ModelMenuItemsProps<M>)
   );
 };
 
+export const ExtraModelMenuItem = (props: IExtraModelMenuItem & { active: boolean }): JSX.Element => {
+  return (
+    <Menu.MenuItem
+      className={classNames("model-menu-item", "model-menu-item--empty", { active: props.active })}
+      onClick={(e: React.MouseEvent<HTMLLIElement>) => !isNil(props.onClick) && props.onClick(e)}
+    >
+      {!isNil(props.icon) && <div className={"icon-container"}>{props.icon}</div>}
+      {props.text}
+    </Menu.MenuItem>
+  );
+};
+
 const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): JSX.Element => {
   const { model, ...primary } = props;
   const {
