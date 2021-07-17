@@ -37,7 +37,6 @@ const isUnfocusedState = (state: MenuState): state is MenuUnfocusedState => {
 };
 
 const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => {
-  const [selected, setSelected] = useState<(number | string)[]>([]);
   const [state, setState] = useState<MenuState>({ focused: false });
   const firstRender = useTrackFirstRender();
   const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("model-menu-")), [props.id]);
@@ -80,12 +79,11 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     return mapping;
   }, [useDeepEqualMemo(models)]);
 
-  useEffect(() => {
+  const selected = useMemo<(number | string)[]>(() => {
     if (isNil(props.selected)) {
-      setSelected([]);
-    } else {
-      setSelected(Array.isArray(props.selected) ? props.selected : [props.selected]);
+      return [];
     }
+    return Array.isArray(props.selected) ? props.selected : [props.selected];
   }, [props.selected]);
 
   const noData = useMemo(() => {
@@ -137,11 +135,8 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
       // the last active selection instead of defaulting to the first selected model
       // in the array.
       forEach(selectedState, (id: number | string) => {
-        const modelItems: GenericModelItem<M>[] = filter(availableItems, (item: GenericItem<M>) =>
-          isModelItem(item)
-        ) as GenericModelItem<M>[];
         const m: GenericModelItem<M> | undefined = find(
-          modelItems,
+          availableModelItems,
           (item: GenericModelItem<M>) => item.model.id === id
         );
         // It might be the case that the selected model does not exist in the
@@ -199,7 +194,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
         // If we are not already in the index focused state, first check to see
         // if there is a selection (i.e. value) - in which case, we will set the
         // index based on that value.
-        let setIndexFromSelected = setIndexFromSelectedState(selected);
+        const setIndexFromSelected = setIndexFromSelectedState(selected);
 
         if (setIndexFromSelected === false) {
           // If we cannot set the index based on a selected value, check to see if
@@ -296,17 +291,14 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
         (m: M | undefined) => m !== undefined
       ) as M[];
       if (includes(selected, model.id)) {
-        setSelected(filter(selected, (id: number | string) => id !== model.id));
         props.onChange(
           filter(selectedModels, (m: M) => m.id !== model.id),
           event
         );
       } else {
-        setSelected([...selected, model.id]);
         props.onChange([...selectedModels, model], event);
       }
     } else {
-      setSelected([model.id]);
       props.onChange(model, event);
     }
   });
@@ -388,7 +380,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
           <ModelMenuItems<M>
             menuId={menuId}
             models={map(topLevelModelItems, (item: GenericModelItem<M>) => item.model)}
-            focusedIndex={isFocusedState(state) && !isNil(topLevelModelItems[state.index]) ? state.index : null}
+            focusedIndex={isFocusedState(state) ? state.index : null}
             checkbox={isMultipleModelMenuProps(props) && props.checkbox === true}
             multiple={isMultipleModelMenuProps(props)}
             onPress={(m: M, e: SyntheticEvent) => onMenuItemClick(m, e)}

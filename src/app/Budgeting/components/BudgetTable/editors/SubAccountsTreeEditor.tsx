@@ -40,7 +40,7 @@ const SubAccountsTreeEditor = ({ setSearch, ...props }: SubAccountsTreeEditorPro
       menuLoading={loading}
       onSearch={(v: string) => setSearch(v)}
       search={search}
-      selected={!isNil(editor.value) ? { id: editor.value.id, type: editor.value.type } : null}
+      selected={!isNil(editor.value) ? editor.value.id : null}
       nodes={subAccountsTree}
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}

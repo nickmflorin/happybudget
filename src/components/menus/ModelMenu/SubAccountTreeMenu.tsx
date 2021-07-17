@@ -1,4 +1,4 @@
-import { isNil, filter } from "lodash";
+import { isNil, filter, map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLongArrowAltRight } from "@fortawesome/pro-light-svg-icons";
@@ -25,7 +25,7 @@ const SubAccountTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
         return null;
       }}
       models={nodes}
-      selected={!isNil(props.selected) ? [`${props.selected.type}-${props.selected.id}`] : null}
+      selected={props.selected}
       menuProps={{ className: "subaccount-item-tree-menu" }}
       itemProps={{ className: "subaccount-item-tree-menu-item" }}
       levelIndent={6}

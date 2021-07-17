@@ -268,12 +268,11 @@ type ExpandedModelTagsMenuProps<M extends Model.M> = _ExpandedModelTagsMenuProps
 interface SubAccountTreeMenuProps
   extends Omit<
     ExpandedModelMenuProps<Model.SubAccountTreeNode>,
-    "renderItem" | "models" | "multiple" | "onChange" | "selected"
+    "renderItem" | "models" | "multiple" | "onChange"
   > {
   readonly nodes: Model.Tree;
   readonly onChange: (m: Model.SimpleSubAccount, e: Table.CellDoneEditingEvent) => void;
   readonly onSearch: (value: string) => void;
   readonly search: string;
   readonly childrenDefaultVisible?: boolean;
-  readonly selected: { id: number; type: "subaccount" | "account" } | null;
 }
