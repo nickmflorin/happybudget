@@ -235,7 +235,7 @@ namespace Model {
   }
 
   interface Actual extends Model.TrackedModel {
-    readonly vendor: string | null;
+    readonly contact: number | null;
     readonly description: string | null;
     readonly purchase_order: string | null;
     readonly date: string | null;

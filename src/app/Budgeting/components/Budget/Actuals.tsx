@@ -1,18 +1,21 @@
-import React, { useEffect, useMemo, useRef, ReactNode } from "react";
+import React, { useState, useEffect, useMemo, useRef, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isNil, map, filter, reduce } from "lodash";
+import { isNil, map, filter, reduce, find } from "lodash";
 
 import { faTrashAlt, faFileCsv, faLineColumns } from "@fortawesome/pro-solid-svg-icons";
 
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
+import { EditContactModal, CreateContactModal } from "app/modals";
+
 import * as models from "lib/model";
 import { useDeepEqualMemo } from "lib/hooks";
 import { getKeyValue } from "lib/util";
 import { downloadAsCsvFile } from "lib/util/files";
-import { findChoiceForName, inferModelFromName } from "lib/model/util";
+import { findChoiceForName, inferModelFromName, parseFirstAndLastName } from "lib/model/util";
 import { agCurrencyValueFormatter, agDateValueFormatter } from "lib/model/formatters";
 import { floatValueSetter, dateTimeValueSetter } from "lib/model/valueSetters";
+import { useContacts } from "store/hooks";
 
 import { WrapInApplicationSpinner } from "components";
 import { FieldsDropdown } from "components/dropdowns";
@@ -32,12 +35,16 @@ const selectActualsLoading = simpleShallowEqualSelector(
 );
 
 const Actuals = (): JSX.Element => {
+  const [contactToEdit, setContactToEdit] = useState<Model.Contact | null>(null);
+  const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
+
   const dispatch = useDispatch();
   const loading = useSelector(selectActualsLoading);
   const data = useSelector(selectActuals);
   const search = useSelector(selectTableSearch);
   const tableRef = useRef<BudgetTable.Ref>(null);
   const budgetDetail = useSelector(selectBudgetDetail);
+  const contacts = useContacts();
 
   useEffect(() => {
     dispatch(actions.requestActualsAction(null));
@@ -208,10 +215,46 @@ const Actuals = (): JSX.Element => {
               type: "longText"
             },
             {
-              field: "vendor",
+              field: "contact",
               headerName: "Contact",
-              flex: 1,
-              type: "contact"
+              cellClass: "cell--centered",
+              cellRenderer: "ContactCell",
+              width: 120,
+              cellEditor: "ContactCellEditor",
+              type: "contact",
+              cellRendererParams: {
+                onEditContact: (contact: Model.Contact) => setContactToEdit(contact)
+              },
+              cellEditorParams: {
+                onNewContact: () => setCreateContactModalVisible(true)
+              },
+              // Required to allow the dropdown to be selectable on Enter key.
+              suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+                if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
+                  return true;
+                }
+                return false;
+              },
+              processCellForClipboard: (row: BudgetTable.ActualRow) => {
+                const id = getKeyValue<BudgetTable.ActualRow, keyof BudgetTable.ActualRow>("contact")(row);
+                if (isNil(id)) {
+                  return "";
+                }
+                const contact: Model.Contact | undefined = find(contacts, { id } as any);
+                return !isNil(contact) ? contact.full_name : "";
+              },
+              processCellFromClipboard: (name: string): Model.Contact | null => {
+                if (name.trim() === "") {
+                  return null;
+                } else {
+                  const names = parseFirstAndLastName(name);
+                  const contact: Model.Contact | undefined = find(contacts, {
+                    first_name: names[0],
+                    last_name: names[1]
+                  });
+                  return contact || null;
+                }
+              }
             },
             {
               field: "purchase_order",
@@ -283,6 +326,19 @@ const Actuals = (): JSX.Element => {
           ]}
         />
       </WrapInApplicationSpinner>
+      {!isNil(contactToEdit) && (
+        <EditContactModal
+          visible={true}
+          contact={contactToEdit}
+          onSuccess={() => setContactToEdit(null)}
+          onCancel={() => setContactToEdit(null)}
+        />
+      )}
+      <CreateContactModal
+        visible={createContactModalVisible}
+        onSuccess={() => setCreateContactModalVisible(false)}
+        onCancel={() => setCreateContactModalVisible(false)}
+      />
     </React.Fragment>
   );
 };
