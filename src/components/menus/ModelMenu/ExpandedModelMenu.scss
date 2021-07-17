@@ -1,8 +1,16 @@
 .expanded-model-menu {
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+
   .search-container {
     padding: 6px;
   }
-  .ant-menu {
-    border-top: none !important;
+  .model-menu-wrapper {
+    height: calc(100% - 42px);
+    overflow-y: scroll;
+    .ant-menu {
+      border-top: none !important;
+    }
   }
 }

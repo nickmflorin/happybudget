@@ -18,7 +18,7 @@ const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>
 
   return (
     <ExpandedModelTagsMenu<Model.Fringe>
-      style={{ width: 160 }}
+      style={{ minWidth: 220 }}
       highlightActive={false}
       checkbox={true}
       multiple={true}

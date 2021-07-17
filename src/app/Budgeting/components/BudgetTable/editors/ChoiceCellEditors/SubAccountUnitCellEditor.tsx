@@ -9,7 +9,15 @@ const SubAccountUnitCellEditor = (
   ref: any
 ) => {
   const units = useSelector(selectSubAccountUnits);
-  return <ChoiceCellEditor<Model.Tag> searchIndices={["title"]} models={units} forwardedRef={ref} {...props} />;
+  return (
+    <ChoiceCellEditor<Model.Tag>
+      style={{ maxHeight: 300 }}
+      searchIndices={["title"]}
+      models={units}
+      forwardedRef={ref}
+      {...props}
+    />
+  );
 };
 
 export default forwardRef(SubAccountUnitCellEditor);

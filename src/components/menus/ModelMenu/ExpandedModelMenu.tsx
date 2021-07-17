@@ -132,15 +132,17 @@ const ExpandedModelMenu = <M extends Model.M>({
       {!isNil(props.children) ? (
         props.children
       ) : (
-        <ModelMenu<M>
-          {...props}
-          {...props.menuProps}
-          loading={props.menuLoading}
-          autoFocus={props.autoFocusMenu}
-          search={isNil(search) ? _search : search}
-          menuRef={_menuRef}
-          onFocusCallback={(focused: boolean) => focusSearch(!focused)}
-        />
+        <div className={"model-menu-wrapper"}>
+          <ModelMenu<M>
+            {...props}
+            {...props.menuProps}
+            loading={props.menuLoading}
+            autoFocus={props.autoFocusMenu}
+            search={isNil(search) ? _search : search}
+            menuRef={_menuRef}
+            onFocusCallback={(focused: boolean) => focusSearch(!focused)}
+          />
+        </div>
       )}
     </div>
   );

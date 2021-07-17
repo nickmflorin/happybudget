@@ -11,7 +11,7 @@ const ContactCellEditor = (props: Table.CellEditorParams, ref: any) => {
   return (
     <ExpandedModelTagCellEditor<Model.Contact, number>
       editor={editor}
-      style={{ width: 120 }}
+      style={{ width: 160 }}
       selected={editor.value}
       menuRef={editor.menuRef}
       models={contacts}

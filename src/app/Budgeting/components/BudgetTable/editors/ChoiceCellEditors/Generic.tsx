@@ -1,13 +1,11 @@
-import React from "react";
 import { isNil } from "lodash";
 
 import useModelMenuEditor from "../ModelMenuEditor";
 import ExpandedModelTagCellEditor from "../ExpandedModelTagCellEditor";
 
-export interface ChoiceCellEditorProps<M extends Model.Model> extends Table.CellEditorParams {
-  models: M[];
-  searchIndices: SearchIndicies;
-  style?: React.CSSProperties;
+export interface ChoiceCellEditorProps<M extends Model.Model> extends Table.CellEditorParams, StandardComponentProps {
+  readonly models: M[];
+  readonly searchIndices: SearchIndicies;
 }
 
 interface _ChoiceCellEditorProps<M extends Model.Model> extends ChoiceCellEditorProps<M> {
@@ -25,6 +23,7 @@ const ChoiceCellEditor = <M extends Model.Model>({
 
   return (
     <ExpandedModelTagCellEditor<M>
+      className={props.className}
       editor={editor}
       searchIndices={searchIndices}
       style={style}
