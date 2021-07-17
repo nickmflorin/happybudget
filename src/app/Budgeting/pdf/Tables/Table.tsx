@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { View } from "../Base";
+import { View } from "components/pdf";
 
 interface TableProps extends StandardPdfComponentProps {
   readonly children: JSX.Element[] | JSX.Element;

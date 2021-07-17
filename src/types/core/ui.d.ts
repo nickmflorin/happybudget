@@ -85,15 +85,24 @@ interface ITag {
   readonly text: string;
 }
 
-interface ITagRenderParams extends StandardComponentProps {
+interface ITagRenderParams<S extends object = React.CSSProperties> {
+  readonly className: string | undefined;
+  readonly textClassName: string | undefined;
+  readonly style: S | undefined;
+  readonly textStyle: S | undefined;
   readonly color: string;
   readonly textColor: string;
   readonly uppercase: boolean;
   readonly fillWidth: boolean;
   readonly text: string;
+  readonly contentRender: ((params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element) | undefined
 }
 
-type TagProps<M extends Model.M = Model.M> = StandardComponentProps & {
+type TagProps<M extends Model.M = Model.M, S extends object = React.CSSProperties> = {
+  readonly className?: string;
+  readonly textClassName?: string;
+  readonly style?: S;
+  readonly textStyle?: S;
   readonly children?: string | M | null;
   readonly text?: string | null;
   readonly textColor?: string;
@@ -106,9 +115,9 @@ type TagProps<M extends Model.M = Model.M> = StandardComponentProps & {
   readonly colorIndex?: number;
   readonly fillWidth?: boolean;
   // Used for custom rendering of the tag - mostly applicable for PDF purposes.
-  readonly render?: (params: ITagRenderParams) => JSX.Element;
+  readonly render?: (params: ITagRenderParams<S>) => JSX.Element;
   // Used for custom rendering of the tag content.
-  readonly contentRender?: (params: ITagRenderParams) => JSX.Element;
+  readonly contentRender?: (params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element;
 }
 
 interface VisibleEmptyTagProps extends StandardComponentProps {

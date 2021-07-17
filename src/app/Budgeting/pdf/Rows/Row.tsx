@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { map } from "lodash";
-import { View } from "../Base";
+import { View } from "components/pdf";
 
 export type RowProps<R extends Table.PdfRow, M extends Model.Model> = StandardPdfComponentProps & {
   readonly columns: Table.PdfColumn<R, M>[];

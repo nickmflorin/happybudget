@@ -149,6 +149,7 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   "th-text": { marginTop: 6, fontSize: 8, color: "#595959", fontWeight: 700 },
   "td-text": { marginTop: 5, fontSize: 9, color: "#1F1F1F", fontWeight: 600 },
   tag: { height: 14, paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1, borderRadius: 20, marginTop: 5 },
+  "tag--contact": { borderRadius: 6 },
   "tag-text": {
     fontSize: 8,
     fontWeight: 400,

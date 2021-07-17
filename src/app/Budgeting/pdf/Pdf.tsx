@@ -1,13 +1,11 @@
 import { Document } from "@react-pdf/renderer";
-import { isNil, map, filter } from "lodash";
+import { isNil, map, filter, find } from "lodash";
 
 import * as formatters from "lib/model/formatters";
-
-import { View, Page } from "./Base";
+import { View, Page, Tag } from "components/pdf";
 import { AccountsTable, AccountTable } from "./Tables";
-import PdfTag from "./PdfTag";
 
-const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
+const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: BudgetPdf.Options) => {
   return (
     <Document>
       <Page title={budget.name} subTitle={"Cost Summary"}>
@@ -92,12 +90,30 @@ const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
                       return { value: "Total" };
                     }
                   },
-                  // {
-                  //   field: "name",
-                  //   headerName: "Contact",
-                  //   type: "contact",
-                  //   width: "10%"
-                  // },
+                  {
+                    field: "contact",
+                    headerName: "Contact",
+                    type: "contact",
+                    width: "10%",
+                    cellRenderer: (
+                      params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
+                    ) => {
+                      if (params.rawValue !== null) {
+                        const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
+                        if (!isNil(contact)) {
+                          return (
+                            <Tag
+                              className={"tag tag--contact"}
+                              color={"#EFEFEF"}
+                              textColor={"#2182e4"}
+                              text={contact.full_name}
+                            />
+                          );
+                        }
+                      }
+                      return <span></span>;
+                    }
+                  },
                   {
                     field: "quantity",
                     headerName: "Qty",
@@ -110,7 +126,7 @@ const BudgetPdf = (budget: Model.PdfBudget, options: BudgetPdf.Options) => {
                     type: "singleSelect",
                     width: "10%",
                     cellRenderer: (params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount>) =>
-                      params.rawValue !== null ? <PdfTag model={params.rawValue} /> : <span></span>
+                      params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>
                   },
                   {
                     field: "multiplier",

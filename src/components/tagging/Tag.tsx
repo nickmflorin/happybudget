@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil, map } from "lodash";
 
@@ -8,10 +8,8 @@ import { selectConsistent, getKeyValue } from "lib/util";
 import { contrastedForegroundColor } from "lib/util/colors";
 import { isModelWithColor, isModelWithName, isTag } from "lib/model/typeguards";
 
-const TagRenderer = ({
-  contentRender,
-  ...params
-}: ITagRenderParams & { contentRender?: (p: ITagRenderParams) => JSX.Element }): JSX.Element => {
+const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderParams<S>): JSX.Element => {
+  const { contentRender, ...rest } = params;
   return (
     <div
       className={classNames(
@@ -22,7 +20,13 @@ const TagRenderer = ({
       )}
       style={{ ...params.style, backgroundColor: params.color, color: params.textColor }}
     >
-      {!isNil(contentRender) ? contentRender(params) : params.text}
+      {!isNil(contentRender) ? (
+        contentRender(rest)
+      ) : (
+        <span className={params.textClassName} style={params.textStyle}>
+          {params.text}
+        </span>
+      )}
     </div>
   );
 };
@@ -41,7 +45,9 @@ export const EmptyTag: React.FC<EmptyTagProps> = (props: EmptyTagProps) => {
   );
 };
 
-const Tag = <M extends Model.M = Model.M>(props: TagProps<M>): JSX.Element => {
+const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties>(
+  props: TagProps<M, S>
+): JSX.Element => {
   const colorScheme = useMemo(() => {
     let tagColorScheme = DEFAULT_TAG_COLOR_SCHEME;
     if (!isNil(props.scheme)) {
@@ -134,21 +140,35 @@ const Tag = <M extends Model.M = Model.M>(props: TagProps<M>): JSX.Element => {
     return contrastedForegroundColor(tagColor);
   }, [tagColor, props]);
 
-  const renderParams = useMemo((): ITagRenderParams => {
+  const renderParams = useMemo<ITagRenderParams<S>>(() => {
     return {
       className: props.className,
       uppercase: props.uppercase || false,
       color: (tagColor as string) || DEFAULT_TAG_COLOR,
       textColor: tagTextColor || DEFAULT_TAG_TEXT_COLOR,
       text: tagText as string,
-      fillWidth: props.fillWidth || false
+      fillWidth: props.fillWidth || false,
+      style: props.style,
+      textStyle: props.textStyle,
+      textClassName: props.textClassName,
+      contentRender: props.contentRender
     };
-  }, [props.className, props.uppercase, tagColor, tagTextColor, tagText, props.fillWidth]);
+  }, [
+    props.className,
+    props.textClassName,
+    props.style,
+    props.textStyle,
+    props.uppercase,
+    tagColor,
+    tagTextColor,
+    tagText,
+    props.fillWidth
+  ]);
 
   if (!isNil(props.render)) {
     return props.render(renderParams);
   }
-  return <TagRenderer contentRender={props.contentRender} {...renderParams} />;
+  return <TagRenderer<S> {...renderParams} />;
 };
 
 const isEmptyTagsPropsNotComponent = (props: EmptyTagProps | JSX.Element): props is EmptyTagProps => {

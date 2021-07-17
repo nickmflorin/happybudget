@@ -4,9 +4,8 @@ import classNames from "classnames";
 import { isNil, map, flatten } from "lodash";
 
 import { ShowHide } from "components";
+import { View, Text } from "components/pdf";
 import { getColumnTypeCSSStyle } from "lib/model/util";
-
-import { View, Text } from "../Base";
 
 const isCallback = <R extends Table.PdfRow, M extends Model.Model, T = any>(
   prop: Table.OptionalPdfCellCallback<R, M, T>

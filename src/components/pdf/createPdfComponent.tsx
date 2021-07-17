@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { mergeStylesFromClassName } from "../Styles";
+import { mergeStylesFromClassName } from "style/pdf";
 
 export interface PdfComponentProps extends StandardPdfComponentProps {
   readonly children?: ReactNode;

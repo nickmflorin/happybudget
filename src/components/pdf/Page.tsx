@@ -3,7 +3,7 @@ import { Page as ReactPDFPage } from "@react-pdf/renderer";
 import classNames from "classnames";
 import { PageSize } from "@react-pdf/types";
 
-import { mergeStylesFromClassName } from "../Styles";
+import { mergeStylesFromClassName } from "style/pdf";
 import Text from "./Text";
 import View from "./View";
 

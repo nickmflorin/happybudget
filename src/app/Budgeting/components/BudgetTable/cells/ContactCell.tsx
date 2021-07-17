@@ -23,7 +23,7 @@ const ContactCell = (props: ContactCellProps): JSX.Element => {
             color={"#EFEFEF"}
             textColor={"#2182e4"}
             text={model.full_name}
-            contentRender={(params: ITagRenderParams) => (
+            contentRender={(params: Omit<ITagRenderParams, "contentRender">) => (
               <ButtonLink onClick={() => !isNil(model) && props.onEditContact(model)}>{params.text}</ButtonLink>
             )}
           />
