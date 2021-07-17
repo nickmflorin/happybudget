@@ -186,7 +186,8 @@ $table-border: 1px solid $table-border-color;
     justify-content: center;
     // This is needed so that we can display white space in our cells without
     // AG Grid trimming them.
-    white-space: break-spaces;
+    white-space: no-wrap;
+    overflow-x: hidden;
 
     &:not(.borderless) {
       border-bottom: $table-border;

@@ -1,4 +1,4 @@
-import { isNil, filter, map } from "lodash";
+import { isNil, filter } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLongArrowAltRight } from "@fortawesome/pro-light-svg-icons";
