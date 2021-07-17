@@ -264,7 +264,7 @@ const GenericSubAccountsTable = ({
           headerComponentParams: {
             onEdit: () => onEditFringes()
           },
-          minWidth: 150,
+          width: 200,
           nullValue: [],
           cellEditor: fringesCellEditor,
           cellEditorParams: fringesCellEditorParams,
