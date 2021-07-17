@@ -254,14 +254,9 @@ namespace Model {
     readonly comments: Model.Comment[];
   }
 
-<<<<<<< HEAD
-  interface Contact extends Model.Model {
-    readonly first_name: string | null;
-=======
   interface Contact extends Model.TimestampTrackedModel {
     readonly type: Model.ContactType | null;
     readonly first_name: string | null
->>>>>>> 16a1e50... Update typings
     readonly last_name: string | null;
     readonly full_name: string;
     readonly company: string | null;
