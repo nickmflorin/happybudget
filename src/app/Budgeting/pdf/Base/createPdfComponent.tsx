@@ -5,12 +5,7 @@ export interface PdfComponentProps extends StandardPdfComponentProps {
   readonly children?: ReactNode;
   readonly debug?: boolean;
   readonly fixed?: boolean;
-  readonly render?: (params: {
-    pageNumber: number;
-    totalPages: number;
-    subPageNumber: number;
-    subPageTotalPages: number;
-  }) => ReactNode;
+  readonly wrap?: boolean;
 }
 
 export const createPdfComponent =

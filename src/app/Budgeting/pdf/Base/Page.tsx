@@ -21,21 +21,18 @@ const Page = (props: PageProps): JSX.Element => {
       size={props.size || "A4"}
       debug={props.debug}
       style={{ ...mergeStylesFromClassName(classNames("page", props.className)), ...props.style }}
+      wrap={true}
     >
-      <View className={"page-header"}>
+      <View className={"page-header"} fixed={true}>
         <Text className={"page-header-title"}>{props.title}</Text>
         <Text className={"page-header-subtitle"}>{props.subTitle}</Text>
       </View>
       <View className={"page-content"}>{props.children}</View>
-      <View className={"page-footer"}>
-        <Text
-          fixed={true}
-          className={"page-footer-page-no-text"}
-          render={(params: { pageNumber: number; totalPages: number }) => {
-            return `Page ${params.pageNumber}`;
-          }}
-        />
-      </View>
+      <Text
+        fixed={true}
+        className={"page-footer-page-no-text"}
+        render={(params: { pageNumber: number }) => `Page ${params.pageNumber}`}
+      />
     </ReactPDFPage>
   );
 };
