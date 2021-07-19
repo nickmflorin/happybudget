@@ -6,6 +6,7 @@ import ExpandedModelTagCellEditor from "../ExpandedModelTagCellEditor";
 export interface ChoiceCellEditorProps<M extends Model.Model> extends Table.CellEditorParams, StandardComponentProps {
   readonly models: M[];
   readonly searchIndices: SearchIndicies;
+  readonly tagProps?: TagProps<M>;
 }
 
 interface _ChoiceCellEditorProps<M extends Model.Model> extends ChoiceCellEditorProps<M> {
@@ -17,6 +18,7 @@ const ChoiceCellEditor = <M extends Model.Model>({
   models,
   searchIndices,
   style,
+  tagProps,
   ...props
 }: _ChoiceCellEditorProps<M>) => {
   const [editor] = useModelMenuEditor<M>(props);
@@ -31,6 +33,7 @@ const ChoiceCellEditor = <M extends Model.Model>({
       onChange={(m: M, e: Table.CellDoneEditingEvent) => editor.onChange(m, e)}
       menuRef={editor.menuRef}
       models={models}
+      tagProps={tagProps}
     />
   );
 };

@@ -248,14 +248,14 @@ type ModelTagsMenuProps<M extends Model.M> = _ModelTagsMenuProps<M> &
     (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
 
 type ExpandedModelMenuRef<M extends Model.M> = {
-    readonly focusSearch: (value: boolean, search?: string) => void;
-    readonly incrementMenuFocusedIndex: () => void;
-    readonly decrementMenuFocusedIndex: () => void;
-    readonly focusMenu: (value: boolean) => void;
-    readonly getModelAtMenuFocusedIndex: () => M | null;
-    readonly performActionAtMenuFocusedIndex: (e: KeyboardEvent) => void;
-    readonly menuFocused: boolean;
-  };
+  readonly focusSearch: (value: boolean, search?: string) => void;
+  readonly incrementMenuFocusedIndex: () => void;
+  readonly decrementMenuFocusedIndex: () => void;
+  readonly focusMenu: (value: boolean) => void;
+  readonly getModelAtMenuFocusedIndex: () => M | null;
+  readonly performActionAtMenuFocusedIndex: (e: KeyboardEvent) => void;
+  readonly menuFocused: boolean;
+};
 
 interface _ExpandedModelMenuProps<M extends Model.M>
   extends Omit<_ModelMenuProps<M>, "menuRef" | "loading" | "onFocusCallback" | "autoFocus"> {
