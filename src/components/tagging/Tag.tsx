@@ -67,13 +67,18 @@ const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties
         }
         return modelTextFieldValue || "";
       } else if (isTag(m)) {
+        if (props.isPlural === true && !isNil(m.plural_title)) {
+          return m.plural_title;
+        }
         return m.title;
       } else if (isModelWithName(m)) {
         return m.name || "";
       }
       return "";
     };
-    if (!isNil(props.text)) {
+    if (props.isPlural === true && !isNil(props.pluralText)) {
+      return props.pluralText;
+    } else if (!isNil(props.text)) {
       return props.text;
     } else if (!isNil(props.children)) {
       if (typeof props.children === "string") {
@@ -179,6 +184,9 @@ const emptyTagPropsOrComponent = (props: JSX.Element | EmptyTagProps): JSX.Eleme
   return isEmptyTagsPropsNotComponent(props) ? <EmptyTag {...props} /> : props;
 };
 
+const isPluralityWithModel = <M extends Model.M = Model.M>(m: M | PluralityWithModel<M>): m is PluralityWithModel<M> =>
+  (m as PluralityWithModel<M>).model !== undefined;
+
 /**
  * Group of <Tag> components that overlap to a certain degree.
  *
@@ -199,8 +207,15 @@ export const MultipleTags = <M extends Model.M = Model.M>(props: MultipleTagsPro
       {!isNil(props.models) ? (
         /* eslint-disable indent */
         props.models.length !== 0 || isNil(props.onMissing) ? (
-          map(props.models, (model: M, index: number) => {
-            return <Tag key={index} model={model} {...props.tagProps} />;
+          map(props.models, (model: M | PluralityWithModel<M>, index: number) => {
+            return (
+              <Tag
+                key={index}
+                {...props.tagProps}
+                model={isPluralityWithModel(model) ? model.model : model}
+                isPlural={isPluralityWithModel(model) ? model.isPlural : props.tagProps?.isPlural}
+              />
+            );
           })
         ) : (
           emptyTagPropsOrComponent(props.onMissing)

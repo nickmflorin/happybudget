@@ -105,9 +105,11 @@ type TagProps<M extends Model.M = Model.M, S extends object = React.CSSPropertie
   readonly textStyle?: S;
   readonly children?: string | M | null;
   readonly text?: string | null;
+  readonly pluralText?: string | null;
   readonly textColor?: string;
   readonly color?: string;
   readonly model?: M | null;
+  readonly isPlural?: boolean;
   readonly modelTextField?: keyof M;
   readonly modelColorField?: keyof M;
   readonly scheme?: string[];
@@ -131,9 +133,14 @@ interface InvisibleEmptyTagProps extends StandardComponentProps {
 
 type EmptyTagProps = VisibleEmptyTagProps | InvisibleEmptyTagProps;
 
+type PluralityWithModel<M extends Model.M = Model.M> = {
+  readonly isPlural?: boolean;
+  readonly model: M;
+}
+
 type MultipleTagsProps<M extends Model.M = Model.M> = StandardComponentProps & {
   // <Tag> components should be generated based on a set of provided models M.
-  readonly models?: M[];
+  readonly models?: (M | PluralityWithModel<M>)[];
   // <Tag> components are provided as children to the component:
   // <MultipleTags><Tag /><Tag /></MultipleTags>
   readonly children?: JSX.Element[];

@@ -243,6 +243,7 @@ export const createAccountTaskSet = (
             ...payload(change)
           })
         );
+
         // We do this to show the loading indicator next to the calculated fields of the footers,
         // otherwise, the loading indicators will not appear until the first API request
         // succeeds and we refresh the parent state.

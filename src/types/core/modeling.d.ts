@@ -67,10 +67,9 @@ namespace Model {
   type ModelWithColor = Model.Model & { color: string | null };
   type ModelWithName = Model.Model & { name: string | null };
 
-  interface Tag extends Model.Model {
-    readonly created_at: string;
-    readonly updated_at: string;
+  interface Tag extends Model.TimestampTrackedModel {
     readonly title: string;
+    readonly plural_title: string | null;
     readonly order: number;
     readonly color: string | null;
   }
@@ -91,11 +90,9 @@ namespace Model {
     readonly is_superuser: boolean;
   }
 
-  interface User extends Model.NestedUser {
+  interface User extends Model.NestedUser, Model.TimestampTrackedModel {
     readonly last_login: null | string;
     readonly date_joined: string;
-    readonly created_at: string;
-    readonly updated_at: string;
     readonly timezone: string;
     readonly is_first_time: boolean;
   }

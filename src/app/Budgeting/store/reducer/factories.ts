@@ -197,10 +197,10 @@ const modelGroupFromState = <S extends EntityStore>(
   action: Redux.Action<any>,
   st: S,
   lineId: number,
-  options: FindModelOptions = { name: "Group", warnIfMissing: true }
+  options: FindModelOptions = { warnIfMissing: true }
 ): Model.Group | null => {
   const predicate = (g: Model.Group) => includes(g.children, lineId);
-  return modelFromState<Model.Group>(action, st.groups.data, predicate, options);
+  return modelFromState<Model.Group>(action, st.groups.data, predicate, { ...options, name: "Group" });
 };
 
 const recalculateGroupMetrics = <S extends EntityStore>(
@@ -237,7 +237,8 @@ const removeModelFromGroup = <S extends EntityStore>(
   action: Redux.Action<any>,
   st: S,
   model: number | Model.Account | Model.SubAccount,
-  group?: number | Model.Group
+  group?: number | Model.Group | undefined,
+  options: FindModelOptions = { warnIfMissing: true }
 ): S => {
   const stateModel = modelFromState<Model.Account | Model.SubAccount, Model.Account[] | Model.SubAccount[]>(
     action,
@@ -246,8 +247,8 @@ const removeModelFromGroup = <S extends EntityStore>(
   );
   if (!isNil(stateModel)) {
     const stateGroup: Model.Group | null = isNil(group)
-      ? modelGroupFromState<S>(action, st, stateModel.id)
-      : groupFromState<S>(action, st, group, stateModel.id);
+      ? modelGroupFromState<S>(action, st, stateModel.id, options)
+      : groupFromState<S>(action, st, group, stateModel.id, options);
     if (!isNil(stateGroup)) {
       const newGroup = {
         ...stateGroup,
@@ -267,7 +268,7 @@ const removeModelFromGroup = <S extends EntityStore>(
 };
 
 const removeModelFromState = <S extends EntityStore>(action: Redux.Action<any>, st: S, id: number) => {
-  st = removeModelFromGroup<S>(action, st, id);
+  st = removeModelFromGroup<S>(action, st, id, undefined, { warnIfMissing: false });
   return {
     ...st,
     children: {

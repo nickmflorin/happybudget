@@ -116,9 +116,9 @@ namespace Table {
     readonly index?: number;
     readonly getModelValue?: (row: R) => M[keyof M];
     readonly getRowValue?: (m: M) => R[keyof R];
+    readonly getHttpValue?: (value: V) => any;
     readonly processCellForClipboard?: (row: R) => string;
     readonly processCellFromClipboard?: (value: string) => any;
-    readonly getHttpValue?: (value: V) => any;
   }
 
   interface PdfColumn<R extends Table.PdfRow, M extends Model.Model> {

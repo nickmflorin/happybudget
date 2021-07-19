@@ -124,7 +124,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
           width: 100,
           cellEditor: "FringeUnitCellEditor",
           type: "singleSelect",
-          getHttpValue: (row: BudgetTable.FringeRow): number | null => (!isNil(row.unit) ? row.unit.id : null),
+          getHttpValue: (value: Model.FringeUnit | null): number | null => (!isNil(value) ? value.id : null),
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
             if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {

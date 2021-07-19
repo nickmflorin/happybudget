@@ -777,6 +777,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         modelsWithoutGroup = [...modelsWithoutGroup, ...ms];
       }
     });
+
     setTable([
       ...newTable,
       ...orderByFieldOrdering(
