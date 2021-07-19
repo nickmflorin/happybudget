@@ -188,7 +188,8 @@ const GenericSubAccountsTable = ({
         {
           field: "description",
           headerName: `${categoryName} Description`,
-          flex: 100,
+          // flex: 100,
+          flex: 1,
           type: "longText",
           index: 1,
           colSpan: (params: ColSpanParams) => {
@@ -204,7 +205,24 @@ const GenericSubAccountsTable = ({
           headerName: "Qty",
           width: 60,
           valueSetter: integerValueSetter<BudgetTable.SubAccountRow>("quantity"),
-          type: "number"
+          type: "number",
+          // If the plurality of the quantity changes, we need to refresh the refresh
+          // the unit column to change the plurality of the tag in the cell.
+          refreshColumns: (change: Table.CellChange<BudgetTable.SubAccountRow, Model.SubAccount>) => {
+            // This shouldn't trigger the callback, but just to be sure.
+            if (change.newValue === null && change.oldValue === null) {
+              return [];
+            } else if (
+              change.newValue === null ||
+              change.oldValue === null ||
+              (change.newValue > 1 && !(change.oldValue > 1)) ||
+              (change.newValue <= 1 && !(change.oldValue <= 1))
+            ) {
+              return ["unit"];
+            } else {
+              return [];
+            }
+          }
         },
         {
           field: "unit",

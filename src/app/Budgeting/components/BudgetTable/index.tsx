@@ -285,6 +285,7 @@ const BudgetTable = <
       cellRenderer: "IdentifierCell",
       type: "number",
       width: 100,
+      maxWidth: 100,
       ...col,
       fieldBehavior: ["read", "write"],
       suppressSizeToFit: true,
@@ -329,12 +330,13 @@ const BudgetTable = <
 
   const CalculatedColumn = useDynamicCallback<Table.Column<R, M>>((col: Table.Column<R, M>): Table.Column<R, M> => {
     return {
-      flex: 1,
+      // flex: 1,
       cellStyle: { textAlign: "right", ...col.cellStyle },
       ...col,
       cellRenderer: "CalculatedCell",
       suppressSizeToFit: true,
-      minWidth: 100,
+      width: 100,
+      maxWidth: 100,
       valueFormatter: agCurrencyValueFormatter,
       cellRendererParams: {
         ...col.cellRendererParams,
@@ -481,7 +483,7 @@ const BudgetTable = <
   });
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    event.api.sizeColumnsToFit();
+    // event.api.sizeColumnsToFit();
   });
 
   return (

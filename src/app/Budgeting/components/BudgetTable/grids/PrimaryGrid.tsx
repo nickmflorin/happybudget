@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect, useRef, useImperativeHandle } from "react";
-import { map, isNil, includes, find, forEach, filter, flatten, reduce, groupBy } from "lodash";
+import { map, isNil, includes, find, forEach, filter, flatten, reduce, groupBy, uniq } from "lodash";
 import { useLocation } from "react-router-dom";
 
 import {
@@ -30,10 +30,11 @@ import {
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import * as models from "lib/model";
+import * as typeguards from "lib/model/typeguards";
+
 import { orderByFieldOrdering, getKeyValue } from "lib/util";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
-import { getGroupColorDefinition } from "lib/model/util";
-import { isKeyboardEvent } from "lib/model/typeguards";
+import { getGroupColorDefinition, consolidateTableChange } from "lib/model/util";
 import { rangeSelectionIsSingleCell } from "../util";
 import BudgetTableMenu from "./Menu";
 import Grid from "./Grid";
@@ -76,7 +77,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
     props.onFirstDataRendered(event);
-
     event.api.ensureIndexVisible(0);
 
     const query = new URLSearchParams(location.search);
@@ -206,7 +206,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       if (isNil(params.nextCellPosition)) {
         // TODO: We need to figure out how to move down to the next cell!  This
         // is tricky, because we have to wait for the row to be present in state.
-        onChangeEvent({ type: "rowAdd", payload: 1 });
+        _onChangeEvent({ type: "rowAdd", payload: 1 });
       } else {
         if (includes(["index", "expand"], params.nextCellPosition.column.getColId())) {
           let nextCellPosition = { ...params.nextCellPosition };
@@ -248,7 +248,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     if (!isNil(apis)) {
       const [node, rowIndex, _] = findFirstNonGroupFooterRow(loc.rowIndex + 1);
       if (node === null) {
-        onChangeEvent({ type: "rowAdd", payload: 1 });
+        _onChangeEvent({ type: "rowAdd", payload: 1 });
       }
       moveToLocation({ rowIndex, column: loc.column }, opts);
     }
@@ -306,7 +306,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   // or the cell below (on Enter completion).  To accomplish this, we use a custom hook
   // to the CellEditor(s) that is manually called inside the CellEditor.
   const onDoneEditing = useDynamicCallback((e: Table.CellDoneEditingEvent) => {
-    if (isKeyboardEvent(e) && !isNil(apis)) {
+    if (typeguards.isKeyboardEvent(e) && !isNil(apis)) {
       const focusedCell = apis.grid.getFocusedCell();
       if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
         if (e.code === "Enter") {
@@ -419,11 +419,66 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     return null;
   };
 
+  /**
+   * Modified version of the onChangeEvent callback passed into the Grid.  The
+   * modified version of the callback will first fire the original callback,
+   * but then inspect whether or not the column associated with any of the fields
+   * that were changed warrant refreshing another column.
+   */
+  const _onChangeEvent = (event: Table.ChangeEvent<R, M>) => {
+    onChangeEvent(event);
+    // TODO: We might have to also apply similiar logic for when a row is added?
+    if (typeguards.isDataChangeEvent(event) && !isNil(apis)) {
+      let nodesToRefresh: RowNode[] = [];
+      let columnsToRefresh: Table.Field<R, M>[] = [];
+
+      const changes: Table.RowChange<R, M>[] = consolidateTableChange(event.payload);
+
+      // Look at the changes for each row and determine if the field changed is
+      // associated with a column that refreshes other columns.
+      forEach(changes, (rowChange: Table.RowChange<R, M>) => {
+        const node = apis.grid.getRowNode(String(rowChange.id));
+        if (!isNil(node)) {
+          let hasColumnsToRefresh = false;
+          for (let i = 0; i < Object.keys(rowChange.data).length; i++) {
+            const field: Table.Field<R, M> = Object.keys(rowChange.data)[i];
+            const change = getKeyValue<Table.RowChangeData<R, M>, Table.Field<R, M>>(field)(
+              rowChange.data
+            ) as Table.NestedCellChange<R, M>;
+            // Check if the cellChange is associated with a Column that when changed,
+            // should refresh other columns.
+            const col: Table.Column<R, M> | undefined = find(columns, { field } as any);
+            if (!isNil(col) && !isNil(col.refreshColumns)) {
+              const fieldsToRefresh = col.refreshColumns({
+                ...change,
+                id: rowChange.id,
+                field
+              });
+              if (!isNil(fieldsToRefresh) && fieldsToRefresh.length !== 0) {
+                hasColumnsToRefresh = true;
+                columnsToRefresh = uniq([
+                  ...columnsToRefresh,
+                  ...(Array.isArray(fieldsToRefresh) ? fieldsToRefresh : [fieldsToRefresh])
+                ]);
+              }
+            }
+          }
+          if (hasColumnsToRefresh === true) {
+            nodesToRefresh.push(node);
+          }
+        }
+      });
+      if (columnsToRefresh.length !== 0) {
+        apis.grid.refreshCells({ force: true, rowNodes: nodesToRefresh, columns: columnsToRefresh as string[] });
+      }
+    }
+  };
+
   const clearCellsOverRange = useDynamicCallback((range: CellRange | CellRange[], paramsApi?: GridApi) => {
     const changes: Table.CellChange<R, M>[] = !Array.isArray(range)
       ? getTableChangesFromRangeClear(range, paramsApi)
       : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, paramsApi)));
-    onChangeEvent({
+    _onChangeEvent({
       type: "dataChange",
       payload: changes
     });
@@ -432,7 +487,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   const clearCell = useDynamicCallback((row: R, def: Table.Column<R, M>) => {
     const change = getCellChangeForClear(row, def);
     if (!isNil(change)) {
-      onChangeEvent({
+      _onChangeEvent({
         type: "dataChange",
         payload: change
       });
@@ -449,7 +504,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       (change: Table.CellChange<R, M> | null) => change !== null
     ) as Table.CellChange<R, M>[];
     if (changes.length !== 0) {
-      onChangeEvent({
+      _onChangeEvent({
         type: "dataChange",
         payload: changes
       });
@@ -503,7 +558,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     } else {
       const deleteRowContextMenuItem: MenuItemDef = {
         name: `Delete ${row.meta.label || "Row"}`,
-        action: () => onChangeEvent({ payload: row.id, type: "rowDelete" })
+        action: () => _onChangeEvent({ payload: row.id, type: "rowDelete" })
       };
       if (isNil(groupParams)) {
         return [deleteRowContextMenuItem];
@@ -646,7 +701,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           const newRows: Table.RowAdd<R, M>[] = map(rowsToAdd, (r: any[]) =>
             createRowAddFromDataArray(apis.column, r, focusedCell.column)
           );
-          onChangeEvent({
+          _onChangeEvent({
             type: "rowAdd",
             payload: newRows
           });
@@ -899,7 +954,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       if (!isNil(customCol)) {
         if (!isNil(cutCellChange)) {
           params = { ...params, value: cutCellChange.oldValue };
-          onChangeEvent({
+          _onChangeEvent({
             type: "dataChange",
             payload: cutCellChange
           });
@@ -941,7 +996,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     } else {
       const change = getCellChangeFromEvent(e);
       if (!isNil(change)) {
-        onChangeEvent({ type: "dataChange", payload: change });
+        _onChangeEvent({ type: "dataChange", payload: change });
         if (!isNil(apis) && !isNil(onRowExpand) && !isNil(rowCanExpand)) {
           const col = apis.column.getColumn("expand");
           const row: R = e.node.data;

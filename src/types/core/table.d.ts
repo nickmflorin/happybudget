@@ -114,6 +114,7 @@ namespace Table {
     readonly budget?: FooterColumn<R>;
     readonly footer?: FooterColumn<R>;
     readonly index?: number;
+    readonly refreshColumns?: (change: Table.CellChange<R, M>) => Field<R, M> | Field<R, M>[] | null;
     readonly getModelValue?: (row: R) => M[keyof M];
     readonly getRowValue?: (m: M) => R[keyof R];
     readonly getHttpValue?: (value: V) => any;
