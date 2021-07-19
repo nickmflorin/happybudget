@@ -49,3 +49,11 @@ export const isModelWithName = (model: Model.M | Model.ModelWithName): model is 
 export const isTag = (model: Model.M | Model.Tag): model is Model.Tag => {
   return (model as Model.Tag).title !== undefined && (model as Model.Tag).color !== undefined;
 };
+
+export const isContact = (user: Model.User | Model.SimpleUser | Model.Contact): user is Model.Contact =>
+  (user as Model.Contact).image !== undefined;
+
+export const isUserWithImage = (user: Model.User | Model.SimpleUser | Model.Contact): user is Model.UserWithImage =>
+  isContact(user)
+    ? (user as Model.Contact).image !== null
+    : (user as Model.User | Model.SimpleUser).profile_image !== null;

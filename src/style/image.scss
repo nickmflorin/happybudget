@@ -1,0 +1,58 @@
+@import "./colors";
+
+.img {
+  height: 100%;
+  width: auto;
+
+  &.circle {
+    border-radius: 100%;
+  }
+
+  &--user {
+    @extend .img;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: contain;
+    text-align: center;
+  }
+}
+
+.img-overlay {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  color: $white;
+
+  svg {
+    color: $white;
+  }
+}
+
+.img-wrapper {
+  height: 100%;
+  width: 100%;
+  position: relative;
+
+  .img-overlay {
+    display: none;
+  }
+
+  &.circle {
+    clip-path: circle(50%);
+  }
+
+  &:hover {
+    .img-overlay {
+      display: flex;
+    }
+  }
+}

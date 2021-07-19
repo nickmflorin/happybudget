@@ -6,36 +6,8 @@
   width: 36px !important;
   height: 36px !important;
   border-radius: 100%;
-  line-height: 18px;
   overflow: hidden;
   text-align: center;
   border-width: 1px;
   position: relative;
-
-  .user-profile-img {
-    height: 100%;
-    width: auto;
-    position: absolute;
-    top: 0;
-    left: 0;
-    object-fit: contain;
-  }
-
-  .user-circle-icon {
-    padding-top: 8px;
-    padding-bottom: 8px;
-    font-weight: 600;
-    height: 100%;
-    background-color: #eee;
-    color: #111;
-  }
-
-  svg {
-    height: 100%;
-    width: auto !important;
-    position: absolute;
-    top: 0;
-    left: 0;
-    color: #b5b5b5;
-  }
 }

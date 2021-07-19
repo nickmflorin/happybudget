@@ -2,21 +2,30 @@
 @import "style/typography";
 
 .image-uploader {
-  .ant-upload.ant-upload-select-picture-card {
-    height: 100%;
-    width: 100%;
-    margin: 0 !important;
+  .ant-upload-picture-card-wrapper {
+    height: 100% !important;
+    width: 100% !important;
 
-    img {
-      height: 100%;
-      width: 100%;
-      object-fit: cover;
+    .ant-upload.ant-upload-select-picture-card {
+      height: 100% !important;
+      width: 100% !important;
+      margin: 0 !important;
+      position: relative;
+      background-color: $white;
+      border: none;
+
+      img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover !important;
+      }
     }
-  }
-  .upload-indicator {
-    .icon {
-      height: 25px;
-      width: 25px;
+
+    .upload-indicator {
+      .icon {
+        height: 25px;
+        width: 25px;
+      }
     }
   }
 }

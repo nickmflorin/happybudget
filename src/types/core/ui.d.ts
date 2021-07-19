@@ -34,6 +34,10 @@ interface StandardComponentProps {
   readonly style?: React.CSSProperties;
 }
 
+interface StandardComponentWithChildrenProps extends StandardComponentProps {
+  readonly children: import("react").ReactNode;
+}
+
 interface StandardPdfComponentProps {
   readonly className?: string;
   readonly style?: import("@react-pdf/renderer").Styles;

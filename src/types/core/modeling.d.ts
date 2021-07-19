@@ -253,6 +253,7 @@ namespace Model {
 
   interface Contact extends Model.TimestampTrackedModel {
     readonly type: Model.ContactType | null;
+    readonly image: string | null;
     readonly first_name: string | null
     readonly last_name: string | null;
     readonly full_name: string;
@@ -266,6 +267,11 @@ namespace Model {
     readonly created_at: string;
     readonly updated_at: string;
   }
+
+  type UserWithImage =
+  | (Model.User & { profile_image: string })
+  | (Model.SimpleUser & { profile_image: string })
+  | (Model.Contact & { image: string });
 
   type HistoryEventType = "field_alteration" | "create";
 
