@@ -64,10 +64,9 @@ const AccountTable = ({
       (subaccount: Model.PdfSubAccount) => !(options.excludeZeroTotals === true) || subaccount.estimated !== 0
     );
     forEach(subaccounts, (subaccount: Model.PdfSubAccount, i: number) => {
-      const details = filter(
-        subaccount.subaccounts,
-        (detail: Model.PdfSubAccount) => !(options.excludeZeroTotals === true) || detail.estimated !== 0
-      );
+      // NOTE: We do not remove details with totals of 0, only sub accounts.
+      const details = subaccount.subaccounts;
+
       const showSubAccountFooterRow =
         filter(columns, (column: ColumnType) => !isNil(column.childFooter)).length !== 0 && details.length !== 0;
       const isLastSubAccount = i === subaccounts.length - 1;
