@@ -6,11 +6,11 @@ form {
 }
 
 .label-base {
-  font-size: 13px;
+  font-size: 11px;
   line-height: 22px;
   color: $text-secondary;
   font-family: $open-sans;
-  font-weight: 400 !important;
+  font-weight: 600 !important;
 }
 
 .form {
@@ -96,6 +96,7 @@ label {
     font-family: $open-sans !important;
     font-weight: 400 !important;
     color: $text-secondary !important;
+    padding-left: 2px;
 
     & > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
       margin-left: -3px;

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 
-import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
+import { SuppressKeyboardEventParams, RowNode } from "@ag-grid-community/core";
 
 import { EditContactModal, CreateContactModal } from "app/modals";
 import { getKeyValue } from "lib/util";
@@ -18,6 +18,7 @@ interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "mana
 }
 
 const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableProps): JSX.Element => {
+  const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
   const [contactToEdit, setContactToEdit] = useState<Model.Contact | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
@@ -30,6 +31,28 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
       <GenericSubAccountsTable
         loadingBudget={loadingBudget}
         loadingParent={loadingParent}
+        onCellFocusChanged={(params: Table.CellFocusChangedParams<BudgetTable.SubAccountRow, Model.SubAccount>) => {
+          /*
+          For the ContactCell, we want the contact tag in the cell to be clickable
+          only when the cell is focused.  This means we have to rerender the cell when
+          it becomes focused or unfocused so that the tag becomes clickable (in the focused
+          case) or unclickable (in the unfocused case).
+          */
+          const rowNodes: RowNode[] = [];
+          if (params.cell.column.field === "contact") {
+            rowNodes.push(params.cell.rowNode);
+          }
+          if (!isNil(params.previousCell) && params.previousCell.column.field === "contact") {
+            rowNodes.push(params.previousCell.rowNode);
+          }
+          if (rowNodes.length !== 0) {
+            params.apis.grid.refreshCells({
+              force: true,
+              rowNodes,
+              columns: ["contact"]
+            });
+          }
+        }}
         columns={[
           {
             field: "contact",
@@ -44,7 +67,17 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
               onEditContact: (contact: Model.Contact) => setContactToEdit(contact)
             },
             cellEditorParams: {
-              onNewContact: () => setCreateContactModalVisible(true)
+              onNewContact: (name?: string) => {
+                setInitialContactFormValues(null);
+                if (!isNil(name)) {
+                  const [firstName, lastName] = parseFirstAndLastName(name);
+                  setInitialContactFormValues({
+                    first_name: firstName,
+                    last_name: lastName
+                  });
+                }
+                setCreateContactModalVisible(true);
+              }
             },
             // Required to allow the dropdown to be selectable on Enter key.
             suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
@@ -126,6 +159,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
       )}
       <CreateContactModal
         visible={createContactModalVisible}
+        initialValues={initialContactFormValues}
         onSuccess={() => setCreateContactModalVisible(false)}
         onCancel={() => setCreateContactModalVisible(false)}
       />

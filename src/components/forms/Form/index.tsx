@@ -17,6 +17,10 @@ interface PrivateFormProps<T = any> extends FormProps<T> {
   children: JSX.Element[] | JSX.Element;
 }
 
+const isChangeEvent = (e: React.ChangeEvent<any> | any): e is React.ChangeEvent<any> => {
+  return (e as React.ChangeEvent<any>).target !== undefined;
+};
+
 /**
  * HOC for an input type field that will auto focus the field on render.  This
  * is used to wrap the first field of a Form.Item when that Form.Item is the
@@ -33,18 +37,26 @@ const withAutoFocusInput =
         inputRef.current.focus();
       }
     }, [inputRef.current]);
-    return <Component {...props} ref={inputRef} />;
+    return <Component {...props} autoFocus={true} />;
   };
 
 /**
  * HOC for Form.Item that will auto focus the first child field if the field
  * is capable of being focused.
  */
-const withFormItemFirstInputFocused =
-  <P extends { children: JSX.Element[] | JSX.Element }>(Component: React.ComponentType<P>) =>
-  /* eslint-disable indent */
-  (props: P): JSX.Element => {
-    const children = useMemo<JSX.Element[]>(() => {
+const withFormItemFirstInputFocused = <
+  T extends { [key: string]: any },
+  P extends { children: JSX.Element[] | JSX.Element; name: string } = {
+    children: JSX.Element[] | JSX.Element;
+    name: string;
+    [key: string]: any;
+  }
+>(
+  Component: React.ComponentType<P>,
+  formProps: Omit<PrivateFormProps<T>, "globalError" | "loading" | "children">
+) => {
+  const FormItem = (props: P): JSX.Element => {
+    const newChildren = useMemo<JSX.Element[]>(() => {
       /*
       NOTE: A Form.Item can have an Array of children, or a single child.  Each
       of which may or may not be an input field.
@@ -60,7 +72,9 @@ const withFormItemFirstInputFocused =
 
       The first option involves filtering the children (commented out below)
       - but it is not working properly, the filter does not seem to respect the
-      Input type.  However, that might not be what we want to do anyways...
+      Input type.  This is because of the use of forwardRef.
+
+      However, that might not be what we want to do anyways...
 
       We do not want to skip the focus to the middle of the form if the first
       few elements are Select fields (which cannot be focused).
@@ -70,20 +84,56 @@ const withFormItemFirstInputFocused =
 
       if (inputChildren.length !== 0) {
         const firstInputIndex = indexOf(c, inputChildren[0]);
+
         const AutoFocusInputComponent = withAutoFocusInput(inputChildren[0].type);
+
         c = [
           ...c.slice(0, firstInputIndex),
-          <AutoFocusInputComponent key={firstInputIndex} {...inputChildren[0].props} />,
+          <AutoFocusInputComponent
+            key={firstInputIndex}
+            {...inputChildren[0].props}
+            // We have to manually set the defaultValue because AntD will not apply it
+            // since we are messing with the AntD form mechanics here.
+            defaultValue={
+              !isNil(formProps.initialValues) && !isNil(props.name) ? formProps.initialValues[props.name] : undefined
+            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
+              /*
+                This is necessary in order to get changes to the fields of the <Form.Item>
+                to reflect in the Form data.  Normally, AntD handles this for us - but since
+                we are messing with the Form.Item structure here, we have to do it ourselves.
+
+                Because this onChange handler can be used for many different input types, the
+                event may or may not be a traditional React.ChangeEvent.  For example, if the
+                input element is a Select component, the event will just be the value of the
+                chosen Select.Option.
+
+                We could restrict the behavior to only apply to children input elements of
+                type <Input />, but that does not seem to be possible due to uses of
+                forwardRef (see above explanation).
+              */
+              const value = isChangeEvent(e) ? e.target.value : e;
+              if (!isNil(props.name)) {
+                formProps.form.setFieldsValue({ [props.name]: value } as any);
+              }
+              if (!isNil(inputChildren[0].props.onChange)) {
+                inputChildren[0].props.onChange(e);
+              }
+            }}
+          />,
           ...c.slice(firstInputIndex + 1)
         ];
       }
       return c;
     }, [props.children]);
-    return <React.Fragment>{children}</React.Fragment>;
+    const newProps = { ...props, children: newChildren.length === 1 ? newChildren[0] : newChildren };
+    return <Component {...newProps} />;
   };
+  return FormItem;
+};
 
 const PrivateForm = <T extends { [key: string]: any } = any>(
-  { globalError, initialValues, loading, children, className, style = {}, ...props }: PrivateFormProps<T>,
+  { globalError, loading, children, ...props }: PrivateFormProps<T>,
   ref: any
 ): JSX.Element => {
   const childrenArray = useMemo<JSX.Element[]>(() => {
@@ -115,12 +165,11 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
       const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item);
       if (formItemChildren.length !== 0) {
         const firstFormItemIndex = indexOf(c, formItemChildren[0]);
-        const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused(formItemChildren[0].type);
-        c = [
-          ...c.slice(0, firstFormItemIndex),
-          <AutFocusFirstInputFormItemComponent key={firstFormItemIndex} {...formItemChildren[0].props} />,
-          ...c.slice(firstFormItemIndex + 1)
-        ];
+        const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemChildren[0].type, props);
+        let newComponent = (
+          <AutFocusFirstInputFormItemComponent key={firstFormItemIndex} {...formItemChildren[0].props} />
+        );
+        c = [...c.slice(0, firstFormItemIndex), newComponent, ...c.slice(firstFormItemIndex + 1)];
       }
     }
     return c;
@@ -135,9 +184,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
       {...props}
       name={!isNil(props.name) ? props.name : props.form.isInModal === true ? "form_in_modal" : undefined}
       ref={ref}
-      initialValues={initialValues}
-      className={classNames(className, "form")}
-      style={style}
+      className={classNames(props.className, "form")}
     >
       <RenderWithSpinner loading={!isNil(props.form.loading) ? props.form.loading : loading}>
         {map(

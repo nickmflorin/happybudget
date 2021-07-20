@@ -31,8 +31,7 @@
   &--contact {
     border-radius: 4px;
 
-    &:hover,
-    &:focus {
+    &.focused {
       cursor: pointer;
     }
   }

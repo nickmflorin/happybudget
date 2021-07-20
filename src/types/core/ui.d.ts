@@ -259,6 +259,7 @@ type ExpandedModelMenuRef<M extends Model.M> = {
   readonly getModelAtMenuFocusedIndex: () => M | null;
   readonly performActionAtMenuFocusedIndex: (e: KeyboardEvent) => void;
   readonly menuFocused: boolean;
+  readonly searchValue: string;
 };
 
 interface _ExpandedModelMenuProps<M extends Model.M>

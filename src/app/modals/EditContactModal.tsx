@@ -65,7 +65,7 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
         form={form}
         globalError={globalError}
         initialValues={{
-          type: !isNil(contact.type) ? contact.type : null,
+          type: !isNil(contact.type) ? contact.type.id : null,
           first_name: contact.first_name,
           last_name: contact.last_name,
           company: contact.company,

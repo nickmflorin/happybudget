@@ -25,7 +25,8 @@ import {
   ProcessDataFromClipboardParams,
   CellRange,
   CellEditingStartedEvent,
-  CellMouseOverEvent
+  CellMouseOverEvent,
+  CellFocusedEvent
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -54,6 +55,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   actions,
   detached,
   rowLabel = "Row",
+  onCellFocusChanged,
   modelToRow,
   getModelLabel,
   getModelChildren,
@@ -72,6 +74,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   // cut/paste needs to be built in.
   const [cutCellChange, setCutCellChange] = useState<Table.CellChange<R, M> | null>(null);
   const oldRow = useRef<R | null>(null); // TODO: Figure out a better way to do this.
+  const oldFocusedEvent = useRef<CellFocusedEvent | null>(null);
+
   const location = useLocation();
   const [table, setTable] = useState<R[]>([]);
 
@@ -1008,6 +1012,50 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     }
   });
 
+  const onCellFocused = useDynamicCallback((e: CellFocusedEvent) => {
+    const getCellFromFocusedEvent = (event: CellFocusedEvent, col?: Table.Column<R, M>): Table.Cell<R, M> | null => {
+      if (!isNil(apis) && !isNil(event.rowIndex) && !isNil(event.column)) {
+        const rowNode: RowNode | null = apis.grid.getDisplayedRowAtIndex(event.rowIndex);
+        const column: Table.Column<R, M> | undefined = !isNil(col)
+          ? col
+          : find(columns, { field: event.column.getColId() } as any);
+        if (!isNil(rowNode) && !isNil(column)) {
+          const row: R = rowNode.data;
+          return { rowNode, column, row };
+        }
+      }
+      return null;
+    };
+
+    const cellsTheSame = (cell1: Table.Cell<R, M>, cell2: Table.Cell<R, M>): boolean => {
+      return cell1.column.field === cell2.column.field && cell1.row.id === cell2.row.id;
+    };
+
+    if (!isNil(e.column) && !isNil(apis)) {
+      const previousFocusEvent = !isNil(oldFocusedEvent.current) ? { ...oldFocusedEvent.current } : null;
+      oldFocusedEvent.current = e;
+
+      const col: Table.Column<R, M> | undefined = find(columns, { field: e.column.getColId() } as any);
+      if (!isNil(col)) {
+        const cell: Table.Cell<R, M> | null = getCellFromFocusedEvent(e);
+        const previousCell = !isNil(previousFocusEvent) ? getCellFromFocusedEvent(previousFocusEvent) : null;
+        if (!isNil(cell)) {
+          if (previousCell === null || !cellsTheSame(cell, previousCell)) {
+            if (!isNil(col.onCellFocus)) {
+              col.onCellFocus({ apis, cell });
+            }
+            if (!isNil(onCellFocusChanged)) {
+              onCellFocusChanged({ apis, previousCell, cell });
+            }
+            if (!isNil(previousCell) && !isNil(col.onCellUnfocus)) {
+              col.onCellUnfocus({ apis, cell: previousCell });
+            }
+          }
+        }
+      }
+    }
+  });
+
   const includeCellEditorParams = (def: Table.Column<R, M>): Table.Column<R, M> => {
     return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
   };
@@ -1045,6 +1093,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           onCellKeyDown={onCellKeyDown}
           onFirstDataRendered={onFirstDataRendered}
           suppressKeyboardEvent={suppressKeyboardEvent}
+          onCellFocused={onCellFocused}
           // rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
           onCellEditingStarted={(event: CellEditingStartedEvent) => {
             oldRow.current = { ...event.node.data };

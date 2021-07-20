@@ -6,9 +6,10 @@ import { faPlus } from "@fortawesome/pro-light-svg-icons";
 import { useContacts } from "store/hooks";
 import useModelMenuEditor from "./ModelMenuEditor";
 import ExpandedModelTagCellEditor from "./ExpandedModelTagCellEditor";
+import { isNil } from "lodash";
 
 interface ContactCellEditorProps extends Table.CellEditorParams {
-  readonly onNewContact: () => void;
+  readonly onNewContact: (name?: string) => void;
 }
 
 const ContactCellEditor = (props: ContactCellEditorProps, ref: any) => {
@@ -27,7 +28,13 @@ const ContactCellEditor = (props: ContactCellEditorProps, ref: any) => {
       tagProps={{ color: "#EFEFEF", textColor: "#2182e4", modelTextField: "full_name", className: "tag--contact" }}
       extra={[
         {
-          onClick: () => props.onNewContact(),
+          onClick: () => {
+            if (!isNil(editor.menuRef.current) && editor.menuRef.current.searchValue !== "") {
+              props.onNewContact(editor.menuRef.current.searchValue);
+            } else {
+              props.onNewContact();
+            }
+          },
           text: "Add Contact",
           icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />,
           showOnNoSearchResults: true,

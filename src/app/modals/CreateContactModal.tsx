@@ -11,12 +11,13 @@ import { Modal } from "components/modals";
 import { addContactToStateAction } from "store/actions";
 
 interface CreateContactModalProps {
-  visible: boolean;
-  onCancel: () => void;
-  onSuccess: () => void;
+  readonly visible: boolean;
+  readonly initialValues?: any;
+  readonly onCancel: () => void;
+  readonly onSuccess: () => void;
 }
 
-const CreateContactModal = ({ visible, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
+const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true });
   const dispatch: Dispatch = useDispatch();
@@ -57,7 +58,7 @@ const CreateContactModal = ({ visible, onCancel, onSuccess }: CreateContactModal
           });
       }}
     >
-      <ContactForm form={form} />
+      <ContactForm form={form} initialValues={initialValues} />
     </Modal>
   );
 };

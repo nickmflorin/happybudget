@@ -104,6 +104,23 @@ namespace Table {
 
   type Field<R extends Table.Row, M extends Model.Model> = Omit<keyof R & keyof M & string, "id">;
 
+  type Cell<R extends Table.Row, M extends Model.Model> = {
+    readonly row: R;
+    readonly column: Table.Column<R, M>;
+    readonly rowNode: import("@ag-grid-community/core").RowNode;
+  }
+
+  type CellFocusedParams<R extends Table.Row, M extends Model.Model> = {
+    readonly cell: Table.Cell<R, M>;
+    readonly apis: APIs;
+  }
+
+  type CellFocusChangedParams<R extends Table.Row, M extends Model.Model> = {
+    readonly cell: Table.Cell<R, M>;
+    readonly previousCell: Table.Cell<R, M> | null;
+    readonly apis: APIs;
+  }
+
   interface Column<R extends Table.Row, M extends Model.Model, V = any> extends Omit<import("@ag-grid-community/core").ColDef, "field"> {
     readonly type: ColumnTypeId;
     readonly nullValue?: null | "" | 0 | [];
@@ -114,6 +131,8 @@ namespace Table {
     readonly budget?: FooterColumn<R>;
     readonly footer?: FooterColumn<R>;
     readonly index?: number;
+    readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
+    readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
     readonly refreshColumns?: (change: Table.CellChange<R, M>) => Field<R, M> | Field<R, M>[] | null;
     readonly getModelValue?: (row: R) => M[keyof M];
     readonly getRowValue?: (m: M) => R[keyof R];
@@ -324,6 +343,7 @@ namespace BudgetTable {
     readonly search?: string;
     readonly columns: Table.Column<R, M>[];
     readonly rowLabel?: string;
+    readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
     readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
     // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
     // onRowExpand is provided to the BudgetTable.

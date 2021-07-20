@@ -76,6 +76,7 @@ const ExpandedModelMenu = <M extends Model.M>({
     menuRef,
     (): ExpandedModelMenuRef<M> => ({
       menuFocused: getFromMenuRef("focused", false),
+      searchValue: isNil(search) ? _search : search,
       getModelAtMenuFocusedIndex: getModelAtMenuFocusedIndex,
       performActionAtMenuFocusedIndex: performActionAtMenuFocusedIndex,
       incrementMenuFocusedIndex: () => {
