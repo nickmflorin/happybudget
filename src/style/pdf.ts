@@ -72,7 +72,9 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     fontFamily: "OpenSans",
     color: "#000000",
     fontWeight: 600,
-    fontSize: 10
+    fontSize: 10,
+    textAlign: "right",
+    width: "100%"
   },
   table: {
     // Note: react-pdf does not "support" display: table, even though it works fine,
