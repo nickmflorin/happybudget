@@ -177,7 +177,7 @@ const GenericSubAccountsTable = ({
       columns={[
         {
           field: "identifier",
-          type: "number",
+          columnType: "number",
           headerName: identifierFieldHeader,
           width: 90,
           cellRendererParams: { className: "subaccount-identifier" },
@@ -190,7 +190,7 @@ const GenericSubAccountsTable = ({
           headerName: `${categoryName} Description`,
           // flex: 100,
           flex: 1,
-          type: "longText",
+          columnType: "longText",
           index: 1,
           colSpan: (params: ColSpanParams) => {
             const row: BudgetTable.SubAccountRow = params.data;
@@ -205,7 +205,7 @@ const GenericSubAccountsTable = ({
           headerName: "Qty",
           width: 60,
           valueSetter: integerValueSetter<BudgetTable.SubAccountRow>("quantity"),
-          type: "number",
+          columnType: "number",
           // If the plurality of the quantity changes, we need to refresh the refresh
           // the unit column to change the plurality of the tag in the cell.
           refreshColumns: (change: Table.CellChange<BudgetTable.SubAccountRow, Model.SubAccount>) => {
@@ -231,7 +231,7 @@ const GenericSubAccountsTable = ({
           cellRenderer: "SubAccountUnitCell",
           width: 100,
           cellEditor: "SubAccountUnitCellEditor",
-          type: "singleSelect",
+          columnType: "singleSelect",
           getHttpValue: (value: Model.Tag | null): number | null => (!isNil(value) ? value.id : null),
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
@@ -264,7 +264,7 @@ const GenericSubAccountsTable = ({
           headerName: "X",
           width: 50,
           valueSetter: floatValueSetter<BudgetTable.SubAccountRow>("multiplier"),
-          type: "number"
+          columnType: "number"
         },
         {
           field: "rate",
@@ -272,7 +272,7 @@ const GenericSubAccountsTable = ({
           width: 100,
           valueFormatter: agCurrencyValueFormatter,
           valueSetter: floatValueSetter<BudgetTable.SubAccountRow>("rate"),
-          type: "currency"
+          columnType: "currency"
         },
         {
           field: "fringes",
@@ -286,7 +286,7 @@ const GenericSubAccountsTable = ({
           nullValue: [],
           cellEditor: fringesCellEditor,
           cellEditorParams: fringesCellEditorParams,
-          type: "singleSelect",
+          columnType: "singleSelect",
           getRowValue: (m: Model.SubAccount): Model.Fringe[] => getModelsByIds(fringes, m.fringes),
           getModelValue: (row: BudgetTable.SubAccountRow): number[] => map(row.fringes, (f: Model.Fringe) => f.id),
           processCellFromClipboard: (value: string) => {

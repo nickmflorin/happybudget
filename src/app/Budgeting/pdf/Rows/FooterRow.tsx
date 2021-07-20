@@ -5,11 +5,11 @@ import classNames from "classnames";
 import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
-const FooterRow = <R extends Table.PdfRow, M extends Model.Model>(props: Omit<RowProps<R, M>, "row">): JSX.Element => {
+const FooterRow = <R extends PdfTable.Row, M extends Model.Model>(props: Omit<RowProps<R, M>, "row">): JSX.Element => {
   const footerRow = useMemo((): R => {
     return reduce(
       props.columns,
-      (obj: { [key: string]: any }, col: Table.PdfColumn<R, M>) => {
+      (obj: { [key: string]: any }, col: PdfTable.Column<R, M>) => {
         if (!isNil(col.footer) && !isNil(col.footer.value)) {
           obj[col.field as string] = col.footer.value;
         } else {

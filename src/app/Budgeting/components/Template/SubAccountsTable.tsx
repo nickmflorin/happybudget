@@ -24,7 +24,7 @@ const SubAccountsTable = ({ detail, ...props }: SubAccountsTableProps): JSX.Elem
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            type: "sum",
+            columnType: "sum",
             fieldBehavior: ["read"],
             budget: {
               value: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0

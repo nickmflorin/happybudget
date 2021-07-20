@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect, useRef, useImperativeHandle } from "react";
-import { map, isNil, includes, find, forEach, filter, flatten, reduce, groupBy, uniq } from "lodash";
+import { map, isNil, includes, find, forEach, filter, flatten, reduce, uniq } from "lodash";
 import { useLocation } from "react-router-dom";
 
 import {
@@ -33,9 +33,9 @@ import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/g
 import * as models from "lib/model";
 import * as typeguards from "lib/model/typeguards";
 
-import { orderByFieldOrdering, getKeyValue } from "lib/util";
+import { getKeyValue } from "lib/util";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
-import { getGroupColorDefinition, consolidateTableChange } from "lib/model/util";
+import { getGroupColorDefinition, consolidateTableChange, createTableData } from "lib/model/util";
 import { rangeSelectionIsSingleCell } from "../util";
 import BudgetTableMenu from "./Menu";
 import Grid from "./Grid";
@@ -391,7 +391,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   const getCellChangeFromEvent = (
     event: CellEditingStoppedEvent | CellValueChangedEvent
   ): Table.CellChange<R, M> | null => {
-    const field = event.column.getColId() as Table.Field<R, M>;
+    const field = event.column.getColId() as GenericTable.Field<R, M>;
     // AG Grid treats cell values as undefined when they are cleared via edit,
     // so we need to translate that back into a null representation.
     const customCol: Table.Column<R, M> | undefined = find(columns, { field } as any);
@@ -434,7 +434,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     // TODO: We might have to also apply similiar logic for when a row is added?
     if (typeguards.isDataChangeEvent(event) && !isNil(apis)) {
       let nodesToRefresh: RowNode[] = [];
-      let columnsToRefresh: Table.Field<R, M>[] = [];
+      let columnsToRefresh: GenericTable.Field<R, M>[] = [];
 
       const changes: Table.RowChange<R, M>[] = consolidateTableChange(event.payload);
 
@@ -445,8 +445,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         if (!isNil(node)) {
           let hasColumnsToRefresh = false;
           for (let i = 0; i < Object.keys(rowChange.data).length; i++) {
-            const field: Table.Field<R, M> = Object.keys(rowChange.data)[i];
-            const change = getKeyValue<Table.RowChangeData<R, M>, Table.Field<R, M>>(field)(
+            const field: GenericTable.Field<R, M> = Object.keys(rowChange.data)[i];
+            const change = getKeyValue<Table.RowChangeData<R, M>, GenericTable.Field<R, M>>(field)(
               rowChange.data
             ) as Table.NestedCellChange<R, M>;
             // Check if the cellChange is associated with a Column that when changed,
@@ -633,7 +633,9 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         const column = params.column;
         const customCol = find(columns, (def: Table.Column<R, M>) => def.field === column.getColId());
         if (!isNil(customCol)) {
-          const columnType: Table.ColumnType | undefined = find(models.ColumnTypes, { id: customCol.type });
+          const columnType: GenericTable.ColumnType | undefined = find(models.ColumnTypes, {
+            id: customCol.columnType
+          });
           if (!isNil(columnType) && columnType.editorIsPopup === true) {
             const row: R = params.node.data;
             clearCell(row, customCol);
@@ -773,77 +775,33 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
       }
       return null;
     };
-    const getGroupForModel = (model: M): number | null => {
-      const group: Model.Group | undefined = find(groups, (g: Model.Group) =>
-        includes(
-          map(g.children, (child: number) => child),
-          model.id
-        )
-      );
-      return !isNil(group) ? group.id : null;
-    };
 
-    const convertModelToRow = (model: M): R => {
-      if (!isNil(modelToRow)) {
-        return modelToRow(model);
-      }
-      return reduce(
-        readColumns,
-        (obj: { [key: string]: any }, col: Table.Column<R, M>) => {
-          const nullValue = col.nullValue === undefined ? null : col.nullValue;
-          const modelValue = !isNil(col.getRowValue) ? col.getRowValue(model) : model[col.field as keyof M];
-          if (modelValue !== undefined) {
-            obj[col.field as string] = modelValue;
-          } else {
-            obj[col.field as string] = nullValue;
-          }
-          return obj;
-        },
-        {
-          id: model.id,
-          meta: {
-            ...models.DefaultRowMeta,
-            children: !isNil(getModelChildren) ? getModelChildren(model) : [],
-            group: getGroupForModel(model),
-            label: !isNil(getModelLabel) ? getModelLabel(model) : model.id
-          }
-        }
-      ) as R;
-    };
-
-    const modelsWithGroup = filter(data, (m: M) => !isNil(getGroupForModel(m)));
-    let modelsWithoutGroup = filter(data, (m: M) => isNil(getGroupForModel(m)));
-
-    const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
-
-    const newTable: R[] = [];
-    forEach(groupedModels, (ms: M[], groupId: string) => {
-      const group: Model.Group | undefined = find(groups, { id: parseInt(groupId) } as any);
-      if (!isNil(group)) {
-        newTable.push(
-          ...orderByFieldOrdering(
-            map(ms, (m: M) => convertModelToRow(m)),
-            ordering
-          )
-        );
-        const footer: R | null = createGroupFooter(group);
-        if (!isNil(footer)) {
-          newTable.push(footer);
-        }
-      } else {
-        // In the case that the group no longer exists, that means the group was removed from the
-        // state.  In this case, we want to disassociate the rows with the group.
-        modelsWithoutGroup = [...modelsWithoutGroup, ...ms];
-      }
+    const tableData = createTableData<Table.Column<R, M>, R, M, Table.RowMeta>(readColumns, data, groups, {
+      defaultNullValue: null,
+      ordering,
+      getRowMeta: (m: M) => ({
+        ...models.DefaultRowMeta,
+        children: !isNil(getModelChildren) ? getModelChildren(m) : [],
+        label: !isNil(getModelLabel) ? getModelLabel(m) : m.id
+      })
     });
 
-    setTable([
-      ...newTable,
-      ...orderByFieldOrdering(
-        map(modelsWithoutGroup, (m: M) => convertModelToRow(m)),
-        ordering
+    setTable(
+      reduce(
+        tableData,
+        (rows: R[], rowGroup: GenericTable.RowGroup<R, Table.RowMeta>) => {
+          let newRows: R[] = [...rows, ...rowGroup.rows];
+          if (!isNil(rowGroup.group)) {
+            const footer: R | null = createGroupFooter(rowGroup.group);
+            if (!isNil(footer)) {
+              newRows = [...newRows, footer];
+            }
+          }
+          return newRows;
+        },
+        []
       )
-    ]);
+    );
   }, [useDeepEqualMemo(data), useDeepEqualMemo(columns), useDeepEqualMemo(groups), ordering]);
 
   useEffect(() => {

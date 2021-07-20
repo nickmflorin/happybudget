@@ -70,7 +70,7 @@ const AccountsTable = (): JSX.Element => {
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            type: "sum",
+            columnType: "sum",
             fieldBehavior: ["read"],
             footer: {
               value: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0
@@ -80,7 +80,7 @@ const AccountsTable = (): JSX.Element => {
             field: "actual",
             headerName: "Actual",
             isCalculated: true,
-            type: "sum",
+            columnType: "sum",
             fieldBehavior: ["read"],
             footer: {
               value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
@@ -90,7 +90,7 @@ const AccountsTable = (): JSX.Element => {
             field: "variance",
             headerName: "Variance",
             isCalculated: true,
-            type: "sum",
+            columnType: "sum",
             fieldBehavior: ["read"],
             footer: {
               value: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0

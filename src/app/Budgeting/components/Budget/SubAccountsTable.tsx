@@ -61,7 +61,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
             cellRenderer: "ContactCell",
             width: 120,
             cellEditor: "ContactCellEditor",
-            type: "contact",
+            columnType: "contact",
             index: 2,
             cellRendererParams: {
               onEditContact: (contact: Model.Contact) => setContactToEdit(contact)
@@ -111,7 +111,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            type: "sum",
+            columnType: "sum",
             fieldBehavior: ["read"],
             budget: {
               value: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0
@@ -124,7 +124,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
             field: "actual",
             headerName: "Actual",
             isCalculated: true,
-            type: "sum",
+            columnType: "sum",
             fieldBehavior: ["read"],
             budget: {
               value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
@@ -137,7 +137,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
             field: "variance",
             headerName: "Variance",
             isCalculated: true,
-            type: "sum",
+            columnType: "sum",
             fieldBehavior: ["read"],
             budget: {
               value: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0

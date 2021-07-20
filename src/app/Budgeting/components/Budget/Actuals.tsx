@@ -161,7 +161,7 @@ const Actuals = (): JSX.Element => {
             {
               field: "subaccount",
               headerName: "Sub-Account",
-              type: "singleSelect",
+              columnType: "singleSelect",
               minWidth: 200,
               maxWidth: 200,
               width: 200,
@@ -212,7 +212,7 @@ const Actuals = (): JSX.Element => {
               field: "description",
               headerName: "Description",
               flex: 3,
-              type: "longText"
+              columnType: "longText"
             },
             {
               field: "contact",
@@ -221,7 +221,7 @@ const Actuals = (): JSX.Element => {
               cellRenderer: "ContactCell",
               width: 120,
               cellEditor: "ContactCellEditor",
-              type: "contact",
+              columnType: "contact",
               cellRendererParams: {
                 onEditContact: (contact: Model.Contact) => setContactToEdit(contact)
               },
@@ -260,7 +260,7 @@ const Actuals = (): JSX.Element => {
               field: "purchase_order",
               headerName: "Purchase Order",
               flex: 1,
-              type: "number"
+              columnType: "number"
             },
             {
               field: "date",
@@ -268,7 +268,7 @@ const Actuals = (): JSX.Element => {
               flex: 1,
               valueFormatter: agDateValueFormatter,
               valueSetter: dateTimeValueSetter<BudgetTable.ActualRow>("date"),
-              type: "date"
+              columnType: "date"
             },
             {
               field: "payment_method",
@@ -277,7 +277,7 @@ const Actuals = (): JSX.Element => {
               cellRenderer: "PaymentMethodCell",
               flex: 1,
               cellEditor: "PaymentMethodCellEditor",
-              type: "singleSelect",
+              columnType: "singleSelect",
               getHttpValue: (value: Model.PaymentMethod | null): number | null => (!isNil(value) ? value.id : null),
               // Required to allow the dropdown to be selectable on Enter key.
               suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
@@ -310,7 +310,7 @@ const Actuals = (): JSX.Element => {
               field: "payment_id",
               headerName: "Pay ID",
               flex: 1,
-              type: "number"
+              columnType: "number"
             },
             {
               field: "value",
@@ -319,7 +319,7 @@ const Actuals = (): JSX.Element => {
               valueFormatter: agCurrencyValueFormatter,
               valueSetter: floatValueSetter<BudgetTable.ActualRow>("value"),
               cellRenderer: "BodyCell",
-              type: "currency",
+              columnType: "currency",
               footer: { value: actualsTableTotal }
             }
           ]}

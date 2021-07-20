@@ -61,7 +61,7 @@ const AccountsTable = (): JSX.Element => {
             field: "estimated",
             headerName: "Estimated",
             isCalculated: true,
-            type: "sum",
+            columnType: "sum",
             fieldBehavior: ["read"],
             footer: {
               value: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0

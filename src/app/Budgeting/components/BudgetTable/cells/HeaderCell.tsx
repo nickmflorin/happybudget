@@ -31,9 +31,9 @@ interface IHeaderCompParams {
 export interface HeaderCellProps<R extends Table.Row, M extends Model.Model>
   extends Omit<IHeaderCompParams, "column">,
     StandardComponentProps {
-  onSort?: (order: Order, field: Table.Field<R, M>, column: Table.Column<R, M>) => void;
-  onEdit?: (field: Table.Field<R, M>, column: Table.Column<R, M>) => void;
-  ordering?: FieldOrdering<Table.Field<R, M>>;
+  onSort?: (order: Order, field: GenericTable.Field<R, M>, column: Table.Column<R, M>) => void;
+  onEdit?: (field: GenericTable.Field<R, M>, column: Table.Column<R, M>) => void;
+  ordering?: FieldOrdering<GenericTable.Field<R, M>>;
   column: Table.Column<R, M>;
 }
 
@@ -49,8 +49,8 @@ const HeaderCell = <R extends Table.Row, M extends Model.Model>({
 }: HeaderCellProps<R, M>): JSX.Element => {
   const [order, setOrder] = useState<Order>(0);
 
-  const columnType: Table.ColumnType | null = useMemo(() => {
-    return find(models.ColumnTypes, { id: column.type } as any) || null;
+  const columnType: GenericTable.ColumnType | null = useMemo(() => {
+    return find(models.ColumnTypes, { id: column.columnType } as any) || null;
   }, [column]);
 
   const columnStyle = useMemo(() => {
@@ -67,7 +67,9 @@ const HeaderCell = <R extends Table.Row, M extends Model.Model>({
   useEffect(() => {
     if (column.sortable === true) {
       if (!isNil(ordering)) {
-        const fieldOrder: FieldOrder<Table.Field<R, M>> | undefined = find(ordering, { field: column.field } as any);
+        const fieldOrder: FieldOrder<GenericTable.Field<R, M>> | undefined = find(ordering, {
+          field: column.field
+        } as any);
         if (!isNil(fieldOrder)) {
           setOrder(fieldOrder.order);
         }

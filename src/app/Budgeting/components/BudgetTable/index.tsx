@@ -223,7 +223,7 @@ const BudgetTable = <
   const IndexColumn = useDynamicCallback<Table.Column<R, M>>(
     (): Table.Column<R, M> => ({
       ...indexColumn,
-      type: "action",
+      columnType: "action",
       editable: false,
       headerName: "",
       resizable: false,
@@ -263,7 +263,7 @@ const BudgetTable = <
       width: 30,
       maxWidth: 30,
       ...expandColumn,
-      type: "action",
+      columnType: "action",
       fieldBehavior: [],
       headerName: "",
       field: "expand" as keyof M & keyof R & string,
@@ -283,7 +283,7 @@ const BudgetTable = <
   const IdentifierColumn = useDynamicCallback<Table.Column<R, M>>(
     (col: Partial<Table.Column<R, M>> & { field: keyof R & string }): Table.Column<R, M> => ({
       cellRenderer: "IdentifierCell",
-      type: "number",
+      columnType: "number",
       width: 100,
       maxWidth: 100,
       ...col,
@@ -330,7 +330,6 @@ const BudgetTable = <
 
   const CalculatedColumn = useDynamicCallback<Table.Column<R, M>>((col: Table.Column<R, M>): Table.Column<R, M> => {
     return {
-      // flex: 1,
       cellStyle: { textAlign: "right", ...col.cellStyle },
       ...col,
       cellRenderer: "CalculatedCell",

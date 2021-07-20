@@ -7,14 +7,14 @@ import { useDynamicCallback } from "lib/hooks";
 import Table from "./Table";
 import { BodyRow, HeaderRow, FooterRow } from "../Rows";
 
-type ColumnType = Table.PdfColumn<BudgetPdf.SubAccountRow, Model.PdfSubAccount>;
+type ColumnType = PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>;
 
 const AccountTable = ({
   /* eslint-disable indent */
   columns,
   account,
   options
-}: BudgetPdf.AccountTableProps): JSX.Element => {
+}: PdfBudgetTable.AccountTableProps): JSX.Element => {
   const showFooterRow = useMemo(() => {
     return filter(columns, (column: ColumnType) => !isNil(column.footer)).length !== 0;
   }, [columns]);
@@ -28,14 +28,14 @@ const AccountTable = ({
         row[column.field as keyof Model.PdfAccount] = null;
       }
     });
-    return row as BudgetPdf.SubAccountRow;
+    return row as PdfBudgetTable.SubAccountRow;
   }, [account, columns]);
 
   const generateRows = useDynamicCallback((): JSX.Element[] => {
-    const convertModelToRow = (model: Model.PdfSubAccount): BudgetPdf.SubAccountRow => {
+    const convertModelToRow = (model: Model.PdfSubAccount): PdfBudgetTable.SubAccountRow => {
       return reduce(
         columns,
-        (obj: { [key: string]: any }, col: Table.PdfColumn<BudgetPdf.SubAccountRow, Model.PdfSubAccount>) => {
+        (obj: { [key: string]: any }, col: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => {
           if (model[col.field as keyof Model.PdfSubAccount] !== undefined) {
             obj[col.field as string] = model[col.field as keyof Model.PdfSubAccount];
           } else {
@@ -44,11 +44,11 @@ const AccountTable = ({
           return obj;
         },
         { id: model.id, meta: {} }
-      ) as BudgetPdf.SubAccountRow;
+      ) as PdfBudgetTable.SubAccountRow;
     };
     let rows: JSX.Element[] = [
       <HeaderRow className={"account-header-tr"} columns={columns} index={0} key={0} />,
-      <BodyRow<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
+      <BodyRow<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>
         key={1}
         index={1}
         className={"account-sub-header-tr"}
@@ -86,7 +86,7 @@ const AccountTable = ({
           return obj;
         },
         {}
-      ) as BudgetPdf.SubAccountRow;
+      ) as PdfBudgetTable.SubAccountRow;
 
       rows.push(
         <BodyRow
@@ -103,7 +103,7 @@ const AccountTable = ({
       forEach(details, (detail: Model.PdfSubAccount, j: number) => {
         const detailRow = convertModelToRow(detail);
         rows.push(
-          <BodyRow<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
+          <BodyRow<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>
             key={runningIndex}
             index={runningIndex}
             columns={columns}
@@ -111,10 +111,10 @@ const AccountTable = ({
             row={detailRow}
             cellProps={{
               cellContentsVisible: (
-                params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
+                params: PdfTable.CellCallbackParams<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>
               ) => (params.column.field === "identifier" ? false : true),
               textClassName: "detail-tr-td-text",
-              className: (params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount>) => {
+              className: (params: PdfTable.CellCallbackParams<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => {
                 if (params.column.field === "description") {
                   return classNames("detail-td", "indent-td");
                 }
@@ -138,7 +138,7 @@ const AccountTable = ({
             return obj;
           },
           {}
-        ) as BudgetPdf.SubAccountRow;
+        ) as PdfBudgetTable.SubAccountRow;
 
         rows.push(
           <BodyRow

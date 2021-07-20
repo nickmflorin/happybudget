@@ -5,7 +5,7 @@ import * as formatters from "lib/model/formatters";
 import { View, Page, Tag } from "components/pdf";
 import { AccountsTable, AccountTable } from "./Tables";
 
-const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: BudgetPdf.Options) => {
+const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: PdfBudgetTable.Options) => {
   return (
     <Document>
       <Page title={budget.name} subTitle={"Cost Summary"}>
@@ -21,14 +21,14 @@ const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: 
               {
                 field: "identifier",
                 headerName: "Acct #",
-                type: "text",
+                columnType: "text",
                 width: "10%",
                 cellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
               },
               {
                 field: "description",
                 headerName: "Category Description",
-                type: "longText",
+                columnType: "longText",
                 width: "75%",
                 footer: {
                   value: "Grand Total"
@@ -38,7 +38,7 @@ const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: 
                 field: "estimated",
                 headerName: "Estimated",
                 isCalculated: true,
-                type: "sum",
+                columnType: "sum",
                 formatter: formatters.currencyValueFormatter,
                 width: "15%",
                 footer: {
@@ -63,7 +63,7 @@ const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: 
                 columns={[
                   {
                     field: "identifier",
-                    type: "number",
+                    columnType: "number",
                     headerName: "Acct",
                     width: "10%",
                     cellProps: { style: { borderRightWidth: 1 }, textStyle: { textAlign: "center" } }
@@ -71,7 +71,7 @@ const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: 
                   {
                     field: "description",
                     headerName: "Description",
-                    type: "longText",
+                    columnType: "longText",
                     width: "30%",
                     footer: {
                       /* eslint-disable indent */
@@ -93,10 +93,10 @@ const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: 
                   {
                     field: "contact",
                     headerName: "Contact",
-                    type: "contact",
+                    columnType: "contact",
                     width: "10%",
                     cellRenderer: (
-                      params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount>
+                      params: PdfTable.CellCallbackParams<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>
                     ) => {
                       if (params.rawValue !== null) {
                         const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
@@ -117,35 +117,36 @@ const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: 
                   {
                     field: "quantity",
                     headerName: "Qty",
-                    type: "number",
+                    columnType: "number",
                     width: "10%"
                   },
                   {
                     field: "unit",
                     headerName: "Unit",
-                    type: "singleSelect",
+                    columnType: "singleSelect",
                     width: "10%",
-                    cellRenderer: (params: Table.PdfCellCallbackParams<BudgetPdf.SubAccountRow, Model.PdfSubAccount>) =>
-                      params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>
+                    cellRenderer: (
+                      params: PdfTable.CellCallbackParams<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>
+                    ) => (params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>)
                   },
                   {
                     field: "multiplier",
                     headerName: "X",
-                    type: "number",
+                    columnType: "number",
                     width: "10%"
                   },
                   {
                     field: "rate",
                     headerName: "Rate",
                     formatter: formatters.currencyValueFormatter,
-                    type: "currency",
+                    columnType: "currency",
                     width: "10%"
                   },
                   {
                     field: "estimated",
                     headerName: "Total",
                     isCalculated: true,
-                    type: "sum",
+                    columnType: "sum",
                     width: "10%",
                     formatter: formatters.currencyValueFormatter,
                     footer: {

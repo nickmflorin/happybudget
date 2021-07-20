@@ -2,7 +2,7 @@ import classNames from "classnames";
 
 import Cell, { CellProps } from "./Cell";
 
-const HeaderCell = <R extends Table.PdfRow, M extends Model.Model>(props: CellProps<R, M>): JSX.Element => {
+const HeaderCell = <R extends PdfTable.Row, M extends Model.Model>(props: CellProps<R, M>): JSX.Element => {
   return (
     <Cell
       {...props}

@@ -140,7 +140,7 @@ const GenericAccountsTable = ({
       columns={[
         {
           field: "identifier",
-          type: "number",
+          columnType: "number",
           headerName: "Account",
           width: 90,
           footer: { value: !isNil(detail) ? `${detail.name} Total` : "Total", colSpan: (params: ColSpanParams) => 2 }
@@ -149,7 +149,7 @@ const GenericAccountsTable = ({
           field: "description",
           headerName: "Account Description",
           flex: 100,
-          type: "longText"
+          columnType: "longText"
         },
         ...props.columns
       ]}

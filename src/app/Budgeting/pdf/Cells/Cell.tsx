@@ -7,16 +7,16 @@ import { ShowHide } from "components";
 import { View, Text } from "components/pdf";
 import { getColumnTypeCSSStyle } from "lib/model/util";
 
-const isCallback = <R extends Table.PdfRow, M extends Model.Model, T = any>(
-  prop: Table.OptionalPdfCellCallback<R, M, T>
-): prop is Table.PdfCellCallback<R, M, T> => {
+const isCallback = <R extends PdfTable.Row, M extends Model.Model, T = any>(
+  prop: PdfTable.OptionalCellCallback<R, M, T>
+): prop is PdfTable.CellCallback<R, M, T> => {
   return typeof prop === "function";
 };
 
-const evaluateOptionalCallbackProp = <R extends Table.PdfRow, M extends Model.Model, T = any>(
+const evaluateOptionalCallbackProp = <R extends PdfTable.Row, M extends Model.Model, T = any>(
   /* eslint-disable indent */
-  prop: Table.OptionalPdfCellCallback<R, M, T> | undefined,
-  params: Table.PdfCellCallbackParams<R, M>
+  prop: PdfTable.OptionalCellCallback<R, M, T> | undefined,
+  params: PdfTable.CellCallbackParams<R, M>
 ) => {
   if (isCallback(prop)) {
     return prop(params);
@@ -24,14 +24,14 @@ const evaluateOptionalCallbackProp = <R extends Table.PdfRow, M extends Model.Mo
   return prop;
 };
 
-const evaluateClassName = <R extends Table.PdfRow, M extends Model.Model>(
-  className: Table.PdfCellClassName<R, M>,
-  params: Table.PdfCellCallbackParams<R, M>
+const evaluateClassName = <R extends PdfTable.Row, M extends Model.Model>(
+  className: PdfTable.CellClassName<R, M>,
+  params: PdfTable.CellCallbackParams<R, M>
 ): (string | undefined)[] => {
   if (Array.isArray(className)) {
-    const parts: (string | Table.PdfCellCallback<R, M> | Table.PdfCellClassName<R, M> | undefined)[] = className;
+    const parts: (string | PdfTable.CellCallback<R, M> | PdfTable.CellClassName<R, M> | undefined)[] = className;
     return flatten(
-      map(parts, (csName: string | Table.PdfCellCallback<R, M> | Table.PdfCellClassName<R, M> | undefined) =>
+      map(parts, (csName: string | PdfTable.CellCallback<R, M> | PdfTable.CellClassName<R, M> | undefined) =>
         evaluateClassName(csName, params)
       )
     );
@@ -40,23 +40,23 @@ const evaluateClassName = <R extends Table.PdfRow, M extends Model.Model>(
   }
 };
 
-export interface CellProps<R extends Table.PdfRow, M extends Model.Model> {
-  readonly column: Table.PdfColumn<R, M>;
+export interface CellProps<R extends PdfTable.Row, M extends Model.Model> {
+  readonly column: PdfTable.Column<R, M>;
   readonly row: R;
-  readonly location: Table.PdfCellLocation;
-  readonly style?: Table.OptionalPdfCellCallback<R, M, Style>;
-  readonly className?: Table.PdfCellClassName<R, M>;
-  readonly textStyle?: Table.OptionalPdfCellCallback<R, M, Style>;
-  readonly textClassName?: Table.PdfCellClassName<R, M>;
+  readonly location: PdfTable.CellLocation;
+  readonly style?: PdfTable.OptionalCellCallback<R, M, Style>;
+  readonly className?: PdfTable.CellClassName<R, M>;
+  readonly textStyle?: PdfTable.OptionalCellCallback<R, M, Style>;
+  readonly textClassName?: PdfTable.CellClassName<R, M>;
   readonly formatting?: boolean;
   readonly isHeader?: boolean;
   readonly debug?: boolean;
   readonly border?: boolean;
-  readonly cellContentsVisible?: Table.OptionalPdfCellCallback<R, M, boolean>;
-  readonly valueCallback?: (params: Omit<Table.PdfCellCallbackParams<R, M>, "value" | "rawValue">) => any;
+  readonly cellContentsVisible?: PdfTable.OptionalCellCallback<R, M, boolean>;
+  readonly valueCallback?: (params: Omit<PdfTable.CellCallbackParams<R, M>, "value" | "rawValue">) => any;
 }
 
-const Cell = <R extends Table.PdfRow, M extends Model.Model>(props: CellProps<R, M>): JSX.Element => {
+const Cell = <R extends PdfTable.Row, M extends Model.Model>(props: CellProps<R, M>): JSX.Element => {
   const callbackParams = useMemo(() => {
     return {
       location: props.location,
@@ -139,7 +139,10 @@ const Cell = <R extends Table.PdfRow, M extends Model.Model>(props: CellProps<R,
               // column types, since these are also used for the AG Grid tables.  We need to
               // figure out a way to differentiate between the two, because here - we are just
               // assuming that the column type styling only applies to the text.
-              ...(getColumnTypeCSSStyle(props.column.type, { header: props.isHeader || false, pdf: true }) as Style),
+              ...(getColumnTypeCSSStyle(props.column.columnType, {
+                header: props.isHeader || false,
+                pdf: true
+              }) as Style),
               ...evaluateOptionalCallbackProp<R, M, Style>(
                 props.isHeader === true ? props.column.headerCellProps?.textStyle : props.column.cellProps?.textStyle,
                 fullCallbackParams

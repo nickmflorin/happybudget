@@ -3,11 +3,11 @@ import { groupBy, isNil, reduce, find, forEach, includes, filter, map } from "lo
 import { ColDef } from "@ag-grid-community/core";
 
 import * as models from "lib/model";
-import { getKeyValue } from "lib/util";
+import { getKeyValue, orderByFieldOrdering } from "lib/util";
 import { contrastedForegroundColor } from "lib/util/colors";
 import { tableChangeIsCellChange, tableChangeIsRowChange } from "../typeguards/tabling";
 
-export const getGroupColorDefinition = (group: Model.Group): Table.RowColorDefinition => {
+export const getGroupColorDefinition = (group: Model.Group): GenericTable.RowColorDefinition => {
   if (!isNil(group) && !isNil(group.color)) {
     let backgroundColor = group.color;
     if (!isNil(backgroundColor)) {
@@ -29,12 +29,12 @@ type ColumnTypeVariantOptions = {
 };
 
 export const getColumnTypeCSSStyle = (
-  type: Table.ColumnTypeId | Table.ColumnType,
+  type: GenericTable.ColumnTypeId | GenericTable.ColumnType,
   options: ColumnTypeVariantOptions = { header: false, pdf: false }
 ): React.CSSProperties => {
-  let colType: Table.ColumnType;
+  let colType: GenericTable.ColumnType;
   if (typeof type === "string") {
-    const ct: Table.ColumnType | undefined = find(models.ColumnTypes, { id: type } as any);
+    const ct: GenericTable.ColumnType | undefined = find(models.ColumnTypes, { id: type } as any);
     if (isNil(ct)) {
       return {};
     }
@@ -60,12 +60,12 @@ export const toAgGridColDef = <R extends Table.Row = Table.Row, M extends Model.
     isCalculated,
     processCellForClipboard,
     processCellFromClipboard,
-    type,
+    columnType,
     budget,
     footer,
     ...original
   } = column;
-  original.cellStyle = { ...getColumnTypeCSSStyle(column.type), ...original.cellStyle };
+  original.cellStyle = { ...getColumnTypeCSSStyle(column.columnType), ...original.cellStyle };
   return original as ColDef;
 };
 
@@ -104,9 +104,9 @@ export const addCellChangeToRowChange = <R extends Table.Row, M extends Model.Mo
   cellChange: Table.CellChange<R, M>
 ): Table.RowChange<R, M> => {
   let newRowChange = { ...rowChange };
-  const fieldChange = getKeyValue<Table.RowChangeData<R, M>, Table.Field<R, M>>(cellChange.field)(newRowChange.data) as
-    | Omit<Table.CellChange<R, M>, "field" | "id">
-    | undefined;
+  const fieldChange = getKeyValue<Table.RowChangeData<R, M>, GenericTable.Field<R, M>>(cellChange.field)(
+    newRowChange.data
+  ) as Omit<Table.CellChange<R, M>, "field" | "id"> | undefined;
   if (isNil(fieldChange)) {
     newRowChange = {
       ...newRowChange,
@@ -144,8 +144,8 @@ export const reduceChangesForRow = <R extends Table.Row, M extends Model.Model>(
     return addCellChangeToRowChange(initialRowChange, change);
   } else {
     let rowChange = { ...initialRowChange };
-    Object.keys(change.data).forEach((key: Table.Field<R, M>) => {
-      const cellChange = getKeyValue<Table.RowChangeData<R, M>, Table.Field<R, M>>(key)(change.data) as Omit<
+    Object.keys(change.data).forEach((key: GenericTable.Field<R, M>) => {
+      const cellChange = getKeyValue<Table.RowChangeData<R, M>, GenericTable.Field<R, M>>(key)(change.data) as Omit<
         Table.CellChange<R, M>,
         "field" | "id"
       >;
@@ -185,8 +185,8 @@ export const mergeChangesWithModel = <R extends Table.Row, M extends Model.Model
     if (change.id !== model.id) {
       throw new Error("Trying to apply table changes to a model that were created for another model!");
     }
-    Object.keys(change.data).forEach((key: Table.Field<R, M>) => {
-      const cellChange = getKeyValue<Table.RowChangeData<R, M>, Table.Field<R, M>>(key)(
+    Object.keys(change.data).forEach((key: GenericTable.Field<R, M>) => {
+      const cellChange = getKeyValue<Table.RowChangeData<R, M>, GenericTable.Field<R, M>>(key)(
         change.data
       ) as Table.NestedCellChange<R, M>;
       let value = cellChange.newValue;
@@ -211,8 +211,8 @@ export const payload = <R extends Table.Row, M extends Model.Model, P extends Ht
     return (obj as Table.NestedCellAdd<R, M>).value !== undefined;
   };
 
-  Object.keys(p.data).forEach((key: Table.Field<R, M>) => {
-    const cellDelta = getKeyValue<Table.RowChangeData<R, M>, Table.Field<R, M>>(key)(p.data) as
+  Object.keys(p.data).forEach((key: GenericTable.Field<R, M>) => {
+    const cellDelta = getKeyValue<Table.RowChangeData<R, M>, GenericTable.Field<R, M>>(key)(p.data) as
       | Table.NestedCellChange<R, M>
       | Table.NestedCellAdd<R, M>;
 
@@ -289,4 +289,89 @@ export const createBulkCreatePayload = <R extends Table.Row, M extends Model.Mod
     bulkPayload = { data: map(p, (pi: Table.RowAdd<R, M>) => payload(pi)) };
   }
   return bulkPayload;
+};
+
+type CreateTableDataOptions<R extends GenericTable.Row<E>, M extends Model.Model, E extends object = any> = {
+  readonly getRowMeta?: (m: M) => E;
+  readonly defaultNullValue?: GenericTable.NullValue;
+  readonly ordering?: FieldOrder<keyof R>[];
+};
+
+export const createTableData = <
+  C extends GenericTable.Column<R, M>,
+  R extends GenericTable.Row<E>,
+  M extends Model.Model,
+  E extends object = any
+>(
+  columns: C[],
+  data: M[],
+  groups?: Model.Group[],
+  options?: CreateTableDataOptions<R, M, E>
+): GenericTable.TableData<R> => {
+  const dataOptions = options || {};
+  const defaultNullValue = dataOptions.defaultNullValue === undefined ? null : dataOptions.defaultNullValue;
+
+  const getGroupForModel = (model: M): number | null => {
+    if (isNil(groups)) {
+      return null;
+    }
+    const group: Model.Group | undefined = find(groups, (g: Model.Group) => includes(g.children, model.id));
+    return !isNil(group) ? group.id : null;
+  };
+
+  const convertModelToRow = (model: M): R => {
+    return reduce(
+      columns,
+      (obj: Partial<R>, col: PdfTable.Column<R, M>) => {
+        const nullValue = col.nullValue === undefined ? defaultNullValue : col.nullValue;
+        const modelValue = !isNil(col.getRowValue)
+          ? col.getRowValue(model)
+          : getKeyValue<M, keyof M>(col.field as keyof M)(model);
+        if (modelValue !== undefined) {
+          obj[col.field as keyof R] = modelValue as any;
+        } else {
+          obj[col.field as keyof R] = nullValue as R[keyof R];
+        }
+        return obj;
+      },
+      {
+        id: model.id,
+        meta: {
+          group: getGroupForModel(model),
+          ...(!isNil(dataOptions.getRowMeta) ? dataOptions.getRowMeta(model) : {})
+        }
+      } as Partial<R>
+    ) as R;
+  };
+  const modelsWithGroup: M[] = filter(data, (m: M) => !isNil(getGroupForModel(m)));
+  let modelsWithoutGroup: M[] = filter(data, (m: M) => isNil(getGroupForModel(m)));
+
+  const orderRows = (rows: R[]) =>
+    !isNil(dataOptions.ordering) ? orderByFieldOrdering<R>(rows, dataOptions.ordering) : rows;
+
+  let groupsWithGroup: GenericTable.RowGroup<R, E>[] = [];
+  let groupWithoutGroup: GenericTable.RowGroup<R, E> = {
+    group: null,
+    rows: map(modelsWithoutGroup, (m: M) => convertModelToRow(m))
+  };
+
+  const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
+  forEach(groupedModels, (ms: M[], groupId: string) => {
+    const group: Model.Group | undefined = find(groups, { id: parseInt(groupId) } as any);
+    if (!isNil(group)) {
+      groupsWithGroup.push({
+        group,
+        rows: orderRows(map(ms, (m: M) => convertModelToRow(m)))
+      });
+    } else {
+      // In the case that the group no longer exists, that means the group was removed from the
+      // state.  In this case, we want to disassociate the rows with the group.
+      groupWithoutGroup = {
+        ...groupWithoutGroup,
+        rows: [...groupWithoutGroup.rows, ...orderRows(map(ms, (m: M) => convertModelToRow(m)))]
+      };
+    }
+  });
+
+  return [...groupsWithGroup, groupWithoutGroup];
 };

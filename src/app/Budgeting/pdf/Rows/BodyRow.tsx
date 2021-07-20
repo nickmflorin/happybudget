@@ -4,7 +4,7 @@ import { BodyCell } from "../Cells";
 import { CellProps } from "../Cells/Cell";
 import Row, { RowProps } from "./Row";
 
-const BodyRow = <R extends Table.PdfRow, M extends Model.Model>({
+const BodyRow = <R extends PdfTable.Row, M extends Model.Model>({
   cellProps,
   ...props
 }: RowProps<R, M> & {
@@ -14,7 +14,7 @@ const BodyRow = <R extends Table.PdfRow, M extends Model.Model>({
   <Row
     {...props}
     className={classNames("body-tr", props.className)}
-    renderCell={(params: { column: Table.PdfColumn<R, M>; location: Table.PdfCellLocation }) => {
+    renderCell={(params: { column: PdfTable.Column<R, M>; location: PdfTable.CellLocation }) => {
       return (
         <BodyCell<R, M>
           key={`${params.location.index}-${params.location.colIndex}`}

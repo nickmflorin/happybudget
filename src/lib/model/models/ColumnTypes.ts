@@ -12,7 +12,7 @@ import {
   faPercentage
 } from "@fortawesome/pro-solid-svg-icons";
 
-const ColumnTypes: Table.ColumnType[] = [
+const ColumnTypes: GenericTable.ColumnType[] = [
   {
     id: "action"
   },

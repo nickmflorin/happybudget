@@ -92,7 +92,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
       columns={[
         {
           field: "name",
-          type: "text",
+          columnType: "text",
           headerName: "Name"
         },
         {
@@ -102,19 +102,19 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
           cellRenderer: "ColorCell",
           cellEditor: "FringesColorEditor",
           width: 100,
-          type: "singleSelect"
+          columnType: "singleSelect"
         },
         {
           field: "description",
           headerName: "Description",
-          type: "longText"
+          columnType: "longText"
         },
         {
           field: "rate",
           headerName: "Rate",
           valueFormatter: agPercentageValueFormatter,
           valueSetter: percentageToDecimalValueSetter<BudgetTable.FringeRow>("rate"),
-          type: "percentage"
+          columnType: "percentage"
         },
         {
           field: "unit",
@@ -123,7 +123,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
           cellRenderer: "FringeUnitCell",
           width: 100,
           cellEditor: "FringeUnitCellEditor",
-          type: "singleSelect",
+          columnType: "singleSelect",
           getHttpValue: (value: Model.FringeUnit | null): number | null => (!isNil(value) ? value.id : null),
           // Required to allow the dropdown to be selectable on Enter key.
           suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
@@ -153,7 +153,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
         {
           field: "cutoff",
           headerName: "Cutoff",
-          type: "number"
+          columnType: "number"
         }
       ]}
       {...props}
