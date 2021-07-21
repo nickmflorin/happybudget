@@ -562,7 +562,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     } else {
       const deleteRowContextMenuItem: MenuItemDef = {
         name: `Delete ${row.meta.label || "Row"}`,
-        action: () => _onChangeEvent({ payload: row.id, type: "rowDelete" })
+        action: () => _onChangeEvent({ payload: { rows: row, columns }, type: "rowDelete" })
       };
       if (isNil(groupParams)) {
         return [deleteRowContextMenuItem];

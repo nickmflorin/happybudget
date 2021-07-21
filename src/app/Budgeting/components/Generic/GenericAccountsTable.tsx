@@ -59,7 +59,7 @@ const GenericAccountsTable = ({
           onClick: () => {
             const rows: BudgetTable.AccountRow[] = params.apis.grid.getSelectedRows();
             props.onChangeEvent({
-              payload: map(rows, (row: BudgetTable.AccountRow) => row.id),
+              payload: { rows, columns: params.columns },
               type: "rowDelete"
             });
           }

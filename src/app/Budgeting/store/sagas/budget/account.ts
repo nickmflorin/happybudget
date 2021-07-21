@@ -188,7 +188,6 @@ const tasks = createAccountTaskSet(
     },
     account: {
       request: actions.requestAccountAction,
-      loading: actions.loadingAccountAction,
       response: actions.responseAccountAction
     },
     groups: {

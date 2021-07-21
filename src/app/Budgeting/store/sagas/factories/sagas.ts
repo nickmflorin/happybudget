@@ -57,7 +57,7 @@ interface GroupsTaskMap {
 interface FringeTaskMap {
   getFringes: Redux.Task<null>;
   handleRowAddEvent: Redux.Task<Table.RowAddEvent<BudgetTable.FringeRow, Model.Fringe>>;
-  handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
+  handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent<BudgetTable.FringeRow, Model.Fringe>>;
   handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<BudgetTable.FringeRow, Model.Fringe>>;
 }
 
@@ -67,7 +67,7 @@ interface TaskMap<R extends Table.Row, M extends Model.Model> {
   Groups: GroupsTaskMap;
   Request: Redux.Task<null>;
   HandleRowAddEvent: Redux.Task<Table.RowAddEvent<R, M>>;
-  HandleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent>;
+  HandleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent<R, M>>;
   HandleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R, M>>;
 }
 
@@ -202,7 +202,10 @@ export const createStandardFringesSaga = (actions: FringesActionMap, tasks: Frin
           );
         } else if (typeguards.isRowDeleteEvent(event)) {
           // Blocking call so that table changes happen sequentially.
-          yield call(tasks.handleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent>);
+          yield call(
+            tasks.handleRowDeleteEvent,
+            action as Redux.Action<Table.RowDeleteEvent<BudgetTable.FringeRow, Model.Fringe>>
+          );
         }
       }
     }
@@ -260,7 +263,7 @@ export const createStandardSaga = <R extends Table.Row, M extends Model.Model>(
           yield call(tasks.HandleRowAddEvent, action as Redux.Action<Table.RowAddEvent<R, M>>);
         } else if (typeguards.isRowDeleteEvent(event)) {
           // Blocking call so that table changes happen sequentially.
-          yield call(tasks.HandleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent>);
+          yield call(tasks.HandleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent<R, M>>);
         }
       }
     }

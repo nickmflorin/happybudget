@@ -49,7 +49,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
             const rows: BudgetTable.FringeRow[] = params.apis.grid.getSelectedRows();
             props.onChangeEvent({
               type: "rowDelete",
-              payload: map(rows, (row: BudgetTable.FringeRow) => row.id)
+              payload: { rows, columns: params.columns }
             });
           }
         },

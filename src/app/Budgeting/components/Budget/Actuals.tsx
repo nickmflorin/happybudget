@@ -91,7 +91,10 @@ const Actuals = (): JSX.Element => {
                 dispatch(
                   actions.handleTableChangeEventAction({
                     type: "rowDelete",
-                    payload: map(rows, (row: BudgetTable.ActualRow) => row.id)
+                    payload: {
+                      rows,
+                      columns: params.columns
+                    }
                   })
                 );
               }

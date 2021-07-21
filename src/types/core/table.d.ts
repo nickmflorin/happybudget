@@ -97,6 +97,7 @@ namespace Table {
     readonly budget?: FooterColumn<R>;
     readonly footer?: FooterColumn<R>;
     readonly index?: number;
+    readonly refreshParentOnChange?: boolean;
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
     readonly refreshColumns?: (change: Table.CellChange<R, M>) => Field<R, M> | Field<R, M>[] | null;
@@ -135,6 +136,12 @@ namespace Table {
     readonly cell: Table.Cell<R, M>;
     readonly previousCell: Table.Cell<R, M> | null;
     readonly apis: APIs;
+  }
+
+  type ChangeEventId = "dataChange" | "rowAdd" | "rowDelete";
+
+  type BaseChangeEvent = {
+    readonly type: ChangeEventId;
   }
 
   type CellChange<R extends Table.Row, M extends Model.Model, V = any> = {
@@ -178,31 +185,26 @@ namespace Table {
 
   type ConsolidatedChange<R extends Table.Row, M extends Model.Model> = Table.RowChange<R, M>[];
 
-  type RowAddPayload<R extends Table.Row, M extends Model.Model> = number | Table.RowAdd<R, M> | Table.RowAdd<R, M>[];
-  type RowAddFunc<R extends Table.Row, M extends Model.Model> = (payload: RowAddPayload<R, M>) => void;
-
-  type ChangeEventId = "dataChange" | "rowAdd" | "rowDelete";
-
-  type BaseChangeEvent = {
-    readonly type: ChangeEventId;
-  }
-
   type DataChangeEvent<R extends Table.Row, M extends Model.Model> = Table.BaseChangeEvent & {
     readonly type: "dataChange";
     readonly payload: Table.Change<R, M>
   }
 
+  type RowAddPayload<R extends Table.Row, M extends Model.Model> = number | Table.RowAdd<R, M> | Table.RowAdd<R, M>[];
+  type RowAddFunc<R extends Table.Row, M extends Model.Model> = (payload: RowAddPayload<R, M>) => void;
   type RowAddEvent<R extends Table.Row, M extends Model.Model> = Table.BaseChangeEvent & {
     readonly type: "rowAdd";
     readonly payload: Table.RowAddPayload<R, M>;
   }
 
-  type RowDeleteEvent = Table.BaseChangeEvent & {
+  type RowDeletePayload<R extends Table.Row, M extends Model.Model> = {columns: Table.Column<R, M>[], rows: R | R[]};
+  type RowDeleteFunc<R extends Table.Row, M extends Model.Model> = (payload: RowDeletePayload<R, M>) => void;
+  type RowDeleteEvent<R extends Table.Row, M extends Model.Model> = Table.BaseChangeEvent & {
     readonly type: "rowDelete";
-    readonly payload: number[] | number;
+    readonly payload: Table.RowDeletePayload<R, M>;
   }
 
-  type ChangeEvent<R extends Table.Row, M extends Model.Model> = Table.DataChangeEvent<R, M> | Table.RowAddEvent<R, M> | Table.RowDeleteEvent;
+  type ChangeEvent<R extends Table.Row, M extends Model.Model> = Table.DataChangeEvent<R, M> | Table.RowAddEvent<R, M> | Table.RowDeleteEvent<R, M>;
 
   interface CellPositionMoveOptions {
     readonly startEdit?: boolean;

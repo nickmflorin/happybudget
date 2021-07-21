@@ -193,7 +193,6 @@ const tasks = createSubAccountTaskSet(
     },
     subaccount: {
       request: actions.requestSubAccountAction,
-      loading: actions.loadingSubAccountAction,
       response: actions.responseSubAccountAction
     },
     groups: {

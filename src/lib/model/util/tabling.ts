@@ -5,7 +5,12 @@ import { ColDef } from "@ag-grid-community/core";
 import * as models from "lib/model";
 import { getKeyValue } from "lib/util";
 import { contrastedForegroundColor } from "lib/util/colors";
-import { tableChangeIsCellChange, tableChangeIsRowChange } from "../typeguards/tabling";
+import {
+  tableChangeIsCellChange,
+  tableChangeIsRowChange,
+  isDataChangeEvent,
+  isRowAddEvent
+} from "../typeguards/tabling";
 
 export const getGroupColorDefinition = (group: Model.Group): GenericTable.RowColorDefinition => {
   if (!isNil(group) && !isNil(group.color)) {
@@ -197,6 +202,88 @@ export const mergeChangesWithModel = <R extends Table.Row, M extends Model.Model
     });
   });
   return newModel;
+};
+
+export const rowChangeRequiresParentRefresh = <R extends Table.Row, M extends Model.Model>(
+  change: Table.RowChange<R, M>
+): boolean =>
+  /* eslint-disable indent */
+  filter(change.data, (value: Table.NestedCellChange<R, M>) => value.column.refreshParentOnChange === true).length !==
+  0;
+
+export const rowAddRequiresParentRefresh = <R extends Table.Row, M extends Model.Model>(
+  add: Table.RowAdd<R, M>
+): boolean =>
+  /* eslint-disable indent */
+  filter(add.data, (value: Table.NestedCellAdd<R, M>) => value.column.refreshParentOnChange === true).length !== 0;
+
+export const rowDeleteRequiresParentRefresh = <R extends Table.Row, M extends Model.Model>(
+  row: R,
+  columns: Table.Column<R, M>[]
+): boolean => {
+  return (
+    reduce(
+      columns,
+      (data: boolean[], column: Table.Column<R, M>) => {
+        if (column.refreshParentOnChange === true) {
+          const nullValue = column.nullValue === undefined ? null : column.nullValue;
+          if (row[column.field as keyof R] !== nullValue) {
+            return [...data, true];
+          }
+        }
+        return data;
+      },
+      []
+    ).length !== 0
+  );
+};
+
+export const consolidatedChangesRequireParentRefresh = <R extends Table.Row, M extends Model.Model>(
+  changes: Table.ConsolidatedChange<R, M>
+): boolean => {
+  const changesRequiringRefresh: Table.ConsolidatedChange<R, M> = filter(changes, (change: Table.RowChange<R, M>) =>
+    rowChangeRequiresParentRefresh<R, M>(change)
+  );
+  return changesRequiringRefresh.length !== 0;
+};
+
+export const changesRequireParentRefresh = <R extends Table.Row, M extends Model.Model>(
+  changes: Table.Change<R, M>
+): boolean => {
+  const consolidated: Table.ConsolidatedChange<R, M> = consolidateTableChange<R, M>(changes);
+  return consolidatedChangesRequireParentRefresh(consolidated);
+};
+
+export const additionsRequireParentRefresh = <R extends Table.Row, M extends Model.Model>(
+  additions: Table.RowAddPayload<R, M>
+): boolean => {
+  // If the payload is just a number, we are just creating a certain number of blank
+  // rows - so no refresh is warranted.
+  if (typeof additions === "number") {
+    return false;
+  }
+  return Array.isArray(additions)
+    ? filter(additions, (add: Table.RowAdd<R, M>) => rowAddRequiresParentRefresh(add) === true).length !== 0
+    : rowAddRequiresParentRefresh(additions);
+};
+
+export const deletionsRequireParentRefresh = <R extends Table.Row, M extends Model.Model>(
+  deletion: Table.RowDeletePayload<R, M>
+): boolean => {
+  const rows: R[] = Array.isArray(deletion.rows) ? deletion.rows : [deletion.rows];
+  return filter(rows, (row: R) => rowDeleteRequiresParentRefresh<R, M>(row, deletion.columns)).length !== 0;
+};
+
+export const eventRequiresParentRefresh = <R extends Table.Row, M extends Model.Model>(
+  e: Table.ChangeEvent<R, M>
+): boolean => {
+  if (isDataChangeEvent(e)) {
+    return changesRequireParentRefresh(e.payload);
+  } else if (isRowAddEvent(e)) {
+    return additionsRequireParentRefresh(e.payload);
+  } else {
+    return deletionsRequireParentRefresh(e.payload);
+  }
 };
 
 export const payload = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(

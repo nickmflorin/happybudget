@@ -22,8 +22,8 @@ export const isRowAddEvent = <R extends Table.Row, M extends Model.Model>(
 
 export const isRowDeleteEvent = <R extends Table.Row, M extends Model.Model>(
   e: Table.ChangeEvent<R, M>
-): e is Table.RowDeleteEvent => {
-  return (e as Table.RowDeleteEvent).type === "rowDelete";
+): e is Table.RowDeleteEvent<R, M> => {
+  return (e as Table.RowDeleteEvent<R, M>).type === "rowDelete";
 };
 
 export const tableChangeIsRowChange = <R extends Table.Row, M extends Model.Model>(

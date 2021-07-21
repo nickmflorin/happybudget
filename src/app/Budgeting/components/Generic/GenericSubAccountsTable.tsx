@@ -96,7 +96,7 @@ const GenericSubAccountsTable = ({
           onClick: () => {
             const rows: BudgetTable.SubAccountRow[] = params.apis.grid.getSelectedRows();
             props.onChangeEvent({
-              payload: map(rows, (row: BudgetTable.SubAccountRow) => row.id),
+              payload: { rows, columns: params.columns },
               type: "rowDelete"
             });
           }
@@ -204,6 +204,7 @@ const GenericSubAccountsTable = ({
           field: "quantity",
           headerName: "Qty",
           width: 60,
+          refreshParentOnChange: true,
           valueSetter: integerValueSetter<BudgetTable.SubAccountRow>("quantity"),
           columnType: "number",
           // If the plurality of the quantity changes, we need to refresh the refresh
@@ -263,6 +264,7 @@ const GenericSubAccountsTable = ({
           field: "multiplier",
           headerName: "X",
           width: 50,
+          refreshParentOnChange: true,
           valueSetter: floatValueSetter<BudgetTable.SubAccountRow>("multiplier"),
           columnType: "number"
         },
@@ -270,6 +272,7 @@ const GenericSubAccountsTable = ({
           field: "rate",
           headerName: "Rate",
           width: 100,
+          refreshParentOnChange: true,
           valueFormatter: agCurrencyValueFormatter,
           valueSetter: floatValueSetter<BudgetTable.SubAccountRow>("rate"),
           columnType: "currency"
@@ -277,6 +280,7 @@ const GenericSubAccountsTable = ({
         {
           field: "fringes",
           headerName: "Fringes",
+          refreshParentOnChange: true,
           cellClass: classNames("cell--centered"),
           cellRenderer: "FringesCell",
           headerComponentParams: {
