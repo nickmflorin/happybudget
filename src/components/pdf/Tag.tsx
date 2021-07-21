@@ -11,19 +11,14 @@ const Tag = <M extends Model.Model = Model.Model>(params: TagProps<M, Style>): J
       render={(p: ITagRenderParams<Style>) => {
         return (
           <View
-            className={classNames(
-              "tag",
-              { uppercase: params.uppercase },
-              { "fill-width": params.fillWidth },
-              params.className
-            )}
-            style={{ ...params.style, backgroundColor: params.color, color: params.textColor }}
+            className={classNames("tag", { uppercase: p.uppercase }, { "fill-width": p.fillWidth }, p.className)}
+            style={{ ...params.style, backgroundColor: p.color }}
           >
             {!isNil(params.contentRender) ? (
               params.contentRender(p)
             ) : (
-              <Text className={classNames("tag-text", params.textClassName)} style={params.textStyle}>
-                {params.text}
+              <Text className={classNames("tag-text", p.textClassName)} style={{ ...p.textStyle, color: p.textColor }}>
+                {p.text}
               </Text>
             )}
           </View>

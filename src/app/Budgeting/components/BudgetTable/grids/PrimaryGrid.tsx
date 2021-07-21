@@ -789,8 +789,11 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     setTable(
       reduce(
         tableData,
-        (rows: R[], rowGroup: GenericTable.RowGroup<R, Table.RowMeta>) => {
-          let newRows: R[] = [...rows, ...rowGroup.rows];
+        (rows: R[], rowGroup: GenericTable.RowGroup<R, M, Table.RowMeta>) => {
+          let newRows: R[] = [
+            ...rows,
+            ...map(rowGroup.rows, (row: GenericTable.ModelWithRow<R, M, Table.RowMeta>) => row.row)
+          ];
           if (!isNil(rowGroup.group)) {
             const footer: R | null = createGroupFooter(rowGroup.group);
             if (!isNil(footer)) {

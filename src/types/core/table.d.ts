@@ -10,16 +10,21 @@ namespace GenericTable {
   }
 
   interface RowMeta {
-    readonly group: number | null;
+    readonly group?: number | null;
   };
 
-  interface Row<E extends Table.RowMeta> extends Record<string, any> {
+  interface Row<E extends Table.RowMeta = Table.RowMeta> extends Record<string, any> {
     readonly id: number;
     readonly meta: E;
   }
 
-  interface RowGroup<R extends GenericTable.Row<E>, E extends Table.RowMeta> {
-    readonly rows: R[];
+  type ModelWithRow<R extends GenericTable.Row<E>, M extends Model.Model, E extends Table.RowMeta = Table.RowMeta> = {
+    readonly row: R;
+    readonly model: M;
+  }
+
+  interface RowGroup<R extends GenericTable.Row<E>, M extends Model.Model, E extends Table.RowMeta = Table.RowMeta> {
+    readonly rows: GenericTable.ModelWithRow<R, M, E>[];
     readonly group?: Model.Group | null;
   }
 
@@ -76,13 +81,12 @@ namespace GenericTable {
 namespace Table {
   type FieldBehavior = "read" | "write";
 
-  interface RowMeta {
+  interface RowMeta extends GenericTable.RowMeta {
     readonly isGroupFooter?: boolean;
     readonly isTableFooter?: boolean;
     readonly isBudgetFooter?: boolean;
     readonly children?: number[];
     readonly label?: string | number | null;
-    readonly group?: number | null;
   }
 
   type Row = GenericTable.Row<Table.RowMeta>;
@@ -237,7 +241,7 @@ namespace Table {
 }
 
 namespace PdfTable {
-  type RowMeta = {};
+  type RowMeta = GenericTable.RowMeta & {};
   type Row = GenericTable.Row<PdfTable.RowMeta>;
 
   interface FooterColumn {
@@ -253,16 +257,27 @@ namespace PdfTable {
     readonly isHeader: boolean;
     readonly rawValue: any;
     readonly value: any;
+    readonly indented: boolean;
   }
+
   type CellCallback<R extends PdfTable.Row, M extends Model.Model, V = any> = (params: PdfTable.CellCallbackParams<R, M>) => V;
   type OptionalCellCallback<R extends PdfTable.Row, M extends Model.Model, V = any> = V | PdfTable.CellCallback<R, M, V> | undefined;
-  type CellClassName<R extends PdfTable.Row, M extends Model.Model> = (PdfTable.OptionalCellCallback<R, M, string> | PdfTable.CellClassName<R, M>)[] | PdfTable.OptionalCellCallback<R, M, string>
+
+  interface _CellClassName<R extends PdfTable.Row, M extends Model.Model> {
+    [n: number]: OptionalCellCallback<R, M, string> | _CellClassName<R, M>;
+  };
+  type CellClassName<R extends PdfTable.Row, M extends Model.Model> = OptionalCellCallback<R, M, string> | _CellClassName<R, M>;
+
+  interface _CellStyle<R extends PdfTable.Row, M extends Model.Model> {
+    [n: number]: OptionalCellCallback<R, M, import("@react-pdf/types").Style> | _CellStyle<R, M>;
+  };
+  type CellStyle<R extends PdfTable.Row, M extends Model.Model> = OptionalCellCallback<R, M, import("@react-pdf/types").Style> | _CellStyle<R, M>;
 
   type CellStandardProps<R extends PdfTable.Row, M extends Model.Model> = {
-    readonly style?: PdfTable.OptionalCellCallback<R, M, import("@react-pdf/types").Style>;
-    readonly className?: PdfTable.OptionalCellCallback<R, M, PdfTable.CellClassName<R, M>>;
-    readonly textStyle?: PdfTable.OptionalCellCallback<R, M, import("@react-pdf/types").Style>;
-    readonly textClassName?: PdfTable.OptionalCellCallback<R, M, PdfTable.CellClassName<R, M>>;
+    readonly style?: PdfTable.CellStyle<R, M>;
+    readonly className?: PdfTable.CellClassName<R, M>;
+    readonly textStyle?: PdfTable.CellStyle<R, M>;
+    readonly textClassName?: PdfTable.CellClassName<R, M>;
   }
 
   interface Column<R extends PdfTable.Row, M extends Model.Model> extends GenericTable.Column<R, M> {

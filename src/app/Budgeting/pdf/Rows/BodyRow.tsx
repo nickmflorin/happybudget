@@ -14,13 +14,14 @@ const BodyRow = <R extends PdfTable.Row, M extends Model.Model>({
   <Row
     {...props}
     className={classNames("body-tr", props.className)}
-    renderCell={(params: { column: PdfTable.Column<R, M>; location: PdfTable.CellLocation }) => {
+    renderCell={(params: { column: PdfTable.Column<R, M>; indented: boolean; location: PdfTable.CellLocation }) => {
       return (
         <BodyCell<R, M>
           key={`${params.location.index}-${params.location.colIndex}`}
           location={params.location}
           column={params.column}
           row={props.row}
+          indented={params.indented}
           {...cellProps}
         />
       );

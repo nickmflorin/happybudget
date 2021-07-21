@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Style } from "@react-pdf/types";
 import classNames from "classnames";
-import { isNil, map, flatten } from "lodash";
+import { isNil, map, flatten, reduce } from "lodash";
 
 import { ShowHide } from "components";
 import { View, Text } from "components/pdf";
@@ -36,7 +36,25 @@ const evaluateClassName = <R extends PdfTable.Row, M extends Model.Model>(
       )
     );
   } else {
-    return [evaluateOptionalCallbackProp(className, params)];
+    return [evaluateOptionalCallbackProp<R, M>(className, params)];
+  }
+};
+
+const evaluateCellStyle = <R extends PdfTable.Row, M extends Model.Model>(
+  styleObj: PdfTable.CellStyle<R, M>,
+  params: PdfTable.CellCallbackParams<R, M>
+): Style | undefined => {
+  if (Array.isArray(styleObj)) {
+    return reduce(
+      styleObj,
+      (obj: Style, newObj: PdfTable.CellStyle<R, M>) => ({
+        ...obj,
+        ...evaluateCellStyle(newObj, params)
+      }),
+      {}
+    );
+  } else {
+    return evaluateOptionalCallbackProp(styleObj, params);
   }
 };
 
@@ -44,25 +62,27 @@ export interface CellProps<R extends PdfTable.Row, M extends Model.Model> {
   readonly column: PdfTable.Column<R, M>;
   readonly row: R;
   readonly location: PdfTable.CellLocation;
-  readonly style?: PdfTable.OptionalCellCallback<R, M, Style>;
+  readonly style?: PdfTable.CellStyle<R, M>;
   readonly className?: PdfTable.CellClassName<R, M>;
-  readonly textStyle?: PdfTable.OptionalCellCallback<R, M, Style>;
+  readonly textStyle?: PdfTable.CellStyle<R, M>;
   readonly textClassName?: PdfTable.CellClassName<R, M>;
   readonly formatting?: boolean;
   readonly isHeader?: boolean;
   readonly debug?: boolean;
+  readonly indented?: boolean;
   readonly border?: boolean;
   readonly cellContentsVisible?: PdfTable.OptionalCellCallback<R, M, boolean>;
   readonly valueCallback?: (params: Omit<PdfTable.CellCallbackParams<R, M>, "value" | "rawValue">) => any;
 }
 
 const Cell = <R extends PdfTable.Row, M extends Model.Model>(props: CellProps<R, M>): JSX.Element => {
-  const callbackParams = useMemo(() => {
+  const callbackParams = useMemo<Omit<PdfTable.CellCallbackParams<R, M>, "value" | "rawValue">>(() => {
     return {
       location: props.location,
       row: props.row,
       column: props.column,
-      isHeader: props.isHeader || false
+      isHeader: props.isHeader || false,
+      indented: props.indented === true
     };
   }, [props.location, props.row, props.column, props.isHeader]);
 
@@ -79,7 +99,7 @@ const Cell = <R extends PdfTable.Row, M extends Model.Model>(props: CellProps<R,
     return "";
   }, [rawValue, props.column, props.formatting]);
 
-  const fullCallbackParams = useMemo(() => {
+  const fullCallbackParams = useMemo<PdfTable.CellCallbackParams<R, M>>(() => {
     return { ...callbackParams, rawValue, value };
   }, [rawValue, value, callbackParams]);
 
@@ -97,25 +117,26 @@ const Cell = <R extends PdfTable.Row, M extends Model.Model>(props: CellProps<R,
     }
     return {
       ...cStyle,
-      ...evaluateOptionalCallbackProp<R, M, Style>(props.style, fullCallbackParams)
+      ...evaluateCellStyle<R, M>(props.style, fullCallbackParams)
     };
   }, [props.column]);
 
   return (
     <View
       className={classNames(
-        evaluateOptionalCallbackProp<R, M, string>(
+        evaluateClassName<R, M>(
           props.isHeader === true ? props.column.headerCellProps?.className : props.column.cellProps?.className,
           fullCallbackParams
         ),
         evaluateClassName<R, M>(props.className, fullCallbackParams),
-        { "no-border": props.border === false }
+        { indented: props.indented === true }
       )}
       style={cellStyle}
       debug={props.debug}
     >
       <ShowHide
         hide={
+          props.indented === true ||
           evaluateOptionalCallbackProp<R, M, boolean>(props.cellContentsVisible, fullCallbackParams) === false ||
           evaluateOptionalCallbackProp<R, M, boolean>(props.column.cellContentsVisible, fullCallbackParams) === false
         }
@@ -147,7 +168,7 @@ const Cell = <R extends PdfTable.Row, M extends Model.Model>(props: CellProps<R,
                 props.isHeader === true ? props.column.headerCellProps?.textStyle : props.column.cellProps?.textStyle,
                 fullCallbackParams
               ),
-              ...evaluateOptionalCallbackProp<R, M, Style>(props.textStyle, fullCallbackParams)
+              ...evaluateCellStyle<R, M>(props.textStyle, fullCallbackParams)
             }}
           >
             {value}

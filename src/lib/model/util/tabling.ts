@@ -1,9 +1,9 @@
 import React from "react";
-import { groupBy, isNil, reduce, find, forEach, includes, filter, map } from "lodash";
+import { groupBy, isNil, reduce, find, forEach, includes, filter, map, orderBy } from "lodash";
 import { ColDef } from "@ag-grid-community/core";
 
 import * as models from "lib/model";
-import { getKeyValue, orderByFieldOrdering } from "lib/util";
+import { getKeyValue } from "lib/util";
 import { contrastedForegroundColor } from "lib/util/colors";
 import { tableChangeIsCellChange, tableChangeIsRowChange } from "../typeguards/tabling";
 
@@ -291,6 +291,22 @@ export const createBulkCreatePayload = <R extends Table.Row, M extends Model.Mod
   return bulkPayload;
 };
 
+export const orderModelsWithRowsByFieldOrdering = <
+  R extends GenericTable.Row<E>,
+  M extends Model.Model,
+  E extends GenericTable.RowMeta = GenericTable.RowMeta
+>(
+  array: GenericTable.ModelWithRow<R, M, E>[],
+  fieldOrdering: FieldOrdering<keyof R>
+): GenericTable.ModelWithRow<R, M, E>[] => {
+  return orderBy(
+    array,
+    (row: GenericTable.ModelWithRow<R, M, E>) =>
+      map(fieldOrdering, (fieldOrder: FieldOrder<keyof R>) => row.row[fieldOrder.field]),
+    map(fieldOrdering, (fieldOrder: FieldOrder<keyof R>) => (fieldOrder.order === 1 ? "asc" : "desc"))
+  );
+};
+
 type CreateTableDataOptions<R extends GenericTable.Row<E>, M extends Model.Model, E extends object = any> = {
   readonly getRowMeta?: (m: M) => E;
   readonly defaultNullValue?: GenericTable.NullValue;
@@ -301,7 +317,7 @@ export const createTableData = <
   C extends GenericTable.Column<R, M>,
   R extends GenericTable.Row<E>,
   M extends Model.Model,
-  E extends object = any
+  E extends GenericTable.RowMeta = GenericTable.RowMeta
 >(
   columns: C[],
   data: M[],
@@ -346,13 +362,13 @@ export const createTableData = <
   const modelsWithGroup: M[] = filter(data, (m: M) => !isNil(getGroupForModel(m)));
   let modelsWithoutGroup: M[] = filter(data, (m: M) => isNil(getGroupForModel(m)));
 
-  const orderRows = (rows: R[]) =>
-    !isNil(dataOptions.ordering) ? orderByFieldOrdering<R>(rows, dataOptions.ordering) : rows;
+  const orderModelsWithRows = (rows: GenericTable.ModelWithRow<R, M, E>[]) =>
+    !isNil(dataOptions.ordering) ? orderModelsWithRowsByFieldOrdering<R, M, E>(rows, dataOptions.ordering) : rows;
 
-  let groupsWithGroup: GenericTable.RowGroup<R, E>[] = [];
-  let groupWithoutGroup: GenericTable.RowGroup<R, E> = {
+  let groupsWithGroup: GenericTable.RowGroup<R, M, E>[] = [];
+  let groupWithoutGroup: GenericTable.RowGroup<R, M, E> = {
     group: null,
-    rows: map(modelsWithoutGroup, (m: M) => convertModelToRow(m))
+    rows: map(modelsWithoutGroup, (m: M) => ({ model: m, row: convertModelToRow(m) }))
   };
 
   const groupedModels: { [key: number]: M[] } = groupBy(modelsWithGroup, (model: M) => getGroupForModel(model));
@@ -361,17 +377,24 @@ export const createTableData = <
     if (!isNil(group)) {
       groupsWithGroup.push({
         group,
-        rows: orderRows(map(ms, (m: M) => convertModelToRow(m)))
+        rows: orderModelsWithRows(map(ms, (m: M) => ({ model: m, row: convertModelToRow(m) })))
       });
     } else {
       // In the case that the group no longer exists, that means the group was removed from the
       // state.  In this case, we want to disassociate the rows with the group.
       groupWithoutGroup = {
         ...groupWithoutGroup,
-        rows: [...groupWithoutGroup.rows, ...orderRows(map(ms, (m: M) => convertModelToRow(m)))]
+        // Wait until the end to establish ordering for performance.
+        rows: [...groupWithoutGroup.rows, ...map(ms, (m: M) => ({ model: m, row: convertModelToRow(m) }))]
       };
     }
   });
 
-  return [...groupsWithGroup, groupWithoutGroup];
+  return [
+    ...groupsWithGroup,
+    {
+      ...groupWithoutGroup,
+      rows: orderModelsWithRows(groupWithoutGroup.rows)
+    }
+  ];
 };

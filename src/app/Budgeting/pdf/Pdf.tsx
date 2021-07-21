@@ -127,7 +127,13 @@ const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: 
                     width: "10%",
                     cellRenderer: (
                       params: PdfTable.CellCallbackParams<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>
-                    ) => (params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>)
+                    ) => {
+                      return params.rawValue !== null ? (
+                        <Tag className={"tag"} model={params.rawValue} />
+                      ) : (
+                        <span></span>
+                      );
+                    }
                   },
                   {
                     field: "multiplier",

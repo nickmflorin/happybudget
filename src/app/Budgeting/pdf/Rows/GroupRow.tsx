@@ -4,13 +4,17 @@ import classNames from "classnames";
 
 import { getGroupColorDefinition } from "lib/model/util";
 
+import { CellProps } from "../Cells/Cell";
 import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
 const GroupRow = <R extends PdfTable.Row, M extends Model.Model>(
-  props: Omit<RowProps<R, M>, "row"> & { group: Model.Group }
+  props: Omit<RowProps<R, M>, "row"> & {
+    group: Model.Group;
+    readonly cellProps?: Omit<CellProps<R, M>, "column" | "location" | "row" | "debug" | "isHeader">;
+  }
 ): JSX.Element => {
-  const rowStyle = useMemo(() => {
+  const cellStyle = useMemo(() => {
     const colorDef = getGroupColorDefinition(props.group);
     return {
       backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF"
@@ -48,9 +52,24 @@ const GroupRow = <R extends PdfTable.Row, M extends Model.Model>(
     <BodyRow
       {...props}
       row={groupRow}
-      style={{ ...rowStyle, ...props.style }}
+      style={{ ...cellStyle, ...props.style }}
       className={classNames("group-tr", props.className)}
-      cellProps={{ border: false, textClassName: "group-tr-td-text", textStyle: cellTextStyle }}
+      cellProps={{
+        ...props.cellProps,
+        className: [
+          props.cellProps?.className,
+          (params: PdfTable.CellCallbackParams<R, M>) => {
+            // We have to add a borderLeft to the first indented column for the Group Row
+            // because the Row itself will not have a borderLeft attribute on it and the
+            // Row starts one column to the right.
+            /* eslint-disable indent */
+            return params.indented === false ? "group-tr-td" : params.location.colIndex === 0 ? "td-border-left" : "";
+          }
+        ],
+        // style: [props.cellProps?.style, cellStyle],
+        textClassName: ["group-tr-td-text", props.cellProps?.textClassName],
+        textStyle: [cellTextStyle, props.cellProps?.textStyle]
+      }}
     />
   );
 };

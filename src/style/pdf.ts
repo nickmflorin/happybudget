@@ -107,6 +107,7 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     borderLeftWidth: 0,
     borderRightWidth: 0
   },
+  "detail-group-tr": {},
   "footer-tr": {
     height: "24pt",
     backgroundColor: TABLE_BORDER_COLOR,
@@ -141,11 +142,34 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     borderRightWidth: 0,
     borderColor: TABLE_BORDER_COLOR
   },
-  "no-border": {
-    border: "none !important"
+  "td-border-right": {
+    borderRightWidth: 1
+  },
+  "td-border-left": {
+    borderLeftWidth: 1
+  },
+  "group-tr-td": {
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+    border: "none !important",
+    borderColor: "none"
+  },
+  indented: {
+    backgroundColor: "white",
+    // This here is an absolute hack.  The problem is that because we are applying
+    // a background color to the entire GroupRow, but overriding the indented cells
+    // with a background color "white", we still see remnants of the GroupRow backgroundColor
+    // as a thin line at the top of the indented cell.  To fix this, we essentially
+    // "cover" it here, by giving it a white top border and moving the cell up slightly.
+    borderTopWidth: 3,
+    borderTopColor: "white",
+    marginTop: -2
   },
   "indent-td": {
     paddingLeft: 18
+  },
+  "detail-group-indent-td": {
+    paddingLeft: 14
   },
   "cell-text": { margin: "auto", width: "100%" },
   "th-text": { marginTop: 6, fontSize: 8, color: "#595959", fontWeight: 700 },
@@ -160,7 +184,7 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   },
   uppercase: { textTransform: "uppercase" },
   "fill-width": { textAlign: "center", width: "100%" },
-  "group-tr-td-text": { textTransform: "uppercase", color: "#595959", fontWeight: 700 },
+  "group-tr-td-text": { color: "#595959", fontWeight: 700 },
   "footer-tr-td-text": { color: "#595959", fontWeight: 700, marginTop: 6 },
   "detail-tr-td-text": { fontWeight: 300, color: "#000000" },
   "account-sub-header-tr-td-text": { color: "#595959", fontWeight: 700 },
