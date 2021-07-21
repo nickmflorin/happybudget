@@ -129,7 +129,11 @@ const BudgetPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], options: 
                       params: PdfTable.CellCallbackParams<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>
                     ) => {
                       return params.rawValue !== null ? (
-                        <Tag className={"tag"} model={params.rawValue} />
+                        <Tag
+                          className={"tag"}
+                          isPlural={!isNil(params.row.quantity) && params.row.quantity > 1}
+                          model={params.rawValue}
+                        />
                       ) : (
                         <span></span>
                       );
