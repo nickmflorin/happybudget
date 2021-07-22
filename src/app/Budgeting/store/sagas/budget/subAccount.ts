@@ -6,7 +6,7 @@ import { isNil } from "lodash";
 import * as api from "api";
 
 import { ActionType } from "../../actions";
-import { loadingBudgetAction, requestBudgetAction } from "../../actions/budget";
+import { loadingBudgetAction, updateBudgetInStateAction } from "../../actions/budget";
 import * as actions from "../../actions/budget/subAccount";
 import {
   createStandardSaga,
@@ -157,7 +157,10 @@ const fringeTasks = createFringeTaskSet<Model.Budget>(
     deleting: actions.deletingFringeAction,
     creating: actions.creatingFringeAction,
     updating: actions.updatingFringeAction,
-    requestBudget: requestBudgetAction
+    budget: {
+      loading: loadingBudgetAction,
+      updateInState: updateBudgetInStateAction
+    }
   },
   {
     request: api.getBudgetFringes,
@@ -166,8 +169,7 @@ const fringeTasks = createFringeTaskSet<Model.Budget>(
     bulkCreate: api.bulkCreateBudgetFringes,
     bulkDelete: api.bulkDeleteBudgetFringes
   },
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.id,
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.id
 );
 
 const fringesRootSaga = createStandardFringesSaga(
@@ -178,7 +180,7 @@ const fringesRootSaga = createStandardFringesSaga(
   fringeTasks
 );
 
-const tasks = createSubAccountTaskSet(
+const tasks = createSubAccountTaskSet<Model.Budget>(
   {
     loading: actions.loadingSubAccountsAction,
     deleting: actions.deletingSubAccountAction,
@@ -189,7 +191,7 @@ const tasks = createSubAccountTaskSet(
     addToState: actions.addSubAccountToStateAction,
     budget: {
       loading: loadingBudgetAction,
-      request: requestBudgetAction
+      updateInState: updateBudgetInStateAction
     },
     subaccount: {
       request: actions.requestSubAccountAction,
@@ -197,7 +199,6 @@ const tasks = createSubAccountTaskSet(
     },
     groups: {
       deleting: actions.deletingGroupAction,
-      removeFromState: actions.removeGroupFromStateAction,
       loading: actions.loadingGroupsAction,
       response: actions.responseGroupsAction,
       request: actions.requestGroupsAction
@@ -235,10 +236,7 @@ const rootSubAccountSaga = createStandardSaga(
     Request: ActionType.Budget.SubAccount.SubAccounts.Request,
     TableChange: ActionType.Budget.SubAccount.TableChanged,
     Groups: {
-      Request: ActionType.Budget.SubAccount.Groups.Request,
-      RemoveModel: ActionType.Budget.SubAccount.SubAccounts.RemoveFromGroup,
-      AddModel: ActionType.Budget.SubAccount.SubAccounts.AddToGroup,
-      Delete: ActionType.Budget.SubAccount.Groups.Delete
+      Request: ActionType.Budget.SubAccount.Groups.Request
     },
     Comments: {
       Request: ActionType.Budget.SubAccount.Comments.Request,
@@ -252,14 +250,14 @@ const rootSubAccountSaga = createStandardSaga(
   },
   {
     Request: tasks.getSubAccounts,
-    HandleDataChangeEvent: tasks.handleDataChangeEvent,
-    HandleRowAddEvent: tasks.handleRowAddEvent,
-    HandleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    handleDataChangeEvent: tasks.handleDataChangeEvent,
+    handleRowAddEvent: tasks.handleRowAddEvent,
+    handleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    handleAddRowToGroupEvent: tasks.handleAddRowToGroupEvent,
+    handleRemoveRowFromGroupEvent: tasks.handleRemoveRowFromGroupEvent,
+    handleDeleteGroupEvent: tasks.handleDeleteGroupEvent,
     Groups: {
-      Request: tasks.getGroups,
-      RemoveModel: tasks.removeFromGroup,
-      AddModel: tasks.addToGroup,
-      Delete: tasks.deleteGroup
+      Request: tasks.getGroups
     },
     Comments: {
       Request: getCommentsTask,

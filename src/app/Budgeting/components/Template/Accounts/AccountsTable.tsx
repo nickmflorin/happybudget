@@ -47,11 +47,6 @@ const AccountsTable = (): JSX.Element => {
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
-        onDeleteGroup={(group: Model.Group) => dispatch(actions.deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: BudgetTable.AccountRow) => dispatch(actions.removeAccountFromGroupAction(row.id))}
-        onRowAddToGroup={(group: number, row: BudgetTable.AccountRow) =>
-          dispatch(actions.addAccountToGroupAction({ id: row.id, group }))
-        }
         onGroupRows={(rows: BudgetTable.AccountRow[]) =>
           setGroupAccounts(map(rows, (row: BudgetTable.AccountRow) => row.id))
         }

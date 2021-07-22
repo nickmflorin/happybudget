@@ -19,7 +19,7 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericSubAccountsTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.SubAccountRow, Model.SubAccount, Http.SubAccountPayload>,
-    "groupParams" | "rowCanExpand" | "tableRef" | "manager"
+    "rowCanExpand" | "tableRef" | "manager"
   > {
   exportFileName: string;
   categoryName: "Sub Account" | "Detail";
@@ -38,10 +38,7 @@ export interface GenericSubAccountsTableProps
   budgetFooterIdentifierValue?: string;
   subAccountUnits: Model.Tag[];
   onGroupRows: (rows: BudgetTable.SubAccountRow[]) => void;
-  onDeleteGroup: (group: Model.Group) => void;
   onEditGroup: (group: Model.Group) => void;
-  onRowRemoveFromGroup: (row: BudgetTable.SubAccountRow) => void;
-  onRowAddToGroup: (group: number, row: BudgetTable.SubAccountRow) => void;
   onEditFringes: () => void;
 }
 
@@ -57,10 +54,7 @@ const GenericSubAccountsTable = ({
   budgetFooterIdentifierValue = "Budget Total",
   tableFooterIdentifierValue,
   onGroupRows,
-  onDeleteGroup,
   onEditGroup,
-  onRowRemoveFromGroup,
-  onRowAddToGroup,
   onEditFringes,
   ...props
 }: GenericSubAccountsTableProps): JSX.Element => {
@@ -76,13 +70,7 @@ const GenericSubAccountsTable = ({
           return !isNil(row.meta.children) && row.meta.children.length === 0;
         }
       }}
-      groupParams={{
-        onDeleteGroup,
-        onRowRemoveFromGroup,
-        onGroupRows,
-        onEditGroup,
-        onRowAddToGroup
-      }}
+      onGroupRows={onGroupRows}
       rowCanExpand={(row: BudgetTable.SubAccountRow) =>
         !isNil(row.identifier) || (!isNil(row.meta.children) && row.meta.children.length !== 0)
       }
@@ -204,7 +192,7 @@ const GenericSubAccountsTable = ({
           field: "quantity",
           headerName: "Qty",
           width: 60,
-          refreshParentOnChange: true,
+          isCalculating: true,
           valueSetter: integerValueSetter<BudgetTable.SubAccountRow>("quantity"),
           columnType: "number",
           // If the plurality of the quantity changes, we need to refresh the refresh
@@ -264,7 +252,7 @@ const GenericSubAccountsTable = ({
           field: "multiplier",
           headerName: "X",
           width: 50,
-          refreshParentOnChange: true,
+          isCalculating: true,
           valueSetter: floatValueSetter<BudgetTable.SubAccountRow>("multiplier"),
           columnType: "number"
         },
@@ -272,7 +260,7 @@ const GenericSubAccountsTable = ({
           field: "rate",
           headerName: "Rate",
           width: 100,
-          refreshParentOnChange: true,
+          isCalculating: true,
           valueFormatter: agCurrencyValueFormatter,
           valueSetter: floatValueSetter<BudgetTable.SubAccountRow>("rate"),
           columnType: "currency"
@@ -280,7 +268,7 @@ const GenericSubAccountsTable = ({
         {
           field: "fringes",
           headerName: "Fringes",
-          refreshParentOnChange: true,
+          isCalculating: true,
           cellClass: classNames("cell--centered"),
           cellRenderer: "FringesCell",
           headerComponentParams: {

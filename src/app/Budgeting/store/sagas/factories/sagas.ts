@@ -18,9 +18,6 @@ interface HistoryActionMap {
 
 interface GroupsActionMap {
   Request: string;
-  Delete: string;
-  RemoveModel: string;
-  AddModel: string;
 }
 
 interface FringesActionMap {
@@ -49,9 +46,6 @@ interface HistoryTasMap {
 
 interface GroupsTaskMap {
   Request: Redux.Task<null>;
-  Delete: Redux.Task<number>;
-  RemoveModel: Redux.Task<number>;
-  AddModel: Redux.Task<{ id: number; group: number }>;
 }
 
 interface FringeTaskMap {
@@ -66,9 +60,12 @@ interface TaskMap<R extends Table.Row, M extends Model.Model> {
   History?: HistoryTasMap;
   Groups: GroupsTaskMap;
   Request: Redux.Task<null>;
-  HandleRowAddEvent: Redux.Task<Table.RowAddEvent<R, M>>;
-  HandleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent<R, M>>;
-  HandleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R, M>>;
+  handleRowAddEvent: Redux.Task<Table.RowAddEvent<R, M>>;
+  handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent<R, M>>;
+  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R, M>>;
+  handleAddRowToGroupEvent: Redux.Task<Table.RowAddToGroupEvent<R, M>>;
+  handleRemoveRowFromGroupEvent: Redux.Task<Table.RowRemoveFromGroupEvent<R, M>>;
+  handleDeleteGroupEvent: Redux.Task<Table.GroupDeleteEvent>;
 }
 
 const createStandardHistorySaga = (actions: HistoryActionMap, tasks: HistoryTasMap) => {
@@ -153,27 +150,8 @@ const createStandardGroupsSaga = (actions: GroupsActionMap, tasks: GroupsTaskMap
     }
   }
 
-  function* deleteSaga(): SagaIterator {
-    yield takeWithCancellableById<number>(actions.Delete, tasks.Delete, (p: number) => p);
-  }
-
-  function* removeModelSaga(): SagaIterator {
-    yield takeWithCancellableById<number>(actions.RemoveModel, tasks.RemoveModel, (p: number) => p);
-  }
-
-  function* addModelSaga(): SagaIterator {
-    yield takeWithCancellableById<{ id: number; group: number }>(
-      actions.AddModel,
-      tasks.AddModel,
-      (p: { id: number; group: number }) => p.id
-    );
-  }
-
   function* rootSaga(): SagaIterator {
     yield spawn(requestSaga);
-    yield spawn(removeModelSaga);
-    yield spawn(deleteSaga);
-    yield spawn(addModelSaga);
   }
   return rootSaga;
 };
@@ -257,13 +235,22 @@ export const createStandardSaga = <R extends Table.Row, M extends Model.Model>(
         const event: Table.ChangeEvent<R, M> = action.payload;
         if (typeguards.isDataChangeEvent(event)) {
           // Blocking call so that table changes happen sequentially.
-          yield call(tasks.HandleDataChangeEvent, action as Redux.Action<Table.DataChangeEvent<R, M>>);
+          yield call(tasks.handleDataChangeEvent, action as Redux.Action<Table.DataChangeEvent<R, M>>);
         } else if (typeguards.isRowAddEvent(event)) {
           // Blocking call so that table changes happen sequentially.
-          yield call(tasks.HandleRowAddEvent, action as Redux.Action<Table.RowAddEvent<R, M>>);
+          yield call(tasks.handleRowAddEvent, action as Redux.Action<Table.RowAddEvent<R, M>>);
         } else if (typeguards.isRowDeleteEvent(event)) {
           // Blocking call so that table changes happen sequentially.
-          yield call(tasks.HandleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent<R, M>>);
+          yield call(tasks.handleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent<R, M>>);
+        } else if (typeguards.isRowAddToGroupEvent(event)) {
+          // Blocking call so that table changes happen sequentially.
+          yield call(tasks.handleAddRowToGroupEvent, action as Redux.Action<Table.RowAddToGroupEvent<R, M>>);
+        } else if (typeguards.isRowRemoveFromGroupEvent(event)) {
+          // Blocking call so that table changes happen sequentially.
+          yield call(tasks.handleRemoveRowFromGroupEvent, action as Redux.Action<Table.RowRemoveFromGroupEvent<R, M>>);
+        } else if (typeguards.isGroupDeleteEvent(event)) {
+          // Blocking call so that table changes happen sequentially.
+          yield call(tasks.handleDeleteGroupEvent, action as Redux.Action<Table.GroupDeleteEvent>);
         }
       }
     }

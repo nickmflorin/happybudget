@@ -49,12 +49,12 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   ordering,
   groups = [],
   columns,
-  groupParams,
   frameworkComponents,
   search,
   actions,
   detached,
   rowLabel = "Row",
+  onGroupRows,
   onCellFocusChanged,
   modelToRow,
   getModelLabel,
@@ -547,13 +547,17 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     if (row.meta.isTableFooter) {
       return [];
     } else if (row.meta.isGroupFooter) {
-      if (!isNil(row.group) && !isNil(groupParams)) {
+      if (!isNil(row.group)) {
         const group: Model.Group | undefined = find(groups, { id: row.group } as any);
         if (!isNil(group)) {
           return [
             {
               name: `Ungroup ${group.name}`,
-              action: () => groupParams.onDeleteGroup(group)
+              action: () =>
+                _onChangeEvent({
+                  type: "groupDelete",
+                  payload: group.id
+                })
             }
           ];
         }
@@ -564,7 +568,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         name: `Delete ${row.meta.label || "Row"}`,
         action: () => _onChangeEvent({ payload: { rows: row, columns }, type: "rowDelete" })
       };
-      if (isNil(groupParams)) {
+      if (isNil(groups)) {
         return [deleteRowContextMenuItem];
       } else if (!isNil(row.meta.group)) {
         const group: Model.Group | undefined = find(groups, { id: row.meta.group } as any);
@@ -573,12 +577,16 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
             deleteRowContextMenuItem,
             {
               name: `Remove ${row.meta.label || "Row"} from Group ${group.name}`,
-              action: () => groupParams.onRowRemoveFromGroup(row)
+              action: () =>
+                _onChangeEvent({
+                  type: "rowRemoveFromGroup",
+                  payload: { columns, rows: row, group: group.id }
+                })
             }
           ];
         }
         return [deleteRowContextMenuItem];
-      } else {
+      } else if (!isNil(onGroupRows)) {
         const menuItems: MenuItemDef[] = [deleteRowContextMenuItem];
 
         const groupableNodesAbove = findRowsUpUntilFirstGroupFooterRow(params.node);
@@ -602,7 +610,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           }
           menuItems.push({
             name: label,
-            action: () => groupParams.onGroupRows(map(groupableNodesAbove, (n: RowNode) => n.data as R))
+            action: () => onGroupRows(map(groupableNodesAbove, (n: RowNode) => n.data as R))
           });
         }
         if (groups.length !== 0) {
@@ -610,11 +618,17 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
             name: "Add to Group",
             subMenu: map(groups, (group: Model.Group) => ({
               name: group.name,
-              action: () => groupParams.onRowAddToGroup(group.id, row)
+              action: () =>
+                _onChangeEvent({
+                  type: "rowAddToGroup",
+                  payload: { columns, rows: row, group: group.id }
+                })
             }))
           });
         }
         return menuItems;
+      } else {
+        return [deleteRowContextMenuItem];
       }
     }
   });

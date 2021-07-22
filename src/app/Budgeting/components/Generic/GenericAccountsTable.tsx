@@ -16,20 +16,14 @@ export interface GenericAccountsTableProps
   > {
   exportFileName: string;
   onGroupRows: (rows: BudgetTable.AccountRow[]) => void;
-  onDeleteGroup: (group: Model.Group) => void;
   onEditGroup: (group: Model.Group) => void;
-  onRowRemoveFromGroup: (row: BudgetTable.AccountRow) => void;
-  onRowAddToGroup: (group: number, row: BudgetTable.AccountRow) => void;
   detail: Model.Template | Model.Budget | undefined;
 }
 
 const GenericAccountsTable = ({
   /* eslint-disable indent */
   onGroupRows,
-  onDeleteGroup,
   onEditGroup,
-  onRowRemoveFromGroup,
-  onRowAddToGroup,
   exportFileName,
   detail,
   ...props
@@ -39,13 +33,7 @@ const GenericAccountsTable = ({
   return (
     <BudgetTableComponent<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>
       tableRef={tableRef}
-      groupParams={{
-        onDeleteGroup,
-        onRowRemoveFromGroup,
-        onGroupRows,
-        onEditGroup,
-        onRowAddToGroup
-      }}
+      onGroupRows={onGroupRows}
       rowCanExpand={(row: BudgetTable.AccountRow) =>
         !isNil(row.identifier) || (!isNil(row.meta.children) && row.meta.children.length !== 0)
       }

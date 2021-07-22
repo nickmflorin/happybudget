@@ -9,7 +9,9 @@ import {
   tableChangeIsCellChange,
   tableChangeIsRowChange,
   isDataChangeEvent,
-  isRowAddEvent
+  isRowAddEvent,
+  isFullRowEvent,
+  isRowDeleteEvent
 } from "../typeguards/tabling";
 
 export const getGroupColorDefinition = (group: Model.Group): GenericTable.RowColorDefinition => {
@@ -204,20 +206,47 @@ export const mergeChangesWithModel = <R extends Table.Row, M extends Model.Model
   return newModel;
 };
 
-export const rowChangeRequiresParentRefresh = <R extends Table.Row, M extends Model.Model>(
+export const cellChangeWarantsRecalculation = <R extends Table.Row, M extends Model.Model>(
+  change: Table.CellChange<R, M> | Table.NestedCellChange<R, M>
+): boolean => change.column.isCalculating === true;
+
+export const rowChangeWarrantsRecalculation = <R extends Table.Row, M extends Model.Model>(
   change: Table.RowChange<R, M>
 ): boolean =>
   /* eslint-disable indent */
-  filter(change.data, (value: Table.NestedCellChange<R, M>) => value.column.refreshParentOnChange === true).length !==
-  0;
+  filter(change.data, (value: Table.NestedCellChange<R, M>) => cellChangeWarantsRecalculation(value)).length !== 0;
 
-export const rowAddRequiresParentRefresh = <R extends Table.Row, M extends Model.Model>(
+export const changeWarrantsRecalculation = <R extends Table.Row, M extends Model.Model>(
+  change: Table.Change<R, M>
+): boolean => {
+  const arrayChanges: (Table.RowChange<R, M> | Table.CellChange<R, M>)[] = Array.isArray(change) ? change : [change];
+  return (
+    filter(arrayChanges, (ch: Table.RowChange<R, M> | Table.CellChange<R, M>) =>
+      tableChangeIsRowChange(ch) ? rowChangeWarrantsRecalculation(ch) : cellChangeWarantsRecalculation(ch)
+    ).length !== 0
+  );
+};
+
+export const addWarrantsRecalculation = <R extends Table.Row, M extends Model.Model>(
   add: Table.RowAdd<R, M>
 ): boolean =>
   /* eslint-disable indent */
-  filter(add.data, (value: Table.NestedCellAdd<R, M>) => value.column.refreshParentOnChange === true).length !== 0;
+  filter(add.data, (value: Table.NestedCellAdd<R, M>) => value.column.isCalculating === true).length !== 0;
 
-export const rowDeleteRequiresParentRefresh = <R extends Table.Row, M extends Model.Model>(
+export const additionsWarrantParentRefresh = <R extends Table.Row, M extends Model.Model>(
+  additions: Table.RowAddPayload<R, M>
+): boolean => {
+  // If the payload is just a number, we are just creating a certain number of blank
+  // rows - so no refresh is warranted.
+  if (typeof additions === "number") {
+    return false;
+  }
+  return Array.isArray(additions)
+    ? filter(additions, (add: Table.RowAdd<R, M>) => addWarrantsRecalculation(add) === true).length !== 0
+    : addWarrantsRecalculation(additions);
+};
+
+export const rowWarrantsRecalculation = <R extends Table.Row, M extends Model.Model>(
   row: R,
   columns: Table.Column<R, M>[]
 ): boolean => {
@@ -225,7 +254,7 @@ export const rowDeleteRequiresParentRefresh = <R extends Table.Row, M extends Mo
     reduce(
       columns,
       (data: boolean[], column: Table.Column<R, M>) => {
-        if (column.refreshParentOnChange === true) {
+        if (column.isCalculating === true) {
           const nullValue = column.nullValue === undefined ? null : column.nullValue;
           if (row[column.field as keyof R] !== nullValue) {
             return [...data, true];
@@ -238,51 +267,43 @@ export const rowDeleteRequiresParentRefresh = <R extends Table.Row, M extends Mo
   );
 };
 
-export const consolidatedChangesRequireParentRefresh = <R extends Table.Row, M extends Model.Model>(
-  changes: Table.ConsolidatedChange<R, M>
+export const fullRowPayloadRequiresRefresh = <R extends Table.Row, M extends Model.Model>(
+  payload: Table.FullRowPayload<R, M>
 ): boolean => {
-  const changesRequiringRefresh: Table.ConsolidatedChange<R, M> = filter(changes, (change: Table.RowChange<R, M>) =>
-    rowChangeRequiresParentRefresh<R, M>(change)
-  );
-  return changesRequiringRefresh.length !== 0;
+  const rows: R[] = Array.isArray(payload.rows) ? payload.rows : [payload.rows];
+  return filter(rows, (row: R) => rowWarrantsRecalculation<R, M>(row, payload.columns)).length !== 0;
 };
 
-export const changesRequireParentRefresh = <R extends Table.Row, M extends Model.Model>(
-  changes: Table.Change<R, M>
+// Not applicable for GroupDeleteEvent because deletion of a group should not
+// warrant any recalculation of that deleted group.
+export const eventWarrantsGroupRecalculation = <R extends Table.Row, M extends Model.Model>(
+  e:
+    | Table.DataChangeEvent<R, M>
+    | Table.RowAddEvent<R, M>
+    | Table.RowDeleteEvent<R, M>
+    | Table.RowRemoveFromGroupEvent<R, M>
+    | Table.RowAddToGroupEvent<R, M>
 ): boolean => {
-  const consolidated: Table.ConsolidatedChange<R, M> = consolidateTableChange<R, M>(changes);
-  return consolidatedChangesRequireParentRefresh(consolidated);
-};
-
-export const additionsRequireParentRefresh = <R extends Table.Row, M extends Model.Model>(
-  additions: Table.RowAddPayload<R, M>
-): boolean => {
-  // If the payload is just a number, we are just creating a certain number of blank
-  // rows - so no refresh is warranted.
-  if (typeof additions === "number") {
-    return false;
-  }
-  return Array.isArray(additions)
-    ? filter(additions, (add: Table.RowAdd<R, M>) => rowAddRequiresParentRefresh(add) === true).length !== 0
-    : rowAddRequiresParentRefresh(additions);
-};
-
-export const deletionsRequireParentRefresh = <R extends Table.Row, M extends Model.Model>(
-  deletion: Table.RowDeletePayload<R, M>
-): boolean => {
-  const rows: R[] = Array.isArray(deletion.rows) ? deletion.rows : [deletion.rows];
-  return filter(rows, (row: R) => rowDeleteRequiresParentRefresh<R, M>(row, deletion.columns)).length !== 0;
-};
-
-export const eventRequiresParentRefresh = <R extends Table.Row, M extends Model.Model>(
-  e: Table.ChangeEvent<R, M>
-): boolean => {
-  if (isDataChangeEvent(e)) {
-    return changesRequireParentRefresh(e.payload);
-  } else if (isRowAddEvent(e)) {
-    return additionsRequireParentRefresh(e.payload);
+  if (isDataChangeEvent(e) || isRowAddEvent(e) || isRowDeleteEvent(e)) {
+    return eventWarrantsRecalculation(e);
   } else {
-    return deletionsRequireParentRefresh(e.payload);
+    // Only RowRemoveFromGroupEvent | RowAddToGroupEvent at this point.
+    return fullRowPayloadRequiresRefresh(e.payload);
+  }
+};
+
+// Not applicable for RowAddToGroupEvent, RowRemoveFromGroupEvent and GroupDeleteEvent
+// because modifications to a group only cause recalculation of the group itself, not
+// the parent Account/SubAccount and/or Budget/Template.
+export const eventWarrantsRecalculation = <R extends Table.Row, M extends Model.Model>(
+  e: Table.DataChangeEvent<R, M> | Table.RowAddEvent<R, M> | Table.RowDeleteEvent<R, M>
+): boolean => {
+  if (isFullRowEvent(e)) {
+    return fullRowPayloadRequiresRefresh(e.payload);
+  } else if (isDataChangeEvent(e)) {
+    return changeWarrantsRecalculation(e.payload);
+  } else {
+    return additionsWarrantParentRefresh(e.payload);
   }
 };
 

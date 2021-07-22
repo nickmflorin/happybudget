@@ -4,30 +4,31 @@ import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, map } from "lodash";
 
 import * as api from "api";
-
-import { consolidateTableChange, createBulkCreatePayload, payload, eventRequiresParentRefresh } from "lib/model/util";
+import * as typeguards from "lib/model/typeguards";
+import { consolidateTableChange, createBulkCreatePayload, payload, eventWarrantsRecalculation } from "lib/model/util";
 
 type R = BudgetTable.SubAccountRow;
 type M = Model.SubAccount;
+type C = Model.SubAccount;
+type P = Http.SubAccountPayload;
 
-export interface SubAccountTasksActionMap {
+export interface SubAccountTasksActionMap<B extends Model.Budget | Model.Template> {
   deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
   creating: Redux.ActionCreator<boolean>;
   updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  addToState: Redux.ActionCreator<M>;
+  addToState: Redux.ActionCreator<C>;
   loading: Redux.ActionCreator<boolean>;
-  response: Redux.ActionCreator<Http.ListResponse<M>>;
+  response: Redux.ActionCreator<Http.ListResponse<C>>;
   request: Redux.ActionCreator<null>;
   budget: {
     loading: Redux.ActionCreator<boolean>;
-    request: Redux.ActionCreator<null>;
+    updateInState: Redux.ActionCreator<Partial<B>>;
   };
   subaccount: {
     request: Redux.ActionCreator<null>;
-    response: Redux.ActionCreator<M | undefined>;
+    response: Redux.ActionCreator<C | undefined>;
   };
   groups: {
-    removeFromState: Redux.ActionCreator<number>;
     deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
     loading: Redux.ActionCreator<boolean>;
     response: Redux.ActionCreator<Http.ListResponse<Model.Group>>;
@@ -36,255 +37,263 @@ export interface SubAccountTasksActionMap {
 }
 
 export interface SubAccountTaskSet {
-  addToGroup: Redux.Task<{ id: number; group: number }>;
-  removeFromGroup: Redux.Task<number>;
-  deleteGroup: Redux.Task<number>;
-  handleRowAddEvent: Redux.Task<Table.RowAddEvent<R, M>>;
-  handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent<R, M>>;
-  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R, M>>;
+  handleRowAddEvent: Redux.Task<Table.RowAddEvent<R, C>>;
+  handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent<R, C>>;
+  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R, C>>;
+  handleAddRowToGroupEvent: Redux.Task<Table.RowAddToGroupEvent<R, C>>;
+  handleRemoveRowFromGroupEvent: Redux.Task<Table.RowRemoveFromGroupEvent<R, C>>;
+  handleDeleteGroupEvent: Redux.Task<Table.GroupDeleteEvent>;
   getSubAccounts: Redux.Task<null>;
   getGroups: Redux.Task<null>;
   getSubAccount: Redux.Task<null>;
   handleSubAccountChange: Redux.Task<number>;
 }
 
-export const createSubAccountTaskSet = (
+export const createSubAccountTaskSet = <B extends Model.Budget | Model.Template>(
   /* eslint-disable indent */
-  actions: SubAccountTasksActionMap,
+  actions: SubAccountTasksActionMap<B>,
   selectSubAccountId: (state: Modules.ApplicationStore) => number | null,
-  selectModels: (state: Modules.ApplicationStore) => M[],
+  selectModels: (state: Modules.ApplicationStore) => C[],
   selectAutoIndex: (state: Modules.ApplicationStore) => boolean
 ): SubAccountTaskSet => {
-  function* handleSubAccountChangeTask(action: Redux.Action<number>): SagaIterator {
-    yield all([put(actions.subaccount.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);
-  }
-
-  function* removeFromGroupTask(action: Redux.Action<number>): SagaIterator {
-    if (!isNil(action.payload)) {
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
-      yield put(actions.updating({ id: action.payload, value: true }));
-      try {
-        // NOTE: We do not need to update the SubAccount in state because the reducer will already
-        // disassociate the SubAccount from the group.
-        yield call(api.updateSubAccount, action.payload, { group: null }, { cancelToken: source.token });
-      } catch (e) {
-        if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error removing the sub account from the group.");
-        }
-      } finally {
-        yield put(actions.updating({ id: action.payload, value: false }));
-        if (yield cancelled()) {
-          source.cancel();
-        }
-      }
-    }
-  }
-
-  function* addToGroupTask(action: Redux.Action<{ id: number; group: number }>): SagaIterator {
-    if (!isNil(action.payload)) {
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
-      yield put(actions.updating({ id: action.payload.id, value: true }));
-      try {
-        yield call(
-          api.updateSubAccount,
-          action.payload.id,
-          { group: action.payload.group },
-          { cancelToken: source.token }
-        );
-      } catch (e) {
-        if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error adding the sub account to the the group.");
-        }
-      } finally {
-        yield put(actions.updating({ id: action.payload.id, value: false }));
-        if (yield cancelled()) {
-          source.cancel();
-        }
-      }
-    }
-  }
-
-  function* deleteGroupTask(action: Redux.Action<number>): SagaIterator {
-    if (!isNil(action.payload)) {
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
-      yield put(actions.groups.deleting({ id: action.payload, value: true }));
-      try {
-        yield call(api.deleteGroup, action.payload, { cancelToken: source.token });
-        yield put(actions.groups.removeFromState(action.payload));
-      } catch (e) {
-        if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error deleting the sub account group.");
-        }
-      } finally {
-        yield put(actions.groups.deleting({ id: action.payload, value: false }));
-        if (yield cancelled()) {
-          source.cancel();
-        }
-      }
-    }
-  }
-
-  function* bulkCreateTask(subaccountId: number, e: Table.RowAddEvent<R, M>): SagaIterator {
+  function* bulkCreateTask(subaccountId: number, e: Table.RowAddEvent<R, C>, errorMessage: string): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
-    yield put(actions.creating(true));
 
     const data = yield select(selectModels);
     const autoIndex = yield select(selectAutoIndex);
 
-    const requestPayload: Http.BulkCreatePayload<Http.SubAccountPayload> = createBulkCreatePayload<
-      R,
-      M,
-      Http.SubAccountPayload
-    >(e.payload, {
+    const requestPayload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, C, P>(e.payload, {
       autoIndex,
       models: data,
       field: "identifier"
     });
-    // We do this to show the loading indicator next to the calculated fields of the footers,
-    // otherwise, the loading indicators will not appear until the first API request
-    // succeeds and we refresh the parent state.
-    if (eventRequiresParentRefresh(e)) {
+    if (eventWarrantsRecalculation(e)) {
       yield put(actions.budget.loading(true));
     }
-
-    let success = true;
+    yield put(actions.creating(true));
     try {
-      const subaccounts: M[] = yield call(api.bulkCreateSubAccountSubAccounts, subaccountId, requestPayload, {
-        cancelToken: source.token
-      });
-      yield all(subaccounts.map((subaccount: M) => put(actions.addToState(subaccount))));
-    } catch (err) {
-      success = false;
-      if (eventRequiresParentRefresh(e)) {
-        yield put(actions.budget.loading(false));
+      const response: Http.BudgetBulkCreateResponse<B, M, C> = yield call(
+        api.bulkCreateSubAccountSubAccounts,
+        subaccountId,
+        requestPayload,
+        { cancelToken: source.token }
+      );
+      /*
+      Note: We also have access to the updated Account from the response (as response.data)
+      so we could use this to update the overall Account in state.  However, the reducer handles
+      that logic pre-request currently, although in the future we may want to use the response
+      data as the fallback/source of truth.
+      */
+      if (eventWarrantsRecalculation(e)) {
+        yield put(actions.budget.updateInState(response.budget as Partial<B>));
       }
+      yield all(response.children.map((subaccount: C) => put(actions.addToState(subaccount))));
+    } catch (err) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err, "There was an error creating the sub accounts.");
+        api.handleRequestError(err, errorMessage);
       }
     } finally {
       yield put(actions.creating(false));
+      if (eventWarrantsRecalculation(e)) {
+        yield put(actions.budget.loading(false));
+      }
       if (yield cancelled()) {
         source.cancel();
       }
     }
-    if (success === true && eventRequiresParentRefresh(e)) {
-      yield put(actions.budget.request(null));
+  }
+
+  function* bulkUpdateTask(
+    subaccountId: number,
+    e: Table.ChangeEvent<R, C>,
+    requestPayload: Http.BulkUpdatePayload<P>[],
+    errorMessage: string
+  ): SagaIterator {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+    /*
+    TODO: In the case of modifications to the rows of a group, would it be more appropriate
+    to instead indicate that the group is being updated?
+    There is a discrepancy between what we are indicating as loading between removing a row
+    from the group and deleting the group itself.
+    */
+    yield all(requestPayload.map((p: Http.BulkUpdatePayload<P>) => put(actions.updating({ id: p.id, value: true }))));
+    if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+      yield put(actions.budget.loading(true));
+    }
+    try {
+      const response: Http.BudgetBulkResponse<B, M> = yield call(
+        api.bulkUpdateSubAccountSubAccounts,
+        subaccountId,
+        requestPayload,
+        { cancelToken: source.token }
+      );
+      /*
+      Note: We also have access to the updated Account from the response (as response.data)
+      so we could use this to update the overall Account in state.  However, the reducer handles
+      that logic pre-request currently, although in the future we may want to use the response
+      data as the fallback/source of truth.
+      */
+      if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+        yield put(actions.budget.updateInState(response.budget as Partial<B>));
+      }
+    } catch (err) {
+      if (!(yield cancelled())) {
+        api.handleRequestError(err, errorMessage);
+      }
+    } finally {
+      if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+        yield put(actions.budget.loading(false));
+      }
+      yield all(
+        requestPayload.map((p: Http.BulkUpdatePayload<P>) => put(actions.updating({ id: p.id, value: false })))
+      );
+      if (yield cancelled()) {
+        source.cancel();
+      }
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, M>>): SagaIterator {
-    const subaccountId = yield select(selectSubAccountId);
-    if (!isNil(subaccountId) && !isNil(action.payload)) {
-      const event: Table.RowAddEvent<R, M> = action.payload;
-      yield fork(bulkCreateTask, subaccountId, event);
-    }
-  }
+  function* bulkDeleteTask(subaccountId: number, e: Table.RowDeleteEvent<R, C>, errorMessage: string): SagaIterator {
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
 
-  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, M>>): SagaIterator {
-    const subaccountId = yield select(selectSubAccountId);
-    if (!isNil(subaccountId) && !isNil(action.payload)) {
-      const e: Table.RowDeleteEvent<R, M> = action.payload;
-      const rows = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-      if (rows.length !== 0) {
-        yield all(rows.map((row: R) => put(actions.deleting({ id: row.id, value: true }))));
+    const rows: R[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+    if (rows.length !== 0) {
+      const ids = map(rows, (row: R) => row.id);
 
-        // We do this to show the loading indicator next to the calculated fields of the footers,
-        // otherwise, the loading indicators will not appear until the first API request
-        // succeeds and we refresh the parent state.
-        if (eventRequiresParentRefresh(e)) {
-          yield put(actions.budget.loading(true));
+      yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
+      if (eventWarrantsRecalculation<R, C>(e)) {
+        yield put(actions.budget.loading(true));
+      }
+      try {
+        const response: Http.BudgetBulkResponse<B, C> = yield call(
+          api.bulkDeleteSubAccountSubAccounts,
+          subaccountId,
+          ids,
+          { cancelToken: source.token }
+        );
+        /*
+        Note: We also have access to the updated SubAccount from the response (as response.data)
+        so we could use this to update the overall SubAccount in state.  However, the reducer handles
+        that logic pre-request currently, although in the future we may want to use the response
+        data as the fallback/source of truth.
+        */
+        if (eventWarrantsRecalculation(e)) {
+          yield put(actions.budget.updateInState(response.budget as Partial<B>));
         }
-
-        const CancelToken = axios.CancelToken;
-        const source = CancelToken.source();
-        let success = true;
-        try {
-          yield call(
-            api.bulkDeleteSubAccountSubAccounts,
-            subaccountId,
-            map(rows, (row: R) => row.id),
-            { cancelToken: source.token }
-          );
-        } catch (err) {
-          success = false;
-          if (eventRequiresParentRefresh(e)) {
-            yield put(actions.budget.loading(false));
-          }
-          if (!(yield cancelled())) {
-            api.handleRequestError(err, "There was an error deleting the sub accounts.");
-          }
-        } finally {
-          yield all(rows.map((row: R) => put(actions.deleting({ id: row.id, value: false }))));
-          if (yield cancelled()) {
-            success = false;
-            source.cancel();
-          }
+      } catch (err) {
+        if (!(yield cancelled())) {
+          api.handleRequestError(err, errorMessage);
         }
-        if (success === true && eventRequiresParentRefresh(e)) {
-          // NOTE: We update teh parent subaccount synchronously in the reducer.
-          yield put(actions.budget.request(null));
+      } finally {
+        yield all(ids.map((id: number) => put(actions.deleting({ id, value: false }))));
+        if (eventWarrantsRecalculation(e)) {
+          yield put(actions.budget.loading(false));
+        }
+        if (yield cancelled()) {
+          source.cancel();
         }
       }
     }
   }
 
-  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
-    const subaccountId = yield select(selectSubAccountId);
-    if (!isNil(subaccountId) && !isNil(action.payload)) {
-      const e: Table.DataChangeEvent<R, M> = action.payload;
+  function* handleSubAccountChange(action: Redux.Action<number>): SagaIterator {
+    yield all([put(actions.subaccount.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);
+  }
 
+  function* handleRemoveRowFromGroupEvent(action: Redux.Action<Table.RowRemoveFromGroupEvent<R, C>>): SagaIterator {
+    const subaccountId = yield select(selectSubAccountId);
+    if (!isNil(action.payload) && !isNil(subaccountId)) {
+      const e: Table.RowRemoveFromGroupEvent<R, C> = action.payload;
+      const rows: R[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+      const requestPayload: Http.BulkUpdatePayload<P>[] = map(rows, (row: R) => ({
+        id: row.id,
+        group: null
+      }));
+      yield fork(
+        bulkUpdateTask,
+        subaccountId,
+        e,
+        requestPayload,
+        "There was an error removing the sub account from the group."
+      );
+    }
+  }
+
+  function* handleAddRowToGroupEvent(action: Redux.Action<Table.RowAddToGroupEvent<R, C>>): SagaIterator {
+    const subaccountId = yield select(selectSubAccountId);
+    if (!isNil(action.payload) && !isNil(subaccountId)) {
+      const e: Table.RowAddToGroupEvent<R, C> = action.payload;
+      const rows: R[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+      const requestPayload: Http.BulkUpdatePayload<P>[] = map(rows, (row: R) => ({
+        id: row.id,
+        group: e.payload.group
+      }));
+      yield fork(
+        bulkUpdateTask,
+        subaccountId,
+        e,
+        requestPayload,
+        "There was an error adding the sub account to the group."
+      );
+    }
+  }
+
+  function* handleDeleteGroupEvent(action: Redux.Action<Table.GroupDeleteEvent>): SagaIterator {
+    if (!isNil(action.payload)) {
+      const e: Table.GroupDeleteEvent = action.payload;
+      const CancelToken = axios.CancelToken;
+      const source = CancelToken.source();
+      yield put(actions.groups.deleting({ id: e.payload, value: true }));
+      try {
+        yield call(api.deleteGroup, e.payload, { cancelToken: source.token });
+      } catch (err) {
+        if (!(yield cancelled())) {
+          api.handleRequestError(err, "There was an error deleting the sub account group.");
+        }
+      } finally {
+        yield put(actions.groups.deleting({ id: e.payload, value: false }));
+        if (yield cancelled()) {
+          source.cancel();
+        }
+      }
+    }
+  }
+
+  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, C>>): SagaIterator {
+    const subaccountId = yield select(selectSubAccountId);
+    if (!isNil(action.payload) && !isNil(subaccountId)) {
+      const e: Table.RowAddEvent<R, C> = action.payload;
+      yield fork(bulkCreateTask, subaccountId, e, "There was an error creating the sub accounts.");
+    }
+  }
+
+  function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, C>>): SagaIterator {
+    const subaccountId = yield select(selectSubAccountId);
+    if (!isNil(action.payload) && !isNil(subaccountId)) {
+      const e: Table.RowDeleteEvent<R, C> = action.payload;
+      yield fork(bulkDeleteTask, subaccountId, e, "There was an error deleting the sub accounts.");
+    }
+  }
+
+  function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, C>>): SagaIterator {
+    const subaccountId = yield select(selectSubAccountId);
+    if (!isNil(action.payload) && !isNil(subaccountId)) {
+      const e: Table.DataChangeEvent<R, C> = action.payload;
       const merged = consolidateTableChange(e.payload);
       if (merged.length !== 0) {
-        const CancelToken = axios.CancelToken;
-        const source = CancelToken.source();
-        const requestPayload: Http.BulkUpdatePayload<Http.SubAccountPayload>[] = map(
-          merged,
-          (change: Table.RowChange<R, M>) => ({
-            id: change.id,
-            ...payload(change)
-          })
-        );
-        // We do this to show the loading indicator next to the calculated fields of the footers,
-        // otherwise, the loading indicators will not appear until the first API request
-        // succeeds and we refresh the parent state.
-        if (eventRequiresParentRefresh(e)) {
-          yield put(actions.budget.loading(true));
-        }
-
-        let success = true;
-        yield all(merged.map((change: Table.RowChange<R, M>) => put(actions.updating({ id: change.id, value: true }))));
-        try {
-          yield call(api.bulkUpdateSubAccountSubAccounts, subaccountId, requestPayload, { cancelToken: source.token });
-        } catch (err) {
-          success = false;
-          if (eventRequiresParentRefresh(e)) {
-            yield put(actions.budget.loading(false));
-          }
-          if (!(yield cancelled())) {
-            api.handleRequestError(err, "There was an error updating the sub accounts.");
-          }
-        } finally {
-          yield all(
-            merged.map((change: Table.RowChange<R, M>) => put(actions.updating({ id: change.id, value: false })))
-          );
-          if (yield cancelled()) {
-            success = false;
-            source.cancel();
-          }
-        }
-        if (success === true && eventRequiresParentRefresh(e)) {
-          // NOTE: We update teh parent subaccount synchronously in the reducer.
-          yield put(actions.budget.request(null));
-        }
+        const requestPayload: Http.BulkUpdatePayload<P>[] = map(merged, (change: Table.RowChange<R, C>) => ({
+          id: change.id,
+          ...payload(change)
+        }));
+        yield fork(bulkUpdateTask, subaccountId, e, requestPayload, "There was an error updating the sub accounts.");
       }
     }
   }
 
-  function* getGroupsTask(action: Redux.Action<null>): SagaIterator {
+  function* getGroups(action: Redux.Action<null>): SagaIterator {
     const subaccountId = yield select(selectSubAccountId);
     if (!isNil(subaccountId)) {
       const CancelToken = axios.CancelToken;
@@ -312,14 +321,14 @@ export const createSubAccountTaskSet = (
     }
   }
 
-  function* getSubAccountsTask(action: Redux.Action<null>): SagaIterator {
+  function* getSubAccounts(action: Redux.Action<null>): SagaIterator {
     const subaccountId = yield select(selectSubAccountId);
     if (!isNil(subaccountId)) {
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
       yield put(actions.loading(true));
       try {
-        const response: Http.ListResponse<M> = yield call(
+        const response: Http.ListResponse<C> = yield call(
           api.getSubAccountSubAccounts,
           subaccountId,
           { no_pagination: true },
@@ -327,7 +336,12 @@ export const createSubAccountTaskSet = (
         );
         yield put(actions.response(response));
         if (response.data.length === 0) {
-          yield call(bulkCreateTask, subaccountId, { type: "rowAdd", payload: 2 });
+          yield call(
+            bulkCreateTask,
+            subaccountId,
+            { type: "rowAdd", payload: 2 },
+            "There was an error creating the sub accounts."
+          );
         }
       } catch (e) {
         if (!(yield cancelled())) {
@@ -343,14 +357,14 @@ export const createSubAccountTaskSet = (
     }
   }
 
-  function* getSubAccountTask(action: Redux.Action<null>): SagaIterator {
+  function* getSubAccount(action: Redux.Action<null>): SagaIterator {
     const subaccountId = yield select(selectSubAccountId);
     if (!isNil(subaccountId)) {
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
 
       try {
-        const response: M = yield call(api.getSubAccount, subaccountId, { cancelToken: source.token });
+        const response: C = yield call(api.getSubAccount, subaccountId, { cancelToken: source.token });
         yield put(actions.subaccount.response(response));
       } catch (e) {
         if (!(yield cancelled())) {
@@ -366,15 +380,15 @@ export const createSubAccountTaskSet = (
   }
 
   return {
-    addToGroup: addToGroupTask,
-    removeFromGroup: removeFromGroupTask,
-    deleteGroup: deleteGroupTask,
-    handleDataChangeEvent: handleDataChangeEvent,
-    handleRowDeleteEvent: handleRowDeleteEvent,
+    handleRemoveRowFromGroupEvent: handleRemoveRowFromGroupEvent,
+    handleAddRowToGroupEvent: handleAddRowToGroupEvent,
+    handleDeleteGroupEvent: handleDeleteGroupEvent,
     handleRowAddEvent: handleRowAddEvent,
-    getSubAccounts: getSubAccountsTask,
-    getGroups: getGroupsTask,
-    getSubAccount: getSubAccountTask,
-    handleSubAccountChange: handleSubAccountChangeTask
+    handleRowDeleteEvent: handleRowDeleteEvent,
+    handleDataChangeEvent: handleDataChangeEvent,
+    getSubAccounts: getSubAccounts,
+    getGroups: getGroups,
+    getSubAccount: getSubAccount,
+    handleSubAccountChange: handleSubAccountChange
   };
 };

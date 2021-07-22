@@ -20,33 +20,31 @@ export const updateAccount = async (
   return client.patch<Model.Account>(url, payload, options);
 };
 
-export const bulkUpdateAccountSubAccounts = async (
+export const bulkUpdateAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
   id: number,
   data: Http.BulkUpdatePayload<Http.SubAccountPayload>[],
   options: Http.RequestOptions = {}
-): Promise<Model.Account> => {
+): Promise<Http.BudgetBulkResponse<B, Model.Account>> => {
   const url = URL.v1("accounts", id, "bulk-update-subaccounts");
-  return client.patch<Model.Account>(url, { data }, options);
+  return client.patch<Http.BudgetBulkResponse<B, Model.Account>>(url, { data }, options);
 };
 
-export const bulkDeleteAccountSubAccounts = async (
+export const bulkDeleteAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
-): Promise<Model.Account> => {
+): Promise<Http.BudgetBulkResponse<B, Model.Account>> => {
   const url = URL.v1("accounts", id, "bulk-delete-subaccounts");
-  return client.patch<Model.Account>(url, { ids }, options);
+  return client.patch<Http.BudgetBulkResponse<B, Model.Account>>(url, { ids }, options);
 };
 
-export const bulkCreateAccountSubAccounts = async (
+export const bulkCreateAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
   id: number,
   payload: Http.BulkCreatePayload<Http.SubAccountPayload>,
   options: Http.RequestOptions = {}
-): Promise<Model.SubAccount[]> => {
+): Promise<Http.BudgetBulkCreateResponse<B, Model.Account, Model.SubAccount>> => {
   const url = URL.v1("accounts", id, "bulk-create-subaccounts");
-  return client
-    .patch<Http.BulkCreateResponse<Model.SubAccount>>(url, payload, options)
-    .then((response: Http.BulkCreateResponse<Model.SubAccount>) => response.data);
+  return client.patch<Http.BudgetBulkCreateResponse<B, Model.Account, Model.SubAccount>>(url, payload, options);
 };
 
 export const getAccountSubAccounts = async (

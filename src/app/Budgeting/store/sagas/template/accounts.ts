@@ -1,7 +1,7 @@
 import * as api from "api";
 
 import { ActionType } from "../../actions";
-import { requestTemplateAction, loadingTemplateAction } from "../../actions/template";
+import { loadingTemplateAction, updateTemplateInStateAction } from "../../actions/template";
 import * as actions from "../../actions/template/accounts";
 import { createStandardSaga, createAccountsTaskSet } from "../factories";
 
@@ -15,11 +15,10 @@ const tasks = createAccountsTaskSet<Model.Template>(
     addToState: actions.addAccountToStateAction,
     budget: {
       loading: loadingTemplateAction,
-      request: requestTemplateAction
+      updateInState: updateTemplateInStateAction
     },
     groups: {
       deleting: actions.deletingGroupAction,
-      removeFromState: actions.removeGroupFromStateAction,
       loading: actions.loadingGroupsAction,
       response: actions.responseGroupsAction
     }
@@ -41,22 +40,19 @@ export default createStandardSaga(
     Request: ActionType.Template.Accounts.Request,
     TableChange: ActionType.Template.SubAccount.TableChanged,
     Groups: {
-      Request: ActionType.Template.Groups.Request,
-      RemoveModel: ActionType.Template.Accounts.RemoveFromGroup,
-      AddModel: ActionType.Template.Accounts.AddToGroup,
-      Delete: ActionType.Template.Groups.Delete
+      Request: ActionType.Template.Groups.Request
     }
   },
   {
     Request: tasks.getAccounts,
-    HandleDataChangeEvent: tasks.handleDataChangeEvent,
-    HandleRowAddEvent: tasks.handleRowAddEvent,
-    HandleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    handleDataChangeEvent: tasks.handleDataChangeEvent,
+    handleRowAddEvent: tasks.handleRowAddEvent,
+    handleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    handleAddRowToGroupEvent: tasks.handleAddRowToGroupEvent,
+    handleRemoveRowFromGroupEvent: tasks.handleRemoveRowFromGroupEvent,
+    handleDeleteGroupEvent: tasks.handleDeleteGroupEvent,
     Groups: {
-      Request: tasks.getGroups,
-      RemoveModel: tasks.removeFromGroup,
-      AddModel: tasks.addToGroup,
-      Delete: tasks.deleteGroup
+      Request: tasks.getGroups
     }
   }
 );

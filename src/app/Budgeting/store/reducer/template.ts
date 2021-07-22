@@ -26,15 +26,12 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Template.Account.SubAccounts.AddToState,
         Deleting: ActionType.Template.Account.SubAccounts.Deleting,
         Creating: ActionType.Template.Account.SubAccounts.Creating,
-        Updating: ActionType.Template.Account.SubAccounts.Updating,
-        RemoveFromGroup: ActionType.Template.Account.SubAccounts.RemoveFromGroup,
-        AddToGroup: ActionType.Template.Account.SubAccounts.AddToGroup
+        Updating: ActionType.Template.Account.SubAccounts.Updating
       },
       Groups: {
         Response: ActionType.Template.Account.Groups.Response,
         Request: ActionType.Template.Account.Groups.Request,
         Loading: ActionType.Template.Account.Groups.Loading,
-        RemoveFromState: ActionType.Template.Account.Groups.RemoveFromState,
         UpdateInState: ActionType.Template.Account.Groups.UpdateInState,
         AddToState: ActionType.Template.Account.Groups.AddToState,
         Deleting: ActionType.Template.Account.Groups.Deleting
@@ -69,15 +66,12 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Template.SubAccount.SubAccounts.AddToState,
         Deleting: ActionType.Template.SubAccount.SubAccounts.Deleting,
         Creating: ActionType.Template.SubAccount.SubAccounts.Creating,
-        Updating: ActionType.Template.SubAccount.SubAccounts.Updating,
-        RemoveFromGroup: ActionType.Template.SubAccount.SubAccounts.RemoveFromGroup,
-        AddToGroup: ActionType.Template.SubAccount.SubAccounts.AddToGroup
+        Updating: ActionType.Template.SubAccount.SubAccounts.Updating
       },
       Groups: {
         Response: ActionType.Template.SubAccount.Groups.Response,
         Request: ActionType.Template.SubAccount.Groups.Request,
         Loading: ActionType.Template.SubAccount.Groups.Loading,
-        RemoveFromState: ActionType.Template.SubAccount.Groups.RemoveFromState,
         UpdateInState: ActionType.Template.SubAccount.Groups.UpdateInState,
         AddToState: ActionType.Template.SubAccount.Groups.AddToState,
         Deleting: ActionType.Template.SubAccount.Groups.Deleting
@@ -103,6 +97,7 @@ const genericReducer = combineReducers({
       Loading: ActionType.Template.Loading,
       Request: ActionType.Template.Request,
       SetId: ActionType.Template.SetId,
+      UpdateInState: ActionType.Template.UpdateInState,
       Accounts: {
         Response: ActionType.Template.Accounts.Response,
         Request: ActionType.Template.Accounts.Request,
@@ -111,15 +106,12 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Template.Accounts.AddToState,
         Deleting: ActionType.Template.Accounts.Deleting,
         Creating: ActionType.Template.Accounts.Creating,
-        Updating: ActionType.Template.Accounts.Updating,
-        RemoveFromGroup: ActionType.Template.Accounts.RemoveFromGroup,
-        AddToGroup: ActionType.Template.Accounts.AddToGroup
+        Updating: ActionType.Template.Accounts.Updating
       },
       Groups: {
         Response: ActionType.Template.Groups.Response,
         Request: ActionType.Template.Groups.Request,
         Loading: ActionType.Template.Groups.Loading,
-        RemoveFromState: ActionType.Template.Groups.RemoveFromState,
         UpdateInState: ActionType.Template.Groups.UpdateInState,
         AddToState: ActionType.Template.Groups.AddToState,
         Deleting: ActionType.Template.Groups.Deleting

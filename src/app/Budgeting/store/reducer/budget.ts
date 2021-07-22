@@ -120,9 +120,7 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Budget.Account.SubAccounts.AddToState,
         Deleting: ActionType.Budget.Account.SubAccounts.Deleting,
         Creating: ActionType.Budget.Account.SubAccounts.Creating,
-        Updating: ActionType.Budget.Account.SubAccounts.Updating,
-        RemoveFromGroup: ActionType.Budget.Account.SubAccounts.RemoveFromGroup,
-        AddToGroup: ActionType.Budget.Account.SubAccounts.AddToGroup
+        Updating: ActionType.Budget.Account.SubAccounts.Updating
       },
       History: {
         Response: ActionType.Budget.Account.History.Response,
@@ -133,7 +131,6 @@ const genericReducer = combineReducers({
         Response: ActionType.Budget.Account.Groups.Response,
         Request: ActionType.Budget.Account.Groups.Request,
         Loading: ActionType.Budget.Account.Groups.Loading,
-        RemoveFromState: ActionType.Budget.Account.Groups.RemoveFromState,
         UpdateInState: ActionType.Budget.Account.Groups.UpdateInState,
         AddToState: ActionType.Budget.Account.Groups.AddToState,
         Deleting: ActionType.Budget.Account.Groups.Deleting
@@ -180,9 +177,7 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Budget.SubAccount.SubAccounts.AddToState,
         Deleting: ActionType.Budget.SubAccount.SubAccounts.Deleting,
         Creating: ActionType.Budget.SubAccount.SubAccounts.Creating,
-        Updating: ActionType.Budget.SubAccount.SubAccounts.Updating,
-        RemoveFromGroup: ActionType.Budget.SubAccount.SubAccounts.RemoveFromGroup,
-        AddToGroup: ActionType.Budget.SubAccount.SubAccounts.AddToGroup
+        Updating: ActionType.Budget.SubAccount.SubAccounts.Updating
       },
       History: {
         Response: ActionType.Budget.SubAccount.History.Response,
@@ -193,7 +188,6 @@ const genericReducer = combineReducers({
         Response: ActionType.Budget.SubAccount.Groups.Response,
         Request: ActionType.Budget.SubAccount.Groups.Request,
         Loading: ActionType.Budget.SubAccount.Groups.Loading,
-        RemoveFromState: ActionType.Budget.SubAccount.Groups.RemoveFromState,
         UpdateInState: ActionType.Budget.SubAccount.Groups.UpdateInState,
         AddToState: ActionType.Budget.SubAccount.Groups.AddToState,
         Deleting: ActionType.Budget.SubAccount.Groups.Deleting
@@ -232,6 +226,7 @@ const genericReducer = combineReducers({
       Loading: ActionType.Budget.Loading,
       Request: ActionType.Budget.Request,
       SetId: ActionType.Budget.SetId,
+      UpdateInState: ActionType.Budget.UpdateInState,
       Accounts: {
         Response: ActionType.Budget.Accounts.Response,
         Request: ActionType.Budget.Accounts.Request,
@@ -240,15 +235,12 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Budget.Accounts.AddToState,
         Deleting: ActionType.Budget.Accounts.Deleting,
         Creating: ActionType.Budget.Accounts.Creating,
-        Updating: ActionType.Budget.Accounts.Updating,
-        RemoveFromGroup: ActionType.Budget.Accounts.RemoveFromGroup,
-        AddToGroup: ActionType.Budget.Accounts.AddToGroup
+        Updating: ActionType.Budget.Accounts.Updating
       },
       Groups: {
         Response: ActionType.Budget.Groups.Response,
         Request: ActionType.Budget.Groups.Request,
         Loading: ActionType.Budget.Groups.Loading,
-        RemoveFromState: ActionType.Budget.Groups.RemoveFromState,
         UpdateInState: ActionType.Budget.Groups.UpdateInState,
         AddToState: ActionType.Budget.Groups.AddToState,
         Deleting: ActionType.Budget.Groups.Deleting

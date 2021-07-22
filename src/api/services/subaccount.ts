@@ -43,33 +43,31 @@ export const updateSubAccount = async (
   return client.patch<Model.SubAccount>(url, payload, options);
 };
 
-export const bulkUpdateSubAccountSubAccounts = async (
+export const bulkUpdateSubAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
   id: number,
   data: Http.BulkUpdatePayload<Http.SubAccountPayload>[],
   options: Http.RequestOptions = {}
-): Promise<Model.SubAccount> => {
+): Promise<Http.BudgetBulkResponse<B, Model.SubAccount>> => {
   const url = URL.v1("subaccounts", id, "bulk-update-subaccounts");
-  return client.patch<Model.SubAccount>(url, { data }, options);
+  return client.patch<Http.BudgetBulkResponse<B, Model.SubAccount>>(url, { data }, options);
 };
 
-export const bulkDeleteSubAccountSubAccounts = async (
+export const bulkDeleteSubAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
-): Promise<Model.SubAccount> => {
+): Promise<Http.BudgetBulkResponse<B, Model.SubAccount>> => {
   const url = URL.v1("subaccounts", id, "bulk-delete-subaccounts");
-  return client.patch<Model.SubAccount>(url, { ids }, options);
+  return client.patch<Http.BudgetBulkResponse<B, Model.SubAccount>>(url, { ids }, options);
 };
 
-export const bulkCreateSubAccountSubAccounts = async (
+export const bulkCreateSubAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
   id: number,
   payload: Http.BulkCreatePayload<Http.SubAccountPayload>,
   options: Http.RequestOptions = {}
-): Promise<Model.SubAccount[]> => {
+): Promise<Http.BudgetBulkCreateResponse<B, Model.SubAccount, Model.SubAccount>> => {
   const url = URL.v1("subaccounts", id, "bulk-create-subaccounts");
-  return client
-    .patch<Http.BulkCreateResponse<Model.SubAccount>>(url, payload, options)
-    .then((response: Http.BulkCreateResponse<Model.SubAccount>) => response.data);
+  return client.patch<Http.BudgetBulkCreateResponse<B, Model.SubAccount, Model.SubAccount>>(url, payload, options);
 };
 
 export const createSubAccountSubAccountGroup = async (

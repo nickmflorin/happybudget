@@ -34,8 +34,8 @@ export const isBudgetOrTemplateForm = (
   return isBudgetForm(obj) || isTemplateForm(obj);
 };
 
-export const isSubAccount = (obj: Model.SubAccount | Model.SubAccount): obj is Model.SubAccount => {
-  return Object.prototype.hasOwnProperty.call(obj, "variance") && Object.prototype.hasOwnProperty.call(obj, "actual");
+export const isSubAccount = (obj: Model.Account | Model.SubAccount): obj is Model.SubAccount => {
+  return (obj as Model.SubAccount).type === "subaccount";
 };
 
 export const isModelWithColor = (model: Model.M | Model.ModelWithColor): model is Model.ModelWithColor => {

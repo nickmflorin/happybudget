@@ -50,9 +50,9 @@ namespace Modules {
       readonly replying: number[];
     }
 
-    type SubAccountStore = {
+    type AccountSubAccountStore<M extends Model.Account | Model.SubAccount> = {
       readonly id: number | null;
-      readonly detail: Redux.ModelDetailResponseStore<Model.SubAccount>;
+      readonly detail: Redux.ModelDetailResponseStore<M>;
       readonly children: Redux.ModelListResponseStore<Model.SubAccount>;
       readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
       readonly groups: Redux.ModelListResponseStore<Model.Group>;
@@ -60,15 +60,8 @@ namespace Modules {
       readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>; // Not applicable for templates.
     }
 
-    type AccountStore = {
-      readonly id: number | null;
-      readonly detail: Redux.ModelDetailResponseStore<Model.Account>;
-      readonly children: Redux.ModelListResponseStore<Model.SubAccount>;
-      readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
-      readonly groups: Redux.ModelListResponseStore<Model.Group>;
-      readonly comments: CommentsStore; // Not applicable for templates.
-      readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>; // Not applicable for templates.
-    }
+    type SubAccountStore = Modules.Budget.AccountSubAccountStore<Model.SubAccount>;
+    type AccountStore = Modules.Budget.AccountSubAccountStore<Model.Account>;
 
     interface BudgetStore<M extends Model.Model> {
       readonly id: number | null;

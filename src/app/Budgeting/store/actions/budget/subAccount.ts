@@ -56,12 +56,6 @@ export const responseSubAccountsAction = simpleAction<Http.ListResponse<Model.Su
   ActionType.Budget.SubAccount.SubAccounts.Response
 );
 export const setSubAccountsSearchAction = simpleAction<string>(ActionType.Budget.SubAccount.SubAccounts.SetSearch);
-export const removeSubAccountFromGroupAction = simpleAction<number>(
-  ActionType.Budget.SubAccount.SubAccounts.RemoveFromGroup
-);
-export const addSubAccountToGroupAction = simpleAction<{ id: number; group: number }>(
-  ActionType.Budget.SubAccount.SubAccounts.AddToGroup
-);
 export const addSubAccountToStateAction = simpleAction<Model.SubAccount>(
   ActionType.Budget.SubAccount.SubAccounts.AddToState
 );
@@ -74,7 +68,6 @@ export const addGroupToStateAction = simpleAction<Model.Group>(ActionType.Budget
 export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Group>>(
   ActionType.Budget.SubAccount.Groups.UpdateInState
 );
-export const removeGroupFromStateAction = simpleAction<number>(ActionType.Budget.SubAccount.Groups.RemoveFromState);
 export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.SubAccount.Groups.Deleting
 );

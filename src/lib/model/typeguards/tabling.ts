@@ -26,6 +26,36 @@ export const isRowDeleteEvent = <R extends Table.Row, M extends Model.Model>(
   return (e as Table.RowDeleteEvent<R, M>).type === "rowDelete";
 };
 
+export const isRowRemoveFromGroupEvent = <R extends Table.Row, M extends Model.Model>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.RowRemoveFromGroupEvent<R, M> => {
+  return (e as Table.RowRemoveFromGroupEvent<R, M>).type === "rowRemoveFromGroup";
+};
+
+export const isRowAddToGroupEvent = <R extends Table.Row, M extends Model.Model>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.RowAddToGroupEvent<R, M> => {
+  return (e as Table.RowAddToGroupEvent<R, M>).type === "rowAddToGroup";
+};
+
+export const isGroupDeleteEvent = <R extends Table.Row, M extends Model.Model>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.GroupDeleteEvent => {
+  return (e as Table.GroupDeleteEvent).type === "groupDelete";
+};
+
+export const isFullRowEvent = <R extends Table.Row, M extends Model.Model>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.FullRowEvent<R, M> => {
+  return (e as Table.FullRowEvent<R, M>).payload.rows !== undefined;
+};
+
+export const isGroupEvent = <R extends Table.Row, M extends Model.Model>(
+  e: Table.ChangeEvent<R, M>
+): e is Table.GroupEvent<R, M> => {
+  return isGroupDeleteEvent(e) || isRowAddToGroupEvent(e) || isRowRemoveFromGroupEvent(e);
+};
+
 export const tableChangeIsRowChange = <R extends Table.Row, M extends Model.Model>(
   change: Table.Change<R, M>
 ): change is Table.RowChange<R, M> => {

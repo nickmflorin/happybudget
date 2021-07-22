@@ -1,6 +1,13 @@
 /// <reference path="./modeling.d.ts" />
 
 
+type Animal = {
+  name: string;
+  color: string;
+}
+
+type Dog = Animal & { legs: number };
+
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace GenericTable {
@@ -97,7 +104,7 @@ namespace Table {
     readonly budget?: FooterColumn<R>;
     readonly footer?: FooterColumn<R>;
     readonly index?: number;
-    readonly refreshParentOnChange?: boolean;
+    readonly isCalculating?: boolean;
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;
     readonly refreshColumns?: (change: Table.CellChange<R, M>) => Field<R, M> | Field<R, M>[] | null;
@@ -138,7 +145,7 @@ namespace Table {
     readonly apis: APIs;
   }
 
-  type ChangeEventId = "dataChange" | "rowAdd" | "rowDelete";
+  type ChangeEventId = "dataChange" | "rowAdd" | "rowDelete" | "rowRemoveFromGroup" | "rowAddToGroup" | "groupDelete";
 
   type BaseChangeEvent = {
     readonly type: ChangeEventId;
@@ -191,20 +198,50 @@ namespace Table {
   }
 
   type RowAddPayload<R extends Table.Row, M extends Model.Model> = number | Table.RowAdd<R, M> | Table.RowAdd<R, M>[];
-  type RowAddFunc<R extends Table.Row, M extends Model.Model> = (payload: RowAddPayload<R, M>) => void;
   type RowAddEvent<R extends Table.Row, M extends Model.Model> = Table.BaseChangeEvent & {
     readonly type: "rowAdd";
     readonly payload: Table.RowAddPayload<R, M>;
   }
 
-  type RowDeletePayload<R extends Table.Row, M extends Model.Model> = {columns: Table.Column<R, M>[], rows: R | R[]};
-  type RowDeleteFunc<R extends Table.Row, M extends Model.Model> = (payload: RowDeletePayload<R, M>) => void;
-  type RowDeleteEvent<R extends Table.Row, M extends Model.Model> = Table.BaseChangeEvent & {
-    readonly type: "rowDelete";
-    readonly payload: Table.RowDeletePayload<R, M>;
+  type FullRowPayload<R extends Table.Row, M extends Model.Model> = {columns: Table.Column<R, M>[], rows: R | R[]};
+  type BaseFullRowEvent<R extends Table.Row, M extends Model.Model> = Table.BaseChangeEvent & {
+    readonly payload: Table.FullRowPayload<R, M>;
   }
 
-  type ChangeEvent<R extends Table.Row, M extends Model.Model> = Table.DataChangeEvent<R, M> | Table.RowAddEvent<R, M> | Table.RowDeleteEvent<R, M>;
+  type RowDeletePayload<R extends Table.Row, M extends Model.Model> = Table.FullRowPayload<R, M>;
+  type RowDeleteEvent<R extends Table.Row, M extends Model.Model> = Table.BaseFullRowEvent<R, M> & {
+    readonly type: "rowDelete";
+  }
+
+  type RowRemoveFromGroupPayload<R extends Table.Row, M extends Model.Model> = Table.FullRowPayload<R, M> & { group: number };
+  type RowRemoveFromGroupEvent<R extends Table.Row, M extends Model.Model> = Table.BaseFullRowEvent<R, M> & {
+    readonly type: "rowRemoveFromGroup";
+    readonly payload: Table.RowRemoveFromGroupPayload<R, M>;
+  }
+
+  type RowAddToGroupPayload<R extends Table.Row, M extends Model.Model> = Table.FullRowPayload<R, M> & { group: number };
+  type RowAddToGroupEvent<R extends Table.Row, M extends Model.Model> = Table.BaseFullRowEvent<R, M> & {
+    readonly type: "rowAddToGroup";
+    readonly payload: Table.RowAddToGroupPayload<R, M>;
+  }
+
+  type GroupDeletePayload = number;
+  type GroupDeleteEvent = Table.BaseChangeEvent & {
+    readonly type: "groupDelete";
+    readonly payload: GroupDeletePayload;
+  }
+
+  type FullRowEvent<R extends Table.Row, M extends Model.Model> = RowDeleteEvent<R, M> | RowRemoveFromGroupEvent<R, M> | RowAddToGroupEvent<R, M>;
+  type GrouplessEvent<R extends Table.Row, M extends Model.Model> =
+    | Table.DataChangeEvent<R, M>
+    | Table.RowAddEvent<R, M>
+    | Table.RowDeleteEvent<R, M>;
+  type GroupEvent<R extends Table.Row, M extends Model.Model> =
+  | Table.RowRemoveFromGroupEvent<R, M>
+  | Table.RowAddToGroupEvent<R, M>
+  | Table.GroupDeleteEvent;
+
+  type ChangeEvent<R extends Table.Row, M extends Model.Model> = GrouplessEvent<R, M> | GroupEvent<R, M>;
 
   interface CellPositionMoveOptions {
     readonly startEdit?: boolean;
@@ -303,14 +340,6 @@ namespace BudgetTable {
   type GridId = "primary" | "tableFooter" | "budgetFooter";
   type GridSet<T> = { primary: T; tableFooter: T; budgetFooter: T };
 
-  interface GroupProps<R extends Table.Row> {
-    readonly onGroupRows: (rows: R[]) => void;
-    readonly onDeleteGroup: (group: Model.Group) => void;
-    readonly onEditGroup: (group: Model.Group) => void;
-    readonly onRowRemoveFromGroup: (row: R) => void;
-    readonly onRowAddToGroup: (groupId: number, row: R) => void;
-  }
-
   interface CookiesProps {
     readonly ordering?: string;
   }
@@ -373,11 +402,11 @@ namespace BudgetTable {
   > {
     readonly data: M[];
     readonly groups?: Model.Group[];
-    readonly groupParams?: BudgetTable.GroupProps<R>;
     readonly frameworkComponents?: { [key: string]: any };
     readonly search?: string;
     readonly columns: Table.Column<R, M>[];
     readonly rowLabel?: string;
+    readonly onGroupRows?: (rows: R[]) => void;
     readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
     readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
     // Callback to conditionally set the ability of a row to expand or not.  Only applicable if
@@ -424,6 +453,7 @@ namespace BudgetTable {
     readonly nonEditableCells?: (keyof R)[];
     readonly cookies?: BudgetTable.CookiesProps;
     readonly loading?: boolean;
+    readonly onEditGroup?: (group: Model.Group) => void;
     readonly cellClass?: (params: import("@ag-grid-community/core").CellClassParams) => string | undefined;
     readonly isCellEditable?: (row: R, col: Table.Column) => boolean;
     readonly isCellSelectable?: (row: R, col: Table.Column) => boolean;

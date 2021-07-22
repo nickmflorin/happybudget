@@ -5,7 +5,7 @@ export const setAccountIdAction = simpleAction<number>(ActionType.Budget.Account
 export const requestAccountAction = simpleAction<null>(ActionType.Budget.Account.Request);
 export const loadingAccountAction = simpleAction<boolean>(ActionType.Budget.Account.Loading);
 export const responseAccountAction = simpleAction<Model.Account | undefined>(ActionType.Budget.Account.Response);
-export const updateAccountInStateAction = simpleAction<Partial<Redux.UpdateModelActionPayload<Model.Account>>>(
+export const updateAccountInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Account>>(
   ActionType.Budget.Account.UpdateInState
 );
 export const requestCommentsAction = simpleAction<null>(ActionType.Budget.Account.Comments.Request);
@@ -34,9 +34,9 @@ export const addCommentToStateAction = simpleAction<{ data: Comment; parent?: nu
   ActionType.Budget.Account.Comments.AddToState
 );
 export const removeCommentFromStateAction = simpleAction<number>(ActionType.Budget.Account.Comments.RemoveFromState);
-export const updateCommentInStateAction = simpleAction<
-  Redux.UpdateModelActionPayload<Redux.UpdateModelActionPayload<Model.Comment>>
->(ActionType.Budget.Account.Comments.UpdateInState);
+export const updateCommentInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Comment>>(
+  ActionType.Budget.Account.Comments.UpdateInState
+);
 export const handleTableChangeEventAction = simpleAction<
   Table.ChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount>
 >(ActionType.Budget.Account.TableChanged);
@@ -53,12 +53,6 @@ export const responseSubAccountsAction = simpleAction<Http.ListResponse<Model.Su
   ActionType.Budget.Account.SubAccounts.Response
 );
 export const setSubAccountsSearchAction = simpleAction<string>(ActionType.Budget.Account.SubAccounts.SetSearch);
-export const removeSubAccountFromGroupAction = simpleAction<number>(
-  ActionType.Budget.Account.SubAccounts.RemoveFromGroup
-);
-export const addSubAccountToGroupAction = simpleAction<{ id: number; group: number }>(
-  ActionType.Budget.Account.SubAccounts.AddToGroup
-);
 export const addSubAccountToStateAction = simpleAction<Model.SubAccount>(
   ActionType.Budget.Account.SubAccounts.AddToState
 );
@@ -71,7 +65,6 @@ export const addGroupToStateAction = simpleAction<Model.Group>(ActionType.Budget
 export const updateGroupInStateAction = simpleAction<Redux.UpdateModelActionPayload<Model.Group>>(
   ActionType.Budget.Account.Groups.UpdateInState
 );
-export const removeGroupFromStateAction = simpleAction<number>(ActionType.Budget.Account.Groups.RemoveFromState);
 export const deletingGroupAction = simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.Account.Groups.Deleting
 );

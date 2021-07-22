@@ -106,9 +106,9 @@ export const bulkDeleteTemplateFringes = async (
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
-): Promise<Model.Template> => {
+): Promise<Http.BulkResponse<Model.Template>> => {
   const url = URL.v1("templates", id, "bulk-delete-fringes");
-  return client.patch<Model.Template>(url, { ids }, options);
+  return client.patch<Http.BulkResponse<Model.Template>>(url, { ids }, options);
 };
 
 export const createTemplateFringe = async (
@@ -124,47 +124,43 @@ export const bulkUpdateTemplateAccounts = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.AccountPayload>[],
   options: Http.RequestOptions = {}
-): Promise<Model.Template> => {
+): Promise<Http.BulkResponse<Model.Template>> => {
   const url = URL.v1("templates", id, "bulk-update-accounts");
-  return client.patch<Model.Template>(url, { data }, options);
+  return client.patch<Http.BulkResponse<Model.Template>>(url, { data }, options);
 };
 
 export const bulkDeleteTemplateAccounts = async (
   id: number,
   ids: number[],
   options: Http.RequestOptions = {}
-): Promise<Model.Template> => {
+): Promise<Http.BulkResponse<Model.Template>> => {
   const url = URL.v1("templates", id, "bulk-delete-accounts");
-  return client.patch<Model.Template>(url, { ids }, options);
+  return client.patch<Http.BulkResponse<Model.Template>>(url, { ids }, options);
 };
 
 export const bulkCreateTemplateAccounts = async (
   id: number,
   payload: Http.BulkCreatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
-): Promise<Model.Account[]> => {
+): Promise<Http.BulkCreateResponse<Model.Template, Model.Account>> => {
   const url = URL.v1("templates", id, "bulk-create-accounts");
-  return client
-    .patch<Http.BulkCreateResponse<Model.Account>>(url, payload, options)
-    .then((response: Http.BulkCreateResponse<Model.Account>) => response.data);
+  return client.patch<Http.BulkCreateResponse<Model.Template, Model.Account>>(url, payload, options);
 };
 
 export const bulkUpdateTemplateFringes = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.FringePayload>[],
   options: Http.RequestOptions = {}
-): Promise<Model.Template> => {
+): Promise<Http.BulkResponse<Model.Template>> => {
   const url = URL.v1("templates", id, "bulk-update-fringes");
-  return client.patch<Model.Template>(url, { data }, options);
+  return client.patch<Http.BulkResponse<Model.Template>>(url, { data }, options);
 };
 
 export const bulkCreateTemplateFringes = async (
   id: number,
   payload: Http.BulkCreatePayload<Http.FringePayload>,
   options: Http.RequestOptions = {}
-): Promise<Model.Fringe[]> => {
+): Promise<Http.BulkCreateResponse<Model.Template, Model.Fringe>> => {
   const url = URL.v1("templates", id, "bulk-create-fringes");
-  return client
-    .patch<Http.BulkCreateResponse<Model.Fringe>>(url, payload, options)
-    .then((response: Http.BulkCreateResponse<Model.Fringe>) => response.data);
+  return client.patch<Http.BulkCreateResponse<Model.Template, Model.Fringe>>(url, payload, options);
 };

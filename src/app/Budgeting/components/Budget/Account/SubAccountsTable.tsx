@@ -97,13 +97,6 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/subaccounts/${id}`)}
         onBack={() => history.push(`/budgets/${budgetId}/accounts?row=${accountId}`)}
-        onDeleteGroup={(group: Model.Group) => dispatch(actions.deleteGroupAction(group.id))}
-        onRowRemoveFromGroup={(row: BudgetTable.SubAccountRow) =>
-          dispatch(actions.removeSubAccountFromGroupAction(row.id))
-        }
-        onRowAddToGroup={(group: number, row: BudgetTable.SubAccountRow) =>
-          dispatch(actions.addSubAccountToGroupAction({ id: row.id, group }))
-        }
         onGroupRows={(rows: BudgetTable.SubAccountRow[]) =>
           setGroupSubAccounts(map(rows, (row: BudgetTable.SubAccountRow) => row.id))
         }

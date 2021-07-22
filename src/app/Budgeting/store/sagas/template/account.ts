@@ -4,11 +4,11 @@ import { take, call, cancel, spawn } from "redux-saga/effects";
 import * as api from "api";
 
 import { ActionType } from "../../actions";
-import { loadingTemplateAction, requestTemplateAction } from "../../actions/template";
+import { loadingTemplateAction, updateTemplateInStateAction } from "../../actions/template";
 import * as actions from "../../actions/template/account";
 import { createStandardSaga, createAccountTaskSet, createStandardFringesSaga, createFringeTaskSet } from "../factories";
 
-const tasks = createAccountTaskSet(
+const tasks = createAccountTaskSet<Model.Template>(
   {
     loading: actions.loadingSubAccountsAction,
     deleting: actions.deletingSubAccountAction,
@@ -19,7 +19,7 @@ const tasks = createAccountTaskSet(
     addToState: actions.addSubAccountToStateAction,
     budget: {
       loading: loadingTemplateAction,
-      request: requestTemplateAction
+      updateInState: updateTemplateInStateAction
     },
     account: {
       request: actions.requestAccountAction,
@@ -27,7 +27,6 @@ const tasks = createAccountTaskSet(
     },
     groups: {
       deleting: actions.deletingGroupAction,
-      removeFromState: actions.removeGroupFromStateAction,
       loading: actions.loadingGroupsAction,
       response: actions.responseGroupsAction,
       request: actions.requestGroupsAction
@@ -68,7 +67,10 @@ const fringeTasks = createFringeTaskSet<Model.Template>(
     deleting: actions.deletingFringeAction,
     creating: actions.creatingFringeAction,
     updating: actions.updatingFringeAction,
-    requestBudget: requestTemplateAction
+    budget: {
+      loading: loadingTemplateAction,
+      updateInState: updateTemplateInStateAction
+    }
   },
   {
     request: api.getTemplateFringes,
@@ -77,8 +79,7 @@ const fringeTasks = createFringeTaskSet<Model.Template>(
     bulkCreate: api.bulkCreateTemplateFringes,
     bulkDelete: api.bulkDeleteTemplateFringes
   },
-  (state: Modules.ApplicationStore) => state.budget.template.budget.id,
-  (state: Modules.ApplicationStore) => state.budget.template.account.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.template.budget.id
 );
 
 const fringesRootSaga = createStandardFringesSaga(
@@ -94,22 +95,19 @@ const rootAccountSaga = createStandardSaga(
     Request: ActionType.Template.Account.SubAccounts.Request,
     TableChange: ActionType.Template.Account.TableChanged,
     Groups: {
-      Request: ActionType.Template.Account.Groups.Request,
-      RemoveModel: ActionType.Template.Account.SubAccounts.RemoveFromGroup,
-      AddModel: ActionType.Template.Account.SubAccounts.AddToGroup,
-      Delete: ActionType.Template.Account.Groups.Delete
+      Request: ActionType.Template.Account.Groups.Request
     }
   },
   {
     Request: tasks.getSubAccounts,
-    HandleDataChangeEvent: tasks.handleDataChangeEvent,
-    HandleRowAddEvent: tasks.handleRowAddEvent,
-    HandleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    handleDataChangeEvent: tasks.handleDataChangeEvent,
+    handleRowAddEvent: tasks.handleRowAddEvent,
+    handleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    handleAddRowToGroupEvent: tasks.handleAddRowToGroupEvent,
+    handleRemoveRowFromGroupEvent: tasks.handleRemoveRowFromGroupEvent,
+    handleDeleteGroupEvent: tasks.handleDeleteGroupEvent,
     Groups: {
-      Request: tasks.getGroups,
-      RemoveModel: tasks.removeFromGroup,
-      AddModel: tasks.addToGroup,
-      Delete: tasks.deleteGroup
+      Request: tasks.getGroups
     }
   },
   watchForRequestAccountSaga,

@@ -13,7 +13,7 @@ import {
   all,
   actionChannel
 } from "redux-saga/effects";
-import { isNil, map, filter, includes } from "lodash";
+import { isNil, map } from "lodash";
 
 import * as api from "api";
 import * as typeguards from "lib/model/typeguards";
@@ -23,26 +23,25 @@ import { consolidateTableChange, createBulkCreatePayload, payload } from "lib/mo
 import { ActionType } from "../../actions";
 import * as actions from "../../actions/budget/actuals";
 
-type M = Model.Actual;
+type B = Model.Budget;
+type C = Model.Actual;
 type R = BudgetTable.ActualRow;
+type P = Http.ActualPayload;
 
-function* bulkCreateTask(budgetId: number, p: Table.RowAddPayload<R, M>): SagaIterator {
+function* bulkCreateTask(budgetId: number, e: Table.RowAddEvent<R, C>, errorMessage: string): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
+
+  const requestPayload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, C, P>(e.payload);
   yield put(actions.creatingActualAction(true));
-
-  const requestPayload: Http.BulkCreatePayload<Http.ActualPayload> = createBulkCreatePayload<R, M, Http.ActualPayload>(
-    p
-  );
-
   try {
-    const actuals: M[] = yield call(api.bulkCreateBudgetActuals, budgetId, requestPayload, {
+    const response: Http.BulkCreateResponse<B, C> = yield call(api.bulkCreateBudgetActuals, budgetId, requestPayload, {
       cancelToken: source.token
     });
-    yield all(actuals.map((actual: M) => put(actions.addActualToStateAction(actual))));
-  } catch (e) {
+    yield all(response.children.map((actual: C) => put(actions.addActualToStateAction(actual))));
+  } catch (err) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error creating the actuals.");
+      api.handleRequestError(err, errorMessage);
     }
   } finally {
     yield put(actions.creatingActualAction(false));
@@ -52,87 +51,93 @@ function* bulkCreateTask(budgetId: number, p: Table.RowAddPayload<R, M>): SagaIt
   }
 }
 
-function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, M>>): SagaIterator {
-  const budgetId = yield select((state: Modules.ApplicationStore) => state.budget.budget.budget.id);
-  if (!isNil(budgetId) && !isNil(action.payload)) {
-    const event: Table.RowAddEvent<R, M> = action.payload;
-    yield fork(bulkCreateTask, budgetId, event.payload);
+function* bulkUpdateTask(
+  budgetId: number,
+  requestPayload: Http.BulkUpdatePayload<P>[],
+  errorMessage: string
+): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
+
+  yield all(
+    requestPayload.map((p: Http.BulkUpdatePayload<P>) => put(actions.updatingActualAction({ id: p.id, value: true })))
+  );
+  try {
+    yield call(api.bulkUpdateBudgetActuals, budgetId, requestPayload, {
+      cancelToken: source.token
+    });
+  } catch (err) {
+    if (!(yield cancelled())) {
+      api.handleRequestError(err, errorMessage);
+    }
+  } finally {
+    yield all(
+      requestPayload.map((p: Http.BulkUpdatePayload<P>) =>
+        put(actions.updatingActualAction({ id: p.id, value: false }))
+      )
+    );
+    if (yield cancelled()) {
+      source.cancel();
+    }
   }
 }
 
-function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, M>>): SagaIterator {
-  const budgetId = yield select((state: Modules.ApplicationStore) => state.budget.budget.budget.id);
-  if (!isNil(budgetId) && !isNil(action.payload)) {
-    const event: Table.RowDeleteEvent<R, M> = action.payload;
-    const ms: M[] = yield select((state: Modules.ApplicationStore) => state.budget.budget.actuals.data);
-    let rows: R[] = Array.isArray(event.payload.rows) ? event.payload.rows : [event.payload.rows];
-    rows = filter(rows, (row: R) =>
-      includes(
-        map(ms, (m: M) => m.id),
-        row.id
-      )
-    );
-    if (rows.length !== 0) {
-      yield all(rows.map((row: R) => put(actions.deletingActualAction({ id: row.id, value: true }))));
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
-      try {
-        yield call(
-          api.bulkDeleteBudgetActuals,
-          budgetId,
-          map(rows, (row: R) => row.id),
-          { cancelToken: source.token }
-        );
-      } catch (e) {
-        if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error deleting the actuals.");
-        }
-      } finally {
-        yield all(rows.map((row: R) => put(actions.deletingActualAction({ id: row.id, value: false }))));
-        if (yield cancelled()) {
-          source.cancel();
-        }
+function* bulkDeleteTask(budgetId: number, e: Table.RowDeleteEvent<R, C>, errorMessage: string): SagaIterator {
+  const CancelToken = axios.CancelToken;
+  const source = CancelToken.source();
+
+  const rows: R[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+  if (rows.length !== 0) {
+    const ids = map(rows, (row: R) => row.id);
+
+    yield all(ids.map((id: number) => put(actions.deletingActualAction({ id, value: true }))));
+    try {
+      yield call(api.bulkDeleteBudgetActuals, budgetId, ids, {
+        cancelToken: source.token
+      });
+    } catch (err) {
+      if (!(yield cancelled())) {
+        api.handleRequestError(err, errorMessage);
+      }
+    } finally {
+      yield all(ids.map((id: number) => put(actions.deletingActualAction({ id, value: false }))));
+      if (yield cancelled()) {
+        source.cancel();
       }
     }
   }
 }
 
-function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
+function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, C>>): SagaIterator {
   const budgetId = yield select((state: Modules.ApplicationStore) => state.budget.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
-    const event: Table.DataChangeEvent<R, M> = action.payload;
+    const e: Table.RowAddEvent<R, C> = action.payload;
+    yield fork(bulkCreateTask, budgetId, e, "There was an error creating the actuals.");
+  }
+}
 
-    const merged = consolidateTableChange(event.payload);
+function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, C>>): SagaIterator {
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budget.budget.budget.id);
+  if (!isNil(budgetId) && !isNil(action.payload)) {
+    const e: Table.RowDeleteEvent<R, C> = action.payload;
+    yield fork(bulkDeleteTask, budgetId, e, "There was an error deleting the acutals.");
+  }
+}
+
+function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, C>>): SagaIterator {
+  const budgetId = yield select((state: Modules.ApplicationStore) => state.budget.budget.budget.id);
+  if (!isNil(budgetId) && !isNil(action.payload)) {
+    const e: Table.DataChangeEvent<R, C> = action.payload;
+    const merged = consolidateTableChange(e.payload);
     if (merged.length !== 0) {
-      const CancelToken = axios.CancelToken;
-      const source = CancelToken.source();
-
       const requestPayload: Http.BulkUpdatePayload<Http.ActualPayload>[] = map(
         merged,
-        (change: Table.RowChange<R, M>) => ({
+        (change: Table.RowChange<R, C>) => ({
           id: change.id,
           ...payload(change)
         })
       );
-      yield all(
-        merged.map((change: Table.RowChange<R, M>) => put(actions.updatingActualAction({ id: change.id, value: true })))
-      );
-      try {
-        yield call(api.bulkUpdateBudgetActuals, budgetId, requestPayload, { cancelToken: source.token });
-      } catch (e) {
-        if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error updating the actuals.");
-        }
-      } finally {
-        yield all(
-          merged.map((change: Table.RowChange<R, M>) =>
-            put(actions.updatingActualAction({ id: change.id, value: false }))
-          )
-        );
-        if (yield cancelled()) {
-          source.cancel();
-        }
-      }
+      yield fork(bulkUpdateTask, budgetId, requestPayload, "There was an error updating the actuals.");
     }
   }
 }
@@ -152,7 +157,12 @@ function* getActualsTask(action: Redux.Action<null>): SagaIterator {
       );
       yield put(actions.responseActualsAction(response));
       if (response.data.length === 0) {
-        yield call(bulkCreateTask, budgetId, 2);
+        yield call(
+          bulkCreateTask,
+          budgetId,
+          { type: "rowAdd", payload: 2 },
+          "There was an error creating the actuals."
+        );
       }
     } catch (e) {
       if (!(yield cancelled())) {
@@ -209,18 +219,18 @@ function* tableChangeEventSaga(): SagaIterator {
   // delete the same row twice.
   const changeChannel = yield actionChannel(ActionType.Budget.Actuals.TableChanged);
   while (true) {
-    const action: Redux.Action<Table.ChangeEvent<R, M>> = yield take(changeChannel);
+    const action: Redux.Action<Table.ChangeEvent<R, C>> = yield take(changeChannel);
     if (!isNil(action.payload)) {
-      const event: Table.ChangeEvent<R, M> = action.payload;
+      const event: Table.ChangeEvent<R, C> = action.payload;
       if (typeguards.isDataChangeEvent(event)) {
         // Blocking call so that table changes happen sequentially.
-        yield call(handleDataChangeEvent, action as Redux.Action<Table.DataChangeEvent<R, M>>);
+        yield call(handleDataChangeEvent, action as Redux.Action<Table.DataChangeEvent<R, C>>);
       } else if (typeguards.isRowAddEvent(event)) {
         // Blocking call so that table changes happen sequentially.
-        yield call(handleRowAddEvent, action as Redux.Action<Table.RowAddEvent<R, M>>);
+        yield call(handleRowAddEvent, action as Redux.Action<Table.RowAddEvent<R, C>>);
       } else if (typeguards.isRowDeleteEvent(event)) {
         // Blocking call so that table changes happen sequentially.
-        yield call(handleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent<R, M>>);
+        yield call(handleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent<R, C>>);
       }
     }
   }

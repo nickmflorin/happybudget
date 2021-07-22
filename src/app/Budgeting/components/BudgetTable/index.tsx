@@ -134,7 +134,6 @@ const BudgetTable = <
   columns,
   className,
   style = {},
-  groupParams,
   groups = [],
   loading,
   loadingBudget,
@@ -143,6 +142,7 @@ const BudgetTable = <
   cookies,
   expandColumn = {},
   indexColumn = {},
+  onEditGroup,
   rowCanExpand,
   cellClass,
   onChangeEvent,
@@ -292,7 +292,7 @@ const BudgetTable = <
       pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
       cellRendererParams: {
         ...col.cellRendererParams,
-        onGroupEdit: groupParams?.onEditGroup,
+        onGroupEdit: onEditGroup,
         groups
       },
       colSpan: (params: ColSpanParams) => {
@@ -501,7 +501,6 @@ const BudgetTable = <
           rowCanExpand={rowCanExpand}
           onChangeEvent={onChangeEvent}
           groups={groups}
-          groupParams={groupParams}
           {...props}
         />
         <TableFooterGrid<R, M>

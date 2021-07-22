@@ -10,7 +10,7 @@ import { nowAsString } from "lib/util/dates";
 import { generateRandomNumericId } from "lib/util";
 
 import { ActionType } from "../../actions";
-import { requestBudgetAction, loadingBudgetAction } from "../../actions/budget";
+import { loadingBudgetAction, updateBudgetInStateAction } from "../../actions/budget";
 import * as actions from "../../actions/budget/accounts";
 import { createStandardSaga, createAccountsTaskSet } from "../factories";
 
@@ -192,11 +192,10 @@ const tasks = createAccountsTaskSet<Model.Budget>(
     addToState: actions.addAccountToStateAction,
     budget: {
       loading: loadingBudgetAction,
-      request: requestBudgetAction
+      updateInState: updateBudgetInStateAction
     },
     groups: {
       deleting: actions.deletingGroupAction,
-      removeFromState: actions.removeGroupFromStateAction,
       loading: actions.loadingGroupsAction,
       response: actions.responseGroupsAction
     }
@@ -218,10 +217,7 @@ export default createStandardSaga(
     Request: ActionType.Budget.Accounts.Request,
     TableChange: ActionType.Budget.Accounts.TableChanged,
     Groups: {
-      Request: ActionType.Budget.Groups.Request,
-      RemoveModel: ActionType.Budget.Accounts.RemoveFromGroup,
-      AddModel: ActionType.Budget.Accounts.AddToGroup,
-      Delete: ActionType.Budget.Groups.Delete
+      Request: ActionType.Budget.Groups.Request
     },
     Comments: {
       Request: ActionType.Budget.Comments.Request,
@@ -235,14 +231,14 @@ export default createStandardSaga(
   },
   {
     Request: tasks.getAccounts,
-    HandleDataChangeEvent: tasks.handleDataChangeEvent,
-    HandleRowAddEvent: tasks.handleRowAddEvent,
-    HandleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    handleDataChangeEvent: tasks.handleDataChangeEvent,
+    handleRowAddEvent: tasks.handleRowAddEvent,
+    handleRowDeleteEvent: tasks.handleRowDeleteEvent,
+    handleAddRowToGroupEvent: tasks.handleAddRowToGroupEvent,
+    handleRemoveRowFromGroupEvent: tasks.handleRemoveRowFromGroupEvent,
+    handleDeleteGroupEvent: tasks.handleDeleteGroupEvent,
     Groups: {
-      Request: tasks.getGroups,
-      RemoveModel: tasks.removeFromGroup,
-      AddModel: tasks.addToGroup,
-      Delete: tasks.deleteGroup
+      Request: tasks.getGroups
     },
     Comments: {
       Request: getCommentsTask,

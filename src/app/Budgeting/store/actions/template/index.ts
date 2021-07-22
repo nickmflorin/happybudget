@@ -7,3 +7,4 @@ export const setTemplateAutoIndex = simpleAction<boolean>(ActionType.Template.Se
 export const requestTemplateAction = simpleAction<null>(ActionType.Template.Request);
 export const loadingTemplateAction = simpleAction<boolean>(ActionType.Template.Loading);
 export const responseTemplateAction = simpleAction<Model.Template | undefined>(ActionType.Template.Response);
+export const updateTemplateInStateAction = simpleAction<Partial<Model.Template>>(ActionType.Template.UpdateInState);

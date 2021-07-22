@@ -10,3 +10,4 @@ export const responseBudgetAction = simpleAction<Model.Budget | undefined>(Actio
 export const setCommentsHistoryDrawerVisibilityAction = simpleAction<boolean>(
   ActionType.Budget.SetCommentsHistoryDrawerVisibility
 );
+export const updateBudgetInStateAction = simpleAction<Partial<Model.Budget>>(ActionType.Budget.UpdateInState);
