@@ -4,6 +4,7 @@ import * as typeguards from "lib/model/typeguards";
 import UserImage, { UserImageProps } from "./UserImage";
 import UserInitials, { UserInitialsProps } from "./UserInitials";
 import { isNil } from "lodash";
+import { useEffect } from "react";
 
 export interface UserImageOrInitialsProps extends StandardComponentProps {
   readonly user?: Model.User | Model.SimpleUser | Model.Contact;
@@ -31,6 +32,11 @@ const UserImageOrInitials = ({
   // If there is an error loading the image, we want to fallback to the initials
   // but still log that the error occurred.
   const [errorWithImage, setErrorWithImage] = useState<React.SyntheticEvent<HTMLImageElement> | null>(null);
+
+  useEffect(() => {
+    setErrorWithImage(null);
+  }, [src]);
+
   if (!isNil(src) && errorWithImage === null) {
     return (
       <UserImage
