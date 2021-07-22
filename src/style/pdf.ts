@@ -95,9 +95,9 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     borderBottomWidth: 0,
     borderColor: TABLE_BORDER_COLOR
   },
-  "body-tr": { height: "22pt", backgroundColor: "white" },
+  "body-tr": { height: "20pt", backgroundColor: "white" },
   "header-tr": {
-    height: "24pt",
+    height: "22pt",
     backgroundColor: TABLE_BORDER_COLOR,
     borderTopLeftRadius: TABLE_BORDER_RADIUS,
     borderTopRightRadius: TABLE_BORDER_RADIUS,
@@ -109,7 +109,7 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   },
   "detail-group-tr": {},
   "footer-tr": {
-    height: "24pt",
+    height: "22pt",
     backgroundColor: TABLE_BORDER_COLOR,
     borderBottomRightRadius: TABLE_BORDER_RADIUS,
     borderBottomLeftRadius: TABLE_BORDER_RADIUS,
@@ -119,7 +119,7 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     backgroundColor: "#EAEAEA"
   },
   "account-sub-header-tr": {
-    height: "24pt",
+    height: "22pt",
     backgroundColor: TABLE_BORDER_COLOR,
     border: "none"
   },
@@ -173,8 +173,8 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   },
   "cell-text": { margin: "auto", width: "100%" },
   "th-text": { marginTop: 6, fontSize: 8, color: "#595959", fontWeight: 700 },
-  "td-text": { marginTop: 5, fontSize: 9, color: "#1F1F1F", fontWeight: 600 },
-  tag: { height: 14, paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1, borderRadius: 20, marginTop: 5 },
+  "td-text": { marginTop: 4, fontSize: 9, color: "#1F1F1F", fontWeight: 600 },
+  tag: { height: 14, paddingLeft: 2, paddingRight: 2, paddingTop: 1, paddingBottom: 1, borderRadius: 20, marginTop: 2 },
   "tag--contact": { borderRadius: 6 },
   "tag-text": {
     fontSize: 8,
