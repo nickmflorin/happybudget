@@ -5,7 +5,7 @@ namespace RichText {
 
   type GenericBlock<T extends RichText.BlockType, D extends object = any> = import("@editorjs/editorjs").OutputBlockData<T, D>;
 
-  type TextFragment = { text?: string, styles?: Pdf.FontStyle[], children?: TextFragment[] }
+  type TextFragment = { text?: string, styles?: Pdf.FontStyleName[], children?: TextFragment[] }
 
   // Note that we add additional style properties to the paragraph block here, and compute them
   // in a component that wraps EditorJS.  EditorJS does not include the fields other than `text`
@@ -25,7 +25,10 @@ namespace RichText {
 namespace Pdf {
   type FontFamily = "OpenSans" | "Roboto";
   type FontWeight = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";
-  type FontStyle = "italic" | "bold";
+  type FontStyleName = "italic" | "bold";
+  type FontStyleTag = "i" | "b";
+  type SupportedFontStyle = { name: Pdf.FontStyleName, tag: Pdf.FontStyleTag };
+
   type FontVariant = Pdf.FontWeight | { weight: Pdf.FontWeight; style: "italic" };
   type Font = { family: Pdf.FontFamily; variants: Pdf.FontVariant[] };
 

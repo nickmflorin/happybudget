@@ -1,57 +1,14 @@
 import { useMemo, useEffect, ForwardedRef, useImperativeHandle, useState, forwardRef } from "react";
-import { uniqueId, isNil, filter, map } from "lodash";
+import { uniqueId, isNil } from "lodash";
 import classNames from "classnames";
 
-import EditorJS, { OutputData, API, BlockAPI, OutputBlockData, LogLevels } from "@editorjs/editorjs";
+import EditorJS, { OutputData, API, BlockAPI, LogLevels } from "@editorjs/editorjs";
 import Paragraph from "@editorjs/paragraph";
 import Header from "@editorjs/header";
 
-import { partitionHtmlIntoFragments } from "lib/model/util";
+import { convertEditorJSBlocksToInternalBlocks, convertInternalBlocksToEditorJSBlocks } from "lib/model/util";
 import "./Editor.scss";
 import { useDynamicCallback } from "lib/hooks";
-
-type EditorJSBlockConverter<T extends string, D extends object = any> = (
-  original: OutputBlockData<T, D>
-) => RichText.Block;
-
-const IdentityConverter = <B extends RichText.Block>(original: OutputBlockData): B => ({ ...original } as B);
-
-/* eslint-disable no-unused-vars */
-const BlockTypeConverters: { [key in RichText.BlockType]: EditorJSBlockConverter<any> } = {
-  list: IdentityConverter,
-  header: (original: OutputBlockData<"header", { text: string; level: number }>): RichText.HeadingBlock => {
-    const fragments = partitionHtmlIntoFragments(original.data.text);
-    return {
-      ...original,
-      data:
-        fragments.length === 0
-          ? { ...fragments[0], level: original.data.level as Pdf.HeadingLevel }
-          : { children: fragments, level: original.data.level as Pdf.HeadingLevel }
-    };
-  },
-  paragraph: (original: OutputBlockData<"paragraph", { text: string }>): RichText.ParagraphBlock => {
-    const fragments = partitionHtmlIntoFragments(original.data.text);
-    return {
-      ...original,
-      data: fragments.length === 0 ? fragments[0] : { children: fragments }
-    };
-  }
-};
-
-const convertEditorJSBlocksToInternalBlocks = (blocks: OutputBlockData[]): RichText.Block[] => {
-  return filter(
-    map(blocks, (block: OutputBlockData) => {
-      if (isNil(BlockTypeConverters[block.type as RichText.BlockType])) {
-        /* eslint-disable no-console */
-        console.error(`Unsupported block type ${block.type}!`);
-        return null;
-      } else {
-        return BlockTypeConverters[block.type as RichText.BlockType](block);
-      }
-    }),
-    (block: RichText.Block | null) => !isNil(block)
-  ) as RichText.Block[];
-};
 
 const Tools = {
   paragraph: {
@@ -137,7 +94,7 @@ const Editor = (
       holder: id,
       onChange: _onChange,
       onReady: _onReady,
-      data: { blocks: value as OutputBlockData[] }
+      data: { blocks: !isNil(value) ? convertInternalBlocksToEditorJSBlocks(value) : [] }
     });
     setInstance(inst);
     return () => destroyEditor();
