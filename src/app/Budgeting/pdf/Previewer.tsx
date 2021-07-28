@@ -22,7 +22,9 @@ const Previewer = ({ file, loading, onExport, exportDisabled }: PreviewerProps):
 
   return (
     <div className={"previewer"}>
-      <Form.Label>{"Preview:"}</Form.Label>
+      <div className={"preview-header"}>
+        <Form.Label>{"Preview"}</Form.Label>
+      </div>
       <div className={"preview-content"}>
         <RenderDocument
           file={file}
@@ -34,7 +36,7 @@ const Previewer = ({ file, loading, onExport, exportDisabled }: PreviewerProps):
             }
           }}
         >
-          <Page pageNumber={page} width={400} />
+          <Page pageNumber={page} />
         </RenderDocument>
       </div>
       <div className={"preview-footer"}>
