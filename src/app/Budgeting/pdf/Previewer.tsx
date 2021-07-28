@@ -7,8 +7,6 @@ import { Form } from "components";
 import { Button } from "components/buttons";
 import { RenderDocument } from "components/pdf";
 
-import "./Previewer.scss";
-
 interface PreviewerProps {
   readonly file?: string | ArrayBuffer | null;
   readonly loading?: boolean;
