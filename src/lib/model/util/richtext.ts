@@ -61,7 +61,7 @@ export const convertHtmlIntoTextFragments = (html: string): RichText.TextFragmen
       return createTextFragmentFromNode(el.childNodes[0], tags);
     } else {
       return {
-        children: filter(
+        fragments: filter(
           map(el.childNodes, (child: ChildNode) => {
             const tag = el.nodeName.toLowerCase();
             if (includes(supportedTags, tag)) {
@@ -88,9 +88,9 @@ export const convertHtmlIntoTextFragments = (html: string): RichText.TextFragmen
 
 export const convertTextFragmentIntoHtml = (fragment: RichText.TextFragment): string => {
   let text = fragment.text || "";
-  if (!isNil(fragment.children)) {
+  if (!isNil(fragment.fragments)) {
     text = reduce(
-      fragment.children,
+      fragment.fragments,
       (current: string, child: RichText.TextFragment) => {
         return current + convertTextFragmentIntoHtml(child);
       },
@@ -100,30 +100,45 @@ export const convertTextFragmentIntoHtml = (fragment: RichText.TextFragment): st
   return !isNil(fragment.styles) ? wrapTextInFontStyleTags(text, fragment.styles) : text;
 };
 
+export const convertTextFragmentsIntoHtml = (fragments: RichText.TextFragment[]): string => {
+  return reduce(
+    fragments,
+    (text: string, fragment: RichText.TextFragment) => {
+      return text + convertTextFragmentIntoHtml(fragment);
+    },
+    ""
+  );
+};
+
 type EditorJSBlockConverter<T extends string, D extends object = any> = (
   original: OutputBlockData<T, D>
 ) => RichText.Block;
 
-const IdentityConverter = <B extends RichText.Block>(original: OutputBlockData): B => ({ ...original } as B);
-
 /* eslint-disable no-unused-vars */
 const BlockTypeConverters: { [key in RichText.BlockType]: EditorJSBlockConverter<any> } = {
-  list: IdentityConverter,
+  list: (original: OutputBlockData<"list", { items: string[]; style: RichText.ListBlockConfiguration }>) => ({
+    type: "list",
+    items: original.data.items,
+    configuration: original.data.style
+  }),
   header: (original: OutputBlockData<"header", { text: string; level: number }>): RichText.HeadingBlock => {
     const fragments = convertHtmlIntoTextFragments(original.data.text);
+    if (!includes([1, 2, 3, 4, 5, 6], original.data.level)) {
+      /* eslint-disable no-console */
+      console.error(`Unsupported heading level ${original.data.level}!`);
+      return { type: "header", level: 2, fragments };
+    }
     return {
-      ...original,
-      data:
-        fragments.length === 0
-          ? { ...fragments[0], level: original.data.level as Pdf.HeadingLevel }
-          : { children: fragments, level: original.data.level as Pdf.HeadingLevel }
+      type: "header",
+      level: original.data.level as Pdf.HeadingLevel,
+      fragments
     };
   },
   paragraph: (original: OutputBlockData<"paragraph", { text: string }>): RichText.ParagraphBlock => {
     const fragments = convertHtmlIntoTextFragments(original.data.text);
     return {
-      ...original,
-      data: fragments.length === 0 ? fragments[0] : { children: fragments }
+      type: "paragraph",
+      fragments
     };
   }
 };
@@ -148,31 +163,27 @@ type InverseEditorJSBlockConverter<B extends RichText.Block, T extends string, D
   internal: B
 ) => OutputBlockData<T, D>;
 
-const InverseIdentityConverter = <B extends RichText.Block>(internal: B): OutputBlockData =>
-  ({ ...internal } as OutputBlockData);
-
 const InverseBlockTypeConverters: { [key in RichText.BlockType]: InverseEditorJSBlockConverter<any, any> } = {
-  list: InverseIdentityConverter,
-  header: (internal: RichText.HeadingBlock): OutputBlockData<"header", { text: string; level: number }> => ({
-    ...internal,
+  list: (
+    internal: RichText.ListBlock
+  ): OutputBlockData<"list", { items: string[]; style: RichText.ListBlockConfiguration }> => ({
+    type: "list",
     data: {
-      ...internal.data,
-      text: convertTextFragmentIntoHtml({
-        text: internal.data.text,
-        children: internal.data.children,
-        styles: internal.data.styles
-      })
+      items: internal.items,
+      style: internal.configuration
+    }
+  }),
+  header: (internal: RichText.HeadingBlock): OutputBlockData<"header", { text: string; level: number }> => ({
+    type: "header",
+    data: {
+      level: internal.level,
+      text: convertTextFragmentsIntoHtml(internal.fragments)
     }
   }),
   paragraph: (internal: RichText.ParagraphBlock): OutputBlockData<"paragraph", { text: string }> => ({
-    ...internal,
+    type: "paragraph",
     data: {
-      ...internal.data,
-      text: convertTextFragmentIntoHtml({
-        text: internal.data.text,
-        children: internal.data.children,
-        styles: internal.data.styles
-      })
+      text: convertTextFragmentsIntoHtml(internal.fragments)
     }
   })
 };

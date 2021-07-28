@@ -5,17 +5,29 @@ namespace RichText {
 
   type GenericBlock<T extends RichText.BlockType, D extends object = any> = import("@editorjs/editorjs").OutputBlockData<T, D>;
 
-  type TextFragment = { text?: string, styles?: Pdf.FontStyleName[], children?: TextFragment[] }
+  type TextFragment = { text?: string, styles?: Pdf.FontStyleName[], fragments?: TextFragment[] }
 
-  // Note that we add additional style properties to the paragraph block here, and compute them
-  // in a component that wraps EditorJS.  EditorJS does not include the fields other than `text`
-  // by default.
-  type ParagraphBlock = RichText.GenericBlock<"paragraph", RichText.TextFragment>;
-  type HeadingBlock = RichText.GenericBlock<"header", RichText.TextFragment & { level: Pdf.HeadingLevel}>;
+  // Note that these blocks are different from the EditorJS blocks.  This is because
+  // we need to layer on additional functionality, and we need to model them more appropriately
+  // to work with a seamless backend/API.
+  type ParagraphBlock = {
+    readonly type: "paragraph";
+    readonly fragments: RichText.TextFragment[];
+  }
 
-  type ListBlockStyle = "orderered" | "unordered";
-  type ListBlockData = { items: string[], style: RichText.ListBlockStyle };
-  type ListBlock = RichText.GenericBlock<"list", RichText.ListBlockData>;
+  type HeadingBlock = {
+    readonly type: "header";
+    readonly fragments: RichText.TextFragment[];
+    readonly level: Pdf.HeadingLevel;
+  }
+
+  type ListBlockConfiguration = "orderered" | "unordered";
+  type ListBlock = {
+    readonly type: "list";
+    readonly items: string[];
+    readonly configuration: RichText.ListBlockConfiguration;
+
+  }
 
   type Block = ListBlock | ParagraphBlock | HeadingBlock;
 }
@@ -53,8 +65,9 @@ namespace Pdf {
   type RenderDocumentProps = {
     readonly title?: string;
     readonly file?: string | ArrayBuffer | null;
-    readonly loading?: JSX.Element;
+    readonly loading?: boolean;
     readonly onLoadSuccess?: (params: DocumentLoadedParams) => void;
+    readonly onLoadError?: (error: Error) => void;
     readonly children: JSX.Element;
     readonly loadingOnNoFile?: boolean;
   }

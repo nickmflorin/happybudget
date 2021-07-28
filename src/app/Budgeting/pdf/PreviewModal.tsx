@@ -39,11 +39,12 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   header: [
     {
       type: "header",
-      data: { text: `Sample Budget ${new Date().getFullYear()}`, level: 2 }
+      fragments: [{ text: `Sample Budget ${new Date().getFullYear()}` }],
+      level: 2
     },
     {
       type: "paragraph",
-      data: { text: "Cost Summary" }
+      fragments: [{ text: "Cost Summary" }]
     }
   ]
 };

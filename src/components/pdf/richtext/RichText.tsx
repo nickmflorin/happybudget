@@ -19,16 +19,12 @@ const RichText = ({ blocks, ...props }: RichTextProps): JSX.Element => {
           // comes in yet, so we are using an abundance of caution to prevent runtime
           // errors.
           if (typeguards.isParagraphBlock(block) || typeguards.isHeadingBlock(block)) {
-            if (!isNil(block.data.text) && typeof block.data.text !== "string") {
-              /* eslint-disable no-console */
-              console.error(`Block has unsupported text: ${block.data.text}.`);
-              return null;
-            }
             if (typeguards.isParagraphBlock(block)) {
               return <Paragraph key={index} block={block} />;
             } else {
-              let headerLevel = block.data.level || 2;
+              let headerLevel = block.level || 2;
               if (!includes([1, 2, 3, 4, 5, 6], headerLevel)) {
+                /* eslint-disable no-console */
                 console.error(`Unsupported header level ${headerLevel}... defaulting to h2.`);
                 headerLevel = 2;
               }

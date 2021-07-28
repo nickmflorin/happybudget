@@ -1,12 +1,14 @@
-import { TextProps } from "../text/Text";
-import RichTextFragment from "./ParagraphFragment";
+import Paragraph, { ParagraphProps } from "../text/Paragraph";
+import { RichTextParagraphFragments } from "./ParagraphFragment";
 
-interface RichTextParagraphProps extends TextProps {
+interface RichTextParagraphProps extends ParagraphProps {
   readonly block: RichText.ParagraphBlock;
 }
 
 const RichTextParagraph = ({ block, ...props }: RichTextParagraphProps): JSX.Element => (
-  <RichTextFragment fragment={block.data} {...props} />
+  <Paragraph>
+    <RichTextParagraphFragments fragments={block.fragments} {...props} />
+  </Paragraph>
 );
 
 export default RichTextParagraph;

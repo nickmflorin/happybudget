@@ -27,6 +27,7 @@ const Previewer = ({ file, loading, onExport, exportDisabled }: PreviewerProps):
         <RenderDocument
           file={file}
           loadingOnNoFile={true}
+          loading={loading}
           onLoadSuccess={(p: Pdf.DocumentLoadedParams) => {
             setNumPages(p.numPages);
             if (page > p.numPages) {
