@@ -6,6 +6,7 @@ import { faImages, faExclamationCircle, faCheckCircle } from "@fortawesome/pro-s
 
 import { ClearButton } from "components/buttons";
 import * as typeguards from "lib/model/typeguards";
+import { truncateFileName } from "lib/util/files";
 
 import Uploader, { UploaderProps } from "./Uploader";
 import "./UploadPdfImage.scss";
@@ -33,7 +34,9 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
           return (
             <React.Fragment>
               <FontAwesomeIcon className={"icon"} icon={faCheckCircle} />
-              <div className={"upload-text file-text"}>{params.data.fileName || params.data.name}</div>
+              <div className={"upload-text file-text"}>
+                {truncateFileName(params.data.fileName || params.data.name, 18)}
+              </div>
               <ClearButton
                 onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                   e.preventDefault();

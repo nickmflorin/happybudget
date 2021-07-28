@@ -32,8 +32,34 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   excludeZeroTotals: true,
   leftImage: null,
   rightImage: null,
-  leftInfo: [],
-  rightInfo: [],
+  leftInfo: [
+    {
+      type: "header",
+      data: { text: "Production Company", level: 4 }
+    },
+    {
+      type: "paragraph",
+      data: { text: "Address:" }
+    },
+    {
+      type: "paragraph",
+      data: { text: "Phone:" }
+    }
+  ],
+  rightInfo: [
+    {
+      type: "header",
+      data: { text: "Client / Agency", level: 4 }
+    },
+    {
+      type: "paragraph",
+      data: { text: "Address:" }
+    },
+    {
+      type: "paragraph",
+      data: { text: "Phone:" }
+    }
+  ],
   includeNotes: false,
   columns: map(SubAccountColumns, (column: Column) => column.field),
   header: [

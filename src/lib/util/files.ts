@@ -160,3 +160,13 @@ export const downloadAsCsvFile = async (filename: string, data: CSVData) => {
     }
   }
 };
+
+export const truncateFileName = (file: string, length: number) => {
+  const fileExtension = getFileType(file);
+  let filename = file.replace("." + fileExtension, "");
+  if (filename.length <= length) {
+    return file;
+  }
+  filename = filename.substr(0, length) + (file.length > length ? "..." : "");
+  return filename + "." + fileExtension;
+};
