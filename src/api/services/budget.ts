@@ -153,9 +153,9 @@ export const bulkUpdateBudgetActuals = async (
   id: number,
   data: Http.BulkUpdatePayload<Http.ActualPayload>[],
   options: Http.RequestOptions = {}
-): Promise<Model.Actual> => {
+): Promise<Http.BulkResponse<Model.Budget>> => {
   const url = URL.v1("budgets", id, "bulk-update-actuals");
-  return client.patch<Model.Actual>(url, { data }, options);
+  return client.patch<Http.BulkResponse<Model.Budget>>(url, { data }, options);
 };
 
 export const bulkDeleteBudgetActuals = async (

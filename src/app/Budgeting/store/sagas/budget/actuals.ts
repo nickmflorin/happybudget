@@ -21,6 +21,7 @@ import * as typeguards from "lib/model/typeguards";
 import { consolidateTableChange, createBulkCreatePayload, payload } from "lib/model/util";
 
 import { ActionType } from "../../actions";
+import { updateBudgetInStateAction } from "../../actions/budget";
 import * as actions from "../../actions/budget/actuals";
 
 type B = Model.Budget;
@@ -39,6 +40,7 @@ function* bulkCreateTask(budgetId: number, e: Table.RowAddEvent<R, C>, errorMess
       cancelToken: source.token
     });
     yield all(response.children.map((actual: C) => put(actions.addActualToStateAction(actual))));
+    yield put(updateBudgetInStateAction(response.data));
   } catch (err) {
     if (!(yield cancelled())) {
       api.handleRequestError(err, errorMessage);
@@ -63,9 +65,10 @@ function* bulkUpdateTask(
     requestPayload.map((p: Http.BulkUpdatePayload<P>) => put(actions.updatingActualAction({ id: p.id, value: true })))
   );
   try {
-    yield call(api.bulkUpdateBudgetActuals, budgetId, requestPayload, {
+    const response: Http.BulkResponse<B> = yield call(api.bulkUpdateBudgetActuals, budgetId, requestPayload, {
       cancelToken: source.token
     });
+    yield put(updateBudgetInStateAction(response.data));
   } catch (err) {
     if (!(yield cancelled())) {
       api.handleRequestError(err, errorMessage);
@@ -92,9 +95,10 @@ function* bulkDeleteTask(budgetId: number, e: Table.RowDeleteEvent<R, C>, errorM
 
     yield all(ids.map((id: number) => put(actions.deletingActualAction({ id, value: true }))));
     try {
-      yield call(api.bulkDeleteBudgetActuals, budgetId, ids, {
+      const response: Http.BulkResponse<B> = yield call(api.bulkDeleteBudgetActuals, budgetId, ids, {
         cancelToken: source.token
       });
+      yield put(updateBudgetInStateAction(response.data));
     } catch (err) {
       if (!(yield cancelled())) {
         api.handleRequestError(err, errorMessage);
