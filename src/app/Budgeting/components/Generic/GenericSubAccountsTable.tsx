@@ -25,11 +25,7 @@ export interface GenericSubAccountsTableProps
   categoryName: "Sub Account" | "Detail";
   identifierFieldHeader: "Account" | "Line";
   fringes: Model.Fringe[];
-  fringesCellEditor:
-    | "BudgetAccountFringesCellEditor"
-    | "TemplateAccountFringesCellEditor"
-    | "BudgetSubAccountFringesCellEditor"
-    | "TemplateSubAccountFringesCellEditor";
+  fringesCellEditor: "FringesCellEditor" | "FringesCellEditor" | "FringesCellEditor" | "FringesCellEditor";
   fringesCellEditorParams: {
     colId: keyof BudgetTable.SubAccountRow;
     onAddFringes: () => void;

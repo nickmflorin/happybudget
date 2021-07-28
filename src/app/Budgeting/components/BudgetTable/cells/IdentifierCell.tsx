@@ -20,22 +20,22 @@ import { useDeepEqualMemo } from "lib/hooks";
 // better way to do this. possibly with reselect.
 const groupsSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.LevelType) => {
   return (state: Modules.ApplicationStore) => {
-    if (budgetType === "budget") {
-      if (levelType === "budget") {
+    /* eslint-disable indent */
+    switch ([budgetType, levelType]) {
+      case ["budget", "budget"]:
         return state.budget.budget.budget.groups.data;
-      } else if (levelType === "account") {
+      case ["budget", "account"]:
         return state.budget.budget.account.groups.data;
-      } else if (levelType === "subaccount") {
+      case ["budget", "subaccount"]:
         return state.budget.budget.subaccount.groups.data;
-      }
-    } else {
-      if (levelType === "budget") {
+      case ["template", "template"]:
         return state.budget.template.budget.groups.data;
-      } else if (levelType === "account") {
+      case ["template", "account"]:
         return state.budget.template.account.groups.data;
-      } else if (levelType === "subaccount") {
+      case ["template", "subaccount"]:
         return state.budget.template.subaccount.groups.data;
-      }
+      default:
+        return [];
     }
   };
 };

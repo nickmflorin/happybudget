@@ -21,10 +21,7 @@ export const Cells = {
 export const Editors = {
   FringesColorEditor: editors.FringesColorEditor,
   FringeUnitCellEditor: editors.FringeUnitCellEditor,
-  BudgetAccountFringesCellEditor: editors.BudgetAccountFringesCellEditor,
-  BudgetSubAccountFringesCellEditor: editors.BudgetSubAccountFringesCellEditor,
-  TemplateAccountFringesCellEditor: editors.TemplateAccountFringesCellEditor,
-  TemplateSubAccountFringesCellEditor: editors.TemplateSubAccountFringesCellEditor,
+  FringesCellEditor: editors.FringesCellEditor,
   SubAccountUnitCellEditor: editors.SubAccountUnitCellEditor,
   PaymentMethodCellEditor: editors.PaymentMethodCellEditor,
   SubAccountsTreeEditor: editors.SubAccountsTreeEditor,

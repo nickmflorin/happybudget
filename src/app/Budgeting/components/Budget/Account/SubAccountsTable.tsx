@@ -77,7 +77,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
           colId: "fringes"
         }}
         onEditFringes={() => setFringesModalVisible(true)}
-        fringesCellEditor={"BudgetAccountFringesCellEditor"}
+        fringesCellEditor={"FringesCellEditor"}
         loadingParent={accountLoading}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)

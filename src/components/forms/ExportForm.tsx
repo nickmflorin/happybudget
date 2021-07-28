@@ -12,9 +12,10 @@ import * as models from "lib/model";
 
 import { Form, ShowHide } from "components";
 import { EntityText } from "components/typography";
+import { Editor } from "components/richtext";
 import { EntityTextDescription } from "components/typography/EntityText";
 import { FormProps } from "components/forms/Form";
-import { RichText, UploadPdfImage } from "./fields";
+import { UploadPdfImage } from "./fields";
 
 import "./ExportForm.scss";
 
@@ -101,7 +102,7 @@ const ExportForm: React.FC<ExportFormProps> = ({
       }}
     >
       <Form.ItemStyle label={"Header"} labelClassName={"label label--section"}>
-        <RichText
+        <Editor
           value={props.initialValues?.header}
           onChange={(blocks?: RichText.Block[]) => {
             blocks = !isNil(blocks) ? blocks : [];
@@ -131,7 +132,7 @@ const ExportForm: React.FC<ExportFormProps> = ({
             }}
             onError={(error: Error | string) => props.form.setGlobalError(error)}
           />
-          <RichText
+          <Editor
             value={props.initialValues?.leftInfo}
             onChange={(blocks?: RichText.Block[]) => {
               blocks = !isNil(blocks) ? blocks : [];
@@ -160,7 +161,7 @@ const ExportForm: React.FC<ExportFormProps> = ({
             }}
             onError={(error: Error | string) => props.form.setGlobalError(error)}
           />
-          <RichText
+          <Editor
             value={props.initialValues?.rightInfo}
             onChange={(blocks?: RichText.Block[]) => {
               blocks = !isNil(blocks) ? blocks : [];
@@ -276,7 +277,7 @@ const ExportForm: React.FC<ExportFormProps> = ({
 
         <ShowHide show={includeNotes}>
           <Form.Item name={"notes"}>
-            <RichText
+            <Editor
               style={{ height: 140 }}
               value={props.initialValues?.notes}
               onChange={(blocks?: RichText.Block[]) => {
