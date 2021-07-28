@@ -19,7 +19,16 @@ const IdentityConverter = <B extends RichText.Block>(original: OutputBlockData):
 /* eslint-disable no-unused-vars */
 const BlockTypeConverters: { [key in RichText.BlockType]: EditorJSBlockConverter<any> } = {
   list: IdentityConverter,
-  header: IdentityConverter,
+  header: (original: OutputBlockData<"header", { text: string; level: number }>): RichText.HeadingBlock => {
+    const fragments = partitionHtmlIntoFragments(original.data.text);
+    return {
+      ...original,
+      data:
+        fragments.length === 0
+          ? { ...fragments[0], level: original.data.level as Pdf.HeadingLevel }
+          : { children: fragments, level: original.data.level as Pdf.HeadingLevel }
+    };
+  },
   paragraph: (original: OutputBlockData<"paragraph", { text: string }>): RichText.ParagraphBlock => {
     const fragments = partitionHtmlIntoFragments(original.data.text);
     return {

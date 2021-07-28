@@ -4,18 +4,20 @@ import React from "react";
 import { Paragraph } from "../text";
 import { ParagraphProps } from "../text/Paragraph";
 
-interface RichTextFragmentProps extends Omit<ParagraphProps, "children"> {
+interface RichTextParagraphFragmentProps extends Omit<ParagraphProps, "children" | "styles"> {
   readonly fragment: RichText.TextFragment;
 }
 
-const RichTextFragment = ({ fragment, ...props }: RichTextFragmentProps): JSX.Element => {
+const RichTextParagraphFragment = ({ fragment, ...props }: RichTextParagraphFragmentProps): JSX.Element => {
   // Note: We cannot use hooks with @react-pdf components, in particular because of the
   // render callbacks.
   let children: JSX.Element[] = !isNil(fragment.text) ? [<Paragraph>{fragment.text}</Paragraph>] : [];
   if (!isNil(fragment.children) && fragment.children.length !== 0) {
     children = [
       ...children,
-      ...map(fragment.children, (child: RichText.TextFragment, index: number) => <RichTextFragment fragment={child} />)
+      ...map(fragment.children, (child: RichText.TextFragment, index: number) => (
+        <RichTextParagraphFragment fragment={child} {...props} />
+      ))
     ];
   }
   return (
@@ -27,4 +29,4 @@ const RichTextFragment = ({ fragment, ...props }: RichTextFragmentProps): JSX.El
   );
 };
 
-export default RichTextFragment;
+export default RichTextParagraphFragment;

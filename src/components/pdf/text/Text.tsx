@@ -10,7 +10,7 @@ export interface TextProps extends PrimitiveTextProps {
 const Text = ({ styles, ...props }: TextProps): JSX.Element => (
   <PrimitiveText
     {...props}
-    className={classNames("paragraph", props.className, {
+    className={classNames("text", props.className, {
       bold: !isNil(styles) && includes(styles, "bold"),
       italic: !isNil(styles) && includes(styles, "italic")
     })}

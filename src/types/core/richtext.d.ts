@@ -11,9 +11,7 @@ namespace RichText {
   // in a component that wraps EditorJS.  EditorJS does not include the fields other than `text`
   // by default.
   type ParagraphBlock = RichText.GenericBlock<"paragraph", RichText.TextFragment>;
-
-  type HeadingBlockData = { text: string, level: Pdf.HeadingLevel };
-  type HeadingBlock = RichText.GenericBlock<"header", RichText.HeadingBlockData>;
+  type HeadingBlock = RichText.GenericBlock<"header", RichText.TextFragment & { level: Pdf.HeadingLevel}>;
 
   type ListBlockStyle = "orderered" | "unordered";
   type ListBlockData = { items: string[], style: RichText.ListBlockStyle };

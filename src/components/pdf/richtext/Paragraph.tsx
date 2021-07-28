@@ -1,6 +1,5 @@
-import { TextProps } from "../primitive/Text";
-
-import RichTextFragment from "./Fragment";
+import { TextProps } from "../text/Text";
+import RichTextFragment from "./ParagraphFragment";
 
 interface RichTextParagraphProps extends TextProps {
   readonly block: RichText.ParagraphBlock;
