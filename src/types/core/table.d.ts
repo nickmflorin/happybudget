@@ -330,6 +330,7 @@ namespace PdfTable {
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace BudgetTable {
 
+  type LevelType = "budget" | "account" | "subaccount";
   type GridId = "primary" | "tableFooter" | "budgetFooter";
   type GridSet<T> = { primary: T; tableFooter: T; budgetFooter: T };
 
@@ -446,6 +447,8 @@ namespace BudgetTable {
     readonly nonEditableCells?: (keyof R)[];
     readonly cookies?: BudgetTable.CookiesProps;
     readonly loading?: boolean;
+    readonly levelType: BudgetTable.LevelType;
+    readonly budgetType: Model.BudgetType;
     readonly onEditGroup?: (group: Model.Group) => void;
     readonly cellClass?: (params: import("@ag-grid-community/core").CellClassParams) => string | undefined;
     readonly isCellEditable?: (row: R, col: Table.Column) => boolean;

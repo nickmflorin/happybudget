@@ -74,6 +74,10 @@ const Actuals = (): JSX.Element => {
       </Portal>
       <WrapInApplicationSpinner loading={loading}>
         <BudgetTableComponent<BudgetTable.ActualRow, Model.Actual, Http.ActualPayload>
+          // These two props aren't really applicable for the Actuals case, but until we separate out
+          // the BudgetTable more, we have to add them.
+          budgetType={"budget"}
+          levelType={"budget"}
           data={data}
           tableRef={tableRef}
           indexColumn={{ width: 40, maxWidth: 50 }}

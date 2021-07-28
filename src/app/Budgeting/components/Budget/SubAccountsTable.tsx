@@ -12,7 +12,7 @@ import { useContacts } from "store/hooks";
 import { selectBudgetDetail, selectBudgetDetailLoading } from "../../store/selectors";
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
 
-interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "manager" | "columns"> {
+interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "manager" | "columns" | "budgetType"> {
   detail: Model.Account | Model.SubAccount | undefined;
   loadingParent: boolean;
 }
@@ -29,6 +29,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
   return (
     <React.Fragment>
       <GenericSubAccountsTable
+        budgetType={"budget"}
         loadingBudget={loadingBudget}
         loadingParent={loadingParent}
         onCellFocusChanged={(params: Table.CellFocusChangedParams<BudgetTable.SubAccountRow, Model.SubAccount>) => {

@@ -43,6 +43,7 @@ const AccountsTable = (): JSX.Element => {
   return (
     <React.Fragment>
       <GenericAccountsTable
+        budgetType={"budget"}
         data={data}
         groups={groups}
         detail={budgetDetail}

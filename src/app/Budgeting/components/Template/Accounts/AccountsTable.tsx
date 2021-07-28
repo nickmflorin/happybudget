@@ -37,6 +37,7 @@ const AccountsTable = (): JSX.Element => {
   return (
     <React.Fragment>
       <GenericAccountsTable
+        budgetType={"template"}
         data={data}
         groups={groups}
         detail={templateDetail}

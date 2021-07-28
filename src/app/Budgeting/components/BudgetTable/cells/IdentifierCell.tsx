@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 import classNames from "classnames";
 
@@ -11,22 +13,63 @@ import Cell from "./Cell";
 import ValueCell, { ValueCellProps } from "./ValueCell";
 
 import "./index.scss";
+import { useDeepEqualMemo } from "lib/hooks";
 
-interface IdentifierCellProps<R extends Table.Row, G extends Model.Group = Model.Group> extends ValueCellProps<R> {
-  readonly onGroupEdit?: (group: G) => void;
-  readonly groups: G[];
+// Note: This might be slightly problematic with memoization and perfromance, since
+// we have to dynamically create the selector.  We should investigate if there is a
+// better way to do this. possibly with reselect.
+const groupsSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.LevelType) => {
+  return (state: Modules.ApplicationStore) => {
+    if (budgetType === "budget") {
+      if (levelType === "budget") {
+        return state.budget.budget.budget.groups.data;
+      } else if (levelType === "account") {
+        return state.budget.budget.account.groups.data;
+      } else if (levelType === "subaccount") {
+        return state.budget.budget.subaccount.groups.data;
+      }
+    } else {
+      if (levelType === "budget") {
+        return state.budget.template.budget.groups.data;
+      } else if (levelType === "account") {
+        return state.budget.template.account.groups.data;
+      } else if (levelType === "subaccount") {
+        return state.budget.template.subaccount.groups.data;
+      }
+    }
+  };
+};
+
+interface IdentifierCellProps<R extends Table.Row> extends ValueCellProps<R> {
+  readonly onGroupEdit?: (group: Model.Group) => void;
+  readonly budgetType: Model.BudgetType;
+  readonly levelType: BudgetTable.LevelType;
 }
 
-const IdentifierCell = <R extends Table.Row, G extends Model.Group = Model.Group>({
+const IdentifierCell = <R extends Table.Row>({
   onGroupEdit,
-  groups,
+  budgetType,
+  levelType,
   ...props
-}: IdentifierCellProps<R, G>): JSX.Element => {
-  const row: R = props.node.data;
-  if (row.meta.isGroupFooter === true && row.group !== null) {
-    const group: G | undefined = find(groups, { id: row.group } as any);
-    if (!isNil(group)) {
-      const colorDef = getGroupColorDefinition(group);
+}: IdentifierCellProps<R>): JSX.Element => {
+  const selector = groupsSelector(budgetType, levelType);
+  const groups = useSelector(selector);
+
+  const groupId = useMemo(() => {
+    return props.node.data.meta.isGroupFooter === true ? props.node.data.group || null : null;
+  }, [props.node.data.meta.isGroupFooter, props.node.data.group]);
+
+  const group = useMemo<Model.Group | null>((): Model.Group | null => {
+    const g: Model.Group | null = find(groups, { id: groupId } as any) || null;
+    return g;
+  }, [groupId, props.node.data.group, useDeepEqualMemo(groups)]);
+
+  const colorDef = useMemo(() => {
+    return !isNil(group) ? getGroupColorDefinition(group) : null;
+  }, [group]);
+
+  const groupCell = useMemo(() => {
+    if (!isNil(group) && !isNil(colorDef)) {
       return (
         <Cell className={"cell--identifier"} {...props}>
           <div style={{ display: "flex" }}>
@@ -48,7 +91,13 @@ const IdentifierCell = <R extends Table.Row, G extends Model.Group = Model.Group
         </Cell>
       );
     }
+    return null;
+  }, [colorDef, group, onGroupEdit]);
+
+  if (!isNil(groupCell)) {
+    return groupCell;
   }
+  const row: R = props.node.data;
   return (
     <ValueCell
       {...props}

@@ -6,7 +6,7 @@ import { selectTemplateDetail, selectTemplateDetailLoading } from "../../store/s
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
 import FringesModal from "./SubAccount/FringesModal";
 
-interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "manager" | "columns"> {
+interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "manager" | "columns" | "budgetType"> {
   detail: Model.Account | Model.SubAccount | undefined;
 }
 
@@ -18,6 +18,7 @@ const SubAccountsTable = ({ detail, ...props }: SubAccountsTableProps): JSX.Elem
   return (
     <React.Fragment>
       <GenericSubAccountsTable
+        budgetType={"template"}
         loadingBudget={loadingTemplate}
         columns={[
           {

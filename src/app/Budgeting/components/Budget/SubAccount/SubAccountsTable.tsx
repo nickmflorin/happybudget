@@ -66,6 +66,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
   return (
     <React.Fragment>
       <BudgetSubAccountsTable
+        levelType={"subaccount"}
         data={data}
         groups={groups}
         detail={subaccountDetail}

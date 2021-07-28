@@ -44,6 +44,10 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
 
   return (
     <GenericFringesModal
+      // These two props aren't really applicable for the Fringes case, but until we separate out
+      // the BudgetTable more, we have to add them.
+      budgetType={"budget"}
+      levelType={"account"}
       exportFileName={!isNil(budgetDetail) ? `${budgetDetail.name}_fringes` : "fringes"}
       open={open}
       onCancel={onCancel}

@@ -12,7 +12,7 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericAccountsTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>,
-    "groupParams" | "rowCanExpand" | "tableRef" | "manager"
+    "groupParams" | "rowCanExpand" | "tableRef" | "manager" | "levelType"
   > {
   exportFileName: string;
   onGroupRows: (rows: BudgetTable.AccountRow[]) => void;
@@ -32,6 +32,7 @@ const GenericAccountsTable = ({
 
   return (
     <BudgetTableComponent<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>
+      levelType={"budget"}
       tableRef={tableRef}
       onGroupRows={onGroupRows}
       rowCanExpand={(row: BudgetTable.AccountRow) =>

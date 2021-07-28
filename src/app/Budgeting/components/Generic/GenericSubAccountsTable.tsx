@@ -19,7 +19,7 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericSubAccountsTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.SubAccountRow, Model.SubAccount, Http.SubAccountPayload>,
-    "rowCanExpand" | "tableRef" | "manager"
+    "rowCanExpand" | "tableRef" | "manager" | "levelType"
   > {
   exportFileName: string;
   categoryName: "Sub Account" | "Detail";
@@ -37,6 +37,7 @@ export interface GenericSubAccountsTableProps
   tableFooterIdentifierValue: string;
   budgetFooterIdentifierValue?: string;
   subAccountUnits: Model.Tag[];
+  levelType: "account" | "subaccount";
   onGroupRows: (rows: BudgetTable.SubAccountRow[]) => void;
   onEditFringes: () => void;
 }

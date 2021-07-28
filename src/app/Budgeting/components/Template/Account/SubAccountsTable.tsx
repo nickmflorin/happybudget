@@ -54,6 +54,7 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
   return (
     <React.Fragment>
       <TemplateSubAccountsTable
+        levelType={"account"}
         data={data}
         groups={groups}
         detail={accountDetail}
