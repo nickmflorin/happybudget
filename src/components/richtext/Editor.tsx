@@ -82,7 +82,6 @@ const Editor = (
     instance
       .save()
       .then((data: OutputData) => {
-        console.log(data.blocks);
         const internalData = convertEditorJSBlocksToInternalBlocks(data.blocks);
         const isBlocksEqual = props.onCompareBlocks?.(internalData, value || []);
         if (isBlocksEqual) {

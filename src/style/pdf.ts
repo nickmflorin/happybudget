@@ -5,10 +5,12 @@ import { forEach, isNil, map } from "lodash";
 
 import { Colors, TABLE_BORDER_RADIUS } from "./constants";
 
-type FontVariant = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";
+type FontWeight = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";
+type FontStyle = "italic";
+type FontVariant = FontWeight | { weight: FontWeight; style: FontStyle };
 type PdfFont = { family: string; variants: FontVariant[] };
 
-const FontVariantMap = {
+const FontWeightMap = {
   Bold: 700,
   Regular: 400,
   Light: 300,
@@ -16,24 +18,51 @@ const FontVariantMap = {
   Medium: 600
 };
 
+// Note: For both OpenSans and Roboto, there doesn't seem to be a RegularItalic
+// option.
 export const PdfFonts: PdfFont[] = [
   {
     family: "OpenSans",
-    variants: ["Regular", "Light", "SemiBold", "Bold"]
+    variants: [
+      "Regular",
+      "Light",
+      { weight: "Light", style: "italic" },
+      "SemiBold",
+      { weight: "SemiBold", style: "italic" },
+      "Bold",
+      { weight: "Bold", style: "italic" }
+    ]
   },
   {
     family: "Roboto",
-    variants: ["Regular", "Light", "Medium", "Bold"]
+    variants: [
+      "Regular",
+      "Light",
+      { weight: "Light", style: "italic" },
+      "Medium",
+      { weight: "Medium", style: "italic" },
+      "Bold",
+      { weight: "Bold", style: "italic" }
+    ]
   }
 ];
 
 export const registerFont = (font: PdfFont): void => {
   Font.register({
     family: font.family,
-    fonts: map(font.variants, (variant: FontVariant) => ({
-      src: process.env.PUBLIC_URL + `/fonts/${font.family}-${variant}.ttf`,
-      fontWeight: FontVariantMap[variant]
-    }))
+    fonts: map(font.variants, (variant: FontVariant) => {
+      if (typeof variant === "string") {
+        return {
+          src: process.env.PUBLIC_URL + `/fonts/${font.family}-${variant}.ttf`,
+          fontWeight: FontWeightMap[variant]
+        };
+      }
+      return {
+        src: process.env.PUBLIC_URL + `/fonts/${font.family}-${variant.weight}${variant.style.toUpperCase()}.ttf`,
+        fontWeight: FontWeightMap[variant.weight],
+        fontStyle: variant.style
+      };
+    })
   });
 };
 
