@@ -19,7 +19,7 @@ interface CreateContactModalProps {
 
 const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true });
+  const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true, autoFocusField: 1 });
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {

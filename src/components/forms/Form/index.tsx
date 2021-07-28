@@ -160,19 +160,32 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
     // If the Form is being used inside of a modal, we focus the first field by default.
     // Otherwise, we do not focus the first field by default.
     const defaultAutoFocusFirstField = props.form.isInModal === true ? true : false;
-    const autoFocusFirstField = !isNil(props.autoFocusFirstField)
-      ? props.autoFocusFirstField
-      : defaultAutoFocusFirstField;
-
-    if (autoFocusFirstField === true) {
-      const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item);
+    const propAutoFocusField = !isNil(props.autoFocusField) ? props.autoFocusField : props.form.autoFocusField;
+    const autoFocusField = !isNil(propAutoFocusField) ? propAutoFocusField : defaultAutoFocusFirstField;
+    if (autoFocusField === true) {
+      const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
       if (formItemChildren.length !== 0) {
         const firstFormItemIndex = indexOf(c, formItemChildren[0]);
-        const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemChildren[0].type, props);
-        let newComponent = (
-          <AutFocusFirstInputFormItemComponent key={firstFormItemIndex} {...formItemChildren[0].props} />
-        );
-        c = [...c.slice(0, firstFormItemIndex), newComponent, ...c.slice(firstFormItemIndex + 1)];
+        if (firstFormItemIndex !== -1) {
+          const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemChildren[0].type, props);
+          let newComponent = (
+            <AutFocusFirstInputFormItemComponent key={firstFormItemIndex} {...formItemChildren[0].props} />
+          );
+          c = [...c.slice(0, firstFormItemIndex), newComponent, ...c.slice(firstFormItemIndex + 1)];
+        }
+      }
+    } else if (typeof autoFocusField === "number") {
+      const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
+      const formItemAtIndex = formItemChildren[autoFocusField];
+      if (!isNil(formItemAtIndex)) {
+        const formItemIndexInOverall = indexOf(c, formItemChildren[autoFocusField]);
+        if (formItemIndexInOverall !== -1) {
+          const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemAtIndex.type, props);
+          let newComponent = (
+            <AutFocusFirstInputFormItemComponent key={formItemIndexInOverall} {...formItemAtIndex.props} />
+          );
+          c = [...c.slice(0, formItemIndexInOverall), newComponent, ...c.slice(formItemIndexInOverall + 1)];
+        }
       }
     }
     return c;

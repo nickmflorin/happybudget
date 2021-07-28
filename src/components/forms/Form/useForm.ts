@@ -32,6 +32,7 @@ const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
   const wrapForm = useMemo<FormInstance<T>>(() => {
     return {
       ...antdForm,
+      autoFocusField: form?.autoFocusField,
       submit: () => {
         setGlobalError(undefined);
         antdForm.submit();

@@ -21,7 +21,7 @@ interface EditContactModalProps {
 const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContactModalProps): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
-  const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true });
+  const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true, autoFocusField: 1 });
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
