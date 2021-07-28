@@ -38,7 +38,6 @@ export interface GenericSubAccountsTableProps
   budgetFooterIdentifierValue?: string;
   subAccountUnits: Model.Tag[];
   onGroupRows: (rows: BudgetTable.SubAccountRow[]) => void;
-  onEditGroup: (group: Model.Group) => void;
   onEditFringes: () => void;
 }
 
@@ -54,7 +53,6 @@ const GenericSubAccountsTable = ({
   budgetFooterIdentifierValue = "Budget Total",
   tableFooterIdentifierValue,
   onGroupRows,
-  onEditGroup,
   onEditFringes,
   ...props
 }: GenericSubAccountsTableProps): JSX.Element => {
