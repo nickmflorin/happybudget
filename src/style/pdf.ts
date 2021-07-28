@@ -1,14 +1,6 @@
-import ReactPDF from "@react-pdf/renderer";
-import { StyleSheet, Font } from "@react-pdf/renderer";
-import { Style } from "@react-pdf/types";
-import { forEach, isNil, map } from "lodash";
-
+import { Font, StyleSheet } from "@react-pdf/renderer";
+import { forEach, isNil, map, reduce } from "lodash";
 import { Colors, TABLE_BORDER_RADIUS } from "./constants";
-
-type FontWeight = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";
-type FontStyle = "italic";
-type FontVariant = FontWeight | { weight: FontWeight; style: FontStyle };
-type PdfFont = { family: string; variants: FontVariant[] };
 
 const FontWeightMap = {
   Bold: 700,
@@ -20,7 +12,7 @@ const FontWeightMap = {
 
 // Note: For both OpenSans and Roboto, there doesn't seem to be a RegularItalic
 // option.
-export const PdfFonts: PdfFont[] = [
+export const PdfFonts: Pdf.Font[] = [
   {
     family: "OpenSans",
     variants: [
@@ -47,10 +39,10 @@ export const PdfFonts: PdfFont[] = [
   }
 ];
 
-export const registerFont = (font: PdfFont): void => {
+export const registerFont = (font: Pdf.Font): void => {
   Font.register({
     family: font.family,
-    fonts: map(font.variants, (variant: FontVariant) => {
+    fonts: map(font.variants, (variant: Pdf.FontVariant) => {
       if (typeof variant === "string") {
         return {
           src: process.env.PUBLIC_URL + `/fonts/${font.family}-${variant}.ttf`,
@@ -67,17 +59,57 @@ export const registerFont = (font: PdfFont): void => {
 };
 
 export const registerFonts = () => {
-  map(PdfFonts, (font: PdfFont) => registerFont(font));
+  map(PdfFonts, (font: Pdf.Font) => registerFont(font));
 };
 
-const StyleMixins: ReactPDF.Styles = StyleSheet.create({
-  header: {
-    fontFamily: "OpenSans"
-  }
-});
-
 // TODO: It would be nice to reference constants from SCSS files.
-const Styles: ReactPDF.Styles = StyleSheet.create({
+const TextStyles: Pdf.ExtensionStyles = {
+  text: { color: Colors.TEXT_SECONDARY },
+  bold: { fontWeight: 700 },
+  italic: { fontStyle: "italic" },
+  uppercase: { textTransform: "uppercase" },
+  header: { ext: ["text"], fontFamily: "OpenSans" },
+  paragraph: { ext: ["text"], fontFamily: "Roboto", fontSize: 11, lineHeight: "1.5pt" },
+  h1: {
+    ext: ["header"],
+    fontWeight: 700,
+    fontSize: 24
+  },
+  h2: {
+    ext: ["header"],
+    fontWeight: 700,
+    fontSize: 20
+  },
+  h3: {
+    ext: ["header"],
+    fontWeight: 600,
+    fontSize: 16
+  },
+  h4: {
+    ext: ["header"],
+    fontWeight: 600,
+    fontSize: 14
+  },
+  h5: {
+    ext: ["header"],
+    fontWeight: 400,
+    fontSize: 12
+  },
+  h6: {
+    ext: ["header"],
+    fontWeight: 400,
+    fontSize: 10
+  },
+  label: {
+    fontFamily: "OpenSans",
+    fontSize: 12,
+    fontWeight: 600,
+    lineHeight: "1.5pt",
+    marginBottom: 4
+  }
+};
+
+const LayoutStyles: Pdf.ExtensionStyles = {
   page: {
     flexDirection: "column",
     backgroundColor: "white",
@@ -85,34 +117,6 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   },
   "page-header": {
     marginBottom: 20
-  },
-  "budget-page-header": {},
-  "budget-page-primary-header": {},
-  "budget-page-sub-header": {
-    display: "flex",
-    minHeight: 70,
-    marginTop: 20,
-    flexDirection: "row"
-  },
-  "budget-page-sub-header-left": {
-    width: "50%",
-    display: "flex",
-    flexDirection: "row"
-  },
-  "budget-page-sub-header-right": {
-    width: "50%",
-    display: "flex",
-    flexDirection: "row"
-  },
-  "budget-page-sub-header-image": {
-    width: 70,
-    height: 70,
-    objectFit: "contain",
-    marginRight: 15,
-    borderRadius: 10
-  },
-  "budget-page-sub-header-rich-text": {
-    flexGrow: 100
   },
   "page-content": {
     flexGrow: 100
@@ -134,72 +138,15 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   "page-footer": {
     marginTop: 15
   },
-  notes: {},
-  "notes-container": {
-    border: `1px solid ${Colors.TABLE_BORDER}`,
-    borderRadius: 10,
-    padding: 15,
-    minHeight: "50pt"
-  },
-  "notes-text": {},
   "page-number": {
     fontSize: 10,
     textAlign: "right",
     width: "100%",
     marginTop: 4
-  },
-  paragraph: {
-    fontFamily: "Roboto",
-    fontSize: 11,
-    color: Colors.TEXT_PRIMARY,
-    lineHeight: "1.5pt"
-  },
-  label: {
-    fontFamily: "OpenSans",
-    fontSize: 12,
-    fontWeight: 600,
-    color: Colors.TEXT_PRIMARY,
-    lineHeight: "1.5pt",
-    marginBottom: 4
-  },
-  bold: { fontWeight: 700 },
-  italic: { fontStyle: "italic" },
-  h1: {
-    ...StyleMixins.header,
-    fontWeight: 700,
-    fontSize: 24,
-    color: Colors.TEXT_SECONDARY
-  },
-  h2: {
-    ...StyleMixins.header,
-    fontWeight: 700,
-    fontSize: 20,
-    color: Colors.TEXT_SECONDARY
-  },
-  h3: {
-    ...StyleMixins.header,
-    fontWeight: 600,
-    fontSize: 16,
-    color: Colors.TEXT_PRIMARY
-  },
-  h4: {
-    ...StyleMixins.header,
-    fontWeight: 600,
-    fontSize: 14,
-    color: Colors.TEXT_PRIMARY
-  },
-  h5: {
-    ...StyleMixins.header,
-    fontWeight: 400,
-    fontSize: 12,
-    color: Colors.TEXT_PRIMARY
-  },
-  h6: {
-    ...StyleMixins.header,
-    fontWeight: 400,
-    fontSize: 10,
-    color: Colors.TEXT_PRIMARY
-  },
+  }
+};
+
+const TableStyles: Pdf.ExtensionStyles = {
   table: {
     // Note: react-pdf does not "support" display: table, even though it works fine,
     // their TS bindings disallow it.
@@ -312,7 +259,6 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 1
   },
-  uppercase: { textTransform: "uppercase" },
   "fill-width": { textAlign: "center", width: "100%" },
   "group-tr-td-text": { color: "#595959", fontWeight: 700 },
   "footer-tr-td-text": { color: "#595959", fontWeight: 700, marginTop: 6 },
@@ -320,24 +266,90 @@ const Styles: ReactPDF.Styles = StyleSheet.create({
   "account-sub-header-tr-td-text": { color: "#595959", fontWeight: 700 },
   "subaccount-tr-td-text": {},
   "subaccount-footer-tr-td-text": {}
-});
+};
 
-export const mergeStylesFromClassName = (className: string | undefined): Style => {
-  let mergedStyle: Style = {};
+const ExportStyles: Pdf.ExtensionStyles = {
+  "budget-page-header": {},
+  "budget-page-primary-header": {},
+  "budget-page-sub-header": {
+    display: "flex",
+    minHeight: 70,
+    marginTop: 20,
+    flexDirection: "row"
+  },
+  "budget-page-sub-header-left": {
+    width: "50%",
+    display: "flex",
+    flexDirection: "row"
+  },
+  "budget-page-sub-header-right": {
+    width: "50%",
+    display: "flex",
+    flexDirection: "row"
+  },
+  "budget-page-sub-header-image": {
+    width: 70,
+    height: 70,
+    objectFit: "contain",
+    marginRight: 15,
+    borderRadius: 10
+  },
+  "budget-page-sub-header-rich-text": {
+    flexGrow: 100
+  },
+  notes: {},
+  "notes-container": {
+    border: `1px solid ${Colors.TABLE_BORDER}`,
+    borderRadius: 10,
+    padding: 15,
+    minHeight: "50pt"
+  },
+  "notes-text": {}
+};
+
+const Styles: Pdf.ExtensionStyles = { ...TextStyles, ...LayoutStyles, ...ExportStyles, ...TableStyles };
+
+export const styleForClassName = (className: string): Pdf.Style => {
+  let style: Pdf.ExtensionStyle = {};
+  if (isNil(Styles[className.trim()])) {
+    /* eslint-disable no-console */
+    console.warn(`Unrecognized class name ${className}`);
+    return style;
+  }
+  style = Styles[className.trim()];
+  if (!isNil(style.ext)) {
+    let { ext, ...coreStyle } = style;
+    const extensions = Array.isArray(ext) ? ext : [ext];
+    coreStyle = !isNil(coreStyle) ? coreStyle : {};
+    return reduce(
+      extensions,
+      (currentStyle: Pdf.Style, extension: string) => {
+        return { ...styleForClassName(extension), ...currentStyle };
+      },
+      coreStyle
+    );
+  }
+  return style;
+};
+
+export const mergeStylesFromClassName = (className: string | undefined): Pdf.Style => {
+  let mergedStyle: Pdf.Style = {};
   if (isNil(className)) {
     return mergedStyle;
   }
   const split = className.split(" ");
   forEach(split, (csName: string) => {
-    const classStyles: Style | undefined = Styles[csName.trim()];
-    if (!isNil(classStyles)) {
-      mergedStyle = { ...mergedStyle, ...classStyles };
-    } else {
-      /* eslint-disable no-console */
-      console.warn(`Unrecognized class name ${csName}`);
-    }
+    mergedStyle = { ...mergedStyle, ...styleForClassName(csName) };
   });
   return mergedStyle;
 };
 
-export default Styles;
+export const createStyleSheet = (styles: Pdf.ExtensionStyles): Pdf.Styles => {
+  const newStyles: Pdf.Styles = {};
+  forEach(styles, (value: Pdf.Style, className: string) => {
+    newStyles[className] = styleForClassName(className);
+  });
+  return StyleSheet.create(newStyles);
+};
+
+export default createStyleSheet(Styles);

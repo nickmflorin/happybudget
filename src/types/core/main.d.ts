@@ -5,7 +5,6 @@
 /// <reference path="./files.d.ts" />
 /// <reference path="./modeling.d.ts" />
 /// <reference path="./pdf.d.ts" />
-/// <reference path="./richtext.d.ts" />
 
 interface Window {
   analytics: any;

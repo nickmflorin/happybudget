@@ -1,7 +1,7 @@
 import { isNil, includes, map, filter } from "lodash";
 
-const convertTagsToStyles = (tags: string[]): Pdf.TextStyle[] => {
-  const styles: Pdf.TextStyle[] = [];
+const convertTagsToStyles = (tags: string[]): Pdf.FontStyle[] => {
+  const styles: Pdf.FontStyle[] = [];
   if (includes(tags, "b")) {
     styles.push("bold");
   }

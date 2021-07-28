@@ -1,7 +1,40 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+namespace RichText {
+  type BlockType = "paragraph" | "header" | "list";
+
+  type GenericBlock<T extends RichText.BlockType, D extends object = any> = import("@editorjs/editorjs").OutputBlockData<T, D>;
+
+  type TextFragment = { text?: string, styles?: Pdf.FontStyle[], children?: TextFragment[] }
+
+  // Note that we add additional style properties to the paragraph block here, and compute them
+  // in a component that wraps EditorJS.  EditorJS does not include the fields other than `text`
+  // by default.
+  type ParagraphBlock = RichText.GenericBlock<"paragraph", RichText.TextFragment>;
+  type HeadingBlock = RichText.GenericBlock<"header", RichText.TextFragment & { level: Pdf.HeadingLevel}>;
+
+  type ListBlockStyle = "orderered" | "unordered";
+  type ListBlockData = { items: string[], style: RichText.ListBlockStyle };
+  type ListBlock = RichText.GenericBlock<"list", RichText.ListBlockData>;
+
+  type Block = ListBlock | ParagraphBlock | HeadingBlock;
+}
+
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Pdf {
-  type TextStyle = "italic" | "bold";
+  type FontFamily = "OpenSans" | "Roboto";
+  type FontWeight = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";
+  type FontStyle = "italic" | "bold";
+  type FontVariant = Pdf.FontWeight | { weight: Pdf.FontWeight; style: "italic" };
+  type Font = { family: Pdf.FontFamily; variants: Pdf.FontVariant[] };
+
+  type Style = import("@react-pdf/types").Style;
+  type Styles = import("@react-pdf/renderer").default.Styles;
+
+  type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>, fontFamily?: Pdf.FontFamily };
+  type ExtensionStyles = {[key: string]: Pdf.InternalStyle};
+
   type HeadingLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
   type DocumentLoadedParams = {
@@ -13,9 +46,6 @@ namespace Pdf {
   type PageRenderParams = {
     readonly pageNumber: number;
   }
-  type RenderCallback = () => JSX.Element | RichText.Block[];
-  type PageRenderCallback = (params: Pdf.PageRenderParams) => JSX.Element | RichText.Block[];
-  type ElementBlocksOrCallback = Pdf.PageRenderCallback | JSX.Element | RichText.Block[];
 
   type RenderDocumentProps = {
     readonly title?: string;

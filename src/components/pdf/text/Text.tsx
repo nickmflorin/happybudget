@@ -4,7 +4,7 @@ import { PrimitiveText } from "../primitive";
 import { TextProps as PrimitiveTextProps } from "../primitive/Text";
 
 export interface TextProps extends PrimitiveTextProps {
-  readonly styles?: Pdf.TextStyle[];
+  readonly styles?: Pdf.FontStyle[];
 }
 
 const Text = ({ styles, ...props }: TextProps): JSX.Element => (
