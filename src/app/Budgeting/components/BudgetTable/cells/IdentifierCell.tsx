@@ -21,19 +21,29 @@ import { useDeepEqualMemo } from "lib/hooks";
 const groupsSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.LevelType) => {
   return (state: Modules.ApplicationStore) => {
     /* eslint-disable indent */
-    switch ([budgetType, levelType]) {
-      case ["budget", "budget"]:
-        return state.budget.budget.budget.groups.data;
-      case ["budget", "account"]:
-        return state.budget.budget.account.groups.data;
-      case ["budget", "subaccount"]:
-        return state.budget.budget.subaccount.groups.data;
-      case ["template", "template"]:
-        return state.budget.template.budget.groups.data;
-      case ["template", "account"]:
-        return state.budget.template.account.groups.data;
-      case ["template", "subaccount"]:
-        return state.budget.template.subaccount.groups.data;
+    switch (budgetType) {
+      case "budget":
+        switch (levelType) {
+          case "budget":
+            return state.budget.budget.budget.groups.data;
+          case "account":
+            return state.budget.budget.account.groups.data;
+          case "subaccount":
+            return state.budget.budget.subaccount.groups.data;
+          default:
+            return [];
+        }
+      case "template":
+        switch (levelType) {
+          case "budget":
+            return state.budget.template.budget.groups.data;
+          case "account":
+            return state.budget.template.account.groups.data;
+          case "subaccount":
+            return state.budget.template.subaccount.groups.data;
+          default:
+            return [];
+        }
       default:
         return [];
     }

@@ -14,15 +14,25 @@ import useModelMenuEditor from "./ModelMenuEditor";
 const fringesSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.LevelType) => {
   return (state: Modules.ApplicationStore) => {
     /* eslint-disable indent */
-    switch ([budgetType, levelType]) {
-      case ["budget", "account"]:
-        return state.budget.budget.account.fringes.data;
-      case ["budget", "subaccount"]:
-        return state.budget.budget.subaccount.fringes.data;
-      case ["template", "account"]:
-        return state.budget.template.account.fringes.data;
-      case ["template", "subaccount"]:
-        return state.budget.template.subaccount.fringes.data;
+    switch (budgetType) {
+      case "budget":
+        switch (levelType) {
+          case "account":
+            return state.budget.budget.account.fringes.data;
+          case "subaccount":
+            return state.budget.budget.subaccount.fringes.data;
+          default:
+            return [];
+        }
+      case "template":
+        switch (levelType) {
+          case "account":
+            return state.budget.template.account.fringes.data;
+          case "subaccount":
+            return state.budget.template.subaccount.fringes.data;
+          default:
+            return [];
+        }
       default:
         return [];
     }
