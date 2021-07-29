@@ -1,112 +1,117 @@
 @import "style/colors";
 
+// Note that this height isn't actually set on the modal - the logic is built
+// around this effectively being a "max-height".  This height is then used to
+// derive all of the PDF dimensions, which are then calculated based on upper
+// limits they have, which then come back to help us calculate the rest of the
+// dimensions.
 $modal-height: 85vh;
 $modal-header-height: 70px;
+$modal-width: 90vw;
+
+$body-height: calc(#{$modal-height} - #{$modal-header-height});
+
+$inner-body-height: calc(#{$body-height} - 36px); // 36px Padding Bottom
+
+$preview-header-height: 36px;
+$preview-footer-height: 36px;
+
+$previewer-height: min(#{$inner-body-height}, 600px);
+$preview-content-height: calc(#{$previewer-height} - 36px - 36px - 10px);
+$canvas-height: calc(#{$preview-content-height} - 6px);
+// 0.70749 is the Aspect Ratio of an A4 PDF Document
+$canvas-width: calc(0.70749 * #{$canvas-height});
+
+$preview-content-width: calc(#{$canvas-width} + 6px);
+$previewer-width: $preview-content-width;
+$form-container-width: calc(#{$modal-width} - 10px - #{$previewer-width});
 
 .export-preview-modal {
   overflow: hidden;
-  width: 90vw !important;
-  height: $modal-height;
+  width: $modal-width !important;
+  // height: $modal-height !important;
+  // Note: This will not center the modal vertically, but there is no way to
+  // do so without leaving a bunch of empty space at the bottom of the modal.
+  // It has to assume the max height and center it based on that.
   top: calc(0.5 * (100vh - #{$modal-height}));
-
-  .ant-modal-header {
-    height: $modal-header-height;
-    padding-top: 24px;
-    padding-bottom: 12px;
-
-    .ant-modal-title {
-      font-size: 32px;
-      line-height: 34px;
-    }
-  }
-
-  .ant-modal-close {
-    .ant-modal-close-x {
-      padding-left: 36px;
-      padding-right: 36px;
-      height: 70px;
-      width: 70px;
-      position: relative;
-    }
-  }
 
   .ant-modal-content {
     height: 100%;
     width: 100%;
-    overflow-y: scroll;
+    overflow-y: hidden;
+    overflow-x: hidden;
+
+    .ant-modal-header {
+      height: $modal-header-height;
+      padding-top: 24px;
+      padding-bottom: 12px;
+
+      .ant-modal-title {
+        font-size: 32px;
+        line-height: 34px;
+      }
+    }
+
+    .ant-modal-close {
+      .ant-modal-close-x {
+        padding-left: 36px;
+        padding-right: 36px;
+        height: 70px;
+        width: 70px;
+        position: relative;
+      }
+    }
 
     .ant-modal-body {
       padding: 36px;
       padding-top: 0px;
-      height: calc(#{$modal-height} - #{$modal-header-height});
       overflow-y: hidden;
+      overflow-x: hidden;
+      width: 100%;
+      display: flex;
 
-      .export-preview-modal-body {
-        display: flex;
-        height: 100%;
+      .form-container {
+        height: $previewer-height;
+        width: $form-container-width;
+        overflow-y: scroll;
+        margin-right: 10px;
+        padding-right: 20px;
 
-        .form-container {
-          flex-grow: 100;
+        .export-form {
           max-height: 100%;
-          overflow-y: scroll;
-          margin-right: 10px;
-          padding-right: 20px;
+        }
+      }
 
-          .export-form {
-            max-height: 100%;
+      .previewer {
+        height: $previewer-height;
+        width: $previewer-width;
+
+        .preview-header {
+          height: 36px;
+        }
+
+        .preview-content {
+          position: relative;
+          padding: 2px;
+          border: 1px solid $gray-light;
+          margin-bottom: 10px;
+          height: $preview-content-height;
+          width: $preview-content-width;
+
+          .react-pdf__Page__canvas {
+            height: $canvas-height !important;
+            width: $canvas-width !important;
           }
         }
-        .preview-container {
-          max-height: 100%;
+        .preview-footer {
+          display: flex;
+          height: 36px;
 
-          .previewer {
-            display: flex;
-            flex-direction: column;
-            max-height: 100%;
-
-            .preview-header {
-              height: 36px;
-            }
-
-            .preview-content {
-              position: relative;
-              padding: 2px;
-              border: 1px solid $gray-light;
-              margin-bottom: 10px;
-              $content-height: calc(#{$modal-height} - #{$modal-header-height} - 36px - 36px - 36px - 10px);
-              height: $content-height;
-              // 0.70749 is the Aspect Ratio of an A4 PDF Document
-              width: calc(0.70749 * #{$content-height}) !important;
-
-              .react-pdf__Page__canvas {
-                // In order to maintain the aspect ratio of the PDF preview, while also allowing
-                // it to be responsive, we have to dynamically set the height and width based on
-                // the other constraining dimensions and still maintain the correct aspect ratio.
-
-                // Modal Body:                            = modal-height - $modal-header-height
-                //                                        = 36px (Padding Bottom)
-                // Preview Header                         = 36px
-                // Preview Footer                         = 10px
-                // Margin Between Preview Footer & Header = 10px
-                // Padding of Preview Container           = 2px (Bottom & Top)
-                // ------------------------
-                $page-height: calc(#{$content-height} - 4px);
-                height: $page-height !important;
-                // 0.70749 is the Aspect Ratio of an A4 PDF Document
-                width: calc(0.70749 * #{$page-height}) !important;
-              }
-            }
-            .preview-footer {
-              display: flex;
-              height: 36px;
-
-              .ant-pagination {
-                flex-grow: 100;
-              }
-              .btn {
-                width: 80px;
-              }
-            }
+          .ant-pagination {
+            flex-grow: 100;
+          }
+          .btn {
+            width: 80px;
           }
         }
       }
