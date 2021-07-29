@@ -143,39 +143,35 @@ const PreviewModal = ({ budgetId, visible, filename, onSuccess, onCancel }: Prev
       onCancel={() => onCancel()}
       footer={null}
     >
-      <div className={"export-preview-modal-body"}>
-        <div className={"form-container"}>
-          <ExportForm
-            form={form}
-            initialValues={{ ...DEFAULT_OPTIONS }}
-            accountsLoading={loadingData}
-            accounts={!isNil(budgetResponse) ? budgetResponse.accounts : []}
-            disabled={isNil(budgetResponse) || isNil(contactsResponse)}
-            columns={map(SubAccountColumns, (value: Column) => value)}
-            onValuesChange={(changedValues: Partial<PdfBudgetTable.Options>, values: PdfBudgetTable.Options) => {
-              const debouncedSetState = debounce(() => setOptions(values), 400);
-              debouncedSetState();
-            }}
-          />
-        </div>
-        <div className={"preview-container"}>
-          <Previewer
-            file={file}
-            loading={rendering || loadingData}
-            exportDisabled={rendering || loadingData}
-            onExport={() => {
-              // TODO: Since we are debouncing the Options setState, should we rerender the
-              // PDF with the most recent options just in case?
-              if (!isNil(file)) {
-                download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
-                  includeExtensionInName: false
-                });
-                onSuccess?.();
-              }
-            }}
-          />
-        </div>
+      <div className={"form-container"}>
+        <ExportForm
+          form={form}
+          initialValues={{ ...DEFAULT_OPTIONS }}
+          accountsLoading={loadingData}
+          accounts={!isNil(budgetResponse) ? budgetResponse.accounts : []}
+          disabled={isNil(budgetResponse) || isNil(contactsResponse)}
+          columns={map(SubAccountColumns, (value: Column) => value)}
+          onValuesChange={(changedValues: Partial<PdfBudgetTable.Options>, values: PdfBudgetTable.Options) => {
+            const debouncedSetState = debounce(() => setOptions(values), 400);
+            debouncedSetState();
+          }}
+        />
       </div>
+      <Previewer
+        file={file}
+        loading={rendering || loadingData}
+        exportDisabled={rendering || loadingData}
+        onExport={() => {
+          // TODO: Since we are debouncing the Options setState, should we rerender the
+          // PDF with the most recent options just in case?
+          if (!isNil(file)) {
+            download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
+              includeExtensionInName: false
+            });
+            onSuccess?.();
+          }
+        }}
+      />
     </Modal>
   );
 };
