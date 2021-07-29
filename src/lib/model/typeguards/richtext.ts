@@ -9,3 +9,7 @@ export const isHeadingBlock = (block: RichText.Block): block is RichText.Heading
 export const isListBlock = (block: RichText.Block): block is RichText.ListBlock => {
   return (block as RichText.ListBlock).type === "list";
 };
+
+export const isTextFragment = (block: RichText.TextBlock): block is RichText.TextFragment => {
+  return (block as RichText.TextFragment).text !== undefined;
+};

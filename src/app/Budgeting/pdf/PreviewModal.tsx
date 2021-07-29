@@ -36,30 +36,30 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
     {
       type: "header",
       level: 4,
-      fragments: [{ text: "Production Company" }]
+      data: { text: "Production Company" }
     },
     {
       type: "paragraph",
-      fragments: [{ text: "Address:" }]
+      data: { text: "Address:" }
     },
     {
       type: "paragraph",
-      fragments: [{ text: "Phone:" }]
+      data: { text: "Phone:" }
     }
   ],
   rightInfo: [
     {
       type: "header",
       level: 4,
-      fragments: [{ text: "Client / Agency" }]
+      data: { text: "Client / Agency" }
     },
     {
       type: "paragraph",
-      fragments: [{ text: "Address:" }]
+      data: { text: "Address:" }
     },
     {
       type: "paragraph",
-      fragments: [{ text: "Phone:" }]
+      data: { text: "Phone:" }
     }
   ],
   includeNotes: false,
@@ -68,11 +68,11 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
     {
       type: "header",
       level: 2,
-      fragments: [{ text: `Sample Budget ${new Date().getFullYear()}` }]
+      data: { text: `Sample Budget ${new Date().getFullYear()}` }
     },
     {
       type: "paragraph",
-      fragments: [{ text: "Cost Summary" }]
+      data: { text: "Cost Summary" }
     }
   ]
 };

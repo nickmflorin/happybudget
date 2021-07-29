@@ -5,19 +5,21 @@ namespace RichText {
 
   type GenericBlock<T extends RichText.BlockType, D extends object = any> = import("@editorjs/editorjs").OutputBlockData<T, D>;
 
-  type TextFragment = { text?: string, styles?: Pdf.FontStyleName[], fragments?: TextFragment[] }
+  type TextFragment = { text: string; styles?: FontStyleName[] };
+  type TextGroup = { blocks: TextBlock[] };
+  type TextBlock = TextFragment | TextGroup;
 
   // Note that these blocks are different from the EditorJS blocks.  This is because
   // we need to layer on additional functionality, and we need to model them more appropriately
   // to work with a seamless backend/API.
   type ParagraphBlock = {
     readonly type: "paragraph";
-    readonly fragments: RichText.TextFragment[];
+    readonly data: RichText.TextBlock;
   }
 
   type HeadingBlock = {
     readonly type: "header";
-    readonly fragments: RichText.TextFragment[];
+    readonly data: RichText.TextBlock;
     readonly level: Pdf.HeadingLevel;
   }
 
