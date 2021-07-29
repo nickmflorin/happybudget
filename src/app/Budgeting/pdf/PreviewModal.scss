@@ -24,13 +24,14 @@ $canvas-width: calc(0.70749 * #{$canvas-height});
 
 $preview-content-width: calc(#{$canvas-width} + 6px);
 $previewer-width: $preview-content-width;
+$form-container-height: $inner-body-height;
 $form-container-width: calc(#{$modal-width} - 10px - #{$previewer-width});
 
 .export-preview-modal {
   overflow: hidden;
   width: $modal-width !important;
-  // height: $modal-height !important;
-  // Note: This will not center the modal vertically, but there is no way to
+  max-height: $modal-height !important;
+  // Note: This will not always center the modal vertically, but there is no way to
   // do so without leaving a bunch of empty space at the bottom of the modal.
   // It has to assume the max height and center it based on that.
   top: calc(0.5 * (100vh - #{$modal-height}));
@@ -71,7 +72,7 @@ $form-container-width: calc(#{$modal-width} - 10px - #{$previewer-width});
       display: flex;
 
       .form-container {
-        height: $previewer-height;
+        max-height: $form-container-height;
         width: $form-container-width;
         overflow-y: scroll;
         margin-right: 10px;
