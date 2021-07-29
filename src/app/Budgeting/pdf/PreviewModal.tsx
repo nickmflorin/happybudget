@@ -35,29 +35,31 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   leftInfo: [
     {
       type: "header",
-      data: { text: "Production Company", level: 4 }
+      level: 4,
+      fragments: [{ text: "Production Company" }]
     },
     {
       type: "paragraph",
-      data: { text: "Address:" }
+      fragments: [{ text: "Address:" }]
     },
     {
       type: "paragraph",
-      data: { text: "Phone:" }
+      fragments: [{ text: "Phone:" }]
     }
   ],
   rightInfo: [
     {
       type: "header",
-      data: { text: "Client / Agency", level: 4 }
+      level: 4,
+      fragments: [{ text: "Client / Agency" }]
     },
     {
       type: "paragraph",
-      data: { text: "Address:" }
+      fragments: [{ text: "Address:" }]
     },
     {
       type: "paragraph",
-      data: { text: "Phone:" }
+      fragments: [{ text: "Phone:" }]
     }
   ],
   includeNotes: false,
@@ -65,8 +67,8 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   header: [
     {
       type: "header",
-      fragments: [{ text: `Sample Budget ${new Date().getFullYear()}` }],
-      level: 2
+      level: 2,
+      fragments: [{ text: `Sample Budget ${new Date().getFullYear()}` }]
     },
     {
       type: "paragraph",
@@ -141,35 +143,39 @@ const PreviewModal = ({ budgetId, visible, filename, onSuccess, onCancel }: Prev
       onCancel={() => onCancel()}
       footer={null}
     >
-      <div className={"form-container"}>
-        <ExportForm
-          form={form}
-          initialValues={{ ...DEFAULT_OPTIONS }}
-          accountsLoading={loadingData}
-          accounts={!isNil(budgetResponse) ? budgetResponse.accounts : []}
-          disabled={isNil(budgetResponse) || isNil(contactsResponse)}
-          columns={map(SubAccountColumns, (value: Column) => value)}
-          onValuesChange={(changedValues: Partial<PdfBudgetTable.Options>, values: PdfBudgetTable.Options) => {
-            const debouncedSetState = debounce(() => setOptions(values), 400);
-            debouncedSetState();
-          }}
-        />
+      <div className={"export-preview-modal-body"}>
+        <div className={"form-container"}>
+          <ExportForm
+            form={form}
+            initialValues={{ ...DEFAULT_OPTIONS }}
+            accountsLoading={loadingData}
+            accounts={!isNil(budgetResponse) ? budgetResponse.accounts : []}
+            disabled={isNil(budgetResponse) || isNil(contactsResponse)}
+            columns={map(SubAccountColumns, (value: Column) => value)}
+            onValuesChange={(changedValues: Partial<PdfBudgetTable.Options>, values: PdfBudgetTable.Options) => {
+              const debouncedSetState = debounce(() => setOptions(values), 400);
+              debouncedSetState();
+            }}
+          />
+        </div>
+        <div className={"preview-container"}>
+          <Previewer
+            file={file}
+            loading={rendering || loadingData}
+            exportDisabled={rendering || loadingData}
+            onExport={() => {
+              // TODO: Since we are debouncing the Options setState, should we rerender the
+              // PDF with the most recent options just in case?
+              if (!isNil(file)) {
+                download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
+                  includeExtensionInName: false
+                });
+                onSuccess?.();
+              }
+            }}
+          />
+        </div>
       </div>
-      <Previewer
-        file={file}
-        loading={rendering || loadingData}
-        exportDisabled={rendering || loadingData}
-        onExport={() => {
-          // TODO: Since we are debouncing the Options setState, should we rerender the
-          // PDF with the most recent options just in case?
-          if (!isNil(file)) {
-            download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
-              includeExtensionInName: false
-            });
-            onSuccess?.();
-          }
-        }}
-      />
     </Modal>
   );
 };
