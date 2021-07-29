@@ -34,7 +34,7 @@ $form-container-width: calc(#{$modal-width} - 10px - #{$previewer-width});
   // Note: This will not always center the modal vertically, but there is no way to
   // do so without leaving a bunch of empty space at the bottom of the modal.
   // It has to assume the max height and center it based on that.
-  top: calc(0.5 * (100vh - #{$modal-height}));
+  top: calc(0.5 * calc(100vh - #{$modal-height}));
 
   .ant-modal-content {
     height: 100%;
