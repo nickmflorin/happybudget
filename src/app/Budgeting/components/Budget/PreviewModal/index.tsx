@@ -9,10 +9,10 @@ import { download, getBase64 } from "lib/util/files";
 import { Form, Modal } from "components";
 import { ExportForm } from "components/forms";
 
-import BudgetPdf from "./Pdf";
+import BudgetPdf from "../BudgetPdf";
 import Previewer from "./Previewer";
-import { SubAccountColumns } from "./config";
-import "./PreviewModal.scss";
+import { SubAccountColumns } from "../BudgetPdf/config";
+import "./index.scss";
 
 const BudgetPdfFunc = (budget: Model.PdfBudget, contacts: Model.Contact[], options: PdfBudgetTable.Options) => (
   <BudgetPdf budget={budget} contacts={contacts} options={options} />

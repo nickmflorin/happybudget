@@ -12,7 +12,7 @@ import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selec
 import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
 import { selectCommentsHistoryDrawerOpen, selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
 import * as actions from "../../../store/actions/budget/accounts";
-import { PreviewModal } from "../pdf";
+import PreviewModal from "../PreviewModal";
 import { GenericAccountsTable } from "../../Generic";
 
 const selectGroups = simpleDeepEqualSelector(
