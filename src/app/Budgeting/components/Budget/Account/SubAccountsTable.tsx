@@ -16,7 +16,7 @@ import {
   selectSubAccountUnits
 } from "../../../store/selectors";
 import * as actions from "../../../store/actions/budget/account";
-import { PreviewModal } from "../../../pdf";
+import { PreviewModal } from "../pdf";
 import BudgetSubAccountsTable from "../SubAccountsTable";
 import FringesModal from "./FringesModal";
 
