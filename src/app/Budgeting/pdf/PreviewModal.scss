@@ -1,4 +1,5 @@
 @import "style/colors";
+@import "style/breakpoints";
 
 /*
 The dimensioning of this modal is relatively complicated.  However, there is
@@ -14,14 +15,18 @@ to grow or shrink.
 
 Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
 */
-
-$pdf-canvas-width: 362px;
-$pdf-canvas-height: calc(1 / 0.70749 * #{$pdf-canvas-width});
-
-$modal-header-height: 70px;
-$modal-width: 90vw;
-
 .export-preview-modal {
+  $pdf-canvas-width: 362px;
+
+  // @include media("<=xl") {
+  //   $pdf-canvas-width: 320px;
+  // }
+
+  $pdf-canvas-height: calc(1 / 0.70749 * #{$pdf-canvas-width});
+
+  $modal-header-height: 70px;
+  $modal-width: 90vw;
+
   overflow: hidden;
   width: $modal-width !important;
   $modal-height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 36px + 10px + #{$modal-header-height});
@@ -72,6 +77,18 @@ $modal-width: 90vw;
 
         .export-form {
           max-height: 100%;
+
+          @include media("<=xl") {
+            .export-header-sides {
+              display: flex;
+              flex-direction: column;
+
+              .export-header-side-item {
+                width: 100%;
+                margin-left: 0px !important;
+              }
+            }
+          }
         }
       }
 
