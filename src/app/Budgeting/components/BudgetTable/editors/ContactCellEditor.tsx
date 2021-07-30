@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/pro-light-svg-icons";
@@ -6,15 +7,20 @@ import { faPlus } from "@fortawesome/pro-light-svg-icons";
 import { useContacts } from "store/hooks";
 import useModelMenuEditor from "./ModelMenuEditor";
 import ExpandedModelTagCellEditor from "./ExpandedModelTagCellEditor";
-import { isNil } from "lodash";
 
-interface ContactCellEditorProps extends Table.CellEditorParams {
-  readonly onNewContact: (name?: string) => void;
+interface ContactCellEditorProps extends Table.CellEditorParams<BudgetTable.SubAccountRow, Model.SubAccount> {
+  readonly onNewContact: (params: {
+    name?: string;
+    change: Omit<Table.CellChange<BudgetTable.SubAccountRow, Model.SubAccount>, "newValue">;
+  }) => void;
 }
 
 const ContactCellEditor = (props: ContactCellEditorProps, ref: any) => {
   const contacts = useContacts();
-  const [editor] = useModelMenuEditor<Model.Contact, number>({ ...props, forwardedRef: ref });
+  const [editor] = useModelMenuEditor<BudgetTable.SubAccountRow, Model.SubAccount, Model.Contact, number>({
+    ...props,
+    forwardedRef: ref
+  });
 
   return (
     <ExpandedModelTagCellEditor<Model.Contact, number>
@@ -29,10 +35,28 @@ const ContactCellEditor = (props: ContactCellEditorProps, ref: any) => {
       extra={[
         {
           onClick: () => {
+            const row: BudgetTable.SubAccountRow = props.node.data;
             if (!isNil(editor.menuRef.current) && editor.menuRef.current.searchValue !== "") {
-              props.onNewContact(editor.menuRef.current.searchValue);
+              props.onNewContact({
+                name: editor.menuRef.current.searchValue,
+                change: {
+                  oldValue: row.contact || null,
+                  field: props.column.field,
+                  row,
+                  column: props.column,
+                  id: row.id
+                }
+              });
             } else {
-              props.onNewContact();
+              props.onNewContact({
+                change: {
+                  oldValue: row.contact || null,
+                  field: props.column.field,
+                  row,
+                  column: props.column,
+                  id: row.id
+                }
+              });
             }
           },
           text: "Add Contact",

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 
@@ -12,12 +12,16 @@ import { useContacts } from "store/hooks";
 import { selectBudgetDetail, selectBudgetDetailLoading } from "../../store/selectors";
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
 
-interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "manager" | "columns" | "budgetType"> {
-  detail: Model.Account | Model.SubAccount | undefined;
-  loadingParent: boolean;
+type PreContactCreate = Omit<Table.CellChange<BudgetTable.SubAccountRow, Model.SubAccount>, "newValue">;
+
+interface SubAccountsTableProps
+  extends Omit<GenericSubAccountsTableProps, "manager" | "columns" | "budgetType" | "tableRef"> {
+  readonly detail: Model.Account | Model.SubAccount | undefined;
+  readonly loadingParent: boolean;
 }
 
 const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableProps): JSX.Element => {
+  const [preContactCreate, setPreContactCreate] = useState<PreContactCreate | null>(null);
   const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
   const [contactToEdit, setContactToEdit] = useState<Model.Contact | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
@@ -26,10 +30,13 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
   const budgetDetail = useSelector(selectBudgetDetail);
   const loadingBudget = useSelector(selectBudgetDetailLoading);
 
+  const tableRef = useRef<BudgetTable.Ref<BudgetTable.SubAccountRow, Model.SubAccount>>(null);
+
   return (
     <React.Fragment>
       <GenericSubAccountsTable
         budgetType={"budget"}
+        tableRef={tableRef}
         loadingBudget={loadingBudget}
         loadingParent={loadingParent}
         onCellFocusChanged={(params: Table.CellFocusChangedParams<BudgetTable.SubAccountRow, Model.SubAccount>) => {
@@ -68,10 +75,11 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
               onEditContact: (contact: Model.Contact) => setContactToEdit(contact)
             },
             cellEditorParams: {
-              onNewContact: (name?: string) => {
+              onNewContact: (params: { name?: string; change: PreContactCreate }) => {
+                setPreContactCreate(params.change);
                 setInitialContactFormValues(null);
-                if (!isNil(name)) {
-                  const [firstName, lastName] = parseFirstAndLastName(name);
+                if (!isNil(params.name)) {
+                  const [firstName, lastName] = parseFirstAndLastName(params.name);
                   setInitialContactFormValues({
                     first_name: firstName,
                     last_name: lastName
@@ -161,7 +169,26 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
       <CreateContactModal
         visible={createContactModalVisible}
         initialValues={initialContactFormValues}
-        onSuccess={() => setCreateContactModalVisible(false)}
+        onSuccess={(contact: Model.Contact) => {
+          setPreContactCreate(null);
+          setInitialContactFormValues(null);
+          setCreateContactModalVisible(false);
+          // If we have enough information from before the contact was created in the specific
+          // cell, combine that information with the new value to perform a table update, showing
+          // the created contact in the new cell.
+          if (!isNil(preContactCreate)) {
+            const cellChange: Table.CellChange<BudgetTable.SubAccountRow, Model.SubAccount> = {
+              ...preContactCreate,
+              newValue: contact.id
+            };
+            if (!isNil(tableRef.current)) {
+              tableRef.current.applyTableChange({
+                type: "dataChange",
+                payload: cellChange
+              });
+            }
+          }
+        }}
         onCancel={() => setCreateContactModalVisible(false)}
       />
     </React.Fragment>

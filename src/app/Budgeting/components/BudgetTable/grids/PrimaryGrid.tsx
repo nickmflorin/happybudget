@@ -945,6 +945,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   });
 
   useImperativeHandle(gridRef, () => ({
+    applyTableChange: (event: Table.ChangeEvent<R, M>) => _onChangeEvent(event),
     getCSVData: (fields?: string[]) => {
       if (!isNil(apis)) {
         const cs: Table.Column<R, M>[] = filter(

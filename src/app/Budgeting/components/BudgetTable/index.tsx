@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useImperativeHandle, useRef } from "react";
 import classNames from "classnames";
-import { map, isNil, includes, concat, filter, reduce, find } from "lodash";
+import { map, isNil, includes, filter, reduce, find } from "lodash";
 import Cookies from "universal-cookie";
 
 import {
@@ -155,7 +155,7 @@ const BudgetTable = <
 }: BudgetTable.Props<R, M, P>) => {
   const [ordering, setOrdering] = useState<FieldOrder<keyof R>[]>([]);
   const [apis, _setApis] = useState<BudgetTableApis>(new BudgetTableApis({}));
-  const gridRef = useRef<BudgetTable.PrimaryGridRef>(null);
+  const gridRef = useRef<BudgetTable.PrimaryGridRef<R, M>>(null);
 
   const setApis = (id: BudgetTable.GridId) => (gridApis: Table.APIs) => {
     const newApis = apis.clone();
@@ -424,36 +424,51 @@ const BudgetTable = <
   useEffect(() => {
     const orderedColumns = orderColumns<Table.Column<R, M>, R, M>(columns);
 
-    let base: Table.Column<R, M>[] = [IndexColumn()];
+    let cs: Table.Column<R, M>[] = [IndexColumn()];
     if (!isNil(onRowExpand)) {
       // This cell will be hidden for the table footer since the previous index
       // cell will span over this column.
-      base.push(ExpandColumn());
+      cs.push(ExpandColumn());
     }
     if (orderedColumns.length !== 0) {
-      base.push(IdentifierColumn(orderedColumns[0]));
-      const cs = concat(
-        base,
-        map(
-          filter(orderedColumns.slice(1), (col: Table.Column<R, M>) => !(col.isCalculated === true)),
-          (def: Table.Column<R, M>) => BodyColumn(def)
-        ),
-        map(
-          filter(orderedColumns.slice(1), (col: Table.Column<R, M>) => col.isCalculated === true),
-          (def: Table.Column<R, M>) => CalculatedColumn(def)
-        )
-      );
-      setCols(
-        map(cs, (col: Table.Column<R, M>, index: number) => {
+      cs = map(
+        [
+          ...cs,
+          IdentifierColumn(orderedColumns[0]),
+          ...map(
+            filter(orderedColumns.slice(1), (col: Table.Column<R, M>) => !(col.isCalculated === true)),
+            (def: Table.Column<R, M>) => BodyColumn(def)
+          ),
+          ...map(
+            filter(orderedColumns.slice(1), (col: Table.Column<R, M>) => col.isCalculated === true),
+            (def: Table.Column<R, M>) => CalculatedColumn(def)
+          )
+        ],
+        (col: Table.Column<R, M>, index: number) => {
           if (index === cs.length - 1) {
             return UniversalColumn({ ...col, resizable: false });
           }
           return UniversalColumn(col);
-        })
+        }
       );
-    } else {
-      setCols(base);
     }
+    // Provide our custom Table.Column<R, M> and our custom Table.Column<R, M>[]
+    // to each cell editor and cell renderer.
+    setCols(
+      map(cs, (col: Table.Column<R, M>) => ({
+        ...col,
+        cellRendererParams: {
+          ...col.cellRendererParams,
+          columns: cs,
+          column: col
+        },
+        cellEditorParams: {
+          ...col.cellEditorParams,
+          columns: cs,
+          column: col
+        }
+      }))
+    );
   }, [columns, onRowExpand]);
 
   const setColumnVisibility = useDynamicCallback((change: Table.ColumnVisibilityChange) => {
@@ -468,6 +483,12 @@ const BudgetTable = <
   useImperativeHandle(tableRef, () => ({
     setColumnVisibility,
     changeColumnVisibility,
+    applyTableChange: (event: Table.ChangeEvent<R, M>) => {
+      const primaryGridRefObj = gridRef.current;
+      if (!isNil(primaryGridRefObj)) {
+        primaryGridRefObj.applyTableChange(event);
+      }
+    },
     getCSVData: (fields?: string[]) => {
       const primaryGridRefObj = gridRef.current;
       if (!isNil(primaryGridRefObj)) {

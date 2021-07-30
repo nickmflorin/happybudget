@@ -6,12 +6,10 @@ import { useTrackFirstRender } from "lib/hooks";
 
 import { selectFringeColors } from "../../../store/selectors";
 
-export interface ModelTagCellEditorProps extends Table.CellEditorParams {}
-
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-interface FringesColorEditorProps extends Table.CellEditorParams {
+interface FringesColorEditorProps extends Table.CellEditorParams<BudgetTable.FringeRow, Model.Fringe> {
   value: string | null;
 }
 

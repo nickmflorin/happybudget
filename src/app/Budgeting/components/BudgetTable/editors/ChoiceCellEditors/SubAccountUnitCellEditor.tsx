@@ -6,13 +6,16 @@ import { selectSubAccountUnits } from "../../../../store/selectors";
 import ChoiceCellEditor, { ChoiceCellEditorProps } from "./Generic";
 
 const SubAccountUnitCellEditor = (
-  props: Omit<ChoiceCellEditorProps<Model.Tag>, "models" | "searchIndices">,
+  props: Omit<
+    ChoiceCellEditorProps<BudgetTable.SubAccountRow, Model.SubAccount, Model.Tag>,
+    "models" | "searchIndices"
+  >,
   ref: any
 ) => {
   const units = useSelector(selectSubAccountUnits);
   const row: BudgetTable.SubAccountRow = props.node.data;
   return (
-    <ChoiceCellEditor<Model.Tag>
+    <ChoiceCellEditor<BudgetTable.SubAccountRow, Model.SubAccount, Model.Tag>
       style={{ maxHeight: 300 }}
       searchIndices={["title"]}
       models={units}

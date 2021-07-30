@@ -4,11 +4,14 @@ import { PaymentMethods } from "lib/model";
 import ChoiceCellEditor, { ChoiceCellEditorProps } from "./Generic";
 
 const PaymentMethodCellEditor = (
-  props: Omit<ChoiceCellEditorProps<Model.PaymentMethod>, "models" | "searchIndices">,
+  props: Omit<
+    ChoiceCellEditorProps<BudgetTable.ActualRow, Model.Actual, Model.PaymentMethod>,
+    "models" | "searchIndices"
+  >,
   ref: any
 ) => {
   return (
-    <ChoiceCellEditor<Model.PaymentMethod>
+    <ChoiceCellEditor<BudgetTable.ActualRow, Model.Actual, Model.PaymentMethod>
       searchIndices={["name"]}
       models={PaymentMethods}
       forwardedRef={ref}

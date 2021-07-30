@@ -17,7 +17,7 @@ const selectSubAccountsTreeLoading = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.subAccountsTree.loading
 );
 
-interface SubAccountsTreeEditorProps extends Table.CellEditorParams {
+interface SubAccountsTreeEditorProps extends Table.CellEditorParams<BudgetTable.ActualRow, Model.Actual> {
   readonly setSearch: (value: string) => void;
   readonly value: Model.SimpleSubAccount | null;
 }
@@ -28,7 +28,7 @@ const SubAccountsTreeEditor = ({ setSearch, ...props }: SubAccountsTreeEditorPro
   const loading = useSelector(selectSubAccountsTreeLoading);
   const menuRef = useRef<ExpandedModelMenuRef<Model.SubAccountTreeNode>>(null);
 
-  const [editor] = useModelMenuEditor<Model.SimpleSubAccount>({
+  const [editor] = useModelMenuEditor<BudgetTable.ActualRow, Model.Actual, Model.SimpleSubAccount>({
     ...props,
     menuRef,
     forwardedRef: ref

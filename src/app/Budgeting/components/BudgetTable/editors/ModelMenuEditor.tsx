@@ -7,23 +7,25 @@ import { isKeyboardEvent, isSyntheticClickEvent } from "lib/model/typeguards";
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-export interface IEditor<M extends Model.Model, V = M> {
+export interface IEditor<C extends Model.Model, V = C> {
   onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
   isFirstRender: boolean;
   value: V | null;
   changedEvent: Table.CellDoneEditingEvent | null;
-  menuRef: RefObject<ExpandedModelMenuRef<M>>;
-  menu: ExpandedModelMenuRef<M> | null;
+  menuRef: RefObject<ExpandedModelMenuRef<C>>;
+  menu: ExpandedModelMenuRef<C> | null;
 }
 
-interface UseModelMenuEditorParams<V> extends Table.CellEditorParams {
+interface UseModelMenuEditorParams<R extends Table.Row, M extends Model.Model, V> extends Table.CellEditorParams<R, M> {
   value: V | null;
   forwardedRef: RefObject<any>;
   menuRef?: RefObject<ExpandedModelMenuRef<any>>;
 }
 
-const useModelMenuEditor = <M extends Model.Model, V = M>(params: UseModelMenuEditorParams<V>): [IEditor<M, V>] => {
-  const _menuRef = useRef<ExpandedModelMenuRef<M>>(null);
+const useModelMenuEditor = <R extends Table.Row, M extends Model.Model, C extends Model.Model, V = C>(
+  params: UseModelMenuEditorParams<R, M, V>
+): [IEditor<C, V>] => {
+  const _menuRef = useRef<ExpandedModelMenuRef<C>>(null);
   const isFirstRender = useTrackFirstRender();
   const [value, setValue] = useState<V | null>(params.value);
   const [changedEvent, setChangedEvent] = useState<Table.CellDoneEditingEvent | null>(null);

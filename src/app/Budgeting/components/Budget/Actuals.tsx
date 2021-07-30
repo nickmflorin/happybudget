@@ -42,7 +42,7 @@ const Actuals = (): JSX.Element => {
   const loading = useSelector(selectActualsLoading);
   const data = useSelector(selectActuals);
   const search = useSelector(selectTableSearch);
-  const tableRef = useRef<BudgetTable.Ref>(null);
+  const tableRef = useRef<BudgetTable.Ref<BudgetTable.ActualRow, Model.Actual>>(null);
   const budgetDetail = useSelector(selectBudgetDetail);
   const contacts = useContacts();
 

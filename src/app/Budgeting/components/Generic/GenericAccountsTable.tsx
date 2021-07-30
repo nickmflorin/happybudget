@@ -28,7 +28,7 @@ const GenericAccountsTable = ({
   detail,
   ...props
 }: GenericAccountsTableProps): JSX.Element => {
-  const tableRef = useRef<BudgetTable.Ref>(null);
+  const tableRef = useRef<BudgetTable.Ref<BudgetTable.AccountRow, Model.Account>>(null);
 
   return (
     <BudgetTableComponent<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>

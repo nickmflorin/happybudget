@@ -31,7 +31,7 @@ export interface GenericFringesTableProps
 }
 
 const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Element => {
-  const tableRef = useRef<BudgetTable.Ref>(null);
+  const tableRef = useRef<BudgetTable.Ref<BudgetTable.FringeRow, Model.Fringe>>(null);
 
   return (
     <BudgetTableComponent<BudgetTable.FringeRow, Model.Fringe, Http.FringePayload>

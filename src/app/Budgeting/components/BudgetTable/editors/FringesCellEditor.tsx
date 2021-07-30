@@ -39,17 +39,20 @@ const fringesSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.Le
   };
 };
 
-export interface FringesCellEditorProps<R extends Table.Row> extends Table.CellEditorParams {
+export interface FringesCellEditorProps extends Table.CellEditorParams<BudgetTable.SubAccountRow, Model.SubAccount> {
   readonly onAddFringes: () => void;
-  readonly colId: keyof R;
+  readonly colId: keyof BudgetTable.SubAccountRow;
   readonly budgetType: Model.BudgetType;
   readonly levelType: BudgetTable.LevelType;
 }
 
-const FringesCellEditor = <R extends Table.Row>(props: FringesCellEditorProps<R>, ref: any) => {
+const FringesCellEditor = (props: FringesCellEditorProps, ref: any) => {
   const selector = fringesSelector(props.budgetType, props.levelType);
   const fringes = useSelector(selector);
-  const [editor] = useModelMenuEditor<Model.Fringe, Model.Fringe[]>({ ...props, forwardedRef: ref });
+  const [editor] = useModelMenuEditor<BudgetTable.SubAccountRow, Model.SubAccount, Model.Fringe, Model.Fringe[]>({
+    ...props,
+    forwardedRef: ref
+  });
 
   return (
     <ExpandedModelTagsMenu<Model.Fringe>

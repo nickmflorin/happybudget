@@ -14,7 +14,7 @@ interface CreateContactModalProps {
   readonly visible: boolean;
   readonly initialValues?: any;
   readonly onCancel: () => void;
-  readonly onSuccess: () => void;
+  readonly onSuccess: (contact: Model.Contact) => void;
 }
 
 const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
@@ -44,7 +44,7 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
               .then((contact: Model.Contact) => {
                 form.resetFields();
                 dispatch(addContactToStateAction(contact));
-                onSuccess();
+                onSuccess(contact);
               })
               .catch((e: Error) => {
                 form.handleRequestError(e);

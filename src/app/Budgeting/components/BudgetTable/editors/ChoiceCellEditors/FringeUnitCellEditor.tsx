@@ -3,11 +3,16 @@ import { FringeUnits } from "lib/model";
 import ChoiceCellEditor, { ChoiceCellEditorProps } from "./Generic";
 
 const FringeUnitCellEditor = (
-  props: Omit<ChoiceCellEditorProps<Model.FringeUnit>, "models" | "searchIndices">,
+  props: Omit<ChoiceCellEditorProps<BudgetTable.FringeRow, Model.Fringe, Model.FringeUnit>, "models" | "searchIndices">,
   ref: any
 ) => {
   return (
-    <ChoiceCellEditor<Model.FringeUnit> searchIndices={["name"]} models={FringeUnits} forwardedRef={ref} {...props} />
+    <ChoiceCellEditor<BudgetTable.FringeRow, Model.Fringe, Model.FringeUnit>
+      searchIndices={["name"]}
+      models={FringeUnits}
+      forwardedRef={ref}
+      {...props}
+    />
   );
 };
 

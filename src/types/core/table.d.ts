@@ -246,11 +246,12 @@ namespace Table {
 
   // I really don't know why, but extending import("@ag-grid-community/core").ICellEditorParams
   // does not work here.
-  interface CellEditorParams {
+  interface CellEditorParams<R extends Table.Row, M extends Model.Model, V = any> {
     readonly value: any;
     readonly keyPress: number | null;
     readonly charPress: string | null;
-    readonly column: import("@ag-grid-community/core").Column;
+    readonly column: Table.Column<R, M, V>;
+    readonly columns: Table.Column<R, M, V>[];
     readonly colDef: import("@ag-grid-community/core").ColDef;
     readonly node: import("@ag-grid-community/core").RowNode;
     readonly data: any;
@@ -413,7 +414,8 @@ namespace BudgetTable {
     readonly getModelChildren?: (m: M) => number[];
   }
 
-  interface PrimaryGridRef {
+  interface PrimaryGridRef<R extends Table.Row, M extends Model.Model> {
+    readonly applyTableChange: (event: Table.ChangeEvent<R, M>) => void;
     readonly getCSVData: (fields?: string[]) => CSVData;
   }
 
@@ -426,7 +428,7 @@ namespace BudgetTable {
     readonly isCellEditable: (row: R, colDef: Table.Column<R, M>) => boolean;
   }
 
-  interface Ref extends PrimaryGridRef {
+  interface Ref<R extends Table.Row, M extends Model.Model> extends PrimaryGridRef<R, M> {
     readonly changeColumnVisibility: (changes: Table.ColumnVisibilityChange[]) => void;
     readonly setColumnVisibility: (change: Table.ColumnVisibilityChange) => void;
   }
@@ -438,7 +440,7 @@ namespace BudgetTable {
   > extends Omit<BudgetTable.MenuProps<R, M>, "columns" | "apis">,
       BudgetTable.PrimaryGridPassThroughProps<R, M>,
       StandardComponentProps {
-    readonly tableRef: import("react").RefObject<BudgetTable.Ref>;
+    readonly tableRef: import("react").RefObject<BudgetTable.Ref<R, M>>;
     readonly indexColumn?: Partial<Table.Column<R, M>>;
     readonly expandColumn?: Partial<Table.Column<R, M>>;
     readonly loadingBudget?: boolean;

@@ -3,34 +3,37 @@ import { isNil } from "lodash";
 import useModelMenuEditor from "../ModelMenuEditor";
 import ExpandedModelTagCellEditor from "../ExpandedModelTagCellEditor";
 
-export interface ChoiceCellEditorProps<M extends Model.Model> extends Table.CellEditorParams, StandardComponentProps {
-  readonly models: M[];
+export interface ChoiceCellEditorProps<R extends Table.Row, M extends Model.Model, C extends Model.Model>
+  extends Table.CellEditorParams<R, M>,
+    StandardComponentProps {
+  readonly models: C[];
   readonly searchIndices: SearchIndicies;
-  readonly tagProps?: TagProps<M>;
+  readonly tagProps?: TagProps<C>;
 }
 
-interface _ChoiceCellEditorProps<M extends Model.Model> extends ChoiceCellEditorProps<M> {
+interface _ChoiceCellEditorProps<R extends Table.Row, M extends Model.Model, C extends Model.Model>
+  extends ChoiceCellEditorProps<R, M, C> {
   /* eslint-disable react/no-unused-prop-types */
   forwardedRef: any;
 }
 
-const ChoiceCellEditor = <M extends Model.Model>({
+const ChoiceCellEditor = <R extends Table.Row, M extends Model.Model, C extends Model.Model>({
   models,
   searchIndices,
   style,
   tagProps,
   ...props
-}: _ChoiceCellEditorProps<M>) => {
-  const [editor] = useModelMenuEditor<M>(props);
+}: _ChoiceCellEditorProps<R, M, C>) => {
+  const [editor] = useModelMenuEditor<R, M, C>(props);
 
   return (
-    <ExpandedModelTagCellEditor<M>
+    <ExpandedModelTagCellEditor<C>
       className={props.className}
       editor={editor}
       searchIndices={searchIndices}
       style={style}
       selected={!isNil(editor.value) ? editor.value.id : null}
-      onChange={(m: M, e: Table.CellDoneEditingEvent) => editor.onChange(m, e)}
+      onChange={(m: C, e: Table.CellDoneEditingEvent) => editor.onChange(m, e)}
       menuRef={editor.menuRef}
       models={models}
       tagProps={tagProps}

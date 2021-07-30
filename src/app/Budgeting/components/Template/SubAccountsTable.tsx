@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
 
@@ -6,7 +6,8 @@ import { selectTemplateDetail, selectTemplateDetailLoading } from "../../store/s
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
 import FringesModal from "./SubAccount/FringesModal";
 
-interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "manager" | "columns" | "budgetType"> {
+interface SubAccountsTableProps
+  extends Omit<GenericSubAccountsTableProps, "manager" | "columns" | "budgetType" | "tableRef"> {
   detail: Model.Account | Model.SubAccount | undefined;
 }
 
@@ -14,10 +15,12 @@ const SubAccountsTable = ({ detail, ...props }: SubAccountsTableProps): JSX.Elem
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const templateDetail = useSelector(selectTemplateDetail);
   const loadingTemplate = useSelector(selectTemplateDetailLoading);
+  const tableRef = useRef<BudgetTable.Ref<BudgetTable.SubAccountRow, Model.SubAccount>>(null);
 
   return (
     <React.Fragment>
       <GenericSubAccountsTable
+        tableRef={tableRef}
         budgetType={"template"}
         loadingBudget={loadingTemplate}
         columns={[

@@ -1,4 +1,4 @@
-import { useRef, ReactNode } from "react";
+import { ReactNode } from "react";
 import { isNil, includes, find, filter, map } from "lodash";
 import classNames from "classnames";
 
@@ -19,7 +19,7 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericSubAccountsTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.SubAccountRow, Model.SubAccount, Http.SubAccountPayload>,
-    "rowCanExpand" | "tableRef" | "manager" | "levelType"
+    "rowCanExpand" | "manager" | "levelType"
   > {
   exportFileName: string;
   categoryName: "Sub Account" | "Detail";
@@ -53,11 +53,8 @@ const GenericSubAccountsTable = ({
   onEditFringes,
   ...props
 }: GenericSubAccountsTableProps): JSX.Element => {
-  const tableRef = useRef<BudgetTable.Ref>(null);
-
   return (
     <BudgetTableComponent<BudgetTable.SubAccountRow, Model.SubAccount, Http.SubAccountPayload>
-      tableRef={tableRef}
       isCellEditable={(row: BudgetTable.SubAccountRow, colDef: ColDef) => {
         if (includes(["identifier", "description", "name"], colDef.field)) {
           return true;
@@ -109,7 +106,7 @@ const GenericSubAccountsTable = ({
                   defaultChecked: true
                 }))}
                 onChange={(change: FieldCheck) => {
-                  const tableRefObj = tableRef.current;
+                  const tableRefObj = props.tableRef.current;
                   if (!isNil(tableRefObj)) {
                     tableRefObj.setColumnVisibility({ field: change.id, visible: change.checked });
                   }
@@ -135,7 +132,7 @@ const GenericSubAccountsTable = ({
                 buttons={[
                   {
                     onClick: (checks: FieldCheck[]) => {
-                      const tableRefObj = tableRef.current;
+                      const tableRefObj = props.tableRef.current;
                       const fields = map(
                         filter(checks, (field: FieldCheck) => field.checked === true),
                         (field: FieldCheck) => field.id
