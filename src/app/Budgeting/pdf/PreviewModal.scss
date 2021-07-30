@@ -1,40 +1,32 @@
 @import "style/colors";
 
-// Note that this height isn't actually set on the modal - the logic is built
-// around this effectively being a "max-height".  This height is then used to
-// derive all of the PDF dimensions, which are then calculated based on upper
-// limits they have, which then come back to help us calculate the rest of the
-// dimensions.
-$modal-height: 85vh;
+/*
+The dimensioning of this modal is relatively complicated.  However, there is
+one VERY important takeaway:
+
+  *** The dimensions of the PDF document, which must maintain a certain aspect
+      ratio, dictate the dimensions of the rest of the modal's components.
+
+Every other constraint and dimension of the modal is derived from the dimensions
+of the PDF document.  So, in order to build in responsive behavior, we must instead
+adjust the width ot the PDF document appropriately to allow the other components
+to grow or shrink.
+
+Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
+*/
+
+$pdf-canvas-width: 362px;
+$pdf-canvas-height: calc(1 / 0.70749 * #{$pdf-canvas-width});
+
 $modal-header-height: 70px;
 $modal-width: 90vw;
-
-$body-height: calc(#{$modal-height} - #{$modal-header-height});
-
-$inner-body-height: calc(#{$body-height} - 36px); // 36px Padding Bottom
-
-$preview-header-height: 36px;
-$preview-footer-height: 36px;
-
-$previewer-height: min(#{$inner-body-height}, 600px);
-$preview-content-height: calc(#{$previewer-height} - 36px - 36px - 10px);
-$canvas-height: calc(#{$preview-content-height} - 6px);
-// 0.70749 is the Aspect Ratio of an A4 PDF Document
-$canvas-width: calc(0.70749 * #{$canvas-height});
-
-$preview-content-width: calc(#{$canvas-width} + 6px);
-$previewer-width: $preview-content-width;
-$form-container-height: $inner-body-height;
-$form-container-width: calc(#{$modal-width} - 10px - #{$previewer-width});
 
 .export-preview-modal {
   overflow: hidden;
   width: $modal-width !important;
-  max-height: $modal-height !important;
-  // Note: This will not always center the modal vertically, but there is no way to
-  // do so without leaving a bunch of empty space at the bottom of the modal.
-  // It has to assume the max height and center it based on that.
+  $modal-height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 36px + 10px + #{$modal-header-height});
   top: calc(0.5 * calc(100vh - #{$modal-height}));
+  height: $modal-height !important;
 
   .ant-modal-content {
     height: 100%;
@@ -70,11 +62,11 @@ $form-container-width: calc(#{$modal-width} - 10px - #{$previewer-width});
       overflow-x: hidden;
       width: 100%;
       display: flex;
+      height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 36px + 10px) !important;
 
       .form-container {
-        max-height: $form-container-height;
-        width: $form-container-width;
         overflow-y: scroll;
+        flex-grow: 100;
         margin-right: 10px;
         padding-right: 20px;
 
@@ -84,8 +76,8 @@ $form-container-width: calc(#{$modal-width} - 10px - #{$previewer-width});
       }
 
       .previewer {
-        height: $previewer-height;
-        width: $previewer-width;
+        height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 10px) !important;
+        width: calc(#{$pdf-canvas-width} + 6px) !important;
 
         .preview-header {
           height: 36px;
@@ -96,12 +88,12 @@ $form-container-width: calc(#{$modal-width} - 10px - #{$previewer-width});
           padding: 2px;
           border: 1px solid $gray-light;
           margin-bottom: 10px;
-          height: $preview-content-height;
-          width: $preview-content-width;
+          height: calc(#{$pdf-canvas-height} + 6px) !important;
+          width: calc(#{$pdf-canvas-width} + 6px) !important;
 
           .react-pdf__Page__canvas {
-            height: $canvas-height !important;
-            width: $canvas-width !important;
+            height: $pdf-canvas-height !important;
+            width: $pdf-canvas-width !important;
           }
         }
         .preview-footer {
