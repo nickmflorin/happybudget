@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
 import axiosRetry from "axios-retry";
 import Cookies from "universal-cookie";
-import { isNil } from "lodash";
+import { includes, isNil } from "lodash";
 import { addQueryParamsToUrl, convertOrderingQueryToString } from "lib/util/urls";
 import { ClientError, NetworkError, ServerError, ForceLogout, AuthenticationError } from "./errors";
 import { parseAuthError } from "./util";
@@ -41,11 +41,61 @@ instance.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConf
   return config;
 });
 
-export const filterPayload = <T extends { [key: string]: any } = { [key: string]: any }>(payload: T): T => {
-  const newPayload: { [key: string]: any } = {};
+export const evaluatePayloadFilterSettingForField = (field: string, setting: Http.PayloadFilterSetting): boolean => {
+  if (typeof setting === "boolean") {
+    return setting;
+  } else if (Array.isArray(setting)) {
+    return includes(setting, field);
+  } else {
+    return setting === field;
+  }
+};
+
+export const filterPayload = <T extends { [key: string]: any } = { [key: string]: any }>(
+  payload: T,
+  options: Http.RequestOptions
+): T => {
+  let newPayload: { [key: string]: any } = {};
+
+  const handleUndefinedValue = (field: string) => {
+    if (
+      !isNil(options.raiseOnUndefinedValues) &&
+      evaluatePayloadFilterSettingForField(field, options.raiseOnUndefinedValues)
+    ) {
+      throw new Error(`Payload has undefined value for field ${field}.`);
+    } else if (
+      !isNil(options.removeUndefinedValues) &&
+      evaluatePayloadFilterSettingForField(field, options.removeUndefinedValues)
+    ) {
+      newPayload = { ...newPayload };
+    } else {
+      // Default is to convert undefined values to null;
+      newPayload = { ...newPayload, [field]: null };
+    }
+  };
+
+  const handleEmptyValue = (field: string) => {
+    if (!isNil(options.raiseOnEmptyValues) && evaluatePayloadFilterSettingForField(field, options.raiseOnEmptyValues)) {
+      throw new Error(`Payload has empty string value for field ${field}.`);
+    } else if (
+      !isNil(options.removeEmptyValues) &&
+      evaluatePayloadFilterSettingForField(field, options.removeEmptyValues)
+    ) {
+      newPayload = { ...newPayload };
+    } else {
+      // Default is to convert empty values to null;
+      newPayload = { ...newPayload, [field]: null };
+    }
+  };
+
   Object.keys(payload).forEach((key: string) => {
-    if (payload[key] !== undefined) {
-      newPayload[key] = payload[key];
+    const value = payload[key];
+    if (value === undefined) {
+      handleUndefinedValue(key);
+    } else if (typeof value === "string" && value.trim() === "") {
+      handleEmptyValue(key);
+    } else {
+      newPayload[key] = value;
     }
   });
   return newPayload as T;
@@ -196,8 +246,9 @@ export class ApiClient {
     };
     url = this._prepare_url(url, query, method);
     let response: AxiosResponse<T>;
+
     try {
-      response = await lookup[method](url, filterPayload(payload), {
+      response = await lookup[method](url, filterPayload(payload, options), {
         cancelToken: options.cancelToken,
         headers: options.headers
       });

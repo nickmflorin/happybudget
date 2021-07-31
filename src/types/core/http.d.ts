@@ -5,10 +5,16 @@
 namespace Http {
   type Method = "POST" | "PATCH" | "GET" | "DELETE";
 
+  type PayloadFilterSetting = boolean | string | string[];
+
   interface RequestOptions extends AxiosRequestConfig {
-    retries?: number;
-    headers?: { [key: string]: string };
-    cancelToken?: any;
+    readonly retries?: number;
+    readonly headers?: { [key: string]: string };
+    readonly cancelToken?: any;
+    readonly raiseOnUndefinedValues?: PayloadFilterSetting;
+    readonly removeUndefinedValues?: PayloadFilterSetting;
+    readonly raiseOnEmptyValues?: PayloadFilterSetting;
+    readonly removeEmptyValues?: PayloadFilterSetting;
   }
 
   interface Query {
