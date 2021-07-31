@@ -23,7 +23,9 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
-    form.resetFields();
+    if (visible === true) {
+      form.resetFields();
+    }
   }, [visible]);
 
   return (
@@ -34,6 +36,7 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
       okText={"Create"}
       cancelText={"Cancel"}
       loading={loading}
+      getContainer={false}
       onOk={() => {
         form
           .validateFields()

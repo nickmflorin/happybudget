@@ -60,6 +60,7 @@ const CreateBudgetModal = ({
       okText={"Create"}
       okButtonProps={{ disabled: form.loading }}
       cancelText={"Cancel"}
+      getContainer={false}
       onOk={() => {
         form
           .validateFields()

@@ -141,6 +141,7 @@ const PreviewModal = ({ budgetId, visible, filename, onSuccess, onCancel }: Prev
       title={"Export"}
       visible={visible}
       onCancel={() => onCancel()}
+      getContainer={false}
       footer={null}
     >
       <div className={"form-container"}>

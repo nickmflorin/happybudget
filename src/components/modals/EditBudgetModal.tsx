@@ -25,6 +25,7 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
       onCancel={() => onCancel()}
       okText={"Save"}
       cancelText={"Cancel"}
+      getContainer={false}
       okButtonProps={{ disabled: form.loading }}
       onOk={() => {
         form

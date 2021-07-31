@@ -25,6 +25,7 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
       onCancel={() => onCancel()}
       okText={"Save"}
       cancelText={"Cancel"}
+      getContainer={false}
       okButtonProps={{ disabled: form.loading }}
       onOk={() => {
         form

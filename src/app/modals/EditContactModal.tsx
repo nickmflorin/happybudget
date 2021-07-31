@@ -25,7 +25,9 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
-    form.resetFields();
+    if (visible === true) {
+      form.resetFields();
+    }
   }, [visible]);
 
   return (
@@ -36,6 +38,7 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
       okText={"Save"}
       cancelText={"Cancel"}
       loading={loading}
+      getContainer={false}
       onOk={() => {
         form
           .validateFields()

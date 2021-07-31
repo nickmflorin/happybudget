@@ -22,6 +22,7 @@ const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubA
       onCancel={() => onCancel()}
       okText={"Save"}
       cancelText={"Cancel"}
+      getContainer={false}
       okButtonProps={{ disabled: form.loading }}
       onOk={() => {
         form
