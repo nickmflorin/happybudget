@@ -15,15 +15,12 @@ export interface GenericAccountsTableProps
     "groupParams" | "rowCanExpand" | "levelType"
   > {
   exportFileName: string;
-  onGroupRows: (rows: BudgetTable.AccountRow[]) => void;
-  onEditGroup: (group: Model.Group) => void;
   detail: Model.Template | Model.Budget | undefined;
 }
 
 const GenericAccountsTable = ({
   /* eslint-disable indent */
   onGroupRows,
-  onEditGroup,
   exportFileName,
   detail,
   ...props
@@ -31,7 +28,6 @@ const GenericAccountsTable = ({
   return (
     <BudgetTableComponent<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>
       levelType={"budget"}
-      onGroupRows={onGroupRows}
       rowCanExpand={(row: BudgetTable.AccountRow) =>
         !isNil(row.identifier) || (!isNil(row.meta.children) && row.meta.children.length !== 0)
       }
