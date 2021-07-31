@@ -1,4 +1,5 @@
-import { ReactNode, useMemo } from "react";
+import React, { ReactNode, useMemo } from "react";
+import { ShowHide } from "components";
 import WrappedSpinner, { WrappedSpinnerProps } from "./WrappedSpinner";
 
 interface RenderWithSpinnerProps extends WrappedSpinnerProps {
@@ -7,22 +8,27 @@ interface RenderWithSpinnerProps extends WrappedSpinnerProps {
   readonly children: ReactNode | JSX.Element | JSX.Element[];
 }
 
-const RenderWithSpinner = ({ loading, toggleOpacity = false, ...props }: RenderWithSpinnerProps): JSX.Element => {
-  const children = useMemo(() => {
+const RenderWithSpinner = ({
+  loading,
+  children,
+  toggleOpacity = false,
+  ...props
+}: RenderWithSpinnerProps): JSX.Element => {
+  const newChildren = useMemo(() => {
     if (toggleOpacity === true) {
-      return <div style={{ opacity: loading ? 0.3 : 1 }}>{props.children}</div>;
+      return <div style={{ opacity: loading ? 0.3 : 1 }}>{children}</div>;
     }
-    return props.children;
-  }, [props.children, toggleOpacity]);
+    return children;
+  }, [children, toggleOpacity]);
 
-  if (loading === true) {
-    return (
-      <WrappedSpinner {...props} style={{ ...props.style, position: "relative" }}>
-        {children}
-      </WrappedSpinner>
-    );
-  }
-  return <>{children}</>;
+  return (
+    <React.Fragment>
+      <ShowHide show={loading === true}>
+        <WrappedSpinner {...props} />
+      </ShowHide>
+      {newChildren}
+    </React.Fragment>
+  );
 };
 
 export default RenderWithSpinner;
