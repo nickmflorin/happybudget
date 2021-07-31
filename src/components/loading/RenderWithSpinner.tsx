@@ -16,7 +16,11 @@ const RenderWithSpinner = ({ loading, toggleOpacity = false, ...props }: RenderW
   }, [props.children, toggleOpacity]);
 
   if (loading === true) {
-    return <WrappedSpinner {...props}>{children}</WrappedSpinner>;
+    return (
+      <WrappedSpinner {...props} style={{ ...props.style, position: "relative" }}>
+        {children}
+      </WrappedSpinner>
+    );
   }
   return <>{children}</>;
 };
