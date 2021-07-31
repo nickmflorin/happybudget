@@ -222,8 +222,22 @@ const BudgetTable = <
     }
   });
 
-  const IndexColumn = useDynamicCallback<Table.Column<R, M>>(
-    (): Table.Column<R, M> => ({
+  useEffect(() => {
+    if (!isNil(cookies) && !isNil(cookies.ordering)) {
+      const kookies = new Cookies();
+      const cookiesOrdering = kookies.get(cookies.ordering);
+      const validatedOrdering = validateCookiesOrdering(
+        cookiesOrdering,
+        filter(columns, (col: Table.Column<R, M>) => !(col.isCalculated === true))
+      );
+      if (!isNil(validatedOrdering)) {
+        setOrdering(validatedOrdering);
+      }
+    }
+  }, [useDeepEqualMemo(cookies)]);
+
+  useEffect(() => {
+    const IndexColumn = (): Table.Column<R, M> => ({
       ...indexColumn,
       columnType: "action",
       editable: false,
@@ -257,11 +271,9 @@ const BudgetTable = <
         }
         return 1;
       }
-    })
-  );
+    });
 
-  const ExpandColumn = useDynamicCallback<Table.Column<R, M>>(
-    (): Table.Column<R, M> => ({
+    const ExpandColumn = (): Table.Column<R, M> => ({
       width: 30,
       maxWidth: 30,
       ...expandColumn,
@@ -279,11 +291,63 @@ const BudgetTable = <
         rowCanExpand
       },
       cellClass: mergeClassNamesFn("cell--action", "cell--not-editable", "cell--not-selectable", expandColumn.cellClass)
-    })
-  );
+    });
 
-  const IdentifierColumn = useDynamicCallback<Table.Column<R, M>>(
-    (col: Partial<Table.Column<R, M>> & { field: keyof R & string }): Table.Column<R, M> => {
+    const CalculatedColumn = (col: Table.Column<R, M>): Table.Column<R, M> => {
+      return {
+        cellStyle: { textAlign: "right", ...col.cellStyle },
+        ...col,
+        cellRenderer: "CalculatedCell",
+        suppressSizeToFit: true,
+        width: 100,
+        maxWidth: 100,
+        valueFormatter: agCurrencyValueFormatter,
+        cellRendererParams: {
+          ...col.cellRendererParams,
+          renderRedIfNegative: true
+        },
+        cellClass: (params: CellClassParams) => {
+          const row: R = params.node.data;
+          if (
+            row.meta.isBudgetFooter === false &&
+            row.meta.isGroupFooter === false &&
+            row.meta.isTableFooter === false
+          ) {
+            return mergeClassNames(params, "cell--not-editable-highlight", col.cellClass);
+          }
+          return mergeClassNames(params, col.cellClass);
+        }
+      };
+    };
+
+    const UniversalColumn = (col: Table.Column<R, M>): Table.Column<R, M> => {
+      return {
+        ...col,
+        suppressMenu: true,
+        editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
+        cellClass: (params: CellClassParams) => {
+          const row: R = params.node.data;
+          return mergeClassNames(params, cellClass, col.cellClass, {
+            "cell--not-selectable": !_isCellSelectable(row, params.colDef),
+            "cell--not-editable": !_isCellEditable(row, params.colDef)
+          });
+        },
+        cellEditorParams: {
+          ...col.cellEditorParams,
+          budgetType,
+          levelType
+        },
+        cellRendererParams: {
+          ...col.cellRendererParams,
+          budgetType,
+          levelType
+        }
+      };
+    };
+
+    const IdentifierColumn = (
+      col: Partial<Table.Column<R, M>> & { field: GenericTable.Field<R, M> }
+    ): Table.Column<R, M> => {
       return {
         cellRenderer: "IdentifierCell",
         columnType: "number",
@@ -300,7 +364,7 @@ const BudgetTable = <
         colSpan: (params: ColSpanParams) => {
           const row: R = params.data;
           if (row.meta.isGroupFooter === true) {
-            const readColumns = filter(cols, (c: Table.Column<R, M>) => {
+            const readColumns = filter(columns, (c: Table.Column<R, M>) => {
               const fieldBehavior: Table.FieldBehavior[] = c.fieldBehavior || ["read", "write"];
               return includes(fieldBehavior, "read") && c.isCalculated !== true;
             });
@@ -328,100 +392,36 @@ const BudgetTable = <
           return true;
         }
       };
-    }
-  );
-
-  const CalculatedColumn = useDynamicCallback<Table.Column<R, M>>((col: Table.Column<R, M>): Table.Column<R, M> => {
-    return {
-      cellStyle: { textAlign: "right", ...col.cellStyle },
-      ...col,
-      cellRenderer: "CalculatedCell",
-      suppressSizeToFit: true,
-      width: 100,
-      maxWidth: 100,
-      valueFormatter: agCurrencyValueFormatter,
-      cellRendererParams: {
-        ...col.cellRendererParams,
-        renderRedIfNegative: true
-      },
-      cellClass: (params: CellClassParams) => {
-        const row: R = params.node.data;
-        if (row.meta.isBudgetFooter === false && row.meta.isGroupFooter === false && row.meta.isTableFooter === false) {
-          return mergeClassNames(params, "cell--not-editable-highlight", col.cellClass);
-        }
-        return mergeClassNames(params, col.cellClass);
-      }
     };
-  });
 
-  const BodyColumn = useDynamicCallback<Table.Column<R, M>>((col: Table.Column<R, M>): Table.Column<R, M> => {
-    return {
-      ...col,
-      headerComponentParams: {
-        ...col.headerComponentParams,
-        onSort: onSort,
-        ordering
-      },
-      valueSetter: (params: ValueSetterParams) => {
-        // By default, AG Grid treats Backspace clearing the cell as setting the
-        // value to undefined - but we have to set it to the null value associated
-        // with the column.
-        if (params.newValue === undefined) {
-          const column: Table.Column<R, M> | undefined = find(columns, { field: params.column.getColId() } as any);
-          if (!isNil(column)) {
-            params.newValue = column.nullValue === undefined ? null : column.nullValue;
+    const BodyColumn = (col: Table.Column<R, M>): Table.Column<R, M> => {
+      return {
+        ...col,
+        headerComponentParams: {
+          ...col.headerComponentParams,
+          onSort: onSort,
+          ordering
+        },
+        valueSetter: (params: ValueSetterParams) => {
+          // By default, AG Grid treats Backspace clearing the cell as setting the
+          // value to undefined - but we have to set it to the null value associated
+          // with the column.
+          if (params.newValue === undefined) {
+            const column: Table.Column<R, M> | undefined = find(columns, { field: params.column.getColId() } as any);
+            if (!isNil(column)) {
+              params.newValue = column.nullValue === undefined ? null : column.nullValue;
+            }
+            params.newValue = null;
           }
-          params.newValue = null;
+          if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
+            return col.valueSetter(params);
+          }
+          params.data[params.column.getColId()] = params.newValue;
+          return true;
         }
-        if (!isNil(col.valueSetter) && typeof col.valueSetter === "function") {
-          return col.valueSetter(params);
-        }
-        params.data[params.column.getColId()] = params.newValue;
-        return true;
-      }
+      };
     };
-  });
 
-  const UniversalColumn = useDynamicCallback<Table.Column<R, M>>((col: Table.Column<R, M>): Table.Column<R, M> => {
-    return {
-      ...col,
-      suppressMenu: true,
-      editable: (params: EditableCallbackParams) => _isCellEditable(params.node.data as R, params.colDef),
-      cellClass: (params: CellClassParams) => {
-        const row: R = params.node.data;
-        return mergeClassNames(params, cellClass, col.cellClass, {
-          "cell--not-selectable": !_isCellSelectable(row, params.colDef),
-          "cell--not-editable": !_isCellEditable(row, params.colDef)
-        });
-      },
-      cellEditorParams: {
-        ...col.cellEditorParams,
-        budgetType,
-        levelType
-      },
-      cellRendererParams: {
-        ...col.cellRendererParams,
-        budgetType,
-        levelType
-      }
-    };
-  });
-
-  useEffect(() => {
-    if (!isNil(cookies) && !isNil(cookies.ordering)) {
-      const kookies = new Cookies();
-      const cookiesOrdering = kookies.get(cookies.ordering);
-      const validatedOrdering = validateCookiesOrdering(
-        cookiesOrdering,
-        filter(columns, (col: Table.Column<R, M>) => !(col.isCalculated === true))
-      );
-      if (!isNil(validatedOrdering)) {
-        setOrdering(validatedOrdering);
-      }
-    }
-  }, [useDeepEqualMemo(cookies)]);
-
-  useEffect(() => {
     const orderedColumns = orderColumns<Table.Column<R, M>, R, M>(columns);
 
     let cs: Table.Column<R, M>[] = [IndexColumn()];
