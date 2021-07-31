@@ -13,6 +13,8 @@ import { ShowHide } from "components";
 import { Button, IconButton } from "components/buttons";
 import { PortalOrRender } from "components/layout";
 
+import "./BudgetTableMenu.scss";
+
 interface BudgetTableMenuActionProps {
   readonly action: BudgetTable.MenuAction;
 }
@@ -99,8 +101,8 @@ const BudgetTableMenu = <R extends Table.Row, M extends Model.Model>({
 }: BudgetTable.MenuProps<R, M>) => {
   return (
     <PortalOrRender id={"supplementary-header"} portal={!detached}>
-      <div className={classNames("table-header", { detached })}>
-        <div className={"table-header-left"}>
+      <div className={classNames("budget-table-menu", { detached })}>
+        <div className={"budget-table-menu-left"}>
           <Tooltip title={"Select All"} placement={"bottom"}>
             <Checkbox
               onChange={(e: CheckboxChangeEvent) => {
@@ -133,7 +135,7 @@ const BudgetTableMenu = <R extends Table.Row, M extends Model.Model>({
             </div>
           )}
         </div>
-        <div className={"table-header-right"}>
+        <div className={"budget-table-menu-right"}>
           <ShowHide show={!isNil(search)}>
             <Input
               className={"input--small"}

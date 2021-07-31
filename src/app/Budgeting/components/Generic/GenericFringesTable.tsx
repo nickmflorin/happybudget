@@ -93,7 +93,8 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
         {
           field: "name",
           columnType: "text",
-          headerName: "Name"
+          headerName: "Name",
+          width: 120
         },
         {
           field: "color",
@@ -107,7 +108,8 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
         {
           field: "description",
           headerName: "Description",
-          columnType: "longText"
+          columnType: "longText",
+          flex: 100
         },
         {
           field: "rate",
@@ -115,7 +117,8 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
           valueFormatter: agPercentageValueFormatter,
           valueSetter: percentageToDecimalValueSetter<BudgetTable.FringeRow>("rate"),
           columnType: "percentage",
-          isCalculating: true
+          isCalculating: true,
+          width: 100
         },
         {
           field: "unit",
@@ -155,7 +158,8 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
           field: "cutoff",
           headerName: "Cutoff",
           columnType: "number",
-          isCalculating: true
+          isCalculating: true,
+          width: 100
         }
       ]}
       {...props}

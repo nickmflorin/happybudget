@@ -37,7 +37,7 @@ import { getKeyValue } from "lib/util";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { getGroupColorDefinition, consolidateTableChange, createTableData } from "lib/model/util";
 import { rangeSelectionIsSingleCell } from "../util";
-import BudgetTableMenu from "./Menu";
+import BudgetTableMenu from "./BudgetTableMenu";
 import Grid from "./Grid";
 
 const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({

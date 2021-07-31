@@ -1,0 +1,41 @@
+.budget-table-menu {
+  display: flex;
+  // This will align the checkbox in the header with the checkboxes in the
+  // rows vertically.
+  padding-left: 2px;
+  height: 30px;
+
+  &.detached {
+    margin-bottom: 10px;
+  }
+
+  .ant-checkbox-wrapper {
+    .ant-checkbox {
+      padding: 7px;
+      padding-left: 0px;
+      .ant-checkbox-inner {
+        top: 0.05rem;
+      }
+    }
+  }
+  .toolbar-buttons {
+    display: flex;
+    margin-right: 8px;
+  }
+
+  .btn--caret {
+    &:not(:last-child) {
+      margin-right: 14px;
+    }
+  }
+
+  .budget-table-menu-left {
+    display: flex;
+    flex-grow: 100;
+  }
+  .budget-table-menu-right {
+    display: flex;
+    min-width: 300px;
+    max-width: 500px;
+  }
+}

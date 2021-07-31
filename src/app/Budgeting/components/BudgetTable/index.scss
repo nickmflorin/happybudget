@@ -1,47 +1,12 @@
 @import "style/colors";
 @import "style/typography";
 
-.table-header {
-  display: flex;
-  // This will align the checkbox in the header with the checkboxes in the
-  // rows vertically.
-  padding-left: 2px;
-  height: 30px;
-
-  &.detached {
-    margin-bottom: 10px;
-  }
-
-  .ant-checkbox-wrapper {
-    .ant-checkbox {
-      padding: 7px;
-      padding-left: 0px;
-      .ant-checkbox-inner {
-        top: 0.05rem;
-      }
-    }
-  }
-  .toolbar-buttons {
-    display: flex;
-    margin-right: 8px;
-  }
-
-  .btn--caret {
-    &:not(:last-child) {
-      margin-right: 14px;
-    }
-  }
-
-  .table-header-left {
-    display: flex;
-    flex-grow: 100;
-  }
-  .table-header-right {
-    display: flex;
-    min-width: 300px;
-    max-width: 500px;
-  }
-}
+// 30px for the Header Height and 10px Margin Below
+$detached-header-height: calc(30px + 10px);
+$table-footer-grid-height: 40px;
+$budget-footer-grid-height: 30px;
+$budget-footer-grid-margin: 10px;
+$budget-footer-grid-height-plus-margin: calc(#{$budget-footer-grid-height} + #{$budget-footer-grid-margin});
 
 .budget-table {
   display: flex;
@@ -53,11 +18,12 @@
   // the bottom page between the bottom of the table and the end of the page.
   height: calc(100vh - 90px - 10px);
 
-  .core-grid-wrapper {
-    max-height: calc(100vh - 90px - 10px - 40px);
+  .core-table {
+    overflow-y: hidden;
 
     .table-grid {
-      max-height: calc(100vh - 90px - 10px - 40px - 40px);
+      max-height: calc(100vh - 90px - 10px - #{$table-footer-grid-height});
+
       position: relative;
       overflow-y: hidden;
       display: flex;
@@ -99,18 +65,38 @@
         border-bottom-right-radius: 8px;
       }
     }
+
+    &.with-budget-footer {
+      .table-grid {
+        max-height: calc(
+          100vh - 90px - 10px - #{$table-footer-grid-height} - #{$budget-footer-grid-height-plus-margin}
+        );
+      }
+    }
+    &.with-detached-header {
+      .table-grid {
+        max-height: calc(100vh - 90px - 10px - #{$detached-header-height} - #{$table-footer-grid-height});
+      }
+      &.with-budget-footer {
+        .table-grid {
+          max-height: calc(
+            100vh - 90px - 10px - #{$table-footer-grid-height} - #{$budget-footer-grid-height-plus-margin} - #{$detached-header-height}
+          );
+        }
+      }
+    }
   }
 
   .budget-footer-grid-wrapper {
     flex-grow: 100;
     display: flex;
     flex-direction: column;
-    min-height: 40px;
+    min-height: $budget-footer-grid-height-plus-margin;
 
     .budget-footer-grid {
       flex: none;
-      height: 30px;
-      margin-top: 10px;
+      height: $budget-footer-grid-height;
+      margin-top: $budget-footer-grid-margin;
       .ag-body-viewport {
         border-radius: 8px;
       }

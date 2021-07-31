@@ -515,7 +515,12 @@ const BudgetTable = <
   return (
     <WrapInApplicationSpinner hideWhileLoading={false} loading={loading}>
       <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
-        <div className={"core-grid-wrapper"}>
+        <div
+          className={classNames("core-table", {
+            "with-budget-footer": showBudgetFooterGrid,
+            "with-detached-header": props.detached
+          })}
+        >
           <PrimaryGrid<R, M>
             apis={apis.primary}
             gridRef={gridRef}
