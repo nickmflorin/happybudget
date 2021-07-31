@@ -1065,6 +1065,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           getRowClass={getRowClass}
           getRowStyle={getRowStyle}
           rowSelection={"multiple"}
+          domLayout={"autoHeight"}
           immutableData={true}
           getRowNodeId={(r: any) => r.id}
           onGridReady={onGridReady}
@@ -1093,10 +1094,8 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
               )
             ) {
               const nodes: RowNode[] = [];
-
               const firstRow = e.api.getFirstDisplayedRow();
               const lastRow = e.api.getLastDisplayedRow();
-
               e.api.forEachNodeAfterFilter((node: RowNode, index: number) => {
                 if (index >= firstRow && index <= lastRow) {
                   const row: R = node.data;

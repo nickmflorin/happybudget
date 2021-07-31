@@ -515,37 +515,44 @@ const BudgetTable = <
   return (
     <WrapInApplicationSpinner hideWhileLoading={false} loading={loading}>
       <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
-        <PrimaryGrid<R, M>
-          apis={apis.primary}
-          gridRef={gridRef}
-          onGridReady={(e: GridReadyEvent) => onGridReady("primary", { grid: e.api, column: e.columnApi })}
-          onFirstDataRendered={onFirstDataRendered}
-          columns={cols}
-          options={gridOptions.primary}
-          ordering={ordering}
-          isCellEditable={_isCellEditable}
-          onRowExpand={onRowExpand}
-          rowCanExpand={rowCanExpand}
-          onChangeEvent={onChangeEvent}
-          {...props}
-        />
-        <TableFooterGrid<R, M>
-          apis={apis.tableFooter}
-          onGridReady={(e: GridReadyEvent) => onGridReady("tableFooter", { grid: e.api, column: e.columnApi })}
-          onFirstDataRendered={onFirstDataRendered}
-          options={gridOptions.tableFooter}
-          columns={cols}
-          loadingParent={loadingParent}
-        />
-        <ShowHide show={showBudgetFooterGrid}>
-          <BudgetFooterGrid<R, M>
-            apis={apis.budgetFooter}
-            onGridReady={(e: GridReadyEvent) => onGridReady("budgetFooter", { grid: e.api, column: e.columnApi })}
+        <div className={"core-grid-wrapper"}>
+          {/* <div className={"table-grid"}> */}
+          <PrimaryGrid<R, M>
+            apis={apis.primary}
+            gridRef={gridRef}
+            onGridReady={(e: GridReadyEvent) => onGridReady("primary", { grid: e.api, column: e.columnApi })}
             onFirstDataRendered={onFirstDataRendered}
-            options={gridOptions.budgetFooter}
             columns={cols}
-            loadingBudget={loadingBudget}
+            options={gridOptions.primary}
+            ordering={ordering}
+            isCellEditable={_isCellEditable}
+            onRowExpand={onRowExpand}
+            rowCanExpand={rowCanExpand}
+            onChangeEvent={onChangeEvent}
+            {...props}
           />
+          {/* </div> */}
+          <TableFooterGrid<R, M>
+            apis={apis.tableFooter}
+            onGridReady={(e: GridReadyEvent) => onGridReady("tableFooter", { grid: e.api, column: e.columnApi })}
+            onFirstDataRendered={onFirstDataRendered}
+            options={gridOptions.tableFooter}
+            columns={cols}
+            loadingParent={loadingParent}
+          />
+        </div>
+        <ShowHide show={showBudgetFooterGrid}>
+          <div className={"budget-footer-grid-wrapper"}>
+            <div style={{ flexGrow: 100 }}></div>
+            <BudgetFooterGrid<R, M>
+              apis={apis.budgetFooter}
+              onGridReady={(e: GridReadyEvent) => onGridReady("budgetFooter", { grid: e.api, column: e.columnApi })}
+              onFirstDataRendered={onFirstDataRendered}
+              options={gridOptions.budgetFooter}
+              columns={cols}
+              loadingBudget={loadingBudget}
+            />
+          </div>
         </ShowHide>
       </div>
     </WrapInApplicationSpinner>

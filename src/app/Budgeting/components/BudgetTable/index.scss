@@ -53,38 +53,67 @@
   // the bottom page between the bottom of the table and the end of the page.
   height: calc(100vh - 90px - 10px);
 
-  .table-grid {
-    flex: 1 1 auto;
-    height: 100%; // Required to render correctly in Safari.
+  .core-grid-wrapper {
+    max-height: calc(100vh - 90px - 10px - 40px);
 
-    .ag-row:last-child {
-      border-bottom: none !important;
+    .table-grid {
+      max-height: calc(100vh - 90px - 10px - 40px - 40px);
+      position: relative;
+      overflow-y: hidden;
+      display: flex;
+      flex-direction: column;
+
+      > * {
+        overflow-y: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .ag-root-wrapper-body {
+        &.ag-layout-auto-height {
+          overflow-y: hidden;
+        }
+      }
+      .ag-body-viewport {
+        overflow-y: scroll !important;
+      }
+
+      .ag-row:last-child {
+        border-bottom: none !important;
+      }
+      div[role="gridcell"].unit-cell {
+        // This padding is an attempt to vertically align the tag in the cell.  It
+        // is not the best way, since the height of the cell can cause the vertical
+        // alignment to become skewed.  We should figure out the right way to do this.
+        padding-top: 6px;
+        padding-bottom: 6px;
+      }
     }
-    div[role="gridcell"].unit-cell {
-      // This padding is an attempt to vertically align the tag in the cell.  It
-      // is not the best way, since the height of the cell can cause the vertical
-      // alignment to become skewed.  We should figure out the right way to do this.
-      padding-top: 6px;
-      padding-bottom: 6px;
+
+    .table-footer-grid {
+      flex: none;
+      height: 40px;
+      margin-top: 0px;
+      .ag-body-viewport {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
     }
   }
 
-  .table-footer-grid {
-    flex: none;
-    height: 44px;
-    margin-top: 0px;
-    .ag-body-viewport {
-      border-bottom-left-radius: 8px;
-      border-bottom-right-radius: 8px;
-    }
-  }
+  .budget-footer-grid-wrapper {
+    flex-grow: 100;
+    display: flex;
+    flex-direction: column;
+    min-height: 40px;
 
-  .budget-footer-grid {
-    flex: none;
-    height: 30px;
-    margin-top: 10px;
-    .ag-body-viewport {
-      border-radius: 8px;
+    .budget-footer-grid {
+      flex: none;
+      height: 30px;
+      margin-top: 10px;
+      .ag-body-viewport {
+        border-radius: 8px;
+      }
     }
   }
 
