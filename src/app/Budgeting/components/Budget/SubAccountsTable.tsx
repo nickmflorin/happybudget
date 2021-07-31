@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 
@@ -14,8 +14,7 @@ import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generi
 
 type PreContactCreate = Omit<Table.CellChange<BudgetTable.SubAccountRow, Model.SubAccount>, "newValue">;
 
-interface SubAccountsTableProps
-  extends Omit<GenericSubAccountsTableProps, "manager" | "columns" | "budgetType" | "tableRef"> {
+interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "manager" | "columns" | "budgetType"> {
   readonly detail: Model.Account | Model.SubAccount | undefined;
   readonly loadingParent: boolean;
 }
@@ -30,13 +29,10 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
   const budgetDetail = useSelector(selectBudgetDetail);
   const loadingBudget = useSelector(selectBudgetDetailLoading);
 
-  const tableRef = useRef<BudgetTable.Ref<BudgetTable.SubAccountRow, Model.SubAccount>>(null);
-
   return (
     <React.Fragment>
       <GenericSubAccountsTable
         budgetType={"budget"}
-        tableRef={tableRef}
         loadingBudget={loadingBudget}
         loadingParent={loadingParent}
         onCellFocusChanged={(params: Table.CellFocusChangedParams<BudgetTable.SubAccountRow, Model.SubAccount>) => {
@@ -181,8 +177,8 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
               ...preContactCreate,
               newValue: contact.id
             };
-            if (!isNil(tableRef.current)) {
-              tableRef.current.applyTableChange({
+            if (!isNil(props.tableRef.current)) {
+              props.tableRef.current.applyTableChange({
                 type: "dataChange",
                 payload: cellChange
               });

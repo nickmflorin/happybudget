@@ -5,14 +5,14 @@ import { GroupForm } from "components/forms";
 
 import Modal from "./Modal";
 
-interface EditSubAccountGroupModalProps {
+interface EditGroupModalProps {
   onSuccess: (group: Model.Group) => void;
   onCancel: () => void;
   group: Model.Group;
   open: boolean;
 }
 
-const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubAccountGroupModalProps): JSX.Element => {
+const EditGroupModal = ({ group, open, onSuccess, onCancel }: EditGroupModalProps): JSX.Element => {
   const [form] = Form.useForm<Http.GroupPayload>({ isInModal: true });
 
   return (
@@ -52,4 +52,4 @@ const EditSubAccountGroupModal = ({ group, open, onSuccess, onCancel }: EditSubA
   );
 };
 
-export default EditSubAccountGroupModal;
+export default EditGroupModal;

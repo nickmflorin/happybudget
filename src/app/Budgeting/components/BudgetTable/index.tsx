@@ -483,6 +483,12 @@ const BudgetTable = <
   useImperativeHandle(tableRef, () => ({
     setColumnVisibility,
     changeColumnVisibility,
+    applyGroupColorChange: (group: Model.Group) => {
+      const primaryGridRefObj = gridRef.current;
+      if (!isNil(primaryGridRefObj)) {
+        primaryGridRefObj.applyGroupColorChange(group);
+      }
+    },
     applyTableChange: (event: Table.ChangeEvent<R, M>) => {
       const primaryGridRefObj = gridRef.current;
       if (!isNil(primaryGridRefObj)) {

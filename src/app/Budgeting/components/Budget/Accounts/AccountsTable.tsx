@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
@@ -40,9 +40,12 @@ const AccountsTable = (): JSX.Element => {
   const groups = useSelector(selectGroups);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
 
+  const tableRef = useRef<BudgetTable.Ref<BudgetTable.AccountRow, Model.Account>>(null);
+
   return (
     <React.Fragment>
       <GenericAccountsTable
+        tableRef={tableRef}
         budgetType={"budget"}
         data={data}
         groups={groups}
@@ -125,6 +128,9 @@ const AccountsTable = (): JSX.Element => {
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
+            if (group.color !== groupToEdit.color && !isNil(tableRef.current)) {
+              tableRef.current.applyGroupColorChange(group);
+            }
           }}
         />
       )}

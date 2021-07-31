@@ -1,4 +1,4 @@
-import { useRef, ReactNode } from "react";
+import { ReactNode } from "react";
 import { isNil, map, filter } from "lodash";
 
 import { faSigma, faPercentage, faTrashAlt, faLineColumns, faFileCsv } from "@fortawesome/pro-solid-svg-icons";
@@ -12,7 +12,7 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericAccountsTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>,
-    "groupParams" | "rowCanExpand" | "tableRef" | "manager" | "levelType"
+    "groupParams" | "rowCanExpand" | "levelType"
   > {
   exportFileName: string;
   onGroupRows: (rows: BudgetTable.AccountRow[]) => void;
@@ -28,12 +28,9 @@ const GenericAccountsTable = ({
   detail,
   ...props
 }: GenericAccountsTableProps): JSX.Element => {
-  const tableRef = useRef<BudgetTable.Ref<BudgetTable.AccountRow, Model.Account>>(null);
-
   return (
     <BudgetTableComponent<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>
       levelType={"budget"}
-      tableRef={tableRef}
       onGroupRows={onGroupRows}
       rowCanExpand={(row: BudgetTable.AccountRow) =>
         !isNil(row.identifier) || (!isNil(row.meta.children) && row.meta.children.length !== 0)
@@ -78,7 +75,7 @@ const GenericAccountsTable = ({
                   defaultChecked: true
                 }))}
                 onChange={(change: FieldCheck) => {
-                  const tableRefObj = tableRef.current;
+                  const tableRefObj = props.tableRef.current;
                   if (!isNil(tableRefObj)) {
                     tableRefObj.setColumnVisibility({ field: change.id, visible: change.checked });
                   }
@@ -104,7 +101,7 @@ const GenericAccountsTable = ({
                 buttons={[
                   {
                     onClick: (checks: FieldCheck[]) => {
-                      const tableRefObj = tableRef.current;
+                      const tableRefObj = props.tableRef.current;
                       const fields = map(
                         filter(checks, (field: FieldCheck) => field.checked === true),
                         (field: FieldCheck) => field.id

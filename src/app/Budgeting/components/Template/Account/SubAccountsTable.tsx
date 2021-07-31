@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
@@ -51,9 +51,12 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
   const fringes = useSelector(selectFringes);
   const subAccountUnits = useSelector(selectSubAccountUnits);
 
+  const tableRef = useRef<BudgetTable.Ref<BudgetTable.SubAccountRow, Model.SubAccount>>(null);
+
   return (
     <React.Fragment>
       <TemplateSubAccountsTable
+        tableRef={tableRef}
         levelType={"account"}
         data={data}
         groups={groups}
@@ -108,6 +111,9 @@ const SubAccountsTable = ({ accountId }: SubAccountsTableProps): JSX.Element => 
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
+            if (group.color !== groupToEdit.color && !isNil(tableRef.current)) {
+              tableRef.current.applyGroupColorChange(group);
+            }
           }}
         />
       )}

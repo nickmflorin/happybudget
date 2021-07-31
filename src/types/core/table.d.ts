@@ -416,6 +416,7 @@ namespace BudgetTable {
 
   interface PrimaryGridRef<R extends Table.Row, M extends Model.Model> {
     readonly applyTableChange: (event: Table.ChangeEvent<R, M>) => void;
+    readonly applyGroupColorChange: (group: Model.Group) => void;
     readonly getCSVData: (fields?: string[]) => CSVData;
   }
 

@@ -945,6 +945,14 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
 
   useImperativeHandle(gridRef, () => ({
     applyTableChange: (event: Table.ChangeEvent<R, M>) => _onChangeEvent(event),
+    applyGroupColorChange: (group: Model.Group) => {
+      if (!isNil(apis)) {
+        const node: RowNode | null = apis.grid.getRowNode(`group-${group.id}`);
+        if (!isNil(node)) {
+          apis.grid.redrawRows({ rowNodes: [node] });
+        }
+      }
+    },
     getCSVData: (fields?: string[]) => {
       if (!isNil(apis)) {
         const cs: Table.Column<R, M>[] = filter(
