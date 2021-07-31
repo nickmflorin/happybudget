@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil, map } from "lodash";
 
-import { DEFAULT_TAG_COLOR_SCHEME, DEFAULT_TAG_COLOR, DEFAULT_TAG_TEXT_COLOR } from "config";
+import { DEFAULT_TAG_COLOR_SCHEME, Colors } from "style/constants";
 
 import { selectConsistent, getKeyValue } from "lib/util";
 import { contrastedForegroundColor } from "lib/util/colors";
@@ -94,11 +94,11 @@ const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties
   const tagColor = useMemo((): string => {
     const validateAndReturnColor = (color: string | null | undefined, field: string): string => {
       if (isNil(color)) {
-        return DEFAULT_TAG_COLOR;
+        return Colors.DEFAULT_TAG_BACKGROUND;
       } else if (typeof color !== "string") {
         /* eslint-disable no-console */
         console.error(`The field ${field} did not return a string color.`);
-        return DEFAULT_TAG_COLOR;
+        return Colors.DEFAULT_TAG_BACKGROUND;
       }
       if (!color.startsWith("#")) {
         color = `#${color}`;
@@ -106,7 +106,7 @@ const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties
       if (color.length !== 7) {
         /* eslint-disable no-console */
         console.error(`The field ${field} did not return a valid HEX string color.`);
-        return DEFAULT_TAG_COLOR;
+        return Colors.DEFAULT_TAG_BACKGROUND;
       }
       return color;
     };
@@ -121,7 +121,7 @@ const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties
       } else if (typeof m.id === "number" && !isNil(colorScheme[m.id])) {
         return colorScheme[m.id];
       }
-      return "";
+      return Colors.DEFAULT_TAG_BACKGROUND;
     };
     if (!isNil(props.color)) {
       return validateAndReturnColor(props.color, "color");
@@ -133,7 +133,7 @@ const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties
       if (!isNil(colorScheme[props.colorIndex])) {
         return colorScheme[props.colorIndex];
       }
-      return DEFAULT_TAG_COLOR;
+      return Colors.DEFAULT_TAG_BACKGROUND;
     }
     return selectConsistent(colorScheme, tagText as string);
   }, [props]);
@@ -149,8 +149,8 @@ const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties
     return {
       className: props.className,
       uppercase: props.uppercase || false,
-      color: (tagColor as string) || DEFAULT_TAG_COLOR,
-      textColor: tagTextColor || DEFAULT_TAG_TEXT_COLOR,
+      color: tagColor,
+      textColor: tagTextColor,
       text: tagText as string,
       fillWidth: props.fillWidth || false,
       style: props.style,

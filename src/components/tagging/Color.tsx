@@ -6,6 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle } from "@fortawesome/pro-solid-svg-icons";
 import { faCircle as faCircleOpen } from "@fortawesome/pro-light-svg-icons";
 
+import { Colors } from "style/constants";
+
 interface ColorProps extends StandardComponentProps {
   color?: string | null | undefined;
   selected?: boolean;
@@ -26,7 +28,7 @@ const Color = ({ color, selected, className, noValueColor, onClick, style = {} }
           <FontAwesomeIcon icon={faCircle} style={{ color }} />
         </React.Fragment>
       ) : (
-        <FontAwesomeIcon icon={faCircleOpen} style={{ color: noValueColor || "#585858" }} />
+        <FontAwesomeIcon icon={faCircleOpen} style={{ color: noValueColor || Colors.COLOR_NO_COLOR }} />
       )}
     </div>
   );

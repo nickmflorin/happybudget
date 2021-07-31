@@ -799,7 +799,6 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
         label: !isNil(getModelLabel) ? getModelLabel(m) : m.id
       })
     });
-
     setTable(
       reduce(
         tableData,

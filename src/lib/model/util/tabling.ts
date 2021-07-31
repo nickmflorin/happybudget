@@ -2,6 +2,8 @@ import React from "react";
 import { groupBy, isNil, reduce, find, forEach, includes, filter, map, orderBy } from "lodash";
 import { ColDef } from "@ag-grid-community/core";
 
+import { Colors } from "style/constants";
+
 import * as models from "lib/model";
 import { getKeyValue } from "lib/util";
 import { contrastedForegroundColor } from "lib/util/colors";
@@ -27,7 +29,10 @@ export const getGroupColorDefinition = (group: Model.Group): GenericTable.RowCol
       };
     }
   }
-  return {};
+  return {
+    backgroundColor: Colors.DEFAULT_GROUP_ROW_BACKGROUND,
+    color: contrastedForegroundColor(Colors.DEFAULT_GROUP_ROW_BACKGROUND)
+  };
 };
 
 type ColumnTypeVariantOptions = {
