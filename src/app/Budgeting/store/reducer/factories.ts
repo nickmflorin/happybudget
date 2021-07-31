@@ -171,15 +171,24 @@ export const createFringesReducer = (
         // Eventually, we will want to implement this - so we do not have to rely on waiting
         // for the response of the API request.
       } else if (typeguards.isRowDeleteEvent(e)) {
-        const ids = Array.isArray(e.payload) ? e.payload : [e.payload];
-        for (let i = 0; i < ids.length; i++) {
-          newState = {
-            ...newState,
-            /* eslint-disable no-loop-func */
-            data: filter(newState.data, (m: Model.Fringe) => m.id !== ids[i]),
-            count: newState.count - 1
-          };
-        }
+        const ids: number[] = Array.isArray(e.payload.rows)
+          ? map(e.payload.rows, (row: BudgetTable.FringeRow) => row.id)
+          : [e.payload.rows.id];
+        newState = reduce(
+          ids,
+          (st: Redux.ModelListResponseStore<Model.Fringe>, id: number): Redux.ModelListResponseStore<Model.Fringe> => {
+            const model: Model.Fringe | null = modelFromState<Model.Fringe>(action, st.data, id);
+            if (!isNil(model)) {
+              return {
+                ...st,
+                data: filter(newState.data, (m: Model.Fringe) => m.id !== id),
+                count: newState.count - 1
+              };
+            }
+            return st;
+          },
+          newState
+        );
       }
     }
     return newState;
