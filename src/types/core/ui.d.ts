@@ -309,3 +309,11 @@ interface ClickableProps extends StandardComponentProps {
   readonly tooltip?: Partial<TooltipPropsWithTitle>;
   readonly icon?: ReactNode;
 }
+
+type HeaderTemplateFormData = {
+  readonly header: RichText.Block[] | null;
+  readonly left_image: UploadedImage | SavedImage | null;
+  readonly left_info: RichText.Block[] | null;
+  readonly right_image: UploadedImage | SavedImage | null;
+  readonly right_info: RichText.Block[] | null;
+};

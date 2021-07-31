@@ -16,6 +16,16 @@ const ActionType = {
     Response: "budget.Response",
     Request: "budget.Request",
     UpdateInState: "budget.UpdateInState",
+    HeaderTemplates: {
+      Loading: "budget.headertemplates.Loading",
+      LoadingDetail: "budget.headertemplates.LoadingDetail",
+      Request: "budget.headertemplates.Request",
+      Response: "budget.headertemplates.Response",
+      AddToState: "budget.headertemplates.AddToState",
+      Load: "budget.headertemplates.Load",
+      Display: "budget.headertemplates.Display",
+      Clear: "budget.headertemplates.Clear"
+    },
     Comments: {
       Loading: "budget.comments.Loading",
       Response: "budget.comments.Response",

@@ -292,4 +292,17 @@ namespace Model {
   interface CreateEvent extends Model.PolymorphicEvent {}
 
   type HistoryEvent = Model.FieldAlterationEvent | Model.CreateEvent;
+
+  interface SimpleHeaderTemplate extends Model.TimestampTrackedModel {
+    readonly id: number;
+    readonly name: string;
+  }
+
+  interface HeaderTemplate extends Model.SimpleHeaderTemplate {
+    readonly header: RichText.Block[] | null;
+    readonly left_image: SavedImage | null;
+    readonly left_info: RichText.Block[] | null;
+    readonly right_image: SavedImage | null;
+    readonly right_info: RichText.Block[] | null;
+  }
 }

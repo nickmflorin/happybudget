@@ -3,4 +3,4 @@ export { default as UserProfileForm } from "./UserProfileForm";
 export { default as GroupForm } from "./GroupForm";
 export { default as BudgetForm } from "./BudgetForm";
 export { default as TemplateForm } from "./TemplateForm";
-export { default as ExportForm } from "./ExportForm";
+export { default as ExportPdfForm } from "./ExportPdfForm";

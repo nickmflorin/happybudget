@@ -1,37 +1,50 @@
 import { useState } from "react";
 import { Page } from "react-pdf/dist/esm/entry.webpack";
-import classNames from "classnames";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRedo } from "@fortawesome/free-solid-svg-icons";
 
 import { Pagination } from "antd";
 
+import { Form } from "components";
 import { Button } from "components/buttons";
 import { RenderDocument } from "components/pdf";
 
 interface PreviewerProps {
+  readonly autoRenderPdf?: boolean;
   readonly file?: string | ArrayBuffer | null;
   readonly loading?: boolean;
   readonly onExport: () => void;
+  readonly onRefresh: () => void;
   readonly exportDisabled?: boolean;
 }
 
-const Previewer = ({ file, loading, onExport, exportDisabled }: PreviewerProps): JSX.Element => {
+const Previewer = ({
+  file,
+  loading,
+  onExport,
+  onRefresh,
+  exportDisabled,
+  autoRenderPdf
+}: PreviewerProps): JSX.Element => {
   const [numPages, setNumPages] = useState(0);
   const [page, setPage] = useState(1);
 
   return (
     <div className={"previewer"}>
       <div className={"preview-header"}>
-        <Button
-          className={classNames("btn--refresh-pdf", loading ? "loading" : "")}
-          onClick={() => console.log("test")}
-          disabled={loading}
-          icon={<FontAwesomeIcon icon={faRedo} />}
-        >
-          {"Refresh Preview"}
-        </Button>
+        {autoRenderPdf === true ? (
+          <Form.Label>{"Preview"}</Form.Label>
+        ) : (
+          <Button
+            className={"btn--bare"}
+            onClick={() => onRefresh()}
+            disabled={loading}
+            icon={<FontAwesomeIcon icon={faRedo} />}
+          >
+            {"Refresh"}
+          </Button>
+        )}
       </div>
       <div className={"preview-content"}>
         <RenderDocument

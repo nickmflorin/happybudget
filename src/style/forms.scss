@@ -130,15 +130,16 @@ form {
           }
         }
       }
-      // Alerts/feedback that go underneath the form control.
-      .ant-form-item-explain {
-        min-height: 12px;
-        div[role="alert"] {
-          margin-top: 5px;
-          font-size: 11px;
-          line-height: 12px;
-          margin-left: 5px;
-        }
+    }
+
+    // Alerts/feedback that go underneath the form control.
+    .ant-form-item-explain {
+      min-height: 12px;
+      div[role="alert"] {
+        margin-top: 5px;
+        font-size: 11px;
+        line-height: 12px;
+        margin-left: 5px;
       }
     }
 
@@ -198,6 +199,13 @@ label,
   .label {
     @extend .label-base;
     margin-bottom: 2px;
+
+    &::after {
+      content: "" !important;
+      position: relative;
+      top: -0.5px;
+      margin: 0 8px 0 2px;
+    }
 
     &--section {
       margin-bottom: 8px;

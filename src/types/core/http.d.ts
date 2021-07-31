@@ -28,8 +28,10 @@ namespace Http {
     readonly search?: string;
   }
 
+  type NonModelPayloadFields = "created_at" | "updated_at" | "created_by" | "updated_by" | "id";
+
   type ModelPayload<M extends Model.Model> = {
-    [key in keyof Omit<M, "id">]?: any;
+    [key in keyof Omit<M, NonModelPayloadFields>]: M[key];
   };
 
   interface ListResponse<T> {
@@ -159,6 +161,11 @@ namespace Http {
   interface CommentPayload {
     readonly likes?: number[];
     readonly text: string;
+  }
+
+  interface HeaderTemplatePayload extends Http.ModelPayload<Model.HeaderTemplate> {
+    readonly left_image?: string | ArrayBuffer | null;
+    readonly right_image?: string | ArrayBuffer | null;
   }
 
   interface ContactPayload {

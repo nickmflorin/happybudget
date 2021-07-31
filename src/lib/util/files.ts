@@ -18,6 +18,21 @@ export const getBase64 = (file: File | Blob): Promise<string | ArrayBuffer> =>
     reader.onerror = error => reject(error);
   });
 
+export const getBase64FromUrl = (url: string): Promise<string | ArrayBuffer> =>
+  new Promise((resolve, reject) => {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      var reader = new FileReader();
+      reader.readAsDataURL(xhr.response);
+      reader.onload = () =>
+        reader.result === null ? reject("Could not determine base64 encoding from URL.") : resolve(reader.result);
+      reader.onerror = error => reject(error);
+    };
+    xhr.open("GET", url);
+    xhr.responseType = "blob";
+    xhr.send();
+  });
+
 export const base64ToArrayBuffer = (base64: string): Uint8Array => {
   const binaryString = window.atob(base64);
   const binaryLen = binaryString.length;

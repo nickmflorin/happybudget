@@ -46,6 +46,11 @@ namespace Modules {
   }
 
   namespace Budget {
+    interface HeaderTemplatesStore extends Redux.ModelListResponseStore<Model.HeaderTemplate> {
+      readonly displayedTemplate: Model.HeaderTemplate | null;
+      readonly loadingDetail: boolean;
+    }
+
     interface CommentsStore extends Redux.ModelListResponseStore<Model.Comment> {
       readonly replying: number[];
     }
@@ -79,6 +84,7 @@ namespace Modules {
       readonly account: AccountStore;
       readonly budget: BudgetStore<M>;
       // Not applicable for templates.
+      readonly headerTemplates: HeaderTemplatesStore;
       readonly commentsHistoryDrawerOpen: boolean;
       readonly subAccountsTree: Redux.ModelListResponseStore<Model.SubAccountTreeNode>;
       readonly actuals: Redux.ModelListResponseStore<Model.Actual>;

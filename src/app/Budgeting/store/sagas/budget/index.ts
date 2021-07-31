@@ -15,6 +15,7 @@ import accountSaga from "./account";
 import accountsSaga from "./accounts";
 import actualsSaga from "./actuals";
 import subAccountSaga from "./subAccount";
+import pdfSaga from "./pdf";
 
 export function* handleBudgetChangedTask(action: Redux.Action<number>): SagaIterator {
   // TODO: Maybe we should not call getFringeColorsTask whenever the template/budget changes but
@@ -27,7 +28,7 @@ export function* handleBudgetChangedTask(action: Redux.Action<number>): SagaIter
   ]);
 }
 
-export function* getBudgetTask(): SagaIterator {
+function* getBudgetTask(): SagaIterator {
   const budgetId = yield select((state: Modules.ApplicationStore) => state.budget.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
@@ -79,4 +80,5 @@ export default function* rootSaga(): SagaIterator {
   yield spawn(accountsSaga);
   yield spawn(actualsSaga);
   yield spawn(subAccountSaga);
+  yield spawn(pdfSaga);
 }

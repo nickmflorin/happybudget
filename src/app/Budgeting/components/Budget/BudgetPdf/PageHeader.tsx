@@ -1,10 +1,9 @@
 import { isNil } from "lodash";
 
-import { getBase64 } from "lib/util/files";
 import { View, RichText, Image } from "components/pdf";
 
 type SubHeaderItemImage = {
-  readonly image: ArrayBuffer | string | Promise<ArrayBuffer | string>;
+  readonly image: UploadedImage | SavedImage;
 };
 
 type SubHeaderItemInfo = {
@@ -12,7 +11,7 @@ type SubHeaderItemInfo = {
 };
 
 type SubHeaderImageAndInfo = {
-  readonly image: ArrayBuffer | string | Promise<ArrayBuffer | string | void>;
+  readonly image: UploadedImage | SavedImage;
   readonly info: RichText.Block[];
 };
 
@@ -27,48 +26,46 @@ const subHeaderItemHasInfo = (item: SubHeaderItem): item is SubHeaderImageAndInf
 };
 
 interface PageHeaderProps {
-  readonly options: PdfBudgetTable.Options;
+  readonly header: Omit<HeaderTemplateFormData, "name">;
 }
 
 const PageHeader = (props: PageHeaderProps): JSX.Element => {
   // Note: We cannot use hooks with @react-pdf components, in particular because of the
   // render callbacks.
   let subHeaderLeft: SubHeaderItem | null = null;
-  if (!(props.options.leftInfo.length === 0 && isNil(props.options.leftImage))) {
-    if (isNil(props.options.leftImage)) {
-      subHeaderLeft = { info: props.options.leftInfo };
-    } else {
+  const leftInfoMissing = isNil(props.header.left_info) || props.header.left_info.length !== 0;
+  if (!(leftInfoMissing && isNil(props.header.left_image))) {
+    if (!isNil(props.header.left_info)) {
+      subHeaderLeft = { info: props.header.left_info };
+    }
+    if (!isNil(props.header.left_image)) {
       subHeaderLeft = {
-        info: props.options.leftInfo,
-        image: getBase64(props.options.leftImage).catch((e: Error) => {
-          /* eslint-disable no-console */
-          console.error(e);
-        })
+        ...subHeaderLeft,
+        image: props.header.left_image
       };
     }
   }
   // Note: We cannot use hooks with @react-pdf components, in particular because of the
   // render callbacks.
   let subHeaderRight: SubHeaderItem | null = null;
-  if (!(props.options.rightInfo.length === 0 && isNil(props.options.rightImage))) {
-    if (isNil(props.options.rightImage)) {
-      subHeaderRight = { info: props.options.rightInfo };
-    } else {
+  const rightInfoMissing = isNil(props.header.right_info) || props.header.right_info.length !== 0;
+  if (!(rightInfoMissing && isNil(props.header.right_image))) {
+    if (!isNil(props.header.right_info)) {
+      subHeaderRight = { info: props.header.right_info };
+    }
+    if (!isNil(props.header.right_image)) {
       subHeaderRight = {
-        info: props.options.rightInfo,
-        image: getBase64(props.options.rightImage).catch((e: Error) => {
-          /* eslint-disable no-console */
-          console.error(e);
-        })
+        ...subHeaderRight,
+        image: props.header.right_image
       };
     }
   }
 
   return (
     <View className={"budget-page-header"}>
-      {!isNil(props.options.header) && (
+      {!isNil(props.header.header) && (
         <View className={"budget-page-primary-header"}>
-          <RichText blocks={props.options.header} />
+          <RichText blocks={props.header.header} />
         </View>
       )}
       {(!isNil(subHeaderLeft) || !isNil(subHeaderRight)) && (
@@ -77,7 +74,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
             <View className={"budget-page-sub-header-left"}>
               {subHeaderItemHasImage(subHeaderLeft) && (
                 //  @ts-ignore React-PDF does not like the ArrayBuffer vs. Buffer, even though it works fine.
-                <Image className={"budget-page-sub-header-image"} src={subHeaderLeft.image} />
+                <Image className={"budget-page-sub-header-image"} src={subHeaderLeft.image.url} />
               )}
               {subHeaderItemHasInfo(subHeaderLeft) && (
                 <RichText className={"budget-page-sub-header-rich-text"} blocks={subHeaderLeft.info} />
@@ -88,7 +85,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
             <View className={"budget-page-sub-header-right"}>
               {subHeaderItemHasImage(subHeaderRight) && (
                 //  @ts-ignore React-PDF does not like the ArrayBuffer vs. Buffer, even though it works fine.
-                <Image className={"budget-page-sub-header-image"} src={subHeaderRight.image} />
+                <Image className={"budget-page-sub-header-image"} src={subHeaderRight.image.url} />
               )}
               {subHeaderItemHasInfo(subHeaderRight) && (
                 <RichText className={"budget-page-sub-header-rich-text"} blocks={subHeaderRight.info} />

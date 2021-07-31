@@ -72,6 +72,7 @@ input.ant-input,
     padding-right: 8px;
     font-size: 12px;
     line-height: 15px;
+    height: 30px !important;
     border-radius: $input-small-border-radius;
   }
 }
@@ -127,13 +128,13 @@ input.ant-input,
     }
   }
   &--small {
-    padding-top: 4px;
-    padding-bottom: 6px;
-    padding-left: 8px;
-    padding-right: 8px;
-    font-size: 12px;
-    line-height: 16px;
-    border-radius: $input-small-border-radius;
+    padding-top: 4px !important;
+    padding-bottom: 6px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    border-radius: $input-small-border-radius !important;
   }
 }
 
@@ -192,6 +193,8 @@ textarea {
 }
 
 .ant-select {
+  min-width: 200px;
+
   .ant-select-selector {
     @extend .select-base;
   }

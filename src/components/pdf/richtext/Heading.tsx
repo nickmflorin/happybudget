@@ -3,17 +3,17 @@ import { map } from "lodash";
 
 import Heading, { HeadingProps } from "../text/Heading";
 
-interface HeadingTextBlockProps extends HeadingProps {
-  readonly block: RichText.TextBlock;
+interface HeadingTextElementProps extends HeadingProps {
+  readonly textElement: RichText.TextDataElement;
 }
 
-const HeadingTextBlock = ({ block, ...props }: HeadingTextBlockProps): JSX.Element => (
-  <Heading {...props} styles={typeguards.isTextFragment(block) ? block.styles : []}>
-    {typeguards.isTextFragment(block)
+const HeadingTextElement = ({ textElement, ...props }: HeadingTextElementProps): JSX.Element => (
+  <Heading {...props} styles={typeguards.isTextFragment(textElement) ? textElement.styles : []}>
+    {typeguards.isTextFragment(textElement)
       ? /* eslint-disable indent */
-        block.text
-      : map(block.blocks, (subBlock: RichText.TextBlock, index: number) => (
-          <HeadingTextBlock key={index} {...props} block={subBlock} />
+        textElement.text
+      : map(textElement.data, (subTextElement: RichText.TextDataElement, index: number) => (
+          <HeadingTextElement key={index} {...props} textElement={subTextElement} />
         ))}
   </Heading>
 );
@@ -23,12 +23,10 @@ interface RichTextHeadingProps extends Omit<HeadingProps, "level"> {
 }
 
 const RichTextHeading = ({ block, ...props }: RichTextHeadingProps): JSX.Element => (
-  <Heading {...props} level={block.level} styles={typeguards.isTextFragment(block.data) ? block.data.styles : []}>
-    {typeguards.isTextFragment(block.data)
-      ? block.data.text
-      : map(block.data.blocks, (subBlock: RichText.TextBlock, index: number) => (
-          <HeadingTextBlock {...props} key={index} level={block.level} block={subBlock} />
-        ))}
+  <Heading {...props} level={block.level}>
+    {map(block.data, (textElement: RichText.TextDataElement, index: number) => (
+      <HeadingTextElement {...props} key={index} level={block.level} textElement={textElement} />
+    ))}
   </Heading>
 );
 

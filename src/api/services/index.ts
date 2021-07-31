@@ -10,3 +10,4 @@ export * from "./history";
 export * from "./subaccount";
 export * from "./template";
 export * from "./user";
+export * from "./pdf";

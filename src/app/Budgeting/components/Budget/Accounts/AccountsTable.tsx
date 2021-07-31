@@ -136,6 +136,7 @@ const AccountsTable = (): JSX.Element => {
       )}
       {!isNil(budgetId) && (
         <PreviewModal
+          autoRenderPdf={false}
           visible={previewModalVisible}
           onCancel={() => setPreviewModalVisible(false)}
           budgetId={budgetId}

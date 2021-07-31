@@ -13,8 +13,42 @@ import { consolidateTableChange, mergeChangesWithModel } from "lib/model/util";
 import * as typeguards from "lib/model/typeguards";
 
 import { ActionType } from "../actions";
-import initialState, { initialAccountState, initialSubAccountState, initialBudgetBudgetState } from "../initialState";
+import initialState, {
+  initialAccountState,
+  initialSubAccountState,
+  initialBudgetBudgetState,
+  initialHeaderTemplatesState
+} from "../initialState";
 import * as factories from "./factories";
+
+const headerTemplatesRootReducer: Reducer<Modules.Budget.HeaderTemplatesStore, Redux.Action<any>> = (
+  state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,
+  action: Redux.Action<any>
+): Modules.Budget.HeaderTemplatesStore => {
+  const listResponseReducer = createModelListResponseReducer<Model.HeaderTemplate, Modules.Budget.HeaderTemplatesStore>(
+    {
+      Response: ActionType.Budget.HeaderTemplates.Response,
+      Loading: ActionType.Budget.HeaderTemplates.Loading,
+      Request: ActionType.Budget.HeaderTemplates.Request,
+      AddToState: ActionType.Budget.HeaderTemplates.AddToState
+    },
+    { initialState: initialHeaderTemplatesState }
+  );
+
+  let newState = listResponseReducer(state, action);
+  if (!isNil(action.payload)) {
+    if (action.type === ActionType.Budget.HeaderTemplates.Display) {
+      const template: Model.HeaderTemplate = action.payload;
+      newState = { ...newState, displayedTemplate: template };
+    } else if (action.type === ActionType.Budget.HeaderTemplates.LoadingDetail) {
+      newState = { ...newState, loadingDetail: action.payload };
+    }
+  }
+  if (action.type === ActionType.Budget.HeaderTemplates.Clear) {
+    newState = { ...newState, displayedTemplate: null };
+  }
+  return newState;
+};
 
 const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Redux.Action<any>> = (
   state: Redux.ModelListResponseStore<Model.Actual> = initialModelListResponseState,
@@ -270,7 +304,8 @@ const genericReducer = combineReducers({
     Loading: ActionType.Budget.SubAccountsTree.Loading,
     SetSearch: ActionType.Budget.SubAccountsTree.SetSearch,
     RestoreSearchCache: ActionType.Budget.SubAccountsTree.RestoreSearchCache
-  })
+  }),
+  headerTemplates: headerTemplatesRootReducer
 });
 
 const rootReducer: Reducer<Modules.Budget.ModuleStore<Model.Budget>, Redux.Action<any>> = (

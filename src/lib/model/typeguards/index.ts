@@ -1,5 +1,5 @@
 export * from "./tabling";
-export * from "./richtext";
+export * from "./pdf";
 
 export const isFieldAlterationEvent = (
   event: Model.FieldAlterationEvent | Model.CreateEvent

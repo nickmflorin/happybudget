@@ -2,11 +2,15 @@ import { Reducer, combineReducers } from "redux";
 
 import { createSimplePayloadReducer } from "lib/redux/factories";
 import { identityReducer } from "lib/redux/util";
-
-import { ActionType } from "../actions";
-import initialState, { initialAccountState, initialSubAccountState, initialBudgetBudgetState } from "../initialState";
-import * as factories from "./factories";
 import { initialModelListResponseState } from "store/initialState";
+import { ActionType } from "../actions";
+import initialState, {
+  initialAccountState,
+  initialSubAccountState,
+  initialBudgetBudgetState,
+  initialHeaderTemplatesState
+} from "../initialState";
+import * as factories from "./factories";
 
 const genericReducer = combineReducers({
   autoIndex: createSimplePayloadReducer<boolean>(ActionType.Template.SetAutoIndex, false),
@@ -121,6 +125,7 @@ const genericReducer = combineReducers({
   ),
   commentsHistoryDrawerOpen: identityReducer<boolean>(false),
   actuals: identityReducer<Redux.ModelListResponseStore<Model.Actual>>(initialModelListResponseState),
+  headerTemplates: identityReducer<Modules.Budget.HeaderTemplatesStore>(initialHeaderTemplatesState),
   subAccountsTree:
     identityReducer<Redux.ModelListResponseStore<Model.SubAccountTreeNode>>(initialModelListResponseState)
 });

@@ -8,6 +8,7 @@ import { RenderWithSpinner } from "components";
 import { useTrackFirstRender } from "lib/hooks";
 
 import Error from "./Error";
+import FieldError from "./FieldError";
 import Footer from "./Footer";
 import { FormProps } from "./model";
 import useForm from "./useForm";
@@ -139,7 +140,7 @@ const withFormItemFirstInputFocused = <
 };
 
 const PrivateForm = <T extends { [key: string]: any } = any>(
-  { globalError, loading, children, ...props }: PrivateFormProps<T>,
+  { globalError, loading, children, autoFocusField, ...props }: PrivateFormProps<T>,
   ref: any
 ): JSX.Element => {
   const firstRender = useTrackFirstRender();
@@ -164,8 +165,8 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
     // If the Form is being used inside of a modal, we focus the first field by default.
     // Otherwise, we do not focus the first field by default.
     const defaultAutoFocusFirstField = props.form.isInModal === true ? true : false;
-    const propAutoFocusField = !isNil(props.autoFocusField) ? props.autoFocusField : props.form.autoFocusField;
-    const autoFocusField = !isNil(propAutoFocusField) ? propAutoFocusField : defaultAutoFocusFirstField;
+    const propAutoFocusField = !isNil(autoFocusField) ? autoFocusField : props.form.autoFocusField;
+    const useAutoFocusField = !isNil(propAutoFocusField) ? propAutoFocusField : defaultAutoFocusFirstField;
 
     // We cannot use the HOC components after the first render.  This is because AntD always rerenders
     // the entire form when a field changes, so whenever we would change another field, it would auto
@@ -173,7 +174,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
     // array for the dependency array of this useEffect, because then the Form.Item(s) would not
     // update appropriately when props change.
     if (firstRender === true) {
-      if (autoFocusField === true) {
+      if (useAutoFocusField === true) {
         const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
         if (formItemChildren.length !== 0) {
           const firstFormItemIndex = indexOf(c, formItemChildren[0]);
@@ -188,11 +189,11 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
             c = [...c.slice(0, firstFormItemIndex), newComponent, ...c.slice(firstFormItemIndex + 1)];
           }
         }
-      } else if (typeof autoFocusField === "number") {
+      } else if (typeof useAutoFocusField === "number") {
         const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
-        const formItemAtIndex = formItemChildren[autoFocusField];
+        const formItemAtIndex = formItemChildren[useAutoFocusField];
         if (!isNil(formItemAtIndex)) {
-          const formItemIndexInOverall = indexOf(c, formItemChildren[autoFocusField]);
+          const formItemIndexInOverall = indexOf(c, formItemChildren[useAutoFocusField]);
           if (formItemIndexInOverall !== -1) {
             const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemAtIndex.type, props);
             let newComponent = (
@@ -238,6 +239,7 @@ const Form = forwardRef(PrivateForm);
 const exportable = {
   Form: Form,
   Error: Error,
+  FieldError: FieldError,
   useForm: useForm,
   Footer: Footer,
   Item: FormItemComp,

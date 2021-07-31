@@ -437,7 +437,7 @@ namespace BudgetTable {
   interface Props<
     R extends Table.Row,
     M extends Model.Model,
-    P extends Http.ModelPayload<M> = Http.ModelPayload<M>
+    P
   > extends Omit<BudgetTable.MenuProps<R, M>, "columns" | "apis">,
       BudgetTable.PrimaryGridPassThroughProps<R, M>,
       StandardComponentProps {
@@ -511,11 +511,7 @@ namespace PdfBudgetTable {
   type TableOption = "topsheet" | number;
 
   interface Options {
-    readonly header: RichText.Block[];
-    readonly leftImage: File | Blob | null;
-    readonly leftInfo: RichText.Block[];
-    readonly rightImage: File | Blob | null;
-    readonly rightInfo: RichText.Block[];
+    readonly header: Omit<HeaderTemplateFormData, "name">;
     readonly columns: GenericTable.Field<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>[];
     readonly tables?: TableOption[] | null | undefined;
     readonly excludeZeroTotals: boolean;

@@ -1,0 +1,22 @@
+@import "style/colors";
+
+.header-template-save-form {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+
+  .btn--accept,
+  .btn--clear {
+    height: 30px;
+    width: 30px;
+    padding: 0px;
+  }
+
+  .form-item {
+    margin-bottom: 0px !important;
+  }
+
+  .with-error {
+    border: 1px solid $red;
+  }
+}

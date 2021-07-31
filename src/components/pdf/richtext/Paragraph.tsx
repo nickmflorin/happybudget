@@ -3,17 +3,17 @@ import { map } from "lodash";
 
 import Paragraph, { ParagraphProps } from "../text/Paragraph";
 
-interface ParagraphTextBlockProps extends ParagraphProps {
-  readonly block: RichText.TextBlock;
+interface ParagraphTextElementProps extends ParagraphProps {
+  readonly textElement: RichText.TextDataElement;
 }
 
-const ParagraphTextBlock = ({ block, ...props }: ParagraphTextBlockProps): JSX.Element => (
-  <Paragraph {...props} styles={typeguards.isTextFragment(block) ? block.styles : []}>
-    {typeguards.isTextFragment(block)
+const ParagraphTextElement = ({ textElement, ...props }: ParagraphTextElementProps): JSX.Element => (
+  <Paragraph {...props} styles={typeguards.isTextFragment(textElement) ? textElement.styles : []}>
+    {typeguards.isTextFragment(textElement)
       ? /* eslint-disable indent */
-        block.text
-      : map(block.blocks, (subBlock: RichText.TextBlock, index: number) => (
-          <ParagraphTextBlock key={index} {...props} block={subBlock} />
+        textElement.text
+      : map(textElement.data, (subTextElement: RichText.TextDataElement, index: number) => (
+          <ParagraphTextElement key={index} {...props} textElement={subTextElement} />
         ))}
   </Paragraph>
 );
@@ -23,12 +23,10 @@ interface RichTextParagraphProps extends Omit<ParagraphProps, "level"> {
 }
 
 const RichTextParagraph = ({ block, ...props }: RichTextParagraphProps): JSX.Element => (
-  <Paragraph {...props} styles={typeguards.isTextFragment(block.data) ? block.data.styles : []}>
-    {typeguards.isTextFragment(block.data)
-      ? block.data.text
-      : map(block.data.blocks, (subBlock: RichText.TextBlock, index: number) => (
-          <ParagraphTextBlock key={index} {...props} block={subBlock} />
-        ))}
+  <Paragraph {...props}>
+    {map(block.data, (textElement: RichText.TextDataElement, index: number) => (
+      <ParagraphTextElement key={index} {...props} textElement={textElement} />
+    ))}
   </Paragraph>
 );
 

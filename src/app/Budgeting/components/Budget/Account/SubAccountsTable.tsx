@@ -146,6 +146,7 @@ const SubAccountsTable = ({ accountId }: AccountBudgetTableProps): JSX.Element =
       <FringesModal open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
       {!isNil(budgetId) && (
         <PreviewModal
+          autoRenderPdf={false}
           visible={previewModalVisible}
           onCancel={() => setPreviewModalVisible(false)}
           budgetId={budgetId}

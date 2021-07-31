@@ -10,6 +10,6 @@ export const isListBlock = (block: RichText.Block): block is RichText.ListBlock 
   return (block as RichText.ListBlock).type === "list";
 };
 
-export const isTextFragment = (block: RichText.TextBlock): block is RichText.TextFragment => {
+export const isTextFragment = (block: RichText.TextDataElement): block is RichText.TextFragment => {
   return (block as RichText.TextFragment).text !== undefined;
 };

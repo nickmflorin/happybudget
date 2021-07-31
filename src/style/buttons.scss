@@ -224,6 +224,14 @@
     font-weight: 600;
   }
 
+  &--small {
+    @extend .btn;
+    font-size: 11px;
+    line-height: 18px;
+    padding: 6px 12px;
+    height: 30px;
+  }
+
   // A Button That Looks Like a <a> Link
   &--link {
     @extend .btn;
@@ -534,6 +542,25 @@
     }
   }
 
+  &--clear,
+  &--accept {
+    @extend .btn;
+    flex-direction: column;
+    justify-content: center;
+
+    svg {
+      height: 14px;
+      width: 14px;
+      color: #d2d2d2 !important;
+    }
+
+    &:hover {
+      svg {
+        color: #a5a5a5 !important;
+      }
+    }
+  }
+
   &--google {
     @extend .btn--large;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1) !important;
@@ -600,29 +627,26 @@
     }
   }
 
-  &--budget-table-menu {
+  &--bare {
     font-weight: 500;
     border: none !important;
     box-shadow: none !important;
-    color: $text-tertiary;
-    padding: 6px 8px;
-    line-height: 18px;
-    height: 30px;
+    color: $text-secondary;
     min-width: 0px;
 
     svg {
       height: 1.2rem !important;
       margin-right: 0.5rem;
-      color: $text-tertiary;
+      color: $text-secondary;
     }
 
     &:hover,
     &:focus {
-      color: lighten($text-tertiary, 20%) !important;
+      color: lighten($text-secondary, 20%) !important;
       border-color: $transparent !important;
       background-color: transparent;
       svg {
-        color: lighten($text-tertiary, 20%) !important;
+        color: lighten($text-secondary, 20%) !important;
       }
     }
 
@@ -636,5 +660,11 @@
         color: $disabled-color !important;
       }
     }
+  }
+
+  &--budget-table-menu {
+    padding: 6px 8px;
+    line-height: 18px;
+    height: 30px;
   }
 }

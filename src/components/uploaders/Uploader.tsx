@@ -16,6 +16,7 @@ import { RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
 
 import "./Uploader.scss";
+import { useEffect } from "react";
 
 const ACCCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 const MAX_IMAGE_SIZE = 2; // In MB
@@ -123,7 +124,7 @@ const Uploader = (
 ): JSX.Element => {
   const [error, setError] = useState<Error | string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [image, _setImage] = useState<UploadedImage | SavedImage | null>(value || null);
+  const [image, _setImage] = useState<UploadedImage | SavedImage | null>(null);
 
   const _onError = (e: string | Error) => {
     setError(e);
@@ -149,6 +150,12 @@ const Uploader = (
       setImage(null);
     }
   }));
+
+  useEffect(() => {
+    if (value !== undefined) {
+      _setImage(value);
+    }
+  }, [value]);
 
   return (
     <div className={classNames("image-uploader", className)} style={style}>

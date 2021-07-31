@@ -325,7 +325,7 @@ export const eventWarrantsRecalculation = <R extends Table.Row, M extends Model.
   }
 };
 
-export const payload = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+export const payload = <R extends Table.Row, M extends Model.Model, P>(
   p: Table.RowChange<R, M> | Table.RowAdd<R, M>
 ): Partial<P> => {
   /* eslint-disable no-unused-vars */
@@ -394,7 +394,7 @@ type AutoIndexParams<M extends Model.Model> = {
   field: keyof M;
 };
 
-export const createBulkCreatePayload = <R extends Table.Row, M extends Model.Model, P extends Http.ModelPayload<M>>(
+export const createBulkCreatePayload = <R extends Table.Row, M extends Model.Model, P>(
   /* eslint-disable indent */
   p: Table.RowAddPayload<R, M>,
   autoIndexParams?: AutoIndexParams<M>

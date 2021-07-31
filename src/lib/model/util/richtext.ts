@@ -40,11 +40,14 @@ export const wrapTextInFontStyleTags = (text: string, names: Pdf.FontStyleName[]
   );
 };
 
-export const convertHtmlIntoTextBlock = (html: string): RichText.TextBlock | null => {
+export const convertHtmlIntoTextData = (html: string): RichText.TextData | null => {
   let doc = new DOMParser().parseFromString(html, "text/html");
   let element = doc.body;
 
-  const convertNodeIntoTextBlock = (el: ChildNode, tags?: Pdf.FontStyleTag[]): RichText.TextBlock | null => {
+  const convertNodeIntoTextDataElement = (
+    el: ChildNode,
+    tags?: Pdf.FontStyleTag[]
+  ): RichText.TextDataElement | null => {
     const supportedTags: Pdf.FontStyleTag[] = map(SupportedPdfFontStyles, (style: Pdf.SupportedFontStyle) => style.tag);
 
     tags = tags || [];
@@ -62,31 +65,31 @@ export const convertHtmlIntoTextBlock = (html: string): RichText.TextBlock | nul
       if (includes(supportedTags, tag)) {
         tags = [...tags, tag as Pdf.FontStyleTag];
       }
-      return convertNodeIntoTextBlock(el.childNodes[0], tags);
+      return convertNodeIntoTextDataElement(el.childNodes[0], tags);
     } else {
       const tag = el.nodeName.toLowerCase();
       if (includes(supportedTags, tag)) {
         tags = [...tags, tag as Pdf.FontStyleTag];
       }
-      const children: RichText.TextBlock[] = reduce(
+      const children: RichText.TextDataElement[] = reduce(
         el.childNodes,
-        (current: RichText.TextBlock[], node: ChildNode) => {
-          const block: RichText.TextBlock | null = convertNodeIntoTextBlock(node, tags);
-          if (!isNil(block)) {
-            return [...current, block];
+        (current: RichText.TextDataElement[], node: ChildNode) => {
+          const textElement: RichText.TextDataElement | null = convertNodeIntoTextDataElement(node, tags);
+          if (!isNil(textElement)) {
+            return [...current, textElement];
           }
           return current;
         },
         []
       );
-      return children.length !== 0 ? { blocks: children } : null;
+      return children.length !== 0 ? { data: children } : null;
     }
   };
 
-  let blocks: RichText.TextBlock[] = reduce(
+  let data: RichText.TextDataElement[] = reduce(
     element.childNodes,
-    (bs: RichText.TextBlock[], child: ChildNode) => {
-      const block = convertNodeIntoTextBlock(child);
+    (bs: RichText.TextDataElement[], child: ChildNode) => {
+      const block = convertNodeIntoTextDataElement(child);
       if (!isNil(block)) {
         return [...bs, block];
       }
@@ -94,27 +97,32 @@ export const convertHtmlIntoTextBlock = (html: string): RichText.TextBlock | nul
     },
     []
   );
-  if (blocks.length === 0) {
+  if (data.length === 0) {
     return null;
-  } else if (blocks.length === 1) {
-    return blocks[0];
   }
-  return { blocks };
+  return data;
 };
 
-export const convertTextBlockIntoHtml = (block: RichText.TextBlock): string => {
-  if (typeguards.isTextFragment(block)) {
-    return !isNil(block.styles) ? wrapTextInFontStyleTags(block.text, block.styles) : block.text;
+export const convertTextElementIntoHtml = (element: RichText.TextDataElement): string => {
+  if (typeguards.isTextFragment(element)) {
+    return !isNil(element.styles) ? wrapTextInFontStyleTags(element.text, element.styles) : element.text;
   } else {
     return reduce(
-      block.blocks,
-      (current: string, subblock: RichText.TextBlock) => {
-        return current + convertTextBlockIntoHtml(subblock);
+      element.data,
+      (c: string, subElement: RichText.TextDataElement) => {
+        return c + convertTextElementIntoHtml(subElement);
       },
       ""
     );
   }
 };
+
+export const convertTextDataIntoHtml = (data: RichText.TextData): string =>
+  reduce(
+    data,
+    (current: string, element: RichText.TextDataElement) => current + convertTextElementIntoHtml(element),
+    ""
+  );
 
 type EditorJSBlockConverter<T extends string, D extends object = any> = (
   original: OutputBlockData<T, D>
@@ -128,17 +136,17 @@ const BlockTypeConverters: { [key in RichText.BlockType]: EditorJSBlockConverter
     configuration: original.data.style
   }),
   header: (original: OutputBlockData<"header", { text: string; level: number }>): RichText.HeadingBlock | null => {
-    const block = convertHtmlIntoTextBlock(original.data.text);
-    if (!isNil(block)) {
+    const textData = convertHtmlIntoTextData(original.data.text);
+    if (!isNil(textData)) {
       if (!includes([1, 2, 3, 4, 5, 6], original.data.level)) {
         /* eslint-disable no-console */
         console.error(`Unsupported heading level ${original.data.level}!`);
-        return { type: "header", level: 2, data: block };
+        return { type: "header", level: 2, data: textData };
       }
       return {
         type: "header",
         level: original.data.level as Pdf.HeadingLevel,
-        data: block
+        data: textData
       };
     } else {
       /* eslint-disable no-console */
@@ -147,11 +155,11 @@ const BlockTypeConverters: { [key in RichText.BlockType]: EditorJSBlockConverter
     }
   },
   paragraph: (original: OutputBlockData<"paragraph", { text: string }>): RichText.ParagraphBlock | null => {
-    const block = convertHtmlIntoTextBlock(original.data.text);
-    if (!isNil(block)) {
+    const textData = convertHtmlIntoTextData(original.data.text);
+    if (!isNil(textData)) {
       return {
         type: "paragraph",
-        data: block
+        data: textData
       };
     } else {
       /* eslint-disable no-console */
@@ -199,13 +207,13 @@ const InverseBlockTypeConverters: { [key in RichText.BlockType]: InverseEditorJS
     type: "header",
     data: {
       level: internal.level,
-      text: convertTextBlockIntoHtml(internal.data)
+      text: convertTextDataIntoHtml(internal.data)
     }
   }),
   paragraph: (internal: RichText.ParagraphBlock): OutputBlockData<"paragraph", { text: string }> => ({
     type: "paragraph",
     data: {
-      text: convertTextBlockIntoHtml(internal.data)
+      text: convertTextDataIntoHtml(internal.data)
     }
   })
 };

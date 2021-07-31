@@ -125,11 +125,7 @@ class BudgetTableApis implements BudgetTable.GridSet<Table.APIs | null> {
   }
 }
 
-const BudgetTable = <
-  R extends Table.Row,
-  M extends Model.Model,
-  P extends Http.ModelPayload<M> = Http.ModelPayload<M>
->({
+const BudgetTable = <R extends Table.Row, M extends Model.Model, P>({
   /* eslint-disable indent */
   tableRef,
   columns,

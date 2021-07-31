@@ -33,6 +33,12 @@ export const initialAccountState: Modules.Budget.AccountStore = {
   history: initialModelListResponseState
 };
 
+export const initialHeaderTemplatesState: Modules.Budget.HeaderTemplatesStore = {
+  ...initialModelListResponseState,
+  displayedTemplate: null,
+  loadingDetail: false
+};
+
 export const initialBudgetModuleState: Modules.Budget.ModuleStore<any> = {
   autoIndex: false,
   budget: initialBudgetBudgetState,
@@ -40,7 +46,8 @@ export const initialBudgetModuleState: Modules.Budget.ModuleStore<any> = {
   account: initialAccountState,
   subaccount: initialSubAccountState,
   actuals: initialModelListResponseState,
-  subAccountsTree: initialModelListResponseState
+  subAccountsTree: initialModelListResponseState,
+  headerTemplates: initialHeaderTemplatesState
 };
 
 const initialState: Modules.Budget.Store = {
