@@ -12,7 +12,7 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericAccountsTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>,
-    "groupParams" | "rowCanExpand" | "levelType"
+    "rowCanExpand" | "levelType"
   > {
   exportFileName: string;
   detail: Model.Template | Model.Budget | undefined;
