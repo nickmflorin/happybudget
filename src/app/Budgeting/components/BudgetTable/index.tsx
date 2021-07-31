@@ -516,7 +516,6 @@ const BudgetTable = <
     <WrapInApplicationSpinner hideWhileLoading={false} loading={loading}>
       <div className={classNames("budget-table ag-theme-alpine", className)} style={style}>
         <div className={"core-grid-wrapper"}>
-          {/* <div className={"table-grid"}> */}
           <PrimaryGrid<R, M>
             apis={apis.primary}
             gridRef={gridRef}
@@ -531,7 +530,6 @@ const BudgetTable = <
             onChangeEvent={onChangeEvent}
             {...props}
           />
-          {/* </div> */}
           <TableFooterGrid<R, M>
             apis={apis.tableFooter}
             onGridReady={(e: GridReadyEvent) => onGridReady("tableFooter", { grid: e.api, column: e.columnApi })}
