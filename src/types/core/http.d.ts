@@ -11,10 +11,6 @@ namespace Http {
     readonly retries?: number;
     readonly headers?: { [key: string]: string };
     readonly cancelToken?: any;
-    readonly raiseOnUndefinedValues?: PayloadFilterSetting;
-    readonly removeUndefinedValues?: PayloadFilterSetting;
-    readonly raiseOnEmptyValues?: PayloadFilterSetting;
-    readonly removeEmptyValues?: PayloadFilterSetting;
   }
 
   interface Query {
