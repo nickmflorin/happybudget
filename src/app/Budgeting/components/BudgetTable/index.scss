@@ -19,29 +19,37 @@ $budget-footer-grid-height-plus-margin: calc(#{$budget-footer-grid-height} + #{$
   height: calc(100vh - 90px - 10px);
 
   .core-table {
-    overflow-y: hidden;
+    max-height: calc(100vh - 90px - 10px);
+
+    $core-table-inner-height: calc(100vh - 90px - 10px - #{$table-footer-grid-height});
 
     .table-grid {
-      max-height: calc(100vh - 90px - 10px - #{$table-footer-grid-height});
-
+      max-height: $core-table-inner-height;
       position: relative;
-      overflow-y: hidden;
       display: flex;
       flex-direction: column;
 
       > * {
-        overflow-y: hidden;
+        max-height: $core-table-inner-height !important;
         display: flex;
         flex-direction: column;
       }
 
-      .ag-root-wrapper-body {
-        &.ag-layout-auto-height {
-          overflow-y: hidden;
+      .ag-root-wrapper {
+        overflow: visible;
+        max-height: $core-table-inner-height !important;
+        .ag-root-wrapper-body {
+          max-height: $core-table-inner-height !important;
+        }
+        .ag-body-viewport {
+          overflow-y: scroll !important;
         }
       }
-      .ag-body-viewport {
-        overflow-y: scroll !important;
+
+      .ag-root {
+        &.ag-layout-auto-height {
+          overflow: visible;
+        }
       }
 
       .ag-row:last-child {
@@ -67,21 +75,49 @@ $budget-footer-grid-height-plus-margin: calc(#{$budget-footer-grid-height} + #{$
     }
 
     &.with-budget-footer {
+      $with-budget-footer-height: calc(#{$core-table-inner-height} - #{$budget-footer-grid-height-plus-margin});
       .table-grid {
-        max-height: calc(
-          100vh - 90px - 10px - #{$table-footer-grid-height} - #{$budget-footer-grid-height-plus-margin}
-        );
+        max-height: $with-budget-footer-height;
+        > * {
+          max-height: $with-budget-footer-height;
+        }
+        .ag-root-wrapper {
+          max-height: $with-budget-footer-height;
+          .ag-root-wrapper-body {
+            max-height: $with-budget-footer-height;
+          }
+        }
       }
     }
     &.with-detached-header {
+      $with-detached-header-height: calc(#{$core-table-inner-height} - #{$detached-header-height});
       .table-grid {
-        max-height: calc(100vh - 90px - 10px - #{$detached-header-height} - #{$table-footer-grid-height});
+        max-height: $with-detached-header-height;
+        > * {
+          max-height: $with-detached-header-height;
+        }
+        .ag-root-wrapper {
+          max-height: $with-detached-header-height;
+          .ag-root-wrapper-body {
+            max-height: $with-detached-header-height;
+          }
+        }
       }
       &.with-budget-footer {
+        $with-header-footer-height: calc(
+          #{$core-table-inner-height} - #{$detached-header-height} - #{$budget-footer-grid-height-plus-margin}
+        );
         .table-grid {
-          max-height: calc(
-            100vh - 90px - 10px - #{$table-footer-grid-height} - #{$budget-footer-grid-height-plus-margin} - #{$detached-header-height}
-          );
+          max-height: $with-header-footer-height;
+          > * {
+            max-height: $with-header-footer-height;
+          }
+          .ag-root-wrapper {
+            max-height: $with-header-footer-height;
+            .ag-root-wrapper-body {
+              max-height: $with-header-footer-height;
+            }
+          }
         }
       }
     }

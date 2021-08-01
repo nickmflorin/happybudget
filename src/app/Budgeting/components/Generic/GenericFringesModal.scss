@@ -8,11 +8,23 @@
     overflow-y: hidden;
 
     .fringes-table {
-      height: 100% !important;
+      // 20px is for modal-body padding (10px on top and 10px on bottom).
+      max-height: calc(60vh - 84px - 20px);
 
       .core-table {
+        max-height: calc(60vh - 84px - 20px);
+
         .table-grid {
-          max-height: calc(100% - 40px - 40px);
+          max-height: calc(60vh - 84px - 40px - 40px - 20px) !important;
+          > * {
+            max-height: calc(60vh - 84px - 40px - 40px - 20px) !important;
+          }
+          .ag-root-wrapper {
+            max-height: calc(60vh - 84px - 40px - 40px - 20px) !important;
+            .ag-root-wrapper-body {
+              max-height: calc(60vh - 84px - 40px - 40px - 20px) !important;
+            }
+          }
         }
       }
     }
