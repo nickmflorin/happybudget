@@ -6,7 +6,8 @@ import { Input, Button } from "antd";
 
 import * as typeguards from "lib/model/typeguards";
 
-import { Form } from "components";
+import { Form, FullSize } from "components";
+import { ImageClearButton } from "components/buttons";
 import { UserImageOrInitials, EditImageOverlay } from "components/images";
 import { FormProps } from "components/forms/Form";
 import { UploadUserImage, TimezoneSelect } from "./fields";
@@ -60,20 +61,30 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImag
           onError={(error: Error | string) => props.form.setGlobalError(error)}
           renderContentNoError={(params: UploadFileParamsNoError, original: Model.Image | null) => {
             return (
-              <UserImageOrInitials
-                circle={true}
-                src={
-                  /* eslint-disable indent */
-                  typeguards.isUploadParamsWithData(params)
-                    ? params.data.url
-                    : !isNil(original)
-                    ? original.url
-                    : undefined
-                }
-                firstName={firstName}
-                lastName={lastName}
-                overlay={() => <EditImageOverlay visible={true} />}
-              />
+              <FullSize>
+                <ImageClearButton
+                  style={{ position: "absolute", top: 0, right: 0 }}
+                  onClick={(e: React.MouseEvent<any>) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    params.onClear();
+                  }}
+                />
+                <UserImageOrInitials
+                  circle={true}
+                  src={
+                    /* eslint-disable indent */
+                    typeguards.isUploadParamsWithData(params)
+                      ? params.data.url
+                      : !isNil(original)
+                      ? original.url
+                      : undefined
+                  }
+                  firstName={firstName}
+                  lastName={lastName}
+                  overlay={() => <EditImageOverlay visible={true} />}
+                />
+              </FullSize>
             );
           }}
         />

@@ -476,6 +476,40 @@
     }
   }
 
+  .btn--clear {
+    flex-direction: column;
+    justify-content: center;
+
+    svg {
+      height: 14px;
+      width: 14px;
+      color: #d2d2d2 !important;
+    }
+
+    &:hover {
+      svg {
+        color: #a5a5a5 !important;
+      }
+    }
+  }
+
+  .btn--clear-image {
+    flex-direction: column;
+    justify-content: center;
+
+    svg {
+      height: 14px;
+      width: 14px;
+      color: $text-primary !important;
+    }
+
+    &:hover {
+      svg {
+        color: lighten($text-primary, 20%) !important;
+      }
+    }
+  }
+
   &--login,
   &--reset {
     @extend .btn--large;

@@ -52,6 +52,11 @@ code {
   }
 }
 
+.full-size {
+  height: 100% !important;
+  width: 100% !important;
+}
+
 .disabled {
   pointer-events: none !important;
   box-shadow: none !important;

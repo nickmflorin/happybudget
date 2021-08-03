@@ -5,12 +5,7 @@ import IconButton, { IconButtonProps } from "./IconButton";
 
 const ClearButton = (props: Omit<IconButtonProps, "size" | "icon">): JSX.Element => {
   return (
-    <IconButton
-      {...props}
-      className={"btn--clear-cell"}
-      size={"small"}
-      icon={<FontAwesomeIcon icon={faTimesCircle} />}
-    />
+    <IconButton {...props} className={"btn--clear"} size={"small"} icon={<FontAwesomeIcon icon={faTimesCircle} />} />
   );
 };
 
