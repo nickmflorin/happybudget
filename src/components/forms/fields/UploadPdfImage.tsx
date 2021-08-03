@@ -10,6 +10,7 @@ import { truncateFileName } from "lib/util/files";
 
 import Uploader, { UploaderProps } from "./Uploader";
 import "./UploadPdfImage.scss";
+import { isNil } from "lodash";
 
 const UploadPdfImage = (props: UploaderProps): JSX.Element => {
   // NOTE: We could show a loading indicator when the upload is loading, but it
@@ -20,8 +21,8 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
       {...props}
       className={classNames("pdf-image-uploader", props.className)}
       showLoadingIndicator={false}
-      renderContent={(params: UploadFileParams) => {
-        if (typeguards.isUploadParamsWithError(params)) {
+      renderContent={(params: UploadImageParams) => {
+        if (!isNil(params.error)) {
           return (
             <React.Fragment>
               <FontAwesomeIcon className={"icon"} icon={faExclamationCircle} />
@@ -30,12 +31,14 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
               </div>
             </React.Fragment>
           );
-        } else if (typeguards.isUploadParamsWithData(params)) {
+        } else if (typeguards.isUploadParamsWithImage(params)) {
           return (
             <React.Fragment>
               <FontAwesomeIcon className={"icon"} icon={faCheckCircle} />
               <div className={"upload-text file-text"}>
-                {truncateFileName(params.data.fileName || params.data.name, 18)}
+                {typeguards.isUploadedImage(params.image)
+                  ? truncateFileName(params.image.fileName || params.image.name, 18)
+                  : `Saved ${params.image.extension} Image`}
               </div>
               <ClearButton
                 onClick={(e: React.MouseEvent<HTMLInputElement>) => {

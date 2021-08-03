@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { Input, Button } from "antd";
@@ -13,8 +12,8 @@ import { FormProps } from "components/forms/Form";
 import { UploadUserImage, TimezoneSelect } from "./fields";
 
 interface UserProfileFormProps extends FormProps<Http.UserPayload> {
-  originalImage?: Model.Image | null;
-  onImageChange?: (f: File | Blob | null) => void;
+  originalImage?: SavedImage | null;
+  onImageChange?: (f: UploadedImage | null) => void;
 }
 
 const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImageChange, ...props }): JSX.Element => {
@@ -52,14 +51,10 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImag
       </Form.Item>
       <Form.Item label={"Avatar"}>
         <UploadUserImage
-          original={originalImage}
-          onChange={(f: UploadedData | null) => {
-            if (!isNil(onImageChange)) {
-              onImageChange(!isNil(f) ? f.file : null);
-            }
-          }}
+          value={originalImage}
+          onChange={(f: UploadedImage | null) => onImageChange?.(f)}
           onError={(error: Error | string) => props.form.setGlobalError(error)}
-          renderContentNoError={(params: UploadFileParamsNoError, original: Model.Image | null) => {
+          renderContentNoError={(params: UploadImageParams) => {
             return (
               <FullSize>
                 <ImageClearButton
@@ -72,14 +67,7 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImag
                 />
                 <UserImageOrInitials
                   circle={true}
-                  src={
-                    /* eslint-disable indent */
-                    typeguards.isUploadParamsWithData(params)
-                      ? params.data.url
-                      : !isNil(original)
-                      ? original.url
-                      : undefined
-                  }
+                  src={typeguards.isUploadParamsWithImage(params) ? params.image.url : null}
                   firstName={firstName}
                   lastName={lastName}
                   overlay={() => <EditImageOverlay visible={true} />}

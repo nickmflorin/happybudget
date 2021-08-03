@@ -120,7 +120,7 @@ const ExportForm: React.FC<ExportFormProps> = ({
           labelClassName={"label label--section"}
         >
           <UploadPdfImage
-            onChange={(f: UploadedData | null) => {
+            onChange={(f: UploadedImage | null) => {
               const values: PdfBudgetTable.Options = props.form.getFieldsValue();
               // Images are not included in traditional form and thus do not trigger the
               // onValuesChange() callback - so we have to do it manually here.
@@ -149,7 +149,7 @@ const ExportForm: React.FC<ExportFormProps> = ({
           labelClassName={"label label--section"}
         >
           <UploadPdfImage
-            onChange={(f: UploadedData | null) => {
+            onChange={(f: UploadedImage | null) => {
               const values: PdfBudgetTable.Options = props.form.getFieldsValue();
               // Images are not included in traditional form and thus do not trigger the
               // onValuesChange() callback - so we have to do it manually here.

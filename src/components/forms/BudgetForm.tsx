@@ -8,7 +8,7 @@ import { UploadUserImage } from "./fields";
 import "./BudgetForm.scss";
 
 interface BudgetFormProps extends FormProps<Http.BudgetPayload> {
-  originalImage?: Model.Image | null;
+  originalImage?: SavedImage | null;
   onImageChange?: (f: File | Blob | null) => void;
   templates?: Model.Template[] | Model.SimpleTemplate[];
   templatesLoading?: boolean;
@@ -62,8 +62,8 @@ const BudgetForm: React.FC<BudgetFormProps> = ({
       )}
       <Form.Item label={"Avatar"} rules={[{ required: false }]}>
         <UploadUserImage
-          original={originalImage}
-          onChange={(f: UploadedData | null) => {
+          value={originalImage}
+          onChange={(f: UploadedImage | null) => {
             if (!isNil(onImageChange)) {
               onImageChange(!isNil(f) ? f.file : null);
             }

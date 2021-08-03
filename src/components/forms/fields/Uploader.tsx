@@ -23,60 +23,49 @@ interface UploaderContentProps extends Omit<StandardComponentProps, "id"> {
   readonly imageStyle?: React.CSSProperties;
   readonly imageClassName?: string;
   readonly error: UploadError | null;
-  readonly data: UploadedData | null;
-  readonly original: Model.Image | null;
+  readonly image: UploadedImage | SavedImage | null;
   readonly loading: boolean;
   readonly onClear: () => void;
-  readonly renderContent?: (params: UploadFileParams, original: Model.Image | null) => JSX.Element;
-  readonly renderContentNoError?: (params: UploadFileParamsNoError, original: Model.Image | null) => JSX.Element;
-  readonly renderImage?: (params: UploadFileParamsWithData | Model.Image) => JSX.Element;
-  readonly renderNoImage?: (params: UploadFileParamsNoData) => JSX.Element;
-  readonly renderError?: (e: Error | string, original: Model.Image | null) => JSX.Element;
+  readonly renderContent?: (params: UploadImageParams) => JSX.Element;
+  readonly renderContentNoError?: (params: UploadImageParams) => JSX.Element;
+  readonly renderImage?: (params: UploadImageParams) => JSX.Element;
+  readonly renderNoImage?: (params: UploadImageParamsNoImage) => JSX.Element;
+  readonly renderError?: (params: UploadImageParams) => JSX.Element;
 }
 
 const UploaderContent = (props: UploaderContentProps): JSX.Element => {
-  const baseParams: Pick<UploadFileParams, "loading" | "onClear" | "source"> = {
+  const params: UploadImageParamsNoImage = {
     loading: props.loading,
     onClear: props.onClear,
-    source: "upload"
+    error: props.error
   };
   if (!isNil(props.renderContent)) {
-    if (!isNil(props.error)) {
-      return props.renderContent({ error: props.error, ...baseParams }, props.original);
-    } else if (!isNil(props.data)) {
-      return props.renderContent({ data: props.data, ...baseParams }, props.original);
+    if (!isNil(props.image)) {
+      return props.renderContent({ ...params, image: props.image });
     }
-    return props.renderContent({ ...baseParams }, props.original);
+    return props.renderContent(params);
   } else if (!isNil(props.error)) {
     return !isNil(props.renderError) ? (
-      props.renderError(props.error, props.original)
+      props.renderError(params)
     ) : (
       <div className={classNames("upload-indicator", props.className)} style={props.style}>
         <FontAwesomeIcon className={"icon"} icon={faExclamationCircle} />
       </div>
     );
   } else if (!isNil(props.renderContentNoError)) {
-    if (!isNil(props.data)) {
-      return props.renderContentNoError({ data: props.data, ...baseParams }, props.original);
+    if (!isNil(props.image)) {
+      return props.renderContentNoError({ ...params, image: props.image });
     }
-    return props.renderContentNoError({ ...baseParams }, props.original);
+    return props.renderContentNoError(params);
   } else {
-    const data: UploadedData | null = props.data;
-    const image: Model.Image | null = props.original;
-    if (!isNil(data)) {
+    if (!isNil(props.image)) {
       return !isNil(props.renderImage) ? (
-        props.renderImage({ data, ...baseParams })
+        props.renderImage(params)
       ) : (
-        <Image className={props.imageClassName} src={data.url} style={{ width: "100%", ...props.imageStyle }} />
-      );
-    } else if (!isNil(image)) {
-      return !isNil(props.renderImage) ? (
-        props.renderImage(image)
-      ) : (
-        <Image className={props.imageClassName} src={image.url} style={{ width: "100%", ...props.imageStyle }} />
+        <Image className={props.imageClassName} src={props.image.url} style={{ width: "100%", ...props.imageStyle }} />
       );
     } else if (!isNil(props.renderNoImage)) {
-      return props.renderNoImage({ ...baseParams });
+      return props.renderNoImage(params);
     } else {
       return (
         <div className={classNames("upload-indicator", props.className)} style={props.style}>
@@ -87,14 +76,13 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
   }
 };
 
-export interface UploaderProps
-  extends Omit<UploaderContentProps, "data" | "error" | "loading" | "onClear" | "original"> {
+export interface UploaderProps extends Omit<UploaderContentProps, "data" | "error" | "loading" | "onClear" | "image"> {
   readonly contentStyle?: React.CSSProperties;
   readonly contentClassName?: string;
-  readonly initialValue?: Model.Image | null;
+  readonly initialValue?: SavedImage | null;
   readonly showLoadingIndicator?: boolean;
-  readonly original?: Model.Image | null;
-  readonly onChange: (params: UploadedData | null) => void;
+  readonly value?: SavedImage | UploadedImage | null;
+  readonly onChange: (params: UploadedImage | null) => void;
   readonly onError: (error: Error | string) => void;
   readonly hoverOverlay?: (params: { visible: boolean; children: () => JSX.Element }) => JSX.Element;
 }
@@ -109,30 +97,30 @@ const Uploader = (
     showLoadingIndicator = true,
     onChange,
     onError,
-    original,
+    value,
     ...props
   }: UploaderProps,
   ref: ForwardedRef<IUploaderRef>
 ): JSX.Element => {
   const [error, setError] = useState<Error | string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [uploadData, setUploadData] = useState<UploadedData | null>(null);
+  const [image, _setImage] = useState<UploadedImage | SavedImage | null>(value || null);
 
   const _onError = (e: string | Error) => {
     setError(e);
     onError(e);
   };
 
-  const _setUploadData = (params: UploadedData | null) => {
-    setUploadData(params);
-    onChange(params);
+  const setImage = (img: UploadedImage | null) => {
+    _setImage(img);
+    onChange(img);
   };
 
   useImperativeHandle(ref, () => ({
     clear: () => {
       setError(null);
       setLoading(false);
-      _setUploadData(null);
+      setImage(null);
     }
   }));
 
@@ -168,7 +156,7 @@ const Uploader = (
             if (!isNil(file) && !isNil(response)) {
               getBase64(file)
                 .then((data: ArrayBuffer | string) => {
-                  _setUploadData({
+                  setImage({
                     url: response.fileUrl,
                     file,
                     name: info.file.name,
@@ -203,14 +191,13 @@ const Uploader = (
           <UploaderContent
             className={contentClassName}
             style={contentStyle}
-            original={original || null}
-            data={uploadData}
+            image={image}
             error={error}
             loading={loading}
             onClear={() => {
               setError(null);
               setLoading(false);
-              _setUploadData(null);
+              setImage(null);
             }}
             {...props}
           />

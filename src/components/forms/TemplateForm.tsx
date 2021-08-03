@@ -10,7 +10,7 @@ import { UploadUserImage } from "./fields";
 import "./TemplateForm.scss";
 
 interface TemplateFormProps extends FormProps<Http.TemplatePayload> {
-  originalImage?: Model.Image | null;
+  originalImage?: SavedImage | null;
   onImageChange?: (f: File | Blob | null) => void;
 }
 
@@ -22,8 +22,8 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ originalImage, onImageChang
       </Form.Item>
       <Form.Item label={"Avatar"}>
         <UploadUserImage
-          original={originalImage}
-          onChange={(f: UploadedData | null) => {
+          value={originalImage}
+          onChange={(f: UploadedImage | null) => {
             if (!isNil(onImageChange)) {
               onImageChange(!isNil(f) ? f.file : null);
             }

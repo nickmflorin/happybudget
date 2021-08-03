@@ -14,14 +14,6 @@ namespace Model {
     readonly id: number;
   }
 
-  interface Image {
-    readonly url: string;
-    readonly size: number;
-    readonly height: number;
-    readonly width: number;
-    readonly extension: string;
-  }
-
   interface TimestampTrackedModel extends Model.Model {
     readonly created_at: string;
     readonly updated_at: string;
@@ -89,7 +81,7 @@ namespace Model {
     readonly last_name: string;
     readonly full_name: string;
     readonly email: string;
-    readonly profile_image: Model.Image | null;
+    readonly profile_image: SavedImage | null;
   }
 
   interface NestedUser extends Model.SimpleUser {
@@ -123,7 +115,7 @@ namespace Model {
 
   interface SimpleTemplate extends Model.BaseBudget {
     readonly type: "template";
-    readonly image: Model.Image | null;
+    readonly image: SavedImage | null;
     // The hidden attribute will not be present for non-community templates.
     readonly hidden?: boolean;
   }
@@ -134,7 +126,7 @@ namespace Model {
 
   interface SimpleBudget extends Model.BaseBudget {
     readonly type: "budget";
-    readonly image: Model.Image | null;
+    readonly image: SavedImage | null;
   }
 
   interface Budget extends Model.SimpleBudget {
@@ -263,7 +255,7 @@ namespace Model {
 
   interface Contact extends Model.TimestampTrackedModel {
     readonly type: Model.ContactType | null;
-    readonly image: Model.Image | null;
+    readonly image: SavedImage | null;
     readonly first_name: string | null
     readonly last_name: string | null;
     readonly full_name: string;
@@ -279,9 +271,9 @@ namespace Model {
   }
 
   type UserWithImage =
-  | (Model.User & { profile_image: Model.Image })
-  | (Model.SimpleUser & { profile_image: Model.Image })
-  | (Model.Contact & { image: Model.Image });
+  | (Model.User & { profile_image: SavedImage })
+  | (Model.SimpleUser & { profile_image: SavedImage })
+  | (Model.Contact & { image: SavedImage });
 
   type HistoryEventType = "field_alteration" | "create";
 

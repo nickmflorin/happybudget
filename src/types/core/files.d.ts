@@ -3,9 +3,17 @@
 type CSVRow = (string | number | null | undefined)[];
 type CSVData = CSVRow[];
 
-type UploadError = Error | string;
-type UploadFile = import("antd/lib/upload/interface").UploadFile<Http.FileUploadResponse>;
-type UploadedData = {
+// Image data that is received from the API.
+type SavedImage = {
+  readonly url: string;
+  readonly size: number;
+  readonly height: number;
+  readonly width: number;
+  readonly extension: string;
+}
+
+// Image data that is received from an upload, but not saved to the API.
+type UploadedImage = {
   readonly file: File | Blob;
   readonly size?: number;
   readonly name: string;
@@ -14,13 +22,12 @@ type UploadedData = {
   readonly data: string | ArrayBuffer;
 }
 
-type BaseUploadFileParams = { source: "upload" }
-type UploadFileParamsNoData = BaseUploadFileParams & { loading: boolean, onClear: () => void };
-type UploadFileParamsWithData = UploadFileParamsNoData & { data: UploadedData }
-type UploadFileParamsWithError = UploadFileParamsNoData & { error: UploadError }
+type UploadError = Error | string;
+type UploadFile = import("antd/lib/upload/interface").UploadFile<Http.FileUploadResponse>;
 
-type UploadFileParamsNoError = UploadFileParamsNoData | UploadFileParamsWithData;
-type UploadFileParams = UploadFileParamsNoError | UploadFileParamsWithError;
+type UploadImageParamsNoImage = { loading: boolean, onClear: () => void, error?: UploadError | null };
+type UploadImageParamsWithImage = UploadImageParamsNoImage & { image: UploadedImage | SavedImage }
+type UploadImageParams = UploadImageParamsWithImage | UploadImageParamsNoImage;
 
 type IUploaderRef = {
   readonly clear: () => void;

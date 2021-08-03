@@ -61,14 +61,10 @@ export const isUserWithImage = (user: Model.User | Model.SimpleUser | Model.Cont
     ? (user as Model.Contact).image !== null
     : (user as Model.User | Model.SimpleUser).profile_image !== null;
 
-export const isUploadParamsWithError = (params: UploadFileParams): params is UploadFileParamsWithError => {
-  return (params as UploadFileParamsWithError).error !== undefined;
+export const isUploadParamsWithImage = (params: UploadImageParams): params is UploadImageParamsWithImage => {
+  return (params as UploadImageParamsWithImage).image !== undefined;
 };
 
-export const isUploadParamsWithData = (params: UploadFileParams): params is UploadFileParamsWithData => {
-  return (params as UploadFileParamsWithData).data !== undefined;
-};
-
-export const isUploadedImage = (params: UploadFileParams | Model.Image): params is UploadFileParams => {
-  return (params as UploadFileParams).source === "upload";
+export const isUploadedImage = (params: UploadedImage | SavedImage): params is UploadedImage => {
+  return (params as UploadedImage).file !== undefined;
 };
