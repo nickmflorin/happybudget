@@ -392,13 +392,3 @@ $table-border: 1px solid $table-border-color;
     box-shadow: 0px 3px 20px #00000029;
   }
 }
-
-.truncate {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  &.link {
-    text-align: left;
-  }
-}

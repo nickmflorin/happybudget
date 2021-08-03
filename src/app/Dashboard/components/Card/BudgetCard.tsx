@@ -22,7 +22,7 @@ const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: Bu
 
   const subTitle = useMemo(() => {
     if (isToday(budget.updated_at)) {
-      return `Last edited ${toDisplayTimeSince(budget.updated_at)} ago by ${user.full_name}`;
+      return `Last edited ${toDisplayTimeSince(budget.updated_at)} by ${user.full_name}`;
     }
     return `Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(budget.updated_at, { tz })}`;
   }, [budget.updated_at, user.full_name]);

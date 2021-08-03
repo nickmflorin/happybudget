@@ -17,16 +17,16 @@
     -webkit-box-pack: center;
     -webkit-box-align: center;
 
-    @include media(">=xxl") {
-      min-width: 600px;
-      max-width: 700px;
+    @include media(">=xl") {
+      min-width: 500px;
+      max-width: 600px;
     }
 
     .logo {
       display: inline-block;
 
-      @include media("<=medium") {
-        width: 70%;
+      @include media("<=xl") {
+        width: 75%;
       }
 
       @include media(">=xl") {
@@ -35,22 +35,14 @@
     }
 
     .landing-form-container {
-      padding: 0px;
+      padding: 20px;
 
-      @include media("<=xl") {
-        padding: 25px;
+      @include media(">=small") {
+        padding: 20px 30px;
       }
 
-      @include media("<=large") {
-        padding: 20px;
-      }
-
-      @include media("<=medium") {
-        padding: 15px;
-      }
-
-      @include media("<=small") {
-        padding: 10px;
+      @include media(">=medium") {
+        padding: 20px 50px;
       }
 
       .title {

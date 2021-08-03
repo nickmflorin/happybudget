@@ -44,3 +44,13 @@ h5 {
 h6 {
   @extend .header-base;
 }
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.link {
+    text-align: left;
+  }
+}

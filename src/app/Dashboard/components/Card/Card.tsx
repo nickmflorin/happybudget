@@ -51,7 +51,7 @@ const Card = ({
         <div className={classNames("dashboard-card-footer", { "title-only": isNil(subTitle) })} onClick={onClick}>
           <div className={"title"}>{title}</div>
           <ShowHide show={!isNil(subTitle)}>
-            <div className={"sub-title"}>{subTitle}</div>
+            <div className={"sub-title truncate"}>{subTitle}</div>
           </ShowHide>
         </div>
       </RenderWithSpinner>

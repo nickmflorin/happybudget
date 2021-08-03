@@ -1,46 +1,42 @@
 @import "style/typography";
 @import "style/colors";
+@import "style/breakpoints";
 
 .dashboard-card-base {
   border-radius: 14px;
   position: relative;
   height: 214px;
   cursor: pointer;
-  flex: 1 1 300px;
-  margin-bottom: 50px;
-  max-width: 300px;
-
-  /* 11in 2020 iPad Pro - Landscape */
-  /* Declare the same value for min- and max-width to avoid colliding with desktops */
-  /* Source: https://medium.com/connect-the-dots/css-media-queries-for-ipad-pro-8cad10e17106*/
-  @media only screen and (min-device-width: 1194px) and (max-device-width: 1194px) and (orientation: landscape) and (-webkit-min-device-pixel-ratio: 2) {
-    // flex: 1 1;
-    max-width: 245px;
-  }
-
-  @media only screen and (min-device-width: 834px) and (max-device-width: 834px) and (orientation: portrait) and (-webkit-min-device-pixel-ratio: 2) {
-    // flex: 1 1;
-    max-width: 213px;
-  }
-
-  &:not(:last-child) {
-    margin-right: 50px;
-  }
 }
 
 .dashboard-card-grid {
   margin-bottom: 15px;
-  display: flex;
-  flex-wrap: wrap;
-  flex-grow: 100;
+  display: grid;
+  grid-template-columns: minmax(275px, 300px);
+  gap: 30px;
+
+  @include media(">=large") {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include media(">=xl") {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include media(">=xxl") {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include media(">=xxxl") {
+    grid-template-columns: repeat(4, 300px);
+  }
 
   .dashboard-empty-card {
     @extend .dashboard-card-base;
     border: 2px dashed #8a8a8a;
     box-sizing: border-box;
-    align-items: center;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
     text-align: center;
 

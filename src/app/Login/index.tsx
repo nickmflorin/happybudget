@@ -16,7 +16,7 @@ const Login = (): JSX.Element => {
   const history = useHistory();
 
   return (
-    <>
+    <div className={"landing-page-left-container"}>
       <div className={"logo-container"}>
         <Logo color={"green"} />
       </div>
@@ -70,7 +70,7 @@ const Login = (): JSX.Element => {
           }}
         />
       </div>
-    </>
+    </div>
   );
 };
 
