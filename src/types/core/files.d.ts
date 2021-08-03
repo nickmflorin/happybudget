@@ -11,10 +11,11 @@ type UploadedData = {
   readonly name: string;
   readonly fileName?: string;
   readonly url: string;
+  readonly data: string | ArrayBuffer;
 }
 
-
-type UploadFileParamsNoData = { loading: boolean, onClear: () => void };
+type BaseUploadFileParams = { source: "upload" }
+type UploadFileParamsNoData = BaseUploadFileParams & { loading: boolean, onClear: () => void };
 type UploadFileParamsWithData = UploadFileParamsNoData & { data: UploadedData }
 type UploadFileParamsWithError = UploadFileParamsNoData & { error: UploadError }
 

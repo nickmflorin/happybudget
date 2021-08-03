@@ -12,11 +12,11 @@ import { FormProps } from "components/forms/Form";
 import { UploadUserImage, TimezoneSelect } from "./fields";
 
 interface UserProfileFormProps extends FormProps<Http.UserPayload> {
-  imageUrl?: string | null;
+  originalImage?: Model.Image | null;
   onImageChange?: (f: File | Blob | null) => void;
 }
 
-const UserProfileForm: React.FC<UserProfileFormProps> = ({ imageUrl, onImageChange, ...props }): JSX.Element => {
+const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImageChange, ...props }): JSX.Element => {
   const [firstName, setFirstName] = useState<string | null>(props.initialValues?.first_name);
   const [lastName, setLastName] = useState<string | null>(props.initialValues?.last_name);
 
@@ -51,18 +51,25 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ imageUrl, onImageChan
       </Form.Item>
       <Form.Item label={"Avatar"}>
         <UploadUserImage
-          initialValue={imageUrl}
+          original={originalImage}
           onChange={(f: UploadedData | null) => {
             if (!isNil(onImageChange)) {
               onImageChange(!isNil(f) ? f.file : null);
             }
           }}
           onError={(error: Error | string) => props.form.setGlobalError(error)}
-          renderContentNoError={(params: UploadFileParamsNoError) => {
+          renderContentNoError={(params: UploadFileParamsNoError, original: Model.Image | null) => {
             return (
               <UserImageOrInitials
                 circle={true}
-                src={typeguards.isUploadParamsWithData(params) ? params.data.url : undefined}
+                src={
+                  /* eslint-disable indent */
+                  typeguards.isUploadParamsWithData(params)
+                    ? params.data.url
+                    : !isNil(original)
+                    ? original.url
+                    : undefined
+                }
                 firstName={firstName}
                 lastName={lastName}
                 overlay={() => <EditImageOverlay visible={true} />}

@@ -11,10 +11,17 @@ export interface UserImageProps extends Omit<ImageProps, "src"> {
 }
 
 const UserImage = ({ user, src, ...props }: UserImageProps): JSX.Element => {
-  const imageSrc = useMemo<string | null>(
-    () => (!isNil(src) ? src : !isNil(user) ? (typeguards.isContact(user) ? user.image : user.profile_image) : null),
-    [user, src]
-  );
+  const imageSrc = useMemo<string | null>(() => {
+    if (isNil(src)) {
+      if (!isNil(user) && typeguards.isContact(user)) {
+        return !isNil(user.image) ? user.image.url : null;
+      } else if (!isNil(user)) {
+        return !isNil(user.profile_image) ? user.profile_image.url : null;
+      }
+      return null;
+    }
+    return src;
+  }, [user, src]);
   return !isNil(imageSrc) ? (
     <Image
       {...props}

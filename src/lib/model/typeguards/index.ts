@@ -68,3 +68,7 @@ export const isUploadParamsWithError = (params: UploadFileParams): params is Upl
 export const isUploadParamsWithData = (params: UploadFileParams): params is UploadFileParamsWithData => {
   return (params as UploadFileParamsWithData).data !== undefined;
 };
+
+export const isUploadedImage = (params: UploadFileParams | Model.Image): params is UploadFileParams => {
+  return (params as UploadFileParams).source === "upload";
+};

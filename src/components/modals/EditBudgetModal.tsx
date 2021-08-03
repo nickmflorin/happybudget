@@ -66,7 +66,7 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
       <BudgetForm
         form={form}
         onImageChange={(f: File | Blob | null) => setFile(f)}
-        imageUrl={budget.image}
+        originalImage={budget.image}
         initialValues={{ name: budget.name }}
       />
     </Modal>

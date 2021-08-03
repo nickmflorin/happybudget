@@ -1,3 +1,4 @@
+import { isNil } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClone, faEdit, faImage, faTrash, faUserFriends } from "@fortawesome/pro-light-svg-icons";
 
@@ -38,7 +39,7 @@ const TemplateCard = ({
       onClick={() => onClick()}
       title={template.name}
       loading={loading}
-      image={template.image}
+      image={!isNil(template.image) ? template.image.url : null}
       dropdown={[
         {
           id: "edit",

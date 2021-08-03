@@ -65,7 +65,7 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
       <TemplateForm
         form={form}
         onImageChange={(f: File | Blob | null) => setFile(f)}
-        imageUrl={template.image}
+        originalImage={template.image}
         initialValues={{ name: template.name }}
       />
     </Modal>

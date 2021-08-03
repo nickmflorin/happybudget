@@ -1,5 +1,7 @@
 import { isNil } from "lodash";
 
+export const fileSizeInMB = (file: File) => file.size / 1024 / 1024;
+
 export const getFileType = (filename: string): string | undefined => {
   if (!filename.includes(".")) {
     return undefined;

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { isNil } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faImage } from "@fortawesome/pro-light-svg-icons";
 
@@ -34,7 +35,7 @@ const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: Bu
       title={budget.name}
       subTitle={subTitle}
       loading={loading}
-      image={budget.image}
+      image={!isNil(budget.image) ? budget.image.url : null}
       dropdown={[
         {
           id: "edit",

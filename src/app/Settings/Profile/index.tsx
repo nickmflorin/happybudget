@@ -31,7 +31,7 @@ const Profile = (): JSX.Element => {
             timezone: user.timezone
           }}
           onImageChange={(f: File | Blob | null) => setFile(f)}
-          imageUrl={user.profile_image}
+          originalImage={user.profile_image}
           onFinish={(values: Partial<Http.UserPayload>) => {
             const submit = (payload: Partial<Http.UserPayload>) => {
               form.setLoading(true);
