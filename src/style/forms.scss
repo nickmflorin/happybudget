@@ -57,6 +57,127 @@ form {
       color: $text-secondary !important;
     }
   }
+
+  .form-item {
+    margin-bottom: 10px;
+
+    &.form-item-section {
+      .form-item {
+        margin-bottom: 5px;
+      }
+    }
+
+    &.condensed {
+      margin-bottom: 5px;
+      &.form-item-section {
+        .form-item {
+          margin-bottom: 0px;
+        }
+      }
+    }
+
+    // When a text field in a form has an error, do not give the text field a
+    // red border and highlight the prefix icon red.
+    &.ant-form-item-has-error {
+      .input,
+      .ant-input-affix-wrapper {
+        border: none !important;
+        .ant-input-prefix {
+          color: unset !important;
+        }
+      }
+    }
+
+    *:last-child {
+      margin-bottom: 0px !important;
+    }
+
+    .ant-form-item-extra {
+      margin-top: 4px;
+    }
+
+    .ant-form-item-label {
+      font-family: $open-sans !important;
+      font-weight: 400 !important;
+      color: $text-secondary !important;
+      padding-left: 2px;
+
+      & > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
+        margin-left: -3px;
+
+        &:before {
+          content: "";
+        }
+      }
+    }
+
+    .ant-form-item-control {
+      width: 100%;
+
+      .ant-form-item-extra {
+        font-size: 12px;
+        line-height: 12px;
+        min-height: 12px;
+        margin-top: 6px;
+        font-family: $roboto;
+        font-weight: 400;
+      }
+      .ant-form-item-control-input {
+        min-height: 36px;
+        .ant-form-item-control-input-content {
+          // The actual <input> element.
+          .ant-input {
+          }
+        }
+      }
+      // Alerts/feedback that go underneath the form control.
+      .ant-form-item-explain {
+        min-height: 12px;
+        div[role="alert"] {
+          margin-top: 5px;
+          font-size: 11px;
+          line-height: 12px;
+          margin-left: 5px;
+        }
+      }
+    }
+
+    &.condensed {
+      .form-item {
+        margin-bottom: 5px;
+
+        &.form-item-section {
+          .form-item {
+            margin-bottom: 0px;
+          }
+        }
+      }
+    }
+  }
+
+  .ant-form-item-has-error {
+    .ant-form-item-control {
+      .ant-form-item-control-input {
+        .ant-form-item-control-input-content {
+          .ant-input,
+          .ant-input-affix-wrapper,
+          .ant-input:hover,
+          .ant-input-affix-wrapper:hover {
+            border: 1px solid $red;
+          }
+          .ant-input-affix-wrapper {
+            .ant-input,
+            .ant-input:hover {
+              border: none !important;
+            }
+          }
+        }
+      }
+      .ant-form-item-explain.ant-form-item-explain-error {
+        color: $red;
+      }
+    }
+  }
 }
 
 label,
@@ -88,106 +209,6 @@ label,
 
 .ant-form-vertical .ant-form-item:last-child {
   margin-bottom: 0px !important;
-}
-
-.form-item {
-  margin-bottom: 5px;
-
-  &.form-item-section {
-    .form-item {
-      margin-bottom: 0px;
-    }
-  }
-
-  // When a text field in a form has an error, do not give the text field a
-  // red border and highlight the prefix icon red.
-  &.ant-form-item-has-error {
-    .input,
-    .ant-input-affix-wrapper {
-      border: none !important;
-      .ant-input-prefix {
-        color: unset !important;
-      }
-    }
-  }
-
-  *:last-child {
-    margin-bottom: 0px !important;
-  }
-
-  .ant-form-item-extra {
-    margin-top: 4px;
-  }
-
-  .ant-form-item-label {
-    font-family: $open-sans !important;
-    font-weight: 400 !important;
-    color: $text-secondary !important;
-    padding-left: 2px;
-
-    & > label.ant-form-item-required:not(.ant-form-item-required-mark-optional) {
-      margin-left: -3px;
-
-      &:before {
-        content: "";
-      }
-    }
-  }
-
-  .ant-form-item-control {
-    width: 100%;
-
-    .ant-form-item-extra {
-      font-size: 12px;
-      line-height: 12px;
-      min-height: 12px;
-      margin-top: 6px;
-      font-family: $roboto;
-      font-weight: 400;
-    }
-    .ant-form-item-control-input {
-      min-height: 36px;
-      .ant-form-item-control-input-content {
-        // The actual <input> element.
-        .ant-input {
-        }
-      }
-    }
-    // Alerts/feedback that go underneath the form control.
-    .ant-form-item-explain {
-      min-height: 12px;
-      div[role="alert"] {
-        margin-top: 5px;
-        font-size: 11px;
-        line-height: 12px;
-        margin-left: 5px;
-      }
-    }
-  }
-}
-
-.ant-form-item-has-error {
-  .ant-form-item-control {
-    .ant-form-item-control-input {
-      .ant-form-item-control-input-content {
-        .ant-input,
-        .ant-input-affix-wrapper,
-        .ant-input:hover,
-        .ant-input-affix-wrapper:hover {
-          border: 1px solid $red;
-        }
-        .ant-input-affix-wrapper {
-          .ant-input,
-          .ant-input:hover {
-            border: none !important;
-          }
-        }
-      }
-    }
-    .ant-form-item-explain.ant-form-item-explain-error {
-      color: $red;
-    }
-  }
 }
 
 .ant-switch {

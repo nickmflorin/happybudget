@@ -87,7 +87,7 @@ const ExportForm: React.FC<ExportFormProps> = ({
     <Form.Form
       {...props}
       initialValues={initialValues}
-      className={classNames("export-form", props.className)}
+      className={classNames("export-form", "condensed", props.className)}
       onFinish={(values: Omit<PdfBudgetTable.Options, NonFormFields>) => {
         props.onFinish?.(payload(values));
       }}
