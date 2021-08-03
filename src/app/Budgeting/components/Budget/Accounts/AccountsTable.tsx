@@ -139,6 +139,9 @@ const AccountsTable = (): JSX.Element => {
           visible={previewModalVisible}
           onCancel={() => setPreviewModalVisible(false)}
           budgetId={budgetId}
+          budgetName={
+            !isNil(budgetDetail) ? `${budgetDetail.name} Budget` : `Sample Budget ${new Date().getFullYear()}`
+          }
           filename={!isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf"}
         />
       )}

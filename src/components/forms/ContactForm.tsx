@@ -73,7 +73,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
         <PhoneNumberInput placeholder={"(123) 456-7890"} />
       </Form.Item>
       <Form.Item name={"rate"} label={"Rate"}>
-        <Input placeholder={"100 /hr"} />
+        <Input placeholder={"100"} />
       </Form.Item>
     </Form.Form>
   );

@@ -18,16 +18,6 @@ const BudgetPdfFunc = (budget: Model.PdfBudget, contacts: Model.Contact[], optio
   <BudgetPdf budget={budget} contacts={contacts} options={options} />
 );
 
-interface PreviewModalProps {
-  readonly onSuccess?: () => void;
-  readonly onCancel: () => void;
-  readonly visible: boolean;
-  readonly budgetId: number;
-  readonly filename: string;
-}
-
-type Column = PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>;
-
 const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   excludeZeroTotals: true,
   leftImage: null,
@@ -77,7 +67,25 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   ]
 };
 
-const PreviewModal = ({ budgetId, visible, filename, onSuccess, onCancel }: PreviewModalProps): JSX.Element => {
+interface PreviewModalProps {
+  readonly onSuccess?: () => void;
+  readonly onCancel: () => void;
+  readonly visible: boolean;
+  readonly budgetId: number;
+  readonly budgetName: string;
+  readonly filename: string;
+}
+
+type Column = PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>;
+
+const PreviewModal = ({
+  budgetId,
+  budgetName,
+  visible,
+  filename,
+  onSuccess,
+  onCancel
+}: PreviewModalProps): JSX.Element => {
   const [loadingData, setLoadingData] = useState(false);
   const [rendering, setRendering] = useState(false);
   const [options, setOptions] = useState<PdfBudgetTable.Options>({ ...DEFAULT_OPTIONS });
@@ -147,7 +155,10 @@ const PreviewModal = ({ budgetId, visible, filename, onSuccess, onCancel }: Prev
       <div className={"form-container"}>
         <ExportForm
           form={form}
-          initialValues={{ ...DEFAULT_OPTIONS }}
+          initialValues={{
+            ...DEFAULT_OPTIONS,
+            header: [{ ...DEFAULT_OPTIONS.header[0], data: { text: budgetName } }, ...DEFAULT_OPTIONS.header.slice(1)]
+          }}
           accountsLoading={loadingData}
           accounts={!isNil(budgetResponse) ? budgetResponse.accounts : []}
           disabled={isNil(budgetResponse) || isNil(contactsResponse)}

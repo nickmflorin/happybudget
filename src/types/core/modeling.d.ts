@@ -265,7 +265,6 @@ namespace Model {
     readonly city: string | null;
     readonly email: string | null;
     readonly phone_number: string | null;
-    readonly rate: number | null;
     readonly created_at: string;
     readonly updated_at: string;
   }

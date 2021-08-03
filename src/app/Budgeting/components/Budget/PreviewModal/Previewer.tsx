@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Page } from "react-pdf/dist/esm/entry.webpack";
+import classNames from "classnames";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRedo } from "@fortawesome/free-solid-svg-icons";
 
 import { Pagination } from "antd";
 
-import { Form } from "components";
 import { Button } from "components/buttons";
 import { RenderDocument } from "components/pdf";
 
@@ -21,7 +24,14 @@ const Previewer = ({ file, loading, onExport, exportDisabled }: PreviewerProps):
   return (
     <div className={"previewer"}>
       <div className={"preview-header"}>
-        <Form.Label>{"Preview"}</Form.Label>
+        <Button
+          className={classNames("btn--refresh-pdf", loading ? "loading" : "")}
+          onClick={() => console.log("test")}
+          disabled={loading}
+          icon={<FontAwesomeIcon icon={faRedo} />}
+        >
+          {"Refresh Preview"}
+        </Button>
       </div>
       <div className={"preview-content"}>
         <RenderDocument
@@ -39,7 +49,7 @@ const Previewer = ({ file, loading, onExport, exportDisabled }: PreviewerProps):
         </RenderDocument>
       </div>
       <div className={"preview-footer"}>
-        <Pagination total={numPages} pageSize={1} current={page} onChange={(p: number) => setPage(p)} />
+        <Pagination total={numPages} pageSize={1} current={page} size={"small"} onChange={(p: number) => setPage(p)} />
         <Button className={"btn btn--primary"} htmlType={"submit"} disabled={exportDisabled} onClick={() => onExport()}>
           {"Export"}
         </Button>

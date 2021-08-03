@@ -29,7 +29,7 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
 
   overflow: hidden;
   width: $modal-width !important;
-  $modal-height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 36px + 10px + #{$modal-header-height});
+  $modal-height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 36px + 10px + 10px + 36px + #{$modal-header-height});
   top: calc(0.5 * calc(100vh - #{$modal-height}));
   height: $modal-height !important;
 
@@ -67,13 +67,27 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
       overflow-x: hidden;
       width: 100%;
       display: flex;
-      height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 36px + 10px) !important;
+      height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 36px + 10px + 10px + 36px) !important;
 
       .form-container {
         overflow-y: scroll;
         flex-grow: 100;
         margin-right: 10px;
         padding-right: 20px;
+        scrollbar-color: $gray transparent; // Firefox
+        scrollbar-width: thin; // Firefox
+
+        // Chrome & Safari
+        &::-webkit-scrollbar {
+          background-color: transparent;
+          width: 7px;
+        }
+
+        // Chrome & Safari
+        &::-webkit-scrollbar-thumb {
+          background-color: $gray;
+          border-radius: 10px;
+        }
 
         .export-form {
           max-height: 100%;
@@ -93,7 +107,7 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
       }
 
       .previewer {
-        height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 10px) !important;
+        height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 10px + 10px + 36px) !important;
         width: calc(#{$pdf-canvas-width} + 6px) !important;
 
         .preview-header {
@@ -114,17 +128,27 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
           }
         }
         .preview-footer {
-          display: flex;
           height: 36px;
 
           .ant-pagination {
-            flex-grow: 100;
+            width: auto;
+            margin-bottom: 10px;
+            text-align: center;
           }
           .btn {
-            width: 80px;
+            width: 100%;
           }
         }
       }
+    }
+  }
+
+  .btn--refresh-pdf {
+    border: none;
+    box-shadow: none;
+
+    svg {
+      margin-right: 10px;
     }
   }
 }
