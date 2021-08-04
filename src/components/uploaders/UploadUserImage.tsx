@@ -2,9 +2,12 @@ import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCamera, faPlus } from "@fortawesome/pro-solid-svg-icons";
+
 import * as typeguards from "lib/model/typeguards";
 
-import { FullSize, ShowHide } from "components";
+import { FullSize, ShowHide, VerticalFlexCenter } from "components";
 import { ImageClearButton } from "components/buttons";
 import { UserImageOrInitials, EditImageOverlay } from "components/images";
 
@@ -16,6 +19,19 @@ export interface UploadUserImageProps extends UploaderProps {
   readonly lastName: string | null;
   readonly imageClearButtonProps?: StandardComponentProps;
 }
+
+const UploadUserImageNoInitials = (): JSX.Element => {
+  return (
+    <div className={"no-initials"}>
+      <VerticalFlexCenter className={"no-initials-icon-wrapper"}>
+        <FontAwesomeIcon className={"icon"} icon={faCamera} />
+      </VerticalFlexCenter>
+      <VerticalFlexCenter className={"no-initials-icon-wrapper"}>
+        <FontAwesomeIcon className={"icon"} icon={faPlus} />
+      </VerticalFlexCenter>
+    </div>
+  );
+};
 
 const UploadUserImage = ({
   firstName,
@@ -52,6 +68,7 @@ const UploadUserImage = ({
               firstName={firstName}
               lastName={lastName}
               overlay={() => <EditImageOverlay visible={true} />}
+              renderNoInitials={<UploadUserImageNoInitials />}
             />
           </FullSize>
         );

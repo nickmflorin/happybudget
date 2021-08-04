@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 import * as typeguards from "lib/model/typeguards";
 import UserImage, { UserImageProps } from "./UserImage";
@@ -6,13 +6,13 @@ import UserInitials, { UserInitialsProps } from "./UserInitials";
 import { isNil } from "lodash";
 import { useEffect } from "react";
 
-export interface UserImageOrInitialsProps extends StandardComponentProps {
+export interface UserImageOrInitialsProps
+  extends StandardComponentProps,
+    Omit<UserInitialsProps, StandardComponentPropNames> {
   readonly user?: Model.User | Model.SimpleUser | Model.Contact;
   readonly src?: string | null;
-  readonly firstName?: string | null;
-  readonly lastName?: string | null;
-  readonly initials?: string | null;
-  readonly initialsProps?: Omit<UserInitialsProps, "user" | "firstName" | "lastName" | "initials">;
+  readonly initialsStyle?: React.CSSProperties;
+  readonly initialsClassName?: string;
   readonly imageProps?: Omit<UserImageProps, "user" | "src">;
   readonly circle?: boolean;
   readonly overlay?: () => JSX.Element;
@@ -22,11 +22,9 @@ const UserImageOrInitials = ({
   user,
   src,
   imageProps,
-  initialsProps,
-  firstName,
-  lastName,
-  initials,
   overlay,
+  initialsStyle,
+  initialsClassName,
   ...props
 }: UserImageOrInitialsProps): JSX.Element => {
   // If there is an error loading the image, we want to fallback to the initials
@@ -37,37 +35,30 @@ const UserImageOrInitials = ({
     setErrorWithImage(null);
   }, [src]);
 
-  if (!isNil(src) && errorWithImage === null) {
+  const userImageSrcProps = useMemo(() => {
+    if (errorWithImage === null) {
+      if (!isNil(src)) {
+        return { src };
+      } else if (!isNil(user) && typeguards.isUserWithImage(user)) {
+        return { user };
+      }
+      return null;
+    }
+    return null;
+  }, [src, errorWithImage, user]);
+
+  if (!isNil(userImageSrcProps)) {
     return (
       <UserImage
-        src={src}
         overlay={overlay}
-        {...props}
-        {...imageProps}
-        onError={(e: React.SyntheticEvent<HTMLImageElement>) => setErrorWithImage(e)}
-      />
-    );
-  } else if (!isNil(user) && typeguards.isUserWithImage(user) && errorWithImage === null) {
-    return (
-      <UserImage
-        user={user}
-        overlay={overlay}
+        {...userImageSrcProps}
         {...props}
         {...imageProps}
         onError={(e: React.SyntheticEvent<HTMLImageElement>) => setErrorWithImage(e)}
       />
     );
   } else {
-    return (
-      <UserInitials
-        {...props}
-        {...initialsProps}
-        user={user}
-        initials={initials}
-        firstName={firstName}
-        lastName={lastName}
-      />
-    );
+    return <UserInitials {...props} user={user} className={initialsClassName} style={initialsStyle} />;
   }
 };
 

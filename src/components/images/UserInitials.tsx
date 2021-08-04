@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
+import { ShowHide } from "components";
+
 import "./UserInitials.scss";
 
 export interface UserInitialsProps extends StandardComponentProps {
@@ -9,6 +11,7 @@ export interface UserInitialsProps extends StandardComponentProps {
   readonly initials?: string | null;
   readonly firstName?: string | null;
   readonly lastName?: string | null;
+  readonly renderNoInitials?: JSX.Element;
 }
 
 const UserInitials = ({
@@ -16,6 +19,7 @@ const UserInitials = ({
   initials,
   firstName,
   lastName,
+  renderNoInitials,
   ...props
 }: Omit<UserInitialsProps, "src">): JSX.Element => {
   const userFirstName = useMemo<string | null>(() => {
@@ -56,7 +60,10 @@ const UserInitials = ({
 
   return (
     <div className={classNames("user-initials", props.className)} style={props.style}>
-      <div className={"user-initials-text"}>{userInitials}</div>
+      <ShowHide show={isNil(renderNoInitials) || userInitials !== ""}>
+        <div className={"user-initials-text"}>{userInitials}</div>
+      </ShowHide>
+      <ShowHide show={!isNil(renderNoInitials) && userInitials === ""}>{renderNoInitials}</ShowHide>
     </div>
   );
 };

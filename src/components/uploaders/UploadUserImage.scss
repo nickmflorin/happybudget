@@ -1,8 +1,31 @@
+@import "style/colors";
+
 .user-image-uploader {
   .image-uploader-upload {
     border: none !important;
     .ant-upload-select-picture-card {
       border: none !important;
+    }
+  }
+  .no-initials {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    .no-initials-icon-wrapper {
+      &:not(:first-child) {
+        margin-left: 4px;
+      }
+      .icon {
+        color: $text-secondary !important;
+        &.fa-camera {
+          height: 26px;
+          width: 26px;
+        }
+        svg {
+          color: $text-secondary !important;
+        }
+      }
     }
   }
 }

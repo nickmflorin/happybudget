@@ -28,6 +28,8 @@ interface FieldCheck {
 type SearchIndex = string | string[];
 type SearchIndicies = SearchIndex[];
 
+type StandardComponentPropNames = "id" | "className" | "style";
+
 interface StandardComponentProps {
   readonly id?: any;
   readonly className?: string;
