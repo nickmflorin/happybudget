@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
+import { isNil } from "lodash";
 
 import * as api from "api";
 
@@ -56,9 +57,15 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
         form
           .validateFields()
           .then((values: Http.ContactPayload) => {
+            let payload = { ...values };
+            // We have to account for allowing the image to be null, which is the case
+            // when we are deleting the image for the contact.
+            if (image !== undefined) {
+              payload = { ...payload, image: !isNil(image) ? image.data : null };
+            }
             setLoading(true);
             api
-              .createContact(values)
+              .createContact(payload)
               .then((contact: Model.Contact) => {
                 form.resetFields();
                 dispatch(addContactToStateAction(contact));
