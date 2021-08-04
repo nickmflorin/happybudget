@@ -39,8 +39,8 @@ const withAutoFocusInput =
       if (!isNil(inputRef.current) && !isNil(inputRef.current.focus)) {
         inputRef.current.focus();
       }
-    }, []);
-    return <Component {...props} autoFocus={true} />;
+    }, [isNil(inputRef.current)]);
+    return <Component {...props} ref={inputRef} />;
   };
 
 /**
@@ -94,7 +94,7 @@ const withFormItemFirstInputFocused = <
           ...c.slice(0, firstInputIndex),
           <AutoFocusInputComponent
             key={firstInputIndex}
-            {...inputChildren[0].props}
+            {...inputChildren[firstInputIndex].props}
             // We have to manually set the defaultValue because AntD will not apply it
             // since we are messing with the AntD form mechanics here.
             defaultValue={
@@ -120,7 +120,7 @@ const withFormItemFirstInputFocused = <
                 formProps.form.setFieldsValue({ [props.name]: value } as any);
               }
               if (!isNil(inputChildren[0].props.onChange)) {
-                inputChildren[0].props.onChange(e);
+                inputChildren[firstInputIndex].props.onChange(e);
               }
             }}
           />,
@@ -128,7 +128,8 @@ const withFormItemFirstInputFocused = <
         ];
       }
       return c;
-    }, [props.children]);
+    }, []);
+
     const newProps = { ...props, children: newChildren.length === 1 ? newChildren[0] : newChildren };
     return <Component {...newProps} />;
   };
@@ -189,7 +190,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
       }
     }
     return c;
-  }, [props.name, children]);
+  }, []);
 
   const footer = useMemo<JSX.Element | undefined>(() => {
     return find(childrenArray, (child: JSX.Element) => child.type === Footer);
