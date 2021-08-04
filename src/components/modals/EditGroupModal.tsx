@@ -16,7 +16,7 @@ const EditGroupModal = ({ group, open, onSuccess, onCancel }: EditGroupModalProp
   const [form] = Form.useForm<Http.GroupPayload>({ isInModal: true });
 
   return (
-    <Modal
+    <Modal.Modal
       title={"Edit Sub-Total"}
       visible={open}
       onCancel={() => onCancel()}
@@ -48,7 +48,7 @@ const EditGroupModal = ({ group, open, onSuccess, onCancel }: EditGroupModalProp
       }}
     >
       <GroupForm form={form} initialValues={{ name: group.name, color: group.color }} />
-    </Modal>
+    </Modal.Modal>
   );
 };
 

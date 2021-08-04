@@ -1,4 +1,4 @@
-import { Modal } from "components/modals";
+import { Modal } from "components";
 import GenericFringesTable, { GenericFringesTableProps } from "./GenericFringesTable";
 import "./GenericFringesModal.scss";
 
@@ -10,7 +10,7 @@ export interface GenericFringesModalProps extends GenericFringesTableProps {
 
 const GenericFringesModal = ({ open, onCancel, loading, ...props }: GenericFringesModalProps): JSX.Element => {
   return (
-    <Modal
+    <Modal.Modal
       className={"fringes-modal"}
       title={"Fringes"}
       loading={loading}
@@ -19,7 +19,7 @@ const GenericFringesModal = ({ open, onCancel, loading, ...props }: GenericFring
       footer={null}
     >
       <GenericFringesTable {...props} />
-    </Modal>
+    </Modal.Modal>
   );
 };
 

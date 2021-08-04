@@ -26,7 +26,7 @@ const CreateTemplateModal = ({
   const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
 
   return (
-    <Modal
+    <Modal.Modal
       title={"Create Template"}
       visible={open}
       onCancel={() => onCancel()}
@@ -61,7 +61,7 @@ const CreateTemplateModal = ({
       }}
     >
       <TemplateForm form={form} onImageChange={(f: UploadedImage | null) => setFile(f)} initialValues={{}} />
-    </Modal>
+    </Modal.Modal>
   );
 };
 

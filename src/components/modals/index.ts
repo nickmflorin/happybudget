@@ -8,4 +8,5 @@ export { default as CreateTemplateAccountGroupModal } from "./CreateTemplateAcco
 export { default as EditGroupModal } from "./EditGroupModal";
 export { default as EditBudgetModal } from "./EditBudgetModal";
 export { default as EditTemplateModal } from "./EditTemplateModal";
-export { default as Modal } from "./Modal";
+export { default as CreateContactModal } from "./CreateContactModal";
+export { default as EditContactModal } from "./EditContactModal";

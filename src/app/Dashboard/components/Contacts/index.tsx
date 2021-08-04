@@ -6,7 +6,7 @@ import { Input, Button } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
-import { CreateContactModal } from "app/modals";
+import { CreateContactModal } from "components/modals";
 import { ActionsMenuBar } from "components/menus";
 import { Page } from "components/layout";
 

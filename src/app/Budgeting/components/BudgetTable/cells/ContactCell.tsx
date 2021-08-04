@@ -9,7 +9,7 @@ import Cell, { CellProps } from "./Cell";
 import classNames from "classnames";
 
 interface ContactCellProps extends CellProps<BudgetTable.SubAccountRow> {
-  readonly onEditContact: (contact: Model.Contact) => void;
+  readonly onEditContact: (id: number) => void;
 }
 
 const ContactCell = (props: ContactCellProps): JSX.Element => {
@@ -33,7 +33,7 @@ const ContactCell = (props: ContactCellProps): JSX.Element => {
             textColor={"#2182e4"}
             text={model.full_name}
             contentRender={(params: Omit<ITagRenderParams, "contentRender">) => (
-              <ButtonLink disabled={!isFocused} onClick={() => props.onEditContact(model)}>
+              <ButtonLink disabled={!isFocused} onClick={() => props.onEditContact(model.id)}>
                 {params.text}
               </ButtonLink>
             )}

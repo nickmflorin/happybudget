@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { isNil, forEach, find } from "lodash";
 import { Form as RootForm } from "antd";
-import { ClientError, NetworkError, parseGlobalError, parseFieldErrors, standardizeError } from "api";
+import { ClientError, ServerError, NetworkError, parseGlobalError, parseFieldErrors, standardizeError } from "api";
 import { replaceInArray } from "lib/util";
 import { FormInstance } from "./model";
 
@@ -61,6 +61,10 @@ const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
           // Render the errors for each field next to the form field.
           renderFieldErrors(e);
         } else if (e instanceof NetworkError) {
+          setGlobalError("There was a problem communicating with the server.");
+        } else if (e instanceof ServerError) {
+          /* eslint-disable no-console */
+          console.error(e);
           setGlobalError("There was a problem communicating with the server.");
         } else {
           throw e;

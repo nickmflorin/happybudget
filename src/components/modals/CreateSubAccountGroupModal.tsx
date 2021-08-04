@@ -27,7 +27,7 @@ const CreateSubAccountGroupModal = ({
   const [form] = Form.useForm<Http.GroupPayload>({ isInModal: true });
 
   return (
-    <Modal
+    <Modal.Modal
       title={"Create Sub-Total"}
       visible={open}
       onCancel={() => onCancel()}
@@ -74,7 +74,7 @@ const CreateSubAccountGroupModal = ({
       }}
     >
       <GroupForm form={form} initialValues={{}} />
-    </Modal>
+    </Modal.Modal>
   );
 };
 

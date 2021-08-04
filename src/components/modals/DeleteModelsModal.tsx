@@ -27,7 +27,7 @@ const DeleteModelsModal = <M extends Model.Model>({
   ...props
 }: DeleteModelsModalProps<M>): JSX.Element => {
   return (
-    <Modal loading={loading} {...props}>
+    <Modal.Modal loading={loading} {...props}>
       <React.Fragment>
         {!isNil(info) && <Info style={{ marginBottom: 24 }} detail={info} />}
         {!isNil(warning) && <Warning style={{ marginBottom: 24 }} detail={warning} />}
@@ -38,7 +38,7 @@ const DeleteModelsModal = <M extends Model.Model>({
           renderItem={(item: any) => <DeleteModelListItem {...itemProps(item)} />}
         />
       </React.Fragment>
-    </Modal>
+    </Modal.Modal>
   );
 };
 

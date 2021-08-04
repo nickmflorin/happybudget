@@ -18,7 +18,7 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
   const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
 
   return (
-    <Modal
+    <Modal.Modal
       title={`Edit ${template.name}`}
       visible={open}
       onCancel={() => onCancel()}
@@ -55,7 +55,7 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
         originalImage={template.image}
         initialValues={{ name: template.name }}
       />
-    </Modal>
+    </Modal.Modal>
   );
 };
 

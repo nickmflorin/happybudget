@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 
 import { SuppressKeyboardEventParams, RowNode } from "@ag-grid-community/core";
 
-import { EditContactModal, CreateContactModal } from "app/modals";
+import { EditContactModal, CreateContactModal } from "components/modals";
 import { getKeyValue } from "lib/util";
 import { parseFirstAndLastName } from "lib/model/util";
-import { useContacts } from "store/hooks";
+import { simpleDeepEqualSelector } from "store/selectors";
 
 import { selectBudgetDetail, selectBudgetDetailLoading } from "../../store/selectors";
 import { GenericSubAccountsTable, GenericSubAccountsTableProps } from "../Generic";
@@ -19,15 +19,31 @@ interface SubAccountsTableProps extends Omit<GenericSubAccountsTableProps, "mana
   readonly loadingParent: boolean;
 }
 
+const selectContacts = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.user.contacts.data);
+
 const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableProps): JSX.Element => {
   const [preContactCreate, setPreContactCreate] = useState<PreContactCreate | null>(null);
   const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
-  const [contactToEdit, setContactToEdit] = useState<Model.Contact | null>(null);
+  const [contactToEdit, setContactToEdit] = useState<number | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
-  const contacts = useContacts();
+  const contacts = useSelector(selectContacts);
   const budgetDetail = useSelector(selectBudgetDetail);
   const loadingBudget = useSelector(selectBudgetDetailLoading);
+
+  const editingContact = useMemo(() => {
+    if (!isNil(contactToEdit)) {
+      const contact: Model.Contact | undefined = find(contacts, { id: contactToEdit } as any);
+      if (!isNil(contact)) {
+        return contact;
+      } else {
+        /* eslint-disable no-console */
+        console.error(`Could not find contact with ID ${contactToEdit} in state.`);
+        return null;
+      }
+    }
+    return null;
+  }, [contactToEdit]);
 
   return (
     <React.Fragment>
@@ -68,7 +84,7 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
             columnType: "contact",
             index: 2,
             cellRendererParams: {
-              onEditContact: (contact: Model.Contact) => setContactToEdit(contact)
+              onEditContact: (contact: number) => setContactToEdit(contact)
             },
             cellEditorParams: {
               onNewContact: (params: { name?: string; change: PreContactCreate }) => {
@@ -154,10 +170,10 @@ const SubAccountsTable = ({ loadingParent, detail, ...props }: SubAccountsTableP
         ]}
         {...props}
       />
-      {!isNil(contactToEdit) && (
+      {!isNil(editingContact) && (
         <EditContactModal
           visible={true}
-          contact={contactToEdit}
+          contact={editingContact}
           onSuccess={() => setContactToEdit(null)}
           onCancel={() => setContactToEdit(null)}
         />

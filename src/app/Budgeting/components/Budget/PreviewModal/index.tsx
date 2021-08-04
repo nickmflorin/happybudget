@@ -136,7 +136,7 @@ const PreviewModal = ({ budgetId, visible, filename, onSuccess, onCancel }: Prev
   }, [contactsResponse, budgetResponse, options]);
 
   return (
-    <Modal
+    <Modal.Modal
       className={"export-preview-modal"}
       title={"Export"}
       visible={visible}
@@ -173,7 +173,7 @@ const PreviewModal = ({ budgetId, visible, filename, onSuccess, onCancel }: Prev
           }
         }}
       />
-    </Modal>
+    </Modal.Modal>
   );
 };
 

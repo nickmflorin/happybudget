@@ -6,7 +6,7 @@ import { faTrashAlt, faFileCsv, faLineColumns } from "@fortawesome/pro-solid-svg
 
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
-import { EditContactModal, CreateContactModal } from "app/modals";
+import { EditContactModal, CreateContactModal } from "components/modals";
 
 import * as models from "lib/model";
 import { useDeepEqualMemo } from "lib/hooks";
@@ -15,7 +15,6 @@ import { downloadAsCsvFile } from "lib/util/files";
 import { findChoiceForName, inferModelFromName, parseFirstAndLastName } from "lib/model/util";
 import { agCurrencyValueFormatter, agDateValueFormatter } from "lib/model/formatters";
 import { floatValueSetter, dateTimeValueSetter } from "lib/model/valueSetters";
-import { useContacts } from "store/hooks";
 
 import { WrapInApplicationSpinner } from "components";
 import { FieldsDropdown } from "components/dropdowns";
@@ -27,6 +26,7 @@ import { selectBudgetDetail } from "../../store/selectors";
 import BudgetTableComponent from "../BudgetTable";
 
 const selectActuals = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.budget.budget.actuals.data);
+const selectContacts = simpleDeepEqualSelector((state: Modules.ApplicationStore) => state.user.contacts.data);
 const selectTableSearch = simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.actuals.search
 );
@@ -35,7 +35,7 @@ const selectActualsLoading = simpleShallowEqualSelector(
 );
 
 const Actuals = (): JSX.Element => {
-  const [contactToEdit, setContactToEdit] = useState<Model.Contact | null>(null);
+  const [contactToEdit, setContactToEdit] = useState<number | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
   const dispatch = useDispatch();
@@ -44,7 +44,7 @@ const Actuals = (): JSX.Element => {
   const search = useSelector(selectTableSearch);
   const tableRef = useRef<BudgetTable.Ref<BudgetTable.ActualRow, Model.Actual>>(null);
   const budgetDetail = useSelector(selectBudgetDetail);
-  const contacts = useContacts();
+  const contacts = useSelector(selectContacts);
 
   useEffect(() => {
     dispatch(actions.requestActualsAction(null));
@@ -57,6 +57,20 @@ const Actuals = (): JSX.Element => {
   const actualsTableTotal = useMemo(() => {
     return reduce(data, (sum: number, s: Model.Actual) => sum + (s.value || 0), 0);
   }, [useDeepEqualMemo(data)]);
+
+  const editingContact = useMemo(() => {
+    if (!isNil(contactToEdit)) {
+      const contact: Model.Contact | undefined = find(contacts, { id: contactToEdit } as any);
+      if (!isNil(contact)) {
+        return contact;
+      } else {
+        /* eslint-disable no-console */
+        console.error(`Could not find contact with ID ${contactToEdit} in state.`);
+        return null;
+      }
+    }
+    return null;
+  }, [contactToEdit]);
 
   return (
     <React.Fragment>
@@ -230,7 +244,7 @@ const Actuals = (): JSX.Element => {
               cellEditor: "ContactCellEditor",
               columnType: "contact",
               cellRendererParams: {
-                onEditContact: (contact: Model.Contact) => setContactToEdit(contact)
+                onEditContact: (id: number) => setContactToEdit(id)
               },
               cellEditorParams: {
                 onNewContact: () => setCreateContactModalVisible(true)
@@ -332,10 +346,10 @@ const Actuals = (): JSX.Element => {
           ]}
         />
       </WrapInApplicationSpinner>
-      {!isNil(contactToEdit) && (
+      {!isNil(editingContact) && (
         <EditContactModal
           visible={true}
-          contact={contactToEdit}
+          contact={editingContact}
           onSuccess={() => setContactToEdit(null)}
           onCancel={() => setContactToEdit(null)}
         />

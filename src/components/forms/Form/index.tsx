@@ -39,7 +39,7 @@ const withAutoFocusInput =
       if (!isNil(inputRef.current) && !isNil(inputRef.current.focus)) {
         inputRef.current.focus();
       }
-    }, [inputRef.current]);
+    }, []);
     return <Component {...props} autoFocus={true} />;
   };
 

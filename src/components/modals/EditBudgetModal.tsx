@@ -18,7 +18,7 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
   const [form] = Form.useForm<Http.BudgetPayload>({ isInModal: true });
 
   return (
-    <Modal
+    <Modal.Modal
       title={`Edit ${budget.name}`}
       visible={open}
       onCancel={() => onCancel()}
@@ -55,7 +55,7 @@ const EditBudgetModal = ({ open, budget, onSuccess, onCancel }: EditBudgetModalP
         originalImage={budget.image}
         initialValues={{ name: budget.name }}
       />
-    </Modal>
+    </Modal.Modal>
   );
 };
 

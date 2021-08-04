@@ -52,7 +52,7 @@ const CreateBudgetModal = ({
   }, [allowTemplateSelection, templates]);
 
   return (
-    <Modal
+    <Modal.Modal
       title={title}
       visible={open}
       onCancel={() => onCancel()}
@@ -99,7 +99,7 @@ const CreateBudgetModal = ({
         }
         initialValues={{}}
       />
-    </Modal>
+    </Modal.Modal>
   );
 };
 
