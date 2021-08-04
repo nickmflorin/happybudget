@@ -227,3 +227,17 @@ label,
     }
   }
 }
+
+.ant-form-vertical {
+  .ant-form-item {
+    // For horizontally laid out forms, where the label is to the left of the
+    // field, the label must still be 36px in height to align properly with the
+    // fields which are also 36px.
+    .ant-form-item-label {
+      height: 26px !important;
+      label {
+        height: 26px !important;
+      }
+    }
+  }
+}

@@ -1,8 +1,15 @@
 @import "style/colors";
 @import "style/typography";
 
+.ant-modal-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .ant-modal {
   padding-bottom: 0px;
+  top: auto !important;
 }
 
 .ant-modal-content {
@@ -12,10 +19,10 @@
 
   .ant-modal-header {
     padding-top: 36px;
-    padding-bottom: 24px;
+    padding-bottom: 12px;
     padding-left: 36px;
     padding-right: 36px;
-    height: 84px;
+    height: 72px;
 
     background: $white !important;
     border-bottom: none !important;
@@ -32,10 +39,9 @@
 
   .ant-modal-close {
     .ant-modal-close-x {
-      padding-left: 36px;
-      padding-right: 36px;
-      height: 84px;
-      width: 88px;
+      padding: 28px !important;
+      height: 72px;
+      width: 72px;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -65,7 +71,7 @@
     border-top: none !important;
     padding-top: 12px;
     padding-right: 36px;
-    padding-bottom: 36px;
+    padding-bottom: 24px;
     padding-left: 36px;
   }
 }
