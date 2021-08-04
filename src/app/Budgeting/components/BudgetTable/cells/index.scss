@@ -101,7 +101,9 @@
     position: absolute;
     right: 0px;
     top: 0;
-    height: 100%;
+    padding: 9px !important;
+    height: 100% !important;
+    width: 24px !important;
   }
 
   &:hover {
