@@ -91,51 +91,51 @@
       }
     }
 
-    .image,
-    .image-placeholder {
-      height: 150px;
-      width: 100%;
-      position: relative;
-      justify-content: center;
-      align-items: center;
-      display: inline-flex;
-      -webkit-box-align: center;
-      -webkit-box-pack: center;
-      border-top-left-radius: 14px;
-      border-top-right-radius: 14px;
-      overflow: hidden;
+    // .image,
+    // .image-placeholder {
+    //   height: 150px;
+    //   width: 100%;
+    //   position: relative;
+    //   justify-content: center;
+    //   align-items: center;
+    //   display: inline-flex;
+    //   -webkit-box-align: center;
+    //   -webkit-box-pack: center;
+    //   border-top-left-radius: 14px;
+    //   border-top-right-radius: 14px;
+    //   overflow: hidden;
 
-      &.title-only {
-        height: 170px;
-      }
-    }
+    //   &.title-only {
+    //     height: 170px;
+    //   }
+    // }
 
-    .image {
-      .image-tint {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(15, 15, 15, 0.04);
-        border-top-left-radius: 14px;
-        border-top-right-radius: 14px;
-      }
-      img {
-        height: 100%;
-        width: 100%;
-        object-fit: cover;
-      }
-    }
+    // .image {
+    //   .image-tint {
+    //     position: absolute;
+    //     top: 0;
+    //     left: 0;
+    //     height: 100%;
+    //     width: 100%;
+    //     background-color: rgba(15, 15, 15, 0.04);
+    //     border-top-left-radius: 14px;
+    //     border-top-right-radius: 14px;
+    //   }
+    //   img {
+    //     height: 100%;
+    //     width: 100%;
+    //     object-fit: cover;
+    //   }
+    // }
 
-    .image-placeholder {
-      background-color: #f9f9f9;
-      svg {
-        height: 40px;
-        width: 40px;
-        color: #cacaca;
-      }
-    }
+    // .image-placeholder {
+    //   background-color: #f9f9f9;
+    //   svg {
+    //     height: 40px;
+    //     width: 40px;
+    //     color: #cacaca;
+    //   }
+    // }
 
     .dashboard-card-footer {
       position: absolute;

@@ -8,6 +8,15 @@
     border-radius: 100%;
   }
 
+  .image-tint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(15, 15, 15, 0.04);
+  }
+
   &--user {
     @extend .img;
     position: absolute;

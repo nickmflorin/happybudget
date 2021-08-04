@@ -12,12 +12,25 @@ import { UploadFile } from "antd/lib/upload/interface";
 
 import * as api from "api";
 import { fileSizeInMB, getBase64 } from "lib/util/files";
-import { RenderWithSpinner, Image } from "components";
+import { RenderWithSpinner, Image, ShowHide } from "components";
+import { ImageClearButton } from "components/buttons";
 
 import "./Uploader.scss";
 
 const ACCCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png"];
 const MAX_IMAGE_SIZE = 2; // In MB
+
+interface UploaderImageProps extends StandardComponentProps {
+  readonly image: UploadedImage | SavedImage;
+}
+
+const UploaderImage = (props: UploaderImageProps): JSX.Element => {
+  return (
+    <div className={"uploader-image-wrapper"}>
+      <Image className={props.className} src={props.image.url} style={{ width: "100%", ...props.style }} />
+    </div>
+  );
+};
 
 interface UploaderContentProps extends Omit<StandardComponentProps, "id"> {
   readonly imageStyle?: React.CSSProperties;
@@ -62,7 +75,7 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
       return !isNil(props.renderImage) ? (
         props.renderImage(params)
       ) : (
-        <Image className={props.imageClassName} src={props.image.url} style={{ width: "100%", ...props.imageStyle }} />
+        <UploaderImage className={props.imageClassName} image={props.image} style={props.imageStyle} />
       );
     } else if (!isNil(props.renderNoImage)) {
       return props.renderNoImage(params);
@@ -76,12 +89,15 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
   }
 };
 
-export interface UploaderProps extends Omit<UploaderContentProps, "data" | "error" | "loading" | "onClear" | "image"> {
+export interface UploaderProps extends Omit<UploaderContentProps, "data" | "error" | "loading" | "image" | "onClear"> {
   readonly contentStyle?: React.CSSProperties;
   readonly contentClassName?: string;
   readonly initialValue?: SavedImage | null;
   readonly showLoadingIndicator?: boolean;
   readonly value?: SavedImage | UploadedImage | null;
+  readonly showClear?: boolean;
+  readonly imageClearButtonProps?: StandardComponentProps;
+  readonly onClear?: () => void;
   readonly onChange: (params: UploadedImage | null) => void;
   readonly onError: (error: Error | string) => void;
   readonly hoverOverlay?: (params: { visible: boolean; children: () => JSX.Element }) => JSX.Element;
@@ -93,11 +109,14 @@ const Uploader = (
     style,
     contentStyle,
     contentClassName,
-    hoverOverlay,
     showLoadingIndicator = true,
+    value,
+    showClear,
+    imageClearButtonProps,
+    hoverOverlay,
     onChange,
     onError,
-    value,
+    onClear,
     ...props
   }: UploaderProps,
   ref: ForwardedRef<IUploaderRef>
@@ -109,6 +128,13 @@ const Uploader = (
   const _onError = (e: string | Error) => {
     setError(e);
     onError(e);
+  };
+
+  const _onClear = () => {
+    setError(null);
+    setLoading(false);
+    setImage(null);
+    onClear?.();
   };
 
   const setImage = (img: UploadedImage | null) => {
@@ -127,6 +153,7 @@ const Uploader = (
   return (
     <div className={classNames("image-uploader", className)} style={style}>
       <Upload
+        className={classNames("image-uploader-upload", { "with-image": !isNil(image) })}
         name={"avatar"}
         listType={"picture-card"}
         showUploadList={false}
@@ -188,17 +215,24 @@ const Uploader = (
         }}
       >
         <RenderWithSpinner size={24} loading={loading && showLoadingIndicator}>
+          <ShowHide show={!isNil(image) && showClear === true}>
+            <ImageClearButton
+              {...imageClearButtonProps}
+              style={{ position: "absolute", top: -17, right: -17, ...imageClearButtonProps?.style }}
+              onClick={(e: React.MouseEvent<any>) => {
+                e.stopPropagation();
+                e.preventDefault();
+                _onClear();
+              }}
+            />
+          </ShowHide>
           <UploaderContent
             className={contentClassName}
             style={contentStyle}
             image={image}
             error={error}
             loading={loading}
-            onClear={() => {
-              setError(null);
-              setLoading(false);
-              setImage(null);
-            }}
+            onClear={_onClear}
             {...props}
           />
         </RenderWithSpinner>

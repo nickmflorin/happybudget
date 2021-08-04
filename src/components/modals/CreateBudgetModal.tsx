@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { BudgetForm } from "components/forms";
 
@@ -32,7 +31,7 @@ const CreateBudgetModal = ({
   const [_templatesLoading, setTemplatesLoading] = useState(false);
   const [_templates, setTemplates] = useState<Model.SimpleTemplate[]>([]);
 
-  const [file, setFile] = useState<File | Blob | null>(null);
+  const [file, setFile] = useState<UploadedImage | null>(null);
   const [form] = Form.useForm<Http.BudgetPayload>({ isInModal: true });
 
   useEffect(() => {
@@ -65,35 +64,22 @@ const CreateBudgetModal = ({
         form
           .validateFields()
           .then((values: Http.BudgetPayload) => {
-            const submit = (payload: Http.BudgetPayload) => {
-              if (!isNil(templateId)) {
-                payload = { ...payload, template: templateId };
-              }
-              form.setLoading(true);
-              api
-                .createBudget(payload)
-                .then((budget: Model.Budget) => {
-                  form.resetFields();
-                  onSuccess(budget);
-                })
-                .catch((e: Error) => {
-                  form.handleRequestError(e);
-                })
-                .finally(() => {
-                  form.setLoading(false);
-                });
-            };
-
-            if (!isNil(file)) {
-              getBase64(file)
-                .then((result: ArrayBuffer | string) => submit({ ...values, image: result }))
-                .catch((e: Error) => {
-                  /* eslint-disable no-console */
-                  console.error(e);
-                });
-            } else {
-              submit(values);
+            if (!isNil(templateId)) {
+              values = { ...values, template: templateId };
             }
+            form.setLoading(true);
+            api
+              .createBudget({ ...values, image: !isNil(file) ? file.data : null })
+              .then((budget: Model.Budget) => {
+                form.resetFields();
+                onSuccess(budget);
+              })
+              .catch((e: Error) => {
+                form.handleRequestError(e);
+              })
+              .finally(() => {
+                form.setLoading(false);
+              });
           })
           .catch(() => {
             return;
@@ -102,7 +88,7 @@ const CreateBudgetModal = ({
     >
       <BudgetForm
         form={form}
-        onImageChange={(f: File | Blob | null) => setFile(f)}
+        onImageChange={(f: UploadedImage | null) => setFile(f)}
         templatesLoading={templatesLoading !== undefined ? templatesLoading : _templatesLoading}
         templates={
           allowTemplateSelection === true && isNil(templateId)

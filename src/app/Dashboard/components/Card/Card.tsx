@@ -1,50 +1,22 @@
-import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEyeSlash } from "@fortawesome/pro-solid-svg-icons";
-import { faImagePolaroid, faEllipsisV } from "@fortawesome/pro-light-svg-icons";
+import { faEllipsisV } from "@fortawesome/pro-light-svg-icons";
 
 import { ShowHide, RenderWithSpinner, Dropdown } from "components";
 import { IconButton } from "components/buttons";
+import { BudgetCardImage } from "components/images";
 import { IDropdownMenuItem } from "components/menus/DropdownMenu";
 
 import "./index.scss";
-
-interface DashboardCardImagePlaceholderProps {
-  onClick?: () => void;
-  titleOnly?: boolean;
-}
-
-const DashboardCardImagePlaceholder: React.FC<DashboardCardImagePlaceholderProps> = ({ titleOnly, onClick }) => {
-  return (
-    <div className={classNames("image-placeholder", { "title-only": titleOnly })} onClick={onClick}>
-      <FontAwesomeIcon className={"icon"} icon={faImagePolaroid} />
-    </div>
-  );
-};
-
-interface DashboardCardImageProps {
-  image: string;
-  onClick?: () => void;
-  titleOnly?: boolean;
-}
-
-const DashboardCardImage: React.FC<DashboardCardImageProps> = ({ image, onClick, titleOnly }) => {
-  return (
-    <div className={classNames("image", { "title-only": titleOnly })} onClick={onClick}>
-      <div className={"image-tint"}></div>
-      <img src={image} alt={"avatar"} />
-    </div>
-  );
-};
 
 interface CardProps extends StandardComponentProps {
   dropdown?: IDropdownMenuItem[];
   title: string;
   subTitle?: string;
-  image?: string | null;
+  image: SavedImage | null;
   loading?: boolean;
   onClick?: () => void;
   hidden?: boolean;
@@ -75,11 +47,7 @@ const Card = ({
             />
           </Dropdown>
         )}
-        {!isNil(image) ? (
-          <DashboardCardImage image={image} onClick={onClick} titleOnly={isNil(subTitle)} />
-        ) : (
-          <DashboardCardImagePlaceholder onClick={onClick} titleOnly={isNil(subTitle)} />
-        )}
+        <BudgetCardImage image={image} onClick={onClick} titleOnly={isNil(subTitle)} />
         <div className={classNames("dashboard-card-footer", { "title-only": isNil(subTitle) })} onClick={onClick}>
           <div className={"title"}>{title}</div>
           <ShowHide show={!isNil(subTitle)}>

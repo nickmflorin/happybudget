@@ -4,12 +4,12 @@ import { Input, Select } from "antd";
 
 import { Form } from "components";
 import { FormProps } from "components/forms/Form";
-import { UploadUserImage } from "./fields";
+import { UploadBudgetImage } from "components/uploaders";
 import "./BudgetForm.scss";
 
 interface BudgetFormProps extends FormProps<Http.BudgetPayload> {
   originalImage?: SavedImage | null;
-  onImageChange?: (f: File | Blob | null) => void;
+  onImageChange?: (f: UploadedImage | null) => void;
   templates?: Model.Template[] | Model.SimpleTemplate[];
   templatesLoading?: boolean;
 }
@@ -61,13 +61,9 @@ const BudgetForm: React.FC<BudgetFormProps> = ({
         <></>
       )}
       <Form.Item label={"Avatar"} rules={[{ required: false }]}>
-        <UploadUserImage
+        <UploadBudgetImage
           value={originalImage}
-          onChange={(f: UploadedImage | null) => {
-            if (!isNil(onImageChange)) {
-              onImageChange(!isNil(f) ? f.file : null);
-            }
-          }}
+          onChange={(f: UploadedImage | null) => onImageChange?.(f)}
           onError={(error: Error | string) => props.form.setGlobalError(error)}
         />
       </Form.Item>

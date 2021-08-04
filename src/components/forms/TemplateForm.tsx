@@ -1,17 +1,15 @@
 import React from "react";
-import { isNil } from "lodash";
 
 import { Input } from "antd";
 
 import { Form } from "components";
 import { FormProps } from "components/forms/Form";
-
-import { UploadUserImage } from "./fields";
+import { UploadBudgetImage } from "components/uploaders";
 import "./TemplateForm.scss";
 
 interface TemplateFormProps extends FormProps<Http.TemplatePayload> {
   originalImage?: SavedImage | null;
-  onImageChange?: (f: File | Blob | null) => void;
+  onImageChange?: (f: UploadedImage | null) => void;
 }
 
 const TemplateForm: React.FC<TemplateFormProps> = ({ originalImage, onImageChange, ...props }) => {
@@ -21,13 +19,9 @@ const TemplateForm: React.FC<TemplateFormProps> = ({ originalImage, onImageChang
         <Input placeholder={"Name"} />
       </Form.Item>
       <Form.Item label={"Avatar"}>
-        <UploadUserImage
+        <UploadBudgetImage
           value={originalImage}
-          onChange={(f: UploadedImage | null) => {
-            if (!isNil(onImageChange)) {
-              onImageChange(!isNil(f) ? f.file : null);
-            }
-          }}
+          onChange={(f: UploadedImage | null) => onImageChange?.(f)}
           onError={(error: Error | string) => props.form.setGlobalError(error)}
         />
       </Form.Item>

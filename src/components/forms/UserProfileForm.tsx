@@ -3,13 +3,10 @@ import classNames from "classnames";
 
 import { Input, Button } from "antd";
 
-import * as typeguards from "lib/model/typeguards";
-
-import { Form, FullSize } from "components";
-import { ImageClearButton } from "components/buttons";
-import { UserImageOrInitials, EditImageOverlay } from "components/images";
+import { Form } from "components";
+import { UploadUserImage } from "components/uploaders";
 import { FormProps } from "components/forms/Form";
-import { UploadUserImage, TimezoneSelect } from "./fields";
+import { TimezoneSelect } from "./fields";
 
 interface UserProfileFormProps extends FormProps<Http.UserPayload> {
   originalImage?: SavedImage | null;
@@ -54,27 +51,8 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImag
           value={originalImage}
           onChange={(f: UploadedImage | null) => onImageChange?.(f)}
           onError={(error: Error | string) => props.form.setGlobalError(error)}
-          renderContentNoError={(params: UploadImageParams) => {
-            return (
-              <FullSize>
-                <ImageClearButton
-                  style={{ position: "absolute", top: 0, right: 0 }}
-                  onClick={(e: React.MouseEvent<any>) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    params.onClear();
-                  }}
-                />
-                <UserImageOrInitials
-                  circle={true}
-                  src={typeguards.isUploadParamsWithImage(params) ? params.image.url : null}
-                  firstName={firstName}
-                  lastName={lastName}
-                  overlay={() => <EditImageOverlay visible={true} />}
-                />
-              </FullSize>
-            );
-          }}
+          firstName={firstName}
+          lastName={lastName}
         />
       </Form.Item>
       <Form.Item>

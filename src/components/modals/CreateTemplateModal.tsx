@@ -2,7 +2,6 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
 import { useLoggedInUser } from "store/hooks";
@@ -23,7 +22,7 @@ const CreateTemplateModal = ({
   onCancel
 }: CreateTemplateModalProps): JSX.Element => {
   const user = useLoggedInUser();
-  const [file, setFile] = useState<File | Blob | null>(null);
+  const [file, setFile] = useState<UploadedImage | null>(null);
   const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
 
   return (
@@ -43,37 +42,25 @@ const CreateTemplateModal = ({
             if (community === true && user.is_staff === true) {
               service = api.createCommunityTemplate;
             }
-            const submit = (payload: Http.TemplatePayload) => {
-              form.setLoading(true);
-              service(payload)
-                .then((template: Model.Template) => {
-                  form.resetFields();
-                  onSuccess(template);
-                })
-                .catch((e: Error) => {
-                  form.handleRequestError(e);
-                })
-                .finally(() => {
-                  form.setLoading(false);
-                });
-            };
-            if (!isNil(file)) {
-              getBase64(file)
-                .then((result: ArrayBuffer | string) => submit({ ...values, image: result }))
-                .catch((e: Error) => {
-                  /* eslint-disable no-console */
-                  console.error(e);
-                });
-            } else {
-              submit(values);
-            }
+            form.setLoading(true);
+            service({ ...values, image: !isNil(file) ? file.data : null })
+              .then((template: Model.Template) => {
+                form.resetFields();
+                onSuccess(template);
+              })
+              .catch((e: Error) => {
+                form.handleRequestError(e);
+              })
+              .finally(() => {
+                form.setLoading(false);
+              });
           })
           .catch(() => {
             return;
           });
       }}
     >
-      <TemplateForm form={form} onImageChange={(f: File | Blob | null) => setFile(f)} initialValues={{}} />
+      <TemplateForm form={form} onImageChange={(f: UploadedImage | null) => setFile(f)} initialValues={{}} />
     </Modal>
   );
 };

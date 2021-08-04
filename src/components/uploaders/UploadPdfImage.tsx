@@ -1,5 +1,6 @@
 import React from "react";
 import classNames from "classnames";
+import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImages, faExclamationCircle, faCheckCircle } from "@fortawesome/pro-solid-svg-icons";
@@ -10,7 +11,6 @@ import { truncateFileName } from "lib/util/files";
 
 import Uploader, { UploaderProps } from "./Uploader";
 import "./UploadPdfImage.scss";
-import { isNil } from "lodash";
 
 const UploadPdfImage = (props: UploaderProps): JSX.Element => {
   // NOTE: We could show a loading indicator when the upload is loading, but it

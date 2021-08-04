@@ -13,9 +13,9 @@ import * as models from "lib/model";
 import { Form, ShowHide } from "components";
 import { EntityText } from "components/typography";
 import { Editor } from "components/richtext";
+import { UploadPdfImage } from "components/uploaders";
 import { EntityTextDescription } from "components/typography/EntityText";
 import { FormProps } from "components/forms/Form";
-import { UploadPdfImage } from "./fields";
 
 import "./ExportForm.scss";
 

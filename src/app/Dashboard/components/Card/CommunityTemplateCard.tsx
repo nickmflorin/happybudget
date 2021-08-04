@@ -1,5 +1,3 @@
-import { isNil } from "lodash";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faImage, faTrash, faClone, faEyeSlash, faEye } from "@fortawesome/pro-light-svg-icons";
 
@@ -41,7 +39,7 @@ const CommunityTemplateCard = ({
       onClick={() => onClick()}
       title={template.name}
       loading={loading}
-      image={!isNil(template.image) ? template.image.url : null}
+      image={template.image}
       hidden={user.is_staff === true && template.hidden === true}
       dropdown={
         /* eslint-disable indent */

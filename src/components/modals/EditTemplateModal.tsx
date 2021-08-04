@@ -2,7 +2,6 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { getBase64 } from "lib/util/files";
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
 import Modal from "./Modal";
@@ -15,7 +14,7 @@ interface EditTemplateModalProps {
 }
 
 const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplateModalProps): JSX.Element => {
-  const [file, setFile] = useState<File | Blob | null>(null);
+  const [file, setFile] = useState<UploadedImage | null>(null);
   const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
 
   return (
@@ -31,31 +30,19 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
         form
           .validateFields()
           .then((values: Http.TemplatePayload) => {
-            const submit = (payload: Partial<Http.TemplatePayload>) => {
-              form.setLoading(true);
-              api
-                .updateTemplate(template.id, payload)
-                .then((newTemplate: Model.Template) => {
-                  form.resetFields();
-                  onSuccess(newTemplate);
-                })
-                .catch((e: Error) => {
-                  form.handleRequestError(e);
-                })
-                .finally(() => {
-                  form.setLoading(false);
-                });
-            };
-            if (!isNil(file)) {
-              getBase64(file)
-                .then((result: ArrayBuffer | string) => submit({ ...values, image: result }))
-                .catch((e: Error) => {
-                  /* eslint-disable no-console */
-                  console.error(e);
-                });
-            } else {
-              submit(values);
-            }
+            form.setLoading(true);
+            api
+              .updateTemplate(template.id, { ...values, image: !isNil(file) ? file.data : null })
+              .then((newTemplate: Model.Template) => {
+                form.resetFields();
+                onSuccess(newTemplate);
+              })
+              .catch((e: Error) => {
+                form.handleRequestError(e);
+              })
+              .finally(() => {
+                form.setLoading(false);
+              });
           })
           .catch(() => {
             return;
@@ -64,7 +51,7 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
     >
       <TemplateForm
         form={form}
-        onImageChange={(f: File | Blob | null) => setFile(f)}
+        onImageChange={(f: UploadedImage | null) => setFile(f)}
         originalImage={template.image}
         initialValues={{ name: template.name }}
       />
