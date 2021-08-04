@@ -171,6 +171,7 @@ namespace Http {
     readonly email?: string | null;
     readonly phone_number?: string | null;
     readonly rate?: number | null;
+    readonly image?: ArrayBuffer | string | null;
   }
 
   type _BulkCreateCountPayload = { count: number };

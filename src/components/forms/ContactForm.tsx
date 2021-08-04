@@ -1,3 +1,5 @@
+import React from "react";
+import classNames from "classnames";
 import { Input, Select } from "antd";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,10 +12,25 @@ import { FormProps } from "components/forms/Form";
 import { PhoneNumberInput } from "./fields";
 import "./ContactForm.scss";
 
-const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, globalError }) => {
+interface ContactFormProps extends FormProps<Http.ContactPayload> {
+  // These are needed so that the ContactModal can hook into them and displayed the
+  // updated name in real time.
+  readonly onFirstNameChange: (value: string) => void;
+  readonly onLastNameChange: (value: string) => void;
+}
+
+const ContactForm: React.FC<ContactFormProps> = ({
+  form,
+  onFirstNameChange,
+  onLastNameChange,
+  initialValues,
+  globalError,
+  ...props
+}) => {
   return (
     <Form.Form
-      className={"contact-form"}
+      {...props}
+      className={classNames("contact-form", props.className)}
       form={form}
       globalError={globalError}
       layout={"vertical"}
@@ -29,10 +46,16 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
         </Select>
       </Form.Item>
       <Form.Item name={"first_name"} label={"First Name"}>
-        <Input placeholder={"John"} />
+        <Input
+          placeholder={"John"}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onFirstNameChange(e.target.value)}
+        />
       </Form.Item>
       <Form.Item name={"last_name"} label={"Last Name"}>
-        <Input placeholder={"Smith"} />
+        <Input
+          placeholder={"Smith"}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onLastNameChange(e.target.value)}
+        />
       </Form.Item>
       <Form.Item name={"company"} label={"Company"}>
         <Input placeholder={"ACME Corporation"} />
