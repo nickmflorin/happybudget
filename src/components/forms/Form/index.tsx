@@ -5,6 +5,8 @@ import classNames from "classnames";
 import { Form as RootForm, Input } from "antd";
 
 import { RenderWithSpinner } from "components";
+import { useTrackFirstRender } from "lib/hooks";
+
 import Error from "./Error";
 import Footer from "./Footer";
 import { FormProps } from "./model";
@@ -140,6 +142,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
   { globalError, loading, children, ...props }: PrivateFormProps<T>,
   ref: any
 ): JSX.Element => {
+  const firstRender = useTrackFirstRender();
   const childrenArray = useMemo<JSX.Element[]>(() => {
     /*
     Under certain conditions, we want to auto focus the first field of a Form.
@@ -163,34 +166,45 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
     const defaultAutoFocusFirstField = props.form.isInModal === true ? true : false;
     const propAutoFocusField = !isNil(props.autoFocusField) ? props.autoFocusField : props.form.autoFocusField;
     const autoFocusField = !isNil(propAutoFocusField) ? propAutoFocusField : defaultAutoFocusFirstField;
-    if (autoFocusField === true) {
-      const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
-      if (formItemChildren.length !== 0) {
-        const firstFormItemIndex = indexOf(c, formItemChildren[0]);
-        if (firstFormItemIndex !== -1) {
-          const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemChildren[0].type, props);
-          let newComponent = (
-            <AutFocusFirstInputFormItemComponent key={firstFormItemIndex} {...formItemChildren[0].props} />
-          );
-          c = [...c.slice(0, firstFormItemIndex), newComponent, ...c.slice(firstFormItemIndex + 1)];
+
+    // We cannot use the HOC components after the first render.  This is because AntD always rerenders
+    // the entire form when a field changes, so whenever we would change another field, it would auto
+    // focus the other field designated by `autoFocusField` again.  However, we cannot use an empty
+    // array for the dependency array of this useEffect, because then the Form.Item(s) would not
+    // update appropriately when props change.
+    if (firstRender === true) {
+      if (autoFocusField === true) {
+        const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
+        if (formItemChildren.length !== 0) {
+          const firstFormItemIndex = indexOf(c, formItemChildren[0]);
+          if (firstFormItemIndex !== -1) {
+            const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(
+              formItemChildren[0].type,
+              props
+            );
+            let newComponent = (
+              <AutFocusFirstInputFormItemComponent key={firstFormItemIndex} {...formItemChildren[0].props} />
+            );
+            c = [...c.slice(0, firstFormItemIndex), newComponent, ...c.slice(firstFormItemIndex + 1)];
+          }
         }
-      }
-    } else if (typeof autoFocusField === "number") {
-      const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
-      const formItemAtIndex = formItemChildren[autoFocusField];
-      if (!isNil(formItemAtIndex)) {
-        const formItemIndexInOverall = indexOf(c, formItemChildren[autoFocusField]);
-        if (formItemIndexInOverall !== -1) {
-          const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemAtIndex.type, props);
-          let newComponent = (
-            <AutFocusFirstInputFormItemComponent key={formItemIndexInOverall} {...formItemAtIndex.props} />
-          );
-          c = [...c.slice(0, formItemIndexInOverall), newComponent, ...c.slice(formItemIndexInOverall + 1)];
+      } else if (typeof autoFocusField === "number") {
+        const formItemChildren = filter(c, (ci: JSX.Element) => ci.type === RootForm.Item || ci.type === FormItemComp);
+        const formItemAtIndex = formItemChildren[autoFocusField];
+        if (!isNil(formItemAtIndex)) {
+          const formItemIndexInOverall = indexOf(c, formItemChildren[autoFocusField]);
+          if (formItemIndexInOverall !== -1) {
+            const AutFocusFirstInputFormItemComponent = withFormItemFirstInputFocused<T>(formItemAtIndex.type, props);
+            let newComponent = (
+              <AutFocusFirstInputFormItemComponent key={formItemIndexInOverall} {...formItemAtIndex.props} />
+            );
+            c = [...c.slice(0, formItemIndexInOverall), newComponent, ...c.slice(formItemIndexInOverall + 1)];
+          }
         }
       }
     }
     return c;
-  }, []);
+  }, [children]);
 
   const footer = useMemo<JSX.Element | undefined>(() => {
     return find(childrenArray, (child: JSX.Element) => child.type === Footer);
