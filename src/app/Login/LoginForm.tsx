@@ -75,7 +75,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <RouterLink className={"forgot-link"}>{"Forgot Password?"}</RouterLink>
       </div>
       <Form.Footer>
-        <Button loading={loading} className={"btn--login"} htmlType={"submit"}>
+        <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>
           {"Login"}
         </Button>
         <SocialButton

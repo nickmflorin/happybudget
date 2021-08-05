@@ -27,7 +27,7 @@ const CaretButton = ({
   ...props
 }: _CaretButtonProps): JSX.Element => {
   return (
-    <Button className={classNames("btn--caret", { primary: solid }, className)} style={style} {...props}>
+    <Button className={classNames("btn btn--caret", { primary: solid }, className)} style={style} {...props}>
       <div className={"caret-button-inner"}>
         <div className={classNames("caret-button-text", textProps.className)} {...textProps}>
           {children}

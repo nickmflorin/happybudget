@@ -5,7 +5,12 @@ import IconButton, { IconButtonProps } from "./IconButton";
 
 const AcceptButton = (props: Omit<IconButtonProps, "size" | "icon">): JSX.Element => {
   return (
-    <IconButton {...props} className={"btn--accept"} size={"small"} icon={<FontAwesomeIcon icon={faCheckCircle} />} />
+    <IconButton
+      {...props}
+      className={"btn btn--accept"}
+      size={"small"}
+      icon={<FontAwesomeIcon icon={faCheckCircle} />}
+    />
   );
 };
 

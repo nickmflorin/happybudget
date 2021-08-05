@@ -75,7 +75,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
   const renderDropdownButton = (i: IBreadCrumbItem): React.ReactChild => {
     if (!isNil(i.text)) {
       return (
-        <Button className={"btn--caret-simple"} onClick={() => setDropdownVisible(true)}>
+        <Button className={"btn btn--caret-simple"} onClick={() => setDropdownVisible(true)}>
           {i.text}
         </Button>
       );

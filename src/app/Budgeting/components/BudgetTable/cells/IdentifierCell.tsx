@@ -85,7 +85,7 @@ const IdentifierCell = <R extends Table.Row>({
           <div style={{ display: "flex" }}>
             <span>{`${group.name} (${group.children.length} Line Items)`}</span>
             <IconButton
-              className={"btn--edit-group"}
+              className={"btn btn--edit-group"}
               size={"small"}
               icon={
                 <FontAwesomeIcon

@@ -193,20 +193,28 @@
   -webkit-appearance: none;
   -webkit-tap-highlight-color: transparent;
 
-  // Size of the CircularProgress is set in JS/TS.
   .spinner {
     color: $green;
+    height: 16px !important;
+    width: 16px !important;
+    aspect-ratio: 1;
     position: initial;
+    margin-right: 8px;
+
+    svg {
+      height: 100% !important;
+      width: auto !important;
+    }
   }
 
   .icon {
     cursor: pointer;
-    height: 100%;
-    width: auto;
+    height: 16px !important;
+    width: 16px !important;
 
     svg {
-      height: 100%;
-      width: auto;
+      height: 100% !important;
+      width: auto !important;
       color: $icon-color !important;
     }
   }

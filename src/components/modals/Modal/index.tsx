@@ -20,8 +20,8 @@ const Modal = ({
   return (
     <RootModal
       cancelText={"Cancel"}
-      okButtonProps={{ ...okButtonProps, className: "btn--primary" }}
-      cancelButtonProps={{ ...cancelButtonProps, className: "btn--default" }}
+      okButtonProps={{ ...okButtonProps, className: "btn btn--primary" }}
+      cancelButtonProps={{ ...cancelButtonProps, className: "btn btn--default" }}
       {...props}
     >
       <RenderWithSpinner loading={loading}>{children}</RenderWithSpinner>

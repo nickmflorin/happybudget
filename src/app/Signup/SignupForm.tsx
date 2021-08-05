@@ -97,7 +97,7 @@ const SignupForm = ({
         <Input.Password className={"input"} size={"large"} placeholder={"Confirm"} prefix={<LockOutlined />} />
       </Form.Item>
       <Form.Footer style={{ marginTop: 20 }}>
-        <Button loading={loading} className={"btn--login"} htmlType={"submit"}>
+        <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>
           {"Register"}
         </Button>
         <SocialButton

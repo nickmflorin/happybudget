@@ -14,7 +14,7 @@ const IconButton = ({ icon, size = "medium", ...props }: IconButtonProps): JSX.E
   <Button
     {...props}
     icon={icon}
-    className={classNames("btn--icon-only", props.className, {
+    className={classNames("btn btn--icon-only", props.className, {
       medium: size === "medium",
       small: size === "small",
       large: size === "large"

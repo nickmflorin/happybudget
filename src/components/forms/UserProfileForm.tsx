@@ -56,7 +56,7 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ originalImage, onImag
         />
       </Form.Item>
       <Form.Item>
-        <Button className={"btn--primary"} htmlType={"submit"} style={{ width: "100%" }}>
+        <Button className={"btn btn--primary"} htmlType={"submit"} style={{ width: "100%" }}>
           {"Save"}
         </Button>
       </Form.Item>

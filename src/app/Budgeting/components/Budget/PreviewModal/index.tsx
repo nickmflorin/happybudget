@@ -109,7 +109,7 @@ const PreviewModal = ({
 }: PreviewModalProps): JSX.Element => {
   const initialPdfRender = useRef(false);
   const [loadingData, setLoadingData] = useState(false);
-  const [rendering, setRendering] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(false);
   const [options, setOptions] = useState<PdfBudgetTable.Options>({ ...DEFAULT_OPTIONS });
 
   // TODO: Should we just use the useContacts hook?
@@ -147,7 +147,7 @@ const PreviewModal = ({
   }, [visible]);
 
   const renderPdf = (budget: Model.PdfBudget, contacts: Model.Contact[], opts: PdfBudgetTable.Options) => {
-    setRendering(true);
+    setGeneratingPdf(true);
     const pdfComponent = BudgetPdfFunc(budget, contacts, opts);
     pdf(pdfComponent)
       .toBlob()
@@ -158,24 +158,25 @@ const PreviewModal = ({
             // TODO: Appropriately handle error here by providing feedback.
             /* eslint-disable no-console */
             console.error(e);
+          })
+          .finally(() => {
+            setGeneratingPdf(false);
           });
       })
       .catch((e: Error) => {
         // TODO: Appropriately handle error here by providing feedback.
         /* eslint-disable no-console */
         console.error(e);
-      })
-      .finally(() => {
-        setRendering(false);
+        setGeneratingPdf(false);
       });
   };
 
   const debouncedRender = useMemo(() => {
-    return debounce(() => {
+    return () => {
       if (!isNil(contactsResponse) && !isNil(budgetResponse)) {
         renderPdf(budgetResponse, contactsResponse.data, options);
       }
-    }, 400);
+    };
   }, [contactsResponse, budgetResponse, options]);
 
   useEffect(() => {
@@ -243,8 +244,8 @@ const PreviewModal = ({
       </div>
       <Previewer
         file={file}
-        loading={rendering || loadingData}
-        exportDisabled={rendering || loadingData}
+        generatingPdf={generatingPdf}
+        loadingData={loadingData}
         onRefresh={() => debouncedRender()}
         onExport={() => {
           // TODO: Since we are debouncing the Options setState, should we rerender the

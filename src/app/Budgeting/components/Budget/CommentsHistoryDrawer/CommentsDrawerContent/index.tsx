@@ -73,7 +73,7 @@ const CommentsDrawerContent = ({
         <Button
           disabled={text.trim() === ""}
           loading={submitting}
-          className={"btn--primary"}
+          className={"btn btn--primary"}
           style={{ width: "100%" }}
           onClick={() => onSubmit({ text })}
         >

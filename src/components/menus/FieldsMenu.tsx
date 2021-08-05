@@ -80,7 +80,7 @@ const FieldsMenu = ({ fields, buttons, onChange }: FieldsMenuProps): JSX.Element
             return (
               <Button
                 key={index}
-                className={classNames("btn--field-menu", btn.className)}
+                className={classNames("btn btn--field-menu", btn.className)}
                 style={btn.style}
                 onClick={() =>
                   !isNil(btn.onClick) &&

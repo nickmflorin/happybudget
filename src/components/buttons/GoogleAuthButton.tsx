@@ -13,7 +13,7 @@ const GoogleAuthButton = ({
   disabled = false
 }: GoogleAuthButtonProps): JSX.Element => {
   return (
-    <Button className={"btn--google"} onClick={onClick} disabled={disabled}>
+    <Button className={"btn btn--google"} onClick={onClick} disabled={disabled}>
       <div className={"content-wrapper"}>
         <div className={"icon-wrapper"}>
           <GoogleIcon />

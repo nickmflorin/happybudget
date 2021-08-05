@@ -71,6 +71,7 @@ namespace Pdf {
     readonly loading?: boolean;
     readonly onLoadSuccess?: (params: DocumentLoadedParams) => void;
     readonly onLoadError?: (error: Error) => void;
+    readonly onLoadStarted?: () => void;
     readonly children: JSX.Element;
     readonly loadingOnNoFile?: boolean;
   }

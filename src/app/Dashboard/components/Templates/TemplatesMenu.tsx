@@ -78,7 +78,7 @@ const TemplatesMenu = (): JSX.Element => {
           <VerticalFlexCenter>
             <Button
               loading={false}
-              className={"btn--primary"}
+              className={"btn btn--primary"}
               style={{ width: "100%" }}
               onClick={() => setCreateBudgetModalOpen(true)}
             >

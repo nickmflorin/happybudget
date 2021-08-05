@@ -79,7 +79,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
                       }
                     },
                     text: "Download",
-                    className: "btn--primary"
+                    className: "btn btn--primary"
                   }
                 ]}
               >

@@ -143,7 +143,7 @@ const GenericSubAccountsTable = ({
                       }
                     },
                     text: "Download",
-                    className: "btn--primary"
+                    className: "btn btn--primary"
                   }
                 ]}
               >

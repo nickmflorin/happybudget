@@ -20,7 +20,7 @@ const EntityTextButton = (
   ref: any
 ): JSX.Element => {
   return (
-    <Button className={classNames("btn--entity-text", className)} style={style} {...props} ref={ref}>
+    <Button className={classNames("btn btn--entity-text", className)} style={style} {...props} ref={ref}>
       <div className={"entity-text-button-inner"}>
         <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
         <VerticalFlexCenter className={"entity-text-button-caret"}>

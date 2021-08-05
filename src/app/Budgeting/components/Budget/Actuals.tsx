@@ -168,7 +168,7 @@ const Actuals = (): JSX.Element => {
                           }
                         },
                         text: "Download",
-                        className: "btn--primary"
+                        className: "btn btn--primary"
                       }
                     ]}
                   >

@@ -31,7 +31,7 @@ const Contacts = (): JSX.Element => {
               dispatch(setContactsSearchAction(event.target.value))
             }
           />
-          <Button className={"btn--primary"} onClick={() => setNewContactModalOpen(true)}>
+          <Button className={"btn btn--primary"} onClick={() => setNewContactModalOpen(true)}>
             {"Add Contact"}
           </Button>
         </ActionsMenuBar>

@@ -13,18 +13,18 @@ import { RenderDocument } from "components/pdf";
 interface PreviewerProps {
   readonly autoRenderPdf?: boolean;
   readonly file?: string | ArrayBuffer | null;
-  readonly loading?: boolean;
+  readonly generatingPdf?: boolean;
   readonly onExport: () => void;
   readonly onRefresh: () => void;
-  readonly exportDisabled?: boolean;
+  readonly loadingData?: boolean;
 }
 
 const Previewer = ({
   file,
-  loading,
+  generatingPdf,
   onExport,
   onRefresh,
-  exportDisabled,
+  loadingData,
   autoRenderPdf
 }: PreviewerProps): JSX.Element => {
   const [numPages, setNumPages] = useState(0);
@@ -37,9 +37,10 @@ const Previewer = ({
           <Form.Label>{"Preview"}</Form.Label>
         ) : (
           <Button
-            className={"btn--bare"}
+            className={"btn btn--bare"}
             onClick={() => onRefresh()}
-            disabled={loading}
+            disabled={loadingData || generatingPdf}
+            loading={generatingPdf}
             icon={<FontAwesomeIcon icon={faRedo} />}
           >
             {"Refresh"}
@@ -50,7 +51,7 @@ const Previewer = ({
         <RenderDocument
           file={file}
           loadingOnNoFile={true}
-          loading={loading}
+          loading={generatingPdf}
           onLoadSuccess={(p: Pdf.DocumentLoadedParams) => {
             setNumPages(p.numPages);
             if (page > p.numPages) {
@@ -63,7 +64,12 @@ const Previewer = ({
       </div>
       <div className={"preview-footer"}>
         <Pagination total={numPages} pageSize={1} current={page} size={"small"} onChange={(p: number) => setPage(p)} />
-        <Button className={"btn btn--primary"} htmlType={"submit"} disabled={exportDisabled} onClick={() => onExport()}>
+        <Button
+          className={"btn btn--primary"}
+          htmlType={"submit"}
+          disabled={generatingPdf || loadingData}
+          onClick={() => onExport()}
+        >
           {"Export"}
         </Button>
       </div>
