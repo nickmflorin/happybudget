@@ -2,9 +2,9 @@ import { ReactNode } from "react";
 import classNames from "classnames";
 import Button, { ButtonProps } from "./Button";
 
-export interface IconButtonProps extends Omit<ButtonProps, "size" | "icon"> {
-  icon: ReactNode;
-  size?: "small" | "medium" | "large";
+export interface IconButtonProps extends Omit<ButtonProps, "size" | "icon" | "children"> {
+  readonly icon: ReactNode;
+  readonly size?: "small" | "medium" | "large";
 }
 
 /**

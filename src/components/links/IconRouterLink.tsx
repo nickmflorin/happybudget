@@ -1,19 +1,17 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import classNames from "classnames";
-import RouterLink from "./RouterLink";
+import RouterLink, { RouterLinkProps } from "./RouterLink";
 
-interface IconRouterLinkProps {
-  className?: string;
-  icon: ReactNode;
-  [key: string]: any;
+interface IconRouterLinkProps extends Omit<RouterLinkProps, "icon" | "children"> {
+  readonly icon: ReactNode;
 }
 
 /**
  * A consistently styled <Link> component for react-router-dom Link components\
  * that contain just an Icon.
  */
-const IconRouterLink = ({ className, icon, ...props }: IconRouterLinkProps): JSX.Element => (
-  <RouterLink className={classNames("link--icon-only", className)} icon={icon} {...props} />
+const IconRouterLink = ({ icon, ...props }: IconRouterLinkProps): JSX.Element => (
+  <RouterLink {...props} className={classNames("link--icon-only", props.className)} icon={icon} />
 );
 
 export default IconRouterLink;

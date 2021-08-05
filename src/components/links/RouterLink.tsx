@@ -1,18 +1,28 @@
-import { Link as ReactLink } from "react-router-dom";
+import { Link, LinkProps } from "react-router-dom";
 import classNames from "classnames";
-import { GenericClickable } from "components/util";
+import { isNil } from "lodash";
 
-interface RouterLinkProps {
-  className?: string;
-  [key: string]: any;
-}
+import { ShowHide, TooltipWrapper } from "components";
+
+export type RouterLinkProps = LinkProps & StandardComponentProps & ClickableProps;
 
 /**
  * A consistently styled react-router Link component that provides additional
  * functionality, like disabling, tooltips and icon inclusion.
  */
-const RouterLink = ({ className, ...props }: RouterLinkProps): JSX.Element => (
-  <GenericClickable className={classNames("link", className)} component={ReactLink} {...props} />
+const RouterLink = ({ className, children, tooltip, icon, disabled, ...props }: RouterLinkProps): JSX.Element => (
+  <TooltipWrapper {...tooltip}>
+    <Link
+      {...props}
+      className={classNames("link", className, {
+        disabled: disabled === true && isNil(tooltip),
+        "fake-disabled": disabled === true && !isNil(tooltip)
+      })}
+    >
+      <ShowHide show={!isNil(icon)}>{icon}</ShowHide>
+      {children}
+    </Link>
+  </TooltipWrapper>
 );
 
 export default RouterLink;

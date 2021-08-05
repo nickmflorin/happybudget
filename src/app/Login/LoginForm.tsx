@@ -72,7 +72,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
         />
       </Form.Item>
       <div className={"forgot-password-text"}>
-        <RouterLink className={"forgot-link"}>{"Forgot Password?"}</RouterLink>
+        <RouterLink to={"#"} className={"forgot-link"}>
+          {"Forgot Password?"}
+        </RouterLink>
       </div>
       <Form.Footer>
         <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>

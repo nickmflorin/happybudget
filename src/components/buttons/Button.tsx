@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from "react";
+import React, { useMemo } from "react";
 import classNames from "classnames";
 import { Button as AntDButton } from "antd";
 import { ButtonProps as AntDButtonProps } from "antd/lib/button";
@@ -7,9 +7,10 @@ import { isNil } from "lodash";
 
 import { TooltipWrapper, Spinner } from "components";
 
-export interface ButtonProps extends Omit<AntDButtonProps, "icon" | StandardComponentPropNames>, ClickableProps {
-  readonly children?: ReactNode;
-  readonly disabled?: boolean;
+export interface ButtonProps
+  extends Omit<AntDButtonProps, "disabled" | "icon" | StandardComponentPropNames>,
+    ClickableProps,
+    StandardComponentProps {
   readonly loading?: boolean;
   readonly showLoadingIndicatorOverIcon?: boolean;
 }
@@ -25,7 +26,6 @@ const Button = ({
   showLoadingIndicatorOverIcon,
   icon,
   className,
-  style,
   tooltip,
   ...props
 }: ButtonProps): JSX.Element => {

@@ -1,24 +1,27 @@
-import { ReactNode } from "react";
 import classNames from "classnames";
-import { GenericClickable } from "components/util";
+import { isNil } from "lodash";
 
-interface LinkProps {
-  className?: string;
-  children: ReactNode;
-  [key: string]: any;
-}
+import { ShowHide, TooltipWrapper } from "components";
+
+type LinkProps = StandardComponentWithChildrenProps & ClickableProps;
 
 /**
  * A consistently styled <a> component with functionality allowing the link to
  * include icons, be disabled and other features.
  */
-const Link = ({ className, children, ...props }: LinkProps): JSX.Element => (
-  <GenericClickable
-    className={classNames(className, "link")}
-    children={children}
-    component={({ ...g }: { [key: string]: any }) => <a {...g}>{g.children}</a>}
-    {...props}
-  />
+const Link = ({ className, children, tooltip, icon, disabled, ...props }: LinkProps): JSX.Element => (
+  <TooltipWrapper {...tooltip}>
+    <a
+      {...props}
+      className={classNames("link", className, {
+        disabled: disabled === true && isNil(tooltip),
+        "fake-disabled": disabled === true && !isNil(tooltip)
+      })}
+    >
+      <ShowHide show={!isNil(icon)}>{icon}</ShowHide>
+      {children}
+    </a>
+  </TooltipWrapper>
 );
 
 export default Link;
