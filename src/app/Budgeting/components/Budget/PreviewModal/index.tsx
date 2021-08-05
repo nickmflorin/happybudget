@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { pdf } from "@react-pdf/renderer";
 import { isNil, map, debounce } from "lodash";
@@ -107,6 +107,7 @@ const PreviewModal = ({
   onSuccess,
   onCancel
 }: PreviewModalProps): JSX.Element => {
+  const initialPdfRender = useRef(false);
   const [loadingData, setLoadingData] = useState(false);
   const [rendering, setRendering] = useState(false);
   const [options, setOptions] = useState<PdfBudgetTable.Options>({ ...DEFAULT_OPTIONS });
@@ -170,18 +171,23 @@ const PreviewModal = ({
   };
 
   const debouncedRender = useMemo(() => {
-    return debounce((opts: PdfBudgetTable.Options) => {
+    return debounce(() => {
       if (!isNil(contactsResponse) && !isNil(budgetResponse)) {
-        renderPdf(budgetResponse, contactsResponse.data, opts);
+        renderPdf(budgetResponse, contactsResponse.data, options);
       }
     }, 400);
-  }, [contactsResponse, budgetResponse]);
+  }, [contactsResponse, budgetResponse, options]);
 
   useEffect(() => {
     if (!isNil(contactsResponse) && !isNil(budgetResponse)) {
-      renderPdf(budgetResponse, contactsResponse.data, options);
+      // If we are not auto rendering the PDF, we do not want to rerender]
+      // automatically everytime the options change.
+      if (initialPdfRender.current === false || autoRenderPdf) {
+        renderPdf(budgetResponse, contactsResponse.data, options);
+      }
+      initialPdfRender.current = true;
     }
-  }, [contactsResponse, budgetResponse]);
+  }, [contactsResponse, budgetResponse, options, autoRenderPdf]);
 
   return (
     <Modal.Modal
@@ -217,9 +223,13 @@ const PreviewModal = ({
           disabled={isNil(budgetResponse) || isNil(contactsResponse)}
           columns={map(SubAccountColumns, (value: Column) => value)}
           onValuesChange={(changedValues: Partial<PdfBudgetTable.Options>, values: PdfBudgetTable.Options) => {
-            setOptions(values);
-            if (autoRenderPdf === true) {
-              debouncedRender(values);
+            const debouncedSetOptions = debounce(() => setOptions(values), 400);
+            // We only care about debouncing the state set if the state set will result in
+            // a rerender of the PDF.
+            if (autoRenderPdf) {
+              debouncedSetOptions();
+            } else {
+              setOptions(values);
             }
           }}
           displayedHeaderTemplate={displayedHeaderTemplate}
@@ -235,7 +245,7 @@ const PreviewModal = ({
         file={file}
         loading={rendering || loadingData}
         exportDisabled={rendering || loadingData}
-        onRefresh={() => debouncedRender(options)}
+        onRefresh={() => debouncedRender()}
         onExport={() => {
           // TODO: Since we are debouncing the Options setState, should we rerender the
           // PDF with the most recent options just in case?

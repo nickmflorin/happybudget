@@ -33,7 +33,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
   // Note: We cannot use hooks with @react-pdf components, in particular because of the
   // render callbacks.
   let subHeaderLeft: SubHeaderItem | null = null;
-  const leftInfoMissing = isNil(props.header.left_info) || props.header.left_info.length !== 0;
+  const leftInfoMissing = isNil(props.header.left_info) || props.header.left_info.length === 0;
   if (!(leftInfoMissing && isNil(props.header.left_image))) {
     if (!isNil(props.header.left_info)) {
       subHeaderLeft = { info: props.header.left_info };
@@ -48,7 +48,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
   // Note: We cannot use hooks with @react-pdf components, in particular because of the
   // render callbacks.
   let subHeaderRight: SubHeaderItem | null = null;
-  const rightInfoMissing = isNil(props.header.right_info) || props.header.right_info.length !== 0;
+  const rightInfoMissing = isNil(props.header.right_info) || props.header.right_info.length === 0;
   if (!(rightInfoMissing && isNil(props.header.right_image))) {
     if (!isNil(props.header.right_info)) {
       subHeaderRight = { info: props.header.right_info };
