@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { useSelector } from "react-redux";
-import { isNil, map } from "lodash";
+import { isNil, filter, map } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/pro-light-svg-icons";
@@ -54,10 +54,6 @@ const FringesCellEditor = (props: FringesCellEditorProps, ref: any) => {
     forwardedRef: ref
   });
 
-  const newFringes = fringes.filter(fringe => {
-    return !isNil(fringe.name) && fringe.name !== "";
-  });
-
   return (
     <ExpandedModelTagsMenu<Model.Fringe>
       style={{ minWidth: 220 }}
@@ -65,7 +61,7 @@ const FringesCellEditor = (props: FringesCellEditorProps, ref: any) => {
       checkbox={true}
       multiple={true}
       selected={map(editor.value, (v: Model.Fringe) => v.id)}
-      models={newFringes}
+      models={filter(fringes, (fringe: Model.Fringe) => !isNil(fringe.name) && fringe.name.trim() !== "")}
       onChange={(ms: Model.Fringe[], e: Table.CellDoneEditingEvent) => editor.onChange(ms, e, false)}
       menuRef={editor.menuRef}
       searchIndices={["name"]}
