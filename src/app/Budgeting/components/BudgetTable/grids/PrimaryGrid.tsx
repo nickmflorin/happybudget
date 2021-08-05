@@ -35,8 +35,12 @@ import * as typeguards from "lib/model/typeguards";
 
 import { getKeyValue } from "lib/util";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
-import { getGroupColorDefinition, consolidateTableChange, createTableData } from "lib/model/util";
-import { rangeSelectionIsSingleCell } from "../util";
+import {
+  getGroupColorDefinition,
+  consolidateTableChange,
+  createTableData,
+  rangeSelectionIsSingleCell
+} from "lib/model/util";
 import BudgetTableMenu from "./BudgetTableMenu";
 import Grid from "./Grid";
 

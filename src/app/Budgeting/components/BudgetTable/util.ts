@@ -1,13 +1,4 @@
 import { forEach, includes, isNil, map } from "lodash";
-import classNames from "classnames";
-import { CellRange, CellClassParams } from "@ag-grid-community/core";
-
-export const rangeSelectionIsSingleCell = (range: CellRange) => {
-  if (range.startRow?.rowIndex === range.endRow?.rowIndex && range.columns.length === 1) {
-    return true;
-  }
-  return false;
-};
 
 const validateCookiesFieldOrder = <R extends Table.Row, M extends Model.Model>(
   obj: any,
@@ -56,23 +47,3 @@ export const validateCookiesOrdering = <R extends Table.Row, M extends Model.Mod
   }
   return null;
 };
-
-type AGGridCellClassFn = (params: CellClassParams) => string | string[] | undefined;
-type ClassNameConstruct = string | string[] | AGGridCellClassFn | undefined | { [key: string]: boolean };
-
-export const mergeClassNames = (params: CellClassParams, ...args: ClassNameConstruct[]): string => {
-  const stringClassNames = map(args, (arg: ClassNameConstruct) => {
-    if (typeof arg === "function") {
-      return arg(params);
-    }
-    return arg;
-  });
-  return classNames(stringClassNames);
-};
-
-/* prettier-ignore */
-export const mergeClassNamesFn =
-  (...args: ClassNameConstruct[]) =>
-    (params: CellClassParams) => {
-      return mergeClassNames(params, ...args);
-    };

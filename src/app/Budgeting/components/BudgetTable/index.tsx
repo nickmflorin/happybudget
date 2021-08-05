@@ -22,9 +22,9 @@ import { WrapInApplicationSpinner, ShowHide } from "components";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import { updateFieldOrdering } from "lib/util";
 import { agCurrencyValueFormatter } from "lib/model/formatters";
-import { orderColumns } from "lib/model/util";
+import { orderColumns, mergeClassNames, mergeClassNamesFn } from "lib/model/util";
 
-import { validateCookiesOrdering, mergeClassNames, mergeClassNamesFn } from "./util";
+import { validateCookiesOrdering } from "./util";
 import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
 import "./index.scss";
 

@@ -1,6 +1,7 @@
 import React from "react";
+import classNames from "classnames";
 import { groupBy, isNil, reduce, find, forEach, includes, filter, map, orderBy } from "lodash";
-import { ColDef } from "@ag-grid-community/core";
+import { ColDef, CellClassParams, CellRange } from "@ag-grid-community/core";
 
 import { Colors } from "style/constants";
 
@@ -15,6 +16,33 @@ import {
   isFullRowEvent,
   isRowDeleteEvent
 } from "../typeguards/tabling";
+
+export const rangeSelectionIsSingleCell = (range: CellRange) => {
+  if (range.startRow?.rowIndex === range.endRow?.rowIndex && range.columns.length === 1) {
+    return true;
+  }
+  return false;
+};
+
+type AGGridCellClassFn = (params: CellClassParams) => string | string[] | undefined;
+type ClassNameConstruct = string | string[] | AGGridCellClassFn | undefined | { [key: string]: boolean };
+
+export const mergeClassNames = (params: CellClassParams, ...args: ClassNameConstruct[]): string => {
+  const stringClassNames = map(args, (arg: ClassNameConstruct) => {
+    if (typeof arg === "function") {
+      return arg(params);
+    }
+    return arg;
+  });
+  return classNames(stringClassNames);
+};
+
+/* prettier-ignore */
+export const mergeClassNamesFn =
+  (...args: ClassNameConstruct[]) =>
+    (params: CellClassParams) => {
+      return mergeClassNames(params, ...args);
+    };
 
 export const getGroupColorDefinition = (group: Model.Group): GenericTable.RowColorDefinition => {
   if (!isNil(group) && !isNil(group.color)) {
