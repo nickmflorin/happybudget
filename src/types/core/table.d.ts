@@ -337,6 +337,7 @@ namespace BudgetTable {
 
   interface CookiesProps {
     readonly ordering?: string;
+    readonly hiddenColumns?: string;
   }
 
   type MenuAction = {

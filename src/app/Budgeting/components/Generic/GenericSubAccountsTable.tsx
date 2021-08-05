@@ -19,23 +19,24 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericSubAccountsTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.SubAccountRow, Model.SubAccount, Http.SubAccountPayload>,
-    "rowCanExpand" | "manager" | "levelType"
+    "rowCanExpand" | "manager" | "levelType" | "cookies"
   > {
-  exportFileName: string;
-  categoryName: "Sub Account" | "Detail";
-  identifierFieldHeader: "Account" | "Line";
-  fringes: Model.Fringe[];
-  fringesCellEditor: "FringesCellEditor" | "FringesCellEditor" | "FringesCellEditor" | "FringesCellEditor";
-  fringesCellEditorParams: {
+  readonly cookies?: Omit<BudgetTable.CookiesProps, "hiddenColumns">;
+  readonly exportFileName: string;
+  readonly categoryName: "Sub Account" | "Detail";
+  readonly identifierFieldHeader: "Account" | "Line";
+  readonly fringes: Model.Fringe[];
+  readonly fringesCellEditor: "FringesCellEditor" | "FringesCellEditor" | "FringesCellEditor" | "FringesCellEditor";
+  readonly fringesCellEditorParams: {
     colId: keyof BudgetTable.SubAccountRow;
     onAddFringes: () => void;
   };
-  tableFooterIdentifierValue: string;
-  budgetFooterIdentifierValue?: string;
-  subAccountUnits: Model.Tag[];
-  levelType: "account" | "subaccount";
-  onGroupRows: (rows: BudgetTable.SubAccountRow[]) => void;
-  onEditFringes: () => void;
+  readonly tableFooterIdentifierValue: string;
+  readonly budgetFooterIdentifierValue?: string;
+  readonly subAccountUnits: Model.Tag[];
+  readonly levelType: "account" | "subaccount";
+  readonly onGroupRows: (rows: BudgetTable.SubAccountRow[]) => void;
+  readonly onEditFringes: () => void;
 }
 
 const GenericSubAccountsTable = ({
@@ -69,6 +70,7 @@ const GenericSubAccountsTable = ({
       getModelChildren={(model: Model.SubAccount) => model.subaccounts}
       getModelLabel={(model: Model.SubAccount) => model.identifier || model.description}
       {...props}
+      cookies={{ ...props.cookies, hiddenColumns: "subaccount-table-hidden-columns" }}
       actions={(params: BudgetTable.MenuActionParams<BudgetTable.SubAccountRow, Model.SubAccount>) => [
         {
           tooltip: "Delete",
@@ -103,7 +105,7 @@ const GenericSubAccountsTable = ({
                 fields={map(params.columns, (col: Table.Column<BudgetTable.SubAccountRow, Model.SubAccount>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
-                  defaultChecked: true
+                  defaultChecked: !(col.hide === true)
                 }))}
                 onChange={(change: FieldCheck) => {
                   const tableRefObj = props.tableRef.current;
@@ -127,7 +129,7 @@ const GenericSubAccountsTable = ({
                 fields={map(params.columns, (col: Table.Column<BudgetTable.SubAccountRow, Model.SubAccount>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
-                  defaultChecked: true
+                  defaultChecked: !(col.hide === true)
                 }))}
                 buttons={[
                   {
@@ -168,7 +170,6 @@ const GenericSubAccountsTable = ({
         {
           field: "description",
           headerName: `${categoryName} Description`,
-          // flex: 100,
           flex: 1,
           columnType: "longText",
           index: 1,

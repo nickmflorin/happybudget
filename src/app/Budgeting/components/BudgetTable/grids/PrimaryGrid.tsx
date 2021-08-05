@@ -32,7 +32,6 @@ import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/g
 
 import * as models from "lib/model";
 import * as typeguards from "lib/model/typeguards";
-
 import { getKeyValue } from "lib/util";
 import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
 import {
@@ -1065,7 +1064,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           columns={map(columns, (col: Table.Column<R, M>) => includeCellEditorParams(col))}
           getContextMenuItems={getContextMenuItems}
           // This is the same as checking if the onGridReady event has fired.
-          rowData={!isNil(apis) ? table : []}
+          rowData={table}
           getRowClass={getRowClass}
           getRowStyle={getRowStyle}
           rowSelection={"multiple"}

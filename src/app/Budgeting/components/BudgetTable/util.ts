@@ -1,4 +1,57 @@
-import { forEach, includes, isNil, map } from "lodash";
+import { forEach, includes, isNil, map, reduce, uniq, filter } from "lodash";
+import Cookies from "universal-cookie";
+
+export const validateCookiesHiddenColumns = <R extends Table.Row, M extends Model.Model>(
+  obj: any,
+  columns: Table.Column<R, M>[]
+): GenericTable.Field<R, M>[] =>
+  /* eslint-disable indent */
+  Array.isArray(obj)
+    ? uniq(
+        reduce(
+          obj,
+          (fields: GenericTable.Field<R, M>[], iteree: any) => {
+            if (
+              typeof iteree === "string" &&
+              includes(
+                map(columns, (col: Table.Column<R, M>) => col.field),
+                iteree
+              )
+            ) {
+              return [...fields, iteree as GenericTable.Field<R, M>];
+            }
+            return fields;
+          },
+          [] as GenericTable.Field<R, M>[]
+        )
+      )
+    : [];
+
+export const getCookiesHiddenColumns = <R extends Table.Row, M extends Model.Model>(
+  cookieName: string,
+  columns: Table.Column<R, M>[],
+  cookiesObj?: Cookies
+): GenericTable.Field<R, M>[] => {
+  cookiesObj = cookiesObj || new Cookies();
+  const cookiesHiddenColumns = cookiesObj.get(cookieName);
+  return validateCookiesHiddenColumns(cookiesHiddenColumns, columns);
+};
+
+export const changeCookiesColumnVisibility = <R extends Table.Row, M extends Model.Model>(
+  cookieName: string,
+  columns: Table.Column<R, M>[],
+  change: { field: GenericTable.Field<R, M>; visible: boolean }
+) => {
+  const cookiesObj = new Cookies();
+
+  let hiddenColumns = getCookiesHiddenColumns(cookieName, columns, cookiesObj);
+  if (change.visible === true && includes(hiddenColumns, change.field)) {
+    hiddenColumns = filter(hiddenColumns, (value: GenericTable.Field<R, M>) => value !== change.field);
+    cookiesObj.set(cookieName, hiddenColumns);
+  } else if (change.visible === false && !includes(hiddenColumns, change.field)) {
+    cookiesObj.set(cookieName, [...hiddenColumns, change.field]);
+  }
+};
 
 const validateCookiesFieldOrder = <R extends Table.Row, M extends Model.Model>(
   obj: any,

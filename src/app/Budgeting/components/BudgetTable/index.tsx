@@ -19,12 +19,12 @@ import {
 
 import { TABLE_DEBUG, TABLE_PINNING_ENABLED } from "config";
 import { WrapInApplicationSpinner, ShowHide } from "components";
-import { useDynamicCallback, useDeepEqualMemo } from "lib/hooks";
+import { useDynamicCallback } from "lib/hooks";
 import { updateFieldOrdering } from "lib/util";
 import { agCurrencyValueFormatter } from "lib/model/formatters";
 import { orderColumns, mergeClassNames, mergeClassNamesFn } from "lib/model/util";
 
-import { validateCookiesOrdering } from "./util";
+import { validateCookiesOrdering, getCookiesHiddenColumns, changeCookiesColumnVisibility } from "./util";
 import { BudgetFooterGrid, TableFooterGrid, PrimaryGrid } from "./grids";
 import "./index.scss";
 
@@ -230,9 +230,12 @@ const BudgetTable = <R extends Table.Row, M extends Model.Model, P>({
         setOrdering(validatedOrdering);
       }
     }
-  }, [useDeepEqualMemo(cookies)]);
+  }, [cookies?.ordering]);
 
   useEffect(() => {
+    let hiddenColumns: GenericTable.Field<R, M>[] =
+      !isNil(cookies) && !isNil(cookies.hiddenColumns) ? getCookiesHiddenColumns(cookies.hiddenColumns, columns) : [];
+
     const IndexColumn = (): Table.Column<R, M> => ({
       ...indexColumn,
       columnType: "action",
@@ -297,6 +300,7 @@ const BudgetTable = <R extends Table.Row, M extends Model.Model, P>({
         suppressSizeToFit: true,
         width: 100,
         maxWidth: 100,
+        hide: includes(hiddenColumns, col.field),
         valueFormatter: agCurrencyValueFormatter,
         cellRendererParams: {
           ...col.cellRendererParams,
@@ -352,6 +356,7 @@ const BudgetTable = <R extends Table.Row, M extends Model.Model, P>({
         ...col,
         fieldBehavior: ["read", "write"],
         suppressSizeToFit: true,
+        hide: includes(hiddenColumns, col.field),
         pinned: TABLE_PINNING_ENABLED === true ? "left" : undefined,
         cellRendererParams: {
           ...col.cellRendererParams,
@@ -398,6 +403,7 @@ const BudgetTable = <R extends Table.Row, M extends Model.Model, P>({
           onSort: onSort,
           ordering
         },
+        hide: includes(hiddenColumns, col.field),
         valueSetter: (params: ValueSetterParams) => {
           // By default, AG Grid treats Backspace clearing the cell as setting the
           // value to undefined - but we have to set it to the null value associated
@@ -467,12 +473,20 @@ const BudgetTable = <R extends Table.Row, M extends Model.Model, P>({
     );
   }, [columns, onRowExpand]);
 
-  const setColumnVisibility = useDynamicCallback((change: Table.ColumnVisibilityChange) => {
+  const setColumnVisibility = useDynamicCallback((change: Table.ColumnVisibilityChange, sizeToFit = true) => {
     apis.columnMap((api: ColumnApi) => api.setColumnVisible(change.field, change.visible));
+    if (!isNil(cookies) && !isNil(cookies.hiddenColumns)) {
+      changeCookiesColumnVisibility(cookies.hiddenColumns, columns, change);
+    }
+    if (sizeToFit === true) {
+      apis.gridMap((api: GridApi) => api.sizeColumnsToFit());
+    }
   });
 
   const changeColumnVisibility = useDynamicCallback((changes: Table.ColumnVisibilityChange[]) => {
-    map(changes, (change: { field: string; visible: boolean }) => setColumnVisibility(change.field, change.visible));
+    map(changes, (change: { field: string; visible: boolean }) =>
+      setColumnVisibility(change.field, change.visible, false)
+    );
     apis.gridMap((api: GridApi) => api.sizeColumnsToFit());
   });
 
@@ -505,7 +519,7 @@ const BudgetTable = <R extends Table.Row, M extends Model.Model, P>({
   });
 
   const onFirstDataRendered = useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    // event.api.sizeColumnsToFit();
+    event.api.sizeColumnsToFit();
   });
 
   return (

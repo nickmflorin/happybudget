@@ -12,10 +12,11 @@ import BudgetTableComponent from "../BudgetTable";
 export interface GenericAccountsTableProps
   extends Omit<
     BudgetTable.Props<BudgetTable.AccountRow, Model.Account, Http.AccountPayload>,
-    "rowCanExpand" | "levelType"
+    "rowCanExpand" | "levelType" | "cookies"
   > {
-  exportFileName: string;
-  detail: Model.Template | Model.Budget | undefined;
+  readonly exportFileName: string;
+  readonly detail: Model.Template | Model.Budget | undefined;
+  readonly cookies?: Omit<BudgetTable.CookiesProps, "hiddenColumns">;
 }
 
 const GenericAccountsTable = ({
@@ -34,6 +35,7 @@ const GenericAccountsTable = ({
       getModelChildren={(model: Model.Account) => model.subaccounts}
       getModelLabel={(model: Model.Account) => model.identifier || model.description}
       {...props}
+      cookies={{ ...props.cookies, hiddenColumns: "account-table-hidden-columns" }}
       actions={(params: BudgetTable.MenuActionParams<BudgetTable.AccountRow, Model.Account>) => [
         {
           tooltip: "Delete",
