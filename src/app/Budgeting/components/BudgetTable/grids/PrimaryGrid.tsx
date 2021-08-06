@@ -673,39 +673,38 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     return false;
   });
 
-  const createRowAddFromDataArray = (local: ColumnApi, array: any[], startingColumn: Column): Table.RowAdd<R, M> => {
-    let rowAdd: Table.RowAdd<R, M> = { data: {} };
-    let currentColumn: Column = startingColumn;
-    map(array, (value: any) => {
-      const field = currentColumn.getColDef().field;
-      if (!isNil(field)) {
-        const column: Table.Column<R, M> | undefined = find(columns, { field } as any);
-        if (!isNil(column)) {
-          const fieldBehavior = column.fieldBehavior || ["read", "write"];
-          if (includes(fieldBehavior, "write")) {
-            rowAdd = {
-              ...rowAdd,
-              data: {
-                ...rowAdd.data,
-                [column.field as string]: {
-                  value: processCellValueFromClipboard(currentColumn, value),
-                  column
+  const processDataFromClipboard = useDynamicCallback((params: ProcessDataFromClipboardParams) => {
+    const createRowAddFromDataArray = (local: ColumnApi, array: any[], startingColumn: Column): Table.RowAdd<R, M> => {
+      let rowAdd: Table.RowAdd<R, M> = { data: {} };
+      let currentColumn: Column = startingColumn;
+      map(array, (value: any) => {
+        const field = currentColumn.getColDef().field;
+        if (!isNil(field)) {
+          const column: Table.Column<R, M> | undefined = find(columns, { field } as any);
+          if (!isNil(column)) {
+            const fieldBehavior = column.fieldBehavior || ["read", "write"];
+            if (includes(fieldBehavior, "write")) {
+              rowAdd = {
+                ...rowAdd,
+                data: {
+                  ...rowAdd.data,
+                  [column.field as string]: {
+                    value: processCellValueFromClipboard(currentColumn, value),
+                    column
+                  }
                 }
-              }
-            };
+              };
+            }
           }
         }
-      }
-      const nextColumn = local.getDisplayedColAfter(currentColumn);
-      if (isNil(nextColumn)) {
-        return false;
-      }
-      currentColumn = nextColumn;
-    });
-    return rowAdd;
-  };
-
-  const processDataFromClipboard = useDynamicCallback((params: ProcessDataFromClipboardParams) => {
+        const nextColumn = local.getDisplayedColAfter(currentColumn);
+        if (isNil(nextColumn)) {
+          return false;
+        }
+        currentColumn = nextColumn;
+      });
+      return rowAdd;
+    };
     if (!isNil(apis)) {
       const lastIndex = apis.grid.getDisplayedRowCount();
       const focusedCell = apis.grid.getFocusedCell();
