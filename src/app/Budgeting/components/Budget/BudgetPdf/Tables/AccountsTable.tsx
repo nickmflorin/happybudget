@@ -1,35 +1,39 @@
 import { useMemo } from "react";
 import { isNil, filter, reduce, map } from "lodash";
 
-import { useDynamicCallback } from "lib/hooks";
-import { createTableData } from "lib/model/util";
+import { tabling, hooks } from "lib";
 import Table from "./Table";
 import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../Rows";
 
-type ColumnType = PdfTable.Column<PdfBudgetTable.AccountRow, Model.PdfAccount>;
-type ModelWithRowType = GenericTable.ModelWithRow<PdfBudgetTable.AccountRow, Model.PdfAccount, PdfTable.RowMeta>;
-type RowGroupType = GenericTable.RowGroup<PdfBudgetTable.AccountRow, Model.PdfAccount, PdfTable.RowMeta>;
+type ColumnType = PdfTable.Column<Tables.PdfAccountRow, Model.PdfAccount>;
+type ModelWithRowType = Table.ModelWithRow<Tables.PdfAccountRow, Model.PdfAccount>;
+type RowGroupType = BudgetTable.RowGroup<Tables.PdfAccountRow, Model.PdfAccount>;
+
+type AccountsTableProps = {
+  readonly data: Model.PdfAccount[];
+  readonly groups: Model.Group[];
+  readonly columns: ColumnType[];
+};
 
 const AccountsTable = ({
   /* eslint-disable indent */
   columns,
   data,
   groups
-}: PdfBudgetTable.AccountsTableProps): JSX.Element => {
+}: AccountsTableProps): JSX.Element => {
   const showFooterRow = useMemo(() => {
     return filter(columns, (column: ColumnType) => !isNil(column.footer)).length !== 0;
   }, [columns]);
 
-  const table: RowGroupType[] = createTableData<
-    PdfTable.Column<PdfBudgetTable.AccountRow, Model.PdfAccount>,
-    PdfBudgetTable.AccountRow,
-    Model.PdfAccount,
-    PdfTable.RowMeta
+  const table: RowGroupType[] = tabling.util.createBudgetTableData<
+    PdfTable.Column<Tables.PdfAccountRow, Model.PdfAccount>,
+    Tables.PdfAccountRow,
+    Model.PdfAccount
   >(columns, data, groups, {
     defaultNullValue: ""
   });
 
-  const generateRows = useDynamicCallback((): JSX.Element[] => {
+  const generateRows = hooks.useDynamicCallback((): JSX.Element[] => {
     let runningIndex = 1;
     const rows = reduce(
       table,

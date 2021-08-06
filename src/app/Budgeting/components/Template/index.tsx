@@ -7,12 +7,12 @@ import { createSelector } from "reselect";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy, faFileSpreadsheet } from "@fortawesome/pro-light-svg-icons";
 
+import { budgeting } from "lib";
 import { RenderIfValidId, SavingChanges } from "components";
 
+import { selectTemplateDetail } from "../../store/selectors";
 import { wipeStateAction, setTemplateIdAction } from "../../store/actions/template";
-import { GenericLayout } from "../Generic";
-import { getTemplateLastVisited } from "../../urls";
-
+import GenericLayout from "../GenericLayout";
 import Account from "./Account";
 import Accounts from "./Accounts";
 import SubAccount from "./SubAccount";
@@ -46,6 +46,7 @@ const Template = (): JSX.Element => {
   const { templateId } = useParams<{ templateId: string }>();
   const match = useRouteMatch();
   const saving = useSelector(selectSaving);
+  const template = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     dispatch(wipeStateAction(null));
@@ -70,7 +71,7 @@ const Template = (): JSX.Element => {
           icon: <FontAwesomeIcon icon={faFileSpreadsheet} />,
           onClick: () => {
             if (!isNaN(parseInt(templateId))) {
-              const templateLastVisited = getTemplateLastVisited(parseInt(templateId));
+              const templateLastVisited = budgeting.urls.getTemplateLastVisited(parseInt(templateId));
               if (!isNil(templateLastVisited)) {
                 history.push(templateLastVisited);
               } else {
@@ -91,9 +92,19 @@ const Template = (): JSX.Element => {
       <RenderIfValidId id={[templateId]}>
         <Switch>
           <Redirect exact from={match.url} to={`${match.url}/accounts`} />
-          <Route exact path={"/templates/:templateId/accounts/:accountId"} component={Account} />
-          <Route path={"/templates/:templateId/accounts"} component={Accounts} />
-          <Route path={"/templates/:templateId/subaccounts/:subaccountId"} component={SubAccount} />
+          <Route
+            exact
+            path={"/templates/:templateId/accounts/:accountId"}
+            render={() => <Account templateId={parseInt(templateId)} template={template} />}
+          />
+          <Route
+            path={"/templates/:templateId/accounts"}
+            render={() => <Accounts templateId={parseInt(templateId)} template={template} />}
+          />
+          <Route
+            path={"/templates/:templateId/subaccounts/:subaccountId"}
+            render={() => <SubAccount templateId={parseInt(templateId)} template={template} />}
+          />
         </Switch>
       </RenderIfValidId>
     </GenericLayout>

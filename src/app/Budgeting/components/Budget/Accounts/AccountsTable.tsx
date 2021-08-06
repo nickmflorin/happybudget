@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
@@ -6,26 +6,31 @@ import { map } from "lodash";
 
 import { faCommentsAlt, faPrint } from "@fortawesome/pro-regular-svg-icons";
 
+import { redux, tabling } from "lib";
 import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals";
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { BudgetAccountsTable } from "components/tabling";
 
 import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
-import { selectCommentsHistoryDrawerOpen, selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
+import { selectCommentsHistoryDrawerOpen } from "../../../store/selectors";
 import * as actions from "../../../store/actions/budget/accounts";
 import PreviewModal from "../PreviewModal";
-import { GenericAccountsTable } from "../../Generic";
 
-const selectGroups = simpleDeepEqualSelector(
+const selectGroups = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.budget.groups.data
 );
-const selectData = simpleDeepEqualSelector(
+const selectData = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.budget.children.data
 );
-const selectTableSearch = simpleShallowEqualSelector(
+const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.budget.children.search
 );
 
-const AccountsTable = (): JSX.Element => {
+interface AccountsTableProps {
+  readonly budgetId: number;
+  readonly budget: Model.Budget | undefined;
+}
+
+const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element => {
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Model.Group | undefined>(undefined);
@@ -33,66 +38,29 @@ const AccountsTable = (): JSX.Element => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const budgetId = useSelector(selectBudgetId);
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
-  const budgetDetail = useSelector(selectBudgetDetail);
   const groups = useSelector(selectGroups);
   const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
 
-  const tableRef = useRef<BudgetTable.Ref<BudgetTable.AccountRow, Model.Account>>(null);
+  const table = tabling.hooks.useBudgetTable<Tables.AccountRow, Model.Account>();
 
   return (
     <React.Fragment>
-      <GenericAccountsTable
-        tableRef={tableRef}
-        budgetType={"budget"}
+      <BudgetAccountsTable
+        table={table}
         data={data}
         groups={groups}
-        detail={budgetDetail}
         search={search}
+        budget={budget}
+        menuPortalId={"supplementary-header"}
         onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
-        exportFileName={!isNil(budgetDetail) ? `budget_${budgetDetail.name}_accounts` : ""}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.AccountRow, Model.Account>) =>
+        onChangeEvent={(e: Table.ChangeEvent<Tables.AccountRow, Model.Account>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
-        onGroupRows={(rows: BudgetTable.AccountRow[]) =>
-          setGroupAccounts(map(rows, (row: BudgetTable.AccountRow) => row.id))
-        }
+        onGroupRows={(rows: Tables.AccountRow[]) => setGroupAccounts(map(rows, (row: Tables.AccountRow) => row.id))}
         onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
-        columns={[
-          {
-            field: "estimated",
-            headerName: "Estimated",
-            isCalculated: true,
-            columnType: "sum",
-            fieldBehavior: ["read"],
-            footer: {
-              value: !isNil(budgetDetail) && !isNil(budgetDetail.estimated) ? budgetDetail.estimated : 0.0
-            }
-          },
-          {
-            field: "actual",
-            headerName: "Actual",
-            isCalculated: true,
-            columnType: "sum",
-            fieldBehavior: ["read"],
-            footer: {
-              value: !isNil(budgetDetail) && !isNil(budgetDetail.actual) ? budgetDetail.actual : 0.0
-            }
-          },
-          {
-            field: "variance",
-            headerName: "Variance",
-            isCalculated: true,
-            columnType: "sum",
-            fieldBehavior: ["read"],
-            footer: {
-              value: !isNil(budgetDetail) && !isNil(budgetDetail.variance) ? budgetDetail.variance : 0.0
-            }
-          }
-        ]}
         actions={[
           {
             icon: faPrint,
@@ -126,24 +94,20 @@ const AccountsTable = (): JSX.Element => {
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
-            if (group.color !== groupToEdit.color && !isNil(tableRef.current)) {
-              tableRef.current.applyGroupColorChange(group);
+            if (group.color !== groupToEdit.color) {
+              table.current.applyGroupColorChange(group);
             }
           }}
         />
       )}
-      {!isNil(budgetId) && (
-        <PreviewModal
-          autoRenderPdf={false}
-          visible={previewModalVisible}
-          onCancel={() => setPreviewModalVisible(false)}
-          budgetId={budgetId}
-          budgetName={
-            !isNil(budgetDetail) ? `${budgetDetail.name} Budget` : `Sample Budget ${new Date().getFullYear()}`
-          }
-          filename={!isNil(budgetDetail) ? `${budgetDetail.name}.pdf` : "budget.pdf"}
-        />
-      )}
+      <PreviewModal
+        autoRenderPdf={false}
+        visible={previewModalVisible}
+        onCancel={() => setPreviewModalVisible(false)}
+        budgetId={budgetId}
+        budgetName={!isNil(budget) ? `${budget.name} Budget` : `Sample Budget ${new Date().getFullYear()}`}
+        filename={!isNil(budget) ? `${budget.name}.pdf` : "budget.pdf"}
+      />
     </React.Fragment>
   );
 };

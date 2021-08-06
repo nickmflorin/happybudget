@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { isNil, forEach, find } from "lodash";
 import { Form as RootForm } from "antd";
-import { ClientError, ServerError, NetworkError, parseGlobalError, parseFieldErrors, standardizeError } from "api";
-import { replaceInArray } from "lib/util";
+import * as api from "api";
+import { util } from "lib";
 import { FormInstance } from "./model";
 
 const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
@@ -12,18 +12,18 @@ const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
   const [globalError, setGlobalError] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean | undefined>(undefined);
 
-  const renderFieldErrors = (e: ClientError) => {
+  const renderFieldErrors = (e: api.ClientError) => {
     let fieldsWithErrors: { name: string; errors: string[] }[] = [];
-    forEach(parseFieldErrors(e), (error: Http.FieldError) => {
+    forEach(api.parseFieldErrors(e), (error: Http.FieldError) => {
       const existing = find(fieldsWithErrors, { name: error.field });
       if (!isNil(existing)) {
-        fieldsWithErrors = replaceInArray<{ name: string; errors: string[] }>(
+        fieldsWithErrors = util.replaceInArray<{ name: string; errors: string[] }>(
           fieldsWithErrors,
           { name: error.field },
-          { ...existing, errors: [...existing.errors, standardizeError(error).message] }
+          { ...existing, errors: [...existing.errors, api.standardizeError(error).message] }
         );
       } else {
-        fieldsWithErrors.push({ name: error.field, errors: [standardizeError(error).message] });
+        fieldsWithErrors.push({ name: error.field, errors: [api.standardizeError(error).message] });
       }
     });
     antdForm.setFields(fieldsWithErrors);
@@ -51,8 +51,8 @@ const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
       },
       renderFieldErrors: renderFieldErrors,
       handleRequestError: (e: Error) => {
-        if (e instanceof ClientError) {
-          const global = parseGlobalError(e);
+        if (e instanceof api.ClientError) {
+          const global = api.parseGlobalError(e);
           if (!isNil(global)) {
             /* eslint-disable no-console */
             console.error(e.errors);
@@ -60,9 +60,9 @@ const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
           }
           // Render the errors for each field next to the form field.
           renderFieldErrors(e);
-        } else if (e instanceof NetworkError) {
+        } else if (e instanceof api.NetworkError) {
           setGlobalError("There was a problem communicating with the server.");
-        } else if (e instanceof ServerError) {
+        } else if (e instanceof api.ServerError) {
           /* eslint-disable no-console */
           console.error(e);
           setGlobalError("There was a problem communicating with the server.");

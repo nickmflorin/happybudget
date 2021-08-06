@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
-const FooterRow = <R extends PdfTable.Row, M extends Model.Model>(props: Omit<RowProps<R, M>, "row">): JSX.Element => {
+const FooterRow = <R extends Table.Row, M extends Model.Model>(props: Omit<RowProps<R, M>, "row">): JSX.Element => {
   const footerRow = useMemo((): R => {
     return reduce(
       props.columns,

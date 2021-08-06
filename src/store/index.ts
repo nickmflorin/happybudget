@@ -7,6 +7,12 @@ import createApplicationReducer from "./reducer";
 import createRootSaga from "./sagas";
 import createRootInitialState from "./initialState";
 
+export * as actions from "./actions";
+export * as hooks from "./hooks";
+export * as initialState from "./initialState";
+export * as tasks from "./tasks";
+export * as selectors from "./selectors";
+
 const configureStore = (user: Model.User): Store<Modules.ApplicationStore, Redux.Action<any>> => {
   const initialState = createRootInitialState(ApplicationReduxConfig, user);
 

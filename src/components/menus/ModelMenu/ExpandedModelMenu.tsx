@@ -2,12 +2,10 @@ import React, { useImperativeHandle, useCallback, useState, useRef, useEffect } 
 import { isNil, get } from "lodash";
 
 import classNames from "classnames";
-import { Input } from "antd";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/pro-light-svg-icons";
-
-import { isCharacterKeyPress, isBackspaceKeyPress } from "lib/util/events";
+import { Input as AntDInput } from "antd";
+import { util } from "lib";
+import { SearchInput } from "components/fields";
 
 import ModelMenu from "./ModelMenu";
 import "./ExpandedModelMenu.scss";
@@ -23,7 +21,7 @@ const ExpandedModelMenu = <M extends Model.M>({
 }: ExpandedModelMenuProps<M>): JSX.Element => {
   const [_search, _setSearch] = useState("");
   const _menuRef = useRef<ModelMenuRef<M>>(null);
-  const searchRef = useRef<Input>(null);
+  const searchRef = useRef<AntDInput>(null);
 
   const getFromMenuRef = useCallback(
     (getter: string, notSet: any): any => {
@@ -94,7 +92,7 @@ const ExpandedModelMenu = <M extends Model.M>({
 
   useEffect(() => {
     const keyListener = (e: KeyboardEvent) => {
-      if (isCharacterKeyPress(e) || isBackspaceKeyPress(e)) {
+      if (util.events.isCharacterKeyPress(e) || util.events.isBackspaceKeyPress(e)) {
         const searchInput = searchRef.current;
         if (!isNil(searchInput)) {
           searchInput.focus();
@@ -116,14 +114,12 @@ const ExpandedModelMenu = <M extends Model.M>({
   return (
     <div className={classNames("expanded-model-menu", className)} style={style}>
       <div className={"search-container"}>
-        <Input
+        <SearchInput
           className={"input--small"}
           placeholder={props.searchPlaceholder || "Search"}
           autoFocus={true}
           value={isNil(search) ? _search : search}
           ref={searchRef}
-          prefix={<FontAwesomeIcon className={"icon"} icon={faSearch} />}
-          allowClear={true}
           style={{ maxWidth: 300, minWidth: 100 }}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
             setSearch(event.target.value);

@@ -5,15 +5,15 @@ import { isNil, map, flatten, reduce } from "lodash";
 
 import { ShowHide } from "components";
 import { View, Text } from "components/pdf";
-import { getColumnTypeCSSStyle } from "lib/model/util";
+import { tabling } from "lib";
 
-const isCallback = <R extends PdfTable.Row, M extends Model.Model, T = any>(
+const isCallback = <R extends Table.Row, M extends Model.Model, T = any>(
   prop: PdfTable.OptionalCellCallback<R, M, T>
 ): prop is PdfTable.CellCallback<R, M, T> => {
   return typeof prop === "function";
 };
 
-const evaluateOptionalCallbackProp = <R extends PdfTable.Row, M extends Model.Model, T = any>(
+const evaluateOptionalCallbackProp = <R extends Table.Row, M extends Model.Model, T = any>(
   /* eslint-disable indent */
   prop: PdfTable.OptionalCellCallback<R, M, T> | undefined,
   params: PdfTable.CellCallbackParams<R, M>
@@ -24,7 +24,7 @@ const evaluateOptionalCallbackProp = <R extends PdfTable.Row, M extends Model.Mo
   return prop;
 };
 
-const evaluateClassName = <R extends PdfTable.Row, M extends Model.Model>(
+const evaluateClassName = <R extends Table.Row, M extends Model.Model>(
   className: PdfTable.CellClassName<R, M>,
   params: PdfTable.CellCallbackParams<R, M>
 ): (string | undefined)[] => {
@@ -40,7 +40,7 @@ const evaluateClassName = <R extends PdfTable.Row, M extends Model.Model>(
   }
 };
 
-const evaluateCellStyle = <R extends PdfTable.Row, M extends Model.Model>(
+const evaluateCellStyle = <R extends Table.Row, M extends Model.Model>(
   styleObj: PdfTable.CellStyle<R, M>,
   params: PdfTable.CellCallbackParams<R, M>
 ): Style | undefined => {
@@ -58,7 +58,7 @@ const evaluateCellStyle = <R extends PdfTable.Row, M extends Model.Model>(
   }
 };
 
-export interface CellProps<R extends PdfTable.Row, M extends Model.Model> {
+export interface CellProps<R extends Table.Row, M extends Model.Model> {
   readonly column: PdfTable.Column<R, M>;
   readonly row: R;
   readonly location: PdfTable.CellLocation;
@@ -75,7 +75,7 @@ export interface CellProps<R extends PdfTable.Row, M extends Model.Model> {
   readonly valueCallback?: (params: Omit<PdfTable.CellCallbackParams<R, M>, "value" | "rawValue">) => any;
 }
 
-const Cell = <R extends PdfTable.Row, M extends Model.Model>(props: CellProps<R, M>): JSX.Element => {
+const Cell = <R extends Table.Row, M extends Model.Model>(props: CellProps<R, M>): JSX.Element => {
   const callbackParams = useMemo<Omit<PdfTable.CellCallbackParams<R, M>, "value" | "rawValue">>(() => {
     return {
       location: props.location,
@@ -153,7 +153,7 @@ const Cell = <R extends PdfTable.Row, M extends Model.Model>(props: CellProps<R,
               // column types, since these are also used for the AG Grid tables.  We need to
               // figure out a way to differentiate between the two, because here - we are just
               // assuming that the column type styling only applies to the text.
-              ...(getColumnTypeCSSStyle(props.column.columnType, {
+              ...(tabling.util.getColumnTypeCSSStyle(props.column.columnType, {
                 header: props.isHeader || false,
                 pdf: true
               }) as Style),

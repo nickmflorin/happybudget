@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { includes, map } from "lodash";
 
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { redux } from "lib";
 import CommentsHistoryDrawer from "../CommentsHistoryDrawer";
 import {
   requestCommentsAction,
@@ -11,28 +11,28 @@ import {
   requestHistoryAction
 } from "../../../store/actions/budget/account";
 
-const selectDeletingComments = simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
+const selectDeletingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
   map(state.budget.budget.account.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
-const selectEditingComments = simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
+const selectEditingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
   map(state.budget.budget.account.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
-const selectReplyingComments = simpleDeepEqualSelector(
+const selectReplyingComments = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.account.comments.replying
 );
-const selectCommentsData = simpleDeepEqualSelector(
+const selectCommentsData = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.account.comments.data
 );
-const selectSubmittingComment = simpleShallowEqualSelector(
+const selectSubmittingComment = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.account.comments.creating
 );
-const selectLoadingComments = simpleShallowEqualSelector(
+const selectLoadingComments = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.account.comments.loading
 );
-const selectLoadingHistory = simpleShallowEqualSelector(
+const selectLoadingHistory = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.account.history.loading
 );
-const selectHistory = simpleDeepEqualSelector(
+const selectHistory = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.account.history.data
 );
 

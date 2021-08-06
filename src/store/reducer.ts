@@ -1,6 +1,6 @@
 import { Reducer, combineReducers } from "redux";
 import { forEach, isNil, includes } from "lodash";
-import { createSimpleBooleanReducer, createModelListResponseReducer } from "lib/redux/factories";
+import { redux } from "lib";
 import { ApplicationActionTypes } from "./actions";
 import { createInitialUserState } from "./initialState";
 
@@ -51,7 +51,10 @@ const createWrappedModuleReducer = (
 const createUserReducer = (user: Model.User): Reducer<Modules.UserStore, Redux.Action<any>> => {
   const initialUserState = createInitialUserState(user);
 
-  const contactsReducer = createModelListResponseReducer<Model.Contact, Redux.ModelListResponseStore<Model.Contact>>({
+  const contactsReducer = redux.factories.createModelListResponseReducer<
+    Model.Contact,
+    Redux.ModelListResponseStore<Model.Contact>
+  >({
     Response: ApplicationActionTypes.User.Contacts.Response,
     Request: ApplicationActionTypes.User.Contacts.Request,
     Loading: ApplicationActionTypes.User.Contacts.Loading,
@@ -103,7 +106,7 @@ const createApplicationReducer = (config: Modules.ApplicationConfig, user: Model
   return combineReducers({
     ...moduleReducers,
     user: createUserReducer(user),
-    drawerVisible: createSimpleBooleanReducer(ApplicationActionTypes.SetDrawerVisibility),
+    drawerVisible: redux.factories.createSimpleBooleanReducer(ApplicationActionTypes.SetDrawerVisibility),
     loading: loadingReducer
   });
 };

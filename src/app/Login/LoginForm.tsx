@@ -1,12 +1,11 @@
 import React from "react";
 import classNames from "classnames";
 
-import { validateEmail } from "lib/util/validate";
-
 import { Form } from "components";
 import { PasswordInput, EmailInput } from "components/fields";
 import { Button } from "components/buttons";
 import { RouterLink } from "components/links";
+import { util } from "lib";
 
 import SocialButton from "../SocialButton";
 
@@ -48,7 +47,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           () => ({
             validateTrigger: "onSubmit",
             validator(rule: any, value: string) {
-              if (value !== "" && !validateEmail(value)) {
+              if (value !== "" && !util.validate.validateEmail(value)) {
                 return Promise.reject("Please enter a valid email.");
               }
               return Promise.resolve();

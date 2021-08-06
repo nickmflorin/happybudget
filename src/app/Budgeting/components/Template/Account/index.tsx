@@ -4,26 +4,25 @@ import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map } from "lodash";
 
+import { redux, budgeting } from "lib";
+
 import { RenderIfValidId, WrapInApplicationSpinner } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setTemplateAutoIndex } from "../../../store/actions/template";
 import * as actions from "../../../store/actions/template/account";
-import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
-import { setTemplateLastVisited, getUrl } from "../../../urls";
 
 import SubAccountsTable from "./SubAccountsTable";
 
-const selectDetail = simpleDeepEqualSelector(
+const selectDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.account.detail.data
 );
-const selectSubAccountsLoading = simpleShallowEqualSelector(
+const selectSubAccountsLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.account.children.loading
 );
-const selectGroupsLoading = simpleShallowEqualSelector(
+const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.account.groups.loading
 );
 const selectLoading = createSelector(
@@ -32,13 +31,16 @@ const selectLoading = createSelector(
   (tableLoading: boolean, groupsLoading: boolean) => tableLoading || groupsLoading
 );
 
-const Account = (): JSX.Element => {
+interface AccountProps {
+  readonly templateId: number;
+  readonly template: Model.Template | undefined;
+}
+
+const Account = ({ templateId, template }: AccountProps): JSX.Element => {
   const { accountId } = useParams<{ accountId: string }>();
   const dispatch = useDispatch();
-  const templateId = useSelector(selectTemplateId);
   const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
-  const templateDetail = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     dispatch(setTemplateAutoIndex(false));
@@ -56,7 +58,7 @@ const Account = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(templateId) && !isNaN(parseInt(accountId))) {
-      setTemplateLastVisited(templateId, `/templates/${templateId}/accounts/${accountId}`);
+      budgeting.urls.setTemplateLastVisited(templateId, `/templates/${templateId}/accounts/${accountId}`);
     }
   }, [templateId]);
 
@@ -64,26 +66,26 @@ const Account = (): JSX.Element => {
     <RenderIfValidId id={[accountId]}>
       <Portal id={"breadcrumbs"}>
         <BreadCrumbs
-          params={{ template: templateDetail, account: detail }}
+          params={{ t: template, account: detail }}
           items={[
             {
-              requiredParams: ["template"],
-              func: ({ template }: { template: Model.Template }) => ({
-                id: template.id,
+              requiredParams: ["t"],
+              func: ({ t }: { t: Model.Template }) => ({
+                id: t.id,
                 primary: true,
-                text: template.name,
+                text: t.name,
                 tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: getUrl(template)
+                url: budgeting.urls.getUrl(t)
               })
             },
             {
-              requiredParams: ["template", "account"],
-              func: ({ template, account }: { template: Model.Template; account: Model.Account }) => {
+              requiredParams: ["t", "account"],
+              func: ({ t, account }: { t: Model.Template; account: Model.Account }) => {
                 const siblings = account.siblings || [];
                 return {
                   id: account.id,
                   primary: true,
-                  url: getUrl(template, account),
+                  url: budgeting.urls.getUrl(t, account),
                   render: (params: IBreadCrumbItemRenderParams) => {
                     if (siblings.length !== 0) {
                       return (
@@ -96,7 +98,7 @@ const Account = (): JSX.Element => {
                   },
                   options: map(siblings, (option: Model.SimpleAccount) => ({
                     id: option.id,
-                    url: getUrl(template, option),
+                    url: budgeting.urls.getUrl(t, option),
                     render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
                   }))
                 };
@@ -106,7 +108,7 @@ const Account = (): JSX.Element => {
         />
       </Portal>
       <WrapInApplicationSpinner loading={loading}>
-        <SubAccountsTable accountId={parseInt(accountId)} />
+        <SubAccountsTable accountId={parseInt(accountId)} template={template} templateId={templateId} />
       </WrapInApplicationSpinner>
     </RenderIfValidId>
   );

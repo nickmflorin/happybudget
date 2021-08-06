@@ -1,73 +1,71 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
 
+import { redux, tabling } from "lib";
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { TemplateSubAccountsTable } from "components/tabling";
 
-import { selectTemplateId, selectSubAccountUnits } from "../../../store/selectors";
+import { selectSubAccountUnits } from "../../../store/selectors";
 import * as actions from "../../../store/actions/template/subAccount";
-import TemplateSubAccountsTable from "../SubAccountsTable";
 import FringesModal from "./FringesModal";
 
-const selectGroups = simpleDeepEqualSelector(
+const selectGroups = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.groups.data
 );
-const selectSubAccounts = simpleDeepEqualSelector(
+const selectSubAccounts = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.children.data
 );
-const selectTableSearch = simpleShallowEqualSelector(
+const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.children.search
 );
-const selectSubAccountDetail = simpleDeepEqualSelector(
+const selectSubAccountDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.detail.data
 );
-const selectLoadingSubAcount = simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.detail.loading
-);
-const selectFringes = simpleDeepEqualSelector(
+const selectFringes = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.fringes.data
 );
 
 interface SubAccountsTableProps {
-  subaccountId: number;
+  readonly subaccountId: number;
+  readonly templateId: number;
+  readonly template: Model.Template | undefined; // Not currently used, but including it is consistent.
 }
 
-const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element => {
+const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Model.Group | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
-  const templateId = useSelector(selectTemplateId);
   const data = useSelector(selectSubAccounts);
   const search = useSelector(selectTableSearch);
   const subaccountDetail = useSelector(selectSubAccountDetail);
-  const subAccountLoading = useSelector(selectLoadingSubAcount);
   const groups = useSelector(selectGroups);
   const fringes = useSelector(selectFringes);
   const subAccountUnits = useSelector(selectSubAccountUnits);
 
-  const tableRef = useRef<BudgetTable.Ref<BudgetTable.SubAccountRow, Model.SubAccount>>(null);
+  const table = tabling.hooks.useBudgetTable<Tables.SubAccountRow, Model.SubAccount>();
 
   return (
     <React.Fragment>
       <TemplateSubAccountsTable
-        tableRef={tableRef}
+        template={template}
+        table={table}
         levelType={"subaccount"}
+        menuPortalId={"supplementary-header"}
         data={data}
         groups={groups}
         subAccountUnits={subAccountUnits}
         fringes={fringes}
-        fringesCellEditorParams={{
+        fringesEditorParams={{
           onAddFringes: () => setFringesModalVisible(true),
           colId: "fringes"
         }}
         onEditFringes={() => setFringesModalVisible(true)}
-        fringesCellEditor={"FringesCellEditor"}
-        loadingParent={subAccountLoading}
+        fringesEditor={"FringesEditor"}
         // Right now, the SubAccount recursion only goes 1 layer deep.
         // Account -> SubAccount -> Detail (Recrusive SubAccount).
         onRowExpand={null}
@@ -82,7 +80,7 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.SubAccountRow, Model.SubAccount>) =>
+        onChangeEvent={(e: Table.ChangeEvent<Tables.SubAccountRow, Model.SubAccount>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onBack={() => {
@@ -99,9 +97,9 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
             }
           }
         }}
-        cookies={!isNil(subaccountDetail) ? { ordering: `subaccount-${subaccountDetail.id}-table-ordering` } : {}}
-        onGroupRows={(rows: BudgetTable.SubAccountRow[]) =>
-          setGroupSubAccounts(map(rows, (row: BudgetTable.SubAccountRow) => row.id))
+        cookieNames={!isNil(subaccountDetail) ? { ordering: `subaccount-${subaccountDetail.id}-table-ordering` } : {}}
+        onGroupRows={(rows: Tables.SubAccountRow[]) =>
+          setGroupSubAccounts(map(rows, (row: Tables.SubAccountRow) => row.id))
         }
         onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
       />
@@ -125,13 +123,13 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
-            if (group.color !== groupToEdit.color && !isNil(tableRef.current)) {
-              tableRef.current.applyGroupColorChange(group);
+            if (group.color !== groupToEdit.color) {
+              table.current.applyGroupColorChange(group);
             }
           }}
         />
       )}
-      <FringesModal open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
+      <FringesModal template={template} open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
     </React.Fragment>
   );
 };

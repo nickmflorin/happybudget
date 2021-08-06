@@ -6,7 +6,7 @@ import { CellProps } from "../Cells/Cell";
 import HeaderCell from "../Cells/HeaderCell";
 import Row, { RowProps } from "./Row";
 
-const HeaderRow = <R extends PdfTable.Row, M extends Model.Model>({
+const HeaderRow = <R extends Table.Row, M extends Model.Model>({
   cellProps,
   ...props
 }: Omit<RowProps<R, M>, "row"> & { readonly cellProps?: CellProps<R, M> }): JSX.Element => {

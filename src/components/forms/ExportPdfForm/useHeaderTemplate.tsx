@@ -1,8 +1,7 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { isNil } from "lodash";
 
-import * as typeguards from "lib/model/typeguards";
-import { useDynamicCallback } from "lib/hooks";
+import { model, hooks } from "lib";
 
 import "./index.scss";
 
@@ -71,7 +70,7 @@ const useHeaderTemplate = (
     }
   };
 
-  const setHeaderBlocks = useDynamicCallback((data: RichText.Block[] | null) => {
+  const setHeaderBlocks = hooks.useDynamicCallback((data: RichText.Block[] | null) => {
     const blocks = !isNil(data) ? data : [];
     if (isNil(props.template)) {
       setUnsavedHeaderBlocks(blocks);
@@ -80,7 +79,7 @@ const useHeaderTemplate = (
     onValuesChange({ header: blocks }, { ...headerPayload, header: blocks });
   });
 
-  const setLeftInfoBlocks = useDynamicCallback((data: RichText.Block[] | null) => {
+  const setLeftInfoBlocks = hooks.useDynamicCallback((data: RichText.Block[] | null) => {
     const blocks = !isNil(data) ? data : [];
     if (isNil(props.template)) {
       setUnsavedLeftInfoBlocks(blocks);
@@ -89,7 +88,7 @@ const useHeaderTemplate = (
     onValuesChange({ left_info: blocks }, { ...headerPayload, left_info: blocks });
   });
 
-  const setRightInfoBlocks = useDynamicCallback((data: RichText.Block[] | null) => {
+  const setRightInfoBlocks = hooks.useDynamicCallback((data: RichText.Block[] | null) => {
     const blocks = !isNil(data) ? data : [];
     if (isNil(props.template)) {
       setUnsavedRightInfoBlocks(blocks);
@@ -102,7 +101,7 @@ const useHeaderTemplate = (
     if (isNil(props.template)) {
       // If the image is not associated with an active template, it should still just be an
       // uploaded image (and not a saved image).
-      if (!isNil(img) && !typeguards.isUploadedImage(img)) {
+      if (!isNil(img) && !model.typeguards.isUploadedImage(img)) {
         throw new Error("If a template is not populated, the image should be of uploaded form.");
       }
       setUnsavedLeftImage(img);
@@ -115,7 +114,7 @@ const useHeaderTemplate = (
     if (isNil(props.template)) {
       // If the image is not associated with an active template, it should still just be an
       // uploaded image (and not a saved image).
-      if (!isNil(img) && !typeguards.isUploadedImage(img)) {
+      if (!isNil(img) && !model.typeguards.isUploadedImage(img)) {
         throw new Error("If a template is not populated, the image should be of uploaded form.");
       }
       setUnsavedRightImage(img);

@@ -65,6 +65,8 @@
   .ant-modal-body {
     padding: 10px 36px;
     overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
   }
 
   .ant-modal-footer {

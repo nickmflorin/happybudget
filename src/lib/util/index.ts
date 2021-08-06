@@ -1,5 +1,15 @@
 import { forEach, findIndex, find, isNil, map, filter, reduce, includes, orderBy } from "lodash";
 
+export * as colors from "./colors";
+export * as dates from "./dates";
+export * as events from "./events";
+export * as files from "./files";
+export * as formatters from "./formatters";
+export * as forms from "./forms";
+export * as html from "./html";
+export * as urls from "./urls";
+export * as validate from "./validate";
+
 export const sumChars = (val: string): number => {
   let sum = 0;
   for (let i = 0; i < val.length; i++) {

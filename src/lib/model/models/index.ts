@@ -4,5 +4,3 @@ export * from "./FringeUnits";
 export { default as FringeUnits } from "./FringeUnits";
 export * from "./PaymentMethods";
 export { default as PaymentMethods } from "./PaymentMethods";
-export { default as ColumnTypes } from "./ColumnTypes";
-export { default as SupportedPdfFontStyles } from "./SupportedPdfFontStyles";

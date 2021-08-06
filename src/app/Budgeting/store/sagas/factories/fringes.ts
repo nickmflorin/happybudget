@@ -4,11 +4,9 @@ import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, map } from "lodash";
 
 import * as api from "api";
-import * as typeguards from "lib/model/typeguards";
+import { tabling } from "lib";
 
-import { consolidateTableChange, createBulkCreatePayload, payload, eventWarrantsRecalculation } from "lib/model/util";
-
-type R = BudgetTable.FringeRow;
+type R = Tables.FringeRow;
 type M = Model.Fringe;
 type P = Http.FringePayload;
 
@@ -57,17 +55,17 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-    const requestPayload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, M, P>(e.payload);
+    const requestPayload: Http.BulkCreatePayload<P> = tabling.util.createBulkCreatePayload<R, M, P>(e.payload);
 
     yield put(actions.creating(true));
-    if (eventWarrantsRecalculation(e)) {
+    if (tabling.util.eventWarrantsRecalculation(e)) {
       yield put(actions.budget.loading(true));
     }
     try {
       const response: Http.BulkCreateResponse<B, M> = yield call(services.bulkCreate, objId, requestPayload, {
         cancelToken: source.token
       });
-      if (eventWarrantsRecalculation(e)) {
+      if (tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.updateInState(response.data as Partial<B>));
       }
       yield all(response.children.map((fringe: M) => put(actions.addToState(fringe))));
@@ -77,7 +75,7 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
       }
     } finally {
       yield put(actions.creating(false));
-      if (eventWarrantsRecalculation(e)) {
+      if (tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.loading(true));
       }
       if (yield cancelled()) {
@@ -95,14 +93,14 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
     yield all(requestPayload.map((p: Http.BulkUpdatePayload<P>) => put(actions.updating({ id: p.id, value: true }))));
-    if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+    if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
       yield put(actions.budget.loading(true));
     }
     try {
       const response: Http.BulkResponse<B> = yield call(services.bulkUpdate, objId, requestPayload, {
         cancelToken: source.token
       });
-      if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+      if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.updateInState(response.data as Partial<B>));
       }
     } catch (err) {
@@ -110,7 +108,7 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
         api.handleRequestError(err, errorMessage);
       }
     } finally {
-      if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+      if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.loading(false));
       }
       yield all(
@@ -131,14 +129,14 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
       const ids = map(rows, (row: R) => row.id);
 
       yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
-      if (eventWarrantsRecalculation<R, M>(e)) {
+      if (tabling.util.eventWarrantsRecalculation<R, M>(e)) {
         yield put(actions.budget.loading(true));
       }
       try {
         const response: Http.BulkResponse<B> = yield call(services.bulkDelete, objId, ids, {
           cancelToken: source.token
         });
-        if (eventWarrantsRecalculation(e)) {
+        if (tabling.util.eventWarrantsRecalculation(e)) {
           yield put(actions.budget.updateInState(response.data as Partial<B>));
         }
       } catch (err) {
@@ -147,7 +145,7 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
         }
       } finally {
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: false }))));
-        if (eventWarrantsRecalculation(e)) {
+        if (tabling.util.eventWarrantsRecalculation(e)) {
           yield put(actions.budget.loading(false));
         }
         if (yield cancelled()) {
@@ -177,11 +175,11 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
       const e: Table.DataChangeEvent<R, M> = action.payload;
-      const merged = consolidateTableChange(e.payload);
+      const merged = tabling.util.consolidateTableChange(e.payload);
       if (merged.length !== 0) {
         const requestPayload: Http.BulkUpdatePayload<P>[] = map(merged, (change: Table.RowChange<R, M>) => ({
           id: change.id,
-          ...payload(change)
+          ...tabling.util.payload(change)
         }));
         yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the fringes.");
       }

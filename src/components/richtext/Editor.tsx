@@ -6,9 +6,8 @@ import EditorJS, { OutputData, API, BlockAPI, LogLevels } from "@editorjs/editor
 import Paragraph from "@editorjs/paragraph";
 import Header from "@editorjs/header";
 
-import { convertEditorJSBlocksToInternalBlocks, convertInternalBlocksToEditorJSBlocks } from "lib/model/util";
+import { richtext, hooks } from "lib";
 import "./Editor.scss";
-import { useDeepEqualMemo, useDynamicCallback } from "lib/hooks";
 
 const Tools = {
   paragraph: {
@@ -43,14 +42,14 @@ const Editor = (
   const disableOnChange = useRef(false); // See note towards bottom of component.
   const [instance, setInstance] = useState<EditorJS | null>(null);
 
-  const _onChange = useDynamicCallback((api: API, block: BlockAPI) => {
+  const _onChange = hooks.useDynamicCallback((api: API, block: BlockAPI) => {
     if (isNil(onChange) || isNil(instance) || disableOnChange.current === true) {
       return;
     }
     instance
       .save()
       .then((data: OutputData) => {
-        const internalData = convertEditorJSBlocksToInternalBlocks(data.blocks);
+        const internalData = richtext.util.convertEditorJSBlocksToInternalBlocks(data.blocks);
         const isBlocksEqual = props.onCompareBlocks?.(internalData, value || []);
         if (isBlocksEqual) {
           return;
@@ -64,13 +63,13 @@ const Editor = (
       });
   });
 
-  const _onReady = useDynamicCallback(() => {
+  const _onReady = hooks.useDynamicCallback(() => {
     return onReady?.(instance);
   });
 
   useImperativeHandle(ref, () => ({
     setValue: (v: RichText.Block[] | null) => {
-      const data = { blocks: !isNil(v) ? convertInternalBlocksToEditorJSBlocks(v) : [] };
+      const data = { blocks: !isNil(v) ? richtext.util.convertInternalBlocksToEditorJSBlocks(v) : [] };
       if (!isNil(instance)) {
         instance.isReady
           .then(() => {
@@ -88,7 +87,7 @@ const Editor = (
     }
   }));
 
-  const destroyEditor = useDynamicCallback(() => {
+  const destroyEditor = hooks.useDynamicCallback(() => {
     if (!isNil(instance)) {
       instance.isReady
         .then(() => {
@@ -110,7 +109,7 @@ const Editor = (
       ...props,
       tools: Tools,
       holder: id,
-      data: { blocks: !isNil(value) ? convertInternalBlocksToEditorJSBlocks(value) : [] },
+      data: { blocks: !isNil(value) ? richtext.util.convertInternalBlocksToEditorJSBlocks(value) : [] },
       onChange: _onChange,
       onReady: _onReady
     });
@@ -146,7 +145,7 @@ const Editor = (
     if (!isNil(instance)) {
       instance.isReady
         .then(() => {
-          const data = { blocks: !isNil(value) ? convertInternalBlocksToEditorJSBlocks(value) : [] };
+          const data = { blocks: !isNil(value) ? richtext.util.convertInternalBlocksToEditorJSBlocks(value) : [] };
           disableOnChange.current = true;
           instance.clear();
           instance.render(data);
@@ -157,7 +156,7 @@ const Editor = (
           console.error(e);
         });
     }
-  }, [useDeepEqualMemo(value)]);
+  }, [hooks.useDeepEqualMemo(value)]);
 
   return <div className={classNames("rich-text-editor", className)} id={id} style={style}></div>;
 };

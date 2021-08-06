@@ -7,8 +7,7 @@ import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { ShowHide } from "components";
 import { AccountCircleLink } from "components/links";
 import { SegmentedText } from "components/typography";
-import { isFieldAlterationEvent } from "lib/model/typeguards";
-import { toDisplayTimeSince } from "lib/util/dates";
+import { model, util } from "lib";
 
 import "./Event.scss";
 
@@ -29,7 +28,7 @@ const EventHeader = (props: { event: Model.HistoryEvent }): JSX.Element => {
     <div className={"event-header"}>
       <AccountCircleLink user={props.event.user} />
       <div className={"event-user-name"}>{props.event.user.full_name}</div>
-      <div className={"event-created-at"}>{toDisplayTimeSince(props.event.created_at)}</div>
+      <div className={"event-created-at"}>{util.dates.toDisplayTimeSince(props.event.created_at)}</div>
     </div>
   );
 };
@@ -114,7 +113,11 @@ const Event = ({ event }: EventProps): JSX.Element => {
       <EventHeader event={event} />
       <div className={"event-body"}>
         <div className={"event-body-text"}>
-          {isFieldAlterationEvent(event) ? <FieldAlteration event={event} /> : <ItemCreated event={event} />}
+          {model.typeguards.isFieldAlterationEvent(event) ? (
+            <FieldAlteration event={event} />
+          ) : (
+            <ItemCreated event={event} />
+          )}
         </div>
       </div>
     </div>

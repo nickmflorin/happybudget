@@ -2,8 +2,8 @@ import moment from "moment-timezone";
 import { isNil } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock } from "@fortawesome/pro-solid-svg-icons";
-import { Select } from "antd";
-import { SelectProps } from "antd/lib/select";
+import { Select } from "components/fields";
+import { SelectProps } from "components/fields/Select";
 
 interface TimezoneSelectProps extends SelectProps<string> {}
 

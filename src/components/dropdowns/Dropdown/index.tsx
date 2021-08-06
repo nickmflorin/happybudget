@@ -1,16 +1,14 @@
 import React, { useMemo } from "react";
 import classNames from "classnames";
 import ClickAwayListener from "react-click-away-listener";
-import { uniqueId } from "lodash";
+import { uniqueId, isNil } from "lodash";
 
 import { Dropdown as AntdDropdown } from "antd";
 import { DropDownProps } from "antd/lib/dropdown";
 
-import { isNodeDescendantOf } from "lib/util/html";
-
 import { DropdownMenu } from "components/menus";
 import { IDropdownMenu, IDropdownMenuItem } from "components/menus/DropdownMenu";
-import { isNil } from "lodash";
+import { util } from "lib";
 
 interface BaseDropdownProps
   extends Omit<DropDownProps, "overlay" | "className">,
@@ -59,7 +57,7 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
               const menus = document.getElementsByClassName("dropdown-menu");
               let clickInsideMenu = false;
               for (let i = 0; i < menus.length; i++) {
-                if (isNodeDescendantOf(menus[i], e.target)) {
+                if (util.html.isNodeDescendantOf(menus[i], e.target)) {
                   clickInsideMenu = true;
                   break;
                 }
@@ -68,7 +66,7 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
               // of the menu (where the ClickAway is detected), clicking the
               // button will also trigger the ClickAway, so we need to avoid it.
               const button = document.getElementById(buttonId);
-              if (!isNil(button) && !isNodeDescendantOf(button, e.target) && clickInsideMenu === false) {
+              if (!isNil(button) && !util.html.isNodeDescendantOf(button, e.target) && clickInsideMenu === false) {
                 props.onClickAway();
               }
             }

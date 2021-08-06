@@ -1,8 +1,9 @@
 import { SagaIterator } from "redux-saga";
 import { call, put, cancelled } from "redux-saga/effects";
 import axios from "axios";
-import { handleRequestError } from "api";
-import { getFringeColors, getSubAccountUnits } from "api/services";
+
+import * as api from "api";
+
 import {
   loadingFringeColorsAction,
   responseFringeColorsAction,
@@ -15,11 +16,11 @@ export function* getFringeColorsTask(): SagaIterator {
   const source = CancelToken.source();
   yield put(loadingFringeColorsAction(true));
   try {
-    const response = yield call(getFringeColors, { cancelToken: source.token });
+    const response = yield call(api.getFringeColors, { cancelToken: source.token });
     yield put(responseFringeColorsAction(response));
   } catch (e) {
     if (!(yield cancelled())) {
-      handleRequestError(e, "There was an error retrieving the budget's fringe colors.");
+      api.handleRequestError(e, "There was an error retrieving the budget's fringe colors.");
       yield put(responseFringeColorsAction({ count: 0, data: [] }, { error: e }));
     }
   } finally {
@@ -35,11 +36,11 @@ export function* getSubAccountUnitsTask(): SagaIterator {
   const source = CancelToken.source();
   yield put(loadingSubAccountUnitsAction(true));
   try {
-    const response = yield call(getSubAccountUnits, { cancelToken: source.token });
+    const response = yield call(api.getSubAccountUnits, { cancelToken: source.token });
     yield put(responseSubAccountUnitsAction(response));
   } catch (e) {
     if (!(yield cancelled())) {
-      handleRequestError(e, "There was an error retrieving the budget's sub-account units.");
+      api.handleRequestError(e, "There was an error retrieving the budget's sub-account units.");
       yield put(responseSubAccountUnitsAction({ count: 0, data: [] }, { error: e }));
     }
   } finally {

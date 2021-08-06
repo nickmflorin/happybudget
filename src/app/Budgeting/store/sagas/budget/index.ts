@@ -2,9 +2,8 @@ import { SagaIterator } from "redux-saga";
 import { spawn, take, cancel, fork, call, put, select, all, cancelled } from "redux-saga/effects";
 import axios from "axios";
 import { isNil } from "lodash";
-import { handleRequestError } from "api";
 
-import { getBudget } from "api/services";
+import * as api from "api";
 import { getContactsTask } from "store/tasks";
 
 import { ActionType } from "../../actions";
@@ -35,11 +34,11 @@ function* getBudgetTask(): SagaIterator {
     const source = CancelToken.source();
     yield put(loadingBudgetAction(true));
     try {
-      const response: Model.Budget = yield call(getBudget, budgetId, { cancelToken: source.token });
+      const response: Model.Budget = yield call(api.getBudget, budgetId, { cancelToken: source.token });
       yield put(responseBudgetAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error retrieving the budget.");
+        api.handleRequestError(e, "There was an error retrieving the budget.");
         yield put(responseBudgetAction(undefined, { error: e }));
       }
     } finally {

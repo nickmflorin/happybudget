@@ -5,8 +5,8 @@ import { useDispatch } from "react-redux";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
+import { util } from "lib";
 import { setDrawerVisibilityAction } from "store/actions";
-import { isNodeDescendantOf } from "lib/util/html";
 import Portal from "./Portal";
 
 interface DrawerSectionProps {
@@ -67,7 +67,7 @@ const Drawer = ({ children, className, visible, style = {}, onClickAway }: Drawe
           let ignoreClick = false;
           /* eslint-disable quotes */
           document.querySelectorAll('[role="drawer-toggle"]').forEach((el: Element) => {
-            if (isNodeDescendantOf(el, event.srcElement)) {
+            if (util.html.isNodeDescendantOf(el, event.srcElement)) {
               ignoreClick = true;
               return false;
             }

@@ -3,7 +3,7 @@ import { isNil, map, filter, find, includes, reduce } from "lodash";
 
 import { ShowHide } from "components";
 import { Document, View, Page, Tag, NoDataPage } from "components/pdf";
-import { orderColumns } from "lib/model/util";
+import { tabling } from "lib";
 
 import { AccountColumns, SubAccountColumns } from "./config";
 import PageHeader from "./PageHeader";
@@ -17,7 +17,7 @@ interface BudgetPdfProps {
 }
 
 const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element => {
-  const accountColumns = useMemo<PdfTable.Column<PdfBudgetTable.AccountRow, Model.PdfAccount>[]>(() => {
+  const accountColumns = useMemo<PdfTable.Column<Tables.PdfAccountRow, Model.PdfAccount>[]>(() => {
     const columnsObj = {
       ...AccountColumns,
       estimated: {
@@ -27,15 +27,15 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         }
       }
     };
-    return orderColumns<
-      PdfTable.Column<PdfBudgetTable.AccountRow, Model.PdfAccount>,
-      PdfBudgetTable.AccountRow,
+    return tabling.util.orderColumns<
+      PdfTable.Column<Tables.PdfAccountRow, Model.PdfAccount>,
+      Tables.PdfAccountRow,
       Model.PdfAccount
-    >(map(columnsObj, (c: PdfTable.Column<PdfBudgetTable.AccountRow, Model.PdfAccount>) => c));
+    >(map(columnsObj, (c: PdfTable.Column<Tables.PdfAccountRow, Model.PdfAccount>) => c));
   }, []);
 
   const subaccountColumns = useMemo(() => {
-    return (account: Model.PdfAccount): PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>[] => {
+    return (account: Model.PdfAccount): PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>[] => {
       // Add in properties to each column that depend on props and table state - properties
       // that cannot be added yet in the config file.
       const columnsObj = {
@@ -61,7 +61,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         },
         contact: {
           ...SubAccountColumns.contact,
-          cellRenderer: (params: PdfTable.CellCallbackParams<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => {
+          cellRenderer: (params: PdfTable.CellCallbackParams<Tables.PdfSubAccountRow, Model.PdfSubAccount>) => {
             if (params.rawValue !== null) {
               const contact: Model.Contact | undefined = find(contacts, { id: params.rawValue });
               if (!isNil(contact)) {
@@ -80,7 +80,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         },
         unit: {
           ...SubAccountColumns.unit,
-          cellRenderer: (params: PdfTable.CellCallbackParams<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) =>
+          cellRenderer: (params: PdfTable.CellCallbackParams<Tables.PdfSubAccountRow, Model.PdfSubAccount>) =>
             params.rawValue !== null ? <Tag model={params.rawValue} /> : <span></span>
         },
         estimated: {
@@ -94,46 +94,44 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
         }
       };
       // Map Columns Obj to Array
-      let columns: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>[] = map(
+      let columns: PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>[] = map(
         columnsObj,
-        (c: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => c
+        (c: PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>) => c
       );
       // Calculate Total Column Width Before Filtering Out Unused Columns
       const totalWidth = reduce(
         columns,
-        (prev: number, column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) =>
-          prev + column.width,
+        (prev: number, column: PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>) => prev + column.width,
         0.0
       );
       if (totalWidth !== 0.0) {
         // Normalize Column Widths Before Filtering Out Unused Columns
-        columns = map(columns, (column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => ({
+        columns = map(columns, (column: PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>) => ({
           ...column,
           width: column.width / totalWidth
         }));
         // Filter Out Unused Columns
-        columns = filter(columns, (column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) =>
+        columns = filter(columns, (column: PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>) =>
           includes(options.columns, column.field as string)
         );
         // Calculate Total Column Width After Filtering Out Unused Columns
         const totalWidthWithFilter = reduce(
           columns,
-          (prev: number, column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) =>
-            prev + column.width,
+          (prev: number, column: PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>) => prev + column.width,
           0.0
         );
         if (totalWidthWithFilter !== 0.0) {
           // Normalize Column Widths After Filtering Out Unused Columns
-          columns = map(columns, (column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => ({
+          columns = map(columns, (column: PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>) => ({
             ...column,
             width: column.width / totalWidthWithFilter
           }));
         }
       }
       // Order the Columns
-      return orderColumns<
-        PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>,
-        PdfBudgetTable.SubAccountRow,
+      return tabling.util.orderColumns<
+        PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>,
+        Tables.PdfSubAccountRow,
         Model.PdfSubAccount
       >(columns);
     };
@@ -174,7 +172,6 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
           footer={options.includeNotes === true ? <Notes blocks={options.notes} /> : null}
         >
           <AccountsTable
-            options={options}
             data={filter(
               budget.accounts,
               (account: Model.PdfAccount) => !(options.excludeZeroTotals === true) || account.estimated !== 0

@@ -1,0 +1,401 @@
+@import "./antd";
+@import "./ag_theme";
+
+.cell-dropdown {
+  border-radius: 0px;
+  border: none !important;
+  padding-top: 4px;
+  background-color: transparent;
+
+  .model-tags-menu {
+    border: 1px solid #efefef;
+  }
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  height: 100%;
+
+  .ag-header {
+    border: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+
+    .ag-header-row {
+      > .ag-header-cell {
+        padding-left: 10px;
+        padding-right: 10px;
+        letter-spacing: 0.045em;
+        font-size: 12px;
+        font-weight: 400;
+
+        .ag-react-container {
+          width: 100%;
+        }
+
+        .inner-cell--header {
+          display: flex;
+          width: 100%;
+
+          .icon--table-header {
+            color: $grid-icon-color;
+            margin-right: 8px;
+          }
+
+          .text {
+            line-height: 36px;
+            flex-grow: 100;
+            font-weight: 400;
+          }
+
+          .btn--table-header-edit {
+            margin-left: 8px;
+            height: 18px;
+            width: 18px;
+            padding: 2px;
+
+            svg {
+              height: 14px;
+              width: 14px;
+            }
+          }
+
+          .icon-holder--sort {
+            margin-left: 8px;
+            height: 18px;
+            width: 18px;
+            padding: 2px;
+
+            svg {
+              height: 14px;
+              width: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .grid {
+    .row {
+      border: none !important;
+      color: #3a3a3a;
+
+      &:first-child {
+        .ag-cell:not(.ag-cell-focus) {
+          border-top: none !important;
+        }
+      }
+
+      > .cell {
+        font-size: 13px;
+        font-weight: 400;
+        background-color: $white;
+        overflow: hidden;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        border-bottom: $table-border;
+        border-left: $table-border;
+        // This is needed so that we can display white space in our cells without
+        // AG Grid trimming them.  Note that this sometimes causes issues with cell
+        // text overflow.  We still need to figure out a mores sustainable solution.
+        white-space: break-spaces;
+
+        &--action {
+          // white-space break-spaces messes with the checkbox selection cells.
+          white-space: nowrap !important;
+        }
+
+        // In the case that the cell renders HTML (like a tag) it is much easier
+        // to vertically center the content with flex than it is to pad each cell
+        // to center the rendered HTML.  It is important that we do not apply this
+        // flex to cells that just render text, because they will already be vertically
+        // centered and it messes with the cell's ability to truncate text.
+        &--renders-html {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+
+          .ag-react-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+          }
+        }
+
+        &.ag-cell-inline-editing {
+          height: 36px;
+          border-radius: 0px !important;
+
+          .ag-input-field-input,
+          .ag-text-field-input {
+            padding: 0px !important;
+            border: none !important;
+            box-shadow: none !important;
+            background-color: transparent !important;
+          }
+        }
+
+        &.ag-cell-last-left-pinned:not(.ag-cell-range-right):not(.ag-cell-range-single-cell):not(.ag-cell-focus) {
+          border-right: unset !important;
+          border-right-color: unset !important;
+        }
+
+        // This will vertically center the text nicely while also not adjusting the
+        // vertical location of the text when the cell is selected.
+        .ag-react-container {
+          max-height: 100%;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          white-space: nowrap;
+        }
+
+        .ag-selection-checkbox {
+          height: 16px;
+          margin-right: 0px;
+        }
+
+        &.ag-cell-focus {
+          border: 2px solid $green !important;
+          &.cell--not-selectable {
+            border: unset !important;
+            .ag-fill-handle {
+              display: none !important;
+            }
+          }
+        }
+
+        .ag-fill-handle {
+          background-color: $green;
+        }
+
+        .inner-cell {
+          width: 100%;
+
+          .loadable-cell-wrapper {
+            span {
+              position: relative;
+
+              .loadable-cell-spinner {
+                display: block;
+                height: 16px;
+                width: 16px;
+                padding: 1px;
+                position: absolute;
+                top: calc(50% - 9px);
+                right: calc(50% - 8px);
+                color: $green;
+
+                .ant-spin-dot {
+                  height: 16px;
+                  width: 16px;
+
+                  svg {
+                    height: 16px;
+                    width: 16px;
+                  }
+                }
+              }
+            }
+
+            &.loading {
+              .inner-cell-content {
+                opacity: 0.3;
+              }
+            }
+          }
+
+          .btn--clear {
+            display: none;
+            position: absolute;
+            right: 0px;
+            top: 0;
+            padding: 9px !important;
+            height: 100% !important;
+            width: 24px !important;
+          }
+
+          &:hover {
+            .btn--clear {
+              display: flex;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .core-table {
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    &.with-page-footer {
+      max-height: calc(100% - 40px);
+    }
+
+    .grid--data {
+      max-height: calc(100% - 40px);
+      display: flex;
+      flex-direction: column;
+
+      .ag-root-wrapper {
+        overflow: visible;
+        max-height: 100% !important;
+        .ag-root-wrapper-body {
+          overflow-y: hidden;
+          max-height: 100% !important;
+          .ag-body-viewport {
+            overflow-y: scroll !important;
+          }
+        }
+      }
+
+      .ag-row:last-child {
+        border-bottom: none !important;
+      }
+
+      .row {
+        > .cell {
+          &--action {
+            border: unset !important;
+            text-align: center;
+            padding: 2px;
+            .ag-react-container {
+              > * {
+                margin: 0 auto;
+              }
+            }
+          }
+
+          &--calculated {
+            background-color: #f7fffa;
+            .ag-fill-handle {
+              display: none !important;
+            }
+            &:not(.ag-cell-range-top) {
+              border-top-color: transparent;
+            }
+            &:not(.ag-cell-range-right) {
+              border-right-color: transparent;
+            }
+            &:not(.ag-cell-range-left) {
+              border-left-color: transparent;
+            }
+            &:not(.ag-cell-range-bottom) {
+              border-bottom-color: transparent;
+            }
+          }
+        }
+
+        &.ag-row-hover {
+          background-color: $gray-highlight;
+          > .cell {
+            background-color: $gray-highlight;
+            &.cell--calculated {
+              background-color: $gray-highlight;
+            }
+          }
+        }
+
+        &--group {
+          border-bottom: none !important;
+          // Since the entire row is colored (instead of coloring the individual
+          // cells) we have to apply the radius to the entire row AND the first/
+          // last cells.  If the radius isn't applied to the row, the underlying
+          // curved radii of the first and last cells will not be seen.
+          border-radius: 10px !important;
+
+          > .cell {
+            font-weight: 400 !important;
+            border: none !important;
+            background-color: inherit !important;
+
+            &[aria-colindex="1"] {
+              border-bottom-left-radius: 8px;
+              border-top-left-radius: 8px;
+            }
+            &.ag-cell-range-right {
+              border-bottom-right-radius: 8px;
+              border-top-right-radius: 8px;
+            }
+          }
+        }
+      }
+    }
+
+    .grid--table-footer {
+      flex: none;
+      height: 40px;
+      margin-top: -1px;
+
+      .ag-body-viewport {
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+      }
+
+      .row {
+        border-bottom: none !important;
+
+        > .cell {
+          background-color: #f8f8f8;
+          font-family: $roboto;
+          font-weight: 400;
+          border: none !important;
+
+          &[aria-colindex="1"] {
+            border-bottom-left-radius: 8px;
+          }
+          &.ag-cell-range-right {
+            border-bottom-right-radius: 8px;
+          }
+          &.ag-cell-range-selected {
+            background-color: #f8f8f8 !important;
+          }
+        }
+      }
+    }
+  }
+
+  .page-footer-grid-wrapper {
+    flex-grow: 100;
+    display: flex;
+    flex-direction: column;
+    min-height: 40px;
+
+    .grid--page-footer {
+      flex: none;
+      height: 30px;
+      margin-top: 10px;
+
+      .ag-body-viewport {
+        border-radius: 8px;
+      }
+
+      .row {
+        border-bottom: none !important;
+
+        > .cell {
+          background-color: #d3d3d3 !important;
+          font-family: $roboto;
+          font-weight: 400;
+          border: none !important;
+
+          &[aria-colindex="1"] {
+            border-bottom-left-radius: 8px;
+            border-top-left-radius: 8px;
+          }
+          &.ag-cell-range-right {
+            border-bottom-right-radius: 8px;
+            border-top-right-radius: 8px;
+          }
+          &.ag-cell-range-selected {
+            background-color: #d3d3d3 !important;
+          }
+        }
+      }
+    }
+  }
+}

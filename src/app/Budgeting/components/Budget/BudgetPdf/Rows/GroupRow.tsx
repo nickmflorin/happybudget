@@ -2,27 +2,27 @@ import { useMemo } from "react";
 import { isNil, reduce } from "lodash";
 import classNames from "classnames";
 
-import { getGroupColorDefinition } from "lib/model/util";
+import { model } from "lib";
 
 import { CellProps } from "../Cells/Cell";
 import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
-const GroupRow = <R extends PdfTable.Row, M extends Model.Model>(
+const GroupRow = <R extends Table.Row, M extends Model.Model>(
   props: Omit<RowProps<R, M>, "row"> & {
     group: Model.Group;
     readonly cellProps?: Omit<CellProps<R, M>, "column" | "location" | "row" | "debug" | "isHeader">;
   }
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
-    const colorDef = getGroupColorDefinition(props.group);
+    const colorDef = model.util.getGroupColorDefinition(props.group);
     return {
       backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF"
     };
   }, [props.group]);
 
   const cellTextStyle = useMemo(() => {
-    const colorDef = getGroupColorDefinition(props.group);
+    const colorDef = model.util.getGroupColorDefinition(props.group);
     return {
       color: !isNil(colorDef.color) ? colorDef.color : "#424242"
     };

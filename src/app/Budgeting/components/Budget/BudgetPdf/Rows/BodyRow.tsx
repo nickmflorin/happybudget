@@ -4,7 +4,7 @@ import { BodyCell } from "../Cells";
 import { CellProps } from "../Cells/Cell";
 import Row, { RowProps } from "./Row";
 
-const BodyRow = <R extends PdfTable.Row, M extends Model.Model>({
+const BodyRow = <R extends Table.Row, M extends Model.Model>({
   cellProps,
   ...props
 }: RowProps<R, M> & {

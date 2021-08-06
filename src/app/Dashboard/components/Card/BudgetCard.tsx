@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faImage } from "@fortawesome/pro-light-svg-icons";
 
 import { useLoggedInUser, useTimezone } from "store/hooks";
-import { toAbbvDisplayDateTime, isToday, toDisplayTimeSince } from "lib/util/dates";
+import { util } from "lib";
 
 import Card from "./Card";
 
@@ -21,10 +21,10 @@ const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: Bu
   const tz = useTimezone();
 
   const subTitle = useMemo(() => {
-    if (isToday(budget.updated_at)) {
-      return `Last edited ${toDisplayTimeSince(budget.updated_at)} by ${user.full_name}`;
+    if (util.dates.isToday(budget.updated_at)) {
+      return `Last edited ${util.dates.toDisplayTimeSince(budget.updated_at)} by ${user.full_name}`;
     }
-    return `Last edited by ${user.full_name} on ${toAbbvDisplayDateTime(budget.updated_at, { tz })}`;
+    return `Last edited by ${user.full_name} on ${util.dates.toAbbvDisplayDateTime(budget.updated_at, { tz })}`;
   }, [budget.updated_at, user.full_name]);
 
   return (

@@ -1,9 +1,13 @@
 import { Reducer, combineReducers } from "redux";
-import { createModelListActionReducer, createModelListResponseReducer } from "lib/redux/factories";
+import { redux } from "lib";
 import { ActionType } from "./actions";
 
 const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combineReducers({
-  templates: createModelListResponseReducer<Model.SimpleTemplate, Modules.Dashboard.TemplatesStore, Redux.Action<any>>(
+  templates: redux.factories.createModelListResponseReducer<
+    Model.SimpleTemplate,
+    Modules.Dashboard.TemplatesStore,
+    Redux.Action<any>
+  >(
     {
       Response: ActionType.Templates.Response,
       Loading: ActionType.Templates.Loading,
@@ -18,12 +22,12 @@ const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combine
     },
     {
       subReducers: {
-        duplicating: createModelListActionReducer(ActionType.Templates.Duplicating),
-        moving: createModelListActionReducer(ActionType.Templates.MovingToCommunity)
+        duplicating: redux.factories.createModelListActionReducer(ActionType.Templates.Duplicating),
+        moving: redux.factories.createModelListActionReducer(ActionType.Templates.MovingToCommunity)
       }
     }
   ),
-  community: createModelListResponseReducer<
+  community: redux.factories.createModelListResponseReducer<
     Model.SimpleTemplate,
     Modules.Dashboard.CommunityTemplatesStore,
     Redux.Action<any>
@@ -42,13 +46,13 @@ const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combine
     },
     {
       subReducers: {
-        duplicating: createModelListActionReducer(ActionType.Community.Duplicating),
-        hiding: createModelListActionReducer(ActionType.Community.Hiding),
-        showing: createModelListActionReducer(ActionType.Community.Showing)
+        duplicating: redux.factories.createModelListActionReducer(ActionType.Community.Duplicating),
+        hiding: redux.factories.createModelListActionReducer(ActionType.Community.Hiding),
+        showing: redux.factories.createModelListActionReducer(ActionType.Community.Showing)
       }
     }
   ),
-  budgets: createModelListResponseReducer<
+  budgets: redux.factories.createModelListResponseReducer<
     Model.SimpleBudget,
     Redux.ModelListResponseStore<Model.SimpleBudget>,
     Redux.Action<any>

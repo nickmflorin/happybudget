@@ -4,7 +4,7 @@ import { isNil, find, map, includes } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faIdCard } from "@fortawesome/free-solid-svg-icons";
 
-import { removeFromArray } from "lib/util";
+import { util } from "lib";
 
 import DeleteModelsModal from "./DeleteModelsModal";
 
@@ -42,7 +42,7 @@ const DeleteContactsModal = ({ visible, contacts, onOk, onCancel }: DeleteContac
         onToggle: () => {
           const existing = find(contactsToDelete, { id: contact.id });
           if (!isNil(existing)) {
-            setContactsToDelete(removeFromArray(contactsToDelete, "id", contact.id));
+            setContactsToDelete(util.removeFromArray(contactsToDelete, "id", contact.id));
           } else {
             setContactsToDelete([...contactsToDelete, contact]);
           }

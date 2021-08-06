@@ -5,8 +5,7 @@ import { isNil, map, debounce } from "lodash";
 
 import * as api from "api";
 import { registerFonts } from "style/pdf";
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
-import { download, getBase64 } from "lib/util/files";
+import { util, redux } from "lib";
 
 import { Form, Modal } from "components";
 import { ExportPdfForm } from "components/forms";
@@ -83,18 +82,18 @@ interface PreviewModalProps {
   readonly filename: string;
 }
 
-type Column = PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>;
+type Column = PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>;
 
-const selectHeaderTemplatesLoading = simpleShallowEqualSelector(
+const selectHeaderTemplatesLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.headerTemplates.loading
 );
-const selectHeaderTemplates = simpleDeepEqualSelector(
+const selectHeaderTemplates = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.headerTemplates.data
 );
-const selectDisplayedHeaderTemplate = simpleDeepEqualSelector(
+const selectDisplayedHeaderTemplate = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.headerTemplates.displayedTemplate
 );
-const selectHeaderTemplateLoading = simpleShallowEqualSelector(
+const selectHeaderTemplateLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.headerTemplates.loadingDetail
 );
 
@@ -153,7 +152,8 @@ const PreviewModal = ({
     pdf(pdfComponent)
       .toBlob()
       .then((blb: Blob) => {
-        getBase64(blb)
+        util.files
+          .getBase64(blb)
           .then((result: ArrayBuffer | string) => setFile(result))
           .catch((e: Error) => {
             // TODO: Appropriately handle error here by providing feedback.
@@ -258,7 +258,7 @@ const PreviewModal = ({
           // TODO: Since we are debouncing the Options setState, should we rerender the
           // PDF with the most recent options just in case?
           if (!isNil(file)) {
-            download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
+            util.files.download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
               includeExtensionInName: false
             });
             onSuccess?.();

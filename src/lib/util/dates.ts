@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
 import { Moment } from "moment";
 import { isNil } from "lodash";
-import { mergeWithDefaults } from "lib/util";
+import { util } from "lib";
 
 import {
   MOMENT_API_DATETIME_FORMAT,
@@ -26,7 +26,7 @@ interface IDateOptions {
 }
 
 const createDefaultMergedOptions = (options?: Partial<IDateOptions>) => {
-  return mergeWithDefaults<IDateOptions>(options || {}, {
+  return util.mergeWithDefaults<IDateOptions>(options || {}, {
     strict: false,
     tz: null,
     onError: null

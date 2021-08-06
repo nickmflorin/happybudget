@@ -8,8 +8,8 @@ import { faThumbsUp, faEdit, faTrashAlt } from "@fortawesome/free-regular-svg-ic
 import { IconButton } from "components/buttons";
 import { AccountCircleLink } from "components/links";
 import { ShowHide } from "components";
-import { toDisplayTimeSince } from "lib/util/dates";
 import { useLoggedInUser } from "store/hooks";
+import { util } from "lib";
 
 import CommentEdit from "./CommentEdit";
 import "./Comment.scss";
@@ -19,7 +19,7 @@ const CommentHeader = (props: { comment: Model.Comment }): JSX.Element => {
     <div className={"comment-header"}>
       <AccountCircleLink user={props.comment.user} />
       <div className={"comment-user-name"}>{props.comment.user.full_name}</div>
-      <div className={"comment-updated-at"}>{toDisplayTimeSince(props.comment.updated_at)}</div>
+      <div className={"comment-updated-at"}>{util.dates.toDisplayTimeSince(props.comment.updated_at)}</div>
     </div>
   );
 };

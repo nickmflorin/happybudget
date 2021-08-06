@@ -10,7 +10,7 @@ import { faEdit, faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
 import { EditContactModal } from "components/modals";
 import { DeleteContactsModal } from "components/modals";
 import { Table, ActionsTableCell, ModelSelectController } from "components/tables";
-import { formatAsPhoneNumber } from "lib/util/formatters";
+import { util } from "lib";
 import {
   requestContactsAction,
   setContactsPageAction,
@@ -201,7 +201,11 @@ const ContactsTable = (): JSX.Element => {
             dataIndex: "phone_number",
             render: (value: number | null) => {
               if (!isNil(value)) {
-                return <a href={`tel:${formatAsPhoneNumber(value)}`}>{formatAsPhoneNumber(value)}</a>;
+                return (
+                  <a href={`tel:${util.formatters.formatAsPhoneNumber(value)}`}>
+                    {util.formatters.formatAsPhoneNumber(value)}
+                  </a>
+                );
               }
               return <span></span>;
             }

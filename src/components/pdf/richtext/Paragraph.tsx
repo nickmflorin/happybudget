@@ -1,6 +1,6 @@
-import * as typeguards from "lib/model/typeguards";
 import { map } from "lodash";
 
+import { pdf } from "lib";
 import Paragraph, { ParagraphProps } from "../text/Paragraph";
 
 interface ParagraphTextElementProps extends ParagraphProps {
@@ -8,8 +8,8 @@ interface ParagraphTextElementProps extends ParagraphProps {
 }
 
 const ParagraphTextElement = ({ textElement, ...props }: ParagraphTextElementProps): JSX.Element => (
-  <Paragraph {...props} styles={typeguards.isTextFragment(textElement) ? textElement.styles : []}>
-    {typeguards.isTextFragment(textElement)
+  <Paragraph {...props} styles={pdf.typeguards.isTextFragment(textElement) ? textElement.styles : []}>
+    {pdf.typeguards.isTextFragment(textElement)
       ? /* eslint-disable indent */
         textElement.text
       : map(textElement.data, (subTextElement: RichText.TextDataElement, index: number) => (

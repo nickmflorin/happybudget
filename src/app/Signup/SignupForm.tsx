@@ -5,7 +5,7 @@ import { Form } from "components";
 import { PasswordInput, EmailInput, UserInput } from "components/fields";
 import { Button } from "components/buttons";
 import { RouterLink } from "components/links";
-import { validateEmail, validatePassword } from "lib/util/validate";
+import { util } from "lib";
 import SocialButton from "../SocialButton";
 
 export interface ISignupFormValues {
@@ -53,7 +53,7 @@ const SignupForm = ({
           { required: true, message: "Please enter an email." },
           ({ getFieldValue }: { getFieldValue: any }) => ({
             validator(rule: any, value: string) {
-              if (value !== "" && !validateEmail(value)) {
+              if (value !== "" && !util.validate.validateEmail(value)) {
                 return Promise.reject("Please enter a valid email.");
               }
               return Promise.resolve();
@@ -69,7 +69,7 @@ const SignupForm = ({
           { required: true, message: "Please enter a valid password.", min: 8 },
           ({ getFieldValue }: { getFieldValue: any }) => ({
             validator(rule: any, value: string) {
-              if (value !== "" && !validatePassword(value)) {
+              if (value !== "" && !util.validate.validatePassword(value)) {
                 return Promise.reject("The password does not meet our requirements.");
               }
               return Promise.resolve();
@@ -85,7 +85,7 @@ const SignupForm = ({
           { required: true, message: "Please confirm your password.", min: 8 },
           ({ getFieldValue }: { getFieldValue: any }) => ({
             validator(rule: any, value: string) {
-              if (value !== "" && !validatePassword(value)) {
+              if (value !== "" && !util.validate.validatePassword(value)) {
                 return Promise.reject("The password does not meet our requirements.");
               }
               return Promise.resolve();

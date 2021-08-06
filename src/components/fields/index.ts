@@ -8,3 +8,4 @@ export { default as PasswordInput } from "./PasswordInput";
 export { default as EmailInput } from "./EmailInput";
 export { default as UserInput } from "./EmailInput";
 export { default as Select } from "./Select";
+export { default as SearchInput } from "./SearchInput";

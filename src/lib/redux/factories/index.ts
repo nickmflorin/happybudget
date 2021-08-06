@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { isNil, filter, find } from "lodash";
-import { replaceInArray } from "lib/util";
+import { util } from "lib";
 import { warnInconsistentState } from "../util";
 
 export * from "./counter";
@@ -49,7 +49,7 @@ export const createAgnosticModelListActionReducer =
       if (action.payload.value === true) {
         const instance: Redux.ModelListActionInstance | undefined = find(st, { id: action.payload.id });
         if (!isNil(instance)) {
-          return replaceInArray<Redux.ModelListActionInstance>(
+          return util.replaceInArray<Redux.ModelListActionInstance>(
             st,
             { id: action.payload.id },
             { ...instance, count: instance.count + 1 }
@@ -69,7 +69,7 @@ export const createAgnosticModelListActionReducer =
           if (instance.count === 1) {
             return filter(st, (inst: Redux.ModelListActionInstance) => inst.id !== action.payload.id);
           } else {
-            return replaceInArray<Redux.ModelListActionInstance>(
+            return util.replaceInArray<Redux.ModelListActionInstance>(
               st,
               { id: action.payload.id },
               { ...instance, count: instance.count - 1 }

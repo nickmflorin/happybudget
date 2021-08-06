@@ -1,6 +1,6 @@
 import { isNil, map, includes, filter } from "lodash";
 
-import * as typeguards from "lib/model/typeguards";
+import { pdf } from "lib";
 
 import { View } from "../primitive";
 import Paragraph from "./Paragraph";
@@ -18,8 +18,8 @@ const RichText = ({ blocks, ...props }: RichTextProps): JSX.Element => {
           // Note: We aren't 100% comfortable/familiar with how the data from EditorJS
           // comes in yet, so we are using an abundance of caution to prevent runtime
           // errors.
-          if (typeguards.isParagraphBlock(block) || typeguards.isHeadingBlock(block)) {
-            if (typeguards.isParagraphBlock(block)) {
+          if (pdf.typeguards.isParagraphBlock(block) || pdf.typeguards.isHeadingBlock(block)) {
+            if (pdf.typeguards.isParagraphBlock(block)) {
               return <Paragraph key={index} block={block} />;
             } else {
               let headerLevel = block.level || 2;

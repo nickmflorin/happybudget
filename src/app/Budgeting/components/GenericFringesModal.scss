@@ -1,0 +1,9 @@
+.fringes-modal {
+  min-width: 70vw;
+  height: 60vh;
+  top: 20vh;
+
+  .ant-modal-body {
+    height: calc(60vh - 72px);
+  }
+}

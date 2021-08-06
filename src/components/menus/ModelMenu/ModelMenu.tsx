@@ -3,7 +3,7 @@ import { map, isNil, includes, filter, find, forEach, uniqueId } from "lodash";
 import classNames from "classnames";
 
 import { RenderWithSpinner, Menu } from "components";
-import { useDeepEqualMemo, useDebouncedJSSearch, useTrackFirstRender, useDynamicCallback } from "lib/hooks";
+import { hooks } from "lib";
 
 import { ModelMenuItems, ExtraModelMenuItem } from "./ModelMenuItem";
 import { isMultipleModelMenuProps, isModelWithChildren } from "./typeguards";
@@ -38,7 +38,7 @@ const isUnfocusedState = (state: MenuState): state is MenuUnfocusedState => {
 
 const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => {
   const [state, setState] = useState<MenuState>({ focused: false });
-  const firstRender = useTrackFirstRender();
+  const firstRender = hooks.useTrackFirstRender();
   const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("model-menu-")), [props.id]);
 
   const _flattenedModels = useMemo<M[]>(() => {
@@ -56,10 +56,10 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     };
     map(props.models, (model: M) => addModel(model));
     return flattened;
-  }, [useDeepEqualMemo(props.models)]);
+  }, [hooks.useDeepEqualMemo(props.models)]);
 
   // This will only perform searching if clientSearching is not false.
-  const _filteredModels = useDebouncedJSSearch<M>(props.search, _flattenedModels, {
+  const _filteredModels = hooks.useDebouncedJSSearch<M>(props.search, _flattenedModels, {
     indices: props.searchIndices || ["id"],
     disabled: props.clientSearching === false
   });
@@ -69,7 +69,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
       return _flattenedModels;
     }
     return _filteredModels;
-  }, [useDeepEqualMemo(_filteredModels), useDeepEqualMemo(_flattenedModels), props.clientSearching]);
+  }, [hooks.useDeepEqualMemo(_filteredModels), hooks.useDeepEqualMemo(_flattenedModels), props.clientSearching]);
 
   const indexMap = useMemo<{ [key: string]: number }>(() => {
     const mapping: { [key: string]: number } = {};
@@ -77,7 +77,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
       mapping[String(m.id)] = index;
     });
     return mapping;
-  }, [useDeepEqualMemo(models)]);
+  }, [hooks.useDeepEqualMemo(models)]);
 
   const selected = useMemo<(number | string)[]>(() => {
     if (isNil(props.selected)) {
@@ -125,7 +125,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
   const topLevelModelItems = useMemo<GenericModelItem<M>[]>(() => {
     const topLevelIds: (number | string)[] = map(props.models, (m: M) => m.id);
     return filter(availableModelItems, (item: GenericModelItem<M>) => includes(topLevelIds, item.model.id));
-  }, [useDeepEqualMemo(props.models), useDeepEqualMemo(models), availableModelItems]);
+  }, [hooks.useDeepEqualMemo(props.models), hooks.useDeepEqualMemo(models), availableModelItems]);
 
   const setIndexFromSelectedState = (selectedState: (number | string)[]) => {
     if (selectedState.length !== 0) {
@@ -160,7 +160,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
 
   useEffect(() => {
     setIndexFromSelectedState(selected);
-  }, [useDeepEqualMemo(selected)]);
+  }, [hooks.useDeepEqualMemo(selected)]);
 
   useEffect(() => {
     if (isFocusedState(state) || props.autoFocus === true) {
@@ -232,7 +232,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     if (props.defaultFocusFirstItem === true && firstRender === true && models.length !== 0 && selected.length === 0) {
       setState({ focused: true, index: 0 });
     }
-  }, [props.defaultFocusFirstItem, useDeepEqualMemo(models)]);
+  }, [props.defaultFocusFirstItem, hooks.useDeepEqualMemo(models)]);
 
   // If there is only one model that is visible, either from a search or from only
   // 1 model being present, we may want it to be active/selected by default.
@@ -244,7 +244,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     ) {
       setState({ focused: true, index: 0 });
     }
-  }, [useDeepEqualMemo(models), props.search, props.defaultFocusOnlyItemOnSearch, props.defaultFocusOnlyItem]);
+  }, [hooks.useDeepEqualMemo(models), props.search, props.defaultFocusOnlyItemOnSearch, props.defaultFocusOnlyItem]);
 
   const incrementFocusedIndex = () => {
     if (isFocusedState(state)) {
@@ -284,7 +284,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     }
   };
 
-  const onMenuItemClick = useDynamicCallback((model: M, event: SyntheticEvent | KeyboardEvent): void => {
+  const onMenuItemClick = hooks.useDynamicCallback((model: M, event: SyntheticEvent | KeyboardEvent): void => {
     if (isMultipleModelMenuProps(props)) {
       const selectedModels = filter(
         map(selected, (id: number | string) => find(props.models, { id })),
@@ -303,7 +303,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     }
   });
 
-  const performActionAtFocusedIndex = useDynamicCallback((event: KeyboardEvent) => {
+  const performActionAtFocusedIndex = hooks.useDynamicCallback((event: KeyboardEvent) => {
     if (isFocusedState(state)) {
       const item = availableItems[state.index];
       if (!isNil(item)) {
@@ -318,7 +318,7 @@ const ModelMenu = <M extends Model.M>(props: ModelMenuProps<M>): JSX.Element => 
     }
   });
 
-  const keyListener = useDynamicCallback((e: KeyboardEvent) => {
+  const keyListener = hooks.useDynamicCallback((e: KeyboardEvent) => {
     if (e.code === "Enter" || e.code === "Tab") {
       performActionAtFocusedIndex(e);
     } else if (e.code === "ArrowDown") {

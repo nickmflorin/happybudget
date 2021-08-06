@@ -3,10 +3,7 @@ import classNames from "classnames";
 import { isNil, map } from "lodash";
 
 import { DEFAULT_TAG_COLOR_SCHEME, Colors } from "style/constants";
-
-import { selectConsistent, getKeyValue } from "lib/util";
-import { contrastedForegroundColor } from "lib/util/colors";
-import { isModelWithColor, isModelWithName, isTag } from "lib/model/typeguards";
+import { model, util } from "lib";
 
 const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderParams<S>): JSX.Element => {
   const { contentRender, ...rest } = params;
@@ -59,19 +56,19 @@ const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties
   const tagText = useMemo((): string | M[keyof M] => {
     const getTextFromModel = (m: M): string | M[keyof M] => {
       if (!isNil(props.modelTextField)) {
-        const modelTextFieldValue = getKeyValue<M, keyof M>(props.modelTextField)(m);
+        const modelTextFieldValue = util.getKeyValue<M, keyof M>(props.modelTextField)(m);
         if (!isNil(modelTextFieldValue) && typeof modelTextFieldValue !== "string") {
           /* eslint-disable no-console */
           console.error(`The field ${props.modelTextField} did not return a string.`);
           return "";
         }
         return modelTextFieldValue || "";
-      } else if (isTag(m)) {
+      } else if (model.typeguards.isTag(m)) {
         if (props.isPlural === true && !isNil(m.plural_title)) {
           return m.plural_title;
         }
         return m.title;
-      } else if (isModelWithName(m)) {
+      } else if (model.typeguards.isModelWithName(m)) {
         return m.name || "";
       }
       return "";
@@ -114,9 +111,9 @@ const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties
       if (!isNil(props.modelColorField)) {
         const modelColorFieldValue: unknown = m[props.modelColorField];
         return validateAndReturnColor(modelColorFieldValue as string, props.modelColorField as string);
-      } else if (isTag(m)) {
+      } else if (model.typeguards.isTag(m)) {
         return validateAndReturnColor(m.color, "color");
-      } else if (isModelWithColor(m)) {
+      } else if (model.typeguards.isModelWithColor(m)) {
         return validateAndReturnColor(m.color, "color");
       } else if (typeof m.id === "number" && !isNil(colorScheme[m.id])) {
         return colorScheme[m.id];
@@ -135,14 +132,14 @@ const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties
       }
       return Colors.DEFAULT_TAG_BACKGROUND;
     }
-    return selectConsistent(colorScheme, tagText as string);
+    return util.selectConsistent(colorScheme, tagText as string);
   }, [props]);
 
   const tagTextColor = useMemo(() => {
     if (!isNil(props.textColor)) {
       return props.textColor;
     }
-    return contrastedForegroundColor(tagColor);
+    return util.colors.contrastedForegroundColor(tagColor);
   }, [tagColor, props]);
 
   const renderParams = useMemo<ITagRenderParams<S>>(() => {
@@ -207,13 +204,13 @@ export const MultipleTags = <M extends Model.M = Model.M>(props: MultipleTagsPro
       {!isNil(props.models) ? (
         /* eslint-disable indent */
         props.models.length !== 0 || isNil(props.onMissing) ? (
-          map(props.models, (model: M | PluralityWithModel<M>, index: number) => {
+          map(props.models, (m: M | PluralityWithModel<M>, index: number) => {
             return (
               <Tag
                 key={index}
                 {...props.tagProps}
-                model={isPluralityWithModel(model) ? model.model : model}
-                isPlural={isPluralityWithModel(model) ? model.isPlural : props.tagProps?.isPlural}
+                model={isPluralityWithModel(m) ? m.model : m}
+                isPlural={isPluralityWithModel(m) ? m.isPlural : props.tagProps?.isPlural}
               />
             );
           })

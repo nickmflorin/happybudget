@@ -2,14 +2,14 @@ import classNames from "classnames";
 import { map, isNil } from "lodash";
 import { View } from "components/pdf";
 
-export type RowProps<R extends PdfTable.Row, M extends Model.Model> = StandardPdfComponentProps & {
+export type RowProps<R extends Table.Row, M extends Model.Model> = StandardPdfComponentProps & {
   readonly columns: PdfTable.Column<R, M>[];
   readonly row: R;
   readonly index: number;
   readonly columnIndent?: number;
 };
 
-const Row = <R extends PdfTable.Row, M extends Model.Model>(
+const Row = <R extends Table.Row, M extends Model.Model>(
   props: RowProps<R, M> & {
     readonly renderCell: (params: {
       column: PdfTable.Column<R, M>;

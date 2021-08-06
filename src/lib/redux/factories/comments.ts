@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { isNil, find, filter, concat } from "lodash";
-import { removeFromArray, replaceInArray } from "lib/util";
+import { util } from "lib";
 import { initialCommentsListResponseState } from "store/initialState";
 
 import { warnInconsistentState } from "../util";
@@ -174,7 +174,7 @@ export const createCommentsListResponseReducer = <
           };
         } else {
           const parent = getCommentAtPath(st.data, path.slice(0, -1));
-          const newParent = { ...parent, comments: removeFromArray(parent.comments, "id", action.payload) };
+          const newParent = { ...parent, comments: util.removeFromArray(parent.comments, "id", action.payload) };
           return { ...st, data: insertCommentAtPath(st.data, newParent, path.slice(0, -1)) };
         }
       }
@@ -197,13 +197,13 @@ export const createCommentsListResponseReducer = <
         if (path.length === 1) {
           return {
             ...st,
-            data: replaceInArray<Model.Comment>(st.data, { id: action.payload.id }, { ...existing, ...withoutId })
+            data: util.replaceInArray<Model.Comment>(st.data, { id: action.payload.id }, { ...existing, ...withoutId })
           };
         } else {
           const parent = getCommentAtPath(st.data, path.slice(0, -1));
           const newParent = {
             ...parent,
-            comments: replaceInArray(parent.comments, { id: action.payload.id }, { ...existing, ...withoutId })
+            comments: util.replaceInArray(parent.comments, { id: action.payload.id }, { ...existing, ...withoutId })
           };
           return { ...st, data: insertCommentAtPath(st.data, newParent, path.slice(0, -1)) };
         }

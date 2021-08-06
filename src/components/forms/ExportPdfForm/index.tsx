@@ -8,10 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/pro-solid-svg-icons";
 
 import * as api from "api";
-import { getBase64FromUrl } from "lib/util/files";
-import * as models from "lib/model";
-import * as typeguards from "lib/model/typeguards";
-import { useDynamicCallback } from "lib/hooks";
+import { hooks, model, util, tabling } from "lib";
 
 import { Form, ShowHide, Separator } from "components";
 import { UploadPdfImage } from "components/uploaders";
@@ -35,7 +32,7 @@ type CustomTagProps = {
   closable: boolean;
 };
 
-type Column = PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>;
+type Column = PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>;
 type NonFormFields = "includeNotes" | "notes" | "header";
 type RichTextFields = "notes" | "header";
 
@@ -131,7 +128,7 @@ const ExportForm = (
 
   // TODO: Since we are doing this outside of Redux, which is necessary, we need to debounce
   // this in some manner.
-  const createHeaderTemplate = useDynamicCallback((name: string) => {
+  const createHeaderTemplate = hooks.useDynamicCallback((name: string) => {
     let requestPayload: Partial<Http.HeaderTemplatePayload> = {
       header: headerTemplateData.header,
       left_info: headerTemplateData.left_info,
@@ -191,14 +188,14 @@ const ExportForm = (
     */
     const urlImages: { [key: string]: false | string } = { left_image: false, right_image: false };
     if (!isNil(headerTemplateData.left_image)) {
-      if (!typeguards.isUploadedImage(headerTemplateData.left_image)) {
+      if (!model.typeguards.isUploadedImage(headerTemplateData.left_image)) {
         urlImages.left_image = headerTemplateData.left_image.url;
       } else {
         requestPayload = { ...requestPayload, left_image: headerTemplateData.left_image.data };
       }
     }
     if (!isNil(headerTemplateData.right_image)) {
-      if (!typeguards.isUploadedImage(headerTemplateData.right_image)) {
+      if (!model.typeguards.isUploadedImage(headerTemplateData.right_image)) {
         urlImages.right_image = headerTemplateData.right_image.url;
       } else {
         requestPayload = { ...requestPayload, left_image: headerTemplateData.right_image.data };
@@ -209,7 +206,8 @@ const ExportForm = (
     if (urlImages.left_image === false && urlImages.right_image === false) {
       submit(requestPayload as Http.HeaderTemplatePayload);
     } else if (urlImages.left_image !== false && urlImages.right_image === false) {
-      getBase64FromUrl(urlImages.left_image)
+      util.files
+        .getBase64FromUrl(urlImages.left_image)
         .then((result: string | ArrayBuffer) => {
           submit({ ...requestPayload, left_image: result } as Http.HeaderTemplatePayload);
         })
@@ -222,7 +220,8 @@ const ExportForm = (
           submit(requestPayload as Http.HeaderTemplatePayload);
         });
     } else if (urlImages.left_image === false && urlImages.right_image !== false) {
-      getBase64FromUrl(urlImages.right_image)
+      util.files
+        .getBase64FromUrl(urlImages.right_image)
         .then((result: string | ArrayBuffer) => {
           submit({ ...requestPayload, right_image: result } as Http.HeaderTemplatePayload);
         })
@@ -236,8 +235,8 @@ const ExportForm = (
         });
     } else {
       const promises: [Promise<ArrayBuffer | string>, Promise<ArrayBuffer | string>] = [
-        getBase64FromUrl(urlImages.left_image as string),
-        getBase64FromUrl(urlImages.right_image as string)
+        util.files.getBase64FromUrl(urlImages.left_image as string),
+        util.files.getBase64FromUrl(urlImages.right_image as string)
       ];
       Promise.all(promises)
         .then((result: [ArrayBuffer | string, ArrayBuffer | string]) => {
@@ -258,7 +257,7 @@ const ExportForm = (
 
   // TODO: Since we are doing this outside of Redux, which is necessary, we need to debounce
   // this in some manner.
-  const updateHeaderTemplate = useDynamicCallback(() => {
+  const updateHeaderTemplate = hooks.useDynamicCallback(() => {
     if (!isNil(displayedHeaderTemplate)) {
       let requestPayload: Partial<Http.HeaderTemplatePayload> = {
         header: headerTemplateData.header,
@@ -267,12 +266,12 @@ const ExportForm = (
       };
       // We only want to include the images in the payload if they were changed - this means they
       // are either null or of the UploadedImage form.
-      if (!isNil(headerTemplateData.left_image) && typeguards.isUploadedImage(headerTemplateData.left_image)) {
+      if (!isNil(headerTemplateData.left_image) && model.typeguards.isUploadedImage(headerTemplateData.left_image)) {
         requestPayload = { ...requestPayload, left_image: headerTemplateData.left_image.data };
       } else if (isNil(headerTemplateData.left_image)) {
         requestPayload = { ...requestPayload, left_image: null };
       }
-      if (!isNil(headerTemplateData.right_image) && typeguards.isUploadedImage(headerTemplateData.right_image)) {
+      if (!isNil(headerTemplateData.right_image) && model.typeguards.isUploadedImage(headerTemplateData.right_image)) {
         requestPayload = { ...requestPayload, right_image: headerTemplateData.right_image.data };
       } else if (isNil(headerTemplateData.right_image)) {
         requestPayload = { ...requestPayload, right_image: null };
@@ -408,7 +407,7 @@ const ExportForm = (
             tagRender={(params: CustomTagProps) => {
               const column = find(columns, { field: params.value });
               if (!isNil(column)) {
-                const colType = find(models.ColumnTypes, { id: column.columnType });
+                const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
                 return (
                   <Tag className={"column-select-tag"} style={{ marginRight: 3 }} {...params}>
                     {!isNil(colType) && !isNil(colType.icon) && (
@@ -424,7 +423,7 @@ const ExportForm = (
             }}
           >
             {map(columns, (column: Column, index: number) => {
-              const colType = find(models.ColumnTypes, { id: column.columnType });
+              const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
               return (
                 <Select.Option className={"column-select-option"} key={index + 1} value={column.field as string}>
                   {!isNil(colType) && !isNil(colType.icon) && (

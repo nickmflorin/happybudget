@@ -3,21 +3,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
+import { redux, budgeting } from "lib";
 import { WrapInApplicationSpinner } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
-import { simpleShallowEqualSelector } from "store/selectors";
 
 import { setTemplateAutoIndex } from "../../../store/actions/template";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/template/accounts";
-import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
-import { setTemplateLastVisited, getUrl } from "../../../urls";
 
-import AccountsBudgetTable from "./AccountsTable";
+import AccountsTable from "./AccountsTable";
 
-const selectAccountsLoading = simpleShallowEqualSelector(
+const selectAccountsLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.budget.children.loading
 );
-const selectGroupsLoading = simpleShallowEqualSelector(
+const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.budget.groups.loading
 );
 const selectLoading = createSelector(
@@ -26,11 +24,14 @@ const selectLoading = createSelector(
   (tableLoading: boolean, groupsLoading: boolean) => tableLoading || groupsLoading
 );
 
-const Accounts = (): JSX.Element => {
+interface AccountsProps {
+  readonly templateId: number;
+  readonly template: Model.Template | undefined;
+}
+
+const Accounts = ({ templateId, template }: AccountsProps): JSX.Element => {
   const dispatch = useDispatch();
-  const templateId = useSelector(selectTemplateId);
   const loading = useSelector(selectLoading);
-  const templateDetail = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     dispatch(setTemplateAutoIndex(false));
@@ -43,7 +44,7 @@ const Accounts = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(templateId)) {
-      setTemplateLastVisited(templateId, `/templates/${templateId}/accounts`);
+      budgeting.urls.setTemplateLastVisited(templateId, `/templates/${templateId}/accounts`);
     }
   }, [templateId]);
 
@@ -51,23 +52,23 @@ const Accounts = (): JSX.Element => {
     <React.Fragment>
       <Portal id={"breadcrumbs"}>
         <BreadCrumbs
-          params={{ template: templateDetail }}
+          params={{ t: template }}
           items={[
             {
-              requiredParams: ["template"],
-              func: ({ template }: { template: Model.Template }) => ({
-                id: template.id,
+              requiredParams: ["t"],
+              func: ({ t }: { t: Model.Template }) => ({
+                id: t.id,
                 primary: true,
-                text: template.name,
+                text: t.name,
                 tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: getUrl(template)
+                url: budgeting.urls.getUrl(t)
               })
             }
           ]}
         />
       </Portal>
       <WrapInApplicationSpinner loading={loading}>
-        <AccountsBudgetTable />
+        <AccountsTable template={template} templateId={templateId} />
       </WrapInApplicationSpinner>
     </React.Fragment>
   );

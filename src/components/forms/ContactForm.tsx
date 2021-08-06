@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/pro-solid-svg-icons";
 
-import { ContactTypes } from "lib/model";
+import { model } from "lib";
 
 import { Form } from "components";
 import { Input, Select } from "components/fields";
@@ -38,9 +38,9 @@ const ContactForm: React.FC<ContactFormProps> = ({
     >
       <Form.Item name={"type"} label={"Type"}>
         <Select suffixIcon={<FontAwesomeIcon icon={faCaretDown} />} placeholder={"Contractor"}>
-          {ContactTypes.map((model: Model.ContactType, index: number) => (
-            <Select.Option key={index} value={model.id}>
-              {model.name}
+          {model.models.ContactTypes.map((m: Model.ContactType, index: number) => (
+            <Select.Option key={index} value={m.id}>
+              {m.name}
             </Select.Option>
           ))}
         </Select>

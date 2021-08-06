@@ -8,10 +8,11 @@ import "style/index.scss";
 
 import { ApplicationSpinner } from "components";
 import { ReduxRoute } from "components/routes";
-import { lazyWithRetry } from "lib/operational";
 
-const Landing = lazyWithRetry(() => import("./Landing"));
-const Application = lazyWithRetry(() => import("./Application"));
+import { operational } from "lib";
+
+const Landing = operational.lazyWithRetry(() => import("./Landing"));
+const Application = operational.lazyWithRetry(() => import("./Application"));
 
 const history = createBrowserHistory();
 

@@ -3,22 +3,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
+import { redux, budgeting } from "lib";
 import { WrapInApplicationSpinner } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
-import { simpleShallowEqualSelector } from "store/selectors";
 
 import { setBudgetAutoIndex } from "../../../store/actions/budget";
 import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/budget/accounts";
-import { selectBudgetId, selectBudgetDetail } from "../../../store/selectors";
-import { setBudgetLastVisited, getUrl } from "../../../urls";
 
 import AccountsTable from "./AccountsTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
 
-const selectAccountsLoading = simpleShallowEqualSelector(
+const selectAccountsLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.budget.children.loading
 );
-const selectGroupsLoading = simpleShallowEqualSelector(
+const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.budget.groups.loading
 );
 const selectLoading = createSelector(
@@ -27,11 +25,14 @@ const selectLoading = createSelector(
   (tableLoading: boolean, groupsLoading: boolean) => tableLoading || groupsLoading
 );
 
-const Accounts = (): JSX.Element => {
+interface AccountsProps {
+  readonly budgetId: number;
+  readonly budget: Model.Budget | undefined;
+}
+
+const Accounts = ({ budget, budgetId }: AccountsProps): JSX.Element => {
   const dispatch = useDispatch();
-  const budgetId = useSelector(selectBudgetId);
   const loading = useSelector(selectLoading);
-  const budgetDetail = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     dispatch(setBudgetAutoIndex(false));
@@ -44,7 +45,7 @@ const Accounts = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(budgetId)) {
-      setBudgetLastVisited(budgetId, `/budgets/${budgetId}/accounts`);
+      budgeting.urls.setBudgetLastVisited(budgetId, `/budgets/${budgetId}/accounts`);
     }
   }, [budgetId]);
 
@@ -52,23 +53,23 @@ const Accounts = (): JSX.Element => {
     <React.Fragment>
       <Portal id={"breadcrumbs"}>
         <BreadCrumbs
-          params={{ budget: budgetDetail }}
+          params={{ b: budget }}
           items={[
             {
-              requiredParams: ["budget"],
-              func: ({ budget }: { budget: Model.Budget }) => ({
-                id: budget.id,
+              requiredParams: ["b"],
+              func: ({ b }: { b: Model.Budget }) => ({
+                id: b.id,
                 primary: true,
-                text: budget.name,
+                text: b.name,
                 tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: getUrl(budget)
+                url: budgeting.urls.getUrl(b)
               })
             }
           ]}
         />
       </Portal>
       <WrapInApplicationSpinner loading={loading}>
-        <AccountsTable />
+        <AccountsTable budget={budget} budgetId={budgetId} />
       </WrapInApplicationSpinner>
       <AccountsCommentsHistory />
     </React.Fragment>

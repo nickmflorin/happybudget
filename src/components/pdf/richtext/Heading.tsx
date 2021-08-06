@@ -1,6 +1,5 @@
-import * as typeguards from "lib/model/typeguards";
 import { map } from "lodash";
-
+import { pdf } from "lib";
 import Heading, { HeadingProps } from "../text/Heading";
 
 interface HeadingTextElementProps extends HeadingProps {
@@ -8,8 +7,8 @@ interface HeadingTextElementProps extends HeadingProps {
 }
 
 const HeadingTextElement = ({ textElement, ...props }: HeadingTextElementProps): JSX.Element => (
-  <Heading {...props} styles={typeguards.isTextFragment(textElement) ? textElement.styles : []}>
-    {typeguards.isTextFragment(textElement)
+  <Heading {...props} styles={pdf.typeguards.isTextFragment(textElement) ? textElement.styles : []}>
+    {pdf.typeguards.isTextFragment(textElement)
       ? /* eslint-disable indent */
         textElement.text
       : map(textElement.data, (subTextElement: RichText.TextDataElement, index: number) => (

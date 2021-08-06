@@ -2,7 +2,9 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse, AxiosRequestConfig } f
 import axiosRetry from "axios-retry";
 import Cookies from "universal-cookie";
 import { isNil } from "lodash";
-import { addQueryParamsToUrl, convertOrderingQueryToString } from "lib/util/urls";
+
+import { util } from "lib";
+
 import { ClientError, NetworkError, ServerError, ForceLogout, AuthenticationError } from "./errors";
 import { parseAuthError } from "./util";
 
@@ -151,12 +153,12 @@ export class ApiClient {
       // Convert Ordering to String if Present
       if (method === HttpRequestMethods.GET && !isNil(ordering)) {
         if (typeof ordering !== "string") {
-          rest.ordering = convertOrderingQueryToString(ordering);
+          rest.ordering = util.urls.convertOrderingQueryToString(ordering);
         } else {
           rest.ordering = ordering;
         }
       }
-      url = addQueryParamsToUrl(url, rest, { filter: [""] });
+      url = util.urls.addQueryParamsToUrl(url, rest, { filter: [""] });
     } else if (!url.endsWith("/")) {
       url = url + "/";
     }

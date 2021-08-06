@@ -1,10 +1,9 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { isNil } from "lodash";
 
-import * as typeguards from "lib/model/typeguards";
+import { model } from "lib";
 import UserImage, { UserImageProps } from "./UserImage";
 import UserInitials, { UserInitialsProps } from "./UserInitials";
-import { isNil } from "lodash";
-import { useEffect } from "react";
 
 export interface UserImageOrInitialsProps
   extends StandardComponentProps,
@@ -39,7 +38,7 @@ const UserImageOrInitials = ({
     if (errorWithImage === null) {
       if (!isNil(src)) {
         return { src };
-      } else if (!isNil(user) && typeguards.isUserWithImage(user)) {
+      } else if (!isNil(user) && model.typeguards.isUserWithImage(user)) {
         return { user };
       }
       return null;

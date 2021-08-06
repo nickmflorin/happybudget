@@ -22,11 +22,13 @@ import {
   faFileChartLine
 } from "@fortawesome/pro-light-svg-icons";
 
+import { budgeting } from "lib";
 import { RenderIfValidId, SavingChanges } from "components";
 
 import { wipeStateAction, setBudgetIdAction } from "../../store/actions/budget";
-import { GenericLayout } from "../Generic";
-import { getBudgetLastVisited, isBudgetRelatedUrl } from "../../urls";
+import { selectBudgetDetail } from "../../store/selectors";
+
+import GenericLayout from "../GenericLayout";
 
 import Account from "./Account";
 import Accounts from "./Accounts";
@@ -66,6 +68,7 @@ const Budget = (): JSX.Element => {
   const { budgetId } = useParams<{ budgetId: string }>();
   const match = useRouteMatch();
   const saving = useSelector(selectSaving);
+  const budget = useSelector(selectBudgetDetail);
 
   useEffect(() => {
     dispatch(wipeStateAction(null));
@@ -120,8 +123,8 @@ const Budget = (): JSX.Element => {
           icon: <FontAwesomeIcon icon={faFileSpreadsheet} />,
           activeIcon: <FontAwesomeIcon icon={faFileSpreadsheetSolid} />,
           onClick: () => {
-            if (!isNaN(parseInt(budgetId)) && !isBudgetRelatedUrl(location.pathname)) {
-              const budgetLastVisited = getBudgetLastVisited(parseInt(budgetId));
+            if (!isNaN(parseInt(budgetId)) && !budgeting.urls.isBudgetRelatedUrl(location.pathname)) {
+              const budgetLastVisited = budgeting.urls.getBudgetLastVisited(parseInt(budgetId));
               if (!isNil(budgetLastVisited)) {
                 history.push(budgetLastVisited);
               } else {
@@ -129,7 +132,7 @@ const Budget = (): JSX.Element => {
               }
             }
           },
-          active: isBudgetRelatedUrl(location.pathname),
+          active: budgeting.urls.isBudgetRelatedUrl(location.pathname),
           tooltip: {
             title: "Budget",
             placement: "right"
@@ -150,11 +153,24 @@ const Budget = (): JSX.Element => {
       <RenderIfValidId id={[budgetId]}>
         <Switch>
           <Redirect exact from={match.url} to={`${match.url}/accounts`} />
-          <Route path={"/budgets/:budgetId/actuals"} component={Actuals} />
+          <Route
+            path={"/budgets/:budgetId/actuals"}
+            render={() => <Actuals budgetId={parseInt(budgetId)} budget={budget} />}
+          />
           <Route path={"/budgets/:budgetId/analysis"} component={Analysis} />
-          <Route exact path={"/budgets/:budgetId/accounts/:accountId"} component={Account} />
-          <Route path={"/budgets/:budgetId/accounts"} component={Accounts} />
-          <Route path={"/budgets/:budgetId/subaccounts/:subaccountId"} component={SubAccount} />
+          <Route
+            exact
+            path={"/budgets/:budgetId/accounts/:accountId"}
+            render={() => <Account budgetId={parseInt(budgetId)} budget={budget} />}
+          />
+          <Route
+            path={"/budgets/:budgetId/accounts"}
+            render={() => <Accounts budgetId={parseInt(budgetId)} budget={budget} />}
+          />
+          <Route
+            path={"/budgets/:budgetId/subaccounts/:subaccountId"}
+            render={() => <SubAccount budgetId={parseInt(budgetId)} budget={budget} />}
+          />
         </Switch>
       </RenderIfValidId>
     </GenericLayout>

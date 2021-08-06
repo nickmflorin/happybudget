@@ -4,26 +4,25 @@ import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil, map } from "lodash";
 
+import { redux, budgeting } from "lib";
+
 import { RenderIfValidId, WrapInApplicationSpinner } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
 
 import { setTemplateAutoIndex } from "../../../store/actions/template";
 import * as actions from "../../../store/actions/template/subAccount";
-import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
-import { setTemplateLastVisited, getUrl } from "../../../urls";
 
 import SubAccountBudgetTable from "./SubAccountsTable";
 
-const selectDetail = simpleDeepEqualSelector(
+const selectDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.detail.data
 );
-const selectSubAccountsLoading = simpleShallowEqualSelector(
+const selectSubAccountsLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.children.loading
 );
-const selectGroupsLoading = simpleShallowEqualSelector(
+const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.groups.loading
 );
 const selectLoading = createSelector(
@@ -31,13 +30,17 @@ const selectLoading = createSelector(
   selectGroupsLoading,
   (tableLoading: boolean, groupsLoading: boolean) => tableLoading || groupsLoading
 );
-const SubAccount = (): JSX.Element => {
+
+interface SubAccountProps {
+  readonly templateId: number;
+  readonly template: Model.Template | undefined;
+}
+
+const SubAccount = ({ template, templateId }: SubAccountProps): JSX.Element => {
   const { subaccountId } = useParams<{ subaccountId: string }>();
   const dispatch = useDispatch();
-  const templateId = useSelector(selectTemplateId);
   const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
-  const templateDetail = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     dispatch(setTemplateAutoIndex(true));
@@ -55,7 +58,7 @@ const SubAccount = (): JSX.Element => {
 
   useEffect(() => {
     if (!isNil(templateId) && !isNaN(parseInt(subaccountId))) {
-      setTemplateLastVisited(templateId, `/templates/${templateId}/subaccounts/${subaccountId}`);
+      budgeting.urls.setTemplateLastVisited(templateId, `/templates/${templateId}/subaccounts/${subaccountId}`);
     }
   }, [templateId]);
 
@@ -63,21 +66,21 @@ const SubAccount = (): JSX.Element => {
     <RenderIfValidId id={[subaccountId]}>
       <Portal id={"breadcrumbs"}>
         <BreadCrumbs
-          params={{ template: templateDetail, subaccount: detail }}
+          params={{ t: template, subaccount: detail }}
           items={[
             {
-              requiredParams: ["template"],
-              func: ({ template }: { template: Model.Template }) => ({
-                id: template.id,
+              requiredParams: ["t"],
+              func: ({ t }: { t: Model.Template }) => ({
+                id: t.id,
                 primary: true,
-                text: template.name,
+                text: t.name,
                 tooltip: { title: "Top Sheet", placement: "bottom" },
-                url: getUrl(template)
+                url: budgeting.urls.getUrl(t)
               })
             },
             {
-              requiredParams: ["template", "subaccount"],
-              func: ({ template, subaccount }: { template: Model.Template; subaccount: Model.SubAccount }) => {
+              requiredParams: ["t", "subaccount"],
+              func: ({ t, subaccount }: { t: Model.Template; subaccount: Model.SubAccount }) => {
                 const siblings = subaccount.siblings || [];
                 const ancestors = subaccount.ancestors || [];
                 return [
@@ -85,12 +88,12 @@ const SubAccount = (): JSX.Element => {
                     return {
                       id: ancestor.id,
                       render: () => <EntityText fillEmpty={"---------"}>{ancestor}</EntityText>,
-                      url: getUrl(template, ancestor)
+                      url: budgeting.urls.getUrl(t, ancestor)
                     };
                   }),
                   {
                     id: subaccount.id,
-                    url: getUrl(template, subaccount),
+                    url: budgeting.urls.getUrl(t, subaccount),
                     render: (params: IBreadCrumbItemRenderParams) => {
                       if (siblings.length !== 0) {
                         return (
@@ -103,7 +106,7 @@ const SubAccount = (): JSX.Element => {
                     },
                     options: map(siblings, (option: Model.SimpleSubAccount) => ({
                       id: option.id,
-                      url: getUrl(template, option),
+                      url: budgeting.urls.getUrl(t, option),
                       render: () => <EntityText fillEmpty={"---------"}>{option}</EntityText>
                     }))
                   }
@@ -114,7 +117,7 @@ const SubAccount = (): JSX.Element => {
         />
       </Portal>
       <WrapInApplicationSpinner loading={loading}>
-        <SubAccountBudgetTable subaccountId={parseInt(subaccountId)} />
+        <SubAccountBudgetTable template={template} templateId={templateId} subaccountId={parseInt(subaccountId)} />
       </WrapInApplicationSpinner>
     </RenderIfValidId>
   );

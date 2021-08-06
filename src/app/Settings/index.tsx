@@ -5,9 +5,9 @@ import { faAddressCard } from "@fortawesome/free-solid-svg-icons";
 
 import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
-import { lazyWithRetry } from "lib/operational";
+import { operational } from "lib";
 
-const Profile = lazyWithRetry(() => import("./Profile"));
+const Profile = operational.lazyWithRetry(() => import("./Profile"));
 
 const Settings = (): JSX.Element => {
   const history = useHistory();

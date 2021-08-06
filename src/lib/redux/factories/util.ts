@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { forEach, isNil, reduce } from "lodash";
-import { getKeyValue } from "lib/util";
+import { util } from "lib";
 import { MappedReducers, FactoryOptions } from ".";
 
 export const mergeOptionsWithDefaults = <S, A extends Redux.Action<any> = Redux.Action<any>>(
@@ -79,7 +79,7 @@ export const createObjectReducerFromMap = <P, S extends object, A extends Redux.
     }
     if (!isNil(options.subReducers)) {
       forEach(options.subReducers, (subReducer: Reducer<any, A>, stateDirective: string) => {
-        const subState = getKeyValue<S, keyof S>(stateDirective as keyof S)(newState);
+        const subState = util.getKeyValue<S, keyof S>(stateDirective as keyof S)(newState);
         if (!isNil(subState)) {
           newState = { ...newState, [stateDirective]: subReducer(subState, action) };
         }

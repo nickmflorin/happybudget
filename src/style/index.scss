@@ -1,6 +1,5 @@
 @import "./colors";
 @import "./typography";
-@import "./drawers";
 @import "./input";
 @import "./layout";
 @import "./buttons";
@@ -8,12 +7,12 @@
 @import "./forms";
 @import "./tooltips";
 @import "./dropdowns";
-@import "./tables";
 @import "./modals";
 @import "./feedback";
 @import "./menus";
 @import "./tagging";
 @import "./image";
+@import "./tabling/index";
 
 @import "~react-toastify/dist/ReactToastify.css";
 @import "~antd/dist/antd.css";
@@ -91,6 +90,7 @@ code {
     height: 50px;
     margin-bottom: 8px;
   }
+
   .ant-empty-description {
     font-size: 13px;
     color: $text-secondary;

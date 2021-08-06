@@ -10,7 +10,7 @@ namespace Model {
   }
 
   /* eslint-disable no-shadow */
-  interface Model {
+  interface Model extends Omit<Model.M, "id"> {
     readonly id: number;
   }
 

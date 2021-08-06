@@ -2,8 +2,8 @@ import { SagaIterator } from "redux-saga";
 import { spawn, take, cancel, fork, call, put, select, all, cancelled } from "redux-saga/effects";
 import axios from "axios";
 import { isNil } from "lodash";
-import { handleRequestError } from "api";
-import { getTemplate } from "api/services";
+
+import * as api from "api";
 
 import { ActionType } from "../../actions";
 import { loadingTemplateAction, responseTemplateAction } from "../../actions/template";
@@ -26,11 +26,11 @@ export function* getTemplateTask(): SagaIterator {
     const source = CancelToken.source();
     yield put(loadingTemplateAction(true));
     try {
-      const response: Model.Template = yield call(getTemplate, templateId, { cancelToken: source.token });
+      const response: Model.Template = yield call(api.getTemplate, templateId, { cancelToken: source.token });
       yield put(responseTemplateAction(response));
     } catch (e) {
       if (!(yield cancelled())) {
-        handleRequestError(e, "There was an error retrieving the template.");
+        api.handleRequestError(e, "There was an error retrieving the template.");
         yield put(responseTemplateAction(undefined, { error: e }));
       }
     } finally {

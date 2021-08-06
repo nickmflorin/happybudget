@@ -1,26 +1,7 @@
 import { Reducer, combineReducers } from "redux";
 import { isNil, includes, map, filter, reduce, uniq, flatten } from "lodash";
 
-import {
-  createModelListResponseReducer,
-  createDetailResponseReducer,
-  createSimplePayloadReducer,
-  createCommentsListResponseReducer
-} from "lib/redux/factories";
-import { CommentsListResponseActionMap } from "lib/redux/factories/comments";
-import { warnInconsistentState, identityReducer } from "lib/redux/util";
-import * as typeguards from "lib/model/typeguards";
-import {
-  fringeValue,
-  consolidateTableChange,
-  mergeChangesWithModel,
-  eventWarrantsGroupRecalculation,
-  eventWarrantsRecalculation,
-  changeWarrantsRecalculation,
-  rowWarrantsRecalculation
-} from "lib/model/util";
-import { replaceInArray, findWithDistributedTypes } from "lib/util";
-
+import { redux, tabling, model, util } from "lib";
 import { initialModelListResponseState } from "store/initialState";
 
 type EntityStore =
@@ -44,12 +25,12 @@ const findModelInData = <M extends Model.Model, A extends Array<any> = M[]>(
   options: FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M | null => {
   const predicate = typeof id === "number" ? (m: M) => m.id === id : id;
-  const model = findWithDistributedTypes<M, A>(data, predicate);
-  if (!isNil(model)) {
-    return model;
+  const m = util.findWithDistributedTypes<M, A>(data, predicate);
+  if (!isNil(m)) {
+    return m;
   } else {
     if (options.warnIfMissing !== false) {
-      warnInconsistentState({
+      redux.util.warnInconsistentState({
         action: action.type,
         reason: `${options.name || "Model"} does not exist in state when it is expected to.`,
         id: id
@@ -67,7 +48,7 @@ const findModelsInData = <M extends Model.Model, A extends Array<any> = M[]>(
 ): M[] =>
   filter(
     map(ids, (predicate: ModelLookup<M>) => findModelInData(action, data, predicate, options)),
-    (model: M | null) => model !== null
+    (m: M | null) => m !== null
   ) as M[];
 
 const modelFromState = <M extends Model.Model, A extends Array<any> = M[]>(
@@ -101,7 +82,10 @@ export const createFringesReducer = (
   /* eslint-disable indent */
   mapping: FringesReducerFactoryActionMap
 ): Reducer<Redux.ModelListResponseStore<Model.Fringe>, Redux.Action<any>> => {
-  const listResponseReducer = createModelListResponseReducer<Model.Fringe, Redux.ModelListResponseStore<Model.Fringe>>(
+  const listResponseReducer = redux.factories.createModelListResponseReducer<
+    Model.Fringe,
+    Redux.ModelListResponseStore<Model.Fringe>
+  >(
     {
       Response: mapping.Response,
       Loading: mapping.Loading,
@@ -124,15 +108,15 @@ export const createFringesReducer = (
   ): Redux.ModelListResponseStore<Model.Fringe> => {
     let newState = listResponseReducer(state, action);
     if (action.type === mapping.TableChanged) {
-      const e: Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe> = action.payload;
+      const e: Table.ChangeEvent<Tables.FringeRow, Model.Fringe> = action.payload;
 
-      if (typeguards.isDataChangeEvent(e)) {
-        const consolidated = consolidateTableChange(e.payload);
+      if (tabling.typeguards.isDataChangeEvent(e)) {
+        const consolidated = tabling.util.consolidateTableChange(e.payload);
 
         // The consolidateTableChange method should return changes that are grouped by SubAccount,
         // but just in case we apply grouping logic here.
         let changesPerFringe: {
-          [key: number]: { changes: Table.RowChange<BudgetTable.FringeRow, Model.Fringe>[]; model: Model.Fringe };
+          [key: number]: { changes: Table.RowChange<Tables.FringeRow, Model.Fringe>[]; model: Model.Fringe };
         } = {};
         for (let i = 0; i < consolidated.length; i++) {
           if (isNil(changesPerFringe[consolidated[i].id])) {
@@ -160,28 +144,28 @@ export const createFringesReducer = (
           const changesObj = changesPerFringe[id];
           let fringe = changesObj.model;
           for (let j = 0; j < changesObj.changes.length; j++) {
-            fringe = mergeChangesWithModel(changesObj.model, changesObj.changes[j]);
+            fringe = tabling.util.mergeChangesWithModel(changesObj.model, changesObj.changes[j]);
           }
           newState = {
             ...newState,
-            data: replaceInArray<Model.Fringe>(newState.data, { id: fringe.id }, fringe)
+            data: util.replaceInArray<Model.Fringe>(newState.data, { id: fringe.id }, fringe)
           };
         }
-      } else if (typeguards.isRowAddEvent(e)) {
+      } else if (tabling.typeguards.isRowAddEvent(e)) {
         // Eventually, we will want to implement this - so we do not have to rely on waiting
         // for the response of the API request.
-      } else if (typeguards.isRowDeleteEvent(e)) {
+      } else if (tabling.typeguards.isRowDeleteEvent(e)) {
         const ids: number[] = Array.isArray(e.payload.rows)
-          ? map(e.payload.rows, (row: BudgetTable.FringeRow) => row.id)
+          ? map(e.payload.rows, (row: Tables.FringeRow) => row.id)
           : [e.payload.rows.id];
         newState = reduce(
           ids,
           (st: Redux.ModelListResponseStore<Model.Fringe>, id: number): Redux.ModelListResponseStore<Model.Fringe> => {
-            const model: Model.Fringe | null = modelFromState<Model.Fringe>(action, st.data, id);
-            if (!isNil(model)) {
+            const m: Model.Fringe | null = modelFromState<Model.Fringe>(action, st.data, id);
+            if (!isNil(m)) {
               return {
                 ...st,
-                data: filter(newState.data, (m: Model.Fringe) => m.id !== id),
+                data: filter(st.data, (mi: Model.Fringe) => mi.id !== id),
                 count: newState.count - 1
               };
             }
@@ -245,7 +229,7 @@ const recalculateGroupMetrics = <S extends EntityStore>(
       ...st,
       groups: {
         ...st.groups,
-        data: replaceInArray<Model.Group>(st.groups.data, { id: stateGroup.id }, { ...stateGroup, ...payload })
+        data: util.replaceInArray<Model.Group>(st.groups.data, { id: stateGroup.id }, { ...stateGroup, ...payload })
       }
     };
   }
@@ -260,21 +244,21 @@ const removeRowFromGroup = <S extends EntityStore>(
   options: FindModelOptions = { warnIfMissing: true }
 ): [S, number | null] => {
   let newGroup: Model.Group | null = null;
-  const model: Model | null = modelFromState<Model, Models>(action, st.children.data, id);
-  if (!isNil(model)) {
+  const m: Model | null = modelFromState<Model, Models>(action, st.children.data, id);
+  if (!isNil(m)) {
     newGroup = !isNil(group)
       ? groupFromState<S>(action, st, group, id)
-      : modelGroupFromState<S>(action, st, model.id, options);
+      : modelGroupFromState<S>(action, st, m.id, options);
     if (!isNil(newGroup)) {
       newGroup = {
         ...newGroup,
-        children: filter(newGroup.children, (child: number) => child !== model.id)
+        children: filter(newGroup.children, (child: number) => child !== m.id)
       };
       st = {
         ...st,
         groups: {
           ...st.groups,
-          data: replaceInArray<Model.Group>(st.groups.data, { id: newGroup.id }, newGroup)
+          data: util.replaceInArray<Model.Group>(st.groups.data, { id: newGroup.id }, newGroup)
         }
       };
     }
@@ -327,7 +311,7 @@ const recalculateSubAccountMetrics = <M extends Model.Account | Model.SubAccount
     // Reapply the fringes to the SubAccount's estimated value.
     newSubAccount = {
       ...newSubAccount,
-      estimated: fringeValue(
+      estimated: model.util.fringeValue(
         newSubAccount.estimated,
         findModelsInData(action, st.fringes.data, newSubAccount.fringes, { name: "Fringe" })
       )
@@ -374,7 +358,7 @@ type BudgetTemplateReducerFactoryActionMap = {
   // History only applicable in the Budget case (not the Template case).
   History?: HistoryActionMap;
   // Comments only applicable in the Budget case (not the Template case).
-  Comments?: Partial<CommentsListResponseActionMap>;
+  Comments?: Partial<redux.factories.CommentsListResponseActionMap>;
 };
 
 type AccountSubAccountReducerFactoryActionMap = Omit<BudgetTemplateReducerFactoryActionMap, "Accounts"> & {
@@ -389,15 +373,15 @@ const createTableReducer = <
 >(
   initialState: S
 ) => {
-  type R = S extends Modules.Budget.AccountSubAccountStore<M> ? BudgetTable.SubAccountRow : BudgetTable.AccountRow;
+  type R = S extends Modules.Budget.AccountSubAccountStore<M> ? Tables.SubAccountRow : Tables.AccountRow;
   return (state: S = initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
     let newState: S = { ...state };
 
     // The table change e that is attached to the action.
     const e: Table.ChangeEvent<R, M> = action.payload;
 
-    if (typeguards.isDataChangeEvent(e)) {
-      const consolidated = consolidateTableChange(e.payload);
+    if (tabling.typeguards.isDataChangeEvent(e)) {
+      const consolidated = tabling.util.consolidateTableChange(e.payload);
 
       // The consolidated changes should contain one change per Account/SubAccount, but
       // just in case we apply that grouping logic here.
@@ -406,9 +390,9 @@ const createTableReducer = <
       } = {};
       for (let i = 0; i < consolidated.length; i++) {
         if (isNil(changesPerModel[consolidated[i].id])) {
-          const model: M | null = modelFromState<M>(action, newState.children.data as M[], consolidated[i].id);
-          if (!isNil(model)) {
-            changesPerModel[consolidated[i].id] = { changes: [], model };
+          const m: M | null = modelFromState<M>(action, newState.children.data as M[], consolidated[i].id);
+          if (!isNil(m)) {
+            changesPerModel[consolidated[i].id] = { changes: [], model: m };
           }
         }
         if (!isNil(changesPerModel[consolidated[i].id])) {
@@ -423,9 +407,9 @@ const createTableReducer = <
       newState = reduce(
         changesPerModel,
         (s: S, data: { changes: Table.RowChange<R, M>[]; model: M }) => {
-          let model: M = reduce(
+          let m: M = reduce(
             data.changes,
-            (m: M, change: Table.RowChange<R, M>) => mergeChangesWithModel(m, change),
+            (mi: M, change: Table.RowChange<R, M>) => tabling.util.mergeChangesWithModel(mi, change),
             data.model
           );
           /*
@@ -434,14 +418,14 @@ const createTableReducer = <
           behavior does not apply to Account(s), since there are no fields we can update on
           an Account that warrant recalculation.
           */
-          if (changeWarrantsRecalculation(data.changes) && typeguards.isSubAccount(model)) {
-            model = recalculateSubAccountMetrics<M>(s as Modules.Budget.AccountSubAccountStore<M>, action, model) as M;
+          if (tabling.util.changeWarrantsRecalculation(data.changes) && model.typeguards.isSubAccount(m)) {
+            m = recalculateSubAccountMetrics<M>(s as Modules.Budget.AccountSubAccountStore<M>, action, m) as M;
           }
           s = {
             ...s,
             children: {
               ...s.children,
-              data: replaceInArray<M>(s.children.data as M[], { id: model.id }, model)
+              data: util.replaceInArray<M>(s.children.data as M[], { id: m.id }, m)
             }
           };
           /*
@@ -452,9 +436,9 @@ const createTableReducer = <
           the future, if there is a column that specifies isCalculating, so we perform
           this logic regardless of whether or not the rows are AccountRow or SubAccountRow.
           */
-          if (eventWarrantsGroupRecalculation(e)) {
+          if (tabling.util.eventWarrantsGroupRecalculation(e)) {
             // The Group might not necessarily exist.
-            const rowGroup = modelGroupFromState<S>(action, s, model.id, { name: "Group", warnIfMissing: false });
+            const rowGroup = modelGroupFromState<S>(action, s, m.id, { name: "Group", warnIfMissing: false });
             if (!isNil(rowGroup)) {
               s = recalculateGroupMetrics<S>(action, s, rowGroup);
             }
@@ -463,15 +447,15 @@ const createTableReducer = <
         },
         newState
       );
-    } else if (typeguards.isRowAddEvent(e)) {
+    } else if (tabling.typeguards.isRowAddEvent(e)) {
       // Eventually, we will want to implement this - so we do not have to rely on waiting
       // for the response of the API request.
-    } else if (typeguards.isFullRowEvent(e)) {
+    } else if (tabling.typeguards.isFullRowEvent(e)) {
       const ids = Array.isArray(e.payload.rows)
-        ? map(e.payload.rows, (row: BudgetTable.AccountRow) => row.id)
+        ? map(e.payload.rows, (row: Tables.AccountRow) => row.id)
         : [e.payload.rows.id];
 
-      if (typeguards.isRowDeleteEvent(e)) {
+      if (tabling.typeguards.isRowDeleteEvent(e)) {
         // We cannot supply the Group ID because we do not know what Group each row belonged to
         // yet.  That is handled by the removeRowsFromGroup method.
         const [updatedState, groups] = removeRowsFromGroup(action, newState, ids, undefined, { warnIfMissing: false });
@@ -479,13 +463,13 @@ const createTableReducer = <
         newState = reduce(
           ids,
           (s: S, id: number) => {
-            const model: M | null = modelFromState<M, M[]>(action, newState.children.data as M[], id);
-            if (!isNil(model)) {
+            const m: M | null = modelFromState<M, M[]>(action, newState.children.data as M[], id);
+            if (!isNil(m)) {
               return {
                 ...s,
                 children: {
                   ...s.children,
-                  data: filter(s.children.data, (m: M) => m.id !== model.id),
+                  data: filter(s.children.data, (mi: M) => mi.id !== m.id),
                   count: s.children.count - 1
                 }
               };
@@ -494,30 +478,30 @@ const createTableReducer = <
           },
           newState
         );
-        if (eventWarrantsGroupRecalculation(e)) {
+        if (tabling.util.eventWarrantsGroupRecalculation(e)) {
           newState = reduce(groups, (s: S, id: number) => recalculateGroupMetrics(action, s, id), newState);
         }
-      } else if (typeguards.isRowRemoveFromGroupEvent(e)) {
+      } else if (tabling.typeguards.isRowRemoveFromGroupEvent(e)) {
         // NOTE: Since we are supplying the actual Group ID here, the Groups returned from the
         // function will only ever have one ID (the original ID we passed in).
         const [updatedState, groups] = removeRowsFromGroup(action, newState, ids, e.payload.group);
         newState = { ...updatedState };
-        if (eventWarrantsGroupRecalculation(e)) {
+        if (tabling.util.eventWarrantsGroupRecalculation(e)) {
           newState = reduce(groups, (s: S, id: number) => recalculateGroupMetrics(action, s, id), newState);
         }
-      } else if (typeguards.isRowAddToGroupEvent(e)) {
+      } else if (tabling.typeguards.isRowAddToGroupEvent(e)) {
         const g: Model.Group | null = groupFromState<S>(action, newState, e.payload.group);
         if (!isNil(g)) {
           const [updatedState, wasUpdated]: [S, boolean] = reduce(
             ids,
             (current: [S, boolean], id: number): [S, boolean] => {
-              const model = modelFromState<M, M[]>(action, newState.children.data as M[], id);
-              if (!isNil(model)) {
-                if (includes(g.children, model.id)) {
-                  warnInconsistentState({
+              const m = modelFromState<M, M[]>(action, newState.children.data as M[], id);
+              if (!isNil(m)) {
+                if (includes(g.children, m.id)) {
+                  redux.util.warnInconsistentState({
                     action,
                     reason: "Model already exists as a child for group.",
-                    id: model.id,
+                    id: m.id,
                     group: g.id
                   });
                   return current;
@@ -527,12 +511,12 @@ const createTableReducer = <
                       ...current[0],
                       groups: {
                         ...current[0].groups,
-                        data: replaceInArray<Model.Group>(
+                        data: util.replaceInArray<Model.Group>(
                           current[0].groups.data,
                           { id: g.id },
                           {
                             ...g,
-                            children: [...g.children, model.id]
+                            children: [...g.children, m.id]
                           }
                         )
                       }
@@ -546,12 +530,12 @@ const createTableReducer = <
             [newState, false]
           );
           newState = { ...updatedState };
-          if (eventWarrantsGroupRecalculation(e) && wasUpdated === true) {
+          if (tabling.util.eventWarrantsGroupRecalculation(e) && wasUpdated === true) {
             newState = recalculateGroupMetrics(action, newState, e.payload.group);
           }
         }
       }
-    } else if (typeguards.isGroupDeleteEvent(e)) {
+    } else if (tabling.typeguards.isGroupDeleteEvent(e)) {
       // NOTE: We do not have to worry about recalculation of any metrics in this case.
       const group: Model.Group | null = groupFromState<S>(action, newState, e.payload);
       if (!isNil(group)) {
@@ -574,14 +558,14 @@ export const createBudgetReducer = <M extends Model.Budget | Model.Template>(
   initialState: Modules.Budget.BudgetStore<M>
 ): Reducer<Modules.Budget.BudgetStore<M>, Redux.Action<any>> => {
   const genericReducer: Reducer<Modules.Budget.BudgetStore<M>, Redux.Action<any>> = combineReducers({
-    id: createSimplePayloadReducer<number | null>(mapping.SetId, null),
-    detail: createDetailResponseReducer<M, Redux.ModelDetailResponseStore<M>, Redux.Action>({
+    id: redux.factories.createSimplePayloadReducer<number | null>(mapping.SetId, null),
+    detail: redux.factories.createDetailResponseReducer<M, Redux.ModelDetailResponseStore<M>, Redux.Action>({
       Response: mapping.Response,
       Loading: mapping.Loading,
       Request: mapping.Request,
       UpdateInState: mapping.UpdateInState
     }),
-    children: createModelListResponseReducer<Model.Account>({
+    children: redux.factories.createModelListResponseReducer<Model.Account>({
       Response: mapping.Accounts.Response,
       Request: mapping.Accounts.Request,
       Loading: mapping.Accounts.Loading,
@@ -593,7 +577,7 @@ export const createBudgetReducer = <M extends Model.Budget | Model.Template>(
       Updating: mapping.Accounts.Updating,
       Creating: mapping.Accounts.Creating
     }),
-    groups: createModelListResponseReducer<Model.Group>({
+    groups: redux.factories.createModelListResponseReducer<Model.Group>({
       Response: mapping.Groups.Response,
       Loading: mapping.Groups.Loading,
       Request: mapping.Groups.Request,
@@ -602,11 +586,11 @@ export const createBudgetReducer = <M extends Model.Budget | Model.Template>(
       Deleting: mapping.Groups.Deleting
     }),
     comments: !isNil(mapping.Comments)
-      ? createCommentsListResponseReducer(mapping.Comments)
-      : identityReducer<Redux.ModelListResponseStore<Model.Comment>>(initialModelListResponseState),
+      ? redux.factories.createCommentsListResponseReducer(mapping.Comments)
+      : redux.util.identityReducer<Redux.ModelListResponseStore<Model.Comment>>(initialModelListResponseState),
     history: !isNil(mapping.History)
-      ? createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
-      : identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(initialModelListResponseState)
+      ? redux.factories.createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
+      : redux.util.identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(initialModelListResponseState)
   });
 
   const tableReducer = createTableReducer<Model.Account, Modules.Budget.BudgetStore<M>>(initialState);
@@ -627,15 +611,15 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
   type S = Modules.Budget.AccountSubAccountStore<M>;
 
   const genericReducer: Reducer<S, Redux.Action<any>> = combineReducers({
-    id: createSimplePayloadReducer<number | null>(mapping.SetId, null),
-    detail: createDetailResponseReducer<M, Redux.ModelDetailResponseStore<M>, Redux.Action>({
+    id: redux.factories.createSimplePayloadReducer<number | null>(mapping.SetId, null),
+    detail: redux.factories.createDetailResponseReducer<M, Redux.ModelDetailResponseStore<M>, Redux.Action>({
       Response: mapping.Response,
       Loading: mapping.Loading,
       Request: mapping.Request,
       UpdateInState: mapping.UpdateInState
     }),
     fringes: createFringesReducer(mapping.Fringes),
-    children: createModelListResponseReducer<Model.SubAccount>({
+    children: redux.factories.createModelListResponseReducer<Model.SubAccount>({
       Response: mapping.SubAccounts.Response,
       Request: mapping.SubAccounts.Request,
       Loading: mapping.SubAccounts.Loading,
@@ -645,7 +629,7 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
       Updating: mapping.SubAccounts.Updating,
       Creating: mapping.SubAccounts.Creating
     }),
-    groups: createModelListResponseReducer<Model.Group>({
+    groups: redux.factories.createModelListResponseReducer<Model.Group>({
       Response: mapping.Groups.Response,
       Loading: mapping.Groups.Loading,
       Request: mapping.Groups.Request,
@@ -654,20 +638,17 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
       Deleting: mapping.Groups.Deleting
     }),
     comments: !isNil(mapping.Comments)
-      ? createCommentsListResponseReducer(mapping.Comments)
-      : identityReducer<Redux.ModelListResponseStore<Model.Comment>>(initialModelListResponseState),
+      ? redux.factories.createCommentsListResponseReducer(mapping.Comments)
+      : redux.util.identityReducer<Redux.ModelListResponseStore<Model.Comment>>(initialModelListResponseState),
     history: !isNil(mapping.History)
-      ? createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
-      : identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(initialModelListResponseState)
+      ? redux.factories.createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
+      : redux.util.identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(initialModelListResponseState)
   });
 
   const tableReducer = createTableReducer<M, S>(initialState);
 
-  type GenericEvent = Table.ChangeEvent<
-    BudgetTable.FringeRow | BudgetTable.SubAccountRow,
-    Model.Fringe | Model.SubAccount
-  >;
-  type FringeEvent = Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe>;
+  type GenericEvent = Table.ChangeEvent<Tables.FringeRow | Tables.SubAccountRow, Model.Fringe | Model.SubAccount>;
+  type FringeEvent = Table.ChangeEvent<Tables.FringeRow, Model.Fringe>;
 
   return (state: S = initialState, action: Redux.Action<any>) => {
     let newState: S = genericReducer(state, action);
@@ -690,7 +671,7 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
         const fringeEvent = e as FringeEvent;
         // There are no group related events for the Fringe Table, but we have to assert this with
         // a typeguard to make TS happy.
-        if (!typeguards.isGroupEvent(fringeEvent)) {
+        if (!tabling.typeguards.isGroupEvent(fringeEvent)) {
           const recalculateSubAccountsWithFringes = (ids: number[], removeFringes?: boolean): S => {
             /*
             For each Fringe that changed, we have to look at the SubAccount(s) that have that Fringe
@@ -726,7 +707,7 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
                     ...s,
                     children: {
                       ...s.children,
-                      data: replaceInArray<Model.SubAccount>(s.children.data, { id: subAccount.id }, subAccount)
+                      data: util.replaceInArray<Model.SubAccount>(s.children.data, { id: subAccount.id }, subAccount)
                     }
                   };
                 }
@@ -737,7 +718,7 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
           };
           // There are no group related events for the Fringe Table, but we have to assert this with
           // a typeguard to make TS happy.
-          if (typeguards.isDataChangeEvent(fringeEvent)) {
+          if (tabling.typeguards.isDataChangeEvent(fringeEvent)) {
             /*
             For each Fringe change that occured, obtain the ID of the Fringe for only the changes
             that warrant recalculation of the SubAccount, and then recalculate the metrics for each
@@ -749,7 +730,7 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
             to determine what SubAccount(s) need to be updated (as a result of the change to the
             Fringe).
             */
-            const consolidated = consolidateTableChange(fringeEvent.payload);
+            const consolidated = tabling.util.consolidateTableChange(fringeEvent.payload);
             newState = recalculateSubAccountsWithFringes(
               uniq(
                 map(
@@ -758,24 +739,24 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
                   the SubAccount.  The event will only warrant recalculation if either the
                   rate field or the cutoff field are changed (at least currently).
                   */
-                  filter(consolidated, (ch: Table.RowChange<BudgetTable.FringeRow, Model.Fringe>) =>
-                    changeWarrantsRecalculation(ch)
+                  filter(consolidated, (ch: Table.RowChange<Tables.FringeRow, Model.Fringe>) =>
+                    tabling.util.changeWarrantsRecalculation(ch)
                   ),
-                  (change: Table.RowChange<BudgetTable.FringeRow, Model.Fringe>) => change.id
+                  (change: Table.RowChange<Tables.FringeRow, Model.Fringe>) => change.id
                 )
               )
             );
-          } else if (typeguards.isRowAddEvent(fringeEvent)) {
+          } else if (tabling.typeguards.isRowAddEvent(fringeEvent)) {
             // Eventually, we will want to implement this - so we do not have to rely on waiting
             // for the response of the API request.
-          } else if (typeguards.isRowDeleteEvent(fringeEvent)) {
+          } else if (tabling.typeguards.isRowDeleteEvent(fringeEvent)) {
             /*
             For each FringeRow that was removed, obtain the ID of the Fringe for only the removed rows
             that warrant recalculation of the SubAccount, and then recalculate the metrics for each
             SubAccount(s) that previously had that Fringe applied (while also removing the Fringe
             from that SubAccount).
             */
-            const rows: BudgetTable.FringeRow[] = Array.isArray(fringeEvent.payload.rows)
+            const rows: Tables.FringeRow[] = Array.isArray(fringeEvent.payload.rows)
               ? fringeEvent.payload.rows
               : [fringeEvent.payload.rows];
             newState = recalculateSubAccountsWithFringes(
@@ -786,10 +767,10 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
                   recalculation of the SubAccount.  The row will only warrant recalculation of the
                   SubAccount if the rate field or the cutoff field are changed (at least currently).
                   */
-                  filter(rows, (row: BudgetTable.FringeRow) =>
-                    rowWarrantsRecalculation(row, fringeEvent.payload.columns)
+                  filter(rows, (row: Tables.FringeRow) =>
+                    tabling.util.rowWarrantsRecalculation(row, fringeEvent.payload.columns)
                   ),
-                  (row: BudgetTable.FringeRow) => row.id
+                  (row: Tables.FringeRow) => row.id
                 )
               ),
               true
@@ -797,7 +778,7 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
           }
         }
       }
-      if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+      if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
         // Update the overall Account based on the underlying SubAccount(s) present.
         let subAccounts: Model.SubAccount[] = newState.children.data;
         let newData: { estimated: number; actual?: number; variance?: number } = {

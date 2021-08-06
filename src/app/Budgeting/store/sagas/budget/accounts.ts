@@ -5,9 +5,7 @@ import { isNil } from "lodash";
 
 import * as api from "api";
 
-import { userToSimpleUser } from "lib/model/mappings";
-import { nowAsString } from "lib/util/dates";
-import { generateRandomNumericId } from "lib/util";
+import { model, util } from "lib";
 
 import { ActionType } from "../../actions";
 import { loadingBudgetAction, updateBudgetInStateAction } from "../../actions/budget";
@@ -155,10 +153,10 @@ export function* addToHistoryState(
 ): SagaIterator {
   const user = yield select((state: Modules.ApplicationStore) => state.user);
   const polymorphicEvent: Model.PolymorphicEvent = {
-    id: generateRandomNumericId(),
-    created_at: nowAsString(),
+    id: util.generateRandomNumericId(),
+    created_at: util.dates.nowAsString(),
     type: eventType,
-    user: userToSimpleUser(user),
+    user: model.mappings.userToSimpleUser(user),
     content_object: {
       id: account.id,
       identifier: account.identifier,

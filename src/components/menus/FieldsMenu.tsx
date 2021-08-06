@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { map, filter, includes, isNil } from "lodash";
 import classNames from "classnames";
 
-import { Menu, Checkbox, Button } from "antd";
+import { Menu, Checkbox } from "antd";
 
+import { Button } from "components/buttons";
 import "./FieldsMenu.scss";
-import { useEffect } from "react";
 
 export interface FieldMenuField extends Field {
   defaultChecked?: boolean;
@@ -35,13 +35,18 @@ const FieldsMenuItem = ({ field, checked, onClick, ...props }: FieldsMenuItemPro
 };
 
 export interface FieldsMenuProps {
-  fields: FieldMenuField[];
-  buttons?: IFieldMenuButton[];
-  onChange?: (change: FieldCheck) => void;
+  readonly fields: FieldMenuField[];
+  readonly buttons?: IFieldMenuButton[];
+  readonly onChange?: (change: FieldCheck) => void;
+  readonly selected?: string[];
 }
 
-const FieldsMenu = ({ fields, buttons, onChange }: FieldsMenuProps): JSX.Element => {
-  const [selected, setSelected] = useState<string[]>([]);
+const FieldsMenu = ({ fields, buttons, selected, onChange }: FieldsMenuProps): JSX.Element => {
+  const [_selected, setSelected] = useState<string[]>([]);
+
+  const value = useMemo(() => {
+    return !isNil(selected) ? selected : _selected;
+  }, [selected, _selected]);
 
   useEffect(() => {
     const defaultCheckedFields: FieldMenuField[] = filter(
@@ -61,15 +66,15 @@ const FieldsMenu = ({ fields, buttons, onChange }: FieldsMenuProps): JSX.Element
               key={index}
               field={field}
               onClick={() => {
-                const checked = includes(selected, field.id);
+                const checked = includes(value, field.id);
                 if (checked === false) {
-                  setSelected([...selected, field.id]);
+                  setSelected([...value, field.id]);
                 } else {
-                  setSelected(filter(selected, (id: string) => id !== field.id));
+                  setSelected(filter(value, (id: string) => id !== field.id));
                 }
                 !isNil(onChange) && onChange({ id: field.id, checked: !checked });
               }}
-              checked={includes(selected, field.id)}
+              checked={includes(value, field.id)}
             />
           );
         })}

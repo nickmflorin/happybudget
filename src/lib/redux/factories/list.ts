@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { isNil, forEach, find, filter, includes, map } from "lodash";
-import { replaceInArray } from "lib/util";
+import { util } from "lib";
 import { initialModelListResponseState, initialListResponseState } from "store/initialState";
 
 import { warnInconsistentState } from "../util";
@@ -217,7 +217,7 @@ export const createModelListResponseReducer = <
         return st;
       }
       const { id: _, ...withoutId } = action.payload.data;
-      return { ...st, data: replaceInArray<M>(st.data, { id: action.payload.id }, { ...existing, ...withoutId }) };
+      return { ...st, data: util.replaceInArray<M>(st.data, { id: action.payload.id }, { ...existing, ...withoutId }) };
     },
     Deselect: (st: S = Options.initialState, action: Redux.Action<number>) => {
       const element = find(st.data, { id: action.payload });

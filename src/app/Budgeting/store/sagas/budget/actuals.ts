@@ -16,9 +16,7 @@ import {
 import { isNil, map } from "lodash";
 
 import * as api from "api";
-import * as typeguards from "lib/model/typeguards";
-
-import { consolidateTableChange, createBulkCreatePayload, payload } from "lib/model/util";
+import { tabling } from "lib";
 
 import { ActionType } from "../../actions";
 import { updateBudgetInStateAction } from "../../actions/budget";
@@ -26,14 +24,14 @@ import * as actions from "../../actions/budget/actuals";
 
 type B = Model.Budget;
 type C = Model.Actual;
-type R = BudgetTable.ActualRow;
+type R = Tables.ActualRow;
 type P = Http.ActualPayload;
 
 function* bulkCreateTask(budgetId: number, e: Table.RowAddEvent<R, C>, errorMessage: string): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
 
-  const requestPayload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, C, P>(e.payload);
+  const requestPayload: Http.BulkCreatePayload<P> = tabling.util.createBulkCreatePayload<R, C, P>(e.payload);
   yield put(actions.creatingActualAction(true));
   try {
     const response: Http.BulkCreateResponse<B, C> = yield call(api.bulkCreateBudgetActuals, budgetId, requestPayload, {
@@ -132,13 +130,13 @@ function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, C>
   const budgetId = yield select((state: Modules.ApplicationStore) => state.budget.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const e: Table.DataChangeEvent<R, C> = action.payload;
-    const merged = consolidateTableChange(e.payload);
+    const merged = tabling.util.consolidateTableChange(e.payload);
     if (merged.length !== 0) {
       const requestPayload: Http.BulkUpdatePayload<Http.ActualPayload>[] = map(
         merged,
         (change: Table.RowChange<R, C>) => ({
           id: change.id,
-          ...payload(change)
+          ...tabling.util.payload(change)
         })
       );
       yield fork(bulkUpdateTask, budgetId, requestPayload, "There was an error updating the actuals.");
@@ -226,13 +224,13 @@ function* tableChangeEventSaga(): SagaIterator {
     const action: Redux.Action<Table.ChangeEvent<R, C>> = yield take(changeChannel);
     if (!isNil(action.payload)) {
       const event: Table.ChangeEvent<R, C> = action.payload;
-      if (typeguards.isDataChangeEvent(event)) {
+      if (tabling.typeguards.isDataChangeEvent(event)) {
         // Blocking call so that table changes happen sequentially.
         yield call(handleDataChangeEvent, action as Redux.Action<Table.DataChangeEvent<R, C>>);
-      } else if (typeguards.isRowAddEvent(event)) {
+      } else if (tabling.typeguards.isRowAddEvent(event)) {
         // Blocking call so that table changes happen sequentially.
         yield call(handleRowAddEvent, action as Redux.Action<Table.RowAddEvent<R, C>>);
-      } else if (typeguards.isRowDeleteEvent(event)) {
+      } else if (tabling.typeguards.isRowDeleteEvent(event)) {
         // Blocking call so that table changes happen sequentially.
         yield call(handleRowDeleteEvent, action as Redux.Action<Table.RowDeleteEvent<R, C>>);
       }

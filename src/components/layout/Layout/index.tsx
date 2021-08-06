@@ -2,11 +2,8 @@ import { useState, useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { ShowHide } from "components";
-
 import Content from "./Content";
 import Header from "./Header";
-import Footer from "./Footer";
 import Sidebar, { ISidebarItem } from "./Sidebar";
 import { IToolbarItem } from "./Header/Toolbar";
 
@@ -20,7 +17,6 @@ export interface LayoutProps {
   collapsed?: boolean;
   headerProps?: StandardComponentProps;
   contentProps?: StandardComponentProps;
-  includeFooter?: boolean;
   showHeaderLogo?: boolean;
   // The default header height is 70px.  But this only applies when there is
   // not a supplementary header below the default header.  To layout the component
@@ -38,7 +34,6 @@ const Layout = ({
   sidebar,
   style = {},
   collapsed = false,
-  includeFooter = true,
   showHeaderLogo = false,
   headerProps = {},
   headerHeight,
@@ -57,7 +52,7 @@ const Layout = ({
   );
 
   return (
-    <div className={classNames("application", className)} style={style}>
+    <div className={classNames("layout", className)} style={style}>
       {!isNil(sidebar) && (
         <div className={classNames("sidebar-container", layoutClassNameProps)}>
           {Array.isArray(sidebar) ? (
@@ -72,7 +67,7 @@ const Layout = ({
           )}
         </div>
       )}
-      <div className={classNames("application-content", layoutClassNameProps)}>
+      <div className={classNames("layout-content", layoutClassNameProps)}>
         <Header
           toolbar={toolbar}
           {...headerProps}
@@ -83,10 +78,9 @@ const Layout = ({
           toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
           showHeaderLogo={showHeaderLogo}
         />
-        <Content {...contentProps}>{children}</Content>
-        <ShowHide show={includeFooter}>
-          <Footer />
-        </ShowHide>
+        <div className={"window"}>
+          <Content {...contentProps}>{children}</Content>
+        </div>
       </div>
     </div>
   );

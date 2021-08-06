@@ -100,6 +100,7 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
       overflow-x: hidden;
       width: 100%;
       display: flex;
+      flex-direction: row;
 
       .form-container {
         overflow-y: scroll;

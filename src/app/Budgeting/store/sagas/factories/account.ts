@@ -4,10 +4,9 @@ import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, map } from "lodash";
 
 import * as api from "api";
-import * as typeguards from "lib/model/typeguards";
-import { consolidateTableChange, createBulkCreatePayload, payload, eventWarrantsRecalculation } from "lib/model/util";
+import { tabling } from "lib";
 
-type R = BudgetTable.SubAccountRow;
+type R = Tables.SubAccountRow;
 type M = Model.Account;
 type C = Model.SubAccount;
 type P = Http.SubAccountPayload;
@@ -63,12 +62,12 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
     const data = yield select(selectModels);
     const autoIndex = yield select(selectAutoIndex);
 
-    const requestPayload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, C, P>(e.payload, {
+    const requestPayload: Http.BulkCreatePayload<P> = tabling.util.createBulkCreatePayload<R, C, P>(e.payload, {
       autoIndex,
       models: data,
       field: "identifier"
     });
-    if (eventWarrantsRecalculation(e)) {
+    if (tabling.util.eventWarrantsRecalculation(e)) {
       yield put(actions.budget.loading(true));
     }
     yield put(actions.creating(true));
@@ -87,7 +86,7 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
       that logic pre-request currently, although in the future we may want to use the response
       data as the fallback/source of truth.
       */
-      if (eventWarrantsRecalculation(e)) {
+      if (tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.updateInState(response.budget as Partial<B>));
       }
       yield all(response.children.map((subaccount: C) => put(actions.addToState(subaccount))));
@@ -97,7 +96,7 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
       }
     } finally {
       yield put(actions.creating(false));
-      if (eventWarrantsRecalculation(e)) {
+      if (tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.loading(false));
       }
       if (yield cancelled()) {
@@ -121,7 +120,7 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
     from the group and deleting the group itself.
     */
     yield all(requestPayload.map((p: Http.BulkUpdatePayload<P>) => put(actions.updating({ id: p.id, value: true }))));
-    if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+    if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
       yield put(actions.budget.loading(true));
     }
     try {
@@ -137,7 +136,7 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
       that logic pre-request currently, although in the future we may want to use the response
       data as the fallback/source of truth.
       */
-      if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+      if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.updateInState(response.budget as Partial<B>));
       }
     } catch (err) {
@@ -145,7 +144,7 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
         api.handleRequestError(err, errorMessage);
       }
     } finally {
-      if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+      if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.loading(false));
       }
       yield all(
@@ -166,7 +165,7 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
       const ids = map(rows, (row: R) => row.id);
 
       yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
-      if (eventWarrantsRecalculation<R, C>(e)) {
+      if (tabling.util.eventWarrantsRecalculation<R, C>(e)) {
         yield put(actions.budget.loading(true));
       }
       try {
@@ -179,7 +178,7 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
         that logic pre-request currently, although in the future we may want to use the response
         data as the fallback/source of truth.
         */
-        if (eventWarrantsRecalculation(e)) {
+        if (tabling.util.eventWarrantsRecalculation(e)) {
           yield put(actions.budget.updateInState(response.budget as Partial<B>));
         }
       } catch (err) {
@@ -188,7 +187,7 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
         }
       } finally {
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: false }))));
-        if (eventWarrantsRecalculation(e)) {
+        if (tabling.util.eventWarrantsRecalculation(e)) {
           yield put(actions.budget.loading(false));
         }
         if (yield cancelled()) {
@@ -284,11 +283,11 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
     const accountId = yield select(selectAccountId);
     if (!isNil(action.payload) && !isNil(accountId)) {
       const e: Table.DataChangeEvent<R, C> = action.payload;
-      const merged = consolidateTableChange(e.payload);
+      const merged = tabling.util.consolidateTableChange(e.payload);
       if (merged.length !== 0) {
         const requestPayload: Http.BulkUpdatePayload<P>[] = map(merged, (change: Table.RowChange<R, C>) => ({
           id: change.id,
-          ...payload(change)
+          ...tabling.util.payload(change)
         }));
         yield fork(bulkUpdateTask, accountId, e, requestPayload, "There was an error updating the sub accounts.");
       }

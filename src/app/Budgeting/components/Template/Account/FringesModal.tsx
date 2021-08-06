@@ -3,19 +3,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { redux } from "lib";
 
 import * as actions from "../../../store/actions/template/account";
-import { selectTemplateDetail } from "../../../store/selectors";
-import { GenericFringesModal, GenericFringesModalProps } from "../../Generic";
+import GenericFringesModal, { GenericFringesModalProps } from "../../GenericFringesModal";
 
-const selectData = simpleDeepEqualSelector(
+const selectData = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.account.fringes.data
 );
-const selectTableSearch = simpleShallowEqualSelector(
+const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.account.fringes.search
 );
-const selectLoading = simpleShallowEqualSelector(
+const selectLoading = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.account.fringes.loading
 );
 const selectSaving = createSelector(
@@ -26,13 +25,17 @@ const selectSaving = createSelector(
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
 
-const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">> = ({ open, onCancel }) => {
+interface FringesModalProps extends Pick<GenericFringesModalProps, "open" | "onCancel"> {
+  readonly template: Model.Template | undefined;
+}
+
+const FringesModal: React.FC<FringesModalProps> = ({ template, open, onCancel }) => {
   const dispatch = useDispatch();
   const loading = useSelector(selectLoading);
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
+
   const saving = useSelector(selectSaving);
-  const templateDetail = useSelector(selectTemplateDetail);
 
   useEffect(() => {
     // TODO: It might not be necessary to always refresh the Fringes when the modal opens, but it is
@@ -44,11 +47,7 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
 
   return (
     <GenericFringesModal
-      // These two props aren't really applicable for the Fringes case, but until we separate out
-      // the BudgetTable more, we have to add them.
-      budgetType={"template"}
-      levelType={"account"}
-      exportFileName={!isNil(templateDetail) ? `${templateDetail.name}_fringes` : "fringes"}
+      exportFileName={!isNil(template) ? `${template.name}_fringes` : "fringes"}
       open={open}
       onCancel={onCancel}
       loading={loading}
@@ -56,7 +55,7 @@ const FringesModal: React.FC<Pick<GenericFringesModalProps, "open" | "onCancel">
       search={search}
       onSearch={(value: string) => dispatch(actions.setFringesSearchAction(value))}
       saving={saving}
-      onChangeEvent={(e: Table.ChangeEvent<BudgetTable.FringeRow, Model.Fringe>) =>
+      onChangeEvent={(e: Table.ChangeEvent<Tables.FringeRow, Model.Fringe>) =>
         dispatch(actions.handleFringesTableChangeEventAction(e))
       }
     />

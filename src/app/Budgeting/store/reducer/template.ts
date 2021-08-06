@@ -1,7 +1,6 @@
 import { Reducer, combineReducers } from "redux";
 
-import { createSimplePayloadReducer } from "lib/redux/factories";
-import { identityReducer } from "lib/redux/util";
+import { redux } from "lib";
 import { initialModelListResponseState } from "store/initialState";
 import { ActionType } from "../actions";
 import initialState, {
@@ -13,7 +12,7 @@ import initialState, {
 import * as factories from "./factories";
 
 const genericReducer = combineReducers({
-  autoIndex: createSimplePayloadReducer<boolean>(ActionType.Template.SetAutoIndex, false),
+  autoIndex: redux.factories.createSimplePayloadReducer<boolean>(ActionType.Template.SetAutoIndex, false),
   account: factories.createAccountReducer(
     {
       SetId: ActionType.Template.Account.SetId,
@@ -123,11 +122,11 @@ const genericReducer = combineReducers({
     },
     initialBudgetBudgetState
   ),
-  commentsHistoryDrawerOpen: identityReducer<boolean>(false),
-  actuals: identityReducer<Redux.ModelListResponseStore<Model.Actual>>(initialModelListResponseState),
-  headerTemplates: identityReducer<Modules.Budget.HeaderTemplatesStore>(initialHeaderTemplatesState),
+  commentsHistoryDrawerOpen: redux.util.identityReducer<boolean>(false),
+  actuals: redux.util.identityReducer<Redux.ModelListResponseStore<Model.Actual>>(initialModelListResponseState),
+  headerTemplates: redux.util.identityReducer<Modules.Budget.HeaderTemplatesStore>(initialHeaderTemplatesState),
   subAccountsTree:
-    identityReducer<Redux.ModelListResponseStore<Model.SubAccountTreeNode>>(initialModelListResponseState)
+    redux.util.identityReducer<Redux.ModelListResponseStore<Model.SubAccountTreeNode>>(initialModelListResponseState)
 });
 
 const rootReducer: Reducer<Modules.Budget.ModuleStore<Model.Template>, Redux.Action<any>> = (

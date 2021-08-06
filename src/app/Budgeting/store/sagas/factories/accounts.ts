@@ -4,10 +4,9 @@ import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
 import { isNil, map } from "lodash";
 
 import * as api from "api";
-import * as typeguards from "lib/model/typeguards";
-import { consolidateTableChange, createBulkCreatePayload, payload, eventWarrantsRecalculation } from "lib/model/util";
+import { tabling } from "lib";
 
-type R = BudgetTable.AccountRow;
+type R = Tables.AccountRow;
 type C = Model.Account;
 type P = Http.AccountPayload;
 
@@ -75,14 +74,14 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
     const autoIndex = yield select(selectAutoIndex);
     const data = yield select(selectModels);
 
-    const requestPayload: Http.BulkCreatePayload<P> = createBulkCreatePayload<R, C, P>(e.payload, {
+    const requestPayload: Http.BulkCreatePayload<P> = tabling.util.createBulkCreatePayload<R, C, P>(e.payload, {
       autoIndex,
       models: data,
       field: "identifier"
     });
 
     yield put(actions.creating(true));
-    if (eventWarrantsRecalculation(e)) {
+    if (tabling.util.eventWarrantsRecalculation(e)) {
       yield put(actions.budget.loading(true));
     }
     try {
@@ -90,7 +89,7 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
         cancelToken: source.token
       });
       yield all(response.children.map((account: C) => put(actions.addToState(account))));
-      if (eventWarrantsRecalculation(e)) {
+      if (tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.updateInState(response.data as Partial<B>));
       }
     } catch (err) {
@@ -99,7 +98,7 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
       }
     } finally {
       yield put(actions.creating(false));
-      if (eventWarrantsRecalculation(e)) {
+      if (tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.loading(false));
       }
       if (yield cancelled()) {
@@ -122,14 +121,14 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
     // There is a discrepancy between what we are indicating as loading between removing a row
     // from the group and deleting the group itself.
     yield all(requestPayload.map((p: Http.BulkUpdatePayload<P>) => put(actions.updating({ id: p.id, value: true }))));
-    if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+    if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
       yield put(actions.budget.loading(true));
     }
     try {
       const response: Http.BulkResponse<B> = yield call(services.bulkUpdate, objId, requestPayload, {
         cancelToken: source.token
       });
-      if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+      if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.updateInState(response.data as Partial<B>));
       }
     } catch (err) {
@@ -140,7 +139,7 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
       yield all(
         requestPayload.map((p: Http.BulkUpdatePayload<P>) => put(actions.updating({ id: p.id, value: false })))
       );
-      if (!typeguards.isGroupEvent(e) && eventWarrantsRecalculation(e)) {
+      if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.loading(false));
       }
       if (yield cancelled()) {
@@ -158,14 +157,14 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
       const ids = map(rows, (row: R) => row.id);
 
       yield all(ids.map((id: number) => put(actions.deleting({ id, value: true }))));
-      if (eventWarrantsRecalculation<R, C>(e)) {
+      if (tabling.util.eventWarrantsRecalculation<R, C>(e)) {
         yield put(actions.budget.loading(true));
       }
       try {
         const response: Http.BulkResponse<B> = yield call(services.bulkDelete, objId, ids, {
           cancelToken: source.token
         });
-        if (eventWarrantsRecalculation(e)) {
+        if (tabling.util.eventWarrantsRecalculation(e)) {
           yield put(actions.budget.updateInState(response.data as Partial<B>));
         }
       } catch (err) {
@@ -174,7 +173,7 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
         }
       } finally {
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: false }))));
-        if (eventWarrantsRecalculation(e)) {
+        if (tabling.util.eventWarrantsRecalculation(e)) {
           yield put(actions.budget.loading(false));
         }
         if (yield cancelled()) {
@@ -252,11 +251,11 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
     const objId = yield select(selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
       const e: Table.DataChangeEvent<R, C> = action.payload;
-      const merged = consolidateTableChange(e.payload);
+      const merged = tabling.util.consolidateTableChange(e.payload);
       if (merged.length !== 0) {
         const requestPayload: Http.BulkUpdatePayload<P>[] = map(merged, (change: Table.RowChange<R, C>) => ({
           id: change.id,
-          ...payload(change)
+          ...tabling.util.payload(change)
         }));
         yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the accounts.");
       }

@@ -1,72 +1,59 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 import { map } from "lodash";
 
+import { tabling, redux } from "lib";
 import { CreateTemplateAccountGroupModal, EditGroupModal } from "components/modals";
-import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
+import { TemplateAccountsTable } from "components/tabling";
 
-import { selectTemplateId, selectTemplateDetail } from "../../../store/selectors";
 import * as actions from "../../../store/actions/template/accounts";
-import { GenericAccountsTable } from "../../Generic";
 
-const selectGroups = simpleDeepEqualSelector(
+const selectGroups = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.budget.groups.data
 );
-const selectData = simpleDeepEqualSelector(
+const selectData = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.budget.children.data
 );
-const selectTableSearch = simpleShallowEqualSelector(
+const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.budget.children.search
 );
 
-const AccountsTable = (): JSX.Element => {
+interface AccountsTableProps {
+  readonly templateId: number;
+  readonly template: Model.Template | undefined;
+}
+
+const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Element => {
   const [groupAccounts, setGroupAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Model.Group | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const templateId = useSelector(selectTemplateId);
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
-  const templateDetail = useSelector(selectTemplateDetail);
   const groups = useSelector(selectGroups);
 
-  const tableRef = useRef<BudgetTable.Ref<BudgetTable.AccountRow, Model.Account>>(null);
+  const table = tabling.hooks.useBudgetTable<Tables.AccountRow, Model.Account>();
 
   return (
     <React.Fragment>
-      <GenericAccountsTable
-        tableRef={tableRef}
-        budgetType={"template"}
+      <TemplateAccountsTable
+        table={table}
         data={data}
         groups={groups}
-        detail={templateDetail}
+        template={template}
         search={search}
+        menuPortalId={"supplementary-header"}
         onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
-        exportFileName={!isNil(templateDetail) ? `template_${templateDetail.name}_accounts` : ""}
-        onChangeEvent={(e: Table.ChangeEvent<BudgetTable.AccountRow, Model.Account>) =>
+        onChangeEvent={(e: Table.ChangeEvent<Tables.AccountRow, Model.Account>) =>
           dispatch(actions.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
-        onGroupRows={(rows: BudgetTable.AccountRow[]) =>
-          setGroupAccounts(map(rows, (row: BudgetTable.AccountRow) => row.id))
-        }
+        onGroupRows={(rows: Tables.AccountRow[]) => setGroupAccounts(map(rows, (row: Tables.AccountRow) => row.id))}
         onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
-        columns={[
-          {
-            field: "estimated",
-            headerName: "Estimated",
-            isCalculated: true,
-            columnType: "sum",
-            fieldBehavior: ["read"],
-            footer: {
-              value: !isNil(templateDetail) && !isNil(templateDetail.estimated) ? templateDetail.estimated : 0.0
-            }
-          }
-        ]}
       />
       {!isNil(groupAccounts) && !isNil(templateId) && (
         <CreateTemplateAccountGroupModal
@@ -88,8 +75,8 @@ const AccountsTable = (): JSX.Element => {
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
             dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
-            if (group.color !== groupToEdit.color && !isNil(tableRef.current)) {
-              tableRef.current.applyGroupColorChange(group);
+            if (group.color !== groupToEdit.color) {
+              table.current.applyGroupColorChange(group);
             }
           }}
         />

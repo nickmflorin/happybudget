@@ -1,16 +1,8 @@
 import { Reducer, combineReducers } from "redux";
 import { isNil, find, filter } from "lodash";
 
-import {
-  createModelListResponseReducer,
-  createSimpleBooleanReducer,
-  createSimplePayloadReducer
-} from "lib/redux/factories";
+import { redux, util, tabling } from "lib";
 import { initialModelListResponseState } from "store/initialState";
-import { warnInconsistentState } from "lib/redux/util";
-import { replaceInArray } from "lib/util";
-import { consolidateTableChange, mergeChangesWithModel } from "lib/model/util";
-import * as typeguards from "lib/model/typeguards";
 
 import { ActionType } from "../actions";
 import initialState, {
@@ -25,7 +17,10 @@ const headerTemplatesRootReducer: Reducer<Modules.Budget.HeaderTemplatesStore, R
   state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,
   action: Redux.Action<any>
 ): Modules.Budget.HeaderTemplatesStore => {
-  const listResponseReducer = createModelListResponseReducer<Model.HeaderTemplate, Modules.Budget.HeaderTemplatesStore>(
+  const listResponseReducer = redux.factories.createModelListResponseReducer<
+    Model.HeaderTemplate,
+    Modules.Budget.HeaderTemplatesStore
+  >(
     {
       Response: ActionType.Budget.HeaderTemplates.Response,
       Loading: ActionType.Budget.HeaderTemplates.Loading,
@@ -55,7 +50,10 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
   state: Redux.ModelListResponseStore<Model.Actual> = initialModelListResponseState,
   action: Redux.Action<any>
 ): Redux.ModelListResponseStore<Model.Actual> => {
-  const listResponseReducer = createModelListResponseReducer<Model.Actual, Redux.ModelListResponseStore<Model.Actual>>(
+  const listResponseReducer = redux.factories.createModelListResponseReducer<
+    Model.Actual,
+    Redux.ModelListResponseStore<Model.Actual>
+  >(
     {
       Response: ActionType.Budget.Actuals.Response,
       Request: ActionType.Budget.Actuals.Request,
@@ -74,21 +72,21 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
   );
   let newState = listResponseReducer(state, action);
   if (action.type === ActionType.Budget.Actuals.TableChanged) {
-    const event: Table.ChangeEvent<BudgetTable.ActualRow, Model.Actual> = action.payload;
+    const event: Table.ChangeEvent<Tables.ActualRow, Model.Actual> = action.payload;
 
-    if (typeguards.isDataChangeEvent(event)) {
-      const consolidated = consolidateTableChange(event.payload);
+    if (tabling.typeguards.isDataChangeEvent(event)) {
+      const consolidated = tabling.util.consolidateTableChange(event.payload);
 
       // The consolidated changes should contain one change per actual, but
       // just in case we apply that grouping logic here.
       let changesPerActual: {
-        [key: number]: { changes: Table.RowChange<BudgetTable.ActualRow, Model.Actual>[]; model: Model.Actual };
+        [key: number]: { changes: Table.RowChange<Tables.ActualRow, Model.Actual>[]; model: Model.Actual };
       } = {};
       for (let i = 0; i < consolidated.length; i++) {
         if (isNil(changesPerActual[consolidated[i].id])) {
           const actual: Model.Actual | undefined = find(newState.data, { id: consolidated[i].id } as any);
           if (isNil(actual)) {
-            warnInconsistentState({
+            redux.util.warnInconsistentState({
               action: action.type,
               reason: "Actual does not exist in state when it is expected to.",
               id: consolidated[i].id
@@ -111,17 +109,17 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
         const changesObj = changesPerActual[id];
         let actual = changesObj.model;
         for (let j = 0; j < changesObj.changes.length; j++) {
-          actual = mergeChangesWithModel(changesObj.model, changesObj.changes[j]);
+          actual = tabling.util.mergeChangesWithModel(changesObj.model, changesObj.changes[j]);
         }
         newState = {
           ...newState,
-          data: replaceInArray<Model.Actual>(newState.data, { id: actual.id }, actual)
+          data: util.replaceInArray<Model.Actual>(newState.data, { id: actual.id }, actual)
         };
       }
-    } else if (typeguards.isRowAddEvent(event)) {
+    } else if (tabling.typeguards.isRowAddEvent(event)) {
       // Eventually, we will want to implement this - so we do not have to rely on waiting
       // for the response of the API request.
-    } else if (typeguards.isRowDeleteEvent(event)) {
+    } else if (tabling.typeguards.isRowDeleteEvent(event)) {
       const ids = Array.isArray(event.payload) ? event.payload : [event.payload];
       for (let i = 0; i < ids.length; i++) {
         newState = {
@@ -137,8 +135,10 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
 };
 
 const genericReducer = combineReducers({
-  autoIndex: createSimplePayloadReducer<boolean>(ActionType.Budget.SetAutoIndex, false),
-  commentsHistoryDrawerOpen: createSimpleBooleanReducer(ActionType.Budget.SetCommentsHistoryDrawerVisibility),
+  autoIndex: redux.factories.createSimplePayloadReducer<boolean>(ActionType.Budget.SetAutoIndex, false),
+  commentsHistoryDrawerOpen: redux.factories.createSimpleBooleanReducer(
+    ActionType.Budget.SetCommentsHistoryDrawerVisibility
+  ),
   account: factories.createAccountReducer(
     {
       SetId: ActionType.Budget.Account.SetId,
@@ -300,7 +300,7 @@ const genericReducer = combineReducers({
     },
     initialBudgetBudgetState
   ),
-  subAccountsTree: createModelListResponseReducer<Model.SubAccountTreeNode>({
+  subAccountsTree: redux.factories.createModelListResponseReducer<Model.SubAccountTreeNode>({
     Response: ActionType.Budget.SubAccountsTree.Response,
     Loading: ActionType.Budget.SubAccountsTree.Loading,
     SetSearch: ActionType.Budget.SubAccountsTree.SetSearch,

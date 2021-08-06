@@ -4,12 +4,11 @@ import { map, isNil, orderBy, forEach } from "lodash";
 import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 import classNames from "classnames";
 
-import { Button } from "antd";
-
 import { Dropdown, TooltipWrapper } from "components";
+import { Button } from "components/buttons";
+import { hooks } from "lib";
 
 import "./BreadCrumbs.scss";
-import { useDynamicCallback } from "lib/hooks";
 
 const isLazyBreadCrumbItem = (item: IBreadCrumbItem | ILazyBreadCrumbItem): item is ILazyBreadCrumbItem => {
   return (item as ILazyBreadCrumbItem).func !== undefined;
@@ -166,7 +165,7 @@ interface BreadCrumbsProps extends StandardComponentProps {
 }
 
 const BreadCrumbs = ({ items, itemProps, params, children, ...props }: BreadCrumbsProps): JSX.Element => {
-  const parametersPresent = useDynamicCallback((item: ILazyBreadCrumbItem): [boolean, { [key: string]: any }] => {
+  const parametersPresent = hooks.useDynamicCallback((item: ILazyBreadCrumbItem): [boolean, { [key: string]: any }] => {
     if ((item.requiredParams.length !== 0 && !isNil(params) && Object.keys(params).length === 0) || isNil(params)) {
       return [false, {}];
     }

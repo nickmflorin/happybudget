@@ -1,13 +1,15 @@
-import { simpleAction } from "store/actions";
+import { redux } from "lib";
 import ActionType from "../ActionType";
 
-export const wipeStateAction = simpleAction<null>(ActionType.Budget.WipeState);
-export const setBudgetIdAction = simpleAction<number>(ActionType.Budget.SetId);
-export const setBudgetAutoIndex = simpleAction<boolean>(ActionType.Budget.SetAutoIndex);
-export const requestBudgetAction = simpleAction<null>(ActionType.Budget.Request);
-export const loadingBudgetAction = simpleAction<boolean>(ActionType.Budget.Loading);
-export const responseBudgetAction = simpleAction<Model.Budget | undefined>(ActionType.Budget.Response);
-export const setCommentsHistoryDrawerVisibilityAction = simpleAction<boolean>(
+export const wipeStateAction = redux.actions.simpleAction<null>(ActionType.Budget.WipeState);
+export const setBudgetIdAction = redux.actions.simpleAction<number>(ActionType.Budget.SetId);
+export const setBudgetAutoIndex = redux.actions.simpleAction<boolean>(ActionType.Budget.SetAutoIndex);
+export const requestBudgetAction = redux.actions.simpleAction<null>(ActionType.Budget.Request);
+export const loadingBudgetAction = redux.actions.simpleAction<boolean>(ActionType.Budget.Loading);
+export const responseBudgetAction = redux.actions.simpleAction<Model.Budget | undefined>(ActionType.Budget.Response);
+export const setCommentsHistoryDrawerVisibilityAction = redux.actions.simpleAction<boolean>(
   ActionType.Budget.SetCommentsHistoryDrawerVisibility
 );
-export const updateBudgetInStateAction = simpleAction<Partial<Model.Budget>>(ActionType.Budget.UpdateInState);
+export const updateBudgetInStateAction = redux.actions.simpleAction<Partial<Model.Budget>>(
+  ActionType.Budget.UpdateInState
+);

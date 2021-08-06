@@ -10,7 +10,6 @@ type DependencyList = UseEffectParams[1];
 type UseEffectReturn = ReturnType<typeof useEffect>;
 
 export * from "./ui";
-export * from "./tagging";
 
 export const useDynamicCallback = <T = any>(callback: (...args: any[]) => T) => {
   const ref = useRef<any>();
