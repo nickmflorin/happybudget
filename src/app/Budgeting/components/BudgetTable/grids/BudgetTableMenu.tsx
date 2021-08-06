@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { Input, Checkbox, Tooltip } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/pro-light-svg-icons";
+import { faSearch } from "@fortawesome/pro-regular-svg-icons";
 
 import { RowNode } from "@ag-grid-community/core";
 
@@ -27,7 +27,7 @@ const BudgetTableMenuAction = ({ action }: BudgetTableMenuActionProps): JSX.Elem
       return (
         <Button
           onClick={() => !isNil(action.onClick) && action.onClick()}
-          className={"btn btn--bare btn--budget-table-menu"}
+          className={classNames("btn btn--bare btn--budget-table-menu green-icon-hover", action.className)}
           disabled={action.disabled}
           icon={<FontAwesomeIcon className={"icon"} icon={action.icon} />}
           tooltip={
@@ -56,7 +56,7 @@ const BudgetTableMenuAction = ({ action }: BudgetTableMenuActionProps): JSX.Elem
     } else {
       return (
         <IconButton
-          className={"btn btn--icon-only-budget-table-menu dark"}
+          className={classNames("btn btn--budget-table-menu dark green-icon-hover", action.className)}
           size={"large"}
           onClick={() => !isNil(action.onClick) && action.onClick()}
           disabled={action.disabled}

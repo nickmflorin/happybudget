@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { isNil, map, filter } from "lodash";
 
-import { faSigma, faPercentage, faTrashAlt, faLineColumns, faFileCsv } from "@fortawesome/pro-solid-svg-icons";
+import { faFolder, faBadgePercent, faTrashAlt, faLineColumns, faFileCsv } from "@fortawesome/pro-regular-svg-icons";
 
 import { ColSpanParams } from "@ag-grid-community/core";
 
@@ -49,14 +49,12 @@ const GenericAccountsTable = ({
           }
         },
         {
-          tooltip: "Group",
-          icon: faSigma,
+          icon: faFolder,
           disabled: true,
           text: "Group"
         },
         {
-          tooltip: "Mark Up",
-          icon: faPercentage,
+          icon: faBadgePercent,
           disabled: true,
           text: "Mark Up"
         },
@@ -67,6 +65,7 @@ const GenericAccountsTable = ({
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
+                className={"Dropdown"}
                 fields={map(params.columns, (col: Table.Column<BudgetTable.AccountRow, Model.Account>) => ({
                   id: col.field as string,
                   label: col.headerName as string,
@@ -86,7 +85,6 @@ const GenericAccountsTable = ({
         },
         {
           text: "Export CSV",
-          tooltip: "Export as CSV",
           icon: faFileCsv,
           wrap: (children: ReactNode) => {
             return (

@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { isNil, includes, find, filter, map } from "lodash";
 import classNames from "classnames";
 
-import { faSigma, faPercentage, faTrashAlt, faLineColumns, faFileCsv } from "@fortawesome/pro-solid-svg-icons";
+import { faSigma, faPercentage, faTrashAlt, faLineColumns, faFileCsv } from "@fortawesome/pro-regular-svg-icons";
 
 import { ColDef, ColSpanParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
@@ -84,13 +84,11 @@ const GenericSubAccountsTable = ({
           }
         },
         {
-          tooltip: "Group",
           icon: faSigma,
           disabled: true,
           text: "Group"
         },
         {
-          tooltip: "Mark Up",
           icon: faPercentage,
           disabled: true,
           text: "Mark Up"
@@ -122,7 +120,6 @@ const GenericSubAccountsTable = ({
         {
           text: "Export CSV",
           icon: faFileCsv,
-          tooltip: "Export as CSV",
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown

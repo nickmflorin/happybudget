@@ -346,6 +346,7 @@ namespace BudgetTable {
     readonly onClick?: () => void;
     readonly disabled?: boolean;
     readonly text?: string;
+    readonly className?: string;
     readonly render?: RenderFunc;
     readonly wrap?: (children: ReactNode) => JSX.Element;
   }

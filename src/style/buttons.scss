@@ -87,39 +87,6 @@
     font-size: inherit !important;
   }
 
-  &--icon-only {
-    @extend .link;
-    min-width: 0px;
-    box-shadow: none !important;
-    height: 28px;
-    width: 28px;
-    padding: 5px;
-    border-radius: 100px;
-    border: 1px solid transparent;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    svg {
-      height: 18px;
-      width: 18px;
-      color: $icon-color;
-    }
-
-    &:hover,
-    &.disabled,
-    &.fake-disabled,
-    &:disabled,
-    &:focus {
-      color: lighten($icon-color, 20%) !important;
-      background-color: rgba(0, 0, 0, 0.015);
-
-      svg {
-        color: $blue !important;
-      }
-    }
-  }
-
   // Links that are displayed immediately under a FormItem.  This is used in
   // the login/reset password pages.
   &--form-supplementary {
@@ -287,12 +254,17 @@
     border-color: $green;
 
     &:hover,
-    &.disabled,
-    &.fake-disabled,
-    &:disabled,
     &:focus {
       border-color: transparent !important;
-      background-color: $green-darker !important;
+      background-color: $green-light !important;
+      color: $white !important;
+    }
+
+    &.disabled,
+    &:disabled,
+    &.fake-disabled {
+      border-color: transparent !important;
+      background-color: $disabled-color !important;
       color: $white !important;
     }
   }
@@ -641,12 +613,14 @@
     box-shadow: none !important;
     color: $text-secondary;
     min-width: 0px;
-
+    
     svg {
       height: 1.2rem !important;
       margin-right: 0.5rem;
       color: $text-secondary;
     }
+
+
 
     &:hover,
     &:focus {
@@ -658,9 +632,22 @@
       }
     }
 
+    &.green-icon-hover {
+      &:hover:not(.disabled):not(:disabled):not(.fake-disabled),
+      &:focus:not(.disabled):not(:disabled):not(.fake-disabled) {
+        color: $green !important;
+        border-color: $transparent !important;
+        background-color: transparent;
+        svg {
+          color: $green !important;
+        }
+      }
+    }
+
     &:disabled,
     &.disabled,
-    &.fake-disabled {
+    &.fake-disabled
+    {
       color: $disabled-color !important;
       border-color: $transparent !important;
       background-color: transparent;
