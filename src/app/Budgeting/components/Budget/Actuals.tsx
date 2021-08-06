@@ -104,6 +104,7 @@ const Actuals = (): JSX.Element => {
             {
               tooltip: "Delete",
               icon: faTrashAlt,
+              disabled: params.selectedRows.length === 0,
               onClick: () => {
                 const rows: BudgetTable.ActualRow[] = params.apis.grid.getSelectedRows();
                 dispatch(

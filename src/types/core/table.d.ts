@@ -353,16 +353,16 @@ namespace BudgetTable {
   interface MenuActionParams<R extends Table.Row, M extends Model.Model> {
     readonly apis: Table.APIs;
     readonly columns: Table.Column<R, M>[];
+    readonly selectedRows: R[];
   }
 
   interface MenuProps<R extends Table.Row, M extends Model.Model> {
     readonly apis: Table.APIs;
     readonly columns: Table.Column<R, M>[];
-    readonly actions?:
-      | ((params: BudgetTable.MenuActionParams<R>) => BudgetTable.MenuAction[])
-      | BudgetTable.MenuAction[];
+    readonly actions?: MenuAction[] | ((params: MenuActionParams<R>) => MenuAction[]);
     readonly search?: string;
     readonly detached?: boolean;
+    readonly selectedRows: R[];
     readonly onSearch?: (value: string) => void;
   }
 
@@ -423,7 +423,7 @@ namespace BudgetTable {
 
   interface PrimaryGridProps<R extends Table.Row, M extends Model.Model>
     extends BudgetTable.PrimaryGridPassThroughProps<R, M>,
-      Omit<BudgetTable.MenuProps<R, M>, "columns" | "apis">,
+      Omit<BudgetTable.MenuProps<R, M>, "columns" | "apis" | "selectedRows">,
       SpecificGridProps<R, M> {
     readonly gridRef: import("react").RefObject<PrimaryGridRef>;
     readonly ordering: FieldOrder<keyof R>[];
@@ -439,7 +439,7 @@ namespace BudgetTable {
     R extends Table.Row,
     M extends Model.Model,
     P
-  > extends Omit<BudgetTable.MenuProps<R, M>, "columns" | "apis">,
+  > extends Omit<BudgetTable.MenuProps<R, M>, "columns" | "apis" | "selectedRows">,
       BudgetTable.PrimaryGridPassThroughProps<R, M>,
       StandardComponentProps {
     readonly tableRef: import("react").RefObject<BudgetTable.Ref<R, M>>;

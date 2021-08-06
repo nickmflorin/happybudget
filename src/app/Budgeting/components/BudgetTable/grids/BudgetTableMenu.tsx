@@ -97,6 +97,7 @@ const BudgetTableMenu = <R extends Table.Row, M extends Model.Model>({
   search,
   detached = false,
   columns,
+  selectedRows,
   onSearch
 }: BudgetTable.MenuProps<R, M>) => {
   return (
@@ -126,7 +127,8 @@ const BudgetTableMenu = <R extends Table.Row, M extends Model.Model>({
                   ? actions
                   : actions({
                       apis,
-                      columns: filter(columns, (col: Table.Column<R, M>) => !includes(["index", "expand"], col.field))
+                      columns: filter(columns, (col: Table.Column<R, M>) => !includes(["index", "expand"], col.field)),
+                      selectedRows
                     }),
                 (action: BudgetTable.MenuAction, index: number) => (
                   <BudgetTableMenuAction key={index} action={action} />

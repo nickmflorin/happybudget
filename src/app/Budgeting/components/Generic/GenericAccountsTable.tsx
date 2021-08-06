@@ -40,6 +40,7 @@ const GenericAccountsTable = ({
         {
           tooltip: "Delete",
           icon: faTrashAlt,
+          disabled: params.selectedRows.length === 0,
           onClick: () => {
             const rows: BudgetTable.AccountRow[] = params.apis.grid.getSelectedRows();
             props.onChangeEvent({

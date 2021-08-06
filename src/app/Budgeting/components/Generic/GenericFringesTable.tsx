@@ -45,6 +45,7 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
         {
           tooltip: "Delete",
           icon: faTrashAlt,
+          disabled: params.selectedRows.length === 0,
           onClick: () => {
             const rows: BudgetTable.FringeRow[] = params.apis.grid.getSelectedRows();
             props.onChangeEvent({

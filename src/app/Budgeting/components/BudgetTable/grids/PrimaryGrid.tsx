@@ -26,7 +26,8 @@ import {
   CellRange,
   CellEditingStartedEvent,
   CellMouseOverEvent,
-  CellFocusedEvent
+  CellFocusedEvent,
+  SelectionChangedEvent
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -71,6 +72,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
   onBack,
   ...props
 }: BudgetTable.PrimaryGridProps<R, M>): JSX.Element => {
+  const [selectedRows, setSelectedRows] = useState<R[]>([]); // Only for BudgetTableMenu
   const [cellChangeEvents, setCellChangeEvents] = useState<CellValueChangedEvent[]>([]);
   const [focused, setFocused] = useState(false);
   // Right now, we can only support Cut/Paste for 1 cell at a time.  Multi-cell
@@ -1046,6 +1048,13 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
     return { ...def, cellEditorParams: { ...def.cellEditorParams, onDoneEditing } };
   };
 
+  const onSelectionChanged = useDynamicCallback((e: SelectionChangedEvent) => {
+    if (!isNil(apis)) {
+      const selected: R[] = apis.grid.getSelectedRows();
+      setSelectedRows(selected);
+    }
+  });
+
   return (
     <React.Fragment>
       {!isNil(apis) && (
@@ -1056,6 +1065,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           onSearch={onSearch}
           columns={columns}
           detached={detached}
+          selectedRows={selectedRows}
         />
       )}
       <div className={"table-grid"}>
@@ -1081,6 +1091,7 @@ const PrimaryGrid = <R extends Table.Row, M extends Model.Model>({
           onFirstDataRendered={onFirstDataRendered}
           suppressKeyboardEvent={suppressKeyboardEvent}
           onCellFocused={onCellFocused}
+          onSelectionChanged={onSelectionChanged}
           // rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
           onCellEditingStarted={(event: CellEditingStartedEvent) => {
             oldRow.current = { ...event.node.data };

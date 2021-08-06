@@ -75,6 +75,7 @@ const GenericSubAccountsTable = ({
         {
           tooltip: "Delete",
           icon: faTrashAlt,
+          disabled: params.selectedRows.length === 0,
           onClick: () => {
             const rows: BudgetTable.SubAccountRow[] = params.apis.grid.getSelectedRows();
             props.onChangeEvent({
