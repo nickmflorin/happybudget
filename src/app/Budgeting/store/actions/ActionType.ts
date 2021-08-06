@@ -22,6 +22,7 @@ const ActionType = {
       Request: "budget.headertemplates.Request",
       Response: "budget.headertemplates.Response",
       AddToState: "budget.headertemplates.AddToState",
+      RemoveFromState: "budget.headertemplates.RemoveFromState",
       Load: "budget.headertemplates.Load",
       Display: "budget.headertemplates.Display",
       Clear: "budget.headertemplates.Clear"

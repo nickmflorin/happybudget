@@ -33,3 +33,8 @@ export const createHeaderTemplate = async (
   const url = URL.v1("pdf", "header-templates");
   return client.post<Model.HeaderTemplate>(url, payload, options);
 };
+
+export const deleteHeaderTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
+  const url = URL.v1("pdf", "header-templates", id);
+  return client.delete<null>(url, options);
+};

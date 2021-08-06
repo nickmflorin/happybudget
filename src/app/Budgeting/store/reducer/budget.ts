@@ -30,7 +30,8 @@ const headerTemplatesRootReducer: Reducer<Modules.Budget.HeaderTemplatesStore, R
       Response: ActionType.Budget.HeaderTemplates.Response,
       Loading: ActionType.Budget.HeaderTemplates.Loading,
       Request: ActionType.Budget.HeaderTemplates.Request,
-      AddToState: ActionType.Budget.HeaderTemplates.AddToState
+      AddToState: ActionType.Budget.HeaderTemplates.AddToState,
+      RemoveFromState: ActionType.Budget.HeaderTemplates.RemoveFromState
     },
     { initialState: initialHeaderTemplatesState }
   );

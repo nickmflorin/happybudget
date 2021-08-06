@@ -236,6 +236,12 @@ const PreviewModal = ({
           displayedHeaderTemplate={displayedHeaderTemplate}
           onClearHeaderTemplate={() => dispatch(actions.clearHeaderTemplateAction(null))}
           onLoadHeaderTemplate={(id: number) => dispatch(actions.loadHeaderTemplateAction(id))}
+          onHeaderTemplateDeleted={(id: number) => {
+            if (!isNil(displayedHeaderTemplate) && displayedHeaderTemplate.id === id) {
+              dispatch(actions.clearHeaderTemplateAction(null));
+            }
+            dispatch(actions.removeHeaderTemplateFromStateAction(id));
+          }}
           onHeaderTemplateCreated={(template: Model.HeaderTemplate) => {
             dispatch(actions.addHeaderTemplateToStateAction(template));
             dispatch(actions.displayHeaderTemplateAction(template));

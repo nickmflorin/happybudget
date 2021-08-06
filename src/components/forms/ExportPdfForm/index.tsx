@@ -22,6 +22,7 @@ import { FormProps } from "components/forms/Form";
 
 import HeaderTemplateSaveForm, { IHeaderTemplateSaveFormRef } from "./HeaderTemplateSaveForm";
 import useHeaderTemplate from "./useHeaderTemplate";
+import HeaderTemplateSelect from "./HeaderTemplateSelect";
 
 import "./index.scss";
 
@@ -52,6 +53,7 @@ interface ExportFormProps extends FormProps<PdfBudgetTable.Options> {
   readonly headerTemplatesLoading: boolean;
   readonly onClearHeaderTemplate: () => void;
   readonly onLoadHeaderTemplate: (id: number) => void;
+  readonly onHeaderTemplateDeleted: (id: number) => void;
   readonly onHeaderTemplateCreated: (template: Model.HeaderTemplate) => void;
   readonly onHeaderTemplateUpdated?: (template: Model.HeaderTemplate) => void;
 }
@@ -69,12 +71,14 @@ const ExportForm = (
     onClearHeaderTemplate,
     onLoadHeaderTemplate,
     onHeaderTemplateUpdated,
+    onHeaderTemplateDeleted,
     ...props
   }: ExportFormProps,
   ref: ForwardedRef<IExportFormRef>
 ): JSX.Element => {
   const saveFormRef = useRef<IHeaderTemplateSaveFormRef>(null);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState<number | null>(null);
   const [showAllTables, setShowAllTables] = useState(isNil(props.initialValues?.tables));
   const [includeNotes, setIncludeNotes] = useState(false);
   const [notesBlocks, setNotesBlocks] = useState<RichText.Block[]>(props.initialValues?.notes || []);
@@ -312,32 +316,22 @@ const ExportForm = (
     >
       <Form.ItemSection label={"Header"}>
         <Form.ItemStyle label={"Template"}>
-          <Select
-            showArrow
+          <HeaderTemplateSelect
             loading={headerTemplatesLoading}
-            disabled={headerTemplatesLoading}
-            value={!isNil(displayedHeaderTemplate) ? displayedHeaderTemplate.id : "none"}
-            onChange={(value: number | "none") => {
-              if (typeof value === "number") {
-                onLoadHeaderTemplate(value);
-              } else {
-                onClearHeaderTemplate();
-              }
+            onLoad={onLoadHeaderTemplate}
+            onClear={onClearHeaderTemplate}
+            value={displayedHeaderTemplate}
+            templates={headerTemplates}
+            deleting={deleting}
+            onDelete={(id: number) => {
+              setDeleting(id);
+              api
+                .deleteHeaderTemplate(id)
+                .then(() => onHeaderTemplateDeleted(id))
+                .catch((e: Error) => props.form.handleRequestError(e))
+                .finally(() => setDeleting(null));
             }}
-          >
-            <React.Fragment>
-              <Select.Option key={0} value={"none"}>
-                {"Untitled"}
-              </Select.Option>
-              {map(headerTemplates, (template: Model.HeaderTemplate, index: number) => {
-                return (
-                  <Select.Option key={index + 1} value={template.id}>
-                    {template.name}
-                  </Select.Option>
-                );
-              })}
-            </React.Fragment>
-          </Select>
+          />
         </Form.ItemStyle>
 
         <Form.ItemStyle label={"Title"}>
