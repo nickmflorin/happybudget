@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
 
-import { faCommentsAlt, faPrint } from "@fortawesome/pro-regular-svg-icons";
+import { faCommentsAlt, faPrint } from "@fortawesome/pro-solid-svg-icons";
 
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
@@ -119,11 +119,13 @@ const SubAccountsTable = ({ subaccountId }: SubAccountsTableProps): JSX.Element 
         onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
         actions={[
           {
+            tooltip: "Export as PDF",
             icon: faPrint,
             text: "Export PDF",
             onClick: () => setPreviewModalVisible(true)
           },
           {
+            tooltip: "Comments",
             text: "Comments",
             icon: faCommentsAlt,
             onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))

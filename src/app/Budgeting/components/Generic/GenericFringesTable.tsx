@@ -2,7 +2,7 @@ import { useRef, ReactNode } from "react";
 import classNames from "classnames";
 import { isNil, map, filter } from "lodash";
 
-import { faTrashAlt, faFileCsv } from "@fortawesome/pro-regular-svg-icons";
+import { faTrashAlt, faFileCsv } from "@fortawesome/pro-solid-svg-icons";
 
 import { CellClassParams, SuppressKeyboardEventParams } from "@ag-grid-community/core";
 

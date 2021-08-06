@@ -5,7 +5,7 @@ import { forEach, includes, isNil, map } from "lodash";
 import { createSelector } from "reselect";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
+import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 
 import { EditContactModal } from "components/modals";
 import { DeleteContactsModal } from "components/modals";

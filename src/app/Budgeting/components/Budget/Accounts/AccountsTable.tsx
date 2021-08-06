@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 import { map } from "lodash";
 
-import { faCommentsAlt, faPrint } from "@fortawesome/pro-regular-svg-icons";
+import { faCommentsAlt, faPrint } from "@fortawesome/pro-solid-svg-icons";
 
 import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals";
 import { simpleDeepEqualSelector, simpleShallowEqualSelector } from "store/selectors";
@@ -95,11 +95,13 @@ const AccountsTable = (): JSX.Element => {
         ]}
         actions={[
           {
+            tooltip: "Export as PDF",
             icon: faPrint,
             text: "Export PDF",
             onClick: () => setPreviewModalVisible(true)
           },
           {
+            tooltip: "Comments",
             text: "Comments",
             icon: faCommentsAlt,
             onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
