@@ -5,6 +5,7 @@ import { LicenseManager } from "@ag-grid-enterprise/core";
 import { isNil } from "lodash";
 
 import "style/index.scss";
+
 import App from "./app";
 import reportWebVitals from "./lib/operational/reportWebVitals";
 

@@ -1,13 +1,13 @@
 @import "./colors";
 
 $roboto: "Roboto", sans-serif;
-$open-sans: "Open Sans", sans-serif;
+$avenir: "AvenirNext", sans-serif;
 
 .header-base {
   color: $text-primary;
   margin-top: 0;
   margin-bottom: 0;
-  font-family: $open-sans;
+  font-family: $avenir;
   font-weight: 600;
 }
 

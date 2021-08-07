@@ -128,21 +128,22 @@ const PreviewModal = ({
   useEffect(() => {
     if (visible === true) {
       dispatch(actions.requestHeaderTemplatesAction(null));
-      registerFonts();
-      const promises: [Promise<Model.PdfBudget>, Promise<Http.ListResponse<Model.Contact>>] = [
-        api.getBudgetPdf(budgetId),
-        api.getContacts()
-      ];
-      setLoadingData(true);
-      Promise.all(promises)
-        .then(([b, cs]: [Model.PdfBudget, Http.ListResponse<Model.Contact>]) => {
-          setContactsResponse(cs);
-          setBudgetResponse(b);
-        })
-        // TODO: We should probably display the error in the modal and not let the default toast
-        // package display it in the top right of the window.
-        .catch((e: Error) => api.handleRequestError(e))
-        .finally(() => setLoadingData(false));
+      registerFonts().then(() => {
+        const promises: [Promise<Model.PdfBudget>, Promise<Http.ListResponse<Model.Contact>>] = [
+          api.getBudgetPdf(budgetId),
+          api.getContacts()
+        ];
+        setLoadingData(true);
+        Promise.all(promises)
+          .then(([b, cs]: [Model.PdfBudget, Http.ListResponse<Model.Contact>]) => {
+            setContactsResponse(cs);
+            setBudgetResponse(b);
+          })
+          // TODO: We should probably display the error in the modal and not let the default toast
+          // package display it in the top right of the window.
+          .catch((e: Error) => api.handleRequestError(e))
+          .finally(() => setLoadingData(false));
+      });
     }
   }, [visible]);
 

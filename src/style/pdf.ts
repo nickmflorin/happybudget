@@ -1,65 +1,50 @@
 import { Font, StyleSheet } from "@react-pdf/renderer";
-import { forEach, isNil, map, reduce } from "lodash";
-import { Colors, TABLE_BORDER_RADIUS } from "./constants";
+import { forEach, isNil, map, reduce, filter } from "lodash";
+import {
+  SupportedFontFaces,
+  FontWeightMap,
+  Colors,
+  TABLE_BORDER_RADIUS,
+  fontsFromFontFace,
+  fontToString,
+  getFontSourceModuleName
+} from "./constants";
 
-const FontWeightMap = {
-  Bold: 700,
-  Regular: 400,
-  Light: 300,
-  SemiBold: 600,
-  Medium: 600
+export const importFontModules = (): Promise<{ [key: string]: any }> => import("./fonts");
+
+export const getPdfFont = (font: Style.Font, modules: { [key: string]: any }): Pdf.Font | null => {
+  const moduleName = getFontSourceModuleName(font);
+  if (isNil(modules[moduleName])) {
+    /* eslint-disable no-console */
+    console.warn(`Module ${moduleName} is not on fonts path for ${fontToString(font)}.  It will not be registered.`);
+    return null;
+  } else if (font.italic === true) {
+    return {
+      src: modules[moduleName],
+      fontWeight: FontWeightMap[font.weight],
+      fontStyle: "italic"
+    };
+  } else {
+    return {
+      src: modules[moduleName],
+      fontWeight: FontWeightMap[font.weight]
+    };
+  }
 };
 
-// Note: For both OpenSans and Roboto, there doesn't seem to be a RegularItalic
-// option.
-export const PdfFonts: Pdf.Font[] = [
-  {
-    family: "OpenSans",
-    variants: [
-      "Regular",
-      "Light",
-      { weight: "Light", style: "italic" },
-      "SemiBold",
-      { weight: "SemiBold", style: "italic" },
-      "Bold",
-      { weight: "Bold", style: "italic" }
-    ]
-  },
-  {
-    family: "Roboto",
-    variants: [
-      "Regular",
-      "Light",
-      { weight: "Light", style: "italic" },
-      "Medium",
-      { weight: "Medium", style: "italic" },
-      "Bold",
-      { weight: "Bold", style: "italic" }
-    ]
-  }
-];
-
-export const registerFont = (font: Pdf.Font): void => {
+export const registerFontFace = (fontFace: Style.FontFace, modules: { [key: string]: any }) => {
+  const fontFaceFonts: Style.Font[] = fontsFromFontFace(fontFace);
+  const pdfFonts = map(fontFaceFonts, (font: Style.Font) => getPdfFont(font, modules));
   Font.register({
-    family: font.family,
-    fonts: map(font.variants, (variant: Pdf.FontVariant) => {
-      if (typeof variant === "string") {
-        return {
-          src: process.env.PUBLIC_URL + `/fonts/${font.family}-${variant}.ttf`,
-          fontWeight: FontWeightMap[variant]
-        };
-      }
-      return {
-        src: process.env.PUBLIC_URL + `/fonts/${font.family}-${variant.weight}${variant.style.toUpperCase()}.ttf`,
-        fontWeight: FontWeightMap[variant.weight],
-        fontStyle: variant.style
-      };
-    })
+    family: fontFace.family,
+    fonts: filter(pdfFonts, (font: Pdf.Font | null) => !isNil(font)) as Pdf.Font[]
   });
 };
 
-export const registerFonts = () => {
-  map(PdfFonts, (font: Pdf.Font) => registerFont(font));
+export const registerFonts = (): Promise<void> => {
+  return importFontModules().then((modules: { [key: string]: any }) => {
+    map(SupportedFontFaces, (fontFace: Style.FontFace) => registerFontFace(fontFace, modules));
+  });
 };
 
 // TODO: It would be nice to reference constants from SCSS files.
@@ -68,7 +53,7 @@ const TextStyles: Pdf.ExtensionStyles = {
   bold: { fontWeight: 700 },
   italic: { fontStyle: "italic" },
   uppercase: { textTransform: "uppercase" },
-  header: { ext: ["text"], fontFamily: "OpenSans" },
+  header: { ext: ["text"], fontFamily: "AvenirNext" },
   paragraph: { ext: ["text"], fontFamily: "Roboto", fontSize: 11, lineHeight: "1.5pt" },
   h1: {
     ext: ["header"],
@@ -101,7 +86,7 @@ const TextStyles: Pdf.ExtensionStyles = {
     fontSize: 10
   },
   label: {
-    fontFamily: "OpenSans",
+    fontFamily: "AvenirNext",
     fontSize: 12,
     fontWeight: 600,
     lineHeight: "1.5pt",
@@ -130,7 +115,7 @@ const LayoutStyles: Pdf.ExtensionStyles = {
   },
   "page-no-data-text": {
     textAlign: "center",
-    fontFamily: "OpenSans",
+    fontFamily: "AvenirNext",
     color: "#404152",
     fontWeight: 700,
     fontSize: 20

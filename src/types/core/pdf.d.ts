@@ -38,20 +38,20 @@ namespace RichText {
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Pdf {
-  type FontFamily = "OpenSans" | "Roboto";
-  type FontWeight = "Bold" | "Regular" | "Light" | "SemiBold" | "Medium";
-  type FontStyleName = "italic" | "bold";
-  type FontStyleTag = "i" | "b";
-  type SupportedFontStyle = { name: Pdf.FontStyleName, tag: Pdf.FontStyleTag };
-
-  type FontVariant = Pdf.FontWeight | { weight: Pdf.FontWeight; style: "italic" };
-  type Font = { family: Pdf.FontFamily; variants: Pdf.FontVariant[] };
-
   type Style = import("@react-pdf/types").Style;
   type Styles = import("@react-pdf/renderer").default.Styles;
 
-  type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>, fontFamily?: Pdf.FontFamily };
-  type ExtensionStyles = {[key: string]: Pdf.InternalStyle};
+  type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>, fontFamily?: Style.FontFamily };
+  type ExtensionStyles = {[key: string]: Pdf.ExtensionStyle};
+
+  type FontStyleName = "italic" | "bold";
+  type FontStyleTag = "i" | "b";
+  type SupportedFontStyle = { name: FontStyleName, tag: FontStyleTag };
+  type Font = {
+    readonly src: any;
+    readonly fontWeight: Style.FontWeight;
+    readonly fontStyle?: "italic";
+  };
 
   type HeadingLevel = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 

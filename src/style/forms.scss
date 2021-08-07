@@ -9,7 +9,7 @@ form {
   font-size: 12px;
   line-height: 22px;
   color: $text-secondary;
-  font-family: $open-sans;
+  font-family: $avenir;
   font-weight: 600 !important;
   height: 36px !important;
 }
@@ -46,13 +46,13 @@ form {
       line-height: 16px !important;
       margin-bottom: 6px !important;
       color: $text-primary !important;
-      font-family: $open-sans;
+      font-family: $avenir;
     }
 
     .ant-alert-description {
       font-size: 12px !important;
       line-height: 14px !important;
-      font-family: $open-sans;
+      font-family: $avenir;
       font-weight: 400;
       color: $text-secondary !important;
     }
@@ -97,7 +97,7 @@ form {
     }
 
     .ant-form-item-label {
-      font-family: $open-sans !important;
+      font-family: $avenir !important;
       font-weight: 400 !important;
       color: $text-secondary !important;
       padding-left: 2px;

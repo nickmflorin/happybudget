@@ -124,7 +124,7 @@
   // the login/reset password pages.
   &--form-supplementary {
     color: #868686;
-    font-family: $open-sans;
+    font-family: $avenir;
     font-weight: 400;
     font-size: 14px;
     text-transform: unset !important;
@@ -170,7 +170,8 @@
 .btn,
 .ant-btn {
   @extend .btn-link-base;
-  font-family: $roboto;
+  font-family: $avenir;
+  letter-spacing: 0.01em;
   font-weight: 600;
   padding: 6px 12px;
   min-width: 80px;
@@ -227,7 +228,7 @@
     padding-bottom: 12px;
     height: auto;
     width: 230px;
-    font-family: $open-sans;
+    font-family: $avenir;
     text-transform: unset;
     font-weight: 600;
   }
@@ -532,7 +533,7 @@
     background-color: $green;
     color: $white;
     border: 1px solid transparent;
-    font-family: $open-sans;
+    font-family: $avenir;
     font-weight: 600;
 
     .anticon-loading {
@@ -580,7 +581,7 @@
     padding-bottom: 2px !important;
     height: 48px;
     font-size: 14px;
-    font-family: $open-sans;
+    font-family: $avenir;
 
     &:hover,
     &:focus,
@@ -636,7 +637,7 @@
   }
 
   &--bare {
-    font-weight: 500;
+    font-weight: 600;
     border: none !important;
     box-shadow: none !important;
     color: $text-secondary;
