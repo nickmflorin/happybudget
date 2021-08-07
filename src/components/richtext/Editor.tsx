@@ -110,6 +110,7 @@ const Editor = (
       ...props,
       tools: Tools,
       holder: id,
+      data: { blocks: !isNil(value) ? convertInternalBlocksToEditorJSBlocks(value) : [] },
       onChange: _onChange,
       onReady: _onReady
     });
@@ -156,7 +157,7 @@ const Editor = (
           console.error(e);
         });
     }
-  }, [useDeepEqualMemo(value), !isNil(instance)]);
+  }, [useDeepEqualMemo(value)]);
 
   return <div className={classNames("rich-text-editor", className)} id={id} style={style}></div>;
 };

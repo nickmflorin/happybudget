@@ -500,7 +500,7 @@ const ExportForm = (
         </Form.Item>
 
         <ShowHide show={includeNotes}>
-          <Form.Item name={"notes"}>
+          <Form.ItemStyle>
             <Editor
               style={{ height: 140 }}
               value={props.initialValues?.notes}
@@ -511,7 +511,7 @@ const ExportForm = (
                 props.onValuesChange?.({ notes: blocks }, { ...formData(values), notes: blocks });
               }}
             />
-          </Form.Item>
+          </Form.ItemStyle>
         </ShowHide>
       </Form.ItemSection>
     </Form.Form>
