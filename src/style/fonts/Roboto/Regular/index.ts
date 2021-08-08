@@ -1,1 +1,1 @@
-export { default as RobotoRegular } from "./Roboto-Regular.ttf"; // Required for PDF Rendering
+export { default as Roboto_Regular } from "./Roboto-Regular.ttf"; // Required for PDF Rendering
