@@ -1,5 +1,6 @@
 @import "style/colors";
 @import "style/variables";
+@import "style/breakpoints";
 
 .ant-select-item-option {
   &.column-select-option {
@@ -64,6 +65,13 @@
         width: auto;
         z-index: 0;
         margin-top: 10px;
+      }
+    }
+    @include media("<=xl") {
+      flex-direction: column;
+      .export-header-side-item {
+        width: 100%;
+        margin-left: 0px !important;
       }
     }
   }

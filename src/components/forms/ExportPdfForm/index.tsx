@@ -395,7 +395,11 @@ const ExportForm = (
 
       <Separator style={{ margin: "2px auto" }} />
 
-      <Form.ItemSection label={"Table Options"} labelClassName={"label label--section"}>
+      <Form.ItemSection
+        label={"Table Options"}
+        labelClassName={"label label--section"}
+        labelStyle={{ marginBottom: "5px !important" }}
+      >
         <Form.Item label={"Columns"} name={"columns"}>
           <Select
             suffixIcon={<FontAwesomeIcon icon={faCaretDown} />}
