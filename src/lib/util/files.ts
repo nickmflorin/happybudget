@@ -28,6 +28,8 @@ export const getBase64FromUrl = (url: string): Promise<string | ArrayBuffer> =>
         reader.result === null ? reject("Could not determine base64 encoding from URL.") : resolve(reader.result);
       reader.onerror = error => reject(error);
     };
+    // For AWS S3 Bucket
+    xhr.setRequestHeader("Access-Control-Allow-Origin", "*");
     xhr.open("GET", url);
     xhr.responseType = "blob";
     xhr.send();
