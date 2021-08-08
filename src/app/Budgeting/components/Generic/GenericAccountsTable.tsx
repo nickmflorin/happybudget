@@ -38,7 +38,6 @@ const GenericAccountsTable = ({
       cookies={{ ...props.cookies, hiddenColumns: "account-table-hidden-columns" }}
       actions={(params: BudgetTable.MenuActionParams<BudgetTable.AccountRow, Model.Account>) => [
         {
-          tooltip: "Delete",
           icon: faTrashAlt,
           disabled: params.selectedRows.length === 0,
           onClick: () => {
@@ -61,7 +60,6 @@ const GenericAccountsTable = ({
         },
         {
           text: "Columns",
-          tooltip: "Toggle Visibility",
           icon: faLineColumns,
           wrap: (children: ReactNode) => {
             return (

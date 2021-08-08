@@ -73,7 +73,6 @@ const GenericSubAccountsTable = ({
       cookies={{ ...props.cookies, hiddenColumns: "subaccount-table-hidden-columns" }}
       actions={(params: BudgetTable.MenuActionParams<BudgetTable.SubAccountRow, Model.SubAccount>) => [
         {
-          tooltip: "Delete",
           icon: faTrashAlt,
           disabled: params.selectedRows.length === 0,
           onClick: () => {
@@ -97,7 +96,6 @@ const GenericSubAccountsTable = ({
         {
           text: "Columns",
           icon: faLineColumns,
-          tooltip: "Toggle Visibility",
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown

@@ -43,7 +43,6 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
       cellClass={(params: CellClassParams) => (params.colDef.field === "object_id" ? "no-select" : undefined)}
       actions={(params: BudgetTable.MenuActionParams<BudgetTable.FringeRow, Model.Fringe>) => [
         {
-          tooltip: "Delete",
           icon: faTrashAlt,
           disabled: params.selectedRows.length === 0,
           onClick: () => {
@@ -57,7 +56,6 @@ const GenericFringesTable: React.FC<GenericFringesTableProps> = (props): JSX.Ele
         {
           text: "Export CSV",
           icon: faFileCsv,
-          tooltip: "Export as CSV",
           wrap: (children: ReactNode) => {
             return (
               <FieldsDropdown
