@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { isNil, map, filter, find, includes } from "lodash";
+import { isNil, map, filter, find, includes, reduce } from "lodash";
 
 import { ShowHide } from "components";
 import { Document, View, Page, Tag, NoDataPage } from "components/pdf";
@@ -36,6 +36,8 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
 
   const subaccountColumns = useMemo(() => {
     return (account: Model.PdfAccount): PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>[] => {
+      // Add in properties to each column that depend on props and table state - properties
+      // that cannot be added yet in the config file.
       const columnsObj = {
         ...SubAccountColumns,
         description: {
@@ -91,14 +93,49 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
           }
         }
       };
-      const ordered = orderColumns<
+      // Map Columns Obj to Array
+      let columns: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>[] = map(
+        columnsObj,
+        (c: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => c
+      );
+      // Calculate Total Column Width Before Filtering Out Unused Columns
+      const totalWidth = reduce(
+        columns,
+        (prev: number, column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) =>
+          prev + column.width,
+        0.0
+      );
+      if (totalWidth !== 0.0) {
+        // Normalize Column Widths Before Filtering Out Unused Columns
+        columns = map(columns, (column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => ({
+          ...column,
+          width: column.width / totalWidth
+        }));
+        // Filter Out Unused Columns
+        columns = filter(columns, (column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) =>
+          includes(options.columns, column.field as string)
+        );
+        // Calculate Total Column Width After Filtering Out Unused Columns
+        const totalWidthWithFilter = reduce(
+          columns,
+          (prev: number, column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) =>
+            prev + column.width,
+          0.0
+        );
+        if (totalWidthWithFilter !== 0.0) {
+          // Normalize Column Widths After Filtering Out Unused Columns
+          columns = map(columns, (column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => ({
+            ...column,
+            width: column.width / totalWidthWithFilter
+          }));
+        }
+      }
+      // Order the Columns
+      return orderColumns<
         PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>,
         PdfBudgetTable.SubAccountRow,
         Model.PdfSubAccount
-      >(map(columnsObj, (c: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) => c));
-      return filter(ordered, (column: PdfTable.Column<PdfBudgetTable.SubAccountRow, Model.PdfSubAccount>) =>
-        includes(options.columns, column.field as string)
-      );
+      >(columns);
     };
   }, []);
 

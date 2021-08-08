@@ -314,7 +314,10 @@ namespace PdfTable {
   }
 
   interface Column<R extends PdfTable.Row, M extends Model.Model> extends GenericTable.Column<R, M> {
-    readonly width?: string | number;
+    // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
+    // of the column width to the overall table width assuming that all columns are present.  When
+    // columns are hidden/shown, this ratio is adjusted.
+    readonly width: number;
     readonly cellProps?: PdfTable.CellStandardProps;
     readonly headerCellProps?: PdfTable.CellStandardProps;
     readonly footer?: Table.FooterPdfColumn;

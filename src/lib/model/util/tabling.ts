@@ -492,7 +492,7 @@ export const createTableData = <
   const convertModelToRow = (model: M): R => {
     return reduce(
       columns,
-      (obj: Partial<R>, col: PdfTable.Column<R, M>) => {
+      (obj: Partial<R>, col: C) => {
         const nullValue = col.nullValue === undefined ? defaultNullValue : col.nullValue;
         const modelValue = !isNil(col.getRowValue)
           ? col.getRowValue(model)

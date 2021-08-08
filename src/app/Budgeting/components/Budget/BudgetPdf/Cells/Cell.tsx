@@ -104,19 +104,12 @@ const Cell = <R extends PdfTable.Row, M extends Model.Model>(props: CellProps<R,
   }, [rawValue, value, callbackParams]);
 
   const cellStyle = useMemo(() => {
-    let cStyle = evaluateOptionalCallbackProp<R, M, Style>(
-      props.isHeader === true ? props.column.headerCellProps?.style : props.column.cellProps?.style,
-      fullCallbackParams
-    );
-    if (!isNil(props.column.width)) {
-      if (typeof props.column.width === "number") {
-        cStyle = { ...cStyle, width: `${props.column.width}px` };
-      } else {
-        cStyle = { ...cStyle, width: props.column.width };
-      }
-    }
     return {
-      ...cStyle,
+      ...evaluateOptionalCallbackProp<R, M, Style>(
+        props.isHeader === true ? props.column.headerCellProps?.style : props.column.cellProps?.style,
+        fullCallbackParams
+      ),
+      width: `${props.column.width * 100.0}%`,
       ...evaluateCellStyle<R, M>(props.style, fullCallbackParams)
     };
   }, [props.column]);
