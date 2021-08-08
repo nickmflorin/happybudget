@@ -73,8 +73,8 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
           {!isNil(subHeaderLeft) && (
             <View className={"budget-page-sub-header-left"}>
               {subHeaderItemHasImage(subHeaderLeft) && (
-                //  @ts-ignore React-PDF does not like the ArrayBuffer vs. Buffer, even though it works fine.
-                <Image className={"budget-page-sub-header-image"} src={subHeaderLeft.image.url} />
+                // @ts-ignore React-PDF does not like the ArrayBuffer vs. Buffer, even though it works fine.
+                <Image className={"budget-page-sub-header-image"} src={subHeaderLeft.image.data} />
               )}
               {subHeaderItemHasInfo(subHeaderLeft) && (
                 <RichText className={"budget-page-sub-header-rich-text"} blocks={subHeaderLeft.info} />
@@ -84,8 +84,8 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
           {!isNil(subHeaderRight) && (
             <View className={"budget-page-sub-header-right"}>
               {subHeaderItemHasImage(subHeaderRight) && (
-                //  @ts-ignore React-PDF does not like the ArrayBuffer vs. Buffer, even though it works fine.
-                <Image className={"budget-page-sub-header-image"} src={subHeaderRight.image.url} />
+                // @ts-ignore React-PDF does not like the ArrayBuffer vs. Buffer, even though it works fine.
+                <Image className={"budget-page-sub-header-image"} src={subHeaderRight.image.data} />
               )}
               {subHeaderItemHasInfo(subHeaderRight) && (
                 <RichText className={"budget-page-sub-header-rich-text"} blocks={subHeaderRight.info} />
