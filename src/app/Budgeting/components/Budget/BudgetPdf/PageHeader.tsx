@@ -3,7 +3,7 @@ import { isNil } from "lodash";
 import { View, RichText, Image } from "components/pdf";
 
 type SubHeaderItemImage = {
-  readonly image: UploadedImage | SavedImage;
+  readonly image: string;
 };
 
 type SubHeaderItemInfo = {
@@ -11,7 +11,7 @@ type SubHeaderItemInfo = {
 };
 
 type SubHeaderImageAndInfo = {
-  readonly image: UploadedImage | SavedImage;
+  readonly image: string;
   readonly info: RichText.Block[];
 };
 
@@ -41,10 +41,11 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
     if (!isNil(props.header.left_image)) {
       subHeaderLeft = {
         ...subHeaderLeft,
-        image: props.header.left_image
+        image: props.header.left_image.url
       };
     }
   }
+
   // Note: We cannot use hooks with @react-pdf components, in particular because of the
   // render callbacks.
   let subHeaderRight: SubHeaderItem | null = null;
@@ -56,7 +57,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
     if (!isNil(props.header.right_image)) {
       subHeaderRight = {
         ...subHeaderRight,
-        image: props.header.right_image
+        image: props.header.right_image.url
       };
     }
   }
@@ -74,7 +75,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
             <View className={"budget-page-sub-header-left"}>
               {subHeaderItemHasImage(subHeaderLeft) && (
                 // @ts-ignore React-PDF does not like the ArrayBuffer vs. Buffer, even though it works fine.
-                <Image className={"budget-page-sub-header-image"} src={subHeaderLeft.image.data} />
+                <Image className={"budget-page-sub-header-image"} src={subHeaderLeft.image} />
               )}
               {subHeaderItemHasInfo(subHeaderLeft) && (
                 <RichText className={"budget-page-sub-header-rich-text"} blocks={subHeaderLeft.info} />
@@ -85,7 +86,7 @@ const PageHeader = (props: PageHeaderProps): JSX.Element => {
             <View className={"budget-page-sub-header-right"}>
               {subHeaderItemHasImage(subHeaderRight) && (
                 // @ts-ignore React-PDF does not like the ArrayBuffer vs. Buffer, even though it works fine.
-                <Image className={"budget-page-sub-header-image"} src={subHeaderRight.image.data} />
+                <Image className={"budget-page-sub-header-image"} src={subHeaderRight.image} />
               )}
               {subHeaderItemHasInfo(subHeaderRight) && (
                 <RichText className={"budget-page-sub-header-rich-text"} blocks={subHeaderRight.info} />
