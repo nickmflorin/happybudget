@@ -658,22 +658,34 @@
         color: lighten($text-secondary, 20%) !important;
       }
     }
-
-    &:disabled,
-    &.disabled,
-    &.fake-disabled {
-      color: $disabled-color !important;
-      border-color: $transparent !important;
-      background-color: transparent;
-      svg {
-        color: $disabled-color !important;
-      }
-    }
   }
 
   &--budget-table-menu {
     padding: 6px 8px;
     line-height: 18px;
     height: 30px;
+    font-weight: 500;
+
+    svg {
+      height: 1.2rem !important;
+      margin-right: 0.5rem;
+    }
+
+    &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
+    &:focus:not(:disabled):not(.disabled):not(.fake-disabled) {
+      color: $green !important;
+      svg {
+        color: $green !important;
+      }
+    }
+
+    &:disabled,
+    &.disabled,
+    &.fake-disabled {
+      color: $disabled-color !important;
+      svg {
+        color: $disabled-color !important;
+      }
+    }
   }
 }

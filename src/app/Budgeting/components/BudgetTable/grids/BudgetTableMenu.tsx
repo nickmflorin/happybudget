@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { Input, Checkbox, Tooltip } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/pro-light-svg-icons";
+import { faSearch } from "@fortawesome/pro-regular-svg-icons";
 
 import { RowNode } from "@ag-grid-community/core";
 
@@ -56,7 +56,7 @@ const BudgetTableMenuAction = ({ action }: BudgetTableMenuActionProps): JSX.Elem
     } else {
       return (
         <IconButton
-          className={"btn btn--icon-only-budget-table-menu dark"}
+          className={"btn btn--budget-table-menu dark"}
           size={"large"}
           onClick={() => !isNil(action.onClick) && action.onClick()}
           disabled={action.disabled}

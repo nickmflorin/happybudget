@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { isNil, map, filter, reduce, find } from "lodash";
 
-import { faTrashAlt, faFileCsv, faLineColumns } from "@fortawesome/pro-solid-svg-icons";
+import { faTrashAlt, faFileCsv, faLineColumns } from "@fortawesome/pro-regular-svg-icons";
 
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
