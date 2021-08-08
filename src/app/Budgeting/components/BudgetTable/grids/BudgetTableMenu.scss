@@ -18,15 +18,15 @@
       }
     }
   }
+
   .toolbar-buttons {
     display: flex;
     margin-right: 8px;
   }
 
-  .btn--caret {
-    &:not(:last-child) {
-      margin-right: 14px;
-    }
+  .btn--icon-only {
+    height: 30px;
+    width: 30px;
   }
 
   .budget-table-menu-left {

@@ -27,7 +27,7 @@ const BudgetTableMenuAction = ({ action }: BudgetTableMenuActionProps): JSX.Elem
       return (
         <Button
           onClick={() => !isNil(action.onClick) && action.onClick()}
-          className={"btn btn--bare btn--budget-table-menu"}
+          className={"btn--bare btn--budget-table-menu"}
           disabled={action.disabled}
           icon={<FontAwesomeIcon className={"icon"} icon={action.icon} />}
           tooltip={
@@ -56,7 +56,7 @@ const BudgetTableMenuAction = ({ action }: BudgetTableMenuActionProps): JSX.Elem
     } else {
       return (
         <IconButton
-          className={"btn btn--budget-table-menu dark"}
+          className={"green-hover"}
           size={"large"}
           onClick={() => !isNil(action.onClick) && action.onClick()}
           disabled={action.disabled}

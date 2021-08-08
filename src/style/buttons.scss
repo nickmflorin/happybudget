@@ -383,6 +383,15 @@
       }
     }
 
+    &.green-hover {
+      &:hover,
+      &:focus {
+        svg {
+          color: $green !important;
+        }
+      }
+    }
+
     &.btn--icon-only-budget-table-menu {
       padding: 6px;
       height: 30px;
