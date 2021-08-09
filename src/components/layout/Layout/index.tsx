@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
@@ -41,19 +42,44 @@ const Layout = ({
   headerHeight,
   contentProps = {}
 }: LayoutProps): JSX.Element => {
+  const [sidebarVisible, setSidebarVisible] = useState(true);
+
+  const layoutClassNameProps = useMemo<LayoutClassNameParams>(
+    (): LayoutClassNameParams => ({
+      "collapsed-layout": collapsed,
+      "expanded-layout": !collapsed,
+      "sidebar-visible": sidebarVisible,
+      "sidebar-hidden": !sidebarVisible
+    }),
+    [collapsed, sidebarVisible]
+  );
+
   return (
     <div className={classNames("application", className)} style={style}>
       {!isNil(sidebar) && (
-        <div className={classNames("sidebar-container", { collapsed })}>
+        <div className={classNames("sidebar-container", layoutClassNameProps)}>
           {Array.isArray(sidebar) ? (
-            <Sidebar collapsed={collapsed} sidebarItems={sidebar as ISidebarItem[]} />
+            <Sidebar
+              className={classNames(layoutClassNameProps)}
+              collapsed={collapsed}
+              sidebarItems={sidebar as ISidebarItem[]}
+              toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
+            />
           ) : (
             sidebar()
           )}
         </div>
       )}
-      <div className={classNames("application-content", { collapsed })}>
-        <Header toolbar={toolbar} {...headerProps} headerHeight={headerHeight} />
+      <div className={classNames("application-content", layoutClassNameProps)}>
+        <Header
+          toolbar={toolbar}
+          {...headerProps}
+          className={classNames(headerProps.className, layoutClassNameProps)}
+          collapsed={collapsed}
+          sidebarVisible={sidebarVisible}
+          headerHeight={headerHeight}
+          toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
+        />
         <Content {...contentProps}>{children}</Content>
         <ShowHide show={includeFooter}>
           <Footer />

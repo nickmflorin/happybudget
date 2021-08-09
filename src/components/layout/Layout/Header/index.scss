@@ -1,35 +1,65 @@
 @import "style/typography";
+@import "style/breakpoints";
 @import "style/colors";
 @import "style/layout";
 
-.primary-header {
-  display: flex;
-  justify-content: space-between;
-
-  .breadcrumb-wrapper {
-    padding-top: 7px;
-    padding-bottom: 7px;
-  }
-
-  .toolbar-wrapper {
-    justify-content: flex-end;
-    flex-grow: 100;
+.header {
+  .primary-header {
     display: flex;
-    padding-right: 10px;
+    justify-content: space-between;
+    align-items: center;
+
+    .btn--header-sidebar-toggle {
+      padding: 8px;
+      padding-left: 0;
+      position: relative;
+      height: 36px;
+      width: 25.5px;
+      margin-right: 5px;
+
+      svg {
+        height: 20px !important;
+        width: 17.5px !important;
+      }
+    }
+
+    .breadcrumb-wrapper {
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
+
+    .toolbar-wrapper {
+      justify-content: flex-end;
+      flex-grow: 100;
+      display: flex;
+      padding-right: 10px;
+    }
+
+    .account-wrapper {
+      width: 36px;
+      padding-top: 7px;
+      padding-bottom: 7px;
+    }
   }
 
-  .account-wrapper {
-    width: 36px;
-    padding-top: 7px;
-    padding-bottom: 7px;
+  .header-dropdown-menu {
+    .dropdown-menu-item {
+      svg {
+        width: 16px;
+        height: auto;
+      }
+    }
   }
-}
 
-.header-dropdown-menu {
-  .dropdown-menu-item {
-    svg {
-      width: 16px;
-      height: auto;
+  &.expanded-layout {
+    // In the case that we are not using a collapsed layout, we always show the
+    // sidebar toggle button - the only exception is cases where the screen is very
+    // large and we do not allow the sidebar to be toggled, but in those cases this
+    // button is hidden with media queries.
+    .btn--header-sidebar-toggle {
+      @include media(">=xl") {
+        display: none;
+      }
     }
   }
 }

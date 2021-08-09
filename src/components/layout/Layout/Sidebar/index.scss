@@ -1,6 +1,7 @@
 @import "style/colors";
 @import "style/typography";
 @import "style/layout";
+@import "style/breakpoints";
 
 .sidebar {
   padding-top: 20px;
@@ -119,7 +120,22 @@
     }
   }
 
-  &.collapsed {
+  .btn--sidebar-close {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  &.expanded-layout {
+    @include media("<=medium") {
+      .btn--sidebar-close {
+        display: block;
+      }
+    }
+  }
+
+  &.collapsed-layout {
     padding: 0px !important;
 
     .logo-container {
@@ -135,6 +151,24 @@
         }
       }
     }
+
+    // The sidebar toggle button is not shown in the header for the expanded
+    // layout case - so it is only applicable here.
+    .sidebar-toggle-btn-container {
+      // Assuming that the sidebar toggle btn is 36px x 36px, we want to add
+      // padding to center in the width of the collapsed sidebar.
+      padding-left: calc(0.5 * (#{$sidebar-collapsed-width} - 36px));
+      padding-right: calc(0.5 * (#{$sidebar-collapsed-width} - 36px));
+      // 8px aligns it vertically with the sidebar toggle btn in the header.
+      padding-top: 8px;
+
+      // For the condensed layout, on larger screens we always show the sidebar
+      // (there is no toggling).
+      @include media(">=xl") {
+        display: none;
+      }
+    }
+
     .sidebar-menu {
       .sidebar-menu-item {
         margin-bottom: 10px;

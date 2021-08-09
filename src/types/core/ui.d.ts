@@ -25,6 +25,13 @@ interface FieldCheck {
   checked: boolean;
 }
 
+type LayoutClassNameParams = {
+  "expanded-layout": boolean,
+  "collapsed-layout": boolean,
+  "sidebar-visible": boolean,
+  "sidebar-hidden": boolean
+}
+
 type SearchIndex = string | string[];
 type SearchIndicies = SearchIndex[];
 
