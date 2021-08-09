@@ -91,7 +91,6 @@ const TemplatesMenu = (): JSX.Element => {
       {createBudgetModalOpen === true && (
         <CreateBudgetModal
           open={true}
-          allowTemplateSelection={false}
           onCancel={() => setCreateBudgetModalOpen(false)}
           onSuccess={(budget: Model.Budget) => {
             setCreateBudgetModalOpen(false);

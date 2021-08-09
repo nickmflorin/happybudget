@@ -2,7 +2,7 @@ import React from "react";
 import { isNil } from "lodash";
 
 import { Form } from "components";
-import { Input, Select } from "components/fields";
+import { Input } from "components/fields";
 import { FormProps } from "components/forms/Form";
 import { UploadBudgetImage } from "components/uploaders";
 import "./BudgetForm.scss";
@@ -10,17 +10,9 @@ import "./BudgetForm.scss";
 interface BudgetFormProps extends FormProps<Http.BudgetPayload> {
   originalImage?: SavedImage | null;
   onImageChange?: (f: UploadedImage | null) => void;
-  templates?: Model.Template[] | Model.SimpleTemplate[];
-  templatesLoading?: boolean;
 }
 
-const BudgetForm: React.FC<BudgetFormProps> = ({
-  originalImage,
-  onImageChange,
-  templates,
-  templatesLoading,
-  ...props
-}) => {
+const BudgetForm: React.FC<BudgetFormProps> = ({ originalImage, onImageChange, ...props }) => {
   return (
     <Form.Form
       className={"budget-form"}
@@ -43,23 +35,6 @@ const BudgetForm: React.FC<BudgetFormProps> = ({
       <Form.Item name={"name"} rules={[{ required: true, message: "Please provide a valid name for the budget." }]}>
         <Input placeholder={"Name"} />
       </Form.Item>
-      {!isNil(templates) ? (
-        <Form.Item name={"template"} label={"Template"} rules={[{ required: false }]}>
-          <Select
-            placeholder={"Choose a template..."}
-            loading={templatesLoading === true}
-            disabled={templatesLoading === true}
-          >
-            {templates.map((template: Model.Template | Model.SimpleTemplate, index: number) => (
-              <Select.Option key={index} value={template.id}>
-                {template.name}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-      ) : (
-        <></>
-      )}
       <Form.Item label={"Avatar"} rules={[{ required: false }]}>
         <UploadBudgetImage
           value={originalImage}

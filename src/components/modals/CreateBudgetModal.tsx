@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -12,44 +12,18 @@ interface CreateBudgetModalProps {
   onCancel: () => void;
   open: boolean;
   templateId?: number;
-  templates?: Model.Template[];
-  templatesLoading?: boolean;
-  allowTemplateSelection?: boolean;
   title?: string;
 }
 
 const CreateBudgetModal = ({
   open,
   templateId,
-  templates,
-  templatesLoading,
-  allowTemplateSelection = true,
   title = "Create Budget",
   onSuccess,
   onCancel
 }: CreateBudgetModalProps): JSX.Element => {
-  const [_templatesLoading, setTemplatesLoading] = useState(false);
-  const [_templates, setTemplates] = useState<Model.SimpleTemplate[]>([]);
-
   const [file, setFile] = useState<UploadedImage | null>(null);
   const [form] = Form.useForm<Http.BudgetPayload>({ isInModal: true });
-
-  useEffect(() => {
-    if (allowTemplateSelection === true && isNil(templates) && isNil(templateId)) {
-      setTemplatesLoading(true);
-      api
-        .getTemplates({ no_pagination: true })
-        .then((response: Http.ListResponse<Model.SimpleTemplate>) => {
-          setTemplates(response.data);
-        })
-        .catch((e: Error) => {
-          form.handleRequestError(e);
-        })
-        .finally(() => {
-          setTemplatesLoading(false);
-        });
-    }
-  }, [allowTemplateSelection, templates]);
 
   return (
     <Modal.Modal
@@ -86,19 +60,7 @@ const CreateBudgetModal = ({
           });
       }}
     >
-      <BudgetForm
-        form={form}
-        onImageChange={(f: UploadedImage | null) => setFile(f)}
-        templatesLoading={templatesLoading !== undefined ? templatesLoading : _templatesLoading}
-        templates={
-          allowTemplateSelection === true && isNil(templateId)
-            ? templates !== undefined
-              ? templates
-              : _templates
-            : undefined
-        }
-        initialValues={{}}
-      />
+      <BudgetForm form={form} onImageChange={(f: UploadedImage | null) => setFile(f)} initialValues={{}} />
     </Modal.Modal>
   );
 };

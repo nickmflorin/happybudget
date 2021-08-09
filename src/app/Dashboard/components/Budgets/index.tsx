@@ -90,7 +90,6 @@ const Budgets = (): JSX.Element => {
       {createBudgetModalOpen === true && (
         <CreateBudgetModal
           open={true}
-          allowTemplateSelection={true}
           onCancel={() => setCreateBudgetModalOpen(false)}
           onSuccess={(budget: Model.Budget) => {
             setCreateBudgetModalOpen(false);
