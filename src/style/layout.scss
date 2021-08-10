@@ -67,11 +67,20 @@ $footer-background-color: $white;
       background: $sidebar-background-color;
       position: fixed;
       height: 100vh;
+      transition: margin-left 0.1s;
 
       &.sidebar-hidden {
         margin-left: -#{$sidebar-width};
+        // We want to show the sidebar-container by default on >=xl screens, regardless of `sidebar-hidden` class. So we are overriding the margin-left value via media query.
+        @include media(">=xl") {
+          margin-left: 0;
+        }
         &.collapsed-layout {
           margin-left: -#{$sidebar-collapsed-width};
+
+          @include media(">=xl") {
+            margin-left: 0;
+          }
         }
       }
 
@@ -163,6 +172,23 @@ $footer-background-color: $white;
         }
       }
 
+      &.sidebar-hidden {
+        margin-left: 0px !important;
+        width: 100% !important;
+        @include media(">=xl") {
+          margin-left: $sidebar-width !important;
+        }
+
+        .header {
+          width: 100% !important;
+        }
+        &.collapsed-layout {
+          @include media(">=xl") {
+            margin-left: $sidebar-collapsed-width !important;
+          }
+        }
+      }
+
       &.collapsed-layout {
         margin-left: $sidebar-collapsed-width;
         .header {
@@ -176,14 +202,6 @@ $footer-background-color: $white;
           .header {
             width: 0;
           }
-        }
-      }
-
-      &.sidebar-hidden {
-        margin-left: 0px !important;
-        width: 100% !important;
-        .header {
-          width: 100% !important;
         }
       }
     }

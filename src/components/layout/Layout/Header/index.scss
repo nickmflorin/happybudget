@@ -17,6 +17,10 @@
       width: 25.5px;
       margin-right: 5px;
 
+      @include media(">=xl") {
+        display: none;
+      }
+
       svg {
         height: 20px !important;
         width: 17.5px !important;
