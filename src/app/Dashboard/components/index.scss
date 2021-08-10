@@ -1,0 +1,40 @@
+@import "style/breakpoints";
+
+.dashboard-card-grid {
+  margin-bottom: 15px;
+  display: grid;
+  grid-template-columns: repeat(1fr);
+  gap: 30px;
+
+  @include media(">=medium") {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include media(">=large") {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @include media(">=xxl") {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @include media(">=xxxl") {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+.sidebar-visible {
+  .dashboard-card-grid {
+    @include media(">=medium") {
+      grid-template-columns: repeat(1, 1fr);
+    }
+
+    @include media(">=large") {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include media(">=xl") {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}

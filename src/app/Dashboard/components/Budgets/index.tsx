@@ -19,7 +19,6 @@ import {
   setBudgetsSearchAction
 } from "../../store/actions";
 import { EmptyCard, BudgetCard } from "../Card";
-import "./index.scss";
 
 const selectBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.data;
 const selectLoadingBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.loading;

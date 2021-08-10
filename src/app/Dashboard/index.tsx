@@ -12,6 +12,8 @@ import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
 import { Contacts, Templates, Budgets } from "./components";
 
+import "./components/index.scss";
+
 const Dashboard = (): JSX.Element => {
   const history = useHistory();
   const location = useLocation();
