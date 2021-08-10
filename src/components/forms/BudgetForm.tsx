@@ -1,8 +1,8 @@
 import React from "react";
 import { isNil } from "lodash";
-import { Input, Select } from "antd";
 
 import { Form } from "components";
+import { Input, Select } from "components/fields";
 import { FormProps } from "components/forms/Form";
 import { UploadBudgetImage } from "components/uploaders";
 import "./BudgetForm.scss";

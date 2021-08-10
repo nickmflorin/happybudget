@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { Dropdown } from "components";
 import { Color } from "components/tagging";
 import { DropdownProps } from "components/dropdowns/Dropdown";
-import { ColorSelect } from "components/forms/fields";
+import { ColorSelect } from "components/fields";
 
 import "./ColorDropdown.scss";
 

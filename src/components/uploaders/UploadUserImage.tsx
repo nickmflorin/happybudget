@@ -9,7 +9,7 @@ import * as typeguards from "lib/model/typeguards";
 
 import { FullSize, ShowHide, VerticalFlexCenter } from "components";
 import { ImageClearButton } from "components/buttons";
-import { UserImageOrInitials, EditImageOverlay } from "components/images";
+import { UserImageOrInitials, EditImageOverlay } from "components/layout/Layout/images";
 
 import Uploader, { UploaderProps } from "./Uploader";
 import "./UploadUserImage.scss";

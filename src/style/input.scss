@@ -10,17 +10,13 @@ input:-webkit-autofill:focus textarea:-webkit-autofill,
 textarea:-webkit-autofill:hover textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
-input.ant-input:focus,
+input:focus,
 textarea:focus,
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused,
 select:-webkit-autofill:focus {
   box-shadow: 0 0 0px 1000px $gray-light inset !important;
   -webkit-box-shadow: 0 0 0px 1000px $gray-light inset !important;
-}
-
-form {
-  width: 100%;
 }
 
 .checkbox-wrapper {
@@ -40,99 +36,56 @@ form {
 
 // This class is not meant to be used in the components.
 .input-base {
-  border-radius: $input-border-radius;
   border: none;
   background-color: $gray-light !important;
-  color: $text-secondary;
+  color: #585858;
   cursor: text;
   position: relative;
   box-sizing: border-box;
   align-items: center;
   font-family: $avenir;
-  font-weight: 400;
+  font-weight: 500;
   width: 100%;
-  padding-top: 6px;
-  padding-bottom: 8px;
-  padding-left: 12px;
-  padding-right: 12px;
   line-height: 22px;
   font-size: 14px;
 }
 
-input.ant-input,
-.input {
-  @extend .input-base;
-
-  &--small {
-    padding-top: 4px;
-    padding-bottom: 6px;
-    padding-left: 8px;
-    padding-right: 8px;
-    font-size: 12px;
-    line-height: 15px;
-    height: 30px !important;
-    border-radius: $input-small-border-radius;
-  }
+.input-small-base {
+  line-height: 16px !important;
+  font-size: 12px !important;
 }
 
-.ant-input-affix-wrapper {
+// The generic `input` class is applied to the wrapping component.  The actual
+// HTML <input> element does not have this class applied and is a child of this
+// wrapping component.
+.input {
   @extend .input-base;
-
   border-radius: $input-border-radius;
-  border: none;
-  color: rgba(0, 0, 0, 0.25);
+  padding-top: 6px;
+  padding-bottom: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+
+  .ant-input-prefix {
+    margin-right: 12px;
+    font-size: 14px;
+  }
+
   input {
-    border-radius: 0px !important;
+    @extend .input-base;
   }
-  &.input--small {
-    padding-top: 4px;
-    padding-bottom: 6px;
-    padding-left: 8px;
-    padding-right: 8px;
-    font-size: 12px;
-    line-height: 15px;
-    height: 30px !important;
-    border-radius: $input-small-border-radius;
 
-    input.ant-input,
-    .input {
-      padding-top: 4px;
-      padding-bottom: 6px;
-      padding-left: 8px;
-      padding-right: 8px;
-      font-size: 12px;
-      line-height: 15px;
-      border-radius: $input-small-border-radius;
-    }
-  }
-}
-
-.ant-input-prefix {
-  margin-right: 12px;
-  font-size: 14px;
-}
-
-.input {
-  .ant-input-wrapper {
-    .ant-input-group-addon {
-      background-color: $gray-light !important;
-      border: none;
-      .anticon {
-        color: $text-secondary;
-      }
-    }
-    input.ant-input {
-      border-left: none;
-    }
-  }
   &--small {
+    @extend .input-small-base;
     padding-top: 4px !important;
-    padding-bottom: 6px !important;
+    padding-bottom: 5px !important;
     padding-left: 8px !important;
     padding-right: 8px !important;
-    font-size: 12px !important;
-    line-height: 16px !important;
     border-radius: $input-small-border-radius !important;
+
+    input {
+      @extend .input-small-base;
+    }
   }
 }
 
@@ -169,9 +122,19 @@ textarea {
 }
 
 .select {
+  min-width: 200px;
   @extend .select-base;
+  .ant-select-selector {
+    @extend .select-base;
+  }
+  &.ant-select-open .ant-select-arrow svg {
+    color: $black;
+  }
   &.disabled {
     @extend .select-disabled-base;
+    .ant-select-selector {
+      @extend .select-disabled-base;
+    }
   }
 }
 
@@ -187,21 +150,5 @@ textarea {
     color: $text-secondary;
     font-weight: 600;
     background-color: #e6f7ff;
-  }
-}
-
-.ant-select {
-  min-width: 200px;
-
-  .ant-select-selector {
-    @extend .select-base;
-  }
-  &.ant-select-open .ant-select-arrow svg {
-    color: $black;
-  }
-  &.disabled {
-    .ant-select-selector {
-      @extend .select-disabled-base;
-    }
   }
 }

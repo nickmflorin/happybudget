@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Button, Input } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
 import { VerticalFlexCenter } from "components";
+import { Button } from "components/buttons";
+import { Input } from "components/fields";
 import { HorizontalMenu } from "components/menus";
 import { IHorizontalMenuItem } from "components/menus/HorizontalMenu";
 import { CreateBudgetModal } from "components/modals";

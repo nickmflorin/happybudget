@@ -1,12 +1,11 @@
 import React from "react";
 import classNames from "classnames";
 
-import { Button, Input } from "antd";
-import { MailOutlined, LockOutlined } from "@ant-design/icons";
-
 import { validateEmail } from "lib/util/validate";
 
 import { Form } from "components";
+import { PasswordInput, EmailInput } from "components/fields";
+import { Button } from "components/buttons";
 import { RouterLink } from "components/links";
 
 import SocialButton from "../SocialButton";
@@ -57,19 +56,14 @@ const LoginForm: React.FC<LoginFormProps> = ({
           })
         ]}
       >
-        <Input className={"input"} size={"large"} placeholder={"Email"} prefix={<MailOutlined className={"icon"} />} />
+        <EmailInput size={"large"} />
       </Form.Item>
       <Form.Item
         className={"mb--0"}
         name={"password"}
         rules={[{ required: true, message: "Please enter a valid password.", min: 8 }]}
       >
-        <Input.Password
-          className={"input"}
-          size={"large"}
-          placeholder={"Passsword"}
-          prefix={<LockOutlined className={"icon"} />}
-        />
+        <PasswordInput size={"large"} />
       </Form.Item>
       <div className={"forgot-password-text"}>
         <RouterLink to={"#"} className={"forgot-link"}>

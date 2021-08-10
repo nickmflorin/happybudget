@@ -4,10 +4,10 @@ import { useHistory } from "react-router-dom";
 import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
-import { Input } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
+import { Input } from "components/fields";
 import { Page } from "components/layout";
 import { EditBudgetModal, CreateBudgetModal } from "components/modals";
 

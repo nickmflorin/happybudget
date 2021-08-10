@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import { isNil } from "lodash";
-import { Input } from "antd";
 
 import { useGroupColors } from "lib/hooks";
 
 import { Form } from "components";
+import { Input } from "components/fields";
 import { FormProps } from "components/forms/Form";
-import { ColorSelect } from "./fields";
+import { ColorSelect } from "../fields";
 
 const GroupForm: React.FC<FormProps<Http.GroupPayload>> = ({ ...props }) => {
   const [colors, loading, error] = useGroupColors();

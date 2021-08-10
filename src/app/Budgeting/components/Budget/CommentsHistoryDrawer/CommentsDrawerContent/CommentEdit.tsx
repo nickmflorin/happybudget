@@ -1,6 +1,5 @@
-import { Input } from "antd";
-
 import { ShowHide } from "components";
+import { TextArea } from "components/fields";
 import { TextWithLink } from "components/links";
 
 import "./CommentEdit.scss";
@@ -18,7 +17,7 @@ const CommentEdit = ({ visible, value, setValue, onSubmit, onClose }: CommentEdi
     <ShowHide show={visible}>
       <div className={"comment-edit"}>
         <div className={"comment-edit-body"}>
-          <Input.TextArea
+          <TextArea
             maxLength={1028}
             value={value}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {

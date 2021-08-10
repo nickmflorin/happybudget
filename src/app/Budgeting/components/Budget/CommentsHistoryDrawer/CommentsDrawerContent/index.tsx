@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
-import { Input, Button } from "antd";
-
+import { Button } from "components/buttons";
+import { TextArea } from "components/fields";
 import { Drawer } from "components/layout";
 import Comments from "./Comments";
 
@@ -54,7 +54,7 @@ const CommentsDrawerContent = ({
         </div>
       </Drawer.Content>
       <Drawer.Footer className={"form-section"}>
-        <Input.TextArea
+        <TextArea
           style={{ marginBottom: 10, height: "5rem" }}
           placeholder={"Leave comment here..."}
           maxLength={1028}

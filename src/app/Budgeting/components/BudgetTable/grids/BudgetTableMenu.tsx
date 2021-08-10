@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { filter, includes, isNil, map } from "lodash";
 import classNames from "classnames";
 
-import { Input, Checkbox, Tooltip } from "antd";
+import { Checkbox, Tooltip } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/pro-regular-svg-icons";
@@ -11,6 +11,7 @@ import { RowNode } from "@ag-grid-community/core";
 
 import { ShowHide } from "components";
 import { Button, IconButton } from "components/buttons";
+import { Input } from "components/fields";
 import { PortalOrRender } from "components/layout";
 
 import "./BudgetTableMenu.scss";

@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import classNames from "classnames";
 
-import { UserImageOrInitials } from "components/images";
-import { UserImageOrInitialsProps } from "components/images/UserImageOrInitials";
+import { UserImageOrInitials } from "components/layout/Layout/images";
+import { UserImageOrInitialsProps } from "components/layout/Layout/images/UserImageOrInitials";
 
 import "./AccountCircleLink.scss";
 

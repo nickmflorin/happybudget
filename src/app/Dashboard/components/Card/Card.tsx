@@ -7,7 +7,7 @@ import { faEllipsisV } from "@fortawesome/pro-light-svg-icons";
 
 import { ShowHide, RenderWithSpinner, Dropdown } from "components";
 import { IconButton } from "components/buttons";
-import { BudgetCardImage } from "components/images";
+import { BudgetCardImage } from "components/layout/Layout/images";
 import { IDropdownMenuItem } from "components/menus/DropdownMenu";
 
 import "./index.scss";

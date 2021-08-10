@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { isNil } from "lodash";
 
-import { Input } from "antd";
-import { InputProps } from "antd/lib/input";
-
 import { formatAsPhoneNumber } from "lib/util/formatters";
+import Input, { InputProps } from "./Input";
 
 interface PhoneNumberInputProps extends Omit<InputProps, "onChange"> {
   readonly displayFormattedValue?: boolean;
@@ -18,7 +16,6 @@ const PhoneNumberInput = ({ displayFormattedValue = true, onChange, ...props }: 
   return (
     <React.Fragment>
       <Input
-        className={"input"}
         size={"large"}
         placeholder={"Phone number"}
         {...props}

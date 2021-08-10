@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Input } from "antd";
 
 import { ShowHide } from "components";
+import { TextArea } from "components/fields";
 import { AccountCircleLink } from "components/links";
 import { TextWithLink } from "components/links";
 
@@ -33,7 +33,7 @@ const CommentReply = ({ comment, visible, onSubmit, onClose }: CommentReplyProps
           <div className={"account-circle-wrapper"}>
             <AccountCircleLink user={comment.user} />
           </div>
-          <Input.TextArea
+          <TextArea
             maxLength={1028}
             value={replyText}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {

@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 
-import { Input, Button } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/pro-light-svg-icons";
 
+import { Input } from "components/fields";
+import { Button } from "components/buttons";
 import { CreateContactModal } from "components/modals";
 import { ActionsMenuBar } from "components/menus";
 import { Page } from "components/layout";

@@ -1,10 +1,9 @@
 import React from "react";
 import classNames from "classnames";
 
-import { Button, Input } from "antd";
-import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons";
-
 import { Form } from "components";
+import { PasswordInput, EmailInput, UserInput } from "components/fields";
+import { Button } from "components/buttons";
 import { RouterLink } from "components/links";
 import { validateEmail, validatePassword } from "lib/util/validate";
 import SocialButton from "../SocialButton";
@@ -43,10 +42,10 @@ const SignupForm = ({
       onFinish={(values: ISignupFormValues) => onSubmit(values)}
     >
       <Form.Item name={"first_name"} rules={[{ required: true, message: "Please enter a valid first name." }]}>
-        <Input className={"input"} size={"large"} prefix={<UserOutlined />} placeholder={"First name"} />
+        <UserInput size={"large"} placeholder={"First name"} />
       </Form.Item>
       <Form.Item name={"last_name"} rules={[{ required: true, message: "Please enter a valid last name." }]}>
-        <Input className={"input"} size={"large"} prefix={<UserOutlined />} placeholder={"Last name"} />
+        <UserInput size={"large"} placeholder={"Last name"} />
       </Form.Item>
       <Form.Item
         name={"email"}
@@ -62,7 +61,7 @@ const SignupForm = ({
           })
         ]}
       >
-        <Input className={"input"} size={"large"} placeholder={"Email"} prefix={<MailOutlined />} />
+        <EmailInput size={"large"} />
       </Form.Item>
       <Form.Item
         name={"password"}
@@ -78,7 +77,7 @@ const SignupForm = ({
           })
         ]}
       >
-        <Input.Password className={"input"} size={"large"} placeholder={"Password"} prefix={<LockOutlined />} />
+        <PasswordInput size={"large"} />
       </Form.Item>
       <Form.Item
         name={"confirm"}
@@ -94,7 +93,7 @@ const SignupForm = ({
           })
         ]}
       >
-        <Input.Password className={"input"} size={"large"} placeholder={"Confirm"} prefix={<LockOutlined />} />
+        <PasswordInput size={"large"} placeholder={"Confirm"} />
       </Form.Item>
       <Form.Footer style={{ marginTop: 20 }}>
         <Button loading={loading} className={"btn btn--login"} htmlType={"submit"}>

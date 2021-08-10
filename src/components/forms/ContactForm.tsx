@@ -1,6 +1,5 @@
 import React from "react";
 import classNames from "classnames";
-import { Input, Select } from "antd";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/pro-solid-svg-icons";
@@ -8,8 +7,9 @@ import { faCaretDown } from "@fortawesome/pro-solid-svg-icons";
 import { ContactTypes } from "lib/model";
 
 import { Form } from "components";
+import { Input, Select } from "components/fields";
 import { FormProps } from "components/forms/Form";
-import { PhoneNumberInput } from "./fields";
+import { PhoneNumberInput, InputOnFocus } from "../fields";
 import "./ContactForm.scss";
 
 interface ContactFormProps extends FormProps<Http.ContactPayload> {
