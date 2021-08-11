@@ -42,7 +42,7 @@ const Layout = ({
   headerHeight,
   contentProps = {}
 }: LayoutProps): JSX.Element => {
-  const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
 
   const layoutClassNameProps = useMemo<LayoutClassNameParams>(
     (): LayoutClassNameParams => ({

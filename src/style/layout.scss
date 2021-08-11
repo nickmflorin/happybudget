@@ -174,7 +174,6 @@ $footer-background-color: $white;
 
       &.sidebar-hidden {
         margin-left: 0px !important;
-        width: 100% !important;
         @include media(">=xl") {
           margin-left: $sidebar-width !important;
         }
