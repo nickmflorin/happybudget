@@ -9,7 +9,7 @@ import { ContactTypes } from "lib/model";
 import { Form } from "components";
 import { Input, Select } from "components/fields";
 import { FormProps } from "components/forms/Form";
-import { PhoneNumberInput, InputOnFocus } from "../fields";
+import { PhoneNumberInput } from "../fields";
 import "./ContactForm.scss";
 
 interface ContactFormProps extends FormProps<Http.ContactPayload> {
