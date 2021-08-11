@@ -21,6 +21,7 @@ export interface LayoutProps {
   headerProps?: StandardComponentProps;
   contentProps?: StandardComponentProps;
   includeFooter?: boolean;
+  showHeaderLogo?: boolean;
   // The default header height is 70px.  But this only applies when there is
   // not a supplementary header below the default header.  To layout the component
   // hierarchy properly with scrolling and fixed headers, we need to programatically
@@ -38,6 +39,7 @@ const Layout = ({
   style = {},
   collapsed = false,
   includeFooter = true,
+  showHeaderLogo = false,
   headerProps = {},
   headerHeight,
   contentProps = {}
@@ -79,6 +81,7 @@ const Layout = ({
           sidebarVisible={sidebarVisible}
           headerHeight={headerHeight}
           toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
+          showHeaderLogo={showHeaderLogo}
         />
         <Content {...contentProps}>{children}</Content>
         <ShowHide show={includeFooter}>

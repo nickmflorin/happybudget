@@ -9,60 +9,68 @@
     justify-content: space-between;
     align-items: center;
 
-    .btn--header-sidebar-toggle {
-      padding: 8px;
-      padding-left: 0;
-      position: relative;
-      height: 36px;
-      width: 25.5px;
-      margin-right: 5px;
-
-      @include media(">=xl") {
-        display: none;
-      }
-
-      svg {
-        height: 20px !important;
-        width: 17.5px !important;
-      }
-    }
-
-    .breadcrumb-wrapper {
-      padding-top: 7px;
-      padding-bottom: 7px;
-    }
-
-    .toolbar-wrapper {
-      justify-content: flex-end;
-      flex-grow: 100;
+    .primary-header-left {
+      flex: 1;
       display: flex;
-      padding-right: 10px;
+      padding: 7px 0;
+
+      .btn--header-sidebar-toggle {
+        position: relative;
+        margin-right: 5px;
+        padding: 8px;
+        padding-left: 0;
+        height: 36px;
+        width: 25.5px;
+
+        @include media(">=xl") {
+          display: none;
+        }
+
+        svg {
+          height: 20px !important;
+          width: 17.5px !important;
+        }
+      }
     }
 
-    .account-wrapper {
-      width: 36px;
-      padding-top: 7px;
-      padding-bottom: 7px;
+    .primary-header-center {
+      padding: 7px 0;
+      height: 50px;
+
+      .logo-link {
+        display: block;
+        height: 100%;
+
+        svg {
+          height: 100%;
+          width: auto;
+        }
+
+        @include media(">=xl") {
+          display: none;
+        }
+      }
+    }
+
+    .primary-header-right {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      padding: 7px 0;
+    }
+  }
+
+  &.sidebar-visible .primary-header-center {
+    .logo-link {
+      display: none;
     }
   }
 
   .header-dropdown-menu {
     .dropdown-menu-item {
       svg {
-        width: 16px;
         height: auto;
-      }
-    }
-  }
-
-  &.expanded-layout {
-    // In the case that we are not using a collapsed layout, we always show the
-    // sidebar toggle button - the only exception is cases where the screen is very
-    // large and we do not allow the sidebar to be toggled, but in those cases this
-    // button is hidden with media queries.
-    .btn--header-sidebar-toggle {
-      @include media(">=xl") {
-        display: none;
+        width: 16px;
       }
     }
   }

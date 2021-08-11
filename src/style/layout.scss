@@ -179,11 +179,23 @@ $footer-background-color: $white;
         }
 
         .header {
-          width: 100% !important;
+          width: 100%;
+
+          @include media(">=xl") {
+            width: calc(100% - #{$sidebar-width});
+          }
         }
         &.collapsed-layout {
           @include media(">=xl") {
             margin-left: $sidebar-collapsed-width !important;
+          }
+
+          .header {
+            width: 100%;
+
+            @include media(">=xl") {
+              width: calc(100% - #{$sidebar-collapsed-width});
+            }
           }
         }
       }
@@ -198,9 +210,6 @@ $footer-background-color: $white;
       &.expanded-layout {
         @include media("<=medium") {
           margin-left: 100%;
-          .header {
-            width: 0;
-          }
         }
       }
     }

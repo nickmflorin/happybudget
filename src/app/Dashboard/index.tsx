@@ -41,6 +41,7 @@ const Dashboard = (): JSX.Element => {
           active: location.pathname.startsWith("/contacts")
         }
       ]}
+      showHeaderLogo={true}
     >
       <Switch>
         <PrivateRoute exact path={"/contacts"} component={Contacts} />
