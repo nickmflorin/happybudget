@@ -17,7 +17,7 @@ const SubAccountUnitCellEditor = (
   return (
     <ChoiceCellEditor<BudgetTable.SubAccountRow, Model.SubAccount, Model.Tag>
       style={{ maxHeight: 300 }}
-      searchIndices={["title"]}
+      searchIndices={["title", "plural_title"]}
       models={units}
       forwardedRef={ref}
       tagProps={{ isPlural: !isNil(row.quantity) && row.quantity > 1 }}
