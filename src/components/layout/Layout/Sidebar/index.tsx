@@ -3,7 +3,7 @@ import { map } from "lodash";
 import classNames from "classnames";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faTimes } from "@fortawesome/pro-light-svg-icons";
+import { faBars, faTimes, faArrowAltToLeft } from "@fortawesome/pro-light-svg-icons";
 
 import { ShowHide } from "components";
 import { IconButton } from "components/buttons";
@@ -23,10 +23,17 @@ export interface ISidebarDropdownItem {
 interface SidebarProps extends StandardComponentProps {
   readonly sidebarItems?: ISidebarItem[];
   readonly collapsed?: boolean;
+  readonly sidebarVisible: boolean;
   readonly toggleSidebar: () => void;
 }
 
-const Sidebar = ({ sidebarItems = [], collapsed = false, toggleSidebar, ...props }: SidebarProps): JSX.Element => {
+const Sidebar = ({
+  sidebarItems = [],
+  collapsed = false,
+  sidebarVisible,
+  toggleSidebar,
+  ...props
+}: SidebarProps): JSX.Element => {
   return (
     <div {...props} className={classNames("sidebar", props.className)}>
       <IconButton
@@ -38,10 +45,16 @@ const Sidebar = ({ sidebarItems = [], collapsed = false, toggleSidebar, ...props
       <ShowHide show={collapsed}>
         <div className={"sidebar-toggle-btn-container"}>
           <IconButton
-            className={"btn--sidebar-sidebar-toggle"}
+            className={"btn--sidebar-toggle"}
             size={"large"}
-            icon={<FontAwesomeIcon icon={faBars} />}
-            onClick={() => toggleSidebar?.()}
+            icon={(params: ClickableIconCallbackParams) => {
+              if (sidebarVisible === true && params.isHovered === true) {
+                return <FontAwesomeIcon icon={faArrowAltToLeft} className={"icon icon--toggle-hover"} />;
+              } else {
+                return <FontAwesomeIcon icon={faBars} />;
+              }
+            }}
+            onClick={() => toggleSidebar()}
           />
         </div>
       </ShowHide>

@@ -311,10 +311,14 @@ interface SubAccountTreeMenuProps
   readonly childrenDefaultVisible?: boolean;
 }
 
+type ClickableIconCallbackParams = {
+  readonly isHovered: boolean;
+}
+
 interface ClickableProps extends StandardComponentProps {
   readonly disabled?: boolean;
   readonly tooltip?: Partial<TooltipPropsWithTitle>;
-  readonly icon?: ReactNode;
+  readonly icon?: ReactNode | ((params: ClickableIconCallbackParams) => JSX.Element);
 }
 
 type HeaderTemplateFormData = {

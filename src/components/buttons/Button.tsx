@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import classNames from "classnames";
 import { Button as AntDButton } from "antd";
 import { ButtonProps as AntDButtonProps } from "antd/lib/button";
@@ -35,23 +35,26 @@ const Button = ({
   // set the Button as disabled, but have to style the button as if it were disabled,
   // and block click events manually.
   const isFakeDisabled = useMemo(() => disabled === true && !isNil(tooltip), [disabled, tooltip]);
+  const [isHovered, setIsHovered] = useState(false);
 
   const prefix = useMemo(() => {
     if (isNil(icon)) {
       return loading === true ? <Spinner /> : <></>;
     } else if (showLoadingIndicatorOverIcon !== false) {
-      return loading === true ? <Spinner /> : icon;
-    } else {
-      return loading === true ? (
+      return loading === true ? <Spinner /> : typeof icon == "function" ? icon({ isHovered }) : icon;
+    } else if (loading === true) {
+      return (
         <React.Fragment>
           <Spinner />
           {icon}
         </React.Fragment>
-      ) : (
-        icon
       );
+    } else if (typeof icon == "function") {
+      return icon({ isHovered });
+    } else {
+      return icon;
     }
-  }, []);
+  }, [isHovered, icon]);
 
   return (
     <TooltipWrapper {...tooltip}>
@@ -63,6 +66,8 @@ const Button = ({
           "fake-disabled": isFakeDisabled
         })}
         disabled={isDisabled}
+        onMouseEnter={() => setIsHovered(!isHovered)}
+        onMouseLeave={() => setIsHovered(!isHovered)}
       >
         {prefix}
         {children}

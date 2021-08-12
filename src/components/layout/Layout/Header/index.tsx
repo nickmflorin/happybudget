@@ -4,7 +4,14 @@ import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faSignOutAlt, faAddressCard, faLock } from "@fortawesome/pro-light-svg-icons";
+import {
+  faBars,
+  faArrowAltToLeft,
+  faArrowAltToRight,
+  faSignOutAlt,
+  faAddressCard,
+  faLock
+} from "@fortawesome/pro-light-svg-icons";
 
 import { Layout } from "antd";
 
@@ -65,7 +72,15 @@ const Header = ({
             <IconButton
               className={"btn--header-sidebar-toggle"}
               size={"large"}
-              icon={<FontAwesomeIcon icon={faBars} />}
+              icon={(params: ClickableIconCallbackParams) => {
+                if (sidebarVisible === true && params.isHovered === true) {
+                  return <FontAwesomeIcon icon={faArrowAltToLeft} className={"icon icon--toggle-hover"} />;
+                } else if (params.isHovered === true) {
+                  return <FontAwesomeIcon icon={faArrowAltToRight} className={"icon icon--toggle-hover"} />;
+                } else {
+                  return <FontAwesomeIcon icon={faBars} />;
+                }
+              }}
               onClick={() => toggleSidebar()}
             />
           </ShowHide>

@@ -167,6 +167,19 @@
       @include media(">=xl") {
         display: none;
       }
+
+      .btn--sidebar-toggle {
+        svg {
+          height: 20px !important;
+          width: 17.5px !important;
+
+          &.icon.icon--toggle-hover {
+            path {
+              fill: $green;
+            }
+          }
+        }
+      }
     }
 
     .sidebar-menu {

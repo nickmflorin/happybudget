@@ -60,6 +60,7 @@ const Layout = ({
               className={classNames(layoutClassNameProps)}
               collapsed={collapsed}
               sidebarItems={sidebar as ISidebarItem[]}
+              sidebarVisible={sidebarVisible}
               toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
             />
           ) : (

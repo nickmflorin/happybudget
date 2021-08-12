@@ -29,6 +29,12 @@
         svg {
           height: 20px !important;
           width: 17.5px !important;
+
+          &.icon.icon--toggle-hover {
+            path {
+              fill: $green;
+            }
+          }
         }
       }
     }
