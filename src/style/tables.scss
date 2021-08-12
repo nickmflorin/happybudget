@@ -123,7 +123,9 @@ $table-border: 1px solid $table-border-color;
   .ag-cell {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    // white-space: nowrap;
+    // This is required to prevent AG Grid from truncating white space around text.
+    white-space: break-spaces;
   }
 
   .ag-cell,
