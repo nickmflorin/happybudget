@@ -1,7 +1,7 @@
 import { Reducer, combineReducers } from "redux";
 
 import { redux } from "lib";
-import { initialModelListResponseState } from "store/initialState";
+
 import { ActionType } from "../actions";
 import initialState, {
   initialAccountState,
@@ -12,7 +12,7 @@ import initialState, {
 import * as factories from "./factories";
 
 const genericReducer = combineReducers({
-  autoIndex: redux.factories.createSimplePayloadReducer<boolean>(ActionType.Template.SetAutoIndex, false),
+  autoIndex: redux.reducers.factories.createSimplePayloadReducer<boolean>(ActionType.Template.SetAutoIndex, false),
   account: factories.createAccountReducer(
     {
       SetId: ActionType.Template.Account.SetId,
@@ -20,8 +20,8 @@ const genericReducer = combineReducers({
       Loading: ActionType.Template.Account.Loading,
       Request: ActionType.Template.Account.Request,
       UpdateInState: ActionType.Template.Account.UpdateInState,
-      TableChanged: ActionType.Template.Account.TableChanged,
-      SubAccounts: {
+      Table: {
+        TableChanged: ActionType.Template.Account.TableChanged,
         Response: ActionType.Template.Account.SubAccounts.Response,
         Request: ActionType.Template.Account.SubAccounts.Request,
         Loading: ActionType.Template.Account.SubAccounts.Loading,
@@ -29,15 +29,15 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Template.Account.SubAccounts.AddToState,
         Deleting: ActionType.Template.Account.SubAccounts.Deleting,
         Creating: ActionType.Template.Account.SubAccounts.Creating,
-        Updating: ActionType.Template.Account.SubAccounts.Updating
-      },
-      Groups: {
-        Response: ActionType.Template.Account.Groups.Response,
-        Request: ActionType.Template.Account.Groups.Request,
-        Loading: ActionType.Template.Account.Groups.Loading,
-        UpdateInState: ActionType.Template.Account.Groups.UpdateInState,
-        AddToState: ActionType.Template.Account.Groups.AddToState,
-        Deleting: ActionType.Template.Account.Groups.Deleting
+        Updating: ActionType.Template.Account.SubAccounts.Updating,
+        Groups: {
+          Response: ActionType.Template.Account.Groups.Response,
+          Request: ActionType.Template.Account.Groups.Request,
+          Loading: ActionType.Template.Account.Groups.Loading,
+          UpdateInState: ActionType.Template.Account.Groups.UpdateInState,
+          AddToState: ActionType.Template.Account.Groups.AddToState,
+          Deleting: ActionType.Template.Account.Groups.Deleting
+        }
       },
       Fringes: {
         TableChanged: ActionType.Template.Account.Fringes.TableChanged,
@@ -60,8 +60,8 @@ const genericReducer = combineReducers({
       Loading: ActionType.Template.SubAccount.Loading,
       Request: ActionType.Template.SubAccount.Request,
       UpdateInState: ActionType.Template.SubAccount.UpdateInState,
-      TableChanged: ActionType.Template.SubAccount.TableChanged,
-      SubAccounts: {
+      Table: {
+        TableChanged: ActionType.Template.SubAccount.TableChanged,
         Response: ActionType.Template.SubAccount.SubAccounts.Response,
         Request: ActionType.Template.SubAccount.SubAccounts.Request,
         Loading: ActionType.Template.SubAccount.SubAccounts.Loading,
@@ -69,15 +69,15 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Template.SubAccount.SubAccounts.AddToState,
         Deleting: ActionType.Template.SubAccount.SubAccounts.Deleting,
         Creating: ActionType.Template.SubAccount.SubAccounts.Creating,
-        Updating: ActionType.Template.SubAccount.SubAccounts.Updating
-      },
-      Groups: {
-        Response: ActionType.Template.SubAccount.Groups.Response,
-        Request: ActionType.Template.SubAccount.Groups.Request,
-        Loading: ActionType.Template.SubAccount.Groups.Loading,
-        UpdateInState: ActionType.Template.SubAccount.Groups.UpdateInState,
-        AddToState: ActionType.Template.SubAccount.Groups.AddToState,
-        Deleting: ActionType.Template.SubAccount.Groups.Deleting
+        Updating: ActionType.Template.SubAccount.SubAccounts.Updating,
+        Groups: {
+          Response: ActionType.Template.SubAccount.Groups.Response,
+          Request: ActionType.Template.SubAccount.Groups.Request,
+          Loading: ActionType.Template.SubAccount.Groups.Loading,
+          UpdateInState: ActionType.Template.SubAccount.Groups.UpdateInState,
+          AddToState: ActionType.Template.SubAccount.Groups.AddToState,
+          Deleting: ActionType.Template.SubAccount.Groups.Deleting
+        }
       },
       Fringes: {
         TableChanged: ActionType.Template.SubAccount.Fringes.TableChanged,
@@ -95,13 +95,13 @@ const genericReducer = combineReducers({
   ),
   budget: factories.createBudgetReducer<Model.Template>(
     {
-      TableChanged: ActionType.Template.Accounts.TableChanged,
       Response: ActionType.Template.Response,
       Loading: ActionType.Template.Loading,
       Request: ActionType.Template.Request,
       SetId: ActionType.Template.SetId,
       UpdateInState: ActionType.Template.UpdateInState,
-      Accounts: {
+      Table: {
+        TableChanged: ActionType.Template.Accounts.TableChanged,
         Response: ActionType.Template.Accounts.Response,
         Request: ActionType.Template.Accounts.Request,
         Loading: ActionType.Template.Accounts.Loading,
@@ -109,24 +109,27 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Template.Accounts.AddToState,
         Deleting: ActionType.Template.Accounts.Deleting,
         Creating: ActionType.Template.Accounts.Creating,
-        Updating: ActionType.Template.Accounts.Updating
-      },
-      Groups: {
-        Response: ActionType.Template.Groups.Response,
-        Request: ActionType.Template.Groups.Request,
-        Loading: ActionType.Template.Groups.Loading,
-        UpdateInState: ActionType.Template.Groups.UpdateInState,
-        AddToState: ActionType.Template.Groups.AddToState,
-        Deleting: ActionType.Template.Groups.Deleting
+        Updating: ActionType.Template.Accounts.Updating,
+        Groups: {
+          Response: ActionType.Template.Groups.Response,
+          Request: ActionType.Template.Groups.Request,
+          Loading: ActionType.Template.Groups.Loading,
+          UpdateInState: ActionType.Template.Groups.UpdateInState,
+          AddToState: ActionType.Template.Groups.AddToState,
+          Deleting: ActionType.Template.Groups.Deleting
+        }
       }
     },
     initialBudgetBudgetState
   ),
   commentsHistoryDrawerOpen: redux.util.identityReducer<boolean>(false),
-  actuals: redux.util.identityReducer<Redux.ModelListResponseStore<Model.Actual>>(initialModelListResponseState),
+  actuals: redux.util.identityReducer<Redux.ModelListResponseStore<Model.Actual>>(
+    redux.initialState.initialModelListResponseState
+  ),
   headerTemplates: redux.util.identityReducer<Modules.Budget.HeaderTemplatesStore>(initialHeaderTemplatesState),
-  subAccountsTree:
-    redux.util.identityReducer<Redux.ModelListResponseStore<Model.SubAccountTreeNode>>(initialModelListResponseState)
+  subAccountsTree: redux.util.identityReducer<Redux.ModelListResponseStore<Model.SubAccountTreeNode>>(
+    redux.initialState.initialModelListResponseState
+  )
 });
 
 const rootReducer: Reducer<Modules.Budget.ModuleStore<Model.Template>, Redux.Action<any>> = (

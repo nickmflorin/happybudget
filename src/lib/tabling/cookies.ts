@@ -30,17 +30,29 @@ export const getHiddenColumns = <R extends Table.Row, M extends Model.Model>(
   return validateHiddenColumns(cookiesHiddenColumns, validateAgainst);
 };
 
-const applyHiddenColumnChange = <R extends Table.Row, M extends Model.Model>(
-  change: Table.ColumnVisibilityChange<R, M>,
+export const applyHiddenColumnChanges = <R extends Table.Row, M extends Model.Model>(
+  changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>,
   hiddenColumns: Table.Field<R, M>[]
 ): Table.Field<R, M>[] => {
-  if (change.visible === true && includes(hiddenColumns, change.field)) {
-    hiddenColumns = filter(hiddenColumns, (value: Table.Field<R, M>) => value !== change.field);
-    return hiddenColumns;
-  } else if (change.visible === false && !includes(hiddenColumns, change.field)) {
-    return [...hiddenColumns, change.field];
-  }
-  return hiddenColumns;
+  const applyHiddenColumnChange = (
+    change: Table.ColumnVisibilityChange<R, M>,
+    cols: Table.Field<R, M>[]
+  ): Table.Field<R, M>[] => {
+    if (change.visible === true && includes(cols, change.field)) {
+      return filter(cols, (value: Table.Field<R, M>) => value !== change.field);
+    } else if (change.visible === false && !includes(cols, change.field)) {
+      return [...cols, change.field];
+    }
+    return cols;
+  };
+
+  changes = Array.isArray(changes) ? changes : [changes];
+  return reduce(
+    changes,
+    (fields: Table.Field<R, M>[], change: Table.ColumnVisibilityChange<R, M>) =>
+      applyHiddenColumnChange(change, fields),
+    hiddenColumns
+  );
 };
 
 export const getHiddenColumnsAfterChanges = <R extends Table.Row, M extends Model.Model>(
@@ -48,13 +60,7 @@ export const getHiddenColumnsAfterChanges = <R extends Table.Row, M extends Mode
   changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>
 ): Table.Field<R, M>[] => {
   const hiddenColumns = getHiddenColumns(cookieName);
-  const arrayOfChanges = Array.isArray(changes) ? changes : [changes];
-  return reduce(
-    arrayOfChanges,
-    (fields: Table.Field<R, M>[], change: Table.ColumnVisibilityChange<R, M>) =>
-      applyHiddenColumnChange(change, fields),
-    hiddenColumns
-  );
+  return applyHiddenColumnChanges(changes, hiddenColumns);
 };
 
 export const setHiddenColumns = <R extends Table.Row, M extends Model.Model>(

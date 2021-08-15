@@ -138,6 +138,7 @@ namespace Table {
     readonly page?: Table.FooterColumn<R, M>;
     readonly cellRenderer?: string | Partial<Table.GridSet<string>>;
     readonly cellClass?: Table.CellClassName;
+    // Only applicable for BudgetTable - we might want to create a separate BudgetTable.Column type.
     readonly isCalculating?: boolean;
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
@@ -174,7 +175,7 @@ namespace Table {
 
   type MenuAction = {
     readonly icon: import("@fortawesome/fontawesome-svg-core").IconProp;
-    readonly tooltip?: Partial<import("antd/lib/tooltip").TooltipPropsWithTitle> | string;
+    readonly tooltip?: Tooltip;
     // If being wrapped in a Dropdown, the onClick prop will not be used.
     readonly onClick?: () => void;
     readonly disabled?: boolean;

@@ -14,7 +14,7 @@ const selectActuals = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.actuals.data
 );
 const selectContacts = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.user.contacts.data
+  (state: Modules.ApplicationStore) => state.user.contacts.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.actuals.search

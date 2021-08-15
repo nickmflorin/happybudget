@@ -2,6 +2,8 @@
 @import "style/colors";
 
 .page {
+  overflow-y: hidden;
+
   .page-header {
     margin-bottom: 10px;
     display: flex;
@@ -23,5 +25,10 @@
     .extra-wrapper {
       display: flex;
     }
+  }
+
+  .page-content {
+    // If the page-header changes sizes, this needs to be adjusted as well.
+    max-height: calc(100% - 36px - 10px);
   }
 }

@@ -80,7 +80,7 @@ interface ILazyBreadCrumbItem {
 interface IBreadCrumbItem {
   readonly id: number | string;
   readonly url?: string;
-  readonly tooltip?: import("antd/lib/tooltip").TooltipPropsWithTitle;
+  readonly tooltip?: Tooltip;
   readonly text?: string;
   readonly render?: (params: IBreadCrumbItemRenderParams) => React.ReactChild;
   readonly options?: IBreadCrumbItemOption[];
@@ -311,13 +311,15 @@ interface SubAccountTreeMenuProps
   readonly childrenDefaultVisible?: boolean;
 }
 
+type Tooltip = Omit<Partial<import("antd/lib/tooltip").TooltipPropsWithTitle>, "title"> & { readonly title: string } | string;
+
 type ClickableIconCallbackParams = {
   readonly isHovered: boolean;
 }
 
 interface ClickableProps extends StandardComponentProps {
   readonly disabled?: boolean;
-  readonly tooltip?: Partial<TooltipPropsWithTitle>;
+  readonly tooltip?: Tooltip;
   readonly icon?: ReactNode | ((params: ClickableIconCallbackParams) => JSX.Element);
 }
 

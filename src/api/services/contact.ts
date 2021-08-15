@@ -35,3 +35,24 @@ export const deleteContact = async (id: number, options: Http.RequestOptions = {
   const url = URL.v1("contacts", id);
   return client.delete<null>(url, options);
 };
+
+export const bulkUpdateContacts = async (
+  data: Http.BulkUpdatePayload<Http.ContactPayload>[],
+  options: Http.RequestOptions = {}
+): Promise<Model.Contact> => {
+  const url = URL.v1("contacts", "bulk-update");
+  return client.patch<Model.Contact>(url, { data }, options);
+};
+
+export const bulkCreateContacts = async (
+  payload: Http.BulkCreatePayload<Http.ContactPayload>,
+  options: Http.RequestOptions = {}
+): Promise<Http.BulkCreateResponse<Model.Contact>> => {
+  const url = URL.v1("contacts", "bulk-create");
+  return client.patch<Http.BulkCreateResponse<Model.Contact>>(url, payload, options);
+};
+
+export const bulkDeleteContacts = async (ids: number[], options: Http.RequestOptions = {}): Promise<void> => {
+  const url = URL.v1("contacts", "bulk-delete");
+  return client.patch<void>(url, { ids }, options);
+};

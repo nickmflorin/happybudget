@@ -75,7 +75,7 @@ const Table = <R extends Table.Row, M extends Model.Model>({
     return { data, footer, page };
   }, []);
 
-  const hasExpandColumn = useMemo(() => !isNil(props.rowCanExpand), [props.rowCanExpand]);
+  const hasExpandColumn = useMemo(() => !isNil(props.onRowExpand), [props.onRowExpand]);
 
   useImperativeHandle(table, () => ({
     applyTableChange: grid.current.applyTableChange,

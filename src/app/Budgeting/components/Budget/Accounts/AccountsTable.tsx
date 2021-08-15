@@ -16,13 +16,13 @@ import * as actions from "../../../store/actions/budget/accounts";
 import PreviewModal from "../PreviewModal";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.groups.data
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.children.data
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.children.search
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.search
 );
 
 interface AccountsTableProps {

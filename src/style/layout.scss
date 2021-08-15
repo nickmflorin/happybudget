@@ -137,7 +137,7 @@ $sidebar-background-color: #fcfcfc;
         flex-direction: row;
 
         .sub-content {
-          overflow-y: scroll;
+          overflow-y: hidden;
           display: flex;
           flex-direction: column;
           padding: 10px 15px;

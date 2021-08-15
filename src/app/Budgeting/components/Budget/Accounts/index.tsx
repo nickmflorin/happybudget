@@ -14,10 +14,10 @@ import AccountsTable from "./AccountsTable";
 import AccountsCommentsHistory from "./AccountsCommentsHistory";
 
 const selectAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.children.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.loading
 );
 const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.groups.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.groups.loading
 );
 const selectLoading = createSelector(
   selectAccountsLoading,

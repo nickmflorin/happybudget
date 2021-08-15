@@ -4,11 +4,12 @@ import { call, put, select, cancelled, take, cancel, spawn } from "redux-saga/ef
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { redux } from "lib";
 
 import { ActionType } from "../../actions";
 import { loadingBudgetAction, updateBudgetInStateAction } from "../../actions/budget";
 import * as actions from "../../actions/budget/account";
-import { createStandardSaga, createStandardFringesSaga, createAccountTaskSet, createFringeTaskSet } from "../factories";
+import { createStandardSaga, createAccountTaskSet, createFringeTaskSet } from "../factories";
 
 export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
   const accountId = yield select((state: Modules.ApplicationStore) => state.budget.budget.account.id);
@@ -144,35 +145,33 @@ export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
   }
 }
 
-const fringeTasks = createFringeTaskSet<Model.Budget>(
-  {
-    response: actions.responseFringesAction,
-    loading: actions.loadingFringesAction,
-    addToState: actions.addFringeToStateAction,
-    deleting: actions.deletingFringeAction,
-    creating: actions.creatingFringeAction,
-    updating: actions.updatingFringeAction,
-    budget: {
-      loading: loadingBudgetAction,
-      updateInState: updateBudgetInStateAction
-    }
-  },
-  {
-    request: api.getBudgetFringes,
-    create: api.createBudgetFringe,
-    bulkUpdate: api.bulkUpdateBudgetFringes,
-    bulkCreate: api.bulkCreateBudgetFringes,
-    bulkDelete: api.bulkDeleteBudgetFringes
-  },
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.id
-);
-
-const fringesRootSaga = createStandardFringesSaga(
+const fringesRootSaga = redux.sagas.factories.createTableSaga(
   {
     Request: ActionType.Budget.Account.Fringes.Request,
     TableChanged: ActionType.Budget.Account.Fringes.TableChanged
   },
-  fringeTasks
+  createFringeTaskSet<Model.Budget>(
+    {
+      response: actions.responseFringesAction,
+      loading: actions.loadingFringesAction,
+      addToState: actions.addFringeToStateAction,
+      deleting: actions.deletingFringeAction,
+      creating: actions.creatingFringeAction,
+      updating: actions.updatingFringeAction,
+      budget: {
+        loading: loadingBudgetAction,
+        updateInState: updateBudgetInStateAction
+      }
+    },
+    {
+      request: api.getBudgetFringes,
+      create: api.createBudgetFringe,
+      bulkUpdate: api.bulkUpdateBudgetFringes,
+      bulkCreate: api.bulkCreateBudgetFringes,
+      bulkDelete: api.bulkDeleteBudgetFringes
+    },
+    (state: Modules.ApplicationStore) => state.budget.budget.budget.id
+  )
 );
 
 const tasks = createAccountTaskSet<Model.Budget>(
@@ -200,7 +199,7 @@ const tasks = createAccountTaskSet<Model.Budget>(
     }
   },
   (state: Modules.ApplicationStore) => state.budget.budget.account.id,
-  (state: Modules.ApplicationStore) => state.budget.budget.account.children.data,
+  (state: Modules.ApplicationStore) => state.budget.budget.account.table.data,
   (state: Modules.ApplicationStore) => state.budget.budget.autoIndex
 );
 
@@ -226,13 +225,11 @@ function* watchForAccountIdChangedSaga(): SagaIterator {
   }
 }
 
-const rootAccountSaga = createStandardSaga(
+const rootAccountSaga = createStandardSaga<Tables.SubAccountRow, Model.SubAccount>(
   {
     Request: ActionType.Budget.Account.SubAccounts.Request,
-    TableChange: ActionType.Budget.Account.TableChanged,
-    Groups: {
-      Request: ActionType.Budget.Account.Groups.Request
-    },
+    TableChanged: ActionType.Budget.Account.TableChanged,
+    Groups: { Request: ActionType.Budget.Account.Groups.Request },
     Comments: {
       Request: ActionType.Budget.Account.Comments.Request,
       Submit: ActionType.Budget.Account.Comments.Create,
@@ -244,24 +241,15 @@ const rootAccountSaga = createStandardSaga(
     }
   },
   {
-    Request: tasks.getSubAccounts,
-    handleDataChangeEvent: tasks.handleDataChangeEvent,
-    handleRowAddEvent: tasks.handleRowAddEvent,
-    handleRowDeleteEvent: tasks.handleRowDeleteEvent,
-    handleAddRowToGroupEvent: tasks.handleAddRowToGroupEvent,
-    handleRemoveRowFromGroupEvent: tasks.handleRemoveRowFromGroupEvent,
-    handleDeleteGroupEvent: tasks.handleDeleteGroupEvent,
-    Groups: {
-      Request: tasks.getGroups
+    ...tasks,
+    comments: {
+      request: getCommentsTask,
+      submit: submitCommentTask,
+      delete: deleteCommentTask,
+      edit: editCommentTask
     },
-    Comments: {
-      Request: getCommentsTask,
-      Submit: submitCommentTask,
-      Delete: deleteCommentTask,
-      Edit: editCommentTask
-    },
-    History: {
-      Request: getHistoryTask
+    history: {
+      request: getHistoryTask
     }
   },
   watchForRequestAccountSaga,

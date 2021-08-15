@@ -70,6 +70,7 @@ export interface DataGridProps<R extends Table.Row, M extends Model.Model>
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
   readonly hasExpandColumn: boolean;
+  readonly expandCellTooltip?: string;
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
   readonly onGridReady: (event: GridReadyEvent) => void;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
@@ -100,6 +101,7 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
   defaultRowLabel,
   cookieNames,
   hasExpandColumn,
+  expandCellTooltip,
   includeRowInNavigation,
   refreshRowExpandColumnOnCellHover,
   cellClass,
@@ -263,7 +265,8 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
         framework.columnObjs.ExpandColumn({
           cellRendererParams: {
             onClick: onRowExpand,
-            rowCanExpand: rowCanExpand
+            rowCanExpand: rowCanExpand,
+            tooltip: expandCellTooltip
           }
         }),
         ...cs
@@ -956,7 +959,7 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
       is hovered.  We should figure out if there is a way to optimize
       this to only refresh under certain circumstances.
       */
-      if (!isNil(onRowExpand) && !isNil(rowCanExpand)) {
+      if (hasExpandColumn) {
         if (
           includes(
             map(localColumns, (col: Table.Column<R, M>) => col.field),

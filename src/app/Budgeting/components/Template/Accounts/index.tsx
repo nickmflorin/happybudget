@@ -13,10 +13,10 @@ import { requestAccountsAction, requestGroupsAction } from "../../../store/actio
 import AccountsTable from "./AccountsTable";
 
 const selectAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.children.loading
+  (state: Modules.ApplicationStore) => state.budget.template.budget.table.loading
 );
 const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.groups.loading
+  (state: Modules.ApplicationStore) => state.budget.template.budget.table.groups.loading
 );
 const selectLoading = createSelector(
   selectAccountsLoading,

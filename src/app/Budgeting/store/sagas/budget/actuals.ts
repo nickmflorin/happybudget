@@ -34,9 +34,14 @@ function* bulkCreateTask(budgetId: number, e: Table.RowAddEvent<R, C>, errorMess
   const requestPayload: Http.BulkCreatePayload<P> = tabling.util.createBulkCreatePayload<R, C, P>(e.payload);
   yield put(actions.creatingActualAction(true));
   try {
-    const response: Http.BulkCreateResponse<B, C> = yield call(api.bulkCreateBudgetActuals, budgetId, requestPayload, {
-      cancelToken: source.token
-    });
+    const response: Http.BulkCreateChildrenResponse<B, C> = yield call(
+      api.bulkCreateBudgetActuals,
+      budgetId,
+      requestPayload,
+      {
+        cancelToken: source.token
+      }
+    );
     yield all(response.children.map((actual: C) => put(actions.addActualToStateAction(actual))));
     yield put(updateBudgetInStateAction(response.data));
   } catch (err) {
@@ -63,7 +68,7 @@ function* bulkUpdateTask(
     requestPayload.map((p: Http.BulkUpdatePayload<P>) => put(actions.updatingActualAction({ id: p.id, value: true })))
   );
   try {
-    const response: Http.BulkResponse<B> = yield call(api.bulkUpdateBudgetActuals, budgetId, requestPayload, {
+    const response: Http.BulkModelResponse<B> = yield call(api.bulkUpdateBudgetActuals, budgetId, requestPayload, {
       cancelToken: source.token
     });
     yield put(updateBudgetInStateAction(response.data));
@@ -93,7 +98,7 @@ function* bulkDeleteTask(budgetId: number, e: Table.RowDeleteEvent<R, C>, errorM
 
     yield all(ids.map((id: number) => put(actions.deletingActualAction({ id, value: true }))));
     try {
-      const response: Http.BulkResponse<B> = yield call(api.bulkDeleteBudgetActuals, budgetId, ids, {
+      const response: Http.BulkModelResponse<B> = yield call(api.bulkDeleteBudgetActuals, budgetId, ids, {
         cancelToken: source.token
       });
       yield put(updateBudgetInStateAction(response.data));

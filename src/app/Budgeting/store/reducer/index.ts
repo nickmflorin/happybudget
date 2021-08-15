@@ -9,11 +9,11 @@ import templateRootReducer from "./template";
 const rootReducer: Reducer<Modules.Budget.Store, Redux.Action<any>> = combineReducers({
   budget: budgetRootReducer,
   template: templateRootReducer,
-  fringeColors: redux.factories.createListResponseReducer<string>({
+  fringeColors: redux.reducers.factories.createListResponseReducer<string>({
     Response: ActionType.FringeColors.Response,
     Loading: ActionType.FringeColors.Loading
   }),
-  subaccountUnits: redux.factories.createModelListResponseReducer<Model.Tag>({
+  subaccountUnits: redux.reducers.factories.createModelListResponseReducer<Model.Tag>({
     Response: ActionType.SubAccountUnits.Response,
     Loading: ActionType.SubAccountUnits.Loading
   })

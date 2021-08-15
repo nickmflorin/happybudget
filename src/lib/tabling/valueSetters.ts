@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
-import { toApiDateTime } from "lib/util/dates";
+import { util } from "lib";
 
 /* prettier-ignore */
 export const percentageToDecimalValueSetter =
@@ -55,10 +55,25 @@ export const dateTimeValueSetter =
         params.data[field] = null;
         return true;
       }
-      const dateTime = toApiDateTime(params.newValue);
+      const dateTime = util.dates.toApiDateTime(params.newValue);
       if (!isNil(dateTime)) {
         params.data[field] = dateTime;
         return true;
       }
       return false;
+    };
+
+/* prettier-ignore */
+export const emailValueSetter =
+<R extends Table.Row>(field: keyof R) =>
+    (params: ValueSetterParams): boolean => {
+      if (params.newValue === undefined || params.newValue === null) {
+        params.data[field] = null;
+        return true;
+      }
+      if (!util.validate.validateEmail(params.newValue)) {
+        return false;
+      }
+      params.data[field] = params.newValue;
+      return true;
     };

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { isNil } from "lodash";
 import classNames from "classnames";
-import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 
 import { ShowHide, TooltipWrapper, Separator } from "components";
 
@@ -19,7 +18,7 @@ export interface ISidebarItem {
   children?: ISidebarItem[];
   childrenLoading?: boolean;
   defaultShowChildren?: boolean;
-  tooltip?: TooltipPropsWithTitle;
+  tooltip?: Tooltip;
   onClick?: () => void;
   onActivated?: () => void;
 }
@@ -78,7 +77,7 @@ const SidebarItem = ({
     return <></>;
   }
   return (
-    <TooltipWrapper {...tooltip}>
+    <TooltipWrapper tooltip={tooltip}>
       <div className={classNames("sidebar-menu-item", { active: isActive })}>
         <div
           className={"sidebar-menu-item-item"}

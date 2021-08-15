@@ -4,7 +4,7 @@ import { isNil, filter, map } from "lodash";
 
 import { ColumnApi, GridApi } from "@ag-grid-community/core";
 
-import { util } from "lib";
+import { util, hooks } from "lib";
 import TableApis from "./apis";
 import * as cookies from "./cookies";
 
@@ -137,20 +137,22 @@ export const useHiddenColumns = <R extends Table.Row, M extends Model.Model>(
     }
   }, [params.cookie]);
 
-  const changeColumnVisibility = (changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>, sizeToFit?: boolean) => {
-    const arrayOfChanges = Array.isArray(changes) ? changes : [changes];
-    map(arrayOfChanges, (change: Table.ColumnVisibilityChange<R, M>) =>
-      params.apis.columnMap((api: ColumnApi) => api.setColumnVisible(change.field as string, change.visible))
-    );
-    if (sizeToFit !== false) {
-      params.apis.gridMap((api: GridApi) => api.sizeColumnsToFit());
-    }
-    if (!isNil(params.cookie)) {
-      const newHiddenColumns = cookies.getHiddenColumnsAfterChanges(params.cookie, changes);
+  const changeColumnVisibility = hooks.useDynamicCallback(
+    (changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>, sizeToFit?: boolean) => {
+      const arrayOfChanges = Array.isArray(changes) ? changes : [changes];
+      map(arrayOfChanges, (change: Table.ColumnVisibilityChange<R, M>) =>
+        params.apis.columnMap((api: ColumnApi) => api.setColumnVisible(change.field as string, change.visible))
+      );
+      if (sizeToFit !== false) {
+        params.apis.gridMap((api: GridApi) => api.sizeColumnsToFit());
+      }
+      const newHiddenColumns = cookies.applyHiddenColumnChanges(changes, hiddenColumns);
       _setHiddenColumns(newHiddenColumns);
-      cookies.setHiddenColumns(params.cookie, newHiddenColumns);
+      if (!isNil(params.cookie)) {
+        cookies.setHiddenColumns(params.cookie, newHiddenColumns);
+      }
     }
-  };
+  );
 
   return [hiddenColumns, changeColumnVisibility];
 };

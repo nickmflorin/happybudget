@@ -11,14 +11,7 @@ type M = Model.Account;
 type C = Model.SubAccount;
 type P = Http.SubAccountPayload;
 
-export interface AccountTasksActionMap<B extends Model.Budget | Model.Template> {
-  deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  creating: Redux.ActionCreator<boolean>;
-  updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  addToState: Redux.ActionCreator<C>;
-  loading: Redux.ActionCreator<boolean>;
-  response: Redux.ActionCreator<Http.ListResponse<C>>;
-  request: Redux.ActionCreator<null>;
+export type AccountTasksActionMap<B extends Model.Budget | Model.Template> = Redux.BudgetTableActionCreatorMap<C> & {
   budget: {
     loading: Redux.ActionCreator<boolean>;
     updateInState: Redux.ActionCreator<Partial<B>>;
@@ -27,26 +20,12 @@ export interface AccountTasksActionMap<B extends Model.Budget | Model.Template> 
     request: Redux.ActionCreator<null>;
     response: Redux.ActionCreator<Model.Account | undefined>;
   };
-  groups: {
-    deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
-    loading: Redux.ActionCreator<boolean>;
-    response: Redux.ActionCreator<Http.ListResponse<Model.Group>>;
-    request: Redux.ActionCreator<null>;
-  };
-}
+};
 
-export interface AccountTaskSet {
-  handleRowAddEvent: Redux.Task<Table.RowAddEvent<R, C>>;
-  handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent<R, C>>;
-  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R, C>>;
-  handleAddRowToGroupEvent: Redux.Task<Table.RowAddToGroupEvent<R, C>>;
-  handleRemoveRowFromGroupEvent: Redux.Task<Table.RowRemoveFromGroupEvent<R, C>>;
-  handleDeleteGroupEvent: Redux.Task<Table.GroupDeleteEvent>;
-  getSubAccounts: Redux.Task<null>;
-  getGroups: Redux.Task<null>;
+export type AccountTaskSet = Redux.BudgetTableTaskMap<R, C> & {
   getAccount: Redux.Task<null>;
   handleAccountChange: Redux.Task<number>;
-}
+};
 
 export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
   /* eslint-disable indent */
@@ -387,8 +366,8 @@ export const createAccountTaskSet = <B extends Model.Budget | Model.Template>(
     handleRowAddEvent: handleRowAddEvent,
     handleRowDeleteEvent: handleRowDeleteEvent,
     handleDataChangeEvent: handleDataChangeEvent,
-    getSubAccounts: getSubAccounts,
-    getGroups: getGroups,
+    request: getSubAccounts,
+    requestGroups: getGroups,
     getAccount: getAccount,
     handleAccountChange: handleAccountChange
   };

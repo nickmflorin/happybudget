@@ -1,7 +1,6 @@
 import React, { ReactNode, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { map, isNil, orderBy, forEach } from "lodash";
-import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 import classNames from "classnames";
 
 import { Dropdown, TooltipWrapper } from "components";
@@ -17,7 +16,7 @@ const isLazyBreadCrumbItem = (item: IBreadCrumbItem | ILazyBreadCrumbItem): item
 interface BreadCrumbGenericItemProps extends StandardComponentProps {
   readonly url?: string;
   readonly children: ReactNode;
-  readonly tooltip?: TooltipPropsWithTitle;
+  readonly tooltip?: Tooltip;
   readonly primary?: boolean;
   suppressClickBehavior?: boolean;
   readonly onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
@@ -48,7 +47,7 @@ const BreadCrumbGenericItem = ({
         }
       }}
     >
-      <TooltipWrapper {...tooltip}>{children}</TooltipWrapper>
+      <TooltipWrapper tooltip={tooltip}>{children}</TooltipWrapper>
     </div>
   );
 };

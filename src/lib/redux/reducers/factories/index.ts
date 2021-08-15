@@ -1,27 +1,11 @@
 import { Reducer } from "redux";
 import { isNil, filter, find } from "lodash";
 import { util } from "lib";
-import { warnInconsistentState } from "../util";
+import { warnInconsistentState } from "../../util";
 
-export * from "./counter";
 export * from "./comments";
-export * from "./list";
 export * from "./detail";
-
-export interface FactoryOptions<S, A extends Redux.Action<any> = Redux.Action<any>> {
-  initialState: S;
-  excludeActions: null | ((action: A, state: S) => boolean | undefined | void);
-  extension: Reducer<S, A> | Reducer<S, A>[] | null;
-  /* eslint-disable no-unused-vars */
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  subReducers: { [Property in keyof Partial<S>]: Reducer<any, A> } | null | {};
-  extensions: { [key: string]: Reducer<S, A> } | null;
-  strictSelect: boolean;
-}
-
-export type MappedReducers<O, S, A extends Redux.Action<any> = Redux.Action<any>> = Partial<
-  Record<keyof O, Reducer<S, A>>
->;
+export * from "./table";
 
 export const createSimplePayloadReducer = <P, A extends Redux.Action<P> = Redux.Action<P>>(
   actionType: string,

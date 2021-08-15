@@ -15,7 +15,7 @@ interface SubAccountsTableProps extends Omit<BudgetSubAccountsTableProps, OmitTa
 }
 
 const selectContacts = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.user.contacts.data
+  (state: Modules.ApplicationStore) => state.user.contacts.table.data
 );
 
 const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {

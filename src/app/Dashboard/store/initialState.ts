@@ -1,14 +1,14 @@
-import { initialModelListResponseState } from "store/initialState";
+import { redux } from "lib";
 
 const initialState: Modules.Dashboard.Store = {
-  budgets: initialModelListResponseState,
+  budgets: redux.initialState.initialModelListResponseState,
   templates: {
-    ...initialModelListResponseState,
+    ...redux.initialState.initialModelListResponseState,
     duplicating: [],
     moving: []
   },
   community: {
-    ...initialModelListResponseState,
+    ...redux.initialState.initialModelListResponseState,
     duplicating: [],
     hiding: [],
     showing: []

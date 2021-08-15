@@ -39,7 +39,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
                   ...action.tooltip,
                   overlayClassName: classNames({ disabled: action.disabled === true }, action.tooltip.overlayClassName)
                 }
-            : {}
+            : undefined
         }
       >
         {action.text}
@@ -67,7 +67,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
                   ...action.tooltip,
                   overlayClassName: classNames({ disabled: action.disabled === true }, action.tooltip.overlayClassName)
                 }
-            : {}
+            : undefined
         }
       />
     );

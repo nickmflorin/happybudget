@@ -20,10 +20,10 @@ const selectDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.account.detail.data
 );
 const selectSubAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.children.loading
+  (state: Modules.ApplicationStore) => state.budget.template.account.table.loading
 );
 const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.groups.loading
+  (state: Modules.ApplicationStore) => state.budget.template.account.table.groups.loading
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,

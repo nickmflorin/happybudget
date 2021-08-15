@@ -24,7 +24,7 @@ const Link = ({ className, children, tooltip, icon, disabled, ...props }: LinkPr
   }, [isHovered, icon]);
 
   return (
-    <TooltipWrapper {...tooltip}>
+    <TooltipWrapper tooltip={tooltip}>
       <a
         {...props}
         className={classNames("link", className, {

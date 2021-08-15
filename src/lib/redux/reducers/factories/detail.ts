@@ -1,15 +1,6 @@
 import { Reducer } from "redux";
-import { initialDetailResponseState } from "store/initialState";
+import { redux } from "lib";
 import { mergeOptionsWithDefaults, createObjectReducerFromMap } from "./util";
-import { MappedReducers, FactoryOptions } from ".";
-
-export type IDetailResponseActionMap = {
-  Loading: string;
-  Response: string;
-  Request: string;
-  RemoveFromState: string;
-  UpdateInState: string;
-};
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
@@ -29,12 +20,15 @@ export const createDetailResponseReducer = <
   A extends Redux.Action<any> = Redux.Action<any>
 >(
   /* eslint-disable indent */
-  mappings: Partial<IDetailResponseActionMap>,
-  options: Partial<FactoryOptions<S, A>> = {}
+  mappings: Partial<Redux.DetailResponseActionMap>,
+  options: Partial<Redux.FactoryOptions<Redux.DetailResponseActionMap, S, A>> = {}
 ): Reducer<S, A> => {
-  const Options = mergeOptionsWithDefaults<S, A>(options, initialDetailResponseState as S);
+  const Options = mergeOptionsWithDefaults<Redux.DetailResponseActionMap, S, A>(
+    options,
+    redux.initialState.initialDetailResponseState as S
+  );
 
-  const transformers: MappedReducers<IDetailResponseActionMap, S, A> = {
+  const transformers: Redux.MappedReducers<Redux.DetailResponseActionMap, S, A> = {
     Response: (st: S = Options.initialState, action: Redux.Action<M>) => ({
       ...st,
       data: action.payload,
@@ -49,5 +43,5 @@ export const createDetailResponseReducer = <
     Request: (st: S = Options.initialState) => ({ ...st, responseWasReceived: false })
   };
 
-  return createObjectReducerFromMap<IDetailResponseActionMap, S, A>(mappings, transformers, Options);
+  return createObjectReducerFromMap<Redux.DetailResponseActionMap, S, A>(mappings, transformers, Options);
 };

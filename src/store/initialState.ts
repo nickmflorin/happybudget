@@ -1,40 +1,14 @@
 import { forEach } from "lodash";
+import { redux } from "lib";
 
-export const initialListResponseState: Redux.ListResponseStore<any> = {
-  loading: false,
-  data: [],
-  count: 0,
-  responseWasReceived: false
-};
-
-export const initialModelListResponseState: Redux.ModelListResponseStore<any> = {
-  ...initialListResponseState,
-  page: 1,
-  pageSize: 10,
-  search: "",
-  selected: [],
-  creating: false,
-  deleting: [],
-  updating: [],
-  objLoading: [],
-  cache: {}
-};
-
-export const initialDetailResponseState: Redux.ModelDetailResponseStore<any> = {
-  loading: false,
-  data: undefined,
-  responseWasReceived: false
-};
-
-export const initialCommentsListResponseState: Redux.CommentsListResponseStore = {
-  ...initialModelListResponseState,
-  replying: []
+export const initialContactsState: Modules.ContactsStore = {
+  table: redux.initialState.initialTableState
 };
 
 export const createInitialUserState = (user: Model.User): Modules.UserStore => {
   return {
     ...user,
-    contacts: initialModelListResponseState
+    contacts: initialContactsState
   };
 };
 

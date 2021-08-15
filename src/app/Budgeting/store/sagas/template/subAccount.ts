@@ -2,17 +2,13 @@ import { SagaIterator } from "redux-saga";
 import { take, call, cancel, spawn } from "redux-saga/effects";
 
 import * as api from "api";
+import { redux } from "lib";
 
 import { ActionType } from "../../actions";
 import { loadingTemplateAction, updateTemplateInStateAction } from "../../actions/template";
 import * as actions from "../../actions/template/subAccount";
 
-import {
-  createStandardSaga,
-  createStandardFringesSaga,
-  createSubAccountTaskSet,
-  createFringeTaskSet
-} from "../factories";
+import { createStandardSaga, createSubAccountTaskSet, createFringeTaskSet } from "../factories";
 
 const tasks = createSubAccountTaskSet<Model.Template>(
   {
@@ -39,7 +35,7 @@ const tasks = createSubAccountTaskSet<Model.Template>(
     }
   },
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.id,
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.children.data,
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.data,
   (state: Modules.ApplicationStore) => state.budget.template.autoIndex
 );
 
@@ -65,57 +61,44 @@ function* watchForRequestSubAccountSaga(): SagaIterator {
   }
 }
 
-const fringeTasks = createFringeTaskSet<Model.Template>(
-  {
-    response: actions.responseFringesAction,
-    loading: actions.loadingFringesAction,
-    addToState: actions.addFringeToStateAction,
-    deleting: actions.deletingFringeAction,
-    creating: actions.creatingFringeAction,
-    updating: actions.updatingFringeAction,
-    budget: {
-      loading: loadingTemplateAction,
-      updateInState: updateTemplateInStateAction
-    }
-  },
-  {
-    request: api.getTemplateFringes,
-    create: api.createTemplateFringe,
-    bulkUpdate: api.bulkUpdateTemplateFringes,
-    bulkCreate: api.bulkCreateTemplateFringes,
-    bulkDelete: api.bulkDeleteTemplateFringes
-  },
-  (state: Modules.ApplicationStore) => state.budget.template.budget.id
-);
-
-const fringesRootSaga = createStandardFringesSaga(
+const fringesRootSaga = redux.sagas.factories.createTableSaga(
   {
     Request: ActionType.Template.SubAccount.Fringes.Request,
     TableChanged: ActionType.Template.SubAccount.Fringes.TableChanged
   },
-  fringeTasks
+  createFringeTaskSet<Model.Template>(
+    {
+      response: actions.responseFringesAction,
+      loading: actions.loadingFringesAction,
+      addToState: actions.addFringeToStateAction,
+      deleting: actions.deletingFringeAction,
+      creating: actions.creatingFringeAction,
+      updating: actions.updatingFringeAction,
+      budget: {
+        loading: loadingTemplateAction,
+        updateInState: updateTemplateInStateAction
+      }
+    },
+    {
+      request: api.getTemplateFringes,
+      create: api.createTemplateFringe,
+      bulkUpdate: api.bulkUpdateTemplateFringes,
+      bulkCreate: api.bulkCreateTemplateFringes,
+      bulkDelete: api.bulkDeleteTemplateFringes
+    },
+    (state: Modules.ApplicationStore) => state.budget.template.budget.id
+  )
 );
 
 const rootSubAccountSaga = createStandardSaga(
   {
     Request: ActionType.Template.SubAccount.SubAccounts.Request,
-    TableChange: ActionType.Template.SubAccount.TableChanged,
+    TableChanged: ActionType.Template.SubAccount.TableChanged,
     Groups: {
       Request: ActionType.Template.SubAccount.Groups.Request
     }
   },
-  {
-    Request: tasks.getSubAccounts,
-    handleDataChangeEvent: tasks.handleDataChangeEvent,
-    handleRowAddEvent: tasks.handleRowAddEvent,
-    handleRowDeleteEvent: tasks.handleRowDeleteEvent,
-    handleAddRowToGroupEvent: tasks.handleAddRowToGroupEvent,
-    handleRemoveRowFromGroupEvent: tasks.handleRemoveRowFromGroupEvent,
-    handleDeleteGroupEvent: tasks.handleDeleteGroupEvent,
-    Groups: {
-      Request: tasks.getGroups
-    }
-  },
+  tasks,
   watchForRequestSubAccountSaga,
   watchForSubAccountIdChangedSaga
 );

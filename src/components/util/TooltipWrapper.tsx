@@ -1,18 +1,18 @@
 import { ReactNode } from "react";
 import { isNil } from "lodash";
-import { Tooltip } from "antd";
-import { TooltipPropsWithTitle } from "antd/lib/tooltip";
+import { Tooltip as AntDTooltip } from "antd";
 
-interface TooltipWrapperProps extends Partial<TooltipPropsWithTitle> {
-  children?: ReactNode;
+interface TooltipWrapperProps {
+  readonly children?: ReactNode;
+  readonly tooltip: Tooltip | undefined | null;
 }
 
-const TooltipWrapper = ({ children, ...props }: TooltipWrapperProps): JSX.Element => {
-  if (!isNil(props.title)) {
-    return (
-      <Tooltip title={props.title} {...props}>
-        {children}
-      </Tooltip>
+const TooltipWrapper = ({ children, tooltip }: TooltipWrapperProps): JSX.Element => {
+  if (!isNil(tooltip)) {
+    return typeof tooltip === "string" ? (
+      <AntDTooltip title={tooltip}>{children}</AntDTooltip>
+    ) : (
+      <AntDTooltip {...tooltip}>{children}</AntDTooltip>
     );
   } else {
     return <>{children}</>;

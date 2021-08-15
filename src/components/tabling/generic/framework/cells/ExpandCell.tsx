@@ -1,7 +1,5 @@
 import { isNil } from "lodash";
 
-import { Tooltip } from "antd";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExpandAlt } from "@fortawesome/pro-solid-svg-icons";
 
@@ -9,13 +7,17 @@ import { ShowHide } from "components";
 import { IconButton } from "components/buttons";
 
 interface ExpandCellProps<R extends Table.Row, M extends Model.Model> extends Table.CellProps<R, M, null> {
-  onClick: (id: number) => void;
-  rowCanExpand?: (row: R) => boolean;
+  readonly onClick: (id: number) => void;
+  readonly rowCanExpand?: (row: R) => boolean;
+  readonly tooltip?: string;
+  readonly cannotExpandTooltip?: string;
 }
 
 const ExpandCell = <R extends Table.Row, M extends Model.Model>({
   rowCanExpand,
   onClick,
+  tooltip,
+  cannotExpandTooltip,
   node,
   ...props
 }: ExpandCellProps<R, M>): JSX.Element => {
@@ -33,27 +35,29 @@ const ExpandCell = <R extends Table.Row, M extends Model.Model>({
   if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
     return (
       <ShowHide show={rowIsHovered()}>
-        <Tooltip title={"Expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
-          <IconButton
-            className={"ag-grid-expand-button"}
-            size={"small"}
-            icon={<FontAwesomeIcon icon={faExpandAlt} />}
-            onClick={() => onClick(node.data.id)}
-          />
-        </Tooltip>
+        <IconButton
+          className={"ag-grid-expand-button"}
+          size={"small"}
+          icon={<FontAwesomeIcon icon={faExpandAlt} />}
+          onClick={() => onClick(node.data.id)}
+          tooltip={{ placement: "bottom", overlayClassName: "tooltip-lower", title: tooltip || "Expand" }}
+        />
       </ShowHide>
     );
   } else {
     return (
       <ShowHide show={rowIsHovered()}>
-        <Tooltip title={"Fill in account to expand"} placement={"bottom"} overlayClassName={"tooltip-lower"}>
-          <IconButton
-            className={"ag-grid-expand-button fake-disabled"}
-            size={"small"}
-            disabled={false}
-            icon={<FontAwesomeIcon icon={faExpandAlt} />}
-          />
-        </Tooltip>
+        <IconButton
+          className={"ag-grid-expand-button fake-disabled"}
+          size={"small"}
+          disabled={false}
+          tooltip={
+            !isNil(cannotExpandTooltip)
+              ? { placement: "bottom", overlayClassName: "tooltip-lower", title: cannotExpandTooltip }
+              : undefined
+          }
+          icon={<FontAwesomeIcon icon={faExpandAlt} />}
+        />
       </ShowHide>
     );
   }

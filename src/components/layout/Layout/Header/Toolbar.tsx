@@ -1,5 +1,4 @@
 import { map, isNil } from "lodash";
-import { TooltipPropsWithTitle } from "antd/lib/tooltip";
 
 import { VerticalFlexCenter } from "components";
 import { IconButton } from "components/buttons";
@@ -9,11 +8,9 @@ import "./Toolbar.scss";
 export interface IToolbarItem {
   icon: JSX.Element;
   to?: string;
-  // TODO: Implement activity of IconButton.
   active?: boolean;
   activePathRegexes?: RegExp[];
-  // TODO: Implement Tooltip Wrapper.
-  tooltip?: TooltipPropsWithTitle;
+  tooltip?: Tooltip;
   onClick?: () => void;
   disabled?: boolean;
   role?: string;

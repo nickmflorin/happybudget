@@ -21,22 +21,22 @@ const groupsSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.Lev
       case "budget":
         switch (levelType) {
           case "budget":
-            return state.budget.budget.budget.groups.data;
+            return state.budget.budget.budget.table.groups.data;
           case "account":
-            return state.budget.budget.account.groups.data;
+            return state.budget.budget.account.table.groups.data;
           case "subaccount":
-            return state.budget.budget.subaccount.groups.data;
+            return state.budget.budget.subaccount.table.groups.data;
           default:
             return [];
         }
       case "template":
         switch (levelType) {
           case "budget":
-            return state.budget.template.budget.groups.data;
+            return state.budget.template.budget.table.groups.data;
           case "account":
-            return state.budget.template.account.groups.data;
+            return state.budget.template.account.table.groups.data;
           case "subaccount":
-            return state.budget.template.subaccount.groups.data;
+            return state.budget.template.subaccount.table.groups.data;
           default:
             return [];
         }

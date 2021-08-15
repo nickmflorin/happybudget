@@ -11,13 +11,13 @@ import { TemplateAccountsTable } from "components/tabling";
 import * as actions from "../../../store/actions/template/accounts";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.groups.data
+  (state: Modules.ApplicationStore) => state.budget.template.budget.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.children.data
+  (state: Modules.ApplicationStore) => state.budget.template.budget.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.children.search
+  (state: Modules.ApplicationStore) => state.budget.template.budget.table.search
 );
 
 interface AccountsTableProps {

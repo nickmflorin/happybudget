@@ -186,6 +186,7 @@ const tasks = createAccountsTaskSet<Model.Budget>(
     deleting: actions.deletingAccountAction,
     creating: actions.creatingAccountAction,
     updating: actions.updatingAccountAction,
+    request: actions.requestAccountsAction,
     response: actions.responseAccountsAction,
     addToState: actions.addAccountToStateAction,
     budget: {
@@ -195,7 +196,8 @@ const tasks = createAccountsTaskSet<Model.Budget>(
     groups: {
       deleting: actions.deletingGroupAction,
       loading: actions.loadingGroupsAction,
-      response: actions.responseGroupsAction
+      response: actions.responseGroupsAction,
+      request: actions.requestGroupsAction
     }
   },
   {
@@ -206,14 +208,14 @@ const tasks = createAccountsTaskSet<Model.Budget>(
     bulkDelete: api.bulkDeleteBudgetAccounts
   },
   (state: Modules.ApplicationStore) => state.budget.budget.budget.id,
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.children.data,
+  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.data,
   (state: Modules.ApplicationStore) => state.budget.budget.autoIndex
 );
 
 export default createStandardSaga(
   {
     Request: ActionType.Budget.Accounts.Request,
-    TableChange: ActionType.Budget.Accounts.TableChanged,
+    TableChanged: ActionType.Budget.Accounts.TableChanged,
     Groups: {
       Request: ActionType.Budget.Groups.Request
     },
@@ -228,24 +230,15 @@ export default createStandardSaga(
     }
   },
   {
-    Request: tasks.getAccounts,
-    handleDataChangeEvent: tasks.handleDataChangeEvent,
-    handleRowAddEvent: tasks.handleRowAddEvent,
-    handleRowDeleteEvent: tasks.handleRowDeleteEvent,
-    handleAddRowToGroupEvent: tasks.handleAddRowToGroupEvent,
-    handleRemoveRowFromGroupEvent: tasks.handleRemoveRowFromGroupEvent,
-    handleDeleteGroupEvent: tasks.handleDeleteGroupEvent,
-    Groups: {
-      Request: tasks.getGroups
+    ...tasks,
+    comments: {
+      request: getCommentsTask,
+      submit: submitCommentTask,
+      delete: deleteCommentTask,
+      edit: editCommentTask
     },
-    Comments: {
-      Request: getCommentsTask,
-      Submit: submitCommentTask,
-      Delete: deleteCommentTask,
-      Edit: editCommentTask
-    },
-    History: {
-      Request: getHistoryTask
+    history: {
+      request: getHistoryTask
     }
   }
 );

@@ -57,7 +57,7 @@ const Button = ({
   }, [isHovered, icon]);
 
   return (
-    <TooltipWrapper {...tooltip}>
+    <TooltipWrapper tooltip={tooltip}>
       <AntDButton
         {...props}
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => !isFakeDisabled && props.onClick?.(e)}

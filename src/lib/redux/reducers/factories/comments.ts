@@ -1,12 +1,11 @@
 import { Reducer } from "redux";
 import { isNil, find, filter, concat } from "lodash";
-import { util } from "lib";
-import { initialCommentsListResponseState } from "store/initialState";
+import { util, redux } from "lib";
 
-import { warnInconsistentState } from "../util";
-import { createModelListResponseReducer } from "./list";
+import { warnInconsistentState } from "../../util";
+import { createModelListResponseReducer } from "./table";
 import { mergeOptionsWithDefaults, createObjectReducerFromMap } from "./util";
-import { MappedReducers, FactoryOptions, createModelListActionReducer } from ".";
+import { createModelListActionReducer } from ".";
 
 const getCommentAtPath = (data: Model.Comment[], pt: number[]) => {
   if (pt.length === 0) {
@@ -55,26 +54,6 @@ const findPath = (id: number, data: Model.Comment[], current: number[] = []): nu
   }
 };
 
-export type CommentsListResponseActionMap = {
-  SetSearch: string;
-  Loading: string;
-  Response: string;
-  SetPage: string;
-  SetPageSize: string;
-  SetPageAndSize: string;
-  AddToState: string;
-  RemoveFromState: string;
-  UpdateInState: string;
-  Select: string;
-  SelectAll: string;
-  Deselect: string;
-  Request: string;
-  Deleting: string;
-  Updating: string;
-  Creating: string;
-  Replying: string;
-};
-
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
  * comments list response, where a list response might be the response received
@@ -96,10 +75,13 @@ export const createCommentsListResponseReducer = <
   A extends Redux.Action<any> = Redux.Action<any>
 >(
   /* eslint-disable indent */
-  mappings: Partial<CommentsListResponseActionMap>,
-  options: Partial<FactoryOptions<S, A>> = {}
+  mappings: Partial<Redux.CommentsListResponseActionMap>,
+  options: Partial<Redux.FactoryOptions<Redux.CommentsListResponseActionMap, S, A>> = {}
 ): Reducer<S, A> => {
-  const Options = mergeOptionsWithDefaults<S, A>(options, initialCommentsListResponseState as S);
+  const Options = mergeOptionsWithDefaults<Redux.CommentsListResponseActionMap, S, A>(
+    options,
+    redux.initialState.initialCommentsListResponseState as S
+  );
 
   let subReducers = {};
   if (!isNil(mappings.Replying)) {
@@ -119,7 +101,7 @@ export const createCommentsListResponseReducer = <
     }
   );
 
-  const reducers: MappedReducers<CommentsListResponseActionMap, S, A> = {
+  const reducers: Redux.MappedReducers<Redux.CommentsListResponseActionMap, S, A> = {
     AddToState: (st: S = Options.initialState, action: Redux.Action<{ data: Model.Comment; parent?: number }>) => {
       if (!isNil(action.payload.parent)) {
         const path = findPath(action.payload.parent, st.data);
@@ -211,7 +193,7 @@ export const createCommentsListResponseReducer = <
     }
   };
 
-  return createObjectReducerFromMap<CommentsListResponseActionMap, S, A>(mappings, reducers, {
+  return createObjectReducerFromMap<Redux.CommentsListResponseActionMap, S, A>(mappings, reducers, {
     ...Options,
     extension: genericListResponseReducer
   });

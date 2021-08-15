@@ -11,6 +11,7 @@ const tasks = createAccountsTaskSet<Model.Template>(
     deleting: actions.deletingAccountAction,
     creating: actions.creatingAccountAction,
     updating: actions.updatingAccountAction,
+    request: actions.requestAccountsAction,
     response: actions.responseAccountsAction,
     addToState: actions.addAccountToStateAction,
     budget: {
@@ -20,7 +21,8 @@ const tasks = createAccountsTaskSet<Model.Template>(
     groups: {
       deleting: actions.deletingGroupAction,
       loading: actions.loadingGroupsAction,
-      response: actions.responseGroupsAction
+      response: actions.responseGroupsAction,
+      request: actions.requestGroupsAction
     }
   },
   {
@@ -31,28 +33,17 @@ const tasks = createAccountsTaskSet<Model.Template>(
     bulkDelete: api.bulkDeleteTemplateAccounts
   },
   (state: Modules.ApplicationStore) => state.budget.template.budget.id,
-  (state: Modules.ApplicationStore) => state.budget.template.budget.children.data,
+  (state: Modules.ApplicationStore) => state.budget.template.budget.table.data,
   (state: Modules.ApplicationStore) => state.budget.template.autoIndex
 );
 
 export default createStandardSaga(
   {
     Request: ActionType.Template.Accounts.Request,
-    TableChange: ActionType.Template.SubAccount.TableChanged,
+    TableChanged: ActionType.Template.SubAccount.TableChanged,
     Groups: {
       Request: ActionType.Template.Groups.Request
     }
   },
-  {
-    Request: tasks.getAccounts,
-    handleDataChangeEvent: tasks.handleDataChangeEvent,
-    handleRowAddEvent: tasks.handleRowAddEvent,
-    handleRowDeleteEvent: tasks.handleRowDeleteEvent,
-    handleAddRowToGroupEvent: tasks.handleAddRowToGroupEvent,
-    handleRemoveRowFromGroupEvent: tasks.handleRemoveRowFromGroupEvent,
-    handleDeleteGroupEvent: tasks.handleDeleteGroupEvent,
-    Groups: {
-      Request: tasks.getGroups
-    }
-  }
+  tasks
 );

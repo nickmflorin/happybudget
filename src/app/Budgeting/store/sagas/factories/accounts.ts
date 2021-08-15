@@ -10,36 +10,25 @@ type R = Tables.AccountRow;
 type C = Model.Account;
 type P = Http.AccountPayload;
 
-export interface AccountsTasksActionMap<B extends Model.Budget | Model.Template> {
-  deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  creating: Redux.ActionCreator<boolean>;
-  updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
-  addToState: Redux.ActionCreator<C>;
-  loading: Redux.ActionCreator<boolean>;
-  response: Redux.ActionCreator<Http.ListResponse<C>>;
+export type AccountsTasksActionMap<B extends Model.Budget | Model.Template> = Redux.BudgetTableActionCreatorMap<C> & {
   budget: {
     loading: Redux.ActionCreator<boolean>;
     updateInState: Redux.ActionCreator<Partial<B>>;
   };
-  groups: {
-    deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
-    loading: Redux.ActionCreator<boolean>;
-    response: Redux.ActionCreator<Http.ListResponse<Model.Group>>;
-  };
-}
+};
 
 export interface AccountsServiceSet<B extends Model.Model> {
-  bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BulkResponse<B>>;
+  bulkDelete: (id: number, ids: number[], options: Http.RequestOptions) => Promise<Http.BulkModelResponse<B>>;
   bulkUpdate: (
     id: number,
     data: Http.BulkUpdatePayload<P>[],
     options: Http.RequestOptions
-  ) => Promise<Http.BulkResponse<B>>;
+  ) => Promise<Http.BulkModelResponse<B>>;
   bulkCreate: (
     id: number,
     p: Http.BulkCreatePayload<P>,
     options: Http.RequestOptions
-  ) => Promise<Http.BulkCreateResponse<B, Model.Account>>;
+  ) => Promise<Http.BulkCreateChildrenResponse<B, C>>;
   getAccounts: (id: number, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<C>>;
   getGroups: (
     id: number,
@@ -48,16 +37,7 @@ export interface AccountsServiceSet<B extends Model.Model> {
   ) => Promise<Http.ListResponse<Model.Group>>;
 }
 
-export interface AccountsTaskSet {
-  getAccounts: Redux.Task<null>;
-  getGroups: Redux.Task<null>;
-  handleRowAddEvent: Redux.Task<Table.RowAddEvent<R, C>>;
-  handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent<R, C>>;
-  handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R, C>>;
-  handleAddRowToGroupEvent: Redux.Task<Table.RowAddToGroupEvent<R, C>>;
-  handleRemoveRowFromGroupEvent: Redux.Task<Table.RowRemoveFromGroupEvent<R, C>>;
-  handleDeleteGroupEvent: Redux.Task<Table.GroupDeleteEvent>;
-}
+export type AccountsTaskSet = Redux.BudgetTableTaskMap<R, C>;
 
 export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
   /* eslint-disable indent */
@@ -85,7 +65,7 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
       yield put(actions.budget.loading(true));
     }
     try {
-      const response: Http.BulkCreateResponse<B, C> = yield call(services.bulkCreate, objId, requestPayload, {
+      const response: Http.BulkCreateChildrenResponse<B, C> = yield call(services.bulkCreate, objId, requestPayload, {
         cancelToken: source.token
       });
       yield all(response.children.map((account: C) => put(actions.addToState(account))));
@@ -125,7 +105,7 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
       yield put(actions.budget.loading(true));
     }
     try {
-      const response: Http.BulkResponse<B> = yield call(services.bulkUpdate, objId, requestPayload, {
+      const response: Http.BulkModelResponse<B> = yield call(services.bulkUpdate, objId, requestPayload, {
         cancelToken: source.token
       });
       if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
@@ -161,7 +141,7 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
         yield put(actions.budget.loading(true));
       }
       try {
-        const response: Http.BulkResponse<B> = yield call(services.bulkDelete, objId, ids, {
+        const response: Http.BulkModelResponse<B> = yield call(services.bulkDelete, objId, ids, {
           cancelToken: source.token
         });
         if (tabling.util.eventWarrantsRecalculation(e)) {
@@ -332,7 +312,7 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
     handleRowAddEvent: handleRowAddEvent,
     handleRowDeleteEvent: handleRowDeleteEvent,
     handleDataChangeEvent: handleDataChangeEvent,
-    getGroups: getGroups,
-    getAccounts: getAccounts
+    requestGroups: getGroups,
+    request: getAccounts
   };
 };

@@ -11,7 +11,7 @@ export type RouterLinkProps = LinkProps & StandardComponentProps & ClickableProp
  * functionality, like disabling, tooltips and icon inclusion.
  */
 const RouterLink = ({ className, children, tooltip, icon, disabled, ...props }: RouterLinkProps): JSX.Element => (
-  <TooltipWrapper {...tooltip}>
+  <TooltipWrapper tooltip={tooltip}>
     <Link
       {...props}
       className={classNames("link", className, {

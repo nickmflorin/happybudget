@@ -18,9 +18,10 @@ type OmitTableProps = "columns" | "getModelLabel" | "actions" | "showPageFooter"
 
 export interface ContactsTableProps extends Omit<ModelTableProps<R, M>, OmitTableProps> {
   readonly exportFileName: string;
+  readonly onEditContact: (id: number) => void;
 }
 
-const ContactsTable = ({ exportFileName, ...props }: ContactsTableProps): JSX.Element => {
+const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTableProps): JSX.Element => {
   const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
   return (
     <ModelTable<R, M>
@@ -30,6 +31,8 @@ const ContactsTable = ({ exportFileName, ...props }: ContactsTableProps): JSX.El
       table={table}
       getModelLabel={(m: M) => m.full_name}
       framework={tabling.util.combineFrameworks(Framework, props.framework)}
+      onRowExpand={(id: number) => onEditContact(id)}
+      expandCellTooltip={"Edit"}
       actions={(params: Table.MenuActionParams<R, M>) => [
         {
           tooltip: "Delete",
@@ -110,7 +113,8 @@ const ContactsTable = ({ exportFileName, ...props }: ContactsTableProps): JSX.El
           field: "email",
           headerName: "Email",
           columnType: "email",
-          cellRenderer: { data: "EmailCell" }
+          cellRenderer: { data: "EmailCell" },
+          valueSetter: tabling.valueSetters.emailValueSetter<R>("email")
         }
       ]}
     />

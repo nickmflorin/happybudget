@@ -18,15 +18,15 @@ import Accounts from "./Accounts";
 import SubAccount from "./SubAccount";
 
 const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.children.deleting,
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.children.updating,
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.children.creating,
-  (state: Modules.ApplicationStore) => state.budget.template.account.children.deleting,
-  (state: Modules.ApplicationStore) => state.budget.template.account.children.updating,
-  (state: Modules.ApplicationStore) => state.budget.template.account.children.creating,
-  (state: Modules.ApplicationStore) => state.budget.template.budget.children.deleting,
-  (state: Modules.ApplicationStore) => state.budget.template.budget.children.updating,
-  (state: Modules.ApplicationStore) => state.budget.template.budget.children.creating,
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.deleting,
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.updating,
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.creating,
+  (state: Modules.ApplicationStore) => state.budget.template.account.table.deleting,
+  (state: Modules.ApplicationStore) => state.budget.template.account.table.updating,
+  (state: Modules.ApplicationStore) => state.budget.template.account.table.creating,
+  (state: Modules.ApplicationStore) => state.budget.template.budget.table.deleting,
+  (state: Modules.ApplicationStore) => state.budget.template.budget.table.updating,
+  (state: Modules.ApplicationStore) => state.budget.template.budget.table.creating,
   (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
     return (
       filter(

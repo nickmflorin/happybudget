@@ -4,7 +4,7 @@ import axios from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { getContactsTask } from "store/tasks";
+import { getContactsTask } from "store/sagas/contacts";
 
 import { ActionType } from "../../actions";
 import { loadingBudgetAction, responseBudgetAction } from "../../actions/budget";

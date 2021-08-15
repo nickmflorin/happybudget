@@ -189,19 +189,23 @@ namespace Http {
     readonly id: number;
   }
 
-  type BulkResponse<M extends Model.Model> = {
+  type BulkModelResponse<M extends Model.Model> = {
     readonly data: M;
   }
 
-  type BudgetBulkResponse<B extends Model.Budget | Model.Template, M extends Model.Model> = Http.BulkResponse<M> & {
+  type BulkCreateResponse<M extends Model.Model> = {
+    readonly data: M[];
+  }
+
+  type BudgetBulkResponse<B extends Model.Budget | Model.Template, M extends Model.Model> = Http.BulkModelResponse<M> & {
     readonly budget: B;
   }
 
-  type BulkCreateResponse<M extends Model.Model, C extends Model.Model> = Http.BulkResponse<M> & {
+  type BulkCreateChildrenResponse<M extends Model.Model, C extends Model.Model> = Http.BulkModelResponse<M> & {
     readonly children: C[];
   }
 
-  type BudgetBulkCreateResponse<B extends Model.Budget | Model.Template, M extends Model.Model, C extends Model.Model> = Http.BulkCreateResponse<M, C> & {
+  type BudgetBulkCreateResponse<B extends Model.Budget | Model.Template, M extends Model.Model, C extends Model.Model> = Http.BulkCreateChildrenResponse<M, C> & {
     readonly budget: B;
   }
 }

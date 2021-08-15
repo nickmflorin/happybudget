@@ -12,13 +12,13 @@ import * as actions from "../../../store/actions/template/account";
 import FringesModal from "./FringesModal";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.groups.data
+  (state: Modules.ApplicationStore) => state.budget.template.account.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.children.data
+  (state: Modules.ApplicationStore) => state.budget.template.account.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.children.search
+  (state: Modules.ApplicationStore) => state.budget.template.account.table.search
 );
 const selectAccountDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.account.detail.data

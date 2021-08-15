@@ -1,4 +1,3 @@
-@import "./antd";
 @import "./ag_theme";
 
 .cell-dropdown {
@@ -147,6 +146,7 @@
         // vertical location of the text when the cell is selected.
         .ag-react-container {
           max-height: 100%;
+          height: 100%;
           display: flex;
           flex-direction: column;
           justify-content: center;

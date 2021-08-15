@@ -2,7 +2,6 @@ import { Reducer, combineReducers } from "redux";
 import { isNil, find, filter } from "lodash";
 
 import { redux, util, tabling } from "lib";
-import { initialModelListResponseState } from "store/initialState";
 
 import { ActionType } from "../actions";
 import initialState, {
@@ -17,7 +16,7 @@ const headerTemplatesRootReducer: Reducer<Modules.Budget.HeaderTemplatesStore, R
   state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,
   action: Redux.Action<any>
 ): Modules.Budget.HeaderTemplatesStore => {
-  const listResponseReducer = redux.factories.createModelListResponseReducer<
+  const listResponseReducer = redux.reducers.factories.createModelListResponseReducer<
     Model.HeaderTemplate,
     Modules.Budget.HeaderTemplatesStore
   >(
@@ -47,10 +46,10 @@ const headerTemplatesRootReducer: Reducer<Modules.Budget.HeaderTemplatesStore, R
 };
 
 const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Redux.Action<any>> = (
-  state: Redux.ModelListResponseStore<Model.Actual> = initialModelListResponseState,
+  state: Redux.ModelListResponseStore<Model.Actual> = redux.initialState.initialModelListResponseState,
   action: Redux.Action<any>
 ): Redux.ModelListResponseStore<Model.Actual> => {
-  const listResponseReducer = redux.factories.createModelListResponseReducer<
+  const listResponseReducer = redux.reducers.factories.createModelListResponseReducer<
     Model.Actual,
     Redux.ModelListResponseStore<Model.Actual>
   >(
@@ -67,7 +66,7 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
       Creating: ActionType.Budget.Actuals.Creating
     },
     {
-      initialState: initialModelListResponseState
+      initialState: redux.initialState.initialModelListResponseState
     }
   );
   let newState = listResponseReducer(state, action);
@@ -135,8 +134,8 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
 };
 
 const genericReducer = combineReducers({
-  autoIndex: redux.factories.createSimplePayloadReducer<boolean>(ActionType.Budget.SetAutoIndex, false),
-  commentsHistoryDrawerOpen: redux.factories.createSimpleBooleanReducer(
+  autoIndex: redux.reducers.factories.createSimplePayloadReducer<boolean>(ActionType.Budget.SetAutoIndex, false),
+  commentsHistoryDrawerOpen: redux.reducers.factories.createSimpleBooleanReducer(
     ActionType.Budget.SetCommentsHistoryDrawerVisibility
   ),
   account: factories.createAccountReducer(
@@ -146,8 +145,8 @@ const genericReducer = combineReducers({
       Loading: ActionType.Budget.Account.Loading,
       Request: ActionType.Budget.Account.Request,
       UpdateInState: ActionType.Budget.Account.UpdateInState,
-      TableChanged: ActionType.Budget.Account.TableChanged,
-      SubAccounts: {
+      Table: {
+        TableChanged: ActionType.Budget.Account.TableChanged,
         Response: ActionType.Budget.Account.SubAccounts.Response,
         Request: ActionType.Budget.Account.SubAccounts.Request,
         Loading: ActionType.Budget.Account.SubAccounts.Loading,
@@ -155,20 +154,20 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Budget.Account.SubAccounts.AddToState,
         Deleting: ActionType.Budget.Account.SubAccounts.Deleting,
         Creating: ActionType.Budget.Account.SubAccounts.Creating,
-        Updating: ActionType.Budget.Account.SubAccounts.Updating
+        Updating: ActionType.Budget.Account.SubAccounts.Updating,
+        Groups: {
+          Response: ActionType.Budget.Account.Groups.Response,
+          Request: ActionType.Budget.Account.Groups.Request,
+          Loading: ActionType.Budget.Account.Groups.Loading,
+          UpdateInState: ActionType.Budget.Account.Groups.UpdateInState,
+          AddToState: ActionType.Budget.Account.Groups.AddToState,
+          Deleting: ActionType.Budget.Account.Groups.Deleting
+        }
       },
       History: {
         Response: ActionType.Budget.Account.History.Response,
         Request: ActionType.Budget.Account.History.Request,
         Loading: ActionType.Budget.Account.History.Loading
-      },
-      Groups: {
-        Response: ActionType.Budget.Account.Groups.Response,
-        Request: ActionType.Budget.Account.Groups.Request,
-        Loading: ActionType.Budget.Account.Groups.Loading,
-        UpdateInState: ActionType.Budget.Account.Groups.UpdateInState,
-        AddToState: ActionType.Budget.Account.Groups.AddToState,
-        Deleting: ActionType.Budget.Account.Groups.Deleting
       },
       Fringes: {
         TableChanged: ActionType.Budget.Account.Fringes.TableChanged,
@@ -203,8 +202,8 @@ const genericReducer = combineReducers({
       Loading: ActionType.Budget.SubAccount.Loading,
       Request: ActionType.Budget.SubAccount.Request,
       UpdateInState: ActionType.Budget.SubAccount.UpdateInState,
-      TableChanged: ActionType.Budget.SubAccount.TableChanged,
-      SubAccounts: {
+      Table: {
+        TableChanged: ActionType.Budget.SubAccount.TableChanged,
         Response: ActionType.Budget.SubAccount.SubAccounts.Response,
         Request: ActionType.Budget.SubAccount.SubAccounts.Request,
         Loading: ActionType.Budget.SubAccount.SubAccounts.Loading,
@@ -212,20 +211,20 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Budget.SubAccount.SubAccounts.AddToState,
         Deleting: ActionType.Budget.SubAccount.SubAccounts.Deleting,
         Creating: ActionType.Budget.SubAccount.SubAccounts.Creating,
-        Updating: ActionType.Budget.SubAccount.SubAccounts.Updating
+        Updating: ActionType.Budget.SubAccount.SubAccounts.Updating,
+        Groups: {
+          Response: ActionType.Budget.SubAccount.Groups.Response,
+          Request: ActionType.Budget.SubAccount.Groups.Request,
+          Loading: ActionType.Budget.SubAccount.Groups.Loading,
+          UpdateInState: ActionType.Budget.SubAccount.Groups.UpdateInState,
+          AddToState: ActionType.Budget.SubAccount.Groups.AddToState,
+          Deleting: ActionType.Budget.SubAccount.Groups.Deleting
+        }
       },
       History: {
         Response: ActionType.Budget.SubAccount.History.Response,
         Request: ActionType.Budget.SubAccount.History.Request,
         Loading: ActionType.Budget.SubAccount.History.Loading
-      },
-      Groups: {
-        Response: ActionType.Budget.SubAccount.Groups.Response,
-        Request: ActionType.Budget.SubAccount.Groups.Request,
-        Loading: ActionType.Budget.SubAccount.Groups.Loading,
-        UpdateInState: ActionType.Budget.SubAccount.Groups.UpdateInState,
-        AddToState: ActionType.Budget.SubAccount.Groups.AddToState,
-        Deleting: ActionType.Budget.SubAccount.Groups.Deleting
       },
       Fringes: {
         TableChanged: ActionType.Budget.SubAccount.Fringes.TableChanged,
@@ -256,13 +255,13 @@ const genericReducer = combineReducers({
   actuals: actualsRootReducer,
   budget: factories.createBudgetReducer<Model.Budget>(
     {
-      TableChanged: ActionType.Budget.Accounts.TableChanged,
       Response: ActionType.Budget.Response,
       Loading: ActionType.Budget.Loading,
       Request: ActionType.Budget.Request,
       SetId: ActionType.Budget.SetId,
       UpdateInState: ActionType.Budget.UpdateInState,
-      Accounts: {
+      Table: {
+        TableChanged: ActionType.Budget.Accounts.TableChanged,
         Response: ActionType.Budget.Accounts.Response,
         Request: ActionType.Budget.Accounts.Request,
         Loading: ActionType.Budget.Accounts.Loading,
@@ -270,15 +269,15 @@ const genericReducer = combineReducers({
         AddToState: ActionType.Budget.Accounts.AddToState,
         Deleting: ActionType.Budget.Accounts.Deleting,
         Creating: ActionType.Budget.Accounts.Creating,
-        Updating: ActionType.Budget.Accounts.Updating
-      },
-      Groups: {
-        Response: ActionType.Budget.Groups.Response,
-        Request: ActionType.Budget.Groups.Request,
-        Loading: ActionType.Budget.Groups.Loading,
-        UpdateInState: ActionType.Budget.Groups.UpdateInState,
-        AddToState: ActionType.Budget.Groups.AddToState,
-        Deleting: ActionType.Budget.Groups.Deleting
+        Updating: ActionType.Budget.Accounts.Updating,
+        Groups: {
+          Response: ActionType.Budget.Groups.Response,
+          Request: ActionType.Budget.Groups.Request,
+          Loading: ActionType.Budget.Groups.Loading,
+          UpdateInState: ActionType.Budget.Groups.UpdateInState,
+          AddToState: ActionType.Budget.Groups.AddToState,
+          Deleting: ActionType.Budget.Groups.Deleting
+        }
       },
       History: {
         Response: ActionType.Budget.History.Response,
@@ -300,7 +299,7 @@ const genericReducer = combineReducers({
     },
     initialBudgetBudgetState
   ),
-  subAccountsTree: redux.factories.createModelListResponseReducer<Model.SubAccountTreeNode>({
+  subAccountsTree: redux.reducers.factories.createModelListResponseReducer<Model.SubAccountTreeNode>({
     Response: ActionType.Budget.SubAccountsTree.Response,
     Loading: ActionType.Budget.SubAccountsTree.Loading,
     SetSearch: ActionType.Budget.SubAccountsTree.SetSearch,
