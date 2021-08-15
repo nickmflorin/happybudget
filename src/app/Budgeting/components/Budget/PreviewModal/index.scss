@@ -22,15 +22,15 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
   $pdf-canvas-height: calc(1 / 0.70749 * #{$canvas-width});
 
   width: $modal-width !important;
-  $modal-height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 10px + 72px + #{$modal-header-height});
+  $modal-height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 10px + 70px + #{$modal-header-height});
   height: $modal-height !important;
 
   .ant-modal-content {
     .ant-modal-body {
-      height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 10px + 72px) !important;
+      height: calc(#{$pdf-canvas-height} + 6px + 36px + 36px + 10px + 70px) !important;
 
       .previewer {
-        height: calc(#{$pdf-canvas-height} + 6px + 36px + 10px + 72px) !important;
+        height: calc(#{$pdf-canvas-height} + 6px + 36px + 10px + 70px) !important;
         width: calc(#{$canvas-width} + 6px) !important;
 
         .preview-content {
@@ -113,27 +113,31 @@ Note that 0.70749 is roughly the Aspect Ratio of an A4 PDF Document
         }
       }
 
-      .previewer {
-        .preview-header {
-          height: 36px;
-        }
+      .previewer-container {
+        overflow-y: scroll;
 
-        .preview-content {
-          position: relative;
-          padding: 2px;
-          border: 1px solid $gray-light;
-          margin-bottom: 10px;
-        }
-        .preview-footer {
-          height: 72px;
-
-          .ant-pagination {
-            height: 36px !important;
-            width: auto;
-            text-align: center;
+        .previewer {
+          .preview-header {
+            height: 36px;
           }
-          .btn {
-            width: 100%;
+
+          .preview-content {
+            position: relative;
+            padding: 2px;
+            border: 1px solid $gray-light;
+            margin-bottom: 10px;
+          }
+          .preview-footer {
+            height: 72px;
+
+            .ant-pagination {
+              height: 36px !important;
+              width: auto;
+              text-align: center;
+            }
+            .btn {
+              width: 100%;
+            }
           }
         }
       }
