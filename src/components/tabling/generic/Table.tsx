@@ -117,7 +117,12 @@ const Table = <R extends Table.Row, M extends Model.Model>({
   return (
     <WrapInApplicationSpinner hideWhileLoading={false} loading={loading}>
       <div className={classNames("table", className)} style={style}>
-        <div className={classNames("core-table", { "with-page-footer": showPageFooter })}>
+        <div
+          className={classNames("core-table", {
+            "with-page-footer": showPageFooter,
+            "with-table-menu": isNil(menuPortalId)
+          })}
+        >
           <TableMenu<R, M>
             apis={apis.get("data")}
             actions={actions}
