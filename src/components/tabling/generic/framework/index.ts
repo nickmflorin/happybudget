@@ -19,6 +19,9 @@ const FrameworkComponents: Table.Framework = {
       CalculatedCell: cells.CalculatedCell,
       ColorCell: cells.ColorCell,
       ContactCell: cells.ContactCell,
+      PhoneNumberCell: cells.PhoneNumberCell,
+      EmailCell: cells.EmailCell,
+      LinkCell: cells.LinkCell,
       agColumnHeader: cells.HeaderCell
     },
     footer: {

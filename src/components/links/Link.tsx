@@ -1,9 +1,12 @@
+import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { ShowHide, TooltipWrapper } from "components";
 
-type LinkProps = StandardComponentWithChildrenProps & ClickableProps;
+export type LinkProps = StandardComponentWithChildrenProps &
+  ClickableProps &
+  React.LinkHTMLAttributes<HTMLAnchorElement>;
 
 /**
  * A consistently styled <a> component with functionality allowing the link to

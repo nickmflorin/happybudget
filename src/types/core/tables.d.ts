@@ -64,4 +64,14 @@ namespace Tables {
     readonly variance: number | null;
     readonly actual: number | null;
   }
+
+  interface ContactRow extends Table.Row {
+    readonly type: Model.ContactTypeName | null;
+    readonly image: SavedImage | null;
+    readonly name: string;
+    readonly company: string | null;
+    readonly position: string | null;
+    readonly phone_number: string | null;
+    readonly email: string | null;
+  }
 }

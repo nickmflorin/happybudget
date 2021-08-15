@@ -6,7 +6,7 @@
 namespace Table {
 
   type NullValue = null | "" | 0 | [];
-  type Formatter = (value: string | number) => string;
+  type ValueFormatter = (params: import("@ag-grid-community/core").ValueFormatterParams) => string | number | null;
 
   interface PageAndSize {
     readonly page: number;
@@ -364,7 +364,12 @@ namespace Table {
     readonly children: import("react").ReactNode;
   };
 
-  type ValueCellProps<R extends Table.Row, M extends Model.Model> = Table.CellProps<R, M, string | number | null>;
+  type ValueCellProps<R extends Table.Row, M extends Model.Model> = Table.CellProps<R, M, string | number | null> & {
+    // This is used for extending cells.  Normally, the value formatter will be included on the ColDef
+    // of the associated column.  But when extending a Cell, we sometimes want to provide a formatter
+    // for that specific cell.
+    readonly valueFormatter?: Table.ValueFormatter;
+  };
 }
 
 /* eslint-disable no-unused-vars */
@@ -442,6 +447,8 @@ namespace PdfTable {
     readonly textStyle?: import("@react-pdf/types").Style;
   }
 
+  type Formatter = (value: string | number) => string;
+
   interface Column<R extends Table.Row, M extends Model.Model> extends Table.DualColumn<R, M> {
     // In the PDF case, since we cannot dynamically resize columns, the width refers to a ratio
     // of the column width to the overall table width assuming that all columns are present.  When
@@ -451,7 +458,7 @@ namespace PdfTable {
     readonly headerCellProps?: PdfTable.CellStandardProps;
     readonly footer?: Table.FooterPdfColumn;
     readonly cellContentsVisible?: PdfTable.OptionalCellCallback<R, M, boolean>;
-    readonly formatter?: Formatter;
+    readonly formatter?: PdfTable.Formatter;
     readonly cellRenderer?: (params: PdfTable.CellCallbackParams<R, M>) => JSX.Element;
     // NOTE: This only applies for the individual Account tables, not gf the overall
     // Accounts table.

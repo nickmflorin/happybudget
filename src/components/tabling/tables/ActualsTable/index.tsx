@@ -16,7 +16,7 @@ type M = Model.Actual;
 
 type PreContactCreate = Omit<Table.CellChange<Tables.SubAccountRow, Model.SubAccount>, "newValue">;
 
-type OmitTableProps = "columns" | "getModelLabel" | "actions" | "embedInlayout" | "showPageFooter";
+type OmitTableProps = "columns" | "getModelLabel" | "actions" | "showPageFooter";
 
 export interface ActualsTableProps extends Omit<ModelTableProps<R, M>, OmitTableProps> {
   readonly exportFileName: string;
@@ -43,6 +43,7 @@ const ActualsTable = ({
       defaultRowLabel={"Actual"}
       showPageFooter={false}
       table={table}
+      getModelLabel={(m: M) => m.description}
       framework={tabling.util.combineFrameworks(Framework, props.framework)}
       actions={(params: Table.MenuActionParams<R, M>) => [
         {
