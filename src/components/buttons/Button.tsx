@@ -29,6 +29,13 @@ const Button = ({
   tooltip,
   ...props
 }: ButtonProps): JSX.Element => {
+  const isDisabled = useMemo(() => disabled === true && isNil(tooltip), [disabled, tooltip]);
+  // If the button is disabled but has a tooltip, the only way to show the tooltip
+  // on hover is to allow pointer events on the Button.  This means that we cannot
+  // set the Button as disabled, but have to style the button as if it were disabled,
+  // and block click events manually.
+  const isFakeDisabled = useMemo(() => disabled === true && !isNil(tooltip), [disabled, tooltip]);
+
   const prefix = useMemo(() => {
     if (isNil(icon)) {
       return loading === true ? <Spinner /> : <></>;
@@ -50,11 +57,12 @@ const Button = ({
     <TooltipWrapper {...tooltip}>
       <AntDButton
         {...props}
+        onClick={(e: React.MouseEvent<HTMLButtonElement>) => !isFakeDisabled && props.onClick?.(e)}
         className={classNames("btn", className, {
-          disabled: disabled === true && isNil(tooltip),
-          "fake-disabled": disabled === true && !isNil(tooltip)
+          disabled: isDisabled,
+          "fake-disabled": isFakeDisabled
         })}
-        disabled={disabled === true && isNil(tooltip)}
+        disabled={isDisabled}
       >
         {prefix}
         {children}
