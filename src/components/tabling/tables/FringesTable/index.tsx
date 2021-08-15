@@ -54,7 +54,7 @@ const FringesTable: React.FC<FringesTableProps> = ({ exportFileName, ...props })
           field: "color",
           headerName: "Color",
           cellClass: "cell--renders-html",
-          cellRenderer: "ColorCell",
+          cellRenderer: { data: "ColorCell" },
           cellEditor: "FringesColorEditor",
           width: 100,
           columnType: "singleSelect"
