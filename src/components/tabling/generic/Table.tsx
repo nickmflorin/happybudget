@@ -48,6 +48,7 @@ const Table = <R extends Table.Row, M extends Model.Model>({
   actions,
   menuPortalId,
   showPageFooter,
+  saving,
   onSearch,
   renderDataGrid,
   ...props
@@ -133,6 +134,7 @@ const Table = <R extends Table.Row, M extends Model.Model>({
             selectedRows={selectedRows}
             hiddenColumns={hiddenColumns}
             rowHasCheckboxSelection={props.rowHasCheckboxSelection}
+            saving={saving}
           />
           {!isNil(renderDataGrid) ? (
             renderDataGrid({

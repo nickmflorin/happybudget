@@ -38,5 +38,14 @@
     display: flex;
     min-width: 300px;
     max-width: 500px;
+
+    .saving-changes {
+      height: 30px;
+      margin-right: 10px;
+
+      .text-container {
+        line-height: 30px;
+      }
+    }
   }
 }

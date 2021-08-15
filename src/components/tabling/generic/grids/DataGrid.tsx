@@ -154,6 +154,58 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
     const BodyColumn = (col: Table.Column<R, M>): Table.Column<R, M> => {
       return {
         ...col,
+        suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
+          if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
+            return true;
+          } else if (
+            !isNil(params.api) &&
+            readOnly !== true &&
+            !params.editing &&
+            includes(["Backspace", "Delete"], params.event.code)
+          ) {
+            const clearCellsOverRange = (range: CellRange | CellRange[], api: GridApi) => {
+              const changes: Table.CellChange<R, M>[] = !Array.isArray(range)
+                ? getTableChangesFromRangeClear(range, api)
+                : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, api)));
+              _onChangeEvent({
+                type: "dataChange",
+                payload: changes
+              });
+            };
+            // Suppress Backspace/Delete events when multiple cells are selected in a range.
+            const ranges = params.api.getCellRanges();
+            if (!isNil(ranges) && (ranges.length !== 1 || !tabling.util.rangeSelectionIsSingleCell(ranges[0]))) {
+              clearCellsOverRange(ranges, params.api);
+              return true;
+            } else {
+              /*
+              For custom Cell Editor(s) with a Pop-Up, we do not want Backspace/Delete to go into
+              edit mode but instead want to clear the values of the cells - so we prevent those key
+              presses from triggering edit mode in the Cell Editor and clear the value at this level.
+              */
+              const column = params.column;
+              const customCol = find(localColumns, (def: Table.Column<R, M>) => def.field === column.getColId());
+              if (!isNil(customCol)) {
+                const columnType: Table.ColumnType | undefined = find(tabling.models.ColumnTypes, {
+                  id: customCol.columnType
+                });
+                if (!isNil(columnType) && columnType.editorIsPopup === true) {
+                  const row: R = params.node.data;
+                  clearCell(row, customCol);
+                  return true;
+                }
+              }
+              return false;
+            }
+          } else if (
+            !isNil(params.api) &&
+            (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
+            (params.event.ctrlKey || params.event.metaKey)
+          ) {
+            return true;
+          }
+          return false;
+        },
         headerComponentParams: {
           ...col.headerComponentParams,
           onSort: (order: Order, field: keyof R) => updateOrdering(order, field),
@@ -233,7 +285,7 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
         ...cs
       ];
     }
-  }, [hooks.useDeepEqualMemo(columns), rowCanExpand, onRowExpand, hasExpandColumn, rowHasCheckboxSelection]);
+  }, [hooks.useDeepEqualMemo(columns), rowCanExpand, onRowExpand, hasExpandColumn, rowHasCheckboxSelection, readOnly]);
 
   useImperativeHandle(grid, () => ({
     applyTableChange: (event: Table.ChangeEvent<R, M>) => _onChangeEvent(event),
@@ -658,58 +710,6 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
     return contextMenuItems;
   });
 
-  // TODO: This needs to be moved to the ColDef(s), it will be deprecated on GridOptions in the near future.
-  const suppressKeyboardEvent = hooks.useDynamicCallback((params: SuppressKeyboardEventParams) => {
-    if (
-      !isNil(params.api) &&
-      readOnly !== true &&
-      !params.editing &&
-      includes(["Backspace", "Delete"], params.event.code)
-    ) {
-      const clearCellsOverRange = (range: CellRange | CellRange[], api: GridApi) => {
-        const changes: Table.CellChange<R, M>[] = !Array.isArray(range)
-          ? getTableChangesFromRangeClear(range, api)
-          : flatten(map(range, (rng: CellRange) => getTableChangesFromRangeClear(rng, api)));
-        _onChangeEvent({
-          type: "dataChange",
-          payload: changes
-        });
-      };
-      // Suppress Backspace/Delete events when multiple cells are selected in a range.
-      const ranges = params.api.getCellRanges();
-      if (!isNil(ranges) && (ranges.length !== 1 || !tabling.util.rangeSelectionIsSingleCell(ranges[0]))) {
-        clearCellsOverRange(ranges, params.api);
-        return true;
-      } else {
-        /*
-        For custom Cell Editor(s) with a Pop-Up, we do not want Backspace/Delete to go into
-        edit mode but instead want to clear the values of the cells - so we prevent those key
-        presses from triggering edit mode in the Cell Editor and clear the value at this level.
-        */
-        const column = params.column;
-        const customCol = find(localColumns, (def: Table.Column<R, M>) => def.field === column.getColId());
-        if (!isNil(customCol)) {
-          const columnType: Table.ColumnType | undefined = find(tabling.models.ColumnTypes, {
-            id: customCol.columnType
-          });
-          if (!isNil(columnType) && columnType.editorIsPopup === true) {
-            const row: R = params.node.data;
-            clearCell(row, customCol);
-            return true;
-          }
-        }
-        return false;
-      }
-    } else if (
-      !isNil(params.api) &&
-      (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
-      (params.event.ctrlKey || params.event.metaKey)
-    ) {
-      return true;
-    }
-    return false;
-  });
-
   const processDataFromClipboard = hooks.useDynamicCallback((params: ProcessDataFromClipboardParams) => {
     const createRowAddFromDataArray = (local: ColumnApi, array: any[], startingColumn: Column): Table.RowAdd<R, M> => {
       let rowAdd: Table.RowAdd<R, M> = { data: {} };
@@ -1001,7 +1001,6 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
       getContextMenuItems={getContextMenuItems}
       onGridReady={onGridReady}
       onFirstDataRendered={onFirstDataRendered}
-      suppressKeyboardEvent={suppressKeyboardEvent}
       processDataFromClipboard={readOnly !== true ? processDataFromClipboard : undefined}
       processCellForClipboard={_processCellForClipboard}
       processCellFromClipboard={readOnly !== true ? _processCellFromClipboard : undefined}

@@ -107,6 +107,13 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
           canBeHidden,
           fieldBehavior,
           columnType,
+          nullValue,
+          refreshColumns,
+          processCellForClipboard,
+          processCellFromClipboard,
+          getHttpValue,
+          getModelValue,
+          getRowValue,
           ...agColumn
         } = col;
         return {
