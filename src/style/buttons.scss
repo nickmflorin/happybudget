@@ -242,10 +242,10 @@
   font-family: $avenir;
   letter-spacing: 0.01em;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 8px 12px;
   min-width: 80px;
   height: 36px;
-  line-height: 24px;
+  line-height: 20px;
   border-radius: 4px;
   margin: 0;
   display: inline-flex;
@@ -612,6 +612,19 @@
 
     .icon {
       height: 1.2rem !important;
+    }
+  }
+
+  &--circle-icon {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    border-radius: 100px;
+    padding: 7px;
+
+    svg {
+      height: 100% !important;
+      width: 100% !important;
     }
   }
 }

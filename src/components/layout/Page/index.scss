@@ -1,5 +1,6 @@
 @import "style/typography";
 @import "style/colors";
+@import "style/breakpoints";
 
 .page {
   overflow-y: hidden;
@@ -7,23 +8,47 @@
   .page-header {
     margin-bottom: 10px;
     display: flex;
+    flex-direction: column;
 
-    .title-wrapper {
+    .page-header-title {
+      order: 2;
       flex-grow: 100;
 
-      .page-header-title {
-        margin-right: 0px;
-        margin-bottom: 0;
-        color: $text-primary !important;
-        font-weight: 700;
-        font-family: $avenir;
-        font-size: 32px;
-        line-height: 36px;
+      @include media(">=xl") {
+        order: 1;
+
+        &.with-subtitle {
+          margin-bottom: 10px;
+        }
+      }
+
+      .title-text-wrapper {
+        .page-header-title-text {
+          margin-right: 0px;
+          margin-bottom: 0;
+          color: $text-primary !important;
+          font-weight: 600;
+          font-family: $avenir;
+          font-size: 28px;
+          line-height: 36px;
+        }
+      }
+
+      .extra-wrapper {
+        display: flex;
       }
     }
 
-    .extra-wrapper {
+    .page-header-subtitle {
+      order: 1;
       display: flex;
+      margin-bottom: 10px;
+
+      @include media(">=xl") {
+        order: 2;
+        justify-content: flex-start;
+        margin-bottom: 0;
+      }
     }
   }
 

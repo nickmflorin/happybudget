@@ -4,23 +4,20 @@ import { useHistory } from "react-router-dom";
 import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
-import { Icon } from "components";
-import { Input } from "components/fields";
 import { Page } from "components/layout";
 import { EditBudgetModal, CreateBudgetModal } from "components/modals";
+import BudgetsSubTitle from "./BudgetsSubTitle";
 
 import {
   requestBudgetsAction,
   deleteBudgetAction,
   updateBudgetInStateAction,
-  addBudgetToStateAction,
-  setBudgetsSearchAction
+  addBudgetToStateAction
 } from "../../store/actions";
-import { EmptyCard, BudgetCard } from "../Card";
+import { BudgetCard } from "../Card";
 
 const selectBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.data;
 const selectLoadingBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.loading;
-const selectBudgetsSearch = (state: Modules.ApplicationStore) => state.dashboard.budgets.search;
 const selectDeletingBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.deleting;
 
 const Budgets = (): JSX.Element => {
@@ -32,7 +29,6 @@ const Budgets = (): JSX.Element => {
   const budgets = useSelector(selectBudgets);
   const deleting = useSelector(selectDeletingBudgets);
   const loading = useSelector(selectLoadingBudgets);
-  const search = useSelector(selectBudgetsSearch);
 
   useEffect(() => {
     dispatch(requestBudgetsAction(null));
@@ -43,20 +39,9 @@ const Budgets = (): JSX.Element => {
       className={"budgets"}
       loading={loading}
       title={"My Budgets"}
-      extra={[
-        <Input
-          placeholder={"Search Projects..."}
-          value={search}
-          allowClear={true}
-          prefix={<Icon icon={"search"} weight={"light"} />}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-            dispatch(setBudgetsSearchAction(event.target.value))
-          }
-        />
-      ]}
+      subTitle={<BudgetsSubTitle onNewBudget={() => setCreateBudgetModalOpen(true)} />}
     >
       <div className={"dashboard-card-grid"}>
-        <EmptyCard title={"New Budget"} icon={"plus"} onClick={() => setCreateBudgetModalOpen(true)} />
         {map(budgets, (budget: Model.Budget, index: number) => {
           return (
             <BudgetCard

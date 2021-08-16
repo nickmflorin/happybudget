@@ -7,3 +7,4 @@ export { default as ClearButton } from "./ClearButton";
 export { default as EntityTextButton } from "./EntityTextButton";
 export { default as ImageClearButton } from "./ImageClearButton";
 export { default as AcceptButton } from "./AcceptButton";
+export { default as CircleIconButton } from "./CircleIconButton";

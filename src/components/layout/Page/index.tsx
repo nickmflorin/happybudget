@@ -12,12 +12,13 @@ interface PageProps {
   loading?: boolean;
   style?: React.CSSProperties;
   title?: string;
+  subTitle?: JSX.Element | JSX.Element[];
   extra?: JSX.Element[];
 }
 
-const Page = ({ className, children, title, extra, style = {}, loading = false }: PageProps): JSX.Element => (
+const Page = ({ className, children, title, subTitle, extra, style = {}, loading = false }: PageProps): JSX.Element => (
   <div className={"page"} style={style}>
-    <PageHeader title={title} extra={extra} />
+    <PageHeader title={title} subTitle={subTitle} extra={extra} />
     <WrapInApplicationSpinner loading={loading}>
       {!isNil(children) && <div className={classNames("page-content", className)}>{children}</div>}
     </WrapInApplicationSpinner>

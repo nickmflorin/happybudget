@@ -1,0 +1,32 @@
+@import "style/breakpoints";
+
+.budget-sub-title {
+  display: flex;
+  flex-grow: 100;
+
+  .input {
+    margin-right: 10px;
+
+    @include media(">=xl") {
+      max-width: 300px;
+    }
+  }
+
+  .btn-non-circle {
+    display: none;
+
+    @include media(">=xl") {
+      display: inherit;
+    }
+  }
+
+  .btn--circle-icon {
+    @include media(">=xl") {
+      display: none;
+    }
+
+    .icon {
+      margin-right: 0;
+    }
+  }
+}
