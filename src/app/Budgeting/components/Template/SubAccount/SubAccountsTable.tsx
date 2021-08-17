@@ -24,7 +24,7 @@ const selectSubAccountDetail = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.template.subaccount.detail.data
 );
 const selectFringes = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.fringes.data
 );
 
 interface SubAccountsTableProps {

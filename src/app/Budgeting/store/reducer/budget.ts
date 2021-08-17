@@ -162,23 +162,23 @@ const genericReducer = combineReducers({
           UpdateInState: ActionType.Budget.Account.Groups.UpdateInState,
           AddToState: ActionType.Budget.Account.Groups.AddToState,
           Deleting: ActionType.Budget.Account.Groups.Deleting
+        },
+        Fringes: {
+          TableChanged: ActionType.Budget.Account.Fringes.TableChanged,
+          Response: ActionType.Budget.Account.Fringes.Response,
+          Request: ActionType.Budget.Account.Fringes.Request,
+          Loading: ActionType.Budget.Account.Fringes.Loading,
+          AddToState: ActionType.Budget.Account.Fringes.AddToState,
+          SetSearch: ActionType.Budget.Account.Fringes.SetSearch,
+          Deleting: ActionType.Budget.Account.Fringes.Deleting,
+          Creating: ActionType.Budget.Account.Fringes.Creating,
+          Updating: ActionType.Budget.Account.Fringes.Updating
         }
       },
       History: {
         Response: ActionType.Budget.Account.History.Response,
         Request: ActionType.Budget.Account.History.Request,
         Loading: ActionType.Budget.Account.History.Loading
-      },
-      Fringes: {
-        TableChanged: ActionType.Budget.Account.Fringes.TableChanged,
-        Response: ActionType.Budget.Account.Fringes.Response,
-        Request: ActionType.Budget.Account.Fringes.Request,
-        Loading: ActionType.Budget.Account.Fringes.Loading,
-        AddToState: ActionType.Budget.Account.Fringes.AddToState,
-        SetSearch: ActionType.Budget.Account.Fringes.SetSearch,
-        Deleting: ActionType.Budget.Account.Fringes.Deleting,
-        Creating: ActionType.Budget.Account.Fringes.Creating,
-        Updating: ActionType.Budget.Account.Fringes.Updating
       },
       Comments: {
         Response: ActionType.Budget.Account.Comments.Response,
@@ -219,23 +219,23 @@ const genericReducer = combineReducers({
           UpdateInState: ActionType.Budget.SubAccount.Groups.UpdateInState,
           AddToState: ActionType.Budget.SubAccount.Groups.AddToState,
           Deleting: ActionType.Budget.SubAccount.Groups.Deleting
+        },
+        Fringes: {
+          TableChanged: ActionType.Budget.SubAccount.Fringes.TableChanged,
+          Response: ActionType.Budget.SubAccount.Fringes.Response,
+          Request: ActionType.Budget.SubAccount.Fringes.Request,
+          Loading: ActionType.Budget.SubAccount.Fringes.Loading,
+          AddToState: ActionType.Budget.SubAccount.Fringes.AddToState,
+          SetSearch: ActionType.Budget.SubAccount.Fringes.SetSearch,
+          Deleting: ActionType.Budget.SubAccount.Fringes.Deleting,
+          Creating: ActionType.Budget.SubAccount.Fringes.Creating,
+          Updating: ActionType.Budget.SubAccount.Fringes.Updating
         }
       },
       History: {
         Response: ActionType.Budget.SubAccount.History.Response,
         Request: ActionType.Budget.SubAccount.History.Request,
         Loading: ActionType.Budget.SubAccount.History.Loading
-      },
-      Fringes: {
-        TableChanged: ActionType.Budget.SubAccount.Fringes.TableChanged,
-        Response: ActionType.Budget.SubAccount.Fringes.Response,
-        Request: ActionType.Budget.SubAccount.Fringes.Request,
-        Loading: ActionType.Budget.SubAccount.Fringes.Loading,
-        AddToState: ActionType.Budget.SubAccount.Fringes.AddToState,
-        SetSearch: ActionType.Budget.SubAccount.Fringes.SetSearch,
-        Deleting: ActionType.Budget.SubAccount.Fringes.Deleting,
-        Creating: ActionType.Budget.SubAccount.Fringes.Creating,
-        Updating: ActionType.Budget.SubAccount.Fringes.Updating
       },
       Comments: {
         Response: ActionType.Budget.SubAccount.Comments.Response,

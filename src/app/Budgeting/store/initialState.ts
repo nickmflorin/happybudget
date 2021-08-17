@@ -11,8 +11,7 @@ export const initialBudgetBudgetState: Modules.Budget.BudgetStore<any> = {
 export const initialSubAccountState: Modules.Budget.SubAccountStore = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
-  table: redux.initialState.initialBudgetTableState,
-  fringes: redux.initialState.initialModelListResponseState,
+  table: redux.initialState.initialBudgetTableWithFringesState,
   comments: redux.initialState.initialCommentsListResponseState,
   history: redux.initialState.initialModelListResponseState
 };
@@ -20,8 +19,7 @@ export const initialSubAccountState: Modules.Budget.SubAccountStore = {
 export const initialAccountState: Modules.Budget.AccountStore = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
-  table: redux.initialState.initialBudgetTableState,
-  fringes: redux.initialState.initialModelListResponseState,
+  table: redux.initialState.initialBudgetTableWithFringesState,
   comments: redux.initialState.initialCommentsListResponseState,
   history: redux.initialState.initialModelListResponseState
 };

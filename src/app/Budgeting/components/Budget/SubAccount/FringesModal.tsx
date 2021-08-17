@@ -9,18 +9,18 @@ import * as actions from "../../../store/actions/budget/subAccount";
 import GenericFringesModal, { GenericFringesModalProps } from "../../GenericFringesModal";
 
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.data
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.search
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.search
 );
 const selectLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.loading
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.loading
 );
 const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.deleting,
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.updating,
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.fringes.creating,
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.deleting,
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.updating,
+  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );

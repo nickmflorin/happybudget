@@ -48,7 +48,7 @@ export const createListResponseReducer = <
   return createObjectReducerFromMap<Redux.ListResponseActionMap, S, A>(mappings, reducers, Options);
 };
 
-export const createTableReducer = <
+export const createSimpleTableReducer = <
   M extends Model.Model,
   S extends Redux.TableStore<M> = Redux.TableStore<M>,
   A extends Redux.Action<any> = Redux.Action<any>
@@ -156,25 +156,6 @@ export const createTableReducer = <
   return createObjectReducerFromMap<Redux.ModelListResponseActionMap, S, A>(mappings, reducers, Options);
 };
 
-export const createBudgetTableReducer = <M extends Model.Model, A extends Redux.Action<any> = Redux.Action<any>>(
-  /* eslint-disable indent */
-  mappings: Partial<Redux.BudgetTableActionMap>,
-  options: Partial<Redux.FactoryOptions<Omit<Redux.BudgetTableActionMap, "Groups">, Redux.BudgetTableStore<M>, A>> = {}
-): Reducer<Redux.BudgetTableStore<M>, A> => {
-  const Options = mergeOptionsWithDefaults<Omit<Redux.BudgetTableActionMap, "Groups">, Redux.BudgetTableStore<M>, A>(
-    options,
-    redux.initialState.initialBudgetTableState
-  );
-  let subReducers = { ...Options.subReducers };
-  if (!isNil(mappings.Groups)) {
-    subReducers = { ...subReducers, groups: createTableReducer<Model.Group>(mappings.Groups) };
-  }
-  return createTableReducer<M, Redux.BudgetTableStore<M>, A>(mappings, {
-    ...Options,
-    subReducers
-  });
-};
-
 export const createModelListResponseReducer = <
   M extends Model.Model,
   S extends Redux.ModelListResponseStore<M> = Redux.ModelListResponseStore<M>,
@@ -189,7 +170,7 @@ export const createModelListResponseReducer = <
     redux.initialState.initialModelListResponseState as S
   );
 
-  return createTableReducer(mappings, {
+  return createSimpleTableReducer(mappings, {
     ...Options,
     overrides: {
       // We have to reset the page to it's initial state otherwise we run the risk

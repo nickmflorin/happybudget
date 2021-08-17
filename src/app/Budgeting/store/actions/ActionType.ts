@@ -91,15 +91,15 @@ const ActionType = {
         UpdateInState: "budget.subaccount.comments.UpdateInState"
       },
       Fringes: {
-        TableChanged: "budget.subaccount.fringes.TableChanged",
-        Deleting: "budget.subaccount.fringes.Deleting",
-        Creating: "budget.subaccount.fringes.Creating",
-        Updating: "budget.subaccount.fringes.Updating",
-        Loading: "budget.subaccount.fringes.Loading",
-        Response: "budget.subaccount.fringes.Response",
-        Request: "budget.subaccount.fringes.Request",
-        AddToState: "budget.subaccount.fringes.AddToState",
-        SetSearch: "budget.subaccount.fringes.SetSearch"
+        TableChanged: "budget.subaccount.table.fringes.TableChanged",
+        Deleting: "budget.subaccount.table.fringes.Deleting",
+        Creating: "budget.subaccount.table.fringes.Creating",
+        Updating: "budget.subaccount.table.fringes.Updating",
+        Loading: "budget.subaccount.table.fringes.Loading",
+        Response: "budget.subaccount.table.fringes.Response",
+        Request: "budget.subaccount.table.fringes.Request",
+        AddToState: "budget.subaccount.table.fringes.AddToState",
+        SetSearch: "budget.subaccount.table.fringes.SetSearch"
       },
       SubAccounts: {
         Deleting: "budget.subaccount.subaccounts.Deleting",
@@ -149,15 +149,15 @@ const ActionType = {
         UpdateInState: "budget.account.comments.UpdateInState"
       },
       Fringes: {
-        TableChanged: "budget.account.fringes.TableChanged",
-        Deleting: "budget.account.fringes.Deleting",
-        Creating: "budget.account.fringes.Creating",
-        Updating: "budget.account.fringes.Updating",
-        Loading: "budget.account.fringes.Loading",
-        Response: "budget.account.fringes.Response",
-        Request: "budget.account.fringes.Request",
-        AddToState: "budget.account.fringes.AddToState",
-        SetSearch: "budget.account.fringes.SetSearch"
+        TableChanged: "budget.account.table.fringes.TableChanged",
+        Deleting: "budget.account.table.fringes.Deleting",
+        Creating: "budget.account.table.fringes.Creating",
+        Updating: "budget.account.table.fringes.Updating",
+        Loading: "budget.account.table.fringes.Loading",
+        Response: "budget.account.table.fringes.Response",
+        Request: "budget.account.table.fringes.Request",
+        AddToState: "budget.account.table.fringes.AddToState",
+        SetSearch: "budget.account.table.fringes.SetSearch"
       },
       SubAccounts: {
         Deleting: "budget.account.subaccounts.Deleting",
@@ -239,15 +239,15 @@ const ActionType = {
       UpdateInState: "template.subaccount.UpdateInState",
       TableChanged: "template.subaccount.TableChanged",
       Fringes: {
-        TableChanged: "template.subaccount.fringes.TableChanged",
-        Deleting: "template.subaccount.fringes.Deleting",
-        Creating: "template.subaccount.fringes.Creating",
-        Updating: "template.subaccount.fringes.Updating",
-        Loading: "template.subaccount.fringes.Loading",
-        Response: "template.subaccount.fringes.Response",
-        Request: "template.subaccount.fringes.Request",
-        AddToState: "template.subaccount.fringes.AddToState",
-        SetSearch: "template.subaccount.fringes.SetSearch"
+        TableChanged: "template.subaccount.table.fringes.TableChanged",
+        Deleting: "template.subaccount.table.fringes.Deleting",
+        Creating: "template.subaccount.table.fringes.Creating",
+        Updating: "template.subaccount.table.fringes.Updating",
+        Loading: "template.subaccount.table.fringes.Loading",
+        Response: "template.subaccount.table.fringes.Response",
+        Request: "template.subaccount.table.fringes.Request",
+        AddToState: "template.subaccount.table.fringes.AddToState",
+        SetSearch: "template.subaccount.table.fringes.SetSearch"
       },
       SubAccounts: {
         Deleting: "template.subaccount.subaccounts.Deleting",
@@ -277,15 +277,15 @@ const ActionType = {
       UpdateInState: "template.account.UpdateInState",
       TableChanged: "template.account.TableChanged",
       Fringes: {
-        TableChanged: "template.account.fringes.TableChanged",
-        Deleting: "template.account.fringes.Deleting",
-        Creating: "template.account.fringes.Creating",
-        Updating: "template.account.fringes.Updating",
-        Loading: "template.account.fringes.Loading",
-        Response: "template.account.fringes.Response",
-        Request: "template.account.fringes.Request",
-        AddToState: "template.account.fringes.AddToState",
-        SetSearch: "template.account.fringes.SetSearch"
+        TableChanged: "template.account.table.fringes.TableChanged",
+        Deleting: "template.account.table.fringes.Deleting",
+        Creating: "template.account.table.fringes.Creating",
+        Updating: "template.account.table.fringes.Updating",
+        Loading: "template.account.table.fringes.Loading",
+        Response: "template.account.table.fringes.Response",
+        Request: "template.account.table.fringes.Request",
+        AddToState: "template.account.table.fringes.AddToState",
+        SetSearch: "template.account.table.fringes.SetSearch"
       },
       SubAccounts: {
         Loading: "template.account.subaccounts.Loading",

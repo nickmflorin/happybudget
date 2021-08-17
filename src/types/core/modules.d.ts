@@ -55,25 +55,23 @@ namespace Modules {
       readonly replying: number[];
     }
 
-    type AccountSubAccountStore<M extends Model.Account | Model.SubAccount> = {
+    // The store for either the top level budget, or a specific account or sub account.
+    type EntityStore<D extends Model.Model> = {
       readonly id: number | null;
-      readonly table: Redux.BudgetTableStore<Model.SubAccount>;
-      readonly detail: Redux.ModelDetailResponseStore<M>;
-      readonly fringes: Redux.ModelListResponseStore<Model.Fringe>;
+      readonly detail: Redux.ModelDetailResponseStore<D>;
       readonly comments: CommentsStore; // Not applicable for templates.
       readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>; // Not applicable for templates.
     }
 
-    type SubAccountStore = Modules.Budget.AccountSubAccountStore<Model.SubAccount>;
-    type AccountStore = Modules.Budget.AccountSubAccountStore<Model.Account>;
+    type AccountOrSubAccountStore<D extends Model.Model> = EntityStore<D> & {
+      readonly table: Redux.BudgetTableWithFringesStore<Model.SubAccount>;
+    }
 
-    interface BudgetStore<M extends Model.Model> {
-      readonly id: number | null;
+    type SubAccountStore = Modules.Budget.AccountOrSubAccountStore<Model.SubAccount>;
+    type AccountStore = Modules.Budget.AccountOrSubAccountStore<Model.Account>;
+    type BudgetStore<M extends Model.Budget | Model.Template> = Omit<Modules.Budget.EntityStore<M>, "table"> & {
       readonly table: Redux.BudgetTableStore<Model.Account>;
-      readonly detail: Redux.ModelDetailResponseStore<M>;
-      readonly comments: CommentsStore; // Not applicable for templates.
-      readonly history: Redux.ModelListResponseStore<Model.IFieldAlterationEvent>; // Not applicable for templates.
-    }
+    };
 
     /* eslint-disable no-shadow */
     interface ModuleStore<M extends Model.Model> {

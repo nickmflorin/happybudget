@@ -33,6 +33,13 @@ namespace Redux {
 
   type Task<P = any, A extends Redux.Action<P> = Redux.Action<P>> = (action: A) => SagaIterator;
 
+  type ModelLookup<M extends Model.Model> = number | ((m: M) => boolean);
+
+  type FindModelOptions = {
+    readonly warnIfMissing?: boolean;
+    readonly name?: string;
+  };
+
   type ListStore<T> = T[];
 
   type ModelListActionPayload = { id: number; value: boolean };
@@ -87,8 +94,10 @@ namespace Redux {
     readonly Deleting: string;
     readonly Updating: string;
     readonly Creating: string;
-    readonly RemoveFromState: string;
-    readonly UpdateInState: string;
+    // In most cases, RemoveFromState and UpdateInState actions are completely handled by the
+    // TableChanged action in the reducer.
+    readonly RemoveFromState?: string;
+    readonly UpdateInState?: string;
   }
 
   type TableActionCreatorMap<M extends Model.Model> = {
@@ -125,8 +134,14 @@ namespace Redux {
     readonly Groups: Pick<Redux.TableActionMap, "Request">;
   }
 
-  type BudgetTableActionMap = TableActionMap & {
+  // The RemoveFromState and UpdateInState actions are completely handled by the
+  // TableChanged action in the reducer.
+  type BudgetTableActionMap = Omit<TableActionMap, "RemoveFromState" | "UpdateInState"> & {
     readonly Groups: Omit<Redux.TableActionMap, "TableChanged" | "Updating" | "Creating" | "RemoveFromState" | "SetSearch">;
+  }
+
+  type BudgetTableWithFringesActionMap = BudgetTableActionMap & {
+    readonly Fringes: Redux.TableActionMap;
   }
 
   type BudgetTableActionCreatorMap<M extends Model.Model> = Redux.TableActionCreatorMap<M> & {
@@ -146,7 +161,11 @@ namespace Redux {
   }
 
   type BudgetTableStore<M extends Model.Model> = Redux.TableStore<M> & {
-    readonly groups: Redux.TableStore;
+    readonly groups: Redux.TableStore<Model.Group>;
+  }
+
+  type BudgetTableWithFringesStore<M extends Model.Model> = Redux.BudgetTableStore<M> & {
+    readonly fringes: Redux.TableStore<Model.Fringe>;
   }
 
   type ModelListResponseActionMap = Omit<TableActionMap, "TableChanged"> & {

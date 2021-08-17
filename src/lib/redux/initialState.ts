@@ -22,8 +22,13 @@ export const initialTableState: Redux.TableStore<any> = {
 };
 
 export const initialBudgetTableState: Redux.BudgetTableStore<any> = {
-  ...initialModelListResponseState,
-  groups: initialModelListResponseState
+  ...initialTableState,
+  groups: initialTableState
+};
+
+export const initialBudgetTableWithFringesState: Redux.BudgetTableWithFringesStore<any> = {
+  ...initialBudgetTableState,
+  fringes: initialTableState
 };
 
 export const initialDetailResponseState: Redux.ModelDetailResponseStore<any> = {

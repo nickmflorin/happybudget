@@ -1,18 +1,11 @@
 import { isNil, filter, map } from "lodash";
 import { util, redux } from "lib";
 
-export type ModelLookup<M extends Model.Model> = number | ((m: M) => boolean);
-
-export type FindModelOptions = {
-  readonly warnIfMissing?: boolean;
-  readonly name?: string;
-};
-
 export const findModelInData = <M extends Model.Model, A extends Array<any> = M[]>(
   action: Redux.Action<any>,
   data: A,
-  id: ModelLookup<M>,
-  options: FindModelOptions = { name: "Model", warnIfMissing: true }
+  id: Redux.ModelLookup<M>,
+  options: Redux.FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M | null => {
   const predicate = typeof id === "number" ? (m: M) => m.id === id : id;
   const m = util.findWithDistributedTypes<M, A>(data, predicate);
@@ -33,11 +26,11 @@ export const findModelInData = <M extends Model.Model, A extends Array<any> = M[
 export const findModelsInData = <M extends Model.Model, A extends Array<any> = M[]>(
   action: Redux.Action<any>,
   data: A,
-  ids: ModelLookup<M>[],
-  options: FindModelOptions = { name: "Model", warnIfMissing: true }
+  ids: Redux.ModelLookup<M>[],
+  options: Redux.FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M[] =>
   filter(
-    map(ids, (predicate: ModelLookup<M>) => findModelInData(action, data, predicate, options)),
+    map(ids, (predicate: Redux.ModelLookup<M>) => findModelInData(action, data, predicate, options)),
     (m: M | null) => m !== null
   ) as M[];
 
@@ -45,8 +38,8 @@ export const modelFromState = <M extends Model.Model, A extends Array<any> = M[]
   /* eslint-disable indent */
   action: Redux.Action<any>,
   data: A,
-  id: ModelLookup<M> | M,
-  options: FindModelOptions = { name: "Model", warnIfMissing: true }
+  id: Redux.ModelLookup<M> | M,
+  options: Redux.FindModelOptions = { name: "Model", warnIfMissing: true }
 ): M | null => {
   if (typeof id === "number" || typeof id === "function") {
     return findModelInData<M, A>(action, data, id, options);

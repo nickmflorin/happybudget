@@ -3,6 +3,7 @@ import { isNil, filter, find } from "lodash";
 import { util } from "lib";
 import { warnInconsistentState } from "../../util";
 
+export * from "./util";
 export * from "./comments";
 export * from "./detail";
 export * from "./table";

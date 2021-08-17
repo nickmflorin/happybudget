@@ -37,18 +37,18 @@ const genericReducer = combineReducers({
           UpdateInState: ActionType.Template.Account.Groups.UpdateInState,
           AddToState: ActionType.Template.Account.Groups.AddToState,
           Deleting: ActionType.Template.Account.Groups.Deleting
+        },
+        Fringes: {
+          TableChanged: ActionType.Template.Account.Fringes.TableChanged,
+          Response: ActionType.Template.Account.Fringes.Response,
+          Request: ActionType.Template.Account.Fringes.Request,
+          Loading: ActionType.Template.Account.Fringes.Loading,
+          AddToState: ActionType.Template.Account.Fringes.AddToState,
+          SetSearch: ActionType.Template.Account.Fringes.SetSearch,
+          Deleting: ActionType.Template.Account.Fringes.Deleting,
+          Creating: ActionType.Template.Account.Fringes.Creating,
+          Updating: ActionType.Template.Account.Fringes.Updating
         }
-      },
-      Fringes: {
-        TableChanged: ActionType.Template.Account.Fringes.TableChanged,
-        Response: ActionType.Template.Account.Fringes.Response,
-        Request: ActionType.Template.Account.Fringes.Request,
-        Loading: ActionType.Template.Account.Fringes.Loading,
-        AddToState: ActionType.Template.Account.Fringes.AddToState,
-        SetSearch: ActionType.Template.Account.Fringes.SetSearch,
-        Deleting: ActionType.Template.Account.Fringes.Deleting,
-        Creating: ActionType.Template.Account.Fringes.Creating,
-        Updating: ActionType.Template.Account.Fringes.Updating
       }
     },
     initialAccountState
@@ -77,18 +77,18 @@ const genericReducer = combineReducers({
           UpdateInState: ActionType.Template.SubAccount.Groups.UpdateInState,
           AddToState: ActionType.Template.SubAccount.Groups.AddToState,
           Deleting: ActionType.Template.SubAccount.Groups.Deleting
+        },
+        Fringes: {
+          TableChanged: ActionType.Template.SubAccount.Fringes.TableChanged,
+          Response: ActionType.Template.SubAccount.Fringes.Response,
+          Request: ActionType.Template.SubAccount.Fringes.Request,
+          Loading: ActionType.Template.SubAccount.Fringes.Loading,
+          AddToState: ActionType.Template.SubAccount.Fringes.AddToState,
+          SetSearch: ActionType.Template.SubAccount.Fringes.SetSearch,
+          Deleting: ActionType.Template.SubAccount.Fringes.Deleting,
+          Creating: ActionType.Template.SubAccount.Fringes.Creating,
+          Updating: ActionType.Template.SubAccount.Fringes.Updating
         }
-      },
-      Fringes: {
-        TableChanged: ActionType.Template.SubAccount.Fringes.TableChanged,
-        Response: ActionType.Template.SubAccount.Fringes.Response,
-        Request: ActionType.Template.SubAccount.Fringes.Request,
-        Loading: ActionType.Template.SubAccount.Fringes.Loading,
-        AddToState: ActionType.Template.SubAccount.Fringes.AddToState,
-        SetSearch: ActionType.Template.SubAccount.Fringes.SetSearch,
-        Deleting: ActionType.Template.SubAccount.Fringes.Deleting,
-        Creating: ActionType.Template.SubAccount.Fringes.Creating,
-        Updating: ActionType.Template.SubAccount.Fringes.Updating
       }
     },
     initialSubAccountState

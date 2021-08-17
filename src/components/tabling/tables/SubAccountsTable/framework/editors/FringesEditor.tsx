@@ -18,18 +18,18 @@ const fringesSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.Le
       case "budget":
         switch (levelType) {
           case "account":
-            return state.budget.budget.account.fringes.data;
+            return state.budget.budget.account.table.fringes.data;
           case "subaccount":
-            return state.budget.budget.subaccount.fringes.data;
+            return state.budget.budget.subaccount.table.fringes.data;
           default:
             return [];
         }
       case "template":
         switch (levelType) {
           case "account":
-            return state.budget.template.account.fringes.data;
+            return state.budget.template.account.table.fringes.data;
           case "subaccount":
-            return state.budget.template.subaccount.fringes.data;
+            return state.budget.template.subaccount.table.fringes.data;
           default:
             return [];
         }
