@@ -118,6 +118,12 @@ namespace Table {
     readonly columns: Table.Column<R, M>[];
   }
 
+  type MinimalColumn<R extends Table.Row, M extends Model.Model> = {
+    readonly field: Table.Field<R, M>;
+    readonly headerName: string;
+    readonly columnType: Table.ColumnTypeId;
+  }
+
   // Column Type for Both PDF and AG Grid Tables
   interface DualColumn<R extends Table.Row, M extends Model.Model, V = any> {
     readonly field: Table.Field<R, M>;

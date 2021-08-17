@@ -1,16 +1,20 @@
 import { isNil, find } from "lodash";
 
-import { SuppressKeyboardEventParams, RowNode } from "@ag-grid-community/core";
+import { RowNode } from "@ag-grid-community/core";
 
-import { util, model } from "lib";
+import { model } from "lib";
+import { framework } from "components/tabling/generic";
 import GenericSubAccountsTable, { GenericSubAccountsTableProps } from "./Generic";
+
+type R = Tables.SubAccountRow;
+type M = Model.SubAccount;
 
 type OmitTableProps = "budgetType" | "onCellFocusChanged" | "columns";
 
-type PreContactCreate = Omit<Table.CellChange<Tables.SubAccountRow, Model.SubAccount>, "newValue">;
+type PreContactCreate = Omit<Table.CellChange<R, M>, "newValue">;
 
 export interface BudgetSubAccountsTableProps extends Omit<GenericSubAccountsTableProps, OmitTableProps> {
-  readonly detail: Model.Account | Model.SubAccount | undefined;
+  readonly detail: Model.Account | M | undefined;
   readonly budget: Model.Budget | undefined;
   readonly contacts: Model.Contact[];
   readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
@@ -29,7 +33,7 @@ const BudgetSubAccountsTable = ({
     <GenericSubAccountsTable
       {...props}
       budgetType={"budget"}
-      onCellFocusChanged={(params: Table.CellFocusChangedParams<Tables.SubAccountRow, Model.SubAccount>) => {
+      onCellFocusChanged={(params: Table.CellFocusChangedParams<R, M>) => {
         /*
           For the ContactCell, we want the contact tag in the cell to be clickable
           only when the cell is focused.  This means we have to rerender the cell when
@@ -52,32 +56,17 @@ const BudgetSubAccountsTable = ({
         }
       }}
       columns={[
-        {
+        framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
           field: "contact",
           headerName: "Contact",
-          cellClass: "cell--renders-html",
           cellRenderer: { data: "ContactCell" },
-          width: 120,
           cellEditor: "ContactEditor",
           columnType: "contact",
           index: 2,
           cellRendererParams: { onEditContact },
           cellEditorParams: { onNewContact },
-          // Required to allow the dropdown to be selectable on Enter key.
-          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-              return true;
-            }
-            return false;
-          },
-          processCellForClipboard: (row: Tables.SubAccountRow) => {
-            const id = util.getKeyValue<Tables.SubAccountRow, keyof Tables.SubAccountRow>("contact")(row);
-            if (isNil(id)) {
-              return "";
-            }
-            const contact: Model.Contact | undefined = find(contacts, { id } as any);
-            return !isNil(contact) ? contact.full_name : "";
-          },
+          models: contacts,
+          modelClipboardValue: (m: Model.Contact) => m.full_name,
           processCellFromClipboard: (name: string): Model.Contact | null => {
             if (name.trim() === "") {
               return null;
@@ -90,7 +79,7 @@ const BudgetSubAccountsTable = ({
               return contact || null;
             }
           }
-        },
+        }),
         {
           field: "estimated",
           headerName: "Estimated",

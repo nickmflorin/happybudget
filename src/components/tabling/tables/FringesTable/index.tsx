@@ -1,10 +1,8 @@
 import classNames from "classnames";
-import { isNil } from "lodash";
 
 import { faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
-import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
-import { util, model, tabling } from "lib";
+import { model, tabling } from "lib";
 import { ModelTable, ModelTableProps } from "components/tabling";
 import { framework } from "components/tabling/generic";
 
@@ -74,40 +72,13 @@ const FringesTable: React.FC<FringesTableProps> = ({ exportFileName, ...props })
           isCalculating: true,
           width: 100
         },
-        {
+        framework.columnObjs.ChoiceSelectColumn<R, M, Model.FringeUnit>({
           field: "unit",
           headerName: "Unit",
-          cellClass: "cell--renders-html",
           cellRenderer: { data: "FringeUnitCell" },
-          width: 100,
           cellEditor: "FringeUnitEditor",
-          columnType: "singleSelect",
-          getHttpValue: (value: Model.FringeUnit | null): number | null => (!isNil(value) ? value.id : null),
-          // Required to allow the dropdown to be selectable on Enter key.
-          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-              return true;
-            }
-            return false;
-          },
-          processCellForClipboard: (row: R) => {
-            const unit = util.getKeyValue<R, keyof R>("unit")(row);
-            if (isNil(unit)) {
-              return "";
-            }
-            return unit.name;
-          },
-          processCellFromClipboard: (name: string) => {
-            if (name.trim() === "") {
-              return null;
-            }
-            const unit = model.util.findChoiceForName<Model.FringeUnit>(model.models.FringeUnits, name);
-            if (!isNil(unit)) {
-              return unit;
-            }
-            return null;
-          }
-        },
+          models: model.models.FringeUnits
+        }),
         {
           field: "cutoff",
           headerName: "Cutoff",

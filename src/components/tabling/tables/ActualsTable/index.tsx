@@ -4,7 +4,7 @@ import { faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
 
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
-import { model, util, tabling } from "lib";
+import { model, tabling } from "lib";
 
 import { ModelTable, ModelTableProps } from "components/tabling";
 import { framework } from "components/tabling/generic";
@@ -118,31 +118,17 @@ const ActualsTable = ({
           flex: 3,
           columnType: "longText"
         },
-        {
+        framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
           field: "contact",
           headerName: "Contact",
-          cellClass: "cell--renders-html",
           cellRenderer: { data: "ContactCell" },
-          width: 120,
           cellEditor: "ContactEditor",
           columnType: "contact",
+          index: 2,
           cellRendererParams: { onEditContact },
           cellEditorParams: { onNewContact },
-          // Required to allow the dropdown to be selectable on Enter key.
-          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-              return true;
-            }
-            return false;
-          },
-          processCellForClipboard: (row: R) => {
-            const id = util.getKeyValue<R, keyof R>("contact")(row);
-            if (isNil(id)) {
-              return "";
-            }
-            const contact: Model.Contact | undefined = find(contacts, { id } as any);
-            return !isNil(contact) ? contact.full_name : "";
-          },
+          models: contacts,
+          modelClipboardValue: (m: Model.Contact) => m.full_name,
           processCellFromClipboard: (name: string): Model.Contact | null => {
             if (name.trim() === "") {
               return null;
@@ -155,7 +141,7 @@ const ActualsTable = ({
               return contact || null;
             }
           }
-        },
+        }),
         {
           field: "purchase_order",
           headerName: "Purchase Order",
@@ -170,40 +156,13 @@ const ActualsTable = ({
           valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
           columnType: "date"
         },
-        {
+        framework.columnObjs.ChoiceSelectColumn<R, M, Model.PaymentMethod>({
           field: "payment_method",
           headerName: "Pay Method",
-          cellClass: "cell--renders-html",
           cellRenderer: { data: "PaymentMethodCell" },
-          flex: 1,
           cellEditor: "PaymentMethodEditor",
-          columnType: "singleSelect",
-          getHttpValue: (value: Model.PaymentMethod | null): number | null => (!isNil(value) ? value.id : null),
-          // Required to allow the dropdown to be selectable on Enter key.
-          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-              return true;
-            }
-            return false;
-          },
-          processCellForClipboard: (row: R) => {
-            const payment_method = util.getKeyValue<R, keyof R>("payment_method")(row);
-            if (isNil(payment_method)) {
-              return "";
-            }
-            return payment_method.name;
-          },
-          processCellFromClipboard: (name: string) => {
-            if (name.trim() === "") {
-              return null;
-            }
-            const payment_method = model.util.findChoiceForName<Model.PaymentMethod>(model.models.PaymentMethods, name);
-            if (!isNil(payment_method)) {
-              return payment_method;
-            }
-            return null;
-          }
-        },
+          models: model.models.PaymentMethods
+        }),
         {
           field: "payment_id",
           headerName: "Pay ID",

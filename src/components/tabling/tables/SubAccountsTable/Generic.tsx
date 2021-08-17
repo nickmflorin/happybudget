@@ -1,10 +1,10 @@
-import { isNil, find, filter, map, includes } from "lodash";
+import { isNil, filter, map, includes } from "lodash";
 import classNames from "classnames";
 
 import { faSigma, faPercentage, faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
 import { SuppressKeyboardEventParams, Column } from "@ag-grid-community/core";
 
-import { util, tabling, model } from "lib";
+import { tabling, model } from "lib";
 import { BudgetTable, BudgetTableProps } from "components/tabling";
 import { framework } from "components/tabling/generic";
 
@@ -172,41 +172,13 @@ const GenericSubAccountsTable = ({
             }
           }
         },
-        {
+        framework.columnObjs.TagSelectColumn<R, M>({
           field: "unit",
           headerName: "Unit",
-          cellClass: "cell--renders-html",
           cellRenderer: { data: "SubAccountUnitCell" },
-          width: 100,
           cellEditor: "SubAccountUnitEditor",
-          columnType: "singleSelect",
-          getHttpValue: (value: Model.Tag | null): number | null => (!isNil(value) ? value.id : null),
-          // Required to allow the dropdown to be selectable on Enter key.
-          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-              return true;
-            }
-            return false;
-          },
-          processCellForClipboard: (row: R) => {
-            const unit = util.getKeyValue<R, keyof R>("unit")(row);
-            if (isNil(unit)) {
-              return "";
-            }
-            return unit.name;
-          },
-          processCellFromClipboard: (name: string) => {
-            if (name.trim() === "") {
-              return null;
-            } else {
-              const unit = find(subAccountUnits, { title: name });
-              if (!isNil(unit)) {
-                return unit;
-              }
-              return null;
-            }
-          }
-        },
+          models: subAccountUnits
+        }),
         {
           field: "multiplier",
           headerName: "X",

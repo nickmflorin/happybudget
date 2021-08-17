@@ -1,10 +1,6 @@
-import { isNil } from "lodash";
-
 import { faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
 
-import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
-
-import { model, util, tabling } from "lib";
+import { model, tabling } from "lib";
 
 import { ModelTable, ModelTableProps } from "components/tabling";
 import { framework } from "components/tabling/generic";
@@ -63,39 +59,13 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
           headerName: "Last Name",
           columnType: "text"
         },
-        {
+        framework.columnObjs.ChoiceSelectColumn<R, M, Model.ContactType>({
           field: "type",
           headerName: "Type",
-          cellClass: "cell--renders-html",
           cellRenderer: { data: "ContactTypeCell" },
           cellEditor: "ContactTypeEditor",
-          columnType: "singleSelect",
-          getHttpValue: (value: Model.ContactType | null): number | null => (!isNil(value) ? value.id : null),
-          // Required to allow the dropdown to be selectable on Enter key.
-          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-              return true;
-            }
-            return false;
-          },
-          processCellForClipboard: (row: R) => {
-            const contactType = util.getKeyValue<R, keyof R>("type")(row);
-            if (isNil(contactType)) {
-              return "";
-            }
-            return contactType.name;
-          },
-          processCellFromClipboard: (name: string) => {
-            if (name.trim() === "") {
-              return null;
-            }
-            const contactType = model.util.findChoiceForName<Model.ContactType>(model.models.ContactTypes, name);
-            if (!isNil(contactType)) {
-              return contactType;
-            }
-            return null;
-          }
-        },
+          models: model.models.ContactTypes
+        }),
         {
           field: "company",
           headerName: "Company",
