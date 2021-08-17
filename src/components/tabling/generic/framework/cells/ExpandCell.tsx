@@ -32,33 +32,38 @@ const ExpandCell = <R extends Table.Row, M extends Model.Model>({
     return false;
   };
 
+  // Note: Wrapping the cell in a <div> helps alleviate some issues with AG Grid.
   if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
     return (
-      <ShowHide show={rowIsHovered()}>
-        <IconButton
-          className={"ag-grid-expand-button"}
-          size={"small"}
-          icon={<FontAwesomeIcon icon={faExpandAlt} />}
-          onClick={() => onClick(node.data.id)}
-          tooltip={{ placement: "bottom", overlayClassName: "tooltip-lower", title: tooltip || "Expand" }}
-        />
-      </ShowHide>
+      <div>
+        <ShowHide show={rowIsHovered()}>
+          <IconButton
+            className={"ag-grid-expand-button"}
+            size={"small"}
+            icon={<FontAwesomeIcon icon={faExpandAlt} />}
+            onClick={() => onClick(node.data.id)}
+            tooltip={{ placement: "bottom", overlayClassName: "tooltip-lower", title: tooltip || "Expand" }}
+          />
+        </ShowHide>
+      </div>
     );
   } else {
     return (
-      <ShowHide show={rowIsHovered()}>
-        <IconButton
-          className={"ag-grid-expand-button fake-disabled"}
-          size={"small"}
-          disabled={false}
-          tooltip={
-            !isNil(cannotExpandTooltip)
-              ? { placement: "bottom", overlayClassName: "tooltip-lower", title: cannotExpandTooltip }
-              : undefined
-          }
-          icon={<FontAwesomeIcon icon={faExpandAlt} />}
-        />
-      </ShowHide>
+      <div>
+        <ShowHide show={rowIsHovered()}>
+          <IconButton
+            className={"ag-grid-expand-button fake-disabled"}
+            size={"small"}
+            disabled={false}
+            tooltip={
+              !isNil(cannotExpandTooltip)
+                ? { placement: "bottom", overlayClassName: "tooltip-lower", title: cannotExpandTooltip }
+                : undefined
+            }
+            icon={<FontAwesomeIcon icon={faExpandAlt} />}
+          />
+        </ShowHide>
+      </div>
     );
   }
 };

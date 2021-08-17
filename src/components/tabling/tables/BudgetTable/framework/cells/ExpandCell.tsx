@@ -28,6 +28,7 @@ const ExpandCell = <R extends BudgetTable.Row, M extends Model.Model>({
     return false;
   };
 
+  // Note: Wrapping the cell in a <div> helps alleviate some issues with AG Grid.
   if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
     if (!isNil(row.meta.children) && row.meta.children.length !== 0) {
       return (
@@ -41,28 +42,32 @@ const ExpandCell = <R extends BudgetTable.Row, M extends Model.Model>({
       );
     } else {
       return (
-        <ShowHide show={rowIsHovered()}>
-          <IconButton
-            className={"ag-grid-expand-button"}
-            size={"small"}
-            icon={<FontAwesomeIcon icon={faExpandAlt} />}
-            onClick={() => onClick(node.data.id)}
-            tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "tooltip-lower" }}
-          />
-        </ShowHide>
+        <div>
+          <ShowHide show={rowIsHovered()}>
+            <IconButton
+              className={"ag-grid-expand-button"}
+              size={"small"}
+              icon={<FontAwesomeIcon icon={faExpandAlt} />}
+              onClick={() => onClick(node.data.id)}
+              tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "tooltip-lower" }}
+            />
+          </ShowHide>
+        </div>
       );
     }
   } else {
     return (
-      <ShowHide show={rowIsHovered()}>
-        <IconButton
-          className={"ag-grid-expand-button fake-disabled"}
-          size={"small"}
-          disabled={false}
-          icon={<FontAwesomeIcon icon={faExpandAlt} />}
-          tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "Fill in account to expand" }}
-        />
-      </ShowHide>
+      <div>
+        <ShowHide show={rowIsHovered()}>
+          <IconButton
+            className={"ag-grid-expand-button fake-disabled"}
+            size={"small"}
+            disabled={false}
+            icon={<FontAwesomeIcon icon={faExpandAlt} />}
+            tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "Fill in account to expand" }}
+          />
+        </ShowHide>
+      </div>
     );
   }
 };
