@@ -1,14 +1,10 @@
 import { forEach } from "lodash";
 import { redux } from "lib";
 
-export const initialContactsState: Modules.ContactsStore = {
-  table: redux.initialState.initialTableState
-};
-
 export const createInitialUserState = (user: Model.User): Modules.UserStore => {
   return {
     ...user,
-    contacts: initialContactsState
+    contacts: redux.initialState.initialTableState
   };
 };
 

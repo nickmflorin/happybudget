@@ -1,4 +1,4 @@
-import { Reducer, combineReducers } from "redux";
+import { Reducer } from "redux";
 import { isNil, reduce, map, filter } from "lodash";
 
 import { redux, tabling, util } from "lib";
@@ -99,7 +99,7 @@ const contactsTableEventReducer: Reducer<Redux.TableStore<M>, Redux.Action<any>>
   return newState;
 };
 
-const contactsTableReducer: Reducer<Redux.TableStore<M>, Redux.Action<any>> = (
+const contactsReducer: Reducer<Redux.TableStore<M>, Redux.Action<any>> = (
   state: Redux.TableStore<M> = redux.initialState.initialTableState,
   action: Redux.Action<any>
 ): Redux.TableStore<M> => {
@@ -111,9 +111,5 @@ const contactsTableReducer: Reducer<Redux.TableStore<M>, Redux.Action<any>> = (
   }
   return newState;
 };
-
-const contactsReducer: Reducer<Modules.ContactsStore, Redux.Action<any>> = combineReducers({
-  table: contactsTableReducer
-});
 
 export default contactsReducer;

@@ -13,9 +13,9 @@ import { ContactsTable } from "components/tabling";
 import { selectors, actions } from "store";
 
 const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.user.contacts.table.deleting,
-  (state: Modules.ApplicationStore) => state.user.contacts.table.updating,
-  (state: Modules.ApplicationStore) => state.user.contacts.table.creating,
+  (state: Modules.ApplicationStore) => state.user.contacts.deleting,
+  (state: Modules.ApplicationStore) => state.user.contacts.updating,
+  (state: Modules.ApplicationStore) => state.user.contacts.creating,
   (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
     return (
       filter(

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { isNil, reduce, find } from "lodash";
 
 import { hooks, redux } from "lib";
+import { selectors } from "store";
 
 import { Portal, BreadCrumbs } from "components/layout";
 import { EditContactModal, CreateContactModal } from "components/modals";
@@ -12,9 +13,6 @@ import * as actions from "../../store/actions/budget/actuals";
 
 const selectActuals = redux.selectors.simpleDeepEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.actuals.data
-);
-const selectContacts = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.user.contacts.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
   (state: Modules.ApplicationStore) => state.budget.budget.actuals.search
@@ -36,7 +34,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
   const loading = useSelector(selectActualsLoading);
   const data = useSelector(selectActuals);
   const search = useSelector(selectTableSearch);
-  const contacts = useSelector(selectContacts);
+  const contacts = useSelector(selectors.selectContacts);
 
   useEffect(() => {
     dispatch(actions.requestActualsAction(null));

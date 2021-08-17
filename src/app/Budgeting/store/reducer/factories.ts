@@ -301,7 +301,7 @@ type AccountSubAccountReducerFactoryActionMap = BudgetTemplateReducerFactoryActi
   Fringes: FringesReducerFactoryActionMap;
 };
 
-const createTableReducer = <
+const createTableChangeEventReducer = <
   M extends Model.Account | Model.SubAccount,
   S extends Modules.Budget.AccountSubAccountStore<M> | Modules.Budget.BudgetStore<Model.Budget | Model.Template>
 >(
@@ -518,7 +518,7 @@ export const createBudgetReducer = <M extends Model.Budget | Model.Template>(
         )
   });
 
-  const tableReducer = createTableReducer<Model.Account, Modules.Budget.BudgetStore<M>>(initialState);
+  const tableReducer = createTableChangeEventReducer<Model.Account, Modules.Budget.BudgetStore<M>>(initialState);
 
   return (state: Modules.Budget.BudgetStore<M> = initialState, action: Redux.Action<any>) => {
     let newState: Modules.Budget.BudgetStore<M> = genericReducer(state, action);
@@ -557,7 +557,7 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
         )
   });
 
-  const tableReducer = createTableReducer<M, S>(initialState);
+  const tableReducer = createTableChangeEventReducer<M, S>(initialState);
 
   type GenericEvent = Table.ChangeEvent<Tables.FringeRow | Tables.SubAccountRow, Model.Fringe | Model.SubAccount>;
   type FringeEvent = Table.ChangeEvent<Tables.FringeRow, Model.Fringe>;

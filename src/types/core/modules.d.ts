@@ -96,12 +96,8 @@ namespace Modules {
     }
   }
 
-  interface ContactsStore {
-    readonly table: Redux.TableStore<Model.Contact>;
-  }
-
   interface UserStore extends Model.User {
-    readonly contacts: ContactsStore;
+    readonly contacts: Redux.TableStore<Model.Contact>;
   }
 
   interface ApplicationStore extends ModulesStore {

@@ -2,7 +2,8 @@ import React, { useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 
-import { model, redux } from "lib";
+import { model } from "lib";
+import { selectors } from "store";
 import { EditContactModal, CreateContactModal } from "components/modals";
 import { BudgetSubAccountsTable, BudgetSubAccountsTableProps } from "components/tabling";
 
@@ -14,17 +15,13 @@ interface SubAccountsTableProps extends Omit<BudgetSubAccountsTableProps, OmitTa
   readonly table: BudgetTable.Ref<Tables.SubAccountRow, Model.SubAccount>;
 }
 
-const selectContacts = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.user.contacts.table.data
-);
-
 const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
   const [preContactCreate, setPreContactCreate] = useState<PreContactCreate | null>(null);
   const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
   const [contactToEdit, setContactToEdit] = useState<number | null>(null);
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
-  const contacts = useSelector(selectContacts);
+  const contacts = useSelector(selectors.selectContacts);
 
   const editingContact = useMemo(() => {
     if (!isNil(contactToEdit)) {
