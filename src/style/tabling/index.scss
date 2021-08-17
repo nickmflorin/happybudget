@@ -11,11 +11,27 @@
   }
 }
 
+@mixin grid_borders($color) {
+  .grid {
+    .ag-header {
+      background-color: $color !important;
+    }
+    .row {
+      > .cell {
+        border-bottom: 1px solid $color;
+        border-left: 1px solid $color;
+      }
+    }
+  }
+}
+
 .table {
   display: flex;
   flex-direction: column;
   max-height: 100%;
   height: 100%;
+
+  @include grid_borders($table-border-color);
 
   .ag-header {
     border: none;
@@ -89,22 +105,30 @@
       }
 
       > .cell {
+        line-height: 36px;
+        padding-left: 6px;
+        padding-right: 6px;
         font-size: 13px;
         font-weight: 400;
         background-color: $white;
         overflow: hidden;
         overflow-x: hidden;
         text-overflow: ellipsis;
-        border-bottom: $table-border;
-        border-left: $table-border;
         // This is needed so that we can display white space in our cells without
         // AG Grid trimming them.  Note that this sometimes causes issues with cell
         // text overflow.  We still need to figure out a mores sustainable solution.
         white-space: break-spaces;
+        -webkit-font-smoothing: subpixel-antialiased;
 
         &--action {
           // white-space break-spaces messes with the checkbox selection cells.
           white-space: nowrap !important;
+        }
+
+        &--centered {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
         }
 
         // In the case that the cell renders HTML (like a tag) it is much easier
@@ -228,6 +252,13 @@
     }
   }
 
+  .grid--footer {
+    .ag-header {
+      height: 0px !important;
+      min-height: 0px !important;
+    }
+  }
+
   .core-table {
     display: flex;
     flex-direction: column;
@@ -348,7 +379,7 @@
         border-bottom: none !important;
 
         > .cell {
-          background-color: #f8f8f8;
+          background-color: $table-border-color;
           font-family: $roboto;
           font-weight: 400;
           border: none !important;
@@ -360,7 +391,7 @@
             border-bottom-right-radius: 8px;
           }
           &.ag-cell-range-selected {
-            background-color: #f8f8f8 !important;
+            background-color: $table-border-color;
           }
         }
       }
@@ -401,6 +432,46 @@
           }
           &.ag-cell-range-selected {
             background-color: #d3d3d3 !important;
+          }
+        }
+      }
+    }
+  }
+
+  &--minimal {
+    @include grid_borders($transparent);
+    font-family: $avenir !important;
+
+    .ag-header {
+      border: none;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+
+      .ag-header-row {
+        > .ag-header-cell {
+          background-color: $white;
+        }
+      }
+    }
+
+    .core-table {
+      .grid--data {
+        .row {
+          > .cell {
+            background-color: $white;
+            font-family: $avenir;
+
+            .link--table {
+              font-family: $avenir;
+            }
+          }
+        }
+      }
+      .grid--table-footer {
+        .row {
+          > .cell {
+            background-color: $white;
+            font-family: $avenir;
           }
         }
       }

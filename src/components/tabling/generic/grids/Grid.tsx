@@ -25,6 +25,14 @@ type OmitAGGridProps =
 
 type AGFramework = { [key: string]: React.ComponentType<any> };
 
+export type CommonGridProps<R extends Table.Row, M extends Model.Model> = {
+  readonly readOnly?: boolean;
+  readonly indexColumnWidth?: number;
+  readonly expandColumnWidth?: number;
+  readonly hasExpandColumn: boolean;
+  readonly columns: Table.Column<R, M>[];
+};
+
 export interface GridProps<R extends Table.Row, M extends Model.Model>
   extends StandardComponentProps,
     Omit<AgGridReactProps, OmitAGGridProps> {

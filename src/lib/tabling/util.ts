@@ -33,6 +33,12 @@ export const mergeClassNames = <T>(params: T, ...args: Table.ClassName<T>[]): st
   return classNames(stringClassNames);
 };
 
+/* eslint-disable indent */
+export const mergeClassNamesFn =
+  <T>(...args: Table.ClassName<T>[]): ((params: T) => string) =>
+  (params: T) =>
+    mergeClassNames(params, ...args);
+
 export const combineFrameworks = (...args: (Table.Framework | undefined | null)[]): Table.Framework => {
   return reduce(
     args,

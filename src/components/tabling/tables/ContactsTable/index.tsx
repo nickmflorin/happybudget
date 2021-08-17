@@ -29,6 +29,9 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
       defaultRowLabel={"Contact"}
       showPageFooter={false}
       table={table}
+      minimal={true}
+      leftAlignNewRowButton={true}
+      indexColumnWidth={40}
       getModelLabel={(m: M) => m.full_name}
       framework={tabling.util.combineFrameworks(Framework, props.framework)}
       onRowExpand={(id: number) => onEditContact(id)}

@@ -36,6 +36,9 @@ export interface TableProps<R extends Table.Row, M extends Model.Model>
   readonly table?: Table.Ref<R, M>;
   readonly loading?: boolean;
   readonly showPageFooter?: boolean;
+  readonly minimal?: boolean;
+  readonly leftAlignNewRowButton?: boolean;
+  readonly calculatedColumnWidth?: number;
   readonly renderDataGrid?: (params: DataGridProps<R, M>) => JSX.Element;
 }
 
@@ -49,6 +52,9 @@ const Table = <R extends Table.Row, M extends Model.Model>({
   menuPortalId,
   showPageFooter,
   saving,
+  minimal,
+  leftAlignNewRowButton,
+  calculatedColumnWidth,
   onSearch,
   renderDataGrid,
   ...props
@@ -90,12 +96,12 @@ const Table = <R extends Table.Row, M extends Model.Model>({
         ...filter(orderedColumns, (col: Table.Column<R, M>) => !(col.isCalculated === true)),
         ...map(
           filter(orderedColumns, (col: Table.Column<R, M>) => col.isCalculated === true),
-          (def: Table.Column<R, M>) => framework.columnObjs.CalculatedColumn(def)
+          (def: Table.Column<R, M>) => framework.columnObjs.CalculatedColumn(def, calculatedColumnWidth)
         )
       ]);
     }
     return orderedColumns;
-  }, [hooks.useDeepEqualMemo(columns), hasExpandColumn, props.onRowExpand, props.rowCanExpand]);
+  }, [hooks.useDeepEqualMemo(columns), hasExpandColumn, calculatedColumnWidth, props.onRowExpand, props.rowCanExpand]);
 
   const onGridReady = hooks.useDynamicCallback((e: GridReadyEvent, id: Table.GridId) => {
     const newApis = apis.clone();
@@ -117,7 +123,7 @@ const Table = <R extends Table.Row, M extends Model.Model>({
 
   return (
     <WrapInApplicationSpinner hideWhileLoading={false} loading={loading}>
-      <div className={classNames("table", className)} style={style}>
+      <div className={classNames("table", { "table--minimal": minimal }, className)} style={style}>
         <div
           className={classNames("core-table", {
             "with-page-footer": showPageFooter,
@@ -172,6 +178,9 @@ const Table = <R extends Table.Row, M extends Model.Model>({
             hiddenColumns={hiddenColumns}
             framework={props.framework}
             onChangeEvent={props.onChangeEvent}
+            leftAlignNewRowButton={leftAlignNewRowButton}
+            indexColumnWidth={props.indexColumnWidth}
+            expandColumnWidth={props.expandColumnWidth}
           />
         </div>
         <ShowHide show={showPageFooter}>
@@ -186,6 +195,8 @@ const Table = <R extends Table.Row, M extends Model.Model>({
               hiddenColumns={hiddenColumns}
               framework={props.framework}
               onChangeEvent={props.onChangeEvent}
+              indexColumnWidth={props.indexColumnWidth}
+              expandColumnWidth={props.expandColumnWidth}
             />
           </div>
         </ShowHide>

@@ -4,14 +4,6 @@
 .ag-theme-alpine {
   font-family: $roboto;
 
-  .ag-cell,
-  .ag-full-width-row .ag-cell-wrapper.ag-row-group {
-    line-height: 36px;
-    padding-left: 6px;
-    padding-right: 6px;
-    -webkit-font-smoothing: subpixel-antialiased;
-  }
-
   .ag-right-aligned-header div.ag-header-cell-label {
     justify-content: flex-end !important;
   }

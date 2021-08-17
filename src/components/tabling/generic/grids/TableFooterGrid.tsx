@@ -3,21 +3,22 @@ import classNames from "classnames";
 
 import { hooks } from "lib";
 import * as framework from "../framework";
+import { CommonGridProps } from "./Grid";
 import FooterGrid, { FooterGridProps } from "./FooterGrid";
 
 type OmitGridProps = "id" | "rowId" | "getFooterColumn" | "onColumnsSet";
 
 interface TableFooterGridProps<R extends Table.Row, M extends Model.Model>
-  extends Omit<FooterGridProps<R, M>, OmitGridProps> {
-  readonly columns: Table.Column<R, M>[];
-  readonly readOnly?: boolean;
-  readonly hasExpandColumn: boolean;
+  extends Omit<FooterGridProps<R, M>, OmitGridProps>,
+    CommonGridProps<R, M> {
+  readonly leftAlignNewRowButton?: boolean;
 }
 
 const TableFooterGrid = <R extends Table.Row, M extends Model.Model>({
   columns,
   readOnly,
   hasExpandColumn,
+  leftAlignNewRowButton,
   ...props
 }: TableFooterGridProps<R, M>): JSX.Element => {
   const localColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
@@ -25,18 +26,27 @@ const TableFooterGrid = <R extends Table.Row, M extends Model.Model>({
       framework.columnObjs.IndexColumn(
         {
           cellRenderer: "NewRowCell",
-          colSpan: (params: Table.ColSpanParams<R, M>) => (hasExpandColumn ? 2 : 1),
+          // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
+          // because then the New Row Button will be centered horizontally between two cells and not
+          // aligned with the Index cells in the grid--data.
+          colSpan: (params: Table.ColSpanParams<R, M>) =>
+            hasExpandColumn && !(leftAlignNewRowButton === true) ? 2 : 1,
           // The onChangeEvent callback is needed to dispatch the action to create a new row.
           cellRendererParams: {
             onChangeEvent: props.onChangeEvent
           }
         },
-        hasExpandColumn
+        hasExpandColumn,
+        props.indexColumnWidth
       ),
       ...columns
     ];
     if (hasExpandColumn === true) {
-      return [cs[0], framework.columnObjs.ExpandColumn({ cellRenderer: "EmptyCell" }), ...cs.slice(1)];
+      return [
+        cs[0],
+        framework.columnObjs.ExpandColumn({ cellRenderer: "EmptyCell" }, props.expandColumnWidth),
+        ...cs.slice(1)
+      ];
     }
     return cs;
   }, [hooks.useDeepEqualMemo(columns), hasExpandColumn]);

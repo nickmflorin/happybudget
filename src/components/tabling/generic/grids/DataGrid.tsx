@@ -38,7 +38,7 @@ import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/g
 import { TABLE_DEBUG } from "config";
 import { tabling, hooks, util } from "lib";
 import * as framework from "../framework";
-import Grid, { GridProps } from "./Grid";
+import Grid, { GridProps, CommonGridProps } from "./Grid";
 
 export const DefaultDataGridOptions: GridOptions = {
   defaultColDef: {
@@ -60,16 +60,14 @@ export const DefaultDataGridOptions: GridOptions = {
 type OmitGridProps = "id" | "rows" | "columns" | "getContextMenuItems" | "onSelectionChanged" | "onColumnsSet";
 
 export interface DataGridProps<R extends Table.Row, M extends Model.Model>
-  extends Omit<GridProps<R, M>, OmitGridProps> {
-  readonly readOnly?: boolean;
+  extends Omit<GridProps<R, M>, OmitGridProps>,
+    CommonGridProps<R, M> {
   readonly apis: Table.GridApis | null;
-  readonly columns: Table.Column<R, M>[];
   readonly grid?: Table.GridRef<R, M>;
   readonly data?: R[];
   readonly defaultRowLabel?: string;
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
-  readonly hasExpandColumn: boolean;
   readonly expandCellTooltip?: string;
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
   readonly onGridReady: (event: GridReadyEvent) => void;
@@ -261,15 +259,19 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
               return isNil(rowHasCheckboxSelection) || rowHasCheckboxSelection(row);
             }
           },
-          hasExpandColumn
+          hasExpandColumn,
+          props.indexColumnWidth
         ),
-        framework.columnObjs.ExpandColumn({
-          cellRendererParams: {
-            onClick: onRowExpand,
-            rowCanExpand: rowCanExpand,
-            tooltip: expandCellTooltip
-          }
-        }),
+        framework.columnObjs.ExpandColumn(
+          {
+            cellRendererParams: {
+              onClick: onRowExpand,
+              rowCanExpand: rowCanExpand,
+              tooltip: expandCellTooltip
+            }
+          },
+          props.expandColumnWidth
+        ),
         ...cs
       ];
     } else {
@@ -284,7 +286,8 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
               return isNil(rowHasCheckboxSelection) || rowHasCheckboxSelection(row);
             }
           },
-          hasExpandColumn
+          hasExpandColumn,
+          props.indexColumnWidth
         ),
         ...cs
       ];
