@@ -155,6 +155,7 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
   const localColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
     const BodyColumn = (col: Table.Column<R, M>): Table.Column<R, M> => {
       return {
+        cellRenderer: "BodyCell",
         ...col,
         suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
           if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
