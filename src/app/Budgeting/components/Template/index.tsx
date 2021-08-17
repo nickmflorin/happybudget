@@ -6,24 +6,24 @@ import { createSelector } from "reselect";
 
 import { budgeting } from "lib";
 import { RenderIfValidId, Icon } from "components";
+import { Layout } from "components/layout";
 
-import { selectTemplateDetail } from "../../store/selectors";
-import { wipeStateAction, setTemplateIdAction } from "../../store/actions/template";
-import GenericLayout from "../GenericLayout";
+import { actions, selectors } from "../../store";
+
 import Account from "./Account";
 import Accounts from "./Accounts";
 import SubAccount from "./SubAccount";
 
 const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.deleting,
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.updating,
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.creating,
-  (state: Modules.ApplicationStore) => state.budget.template.account.table.deleting,
-  (state: Modules.ApplicationStore) => state.budget.template.account.table.updating,
-  (state: Modules.ApplicationStore) => state.budget.template.account.table.creating,
-  (state: Modules.ApplicationStore) => state.budget.template.budget.table.deleting,
-  (state: Modules.ApplicationStore) => state.budget.template.budget.table.updating,
-  (state: Modules.ApplicationStore) => state.budget.template.budget.table.creating,
+  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.table.deleting,
+  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.table.updating,
+  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.table.creating,
+  (state: Modules.Authenticated.Store) => state.budget.template.account.table.deleting,
+  (state: Modules.Authenticated.Store) => state.budget.template.account.table.updating,
+  (state: Modules.Authenticated.Store) => state.budget.template.account.table.creating,
+  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.deleting,
+  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.updating,
+  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.creating,
   (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
     return (
       filter(
@@ -43,17 +43,19 @@ const Template = (): JSX.Element => {
   const { templateId } = useParams<{ templateId: string }>();
   const match = useRouteMatch();
   const saving = useSelector(selectSaving);
-  const template = useSelector(selectTemplateDetail);
+  const template = useSelector(selectors.selectTemplateDetail);
 
   useEffect(() => {
-    dispatch(wipeStateAction(null));
+    dispatch(actions.template.wipeStateAction(null));
     if (!isNaN(parseInt(templateId))) {
-      dispatch(setTemplateIdAction(parseInt(templateId)));
+      dispatch(actions.template.setTemplateIdAction(parseInt(templateId)));
     }
   }, [templateId]);
 
   return (
-    <GenericLayout
+    <Layout
+      collapsed
+      className={"layout--budget"}
       saving={saving}
       sidebar={[
         {
@@ -106,7 +108,7 @@ const Template = (): JSX.Element => {
           />
         </Switch>
       </RenderIfValidId>
-    </GenericLayout>
+    </Layout>
   );
 };
 

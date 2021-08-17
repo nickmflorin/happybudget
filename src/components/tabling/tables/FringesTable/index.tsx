@@ -1,9 +1,9 @@
 import classNames from "classnames";
 
 import { model, tabling } from "lib";
-import { ModelTable, ModelTableProps } from "components/tabling";
-import { framework } from "components/tabling/generic";
 
+import { framework } from "components/tabling/generic";
+import { ReadWriteModelTable, ReadWriteModelTableProps } from "../ModelTable";
 import Framework from "./framework";
 
 type R = Tables.FringeRow;
@@ -11,42 +11,31 @@ type M = Model.Fringe;
 
 type OmitTableProps = "columns" | "getRowLabel" | "actions";
 
-export interface FringesTableProps extends Omit<ModelTableProps<R, M>, OmitTableProps> {
+export interface FringesTableProps extends Omit<ReadWriteModelTableProps<R, M>, OmitTableProps> {
   readonly exportFileName: string;
 }
 
 const FringesTable: React.FC<FringesTableProps> = ({ exportFileName, ...props }): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined(props.table);
+  const tableRef = tabling.hooks.useReadWriteTableIfNotDefined<R, M>(props.tableRef);
 
   return (
-    <ModelTable<R, M>
+    <ReadWriteModelTable<R, M>
       {...props}
-      table={table}
+      tableRef={tableRef}
       framework={tabling.util.combineFrameworks(Framework, props.framework)}
       className={classNames("fringes-table", props.className)}
       getRowLabel={(m: M) => m.name}
-      actions={(params: Table.MenuActionParams<R, M>) => [
-        {
-          icon: "trash-alt",
-          disabled: params.selectedRows.length === 0,
-          onClick: () => {
-            const rows: R[] = params.apis.grid.getSelectedRows();
-            props.onChangeEvent?.({
-              type: "rowDelete",
-              payload: { rows, columns: params.columns }
-            });
-          }
-        },
-        framework.actions.ExportCSVAction(table.current, params, exportFileName)
+      actions={(params: Table.ReadWriteMenuActionParams<R, M>) => [
+        framework.actions.ExportCSVAction<R, M>(tableRef.current, params, exportFileName)
       ]}
       columns={[
-        {
+        framework.columnObjs.BodyColumn({
           field: "name",
           columnType: "text",
           headerName: "Name",
           width: 120
-        },
-        {
+        }),
+        framework.columnObjs.BodyColumn({
           field: "color",
           headerName: "Color",
           cellClass: "cell--renders-html",
@@ -54,14 +43,14 @@ const FringesTable: React.FC<FringesTableProps> = ({ exportFileName, ...props })
           cellEditor: "FringesColorEditor",
           width: 100,
           columnType: "singleSelect"
-        },
-        {
+        }),
+        framework.columnObjs.BodyColumn({
           field: "description",
           headerName: "Description",
           columnType: "longText",
           flex: 100
-        },
-        {
+        }),
+        framework.columnObjs.BodyColumn({
           field: "rate",
           headerName: "Rate",
           valueFormatter: tabling.formatters.agPercentageValueFormatter,
@@ -69,7 +58,7 @@ const FringesTable: React.FC<FringesTableProps> = ({ exportFileName, ...props })
           columnType: "percentage",
           isCalculating: true,
           width: 100
-        },
+        }),
         framework.columnObjs.ChoiceSelectColumn<R, M, Model.FringeUnit>({
           field: "unit",
           headerName: "Unit",
@@ -77,13 +66,13 @@ const FringesTable: React.FC<FringesTableProps> = ({ exportFileName, ...props })
           cellEditor: "FringeUnitEditor",
           models: model.models.FringeUnits
         }),
-        {
+        framework.columnObjs.BodyColumn({
           field: "cutoff",
           headerName: "Cutoff",
           columnType: "number",
           isCalculating: true,
           width: 100
-        }
+        })
       ]}
     />
   );

@@ -1,8 +1,7 @@
 import { model, tabling } from "lib";
 
-import { ModelTable, ModelTableProps } from "components/tabling";
 import { framework } from "components/tabling/generic";
-
+import { ReadWriteModelTable, ReadWriteModelTableProps } from "../ModelTable";
 import Framework from "./framework";
 
 type R = Tables.ContactRow;
@@ -10,45 +9,33 @@ type M = Model.Contact;
 
 type OmitTableProps = "columns" | "getRowLabel" | "actions" | "showPageFooter";
 
-export interface ContactsTableProps extends Omit<ModelTableProps<R, M>, OmitTableProps> {
+export interface ContactsTableProps extends Omit<ReadWriteModelTableProps<R, M>, OmitTableProps> {
   readonly exportFileName: string;
   readonly onEditContact: (id: number) => void;
 }
 
 const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTableProps): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+  const tableRef = tabling.hooks.useReadWriteTableIfNotDefined<R, M>(props.tableRef);
   return (
-    <ModelTable<R, M>
+    <ReadWriteModelTable<R, M>
       {...props}
       defaultRowLabel={"Contact"}
       showPageFooter={false}
-      table={table}
+      tableRef={tableRef}
       minimal={true}
       leftAlignNewRowButton={true}
       indexColumnWidth={40}
       getRowLabel={(m: M) => m.full_name}
-      framework={tabling.util.combineFrameworks(Framework, props.framework)}
+      framework={Framework}
       onRowExpand={(id: number) => onEditContact(id)}
       expandCellTooltip={"Edit"}
       rowHeight={36}
-      actions={(params: Table.MenuActionParams<R, M>) => [
-        {
-          tooltip: "Delete",
-          icon: "trash-alt",
-          disabled: params.selectedRows.length === 0,
-          onClick: () => {
-            const rows: R[] = params.apis.grid.getSelectedRows();
-            props.onChangeEvent?.({
-              payload: { rows, columns: params.columns },
-              type: "rowDelete"
-            });
-          }
-        },
-        framework.actions.ToggleColumnAction(table.current, params),
-        framework.actions.ExportCSVAction(table.current, params, exportFileName)
+      actions={(params: Table.ReadWriteMenuActionParams<R, M>) => [
+        framework.actions.ToggleColumnAction(tableRef.current, params),
+        framework.actions.ExportCSVAction(tableRef.current, params, exportFileName)
       ]}
       columns={[
-        {
+        framework.columnObjs.BodyColumn({
           field: "names_and_image",
           headerName: "Name",
           columnType: "text",
@@ -57,7 +44,7 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
           cellClass: "cell--renders-html",
           getRowValue: (m: Model.Contact) => ({ image: m.image, first_name: m.first_name, last_name: m.last_name }),
           onCellDoubleClicked: (row: Tables.ContactRow) => onEditContact(row.id)
-        },
+        }),
         framework.columnObjs.ChoiceSelectColumn<R, M, Model.ContactType>({
           field: "type",
           headerName: "Type",
@@ -65,29 +52,29 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
           cellEditor: "ContactTypeEditor",
           models: model.models.ContactTypes
         }),
-        {
+        framework.columnObjs.BodyColumn({
           field: "company",
           headerName: "Company",
           columnType: "text"
-        },
-        {
+        }),
+        framework.columnObjs.BodyColumn({
           field: "position",
           headerName: "Position",
           columnType: "text"
-        },
-        {
+        }),
+        framework.columnObjs.BodyColumn({
           field: "phone_number",
           headerName: "Phone Number",
           columnType: "phone",
           cellRenderer: { data: "PhoneNumberCell" }
-        },
-        {
+        }),
+        framework.columnObjs.BodyColumn({
           field: "email",
           headerName: "Email",
           columnType: "email",
           cellRenderer: { data: "EmailCell" },
           valueSetter: tabling.valueSetters.emailValueSetter<R>("email")
-        }
+        })
       ]}
     />
   );

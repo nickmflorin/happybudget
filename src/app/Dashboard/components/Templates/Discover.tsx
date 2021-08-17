@@ -16,8 +16,8 @@ import { useLoggedInUser } from "store/hooks";
 
 import { actions } from "../../store";
 
-const selectTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.data;
-const selectLoadingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.loading;
+const selectTemplates = (state: Modules.Authenticated.Store) => state.dashboard.community.data;
+const selectLoadingTemplates = (state: Modules.Authenticated.Store) => state.dashboard.community.loading;
 
 interface DiscoverProps {
   setTemplateToDerive: (template: number) => void;

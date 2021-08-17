@@ -1,35 +1,53 @@
 import { SagaIterator, Saga } from "redux-saga";
 import { spawn } from "redux-saga/effects";
-import { isNil } from "lodash";
+import { isNil, filter } from "lodash";
 
 import { redux } from "lib";
-import { ApplicationActionTypes } from "../actions";
-import createContactsTaskSet from "./contacts";
+import { AuthenticatedActionTypes, UnauthenticatedActionTypes } from "../actions";
+import { createContactsTaskSet, createReadOnlyContactsTaskSet } from "./contacts";
 
 const contactsRootSaga = redux.sagas.factories.createTableSaga(
   {
-    Request: ApplicationActionTypes.User.Contacts.Request,
-    TableChanged: ApplicationActionTypes.User.Contacts.TableChanged
+    Request: AuthenticatedActionTypes.User.Contacts.Request,
+    TableChanged: AuthenticatedActionTypes.User.Contacts.TableChanged
   },
   createContactsTaskSet()
 );
 
-export function* RootSaga(): SagaIterator {
-  yield spawn(contactsRootSaga);
-}
+const contactsReadOnlyRootSaga = redux.sagas.factories.createReadOnlyTableSaga(
+  { Request: UnauthenticatedActionTypes.Contacts.Request },
+  createReadOnlyContactsTaskSet()
+);
 
-const createApplicationSaga = (config: Modules.ApplicationConfig): Saga => {
+export const createUnauthenticatedRootSaga = (config: Modules.ModuleConfigs): Saga => {
   function* applicationSaga(): SagaIterator {
-    for (var i = 0; i < config.length; i++) {
-      const moduleConfig: Modules.ModuleConfig<any, any> = config[i];
+    let unauthenticatedConfig: Modules.Unauthenticated.ModuleConfigs = filter(config, (c: Modules.ModuleConfig) =>
+      redux.typeguards.isUnauthenticatedModuleConfig(c)
+    ) as Modules.Unauthenticated.ModuleConfigs;
+    for (var i = 0; i < unauthenticatedConfig.length; i++) {
+      const moduleConfig: Modules.Unauthenticated.ModuleConfig = unauthenticatedConfig[i];
       if (!isNil(moduleConfig.rootSaga)) {
         yield spawn(moduleConfig.rootSaga);
       }
     }
-    // Spawn the main application saga.
-    yield spawn(RootSaga);
+    yield spawn(contactsReadOnlyRootSaga);
   }
   return applicationSaga;
 };
 
-export default createApplicationSaga;
+export const createAuthenticatedRootSaga = (config: Modules.ModuleConfigs): Saga => {
+  function* applicationSaga(): SagaIterator {
+    let authenticatedConfig: Modules.Authenticated.ModuleConfigs = filter(
+      config,
+      (c: Modules.ModuleConfig) => !redux.typeguards.isUnauthenticatedModuleConfig(c)
+    ) as Modules.Authenticated.ModuleConfigs;
+    for (var i = 0; i < authenticatedConfig.length; i++) {
+      const moduleConfig: Modules.Authenticated.ModuleConfig = authenticatedConfig[i];
+      if (!isNil(moduleConfig.rootSaga)) {
+        yield spawn(moduleConfig.rootSaga);
+      }
+    }
+    yield spawn(contactsRootSaga);
+  }
+  return applicationSaga;
+};

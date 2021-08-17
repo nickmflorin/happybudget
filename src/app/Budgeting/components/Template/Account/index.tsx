@@ -11,19 +11,17 @@ import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
 
-import { setTemplateAutoIndex } from "../../../store/actions/template";
-import * as actions from "../../../store/actions/template/account";
-
+import { actions } from "../../../store";
 import SubAccountsTable from "./SubAccountsTable";
 
 const selectDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.detail.data
+  (state: Modules.Authenticated.Store) => state.budget.template.account.detail.data
 );
 const selectSubAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.table.loading
+  (state: Modules.Authenticated.Store) => state.budget.template.account.table.loading
 );
 const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.table.groups.loading
+  (state: Modules.Authenticated.Store) => state.budget.template.account.table.groups.loading
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,
@@ -43,16 +41,16 @@ const Account = ({ templateId, template }: AccountProps): JSX.Element => {
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
-    dispatch(setTemplateAutoIndex(false));
+    dispatch(actions.template.setTemplateAutoIndex(false));
   }, []);
 
   useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
-      dispatch(actions.setAccountIdAction(parseInt(accountId)));
+      dispatch(actions.template.account.setAccountIdAction(parseInt(accountId)));
       // TODO: It might not be necessary to get a fresh set of fringes everytime the Account changes,
       // we might be able to move this further up in the tree - but for now it is safer to rely on the
       // source of truth from the API more often than not.
-      dispatch(actions.requestFringesAction(null));
+      dispatch(actions.template.subAccount.requestFringesAction(null));
     }
   }, [accountId]);
 

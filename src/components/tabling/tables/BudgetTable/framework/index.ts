@@ -1,6 +1,6 @@
 import * as cells from "./cells";
 
-const FrameworkComponents: Table.Framework = {
+export const Framework: Table.Framework = {
   editors: {},
   cells: {
     data: {
@@ -11,5 +11,3 @@ const FrameworkComponents: Table.Framework = {
     page: { BudgetFooterCalculatedCell: cells.BudgetFooterCalculatedCell, IdentifierCell: cells.IdentifierCell }
   }
 };
-
-export default FrameworkComponents;

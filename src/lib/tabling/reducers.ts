@@ -1,4 +1,3 @@
-import { Reducer } from "redux";
 import { isNil, reduce, map, includes, filter, uniq, flatten } from "lodash";
 
 import { tabling, util, redux, model } from "lib";
@@ -62,11 +61,12 @@ export const createTableChangeEventReducer = <
       // for the response of the API request.
     } else if (tabling.typeguards.isFullRowEvent(e)) {
       const ids = Array.isArray(e.payload.rows) ? map(e.payload.rows, (row: R) => row.id) : [e.payload.rows.id];
+
       if (tabling.typeguards.isRowDeleteEvent(e)) {
         newState = reduce(
           ids,
           (s: S, id: number) => {
-            const m: M | null = redux.reducers.modelFromState<M, M[]>(action, newState.data, id);
+            const m: M | null = redux.reducers.modelFromState<M, M[]>(action, s.data, id);
             if (!isNil(m)) {
               return {
                 ...s,
@@ -84,19 +84,16 @@ export const createTableChangeEventReducer = <
   };
 };
 
-export const createTableReducer = <
-  R extends Table.Row,
-  M extends Model.Model,
-  S extends Redux.TableStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
->(
+export const createTableReducer = <R extends Table.Row, M extends Model.Model, S extends Redux.TableStore<M>>(
   /* eslint-disable indent */
   mappings: Redux.TableActionMap,
   initialState: S
-): Reducer<S, A> => {
-  const genericReducer: Reducer<S, A> = redux.reducers.factories.createSimpleTableReducer(mappings);
+): Redux.Reducer<S> => {
+  const genericReducer: Redux.Reducer<S> = redux.reducers.factories.createSimpleTableReducer(mappings, {
+    initialState
+  });
   const tableEventReducer = createTableChangeEventReducer<R, M, S>(initialState);
-  return (state: S = initialState, action: A) => {
+  return (state: S = initialState, action: Redux.Action) => {
     let newState: S = genericReducer(state, action);
     if (action.type === mappings.TableChanged) {
       newState = tableEventReducer(newState, action);
@@ -105,12 +102,22 @@ export const createTableReducer = <
   };
 };
 
+export const createReadOnlyTableReducer = <M extends Model.Model, S extends Redux.ReadOnlyTableStore<M>>(
+  /* eslint-disable indent */
+  mappings: Redux.ReadOnlyTableActionMap,
+  initialState: S
+): Redux.Reducer<S> => {
+  const genericReducer: Redux.Reducer<S> = redux.reducers.factories.createSimpleReadOnlyTableReducer(mappings, {
+    initialState
+  });
+  return genericReducer;
+};
+
 const groupFromState = <
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>
 >(
-  action: A,
+  action: Redux.Action,
   st: S,
   id: Model.Group | number,
   lineId?: number,
@@ -127,7 +134,7 @@ const groupFromState = <
 };
 
 const modelGroupFromState = <M extends Model.Account | Model.SubAccount>(
-  action: Redux.Action<any>,
+  action: Redux.Action,
   st: Redux.BudgetTableStore<M>,
   lineId: number,
   options: Redux.FindModelOptions = { warnIfMissing: true }
@@ -141,11 +148,10 @@ const modelGroupFromState = <M extends Model.Account | Model.SubAccount>(
 
 const recalculateGroupMetrics = <
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>
 >(
   /* eslint-disable indent */
-  action: A,
+  action: Redux.Action,
   st: S,
   group: Model.Group | number
 ): S => {
@@ -172,10 +178,9 @@ const recalculateGroupMetrics = <
 
 const removeRowFromGroup = <
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>
 >(
-  action: A,
+  action: Redux.Action,
   st: S,
   id: number,
   group?: number,
@@ -206,11 +211,10 @@ const removeRowFromGroup = <
 
 const removeRowsFromGroup = <
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>
 >(
   st: S,
-  action: A,
+  action: Redux.Action,
   rows: number[],
   group?: number,
   options: Redux.FindModelOptions = { warnIfMissing: true }
@@ -219,7 +223,7 @@ const removeRowsFromGroup = <
   st = reduce(
     rows,
     (s: S, row: number) => {
-      const [newState, updatedGroup] = removeRowFromGroup<M, S, A>(action, st, row, group, options);
+      const [newState, updatedGroup] = removeRowFromGroup<M, S>(action, st, row, group, options);
       groups = !isNil(updatedGroup) ? [...groups, updatedGroup] : groups;
       return newState;
     },
@@ -234,11 +238,10 @@ const isBudgetTableWithFringesStore = <M extends Model.Account | Model.SubAccoun
 
 const recalculateSubAccountMetrics = <
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>
 >(
   st: S,
-  action: A,
+  action: Redux.Action,
   sub: Model.SubAccount
 ): Model.SubAccount => {
   let newSubAccount = { ...sub };
@@ -273,12 +276,11 @@ const recalculateSubAccountMetrics = <
 
 export const createBudgetTableChangeEventReducer = <
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>
 >(
   initialState: S,
   options?: Pick<Redux.FindModelOptions, "name">
-): Reducer<S, A> => {
+): Redux.Reducer<S> => {
   type R = M extends Model.Account ? Tables.AccountRow : Tables.SubAccountRow;
   return (state: S = initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
     let newState: S = { ...state };
@@ -326,7 +328,7 @@ export const createBudgetTableChangeEventReducer = <
           */
           if (tabling.util.changeWarrantsRecalculation(data.changes) && model.typeguards.isSubAccount(m)) {
             // We have to force coerce to M because it does not know that M has now been restricted to the SubAccount case.
-            m = recalculateSubAccountMetrics<M, S, A>(s, action as A, m) as M;
+            m = recalculateSubAccountMetrics<M, S>(s, action as Redux.Action, m) as M;
           }
           s = {
             ...s,
@@ -335,7 +337,7 @@ export const createBudgetTableChangeEventReducer = <
           /*
           NOTE: Right now, in regard to the Account(s) case (when there are several Account(s),
           not a single Account with several SubAccount(s) - i.e. the case when
-          S = Modules.Budget.BudgetStore) there are no changes to a single AccountRow that
+          S = Modules.Authenticated.Budget.BudgetStore) there are no changes to a single AccountRow that
           would warrant recalculation of higher level fields - however, we might have them in
           the future, if there is a column that specifies isCalculating, so we perform
           this logic regardless of whether or not the rows are AccountRow or SubAccountRow.
@@ -347,7 +349,7 @@ export const createBudgetTableChangeEventReducer = <
               warnIfMissing: false
             });
             if (!isNil(rowGroup)) {
-              s = recalculateGroupMetrics<M, S, A>(action as A, s, rowGroup);
+              s = recalculateGroupMetrics<M, S>(action as Redux.Action, s, rowGroup);
             }
           }
           return s;
@@ -365,14 +367,15 @@ export const createBudgetTableChangeEventReducer = <
       if (tabling.typeguards.isRowDeleteEvent(e)) {
         // We cannot supply the Group ID because we do not know what Group each row belonged to
         // yet.  That is handled by the removeRowsFromGroup method.
-        const [updatedState, groups] = removeRowsFromGroup<M, S, A>(newState, action as A, ids, undefined, {
+        const [updatedState, groups] = removeRowsFromGroup<M, S>(newState, action as Redux.Action, ids, undefined, {
           warnIfMissing: false
         });
+
         newState = { ...updatedState };
         newState = reduce(
           ids,
           (s: S, id: number) => {
-            const m: M | null = redux.reducers.modelFromState<M, M[]>(action, newState.data, id);
+            const m: M | null = redux.reducers.modelFromState<M, M[]>(action, s.data, id);
             if (!isNil(m)) {
               return {
                 ...s,
@@ -390,7 +393,7 @@ export const createBudgetTableChangeEventReducer = <
       } else if (tabling.typeguards.isRowRemoveFromGroupEvent(e)) {
         // NOTE: Since we are supplying the actual Group ID here, the Groups returned from the
         // function will only ever have one ID (the original ID we passed in).
-        const [updatedState, groups] = removeRowsFromGroup(newState, action as A, ids, e.payload.group);
+        const [updatedState, groups] = removeRowsFromGroup(newState, action as Redux.Action, ids, e.payload.group);
         newState = { ...updatedState };
         if (tabling.util.eventWarrantsGroupRecalculation(e)) {
           newState = reduce(groups, (s: S, id: number) => recalculateGroupMetrics(action, s, id), newState);
@@ -461,13 +464,12 @@ export const createBudgetTableChangeEventReducer = <
 
 const createSimpleBudgetTableReducer = <
   M extends Model.Model,
-  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>
 >(
   /* eslint-disable indent */
   mappings: Redux.BudgetTableActionMap,
   initialState: S
-): Reducer<S, A> => {
+): Redux.Reducer<S> => {
   let subReducers = {};
   if (!isNil(mappings.Groups)) {
     subReducers = {
@@ -475,23 +477,51 @@ const createSimpleBudgetTableReducer = <
       groups: redux.reducers.factories.createSimpleTableReducer<Model.Group>(mappings.Groups)
     };
   }
-  return redux.reducers.factories.createSimpleTableReducer<M, S, A>(mappings, {
+  return redux.reducers.factories.createSimpleTableReducer<M, S>(mappings, {
     initialState,
     subReducers
   });
 };
 
+const createSimpleReadOnlyBudgetTableReducer = <
+  M extends Model.Model,
+  S extends Redux.ReadOnlyBudgetTableStore<M> = Redux.ReadOnlyBudgetTableStore<M>
+>(
+  /* eslint-disable indent */
+  mappings: Redux.ReadOnlyBudgetTableActionMap,
+  initialState: S
+): Redux.Reducer<S> => {
+  let subReducers = {};
+  if (!isNil(mappings.Groups)) {
+    subReducers = {
+      ...subReducers,
+      groups: redux.reducers.factories.createSimpleReadOnlyTableReducer<Model.Group>(mappings.Groups)
+    };
+  }
+  return redux.reducers.factories.createSimpleReadOnlyTableReducer<M, S>(mappings, {
+    initialState,
+    subReducers
+  });
+};
+
+export const createReadOnlyBudgetTableReducer = <
+  M extends Model.Account | Model.SubAccount,
+  S extends Redux.ReadOnlyBudgetTableStore<M> = Redux.ReadOnlyBudgetTableStore<M>
+>(
+  mappings: Redux.ReadOnlyBudgetTableActionMap,
+  initialState: S
+) => createSimpleReadOnlyBudgetTableReducer<M, S>(mappings, initialState);
+
 export const createBudgetTableReducer = <
   M extends Model.Account | Model.SubAccount,
-  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableStore<M> = Redux.BudgetTableStore<M>
 >(
   mappings: Redux.BudgetTableActionMap,
   initialState: S
-): Reducer<S, A> => {
-  const genericReducer: Reducer<S, A> = createSimpleBudgetTableReducer(mappings, initialState);
-  const tableEventReducer = createBudgetTableChangeEventReducer<M, S, A>(initialState);
-  return (state: S = initialState, action: A) => {
+): Redux.Reducer<S> => {
+  const genericReducer: Redux.Reducer<S> = createSimpleBudgetTableReducer(mappings, initialState);
+  const tableEventReducer = createBudgetTableChangeEventReducer<M, S>(initialState);
+  return (state: S = initialState, action: Redux.Action) => {
     let newState: S = genericReducer(state, action);
     if (action.type === mappings.TableChanged) {
       newState = tableEventReducer(newState, action);
@@ -502,51 +532,87 @@ export const createBudgetTableReducer = <
 
 const createSimpleBudgetTableWithFringesReducer = <
   M extends Model.Model,
-  S extends Redux.BudgetTableWithFringesStore<M> = Redux.BudgetTableWithFringesStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableWithFringesStore<M> = Redux.BudgetTableWithFringesStore<M>
 >(
   /* eslint-disable indent */
   mappings: Redux.BudgetTableWithFringesActionMap,
   initialState: S
-): Reducer<S, A> => {
+): Redux.Reducer<S> => {
   let subReducers = {};
   if (!isNil(mappings.Groups)) {
     subReducers = {
       ...subReducers,
       groups: redux.reducers.factories.createSimpleTableReducer<Model.Group>(mappings.Groups),
-      fringes: createTableReducer<Tables.FringeRow, Model.Fringe, Redux.TableStore<Model.Fringe>, A>(
+      fringes: createTableReducer<Tables.FringeRow, Model.Fringe, Redux.TableStore<Model.Fringe>>(
         mappings.Fringes,
         initialState.fringes
       )
     };
   }
-  return redux.reducers.factories.createSimpleTableReducer<M, S, A>(mappings, {
+  return redux.reducers.factories.createSimpleTableReducer<M, S>(mappings, {
     initialState,
     subReducers
   });
 };
 
+const createSimpleReadOnlyBudgetTableWithFringesReducer = <
+  M extends Model.Model,
+  S extends Redux.ReadOnlyBudgetTableWithFringesStore<M> = Redux.ReadOnlyBudgetTableWithFringesStore<M>
+>(
+  /* eslint-disable indent */
+  mappings: Redux.ReadOnlyBudgetTableWithFringesActionMap,
+  initialState: S
+): Redux.Reducer<S> => {
+  let subReducers = {};
+  if (!isNil(mappings.Groups)) {
+    subReducers = {
+      ...subReducers,
+      groups: redux.reducers.factories.createSimpleReadOnlyTableReducer<Model.Group>(mappings.Groups),
+      fringes: createReadOnlyTableReducer<Model.Fringe, Redux.ReadOnlyTableStore<Model.Fringe>>(
+        mappings.Fringes,
+        initialState.fringes
+      )
+    };
+  }
+  return redux.reducers.factories.createSimpleReadOnlyTableReducer<M, S>(mappings, {
+    initialState,
+    subReducers
+  });
+};
+
+export const createReadOnlyBudgetTableWithFringesReducer = <
+  M extends Model.SubAccount,
+  S extends Redux.ReadOnlyBudgetTableWithFringesStore<M> = Redux.ReadOnlyBudgetTableWithFringesStore<M>
+>(
+  mappings: Redux.ReadOnlyBudgetTableWithFringesActionMap,
+  initialState: S
+) => createSimpleReadOnlyBudgetTableWithFringesReducer<M, S>(mappings, initialState);
+
 export const createBudgetTableWithFringesReducer = <
   M extends Model.SubAccount,
-  S extends Redux.BudgetTableWithFringesStore<M> = Redux.BudgetTableWithFringesStore<M>,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.BudgetTableWithFringesStore<M> = Redux.BudgetTableWithFringesStore<M>
 >(
   mappings: Redux.BudgetTableWithFringesActionMap,
   initialState: S
-): Reducer<S, A> => {
-  const genericReducer: Reducer<S, A> = createSimpleBudgetTableWithFringesReducer<M, S, A>(mappings, initialState);
+): Redux.Reducer<S> => {
+  const genericReducer: Redux.Reducer<S> = createSimpleBudgetTableWithFringesReducer<M, S>(mappings, initialState);
 
   type GenericEvent = Table.ChangeEvent<Tables.FringeRow | Tables.SubAccountRow, Model.Fringe | Model.SubAccount>;
   type FringeEvent = Table.ChangeEvent<Tables.FringeRow, Model.Fringe>;
 
-  return (state: S = initialState, action: A) => {
+  return (state: S = initialState, action: Redux.Action) => {
     let newState: S = genericReducer(state, action);
 
     // When an Account's underlying subaccounts are removed, updated or added,
     // or the Fringes are changed, we need to update/recalculate the Account.
     if (action.type === mappings.TableChanged || action.type === mappings.Fringes.TableChanged) {
       const e: GenericEvent = action.payload;
-      if (action.type === mappings.Fringes.TableChanged) {
+
+      const tableEventReducer = createBudgetTableChangeEventReducer<M, S>(initialState);
+
+      if (action.type === mappings.TableChanged) {
+        newState = tableEventReducer(newState, action);
+      } else if (action.type === mappings.Fringes.TableChanged) {
         /*
         Since the Fringes are displayed in a modal and not on a separate page, when a Fringe is
         changed we need to recalculate the SubAcccount(s) that have that Fringe so they display
@@ -578,7 +644,7 @@ export const createBudgetTableWithFringesReducer = <
               (s: S, id: number): S => {
                 let subAccount = redux.reducers.modelFromState<M>(action, s.data, id);
                 if (!isNil(subAccount)) {
-                  subAccount = recalculateSubAccountMetrics<M, S, A>(s, action, subAccount) as M;
+                  subAccount = recalculateSubAccountMetrics<M, S>(s, action, subAccount) as M;
                   if (removeFringes === true) {
                     subAccount = {
                       ...subAccount,

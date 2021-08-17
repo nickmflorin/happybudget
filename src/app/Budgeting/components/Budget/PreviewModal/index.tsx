@@ -10,7 +10,7 @@ import { util, redux } from "lib";
 import { Form, Modal } from "components";
 import { ExportPdfForm } from "components/forms";
 
-import * as actions from "../../../store/actions/budget/pdf";
+import { actions } from "../../../store";
 
 import BudgetPdf from "../BudgetPdf";
 import Previewer from "./Previewer";
@@ -85,16 +85,16 @@ interface PreviewModalProps {
 type Column = PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>;
 
 const selectHeaderTemplatesLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.headerTemplates.loading
+  (state: Modules.Authenticated.Store) => state.budget.budget.headerTemplates.loading
 );
 const selectHeaderTemplates = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.headerTemplates.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.headerTemplates.data
 );
 const selectDisplayedHeaderTemplate = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.headerTemplates.displayedTemplate
+  (state: Modules.Authenticated.Store) => state.budget.budget.headerTemplates.displayedTemplate
 );
 const selectHeaderTemplateLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.headerTemplates.loadingDetail
+  (state: Modules.Authenticated.Store) => state.budget.budget.headerTemplates.loadingDetail
 );
 
 const PreviewModal = ({
@@ -126,7 +126,7 @@ const PreviewModal = ({
 
   useEffect(() => {
     if (visible === true) {
-      dispatch(actions.requestHeaderTemplatesAction(null));
+      dispatch(actions.budget.pdf.requestHeaderTemplatesAction(null));
       registerFonts().then(() => {
         const promises: [Promise<Model.PdfBudget>, Promise<Http.ListResponse<Model.Contact>>] = [
           api.getBudgetPdf(budgetId),
@@ -235,17 +235,17 @@ const PreviewModal = ({
             }
           }}
           displayedHeaderTemplate={displayedHeaderTemplate}
-          onClearHeaderTemplate={() => dispatch(actions.clearHeaderTemplateAction(null))}
-          onLoadHeaderTemplate={(id: number) => dispatch(actions.loadHeaderTemplateAction(id))}
+          onClearHeaderTemplate={() => dispatch(actions.budget.pdf.clearHeaderTemplateAction(null))}
+          onLoadHeaderTemplate={(id: number) => dispatch(actions.budget.pdf.loadHeaderTemplateAction(id))}
           onHeaderTemplateDeleted={(id: number) => {
             if (!isNil(displayedHeaderTemplate) && displayedHeaderTemplate.id === id) {
-              dispatch(actions.clearHeaderTemplateAction(null));
+              dispatch(actions.budget.pdf.clearHeaderTemplateAction(null));
             }
-            dispatch(actions.removeHeaderTemplateFromStateAction(id));
+            dispatch(actions.budget.pdf.removeHeaderTemplateFromStateAction(id));
           }}
           onHeaderTemplateCreated={(template: Model.HeaderTemplate) => {
-            dispatch(actions.addHeaderTemplateToStateAction(template));
-            dispatch(actions.displayHeaderTemplateAction(template));
+            dispatch(actions.budget.pdf.addHeaderTemplateToStateAction(template));
+            dispatch(actions.budget.pdf.displayHeaderTemplateAction(template));
           }}
         />
       </div>

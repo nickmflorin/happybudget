@@ -1,4 +1,3 @@
-import { Reducer } from "redux";
 import { isNil, find, filter, concat } from "lodash";
 import { util, redux } from "lib";
 
@@ -71,14 +70,13 @@ const findPath = (id: number, data: Model.Comment[], current: number[] = []): nu
  * @param options   Additional options supplied to the reducer factory.
  */
 export const createCommentsListResponseReducer = <
-  S extends Redux.CommentsListResponseStore = Redux.CommentsListResponseStore,
-  A extends Redux.Action<any> = Redux.Action<any>
+  S extends Redux.CommentsListResponseStore = Redux.CommentsListResponseStore
 >(
   /* eslint-disable indent */
   mappings: Partial<Redux.CommentsListResponseActionMap>,
-  options: Partial<Redux.FactoryOptions<Redux.CommentsListResponseActionMap, S, A>> = {}
-): Reducer<S, A> => {
-  const Options = mergeOptionsWithDefaults<Redux.CommentsListResponseActionMap, S, A>(
+  options: Partial<Redux.FactoryOptions<Redux.CommentsListResponseActionMap, S>> = {}
+): Redux.Reducer<S> => {
+  const Options = mergeOptionsWithDefaults<Redux.CommentsListResponseActionMap, S>(
     options,
     redux.initialState.initialCommentsListResponseState as S
   );
@@ -87,7 +85,7 @@ export const createCommentsListResponseReducer = <
   if (!isNil(mappings.Replying)) {
     subReducers = { ...subReducers, replying: createModelListActionReducer(mappings.Replying) };
   }
-  const genericListResponseReducer = createModelListResponseReducer<Model.Comment, S, A>(
+  const genericListResponseReducer = createModelListResponseReducer<Model.Comment, S>(
     {
       Response: mappings.Response,
       Request: mappings.Request,
@@ -101,7 +99,7 @@ export const createCommentsListResponseReducer = <
     }
   );
 
-  const reducers: Redux.MappedReducers<Redux.CommentsListResponseActionMap, S, A> = {
+  const reducers: Redux.MappedReducers<Redux.CommentsListResponseActionMap, S> = {
     AddToState: (st: S = Options.initialState, action: Redux.Action<{ data: Model.Comment; parent?: number }>) => {
       if (!isNil(action.payload.parent)) {
         const path = findPath(action.payload.parent, st.data);
@@ -130,11 +128,7 @@ export const createCommentsListResponseReducer = <
           });
           return st;
         } else {
-          let pageSize = st.pageSize;
-          if (st.data.length + 1 >= st.pageSize) {
-            pageSize = st.pageSize + 1;
-          }
-          return { ...st, data: [...st.data, action.payload.data], count: st.count + 1, pageSize };
+          return { ...st, data: [...st.data, action.payload.data], count: st.count + 1 };
         }
       }
     },
@@ -193,7 +187,7 @@ export const createCommentsListResponseReducer = <
     }
   };
 
-  return createObjectReducerFromMap<Redux.CommentsListResponseActionMap, S, A>(mappings, reducers, {
+  return createObjectReducerFromMap<Redux.CommentsListResponseActionMap, S>(mappings, reducers, {
     ...Options,
     extension: genericListResponseReducer
   });

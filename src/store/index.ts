@@ -1,38 +1,60 @@
-import { Store, Reducer, createStore, applyMiddleware, compose } from "redux";
-import createSagaMiddleware from "redux-saga";
+import { Store, Middleware, createStore, applyMiddleware, compose } from "redux";
+import createSagaMiddleware, { Saga } from "redux-saga";
 import * as Sentry from "@sentry/react";
 
-import ApplicationReduxConfig from "./config";
-import createApplicationReducer from "./reducer";
-import createRootSaga from "./sagas";
-import createRootInitialState from "./initialState";
+import { redux } from "lib";
+
+import GlobalReduxConfig from "./config";
+import { createAuthenticatedReducer, createUnauthenticatedReducer } from "./reducer";
+import { createAuthenticatedRootSaga, createUnauthenticatedRootSaga } from "./sagas";
+import { createAuthenticatedInitialState, createUnauthenticatedInitialState } from "./initialState";
 
 export * as actions from "./actions";
 export * as hooks from "./hooks";
 export * as initialState from "./initialState";
 export * as selectors from "./selectors";
+export * as tasks from "./tasks";
 
-const configureStore = (user: Model.User): Store<Modules.ApplicationStore, Redux.Action<any>> => {
-  const initialState = createRootInitialState(ApplicationReduxConfig, user);
+export const authenticatedActionMiddleware: Middleware<{}, Modules.Store> = api => next => action => {
+  const state = api.getState();
+  if (redux.typeguards.isAuthenticatedStore(state)) {
+    return next({ ...action, isAuthenticated: true });
+  }
+  return next({ ...action, isAuthenticated: false });
+};
 
+const configureGenericStore = <S extends Modules.Store>(
+  initialState: S,
+  reducer: Redux.Reducer<S>,
+  rootSaga: Saga<any[]>
+): Store<S, Redux.Action> => {
   const sentryReduxEnhancer = Sentry.createReduxEnhancer();
 
-  const applicationReducer = createApplicationReducer(ApplicationReduxConfig, user) as Reducer<
-    Modules.ApplicationStore,
-    Redux.Action
-  >;
-  const applicationSaga = createRootSaga(ApplicationReduxConfig);
-
+  // Create the redux-saga middleware that allows the sagas to run as side-effects
+  // in the application.
   const sagaMiddleware = createSagaMiddleware();
 
-  const store: Store<Modules.ApplicationStore, Redux.Action<any>> = createStore(
-    applicationReducer,
+  const store: Store<S, Redux.Action> = createStore(
+    reducer,
     initialState,
-    compose(applyMiddleware(sagaMiddleware), sentryReduxEnhancer)
+    compose(applyMiddleware(sagaMiddleware, authenticatedActionMiddleware), sentryReduxEnhancer)
   );
 
-  sagaMiddleware.run(applicationSaga);
+  // Start the application saga.
+  sagaMiddleware.run(rootSaga);
   return store;
 };
 
-export default configureStore;
+export const configureAuthenticatedStore = (user: Model.User): Store<Modules.Authenticated.Store, Redux.Action> => {
+  const initialState = createAuthenticatedInitialState(GlobalReduxConfig, user);
+  const applicationReducer = createAuthenticatedReducer(GlobalReduxConfig, user);
+  const applicationSaga = createAuthenticatedRootSaga(GlobalReduxConfig);
+  return configureGenericStore<Modules.Authenticated.Store>(initialState, applicationReducer, applicationSaga);
+};
+
+export const configureUnauthenticatedStore = (): Store<Modules.Unauthenticated.Store, Redux.Action> => {
+  const initialState = createUnauthenticatedInitialState(GlobalReduxConfig);
+  const applicationReducer = createUnauthenticatedReducer(GlobalReduxConfig);
+  const applicationSaga = createUnauthenticatedRootSaga(GlobalReduxConfig);
+  return configureGenericStore<Modules.Unauthenticated.Store>(initialState, applicationReducer, applicationSaga);
+};

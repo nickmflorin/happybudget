@@ -1,4 +1,6 @@
-export { default as Table } from "./Table";
-export * from "./Table";
 export * from "./grids";
 export * as framework from "./framework";
+export * from "./tables";
+export * from "./menus";
+export * from "./hocs";
+export * as hocs from "./hocs";

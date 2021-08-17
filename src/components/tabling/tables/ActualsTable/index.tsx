@@ -1,11 +1,9 @@
 import { isNil, map, filter, find } from "lodash";
-import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import { model, tabling } from "lib";
 
-import { ModelTable, ModelTableProps } from "components/tabling";
 import { framework } from "components/tabling/generic";
-
+import { ReadWriteModelTable, ReadWriteModelTableProps } from "../ModelTable";
 import Framework from "./framework";
 
 type R = Tables.ActualRow;
@@ -15,7 +13,7 @@ type PreContactCreate = Omit<Table.CellChange<Tables.SubAccountRow, Model.SubAcc
 
 type OmitTableProps = "columns" | "getRowLabel" | "actions" | "showPageFooter";
 
-export interface ActualsTableProps extends Omit<ModelTableProps<R, M>, OmitTableProps> {
+export interface ActualsTableProps extends Omit<ReadWriteModelTableProps<R, M>, OmitTableProps> {
   readonly exportFileName: string;
   readonly contacts: Model.Contact[];
   readonly actualsTableTotal: number;
@@ -33,36 +31,23 @@ const ActualsTable = ({
   onEditContact,
   ...props
 }: ActualsTableProps): JSX.Element => {
-  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
+  const tableRef = tabling.hooks.useReadWriteTableIfNotDefined<R, M>(props.tableRef);
   return (
-    <ModelTable<R, M>
+    <ReadWriteModelTable<R, M>
       {...props}
       defaultRowLabel={"Actual"}
       showPageFooter={false}
-      table={table}
+      tableRef={tableRef}
       getRowLabel={(m: M) => m.description}
       framework={tabling.util.combineFrameworks(Framework, props.framework)}
-      actions={(params: Table.MenuActionParams<R, M>) => [
-        {
-          tooltip: "Delete",
-          icon: "trash-alt",
-          disabled: params.selectedRows.length === 0,
-          onClick: () => {
-            const rows: R[] = params.apis.grid.getSelectedRows();
-            props.onChangeEvent?.({
-              payload: { rows, columns: params.columns },
-              type: "rowDelete"
-            });
-          }
-        },
-        framework.actions.ToggleColumnAction(table.current, params),
-        framework.actions.ExportCSVAction(table.current, params, exportFileName)
+      actions={(params: Table.ReadWriteMenuActionParams<R, M>) => [
+        framework.actions.ToggleColumnAction(tableRef.current, params),
+        framework.actions.ExportCSVAction(tableRef.current, params, exportFileName)
       ]}
       columns={[
-        {
+        framework.columnObjs.SelectColumn({
           field: "subaccount",
           headerName: "Sub-Account",
-          columnType: "singleSelect",
           minWidth: 200,
           maxWidth: 200,
           width: 200,
@@ -83,7 +68,7 @@ const ActualsTable = ({
               return null;
             }
             const availableSubAccounts: Model.SimpleSubAccount[] = filter(
-              map(props.data, (actual: M) => actual.subaccount),
+              map(props.models, (actual: M) => actual.subaccount),
               (sub: Model.SimpleSubAccount | null) => sub !== null && sub.identifier !== null
             ) as Model.SimpleSubAccount[];
             // NOTE: If there are multiple sub accounts with the same identifier, this will
@@ -98,23 +83,16 @@ const ActualsTable = ({
           cellEditorParams: {
             setSearch: (value: string) => onSubAccountsTreeSearch(value)
           },
-          // Required to allow the dropdown to be selectable on Enter key.
-          suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
-            if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-              return true;
-            }
-            return false;
-          },
           footer: {
             value: "Actuals Total"
           }
-        },
-        {
+        }),
+        framework.columnObjs.BodyColumn({
           field: "description",
           headerName: "Description",
           flex: 3,
           columnType: "longText"
-        },
+        }),
         framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
           field: "contact",
           headerName: "Contact",
@@ -138,20 +116,21 @@ const ActualsTable = ({
             }
           }
         }),
-        {
+        framework.columnObjs.BodyColumn({
           field: "purchase_order",
           headerName: "Purchase Order",
           flex: 1,
-          columnType: "number"
-        },
-        {
+          columnType: "number",
+          tableColumnType: "body"
+        }),
+        framework.columnObjs.BodyColumn({
           field: "date",
           headerName: "Date",
           flex: 1,
           valueFormatter: tabling.formatters.agDateValueFormatter,
           valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
           columnType: "date"
-        },
+        }),
         framework.columnObjs.ChoiceSelectColumn<R, M, Model.PaymentMethod>({
           field: "payment_method",
           headerName: "Pay Method",
@@ -159,13 +138,13 @@ const ActualsTable = ({
           cellEditor: "PaymentMethodEditor",
           models: model.models.PaymentMethods
         }),
-        {
+        framework.columnObjs.BodyColumn({
           field: "payment_id",
           headerName: "Pay ID",
           flex: 1,
           columnType: "number"
-        },
-        {
+        }),
+        framework.columnObjs.BodyColumn({
           field: "value",
           headerName: "Amount",
           flex: 1,
@@ -174,7 +153,7 @@ const ActualsTable = ({
           cellRenderer: "BodyCell",
           columnType: "currency",
           footer: { value: actualsTableTotal }
-        }
+        })
       ]}
     />
   );

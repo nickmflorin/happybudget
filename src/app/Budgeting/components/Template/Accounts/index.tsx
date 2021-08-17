@@ -7,16 +7,14 @@ import { redux, budgeting } from "lib";
 import { WrapInApplicationSpinner } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
 
-import { setTemplateAutoIndex } from "../../../store/actions/template";
-import { requestAccountsAction, requestGroupsAction } from "../../../store/actions/template/accounts";
-
+import { actions } from "../../../store";
 import AccountsTable from "./AccountsTable";
 
 const selectAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.table.loading
+  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.loading
 );
 const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.table.groups.loading
+  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.groups.loading
 );
 const selectLoading = createSelector(
   selectAccountsLoading,
@@ -34,12 +32,12 @@ const Accounts = ({ templateId, template }: AccountsProps): JSX.Element => {
   const loading = useSelector(selectLoading);
 
   useEffect(() => {
-    dispatch(setTemplateAutoIndex(false));
+    dispatch(actions.template.setTemplateAutoIndex(false));
   }, []);
 
   useEffect(() => {
-    dispatch(requestAccountsAction(null));
-    dispatch(requestGroupsAction(null));
+    dispatch(actions.template.accounts.requestAccountsAction(null));
+    dispatch(actions.template.accounts.requestGroupsAction(null));
   }, []);
 
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { Reducer, combineReducers } from "redux";
+import { combineReducers } from "redux";
 import { isNil, find, filter, map, reduce } from "lodash";
 
 import { redux, util, tabling } from "lib";
@@ -12,13 +12,13 @@ import initialState, {
 } from "../initialState";
 import * as factories from "./factories";
 
-const headerTemplatesRootReducer: Reducer<Modules.Budget.HeaderTemplatesStore, Redux.Action<any>> = (
-  state: Modules.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,
-  action: Redux.Action<any>
-): Modules.Budget.HeaderTemplatesStore => {
+const headerTemplatesRootReducer: Redux.Reducer<Modules.Authenticated.Budget.HeaderTemplatesStore> = (
+  state: Modules.Authenticated.Budget.HeaderTemplatesStore = initialHeaderTemplatesState,
+  action: Redux.Action
+): Modules.Authenticated.Budget.HeaderTemplatesStore => {
   const listResponseReducer = redux.reducers.factories.createModelListResponseReducer<
     Model.HeaderTemplate,
-    Modules.Budget.HeaderTemplatesStore
+    Modules.Authenticated.Budget.HeaderTemplatesStore
   >(
     {
       Response: ActionType.Budget.HeaderTemplates.Response,
@@ -45,9 +45,9 @@ const headerTemplatesRootReducer: Reducer<Modules.Budget.HeaderTemplatesStore, R
   return newState;
 };
 
-const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Redux.Action<any>> = (
+const actualsRootReducer: Redux.Reducer<Redux.ModelListResponseStore<Model.Actual>> = (
   state: Redux.ModelListResponseStore<Model.Actual> = redux.initialState.initialModelListResponseState,
-  action: Redux.Action<any>
+  action: Redux.Action
 ): Redux.ModelListResponseStore<Model.Actual> => {
   const listResponseReducer = redux.reducers.factories.createModelListResponseReducer<
     Model.Actual,
@@ -318,10 +318,10 @@ const genericReducer = combineReducers({
   headerTemplates: headerTemplatesRootReducer
 });
 
-const rootReducer: Reducer<Modules.Budget.ModuleStore<Model.Budget>, Redux.Action<any>> = (
-  state: Modules.Budget.ModuleStore<Model.Budget> = initialState.budget,
-  action: Redux.Action<any>
-): Modules.Budget.ModuleStore<Model.Budget> => {
+const rootReducer: Redux.Reducer<Modules.Authenticated.Budget.ModuleStore<Model.Budget>> = (
+  state: Modules.Authenticated.Budget.ModuleStore<Model.Budget> = initialState.budget,
+  action: Redux.Action
+): Modules.Authenticated.Budget.ModuleStore<Model.Budget> => {
   let newState = { ...state };
   if (action.type === ActionType.Budget.WipeState) {
     newState = initialState.budget;

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { Router, Route, Switch } from "react-router-dom";
+import { Router, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
@@ -7,7 +7,7 @@ import { createBrowserHistory } from "history";
 import "style/index.scss";
 
 import { ApplicationSpinner } from "components";
-import { ReduxRoute } from "components/routes";
+import { AuthenticatedReduxRoute, UnauthenticatedReduxRoute } from "components/routes";
 
 import { operational } from "lib";
 
@@ -49,8 +49,8 @@ function App(): JSX.Element {
         <div id={"application-spinner-container"}></div>
         <Suspense fallback={<ApplicationSpinner visible={true} />}>
           <Switch>
-            <Route path={["/login", "/signup"]} component={Landing} />
-            <ReduxRoute path={["/"]} component={Application} />
+            <UnauthenticatedReduxRoute path={["/login", "/signup"]} component={Landing} />
+            <AuthenticatedReduxRoute path={["/"]} component={Application} />
           </Switch>
         </Suspense>
       </div>

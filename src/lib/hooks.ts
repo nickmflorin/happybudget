@@ -1,6 +1,6 @@
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect, useMemo } from "react";
 import { dequal as deepEqual } from "dequal";
-import { isEqual } from "lodash";
+import { isEqual, isNil } from "lodash";
 
 var equal = require("fast-deep-equal/es6");
 
@@ -8,6 +8,15 @@ type UseEffectParams = Parameters<typeof useEffect>;
 type EffectCallback = UseEffectParams[0];
 type DependencyList = UseEffectParams[1];
 type UseEffectReturn = ReturnType<typeof useEffect>;
+
+export const useRefIfNotDefined = <T extends { [key: string]: any }>(
+  hook: () => { current: T },
+  prop?: { current: T }
+): { current: T } => {
+  const ref = hook();
+  const returnRef = useMemo(() => (!isNil(prop) ? prop : ref), [prop, ref.current]);
+  return returnRef;
+};
 
 export const useDynamicCallback = <T = any>(callback: (...args: any[]) => T) => {
   const ref = useRef<any>();

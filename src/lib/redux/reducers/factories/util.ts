@@ -1,11 +1,10 @@
-import { Reducer } from "redux";
 import { forEach, isNil, reduce } from "lodash";
 import { util } from "lib";
 
-export const mergeOptionsWithDefaults = <O extends Redux.ActionMap, S, A extends Redux.Action<any> = Redux.Action<any>>(
-  options: Partial<Redux.FactoryOptions<O, S, A>>,
+export const mergeOptionsWithDefaults = <O extends Redux.ActionMap, S>(
+  options: Partial<Redux.FactoryOptions<O, S>>,
   initialState: S
-): Redux.FactoryOptions<O, S, A> => {
+): Redux.FactoryOptions<O, S> => {
   return {
     initialState: initialState,
     subReducers: null,
@@ -17,12 +16,12 @@ export const mergeOptionsWithDefaults = <O extends Redux.ActionMap, S, A extends
   };
 };
 
-const findReducerForAction = <O extends Redux.ActionMap, S, A extends Redux.Action<any> = Redux.Action<any>>(
+const findReducerForAction = <O extends Redux.ActionMap, S>(
   /* eslint-disable indent */
-  action: A,
+  action: Redux.Action,
   mappings: Partial<O>,
-  reducers: Redux.MappedReducers<O, S, A>
-): Reducer<S, A> | undefined => {
+  reducers: Redux.MappedReducers<O, S>
+): Redux.Reducer<S> | undefined => {
   // Find the standardized action type that the associated action maps to based
   // on the provided mappings.
   let standardizedActionType: string | undefined = undefined;
@@ -33,42 +32,38 @@ const findReducerForAction = <O extends Redux.ActionMap, S, A extends Redux.Acti
     }
   });
   if (!isNil(standardizedActionType)) {
-    const reducer: Reducer<S, A> | undefined = reducers[standardizedActionType];
+    const reducer: Redux.Reducer<S> | undefined = reducers[standardizedActionType];
     return reducer;
   }
   return undefined;
 };
 
 export const createSimpleReducerFromMap =
-  <O extends Redux.ActionMap, S, A extends Redux.Action<any> = Redux.Action<any>>(
+  <O extends Redux.ActionMap, S>(
     /* eslint-disable indent */
     mappings: Partial<O>,
-    reducers: Redux.MappedReducers<O, S, A>,
-    options: Redux.FactoryOptions<O, S, A>
-  ): Reducer<S, A> =>
-  (state: S = options.initialState, action: A): S => {
-    const actionReducer = findReducerForAction<O, S, A>(action, mappings, reducers);
+    reducers: Redux.MappedReducers<O, S>,
+    options: Redux.FactoryOptions<O, S>
+  ): Redux.Reducer<S> =>
+  (state: S = options.initialState, action: Redux.Action): S => {
+    const actionReducer = findReducerForAction<O, S>(action, mappings, reducers);
     if (!isNil(actionReducer)) {
       return actionReducer(state, action);
     }
     return state;
   };
 
-export const createObjectReducerFromMap = <
-  O extends Redux.ActionMap,
-  S extends object,
-  A extends Redux.Action<any> = Redux.Action<any>
->(
+export const createObjectReducerFromMap = <O extends Redux.ActionMap, S extends object>(
   /* eslint-disable indent */
   mappings: Partial<O>,
-  transformers: Redux.MappedReducers<O, S, A>,
-  options: Redux.FactoryOptions<O, S, A>
-): Reducer<S, A> => {
-  const reducer: Reducer<S, A> = (state: S = options.initialState, action: A): S => {
+  transformers: Redux.MappedReducers<O, S>,
+  options: Redux.FactoryOptions<O, S>
+): Redux.Reducer<S> => {
+  const reducer: Redux.Reducer<S> = (state: S = options.initialState, action: Redux.Action): S => {
     let newState = { ...state };
     let reducers = { ...transformers, ...options.overrides };
 
-    const actionReducer = findReducerForAction<O, S, A>(action, mappings, reducers);
+    const actionReducer = findReducerForAction<O, S>(action, mappings, reducers);
     if (!isNil(actionReducer)) {
       // If the action is being filtered out of the reducer, do not update the state.
       if (isNil(options.excludeActions) || options.excludeActions(action, state) === false) {
@@ -82,7 +77,7 @@ export const createObjectReducerFromMap = <
       }
     }
     if (!isNil(options.subReducers)) {
-      forEach(options.subReducers, (subReducer: Reducer<any, A>, stateDirective: string) => {
+      forEach(options.subReducers, (subReducer: Redux.Reducer<any>, stateDirective: string) => {
         const subState = util.getKeyValue<S, keyof S>(stateDirective as keyof S)(newState);
         if (!isNil(subState)) {
           newState = { ...newState, [stateDirective]: subReducer(subState, action) };
@@ -93,7 +88,7 @@ export const createObjectReducerFromMap = <
     // the action and state.
     if (!isNil(options.extension)) {
       if (Array.isArray(options.extension)) {
-        newState = reduce(options.extension, (st: S, ext: Reducer<S, A>) => ext(st, action), newState);
+        newState = reduce(options.extension, (st: S, ext: Redux.Reducer<S>) => ext(st, action), newState);
       } else {
         newState = options.extension(newState, action);
       }

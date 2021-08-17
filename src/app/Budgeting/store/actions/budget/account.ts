@@ -15,9 +15,10 @@ export const responseCommentsAction = redux.actions.simpleAction<Http.ListRespon
   ActionType.Budget.Account.Comments.Response
 );
 export const loadingCommentsAction = redux.actions.simpleAction<boolean>(ActionType.Budget.Account.Comments.Loading);
-export const createCommentAction = redux.actions.simpleAction<{ parent?: number; data: Http.CommentPayload }>(
-  ActionType.Budget.Account.Comments.Create
-);
+export const createCommentAction = redux.actions.simpleAction<{
+  parent?: number;
+  data: Http.CommentPayload;
+}>(ActionType.Budget.Account.Comments.Create);
 export const creatingCommentAction = redux.actions.simpleAction<boolean>(ActionType.Budget.Account.Comments.Creating);
 export const deleteCommentAction = redux.actions.simpleAction<number>(ActionType.Budget.Account.Comments.Delete);
 export const updateCommentAction = redux.actions.simpleAction<Redux.UpdateModelActionPayload<Model.Comment>>(

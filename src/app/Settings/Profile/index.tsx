@@ -5,19 +5,18 @@ import { toast } from "react-toastify";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { hooks, actions } from "store";
 
 import { Form } from "components";
 import { UserProfileForm } from "components/forms";
 import { Page } from "components/layout";
-import { updateLoggedInUserAction } from "store/actions";
-import { useLoggedInUser } from "store/hooks";
 
 import "./index.scss";
 
 const Profile = (): JSX.Element => {
   const [file, setFile] = useState<UploadedImage | null>(null);
   const [form] = Form.useForm<Http.UserPayload>();
-  const user = useLoggedInUser();
+  const user = hooks.useLoggedInUser();
   const dispatch: Dispatch = useDispatch();
 
   return (
@@ -38,7 +37,7 @@ const Profile = (): JSX.Element => {
             api
               .updateActiveUser(payload)
               .then((response: Model.User) => {
-                dispatch(updateLoggedInUserAction(response));
+                dispatch(actions.authenticated.updateLoggedInUserAction(response));
                 toast.success("Your information has been successfully saved.");
               })
               .catch((e: Error) => {

@@ -254,7 +254,6 @@
   color: $text-secondary;
   box-sizing: border-box;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
-  @include transition(all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1));
 
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -278,7 +277,6 @@
     height: 100% !important;
     width: auto !important;
     color: inherit;
-    @include transition(all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1));
   }
 
   &--large {

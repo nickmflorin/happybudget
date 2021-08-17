@@ -1,6 +1,6 @@
 import { redux } from "lib";
 
-export const initialBudgetBudgetState: Modules.Budget.BudgetStore<any> = {
+export const initialBudgetBudgetState: Modules.Authenticated.Budget.BudgetStore<any> = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   table: redux.initialState.initialBudgetTableState,
@@ -8,7 +8,7 @@ export const initialBudgetBudgetState: Modules.Budget.BudgetStore<any> = {
   history: redux.initialState.initialModelListResponseState
 };
 
-export const initialSubAccountState: Modules.Budget.SubAccountStore = {
+export const initialSubAccountState: Modules.Authenticated.Budget.SubAccountStore = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   table: redux.initialState.initialBudgetTableWithFringesState,
@@ -16,7 +16,7 @@ export const initialSubAccountState: Modules.Budget.SubAccountStore = {
   history: redux.initialState.initialModelListResponseState
 };
 
-export const initialAccountState: Modules.Budget.AccountStore = {
+export const initialAccountState: Modules.Authenticated.Budget.AccountStore = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
   table: redux.initialState.initialBudgetTableWithFringesState,
@@ -24,13 +24,13 @@ export const initialAccountState: Modules.Budget.AccountStore = {
   history: redux.initialState.initialModelListResponseState
 };
 
-export const initialHeaderTemplatesState: Modules.Budget.HeaderTemplatesStore = {
+export const initialHeaderTemplatesState: Modules.Authenticated.Budget.HeaderTemplatesStore = {
   ...redux.initialState.initialModelListResponseState,
   displayedTemplate: null,
   loadingDetail: false
 };
 
-export const initialBudgetModuleState: Modules.Budget.ModuleStore<any> = {
+export const initialBudgetModuleState: Modules.Authenticated.Budget.ModuleStore<any> = {
   autoIndex: false,
   budget: initialBudgetBudgetState,
   commentsHistoryDrawerOpen: false,
@@ -41,11 +41,10 @@ export const initialBudgetModuleState: Modules.Budget.ModuleStore<any> = {
   headerTemplates: initialHeaderTemplatesState
 };
 
-const initialState: Modules.Budget.Store = {
+const initialState: Modules.Authenticated.Budget.Store = {
   budget: initialBudgetModuleState,
   template: initialBudgetModuleState,
-  fringeColors: redux.initialState.initialModelListResponseState,
-  subaccountUnits: redux.initialState.initialModelListResponseState
+  fringeColors: redux.initialState.initialModelListResponseState
 };
 
 export default initialState;

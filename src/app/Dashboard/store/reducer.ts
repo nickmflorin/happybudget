@@ -1,12 +1,11 @@
-import { Reducer, combineReducers } from "redux";
+import { combineReducers } from "redux";
 import { redux } from "lib";
 import { ActionType } from "./actions";
 
-const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combineReducers({
+const rootReducer: Redux.Reducer<Modules.Authenticated.Dashboard.Store> = combineReducers({
   templates: redux.reducers.factories.createModelListResponseReducer<
     Model.SimpleTemplate,
-    Redux.ModelListResponseStore<Model.SimpleTemplate>,
-    Redux.Action<any>
+    Redux.ModelListResponseStore<Model.SimpleTemplate>
   >({
     Response: ActionType.Templates.Response,
     Loading: ActionType.Templates.Loading,
@@ -17,8 +16,7 @@ const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combine
   }),
   community: redux.reducers.factories.createModelListResponseReducer<
     Model.SimpleTemplate,
-    Redux.ModelListResponseStore<Model.SimpleTemplate>,
-    Redux.Action<any>
+    Redux.ModelListResponseStore<Model.SimpleTemplate>
   >({
     Response: ActionType.Community.Response,
     Loading: ActionType.Community.Loading,
@@ -29,8 +27,7 @@ const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combine
   }),
   budgets: redux.reducers.factories.createModelListResponseReducer<
     Model.SimpleBudget,
-    Redux.ModelListResponseStore<Model.SimpleBudget>,
-    Redux.Action<any>
+    Redux.ModelListResponseStore<Model.SimpleBudget>
   >({
     Response: ActionType.Budgets.Response,
     Loading: ActionType.Budgets.Loading,

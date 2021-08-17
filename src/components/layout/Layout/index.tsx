@@ -49,6 +49,7 @@ const Layout = (props: LayoutProps): JSX.Element => {
       <div className={classNames("layout-content", layoutClassNameProps)}>
         <Header
           {...props.headerProps}
+          saving={props.saving}
           collapsed={props.collapsed}
           showHeaderLogo={props.showHeaderLogo}
           className={classNames(props.headerProps?.className, layoutClassNameProps)}

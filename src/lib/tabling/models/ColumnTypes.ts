@@ -1,84 +1,70 @@
-import {
-  faFontCase,
-  faAlignLeft,
-  faCaretCircleDown,
-  faUser,
-  faPhone,
-  faEnvelope,
-  faHashtag,
-  faDollarSign,
-  faEquals,
-  faCalendarDay,
-  faPercentage
-} from "@fortawesome/pro-solid-svg-icons";
-
 const ColumnTypes: Table.ColumnType[] = [
   {
     id: "action"
   },
   {
     id: "text",
-    icon: faFontCase,
+    icon: "font-case",
     style: { textAlign: "left" },
     headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "longText",
-    icon: faAlignLeft,
+    icon: "align-left",
     style: { textAlign: "left" }
   },
   {
     id: "singleSelect",
-    icon: faCaretCircleDown,
+    icon: "caret-circle-down",
     style: { textAlign: "left" },
     headerOverrides: { style: { textAlign: "center" } },
     editorIsPopup: true
   },
   {
     id: "contact",
-    icon: faUser,
+    icon: "user",
     style: { textAlign: "left" },
     headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "phone",
-    icon: faPhone,
+    icon: "phone",
     style: { textAlign: "left" },
     headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "email",
-    icon: faEnvelope,
+    icon: "envelope",
     style: { textAlign: "left" },
     headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "number",
-    icon: faHashtag,
+    icon: "hashtag",
     style: { textAlign: "right" },
     headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "currency",
-    icon: faDollarSign,
+    icon: "dollar-sign",
     style: { textAlign: "right" },
     headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "sum",
-    icon: faEquals,
+    icon: "equals",
     style: { textAlign: "right" },
     headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "date",
-    icon: faCalendarDay,
+    icon: "calendar-day",
     style: { textAlign: "right" },
     headerOverrides: { style: { textAlign: "center" } }
   },
   {
     id: "percentage",
-    icon: faPercentage,
+    icon: "percentage",
     style: { textAlign: "right" },
     headerOverrides: { style: { textAlign: "center" } }
   }

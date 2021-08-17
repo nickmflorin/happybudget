@@ -1,4 +1,3 @@
-export { default as BudgetAccountsTable } from "./BudgetAccountsTable";
-export * from "./BudgetAccountsTable";
-export { default as TemplateAccountsTable } from "./TemplateAccountsTable";
-export * from "./TemplateAccountsTable";
+export { default as ReadOnlyBudgetAccountsTable } from "./ReadOnlyBudgetAccountsTable";
+export { default as ReadWriteBudgetAccountsTable } from "./ReadWriteBudgetAccountsTable";
+export { default as ReadWriteTemplateAccountsTable } from "./ReadWriteTemplateAccountsTable";

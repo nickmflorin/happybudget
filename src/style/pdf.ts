@@ -12,7 +12,7 @@ import {
 
 export const importFontModules = (): Promise<{ [key: string]: any }> => import("./fonts");
 
-export const getPdfFont = (font: Style.Font, modules: { [key: string]: any }): Pdf.Font | null => {
+export const getPdfFont = (font: Font, modules: { [key: string]: any }): Pdf.Font | null => {
   const moduleName = getFontSourceModuleName(font);
   if (isNil(modules[moduleName])) {
     /* eslint-disable no-console */
@@ -32,9 +32,9 @@ export const getPdfFont = (font: Style.Font, modules: { [key: string]: any }): P
   }
 };
 
-export const registerFontFace = (fontFace: Style.FontFace, modules: { [key: string]: any }) => {
-  const fontFaceFonts: Style.Font[] = fontsFromFontFace(fontFace);
-  const pdfFonts = map(fontFaceFonts, (font: Style.Font) => getPdfFont(font, modules));
+export const registerFontFace = (fontFace: FontFace, modules: { [key: string]: any }) => {
+  const fontFaceFonts: Font[] = fontsFromFontFace(fontFace);
+  const pdfFonts = map(fontFaceFonts, (font: Font) => getPdfFont(font, modules));
   Font.register({
     family: fontFace.family,
     fonts: filter(pdfFonts, (font: Pdf.Font | null) => !isNil(font)) as Pdf.Font[]
@@ -43,7 +43,7 @@ export const registerFontFace = (fontFace: Style.FontFace, modules: { [key: stri
 
 export const registerFonts = (): Promise<void> => {
   return importFontModules().then((modules: { [key: string]: any }) => {
-    map(SupportedFontFaces, (fontFace: Style.FontFace) => registerFontFace(fontFace, modules));
+    map(SupportedFontFaces, (fontFace: FontFace) => registerFontFace(fontFace, modules));
   });
 };
 

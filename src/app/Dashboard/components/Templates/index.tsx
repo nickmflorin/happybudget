@@ -6,7 +6,7 @@ import { isNil } from "lodash";
 import { Page } from "components/layout";
 import { CreateBudgetModal } from "components/modals";
 
-import { addBudgetToStateAction } from "../../store/actions";
+import { actions } from "../../store";
 
 import Discover from "./Discover";
 import MyTemplates from "./MyTemplates";
@@ -36,7 +36,7 @@ const Templates = (): JSX.Element => {
           title={"Create Budget from Template"}
           onSuccess={(budget: Model.Budget) => {
             setTemplateToDerive(undefined);
-            dispatch(addBudgetToStateAction(budget));
+            dispatch(actions.addBudgetToStateAction(budget));
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

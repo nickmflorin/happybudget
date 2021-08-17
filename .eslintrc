@@ -1,82 +1,64 @@
 {
-    "env": {
-      "commonjs": true,
-      "es6": true,
-      "node": true
-    },
-    "extends": [
-      "react-app",
-      "eslint:recommended",
-      "plugin:prettier/recommended"
-    ],
-    "globals": {
-      "Atomics": "readonly",
-      "SharedArrayBuffer": "readonly",
-      "JSX": "readonly"
-    },
-    "parserOptions": {
-      "ecmaVersion": 2018,
-      "sourceType": "module",
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    },
-    "rules": {
-      "prettier/prettier": "error",
-      "no-global-assign": 2,
-      "no-redeclare": 2,
-      "no-shadow": 2,
-      "no-restricted-globals": 2,
-      "quotes": [
-        1,
-        "double"
-      ],
-      "semi": [
-        1,
-        "always"
-      ],
-      "indent": [
-        1,
-        2
-      ],
-      "no-unused-vars": "warn",
-      "no-unused-expressions": "warn",
-      "no-multi-spaces": "warn",
-      "no-trailing-spaces": "warn",
-      "no-console": "warn",
-      "no-eval": "warn",
-      "import/first": "warn",
-      "object-curly-spacing": [
-        1,
-        "always"
-      ],
-      "react/no-unused-prop-types": "warn",
-      "react/no-unused-state": "warn",
-      "react/jsx-uses-react": "warn",
-      "react/jsx-uses-vars": "warn",
-      "react/jsx-no-undef": "error",
-      "react/jsx-no-comment-textnodes": "off",
-      "react-hooks/exhaustive-deps": "off",
-      "@typescript-eslint/explicit-function-return-type": [
-        "off"
-      ],
-      "react/jsx-curly-brace-presence": [
-        "warn",
-        {
-          "props": "always",
-          "children": "always"
-        }
-      ],
-      // Note:  These non-typescript base rules have to be disabled as of TS
-      // 4.0.0 in order to prevent false positives.  The no-undef lint rule does
-      // not use TypeScript to determine the global variables that exist -
-      // instead, it relies upon ESLint's configuration - so it is strongly
-      // recommended that it be turned off since TS will handle it anyways.
-      // https://github.com/typescript-eslint/typescript-eslint/blob/master/
-      // docs/getting-started/linting/FAQ.md#i-get-errors-from-the-no-undef-
-      // rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
-      "no-use-before-define": "off",
-      "no-undef": "off",
-      "@typescript-eslint/no-use-before-define": ["error"]
+  "env": {
+    "commonjs": true,
+    "es6": true,
+    "node": true
+  },
+  "extends": ["react-app", "eslint:recommended", "plugin:prettier/recommended"],
+  "globals": {
+    "Atomics": "readonly",
+    "SharedArrayBuffer": "readonly",
+    "JSX": "readonly"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
     }
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "no-global-assign": 2,
+    "no-redeclare": "off", // Messes with function overloading.
+    "no-shadow": 2,
+    "no-restricted-globals": 2,
+    "quotes": [1, "double"],
+    "semi": [1, "always"],
+    "indent": [1, 2],
+    "no-unused-vars": "warn",
+    "no-unused-expressions": "warn",
+    "no-multi-spaces": "warn",
+    "no-trailing-spaces": "warn",
+    "no-console": "warn",
+    "no-eval": "warn",
+    "import/first": "warn",
+    "object-curly-spacing": [1, "always"],
+    "react/no-unused-prop-types": "warn",
+    "react/no-unused-state": "warn",
+    "react/jsx-uses-react": "warn",
+    "react/jsx-uses-vars": "warn",
+    "react/jsx-no-undef": "error",
+    "react/jsx-no-comment-textnodes": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "@typescript-eslint/explicit-function-return-type": ["off"],
+    "react/jsx-curly-brace-presence": [
+      "warn",
+      {
+        "props": "always",
+        "children": "always"
+      }
+    ],
+    // Note:  These non-typescript base rules have to be disabled as of TS
+    // 4.0.0 in order to prevent false positives.  The no-undef lint rule does
+    // not use TypeScript to determine the global variables that exist -
+    // instead, it relies upon ESLint's configuration - so it is strongly
+    // recommended that it be turned off since TS will handle it anyways.
+    // https://github.com/typescript-eslint/typescript-eslint/blob/master/
+    // docs/getting-started/linting/FAQ.md#i-get-errors-from-the-no-undef-
+    // rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
+    "no-use-before-define": "off",
+    "no-undef": "off",
+    "@typescript-eslint/no-use-before-define": ["error"]
   }
+}

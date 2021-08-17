@@ -6,21 +6,19 @@ import { map } from "lodash";
 
 import { redux, tabling } from "lib";
 import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals";
-import { BudgetAccountsTable } from "components/tabling";
+import { ReadWriteBudgetAccountsTable } from "components/tabling";
 
-import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
-import { selectCommentsHistoryDrawerOpen } from "../../../store/selectors";
-import * as actions from "../../../store/actions/budget/accounts";
+import { actions, selectors } from "../../../store";
 import PreviewModal from "../PreviewModal";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.groups.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.search
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.search
 );
 
 interface AccountsTableProps {
@@ -39,22 +37,22 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
   const data = useSelector(selectData);
   const search = useSelector(selectTableSearch);
   const groups = useSelector(selectGroups);
-  const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
+  const commentsHistoryDrawerOpen = useSelector(selectors.selectCommentsHistoryDrawerOpen);
 
-  const table = tabling.hooks.useBudgetTable<Tables.AccountRow, Model.Account>();
+  const table = tabling.hooks.useReadWriteBudgetTable<Tables.AccountRow, Model.Account>();
 
   return (
     <React.Fragment>
-      <BudgetAccountsTable
-        table={table}
-        data={data}
+      <ReadWriteBudgetAccountsTable
+        tableRef={table}
+        models={data}
         groups={groups}
         search={search}
         budget={budget}
         menuPortalId={"supplementary-header"}
-        onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
+        onSearch={(value: string) => dispatch(actions.budget.accounts.setAccountsSearchAction(value))}
         onChangeEvent={(e: Table.ChangeEvent<Tables.AccountRow, Model.Account>) =>
-          dispatch(actions.handleTableChangeEventAction(e))
+          dispatch(actions.budget.accounts.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         onGroupRows={(rows: Tables.AccountRow[]) => setGroupAccounts(map(rows, (row: Tables.AccountRow) => row.id))}
@@ -68,7 +66,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
           {
             label: "Comments",
             icon: "comments-alt",
-            onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
+            onClick: () => dispatch(actions.budget.setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
           }
         ]}
       />
@@ -79,7 +77,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupAccounts(undefined);
-            dispatch(actions.addGroupToStateAction(group));
+            dispatch(actions.budget.accounts.addGroupToStateAction(group));
           }}
           onCancel={() => setGroupAccounts(undefined)}
         />
@@ -91,7 +89,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
+            dispatch(actions.budget.accounts.updateGroupInStateAction({ id: group.id, data: group }));
             if (group.color !== groupToEdit.color) {
               table.current.applyGroupColorChange(group);
             }

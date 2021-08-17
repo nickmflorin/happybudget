@@ -2,7 +2,7 @@ import { withExcludeGroupRows } from "components/tabling/tables/BudgetTable/fram
 import * as cells from "./cells";
 import * as editors from "./editors";
 
-const FrameworkComponents: Table.Framework = {
+export const Framework: Table.Framework = {
   editors: {
     FringesEditor: editors.FringesEditor,
     SubAccountUnitEditor: editors.SubAccountUnitEditor
@@ -14,5 +14,3 @@ const FrameworkComponents: Table.Framework = {
     }
   }
 };
-
-export default FrameworkComponents;

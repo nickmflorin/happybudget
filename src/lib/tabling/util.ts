@@ -19,6 +19,40 @@ type Defaults = {
   label?: string | undefined;
 };
 
+export const updateColumnsOfTableType = <C extends Table.DualColumn<R, M>, R extends Table.Row, M extends Model.Model>(
+  columns: C[],
+  type: Table.TableColumnTypeId,
+  update: Partial<C> | ((c: C) => Partial<C>)
+): C[] => {
+  return reduce(
+    columns,
+    (curr: C[], col: C) => {
+      if (col.tableColumnType === type) {
+        return [...curr, { ...col, ...(typeof update === "function" ? update(col) : update) }];
+      }
+      return [...curr, col];
+    },
+    []
+  );
+};
+
+export const updateColumnsOfField = <C extends Table.DualColumn<R, M>, R extends Table.Row, M extends Model.Model>(
+  columns: C[],
+  field: Table.Field<R, M>,
+  update: Partial<C> | ((c: C) => Partial<C>)
+): C[] => {
+  return reduce(
+    columns,
+    (curr: C[], col: C) => {
+      if (col.field === field) {
+        return [...curr, { ...col, ...(typeof update === "function" ? update(col) : update) }];
+      }
+      return [...curr, col];
+    },
+    []
+  );
+};
+
 export const getFullRowLabel = <R extends Table.Row>(row: R, defaults?: Defaults): string | null => {
   const rowLabel: string | number | null | undefined = row.meta.label || defaults?.label;
   const rowName: string | number | null | undefined = row.meta.name || defaults?.name;
@@ -57,6 +91,19 @@ export const mergeClassNamesFn =
   <T>(...args: Table.ClassName<T>[]): ((params: T) => string) =>
   (params: T) =>
     mergeClassNames(params, ...args);
+
+export const combineMenuActions = <P extends Table.MenuActionParams<R, M>, R extends Table.Row, M extends Model.Model>(
+  ...args: Table.MenuActions<R, M, P>[]
+): Table.MenuActions<R, M, P> => {
+  return (params: P) =>
+    reduce(
+      args,
+      (curr: Array<Table.MenuAction<R, M, P>>, actions: Table.MenuActions<R, M, P>) => {
+        return [...curr, ...(typeof actions === "function" ? actions(params) : actions)];
+      },
+      []
+    );
+};
 
 export const combineFrameworks = (...args: (Table.Framework | undefined | null)[]): Table.Framework => {
   return reduce(
@@ -114,15 +161,45 @@ export const getColumnTypeCSSStyle = (
   return style;
 };
 
+export const orderActions = (actions: Table.MenuActionObj[]): Table.MenuActionObj[] => {
+  const actionsWithIndex = filter(actions, (action: Table.MenuActionObj) => !isNil(action.index));
+  const actionsWithoutIndex = filter(actions, (action: Table.MenuActionObj) => isNil(action.index));
+  return [...orderBy(actionsWithIndex, ["index"], ["asc"]), ...actionsWithoutIndex];
+};
+
+export const evaluateActions = <
+  R extends Table.Row,
+  M extends Model.Model,
+  T extends Table.MenuActionParams<R, M> = Table.MenuActionParams<R, M>
+>(
+  actions: Table.MenuActions<R, M, T>,
+  params: T
+): Table.MenuActionObj[] => {
+  return orderActions(
+    reduce(
+      Array.isArray(actions) ? actions : actions(params),
+      (objs: Table.MenuActionObj[], action: Table.MenuAction<R, M, T>) => {
+        return [...objs, typeof action === "function" ? action(params) : action];
+      },
+      []
+    )
+  );
+};
+
 export const orderColumns = <C extends Table.DualColumn<R, M>, R extends Table.Row, M extends Model.Model>(
   columns: C[]
 ): C[] => {
   const columnsWithIndex = filter(columns, (col: C) => !isNil(col.index));
-  const columnsWithoutIndexNotCalculated = filter(columns, (col: C) => isNil(col.index) && col.isCalculated !== true);
-  const columnsWithoutIndexCalculated = filter(columns, (col: C) => isNil(col.index) && col.isCalculated === true);
+  const columnsWithoutIndexAction = filter(columns, (col: C) => isNil(col.index) && col.tableColumnType === "action");
+  const columnsWithoutIndexBody = filter(columns, (col: C) => isNil(col.index) && col.tableColumnType === "body");
+  const columnsWithoutIndexCalculated = filter(
+    columns,
+    (col: C) => isNil(col.index) && col.tableColumnType === "calculated"
+  );
   return [
+    ...columnsWithoutIndexAction,
     ...orderBy(columnsWithIndex, ["index"], ["asc"]),
-    ...columnsWithoutIndexNotCalculated,
+    ...columnsWithoutIndexBody,
     ...columnsWithoutIndexCalculated
   ];
 };
@@ -233,14 +310,14 @@ export const consolidateTableChange = <R extends Table.Row, M extends Model.Mode
 };
 
 export const mergeChangesWithModel = <R extends Table.Row, M extends Model.Model>(
-  model: M,
+  m: M,
   changes: Table.Change<R, M>
 ): M => {
   const consolidated: Table.ConsolidatedChange<R, M> = consolidateTableChange<R, M>(changes);
 
-  let newModel = { ...model };
+  let newModel = { ...m };
   forEach(consolidated, (change: Table.RowChange<R, M>) => {
-    if (change.id !== model.id) {
+    if (change.id !== m.id) {
       throw new Error("Trying to apply table changes to a model that were created for another model!");
     }
     Object.keys(change.data).forEach((key: Table.Field<R, M>) => {
@@ -402,9 +479,9 @@ export const createAutoIndexedBulkCreatePayload = <M extends Model.Model>(
   ms: M[],
   autoIndexField: keyof M
 ): Http.BulkCreatePayload<any> => {
-  const converter = (model: M): number | null => {
-    if (!isNil(model[autoIndexField]) && !isNaN(parseInt(String(model[autoIndexField])))) {
-      return parseInt(String(model[autoIndexField]));
+  const converter = (m: M): number | null => {
+    if (!isNil(m[autoIndexField]) && !isNaN(parseInt(String(m[autoIndexField])))) {
+      return parseInt(String(m[autoIndexField]));
     }
     return null;
   };
@@ -474,7 +551,7 @@ export const convertModelToRow = <
   M extends Model.Model,
   E extends Table.RowMeta
 >(
-  model: M,
+  m: M,
   columns: C[],
   options?: CreateTableDataOptions<E, R, M>
 ): R => {
@@ -485,8 +562,8 @@ export const convertModelToRow = <
     (obj: Partial<R>, col: C) => {
       const nullValue = col.nullValue === undefined ? defaultNullValue : col.nullValue;
       const modelValue = !isNil(col.getRowValue)
-        ? col.getRowValue(model)
-        : util.getKeyValue<M, keyof M>(col.field as keyof M)(model);
+        ? col.getRowValue(m)
+        : util.getKeyValue<M, keyof M>(col.field as keyof M)(m);
       if (modelValue !== undefined) {
         obj[col.field as keyof R] = modelValue as any;
       } else {
@@ -495,8 +572,8 @@ export const convertModelToRow = <
       return obj;
     },
     {
-      id: model.id,
-      meta: !isNil(dataOptions.getRowMeta) ? dataOptions.getRowMeta(model) : {}
+      id: m.id,
+      meta: !isNil(dataOptions.getRowMeta) ? dataOptions.getRowMeta(m) : {}
     } as Partial<R>
   ) as R;
 };
@@ -507,7 +584,7 @@ export const createTableData = <C extends Table.DualColumn<R, M>, R extends Tabl
   options?: CreateTableDataOptions<Table.RowMeta, R, M>
 ): Table.TableData<R, M> => {
   const dataOptions = options || {};
-  const modelsWithRows = map(data, (model: M) => ({ model, row: convertModelToRow(model, columns, options) }));
+  const modelsWithRows = map(data, (m: M) => ({ model: m, row: convertModelToRow(m, columns, options) }));
   return !isNil(dataOptions.ordering)
     ? orderModelsWithRowsByFieldOrdering<R, M>(modelsWithRows, dataOptions.ordering)
     : modelsWithRows;

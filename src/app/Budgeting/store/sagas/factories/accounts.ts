@@ -43,9 +43,9 @@ export const createAccountsTaskSet = <B extends Model.Budget | Model.Template>(
   /* eslint-disable indent */
   actions: AccountsTasksActionMap<B>,
   services: AccountsServiceSet<B>,
-  selectObjId: (state: Modules.ApplicationStore) => number | null,
-  selectModels: (state: Modules.ApplicationStore) => C[],
-  selectAutoIndex: (state: Modules.ApplicationStore) => boolean
+  selectObjId: (state: Modules.Authenticated.Store) => number | null,
+  selectModels: (state: Modules.Authenticated.Store) => C[],
+  selectAutoIndex: (state: Modules.Authenticated.Store) => boolean
 ): AccountsTaskSet => {
   function* bulkCreateTask(objId: number, e: Table.RowAddEvent<R, C>, errorMessage: string): SagaIterator {
     const CancelToken = axios.CancelToken;

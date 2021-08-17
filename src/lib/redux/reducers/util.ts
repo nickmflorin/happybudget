@@ -2,7 +2,7 @@ import { isNil, filter, map } from "lodash";
 import { util, redux } from "lib";
 
 export const findModelInData = <M extends Model.Model, A extends Array<any> = M[]>(
-  action: Redux.Action<any>,
+  action: Redux.Action,
   data: A,
   id: Redux.ModelLookup<M>,
   options: Redux.FindModelOptions = { name: "Model", warnIfMissing: true }
@@ -24,7 +24,7 @@ export const findModelInData = <M extends Model.Model, A extends Array<any> = M[
 };
 
 export const findModelsInData = <M extends Model.Model, A extends Array<any> = M[]>(
-  action: Redux.Action<any>,
+  action: Redux.Action,
   data: A,
   ids: Redux.ModelLookup<M>[],
   options: Redux.FindModelOptions = { name: "Model", warnIfMissing: true }
@@ -36,7 +36,7 @@ export const findModelsInData = <M extends Model.Model, A extends Array<any> = M
 
 export const modelFromState = <M extends Model.Model, A extends Array<any> = M[]>(
   /* eslint-disable indent */
-  action: Redux.Action<any>,
+  action: Redux.Action,
   data: A,
   id: Redux.ModelLookup<M> | M,
   options: Redux.FindModelOptions = { name: "Model", warnIfMissing: true }

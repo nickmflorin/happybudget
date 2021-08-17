@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import Cookies from "universal-cookie";
 import { isNil, filter, map } from "lodash";
 
@@ -7,74 +7,6 @@ import { ColumnApi, GridApi } from "@ag-grid-community/core";
 import { util, hooks } from "lib";
 import TableApis from "./apis";
 import * as cookies from "./cookies";
-
-export const InitialDataGridRef: Table.Grid<any, any> = {
-  applyTableChange: (event: Table.ChangeEvent<any, any>) => {},
-  getCSVData: (fields?: string[]) => []
-};
-
-export const InitialBudgetDataGridRef: BudgetTable.Grid<any, any> = {
-  ...InitialDataGridRef,
-  applyGroupColorChange: (group: Model.Group) => {}
-};
-
-export const InitialTableRef: Table.Table<any, any> = {
-  ...InitialDataGridRef,
-  changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any, any>>, sizeToFit?: boolean) => {}
-};
-
-export const InitialBudgetTableRef: BudgetTable.Table<any, any> = {
-  ...InitialBudgetDataGridRef,
-  ...InitialTableRef
-};
-
-export const useGrid = <R extends Table.Row, M extends Model.Model>(): Table.GridRef<R, M> => {
-  return useRef<Table.Grid<R, M>>(InitialDataGridRef);
-};
-
-export const useGridIfNotDefined = <R extends Table.Row, M extends Model.Model>(
-  grid?: Table.GridRef<R, M>
-): Table.GridRef<R, M> => {
-  const ref = useRef<Table.Grid<R, M>>(InitialDataGridRef);
-  const returnRef = useMemo(() => (!isNil(grid) ? grid : ref), [grid, ref.current]);
-  return returnRef;
-};
-
-export const useBudgetGrid = <R extends BudgetTable.Row, M extends Model.Model>(): BudgetTable.GridRef<R, M> => {
-  return useRef<BudgetTable.Grid<R, M>>(InitialBudgetDataGridRef);
-};
-
-export const useBudgetGridIfNotDefined = <R extends BudgetTable.Row, M extends Model.Model>(
-  grid?: BudgetTable.GridRef<R, M>
-): BudgetTable.GridRef<R, M> => {
-  const ref = useRef<BudgetTable.Grid<R, M>>(InitialBudgetDataGridRef);
-  const returnRef = useMemo(() => (!isNil(grid) ? grid : ref), [grid, ref.current]);
-  return returnRef;
-};
-
-export const useTable = <R extends Table.Row, M extends Model.Model>(): Table.Ref<R, M> => {
-  return useRef<Table.Table<R, M>>(InitialTableRef);
-};
-
-export const useTableIfNotDefined = <R extends Table.Row, M extends Model.Model>(
-  table?: Table.Ref<R, M> | null
-): Table.Ref<R, M> => {
-  const ref = useRef<Table.Table<R, M>>(InitialBudgetTableRef);
-  const returnRef = useMemo(() => (!isNil(table) ? table : ref), [table, ref.current]);
-  return returnRef;
-};
-
-export const useBudgetTable = <R extends Table.Row, M extends Model.Model>(): BudgetTable.Ref<R, M> => {
-  return useRef<BudgetTable.Table<R, M>>(InitialBudgetTableRef);
-};
-
-export const useBudgetTableIfNotDefined = <R extends BudgetTable.Row, M extends Model.Model>(
-  table?: BudgetTable.Ref<R, M> | null
-): BudgetTable.Ref<R, M> => {
-  const ref = useRef<BudgetTable.Table<R, M>>(InitialBudgetTableRef);
-  const returnRef = useMemo(() => (!isNil(table) ? table : ref), [table, ref.current]);
-  return returnRef;
-};
 
 type UseOrderingParams<R extends Table.Row, M extends Model.Model> = {
   readonly cookie?: string;
@@ -104,7 +36,7 @@ export const useOrdering = <R extends Table.Row, M extends Model.Model>(
       const cookiesOrdering = cookiesObj.get(params.cookie);
       const validatedOrdering = cookies.validateOrdering(
         cookiesOrdering,
-        filter(params.columns, (col: Table.Column<R, M>) => !(col.isCalculated === true))
+        filter(params.columns, (col: Table.Column<R, M>) => col.tableColumnType !== "calculated")
       );
       if (!isNil(validatedOrdering)) {
         setOrdering(validatedOrdering);
@@ -156,3 +88,52 @@ export const useHiddenColumns = <R extends Table.Row, M extends Model.Model>(
 
   return [hiddenColumns, changeColumnVisibility];
 };
+
+export const InitialReadOnlyTableRef: Table.ReadOnlyTableRefObj<any, any> = {
+  getCSVData: (fields?: string[]) => [],
+  changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any, any>>, sizeToFit?: boolean) => {}
+};
+
+export const InitialReadWriteTableRef: Table.ReadWriteTableRefObj<any, any> = {
+  applyTableChange: (event: Table.ChangeEvent<any, any>) => {},
+  ...InitialReadOnlyTableRef
+};
+
+export const InitialReadWriteBudgetTableRef: BudgetTable.ReadWriteTableRefObj<any, any> = {
+  applyGroupColorChange: (group: Model.Group) => {},
+  ...InitialReadWriteTableRef
+};
+
+export const useReadOnlyTable = <R extends Table.Row, M extends Model.Model>(): NonNullRef<
+  Table.ReadOnlyTableRefObj<R, M>
+> => {
+  return useRef<Table.ReadOnlyTableRefObj<R, M>>(InitialReadWriteBudgetTableRef);
+};
+
+/* eslint-disable indent */
+export const useReadOnlyTableIfNotDefined = <R extends Table.Row, M extends Model.Model>(
+  grid?: NonNullRef<Table.ReadOnlyTableRefObj<R, M>>
+): NonNullRef<Table.ReadOnlyTableRefObj<R, M>> =>
+  hooks.useRefIfNotDefined<Table.ReadOnlyTableRefObj<R, M>>(useReadOnlyTable, grid);
+
+export const useReadWriteTable = <R extends Table.Row, M extends Model.Model>(): NonNullRef<
+  Table.ReadWriteTableRefObj<R, M>
+> => {
+  return useRef<Table.ReadWriteTableRefObj<R, M>>(InitialReadWriteBudgetTableRef);
+};
+
+export const useReadWriteTableIfNotDefined = <R extends Table.Row, M extends Model.Model>(
+  grid?: NonNullRef<Table.ReadWriteTableRefObj<R, M>>
+): NonNullRef<Table.ReadWriteTableRefObj<R, M>> =>
+  hooks.useRefIfNotDefined<Table.ReadWriteTableRefObj<R, M>>(useReadWriteTable, grid);
+
+export const useReadWriteBudgetTable = <R extends Table.Row, M extends Model.Model>(): NonNullRef<
+  BudgetTable.ReadWriteTableRefObj<R, M>
+> => {
+  return useRef<BudgetTable.ReadWriteTableRefObj<R, M>>(InitialReadWriteBudgetTableRef);
+};
+
+export const useReadWriteBudgetTableIfNotDefined = <R extends Table.Row, M extends Model.Model>(
+  grid?: NonNullRef<BudgetTable.ReadWriteTableRefObj<R, M>>
+): NonNullRef<BudgetTable.ReadWriteTableRefObj<R, M>> =>
+  hooks.useRefIfNotDefined<BudgetTable.ReadWriteTableRefObj<R, M>>(useReadWriteBudgetTable, grid);

@@ -4,10 +4,11 @@ import axios from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { tasks } from "store";
 
 import { ActionType } from "../../actions";
 import { loadingTemplateAction, responseTemplateAction } from "../../actions/template";
-import { getFringeColorsTask, getSubAccountUnitsTask } from "../tasks";
+import { getFringeColorsTask } from "../tasks";
 
 import accountSaga from "./account";
 import budgetSaga from "./accounts";
@@ -16,11 +17,11 @@ import subAccountSaga from "./subAccount";
 export function* handleTemplateChangedTask(action: Redux.Action<number>): SagaIterator {
   // TODO: Maybe we should not call getFringeColorsTask whenever the template/budget changes but
   // just once.  Same thing goes for the Sub Account Units.
-  yield all([call(getTemplateTask), call(getFringeColorsTask), call(getSubAccountUnitsTask)]);
+  yield all([call(getTemplateTask), call(getFringeColorsTask), call(tasks.getSubAccountUnitsTask, action)]);
 }
 
 export function* getTemplateTask(): SagaIterator {
-  const templateId = yield select((state: Modules.ApplicationStore) => state.budget.template.budget.id);
+  const templateId = yield select((state: Modules.Authenticated.Store) => state.budget.template.budget.id);
   if (!isNil(templateId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

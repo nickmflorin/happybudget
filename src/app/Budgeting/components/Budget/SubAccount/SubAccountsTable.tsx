@@ -5,28 +5,27 @@ import { isNil, map } from "lodash";
 
 import { redux, tabling } from "lib";
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
+import { hooks } from "store";
 
-import { setCommentsHistoryDrawerVisibilityAction } from "../../../store/actions/budget";
-import { selectCommentsHistoryDrawerOpen, selectSubAccountUnits } from "../../../store/selectors";
-import * as actions from "../../../store/actions/budget/subAccount";
+import { actions, selectors } from "../../../store";
 import PreviewModal from "../PreviewModal";
 import BudgetSubAccountsTable from "../SubAccountsTable";
 import FringesModal from "./FringesModal";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.groups.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.groups.data
 );
 const selectSubAccounts = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.search
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.search
 );
 const selectSubAccountDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.detail.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.detail.data
 );
 const selectFringes = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.fringes.data
 );
 
 interface SubAccountsTableProps {
@@ -48,29 +47,25 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
   const search = useSelector(selectTableSearch);
   const subaccountDetail = useSelector(selectSubAccountDetail);
   const groups = useSelector(selectGroups);
-  const subAccountUnits = useSelector(selectSubAccountUnits);
+  const subAccountUnits = hooks.useSubAccountUnits();
   const fringes = useSelector(selectFringes);
-  const commentsHistoryDrawerOpen = useSelector(selectCommentsHistoryDrawerOpen);
+  const commentsHistoryDrawerOpen = useSelector(selectors.selectCommentsHistoryDrawerOpen);
 
-  const table = tabling.hooks.useBudgetTable<Tables.SubAccountRow, Model.SubAccount>();
+  const tableRef = tabling.hooks.useReadWriteBudgetTable<Tables.SubAccountRow, Model.SubAccount>();
 
   return (
     <React.Fragment>
       <BudgetSubAccountsTable
         budget={budget}
-        table={table}
         levelType={"subaccount"}
-        data={data}
+        tableRef={tableRef}
+        models={data}
         groups={groups}
         detail={subaccountDetail}
         subAccountUnits={subAccountUnits}
         fringes={fringes}
-        fringesEditorParams={{
-          onAddFringes: () => setFringesModalVisible(true),
-          colId: "fringes"
-        }}
+        onAddFringes={() => setFringesModalVisible(true)}
         onEditFringes={() => setFringesModalVisible(true)}
-        fringesEditor={"FringesEditor"}
         // Right now, the SubAccount recursion only goes 1 layer deep.
         // Account -> SubAccount -> Detail (Recrusive SubAccount).
         onRowExpand={null}
@@ -81,11 +76,11 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
         }
         exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
         search={search}
-        onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
+        onSearch={(value: string) => dispatch(actions.budget.subAccount.setSubAccountsSearchAction(value))}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}
         onChangeEvent={(e: Table.ChangeEvent<Tables.SubAccountRow, Model.SubAccount>) =>
-          dispatch(actions.handleTableChangeEventAction(e))
+          dispatch(actions.budget.subAccount.handleTableChangeEventAction(e))
         }
         onBack={(row?: Tables.FringeRow) => {
           if (
@@ -115,7 +110,7 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           {
             label: "Comments",
             icon: "comments-alt",
-            onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
+            onClick: () => dispatch(actions.budget.setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
           }
         ]}
       />
@@ -126,7 +121,7 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
-            dispatch(actions.addGroupToStateAction(group));
+            dispatch(actions.budget.subAccount.addGroupToStateAction(group));
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
         />
@@ -138,9 +133,9 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
+            dispatch(actions.budget.subAccount.updateGroupInStateAction({ id: group.id, data: group }));
             if (group.color !== groupToEdit.color) {
-              table.current.applyGroupColorChange(group);
+              tableRef.current.applyGroupColorChange(group);
             }
           }}
         />

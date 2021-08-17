@@ -34,9 +34,9 @@ const tasks = createSubAccountTaskSet<Model.Template>(
       request: actions.requestGroupsAction
     }
   },
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.id,
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.data,
-  (state: Modules.ApplicationStore) => state.budget.template.autoIndex
+  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.id,
+  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.table.data,
+  (state: Modules.Authenticated.Store) => state.budget.template.autoIndex
 );
 
 function* watchForSubAccountIdChangedSaga(): SagaIterator {
@@ -86,7 +86,7 @@ const fringesRootSaga = redux.sagas.factories.createTableSaga(
       bulkCreate: api.bulkCreateTemplateFringes,
       bulkDelete: api.bulkDeleteTemplateFringes
     },
-    (state: Modules.ApplicationStore) => state.budget.template.budget.id
+    (state: Modules.Authenticated.Store) => state.budget.template.budget.id
   )
 );
 

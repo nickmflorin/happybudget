@@ -15,6 +15,7 @@ interface ContactEditorProps extends Table.EditorParams<Tables.SubAccountRow, Mo
 
 const ContactEditor = (props: ContactEditorProps, ref: any) => {
   const contacts = useContacts();
+
   const [editor] = framework.editors.useModelMenuEditor<Tables.SubAccountRow, Model.SubAccount, Model.Contact, number>({
     ...props,
     forwardedRef: ref

@@ -30,7 +30,7 @@ const AccountTable = ({
   const accountSubHeaderRow = useMemo(() => {
     const row: { [key: string]: any } = {};
     forEach(columns, (column: ColumnType) => {
-      if (!isNil(account[column.field as keyof Model.PdfAccount]) && column.isCalculated !== true) {
+      if (!isNil(account[column.field as keyof Model.PdfAccount]) && column.tableColumnType === "calculated") {
         row[column.field as keyof Model.PdfAccount] = account[column.field as keyof Model.PdfAccount];
       } else {
         row[column.field as keyof Model.PdfAccount] = null;
@@ -61,7 +61,7 @@ const AccountTable = ({
         (obj: { [key: string]: any }, col: ColumnType) => {
           if (
             !isNil(subaccount[col.field as keyof Model.PdfSubAccount]) &&
-            (subaccount.subaccounts.length === 0 || col.isCalculated !== true)
+            (subaccount.subaccounts.length === 0 || col.tableColumnType !== "calculated")
           ) {
             obj[col.field as string] = subaccount[col.field as keyof Model.PdfSubAccount];
           } else {

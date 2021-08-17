@@ -3,10 +3,10 @@ import { util } from "lib";
 import { ExportCSVDropdown, ToggleColumnsDropdown } from "components/dropdowns";
 
 export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
-  table: Table.Table<R, M>,
+  table: Table.ReadOnlyTableRefObj<R, M> | Table.ReadWriteTableRefObj<R, M>,
   params: Table.MenuActionParams<R, M>,
   exportFileName: string
-): Table.MenuAction => ({
+): Table.MenuActionObj => ({
   /* eslint-disable indent */
   label: "Export CSV",
   icon: "file-csv",
@@ -34,9 +34,9 @@ export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
 });
 
 export const ToggleColumnAction = <R extends Table.Row, M extends Model.Model>(
-  table: Table.Table<R, M>,
+  table: Table.ReadOnlyTableRefObj<R, M> | Table.ReadWriteTableRefObj<R, M>,
   params: Table.MenuActionParams<R, M>
-): Table.MenuAction => ({
+): Table.MenuActionObj => ({
   /* eslint-disable indent */
   label: "Columns",
   icon: "line-columns",

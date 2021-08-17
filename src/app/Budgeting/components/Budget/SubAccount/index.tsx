@@ -11,19 +11,18 @@ import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
 
-import { setBudgetAutoIndex } from "../../../store/actions/budget";
-import * as actions from "../../../store/actions/budget/subAccount";
+import { actions } from "../../../store";
 import SubAccountsTable from "./SubAccountsTable";
 import SubAccountCommentsHistory from "./SubAccountCommentsHistory";
 
 const selectDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.detail.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.detail.data
 );
 const selectSubAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.loading
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.loading
 );
 const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.groups.loading
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.groups.loading
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,
@@ -44,16 +43,16 @@ const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
-    dispatch(setBudgetAutoIndex(true));
+    dispatch(actions.budget.setBudgetAutoIndex(true));
   }, []);
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
-      dispatch(actions.setSubAccountIdAction(parseInt(subaccountId)));
+      dispatch(actions.budget.subAccount.setSubAccountIdAction(parseInt(subaccountId)));
       // TODO: It might not be necessary to get a fresh set of fringes everytime the SubAccount changes,
       // we might be able to move this further up in the tree - but for now it is safer to rely on the
       // source of truth from the API more often than not.
-      dispatch(actions.requestFringesAction(null));
+      dispatch(actions.budget.subAccount.requestFringesAction(null));
     }
   }, [subaccountId]);
 

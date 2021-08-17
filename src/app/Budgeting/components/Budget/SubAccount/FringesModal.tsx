@@ -5,22 +5,22 @@ import { isNil } from "lodash";
 
 import { redux } from "lib";
 
-import * as actions from "../../../store/actions/budget/subAccount";
+import { actions } from "../../../store";
 import GenericFringesModal, { GenericFringesModalProps } from "../../GenericFringesModal";
 
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.fringes.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.search
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.fringes.search
 );
 const selectLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.loading
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.fringes.loading
 );
 const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.deleting,
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.updating,
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.fringes.creating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.fringes.deleting,
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.fringes.updating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.fringes.creating,
   (deleting: Redux.ModelListActionInstance[], updating: Redux.ModelListActionInstance[], creating: boolean) =>
     deleting.length !== 0 || updating.length !== 0 || creating === true
 );
@@ -40,7 +40,7 @@ const FringesModal: React.FC<FringesModalProps> = ({ budget, open, onCancel }) =
     // TODO: It might not be necessary to always refresh the Fringes when the modal opens, but it is
     // safer for now to rely on the API as a source of truth more often than not.
     if (open === true) {
-      dispatch(actions.requestFringesAction(null));
+      dispatch(actions.budget.subAccount.requestFringesAction(null));
     }
   }, [open]);
 
@@ -50,12 +50,12 @@ const FringesModal: React.FC<FringesModalProps> = ({ budget, open, onCancel }) =
       open={open}
       onCancel={onCancel}
       loading={loading}
-      data={data}
+      models={data}
       search={search}
-      onSearch={(value: string) => dispatch(actions.setFringesSearchAction(value))}
+      onSearch={(value: string) => dispatch(actions.budget.subAccount.setFringesSearchAction(value))}
       saving={saving}
       onChangeEvent={(e: Table.ChangeEvent<Tables.FringeRow, Model.Fringe>) =>
-        dispatch(actions.handleFringesTableChangeEventAction(e))
+        dispatch(actions.budget.subAccount.handleFringesTableChangeEventAction(e))
       }
     />
   );

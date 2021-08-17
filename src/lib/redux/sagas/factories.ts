@@ -21,6 +21,18 @@ export const createStandardRequestSaga = (actionName: string, task: Redux.Task<n
   return rootSaga;
 };
 
+export const createReadOnlyTableSaga = <R extends Table.Row, M extends Model.Model>(
+  actions: Pick<Redux.ReadOnlyTableActionMap, "Request">,
+  tasks: Redux.ReadOnlyTableTaskMap<R, M>
+) => {
+  const reqSaga = createStandardRequestSaga(actions.Request, tasks.request);
+
+  function* rootSaga(): SagaIterator {
+    yield spawn(reqSaga);
+  }
+  return rootSaga;
+};
+
 export const createTableSaga = <R extends Table.Row, M extends Model.Model>(
   actions: Pick<Redux.TableActionMap, "Request" | "TableChanged">,
   tasks: Redux.TableTaskMap<R, M>
@@ -52,6 +64,17 @@ export const createTableSaga = <R extends Table.Row, M extends Model.Model>(
   function* rootSaga(): SagaIterator {
     yield spawn(reqSaga);
     yield spawn(tableChangeEventSaga);
+  }
+  return rootSaga;
+};
+
+export const createReadOnlyBudgetTableSaga = <R extends BudgetTable.Row, M extends Model.Model>(
+  actions: Pick<Redux.ReadOnlyBudgetTableActionMap, "Request">,
+  tasks: Redux.ReadOnlyBudgetTableTaskMap<R, M>
+) => {
+  const reqSaga = createStandardRequestSaga(actions.Request, tasks.request);
+  function* rootSaga(): SagaIterator {
+    yield spawn(reqSaga);
   }
   return rootSaga;
 };

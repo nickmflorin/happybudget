@@ -5,20 +5,21 @@ import { isNil, reduce, find } from "lodash";
 import { hooks, redux } from "lib";
 import { selectors } from "store";
 
+import { WrapInApplicationSpinner } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
 import { EditContactModal, CreateContactModal } from "components/modals";
 import { ActualsTable } from "components/tabling";
 
-import * as actions from "../../store/actions/budget/actuals";
+import { actions } from "../../store";
 
 const selectActuals = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.actuals.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.actuals.search
+  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.search
 );
 const selectActualsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.actuals.loading
+  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.loading
 );
 
 interface ActualsProps {
@@ -37,8 +38,8 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
   const contacts = useSelector(selectors.selectContacts);
 
   useEffect(() => {
-    dispatch(actions.requestActualsAction(null));
-    dispatch(actions.requestSubAccountsTreeAction(null));
+    dispatch(actions.budget.actuals.requestActualsAction(null));
+    dispatch(actions.budget.actuals.requestSubAccountsTreeAction(null));
   }, []);
 
   // NOTE: Right now, the total actual value for a budget can differ from totaling the actual
@@ -76,35 +77,39 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
           ]}
         />
       </Portal>
-      <ActualsTable
-        loading={loading}
-        data={data}
-        search={search}
-        contacts={contacts}
-        menuPortalId={"supplementary-header"}
-        onSearch={(value: string) => dispatch(actions.setActualsSearchAction(value))}
-        onChangeEvent={(e: Table.ChangeEvent<Tables.ActualRow, Model.Actual>) =>
-          dispatch(actions.handleTableChangeEventAction(e))
-        }
-        actualsTableTotal={actualsTableTotal}
-        onSubAccountsTreeSearch={(value: string) => dispatch(actions.setSubAccountsTreeSearchAction(value))}
-        exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
-        onNewContact={() => setCreateContactModalVisible(true)}
-        onEditContact={(id: number) => setContactToEdit(id)}
-      />
-      {!isNil(editingContact) && (
-        <EditContactModal
-          visible={true}
-          contact={editingContact}
-          onSuccess={() => setContactToEdit(null)}
-          onCancel={() => setContactToEdit(null)}
+      <WrapInApplicationSpinner loading={loading}>
+        <ActualsTable
+          loading={loading}
+          models={data}
+          search={search}
+          contacts={contacts}
+          menuPortalId={"supplementary-header"}
+          onSearch={(value: string) => dispatch(actions.budget.actuals.setActualsSearchAction(value))}
+          onChangeEvent={(e: Table.ChangeEvent<Tables.ActualRow, Model.Actual>) =>
+            dispatch(actions.budget.actuals.handleTableChangeEventAction(e))
+          }
+          actualsTableTotal={actualsTableTotal}
+          onSubAccountsTreeSearch={(value: string) =>
+            dispatch(actions.budget.actuals.setSubAccountsTreeSearchAction(value))
+          }
+          exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}
+          onNewContact={() => setCreateContactModalVisible(true)}
+          onEditContact={(id: number) => setContactToEdit(id)}
         />
-      )}
-      <CreateContactModal
-        visible={createContactModalVisible}
-        onSuccess={() => setCreateContactModalVisible(false)}
-        onCancel={() => setCreateContactModalVisible(false)}
-      />
+        {!isNil(editingContact) && (
+          <EditContactModal
+            visible={true}
+            contact={editingContact}
+            onSuccess={() => setContactToEdit(null)}
+            onCancel={() => setContactToEdit(null)}
+          />
+        )}
+        <CreateContactModal
+          visible={createContactModalVisible}
+          onSuccess={() => setCreateContactModalVisible(false)}
+          onCancel={() => setCreateContactModalVisible(false)}
+        />
+      </WrapInApplicationSpinner>
     </React.Fragment>
   );
 };

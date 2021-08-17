@@ -2,38 +2,32 @@ import { useDispatch, useSelector } from "react-redux";
 import { includes, map } from "lodash";
 
 import { redux } from "lib";
-import {
-  createCommentAction,
-  requestCommentsAction,
-  deleteCommentAction,
-  updateCommentAction,
-  requestAccountsHistoryAction
-} from "../../../store/actions/budget/accounts";
+import { actions } from "../../../store";
 import CommentsHistoryDrawer from "../CommentsHistoryDrawer";
 
-const selectDeletingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
+const selectDeletingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.Authenticated.Store) =>
   map(state.budget.budget.budget.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
-const selectEditingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.ApplicationStore) =>
+const selectEditingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.Authenticated.Store) =>
   map(state.budget.budget.budget.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectReplyingComments = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.comments.replying
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.comments.replying
 );
 const selectCommentsData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.comments.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.comments.data
 );
 const selectSubmittingComment = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.comments.creating
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.comments.creating
 );
 const selectLoadingComments = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.comments.loading
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.comments.loading
 );
 const selectLoadingHistory = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.history.loading
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.history.loading
 );
 const selectHistory = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.history.data
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.history.data
 );
 
 const AccountCommentsHistory = (): JSX.Element => {
@@ -57,20 +51,21 @@ const AccountCommentsHistory = (): JSX.Element => {
           includes(editingComments, comment.id) ||
           includes(deletingComments, comment.id) ||
           includes(replyingComments, comment.id),
-        onRequest: () => dispatch(requestCommentsAction(null)),
-        onSubmit: (payload: Http.CommentPayload) => dispatch(createCommentAction({ data: payload })),
+        onRequest: () => dispatch(actions.budget.accounts.requestCommentsAction(null)),
+        onSubmit: (payload: Http.CommentPayload) =>
+          dispatch(actions.budget.accounts.createCommentAction({ data: payload })),
         onDoneEditing: (comment: Model.Comment, value: string) =>
-          dispatch(updateCommentAction({ id: comment.id, data: { text: value } })),
+          dispatch(actions.budget.accounts.updateCommentAction({ id: comment.id, data: { text: value } })),
         onDoneReplying: (comment: Model.Comment, value: string) =>
-          dispatch(createCommentAction({ parent: comment.id, data: { text: value } })),
+          dispatch(actions.budget.accounts.createCommentAction({ parent: comment.id, data: { text: value } })),
         /* eslint-disable no-console */
         onLike: (comment: Model.Comment) => console.log(comment),
-        onDelete: (comment: Model.Comment) => dispatch(deleteCommentAction(comment.id))
+        onDelete: (comment: Model.Comment) => dispatch(actions.budget.accounts.deleteCommentAction(comment.id))
       }}
       historyProps={{
         history,
         loading: loadingHistory,
-        onRequest: () => dispatch(requestAccountsHistoryAction(null))
+        onRequest: () => dispatch(actions.budget.accounts.requestAccountsHistoryAction(null))
       }}
     />
   );

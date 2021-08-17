@@ -1,105 +1,148 @@
 import React, { useMemo } from "react";
-import { map, reduce, isNil, includes } from "lodash";
+import { map, isNil, includes } from "lodash";
 import classNames from "classnames";
 
 import { AgGridReact } from "@ag-grid-community/react";
-import { AgGridReactProps } from "@ag-grid-community/react/lib/interfaces";
 import { AllModules, ColSpanParams } from "@ag-grid-enterprise/all-modules";
-import { ColDef, EditableCallbackParams, CellClassParams, RowClassParams } from "@ag-grid-community/core";
+import {
+  ColDef,
+  EditableCallbackParams,
+  CellClassParams,
+  RowClassParams,
+  GetContextMenuItemsParams,
+  NavigateToNextCellParams,
+  ProcessCellForExportParams,
+  TabToNextCellParams,
+  CellFocusedEvent,
+  CellMouseOverEvent,
+  CellPosition,
+  CellKeyDownEvent,
+  CellDoubleClickedEvent,
+  FirstDataRenderedEvent,
+  SelectionChangedEvent,
+  GridReadyEvent,
+  CellValueChangedEvent,
+  CellEditingStartedEvent,
+  PasteEndEvent,
+  PasteStartEvent,
+  ProcessDataFromClipboardParams
+} from "@ag-grid-community/core";
+import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import { TABLE_DEBUG } from "config";
-import { tabling, hooks } from "lib";
-import BaseFramework from "../framework";
+import { tabling, hooks, util } from "lib";
 
-type OmitAGGridProps =
-  | "className"
-  | "columnDefs"
-  | "overlayNoRowsTemplate"
-  | "overlayLoadingTemplate"
-  | "modules"
-  | "debug"
-  | "suppressCopyRowsToClipboard"
-  | "frameworkComponents"
-  | "rowData"
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+type OverriddenAgProps =
   | "getRowClass"
   | "rowClass"
+  | "rowHeight"
+  | "className"
+  | "suppressCopyRowsToClipboard"
+  | "getContextMenuItems"
+  | "rowData"
+  | "columnDefs"
+  | "debug"
+  | "modules"
   | "getRowStyle"
-  | "modules";
+  | "overlayNoRowsTemplate"
+  | "overlayLoadingTemplate"
+  | "navigateToNextCell"
+  | "tabToNextCell"
+  | "frameworkComponents";
 
-type AGFramework = { [key: string]: React.ComponentType<any> };
+type ExtendAgGridProps = false;
+type ExtensionProps = ExtendAgGridProps extends true ? Omit<Table.AgGridProps, OverriddenAgProps> : {};
 
-export type CommonGridProps<R extends Table.Row, M extends Model.Model> = {
-  readonly readOnly?: boolean;
-  readonly indexColumnWidth?: number;
-  readonly expandColumnWidth?: number;
-  readonly hasExpandColumn: boolean;
-  readonly columns: Table.Column<R, M>[];
+/*
+Note: Right now, we are restricting the use of AG Grid props to those that are
+      explicitly defined. If we want to use an additional prop, the best practice
+      is to define the prop we want to use ourselves.  This is done because AG
+      Grid's typing is prone to errors.
+      If we want to open the flood gates and allow our tables to define an AG
+      Grid prop anywhere when they are created, we can simply set
+      ExtendAgGridProps to true above.
+*/
+type UseAgProps<R extends Table.Row> = ExtensionProps & {
+  readonly allowContextMenuWithControlKey?: boolean;
+  readonly frameworkComponents?: Table.FrameworkGroup;
+  readonly suppressCopyRowsToClipboard?: boolean;
+  readonly cellStyle?: React.CSSProperties;
+  readonly getRowStyle?: Table.GetRowStyle;
+  readonly getRowClass?: Table.GetRowClassName;
+  readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
+  readonly processCellForClipboard?: (params: ProcessCellForExportParams) => void;
+  readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
+  readonly onCellFocused?: (e: CellFocusedEvent) => void;
+  readonly onCellMouseOver?: (e: CellMouseOverEvent) => void;
+  readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;
+  readonly onSelectionChanged?: (e: SelectionChangedEvent) => void;
+  readonly onGridReady: (e: GridReadyEvent) => void;
+  readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
+  readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
+  readonly processDataFromClipboard?: (params: ProcessDataFromClipboardParams) => any;
+  readonly processCellFromClipboard?: (params: ProcessCellForExportParams) => string;
+  readonly onCellEditingStarted?: (event: CellEditingStartedEvent) => void;
+  readonly onPasteStart?: (event: PasteStartEvent) => void;
+  readonly onPasteEnd?: (event: PasteEndEvent) => void;
+  readonly onCellValueChanged?: (e: CellValueChangedEvent) => void;
+  readonly fillOperation?: (params: FillOperationParams) => boolean;
+  readonly getContextMenuItems?: (row: R, node: Table.RowNode) => Table.MenuItemDef[];
 };
 
-export interface GridProps<R extends Table.Row, M extends Model.Model>
-  extends StandardComponentProps,
-    Omit<AgGridReactProps, OmitAGGridProps> {
+export interface GridProps<R extends Table.Row, M extends Model.Model> extends UseAgProps<R> {
   readonly id: Table.GridId;
   readonly data?: R[];
-  readonly columns: Table.Column<R, M>[];
-  readonly framework?: Table.Framework;
   readonly hiddenColumns: Table.Field<R, M>[];
+  readonly gridOptions: Table.GridOptions;
+  readonly indexColumn?: Partial<Table.Column<R, M>>;
+  readonly columns: Table.Column<R, M>[];
+  readonly className?: Table.GeneralClassName;
   readonly rowClass?: Table.RowClassName;
-  readonly getRowStyle?: (params: RowClassParams) => {
-    [cssProperty: string]: string;
-  };
-  readonly onChangeEvent?: (event: Table.ChangeEvent<R, M>) => void;
+  readonly rowHeight?: number;
+  readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
+  readonly getContextMenuItems?: (row: R, node: Table.RowNode) => Table.MenuItemDef[];
+  readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
+  readonly processCellForClipboard?: (params: ProcessCellForExportParams) => string;
+  readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
+  readonly onCellFocused?: (e: CellFocusedEvent) => void;
+  readonly onCellMouseOver?: (e: CellMouseOverEvent) => void;
+  readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;
+  readonly onGridReady: (e: Table.GridReadyEvent) => void;
+  readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
 }
 
 const Grid = <R extends Table.Row, M extends Model.Model>({
   id,
   columns,
-  data = [],
-  framework,
-  style,
+  data,
   className,
   hiddenColumns,
   rowClass,
-  onChangeEvent,
+  indexColumn,
   ...props
 }: GridProps<R, M>): JSX.Element => {
-  const Framework = useMemo<AGFramework>((): AGFramework => {
-    const combinedFramework = tabling.util.combineFrameworks(BaseFramework, framework);
-    return {
-      ...reduce(
-        combinedFramework.cells?.[id],
-        (prev: AGFramework, cell: React.ComponentType<any>, name: string) => ({ ...prev, [name]: cell }),
-        {}
-      ),
-      ...reduce(
-        combinedFramework.editors,
-        (prev: AGFramework, editor: React.ComponentType<any>, name: string) => {
-          return { ...prev, [name]: editor };
-        },
-        {}
-      )
-    };
-  }, [framework, id]);
-
   const rowData = useMemo(
-    () => map(data, (row: R) => ({ ...row, meta: { ...row.meta, gridId: id } })),
+    () => (isNil(data) ? [] : map(data, (row: R) => ({ ...row, meta: { ...row.meta, gridId: id } }))),
     [id, hooks.useDeepEqualMemo(data)]
   );
 
   const localColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-    return map(
+    let cs: Table.Column<R, M>[] = map(
       columns,
       (col: Table.Column<R, M>, index: number): Table.Column<R, M> =>
         ({
           ...col,
           headerComponentParams: { ...col.headerComponentParams, column: col },
-          cellRendererParams: { ...col.cellRendererParams, columns, column: col, onChangeEvent },
-          cellEditorParams: { ...col.cellEditorParams, columns, column: col },
+          cellRendererParams: { ...col.cellRendererParams, columns, column: col },
           hide: includes(hiddenColumns, col.field),
           resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
           cellStyle: { ...tabling.util.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
         } as Table.Column<R, M>)
     );
+    cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M>>(cs, { field: "index" }, indexColumn) : cs;
+    return cs;
   }, [hooks.useDeepEqualMemo(columns)]);
 
   const colDefs = useMemo(
@@ -114,13 +157,13 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
           footer,
           page,
           selectable,
-          isCalculated,
           isCalculating,
           index,
           canBeExported,
           canBeHidden,
           fieldBehavior,
           columnType,
+          tableColumnType,
           nullValue,
           refreshColumns,
           onCellDoubleClicked,
@@ -134,6 +177,7 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
         return {
           ...agColumn,
           field: col.field as string,
+          cellStyle: !isNil(col.cellStyle) ? (col.cellStyle as { [key: string]: any }) : undefined,
           suppressMenu: true,
           cellRenderer:
             /* eslint-disable indent */
@@ -162,8 +206,7 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
               : col.selectable;
             return tabling.util.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
               "cell--not-selectable": isSelectable === false,
-              "cell--not-editable": !(col.editable === true),
-              "cell--calculated": col.isCalculated === true
+              "cell--not-editable": !(col.editable === true)
             });
           }
         };
@@ -171,32 +214,58 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
     [hooks.useDeepEqualMemo(localColumns)]
   );
 
+  const navigateToNextCell = (params: NavigateToNextCellParams): CellPosition => {
+    if (!isNil(props.navigateToNextCell)) {
+      return { ...props.navigateToNextCell(params), rowPinned: null };
+    }
+    return params.nextCellPosition || params.previousCellPosition;
+  };
+
+  const tabToNextCell = (params: TabToNextCellParams): CellPosition => {
+    if (!isNil(props.tabToNextCell)) {
+      return { ...props.tabToNextCell(params), rowPinned: null };
+    }
+    return params.nextCellPosition;
+  };
+
   return (
-    <div className={classNames("ag-theme-alpine", "grid", className)} style={style}>
+    <div className={classNames("ag-theme-alpine", "grid", className)}>
       <AgGridReact
         rowHeight={36}
         headerHeight={38}
-        allowContextMenuWithControlKey={true}
         cellFlashDelay={100}
         cellFadeDelay={500}
         suppressRowClickSelection={true}
-        stopEditingWhenGridLosesFocus={true}
+        stopEditingWhenCellsLoseFocus={true}
         enableRangeSelection={true}
         animateRows={true}
         enterMovesDown={false}
         immutableData={true}
         getRowNodeId={(r: any) => r.id}
         {...props}
+        navigateToNextCell={navigateToNextCell}
+        tabToNextCell={tabToNextCell}
+        getRowStyle={
+          // Because AG Grid is terrible with their type bindings, we have to do this
+          // to keep things quiet.
+          !isNil(props.getRowStyle)
+            ? (props.getRowStyle as (params: RowClassParams) => { [key: string]: string })
+            : undefined
+        }
+        getContextMenuItems={(params: GetContextMenuItemsParams) => {
+          if (!isNil(props.getContextMenuItems) && !isNil(params.node)) {
+            const row: R = params.node.data;
+            return props.getContextMenuItems(row, params.node);
+          }
+          return [];
+        }}
         getRowClass={(params: RowClassParams) => tabling.util.mergeClassNames<RowClassParams>(params, "row", rowClass)}
         rowData={rowData}
-        // Required to get processCellFromClipboard to work with column spanning.
-        suppressCopyRowsToClipboard={true}
         columnDefs={colDefs}
         debug={process.env.NODE_ENV === "development" && TABLE_DEBUG}
         modules={AllModules}
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}
-        frameworkComponents={Framework}
       />
     </div>
   );

@@ -4,7 +4,7 @@ import classNames from "classnames";
 
 import { Column } from "@ag-grid-community/core";
 
-import { tabling } from "lib";
+import { tabling, ui } from "lib";
 import { Icon, ShowHide, VerticalFlexCenter } from "components";
 import { IconButton } from "components/buttons";
 
@@ -84,7 +84,11 @@ const HeaderCell = <R extends Table.Row, M extends Model.Model>({
     >
       {!isNil(columnType) && !isNil(columnType.icon) && (
         <VerticalFlexCenter>
-          <Icon className={"icon--table-header"} icon={columnType.icon} weight={"solid"} />
+          {ui.typeguards.iconIsJSX(columnType.icon) ? (
+            columnType.icon
+          ) : (
+            <Icon className={"icon--table-header"} icon={columnType.icon} weight={"solid"} />
+          )}
         </VerticalFlexCenter>
       )}
       <div className={"text"}>{displayName}</div>

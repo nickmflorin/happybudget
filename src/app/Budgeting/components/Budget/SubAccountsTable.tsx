@@ -5,14 +5,14 @@ import { isNil, find } from "lodash";
 import { model } from "lib";
 import { selectors } from "store";
 import { EditContactModal, CreateContactModal } from "components/modals";
-import { BudgetSubAccountsTable, BudgetSubAccountsTableProps } from "components/tabling";
+import { ReadWriteBudgetSubAccountsTable, ReadWriteBudgetSubAccountsTableProps } from "components/tabling";
 
 type PreContactCreate = Omit<Table.CellChange<Tables.SubAccountRow, Model.SubAccount>, "newValue">;
 
-type OmitTableProps = "table" | "contacts" | "onEditContact" | "onNewContact" | "menuPortalId";
+type OmitTableProps = "contacts" | "onEditContact" | "onNewContact" | "menuPortalId" | "columns";
 
-interface SubAccountsTableProps extends Omit<BudgetSubAccountsTableProps, OmitTableProps> {
-  readonly table: BudgetTable.Ref<Tables.SubAccountRow, Model.SubAccount>;
+interface SubAccountsTableProps extends Omit<ReadWriteBudgetSubAccountsTableProps, OmitTableProps> {
+  readonly tableRef: NonNullRef<BudgetTable.ReadWriteTableRefObj<Tables.SubAccountRow, Model.SubAccount>>;
 }
 
 const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
@@ -39,7 +39,7 @@ const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
 
   return (
     <React.Fragment>
-      <BudgetSubAccountsTable
+      <ReadWriteBudgetSubAccountsTable
         {...props}
         menuPortalId={"supplementary-header"}
         contacts={contacts}
@@ -80,7 +80,7 @@ const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
               ...preContactCreate,
               newValue: contact.id
             };
-            props.table.current.applyTableChange({
+            props.tableRef.current.applyTableChange({
               type: "dataChange",
               payload: cellChange
             });

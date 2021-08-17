@@ -1,7 +1,3 @@
-export { default as BudgetTable } from "./BudgetTable";
-export * from "./BudgetTable";
-export { default as ModelTable } from "./ModelTable";
-export * from "./ModelTable";
 export * from "./SubAccountsTable";
 export * from "./AccountsTable";
 export { default as FringesTable } from "./FringesTable";

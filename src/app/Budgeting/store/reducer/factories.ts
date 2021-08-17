@@ -1,4 +1,4 @@
-import { Reducer, combineReducers } from "redux";
+import { combineReducers } from "redux";
 import { isNil, reduce } from "lodash";
 
 import { redux, tabling } from "lib";
@@ -23,12 +23,12 @@ type ReducerFactoryActionMap = {
 
 export const createBudgetReducer = <M extends Model.Budget | Model.Template>(
   mapping: ReducerFactoryActionMap & { Table: Omit<Redux.BudgetTableActionMap, "RemoveFromState" | "UpdateInState"> },
-  initialState: Modules.Budget.BudgetStore<M>
-): Reducer<Modules.Budget.BudgetStore<M>, Redux.Action<any>> => {
+  initialState: Modules.Authenticated.Budget.BudgetStore<M>
+): Redux.Reducer<Modules.Authenticated.Budget.BudgetStore<M>> => {
   /* eslint-disable indent */
-  const genericReducer: Reducer<Modules.Budget.BudgetStore<M>, Redux.Action<any>> = combineReducers({
-    id: redux.reducers.factories.createSimplePayloadReducer<number | null>(mapping.SetId, null),
-    detail: redux.reducers.factories.createDetailResponseReducer<M, Redux.ModelDetailResponseStore<M>, Redux.Action>({
+  const genericReducer: Redux.Reducer<Modules.Authenticated.Budget.BudgetStore<M>> = combineReducers({
+    id: redux.reducers.factories.createSimplePayloadReducer<number | null>(mapping.SetId, initialState.id),
+    detail: redux.reducers.factories.createDetailResponseReducer<M, Redux.ModelDetailResponseStore<M>>({
       Response: mapping.Response,
       Loading: mapping.Loading,
       Request: mapping.Request,
@@ -36,10 +36,16 @@ export const createBudgetReducer = <M extends Model.Budget | Model.Template>(
     }),
     table: tabling.reducers.createBudgetTableReducer<Model.Account>(mapping.Table, initialState.table),
     comments: !isNil(mapping.Comments)
-      ? redux.reducers.factories.createCommentsListResponseReducer(mapping.Comments)
-      : redux.util.identityReducer<Redux.ModelListResponseStore<Model.Comment>>(initialState.comments),
+      ? redux.reducers.factories.createCommentsListResponseReducer(mapping.Comments, {
+          initialState: redux.initialState.initialCommentsListResponseState
+        })
+      : redux.util.identityReducer<Redux.CommentsListResponseStore>(
+          redux.initialState.initialCommentsListResponseState
+        ),
     history: !isNil(mapping.History)
-      ? redux.reducers.factories.createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
+      ? redux.reducers.factories.createModelListResponseReducer<Model.HistoryEvent>(mapping.History, {
+          initialState: initialState.history
+        })
       : redux.util.identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(initialState.history)
   });
 
@@ -51,12 +57,12 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
   mapping: ReducerFactoryActionMap & {
     Table: Omit<Redux.BudgetTableWithFringesActionMap, "RemoveFromState" | "UpdateInState">;
   },
-  initialState: Modules.Budget.AccountOrSubAccountStore<M>
-): Reducer<Modules.Budget.AccountOrSubAccountStore<M>, Redux.Action<any>> => {
+  initialState: Modules.Authenticated.Budget.AccountOrSubAccountStore<M>
+): Redux.Reducer<Modules.Authenticated.Budget.AccountOrSubAccountStore<M>> => {
   /* eslint-disable indent */
-  const genericReducer: Reducer<Modules.Budget.AccountOrSubAccountStore<M>, Redux.Action<any>> = combineReducers({
-    id: redux.reducers.factories.createSimplePayloadReducer<number | null>(mapping.SetId, null),
-    detail: redux.reducers.factories.createDetailResponseReducer<M, Redux.ModelDetailResponseStore<M>, Redux.Action>({
+  const genericReducer: Redux.Reducer<Modules.Authenticated.Budget.AccountOrSubAccountStore<M>> = combineReducers({
+    id: redux.reducers.factories.createSimplePayloadReducer<number | null>(mapping.SetId, initialState.id),
+    detail: redux.reducers.factories.createDetailResponseReducer<M, Redux.ModelDetailResponseStore<M>>({
       Response: mapping.Response,
       Loading: mapping.Loading,
       Request: mapping.Request,
@@ -67,21 +73,21 @@ const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccou
       redux.initialState.initialBudgetTableWithFringesState
     ),
     comments: !isNil(mapping.Comments)
-      ? redux.reducers.factories.createCommentsListResponseReducer(mapping.Comments)
-      : redux.util.identityReducer<Redux.ModelListResponseStore<Model.Comment>>(
-          redux.initialState.initialModelListResponseState
-        ),
+      ? redux.reducers.factories.createCommentsListResponseReducer(mapping.Comments, {
+          initialState: initialState.comments
+        })
+      : redux.util.identityReducer<Redux.CommentsListResponseStore>(initialState.comments),
     history: !isNil(mapping.History)
-      ? redux.reducers.factories.createModelListResponseReducer<Model.HistoryEvent>(mapping.History)
-      : redux.util.identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(
-          redux.initialState.initialModelListResponseState
-        )
+      ? redux.reducers.factories.createModelListResponseReducer<Model.HistoryEvent>(mapping.History, {
+          initialState: initialState.history
+        })
+      : redux.util.identityReducer<Redux.ModelListResponseStore<Model.HistoryEvent>>(initialState.history)
   });
 
   type GenericEvent = Table.ChangeEvent<Tables.FringeRow | Tables.SubAccountRow, Model.Fringe | Model.SubAccount>;
 
-  return (state: Modules.Budget.AccountOrSubAccountStore<M> = initialState, action: Redux.Action<any>) => {
-    let newState: Modules.Budget.AccountOrSubAccountStore<M> = genericReducer(state, action);
+  return (state: Modules.Authenticated.Budget.AccountOrSubAccountStore<M> = initialState, action: Redux.Action) => {
+    let newState: Modules.Authenticated.Budget.AccountOrSubAccountStore<M> = genericReducer(state, action);
 
     // When an Account's underlying subaccounts are removed, updated or added,
     // or the Fringes are changed, we need to update/recalculate the Account.
@@ -121,14 +127,14 @@ export const createAccountReducer = (
   mapping: ReducerFactoryActionMap & {
     Table: Omit<Redux.BudgetTableWithFringesActionMap, "RemoveFromState" | "UpdateInState">;
   },
-  initialState: Modules.Budget.AccountStore
-): Reducer<Modules.Budget.AccountStore, Redux.Action<any>> =>
+  initialState: Modules.Authenticated.Budget.AccountStore
+): Redux.Reducer<Modules.Authenticated.Budget.AccountStore> =>
   createAccountSubAccountReducer<Model.Account>(mapping, initialState);
 
 export const createSubAccountReducer = (
   mapping: ReducerFactoryActionMap & {
     Table: Omit<Redux.BudgetTableWithFringesActionMap, "RemoveFromState" | "UpdateInState">;
   },
-  initialState: Modules.Budget.SubAccountStore
-): Reducer<Modules.Budget.SubAccountStore, Redux.Action<any>> =>
+  initialState: Modules.Authenticated.Budget.SubAccountStore
+): Redux.Reducer<Modules.Authenticated.Budget.SubAccountStore> =>
   createAccountSubAccountReducer<Model.SubAccount>(mapping, initialState);

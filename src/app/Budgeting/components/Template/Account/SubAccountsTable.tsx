@@ -4,27 +4,27 @@ import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
 
 import { redux, tabling } from "lib";
+import { hooks } from "store";
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { TemplateSubAccountsTable } from "components/tabling";
 
-import { selectSubAccountUnits } from "../../../store/selectors";
-import * as actions from "../../../store/actions/template/account";
+import { actions } from "../../../store";
 import FringesModal from "./FringesModal";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.table.groups.data
+  (state: Modules.Authenticated.Store) => state.budget.template.account.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.table.data
+  (state: Modules.Authenticated.Store) => state.budget.template.account.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.table.search
+  (state: Modules.Authenticated.Store) => state.budget.template.account.table.search
 );
 const selectAccountDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.detail.data
+  (state: Modules.Authenticated.Store) => state.budget.template.account.detail.data
 );
 const selectFringes = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.account.table.fringes.data
+  (state: Modules.Authenticated.Store) => state.budget.template.account.table.fringes.data
 );
 
 interface SubAccountsTableProps {
@@ -46,28 +46,24 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
   const accountDetail = useSelector(selectAccountDetail);
   const groups = useSelector(selectGroups);
   const fringes = useSelector(selectFringes);
-  const subAccountUnits = useSelector(selectSubAccountUnits);
+  const subAccountUnits = hooks.useSubAccountUnits();
 
-  const table = tabling.hooks.useBudgetTable<Tables.SubAccountRow, Model.SubAccount>();
+  const tableRef = tabling.hooks.useReadWriteBudgetTable<Tables.SubAccountRow, Model.SubAccount>();
 
   return (
     <React.Fragment>
       <TemplateSubAccountsTable
-        template={template}
-        table={table}
+        budget={template}
+        tableRef={tableRef}
         levelType={"account"}
         menuPortalId={"supplementary-header"}
-        data={data}
+        models={data}
         groups={groups}
         detail={accountDetail}
         subAccountUnits={subAccountUnits}
         fringes={fringes}
-        fringesEditorParams={{
-          onAddFringes: () => setFringesModalVisible(true),
-          colId: "fringes"
-        }}
+        onAddFringes={() => setFringesModalVisible(true)}
         onEditFringes={() => setFringesModalVisible(true)}
-        fringesEditor={"FringesEditor"}
         tableFooterIdentifierValue={
           !isNil(accountDetail) && !isNil(accountDetail.description)
             ? `${accountDetail.description} Total`
@@ -75,12 +71,12 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
         }
         exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
         search={search}
-        onSearch={(value: string) => dispatch(actions.setSubAccountsSearchAction(value))}
+        onSearch={(value: string) => dispatch(actions.template.account.setSubAccountsSearchAction(value))}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}
         cookieNames={!isNil(accountDetail) ? { ordering: `account-${accountDetail.id}-table-ordering` } : {}}
         onChangeEvent={(e: Table.ChangeEvent<Tables.SubAccountRow, Model.SubAccount>) =>
-          dispatch(actions.handleTableChangeEventAction(e))
+          dispatch(actions.template.account.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/subaccounts/${id}`)}
         onBack={() => history.push(`/templates/${templateId}/accounts?row=${accountId}`)}
@@ -96,7 +92,7 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupSubAccounts(undefined);
-            dispatch(actions.addGroupToStateAction(group));
+            dispatch(actions.template.account.addGroupToStateAction(group));
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
         />
@@ -108,9 +104,9 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
+            dispatch(actions.template.account.updateGroupInStateAction({ id: group.id, data: group }));
             if (group.color !== groupToEdit.color) {
-              table.current.applyGroupColorChange(group);
+              tableRef.current.applyGroupColorChange(group);
             }
           }}
         />

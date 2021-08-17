@@ -35,7 +35,7 @@ export const warnInconsistentState = ({ level = "warn", ...props }: WarningParam
 };
 
 export const identityReducer =
-  <S, A extends Redux.Action<any> = Redux.Action<any>>(initialState: S): Reducer<S, A> =>
+  <S>(initialState: S): Redux.Reducer<S> =>
   /* eslint-disable indent */
-  (st: S = initialState, action: A) =>
+  (st: S = initialState, action: Redux.Action) =>
     st;

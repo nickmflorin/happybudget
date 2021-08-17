@@ -12,7 +12,7 @@ import { Cell, ValueCell } from "components/tabling/generic/framework/cells";
 // directory.  We should consider alternate solutions to this or potentially moving the
 // cell component into the app directory.
 const groupsSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.LevelType) => {
-  return (state: Modules.ApplicationStore) => {
+  return (state: Modules.Authenticated.Store) => {
     /* eslint-disable indent */
     switch (budgetType) {
       case "budget":
@@ -79,7 +79,7 @@ const IdentifierCell = <R extends BudgetTable.Row, M extends Model.Model>({
             <span>{`${group.name} (${group.children.length} Line Items)`}</span>
             <IconButton
               className={"btn btn--edit-group"}
-              size={"xsmall"}
+              size={"xxsmall"}
               icon={"edit"}
               onClick={() => !isNil(onGroupEdit) && onGroupEdit(group)}
               style={!isNil(colorDef.color) ? { color: colorDef.color } : {}}

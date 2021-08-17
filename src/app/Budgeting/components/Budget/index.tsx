@@ -6,11 +6,9 @@ import { createSelector } from "reselect";
 
 import { budgeting } from "lib";
 import { Icon, RenderIfValidId } from "components";
+import { Layout } from "components/layout";
 
-import { wipeStateAction, setBudgetIdAction } from "../../store/actions/budget";
-import { selectBudgetDetail } from "../../store/selectors";
-
-import GenericLayout from "../GenericLayout";
+import { actions, selectors } from "../../store";
 
 import Account from "./Account";
 import Accounts from "./Accounts";
@@ -19,18 +17,18 @@ import Actuals from "./Actuals";
 import Analysis from "./Analysis";
 
 const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.budget.budget.actuals.deleting,
-  (state: Modules.ApplicationStore) => state.budget.budget.actuals.updating,
-  (state: Modules.ApplicationStore) => state.budget.budget.actuals.creating,
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.deleting,
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.updating,
-  (state: Modules.ApplicationStore) => state.budget.budget.subaccount.table.creating,
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.deleting,
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.updating,
-  (state: Modules.ApplicationStore) => state.budget.budget.budget.table.creating,
-  (state: Modules.ApplicationStore) => state.budget.budget.account.table.deleting,
-  (state: Modules.ApplicationStore) => state.budget.budget.account.table.updating,
-  (state: Modules.ApplicationStore) => state.budget.budget.account.table.creating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.deleting,
+  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.updating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.creating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.deleting,
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.updating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.creating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.deleting,
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.updating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.creating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.account.table.deleting,
+  (state: Modules.Authenticated.Store) => state.budget.budget.account.table.updating,
+  (state: Modules.Authenticated.Store) => state.budget.budget.account.table.creating,
   (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
     return (
       filter(
@@ -50,17 +48,20 @@ const Budget = (): JSX.Element => {
   const { budgetId } = useParams<{ budgetId: string }>();
   const match = useRouteMatch();
   const saving = useSelector(selectSaving);
-  const budget = useSelector(selectBudgetDetail);
+  const budget = useSelector(selectors.selectBudgetDetail);
 
   useEffect(() => {
-    dispatch(wipeStateAction(null));
+    dispatch(actions.budget.wipeStateAction(null));
     if (!isNaN(parseInt(budgetId))) {
-      dispatch(setBudgetIdAction(parseInt(budgetId)));
+      dispatch(actions.budget.setBudgetIdAction(parseInt(budgetId)));
     }
   }, [budgetId]);
 
+  console.log(saving);
   return (
-    <GenericLayout
+    <Layout
+      collapsed
+      className={"layout--budget"}
       saving={saving}
       sidebar={[
         {
@@ -155,7 +156,7 @@ const Budget = (): JSX.Element => {
           />
         </Switch>
       </RenderIfValidId>
-    </GenericLayout>
+    </Layout>
   );
 };
 

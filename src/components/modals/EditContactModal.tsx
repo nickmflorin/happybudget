@@ -4,12 +4,11 @@ import { Dispatch } from "redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { actions } from "store";
 
 import { Form } from "components";
 import { ContactForm } from "components/forms";
 import { Modal } from "components";
-
-import { updateContactInStateAction } from "store/actions";
 
 import ContactModalHeader from "./ContactModalHeader";
 import "./ContactModal.scss";
@@ -70,7 +69,7 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
               .then((newContact: Model.Contact) => {
                 setGlobalError(undefined);
                 form.resetFields();
-                dispatch(updateContactInStateAction({ id: contact.id, data: newContact }));
+                dispatch(actions.authenticated.updateContactInStateAction({ id: contact.id, data: newContact }));
                 onSuccess();
               })
               .catch((e: Error) => {

@@ -1,4 +1,3 @@
-import { Reducer } from "redux";
 import { modelListActionReducer } from "lib/redux/reducers";
 
 export * from "./util";
@@ -6,11 +5,8 @@ export * from "./comments";
 export * from "./detail";
 export * from "./table";
 
-export const createSimplePayloadReducer = <P, A extends Redux.Action<P> = Redux.Action<P>>(
-  actionType: string,
-  initialState: P
-): Reducer<P, A> => {
-  const reducer: Reducer<P, A> = (state: P = initialState, action: A): P => {
+export const createSimplePayloadReducer = <P>(actionType: string, initialState: P): Redux.Reducer<P> => {
+  const reducer: Redux.Reducer<P> = (state: P = initialState, action: Redux.Action<P>): P => {
     if (action.type === actionType && action.payload !== undefined) {
       return action.payload;
     }
@@ -19,8 +15,8 @@ export const createSimplePayloadReducer = <P, A extends Redux.Action<P> = Redux.
   return reducer;
 };
 
-export const createSimpleBooleanReducer = <A extends Redux.Action<boolean>>(actionType: string): Reducer<boolean, A> =>
-  createSimplePayloadReducer<boolean, A>(actionType, false);
+export const createSimpleBooleanReducer = (actionType: string): Redux.Reducer<boolean> =>
+  createSimplePayloadReducer<boolean>(actionType, false);
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a

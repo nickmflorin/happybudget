@@ -5,6 +5,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Table {
 
+  type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
+
   type NullValue = null | "" | 0 | [];
   type ValueFormatter = (params: import("@ag-grid-community/core").ValueFormatterParams) => string | number | null;
 
@@ -20,7 +22,21 @@ namespace Table {
   type GridId = "data" | "footer" | "page";
   type GridSet<T> = { [key in GridId]: T };
   type TableApiSet = GridSet<GridApis | null>;
+  type GridOptions = import("@ag-grid-community/core").GridOptions;
   type TableOptionsSet = GridSet<import("@ag-grid-community/core").GridOptions>;
+
+  type GeneralClassName = string | undefined | null;
+  type RowClassParams = import("@ag-grid-community/core").RowClassParams;
+  type GetRowStyle = (params: Table.RowClassParams) => import("react").CSSProperties | null | undefined;
+  type GetRowClassName = (params: Table.RowClassParams) => Table.RowClassName;
+
+  type CellPosition = Omit<import("@ag-grid-community/core").CellPosition, "rowPinned">
+  type CellKeyDownEvent = import("@ag-grid-community/core").CellKeyDownEvent;
+  type AgColumn = import("@ag-grid-community/core").Column;
+  type RowNode = import("@ag-grid-community/core").RowNode;
+  type MenuItemDef = import("@ag-grid-community/core").MenuItemDef;
+  type GridReadyEvent = import("@ag-grid-community/core").GridReadyEvent;
+  type FirstDataRenderedEvent = import("@ag-grid-community/core").FirstDataRenderedEvent;
 
   type FrameworkGroup = { [key: string]: React.ComponentType<any> };
   type GridFramework = {
@@ -79,11 +95,12 @@ namespace Table {
     | "action";
 
   type ColumnAlignment = "right" | "left" | null;
+  type TableColumnTypeId = "action" | "body" | "calculated";
 
   interface ColumnType {
     readonly id: Table.ColumnTypeId;
     readonly style?: React.CSSProperties;
-    readonly icon?: any;
+    readonly icon?: IconOrElement;
     readonly editorIsPopup?: boolean;
     readonly pdfOverrides?: Omit<Partial<Table.ColumnType>, "id" | "editorIsPopup">;
     readonly headerOverrides?: Omit<Partial<Table.ColumnType>, "id" | "editorIsPopup" | "icon" | "pdfOverrides">;
@@ -118,13 +135,14 @@ namespace Table {
     readonly field: Table.Field<R, M>;
     readonly headerName: string;
     readonly columnType: Table.ColumnTypeId;
+    readonly tableColumnType: Table.TableColumnTypeId;
     readonly nullValue?: Table.NullValue;
     readonly index?: number;
-    readonly isCalculated?: boolean;
     readonly getRowValue?: (m: M) => R[keyof R];
   }
 
   type OmitColDefParams = "field" | "headerName" | "cellRenderer" | "cellClass" | "getCellClass" | "colSpan";
+
   interface Column<R extends Table.Row, M extends Model.Model, V = any> extends Omit<import("@ag-grid-community/core").ColDef, OmitColDefParams>, Table.DualColumn<R, M, V> {
     readonly selectable?: boolean | ((params: Table.SelectableCallbackParams<R, M>) => boolean) | undefined;
     readonly editable?: boolean | ((params: Table.EditableCallbackParams<R, M>) => boolean) | undefined;
@@ -133,6 +151,7 @@ namespace Table {
     readonly page?: Table.FooterColumn<R, M>;
     readonly cellRenderer?: string | Partial<Table.GridSet<string>>;
     readonly cellClass?: Table.CellClassName;
+    readonly cellStyle?: React.CSSProperties;
     // Only applicable for BudgetTable - we might want to create a separate BudgetTable.Column type.
     readonly isCalculating?: boolean;
     readonly canBeHidden?: boolean;
@@ -151,6 +170,7 @@ namespace Table {
   interface FooterColumn<R extends Table.Row, M extends Model.Model> extends Pick<Table.Column<R, M>, "selectable" | "editable" | "colSpan"> {
     readonly value?: any;
     readonly cellRenderer?: string;
+    readonly cellStyle?: React.CSSProperties;
   }
 
   interface CookieNames {
@@ -158,34 +178,46 @@ namespace Table {
     readonly hiddenColumns?: string;
   }
 
-  interface Grid<R extends Table.Row, M extends Model.Model> {
-    applyTableChange: (event: Table.ChangeEvent<R, M>) => void;
-    getCSVData: (fields?: string[]) => CSVData;
-  }
   /* eslint-disable no-shadow */
-  type Table<R extends Table.Row, M extends Model.Model> = Table.Grid<R, M> & {
-    changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>, sizeToFit?: boolean) => void;
+  type ReadOnlyTableRefObj<R extends Table.Row, M extends Model.Model> = {
+    readonly getCSVData: (fields?: string[]) => CSVData;
+    readonly changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>, sizeToFit?: boolean) => void;
   };
-  type GridRef<R extends Table.Row, M extends Model.Model> = { current: Table.Grid<R, M> };
-  type Ref<R extends Table.Row, M extends Model.Model> = { current: Table.Table<R, M> };
+  type ReadWriteTableRefObj<R extends Table.Row, M extends Model.Model> = Table.ReadOnlyTableRefObj<R, M> & {
+    readonly applyTableChange: (event: Table.ChangeEvent<R, M>) => void;
+  }
 
-  type MenuAction = {
-    readonly icon: IconProp;
+  type MenuActionObj = {
+    readonly index?: number;
+    readonly icon: IconOrElement;
     readonly tooltip?: Tooltip;
     readonly disabled?: boolean;
     readonly label?: string;
+    readonly isWriteOnly?: boolean;
     // If being wrapped in a Dropdown, the onClick prop will not be used.
     readonly onClick?: () => void;
-    readonly wrapInDropdown?: (children: import("react").ReactChild | import("react").ReactChild[]) => JSX.Element;
+    readonly wrapInDropdown?: (children: ReactNode) => JSX.Element;
     readonly render?: RenderFunc;
   }
 
-  interface MenuActionParams<R extends Table.Row, M extends Model.Model> {
+  type MenuActionParams<R extends Table.Row, M extends Model.Model> = {
     readonly apis: Table.GridApis;
     readonly columns: Table.Column<R, M>[];
-    readonly selectedRows: R[];
     readonly hiddenColumns: Table.Field<R, M>[];
   }
+  type ReadOnlyMenuActionParams<R extends Table.Row, M extends Model.Model> = MenuActionParams<R, M>;
+  type ReadWriteMenuActionParams<R extends Table.Row, M extends Model.Model> = MenuActionParams<R, M> & {
+    readonly selectedRows: R[];
+  }
+
+  type MenuActionCallback<V, R extends Table.Row, M extends Model.Model, T extends MenuActionParams<R, M> = MenuActionParams<R, M>> = (params: T) => V;
+  type MenuAction<R extends Table.Row, M extends Model.Model, T extends MenuActionParams<R, M> = MenuActionParams<R, M>> = MenuActionObj | MenuActionCallback<MenuActionObj, R, M, T>;
+  type MenuActions<R extends Table.Row, M extends Model.Model, T extends MenuActionParams<R, M> = MenuActionParams<R, M>> = Array<MenuAction<R, M, T>> | MenuActionCallback<MenuAction<R, M, T>[], R, M, T>;
+
+  type ReadOnlyMenuAction<R extends Table.Row, M extends Model.Model> = MenuAction<R, M, ReadOnlyMenuActionParams<R, M>>;
+  type ReadWriteMenuAction<R extends Table.Row, M extends Model.Model> = MenuAction<R, M, ReadWriteMenuActionParams<R, M>>;
+  type ReadOnlyMenuActions<R extends Table.Row, M extends Model.Model> = MenuActions<R, M, ReadOnlyMenuActionParams<R, M>,>;
+  type ReadWriteMenuActions<R extends Table.Row, M extends Model.Model> = MenuActions<R, M, ReadWriteMenuActionParams<R, M>>;
 
   interface ColumnVisibilityChange<R extends Table.Row, M extends Model.Model> {
     readonly field: Table.Field<R, M>;
@@ -308,10 +340,6 @@ namespace Table {
   type OnChangeEvent<R extends Table.Row, M extends Model.Model> = (event: Table.ChangeEvent<R, M>) => void;
   type ChangeEvent<R extends Table.Row, M extends Model.Model> = GrouplessEvent<R, M> | GroupEvent<R, M>;
 
-  interface CellPositionMoveOptions {
-    readonly startEdit?: boolean;
-  }
-
   type CellDoneEditingEvent =
     | import("react").SyntheticEvent
     | KeyboardEvent;
@@ -369,8 +397,6 @@ namespace Table {
   };
 }
 
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 namespace BudgetTable {
   interface RowMeta extends Table.RowMeta {
     readonly isGroupRow?: boolean;
@@ -389,13 +415,9 @@ namespace BudgetTable {
 
   type TableData<R extends BudgetTable.Row, M extends Model.Model> = BudgetTable.RowGroup<R, M>[];
 
-  interface Grid<R extends BudgetTable.Row, M extends Model.Model> extends Table.Grid<R, M> {
-    applyGroupColorChange: (group: Model.Group) => void;
-  }
-  /* eslint-disable no-shadow */
-  type Table<R extends BudgetTable.Row, M extends Model.Model> = Table.Table<R, M> & BudgetTable.Grid<R, M>;
-  type GridRef<R extends BudgetTable.Row, M extends Model.Model> = { current: BudgetTable.Grid<R, M> };
-  type Ref<R extends BudgetTable.Row, M extends Model.Model> = { current: BudgetTable.Table<R, M> };
+  type ReadWriteTableRefObj<R extends Table.Row, M extends Model.Model> = Table.ReadWriteTableRefObj<R, M> & {
+    readonly applyGroupColorChange: (group: Model.Group) => void;
+  };
 
   type LevelType = "budget" | "account" | "subaccount";
 
@@ -463,8 +485,6 @@ namespace PdfTable {
   }
 }
 
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 namespace PdfBudgetTable {
   // Either the TopSheet page or an ID of the account.
   type TableOption = "topsheet" | number;

@@ -13,8 +13,8 @@ import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 
 import { actions } from "../../store";
 
-const selectTemplates = (state: Modules.ApplicationStore) => state.dashboard.templates.data;
-const selectLoadingTemplates = (state: Modules.ApplicationStore) => state.dashboard.templates.loading;
+const selectTemplates = (state: Modules.Authenticated.Store) => state.dashboard.templates.data;
+const selectLoadingTemplates = (state: Modules.Authenticated.Store) => state.dashboard.templates.loading;
 
 interface MyTemplatesProps {
   setTemplateToDerive: (template: number) => void;

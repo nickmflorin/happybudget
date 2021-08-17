@@ -1,6 +1,7 @@
 import BudgetingReduxConfig from "app/Budgeting/config";
 import DashboardReduxConfig from "app/Dashboard/config";
+import ShareReduxConfig from "app/Share/config";
 
-const ApplicationReduxConfig: Modules.ApplicationConfig = [DashboardReduxConfig, BudgetingReduxConfig];
+const GlobalReduxConfig: Modules.ModuleConfigs = [DashboardReduxConfig, BudgetingReduxConfig, ShareReduxConfig];
 
-export default ApplicationReduxConfig;
+export default GlobalReduxConfig;

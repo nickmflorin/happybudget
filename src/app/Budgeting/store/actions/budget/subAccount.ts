@@ -19,9 +19,10 @@ export const responseCommentsAction = redux.actions.simpleAction<Http.ListRespon
   ActionType.Budget.SubAccount.Comments.Response
 );
 export const loadingCommentsAction = redux.actions.simpleAction<boolean>(ActionType.Budget.SubAccount.Comments.Loading);
-export const createCommentAction = redux.actions.simpleAction<{ parent?: number; data: Http.CommentPayload }>(
-  ActionType.Budget.SubAccount.Comments.Create
-);
+export const createCommentAction = redux.actions.simpleAction<{
+  parent?: number;
+  data: Http.CommentPayload;
+}>(ActionType.Budget.SubAccount.Comments.Create);
 export const creatingCommentAction = redux.actions.simpleAction<boolean>(
   ActionType.Budget.SubAccount.Comments.Creating
 );
@@ -38,9 +39,10 @@ export const deletingCommentAction = redux.actions.simpleAction<Redux.ModelListA
 export const updatingCommentAction = redux.actions.simpleAction<Redux.ModelListActionPayload>(
   ActionType.Budget.SubAccount.Comments.Updating
 );
-export const addCommentToStateAction = redux.actions.simpleAction<{ data: Model.Comment; parent?: number }>(
-  ActionType.Budget.SubAccount.Comments.AddToState
-);
+export const addCommentToStateAction = redux.actions.simpleAction<{
+  data: Model.Comment;
+  parent?: number;
+}>(ActionType.Budget.SubAccount.Comments.AddToState);
 export const removeCommentFromStateAction = redux.actions.simpleAction<number>(
   ActionType.Budget.SubAccount.Comments.RemoveFromState
 );

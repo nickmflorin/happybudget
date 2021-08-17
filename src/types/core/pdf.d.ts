@@ -41,7 +41,7 @@ namespace Pdf {
   type Style = import("@react-pdf/types").Style;
   type Styles = import("@react-pdf/renderer").default.Styles;
 
-  type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>, fontFamily?: Style.FontFamily };
+  type ExtensionStyle = ReactPdfStyle & { ext?: SingleOrArray<string>, fontFamily?: FontFamily };
   type ExtensionStyles = {[key: string]: Pdf.ExtensionStyle};
 
   type FontStyleName = "italic" | "bold";
@@ -49,7 +49,7 @@ namespace Pdf {
   type SupportedFontStyle = { name: FontStyleName, tag: FontStyleTag };
   type Font = {
     readonly src: any;
-    readonly fontWeight: Style.FontWeight;
+    readonly fontWeight: FontWeight;
     readonly fontStyle?: "italic";
   };
 

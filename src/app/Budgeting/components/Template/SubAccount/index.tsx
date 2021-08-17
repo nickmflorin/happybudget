@@ -11,19 +11,17 @@ import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
 
-import { setTemplateAutoIndex } from "../../../store/actions/template";
-import * as actions from "../../../store/actions/template/subAccount";
-
+import { actions } from "../../../store";
 import SubAccountBudgetTable from "./SubAccountsTable";
 
 const selectDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.detail.data
+  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.detail.data
 );
 const selectSubAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.loading
+  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.table.loading
 );
 const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.subaccount.table.groups.loading
+  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.table.groups.loading
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,
@@ -43,16 +41,16 @@ const SubAccount = ({ template, templateId }: SubAccountProps): JSX.Element => {
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
-    dispatch(setTemplateAutoIndex(true));
+    dispatch(actions.template.setTemplateAutoIndex(true));
   }, []);
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
-      dispatch(actions.setSubAccountIdAction(parseInt(subaccountId)));
+      dispatch(actions.template.subAccount.setSubAccountIdAction(parseInt(subaccountId)));
       // TODO: It might not be necessary to get a fresh set of fringes everytime the SubAccount changes,
       // we might be able to move this further up in the tree - but for now it is safer to rely on the
       // source of truth from the API more often than not.
-      dispatch(actions.requestFringesAction(null));
+      dispatch(actions.template.subAccount.requestFringesAction(null));
     }
   }, [subaccountId]);
 

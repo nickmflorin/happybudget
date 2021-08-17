@@ -1,8 +1,6 @@
-import initialState from "./store/initialState";
-import rootReducer from "./store/reducer";
-import rootSaga from "./store/sagas";
+import { initialState, rootReducer, rootSaga } from "./store";
 
-const Config: Modules.ModuleConfig<Modules.Dashboard.Store, Redux.Action> = {
+const Config: Modules.Authenticated.ModuleConfig<Modules.Authenticated.Dashboard.Store> = {
   rootReducer: rootReducer,
   rootSaga: rootSaga,
   initialState: initialState,

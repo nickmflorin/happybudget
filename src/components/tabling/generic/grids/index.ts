@@ -1,6 +1,6 @@
-export { default as DataGrid } from "./DataGrid";
-export * from "./DataGrid";
-export { default as FooterGrid } from "./FooterGrid";
-export * from "./FooterGrid";
-export { default as PageFooterGrid } from "./PageFooterGrid";
-export { default as TableFooterGrid } from "./TableFooterGrid";
+export { default as ReadOnlyGrid } from "./ReadOnlyGrid";
+export * from "./ReadOnlyGrid";
+export { default as ReadWriteGrid } from "./ReadWriteGrid";
+export * from "./ReadWriteGrid";
+export { default as Grid } from "./Grid";
+export * from "./Grid";

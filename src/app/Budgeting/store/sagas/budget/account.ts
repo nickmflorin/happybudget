@@ -12,7 +12,7 @@ import * as actions from "../../actions/budget/account";
 import { createStandardSaga, createAccountTaskSet, createFringeTaskSet } from "../factories";
 
 export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
-  const accountId = yield select((state: Modules.ApplicationStore) => state.budget.budget.account.id);
+  const accountId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.account.id);
   if (!isNil(accountId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -39,7 +39,7 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
 }
 
 export function* submitCommentTask(action: Redux.Action<{ parent?: number; data: Http.CommentPayload }>): SagaIterator {
-  const accountId = yield select((state: Modules.ApplicationStore) => state.budget.budget.account.id);
+  const accountId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.account.id);
   if (!isNil(accountId) && !isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -121,8 +121,8 @@ export function* editCommentTask(action: Redux.Action<Redux.UpdateModelActionPay
   }
 }
 
-export function* getCommentsTask(action: Redux.Action<any>): SagaIterator {
-  const accountId = yield select((state: Modules.ApplicationStore) => state.budget.budget.account.id);
+export function* getCommentsTask(action: Redux.Action): SagaIterator {
+  const accountId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.account.id);
   if (!isNil(accountId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -170,7 +170,7 @@ const fringesRootSaga = redux.sagas.factories.createTableSaga(
       bulkCreate: api.bulkCreateBudgetFringes,
       bulkDelete: api.bulkDeleteBudgetFringes
     },
-    (state: Modules.ApplicationStore) => state.budget.budget.budget.id
+    (state: Modules.Authenticated.Store) => state.budget.budget.budget.id
   )
 );
 
@@ -198,9 +198,9 @@ const tasks = createAccountTaskSet<Model.Budget>(
       request: actions.requestGroupsAction
     }
   },
-  (state: Modules.ApplicationStore) => state.budget.budget.account.id,
-  (state: Modules.ApplicationStore) => state.budget.budget.account.table.data,
-  (state: Modules.ApplicationStore) => state.budget.budget.autoIndex
+  (state: Modules.Authenticated.Store) => state.budget.budget.account.id,
+  (state: Modules.Authenticated.Store) => state.budget.budget.account.table.data,
+  (state: Modules.Authenticated.Store) => state.budget.budget.autoIndex
 );
 
 function* watchForRequestAccountSaga(): SagaIterator {

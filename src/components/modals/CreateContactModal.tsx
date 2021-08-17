@@ -4,12 +4,11 @@ import { Dispatch } from "redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { actions } from "store";
 
 import { Form } from "components";
 import { ContactForm } from "components/forms";
 import { Modal } from "components";
-
-import { addContactToStateAction } from "store/actions";
 
 import ContactModalHeader from "./ContactModalHeader";
 import "./ContactModal.scss";
@@ -68,7 +67,7 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
               .createContact(payload)
               .then((contact: Model.Contact) => {
                 form.resetFields();
-                dispatch(addContactToStateAction(contact));
+                dispatch(actions.authenticated.addContactToStateAction(contact));
                 onSuccess(contact);
               })
               .catch((e: Error) => {

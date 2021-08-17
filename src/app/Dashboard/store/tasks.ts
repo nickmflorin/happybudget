@@ -5,14 +5,13 @@ import { call, put, select, cancelled } from "redux-saga/effects";
 import * as api from "api";
 import * as actions from "./actions";
 
-export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
+// TODO: These need to be paginated!
+export function* getBudgetsTask(action: Redux.Action): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Modules.ApplicationStore) => {
+  const query = yield select((state: Modules.Authenticated.Store) => {
     return {
-      search: state.dashboard.budgets.search,
-      page_size: state.dashboard.budgets.pageSize,
-      page: state.dashboard.budgets.page
+      search: state.dashboard.budgets.search
     };
   });
   yield put(actions.loadingBudgetsAction(true));
@@ -34,14 +33,13 @@ export function* getBudgetsTask(action: Redux.Action<any>): SagaIterator {
   }
 }
 
-export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
+// TODO: These need to be paginated!
+export function* getTemplatesTask(action: Redux.Action): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Modules.ApplicationStore) => {
+  const query = yield select((state: Modules.Authenticated.Store) => {
     return {
-      search: state.dashboard.templates.search,
-      page_size: state.dashboard.templates.pageSize,
-      page: state.dashboard.templates.page
+      search: state.dashboard.templates.search
     };
   });
   yield put(actions.loadingTemplatesAction(true));
@@ -63,14 +61,13 @@ export function* getTemplatesTask(action: Redux.Action<any>): SagaIterator {
   }
 }
 
-export function* getCommunityTemplatesTask(action: Redux.Action<any>): SagaIterator {
+// TODO: These need to be paginated!
+export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Modules.ApplicationStore) => {
+  const query = yield select((state: Modules.Authenticated.Store) => {
     return {
-      search: state.dashboard.community.search,
-      page_size: state.dashboard.community.pageSize,
-      page: state.dashboard.community.page
+      search: state.dashboard.community.search
     };
   });
   yield put(actions.loadingCommunityTemplatesAction(true));

@@ -5,50 +5,35 @@ import { map, isNil } from "lodash";
 
 import * as api from "api";
 import { tabling } from "lib";
+import { getContactsTask } from "store/tasks";
 import { actions } from "store";
 
 type R = Tables.ContactRow;
 type M = Model.Contact;
 type P = Http.ContactPayload;
 
-export function* getContactsTask(action: Redux.Action<any>): SagaIterator {
-  const CancelToken = axios.CancelToken;
-  const source = CancelToken.source();
-  yield put(actions.loadingContactsAction(true));
-  try {
-    const response: Http.ListResponse<Model.Contact> = yield call(api.getContacts, {}, { cancelToken: source.token });
-    yield put(actions.responseContactsAction(response));
-  } catch (e) {
-    if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error retrieving the contacts.");
-      yield put(actions.responseContactsAction({ count: 0, data: [] }, { error: e }));
-    }
-  } finally {
-    yield put(actions.loadingContactsAction(false));
-    if (yield cancelled()) {
-      source.cancel();
-    }
-  }
-}
+export const createReadOnlyContactsTaskSet = (): Redux.ReadOnlyTableTaskMap<R, M> => {
+  return { request: getContactsTask };
+};
 
-const createContactsTaskMap = (): Redux.TableTaskMap<R, M> => {
+export const createContactsTaskSet = (): Redux.TableTaskMap<R, M> => {
   function* bulkCreateTask(e: Table.RowAddEvent<R, M>, errorMessage: string): SagaIterator {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
     const requestPayload: Http.BulkCreatePayload<P> = tabling.util.createBulkCreatePayload<R, M, P>(e.payload);
-    yield put(actions.creatingContactAction(true));
+    yield put(actions.authenticated.creatingContactAction(true));
     try {
       const response: Http.BulkCreateResponse<M> = yield call(api.bulkCreateContacts, requestPayload, {
         cancelToken: source.token
       });
-      yield all(response.data.map((contact: M) => put(actions.addContactToStateAction(contact))));
+      yield all(response.data.map((contact: M) => put(actions.authenticated.addContactToStateAction(contact))));
     } catch (err) {
       if (!(yield cancelled())) {
         api.handleRequestError(err, errorMessage);
       }
     } finally {
-      yield put(actions.creatingContactAction(false));
+      yield put(actions.authenticated.creatingContactAction(false));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -64,7 +49,7 @@ const createContactsTaskMap = (): Redux.TableTaskMap<R, M> => {
     const source = CancelToken.source();
     yield all(
       requestPayload.map((p: Http.BulkUpdatePayload<P>) =>
-        put(actions.updatingContactAction({ id: p.id, value: true }))
+        put(actions.authenticated.updatingContactAction({ id: p.id, value: true }))
       )
     );
     try {
@@ -76,7 +61,7 @@ const createContactsTaskMap = (): Redux.TableTaskMap<R, M> => {
     } finally {
       yield all(
         requestPayload.map((p: Http.BulkUpdatePayload<P>) =>
-          put(actions.updatingContactAction({ id: p.id, value: false }))
+          put(actions.authenticated.updatingContactAction({ id: p.id, value: false }))
         )
       );
       if (yield cancelled()) {
@@ -92,7 +77,7 @@ const createContactsTaskMap = (): Redux.TableTaskMap<R, M> => {
     const rows: R[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
     if (rows.length !== 0) {
       const ids = map(rows, (row: R) => row.id);
-      yield all(ids.map((id: number) => put(actions.deletingContactAction({ id, value: true }))));
+      yield all(ids.map((id: number) => put(actions.authenticated.deletingContactAction({ id, value: true }))));
       try {
         yield call(api.bulkDeleteContacts, ids, { cancelToken: source.token });
       } catch (err) {
@@ -100,7 +85,7 @@ const createContactsTaskMap = (): Redux.TableTaskMap<R, M> => {
           api.handleRequestError(err, errorMessage);
         }
       } finally {
-        yield all(ids.map((id: number) => put(actions.deletingContactAction({ id, value: false }))));
+        yield all(ids.map((id: number) => put(actions.authenticated.deletingContactAction({ id, value: false }))));
         if (yield cancelled()) {
           source.cancel();
         }
@@ -137,11 +122,9 @@ const createContactsTaskMap = (): Redux.TableTaskMap<R, M> => {
   }
 
   return {
+    ...createReadOnlyContactsTaskSet(),
     handleRowAddEvent: handleRowAddEvent,
     handleRowDeleteEvent: handleRowDeleteEvent,
-    handleDataChangeEvent: handleDataChangeEvent,
-    request: getContactsTask
+    handleDataChangeEvent: handleDataChangeEvent
   };
 };
-
-export default createContactsTaskMap;

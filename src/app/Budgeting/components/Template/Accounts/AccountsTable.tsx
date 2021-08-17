@@ -6,18 +6,18 @@ import { map } from "lodash";
 
 import { tabling, redux } from "lib";
 import { CreateTemplateAccountGroupModal, EditGroupModal } from "components/modals";
-import { TemplateAccountsTable } from "components/tabling";
+import { ReadWriteTemplateAccountsTable } from "components/tabling";
 
-import * as actions from "../../../store/actions/template/accounts";
+import { actions } from "../../../store";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.table.groups.data
+  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.table.data
+  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.ApplicationStore) => state.budget.template.budget.table.search
+  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.search
 );
 
 interface AccountsTableProps {
@@ -36,20 +36,20 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
   const search = useSelector(selectTableSearch);
   const groups = useSelector(selectGroups);
 
-  const table = tabling.hooks.useBudgetTable<Tables.AccountRow, Model.Account>();
+  const tableRef = tabling.hooks.useReadWriteBudgetTable<Tables.AccountRow, Model.Account>();
 
   return (
     <React.Fragment>
-      <TemplateAccountsTable
-        table={table}
-        data={data}
+      <ReadWriteTemplateAccountsTable
+        tableRef={tableRef}
+        models={data}
         groups={groups}
-        template={template}
+        budget={template}
         search={search}
         menuPortalId={"supplementary-header"}
-        onSearch={(value: string) => dispatch(actions.setAccountsSearchAction(value))}
+        onSearch={(value: string) => dispatch(actions.template.accounts.setAccountsSearchAction(value))}
         onChangeEvent={(e: Table.ChangeEvent<Tables.AccountRow, Model.Account>) =>
-          dispatch(actions.handleTableChangeEventAction(e))
+          dispatch(actions.template.accounts.handleTableChangeEventAction(e))
         }
         onRowExpand={(id: number) => history.push(`/templates/${templateId}/accounts/${id}`)}
         onGroupRows={(rows: Tables.AccountRow[]) => setGroupAccounts(map(rows, (row: Tables.AccountRow) => row.id))}
@@ -62,7 +62,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
           open={true}
           onSuccess={(group: Model.Group) => {
             setGroupAccounts(undefined);
-            dispatch(actions.addGroupToStateAction(group));
+            dispatch(actions.template.accounts.addGroupToStateAction(group));
           }}
           onCancel={() => setGroupAccounts(undefined)}
         />
@@ -74,9 +74,9 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.Group) => {
             setGroupToEdit(undefined);
-            dispatch(actions.updateGroupInStateAction({ id: group.id, data: group }));
+            dispatch(actions.template.accounts.updateGroupInStateAction({ id: group.id, data: group }));
             if (group.color !== groupToEdit.color) {
-              table.current.applyGroupColorChange(group);
+              tableRef.current.applyGroupColorChange(group);
             }
           }}
         />

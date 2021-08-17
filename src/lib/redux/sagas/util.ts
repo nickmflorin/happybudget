@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 function* takeWithCancellableByIdSaga(actionType: string, task: any, getId: any): SagaIterator {
   let lastTasks: { [key: number]: any[] } = {};
   while (true) {
-    const action: Redux.Action<any> = yield take(actionType);
+    const action: Redux.Action = yield take(actionType);
     if (!isNil(action.payload)) {
       const actionId = getId(action.payload);
       if (isNil(lastTasks[actionId])) {

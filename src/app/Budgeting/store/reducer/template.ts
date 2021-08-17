@@ -1,4 +1,4 @@
-import { Reducer, combineReducers } from "redux";
+import { combineReducers } from "redux";
 
 import { redux } from "lib";
 
@@ -126,16 +126,17 @@ const genericReducer = combineReducers({
   actuals: redux.util.identityReducer<Redux.ModelListResponseStore<Model.Actual>>(
     redux.initialState.initialModelListResponseState
   ),
-  headerTemplates: redux.util.identityReducer<Modules.Budget.HeaderTemplatesStore>(initialHeaderTemplatesState),
+  headerTemplates:
+    redux.util.identityReducer<Modules.Authenticated.Budget.HeaderTemplatesStore>(initialHeaderTemplatesState),
   subAccountsTree: redux.util.identityReducer<Redux.ModelListResponseStore<Model.SubAccountTreeNode>>(
     redux.initialState.initialModelListResponseState
   )
 });
 
-const rootReducer: Reducer<Modules.Budget.ModuleStore<Model.Template>, Redux.Action<any>> = (
-  state: Modules.Budget.ModuleStore<Model.Template> = initialState.template,
-  action: Redux.Action<any>
-): Modules.Budget.ModuleStore<Model.Template> => {
+const rootReducer: Redux.Reducer<Modules.Authenticated.Budget.ModuleStore<Model.Template>> = (
+  state: Modules.Authenticated.Budget.ModuleStore<Model.Template> = initialState.template,
+  action: Redux.Action
+): Modules.Authenticated.Budget.ModuleStore<Model.Template> => {
   let newState = { ...state };
   if (action.type === ActionType.Template.WipeState) {
     newState = initialState.template;

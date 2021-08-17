@@ -18,6 +18,9 @@ export const sumChars = (val: string): number => {
   return sum;
 };
 
+export const destruct = (obj: { [key: string]: any }, ...keys: string[]) =>
+  keys.reduce((a, c) => ({ ...a, [c]: obj[c] }), {});
+
 export const hashString = (s: string): number =>
   s.split("").reduce((a, b) => {
     a = (a << 5) - a + b.charCodeAt(0);
@@ -98,6 +101,18 @@ export const replaceInArray = <T>(
   return newArray;
 };
 
+export const updateInArray = <T extends object>(
+  array: T[],
+  predicate: ((i: T) => boolean) | { [key: string]: any },
+  updateValue: Partial<T>
+): T[] => {
+  const currentValue = find(array, predicate) as T | undefined;
+  if (!isNil(currentValue)) {
+    return replaceInArray<T>(array, predicate, { ...currentValue, ...updateValue });
+  }
+  return array;
+};
+
 export const updateFieldOrdering = <T = string>(
   fieldOrdering: FieldOrdering<T>,
   field: T,
@@ -134,14 +149,6 @@ export const includesAnyIn = <T = any>(array: T[], anotherArray: T[] | T): boole
     }
   });
   return found;
-};
-
-export const mapWithoutVoid = <T = any, R = T>(collection: T[], predicate: (obj: T, index: number) => R | void) => {
-  return filterOutVoid<R>(map(collection, (obj: T, index: number) => predicate(obj, index)));
-};
-
-export const filterOutVoid = <T = any>(collection: (T | void)[]): T[] => {
-  return filter(collection, (obj: T | void) => obj !== undefined) as T[];
 };
 
 export const selectRandom = <T = any>(array: T[]): T => {
@@ -182,13 +189,6 @@ export const mergeWithDefaults = <T extends object>(obj: Partial<T>, defaults: T
     }
   });
   return merged as T;
-};
-
-export const conditionalObj = <T = any>(obj: T, condition: boolean): Partial<T> => {
-  if (condition === true) {
-    return obj;
-  }
-  return {};
 };
 
 /* prettier-ignore */

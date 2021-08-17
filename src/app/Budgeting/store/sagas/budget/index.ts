@@ -4,11 +4,11 @@ import axios from "axios";
 import { isNil } from "lodash";
 
 import * as api from "api";
-import { getContactsTask } from "store/sagas/contacts";
+import { tasks } from "store";
 
 import { ActionType } from "../../actions";
 import { loadingBudgetAction, responseBudgetAction } from "../../actions/budget";
-import { getFringeColorsTask, getSubAccountUnitsTask } from "../tasks";
+import { getFringeColorsTask } from "../tasks";
 
 import accountSaga from "./account";
 import accountsSaga from "./accounts";
@@ -22,13 +22,13 @@ export function* handleBudgetChangedTask(action: Redux.Action<number>): SagaIter
   yield all([
     call(getBudgetTask),
     call(getFringeColorsTask),
-    call(getSubAccountUnitsTask),
-    call(getContactsTask, action)
+    call(tasks.getSubAccountUnitsTask, action),
+    call(tasks.getContactsTask, action)
   ]);
 }
 
 function* getBudgetTask(): SagaIterator {
-  const budgetId = yield select((state: Modules.ApplicationStore) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

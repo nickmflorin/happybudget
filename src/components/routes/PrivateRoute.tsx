@@ -3,10 +3,9 @@ import { useDispatch } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
 import { Dispatch } from "redux";
 
-import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
+import * as api from "api";
+import { actions } from "store";
 import { WrapInApplicationSpinner } from "components";
-import { updateLoggedInUserAction } from "store/actions";
-import { validateToken } from "api/services";
 
 const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
@@ -15,9 +14,10 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
 
   useEffect(() => {
     setAuthenticating(true);
-    validateToken()
+    api
+      .validateToken()
       .then((response: Http.TokenValidationResponse) => {
-        dispatch(updateLoggedInUserAction(response.user));
+        dispatch(actions.authenticated.updateLoggedInUserAction(response.user));
         // TODO: Figure out how to do this just on login.
         if (process.env.NODE_ENV !== "development") {
           window.analytics.identify(response.user.id, {
@@ -27,10 +27,10 @@ const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
         }
       })
       .catch((e: Error) => {
-        if (e instanceof AuthenticationError) {
+        if (e instanceof api.AuthenticationError) {
           setRedirect(true);
         } else {
-          if (e instanceof NetworkError || e instanceof ClientError || e instanceof ServerError) {
+          if (e instanceof api.NetworkError || e instanceof api.ClientError || e instanceof api.ServerError) {
             /* eslint-disable no-console */
             console.error(e);
           } else {

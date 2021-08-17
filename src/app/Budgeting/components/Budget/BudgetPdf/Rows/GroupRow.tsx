@@ -34,7 +34,7 @@ const GroupRow = <R extends Table.Row, M extends Model.Model>(
       (obj: { [key: string]: any }, col: PdfTable.Column<R, M>, index: number) => {
         if (props.columns.length === 1 || index === 1) {
           obj[col.field as string] = props.group.name;
-        } else if (col.isCalculated === true) {
+        } else if (col.tableColumnType === "calculated") {
           obj[col.field as string] = null;
           if (!isNil(props.group[col.field as keyof Model.Group])) {
             obj[col.field as string] = props.group[col.field as keyof Model.Group];

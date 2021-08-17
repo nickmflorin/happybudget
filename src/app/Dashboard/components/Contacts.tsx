@@ -5,17 +5,16 @@ import { isNil, find, filter, map } from "lodash";
 import { createSelector } from "reselect";
 
 import { hooks } from "lib";
+import { selectors, actions } from "store";
 
 import { Page } from "components/layout";
 import { CreateContactModal, EditContactModal } from "components/modals";
 import { ContactsTable } from "components/tabling";
 
-import { selectors, actions } from "store";
-
 const selectSaving = createSelector(
-  (state: Modules.ApplicationStore) => state.user.contacts.deleting,
-  (state: Modules.ApplicationStore) => state.user.contacts.updating,
-  (state: Modules.ApplicationStore) => state.user.contacts.creating,
+  (state: Modules.Authenticated.Store) => state.user.contacts.deleting,
+  (state: Modules.Authenticated.Store) => state.user.contacts.updating,
+  (state: Modules.Authenticated.Store) => state.user.contacts.creating,
   (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
     return (
       filter(
@@ -38,7 +37,7 @@ const Contacts = (): JSX.Element => {
   const saving = useSelector(selectSaving);
 
   useEffect(() => {
-    dispatch(actions.requestContactsAction(null));
+    dispatch(actions.authenticated.requestContactsAction(null));
   }, []);
 
   const onEditContact = hooks.useDynamicCallback((id: number) => {
@@ -52,13 +51,13 @@ const Contacts = (): JSX.Element => {
     <Page className={"contacts"} title={"My Contacts"}>
       <ContactsTable
         loading={loading}
-        data={contacts}
+        models={contacts}
         search={search}
         saving={saving}
         onEditContact={onEditContact}
-        onSearch={(value: string) => dispatch(actions.setContactsSearchAction(value))}
+        onSearch={(value: string) => dispatch(actions.authenticated.setContactsSearchAction(value))}
         onChangeEvent={(e: Table.ChangeEvent<Tables.ContactRow, Model.Contact>) =>
-          dispatch(actions.handleContactsTableChangeEventAction(e))
+          dispatch(actions.authenticated.handleContactsTableChangeEventAction(e))
         }
         exportFileName={"contacts"}
       />
