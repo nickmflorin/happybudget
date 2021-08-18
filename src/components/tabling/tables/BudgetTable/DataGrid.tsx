@@ -16,8 +16,9 @@ export interface BudgetDataGridProps<R extends BudgetTable.Row, M extends Model.
   readonly budgetType: Model.BudgetType;
   readonly onGroupRows: (rows: R[]) => void;
   readonly onBack?: () => void;
-  readonly getModelChildren: (m: M) => number[];
-  readonly getModelLabel?: (m: M) => number | string | null;
+  readonly getRowName?: number | string | ((m: M) => number | string | null);
+  readonly getRowChildren: (m: M) => number[];
+  readonly getRowLabel?: number | string | ((m: M) => number | string | null);
 }
 
 const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
@@ -28,8 +29,10 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
   columns,
   levelType,
   budgetType,
+  getRowName,
+  getRowLabel,
   onGroupRows,
-  getModelChildren,
+  getRowChildren,
   onBack,
   ...props
 }: BudgetDataGridProps<R, M>): JSX.Element => {
@@ -96,6 +99,12 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
 
   const getContextMenuItems = hooks.useDynamicCallback(
     (row: R, node: RowNode, onChangeEvent: Table.OnChangeEvent<R, M>): MenuItemDef[] => {
+      const fullRowLabel =
+        tabling.util.getFullRowLabel(row, {
+          name: props.defaultRowName,
+          label: props.defaultRowLabel
+        }) || "Row";
+
       if (row.meta.isGroupRow === true) {
         const group: Model.Group | undefined = find(groups, { id: row.meta.group } as any);
         /* eslint-disable indent */
@@ -116,7 +125,7 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
         return !isNil(group)
           ? [
               {
-                name: `Remove ${row.meta.label || "Row"} from Group ${group.name}`,
+                name: `Remove ${fullRowLabel} from Group ${group.name}`,
                 action: () =>
                   onChangeEvent({
                     type: "rowRemoveFromGroup",
@@ -131,19 +140,14 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
         if (groupableNodesAbove.length !== 0) {
           let label: string;
           if (groupableNodesAbove.length === 1) {
-            label = `Group ${row.meta.label || props.defaultRowLabel || "Row"}`;
-            if (!isNil(groupableNodesAbove[0].data.meta.label)) {
-              label = `Group ${row.meta.label || props.defaultRowLabel || "Row"} ${
-                groupableNodesAbove[0].data.meta.label
-              }`;
-            }
+            label = `Group ${fullRowLabel}`;
           } else {
-            label = `Group ${row.meta.label || props.defaultRowLabel || "Row"}s`;
+            label = `Group ${row.meta.name || props.defaultRowName || "Row"}s`;
             if (
               !isNil(groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label) &&
               !isNil(groupableNodesAbove[0].data.meta.label)
             ) {
-              label = `Group ${row.meta.label || props.defaultRowLabel || "Row"}s ${
+              label = `Group ${row.meta.name || props.defaultRowName || "Row"}s ${
                 groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label
               } - ${groupableNodesAbove[0].data.meta.label}`;
             }
@@ -215,8 +219,9 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
       // ordering: props.ordering,
       getRowMeta: (m: M) => ({
         gridId: "data",
-        children: getModelChildren(m),
-        label: !isNil(props.getModelLabel) ? props.getModelLabel(m) : m.id
+        children: getRowChildren(m),
+        name: !isNil(getRowName) ? (typeof getRowName === "function" ? getRowName(m) : getRowName) : null,
+        label: !isNil(getRowLabel) ? (typeof getRowLabel === "function" ? getRowLabel(m) : getRowLabel) : null
       })
     });
     setTable(

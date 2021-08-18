@@ -10,7 +10,7 @@ import Framework from "./framework";
 type R = Tables.ContactRow;
 type M = Model.Contact;
 
-type OmitTableProps = "columns" | "getModelLabel" | "actions" | "showPageFooter";
+type OmitTableProps = "columns" | "getRowLabel" | "actions" | "showPageFooter";
 
 export interface ContactsTableProps extends Omit<ModelTableProps<R, M>, OmitTableProps> {
   readonly exportFileName: string;
@@ -28,7 +28,7 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
       minimal={true}
       leftAlignNewRowButton={true}
       indexColumnWidth={40}
-      getModelLabel={(m: M) => m.full_name}
+      getRowLabel={(m: M) => m.full_name}
       framework={tabling.util.combineFrameworks(Framework, props.framework)}
       onRowExpand={(id: number) => onEditContact(id)}
       expandCellTooltip={"Edit"}

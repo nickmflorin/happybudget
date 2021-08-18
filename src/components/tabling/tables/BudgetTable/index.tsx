@@ -19,8 +19,9 @@ export interface BudgetTableProps<R extends BudgetTable.Row, M extends Model.Mod
   readonly groups: Model.Group[];
   readonly onGroupRows: (rows: R[]) => void;
   readonly onBack?: () => void;
-  readonly getModelChildren: (m: M) => number[];
-  readonly getModelLabel?: (m: M) => number | string | null;
+  readonly getRowName?: number | string | ((m: M) => number | string | null);
+  readonly getRowChildren: (m: M) => number[];
+  readonly getRowLabel?: number | string | ((m: M) => number | string | null);
 }
 
 const BudgetTable = <R extends BudgetTable.Row, M extends Model.Model>({
@@ -31,8 +32,9 @@ const BudgetTable = <R extends BudgetTable.Row, M extends Model.Model>({
   groups,
   onGroupRows,
   onBack,
-  getModelChildren,
-  getModelLabel,
+  getRowChildren,
+  getRowLabel,
+  getRowName,
   ...props
 }: BudgetTableProps<R, M>) => {
   const genericTable = tabling.hooks.useTable<R, M>();
@@ -62,7 +64,9 @@ const BudgetTable = <R extends BudgetTable.Row, M extends Model.Model>({
           groups={groups}
           onGroupRows={onGroupRows}
           onBack={onBack}
-          getModelChildren={getModelChildren}
+          getRowChildren={getRowChildren}
+          getRowLabel={getRowLabel}
+          getRowName={getRowName}
         />
       )}
     />

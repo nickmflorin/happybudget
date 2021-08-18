@@ -65,10 +65,11 @@ export interface DataGridProps<R extends Table.Row, M extends Model.Model>
   readonly apis: Table.GridApis | null;
   readonly grid?: Table.GridRef<R, M>;
   readonly data?: R[];
-  readonly defaultRowLabel?: string;
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
   readonly expandCellTooltip?: string;
+  readonly defaultRowLabel?: string;
+  readonly defaultRowName?: string;
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
   readonly onGridReady: (event: GridReadyEvent) => void;
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
@@ -96,10 +97,11 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
   data,
   columns,
   search,
-  defaultRowLabel,
   cookieNames,
   hasExpandColumn,
   expandCellTooltip,
+  defaultRowLabel,
+  defaultRowName,
   includeRowInNavigation,
   refreshRowExpandColumnOnCellHover,
   cellClass,
@@ -709,7 +711,9 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
       contextMenuItems = [
         ...contextMenuItems,
         {
-          name: `Delete ${row.meta.label || defaultRowLabel || "Row"}`,
+          name: `Delete ${
+            tabling.util.getFullRowLabel(row, { name: defaultRowName, label: defaultRowLabel }) || "Row"
+          }`,
           action: () => _onChangeEvent({ payload: { rows: row, columns: localColumns }, type: "rowDelete" })
         }
       ];

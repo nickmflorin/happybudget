@@ -4,7 +4,7 @@ import ModelDataGrid from "./DataGrid";
 
 export interface ModelTableProps<R extends Table.Row, M extends Model.Model> extends Omit<TableProps<R, M>, "data"> {
   readonly data: M[];
-  readonly getModelLabel?: (m: M) => number | string | null;
+  readonly getRowLabel?: (m: M) => number | string | null;
 }
 
 const ModelTable = <R extends BudgetTable.Row, M extends Model.Model>({ data, ...props }: ModelTableProps<R, M>) => {

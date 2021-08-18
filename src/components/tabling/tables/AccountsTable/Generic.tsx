@@ -10,7 +10,7 @@ import { framework } from "components/tabling/generic";
 type R = Tables.AccountRow;
 type M = Model.Account;
 
-type OmitTableProps = "levelType" | "cookieNames" | "getModelChildren" | "getModelLabel" | "showPageFooter";
+type OmitTableProps = "levelType" | "cookieNames" | "getRowChildren" | "getRowLabel" | "showPageFooter";
 
 export interface GenericAccountsTableProps extends Omit<BudgetTableProps<R, M>, OmitTableProps> {
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
@@ -32,8 +32,9 @@ const GenericAccountsTable = ({
       levelType={"budget"}
       showPageFooter={false}
       table={table}
-      getModelChildren={(model: M) => model.subaccounts}
-      getModelLabel={(model: M) => model.identifier || model.description}
+      getRowChildren={(model: M) => model.subaccounts}
+      getRowLabel={(model: M) => model.identifier || model.description}
+      getRowName={"Account"}
       cookieNames={{ ...props.cookieNames, hiddenColumns: "account-table-hidden-columns" }}
       actions={(params: Table.MenuActionParams<R, M>) => [
         {

@@ -13,7 +13,7 @@ import Framework from "./framework";
 type R = Tables.SubAccountRow;
 type M = Model.SubAccount;
 
-type OmitTableProps = "levelType" | "cookieNames" | "getModelChildren" | "getModelLabel" | "showPageFooter";
+type OmitTableProps = "levelType" | "cookieNames" | "getRowChildren" | "getRowLabel" | "showPageFooter";
 
 export interface GenericSubAccountsTableProps extends Omit<BudgetTableProps<R, M>, OmitTableProps> {
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
@@ -57,8 +57,9 @@ const GenericSubAccountsTable = ({
       table={table}
       showPageFooter={true}
       className={classNames("subaccounts-table", props.className)}
-      getModelChildren={(m: M) => m.subaccounts}
-      getModelLabel={(m: M) => m.identifier || m.description}
+      getRowChildren={(m: M) => m.subaccounts}
+      getRowLabel={(m: M) => m.identifier || m.description}
+      getRowName={"Sub Account"}
       framework={tabling.util.combineFrameworks(Framework, props.framework)}
       cookieNames={{ ...props.cookieNames, hiddenColumns: "subaccount-table-hidden-columns" }}
       actions={(params: Table.MenuActionParams<R, M>) => [

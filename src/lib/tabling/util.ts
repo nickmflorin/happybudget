@@ -14,6 +14,25 @@ import {
   isRowDeleteEvent
 } from "./typeguards";
 
+type Defaults = {
+  name?: string | undefined;
+  label?: string | undefined;
+};
+
+export const getFullRowLabel = <R extends Table.Row>(row: R, defaults?: Defaults): string | null => {
+  const rowLabel: string | number | null | undefined = row.meta.label || defaults?.label;
+  const rowName: string | number | null | undefined = row.meta.name || defaults?.name;
+  if (!isNil(rowLabel) && !isNil(rowName)) {
+    return `${rowName} ${rowLabel}`;
+  } else if (!isNil(rowLabel)) {
+    return String(rowLabel);
+  } else if (!isNil(rowName)) {
+    return String(rowName);
+  } else {
+    return null;
+  }
+};
+
 export const rangeSelectionIsSingleCell = (range: CellRange) => {
   if (range.startRow?.rowIndex === range.endRow?.rowIndex && range.columns.length === 1) {
     return true;

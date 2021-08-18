@@ -7,13 +7,13 @@ import { DataGrid, DataGridProps } from "components/tabling/generic";
 
 export interface ModelDataGridProps<R extends BudgetTable.Row, M extends Model.Model>
   extends Omit<DataGridProps<R, M>, "data"> {
-  readonly getModelLabel?: (m: M) => number | string | null;
+  readonly getRowLabel?: (m: M) => number | string | null;
   readonly data: M[];
 }
 
 const ModelDataGrid = <R extends Table.Row, M extends Model.Model>({
   data,
-  getModelLabel,
+  getRowLabel,
   ...props
 }: ModelDataGridProps<R, M>): JSX.Element => {
   const [table, setTable] = useState<R[]>([]);
@@ -27,7 +27,7 @@ const ModelDataGrid = <R extends Table.Row, M extends Model.Model>({
       defaultNullValue: null,
       // ordering,
       getRowMeta: (m: M) => ({
-        label: !isNil(getModelLabel) ? getModelLabel(m) : m.id,
+        label: !isNil(getRowLabel) ? getRowLabel(m) : m.id,
         gridId: "data"
       })
     });

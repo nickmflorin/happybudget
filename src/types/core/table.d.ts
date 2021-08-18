@@ -46,6 +46,7 @@ namespace Table {
   }
 
   interface RowMeta {
+    readonly name?: string | number | null;
     readonly label?: string | number | null;
     readonly gridId: Table.GridId;
   };
