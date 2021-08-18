@@ -12,7 +12,7 @@ import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
 import { Contacts, Templates, Budgets } from "./components";
 
-import "./components/index.scss";
+import "./index.scss";
 
 const Dashboard = (): JSX.Element => {
   const history = useHistory();
