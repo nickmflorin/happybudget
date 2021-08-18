@@ -1,6 +1,6 @@
 @import "style/breakpoints";
 
-.dashboard-card-grid {
+.dashboard-card-grid-base {
   margin-bottom: 15px;
   display: grid;
   grid-template-columns: repeat(1fr);
@@ -14,13 +14,19 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
+  // setting !important prevents the need to repeat
+  // the xxl & xxxl media queries in the .sidebar-visible class
   @include media(">=xxl") {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr) !important;
   }
 
   @include media(">=xxxl") {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(5, 1fr) !important;
   }
+}
+
+.dashboard-card-grid {
+  @extend .dashboard-card-grid-base;
 }
 
 .sidebar-visible {

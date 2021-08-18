@@ -159,12 +159,6 @@
       // 8px aligns it vertically with the sidebar toggle btn in the header.
       padding-top: 8px;
 
-      // For the condensed layout, on larger screens we always show the sidebar
-      // (there is no toggling).
-      @include media(">=xl") {
-        display: none;
-      }
-
       .btn--sidebar-toggle {
         svg {
           height: 20px !important;
