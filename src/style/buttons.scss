@@ -485,6 +485,16 @@
       height: 14px;
       width: 14px;
     }
+
+    svg {
+      color: $white !important;
+    }
+
+    &:hover {
+      svg {
+        color: $white !important;
+      }
+    }
   }
 
   &--login,

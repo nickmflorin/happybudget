@@ -6,7 +6,7 @@ interface ContactModalHeaderProps extends StandardComponentProps, UploadUserImag
 const ContactModalHeader = (props: ContactModalHeaderProps): JSX.Element => {
   return (
     <div className={"contact-modal-header"}>
-      <UploadUserImage {...props} imageClearButtonProps={{ style: { top: -15, right: -15 } }} />
+      <UploadUserImage {...props} />
       <div className={"contact-name-wrapper"}>
         <div className={"contact-name"}>{props.firstName}</div>
         <div className={"contact-name"}>{props.lastName}</div>
