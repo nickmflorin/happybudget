@@ -16,7 +16,6 @@ const PhoneNumberInput = ({ displayFormattedValue = true, onChange, ...props }: 
   return (
     <Input
       size={"large"}
-      placeholder={"Phone number"}
       {...props}
       value={
         !isNil(props.value)

@@ -37,7 +37,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
       initialValues={initialValues}
     >
       <Form.Item name={"type"} label={"Type"}>
-        <Select suffixIcon={<FontAwesomeIcon icon={faCaretDown} />} placeholder={"Contractor"}>
+        <Select suffixIcon={<FontAwesomeIcon icon={faCaretDown} />} placeholder={"Select Type"}>
           {model.models.ContactTypes.map((m: Model.ContactType, index: number) => (
             <Select.Option key={index} value={m.id}>
               {m.name}
@@ -46,34 +46,28 @@ const ContactForm: React.FC<ContactFormProps> = ({
         </Select>
       </Form.Item>
       <Form.Item name={"first_name"} label={"First Name"}>
-        <Input
-          placeholder={"John"}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onFirstNameChange(e.target.value)}
-        />
+        <Input onChange={(e: React.ChangeEvent<HTMLInputElement>) => onFirstNameChange(e.target.value)} />
       </Form.Item>
       <Form.Item name={"last_name"} label={"Last Name"}>
-        <Input
-          placeholder={"Smith"}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onLastNameChange(e.target.value)}
-        />
+        <Input onChange={(e: React.ChangeEvent<HTMLInputElement>) => onLastNameChange(e.target.value)} />
       </Form.Item>
       <Form.Item name={"company"} label={"Company"}>
-        <Input placeholder={"ACME Corporation"} />
+        <Input />
       </Form.Item>
       <Form.Item name={"position"} label={"Job Title"}>
-        <Input placeholder={"Producer"} />
+        <Input />
       </Form.Item>
       <Form.Item name={"city"} label={"City"}>
-        <Input placeholder={"Los Angeles"} />
+        <Input />
       </Form.Item>
       <Form.Item name={"email"} label={"Email"}>
-        <Input placeholder={"jsmith@gmail.com"} />
+        <Input />
       </Form.Item>
       <Form.Item name={"phone_number"} label={"Phone Number"}>
-        <PhoneNumberInput placeholder={"(123) 456-7890"} />
+        <PhoneNumberInput />
       </Form.Item>
       <Form.Item name={"rate"} label={"Rate"}>
-        <Input placeholder={"100"} />
+        <Input />
       </Form.Item>
     </Form.Form>
   );
