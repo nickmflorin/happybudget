@@ -124,7 +124,6 @@ const ActualsTable = ({
           cellRenderer: { data: "ContactCell" },
           cellEditor: "ContactEditor",
           columnType: "contact",
-          index: 2,
           cellRendererParams: { onEditContact },
           cellEditorParams: { onNewContact },
           models: contacts,
