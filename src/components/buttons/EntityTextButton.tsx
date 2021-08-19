@@ -24,7 +24,7 @@ const EntityTextButton = (
       <div className={"entity-text-button-inner"}>
         <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
         <VerticalFlexCenter className={"entity-text-button-caret"}>
-          <FontAwesomeIcon icon={faCaretDown} />
+          <FontAwesomeIcon className={"icon"} icon={faCaretDown} />
         </VerticalFlexCenter>
       </div>
     </Button>

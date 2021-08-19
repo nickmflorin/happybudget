@@ -43,7 +43,7 @@ const Card = ({
           <Dropdown items={dropdown} placement={"bottomRight"} trigger={["click"]}>
             <IconButton
               className={classNames("dropdown-ellipsis", { "for-placeholder": isNil(image) })}
-              icon={<FontAwesomeIcon icon={faEllipsisV} />}
+              icon={<FontAwesomeIcon className={"icon"} icon={faEllipsisV} />}
             />
           </Dropdown>
         )}

@@ -30,7 +30,6 @@ const Toolbar = ({ items }: ToolbarProps): JSX.Element => {
               tooltip={item.tooltip}
               className={"dark"}
               role={item.role}
-              size={"large"}
               icon={item.icon}
               disabled={item.disabled}
               onClick={() => {

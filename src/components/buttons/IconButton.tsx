@@ -10,7 +10,7 @@ export interface IconButtonProps extends Omit<ButtonProps, "size" | "icon" | "ch
 /**
  * A consistently styled Button component for buttons that contain just an Icon.
  */
-const IconButton = ({ icon, size = "medium", ...props }: IconButtonProps): JSX.Element => (
+const IconButton = ({ icon, size = "large", ...props }: IconButtonProps): JSX.Element => (
   <Button
     {...props}
     icon={icon}

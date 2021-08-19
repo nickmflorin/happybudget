@@ -14,23 +14,16 @@
       display: flex;
       padding: 7px 0;
 
-      .btn--header-sidebar-toggle {
-        position: relative;
-        margin-right: 5px;
-        padding: 8px;
+      .btn--sidebar-toggle {
         padding-left: 0;
-        height: 36px;
-        width: 25.5px;
+        // We have to adjust the width here so that the icon aligns on the left
+        // of the button so it aligns on the left of the screen.
+        width: 24.5px;
+        margin-right: 8px;
 
-        svg {
-          height: 20px !important;
-          width: 17.5px !important;
-
-          &.icon.icon--toggle-hover {
-            path {
-              fill: $green;
-            }
-          }
+        .icon {
+          height: 20px;
+          width: 17.5px;
         }
       }
     }

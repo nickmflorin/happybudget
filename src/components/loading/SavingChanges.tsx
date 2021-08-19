@@ -24,7 +24,7 @@ const SavingChanges = ({ saving }: SavingChangesProps): JSX.Element => {
         </ShowHide>
         <ShowHide show={!saving}>
           <div className={"check-wrapper"}>
-            <FontAwesomeIcon icon={faCheckCircle} />
+            <FontAwesomeIcon className={"icon"} icon={faCheckCircle} />
           </div>
         </ShowHide>
       </VerticalFlexCenter>

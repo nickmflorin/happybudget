@@ -23,22 +23,22 @@ const Dashboard = (): JSX.Element => {
       sidebar={[
         {
           text: "Templates",
-          icon: <FontAwesomeIcon icon={faFilePlus} />,
-          activeIcon: <FontAwesomeIcon icon={faFilePlusSolid} />,
+          icon: <FontAwesomeIcon className={"icon"} icon={faFilePlus} />,
+          activeIcon: <FontAwesomeIcon className={"icon"} icon={faFilePlusSolid} />,
           onClick: () => history.push("/templates"),
           active: location.pathname.startsWith("/templates") || location.pathname.startsWith("/discover")
         },
         {
           text: "My Budgets",
-          icon: <FontAwesomeIcon icon={faCopy} />,
-          activeIcon: <FontAwesomeIcon icon={faCopySolid} />,
+          icon: <FontAwesomeIcon className={"icon"} icon={faCopy} />,
+          activeIcon: <FontAwesomeIcon className={"icon"} icon={faCopySolid} />,
           onClick: () => history.push("/budgets"),
           active: location.pathname.startsWith("/budgets")
         },
         {
           text: "Contacts",
-          icon: <FontAwesomeIcon icon={faAddressBook} flip={"horizontal"} />,
-          activeIcon: <FontAwesomeIcon icon={faAddressBookSolid} flip={"horizontal"} />,
+          icon: <FontAwesomeIcon className={"icon"} icon={faAddressBook} flip={"horizontal"} />,
+          activeIcon: <FontAwesomeIcon className={"icon"} icon={faAddressBookSolid} flip={"horizontal"} />,
           onClick: () => history.push("/contacts"),
           active: location.pathname.startsWith("/contacts")
         }

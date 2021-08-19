@@ -41,7 +41,7 @@ const Previewer = ({
             onClick={() => onRefresh()}
             disabled={loadingData || generatingPdf}
             loading={generatingPdf}
-            icon={<FontAwesomeIcon icon={faRedo} />}
+            icon={<FontAwesomeIcon className={"icon"} icon={faRedo} />}
           >
             {"Refresh"}
           </Button>

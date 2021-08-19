@@ -60,7 +60,7 @@ const Template = (): JSX.Element => {
       toolbar={() => <SavingChanges saving={saving} />}
       sidebar={[
         {
-          icon: <FontAwesomeIcon icon={faCopy} />,
+          icon: <FontAwesomeIcon className={"icon"} icon={faCopy} />,
           onClick: () => history.push("/templates"),
           tooltip: {
             title: "My Templates",
@@ -68,7 +68,7 @@ const Template = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon icon={faFileSpreadsheet} />,
+          icon: <FontAwesomeIcon className={"icon"} icon={faFileSpreadsheet} />,
           onClick: () => {
             if (!isNaN(parseInt(templateId))) {
               const templateLastVisited = budgeting.urls.getTemplateLastVisited(parseInt(templateId));

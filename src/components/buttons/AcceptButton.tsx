@@ -9,7 +9,7 @@ const AcceptButton = (props: Omit<IconButtonProps, "size" | "icon">): JSX.Elemen
       {...props}
       className={"btn btn--accept"}
       size={"small"}
-      icon={<FontAwesomeIcon icon={faCheckCircle} />}
+      icon={<FontAwesomeIcon className={"icon"} icon={faCheckCircle} />}
     />
   );
 };

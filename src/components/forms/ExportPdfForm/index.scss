@@ -10,9 +10,6 @@
       .icon-wrapper {
         height: 22px;
         width: 22px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
 
         svg {
           height: 12px;
@@ -30,9 +27,6 @@
   .icon-wrapper {
     height: 22px;
     width: 22px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     margin-right: -4px;
 
     svg {
@@ -40,6 +34,7 @@
       width: 12px;
     }
   }
+
   .ant-tag-close-icon {
     display: flex;
     flex-direction: column;

@@ -33,7 +33,7 @@ const CaretButton = ({
           {children}
         </div>
         <div className={"caret-button-caret"}>
-          <FontAwesomeIcon icon={faCaretDown} />
+          <FontAwesomeIcon className={"icon"} icon={faCaretDown} />
         </div>
       </div>
     </Button>

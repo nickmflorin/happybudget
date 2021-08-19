@@ -8,7 +8,7 @@ import { faArrowUp, faArrowDown, faEdit } from "@fortawesome/free-solid-svg-icon
 import { Column } from "@ag-grid-community/core";
 
 import { tabling } from "lib";
-import { ShowHide, IconHolder, VerticalFlexCenter } from "components";
+import { ShowHide, VerticalFlexCenter } from "components";
 import { IconButton } from "components/buttons";
 
 // This is defined in AG Grid's documentation but does not seem to be importable from anywhere.
@@ -102,13 +102,10 @@ const HeaderCell = <R extends Table.Row, M extends Model.Model>({
         </VerticalFlexCenter>
       )}
       <ShowHide show={column.sortable === true}>
-        <IconHolder
-          className={"icon-holder--sort"}
-          size={"small"}
+        <FontAwesomeIcon
           style={order === 0 ? { opacity: 0 } : { opacity: 1 }}
-        >
-          <FontAwesomeIcon icon={order === 1 || 0 ? faArrowUp : faArrowDown} />
-        </IconHolder>
+          icon={order === 1 || 0 ? faArrowUp : faArrowDown}
+        />
       </ShowHide>
     </div>
   );

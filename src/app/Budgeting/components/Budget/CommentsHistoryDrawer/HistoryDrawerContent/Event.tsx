@@ -41,7 +41,7 @@ const FieldChange = ({ event }: FieldAlterationProps): JSX.Element => {
       <SegmentedText.Segment blue>{event.field}</SegmentedText.Segment>
       <SegmentedText.Segment>{"from"}</SegmentedText.Segment>
       <SegmentedText.Segment bold>{event.old_value}</SegmentedText.Segment>
-      <FontAwesomeIcon className={"arrow-change"} icon={faArrowRight} />
+      <FontAwesomeIcon className={"icon arrow-change"} icon={faArrowRight} />
       {!isNil(event.content_object.identifier) && event.field !== "identifier" ? (
         <SegmentedText>
           <SegmentedText.Segment bold>{event.new_value}</SegmentedText.Segment>

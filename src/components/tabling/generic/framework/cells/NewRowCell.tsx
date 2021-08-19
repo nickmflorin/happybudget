@@ -12,7 +12,7 @@ const NewRowCell = ({ onChangeEvent }: NewRowCellProps): JSX.Element => {
     <IconButton
       className={"green"}
       size={"medium"}
-      icon={<FontAwesomeIcon icon={faPlusCircle} />}
+      icon={<FontAwesomeIcon className={"icon"} icon={faPlusCircle} />}
       style={{ margin: "0 auto" }}
       onClick={() =>
         onChangeEvent({

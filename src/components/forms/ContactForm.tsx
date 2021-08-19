@@ -37,7 +37,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
       initialValues={initialValues}
     >
       <Form.Item name={"type"} label={"Type"}>
-        <Select suffixIcon={<FontAwesomeIcon icon={faCaretDown} />} placeholder={"Select Type"}>
+        <Select suffixIcon={<FontAwesomeIcon className={"icon"} icon={faCaretDown} />} placeholder={"Select Type"}>
           {model.models.ContactTypes.map((m: Model.ContactType, index: number) => (
             <Select.Option key={index} value={m.id}>
               {m.name}

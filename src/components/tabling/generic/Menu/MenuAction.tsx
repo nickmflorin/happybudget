@@ -49,7 +49,6 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
     return (
       <IconButton
         className={"green-hover"}
-        size={"large"}
         onClick={() => !isNil(action.onClick) && action.onClick()}
         disabled={action.disabled}
         icon={<FontAwesomeIcon className={"icon"} icon={action.icon} />}

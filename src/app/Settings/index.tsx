@@ -18,7 +18,7 @@ const Settings = (): JSX.Element => {
       sidebar={[
         {
           text: "Profile",
-          icon: <FontAwesomeIcon icon={faAddressCard} />,
+          icon: <FontAwesomeIcon className={"icon"} icon={faAddressCard} />,
           onClick: () => history.push("/profile"),
           active: location.pathname.startsWith("/profile")
         }

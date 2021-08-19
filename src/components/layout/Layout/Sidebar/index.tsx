@@ -38,25 +38,21 @@ const Sidebar = ({
     <div {...props} className={classNames("sidebar", props.className)}>
       <IconButton
         className={"btn--sidebar-close"}
-        size={"large"}
-        icon={<FontAwesomeIcon icon={faTimes} />}
+        icon={<FontAwesomeIcon className={"icon"} icon={faTimes} />}
         onClick={() => toggleSidebar()}
       />
       <ShowHide show={collapsed}>
-        <div className={"sidebar-toggle-btn-container"}>
-          <IconButton
-            className={"btn--sidebar-toggle"}
-            size={"large"}
-            icon={(params: ClickableIconCallbackParams) => {
-              if (sidebarVisible === true && params.isHovered === true) {
-                return <FontAwesomeIcon icon={faArrowAltToLeft} className={"icon icon--toggle-hover"} />;
-              } else {
-                return <FontAwesomeIcon icon={faBars} />;
-              }
-            }}
-            onClick={() => toggleSidebar()}
-          />
-        </div>
+        <IconButton
+          className={"btn--sidebar-toggle"}
+          icon={(params: ClickableIconCallbackParams) => {
+            if (sidebarVisible === true && params.isHovered === true) {
+              return <FontAwesomeIcon icon={faArrowAltToLeft} className={"icon icon--green"} />;
+            } else {
+              return <FontAwesomeIcon icon={faBars} className={"icon"} />;
+            }
+          }}
+          onClick={() => toggleSidebar()}
+        />
       </ShowHide>
       <div className={"logo-container"}>
         <Link className={"logo-link"} to={"/"}>

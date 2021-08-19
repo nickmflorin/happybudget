@@ -25,10 +25,14 @@ const Color = ({ color, selected, className, noValueColor, onClick, style = {} }
       {!isNil(color) ? (
         <React.Fragment>
           <div className={"icon-border"}></div>
-          <FontAwesomeIcon icon={faCircle} style={{ color }} />
+          <FontAwesomeIcon className={"icon"} icon={faCircle} style={{ color }} />
         </React.Fragment>
       ) : (
-        <FontAwesomeIcon icon={faCircleOpen} style={{ color: noValueColor || Colors.COLOR_NO_COLOR }} />
+        <FontAwesomeIcon
+          className={"icon"}
+          icon={faCircleOpen}
+          style={{ color: noValueColor || Colors.COLOR_NO_COLOR }}
+        />
       )}
     </div>
   );

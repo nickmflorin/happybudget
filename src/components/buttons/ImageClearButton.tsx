@@ -9,7 +9,7 @@ const ImageClearButton = (props: Omit<IconButtonProps, "size" | "icon">): JSX.El
       {...props}
       className={"btn btn--clear-image"}
       size={"medium"}
-      icon={<FontAwesomeIcon icon={faTimesCircle} />}
+      icon={<FontAwesomeIcon className={"icon"} icon={faTimesCircle} />}
     />
   );
 };

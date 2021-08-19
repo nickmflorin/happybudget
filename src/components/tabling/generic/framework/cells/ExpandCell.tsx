@@ -40,7 +40,7 @@ const ExpandCell = <R extends Table.Row, M extends Model.Model>({
           <IconButton
             className={"ag-grid-expand-button"}
             size={"small"}
-            icon={<FontAwesomeIcon icon={faExpandAlt} />}
+            icon={<FontAwesomeIcon className={"icon"} icon={faExpandAlt} />}
             onClick={() => onClick(node.data.id)}
             tooltip={{ placement: "bottom", overlayClassName: "tooltip-lower", title: tooltip || "Expand" }}
           />
@@ -60,7 +60,7 @@ const ExpandCell = <R extends Table.Row, M extends Model.Model>({
                 ? { placement: "bottom", overlayClassName: "tooltip-lower", title: cannotExpandTooltip }
                 : undefined
             }
-            icon={<FontAwesomeIcon icon={faExpandAlt} />}
+            icon={<FontAwesomeIcon className={"icon"} icon={faExpandAlt} />}
           />
         </ShowHide>
       </div>

@@ -52,7 +52,7 @@ const Layout = ({
   );
 
   return (
-    <div className={classNames("layout", className)} style={style}>
+    <div className={classNames("layout", className, layoutClassNameProps)} style={style}>
       {!isNil(sidebar) && (
         <div className={classNames("sidebar-container", layoutClassNameProps)}>
           {Array.isArray(sidebar) ? (
@@ -79,9 +79,7 @@ const Layout = ({
           toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
           showHeaderLogo={showHeaderLogo}
         />
-        <div className={"window"}>
-          <Content {...contentProps}>{children}</Content>
-        </div>
+        <Content {...contentProps}>{children}</Content>
       </div>
     </div>
   );

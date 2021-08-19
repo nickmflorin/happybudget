@@ -67,13 +67,13 @@ const ComentFooter = ({ comment, onDelete, onEdit, onLike, onReply }: CommentFoo
         <IconButton
           className={"dark"}
           size={"small"}
-          icon={<FontAwesomeIcon icon={faReply} />}
+          icon={<FontAwesomeIcon className={"icon"} icon={faReply} />}
           onClick={() => !isNil(onReply) && onReply()}
         />
         <IconButton
           className={"dark"}
           size={"small"}
-          icon={<FontAwesomeIcon icon={faThumbsUp} />}
+          icon={<FontAwesomeIcon className={"icon"} icon={faThumbsUp} />}
           onClick={() => !isNil(onLike) && onLike()}
         />
       </div>
@@ -82,13 +82,13 @@ const ComentFooter = ({ comment, onDelete, onEdit, onLike, onReply }: CommentFoo
           <IconButton
             className={"dark"}
             size={"small"}
-            icon={<FontAwesomeIcon icon={faEdit} />}
+            icon={<FontAwesomeIcon className={"icon"} icon={faEdit} />}
             onClick={() => !isNil(onEdit) && onEdit()}
           />
           <IconButton
             className={"dark"}
             size={"small"}
-            icon={<FontAwesomeIcon icon={faTrashAlt} />}
+            icon={<FontAwesomeIcon className={"icon"} icon={faTrashAlt} />}
             onClick={() => !isNil(onDelete) && onDelete()}
           />
         </div>

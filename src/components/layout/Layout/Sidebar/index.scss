@@ -151,27 +151,30 @@
 
     // The sidebar toggle button is not shown in the header for the expanded
     // layout case - so it is only applicable here.
-    .sidebar-toggle-btn-container {
-      // Assuming that the sidebar toggle btn is 36px x 36px, we want to add
-      // padding to center in the width of the collapsed sidebar.
-      padding-left: calc(0.5 * (#{$sidebar-collapsed-width} - 36px));
-      padding-right: calc(0.5 * (#{$sidebar-collapsed-width} - 36px));
-      // 8px aligns it vertically with the sidebar toggle btn in the header.
-      padding-top: 8px;
-
-      .btn--sidebar-toggle {
-        svg {
-          height: 20px !important;
-          width: 17.5px !important;
-
-          &.icon.icon--toggle-hover {
-            path {
-              fill: $green;
-            }
-          }
-        }
-      }
+    .btn--sidebar-toggle {
+      margin: 0 auto;
     }
+
+    // The sidebar toggle button is not shown in the header for the expanded
+    // layout case - so it is only applicable here.
+    // .sidebar-toggle-btn-container {
+    //   margin: 0 auto;
+    //   // 8px aligns it vertically with the sidebar toggle btn in the header.
+    //   padding-top: 8px;
+
+    //   .btn--sidebar-toggle {
+    //     svg {
+    //       height: 20px !important;
+    //       width: 17.5px !important;
+
+    //       &.icon.icon--toggle-hover {
+    //         path {
+    //           fill: $green;
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
 
     .sidebar-menu {
       .sidebar-menu-item {

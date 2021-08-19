@@ -5,8 +5,6 @@ $header-background-color: $white;
 
 $app-background-color: $white;
 
-$sidebar-width: 260px;
-$sidebar-collapsed-width: 60px;
 $sidebar-background-color: #fcfcfc;
 
 .root {
@@ -52,6 +50,84 @@ $sidebar-background-color: #fcfcfc;
     overflow-y: hidden;
   }
 
+  @mixin include_content_layout_dimensions($sidebar-width, $sidebar_hidden, $header-h) {
+    $margin-left: $sidebar-width;
+    @if $sidebar_hidden {
+      $margin-left: 0px;
+    }
+
+    // Note: We cannot simply use width: 100% when the sidebar is visible because
+    // the sidebar has fixed positioning.
+    $width: calc(100vw - #{$sidebar-width});
+    @if $sidebar_hidden {
+      $width: 100%;
+    }
+
+    .layout-content {
+      margin-left: $margin-left;
+
+      .header {
+        height: $header-h;
+        width: $width !important;
+      }
+      .content {
+        margin-top: $header-h;
+        height: calc(100vh - #{$header-h});
+        overflow-y: hidden;
+      }
+    }
+  }
+
+  @mixin calculate_layout_dimensions($collapsed, $sidebar_hidden, $mobile: false) {
+    $sidebar-width: 260px;
+    @if $collapsed {
+      $sidebar-width: 60px;
+    } @else if $mobile {
+      // On mobile devices, the sidebar (when visible) takes up the full width
+      // of the screen.
+      $sidebar-width: 100%;
+    }
+
+    $sidebar-margin-left: 0px;
+    @if $sidebar_hidden {
+      $sidebar-margin-left: -#{$sidebar-width};
+    }
+
+    .sidebar-container {
+      max-width: $sidebar-width; // Might not be needed?
+      width: $sidebar-width;
+      margin-left: $sidebar-margin-left;
+    }
+
+    @include include_content_layout_dimensions($sidebar-width, $sidebar_hidden, $header-height);
+    &.layout--budget {
+      @include include_content_layout_dimensions($sidebar-width, $sidebar_hidden, calc(#{$header-height} + 30px));
+    }
+  }
+
+  @mixin device_layout_dimensions($collapsed, $sidebar_hidden) {
+    @include calculate_layout_dimensions($collapsed, $sidebar_hidden);
+    @include media("<=medium") {
+      @include calculate_layout_dimensions($collapsed, $sidebar_hidden, true);
+    }
+  }
+
+  @mixin collapsed_layout_dimensions() {
+    @include device_layout_dimensions(true, true);
+    &.sidebar-visible {
+      @include device_layout_dimensions(true, false);
+    }
+  }
+
+  @mixin expanded_layout_dimensions() {
+    @include device_layout_dimensions(false, true);
+    &.sidebar-visible {
+      @include device_layout_dimensions(false, false);
+    }
+  }
+
+  $sidebar-default-hidden: false;
+
   // App Content - Container for the main content that gets displayed inside
   // the logged in application.
   .layout {
@@ -59,70 +135,43 @@ $sidebar-background-color: #fcfcfc;
     overflow-y: hidden;
     min-height: 100vh;
 
+    @include expanded_layout_dimensions();
+    &.collapsed-layout {
+      @include collapsed_layout_dimensions();
+    }
+
     .sidebar-container {
-      width: $sidebar-width;
       background: $sidebar-background-color;
       position: fixed;
       height: 100vh;
       transition: margin-left 0.1s;
-
-      &.sidebar-hidden {
-        margin-left: -#{$sidebar-width};
-
-        &.collapsed-layout {
-          margin-left: -#{$sidebar-collapsed-width};
-        }
-      }
-
-      &.collapsed-layout {
-        max-width: $sidebar-collapsed-width;
-      }
-
-      &.expanded-layout {
-        @include media("<=medium") {
-          width: 100%;
-          &.sidebar-hidden {
-            margin-left: -100%;
-          }
-        }
-      }
-    }
-
-    @mixin include_content_layout_dimensions($header-h) {
-      .layout-content {
-        .header {
-          height: $header-h;
-        }
-        .content {
-          margin-top: $header-h;
-          height: calc(100vh - #{$header-h});
-          overflow-y: hidden;
-        }
-      }
-    }
-
-    @include include_content_layout_dimensions($header-height);
-    &--budget {
-      @include include_content_layout_dimensions(calc(#{$header-height} + 30px));
+      // This is important to align the sidebar toggle button in the header.
+      padding-top: 8px;
     }
 
     .layout-content {
-      margin-left: $sidebar-width;
       display: flex;
       flex-direction: column;
       overflow-y: hidden;
-      transition: margin-left 0.1s;
+
+      -webkit-transition: margin-left 0.3s ease-out;
+      -moz-transition: margin-left 0.2s ease-out;
+      -o-transition: margin-left 0.2s ease-out;
+      transition: margin-left 0.2s ease-out;
 
       .header {
         margin-top: auto;
         line-height: unset !important;
         position: fixed !important;
         top: 0 !important;
-        width: calc(100% - #{$sidebar-width});
         padding-left: 15px;
         padding-right: 20px;
         background-color: $header-background-color !important;
-        transition: width 0.1s;
+
+        -webkit-transition: width 0.3s ease-out;
+        -moz-transition: width 0.2s ease-out;
+        -o-transition: width 0.2s ease-out;
+        transition: width 0.2s ease-out;
       }
 
       .content {
@@ -182,32 +231,32 @@ $sidebar-background-color: #fcfcfc;
         }
       }
 
-      &.sidebar-hidden {
-        margin-left: 0px !important;
+      // &.sidebar-hidden {
+      //   margin-left: 0px !important;
 
-        .header {
-          width: 100%;
-        }
+      //   .header {
+      //     width: 100%;
+      //   }
 
-        &.collapsed-layout {
-          .header {
-            width: 100%;
-          }
-        }
-      }
+      //   &.collapsed-layout {
+      //     .header {
+      //       width: 100%;
+      //     }
+      //   }
+      // }
 
-      &.collapsed-layout {
-        margin-left: $sidebar-collapsed-width;
-        .header {
-          width: calc(100% - #{$sidebar-collapsed-width});
-        }
-      }
+      // &.collapsed-layout {
+      //   margin-left: $sidebar-collapsed-width;
+      //   .header {
+      //     width: calc(100% - #{$sidebar-collapsed-width});
+      //   }
+      // }
 
-      &.expanded-layout {
-        @include media("<=medium") {
-          margin-left: 100%;
-        }
-      }
+      // &.expanded-layout {
+      //   @include media("<=medium") {
+      //     margin-left: 100%;
+      //   }
+      // }
     }
   }
 }

@@ -10,40 +10,156 @@
   user-select: none;
   vertical-align: middle;
   justify-content: center;
+  border-color: $transparent !important;
+
+  &:disabled,
+  &.disabled,
+  &.fake-disabled,
+  &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
+  &:focus:not(:disabled):not(.disabled):not(.fake-disabled),
+  &.hovered:not(:disabled):not(.disabled):not(.fake-disabled) {
+    border-color: $transparent !important;
+  }
 
   &.no-transform {
     text-transform: unset;
   }
+
+  .icon {
+    cursor: pointer;
+    margin-right: 8px;
+  }
 }
 
-.icon-holder {
-  min-width: 0px;
-  box-shadow: none !important;
-  border-radius: 100px;
-  border: 1px solid $transparent;
-  background-color: $transparent;
-  padding: 0px;
-  height: 36px;
-  width: 36px;
+.icon {
+  color: $icon-color;
+
+  &--green {
+    color: $green !important;
+  }
+}
+
+.icon-wrapper {
+  height: 100%;
+  width: 100%;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
 
-  svg {
+  .icon {
     height: 100%;
-    width: auto !important;
-    color: $icon-color !important;
+    width: auto;
   }
+}
 
-  &.small {
-    padding: 10px;
+@mixin color_on_hover($c) {
+  &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
+  &:focus:not(:disabled):not(.disabled):not(.fake-disabled),
+  &.hovered:not(:disabled):not(.disabled):not(.fake-disabled) {
+    color: $c;
+    .icon {
+      color: $c;
+    }
   }
-  &.medium {
-    padding: 8px;
+}
+
+@mixin color_on_disabled($c: $disabled-color) {
+  &:disabled,
+  &.disabled,
+  &.fake-disabled {
+    color: $c;
+    .icon {
+      color: $c;
+    }
   }
-  &.large {
-    padding: 6px;
+}
+
+@mixin color_on_hover_and_disabled($c) {
+  @include color_on_hover($c);
+  @include color_on_disabled($c);
+}
+
+@mixin bg_color_on_hover($c) {
+  &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
+  &:focus:not(:disabled):not(.disabled):not(.fake-disabled),
+  &.hovered:not(:disabled):not(.disabled):not(.fake-disabled) {
+    background-color: $c;
+    background: $c;
   }
+}
+
+@mixin bg_color_on_disabled($c) {
+  &:disabled,
+  &.disabled,
+  &.fake-disabled {
+    background-color: $c;
+    background: $c;
+  }
+}
+
+@mixin bg_color_on_hover_and_disabled($c) {
+  @include bg_color_on_hover($c);
+  @include bg_color_on_disabled($c);
+}
+
+@mixin color($c) {
+  color: $c;
+  .icon {
+    color: $c;
+  }
+}
+
+@mixin bg_color($c) {
+  background-color: $c;
+  background: $c;
+}
+
+@mixin green() {
+  @include color_set($green, $green-darker);
+}
+
+@mixin green_on_hover() {
+  @include color_on_hover($green);
+}
+
+@mixin color_set($c, $h: lighten($c, 20%), $d: $disabled-color) {
+  @include color($c);
+  @include color_on_disabled($d);
+  @include color_on_hover($h);
+}
+
+@mixin bare_color_set($c, $h: lighten($c, 20%), $d: $disabled-color) {
+  @include color_set($c, $h, $d);
+
+  &:hover,
+  &:disabled,
+  &.disabled,
+  &.fake-disabled,
+  &:focus {
+    border-color: $transparent;
+    background-color: $transparent;
+  }
+}
+
+@mixin bg_color_set($c, $h: darken($c, 20%), $d: darken($c, 20%)) {
+  @include bg_color($c);
+  @include bg_color_on_disabled($d);
+  @include bg_color_on_hover($h);
+}
+
+@mixin solid_color($c) {
+  @include color_set($c, $c, $c);
+}
+
+@mixin primary() {
+  @include bg_color_set($green, $green-darker, $green-darker);
+  @include solid_color($white);
+}
+
+@mixin default() {
+  @include bg_color_set(#ececec, darken(#ececec, 10%), darken(#ececec, 10%));
+  @include solid_color($text-secondary);
 }
 
 .link {
@@ -57,22 +173,9 @@
   padding: 0;
   border: none !important;
 
-  .icon-wrapper {
-    .icon {
-      svg {
-        color: $icon-color !important;
-      }
-    }
-  }
-
   .icon {
-    cursor: pointer;
-
-    svg {
-      color: $icon-color !important;
-      height: 1.5rem;
-      width: 1.5rem;
-    }
+    height: 1.5rem;
+    width: 1.5rem;
   }
 
   &--black {
@@ -82,39 +185,6 @@
 
   &--inline {
     font-size: inherit !important;
-  }
-
-  &--icon-only {
-    @extend .link;
-    min-width: 0px;
-    box-shadow: none !important;
-    height: 28px;
-    width: 28px;
-    padding: 5px;
-    border-radius: 100px;
-    border: 1px solid transparent;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    svg {
-      height: 18px;
-      width: 18px;
-      color: $icon-color;
-    }
-
-    &:hover,
-    &.disabled,
-    &.fake-disabled,
-    &:disabled,
-    &:focus {
-      color: lighten($icon-color, 20%) !important;
-      background-color: rgba(0, 0, 0, 0.015);
-
-      svg {
-        color: $blue !important;
-      }
-    }
   }
 
   // Links that are displayed immediately under a FormItem.  This is used in
@@ -206,15 +276,8 @@
   }
 
   .icon {
-    cursor: pointer;
-    height: 16px !important;
-    width: 16px !important;
-
-    svg {
-      height: 100% !important;
-      width: auto !important;
-      color: $icon-color !important;
-    }
+    height: 100% !important;
+    width: auto !important;
   }
 
   &--large {
@@ -251,11 +314,6 @@
     height: auto;
     border: none !important;
 
-    .ant-icon {
-      color: $icon-color !important;
-      cursor: pointer;
-    }
-
     &:hover {
       background-color: transparent;
     }
@@ -263,53 +321,12 @@
 
   &--default {
     @extend .btn;
-    color: $text-secondary;
-    background: #ececec;
-    border-color: #ececec;
-
-    &:hover,
-    &:disabled,
-    &.disabled,
-    &.fake-disabled,
-    &:focus {
-      border-color: transparent !important;
-      background-color: darken(#ececec, 10%) !important;
-      color: $text-secondary !important;
-    }
+    @include default();
   }
 
   &--primary {
     @extend .btn;
-    color: $white;
-    background: $green;
-    border-color: $green;
-
-    &:hover,
-    &.disabled,
-    &.fake-disabled,
-    &:disabled,
-    &:focus {
-      border-color: transparent !important;
-      background-color: $green-darker !important;
-      color: $white !important;
-    }
-  }
-
-  &--danger {
-    @extend .btn;
-    color: $white;
-    background: $red;
-    border-color: $red;
-
-    &:hover,
-    &:focus,
-    &.disabled,
-    &.fake-disabled,
-    &:disabled {
-      color: $white;
-      background: $red-hover;
-      border-color: $red;
-    }
+    @include primary();
   }
 
   &--icon-only {
@@ -318,87 +335,54 @@
     border-radius: 100px;
     border: 1px solid $transparent;
     background-color: $transparent;
-    padding: 0px;
     height: 36px;
     width: 36px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding: 6px;
+
+    .icon {
+      margin-right: 0px;
+    }
+
+    @include bare_color_set($icon-color);
 
     // For whatever reason, applying the styling to the edit group button in
     // the AG Grid table is not respecting CSS inheritance rules and is not
     // allowing us to dynamically change the color unless this is unset.  We
     // should eventually figure that out, but for now - AG Grid is a pain.
     &:not(.btn--edit-group) {
-      svg {
-        color: $icon-color;
-      }
       &:hover,
       &:focus {
         svg {
           color: lighten($icon-color, 20%) !important;
         }
       }
-    }
-
-    svg {
-      height: 100%;
-      width: auto !important;
     }
 
     &.small {
-      padding: 10px;
-    }
-    &.medium {
       padding: 8px;
     }
-    &.large {
+    &.medium {
       padding: 7px;
     }
-
-    &:hover,
-    &:disabled,
-    &.disabled,
-    &.fake-disabled,
-    &:focus {
-      border-color: $transparent !important;
-      background-color: transparent;
-      svg {
-        color: lighten($icon-color, 20%) !important;
-      }
+    &.large {
+      padding: 6px;
     }
 
     &.green {
-      svg {
-        color: $green !important;
-      }
-      &:hover,
-      &:focus {
-        svg {
-          color: $green-darker !important;
-        }
-      }
+      @include color_set($green, $green-darker);
     }
 
     &.green-hover {
-      &:hover,
-      &:focus {
-        svg {
-          color: $green !important;
-        }
-      }
-      &.disabled,
-      &.fake-disabled {
-        svg {
-          color: lighten($icon-color, 20%) !important;
-        }
-      }
+      @include green_on_hover();
     }
 
     // The color of the button is set dynamically based on the group color.
     &--edit-group {
       &:hover {
-        svg {
+        .icon {
           color: #c7c7c7 !important;
         }
       }
@@ -412,7 +396,7 @@
       flex-direction: column;
       align-items: center;
 
-      svg {
+      .icon {
         height: 16px;
         width: auto !important;
         color: $green !important;
@@ -425,7 +409,7 @@
       &.disabled,
       &:disabled,
       &.fake-disabled {
-        svg {
+        .icon {
           color: $disabled-color !important;
         }
         &:hover {
@@ -446,7 +430,6 @@
   &--caret {
     background-color: $transparent;
     border: none;
-    color: $icon-color;
     box-shadow: none;
 
     .caret-button-inner {
@@ -463,20 +446,19 @@
       }
     }
 
+    @include bare_color_set($icon-color);
+
     &:hover,
     &:disabled,
     &.disabled,
     &.fake-disabled,
     &:focus {
-      border-color: transparent !important;
-      background-color: $transparent !important;
-
       .caret-button-inner {
         .caret-button-text {
           color: lighten($icon-color, 20%);
         }
         .caret-button-caret {
-          svg {
+          .icon {
             color: lighten($icon-color, 20%);
           }
         }
@@ -484,22 +466,19 @@
     }
 
     &.primary {
-      color: $white;
-      background: $green;
-      border-color: $green;
+      @include primary();
 
       &:hover,
       &:disabled,
       &.disabled,
       &.fake-disabled,
       &:focus {
-        background-color: $green-darker !important;
         .caret-button-inner {
           .caret-button-text {
             color: $white !important;
           }
           .caret-button-caret {
-            svg {
+            .icon {
               color: $white !important;
             }
           }
@@ -508,45 +487,20 @@
     }
   }
 
-  .btn--clear {
+  &--clear-image {
     flex-direction: column;
     justify-content: center;
+    @include bare_color_set($text-primary);
 
-    svg {
+    .icon {
       height: 14px;
       width: 14px;
-      color: #d2d2d2 !important;
-    }
-
-    &:hover {
-      svg {
-        color: #a5a5a5 !important;
-      }
-    }
-  }
-
-  .btn--clear-image {
-    flex-direction: column;
-    justify-content: center;
-
-    svg {
-      height: 14px;
-      width: 14px;
-      color: $text-primary !important;
-    }
-
-    &:hover {
-      svg {
-        color: lighten($text-primary, 20%) !important;
-      }
     }
   }
 
   &--login,
   &--reset {
     @extend .btn--large;
-    background-color: $green;
-    color: $white;
     border: 1px solid transparent;
     font-family: $avenir;
     font-weight: 600;
@@ -555,15 +509,8 @@
       color: $white !important;
     }
 
-    &:hover,
-    &:disabled,
-    &.disabled,
-    &.fake-disabled,
-    &:focus {
-      border-color: transparent !important;
-      background-color: $green-darker !important;
-      color: $white !important;
-    }
+    @include primary();
+    @include solid_color($white);
   }
 
   &--clear,
@@ -571,17 +518,11 @@
     @extend .btn;
     flex-direction: column;
     justify-content: center;
+    @include bare_color_set(#d2d2d2, #a5a5a5);
 
-    svg {
+    .icon {
       height: 14px;
       width: 14px;
-      color: #d2d2d2 !important;
-    }
-
-    &:hover {
-      svg {
-        color: #a5a5a5 !important;
-      }
     }
   }
 
@@ -598,6 +539,9 @@
     font-size: 14px;
     font-family: $avenir;
 
+    @include color_on_disabled(rgba(70, 70, 70, 0.6));
+    @include color_on_hover(rgba(70, 70, 70, 0.6));
+
     &:hover,
     &:focus,
     &:disabled,
@@ -605,7 +549,6 @@
     &.disabled {
       border-color: #d9d9d9 !important;
       box-shadow: none !important;
-      color: rgba(70, 70, 70, 0.6) !important;
     }
 
     .content-wrapper {
@@ -614,7 +557,8 @@
 
       .icon-wrapper {
         padding: 13px;
-        svg {
+
+        .icon {
           top: 1px;
           position: relative;
           height: 18px;
@@ -653,27 +597,11 @@
 
   &--bare {
     font-weight: 600;
-    border: none !important;
     box-shadow: none !important;
-    color: $text-secondary;
     min-width: 0px;
-    background: transparent !important;
-
-    svg {
-      height: 1.2rem !important;
-      margin-right: 0.5rem;
-      color: $text-secondary;
-    }
-
-    &:hover,
-    &:focus {
-      color: lighten($text-secondary, 20%) !important;
-      border-color: $transparent !important;
-      background-color: transparent;
-      svg {
-        color: lighten($text-secondary, 20%) !important;
-      }
-    }
+    padding: 10px 12px;
+    line-height: 16px;
+    @include bare_color_set($text-secondary);
   }
 
   &--budget-table-menu {
@@ -681,26 +609,10 @@
     line-height: 18px;
     height: 30px;
 
-    svg {
+    @include bare_color_set($text-secondary, $green);
+
+    .icon {
       height: 1.2rem !important;
-      margin-right: 0.5rem;
-    }
-
-    &:hover:not(:disabled):not(.disabled):not(.fake-disabled),
-    &:focus:not(:disabled):not(.disabled):not(.fake-disabled) {
-      color: $green !important;
-      svg {
-        color: $green !important;
-      }
-    }
-
-    &:disabled,
-    &.disabled,
-    &.fake-disabled {
-      color: $disabled-color !important;
-      svg {
-        color: $disabled-color !important;
-      }
     }
   }
 }

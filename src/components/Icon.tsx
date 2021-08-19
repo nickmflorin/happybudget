@@ -1,10 +1,8 @@
+import { isNil } from "lodash";
 import classNames from "classnames";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/pro-solid-svg-icons";
 import { IconDefinition } from "@fortawesome/fontawesome-common-types";
-
-import "./Icon.scss";
-import { isNil } from "lodash";
 
 export type IconName = "plus";
 export type IconType = IconDefinition | IconName;
