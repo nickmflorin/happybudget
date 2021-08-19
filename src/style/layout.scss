@@ -1,10 +1,10 @@
-@import "./breakpoints.scss";
+@import "./breakpoints";
+@import "./mixins";
 
 $header-height: 50px;
 $header-background-color: $white;
 
 $app-background-color: $white;
-
 $sidebar-background-color: #fcfcfc;
 
 .root {
@@ -112,21 +112,20 @@ $sidebar-background-color: #fcfcfc;
     }
   }
 
-  @mixin collapsed_layout_dimensions() {
-    @include device_layout_dimensions(true, true);
+  @mixin layout_dimensions($collapsed) {
+    @include device_layout_dimensions($collapsed, true);
     &.sidebar-visible {
-      @include device_layout_dimensions(true, false);
+      @include device_layout_dimensions($collapsed, false);
     }
+  }
+
+  @mixin collapsed_layout_dimensions() {
+    @include layout_dimensions(true);
   }
 
   @mixin expanded_layout_dimensions() {
-    @include device_layout_dimensions(false, true);
-    &.sidebar-visible {
-      @include device_layout_dimensions(false, false);
-    }
+    @include layout_dimensions(false);
   }
-
-  $sidebar-default-hidden: false;
 
   // App Content - Container for the main content that gets displayed inside
   // the logged in application.
@@ -144,9 +143,14 @@ $sidebar-background-color: #fcfcfc;
       background: $sidebar-background-color;
       position: fixed;
       height: 100vh;
-      transition: margin-left 0.1s;
-      // This is important to align the sidebar toggle button in the header.
-      padding-top: 8px;
+      @include transition(margin-left 0.2s ease-out);
+    }
+
+    &.collapsed-layout {
+      .sidebar-container {
+        // This is important to align the sidebar toggle button in the header.
+        padding-top: 8px;
+      }
     }
 
     .layout-content {
@@ -154,10 +158,7 @@ $sidebar-background-color: #fcfcfc;
       flex-direction: column;
       overflow-y: hidden;
 
-      -webkit-transition: margin-left 0.3s ease-out;
-      -moz-transition: margin-left 0.2s ease-out;
-      -o-transition: margin-left 0.2s ease-out;
-      transition: margin-left 0.2s ease-out;
+      @include transition(margin-left 0.2s ease-out);
 
       .header {
         margin-top: auto;
@@ -168,10 +169,7 @@ $sidebar-background-color: #fcfcfc;
         padding-right: 20px;
         background-color: $header-background-color !important;
 
-        -webkit-transition: width 0.3s ease-out;
-        -moz-transition: width 0.2s ease-out;
-        -o-transition: width 0.2s ease-out;
-        transition: width 0.2s ease-out;
+        @include transition(width 0.2s ease-out);
       }
 
       .content {
@@ -199,8 +197,7 @@ $sidebar-background-color: #fcfcfc;
         .drawer-wrapper {
           max-height: 100%;
           max-width: 400px;
-          -webkit-transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
-          transition: -webkit-transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+          @include transition(0.3s cubic-bezier(0.7, 0.3, 0.1, 1));
 
           .drawer {
             width: 100%;
@@ -230,33 +227,6 @@ $sidebar-background-color: #fcfcfc;
           }
         }
       }
-
-      // &.sidebar-hidden {
-      //   margin-left: 0px !important;
-
-      //   .header {
-      //     width: 100%;
-      //   }
-
-      //   &.collapsed-layout {
-      //     .header {
-      //       width: 100%;
-      //     }
-      //   }
-      // }
-
-      // &.collapsed-layout {
-      //   margin-left: $sidebar-collapsed-width;
-      //   .header {
-      //     width: calc(100% - #{$sidebar-collapsed-width});
-      //   }
-      // }
-
-      // &.expanded-layout {
-      //   @include media("<=medium") {
-      //     margin-left: 100%;
-      //   }
-      // }
     }
   }
 }

@@ -1,5 +1,14 @@
 import { reduce, flatten, map } from "lodash";
 
+export const Breakpoints: Breakpoints = {
+  small: 320,
+  medium: 480,
+  large: 768,
+  xl: 1024,
+  xxl: 1200,
+  xxxl: 1580
+};
+
 export const DEFAULT_TAG_COLOR_SCHEME = [
   "#d5d5e5",
   "#ffd2ba",

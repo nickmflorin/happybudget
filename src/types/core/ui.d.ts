@@ -3,6 +3,10 @@ type PageAndSize = {
   pageSize?: number;
 };
 
+type Breakpoint = 320 | 480 | 768 | 1024 | 1200 | 1580;
+type BreakpointId = "small" | "medium" | "large" | "xl" | "xxl" | "xxxl";
+type Breakpoints = Record<BreakpointId, Breakpoint>;
+
 type BudgetViewType = "budget" | "template";
 
 type Order = 1 | -1 | 0;

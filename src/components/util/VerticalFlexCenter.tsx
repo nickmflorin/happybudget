@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 interface VerticalFlexCenterProps extends StandardComponentProps {
   children: ReactNode;
@@ -12,4 +12,4 @@ const VerticalFlexCenter: React.FC<VerticalFlexCenterProps> = ({ children, class
   );
 };
 
-export default VerticalFlexCenter;
+export default React.memo(VerticalFlexCenter);

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useHistory, Link } from "react-router-dom";
 import classNames from "classnames";
 import { isNil } from "lodash";
@@ -28,40 +28,24 @@ import "./index.scss";
 interface HeaderProps extends StandardComponentProps {
   readonly toolbar?: IToolbarItem[] | (() => JSX.Element);
   readonly sidebarVisible: boolean;
-  // The default header height is 70px.  But this only applies when there is
-  // not a supplementary header below the default header.  To layout the component
-  // hierarchy properly with scrolling and fixed headers, we need to programatically
-  // adjust the height (so it can be dynamic, in the case of a supplementary header).
-  // Example: headerHeight: 100 would refer to a situation in which the supplementary
-  // header height is 30px.
   readonly collapsed: boolean;
-  readonly headerHeight?: number;
   readonly toggleSidebar: () => void;
   readonly showHeaderLogo?: boolean;
 }
 
 const Header = ({
   toolbar,
-  className,
-  headerHeight,
   sidebarVisible,
   collapsed,
   toggleSidebar,
   showHeaderLogo,
-  style = {}
+  ...props
 }: HeaderProps): JSX.Element => {
   const user = useLoggedInUser();
   const history = useHistory();
 
-  const headerStyle = useMemo((): React.CSSProperties => {
-    if (!isNil(headerHeight)) {
-      style.height = headerHeight;
-    }
-    return style;
-  }, [headerHeight, style]);
-
   return (
-    <Layout.Header className={classNames("header", className)} style={headerStyle}>
+    <Layout.Header {...props} className={classNames("header", props.className)}>
       <div className={"primary-header"}>
         <div className={"primary-header-left"}>
           {/* In the case that we are not using a collapsed layout, we always show the
@@ -138,4 +122,4 @@ const Header = ({
   );
 };
 
-export default Header;
+export default React.memo(Header);

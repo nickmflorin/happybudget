@@ -1,3 +1,4 @@
+import React from "react";
 import { map, isNil } from "lodash";
 
 import { VerticalFlexCenter } from "components";
@@ -45,4 +46,4 @@ const Toolbar = ({ items }: ToolbarProps): JSX.Element => {
   );
 };
 
-export default Toolbar;
+export default React.memo(Toolbar);

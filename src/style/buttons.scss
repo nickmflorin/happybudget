@@ -348,19 +348,6 @@
 
     @include bare_color_set($icon-color);
 
-    // For whatever reason, applying the styling to the edit group button in
-    // the AG Grid table is not respecting CSS inheritance rules and is not
-    // allowing us to dynamically change the color unless this is unset.  We
-    // should eventually figure that out, but for now - AG Grid is a pain.
-    &:not(.btn--edit-group) {
-      &:hover,
-      &:focus {
-        svg {
-          color: lighten($icon-color, 20%) !important;
-        }
-      }
-    }
-
     &.small {
       padding: 8px;
     }

@@ -4,7 +4,18 @@ import * as JsSearch from "js-search";
 import AwesomeDebouncePromise from "awesome-debounce-promise";
 import useConstant from "use-constant";
 import { useAsync, UseAsyncReturn } from "react-async-hook";
+import { useMediaQuery } from "react-responsive";
+
+import { Breakpoints } from "style/constants";
 import { useDeepEqualMemo } from "lib/hooks";
+
+export const useLessThanBreakpoint = (id: BreakpointId): boolean => {
+  return useMediaQuery({ query: `(max-width: ${Breakpoints[id]}px)` });
+};
+
+export const useGreaterThanBreakpoint = (id: BreakpointId): boolean => {
+  return useMediaQuery({ query: `(min-width: ${Breakpoints[id]}px)` });
+};
 
 const createRootElement = (id: string | number): HTMLElement => {
   const rootContainer = document.createElement("div");

@@ -18,7 +18,7 @@ interface BreadCrumbGenericItemProps extends StandardComponentProps {
   readonly children: ReactNode;
   readonly tooltip?: Tooltip;
   readonly primary?: boolean;
-  suppressClickBehavior?: boolean;
+  readonly suppressClickBehavior?: boolean;
   readonly onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
 }
 
@@ -228,4 +228,4 @@ const BreadCrumbs = ({ items, itemProps, params, children, ...props }: BreadCrum
   }
 };
 
-export default BreadCrumbs;
+export default React.memo(BreadCrumbs);

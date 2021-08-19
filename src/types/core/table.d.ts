@@ -8,11 +8,6 @@ namespace Table {
   type NullValue = null | "" | 0 | [];
   type ValueFormatter = (params: import("@ag-grid-community/core").ValueFormatterParams) => string | number | null;
 
-  interface PageAndSize {
-    readonly page: number;
-    readonly pageSize: number;
-  }
-
   type FieldBehavior = "read" | "write";
   type Field<R extends Table.Row, M extends Model.Model> = Omit<keyof R & keyof M & string, "id">;
 
