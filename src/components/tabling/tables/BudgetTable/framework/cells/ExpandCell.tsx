@@ -1,9 +1,5 @@
 import { isNil } from "lodash";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExpandAlt } from "@fortawesome/pro-solid-svg-icons";
-
-import { ShowHide } from "components";
+import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 
 interface ExpandCellProps<R extends BudgetTable.Row, M extends Model.Model> extends BudgetTable.CellProps<R, M, null> {
@@ -35,7 +31,7 @@ const ExpandCell = <R extends BudgetTable.Row, M extends Model.Model>({
         <IconButton
           className={"ag-grid-expand-button"}
           size={"small"}
-          icon={<FontAwesomeIcon className={"icon"} icon={faExpandAlt} />}
+          icon={<Icon icon={"expand-alt"} weight={"solid"} />}
           onClick={() => onClick(node.data.id)}
           tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "tooltip-lower" }}
         />
@@ -47,7 +43,7 @@ const ExpandCell = <R extends BudgetTable.Row, M extends Model.Model>({
             <IconButton
               className={"ag-grid-expand-button"}
               size={"small"}
-              icon={<FontAwesomeIcon className={"icon"} icon={faExpandAlt} />}
+              icon={<Icon icon={"expand-alt"} weight={"solid"} />}
               onClick={() => onClick(node.data.id)}
               tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "tooltip-lower" }}
             />
@@ -63,7 +59,7 @@ const ExpandCell = <R extends BudgetTable.Row, M extends Model.Model>({
             className={"ag-grid-expand-button fake-disabled"}
             size={"small"}
             disabled={false}
-            icon={<FontAwesomeIcon className={"icon"} icon={faExpandAlt} />}
+            icon={<Icon icon={"expand-alt"} weight={"solid"} />}
             tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "Fill in account to expand" }}
           />
         </ShowHide>

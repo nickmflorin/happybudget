@@ -1,12 +1,9 @@
 import React from "react";
 import classNames from "classnames";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown } from "@fortawesome/pro-solid-svg-icons";
-
 import { model } from "lib";
 
-import { Form } from "components";
+import { Form, Icon } from "components";
 import { Input, Select } from "components/fields";
 import { FormProps } from "components/forms/Form";
 import { PhoneNumberInput } from "../fields";
@@ -37,7 +34,7 @@ const ContactForm: React.FC<ContactFormProps> = ({
       initialValues={initialValues}
     >
       <Form.Item name={"type"} label={"Type"}>
-        <Select suffixIcon={<FontAwesomeIcon className={"icon"} icon={faCaretDown} />} placeholder={"Select Type"}>
+        <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />} placeholder={"Select Type"}>
           {model.models.ContactTypes.map((m: Model.ContactType, index: number) => (
             <Select.Option key={index} value={m.id}>
               {m.name}

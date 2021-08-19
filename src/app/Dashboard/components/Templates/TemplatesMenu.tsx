@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/pro-light-svg-icons";
-
 import { VerticalFlexCenter } from "components";
 import { Button } from "components/buttons";
-import { Input } from "components/fields";
+import { SearchInput } from "components/fields";
 import { HorizontalMenu } from "components/menus";
 import { IHorizontalMenuItem } from "components/menus/HorizontalMenu";
 import { CreateBudgetModal } from "components/modals";
@@ -62,11 +59,9 @@ const TemplatesMenu = (): JSX.Element => {
         </div>
         <div className={"extra-wrapper"}>
           <VerticalFlexCenter>
-            <Input
+            <SearchInput
               placeholder={"Search Templates..."}
               value={page === "my-templates" ? templatesSearch : communitySearch}
-              allowClear={true}
-              prefix={<FontAwesomeIcon className={"icon"} icon={faSearch} />}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 if (page === "my-templates") {
                   dispatch(setTemplatesSearchAction(event.target.value));

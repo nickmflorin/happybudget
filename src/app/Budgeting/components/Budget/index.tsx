@@ -4,26 +4,8 @@ import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMa
 import { filter, isNil, map } from "lodash";
 import { createSelector } from "reselect";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFilePlus as faFilePlusSolid,
-  faCopy as faCopySolid,
-  faAddressBook as faAddressBookSolid,
-  faFileSpreadsheet as faFileSpreadsheetSolid,
-  faFileInvoice as faFileInvoiceSolid,
-  faFileChartLine as faFileChartLineSolid
-} from "@fortawesome/pro-solid-svg-icons";
-import {
-  faFilePlus,
-  faCopy,
-  faAddressBook,
-  faFileSpreadsheet,
-  faFileInvoice,
-  faFileChartLine
-} from "@fortawesome/pro-light-svg-icons";
-
 import { budgeting } from "lib";
-import { RenderIfValidId, SavingChanges } from "components";
+import { Icon, RenderIfValidId, SavingChanges } from "components";
 
 import { wipeStateAction, setBudgetIdAction } from "../../store/actions/budget";
 import { selectBudgetDetail } from "../../store/selectors";
@@ -82,8 +64,8 @@ const Budget = (): JSX.Element => {
       toolbar={() => <SavingChanges saving={saving} />}
       sidebar={[
         {
-          icon: <FontAwesomeIcon className={"icon"} icon={faFilePlus} />,
-          activeIcon: <FontAwesomeIcon className={"icon"} icon={faFilePlusSolid} />,
+          icon: <Icon weight={"light"} icon={"file-plus"} />,
+          activeIcon: <Icon weight={"solid"} icon={"file-plus"} />,
           onClick: () => history.push("/templates"),
           tooltip: {
             title: "Templates",
@@ -91,8 +73,8 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon className={"icon"} icon={faCopy} />,
-          activeIcon: <FontAwesomeIcon className={"icon"} icon={faCopySolid} />,
+          icon: <Icon weight={"light"} icon={"copy"} />,
+          activeIcon: <Icon weight={"solid"} icon={"copy"} />,
           onClick: () => history.push("/budgets"),
           tooltip: {
             title: "My Budgets",
@@ -100,8 +82,8 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon className={"icon"} icon={faAddressBook} flip={"horizontal"} />,
-          activeIcon: <FontAwesomeIcon className={"icon"} icon={faAddressBookSolid} flip={"horizontal"} />,
+          icon: <Icon weight={"light"} icon={"address-book"} flip={"horizontal"} />,
+          activeIcon: <Icon weight={"solid"} icon={"address-book"} flip={"horizontal"} />,
           onClick: () => history.push("/contacts"),
           separatorAfter: true,
           tooltip: {
@@ -110,8 +92,8 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon className={"icon"} icon={faFileChartLine} />,
-          activeIcon: <FontAwesomeIcon className={"icon"} icon={faFileChartLineSolid} />,
+          icon: <Icon weight={"light"} icon={"file-chart-line"} />,
+          activeIcon: <Icon weight={"solid"} icon={"file-chart-line"} />,
           onClick: () => history.push(`/budgets/${budgetId}/analysis`),
           active: location.pathname.startsWith(`/budgets/${budgetId}/analysis`),
           tooltip: {
@@ -120,8 +102,8 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon className={"icon"} icon={faFileSpreadsheet} />,
-          activeIcon: <FontAwesomeIcon className={"icon"} icon={faFileSpreadsheetSolid} />,
+          icon: <Icon weight={"light"} icon={"file-spreadsheet"} />,
+          activeIcon: <Icon weight={"solid"} icon={"file-spreadsheet"} />,
           onClick: () => {
             if (!isNaN(parseInt(budgetId)) && !budgeting.urls.isBudgetRelatedUrl(location.pathname)) {
               const budgetLastVisited = budgeting.urls.getBudgetLastVisited(parseInt(budgetId));
@@ -139,8 +121,8 @@ const Budget = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon className={"icon"} icon={faFileInvoice} />,
-          activeIcon: <FontAwesomeIcon className={"icon"} icon={faFileInvoiceSolid} />,
+          icon: <Icon weight={"light"} icon={"file-invoice"} />,
+          activeIcon: <Icon weight={"solid"} icon={"file-invoice"} />,
           onClick: () => history.push(`/budgets/${budgetId}/actuals`),
           active: location.pathname.startsWith(`/budgets/${budgetId}/actuals`),
           tooltip: {

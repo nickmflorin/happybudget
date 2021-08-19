@@ -1,13 +1,9 @@
 import { useState } from "react";
 import { isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faReply } from "@fortawesome/free-solid-svg-icons";
-import { faThumbsUp, faEdit, faTrashAlt } from "@fortawesome/free-regular-svg-icons";
-
 import { IconButton } from "components/buttons";
 import { AccountCircleLink } from "components/links";
-import { ShowHide } from "components";
+import { ShowHide, Icon } from "components";
 import { useLoggedInUser } from "store/hooks";
 import { util } from "lib";
 
@@ -67,13 +63,13 @@ const ComentFooter = ({ comment, onDelete, onEdit, onLike, onReply }: CommentFoo
         <IconButton
           className={"dark"}
           size={"small"}
-          icon={<FontAwesomeIcon className={"icon"} icon={faReply} />}
+          icon={<Icon icon={"reply"} />}
           onClick={() => !isNil(onReply) && onReply()}
         />
         <IconButton
           className={"dark"}
           size={"small"}
-          icon={<FontAwesomeIcon className={"icon"} icon={faThumbsUp} />}
+          icon={<Icon icon={"thumbs-up"} />}
           onClick={() => !isNil(onLike) && onLike()}
         />
       </div>
@@ -82,13 +78,13 @@ const ComentFooter = ({ comment, onDelete, onEdit, onLike, onReply }: CommentFoo
           <IconButton
             className={"dark"}
             size={"small"}
-            icon={<FontAwesomeIcon className={"icon"} icon={faEdit} />}
+            icon={<Icon icon={"edit"} />}
             onClick={() => !isNil(onEdit) && onEdit()}
           />
           <IconButton
             className={"dark"}
             size={"small"}
-            icon={<FontAwesomeIcon className={"icon"} icon={faTrashAlt} />}
+            icon={<Icon icon={"trash"} />}
             onClick={() => !isNil(onDelete) && onDelete()}
           />
         </div>

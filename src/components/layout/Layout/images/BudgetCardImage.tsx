@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImagePolaroid } from "@fortawesome/pro-light-svg-icons";
-
+import { Icon } from "components";
 import Image from "./Image";
 import "./BudgetCardImage.scss";
 
@@ -16,7 +14,7 @@ interface BudgetCardImagePlaceholderProps {
 const BudgetCardImagePlaceholder: React.FC<BudgetCardImagePlaceholderProps> = ({ titleOnly, onClick }) => {
   return (
     <div className={classNames("budget-card-image-placeholder", { "title-only": titleOnly })} onClick={onClick}>
-      <FontAwesomeIcon className={"icon"} icon={faImagePolaroid} />
+      <Icon icon={"image-polaroid"} weight={"light"} />
     </div>
   );
 };

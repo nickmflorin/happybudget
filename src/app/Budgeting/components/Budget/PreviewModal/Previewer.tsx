@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { Page } from "react-pdf/dist/esm/entry.webpack";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRedo } from "@fortawesome/free-solid-svg-icons";
-
 import { Pagination } from "antd";
 
-import { Form } from "components";
+import { Form, Icon } from "components";
 import { Button } from "components/buttons";
 import { RenderDocument } from "components/pdf";
 
@@ -41,7 +38,7 @@ const Previewer = ({
             onClick={() => onRefresh()}
             disabled={loadingData || generatingPdf}
             loading={generatingPdf}
-            icon={<FontAwesomeIcon className={"icon"} icon={faRedo} />}
+            icon={<Icon icon={"redo"} weight={"solid"} />}
           >
             {"Refresh"}
           </Button>

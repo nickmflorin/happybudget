@@ -1,6 +1,4 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
-
+import { Icon } from "components";
 import IconButton, { IconButtonProps } from "./IconButton";
 
 const ClearButton = (props: Omit<IconButtonProps, "size" | "icon">): JSX.Element => {
@@ -9,7 +7,7 @@ const ClearButton = (props: Omit<IconButtonProps, "size" | "icon">): JSX.Element
       {...props}
       className={"btn btn--clear"}
       size={"small"}
-      icon={<FontAwesomeIcon className={"icon"} icon={faTimesCircle} />}
+      icon={<Icon icon={"times-circle"} weight={"solid"} />}
     />
   );
 };

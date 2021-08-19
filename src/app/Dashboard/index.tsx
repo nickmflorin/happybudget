@@ -1,13 +1,6 @@
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faFilePlus, faAddressBook } from "@fortawesome/pro-light-svg-icons";
-import {
-  faCopy as faCopySolid,
-  faFilePlus as faFilePlusSolid,
-  faAddressBook as faAddressBookSolid
-} from "@fortawesome/pro-solid-svg-icons";
-
+import { Icon } from "components";
 import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
 import { Contacts, Templates, Budgets } from "./components";
@@ -23,22 +16,22 @@ const Dashboard = (): JSX.Element => {
       sidebar={[
         {
           text: "Templates",
-          icon: <FontAwesomeIcon className={"icon"} icon={faFilePlus} />,
-          activeIcon: <FontAwesomeIcon className={"icon"} icon={faFilePlusSolid} />,
+          icon: <Icon icon={"file-plus"} weight={"light"} />,
+          activeIcon: <Icon icon={"file-plus"} weight={"solid"} />,
           onClick: () => history.push("/templates"),
           active: location.pathname.startsWith("/templates") || location.pathname.startsWith("/discover")
         },
         {
           text: "My Budgets",
-          icon: <FontAwesomeIcon className={"icon"} icon={faCopy} />,
-          activeIcon: <FontAwesomeIcon className={"icon"} icon={faCopySolid} />,
+          icon: <Icon icon={"copy"} weight={"light"} />,
+          activeIcon: <Icon icon={"copy"} weight={"solid"} />,
           onClick: () => history.push("/budgets"),
           active: location.pathname.startsWith("/budgets")
         },
         {
           text: "Contacts",
-          icon: <FontAwesomeIcon className={"icon"} icon={faAddressBook} flip={"horizontal"} />,
-          activeIcon: <FontAwesomeIcon className={"icon"} icon={faAddressBookSolid} flip={"horizontal"} />,
+          icon: <Icon icon={"address-book"} weight={"light"} flip={"horizontal"} />,
+          activeIcon: <Icon icon={"address-book"} weight={"solid"} flip={"horizontal"} />,
           onClick: () => history.push("/contacts"),
           active: location.pathname.startsWith("/contacts")
         }

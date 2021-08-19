@@ -2,8 +2,7 @@ import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import { Icon } from "components";
 import { Button, IconButton } from "components/buttons";
 
 interface TableMenuActionProps {
@@ -24,7 +23,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
         onClick={isNil(action.wrapInDropdown) ? () => !isNil(action.onClick) && action.onClick() : props.onClick}
         className={"btn--bare btn--budget-table-menu"}
         disabled={action.disabled}
-        icon={<FontAwesomeIcon className={"icon"} icon={action.icon} />}
+        icon={<Icon icon={action.icon} />}
         tooltip={
           /* eslint-disable indent */
           !isNil(action.tooltip)
@@ -51,7 +50,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
         className={"green-hover"}
         onClick={() => !isNil(action.onClick) && action.onClick()}
         disabled={action.disabled}
-        icon={<FontAwesomeIcon className={"icon"} icon={action.icon} />}
+        icon={<Icon icon={action.icon} />}
         tooltip={
           /* eslint-disable indent */
           !isNil(action.tooltip)

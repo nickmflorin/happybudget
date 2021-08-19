@@ -2,12 +2,9 @@ import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCamera, faPlus } from "@fortawesome/pro-solid-svg-icons";
-
 import * as typeguards from "lib/model/typeguards";
 
-import { FullSize, ShowHide, VerticalFlexCenter } from "components";
+import { Icon, FullSize, ShowHide, VerticalFlexCenter } from "components";
 import { ImageClearButton } from "components/buttons";
 import { UserImageOrInitials, EditImageOverlay } from "components/layout/Layout/images";
 
@@ -24,10 +21,10 @@ const UploadUserImageNoInitials = (): JSX.Element => {
   return (
     <div className={"no-initials"}>
       <VerticalFlexCenter className={"no-initials-icon-wrapper"}>
-        <FontAwesomeIcon className={"icon"} icon={faCamera} />
+        <Icon icon={"camera"} weight={"solid"} />
       </VerticalFlexCenter>
       <VerticalFlexCenter className={"no-initials-icon-wrapper"}>
-        <FontAwesomeIcon className={"icon"} icon={faPlus} />
+        <Icon icon={"plus"} weight={"solid"} />
       </VerticalFlexCenter>
     </div>
   );

@@ -1,7 +1,6 @@
 import { useMemo } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faImage } from "@fortawesome/pro-light-svg-icons";
 
+import { Icon } from "components";
 import { useLoggedInUser, useTimezone } from "store/hooks";
 import { util } from "lib";
 
@@ -39,13 +38,13 @@ const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: Bu
         {
           id: "edit",
           text: "Edit Name/Image",
-          icon: <FontAwesomeIcon className={"icon"} icon={faImage} />,
+          icon: <Icon icon={"image"} weight={"light"} />,
           onClick: () => onEdit()
         },
         {
           id: "delete",
           text: "Delete",
-          icon: <FontAwesomeIcon className={"icon"} icon={faTrash} />,
+          icon: <Icon icon={"trash"} weight={"light"} />,
           onClick: () => onDelete(),
           loading: deleting
         }

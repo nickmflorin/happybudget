@@ -1,8 +1,6 @@
 import { Switch, useHistory, useLocation } from "react-router-dom";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAddressCard } from "@fortawesome/free-solid-svg-icons";
-
+import { Icon } from "components";
 import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
 import { operational } from "lib";
@@ -18,7 +16,8 @@ const Settings = (): JSX.Element => {
       sidebar={[
         {
           text: "Profile",
-          icon: <FontAwesomeIcon className={"icon"} icon={faAddressCard} />,
+          icon: <Icon icon={"address-card"} weight={"light"} />,
+          activeIcon: <Icon icon={"address-card"} weight={"solid"} />,
           onClick: () => history.push("/profile"),
           active: location.pathname.startsWith("/profile")
         }

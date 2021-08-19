@@ -2,9 +2,7 @@ import { forwardRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil, filter, map } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/pro-light-svg-icons";
-
+import { Icon } from "components";
 import { ExpandedModelTagsMenu } from "components/menus";
 import { framework } from "components/tabling/generic";
 
@@ -80,7 +78,7 @@ const FringesEditor = (props: FringesEditorProps, ref: any) => {
         {
           onClick: () => props.onAddFringes(),
           text: "Add Fringes",
-          icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />,
+          icon: <Icon icon={"plus"} weight={"light"} />,
           showOnNoSearchResults: true,
           showOnNoData: true,
           focusOnNoSearchResults: true,

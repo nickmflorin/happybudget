@@ -4,11 +4,8 @@ import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMa
 import { isNil, filter, map } from "lodash";
 import { createSelector } from "reselect";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy, faFileSpreadsheet } from "@fortawesome/pro-light-svg-icons";
-
 import { budgeting } from "lib";
-import { RenderIfValidId, SavingChanges } from "components";
+import { RenderIfValidId, SavingChanges, Icon } from "components";
 
 import { selectTemplateDetail } from "../../store/selectors";
 import { wipeStateAction, setTemplateIdAction } from "../../store/actions/template";
@@ -60,7 +57,8 @@ const Template = (): JSX.Element => {
       toolbar={() => <SavingChanges saving={saving} />}
       sidebar={[
         {
-          icon: <FontAwesomeIcon className={"icon"} icon={faCopy} />,
+          icon: <Icon icon={"copy"} weight={"light"} />,
+          activeIcon: <Icon icon={"copy"} weight={"solid"} />,
           onClick: () => history.push("/templates"),
           tooltip: {
             title: "My Templates",
@@ -68,7 +66,8 @@ const Template = (): JSX.Element => {
           }
         },
         {
-          icon: <FontAwesomeIcon className={"icon"} icon={faFileSpreadsheet} />,
+          icon: <Icon icon={"file-spreadsheet"} weight={"light"} />,
+          activeIcon: <Icon icon={"file-spreadsheet"} weight={"solid"} />,
           onClick: () => {
             if (!isNaN(parseInt(templateId))) {
               const templateLastVisited = budgeting.urls.getTemplateLastVisited(parseInt(templateId));

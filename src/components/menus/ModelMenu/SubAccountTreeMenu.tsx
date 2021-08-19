@@ -1,8 +1,6 @@
 import { isNil, filter } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLongArrowAltRight } from "@fortawesome/pro-light-svg-icons";
-
+import { Icon } from "components";
 import { EntityText } from "components/typography";
 
 import ExpandedModelMenu from "./ExpandedModelMenu";
@@ -43,7 +41,7 @@ const SubAccountTreeMenu = ({ nodes, childrenDefaultVisible = true, ...props }: 
           return (
             <div className={"with-neuter-wrapper"}>
               <div className={"icon-wrapper"}>
-                <FontAwesomeIcon className={"icon"} icon={faLongArrowAltRight} />
+                <Icon icon={"long-arrow-alt-right"} weight={"light"} />
               </div>
               <EntityText fillEmpty={"---------"}>{model}</EntityText>
             </div>

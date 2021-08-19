@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, forwardRef } from "react";
 import classNames from "classnames";
 import { Button as AntDButton } from "antd";
 import { ButtonProps as AntDButtonProps } from "antd/lib/button";
@@ -19,16 +19,10 @@ export interface ButtonProps
  * A consistently styled Button component for consistently styled and themed
  * buttons wrapped around AntD's Button class.
  */
-const Button = ({
-  children,
-  disabled,
-  loading,
-  showLoadingIndicatorOverIcon,
-  icon,
-  className,
-  tooltip,
-  ...props
-}: ButtonProps): JSX.Element => {
+const Button = (
+  { children, disabled, loading, showLoadingIndicatorOverIcon, icon, className, tooltip, ...props }: ButtonProps,
+  ref: any
+): JSX.Element => {
   const isDisabled = useMemo(() => disabled === true && isNil(tooltip), [disabled, tooltip]);
   // If the button is disabled but has a tooltip, the only way to show the tooltip
   // on hover is to allow pointer events on the Button.  This means that we cannot
@@ -60,6 +54,7 @@ const Button = ({
     <TooltipWrapper tooltip={tooltip}>
       <AntDButton
         {...props}
+        ref={ref}
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => !isFakeDisabled && props.onClick?.(e)}
         className={classNames("btn", className, {
           disabled: isDisabled,
@@ -76,4 +71,4 @@ const Button = ({
   );
 };
 
-export default Button;
+export default forwardRef(Button);

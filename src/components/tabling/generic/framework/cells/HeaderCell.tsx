@@ -2,13 +2,10 @@ import { useState, useEffect, useMemo } from "react";
 import { isNil, find } from "lodash";
 import classNames from "classnames";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUp, faArrowDown, faEdit } from "@fortawesome/free-solid-svg-icons";
-
 import { Column } from "@ag-grid-community/core";
 
 import { tabling } from "lib";
-import { ShowHide, VerticalFlexCenter } from "components";
+import { Icon, ShowHide, VerticalFlexCenter } from "components";
 import { IconButton } from "components/buttons";
 
 // This is defined in AG Grid's documentation but does not seem to be importable from anywhere.
@@ -87,7 +84,7 @@ const HeaderCell = <R extends Table.Row, M extends Model.Model>({
     >
       {!isNil(columnType) && !isNil(columnType.icon) && (
         <VerticalFlexCenter>
-          <FontAwesomeIcon className={"icon icon--table-header"} icon={columnType.icon} />
+          <Icon className={"icon--table-header"} icon={columnType.icon} weight={"solid"} />
         </VerticalFlexCenter>
       )}
       <div className={"text"}>{displayName}</div>
@@ -96,15 +93,16 @@ const HeaderCell = <R extends Table.Row, M extends Model.Model>({
           <IconButton
             className={"btn--table-header-edit"}
             size={"small"}
-            icon={<FontAwesomeIcon className={"icon"} icon={faEdit} />}
+            icon={<Icon icon={"edit"} weight={"solid"} />}
             onClick={() => onEdit(column.field, column)}
           />
         </VerticalFlexCenter>
       )}
       <ShowHide show={column.sortable === true}>
-        <FontAwesomeIcon
+        <Icon
           style={order === 0 ? { opacity: 0 } : { opacity: 1 }}
-          icon={order === 1 || 0 ? faArrowUp : faArrowDown}
+          weight={"solid"}
+          icon={order === 1 || 0 ? "arrow-up" : "arrow-down"}
         />
       </ShowHide>
     </div>

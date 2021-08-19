@@ -1,34 +1,50 @@
-import { isNil } from "lodash";
+import React, { useMemo } from "react";
 import classNames from "classnames";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/pro-solid-svg-icons";
-import { IconDefinition } from "@fortawesome/fontawesome-common-types";
+import { isNil } from "lodash";
 
-export type IconName = "plus";
-export type IconType = IconDefinition | IconName;
+import { FontAwesomeIcon, FontAwesomeIconProps } from "@fortawesome/react-fontawesome";
+import { IconProp, IconName, IconPrefix } from "@fortawesome/fontawesome-svg-core";
 
-/* eslint-disable no-unused-vars */
-const Icons: { [key in IconName]: IconDefinition } = { plus: faPlus };
+export type IconType = IconName | [IconPrefix, IconName];
+export type IconWeight = "light" | "regular" | "solid";
 
-const isIconDefinition = (name: IconType): name is IconDefinition => {
-  return (name as IconDefinition).icon !== undefined;
-};
-
-interface IconProps extends StandardComponentProps {
-  name?: IconType | null | undefined;
+interface IconProps extends Omit<FontAwesomeIconProps, "icon"> {
+  readonly icon?: IconProp | undefined | null;
+  readonly prefix?: IconPrefix;
+  readonly green?: boolean;
+  readonly weight?: IconWeight;
+  readonly light?: boolean;
+  readonly regular?: boolean;
+  readonly solid?: boolean;
 }
 
-const Icon: React.FC<IconProps> = ({ name, className, style = {} }) => {
-  if (!isNil(name)) {
+/* eslint-disable no-unused-vars */
+const PrefixMap: { [key in IconWeight]: IconPrefix } = { light: "fal", regular: "far", solid: "fas" };
+
+const Icon: React.FC<IconProps> = ({ icon, green, prefix, weight, light, regular, solid, ...props }) => {
+  const derivedPrefix = useMemo(() => {
+    if (!isNil(prefix)) {
+      return prefix;
+    } else if (!isNil(weight)) {
+      return PrefixMap[weight];
+    } else if (light === true) {
+      return "fal";
+    } else if (solid === true) {
+      return "fas";
+    }
+    return "far";
+  }, [weight, light, regular, solid]);
+
+  if (!isNil(icon)) {
     return (
       <FontAwesomeIcon
-        className={classNames("icon", className)}
-        style={style}
-        icon={isIconDefinition(name) ? name : Icons[name]}
+        {...props}
+        className={classNames("icon", { "icon--green": green }, props.className)}
+        icon={typeof icon === "string" ? [derivedPrefix, icon] : icon}
       />
     );
   }
   return <></>;
 };
 
-export default Icon;
+export default React.memo(Icon);

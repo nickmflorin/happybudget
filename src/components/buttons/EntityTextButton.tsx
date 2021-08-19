@@ -1,30 +1,25 @@
 import { forwardRef } from "react";
 import classNames from "classnames";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown } from "@fortawesome/pro-solid-svg-icons";
-
-import { Button } from "antd";
-
-import { VerticalFlexCenter } from "components";
+import { Icon, VerticalFlexCenter } from "components";
 import { EntityText } from "components/typography";
 import { EntityTextProps } from "components/typography/EntityText";
+import Button, { ButtonProps } from "./Button";
 
-export interface EntityTextButtonProps extends Omit<EntityTextProps, "className" | "style">, StandardComponentProps {
+export interface EntityTextButtonProps
+  extends Omit<EntityTextProps, "className" | "style">,
+    Omit<ButtonProps, "children"> {
   fillEmpty?: string;
   onClick?: () => void;
 }
 
-const EntityTextButton = (
-  { children, className, fillEmpty, style = {}, ...props }: EntityTextButtonProps,
-  ref: any
-): JSX.Element => {
+const EntityTextButton = ({ children, fillEmpty, ...props }: EntityTextButtonProps, ref: any): JSX.Element => {
   return (
-    <Button className={classNames("btn btn--entity-text", className)} style={style} {...props} ref={ref}>
+    <Button {...props} ref={ref} className={classNames("btn--entity-text", props.className)}>
       <div className={"entity-text-button-inner"}>
         <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
         <VerticalFlexCenter className={"entity-text-button-caret"}>
-          <FontAwesomeIcon className={"icon"} icon={faCaretDown} />
+          <Icon icon={"caret-down"} weight={"solid"} />
         </VerticalFlexCenter>
       </div>
     </Button>

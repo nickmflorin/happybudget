@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
 import { isNil } from "lodash";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClock } from "@fortawesome/pro-solid-svg-icons";
+
+import { Icon } from "components";
 import { Select } from "components/fields";
 import { SelectProps } from "components/fields/Select";
 
@@ -11,7 +11,7 @@ const TimezoneSelect: React.FC<TimezoneSelectProps> = ({ placeholder = "Time Zon
   return (
     <Select
       placeholder={"Time Zone"}
-      suffixIcon={<FontAwesomeIcon className={"icon"} icon={faClock} />}
+      suffixIcon={<Icon icon={"clock"} weight={"solid"} />}
       showArrow
       showSearch
       filterOption={(input: any, option: any) =>

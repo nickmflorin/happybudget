@@ -1,10 +1,7 @@
 import React from "react";
 import { isNil, map } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/pro-regular-svg-icons";
-
-import { Spinner } from "components";
+import { Spinner, Icon } from "components";
 import { IconButton } from "components/buttons";
 import { Select } from "components/fields";
 
@@ -51,7 +48,7 @@ const HeaderTemplateSelect = (props: HeaderTemplateSelectProps): JSX.Element => 
                   <></>
                 ) : (
                   <IconButton
-                    icon={<FontAwesomeIcon className={"icon"} icon={faTrash} />}
+                    icon={<Icon icon={"trash"} weight={"regular"} />}
                     onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                       event.stopPropagation();
                       event.preventDefault();

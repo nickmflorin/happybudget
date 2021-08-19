@@ -10,7 +10,7 @@ import { faCaretDown } from "@fortawesome/pro-solid-svg-icons";
 import * as api from "api";
 import { hooks, model, util, tabling } from "lib";
 
-import { Form, ShowHide, Separator } from "components";
+import { Icon, Form, ShowHide, Separator } from "components";
 import { UploadPdfImage } from "components/uploaders";
 import { EntityText } from "components/typography";
 import { Editor } from "components/richtext";
@@ -412,7 +412,7 @@ const ExportForm = (
                   <Tag className={"column-select-tag"} style={{ marginRight: 3 }} {...params}>
                     {!isNil(colType) && !isNil(colType.icon) && (
                       <div className={"icon-wrapper"}>
-                        <FontAwesomeIcon className={"icon"} icon={colType.icon} />
+                        <Icon icon={colType.icon} />
                       </div>
                     )}
                     {column.headerName}
@@ -428,7 +428,7 @@ const ExportForm = (
                 <Select.Option className={"column-select-option"} key={index + 1} value={column.field as string}>
                   {!isNil(colType) && !isNil(colType.icon) && (
                     <div className={"icon-wrapper"}>
-                      <FontAwesomeIcon className={"icon"} icon={colType.icon} />
+                      <Icon icon={colType.icon} />
                     </div>
                   )}
                   {column.headerName}

@@ -2,9 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImages, faExclamationCircle, faCheckCircle } from "@fortawesome/pro-solid-svg-icons";
-
+import { Icon } from "components";
 import { ClearButton } from "components/buttons";
 import * as typeguards from "lib/model/typeguards";
 import { truncateFileName } from "lib/util/files";
@@ -25,7 +23,7 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
         if (!isNil(params.error)) {
           return (
             <React.Fragment>
-              <FontAwesomeIcon className={"icon"} icon={faExclamationCircle} />
+              <Icon icon={"exclamation-circle"} weight={"solid"} />
               <div className={"upload-text error-text"}>
                 {typeof params.error === "string" ? params.error : params.error.message}
               </div>
@@ -34,7 +32,7 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
         } else if (typeguards.isUploadParamsWithImage(params)) {
           return (
             <React.Fragment>
-              <FontAwesomeIcon className={"icon"} icon={faCheckCircle} />
+              <Icon icon={"check-circle"} weight={"solid"} />
               <div className={"upload-text file-text"}>
                 {typeguards.isUploadedImage(params.image)
                   ? truncateFileName(params.image.fileName || params.image.name, 18)
@@ -52,7 +50,7 @@ const UploadPdfImage = (props: UploaderProps): JSX.Element => {
         }
         return (
           <React.Fragment>
-            <FontAwesomeIcon className={"icon"} icon={faImages} />
+            <Icon icon={"images"} weight={"solid"} />
             <div className={"upload-text no-file-text"}>{"Upload File"}</div>
           </React.Fragment>
         );

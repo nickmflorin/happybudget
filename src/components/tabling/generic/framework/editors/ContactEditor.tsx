@@ -1,10 +1,8 @@
 import { forwardRef } from "react";
 import { isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/pro-light-svg-icons";
-
 import { useContacts } from "store/hooks";
+import { Icon } from "components";
 import { framework } from "components/tabling/generic";
 import { ExpandedModelTagEditor } from "components/tabling/generic/framework/editors";
 
@@ -60,7 +58,7 @@ const ContactEditor = (props: ContactEditorProps, ref: any) => {
             }
           },
           text: "Add Contact",
-          icon: <FontAwesomeIcon className={"icon"} icon={faPlus} />,
+          icon: <Icon icon={"plus"} weight={"light"} />,
           showOnNoSearchResults: true,
           showOnNoData: true,
           focusOnNoSearchResults: true,

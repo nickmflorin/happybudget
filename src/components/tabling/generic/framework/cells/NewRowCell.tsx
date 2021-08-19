@@ -1,6 +1,4 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
-
+import { Icon } from "components";
 import { IconButton } from "components/buttons";
 
 interface NewRowCellProps extends Table.CellProps<any, any, null> {
@@ -12,7 +10,7 @@ const NewRowCell = ({ onChangeEvent }: NewRowCellProps): JSX.Element => {
     <IconButton
       className={"green"}
       size={"medium"}
-      icon={<FontAwesomeIcon className={"icon"} icon={faPlusCircle} />}
+      icon={<Icon icon={"plus-circle"} weight={"solid"} />}
       style={{ margin: "0 auto" }}
       onClick={() =>
         onChangeEvent({

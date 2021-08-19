@@ -1,10 +1,7 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle } from "@fortawesome/pro-light-svg-icons";
-
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
-import { ShowHide, VerticalFlexCenter } from "components";
+import { Icon, ShowHide, VerticalFlexCenter } from "components";
 
 import "./SavingChanges.scss";
 
@@ -24,7 +21,7 @@ const SavingChanges = ({ saving }: SavingChangesProps): JSX.Element => {
         </ShowHide>
         <ShowHide show={!saving}>
           <div className={"check-wrapper"}>
-            <FontAwesomeIcon className={"icon"} icon={faCheckCircle} />
+            <Icon icon={"check-circle"} weight={"light"} />
           </div>
         </ShowHide>
       </VerticalFlexCenter>

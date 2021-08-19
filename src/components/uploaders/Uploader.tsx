@@ -5,14 +5,12 @@ import { isNil, includes } from "lodash";
 import { UploadRequestOption } from "rc-upload/lib/interface";
 import { Upload } from "antd";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUpload, faExclamationCircle } from "@fortawesome/pro-light-svg-icons";
 import { UploadChangeParam } from "antd/lib/upload";
 import { UploadFile } from "antd/lib/upload/interface";
 
 import * as api from "api";
 import { fileSizeInMB, getBase64 } from "lib/util/files";
-import { RenderWithSpinner, Image, ShowHide } from "components";
+import { Icon, RenderWithSpinner, Image, ShowHide } from "components";
 import { ImageClearButton } from "components/buttons";
 
 import "./Uploader.scss";
@@ -63,7 +61,7 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
       props.renderError(params)
     ) : (
       <div className={classNames("upload-indicator", props.className)} style={props.style}>
-        <FontAwesomeIcon className={"icon"} icon={faExclamationCircle} />
+        <Icon icon={"exclamation-circle"} weight={"light"} />
       </div>
     );
   } else if (!isNil(props.renderContentNoError)) {
@@ -83,7 +81,7 @@ const UploaderContent = (props: UploaderContentProps): JSX.Element => {
     } else {
       return (
         <div className={classNames("upload-indicator", props.className)} style={props.style}>
-          <FontAwesomeIcon className={"icon"} icon={faUpload} />
+          <Icon icon={"upload"} weight={"light"} />
         </div>
       );
     }

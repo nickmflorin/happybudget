@@ -1,5 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
+
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { fas } from "@fortawesome/pro-solid-svg-icons";
+import { far } from "@fortawesome/pro-regular-svg-icons";
+import { fal } from "@fortawesome/pro-light-svg-icons";
+
 import "ag-grid-enterprise";
 import { LicenseManager } from "@ag-grid-enterprise/core";
 import { isNil } from "lodash";
@@ -8,6 +14,8 @@ import "style/index.scss";
 
 import App from "./app";
 import reportWebVitals from "./lib/operational/reportWebVitals";
+
+library.add(fas, far, fal);
 
 let agGridKey = process.env.REACT_APP_AG_GRID_KEY;
 if (!isNil(agGridKey)) {

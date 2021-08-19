@@ -16,7 +16,7 @@ const EmptyCard = ({ title, icon, onClick, className, style = {} }: EmptyCardPro
   return (
     <div className={classNames("dashboard-empty-card", className)} style={style} onClick={onClick}>
       <div>
-        <Icon name={icon} />
+        <Icon icon={icon} />
         <ShowHide show={!isNil(title)}>
           <div className={"title"}>{title}</div>
         </ShowHide>

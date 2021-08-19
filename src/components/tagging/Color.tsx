@@ -2,10 +2,7 @@ import React from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle } from "@fortawesome/pro-solid-svg-icons";
-import { faCircle as faCircleOpen } from "@fortawesome/pro-light-svg-icons";
-
+import { Icon } from "components";
 import { Colors } from "style/constants";
 
 interface ColorProps extends StandardComponentProps {
@@ -25,14 +22,10 @@ const Color = ({ color, selected, className, noValueColor, onClick, style = {} }
       {!isNil(color) ? (
         <React.Fragment>
           <div className={"icon-border"}></div>
-          <FontAwesomeIcon className={"icon"} icon={faCircle} style={{ color }} />
+          <Icon icon={"circle"} weight={"solid"} style={{ color }} />
         </React.Fragment>
       ) : (
-        <FontAwesomeIcon
-          className={"icon"}
-          icon={faCircleOpen}
-          style={{ color: noValueColor || Colors.COLOR_NO_COLOR }}
-        />
+        <Icon icon={"circle"} weight={"light"} style={{ color: noValueColor || Colors.COLOR_NO_COLOR }} />
       )}
     </div>
   );

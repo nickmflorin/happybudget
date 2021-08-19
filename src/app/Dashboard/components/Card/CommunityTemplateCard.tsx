@@ -1,6 +1,4 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faImage, faTrash, faClone, faEyeSlash, faEye } from "@fortawesome/pro-light-svg-icons";
-
+import { Icon } from "components";
 import { useLoggedInUser } from "store/hooks";
 
 import Card from "./Card";
@@ -48,33 +46,33 @@ const CommunityTemplateCard = ({
               {
                 id: "edit",
                 text: "Edit",
-                icon: <FontAwesomeIcon className={"icon"} icon={faEdit} />,
+                icon: <Icon icon={"edit"} weight={"light"} />,
                 onClick: () => onEdit()
               },
               {
                 id: "edit_name_image",
                 text: "Edit Name/Image",
-                icon: <FontAwesomeIcon className={"icon"} icon={faImage} />,
+                icon: <Icon icon={"image"} weight={"light"} />,
                 onClick: () => onEditNameImage()
               },
               {
                 id: "duplicate",
                 text: "Duplicate",
-                icon: <FontAwesomeIcon className={"icon"} icon={faClone} />,
+                icon: <Icon icon={"clone"} weight={"light"} />,
                 onClick: () => onDuplicate(),
                 loading: duplicating
               },
               {
                 id: "hide_show",
                 text: template.hidden === true ? "Show" : "Hide",
-                icon: <FontAwesomeIcon className={"icon"} icon={template.hidden === true ? faEye : faEyeSlash} />,
+                icon: <Icon weight={"light"} icon={template.hidden === true ? "eye" : "eye-slash"} />,
                 onClick: () => onToggleVisibility(),
                 loading: hidingOrShowing
               },
               {
                 id: "delete",
                 text: "Delete",
-                icon: <FontAwesomeIcon className={"icon"} icon={faTrash} />,
+                icon: <Icon icon={"trash"} weight={"light"} />,
                 onClick: () => onDelete(),
                 loading: deleting
               }

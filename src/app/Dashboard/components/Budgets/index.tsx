@@ -4,9 +4,7 @@ import { useHistory } from "react-router-dom";
 import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/pro-light-svg-icons";
-
+import { Icon } from "components";
 import { Input } from "components/fields";
 import { Page } from "components/layout";
 import { EditBudgetModal, CreateBudgetModal } from "components/modals";
@@ -50,7 +48,7 @@ const Budgets = (): JSX.Element => {
           placeholder={"Search Projects..."}
           value={search}
           allowClear={true}
-          prefix={<FontAwesomeIcon className={"icon"} icon={faSearch} />}
+          prefix={<Icon icon={"search"} weight={"light"} />}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             dispatch(setBudgetsSearchAction(event.target.value))
           }

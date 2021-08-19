@@ -1,15 +1,13 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
-
+import { Icon } from "components";
 import IconButton, { IconButtonProps } from "./IconButton";
 
 const AcceptButton = (props: Omit<IconButtonProps, "size" | "icon">): JSX.Element => {
   return (
     <IconButton
       {...props}
-      className={"btn btn--accept"}
+      className={"btn--accept"}
       size={"small"}
-      icon={<FontAwesomeIcon className={"icon"} icon={faCheckCircle} />}
+      icon={<Icon icon={"check-circle"} weight={"solid"} />}
     />
   );
 };

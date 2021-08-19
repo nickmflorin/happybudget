@@ -3,19 +3,9 @@ import { useHistory, Link } from "react-router-dom";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faBars,
-  faArrowAltToLeft,
-  faArrowAltToRight,
-  faSignOutAlt,
-  faAddressCard,
-  faLock
-} from "@fortawesome/pro-light-svg-icons";
-
 import { Layout } from "antd";
 
-import { Dropdown, VerticalFlexCenter, ShowHide } from "components";
+import { Icon, Dropdown, VerticalFlexCenter, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 import { SidebarLogo } from "components/svgs";
 import { AccountCircleLink } from "components/links";
@@ -57,11 +47,11 @@ const Header = ({
               className={"btn--sidebar-toggle"}
               icon={(params: ClickableIconCallbackParams) => {
                 if (sidebarVisible === true && params.isHovered === true) {
-                  return <FontAwesomeIcon icon={faArrowAltToLeft} className={"icon icon--green"} />;
+                  return <Icon icon={"arrow-alt-to-left"} weight={"light"} green={true} />;
                 } else if (params.isHovered === true) {
-                  return <FontAwesomeIcon icon={faArrowAltToRight} className={"icon icon--green"} />;
+                  return <Icon icon={"arrow-alt-to-right"} weight={"light"} green={true} />;
                 } else {
-                  return <FontAwesomeIcon icon={faBars} className={"icon"} />;
+                  return <Icon icon={"bars"} weight={"light"} />;
                 }
               }}
               onClick={() => toggleSidebar()}
@@ -94,7 +84,7 @@ const Header = ({
                 id: "profile",
                 text: "Profile",
                 onClick: () => history.push("/profile"),
-                icon: <FontAwesomeIcon className={"icon"} icon={faAddressCard} />
+                icon: <Icon icon={"address-card"} weight={"light"} />
               },
               {
                 id: "admin",
@@ -102,14 +92,14 @@ const Header = ({
                 onClick: () => {
                   window.location.href = `${process.env.REACT_APP_API_DOMAIN}/admin`;
                 },
-                icon: <FontAwesomeIcon className={"icon"} icon={faLock} />,
+                icon: <Icon icon={"lock"} weight={"light"} />,
                 visible: user.is_staff === true
               },
               {
                 id: "logout",
                 text: "Logout",
                 onClick: () => history.push("/logout"),
-                icon: <FontAwesomeIcon className={"icon"} icon={faSignOutAlt} />
+                icon: <Icon icon={"sign-out"} weight={"light"} />
               }
             ]}
           >

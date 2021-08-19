@@ -2,10 +2,7 @@ import { Link } from "react-router-dom";
 import { map } from "lodash";
 import classNames from "classnames";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faTimes, faArrowAltToLeft } from "@fortawesome/pro-light-svg-icons";
-
-import { ShowHide } from "components";
+import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 import { SidebarLogo, LeafLogo } from "components/svgs";
 
@@ -38,7 +35,7 @@ const Sidebar = ({
     <div {...props} className={classNames("sidebar", props.className)}>
       <IconButton
         className={"btn--sidebar-close"}
-        icon={<FontAwesomeIcon className={"icon"} icon={faTimes} />}
+        icon={<Icon icon={"times"} weight={"light"} />}
         onClick={() => toggleSidebar()}
       />
       <ShowHide show={collapsed}>
@@ -46,9 +43,9 @@ const Sidebar = ({
           className={"btn--sidebar-toggle"}
           icon={(params: ClickableIconCallbackParams) => {
             if (sidebarVisible === true && params.isHovered === true) {
-              return <FontAwesomeIcon icon={faArrowAltToLeft} className={"icon icon--green"} />;
+              return <Icon icon={"arrow-alt-to-left"} green={true} weight={"light"} />;
             } else {
-              return <FontAwesomeIcon icon={faBars} className={"icon"} />;
+              return <Icon icon={"bars"} weight={"light"} />;
             }
           }}
           onClick={() => toggleSidebar()}
