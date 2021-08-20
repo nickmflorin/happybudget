@@ -117,6 +117,7 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
           columnType,
           nullValue,
           refreshColumns,
+          onCellDoubleClicked,
           processCellForClipboard,
           processCellFromClipboard,
           getHttpValue,

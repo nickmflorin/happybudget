@@ -146,6 +146,7 @@ namespace Table {
     readonly getHttpValue?: (value: V) => any;
     readonly processCellForClipboard?: (row: R) => string;
     readonly processCellFromClipboard?: (value: string) => any;
+    readonly onCellDoubleClicked?: (row: R) => void;
   }
 
   interface FooterColumn<R extends Table.Row, M extends Model.Model> extends Pick<Table.Column<R, M>, "selectable" | "editable" | "colSpan"> {

@@ -57,7 +57,8 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
           cellRenderer: "ContactNameCell",
           editable: false,
           cellClass: "cell--renders-html",
-          getRowValue: (m: Model.Contact) => ({ image: m.image, first_name: m.first_name, last_name: m.last_name })
+          getRowValue: (m: Model.Contact) => ({ image: m.image, first_name: m.first_name, last_name: m.last_name }),
+          onCellDoubleClicked: (row: Tables.ContactRow) => onEditContact(row.id)
         },
         framework.columnObjs.ChoiceSelectColumn<R, M, Model.ContactType>({
           field: "type",

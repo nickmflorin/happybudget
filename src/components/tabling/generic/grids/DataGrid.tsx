@@ -31,7 +31,8 @@ import {
   CellClassParams,
   ValueSetterParams,
   GridOptions,
-  CheckboxSelectionCallbackParams
+  CheckboxSelectionCallbackParams,
+  CellDoubleClickedEvent
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -999,6 +1000,14 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
     []
   );
 
+  const onCellDoubleClicked = hooks.useDynamicCallback((e: CellDoubleClickedEvent) => {
+    const row: R = e.data;
+    const column: Table.Column<R, M> | undefined = find(localColumns, { field: e.column.getColId() } as any);
+    if (!isNil(column) && !isNil(column.onCellDoubleClicked)) {
+      column.onCellDoubleClicked(row);
+    }
+  });
+
   return (
     <Grid<R, M>
       {...props}
@@ -1019,6 +1028,7 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
       tabToNextCell={tabToNextCell}
       onCellKeyDown={onCellKeyDown}
       onCellFocused={onCellFocused}
+      onCellDoubleClicked={onCellDoubleClicked}
       onSelectionChanged={onSelectionChanged}
       // rowDataChangeDetectionStrategy={ChangeDetectionStrategyType.DeepValueCheck}
       onCellEditingStarted={readOnly !== true ? onCellEditingStarted : undefined}
