@@ -97,8 +97,9 @@
         padding-left: 6px;
         padding-right: 6px;
         font-size: 13px;
-        font-weight: 400;
         background-color: $white;
+        font-family: $roboto;
+        font-weight: 400;
         overflow: hidden;
         overflow-x: hidden;
         text-overflow: ellipsis;
@@ -373,8 +374,6 @@
 
         > .cell {
           background-color: $table-border-color;
-          font-family: $roboto;
-          font-weight: 400;
           border: none !important;
 
           &[aria-colindex="1"] {
@@ -411,8 +410,6 @@
 
         > .cell {
           background-color: #d3d3d3 !important;
-          font-family: $roboto;
-          font-weight: 400;
           border: none !important;
 
           &[aria-colindex="1"] {
