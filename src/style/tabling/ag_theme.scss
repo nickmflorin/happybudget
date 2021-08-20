@@ -1,8 +1,15 @@
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-alpine.css";
+@import "~ag-grid-community/src/styles/ag-theme-alpine/sass/ag-theme-alpine-mixin";
 
 .ag-theme-alpine {
   font-family: $roboto;
+
+  @include ag-theme-alpine(
+    (
+      range-selection-border-color: $green
+    )
+  );
 
   .ag-right-aligned-header div.ag-header-cell-label {
     justify-content: flex-end !important;
