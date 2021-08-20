@@ -186,8 +186,16 @@
 
         .inner-cell {
           width: 100%;
+          height: 100%;
+          display: flex;
 
           .loadable-cell-wrapper {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 100;
+
             span {
               position: relative;
 
@@ -222,11 +230,8 @@
 
           .btn--clear {
             display: none;
-            position: absolute;
-            right: 0px;
-            top: 0;
-            padding: 9px !important;
-            height: 100% !important;
+            padding: 4px !important;
+            height: 24px !important;
             width: 24px !important;
           }
 

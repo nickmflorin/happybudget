@@ -32,6 +32,7 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
       framework={tabling.util.combineFrameworks(Framework, props.framework)}
       onRowExpand={(id: number) => onEditContact(id)}
       expandCellTooltip={"Edit"}
+      rowHeight={60}
       actions={(params: Table.MenuActionParams<R, M>) => [
         {
           tooltip: "Delete",
@@ -50,14 +51,13 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
       ]}
       columns={[
         {
-          field: "first_name",
-          headerName: "First Name",
-          columnType: "text"
-        },
-        {
-          field: "last_name",
-          headerName: "Last Name",
-          columnType: "text"
+          field: "names_and_image",
+          headerName: "Name",
+          columnType: "text",
+          cellRenderer: "ContactNameCell",
+          editable: false,
+          cellClass: "cell--renders-html",
+          getRowValue: (m: Model.Contact) => ({ image: m.image, first_name: m.first_name, last_name: m.last_name })
         },
         framework.columnObjs.ChoiceSelectColumn<R, M, Model.ContactType>({
           field: "type",

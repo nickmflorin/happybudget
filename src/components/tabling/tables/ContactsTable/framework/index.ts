@@ -7,7 +7,8 @@ const FrameworkComponents: Table.Framework = {
   },
   cells: {
     data: {
-      ContactTypeCell: cells.ContactTypeCell
+      ContactTypeCell: cells.ContactTypeCell,
+      ContactNameCell: cells.ContactNameCell
     }
   }
 };

@@ -152,6 +152,20 @@ export const inferModelFromName = <M extends Model.Model>(
   }
 };
 
+export const displayFirstAndLastName = (
+  firstName: string | null | undefined,
+  lastName: string | null | undefined
+): string => {
+  if (!isNil(firstName) && !isNil(lastName)) {
+    return `${firstName} ${lastName}`;
+  } else if (!isNil(firstName)) {
+    return firstName;
+  } else if (!isNil(lastName)) {
+    return lastName;
+  }
+  return "";
+};
+
 export const parseFirstAndLastName = (name: string): [string | null, string | null] => {
   if (name.trim() === "") {
     return [null, null];

@@ -14,10 +14,8 @@ const LoadableCellWrapper = ({ children, loading }: LoadableCellWrapperProps): J
 
   return (
     <div className={classNames("loadable-cell-wrapper", { loading })}>
-      <span>
-        {loading === true && <Spin className={"loadable-cell-spinner"} indicator={loadingIcon} size={"small"} />}
-        {children}
-      </span>
+      {loading === true && <Spin className={"loadable-cell-spinner"} indicator={loadingIcon} size={"small"} />}
+      {children}
     </div>
   );
 };

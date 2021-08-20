@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
+import { VerticalFlexCenter } from "components";
 import { ClearButton } from "components/buttons";
 import LoadableCellWrapper from "./LoadableCellWrapper";
 
@@ -29,16 +30,17 @@ const Cell = <R extends Table.Row, M extends Model.Model>(props: Table.CellWithC
       style={props.style}
       onKeyDown={(event: React.KeyboardEvent<HTMLDivElement>) => !isNil(props.onKeyDown) && props.onKeyDown(event)}
     >
-      <LoadableCellWrapper loading={props.loading}>
-        <span className={"inner-cell-content"}>{props.children}</span>
-      </LoadableCellWrapper>
+      <LoadableCellWrapper loading={props.loading}>{props.children}</LoadableCellWrapper>
+
       {showClearButton && (
-        <ClearButton
-          onClick={(event: React.MouseEvent<HTMLElement>) => {
-            // TODO: Figure out how to stop propogation!
-            !isNil(props.onClear) && !isNil(props.colDef) && props.onClear(row, props.customCol);
-          }}
-        />
+        <VerticalFlexCenter>
+          <ClearButton
+            onClick={(event: React.MouseEvent<HTMLElement>) => {
+              // TODO: Figure out how to stop propogation!
+              !isNil(props.onClear) && !isNil(props.colDef) && props.onClear(row, props.customCol);
+            }}
+          />
+        </VerticalFlexCenter>
       )}
     </div>
   );

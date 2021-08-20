@@ -253,11 +253,14 @@ namespace Model {
     readonly comments: Model.Comment[];
   }
 
-  interface Contact extends Model.TimestampTrackedModel {
-    readonly type: Model.ContactType | null;
+  interface ContactNamesAndImage {
     readonly image: SavedImage | null;
     readonly first_name: string | null
     readonly last_name: string | null;
+  }
+
+  interface Contact extends Model.TimestampTrackedModel, ContactNamesAndImage {
+    readonly type: Model.ContactType | null;
     readonly full_name: string;
     readonly company: string | null;
     readonly position: string | null;
