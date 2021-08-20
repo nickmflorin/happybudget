@@ -1,3 +1,5 @@
+@import "./mixins";
+
 // This class is not meant to be used in the components.
 .btn-link-base {
   font-size: 12px;
@@ -251,11 +253,10 @@
   background: $white;
   border-color: #d9d9d9;
   border-width: 1px;
-  color: rgba(70, 70, 70, 0.6);
+  color: $text-secondary;
   box-sizing: border-box;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-  -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  @include transition(all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1));
 
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -278,6 +279,7 @@
   .icon {
     height: 100% !important;
     width: auto !important;
+    @include transition(all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1));
   }
 
   &--large {
