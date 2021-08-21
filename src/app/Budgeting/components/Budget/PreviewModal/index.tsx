@@ -249,24 +249,22 @@ const PreviewModal = ({
           }}
         />
       </div>
-      <div className={"previewer-container"}>
-        <Previewer
-          file={file}
-          generatingPdf={generatingPdf}
-          loadingData={loadingData}
-          onRefresh={() => debouncedRender()}
-          onExport={() => {
-            // TODO: Since we are debouncing the Options setState, should we rerender the
-            // PDF with the most recent options just in case?
-            if (!isNil(file)) {
-              util.files.download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
-                includeExtensionInName: false
-              });
-              onSuccess?.();
-            }
-          }}
-        />
-      </div>
+      <Previewer
+        file={file}
+        generatingPdf={generatingPdf}
+        loadingData={loadingData}
+        onRefresh={() => debouncedRender()}
+        onExport={() => {
+          // TODO: Since we are debouncing the Options setState, should we rerender the
+          // PDF with the most recent options just in case?
+          if (!isNil(file)) {
+            util.files.download(file, !filename.endsWith(".pdf") ? `${filename}.pdf` : filename, {
+              includeExtensionInName: false
+            });
+            onSuccess?.();
+          }
+        }}
+      />
     </Modal.Modal>
   );
 };
