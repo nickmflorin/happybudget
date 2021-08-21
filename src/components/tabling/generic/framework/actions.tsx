@@ -1,9 +1,7 @@
-import { ReactNode } from "react";
 import { filter, map, includes } from "lodash";
-import { faLineColumns, faFileCsv } from "@fortawesome/pro-regular-svg-icons";
 
 import { util } from "lib";
-import { FieldsDropdown } from "components/dropdowns";
+import { Dropdown } from "components";
 
 export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
   table: Table.Table<R, M>,
@@ -12,25 +10,23 @@ export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
 ): Table.MenuAction => ({
   /* eslint-disable indent */
   text: "Export CSV",
-  icon: faFileCsv,
-  wrapInDropdown: (children: ReactNode) => {
+  icon: "file-csv",
+  wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
     const exportableColumns = filter(params.columns, (col: Table.Column<R, M>) => col.canBeExported !== false);
     return (
-      <FieldsDropdown
-        fields={map(exportableColumns, (col: Table.Column<R, M>) => ({
+      <Dropdown
+        menuMode={"multiple"}
+        menuCheckbox={true}
+        menuDefaultSelected={params.hiddenColumns as MenuItemId[]}
+        menuItems={map(exportableColumns, (col: Table.Column<R, M>) => ({
           id: col.field as string,
-          label: col.headerName || "",
-          defaultChecked: !includes(params.hiddenColumns, col.field as string)
+          label: col.headerName || ""
         }))}
-        buttons={[
+        menuButtons={[
           {
-            onClick: (checks: FieldCheck[]) => {
-              const fields = map(
-                filter(checks, (field: FieldCheck) => field.checked === true),
-                (field: FieldCheck) => field.id
-              );
-              if (fields.length !== 0) {
-                const csvData = table.getCSVData(fields);
+            onClick: (state: IMenuState) => {
+              if (state.selected.length !== 0) {
+                const csvData = table.getCSVData(state.selected as string[]);
                 util.files.downloadAsCsvFile(exportFileName, csvData);
               }
             },
@@ -40,7 +36,7 @@ export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
         ]}
       >
         {children}
-      </FieldsDropdown>
+      </Dropdown>
     );
   }
 });
@@ -51,24 +47,27 @@ export const ToggleColumnAction = <R extends Table.Row, M extends Model.Model>(
 ): Table.MenuAction => ({
   /* eslint-disable indent */
   text: "Columns",
-  icon: faLineColumns,
-  wrapInDropdown: (children: ReactNode) => {
+  icon: "line-columns",
+  wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
     const hideableColumns = filter(params.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false);
     return (
-      <FieldsDropdown
-        selected={map(
+      <Dropdown
+        menuMode={"multiple"}
+        menuCheckbox={true}
+        menuSelected={map(
           filter(hideableColumns, (col: Table.Column<R, M>) => !includes(params.hiddenColumns, col.field)),
           (col: Table.Column<R, M>) => col.field as string
         )}
-        fields={map(hideableColumns, (col: Table.Column<R, M>) => ({
+        menuItems={map(hideableColumns, (col: Table.Column<R, M>) => ({
           id: col.field as string,
-          label: col.headerName || "",
-          defaultChecked: includes(params.hiddenColumns, col.field as string)
+          label: col.headerName || ""
         }))}
-        onChange={(change: FieldCheck) => table.changeColumnVisibility({ field: change.id, visible: change.checked })}
+        onChange={(p: IMenuChangeParams) =>
+          table.changeColumnVisibility({ field: p.change.id as Table.Field<R, M>, visible: p.change.selected })
+        }
       >
         {children}
-      </FieldsDropdown>
+      </Dropdown>
     );
   }
 });

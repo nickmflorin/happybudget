@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
 
-import { faCommentsAlt, faPrint } from "@fortawesome/pro-regular-svg-icons";
-
 import { redux, tabling } from "lib";
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 
@@ -95,13 +93,13 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
         actions={[
           {
-            icon: faPrint,
+            icon: "print",
             text: "Export PDF",
             onClick: () => setPreviewModalVisible(true)
           },
           {
             text: "Comments",
-            icon: faCommentsAlt,
+            icon: "comments-alt",
             onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
           }
         ]}

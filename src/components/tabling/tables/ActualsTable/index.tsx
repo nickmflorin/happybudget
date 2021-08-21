@@ -1,7 +1,4 @@
 import { isNil, map, filter, find } from "lodash";
-
-import { faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
-
 import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import { model, tabling } from "lib";
@@ -48,7 +45,7 @@ const ActualsTable = ({
       actions={(params: Table.MenuActionParams<R, M>) => [
         {
           tooltip: "Delete",
-          icon: faTrashAlt,
+          icon: "trash-alt",
           disabled: params.selectedRows.length === 0,
           onClick: () => {
             const rows: R[] = params.apis.grid.getSelectedRows();

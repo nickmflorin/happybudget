@@ -1,5 +1,3 @@
-import { faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
-
 import { model, tabling } from "lib";
 
 import { ModelTable, ModelTableProps } from "components/tabling";
@@ -36,7 +34,7 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
       actions={(params: Table.MenuActionParams<R, M>) => [
         {
           tooltip: "Delete",
-          icon: faTrashAlt,
+          icon: "trash-alt",
           disabled: params.selectedRows.length === 0,
           onClick: () => {
             const rows: R[] = params.apis.grid.getSelectedRows();

@@ -4,38 +4,35 @@ import ClickAwayListener from "react-click-away-listener";
 import { uniqueId, isNil } from "lodash";
 
 import { Dropdown as AntdDropdown } from "antd";
-import { DropDownProps } from "antd/lib/dropdown";
+import { DropDownProps as AntdDropdownProps } from "antd/lib/dropdown";
 
-import { DropdownMenu } from "components/menus";
-import { IDropdownMenu, IDropdownMenuItem } from "components/menus/DropdownMenu";
+import { Menu } from "components";
 import { util } from "lib";
 
-interface BaseDropdownProps
-  extends Omit<DropDownProps, "overlay" | "className">,
-    StandardComponentProps,
-    Omit<IDropdownMenu, "className" | "style" | "items"> {
-  children: React.ReactChild | React.ReactChild[];
-  menuProps?: Omit<IDropdownMenu, "onClick" | "onChange" | "items">;
-  onClickAway?: () => void;
+interface BaseDropdownProps extends Omit<AntdDropdownProps, "overlay"> {
+  readonly onClickAway?: () => void;
+  readonly children: React.ReactChild | React.ReactChild[];
 }
 
 interface DropdownOverlayProps extends BaseDropdownProps {
-  overlay: React.ReactElement | (() => React.ReactElement);
-  items?: undefined;
+  readonly overlay: React.ReactElement | (() => React.ReactElement);
 }
 
 interface DropdownMenuItemsProps extends BaseDropdownProps {
-  items: IDropdownMenuItem[] | JSX.Element[];
-  overlay?: undefined;
+  readonly menuProps?: StandardComponentProps;
+  readonly menuItems: IMenuItem[];
+  readonly menuMode?: "single" | "multiple";
+  readonly menuButtons?: IMenuButton[];
+  readonly menuCheckbox?: boolean;
+  readonly menuDefaultSelected?: MenuItemId[];
+  readonly menuSelected?: MenuItemId[];
+  readonly onChange?: (params: IMenuChangeParams) => void;
 }
 
 export type DropdownProps = DropdownOverlayProps | DropdownMenuItemsProps;
 
-export const includesMenuItems = (
-  obj: DropdownMenuItemsProps | DropdownOverlayProps
-): obj is DropdownMenuItemsProps => {
-  return (obj as DropdownMenuItemsProps).items !== undefined;
-};
+export const isPropsWithOverlay = (props: DropdownProps): props is DropdownOverlayProps =>
+  (props as DropdownOverlayProps).overlay !== undefined;
 
 const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
   const buttonId = useMemo(() => uniqueId(), []);
@@ -73,15 +70,19 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
           }}
         >
           <React.Fragment>
-            {includesMenuItems(props) ? (
-              <DropdownMenu
-                {...props.menuProps}
-                onClick={props.onClick}
-                onChange={props.onChange}
-                items={props.items}
-              />
-            ) : (
+            {isPropsWithOverlay(props) ? (
               props.overlay
+            ) : (
+              <Menu.Expanded
+                {...props.menuProps}
+                onChange={props.onChange}
+                items={props.menuItems}
+                mode={props.menuMode}
+                checkbox={props.menuCheckbox}
+                buttons={props.menuButtons}
+                defaultSelected={props.menuDefaultSelected}
+                selected={props.menuSelected}
+              />
             )}
           </React.Fragment>
         </ClickAwayListener>
@@ -93,7 +94,5 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
     </AntdDropdown>
   );
 };
-
-Dropdown.Menu = DropdownMenu;
 
 export default Dropdown;

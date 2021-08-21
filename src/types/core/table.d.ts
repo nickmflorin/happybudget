@@ -171,7 +171,7 @@ namespace Table {
   type Ref<R extends Table.Row, M extends Model.Model> = { current: Table.Table<R, M> };
 
   type MenuAction = {
-    readonly icon: import("@fortawesome/fontawesome-svg-core").IconProp;
+    readonly icon: IconProp;
     readonly tooltip?: Tooltip;
     // If being wrapped in a Dropdown, the onClick prop will not be used.
     readonly onClick?: () => void;

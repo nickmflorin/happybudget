@@ -45,33 +45,33 @@ const CommunityTemplateCard = ({
           ? [
               {
                 id: "edit",
-                text: "Edit",
+                label: "Edit",
                 icon: <Icon icon={"edit"} weight={"light"} />,
                 onClick: () => onEdit()
               },
               {
                 id: "edit_name_image",
-                text: "Edit Name/Image",
+                label: "Edit Name/Image",
                 icon: <Icon icon={"image"} weight={"light"} />,
                 onClick: () => onEditNameImage()
               },
               {
                 id: "duplicate",
-                text: "Duplicate",
+                label: "Duplicate",
                 icon: <Icon icon={"clone"} weight={"light"} />,
                 onClick: () => onDuplicate(),
                 loading: duplicating
               },
               {
                 id: "hide_show",
-                text: template.hidden === true ? "Show" : "Hide",
+                label: template.hidden === true ? "Show" : "Hide",
                 icon: <Icon weight={"light"} icon={template.hidden === true ? "eye" : "eye-slash"} />,
                 onClick: () => onToggleVisibility(),
                 loading: hidingOrShowing
               },
               {
                 id: "delete",
-                text: "Delete",
+                label: "Delete",
                 icon: <Icon icon={"trash"} weight={"light"} />,
                 onClick: () => onDelete(),
                 loading: deleting

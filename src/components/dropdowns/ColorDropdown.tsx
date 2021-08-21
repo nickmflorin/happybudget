@@ -1,18 +1,18 @@
 import classNames from "classnames";
 
-import { Dropdown } from "components";
 import { Color } from "components/tagging";
-import { DropdownProps } from "components/dropdowns/Dropdown";
 import { ColorSelect } from "components/fields";
+
+import Dropdown, { DropdownProps } from "./Dropdown";
 
 import "./ColorDropdown.scss";
 
-type ColorDropdownProps = Omit<DropdownProps, "overlay" | "items" | "children"> & {
-  colors: string[];
-  value?: string | null;
-  className?: string;
-  onChange: (value: string) => void;
-};
+type ColorDropdownProps = Omit<DropdownProps, "overlay" | "items" | "children"> &
+  StandardComponentProps & {
+    readonly colors: string[];
+    readonly value?: string | null;
+    readonly onChange: (value: string) => void;
+  };
 
 const ColorDropdown = ({
   /* eslint-disable indent */

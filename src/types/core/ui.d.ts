@@ -7,8 +7,6 @@ type Breakpoint = 320 | 480 | 768 | 1024 | 1200 | 1580;
 type BreakpointId = "small" | "medium" | "large" | "xl" | "xxl" | "xxxl";
 type Breakpoints = Record<BreakpointId, Breakpoint>;
 
-type BudgetViewType = "budget" | "template";
-
 type Order = 1 | -1 | 0;
 type DefinitiveOrder = 1 | -1;
 
@@ -61,19 +59,26 @@ interface StandardPdfComponentProps {
   readonly wrap?: boolean;
 }
 
+type IconProp = import("@fortawesome/fontawesome-svg-core").IconName | [import("@fortawesome/fontawesome-svg-core").IconPrefix, import("@fortawesome/fontawesome-svg-core").IconName];
+type IconWeight = "light" | "regular" | "solid";
+type IconOrElement = IconProp | JSX.Element;
+
+interface IIcon extends Omit<import("@fortawesome/react-fontawesome").FontAwesomeIconProps, "icon"> {
+  readonly icon?: IconProp | undefined | null;
+  readonly prefix?: import("@fortawesome/fontawesome-svg-core").IconPrefix;
+  readonly green?: boolean;
+  readonly weight?: IconWeight;
+  readonly light?: boolean;
+  readonly regular?: boolean;
+  readonly solid?: boolean;
+}
+
 type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : never;
 
 type RenderFunc = () => JSX.Element;
 
 interface IBreadCrumbItemRenderParams {
   readonly toggleDropdownVisible: () => void;
-}
-
-interface IBreadCrumbItemOption {
-  readonly id: number;
-  readonly url?: string;
-  readonly text?: string;
-  readonly render?: () => JSX.Element;
 }
 
 interface ILazyBreadCrumbItem {
@@ -87,9 +92,51 @@ interface IBreadCrumbItem {
   readonly tooltip?: Tooltip;
   readonly text?: string;
   readonly render?: (params: IBreadCrumbItemRenderParams) => React.ReactChild;
-  readonly options?: IBreadCrumbItemOption[];
+  readonly options?: IMenuItem[];
   readonly visible?: boolean;
   readonly primary?: boolean;
+}
+
+type MenuItemId = string | number;
+type IMenuItemState = {
+  readonly id: MenuItemId;
+  readonly selected: boolean;
+}
+
+interface IMenuItem extends StandardComponentProps {
+  readonly id: MenuItemId;
+  readonly url?: string;
+  readonly label?: string;
+  readonly loading?: boolean;
+  readonly icon?: IconOrElement;
+  readonly checked?: boolean;
+  readonly visible?: boolean;
+  readonly onClick?: (e: import("react").MouseEvent<HTMLLIElement>) => void;
+  readonly renderContent?: () => import("react").ReactNode;
+}
+
+type IMenuState = {
+  readonly selected: MenuItemId[];
+  readonly state: IMenuItemState[];
+}
+
+type IMenuChangeParams = IMenuState & {
+  readonly change: IMenuItemState;
+}
+
+type IMenuRef = {
+  readonly getState: () => IMenuState;
+}
+
+type IMenu = StandardComponentProps & IMenuState & {
+  readonly onChange?: (params: IMenuChangeParams) => void;
+};
+
+interface IMenuButton {
+  readonly text: string;
+  readonly className?: string;
+  readonly style?: React.CSSProperties;
+  readonly onClick?: (state: IMenuState) => void;
 }
 
 /**
@@ -187,7 +234,7 @@ type ModelMenuRef<M extends Model.M> = {
 type IExtraModelMenuItem = {
   readonly onClick?: (e: Table.CellDoneEditingEvent) => void;
   readonly text: string;
-  readonly icon?: JSX.Element;
+  readonly icon?: IconOrElement;
   readonly showOnNoSearchResults?: boolean;
   readonly focusOnNoSearchResults?: boolean;
   readonly leaveAtBottom?: boolean;
@@ -320,11 +367,13 @@ type Tooltip = Omit<Partial<import("antd/lib/tooltip").TooltipPropsWithTitle>, "
 type ClickableIconCallbackParams = {
   readonly isHovered: boolean;
 }
+type ClickableIconCallback = (params: ClickableIconCallbackParams) => IconOrElement
+type ClickableIconOrElement = IconOrElement | ClickableIconCallback;
 
 interface ClickableProps extends StandardComponentProps {
   readonly disabled?: boolean;
   readonly tooltip?: Tooltip;
-  readonly icon?: ReactNode | ((params: ClickableIconCallbackParams) => JSX.Element);
+  readonly icon?: ClickableIconOrElement;
 }
 
 type HeaderTemplateFormData = {

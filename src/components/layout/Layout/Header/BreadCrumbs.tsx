@@ -59,7 +59,6 @@ interface BreadCrumbItemProps extends StandardComponentProps {
 
 const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const history = useHistory();
 
   const renderItem = (i: IBreadCrumbItem) => {
     if (!isNil(i.text)) {
@@ -97,27 +96,17 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
           trigger={["click"]}
           overlayClassName={"bread-crumb-dropdown"}
           onClickAway={() => setDropdownVisible(false)}
-          items={map(
-            orderBy(item.options, (obj: IBreadCrumbItemOption) => obj.id),
-            (obj: any, index: number) => {
-              return (
-                <Dropdown.Menu.Item
-                  id={obj.id}
-                  key={index}
-                  selected={obj.id === item.id}
-                  onClick={() => {
-                    setDropdownVisible(false);
-                    if (!isNil(obj.url)) {
-                      history.push(obj.url);
-                    } else if (!isNil(obj.onClick)) {
-                      obj.onClick();
-                    }
-                  }}
-                >
-                  {renderItem(obj)}
-                </Dropdown.Menu.Item>
-              );
-            }
+          menuDefaultSelected={[item.id]}
+          menuItems={map(
+            orderBy(item.options, (obj: IMenuItem) => obj.id),
+            (obj: IMenuItem) => ({
+              ...obj,
+              renderContent: () => renderItem(obj),
+              onClick: (e: React.MouseEvent<HTMLLIElement>) => {
+                setDropdownVisible(false);
+                obj.onClick?.(e);
+              }
+            })
           )}
         >
           {renderDropdownButton(item)}

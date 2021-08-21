@@ -1,3 +1,6 @@
+$menu-border-color: #efefef;
+$menu-border: 1px solid $menu-border-color;
+
 .menu-base {
   box-sizing: border-box;
   margin: 0;
@@ -16,6 +19,7 @@
   box-shadow: none !important;
   transition: background 0.3s, width 0.3s cubic-bezier(0.2, 0, 0, 1) 0s;
   width: 100%;
+  background-color: $white;
 }
 
 .menu-item-base {
@@ -24,24 +28,46 @@
   font-family: $roboto;
   font-weight: 400;
   min-width: 100px;
-  padding: 6px 12px;
+  padding: 3px 12px;
   font-size: 13px;
   line-height: 24px;
-  height: 36px;
+  height: 30px;
   margin-bottom: 0px !important;
 
   &.ant-menu-item-selected {
     background-color: $white;
   }
-  &.active {
-    background-color: #efefef !important;
+  &.selected {
+    background-color: #fbfbfb !important;
   }
-  &:hover {
+  &:hover:not(.selected) {
     background-color: #fbfbfb !important;
   }
   &.disabled {
     cursor: not-allowed !important;
     background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.menu-wrapper {
+  background-color: $white;
+  border: $menu-border;
+
+  .menu {
+    border: none !important;
+  }
+
+  .btn-container {
+    width: 100%;
+    padding: 8px;
+
+    > .btn--menu {
+      width: 100%;
+
+      &:not(:last-child) {
+        margin-bottom: 8px;
+      }
+    }
   }
 }
 
@@ -51,33 +77,31 @@
 
 .menu-item {
   @extend .menu-item-base;
-}
+  display: flex;
 
-.ant-dropdown-menu {
-  @extend .menu-base;
+  .ant-checkbox-wrapper {
+    height: 24px !important;
+    width: 24px;
+    padding: 4px;
+    padding-left: 0px;
+    position: relative;
+    bottom: 1px;
 
-  .ant-dropdown-menu-item {
-    @extend .menu-item-base;
-  }
-}
-
-.ant-menu {
-  @extend .menu-base;
-  .ant-menu-item {
-    @extend .menu-item-base;
-
-    .ant-menu-title-content {
-      display: flex;
-      flex-direction: row;
+    .ant-checkbox {
+      display: block;
     }
+  }
 
-    .ant-checkbox-wrapper {
-      height: 24px;
-      width: 24px;
-      padding-top: 4px;
-      padding-bottom: 4px;
-      padding-left: 0px;
-      padding-right: 0px;
+  span.text-wrapper {
+    font-family: $roboto;
+    font-size: 13px;
+    color: $text-primary !important;
+    line-height: 30px;
+  }
+
+  &.selected {
+    span.text-container {
+      color: $text-primary !important;
     }
   }
 }
@@ -85,8 +109,8 @@
 .ag-theme-alpine .ag-popup-editor {
   @extend .dropdown-base;
   background-clip: unset !important;
-  border-color: #efefef !important;
-  border: 1px solid #efefef !important;
+  border-color: $menu-border-color !important;
+  border: $menu-border !important;
   box-shadow: none !important;
 
   .ant-menu {
@@ -96,23 +120,6 @@
     &.ant-menu-vertical,
     &.ant-menu-vertical-left {
       border-right: none !important;
-    }
-  }
-}
-
-.dropdown-menu {
-  @extend .menu-base;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #efefef !important;
-
-  .dropdown-menu-item {
-    @extend .menu-item-base;
-
-    .icon {
-      display: block;
-      height: 100%;
-      width: 100%;
     }
   }
 }

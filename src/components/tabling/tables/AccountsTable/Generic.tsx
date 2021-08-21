@@ -1,6 +1,5 @@
 import { isNil, map, filter, includes } from "lodash";
 
-import { faFolder, faBadgePercent, faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
 import { Column } from "@ag-grid-community/core";
 
 import { tabling } from "lib";
@@ -38,7 +37,7 @@ const GenericAccountsTable = ({
       cookieNames={{ ...props.cookieNames, hiddenColumns: "account-table-hidden-columns" }}
       actions={(params: Table.MenuActionParams<R, M>) => [
         {
-          icon: faTrashAlt,
+          icon: "trash-alt",
           disabled: params.selectedRows.length === 0,
           onClick: () => {
             const rows: R[] = params.apis.grid.getSelectedRows();
@@ -49,12 +48,12 @@ const GenericAccountsTable = ({
           }
         },
         {
-          icon: faFolder,
+          icon: "folder",
           disabled: true,
           text: "Group"
         },
         {
-          icon: faBadgePercent,
+          icon: "badge-percent",
           disabled: true,
           text: "Mark Up"
         },

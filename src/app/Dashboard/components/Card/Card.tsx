@@ -4,12 +4,11 @@ import classNames from "classnames";
 import { Icon, ShowHide, RenderWithSpinner, Dropdown } from "components";
 import { IconButton } from "components/buttons";
 import { BudgetCardImage } from "components/layout/Layout/images";
-import { IDropdownMenuItem } from "components/menus/DropdownMenu";
 
 import "./index.scss";
 
 interface CardProps extends StandardComponentProps {
-  dropdown?: IDropdownMenuItem[];
+  dropdown?: IMenuItem[];
   title: string;
   subTitle?: string;
   image: SavedImage | null;
@@ -36,7 +35,7 @@ const Card = ({
           <Icon className={"icon--hidden"} icon={"eye-slash"} weight={"solid"} />
         </ShowHide>
         {!isNil(dropdown) && (
-          <Dropdown items={dropdown} placement={"bottomRight"} trigger={["click"]}>
+          <Dropdown menuItems={dropdown} placement={"bottomRight"} trigger={["click"]}>
             <IconButton
               className={classNames("dropdown-ellipsis", { "for-placeholder": isNil(image) })}
               icon={<Icon icon={"ellipsis-v"} weight={"light"} />}

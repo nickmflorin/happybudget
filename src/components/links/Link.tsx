@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { ShowHide, TooltipWrapper } from "components";
+import { ui } from "lib";
+import { TooltipWrapper } from "components";
 
 export type LinkProps = StandardComponentWithChildrenProps &
   ClickableProps &
@@ -14,14 +15,7 @@ export type LinkProps = StandardComponentWithChildrenProps &
  */
 const Link = ({ className, children, tooltip, icon, disabled, ...props }: LinkProps): JSX.Element => {
   const [isHovered, setIsHovered] = useState(false);
-
-  const prefix = useMemo(() => {
-    if (typeof icon == "function") {
-      return icon({ isHovered });
-    } else {
-      return icon;
-    }
-  }, [isHovered, icon]);
+  const prefix = ui.hooks.useClickableIcon(icon, { isHovered });
 
   return (
     <TooltipWrapper tooltip={tooltip}>
@@ -34,11 +28,11 @@ const Link = ({ className, children, tooltip, icon, disabled, ...props }: LinkPr
         onMouseEnter={() => setIsHovered(!isHovered)}
         onMouseLeave={() => setIsHovered(!isHovered)}
       >
-        <ShowHide show={!isNil(icon)}>{prefix}</ShowHide>
+        {prefix}
         {children}
       </a>
     </TooltipWrapper>
   );
 };
 
-export default Link;
+export default React.memo(Link);

@@ -20,13 +20,13 @@ export const ModelMenuItems = <M extends Model.M>(props: ModelMenuItemsProps<M>)
 
 export const ExtraModelMenuItem = (props: IExtraModelMenuItem & { active: boolean }): JSX.Element => {
   return (
-    <Menu.MenuItem
+    <Menu.Item
       className={classNames("model-menu-item", "model-menu-item--empty", { active: props.active })}
       onClick={(e: React.MouseEvent<HTMLLIElement>) => !isNil(props.onClick) && props.onClick(e)}
     >
       {!isNil(props.icon) && <div className={"icon-container"}>{props.icon}</div>}
       {props.text}
-    </Menu.MenuItem>
+    </Menu.Item>
   );
 };
 
@@ -82,7 +82,7 @@ const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): JSX.Ele
   if (!isVisible === false) {
     return (
       <React.Fragment>
-        <Menu.MenuItem
+        <Menu.Item
           {...rest} // Required for Antd Menu Item
           {...itemProps}
           key={model.id}
@@ -117,7 +117,7 @@ const ModelMenuItem = <M extends Model.M>(props: ModelMenuItemProps<M>): JSX.Ele
               {renderItem(model, { level: level, index: indexMap[String(model.id)] })}
             </VerticalFlexCenter>
           )}
-        </Menu.MenuItem>
+        </Menu.Item>
         {isModelWithChildren(model) && model.children.length !== 0 && (
           <ModelMenuItems<M> {...primary} models={model.children} level={props.level + 1} />
         )}

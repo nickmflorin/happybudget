@@ -1,11 +1,15 @@
+import React from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
-import { Spinner } from "components";
+
+import { ui } from "lib";
+import { Spinner, Icon } from "components";
+
 import "./IconOrSpinner.scss";
 
 interface IconOrSpinnerProps extends StandardComponentProps {
   loading?: boolean;
-  icon?: JSX.Element;
+  icon?: IconOrElement;
   size?: number;
   [key: string]: any;
 }
@@ -25,7 +29,7 @@ const IconOrSpinner = ({ loading, icon, className, size = 14, style = {} }: Icon
   } else if (!isNil(icon)) {
     return (
       <div className={classNames("icon-or-spinner", className)} style={style}>
-        <div className={"icon-wrapper"}>{icon}</div>
+        <div className={"icon-wrapper"}>{ui.typeguards.iconIsJSX(icon) ? icon : <Icon icon={icon} />}</div>
       </div>
     );
   } else {

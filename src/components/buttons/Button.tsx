@@ -5,6 +5,7 @@ import { ButtonProps as AntDButtonProps } from "antd/lib/button";
 
 import { isNil } from "lodash";
 
+import { ui } from "lib";
 import { TooltipWrapper, Spinner } from "components";
 
 export interface ButtonProps
@@ -31,24 +32,24 @@ const Button = (
   const isFakeDisabled = useMemo(() => disabled === true && !isNil(tooltip), [disabled, tooltip]);
   const [isHovered, setIsHovered] = useState(false);
 
+  const iC = ui.hooks.useClickableIcon(icon, { isHovered });
+
   const prefix = useMemo(() => {
-    if (isNil(icon)) {
+    if (isNil(iC)) {
       return loading === true ? <Spinner /> : <></>;
     } else if (showLoadingIndicatorOverIcon !== false) {
-      return loading === true ? <Spinner /> : typeof icon == "function" ? icon({ isHovered }) : icon;
+      return loading === true ? <Spinner /> : iC;
     } else if (loading === true) {
       return (
         <React.Fragment>
           <Spinner />
-          {icon}
+          {iC}
         </React.Fragment>
       );
-    } else if (typeof icon == "function") {
-      return icon({ isHovered });
     } else {
-      return icon;
+      return iC;
     }
-  }, [isHovered, icon]);
+  }, [iC]);
 
   return (
     <TooltipWrapper tooltip={tooltip}>
@@ -71,4 +72,5 @@ const Button = (
   );
 };
 
-export default forwardRef(Button);
+const ForwardRefButton = forwardRef(Button);
+export default React.memo(ForwardRefButton);

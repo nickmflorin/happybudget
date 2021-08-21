@@ -2,13 +2,12 @@ import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { ShowHide, Icon } from "components";
-import { IconType } from "components/Icon";
 
 import "./index.scss";
 
 interface EmptyCardProps extends StandardComponentProps {
   title?: string;
-  icon?: IconType;
+  icon?: IconProp;
   onClick?: () => void;
 }
 

@@ -37,13 +37,13 @@ const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: Bu
       dropdown={[
         {
           id: "edit",
-          text: "Edit Name/Image",
+          label: "Edit Name/Image",
           icon: <Icon icon={"image"} weight={"light"} />,
           onClick: () => onEdit()
         },
         {
           id: "delete",
-          text: "Delete",
+          label: "Delete",
           icon: <Icon icon={"trash"} weight={"light"} />,
           onClick: () => onDelete(),
           loading: deleting

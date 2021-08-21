@@ -1,7 +1,5 @@
 import classNames from "classnames";
 
-import { faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
-
 import { model, tabling } from "lib";
 import { ModelTable, ModelTableProps } from "components/tabling";
 import { framework } from "components/tabling/generic";
@@ -29,7 +27,7 @@ const FringesTable: React.FC<FringesTableProps> = ({ exportFileName, ...props })
       getRowLabel={(m: M) => m.name}
       actions={(params: Table.MenuActionParams<R, M>) => [
         {
-          icon: faTrashAlt,
+          icon: "trash-alt",
           disabled: params.selectedRows.length === 0,
           onClick: () => {
             const rows: R[] = params.apis.grid.getSelectedRows();

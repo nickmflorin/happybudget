@@ -1,7 +1,5 @@
 import { isNil, filter, map, includes } from "lodash";
 import classNames from "classnames";
-
-import { faSigma, faPercentage, faTrashAlt } from "@fortawesome/pro-regular-svg-icons";
 import { SuppressKeyboardEventParams, Column } from "@ag-grid-community/core";
 
 import { tabling, model } from "lib";
@@ -64,7 +62,7 @@ const GenericSubAccountsTable = ({
       cookieNames={{ ...props.cookieNames, hiddenColumns: "subaccount-table-hidden-columns" }}
       actions={(params: Table.MenuActionParams<R, M>) => [
         {
-          icon: faTrashAlt,
+          icon: "trash-alt",
           disabled: params.selectedRows.length === 0,
           onClick: () => {
             const rows: R[] = params.apis.grid.getSelectedRows();
@@ -75,12 +73,12 @@ const GenericSubAccountsTable = ({
           }
         },
         {
-          icon: faSigma,
+          icon: "sigma",
           disabled: true,
           text: "Group"
         },
         {
-          icon: faPercentage,
+          icon: "percentage",
           disabled: true,
           text: "Mark Up"
         },

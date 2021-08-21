@@ -79,16 +79,16 @@ const Header = ({
             className={"header-dropdown"}
             menuProps={{ className: "header-dropdown-menu" }}
             trigger={["click"]}
-            items={[
+            menuItems={[
               {
                 id: "profile",
-                text: "Profile",
+                label: "Profile",
                 onClick: () => history.push("/profile"),
                 icon: <Icon icon={"address-card"} weight={"light"} />
               },
               {
                 id: "admin",
-                text: "Admin",
+                label: "Admin",
                 onClick: () => {
                   window.location.href = `${process.env.REACT_APP_API_DOMAIN}/admin`;
                 },
@@ -97,7 +97,7 @@ const Header = ({
               },
               {
                 id: "logout",
-                text: "Logout",
+                label: "Logout",
                 onClick: () => history.push("/logout"),
                 icon: <Icon icon={"sign-out"} weight={"light"} />
               }
