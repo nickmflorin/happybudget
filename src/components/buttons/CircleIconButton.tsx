@@ -1,9 +1,8 @@
-import { ReactNode } from "react";
 import classNames from "classnames";
 import Button, { ButtonProps } from "./Button";
 
 interface CircleIconButtonProps extends Omit<ButtonProps, "icon"> {
-  readonly icon: ReactNode;
+  readonly icon: IconOrElement;
 }
 
 const CircleIconButton = (props: CircleIconButtonProps): JSX.Element => (

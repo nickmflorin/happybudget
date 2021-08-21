@@ -3,16 +3,16 @@ import { Dropdown, Icon } from "components";
 
 interface BudgetDropdownProps {
   readonly children: JSX.Element;
-  onNewBudget: () => void;
+  readonly onNewBudget: () => void;
 }
 
-const BudgetDropdown: React.FC<BudgetDropdownProps> = ({ children, onNewBudget, ...props }): JSX.Element => {
+const BudgetDropdown: React.FC<BudgetDropdownProps> = ({ children, onNewBudget }): JSX.Element => {
   return (
     <Dropdown
-      items={[
+      menuItems={[
         {
           id: "new-blank-budget",
-          text: "New Blank Budget",
+          label: "New Blank Budget",
           icon: <Icon icon={"pencil"} weight={"light"} />,
           onClick: () => onNewBudget()
         }
