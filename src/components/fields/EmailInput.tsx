@@ -1,8 +1,6 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope } from "@fortawesome/pro-regular-svg-icons";
-
+import React from "react";
 import classNames from "classnames";
-
+import { Icon } from "components";
 import Input, { InputProps } from "./Input";
 
 export type EmailInputProps = InputProps;
@@ -10,10 +8,10 @@ export type EmailInputProps = InputProps;
 const EmailInput = (props: EmailInputProps): JSX.Element => (
   <Input
     placeholder={"Email"}
-    prefix={<FontAwesomeIcon icon={faEnvelope} className={"icon"} />}
+    prefix={<Icon icon={"envelope"} />}
     {...props}
     className={classNames("input", "input--email", props.className)}
   />
 );
 
-export default EmailInput;
+export default React.memo(EmailInput);

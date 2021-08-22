@@ -4,6 +4,12 @@ export const isFieldAlterationEvent = (
   return (event as Model.FieldAlterationEvent).field !== undefined;
 };
 
+export const isModelWithChildren = <M extends Model.M>(model: M): model is M & { children: M[] } => {
+  return (
+    (model as M & { children: M[] }).children !== undefined && Array.isArray((model as M & { children: M[] }).children)
+  );
+};
+
 export const isBudgetForm = (obj: Model.Entity | Model.SimpleEntity): obj is Model.BudgetForm => {
   return (obj as Model.BudgetForm).type === "budget";
 };

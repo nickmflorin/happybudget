@@ -1,3 +1,4 @@
+import React from "react";
 import moment from "moment-timezone";
 import { isNil } from "lodash";
 
@@ -28,4 +29,4 @@ const TimezoneSelect: React.FC<TimezoneSelectProps> = ({ placeholder = "Time Zon
   );
 };
 
-export default TimezoneSelect;
+export default React.memo(TimezoneSelect);

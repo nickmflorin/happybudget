@@ -6,7 +6,7 @@ import { uniqueId, isNil } from "lodash";
 import { Dropdown as AntdDropdown } from "antd";
 import { DropDownProps as AntdDropdownProps } from "antd/lib/dropdown";
 
-import { Menu } from "components";
+import { Menu } from "components/menus";
 import { util } from "lib";
 
 interface BaseDropdownProps extends Omit<AntdDropdownProps, "overlay"> {
@@ -14,19 +14,19 @@ interface BaseDropdownProps extends Omit<AntdDropdownProps, "overlay"> {
   readonly children: React.ReactChild | React.ReactChild[];
 }
 
-interface DropdownOverlayProps extends BaseDropdownProps {
+export interface DropdownOverlayProps extends BaseDropdownProps {
   readonly overlay: React.ReactElement | (() => React.ReactElement);
 }
 
-interface DropdownMenuItemsProps extends BaseDropdownProps {
+export interface DropdownMenuItemsProps extends BaseDropdownProps {
   readonly menuProps?: StandardComponentProps;
-  readonly menuItems: IMenuItem[];
+  readonly menuItems: MenuItemModel[];
   readonly menuMode?: "single" | "multiple";
-  readonly menuButtons?: IMenuButton[];
+  readonly menuButtons?: IMenuButton<MenuItemModel>[];
   readonly menuCheckbox?: boolean;
   readonly menuDefaultSelected?: MenuItemId[];
   readonly menuSelected?: MenuItemId[];
-  readonly onChange?: (params: IMenuChangeParams) => void;
+  readonly onChange?: (params: MenuChangeEvent<MenuItemModel>) => void;
 }
 
 export type DropdownProps = DropdownOverlayProps | DropdownMenuItemsProps;
@@ -73,10 +73,10 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
             {isPropsWithOverlay(props) ? (
               props.overlay
             ) : (
-              <Menu.Expanded
+              <Menu
                 {...props.menuProps}
                 onChange={props.onChange}
-                items={props.menuItems}
+                models={props.menuItems}
                 mode={props.menuMode}
                 checkbox={props.menuCheckbox}
                 buttons={props.menuButtons}

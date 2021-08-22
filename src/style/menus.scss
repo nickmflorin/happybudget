@@ -22,62 +22,20 @@ $menu-border: 1px solid $menu-border-color;
   background-color: $white;
 }
 
-.menu-item-base {
+.menu-item {
   margin-top: 0px;
   color: $text-secondary !important;
   font-family: $roboto;
   font-weight: 400;
   min-width: 100px;
-  padding: 3px 12px;
+  padding: 4px 10px;
   font-size: 13px;
   line-height: 24px;
-  height: 30px;
+  height: 32px;
   margin-bottom: 0px !important;
-
-  &.ant-menu-item-selected {
-    background-color: $white;
-  }
-  &.selected {
-    background-color: #fbfbfb !important;
-  }
-  &:hover:not(.selected) {
-    background-color: #fbfbfb !important;
-  }
-  &.disabled {
-    cursor: not-allowed !important;
-    background-color: rgba(0, 0, 0, 0.04);
-  }
-}
-
-.menu-wrapper {
-  background-color: $white;
-  border: $menu-border;
-
-  .menu {
-    border: none !important;
-  }
-
-  .btn-container {
-    width: 100%;
-    padding: 8px;
-
-    > .btn--menu {
-      width: 100%;
-
-      &:not(:last-child) {
-        margin-bottom: 8px;
-      }
-    }
-  }
-}
-
-.menu {
-  @extend .menu-base;
-}
-
-.menu-item {
-  @extend .menu-item-base;
+  overflow-y: hidden;
   display: flex;
+  flex-direction: row;
 
   .ant-checkbox-wrapper {
     height: 24px !important;
@@ -95,13 +53,133 @@ $menu-border: 1px solid $menu-border-color;
   span.text-wrapper {
     font-family: $roboto;
     font-size: 13px;
-    color: $text-primary !important;
+    color: $text-secondary !important;
     line-height: 30px;
   }
 
   &.selected {
+    background-color: #fbfbfb !important;
     span.text-container {
       color: $text-primary !important;
+    }
+  }
+  &:focus:not(.selected),
+  &.focused:not(.selected),
+  &:hover:not(.selected) {
+    background-color: #fbfbfb !important;
+    span.text-container {
+      color: $text-primary !important;
+    }
+  }
+  &.disabled {
+    cursor: not-allowed !important;
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  &--extra {
+    font-size: 12px;
+    font-weight: 500 !important;
+    color: rgba(70, 70, 70, 0.85) !important;
+    text-transform: uppercase;
+
+    span.text-wrapper {
+      font-size: 12px;
+    }
+
+    &:hover,
+    &.focus {
+      cursor: default;
+    }
+  }
+}
+
+.menu {
+  @extend .menu-base;
+  border: $menu-border;
+  display: flex;
+  flex-direction: column;
+
+  .search-container {
+    padding: 6px;
+  }
+
+  .ul-wrapper {
+    overflow-y: scroll;
+    // The menu needs to have position relative so that we can detect where the
+    // children menu items are relative to the parent container, which is used
+    // for automatically scrolling them into view.
+    position: relative;
+
+    ul {
+      @extend .menu-base;
+      border: none !important;
+    }
+  }
+
+  .btn-container {
+    width: 100%;
+    padding: 8px;
+
+    > .btn--menu {
+      width: 100%;
+
+      &:not(:last-child) {
+        margin-bottom: 8px;
+      }
+    }
+  }
+
+  &.with-search {
+    .ul-wrapper {
+      height: calc(100% - 38px);
+    }
+  }
+
+  &.model-menu {
+    .menu-item {
+      font-family: $avenir;
+      font-weight: 400 !important;
+      margin-bottom: 0px !important;
+      justify-content: left;
+
+      &:first-child {
+        border-top: none !important;
+      }
+
+      &:hover,
+      &.focus,
+      &.focused {
+        background-color: rgb(33 150 243 / 45%) !important;
+      }
+      &.selected {
+        background-color: rgb(33 150 243 / 65%) !important;
+      }
+    }
+  }
+
+  &.table-menu {
+    max-height: 220px;
+  }
+
+  &.subaccount-item-tree-menu {
+    max-height: 320px;
+    overflow: auto;
+
+    .with-neuter-wrapper {
+      display: flex;
+
+      .icon-wrapper {
+        height: 24px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        svg {
+          height: 16px;
+          width: 16px;
+          margin-left: -15px;
+          margin-right: 10px;
+        }
+      }
     }
   }
 }
@@ -109,17 +187,4 @@ $menu-border: 1px solid $menu-border-color;
 .ag-theme-alpine .ag-popup-editor {
   @extend .dropdown-base;
   background-clip: unset !important;
-  border-color: $menu-border-color !important;
-  border: $menu-border !important;
-  box-shadow: none !important;
-
-  .ant-menu {
-    border-radius: 0px !important;
-
-    &.ant-menu-inline,
-    &.ant-menu-vertical,
-    &.ant-menu-vertical-left {
-      border-right: none !important;
-    }
-  }
 }

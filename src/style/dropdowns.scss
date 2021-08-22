@@ -1,7 +1,8 @@
 .dropdown-base {
-  border: none;
+  border: none !important;
   background-clip: padding-box !important;
-  background-color: $white;
+  background-color: $white !important;
+  box-shadow: none !important;
 }
 
 .ant-dropdown {

@@ -14,3 +14,7 @@ interface Window {
 type NonNullable<T> = Exclude<T, null | undefined>;
 
 type SingleOrArray<T> = T | T[];
+
+type NonNullRef<T> = {
+  readonly current: T;
+}

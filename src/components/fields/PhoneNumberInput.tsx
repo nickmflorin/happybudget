@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { isNil } from "lodash";
-
 import { util } from "lib";
 import Input, { InputProps } from "./Input";
 
@@ -39,4 +38,4 @@ const PhoneNumberInput = ({ displayFormattedValue = true, onChange, ...props }: 
   );
 };
 
-export default PhoneNumberInput;
+export default React.memo(PhoneNumberInput);

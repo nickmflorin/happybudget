@@ -1,10 +1,10 @@
 import { forwardRef } from "react";
-import { isNil } from "lodash";
 
 import { useContacts } from "store/hooks";
 import { Icon } from "components";
 import { framework } from "components/tabling/generic";
-import { ExpandedModelTagEditor } from "components/tabling/generic/framework/editors";
+
+import { ModelTagEditor } from "./generic";
 
 interface ContactEditorProps extends Table.EditorParams<Tables.SubAccountRow, Model.SubAccount> {
   readonly onNewContact: (params: {
@@ -21,22 +21,23 @@ const ContactEditor = (props: ContactEditorProps, ref: any) => {
   });
 
   return (
-    <ExpandedModelTagEditor<Model.Contact, number>
+    <ModelTagEditor<Model.Contact, number>
       editor={editor}
       style={{ width: 160 }}
       selected={editor.value}
-      menuRef={editor.menuRef}
       models={contacts}
-      onChange={(m: Model.Contact, e: Table.CellDoneEditingEvent) => editor.onChange(m.id, e)}
+      onChange={(e: MenuChangeEvent<Model.Contact>) => editor.onChange(e.model.id, e.event)}
       searchIndices={["first_name", "last_name"]}
       tagProps={{ color: "#EFEFEF", textColor: "#2182e4", modelTextField: "full_name", className: "tag--contact" }}
       extra={[
         {
+          id: "add-contact",
           onClick: () => {
             const row: Tables.SubAccountRow = props.node.data;
-            if (!isNil(editor.menuRef.current) && editor.menuRef.current.searchValue !== "") {
+            const searchValue = editor.getSearchValue();
+            if (searchValue !== "") {
               props.onNewContact({
-                name: editor.menuRef.current.searchValue,
+                name: searchValue,
                 change: {
                   oldValue: row.contact || null,
                   field: props.column.field,
@@ -57,8 +58,8 @@ const ContactEditor = (props: ContactEditorProps, ref: any) => {
               });
             }
           },
-          text: "Add Contact",
-          icon: <Icon icon={"plus"} weight={"light"} />,
+          label: "Add Contact",
+          icon: <Icon icon={"plus-circle"} weight={"solid"} green={true} />,
           showOnNoSearchResults: true,
           showOnNoData: true,
           focusOnNoSearchResults: true,

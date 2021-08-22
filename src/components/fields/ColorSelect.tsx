@@ -50,4 +50,4 @@ const ColorSelect: React.FC<ColorSelectProps> = ({
   );
 };
 
-export default ColorSelect;
+export default React.memo(ColorSelect);

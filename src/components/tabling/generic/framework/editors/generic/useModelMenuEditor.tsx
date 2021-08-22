@@ -1,41 +1,33 @@
-import { RefObject, useRef, useImperativeHandle, useState, useEffect, useMemo } from "react";
+import { RefObject, useImperativeHandle, useState, useEffect, useMemo } from "react";
 import { isNil } from "lodash";
 
-import { hooks, tabling } from "lib";
+import { hooks, tabling, ui } from "lib";
 
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-export interface IEditor<C extends Model.Model, V = C> {
-  onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
-  isFirstRender: boolean;
-  value: V | null;
-  changedEvent: Table.CellDoneEditingEvent | null;
-  menuRef: RefObject<ExpandedModelMenuRef<C>>;
-  menu: ExpandedModelMenuRef<C> | null;
-}
+export type IEditor<C extends Model.Model, V = C> = IMenuRef<C> & {
+  readonly onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
+  readonly isFirstRender: boolean;
+  readonly value: V | null;
+  readonly changedEvent: Table.CellDoneEditingEvent | null;
+  readonly menu: NonNullRef<IMenuRef<C>>;
+};
 
 interface UseModelMenuEditorParams<R extends Table.Row, M extends Model.Model, V> extends Table.EditorParams<R, M> {
-  value: V | null;
-  forwardedRef: RefObject<any>;
-  menuRef?: RefObject<ExpandedModelMenuRef<any>>;
+  readonly value: V | null;
+  readonly forwardedRef: RefObject<any>;
 }
 
 const useModelMenuEditor = <R extends Table.Row, M extends Model.Model, C extends Model.Model, V = C>(
   params: UseModelMenuEditorParams<R, M, V>
 ): [IEditor<C, V>] => {
-  const _menuRef = useRef<ExpandedModelMenuRef<C>>(null);
+  const menu = ui.hooks.useMenu<C>();
+
   const isFirstRender = hooks.useTrackFirstRender();
   const [value, setValue] = useState<V | null>(params.value);
   const [changedEvent, setChangedEvent] = useState<Table.CellDoneEditingEvent | null>(null);
   const [stopEditingOnChangeEvent, setStopEditingOnChangeEvent] = useState(true);
-
-  const menuRef = useMemo(() => {
-    if (!isNil(params.menuRef)) {
-      return params.menuRef;
-    }
-    return _menuRef;
-  }, [params.menuRef]);
 
   useEffect(() => {
     setChangedEvent(null);
@@ -65,35 +57,27 @@ const useModelMenuEditor = <R extends Table.Row, M extends Model.Model, C extend
 
   useEffect(() => {
     if (!isNil(params.charPress)) {
-      const menuRefObj = menuRef.current;
-      if (!isNil(menuRefObj)) {
-        menuRefObj.focusSearch(true, params.charPress);
-        return () => {
-          menuRefObj.focusSearch(false);
-        };
-      }
+      menu.current.focusSearch(true, params.charPress);
     } else {
-      const menuRefObj = menuRef.current;
-      if (!isNil(menuRefObj)) {
-        menuRefObj.focusSearch(true, "");
-      }
+      menu.current.focusSearch(true, "");
     }
   }, [params.charPress]);
 
   const wrapEditor = useMemo(() => {
     return {
-      menuRef,
-      menu: menuRef.current,
       isFirstRender,
+      menu,
       value,
       changedEvent,
+      ...menu.current,
+      focusSearch: menu.current.focusSearch,
       onChange: (model: V | null, e: Table.CellDoneEditingEvent, stopEditing = true) => {
         setStopEditingOnChangeEvent(stopEditing);
         setValue(model);
         setChangedEvent(e);
       }
     };
-  }, [value]);
+  }, [value, menu.current]);
 
   useImperativeHandle(params.forwardedRef, () => {
     return {

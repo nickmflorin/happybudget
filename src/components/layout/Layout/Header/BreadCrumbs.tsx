@@ -98,11 +98,11 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
           onClickAway={() => setDropdownVisible(false)}
           menuDefaultSelected={[item.id]}
           menuItems={map(
-            orderBy(item.options, (obj: IMenuItem) => obj.id),
-            (obj: IMenuItem) => ({
+            orderBy(item.options, (obj: MenuItemModel) => obj.id),
+            (obj: MenuItemModel) => ({
               ...obj,
               renderContent: () => renderItem(obj),
-              onClick: (e: React.MouseEvent<HTMLLIElement>) => {
+              onClick: (e: Table.CellDoneEditingEvent) => {
                 setDropdownVisible(false);
                 obj.onClick?.(e);
               }

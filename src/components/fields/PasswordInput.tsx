@@ -1,20 +1,19 @@
+import React from "react";
 import { Input as AntDInput } from "antd";
 import { InputProps as AntDInputProps } from "antd/lib/input";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLock } from "@fortawesome/pro-regular-svg-icons";
-
 import classNames from "classnames";
+
+import { Icon } from "components";
 
 export type PasswordInputProps = AntDInputProps;
 
 const PasswordInput = (props: PasswordInputProps): JSX.Element => (
   <AntDInput.Password
     placeholder={"Passsword"}
-    prefix={<FontAwesomeIcon icon={faLock} className={"icon"} />}
+    prefix={<Icon icon={"lock"} />}
     {...props}
     className={classNames("input", "input--password", props.className)}
   />
 );
 
-export default PasswordInput;
+export default React.memo(PasswordInput);

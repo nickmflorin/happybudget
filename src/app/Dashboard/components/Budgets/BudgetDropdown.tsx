@@ -18,7 +18,6 @@ const BudgetDropdown: React.FC<BudgetDropdownProps> = ({ children, onNewBudget }
         }
       ]}
       placement={"bottomLeft"}
-      trigger={["click"]}
     >
       {children}
     </Dropdown>

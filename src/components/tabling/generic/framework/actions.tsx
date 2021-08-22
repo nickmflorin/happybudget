@@ -1,7 +1,6 @@
-import { filter, map, includes } from "lodash";
-
+import { map, filter } from "lodash";
 import { util } from "lib";
-import { Dropdown } from "components";
+import { ExportCSVDropdown, ToggleColumnsDropdown } from "components/dropdowns";
 
 export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
   table: Table.Table<R, M>,
@@ -12,31 +11,24 @@ export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
   text: "Export CSV",
   icon: "file-csv",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
-    const exportableColumns = filter(params.columns, (col: Table.Column<R, M>) => col.canBeExported !== false);
     return (
-      <Dropdown
-        menuMode={"multiple"}
-        menuCheckbox={true}
-        menuDefaultSelected={params.hiddenColumns as MenuItemId[]}
-        menuItems={map(exportableColumns, (col: Table.Column<R, M>) => ({
-          id: col.field as string,
-          label: col.headerName || ""
-        }))}
-        menuButtons={[
-          {
-            onClick: (state: IMenuState) => {
-              if (state.selected.length !== 0) {
-                const csvData = table.getCSVData(state.selected as string[]);
-                util.files.downloadAsCsvFile(exportFileName, csvData);
-              }
-            },
-            text: "Download",
-            className: "btn btn--primary"
+      <ExportCSVDropdown<R, M>
+        columns={params.columns}
+        hiddenColumns={params.hiddenColumns}
+        onDownload={(state: IMenuItemState<MenuItemModel>[]) => {
+          if (state.length !== 0) {
+            const selectedStates = filter(
+              state,
+              (s: IMenuItemState<MenuItemModel>) => s.selected === true
+            ) as IMenuItemState<MenuItemModel>[];
+            const selectedIds = map(selectedStates, (s: IMenuItemState<MenuItemModel>) => String(s.model.id));
+            const csvData = table.getCSVData(selectedIds);
+            util.files.downloadAsCsvFile(exportFileName, csvData);
           }
-        ]}
+        }}
       >
         {children}
-      </Dropdown>
+      </ExportCSVDropdown>
     );
   }
 });
@@ -49,25 +41,16 @@ export const ToggleColumnAction = <R extends Table.Row, M extends Model.Model>(
   text: "Columns",
   icon: "line-columns",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
-    const hideableColumns = filter(params.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false);
     return (
-      <Dropdown
-        menuMode={"multiple"}
-        menuCheckbox={true}
-        menuSelected={map(
-          filter(hideableColumns, (col: Table.Column<R, M>) => !includes(params.hiddenColumns, col.field)),
-          (col: Table.Column<R, M>) => col.field as string
-        )}
-        menuItems={map(hideableColumns, (col: Table.Column<R, M>) => ({
-          id: col.field as string,
-          label: col.headerName || ""
-        }))}
-        onChange={(p: IMenuChangeParams) =>
-          table.changeColumnVisibility({ field: p.change.id as Table.Field<R, M>, visible: p.change.selected })
+      <ToggleColumnsDropdown
+        hiddenColumns={params.hiddenColumns}
+        columns={params.columns}
+        onChange={(p: MenuChangeEvent<MenuItemModel>) =>
+          table.changeColumnVisibility({ field: p.model.id as Table.Field<R, M>, visible: p.selected })
         }
       >
         {children}
-      </Dropdown>
+      </ToggleColumnsDropdown>
     );
   }
 });

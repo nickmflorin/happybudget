@@ -8,7 +8,7 @@ import { BudgetCardImage } from "components/layout/Layout/images";
 import "./index.scss";
 
 interface CardProps extends StandardComponentProps {
-  dropdown?: IMenuItem[];
+  dropdown?: MenuItemModel[];
   title: string;
   subTitle?: string;
   image: SavedImage | null;

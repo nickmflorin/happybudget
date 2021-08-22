@@ -9,4 +9,5 @@ const Input = (props: InputProps, ref: React.ForwardedRef<AntDInput>): JSX.Eleme
   <AntDInput {...props} ref={ref} className={classNames("input", props.className)} />
 );
 
-export default forwardRef(Input);
+const ForwardRefInput = forwardRef(Input);
+export default React.memo(ForwardRefInput);

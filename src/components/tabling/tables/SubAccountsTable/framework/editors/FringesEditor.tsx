@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { isNil, filter, map } from "lodash";
 
 import { Icon } from "components";
-import { ExpandedModelTagsMenu } from "components/menus";
+import { ModelTagsMenu } from "components/menus";
 import { framework } from "components/tabling/generic";
 
 // It is not ideal that we are importing part of the store in a generalized components
@@ -58,27 +58,33 @@ const FringesEditor = (props: FringesEditorProps, ref: any) => {
   });
 
   return (
-    <ExpandedModelTagsMenu<Model.Fringe>
+    <ModelTagsMenu<Model.Fringe>
       style={{ minWidth: 220 }}
-      highlightActive={false}
       checkbox={true}
-      multiple={true}
+      mode={"multiple"}
+      menu={editor.menu}
+      includeSearch={true}
       selected={map(editor.value, (v: Model.Fringe) => v.id)}
       models={filter(fringes, (fringe: Model.Fringe) => !isNil(fringe.name) && fringe.name.trim() !== "")}
-      onChange={(ms: Model.Fringe[], e: Table.CellDoneEditingEvent) => editor.onChange(ms, e, false)}
-      menuRef={editor.menuRef}
+      onChange={(e: MenuChangeEvent<Model.Fringe>) => {
+        const selectedStates = filter(
+          e.state,
+          (s: IMenuItemState<Model.Fringe>) => s.selected === true
+        ) as IMenuItemState<Model.Fringe>[];
+        const ms = map(selectedStates, (s: IMenuItemState<Model.Fringe>) => s.model);
+        editor.onChange(ms, e.event, false);
+      }}
       searchIndices={["name"]}
       focusSearchOnCharPress={true}
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}
       autoFocusMenu={true}
-      leftAlign={true}
-      fillWidth={false}
       extra={[
         {
+          id: "add-fringes",
           onClick: () => props.onAddFringes(),
-          text: "Add Fringes",
-          icon: <Icon icon={"plus"} weight={"light"} />,
+          label: "Add Fringes",
+          icon: <Icon icon={"plus-circle"} weight={"solid"} green={true} />,
           showOnNoSearchResults: true,
           showOnNoData: true,
           focusOnNoSearchResults: true,

@@ -39,7 +39,7 @@ const PrivateTableMenu = <R extends Table.Row, M extends Model.Model>({
   rowHasCheckboxSelection
 }: Omit<TableMenuProps<R, M>, "menuPortalId"> & { readonly detached: boolean }) => (
   /* eslint-disable indent */
-  <div className={classNames("table-menu", { detached })}>
+  <div className={classNames("table-action-menu", { detached })}>
     <div className={"table-menu-left"}>
       <Tooltip title={"Select All"} placement={"bottom"}>
         <Checkbox

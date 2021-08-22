@@ -1,4 +1,4 @@
-import { useRef, forwardRef } from "react";
+import { forwardRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
 
@@ -28,29 +28,28 @@ const SubAccountsTreeEditor = ({ setSearch, ...props }: SubAccountsTreeEditorPro
   const subAccountsTree = useSelector(selectSubAccountsTree);
   const search = useSelector(selectSubAccountsTreeSearch);
   const loading = useSelector(selectSubAccountsTreeLoading);
-  const menuRef = useRef<ExpandedModelMenuRef<Model.SubAccountTreeNode>>(null);
 
   const [editor] = framework.editors.useModelMenuEditor<Tables.ActualRow, Model.Actual, Model.SimpleSubAccount>({
     ...props,
-    menuRef,
     forwardedRef: ref
   });
 
   return (
     <SubAccountTreeMenu
       style={{ minWidth: 200, maxWidth: 300 }}
-      menuLoading={loading}
+      loading={loading}
       onSearch={(v: string) => setSearch(v)}
       search={search}
       selected={!isNil(editor.value) ? editor.value.id : null}
       nodes={subAccountsTree}
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}
+      includeSearch={true}
       autoFocusMenu={true}
       onChange={(m: Model.SimpleSubAccount, e: Table.CellDoneEditingEvent) => {
         editor.onChange(m, e);
       }}
-      menuRef={menuRef}
+      ref={editor.menu as NonNullRef<IMenuRef<Model.SubAccountTreeNode>>}
       focusSearchOnCharPress={true}
     />
   );

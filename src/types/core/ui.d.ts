@@ -17,16 +17,6 @@ type FieldOrder<T = string> = {
 };
 type FieldOrdering<T = string> = FieldOrder<T>[];
 
-interface Field {
-  id: string;
-  label: string;
-}
-
-interface FieldCheck {
-  id: string;
-  checked: boolean;
-}
-
 type LayoutClassNameParams = {
   "expanded-layout": boolean,
   "collapsed-layout": boolean,
@@ -92,51 +82,125 @@ interface IBreadCrumbItem {
   readonly tooltip?: Tooltip;
   readonly text?: string;
   readonly render?: (params: IBreadCrumbItemRenderParams) => React.ReactChild;
-  readonly options?: IMenuItem[];
+  readonly options?: MenuItemModel[];
   readonly visible?: boolean;
   readonly primary?: boolean;
 }
 
 type MenuItemId = string | number;
-type IMenuItemState = {
-  readonly id: MenuItemId;
+type MenuMode = "single" | "multiple";
+
+type IMenuItemState<M extends MenuItemModel> = {
+  readonly model: M;
   readonly selected: boolean;
 }
 
-interface IMenuItem extends StandardComponentProps {
-  readonly id: MenuItemId;
-  readonly url?: string;
+type MenuItemClickEvent<M extends MenuItemModel> = {
+  readonly model: M;
+  readonly event: Table.CellDoneEditingEvent;
+}
+
+type MenuChangeEvent<M extends MenuItemModel> = MenuItemClickEvent<M> & {
+  readonly selected: boolean;
+  readonly state: IMenuItemState<M>[];
+}
+
+type MenuButtonClickEvent<M extends MenuItemModel> = {
+  readonly state: IMenuItemState<M>[];
+}
+
+type MenuItemModel = Model.M & {
   readonly label?: string;
-  readonly loading?: boolean;
   readonly icon?: IconOrElement;
-  readonly checked?: boolean;
+  readonly loading?: boolean;
+  readonly url?: string;
   readonly visible?: boolean;
-  readonly onClick?: (e: import("react").MouseEvent<HTMLLIElement>) => void;
-  readonly renderContent?: () => import("react").ReactNode;
+  readonly disabled?: boolean;
+  readonly onClick?: (e: Table.CellDoneEditingEvent) => void;
 }
 
-type IMenuState = {
-  readonly selected: MenuItemId[];
-  readonly state: IMenuItemState[];
-}
-
-type IMenuChangeParams = IMenuState & {
-  readonly change: IMenuItemState;
-}
-
-type IMenuRef = {
-  readonly getState: () => IMenuState;
-}
-
-type IMenu = StandardComponentProps & IMenuState & {
-  readonly onChange?: (params: IMenuChangeParams) => void;
+type ExtraMenuItemModel = MenuItemModel & {
+  readonly showOnNoSearchResults?: boolean;
+  readonly focusOnNoSearchResults?: boolean;
+  readonly leaveAtBottom?: boolean;
+  readonly showOnNoData?: boolean;
+  readonly focusOnNoData?: boolean;
 };
 
-interface IMenuButton {
+interface ICommonMenuItem<M extends MenuItemModel> extends Omit<StandardComponentProps, "id"> {
+  readonly model: M;
+  readonly menuId: string;
+  readonly focused: boolean;
+  readonly onClick?: (params: MenuItemClickEvent<M>) => void;
+}
+
+interface IMenuItem<M extends MenuItemModel> extends Omit<StandardComponentProps, "id">, ICommonMenuItem<M> {
+  readonly level: number;
+  readonly selected: boolean;
+  readonly checkbox?: boolean;
+  readonly levelIndent?: number;
+  readonly bordersForLevels?: boolean;
+  readonly renderContent: (model: M, context: { level: number }) => JSX.Element;
+}
+
+type IExtraMenuItem = Omit<StandardComponentProps, "id"> & ICommonMenuItem<ExtraMenuItemModel>;
+
+type IMenu<M extends MenuItemModel> = StandardComponentProps & {
+  readonly models: M[];
+  readonly checkbox?: boolean;
+  readonly selected?: MenuItemId[] | null | undefined | MenuItemId;
+  readonly mode?: MenuMode;
+  readonly defaultSelected?: MenuItemId[] | MenuItemId;
+  readonly itemProps?: StandardComponentProps;
+  readonly levelIndent?: number;
+  readonly loading?: boolean;
+  readonly search?: string;
+  readonly includeSearch?: boolean;
+  readonly clientSearching?: boolean;
+  readonly focusSearchOnCharPress?: boolean;
+  readonly searchPlaceholder?: string;
+  readonly autoFocusMenu?: boolean;
+  readonly unfocusMenuOnSearchFocus?: boolean;
+  readonly buttons?: IMenuButton<M>[];
+  readonly defaultFocusFirstItem?: boolean;
+  readonly defaultFocusOnlyItem?: boolean;
+  readonly defaultFocusOnlyItemOnSearch?: boolean;
+  readonly searchIndices?: SearchIndicies | undefined;
+  readonly extra?: ExtraMenuItemModel[];
+  readonly unfocusMenuOnSearchFocus?: boolean;
+  readonly bordersForLevels?: boolean;
+  readonly onChange?: (params: MenuChangeEvent<M>) => void;
+  readonly onSearch?: (value: string) => void;
+  readonly getFirstSearchResult?: (models: M[]) => M | null;
+  readonly onFocusCallback?: (focused: boolean) => void;
+  readonly renderItemContent?: (model: M, context: { level: number }) => JSX.Element;
+};
+
+interface IMenuItems<M extends MenuItemModel> extends Omit<IMenuItem, "selected" | "focused"> {
+  readonly selected?: MenuItemId[];
+  readonly focusedIndex: number | null;
+  readonly checkbox?: boolean;
+  readonly indexMap: {[key in MenuItemId]: number};
+  readonly itemProps?: Omit<StandardComponentProps, "id">;
+  readonly onClick?: (params: MenuItemClickEvent<M>) => void;
+}
+
+type IMenuRef<M extends MenuItemModel> = {
+  readonly getState: () => IMenuItemState<M>[];
+  readonly getSearchValue: () => string;
+  readonly incrementFocusedIndex: () => void;
+  readonly decrementFocusedIndex: () => void;
+  readonly getModelAtFocusedIndex: () => M | null;
+  readonly performActionAtFocusedIndex: (e: KeyboardEvent) => void;
+  readonly focusSearch: (value: boolean, search?: string) => void;
+  readonly focusMenu: (value: boolean) => void;
+}
+
+interface IMenuButton<M extends MenuItemModel> {
   readonly text: string;
   readonly className?: string;
   readonly style?: React.CSSProperties;
-  readonly onClick?: (state: IMenuState) => void;
+  readonly onClick?: (state: MenuButtonClickEvent<M>) => void;
 }
 
 /**
@@ -151,6 +215,11 @@ interface ITag {
   readonly textColor?: string | undefined | null;
   readonly uppercase?: boolean;
   readonly text: string;
+}
+
+type PluralityWithModel<M extends Model.M = Model.M> = {
+  readonly isPlural?: boolean;
+  readonly model: M;
 }
 
 interface ITagRenderParams<S extends object = React.CSSProperties> {
@@ -190,22 +259,6 @@ type TagProps<M extends Model.M = Model.M, S extends object = React.CSSPropertie
   readonly contentRender?: (params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element;
 }
 
-interface VisibleEmptyTagProps extends StandardComponentProps {
-  readonly visible?: true;
-  readonly text: string;
-}
-
-interface InvisibleEmptyTagProps extends StandardComponentProps {
-  readonly visible: false;
-}
-
-type EmptyTagProps = VisibleEmptyTagProps | InvisibleEmptyTagProps;
-
-type PluralityWithModel<M extends Model.M = Model.M> = {
-  readonly isPlural?: boolean;
-  readonly model: M;
-}
-
 type MultipleTagsProps<M extends Model.M = Model.M> = StandardComponentProps & {
   // <Tag> components should be generated based on a set of provided models M.
   readonly models?: (M | PluralityWithModel<M>)[];
@@ -222,145 +275,16 @@ type MultipleTagsProps<M extends Model.M = Model.M> = StandardComponentProps & {
   readonly onMissing?: JSX.Element | EmptyTagProps;
 }
 
-type ModelMenuRef<M extends Model.M> = {
-  readonly incrementFocusedIndex: () => void;
-  readonly decrementFocusedIndex: () => void;
-  readonly focus: (value: boolean) => void;
-  readonly getModelAtFocusedIndex: () => M | null;
-  readonly performActionAtFocusedIndex: () => void;
-  readonly focused: boolean;
-};
-
-type IExtraModelMenuItem = {
-  readonly onClick?: (e: Table.CellDoneEditingEvent) => void;
+interface VisibleEmptyTagProps extends StandardComponentProps {
+  readonly visible?: true;
   readonly text: string;
-  readonly icon?: IconOrElement;
-  readonly showOnNoSearchResults?: boolean;
-  readonly focusOnNoSearchResults?: boolean;
-  readonly leaveAtBottom?: boolean;
-  readonly showOnNoData?: boolean;
-  readonly focusOnNoData?: boolean;
-};
-
-interface _ModelMenuProps<M extends Model.M> extends StandardComponentProps {
-  readonly loading?: boolean;
-  readonly models: M[];
-  readonly uppercase?: boolean;
-  readonly selected?: number | number[] | string | string[] | null;
-  readonly search?: string;
-  readonly fillWidth?: boolean;
-  readonly menuRef?: Ref<ModelMenuRef<M>>;
-  readonly highlightActive?: boolean;
-  readonly itemProps?: any;
-  readonly levelIndent?: number;
-  readonly clientSearching?: boolean;
-  readonly defaultFocusFirstItem?: boolean;
-  readonly defaultFocusOnlyItem?: boolean;
-  readonly defaultFocusOnlyItemOnSearch?: boolean;
-  readonly searchIndices?: (string[] | string)[] | undefined;
-  readonly visible?: number[];
-  readonly hidden?: number[];
-  readonly extra?: IExtraModelMenuItem[];
-  readonly autoFocus?: boolean;
-  readonly leftAlign?: boolean;
-  readonly bordersForLevels?: boolean;
-  readonly getFirstSearchResult?: (models: M[]) => M | null;
-  readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
-  readonly onFocusCallback?: (focused: boolean) => void;
 }
 
-interface SingleModelMenuProps<M extends Model.M> {
-  readonly onChange: (model: M, e: Table.CellDoneEditingEvent) => void;
-  readonly multiple?: false;
+interface InvisibleEmptyTagProps extends StandardComponentProps {
+  readonly visible: false;
 }
 
-interface MultipleModelMenuProps<M extends Model.M> {
-  readonly onChange: (models: M[], e: Table.CellDoneEditingEvent) => void;
-  readonly multiple: true;
-  readonly checkbox?: boolean;
-}
-
-interface ModelMenuItemProps<M extends Model.M> {
-  readonly menuId: number;
-  readonly model: M;
-  readonly selected: (number | string)[];
-  readonly checkbox: boolean;
-  readonly focusedIndex: number | null;
-  readonly level: number;
-  readonly levelIndent?: number;
-  readonly multiple: boolean;
-  readonly highlightActive: boolean | undefined;
-  readonly leftAlign: boolean | undefined;
-  readonly hidden: (string | number)[] | undefined;
-  readonly visible: (string | number)[] | undefined;
-  readonly indexMap: { [key: string]: number };
-  readonly itemProps?: any;
-  readonly bordersForLevels?: boolean;
-  // This is intentionally not named onClick because it conflicts with AntD's mechanics.
-  readonly onPress: (model: M, e: import("react").SyntheticEvent) => void;
-  readonly renderItem: (model: M, context: { level: number; index: number }) => JSX.Element;
-}
-
-interface ModelMenuItemsProps<M extends Model.M> extends Omit<ModelMenuItemProps<M>, "model"> {
-  readonly models: M[];
-}
-
-type ModelMenuProps<M extends Model.M> = _ModelMenuProps<M> &
-    (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
-
-interface _ModelTagsMenuProps<M extends Model.M> extends Omit<_ModelMenuProps<M>, "renderItem"> {
-  readonly tagProps?: Omit<TagProps<M>, "model" | "children">;
-}
-
-type ModelTagsMenuProps<M extends Model.M> = _ModelTagsMenuProps<M> &
-    (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
-
-type ExpandedModelMenuRef<M extends Model.M> = {
-  readonly focusSearch: (value: boolean, search?: string) => void;
-  readonly incrementMenuFocusedIndex: () => void;
-  readonly decrementMenuFocusedIndex: () => void;
-  readonly focusMenu: (value: boolean) => void;
-  readonly getModelAtMenuFocusedIndex: () => M | null;
-  readonly performActionAtMenuFocusedIndex: (e: KeyboardEvent) => void;
-  readonly menuFocused: boolean;
-  readonly searchValue: string;
-};
-
-interface _ExpandedModelMenuProps<M extends Model.M>
-  extends Omit<_ModelMenuProps<M>, "menuRef" | "loading" | "onFocusCallback" | "autoFocus"> {
-  readonly menuLoading?: boolean;
-  readonly menuProps?: StandardComponentProps;
-  readonly menuRef?: Ref<ExpandedModelMenuRef<M>>;
-  readonly focusSearchOnCharPress?: boolean;
-  readonly searchPlaceholder?: string;
-  readonly children?: ReactNode;
-  readonly autoFocusMenu?: boolean;
-  readonly unfocusMenuOnSearchFocus?: boolean;
-  readonly bordersForLevels?: boolean;
-  readonly onSearch?: (value: string) => void;
-}
-
-type ExpandedModelMenuProps<M extends Model.M> = _ExpandedModelMenuProps<M> &
-    (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
-
-interface _ExpandedModelTagsMenuProps<M extends Model.M> extends Omit<_ExpandedModelMenuProps<M>, "renderItem"> {
-  readonly tagProps?: Omit<TagProps<M>, "model" | "children">;
-}
-
-type ExpandedModelTagsMenuProps<M extends Model.M> = _ExpandedModelTagsMenuProps<M> &
-    (MultipleModelMenuProps<M> | SingleModelMenuProps<M>);
-
-interface SubAccountTreeMenuProps
-  extends Omit<
-    ExpandedModelMenuProps<Model.SubAccountTreeNode>,
-    "renderItem" | "models" | "multiple" | "onChange"
-  > {
-  readonly nodes: Model.Tree;
-  readonly onChange: (m: Model.SimpleSubAccount, e: Table.CellDoneEditingEvent) => void;
-  readonly onSearch: (value: string) => void;
-  readonly search: string;
-  readonly childrenDefaultVisible?: boolean;
-}
+type EmptyTagProps = VisibleEmptyTagProps | InvisibleEmptyTagProps;
 
 type Tooltip = Omit<Partial<import("antd/lib/tooltip").TooltipPropsWithTitle>, "title"> & { readonly title: string } | string;
 
