@@ -102,7 +102,7 @@ const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M>): JSX.Elem
             <Spinner size={16} />
           </VerticalFlexCenter>
         )}
-        <VerticalFlexCenter style={{ overflowX: "hidden" }}>
+        <VerticalFlexCenter>
           {!isNil(props.renderContent) ? (
             props.renderContent(props.model, { level: props.level })
           ) : (
