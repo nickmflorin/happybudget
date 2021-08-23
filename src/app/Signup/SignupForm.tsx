@@ -3,10 +3,9 @@ import classNames from "classnames";
 
 import { Form } from "components";
 import { PasswordInput, EmailInput, UserInput } from "components/fields";
-import { Button } from "components/buttons";
+import { Button, SocialButton } from "components/buttons";
 import { RouterLink } from "components/links";
 import { util } from "lib";
-import SocialButton from "../SocialButton";
 
 export interface ISignupFormValues {
   email: string;

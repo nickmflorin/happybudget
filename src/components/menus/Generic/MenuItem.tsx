@@ -62,7 +62,7 @@ export const ExtraMenuItem = (props: IExtraMenuItem): JSX.Element => {
             <Spinner size={16} />
           </VerticalFlexCenter>
         )}
-        <VerticalFlexCenter style={{ overflowX: "hidden" }}>
+        <VerticalFlexCenter>
           <span className={"text-wrapper"}>{props.model.label}</span>
         </VerticalFlexCenter>
       </React.Fragment>

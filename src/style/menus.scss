@@ -104,12 +104,6 @@ $menu-border: 1px solid $menu-border-color;
   }
 
   .ul-wrapper {
-    overflow-y: scroll;
-    // The menu needs to have position relative so that we can detect where the
-    // children menu items are relative to the parent container, which is used
-    // for automatically scrolling them into view.
-    position: relative;
-
     ul {
       @extend .menu-base;
       border: none !important;
@@ -159,6 +153,14 @@ $menu-border: 1px solid $menu-border-color;
 
   &.table-menu {
     max-height: 220px;
+
+    .ul-wrapper {
+      overflow-y: scroll;
+      // The menu needs to have position relative so that we can detect where the
+      // children menu items are relative to the parent container, which is used
+      // for automatically scrolling them into view.
+      position: relative;
+    }
   }
 
   &.subaccount-item-tree-menu {
