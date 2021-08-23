@@ -49,7 +49,7 @@ const SubAccountsTreeEditor = ({ setSearch, ...props }: SubAccountsTreeEditorPro
       onChange={(m: Model.SimpleSubAccount, e: Table.CellDoneEditingEvent) => {
         editor.onChange(m, e);
       }}
-      ref={editor.menu as NonNullRef<IMenuRef<Model.SubAccountTreeNode>>}
+      menu={editor.menu as NonNullRef<IMenuRef<Model.SubAccountTreeNode>>}
       focusSearchOnCharPress={true}
     />
   );

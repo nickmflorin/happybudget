@@ -172,13 +172,14 @@ $menu-border: 1px solid $menu-border-color;
 
       .icon-wrapper {
         height: 24px;
+        width: 24px;
         padding-top: 4px;
         padding-bottom: 4px;
 
         svg {
           height: 16px;
           width: 16px;
-          margin-left: -15px;
+          margin-left: -5px;
           margin-right: 10px;
         }
       }

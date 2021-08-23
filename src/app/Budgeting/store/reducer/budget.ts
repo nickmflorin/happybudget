@@ -1,5 +1,5 @@
 import { Reducer, combineReducers } from "redux";
-import { isNil, find, filter } from "lodash";
+import { isNil, find, filter, map, reduce } from "lodash";
 
 import { redux, util, tabling } from "lib";
 
@@ -119,15 +119,25 @@ const actualsRootReducer: Reducer<Redux.ModelListResponseStore<Model.Actual>, Re
       // Eventually, we will want to implement this - so we do not have to rely on waiting
       // for the response of the API request.
     } else if (tabling.typeguards.isRowDeleteEvent(event)) {
-      const ids = Array.isArray(event.payload) ? event.payload : [event.payload];
-      for (let i = 0; i < ids.length; i++) {
-        newState = {
-          ...newState,
-          /* eslint-disable no-loop-func */
-          data: filter(newState.data, (m: Model.Actual) => m.id !== ids[i]),
-          count: newState.count - 1
-        };
-      }
+      const ids = Array.isArray(event.payload.rows)
+        ? map(event.payload.rows, (row: Tables.ActualRow) => row.id)
+        : [event.payload.rows.id];
+
+      newState = reduce(
+        ids,
+        (s: Redux.ModelListResponseStore<Model.Actual>, id: number) => {
+          const m: Model.Actual | null = redux.reducers.modelFromState<Model.Actual>(action, newState.data, id);
+          if (!isNil(m)) {
+            return {
+              ...s,
+              data: filter(s.data, (mi: Model.Actual) => mi.id !== m.id),
+              count: s.count - 1
+            };
+          }
+          return s;
+        },
+        newState
+      );
     }
   }
   return newState;
