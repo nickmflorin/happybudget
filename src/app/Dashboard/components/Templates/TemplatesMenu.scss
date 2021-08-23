@@ -2,25 +2,20 @@
 
 .templates-menu {
   display: flex;
-  margin-bottom: 20px;
-  margin-right: 50px;
 
-  .extra-wrapper {
-    display: flex;
-
-    > * {
-      &:not(:last-child) {
-        margin-right: 8px;
-      }
+  > * {
+    &:not(:last-child) {
+      margin-right: 8px;
     }
   }
 
   .templates-menu-menu-wrapper {
     width: 240px;
+    margin-right: 24px;
 
     .templates-menu-menu {
       .templates-menu-menu-item {
-        padding: 10px !important;
+        padding: 6px !important;
         padding-left: 0px !important;
         padding-right: 0px !important;
         flex: unset;
