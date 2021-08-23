@@ -31,6 +31,8 @@ const ToggleColumnsDropdown = <R extends Table.Row, M extends Model.Model>(
     <Dropdown
       {...props}
       menuMode={"multiple"}
+      includeSearch={true}
+      searchIndices={["label"]}
       menuCheckbox={true}
       menuSelected={selected as string[]}
       menuItems={map(hideableColumns, (col: Table.Column<R, M>) => ({

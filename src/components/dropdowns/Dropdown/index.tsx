@@ -26,6 +26,8 @@ export interface DropdownMenuItemsProps extends BaseDropdownProps {
   readonly menuCheckbox?: boolean;
   readonly menuDefaultSelected?: MenuItemId[];
   readonly menuSelected?: MenuItemId[];
+  readonly includeSearch?: boolean;
+  readonly searchIndices?: SearchIndicies;
   readonly onChange?: (params: MenuChangeEvent<MenuItemModel>) => void;
 }
 
@@ -82,6 +84,8 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
                 buttons={props.menuButtons}
                 defaultSelected={props.menuDefaultSelected}
                 selected={props.menuSelected}
+                includeSearch={props.includeSearch}
+                searchIndices={props.searchIndices}
               />
             )}
           </React.Fragment>
