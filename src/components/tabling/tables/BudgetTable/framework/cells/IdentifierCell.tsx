@@ -2,9 +2,6 @@ import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { isNil, find } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-regular-svg-icons";
-
 import { IconButton } from "components/buttons";
 import { getGroupColorDefinition } from "lib/model/util";
 import { useDeepEqualMemo } from "lib/hooks";
@@ -83,13 +80,7 @@ const IdentifierCell = <R extends BudgetTable.Row, M extends Model.Model>({
             <IconButton
               className={"btn btn--edit-group"}
               size={"small"}
-              icon={
-                <FontAwesomeIcon
-                  color={colorDef.color}
-                  style={!isNil(colorDef.color) ? { color: colorDef.color } : {}}
-                  icon={faEdit}
-                />
-              }
+              icon={"edit"}
               onClick={() => !isNil(onGroupEdit) && onGroupEdit(group)}
               style={!isNil(colorDef.color) ? { color: colorDef.color } : {}}
             />

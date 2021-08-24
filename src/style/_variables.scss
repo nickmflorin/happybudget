@@ -1,3 +1,14 @@
+@import "~include-media/dist/_include-media.scss";
+
+$breakpoints: (
+  small: 320px,
+  medium: 480px,
+  large: 768px,
+  xl: 1024px,
+  xxl: 1200px,
+  xxxl: 1580px
+);
+
 // Generic Colors
 $red: #d73a49;
 $red-hover: #e2707b;
@@ -47,11 +58,19 @@ $link-color: #40a9ff;
 
 $table-border-color: #f8f8f8;
 
-.color {
-  &--green {
-    color: $green !important;
-  }
-  &--red {
-    color: $red !important;
-  }
-}
+$roboto: "Roboto", sans-serif;
+$avenir: "AvenirNext", sans-serif;
+
+// Layout
+$header-height: 50px;
+$header-background-color: $white;
+
+$app-background-color: $white;
+$sidebar-background-color: #fcfcfc;
+
+// Input Fields
+$input-border-radius: 8px;
+$input-small-border-radius: 4px;
+
+$menu-border-color: #efefef;
+$menu-border: 1px solid $menu-border-color;

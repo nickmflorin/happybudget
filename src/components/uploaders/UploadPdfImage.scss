@@ -1,6 +1,4 @@
-@import "style/colors";
-@import "style/variables";
-@import "style/typography";
+@import "style/_imports";
 
 .pdf-image-uploader {
   border: 1px dashed $gray-light;

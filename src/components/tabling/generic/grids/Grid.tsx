@@ -2,7 +2,8 @@ import React, { useMemo } from "react";
 import { map, reduce, isNil, includes } from "lodash";
 import classNames from "classnames";
 
-import { AgGridReact, AgGridReactProps } from "@ag-grid-community/react";
+import { AgGridReact } from "@ag-grid-community/react";
+import { AgGridReactProps } from "@ag-grid-community/react/lib/interfaces";
 import { AllModules, ColSpanParams } from "@ag-grid-enterprise/all-modules";
 import { ColDef, EditableCallbackParams, CellClassParams, RowClassParams } from "@ag-grid-community/core";
 
@@ -11,6 +12,7 @@ import { tabling, hooks } from "lib";
 import BaseFramework from "../framework";
 
 type OmitAGGridProps =
+  | "className"
   | "columnDefs"
   | "overlayNoRowsTemplate"
   | "overlayLoadingTemplate"
@@ -21,6 +23,7 @@ type OmitAGGridProps =
   | "rowData"
   | "getRowClass"
   | "rowClass"
+  | "getRowStyle"
   | "modules";
 
 type AGFramework = { [key: string]: React.ComponentType<any> };
@@ -42,6 +45,9 @@ export interface GridProps<R extends Table.Row, M extends Model.Model>
   readonly framework?: Table.Framework;
   readonly hiddenColumns: Table.Field<R, M>[];
   readonly rowClass?: Table.RowClassName;
+  readonly getRowStyle?: (params: RowClassParams) => {
+    [cssProperty: string]: string;
+  };
   readonly onChangeEvent?: (event: Table.ChangeEvent<R, M>) => void;
 }
 

@@ -1,6 +1,6 @@
-@import "./colors";
-@import "./typography";
+@import "./_imports";
 @import "./input";
+@import "./typography";
 @import "./layout";
 @import "./buttons";
 @import "./input";
@@ -133,4 +133,13 @@ form {
 
 svg {
   vertical-align: 0 !important;
+}
+
+.color {
+  &--green {
+    color: $green !important;
+  }
+  &--red {
+    color: $red !important;
+  }
 }

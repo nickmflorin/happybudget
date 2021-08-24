@@ -1,3 +1,5 @@
+@import "style/_imports";
+
 .comments-drawer-content {
   .comments-section {
     height: 100%;
@@ -37,7 +39,7 @@
       .text-container {
         margin-top: 25px;
         text-align: center;
-        font-family: "Open Sans JP", sans-serif;
+        font-family: $avenir;
         font-size: 13px;
         font-weight: 400;
         width: 130px;

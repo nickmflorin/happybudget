@@ -352,7 +352,7 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
       if (!isNil(apis)) {
         let runningIndex = 0;
         let noMoreRows = false;
-        let nextRowNode: RowNode | null = null;
+        let nextRowNode: RowNode | undefined = undefined;
 
         while (noMoreRows === false) {
           if (direction === "desc" && startingIndex - runningIndex < 0) {
@@ -555,7 +555,7 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
         let startRowIndex = Math.min(range.startRow.rowIndex, range.endRow.rowIndex);
         let endRowIndex = Math.max(range.startRow.rowIndex, range.endRow.rowIndex);
         for (let i = startRowIndex; i <= endRowIndex; i++) {
-          const node: RowNode | null = apis.grid.getDisplayedRowAtIndex(i);
+          const node: RowNode | undefined = apis.grid.getDisplayedRowAtIndex(i);
           if (!isNil(node)) {
             const row: R = node.data;
             /* eslint-disable no-loop-func */
@@ -912,7 +912,7 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
   const onCellFocused = hooks.useDynamicCallback((e: CellFocusedEvent) => {
     const getCellFromFocusedEvent = (event: CellFocusedEvent, col?: Table.Column<R, M>): Table.Cell<R, M> | null => {
       if (!isNil(apis) && !isNil(event.rowIndex) && !isNil(event.column)) {
-        const rowNode: RowNode | null = apis.grid.getDisplayedRowAtIndex(event.rowIndex);
+        const rowNode: RowNode | undefined = apis.grid.getDisplayedRowAtIndex(event.rowIndex);
         const column: Table.Column<R, M> | undefined = !isNil(col)
           ? col
           : find(localColumns, { field: event.column.getColId() } as any);

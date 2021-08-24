@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { SuppressKeyboardEventParams, Column } from "@ag-grid-community/core";
 
 import { tabling, model } from "lib";
-import { BudgetTable, BudgetTableProps } from "components/tabling";
+import BudgetTable, { BudgetTableProps } from "components/tabling/tables/BudgetTable";
 import { framework } from "components/tabling/generic";
 
 import Framework from "./framework";
@@ -13,7 +13,7 @@ type M = Model.SubAccount;
 
 type OmitTableProps = "levelType" | "cookieNames" | "getRowChildren" | "getRowLabel" | "showPageFooter";
 
-export interface GenericSubAccountsTableProps extends Omit<BudgetTableProps<R, M>, OmitTableProps> {
+export type GenericSubAccountsTableProps = Omit<BudgetTableProps<R, M>, OmitTableProps> & {
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
   readonly exportFileName: string;
   readonly categoryName: "Sub Account" | "Detail";
@@ -30,7 +30,7 @@ export interface GenericSubAccountsTableProps extends Omit<BudgetTableProps<R, M
   readonly levelType: "account" | "subaccount";
   readonly onEditFringes: () => void;
   readonly onEditGroup?: (group: Model.Group) => void;
-}
+};
 
 const GenericSubAccountsTable = ({
   /* eslint-disable indent */
@@ -47,7 +47,7 @@ const GenericSubAccountsTable = ({
   onEditGroup,
   ...props
 }: GenericSubAccountsTableProps): JSX.Element => {
-  const table = tabling.hooks.useBudgetTableIfNotDefined(props.table);
+  const table = tabling.hooks.useBudgetTableIfNotDefined<R, M>(props.table);
 
   return (
     <BudgetTable<R, M>

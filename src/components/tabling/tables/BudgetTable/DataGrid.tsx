@@ -47,7 +47,7 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
     return "";
   });
 
-  const getRowStyle = hooks.useDynamicCallback((params: RowClassParams) => {
+  const getRowStyle = hooks.useDynamicCallback((params: RowClassParams): { [key: string]: any } => {
     const row: R = params.node.data;
     if (row.meta.isGroupRow === true) {
       if (isNil(row.meta.group)) {
@@ -60,11 +60,22 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
         return {};
       }
       const colorDef = model.util.getGroupColorDefinition(group);
-      return {
-        color: !isNil(colorDef.color) ? `${colorDef.color} !important` : undefined,
-        backgroundColor: !isNil(colorDef.backgroundColor) ? `${colorDef.backgroundColor} !important` : undefined
-      };
+      if (!isNil(colorDef.color) && !isNil(colorDef.backgroundColor)) {
+        return {
+          color: `${colorDef.color} !important`,
+          backgroundColor: `${colorDef.backgroundColor} !important`
+        };
+      } else if (!isNil(colorDef.backgroundColor)) {
+        return {
+          backgroundColor: `${colorDef.backgroundColor} !important`
+        };
+      } else if (!isNil(colorDef.color)) {
+        return {
+          color: `${colorDef.color} !important`
+        };
+      }
     }
+    return {};
   });
 
   /**
@@ -75,7 +86,7 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
   const findRowsUpUntilFirstGroupFooterRow = hooks.useDynamicCallback((node: RowNode): RowNode[] => {
     const nodes: RowNode[] = [node];
     if (!isNil(apis)) {
-      let currentNode: RowNode | null = node;
+      let currentNode: RowNode | undefined = node;
       while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
         currentNode = apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
         if (!isNil(currentNode)) {
@@ -287,7 +298,7 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
     getCSVData: genericGrid.current.getCSVData,
     applyGroupColorChange: (group: Model.Group) => {
       if (!isNil(apis)) {
-        const node: RowNode | null = apis.grid.getRowNode(`group-${group.id}`);
+        const node: RowNode | undefined = apis.grid.getRowNode(`group-${group.id}`);
         if (!isNil(node)) {
           apis.grid.redrawRows({ rowNodes: [node] });
         }

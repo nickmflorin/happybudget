@@ -1,10 +1,7 @@
 import React from "react";
 import { isNil } from "lodash";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
-
-import { ShowHide } from "components";
+import { ShowHide, Icon } from "components";
 import { AccountCircleLink } from "components/links";
 import { SegmentedText } from "components/typography";
 import { model, util } from "lib";
@@ -41,7 +38,7 @@ const FieldChange = ({ event }: FieldAlterationProps): JSX.Element => {
       <SegmentedText.Segment blue>{event.field}</SegmentedText.Segment>
       <SegmentedText.Segment>{"from"}</SegmentedText.Segment>
       <SegmentedText.Segment bold>{event.old_value}</SegmentedText.Segment>
-      <FontAwesomeIcon className={"icon arrow-change"} icon={faArrowRight} />
+      <Icon className={"arrow-change"} icon={"arrow-right"} weight={"solid"} />
       {!isNil(event.content_object.identifier) && event.field !== "identifier" ? (
         <SegmentedText>
           <SegmentedText.Segment bold>{event.new_value}</SegmentedText.Segment>
