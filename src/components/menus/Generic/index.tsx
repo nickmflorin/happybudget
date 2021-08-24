@@ -95,10 +95,10 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   });
 
   const models = useMemo<M[]>(() => {
-    if (props.clientSearching === false) {
-      return _flattenedModels;
+    if (props.clientSearching === true) {
+      return _filteredModels;
     }
-    return _filteredModels;
+    return _flattenedModels;
   }, [hooks.useDeepEqualMemo(_filteredModels), hooks.useDeepEqualMemo(_flattenedModels), props.clientSearching]);
 
   const indexMap = useMemo<{ [key: string]: number }>(() => {
