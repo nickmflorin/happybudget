@@ -3,7 +3,7 @@
 .card-base {
   border-radius: 14px;
   position: relative;
-  height: 210px;
+  height: 214px;
   cursor: pointer;
 }
 
@@ -46,7 +46,7 @@
   .card-footer {
     position: absolute;
     top: 150px;
-    min-height: 64px;
+    min-height: 44px;
     width: 100%;
     padding-top: 12px;
     padding-bottom: 12px;
@@ -77,7 +77,11 @@
 
     &.title-only {
       height: 44px;
-      top: 170px;
+      top: 150px;
     }
   }
+}
+
+.my-templates .card {
+  height: 194px;
 }
