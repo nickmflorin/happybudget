@@ -6,7 +6,7 @@ import { ButtonProps as AntDButtonProps } from "antd/lib/button";
 import { isNil } from "lodash";
 
 import { ui } from "lib";
-import { TooltipWrapper, Spinner } from "components";
+import { TooltipWrapper, Spinner, ShowHide, Icon } from "components";
 
 export interface ButtonProps
   extends Omit<AntDButtonProps, "disabled" | "icon" | StandardComponentPropNames>,
@@ -14,6 +14,8 @@ export interface ButtonProps
     StandardComponentProps {
   readonly loading?: boolean;
   readonly showLoadingIndicatorOverIcon?: boolean;
+  readonly withDropdownCaret?: boolean;
+  readonly dropdownCaretState?: "open" | "closed" | undefined;
 }
 
 /**
@@ -67,6 +69,13 @@ const Button = (
       >
         {prefix}
         {children}
+        <ShowHide show={props.withDropdownCaret}>
+          <Icon
+            className={"caret"}
+            icon={props.dropdownCaretState === "open" ? "caret-up" : "caret-down"}
+            weight={"solid"}
+          />
+        </ShowHide>
       </AntDButton>
     </TooltipWrapper>
   );

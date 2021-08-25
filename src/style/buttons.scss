@@ -30,6 +30,12 @@
   .icon {
     cursor: pointer;
     margin-right: 8px;
+
+    &.caret {
+      margin-left: 6px;
+      padding-top: 1px;
+      padding-bottom: 1px;
+    }
   }
 }
 
@@ -416,66 +422,6 @@
     border-radius: 50px !important;
   }
 
-  &--caret {
-    background-color: $transparent;
-    border: none;
-    box-shadow: none;
-
-    .caret-button-inner {
-      display: flex;
-      width: 100%;
-      position: relative;
-
-      .caret-button-text {
-        font-family: $roboto;
-        font-weight: 400;
-        flex-grow: 100;
-        text-align: center;
-        margin-right: 10px;
-      }
-    }
-
-    @include bare_color_set($icon-color);
-
-    &:hover,
-    &:disabled,
-    &.disabled,
-    &.fake-disabled,
-    &:focus {
-      .caret-button-inner {
-        .caret-button-text {
-          color: lighten($icon-color, 20%);
-        }
-        .caret-button-caret {
-          .icon {
-            color: lighten($icon-color, 20%);
-          }
-        }
-      }
-    }
-
-    &.primary {
-      @include primary();
-
-      &:hover,
-      &:disabled,
-      &.disabled,
-      &.fake-disabled,
-      &:focus {
-        .caret-button-inner {
-          .caret-button-text {
-            color: $white !important;
-          }
-          .caret-button-caret {
-            .icon {
-              color: $white !important;
-            }
-          }
-        }
-      }
-    }
-  }
-
   &--clear-image {
     flex-direction: column;
     justify-content: center;
@@ -571,29 +517,6 @@
     }
   }
 
-  &--simple-caret {
-    border: none !important;
-    box-shadow: none !important;
-    min-width: 0px !important;
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-  }
-
-  &--entity-text {
-    border: none !important;
-    box-shadow: none !important;
-    min-width: 0px !important;
-    padding-left: 0px !important;
-    padding-right: 0px !important;
-
-    .entity-text-button-inner {
-      display: flex;
-      .entity-text-button-caret {
-        margin-left: 8px;
-      }
-    }
-  }
-
   &--bare {
     font-weight: 600;
     box-shadow: none !important;
@@ -601,6 +524,11 @@
     padding: 10px 12px;
     line-height: 16px;
     @include bare_color_set($text-secondary);
+  }
+
+  &--entity-text {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
   }
 
   &--budget-table-menu {
