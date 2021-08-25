@@ -66,9 +66,6 @@
   &:focus:not(:disabled):not(.disabled):not(.fake-disabled),
   &.hovered:not(:disabled):not(.disabled):not(.fake-disabled) {
     color: $c;
-    .icon {
-      color: $c;
-    }
   }
 }
 
@@ -77,9 +74,6 @@
   &.disabled,
   &.fake-disabled {
     color: $c;
-    .icon {
-      color: $c;
-    }
   }
 }
 
@@ -113,9 +107,6 @@
 
 @mixin color($c) {
   color: $c;
-  .icon {
-    color: $c;
-  }
 }
 
 @mixin bg_color($c) {
@@ -184,6 +175,7 @@
   .icon {
     height: 1.5rem;
     width: 1.5rem;
+    color: inherit;
   }
 
   &--black {
@@ -285,6 +277,7 @@
   .icon {
     height: 100% !important;
     width: auto !important;
+    color: inherit;
     @include transition(all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1));
   }
 
@@ -349,6 +342,7 @@
     flex-direction: column;
     justify-content: center;
     padding: 6px;
+    color: $icon-color;
 
     .icon {
       margin-right: 0px;
@@ -356,6 +350,12 @@
 
     @include bare_color_set($icon-color);
 
+    &.xxsmall {
+      padding: 10px;
+    }
+    &.xsmall {
+      padding: 9px;
+    }
     &.small {
       padding: 8px;
     }
@@ -372,15 +372,6 @@
 
     &.green-hover {
       @include green_on_hover();
-    }
-
-    // The color of the button is set dynamically based on the group color.
-    &--edit-group {
-      &:hover {
-        .icon {
-          color: #c7c7c7 !important;
-        }
-      }
     }
 
     &.ag-grid-expand-button {
@@ -410,6 +401,16 @@
         &:hover {
           background-color: transparent !important;
         }
+      }
+    }
+  }
+
+  // The color of the button is set dynamically based on the group color.
+  &--edit-group {
+    &:hover {
+      filter: brightness(95%);
+      .icon {
+        filter: brightness(95%);
       }
     }
   }

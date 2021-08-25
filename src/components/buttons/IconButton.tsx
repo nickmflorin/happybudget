@@ -3,7 +3,7 @@ import Button, { ButtonProps } from "./Button";
 
 export interface IconButtonProps extends Omit<ButtonProps, "size" | "icon" | "children"> {
   readonly icon: IconOrElement | ((params: ClickableIconCallbackParams) => IconOrElement);
-  readonly size?: "small" | "medium" | "large";
+  readonly size?: "small" | "medium" | "large" | "xsmall" | "xxsmall";
 }
 
 /**
@@ -16,7 +16,9 @@ const IconButton = ({ icon, size = "large", ...props }: IconButtonProps): JSX.El
     className={classNames("btn btn--icon-only", props.className, {
       medium: size === "medium",
       small: size === "small",
-      large: size === "large"
+      large: size === "large",
+      xxsmall: size === "xxsmall",
+      xsmall: size === "xsmall"
     })}
   />
 );

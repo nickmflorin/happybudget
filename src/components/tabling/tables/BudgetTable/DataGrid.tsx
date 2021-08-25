@@ -62,16 +62,16 @@ const BudgetDataGrid = <R extends BudgetTable.Row, M extends Model.Model>({
       const colorDef = model.util.getGroupColorDefinition(group);
       if (!isNil(colorDef.color) && !isNil(colorDef.backgroundColor)) {
         return {
-          color: `${colorDef.color} !important`,
-          backgroundColor: `${colorDef.backgroundColor} !important`
+          color: `${colorDef.color}`,
+          backgroundColor: `${colorDef.backgroundColor}`
         };
       } else if (!isNil(colorDef.backgroundColor)) {
         return {
-          backgroundColor: `${colorDef.backgroundColor} !important`
+          backgroundColor: `${colorDef.backgroundColor}`
         };
       } else if (!isNil(colorDef.color)) {
         return {
-          color: `${colorDef.color} !important`
+          color: `${colorDef.color}`
         };
       }
     }

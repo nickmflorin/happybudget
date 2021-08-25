@@ -79,7 +79,7 @@ const IdentifierCell = <R extends BudgetTable.Row, M extends Model.Model>({
             <span>{`${group.name} (${group.children.length} Line Items)`}</span>
             <IconButton
               className={"btn btn--edit-group"}
-              size={"small"}
+              size={"xsmall"}
               icon={"edit"}
               onClick={() => !isNil(onGroupEdit) && onGroupEdit(group)}
               style={!isNil(colorDef.color) ? { color: colorDef.color } : {}}
