@@ -38,7 +38,8 @@ const Layout = (props: LayoutProps): JSX.Element => {
       {!isNil(props.sidebar) && (
         <div className={classNames("sidebar-container", layoutClassNameProps)}>
           <Sidebar
-            {...props}
+            sidebar={props.sidebar}
+            collapsed={props.collapsed}
             className={classNames(layoutClassNameProps)}
             sidebarVisible={sidebarVisible}
             toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
@@ -47,8 +48,9 @@ const Layout = (props: LayoutProps): JSX.Element => {
       )}
       <div className={classNames("layout-content", layoutClassNameProps)}>
         <Header
-          {...props}
           {...props.headerProps}
+          collapsed={props.collapsed}
+          showHeaderLogo={props.showHeaderLogo}
           className={classNames(props.headerProps?.className, layoutClassNameProps)}
           sidebarVisible={sidebarVisible}
           toggleSidebar={() => setSidebarVisible(!sidebarVisible)}

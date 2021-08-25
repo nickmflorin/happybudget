@@ -66,7 +66,7 @@ const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty,
   }, [children]);
 
   return (
-    <div className={classNames("entity-text", className)} style={style}>
+    <span className={classNames("entity-text", className)} style={style}>
       {(!isNil(identifier) || !isNil(fillEmpty)) && (
         <EntityTextIdentifier fillEmpty={fillEmpty}>{identifier}</EntityTextIdentifier>
       )}
@@ -75,7 +75,7 @@ const EntityText: React.FC<EntityTextProps> = ({ children, className, fillEmpty,
           {description}
         </EntityTextDescription>
       )}
-    </div>
+    </span>
   );
 };
 

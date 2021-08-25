@@ -37,7 +37,7 @@ const Header = ({
       {...props}
       className={classNames("header", props.className, {
         "with-logo": showHeaderLogo,
-        "with-saving-changes": !isNil(saving)
+        "with-saving-changes": saving !== undefined
       })}
     >
       <div className={"primary-header"}>

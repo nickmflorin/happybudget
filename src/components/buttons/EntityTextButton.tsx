@@ -16,12 +16,10 @@ export interface EntityTextButtonProps
 const EntityTextButton = ({ children, fillEmpty, ...props }: EntityTextButtonProps, ref: any): JSX.Element => {
   return (
     <Button {...props} ref={ref} className={classNames("btn--entity-text", props.className)}>
-      <div className={"entity-text-button-inner"}>
-        <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
-        <VerticalFlexCenter className={"entity-text-button-caret"}>
-          <Icon icon={"caret-down"} weight={"solid"} />
-        </VerticalFlexCenter>
-      </div>
+      <EntityText fillEmpty={fillEmpty}>{children}</EntityText>
+      <VerticalFlexCenter className={"entity-text-button-caret"}>
+        <Icon icon={"caret-down"} weight={"solid"} />
+      </VerticalFlexCenter>
     </Button>
   );
 };

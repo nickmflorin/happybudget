@@ -9,11 +9,15 @@
         flex: 1;
       } @else {
         flex-grow: 100;
+        margin-right: 10px;
       }
     }
     .primary-header-center {
-      @if not $include_logo {
-        display: none;
+      display: none;
+      @if $include_logo {
+        display: flex;
+        margin-left: 10px;
+        margin-right: 10px;
       }
       @include media(">=xl") {
         display: none;
@@ -23,9 +27,16 @@
       @if $include_logo {
         flex: 1;
       }
-      @if not $include_saving_changes {
+      @if $include_saving_changes {
         .saving-changes {
-          display: none;
+          display: flex;
+        }
+        // If we are including the logo in the header, the saving-changes component
+        // takes up too much space so we must hide.
+        @if $include_logo {
+          .saving-changes {
+            display: none;
+          }
         }
       }
     }
@@ -33,29 +44,28 @@
 }
 
 .header {
-  @include primary_header_layout();
-
+  @include primary_header_layout(false, false);
+  &.with-saving-changes {
+    @include primary_header_layout(false, true);
+  }
   &.with-logo {
     @include primary_header_layout(true);
+    &.with-saving-changes {
+      @include primary_header_layout(true, true);
+    }
   }
 
   .primary-header {
     display: flex;
-    // justify-content: space-between;
-    // align-items: center;
     padding: 7px 0;
 
-    > * {
-      &:not(:last-child) {
-        margin-right: 10px;
-      }
-    }
-
     .primary-header-left {
-      // flex: 1;
       overflow-x: hidden;
-      // flex-grow: 100;
       display: flex;
+
+      #breadcrumbs {
+        overflow-x: hidden;
+      }
 
       .btn--sidebar-toggle {
         padding-left: 0;
@@ -92,15 +102,12 @@
     }
 
     .primary-header-right {
-      // flex: 1;
       display: flex;
       justify-content: flex-end;
-    }
-  }
 
-  &.sidebar-visible .primary-header-center {
-    .logo-link {
-      display: none;
+      .saving-changes {
+        display: none;
+      }
     }
   }
 

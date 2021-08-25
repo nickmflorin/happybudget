@@ -3,6 +3,7 @@
 .bread-crumbs {
   display: flex;
   height: 36px;
+  overflow-x: hidden;
 
   .slash {
     padding-top: 9px;
@@ -18,6 +19,10 @@
   .bread-crumb-item {
     display: flex;
     cursor: pointer;
+
+    &:last-child {
+      overflow-x: hidden;
+    }
 
     .select-wrapper {
       padding-top: 3px;
