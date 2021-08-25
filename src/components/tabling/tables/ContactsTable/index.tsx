@@ -30,7 +30,7 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
       framework={tabling.util.combineFrameworks(Framework, props.framework)}
       onRowExpand={(id: number) => onEditContact(id)}
       expandCellTooltip={"Edit"}
-      rowHeight={60}
+      rowHeight={52}
       actions={(params: Table.MenuActionParams<R, M>) => [
         {
           tooltip: "Delete",
