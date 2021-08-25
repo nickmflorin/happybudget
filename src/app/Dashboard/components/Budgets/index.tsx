@@ -52,7 +52,10 @@ const Budgets = (): JSX.Element => {
                 setDeleting(budget.id);
                 api
                   .deleteBudget(budget.id)
-                  .then(() => e.closeParentDropdown?.())
+                  .then(() => {
+                    e.closeParentDropdown?.();
+                    dispatch(actions.removeBudgetFromStateAction(budget.id));
+                  })
                   .catch((err: Error) => api.handleRequestError(err))
                   .finally(() => setDeleted(budget.id));
               }}
