@@ -9,15 +9,10 @@
     flex-direction: column;
 
     .page-header-title {
-      order: 2;
       flex-grow: 100;
 
-      @include media(">=xl") {
-        order: 1;
-
-        &.with-subtitle {
-          margin-bottom: 10px;
-        }
+      &.with-subtitle {
+        margin-bottom: 10px;
       }
 
       .title-text-wrapper {
@@ -38,15 +33,7 @@
     }
 
     .page-header-subtitle {
-      order: 1;
       display: flex;
-      margin-bottom: 10px;
-
-      @include media(">=xl") {
-        order: 2;
-        justify-content: flex-start;
-        margin-bottom: 0;
-      }
     }
   }
 

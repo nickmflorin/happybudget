@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { Dropdown, Icon, VerticalFlexCenter } from "components";
-import { Button } from "components/buttons";
+import { Icon } from "components";
+import { Button, CircleIconButton } from "components/buttons";
 import { SearchInput } from "components/fields";
 import { HorizontalMenu } from "components/menus";
 import { IHorizontalMenuItem } from "components/menus/HorizontalMenu";
 import { CreateBudgetModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
-import { useLoggedInUser } from "store/hooks";
 
 import { actions } from "../../store";
 import "./TemplatesMenu.scss";
@@ -31,8 +30,6 @@ const TemplatesMenu = (): JSX.Element => {
 
   const templatesSearch = useSelector(selectTemplatesSearch);
   const communitySearch = useSelector(selectCommunityTemplatesSearch);
-
-  const user = useLoggedInUser();
 
   useEffect(() => {
     if (location.pathname.startsWith("/templates")) {
@@ -57,7 +54,7 @@ const TemplatesMenu = (): JSX.Element => {
             ]}
           />
         </div>
-        <VerticalFlexCenter>
+        <div className={"template-sub-title"}>
           <SearchInput
             placeholder={"Search Templates..."}
             value={page === "my-templates" ? templatesSearch : communitySearch}
@@ -69,38 +66,25 @@ const TemplatesMenu = (): JSX.Element => {
               }
             }}
           />
-        </VerticalFlexCenter>
-        <VerticalFlexCenter>
-          <Dropdown
-            menuItems={[
-              {
-                id: "create-new-budget",
-                label: "Create New Budget",
-                icon: <Icon icon={"pencil"} weight={"light"} />,
-                onClick: () => setCreateBudgetModalOpen(true)
-              },
-              {
-                id: "create-new-template",
-                label: "Create New Template",
-                icon: <Icon icon={"pencil"} weight={"light"} />,
-                onClick: () => setCreateTempateModalOpen(true),
-                visible: page === "my-templates"
-              },
-              {
-                id: "create-new-community-template",
-                label: "Create New Community Template",
-                icon: <Icon icon={"pencil"} weight={"light"} />,
-                onClick: () => setCreateCommunityTempateModalOpen(true),
-                visible: page === "discover" && user.is_staff === true
-              }
-            ]}
-            placement={"bottomLeft"}
+          <TemplateDropdown
+            onCreateBudget={() => setCreateBudgetModalOpen(true)}
+            onCreateTemplate={() => setCreateTempateModalOpen(true)}
+            onCreateCommunityTemplate={() => setCreateCommunityTempateModalOpen(true)}
+            page={page}
           >
-            <Button className={"btn btn--primary"} icon={<Icon icon={"plus"} weight={"light"} />}>
+            <CircleIconButton className={"btn--primary"} icon={<Icon icon={"plus"} weight={"light"} />} />
+          </TemplateDropdown>
+          <TemplateDropdown
+            onCreateBudget={() => setCreateBudgetModalOpen(true)}
+            onCreateTemplate={() => setCreateTempateModalOpen(true)}
+            onCreateCommunityTemplate={() => setCreateCommunityTempateModalOpen(true)}
+            page={page}
+          >
+            <Button className={"btn--primary btn-non-circle"} icon={<Icon icon={"plus"} weight={"light"} />}>
               {"Create Budget"}
             </Button>
-          </Dropdown>
-        </VerticalFlexCenter>
+          </TemplateDropdown>
+        </div>
       </div>
 
       {createBudgetModalOpen === true && (

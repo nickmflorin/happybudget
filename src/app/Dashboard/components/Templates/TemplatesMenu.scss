@@ -2,6 +2,12 @@
 
 .templates-menu {
   display: flex;
+  flex-direction: column;
+  flex-grow: 100;
+
+  @include media(">=xl") {
+    flex-direction: row;
+  }
 
   > * {
     &:not(:last-child) {
@@ -11,7 +17,11 @@
 
   .templates-menu-menu-wrapper {
     width: 240px;
-    margin-right: 24px;
+    margin: 0 24px 10px 0;
+
+    @include media(">=xl") {
+      margin: 0 24px 0 0;
+    }
 
     .templates-menu-menu {
       .templates-menu-menu-item {
@@ -31,6 +41,37 @@
         &.horizontal-menu-item-selected {
           border-bottom: 2px solid $text-secondary;
         }
+      }
+    }
+  }
+
+  .template-sub-title {
+    display: flex;
+    flex-grow: 100;
+
+    .input {
+      margin-right: 10px;
+
+      @include media(">=xl") {
+        max-width: 300px;
+      }
+    }
+
+    .btn-non-circle {
+      display: none;
+
+      @include media(">=xl") {
+        display: inherit;
+      }
+    }
+
+    .btn--circle-icon {
+      @include media(">=xl") {
+        display: none;
+      }
+
+      .icon {
+        margin-right: 0;
       }
     }
   }
