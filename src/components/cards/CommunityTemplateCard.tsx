@@ -9,12 +9,12 @@ interface CommunityTemplateCardProps {
   duplicating: boolean;
   hidingOrShowing: boolean;
   deleting: boolean;
-  onToggleVisibility: () => void;
-  onDelete: () => void;
   onEdit: () => void;
   onEditNameImage: () => void;
   onClick: () => void;
-  onDuplicate: () => void;
+  onDuplicate: (e: MenuItemClickEvent<MenuItemModel>) => void;
+  onToggleVisibility: (e: MenuItemClickEvent<MenuItemModel>) => void;
+  onDelete: (e: MenuItemClickEvent<MenuItemModel>) => void;
 }
 
 const CommunityTemplateCard = ({
@@ -59,21 +59,21 @@ const CommunityTemplateCard = ({
                 id: "duplicate",
                 label: "Duplicate",
                 icon: <Icon icon={"clone"} weight={"light"} />,
-                onClick: () => onDuplicate(),
+                onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDuplicate(e),
                 loading: duplicating
               },
               {
                 id: "hide_show",
                 label: template.hidden === true ? "Show" : "Hide",
                 icon: <Icon weight={"light"} icon={template.hidden === true ? "eye" : "eye-slash"} />,
-                onClick: () => onToggleVisibility(),
+                onClick: (e: MenuItemClickEvent<MenuItemModel>) => onToggleVisibility(e),
                 loading: hidingOrShowing
               },
               {
                 id: "delete",
                 label: "Delete",
                 icon: <Icon icon={"trash"} weight={"light"} />,
-                onClick: () => onDelete(),
+                onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDelete(e),
                 loading: deleting
               }
             ]

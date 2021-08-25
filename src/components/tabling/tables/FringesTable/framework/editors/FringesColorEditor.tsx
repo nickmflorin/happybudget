@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 import { ColorSelect } from "components/fields";
-import { hooks } from "lib";
+import { ui } from "lib";
 
 // It is not ideal that we are importing part of the store in a generalized components
 // directory.  We should consider alternate solutions to this or potentially moving the
@@ -17,7 +17,7 @@ interface FringesColorEditorProps extends Table.EditorParams<Tables.FringeRow, M
 }
 
 const FringesColorEditor = (props: FringesColorEditorProps, ref: any) => {
-  const isFirstRender = hooks.useTrackFirstRender();
+  const isFirstRender = ui.hooks.useTrackFirstRender();
   const [value, setValue] = useState<string | null>(props.value);
   const colors = useSelector(selectFringeColors);
 

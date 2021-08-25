@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { Form as RootForm, Input } from "antd";
 
 import { RenderWithSpinner } from "components";
-import { hooks } from "lib";
+import { ui } from "lib";
 
 import Error from "./Error";
 import FieldError from "./FieldError";
@@ -143,7 +143,7 @@ const PrivateForm = <T extends { [key: string]: any } = any>(
   { globalError, loading, children, autoFocusField, ...props }: PrivateFormProps<T>,
   ref: any
 ): JSX.Element => {
-  const firstRender = hooks.useTrackFirstRender();
+  const firstRender = ui.hooks.useTrackFirstRender();
   const childrenArray = useMemo<JSX.Element[]>(() => {
     /*
     Under certain conditions, we want to auto focus the first field of a Form.

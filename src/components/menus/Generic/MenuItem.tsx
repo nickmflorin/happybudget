@@ -24,7 +24,7 @@ const PrivateCommonMenuItem = <M extends MenuItemModel>(
       className={classNames(
         "menu-item",
         {
-          disabled: props.model.disabled,
+          disabled: props.model.disabled || props.model.loading,
           focused: props.focused,
           "menu-item--extra": props.isExtra
         },
@@ -32,12 +32,14 @@ const PrivateCommonMenuItem = <M extends MenuItemModel>(
       )}
       style={props.style}
       onClick={(e: React.MouseEvent<HTMLLIElement>) => {
-        if (!isNil(props.model.url)) {
-          history.push(props.model.url);
-        }
-        props.onClick?.({ event: e, model: props.model });
-        if (props.model.keepDropdownOpenOnClick !== true) {
-          props.closeParentDropdown?.();
+        if (props.model.disabled !== true && props.model.loading !== true) {
+          if (!isNil(props.model.url)) {
+            history.push(props.model.url);
+          }
+          props.onClick?.({ event: e, model: props.model, closeParentDropdown: props.closeParentDropdown });
+          if (props.model.keepDropdownOpenOnClick !== true) {
+            props.closeParentDropdown?.();
+          }
         }
       }}
     >

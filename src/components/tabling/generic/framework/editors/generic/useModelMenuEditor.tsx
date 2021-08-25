@@ -24,7 +24,7 @@ const useModelMenuEditor = <R extends Table.Row, M extends Model.Model, C extend
 ): [IEditor<C, V>] => {
   const menu = ui.hooks.useMenu<C>();
 
-  const isFirstRender = hooks.useTrackFirstRender();
+  const isFirstRender = ui.hooks.useTrackFirstRender();
   const [value, setValue] = useState<V | null>(params.value);
   const [changedEvent, setChangedEvent] = useState<Table.CellDoneEditingEvent | null>(null);
   const [stopEditingOnChangeEvent, setStopEditingOnChangeEvent] = useState(true);

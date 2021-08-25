@@ -40,7 +40,7 @@ const isMenuUnfocusedState = (state: MenuState): state is MenuUnfocusedState => 
 };
 
 const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNullRef<IMenuRef<M>> }): JSX.Element => {
-  const firstRender = hooks.useTrackFirstRender();
+  const firstRender = ui.hooks.useTrackFirstRender();
   const searchRef = useRef<AntDInput>(null);
   const menu = ui.hooks.useMenuIfNotDefined<M>(props.menu);
   const menuId = useMemo(() => (!isNil(props.id) ? props.id : uniqueId("menu-")), [props.id]);
@@ -89,7 +89,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   }, [hooks.useDeepEqualMemo(props.models)]);
 
   // This will only perform searching if clientSearching is not false.
-  const _filteredModels = hooks.useDebouncedJSSearch<M>(search, _flattenedModels, {
+  const _filteredModels = ui.hooks.useDebouncedJSSearch<M>(search, _flattenedModels, {
     indices: props.searchIndices || ["id"],
     disabled: props.includeSearch !== true || props.clientSearching === false
   });
@@ -405,14 +405,15 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   });
 
   const onMenuItemClick = hooks.useDynamicCallback((m: M, e: Table.CellDoneEditingEvent) => {
-    m.onClick?.(e);
+    m.onClick?.({ event: e, model: m, closeParentDropdown: props.closeParentDropdown });
     if (mode === "single") {
       setSelected([m.id]);
       props.onChange?.({
         event: e,
         model: m,
         selected: true,
-        state: stateFromSelected([m.id])
+        state: stateFromSelected([m.id]),
+        closeParentDropdown: props.closeParentDropdown
       });
     } else {
       let newSelected: MenuItemId[];
@@ -429,7 +430,8 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
         event: e,
         model: m,
         selected: wasSelected,
-        state: stateFromSelected(newSelected)
+        state: stateFromSelected(newSelected),
+        closeParentDropdown: props.closeParentDropdown
       });
     }
   });
@@ -442,7 +444,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
           onMenuItemClick(item.model, event);
         } else {
           if (!isNil(item.extra.onClick)) {
-            item.extra.onClick(event);
+            item.extra.onClick({ event, model: item.extra, closeParentDropdown: props.closeParentDropdown });
           }
         }
       }

@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Dispatch } from "redux";
-import { includes, map, isNil } from "lodash";
+import { map, isNil } from "lodash";
+
+import * as api from "api";
+import { redux } from "lib";
 
 import { WrapInApplicationSpinner } from "components";
 import { CommunityTemplateCard } from "components/cards";
@@ -14,10 +17,6 @@ import { actions } from "../../store";
 
 const selectTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.data;
 const selectLoadingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.loading;
-const selectDuplicatingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.duplicating;
-const selectDeletingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.deleting;
-const selectHidingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.hiding;
-const selectShowingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.showing;
 
 interface DiscoverProps {
   setTemplateToDerive: (template: number) => void;
@@ -26,14 +25,13 @@ interface DiscoverProps {
 const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<Model.Template | undefined>(undefined);
   const user = useLoggedInUser();
+  const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
+  const [isTogglingVisibility, setTogglingVisibility, setVisibilityToggled] = redux.hooks.useTrackModelActions([]);
+  const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
 
   const dispatch: Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
   const loading = useSelector(selectLoadingTemplates);
-  const duplicating = useSelector(selectDuplicatingTemplates);
-  const deleting = useSelector(selectDeletingTemplates);
-  const showing = useSelector(selectShowingTemplates);
-  const hiding = useSelector(selectHidingTemplates);
 
   const history = useHistory();
 
@@ -58,39 +56,60 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
             const card = (
               <CommunityTemplateCard
                 template={template}
-                hidingOrShowing={
-                  includes(
-                    map(hiding, (instance: Redux.ModelListActionInstance) => instance.id),
-                    template.id
-                  ) ||
-                  includes(
-                    map(showing, (instance: Redux.ModelListActionInstance) => instance.id),
-                    template.id
-                  )
-                }
-                duplicating={includes(
-                  map(duplicating, (instance: Redux.ModelListActionInstance) => instance.id),
-                  template.id
-                )}
-                deleting={includes(
-                  map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
-                  template.id
-                )}
-                onToggleVisibility={() => {
+                hidingOrShowing={isTogglingVisibility(template.id)}
+                duplicating={isDuplicating(template.id)}
+                deleting={isDeleting(template.id)}
+                onToggleVisibility={(e: MenuItemClickEvent<MenuItemModel>) => {
                   if (user.is_staff === false) {
                     throw new Error("Behavior prohibited for non-staff users.");
                   }
                   if (template.hidden === true) {
-                    dispatch(actions.showCommunityTemplateAction(template.id));
+                    setTogglingVisibility(template.id);
+                    api
+                      .updateTemplate(template.id, { hidden: false })
+                      .then((response: Model.Template) => {
+                        dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
+                        e.closeParentDropdown?.();
+                      })
+                      .catch((err: Error) => api.handleRequestError(err))
+                      .finally(() => setVisibilityToggled(template.id));
                   } else {
-                    dispatch(actions.hideCommunityTemplateAction(template.id));
+                    setTogglingVisibility(template.id);
+                    api
+                      .updateTemplate(template.id, { hidden: true })
+                      .then((response: Model.Template) => {
+                        dispatch(actions.updateCommunityTemplateInStateAction({ id: template.id, data: response }));
+                        e.closeParentDropdown?.();
+                      })
+                      .catch((err: Error) => api.handleRequestError(err))
+                      .finally(() => setVisibilityToggled(template.id));
                   }
                 }}
                 onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                 onEditNameImage={() => setTemplateToEdit(template)}
-                onDelete={() => dispatch(actions.deleteCommunityTemplateAction(template.id))}
+                onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
+                  setDeleting(template.id);
+                  api
+                    .deleteTemplate(template.id)
+                    .then(() => {
+                      e.closeParentDropdown?.();
+                      dispatch(actions.removeCommunityTemplateFromStateAction(template.id));
+                    })
+                    .catch((err: Error) => api.handleRequestError(err))
+                    .finally(() => setDeleted(template.id));
+                }}
                 onClick={() => setTemplateToDerive(template.id)}
-                onDuplicate={() => dispatch(actions.duplicateCommunityTemplateAction(template.id))}
+                onDuplicate={(e: MenuItemClickEvent<MenuItemModel>) => {
+                  setDuplicating(template.id);
+                  api
+                    .duplicateTemplate(template.id)
+                    .then((response: Model.Template) => {
+                      e.closeParentDropdown?.();
+                      dispatch(actions.addCommunityTemplateToStateAction(response));
+                    })
+                    .catch((err: Error) => api.handleRequestError(err))
+                    .finally(() => setDuplicated(template.id));
+                }}
               />
             );
             if (template.hidden === true) {

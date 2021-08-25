@@ -95,6 +95,7 @@ type IMenuItemState<M extends MenuItemModel> = {
 type MenuItemClickEvent<M extends MenuItemModel> = {
   readonly model: M;
   readonly event: Table.CellDoneEditingEvent;
+  readonly closeParentDropdown: (() => void) | undefined;
 }
 
 type MenuChangeEvent<M extends MenuItemModel> = MenuItemClickEvent<M> & {
@@ -114,7 +115,7 @@ type MenuItemModel = Model.M & {
   readonly visible?: boolean;
   readonly disabled?: boolean;
   readonly keepDropdownOpenOnClick?: boolean;
-  readonly onClick?: (e: Table.CellDoneEditingEvent) => void;
+  readonly onClick?: (params: MenuItemClickEvent<this>) => void;
   readonly render?: () => ReactNode;
 }
 

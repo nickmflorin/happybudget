@@ -9,8 +9,6 @@ type EffectCallback = UseEffectParams[0];
 type DependencyList = UseEffectParams[1];
 type UseEffectReturn = ReturnType<typeof useEffect>;
 
-export * from "./hooks/ui";
-
 export const useDynamicCallback = <T = any>(callback: (...args: any[]) => T) => {
   const ref = useRef<any>();
   ref.current = callback;

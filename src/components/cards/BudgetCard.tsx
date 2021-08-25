@@ -10,7 +10,7 @@ interface BudgetCardProps {
   budget: Model.Budget;
   loading?: boolean;
   deleting: boolean;
-  onDelete: () => void;
+  onDelete: (e: MenuItemClickEvent<MenuItemModel>) => void;
   onEdit: () => void;
   onClick: () => void;
 }
@@ -45,8 +45,10 @@ const BudgetCard = ({ budget, loading, deleting, onEdit, onDelete, onClick }: Bu
           id: "delete",
           label: "Delete",
           icon: <Icon icon={"trash"} weight={"light"} />,
-          onClick: () => onDelete(),
-          loading: deleting
+          onClick: (e: MenuItemClickEvent<MenuItemModel>) => onDelete(e),
+          keepDropdownOpenOnClick: true,
+          loading: deleting,
+          disabled: deleting
         }
       ]}
     />

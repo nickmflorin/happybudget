@@ -1,7 +1,5 @@
 import { Reducer } from "redux";
-import { isNil, filter, find } from "lodash";
-import { util } from "lib";
-import { warnInconsistentState } from "../../util";
+import { modelListActionReducer } from "lib/redux/reducers";
 
 export * from "./util";
 export * from "./comments";
@@ -24,46 +22,6 @@ export const createSimplePayloadReducer = <P, A extends Redux.Action<P> = Redux.
 export const createSimpleBooleanReducer = <A extends Redux.Action<boolean>>(actionType: string): Reducer<boolean, A> =>
   createSimplePayloadReducer<boolean, A>(actionType, false);
 
-/* prettier-ignore */
-export const createAgnosticModelListActionReducer =
-  () =>
-    (
-      st: Redux.ModelListActionStore = [],
-      action: Redux.Action<Redux.ModelListActionPayload>
-    ): Redux.ModelListActionStore => {
-      if (action.payload.value === true) {
-        const instance: Redux.ModelListActionInstance | undefined = find(st, { id: action.payload.id });
-        if (!isNil(instance)) {
-          return util.replaceInArray<Redux.ModelListActionInstance>(
-            st,
-            { id: action.payload.id },
-            { ...instance, count: instance.count + 1 }
-          );
-        } else {
-          return [...st, { id: action.payload.id, count: 1 }];
-        }
-      } else {
-        const instance: Redux.ModelListActionInstance | undefined = find(st, { id: action.payload.id });
-        if (isNil(instance)) {
-          warnInconsistentState({
-            action: "Removing from model list action state.",
-            reason: "The instance does not exist in state when it is expected to."
-          });
-          return st;
-        } else {
-          if (instance.count === 1) {
-            return filter(st, (inst: Redux.ModelListActionInstance) => inst.id !== action.payload.id);
-          } else {
-            return util.replaceInArray<Redux.ModelListActionInstance>(
-              st,
-              { id: action.payload.id },
-              { ...instance, count: instance.count - 1 }
-            );
-          }
-        }
-      }
-    };
-
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
  * list of primary keys that indicate that certain behavior is taking place for
@@ -83,9 +41,8 @@ export const createAgnosticModelListActionReducer =
 export const createModelListActionReducer =
   (actionType: string) =>
     (st: Redux.ModelListActionStore = [], action: Redux.Action<Redux.ModelListActionPayload>) => {
-      const reducer = createAgnosticModelListActionReducer();
       if (action.type === actionType) {
-        return reducer(st, action);
+        return modelListActionReducer(st, action);
       }
       return st;
     };

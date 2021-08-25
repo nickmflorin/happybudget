@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { Dispatch } from "redux";
-import { includes, map, isNil } from "lodash";
+import { map, isNil } from "lodash";
+
+import * as api from "api";
+import { redux } from "lib";
 
 import { BudgetCard } from "components/cards";
 import { Page } from "components/layout";
@@ -13,16 +16,16 @@ import BudgetsSubTitle from "./BudgetsSubTitle";
 
 const selectBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.data;
 const selectLoadingBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.loading;
-const selectDeletingBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.deleting;
 
 const Budgets = (): JSX.Element => {
+  const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
+
   const [budgetToEdit, setBudgetToEdit] = useState<Model.Budget | undefined>(undefined);
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
   const history = useHistory();
 
   const dispatch: Dispatch = useDispatch();
   const budgets = useSelector(selectBudgets);
-  const deleting = useSelector(selectDeletingBudgets);
   const loading = useSelector(selectLoadingBudgets);
 
   useEffect(() => {
@@ -42,13 +45,17 @@ const Budgets = (): JSX.Element => {
             <BudgetCard
               key={index}
               budget={budget}
-              deleting={includes(
-                map(deleting, (instance: Redux.ModelListActionInstance) => instance.id),
-                budget.id
-              )}
+              deleting={isDeleting(budget.id)}
               onClick={() => history.push(`/budgets/${budget.id}`)}
               onEdit={() => setBudgetToEdit(budget)}
-              onDelete={() => dispatch(actions.deleteBudgetAction(budget.id))}
+              onDelete={(e: MenuItemClickEvent<MenuItemModel>) => {
+                setDeleting(budget.id);
+                api
+                  .deleteBudget(budget.id)
+                  .then(() => e.closeParentDropdown?.())
+                  .catch((err: Error) => api.handleRequestError(err))
+                  .finally(() => setDeleted(budget.id));
+              }}
             />
           );
         })}

@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
-import { hooks } from "lib";
+import { ui } from "lib";
 
 import Content from "./Content";
 import Header, { HeaderProps } from "./Header";
@@ -15,7 +15,7 @@ export interface LayoutProps extends Omit<HeaderProps & SidebarProps, "sidebarVi
 }
 
 const Layout = (props: LayoutProps): JSX.Element => {
-  const isMobile = hooks.useLessThanBreakpoint("medium");
+  const isMobile = ui.hooks.useLessThanBreakpoint("medium");
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
   useEffect(() => {

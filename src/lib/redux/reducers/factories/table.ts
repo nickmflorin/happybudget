@@ -4,7 +4,6 @@ import { redux, util } from "lib";
 
 import { warnInconsistentState } from "../../util";
 import { mergeOptionsWithDefaults, createObjectReducerFromMap } from "./util";
-import { createAgnosticModelListActionReducer } from ".";
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
@@ -61,9 +60,6 @@ export const createSimpleTableReducer = <
     options,
     redux.initialState.initialTableState as S
   );
-
-  const DeletingReducer = createAgnosticModelListActionReducer();
-  const UpdatingReducer = createAgnosticModelListActionReducer();
 
   const reducers: Redux.MappedReducers<Redux.TableActionMap, S, A> = {
     // We have to reset the page to it's initial state otherwise we run the risk
@@ -142,13 +138,13 @@ export const createSimpleTableReducer = <
     Deleting: (st: S = Options.initialState, action: Redux.Action<Redux.ModelListActionPayload>) => {
       return {
         ...st,
-        deleting: DeletingReducer(st.deleting, action)
+        deleting: redux.reducers.modelListActionReducer(st.deleting, action)
       };
     },
     Updating: (st: S = Options.initialState, action: Redux.Action<Redux.ModelListActionPayload>) => {
       return {
         ...st,
-        updating: UpdatingReducer(st.updating, action)
+        updating: redux.reducers.modelListActionReducer(st.updating, action)
       };
     }
   };

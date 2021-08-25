@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { isNil } from "lodash";
 
-import { hooks } from "lib";
+import { ui } from "lib";
 
 export interface PortalProps {
   id: string | number;
@@ -11,7 +11,7 @@ export interface PortalProps {
 }
 
 const Portal = ({ id, children, visible }: PortalProps): JSX.Element => {
-  const target = hooks.usePortal(id);
+  const target = ui.hooks.usePortal(id);
   if (!isNil(target) && visible !== false) {
     return createPortal(children, target);
   }
