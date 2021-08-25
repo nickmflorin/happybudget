@@ -173,11 +173,11 @@ namespace Table {
   type MenuAction = {
     readonly icon: IconProp;
     readonly tooltip?: Tooltip;
-    // If being wrapped in a Dropdown, the onClick prop will not be used.
-    readonly onClick?: () => void;
     readonly disabled?: boolean;
     readonly text?: string;
-    readonly wrapInDropdown?: (children: ReactNode) => JSX.Element;
+    // If being wrapped in a Dropdown, the onClick prop will not be used.
+    readonly onClick?: () => void;
+    readonly wrapInDropdown?: (children: import("react").ReactChild | import("react").ReactChild[]) => JSX.Element;
     readonly render?: RenderFunc;
   }
 

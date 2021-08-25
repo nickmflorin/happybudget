@@ -5,37 +5,41 @@ import { isNil } from "lodash";
 
 import { Layout } from "antd";
 
-import { Icon, Dropdown, VerticalFlexCenter, ShowHide } from "components";
+import { Icon, Dropdown, ShowHide, SavingChanges } from "components";
 import { IconButton } from "components/buttons";
 import { SidebarLogo } from "components/svgs";
 import { AccountCircleLink } from "components/links";
 import { useLoggedInUser } from "store/hooks";
 
-import Toolbar, { IToolbarItem } from "./Toolbar";
-
 import "./index.scss";
 
-interface HeaderProps extends StandardComponentProps {
-  readonly toolbar?: IToolbarItem[] | (() => JSX.Element);
+export interface HeaderProps extends StandardComponentProps {
   readonly sidebarVisible: boolean;
-  readonly collapsed: boolean;
+  readonly collapsed?: boolean | undefined;
+  readonly showHeaderLogo?: boolean | undefined;
+  readonly saving?: boolean;
   readonly toggleSidebar: () => void;
-  readonly showHeaderLogo?: boolean;
 }
 
 const Header = ({
-  toolbar,
   sidebarVisible,
   collapsed,
   toggleSidebar,
   showHeaderLogo,
+  saving,
   ...props
 }: HeaderProps): JSX.Element => {
   const user = useLoggedInUser();
   const history = useHistory();
 
   return (
-    <Layout.Header {...props} className={classNames("header", props.className)}>
+    <Layout.Header
+      {...props}
+      className={classNames("header", props.className, {
+        "with-logo": showHeaderLogo,
+        "with-saving-changes": !isNil(saving)
+      })}
+    >
       <div className={"primary-header"}>
         <div className={"primary-header-left"}>
           {/* In the case that we are not using a collapsed layout, we always show the
@@ -61,20 +65,13 @@ const Header = ({
         </div>
 
         <div className={"primary-header-center"}>
-          <ShowHide show={showHeaderLogo}>
-            <Link className={"logo-link"} to={"/"}>
-              <SidebarLogo />
-            </Link>
-          </ShowHide>
+          <Link className={"logo-link"} to={"/"}>
+            <SidebarLogo />
+          </Link>
         </div>
 
         <div className={"primary-header-right"}>
-          {!isNil(toolbar) &&
-            (Array.isArray(toolbar) ? (
-              <Toolbar items={toolbar as IToolbarItem[]} />
-            ) : (
-              <VerticalFlexCenter>{toolbar()}</VerticalFlexCenter>
-            ))}
+          {!isNil(saving) && <SavingChanges saving={saving} />}
           <Dropdown
             className={"header-dropdown"}
             menuProps={{ className: "header-dropdown-menu" }}

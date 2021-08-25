@@ -12,6 +12,7 @@ export interface UserInitialsProps extends StandardComponentProps {
   readonly firstName?: string | null;
   readonly lastName?: string | null;
   readonly renderNoInitials?: JSX.Element;
+  readonly hideOnNoInitials?: boolean;
 }
 
 const UserInitials = ({
@@ -20,6 +21,7 @@ const UserInitials = ({
   firstName,
   lastName,
   renderNoInitials,
+  hideOnNoInitials,
   ...props
 }: Omit<UserInitialsProps, "src">): JSX.Element => {
   const userFirstName = useMemo<string | null>(() => {
@@ -59,12 +61,14 @@ const UserInitials = ({
   }, [initials, userFirstName, userLastName]);
 
   return (
-    <div className={classNames("user-initials", props.className)} style={props.style}>
-      <ShowHide show={isNil(renderNoInitials) || userInitials !== ""}>
-        <div className={"user-initials-text"}>{userInitials}</div>
-      </ShowHide>
-      <ShowHide show={!isNil(renderNoInitials) && userInitials === ""}>{renderNoInitials}</ShowHide>
-    </div>
+    <ShowHide hide={hideOnNoInitials === true && userInitials === ""}>
+      <div className={classNames("user-initials", props.className)} style={props.style}>
+        <ShowHide show={isNil(renderNoInitials) || userInitials !== ""}>
+          <div className={"user-initials-text"}>{userInitials}</div>
+        </ShowHide>
+        <ShowHide show={!isNil(renderNoInitials) && userInitials === ""}>{renderNoInitials}</ShowHide>
+      </div>
+    </ShowHide>
   );
 };
 

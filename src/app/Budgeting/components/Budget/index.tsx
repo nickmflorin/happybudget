@@ -5,7 +5,7 @@ import { filter, isNil, map } from "lodash";
 import { createSelector } from "reselect";
 
 import { budgeting } from "lib";
-import { Icon, RenderIfValidId, SavingChanges } from "components";
+import { Icon, RenderIfValidId } from "components";
 
 import { wipeStateAction, setBudgetIdAction } from "../../store/actions/budget";
 import { selectBudgetDetail } from "../../store/selectors";
@@ -61,7 +61,7 @@ const Budget = (): JSX.Element => {
 
   return (
     <GenericLayout
-      toolbar={() => <SavingChanges saving={saving} />}
+      saving={saving}
       sidebar={[
         {
           icon: <Icon weight={"light"} icon={"file-plus"} />,

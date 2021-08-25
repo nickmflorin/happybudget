@@ -1,38 +1,20 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import classNames from "classnames";
 import { isNil } from "lodash";
 
 import { hooks } from "lib";
 
 import Content from "./Content";
-import Header from "./Header";
-import Sidebar, { ISidebarItem } from "./Sidebar";
-import { IToolbarItem } from "./Header/Toolbar";
-import { useEffect } from "react";
+import Header, { HeaderProps } from "./Header";
+import Sidebar, { SidebarProps } from "./Sidebar";
 
-export interface LayoutProps {
-  className?: string;
-  children: any;
-  sidebar?: ISidebarItem[] | (() => JSX.Element);
-  toolbar?: IToolbarItem[] | (() => JSX.Element);
-  style?: React.CSSProperties;
-  collapsed?: boolean;
-  headerProps?: StandardComponentProps;
-  contentProps?: StandardComponentProps;
-  showHeaderLogo?: boolean;
+export interface LayoutProps extends Omit<HeaderProps & SidebarProps, "sidebarVisible" | "toggleSidebar"> {
+  readonly children: JSX.Element;
+  readonly headerProps?: StandardComponentProps;
+  readonly contentProps?: StandardComponentProps;
 }
 
-const Layout = ({
-  className,
-  children,
-  toolbar,
-  sidebar,
-  style = {},
-  collapsed = false,
-  showHeaderLogo = false,
-  headerProps = {},
-  contentProps = {}
-}: LayoutProps): JSX.Element => {
+const Layout = (props: LayoutProps): JSX.Element => {
   const isMobile = hooks.useLessThanBreakpoint("medium");
   const [sidebarVisible, setSidebarVisible] = useState(false);
 
@@ -43,42 +25,35 @@ const Layout = ({
 
   const layoutClassNameProps = useMemo<LayoutClassNameParams>(
     (): LayoutClassNameParams => ({
-      "collapsed-layout": collapsed,
-      "expanded-layout": !collapsed,
+      "collapsed-layout": props.collapsed,
+      "expanded-layout": !props.collapsed,
       "sidebar-visible": sidebarVisible,
       "sidebar-hidden": !sidebarVisible
     }),
-    [collapsed, sidebarVisible]
+    [props.collapsed, sidebarVisible]
   );
 
   return (
-    <div className={classNames("layout", className, layoutClassNameProps)} style={style}>
-      {!isNil(sidebar) && (
+    <div className={classNames("layout", props.className, layoutClassNameProps)} style={props.style}>
+      {!isNil(props.sidebar) && (
         <div className={classNames("sidebar-container", layoutClassNameProps)}>
-          {Array.isArray(sidebar) ? (
-            <Sidebar
-              className={classNames(layoutClassNameProps)}
-              collapsed={collapsed}
-              sidebarItems={sidebar as ISidebarItem[]}
-              sidebarVisible={sidebarVisible}
-              toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
-            />
-          ) : (
-            sidebar()
-          )}
+          <Sidebar
+            {...props}
+            className={classNames(layoutClassNameProps)}
+            sidebarVisible={sidebarVisible}
+            toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
+          />
         </div>
       )}
       <div className={classNames("layout-content", layoutClassNameProps)}>
         <Header
-          toolbar={toolbar}
-          {...headerProps}
-          className={classNames(headerProps.className, layoutClassNameProps)}
-          collapsed={collapsed}
+          {...props}
+          {...props.headerProps}
+          className={classNames(props.headerProps?.className, layoutClassNameProps)}
           sidebarVisible={sidebarVisible}
           toggleSidebar={() => setSidebarVisible(!sidebarVisible)}
-          showHeaderLogo={showHeaderLogo}
         />
-        <Content {...contentProps}>{children}</Content>
+        <Content {...props.contentProps}>{props.children}</Content>
       </div>
     </div>
   );

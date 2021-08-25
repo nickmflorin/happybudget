@@ -5,7 +5,7 @@ import { isNil, filter, map } from "lodash";
 import { createSelector } from "reselect";
 
 import { budgeting } from "lib";
-import { RenderIfValidId, SavingChanges, Icon } from "components";
+import { RenderIfValidId, Icon } from "components";
 
 import { selectTemplateDetail } from "../../store/selectors";
 import { wipeStateAction, setTemplateIdAction } from "../../store/actions/template";
@@ -54,7 +54,7 @@ const Template = (): JSX.Element => {
 
   return (
     <GenericLayout
-      toolbar={() => <SavingChanges saving={saving} />}
+      saving={saving}
       sidebar={[
         {
           icon: <Icon icon={"copy"} weight={"light"} />,

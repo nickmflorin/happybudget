@@ -3,7 +3,7 @@ import classNames from "classnames";
 
 import { Icon, ShowHide, RenderWithSpinner, Dropdown } from "components";
 import { IconButton } from "components/buttons";
-import { BudgetCardImage } from "components/layout/Layout/images";
+import { BudgetCardImage } from "components/images";
 
 import "./index.scss";
 

@@ -4,7 +4,7 @@ import classNames from "classnames";
 import * as typeguards from "lib/model/typeguards";
 
 import { Icon, FullSize, VerticalFlexCenter } from "components";
-import { UserImageOrInitials, EditImageOverlay } from "components/layout/Layout/images";
+import { UserImageOrInitials, EditImageOverlay } from "components/images";
 
 import Uploader, { UploaderProps } from "./Uploader";
 import "./UploadUserImage.scss";

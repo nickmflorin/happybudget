@@ -1,21 +1,68 @@
 @import "style/_imports";
 
+@mixin primary_header_layout($include_logo: false, $include_saving_changes: false) {
+  @debug $include_logo;
+
+  .primary-header {
+    .primary-header-left {
+      @if $include_logo {
+        flex: 1;
+      } @else {
+        flex-grow: 100;
+      }
+    }
+    .primary-header-center {
+      @if not $include_logo {
+        display: none;
+      }
+      @include media(">=xl") {
+        display: none;
+      }
+    }
+    .primary-header-right {
+      @if $include_logo {
+        flex: 1;
+      }
+      @if not $include_saving_changes {
+        .saving-changes {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
 .header {
+  @include primary_header_layout();
+
+  &.with-logo {
+    @include primary_header_layout(true);
+  }
+
   .primary-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    // justify-content: space-between;
+    // align-items: center;
+    padding: 7px 0;
+
+    > * {
+      &:not(:last-child) {
+        margin-right: 10px;
+      }
+    }
 
     .primary-header-left {
-      flex: 1;
+      // flex: 1;
+      overflow-x: hidden;
+      // flex-grow: 100;
       display: flex;
-      padding: 7px 0;
 
       .btn--sidebar-toggle {
         padding-left: 0;
         // We have to adjust the width here so that the icon aligns on the left
         // of the button so it aligns on the left of the screen.
         width: 24.5px;
+        min-width: 24.5px;
         margin-right: 8px;
 
         .icon {
@@ -26,13 +73,12 @@
     }
 
     .primary-header-center {
-      padding: 7px 0;
-      height: 50px;
+      padding: 5px 0;
+      height: 36px;
 
       .logo-link {
         display: block;
         height: 100%;
-        padding: 5px;
 
         svg {
           height: 100%;
@@ -46,10 +92,9 @@
     }
 
     .primary-header-right {
-      flex: 1;
+      // flex: 1;
       display: flex;
       justify-content: flex-end;
-      padding: 7px 0;
     }
   }
 

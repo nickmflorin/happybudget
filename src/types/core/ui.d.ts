@@ -1,3 +1,5 @@
+type ReactNode = import("react").ReactNode;
+
 type PageAndSize = {
   page?: number;
   pageSize?: number;
@@ -18,10 +20,10 @@ type FieldOrder<T = string> = {
 type FieldOrdering<T = string> = FieldOrder<T>[];
 
 type LayoutClassNameParams = {
-  "expanded-layout": boolean,
-  "collapsed-layout": boolean,
-  "sidebar-visible": boolean,
-  "sidebar-hidden": boolean
+  "expanded-layout": boolean | undefined,
+  "collapsed-layout": boolean | undefined,
+  "sidebar-visible": boolean | undefined,
+  "sidebar-hidden": boolean | undefined
 }
 
 type SearchIndex = string | string[];
@@ -36,7 +38,7 @@ interface StandardComponentProps {
 }
 
 interface StandardComponentWithChildrenProps extends StandardComponentProps {
-  readonly children: import("react").ReactNode;
+  readonly children: ReactNode;
 }
 
 interface StandardPdfComponentProps {
@@ -66,6 +68,21 @@ interface IIcon extends Omit<import("@fortawesome/react-fontawesome").FontAwesom
 type PropsOf<T> = T extends React.ComponentType<infer Props> ? Props : never;
 
 type RenderFunc = () => JSX.Element;
+
+interface ISidebarItem {
+  readonly icon?: IconOrElement | null | undefined;
+  readonly activeIcon?: IconOrElement | null | undefined;
+  readonly text?: string;
+  readonly to?: string;
+  readonly collapsed?: boolean;
+  readonly active?: boolean;
+  readonly hidden?: boolean;
+  readonly separatorAfter?: boolean;
+  readonly activePathRegexes?: RegExp[];
+  readonly tooltip?: Tooltip;
+  readonly onClick?: () => void;
+  readonly onActivated?: () => void;
+}
 
 interface IBreadCrumbItemRenderParams {
   readonly toggleDropdownVisible: () => void;

@@ -1,3 +1,4 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { map } from "lodash";
 import classNames from "classnames";
@@ -6,26 +7,20 @@ import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 import { SidebarLogo, LeafLogo } from "components/svgs";
 
-import SidebarItem, { ISidebarItem } from "./SidebarItem";
+import SidebarItem from "./SidebarItem";
 import "./index.scss";
 
 export * from "./SidebarItem";
 
-export interface ISidebarDropdownItem {
-  icon?: JSX.Element;
-  text: string;
-  onClick: () => void;
-}
-
-interface SidebarProps extends StandardComponentProps {
-  readonly sidebarItems?: ISidebarItem[];
+export interface SidebarProps extends StandardComponentProps {
+  readonly sidebar?: ISidebarItem[];
   readonly collapsed?: boolean;
   readonly sidebarVisible: boolean;
   readonly toggleSidebar: () => void;
 }
 
 const Sidebar = ({
-  sidebarItems = [],
+  sidebar = [],
   collapsed = false,
   sidebarVisible,
   toggleSidebar,
@@ -61,9 +56,9 @@ const Sidebar = ({
           </ShowHide>
         </Link>
       </div>
-      <ShowHide show={sidebarItems.length !== 0}>
+      <ShowHide show={sidebar.length !== 0}>
         <div className={"sidebar-menu"}>
-          {map(sidebarItems, (item: ISidebarItem, index: number) => (
+          {map(sidebar, (item: ISidebarItem, index: number) => (
             <SidebarItem key={index} collapsed={collapsed} {...item} />
           ))}
         </div>
@@ -72,4 +67,4 @@ const Sidebar = ({
   );
 };
 
-export default Sidebar;
+export default React.memo(Sidebar);

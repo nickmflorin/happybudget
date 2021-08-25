@@ -1,27 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
 import { ShowHide, TooltipWrapper, Separator } from "components";
-
-export interface ISidebarItem {
-  icon?: JSX.Element;
-  activeIcon?: JSX.Element;
-  text?: string;
-  to?: string;
-  collapsed?: boolean;
-  active?: boolean;
-  hidden?: boolean;
-  separatorAfter?: boolean;
-  activePathRegexes?: RegExp[];
-  children?: ISidebarItem[];
-  childrenLoading?: boolean;
-  defaultShowChildren?: boolean;
-  tooltip?: Tooltip;
-  onClick?: () => void;
-  onActivated?: () => void;
-}
 
 const SidebarItem = ({
   icon,
@@ -104,4 +86,4 @@ const SidebarItem = ({
   );
 };
 
-export default SidebarItem;
+export default React.memo(SidebarItem);
