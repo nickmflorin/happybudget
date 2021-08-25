@@ -23,7 +23,17 @@ export interface ButtonProps
  * buttons wrapped around AntD's Button class.
  */
 const Button = (
-  { children, disabled, loading, showLoadingIndicatorOverIcon, icon, className, tooltip, ...props }: ButtonProps,
+  {
+    children,
+    disabled,
+    loading,
+    showLoadingIndicatorOverIcon,
+    icon,
+    className,
+    tooltip,
+    withDropdownCaret,
+    ...props
+  }: ButtonProps,
   ref: any
 ): JSX.Element => {
   const isDisabled = useMemo(() => disabled === true && isNil(tooltip), [disabled, tooltip]);
@@ -69,7 +79,7 @@ const Button = (
       >
         {prefix}
         {children}
-        <ShowHide show={props.withDropdownCaret}>
+        <ShowHide show={withDropdownCaret}>
           <Icon
             className={"caret"}
             icon={props.dropdownCaretState === "open" ? "caret-up" : "caret-down"}

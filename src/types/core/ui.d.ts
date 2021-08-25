@@ -113,12 +113,9 @@ type MenuItemModel = Model.M & {
   readonly url?: string;
   readonly visible?: boolean;
   readonly disabled?: boolean;
+  readonly keepDropdownOpenOnClick?: boolean;
   readonly onClick?: (e: Table.CellDoneEditingEvent) => void;
   readonly render?: () => ReactNode;
-}
-
-interface IBreadCrumbItemRenderParams {
-  readonly toggleDropdownVisible: () => void;
 }
 
 interface ILazyBreadCrumbItem {
@@ -128,9 +125,9 @@ interface ILazyBreadCrumbItem {
 
 interface IBreadCrumbItem extends Omit<MenuItemModel, "render"> {
   readonly tooltip?: Tooltip;
-  readonly render?: (params: IBreadCrumbItemRenderParams) => React.ReactChild;
   readonly options?: MenuItemModel[];
   readonly primary?: boolean;
+  readonly render?: () => React.ReactChild;
 }
 
 type ExtraMenuItemModel = MenuItemModel & {
@@ -146,6 +143,7 @@ interface ICommonMenuItem<M extends MenuItemModel> extends Omit<StandardComponen
   readonly menuId: string;
   readonly focused: boolean;
   readonly onClick?: (params: MenuItemClickEvent<M>) => void;
+  readonly closeParentDropdown?: () => void;
 }
 
 interface IMenuItem<M extends MenuItemModel> extends Omit<StandardComponentProps, "id">, ICommonMenuItem<M> {
@@ -188,6 +186,7 @@ type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly getFirstSearchResult?: (models: M[]) => M | null;
   readonly onFocusCallback?: (focused: boolean) => void;
   readonly renderItemContent?: (model: M, context: { level: number }) => JSX.Element;
+  readonly closeParentDropdown?: () => void;
 };
 
 interface IMenuItems<M extends MenuItemModel> extends Omit<IMenuItem, "selected" | "focused"> {
@@ -197,6 +196,7 @@ interface IMenuItems<M extends MenuItemModel> extends Omit<IMenuItem, "selected"
   readonly indexMap: {[key in MenuItemId]: number};
   readonly itemProps?: Omit<StandardComponentProps, "id">;
   readonly onClick?: (params: MenuItemClickEvent<M>) => void;
+  readonly closeParentDropdown?: () => void;
 }
 
 type IMenuRef<M extends MenuItemModel> = {
@@ -214,6 +214,7 @@ interface IMenuButton<M extends MenuItemModel> {
   readonly label: string;
   readonly className?: string;
   readonly style?: React.CSSProperties;
+  readonly keepDropdownOpenOnClick?: boolean;
   readonly onClick?: (state: MenuButtonClickEvent<M>) => void;
 }
 

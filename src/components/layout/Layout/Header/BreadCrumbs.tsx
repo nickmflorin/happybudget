@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo, useState } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import { map, isNil, orderBy, forEach } from "lodash";
 import classNames from "classnames";
@@ -60,22 +60,20 @@ interface BreadCrumbItemProps extends StandardComponentProps {
 }
 
 const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element => {
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-
   const renderItem = (i: IBreadCrumbItem) => {
     if (!isNil(i.label)) {
       return i.label;
     } else if (!isNil(i.render)) {
-      return i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) });
+      return i.render();
     }
     return <></>;
   };
 
   const renderDropdownButton = (i: IBreadCrumbItem): React.ReactChild => {
     if (!isNil(i.label)) {
-      return <Button onClick={() => setDropdownVisible(true)}>{i.label}</Button>;
+      return <Button>{i.label}</Button>;
     } else if (!isNil(i.render)) {
-      return i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) });
+      return i.render();
     }
     return <></>;
   };
@@ -90,21 +88,10 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
     >
       {!isNil(item.options) && item.options.length !== 0 ? (
         <Dropdown
-          visible={dropdownVisible}
           trigger={["click"]}
           overlayClassName={"bread-crumb-dropdown"}
           menuDefaultSelected={[item.id]}
-          menuItems={map(
-            orderBy(item.options, (obj: MenuItemModel) => obj.id),
-            (obj: MenuItemModel) => ({
-              ...obj,
-              // render: () => renderItem(obj),
-              onClick: (e: Table.CellDoneEditingEvent) => {
-                setDropdownVisible(false);
-                obj.onClick?.(e);
-              }
-            })
-          )}
+          menuItems={orderBy(item.options, (obj: MenuItemModel) => obj.id)}
         >
           {renderDropdownButton(item)}
         </Dropdown>

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import classNames from "classnames";
 import ClickAwayListener from "react-click-away-listener";
 import { uniqueId, isNil } from "lodash";
@@ -9,7 +9,7 @@ import { DropDownProps as AntdDropdownProps } from "antd/lib/dropdown";
 import { Menu } from "components/menus";
 import { util } from "lib";
 
-interface BaseDropdownProps extends Omit<AntdDropdownProps, "overlay"> {
+interface BaseDropdownProps extends Omit<AntdDropdownProps, "overlay" | "visible"> {
   readonly onClickAway?: () => void;
   readonly children: React.ReactChild | React.ReactChild[];
 }
@@ -37,11 +37,14 @@ export const isPropsWithOverlay = (props: DropdownProps): props is DropdownOverl
   (props as DropdownOverlayProps).overlay !== undefined;
 
 const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
-  const buttonId = useMemo(() => uniqueId(), []);
+  const [visible, setVisible] = useState(false);
+  const buttonId = useMemo(() => uniqueId("dropdown-button-"), []);
+  const menuId = useMemo(() => uniqueId("dropdown-menu-"), []);
 
   return (
     <AntdDropdown
       {...props}
+      visible={visible}
       className={classNames("dropdown", props.className)}
       trigger={props.trigger || ["click"]}
       overlay={
@@ -52,33 +55,34 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
             // component wraps.
             // Note that this logic falls apart if a custom overlay is being
             // used.
-            if (!isNil(props.onClickAway)) {
-              const menus = document.getElementsByClassName("dropdown-menu");
-              let clickInsideMenu = false;
-              for (let i = 0; i < menus.length; i++) {
-                if (util.html.isNodeDescendantOf(menus[i], e.target)) {
-                  clickInsideMenu = true;
-                  break;
-                }
-              }
-              // Since the dropdown button (props.children) is rendered outside
-              // of the menu (where the ClickAway is detected), clicking the
-              // button will also trigger the ClickAway, so we need to avoid it.
-              const button = document.getElementById(buttonId);
-              if (!isNil(button) && !util.html.isNodeDescendantOf(button, e.target) && clickInsideMenu === false) {
-                props.onClickAway();
-              }
+            const menu = document.getElementById(menuId);
+            if (!isNil(menu) && util.html.isNodeDescendantOf(menu, e.target)) {
+              return;
+            }
+            // Since the dropdown button (props.children) is rendered outside
+            // of the menu (where the ClickAway is detected), clicking the
+            // button will also trigger the ClickAway, so we need to avoid it.
+            const button = document.getElementById(buttonId);
+            if (!isNil(button) && !util.html.isNodeDescendantOf(button, e.target)) {
+              setVisible(false);
+              props.onClickAway?.();
             }
           }}
         >
           <React.Fragment>
             {isPropsWithOverlay(props) ? (
-              props.overlay
+              React.Children.only(props.overlay) && React.isValidElement(props.overlay) ? (
+                React.cloneElement(props.overlay, { id: menuId })
+              ) : (
+                props.overlay
+              )
             ) : (
               <Menu
                 {...props.menuProps}
-                onChange={props.onChange}
+                id={menuId}
                 models={props.menuItems}
+                onChange={props.onChange}
+                closeParentDropdown={() => setVisible(false)}
                 mode={props.menuMode}
                 checkbox={props.menuCheckbox}
                 buttons={props.menuButtons}
@@ -93,10 +97,10 @@ const Dropdown = ({ ...props }: DropdownProps): JSX.Element => {
       }
     >
       {React.Children.only(props.children) && React.isValidElement(props.children)
-        ? React.cloneElement(props.children, { id: buttonId })
+        ? React.cloneElement(props.children, { id: buttonId, onClick: () => setVisible(!visible) })
         : props.children}
     </AntdDropdown>
   );
 };
 
-export default Dropdown;
+export default React.memo(Dropdown);

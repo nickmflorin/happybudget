@@ -480,7 +480,11 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   }));
 
   return (
-    <div className={classNames("menu", props.className, { "with-search": props.includeSearch })} style={props.style}>
+    <div
+      className={classNames("menu", props.className, { "with-search": props.includeSearch })}
+      style={props.style}
+      id={props.id}
+    >
       <ShowHide show={props.includeSearch}>
         <div className={"search-container"}>
           <SearchInput
@@ -513,6 +517,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
                 bordersForLevels={props.bordersForLevels}
                 onClick={(event: MenuItemClickEvent<M>) => onMenuItemClick(event.model, event.event)}
                 renderContent={props.renderItemContent}
+                closeParentDropdown={props.closeParentDropdown}
               />
               {map(availableExtraItems, (item: GenericExtraItem, index: number) => {
                 return (
@@ -541,6 +546,9 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
                 onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   const st = menu.current.getState();
                   btn.onClick?.({ state: st });
+                  if (btn.keepDropdownOpenOnClick !== true) {
+                    props.closeParentDropdown?.();
+                  }
                 }}
               >
                 {btn.label}

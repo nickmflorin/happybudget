@@ -87,13 +87,9 @@ const Account = ({ budgetId, budget }: AccountProps): JSX.Element => {
                   id: account.id,
                   primary: true,
                   url: budgeting.urls.getUrl(b, account),
-                  render: (params: IBreadCrumbItemRenderParams) => {
+                  render: () => {
                     if (siblings.length !== 0) {
-                      return (
-                        <EntityTextButton onClick={() => params.toggleDropdownVisible()} fillEmpty={"---------"}>
-                          {account}
-                        </EntityTextButton>
-                      );
+                      return <EntityTextButton fillEmpty={"---------"}>{account}</EntityTextButton>;
                     }
                     return <EntityText fillEmpty={"---------"}>{account}</EntityText>;
                   },

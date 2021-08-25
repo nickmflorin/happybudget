@@ -95,13 +95,9 @@ const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {
                   {
                     id: subaccount.id,
                     url: budgeting.urls.getUrl(b, subaccount),
-                    render: (params: IBreadCrumbItemRenderParams) => {
+                    render: () => {
                       if (siblings.length !== 0) {
-                        return (
-                          <EntityTextButton onClick={() => params.toggleDropdownVisible()} fillEmpty={"---------"}>
-                            {subaccount}
-                          </EntityTextButton>
-                        );
+                        return <EntityTextButton fillEmpty={"---------"}>{subaccount}</EntityTextButton>;
                       }
                       return <EntityText fillEmpty={"---------"}>{subaccount}</EntityText>;
                     },

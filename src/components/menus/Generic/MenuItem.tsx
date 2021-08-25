@@ -36,6 +36,9 @@ const PrivateCommonMenuItem = <M extends MenuItemModel>(
           history.push(props.model.url);
         }
         props.onClick?.({ event: e, model: props.model });
+        if (props.model.keepDropdownOpenOnClick !== true) {
+          props.closeParentDropdown?.();
+        }
       }}
     >
       {props.children}

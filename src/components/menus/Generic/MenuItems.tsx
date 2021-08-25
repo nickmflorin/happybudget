@@ -22,6 +22,7 @@ const MenuItems = <M extends Model.M>(props: IMenuItems<M>): JSX.Element => {
             checkbox={props.checkbox}
             levelIndent={props.levelIndent}
             bordersForLevels={props.bordersForLevels}
+            closeParentDropdown={props.closeParentDropdown}
             onClick={(event: MenuItemClickEvent<M>) => {
               if (!isNil(props.getItemOnClickHandler)) {
                 const handler = props.getItemOnClickHandler(event.model);
