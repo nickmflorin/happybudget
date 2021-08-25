@@ -75,12 +75,12 @@ const GenericSubAccountsTable = ({
         {
           icon: "sigma",
           disabled: true,
-          text: "Group"
+          label: "Group"
         },
         {
           icon: "percentage",
           disabled: true,
-          text: "Mark Up"
+          label: "Mark Up"
         },
         framework.actions.ToggleColumnAction(table.current, params),
         framework.actions.ExportCSVAction(table.current, params, exportFileName),

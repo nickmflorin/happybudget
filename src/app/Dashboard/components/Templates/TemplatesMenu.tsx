@@ -11,13 +11,7 @@ import { CreateBudgetModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
 import { useLoggedInUser } from "store/hooks";
 
-import * as actions from "../../store/actions";
-
-import {
-  addBudgetToStateAction,
-  setTemplatesSearchAction,
-  setCommunityTemplatesSearchAction
-} from "../../store/actions";
+import { actions } from "../../store";
 import "./TemplatesMenu.scss";
 
 type TemplatesPage = "my-templates" | "discover";
@@ -69,9 +63,9 @@ const TemplatesMenu = (): JSX.Element => {
             value={page === "my-templates" ? templatesSearch : communitySearch}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               if (page === "my-templates") {
-                dispatch(setTemplatesSearchAction(event.target.value));
+                dispatch(actions.setTemplatesSearchAction(event.target.value));
               } else {
-                dispatch(setCommunityTemplatesSearchAction(event.target.value));
+                dispatch(actions.setCommunityTemplatesSearchAction(event.target.value));
               }
             }}
           />
@@ -115,7 +109,7 @@ const TemplatesMenu = (): JSX.Element => {
           onCancel={() => setCreateBudgetModalOpen(false)}
           onSuccess={(budget: Model.Budget) => {
             setCreateBudgetModalOpen(false);
-            dispatch(addBudgetToStateAction(budget));
+            dispatch(actions.addBudgetToStateAction(budget));
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

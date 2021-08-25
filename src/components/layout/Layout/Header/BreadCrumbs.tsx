@@ -52,6 +52,8 @@ const BreadCrumbGenericItem = ({
   );
 };
 
+const MemoizedBreadCrumbGenericItem = React.memo(BreadCrumbGenericItem);
+
 interface BreadCrumbItemProps extends StandardComponentProps {
   readonly item: IBreadCrumbItem;
   readonly primary?: boolean;
@@ -61,8 +63,8 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   const renderItem = (i: IBreadCrumbItem) => {
-    if (!isNil(i.text)) {
-      return i.text;
+    if (!isNil(i.label)) {
+      return i.label;
     } else if (!isNil(i.render)) {
       return i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) });
     }
@@ -70,8 +72,8 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
   };
 
   const renderDropdownButton = (i: IBreadCrumbItem): React.ReactChild => {
-    if (!isNil(i.text)) {
-      return <Button onClick={() => setDropdownVisible(true)}>{i.text}</Button>;
+    if (!isNil(i.label)) {
+      return <Button onClick={() => setDropdownVisible(true)}>{i.label}</Button>;
     } else if (!isNil(i.render)) {
       return i.render({ toggleDropdownVisible: () => setDropdownVisible(!dropdownVisible) });
     }
@@ -79,7 +81,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
   };
 
   return (
-    <BreadCrumbGenericItem
+    <MemoizedBreadCrumbGenericItem
       {...props}
       tooltip={item.tooltip}
       url={item.url}
@@ -91,13 +93,12 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
           visible={dropdownVisible}
           trigger={["click"]}
           overlayClassName={"bread-crumb-dropdown"}
-          onClickAway={() => setDropdownVisible(false)}
           menuDefaultSelected={[item.id]}
           menuItems={map(
             orderBy(item.options, (obj: MenuItemModel) => obj.id),
             (obj: MenuItemModel) => ({
               ...obj,
-              renderContent: () => renderItem(obj),
+              // render: () => renderItem(obj),
               onClick: (e: Table.CellDoneEditingEvent) => {
                 setDropdownVisible(false);
                 obj.onClick?.(e);
@@ -110,9 +111,11 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
       ) : (
         <div className={"text-wrapper"}>{renderItem(item)}</div>
       )}
-    </BreadCrumbGenericItem>
+    </MemoizedBreadCrumbGenericItem>
   );
 };
+
+const MemoizedBreadCrumbItem = React.memo(BreadCrumbItem);
 
 interface BreadCrumbItemsProps {
   readonly children: JSX.Element[];
@@ -140,6 +143,8 @@ const BreadCrumbItems = ({ children }: BreadCrumbItemsProps): JSX.Element => {
     );
   }
 };
+
+const MemoizedBreadCrumbItems = React.memo(BreadCrumbItems);
 
 interface BreadCrumbsProps extends StandardComponentProps {
   readonly items?: (IBreadCrumbItem | ILazyBreadCrumbItem)[];
@@ -195,17 +200,17 @@ const BreadCrumbs = ({ items, itemProps, params, children, ...props }: BreadCrum
   if (!isNil(children)) {
     return (
       <div {...props} className={classNames("bread-crumbs", props.className)}>
-        <BreadCrumbItems>{children}</BreadCrumbItems>
+        <MemoizedBreadCrumbItems>{children}</MemoizedBreadCrumbItems>
       </div>
     );
   } else if (!isNil(preparedItems)) {
     return (
       <div {...props} className={classNames("bread-crumbs", props.className)}>
-        <BreadCrumbItems>
+        <MemoizedBreadCrumbItems>
           {map(preparedItems, (item: IBreadCrumbItem, index: number) => (
-            <BreadCrumbItem {...itemProps} key={index} item={item} />
+            <MemoizedBreadCrumbItem {...itemProps} key={index} item={item} />
           ))}
-        </BreadCrumbItems>
+        </MemoizedBreadCrumbItems>
       </div>
     );
   } else {

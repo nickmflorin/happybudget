@@ -29,7 +29,7 @@ const Card = ({
   className
 }: CardProps): JSX.Element => {
   return (
-    <div className={classNames("dashboard-card", className, { hidden })} style={style}>
+    <div className={classNames("card", className, { hidden })} style={style}>
       <RenderWithSpinner size={18} loading={loading} toggleOpacity={true}>
         <ShowHide show={hidden}>
           <Icon className={"icon--hidden"} icon={"eye-slash"} weight={"solid"} />
@@ -43,7 +43,7 @@ const Card = ({
           </Dropdown>
         )}
         <BudgetCardImage image={image} onClick={onClick} titleOnly={isNil(subTitle)} />
-        <div className={classNames("dashboard-card-footer", { "title-only": isNil(subTitle) })} onClick={onClick}>
+        <div className={classNames("card-footer", { "title-only": isNil(subTitle) })} onClick={onClick}>
           <div className={"title"}>{title}</div>
           <ShowHide show={!isNil(subTitle)}>
             <div className={"sub-title truncate"}>{subTitle}</div>

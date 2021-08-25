@@ -8,7 +8,7 @@ import { ShowHide, TooltipWrapper, Separator } from "components";
 const SidebarItem = ({
   icon,
   activeIcon,
-  text,
+  label,
   to,
   active,
   hidden,
@@ -74,8 +74,8 @@ const SidebarItem = ({
           <ShowHide show={!isNil(icon)}>
             <div className={"icon-container"}>{isActive && !isNil(activeIcon) ? activeIcon : icon}</div>
           </ShowHide>
-          <ShowHide show={collapsed === false && !isNil(text)}>
-            <span className={"text-container"}>{text}</span>
+          <ShowHide show={collapsed === false && !isNil(label)}>
+            <span className={"text-container"}>{label}</span>
           </ShowHide>
         </div>
         <ShowHide show={separatorAfter === true}>

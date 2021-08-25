@@ -15,21 +15,21 @@ const Dashboard = (): JSX.Element => {
     <Layout
       sidebar={[
         {
-          text: "Templates",
+          label: "Templates",
           icon: <Icon icon={"file-plus"} weight={"light"} />,
           activeIcon: <Icon icon={"file-plus"} weight={"solid"} />,
           onClick: () => history.push("/templates"),
           active: location.pathname.startsWith("/templates") || location.pathname.startsWith("/discover")
         },
         {
-          text: "My Budgets",
+          label: "My Budgets",
           icon: <Icon icon={"copy"} weight={"light"} />,
           activeIcon: <Icon icon={"copy"} weight={"solid"} />,
           onClick: () => history.push("/budgets"),
           active: location.pathname.startsWith("/budgets")
         },
         {
-          text: "Contacts",
+          label: "Contacts",
           icon: <Icon icon={"address-book"} weight={"light"} flip={"horizontal"} />,
           activeIcon: <Icon icon={"address-book"} weight={"solid"} flip={"horizontal"} />,
           onClick: () => history.push("/contacts"),

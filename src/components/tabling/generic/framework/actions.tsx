@@ -8,7 +8,7 @@ export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
   exportFileName: string
 ): Table.MenuAction => ({
   /* eslint-disable indent */
-  text: "Export CSV",
+  label: "Export CSV",
   icon: "file-csv",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
     return (
@@ -38,7 +38,7 @@ export const ToggleColumnAction = <R extends Table.Row, M extends Model.Model>(
   params: Table.MenuActionParams<R, M>
 ): Table.MenuAction => ({
   /* eslint-disable indent */
-  text: "Columns",
+  label: "Columns",
   icon: "line-columns",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
     return (

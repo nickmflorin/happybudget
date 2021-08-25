@@ -5,12 +5,12 @@ import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
 import { WrapInApplicationSpinner } from "components";
+import { CommunityTemplateCard } from "components/cards";
 import { EditTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
 import { useLoggedInUser } from "store/hooks";
 
-import * as actions from "../../store/actions";
-import { CommunityTemplateCard } from "../Card";
+import { actions } from "../../store";
 
 const selectTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.data;
 const selectLoadingTemplates = (state: Modules.ApplicationStore) => state.dashboard.community.loading;

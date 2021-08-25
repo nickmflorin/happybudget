@@ -59,7 +59,7 @@ const Accounts = ({ templateId, template }: AccountsProps): JSX.Element => {
               func: ({ t }: { t: Model.Template }) => ({
                 id: t.id,
                 primary: true,
-                text: t.name,
+                label: t.name,
                 tooltip: { title: "Top Sheet", placement: "bottom" },
                 url: budgeting.urls.getUrl(t)
               })

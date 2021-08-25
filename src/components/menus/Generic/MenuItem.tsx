@@ -105,6 +105,8 @@ const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M>): JSX.Elem
         <VerticalFlexCenter>
           {!isNil(props.renderContent) ? (
             props.renderContent(props.model, { level: props.level })
+          ) : !isNil(props.model.render) ? (
+            props.model.render()
           ) : (
             <span className={"text-wrapper"}>{props.model.label}</span>
           )}

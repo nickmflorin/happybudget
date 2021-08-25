@@ -543,7 +543,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
                   btn.onClick?.({ state: st });
                 }}
               >
-                {btn.text}
+                {btn.label}
               </Button>
             );
           })}

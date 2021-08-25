@@ -94,11 +94,11 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         actions={[
           {
             icon: "print",
-            text: "Export PDF",
+            label: "Export PDF",
             onClick: () => setPreviewModalVisible(true)
           },
           {
-            text: "Comments",
+            label: "Comments",
             icon: "comments-alt",
             onClick: () => dispatch(setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
           }

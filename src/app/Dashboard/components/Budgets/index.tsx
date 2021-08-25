@@ -4,17 +4,12 @@ import { useHistory } from "react-router-dom";
 import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
+import { BudgetCard } from "components/cards";
 import { Page } from "components/layout";
 import { EditBudgetModal, CreateBudgetModal } from "components/modals";
-import BudgetsSubTitle from "./BudgetsSubTitle";
 
-import {
-  requestBudgetsAction,
-  deleteBudgetAction,
-  updateBudgetInStateAction,
-  addBudgetToStateAction
-} from "../../store/actions";
-import { BudgetCard } from "../Card";
+import { actions } from "../../store";
+import BudgetsSubTitle from "./BudgetsSubTitle";
 
 const selectBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.data;
 const selectLoadingBudgets = (state: Modules.ApplicationStore) => state.dashboard.budgets.loading;
@@ -31,7 +26,7 @@ const Budgets = (): JSX.Element => {
   const loading = useSelector(selectLoadingBudgets);
 
   useEffect(() => {
-    dispatch(requestBudgetsAction(null));
+    dispatch(actions.requestBudgetsAction(null));
   }, []);
 
   return (
@@ -53,7 +48,7 @@ const Budgets = (): JSX.Element => {
               )}
               onClick={() => history.push(`/budgets/${budget.id}`)}
               onEdit={() => setBudgetToEdit(budget)}
-              onDelete={() => dispatch(deleteBudgetAction(budget.id))}
+              onDelete={() => dispatch(actions.deleteBudgetAction(budget.id))}
             />
           );
         })}
@@ -65,7 +60,7 @@ const Budgets = (): JSX.Element => {
           onCancel={() => setBudgetToEdit(undefined)}
           onSuccess={(budget: Model.Budget) => {
             setBudgetToEdit(undefined);
-            dispatch(updateBudgetInStateAction({ id: budget.id, data: budget }));
+            dispatch(actions.updateBudgetInStateAction({ id: budget.id, data: budget }));
           }}
         />
       )}
@@ -75,7 +70,7 @@ const Budgets = (): JSX.Element => {
           onCancel={() => setCreateBudgetModalOpen(false)}
           onSuccess={(budget: Model.Budget) => {
             setCreateBudgetModalOpen(false);
-            dispatch(addBudgetToStateAction(budget));
+            dispatch(actions.addBudgetToStateAction(budget));
             history.push(`/budgets/${budget.id}/accounts`);
           }}
         />

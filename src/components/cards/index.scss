@@ -1,36 +1,14 @@
 @import "style/_imports";
 
-.dashboard-card-base {
+.card-base {
   border-radius: 14px;
   position: relative;
   height: 210px;
   cursor: pointer;
 }
 
-.dashboard-empty-card {
-  @extend .dashboard-card-base;
-  border: 2px dashed #8a8a8a;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
-  .title {
-    font-size: 16px;
-    font-family: $roboto;
-    font-weight: 500;
-    color: $icon-color;
-  }
-
-  svg {
-    height: 22px;
-    width: 22px;
-  }
-}
-
-.dashboard-card {
-  @extend .dashboard-card-base;
+.card {
+  @extend .card-base;
 
   &:hover {
     box-shadow: 0px 2px 10px #b3b3b3;
@@ -65,7 +43,7 @@
     }
   }
 
-  .dashboard-card-footer {
+  .card-footer {
     position: absolute;
     top: 150px;
     min-height: 64px;

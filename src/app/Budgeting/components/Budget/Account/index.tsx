@@ -74,7 +74,7 @@ const Account = ({ budgetId, budget }: AccountProps): JSX.Element => {
               func: ({ b }: { b: Model.Budget }) => ({
                 id: b.id,
                 primary: true,
-                text: b.name,
+                label: b.name,
                 tooltip: { title: "Top Sheet", placement: "bottom" },
                 url: budgeting.urls.getUrl(b)
               })

@@ -70,7 +70,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
             {
               id: "actuals",
               primary: true,
-              text: "Actuals Log",
+              label: "Actuals Log",
               tooltip: { title: "Actuals Log", placement: "bottom" }
             }
           ]}

@@ -51,7 +51,7 @@ const ExportCSVDropdown = <R extends Table.Row, M extends Model.Model>(
       menuButtons={[
         {
           onClick: (e: MenuButtonClickEvent<MenuItemModel>) => props.onDownload(e.state),
-          text: "Download",
+          label: "Download",
           className: "btn btn--primary"
         }
       ]}

@@ -15,7 +15,7 @@ const Settings = (): JSX.Element => {
     <Layout
       sidebar={[
         {
-          text: "Profile",
+          label: "Profile",
           icon: <Icon icon={"address-card"} weight={"light"} />,
           activeIcon: <Icon icon={"address-card"} weight={"solid"} />,
           onClick: () => history.push("/profile"),

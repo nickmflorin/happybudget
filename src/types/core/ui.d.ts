@@ -72,7 +72,7 @@ type RenderFunc = () => JSX.Element;
 interface ISidebarItem {
   readonly icon?: IconOrElement | null | undefined;
   readonly activeIcon?: IconOrElement | null | undefined;
-  readonly text?: string;
+  readonly label?: string;
   readonly to?: string;
   readonly collapsed?: boolean;
   readonly active?: boolean;
@@ -82,26 +82,6 @@ interface ISidebarItem {
   readonly tooltip?: Tooltip;
   readonly onClick?: () => void;
   readonly onActivated?: () => void;
-}
-
-interface IBreadCrumbItemRenderParams {
-  readonly toggleDropdownVisible: () => void;
-}
-
-interface ILazyBreadCrumbItem {
-  readonly requiredParams: string[];
-  readonly func: (params: any) => IBreadCrumbItem | IBreadCrumbItem[];
-}
-
-interface IBreadCrumbItem {
-  readonly id: number | string;
-  readonly url?: string;
-  readonly tooltip?: Tooltip;
-  readonly text?: string;
-  readonly render?: (params: IBreadCrumbItemRenderParams) => React.ReactChild;
-  readonly options?: MenuItemModel[];
-  readonly visible?: boolean;
-  readonly primary?: boolean;
 }
 
 type MenuItemId = string | number;
@@ -134,6 +114,23 @@ type MenuItemModel = Model.M & {
   readonly visible?: boolean;
   readonly disabled?: boolean;
   readonly onClick?: (e: Table.CellDoneEditingEvent) => void;
+  readonly render?: () => ReactNode;
+}
+
+interface IBreadCrumbItemRenderParams {
+  readonly toggleDropdownVisible: () => void;
+}
+
+interface ILazyBreadCrumbItem {
+  readonly requiredParams: string[];
+  readonly func: (params: any) => IBreadCrumbItem | IBreadCrumbItem[];
+}
+
+interface IBreadCrumbItem extends Omit<MenuItemModel, "render"> {
+  readonly tooltip?: Tooltip;
+  readonly render?: (params: IBreadCrumbItemRenderParams) => React.ReactChild;
+  readonly options?: MenuItemModel[];
+  readonly primary?: boolean;
 }
 
 type ExtraMenuItemModel = MenuItemModel & {
@@ -214,7 +211,7 @@ type IMenuRef<M extends MenuItemModel> = {
 }
 
 interface IMenuButton<M extends MenuItemModel> {
-  readonly text: string;
+  readonly label: string;
   readonly className?: string;
   readonly style?: React.CSSProperties;
   readonly onClick?: (state: MenuButtonClickEvent<M>) => void;

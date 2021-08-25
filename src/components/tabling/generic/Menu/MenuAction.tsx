@@ -15,7 +15,7 @@ interface TableMenuActionProps {
 const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.Element => {
   if (!isNil(action.render)) {
     return action.render();
-  } else if (!isNil(action.text)) {
+  } else if (!isNil(action.label)) {
     return (
       <Button
         // If the button is being wrapped in a dropdown, we need to allow the onClick prop that AntD sets
@@ -41,7 +41,7 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
             : undefined
         }
       >
-        {action.text}
+        {action.label}
       </Button>
     );
   } else {

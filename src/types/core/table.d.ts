@@ -174,7 +174,7 @@ namespace Table {
     readonly icon: IconProp;
     readonly tooltip?: Tooltip;
     readonly disabled?: boolean;
-    readonly text?: string;
+    readonly label?: string;
     // If being wrapped in a Dropdown, the onClick prop will not be used.
     readonly onClick?: () => void;
     readonly wrapInDropdown?: (children: import("react").ReactChild | import("react").ReactChild[]) => JSX.Element;

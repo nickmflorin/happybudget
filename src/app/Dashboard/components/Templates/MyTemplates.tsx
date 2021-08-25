@@ -5,16 +5,10 @@ import { Dispatch } from "redux";
 import { includes, map, isNil } from "lodash";
 
 import { WrapInApplicationSpinner } from "components";
+import { TemplateCard } from "components/cards";
 import { EditTemplateModal } from "components/modals";
 
-import {
-  requestTemplatesAction,
-  deleteTemplateAction,
-  updateTemplateInStateAction,
-  moveTemplateToCommunityAction,
-  duplicateTemplateAction
-} from "../../store/actions";
-import { TemplateCard } from "../Card";
+import { actions } from "../../store";
 
 const selectTemplates = (state: Modules.ApplicationStore) => state.dashboard.templates.data;
 const selectLoadingTemplates = (state: Modules.ApplicationStore) => state.dashboard.templates.loading;
@@ -39,7 +33,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
   const history = useHistory();
 
   useEffect(() => {
-    dispatch(requestTemplatesAction(null));
+    dispatch(actions.requestTemplatesAction(null));
   }, []);
 
   return (
@@ -65,10 +59,10 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
                 )}
                 onEdit={() => history.push(`/templates/${template.id}/accounts`)}
                 onEditNameImage={() => setTemplateToEdit(template)}
-                onDelete={() => dispatch(deleteTemplateAction(template.id))}
+                onDelete={() => dispatch(actions.deleteTemplateAction(template.id))}
                 onClick={() => setTemplateToDerive(template.id)}
-                onMoveToCommunity={() => dispatch(moveTemplateToCommunityAction(template.id))}
-                onDuplicate={() => dispatch(duplicateTemplateAction(template.id))}
+                onMoveToCommunity={() => dispatch(actions.moveTemplateToCommunityAction(template.id))}
+                onDuplicate={() => dispatch(actions.duplicateTemplateAction(template.id))}
               />
             );
           })}
@@ -81,7 +75,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
           onCancel={() => setTemplateToEdit(undefined)}
           onSuccess={(template: Model.Template) => {
             setTemplateToEdit(undefined);
-            dispatch(updateTemplateInStateAction({ id: template.id, data: template }));
+            dispatch(actions.updateTemplateInStateAction({ id: template.id, data: template }));
           }}
         />
       )}

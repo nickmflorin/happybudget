@@ -50,12 +50,12 @@ const GenericAccountsTable = ({
         {
           icon: "folder",
           disabled: true,
-          text: "Group"
+          label: "Group"
         },
         {
           icon: "badge-percent",
           disabled: true,
-          text: "Mark Up"
+          label: "Mark Up"
         },
         framework.actions.ToggleColumnAction(table.current, params),
         framework.actions.ExportCSVAction(table.current, params, exportFileName),
