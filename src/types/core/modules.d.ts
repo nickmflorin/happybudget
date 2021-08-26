@@ -25,23 +25,10 @@ namespace Modules {
   interface ModulesStore {}
 
   namespace Dashboard {
-    interface TemplatesStore extends Redux.ModelListResponseStore<Model.SimpleTemplate> {
-      readonly duplicating: Redux.ModelListActionStore;
-      readonly moving: Redux.ModelListActionStore;
-      readonly deleting: Redux.ModelListActionStore;
-    }
-
-    interface CommunityTemplatesStore extends Redux.ModelListResponseStore<Model.SimpleTemplate> {
-      readonly deleting: Redux.ModelListActionStore;
-      readonly duplicating: Redux.ModelListActionStore;
-      readonly showing: Redux.ModelListActionStore;
-      readonly hiding: Redux.ModelListActionStore;
-    }
-
     interface Store {
       readonly budgets: Redux.ModelListResponseStore<Model.SimpleBudget>;
-      readonly templates: TemplatesStore;
-      readonly community: CommunityTemplatesStore;
+      readonly templates: Redux.ModelListResponseStore<Model.SimpleTemplate>;
+      readonly community: Redux.ModelListResponseStore<Model.SimpleTemplate>;
     }
   }
 

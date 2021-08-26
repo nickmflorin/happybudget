@@ -11,6 +11,7 @@ import { CreateBudgetModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
 
 import { actions } from "../../store";
+import TemplateDropdown from "./TemplateDropdown";
 import "./TemplatesMenu.scss";
 
 type TemplatesPage = "my-templates" | "discover";

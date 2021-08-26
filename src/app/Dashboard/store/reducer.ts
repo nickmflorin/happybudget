@@ -5,7 +5,7 @@ import { ActionType } from "./actions";
 const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combineReducers({
   templates: redux.reducers.factories.createModelListResponseReducer<
     Model.SimpleTemplate,
-    Modules.Dashboard.TemplatesStore,
+    Redux.ModelListResponseStore<Model.SimpleTemplate>,
     Redux.Action<any>
   >({
     Response: ActionType.Templates.Response,
@@ -17,7 +17,7 @@ const rootReducer: Reducer<Modules.Dashboard.Store, Redux.Action<any>> = combine
   }),
   community: redux.reducers.factories.createModelListResponseReducer<
     Model.SimpleTemplate,
-    Modules.Dashboard.CommunityTemplatesStore,
+    Redux.ModelListResponseStore<Model.SimpleTemplate>,
     Redux.Action<any>
   >({
     Response: ActionType.Community.Response,
