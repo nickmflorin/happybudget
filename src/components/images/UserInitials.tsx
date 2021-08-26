@@ -8,11 +8,13 @@ import "./UserInitials.scss";
 
 export interface UserInitialsProps extends StandardComponentProps {
   readonly user?: Model.User | Model.SimpleUser | Model.Contact;
+  readonly circle?: boolean;
   readonly initials?: string | null;
   readonly firstName?: string | null;
   readonly lastName?: string | null;
   readonly renderNoInitials?: JSX.Element;
   readonly hideOnNoInitials?: boolean;
+  readonly overlay?: () => JSX.Element;
 }
 
 const UserInitials = ({
@@ -22,6 +24,7 @@ const UserInitials = ({
   lastName,
   renderNoInitials,
   hideOnNoInitials,
+  overlay,
   ...props
 }: Omit<UserInitialsProps, "src">): JSX.Element => {
   const userFirstName = useMemo<string | null>(() => {
@@ -62,7 +65,8 @@ const UserInitials = ({
 
   return (
     <ShowHide hide={hideOnNoInitials === true && userInitials === ""}>
-      <div className={classNames("user-initials", props.className)} style={props.style}>
+      <div className={classNames("user-initials", { circle: props.circle }, props.className)} style={props.style}>
+        {!isNil(overlay) && overlay()}
         <ShowHide show={isNil(renderNoInitials) || userInitials !== ""}>
           <div className={"user-initials-text"}>{userInitials}</div>
         </ShowHide>

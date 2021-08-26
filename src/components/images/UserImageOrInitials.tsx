@@ -14,14 +14,16 @@ export interface UserImageOrInitialsProps
   readonly initialsClassName?: string;
   readonly imageProps?: Omit<UserImageProps, "user" | "src">;
   readonly circle?: boolean;
-  readonly overlay?: () => JSX.Element;
+  readonly imageOverlay?: () => JSX.Element;
+  readonly initialsOverlay?: () => JSX.Element;
 }
 
 const UserImageOrInitials = ({
   user,
   src,
   imageProps,
-  overlay,
+  imageOverlay,
+  initialsOverlay,
   initialsStyle,
   initialsClassName,
   ...props
@@ -49,7 +51,7 @@ const UserImageOrInitials = ({
   if (!isNil(userImageSrcProps)) {
     return (
       <UserImage
-        overlay={overlay}
+        overlay={imageOverlay}
         {...userImageSrcProps}
         {...props}
         {...imageProps}
@@ -57,7 +59,15 @@ const UserImageOrInitials = ({
       />
     );
   } else {
-    return <UserInitials {...props} user={user} className={initialsClassName} style={initialsStyle} />;
+    return (
+      <UserInitials
+        overlay={initialsOverlay}
+        {...props}
+        user={user}
+        className={initialsClassName}
+        style={initialsStyle}
+      />
+    );
   }
 };
 

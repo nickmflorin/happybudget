@@ -1,15 +1,23 @@
 .img-overlay--edit-image {
   display: flex;
-  justify-content: center;
-
-  .overlay-text {
-    margin-left: 6px;
-    font-size: 14px;
-    line-height: 22px;
-    font-weight: 600;
-  }
+  align-items: center;
 
   svg {
-    height: 22px;
+    &.icon.plus,
+    &.icon.edit {
+      height: 24px !important;
+      width: 24px !important;
+    }
+  }
+
+  .icon-wrapper--plus,
+  .icon-wrapper--edit {
+    height: 36px;
+    width: 36px;
+    padding: 5px;
+  }
+
+  .btn--clear-image {
+    padding: 5px;
   }
 }

@@ -9,6 +9,18 @@
   justify-content: center;
   border-radius: 100%;
 
+  .img-overlay {
+    display: none;
+  }
+  &.circle {
+    clip-path: circle(50%);
+  }
+  &:hover {
+    .img-overlay {
+      display: flex;
+    }
+  }
+
   .user-initials-text {
     color: #111;
     line-height: 1;

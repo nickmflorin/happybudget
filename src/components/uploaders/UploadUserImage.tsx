@@ -20,9 +20,6 @@ const UploadUserImageNoInitials = (): JSX.Element => {
       <VerticalFlexCenter className={"no-initials-icon-wrapper"}>
         <Icon icon={"camera"} weight={"solid"} />
       </VerticalFlexCenter>
-      <VerticalFlexCenter className={"no-initials-icon-wrapper"}>
-        <Icon icon={"plus"} weight={"solid"} />
-      </VerticalFlexCenter>
     </div>
   );
 };
@@ -40,7 +37,8 @@ const UploadUserImage = ({ firstName, lastName, ...props }: UploadUserImageProps
               src={typeguards.isUploadParamsWithImage(params) ? params.image.url : null}
               firstName={firstName}
               lastName={lastName}
-              overlay={() => <EditImageOverlay visible={true} onClear={params.onClear} />}
+              imageOverlay={() => <EditImageOverlay visible={true} onClear={params.onClear} isImage={true} />}
+              initialsOverlay={() => <EditImageOverlay visible={true} />}
               renderNoInitials={<UploadUserImageNoInitials />}
             />
           </FullSize>
