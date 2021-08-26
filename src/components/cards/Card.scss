@@ -10,6 +10,10 @@
 .card {
   @extend .card-base;
 
+  &.template-card {
+    height: 194px;
+  }
+
   &:hover {
     box-shadow: 0px 2px 10px #b3b3b3;
   }
@@ -80,8 +84,4 @@
       top: 150px;
     }
   }
-}
-
-.my-templates .card {
-  height: 194px;
 }

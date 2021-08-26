@@ -34,6 +34,7 @@ const CommunityTemplateCard = ({
 
   return (
     <Card
+      className={"template-card"}
       onClick={() => onClick()}
       title={template.name}
       loading={loading}

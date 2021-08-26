@@ -11,7 +11,6 @@ import { CreateBudgetModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
 
 import { actions } from "../../store";
-import TemplateDropdown from "./TemplateDropdown";
 import "./TemplatesMenu.scss";
 
 type TemplatesPage = "my-templates" | "discover";
@@ -67,24 +66,18 @@ const TemplatesMenu = (): JSX.Element => {
               }
             }}
           />
-          <TemplateDropdown
-            onCreateBudget={() => setCreateBudgetModalOpen(true)}
-            onCreateTemplate={() => setCreateTempateModalOpen(true)}
-            onCreateCommunityTemplate={() => setCreateCommunityTempateModalOpen(true)}
-            page={page}
+          <CircleIconButton
+            className={"btn--primary"}
+            icon={<Icon icon={"plus"} weight={"light"} />}
+            onClick={() => setCreateBudgetModalOpen(true)}
+          />
+          <Button
+            className={"btn--primary btn-non-circle"}
+            icon={<Icon icon={"plus"} weight={"light"} />}
+            onClick={() => setCreateBudgetModalOpen(true)}
           >
-            <CircleIconButton className={"btn--primary"} icon={<Icon icon={"plus"} weight={"light"} />} />
-          </TemplateDropdown>
-          <TemplateDropdown
-            onCreateBudget={() => setCreateBudgetModalOpen(true)}
-            onCreateTemplate={() => setCreateTempateModalOpen(true)}
-            onCreateCommunityTemplate={() => setCreateCommunityTempateModalOpen(true)}
-            page={page}
-          >
-            <Button className={"btn--primary btn-non-circle"} icon={<Icon icon={"plus"} weight={"light"} />}>
-              {"Create Budget"}
-            </Button>
-          </TemplateDropdown>
+            {"New Blank Budget"}
+          </Button>
         </div>
       </div>
 

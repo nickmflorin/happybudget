@@ -25,20 +25,20 @@ const TemplateDropdown: React.FC<TemplateDropdownProps> = ({
       menuItems={[
         {
           id: "create-new-budget",
-          label: "Create New Budget",
+          label: "New Blank Budget",
           icon: <Icon icon={"pencil"} weight={"light"} />,
           onClick: () => onCreateBudget()
         },
         {
           id: "create-new-template",
-          label: "Create New Template",
+          label: "New Template",
           icon: <Icon icon={"pencil"} weight={"light"} />,
           onClick: () => onCreateTemplate(),
           visible: page === "my-templates"
         },
         {
           id: "create-new-community-template",
-          label: "Create New Community Template",
+          label: "New Community Template",
           icon: <Icon icon={"pencil"} weight={"light"} />,
           onClick: () => onCreateCommunityTemplate(),
           visible: page === "discover" && user.is_staff === true

@@ -15,7 +15,7 @@ const Dashboard = (): JSX.Element => {
     <Layout
       sidebar={[
         {
-          label: "Templates",
+          label: "New Project",
           icon: <Icon icon={"file-plus"} weight={"light"} />,
           activeIcon: <Icon icon={"file-plus"} weight={"solid"} />,
           onClick: () => history.push("/templates"),

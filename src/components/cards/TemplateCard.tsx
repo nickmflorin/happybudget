@@ -33,6 +33,7 @@ const TemplateCard = ({
   const user = useLoggedInUser();
   return (
     <Card
+      className={"template-card"}
       onClick={() => onClick()}
       title={template.name}
       loading={loading}

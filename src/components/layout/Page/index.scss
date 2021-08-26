@@ -20,7 +20,7 @@
           margin-right: 0px;
           margin-bottom: 0;
           color: $text-primary !important;
-          font-weight: 600;
+          font-weight: 700;
           font-family: $avenir;
           font-size: 28px;
           line-height: 36px;
@@ -34,6 +34,7 @@
 
     .page-header-subtitle {
       display: flex;
+      margin-bottom: 10px;
     }
   }
 

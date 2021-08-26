@@ -8,8 +8,8 @@ import * as api from "api";
 import { redux } from "lib";
 
 import { WrapInApplicationSpinner } from "components";
-import { TemplateCard } from "components/cards";
-import { EditTemplateModal } from "components/modals";
+import { TemplateCard, EmptyCard } from "components/cards";
+import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 
 import { actions } from "../../store";
 
@@ -22,6 +22,7 @@ interface MyTemplatesProps {
 
 const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<Model.Template | undefined>(undefined);
+  const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
   const [isMoving, setMoving, setMoved] = redux.hooks.useTrackModelActions([]);
   const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
@@ -88,6 +89,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
               />
             );
           })}
+          <EmptyCard title={"New Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
         </div>
       </WrapInApplicationSpinner>
       {!isNil(templateToEdit) && (
@@ -101,6 +103,15 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
           }}
         />
       )}
+      <CreateTemplateModal
+        open={createTemplateModalOpen}
+        onCancel={() => setCreateTempateModalOpen(false)}
+        onSuccess={(template: Model.Template) => {
+          setCreateTempateModalOpen(false);
+          dispatch(actions.addTemplateToStateAction(template));
+          history.push(`/templates/${template.id}/accounts`);
+        }}
+      />
     </div>
   );
 };

@@ -8,9 +8,10 @@ import * as api from "api";
 import { redux } from "lib";
 
 import { WrapInApplicationSpinner } from "components";
-import { CommunityTemplateCard } from "components/cards";
-import { EditTemplateModal } from "components/modals";
+import { CommunityTemplateCard, EmptyCard } from "components/cards";
+import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 import { IsStaff } from "components/permissions";
+
 import { useLoggedInUser } from "store/hooks";
 
 import { actions } from "../../store";
@@ -24,6 +25,7 @@ interface DiscoverProps {
 
 const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element => {
   const [templateToEdit, setTemplateToEdit] = useState<Model.Template | undefined>(undefined);
+  const [createTemplateModalOpen, setCreateTempateModalOpen] = useState(false);
   const user = useLoggedInUser();
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
   const [isTogglingVisibility, setTogglingVisibility, setVisibilityToggled] = redux.hooks.useTrackModelActions([]);
@@ -117,6 +119,9 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
             }
             return <React.Fragment key={index}>{card}</React.Fragment>;
           })}
+          <IsStaff>
+            <EmptyCard title={"New Community Template"} icon={"plus"} onClick={() => setCreateTempateModalOpen(true)} />
+          </IsStaff>
         </div>
       </WrapInApplicationSpinner>
       {!isNil(templateToEdit) && (
@@ -132,6 +137,18 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
           />
         </IsStaff>
       )}
+      <IsStaff>
+        <CreateTemplateModal
+          open={createTemplateModalOpen}
+          community={true}
+          onCancel={() => setCreateTempateModalOpen(false)}
+          onSuccess={(template: Model.Template) => {
+            setCreateTempateModalOpen(false);
+            dispatch(actions.addCommunityTemplateToStateAction(template));
+            history.push(`/templates/${template.id}/accounts`);
+          }}
+        />
+      </IsStaff>
     </div>
   );
 };
