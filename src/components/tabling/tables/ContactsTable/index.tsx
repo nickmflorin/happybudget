@@ -78,7 +78,7 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
         {
           field: "phone_number",
           headerName: "Phone Number",
-          columnType: "phoneNumber",
+          columnType: "phone",
           cellRenderer: { data: "PhoneNumberCell" }
         },
         {
