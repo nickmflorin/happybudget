@@ -141,13 +141,13 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
   to the Editor(s) that is manually called inside the Editor.
   */
   const onDoneEditing = hooks.useDynamicCallback((e: Table.CellDoneEditingEvent) => {
-    if (tabling.typeguards.isKeyboardEvent(e) && !isNil(apis)) {
-      const focusedCell = apis.grid.getFocusedCell();
+    if (tabling.typeguards.isKeyboardEvent(e)) {
+      const focusedCell = apis?.grid.getFocusedCell();
       if (!isNil(focusedCell) && !isNil(focusedCell.rowIndex)) {
         if (e.code === "Enter") {
           moveToNextRow({ rowIndex: focusedCell.rowIndex, column: focusedCell.column });
         } else if (e.code === "Tab") {
-          moveToNextColumn(focusedCell.rowIndex, focusedCell.column);
+          moveToNextColumn({ rowIndex: focusedCell.rowIndex, column: focusedCell.column });
         }
       }
     }
@@ -161,12 +161,16 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
         suppressKeyboardEvent: (params: SuppressKeyboardEventParams) => {
           if (!isNil(col.suppressKeyboardEvent) && col.suppressKeyboardEvent(params) === true) {
             return true;
-          } else if (
-            !isNil(params.api) &&
-            readOnly !== true &&
-            !params.editing &&
-            includes(["Backspace", "Delete"], params.event.code)
-          ) {
+          } else if (readOnly !== true && params.editing && includes(["Tab"], params.event.code)) {
+            /*
+            Our custom cell editors have built in functionality that when editing is terminated via
+            a TAB key, we move one cell to the right without continuing in edit mode.  This however
+            does not work for the bland text cells, where we do not have cell editors controlling the
+            edit behavior.  So we need to suppress the TAB behavior when editing, and manually move
+            the cell over.
+            */
+            return true;
+          } else if (readOnly !== true && !params.editing && includes(["Backspace", "Delete"], params.event.code)) {
             const clearCellsOverRange = (range: CellRange | CellRange[], api: GridApi) => {
               const changes: Table.CellChange<R, M>[] = !Array.isArray(range)
                 ? getTableChangesFromRangeClear(range, api)
@@ -202,7 +206,6 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
               return false;
             }
           } else if (
-            !isNil(params.api) &&
             (params.event.key === "ArrowDown" || params.event.key === "ArrowUp") &&
             (params.event.ctrlKey || params.event.metaKey)
           ) {
@@ -323,29 +326,31 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
     }
   }));
 
-  const onFirstDataRendered = hooks.useDynamicCallback((event: FirstDataRenderedEvent): void => {
-    props.onFirstDataRendered(event);
-    event.api.ensureIndexVisible(0);
+  const onFirstDataRendered: (event: FirstDataRenderedEvent) => void = hooks.useDynamicCallback(
+    (event: FirstDataRenderedEvent): void => {
+      props.onFirstDataRendered(event);
+      event.api.ensureIndexVisible(0);
 
-    const query = new URLSearchParams(location.search);
-    const rowId = query.get("row");
-    const cols = event.columnApi.getAllColumns();
+      const query = new URLSearchParams(location.search);
+      const rowId = query.get("row");
+      const cols = event.columnApi.getAllColumns();
 
-    if (!isNil(cols) && cols.length >= 3) {
-      let identifierCol = cols[2];
-      let focusedOnQuery = false;
-      if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
-        const node = event.api.getRowNode(String(rowId));
-        if (!isNil(node) && !isNil(node.rowIndex) && !isNil(identifierCol)) {
-          event.api.setFocusedCell(node.rowIndex, identifierCol);
-          focusedOnQuery = true;
+      if (!isNil(cols) && cols.length >= 3) {
+        let identifierCol = cols[2];
+        let focusedOnQuery = false;
+        if (!isNil(rowId) && !isNaN(parseInt(rowId))) {
+          const node = event.api.getRowNode(String(rowId));
+          if (!isNil(node) && !isNil(node.rowIndex) && !isNil(identifierCol)) {
+            event.api.setFocusedCell(node.rowIndex, identifierCol);
+            focusedOnQuery = true;
+          }
+        }
+        if (focusedOnQuery === false) {
+          event.api.setFocusedCell(0, identifierCol);
         }
       }
-      if (focusedOnQuery === false) {
-        event.api.setFocusedCell(0, identifierCol);
-      }
     }
-  });
+  );
 
   const findNextNavigatableRow = hooks.useDynamicCallback(
     (startingIndex: number, direction: "asc" | "desc" = "asc"): [RowNode | null, number, number] => {
@@ -379,103 +384,110 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
     }
   );
 
-  const navigateToNextCell = hooks.useDynamicCallback((params: NavigateToNextCellParams): CellPosition => {
-    if (!isNil(params.nextCellPosition)) {
-      const verticalAscend = params.previousCellPosition.rowIndex < params.nextCellPosition.rowIndex;
-      const verticalDescend = params.previousCellPosition.rowIndex > params.nextCellPosition.rowIndex;
+  const navigateToNextCell: (params: NavigateToNextCellParams) => CellPosition = hooks.useDynamicCallback(
+    (params: NavigateToNextCellParams): CellPosition => {
+      if (!isNil(params.nextCellPosition)) {
+        const verticalAscend = params.previousCellPosition.rowIndex < params.nextCellPosition.rowIndex;
+        const verticalDescend = params.previousCellPosition.rowIndex > params.nextCellPosition.rowIndex;
 
-      if (verticalAscend === true || verticalDescend === true) {
-        const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
-        /* eslint-disable no-unused-vars */
-        /* eslint-disable @typescript-eslint/no-unused-vars */
-        const [rowNode, _, additionalIndex] = findNextNavigatableRow(params.nextCellPosition.rowIndex, direction);
-        if (!isNil(rowNode)) {
-          return {
-            ...params.nextCellPosition,
-            rowIndex:
-              verticalAscend === true
-                ? params.nextCellPosition.rowIndex + additionalIndex
-                : params.nextCellPosition.rowIndex - additionalIndex
-          };
-        }
-        return params.nextCellPosition;
-      } else if (includes(["expand", "index"], params.nextCellPosition.column.getColId())) {
-        return params.previousCellPosition;
-      } else {
-        return params.nextCellPosition;
-      }
-    }
-    return params.previousCellPosition;
-  });
-
-  const tabToNextCell = hooks.useDynamicCallback((params: TabToNextCellParams): CellPosition => {
-    if (!params.editing && !isNil(apis)) {
-      // If the nextCellPosition is null, it means we are at the bottom of the table
-      // all the way in the Column furthest to the right.
-      if (isNil(params.nextCellPosition)) {
-        // TODO: We need to figure out how to move down to the next cell!  This
-        // is tricky, because we have to wait for the row to be present in state.
-        _onChangeEvent({ type: "rowAdd", payload: 1 });
-      } else {
-        if (includes(["index", "expand"], params.nextCellPosition.column.getColId())) {
-          let nextCellPosition = { ...params.nextCellPosition };
-          const [rowNode, _, additionalIndex] = findNextNavigatableRow(params.nextCellPosition.rowIndex);
+        if (verticalAscend === true || verticalDescend === true) {
+          const direction: "asc" | "desc" = verticalAscend === true ? "asc" : "desc";
+          /* eslint-disable no-unused-vars */
+          /* eslint-disable @typescript-eslint/no-unused-vars */
+          const [rowNode, _, additionalIndex] = findNextNavigatableRow(params.nextCellPosition.rowIndex, direction);
           if (!isNil(rowNode)) {
-            nextCellPosition = {
+            return {
               ...params.nextCellPosition,
-              rowIndex: params.nextCellPosition.rowIndex + additionalIndex
+              rowIndex:
+                verticalAscend === true
+                  ? params.nextCellPosition.rowIndex + additionalIndex
+                  : params.nextCellPosition.rowIndex - additionalIndex
             };
           }
-          const agColumns = apis.column.getAllColumns();
-          if (!isNil(agColumns)) {
-            const baseColumns = filter(agColumns, (c: Column) => includes(["index", "expand"], c.getColId()));
-            if (params.backwards === false && localColumns.length > baseColumns.length) {
-              return { ...nextCellPosition, column: agColumns[baseColumns.length] };
-            } else {
-              return { ...nextCellPosition, column: agColumns[agColumns.length - 1] };
+          return params.nextCellPosition;
+        } else if (includes(["expand", "index"], params.nextCellPosition.column.getColId())) {
+          return params.previousCellPosition;
+        } else {
+          return params.nextCellPosition;
+        }
+      }
+      return params.previousCellPosition;
+    }
+  );
+
+  const tabToNextCell: (params: TabToNextCellParams) => CellPosition = hooks.useDynamicCallback(
+    (params: TabToNextCellParams): CellPosition => {
+      if (!params.editing) {
+        // If the nextCellPosition is null, it means we are at the bottom of the table
+        // all the way in the Column furthest to the right.
+        if (isNil(params.nextCellPosition)) {
+          // TODO: We need to figure out how to move down to the next cell!  This
+          // is tricky, because we have to wait for the row to be present in state.
+          _onChangeEvent({ type: "rowAdd", payload: 1 });
+        } else {
+          if (includes(["index", "expand"], params.nextCellPosition.column.getColId())) {
+            let nextCellPosition = { ...params.nextCellPosition };
+            const [rowNode, _, additionalIndex] = findNextNavigatableRow(params.nextCellPosition.rowIndex);
+            if (!isNil(rowNode)) {
+              nextCellPosition = {
+                ...params.nextCellPosition,
+                rowIndex: params.nextCellPosition.rowIndex + additionalIndex
+              };
+            }
+            const agColumns = apis?.column.getAllColumns();
+            if (!isNil(agColumns)) {
+              const baseColumns = filter(agColumns, (c: Column) => includes(["index", "expand"], c.getColId()));
+              if (params.backwards === false && localColumns.length > baseColumns.length) {
+                return { ...nextCellPosition, column: agColumns[baseColumns.length] };
+              } else {
+                return { ...nextCellPosition, column: agColumns[agColumns.length - 1] };
+              }
             }
           }
         }
       }
+      return params.nextCellPosition;
     }
-    return params.nextCellPosition;
-  });
+  );
 
-  const moveToLocation = hooks.useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
-    if (!isNil(apis)) {
-      apis.grid.setFocusedCell(loc.rowIndex, loc.column);
-      apis.grid.clearRangeSelection();
-      if (opts.startEdit === true && readOnly !== true) {
-        apis.grid.startEditingCell({ rowIndex: loc.rowIndex, colKey: loc.column });
+  const moveToLocation: (loc: Omit<CellPosition, "rowPinned">, opts?: Table.CellPositionMoveOptions) => void =
+    hooks.useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
+      if (!isNil(apis)) {
+        apis.grid.setFocusedCell(loc.rowIndex, loc.column);
+        apis.grid.clearRangeSelection();
+        if (opts.startEdit === true && readOnly !== true) {
+          apis.grid.startEditingCell({ rowIndex: loc.rowIndex, colKey: loc.column });
+        }
       }
-    }
-  });
+    });
 
-  const moveToNextRow = hooks.useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
-    if (!isNil(apis)) {
-      const [node, rowIndex, _] = findNextNavigatableRow(loc.rowIndex + 1);
-      if (node === null) {
-        _onChangeEvent({ type: "rowAdd", payload: 1 });
+  const moveToNextRow: (loc: Omit<CellPosition, "rowPinned">, opts?: Table.CellPositionMoveOptions) => void =
+    hooks.useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
+      if (!isNil(apis)) {
+        const [node, rowIndex, _] = findNextNavigatableRow(loc.rowIndex + 1);
+        if (node === null) {
+          _onChangeEvent({ type: "rowAdd", payload: 1 });
+        }
+        moveToLocation({ rowIndex, column: loc.column }, opts);
       }
-      moveToLocation({ rowIndex, column: loc.column }, opts);
-    }
-  });
+    });
 
-  const moveToNextColumn = hooks.useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
-    if (!isNil(apis)) {
-      const agColumns = apis.column.getAllColumns();
-      if (!isNil(agColumns)) {
-        const index = agColumns.indexOf(loc.column);
-        if (index !== -1) {
-          if (index === agColumns.length - 1) {
-            moveToNextRow({ rowIndex: loc.rowIndex, column: agColumns[0] }, opts);
-          } else {
-            moveToLocation({ rowIndex: loc.rowIndex, column: agColumns[index + 1] }, opts);
+  const moveToNextColumn: (loc: Omit<CellPosition, "rowPinned">, opts?: Table.CellPositionMoveOptions) => void =
+    hooks.useDynamicCallback((loc: CellPosition, opts: Table.CellPositionMoveOptions = {}) => {
+      if (!isNil(apis)) {
+        const agColumns = apis.column.getAllColumns();
+        if (!isNil(agColumns)) {
+          const index = agColumns.indexOf(loc.column);
+          if (index !== -1) {
+            if (index === agColumns.length - 1) {
+              moveToNextRow({ rowIndex: loc.rowIndex, column: agColumns[0] }, opts);
+            } else {
+              moveToLocation({ rowIndex: loc.rowIndex, column: agColumns[index + 1] }, opts);
+            }
           }
         }
       }
-    }
-  });
+    });
 
   const onCellSpaceKey = hooks.useDynamicCallback((event: CellKeyDownEvent) => {
     if (!isNil(event.rowIndex)) {
@@ -505,7 +517,7 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
     }
   });
 
-  const onCellKeyDown = hooks.useDynamicCallback((event: CellKeyDownEvent) => {
+  const onCellKeyDown: (event: CellKeyDownEvent) => void = hooks.useDynamicCallback((event: CellKeyDownEvent) => {
     if (!isNil(event.event)) {
       /* @ts-ignore  AG Grid's Event Object is Wrong */
       // AG Grid only enters Edit mode in a cell when a character is pressed, not the Space
@@ -516,18 +528,21 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
       } else if (event.event.key === "x" && (event.event.ctrlKey || event.event.metaKey) && readOnly !== true) {
         onCellCut(event.event, event.api);
         /* @ts-ignore  AG Grid's Event Object is Wrong */
-      } else if (event.event.code === "Enter") {
+      } else if (event.event.code === "Enter" && !isNil(event.rowIndex)) {
         // If Enter is clicked inside the cell popout, this doesn't get triggered.
         const editing = event.api.getEditingCells();
         if (editing.length === 0) {
           moveToNextRow({ rowIndex: event.rowIndex, column: event.column });
         }
+        /* @ts-ignore  AG Grid's Event Object is Wrong */
+      } else if (event.event.code === "Tab" && !isNil(event.rowIndex)) {
+        moveToNextColumn({ rowIndex: event.rowIndex, column: event.column });
       }
     }
   });
 
-  const getCellChangeForClear = hooks.useDynamicCallback(
-    (row: R, col: Table.Column<R, M>): Table.CellChange<R, M> | null => {
+  const getCellChangeForClear: (row: R, col: Table.Column<R, M>) => Table.CellChange<R, M> | null =
+    hooks.useDynamicCallback((row: R, col: Table.Column<R, M>): Table.CellChange<R, M> | null => {
       const clearValue = col.nullValue !== undefined ? col.nullValue : null;
       const colId = col.field;
       if (row[col.field as string] === undefined || row[col.field as string] !== clearValue) {
@@ -543,11 +558,10 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
       } else {
         return null;
       }
-    }
-  );
+    });
 
-  const getTableChangesFromRangeClear = hooks.useDynamicCallback(
-    (range: CellRange, gridApi?: GridApi): Table.CellChange<R, M>[] => {
+  const getTableChangesFromRangeClear: (range: CellRange, gridApi?: GridApi) => Table.CellChange<R, M>[] =
+    hooks.useDynamicCallback((range: CellRange, gridApi?: GridApi): Table.CellChange<R, M>[] => {
       const changes: Table.CellChange<R, M>[] = [];
       if (!isNil(apis) && !isNil(range.startRow) && !isNil(range.endRow)) {
         gridApi = isNil(gridApi) ? gridApi : apis.grid;
@@ -572,10 +586,11 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
         }
       }
       return changes;
-    }
-  );
+    });
 
-  const getCellChangeFromEvent = (
+  const getCellChangeFromEvent: (
+    event: CellEditingStoppedEvent | CellValueChangedEvent
+  ) => Table.CellChange<R, M> | null = (
     event: CellEditingStoppedEvent | CellValueChangedEvent
   ): Table.CellChange<R, M> | null => {
     const field = event.column.getColId() as Table.Field<R, M>;
@@ -681,11 +696,11 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
     }
   });
 
-  const onPasteStart = hooks.useDynamicCallback((event: PasteStartEvent) => {
+  const onPasteStart: (event: PasteStartEvent) => void = hooks.useDynamicCallback((event: PasteStartEvent) => {
     setCellChangeEvents([]);
   });
 
-  const onPasteEnd = hooks.useDynamicCallback((event: PasteEndEvent) => {
+  const onPasteEnd: (event: PasteEndEvent) => void = hooks.useDynamicCallback((event: PasteEndEvent) => {
     const changes = filter(
       map(cellChangeEvents, (e: CellValueChangedEvent) => getCellChangeFromEvent(e)),
       (change: Table.CellChange<R, M> | null) => change !== null
@@ -698,29 +713,31 @@ const DataGrid = <R extends Table.Row, M extends Model.Model>({
     }
   });
 
-  const getContextMenuItems = hooks.useDynamicCallback((params: GetContextMenuItemsParams): MenuItemDef[] => {
-    let contextMenuItems: MenuItemDef[] = [];
-    // This can happen in rare cases where you right click outside of a cell.
-    if (isNil(params.node)) {
-      return contextMenuItems; // This can happen in rare cases where you right click outside of a cell.
+  const getContextMenuItems: (params: GetContextMenuItemsParams) => MenuItemDef[] = hooks.useDynamicCallback(
+    (params: GetContextMenuItemsParams): MenuItemDef[] => {
+      let contextMenuItems: MenuItemDef[] = [];
+      // This can happen in rare cases where you right click outside of a cell.
+      if (isNil(params.node)) {
+        return contextMenuItems; // This can happen in rare cases where you right click outside of a cell.
+      }
+      const row: R = params.node.data;
+      if (!isNil(props.getContextMenuItems)) {
+        contextMenuItems = [...contextMenuItems, ...props.getContextMenuItems(row, params.node, _onChangeEvent)];
+      }
+      if (isNil(rowCanDelete) || rowCanDelete(row) === true) {
+        contextMenuItems = [
+          ...contextMenuItems,
+          {
+            name: `Delete ${
+              tabling.util.getFullRowLabel(row, { name: defaultRowName, label: defaultRowLabel }) || "Row"
+            }`,
+            action: () => _onChangeEvent({ payload: { rows: row, columns: localColumns }, type: "rowDelete" })
+          }
+        ];
+      }
+      return contextMenuItems;
     }
-    const row: R = params.node.data;
-    if (!isNil(props.getContextMenuItems)) {
-      contextMenuItems = [...contextMenuItems, ...props.getContextMenuItems(row, params.node, _onChangeEvent)];
-    }
-    if (isNil(rowCanDelete) || rowCanDelete(row) === true) {
-      contextMenuItems = [
-        ...contextMenuItems,
-        {
-          name: `Delete ${
-            tabling.util.getFullRowLabel(row, { name: defaultRowName, label: defaultRowLabel }) || "Row"
-          }`,
-          action: () => _onChangeEvent({ payload: { rows: row, columns: localColumns }, type: "rowDelete" })
-        }
-      ];
-    }
-    return contextMenuItems;
-  });
+  );
 
   const processDataFromClipboard = hooks.useDynamicCallback((params: ProcessDataFromClipboardParams) => {
     const createRowAddFromDataArray = (local: ColumnApi, array: any[], startingColumn: Column): Table.RowAdd<R, M> => {

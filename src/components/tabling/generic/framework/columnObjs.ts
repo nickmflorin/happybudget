@@ -1,5 +1,4 @@
 import { isNil, find } from "lodash";
-import { SuppressKeyboardEventParams } from "@ag-grid-community/core";
 
 import { tabling, util, model } from "lib";
 
@@ -78,16 +77,7 @@ const SelectColumn = <R extends Table.Row, M extends Model.Model, C extends Mode
     columnType: "singleSelect",
     width: 100,
     ...props,
-    cellClass: tabling.util.mergeClassNamesFn("cell--renders-html", props.cellClass),
-    // Required to allow the dropdown to be selectable on Enter key.
-    suppressKeyboardEvent: !isNil(props.suppressKeyboardEvent)
-      ? props.suppressKeyboardEvent
-      : (params: SuppressKeyboardEventParams) => {
-          if ((params.event.code === "Enter" || params.event.code === "Tab") && params.editing) {
-            return true;
-          }
-          return false;
-        }
+    cellClass: tabling.util.mergeClassNamesFn("cell--renders-html", props.cellClass)
   };
 };
 
