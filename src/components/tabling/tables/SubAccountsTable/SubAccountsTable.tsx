@@ -57,14 +57,14 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
                 // We always want the text in the identifier cell to be present, but the column
                 // itself isn't always wide enough.  However, applying a colSpan conflicts with the
                 // colSpan of the main data grid, causing weird behavior.
-                cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset" }
+                cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
               },
               page: {
                 value: !isNil(this.props.budget) ? `${this.props.budget.name} Total` : "Budget Total",
                 // We always want the text in the identifier cell to be present, but the column
                 // itself isn't always wide enough.  However, applying a colSpan conflicts with the
                 // colSpan of the main data grid, causing weird behavior.
-                cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset" }
+                cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
               },
               index: 0,
               cellRenderer: { data: "IdentifierCell" },
