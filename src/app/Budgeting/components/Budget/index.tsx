@@ -57,7 +57,6 @@ const Budget = (): JSX.Element => {
     }
   }, [budgetId]);
 
-  console.log(saving);
   return (
     <Layout
       collapsed
