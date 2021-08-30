@@ -35,8 +35,9 @@ const HeaderTemplateSelect = (props: HeaderTemplateSelectProps): JSX.Element => 
     >
       <React.Fragment>
         <Select.Option key={0} value={"none"}>
-          {"Untitled"}
+          {"Select Header Template"}
         </Select.Option>
+
         {map(props.templates, (template: Model.HeaderTemplate, index: number) => {
           return (
             <Select.Option className={"header-template-select-option"} key={index + 1} value={template.id}>
@@ -49,6 +50,7 @@ const HeaderTemplateSelect = (props: HeaderTemplateSelectProps): JSX.Element => 
                 ) : (
                   <IconButton
                     icon={<Icon icon={"trash"} weight={"regular"} />}
+                    size={"xxsmall"}
                     onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
                       event.stopPropagation();
                       event.preventDefault();

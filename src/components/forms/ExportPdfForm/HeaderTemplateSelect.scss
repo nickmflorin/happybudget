@@ -1,5 +1,12 @@
 @import "style/_imports";
 
+.header-template-select {
+  &.select {
+    width: 200px;
+    margin-right: 10px;
+  }
+}
+
 .header-template-select-option {
   .ant-select-item-option-content {
     display: flex;

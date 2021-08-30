@@ -18,7 +18,6 @@ import { EntityTextDescription } from "components/typography/EntityText";
 
 import HeaderTemplateSaveForm, { IHeaderTemplateSaveFormRef } from "./HeaderTemplateSaveForm";
 import useHeaderTemplate from "./useHeaderTemplate";
-import HeaderTemplateSelect from "./HeaderTemplateSelect";
 
 import "./index.scss";
 
@@ -73,7 +72,6 @@ const ExportForm = (
 ): JSX.Element => {
   const saveFormRef = useRef<IHeaderTemplateSaveFormRef>(null);
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState<ID | null>(null);
   const [showAllTables, setShowAllTables] = useState(isNil(props.initialValues?.tables));
   const [includeNotes, setIncludeNotes] = useState(false);
   const [notesBlocks, setNotesBlocks] = useState<RichText.Block[]>(props.initialValues?.notes || []);
@@ -312,25 +310,6 @@ const ExportForm = (
       }}
     >
       <Form.ItemSection label={"Header"}>
-        <Form.ItemStyle label={"Template"}>
-          <HeaderTemplateSelect
-            loading={headerTemplatesLoading}
-            onLoad={onLoadHeaderTemplate}
-            onClear={onClearHeaderTemplate}
-            value={displayedHeaderTemplate}
-            templates={headerTemplates}
-            deleting={deleting}
-            onDelete={(id: ID) => {
-              setDeleting(id);
-              api
-                .deleteHeaderTemplate(id)
-                .then(() => onHeaderTemplateDeleted(id))
-                .catch((e: Error) => props.form.handleRequestError(e))
-                .finally(() => setDeleting(null));
-            }}
-          />
-        </Form.ItemStyle>
-
         <Form.ItemStyle label={"Title"}>
           <Editor
             value={headerTemplateData.header}
@@ -372,6 +351,12 @@ const ExportForm = (
         </div>
 
         <HeaderTemplateSaveForm
+          loading={headerTemplatesLoading}
+          onLoad={onLoadHeaderTemplate}
+          onClear={onClearHeaderTemplate}
+          onHeaderTemplateDeleted={onHeaderTemplateDeleted}
+          value={displayedHeaderTemplate}
+          templates={headerTemplates}
           ref={saveFormRef}
           existing={!isNil(displayedHeaderTemplate)}
           saving={saving}

@@ -1,13 +1,15 @@
-import { useState, useImperativeHandle, forwardRef, ForwardedRef } from "react";
+import { useState, useEffect, useImperativeHandle, forwardRef, ForwardedRef } from "react";
 import classNames from "classnames";
+import { isNil } from "lodash";
+
+import * as api from "api";
 
 import { ShowHide, Form } from "components";
 import { Button, ClearButton } from "components/buttons";
 import { Input } from "components/fields";
 
+import HeaderTemplateSelect from "./HeaderTemplateSelect";
 import "./HeaderTemplateSaveForm.scss";
-import { isNil } from "lodash";
-import { useEffect } from "react";
 
 export type IHeaderTemplateSaveFormRef = {
   readonly setRequestNameInput: (value: boolean) => void;
@@ -19,16 +21,35 @@ interface HeaderTemplateSaveFormProps extends StandardComponentProps {
   readonly existing: boolean;
   readonly saving: boolean;
   readonly onSave: (name?: string) => void;
+  readonly loading: boolean;
+  readonly onLoad: (id: ID) => void;
+  readonly onClear: () => void;
+  readonly value: Model.HeaderTemplate | null;
+  readonly templates: Model.HeaderTemplate[];
+  readonly onHeaderTemplateDeleted: (id: ID) => void;
 }
 
 const HeaderTemplateSaveForm = (
-  { disabled, saving, existing, onSave, ...props }: HeaderTemplateSaveFormProps,
+  {
+    disabled,
+    saving,
+    existing,
+    onSave,
+    loading,
+    onLoad,
+    onClear,
+    value,
+    templates,
+    onHeaderTemplateDeleted,
+    ...props
+  }: HeaderTemplateSaveFormProps,
   ref: ForwardedRef<IHeaderTemplateSaveFormRef>
 ): JSX.Element => {
   const [error, setError] = useState<string | null>(null);
   const [saveAsMode, setSaveAsMode] = useState(false);
   const [requestNameInput, setRequestNameInput] = useState(false);
   const [name, setName] = useState<string>("");
+  const [deleting, setDeleting] = useState<ID | null>(null);
 
   useImperativeHandle(ref, () => ({
     setRequestNameInput,
@@ -43,63 +64,89 @@ const HeaderTemplateSaveForm = (
 
   return (
     <div {...props} className={classNames("header-template-save-form", props.className)}>
-      <div className={"form-item"}>
+      <Form.ItemStyle label={"Header Template"}>
         <div style={{ display: "flex" }}>
-          <Button
-            className={"btn btn--primary btn--small"}
-            disabled={disabled || saving}
-            loading={saving}
-            style={{ marginRight: !isNil(existing) || requestNameInput ? 6 : 0 }}
-            onClick={() => {
-              if (requestNameInput === true) {
-                if (name.trim() !== "") {
-                  setError(null);
-                  onSave(name);
-                } else {
-                  setError("Template name is required.");
-                }
-              } else if (existing === false) {
-                setError(null);
-                setRequestNameInput(true);
-              } else {
-                setError(null);
-                onSave();
-              }
+          <HeaderTemplateSelect
+            loading={loading}
+            onLoad={onLoad}
+            onClear={onClear}
+            value={value}
+            templates={templates}
+            deleting={deleting}
+            onDelete={(id: ID) => {
+              setDeleting(id);
+              api
+                .deleteHeaderTemplate(id)
+                .then(() => onHeaderTemplateDeleted(id))
+                // .catch((e: Error) => props.form.handleRequestError(e))
+                .catch((e: Error) => setError("An error occurred while deleting the header template."))
+                .finally(() => setDeleting(null));
             }}
-          >
-            {"Save"}
-          </Button>
-          <ShowHide show={existing && saveAsMode === false}>
+          />
+
+          <div style={{ display: "flex", width: "100%" }}>
             <Button
               className={"btn btn--default btn--small"}
-              style={{ marginRight: requestNameInput ? 6 : 0 }}
-              disabled={disabled || saving || saveAsMode === true}
+              disabled={disabled || saving}
+              loading={saving}
+              style={{ marginRight: !isNil(existing) || requestNameInput ? 6 : 0 }}
               onClick={() => {
-                setRequestNameInput(true);
-                setSaveAsMode(true);
+                if (requestNameInput === true) {
+                  if (name.trim() !== "") {
+                    setError(null);
+                    onSave(name);
+                  } else {
+                    setError("Template name is required.");
+                  }
+                } else if (existing === false) {
+                  setError(null);
+                  setRequestNameInput(true);
+                } else {
+                  setError(null);
+                  onSave();
+                }
               }}
             >
-              {"Save As"}
+              {"Save"}
             </Button>
-          </ShowHide>
-          <ShowHide show={requestNameInput}>
-            <div style={{ display: "flex" }}>
-              <Input
-                placeholder={"Name"}
-                className={classNames("input input--small", { "with-error": !isNil(error) })}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-              />
-              <ClearButton
+
+            <ShowHide show={existing && saveAsMode === false}>
+              <Button
+                className={"btn btn--default btn--small"}
+                style={{ marginRight: requestNameInput ? 6 : 0 }}
+                disabled={disabled || saving || saveAsMode === true}
                 onClick={() => {
-                  setError(null);
-                  setRequestNameInput(false);
+                  setRequestNameInput(true);
+                  setSaveAsMode(true);
                 }}
-              />
-            </div>
-          </ShowHide>
+              >
+                {"Save As..."}
+              </Button>
+            </ShowHide>
+
+            <ShowHide show={requestNameInput}>
+              <div style={{ display: "flex" }}>
+                <Input
+                  placeholder={"Name"}
+                  className={classNames("input input--small", {
+                    "with-error": !isNil(error)
+                  })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                  style={{ marginRight: 6 }}
+                />
+                <ClearButton
+                  size={"large"}
+                  onClick={() => {
+                    setError(null);
+                    setRequestNameInput(false);
+                  }}
+                />
+              </div>
+            </ShowHide>
+          </div>
         </div>
-        <Form.FieldError>{error}</Form.FieldError>
-      </div>
+      </Form.ItemStyle>
+      <Form.FieldError>{error}</Form.FieldError>
     </div>
   );
 };
