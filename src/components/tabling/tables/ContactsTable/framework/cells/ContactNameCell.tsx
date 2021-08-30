@@ -11,14 +11,14 @@ interface ContactNameCellProps extends Table.CellProps<Tables.ContactRow, Model.
 const ContactNameCell = ({ value, ...props }: ContactNameCellProps): JSX.Element => {
   return (
     <Cell {...props}>
-      <div style={{ display: "flex", justifyContent: "left" }}>
+      <div style={{ display: "flex", justifyContent: "left", alignItems: "center" }}>
         <UserImageOrInitials
           circle={true}
           src={!isNil(value.image) ? value.image.url : null}
           firstName={value.first_name}
           lastName={value.last_name}
-          initialsStyle={{ width: 36, height: 36, marginRight: 8 }}
-          imageProps={{ wrapperStyle: { width: 36, height: 36, marginRight: 8 } }}
+          initialsStyle={{ width: 28, height: 28, marginRight: 8 }}
+          imageProps={{ wrapperStyle: { width: 28, height: 28, marginRight: 8 } }}
           hideOnNoInitials={true}
         />
         {model.util.displayFirstAndLastName(value.first_name, value.last_name)}
