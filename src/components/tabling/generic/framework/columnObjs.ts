@@ -48,7 +48,8 @@ export const BodyColumn = <R extends Table.Row, M extends Model.Model>(
   col: Partial<Table.Column<R, M>>
 ): Table.Column<R, M> => {
   return {
-    cellRenderer: "BodyCell",
+    // Not using our own cell renderer here boosts performance.
+    // cellRenderer: "BodyCell",
     suppressSizeToFit: true,
     ...col,
     tableColumnType: "body"

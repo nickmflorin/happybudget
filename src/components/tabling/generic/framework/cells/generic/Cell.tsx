@@ -46,4 +46,4 @@ const Cell = <R extends Table.Row, M extends Model.Model>(props: Table.CellWithC
   );
 };
 
-export default Cell;
+export default React.memo(Cell) as typeof Cell;

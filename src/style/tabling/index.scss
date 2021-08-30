@@ -108,6 +108,12 @@
         // text overflow.  We still need to figure out a mores sustainable solution.
         white-space: break-spaces;
         -webkit-font-smoothing: subpixel-antialiased;
+        // Because we have a 2px border width when the cell is selected and a 1px border
+        // width when it is not selected, if we do not apply this flex centering the text
+        // shifts on selection.
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
 
         &--action {
           // white-space break-spaces messes with the checkbox selection cells.

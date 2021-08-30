@@ -1,3 +1,4 @@
+import React from "react";
 import { isNil } from "lodash";
 import { Tag } from "components/tagging";
 import Cell from "./Cell";
@@ -23,4 +24,4 @@ const ModelTagCell = <R extends Table.Row, M extends Model.Model, V extends Mode
   );
 };
 
-export default ModelTagCell;
+export default React.memo(ModelTagCell) as typeof ModelTagCell;

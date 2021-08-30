@@ -1,3 +1,4 @@
+import React from "react";
 import Cell from "./Cell";
 
 const ValueCell = <R extends Table.Row, M extends Model.Model>({
@@ -7,4 +8,4 @@ const ValueCell = <R extends Table.Row, M extends Model.Model>({
   return <Cell<R, M> {...props}>{value}</Cell>;
 };
 
-export default ValueCell;
+export default React.memo(ValueCell) as typeof ValueCell;

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 import classNames from "classnames";
 
 import { Spin } from "antd";
@@ -20,4 +20,4 @@ const LoadableCellWrapper = ({ children, loading }: LoadableCellWrapperProps): J
   );
 };
 
-export default LoadableCellWrapper;
+export default React.memo(LoadableCellWrapper);
