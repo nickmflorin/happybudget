@@ -16,7 +16,6 @@ export type SubAccountsTableProps = {
   readonly budget?: Model.Budget | Model.Template;
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
   readonly tableFooterIdentifierValue: string;
-  readonly budgetFooterIdentifierValue?: string;
   readonly subAccountUnits: Model.Tag[];
   readonly fringes: Model.Fringe[];
   readonly categoryName: "Sub Account" | "Detail";
@@ -61,7 +60,7 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
                 cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset" }
               },
               page: {
-                value: this.props.budgetFooterIdentifierValue,
+                value: !isNil(this.props.budget) ? `${this.props.budget.name} Total` : "Budget Total",
                 // We always want the text in the identifier cell to be present, but the column
                 // itself isn't always wide enough.  However, applying a colSpan conflicts with the
                 // colSpan of the main data grid, causing weird behavior.
