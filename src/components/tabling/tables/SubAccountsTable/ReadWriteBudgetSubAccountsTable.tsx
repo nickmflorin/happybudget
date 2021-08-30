@@ -80,6 +80,7 @@ const ReadWriteBudgetSubAccountsTable = (
           cellEditorParams: { onNewContact: props.onNewContact },
           columnType: "contact",
           index: 2,
+          width: 200,
           models: props.contacts,
           modelClipboardValue: (m: Model.Contact) => m.full_name,
           processCellFromClipboard: (name: string): Model.Contact | null => {

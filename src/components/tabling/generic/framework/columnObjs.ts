@@ -14,6 +14,7 @@ export const ActionColumn = <R extends Table.Row, M extends Model.Model>(
   fieldBehavior: [],
   headerName: "",
   editable: false,
+  suppressSizeToFit: true,
   resizable: false,
   cellClass: tabling.util.mergeClassNamesFn("cell--centered", "cell--action", col.cellClass),
   canBeHidden: false,
@@ -33,7 +34,7 @@ export const CalculatedColumn = <R extends Table.Row, M extends Model.Model>(
     fieldBehavior: ["read"],
     suppressSizeToFit: true,
     width: !isNil(width) ? width : 100,
-    maxWidth: !isNil(width) ? width : 100,
+    // maxWidth: !isNil(width) ? width : 100,
     cellClass: tabling.util.mergeClassNamesFn("cell--calculated", col.cellClass),
     valueFormatter: tabling.formatters.agCurrencyValueFormatter,
     cellRendererParams: {
@@ -48,6 +49,7 @@ export const BodyColumn = <R extends Table.Row, M extends Model.Model>(
 ): Table.Column<R, M> => {
   return {
     cellRenderer: "BodyCell",
+    suppressSizeToFit: true,
     ...col,
     tableColumnType: "body"
   } as Table.Column<R, M>;
@@ -92,7 +94,7 @@ export const SelectColumn = <R extends Table.Row, M extends Model.Model>(
 ): Table.Column<R, M> => {
   return BodyColumn({
     columnType: "singleSelect",
-    width: 100,
+    suppressSizeToFit: true,
     ...props,
     cellClass: tabling.util.mergeClassNamesFn("cell--renders-html", props.cellClass),
     // Required to allow the dropdown to be selectable on Enter key.

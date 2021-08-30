@@ -69,7 +69,6 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
               index: 0,
               cellRenderer: { data: "IdentifierCell" },
               width: 100,
-              maxWidth: 100,
               suppressSizeToFit: true,
               cellStyle: { textAlign: "left" },
               colSpan: (params: Table.ColSpanParams<R, M>) => {
@@ -102,9 +101,9 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
             framework.columnObjs.BodyColumn({
               field: "description",
               headerName: `${this.props.categoryName} Description`,
-              flex: 1,
               columnType: "longText",
               index: 1,
+              suppressSizeToFit: false,
               colSpan: (params: Table.ColSpanParams<R, M>) => {
                 const row: R = params.data;
                 if (!isNil(row.meta) && !isNil(row.meta.children) && row.meta.children.length !== 0) {
@@ -157,12 +156,13 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
               headerName: "Unit",
               cellRenderer: { data: "SubAccountUnitCell" },
               cellEditor: "SubAccountUnitEditor",
-              models: this.props.subAccountUnits
+              models: this.props.subAccountUnits,
+              width: 140
             }),
             framework.columnObjs.BodyColumn({
               field: "multiplier",
               headerName: "X",
-              width: 50,
+              width: 60,
               isCalculating: true,
               valueSetter: tabling.valueSetters.floatValueSetter<R>("multiplier"),
               columnType: "number"
