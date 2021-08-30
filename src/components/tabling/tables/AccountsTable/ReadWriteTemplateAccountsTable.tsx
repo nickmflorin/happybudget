@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { isNil } from "lodash";
 
-import { util, hooks } from "lib";
+import { util, hooks, tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { ReadWriteBudgetTable, ReadWriteBudgetTableProps } from "../BudgetTable";
@@ -45,20 +45,23 @@ const ReadWriteTemplateAccountsTable = (
   return (
     <ReadWriteBudgetTable<R, M>
       {...props}
-      actions={(params: Table.ReadWriteMenuActionParams<R, M>) => [
-        {
-          icon: "folder",
-          disabled: true,
-          text: "Group",
-          isWriteOnly: true
-        },
-        {
-          icon: "badge-percent",
-          disabled: true,
-          text: "Mark Up",
-          isWriteOnly: true
-        }
-      ]}
+      actions={tabling.util.combineMenuActions(
+        [
+          {
+            icon: "folder",
+            disabled: true,
+            label: "Group",
+            isWriteOnly: true
+          },
+          {
+            icon: "badge-percent",
+            disabled: true,
+            label: "Mark Up",
+            isWriteOnly: true
+          }
+        ],
+        !isNil(props.actions) ? props.actions : []
+      )}
       columns={columns}
       budgetType={"budget"}
     />
