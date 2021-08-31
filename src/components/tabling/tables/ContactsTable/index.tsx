@@ -31,7 +31,7 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
       framework={Framework}
       onRowExpand={(id: number) => onEditContact(id)}
       expandCellTooltip={"Edit"}
-      rowHeight={36}
+      rowHeight={40}
       actions={(params: Table.ReadWriteMenuActionParams<R, M>) => [
         framework.actions.ToggleColumnAction(tableRef.current, params),
         framework.actions.ExportCSVAction(tableRef.current, params, exportFileName)
