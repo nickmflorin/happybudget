@@ -1,4 +1,4 @@
-import { Store, Middleware, createStore, applyMiddleware, compose } from "redux";
+import { Middleware, createStore, applyMiddleware, compose } from "redux";
 import createSagaMiddleware, { Saga } from "redux-saga";
 import * as Sentry from "@sentry/react";
 
@@ -27,14 +27,14 @@ const configureGenericStore = <S extends Modules.StoreObj>(
   initialState: S,
   reducer: Redux.Reducer<S>,
   rootSaga: Saga<any[]>
-): Store<S, Redux.Action> => {
+): Redux.Store<S> => {
   const sentryReduxEnhancer = Sentry.createReduxEnhancer();
 
   // Create the redux-saga middleware that allows the sagas to run as side-effects
   // in the application.
   const sagaMiddleware = createSagaMiddleware();
 
-  const store: Store<S, Redux.Action> = createStore(
+  const store: Redux.Store<S> = createStore(
     reducer,
     initialState,
     compose(applyMiddleware(sagaMiddleware, authenticatedActionMiddleware), sentryReduxEnhancer)
@@ -45,14 +45,14 @@ const configureGenericStore = <S extends Modules.StoreObj>(
   return store;
 };
 
-export const configureAuthenticatedStore = (user: Model.User): Store<Modules.Authenticated.StoreObj, Redux.Action> => {
+export const configureAuthenticatedStore = (user: Model.User): Redux.Store<Modules.Authenticated.StoreObj> => {
   const initialState = createAuthenticatedInitialState(GlobalReduxConfig, user);
   const applicationReducer = createAuthenticatedReducer(GlobalReduxConfig, user);
   const applicationSaga = createAuthenticatedRootSaga(GlobalReduxConfig);
   return configureGenericStore<Modules.Authenticated.StoreObj>(initialState, applicationReducer, applicationSaga);
 };
 
-export const configureUnauthenticatedStore = (): Store<Modules.Unauthenticated.StoreObj, Redux.Action> => {
+export const configureUnauthenticatedStore = (): Redux.Store<Modules.Unauthenticated.StoreObj> => {
   const initialState = createUnauthenticatedInitialState(GlobalReduxConfig);
   const applicationReducer = createUnauthenticatedReducer(GlobalReduxConfig);
   const applicationSaga = createUnauthenticatedRootSaga(GlobalReduxConfig);
