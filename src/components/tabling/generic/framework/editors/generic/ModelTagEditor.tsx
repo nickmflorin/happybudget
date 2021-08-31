@@ -14,6 +14,7 @@ const ModelTagEditor = <M extends Model.Model, V = M>(props: ModelTagEditorProps
       menu={props.editor.menu}
       includeSearch={true}
       autoFocusMenu={true}
+      clientSearching={true}
       focusSearchOnCharPress={true}
       defaultFocusFirstItem={false}
       {...props}

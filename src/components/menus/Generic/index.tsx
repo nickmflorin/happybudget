@@ -91,7 +91,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   // This will only perform searching if clientSearching is not false.
   const _filteredModels = ui.hooks.useDebouncedJSSearch<M>(search, _flattenedModels, {
     indices: props.searchIndices || ["id"],
-    disabled: props.includeSearch !== true || props.clientSearching === false
+    disabled: props.includeSearch !== true || props.clientSearching !== true
   });
 
   const models = useMemo<M[]>(() => {

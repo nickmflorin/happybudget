@@ -31,7 +31,6 @@ const ChoiceEditor = <R extends Table.Row, M extends Model.Model, C extends Mode
       className={props.className}
       editor={editor}
       searchIndices={searchIndices}
-      includeSearch={true}
       style={style}
       selected={!isNil(editor.value) ? editor.value.id : []}
       onChange={(params: MenuChangeEvent<C>) => editor.onChange(params.model, params.event)}
