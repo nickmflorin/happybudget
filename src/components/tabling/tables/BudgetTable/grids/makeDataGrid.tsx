@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { map, isNil, includes, find, filter, reduce } from "lodash";
+import { map, isNil, find, filter, reduce } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { GridApi, RowClassParams } from "@ag-grid-community/core";
@@ -84,29 +84,21 @@ const BudgetDataGrid = <
     );
 
     const convertedData: R[] = useMemo<R[]>((): R[] => {
-      const readColumns = filter(props.columns, (c: Table.Column<R, M>) => {
-        const fieldBehavior: Table.FieldBehavior[] = c.fieldBehavior || ["read", "write"];
-        return includes(fieldBehavior, "read");
-      });
+      const readColumns = filter(props.columns, (c: Table.Column<R, M>) => c.isRead !== false);
 
       const createGroupRow = (group: Model.Group): R | null => {
         if (readColumns.length !== 0) {
           return reduce(
-            props.columns,
+            readColumns,
             (obj: { [key: string]: any }, col: Table.Column<R, M>) => {
-              const fieldBehavior: Table.FieldBehavior[] = col.fieldBehavior || ["read", "write"];
-              if (includes(fieldBehavior, "read")) {
-                if (!isNil(col.field)) {
-                  if (col.tableColumnType === "calculated") {
-                    if (!isNil(group[col.field as keyof Model.Group])) {
-                      obj[col.field as string] = group[col.field as keyof Model.Group];
-                    } else {
-                      obj[col.field as string] = null;
-                    }
-                  } else {
-                    obj[col.field as string] = null;
-                  }
+              if (col.tableColumnType === "calculated") {
+                if (!isNil(group[col.field as keyof Model.Group])) {
+                  obj[col.field as string] = group[col.field as keyof Model.Group];
+                } else {
+                  obj[col.field as string] = null;
                 }
+              } else {
+                obj[col.field as string] = null;
               }
               return obj;
             },

@@ -146,9 +146,10 @@ namespace Table {
   interface Column<R extends Table.Row, M extends Model.Model, V = any> extends Omit<import("@ag-grid-community/core").ColDef, OmitColDefParams>, Table.DualColumn<R, M, V> {
     readonly selectable?: boolean | ((params: Table.SelectableCallbackParams<R, M>) => boolean) | undefined;
     readonly editable?: boolean | ((params: Table.EditableCallbackParams<R, M>) => boolean) | undefined;
-    readonly fieldBehavior?: Table.FieldBehavior[]; // Defaults to ["read", "write"]
     readonly footer?: Table.FooterColumn<R, M>;
     readonly page?: Table.FooterColumn<R, M>;
+    readonly isRead?: boolean;
+    readonly isWrite?: boolean;
     readonly cellRenderer?: string | Partial<Table.GridSet<string>>;
     readonly cellClass?: Table.CellClassName;
     readonly cellStyle?: React.CSSProperties;

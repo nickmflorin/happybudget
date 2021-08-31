@@ -1,10 +1,10 @@
 import React from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
-import { isNil, map, filter, includes } from "lodash";
-import { Column } from "@ag-grid-community/core";
+import { isNil } from "lodash";
 
 import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
+import { framework as budgetFramework } from "../BudgetTable";
 
 type R = Tables.AccountRow;
 type M = Model.Account;
@@ -51,46 +51,10 @@ const AccountsTable = <T extends AccountsTableProps>(
           )
         ]}
         columns={[
-          framework.columnObjs.BodyColumn({
+          budgetFramework.columnObjs.IdentifierColumn({
             field: "identifier",
-            columnType: "number",
-            headerName: "Account",
-            footer: {
-              value: !isNil(props.budget) ? `${props.budget.name} Total` : "Total",
-              // We always want the text in the identifier cell to be present, but the column
-              // itself isn't always wide enough.  However, applying a colSpan conflicts with the
-              // colSpan of the main data grid, causing weird behavior.
-              cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
-            },
-            index: 0,
-            cellRenderer: "IdentifierCell",
-            width: 100,
-            maxWidth: 100,
-            suppressSizeToFit: true,
-            cellStyle: { textAlign: "left" },
-            colSpan: (params: Table.ColSpanParams<R, M>) => {
-              const row: R = params.data;
-              if (row.meta.isGroupRow === true) {
-                /*
-                Note: We have to look at all of the visible columns that are present up until
-                the calculated columns.  This means we have to use the AG Grid ColumnApi (not our
-                own columns).
-                */
-                const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
-                if (!isNil(agColumns)) {
-                  const readColumns: Table.Field<R, M>[] = map(
-                    filter(params.columns, (c: Table.Column<R, M>) => {
-                      const fieldBehavior: Table.FieldBehavior[] = c.fieldBehavior || ["read", "write"];
-                      return includes(fieldBehavior, "read") && c.tableColumnType !== "calculated";
-                    }),
-                    (c: Table.Column<R, M>) => c.field
-                  );
-                  const readableAgColumns = filter(agColumns, (c: Column) => includes(readColumns, c.getColId()));
-                  return readableAgColumns.length;
-                }
-              }
-              return 1;
-            }
+            tableFooterLabel: !isNil(props.budget) ? `${props.budget.name} Total` : "Total",
+            headerName: "Account"
           }),
           framework.columnObjs.BodyColumn({
             field: "description",

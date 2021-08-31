@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import classNames from "classnames";
-import { isNil, reduce, map, includes } from "lodash";
+import { isNil, reduce, map, filter } from "lodash";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { hooks } from "lib";
@@ -42,15 +42,12 @@ const FooterGrid =
       const data = useMemo(
         () => [
           reduce(
-            columns,
+            filter(columns, (c: Table.Column<R, M>) => c.isRead !== false),
             (obj: { [key: string]: any }, col: Table.Column<R, M>) => {
-              const fieldBehavior: Table.FieldBehavior[] = col.fieldBehavior || ["read", "write"];
-              if (includes(fieldBehavior, "read")) {
-                obj[col.field as string] = null;
-                const footerColumn = config.getFooterColumn(col);
-                if (!isNil(footerColumn) && !isNil(footerColumn.value)) {
-                  obj[col.field as string] = footerColumn.value;
-                }
+              obj[col.field as string] = null;
+              const footerColumn = config.getFooterColumn(col);
+              if (!isNil(footerColumn) && !isNil(footerColumn.value)) {
+                obj[col.field as string] = footerColumn.value;
               }
               return obj;
             },

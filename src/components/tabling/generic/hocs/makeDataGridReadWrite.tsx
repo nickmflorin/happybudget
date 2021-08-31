@@ -427,8 +427,7 @@ const ReadWriteDataGrid =
               const field = currentColumn.getColDef().field;
               if (!isNil(field)) {
                 callWithColumn(field, (c: Table.Column<R, M>) => {
-                  const fieldBehavior = c.fieldBehavior || ["read", "write"];
-                  if (includes(fieldBehavior, "write")) {
+                  if (c.isWrite !== false) {
                     rowAdd = {
                       ...rowAdd,
                       data: {

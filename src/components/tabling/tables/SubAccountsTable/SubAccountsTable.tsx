@@ -7,6 +7,7 @@ import { Column } from "@ag-grid-community/core";
 
 import { tabling, model } from "lib";
 import { framework } from "components/tabling/generic";
+import { framework as budgetFramework } from "../BudgetTable";
 import { Framework } from "./framework";
 
 type R = Tables.SubAccountRow;
@@ -48,55 +49,11 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
           cookieNames={{ ...this.props.cookieNames, hiddenColumns: "subaccount-table-hidden-columns" }}
           framework={Framework}
           columns={[
-            framework.columnObjs.BodyColumn({
+            budgetFramework.columnObjs.IdentifierColumn({
               field: "identifier",
-              columnType: "number",
-              headerName: this.props.identifierFieldHeader,
-              footer: {
-                value: this.props.tableFooterIdentifierValue,
-                // We always want the text in the identifier cell to be present, but the column
-                // itself isn't always wide enough.  However, applying a colSpan conflicts with the
-                // colSpan of the main data grid, causing weird behavior.
-                cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
-              },
-              page: {
-                value: !isNil(this.props.budget) ? `${this.props.budget.name} Total` : "Budget Total",
-                // We always want the text in the identifier cell to be present, but the column
-                // itself isn't always wide enough.  However, applying a colSpan conflicts with the
-                // colSpan of the main data grid, causing weird behavior.
-                cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
-              },
-              index: 0,
-              cellRenderer: { data: "IdentifierCell" },
-              width: 100,
-              suppressSizeToFit: true,
-              cellStyle: { textAlign: "left" },
-              colSpan: (params: Table.ColSpanParams<R, M>) => {
-                const row: R = params.data;
-                if (row.meta.isGroupRow === true) {
-                  /*
-                  Note: We have to look at all of the visible columns that are present up until
-                  the calculated columns.  This means we have to use the AG Grid ColumnApi (not our
-                  own columns).
-                  */
-                  const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
-                  if (!isNil(agColumns)) {
-                    const originalCalculatedColumns = map(
-                      filter(params.columns, (col: Table.Column<R, M>) => col.tableColumnType === "calculated"),
-                      (col: Table.Column<R, M>) => col.field
-                    );
-                    const indexOfIdentifierColumn = findIndex(
-                      agColumns,
-                      (col: Column) => col.getColId() === "identifier"
-                    );
-                    const indexOfFirstCalculatedColumn = findIndex(agColumns, (col: Column) =>
-                      includes(originalCalculatedColumns, col.getColId())
-                    );
-                    return indexOfFirstCalculatedColumn - indexOfIdentifierColumn;
-                  }
-                }
-                return 1;
-              }
+              tableFooterLabel: this.props.tableFooterIdentifierValue,
+              pageFooterLabel: !isNil(this.props.budget) ? `${this.props.budget.name} Total` : "Budget Total",
+              headerName: this.props.identifierFieldHeader
             }),
             framework.columnObjs.BodyColumn({
               field: "description",

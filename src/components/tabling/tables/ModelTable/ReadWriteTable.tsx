@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { map, isNil, includes, filter } from "lodash";
+import { map, isNil, filter } from "lodash";
 
 import { hooks, tabling } from "lib";
 
@@ -31,21 +31,21 @@ const ReadWriteModelTable = <R extends Table.Row = any, M extends Model.Model = 
   props: ReadWriteModelTableProps<R, M>
 ): JSX.Element => {
   const convertedData = useMemo<R[]>((): R[] => {
-    const readColumns = filter(props.columns, (c: Table.Column<R, M>) => {
-      const fieldBehavior: Table.FieldBehavior[] = c.fieldBehavior || ["read", "write"];
-      return includes(fieldBehavior, "read");
-    });
-    const tableData = tabling.util.createTableData<Table.Column<R, M>, R, M>(readColumns, props.models, {
-      defaultNullValue: null,
-      // ordering,
-      getRowMeta: (m: M) => ({
-        label:
-          (!isNil(props.getRowLabel) && typeof props.getRowLabel === "function"
-            ? props.getRowLabel(m)
-            : props.getRowLabel) || m.id,
-        gridId: "data"
-      })
-    });
+    const tableData = tabling.util.createTableData<Table.Column<R, M>, R, M>(
+      filter(props.columns, (c: Table.Column<R, M>) => c.isRead !== false),
+      props.models,
+      {
+        defaultNullValue: null,
+        // ordering,
+        getRowMeta: (m: M) => ({
+          label:
+            (!isNil(props.getRowLabel) && typeof props.getRowLabel === "function"
+              ? props.getRowLabel(m)
+              : props.getRowLabel) || m.id,
+          gridId: "data"
+        })
+      }
+    );
     return map(tableData, (dt: Table.ModelWithRow<R, M>) => dt.row);
   }, [hooks.useDeepEqualMemo(props.models)]);
 

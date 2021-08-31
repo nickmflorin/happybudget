@@ -452,8 +452,7 @@ export const payload = <R extends Table.Row, M extends Model.Model, P>(
       | Table.NestedCellChange<R, M>
       | Table.NestedCellAdd<R, M>;
 
-    const fieldBehavor: Table.FieldBehavior[] = cellDelta.column.fieldBehavior || ["read", "write"];
-    if (includes(fieldBehavor, "write")) {
+    if (cellDelta.column.isWrite !== false) {
       let httpValue: any;
       if (isCellAdd(cellDelta)) {
         httpValue = cellDelta.value;
