@@ -1,4 +1,4 @@
-import { RefObject, useImperativeHandle, useState, useEffect, useMemo } from "react";
+import { ForwardedRef, useImperativeHandle, useState, useEffect, useMemo } from "react";
 import { isNil } from "lodash";
 
 import { hooks, tabling, ui } from "lib";
@@ -6,15 +6,20 @@ import { hooks, tabling, ui } from "lib";
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-interface UseModelMenuEditorParams<R extends Table.Row, M extends Model.Model, V> extends Table.EditorParams<R, M> {
-  readonly value: V | null;
-  readonly forwardedRef: RefObject<any>;
-}
+export type UseModelMenuEditorParams<
+  V = ID,
+  R extends Table.RowData = Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> = Table.EditorParams<R, M, S, V>;
 
-export type IEditor<R extends Table.Row, M extends Model.Model, C extends Model.Model, V = C> = Omit<
-  UseModelMenuEditorParams<R, M, V>,
-  "forwardedRef"
-> & {
+export type IEditor<
+  V = ID,
+  C extends Model.Model = Model.Model,
+  R extends Table.RowData = Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> = Omit<UseModelMenuEditorParams<V, R, M, S>, "forwardedRef"> & {
   readonly onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
   readonly isFirstRender: boolean;
   readonly value: V | null;
@@ -22,9 +27,16 @@ export type IEditor<R extends Table.Row, M extends Model.Model, C extends Model.
   readonly menu: NonNullRef<IMenuRef<C>>;
 };
 
-const useModelMenuEditor = <R extends Table.Row, M extends Model.Model, C extends Model.Model, V = C>(
-  params: UseModelMenuEditorParams<R, M, V>
-): [IEditor<R, M, C, V>] => {
+/* eslint-disable indent */
+const useModelMenuEditor = <
+  C extends Model.Model,
+  V = C,
+  R extends Table.RowData = Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>(
+  params: UseModelMenuEditorParams<V, R, M, S> & { readonly forwardedRef: ForwardedRef<any> }
+): [IEditor<V, C, R, M, S>] => {
   const menu = ui.hooks.useMenu<C>();
 
   const isFirstRender = ui.hooks.useTrackFirstRender();

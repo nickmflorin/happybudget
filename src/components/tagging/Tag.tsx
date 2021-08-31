@@ -42,7 +42,7 @@ export const EmptyTag: React.FC<EmptyTagProps> = (props: EmptyTagProps) => {
   );
 };
 
-const Tag = <M extends Model.M = Model.M, S extends object = React.CSSProperties>(
+const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSProperties>(
   props: TagProps<M, S>
 ): JSX.Element => {
   const colorScheme = useMemo(() => {
@@ -181,8 +181,9 @@ const emptyTagPropsOrComponent = (props: JSX.Element | EmptyTagProps): JSX.Eleme
   return isEmptyTagsPropsNotComponent(props) ? <EmptyTag {...props} /> : props;
 };
 
-const isPluralityWithModel = <M extends Model.M = Model.M>(m: M | PluralityWithModel<M>): m is PluralityWithModel<M> =>
-  (m as PluralityWithModel<M>).model !== undefined;
+const isPluralityWithModel = <M extends Model.Model = Model.Model>(
+  m: M | PluralityWithModel<M>
+): m is PluralityWithModel<M> => (m as PluralityWithModel<M>).model !== undefined;
 
 /**
  * Group of <Tag> components that overlap to a certain degree.
@@ -198,7 +199,7 @@ const isPluralityWithModel = <M extends Model.M = Model.M>(m: M | PluralityWithM
  * (3) Children <Tag> Components:
  *     <MultipleTags><Tag /><Tag /></MultipleTags>
  */
-export const MultipleTags = <M extends Model.M = Model.M>(props: MultipleTagsProps<M>): JSX.Element => {
+export const MultipleTags = <M extends Model.Model = Model.Model>(props: MultipleTagsProps<M>): JSX.Element => {
   return (
     <div className={classNames("multiple-tags-wrapper", props.className)} style={props.style}>
       {!isNil(props.models) ? (

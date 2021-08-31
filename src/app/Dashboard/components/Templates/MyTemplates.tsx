@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Dispatch } from "redux";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
@@ -13,11 +12,11 @@ import { EditTemplateModal, CreateTemplateModal } from "components/modals";
 
 import { actions } from "../../store";
 
-const selectTemplates = (state: Modules.Authenticated.StoreObj) => state.dashboard.templates.data;
-const selectLoadingTemplates = (state: Modules.Authenticated.StoreObj) => state.dashboard.templates.loading;
+const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.data;
+const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.templates.loading;
 
 interface MyTemplatesProps {
-  setTemplateToDerive: (template: number) => void;
+  setTemplateToDerive: (template: ID) => void;
 }
 
 const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.Element => {
@@ -27,7 +26,7 @@ const MyTemplates: React.FC<MyTemplatesProps> = ({ setTemplateToDerive }): JSX.E
   const [isMoving, setMoving, setMoved] = redux.hooks.useTrackModelActions([]);
   const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
 
-  const dispatch: Dispatch = useDispatch();
+  const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
   const loading = useSelector(selectLoadingTemplates);
 

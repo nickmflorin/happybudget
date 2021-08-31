@@ -4,18 +4,19 @@ import { isNil, filter, map } from "lodash";
 
 import { ColumnApi, GridApi } from "@ag-grid-community/core";
 
-import { util, hooks } from "lib";
+import * as hooks from "../hooks";
+import * as util from "../util";
 import TableApis from "./apis";
 import * as cookies from "./cookies";
 
-type UseOrderingParams<R extends Table.Row, M extends Model.Model> = {
+type UseOrderingParams<R extends Table.RowData, M extends Model.Model = Model.Model> = {
   readonly cookie?: string;
   readonly columns: Table.Column<R, M>[];
 };
 
-type UseOrderingReturnType<R extends Table.Row> = [FieldOrder<keyof R>[], (order: Order, field: keyof R) => void];
+type UseOrderingReturnType<R extends Table.RowData> = [FieldOrder<keyof R>[], (order: Order, field: keyof R) => void];
 
-export const useOrdering = <R extends Table.Row, M extends Model.Model>(
+export const useOrdering = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   params: UseOrderingParams<R, M>
 ): UseOrderingReturnType<R> => {
   const cookiesObj = new Cookies();
@@ -47,26 +48,26 @@ export const useOrdering = <R extends Table.Row, M extends Model.Model>(
   return [ordering, updateOrdering];
 };
 
-type UseHiddenColumnsParams<R extends Table.Row, M extends Model.Model> = {
+type UseHiddenColumnsParams<R extends Table.RowData, M extends Model.Model = Model.Model> = {
   readonly cookie?: string;
   readonly columns: Table.Column<R, M>[];
   readonly apis: TableApis;
 };
 
-type UseHiddenColumnsReturnType<R extends Table.Row, M extends Model.Model> = [
-  Table.Field<R, M>[],
-  (changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>, sizeToFit?: boolean) => void
+type UseHiddenColumnsReturnType<R extends Table.RowData> = [
+  (keyof R)[],
+  (changes: SingleOrArray<Table.ColumnVisibilityChange<R>>, sizeToFit?: boolean) => void
 ];
 
-export const useHiddenColumns = <R extends Table.Row, M extends Model.Model>(
+export const useHiddenColumns = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   params: UseHiddenColumnsParams<R, M>
-): UseHiddenColumnsReturnType<R, M> => {
-  const [hiddenColumns, _setHiddenColumns] = useState<Table.Field<R, M>[]>([]);
+): UseHiddenColumnsReturnType<R> => {
+  const [hiddenColumns, _setHiddenColumns] = useState<(keyof R)[]>([]);
 
   useEffect(() => {
     let setColumnsFromCookies = false;
     if (!isNil(params.cookie)) {
-      const hiddenColumnsInCookies: Table.Field<R, M>[] | null = cookies.getHiddenColumns(
+      const hiddenColumnsInCookies: (keyof R)[] | null = cookies.getHiddenColumns(
         params.cookie,
         map(
           filter(params.columns, (c: Table.Column<R, M>) => c.canBeHidden !== false),
@@ -91,9 +92,9 @@ export const useHiddenColumns = <R extends Table.Row, M extends Model.Model>(
   }, [params.cookie]);
 
   const changeColumnVisibility = hooks.useDynamicCallback(
-    (changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>, sizeToFit?: boolean) => {
+    (changes: SingleOrArray<Table.ColumnVisibilityChange<R>>, sizeToFit?: boolean) => {
       const arrayOfChanges = Array.isArray(changes) ? changes : [changes];
-      map(arrayOfChanges, (change: Table.ColumnVisibilityChange<R, M>) =>
+      map(arrayOfChanges, (change: Table.ColumnVisibilityChange<R>) =>
         params.apis.columnMap((api: ColumnApi) => api.setColumnVisible(change.field as string, change.visible))
       );
       if (sizeToFit !== false) {
@@ -110,51 +111,32 @@ export const useHiddenColumns = <R extends Table.Row, M extends Model.Model>(
   return [hiddenColumns, changeColumnVisibility];
 };
 
-export const InitialReadOnlyTableRef: Table.ReadOnlyTableRefObj<any, any> = {
+export const InitialUnauthenticatedTableRef: Table.UnauthenticatedTableRefObj<any> = {
   getCSVData: (fields?: string[]) => [],
-  changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any, any>>, sizeToFit?: boolean) => {}
+  changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any>>, sizeToFit?: boolean) => {}
 };
 
-export const InitialReadWriteTableRef: Table.ReadWriteTableRefObj<any, any> = {
-  applyTableChange: (event: Table.ChangeEvent<any, any>) => {},
-  ...InitialReadOnlyTableRef
-};
-
-export const InitialReadWriteBudgetTableRef: BudgetTable.ReadWriteTableRefObj<any, any> = {
+export const InitialAuthenticatedTableRef: Table.AuthenticatedTableRefObj<any> = {
+  applyTableChange: (event: Table.ChangeEvent<any>) => {},
   applyGroupColorChange: (group: Model.Group) => {},
-  ...InitialReadWriteTableRef
+  ...InitialUnauthenticatedTableRef
 };
 
-export const useReadOnlyTable = <R extends Table.Row, M extends Model.Model>(): NonNullRef<
-  Table.ReadOnlyTableRefObj<R, M>
-> => {
-  return useRef<Table.ReadOnlyTableRefObj<R, M>>(InitialReadWriteBudgetTableRef);
+export const useUnauthenticatedTable = <R extends Table.RowData>(): NonNullRef<Table.UnauthenticatedTableRefObj<R>> => {
+  return useRef<Table.UnauthenticatedTableRefObj<R>>(InitialUnauthenticatedTableRef);
 };
 
 /* eslint-disable indent */
-export const useReadOnlyTableIfNotDefined = <R extends Table.Row, M extends Model.Model>(
-  grid?: NonNullRef<Table.ReadOnlyTableRefObj<R, M>>
-): NonNullRef<Table.ReadOnlyTableRefObj<R, M>> =>
-  hooks.useRefIfNotDefined<Table.ReadOnlyTableRefObj<R, M>>(useReadOnlyTable, grid);
+export const useUnauthenticatedTableIfNotDefined = <R extends Table.RowData>(
+  grid?: NonNullRef<Table.UnauthenticatedTableRefObj<R>>
+): NonNullRef<Table.UnauthenticatedTableRefObj<R>> =>
+  hooks.useRefIfNotDefined<Table.UnauthenticatedTableRefObj<R>>(useUnauthenticatedTable, grid);
 
-export const useReadWriteTable = <R extends Table.Row, M extends Model.Model>(): NonNullRef<
-  Table.ReadWriteTableRefObj<R, M>
-> => {
-  return useRef<Table.ReadWriteTableRefObj<R, M>>(InitialReadWriteBudgetTableRef);
+export const useAuthenticatedTable = <R extends Table.RowData>(): NonNullRef<Table.AuthenticatedTableRefObj<R>> => {
+  return useRef<Table.AuthenticatedTableRefObj<R>>(InitialAuthenticatedTableRef);
 };
 
-export const useReadWriteTableIfNotDefined = <R extends Table.Row, M extends Model.Model>(
-  grid?: NonNullRef<Table.ReadWriteTableRefObj<R, M>>
-): NonNullRef<Table.ReadWriteTableRefObj<R, M>> =>
-  hooks.useRefIfNotDefined<Table.ReadWriteTableRefObj<R, M>>(useReadWriteTable, grid);
-
-export const useReadWriteBudgetTable = <R extends Table.Row, M extends Model.Model>(): NonNullRef<
-  BudgetTable.ReadWriteTableRefObj<R, M>
-> => {
-  return useRef<BudgetTable.ReadWriteTableRefObj<R, M>>(InitialReadWriteBudgetTableRef);
-};
-
-export const useReadWriteBudgetTableIfNotDefined = <R extends Table.Row, M extends Model.Model>(
-  grid?: NonNullRef<BudgetTable.ReadWriteTableRefObj<R, M>>
-): NonNullRef<BudgetTable.ReadWriteTableRefObj<R, M>> =>
-  hooks.useRefIfNotDefined<BudgetTable.ReadWriteTableRefObj<R, M>>(useReadWriteBudgetTable, grid);
+export const useAuthenticatedTableIfNotDefined = <R extends Table.RowData>(
+  grid?: NonNullRef<Table.AuthenticatedTableRefObj<R>>
+): NonNullRef<Table.AuthenticatedTableRefObj<R>> =>
+  hooks.useRefIfNotDefined<Table.AuthenticatedTableRefObj<R>>(useAuthenticatedTable, grid);

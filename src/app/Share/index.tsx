@@ -1,28 +1,9 @@
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect, Route, Switch, useHistory, useLocation, useParams, useRouteMatch } from "react-router-dom";
-import { isNil } from "lodash";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faFilePlus as faFilePlusSolid,
-  faCopy as faCopySolid,
-  faAddressBook as faAddressBookSolid,
-  faFileSpreadsheet as faFileSpreadsheetSolid,
-  faFileInvoice as faFileInvoiceSolid,
-  faFileChartLine as faFileChartLineSolid
-} from "@fortawesome/pro-solid-svg-icons";
-import {
-  faFilePlus,
-  faCopy,
-  faAddressBook,
-  faFileSpreadsheet,
-  faFileInvoice,
-  faFileChartLine
-} from "@fortawesome/pro-light-svg-icons";
 
 import { budgeting } from "lib";
-import { RenderIfValidId } from "components";
+import { RenderIfValidId, Icon } from "components";
 import { Layout } from "components/layout";
 
 import { actions, selectors } from "./store";
@@ -50,69 +31,12 @@ const Budget = (): JSX.Element => {
       className={"layout--budget"}
       sidebar={[
         {
-          icon: <FontAwesomeIcon icon={faFilePlus} />,
-          activeIcon: <FontAwesomeIcon icon={faFilePlusSolid} />,
-          onClick: () => history.push("/templates"),
-          tooltip: {
-            title: "Templates",
-            placement: "right"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faCopy} />,
-          activeIcon: <FontAwesomeIcon icon={faCopySolid} />,
-          onClick: () => history.push("/budgets"),
-          tooltip: {
-            title: "My Budgets",
-            placement: "right"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faAddressBook} flip={"horizontal"} />,
-          activeIcon: <FontAwesomeIcon icon={faAddressBookSolid} flip={"horizontal"} />,
-          onClick: () => history.push("/contacts"),
-          separatorAfter: true,
-          tooltip: {
-            title: "Contacts",
-            placement: "right"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faFileChartLine} />,
-          activeIcon: <FontAwesomeIcon icon={faFileChartLineSolid} />,
-          onClick: () => history.push(`/budgets/${budgetId}/analysis`),
-          active: location.pathname.startsWith(`/budgets/${budgetId}/analysis`),
-          tooltip: {
-            title: "Analysis",
-            placement: "right"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faFileSpreadsheet} />,
-          activeIcon: <FontAwesomeIcon icon={faFileSpreadsheetSolid} />,
-          onClick: () => {
-            if (!isNaN(parseInt(budgetId)) && !budgeting.urls.isBudgetRelatedUrl(location.pathname)) {
-              const budgetLastVisited = budgeting.urls.getBudgetLastVisited(parseInt(budgetId));
-              if (!isNil(budgetLastVisited)) {
-                history.push(budgetLastVisited);
-              } else {
-                history.push(`/budgets/${budgetId}`);
-              }
-            }
-          },
+          icon: <Icon weight={"light"} icon={"file-spreadsheet"} />,
+          activeIcon: <Icon weight={"solid"} icon={"file-spreadsheet"} />,
+          onClick: () => history.push(`/budgets/${budgetId}`),
           active: budgeting.urls.isBudgetRelatedUrl(location.pathname),
           tooltip: {
             title: "Budget",
-            placement: "right"
-          }
-        },
-        {
-          icon: <FontAwesomeIcon icon={faFileInvoice} />,
-          activeIcon: <FontAwesomeIcon icon={faFileInvoiceSolid} />,
-          onClick: () => history.push(`/budgets/${budgetId}/actuals`),
-          active: location.pathname.startsWith(`/budgets/${budgetId}/actuals`),
-          tooltip: {
-            title: "Actuals",
             placement: "right"
           }
         }

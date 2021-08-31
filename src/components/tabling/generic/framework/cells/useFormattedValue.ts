@@ -2,7 +2,14 @@ import { useMemo } from "react";
 import { ValueFormatterParams } from "@ag-grid-community/core";
 import { isNil } from "lodash";
 
-const useFormattedValue = <R extends Table.Row, M extends Model.Model>(props: Table.ValueCellProps<R, M>) => {
+/* eslint-disable indent */
+const useFormattedValue = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>(
+  props: Table.ValueCellProps<R, M, S>
+) => {
   const formatterParams = useMemo<ValueFormatterParams | null>(
     () =>
       /* eslint-disable indent */

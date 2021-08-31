@@ -6,17 +6,19 @@ import { Icon, ShowHide, VerticalFlexCenter } from "components";
 import "./SavingChanges.scss";
 
 interface SavingChangesProps {
-  saving: boolean;
+  readonly saving?: boolean | undefined;
 }
 
 const SavingChanges = ({ saving }: SavingChangesProps): JSX.Element => {
-  const loadingIcon = <LoadingOutlined spin />;
+  if (saving === undefined) {
+    return <></>;
+  }
   return (
     <div className={"saving-changes"}>
       <VerticalFlexCenter>
         <ShowHide show={saving}>
           <div className={"spinner-wrapper"}>
-            <Spin className={"saving-changes-spinner"} indicator={loadingIcon} size={"small"} />
+            <Spin className={"saving-changes-spinner"} indicator={<LoadingOutlined spin />} size={"small"} />
           </div>
         </ShowHide>
         <ShowHide show={!saving}>

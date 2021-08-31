@@ -5,7 +5,7 @@ import { isNil } from "lodash";
 import { ui } from "lib";
 
 export interface PortalProps {
-  id: string | number;
+  id: string | number | undefined;
   visible?: boolean;
   children: ReactNode;
 }

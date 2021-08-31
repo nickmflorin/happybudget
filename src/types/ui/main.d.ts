@@ -4,6 +4,7 @@
 /// <reference path="./style.d.ts" />
 /// <reference path="./table.d.ts" />
 /// <reference path="./forms.d.ts" />
+/// <reference path="./pdf.d.ts" />
 
 type Order = 1 | -1 | 0;
 type DefinitiveOrder = 1 | -1;

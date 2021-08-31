@@ -1,8 +1,8 @@
 import { client } from "api";
 import { URL } from "./util";
 
-export const updateGroup = async <G extends Model.Group = Model.Group | Model.Group>(
-  id: number,
+export const updateGroup = async <G extends Model.BudgetGroup = Model.BudgetGroup | Model.BudgetGroup>(
+  id: ID,
   payload: Partial<Http.GroupPayload>,
   options: Http.RequestOptions = {}
 ): Promise<G> => {
@@ -10,13 +10,13 @@ export const updateGroup = async <G extends Model.Group = Model.Group | Model.Gr
   return client.patch<G>(url, payload, options);
 };
 
-export const deleteGroup = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
+export const deleteGroup = async (id: ID, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("groups", id);
   return client.delete<null>(url, options);
 };
 
-export const getGroup = async <G extends Model.Group = Model.Group | Model.Group>(
-  id: number,
+export const getGroup = async <G extends Model.BudgetGroup = Model.BudgetGroup | Model.BudgetGroup>(
+  id: ID,
   options: Http.RequestOptions = {}
 ): Promise<G> => {
   const url = URL.v1("groups", id);

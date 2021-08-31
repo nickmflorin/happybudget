@@ -1,40 +1,58 @@
 import { combineReducers } from "redux";
 import { redux } from "lib";
-import { ActionType } from "./actions";
+import * as actions from "./actions";
 
-const rootReducer: Redux.Reducer<Modules.Authenticated.Dashboard.StoreObj> = combineReducers({
-  templates: redux.reducers.factories.createModelListResponseReducer<
+const rootReducer: Redux.Reducer<Modules.Dashboard.Store> = combineReducers({
+  templates: redux.reducers.createModelListResponseReducer<
     Model.SimpleTemplate,
-    Redux.ModelListResponseStore<Model.SimpleTemplate>
+    Omit<
+      Redux.ModelListResponseActionMap<Model.SimpleTemplate>,
+      "restoreSearchCache" | "request" | "updating" | "deleting" | "creating"
+    >
   >({
-    Response: ActionType.Templates.Response,
-    Loading: ActionType.Templates.Loading,
-    SetSearch: ActionType.Templates.SetSearch,
-    AddToState: ActionType.Templates.AddToState,
-    RemoveFromState: ActionType.Templates.RemoveFromState,
-    UpdateInState: ActionType.Templates.UpdateInState
+    initialState: redux.initialState.initialModelListResponseState,
+    actions: {
+      response: actions.responseTemplatesAction,
+      loading: actions.loadingTemplatesAction,
+      setSearch: actions.setTemplatesSearchAction,
+      addToState: actions.addTemplateToStateAction,
+      removeFromState: actions.removeTemplateFromStateAction,
+      updateInState: actions.updateTemplateInStateAction
+    }
   }),
-  community: redux.reducers.factories.createModelListResponseReducer<
+  community: redux.reducers.createModelListResponseReducer<
     Model.SimpleTemplate,
-    Redux.ModelListResponseStore<Model.SimpleTemplate>
+    Omit<
+      Redux.ModelListResponseActionMap<Model.SimpleTemplate>,
+      "restoreSearchCache" | "request" | "updating" | "deleting" | "creating"
+    >
   >({
-    Response: ActionType.Community.Response,
-    Loading: ActionType.Community.Loading,
-    SetSearch: ActionType.Community.SetSearch,
-    AddToState: ActionType.Community.AddToState,
-    RemoveFromState: ActionType.Community.RemoveFromState,
-    UpdateInState: ActionType.Community.UpdateInState
+    initialState: redux.initialState.initialModelListResponseState,
+    actions: {
+      response: actions.responseCommunityTemplatesAction,
+      loading: actions.loadingCommunityTemplatesAction,
+      setSearch: actions.setCommunityTemplatesSearchAction,
+      addToState: actions.addCommunityTemplateToStateAction,
+      removeFromState: actions.removeCommunityTemplateFromStateAction,
+      updateInState: actions.updateCommunityTemplateInStateAction
+    }
   }),
-  budgets: redux.reducers.factories.createModelListResponseReducer<
+  budgets: redux.reducers.createModelListResponseReducer<
     Model.SimpleBudget,
-    Redux.ModelListResponseStore<Model.SimpleBudget>
+    Omit<
+      Redux.ModelListResponseActionMap<Model.SimpleBudget>,
+      "restoreSearchCache" | "request" | "updating" | "deleting" | "creating"
+    >
   >({
-    Response: ActionType.Budgets.Response,
-    Loading: ActionType.Budgets.Loading,
-    SetSearch: ActionType.Budgets.SetSearch,
-    AddToState: ActionType.Budgets.AddToState,
-    RemoveFromState: ActionType.Budgets.RemoveFromState,
-    UpdateInState: ActionType.Budgets.UpdateInState
+    initialState: redux.initialState.initialModelListResponseState,
+    actions: {
+      response: actions.responseBudgetsAction,
+      loading: actions.loadingBudgetsAction,
+      setSearch: actions.setBudgetsSearchAction,
+      addToState: actions.addBudgetToStateAction,
+      removeFromState: actions.removeBudgetFromStateAction,
+      updateInState: actions.updateBudgetInStateAction
+    }
   })
 });
 

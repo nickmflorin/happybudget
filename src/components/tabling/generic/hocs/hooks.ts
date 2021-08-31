@@ -2,12 +2,12 @@ import { isNil, includes, filter } from "lodash";
 
 import { NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-community/core";
 
-import { hooks } from "lib";
+import { hooks, tabling } from "lib";
 
-export interface UseCellNavigationParams<R extends Table.Row, M extends Model.Model> {
+export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.Model = Model.Model> {
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
-  readonly includeRowInNavigation?: (row: R) => boolean;
+  readonly includeRowInNavigation?: (row: Table.DataRow<R, M>) => boolean;
   readonly onNewRowRequired?: () => void;
 }
 
@@ -15,10 +15,11 @@ type UseCellNavigationReturnType = [
   (p: NavigateToNextCellParams) => Table.CellPosition,
   (p: TabToNextCellParams) => Table.CellPosition,
   (loc: Table.CellPosition) => void,
-  (loc: Table.CellPosition) => void
+  (loc: Table.CellPosition) => void,
+  (node: Table.RowNode) => Table.RowNode[]
 ];
 
-export const useCellNavigation = <R extends Table.Row, M extends Model.Model>(
+export const useCellNavigation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   params: UseCellNavigationParams<R, M>
 ): UseCellNavigationReturnType => {
   const findNextNavigatableRow: (
@@ -42,8 +43,11 @@ export const useCellNavigation = <R extends Table.Row, M extends Model.Model>(
           if (isNil(nextRowNode)) {
             noMoreRows = true;
           } else {
-            const row: R = nextRowNode.data;
-            if (isNil(params.includeRowInNavigation) || params.includeRowInNavigation(row) !== false) {
+            const row: Table.Row<R, M> = nextRowNode.data;
+            if (
+              tabling.typeguards.isDataRow(row) &&
+              (isNil(params.includeRowInNavigation) || params.includeRowInNavigation(row) !== false)
+            ) {
               return [nextRowNode, startingIndex + runningIndex, runningIndex];
             }
             runningIndex = runningIndex + 1;
@@ -149,5 +153,29 @@ export const useCellNavigation = <R extends Table.Row, M extends Model.Model>(
     }
   });
 
-  return [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow];
+  /**
+   * Starting at the provided node, traverses the table upwards and collects
+   * all of the RowNode(s) until a RowNode that is the footer for a group above
+   * the provided node is reached.
+   */
+  const findRowsUpUntilFirstGroupFooterRow = hooks.useDynamicCallback((node: Table.RowNode): Table.RowNode[] => {
+    const nodes: Table.RowNode[] = [node];
+    if (!isNil(params.apis)) {
+      let currentNode: Table.RowNode | undefined = node;
+      while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
+        currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
+        if (!isNil(currentNode)) {
+          const row: Table.Row<R, M> = currentNode.data;
+          if (tabling.typeguards.isGroupRow(row)) {
+            break;
+          } else {
+            nodes.push(currentNode);
+          }
+        }
+      }
+    }
+    return nodes;
+  });
+
+  return [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow, findRowsUpUntilFirstGroupFooterRow];
 };

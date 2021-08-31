@@ -1,8 +1,7 @@
-import { initialState, rootReducer, rootSaga } from "./store";
+import { initialState, rootReducer } from "./store";
 
-const Config: Modules.Unauthenticated.ModuleConfig = {
+const Config: Application.Unauthenticated.ModuleConfig = {
   rootReducer,
-  rootSaga,
   initialState,
   label: "share",
   isUnauthenticated: true

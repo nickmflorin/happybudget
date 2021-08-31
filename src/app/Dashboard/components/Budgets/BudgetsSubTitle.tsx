@@ -1,6 +1,5 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Dispatch } from "redux";
 
 import { Icon } from "components";
 import { Button, CircleIconButton } from "components/buttons";
@@ -14,10 +13,10 @@ interface BudgetsSubTitleProps extends StandardComponentProps {
   readonly onNewBudget: () => void;
 }
 
-const selectBudgetsSearch = (state: Modules.Authenticated.StoreObj) => state.dashboard.budgets.search;
+const selectBudgetsSearch = (state: Application.Authenticated.Store) => state.dashboard.budgets.search;
 
 const BudgetsSubTitle: React.FC<BudgetsSubTitleProps> = ({ onNewBudget, ...props }): JSX.Element => {
-  const dispatch: Dispatch = useDispatch();
+  const dispatch: Redux.Dispatch = useDispatch();
   const search = useSelector(selectBudgetsSearch);
   return (
     <div className={"budget-sub-title"}>

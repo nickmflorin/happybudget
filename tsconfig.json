@@ -19,6 +19,6 @@
     "noFallthroughCasesInSwitch": true,
     "experimentalDecorators": true
   },
-  "include": ["src"],
+  "include": ["src", "util.ts", "reducer.ts"],
   "exclude": ["node_modules"]
 }

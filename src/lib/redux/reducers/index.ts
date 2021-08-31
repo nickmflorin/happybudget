@@ -1,14 +1,11 @@
-import { Reducer } from "redux";
-
 import { isNil, filter, find } from "lodash";
-import { util } from "lib";
-import { warnInconsistentState } from "../util";
+import { util, redux } from "lib";
 
-export * as factories from "./factories";
+export * from "./factories";
 export * from "./util";
 
 /* prettier-ignore */
-export const modelListActionReducer: Reducer<Redux.ModelListActionStore, Redux.Action<Redux.ModelListActionPayload>> = (
+export const modelListActionReducer: Redux.Reducer<Redux.ModelListActionStore, Redux.Action<Redux.ModelListActionPayload>> = (
   st: Redux.ModelListActionStore = [],
   action: Redux.Action<Redux.ModelListActionPayload>
 ): Redux.ModelListActionStore => {
@@ -26,7 +23,7 @@ export const modelListActionReducer: Reducer<Redux.ModelListActionStore, Redux.A
   } else {
     const instance: Redux.ModelListActionInstance | undefined = find(st, { id: action.payload.id });
     if (isNil(instance)) {
-      warnInconsistentState({
+      redux.util.warnInconsistentState({
         action: "Removing from model list action state.",
         reason: "The instance does not exist in state when it is expected to."
       });

@@ -1,5 +1,4 @@
 import React, { ReactNode, useEffect } from "react";
-import { Dispatch } from "redux";
 import ClickAwayListener from "react-click-away-listener";
 import { useDispatch } from "react-redux";
 import classNames from "classnames";
@@ -51,7 +50,7 @@ interface DrawerProps {
 }
 
 const Drawer = ({ children, className, visible, style = {}, onClickAway }: DrawerProps): JSX.Element => {
-  const dispatch: Dispatch = useDispatch();
+  const dispatch: Redux.Dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(setDrawerVisibilityAction(visible));

@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { Dispatch } from "redux";
 import { isNil } from "lodash";
 
 import * as api from "api";
@@ -26,7 +25,7 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
   const [image, setImage] = useState<UploadedImage | null>(null);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true, autoFocusField: 1 });
-  const dispatch: Dispatch = useDispatch();
+  const dispatch: Redux.Dispatch = useDispatch();
   /*
   Note: We have to use a ref here, instead of storing firstName and lastName in the state
   of this component, because if we were storing it in this component, when the firstName and

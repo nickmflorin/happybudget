@@ -21,16 +21,17 @@ interface IHeaderCompParams {
   api: any;
 }
 
-export interface HeaderCellProps<R extends Table.Row, M extends Model.Model>
+export interface HeaderCellProps<R extends Table.RowData, M extends Model.Model = Model.Model>
   extends Omit<IHeaderCompParams, "column">,
     StandardComponentProps {
-  onSort?: (order: Order, field: Table.Field<R, M>, column: Table.Column<R, M>) => void;
-  onEdit?: (field: Table.Field<R, M>, column: Table.Column<R, M>) => void;
-  ordering?: FieldOrdering<Table.Field<R, M>>;
+  onSort?: (order: Order, field: keyof R, column: Table.Column<R, M>) => void;
+  onEdit?: (field: keyof R, column: Table.Column<R, M>) => void;
+  ordering?: FieldOrdering<keyof R>;
   column: Table.Column<R, M>;
 }
 
-const HeaderCell = <R extends Table.Row, M extends Model.Model>({
+/* eslint-disable indent */
+const HeaderCell = <R extends Table.RowData, M extends Model.Model = Model.Model>({
   column,
   displayName,
   onSort,
@@ -48,7 +49,7 @@ const HeaderCell = <R extends Table.Row, M extends Model.Model>({
 
   const columnStyle = useMemo(() => {
     if (!isNil(columnType)) {
-      return tabling.util.getColumnTypeCSSStyle(columnType, { header: true });
+      return tabling.columns.getColumnTypeCSSStyle(columnType, { header: true });
     }
     return {};
   }, [columnType]);
@@ -60,7 +61,7 @@ const HeaderCell = <R extends Table.Row, M extends Model.Model>({
   useEffect(() => {
     if (column.sortable === true) {
       if (!isNil(ordering)) {
-        const fieldOrder: FieldOrder<Table.Field<R, M>> | undefined = find(ordering, {
+        const fieldOrder: FieldOrder<keyof R> | undefined = find(ordering, {
           field: column.field
         } as any);
         if (!isNil(fieldOrder)) {

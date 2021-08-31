@@ -55,7 +55,7 @@ export const ExtraMenuItem = (props: IExtraMenuItem): JSX.Element => {
     return <></>;
   }
   return (
-    <CommonMenuItem {...props} isExtra={true}>
+    <CommonMenuItem {...props} onClick={props.model.onClick} isExtra={true}>
       <React.Fragment>
         {!isNil(props.model.icon) && (
           <VerticalFlexCenter>

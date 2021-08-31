@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
-import { Dispatch } from "redux";
 
 import * as api from "api";
 import { actions } from "store";
@@ -10,7 +9,7 @@ import { WrapInApplicationSpinner } from "components";
 const PrivateRoute = ({ ...props }: { [key: string]: any }): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
-  const dispatch: Dispatch = useDispatch();
+  const dispatch: Redux.Dispatch = useDispatch();
 
   useEffect(() => {
     setAuthenticating(true);

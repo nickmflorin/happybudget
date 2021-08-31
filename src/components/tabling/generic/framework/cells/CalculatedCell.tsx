@@ -4,14 +4,23 @@ import { isNil } from "lodash";
 
 import BodyCell from "./BodyCell";
 
-export interface CalculatedCellProps<R extends Table.Row, M extends Model.Model> extends Table.ValueCellProps<R, M> {
+export interface CalculatedCellProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> extends Table.ValueCellProps<R, M, S> {
   readonly renderRedIfNegative?: boolean;
 }
 
-const CalculatedCell = <R extends Table.Row, M extends Model.Model>({
+/* eslint-disable indent */
+const CalculatedCell = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>({
   renderRedIfNegative = false,
   ...props
-}: CalculatedCellProps<R, M>): JSX.Element => {
+}: CalculatedCellProps<R, M, S>): JSX.Element => {
   const renderRed = useMemo(() => {
     if (renderRedIfNegative === true && !isNil(props.value)) {
       if (typeof props.value === "string") {
@@ -27,7 +36,7 @@ const CalculatedCell = <R extends Table.Row, M extends Model.Model>({
     }
   }, [props.value, renderRedIfNegative]);
 
-  return <BodyCell<R, M> className={classNames({ "color--red": renderRed })} {...props} />;
+  return <BodyCell<R, M, S> className={classNames({ "color--red": renderRed })} {...props} />;
 };
 
 export default CalculatedCell;

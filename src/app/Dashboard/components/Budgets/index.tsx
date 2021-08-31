@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { Dispatch } from "redux";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
@@ -14,8 +13,8 @@ import { EditBudgetModal, CreateBudgetModal } from "components/modals";
 import { actions } from "../../store";
 import BudgetsSubTitle from "./BudgetsSubTitle";
 
-const selectBudgets = (state: Modules.Authenticated.StoreObj) => state.dashboard.budgets.data;
-const selectLoadingBudgets = (state: Modules.Authenticated.StoreObj) => state.dashboard.budgets.loading;
+const selectBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.data;
+const selectLoadingBudgets = (state: Application.Authenticated.Store) => state.dashboard.budgets.loading;
 
 const Budgets = (): JSX.Element => {
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
@@ -24,7 +23,7 @@ const Budgets = (): JSX.Element => {
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
   const history = useHistory();
 
-  const dispatch: Dispatch = useDispatch();
+  const dispatch: Redux.Dispatch = useDispatch();
   const budgets = useSelector(selectBudgets);
   const loading = useSelector(selectLoadingBudgets);
 

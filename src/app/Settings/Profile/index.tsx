@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Dispatch } from "redux";
 import { toast } from "react-toastify";
 import { isNil } from "lodash";
 
@@ -17,7 +16,7 @@ const Profile = (): JSX.Element => {
   const [file, setFile] = useState<UploadedImage | null>(null);
   const [form] = Form.useForm<Http.UserPayload>();
   const user = hooks.useLoggedInUser();
-  const dispatch: Dispatch = useDispatch();
+  const dispatch: Redux.Dispatch = useDispatch();
 
   return (
     <Page className={"profile"} title={"Profile"}>

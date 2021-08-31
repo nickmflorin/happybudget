@@ -4,13 +4,14 @@ import { filter, map, includes } from "lodash";
 import Dropdown, { DropdownMenuItemsProps } from "./Dropdown";
 
 type OmitDropdownProps = "menuMode" | "menuCheckbox" | "menuSelected" | "menuItems";
-export interface ToggleColumnsDropdownProps<R extends Table.Row, M extends Model.Model>
+export interface ToggleColumnsDropdownProps<R extends Table.RowData, M extends Model.Model = Model.Model>
   extends Omit<DropdownMenuItemsProps, OmitDropdownProps> {
   readonly columns: Table.Column<R, M>[];
-  readonly hiddenColumns?: Table.Field<R, M>[];
+  readonly hiddenColumns?: (keyof R)[];
 }
 
-const ToggleColumnsDropdown = <R extends Table.Row, M extends Model.Model>(
+/* eslint-disable indent */
+const ToggleColumnsDropdown = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   props: ToggleColumnsDropdownProps<R, M>
 ): JSX.Element => {
   const hideableColumns = useMemo<Table.Column<R, M>[]>(
@@ -18,7 +19,7 @@ const ToggleColumnsDropdown = <R extends Table.Row, M extends Model.Model>(
     [props.columns]
   );
 
-  const selected = useMemo<Table.Field<R, M>[]>(
+  const selected = useMemo<(keyof R)[]>(
     () =>
       map(
         filter(hideableColumns, (col: Table.Column<R, M>) => !includes(props.hiddenColumns, col.field)),

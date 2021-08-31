@@ -1,20 +1,26 @@
-import { forwardRef } from "react";
+import { ForwardedRef, forwardRef } from "react";
+
 import { model } from "lib";
 import { framework } from "components/tabling/generic";
-import { ChoiceEditor } from "components/tabling/generic/framework/editors";
+import { ChoiceSelectEditor } from "components/tabling/generic/framework/editors";
 
 const FringeUnitEditor = (
   props: Omit<
-    framework.editors.ChoiceEditorProps<Tables.FringeRow, Model.Fringe, Model.FringeUnit>,
+    framework.editors.ChoiceSelectEditorProps<
+      Model.FringeUnit,
+      Tables.FringeRowData,
+      Model.Fringe,
+      Tables.FringeTableStore
+    >,
     "models" | "searchIndices"
   >,
-  ref: any
+  ref: ForwardedRef<any>
 ) => {
   return (
-    <ChoiceEditor<Tables.FringeRow, Model.Fringe, Model.FringeUnit>
+    <ChoiceSelectEditor<Model.FringeUnit, Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore>
       searchIndices={["name"]}
+      ref={ref}
       models={model.models.FringeUnits}
-      forwardedRef={ref}
       {...props}
     />
   );

@@ -3,11 +3,11 @@ import { modelListActionReducer } from "lib/redux/reducers";
 export * from "./util";
 export * from "./comments";
 export * from "./detail";
-export * from "./table";
+export * from "./list";
 
-export const createSimplePayloadReducer = <P>(actionType: string, initialState: P): Redux.Reducer<P> => {
-  const reducer: Redux.Reducer<P> = (state: P = initialState, action: Redux.Action<P>): P => {
-    if (action.type === actionType && action.payload !== undefined) {
+export const createSimplePayloadReducer = <P>(config: Redux.ReducerConfig<P, { set: P }>): Redux.Reducer<P> => {
+  const reducer: Redux.Reducer<P> = (state: P = config.initialState, action: Redux.Action<P>): P => {
+    if (config.actions.set.toString() === action.type) {
       return action.payload;
     }
     return state;
@@ -15,8 +15,9 @@ export const createSimplePayloadReducer = <P>(actionType: string, initialState: 
   return reducer;
 };
 
-export const createSimpleBooleanReducer = (actionType: string): Redux.Reducer<boolean> =>
-  createSimplePayloadReducer<boolean>(actionType, false);
+export const createSimpleBooleanReducer = (
+  config: Omit<Redux.ReducerConfig<boolean, { set: boolean }>, "initialState">
+): Redux.Reducer<boolean> => createSimplePayloadReducer<boolean>({ ...config, initialState: false });
 
 /**
  * A reducer factory that creates a generic reducer to handle the state of a
@@ -35,9 +36,9 @@ export const createSimpleBooleanReducer = (actionType: string): Redux.Reducer<bo
  */
 /* prettier-ignore */
 export const createModelListActionReducer =
-  (actionType: string) =>
+  (config: Omit<Redux.ReducerConfig<Redux.ModelListActionStore, { change: Redux.ModelListActionPayload }>, "initialState">) =>
     (st: Redux.ModelListActionStore = [], action: Redux.Action<Redux.ModelListActionPayload>) => {
-      if (action.type === actionType) {
+      if (config.actions.change.toString() === action.type) {
         return modelListActionReducer(st, action);
       }
       return st;

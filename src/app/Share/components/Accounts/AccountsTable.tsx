@@ -1,20 +1,39 @@
-import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 
-import { redux, tabling } from "lib";
-import { ReadOnlyBudgetAccountsTable } from "components/tabling";
+import { budgeting, tabling, redux } from "lib";
+import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
 
-const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.budget.table.groups.data
-);
-const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.budget.table.data
-);
-const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.budget.table.search
-);
+type R = Tables.AccountRowData;
+type M = Model.Account;
+
+const ActionMap = {
+  request: actions.accounts.requestAction,
+  loading: actions.accounts.loadingAction,
+  response: actions.accounts.responseAction,
+  setSearch: actions.accounts.setSearchAction
+};
+
+const ConnectedTable = connectTableToStore<
+  GenericAccountsTable.UnauthenticatedBudgetProps,
+  R,
+  M,
+  Model.BudgetGroup,
+  Tables.AccountTableStore
+>({
+  storeId: "async-ShareAccountsTable",
+  actions: ActionMap,
+  reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
+    columns: GenericAccountsTable.BudgetColumns,
+    actions: ActionMap,
+    getModelRowLabel: (r: R) => r.identifier,
+    getModelRowName: "Account",
+    getPlaceholderRowLabel: (r: R) => r.identifier,
+    getPlaceholderRowName: "Account",
+    initialState: redux.initialState.initialTableState
+  })
+})(GenericAccountsTable.UnauthenticatedBudget);
 
 interface AccountsTableProps {
   readonly budgetId: number;
@@ -22,22 +41,14 @@ interface AccountsTableProps {
 }
 
 const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element => {
-  const dispatch = useDispatch();
   const history = useHistory();
-
-  const data = useSelector(selectData);
-  const search = useSelector(selectTableSearch);
-  const groups = useSelector(selectGroups);
+  const table = tabling.hooks.useAuthenticatedTable<R>();
 
   return (
-    <ReadOnlyBudgetAccountsTable
-      models={data}
-      groups={groups}
-      search={search}
+    <ConnectedTable
+      tableRef={table}
       budget={budget}
-      menuPortalId={"supplementary-header"}
-      onSearch={(value: string) => dispatch(actions.accounts.setAccountsSearchAction(value))}
-      onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
+      onRowExpand={(row: Table.ModelRow<R>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
     />
   );
 };

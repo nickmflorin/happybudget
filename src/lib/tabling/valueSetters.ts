@@ -1,10 +1,11 @@
 import { isNil } from "lodash";
 import { ValueSetterParams } from "@ag-grid-community/core";
-import { util } from "lib";
+
+import * as util from "../util";
 
 /* prettier-ignore */
 export const percentageToDecimalValueSetter =
-  <R extends Table.Row>(field: keyof R) =>
+  <R extends Table.RowData>(field: keyof R) =>
     (params: ValueSetterParams): boolean => {
       if (params.newValue === "" || !isNaN(parseFloat(params.newValue))) {
         params.data[field] = parseFloat(params.newValue) / 100;
@@ -15,7 +16,7 @@ export const percentageToDecimalValueSetter =
 
 /* prettier-ignore */
 export const floatValueSetter =
-  <R extends Table.Row>(field: keyof R, nullable = true) =>
+  <R extends Table.RowData>(field: keyof R, nullable = true) =>
     (params: ValueSetterParams): boolean => {
       if (params.newValue === undefined && nullable) {
         params.data[field] = null;
@@ -32,7 +33,7 @@ export const floatValueSetter =
 
 /* prettier-ignore */
 export const integerValueSetter =
-  <R extends Table.Row>(field: keyof R, nullable = true) =>
+  <R extends Table.RowData>(field: keyof R, nullable = true) =>
     (params: ValueSetterParams): boolean => {
       if (params.newValue === undefined && nullable) {
         params.data[field] = null;
@@ -49,7 +50,7 @@ export const integerValueSetter =
 
 /* prettier-ignore */
 export const dateTimeValueSetter =
-  <R extends Table.Row>(field: keyof R) =>
+  <R extends Table.RowData>(field: keyof R) =>
     (params: ValueSetterParams): boolean => {
       if (params.newValue === undefined || params.newValue === null) {
         params.data[field] = null;
@@ -65,7 +66,7 @@ export const dateTimeValueSetter =
 
 /* prettier-ignore */
 export const emailValueSetter =
-<R extends Table.Row>(field: keyof R) =>
+<R extends Table.RowData>(field: keyof R) =>
     (params: ValueSetterParams): boolean => {
       if (params.newValue === undefined || params.newValue === null) {
         params.data[field] = null;

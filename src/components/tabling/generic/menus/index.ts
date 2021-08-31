@@ -1,4 +1,4 @@
-export { default as ReadOnlyMenu } from "./ReadOnlyMenu";
-export * from "./ReadOnlyMenu";
-export { default as ReadWriteMenu } from "./ReadWriteMenu";
-export * from "./ReadWriteMenu";
+export { default as UnauthenticatedMenu } from "./UnauthenticatedMenu";
+export * from "./UnauthenticatedMenu";
+export { default as AuthenticatedMenu } from "./AuthenticatedMenu";
+export * from "./AuthenticatedMenu";

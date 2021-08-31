@@ -9,7 +9,7 @@ import * as actions from "./actions";
 export function* getBudgetsTask(action: Redux.Action): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Modules.Authenticated.StoreObj) => {
+  const query = yield select((state: Application.Authenticated.Store) => {
     return {
       search: state.dashboard.budgets.search
     };
@@ -23,7 +23,7 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
   } catch (e: unknown) {
     if (!(yield cancelled())) {
       api.handleRequestError(e as Error, "There was an error retrieving the budgets.");
-      yield put(actions.responseBudgetsAction({ count: 0, data: [] }, { error: e as Error }));
+      yield put(actions.responseBudgetsAction({ count: 0, data: [] }));
     }
   } finally {
     yield put(actions.loadingBudgetsAction(false));
@@ -37,7 +37,7 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
 export function* getTemplatesTask(action: Redux.Action): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Modules.Authenticated.StoreObj) => {
+  const query = yield select((state: Application.Authenticated.Store) => {
     return {
       search: state.dashboard.templates.search
     };
@@ -51,7 +51,7 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
   } catch (e: unknown) {
     if (!(yield cancelled())) {
       api.handleRequestError(e as Error, "There was an error retrieving the templates.");
-      yield put(actions.responseTemplatesAction({ count: 0, data: [] }, { error: e as Error }));
+      yield put(actions.responseTemplatesAction({ count: 0, data: [] }));
     }
   } finally {
     yield put(actions.loadingTemplatesAction(false));
@@ -65,7 +65,7 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
 export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Modules.Authenticated.StoreObj) => {
+  const query = yield select((state: Application.Authenticated.Store) => {
     return {
       search: state.dashboard.community.search
     };
@@ -79,7 +79,7 @@ export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
   } catch (e: unknown) {
     if (!(yield cancelled())) {
       api.handleRequestError(e as Error, "There was an error retrieving the community templates.");
-      yield put(actions.responseCommunityTemplatesAction({ count: 0, data: [] }, { error: e as Error }));
+      yield put(actions.responseCommunityTemplatesAction({ count: 0, data: [] }));
     }
   } finally {
     yield put(actions.loadingCommunityTemplatesAction(false));

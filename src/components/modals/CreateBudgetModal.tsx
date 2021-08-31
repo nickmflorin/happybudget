@@ -11,7 +11,7 @@ interface CreateBudgetModalProps {
   onSuccess: (budget: Model.Budget) => void;
   onCancel: () => void;
   open: boolean;
-  templateId?: number;
+  templateId?: ID;
   title?: string;
 }
 

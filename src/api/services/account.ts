@@ -1,18 +1,18 @@
 import { client } from "api";
 import { URL } from "./util";
 
-export const getAccount = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Account> => {
+export const getAccount = async (id: ID, options: Http.RequestOptions = {}): Promise<Model.Account> => {
   const url = URL.v1("accounts", id);
   return client.retrieve<Model.Account>(url, options);
 };
 
-export const deleteAccount = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
+export const deleteAccount = async (id: ID, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("accounts", id);
   return client.delete<null>(url, options);
 };
 
 export const updateAccount = async (
-  id: number,
+  id: ID,
   payload: Partial<Http.AccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.Account> => {
@@ -21,17 +21,17 @@ export const updateAccount = async (
 };
 
 export const bulkUpdateAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
-  id: number,
-  data: Http.BulkUpdatePayload<Http.SubAccountPayload>[],
+  id: ID,
+  data: Http.BulkUpdatePayload<Http.SubAccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BudgetBulkResponse<B, Model.Account>> => {
   const url = URL.v1("accounts", id, "bulk-update-subaccounts");
-  return client.patch<Http.BudgetBulkResponse<B, Model.Account>>(url, { data }, options);
+  return client.patch<Http.BudgetBulkResponse<B, Model.Account>>(url, data, options);
 };
 
 export const bulkDeleteAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
-  id: number,
-  ids: number[],
+  id: ID,
+  ids: ID[],
   options: Http.RequestOptions = {}
 ): Promise<Http.BudgetBulkResponse<B, Model.Account>> => {
   const url = URL.v1("accounts", id, "bulk-delete-subaccounts");
@@ -39,7 +39,7 @@ export const bulkDeleteAccountSubAccounts = async <B extends Model.Budget | Mode
 };
 
 export const bulkCreateAccountSubAccounts = async <B extends Model.Budget | Model.Template>(
-  id: number,
+  id: ID,
   payload: Http.BulkCreatePayload<Http.SubAccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BudgetBulkCreateResponse<B, Model.Account, Model.SubAccount>> => {
@@ -48,7 +48,7 @@ export const bulkCreateAccountSubAccounts = async <B extends Model.Budget | Mode
 };
 
 export const getAccountSubAccounts = async (
-  accountId: number,
+  accountId: ID,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.SubAccount>> => {
@@ -57,7 +57,7 @@ export const getAccountSubAccounts = async (
 };
 
 export const createAccountSubAccount = async (
-  accountId: number,
+  accountId: ID,
   payload: Http.SubAccountPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.SubAccount> => {
@@ -66,25 +66,25 @@ export const createAccountSubAccount = async (
 };
 
 export const createAccountSubAccountGroup = async (
-  accountId: number,
+  accountId: ID,
   payload: Http.GroupPayload,
   options: Http.RequestOptions = {}
-): Promise<Model.Group> => {
+): Promise<Model.BudgetGroup> => {
   const url = URL.v1("accounts", accountId, "groups");
-  return client.post<Model.Group>(url, payload, options);
+  return client.post<Model.BudgetGroup>(url, payload, options);
 };
 
 export const getAccountSubAccountGroups = async (
-  accountId: number,
+  accountId: ID,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Group>> => {
+): Promise<Http.ListResponse<Model.BudgetGroup>> => {
   const url = URL.v1("accounts", accountId, "groups");
-  return client.list<Model.Group>(url, query, options);
+  return client.list<Model.BudgetGroup>(url, query, options);
 };
 
 export const getAccountActuals = async (
-  id: number,
+  id: ID,
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Actual>> => {
   const url = URL.v1("accounts", id, "actuals");
@@ -92,7 +92,7 @@ export const getAccountActuals = async (
 };
 
 export const createAccountActual = async (
-  id: number,
+  id: ID,
   payload: Http.ActualPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Actual> => {

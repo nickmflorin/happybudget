@@ -1,4 +1,4 @@
-/// <reference path="./http.d.ts" />
+/// <reference path="../modeling/http.d.ts" />
 
 type CSVRow = (string | number | null | undefined)[];
 type CSVData = CSVRow[];

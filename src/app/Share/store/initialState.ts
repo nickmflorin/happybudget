@@ -1,25 +1,34 @@
 import { redux } from "lib";
 
-export const initialBudgetState: Modules.Unauthenticated.Share.BudgetStore = {
+export const initialSubAccountState: Modules.Share.SubAccountStore = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
-  table: redux.initialState.initialReadOnlyBudgetTableState
+  table: {
+    ...redux.initialState.initialTableState,
+    fringes: {
+      ...redux.initialState.initialTableState,
+      fringeColors: []
+    },
+    subaccountUnits: []
+  }
 };
 
-export const initialSubAccountState: Modules.Unauthenticated.Share.SubAccountStore = {
+export const initialAccountState: Modules.Share.AccountStore = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
-  table: redux.initialState.initialReadOnlyBudgetTableWithFringesState
+  table: {
+    ...redux.initialState.initialTableState,
+    fringes: {
+      ...redux.initialState.initialTableState,
+      fringeColors: []
+    },
+    subaccountUnits: []
+  }
 };
 
-export const initialAccountState: Modules.Unauthenticated.Share.AccountStore = {
+const initialState: Modules.Share.Store = {
   id: null,
   detail: redux.initialState.initialDetailResponseState,
-  table: redux.initialState.initialReadOnlyBudgetTableWithFringesState
-};
-
-const initialState: Modules.Unauthenticated.Share.StoreObj = {
-  budget: initialBudgetState,
   account: initialAccountState,
   subaccount: initialSubAccountState
 };

@@ -7,7 +7,7 @@ import { isNil } from "lodash";
 import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
 import { ApplicationSpinner } from "components";
 import { validateToken } from "api/services";
-import { configureAuthenticatedStore } from "store";
+import { configureAuthenticatedStore } from "store/configureStore";
 
 interface WrapInAuthenticatedStoreProps {
   readonly children: ReactNode;
@@ -16,7 +16,7 @@ interface WrapInAuthenticatedStoreProps {
 const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
-  const [reduxStore, setReduxStore] = useState<Store<Modules.Authenticated.StoreObj, Redux.Action> | undefined>(
+  const [reduxStore, setReduxStore] = useState<Store<Application.Authenticated.Store, Redux.Action> | undefined>(
     undefined
   );
 

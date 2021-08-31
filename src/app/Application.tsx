@@ -9,8 +9,8 @@ import { operational } from "lib";
 import Logout from "./Logout";
 
 const Dashboard = operational.lazyWithRetry(() => import("./Dashboard"));
-const Budget = operational.lazyWithRetry(() => import("./Budgeting/components/Budget"));
-const Template = operational.lazyWithRetry(() => import("./Budgeting/components/Template"));
+const Budget = operational.lazyWithRetry(() => import("./Budget"));
+const Template = operational.lazyWithRetry(() => import("./Template"));
 const Settings = operational.lazyWithRetry(() => import("./Settings"));
 
 const Application = (): JSX.Element => {

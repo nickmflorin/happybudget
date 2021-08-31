@@ -3,8 +3,9 @@ import { isNil } from "lodash";
 import { Cell } from "components/tabling/generic/framework/cells";
 
 type SubAccountCellProps = Table.CellProps<
-  Tables.ActualRow,
+  Tables.ActualRowData,
   Model.Actual,
+  Tables.ActualTableStore,
   Model.SimpleAccount | Model.SimpleSubAccount | null
 >;
 

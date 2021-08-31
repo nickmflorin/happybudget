@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { Dispatch } from "redux";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
@@ -16,11 +15,11 @@ import { useLoggedInUser } from "store/hooks";
 
 import { actions } from "../../store";
 
-const selectTemplates = (state: Modules.Authenticated.StoreObj) => state.dashboard.community.data;
-const selectLoadingTemplates = (state: Modules.Authenticated.StoreObj) => state.dashboard.community.loading;
+const selectTemplates = (state: Application.Authenticated.Store) => state.dashboard.community.data;
+const selectLoadingTemplates = (state: Application.Authenticated.Store) => state.dashboard.community.loading;
 
 interface DiscoverProps {
-  setTemplateToDerive: (template: number) => void;
+  setTemplateToDerive: (template: ID) => void;
 }
 
 const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element => {
@@ -31,7 +30,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
   const [isTogglingVisibility, setTogglingVisibility, setVisibilityToggled] = redux.hooks.useTrackModelActions([]);
   const [isDuplicating, setDuplicating, setDuplicated] = redux.hooks.useTrackModelActions([]);
 
-  const dispatch: Dispatch = useDispatch();
+  const dispatch: Redux.Dispatch = useDispatch();
   const templates = useSelector(selectTemplates);
   const loading = useSelector(selectLoadingTemplates);
 
@@ -45,7 +44,7 @@ const Discover: React.FC<DiscoverProps> = ({ setTemplateToDerive }): JSX.Element
     <div className={"my-templates"}>
       <WrapInApplicationSpinner loading={loading}>
         <div className={"dashboard-card-grid"}>
-          {map(templates, (template: Model.Template, index: number) => {
+          {map(templates, (template: Model.Template, index: ID) => {
             // The API will exclude hidden community templates for non-staff users
             // by design.  However, just in case we will also make sure that we are
             // not showing those templates to the user in the frontend.

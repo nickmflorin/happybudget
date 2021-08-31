@@ -14,7 +14,7 @@ export const getUrl = (budget: Model.Budget | Model.Template, entity?: Model.Ent
     : `/${designation}s/${budget.id}/accounts`;
 };
 
-type PluggableID = number | "([0-9]+)";
+type PluggableID = ID | "([0-9]+)";
 
 export const isAccountsUrl = (
   url: string,
@@ -59,7 +59,7 @@ const getBudgetLastVisitedCookies = (): { [key: string]: any } => {
   return lastVisited;
 };
 
-export const getBudgetLastVisited = (id: number): string | null => {
+export const getBudgetLastVisited = (id: ID): string | null => {
   const cookies = getBudgetLastVisitedCookies();
   if (!isNil(cookies[`${id}`])) {
     if (typeof cookies[`${id}`] === "string" && isBudgetRelatedUrl(cookies[`${id}`], id)) {
@@ -69,7 +69,7 @@ export const getBudgetLastVisited = (id: number): string | null => {
   return null;
 };
 
-export const setBudgetLastVisited = (id: number, url: string): void => {
+export const setBudgetLastVisited = (id: ID, url: string): void => {
   const budgetCookies = getBudgetLastVisitedCookies();
   if (isBudgetRelatedUrl(url, id)) {
     budgetCookies[id] = url;
@@ -88,7 +88,7 @@ const getTemplateLastVisitedCookies = (): { [key: string]: any } => {
   return lastVisited;
 };
 
-export const setTemplateLastVisited = (id: number, url: string): void => {
+export const setTemplateLastVisited = (id: ID, url: string): void => {
   const templatesCookies = getTemplateLastVisitedCookies();
   if (isTemplateRelatedUrl(url, id)) {
     templatesCookies[id] = url;
@@ -97,7 +97,7 @@ export const setTemplateLastVisited = (id: number, url: string): void => {
   }
 };
 
-export const getTemplateLastVisited = (id: number): string | null => {
+export const getTemplateLastVisited = (id: ID): string | null => {
   const cookies = getTemplateLastVisitedCookies();
   if (!isNil(cookies[`${id}`])) {
     if (typeof cookies[`${id}`] === "string" && isTemplateRelatedUrl(cookies[`${id}`], id)) {

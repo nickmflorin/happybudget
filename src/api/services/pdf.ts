@@ -9,16 +9,13 @@ export const getHeaderTemplates = async (
   return client.list<Model.SimpleHeaderTemplate>(url, query, options);
 };
 
-export const getHeaderTemplate = async (
-  id: number,
-  options: Http.RequestOptions = {}
-): Promise<Model.HeaderTemplate> => {
+export const getHeaderTemplate = async (id: ID, options: Http.RequestOptions = {}): Promise<Model.HeaderTemplate> => {
   const url = URL.v1("pdf", "header-templates", id);
   return client.retrieve<Model.HeaderTemplate>(url, options);
 };
 
 export const updateHeaderTemplate = async (
-  id: number,
+  id: ID,
   payload: Partial<Http.HeaderTemplatePayload>,
   options: Http.RequestOptions = {}
 ): Promise<Model.HeaderTemplate> => {
@@ -34,7 +31,7 @@ export const createHeaderTemplate = async (
   return client.post<Model.HeaderTemplate>(url, payload, options);
 };
 
-export const deleteHeaderTemplate = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
+export const deleteHeaderTemplate = async (id: ID, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("pdf", "header-templates", id);
   return client.delete<null>(url, options);
 };

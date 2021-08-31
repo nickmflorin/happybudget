@@ -8,11 +8,23 @@ import { useContacts } from "store/hooks";
 
 import { Cell } from "./generic";
 
-interface ContactCellProps<M extends Model.Model> extends Table.CellProps<Tables.SubAccountRow, M, number | null> {
-  readonly onEditContact: (id: number) => void;
+interface ContactCellProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> extends Table.CellProps<R, M, S, number | null> {
+  readonly onEditContact: (id: ID) => void;
 }
 
-const ContactCell = <M extends Model.Model>({ value, ...props }: ContactCellProps<M>): JSX.Element => {
+/* eslint-disable indent */
+const ContactCell = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>({
+  value,
+  ...props
+}: ContactCellProps<R, M, S>): JSX.Element => {
   const contacts = useContacts();
   const model = useMemo(() => (!isNil(value) ? find(contacts, { id: value } as any) || null : null), [value, contacts]);
 

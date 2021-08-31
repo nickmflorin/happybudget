@@ -1,24 +1,33 @@
+import { useMemo } from "react";
+import { useSelector } from "react-redux";
 import { isNil } from "lodash";
+
+import { hooks, model } from "lib";
+
 import { Tag } from "components/tagging";
 import { Cell } from "components/tabling/generic/framework/cells";
 
 export interface FringesCellProps
-  extends BudgetTable.CellProps<Tables.SubAccountRow, Model.SubAccount, Model.Fringe[]> {
+  extends Table.CellProps<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {
   readonly onAddFringes: () => void;
 }
 
 const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.Element => {
-  // I don't understand why, but sometimes (particularly after a hot reload) the children
-  // prop seems to be coming in as undefined.  So we need to validate that it is not undefined
-  // in the below cases.
+  const row: Tables.SubAccountRow = props.node.data;
+  const fringes = useSelector((state: Application.Store) => props.selector(state).fringes.data);
+
+  const models = useMemo(() => {
+    return model.util.getModelsByIds(fringes, row.fringes);
+  }, [hooks.useDeepEqualMemo(fringes), row.fringes]);
+
   return (
-    <Cell
+    <Cell<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore>
       {...props}
       onClear={() => !isNil(props.setValue) && props.setValue([])}
-      hideClear={isNil(value) || value.length === 0}
+      hideClear={models.length === 0}
     >
       <div style={{ display: "flex", justifyContent: "left" }}>
-        <Tag.Multiple<Model.Fringe> models={value} />
+        <Tag.Multiple<Tables.FringeRow> models={models} />
       </div>
     </Cell>
   );

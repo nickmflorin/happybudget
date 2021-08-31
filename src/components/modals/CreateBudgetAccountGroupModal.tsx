@@ -6,10 +6,10 @@ import { GroupForm } from "components/forms";
 import Modal from "./Modal";
 
 interface CreateBudgetAccountGroupModalProps {
-  onSuccess: (group: Model.Group) => void;
+  onSuccess: (group: Model.BudgetGroup) => void;
   onCancel: () => void;
   budgetId: number;
-  accounts: number[];
+  accounts: ID[];
   open: boolean;
 }
 
@@ -42,7 +42,7 @@ const CreateBudgetAccountGroupModal = ({
                 children: accounts,
                 color: values.color
               })
-              .then((group: Model.Group) => {
+              .then((group: Model.BudgetGroup) => {
                 form.resetFields();
                 onSuccess(group);
               })

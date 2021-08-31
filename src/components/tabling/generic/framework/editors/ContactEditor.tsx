@@ -1,30 +1,43 @@
-import { forwardRef } from "react";
+import { forwardRef, ForwardedRef } from "react";
+import { filter } from "lodash";
 
+import { tabling } from "lib";
 import { useContacts } from "store/hooks";
 import { Icon } from "components";
 import { framework } from "components/tabling/generic";
 
-import { ModelTagEditor } from "./generic";
+import { GenericModelMenuEditor } from "./generic";
 
-interface ContactEditorProps<R extends Table.Row, M extends Model.Model>
-  extends Table.EditorParams<R, M, Model.Contact> {
-  readonly onNewContact: (params: { name?: string; change: Omit<Table.CellChange<R, M>, "newValue"> }) => void;
+interface ContactEditorProps<
+  R extends Table.RowData & { readonly contact: number | null },
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> extends Table.EditorParams<R, M, S> {
+  readonly onNewContact: (params: { name?: string; change: Omit<Table.SoloCellChange<R, M>, "newValue"> }) => void;
 }
 
-const ContactEditor = <R extends Table.Row, M extends Model.Model>(props: ContactEditorProps<R, M>, ref: any) => {
+/* eslint-disable indent */
+const ContactEditor = <
+  R extends Table.RowData & { readonly contact: number | null },
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>(
+  props: ContactEditorProps<R, M, S>,
+  ref: ForwardedRef<any>
+) => {
   const contacts = useContacts();
 
-  const [editor] = framework.editors.useModelMenuEditor<R, M, Model.Contact, number>({
+  const [editor] = framework.editors.useModelMenuEditor<Model.Contact, ID, R, M, S>({
     ...props,
     forwardedRef: ref
   });
-
   return (
-    <ModelTagEditor<R, M, Model.Contact, number>
+    <GenericModelMenuEditor<Model.Contact, ID, R, M, S>
+      {...props}
       editor={editor}
       style={{ width: 160 }}
       selected={editor.value}
-      models={contacts}
+      models={filter(contacts, (m: Model.Contact) => m.full_name !== "")}
       onChange={(e: MenuChangeEvent<Model.Contact>) => editor.onChange(e.model.id, e.event)}
       searchIndices={["first_name", "last_name"]}
       tagProps={{ color: "#EFEFEF", textColor: "#2182e4", modelTextField: "full_name", className: "tag--contact" }}
@@ -32,30 +45,32 @@ const ContactEditor = <R extends Table.Row, M extends Model.Model>(props: Contac
         {
           id: "add-contact",
           onClick: () => {
-            const row: R = props.node.data;
-            const searchValue = editor.menu.current.getSearchValue();
-            editor.stopEditing(false);
-            if (searchValue !== "") {
-              props.onNewContact({
-                name: searchValue,
-                change: {
-                  oldValue: row.contact || null,
-                  field: props.column.field,
-                  row,
-                  column: props.column,
-                  id: row.id
-                }
-              });
-            } else {
-              props.onNewContact({
-                change: {
-                  oldValue: row.contact || null,
-                  field: props.column.field,
-                  row,
-                  column: props.column,
-                  id: row.id
-                }
-              });
+            const row: Table.DataRow<R, M> = props.node.data;
+            if (tabling.typeguards.isModelRow(row)) {
+              const searchValue = editor.menu.current.getSearchValue();
+              editor.stopEditing(false);
+              if (searchValue !== "") {
+                props.onNewContact({
+                  name: searchValue,
+                  change: {
+                    oldValue: (row.contact || null) as unknown as Table.RowValue<R>,
+                    field: props.column.field,
+                    row,
+                    id: row.id,
+                    column: props.column
+                  }
+                });
+              } else {
+                props.onNewContact({
+                  change: {
+                    oldValue: (row.contact || null) as unknown as Table.RowValue<R>,
+                    field: props.column.field,
+                    row,
+                    id: row.id,
+                    column: props.column
+                  }
+                });
+              }
             }
           },
           label: "Add Contact",

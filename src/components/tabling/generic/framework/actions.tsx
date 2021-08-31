@@ -8,8 +8,8 @@ export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
   onClick: () => onExport()
 });
 
-export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
-  table: Table.ReadOnlyTableRefObj<R, M> | Table.ReadWriteTableRefObj<R, M>,
+export const ExportCSVAction = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+  table: Table.UnauthenticatedTableRefObj<R> | Table.AuthenticatedTableRefObj<R>,
   params: Table.MenuActionParams<R, M>,
   exportFileName: string
 ): Table.MenuActionObj => ({
@@ -39,8 +39,8 @@ export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
   }
 });
 
-export const ToggleColumnAction = <R extends Table.Row, M extends Model.Model>(
-  table: Table.ReadOnlyTableRefObj<R, M> | Table.ReadWriteTableRefObj<R, M>,
+export const ToggleColumnAction = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+  table: Table.UnauthenticatedTableRefObj<R> | Table.AuthenticatedTableRefObj<R>,
   params: Table.MenuActionParams<R, M>
 ): Table.MenuActionObj => ({
   /* eslint-disable indent */
@@ -52,7 +52,10 @@ export const ToggleColumnAction = <R extends Table.Row, M extends Model.Model>(
         hiddenColumns={params.hiddenColumns}
         columns={params.columns}
         onChange={(p: MenuChangeEvent<MenuItemModel>) =>
-          table.changeColumnVisibility({ field: p.model.id as Table.Field<R, M>, visible: p.selected })
+          table.changeColumnVisibility({
+            field: p.model.id as keyof R,
+            visible: p.selected
+          })
         }
       >
         {children}

@@ -3,7 +3,7 @@ import { map, isNil, includes } from "lodash";
 
 import { RecursiveMenuItem } from "./MenuItem";
 
-const MenuItems = <M extends Model.M>(props: IMenuItems<M>): JSX.Element => {
+const MenuItems = <M extends Model.Model>(props: IMenuItems<M>): JSX.Element => {
   return (
     <React.Fragment>
       {map(props.models, (m: M, index: number) => {

@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, ForwardedRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil, filter, map } from "lodash";
 
@@ -6,72 +6,40 @@ import { Icon } from "components";
 import { ModelTagsMenu } from "components/menus";
 import { framework } from "components/tabling/generic";
 
-// It is not ideal that we are importing part of the store in a generalized components
-// directory.  We should consider alternate solutions to this or potentially moving the
-// cell component into the app directory.
-const fringesSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.LevelType) => {
-  return (state: Modules.Authenticated.StoreObj) => {
-    /* eslint-disable indent */
-    switch (budgetType) {
-      case "budget":
-        switch (levelType) {
-          case "account":
-            return state.budget.budget.account.table.fringes.data;
-          case "subaccount":
-            return state.budget.budget.subaccount.table.fringes.data;
-          default:
-            return [];
-        }
-      case "template":
-        switch (levelType) {
-          case "account":
-            return state.budget.template.account.table.fringes.data;
-          case "subaccount":
-            return state.budget.template.subaccount.table.fringes.data;
-          default:
-            return [];
-        }
-      default:
-        return [];
-    }
-  };
-};
-
-export interface FringesEditorProps extends Table.EditorParams<Tables.SubAccountRow, Model.SubAccount> {
+export interface FringesEditorProps
+  extends Table.EditorParams<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {
   readonly onAddFringes: () => void;
-  readonly colId: keyof Tables.SubAccountRow;
-  readonly budgetType: Model.BudgetType;
-  readonly levelType: BudgetTable.LevelType;
+  readonly colId: keyof Tables.SubAccountRowData;
 }
 
-const FringesEditor = (props: FringesEditorProps, ref: any) => {
-  const selector = fringesSelector(props.budgetType, props.levelType);
-  const fringes = useSelector(selector);
+const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
+  const fringes = useSelector((state: Application.Store) => props.selector(state).fringes.data);
   const [editor] = framework.editors.useModelMenuEditor<
-    Tables.SubAccountRow,
+    Tables.FringeRow,
+    ID[],
+    Tables.SubAccountRowData,
     Model.SubAccount,
-    Model.Fringe,
-    Model.Fringe[]
+    Tables.SubAccountTableStore
   >({
     ...props,
     forwardedRef: ref
   });
 
   return (
-    <ModelTagsMenu<Model.Fringe>
+    <ModelTagsMenu<Tables.FringeRow>
       style={{ minWidth: 220 }}
       checkbox={true}
       mode={"multiple"}
       menu={editor.menu}
       includeSearch={true}
-      selected={map(editor.value, (v: Model.Fringe) => v.id)}
-      models={filter(fringes, (fringe: Model.Fringe) => !isNil(fringe.name) && fringe.name.trim() !== "")}
-      onChange={(e: MenuChangeEvent<Model.Fringe>) => {
+      selected={editor.value}
+      models={filter(fringes, (fringe: Tables.FringeRow) => !isNil(fringe.name) && fringe.name.trim() !== "")}
+      onChange={(e: MenuChangeEvent<Tables.FringeRow>) => {
         const selectedStates = filter(
           e.state,
-          (s: IMenuItemState<Model.Fringe>) => s.selected === true
-        ) as IMenuItemState<Model.Fringe>[];
-        const ms = map(selectedStates, (s: IMenuItemState<Model.Fringe>) => s.model);
+          (s: IMenuItemState<Tables.FringeRow>) => s.selected === true
+        ) as IMenuItemState<Tables.FringeRow>[];
+        const ms = map(selectedStates, (s: IMenuItemState<Tables.FringeRow>) => s.model.id);
         editor.onChange(ms, e.event, false);
       }}
       searchIndices={["name"]}

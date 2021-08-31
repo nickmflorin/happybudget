@@ -1,23 +1,23 @@
 import { forEach, includes, isNil, map, reduce, uniq, filter } from "lodash";
 import Cookies from "universal-cookie";
 
-export const validateHiddenColumns = <R extends Table.Row, M extends Model.Model>(
+export const validateHiddenColumns = <R extends Table.RowData>(
   obj: any,
-  validateAgainst?: Table.Field<R, M>[]
-): Table.Field<R, M>[] | null => {
+  validateAgainst?: (keyof R)[]
+): (keyof R)[] | null => {
   if (!Array.isArray(obj)) {
     return null;
   } else {
     const validated = uniq(
       reduce(
         obj,
-        (fields: Table.Field<R, M>[], iteree: any) => {
+        (fields: (keyof R)[], iteree: keyof R) => {
           if (typeof iteree === "string" && (isNil(validateAgainst) || includes(validateAgainst, iteree))) {
-            return [...fields, iteree as Table.Field<R, M>];
+            return [...fields, iteree as keyof R];
           }
           return fields;
         },
-        [] as Table.Field<R, M>[]
+        [] as (keyof R)[]
       )
     );
     // If there are columns present in the cookies but non are valid, we want to treat
@@ -28,25 +28,22 @@ export const validateHiddenColumns = <R extends Table.Row, M extends Model.Model
   }
 };
 
-export const getHiddenColumns = <R extends Table.Row, M extends Model.Model>(
+export const getHiddenColumns = <R extends Table.RowData>(
   cookieName: string,
-  validateAgainst?: Table.Field<R, M>[]
-): Table.Field<R, M>[] | null => {
+  validateAgainst?: (keyof R)[]
+): (keyof R)[] | null => {
   const cookiesObj = new Cookies();
   const cookiesHiddenColumns = cookiesObj.get(cookieName);
   return validateHiddenColumns(cookiesHiddenColumns, validateAgainst);
 };
 
-export const applyHiddenColumnChanges = <R extends Table.Row, M extends Model.Model>(
-  changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>,
-  hiddenColumns: Table.Field<R, M>[]
-): Table.Field<R, M>[] => {
-  const applyHiddenColumnChange = (
-    change: Table.ColumnVisibilityChange<R, M>,
-    cols: Table.Field<R, M>[]
-  ): Table.Field<R, M>[] => {
+export const applyHiddenColumnChanges = <R extends Table.RowData>(
+  changes: SingleOrArray<Table.ColumnVisibilityChange<R>>,
+  hiddenColumns: (keyof R)[]
+): (keyof R)[] => {
+  const applyHiddenColumnChange = (change: Table.ColumnVisibilityChange<R>, cols: (keyof R)[]): (keyof R)[] => {
     if (change.visible === true && includes(cols, change.field)) {
-      return filter(cols, (value: Table.Field<R, M>) => value !== change.field);
+      return filter(cols, (value: keyof R) => value !== change.field);
     } else if (change.visible === false && !includes(cols, change.field)) {
       return [...cols, change.field];
     }
@@ -56,38 +53,34 @@ export const applyHiddenColumnChanges = <R extends Table.Row, M extends Model.Mo
   changes = Array.isArray(changes) ? changes : [changes];
   return reduce(
     changes,
-    (fields: Table.Field<R, M>[], change: Table.ColumnVisibilityChange<R, M>) =>
-      applyHiddenColumnChange(change, fields),
+    (fields: (keyof R)[], change: Table.ColumnVisibilityChange<R>) => applyHiddenColumnChange(change, fields),
     hiddenColumns
   );
 };
 
-export const getHiddenColumnsAfterChanges = <R extends Table.Row, M extends Model.Model>(
+export const getHiddenColumnsAfterChanges = <R extends Table.RowData>(
   cookieName: string,
-  changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>
-): Table.Field<R, M>[] => {
+  changes: SingleOrArray<Table.ColumnVisibilityChange<R>>
+): (keyof R)[] => {
   const hiddenColumns = getHiddenColumns(cookieName) || [];
   return applyHiddenColumnChanges(changes, hiddenColumns);
 };
 
-export const setHiddenColumns = <R extends Table.Row, M extends Model.Model>(
-  cookieName: string,
-  fields: Table.Field<R, M>[]
-) => {
+export const setHiddenColumns = <R extends Table.RowData>(cookieName: string, fields: (keyof R)[]) => {
   const cookiesObj = new Cookies();
   cookiesObj.set(cookieName, fields);
 };
 
-export const updateHiddenColumns = <R extends Table.Row, M extends Model.Model>(
+export const updateHiddenColumns = <R extends Table.RowData>(
   cookieName: string,
-  changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>
-): Table.Field<R, M>[] => {
+  changes: SingleOrArray<Table.ColumnVisibilityChange<R>>
+): (keyof R)[] => {
   const hiddenColumns = getHiddenColumnsAfterChanges(cookieName, changes);
   setHiddenColumns(cookieName, hiddenColumns);
   return hiddenColumns;
 };
 
-const validateFieldOrder = <R extends Table.Row, M extends Model.Model>(
+const validateFieldOrder = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   obj: any,
   cols: Table.Column<R, M>[]
 ): FieldOrder<keyof R> | null => {
@@ -110,7 +103,7 @@ const validateFieldOrder = <R extends Table.Row, M extends Model.Model>(
   return null;
 };
 
-export const validateOrdering = <R extends Table.Row, M extends Model.Model>(
+export const validateOrdering = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   obj: any,
   cols: Table.Column<R, M>[]
 ): FieldOrder<keyof R>[] | null => {

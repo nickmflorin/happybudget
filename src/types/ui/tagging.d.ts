@@ -13,7 +13,7 @@
   readonly text: string;
 }
 
-type PluralityWithModel<M extends Model.M = Model.M> = {
+type PluralityWithModel<M extends Model.Model = Model.Model> = {
   readonly isPlural?: boolean;
   readonly model: M;
 }
@@ -31,7 +31,7 @@ interface ITagRenderParams<S extends object = React.CSSProperties> {
   readonly contentRender: ((params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element) | undefined
 }
 
-type TagProps<M extends Model.M = Model.M, S extends object = React.CSSProperties> = {
+type TagProps<M extends Model.Model = Model.Model, S extends object = React.CSSProperties> = {
   readonly className?: string;
   readonly textClassName?: string;
   readonly style?: S;
@@ -55,7 +55,7 @@ type TagProps<M extends Model.M = Model.M, S extends object = React.CSSPropertie
   readonly contentRender?: (params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element;
 }
 
-type MultipleTagsProps<M extends Model.M = Model.M> = StandardComponentProps & {
+type MultipleTagsProps<M extends Model.Model = Model.Model> = StandardComponentProps & {
   // <Tag> components should be generated based on a set of provided models M.
   readonly models?: (M | PluralityWithModel<M>)[];
   // <Tag> components are provided as children to the component:

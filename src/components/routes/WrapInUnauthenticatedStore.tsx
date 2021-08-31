@@ -5,7 +5,7 @@ import { Redirect } from "react-router-dom";
 import { isNil } from "lodash";
 
 import { ApplicationSpinner } from "components";
-import { configureUnauthenticatedStore } from "store";
+import { configureUnauthenticatedStore } from "store/configureStore";
 
 interface WrapInAuthenticatedStoreProps {
   readonly children: ReactNode;
@@ -13,7 +13,7 @@ interface WrapInAuthenticatedStoreProps {
 
 const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): JSX.Element => {
   const [authenticating, setAuthenticating] = useState(true);
-  const [reduxStore, setReduxStore] = useState<Store<Modules.Unauthenticated.StoreObj, Redux.Action> | undefined>(
+  const [reduxStore, setReduxStore] = useState<Store<Application.Unauthenticated.Store, Redux.Action> | undefined>(
     undefined
   );
 

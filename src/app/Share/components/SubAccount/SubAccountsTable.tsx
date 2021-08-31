@@ -1,28 +1,48 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil } from "lodash";
 
 import { redux } from "lib";
-import { hooks } from "store";
-import { ReadOnlyBudgetSubAccountsTable } from "components/tabling";
+import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
 
-const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.subaccount.table.groups.data
-);
-const selectSubAccounts = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.subaccount.table.data
-);
-const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.subaccount.table.search
-);
+type M = Model.SubAccount;
+type R = Tables.SubAccountRowData;
+
 const selectSubAccountDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.subaccount.detail.data
+  (state: Application.Unauthenticated.Store) => state.share.subaccount.detail.data
 );
+
 const selectFringes = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.subaccount.table.fringes.data
+  (state: Application.Unauthenticated.Store) => state.share.subaccount.table.fringes.data
 );
+
+const selectSubAccountUnits = redux.selectors.simpleDeepEqualSelector(
+  (state: Application.Unauthenticated.Store) => state.share.subaccount.table.subaccountUnits
+);
+
+const SubAccountsTableStoreSelector = redux.selectors.simpleDeepEqualSelector(
+  (state: Application.Unauthenticated.Store) => state.share.subaccount.table
+);
+
+const ActionMap = {
+  request: actions.account.requestAction,
+  loading: actions.account.loadingAction,
+  response: actions.account.responseAction,
+  setSearch: actions.account.setSearchAction
+};
+
+const ConnectedTable = connectTableToStore<
+  GenericSubAccountsTable.UnauthenticatedBudgetProps,
+  R,
+  M,
+  Model.BudgetGroup,
+  Tables.SubAccountTableStore
+>({
+  actions: ActionMap,
+  selector: SubAccountsTableStoreSelector
+})(GenericSubAccountsTable.UnauthenticatedBudget);
 
 interface SubAccountsTableProps {
   readonly subaccountId: number;
@@ -31,25 +51,16 @@ interface SubAccountsTableProps {
 }
 
 const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTableProps): JSX.Element => {
-  const dispatch = useDispatch();
   const history = useHistory();
 
-  const data = useSelector(selectSubAccounts);
-  const search = useSelector(selectTableSearch);
   const subaccountDetail = useSelector(selectSubAccountDetail);
-  const groups = useSelector(selectGroups);
   const fringes = useSelector(selectFringes);
-  const subAccountUnits = hooks.useSubAccountUnits();
-  const contacts = hooks.useContacts();
+  const subAccountUnits = useSelector(selectSubAccountUnits);
 
   return (
-    <ReadOnlyBudgetSubAccountsTable
+    <ConnectedTable
       budget={budget}
-      levelType={"subaccount"}
-      models={data}
-      groups={groups}
       detail={subaccountDetail}
-      contacts={contacts}
       subAccountUnits={subAccountUnits}
       fringes={fringes}
       // Right now, the SubAccount recursion only goes 1 layer deep.
@@ -61,11 +72,9 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           : "Sub Account Total"
       }
       exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
-      search={search}
-      onSearch={(value: string) => dispatch(actions.subAccount.setSubAccountsSearchAction(value))}
       categoryName={"Detail"}
       identifierFieldHeader={"Line"}
-      onBack={(row?: Tables.FringeRow) => {
+      onBack={(row?: Tables.FringeRowData) => {
         if (!isNil(subaccountDetail) && !isNil(subaccountDetail.ancestors) && subaccountDetail.ancestors.length !== 0) {
           const ancestor = subaccountDetail.ancestors[subaccountDetail.ancestors.length - 1];
           if (ancestor.type === "subaccount") {

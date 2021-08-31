@@ -22,11 +22,11 @@ export const InitialMenuRef: IMenuRef<any> = {
   focusMenu: (value: boolean) => {}
 };
 
-export const useMenu = <M extends Model.M>(): NonNullRef<IMenuRef<M>> => {
+export const useMenu = <M extends Model.Model>(): NonNullRef<IMenuRef<M>> => {
   return useRef<IMenuRef<M>>(InitialMenuRef);
 };
 
-export const useMenuIfNotDefined = <M extends Model.M>(menu?: NonNullRef<IMenuRef<M>>): NonNullRef<IMenuRef<M>> => {
+export const useMenuIfNotDefined = <M extends Model.Model>(menu?: NonNullRef<IMenuRef<M>>): NonNullRef<IMenuRef<M>> => {
   const ref = useRef<IMenuRef<M>>(InitialMenuRef);
   const returnRef = useMemo(() => (!isNil(menu) ? menu : ref), [menu, ref.current]);
   return returnRef;
@@ -100,13 +100,15 @@ export const usePortalReference = (id: string | number) => {
   return getRootElem();
 };
 
-export const usePortal = (id: string | number) => {
+export const usePortal = (id: string | number | undefined): Element | null => {
   const [parent, setParent] = useState<Element | null>(null);
 
   useEffect(() => {
-    const existingParent = document.querySelector(`#${id}`);
-    const parentElem = existingParent || createRootElement(id);
-    setParent(parentElem);
+    if (!isNil(id)) {
+      const existingParent = document.querySelector(`#${id}`);
+      const parentElem = existingParent || createRootElement(id);
+      setParent(parentElem);
+    }
   }, [id]);
 
   return parent;

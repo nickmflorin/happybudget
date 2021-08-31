@@ -1,17 +1,17 @@
 import { isNil, filter, map, findIndex, includes } from "lodash";
-
+import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
-type IdentifierColumnProps<R extends BudgetTable.Row, M extends Model.Model> = Partial<Table.Column<R, M>> & {
+type IdentifierColumnProps<R extends Table.RowData, M extends Model.Model> = Partial<Table.Column<R, M>> & {
   readonly tableFooterLabel: string;
   readonly pageFooterLabel?: string;
 };
 
-export const IdentifierColumn = <R extends BudgetTable.Row, M extends Model.Model>(
+export const IdentifierColumn = <R extends Table.RowData, M extends Model.Model>(
   props: IdentifierColumnProps<R, M>
 ): Table.Column<R, M> => {
   const { tableFooterLabel, pageFooterLabel, ...col } = props;
-  const base = framework.columnObjs.BodyColumn({
+  const base = framework.columnObjs.BodyColumn<R, M>({
     columnType: "number",
     ...col,
     footer: {
@@ -27,8 +27,8 @@ export const IdentifierColumn = <R extends BudgetTable.Row, M extends Model.Mode
     suppressSizeToFit: true,
     cellStyle: { textAlign: "left" },
     colSpan: (params: Table.ColSpanParams<R, M>) => {
-      const row: R = params.data;
-      if (row.meta.isGroupRow === true) {
+      const row: Table.Row<R, M> = params.data;
+      if (tabling.typeguards.isGroupRow(row)) {
         /*
         Note: We have to look at all of the visible columns that are present up until
         the calculated columns.  This means we have to use the AG Grid ColumnApi (not our
@@ -42,7 +42,7 @@ export const IdentifierColumn = <R extends BudgetTable.Row, M extends Model.Mode
           );
           const indexOfIdentifierColumn = findIndex(agColumns, (c: Table.AgColumn) => c.getColId() === "identifier");
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (c: Table.AgColumn) =>
-            includes(originalCalculatedColumns, c.getColId())
+            includes(originalCalculatedColumns, c.getColId() as keyof R)
           );
           return indexOfFirstCalculatedColumn - indexOfIdentifierColumn;
         }

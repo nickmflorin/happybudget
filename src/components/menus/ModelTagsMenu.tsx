@@ -13,7 +13,7 @@ export type ModelTagsMenuProps<M extends MenuItemModel> = IMenu<M> & { readonly 
   readonly onMissing?: JSX.Element | EmptyTagProps;
 };
 
-const ModelTagsMenu = <M extends Model.Model>(props: ModelTagsMenuProps<M>): JSX.Element => {
+const ModelTagsMenu = <M extends Model.Model>(props: Omit<ModelTagsMenuProps<M>, "renderItemContent">): JSX.Element => {
   return <ModelMenu<M> {...props} renderItemContent={(model: M) => <Tag model={model} {...props.tagProps} />} />;
 };
 

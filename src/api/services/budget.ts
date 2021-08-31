@@ -9,13 +9,13 @@ export const getBudgets = async (
   return client.list<Model.SimpleBudget>(url, query, options);
 };
 
-export const getBudget = async (id: number, options: Http.RequestOptions = {}): Promise<Model.Budget> => {
+export const getBudget = async (id: ID, options: Http.RequestOptions = {}): Promise<Model.Budget> => {
   const url = URL.v1("budgets", id);
   return client.retrieve<Model.Budget>(url, options);
 };
 
 export const updateBudget = async (
-  id: number,
+  id: ID,
   payload: Partial<Http.BudgetPayload> | FormData,
   options: Http.RequestOptions = {}
 ): Promise<Model.Budget> => {
@@ -23,7 +23,7 @@ export const updateBudget = async (
   return client.patch<Model.Budget>(url, payload, options);
 };
 
-export const getBudgetPdf = async (id: number, options: Http.RequestOptions = {}): Promise<Model.PdfBudget> => {
+export const getBudgetPdf = async (id: ID, options: Http.RequestOptions = {}): Promise<Model.PdfBudget> => {
   const url = URL.v1("budgets", id, "pdf");
   return client.get<Model.PdfBudget>(url, options);
 };
@@ -36,13 +36,13 @@ export const createBudget = async (
   return client.post<Model.Budget>(url, payload, options);
 };
 
-export const deleteBudget = async (id: number, options: Http.RequestOptions = {}): Promise<null> => {
+export const deleteBudget = async (id: ID, options: Http.RequestOptions = {}): Promise<null> => {
   const url = URL.v1("budgets", id);
   return client.delete<null>(url, options);
 };
 
 export const getBudgetAccounts = async (
-  budgetId: number,
+  budgetId: ID,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Account>> => {
@@ -51,7 +51,7 @@ export const getBudgetAccounts = async (
 };
 
 export const createBudgetAccount = async (
-  budgetId: number,
+  budgetId: ID,
   payload: Http.AccountPayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Account> => {
@@ -60,25 +60,25 @@ export const createBudgetAccount = async (
 };
 
 export const getBudgetAccountGroups = async (
-  id: number,
+  id: ID,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
-): Promise<Http.ListResponse<Model.Group>> => {
+): Promise<Http.ListResponse<Model.BudgetGroup>> => {
   const url = URL.v1("budgets", id, "groups");
-  return client.list<Model.Group>(url, query, options);
+  return client.list<Model.BudgetGroup>(url, query, options);
 };
 
 export const createBudgetAccountGroup = async (
-  id: number,
+  id: ID,
   payload: Http.GroupPayload,
   options: Http.RequestOptions = {}
-): Promise<Model.Group> => {
+): Promise<Model.BudgetGroup> => {
   const url = URL.v1("budgets", id, "groups");
-  return client.post<Model.Group>(url, payload, options);
+  return client.post<Model.BudgetGroup>(url, payload, options);
 };
 
 export const getBudgetFringes = async (
-  id: number,
+  id: ID,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Fringe>> => {
@@ -87,7 +87,7 @@ export const getBudgetFringes = async (
 };
 
 export const createBudgetFringe = async (
-  id: number,
+  id: ID,
   payload: Http.FringePayload,
   options: Http.RequestOptions = {}
 ): Promise<Model.Fringe> => {
@@ -96,7 +96,7 @@ export const createBudgetFringe = async (
 };
 
 export const getBudgetSubAccounts = async (
-  id: number,
+  id: ID,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.SimpleSubAccount>> => {
@@ -105,7 +105,7 @@ export const getBudgetSubAccounts = async (
 };
 
 export const getBudgetSubAccountsTree = async (
-  id: number,
+  id: ID,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.SubAccountTreeNode>> => {
@@ -114,7 +114,7 @@ export const getBudgetSubAccountsTree = async (
 };
 
 export const getBudgetActuals = async (
-  id: number,
+  id: ID,
   query: Http.ListQuery = {},
   options: Http.RequestOptions = {}
 ): Promise<Http.ListResponse<Model.Actual>> => {
@@ -123,17 +123,17 @@ export const getBudgetActuals = async (
 };
 
 export const bulkUpdateBudgetAccounts = async (
-  id: number,
-  data: Http.BulkUpdatePayload<Http.AccountPayload>[],
+  id: ID,
+  data: Http.BulkUpdatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Budget>> => {
   const url = URL.v1("budgets", id, "bulk-update-accounts");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, { data }, options);
+  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, data, options);
 };
 
 export const bulkDeleteBudgetAccounts = async (
-  id: number,
-  ids: number[],
+  id: ID,
+  ids: ID[],
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Budget>> => {
   const url = URL.v1("budgets", id, "bulk-delete-accounts");
@@ -141,7 +141,7 @@ export const bulkDeleteBudgetAccounts = async (
 };
 
 export const bulkCreateBudgetAccounts = async (
-  id: number,
+  id: ID,
   payload: Http.BulkCreatePayload<Http.AccountPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkCreateChildrenResponse<Model.Budget, Model.Account>> => {
@@ -150,17 +150,17 @@ export const bulkCreateBudgetAccounts = async (
 };
 
 export const bulkUpdateBudgetActuals = async (
-  id: number,
-  data: Http.BulkUpdatePayload<Http.ActualPayload>[],
+  id: ID,
+  data: Http.BulkUpdatePayload<Http.ActualPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Budget>> => {
   const url = URL.v1("budgets", id, "bulk-update-actuals");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, { data }, options);
+  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, data, options);
 };
 
 export const bulkDeleteBudgetActuals = async (
-  id: number,
-  ids: number[],
+  id: ID,
+  ids: ID[],
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Budget>> => {
   const url = URL.v1("budgets", id, "bulk-delete-actuals");
@@ -168,7 +168,7 @@ export const bulkDeleteBudgetActuals = async (
 };
 
 export const bulkCreateBudgetActuals = async (
-  id: number,
+  id: ID,
   payload: Http.BulkCreatePayload<Http.ActualPayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkCreateChildrenResponse<Model.Budget, Model.Actual>> => {
@@ -177,17 +177,17 @@ export const bulkCreateBudgetActuals = async (
 };
 
 export const bulkUpdateBudgetFringes = async (
-  id: number,
-  data: Http.BulkUpdatePayload<Http.FringePayload>[],
+  id: ID,
+  data: Http.BulkUpdatePayload<Http.FringePayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Budget>> => {
   const url = URL.v1("budgets", id, "bulk-update-fringes");
-  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, { data }, options);
+  return client.patch<Http.BulkModelResponse<Model.Budget>>(url, data, options);
 };
 
 export const bulkDeleteBudgetFringes = async (
-  id: number,
-  ids: number[],
+  id: ID,
+  ids: ID[],
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkModelResponse<Model.Budget>> => {
   const url = URL.v1("budgets", id, "bulk-delete-fringes");
@@ -195,7 +195,7 @@ export const bulkDeleteBudgetFringes = async (
 };
 
 export const bulkCreateBudgetFringes = async (
-  id: number,
+  id: ID,
   payload: Http.BulkCreatePayload<Http.FringePayload>,
   options: Http.RequestOptions = {}
 ): Promise<Http.BulkCreateChildrenResponse<Model.Budget, Model.Fringe>> => {

@@ -11,15 +11,13 @@ type WithFooterGridProps<T> = T & { readonly id: "page" | "footer" };
 
 /* eslint-disable indent */
 const FooterGrid =
-  <T extends GridProps<R, M> = GridProps<any, any>, R extends Table.Row = any, M extends Model.Model = any>(
-    config: TableUi.FooterGridConfig<R, M>
-  ) =>
+  <R extends Table.RowData, T extends GridProps<R> = GridProps<R>>(config: TableUi.FooterGridConfig<R>) =>
   (
     Component: React.ComponentClass<WithFooterGridProps<T>, {}> | React.FunctionComponent<WithFooterGridProps<T>>
   ): React.FunctionComponent<Omit<T, "id">> => {
     function WithFooterGrid(props: T) {
-      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-        const UniversalFooterColumn = (col: Table.Column<R, M>): Table.Column<R, M> => {
+      const columns = useMemo<Table.Column<R>[]>((): Table.Column<R>[] => {
+        const UniversalFooterColumn = (col: Table.Column<R>): Table.Column<R> => {
           const footerColumn = config.getFooterColumn(col);
           if (!isNil(footerColumn)) {
             /*
@@ -36,14 +34,14 @@ const FooterGrid =
           }
           return { ...col, editable: false };
         };
-        return map(props.columns, (col: Table.Column<R, M>) => UniversalFooterColumn(col));
+        return map(props.columns, (col: Table.Column<R>) => UniversalFooterColumn(col));
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
       const data = useMemo(
         () => [
           reduce(
-            filter(columns, (c: Table.Column<R, M>) => c.isRead !== false),
-            (obj: { [key: string]: any }, col: Table.Column<R, M>) => {
+            filter(columns, (c: Table.Column<R>) => c.isRead !== false),
+            (obj: { [key: string]: any }, col: Table.Column<R>) => {
               obj[col.field as string] = null;
               const footerColumn = config.getFooterColumn(col);
               if (!isNil(footerColumn) && !isNil(footerColumn.value)) {
@@ -54,7 +52,7 @@ const FooterGrid =
             {
               id: config.rowId,
               /*
-              Note that this will not be typed in accordance with BudgetTable.RowMeta,
+              Note that this will not be typed in accordance with Table.RowMeta,
               but we will avoid bugs with it because we never access the rows of a Footer Grid.
               However, it is curious as to why TypeScript does not complain here, and we should
               invesitgate.
@@ -71,7 +69,6 @@ const FooterGrid =
           {...props}
           id={config.id}
           columns={columns}
-          style={{ flex: "none" }}
           data={data}
           headerHeight={0}
           rowHeight={config.rowHeight || 38}

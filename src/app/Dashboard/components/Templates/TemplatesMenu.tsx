@@ -15,8 +15,8 @@ import "./TemplatesMenu.scss";
 
 type TemplatesPage = "my-templates" | "discover";
 
-const selectTemplatesSearch = (state: Modules.Authenticated.StoreObj) => state.dashboard.templates.search;
-const selectCommunityTemplatesSearch = (state: Modules.Authenticated.StoreObj) => state.dashboard.community.search;
+const selectTemplatesSearch = (state: Application.Authenticated.Store) => state.dashboard.templates.search;
+const selectCommunityTemplatesSearch = (state: Application.Authenticated.Store) => state.dashboard.community.search;
 
 const TemplatesMenu = (): JSX.Element => {
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);

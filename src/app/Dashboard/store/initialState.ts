@@ -1,6 +1,6 @@
 import { redux } from "lib";
 
-const initialState: Modules.Authenticated.Dashboard.StoreObj = {
+const initialState: Modules.Dashboard.Store = {
   budgets: redux.initialState.initialModelListResponseState,
   templates: redux.initialState.initialModelListResponseState,
   community: redux.initialState.initialModelListResponseState

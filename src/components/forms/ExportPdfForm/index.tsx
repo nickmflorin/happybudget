@@ -31,7 +31,6 @@ type CustomTagProps = {
   closable: boolean;
 };
 
-type Column = PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>;
 type NonFormFields = "includeNotes" | "notes" | "header";
 type RichTextFields = "notes" | "header";
 
@@ -41,15 +40,15 @@ export type IExportFormRef = {
 
 interface ExportFormProps extends FormProps<PdfBudgetTable.Options> {
   readonly disabled?: boolean;
-  readonly columns: Column[];
+  readonly columns: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>[];
   readonly accounts: Model.PdfAccount[];
   readonly accountsLoading?: boolean;
   readonly displayedHeaderTemplate: Model.HeaderTemplate | null;
   readonly headerTemplates: Model.HeaderTemplate[];
   readonly headerTemplatesLoading: boolean;
   readonly onClearHeaderTemplate: () => void;
-  readonly onLoadHeaderTemplate: (id: number) => void;
-  readonly onHeaderTemplateDeleted: (id: number) => void;
+  readonly onLoadHeaderTemplate: (id: ID) => void;
+  readonly onHeaderTemplateDeleted: (id: ID) => void;
   readonly onHeaderTemplateCreated: (template: Model.HeaderTemplate) => void;
   readonly onHeaderTemplateUpdated?: (template: Model.HeaderTemplate) => void;
 }
@@ -74,7 +73,7 @@ const ExportForm = (
 ): JSX.Element => {
   const saveFormRef = useRef<IHeaderTemplateSaveFormRef>(null);
   const [saving, setSaving] = useState(false);
-  const [deleting, setDeleting] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState<ID | null>(null);
   const [showAllTables, setShowAllTables] = useState(isNil(props.initialValues?.tables));
   const [includeNotes, setIncludeNotes] = useState(false);
   const [notesBlocks, setNotesBlocks] = useState<RichText.Block[]>(props.initialValues?.notes || []);
@@ -321,7 +320,7 @@ const ExportForm = (
             value={displayedHeaderTemplate}
             templates={headerTemplates}
             deleting={deleting}
-            onDelete={(id: number) => {
+            onDelete={(id: ID) => {
               setDeleting(id);
               api
                 .deleteHeaderTemplate(id)
@@ -421,19 +420,22 @@ const ExportForm = (
               return <></>;
             }}
           >
-            {map(columns, (column: Column, index: number) => {
-              const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
-              return (
-                <Select.Option className={"column-select-option"} key={index + 1} value={column.field as string}>
-                  {!isNil(colType) && !isNil(colType.icon) && (
-                    <div className={"icon-wrapper"}>
-                      {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
-                    </div>
-                  )}
-                  {column.headerName}
-                </Select.Option>
-              );
-            })}
+            {map(
+              columns,
+              (column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>, index: number) => {
+                const colType = find(tabling.models.ColumnTypes, { id: column.columnType });
+                return (
+                  <Select.Option className={"column-select-option"} key={index + 1} value={column.field as string}>
+                    {!isNil(colType) && !isNil(colType.icon) && (
+                      <div className={"icon-wrapper"}>
+                        {ui.typeguards.iconIsJSX(colType.icon) ? colType.icon : <Icon icon={colType.icon} />}
+                      </div>
+                    )}
+                    {column.headerName}
+                  </Select.Option>
+                );
+              }
+            )}
           </Select>
         </Form.Item>
 

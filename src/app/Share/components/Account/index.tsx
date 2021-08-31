@@ -1,12 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { createSelector } from "reselect";
-import { isNil, map } from "lodash";
+import { map } from "lodash";
 
 import { redux, budgeting } from "lib";
 
-import { RenderIfValidId, WrapInApplicationSpinner } from "components";
+import { RenderIfValidId } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
@@ -15,18 +14,7 @@ import { actions } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";
 
 const selectDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.account.detail.data
-);
-const selectSubAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.account.table.loading
-);
-const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.account.table.groups.loading
-);
-const selectLoading = createSelector(
-  selectSubAccountsLoading,
-  selectGroupsLoading,
-  (tableLoading: boolean, groupsLoading: boolean) => tableLoading || groupsLoading
+  (state: Application.Unauthenticated.Store) => state.share.account.detail.data
 );
 
 interface AccountProps {
@@ -37,24 +25,13 @@ interface AccountProps {
 const Account = ({ budgetId, budget }: AccountProps): JSX.Element => {
   const { accountId } = useParams<{ accountId: string }>();
   const dispatch = useDispatch();
-  const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
     if (!isNaN(parseInt(accountId))) {
       dispatch(actions.account.setAccountIdAction(parseInt(accountId)));
-      // TODO: It might not be necessary to get a fresh set of fringes everytime the Account changes,
-      // we might be able to move this further up in the tree - but for now it is safer to rely on the
-      // source of truth from the API more often than not.
-      dispatch(actions.account.requestFringesAction(null));
     }
   }, [accountId]);
-
-  useEffect(() => {
-    if (!isNil(budgetId) && !isNaN(parseInt(accountId))) {
-      budgeting.urls.setBudgetLastVisited(budgetId, `/budgets/${budgetId}/accounts/${accountId}`);
-    }
-  }, [budgetId, accountId]);
 
   return (
     <RenderIfValidId id={[accountId]}>
@@ -97,9 +74,7 @@ const Account = ({ budgetId, budget }: AccountProps): JSX.Element => {
           ]}
         />
       </Portal>
-      <WrapInApplicationSpinner loading={loading}>
-        <SubAccountsTable accountId={parseInt(accountId)} budget={budget} budgetId={budgetId} />
-      </WrapInApplicationSpinner>
+      <SubAccountsTable accountId={parseInt(accountId)} budget={budget} budgetId={budgetId} />
     </RenderIfValidId>
   );
 };

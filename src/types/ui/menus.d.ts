@@ -21,7 +21,7 @@ type MenuButtonClickEvent<M extends MenuItemModel> = {
   readonly state: IMenuItemState<M>[];
 }
 
-type MenuItemModel = Model.M & {
+type MenuItemModel = Model.Model & {
   readonly label?: string;
   readonly icon?: IconOrElement;
   readonly loading?: boolean;

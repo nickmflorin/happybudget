@@ -4,7 +4,7 @@ import { Colors } from "style/constants";
 
 import { FringeUnitModels } from "./models";
 
-export const getGroupColorDefinition = (group: Model.Group): Table.RowColorDefinition => {
+export const getGroupColorDefinition = (group: Model.Group): Table.RowColorDef => {
   if (!isNil(group) && !isNil(group.color)) {
     let backgroundColor = group.color;
     if (!isNil(backgroundColor)) {
@@ -74,7 +74,7 @@ export const findChoiceForName = <M extends Model.Choice<number, string>>(
     : find(models, (model: M) => model.name.toLowerCase() === name.toLowerCase()) || null;
 };
 
-export const findChoiceForId = <M extends Model.Choice<number, string>>(models: M[], id: number): M | null => {
+export const findChoiceForId = <M extends Model.Choice<number, string>>(models: M[], id: ID): M | null => {
   return find(models, { id } as any) || null;
 };
 
@@ -185,7 +185,7 @@ type GetModelsByIdOptions = {
 
 export const getModelById = <M extends Model.Model>(
   models: M[],
-  id: number,
+  id: ID,
   options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
 ): M | null => {
   const model: M | undefined = find(models, { id } as any);
@@ -204,11 +204,11 @@ export const getModelById = <M extends Model.Model>(
 
 export const getModelsByIds = <M extends Model.Model>(
   models: M[],
-  ids: number[],
+  ids: ID[],
   options: GetModelsByIdOptions = { throwOnMissing: false, warnOnMissing: true }
 ): M[] => {
   return filter(
-    map(ids, (id: number) => getModelById(models, id, options)),
+    map(ids, (id: ID) => getModelById(models, id, options)),
     (m: M | null) => !isNil(m)
   ) as M[];
 };

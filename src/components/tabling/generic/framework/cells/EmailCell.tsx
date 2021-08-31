@@ -1,9 +1,16 @@
 import { isNil } from "lodash";
 import LinkCell, { LinkCellProps } from "./LinkCell";
 
-const EmailCell = <R extends Table.Row, M extends Model.Model>(props: LinkCellProps<R, M>): JSX.Element => {
+/* eslint-disable indent */
+const EmailCell = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>(
+  props: LinkCellProps<R, M, S>
+): JSX.Element => {
   return (
-    <LinkCell<R, M>
+    <LinkCell<R, M, S>
       href={(v: string | number | null) => (!isNil(v) ? `mailto:${v}` : undefined)}
       rel={"noreferrer"}
       {...props}

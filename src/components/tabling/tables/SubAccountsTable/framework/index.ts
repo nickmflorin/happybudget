@@ -1,4 +1,5 @@
-import { withExcludeGroupRows } from "components/tabling/tables/BudgetTable/framework/cells";
+import { framework } from "components/tabling/generic";
+
 import * as cells from "./cells";
 import * as editors from "./editors";
 
@@ -9,8 +10,8 @@ export const Framework: Table.Framework = {
   },
   cells: {
     data: {
-      SubAccountUnitCell: withExcludeGroupRows(cells.SubAccountUnitCell),
-      FringesCell: withExcludeGroupRows(cells.FringesCell)
+      SubAccountUnitCell: framework.excludeRowsOfType(["group"])(cells.SubAccountUnitCell),
+      FringesCell: framework.excludeRowsOfType(["group"])(cells.FringesCell)
     }
   }
 };

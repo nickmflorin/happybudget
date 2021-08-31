@@ -4,8 +4,9 @@ import { model } from "lib";
 import { UserImageOrInitials } from "components/images";
 import { Cell } from "components/tabling/generic/framework/cells";
 
-interface ContactNameCellProps extends Table.CellProps<Tables.ContactRow, Model.Contact, Model.ContactNamesAndImage> {
-  readonly onEditContact: (id: number) => void;
+interface ContactNameCellProps
+  extends Table.CellProps<Tables.ContactRowData, Model.Contact, Tables.ContactTableStore, Model.ContactNamesAndImage> {
+  readonly onEditContact: (id: ID) => void;
 }
 
 const ContactNameCell = ({ value, ...props }: ContactNameCellProps): JSX.Element => {

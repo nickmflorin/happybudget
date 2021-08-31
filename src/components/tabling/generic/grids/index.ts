@@ -1,6 +1,10 @@
-export { default as ReadOnlyGrid } from "./ReadOnlyGrid";
-export * from "./ReadOnlyGrid";
-export { default as ReadWriteGrid } from "./ReadWriteGrid";
-export * from "./ReadWriteGrid";
+export { default as UnauthenticatedGrid } from "./UnauthenticatedGrid";
+export * from "./UnauthenticatedGrid";
+export { default as AuthenticatedGrid } from "./AuthenticatedGrid";
+export * from "./AuthenticatedGrid";
 export { default as Grid } from "./Grid";
 export * from "./Grid";
+export { default as AuthenticatedDataGrid } from "./AuthenticatedDataGrid";
+export * from "./AuthenticatedDataGrid";
+export { default as UnauthenticatedDataGrid } from "./UnauthenticatedDataGrid";
+export * from "./UnauthenticatedDataGrid";

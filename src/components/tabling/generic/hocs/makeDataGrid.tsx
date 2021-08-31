@@ -14,7 +14,11 @@ interface InjectedDataGridProps {
   readonly onCellFocused?: (e: CellFocusedEvent) => void;
 }
 
-export interface DataGridProps<R extends Table.Row = any, M extends Model.Model = any> {
+export interface DataGridProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> {
   readonly apis: Table.GridApis | null;
   readonly className?: Table.GeneralClassName;
   readonly rowClass?: Table.RowClassName;
@@ -22,10 +26,11 @@ export interface DataGridProps<R extends Table.Row = any, M extends Model.Model 
   readonly columns: Table.Column<R, M>[];
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
+  readonly groups?: G[];
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
-  readonly isCellSelectable?: (params: Table.SelectableCallbackParams<R, M>) => boolean;
-  readonly rowCanExpand?: (row: R) => boolean;
-  readonly onRowExpand?: null | ((id: number) => void);
+  readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
+  readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
+  readonly onRowExpand?: null | ((row: Table.ModelRow<R, M>) => void);
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
 }
 
@@ -33,8 +38,13 @@ export type WithDataGridProps<T> = T & InjectedDataGridProps;
 
 /* eslint-disable indent */
 const DataGrid =
-  <T extends DataGridProps<R, M> = DataGridProps<any, any>, R extends Table.Row = any, M extends Model.Model = any>(
-    config?: TableUi.DataGridConfig<R>
+  <
+    R extends Table.RowData,
+    M extends Model.Model = Model.Model,
+    G extends Model.Group = Model.Group,
+    T extends DataGridProps<R, M, G> = DataGridProps<R, M, G>
+  >(
+    config?: TableUi.DataGridConfig<R, M>
   ) =>
   (
     Component: React.ComponentClass<WithDataGridProps<T>, {}> | React.FunctionComponent<WithDataGridProps<T>>
@@ -50,9 +60,9 @@ const DataGrid =
 
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         return map(
-          tabling.util.updateColumnsOfTableType<Table.Column<R, M>, R, M>(props.columns, "body", {
+          tabling.columns.updateColumnsOfTableType<Table.Column<R, M>, R, M>(props.columns, "body", {
             headerComponentParams: {
-              onSort: (order: Order, field: keyof R) => updateOrdering(order, field as string),
+              onSort: (order: Order, field: keyof R) => updateOrdering(order, field),
               ordering
             }
           }),
@@ -89,6 +99,40 @@ const DataGrid =
         }
       );
 
+      const getRowClass: Table.GetRowClassName = hooks.useDynamicCallback((params: Table.RowClassParams) => {
+        const row: Table.Row<R, M> = params.node.data;
+        if (tabling.typeguards.isGroupRow(row)) {
+          return classNames("row--data", "row--group", props.rowClass);
+        }
+        return classNames("row--data", props.rowClass);
+      });
+
+      const getRowStyle: Table.GetRowStyle = hooks.useDynamicCallback(
+        (params: Table.RowClassParams): { [key: string]: any } => {
+          const row: Table.Row<R, M> = params.node.data;
+          if (tabling.typeguards.isGroupRow(row) || tabling.typeguards.isModelRow(row)) {
+            const colorDef = row.meta.colorDef;
+            if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
+              return {
+                color: colorDef?.color,
+                backgroundColor: colorDef?.backgroundColor
+              };
+            } else if (!isNil(colorDef?.backgroundColor)) {
+              return {
+                backgroundColor: colorDef?.backgroundColor
+              };
+            } else if (!isNil(colorDef?.color)) {
+              return {
+                color: colorDef?.color
+              };
+            } else {
+              return {};
+            }
+          }
+          return {};
+        }
+      );
+
       const onCellFocused: (e: CellFocusedEvent) => void = hooks.useDynamicCallback((e: CellFocusedEvent) => {
         const getCellFromFocusedEvent = (
           event: CellFocusedEvent,
@@ -100,7 +144,7 @@ const DataGrid =
               ? col
               : find(columns, { field: event.column.getColId() } as any);
             if (!isNil(rowNode) && !isNil(column)) {
-              const row: R = rowNode.data;
+              const row: Table.Row<R, M> = rowNode.data;
               return { rowNode, column, row };
             }
           }
@@ -148,7 +192,7 @@ const DataGrid =
             if (
               includes(
                 map(columns, (col: Table.Column<R, M>) => col.field),
-                e.colDef.field
+                e.colDef.field as keyof R
               )
             ) {
               const nodes: Table.RowNode[] = [];
@@ -156,7 +200,7 @@ const DataGrid =
               const lastRow = e.api.getLastDisplayedRow();
               e.api.forEachNodeAfterFilter((node: Table.RowNode, index: number) => {
                 if (index >= firstRow && index <= lastRow) {
-                  const row: R = node.data;
+                  const row: Table.Row<R, M> = node.data;
                   if (
                     isNil(config?.refreshRowExpandColumnOnCellHover) ||
                     config?.refreshRowExpandColumnOnCellHover(row) === true
@@ -213,11 +257,11 @@ const DataGrid =
         <Component
           {...props}
           id={"data"}
-          style={{ flex: "1 1 auto" }}
           className={classNames("grid--data", props.className)}
-          rowClass={["row--data", props.rowClass]}
           domLayout={"autoHeight"}
           rowSelection={"multiple"}
+          rowClass={getRowClass}
+          getRowStyle={getRowStyle}
           onFirstDataRendered={onFirstDataRendered}
           onCellFocused={onCellFocused}
           onCellMouseOver={onCellMouseOver}

@@ -64,13 +64,13 @@ Note: Right now, we are restricting the use of AG Grid props to those that are
       Grid prop anywhere when they are created, we can simply set
       ExtendAgGridProps to true above.
 */
-type UseAgProps<R extends Table.Row> = ExtensionProps & {
+type UseAgProps<R extends Table.RowData, M extends Model.Model = Model.Model> = ExtensionProps & {
   readonly allowContextMenuWithControlKey?: boolean;
   readonly frameworkComponents?: Table.FrameworkGroup;
   readonly suppressCopyRowsToClipboard?: boolean;
   readonly cellStyle?: React.CSSProperties;
   readonly getRowStyle?: Table.GetRowStyle;
-  readonly getRowClass?: Table.GetRowClassName;
+  // readonly getRowClass?: Table.GetRowClassName;
   readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
   readonly processCellForClipboard?: (params: ProcessCellForExportParams) => void;
   readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
@@ -88,13 +88,13 @@ type UseAgProps<R extends Table.Row> = ExtensionProps & {
   readonly onPasteEnd?: (event: PasteEndEvent) => void;
   readonly onCellValueChanged?: (e: CellValueChangedEvent) => void;
   readonly fillOperation?: (params: FillOperationParams) => boolean;
-  readonly getContextMenuItems?: (row: R, node: Table.RowNode) => Table.MenuItemDef[];
+  readonly getContextMenuItems?: (row: Table.Row<R, M>, node: Table.RowNode) => Table.MenuItemDef[];
 };
 
-export interface GridProps<R extends Table.Row, M extends Model.Model> extends UseAgProps<R> {
+export interface GridProps<R extends Table.RowData, M extends Model.Model = Model.Model> extends UseAgProps<R, M> {
   readonly id: Table.GridId;
-  readonly data?: R[];
-  readonly hiddenColumns: Table.Field<R, M>[];
+  readonly data?: Table.Row<R, M>[];
+  readonly hiddenColumns: (keyof R)[];
   readonly gridOptions: Table.GridOptions;
   readonly indexColumn?: Partial<Table.Column<R, M>>;
   readonly columns: Table.Column<R, M>[];
@@ -103,7 +103,7 @@ export interface GridProps<R extends Table.Row, M extends Model.Model> extends U
   readonly rowClass?: Table.RowClassName;
   readonly rowHeight?: number;
   readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
-  readonly getContextMenuItems?: (row: R, node: Table.RowNode) => Table.MenuItemDef[];
+  readonly getContextMenuItems?: (row: Table.Row<R, M>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly navigateToNextCell?: (params: NavigateToNextCellParams) => Table.CellPosition;
   readonly processCellForClipboard?: (params: ProcessCellForExportParams) => string;
   readonly tabToNextCell?: (params: TabToNextCellParams) => Table.CellPosition;
@@ -114,7 +114,7 @@ export interface GridProps<R extends Table.Row, M extends Model.Model> extends U
   readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
 }
 
-const Grid = <R extends Table.Row, M extends Model.Model>({
+const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
   id,
   columns,
   data,
@@ -126,7 +126,7 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
   ...props
 }: GridProps<R, M>): JSX.Element => {
   const rowData = useMemo(
-    () => (isNil(data) ? [] : map(data, (row: R) => ({ ...row, meta: { ...row.meta, gridId: id } }))),
+    () => (isNil(data) ? [] : map(data, (row: Table.Row<R, M>) => ({ ...row, meta: { ...row.meta, gridId: id } }))),
     [id, hooks.useDeepEqualMemo(data)]
   );
 
@@ -140,7 +140,7 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
           cellRendererParams: { ...col.cellRendererParams, columns, column: col },
           hide: includes(hiddenColumns, col.field),
           resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
-          cellStyle: { ...tabling.util.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
+          cellStyle: { ...tabling.columns.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
         } as Table.Column<R, M>)
     );
     cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M>>(cs, { field: "index" }, indexColumn) : cs;
@@ -168,6 +168,7 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
           columnType,
           tableColumnType,
           nullValue,
+          domain,
           refreshColumns,
           onCellDoubleClicked,
           processCellForClipboard,
@@ -207,7 +208,7 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
               : typeof col.selectable === "function"
               ? col.selectable({ row, column: col })
               : col.selectable;
-            return tabling.util.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
+            return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
               "cell--not-selectable": isSelectable === false,
               "cell--not-editable": !(col.editable === true)
             });
@@ -257,12 +258,14 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
         }
         getContextMenuItems={(params: GetContextMenuItemsParams) => {
           if (!isNil(props.getContextMenuItems) && !isNil(params.node)) {
-            const row: R = params.node.data;
+            const row: Table.Row<R, M> = params.node.data;
             return props.getContextMenuItems(row, params.node);
           }
           return [];
         }}
-        getRowClass={(params: RowClassParams) => tabling.util.mergeClassNames<RowClassParams>(params, "row", rowClass)}
+        getRowClass={(params: RowClassParams) =>
+          tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass)
+        }
         rowData={rowData}
         columnDefs={colDefs}
         debug={process.env.NODE_ENV === "development" && TABLE_DEBUG}

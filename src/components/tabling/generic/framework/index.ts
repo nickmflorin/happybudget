@@ -5,6 +5,7 @@ export * as editors from "./editors";
 export * as cells from "./cells";
 export * as columnObjs from "./columnObjs";
 export * as actions from "./actions";
+export { default as excludeRowsOfType } from "./cells/excludeRowsOfType";
 
 const FrameworkComponents: Table.Framework = {
   editors: {
@@ -12,7 +13,7 @@ const FrameworkComponents: Table.Framework = {
   },
   cells: {
     data: {
-      ExpandCell: cells.ExpandCell,
+      ExpandCell: cells.excludeRowsOfType(["group", "placeholder"])(cells.ExpandCell),
       EmptyCell: cells.EmptyCell,
       NewRowCell: cells.NewRowCell,
       BodyCell: cells.BodyCell,

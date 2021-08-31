@@ -1,26 +1,9 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { createSelector } from "reselect";
-import { isNil } from "lodash";
+import React from "react";
 
-import { redux, budgeting } from "lib";
-import { WrapInApplicationSpinner } from "components";
+import { budgeting } from "lib";
 import { Portal, BreadCrumbs } from "components/layout";
 
-import { actions } from "../../store";
 import AccountsTable from "./AccountsTable";
-
-const selectAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.budget.table.loading
-);
-const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.budget.table.groups.loading
-);
-const selectLoading = createSelector(
-  selectAccountsLoading,
-  selectGroupsLoading,
-  (tableLoading: boolean, groupsLoading: boolean) => tableLoading || groupsLoading
-);
 
 interface AccountsProps {
   readonly budgetId: number;
@@ -28,20 +11,6 @@ interface AccountsProps {
 }
 
 const Accounts = ({ budget, budgetId }: AccountsProps): JSX.Element => {
-  const dispatch = useDispatch();
-  const loading = useSelector(selectLoading);
-
-  useEffect(() => {
-    dispatch(actions.accounts.requestAccountsAction(null));
-    dispatch(actions.accounts.requestGroupsAction(null));
-  }, []);
-
-  useEffect(() => {
-    if (!isNil(budgetId)) {
-      budgeting.urls.setBudgetLastVisited(budgetId, `/budgets/${budgetId}/accounts`);
-    }
-  }, [budgetId]);
-
   return (
     <React.Fragment>
       <Portal id={"breadcrumbs"}>
@@ -61,9 +30,7 @@ const Accounts = ({ budget, budgetId }: AccountsProps): JSX.Element => {
           ]}
         />
       </Portal>
-      <WrapInApplicationSpinner loading={loading}>
-        <AccountsTable budget={budget} budgetId={budgetId} />
-      </WrapInApplicationSpinner>
+      <AccountsTable budget={budget} budgetId={budgetId} />
     </React.Fragment>
   );
 };

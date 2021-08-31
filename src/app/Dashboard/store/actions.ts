@@ -1,4 +1,4 @@
-import { redux } from "lib";
+import { createAction } from "@reduxjs/toolkit";
 
 export const ActionType = {
   Budgets: {
@@ -27,45 +27,70 @@ export const ActionType = {
     UpdateInState: "dashboard.community.UpdateInState",
     RemoveFromState: "dashboard.community.RemoveFromState",
     AddToState: "dashboard.community.AddToState"
+  },
+  Contacts: {
+    TableChanged: "dashboard.contacts.TableChanged",
+    Saving: "dashboard.contacts.Saving",
+    Request: "dashboard.contacts.Request",
+    Loading: "dashboard.contacts.Loading",
+    Response: "dashboard.contacts.Response",
+    SetSearch: "dashboard.contacts.SetSearch",
+    UpdateInState: "dashboard.contacts.UpdateInState",
+    RemoveFromState: "dashboard.contacts.RemoveFromState",
+    AddToState: "dashboard.contacts.AddToState",
+    AddPlaceholdersToState: "dashboard.contacts.AddPlaceholdersToState"
   }
 };
 
-export const requestBudgetsAction = redux.actions.simpleAction<null>(ActionType.Budgets.Request);
-export const loadingBudgetsAction = redux.actions.simpleAction<boolean>(ActionType.Budgets.Loading);
-export const responseBudgetsAction = redux.actions.simpleAction<Http.ListResponse<Model.SimpleBudget>>(
-  ActionType.Budgets.Response
-);
-export const setBudgetsSearchAction = redux.actions.simpleAction<string>(ActionType.Budgets.SetSearch);
-export const updateBudgetInStateAction = redux.actions.simpleAction<Redux.UpdateModelActionPayload<Model.Budget>>(
+export const requestBudgetsAction = createAction<null>(ActionType.Budgets.Request);
+export const loadingBudgetsAction = createAction<boolean>(ActionType.Budgets.Loading);
+export const responseBudgetsAction = createAction<Http.ListResponse<Model.SimpleBudget>>(ActionType.Budgets.Response);
+export const setBudgetsSearchAction = createAction<string>(ActionType.Budgets.SetSearch);
+export const updateBudgetInStateAction = createAction<Redux.UpdateActionPayload<Model.Budget>>(
   ActionType.Budgets.UpdateInState
 );
-export const addBudgetToStateAction = redux.actions.simpleAction<Model.Budget>(ActionType.Budgets.AddToState);
-export const removeBudgetFromStateAction = redux.actions.simpleAction<number>(ActionType.Budgets.RemoveFromState);
+export const addBudgetToStateAction = createAction<Model.SimpleBudget>(ActionType.Budgets.AddToState);
+export const removeBudgetFromStateAction = createAction<ID>(ActionType.Budgets.RemoveFromState);
 
-export const requestTemplatesAction = redux.actions.simpleAction<null>(ActionType.Templates.Request);
-export const loadingTemplatesAction = redux.actions.simpleAction<boolean>(ActionType.Templates.Loading);
-export const responseTemplatesAction = redux.actions.simpleAction<Http.ListResponse<Model.SimpleTemplate>>(
+export const requestTemplatesAction = createAction<null>(ActionType.Templates.Request);
+export const loadingTemplatesAction = createAction<boolean>(ActionType.Templates.Loading);
+export const responseTemplatesAction = createAction<Http.ListResponse<Model.SimpleTemplate>>(
   ActionType.Templates.Response
 );
-export const setTemplatesSearchAction = redux.actions.simpleAction<string>(ActionType.Templates.SetSearch);
-export const updateTemplateInStateAction = redux.actions.simpleAction<Redux.UpdateModelActionPayload<Model.Template>>(
+export const setTemplatesSearchAction = createAction<string>(ActionType.Templates.SetSearch);
+export const updateTemplateInStateAction = createAction<Redux.UpdateActionPayload<Model.Template>>(
   ActionType.Templates.UpdateInState
 );
-export const addTemplateToStateAction = redux.actions.simpleAction<Model.Template>(ActionType.Templates.AddToState);
-export const removeTemplateFromStateAction = redux.actions.simpleAction<number>(ActionType.Templates.RemoveFromState);
+export const addTemplateToStateAction = createAction<Model.SimpleTemplate>(ActionType.Templates.AddToState);
+export const removeTemplateFromStateAction = createAction<ID>(ActionType.Templates.RemoveFromState);
 
-export const requestCommunityTemplatesAction = redux.actions.simpleAction<null>(ActionType.Community.Request);
-export const loadingCommunityTemplatesAction = redux.actions.simpleAction<boolean>(ActionType.Community.Loading);
-export const responseCommunityTemplatesAction = redux.actions.simpleAction<Http.ListResponse<Model.SimpleTemplate>>(
+export const requestCommunityTemplatesAction = createAction<null>(ActionType.Community.Request);
+export const loadingCommunityTemplatesAction = createAction<boolean>(ActionType.Community.Loading);
+export const responseCommunityTemplatesAction = createAction<Http.ListResponse<Model.SimpleTemplate>>(
   ActionType.Community.Response
 );
-export const setCommunityTemplatesSearchAction = redux.actions.simpleAction<string>(ActionType.Community.SetSearch);
-export const updateCommunityTemplateInStateAction = redux.actions.simpleAction<
-  Redux.UpdateModelActionPayload<Model.Template>
->(ActionType.Community.UpdateInState);
-export const addCommunityTemplateToStateAction = redux.actions.simpleAction<Model.Template>(
-  ActionType.Community.AddToState
+export const setCommunityTemplatesSearchAction = createAction<string>(ActionType.Community.SetSearch);
+export const updateCommunityTemplateInStateAction = createAction<Redux.UpdateActionPayload<Model.Template>>(
+  ActionType.Community.UpdateInState
 );
-export const removeCommunityTemplateFromStateAction = redux.actions.simpleAction<number>(
-  ActionType.Community.RemoveFromState
+export const addCommunityTemplateToStateAction = createAction<Model.SimpleTemplate>(ActionType.Community.AddToState);
+export const removeCommunityTemplateFromStateAction = createAction<ID>(ActionType.Community.RemoveFromState);
+
+export const handleContactsTableChangeEventAction = createAction<
+  Table.ChangeEvent<Tables.ContactRowData, Model.Contact>
+>(ActionType.Contacts.TableChanged);
+export const savingContactsTableAction = createAction<boolean>(ActionType.Contacts.Saving);
+export const setContactsSearchAction = createAction<string>(ActionType.Contacts.SetSearch);
+export const requestContactsAction = createAction<null>(ActionType.Contacts.Request);
+export const addContactModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.Contact>>(
+  ActionType.Contacts.AddToState
+);
+export const addContactPlaceholdersToStateAction = createAction<Table.RowAdd<Tables.ContactRowData, Model.Contact>[]>(
+  ActionType.Contacts.AddPlaceholdersToState
+);
+export const loadingContactsAction = createAction<boolean>(ActionType.Contacts.Loading);
+export const responseContactsAction = createAction<Http.TableResponse<Model.Contact>>(ActionType.Contacts.Response);
+export const removeContactFromStateAction = createAction<ID>(ActionType.Contacts.RemoveFromState);
+export const updateContactInStateAction = createAction<Redux.UpdateActionPayload<Model.Contact>>(
+  ActionType.Contacts.UpdateInState
 );

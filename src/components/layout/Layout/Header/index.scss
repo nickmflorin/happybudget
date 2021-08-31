@@ -103,8 +103,12 @@
       display: flex;
       justify-content: flex-end;
 
+      // We used to only show this if we explicitly provided a saving prop to the header.
+      // However, now, the tables occasionally inject the SavingChanges component via a Portal,
+      // which means it happens outside of the prop context of the Header component.
       .saving-changes {
-        display: none;
+        // display: none;
+        display: flex;
       }
     }
   }

@@ -4,11 +4,15 @@ export const isFieldAlterationEvent = (
   return (event as Model.FieldAlterationEvent).field !== undefined;
 };
 
-export const isModelWithChildren = <M extends Model.M>(model: M): model is M & { children: M[] } => {
+export const isModelWithChildren = <M extends Model.Model>(model: M): model is M & { children: M[] } => {
   return (
     (model as M & { children: M[] }).children !== undefined && Array.isArray((model as M & { children: M[] }).children)
   );
 };
+
+export const isModelWithGroup = <M extends Model.Model, G extends Model.Group = Model.Group>(
+  m: M | (M & { readonly group: G | null })
+): m is M & { readonly group: G | null } => (m as M & { readonly group: G | null }).group !== undefined;
 
 export const isBudgetForm = (obj: Model.Entity | Model.SimpleEntity): obj is Model.BudgetForm => {
   return (obj as Model.BudgetForm).type === "budget";
@@ -44,15 +48,15 @@ export const isSubAccount = (obj: Model.Account | Model.SubAccount): obj is Mode
   return (obj as Model.SubAccount).type === "subaccount";
 };
 
-export const isModelWithColor = (model: Model.M | Model.ModelWithColor): model is Model.ModelWithColor => {
+export const isModelWithColor = (model: Model.Model | Model.ModelWithColor): model is Model.ModelWithColor => {
   return (model as Model.ModelWithColor).color !== undefined;
 };
 
-export const isModelWithName = (model: Model.M | Model.ModelWithName): model is Model.ModelWithName => {
+export const isModelWithName = (model: Model.Model | Model.ModelWithName): model is Model.ModelWithName => {
   return (model as Model.ModelWithName).name !== undefined;
 };
 
-export const isTag = (model: Model.M | Model.Tag): model is Model.Tag => {
+export const isTag = (model: Model.Model | Model.Tag): model is Model.Tag => {
   return (model as Model.Tag).title !== undefined && (model as Model.Tag).color !== undefined;
 };
 

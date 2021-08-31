@@ -149,7 +149,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
       // is operating as multiple = true) we should see if there is a way to recover
       // the last active selection instead of defaulting to the first selected model
       // in the array.
-      forEach(selectedState, (id: number | string) => {
+      forEach(selectedState, (id: ID | string) => {
         const m: GenericModelItem<M> | undefined = find(
           availableModelItems,
           (item: GenericModelItem<M>) => item.model.id === id

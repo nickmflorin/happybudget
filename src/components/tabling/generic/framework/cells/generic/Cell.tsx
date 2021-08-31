@@ -6,8 +6,15 @@ import { VerticalFlexCenter } from "components";
 import { ClearButton } from "components/buttons";
 import LoadableCellWrapper from "./LoadableCellWrapper";
 
-const Cell = <R extends Table.Row, M extends Model.Model>(props: Table.CellWithChildrenProps<R, M>): JSX.Element => {
-  const row: R = props.node.data;
+/* eslint-disable indent */
+const Cell = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>(
+  props: Table.CellWithChildrenProps<R, M, S>
+): JSX.Element => {
+  const row: Table.Row<R, M> = props.node.data;
 
   const showClearButton = useMemo(() => {
     if (!isNil(props.onClear)) {

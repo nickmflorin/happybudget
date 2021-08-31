@@ -1,23 +1,34 @@
 import { isNil } from "lodash";
+
 import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 
-interface ExpandCellProps<R extends Table.Row, M extends Model.Model> extends Table.CellProps<R, M, null> {
-  readonly onClick: (id: number) => void;
-  readonly rowCanExpand?: (row: R) => boolean;
+interface ExpandCellProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> extends Table.CellProps<R, M, S, null> {
+  readonly onClick: (row: Table.ModelRow<R>) => void;
+  readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
   readonly tooltip?: string;
   readonly cannotExpandTooltip?: string;
 }
 
-const ExpandCell = <R extends Table.Row, M extends Model.Model>({
+/* eslint-disable indent */
+const ExpandCell = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>({
   rowCanExpand,
   onClick,
   tooltip,
   cannotExpandTooltip,
   node,
   ...props
-}: ExpandCellProps<R, M>): JSX.Element => {
-  const row: R = node.data;
+}: ExpandCellProps<R, M, S>): JSX.Element => {
+  // This cell renderer will only be allowed if the row is of type model.
+  const row: Table.ModelRow<R, M> = node.data;
 
   const rowIsHovered = () => {
     const parent = props.eGridCell.parentElement;
@@ -37,7 +48,7 @@ const ExpandCell = <R extends Table.Row, M extends Model.Model>({
             className={"ag-grid-expand-button"}
             size={"small"}
             icon={<Icon icon={"expand-alt"} weight={"solid"} />}
-            onClick={() => onClick(node.data.id)}
+            onClick={() => onClick(row)}
             tooltip={{ placement: "bottom", overlayClassName: "tooltip-lower", title: tooltip || "Expand" }}
           />
         </ShowHide>

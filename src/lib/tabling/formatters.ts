@@ -1,6 +1,6 @@
 import { isNil } from "lodash";
 import { ValueFormatterParams } from "@ag-grid-community/core";
-import { util } from "lib";
+import * as util from "../util";
 
 export const agPercentageValueFormatter = (params: ValueFormatterParams): any => {
   if (!isNil(params.value)) {

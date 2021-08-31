@@ -1,35 +1,29 @@
-import { forwardRef } from "react";
+import { forwardRef, ForwardedRef } from "react";
 import { useSelector } from "react-redux";
 import { isNil } from "lodash";
 
-import { redux } from "lib";
 import { SubAccountTreeMenu } from "components/menus";
 import { framework } from "components/tabling/generic";
 
-// It is not ideal that we are importing part of the store in a generalized components
-// directory.  We should consider alternate solutions to this or potentially moving the
-// cell component into the app directory.
-const selectSubAccountsTree = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.StoreObj) => state.budget.budget.subAccountsTree.data
-);
-const selectSubAccountsTreeSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.StoreObj) => state.budget.budget.subAccountsTree.search
-);
-const selectSubAccountsTreeLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.StoreObj) => state.budget.budget.subAccountsTree.loading
-);
-
-interface SubAccountsTreeEditorProps extends Table.EditorParams<Tables.ActualRow, Model.Actual> {
+interface SubAccountsTreeEditorProps
+  extends Table.EditorParams<Tables.ActualRowData, Model.Actual, Tables.ActualTableStore, Model.SimpleSubAccount> {
   readonly setSearch: (value: string) => void;
-  readonly value: Model.SimpleSubAccount | null;
 }
 
-const SubAccountsTreeEditor = ({ setSearch, ...props }: SubAccountsTreeEditorProps, ref: any) => {
-  const subAccountsTree = useSelector(selectSubAccountsTree);
-  const search = useSelector(selectSubAccountsTreeSearch);
-  const loading = useSelector(selectSubAccountsTreeLoading);
+const SubAccountsTreeEditor = ({ setSearch, ...props }: SubAccountsTreeEditorProps, ref: ForwardedRef<any>) => {
+  const tree = useSelector((state: Application.Authenticated.Store) => props.selector(state).subAccountsTree.data);
+  const search = useSelector((state: Application.Authenticated.Store) => props.selector(state).subAccountsTree.search);
+  const loading = useSelector(
+    (state: Application.Authenticated.Store) => props.selector(state).subAccountsTree.loading
+  );
 
-  const [editor] = framework.editors.useModelMenuEditor<Tables.ActualRow, Model.Actual, Model.SimpleSubAccount>({
+  const [editor] = framework.editors.useModelMenuEditor<
+    Model.SimpleSubAccount,
+    Model.SimpleSubAccount,
+    Tables.ActualRowData,
+    Model.Actual,
+    Tables.ActualTableStore
+  >({
     ...props,
     forwardedRef: ref
   });
@@ -41,7 +35,7 @@ const SubAccountsTreeEditor = ({ setSearch, ...props }: SubAccountsTreeEditorPro
       onSearch={(v: string) => setSearch(v)}
       search={search}
       selected={!isNil(editor.value) ? editor.value.id : null}
-      nodes={subAccountsTree}
+      nodes={tree}
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}
       includeSearch={true}

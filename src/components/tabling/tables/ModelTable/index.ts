@@ -1,2 +1,2 @@
-export { default as ReadWriteModelTable } from "./ReadWriteTable";
-export * from "./ReadWriteTable";
+export { default as AuthenticatedModelTable } from "./AuthenticatedModelTable";
+export * from "./AuthenticatedModelTable";

@@ -1,8 +1,10 @@
+import { util } from "lib";
+
 import { Icon } from "components";
 import { IconButton } from "components/buttons";
 
-interface NewRowCellProps extends Table.CellProps<any, any, null> {
-  onChangeEvent: (e: Table.ChangeEvent<any, any>) => void;
+interface NewRowCellProps extends Table.CellProps<any, any, any, null> {
+  onChangeEvent: (e: Table.ChangeEvent<any>) => void;
 }
 
 const NewRowCell = ({ onChangeEvent }: NewRowCellProps): JSX.Element => {
@@ -15,7 +17,7 @@ const NewRowCell = ({ onChangeEvent }: NewRowCellProps): JSX.Element => {
       onClick={() =>
         onChangeEvent({
           type: "rowAdd",
-          payload: 1
+          payload: [{ id: `placeholder-${util.generateRandomNumericId()}`, data: {} }]
         })
       }
     />

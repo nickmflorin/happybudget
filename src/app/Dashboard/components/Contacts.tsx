@@ -1,64 +1,63 @@
-import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Dispatch } from "redux";
-import { isNil, find, filter, map } from "lodash";
-import { createSelector } from "reselect";
+import { useState } from "react";
+import { isNil } from "lodash";
 
-import { hooks } from "lib";
-import { selectors, actions } from "store";
+import { tabling, redux, model } from "lib";
 
 import { Page } from "components/layout";
 import { CreateContactModal, EditContactModal } from "components/modals";
-import { ContactsTable } from "components/tabling";
+import { ContactsTable, connectTableToStore } from "components/tabling";
 
-const selectSaving = createSelector(
-  (state: Modules.Authenticated.StoreObj) => state.user.contacts.deleting,
-  (state: Modules.Authenticated.StoreObj) => state.user.contacts.updating,
-  (state: Modules.Authenticated.StoreObj) => state.user.contacts.creating,
-  (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
-    return (
-      filter(
-        map(args, (arg: Redux.ModelListActionInstance[] | boolean) =>
-          Array.isArray(arg) ? arg.length !== 0 : arg === true
-        ),
-        (value: boolean) => value === true
-      ).length !== 0
-    );
-  }
-);
+import { actions } from "../store";
+
+type M = Model.Contact;
+type R = Tables.ContactRowData;
+
+const ActionMap = {
+  tableChanged: actions.handleContactsTableChangeEventAction,
+  request: actions.requestContactsAction,
+  loading: actions.loadingContactsAction,
+  response: actions.responseContactsAction,
+  saving: actions.savingContactsTableAction,
+  addModelsToState: actions.addContactModelsToStateAction,
+  addPlaceholdersToState: actions.addContactPlaceholdersToStateAction,
+  setSearch: actions.setContactsSearchAction
+};
+
+const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Model.Group, Tables.ContactTableStore>({
+  storeId: "async-DashboardContactsTable",
+  actions: ActionMap,
+  reducer: tabling.reducers.createAuthenticatedTableReducer<R, M, Model.Group, Tables.ContactTableStore>({
+    columns: ContactsTable.Columns,
+    actions: ActionMap,
+    getModelRowLabel: (r: R) =>
+      model.util.displayFirstAndLastName(r.names_and_image.first_name, r.names_and_image.last_name),
+    getModelRowName: "Account",
+    getPlaceholderRowLabel: (r: R) =>
+      model.util.displayFirstAndLastName(r.names_and_image.first_name, r.names_and_image.last_name),
+    getPlaceholderRowName: "Account",
+    initialState: redux.initialState.initialTableState
+  })
+})(ContactsTable.Table);
 
 const Contacts = (): JSX.Element => {
-  const [contactToEdit, setContactToEdit] = useState<Model.Contact | undefined>(undefined);
+  const [contactToEdit, setContactToEdit] = useState<M | undefined>(undefined);
   const [newContactModalOpen, setNewContactModalOpen] = useState(false);
-  const dispatch: Dispatch = useDispatch();
-  const contacts = useSelector(selectors.selectContacts);
-  const loading = useSelector(selectors.selectContactsLoading);
-  const search = useSelector(selectors.selectContactsSearch);
-  const saving = useSelector(selectSaving);
-
-  useEffect(() => {
-    dispatch(actions.authenticated.requestContactsAction(null));
-  }, []);
-
-  const onEditContact = hooks.useDynamicCallback((id: number) => {
-    const contact: Model.Contact | undefined = find(contacts, { id } as any);
-    if (!isNil(contact)) {
-      setContactToEdit(contact);
-    }
-  });
 
   return (
     <Page className={"contacts"} title={"My Contacts"}>
-      <ContactsTable
-        loading={loading}
-        models={contacts}
-        search={search}
-        saving={saving}
-        onEditContact={onEditContact}
-        onSearch={(value: string) => dispatch(actions.authenticated.setContactsSearchAction(value))}
-        onChangeEvent={(e: Table.ChangeEvent<Tables.ContactRow, Model.Contact>) =>
-          dispatch(actions.authenticated.handleContactsTableChangeEventAction(e))
-        }
+      <ConnectedContactsTable
+        onRowExpand={(row: Table.ModelRow<R, M>) => {
+          /*
+          Important!:  At least right now, whenever a row is updated or changed, the
+          associated model stored on it's meta property is not updated.  The `meta.model`
+          property is the original model that was used to create the row.  Eventually, this
+          will be improved - but it should be noted right now that the modal will not show the
+          updated <Contact> if the table was edited.
+
+          The relationship between rows and models needs to be improved going forward.
+          */
+          setContactToEdit(row.meta.model);
+        }}
         exportFileName={"contacts"}
       />
       <CreateContactModal

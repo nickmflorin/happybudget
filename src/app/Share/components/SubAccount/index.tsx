@@ -1,12 +1,11 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import { createSelector } from "reselect";
-import { isNil, map } from "lodash";
+import { map } from "lodash";
 
 import { redux, budgeting } from "lib";
 
-import { RenderIfValidId, WrapInApplicationSpinner } from "components";
+import { RenderIfValidId } from "components";
 import { Portal, BreadCrumbs } from "components/layout";
 import { EntityTextButton } from "components/buttons";
 import { EntityText } from "components/typography";
@@ -15,18 +14,7 @@ import { actions } from "../../store";
 import SubAccountsTable from "./SubAccountsTable";
 
 const selectDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.subaccount.detail.data
-);
-const selectSubAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.subaccount.table.loading
-);
-const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.StoreObj) => state.share.subaccount.table.groups.loading
-);
-const selectLoading = createSelector(
-  selectSubAccountsLoading,
-  selectGroupsLoading,
-  (tableLoading: boolean, groupsLoading: boolean) => tableLoading || groupsLoading
+  (state: Application.Unauthenticated.Store) => state.share.subaccount.detail.data
 );
 
 interface SubAccountProps {
@@ -37,25 +25,13 @@ interface SubAccountProps {
 const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {
   const { subaccountId } = useParams<{ subaccountId: string }>();
   const dispatch = useDispatch();
-
-  const loading = useSelector(selectLoading);
   const detail = useSelector(selectDetail);
 
   useEffect(() => {
     if (!isNaN(parseInt(subaccountId))) {
       dispatch(actions.subAccount.setSubAccountIdAction(parseInt(subaccountId)));
-      // TODO: It might not be necessary to get a fresh set of fringes everytime the SubAccount changes,
-      // we might be able to move this further up in the tree - but for now it is safer to rely on the
-      // source of truth from the API more often than not.
-      dispatch(actions.subAccount.requestFringesAction(null));
     }
   }, [subaccountId]);
-
-  useEffect(() => {
-    if (!isNil(budgetId) && !isNaN(parseInt(subaccountId))) {
-      budgeting.urls.setBudgetLastVisited(budgetId, `/budgets/${budgetId}/subaccounts/${subaccountId}`);
-    }
-  }, [budgetId]);
 
   return (
     <RenderIfValidId id={[subaccountId]}>
@@ -107,9 +83,7 @@ const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {
           ]}
         />
       </Portal>
-      <WrapInApplicationSpinner loading={loading}>
-        <SubAccountsTable budget={budget} budgetId={budgetId} subaccountId={parseInt(subaccountId)} />
-      </WrapInApplicationSpinner>
+      <SubAccountsTable budget={budget} budgetId={budgetId} subaccountId={parseInt(subaccountId)} />
     </RenderIfValidId>
   );
 };

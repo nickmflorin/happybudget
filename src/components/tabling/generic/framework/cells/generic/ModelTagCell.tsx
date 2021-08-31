@@ -3,18 +3,28 @@ import { isNil } from "lodash";
 import { Tag } from "components/tagging";
 import Cell from "./Cell";
 
-export interface ModelTagCellProps<R extends Table.Row, M extends Model.Model, V extends Model.Model>
-  extends Table.CellProps<R, M, V | null> {
+export interface ModelTagCellProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  V extends Model.Model = Model.Model
+> extends Table.CellProps<R, M, S, V | null> {
   readonly leftAlign?: boolean;
   readonly tagProps?: Omit<TagProps<V>, "model" | "text" | "children">;
 }
 
-const ModelTagCell = <R extends Table.Row, M extends Model.Model, V extends Model.Model>({
+/* eslint-disable indent */
+const ModelTagCell = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>,
+  V extends Model.Model = Model.Model
+>({
   value,
   leftAlign,
   tagProps,
   ...props
-}: ModelTagCellProps<R, M, V>): JSX.Element => {
+}: ModelTagCellProps<R, M, S, V>): JSX.Element => {
   return (
     <Cell {...props} onClear={() => !isNil(props.setValue) && props.setValue(null)} hideClear={value === null}>
       <div style={{ display: "flex", justifyContent: leftAlign === true ? "left" : "center" }}>

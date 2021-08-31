@@ -3,17 +3,17 @@ import { filter, map, includes } from "lodash";
 
 import Dropdown from "./Dropdown";
 
-export interface ExportCSVDropdownProps<R extends Table.Row, M extends Model.Model> {
+export interface ExportCSVDropdownProps<R extends Table.RowData, M extends Model.Model = Model.Model> {
   readonly children: React.ReactChild | React.ReactChild[];
   readonly columns: Table.Column<R, M>[];
   readonly onDownload: (state: IMenuItemState<MenuItemModel>[]) => void;
-  readonly hiddenColumns?: Table.Field<R, M>[];
+  readonly hiddenColumns?: (keyof R)[];
 }
 
-const ExportCSVDropdown = <R extends Table.Row, M extends Model.Model>(
+const ExportCSVDropdown = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   props: ExportCSVDropdownProps<R, M>
 ): JSX.Element => {
-  const [selected, setSelected] = useState<Table.Field<R, M>[]>([]);
+  const [selected, setSelected] = useState<(keyof R)[]>([]);
 
   const exportableColumns = useMemo<Table.Column<R, M>[]>(
     () => filter(props.columns, (col: Table.Column<R, M>) => col.canBeExported !== false),
@@ -41,7 +41,7 @@ const ExportCSVDropdown = <R extends Table.Row, M extends Model.Model>(
           (s: IMenuItemState<MenuItemModel>) => s.selected === true
         ) as IMenuItemState<MenuItemModel>[];
         const selectedIds = map(selectedStates, (state: IMenuItemState<MenuItemModel>) => String(state.model.id));
-        setSelected(selectedIds as Table.Field<R, M>[]);
+        setSelected(selectedIds as (keyof R)[]);
       }}
       menuSelected={selected as string[]}
       menuItems={map(exportableColumns, (col: Table.Column<R, M>) => ({

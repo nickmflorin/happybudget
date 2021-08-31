@@ -8,3 +8,4 @@ export { default as EditBudgetModal } from "./EditBudgetModal";
 export { default as EditTemplateModal } from "./EditTemplateModal";
 export { default as CreateContactModal } from "./CreateContactModal";
 export { default as EditContactModal } from "./EditContactModal";
+export { default as FringesModal } from "./FringesModal";

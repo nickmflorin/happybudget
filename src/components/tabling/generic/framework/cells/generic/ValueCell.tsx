@@ -1,11 +1,16 @@
 import React from "react";
 import Cell from "./Cell";
 
-const ValueCell = <R extends Table.Row, M extends Model.Model>({
+/* eslint-disable indent */
+const ValueCell = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>({
   value,
   ...props
-}: Table.ValueCellProps<R, M>): JSX.Element => {
-  return <Cell<R, M> {...props}>{value}</Cell>;
+}: Table.ValueCellProps<R, M, S>): JSX.Element => {
+  return <Cell<R, M, S> {...props}>{value}</Cell>;
 };
 
 export default React.memo(ValueCell) as typeof ValueCell;

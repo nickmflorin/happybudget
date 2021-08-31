@@ -1,19 +1,30 @@
 import { isNil } from "lodash";
+
 import { Icon, ShowHide } from "components";
 import { IconButton } from "components/buttons";
 
-interface ExpandCellProps<R extends BudgetTable.Row, M extends Model.Model> extends BudgetTable.CellProps<R, M, null> {
-  onClick: (id: number) => void;
-  rowCanExpand?: (row: R) => boolean;
+interface ExpandCellProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+> extends Table.CellProps<R, M, S, null> {
+  onClick: (row: Table.ModelRow<R, M>) => void;
+  rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
 }
 
-const ExpandCell = <R extends BudgetTable.Row, M extends Model.Model>({
+/* eslint-disable indent */
+const ExpandCell = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+>({
   rowCanExpand,
   onClick,
   node,
   ...props
-}: ExpandCellProps<R, M>): JSX.Element => {
-  const row: R = node.data;
+}: ExpandCellProps<R, M, S>): JSX.Element => {
+  // This cell renderer will only be allowed if the row is of type model.
+  const row: Table.ModelRow<R, M> = node.data;
 
   const rowIsHovered = () => {
     const parent = props.eGridCell.parentElement;
@@ -32,7 +43,7 @@ const ExpandCell = <R extends BudgetTable.Row, M extends Model.Model>({
           className={"ag-grid-expand-button"}
           size={"small"}
           icon={<Icon icon={"expand-alt"} weight={"solid"} />}
-          onClick={() => onClick(node.data.id)}
+          onClick={() => onClick(row)}
           tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "tooltip-lower" }}
         />
       );
@@ -44,7 +55,7 @@ const ExpandCell = <R extends BudgetTable.Row, M extends Model.Model>({
               className={"ag-grid-expand-button"}
               size={"small"}
               icon={<Icon icon={"expand-alt"} weight={"solid"} />}
-              onClick={() => onClick(node.data.id)}
+              onClick={() => onClick(row)}
               tooltip={{ title: "Expand", placement: "bottom", overlayClassName: "tooltip-lower" }}
             />
           </ShowHide>

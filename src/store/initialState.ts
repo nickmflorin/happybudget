@@ -1,59 +1,60 @@
 import { reduce, filter } from "lodash";
 import { redux } from "lib";
 
-export const createInitialUserState = (user: Model.User): Modules.Authenticated.UserStore => {
-  return {
-    ...user,
-    contacts: redux.initialState.initialTableState
-  };
+export const createInitialUserState = (user: Model.User): Model.User => {
+  return { ...user };
 };
 
 function createModularApplicationState(
-  config: Modules.Authenticated.ModuleConfig[]
-): Modules.Authenticated.ModulesStore;
+  config: Application.Authenticated.ModuleConfig[]
+): Application.Authenticated.ModuleStores;
 
 function createModularApplicationState(
-  config: Modules.Unauthenticated.ModuleConfig[]
-): Modules.Unauthenticated.ModulesStore;
+  config: Application.Unauthenticated.ModuleConfig[]
+): Application.Unauthenticated.ModuleStores;
 
-function createModularApplicationState(config: Modules.ModuleConfig[]): Modules.ModulesStore {
+function createModularApplicationState(config: Application.AnyModuleConfig[]): Application.ModuleStores {
   return reduce(
     config,
-    (prev: Modules.ModulesStore, moduleConfig: Modules.ModuleConfig) => {
+    (prev: Application.ModuleStores, moduleConfig: Application.AnyModuleConfig) => {
       if (typeof moduleConfig.initialState === "function") {
         return { ...prev, [moduleConfig.label]: moduleConfig.initialState() };
       }
       return { ...prev, [moduleConfig.label]: moduleConfig.initialState };
     },
-    {} as Modules.ModulesStore
+    {} as Application.ModuleStores
   );
 }
 
-export const createUnauthenticatedInitialState = (config: Modules.ModuleConfigs): Modules.Unauthenticated.StoreObj => {
+export const createUnauthenticatedInitialState = (
+  config: Application.AnyModuleConfig[]
+): Application.Unauthenticated.Store => {
   return {
     ...createModularApplicationState(
-      filter(config, (c: Modules.ModuleConfig) =>
+      filter(config, (c: Application.AnyModuleConfig) =>
         redux.typeguards.isUnauthenticatedModuleConfig(c)
-      ) as Modules.Unauthenticated.ModuleConfigs
+      ) as Application.Unauthenticated.ModuleConfig[]
     ),
     drawerVisible: false,
-    loading: false
-  } as Modules.Unauthenticated.StoreObj;
+    loading: false,
+    contacts: redux.initialState.initialListResponseState
+  } as Application.Unauthenticated.Store;
 };
 
 export const createAuthenticatedInitialState = (
-  config: Modules.ModuleConfigs,
+  config: Application.AnyModuleConfig[],
   user: Model.User
-): Modules.Authenticated.StoreObj => {
+): Application.Authenticated.Store => {
   return {
     ...createModularApplicationState(
       filter(
         config,
-        (c: Modules.ModuleConfig) => !redux.typeguards.isUnauthenticatedModuleConfig(c)
-      ) as Modules.Authenticated.ModuleConfigs
+        (c: Application.AnyModuleConfig) => !redux.typeguards.isUnauthenticatedModuleConfig(c)
+      ) as Application.Authenticated.ModuleConfig[]
     ),
     user: createInitialUserState(user),
     drawerVisible: false,
-    loading: false
-  } as Modules.Authenticated.StoreObj;
+    loading: false,
+    contacts: redux.initialState.initialModelListResponseState
+  } as Application.Authenticated.Store;
 };

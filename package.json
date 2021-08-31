@@ -24,6 +24,7 @@
     "@fortawesome/pro-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@react-pdf/renderer": "^2.0.16",
+    "@reduxjs/toolkit": "^1.6.1",
     "@sentry/react": "^6.3.3",
     "@sentry/tracing": "^6.3.5",
     "@types/axios": "^0.14.0",

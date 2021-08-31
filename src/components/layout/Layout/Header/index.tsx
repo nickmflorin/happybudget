@@ -71,7 +71,7 @@ const Header = ({
         </div>
 
         <div className={"primary-header-right"}>
-          {!isNil(saving) && <SavingChanges saving={saving} />}
+          <div id={"saving-changes"}>{!isNil(saving) && <SavingChanges saving={saving} />}</div>
           <Dropdown
             className={"header-dropdown"}
             menuProps={{ className: "header-dropdown-menu" }}

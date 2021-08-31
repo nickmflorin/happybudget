@@ -1,4 +1,4 @@
-export { default as ReadOnlyBudgetTable } from "./ReadOnlyTable";
-export * from "./ReadOnlyTable";
-export { default as ReadWriteBudgetTable } from "./ReadWriteTable";
-export * from "./ReadWriteTable";
+export { default as UnauthenticatedBudgetTable } from "./UnauthenticatedTable";
+export * from "./UnauthenticatedTable";
+export { default as AuthenticatedBudgetTable } from "./AuthenticatedTable";
+export * from "./AuthenticatedTable";

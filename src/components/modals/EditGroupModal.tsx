@@ -6,9 +6,9 @@ import { GroupForm } from "components/forms";
 import Modal from "./Modal";
 
 interface EditGroupModalProps {
-  onSuccess: (group: Model.Group) => void;
+  onSuccess: (group: Model.BudgetGroup) => void;
   onCancel: () => void;
-  group: Model.Group;
+  group: Model.BudgetGroup;
   open: boolean;
 }
 
@@ -31,7 +31,7 @@ const EditGroupModal = ({ group, open, onSuccess, onCancel }: EditGroupModalProp
             form.setLoading(true);
             api
               .updateGroup(group.id, values)
-              .then((response: Model.Group) => {
+              .then((response: Model.BudgetGroup) => {
                 form.resetFields();
                 onSuccess(response);
               })

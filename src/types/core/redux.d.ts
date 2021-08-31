@@ -1,88 +1,149 @@
-/// <reference path="redux/index.d.ts" />
-/// <reference path="redux-sagas/index.d.ts" />
-/// <reference path="./modeling.d.ts" />
-/// <reference path="./table.d.ts" />
-
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Redux {
   type GenericSelectorFunc<S extends Modules.StoreObj, T = any> = (state: S) => T;
-  type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Modules.Authenticated.StoreObj, T>;
-  type UnauthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Modules.Unauthenticated.StoreObj, T>;
+  type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Application.Authenticated.Store, T>;
+  type UnauthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Modules.Unauthenticated.Store, T>;
   type SwitchSelectorFunc<AUTH extends boolean = true, T = any> = AUTH extends true ? AuthenticatedSelectorFunc<T> : UnauthenticatedSelectorFunc<T>;
   type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
 
+  type AsyncId = `async-${string}`
+  type AsyncStore = { [key in AsyncId]: any };
+
+  type Transformers<S = any, A = any> = {
+    [K in keyof A]: Redux.Reducer<S>
+  }
+
+  type Task<P = any> = (action: Redux.Action<P>) => import("@redux-saga/types").SagaIterator;
+  type TaskMapObject<M = any> = {
+    [K in keyof M]-?: Redux.Task<M[K]>
+  }
+
+  type ActionMapObject<M = any> = {
+    [K in keyof M]-?: import("@reduxjs/toolkit").PayloadActionCreator<M[K]>
+  }
+
+  type Reducer<S, A = Redux.Action> = import("redux").Reducer<S, A>;
+  type ReducersMapObject<S = any> = {
+    [K in keyof S]-?: Redux.Reducer<S[K]>
+  }
+  type AsyncReducers = ReducersMapObject<AsyncStore>;
+
+  type SagaManager = {
+    readonly injectSaga: (id: Redux.AsyncId, saga: import("redux-saga").Saga) => void;
+    readonly ejectSaga: (id: Redux.AsyncId) => void;
+  };
+
+  type ReducerManager<S extends Application.Store> = {
+    readonly getReducerMap: () => Redux.ReducersMapObject<S>;
+    readonly reduce: (state: S | undefined, action: Redux.Action) => S;
+    readonly injectReducer: (key: Redux.AsyncId, reducer: Redux.Reducer<S[AsyncId]>) => void;
+    readonly ejectReducer: (key: Redux.AsyncId) => void;
+  };
+
   type StoreObj = Record<string, any> | boolean | number;
-  type Store<S extends Redux.StoreObj> = import("redux").StoreObj<S, Redux.Action>;
-  type Reducer<S extends Redux.StoreObj> = import("redux").Reducer<S, Redux.Action>;
-
-  interface ActionConfig {
-    readonly error?: Error | string | undefined;
-    readonly meta?: any;
+  type Store<S> = import("redux").Store<S, Redux.Action> & {
+    readonly reducerManager: ReducerManager<S>;
+    readonly sagaManager: SagaManager;
   }
 
-  interface Action<P = any> extends Action<string> {
+  type Dispatch = import("redux").Dispatch<Redux.Action>;
+  type DispatchWithoutActionOptions<T extends keyof ActionOptions> = Redux.Dispatch<Omit<Redux.Action, T>>;
+
+  type ActionOptions = {
     readonly type: string;
+    // readonly asyncId?: Redux.AsyncId;
+    readonly isAuthenticated?: boolean | undefined;
+  };
+
+  interface Action<P = any> extends import("redux").AnyAction, ActionOptions {
     readonly payload: P;
-    readonly error?: Error | string | undefined;
-    readonly meta?: any;
-    // Even though this is "optional" - it will always be set via the middleware.
-    readonly isAuthenticated?: boolean;
   }
+
   type AuthenticatedAction<P = any> = Action<P> & { readonly isAuthenticated?: true | undefined };
   type UnauthenticatedAction<P = any> = Action<P> & { readonly isAuthenticated: false };
 
-  type ActionCreator<P = any> = (
-    payload: P,
-    options?: Redux.ActionConfig | undefined
-  ) => Redux.Action<P>;
-
-  type ActionMap = Record<string, string>;
-  type ActionCreatorMap = Record<string, Redux.ActionCreator<any>>;
-  type TaskMap = Record<string, Redux.Task<any>>;
-  type Task<P = any> = (action: Redux.Action<P>) => SagaIterator;
-
-  type ModelLookup<M extends Model.Model> = number | ((m: M) => boolean);
+  type ModelLookup<M extends Model.Model> = ID | ((m: M) => boolean);
 
   type FindModelOptions = {
     readonly warnIfMissing?: boolean;
     readonly name?: string;
   };
 
+  type TaskConfig<A> = {
+    readonly actions: ActionMapObject<A>;
+  };
+
+  type ReducerConfig<S, A> = TaskConfig<A> & {
+    readonly initialState: S;
+  };
+
+  type TableTaskConfig<
+    R extends Table.RowData,
+    M extends Model.Model = Model.Model,
+    G extends Model.Group = Model.Group,
+    A extends TableActionMap<M, G> = TableActionMap<M, G>
+  > = TaskConfig<A> & {
+    readonly columns: Table.Column<R, M>[];
+  }
+
+  type TableConfiguration<
+    R extends Table.RowData,
+    M extends Model.Model = Model.Model,
+    G extends Model.Group = Model.Group,
+    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
+    A extends TableActionMap<M, G> = TableActionMap<M, G>
+  > = {
+    readonly storeId?: Redux.AsyncId;
+    readonly actions: Redux.ActionMapObject<A>;
+    readonly selector?: (state: Application.Store) => S;
+    readonly reducer?: Redux.Reducer<S>;
+  };
+
+  type TableReducerConfig<
+    R extends Table.RowData,
+    M extends Model.Model = Model.Model,
+    G extends Model.Group = Model.Group,
+    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
+    A extends TableActionMap<M, G> = TableActionMap<M, G>
+  > = TableTaskConfig<R, M, G, A> & Omit<Table.CreateTableDataConfig<R, M, G>, "models" | "groups" | "columns"> & {
+    readonly initialState: S;
+  }
+
+  type SagaConfig<T, A> = TaskConfig<A> & {
+    readonly tasks: TaskMapObject<T>;
+  }
+
+  type TableSagaConfig<
+    R extends Table.RowData,
+    M extends Model.Model = Model.Model,
+    T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
+    A extends TableActionMap<M, G> = TableActionMap<M, G>
+  > = SagaConfig<T, A>;
+
   type ListStore<T> = T[];
 
-  type ModelListActionPayload = { id: number; value: boolean };
-  type ModelListActionInstance = { id: number; count: number };
+  type ModelListActionPayload = { id: ID; value: boolean };
+  type ModelListActionInstance = { id: ID; count: number };
   type ModelListActionStore = ModelListActionInstance[];
 
-  interface UpdateModelActionPayload<M> {
-    id: number;
-    data: Partial<M>;
+  interface UpdateActionPayload<T extends object> {
+    id: ID;
+    data: Partial<T>;
   }
-
-  type ReadOnlyDetailResponseActionMap = {
-    Loading: string;
-    Response: string;
-    Request: string;
-  }
-
-  type DetailResponseActionMap = ReadOnlyDetailResponseActionMap & {
-    RemoveFromState: string;
-    UpdateInState: string;
-  };
 
   interface ModelDetailResponseStore<T extends Model.Model> {
     readonly data: T | undefined;
     readonly loading: boolean;
     readonly responseWasReceived: boolean;
   }
-  type ReadOnlyModelDetailResponseStore<T extends Model.Model> = ModelDetailResponseStore<T>;
 
-  type ListResponseActionMap = {
-    readonly Loading: string;
-    readonly Response: string;
-    readonly Request: string;
-  };
+  interface ModelDetailResponseActionMap<M extends Model.Model> {
+    readonly loading: boolean;
+    readonly request: null;
+    readonly response: M | undefined;
+    readonly updateInState: Redux.UpdateActionPayload<M>;
+  }
 
   interface ListResponseStore<T> {
     readonly data: T[];
@@ -91,186 +152,108 @@ namespace Redux {
     readonly responseWasReceived: boolean;
   }
 
+  type ListResponseActionMap<T> = {
+    readonly loading: boolean;
+    readonly request: null;
+    readonly response: Http.ListResponse<M>;
+  }
+
+  interface ListResponseTaskMap {
+    readonly request: null;
+  }
+
+  interface ModelListResponseStore<T extends Model.Model> extends Redux.ListResponseStore<T> {
+    readonly cache: SearchCache;
+    readonly search: string;
+    readonly deleting: Redux.ModelListActionStore;
+    readonly updating: Redux.ModelListActionStore;
+    readonly creating: boolean;
+    readonly selected: ID[];
+  }
+
+  type ModelListResponseActionMap<M extends Model.Model> = {
+    readonly loading: boolean;
+    readonly request: null;
+    readonly updating: Redux.ModelListActionPayload;
+    readonly creating: boolean;
+    readonly removeFromState: ID;
+    readonly deleting: Redux.ModelListActionPayload;
+    readonly response: Http.ListResponse<M>;
+    readonly addToState: M;
+    readonly updateInState: Redux.UpdateActionPayload<M>;
+    readonly setSearch: string;
+    readonly restoreSearchCache: null;
+  }
+
+  interface ModelListResponseTaskMap {
+    readonly request: null;
+  }
+
+  type CommentsListResponseActionMap = Omit<Redux.ModelListResponseActionMap<Model.Comment>, "addToState" | "setSearch" | "restoreSearchCache"> & {
+    readonly submit: { parent?: ID; data: Http.CommentPayload };
+    readonly delete: ID;
+    readonly edit: Redux.UpdateActionPayload<Model.Comment>;
+    readonly addToState: { data: Model.Comment; parent?: ID };
+    readonly replying: Redux.ModelListActionPayload;
+  };
+
+  type CommentsListResponseTaskMap = Redux.ModelListResponseTaskMap & {
+    readonly submit: { parent?: ID; data: Http.CommentPayload };
+    readonly delete: ID;
+    readonly edit: Redux.UpdateActionPayload<Model.Comment>;
+  };
+
   // Holds previously searched for results.  Note that this may not play well
   // with pagination, in which case we will have to adjust (but we are currently
   // not using pagination anywhere that we are using this cache).
   type SearchCache<T extends Model.Model> = { [key: string]: Http.ListResponse<T> };
 
-  type ReadOnlyTableSideEffectActionMap = {
-    readonly Request: string;
+  type TableTaskMap<R extends Table.RowData, M extends Model.Model = Model.Model> = {
+    readonly request: null;
+    readonly handleRowAddEvent: Table.RowAddEvent<R, M>;
+    readonly handleRowDeleteEvent: Table.RowDeleteEvent<R, M>;
+    readonly handleDataChangeEvent: Table.DataChangeEvent<R, M>;
   }
 
-  type TableSideEffectActionMap = {
-    readonly Request: string;
-    readonly TableChanged: string;
+  type TableTaskMapWithGroups<R extends Table.RowData, M extends Model.Model = Model.Model> = TableTaskMap<R, M> & {
+    readonly handleAddRowToGroupEvent: Table.RowAddToGroupEvent<R, M>;
+    readonly handleRemoveRowFromGroupEvent: Table.RowRemoveFromGroupEvent<R, M>;
+    readonly handleDeleteGroupEvent: Table.GroupDeleteEvent;
   }
 
-  type ReadOnlyTableActionMap = ListResponseActionMap & ReadOnlyTableSideEffectActionMap & {
-    // Optional right now because we do not search for fringes in ReadOnly mode.
-    readonly SetSearch?: string;
+  type TableActionMap<M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
+    readonly loading: boolean;
+    readonly response: Http.TableResponse<M, G>;
+    readonly request: null;
+    readonly setSearch: string;
   }
 
-  type TableActionMap = ListResponseActionMap & TableSideEffectActionMap & {
-    readonly SetSearch: string;
-    readonly AddToState: string;
-    readonly Deleting: string;
-    readonly Updating: string;
-    readonly Creating: string;
-    // In most cases, RemoveFromState and UpdateInState actions are completely handled by the
-    // TableChanged action in the reducer.
-    readonly RemoveFromState?: string;
-    readonly UpdateInState?: string;
+  type AuthenticatedTableActionMap<R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = TableActionMap<M, G> & {
+    readonly tableChanged: Table.ChangeEvent<R, M>;
+    readonly saving: boolean;
+    readonly addModelsToState: Redux.AddModelsToTablePayload<M>;
+    readonly addPlaceholdersToState: Table.RowAdd<R, M>[];
   }
 
-  type ReadOnlyTableActionCreatorMap<M extends Model.Model> = {
-    loading: Redux.ActionCreator<boolean>;
-    response: Redux.ActionCreator<Http.ListResponse<M>>;
-    request: Redux.ActionCreator<null>;
-  }
-
-  type TableActionCreatorMap<M extends Model.Model> = {
-    deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
-    creating: Redux.ActionCreator<boolean>;
-    updating: Redux.ActionCreator<Redux.ModelListActionPayload>;
-    addToState: Redux.ActionCreator<M>;
-    loading: Redux.ActionCreator<boolean>;
-    response: Redux.ActionCreator<Http.ListResponse<M>>;
-    request: Redux.ActionCreator<null>;
-  }
-
-  interface ReadOnlyTableTaskMap<R extends Table.Row, M extends Model.Model> {
-    request: Redux.Task<null>;
-  }
-
-  interface TableTaskMap<R extends Table.Row, M extends Model.Model> extends ReadOnlyTableTaskMap<R, M> {
-    handleRowAddEvent: Redux.Task<Table.RowAddEvent<R, M>>;
-    handleRowDeleteEvent: Redux.Task<Table.RowDeleteEvent<R, M>>;
-    handleDataChangeEvent: Redux.Task<Table.DataChangeEvent<R, M>>;
-  }
-
-  type ReadOnlyTableStore<M extends Model.Model> = Redux.ListResponseStore<M> & {
+  type TableStore<D extends Table.RowData = any, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
+    readonly data: Table.Row<D, M>[];
+    readonly models: M[];
+    readonly groups: G[];
     readonly search: string;
+    readonly loading: boolean;
+    readonly responseWasReceived: boolean;
+    readonly saving: boolean;
   }
 
-  type TableStore<M extends Model.Model> = Redux.ListResponseStore<M> & {
-    readonly search: string;
-    readonly deleting: Redux.ModelListActionStore;
-    readonly updating: Redux.ModelListActionStore;
-    readonly creating: boolean;
+  type AddModelsToTablePayload<M extends Model.Model> = { readonly placeholderIds: Table.PlaceholderRowId[]; readonly models: M[] };
+
+  type InferTableRow<S> = S extends Redux.TableStore<infer R> ? R : unknown;
+  type InferTableModel<S> = S extends TableStore<any, infer M> ? M : unknown;
+  type InferTableGroup<S> = S extends TableStore<any, any, infer G> ? G : unknown;
+
+  type BudgetTableStore<R extends Table.Row = Table.Row, M extends Model.Model = Model.Model> = Redux.TableStore<R, M, Model.BudgetGroup>;
+
+  interface CommentsListResponseStore extends Redux.ModelListResponseStore<Model.Comment> {
+    readonly replying: ID[];
   }
-
-  type ReadOnlyBudgetTableSideEffectActionMap = ReadOnlyTableSideEffectActionMap & {
-    readonly Groups: Pick<Redux.ReadOnlyTableActionMap, "Request">;
-  }
-
-  type BudgetTableSideEffectActionMap = TableSideEffectActionMap & {
-    readonly Groups: Pick<Redux.TableActionMap, "Request">;
-  }
-
-  type ReadOnlyBudgetTableActionMap = ReadOnlyTableActionMap & {
-    readonly Groups: Omit<Redux.ReadOnlyTableActionMap, "SetSearch">;
-  }
-
-  // The RemoveFromState and UpdateInState actions are completely handled by the
-  // TableChanged action in the reducer.
-  type BudgetTableActionMap = Omit<TableActionMap, "RemoveFromState" | "UpdateInState"> & {
-    readonly Groups: Omit<Redux.TableActionMap, "TableChanged" | "Updating" | "Creating" | "RemoveFromState" | "SetSearch">;
-  }
-
-  type ReadOnlyBudgetTableWithFringesActionMap = ReadOnlyBudgetTableActionMap & {
-    readonly Fringes: Omit<Redux.ReadOnlyTableActionMap, "SetSearch">;
-  }
-
-  type BudgetTableWithFringesActionMap = BudgetTableActionMap & {
-    readonly Fringes: Redux.TableActionMap;
-  }
-
-  type ReadOnlyBudgetTableActionCreatorMap<M extends Model.Model> = Redux.ReadOnlyTableActionCreatorMap<M> & {
-    groups: {
-      loading: Redux.ActionCreator<boolean>;
-      response: Redux.ActionCreator<Http.ListResponse<Model.Group>>;
-      request: Redux.ActionCreator<null>;
-    };
-  }
-
-  type BudgetTableActionCreatorMap<M extends Model.Model> = Redux.TableActionCreatorMap<M> & {
-    groups: {
-      deleting: Redux.ActionCreator<Redux.ModelListActionPayload>;
-      loading: Redux.ActionCreator<boolean>;
-      response: Redux.ActionCreator<Http.ListResponse<Model.Group>>;
-      request: Redux.ActionCreator<null>;
-    };
-  }
-
-  type ReadOnlyBudgetTableTaskMap<R extends Table.Row, M extends Model.Model> = Redux.ReadOnlyTableTaskMap<R, M> & {
-    requestGroups: Redux.Task<null>;
-  }
-
-  type BudgetTableTaskMap<R extends Table.Row, M extends Model.Model> = Redux.TableTaskMap<R, M> & {
-    requestGroups: Redux.Task<null>;
-    handleAddRowToGroupEvent?: Redux.Task<Table.RowAddToGroupEvent<R, M>>;
-    handleRemoveRowFromGroupEvent?: Redux.Task<Table.RowRemoveFromGroupEvent<R, M>>;
-    handleDeleteGroupEvent?: Redux.Task<Table.GroupDeleteEvent>;
-  }
-
-  type ReadOnlyBudgetTableStore<M extends Model.Model> = Redux.ReadOnlyTableStore<M> & {
-    readonly groups: Redux.ReadOnlyTableStore<Model.Group>;
-  }
-
-  type BudgetTableStore<M extends Model.Model> = Redux.TableStore<M> & {
-    readonly groups: Redux.TableStore<Model.Group>;
-  }
-
-  type ReadOnlyBudgetTableWithFringesStore<M extends Model.Model> = Redux.ReadOnlyBudgetTableStore<M> & {
-    readonly fringes: Redux.ReadOnlyTableStore<Model.Fringe>;
-  }
-
-  type BudgetTableWithFringesStore<M extends Model.Model> = Redux.BudgetTableStore<M> & {
-    readonly fringes: Redux.TableStore<Model.Fringe>;
-  }
-
-  type ReadOnlyModelListResponseActionMap = ReadOnlyTableActionMap & {
-    readonly RestoreSearchCache?: string;
-  };
-
-  type ModelListResponseActionMap = Omit<TableActionMap, "TableChanged"> & {
-    readonly Select: string;
-    readonly SelectAll: string;
-    readonly Deselect: string;
-    readonly RestoreSearchCache?: string;
-  };
-
-  interface ReadOnlyModelListResponseStore<T extends Model.Model> extends Redux.ReadOnlyTableStore<T> {
-    readonly cache: SearchCache;
-  }
-
-  interface ModelListResponseStore<T extends Model.Model> extends Redux.TableStore<T> {
-    readonly cache: SearchCache;
-    readonly selected: number[];
-  }
-
-  type CommentsListResponseActionMap = ModelListResponseActionMap & {
-    Replying: string;
-  };
-
-  interface CommentsListResponseStore extends ModelListResponseStore<Model.Comment> {
-    readonly replying: number[];
-  }
-
-  type IndexedStore<T> = { [key: number]: T };
-  type IndexedDetailResponseStore<T> = IndexedStore<DetailResponseStore<T>>;
-
-  interface FactoryOptions<O extends Redux.ActionMap, S> {
-    readonly initialState: S;
-    readonly excludeActions: null | ((action: Redux.Action, state: S) => boolean | undefined | void);
-    readonly overrides?: Redux.MappedReducers<O, S>;
-    readonly extension: Redux.Reducer<S> | Redux.Reducer<S>[] | null;
-    readonly subReducers: { [Property in keyof Partial<S>]: Redux.Reducer<any> } | null | {};
-    readonly extensions: { [key: string]: Redux.Reducer<S> } | null;
-    readonly strictSelect: boolean;
-  }
-
-  type MappedReducers<O extends Redux.ActionMap, S> = Partial<
-    Record<keyof O, Redux.Reducer<S>>
-  >;
 }
