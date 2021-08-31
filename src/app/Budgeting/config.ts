@@ -1,6 +1,6 @@
 import { initialState, rootReducer, rootSaga } from "./store";
 
-const Config: Modules.Authenticated.ModuleConfig<Modules.Authenticated.Budget.Store> = {
+const Config: Modules.Authenticated.ModuleConfig<Modules.Authenticated.Budget.StoreObj> = {
   rootReducer,
   rootSaga,
   initialState,

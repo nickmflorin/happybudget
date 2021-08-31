@@ -28,7 +28,7 @@ export function* handleBudgetChangedTask(action: Redux.Action<number>): SagaIter
 }
 
 function* getBudgetTask(): SagaIterator {
-  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();

@@ -29,7 +29,7 @@ function createModularApplicationState(config: Modules.ModuleConfig[]): Modules.
   );
 }
 
-export const createUnauthenticatedInitialState = (config: Modules.ModuleConfigs): Modules.Unauthenticated.Store => {
+export const createUnauthenticatedInitialState = (config: Modules.ModuleConfigs): Modules.Unauthenticated.StoreObj => {
   return {
     ...createModularApplicationState(
       filter(config, (c: Modules.ModuleConfig) =>
@@ -38,13 +38,13 @@ export const createUnauthenticatedInitialState = (config: Modules.ModuleConfigs)
     ),
     drawerVisible: false,
     loading: false
-  } as Modules.Unauthenticated.Store;
+  } as Modules.Unauthenticated.StoreObj;
 };
 
 export const createAuthenticatedInitialState = (
   config: Modules.ModuleConfigs,
   user: Model.User
-): Modules.Authenticated.Store => {
+): Modules.Authenticated.StoreObj => {
   return {
     ...createModularApplicationState(
       filter(
@@ -55,5 +55,5 @@ export const createAuthenticatedInitialState = (
     user: createInitialUserState(user),
     drawerVisible: false,
     loading: false
-  } as Modules.Authenticated.Store;
+  } as Modules.Authenticated.StoreObj;
 };

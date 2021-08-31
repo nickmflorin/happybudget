@@ -9,7 +9,7 @@ import * as actions from "./actions";
 export function* getBudgetsTask(action: Redux.Action): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Modules.Authenticated.Store) => {
+  const query = yield select((state: Modules.Authenticated.StoreObj) => {
     return {
       search: state.dashboard.budgets.search
     };
@@ -37,7 +37,7 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
 export function* getTemplatesTask(action: Redux.Action): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Modules.Authenticated.Store) => {
+  const query = yield select((state: Modules.Authenticated.StoreObj) => {
     return {
       search: state.dashboard.templates.search
     };
@@ -65,7 +65,7 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
 export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
-  const query = yield select((state: Modules.Authenticated.Store) => {
+  const query = yield select((state: Modules.Authenticated.StoreObj) => {
     return {
       search: state.dashboard.community.search
     };

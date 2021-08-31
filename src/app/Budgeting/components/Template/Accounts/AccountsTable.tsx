@@ -11,13 +11,13 @@ import { ReadWriteTemplateAccountsTable } from "components/tabling";
 import { actions } from "../../../store";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.groups.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.search
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.table.search
 );
 
 interface AccountsTableProps {

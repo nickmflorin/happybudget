@@ -7,13 +7,13 @@ import { ReadOnlyBudgetAccountsTable } from "components/tabling";
 import { actions } from "../../store";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.Store) => state.share.budget.table.groups.data
+  (state: Modules.Unauthenticated.StoreObj) => state.share.budget.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.Store) => state.share.budget.table.data
+  (state: Modules.Unauthenticated.StoreObj) => state.share.budget.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.Store) => state.share.budget.table.search
+  (state: Modules.Unauthenticated.StoreObj) => state.share.budget.table.search
 );
 
 interface AccountsTableProps {

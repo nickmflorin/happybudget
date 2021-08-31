@@ -13,7 +13,7 @@ namespace Modules {
 
     namespace Dashboard {
       /* eslint-disable no-shadow */
-      interface Store implements Redux.Store  {
+      interface StoreObj implements Redux.StoreObj  {
         readonly budgets: Redux.ModelListResponseStore<Model.SimpleBudget>;
         readonly templates: Redux.ModelListResponseStore<Model.SimpleTemplate>;
         readonly community: Redux.ModelListResponseStore<Model.SimpleTemplate>;
@@ -61,7 +61,7 @@ namespace Modules {
         readonly actuals: Redux.ModelListResponseStore<Model.Actual>;
       }
 
-      interface Store implements Redux.Store {
+      interface StoreObj implements Redux.StoreObj {
         readonly budget: Modules.Authenticated.Budget.ModuleStore<Model.Budget>;
         readonly template: Modules.Authenticated.Budget.ModuleStore<Model.Template>;
         readonly fringeColors: Redux.ListResponseStore<string>;
@@ -72,20 +72,20 @@ namespace Modules {
       readonly contacts: Redux.TableStore<Model.Contact>;
     }
 
-    type ModuleStore = Authenticated.Budget.Store | Authenticated.Dashboard.Store;
+    type ModuleStore = Authenticated.Budget.StoreObj | Authenticated.Dashboard.StoreObj;
     interface ModulesReducer implements Modules.IModulesReducer<Authenticated.ModuleLabel, Authenticated.ModuleStore> {
-      readonly dashboard: Redux.Reducer<Authenticated.Dashboard.Store>;
-      readonly budget: Redux.Reducer<Authenticated.Budget.Store>;
+      readonly dashboard: Redux.Reducer<Authenticated.Dashboard.StoreObj>;
+      readonly budget: Redux.Reducer<Authenticated.Budget.StoreObj>;
     }
     interface ModulesStore implements Modules.IModulesStore<Authenticated.ModuleLabel> {
-      readonly dashboard: Dashboard.Store;
-      readonly budget: Budget.Store;
+      readonly dashboard: Dashboard.StoreObj;
+      readonly budget: Budget.StoreObj;
     }
-    interface Store extends GlobalStore, Authenticated.ModulesStore  {
+    interface StoreObj extends GlobalStore, Authenticated.ModulesStore  {
       readonly user: UserStore;
       readonly subAccountUnits: Redux.ModelListResponseStore<Model.Tag>;
     }
-    type ModuleConfig<S extends Budget.Store | Dashboard.Store = any> = Omit<_ModuleConfig<Authenticated.ModuleLabel, S>, "isUnauthenticated"> & {
+    type ModuleConfig<S extends Budget.StoreObj | Dashboard.StoreObj = any> = Omit<_ModuleConfig<Authenticated.ModuleLabel, S>, "isUnauthenticated"> & {
       readonly isUnauthenticated?: false;
     };
     type ModuleConfigs = Array<ModuleConfig>;
@@ -107,25 +107,25 @@ namespace Modules {
         readonly detail: Redux.ReadOnlyModelDetailResponseStore<Model.Budget>;
         readonly table: Redux.ReadOnlyBudgetTableStore<Model.Account>;
       };
-      interface Store implements Redux.Store {
+      interface StoreObj implements Redux.StoreObj {
         readonly subaccount: SubAccountStore;
         readonly account: AccountStore;
         readonly budget: BudgetStore;
       }
     }
 
-    type ModuleStore = Modules.Unauthenticated.Share.Store;
+    type ModuleStore = Modules.Unauthenticated.Share.StoreObj;
     interface ModulesReducer implements Modules.IModulesReducer<Unauthenticated.ModuleLabel, Unauthenticated.ModuleStore> {
-      readonly share: Redux.Reducer<Modules.Unauthenticated.Share.Store>;
+      readonly share: Redux.Reducer<Modules.Unauthenticated.Share.StoreObj>;
     }
     interface ModulesStore implements Modules.IModulesStore<Unauthenticated.ModuleLabel> {
-      readonly share: Unauthenticated.Share.Store;
+      readonly share: Unauthenticated.Share.StoreObj;
     }
-    interface Store extends GlobalStore, Unauthenticated.ModulesStore  {
+    interface StoreObj extends GlobalStore, Unauthenticated.ModulesStore  {
       readonly contacts: Redux.ReadOnlyTableStore<Model.Contact>;
       readonly subAccountUnits: Redux.ReadOnlyModelListResponseStore<Model.Tag>;
     }
-    type ModuleConfig<S extends Modules.Unauthenticated.Share.Store = any>  = Omit<_ModuleConfig<Modules.Unauthenticated.ModuleLabel, S>, "isUnauthenticated"> & {
+    type ModuleConfig<S extends Modules.Unauthenticated.Share.StoreObj = any>  = Omit<_ModuleConfig<Modules.Unauthenticated.ModuleLabel, S>, "isUnauthenticated"> & {
       readonly isUnauthenticated: true;
     };
     type ModuleConfigs = Array<Modules.Unauthenticated.ModuleConfig>;
@@ -135,14 +135,14 @@ namespace Modules {
   type ModuleLabel = Authenticated.ModuleLabel | Unauthenticated.ModuleLabel;
   type ModulesStore = Authenticated.ModulesStore | Unauthenticated.ModulesStore;
   type ModulesReducer = Authenticated.ModulesReducer | Unauthenticated.ModulesReducer;
-  type Store = Authenticated.Store | Unauthenticated.Store;
+  type StoreObj = Authenticated.StoreObj | Unauthenticated.StoreObj;
   type ModuleConfigs = Array<Modules.Unauthenticated.ModuleConfig | Modules.Authenticated.ModuleConfig>;
 
   type ModulesSet<T extends ModuleLabel, P> = Record<T, P>;
-  type IModulesStore<T extends ModuleLabel> = ModulesSet<T, Redux.Store>;
-  type IModulesReducer<T extends ModuleLabel, S extends Redux.Store> = ModulesSet<T, Redux.Reducer<S>>;
+  type IModulesStore<T extends ModuleLabel> = ModulesSet<T, Redux.StoreObj>;
+  type IModulesReducer<T extends ModuleLabel, S extends Redux.StoreObj> = ModulesSet<T, Redux.Reducer<S>>;
 
-  interface _ModuleConfig<T extends ModuleLabel, S extends Redux.Store> {
+  interface _ModuleConfig<T extends ModuleLabel, S extends Redux.StoreObj> {
     readonly rootSaga?: import("redux-saga").Saga;
     readonly rootReducer: Redux.Reducer<S>;
     readonly initialState: S | (() => S);

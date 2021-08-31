@@ -32,9 +32,9 @@ const tasks = createAccountsTaskSet<Model.Template>(
     bulkCreate: api.bulkCreateTemplateAccounts,
     bulkDelete: api.bulkDeleteTemplateAccounts
   },
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.id,
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.data,
-  (state: Modules.Authenticated.Store) => state.budget.template.autoIndex
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.id,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.table.data,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.autoIndex
 );
 
 export default createStandardSaga(

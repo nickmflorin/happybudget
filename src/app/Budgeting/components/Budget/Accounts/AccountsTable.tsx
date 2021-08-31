@@ -12,13 +12,13 @@ import { actions, selectors } from "../../../store";
 import PreviewModal from "../PreviewModal";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.groups.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.search
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.table.search
 );
 
 interface AccountsTableProps {

@@ -19,7 +19,7 @@ interface CommentsHistoryDrawerProps {
 
 const CommentsHistoryDrawer = ({ commentsProps, historyProps }: CommentsHistoryDrawerProps): JSX.Element => {
   const [page, setPage] = useState<Page>("comments");
-  const visible = useSelector((state: Modules.Authenticated.Store) => state.budget.budget.commentsHistoryDrawerOpen);
+  const visible = useSelector((state: Modules.Authenticated.StoreObj) => state.budget.budget.commentsHistoryDrawerOpen);
   return (
     <Drawer className={"comments-history-drawer"} visible={visible}>
       <HorizontalMenu<Page>

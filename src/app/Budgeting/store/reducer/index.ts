@@ -6,7 +6,7 @@ import { ActionType } from "../actions";
 import budgetRootReducer from "./budget";
 import templateRootReducer from "./template";
 
-const rootReducer: Redux.Reducer<Modules.Authenticated.Budget.Store> = combineReducers({
+const rootReducer: Redux.Reducer<Modules.Authenticated.Budget.StoreObj> = combineReducers({
   budget: budgetRootReducer,
   template: templateRootReducer,
   fringeColors: redux.reducers.factories.createListResponseReducer<string>({

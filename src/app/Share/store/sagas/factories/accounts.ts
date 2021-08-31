@@ -29,7 +29,7 @@ export const createAccountsTaskSet = (
   /* eslint-disable indent */
   actions: AccountsTasksActionMap,
   services: AccountsServiceSet,
-  selectObjId: (state: Modules.Unauthenticated.Store) => number | null
+  selectObjId: (state: Modules.Unauthenticated.StoreObj) => number | null
 ): AccountsTaskSet => {
   function* getGroups(action: Redux.Action<null>): SagaIterator {
     const objId = yield select(selectObjId);

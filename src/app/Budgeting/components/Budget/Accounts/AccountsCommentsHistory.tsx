@@ -5,29 +5,29 @@ import { redux } from "lib";
 import { actions } from "../../../store";
 import CommentsHistoryDrawer from "../CommentsHistoryDrawer";
 
-const selectDeletingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.Authenticated.Store) =>
+const selectDeletingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.Authenticated.StoreObj) =>
   map(state.budget.budget.budget.comments.deleting, (instance: Redux.ModelListActionInstance) => instance.id)
 );
-const selectEditingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.Authenticated.Store) =>
+const selectEditingComments = redux.selectors.simpleDeepEqualSelector((state: Modules.Authenticated.StoreObj) =>
   map(state.budget.budget.budget.comments.updating, (instance: Redux.ModelListActionInstance) => instance.id)
 );
 const selectReplyingComments = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.comments.replying
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.comments.replying
 );
 const selectCommentsData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.comments.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.comments.data
 );
 const selectSubmittingComment = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.comments.creating
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.comments.creating
 );
 const selectLoadingComments = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.comments.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.comments.loading
 );
 const selectLoadingHistory = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.history.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.history.loading
 );
 const selectHistory = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.history.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.history.data
 );
 
 const AccountCommentsHistory = (): JSX.Element => {

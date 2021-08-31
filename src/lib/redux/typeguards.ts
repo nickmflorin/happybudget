@@ -2,8 +2,8 @@ export const isAction = (obj: Redux.Action | any): obj is Redux.Action => {
   return (obj as Redux.Action).type !== undefined;
 };
 
-export const isAuthenticatedStore = (obj: Modules.Store): obj is Modules.Authenticated.Store =>
-  (obj as Modules.Authenticated.Store).user !== undefined;
+export const isAuthenticatedStore = (obj: Modules.StoreObj): obj is Modules.Authenticated.StoreObj =>
+  (obj as Modules.Authenticated.StoreObj).user !== undefined;
 
 export const isUnauthenticatedModuleConfig = (
   config: Modules.ModuleConfig

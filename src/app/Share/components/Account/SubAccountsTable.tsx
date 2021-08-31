@@ -9,19 +9,19 @@ import { ReadOnlyBudgetSubAccountsTable } from "components/tabling";
 import { actions } from "../../store";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.Store) => state.share.account.table.groups.data
+  (state: Modules.Unauthenticated.StoreObj) => state.share.account.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.Store) => state.share.account.table.data
+  (state: Modules.Unauthenticated.StoreObj) => state.share.account.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Unauthenticated.Store) => state.share.account.table.search
+  (state: Modules.Unauthenticated.StoreObj) => state.share.account.table.search
 );
 const selectAccountDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.Store) => state.share.account.detail.data
+  (state: Modules.Unauthenticated.StoreObj) => state.share.account.detail.data
 );
 const selectFringes = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Unauthenticated.Store) => state.share.account.table.fringes.data
+  (state: Modules.Unauthenticated.StoreObj) => state.share.account.table.fringes.data
 );
 
 interface SubAccountsTableProps {

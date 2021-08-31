@@ -26,7 +26,7 @@ export type AccountTaskSet = Redux.ReadOnlyBudgetTableTaskMap<R, M> & {
 export const createAccountTaskSet = (
   /* eslint-disable indent */
   actions: AccountTasksActionMap,
-  selectAccountId: (state: Modules.Unauthenticated.Store) => number | null
+  selectAccountId: (state: Modules.Unauthenticated.StoreObj) => number | null
 ): AccountTaskSet => {
   function* handleAccountChange(action: Redux.Action<number>): SagaIterator {
     yield all([put(actions.account.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);

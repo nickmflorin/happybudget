@@ -14,8 +14,8 @@ import { EditBudgetModal, CreateBudgetModal } from "components/modals";
 import { actions } from "../../store";
 import BudgetsSubTitle from "./BudgetsSubTitle";
 
-const selectBudgets = (state: Modules.Authenticated.Store) => state.dashboard.budgets.data;
-const selectLoadingBudgets = (state: Modules.Authenticated.Store) => state.dashboard.budgets.loading;
+const selectBudgets = (state: Modules.Authenticated.StoreObj) => state.dashboard.budgets.data;
+const selectLoadingBudgets = (state: Modules.Authenticated.StoreObj) => state.dashboard.budgets.loading;
 
 const Budgets = (): JSX.Element => {
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);

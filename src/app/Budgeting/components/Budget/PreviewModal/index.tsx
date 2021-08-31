@@ -85,16 +85,16 @@ interface PreviewModalProps {
 type Column = PdfTable.Column<Tables.PdfSubAccountRow, Model.PdfSubAccount>;
 
 const selectHeaderTemplatesLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.headerTemplates.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.headerTemplates.loading
 );
 const selectHeaderTemplates = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.headerTemplates.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.headerTemplates.data
 );
 const selectDisplayedHeaderTemplate = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.headerTemplates.displayedTemplate
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.headerTemplates.displayedTemplate
 );
 const selectHeaderTemplateLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.headerTemplates.loadingDetail
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.headerTemplates.loadingDetail
 );
 
 const PreviewModal = ({

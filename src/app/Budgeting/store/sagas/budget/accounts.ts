@@ -13,7 +13,7 @@ import * as actions from "../../actions/budget/accounts";
 import { createStandardSaga, createAccountsTaskSet } from "../factories";
 
 export function* getCommentsTask(action: Redux.Action): SagaIterator {
-  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -37,7 +37,7 @@ export function* getCommentsTask(action: Redux.Action): SagaIterator {
 }
 
 export function* submitCommentTask(action: Redux.Action<{ parent?: number; data: Http.CommentPayload }>): SagaIterator {
-  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -120,7 +120,7 @@ export function* editCommentTask(action: Redux.Action<Redux.UpdateModelActionPay
 }
 
 export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -151,7 +151,7 @@ export function* addToHistoryState(
   eventType: Model.HistoryEventType,
   data?: { field: string; newValue: string | number; oldValue: string | number | null }
 ): SagaIterator {
-  const user = yield select((state: Modules.Authenticated.Store) => state.user);
+  const user = yield select((state: Modules.Authenticated.StoreObj) => state.user);
   const polymorphicEvent: Model.PolymorphicEvent = {
     id: util.generateRandomNumericId(),
     created_at: util.dates.nowAsString(),
@@ -207,9 +207,9 @@ const tasks = createAccountsTaskSet<Model.Budget>(
     bulkCreate: api.bulkCreateBudgetAccounts,
     bulkDelete: api.bulkDeleteBudgetAccounts
   },
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.id,
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.data,
-  (state: Modules.Authenticated.Store) => state.budget.budget.autoIndex
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.table.data,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.autoIndex
 );
 
 export default createStandardSaga(

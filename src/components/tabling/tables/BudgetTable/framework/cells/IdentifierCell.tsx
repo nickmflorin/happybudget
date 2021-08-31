@@ -12,7 +12,7 @@ import { Cell, ValueCell } from "components/tabling/generic/framework/cells";
 // directory.  We should consider alternate solutions to this or potentially moving the
 // cell component into the app directory.
 const groupsSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.LevelType) => {
-  return (state: Modules.Authenticated.Store) => {
+  return (state: Modules.Authenticated.StoreObj) => {
     /* eslint-disable indent */
     switch (budgetType) {
       case "budget":

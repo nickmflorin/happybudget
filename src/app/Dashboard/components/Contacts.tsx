@@ -12,9 +12,9 @@ import { CreateContactModal, EditContactModal } from "components/modals";
 import { ContactsTable } from "components/tabling";
 
 const selectSaving = createSelector(
-  (state: Modules.Authenticated.Store) => state.user.contacts.deleting,
-  (state: Modules.Authenticated.Store) => state.user.contacts.updating,
-  (state: Modules.Authenticated.Store) => state.user.contacts.creating,
+  (state: Modules.Authenticated.StoreObj) => state.user.contacts.deleting,
+  (state: Modules.Authenticated.StoreObj) => state.user.contacts.updating,
+  (state: Modules.Authenticated.StoreObj) => state.user.contacts.creating,
   (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
     return (
       filter(

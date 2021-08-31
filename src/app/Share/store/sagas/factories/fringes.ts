@@ -25,7 +25,7 @@ export type FringeTaskSet = Redux.ReadOnlyTableTaskMap<R, M>;
 export const createFringeTaskSet = (
   actions: FringeTasksActionMap,
   services: FringeServiceSet,
-  selectObjId: (state: Modules.Unauthenticated.Store) => number | null
+  selectObjId: (state: Modules.Unauthenticated.StoreObj) => number | null
 ): FringeTaskSet => {
   function* getFringesTask(action: Redux.Action<null>): SagaIterator {
     const objId = yield select(selectObjId);

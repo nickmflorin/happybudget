@@ -17,7 +17,7 @@ const fringesRootSaga = redux.sagas.factories.createReadOnlyTableSaga(
       budget: { loading: loadingBudgetAction }
     },
     { request: api.getBudgetFringes },
-    (state: Modules.Unauthenticated.Store) => state.share.budget.id
+    (state: Modules.Unauthenticated.StoreObj) => state.share.budget.id
   )
 );
 
@@ -37,7 +37,7 @@ const tasks = createSubAccountTaskSet(
       request: actions.requestGroupsAction
     }
   },
-  (state: Modules.Unauthenticated.Store) => state.share.subaccount.id
+  (state: Modules.Unauthenticated.StoreObj) => state.share.subaccount.id
 );
 
 function* watchForSubAccountIdChangedSaga(): SagaIterator {

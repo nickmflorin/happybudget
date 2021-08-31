@@ -2,7 +2,7 @@ import { combineReducers } from "redux";
 import { redux } from "lib";
 import { ActionType } from "./actions";
 
-const rootReducer: Redux.Reducer<Modules.Authenticated.Dashboard.Store> = combineReducers({
+const rootReducer: Redux.Reducer<Modules.Authenticated.Dashboard.StoreObj> = combineReducers({
   templates: redux.reducers.factories.createModelListResponseReducer<
     Model.SimpleTemplate,
     Redux.ModelListResponseStore<Model.SimpleTemplate>

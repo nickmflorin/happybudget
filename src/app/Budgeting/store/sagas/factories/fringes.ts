@@ -44,7 +44,7 @@ export type FringeTaskSet = Redux.TableTaskMap<R, M>;
 export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
   actions: FringeTasksActionMap<B>,
   services: FringeServiceSet<B>,
-  selectObjId: (state: Modules.Authenticated.Store) => number | null
+  selectObjId: (state: Modules.Authenticated.StoreObj) => number | null
 ): FringeTaskSet => {
   function* bulkCreateTask(objId: number, e: Table.RowAddEvent<R, M>, errorMessage: string): SagaIterator {
     const CancelToken = axios.CancelToken;

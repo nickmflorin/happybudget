@@ -10,13 +10,13 @@ import { framework } from "components/tabling/generic";
 // directory.  We should consider alternate solutions to this or potentially moving the
 // cell component into the app directory.
 const selectSubAccountsTree = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.subAccountsTree.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.subAccountsTree.data
 );
 const selectSubAccountsTreeSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.subAccountsTree.search
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.subAccountsTree.search
 );
 const selectSubAccountsTreeLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.subAccountsTree.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.subAccountsTree.loading
 );
 
 interface SubAccountsTreeEditorProps extends Table.EditorParams<Tables.ActualRow, Model.Actual> {

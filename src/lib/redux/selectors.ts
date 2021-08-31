@@ -18,6 +18,6 @@ export const createGlobalSelector = <T = any>(
   authenticatedFunc: Redux.AuthenticatedSelectorFunc<T>,
   unauthenticatedFunc: Redux.UnauthenticatedSelectorFunc<T>
 ) => {
-  return (state: Modules.Store) =>
+  return (state: Modules.StoreObj) =>
     isAuthenticatedStore(state) ? authenticatedFunc(state) : unauthenticatedFunc(state);
 };

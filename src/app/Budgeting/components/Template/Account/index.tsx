@@ -15,13 +15,13 @@ import { actions } from "../../../store";
 import SubAccountsTable from "./SubAccountsTable";
 
 const selectDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.account.detail.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.detail.data
 );
 const selectSubAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.account.table.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.table.loading
 );
 const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.account.table.groups.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.table.groups.loading
 );
 const selectLoading = createSelector(
   selectSubAccountsLoading,

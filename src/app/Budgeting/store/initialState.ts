@@ -41,7 +41,7 @@ export const initialBudgetModuleState: Modules.Authenticated.Budget.ModuleStore<
   headerTemplates: initialHeaderTemplatesState
 };
 
-const initialState: Modules.Authenticated.Budget.Store = {
+const initialState: Modules.Authenticated.Budget.StoreObj = {
   budget: initialBudgetModuleState,
   template: initialBudgetModuleState,
   fringeColors: redux.initialState.initialModelListResponseState

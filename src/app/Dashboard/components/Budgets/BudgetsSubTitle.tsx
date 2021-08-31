@@ -14,7 +14,7 @@ interface BudgetsSubTitleProps extends StandardComponentProps {
   readonly onNewBudget: () => void;
 }
 
-const selectBudgetsSearch = (state: Modules.Authenticated.Store) => state.dashboard.budgets.search;
+const selectBudgetsSearch = (state: Modules.Authenticated.StoreObj) => state.dashboard.budgets.search;
 
 const BudgetsSubTitle: React.FC<BudgetsSubTitleProps> = ({ onNewBudget, ...props }): JSX.Element => {
   const dispatch: Dispatch = useDispatch();

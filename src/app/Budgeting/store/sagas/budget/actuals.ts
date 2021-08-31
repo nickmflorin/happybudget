@@ -116,7 +116,7 @@ function* bulkDeleteTask(budgetId: number, e: Table.RowDeleteEvent<R, C>, errorM
 }
 
 function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, C>>): SagaIterator {
-  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const e: Table.RowAddEvent<R, C> = action.payload;
     yield fork(bulkCreateTask, budgetId, e, "There was an error creating the actuals.");
@@ -124,7 +124,7 @@ function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, C>>): Saga
 }
 
 function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, C>>): SagaIterator {
-  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const e: Table.RowDeleteEvent<R, C> = action.payload;
     yield fork(bulkDeleteTask, budgetId, e, "There was an error deleting the acutals.");
@@ -132,7 +132,7 @@ function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, C>>)
 }
 
 function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, C>>): SagaIterator {
-  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id);
   if (!isNil(budgetId) && !isNil(action.payload)) {
     const e: Table.DataChangeEvent<R, C> = action.payload;
     const merged = tabling.util.consolidateTableChange(e.payload);
@@ -150,7 +150,7 @@ function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, C>
 }
 
 function* getActualsTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id);
   if (!isNil(budgetId)) {
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
@@ -186,10 +186,10 @@ function* getActualsTask(action: Redux.Action<null>): SagaIterator {
 }
 
 function* getSubAccountsTreeTask(action: Redux.Action<null>): SagaIterator {
-  const budgetId = yield select((state: Modules.Authenticated.Store) => state.budget.budget.budget.id);
+  const budgetId = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.id);
   if (!isNil(budgetId)) {
-    const search = yield select((state: Modules.Authenticated.Store) => state.budget.budget.subAccountsTree.search);
-    const cache = yield select((state: Modules.Authenticated.Store) => state.budget.budget.subAccountsTree.cache);
+    const search = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.subAccountsTree.search);
+    const cache = yield select((state: Modules.Authenticated.StoreObj) => state.budget.budget.subAccountsTree.cache);
     if (!isNil(cache[search])) {
       yield put(actions.restoreSubAccountsTreeSearchCacheAction(null));
     } else {

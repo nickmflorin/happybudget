@@ -26,7 +26,7 @@ export type SubAccountTaskSet = Redux.ReadOnlyBudgetTableTaskMap<R, M> & {
 export const createSubAccountTaskSet = (
   /* eslint-disable indent */
   actions: SubAccountTasksActionMap,
-  selectSubAccountId: (state: Modules.Unauthenticated.Store) => number | null
+  selectSubAccountId: (state: Modules.Unauthenticated.StoreObj) => number | null
 ): SubAccountTaskSet => {
   function* handleSubAccountChange(action: Redux.Action<number>): SagaIterator {
     yield all([put(actions.subaccount.request(null)), put(actions.request(null)), put(actions.groups.request(null))]);

@@ -6,14 +6,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Redux {
-  type GenericSelectorFunc<S extends Modules.Store, T = any> = (state: S) => T;
-  type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Modules.Authenticated.Store, T>;
-  type UnauthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Modules.Unauthenticated.Store, T>;
+  type GenericSelectorFunc<S extends Modules.StoreObj, T = any> = (state: S) => T;
+  type AuthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Modules.Authenticated.StoreObj, T>;
+  type UnauthenticatedSelectorFunc<T = any> = GenericSelectorFunc<Modules.Unauthenticated.StoreObj, T>;
   type SwitchSelectorFunc<AUTH extends boolean = true, T = any> = AUTH extends true ? AuthenticatedSelectorFunc<T> : UnauthenticatedSelectorFunc<T>;
   type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
 
-  type Store = Record<string, any> | boolean | number;
-  type Reducer<S extends Redux.Store> = import("redux").Reducer<S, Redux.Action>;
+  type StoreObj = Record<string, any> | boolean | number;
+  type Store<S extends Redux.StoreObj> = import("redux").StoreObj<S, Redux.Action>;
+  type Reducer<S extends Redux.StoreObj> = import("redux").Reducer<S, Redux.Action>;
 
   interface ActionConfig {
     readonly error?: Error | string | undefined;

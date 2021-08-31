@@ -18,7 +18,7 @@ export const initialAccountState: Modules.Unauthenticated.Share.AccountStore = {
   table: redux.initialState.initialReadOnlyBudgetTableWithFringesState
 };
 
-const initialState: Modules.Unauthenticated.Share.Store = {
+const initialState: Modules.Unauthenticated.Share.StoreObj = {
   budget: initialBudgetState,
   account: initialAccountState,
   subaccount: initialSubAccountState

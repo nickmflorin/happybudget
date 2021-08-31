@@ -12,19 +12,19 @@ import { actions } from "../../../store";
 import FringesModal from "./FringesModal";
 
 const selectGroups = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.account.table.groups.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.table.groups.data
 );
 const selectData = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.account.table.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.table.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.account.table.search
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.table.search
 );
 const selectAccountDetail = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.account.detail.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.detail.data
 );
 const selectFringes = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.account.table.fringes.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.table.fringes.data
 );
 
 interface SubAccountsTableProps {

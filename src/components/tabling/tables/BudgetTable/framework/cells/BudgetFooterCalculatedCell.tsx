@@ -6,7 +6,7 @@ import { CalculatedCell, CalculatedCellProps } from "components/tabling/generic/
 // directory.  We should consider alternate solutions to this or potentially moving the
 // cell component into the app directory.
 const selectBudgetLoading = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.detail.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.detail.loading
 );
 
 const BudgetFooterCalculatedCell = <R extends Table.Row, M extends Model.Model>({

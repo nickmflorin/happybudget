@@ -15,15 +15,15 @@ import Accounts from "./Accounts";
 import SubAccount from "./SubAccount";
 
 const selectSaving = createSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.table.deleting,
-  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.table.updating,
-  (state: Modules.Authenticated.Store) => state.budget.template.subaccount.table.creating,
-  (state: Modules.Authenticated.Store) => state.budget.template.account.table.deleting,
-  (state: Modules.Authenticated.Store) => state.budget.template.account.table.updating,
-  (state: Modules.Authenticated.Store) => state.budget.template.account.table.creating,
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.deleting,
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.updating,
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.creating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.subaccount.table.deleting,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.subaccount.table.updating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.subaccount.table.creating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.table.deleting,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.table.updating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.account.table.creating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.table.deleting,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.table.updating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.table.creating,
   (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
     return (
       filter(

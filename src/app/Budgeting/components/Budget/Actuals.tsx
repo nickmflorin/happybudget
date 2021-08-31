@@ -13,13 +13,13 @@ import { ActualsTable } from "components/tabling";
 import { actions } from "../../store";
 
 const selectActuals = redux.selectors.simpleDeepEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.data
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.actuals.data
 );
 const selectTableSearch = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.search
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.actuals.search
 );
 const selectActualsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.actuals.loading
 );
 
 interface ActualsProps {

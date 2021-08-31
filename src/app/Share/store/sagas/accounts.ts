@@ -21,7 +21,7 @@ const tasks = createAccountsTaskSet(
     getAccounts: api.getBudgetAccounts,
     getGroups: api.getBudgetAccountGroups
   },
-  (state: Modules.Unauthenticated.Store) => state.share.budget.id
+  (state: Modules.Unauthenticated.StoreObj) => state.share.budget.id
 );
 
 export default createStandardSaga(

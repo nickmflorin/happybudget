@@ -30,9 +30,9 @@ export type SubAccountTaskSet = Redux.BudgetTableTaskMap<R, C> & {
 export const createSubAccountTaskSet = <B extends Model.Budget | Model.Template>(
   /* eslint-disable indent */
   actions: SubAccountTasksActionMap<B>,
-  selectSubAccountId: (state: Modules.Authenticated.Store) => number | null,
-  selectModels: (state: Modules.Authenticated.Store) => C[],
-  selectAutoIndex: (state: Modules.Authenticated.Store) => boolean
+  selectSubAccountId: (state: Modules.Authenticated.StoreObj) => number | null,
+  selectModels: (state: Modules.Authenticated.StoreObj) => C[],
+  selectAutoIndex: (state: Modules.Authenticated.StoreObj) => boolean
 ): SubAccountTaskSet => {
   function* bulkCreateTask(subaccountId: number, e: Table.RowAddEvent<R, C>, errorMessage: string): SagaIterator {
     const CancelToken = axios.CancelToken;

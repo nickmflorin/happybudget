@@ -16,7 +16,9 @@ interface WrapInAuthenticatedStoreProps {
 const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): JSX.Element => {
   const [redirect, setRedirect] = useState(false);
   const [authenticating, setAuthenticating] = useState(true);
-  const [reduxStore, setReduxStore] = useState<Store<Modules.Authenticated.Store, Redux.Action> | undefined>(undefined);
+  const [reduxStore, setReduxStore] = useState<Store<Modules.Authenticated.StoreObj, Redux.Action> | undefined>(
+    undefined
+  );
 
   useEffect(() => {
     setAuthenticating(true);

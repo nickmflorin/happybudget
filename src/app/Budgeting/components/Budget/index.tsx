@@ -17,18 +17,18 @@ import Actuals from "./Actuals";
 import Analysis from "./Analysis";
 
 const selectSaving = createSelector(
-  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.deleting,
-  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.updating,
-  (state: Modules.Authenticated.Store) => state.budget.budget.actuals.creating,
-  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.deleting,
-  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.updating,
-  (state: Modules.Authenticated.Store) => state.budget.budget.subaccount.table.creating,
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.deleting,
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.updating,
-  (state: Modules.Authenticated.Store) => state.budget.budget.budget.table.creating,
-  (state: Modules.Authenticated.Store) => state.budget.budget.account.table.deleting,
-  (state: Modules.Authenticated.Store) => state.budget.budget.account.table.updating,
-  (state: Modules.Authenticated.Store) => state.budget.budget.account.table.creating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.actuals.deleting,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.actuals.updating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.actuals.creating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.subaccount.table.deleting,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.subaccount.table.updating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.subaccount.table.creating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.table.deleting,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.table.updating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.budget.table.creating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.account.table.deleting,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.account.table.updating,
+  (state: Modules.Authenticated.StoreObj) => state.budget.budget.account.table.creating,
   (...args: (Redux.ModelListActionInstance[] | boolean)[]) => {
     return (
       filter(

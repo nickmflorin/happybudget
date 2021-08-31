@@ -11,10 +11,10 @@ import { actions } from "../../../store";
 import AccountsTable from "./AccountsTable";
 
 const selectAccountsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.table.loading
 );
 const selectGroupsLoading = redux.selectors.simpleShallowEqualSelector(
-  (state: Modules.Authenticated.Store) => state.budget.template.budget.table.groups.loading
+  (state: Modules.Authenticated.StoreObj) => state.budget.template.budget.table.groups.loading
 );
 const selectLoading = createSelector(
   selectAccountsLoading,

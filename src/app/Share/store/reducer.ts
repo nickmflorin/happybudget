@@ -74,7 +74,7 @@ export const createSubAccountReducer = (
 ): Redux.Reducer<Modules.Unauthenticated.Share.SubAccountStore> =>
   createAccountSubAccountReducer<Model.SubAccount>(mapping, initialState);
 
-const rootReducer: Redux.Reducer<Modules.Unauthenticated.Share.Store> = combineReducers({
+const rootReducer: Redux.Reducer<Modules.Unauthenticated.Share.StoreObj> = combineReducers({
   account: createAccountReducer(
     {
       SetId: ActionType.Budget.Account.SetId,

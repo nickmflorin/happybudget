@@ -40,7 +40,7 @@ function createModularApplicationReducer(config: Modules.ModuleConfig[]): Module
 export const createAuthenticatedReducer = (
   config: Modules.ModuleConfigs,
   user: Model.User
-): Redux.Reducer<Modules.Authenticated.Store> => {
+): Redux.Reducer<Modules.Authenticated.StoreObj> => {
   const moduleReducers = createModularApplicationReducer(
     filter(
       config,
@@ -64,7 +64,7 @@ export const createAuthenticatedReducer = (
  */
 export const createUnauthenticatedReducer = (
   config: Modules.ModuleConfigs
-): Redux.Reducer<Modules.Unauthenticated.Store> => {
+): Redux.Reducer<Modules.Unauthenticated.StoreObj> => {
   const moduleReducers = createModularApplicationReducer(
     filter(config, (c: Modules.ModuleConfig) =>
       redux.typeguards.isUnauthenticatedModuleConfig(c)

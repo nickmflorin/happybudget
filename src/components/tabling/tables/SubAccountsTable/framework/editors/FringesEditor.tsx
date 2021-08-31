@@ -10,7 +10,7 @@ import { framework } from "components/tabling/generic";
 // directory.  We should consider alternate solutions to this or potentially moving the
 // cell component into the app directory.
 const fringesSelector = (budgetType: Model.BudgetType, levelType: BudgetTable.LevelType) => {
-  return (state: Modules.Authenticated.Store) => {
+  return (state: Modules.Authenticated.StoreObj) => {
     /* eslint-disable indent */
     switch (budgetType) {
       case "budget":
