@@ -4,27 +4,34 @@ import Cookies from "universal-cookie";
 export const validateHiddenColumns = <R extends Table.Row, M extends Model.Model>(
   obj: any,
   validateAgainst?: Table.Field<R, M>[]
-): Table.Field<R, M>[] =>
-  /* eslint-disable indent */
-  Array.isArray(obj)
-    ? uniq(
-        reduce(
-          obj,
-          (fields: Table.Field<R, M>[], iteree: any) => {
-            if (typeof iteree === "string" && (isNil(validateAgainst) || includes(validateAgainst, iteree))) {
-              return [...fields, iteree as Table.Field<R, M>];
-            }
-            return fields;
-          },
-          [] as Table.Field<R, M>[]
-        )
+): Table.Field<R, M>[] | null => {
+  if (!Array.isArray(obj)) {
+    return null;
+  } else {
+    const validated = uniq(
+      reduce(
+        obj,
+        (fields: Table.Field<R, M>[], iteree: any) => {
+          if (typeof iteree === "string" && (isNil(validateAgainst) || includes(validateAgainst, iteree))) {
+            return [...fields, iteree as Table.Field<R, M>];
+          }
+          return fields;
+        },
+        [] as Table.Field<R, M>[]
       )
-    : [];
+    );
+    // If there are columns present in the cookies but non are valid, we want to treat
+    // it the same way we would if the cookies were invalid or null to begin with.  On the
+    // other hand, if the value stored in cookies is an empty array, we want to treat that as
+    // not columns being hidden.
+    return validated.length === 0 && obj.length !== 0 ? null : validated;
+  }
+};
 
 export const getHiddenColumns = <R extends Table.Row, M extends Model.Model>(
   cookieName: string,
   validateAgainst?: Table.Field<R, M>[]
-): Table.Field<R, M>[] => {
+): Table.Field<R, M>[] | null => {
   const cookiesObj = new Cookies();
   const cookiesHiddenColumns = cookiesObj.get(cookieName);
   return validateHiddenColumns(cookiesHiddenColumns, validateAgainst);
@@ -59,7 +66,7 @@ export const getHiddenColumnsAfterChanges = <R extends Table.Row, M extends Mode
   cookieName: string,
   changes: SingleOrArray<Table.ColumnVisibilityChange<R, M>>
 ): Table.Field<R, M>[] => {
-  const hiddenColumns = getHiddenColumns(cookieName);
+  const hiddenColumns = getHiddenColumns(cookieName) || [];
   return applyHiddenColumnChanges(changes, hiddenColumns);
 };
 

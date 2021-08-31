@@ -49,7 +49,7 @@ export const useOrdering = <R extends Table.Row, M extends Model.Model>(
 
 type UseHiddenColumnsParams<R extends Table.Row, M extends Model.Model> = {
   readonly cookie?: string;
-  readonly validateAgainst?: Table.Field<R, M>[];
+  readonly columns: Table.Column<R, M>[];
   readonly apis: TableApis;
 };
 
@@ -64,8 +64,29 @@ export const useHiddenColumns = <R extends Table.Row, M extends Model.Model>(
   const [hiddenColumns, _setHiddenColumns] = useState<Table.Field<R, M>[]>([]);
 
   useEffect(() => {
+    let setColumnsFromCookies = false;
     if (!isNil(params.cookie)) {
-      _setHiddenColumns(cookies.getHiddenColumns(params.cookie, params.validateAgainst));
+      const hiddenColumnsInCookies: Table.Field<R, M>[] | null = cookies.getHiddenColumns(
+        params.cookie,
+        map(
+          filter(params.columns, (c: Table.Column<R, M>) => c.canBeHidden !== false),
+          (c: Table.Column<R, M>) => c.field
+        )
+      );
+      if (!isNil(hiddenColumnsInCookies)) {
+        _setHiddenColumns(hiddenColumnsInCookies);
+        setColumnsFromCookies = true;
+      }
+    }
+    if (setColumnsFromCookies === false) {
+      // If there the hidden columns are not stored in cookies or the hidden columns stored in
+      // cookies are corrupted, we want to set the hidden columns based on the defaultHidden property.
+      _setHiddenColumns(
+        map(
+          filter(params.columns, (c: Table.Column<R, M>) => c.canBeHidden !== false && c.defaultHidden === true),
+          (c: Table.Column<R, M>) => c.field
+        )
+      );
     }
   }, [params.cookie]);
 

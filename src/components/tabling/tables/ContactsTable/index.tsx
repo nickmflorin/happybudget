@@ -11,6 +11,7 @@ type OmitTableProps = "columns" | "getRowLabel" | "actions" | "showPageFooter";
 
 export interface ContactsTableProps extends Omit<ReadWriteModelTableProps<R, M>, OmitTableProps> {
   readonly exportFileName: string;
+  readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
   readonly onEditContact: (id: number) => void;
 }
 
@@ -23,6 +24,7 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
       showPageFooter={false}
       tableRef={tableRef}
       minimal={true}
+      cookieNames={{ ...props.cookieNames, hiddenColumns: "contacts-table-hidden-columns" }}
       leftAlignNewRowButton={true}
       indexColumnWidth={40}
       getRowLabel={(m: M) => m.full_name}
@@ -48,6 +50,7 @@ const ContactsTable = ({ exportFileName, onEditContact, ...props }: ContactsTabl
         framework.columnObjs.ChoiceSelectColumn<R, M, Model.ContactType>({
           field: "type",
           headerName: "Type",
+          defaultHidden: true,
           cellRenderer: { data: "ContactTypeCell" },
           cellEditor: "ContactTypeEditor",
           models: model.models.ContactTypes

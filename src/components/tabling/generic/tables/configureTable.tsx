@@ -90,14 +90,10 @@ const configureTable = <P extends _InjectedTableProps<R, M>, R extends Table.Row
   /* eslint-disable indent */
   function Comp(props: Subtract<P, _InjectedTableProps<R, M>> & TableConfiguration<R, M>): JSX.Element {
     const [_apis, _setApis] = useState<tabling.TableApis>(InitialAPIs);
-    //const _apis = useRef<tabling.TableApis>(InitialAPIs);
 
     const [hiddenColumns, changeColumnVisibility] = tabling.hooks.useHiddenColumns<R, M>({
       cookie: props.cookieNames?.hiddenColumns,
-      validateAgainst: map(
-        filter(props.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false),
-        (col: Table.Column<R, M>) => col.field
-      ),
+      columns: map(filter(props.columns, (col: Table.Column<R, M>) => col.canBeHidden !== false)),
       apis: _apis
     });
 

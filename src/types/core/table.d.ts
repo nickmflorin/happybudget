@@ -153,6 +153,7 @@ namespace Table {
     readonly cellRenderer?: string | Partial<Table.GridSet<string>>;
     readonly cellClass?: Table.CellClassName;
     readonly cellStyle?: React.CSSProperties;
+    readonly defaultHidden?: boolean;
     // Only applicable for BudgetTable - we might want to create a separate BudgetTable.Column type.
     readonly isCalculating?: boolean;
     readonly canBeHidden?: boolean;
