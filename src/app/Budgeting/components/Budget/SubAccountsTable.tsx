@@ -7,15 +7,20 @@ import { selectors } from "store";
 import { EditContactModal, CreateContactModal } from "components/modals";
 import { ReadWriteBudgetSubAccountsTable, ReadWriteBudgetSubAccountsTableProps } from "components/tabling";
 
+import PreviewModal from "./PreviewModal";
+
 type PreContactCreate = Omit<Table.CellChange<Tables.SubAccountRow, Model.SubAccount>, "newValue">;
 
-type OmitTableProps = "contacts" | "onEditContact" | "onNewContact" | "menuPortalId" | "columns";
+type OmitTableProps = "contacts" | "onEditContact" | "onNewContact" | "menuPortalId" | "columns" | "onExportPdf";
 
 interface SubAccountsTableProps extends Omit<ReadWriteBudgetSubAccountsTableProps, OmitTableProps> {
   readonly tableRef: NonNullRef<BudgetTable.ReadWriteTableRefObj<Tables.SubAccountRow, Model.SubAccount>>;
+  readonly budgetId: number;
+  readonly budget: Model.Budget | undefined;
 }
 
-const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
+const SubAccountsTable = ({ budget, budgetId, ...props }: SubAccountsTableProps): JSX.Element => {
+  const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [preContactCreate, setPreContactCreate] = useState<PreContactCreate | null>(null);
   const [initialContactFormValues, setInitialContactFormValues] = useState<any>(null);
   const [contactToEdit, setContactToEdit] = useState<number | null>(null);
@@ -44,6 +49,7 @@ const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
         menuPortalId={"supplementary-header"}
         contacts={contacts}
         onEditContact={(contact: number) => setContactToEdit(contact)}
+        onExportPdf={() => setPreviewModalVisible(true)}
         onNewContact={(params: { name?: string; change: PreContactCreate }) => {
           setPreContactCreate(params.change);
           setInitialContactFormValues(null);
@@ -87,6 +93,14 @@ const SubAccountsTable = (props: SubAccountsTableProps): JSX.Element => {
           }
         }}
         onCancel={() => setCreateContactModalVisible(false)}
+      />
+      <PreviewModal
+        autoRenderPdf={false}
+        visible={previewModalVisible}
+        onCancel={() => setPreviewModalVisible(false)}
+        budgetId={budgetId}
+        budgetName={!isNil(budget) ? `${budget.name} Budget` : `Sample Budget ${new Date().getFullYear()}`}
+        filename={!isNil(budget) ? `${budget.name}.pdf` : "budget.pdf"}
       />
     </React.Fragment>
   );

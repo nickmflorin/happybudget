@@ -15,12 +15,15 @@ export type ReadWriteBudgetAccountsTableProps = AccountsTableProps &
     readonly budget?: Model.Budget;
     readonly tableRef?: NonNullRef<BudgetTable.ReadWriteTableRefObj<R, M>>;
     readonly cookieNames?: Table.CookieNames;
+    readonly onExportPdf: () => void;
     readonly onEditGroup: (group: Model.Group) => void;
   };
 
 const ReadWriteBudgetAccountsTable = (
   props: WithAccountsTableProps<ReadWriteBudgetAccountsTableProps>
 ): JSX.Element => {
+  const tableRef = tabling.hooks.useReadWriteBudgetTableIfNotDefined(props.tableRef);
+
   const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
     return [
       ...util.updateInArray<Table.Column<R, M>>(
@@ -59,23 +62,28 @@ const ReadWriteBudgetAccountsTable = (
   return (
     <ReadWriteBudgetTable<R, M>
       {...props}
-      actions={tabling.util.combineMenuActions(
-        [
-          {
-            icon: "folder",
-            disabled: true,
-            label: "Group",
-            isWriteOnly: true
-          },
-          {
-            icon: "badge-percent",
-            disabled: true,
-            label: "Mark Up",
-            isWriteOnly: true
-          }
-        ],
-        !isNil(props.actions) ? props.actions : []
-      )}
+      actions={(params: Table.ReadWriteMenuActionParams<R, M>) => [
+        {
+          icon: "folder",
+          disabled: true,
+          label: "Group",
+          isWriteOnly: true
+        },
+        {
+          icon: "badge-percent",
+          disabled: true,
+          label: "Mark Up",
+          isWriteOnly: true
+        },
+        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
+        framework.actions.ToggleColumnAction<R, M>(tableRef.current, params),
+        framework.actions.ExportPdfAction(props.onExportPdf),
+        framework.actions.ExportCSVAction(
+          tableRef.current,
+          params,
+          !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
+        )
+      ]}
       columns={columns}
       budgetType={"budget"}
     />

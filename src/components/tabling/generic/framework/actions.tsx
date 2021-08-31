@@ -2,6 +2,12 @@ import { map, filter } from "lodash";
 import { util } from "lib";
 import { ExportCSVDropdown, ToggleColumnsDropdown } from "components/dropdowns";
 
+export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
+  icon: "print",
+  label: "Export PDF",
+  onClick: () => onExport()
+});
+
 export const ExportCSVAction = <R extends Table.Row, M extends Model.Model>(
   table: Table.ReadOnlyTableRefObj<R, M> | Table.ReadWriteTableRefObj<R, M>,
   params: Table.MenuActionParams<R, M>,

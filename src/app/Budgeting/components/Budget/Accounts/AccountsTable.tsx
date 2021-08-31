@@ -54,15 +54,11 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         onChangeEvent={(e: Table.ChangeEvent<Tables.AccountRow, Model.Account>) =>
           dispatch(actions.budget.accounts.handleTableChangeEventAction(e))
         }
+        onExportPdf={() => setPreviewModalVisible(true)}
         onRowExpand={(id: number) => history.push(`/budgets/${budgetId}/accounts/${id}`)}
         onGroupRows={(rows: Tables.AccountRow[]) => setGroupAccounts(map(rows, (row: Tables.AccountRow) => row.id))}
         onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
         actions={[
-          {
-            icon: "print",
-            label: "Export PDF",
-            onClick: () => setPreviewModalVisible(true)
-          },
           {
             label: "Comments",
             icon: "comments-alt",

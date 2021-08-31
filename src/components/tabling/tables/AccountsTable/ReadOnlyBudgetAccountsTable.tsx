@@ -1,5 +1,6 @@
 import { isNil } from "lodash";
 
+import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { ReadOnlyBudgetTable, ReadOnlyBudgetTableProps } from "../BudgetTable";
@@ -16,9 +17,20 @@ export type ReadOnlyBudgetAccountsTableProps = AccountsTableProps &
   };
 
 const ReadOnlyBudgetAccountsTable = (props: WithAccountsTableProps<ReadOnlyBudgetAccountsTableProps>): JSX.Element => {
+  const tableRef = tabling.hooks.useReadOnlyTableIfNotDefined(props.tableRef);
+
   return (
     <ReadOnlyBudgetTable<R, M>
       {...props}
+      actions={(params: Table.ReadOnlyMenuActionParams<R, M>) => [
+        ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
+        framework.actions.ToggleColumnAction<R, M>(tableRef.current, params),
+        framework.actions.ExportCSVAction(
+          tableRef.current,
+          params,
+          !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
+        )
+      ]}
       columns={[
         ...props.columns,
         framework.columnObjs.CalculatedColumn({

@@ -8,7 +8,6 @@ import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
 import { hooks } from "store";
 
 import { actions, selectors } from "../../../store";
-import PreviewModal from "../PreviewModal";
 import BudgetSubAccountsTable from "../SubAccountsTable";
 import FringesModal from "./FringesModal";
 
@@ -35,7 +34,6 @@ interface SubAccountsTableProps {
 }
 
 const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTableProps): JSX.Element => {
-  const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const [groupSubAccounts, setGroupSubAccounts] = useState<number[] | undefined>(undefined);
   const [groupToEdit, setGroupToEdit] = useState<Model.Group | undefined>(undefined);
@@ -57,6 +55,7 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
     <React.Fragment>
       <BudgetSubAccountsTable
         budget={budget}
+        budgetId={budgetId}
         levelType={"subaccount"}
         tableRef={tableRef}
         models={data}
@@ -103,11 +102,6 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
         onEditGroup={(group: Model.Group) => setGroupToEdit(group)}
         actions={[
           {
-            icon: "print",
-            label: "Export PDF",
-            onClick: () => setPreviewModalVisible(true)
-          },
-          {
             label: "Comments",
             icon: "comments-alt",
             onClick: () => dispatch(actions.budget.setCommentsHistoryDrawerVisibilityAction(!commentsHistoryDrawerOpen))
@@ -141,14 +135,6 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
         />
       )}
       <FringesModal budget={budget} open={fringesModalVisible} onCancel={() => setFringesModalVisible(false)} />
-      <PreviewModal
-        autoRenderPdf={false}
-        visible={previewModalVisible}
-        onCancel={() => setPreviewModalVisible(false)}
-        budgetId={budgetId}
-        budgetName={!isNil(budget) ? `${budget.name} Budget` : `Sample Budget ${new Date().getFullYear()}`}
-        filename={!isNil(budget) ? `${budget.name}.pdf` : "budget.pdf"}
-      />
     </React.Fragment>
   );
 };

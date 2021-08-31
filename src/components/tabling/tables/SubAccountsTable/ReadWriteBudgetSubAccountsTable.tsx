@@ -20,6 +20,7 @@ export type ReadWriteBudgetSubAccountsTableProps = SubAccountsTableProps &
     readonly detail: Model.Account | M | undefined;
     readonly contacts: Model.Contact[];
     readonly exportFileName: string;
+    readonly onExportPdf: () => void;
     readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
     readonly onEditContact: (id: number) => void;
     readonly onEditGroup: (group: Model.Group) => void;
@@ -166,6 +167,7 @@ const ReadWriteBudgetSubAccountsTable = (
         },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
         framework.actions.ToggleColumnAction<R, M>(tableRef.current, params),
+        framework.actions.ExportPdfAction(props.onExportPdf),
         framework.actions.ExportCSVAction(tableRef.current, params, props.exportFileName)
       ]}
     />
