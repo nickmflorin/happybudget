@@ -46,6 +46,7 @@ const AccountsTable = <T extends AccountsTableProps>(
           framework.columnObjs.BodyColumn({
             field: "description",
             headerName: "Account Description",
+            minWidth: 200,
             flex: 100,
             columnType: "longText"
           })

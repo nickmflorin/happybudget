@@ -57,6 +57,8 @@ function SubAccountsTable<T extends SubAccountsTableProps>(
             }),
             framework.columnObjs.BodyColumn({
               field: "description",
+              minWidth: 200,
+              flex: 100,
               headerName: `${this.props.categoryName} Description`,
               columnType: "longText",
               index: 1,
