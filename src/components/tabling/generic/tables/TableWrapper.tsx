@@ -15,7 +15,7 @@ export interface TableWrapperProps {
 const TableWrapper = (props: TableWrapperProps) => {
   return (
     <WrapInApplicationSpinner hideWhileLoading={false} loading={props.loading}>
-      <div className={classNames("table", { "table--minimal": props.minimal }, props.className)}>
+      <div className={classNames("table", "ag-theme-alpine", { "table--minimal": props.minimal }, props.className)}>
         <div
           className={classNames("core-table", {
             "with-page-footer": !isNil(props.footer),

@@ -99,6 +99,7 @@ export interface GridProps<R extends Table.Row, M extends Model.Model> extends U
   readonly indexColumn?: Partial<Table.Column<R, M>>;
   readonly columns: Table.Column<R, M>[];
   readonly className?: Table.GeneralClassName;
+  readonly style?: React.CSSProperties;
   readonly rowClass?: Table.RowClassName;
   readonly rowHeight?: number;
   readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
@@ -121,6 +122,7 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
   hiddenColumns,
   rowClass,
   indexColumn,
+  style,
   ...props
 }: GridProps<R, M>): JSX.Element => {
   const rowData = useMemo(
@@ -230,7 +232,7 @@ const Grid = <R extends Table.Row, M extends Model.Model>({
   };
 
   return (
-    <div className={classNames("ag-theme-alpine", "grid", className)}>
+    <div className={classNames("ag-theme-alpine", "grid", className)} style={style}>
       <AgGridReact
         rowHeight={36}
         headerHeight={38}

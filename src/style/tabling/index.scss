@@ -273,8 +273,6 @@
 
     .grid--data {
       max-height: calc(100% - 40px);
-      display: flex;
-      flex-direction: column;
 
       .ag-root-wrapper {
         overflow: visible;

@@ -213,6 +213,7 @@ const DataGrid =
         <Component
           {...props}
           id={"data"}
+          style={{ flex: "1 1 auto" }}
           className={classNames("grid--data", props.className)}
           rowClass={["row--data", props.rowClass]}
           domLayout={"autoHeight"}

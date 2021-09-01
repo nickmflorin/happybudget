@@ -71,6 +71,7 @@ const FooterGrid =
           {...props}
           id={config.id}
           columns={columns}
+          style={{ flex: "none" }}
           data={data}
           headerHeight={0}
           rowHeight={config.rowHeight || 38}
