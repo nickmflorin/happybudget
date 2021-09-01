@@ -107,7 +107,7 @@
         // This is needed so that we can display white space in our cells without
         // AG Grid trimming them.  Note that this sometimes causes issues with cell
         // text overflow.  We still need to figure out a mores sustainable solution.
-        white-space: break-spaces;
+        white-space: pre;
         -webkit-font-smoothing: subpixel-antialiased;
         // Because we have a 2px border width when the cell is selected and a 1px border
         // width when it is not selected, if we do not apply this flex centering the text
