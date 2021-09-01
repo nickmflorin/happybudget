@@ -27,7 +27,7 @@ const ChoiceEditor = <R extends Table.Row, M extends Model.Model, C extends Mode
   const [editor] = useModelMenuEditor<R, M, C>(props);
 
   return (
-    <ModelTagEditor<C>
+    <ModelTagEditor<R, M, C>
       className={props.className}
       editor={editor}
       searchIndices={searchIndices}

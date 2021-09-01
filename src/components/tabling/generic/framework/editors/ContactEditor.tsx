@@ -6,23 +6,21 @@ import { framework } from "components/tabling/generic";
 
 import { ModelTagEditor } from "./generic";
 
-interface ContactEditorProps extends Table.EditorParams<Tables.SubAccountRow, Model.SubAccount> {
-  readonly onNewContact: (params: {
-    name?: string;
-    change: Omit<Table.CellChange<Tables.SubAccountRow, Model.SubAccount>, "newValue">;
-  }) => void;
+interface ContactEditorProps<R extends Table.Row, M extends Model.Model>
+  extends Table.EditorParams<R, M, Model.Contact> {
+  readonly onNewContact: (params: { name?: string; change: Omit<Table.CellChange<R, M>, "newValue"> }) => void;
 }
 
-const ContactEditor = (props: ContactEditorProps, ref: any) => {
+const ContactEditor = <R extends Table.Row, M extends Model.Model>(props: ContactEditorProps<R, M>, ref: any) => {
   const contacts = useContacts();
 
-  const [editor] = framework.editors.useModelMenuEditor<Tables.SubAccountRow, Model.SubAccount, Model.Contact, number>({
+  const [editor] = framework.editors.useModelMenuEditor<R, M, Model.Contact, number>({
     ...props,
     forwardedRef: ref
   });
 
   return (
-    <ModelTagEditor<Model.Contact, number>
+    <ModelTagEditor<R, M, Model.Contact, number>
       editor={editor}
       style={{ width: 160 }}
       selected={editor.value}
@@ -34,8 +32,9 @@ const ContactEditor = (props: ContactEditorProps, ref: any) => {
         {
           id: "add-contact",
           onClick: () => {
-            const row: Tables.SubAccountRow = props.node.data;
-            const searchValue = editor.getSearchValue();
+            const row: R = props.node.data;
+            const searchValue = editor.menu.current.getSearchValue();
+            editor.stopEditing(false);
             if (searchValue !== "") {
               props.onNewContact({
                 name: searchValue,

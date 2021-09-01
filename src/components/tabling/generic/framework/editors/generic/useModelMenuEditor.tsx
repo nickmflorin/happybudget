@@ -6,7 +6,15 @@ import { hooks, tabling, ui } from "lib";
 const KEY_BACKSPACE = 8;
 const KEY_DELETE = 46;
 
-export type IEditor<C extends Model.Model, V = C> = IMenuRef<C> & {
+interface UseModelMenuEditorParams<R extends Table.Row, M extends Model.Model, V> extends Table.EditorParams<R, M> {
+  readonly value: V | null;
+  readonly forwardedRef: RefObject<any>;
+}
+
+export type IEditor<R extends Table.Row, M extends Model.Model, C extends Model.Model, V = C> = Omit<
+  UseModelMenuEditorParams<R, M, V>,
+  "forwardedRef"
+> & {
   readonly onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
   readonly isFirstRender: boolean;
   readonly value: V | null;
@@ -14,14 +22,9 @@ export type IEditor<C extends Model.Model, V = C> = IMenuRef<C> & {
   readonly menu: NonNullRef<IMenuRef<C>>;
 };
 
-interface UseModelMenuEditorParams<R extends Table.Row, M extends Model.Model, V> extends Table.EditorParams<R, M> {
-  readonly value: V | null;
-  readonly forwardedRef: RefObject<any>;
-}
-
 const useModelMenuEditor = <R extends Table.Row, M extends Model.Model, C extends Model.Model, V = C>(
   params: UseModelMenuEditorParams<R, M, V>
-): [IEditor<C, V>] => {
+): [IEditor<R, M, C, V>] => {
   const menu = ui.hooks.useMenu<C>();
 
   const isFirstRender = ui.hooks.useTrackFirstRender();
@@ -65,11 +68,11 @@ const useModelMenuEditor = <R extends Table.Row, M extends Model.Model, C extend
 
   const wrapEditor = useMemo(() => {
     return {
+      ...params,
       isFirstRender,
       menu,
       value,
       changedEvent,
-      ...menu.current,
       focusSearch: menu.current.focusSearch,
       onChange: (model: V | null, e: Table.CellDoneEditingEvent, stopEditing = true) => {
         setStopEditingOnChangeEvent(stopEditing);
@@ -77,7 +80,7 @@ const useModelMenuEditor = <R extends Table.Row, M extends Model.Model, C extend
         setChangedEvent(e);
       }
     };
-  }, [value, menu.current]);
+  }, [value, menu]);
 
   useImperativeHandle(params.forwardedRef, () => {
     return {

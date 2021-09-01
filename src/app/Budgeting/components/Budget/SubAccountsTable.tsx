@@ -71,29 +71,31 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: SubAccountsTableProps)
           onCancel={() => setContactToEdit(null)}
         />
       )}
-      <CreateContactModal
-        visible={createContactModalVisible}
-        initialValues={initialContactFormValues}
-        onSuccess={(contact: Model.Contact) => {
-          setPreContactCreate(null);
-          setInitialContactFormValues(null);
-          setCreateContactModalVisible(false);
-          // If we have enough information from before the contact was created in the specific
-          // cell, combine that information with the new value to perform a table update, showing
-          // the created contact in the new cell.
-          if (!isNil(preContactCreate)) {
-            const cellChange: Table.CellChange<Tables.SubAccountRow, Model.SubAccount> = {
-              ...preContactCreate,
-              newValue: contact.id
-            };
-            props.tableRef.current.applyTableChange({
-              type: "dataChange",
-              payload: cellChange
-            });
-          }
-        }}
-        onCancel={() => setCreateContactModalVisible(false)}
-      />
+      {createContactModalVisible && (
+        <CreateContactModal
+          visible={true}
+          initialValues={initialContactFormValues}
+          onSuccess={(contact: Model.Contact) => {
+            setPreContactCreate(null);
+            setInitialContactFormValues(null);
+            setCreateContactModalVisible(false);
+            // If we have enough information from before the contact was created in the specific
+            // cell, combine that information with the new value to perform a table update, showing
+            // the created contact in the new cell.
+            if (!isNil(preContactCreate)) {
+              const cellChange: Table.CellChange<Tables.SubAccountRow, Model.SubAccount> = {
+                ...preContactCreate,
+                newValue: contact.id
+              };
+              props.tableRef.current.applyTableChange({
+                type: "dataChange",
+                payload: cellChange
+              });
+            }
+          }}
+          onCancel={() => setCreateContactModalVisible(false)}
+        />
+      )}
       <PreviewModal
         autoRenderPdf={false}
         visible={previewModalVisible}

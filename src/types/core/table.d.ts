@@ -362,9 +362,9 @@ namespace Table {
     readonly columnApi: import("@ag-grid-community/core").ColumnApi | null | undefined;
     readonly cellStartedEdit: boolean;
     readonly context: any;
+    readonly eGridCell: HTMLElement;
     readonly onKeyDown: (event: KeyboardEvent) => void;
     readonly stopEditing: (suppressNavigateAfterEdit?: boolean) => void;
-    readonly eGridCell: HTMLElement;
     readonly parseValue: (value: any) => any;
     readonly formatValue: (value: any) => any;
     // When the cell editor finishes editing, the AG Grid callback (onCellDoneEditing)

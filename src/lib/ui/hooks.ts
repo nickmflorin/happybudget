@@ -215,6 +215,8 @@ export const useDebouncedJSSearch = <T>(search: string | undefined, models: T[],
       return () => {
         debouncedSearch.cancel();
       };
+    } else {
+      setFilteredModels(models);
     }
   }, [search, useDeepEqualMemo(models)]);
 

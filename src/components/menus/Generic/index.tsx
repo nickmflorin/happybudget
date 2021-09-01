@@ -60,7 +60,6 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   const [_search, _setSearch] = useState("");
   const search = useMemo(() => (!isNil(props.search) ? props.search : _search), [props.search, _search]);
   const mode = useMemo(() => (!isNil(props.mode) ? props.mode : "single"), [props]);
-
   const setSearch = useMemo(
     () => (value: string) => {
       _setSearch(value);
@@ -89,17 +88,10 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   }, [hooks.useDeepEqualMemo(props.models)]);
 
   // This will only perform searching if clientSearching is not false.
-  const _filteredModels = ui.hooks.useDebouncedJSSearch<M>(search, _flattenedModels, {
+  const models = ui.hooks.useDebouncedJSSearch<M>(search, _flattenedModels, {
     indices: props.searchIndices || ["id"],
     disabled: props.includeSearch !== true || props.clientSearching !== true
   });
-
-  const models = useMemo<M[]>(() => {
-    if (props.clientSearching === true) {
-      return _filteredModels;
-    }
-    return _flattenedModels;
-  }, [hooks.useDeepEqualMemo(_filteredModels), hooks.useDeepEqualMemo(_flattenedModels), props.clientSearching]);
 
   const indexMap = useMemo<{ [key: string]: number }>(() => {
     const mapping: { [key: string]: number } = {};
@@ -246,10 +238,28 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   }, [noData, noSearchResults, props.search, props.extra]);
 
   useEffect(() => {
+    const scrollIndexIntoView = (index: number) => {
+      const m: M = models[index];
+      const menuElement = document.getElementById(menuId);
+      if (!isNil(menuElement) && !isNil(m)) {
+        const item = document.getElementById(`${menuId}-item-${m.id}`);
+        if (!isNil(item)) {
+          const top = menuElement.scrollTop;
+          const bottom = menuElement.scrollTop + menuElement.clientHeight;
+          const itemTop = item.offsetTop;
+          const itemBottom = item.offsetTop + item.clientHeight;
+          if (itemTop < top) {
+            menuElement.scrollTop -= top - itemTop;
+          } else if (itemBottom > bottom) {
+            menuElement.scrollTop += itemBottom - bottom;
+          }
+        }
+      }
+    };
     if (isMenuFocusedState(internalState)) {
       scrollIndexIntoView(internalState.index);
     }
-  }, [internalState]);
+  }, [internalState, menuId]);
 
   useEffect(() => {
     if (props.defaultFocusFirstItem === true && firstRender === true && models.length !== 0 && selected.length === 0) {
@@ -364,25 +374,6 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
   );
 
   const state = useMemo(() => stateFromSelected(selected), [selected, stateFromSelected]);
-
-  const scrollIndexIntoView = (index: number) => {
-    const m: M = props.models[index];
-    const menuElement = document.getElementById(menuId);
-    if (!isNil(menuElement) && !isNil(m)) {
-      const item = document.getElementById(`menu-${menuId}-item-${m.id}`);
-      if (!isNil(item)) {
-        const top = menuElement.scrollTop;
-        const bottom = menuElement.scrollTop + menuElement.clientHeight;
-        const itemTop = item.offsetTop;
-        const itemBottom = item.offsetTop + item.clientHeight;
-        if (itemTop < top) {
-          menuElement.scrollTop -= top - itemTop;
-        } else if (itemBottom > bottom) {
-          menuElement.scrollTop += itemBottom - bottom;
-        }
-      }
-    }
-  };
 
   const incrementFocusedIndex = hooks.useDynamicCallback(() => {
     if (isMenuFocusedState(internalState)) {
@@ -502,9 +493,9 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
           />
         </div>
       </ShowHide>
-      <div className={"ul-wrapper"}>
+      <div className={"ul-wrapper"} id={menuId}>
         <RenderWithSpinner loading={props.loading} size={22}>
-          <ul id={!isNil(props.id) ? props.id : menuId}>
+          <ul>
             <React.Fragment>
               <MenuItems<M>
                 models={map(topLevelModelItems, (item: GenericModelItem<M>) => item.model)}

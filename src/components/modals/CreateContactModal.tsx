@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { isNil } from "lodash";
@@ -20,6 +20,8 @@ interface CreateContactModalProps {
   readonly onSuccess: (contact: Model.Contact) => void;
 }
 
+const MemoizedContactForm = React.memo(ContactForm);
+
 const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
   const [image, setImage] = useState<UploadedImage | null>(null);
   const [firstName, setFirstName] = useState<string | null>(null);
@@ -29,10 +31,13 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
   const dispatch: Dispatch = useDispatch();
 
   useEffect(() => {
-    if (visible === true) {
+    return () => {
+      setFirstName(null);
+      setLastName(null);
+      setImage(null);
       form.resetFields();
-    }
-  }, [visible]);
+    };
+  }, []);
 
   return (
     <Modal.Modal
@@ -82,7 +87,7 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
           });
       }}
     >
-      <ContactForm
+      <MemoizedContactForm
         form={form}
         initialValues={initialValues}
         onFirstNameChange={(value: string) => setFirstName(value)}

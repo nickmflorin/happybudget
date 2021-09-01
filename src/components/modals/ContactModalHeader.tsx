@@ -1,3 +1,5 @@
+import React from "react";
+
 import { UploadUserImage } from "components/uploaders";
 import { UploadUserImageProps } from "components/uploaders/UploadUserImage";
 
@@ -15,4 +17,4 @@ const ContactModalHeader = (props: ContactModalHeaderProps): JSX.Element => {
   );
 };
 
-export default ContactModalHeader;
+export default React.memo(ContactModalHeader);

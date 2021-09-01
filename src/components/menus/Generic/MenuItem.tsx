@@ -128,7 +128,7 @@ const PrivateRecursiveMenuItem = <M extends MenuItemModel>(
 ): JSX.Element => {
   return (
     <React.Fragment>
-      <MenuItem {...props} />
+      <MenuItem {...props} id={`menu-${props.menuId}-item-${props.model.id}`} />
       {model.typeguards.isModelWithChildren(props.model) &&
         /* eslint-disable indent */
         props.model.children.length !== 0 &&

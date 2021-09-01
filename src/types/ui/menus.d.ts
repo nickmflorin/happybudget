@@ -49,7 +49,7 @@ interface ICommonMenuItem<M extends MenuItemModel> extends Omit<StandardComponen
   readonly closeParentDropdown?: () => void;
 }
 
-interface IMenuItem<M extends MenuItemModel> extends Omit<StandardComponentProps, "id">, ICommonMenuItem<M> {
+interface IMenuItem<M extends MenuItemModel> extends StandardComponentProps, ICommonMenuItem<M> {
   readonly level: number;
   readonly selected: boolean;
   readonly checkbox?: boolean;

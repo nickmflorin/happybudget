@@ -2,14 +2,17 @@ import classNames from "classnames";
 import { ModelTagsMenu, ModelTagsMenuProps } from "components/menus";
 import { IEditor } from "./useModelMenuEditor";
 
-export interface ModelTagEditorProps<M extends Model.Model, V = M> extends ModelTagsMenuProps<M> {
+export interface ModelTagEditorProps<R extends Table.Row, M extends Model.Model, C extends Model.Model, V = M>
+  extends ModelTagsMenuProps<C> {
   readonly searchIndices: SearchIndicies;
-  readonly editor: IEditor<M, V>;
+  readonly editor: IEditor<R, M, C, V>;
 }
 
-const ModelTagEditor = <M extends Model.Model, V = M>(props: ModelTagEditorProps<M, V>) => {
+const ModelTagEditor = <R extends Table.Row, M extends Model.Model, C extends Model.Model, V = C>(
+  props: ModelTagEditorProps<R, M, C, V>
+) => {
   return (
-    <ModelTagsMenu<M>
+    <ModelTagsMenu<C>
       defaultFocusOnlyItem={true}
       menu={props.editor.menu}
       includeSearch={true}

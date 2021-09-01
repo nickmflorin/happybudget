@@ -43,7 +43,7 @@ const withAutoFocusInput =
         inputRef.current.focus();
       }
     }, [isNil(inputRef.current)]);
-    return <Component {...props} ref={inputRef} />;
+    return <Component {...props} ref={inputRef} autoFocus={true} />;
   };
 
 /**
@@ -105,18 +105,18 @@ const withFormItemFirstInputFocused = <
             }
             onChange={(e: React.ChangeEvent<HTMLInputElement> | number) => {
               /*
-                This is necessary in order to get changes to the fields of the <Form.Item>
-                to reflect in the Form data.  Normally, AntD handles this for us - but since
-                we are messing with the Form.Item structure here, we have to do it ourselves.
+              This is necessary in order to get changes to the fields of the <Form.Item>
+              to reflect in the Form data.  Normally, AntD handles this for us - but since
+              we are messing with the Form.Item structure here, we have to do it ourselves.
 
-                Because this onChange handler can be used for many different input types, the
-                event may or may not be a traditional React.ChangeEvent.  For example, if the
-                input element is a Select component, the event will just be the value of the
-                chosen Select.Option.
+              Because this onChange handler can be used for many different input types, the
+              event may or may not be a traditional React.ChangeEvent.  For example, if the
+              input element is a Select component, the event will just be the value of the
+              chosen Select.Option.
 
-                We could restrict the behavior to only apply to children input elements of
-                type <Input />, but that does not seem to be possible due to uses of
-                forwardRef (see above explanation).
+              We could restrict the behavior to only apply to children input elements of
+              type <Input />, but that does not seem to be possible due to uses of
+              forwardRef (see above explanation).
               */
               const value = isChangeEvent(e) ? e.target.value : e;
               if (!isNil(props.name)) {
@@ -136,7 +136,7 @@ const withFormItemFirstInputFocused = <
     const newProps = { ...props, children: newChildren.length === 1 ? newChildren[0] : newChildren };
     return <Component {...newProps} />;
   };
-  return FormItem;
+  return React.memo(FormItem);
 };
 
 const PrivateForm = <T extends { [key: string]: any } = any>(
