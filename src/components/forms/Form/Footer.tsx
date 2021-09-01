@@ -1,5 +1,10 @@
 import classNames from "classnames";
-import { FormFooterProps } from "./model";
+
+export interface FormFooterProps extends StandardComponentProps {
+  readonly children: JSX.Element[] | JSX.Element;
+  readonly style?: React.CSSProperties;
+  readonly className?: string;
+}
 
 const Footer = ({ children, className, style = {} }: FormFooterProps) => {
   return (

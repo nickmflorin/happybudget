@@ -5,7 +5,6 @@ import { Form } from "components";
 import { Button } from "components/buttons";
 import { Input } from "components/fields";
 import { UploadUserImage } from "components/uploaders";
-import { FormProps } from "components/forms/Form";
 import { TimezoneSelect } from "../fields";
 
 interface UserProfileFormProps extends FormProps<Http.UserPayload> {

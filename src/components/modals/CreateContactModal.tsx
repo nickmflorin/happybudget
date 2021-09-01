@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { Dispatch } from "redux";
 import { isNil } from "lodash";
@@ -10,7 +10,7 @@ import { Form } from "components";
 import { ContactForm } from "components/forms";
 import { Modal } from "components";
 
-import ContactModalHeader from "./ContactModalHeader";
+import ContactModalHeader, { IContactModalHeaderRef } from "./ContactModalHeader";
 import "./ContactModal.scss";
 
 interface CreateContactModalProps {
@@ -24,20 +24,37 @@ const MemoizedContactForm = React.memo(ContactForm);
 
 const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: CreateContactModalProps): JSX.Element => {
   const [image, setImage] = useState<UploadedImage | null>(null);
-  const [firstName, setFirstName] = useState<string | null>(null);
-  const [lastName, setLastName] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm<Http.ContactPayload>({ isInModal: true, autoFocusField: 1 });
   const dispatch: Dispatch = useDispatch();
+  /*
+  Note: We have to use a ref here, instead of storing firstName and lastName in the state
+  of this component, because if we were storing it in this component, when the firstName and
+  lastName change it causes the entire component to rerender, and AntD rerenders all form fields
+  when the form rerenders, which causes the auto focus to be lost on the first and last name fields.
+  */
+  const headerRef = useRef<IContactModalHeaderRef | null>(null);
 
   useEffect(() => {
     return () => {
-      setFirstName(null);
-      setLastName(null);
+      headerRef.current?.setFirstName(null);
+      headerRef.current?.setLastName(null);
       setImage(null);
       form.resetFields();
     };
   }, []);
+
+  const onValuesChange = useMemo(
+    () => (changedValues: Partial<Http.ContactPayload>, values: Http.ContactPayload) => {
+      if (!isNil(changedValues.first_name)) {
+        headerRef.current?.setFirstName(changedValues.first_name);
+      }
+      if (!isNil(changedValues.last_name)) {
+        headerRef.current?.setLastName(changedValues.last_name);
+      }
+    },
+    []
+  );
 
   return (
     <Modal.Modal
@@ -45,10 +62,9 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
       title={
         <ContactModalHeader
           value={image}
+          ref={headerRef}
           onChange={(f: UploadedImage | null) => setImage(f)}
           onError={(error: Error | string) => form.setGlobalError(error)}
-          firstName={firstName}
-          lastName={lastName}
         />
       }
       visible={visible}
@@ -87,12 +103,7 @@ const CreateContactModal = ({ visible, initialValues, onCancel, onSuccess }: Cre
           });
       }}
     >
-      <MemoizedContactForm
-        form={form}
-        initialValues={initialValues}
-        onFirstNameChange={(value: string) => setFirstName(value)}
-        onLastNameChange={(value: string) => setLastName(value)}
-      />
+      <MemoizedContactForm form={form} initialValues={initialValues} onValuesChange={onValuesChange} />
     </Modal.Modal>
   );
 };

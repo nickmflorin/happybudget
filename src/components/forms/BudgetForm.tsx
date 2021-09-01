@@ -3,7 +3,6 @@ import { isNil } from "lodash";
 
 import { Form } from "components";
 import { Input } from "components/fields";
-import { FormProps } from "components/forms/Form";
 import { UploadBudgetImage } from "components/uploaders";
 import "./BudgetForm.scss";
 

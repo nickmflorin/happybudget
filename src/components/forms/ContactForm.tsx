@@ -5,25 +5,10 @@ import { model } from "lib";
 
 import { Form, Icon } from "components";
 import { Input, Select } from "components/fields";
-import { FormProps } from "components/forms/Form";
 import { PhoneNumberInput } from "../fields";
 import "./ContactForm.scss";
 
-interface ContactFormProps extends FormProps<Http.ContactPayload> {
-  // These are needed so that the ContactModal can hook into them and displayed the
-  // updated name in real time.
-  readonly onFirstNameChange: (value: string) => void;
-  readonly onLastNameChange: (value: string) => void;
-}
-
-const ContactForm: React.FC<ContactFormProps> = ({
-  form,
-  onFirstNameChange,
-  onLastNameChange,
-  initialValues,
-  globalError,
-  ...props
-}) => {
+const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialValues, globalError, ...props }) => {
   return (
     <Form.Form
       {...props}
@@ -43,10 +28,10 @@ const ContactForm: React.FC<ContactFormProps> = ({
         </Select>
       </Form.Item>
       <Form.Item name={"first_name"} label={"First Name"}>
-        <Input onChange={(e: React.ChangeEvent<HTMLInputElement>) => onFirstNameChange(e.target.value)} />
+        <Input />
       </Form.Item>
       <Form.Item name={"last_name"} label={"Last Name"}>
-        <Input onChange={(e: React.ChangeEvent<HTMLInputElement>) => onLastNameChange(e.target.value)} />
+        <Input />
       </Form.Item>
       <Form.Item name={"company"} label={"Company"}>
         <Input />

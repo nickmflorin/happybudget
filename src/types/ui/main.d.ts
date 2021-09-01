@@ -3,6 +3,7 @@
 /// <reference path="./tagging.d.ts" />
 /// <reference path="./style.d.ts" />
 /// <reference path="./table.d.ts" />
+/// <reference path="./forms.d.ts" />
 
 type Order = 1 | -1 | 0;
 type DefinitiveOrder = 1 | -1;

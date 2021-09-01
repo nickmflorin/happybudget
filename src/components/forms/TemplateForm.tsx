@@ -2,7 +2,6 @@ import React from "react";
 
 import { Form } from "components";
 import { Input } from "components/fields";
-import { FormProps } from "components/forms/Form";
 import { UploadBudgetImage } from "components/uploaders";
 import "./TemplateForm.scss";
 

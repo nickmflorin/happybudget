@@ -5,7 +5,6 @@ import { model } from "lib";
 
 import { Form } from "components";
 import { Input } from "components/fields";
-import { FormProps } from "components/forms/Form";
 import { ColorSelect } from "../fields";
 
 const GroupForm: React.FC<FormProps<Http.GroupPayload>> = ({ ...props }) => {

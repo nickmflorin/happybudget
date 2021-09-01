@@ -1,20 +1,34 @@
-import React from "react";
+import React, { useState, useImperativeHandle, forwardRef, ForwardedRef } from "react";
 
 import { UploadUserImage } from "components/uploaders";
 import { UploadUserImageProps } from "components/uploaders/UploadUserImage";
 
-interface ContactModalHeaderProps extends StandardComponentProps, UploadUserImageProps {}
+interface ContactModalHeaderProps
+  extends StandardComponentProps,
+    Omit<UploadUserImageProps, "firstName" | "lastName"> {}
 
-const ContactModalHeader = (props: ContactModalHeaderProps): JSX.Element => {
+export interface IContactModalHeaderRef {
+  readonly setFirstName: (v: string | null) => void;
+  readonly setLastName: (v: string | null) => void;
+}
+
+const ContactModalHeader = (props: ContactModalHeaderProps, ref: ForwardedRef<IContactModalHeaderRef>): JSX.Element => {
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const [lastName, setLastName] = useState<string | null>(null);
+  useImperativeHandle(ref, () => ({
+    setFirstName,
+    setLastName
+  }));
   return (
     <div className={"contact-modal-header"}>
-      <UploadUserImage {...props} />
+      <UploadUserImage {...props} firstName={firstName} lastName={lastName} />
       <div className={"contact-name-wrapper"}>
-        <div className={"contact-name"}>{props.firstName}</div>
-        <div className={"contact-name"}>{props.lastName}</div>
+        <div className={"contact-name"}>{firstName}</div>
+        <div className={"contact-name"}>{lastName}</div>
       </div>
     </div>
   );
 };
 
-export default React.memo(ContactModalHeader);
+const Forwarded = forwardRef(ContactModalHeader);
+export default React.memo(Forwarded);

@@ -10,14 +10,11 @@ import { ui } from "lib";
 import Error from "./Error";
 import FieldError from "./FieldError";
 import Footer from "./Footer";
-import { FormProps } from "./model";
 import useForm from "./useForm";
 import FormItemStyle from "./FormItemStyle";
 import FormItemSection from "./FormItemSection";
 import FormItemComp from "./FormItem";
 import FormLabel from "./FormLabel";
-
-export * from "./model";
 
 interface PrivateFormProps<T = any> extends FormProps<T> {
   children: JSX.Element[] | JSX.Element;

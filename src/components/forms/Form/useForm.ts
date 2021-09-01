@@ -3,7 +3,6 @@ import { isNil, forEach, find } from "lodash";
 import { Form as RootForm } from "antd";
 import * as api from "api";
 import { util } from "lib";
-import { FormInstance } from "./model";
 
 const useForm = <T>(form?: Partial<FormInstance<T>> | undefined) => {
   const _useAntdForm = RootForm.useForm();

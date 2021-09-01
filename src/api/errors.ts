@@ -10,27 +10,6 @@ export enum HttpErrorTypes {
   AUTHENTICATION = "AUTHENTICATION"
 }
 
-export interface IHttpNetworkError {
-  readonly url?: string;
-}
-
-export interface IHttpServerError {
-  readonly url?: string;
-}
-
-export interface IHttpClientError {
-  readonly url: string;
-  readonly status: number;
-  readonly response: AxiosResponse<any>;
-  readonly errors: any;
-}
-
-export interface IHttpAuthenticationError {
-  readonly url: string;
-  readonly response: AxiosResponse<any>;
-  readonly errors: any;
-}
-
 export class ForceLogout extends Error {}
 
 /**
@@ -70,7 +49,7 @@ export class HttpError extends Error {}
  * the errors for individual fields have the potential to contain more than 1
  * detail.
  */
-export class ClientError extends HttpError implements IHttpClientError {
+export class ClientError extends HttpError implements Http.IHttpClientError {
   public static type = HttpErrorTypes.CLIENT;
   public status: number;
   public url: string;
@@ -95,7 +74,7 @@ export class ClientError extends HttpError implements IHttpClientError {
   }
 }
 
-export class AuthenticationError extends ClientError implements IHttpAuthenticationError {
+export class AuthenticationError extends ClientError implements Http.IHttpAuthenticationError {
   constructor(response: AxiosResponse<any>, errors: Http.Error[], url: string) {
     super(response, errors, 403, url);
   }
@@ -106,7 +85,7 @@ export class AuthenticationError extends ClientError implements IHttpAuthenticat
  * but the response status code is >= 500.  This can occur due to Internal
  * Server Errors.
  */
-export class ServerError extends HttpError implements IHttpServerError {
+export class ServerError extends HttpError implements Http.IHttpServerError {
   public static type = HttpErrorTypes.SERVER;
   public url?: string;
   public status: number;
@@ -129,7 +108,7 @@ export class ServerError extends HttpError implements IHttpServerError {
  * A NetworkError refers to a HTTP request error where there is no response.
  * This can occur when the server is down or there are connectivity issues.
  */
-export class NetworkError extends HttpError implements IHttpNetworkError {
+export class NetworkError extends HttpError implements Http.IHttpNetworkError {
   public static type = HttpErrorTypes.NETWORK;
   public url?: string | undefined;
 

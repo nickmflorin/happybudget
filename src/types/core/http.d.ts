@@ -54,6 +54,29 @@ namespace Http {
     readonly message: string;
   }
 
+  interface IHttpNetworkError {
+    readonly url?: string;
+  }
+
+  interface IHttpServerError {
+    readonly url?: string;
+  }
+
+  interface IHttpClientError {
+    readonly message: string;
+    readonly name: string;
+    readonly url: string;
+    readonly status: number;
+    readonly response: import("axios").AxiosResponse<any>;
+    readonly errors: any;
+  }
+
+  interface IHttpAuthenticationError {
+    readonly url: string;
+    readonly response: import("axios").AxiosResponse<any>;
+    readonly errors: any;
+  }
+
   interface UnknownError extends BaseError {
     readonly error_type: "unknown";
   }

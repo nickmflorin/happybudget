@@ -15,7 +15,6 @@ import { UploadPdfImage } from "components/uploaders";
 import { EntityText } from "components/typography";
 import { Editor } from "components/richtext";
 import { EntityTextDescription } from "components/typography/EntityText";
-import { FormProps } from "components/forms/Form";
 
 import HeaderTemplateSaveForm, { IHeaderTemplateSaveFormRef } from "./HeaderTemplateSaveForm";
 import useHeaderTemplate from "./useHeaderTemplate";
