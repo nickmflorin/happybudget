@@ -153,6 +153,13 @@ form {
     }
   }
 
+  .form-column-item {
+    .icon-wrapper {
+      width: 26px;
+      padding: 6px;
+    }
+  }
+
   .ant-form-item-has-error {
     .ant-form-item-control {
       .ant-form-item-control-input {

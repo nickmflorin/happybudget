@@ -15,6 +15,7 @@ import FormItemStyle from "./FormItemStyle";
 import FormItemSection from "./FormItemSection";
 import FormItemComp from "./FormItem";
 import FormLabel from "./FormLabel";
+import FormColumnItem from "./FormColumnItem";
 
 interface PrivateFormProps<T = any> extends FormProps<T> {
   children: JSX.Element[] | JSX.Element;
@@ -240,6 +241,7 @@ const exportable = {
   useForm: useForm,
   Footer: Footer,
   Item: FormItemComp,
+  ColumnItem: FormColumnItem,
   ItemStyle: FormItemStyle,
   ItemSection: FormItemSection,
   Label: FormLabel

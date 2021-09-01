@@ -18,7 +18,7 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
       layout={"vertical"}
       initialValues={initialValues}
     >
-      <Form.Item name={"type"} label={"Type"}>
+      <Form.ColumnItem name={"type"} label={"Type"} columnType={"singleSelect"}>
         <Select suffixIcon={<Icon icon={"caret-down"} weight={"solid"} />} placeholder={"Select Type"}>
           {model.models.ContactTypes.map((m: Model.ContactType, index: number) => (
             <Select.Option key={index} value={m.id}>
@@ -26,31 +26,31 @@ const ContactForm: React.FC<FormProps<Http.ContactPayload>> = ({ form, initialVa
             </Select.Option>
           ))}
         </Select>
-      </Form.Item>
-      <Form.Item name={"first_name"} label={"First Name"}>
+      </Form.ColumnItem>
+      <Form.ColumnItem name={"first_name"} label={"First Name"} columnType={"text"}>
         <Input />
-      </Form.Item>
-      <Form.Item name={"last_name"} label={"Last Name"}>
+      </Form.ColumnItem>
+      <Form.ColumnItem name={"last_name"} label={"Last Name"} columnType={"text"}>
         <Input />
-      </Form.Item>
-      <Form.Item name={"company"} label={"Company"}>
+      </Form.ColumnItem>
+      <Form.ColumnItem name={"company"} label={"Company"} columnType={"text"}>
         <Input />
-      </Form.Item>
-      <Form.Item name={"position"} label={"Job Title"}>
+      </Form.ColumnItem>
+      <Form.ColumnItem name={"position"} label={"Job Title"} columnType={"text"}>
         <Input />
-      </Form.Item>
-      <Form.Item name={"city"} label={"City"}>
+      </Form.ColumnItem>
+      <Form.ColumnItem name={"city"} label={"City"} columnType={"text"}>
         <Input />
-      </Form.Item>
-      <Form.Item name={"email"} label={"Email"}>
+      </Form.ColumnItem>
+      <Form.ColumnItem name={"email"} label={"Email"} columnType={"email"}>
         <Input />
-      </Form.Item>
-      <Form.Item name={"phone_number"} label={"Phone Number"}>
+      </Form.ColumnItem>
+      <Form.ColumnItem name={"phone_number"} label={"Phone Number"} columnType={"phone"}>
         <PhoneNumberInput />
-      </Form.Item>
-      <Form.Item name={"rate"} label={"Rate"}>
+      </Form.ColumnItem>
+      <Form.ColumnItem name={"rate"} label={"Rate"} columnType={"currency"}>
         <Input />
-      </Form.Item>
+      </Form.ColumnItem>
     </Form.Form>
   );
 };
