@@ -54,7 +54,7 @@ const TextStyles: Pdf.ExtensionStyles = {
   italic: { fontStyle: "italic" },
   uppercase: { textTransform: "uppercase" },
   header: { ext: ["text"], fontFamily: "AvenirNext" },
-  paragraph: { ext: ["text"], fontFamily: "Roboto", fontSize: 11, lineHeight: "1.5pt" },
+  paragraph: { ext: ["text"], fontFamily: "AvenirNext", fontSize: 11, lineHeight: "1.5pt" },
   h1: {
     ext: ["header"],
     fontWeight: 700,
@@ -139,7 +139,7 @@ const TableStyles: Pdf.ExtensionStyles = {
     display: "table",
     width: "auto",
     backgroundColor: "white",
-    fontFamily: "Roboto"
+    fontFamily: "AvenirNext"
   },
   tr: {
     flexDirection: "row",
@@ -248,7 +248,7 @@ const TableStyles: Pdf.ExtensionStyles = {
   "group-tr-td-text": { color: "#595959", fontWeight: 700 },
   "footer-tr-td-text": { color: "#595959", fontWeight: 700, marginTop: 6 },
   "detail-tr-td-text": { fontWeight: 300, color: "#000000" },
-  "account-sub-header-tr-td-text": { color: "#595959", fontWeight: 700 },
+  "account-sub-header-tr-td-text": { color: "#595959", fontWeight: 700, marginTop: 6 },
   "subaccount-tr-td-text": {},
   "subaccount-footer-tr-td-text": {}
 };

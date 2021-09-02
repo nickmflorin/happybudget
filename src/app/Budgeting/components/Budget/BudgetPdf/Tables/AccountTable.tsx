@@ -30,7 +30,7 @@ const AccountTable = ({
   const accountSubHeaderRow = useMemo(() => {
     const row: { [key: string]: any } = {};
     forEach(columns, (column: ColumnType) => {
-      if (!isNil(account[column.field as keyof Model.PdfAccount]) && column.tableColumnType === "calculated") {
+      if (!isNil(account[column.field as keyof Model.PdfAccount])) {
         row[column.field as keyof Model.PdfAccount] = account[column.field as keyof Model.PdfAccount];
       } else {
         row[column.field as keyof Model.PdfAccount] = null;
