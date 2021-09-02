@@ -32,11 +32,11 @@ export const useMenuIfNotDefined = <M extends Model.M>(menu?: NonNullRef<IMenuRe
   return returnRef;
 };
 
-export const useLessThanBreakpoint = (id: BreakpointId): boolean => {
+export const useLessThanBreakpoint = (id: Style.BreakpointId): boolean => {
   return useMediaQuery({ query: `(max-width: ${Breakpoints[id]}px)` });
 };
 
-export const useGreaterThanBreakpoint = (id: BreakpointId): boolean => {
+export const useGreaterThanBreakpoint = (id: Style.BreakpointId): boolean => {
   return useMediaQuery({ query: `(min-width: ${Breakpoints[id]}px)` });
 };
 

@@ -22,10 +22,10 @@ export function* getCommentsTask(action: Redux.Action): SagaIterator {
       // TODO: We will have to build in pagination.
       const response = yield call(api.getBudgetComments, budgetId, { cancelToken: source.token });
       yield put(actions.responseCommentsAction(response));
-    } catch (e) {
+    } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error retrieving the budget's comments.");
-        yield put(actions.responseCommentsAction({ count: 0, data: [] }, { error: e }));
+        api.handleRequestError(e as Error, "There was an error retrieving the budget's comments.");
+        yield put(actions.responseCommentsAction({ count: 0, data: [] }, { error: e as Error }));
       }
     } finally {
       yield put(actions.loadingCommentsAction(false));
@@ -55,9 +55,9 @@ export function* submitCommentTask(action: Redux.Action<{ parent?: number; data:
         response = yield call(api.createBudgetComment, budgetId, data, { cancelToken: source.token });
       }
       yield put(actions.addCommentToStateAction({ data: response, parent }));
-    } catch (e) {
+    } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error submitting the comment.");
+        api.handleRequestError(e as Error, "There was an error submitting the comment.");
       }
     } finally {
       if (!isNil(parent)) {
@@ -80,9 +80,9 @@ export function* deleteCommentTask(action: Redux.Action<number>): SagaIterator {
     try {
       yield call(api.deleteComment, action.payload, { cancelToken: source.token });
       yield put(actions.removeCommentFromStateAction(action.payload));
-    } catch (e) {
+    } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error deleting the comment.");
+        api.handleRequestError(e as Error, "There was an error deleting the comment.");
       }
     } finally {
       yield put(actions.deletingCommentAction({ id: action.payload, value: false }));
@@ -106,9 +106,9 @@ export function* editCommentTask(action: Redux.Action<Redux.UpdateModelActionPay
         cancelToken: source.token
       });
       yield put(actions.updateCommentInStateAction({ id, data: response }));
-    } catch (e) {
+    } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error updating the comment.");
+        api.handleRequestError(e as Error, "There was an error updating the comment.");
       }
     } finally {
       yield put(actions.updatingCommentAction({ id, value: false }));
@@ -133,9 +133,9 @@ export function* getHistoryTask(action: Redux.Action<null>): SagaIterator {
         { cancelToken: source.token }
       );
       yield put(actions.responseAccountsHistoryAction(response));
-    } catch (e) {
+    } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error retrieving the accounts history.");
+        api.handleRequestError(e as Error, "There was an error retrieving the accounts history.");
       }
     } finally {
       yield put(actions.loadingAccountsHistoryAction(false));

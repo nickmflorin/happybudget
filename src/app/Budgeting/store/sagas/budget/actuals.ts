@@ -44,9 +44,9 @@ function* bulkCreateTask(budgetId: number, e: Table.RowAddEvent<R, C>, errorMess
     );
     yield all(response.children.map((actual: C) => put(actions.addActualToStateAction(actual))));
     yield put(updateBudgetInStateAction(response.data));
-  } catch (err) {
+  } catch (err: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(err, errorMessage);
+      api.handleRequestError(err as Error, errorMessage);
     }
   } finally {
     yield put(actions.creatingActualAction(false));
@@ -72,9 +72,9 @@ function* bulkUpdateTask(
       cancelToken: source.token
     });
     yield put(updateBudgetInStateAction(response.data));
-  } catch (err) {
+  } catch (err: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(err, errorMessage);
+      api.handleRequestError(err as Error, errorMessage);
     }
   } finally {
     yield all(
@@ -102,9 +102,9 @@ function* bulkDeleteTask(budgetId: number, e: Table.RowDeleteEvent<R, C>, errorM
         cancelToken: source.token
       });
       yield put(updateBudgetInStateAction(response.data));
-    } catch (err) {
+    } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err, errorMessage);
+        api.handleRequestError(err as Error, errorMessage);
       }
     } finally {
       yield all(ids.map((id: number) => put(actions.deletingActualAction({ id, value: false }))));
@@ -171,10 +171,10 @@ function* getActualsTask(action: Redux.Action<null>): SagaIterator {
           "There was an error creating the actuals."
         );
       }
-    } catch (e) {
+    } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error retrieving the budget's actuals.");
-        yield put(actions.responseActualsAction({ count: 0, data: [] }, { error: e }));
+        api.handleRequestError(e as Error, "There was an error retrieving the budget's actuals.");
+        yield put(actions.responseActualsAction({ count: 0, data: [] }, { error: e as Error }));
       }
     } finally {
       yield put(actions.loadingActualsAction(false));
@@ -205,10 +205,10 @@ function* getSubAccountsTreeTask(action: Redux.Action<null>): SagaIterator {
           { cancelToken: source.token }
         );
         yield put(actions.responseSubAccountsTreeAction(response));
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving the budget's items.");
-          yield put(actions.responseSubAccountsTreeAction({ count: 0, data: [] }, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving the budget's items.");
+          yield put(actions.responseSubAccountsTreeAction({ count: 0, data: [] }, { error: e as Error }));
         }
       } finally {
         yield put(actions.loadingSubAccountsTreeAction(false));

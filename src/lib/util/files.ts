@@ -20,9 +20,9 @@ export const getBase64 = (file: File | Blob): Promise<string | ArrayBuffer> =>
 
 export const getBase64FromUrl = (url: string): Promise<string | ArrayBuffer> =>
   new Promise((resolve, reject) => {
-    var xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.onload = function () {
-      var reader = new FileReader();
+      const reader = new FileReader();
       reader.readAsDataURL(xhr.response);
       reader.onload = () =>
         reader.result === null ? reject("Could not determine base64 encoding from URL.") : resolve(reader.result);
@@ -51,7 +51,7 @@ export const stringIsBase64 = (value: string): boolean => {
   }
   try {
     return btoa(atob(value)) === value;
-  } catch (err) {
+  } catch (err: unknown) {
     return false;
   }
 };
@@ -152,8 +152,8 @@ export const downloadAsCsvFile = async (filename: string, data: CSVData) => {
     return finalVal + "\n";
   };
 
-  var csvFile = "";
-  for (var i = 0; i < data.length; i++) {
+  let csvFile = "";
+  for (let i = 0; i < data.length; i++) {
     csvFile += processRow(data[i]);
   }
 
@@ -161,22 +161,18 @@ export const downloadAsCsvFile = async (filename: string, data: CSVData) => {
     filename = `${filename}.csv`;
   }
 
-  var blob = new Blob([csvFile], { type: "text/csv;charset=utf-8;" });
-  if (navigator.msSaveBlob) {
-    // IE 10+
-    navigator.msSaveBlob(blob, filename);
-  } else {
-    var link = document.createElement("a");
-    if (link.download !== undefined) {
-      // Feature detection: Browsers that support HTML5 download attribute
-      var url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute("download", filename);
-      link.style.visibility = "hidden";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
+  const blob = new Blob([csvFile], { type: "text/csv;charset=utf-8;" });
+
+  const link = document.createElement("a");
+  if (link.download !== undefined) {
+    // Feature detection: Browsers that support HTML5 download attribute
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 };
 

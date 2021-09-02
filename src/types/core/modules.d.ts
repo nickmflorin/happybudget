@@ -4,8 +4,6 @@
 /// <reference path="./table.d.ts" />
 /// <reference path="./redux.d.ts" />
 
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Modules {
 
   namespace Authenticated {

@@ -25,13 +25,13 @@ export function* getSubAccountUnitsTask(action: Redux.Action): SagaIterator {
         action
       )
     );
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error retrieving the budget's sub-account units.");
+      api.handleRequestError(e as Error, "There was an error retrieving the budget's sub-account units.");
       yield put(
         redux.actions.toggleActionOnAuthentication(
-          actions.authenticated.responseSubAccountUnitsAction({ count: 0, data: [] }, { error: e }),
-          actions.unauthenticated.responseSubAccountUnitsAction({ count: 0, data: [] }, { error: e }),
+          actions.authenticated.responseSubAccountUnitsAction({ count: 0, data: [] }, { error: e as Error }),
+          actions.unauthenticated.responseSubAccountUnitsAction({ count: 0, data: [] }, { error: e as Error }),
           action
         )
       );
@@ -69,13 +69,13 @@ export function* getContactsTask(action: Redux.Action): SagaIterator {
         action
       )
     );
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error retrieving the contacts.");
+      api.handleRequestError(e as Error, "There was an error retrieving the contacts.");
       yield put(
         redux.actions.toggleActionOnAuthentication(
-          actions.authenticated.responseContactsAction({ count: 0, data: [] }, { error: e }),
-          actions.unauthenticated.responseContactsAction({ count: 0, data: [] }, { error: e }),
+          actions.authenticated.responseContactsAction({ count: 0, data: [] }, { error: e as Error }),
+          actions.unauthenticated.responseContactsAction({ count: 0, data: [] }, { error: e as Error }),
           action
         )
       );

@@ -46,10 +46,10 @@ export const createSubAccountTaskSet = (
           { cancelToken: source.token }
         );
         yield put(actions.groups.response(response));
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving the account's sub account groups.");
-          yield put(actions.groups.response({ count: 0, data: [] }, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving the account's sub account groups.");
+          yield put(actions.groups.response({ count: 0, data: [] }, { error: e as Error }));
         }
       } finally {
         yield put(actions.groups.loading(false));
@@ -74,10 +74,10 @@ export const createSubAccountTaskSet = (
           { cancelToken: source.token }
         );
         yield put(actions.response(response));
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving the account's sub accounts.");
-          yield put(actions.response({ count: 0, data: [] }, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving the account's sub accounts.");
+          yield put(actions.response({ count: 0, data: [] }, { error: e as Error }));
         }
       } finally {
         yield put(actions.loading(false));
@@ -97,10 +97,10 @@ export const createSubAccountTaskSet = (
       try {
         const response: M = yield call(api.getSubAccount, subaccountId, { cancelToken: source.token });
         yield put(actions.subaccount.response(response));
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving the sub account.");
-          yield put(actions.subaccount.response(undefined, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving the sub account.");
+          yield put(actions.subaccount.response(undefined, { error: e as Error }));
         }
       } finally {
         if (yield cancelled()) {

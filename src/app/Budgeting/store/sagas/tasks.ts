@@ -13,10 +13,10 @@ export function* getFringeColorsTask(): SagaIterator {
   try {
     const response = yield call(api.getFringeColors, { cancelToken: source.token });
     yield put(responseFringeColorsAction(response));
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error retrieving the budget's fringe colors.");
-      yield put(responseFringeColorsAction({ count: 0, data: [] }, { error: e }));
+      api.handleRequestError(e as Error, "There was an error retrieving the budget's fringe colors.");
+      yield put(responseFringeColorsAction({ count: 0, data: [] }, { error: e as Error }));
     }
   } finally {
     yield put(loadingFringeColorsAction(false));

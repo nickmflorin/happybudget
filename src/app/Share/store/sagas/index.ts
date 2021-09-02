@@ -25,10 +25,10 @@ function* getBudgetTask(): SagaIterator {
     try {
       const response: Model.Budget = yield call(api.getBudget, budgetId, { cancelToken: source.token });
       yield put(responseBudgetAction(response));
-    } catch (e) {
+    } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error retrieving the budget.");
-        yield put(responseBudgetAction(undefined, { error: e }));
+        api.handleRequestError(e as Error, "There was an error retrieving the budget.");
+        yield put(responseBudgetAction(undefined, { error: e as Error }));
       }
     } finally {
       yield put(loadingBudgetAction(false));

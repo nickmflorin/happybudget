@@ -28,9 +28,9 @@ export const createContactsTaskSet = (): Redux.TableTaskMap<R, M> => {
         cancelToken: source.token
       });
       yield all(response.data.map((contact: M) => put(actions.authenticated.addContactToStateAction(contact))));
-    } catch (err) {
+    } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err, errorMessage);
+        api.handleRequestError(err as Error, errorMessage);
       }
     } finally {
       yield put(actions.authenticated.creatingContactAction(false));
@@ -54,9 +54,9 @@ export const createContactsTaskSet = (): Redux.TableTaskMap<R, M> => {
     );
     try {
       yield call(api.bulkUpdateContacts, requestPayload, { cancelToken: source.token });
-    } catch (err) {
+    } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err, errorMessage);
+        api.handleRequestError(err as Error, errorMessage);
       }
     } finally {
       yield all(
@@ -80,9 +80,9 @@ export const createContactsTaskSet = (): Redux.TableTaskMap<R, M> => {
       yield all(ids.map((id: number) => put(actions.authenticated.deletingContactAction({ id, value: true }))));
       try {
         yield call(api.bulkDeleteContacts, ids, { cancelToken: source.token });
-      } catch (err) {
+      } catch (err: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(err, errorMessage);
+          api.handleRequestError(err as Error, errorMessage);
         }
       } finally {
         yield all(ids.map((id: number) => put(actions.authenticated.deletingContactAction({ id, value: false }))));

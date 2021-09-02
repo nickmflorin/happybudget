@@ -45,10 +45,10 @@ export const createAccountsTaskSet = (
           { cancelToken: source.token }
         );
         yield put(actions.groups.response(response));
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving the account groups.");
-          yield put(actions.groups.response({ count: 0, data: [] }, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving the account groups.");
+          yield put(actions.groups.response({ count: 0, data: [] }, { error: e as Error }));
         }
       } finally {
         yield put(actions.groups.loading(false));
@@ -73,10 +73,10 @@ export const createAccountsTaskSet = (
           { cancelToken: source.token }
         );
         yield put(actions.response(response));
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving the accounts.");
-          yield put(actions.response({ count: 0, data: [] }, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving the accounts.");
+          yield put(actions.response({ count: 0, data: [] }, { error: e as Error }));
         }
       } finally {
         yield put(actions.loading(false));

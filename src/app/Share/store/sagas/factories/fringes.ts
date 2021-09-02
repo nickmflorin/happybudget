@@ -36,10 +36,10 @@ export const createFringeTaskSet = (
       try {
         const response = yield call(services.request, objId, { no_pagination: true }, { cancelToken: source.token });
         yield put(actions.response(response));
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving fringes.");
-          yield put(actions.response({ count: 0, data: [] }, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving fringes.");
+          yield put(actions.response({ count: 0, data: [] }, { error: e as Error }));
         }
       } finally {
         yield put(actions.loading(false));

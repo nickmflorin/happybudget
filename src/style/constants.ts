@@ -1,6 +1,6 @@
 import { reduce, flatten, map } from "lodash";
 
-export const Breakpoints: Breakpoints = {
+export const Breakpoints: Style.Breakpoints = {
   small: 320,
   medium: 480,
   large: 768,
@@ -38,7 +38,7 @@ export const Colors = {
 export const TABLE_BORDER_RADIUS = 8;
 
 /* eslint-disable no-unused-vars */
-export const FontWeightMap: { [key in FontWeightName]: FontWeight } = {
+export const FontWeightMap: { [key in Style.FontWeightName]: Style.FontWeight } = {
   Bold: 700,
   Regular: 400,
   Light: 300,
@@ -46,7 +46,7 @@ export const FontWeightMap: { [key in FontWeightName]: FontWeight } = {
   Medium: 600
 };
 
-export const SupportedFontFaces: FontFace[] = [
+export const SupportedFontFaces: Style.FontFace[] = [
   {
     family: "Roboto",
     variants: [
@@ -68,32 +68,32 @@ export const SupportedFontFaces: FontFace[] = [
   }
 ];
 
-export const fontToString = (font: Font): string => {
+export const fontToString = (font: Style.Font): string => {
   return `Font { family = ${font.family}, weight: ${font.weight}, italic: ${font.italic || false} }`;
 };
 
-export const getFontSourceModuleName = (font: Font): string => {
+export const getFontSourceModuleName = (font: Style.Font): string => {
   return font.italic === true ? `${font.family}_${font.weight}Italic` : `${font.family}_${font.weight}`;
 };
 
-export const getFontSourceFileName = (font: Font, extension = "ttf"): string => {
+export const getFontSourceFileName = (font: Style.Font, extension = "ttf"): string => {
   return font.italic === true
     ? `${font.family}-${font.weight}Italic.${extension}`
     : `${font.family}-${font.weight}.${extension}`;
 };
 
-export const getFontSourceFileDirectory = (font: Font): string => {
+export const getFontSourceFileDirectory = (font: Style.Font): string => {
   return font.italic === true ? `${font.family}/${font.weight}/Italic` : `${font.family}/${font.weight}`;
 };
 
-export const getFontSourceFile = (font: Font, extension = "ttf"): string => {
+export const getFontSourceFile = (font: Style.Font, extension = "ttf"): string => {
   return `./fonts/${getFontSourceFileDirectory(font)}/${getFontSourceFileName(font, extension)}`;
 };
 
-export const fontsFromFontFace = (fontFace: FontFace): Font[] => {
+export const fontsFromFontFace = (fontFace: Style.FontFace): Style.Font[] => {
   return reduce(
     fontFace.variants,
-    (fonts: Font[], variant: FontVariant) => {
+    (fonts: Style.Font[], variant: Style.FontVariant) => {
       fonts = [...fonts, { family: fontFace.family, weight: typeof variant === "string" ? variant : variant.weight }];
       if (typeof variant !== "string" && variant.hasItalic === true) {
         return [...fonts, { family: fontFace.family, weight: variant.weight, italic: true }];
@@ -104,6 +104,6 @@ export const fontsFromFontFace = (fontFace: FontFace): Font[] => {
   );
 };
 
-export const SupportedFonts: Font[] = flatten(
-  map(SupportedFontFaces, (fontFace: FontFace) => fontsFromFontFace(fontFace))
+export const SupportedFonts: Style.Font[] = flatten(
+  map(SupportedFontFaces, (fontFace: Style.FontFace) => fontsFromFontFace(fontFace))
 );

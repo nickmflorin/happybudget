@@ -67,9 +67,9 @@ export const createSubAccountTaskSet = <B extends Model.Budget | Model.Template>
         yield put(actions.budget.updateInState(response.budget as Partial<B>));
       }
       yield all(response.children.map((subaccount: C) => put(actions.addToState(subaccount))));
-    } catch (err) {
+    } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err, errorMessage);
+        api.handleRequestError(err as Error, errorMessage);
       }
     } finally {
       yield put(actions.creating(false));
@@ -116,9 +116,9 @@ export const createSubAccountTaskSet = <B extends Model.Budget | Model.Template>
       if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.updateInState(response.budget as Partial<B>));
       }
-    } catch (err) {
+    } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err, errorMessage);
+        api.handleRequestError(err as Error, errorMessage);
       }
     } finally {
       if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
@@ -161,9 +161,9 @@ export const createSubAccountTaskSet = <B extends Model.Budget | Model.Template>
         if (tabling.util.eventWarrantsRecalculation(e)) {
           yield put(actions.budget.updateInState(response.budget as Partial<B>));
         }
-      } catch (err) {
+      } catch (err: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(err, errorMessage);
+          api.handleRequestError(err as Error, errorMessage);
         }
       } finally {
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: false }))));
@@ -227,9 +227,9 @@ export const createSubAccountTaskSet = <B extends Model.Budget | Model.Template>
       yield put(actions.groups.deleting({ id: e.payload, value: true }));
       try {
         yield call(api.deleteGroup, e.payload, { cancelToken: source.token });
-      } catch (err) {
+      } catch (err: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(err, "There was an error deleting the sub account group.");
+          api.handleRequestError(err as Error, "There was an error deleting the sub account group.");
         }
       } finally {
         yield put(actions.groups.deleting({ id: e.payload, value: false }));
@@ -285,10 +285,10 @@ export const createSubAccountTaskSet = <B extends Model.Budget | Model.Template>
           { cancelToken: source.token }
         );
         yield put(actions.groups.response(response));
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving the account's sub account groups.");
-          yield put(actions.groups.response({ count: 0, data: [] }, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving the account's sub account groups.");
+          yield put(actions.groups.response({ count: 0, data: [] }, { error: e as Error }));
         }
       } finally {
         yield put(actions.groups.loading(false));
@@ -321,10 +321,10 @@ export const createSubAccountTaskSet = <B extends Model.Budget | Model.Template>
             "There was an error creating the sub accounts."
           );
         }
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving the account's sub accounts.");
-          yield put(actions.response({ count: 0, data: [] }, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving the account's sub accounts.");
+          yield put(actions.response({ count: 0, data: [] }, { error: e as Error }));
         }
       } finally {
         yield put(actions.loading(false));
@@ -344,10 +344,10 @@ export const createSubAccountTaskSet = <B extends Model.Budget | Model.Template>
       try {
         const response: C = yield call(api.getSubAccount, subaccountId, { cancelToken: source.token });
         yield put(actions.subaccount.response(response));
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving the sub account.");
-          yield put(actions.subaccount.response(undefined, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving the sub account.");
+          yield put(actions.subaccount.response(undefined, { error: e as Error }));
         }
       } finally {
         if (yield cancelled()) {

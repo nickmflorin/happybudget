@@ -64,9 +64,9 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
         yield put(actions.budget.updateInState(response.data as Partial<B>));
       }
       yield all(response.children.map((fringe: M) => put(actions.addToState(fringe))));
-    } catch (err) {
+    } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err, errorMessage);
+        api.handleRequestError(err as Error, errorMessage);
       }
     } finally {
       yield put(actions.creating(false));
@@ -98,9 +98,9 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
       if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
         yield put(actions.budget.updateInState(response.data as Partial<B>));
       }
-    } catch (err) {
+    } catch (err: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(err, errorMessage);
+        api.handleRequestError(err as Error, errorMessage);
       }
     } finally {
       if (!tabling.typeguards.isGroupEvent(e) && tabling.util.eventWarrantsRecalculation(e)) {
@@ -134,9 +134,9 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
         if (tabling.util.eventWarrantsRecalculation(e)) {
           yield put(actions.budget.updateInState(response.data as Partial<B>));
         }
-      } catch (err) {
+      } catch (err: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(err, errorMessage);
+          api.handleRequestError(err as Error, errorMessage);
         }
       } finally {
         yield all(ids.map((id: number) => put(actions.deleting({ id, value: false }))));
@@ -193,10 +193,10 @@ export const createFringeTaskSet = <B extends Model.Template | Model.Budget>(
         if (response.data.length === 0) {
           yield fork(bulkCreateTask, objId, { type: "rowAdd", payload: 2 }, "There was an error creating the fringes.");
         }
-      } catch (e) {
+      } catch (e: unknown) {
         if (!(yield cancelled())) {
-          api.handleRequestError(e, "There was an error retrieving fringes.");
-          yield put(actions.response({ count: 0, data: [] }, { error: e }));
+          api.handleRequestError(e as Error, "There was an error retrieving fringes.");
+          yield put(actions.response({ count: 0, data: [] }, { error: e as Error }));
         }
       } finally {
         yield put(actions.loading(false));

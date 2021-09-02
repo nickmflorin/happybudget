@@ -29,10 +29,10 @@ export function* getTemplateTask(): SagaIterator {
     try {
       const response: Model.Template = yield call(api.getTemplate, templateId, { cancelToken: source.token });
       yield put(responseTemplateAction(response));
-    } catch (e) {
+    } catch (e: unknown) {
       if (!(yield cancelled())) {
-        api.handleRequestError(e, "There was an error retrieving the template.");
-        yield put(responseTemplateAction(undefined, { error: e }));
+        api.handleRequestError(e as Error, "There was an error retrieving the template.");
+        yield put(responseTemplateAction(undefined, { error: e as Error }));
       }
     } finally {
       yield put(loadingTemplateAction(false));

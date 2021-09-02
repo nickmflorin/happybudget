@@ -14,9 +14,9 @@ function* loadHeaderTemplateTask(id: number): SagaIterator {
   try {
     const response: Model.HeaderTemplate = yield call(api.getHeaderTemplate, id, { cancelToken: source.token });
     yield put(actions.displayHeaderTemplateAction(response));
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error loading the header template.");
+      api.handleRequestError(e as Error, "There was an error loading the header template.");
     }
   } finally {
     yield put(actions.setLoadingHeaderTemplateDetailAction(false));
@@ -48,10 +48,10 @@ function* getHeaderTemplatesTask(): SagaIterator {
       { cancelToken: source.token }
     );
     yield put(actions.responseHeaderTemplatesAction(response));
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error retrieving the header templates.");
-      yield put(actions.responseHeaderTemplatesAction({ data: [], count: 0 }, { error: e }));
+      api.handleRequestError(e as Error, "There was an error retrieving the header templates.");
+      yield put(actions.responseHeaderTemplatesAction({ data: [], count: 0 }, { error: e as Error }));
     }
   } finally {
     yield put(actions.loadingHeaderTemplatesAction(false));

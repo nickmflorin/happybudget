@@ -20,10 +20,10 @@ export function* getBudgetsTask(action: Redux.Action): SagaIterator {
       cancelToken: source.token
     });
     yield put(actions.responseBudgetsAction(response));
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error retrieving the budgets.");
-      yield put(actions.responseBudgetsAction({ count: 0, data: [] }, { error: e }));
+      api.handleRequestError(e as Error, "There was an error retrieving the budgets.");
+      yield put(actions.responseBudgetsAction({ count: 0, data: [] }, { error: e as Error }));
     }
   } finally {
     yield put(actions.loadingBudgetsAction(false));
@@ -48,10 +48,10 @@ export function* getTemplatesTask(action: Redux.Action): SagaIterator {
       cancelToken: source.token
     });
     yield put(actions.responseTemplatesAction(response));
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error retrieving the templates.");
-      yield put(actions.responseTemplatesAction({ count: 0, data: [] }, { error: e }));
+      api.handleRequestError(e as Error, "There was an error retrieving the templates.");
+      yield put(actions.responseTemplatesAction({ count: 0, data: [] }, { error: e as Error }));
     }
   } finally {
     yield put(actions.loadingTemplatesAction(false));
@@ -76,10 +76,10 @@ export function* getCommunityTemplatesTask(action: Redux.Action): SagaIterator {
       cancelToken: source.token
     });
     yield put(actions.responseCommunityTemplatesAction(response));
-  } catch (e) {
+  } catch (e: unknown) {
     if (!(yield cancelled())) {
-      api.handleRequestError(e, "There was an error retrieving the community templates.");
-      yield put(actions.responseCommunityTemplatesAction({ count: 0, data: [] }, { error: e }));
+      api.handleRequestError(e as Error, "There was an error retrieving the community templates.");
+      yield put(actions.responseCommunityTemplatesAction({ count: 0, data: [] }, { error: e as Error }));
     }
   } finally {
     yield put(actions.loadingCommunityTemplatesAction(false));

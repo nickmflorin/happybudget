@@ -205,7 +205,7 @@ export class ApiClient {
         headers: options.headers
       });
       return response.data;
-    } catch (e) {
+    } catch (e: unknown) {
       if (e instanceof ForceLogout) {
         window.location.href = "/login";
       }
