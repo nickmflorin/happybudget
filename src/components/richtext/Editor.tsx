@@ -16,7 +16,9 @@ const Tools = {
   },
   header: {
     class: Header,
-    inlineToolbar: ["bold", "italic"]
+    inlineToolbar: ["bold", "italic"],
+    levels: [1, 2, 3, 4, 5, 6],
+    defaultLevel: 3
   }
 };
 
