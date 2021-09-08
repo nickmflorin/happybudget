@@ -27,7 +27,7 @@ const ContactEditor = <R extends Table.Row, M extends Model.Model>(props: Contac
       models={contacts}
       onChange={(e: MenuChangeEvent<Model.Contact>) => editor.onChange(e.model.id, e.event)}
       searchIndices={["first_name", "last_name"]}
-      tagProps={{ color: "#EFEFEF", textColor: "#2182e4", modelTextField: "full_name", className: "tag--contact" }}
+      tagProps={{ color: "#F5F5F5", textColor: "#2182e4", modelTextField: "full_name", className: "tag--contact" }}
       extra={[
         {
           id: "add-contact",
