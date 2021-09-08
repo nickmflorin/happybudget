@@ -10,7 +10,8 @@ export { default as connectCellToStore } from "./cells/connectCellToStore";
 
 export const Framework: Table.Framework = {
   editors: {
-    ContactEditor: editors.ContactEditor
+    ContactEditor: editors.ContactEditor,
+    DateEditor: editors.DateEditor
   },
   cells: {
     data: {

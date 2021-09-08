@@ -16,6 +16,7 @@
 
 @import "~react-toastify/dist/ReactToastify.css";
 @import "~antd/dist/antd.css";
+@import "./react-datepicker";
 
 @mixin fface($family, $type: "Regular", $weight: 400, $style: normal) {
   $src: null;

@@ -56,6 +56,7 @@ const Columns: Table.Column<R, M>[] = [
     field: "date",
     headerName: "Date",
     flex: 1,
+    cellEditor: "DateEditor",
     valueFormatter: tabling.formatters.agDateValueFormatter,
     valueSetter: tabling.valueSetters.dateTimeValueSetter<R>("date"),
     columnType: "date"
