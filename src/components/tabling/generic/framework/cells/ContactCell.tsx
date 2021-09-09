@@ -29,7 +29,7 @@ const ContactCell = <M extends Model.Model>({ value, ...props }: ContactCellProp
         {!isNil(model) ? (
           <Tag
             className={classNames("tag--contact", { focused: isFocused })}
-            color={"#F5F5F5"}
+            color={"#EFEFEF"}
             textColor={"#2182e4"}
             text={model.full_name}
             contentRender={(params: Omit<ITagRenderParams, "contentRender">) => (

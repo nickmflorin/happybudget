@@ -68,7 +68,7 @@ const BudgetPdf = ({ budget, contacts, options }: BudgetPdfProps): JSX.Element =
                 return (
                   <Tag
                     className={"tag tag--contact"}
-                    color={"#F5F5F5"}
+                    color={"#EFEFEF"}
                     textColor={"#2182e4"}
                     text={contact.full_name}
                   />
