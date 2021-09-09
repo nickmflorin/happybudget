@@ -2,6 +2,8 @@ import { useState } from "react";
 import { isNil } from "lodash";
 
 import * as api from "api";
+import { model } from "lib";
+
 import { Form } from "components";
 import { TemplateForm } from "components/forms";
 import Modal from "./Modal";
@@ -14,7 +16,7 @@ interface EditTemplateModalProps {
 }
 
 const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplateModalProps): JSX.Element => {
-  const [file, setFile] = useState<UploadedImage | null>(null);
+  const [file, setFile] = useState<UploadedImage | SavedImage | null>(template.image);
   const [form] = Form.useForm<Http.TemplatePayload>({ isInModal: true });
 
   return (
@@ -31,8 +33,12 @@ const EditTemplateModal = ({ open, template, onSuccess, onCancel }: EditTemplate
           .validateFields()
           .then((values: Http.TemplatePayload) => {
             form.setLoading(true);
+            let payload: Http.BudgetPayload = { ...values };
+            if (isNil(file) || model.typeguards.isUploadedImage(file)) {
+              payload = { ...payload, image: !isNil(file) ? file.data : null };
+            }
             api
-              .updateTemplate(template.id, { ...values, image: !isNil(file) ? file.data : null })
+              .updateTemplate(template.id, payload)
               .then((newTemplate: Model.Template) => {
                 form.resetFields();
                 onSuccess(newTemplate);
