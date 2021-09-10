@@ -1,12 +1,15 @@
+@import "style/_imports";
+
 .table-action-menu {
   display: flex;
   // This will align the checkbox in the header with the checkboxes in the
   // rows vertically.
-  padding-left: 2px;
+  padding-left: 4px;
   height: 30px;
 
   &.detached {
     margin-bottom: 10px;
+    padding-left: 12px;
   }
 
   .ant-checkbox-wrapper {
