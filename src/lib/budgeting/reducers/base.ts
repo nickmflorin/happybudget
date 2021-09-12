@@ -6,10 +6,7 @@ export const createBudgetTableReducer = <
   M extends Model.Account | Model.SubAccount,
   S extends Redux.TableStore<R, M, Model.BudgetGroup> = Redux.TableStore<R, M, Model.BudgetGroup>
 >(
-  config: Table.ReducerConfig<R, M, Model.BudgetGroup, S> & {
-    readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R, M>) => Table.DataRow<R, M>;
-    readonly recalculateGroup?: (state: S, action: Redux.Action, group: Model.BudgetGroup) => Model.BudgetGroup;
-  }
+  config: Table.ReducerConfig<R, M, Model.BudgetGroup, S>
 ): Redux.Reducer<S> => {
   return tabling.reducers.createTableReducer<R, M, Model.BudgetGroup, S>(config);
 };

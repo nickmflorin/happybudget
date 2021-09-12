@@ -75,6 +75,26 @@ export const isGroupDeleteEvent = <R extends Table.RowData, M extends Model.Mode
   return (e as Table.GroupDeleteEvent).type === "groupDelete";
 };
 
+export const isGroupAddEvent = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  e: Table.ChangeEvent<R, M, G>
+): e is Table.GroupAddEvent<G> => {
+  return (e as Table.GroupAddEvent<G>).type === "groupAdd";
+};
+
+export const isGroupUpdateEvent = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  e: Table.ChangeEvent<R, M, G>
+): e is Table.GroupUpdateEvent<G> => {
+  return (e as Table.GroupUpdateEvent<G>).type === "groupUpdate";
+};
+
 export const isFullRowEvent = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   e: Table.ChangeEvent<R, M>
 ): e is Table.FullRowEvent<R, M> => {

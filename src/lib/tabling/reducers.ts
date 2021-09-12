@@ -126,11 +126,15 @@ export const createTableChangeEventReducer = <
   S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
   config: Table.ReducerConfig<R, M, G, S, Redux.AuthenticatedTableActionMap<R, M, G>> & {
-    readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R, M>) => Table.DataRow<R, M>;
-    readonly recalculateGroup?: (state: S, action: Redux.Action, group: G) => G;
+    readonly recalculateRow?: (
+      state: S,
+      action: Redux.Action<Table.ChangeEvent<R, M, G>>,
+      row: Table.DataRow<R, M>
+    ) => Table.DataRow<R, M>;
+    readonly recalculateGroup?: (state: S, action: Redux.Action<Table.ChangeEvent<R, M, G>>, group: G) => G;
   },
   options?: Pick<Redux.FindModelOptions, "name">
-): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M>>> => {
+): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M, G>>> => {
   type EventWarrantingGroupRecalculation =
     | Table.DataChangeEvent<R, M>
     | Table.RowAddEvent<R, M>
@@ -165,10 +169,10 @@ export const createTableChangeEventReducer = <
     return s;
   };
 
-  return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M>>): S => {
+  return (state: S = config.initialState, action: Redux.Action<Table.ChangeEvent<R, M, G>>): S => {
     let newState: S = { ...state };
 
-    const e: Table.ChangeEvent<R, M> = action.payload;
+    const e: Table.ChangeEvent<R, M, G> = action.payload;
 
     if (typeguards.isDataChangeEvent<R, M>(e)) {
       const consolidated = events.consolidateTableChange(e.payload);
@@ -376,6 +380,30 @@ export const createTableChangeEventReducer = <
           groups: filter(newState.groups, (g: G) => g.id !== e.payload)
         };
       }
+    } else if (typeguards.isGroupUpdateEvent(e)) {
+      // Right now, we are only really concerned with changes to the color or names field of the
+      // group, as everything else that would trigger mechanical recalculations is handled by separate
+      // events.
+      const group: G | null = groupFromState<R, M, G, S>(action, newState, e.payload.id);
+      if (!isNil(group)) {
+        newState = {
+          ...newState,
+          groups: util.replaceInArray<G>(newState.groups, { id: e.payload.id }, { ...group, ...e.payload.data })
+        };
+      }
+    } else if (typeguards.isGroupAddEvent(e)) {
+      // ToDo: We should figure out a way to do this without having to regenerate the entire table
+      // state.
+      newState = {
+        ...newState,
+        groups: [...newState.groups, e.payload],
+        data: data.createTableRows<R, M, G>({
+          ...config,
+          gridId: "data",
+          models: newState.models,
+          groups: [...newState.groups, e.payload]
+        })
+      };
     }
     return newState;
   };

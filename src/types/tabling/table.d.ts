@@ -538,7 +538,7 @@ namespace Table {
     | GroupAddEvent<G>
     | GroupDeleteEvent;
 
-  type ChangeEvent<R extends RowData, M extends Model.Model = Model.Model> = GrouplessEvent<R, M> | GroupEvent<R, M>;
+  type ChangeEvent<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = GrouplessEvent<R, M> | GroupEvent<R, M, G>;
 
   type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;
 
