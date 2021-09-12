@@ -27,27 +27,6 @@ export const getFullRowLabel = <D extends Table.RowData, M extends Model.Model =
   }
 };
 
-export const rowWarrantsRecalculation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  row: Table.DataRow<R>,
-  columns: Table.Column<R, M>[]
-): boolean => {
-  return (
-    reduce(
-      columns,
-      (data: boolean[], column: Table.Column<R, M>) => {
-        if (column.isCalculating === true) {
-          const nullValue = column.nullValue === undefined ? null : (column.nullValue as unknown as R[keyof R]);
-          if (row[column.field as keyof R] !== nullValue) {
-            return [...data, true];
-          }
-        }
-        return data;
-      },
-      []
-    ).length !== 0
-  );
-};
-
 export const mergeChangesWithRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   id: Table.RowID,
   row: Table.DataRow<R, M>,
@@ -77,49 +56,39 @@ export const mergeChangesWithRow = <R extends Table.RowData, M extends Model.Mod
 };
 
 /* eslint-disable indent */
-export const createModelRowMeta = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  config: Table.CreateModelRowConfig<R, M, G>
+export const createModelRowMeta = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+  config: Table.CreateModelRowConfig<R, M>
 ): Table.ModelRowMeta<M> => {
   return {
     gridId: config.gridId,
     model: config.model,
-    group: !isNil(config.group) ? config.group.id : null,
     children: !isNil(config.getRowChildren) ? config.getRowChildren(config.model) : null,
     name: !isNil(config.getRowName)
       ? typeof config.getRowName === "function"
-        ? config.getRowName(config.data, config.model, config.group)
+        ? config.getRowName(config.data, config.model)
         : config.getRowName
       : null,
     label: !isNil(config.getRowLabel)
       ? typeof config.getRowLabel === "function"
-        ? config.getRowLabel(config.data, config.model, config.group)
+        ? config.getRowLabel(config.data, config.model)
         : config.getRowLabel
       : null
   };
 };
 
-export const createPlaceholderRowMeta = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  config: Table.CreatePlaceholderRowConfig<R, M, G>
+export const createPlaceholderRowMeta = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+  config: Table.CreatePlaceholderRowConfig<R, M>
 ): Table.PlaceholderRowMeta => {
   return {
     gridId: "data",
-    group: !isNil(config.group) ? config.group.id : null,
     name: !isNil(config.getRowName)
       ? typeof config.getRowName === "function"
-        ? config.getRowName(config.data, config.group)
+        ? config.getRowName(config.data)
         : config.getRowName
       : null,
     label: !isNil(config.getRowLabel)
       ? typeof config.getRowLabel === "function"
-        ? config.getRowLabel(config.data, config.group)
+        ? config.getRowLabel(config.data)
         : config.getRowLabel
       : null
   };
@@ -184,8 +153,8 @@ export const createGroupRow = <R extends Table.RowData, M extends Model.Model, G
   return null;
 };
 
-export const createPlaceholderRow = <R extends Table.RowData, M extends Model.Model, G extends Model.Group>(
-  config: Table.CreatePlaceholderRowConfig<R, M, G>
+export const createPlaceholderRow = <R extends Table.RowData, M extends Model.Model>(
+  config: Table.CreatePlaceholderRowConfig<R, M>
 ): Table.PlaceholderRow<R> => {
   const readColumns = filter(config.columns, (c: Table.AnyColumn<R, M>) => !isAgColumn(c) || c.isRead !== false);
   const defaultNullValue = config.defaultNullValue === undefined ? null : config.defaultNullValue;
@@ -208,12 +177,12 @@ export const createPlaceholderRow = <R extends Table.RowData, M extends Model.Mo
     ...data,
     id: config.id,
     rowType: "placeholder",
-    meta: createPlaceholderRowMeta<R, M, G>({ ...config, data })
+    meta: createPlaceholderRowMeta<R, M>({ ...config, data })
   };
 };
 
-export const createModelRow = <R extends Table.RowData, M extends Model.Model, G extends Model.Group>(
-  config: Omit<Table.CreateModelRowConfig<R, M, G>, "data">
+export const createModelRow = <R extends Table.RowData, M extends Model.Model>(
+  config: Omit<Table.CreateModelRowConfig<R, M>, "data">
 ): Table.ModelRow<R, M> => {
   const readColumns = filter(config.columns, (c: Table.AnyColumn<R, M>) => !isAgColumn(c) || c.isRead !== false);
   const defaultNullValue = config.defaultNullValue === undefined ? null : config.defaultNullValue;

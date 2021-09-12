@@ -58,7 +58,6 @@ const Columns: Table.Column<R, M>[] = [
     field: "quantity",
     headerName: "Qty",
     width: 60,
-    isCalculating: true,
     valueSetter: tabling.valueSetters.integerValueSetter<R>("quantity"),
     columnType: "number",
     // If the plurality of the quantity changes, we need to refresh the refresh
@@ -90,7 +89,6 @@ const Columns: Table.Column<R, M>[] = [
     field: "multiplier",
     headerName: "X",
     width: 60,
-    isCalculating: true,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("multiplier"),
     columnType: "number"
   }),
@@ -99,7 +97,6 @@ const Columns: Table.Column<R, M>[] = [
     headerName: "Rate",
     tableColumnType: "body",
     width: 100,
-    isCalculating: true,
     valueFormatter: tabling.formatters.agCurrencyValueFormatter,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("rate"),
     columnType: "currency"
@@ -107,7 +104,6 @@ const Columns: Table.Column<R, M>[] = [
   framework.columnObjs.SelectColumn<R, M>({
     field: "fringes",
     headerName: "Fringes",
-    isCalculating: true,
     cellRenderer: { data: "FringesCell" },
     width: 200,
     nullValue: [],

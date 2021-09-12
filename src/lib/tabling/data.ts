@@ -1,6 +1,29 @@
-import { includes, groupBy, isNil, reduce, find, filter, map, orderBy } from "lodash";
+import { includes, groupBy, isNil, reduce, find, filter, map, orderBy, uniqBy } from "lodash";
 
+import { model } from "lib";
 import * as rows from "./rows";
+
+/* eslint-disable indent */
+export const findDistinctRowsForEachGroup = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  rws: Table.DataRow<R, M>[],
+  groups: G[]
+): { group: G; rows: Table.DataRow<R, M>[] }[] => {
+  return reduce(
+    uniqBy(groups, (g: G) => g.id),
+    (curr: { group: G; rows: Table.DataRow<R, M>[] }[], group: G) => {
+      const children = model.util.getModelsByIds(rws, group.children);
+      if (children.length !== 0) {
+        return [...curr, { rows: children, group }];
+      }
+      return curr;
+    },
+    []
+  );
+};
 
 export const orderModelsWithRowsByFieldOrdering = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   array: Table.ModelWithRow<R, M>[],
@@ -41,10 +64,9 @@ export const createTableData = <R extends Table.RowData, M extends Model.Model, 
       ) as M[],
       (m: M) => ({
         model: m,
-        row: rows.createModelRow<R, M, G>({
+        row: rows.createModelRow<R, M>({
           columns: config.columns,
           model: m,
-          group: null,
           gridId: "data",
           getRowChildren: config.getModelRowChildren,
           getRowLabel: config.getModelRowLabel,
@@ -70,7 +92,7 @@ export const createTableData = <R extends Table.RowData, M extends Model.Model, 
             rows: orderModelsWithRows(
               map(ms, (m: { model: M; group: G }) => ({
                 model: m.model,
-                row: rows.createModelRow<R, M, G>({
+                row: rows.createModelRow<R, M>({
                   ...m,
                   columns: config.columns,
                   gridId: "data",

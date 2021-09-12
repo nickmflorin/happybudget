@@ -63,8 +63,6 @@ namespace Table {
   }
 
   type BaseRowMeta = {
-    readonly gridId: GridId;
-    readonly group: ID | null;
     readonly name?: string | number | null;
     readonly label?: string | number | null;
   };
@@ -72,6 +70,7 @@ namespace Table {
   type ModelRowMeta<M extends Model.Model = Model.Model> = BaseRowMeta & {
     readonly children: ID[] | null;
     readonly model: M;
+    readonly gridId: GridId;
   };
 
   type PlaceholderRowMeta = Omit<BaseRowMeta, "gridId"> & {
@@ -80,6 +79,7 @@ namespace Table {
 
   type GroupRowMeta = Omit<BaseRowMeta, "gridId"> & {
     readonly gridId: "data";
+    readonly group: ID;
   };
 
   type RowMeta<M extends Model.Model = Model.Model> = ModelRowMeta<M> | PlaceholderRowMeta | GroupRowMeta;
@@ -134,24 +134,20 @@ namespace Table {
 
   type CreateModelRowConfig<
     R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = CreateRowConfig<[R, M, G | null], R, M> & {
+    M extends Model.Model = Model.Model
+  > = CreateRowConfig<[R, M], R, M> & {
     readonly data: R;
     readonly gridId: Table.GridId;
     readonly model: M;
-    readonly group: G | null;
     readonly getRowChildren?: (m: M) => ID[];
   };
 
   type CreatePlaceholderRowConfig<
     R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = CreateRowConfig<[R, G | null], R, M> & {
+    M extends Model.Model = Model.Model
+  > = CreateRowConfig<[R], R, M> & {
     readonly id: Table.PlaceholderRowId;
     readonly data: R;
-    readonly group: G | null;
   };
 
   type CreateGroupRowConfig<
@@ -177,15 +173,15 @@ namespace Table {
 
     // Because these will not necessarily update when the underlying row changes,
     // we should probably remove these from the row meta.
-    readonly getModelRowLabel?: RowStringGetter<[R, M, G | null]>;
+    readonly getModelRowLabel?: RowStringGetter<[R, M]>;
     readonly getGroupRowLabel?: RowStringGetter<[G | null]>;
-    readonly getPlaceholderRowLabel?: RowStringGetter<[R, G | null]>;
+    readonly getPlaceholderRowLabel?: RowStringGetter<[R]>;
 
     // Because these will not necessarily update when the underlying row changes,
     // we should probably remove these from the row meta.
-    readonly getModelRowName?: RowStringGetter<[R, M, G | null]>;
+    readonly getModelRowName?: RowStringGetter<[R, M]>;
     readonly getGroupRowName?: RowStringGetter<[G | null]>;
-    readonly getPlaceholderRowName?: RowStringGetter<[R, G | null]>;
+    readonly getPlaceholderRowName?: RowStringGetter<[R]>;
   };
 
   type ColumnTypeId =
@@ -266,7 +262,6 @@ namespace Table {
     readonly cellClass?: CellClassName;
     readonly cellStyle?: React.CSSProperties;
     readonly defaultHidden?: boolean;
-    readonly isCalculating?: boolean;
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
     readonly requiresAuthentication?: boolean;
@@ -478,8 +473,7 @@ namespace Table {
   };
 
   type RowDeletePayload<R extends RowData, M extends Model.Model = Model.Model> = {
-    readonly rows: DataRow<R, M>[] | DataRow<R, M>;
-    readonly columns: Column<R, M>[];
+    readonly rows: DataRowID[] | DataRowID;
   };
   type RowDeleteEvent<R extends RowData, M extends Model.Model = Model.Model> = {
     readonly type: "rowDelete";
@@ -487,9 +481,8 @@ namespace Table {
   };
 
   type RowRemoveFromGroupPayload<R extends RowData, M extends Model.Model = Model.Model> = {
+    readonly rows: DataRowID[] | DataRowID;
     readonly group: ID;
-    readonly rows: DataRow<R, M>[] | DataRow<R, M>;
-    readonly columns: Column<R, M>[];
   };
   type RowRemoveFromGroupEvent<R extends RowData, M extends Model.Model = Model.Model> = {
     readonly type: "rowRemoveFromGroup";
@@ -498,8 +491,7 @@ namespace Table {
 
   type RowAddToGroupPayload<R extends RowData, M extends Model.Model = Model.Model> = {
     readonly group: ID;
-    readonly rows: DataRow<R, M>[] | DataRow<R, M>;
-    readonly columns: Column<R, M>[];
+    readonly rows: DataRowID[] | DataRowID;
   };
   type RowAddToGroupEvent<R extends RowData, M extends Model.Model = Model.Model> = {
     readonly type: "rowAddToGroup";

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { put, call, cancelled, fork, select, all } from "redux-saga/effects";
-import { map, isNil, filter } from "lodash";
+import { map, isNil } from "lodash";
 
 import * as api from "api";
 import * as tabling from "../../tabling";
@@ -110,9 +110,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     );
 
     yield put(config.actions.saving(true));
-    if (tabling.events.eventWarrantsRecalculation(e)) {
-      yield put(config.actions.loadingBudget(true));
-    }
+    yield put(config.actions.loadingBudget(true));
     try {
       const response: Http.BulkCreateChildrenResponse<B, M> = yield call(
         config.services.bulkCreate,
@@ -135,9 +133,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       }
     } finally {
       yield put(config.actions.saving(false));
-      if (tabling.events.eventWarrantsRecalculation(e)) {
-        yield put(config.actions.loadingBudget(false));
-      }
+      yield put(config.actions.loadingBudget(false));
       if (yield cancelled()) {
         source.cancel();
       }
@@ -151,7 +147,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     errorMessage: string
   ): SagaIterator {
     yield put(config.actions.saving(true));
-    if (!tabling.typeguards.isGroupEvent(e) && tabling.events.eventWarrantsRecalculation(e)) {
+    if (!tabling.typeguards.isGroupEvent(e)) {
       yield put(config.actions.loadingBudget(true));
     }
     try {
@@ -164,7 +160,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         api.handleRequestError(err as Error, errorMessage);
       }
     } finally {
-      if (!tabling.typeguards.isGroupEvent(e) && tabling.events.eventWarrantsRecalculation(e)) {
+      if (!tabling.typeguards.isGroupEvent(e)) {
         yield put(config.actions.loadingBudget(false));
       }
       yield put(config.actions.saving(false));
@@ -175,17 +171,10 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   }
 
   function* bulkDeleteTask(objId: number, e: Table.RowDeleteEvent<R, M>, errorMessage: string): SagaIterator {
-    const rows: Table.ModelRow<R, M>[] = filter(
-      Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows],
-      (r: Table.DataRow<R, M>) => tabling.typeguards.isModelRow(r)
-    ) as Table.ModelRow<R, M>[];
-    if (rows.length !== 0) {
-      const ids = map(rows, (row: Table.ModelRow<R, M>) => row.id);
-
+    const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+    if (ids.length !== 0) {
       yield put(config.actions.saving(true));
-      if (tabling.events.eventWarrantsRecalculation<R, M>(e)) {
-        yield put(config.actions.loadingBudget(true));
-      }
+      yield put(config.actions.loadingBudget(true));
       try {
         const response: Http.BulkModelResponse<B> = yield call(config.services.bulkDelete, objId, ids, {
           cancelToken: source.token
@@ -197,9 +186,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
         }
       } finally {
         yield put(config.actions.saving(false));
-        if (tabling.events.eventWarrantsRecalculation(e)) {
-          yield put(config.actions.loadingBudget(false));
-        }
+        yield put(config.actions.loadingBudget(false));
         if (yield cancelled()) {
           source.cancel();
         }

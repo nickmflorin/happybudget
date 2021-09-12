@@ -452,26 +452,24 @@ const authenticateDataGrid =
                     tabling.rows.getFullRowLabel(row, { name: props.defaultRowName, label: props.defaultRowLabel }) ||
                     "Row"
                   }`,
-                  action: () => props.onChangeEvent({ payload: { rows: row, columns: columns }, type: "rowDelete" })
+                  action: () => props.onChangeEvent({ payload: { rows: [row.id] }, type: "rowDelete" })
                 }
               ];
             }
             if (!isNil(props.groups)) {
-              if (!isNil(row.meta.group)) {
-                const group: G | undefined = find(props.groups, { id: row.meta.group } as any);
-                return !isNil(group)
-                  ? [
-                      ...contextMenuItems,
-                      {
-                        name: `Remove ${fullRowLabel} from Group ${group.name}`,
-                        action: () =>
-                          props.onChangeEvent({
-                            type: "rowRemoveFromGroup",
-                            payload: { columns: props.columns, rows: row, group: group.id }
-                          })
-                      }
-                    ]
-                  : [];
+              const group: G | undefined = find(props.groups, (g: G) => includes(g.children, row.id));
+              if (!isNil(group)) {
+                return [
+                  ...contextMenuItems,
+                  {
+                    name: `Remove ${fullRowLabel} from Group ${group.name}`,
+                    action: () =>
+                      props.onChangeEvent({
+                        type: "rowRemoveFromGroup",
+                        payload: { rows: [row.id], group: group.id }
+                      })
+                  }
+                ];
               } else {
                 const groupableNodesAbove = findRowsUpUntilFirstGroupFooterRow(node);
                 const onGroupRows = props.onGroupRows;
@@ -499,12 +497,12 @@ const authenticateDataGrid =
                 if (props.groups.length !== 0) {
                   contextMenuItems.push({
                     name: "Add to Group",
-                    subMenu: map(props.groups, (group: G) => ({
-                      name: group.name,
+                    subMenu: map(props.groups, (g: G) => ({
+                      name: g.name,
                       action: () =>
                         props.onChangeEvent({
                           type: "rowAddToGroup",
-                          payload: { columns: props.columns, rows: row, group: group.id }
+                          payload: { rows: [row.id], group: g.id }
                         })
                     }))
                   });

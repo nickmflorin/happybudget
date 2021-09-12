@@ -1,5 +1,5 @@
 import { PayloadActionCreator } from "@reduxjs/toolkit";
-import { isNil, reduce, map, includes, filter, uniq, flatten, uniqBy } from "lodash";
+import { isNil, reduce, map, includes, filter, flatten, uniqBy } from "lodash";
 
 import * as tabling from "../../tabling";
 import * as util from "../../util";
@@ -177,58 +177,22 @@ export const createAuthenticatedSubAccountsTableReducer = (
           Fringe).
           */
           const consolidated = tabling.events.consolidateTableChange<Tables.FringeRowData, Model.Fringe>(e.payload);
-          /*
-          We only want to look at the changes to Fringe(s) that warrant recalculation of
-          the SubAccount.  The event will only warrant recalculation if either the
-          rate field or the cutoff field are changed (at least currently).
-          */
-          const changesWarrantingRecalculation: Table.RowChange<Tables.FringeRowData, Model.Fringe>[] = filter(
+          const ids: Table.DataRowID[] = map(
             consolidated,
-            (ch: Table.RowChange<Tables.FringeRowData, Model.Fringe>) =>
-              tabling.events.changeOrAddWarrantsRecalculation(ch)
+            (ch: Table.RowChange<Tables.FringeRowData, Model.Fringe>) => ch.id
           );
-          newState = recalculateSubAccountsWithFringes(
-            uniq(
-              map(
-                /*
-                We only want to look at the changes to Fringe(s) that warrant recalculation of
-                the SubAccount.  The event will only warrant recalculation if either the
-                rate field or the cutoff field are changed (at least currently).
-                */
-                changesWarrantingRecalculation,
-                (change: Table.RowChange<Tables.FringeRowData, Model.Fringe>) => change.id
-              )
-            )
-          );
+          newState = recalculateSubAccountsWithFringes(ids);
         } else if (tabling.typeguards.isRowAddEvent(e)) {
-          // Eventually, we will want to implement this - so we do not have to rely on waiting
-          // for the response of the API request.
+          // We do not need to worry about this right now, because when a Fringe is just added it
+          // is not yet associated with a SubAccount.
         } else if (tabling.typeguards.isRowDeleteEvent(e)) {
           /*
-          For each FringeRow that was removed, obtain the ID of the Fringe for only the removed rows
-          that warrant recalculation of the SubAccount, and then recalculate the metrics for each
-          SubAccount(s) that previously had that Fringe applied (while also removing the Fringe
-          from that SubAccount).
+          For each FringeRow that was removed, obtain the ID of the Fringe and then recalculate the
+          metrics for each SubAccount(s) that previously had that Fringe applied, while simultaneously
+          removing that Fringe from the SubAccount.
           */
-          const rows: Table.DataRow<Tables.FringeRowData, Model.Fringe>[] = Array.isArray(e.payload.rows)
-            ? e.payload.rows
-            : [e.payload.rows];
-          newState = recalculateSubAccountsWithFringes(
-            uniq(
-              map(
-                /*
-                We only want to look at the FringeRow(s) being deleted that would otherwise warrant
-                recalculation of the SubAccount.  The row will only warrant recalculation of the
-                SubAccount if the rate field or the cutoff field are changed (at least currently).
-                */
-                filter(rows, (row: Table.DataRow<Tables.FringeRowData, Model.Fringe>) =>
-                  tabling.rows.rowWarrantsRecalculation(row, e.payload.columns)
-                ),
-                (row: Table.DataRow<Tables.FringeRowData, Model.Fringe>) => row.id
-              )
-            ),
-            true
-          );
+          const ids: Table.DataRowID[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+          newState = recalculateSubAccountsWithFringes(ids, true);
         }
       }
     }

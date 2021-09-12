@@ -1,8 +1,6 @@
-import { groupBy, isNil, reduce, filter } from "lodash";
+import { groupBy, isNil, reduce } from "lodash";
 
 import * as util from "../util";
-import { isDataChangeEvent, isRowAddEvent, isFullRowEvent, isRowDeleteEvent } from "./typeguards";
-import { rowWarrantsRecalculation } from "./rows";
 
 export const collapseSoloCellChange = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   cellChange: Table.SoloCellChange<R, M>
@@ -123,30 +121,7 @@ export const consolidateTableChange = <R extends Table.RowData, M extends Model.
   }
 };
 
-export const cellChangeOrAddWarantsRecalculation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  change: Table.SoloCellChange<R, M> | Table.CellChange<R, M> | Table.CellAdd<R, M>
-): boolean => change.column.isCalculating === true;
-
-export const rowChangeOrAddWarrantsRecalculation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  change: Table.RowChange<R, M> | Table.RowAdd<R, M>
-): boolean =>
-  /* eslint-disable indent */
-  filter(
-    change.data,
-    (value: Table.CellChange<R, M> | Table.CellAdd<R, M> | undefined) =>
-      !isNil(value) && cellChangeOrAddWarantsRecalculation(value)
-  ).length !== 0;
-
-export const changeOrAddWarrantsRecalculation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  change: Table.DataChangePayload<R, M> | Table.RowAddPayload<R, M>
-): boolean => {
-  const arrayChanges: (Table.RowChange<R, M> | Table.RowAdd<R, M>)[] = Array.isArray(change) ? change : [change];
-  return (
-    filter(arrayChanges, (ch: Table.RowChange<R, M> | Table.RowAdd<R, M>) => rowChangeOrAddWarrantsRecalculation(ch))
-      .length !== 0
-  );
-};
-
+/* eslint-disable indent */
 export const rowAddToRowData = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   add: Table.RowAdd<R, M>
 ): R =>
@@ -157,64 +132,3 @@ export const rowAddToRowData = <R extends Table.RowData, M extends Model.Model =
     },
     {} as R
   );
-
-export const addWarrantsRecalculation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  add: Table.RowAdd<R, M>
-): boolean =>
-  /* eslint-disable indent */
-  filter(add.data, (value: Table.CellAdd<R, M> | undefined) => !isNil(value) && value.column.isCalculating === true)
-    .length !== 0;
-
-export const additionsWarrantParentRefresh = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  additions: Table.RowAddPayload<R, M>
-): boolean => {
-  // If the payload is just a number, we are just creating a certain number of blank
-  // rows - so no refresh is warranted.
-  if (typeof additions === "number") {
-    return false;
-  }
-  return Array.isArray(additions)
-    ? filter(additions, (add: Table.RowAdd<R, M>) => addWarrantsRecalculation(add) === true).length !== 0
-    : addWarrantsRecalculation(additions);
-};
-
-export const fullRowPayloadRequiresRefresh = <R extends Table.RowData, M extends Model.Model = Model.Model>(payload: {
-  rows: Table.DataRow<R, M>[] | Table.DataRow<R, M>;
-  columns: Table.Column<R, M>[];
-}): boolean => {
-  const rows: Table.DataRow<R, M>[] = Array.isArray(payload.rows) ? payload.rows : [payload.rows];
-  return filter(rows, (row: Table.DataRow<R, M>) => rowWarrantsRecalculation<R, M>(row, payload.columns)).length !== 0;
-};
-
-// Not applicable for GroupDeleteEvent because deletion of a group should not
-// warrant any recalculation of that deleted group.
-export const eventWarrantsGroupRecalculation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  e:
-    | Table.DataChangeEvent<R, M>
-    | Table.RowAddEvent<R, M>
-    | Table.RowDeleteEvent<R, M>
-    | Table.RowRemoveFromGroupEvent<R, M>
-    | Table.RowAddToGroupEvent<R, M>
-): boolean => {
-  if (isDataChangeEvent(e) || isRowAddEvent(e) || isRowDeleteEvent(e)) {
-    return eventWarrantsRecalculation(e);
-  } else {
-    // Only RowRemoveFromGroupEvent | RowAddToGroupEvent at this point.
-    return fullRowPayloadRequiresRefresh(e.payload);
-  }
-};
-
-// Not applicable for RowAddToGroupEvent, RowRemoveFromGroupEvent and GroupDeleteEvent
-// because modifications to a group only cause recalculation of the group itself, not
-// the parent Account/SubAccount and/or Budget/Template.
-export const eventWarrantsRecalculation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  e: Table.DataChangeEvent<R, M> | Table.RowAddEvent<R, M> | Table.RowDeleteEvent<R, M>
-): boolean => {
-  if (isFullRowEvent(e)) {
-    return fullRowPayloadRequiresRefresh(e.payload);
-  } else if (isDataChangeEvent(e)) {
-    return changeOrAddWarrantsRecalculation(e.payload);
-  } else {
-    return additionsWarrantParentRefresh(e.payload);
-  }
-};

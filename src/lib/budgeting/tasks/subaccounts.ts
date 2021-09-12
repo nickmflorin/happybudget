@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
-import { isNil, map, filter } from "lodash";
+import { isNil, map } from "lodash";
 
 import * as api from "api";
 import * as contactsTasks from "store/tasks/contacts";
@@ -167,9 +167,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         }
       );
       yield put(config.actions.saving(true));
-      if (tabling.events.eventWarrantsRecalculation(e)) {
-        yield put(config.actions.loadingBudget(true));
-      }
+      yield put(config.actions.loadingBudget(true));
       try {
         const response: Http.BudgetBulkCreateResponse<B, M, C> = yield call(
           config.services.bulkCreate,
@@ -199,9 +197,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
         }
       } finally {
         yield put(config.actions.saving(false));
-        if (tabling.events.eventWarrantsRecalculation(e)) {
-          yield put(config.actions.loadingBudget(false));
-        }
+        yield put(config.actions.loadingBudget(false));
         if (yield cancelled()) {
           source.cancel();
         }
@@ -217,7 +213,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
   ): SagaIterator {
     if (isAuthenticatedConfig(config)) {
       yield put(config.actions.saving(true));
-      if (!tabling.typeguards.isGroupEvent(e) && tabling.events.eventWarrantsRecalculation(e)) {
+      if (!tabling.typeguards.isGroupEvent(e)) {
         yield put(config.actions.loadingBudget(true));
       }
       try {
@@ -236,9 +232,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           api.handleRequestError(err as Error, errorMessage);
         }
       } finally {
-        if (!tabling.typeguards.isGroupEvent(e) && tabling.events.eventWarrantsRecalculation(e)) {
-          yield put(config.actions.loadingBudget(false));
-        }
+        yield put(config.actions.loadingBudget(false));
         yield put(config.actions.saving(false));
         if (yield cancelled()) {
           source.cancel();
@@ -249,17 +243,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
   function* bulkDeleteTask(objId: ID, e: Table.RowDeleteEvent<R, C>, errorMessage: string): SagaIterator {
     if (isAuthenticatedConfig(config)) {
-      const rows: Table.ModelRow<R, C>[] = filter(
-        Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows],
-        (r: Table.DataRow<R, C>) => tabling.typeguards.isModelRow(r)
-      ) as Table.ModelRow<R, C>[];
-      if (rows.length !== 0) {
-        const ids = map(rows, (row: Table.ModelRow<R, C>) => row.id);
-
+      const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+      if (ids.length !== 0) {
         yield put(config.actions.saving(true));
-        if (tabling.events.eventWarrantsRecalculation<R, C>(e)) {
-          yield put(config.actions.loadingBudget(true));
-        }
+        yield put(config.actions.loadingBudget(true));
         try {
           const response: Http.BudgetBulkResponse<B, C> = yield call(config.services.bulkDelete, objId, ids, {
             cancelToken: source.token
@@ -277,9 +264,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
           }
         } finally {
           yield put(config.actions.saving(false));
-          if (tabling.events.eventWarrantsRecalculation(e)) {
-            yield put(config.actions.loadingBudget(false));
-          }
+          yield put(config.actions.loadingBudget(false));
           if (yield cancelled()) {
             source.cancel();
           }
@@ -292,13 +277,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     const objId = yield select(config.selectObjId);
     if (!isNil(action.payload) && !isNil(objId)) {
       const e: Table.RowRemoveFromGroupEvent<R, C> = action.payload;
-      const rows: Table.ModelRow<R, C>[] = filter(
-        Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows],
-        (r: Table.DataRow<R, C>) => tabling.typeguards.isModelRow(r)
-      ) as Table.ModelRow<R, C>[];
+      const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const requestPayload: Http.BulkUpdatePayload<P> = {
-        data: map(rows, (row: Table.ModelRow<R, C>) => ({
-          id: row.id,
+        data: map(ids, (id: Table.RowID) => ({
+          id,
           group: null
         }))
       };
@@ -310,13 +292,10 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     const objId = yield select(config.selectObjId);
     if (!isNil(action.payload) && !isNil(objId)) {
       const e: Table.RowAddToGroupEvent<R, C> = action.payload;
-      const rows: Table.ModelRow<R, C>[] = filter(
-        Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows],
-        (r: Table.DataRow<R, C>) => tabling.typeguards.isModelRow(r)
-      ) as Table.ModelRow<R, C>[];
+      const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       const requestPayload: Http.BulkUpdatePayload<P> = {
-        data: map(rows, (row: Table.ModelRow<R, C>) => ({
-          id: row.id,
+        data: map(ids, (id: Table.RowID) => ({
+          id,
           group: e.payload.group
         }))
       };

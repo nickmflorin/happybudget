@@ -148,7 +148,7 @@ namespace Model {
   interface Group extends Model.TrackedModel {
     readonly name: string;
     readonly color: string | null;
-    readonly children: number[];
+    readonly children: ID[];
   }
 
   interface BudgetGroup extends Model.Group {

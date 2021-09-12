@@ -33,7 +33,6 @@ const Columns: Table.Column<R, M>[] = [
     valueFormatter: tabling.formatters.agPercentageValueFormatter,
     valueSetter: tabling.valueSetters.percentageToDecimalValueSetter<R>("rate"),
     columnType: "percentage",
-    isCalculating: true,
     width: 100
   }),
   framework.columnObjs.ChoiceSelectColumn<R, M, Model.FringeUnit>({
@@ -47,7 +46,6 @@ const Columns: Table.Column<R, M>[] = [
     field: "cutoff",
     headerName: "Cutoff",
     columnType: "number",
-    isCalculating: true,
     width: 100
   })
 ];

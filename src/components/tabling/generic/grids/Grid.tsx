@@ -159,7 +159,7 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
           footer,
           page,
           selectable,
-          isCalculating,
+          requiresAuthentication,
           index,
           canBeExported,
           canBeHidden,

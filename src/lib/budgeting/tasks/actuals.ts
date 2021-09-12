@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { put, call, cancelled, fork, select, all } from "redux-saga/effects";
-import { map, isNil, filter } from "lodash";
+import { map, isNil } from "lodash";
 
 import * as api from "api";
 import * as tabling from "../../tabling";
@@ -166,12 +166,8 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
   }
 
   function* bulkDeleteTask(budgetId: ID, e: Table.RowDeleteEvent<R, M>, errorMessage: string): SagaIterator {
-    const rows: Table.ModelRow<R, M>[] = filter(
-      Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows],
-      (r: Table.DataRow<R, M>) => tabling.typeguards.isModelRow(r)
-    ) as Table.ModelRow<R, M>[];
-    if (rows.length !== 0) {
-      const ids = map(rows, (row: Table.DataRow<R, M>) => row.id);
+    const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+    if (ids.length !== 0) {
       yield put(config.actions.saving(true));
       try {
         // Note: We also have access to the updated budget here, we should use that.
