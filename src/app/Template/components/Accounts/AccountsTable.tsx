@@ -47,6 +47,7 @@ const ConnectedTable = connectTableToStore<
     getModelRowLabel: (r: R) => r.identifier,
     getModelRowName: "Account",
     getPlaceholderRowLabel: (r: R) => r.identifier,
+    getModelRowChildren: (m: Model.Account) => m.subaccounts,
     getPlaceholderRowName: "Account",
     initialState: redux.initialState.initialTableState
   })

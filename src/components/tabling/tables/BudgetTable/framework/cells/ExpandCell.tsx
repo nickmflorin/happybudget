@@ -25,7 +25,6 @@ const ExpandCell = <
 }: ExpandCellProps<R, M, S>): JSX.Element => {
   // This cell renderer will only be allowed if the row is of type model.
   const row: Table.ModelRow<R, M> = node.data;
-
   const rowIsHovered = () => {
     const parent = props.eGridCell.parentElement;
     if (!isNil(parent)) {
