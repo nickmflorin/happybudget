@@ -38,15 +38,15 @@
     margin-bottom: 0px !important;
   }
 
-  .ag-root-wrapper-body .ag-checkbox-input-wrapper {
-    &::after {
-      -webkit-text-stroke: 1px white;
-      color: $disabled-color;
-    }
+  // .ag-root-wrapper-body .ag-checkbox-input-wrapper {
+  //   &::after {
+  //     -webkit-text-stroke: 1px white;
+  //     color: $disabled-color;
+  //   }
 
-    &.ag-checked::after {
-      -webkit-text-stroke: 0px;
-      color: #1890ff;
-    }
-  }
+  //   &.ag-checked::after {
+  //     -webkit-text-stroke: 0px;
+  //     color: #1890ff;
+  //   }
+  // }
 }

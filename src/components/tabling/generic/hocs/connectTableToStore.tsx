@@ -4,6 +4,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { isNil } from "lodash";
 import { redux, tabling } from "lib";
+import Application from "app/Application";
 
 type ProvidedProps<
   R extends Table.RowData,

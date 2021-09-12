@@ -25,7 +25,7 @@ namespace Application {
     }
     type StaticReducers = Redux.ReducersMapObject<StaticStores>;
 
-    type Store = StaticStores & Redux.AsyncStore;
+    type Store = StaticStores & Redux.AsyncStores<Redux.TableStore>;
     type Reducers = Redux.ReducersMapObject<Store>;
 
     type ModuleConfig<S extends AnyModuleStore = any> = Omit<
@@ -51,7 +51,7 @@ namespace Application {
     }
     type StaticReducers = Redux.ReducersMapObject<StaticStores>;
 
-    type Store = StaticStores & Redux.AsyncStore;
+    type Store = StaticStores & Redux.AsyncStores<Redux.TableStore>;
     type Reducers = Redux.ReducersMapObject<Store>;
 
     type ModuleConfig<S extends Modules.Share.Store = any> = Omit<

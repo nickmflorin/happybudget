@@ -100,6 +100,8 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
     columns: AccountsTable.BudgetColumns,
     selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
     selectAutoIndex: (state: Application.Authenticated.Store) => state.budget.autoIndex,
+    selectData: (state: Application.Authenticated.Store) =>
+      !isNil(state["async-BudgetAccountsTable"]) ? state["async-BudgetAccountsTable"].data : [],
     actions: ActionMap,
     services: {
       request: api.getBudgetAccounts,

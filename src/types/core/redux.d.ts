@@ -8,7 +8,7 @@ namespace Redux {
   type SelectorFunc<T = any> = AuthenticatedSelectorFunc<T> | UnauthenticatedSelectorFunc<T>;
 
   type AsyncId = `async-${string}`
-  type AsyncStore = { [key in AsyncId]: any };
+  type AsyncStores<S = any> = { [key in AsyncId]: S };
 
   type Transformers<S = any, A = any> = {
     [K in keyof A]: Redux.Reducer<S>
@@ -27,7 +27,9 @@ namespace Redux {
   type ReducersMapObject<S = any> = {
     [K in keyof S]-?: Redux.Reducer<S[K]>
   }
-  type AsyncReducers = ReducersMapObject<AsyncStore>;
+  type ReducersWithAsyncMapObject<S = any> = ReducersMapObject<S> & {
+    [K in AsyncId]: Redux.Reducer<any>
+  }
 
   type SagaManager = {
     readonly injectSaga: (id: Redux.AsyncId, saga: import("redux-saga").Saga) => void;
@@ -35,9 +37,9 @@ namespace Redux {
   };
 
   type ReducerManager<S extends Application.Store> = {
-    readonly getReducerMap: () => Redux.ReducersMapObject<S>;
+    readonly getReducerMap: () => Redux.ReducersWithAsyncMapObject<S>;
     readonly reduce: (state: S | undefined, action: Redux.Action) => S;
-    readonly injectReducer: (key: Redux.AsyncId, reducer: Redux.Reducer<S[AsyncId]>) => void;
+    readonly injectReducer: (key: Redux.AsyncId, reducer: Redux.Reducer<any>) => void;
     readonly ejectReducer: (key: Redux.AsyncId) => void;
   };
 

@@ -94,26 +94,23 @@ const UnauthenticatedTable = <
       minimal={props.minimal}
       className={props.className}
       menuPortalId={props.menuPortalId}
+      showPageFooter={props.showPageFooter}
       footer={
-        props.showPageFooter ? (
-          <PageFooterGrid
-            onGridReady={props.onPageGridReady}
-            onFirstDataRendered={props.onFirstDataRendered}
-            gridOptions={props.tableGridOptions.page}
-            columns={columns}
-            hiddenColumns={props.hiddenColumns}
-            framework={props.framework}
-            indexColumn={{
-              // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
-              // because then the New Row Button will be centered horizontally between two cells and not
-              // aligned with the Index cells in the grid--data.
-              colSpan: (params: Table.ColSpanParams<R, M>) =>
-                props.hasExpandColumn && !(props.leftAlignNewRowButton === true) ? 2 : 1
-            }}
-          />
-        ) : (
-          <></>
-        )
+        <PageFooterGrid
+          onGridReady={props.onPageGridReady}
+          onFirstDataRendered={props.onFirstDataRendered}
+          gridOptions={props.tableGridOptions.page}
+          columns={columns}
+          hiddenColumns={props.hiddenColumns}
+          framework={props.framework}
+          indexColumn={{
+            // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
+            // because then the New Row Button will be centered horizontally between two cells and not
+            // aligned with the Index cells in the grid--data.
+            colSpan: (params: Table.ColSpanParams<R, M>) =>
+              props.hasExpandColumn && !(props.leftAlignNewRowButton === true) ? 2 : 1
+          }}
+        />
       }
     >
       <React.Fragment>

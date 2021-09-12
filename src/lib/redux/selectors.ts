@@ -1,6 +1,6 @@
 import { shallowEqual } from "react-redux";
 import { createSelector, createSelectorCreator, defaultMemoize } from "reselect";
-import { isEqual, filter, map, isNil } from "lodash";
+import { isEqual, filter, map } from "lodash";
 import { isAuthenticatedStore } from "./typeguards";
 
 export const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual);
@@ -35,15 +35,3 @@ export const createLoadingSelector = <S extends Application.Store>(...selectors:
       ).length !== 0
     );
   });
-
-/* eslint-disable indent */
-export const createAsyncSelector =
-  <S extends Redux.TableStore>(id: Redux.AsyncId) =>
-  (selectorFn: (state: S) => any) => {
-    return simpleDeepEqualSelector((s: Application.Store) => {
-      if (!isNil(s[id])) {
-        return selectorFn(s[id]);
-      }
-      return undefined;
-    });
-  };

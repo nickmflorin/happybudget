@@ -1,6 +1,7 @@
 import { SagaIterator } from "redux-saga";
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { spawn } from "redux-saga/effects";
+import { isNil } from "lodash";
 
 import * as api from "api";
 import { budgeting, tabling } from "lib";
@@ -39,6 +40,8 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
     columns: AccountsTable.TemplateColumns,
     selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
     selectAutoIndex: (state: Application.Authenticated.Store) => state.budget.autoIndex,
+    selectData: (state: Application.Authenticated.Store) =>
+      !isNil(state["async-TemplateAccountsTable"]) ? state["async-TemplateAccountsTable"].data : [],
     actions: ActionMap,
     services: {
       request: api.getTemplateAccounts,
