@@ -1,5 +1,6 @@
 import { ValueCell } from "./generic";
 import useFormattedValue from "./useFormattedValue";
+import connectCellToStore from "./connectCellToStore";
 
 /* eslint-disable indent */
 const BodyCell = <
@@ -14,4 +15,4 @@ const BodyCell = <
   return <ValueCell<R, M, S> {...props} value={formattedValue} />;
 };
 
-export default BodyCell;
+export default connectCellToStore(BodyCell) as typeof BodyCell;

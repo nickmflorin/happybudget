@@ -31,11 +31,6 @@ const ActualsTable = ({
 }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
   const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
 
-  // Need to incorporate into top level row selector.
-  // const actualsTableTotal = useMemo(() => {
-  //   return reduce(props.data, (sum: number, s: Tables.ActualRowData) => sum + (s.value || 0), 0);
-  // }, [hooks.useDeepEqualMemo(props.data)]);
-
   return (
     <AuthenticatedModelTable<R, M>
       {...props}

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isNil, find } from "lodash";
+import { createSelector } from "reselect";
+import { isNil, find, reduce } from "lodash";
 
 import { redux } from "lib";
 import { selectors } from "store";
@@ -23,13 +24,17 @@ const ActionMap = {
   setSearch: actions.actuals.setSearchAction
 };
 
-const ActualsTableStoreSelector = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.actuals
-);
-
 const ConnectedActualsTable = connectTableToStore<ActualsTable.Props, R, M, Model.Group, Tables.ActualTableStore>({
   actions: ActionMap,
-  selector: ActualsTableStoreSelector
+  selector: redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals),
+  footerRowSelectors: {
+    footer: createSelector(
+      [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.actuals.data)],
+      (data: Table.Row<Tables.ActualRowData, Model.Actual>[]) => ({
+        value: reduce(data, (sum: number, s: Tables.ActualRowData) => sum + (s.value || 0), 0)
+      })
+    )
+  }
 })(ActualsTable.Table);
 
 interface ActualsProps {
