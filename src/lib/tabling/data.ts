@@ -46,6 +46,7 @@ export const createTableData = <R extends Table.RowData, M extends Model.Model, 
           model: m,
           group: null,
           gridId: "data",
+          getRowChildren: config.getModelRowChildren,
           getRowLabel: config.getModelRowLabel,
           getRowName: config.getModelRowName
         })
@@ -73,6 +74,7 @@ export const createTableData = <R extends Table.RowData, M extends Model.Model, 
                   ...m,
                   columns: config.columns,
                   gridId: "data",
+                  getRowChildren: config.getModelRowChildren,
                   getRowLabel: config.getModelRowLabel,
                   getRowName: config.getModelRowName
                 })
