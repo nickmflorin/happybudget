@@ -196,7 +196,9 @@
           width: 100%;
           height: 100%;
           display: flex;
-          white-space: break-spaces;
+          // This is messing with the hack for text overflow in the identifier
+          // cell of the page and table footers.
+          // white-space: break-spaces;
 
           .loadable-cell-wrapper {
             height: 100%;

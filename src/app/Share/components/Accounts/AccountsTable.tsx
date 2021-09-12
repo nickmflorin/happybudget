@@ -1,4 +1,6 @@
 import { useHistory } from "react-router-dom";
+import { createSelector } from "reselect";
+import { isNil } from "lodash";
 
 import { budgeting, tabling, redux } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
@@ -24,6 +26,17 @@ const ConnectedTable = connectTableToStore<
 >({
   storeId: "async-ShareAccountsTable",
   actions: ActionMap,
+  footerRowSelectors: {
+    footer: createSelector(
+      [redux.selectors.simpleDeepEqualSelector((state: Application.Unauthenticated.Store) => state.share.detail.data)],
+      (budget: Model.Budget | undefined) => ({
+        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
+        estimated: budget?.estimated || 0.0,
+        variance: budget?.variance || 0.0,
+        actual: budget?.actual || 0.0
+      })
+    )
+  },
   reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
     columns: GenericAccountsTable.BudgetColumns,
     actions: ActionMap,

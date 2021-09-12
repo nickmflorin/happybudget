@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isNil } from "lodash";
-import { map } from "lodash";
+import { createSelector } from "reselect";
+import { isNil, map } from "lodash";
 
 import { budgeting, redux, tabling } from "lib";
 import { CreateBudgetAccountGroupModal, EditGroupModal } from "components/modals";
@@ -33,6 +33,17 @@ const ConnectedTable = connectTableToStore<
 >({
   storeId: "async-BudgetAccountsTable",
   actions: ActionMap,
+  footerRowSelectors: {
+    footer: createSelector(
+      [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data)],
+      (budget: Model.Budget | undefined) => ({
+        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
+        estimated: budget?.estimated || 0.0,
+        variance: budget?.variance || 0.0,
+        actual: budget?.actual || 0.0
+      })
+    )
+  },
   reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
     columns: GenericAccountsTable.BudgetColumns,
     actions: ActionMap,

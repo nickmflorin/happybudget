@@ -9,35 +9,26 @@ import {
   AuthenticatedBudgetTableProps,
   framework as budgetTableFramework
 } from "../BudgetTable";
-import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable";
+import SubAccountsTable from "./SubAccountsTable";
 import { AuthenticatedTemplateColumns } from "./Columns";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 
-export type AuthenticatedTemplateProps = Omit<
-  Omit<AuthenticatedBudgetTableProps<R, M>, "columns" | "getRowChildren"> &
-    WithSubAccountsTableProps<{
-      readonly tableFooterIdentifierValue: string;
-      readonly subAccountUnits: Model.Tag[];
-      readonly fringes: Table.Row<Tables.FringeRowData>[];
-      readonly categoryName: "Sub Account" | "Detail";
-      readonly identifierFieldHeader: "Account" | "Line";
-      readonly budget?: Model.Template;
-      readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
-      readonly cookieNames: Table.CookieNames;
-      readonly detail: Model.Account | M | undefined;
-      readonly exportFileName: string;
-      readonly onEditGroup: (group: Model.BudgetGroup) => void;
-      readonly onAddFringes: () => void;
-      readonly onEditFringes: () => void;
-    }>,
-  "getRowChildren"
->;
+export type AuthenticatedTemplateProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> & {
+  readonly subAccountUnits: Model.Tag[];
+  readonly fringes: Table.Row<Tables.FringeRowData>[];
+  readonly categoryName: "Sub Account" | "Detail";
+  readonly identifierFieldHeader: "Account" | "Line";
+  readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
+  readonly cookieNames: Table.CookieNames;
+  readonly exportFileName: string;
+  readonly onEditGroup: (group: Model.BudgetGroup) => void;
+  readonly onAddFringes: () => void;
+  readonly onEditFringes: () => void;
+};
 
-const AuthenticatedTemplateSubAccountsTable = (
-  props: WithSubAccountsTableProps<AuthenticatedTemplateProps>
-): JSX.Element => {
+const AuthenticatedTemplateSubAccountsTable = (props: AuthenticatedTemplateProps): JSX.Element => {
   const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
 
   return (
@@ -52,21 +43,11 @@ const AuthenticatedTemplateSubAccountsTable = (
               ...col.cellRendererParams,
               onGroupEdit: props.onEditGroup
             },
-            tableFooterLabel: props.tableFooterIdentifierValue,
-            pageFooterLabel: !isNil(props.budget) ? `${props.budget.name} Total` : "Budget Total",
             headerName: props.identifierFieldHeader
           }),
         description: { headerName: `${props.categoryName} Description` },
         unit: (col: Table.Column<R, M>) =>
-          framework.columnObjs.TagSelectColumn<R, M>({ ...col, models: props.subAccountUnits }),
-        estimated: {
-          page: {
-            value: !isNil(props.budget) && !isNil(props.budget.estimated) ? props.budget.estimated : 0.0
-          },
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.estimated) ? props.budget.estimated : 0.0
-          }
-        }
+          framework.columnObjs.TagSelectColumn<R, M>({ ...col, models: props.subAccountUnits })
       })}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
         {

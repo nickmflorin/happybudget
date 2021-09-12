@@ -8,7 +8,7 @@ import {
   AuthenticatedBudgetTableProps,
   framework as budgetTableFramework
 } from "../BudgetTable";
-import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable";
+import SubAccountsTable from "./SubAccountsTable";
 import { AuthenticatedBudgetColumns } from "./Columns";
 
 type R = Tables.SubAccountRowData;
@@ -16,33 +16,24 @@ type M = Model.SubAccount;
 
 type PreContactCreate = Omit<Table.SoloCellChange<R, M>, "newValue">;
 
-export type AuthenticatedBudgetProps = Omit<
-  Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> &
-    WithSubAccountsTableProps<{
-      readonly tableFooterIdentifierValue: string;
-      readonly subAccountUnits: Model.Tag[];
-      readonly fringes: Tables.FringeRow[];
-      readonly categoryName: "Sub Account" | "Detail";
-      readonly identifierFieldHeader: "Account" | "Line";
-      readonly budget?: Model.Budget;
-      readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
-      readonly cookieNames: Table.CookieNames;
-      readonly detail: Model.Account | M | undefined;
-      readonly contacts: Model.Contact[];
-      readonly exportFileName: string;
-      readonly onExportPdf: () => void;
-      readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
-      readonly onEditContact: (id: ID) => void;
-      readonly onEditGroup: (group: Model.BudgetGroup) => void;
-      readonly onAddFringes: () => void;
-      readonly onEditFringes: () => void;
-    }>,
-  "getRowChildren"
->;
+export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> & {
+  readonly subAccountUnits: Model.Tag[];
+  readonly fringes: Tables.FringeRow[];
+  readonly categoryName: "Sub Account" | "Detail";
+  readonly identifierFieldHeader: "Account" | "Line";
+  readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
+  readonly cookieNames: Table.CookieNames;
+  readonly contacts: Model.Contact[];
+  readonly exportFileName: string;
+  readonly onExportPdf: () => void;
+  readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
+  readonly onEditContact: (id: ID) => void;
+  readonly onEditGroup: (group: Model.BudgetGroup) => void;
+  readonly onAddFringes: () => void;
+  readonly onEditFringes: () => void;
+};
 
-const AuthenticatedBudgetSubAccountsTable = (
-  props: WithSubAccountsTableProps<AuthenticatedBudgetProps>
-): JSX.Element => {
+const AuthenticatedBudgetSubAccountsTable = (props: AuthenticatedBudgetProps): JSX.Element => {
   const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined(props.tableRef);
 
   return (
@@ -57,8 +48,6 @@ const AuthenticatedBudgetSubAccountsTable = (
               ...col.cellRendererParams,
               onGroupEdit: props.onEditGroup
             },
-            tableFooterLabel: props.tableFooterIdentifierValue,
-            pageFooterLabel: !isNil(props.budget) ? `${props.budget.name} Total` : "Budget Total",
             headerName: props.identifierFieldHeader
           }),
         description: { headerName: `${props.categoryName} Description` },
@@ -104,31 +93,7 @@ const AuthenticatedBudgetSubAccountsTable = (
                 return contact || null;
               }
             }
-          }),
-        estimated: {
-          page: {
-            value: !isNil(props.budget) && !isNil(props.budget.estimated) ? props.budget.estimated : 0.0
-          },
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.estimated) ? props.budget.estimated : 0.0
-          }
-        },
-        actual: {
-          page: {
-            value: !isNil(props.budget) && !isNil(props.budget.actual) ? props.budget.actual : 0.0
-          },
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.actual) ? props.budget.actual : 0.0
-          }
-        },
-        variance: {
-          page: {
-            value: !isNil(props.budget) && !isNil(props.budget.variance) ? props.budget.variance : 0.0
-          },
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.variance) ? props.budget.variance : 0.0
-          }
-        }
+          })
       })}
       onCellFocusChanged={(params: Table.CellFocusChangedParams<R, M>) => {
         /*

@@ -4,21 +4,21 @@ import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
-import AccountsTable, { AccountsTableProps, WithAccountsTableProps } from "./AccountsTable";
+import AccountsTable, { AccountsTableProps } from "./AccountsTable";
 import { TemplateColumns } from "./Columns";
 
 type M = Model.Account;
 type R = Tables.AccountRowData;
 
 export type AuthenticatedTemplateProps = AccountsTableProps &
-  Omit<AuthenticatedBudgetTableProps<R, M>, "columns" | "cookieNames" | "getRowChildren"> & {
+  Omit<AuthenticatedBudgetTableProps<R, M>, "columns" | "cookieNames"> & {
     readonly budget?: Model.Template;
     readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
     readonly cookieNames?: Table.CookieNames;
     readonly onEditGroup: (group: Model.BudgetGroup) => void;
   };
 
-const AuthenticatedTemplateAccountsTable = (props: WithAccountsTableProps<AuthenticatedTemplateProps>): JSX.Element => {
+const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): JSX.Element => {
   const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
 
   return (
@@ -42,17 +42,11 @@ const AuthenticatedTemplateAccountsTable = (props: WithAccountsTableProps<Authen
       columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(TemplateColumns, {
         identifier: (col: Table.Column<R, M>) => ({
           ...col,
-          tableFooterLabel: !isNil(props.budget) ? `${props.budget.name} Total` : "Total",
           cellRendererParams: {
             ...col.cellRendererParams,
             onGroupEdit: props.onEditGroup
           }
-        }),
-        estimated: {
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.estimated) ? props.budget.estimated : 0.0
-          }
-        }
+        })
       })}
     />
   );

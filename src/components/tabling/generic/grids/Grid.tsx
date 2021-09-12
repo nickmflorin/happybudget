@@ -136,8 +136,8 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
       (col: Table.Column<R, M>, index: number): Table.Column<R, M> =>
         ({
           ...col,
-          headerComponentParams: { ...col.headerComponentParams, column: col },
-          cellRendererParams: { ...col.cellRendererParams, columns, column: col },
+          headerComponentParams: { ...col.headerComponentParams, customCol: col },
+          cellRendererParams: { ...col.cellRendererParams, columns, customCol: col, gridId: id },
           hide: includes(hiddenColumns, col.field),
           resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
           cellStyle: { ...tabling.columns.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }

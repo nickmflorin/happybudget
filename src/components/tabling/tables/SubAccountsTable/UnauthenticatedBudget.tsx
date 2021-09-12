@@ -8,32 +8,23 @@ import {
   UnauthenticatedBudgetTableProps,
   framework as budgetTableFramework
 } from "../BudgetTable";
-import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable";
+import SubAccountsTable from "./SubAccountsTable";
 import { UnauthenticatedBudgetColumns } from "./Columns";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 
-export type UnauthenticatedBudgetProps = Omit<
-  Omit<UnauthenticatedBudgetTableProps<R, M>, "columns" | "getRowChildren"> &
-    WithSubAccountsTableProps<{
-      readonly tableFooterIdentifierValue: string;
-      readonly subAccountUnits: Model.Tag[];
-      readonly fringes: Tables.FringeRow[];
-      readonly categoryName: "Sub Account" | "Detail";
-      readonly identifierFieldHeader: "Account" | "Line";
-      readonly budget?: Model.Budget;
-      readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
-      readonly cookieNames: Table.CookieNames;
-      readonly detail: Model.Account | M | undefined;
-      readonly exportFileName: string;
-    }>,
-  "getRowChildren"
->;
+export type UnauthenticatedBudgetProps = Omit<UnauthenticatedBudgetTableProps<R, M>, "columns"> & {
+  readonly subAccountUnits: Model.Tag[];
+  readonly fringes: Tables.FringeRow[];
+  readonly categoryName: "Sub Account" | "Detail";
+  readonly identifierFieldHeader: "Account" | "Line";
+  readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
+  readonly cookieNames: Table.CookieNames;
+  readonly exportFileName: string;
+};
 
-const UnauthenticatedBudgetSubAccountsTable = (
-  props: WithSubAccountsTableProps<UnauthenticatedBudgetProps>
-): JSX.Element => {
+const UnauthenticatedBudgetSubAccountsTable = (props: UnauthenticatedBudgetProps): JSX.Element => {
   const tableRef = tabling.hooks.useUnauthenticatedTableIfNotDefined(props.tableRef);
 
   return (
@@ -44,8 +35,6 @@ const UnauthenticatedBudgetSubAccountsTable = (
         identifier: (col: Table.Column<R, M>) =>
           budgetTableFramework.columnObjs.IdentifierColumn<R, M>({
             ...col,
-            tableFooterLabel: props.tableFooterIdentifierValue,
-            pageFooterLabel: !isNil(props.budget) ? `${props.budget.name} Total` : "Budget Total",
             headerName: props.identifierFieldHeader
           }),
         description: { headerName: `${props.categoryName} Description` },
@@ -55,30 +44,6 @@ const UnauthenticatedBudgetSubAccountsTable = (
           processCellForClipboard: (row: R) => {
             const fringes = model.util.getModelsByIds<Tables.FringeRow>(props.fringes, row.fringes);
             return map(fringes, (fringe: Tables.FringeRow) => fringe.name).join(", ");
-          }
-        },
-        estimated: {
-          page: {
-            value: !isNil(props.budget) && !isNil(props.budget.estimated) ? props.budget.estimated : 0.0
-          },
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.estimated) ? props.budget.estimated : 0.0
-          }
-        },
-        actual: {
-          page: {
-            value: !isNil(props.budget) && !isNil(props.budget.actual) ? props.budget.actual : 0.0
-          },
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.actual) ? props.budget.actual : 0.0
-          }
-        },
-        variance: {
-          page: {
-            value: !isNil(props.budget) && !isNil(props.budget.variance) ? props.budget.variance : 0.0
-          },
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.variance) ? props.budget.variance : 0.0
           }
         }
       })}

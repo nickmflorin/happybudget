@@ -17,7 +17,7 @@ export type ActualsTableActionMap = Redux.AuthenticatedTableActionMap<R, M> & {
   readonly responseSubAccountsTree: Http.ListResponse<Model.SubAccountTreeNode>;
 };
 
-export type ActualsTableTaskConfig = Redux.TableTaskConfig<R, M, Model.Group, ActualsTableActionMap> & {
+export type ActualsTableTaskConfig = Table.TaskConfig<R, M, Model.Group, ActualsTableActionMap> & {
   readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
   readonly selectTreeSearch: (state: Application.Authenticated.Store) => string;
   readonly selectTreeCache: (state: Application.Authenticated.Store) => Redux.SearchCache<Model.SubAccountTreeNode>;

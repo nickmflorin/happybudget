@@ -125,7 +125,7 @@ export const createTableChangeEventReducer = <
   G extends Model.Group = Model.Group,
   S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  config: Redux.TableReducerConfig<R, M, G, S, Redux.AuthenticatedTableActionMap<R, M, G>> & {
+  config: Table.ReducerConfig<R, M, G, S, Redux.AuthenticatedTableActionMap<R, M, G>> & {
     readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R, M>) => Table.DataRow<R, M>;
     readonly recalculateGroup?: (state: S, action: Redux.Action, group: G) => G;
   },
@@ -370,7 +370,7 @@ export const createTableReducer = <
   S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
   A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
 >(
-  config: Redux.TableReducerConfig<R, M, G, S, A>
+  config: Table.ReducerConfig<R, M, G, S, A>
 ): Redux.Reducer<S> => {
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState: S = { ...state };
@@ -409,7 +409,7 @@ export const createUnauthenticatedTableReducer = <
   G extends Model.Group = Model.Group,
   S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  config: Redux.TableReducerConfig<R, M, G, S>
+  config: Table.ReducerConfig<R, M, G, S>
 ): Redux.Reducer<S> => {
   return createTableReducer<R, M, G, S>(config);
 };
@@ -420,7 +420,7 @@ export const createAuthenticatedTableReducer = <
   G extends Model.Group = Model.Group,
   S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  config: Redux.TableReducerConfig<R, M, G, S, Redux.AuthenticatedTableActionMap<R, M, G>> & {
+  config: Table.ReducerConfig<R, M, G, S, Redux.AuthenticatedTableActionMap<R, M, G>> & {
     readonly eventReducer?: Redux.Reducer<S>;
     readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R, M>) => Table.DataRow<R, M>;
     readonly recalculateGroup?: (state: S, action: Redux.Action, group: G) => G;

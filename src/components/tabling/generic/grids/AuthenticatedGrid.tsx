@@ -4,27 +4,34 @@ import { map, isNil, reduce } from "lodash";
 import { SelectionChangedEvent } from "@ag-grid-community/core";
 
 import { tabling, hooks } from "lib";
-import BaseFramework from "components/tabling/generic/framework";
+import { framework as generic } from "components/tabling/generic";
 import Grid, { GridProps } from "./Grid";
 
 export interface AuthenticatedGridProps<R extends Table.RowData, M extends Model.Model = Model.Model>
   extends GridProps<R, M> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
+  readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
   readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
   readonly onRowSelectionChanged?: (rows: Table.DataRow<R, M>[]) => void;
 }
 
 const AuthenticatedGrid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
   framework,
+  footerRowSelectors,
   ...props
 }: AuthenticatedGridProps<R, M>): JSX.Element => {
   const frameworkComponents = useMemo<Table.FrameworkGroup>((): Table.FrameworkGroup => {
-    const combinedFramework = tabling.aggrid.combineFrameworks(BaseFramework, framework);
+    const combinedFramework = tabling.aggrid.combineFrameworks(generic.Framework, framework);
+
     return {
       ...reduce(
         combinedFramework.cells?.[props.id],
-        (prev: Table.FrameworkGroup, cell: React.ComponentType<any>, name: string) => ({ ...prev, [name]: cell }),
+        (prev: Table.FrameworkGroup, cell: React.ComponentType<any>, name: string) => ({
+          ...prev,
+          [name]: cell
+          // [name]: generic.connectCellToStore({ gridId: props.id, footerRowSelectors })(cell)
+        }),
         {}
       ),
       ...reduce(

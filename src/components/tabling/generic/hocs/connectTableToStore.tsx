@@ -17,6 +17,7 @@ type ProvidedProps<
   readonly loading: boolean;
   readonly saving: boolean;
   readonly selector: (state: Application.Store) => S;
+  readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
   readonly onSearch: (v: string) => void;
   readonly onChangeEvent: (e: Table.ChangeEvent<R, M>) => void;
 };
@@ -38,7 +39,7 @@ const connectTableToStore =
     G extends Model.Group = Model.Group,
     S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
   >(
-    config: Redux.TableConfiguration<R, M, G, S>
+    config: Table.StoreConfig<R, M, G, S>
   ) =>
   (
     Component:
@@ -90,6 +91,7 @@ const connectTableToStore =
           groups={groups}
           loading={loading}
           selector={selector}
+          footerRowSelectors={config.footerRowSelectors}
           saving={saving}
           onChangeEvent={(e: Table.ChangeEvent<R, M>) =>
             tabling.typeguards.isAuthenticatedActionMap<R, M, G>(config.actions) &&

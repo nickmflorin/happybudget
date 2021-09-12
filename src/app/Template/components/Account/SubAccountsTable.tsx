@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { createSelector } from "reselect";
 import { isNil, map } from "lodash";
 
 import { redux, tabling } from "lib";
@@ -25,10 +26,6 @@ const selectSubAccountUnits = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.template.account.table.subaccountUnits
 );
 
-const SubAccountsTableStoreSelector = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.template.account.table
-);
-
 const ActionMap = {
   tableChanged: actions.account.handleTableChangeEventAction,
   request: actions.account.requestAction,
@@ -47,7 +44,29 @@ const ConnectedTable = connectTableToStore<
   Tables.SubAccountTableStore
 >({
   actions: ActionMap,
-  selector: SubAccountsTableStoreSelector
+  selector: redux.selectors.simpleDeepEqualSelector(
+    (state: Application.Authenticated.Store) => state.template.account.table
+  ),
+  footerRowSelectors: {
+    page: createSelector(
+      [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
+      (budget: Model.Template | undefined) => ({
+        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
+        estimated: budget?.estimated || 0.0
+      })
+    ),
+    footer: createSelector(
+      [
+        redux.selectors.simpleDeepEqualSelector(
+          (state: Application.Authenticated.Store) => state.template.account.detail.data
+        )
+      ],
+      (detail: Model.Account | undefined) => ({
+        identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
+        estimated: detail?.estimated || 0.0
+      })
+    )
+  }
 })(GenericSubAccountsTable.AuthenticatedTemplate);
 
 interface SubAccountsTableProps {
@@ -73,20 +92,13 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
   return (
     <React.Fragment>
       <ConnectedTable
-        budget={template}
         tableRef={tableRef}
         fringes={fringes}
-        detail={accountDetail}
         subAccountUnits={subAccountUnits}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onAddFringes={() => setFringesModalVisible(true)}
         onEditFringes={() => setFringesModalVisible(true)}
-        tableFooterIdentifierValue={
-          !isNil(accountDetail) && !isNil(accountDetail.description)
-            ? `${accountDetail.description} Total`
-            : "Account Total"
-        }
         exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}

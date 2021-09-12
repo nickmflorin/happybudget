@@ -33,7 +33,7 @@ export function* request(action: Redux.Action): SagaIterator {
 }
 
 export const createTableTaskSet = (
-  config: Redux.TableTaskConfig<R, M, Model.Group, Redux.AuthenticatedTableActionMap<R, M, Model.Group>>
+  config: Table.TaskConfig<R, M, Model.Group, Redux.AuthenticatedTableActionMap<R, M, Model.Group>>
 ): Redux.TaskMapObject<Redux.TableTaskMap<R, M>> => {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();

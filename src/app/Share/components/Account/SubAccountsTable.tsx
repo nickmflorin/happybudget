@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
 import { redux, tabling } from "lib";
@@ -41,7 +42,31 @@ const ConnectedTable = connectTableToStore<
   Tables.SubAccountTableStore
 >({
   actions: ActionMap,
-  selector: SubAccountsTableStoreSelector
+  selector: SubAccountsTableStoreSelector,
+  footerRowSelectors: {
+    page: createSelector(
+      [redux.selectors.simpleDeepEqualSelector((state: Application.Unauthenticated.Store) => state.share.detail.data)],
+      (budget: Model.Budget | undefined) => ({
+        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
+        estimated: budget?.estimated || 0.0,
+        variance: budget?.variance || 0.0,
+        actual: budget?.actual || 0.0
+      })
+    ),
+    footer: createSelector(
+      [
+        redux.selectors.simpleDeepEqualSelector(
+          (state: Application.Unauthenticated.Store) => state.share.account.detail.data
+        )
+      ],
+      (detail: Model.Account | undefined) => ({
+        identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
+        estimated: detail?.estimated || 0.0,
+        variance: detail?.variance || 0.0,
+        actual: detail?.actual || 0.0
+      })
+    )
+  }
 })(GenericSubAccountsTable.UnauthenticatedBudget);
 
 interface SubAccountsTableProps {
@@ -60,16 +85,9 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
 
   return (
     <ConnectedTable
-      budget={budget}
       tableRef={tableRef}
-      detail={accountDetail}
       fringes={fringes}
       subAccountUnits={subAccountUnits}
-      tableFooterIdentifierValue={
-        !isNil(accountDetail) && !isNil(accountDetail.description)
-          ? `${accountDetail.description} Total`
-          : "Account Total"
-      }
       exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
       categoryName={"Sub Account"}
       identifierFieldHeader={"Account"}

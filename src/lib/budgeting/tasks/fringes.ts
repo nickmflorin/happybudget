@@ -40,7 +40,7 @@ export type FringesTaskConfig = Redux.TaskConfig<{ loading: boolean; response: H
   readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
 };
 
-export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Redux.TableTaskConfig<
+export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<
   R,
   M,
   Model.Group,

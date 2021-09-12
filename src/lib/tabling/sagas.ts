@@ -11,7 +11,7 @@ export const createTableSaga = <
   T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
-  config: Redux.TableSagaConfig<R, M, T, A>
+  config: Table.SagaConfig<R, M, T, A>
 ): Saga => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
@@ -36,7 +36,7 @@ export const createUnauthenticatedTableSaga = <
   T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
   A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
 >(
-  config: Redux.TableSagaConfig<R, M, T, A>
+  config: Table.SagaConfig<R, M, T, A>
 ): Saga => {
   return createTableSaga<R, M, T, A>(config);
 };
@@ -54,7 +54,7 @@ export const createAuthenticatedTableSaga = <
   T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
   A extends Redux.AuthenticatedTableActionMap<R, M, G> = Redux.AuthenticatedTableActionMap<R, M, G>
 >(
-  config: Redux.TableSagaConfig<R, M, T, A>
+  config: Table.SagaConfig<R, M, T, A>
 ): Saga => {
   function* tableChangeEventSaga(): SagaIterator {
     // TODO: We probably want a way to prevent duplicate events that can cause

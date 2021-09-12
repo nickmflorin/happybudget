@@ -78,48 +78,9 @@ namespace Redux {
     readonly initialState: S;
   };
 
-  type TableTaskConfig<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    A extends TableActionMap<M, G> = TableActionMap<M, G>
-  > = TaskConfig<A> & {
-    readonly columns: Table.Column<R, M>[];
-  }
-
-  type TableConfiguration<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
-    A extends TableActionMap<M, G> = TableActionMap<M, G>
-  > = {
-    readonly storeId?: Redux.AsyncId;
-    readonly actions: Redux.ActionMapObject<A>;
-    readonly selector?: (state: Application.Store) => S;
-    readonly reducer?: Redux.Reducer<S>;
-  };
-
-  type TableReducerConfig<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group,
-    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
-    A extends TableActionMap<M, G> = TableActionMap<M, G>
-  > = TableTaskConfig<R, M, G, A> & Omit<Table.CreateTableDataConfig<R, M, G>, "models" | "groups" | "columns"> & {
-    readonly initialState: S;
-  }
-
   type SagaConfig<T, A> = TaskConfig<A> & {
     readonly tasks: TaskMapObject<T>;
   }
-
-  type TableSagaConfig<
-    R extends Table.RowData,
-    M extends Model.Model = Model.Model,
-    T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
-    A extends TableActionMap<M, G> = TableActionMap<M, G>
-  > = SagaConfig<T, A>;
 
   type ListStore<T> = T[];
 

@@ -71,7 +71,7 @@ export type SubAccountTableActionMap = Redux.TableActionMap<M, Model.BudgetGroup
 
 /* eslint-disable indent */
 export const createUnauthenticatedSubAccountsTableReducer = (
-  config: Redux.TableReducerConfig<R, M, Model.BudgetGroup, S, SubAccountTableActionMap> & {
+  config: Table.ReducerConfig<R, M, Model.BudgetGroup, S, SubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
   }
 ): Redux.Reducer<S> => {
@@ -95,7 +95,7 @@ export type AuthenticatedSubAccountTableActionMap = Redux.AuthenticatedTableActi
 };
 
 export const createAuthenticatedSubAccountsTableReducer = (
-  config: Redux.TableReducerConfig<R, M, Model.BudgetGroup, S, AuthenticatedSubAccountTableActionMap> & {
+  config: Table.ReducerConfig<R, M, Model.BudgetGroup, S, AuthenticatedSubAccountTableActionMap> & {
     readonly fringes: Redux.Reducer<Tables.FringeTableStore>;
     readonly fringesTableChangedAction: PayloadActionCreator<Table.ChangeEvent<Tables.FringeRowData, Model.Fringe>>;
   }

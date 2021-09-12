@@ -11,8 +11,6 @@ type M = Model.SubAccount;
 const Columns: Table.Column<R, M>[] = [
   budgetFramework.columnObjs.IdentifierColumn<R, M>({
     field: "identifier",
-    tableFooterLabel: "", // Will be populated by Table.
-    pageFooterLabel: "", // Will be populated by Table.
     headerName: "" // Will be populated by Table.
   }),
   framework.columnObjs.BodyColumn<R, M>({

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isNil, map } from "lodash";
+import { createSelector } from "reselect";
 
 import { redux, tabling } from "lib";
 import { CreateSubAccountGroupModal, EditGroupModal } from "components/modals";
@@ -26,10 +27,6 @@ const selectSubAccountUnits = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.budget.account.table.subaccountUnits
 );
 
-const SubAccountsTableStoreSelector = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.budget.account.table
-);
-
 const ActionMap = {
   tableChanged: actions.account.handleTableChangeEventAction,
   request: actions.account.requestAction,
@@ -48,7 +45,33 @@ const ConnectedTable = connectTableToStore<
   Tables.SubAccountTableStore
 >({
   actions: ActionMap,
-  selector: SubAccountsTableStoreSelector
+  selector: redux.selectors.simpleDeepEqualSelector(
+    (state: Application.Authenticated.Store) => state.budget.account.table
+  ),
+  footerRowSelectors: {
+    page: createSelector(
+      [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data)],
+      (budget: Model.Budget | undefined) => ({
+        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
+        estimated: budget?.estimated || 0.0,
+        variance: budget?.variance || 0.0,
+        actual: budget?.actual || 0.0
+      })
+    ),
+    footer: createSelector(
+      [
+        redux.selectors.simpleDeepEqualSelector(
+          (state: Application.Authenticated.Store) => state.budget.account.detail.data
+        )
+      ],
+      (detail: Model.Account | undefined) => ({
+        identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
+        estimated: detail?.estimated || 0.0,
+        variance: detail?.variance || 0.0,
+        actual: detail?.actual || 0.0
+      })
+    )
+  }
 })(BudgetSubAccountsTable);
 
 interface SubAccountsTableProps {
@@ -76,16 +99,10 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         budget={budget}
         budgetId={budgetId}
         tableRef={tableRef}
-        detail={accountDetail}
         fringes={fringes}
         subAccountUnits={subAccountUnits}
         onAddFringes={() => setFringesModalVisible(true)}
         onEditFringes={() => setFringesModalVisible(true)}
-        tableFooterIdentifierValue={
-          !isNil(accountDetail) && !isNil(accountDetail.description)
-            ? `${accountDetail.description} Total`
-            : "Account Total"
-        }
         exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}
         categoryName={"Sub Account"}
         identifierFieldHeader={"Account"}

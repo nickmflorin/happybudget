@@ -59,7 +59,7 @@ export type AuthenticatedSubAccountsTableActionMap<B extends Model.Template | Mo
     readonly responseFringes: Http.TableResponse<Model.Fringe>;
   };
 
-export type SubAccountsTableTaskConfig = Redux.TableTaskConfig<R, C, Model.BudgetGroup, SubAccountsTableActionMap> & {
+export type SubAccountsTableTaskConfig = Table.TaskConfig<R, C, Model.BudgetGroup, SubAccountsTableActionMap> & {
   readonly services: SubAccountsTableServiceSet;
   readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
 };
@@ -67,7 +67,7 @@ export type SubAccountsTableTaskConfig = Redux.TableTaskConfig<R, C, Model.Budge
 export type AuthenticatedSubAccountsTableTaskConfig<
   M extends Model.Account | Model.SubAccount,
   B extends Model.Template | Model.Budget
-> = Redux.TableTaskConfig<R, C, Model.BudgetGroup, AuthenticatedSubAccountsTableActionMap<B>> & {
+> = Table.TaskConfig<R, C, Model.BudgetGroup, AuthenticatedSubAccountsTableActionMap<B>> & {
   readonly services: AuthenticatedSubAccountsTableServiceSet<M, B>;
   readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
   readonly selectData: (state: Application.Authenticated.Store) => Table.Row<R, C>[];

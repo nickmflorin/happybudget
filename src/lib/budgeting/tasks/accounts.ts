@@ -43,12 +43,12 @@ export type AuthenticatedAccountsTableActionMap<B extends Model.Template | Model
     readonly updateBudgetInState: Redux.UpdateActionPayload<B>;
   };
 
-export type AccountsTableTaskConfig = Redux.TableTaskConfig<R, C, Model.BudgetGroup, AccountsTableActionMap> & {
+export type AccountsTableTaskConfig = Table.TaskConfig<R, C, Model.BudgetGroup, AccountsTableActionMap> & {
   readonly services: AccountsTableServiceSet;
   readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
 };
 
-export type AuthenticatedAccountsTableTaskConfig<B extends Model.Template | Model.Budget> = Redux.TableTaskConfig<
+export type AuthenticatedAccountsTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<
   R,
   C,
   Model.BudgetGroup,

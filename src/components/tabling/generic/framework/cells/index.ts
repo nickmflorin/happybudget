@@ -19,3 +19,4 @@ export * from "./EmailCell";
 export { default as PhoneNumberCell } from "./PhoneNumberCell";
 export * from "./PhoneNumberCell";
 export { default as excludeRowsOfType } from "./excludeRowsOfType";
+export { default as connectCellToStore } from "./connectCellToStore";

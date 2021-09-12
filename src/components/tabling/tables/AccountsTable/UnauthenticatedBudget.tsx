@@ -4,20 +4,20 @@ import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { UnauthenticatedBudgetTable, UnauthenticatedBudgetTableProps } from "../BudgetTable";
-import AccountsTable, { WithAccountsTableProps, AccountsTableProps } from "./AccountsTable";
+import AccountsTable, { AccountsTableProps } from "./AccountsTable";
 import { BudgetColumns } from "./Columns";
 
 type M = Model.Account;
 type R = Tables.AccountRowData;
 
 export type UnauthenticatedBudgetProps = AccountsTableProps &
-  Omit<UnauthenticatedBudgetTableProps<R, M>, "cookieNames" | "columns" | "getRowChildren"> & {
+  Omit<UnauthenticatedBudgetTableProps<R, M>, "cookieNames" | "columns"> & {
     readonly budget?: Model.Budget;
     readonly tableRef?: NonNullRef<Table.UnauthenticatedTableRefObj<R>>;
     readonly cookieNames?: Table.CookieNames;
   };
 
-const UnauthenticatedBudgetAccountsTable = (props: WithAccountsTableProps<UnauthenticatedBudgetProps>): JSX.Element => {
+const UnauthenticatedBudgetAccountsTable = (props: UnauthenticatedBudgetProps): JSX.Element => {
   const tableRef = tabling.hooks.useUnauthenticatedTableIfNotDefined(props.tableRef);
 
   return (
@@ -32,27 +32,7 @@ const UnauthenticatedBudgetAccountsTable = (props: WithAccountsTableProps<Unauth
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(BudgetColumns, {
-        identifier: (col: Table.Column<R, M>) => ({
-          ...col,
-          tableFooterLabel: !isNil(props.budget) ? `${props.budget.name} Total` : "Total"
-        }),
-        estimated: {
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.estimated) ? props.budget.estimated : 0.0
-          }
-        },
-        actual: {
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.actual) ? props.budget.actual : 0.0
-          }
-        },
-        variance: {
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.variance) ? props.budget.variance : 0.0
-          }
-        }
-      })}
+      columns={BudgetColumns}
     />
   );
 };

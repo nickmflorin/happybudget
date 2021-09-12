@@ -2,7 +2,7 @@ import * as tabling from "../../tabling";
 
 /* eslint-disable indent */
 export const createAuthenticatedActualsTableReducer = (
-  config: Redux.TableReducerConfig<
+  config: Table.ReducerConfig<
     Tables.ActualRowData,
     Model.Actual,
     Model.Group,

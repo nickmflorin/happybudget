@@ -6,7 +6,7 @@ export type FringeTableActionMap = Redux.TableActionMap<Model.Fringe> & {
 
 /* eslint-disable indent */
 export const createUnauthenticatedFringesTableReducer = (
-  config: Redux.TableReducerConfig<
+  config: Table.ReducerConfig<
     Tables.FringeRowData,
     Model.Fringe,
     Model.Group,
@@ -42,7 +42,7 @@ export type AuthenticatedFringeTableActionMap = Redux.AuthenticatedTableActionMa
 
 /* eslint-disable indent */
 export const createAuthenticatedFringesTableReducer = (
-  config: Redux.TableReducerConfig<
+  config: Table.ReducerConfig<
     Tables.FringeRowData,
     Model.Fringe,
     Model.Group,

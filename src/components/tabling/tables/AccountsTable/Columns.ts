@@ -7,8 +7,7 @@ type M = Model.Account;
 const Columns: Table.Column<R, M>[] = [
   budgetFramework.columnObjs.IdentifierColumn<R, M>({
     field: "identifier",
-    headerName: "Account",
-    tableFooterLabel: "" // Will be populated by Table.
+    headerName: "Account"
   }),
   framework.columnObjs.BodyColumn<R, M>({
     field: "description",

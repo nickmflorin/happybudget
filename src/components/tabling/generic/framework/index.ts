@@ -6,8 +6,9 @@ export * as cells from "./cells";
 export * as columnObjs from "./columnObjs";
 export * as actions from "./actions";
 export { default as excludeRowsOfType } from "./cells/excludeRowsOfType";
+export { default as connectCellToStore } from "./cells/connectCellToStore";
 
-const FrameworkComponents: Table.Framework = {
+export const Framework: Table.Framework = {
   editors: {
     ContactEditor: editors.ContactEditor
   },
@@ -34,5 +35,3 @@ const FrameworkComponents: Table.Framework = {
     page: { CalculatedCell: cells.CalculatedCell, BodyCell: cells.BodyCell, EmptyCell: cells.EmptyCell }
   }
 };
-
-export default FrameworkComponents;

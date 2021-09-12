@@ -2,27 +2,26 @@ import { isNil, filter, map, findIndex, includes } from "lodash";
 import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
-type IdentifierColumnProps<R extends Table.RowData, M extends Model.Model> = Partial<Table.Column<R, M>> & {
-  readonly tableFooterLabel: string;
-  readonly pageFooterLabel?: string;
-};
-
 export const IdentifierColumn = <R extends Table.RowData, M extends Model.Model>(
-  props: IdentifierColumnProps<R, M>
+  props: Partial<Table.Column<R, M>>
 ): Table.Column<R, M> => {
-  const { tableFooterLabel, pageFooterLabel, ...col } = props;
-  const base = framework.columnObjs.BodyColumn<R, M>({
+  return framework.columnObjs.BodyColumn<R, M>({
     columnType: "number",
-    ...col,
+    ...props,
     footer: {
-      value: tableFooterLabel,
+      // We always want the text in the identifier cell to be present, but the column
+      // itself isn't always wide enough.  However, applying a colSpan conflicts with the
+      // colSpan of the main data grid, causing weird behavior.
+      cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
+    },
+    page: {
       // We always want the text in the identifier cell to be present, but the column
       // itself isn't always wide enough.  However, applying a colSpan conflicts with the
       // colSpan of the main data grid, causing weird behavior.
       cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
     },
     index: 0,
-    cellRenderer: { data: "IdentifierCell" },
+    cellRenderer: { data: "IdentifierCell", footer: "IdentifierCell", page: "IdentifierCell" },
     width: 100,
     suppressSizeToFit: true,
     cellStyle: { textAlign: "left" },
@@ -50,18 +49,4 @@ export const IdentifierColumn = <R extends Table.RowData, M extends Model.Model>
       return 1;
     }
   });
-  if (!isNil(props.pageFooterLabel)) {
-    return {
-      ...base,
-      page: {
-        ...col.page,
-        value: props.pageFooterLabel,
-        // We always want the text in the identifier cell to be present, but the column
-        // itself isn't always wide enough.  However, applying a colSpan conflicts with the
-        // colSpan of the main data grid, causing weird behavior.
-        cellStyle: { zIndex: 1000, overflow: "visible", whiteSpace: "unset", textAlign: "left" }
-      }
-    };
-  }
-  return base;
 };

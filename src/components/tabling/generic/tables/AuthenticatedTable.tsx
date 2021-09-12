@@ -85,7 +85,11 @@ const AuthenticatedTable = <
   const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
     return map(props.columns, (c: Table.Column<R, M>) => ({
       ...c,
-      cellRendererParams: { ...c.cellRendererParams, selector: props.selector },
+      cellRendererParams: {
+        ...c.cellRendererParams,
+        selector: props.selector,
+        footerRowSelectors: props.footerRowSelectors
+      },
       cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
     }));
   }, [hooks.useDeepEqualMemo(props.columns)]);
@@ -211,8 +215,10 @@ const AuthenticatedTable = <
             onGridReady={props.onPageGridReady}
             onFirstDataRendered={props.onFirstDataRendered}
             onChangeEvent={_onChangeEvent}
+            footerRowSelectors={props.footerRowSelectors}
             gridOptions={props.tableGridOptions.page}
             columns={columns}
+            framework={props.framework}
             hiddenColumns={props.hiddenColumns}
             indexColumn={{
               // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns
@@ -243,6 +249,7 @@ const AuthenticatedTable = <
           groups: props.groups,
           hasExpandColumn: props.hasExpandColumn,
           framework: props.framework,
+          footerRowSelectors: props.footerRowSelectors,
           onGridReady: props.onDataGridReady,
           onFirstDataRendered: props.onFirstDataRendered,
           onRowSelectionChanged: (rows: Table.DataRow<R, M>[]) => setSelectedRows(rows),
@@ -259,6 +266,8 @@ const AuthenticatedTable = <
           columns={columns}
           hiddenColumns={props.hiddenColumns}
           onChangeEvent={_onChangeEvent}
+          framework={props.framework}
+          footerRowSelectors={props.footerRowSelectors}
           indexColumn={{
             cellRenderer: "NewRowCell",
             // If we want to leftAlign the New Row Button, we do not want to have the cell span 2 columns

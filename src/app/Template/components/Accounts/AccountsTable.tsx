@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isNil } from "lodash";
-import { map } from "lodash";
+import { createSelector } from "reselect";
+import { isNil, map } from "lodash";
 
 import { tabling, budgeting, redux } from "lib";
 import { CreateTemplateAccountGroupModal, EditGroupModal } from "components/modals";
@@ -32,6 +32,15 @@ const ConnectedTable = connectTableToStore<
 >({
   storeId: "async-TemplateAccountsTable",
   actions: ActionMap,
+  footerRowSelectors: {
+    footer: createSelector(
+      [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
+      (template: Model.Template | undefined) => ({
+        identifier: !isNil(template) && !isNil(template.name) ? `${template.name} Total` : "Template Total",
+        estimated: template?.estimated || 0.0
+      })
+    )
+  },
   reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
     columns: GenericAccountsTable.TemplateColumns,
     actions: ActionMap,

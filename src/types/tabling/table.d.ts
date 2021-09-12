@@ -15,8 +15,12 @@ namespace Table {
     readonly grid: GridApi;
     readonly column: ColumnApi;
   };
+
+  type FooterGridId = "footer" | "page";
   type GridId = "data" | "footer" | "page";
   type GridSet<T> = { [key in GridId]: T };
+  type FooterGridSet<T> = { [key in FooterGridId]: T };
+
   type TableApiSet = GridSet<GridApis | null>;
   type GridOptions = import("@ag-grid-community/core").GridOptions;
   type TableOptionsSet = GridSet<import("@ag-grid-community/core").GridOptions>;
@@ -279,9 +283,7 @@ namespace Table {
   type AnyColumn<R extends RowData, M extends Model.Model = Model.Model> = Column<R, M> | PdfTable.Column<R, M>;
 
   interface FooterColumn<R extends RowData, M extends Model.Model = Model.Model>
-    extends Pick<Column<R, M>, "selectable" | "editable" | "colSpan"> {
-    readonly value?: any;
-    readonly cellRenderer?: string;
+    extends Pick<Column<R, M>, "colSpan"> {
     readonly cellStyle?: React.CSSProperties;
   }
 
@@ -563,6 +565,8 @@ namespace Table {
     readonly hideClear?: boolean;
     readonly customCol: Column<R, M>;
     readonly value: V;
+    readonly gridId: Table.GridId;
+    readonly selectorFn: Table.RowDataSelector<R>;
     readonly selector: (state: Application.Store) => S;
     readonly onClear?: (row: Table.Row<R, M>, column: Column<R, M>) => void;
     readonly showClear?: (row: Table.Row<R, M>, column: Column<R, M>) => boolean;
@@ -587,6 +591,48 @@ namespace Table {
     // of the associated column.  But when extending a Cell, we sometimes want to provide a formatter
     // for that specific cell.
     readonly valueFormatter?: ValueFormatter;
+  };
+
+  type RowDataSelector<R extends Table.RowData> = (state: Application.Store) => Partial<R>;
+
+  type TaskConfig<
+    R extends RowData,
+    M extends Model.Model = Model.Model,
+    G extends Model.Group = Model.Group,
+    A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
+  > = Redux.TaskConfig<A> & {
+    readonly columns: Table.Column<R, M>[];
+  }
+
+  type ReducerConfig<
+    R extends RowData,
+    M extends Model.Model = Model.Model,
+    G extends Model.Group = Model.Group,
+    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
+    A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
+  > = TaskConfig<R, M, G, A> & Omit<CreateTableDataConfig<R, M, G>, "models" | "groups" | "columns"> & {
+    readonly initialState: S;
+  }
+
+  type SagaConfig<
+    R extends RowData,
+    M extends Model.Model = Model.Model,
+    T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
+    A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
+  > = Redux.SagaConfig<T, A>;
+
+  type StoreConfig<
+    R extends RowData,
+    M extends Model.Model = Model.Model,
+    G extends Model.Group = Model.Group,
+    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
+    A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
+  > = {
+    readonly storeId?: Redux.AsyncId;
+    readonly actions: Redux.ActionMapObject<A>;
+    readonly selector?: (state: Application.Store) => S;
+    readonly footerRowSelectors?: Partial<FooterGridSet<RowDataSelector<R>>>;
+    readonly reducer?: Redux.Reducer<S>;
   };
 }
 

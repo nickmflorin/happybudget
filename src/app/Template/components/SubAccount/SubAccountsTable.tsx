@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { createSelector } from "reselect";
 import { isNil, map } from "lodash";
 
 import { redux, tabling } from "lib";
@@ -26,10 +27,6 @@ const selectSubAccountUnits = redux.selectors.simpleDeepEqualSelector(
   (state: Application.Authenticated.Store) => state.template.subaccount.table.subaccountUnits
 );
 
-const SubAccountsTableStoreSelector = redux.selectors.simpleDeepEqualSelector(
-  (state: Application.Authenticated.Store) => state.template.subaccount.table
-);
-
 const ActionMap = {
   tableChanged: actions.subAccount.handleTableChangeEventAction,
   request: actions.subAccount.requestAction,
@@ -48,7 +45,29 @@ const ConnectedTable = connectTableToStore<
   Tables.SubAccountTableStore
 >({
   actions: ActionMap,
-  selector: SubAccountsTableStoreSelector
+  selector: redux.selectors.simpleDeepEqualSelector(
+    (state: Application.Authenticated.Store) => state.template.subaccount.table
+  ),
+  footerRowSelectors: {
+    page: createSelector(
+      [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
+      (budget: Model.Template | undefined) => ({
+        identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
+        estimated: budget?.estimated || 0.0
+      })
+    ),
+    footer: createSelector(
+      [
+        redux.selectors.simpleDeepEqualSelector(
+          (state: Application.Authenticated.Store) => state.template.subaccount.detail.data
+        )
+      ],
+      (detail: Model.SubAccount | undefined) => ({
+        identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Sub Account Total",
+        estimated: detail?.estimated || 0.0
+      })
+    )
+  }
 })(GenericSubAccountsTable.AuthenticatedTemplate);
 
 interface SubAccountsTableProps {
@@ -73,7 +92,6 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
   return (
     <React.Fragment>
       <ConnectedTable
-        budget={template}
         tableRef={tableRef}
         fringes={fringes}
         subAccountUnits={subAccountUnits}
@@ -84,12 +102,6 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
         // Right now, the SubAccount recursion only goes 1 layer deep.
         // Account -> SubAccount -> Detail (Recrusive SubAccount).
         onRowExpand={null}
-        detail={subaccountDetail}
-        tableFooterIdentifierValue={
-          !isNil(subaccountDetail) && !isNil(subaccountDetail.description)
-            ? `${subaccountDetail.description} Total`
-            : "Sub Account Total"
-        }
         exportFileName={!isNil(subaccountDetail) ? `subaccount_${subaccountDetail.identifier}` : ""}
         categoryName={"Detail"}
         identifierFieldHeader={"Line"}

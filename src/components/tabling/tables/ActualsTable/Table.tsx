@@ -1,7 +1,6 @@
-import { useMemo } from "react";
-import { map, filter, find, reduce } from "lodash";
+import { map, filter, find } from "lodash";
 
-import { model, tabling, hooks } from "lib";
+import { model, tabling } from "lib";
 
 import { framework, WithConnectedTableProps } from "components/tabling/generic";
 import { AuthenticatedModelTable, AuthenticatedModelTableProps } from "../ModelTable";
@@ -32,9 +31,10 @@ const ActualsTable = ({
 }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
   const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
 
-  const actualsTableTotal = useMemo(() => {
-    return reduce(props.data, (sum: number, s: Tables.ActualRowData) => sum + (s.value || 0), 0);
-  }, [hooks.useDeepEqualMemo(props.data)]);
+  // Need to incorporate into top level row selector.
+  // const actualsTableTotal = useMemo(() => {
+  //   return reduce(props.data, (sum: number, s: Tables.ActualRowData) => sum + (s.value || 0), 0);
+  // }, [hooks.useDeepEqualMemo(props.data)]);
 
   return (
     <AuthenticatedModelTable<R, M>
@@ -71,12 +71,8 @@ const ActualsTable = ({
             cellEditorParams: {
               ...col.cellEditorParams,
               setSearch: (value: string) => onSubAccountsTreeSearch(value)
-            },
-            footer: {
-              value: "Actuals Total"
             }
           }),
-        value: { footer: { value: actualsTableTotal } },
         contact: (col: Table.Column<R, M>) =>
           framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
             ...col,

@@ -4,14 +4,14 @@ import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
 import { AuthenticatedBudgetTable, AuthenticatedBudgetTableProps } from "../BudgetTable";
-import AccountsTable, { AccountsTableProps, WithAccountsTableProps } from "./AccountsTable";
+import AccountsTable, { AccountsTableProps } from "./AccountsTable";
 import { BudgetColumns } from "./Columns";
 
 type R = Tables.AccountRowData;
 type M = Model.Account;
 
 export type AuthenticatedBudgetProps = AccountsTableProps &
-  Omit<AuthenticatedBudgetTableProps<R, M>, "columns" | "cookieNames" | "getRowChildren"> & {
+  Omit<AuthenticatedBudgetTableProps<R, M>, "columns" | "cookieNames"> & {
     readonly budget?: Model.Budget;
     readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
     readonly cookieNames?: Table.CookieNames;
@@ -19,7 +19,7 @@ export type AuthenticatedBudgetProps = AccountsTableProps &
     readonly onEditGroup: (group: Model.BudgetGroup) => void;
   };
 
-const AuthenticatedBudgetAccountsTable = (props: WithAccountsTableProps<AuthenticatedBudgetProps>): JSX.Element => {
+const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.Element => {
   const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
 
   return (
@@ -50,27 +50,11 @@ const AuthenticatedBudgetAccountsTable = (props: WithAccountsTableProps<Authenti
       columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(BudgetColumns, {
         identifier: (col: Table.Column<R, M>) => ({
           ...col,
-          tableFooterLabel: !isNil(props.budget) ? `${props.budget.name} Total` : "Total",
           cellRendererParams: {
             ...col.cellRendererParams,
             onGroupEdit: props.onEditGroup
           }
-        }),
-        estimated: {
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.estimated) ? props.budget.estimated : 0.0
-          }
-        },
-        actual: {
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.actual) ? props.budget.actual : 0.0
-          }
-        },
-        variance: {
-          footer: {
-            value: !isNil(props.budget) && !isNil(props.budget.variance) ? props.budget.variance : 0.0
-          }
-        }
+        })
       })}
     />
   );
