@@ -37,8 +37,8 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   actions: ActionMap,
   tasks: budgeting.tasks.accounts.createTableTaskSet<Model.Template>({
     columns: AccountsTable.TemplateColumns,
-    selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
-    selectAutoIndex: (state: Application.Authenticated.Store) => state.budget.autoIndex,
+    selectObjId: (state: Application.Authenticated.Store) => state.template.id,
+    selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
     selectData: (state: Application.Authenticated.Store) =>
       !isNil(state["async-TemplateAccountsTable"]) ? state["async-TemplateAccountsTable"].data : [],
     actions: ActionMap,

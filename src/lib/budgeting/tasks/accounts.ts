@@ -46,6 +46,7 @@ export type AuthenticatedAccountsTableActionMap<B extends Model.Template | Model
 export type AccountsTableTaskConfig = Table.TaskConfig<R, C, Model.BudgetGroup, AccountsTableActionMap> & {
   readonly services: AccountsTableServiceSet;
   readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
+  readonly selectBudgetId: (state: Application.Authenticated.Store) => ID | null;
 };
 
 export type AuthenticatedAccountsTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<

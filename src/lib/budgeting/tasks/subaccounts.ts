@@ -62,6 +62,7 @@ export type AuthenticatedSubAccountsTableActionMap<B extends Model.Template | Mo
 export type SubAccountsTableTaskConfig = Table.TaskConfig<R, C, Model.BudgetGroup, SubAccountsTableActionMap> & {
   readonly services: SubAccountsTableServiceSet;
   readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
+  readonly selectBudgetId: (state: Application.Authenticated.Store) => ID | null;
 };
 
 export type AuthenticatedSubAccountsTableTaskConfig<
@@ -69,6 +70,7 @@ export type AuthenticatedSubAccountsTableTaskConfig<
   B extends Model.Template | Model.Budget
 > = Table.TaskConfig<R, C, Model.BudgetGroup, AuthenticatedSubAccountsTableActionMap<B>> & {
   readonly services: AuthenticatedSubAccountsTableServiceSet<M, B>;
+  readonly selectBudgetId: (state: Application.Authenticated.Store) => ID | null;
   readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
   readonly selectData: (state: Application.Authenticated.Store) => Table.Row<R, C>[];
   readonly selectAutoIndex: (state: Application.Authenticated.Store) => boolean;
@@ -89,12 +91,13 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
   function* request(action: Redux.Action<null>): SagaIterator {
     const objId = yield select(config.selectObjId);
-    if (!isNil(objId)) {
+    const budgetId = yield select(config.selectBudgetId);
+    if (!isNil(objId) && !isNil(budgetId)) {
       yield put(config.actions.loading(true));
       try {
         yield fork(contactsTasks.request, action);
         yield fork(requestSubAccountUnits);
-        yield fork(requestFringes, objId);
+        yield fork(requestFringes, budgetId);
         const [models, groups]: [Http.ListResponse<C>, Http.ListResponse<Model.BudgetGroup>] = yield all([
           call(requestSubAccounts, objId),
           call(requestGroups, objId)

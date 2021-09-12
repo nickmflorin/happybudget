@@ -87,6 +87,7 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   actions: ActionMap,
   tasks: budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Model.Template>({
     selectObjId: (state: Application.Authenticated.Store) => state.template.account.id,
+    selectBudgetId: (state: Application.Authenticated.Store) => state.template.id,
     selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
     actions: ActionMap,
     columns: SubAccountsTable.AuthenticatedTemplateColumns,
