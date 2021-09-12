@@ -1,10 +1,12 @@
 import { combineReducers } from "redux";
+import { filter } from "lodash";
 
 import { redux, budgeting } from "lib";
 import { SubAccountsTable, FringesTable } from "components/tabling";
 
 import * as actions from "./actions";
 import initialState from "./initialState";
+import { includes } from "lodash";
 
 // const createAccountSubAccountReducer = <M extends Model.Account | Model.SubAccount>(
 //   /* eslint-disable indent */
@@ -120,7 +122,11 @@ const genericReducer = combineReducers({
       getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
       getModelRowName: "Sub Account",
       getPlaceholderRowName: "Sub Account",
-      columns: SubAccountsTable.AuthenticatedBudgetColumns,
+      columns: filter(
+        SubAccountsTable.Columns,
+        (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+          !includes(["contact", "actual", "variance"], c.field)
+      ),
       fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
       fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
         initialState: initialState.account.table.fringes,
@@ -166,7 +172,11 @@ const genericReducer = combineReducers({
         addModelsToState: actions.subAccount.addModelsToStateAction,
         setSearch: actions.subAccount.setSearchAction
       },
-      columns: SubAccountsTable.AuthenticatedBudgetColumns,
+      columns: filter(
+        SubAccountsTable.Columns,
+        (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+          !includes(["contact", "actual", "variance"], c.field)
+      ),
       getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
       getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
       getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,

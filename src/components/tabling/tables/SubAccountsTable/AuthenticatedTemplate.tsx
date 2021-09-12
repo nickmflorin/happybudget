@@ -1,7 +1,6 @@
 import { isNil } from "lodash";
 
 import { tabling } from "lib";
-
 import { framework } from "components/tabling/generic";
 
 import {
@@ -9,8 +8,7 @@ import {
   AuthenticatedBudgetTableProps,
   framework as budgetTableFramework
 } from "../BudgetTable";
-import SubAccountsTable from "./SubAccountsTable";
-import { AuthenticatedTemplateColumns } from "./Columns";
+import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
@@ -28,14 +26,17 @@ export type AuthenticatedTemplateProps = Omit<AuthenticatedBudgetTableProps<R, M
   readonly onEditFringes: () => void;
 };
 
-const AuthenticatedTemplateSubAccountsTable = (props: AuthenticatedTemplateProps): JSX.Element => {
+const AuthenticatedTemplateSubAccountsTable = (
+  props: WithSubAccountsTableProps<AuthenticatedTemplateProps>
+): JSX.Element => {
   const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
 
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
       tableRef={tableRef}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(AuthenticatedTemplateColumns, {
+      excludeColumns={["actual", "contact", "variance"]}
+      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(props.columns, {
         identifier: (col: Table.Column<R, M>) =>
           budgetTableFramework.columnObjs.IdentifierColumn<R, M>({
             ...col,

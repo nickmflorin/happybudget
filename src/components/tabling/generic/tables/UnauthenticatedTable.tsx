@@ -1,5 +1,5 @@
 import React, { useImperativeHandle, useMemo } from "react";
-import { map } from "lodash";
+import { map, isNil, filter, includes } from "lodash";
 
 import { hooks } from "lib";
 
@@ -29,6 +29,7 @@ export type UnauthenticatedTableProps<
 > = TableConfigurationProps<R, M> & {
   readonly tableRef?: NonNullRef<Table.UnauthenticatedTableRefObj<R>>;
   readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
+  readonly excludeColumns?: SingleOrArray<keyof R> | ((col: Table.Column<R, M>) => boolean);
   readonly children: RenderPropChild<UnauthenticatedTableDataGridProps<R, M, G>>;
 };
 
@@ -76,12 +77,31 @@ const UnauthenticatedTable = <
    * and renderer params for each column.
    */
   const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-    return map(props.columns, (c: Table.Column<R, M>) => ({
-      ...c,
-      cellRendererParams: { ...c.cellRendererParams, selector: props.selector },
-      cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
-    }));
-  }, [hooks.useDeepEqualMemo(props.columns)]);
+    const evaluateColumnExclusionProp = (c: Table.Column<R, M>): boolean => {
+      if (c.requiresAuthentication === true) {
+        return true;
+      }
+      if (!isNil(props.excludeColumns)) {
+        if (typeof props.excludeColumns === "function") {
+          return props.excludeColumns(c);
+        }
+        return includes(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], c.field);
+      }
+      return false;
+    };
+    return map(
+      filter(props.columns, (c: Table.Column<R, M>) => !evaluateColumnExclusionProp(c)),
+      (c: Table.Column<R, M>) => ({
+        ...c,
+        cellRendererParams: {
+          ...c.cellRendererParams,
+          selector: props.selector,
+          footerRowSelectors: props.footerRowSelectors
+        },
+        cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
+      })
+    );
+  }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 
   useImperativeHandle(props.tableRef, () => ({
     getCSVData: props.getCSVData,

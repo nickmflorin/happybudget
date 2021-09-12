@@ -41,6 +41,19 @@ const Columns: Table.Column<R, M>[] = [
       return 1;
     }
   }),
+  framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
+    field: "contact",
+    headerName: "Contact",
+    cellRenderer: { data: "ContactCell" },
+    cellEditor: "ContactEditor",
+    columnType: "contact",
+    index: 2,
+    width: 200,
+    requiresAuthentication: true,
+    models: [], // Will be populated by Table.
+    modelClipboardValue: (m: Model.Contact) => m.full_name,
+    processCellFromClipboard: (name: string): Model.Contact | null => null // Will be populated by Table.
+  }),
   framework.columnObjs.BodyColumn<R, M, number>({
     field: "quantity",
     headerName: "Qty",
@@ -99,22 +112,6 @@ const Columns: Table.Column<R, M>[] = [
     width: 200,
     nullValue: [],
     processCellForClipboard: (row: R) => "" // Will be populated by Table.
-  })
-];
-
-export const AuthenticatedBudgetColumns: Table.Column<R, M>[] = [
-  ...Columns,
-  framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
-    field: "contact",
-    headerName: "Contact",
-    cellRenderer: { data: "ContactCell" },
-    cellEditor: "ContactEditor",
-    columnType: "contact",
-    index: 2,
-    width: 200,
-    models: [], // Will be populated by Table.
-    modelClipboardValue: (m: Model.Contact) => m.full_name,
-    processCellFromClipboard: (name: string): Model.Contact | null => null // Will be populated by Table.
   }),
   framework.columnObjs.CalculatedColumn<R, M>({
     field: "estimated",
@@ -130,26 +127,4 @@ export const AuthenticatedBudgetColumns: Table.Column<R, M>[] = [
   })
 ];
 
-export const UnauthenticatedBudgetColumns: Table.Column<R, M>[] = [
-  ...Columns,
-  framework.columnObjs.CalculatedColumn<R, M>({
-    field: "estimated",
-    headerName: "Estimated"
-  }),
-  framework.columnObjs.CalculatedColumn<R, M>({
-    field: "actual",
-    headerName: "Actual"
-  }),
-  framework.columnObjs.CalculatedColumn<R, M>({
-    field: "variance",
-    headerName: "Variance"
-  })
-];
-
-export const AuthenticatedTemplateColumns: Table.Column<R, M>[] = [
-  ...Columns,
-  framework.columnObjs.CalculatedColumn<R, M>({
-    field: "estimated",
-    headerName: "Estimated"
-  })
-];
+export default Columns;

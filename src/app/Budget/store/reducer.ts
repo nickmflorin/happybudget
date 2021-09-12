@@ -181,7 +181,7 @@ const genericReducer = combineReducers({
       getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
       getModelRowName: "Sub Account",
       getPlaceholderRowName: "Sub Account",
-      columns: SubAccountsTable.AuthenticatedBudgetColumns,
+      columns: SubAccountsTable.Columns,
       fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
       fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
         initialState: initialState.account.table.fringes,
@@ -252,7 +252,7 @@ const genericReducer = combineReducers({
         addModelsToState: actions.subAccount.addModelsToStateAction,
         setSearch: actions.subAccount.setSearchAction
       },
-      columns: SubAccountsTable.AuthenticatedBudgetColumns,
+      columns: SubAccountsTable.Columns,
       getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
       getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
       getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,

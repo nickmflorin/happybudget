@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, cancelled, take, cancel, spawn } from "redux-saga/effects";
-import { isNil } from "lodash";
+import { isNil, filter, includes } from "lodash";
 
 import * as api from "api";
 import { budgeting, tabling } from "lib";
@@ -90,7 +90,11 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
     selectBudgetId: (state: Application.Authenticated.Store) => state.template.id,
     selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
     actions: ActionMap,
-    columns: SubAccountsTable.AuthenticatedTemplateColumns,
+    columns: filter(
+      SubAccountsTable.Columns,
+      (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+        !includes(["contact", "actual", "variance"], c.field)
+    ),
     services: {
       request: api.getAccountSubAccounts,
       requestGroups: api.getAccountSubAccountGroups,

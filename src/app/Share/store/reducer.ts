@@ -1,4 +1,5 @@
 import { combineReducers } from "redux";
+import { filter } from "lodash";
 
 import { redux, budgeting } from "lib";
 import { SubAccountsTable, FringesTable } from "components/tabling";
@@ -52,7 +53,10 @@ const genericReducer = combineReducers({
       getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
       getModelRowName: "Sub Account",
       getPlaceholderRowName: "Sub Account",
-      columns: SubAccountsTable.AuthenticatedBudgetColumns,
+      columns: filter(
+        SubAccountsTable.Columns,
+        (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
+      ),
       fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
         initialState: initialState.account.table.fringes,
         columns: FringesTable.Columns,
@@ -97,7 +101,10 @@ const genericReducer = combineReducers({
       getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
       getModelRowName: "Sub Account",
       getPlaceholderRowName: "Sub Account",
-      columns: SubAccountsTable.AuthenticatedBudgetColumns,
+      columns: filter(
+        SubAccountsTable.Columns,
+        (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
+      ),
       fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
         initialState: initialState.subaccount.table.fringes,
         columns: FringesTable.Columns,

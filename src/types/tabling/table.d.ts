@@ -269,6 +269,7 @@ namespace Table {
     readonly isCalculating?: boolean;
     readonly canBeHidden?: boolean;
     readonly canBeExported?: boolean;
+    readonly requiresAuthentication?: boolean;
     readonly colSpan?: (params: ColSpanParams<R, M>) => number;
     readonly onCellFocus?: (params: CellFocusedParams<R, M>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M>) => void;

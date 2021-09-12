@@ -8,8 +8,7 @@ import {
   AuthenticatedBudgetTableProps,
   framework as budgetTableFramework
 } from "../BudgetTable";
-import SubAccountsTable from "./SubAccountsTable";
-import { AuthenticatedBudgetColumns } from "./Columns";
+import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
@@ -33,14 +32,16 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
   readonly onEditFringes: () => void;
 };
 
-const AuthenticatedBudgetSubAccountsTable = (props: AuthenticatedBudgetProps): JSX.Element => {
+const AuthenticatedBudgetSubAccountsTable = (
+  props: WithSubAccountsTableProps<AuthenticatedBudgetProps>
+): JSX.Element => {
   const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined(props.tableRef);
 
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
       tableRef={tableRef}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(AuthenticatedBudgetColumns, {
+      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(props.columns, {
         identifier: (col: Table.Column<R, M>) =>
           budgetTableFramework.columnObjs.IdentifierColumn<R, M>({
             ...col,

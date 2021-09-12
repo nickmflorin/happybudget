@@ -1,5 +1,5 @@
 import React, { useImperativeHandle, useState, useMemo } from "react";
-import { forEach, isNil, find, uniq, map, filter } from "lodash";
+import { forEach, isNil, find, uniq, map, filter, includes } from "lodash";
 
 import { tabling, util, hooks } from "lib";
 import { AuthenticatedGrid } from "components/tabling/generic";
@@ -30,6 +30,7 @@ export type AuthenticatedTableProps<
 > = TableConfigurationProps<R, M> & {
   readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
   readonly actions?: Table.AuthenticatedMenuActions<R, M>;
+  readonly excludeColumns?: SingleOrArray<keyof R> | ((col: Table.Column<R, M>) => boolean);
   readonly onEditGroup?: (g: G) => void;
   readonly onGroupRows?: (rows: Table.DataRow<R, M>[]) => void;
   readonly children: RenderPropChild<AuthenticatedTableDataGridProps<R, M, G>>;
@@ -83,16 +84,29 @@ const AuthenticatedTable = <
    * and renderer params for each column.
    */
   const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-    return map(props.columns, (c: Table.Column<R, M>) => ({
-      ...c,
-      cellRendererParams: {
-        ...c.cellRendererParams,
-        selector: props.selector,
-        footerRowSelectors: props.footerRowSelectors
-      },
-      cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
-    }));
-  }, [hooks.useDeepEqualMemo(props.columns)]);
+    const evaluateColumnExclusionProp = (c: Table.Column<R, M>): boolean => {
+      if (!isNil(props.excludeColumns)) {
+        if (typeof props.excludeColumns === "function") {
+          return props.excludeColumns(c);
+        }
+        return includes(Array.isArray(props.excludeColumns) ? props.excludeColumns : [props.excludeColumns], c.field);
+      }
+      return false;
+    };
+
+    return map(
+      filter(props.columns, (c: Table.Column<R, M>) => !evaluateColumnExclusionProp(c)),
+      (c: Table.Column<R, M>) => ({
+        ...c,
+        cellRendererParams: {
+          ...c.cellRendererParams,
+          selector: props.selector,
+          footerRowSelectors: props.footerRowSelectors
+        },
+        cellEditorParams: { ...c.cellEditorParams, selector: props.selector }
+      })
+    );
+  }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 
   /**
    * Modified version of the onChangeEvent callback passed into the Grid.  The
