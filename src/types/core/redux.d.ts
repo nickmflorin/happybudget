@@ -191,11 +191,15 @@ namespace Redux {
     readonly setSearch: string;
   }
 
-  type AuthenticatedTableActionMap<R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = TableActionMap<M, G> & {
+  type AuthenticatedTableActionMap<R extends Table.RowData = any, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = TableActionMap<M, G> & {
     readonly tableChanged: Table.ChangeEvent<R, M>;
     readonly saving: boolean;
     readonly addModelsToState: Redux.AddModelsToTablePayload<M>;
     readonly addPlaceholdersToState: Table.RowAdd<R, M>[];
+  }
+
+  type AuthenticatedTableActionMapWithGroups<R extends Table.RowData = any, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = AuthenticatedTableActionMap<R, M, G> & {
+    readonly updateGroupInState: Redux.UpdateActionPayload<G>;
   }
 
   type TableStore<D extends Table.RowData = any, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {

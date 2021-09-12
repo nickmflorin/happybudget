@@ -392,7 +392,7 @@ namespace Table {
     readonly apis: GridApis;
   };
 
-  type ChangeEventId = "dataChange" | "rowAdd" | "rowDelete" | "rowRemoveFromGroup" | "rowAddToGroup" | "groupDelete";
+  type ChangeEventId = "dataChange" | "rowAdd" | "rowDelete" | "rowRemoveFromGroup" | "rowAddToGroup" | "groupDelete" | "groupUpdate";
 
   type BaseChangeEvent = {
     readonly type: ChangeEventId;
@@ -497,6 +497,12 @@ namespace Table {
     readonly payload: RowAddToGroupPayload<R, M>;
   };
 
+  type GroupUpdatePayload<G extends Model.Group = Model.Group> = Redux.UpdateActionPayload<G>;
+  type GroupUpdateEvent<G extends Model.Group = Model.Group> = BaseChangeEvent & {
+    readonly type: "groupUpdate";
+    readonly payload: GroupUpdatePayload<G>;
+  };
+
   type GroupDeletePayload = ID;
   type GroupDeleteEvent = BaseChangeEvent & {
     readonly type: "groupDelete";
@@ -511,9 +517,10 @@ namespace Table {
     | DataChangeEvent<R, M>
     | RowAddEvent<R, M>
     | RowDeleteEvent<R, M>;
-  type GroupEvent<R extends RowData, M extends Model.Model = Model.Model> =
+  type GroupEvent<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> =
     | RowRemoveFromGroupEvent<R, M>
     | RowAddToGroupEvent<R, M>
+    | GroupUpdateEvent<G>
     | GroupDeleteEvent;
 
   type ChangeEvent<R extends RowData, M extends Model.Model = Model.Model> = GrouplessEvent<R, M> | GroupEvent<R, M>;

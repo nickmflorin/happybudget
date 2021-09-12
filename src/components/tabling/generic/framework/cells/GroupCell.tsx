@@ -29,41 +29,27 @@ const GroupCell = <
   const row: Table.Row<R> = props.node.data;
   const groups = useSelector((state: Application.Store) => props.selector(state).groups);
 
-  const groupId = useMemo(() => {
-    return tabling.typeguards.isDataRow(row) ? row.meta.group : null;
-  }, [row]);
-
   const group = useMemo<G | null>((): G | null => {
-    const g: G | null = find(groups, { id: groupId } as any) || null;
-    return g;
-  }, [groupId, hooks.useDeepEqualMemo(groups)]);
+    const groupId = tabling.typeguards.isGroupRow(row) ? row.meta.group : null;
+    return isNil(groupId) ? null : (find(groups, { id: groupId } as any) as G | undefined) || null;
+  }, [row, hooks.useDeepEqualMemo(groups)]);
 
-  const groupCell = useMemo(() => {
-    if (!isNil(group)) {
-      return (
-        <Cell {...props}>
-          <div style={{ display: "flex" }}>
-            <span>{`${group.name} (${group.children.length} Line Items)`}</span>
-            <IconButton
-              className={"btn btn--edit-group"}
-              size={"xxsmall"}
-              icon={"edit"}
-              onClick={() => onEdit?.(group)}
-              style={
-                !isNil(row.meta.colorDef) && !isNil(row.meta.colorDef.color) ? { color: row.meta.colorDef.color } : {}
-              }
-            />
-          </div>
-        </Cell>
-      );
-    }
-    return null;
-  }, [group, onEdit]);
-
-  if (!isNil(tabling.typeguards.isGroupRow(row))) {
-    return !isNil(groupCell) ? groupCell : <span></span>;
-  }
-  return <ValueCell {...props} />;
+  return !isNil(group) ? (
+    <Cell {...props}>
+      <div style={{ display: "flex" }}>
+        <span>{`${group.name} (${group.children.length} Line Items)`}</span>
+        <IconButton
+          className={"btn--edit-group"}
+          size={"xxsmall"}
+          icon={"edit"}
+          onClick={() => onEdit?.(group)}
+          style={!isNil(row.meta.colorDef) && !isNil(row.meta.colorDef.color) ? { color: row.meta.colorDef.color } : {}}
+        />
+      </div>
+    </Cell>
+  ) : (
+    <ValueCell {...props} />
+  );
 };
 
 export default GroupCell;
