@@ -102,7 +102,7 @@ const BreadCrumbItem = ({ item, ...props }: BreadCrumbItemProps): JSX.Element =>
   );
 };
 
-const MemoizedBreadCrumbItem = React.memo(BreadCrumbItem);
+const MemoizedBreadCrumbItem = hooks.deepMemo(BreadCrumbItem);
 
 interface BreadCrumbItemsProps {
   readonly children: JSX.Element[];
@@ -205,4 +205,4 @@ const BreadCrumbs = ({ items, itemProps, params, children, ...props }: BreadCrum
   }
 };
 
-export default React.memo(BreadCrumbs);
+export default hooks.deepMemo(BreadCrumbs);

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { isNil } from "lodash";
 
-import { budgeting } from "lib";
+import { budgeting, hooks } from "lib";
 import { Portal, BreadCrumbs } from "components/layout";
 
 import { actions } from "../../store";
@@ -52,4 +52,4 @@ const Accounts = ({ budget, budgetId }: AccountsProps): JSX.Element => {
   );
 };
 
-export default Accounts;
+export default hooks.deepMemo(Accounts);

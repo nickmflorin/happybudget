@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect, useMemo } from "react";
+import React, { useRef, useCallback, useEffect, useMemo } from "react";
 import { dequal as deepEqual } from "dequal";
 import { isEqual, isNil } from "lodash";
 
@@ -27,14 +27,20 @@ export const useDynamicCallback = <T = any>(callback: (...args: any[]) => T) => 
 
 export type DeepEqualCheck = "lodash" | "dequal" | "fast";
 
-export const deepCompare = (a: any, b: any, method?: DeepEqualCheck) => {
-  method = method || "lodash";
+export const deepCompareFn = (method?: DeepEqualCheck) => {
+  method = method || "dequal";
   return {
     lodash: isEqual,
     dequal: deepEqual,
     fast: equal
-  }[method](a, b);
+  }[method];
 };
+
+export const deepCompare = (a: any, b: any, method?: DeepEqualCheck) => {
+  return deepCompareFn(method)(a, b);
+};
+
+export const deepMemo = (c: React.ComponentType<any>, method?: DeepEqualCheck) => React.memo(c, deepCompareFn(method));
 
 export const useDeepEqualMemoDeps = (value: DependencyList, method?: DeepEqualCheck) => {
   const ref = useRef<DependencyList>();
