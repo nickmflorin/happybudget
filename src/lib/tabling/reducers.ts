@@ -258,7 +258,6 @@ export const createTableChangeEventReducer = <
               data: events.rowAddToRowData<R, M>(addition),
               columns: config.columns,
               group: null,
-              getRowColorDef: config.getPlaceholderRowColorDef,
               getRowName: config.getPlaceholderRowName,
               getRowLabel: config.getPlaceholderRowLabel
             })
@@ -504,7 +503,6 @@ export const createAuthenticatedTableReducer = <
                   gridId: "data",
                   model: payload.models[index],
                   columns: config.columns,
-                  getRowColorDef: config.getModelRowColorDef,
                   getRowName: config.getModelRowName,
                   getRowLabel: config.getModelRowLabel,
                   // This would be an edge case, but if the newly created model is somehow otherwise

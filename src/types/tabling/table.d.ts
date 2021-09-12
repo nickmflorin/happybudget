@@ -67,7 +67,6 @@ namespace Table {
     readonly group: ID | null;
     readonly name?: string | number | null;
     readonly label?: string | number | null;
-    readonly colorDef: RowColorDef | null;
   };
 
   type ModelRowMeta<M extends Model.Model = Model.Model> = BaseRowMeta & {
@@ -127,6 +126,8 @@ namespace Table {
   type CreateRowConfig<ARGS extends any[], R extends Table.RowData, M extends Model.Model = Model.Model> = {
     readonly columns: Table.AnyColumn<R, M>[];
     readonly defaultNullValue?: Table.NullValue;
+    // Because these will not necessarily update when the underlying row changes,
+    // we should probably remove these from the row meta.
     readonly getRowName?: RowStringGetter<ARGS>;
     readonly getRowLabel?: RowStringGetter<ARGS>;
   };
@@ -141,7 +142,6 @@ namespace Table {
     readonly model: M;
     readonly group: G | null;
     readonly getRowChildren?: (m: M) => ID[];
-    readonly getRowColorDef?: FnWithTypedArgs<Table.RowColorDef | null, [R, M, G | null]>;
   };
 
   type CreatePlaceholderRowConfig<
@@ -152,7 +152,6 @@ namespace Table {
     readonly id: Table.PlaceholderRowId;
     readonly data: R;
     readonly group: G | null;
-    readonly getRowColorDef?: FnWithTypedArgs<Table.RowColorDef | null, [R, G | null]>;
   };
 
   type CreateGroupRowConfig<
@@ -176,16 +175,17 @@ namespace Table {
     readonly defaultNullValue?: Table.NullValue;
     readonly getModelRowChildren?: (m: M) => ID[];
 
+    // Because these will not necessarily update when the underlying row changes,
+    // we should probably remove these from the row meta.
     readonly getModelRowLabel?: RowStringGetter<[R, M, G | null]>;
     readonly getGroupRowLabel?: RowStringGetter<[G | null]>;
     readonly getPlaceholderRowLabel?: RowStringGetter<[R, G | null]>;
 
+    // Because these will not necessarily update when the underlying row changes,
+    // we should probably remove these from the row meta.
     readonly getModelRowName?: RowStringGetter<[R, M, G | null]>;
     readonly getGroupRowName?: RowStringGetter<[G | null]>;
     readonly getPlaceholderRowName?: RowStringGetter<[R, G | null]>;
-
-    readonly getModelRowColorDef?: FnWithTypedArgs<Table.RowColorDef | null, [R, M, G | null]>;
-    readonly getPlaceholderRowColorDef?: FnWithTypedArgs<Table.RowColorDef | null, [R, G | null]>;
   };
 
   type ColumnTypeId =
@@ -588,7 +588,10 @@ namespace Table {
     readonly customCol: Column<R, M>;
     readonly value: V;
     readonly gridId: Table.GridId;
-    readonly selectorFn: Table.RowDataSelector<R>;
+    // Note: This is only applied for the data grid rows/cells - so we have to be careful.  We need
+    // a better way of establishing which props are available to cells based on which grid they lie
+    // in,
+    readonly getRowColorDef: (row: Table.Row<R, M>) => Table.RowColorDef;
     readonly selector: (state: Application.Store) => S;
     readonly onClear?: (row: Table.Row<R, M>, column: Column<R, M>) => void;
     readonly showClear?: (row: Table.Row<R, M>, column: Column<R, M>) => boolean;

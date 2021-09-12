@@ -31,7 +31,7 @@ const connectCellToStore = <
     if (props.gridId === "data" || isNil(props.footerRowSelectors)) {
       return <Component {...props} />;
     }
-    return <Component {...props} value={value} selectorFn={selectorFn} />;
+    return <Component {...props} value={value} />;
   };
   return hoistNonReactStatics(WithConnectedCell, Component);
 };

@@ -6,7 +6,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { FirstDataRenderedEvent, CellMouseOverEvent, CellFocusedEvent } from "@ag-grid-community/core";
 
-import { tabling, hooks } from "lib";
+import { tabling, hooks, model } from "lib";
 
 interface InjectedDataGridProps {
   readonly id: Table.GridId;
@@ -58,6 +58,30 @@ const DataGrid =
         columns: props.columns
       });
 
+      const getRowColorDef = hooks.useDynamicCallback((row: Table.Row<R, M>): Table.RowColorDef => {
+        if (tabling.typeguards.isGroupRow(row)) {
+          const group: G | undefined = find(props.groups, { id: row.meta.group } as any);
+          if (!isNil(group)) {
+            const colorDef = model.util.getGroupColorDefinition(group);
+            if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
+              return {
+                color: colorDef?.color,
+                backgroundColor: colorDef?.backgroundColor
+              };
+            } else if (!isNil(colorDef?.backgroundColor)) {
+              return {
+                backgroundColor: colorDef?.backgroundColor
+              };
+            } else if (!isNil(colorDef?.color)) {
+              return {
+                color: colorDef?.color
+              };
+            }
+          }
+        }
+        return {};
+      });
+
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         return map(
           tabling.columns.updateColumnsOfTableType<Table.Column<R, M>, R, M>(props.columns, "body", {
@@ -68,6 +92,7 @@ const DataGrid =
           }),
           (col: Table.Column<R, M>) => ({
             ...col,
+            cellRendererParams: { ...col.cellRendererParams, getRowColorDef },
             selectable: col.selectable || props.isCellSelectable
           })
         );
@@ -110,26 +135,7 @@ const DataGrid =
       const getRowStyle: Table.GetRowStyle = hooks.useDynamicCallback(
         (params: Table.RowClassParams): { [key: string]: any } => {
           const row: Table.Row<R, M> = params.node.data;
-          if (tabling.typeguards.isGroupRow(row) || tabling.typeguards.isModelRow(row)) {
-            const colorDef = row.meta.colorDef;
-            if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
-              return {
-                color: colorDef?.color,
-                backgroundColor: colorDef?.backgroundColor
-              };
-            } else if (!isNil(colorDef?.backgroundColor)) {
-              return {
-                backgroundColor: colorDef?.backgroundColor
-              };
-            } else if (!isNil(colorDef?.color)) {
-              return {
-                color: colorDef?.color
-              };
-            } else {
-              return {};
-            }
-          }
-          return {};
+          return getRowColorDef(row);
         }
       );
 
@@ -257,6 +263,7 @@ const DataGrid =
         <Component
           {...props}
           id={"data"}
+          columns={columns}
           className={classNames("grid--data", props.className)}
           domLayout={"autoHeight"}
           rowSelection={"multiple"}

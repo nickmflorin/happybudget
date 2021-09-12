@@ -1,7 +1,6 @@
 import { isNil, reduce, filter } from "lodash";
 
 import * as util from "../util";
-import * as model from "../model";
 import { consolidateTableChange } from "./events";
 import { isAgColumn } from "./typeguards";
 
@@ -90,7 +89,6 @@ export const createModelRowMeta = <
     model: config.model,
     group: !isNil(config.group) ? config.group.id : null,
     children: !isNil(config.getRowChildren) ? config.getRowChildren(config.model) : null,
-    colorDef: !isNil(config.getRowColorDef) ? config.getRowColorDef(config.data, config.model, config.group) : null,
     name: !isNil(config.getRowName)
       ? typeof config.getRowName === "function"
         ? config.getRowName(config.data, config.model, config.group)
@@ -114,7 +112,6 @@ export const createPlaceholderRowMeta = <
   return {
     gridId: "data",
     group: !isNil(config.group) ? config.group.id : null,
-    colorDef: !isNil(config.getRowColorDef) ? config.getRowColorDef(config.data, config.group) : null,
     name: !isNil(config.getRowName)
       ? typeof config.getRowName === "function"
         ? config.getRowName(config.data, config.group)
@@ -138,7 +135,6 @@ export const createGroupRowMeta = <
   return {
     gridId: "data",
     group: config.group.id,
-    colorDef: model.util.getGroupColorDefinition(config.group),
     name: !isNil(config.getRowName)
       ? typeof config.getRowName === "function"
         ? config.getRowName(config.group)

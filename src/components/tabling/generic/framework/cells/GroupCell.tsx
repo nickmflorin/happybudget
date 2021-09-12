@@ -26,13 +26,17 @@ const GroupCell = <
   onEdit,
   ...props
 }: GroupCellProps<R, M, G, S>): JSX.Element => {
-  const row: Table.Row<R> = props.node.data;
+  const row: Table.Row<R, M> = props.node.data;
   const groups = useSelector((state: Application.Store) => props.selector(state).groups);
 
   const group = useMemo<G | null>((): G | null => {
     const groupId = tabling.typeguards.isGroupRow(row) ? row.meta.group : null;
     return isNil(groupId) ? null : (find(groups, { id: groupId } as any) as G | undefined) || null;
   }, [row, hooks.useDeepEqualMemo(groups)]);
+
+  const colorDef = useMemo<Table.RowColorDef>(() => {
+    return props.getRowColorDef(row);
+  }, [row]);
 
   return !isNil(group) ? (
     <Cell {...props}>
@@ -43,7 +47,7 @@ const GroupCell = <
           size={"xxsmall"}
           icon={"edit"}
           onClick={() => onEdit?.(group)}
-          style={!isNil(row.meta.colorDef) && !isNil(row.meta.colorDef.color) ? { color: row.meta.colorDef.color } : {}}
+          style={!isNil(colorDef.color) ? { color: colorDef.color } : {}}
         />
       </div>
     </Cell>
