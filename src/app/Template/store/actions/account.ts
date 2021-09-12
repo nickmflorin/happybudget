@@ -14,9 +14,6 @@ export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Table
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
   ActionType.Account.SubAccounts.AddToState
 );
-export const addPlaceholdersToState = createAction<Table.RowAdd<Tables.SubAccountRowData, Model.SubAccount>[]>(
-  ActionType.SubAccount.SubAccounts.AddPlaceholdersToState
-);
 export const savingTableAction = createAction<boolean>(ActionType.Account.SubAccounts.Saving);
 export const requestAction = createAction<null>(ActionType.Account.SubAccounts.Request);
 export const loadingAction = createAction<boolean>(ActionType.Account.SubAccounts.Loading);
@@ -25,8 +22,3 @@ export const responseAction = createAction<Http.TableResponse<Model.SubAccount, 
 );
 export const setSearchAction = createAction<string>(ActionType.Account.SubAccounts.SetSearch);
 export const addSubAccountToStateAction = createAction<Model.SubAccount>(ActionType.Account.SubAccounts.AddToState);
-
-export const addGroupToStateAction = createAction<Model.BudgetGroup>(ActionType.Account.Groups.AddToState);
-export const updateGroupInStateAction = createAction<Redux.UpdateActionPayload<Model.BudgetGroup>>(
-  ActionType.Account.Groups.UpdateInState
-);

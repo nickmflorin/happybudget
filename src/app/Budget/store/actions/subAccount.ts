@@ -22,9 +22,6 @@ export const responseAction = createAction<Http.TableResponse<Model.SubAccount, 
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.SubAccount>>(
   ActionType.SubAccount.SubAccounts.AddToState
 );
-export const addPlaceholdersToState = createAction<Table.RowAdd<Tables.SubAccountRowData, Model.SubAccount>[]>(
-  ActionType.SubAccount.SubAccounts.AddPlaceholdersToState
-);
 export const setSearchAction = createAction<string>(ActionType.SubAccount.SubAccounts.SetSearch);
 
 export const requestCommentsAction = createAction<null>(ActionType.SubAccount.Comments.Request);
@@ -59,10 +56,6 @@ export const updateCommentInStateAction = createAction<
   Redux.UpdateActionPayload<Redux.UpdateActionPayload<Model.Comment>>
 >(ActionType.SubAccount.Comments.UpdateInState);
 
-export const addGroupToStateAction = createAction<Model.BudgetGroup>(ActionType.SubAccount.Groups.AddToState);
-export const updateGroupInStateAction = createAction<Redux.UpdateActionPayload<Model.BudgetGroup>>(
-  ActionType.SubAccount.Groups.UpdateInState
-);
 export const requestHistoryAction = createAction<null>(ActionType.SubAccount.History.Request);
 export const loadingHistoryAction = createAction<boolean>(ActionType.SubAccount.History.Loading);
 export const responseHistoryAction = createAction<Http.ListResponse<Model.HistoryEvent>>(

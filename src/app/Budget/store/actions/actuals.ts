@@ -21,6 +21,3 @@ export const setSearchAction = createAction<string>(ActionType.Actuals.SetSearch
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.Actual>>(
   ActionType.Actuals.AddToState
 );
-export const addPlaceholdersToState = createAction<Table.RowAdd<Tables.ActualRowData, Model.Actual>[]>(
-  ActionType.Actuals.AddPlaceholdersToState
-);

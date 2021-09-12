@@ -241,8 +241,26 @@ export const createTableChangeEventReducer = <
         newState
       );
     } else if (typeguards.isRowAddEvent(e)) {
-      // Eventually, we will want to implement this - so we do not have to rely on waiting
-      // for the response of the API request.
+      // ToDo: This is where we need to scroll to the bottom of the table.
+      const payload: Table.RowAdd<R, M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
+      newState = {
+        ...newState,
+        data: [
+          ...newState.data,
+          // ToDo: We might want to account for potential group edge cases.
+          ...map(payload, (addition: Table.RowAdd<R, M>) =>
+            rows.createPlaceholderRow<R, M, G>({
+              id: addition.id,
+              data: events.rowAddToRowData<R, M>(addition),
+              columns: config.columns,
+              group: null,
+              getRowColorDef: config.getPlaceholderRowColorDef,
+              getRowName: config.getPlaceholderRowName,
+              getRowLabel: config.getPlaceholderRowLabel
+            })
+          )
+        ]
+      };
     } else if (typeguards.isRowDeleteEvent(e)) {
       const ids = Array.isArray(e.payload.rows)
         ? map(e.payload.rows, (row: Table.DataRow<R, M>) => row.id)
@@ -435,26 +453,6 @@ export const createAuthenticatedTableReducer = <
       newState = tableEventReducer(newState, action);
     } else if (action.type === config.actions.saving.toString()) {
       newState = { ...newState, saving: action.payload };
-    } else if (action.type === config.actions.addPlaceholdersToState.toString()) {
-      const payload: Table.RowAdd<R, M>[] = action.payload;
-      newState = {
-        ...newState,
-        data: [
-          ...newState.data,
-          ...map(payload, (addition: Table.RowAdd<R, M>) => {
-            // ToDo: We might want to account for potential group edge cases.
-            return rows.createPlaceholderRow<R, M, G>({
-              id: addition.id,
-              data: events.rowAddToRowData<R, M>(addition),
-              columns: config.columns,
-              group: null,
-              getRowColorDef: config.getPlaceholderRowColorDef,
-              getRowName: config.getPlaceholderRowName,
-              getRowLabel: config.getPlaceholderRowLabel
-            });
-          })
-        ]
-      };
     } else if (action.type === config.actions.addModelsToState.toString()) {
       const payload: Redux.AddModelsToTablePayload<M> = action.payload;
       newState = reduce(

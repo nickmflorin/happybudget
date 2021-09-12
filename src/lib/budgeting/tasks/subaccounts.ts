@@ -151,9 +151,6 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
 
   function* bulkCreateTask(objId: ID, e: Table.RowAddEvent<R, C>, errorMessage: string): SagaIterator {
     if (isAuthenticatedConfig(config)) {
-      // ToDo: Factor in auto indexing into the placeholder row data.
-      yield put(config.actions.addPlaceholdersToState(Array.isArray(e.payload) ? e.payload : [e.payload]));
-
       const data = yield select(config.selectData);
       const autoIndex = yield select(config.selectAutoIndex);
 

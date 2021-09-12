@@ -33,9 +33,6 @@ export const setFringesSearchAction = createAction<string>(ActionType.Fringes.Se
 export const addFringeModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.Fringe>>(
   ActionType.Fringes.AddToState
 );
-export const addFringePlaceholdersToState = createAction<Table.RowAdd<Tables.FringeRowData, Model.Fringe>[]>(
-  ActionType.Fringes.AddPlaceholdersToState
-);
 
 export const responseSubAccountUnitsAction = createAction<Http.ListResponse<Model.Tag>>(
   ActionType.SubAccountUnits.Response

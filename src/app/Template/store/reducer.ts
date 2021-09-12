@@ -113,7 +113,6 @@ const genericReducer = combineReducers({
         responseSubAccountUnits: actions.responseSubAccountUnitsAction,
         saving: actions.account.savingTableAction,
         addModelsToState: actions.account.addModelsToStateAction,
-        addPlaceholdersToState: actions.account.addPlaceholdersToState,
         setSearch: actions.account.setSearchAction
       },
       getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
@@ -134,7 +133,6 @@ const genericReducer = combineReducers({
           response: actions.responseFringesAction,
           saving: actions.savingFringesTableAction,
           addModelsToState: actions.addFringeModelsToStateAction,
-          addPlaceholdersToState: actions.addFringePlaceholdersToState,
           setSearch: actions.setFringesSearchAction
         }
       })
@@ -166,7 +164,6 @@ const genericReducer = combineReducers({
         response: actions.subAccount.responseAction,
         saving: actions.subAccount.savingTableAction,
         addModelsToState: actions.subAccount.addModelsToStateAction,
-        addPlaceholdersToState: actions.subAccount.addPlaceholdersToState,
         setSearch: actions.subAccount.setSearchAction
       },
       columns: SubAccountsTable.AuthenticatedBudgetColumns,
@@ -187,7 +184,6 @@ const genericReducer = combineReducers({
           response: actions.responseFringesAction,
           saving: actions.savingFringesTableAction,
           addModelsToState: actions.addFringeModelsToStateAction,
-          addPlaceholdersToState: actions.addFringePlaceholdersToState,
           setSearch: actions.setFringesSearchAction
         }
       })

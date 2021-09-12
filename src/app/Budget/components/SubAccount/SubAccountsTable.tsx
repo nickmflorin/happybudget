@@ -143,7 +143,12 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           open={true}
           onSuccess={(group: Model.BudgetGroup) => {
             setGroupSubAccounts(undefined);
-            dispatch(actions.subAccount.addGroupToStateAction(group));
+            dispatch(
+              actions.subAccount.handleTableChangeEventAction({
+                type: "groupAdd",
+                payload: group
+              })
+            );
           }}
           onCancel={() => setGroupSubAccounts(undefined)}
         />
@@ -155,7 +160,12 @@ const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTablePr
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.BudgetGroup) => {
             setGroupToEdit(undefined);
-            dispatch(actions.subAccount.updateGroupInStateAction({ id: group.id, data: group }));
+            dispatch(
+              actions.subAccount.handleTableChangeEventAction({
+                type: "groupUpdate",
+                payload: { id: group.id, data: group }
+              })
+            );
             if (group.color !== groupToEdit.color) {
               tableRef.current.applyGroupColorChange(group);
             }

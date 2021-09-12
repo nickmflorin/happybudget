@@ -13,12 +13,7 @@ const ActionType = {
     Loading: "template.accounts.Loading",
     Response: "template.accounts.Response",
     Request: "template.accounts.Request",
-    AddToState: "template.accounts.AddToState",
-    AddPlaceholdersToState: "template.accounts.AddPlaceholdersToState"
-  },
-  Groups: {
-    AddToState: "template.groups.AddToState",
-    UpdateInState: "template.groups.UpdateInState"
+    AddToState: "template.accounts.AddToState"
   },
   Fringes: {
     TableChanged: "template.fringes.TableChanged",
@@ -27,7 +22,6 @@ const ActionType = {
     Response: "template.fringes.Response",
     Request: "template.fringes.Request",
     AddToState: "template.fringes.AddToState",
-    AddPlaceholdersToState: "template.fringes.AddPlaceholdersToState",
     SetSearch: "template.fringes.SetSearch"
   },
   SubAccountUnits: {
@@ -49,12 +43,7 @@ const ActionType = {
       Loading: "template.subaccount.subaccounts.Loading",
       Response: "template.subaccount.subaccounts.Response",
       Request: "template.subaccount.subaccounts.Request",
-      AddToState: "template.subaccount.subaccounts.AddToState",
-      AddPlaceholdersToState: "template.subaccount.subaccounts.AddPlaceholdersToState"
-    },
-    Groups: {
-      AddToState: "template.subaccount.groups.AddToState",
-      UpdateInState: "template.subaccount.groups.UpdateInState"
+      AddToState: "template.subaccount.subaccounts.AddToState"
     }
   },
   Account: {
@@ -70,12 +59,7 @@ const ActionType = {
       Request: "template.account.subaccounts.Request",
       Saving: "template.account.subaccounts.Saving",
       SetSearch: "template.account.subaccounts.SetSearch",
-      AddToState: "template.account.subaccounts.AddToState",
-      AddPlaceholdersToState: "template.account.subaccounts.AddPlaceholdersToState"
-    },
-    Groups: {
-      AddToState: "template.account.groups.AddToState",
-      UpdateInState: "template.account.groups.UpdateInState"
+      AddToState: "template.account.subaccounts.AddToState"
     }
   }
 };

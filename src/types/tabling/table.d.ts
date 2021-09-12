@@ -392,7 +392,15 @@ namespace Table {
     readonly apis: GridApis;
   };
 
-  type ChangeEventId = "dataChange" | "rowAdd" | "rowDelete" | "rowRemoveFromGroup" | "rowAddToGroup" | "groupDelete" | "groupUpdate";
+  type ChangeEventId =
+   | "dataChange"
+   | "rowAdd"
+   | "rowDelete"
+   | "rowRemoveFromGroup"
+   | "rowAddToGroup"
+   | "groupDelete"
+   | "groupAdd"
+   | "groupUpdate";
 
   type BaseChangeEvent = {
     readonly type: ChangeEventId;
@@ -509,6 +517,12 @@ namespace Table {
     readonly payload: GroupDeletePayload;
   };
 
+  type GroupAddPayload<G extends Model.Group = Model.Group> = G;
+  type GroupAddEvent<G extends Model.Group = Model.Group> = BaseChangeEvent & {
+    readonly type: "groupAdd";
+    readonly payload: GroupAddPayload<G>;
+  };
+
   type FullRowEvent<R extends RowData, M extends Model.Model = Model.Model> =
     | RowDeleteEvent<R, M>
     | RowRemoveFromGroupEvent<R, M>
@@ -521,6 +535,7 @@ namespace Table {
     | RowRemoveFromGroupEvent<R, M>
     | RowAddToGroupEvent<R, M>
     | GroupUpdateEvent<G>
+    | GroupAddEvent<G>
     | GroupDeleteEvent;
 
   type ChangeEvent<R extends RowData, M extends Model.Model = Model.Model> = GrouplessEvent<R, M> | GroupEvent<R, M>;

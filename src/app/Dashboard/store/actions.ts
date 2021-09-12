@@ -37,8 +37,7 @@ export const ActionType = {
     SetSearch: "dashboard.contacts.SetSearch",
     UpdateInState: "dashboard.contacts.UpdateInState",
     RemoveFromState: "dashboard.contacts.RemoveFromState",
-    AddToState: "dashboard.contacts.AddToState",
-    AddPlaceholdersToState: "dashboard.contacts.AddPlaceholdersToState"
+    AddToState: "dashboard.contacts.AddToState"
   }
 };
 
@@ -84,9 +83,6 @@ export const setContactsSearchAction = createAction<string>(ActionType.Contacts.
 export const requestContactsAction = createAction<null>(ActionType.Contacts.Request);
 export const addContactModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.Contact>>(
   ActionType.Contacts.AddToState
-);
-export const addContactPlaceholdersToStateAction = createAction<Table.RowAdd<Tables.ContactRowData, Model.Contact>[]>(
-  ActionType.Contacts.AddPlaceholdersToState
 );
 export const loadingContactsAction = createAction<boolean>(ActionType.Contacts.Loading);
 export const responseContactsAction = createAction<Http.TableResponse<Model.Contact>>(ActionType.Contacts.Response);

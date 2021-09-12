@@ -19,7 +19,6 @@ const ActionMap = {
   response: actions.responseContactsAction,
   saving: actions.savingContactsTableAction,
   addModelsToState: actions.addContactModelsToStateAction,
-  addPlaceholdersToState: actions.addContactPlaceholdersToStateAction,
   setSearch: actions.setContactsSearchAction
 };
 

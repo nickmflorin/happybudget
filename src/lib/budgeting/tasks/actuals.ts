@@ -111,8 +111,6 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
   }
 
   function* bulkCreateTask(budgetId: ID, e: Table.RowAddEvent<R, M>, errorMessage: string): SagaIterator {
-    yield put(config.actions.addPlaceholdersToState(Array.isArray(e.payload) ? e.payload : [e.payload]));
-
     const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, M>(
       e.payload,
       config.columns

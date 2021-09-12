@@ -82,7 +82,6 @@ const ActionMap: Redux.ActionMapObject<
   response: actions.responseAction,
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
-  addPlaceholdersToState: actions.addPlaceholdersToState,
   loadingBudget: loadingBudgetAction,
   updateBudgetInState: updateBudgetInStateAction,
   setSearch: actions.setSearchAction

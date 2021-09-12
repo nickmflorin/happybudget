@@ -69,7 +69,6 @@ const ActionMap = {
   response: actions.responseAction,
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
-  addPlaceholdersToState: actions.addPlaceholdersToState,
   loadingBudget: loadingTemplateAction,
   updateBudgetInState: updateTemplateInStateAction,
   setSearch: actions.setSearchAction,

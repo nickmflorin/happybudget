@@ -88,7 +88,12 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
           open={true}
           onSuccess={(group: Model.BudgetGroup) => {
             setGroupAccounts(undefined);
-            dispatch(actions.accounts.addGroupToStateAction(group));
+            dispatch(
+              actions.accounts.handleTableChangeEventAction({
+                type: "groupAdd",
+                payload: group
+              })
+            );
           }}
           onCancel={() => setGroupAccounts(undefined)}
         />
@@ -100,7 +105,12 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.BudgetGroup) => {
             setGroupToEdit(undefined);
-            dispatch(actions.accounts.updateGroupInStateAction({ id: group.id, data: group }));
+            dispatch(
+              actions.accounts.handleTableChangeEventAction({
+                type: "groupUpdate",
+                payload: { id: group.id, data: group }
+              })
+            );
             if (group.color !== groupToEdit.color) {
               table.current.applyGroupColorChange(group);
             }

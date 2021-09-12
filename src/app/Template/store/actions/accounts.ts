@@ -8,9 +8,6 @@ export const savingTableAction = createAction<boolean>(ActionType.Accounts.Savin
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.Account>>(
   ActionType.Accounts.AddToState
 );
-export const addPlaceholdersToState = createAction<Table.RowAdd<Tables.AccountRowData, Model.Account>[]>(
-  ActionType.Accounts.AddPlaceholdersToState
-);
 
 export const requestAction = createAction<null>(ActionType.Accounts.Request);
 export const loadingAction = createAction<boolean>(ActionType.Accounts.Loading);
@@ -19,7 +16,3 @@ export const responseAction = createAction<Http.TableResponse<Model.Account, Mod
 );
 export const setSearchAction = createAction<string>(ActionType.Accounts.SetSearch);
 export const addAccountToStateAction = createAction<Model.Account>(ActionType.Accounts.AddToState);
-export const addGroupToStateAction = createAction<Model.BudgetGroup>(ActionType.Groups.AddToState);
-export const updateGroupInStateAction = createAction<Redux.UpdateActionPayload<Model.BudgetGroup>>(
-  ActionType.Groups.UpdateInState
-);

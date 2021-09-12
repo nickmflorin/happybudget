@@ -40,7 +40,6 @@ const ActionType = {
     Request: "budget.fringes.Request",
     Response: "budget.fringes.Response",
     AddToState: "budget.fringes.AddToState",
-    AddPlaceholdersToState: "budget.fringes.AddPlaceholdersToState",
     SetSearch: "budget.fringes.SetSearch"
   },
   FringeColors: {
@@ -56,12 +55,7 @@ const ActionType = {
     Loading: "budget.accounts.Loading",
     Response: "budget.accounts.Response",
     Request: "budget.accounts.Request",
-    AddToState: "budget.accounts.AddToState",
-    AddPlaceholdersToState: "budget.accounts.AddPlaceholdersToState"
-  },
-  Groups: {
-    AddToState: "budget.groups.AddToState",
-    UpdateInState: "budget.groups.UpdateInState"
+    AddToState: "budget.accounts.AddToState"
   },
   History: {
     Loading: "budget.history.Loading",
@@ -97,12 +91,7 @@ const ActionType = {
       Loading: "budget.subaccount.subaccounts.Loading",
       Response: "budget.subaccount.subaccounts.Response",
       Request: "budget.subaccount.subaccounts.Request",
-      AddToState: "budget.subaccount.subaccounts.AddToState",
-      AddPlaceholdersToState: "budget.subaccount.subaccounts.AddPlaceholdersToState"
-    },
-    Groups: {
-      AddToState: "budget.subaccount.groups.AddToState",
-      UpdateInState: "budget.subaccount.groups.UpdateInState"
+      AddToState: "budget.subaccount.subaccounts.AddToState"
     },
     History: {
       Loading: "budget.subaccount.history.Loading",
@@ -138,12 +127,7 @@ const ActionType = {
       Response: "budget.account.subaccounts.Response",
       Request: "budget.account.subaccounts.Request",
       SetSearch: "budget.account.subaccounts.SetSearch",
-      AddToState: "budget.account.subaccounts.AddToState",
-      AddPlaceholdersToState: "budget.account.subaccounts.AddPlaceholdersToState"
-    },
-    Groups: {
-      AddToState: "budget.account.groups.AddToState",
-      UpdateInState: "budget.account.groups.UpdateInState"
+      AddToState: "budget.account.subaccounts.AddToState"
     },
     History: {
       Loading: "budget.account.history.Loading",
@@ -164,8 +148,7 @@ const ActionType = {
     SetSearch: "budget.actuals.SetSearch",
     Response: "budget.actuals.Response",
     Request: "budget.actuals.Request",
-    AddToState: "budget.actuals.AddToState",
-    AddPlaceholdersToState: "budget.actuals.AddPlaceholdersToState"
+    AddToState: "budget.actuals.AddToState"
   }
 };
 

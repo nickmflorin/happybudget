@@ -13,7 +13,6 @@ const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActio
   response: actions.responseAction,
   saving: actions.savingTableAction,
   addModelsToState: actions.addModelsToStateAction,
-  addPlaceholdersToState: actions.addPlaceholdersToState,
   setSearch: actions.setSearchAction,
   responseSubAccountsTree: actions.responseSubAccountsTreeAction,
   restoreSubAccountsTreeSearchCache: actions.restoreSubAccountsTreeSearchCacheAction,
