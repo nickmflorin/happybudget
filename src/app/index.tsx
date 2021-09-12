@@ -9,10 +9,10 @@ import "style/index.scss";
 import { ApplicationSpinner } from "components";
 import { AuthenticatedReduxRoute, UnauthenticatedReduxRoute } from "components/routes";
 
-import { operational } from "lib";
+import * as config from "config";
 
-const Landing = operational.lazyWithRetry(() => import("./Landing"));
-const Application = operational.lazyWithRetry(() => import("./Application"));
+const Landing = config.lazyWithRetry(() => import("./Landing"));
+const Application = config.lazyWithRetry(() => import("./Application"));
 
 const history = createBrowserHistory();
 

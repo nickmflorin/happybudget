@@ -10,7 +10,7 @@ import { createStaticAuthenticatedReducers, createStaticUnauthenticatedReducers 
 import { createAuthenticatedRootSaga, createUnauthenticatedRootSaga } from "./sagas";
 import { createAuthenticatedInitialState, createUnauthenticatedInitialState } from "./initialState";
 
-export const authenticatedActionMiddleware: Middleware<{}, Application.Store> = api => next => action => {
+const authenticatedActionMiddleware: Middleware<{}, Application.Store> = api => next => action => {
   const state = api.getState();
   if (isAuthenticatedStore(state)) {
     return next({ ...action, isAuthenticated: true });
@@ -28,6 +28,11 @@ const configureGenericStore = <S extends Application.Store>(
   // Create the redux-saga middleware that allows the sagas to run as side-effects
   // in the application.
   const sagaMiddleware = createSagaMiddleware();
+  let baseMiddleware: Middleware<{}, Application.Store>[] = [sagaMiddleware, authenticatedActionMiddleware];
+  baseMiddleware =
+    process.env.NODE_ENV !== "production"
+      ? [require("redux-immutable-state-invariant").default(), ...baseMiddleware]
+      : baseMiddleware;
 
   const reducerManager = createReducerManager<S>(staticReducers, initialState);
 
@@ -36,7 +41,7 @@ const configureGenericStore = <S extends Application.Store>(
     ...createStore<S, Redux.Action, any, any>(
       reducerManager.reduce,
       initialState,
-      compose(applyMiddleware(sagaMiddleware, authenticatedActionMiddleware), sentryReduxEnhancer)
+      compose(applyMiddleware(...baseMiddleware), sentryReduxEnhancer)
     )
   };
 

@@ -3,9 +3,9 @@ import { Switch, useHistory, useLocation } from "react-router-dom";
 import { Icon } from "components";
 import { Layout } from "components/layout";
 import { PrivateRoute } from "components/routes";
-import { operational } from "lib";
+import * as config from "config";
 
-const Profile = operational.lazyWithRetry(() => import("./Profile"));
+const Profile = config.lazyWithRetry(() => import("./Profile"));
 
 const Settings = (): JSX.Element => {
   const history = useHistory();

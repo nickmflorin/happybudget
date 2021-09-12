@@ -4,14 +4,14 @@ import { Redirect, Switch, Route } from "react-router-dom";
 import { ConnectedApplicationSpinner } from "components";
 import { PrivateRoute } from "components/routes";
 
-import { operational } from "lib";
+import * as config from "config";
 
 import Logout from "./Logout";
 
-const Dashboard = operational.lazyWithRetry(() => import("./Dashboard"));
-const Budget = operational.lazyWithRetry(() => import("./Budget"));
-const Template = operational.lazyWithRetry(() => import("./Template"));
-const Settings = operational.lazyWithRetry(() => import("./Settings"));
+const Dashboard = config.lazyWithRetry(() => import("./Dashboard"));
+const Budget = config.lazyWithRetry(() => import("./Budget"));
+const Template = config.lazyWithRetry(() => import("./Template"));
+const Settings = config.lazyWithRetry(() => import("./Settings"));
 
 const Application = (): JSX.Element => {
   return (

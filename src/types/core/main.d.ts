@@ -1,3 +1,5 @@
+/// <reference types="@welldone-software/why-did-you-render" />
+
 /// <reference path="../modeling/http.d.ts" />
 /// <reference path="./redux.d.ts" />
 /// <reference path="./ui.d.ts" />

@@ -29,7 +29,7 @@ import {
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
-import { TABLE_DEBUG } from "config";
+import { Config } from "config";
 import { tabling, hooks, util } from "lib";
 
 /* eslint-disable no-unused-vars */
@@ -268,7 +268,7 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
         }
         rowData={rowData}
         columnDefs={colDefs}
-        debug={process.env.NODE_ENV === "development" && TABLE_DEBUG}
+        debug={Config.tableDebug}
         modules={AllModules}
         overlayNoRowsTemplate={"<span></span>"}
         overlayLoadingTemplate={"<span></span>"}

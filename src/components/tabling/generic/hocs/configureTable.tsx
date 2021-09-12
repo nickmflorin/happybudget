@@ -3,7 +3,7 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 import { map, isNil, filter, includes, reduce } from "lodash";
 import { GridReadyEvent, GridOptions, FirstDataRenderedEvent, RowNode } from "@ag-grid-community/core";
 
-import { TABLE_DEBUG } from "config";
+import { Config } from "config";
 import { tabling, hooks, util } from "lib";
 
 import * as framework from "../framework";
@@ -17,7 +17,7 @@ export const DefaultDataGridOptions: GridOptions = {
     suppressMovable: true
   },
   suppressHorizontalScroll: true,
-  suppressContextMenu: process.env.NODE_ENV === "development" && TABLE_DEBUG,
+  suppressContextMenu: Config.tableDebug,
   // If for whatever reason, we have a table that cannot support bulk-updating,
   // these two parameters need to be set to true.
   suppressCopyRowsToClipboard: false,

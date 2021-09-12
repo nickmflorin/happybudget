@@ -1,22 +1,13 @@
 import moment from "moment-timezone";
 import { Moment } from "moment";
 import { isNil } from "lodash";
-import { util } from "lib";
 
-import {
-  MOMENT_API_DATETIME_FORMAT,
-  MOMENT_API_DATE_FORMAT,
-  DATETIME_DISPLAY_FORMAT,
-  DATE_DISPLAY_FORMAT,
-  TIME_DISPLAY_FORMAT,
-  DATETIME_ABBV_DISPLAY_FORMAT,
-  MOMENT_DATETIME_FORMAT,
-  MOMENT_DATE_FORMAT
-} from "config";
+import { localization } from "config";
+import { util } from "lib";
 
 export const nowAsString = (): string => {
   const mmt = moment();
-  return mmt.format(MOMENT_DATETIME_FORMAT);
+  return mmt.format(localization.MOMENT_DATETIME_FORMAT);
 };
 
 interface IDateOptions {
@@ -75,10 +66,10 @@ const Converter = (formatter: string) => (value: string | Moment, options?: Part
   return mmt.format(formatter);
 };
 
-export const toDate = Converter(MOMENT_DATE_FORMAT);
-export const toDateTime = Converter(MOMENT_DATETIME_FORMAT);
-export const toApiDate = Converter(MOMENT_API_DATE_FORMAT);
-export const toApiDateTime = Converter(MOMENT_API_DATETIME_FORMAT);
+export const toDate = Converter(localization.MOMENT_DATE_FORMAT);
+export const toDateTime = Converter(localization.MOMENT_DATETIME_FORMAT);
+export const toApiDate = Converter(localization.MOMENT_API_DATE_FORMAT);
+export const toApiDateTime = Converter(localization.MOMENT_API_DATETIME_FORMAT);
 /**
  * Converts a provided string or Moment instance to a standardized
  * string representation of the date and time used for display in the UI.
@@ -86,7 +77,7 @@ export const toApiDateTime = Converter(MOMENT_API_DATETIME_FORMAT);
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a datetime display format.
  */
-export const toDisplayDateTime = Converter(DATETIME_DISPLAY_FORMAT);
+export const toDisplayDateTime = Converter(localization.DATETIME_DISPLAY_FORMAT);
 /**
  * Converts a provided string or Moment instance to a standardized
  * abbreviated string representation of the date and time used for display in
@@ -95,7 +86,7 @@ export const toDisplayDateTime = Converter(DATETIME_DISPLAY_FORMAT);
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a datetime display format.
  */
-export const toAbbvDisplayDateTime = Converter(DATETIME_ABBV_DISPLAY_FORMAT);
+export const toAbbvDisplayDateTime = Converter(localization.DATETIME_ABBV_DISPLAY_FORMAT);
 
 /**
  * Converts a provided string or Moment instance to a standardized
@@ -104,7 +95,7 @@ export const toAbbvDisplayDateTime = Converter(DATETIME_ABBV_DISPLAY_FORMAT);
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a date display format.
  */
-export const toDisplayDate = Converter(DATE_DISPLAY_FORMAT);
+export const toDisplayDate = Converter(localization.DATE_DISPLAY_FORMAT);
 /**
  * Converts a provided string or Moment instance to a standardized
  * string representation of the time used for display in the UI.
@@ -112,7 +103,7 @@ export const toDisplayDate = Converter(DATE_DISPLAY_FORMAT);
  * @param value:   Either a string date/time or a Moment instance that will
  *                 be converted to a time display format.
  */
-export const toDisplayTime = Converter(TIME_DISPLAY_FORMAT);
+export const toDisplayTime = Converter(localization.TIME_DISPLAY_FORMAT);
 
 /**
  * A string representing a general time from now to the specified moment

@@ -1,12 +1,59 @@
-export const MOMENT_DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
-export const MOMENT_DATE_FORMAT = "YYYY-MM-DD";
-export const MOMENT_API_DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
-export const MOMENT_API_DATE_FORMAT = "YYYY-MM-DD";
-export const DATE_DISPLAY_FORMAT = "MM/DD/YYYY";
-export const TIME_DISPLAY_FORMAT = "hh:mm A";
-export const DATETIME_DISPLAY_FORMAT = "LLL";
-export const DATETIME_ABBV_DISPLAY_FORMAT = "lll";
+import React from "react";
+import { reduce } from "lodash";
 
-// Convenience flag for development to turn off the context menu so we can right-click inspect
-// the cells and turn on debug mode for AG Grid.
-export const TABLE_DEBUG = false;
+import configureAgGrid from "./configureAgGrid";
+import configureFontAwesome from "./configureFontAwesome";
+import reportWebVitals from "./reportWebVitals";
+
+import * as flags from "./flags";
+
+export { default as componentLoader } from "./componentLoader";
+export { default as lazyWithRetry } from "./lazyWithRetry";
+export { default as registerIcons } from "./configureFontAwesome";
+
+export * as flags from "./flags";
+export * as localization from "./localization";
+
+export const ConfigOptions: Application.ConfigOption[] = [
+  { name: "tableDebug", default: false, devOnly: true },
+  { name: "reportWebVitals", default: false },
+  { name: "whyDidYouRender", default: false, devOnly: true }
+];
+
+export const Config: Application.Config = reduce(
+  ConfigOptions,
+  (curr: Application.Config, option: Application.ConfigOption) => ({
+    ...curr,
+    [option.name]: flags.evaluateFlagFromEnvOrMemory(option)
+  }),
+  {} as Application.Config
+);
+
+const configureApplication = () => {
+  configureAgGrid();
+  configureFontAwesome();
+
+  // If you want to start measuring performance in your app, pass a function
+  // to log results (for example: reportWebVitals(console.log))
+  // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+  if (process.env.NODE_ENV === "development" && Config.reportWebVitals === true) {
+    /* eslint-disable no-console */
+    reportWebVitals(console.log);
+  }
+};
+
+// WYDR is extremely useful in development, but slows down production bundles.
+// It is important that this is done outside of the scope of the configuration method,
+// because it must be done at the top of the src/index.tsx file before any other imports are
+// performed.
+if (process.env.NODE_ENV === "development" && Config.whyDidYouRender) {
+  console.log("Registering WYDR");
+  const whyDidYouRender = require("@welldone-software/why-did-you-render");
+  whyDidYouRender(React, {
+    trackAllPureComponents: true,
+    trackHooks: true,
+    trackExtraHooks: [[require("react-redux/lib"), "useSelector"]]
+  });
+}
+
+export default configureApplication;

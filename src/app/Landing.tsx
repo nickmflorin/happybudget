@@ -1,12 +1,12 @@
 import { Route, Switch } from "react-router-dom";
 
 import { Logo } from "components/svgs";
-import { operational } from "lib";
+import * as config from "config";
 
 import "./Landing.scss";
 
-const Login = operational.lazyWithRetry(() => import("./Login"));
-const Signup = operational.lazyWithRetry(() => import("./Signup"));
+const Login = config.lazyWithRetry(() => import("./Login"));
+const Signup = config.lazyWithRetry(() => import("./Signup"));
 
 const Landing = (): JSX.Element => {
   return (

@@ -3,7 +3,6 @@ export * as richtext from "./richtext";
 export * as tabling from "./tabling";
 export * as util from "./util";
 export * as redux from "./redux";
-export * as operational from "./operational";
 export * as model from "./model";
 export * as pdf from "./pdf";
 export * as budgeting from "./budgeting";

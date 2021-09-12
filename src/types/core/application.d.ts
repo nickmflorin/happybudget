@@ -7,6 +7,19 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Application {
+
+  type Config = {
+    readonly reportWebVitals: boolean;
+    readonly tableDebug: boolean;
+    readonly whyDidYouRender: boolean;
+  };
+
+  type ConfigOption = {
+    readonly devOnly?: boolean;
+    readonly name: keyof Config;
+    readonly default?: boolean;
+  }
+
   namespace Authenticated {
     type ModuleLabel = "dashboard" | "budget" | "template";
     type AnyModuleStore = Modules.Budget.Store | Modules.Dashboard.Store | Modules.Template.Store;
