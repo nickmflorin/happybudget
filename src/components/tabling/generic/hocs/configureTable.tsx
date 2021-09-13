@@ -88,6 +88,7 @@ export type TableConfigurationProps<
   readonly onRowExpand?: null | ((row: Table.ModelRow<R, M>) => void);
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M, G>) => void;
   readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M, G>) => boolean;
+  readonly pinFirstColumn?: boolean;
 };
 
 export type WithConfiguredTableProps<T, R extends Table.RowData, M extends Model.Model = Model.Model> = T &
@@ -146,11 +147,17 @@ const configureTable = <
 
     const columns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
       let orderedColumns = tabling.columns.orderColumns<Table.Column<R, M, G>, R, M, G>(props.columns);
+
       if (hasExpandColumn === true) {
         return [
-          framework.columnObjs.IndexColumn<R, M, G>({ ...props.indexColumn }, hasExpandColumn, props.indexColumnWidth),
+          framework.columnObjs.IndexColumn<R, M, G>(
+            { ...props.indexColumn, pinned: props.pinFirstColumn ? "left" : undefined },
+            hasExpandColumn,
+            props.indexColumnWidth
+          ),
           framework.columnObjs.ExpandColumn<R, M, G>(
             {
+              pinned: props.pinFirstColumn ? "left" : undefined,
               // These are only applicable for the non-footer grids, but it is easier to define them
               // at the top Table level than at the Grid level.
               cellRendererParams: {
@@ -162,18 +169,22 @@ const configureTable = <
             },
             props.expandColumnWidth
           ),
-          ...orderedColumns
+          ...(orderedColumns.length !== 0
+            ? [{ ...orderedColumns[0], pinned: props.pinFirstColumn ? "left" : undefined }, ...orderedColumns.slice(1)]
+            : orderedColumns)
         ];
       }
       return [
         framework.columnObjs.IndexColumn<R, M, G>(
-          { ...props.indexColumn },
+          { ...props.indexColumn, pinned: props.pinFirstColumn ? "left" : undefined },
           hasExpandColumn || false,
           props.indexColumnWidth
         ),
-        ...orderedColumns
+        ...(orderedColumns.length !== 0
+          ? [{ ...orderedColumns[0], pinned: props.pinFirstColumn ? "left" : undefined }, ...orderedColumns.slice(1)]
+          : orderedColumns)
       ];
-    }, [hooks.useDeepEqualMemo(props.columns), hasExpandColumn, props.onRowExpand]);
+    }, [hooks.useDeepEqualMemo(props.columns), props.pinFirstColumn, hasExpandColumn, props.onRowExpand]);
 
     const processCellForClipboard = hooks.useDynamicCallback(
       (column: Table.Column<R, M, G>, row: Table.DataRow<R, M>, value?: any) => {

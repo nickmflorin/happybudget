@@ -80,9 +80,17 @@
         }
       }
     }
+
+    .ag-pinned-left-header {
+      border-right: 1px solid #cdcdcd;
+    }
   }
 
   .grid {
+    .ag-pinned-left-cols-container {
+      z-index: 1;
+    }
+
     .row {
       border: none !important;
       color: #3a3a3a;
@@ -155,11 +163,6 @@
             box-shadow: none !important;
             background-color: transparent !important;
           }
-        }
-
-        &.ag-cell-last-left-pinned:not(.ag-cell-range-right):not(.ag-cell-range-single-cell):not(.ag-cell-focus) {
-          border-right: unset !important;
-          border-right-color: unset !important;
         }
 
         // This will vertically center the text nicely while also not adjusting the
@@ -352,9 +355,15 @@
               border-bottom-left-radius: 8px;
               border-top-left-radius: 8px;
             }
+
             &.ag-cell-range-right {
               border-bottom-right-radius: 8px;
               border-top-right-radius: 8px;
+            }
+
+            &.ag-cell-last-left-pinned {
+              border-right: 0px;
+              overflow: visible;
             }
           }
         }

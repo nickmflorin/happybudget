@@ -41,6 +41,7 @@ const AuthenticatedBudgetSubAccountsTable = (
     <AuthenticatedBudgetTable<R, M>
       {...props}
       table={table}
+      pinFirstColumn={true}
       columns={tabling.columns.mergeColumns<Table.Column<R, M, G>, R, M, G>(props.columns, {
         identifier: (col: Table.Column<R, M, G>) =>
           budgetTableFramework.columnObjs.IdentifierColumn<R, M>({

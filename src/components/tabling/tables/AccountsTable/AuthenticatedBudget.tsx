@@ -25,6 +25,7 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
     <AuthenticatedBudgetTable<R, M>
       {...props}
       table={table}
+      pinFirstColumn={true}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M, Model.BudgetGroup>) => [
         {
           icon: "folder",

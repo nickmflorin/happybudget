@@ -32,6 +32,7 @@ const UnauthenticatedBudgetAccountsTable = (props: UnauthenticatedBudgetProps): 
         )
       ]}
       columns={BudgetColumns}
+      pinFirstColumn={true}
     />
   );
 };
