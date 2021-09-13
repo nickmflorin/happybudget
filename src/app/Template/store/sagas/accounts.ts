@@ -18,6 +18,7 @@ const ActionMap: Redux.ActionMapObject<
 } = {
   tableChanged: actions.handleTableChangeEventAction,
   request: actions.requestAction,
+  clear: actions.clearAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
   saving: actions.savingTableAction,

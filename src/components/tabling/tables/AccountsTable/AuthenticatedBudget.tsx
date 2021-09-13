@@ -12,7 +12,7 @@ type M = Model.Account;
 
 export type AuthenticatedBudgetProps = AccountsTableProps &
   Omit<AuthenticatedBudgetTableProps<R, M>, "columns" | "cookieNames"> & {
-    readonly budget?: Model.Budget;
+    readonly budget: Model.Budget | null;
     readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
     readonly cookieNames?: Table.CookieNames;
     readonly onExportPdf: () => void;

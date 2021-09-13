@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, call, put, select, takeLatest, cancelled } from "redux-saga/effects";
+import { spawn, call, put, select, takeLatest, cancelled, all } from "redux-saga/effects";
 import axios from "axios";
 import { isNil } from "lodash";
 
@@ -24,7 +24,7 @@ export function* getTemplateTask(action: Redux.Action<null>): SagaIterator {
     } catch (e: unknown) {
       if (!(yield cancelled())) {
         api.handleRequestError(e as Error, "There was an error retrieving the template.");
-        yield put(actions.responseTemplateAction(undefined));
+        yield put(actions.responseTemplateAction(null));
       }
     } finally {
       yield put(actions.loadingTemplateAction(false));
@@ -35,12 +35,17 @@ export function* getTemplateTask(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-function* watchForRequestTemplateSaga(): SagaIterator {
-  yield takeLatest([actions.ActionType.Request, actions.ActionType.SetId], getTemplateTask);
+function* getData(action: Redux.Action<any>): SagaIterator {
+  // yield put(actions.wipeStateAction(null));
+  yield all([call(getTemplateTask, action)]);
+}
+
+function* watchForTemplateIdChangedSaga(): SagaIterator {
+  yield takeLatest(actions.setTemplateIdAction.toString(), getData);
 }
 
 export default function* rootSaga(): SagaIterator {
-  yield spawn(watchForRequestTemplateSaga);
+  yield spawn(watchForTemplateIdChangedSaga);
   yield spawn(accountSaga);
   yield spawn(budgetSaga);
   yield spawn(subAccountSaga);

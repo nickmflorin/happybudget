@@ -5,7 +5,6 @@ const ActionType = {
   SetAutoIndex: "budget.SetAutoIndex",
   Loading: "budget.Loading",
   Response: "budget.Response",
-  Request: "budget.Request",
   UpdateInState: "budget.UpdateInState",
   HeaderTemplates: {
     Loading: "budget.headertemplates.Loading",
@@ -40,7 +39,8 @@ const ActionType = {
     Request: "budget.fringes.Request",
     Response: "budget.fringes.Response",
     AddToState: "budget.fringes.AddToState",
-    SetSearch: "budget.fringes.SetSearch"
+    SetSearch: "budget.fringes.SetSearch",
+    Clear: "budget.fringes.Clear"
   },
   FringeColors: {
     Response: "budget.fringecolors.Response"
@@ -55,7 +55,8 @@ const ActionType = {
     Loading: "budget.accounts.Loading",
     Response: "budget.accounts.Response",
     Request: "budget.accounts.Request",
-    AddToState: "budget.accounts.AddToState"
+    AddToState: "budget.accounts.AddToState",
+    Clear: "budget.accounts.Clear"
   },
   History: {
     Loading: "budget.history.Loading",
@@ -67,7 +68,6 @@ const ActionType = {
     SetId: "budget.subaccount.SetId",
     Loading: "budget.subaccount.Loading",
     Response: "budget.subaccount.Response",
-    Request: "budget.subaccount.Request",
     UpdateInState: "budget.subaccount.UpdateInState",
     Comments: {
       Loading: "budget.subaccount.comments.Loading",
@@ -90,8 +90,9 @@ const ActionType = {
       SetSearch: "budget.subaccount.subaccounts.SetSearch",
       Loading: "budget.subaccount.subaccounts.Loading",
       Response: "budget.subaccount.subaccounts.Response",
-      Request: "budget.subaccount.subaccounts.Request",
-      AddToState: "budget.subaccount.subaccounts.AddToState"
+      // Request: "budget.subaccount.subaccounts.Request",
+      AddToState: "budget.subaccount.subaccounts.AddToState",
+      Clear: "budget.subaccount.subaccounts.Clear"
     },
     History: {
       Loading: "budget.subaccount.history.Loading",
@@ -103,7 +104,6 @@ const ActionType = {
     SetId: "budget.account.SetId",
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",
-    Request: "budget.account.Request",
     UpdateInState: "budget.account.UpdateInState",
     Comments: {
       Loading: "budget.account.comments.Loading",
@@ -125,9 +125,10 @@ const ActionType = {
       Saving: "budget.account.subaccounts.Saving",
       Loading: "budget.account.subaccounts.Loading",
       Response: "budget.account.subaccounts.Response",
-      Request: "budget.account.subaccounts.Request",
+      // Request: "budget.account.subaccounts.Request",
       SetSearch: "budget.account.subaccounts.SetSearch",
-      AddToState: "budget.account.subaccounts.AddToState"
+      AddToState: "budget.account.subaccounts.AddToState",
+      Clear: "budget.account.subaccounts.Clear"
     },
     History: {
       Loading: "budget.account.history.Loading",
@@ -148,7 +149,8 @@ const ActionType = {
     SetSearch: "budget.actuals.SetSearch",
     Response: "budget.actuals.Response",
     Request: "budget.actuals.Request",
-    AddToState: "budget.actuals.AddToState"
+    AddToState: "budget.actuals.AddToState",
+    Clear: "budget.actuals.Clear"
   }
 };
 

@@ -94,6 +94,7 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     const budgetId = yield select(config.selectBudgetId);
     if (!isNil(objId) && !isNil(budgetId)) {
       yield put(config.actions.loading(true));
+      yield put(config.actions.clear(null));
       try {
         yield fork(contactsTasks.request, action);
         yield fork(requestSubAccountUnits);

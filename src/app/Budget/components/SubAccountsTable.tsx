@@ -16,7 +16,7 @@ type OmitTableProps = "contacts" | "onEditContact" | "onNewContact" | "menuPorta
 export interface BudgetSubAccountsTableProps
   extends Omit<GenericSubAccountsTable.AuthenticatedBudgetProps, OmitTableProps> {
   readonly budgetId: ID;
-  readonly budget: Model.Budget | undefined;
+  readonly budget: Model.Budget | null;
 }
 
 const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTableProps): JSX.Element => {

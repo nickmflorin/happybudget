@@ -9,11 +9,9 @@ export const listResponseReducerTransformers = <M, S extends Redux.ListResponseS
     return {
       ...st,
       data: action.payload.data,
-      count: action.payload.count,
-      responseWasReceived: true
+      count: action.payload.count
     };
   },
-  request: (st: S = initialState, action: Redux.Action<null>) => ({ ...st, responseWasReceived: false }),
   loading: (st: S = initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload })
 });
 
@@ -46,7 +44,6 @@ export const modelListResponseReducerTransformers = <
       data: action.payload.data,
       count: action.payload.count,
       selected: [],
-      responseWasReceived: true,
       cache: {
         ...st.cache,
         [st.search]: {
@@ -60,7 +57,6 @@ export const modelListResponseReducerTransformers = <
   },
   request: (st: S = initialState, action: Redux.Action<null>) => ({
     ...st,
-    responseWasReceived: false,
     data: [],
     count: 0,
     selected: [],

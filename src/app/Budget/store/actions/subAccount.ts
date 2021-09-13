@@ -2,9 +2,8 @@ import { createAction } from "@reduxjs/toolkit";
 import ActionType from "./ActionType";
 
 export const setSubAccountIdAction = createAction<ID>(ActionType.SubAccount.SetId);
-export const requestSubAccountAction = createAction<null>(ActionType.SubAccount.Request);
 export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccount.Loading);
-export const responseSubAccountAction = createAction<Model.SubAccount | undefined>(ActionType.SubAccount.Response);
+export const responseSubAccountAction = createAction<Model.SubAccount | null>(ActionType.SubAccount.Response);
 // Not currently used, because the reducer handles the logic, but we may need to use in the near future.
 export const updateParentSubAccountInStateAction = createAction<Partial<Model.Account>>(
   ActionType.SubAccount.UpdateInState
@@ -14,7 +13,7 @@ export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Table
   ActionType.SubAccount.SubAccounts.TableChanged
 );
 export const savingTableAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Saving);
-export const requestAction = createAction<null>(ActionType.SubAccount.SubAccounts.Request);
+export const clearAction = createAction<null>(ActionType.SubAccount.SubAccounts.Clear);
 export const loadingAction = createAction<boolean>(ActionType.SubAccount.SubAccounts.Loading);
 export const responseAction = createAction<Http.TableResponse<Model.SubAccount, Model.BudgetGroup>>(
   ActionType.SubAccount.SubAccounts.Response

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { call, put, select, cancelled, take, cancel, spawn } from "redux-saga/effects";
+import { call, put, select, cancelled, spawn, takeLatest, all } from "redux-saga/effects";
 import { isNil, filter, includes } from "lodash";
 
 import * as api from "api";
@@ -9,7 +9,6 @@ import { budgeting, tabling } from "lib";
 import { SubAccountsTable } from "components/tabling";
 
 import {
-  ActionType,
   account as actions,
   loadingTemplateAction,
   updateTemplateInStateAction,
@@ -30,7 +29,7 @@ function* getAccount(action: Redux.Action<null>): SagaIterator {
     } catch (e: unknown) {
       if (!(yield cancelled())) {
         api.handleRequestError(e as Error, "There was an error retrieving the account.");
-        yield put(actions.responseAccountAction(undefined));
+        yield put(actions.responseAccountAction(null));
       }
     } finally {
       if (yield cancelled()) {
@@ -40,31 +39,8 @@ function* getAccount(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-function* watchForRequestAccountSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Account.Request);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(getAccount, action);
-  }
-}
-
-function* watchForAccountIdChangedSaga(): SagaIterator {
-  let lastTasks;
-  while (true) {
-    const action = yield take(ActionType.Account.SetId);
-    if (lastTasks) {
-      yield cancel(lastTasks);
-    }
-    lastTasks = yield call(getAccount, action);
-  }
-}
-
 const ActionMap = {
   tableChanged: actions.handleTableChangeEventAction,
-  request: actions.requestAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
   saving: actions.savingTableAction,
@@ -74,8 +50,29 @@ const ActionMap = {
   setSearch: actions.setSearchAction,
   responseFringes: responseFringesAction,
   responseSubAccountUnits: responseSubAccountUnitsAction,
-  responseFringeColors: responseFringeColorsAction
+  responseFringeColors: responseFringeColorsAction,
+  clear: actions.clearAction
 };
+
+const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Model.Template>({
+  selectObjId: (state: Application.Authenticated.Store) => state.template.account.id,
+  selectBudgetId: (state: Application.Authenticated.Store) => state.template.id,
+  selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
+  actions: ActionMap,
+  columns: filter(
+    SubAccountsTable.Columns,
+    (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+      !includes(["contact", "actual", "variance"], c.field)
+  ),
+  services: {
+    request: api.getAccountSubAccounts,
+    requestGroups: api.getAccountSubAccountGroups,
+    requestFringes: api.getTemplateFringes,
+    bulkCreate: api.bulkCreateAccountSubAccounts,
+    bulkDelete: api.bulkDeleteAccountSubAccounts,
+    bulkUpdate: api.bulkUpdateAccountSubAccounts
+  }
+});
 
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.SubAccountRowData,
@@ -85,29 +82,18 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Redux.AuthenticatedTableActionMap<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>
 >({
   actions: ActionMap,
-  tasks: budgeting.tasks.subaccounts.createTableTaskSet<Model.Account, Model.Template>({
-    selectObjId: (state: Application.Authenticated.Store) => state.template.account.id,
-    selectBudgetId: (state: Application.Authenticated.Store) => state.template.id,
-    selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
-    actions: ActionMap,
-    columns: filter(
-      SubAccountsTable.Columns,
-      (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
-        !includes(["contact", "actual", "variance"], c.field)
-    ),
-    services: {
-      request: api.getAccountSubAccounts,
-      requestGroups: api.getAccountSubAccountGroups,
-      requestFringes: api.getTemplateFringes,
-      bulkCreate: api.bulkCreateAccountSubAccounts,
-      bulkDelete: api.bulkDeleteAccountSubAccounts,
-      bulkUpdate: api.bulkUpdateAccountSubAccounts
-    }
-  })
+  tasks: Tasks
 });
+
+function* getData(action: Redux.Action<any>): SagaIterator {
+  yield all([call(getAccount, action), call(Tasks.request, action)]);
+}
+
+function* watchForAccountIdChangedSaga(): SagaIterator {
+  yield takeLatest(actions.setAccountIdAction.toString(), getData);
+}
 
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForAccountIdChangedSaga);
-  yield spawn(watchForRequestAccountSaga);
   yield spawn(tableSaga);
 }

@@ -25,11 +25,9 @@ export const createDetailResponseReducer = <
   const transformers: Redux.Transformers<S, Redux.ModelDetailResponseActionMap<M>> = {
     response: (st: S = config.initialState, action: Redux.Action<M>) => ({
       ...st,
-      data: action.payload,
-      responseWasReceived: true
+      data: action.payload
     }),
     loading: (st: S = config.initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload }),
-    request: (st: S = config.initialState) => ({ ...st, responseWasReceived: false }),
     updateInState: (st: S = config.initialState, action: Redux.Action<Partial<M>>) => ({
       ...st,
       data: { ...st.data, ...action.payload }

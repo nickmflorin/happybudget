@@ -21,7 +21,8 @@ const ActionMap = {
   response: actions.actuals.responseAction,
   saving: actions.actuals.savingTableAction,
   addModelsToState: actions.actuals.addModelsToStateAction,
-  setSearch: actions.actuals.setSearchAction
+  setSearch: actions.actuals.setSearchAction,
+  clear: actions.actuals.clearAction
 };
 
 const ConnectedActualsTable = connectTableToStore<ActualsTable.Props, R, M, Model.Group, Tables.ActualTableStore>({
@@ -39,7 +40,7 @@ const ConnectedActualsTable = connectTableToStore<ActualsTable.Props, R, M, Mode
 
 interface ActualsProps {
   readonly budgetId: number;
-  readonly budget: Model.Budget | undefined;
+  readonly budget: Model.Budget | null;
 }
 
 const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {

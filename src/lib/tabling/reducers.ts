@@ -364,15 +364,17 @@ export const createTableReducer = <
   return (state: S | undefined = config.initialState, action: Redux.Action<any>): S => {
     let newState: S = { ...state };
 
-    if (action.type === config.actions.request.toString()) {
-      newState = { ...newState, responseWasReceived: false, data: [] };
+    if (
+      (!isNil(config.actions.request) && action.type === config.actions.request.toString()) ||
+      action.type === config.actions.clear.toString()
+    ) {
+      newState = { ...newState, data: [], models: [], groups: [] };
     } else if (action.type === config.actions.response.toString()) {
       // ToDo: It might make a lot more sense to dispatch all of the table data in one swoop after
       // it is all collected, to avoid unnecessary rerenders!
       const payload: Http.TableResponse<M, G> = action.payload;
       newState = {
         ...newState,
-        responseWasReceived: true,
         models: !isNil(payload.models) ? payload.models.data : newState.models,
         groups: !isNil(payload.groups) ? payload.groups.data : newState.groups,
         data: data.createTableRows<R, M, G>({

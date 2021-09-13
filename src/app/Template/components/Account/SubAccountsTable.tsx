@@ -28,12 +28,12 @@ const selectSubAccountUnits = redux.selectors.simpleDeepEqualSelector(
 
 const ActionMap = {
   tableChanged: actions.account.handleTableChangeEventAction,
-  request: actions.account.requestAction,
   loading: actions.account.loadingAction,
   response: actions.account.responseAction,
   saving: actions.account.savingTableAction,
   addModelsToState: actions.account.addModelsToStateAction,
-  setSearch: actions.account.setSearchAction
+  setSearch: actions.account.setSearchAction,
+  clear: actions.account.clearAction
 };
 
 const ConnectedTable = connectTableToStore<
@@ -43,6 +43,8 @@ const ConnectedTable = connectTableToStore<
   Model.BudgetGroup,
   Tables.SubAccountTableStore
 >({
+  // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
+  autoRequest: false,
   actions: ActionMap,
   selector: redux.selectors.simpleDeepEqualSelector(
     (state: Application.Authenticated.Store) => state.template.account.table
@@ -50,7 +52,7 @@ const ConnectedTable = connectTableToStore<
   footerRowSelectors: {
     page: createSelector(
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
-      (budget: Model.Template | undefined) => ({
+      (budget: Model.Template | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: budget?.estimated || 0.0
       })
@@ -61,7 +63,7 @@ const ConnectedTable = connectTableToStore<
           (state: Application.Authenticated.Store) => state.template.account.detail.data
         )
       ],
-      (detail: Model.Account | undefined) => ({
+      (detail: Model.Account | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Account Total",
         estimated: detail?.estimated || 0.0
       })
@@ -72,7 +74,7 @@ const ConnectedTable = connectTableToStore<
 interface SubAccountsTableProps {
   readonly accountId: number;
   readonly templateId: number;
-  readonly template: Model.Template | undefined; // Not currently used, but including it is consistent.
+  readonly template: Model.Template | null; // Not currently used, but including it is consistent.
 }
 
 const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableProps): JSX.Element => {

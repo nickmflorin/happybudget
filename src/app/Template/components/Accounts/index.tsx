@@ -10,7 +10,7 @@ import AccountsTable from "./AccountsTable";
 
 interface AccountsProps {
   readonly templateId: number;
-  readonly template: Model.Template | undefined;
+  readonly template: Model.Template | null;
 }
 
 const Accounts = ({ templateId, template }: AccountsProps): JSX.Element => {

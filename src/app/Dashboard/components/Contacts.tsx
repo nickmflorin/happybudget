@@ -19,7 +19,8 @@ const ActionMap = {
   response: actions.responseContactsAction,
   saving: actions.savingContactsTableAction,
   addModelsToState: actions.addContactModelsToStateAction,
-  setSearch: actions.setContactsSearchAction
+  setSearch: actions.setContactsSearchAction,
+  clear: actions.clearContactsAction
 };
 
 const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Model.Group, Tables.ContactTableStore>({

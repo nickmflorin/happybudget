@@ -117,7 +117,6 @@ export const createStaticUnauthenticatedReducers = (
     contacts: redux.reducers.createListResponseReducer<Model.Contact>({
       initialState: redux.initialState.initialModelListResponseState,
       actions: {
-        request: actions.requestContactsAction,
         response: actions.responseContactsAction,
         loading: actions.loadingContactsAction
       }

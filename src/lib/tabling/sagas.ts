@@ -15,12 +15,14 @@ export const createTableSaga = <
 ): Saga => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
-    while (true) {
-      const action = yield take(config.actions.request.toString());
-      if (lastTasks) {
-        yield cancel(lastTasks);
+    if (!isNil(config.actions.request)) {
+      while (true) {
+        const action = yield take(config.actions.request.toString());
+        if (lastTasks) {
+          yield cancel(lastTasks);
+        }
+        lastTasks = yield call(config.tasks.request, action);
       }
-      lastTasks = yield call(config.tasks.request, action);
     }
   }
 

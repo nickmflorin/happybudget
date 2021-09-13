@@ -19,7 +19,7 @@ const selectDetail = redux.selectors.simpleDeepEqualSelector(
 
 interface SubAccountProps {
   readonly budgetId: number;
-  readonly budget: Model.Budget | undefined;
+  readonly budget: Model.Budget | null;
 }
 
 const SubAccount = ({ budgetId, budget }: SubAccountProps): JSX.Element => {

@@ -39,7 +39,8 @@ const ActionMap = {
   response: actions.responseContactsAction,
   saving: actions.savingContactsTableAction,
   addModelsToState: actions.addContactModelsToStateAction,
-  setSearch: actions.setContactsSearchAction
+  setSearch: actions.setContactsSearchAction,
+  clear: actions.clearContactsAction
 };
 
 const tableSaga = tabling.sagas.createAuthenticatedTableSaga<

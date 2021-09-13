@@ -19,7 +19,7 @@ const selectLoadingBudgets = (state: Application.Authenticated.Store) => state.d
 const Budgets = (): JSX.Element => {
   const [isDeleting, setDeleting, setDeleted] = redux.hooks.useTrackModelActions([]);
 
-  const [budgetToEdit, setBudgetToEdit] = useState<Model.Budget | undefined>(undefined);
+  const [budgetToEdit, setBudgetToEdit] = useState<Model.Budget | null>(null);
   const [createBudgetModalOpen, setCreateBudgetModalOpen] = useState(false);
   const history = useHistory();
 
@@ -66,9 +66,9 @@ const Budgets = (): JSX.Element => {
         <EditBudgetModal
           open={true}
           budget={budgetToEdit}
-          onCancel={() => setBudgetToEdit(undefined)}
+          onCancel={() => setBudgetToEdit(null)}
           onSuccess={(budget: Model.Budget) => {
-            setBudgetToEdit(undefined);
+            setBudgetToEdit(null);
             dispatch(actions.updateBudgetInStateAction({ id: budget.id, data: budget }));
           }}
         />

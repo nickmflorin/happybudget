@@ -10,9 +10,8 @@ export { default as ActionType } from "./ActionType";
 export const wipeStateAction = createAction<null>(ActionType.WipeState);
 export const setTemplateIdAction = createAction<ID | null>(ActionType.SetId);
 export const setTemplateAutoIndex = createAction<boolean>(ActionType.SetAutoIndex);
-export const requestTemplateAction = createAction<null>(ActionType.Request);
 export const loadingTemplateAction = createAction<boolean>(ActionType.Loading);
-export const responseTemplateAction = createAction<Model.Template | undefined>(ActionType.Response);
+export const responseTemplateAction = createAction<Model.Template | null>(ActionType.Response);
 export const updateTemplateInStateAction = createAction<Redux.UpdateActionPayload<Model.Template>>(
   ActionType.UpdateInState
 );
@@ -31,4 +30,5 @@ export const addFringeModelsToStateAction = createAction<Redux.AddModelsToTableP
 export const responseSubAccountUnitsAction = createAction<Http.ListResponse<Model.Tag>>(
   ActionType.SubAccountUnits.Response
 );
+export const clearFringesAction = createAction<null>(ActionType.Fringes.Clear);
 export const responseFringeColorsAction = createAction<Http.ListResponse<string>>(ActionType.FringeColors.Response);

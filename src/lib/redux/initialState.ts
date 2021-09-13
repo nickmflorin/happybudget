@@ -1,8 +1,7 @@
 export const initialListResponseState: Redux.ListResponseStore<any> = {
   loading: false,
   data: [],
-  count: 0,
-  responseWasReceived: false
+  count: 0
 };
 
 export const initialModelListResponseState: Redux.ModelListResponseStore<any> = {
@@ -18,7 +17,6 @@ export const initialModelListResponseState: Redux.ModelListResponseStore<any> = 
 export const initialTableState: Redux.TableStore<any, any, any> = {
   data: [],
   loading: false,
-  responseWasReceived: false,
   groups: [],
   models: [],
   search: "",
@@ -27,6 +25,5 @@ export const initialTableState: Redux.TableStore<any, any, any> = {
 
 export const initialDetailResponseState: Redux.ModelDetailResponseStore<any> = {
   loading: false,
-  data: undefined,
-  responseWasReceived: false
+  data: undefined
 };

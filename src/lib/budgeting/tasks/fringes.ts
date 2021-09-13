@@ -60,6 +60,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
       yield put(config.actions.loading(true));
+      yield put(config.actions.clear(null));
       try {
         yield all([call(requestFringes, objId), call(requestFringeColors)]);
       } catch (e: unknown) {

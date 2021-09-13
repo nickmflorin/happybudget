@@ -7,7 +7,7 @@ import { redux } from "lib";
 import * as actions from "./actions";
 import * as tasks from "./tasks";
 
-const contactsRootSaga = redux.sagas.createListResponseSaga<Model.Contact>({
+const contactsRootSaga = redux.sagas.createListResponseSaga({
   tasks: { request: tasks.contacts.request },
   actions: { request: actions.requestContactsAction }
 });

@@ -651,6 +651,7 @@ namespace Table {
     S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
     A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
   > = {
+    readonly autoRequest?: boolean;
     readonly asyncId?: Table.AsyncId;
     readonly actions: Redux.ActionMapObject<A>;
     readonly selector?: (state: Application.Store) => S;

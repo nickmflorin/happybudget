@@ -15,6 +15,7 @@ export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Table
 );
 export const savingTableAction = createAction<boolean>(ActionType.Actuals.Saving);
 export const requestAction = createAction<null>(ActionType.Actuals.Request);
+export const clearAction = createAction<null>(ActionType.Actuals.Clear);
 export const loadingAction = createAction<boolean>(ActionType.Actuals.Loading);
 export const responseAction = createAction<Http.TableResponse<Model.Actual>>(ActionType.Actuals.Response);
 export const setSearchAction = createAction<string>(ActionType.Actuals.SetSearch);

@@ -81,7 +81,9 @@ const connectTableToStore =
       }, []);
 
       useEffect(() => {
-        dispatch(config.actions.request(null));
+        if (config.autoRequest !== false && !isNil(config.actions.request)) {
+          dispatch(config.actions.request(null));
+        }
       }, []);
 
       return (

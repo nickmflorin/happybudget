@@ -12,7 +12,7 @@ type R = Tables.AccountRowData;
 
 export type UnauthenticatedBudgetProps = AccountsTableProps &
   Omit<UnauthenticatedBudgetTableProps<R, M>, "cookieNames" | "columns"> & {
-    readonly budget?: Model.Budget;
+    readonly budget: Model.Budget | null;
     readonly tableRef?: NonNullRef<Table.UnauthenticatedTableRefObj<R>>;
     readonly cookieNames?: Table.CookieNames;
   };

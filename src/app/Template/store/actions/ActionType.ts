@@ -4,7 +4,6 @@ const ActionType = {
   SetAutoIndex: "template.SetAutoIndex",
   Loading: "template.Loading",
   Response: "template.Response",
-  Request: "template.Request",
   UpdateInState: "template.UpdateInState",
   Accounts: {
     TableChanged: "template.accounts.TableChanged",
@@ -13,7 +12,8 @@ const ActionType = {
     Loading: "template.accounts.Loading",
     Response: "template.accounts.Response",
     Request: "template.accounts.Request",
-    AddToState: "template.accounts.AddToState"
+    AddToState: "template.accounts.AddToState",
+    Clear: "template.accounts.Clear"
   },
   Fringes: {
     TableChanged: "template.fringes.TableChanged",
@@ -22,7 +22,8 @@ const ActionType = {
     Response: "template.fringes.Response",
     Request: "template.fringes.Request",
     AddToState: "template.fringes.AddToState",
-    SetSearch: "template.fringes.SetSearch"
+    SetSearch: "template.fringes.SetSearch",
+    Clear: "template.fringes.Clear"
   },
   SubAccountUnits: {
     Response: "template.subaccountunits.Response"
@@ -42,8 +43,9 @@ const ActionType = {
       SetSearch: "template.subaccount.subaccounts.SetSearch",
       Loading: "template.subaccount.subaccounts.Loading",
       Response: "template.subaccount.subaccounts.Response",
-      Request: "template.subaccount.subaccounts.Request",
-      AddToState: "template.subaccount.subaccounts.AddToState"
+      // Request: "template.subaccount.subaccounts.Request",
+      AddToState: "template.subaccount.subaccounts.AddToState",
+      Clear: "template.subaccount.subaccounts.Clear"
     }
   },
   Account: {
@@ -56,10 +58,11 @@ const ActionType = {
       TableChanged: "template.account.subaccounts.TableChanged",
       Loading: "template.account.subaccounts.Loading",
       Response: "template.account.subaccounts.Response",
-      Request: "template.account.subaccounts.Request",
+      // Request: "template.account.subaccounts.Request",
       Saving: "template.account.subaccounts.Saving",
       SetSearch: "template.account.subaccounts.SetSearch",
-      AddToState: "template.account.subaccounts.AddToState"
+      AddToState: "template.account.subaccounts.AddToState",
+      Clear: "template.account.subaccounts.Clear"
     }
   }
 };

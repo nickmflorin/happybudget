@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { spawn, takeLatest, call, put, select, cancelled } from "redux-saga/effects";
+import { spawn, takeLatest, call, put, select, cancelled, all } from "redux-saga/effects";
 import axios from "axios";
 import { isNil } from "lodash";
 
@@ -26,7 +26,7 @@ function* getBudgetTask(action: Redux.Action<null>): SagaIterator {
     } catch (e: unknown) {
       if (!(yield cancelled())) {
         api.handleRequestError(e as Error, "There was an error retrieving the budget.");
-        yield put(actions.responseBudgetAction(undefined));
+        yield put(actions.responseBudgetAction(null));
       }
     } finally {
       yield put(actions.loadingBudgetAction(false));
@@ -37,12 +37,17 @@ function* getBudgetTask(action: Redux.Action<null>): SagaIterator {
   }
 }
 
-function* watchForRequestBudgetSaga(): SagaIterator {
-  yield takeLatest([actions.ActionType.Request, actions.ActionType.SetId], getBudgetTask);
+function* getData(action: Redux.Action<any>): SagaIterator {
+  // yield put(actions.wipeStateAction(null));
+  yield all([call(getBudgetTask, action)]);
+}
+
+function* watchForBudgetIdChangedSaga(): SagaIterator {
+  yield takeLatest(actions.setBudgetIdAction.toString(), getData);
 }
 
 export default function* rootSaga(): SagaIterator {
-  yield spawn(watchForRequestBudgetSaga);
+  yield spawn(watchForBudgetIdChangedSaga);
   yield spawn(accountSaga);
   yield spawn(accountsSaga);
   yield spawn(actualsSaga);

@@ -21,7 +21,8 @@ const ActionMap = {
   response: actions.accounts.responseAction,
   saving: actions.accounts.savingTableAction,
   addModelsToState: actions.accounts.addModelsToStateAction,
-  setSearch: actions.accounts.setSearchAction
+  setSearch: actions.accounts.setSearchAction,
+  clear: actions.accounts.clearAction
 };
 
 const ConnectedTable = connectTableToStore<
@@ -36,7 +37,7 @@ const ConnectedTable = connectTableToStore<
   footerRowSelectors: {
     footer: createSelector(
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data)],
-      (budget: Model.Budget | undefined) => ({
+      (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: budget?.estimated || 0.0,
         variance: budget?.variance || 0.0,
@@ -59,7 +60,7 @@ const ConnectedTable = connectTableToStore<
 
 interface AccountsTableProps {
   readonly budgetId: number;
-  readonly budget: Model.Budget | undefined;
+  readonly budget: Model.Budget | null;
 }
 
 const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element => {

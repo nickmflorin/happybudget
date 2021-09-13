@@ -19,7 +19,6 @@ const Budget = (): JSX.Element => {
   const budget = useSelector(selectors.selectBudgetDetail);
 
   useEffect(() => {
-    dispatch(actions.wipeStateAction(null));
     if (!isNaN(parseInt(budgetId))) {
       dispatch(actions.setBudgetIdAction(parseInt(budgetId)));
     }

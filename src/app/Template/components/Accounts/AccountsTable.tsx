@@ -20,7 +20,8 @@ const ActionMap = {
   response: actions.accounts.responseAction,
   saving: actions.accounts.savingTableAction,
   addModelsToState: actions.accounts.addModelsToStateAction,
-  setSearch: actions.accounts.setSearchAction
+  setSearch: actions.accounts.setSearchAction,
+  clear: actions.accounts.clearAction
 };
 
 const ConnectedTable = connectTableToStore<
@@ -35,7 +36,7 @@ const ConnectedTable = connectTableToStore<
   footerRowSelectors: {
     footer: createSelector(
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.template.detail.data)],
-      (template: Model.Template | undefined) => ({
+      (template: Model.Template | null) => ({
         identifier: !isNil(template) && !isNil(template.name) ? `${template.name} Total` : "Template Total",
         estimated: template?.estimated || 0.0
       })
@@ -56,7 +57,7 @@ const ConnectedTable = connectTableToStore<
 
 interface AccountsTableProps {
   readonly templateId: number;
-  readonly template: Model.Template | undefined;
+  readonly template: Model.Template | null;
 }
 
 const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Element => {

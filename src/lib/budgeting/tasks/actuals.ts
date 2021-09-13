@@ -35,6 +35,7 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
     const budgetId = yield select(config.selectObjId);
     if (!isNil(budgetId)) {
       yield put(config.actions.loading(true));
+      yield put(config.actions.clear(null));
       try {
         yield all([call(requestActuals, budgetId), call(requestSubAccountsTree, action)]);
       } catch (e: unknown) {

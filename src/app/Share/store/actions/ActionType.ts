@@ -1,49 +1,52 @@
 const ActionType = {
-  WipeState: "budget.WipeState",
-  SetId: "budget.SetId",
-  Loading: "budget.Loading",
-  Response: "budget.Response",
-  Request: "budget.Request",
+  WipeState: "share.WipeState",
+  SetId: "share.SetId",
+  Loading: "share.Loading",
+  Response: "share.Response",
   Fringes: {
-    Loading: "budget.fringes.Loading",
-    Response: "budget.fringes.Response",
-    Request: "budget.fringes.Request",
-    SetSearch: "budget.fringes.SetSearch"
+    Loading: "share.fringes.Loading",
+    Response: "share.fringes.Response",
+    Request: "share.fringes.Request",
+    SetSearch: "share.fringes.SetSearch",
+    Clear: "shares.fringes.Clear"
   },
   Accounts: {
-    SetSearch: "budget.accounts.SetSearch",
-    Loading: "budget.accounts.Loading",
-    Response: "budget.accounts.Response",
-    Request: "budget.accounts.Request"
+    SetSearch: "share.accounts.SetSearch",
+    Loading: "share.accounts.Loading",
+    Response: "share.accounts.Response",
+    Request: "share.accounts.Request",
+    Clear: "share.accounts.Clear"
   },
   FringeColors: {
-    Response: "budget.fringecolors.Response"
+    Response: "share.fringecolors.Response"
   },
   SubAccountUnits: {
-    Response: "budget.subaccountunits.Response"
+    Response: "share.subaccountunits.Response"
   },
   SubAccount: {
-    SetId: "budget.subaccount.SetId",
-    Loading: "budget.subaccount.Loading",
-    Response: "budget.subaccount.Response",
-    Request: "budget.subaccount.Request",
+    SetId: "share.subaccount.SetId",
+    Loading: "share.subaccount.Loading",
+    Response: "share.subaccount.Response",
+    Request: "share.subaccount.Request",
     SubAccounts: {
-      SetSearch: "budget.subaccount.subaccounts.SetSearch",
-      Loading: "budget.subaccount.subaccounts.Loading",
-      Response: "budget.subaccount.subaccounts.Response",
-      Request: "budget.subaccount.subaccounts.Request"
+      SetSearch: "share.subaccount.subaccounts.SetSearch",
+      Loading: "share.subaccount.subaccounts.Loading",
+      Response: "share.subaccount.subaccounts.Response",
+      Request: "share.subaccount.subaccounts.Request",
+      Clear: "share.subaccount.subaccounts.Clear"
     }
   },
   Account: {
-    SetId: "budget.account.SetId",
-    Loading: "budget.account.Loading",
-    Response: "budget.account.Response",
-    Request: "budget.account.Request",
+    SetId: "share.account.SetId",
+    Loading: "share.account.Loading",
+    Response: "share.account.Response",
+    Request: "share.account.Request",
     SubAccounts: {
-      Loading: "budget.account.subaccounts.Loading",
-      Response: "budget.account.subaccounts.Response",
-      Request: "budget.account.subaccounts.Request",
-      SetSearch: "budget.account.subaccounts.SetSearch"
+      Loading: "share.account.subaccounts.Loading",
+      Response: "share.account.subaccounts.Response",
+      Request: "share.account.subaccounts.Request",
+      SetSearch: "share.account.subaccounts.SetSearch",
+      Clear: "share.account.subaccounts.Clear"
     }
   }
 };

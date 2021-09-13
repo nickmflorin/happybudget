@@ -19,7 +19,6 @@ const Template = (): JSX.Element => {
   const template = useSelector(selectors.selectTemplateDetail);
 
   useEffect(() => {
-    dispatch(actions.wipeStateAction(null));
     if (!isNaN(parseInt(templateId))) {
       dispatch(actions.setTemplateIdAction(parseInt(templateId)));
     }

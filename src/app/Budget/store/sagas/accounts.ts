@@ -78,6 +78,7 @@ const ActionMap: Redux.ActionMapObject<
 } = {
   tableChanged: actions.handleTableChangeEventAction,
   request: actions.requestAction,
+  clear: actions.clearAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
   saving: actions.savingTableAction,
@@ -113,7 +114,5 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
 });
 
 export default function* rootSaga(): SagaIterator {
-  // yield spawn(historySaga);
-  // yield spawn(commentsSaga);
   yield spawn(tableSaga);
 }

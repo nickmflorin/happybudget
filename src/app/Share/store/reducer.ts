@@ -18,7 +18,6 @@ const genericReducer = combineReducers({
   >({
     initialState: redux.initialState.initialDetailResponseState,
     actions: {
-      request: actions.requestBudgetAction,
       loading: actions.loadingBudgetAction,
       response: actions.responseBudgetAction
     }
@@ -34,7 +33,6 @@ const genericReducer = combineReducers({
     >({
       initialState: redux.initialState.initialDetailResponseState,
       actions: {
-        request: actions.account.requestAccountAction,
         loading: actions.account.loadingAccountAction,
         response: actions.account.responseAccountAction
       }
@@ -43,6 +41,7 @@ const genericReducer = combineReducers({
       tableId: "account-subaccounts-table",
       initialState: initialState.account.table,
       actions: {
+        clear: actions.account.clearAction,
         request: actions.account.requestAction,
         loading: actions.account.loadingAction,
         response: actions.account.responseAction,
@@ -63,6 +62,7 @@ const genericReducer = combineReducers({
         initialState: initialState.account.table.fringes,
         columns: FringesTable.Columns,
         actions: {
+          clear: actions.clearFringesAction,
           responseFringeColors: actions.responseFringeColorsAction,
           request: actions.requestFringesAction,
           loading: actions.loadingFringesAction,
@@ -83,7 +83,6 @@ const genericReducer = combineReducers({
     >({
       initialState: redux.initialState.initialDetailResponseState,
       actions: {
-        request: actions.subAccount.requestSubAccountAction,
         loading: actions.subAccount.loadingSubAccountAction,
         response: actions.subAccount.responseSubAccountAction
       }
@@ -96,7 +95,7 @@ const genericReducer = combineReducers({
         loading: actions.subAccount.loadingAction,
         response: actions.subAccount.responseAction,
         responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-
+        clear: actions.subAccount.clearAction,
         setSearch: actions.subAccount.setSearchAction
       },
       getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
@@ -115,6 +114,7 @@ const genericReducer = combineReducers({
         actions: {
           responseFringeColors: actions.responseFringeColorsAction,
           request: actions.requestFringesAction,
+          clear: actions.clearFringesAction,
           loading: actions.loadingFringesAction,
           response: actions.responseFringesAction,
           setSearch: actions.setFringesSearchAction

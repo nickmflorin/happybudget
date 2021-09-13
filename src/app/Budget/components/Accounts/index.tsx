@@ -11,7 +11,7 @@ import AccountsTable from "./AccountsTable";
 
 interface AccountsProps {
   readonly budgetId: number;
-  readonly budget: Model.Budget | undefined;
+  readonly budget: Model.Budget | null;
 }
 
 const Accounts = ({ budget, budgetId }: AccountsProps): JSX.Element => {

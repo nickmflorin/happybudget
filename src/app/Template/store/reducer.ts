@@ -80,7 +80,6 @@ const genericReducer = combineReducers({
   detail: redux.reducers.createDetailResponseReducer<Model.Template>({
     initialState: redux.initialState.initialDetailResponseState,
     actions: {
-      request: actions.requestTemplateAction,
       loading: actions.loadingTemplateAction,
       response: actions.responseTemplateAction,
       updateInState: actions.updateTemplateInStateAction
@@ -100,7 +99,6 @@ const genericReducer = combineReducers({
     >({
       initialState: redux.initialState.initialDetailResponseState,
       actions: {
-        request: actions.account.requestAccountAction,
         loading: actions.account.loadingAccountAction,
         response: actions.account.responseAccountAction
       }
@@ -110,13 +108,13 @@ const genericReducer = combineReducers({
       initialState: initialState.account.table,
       actions: {
         tableChanged: actions.account.handleTableChangeEventAction,
-        request: actions.account.requestAction,
         loading: actions.account.loadingAction,
         response: actions.account.responseAction,
         responseSubAccountUnits: actions.responseSubAccountUnitsAction,
         saving: actions.account.savingTableAction,
         addModelsToState: actions.account.addModelsToStateAction,
-        setSearch: actions.account.setSearchAction
+        setSearch: actions.account.setSearchAction,
+        clear: actions.account.clearAction
       },
       getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
       getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
@@ -141,7 +139,8 @@ const genericReducer = combineReducers({
           response: actions.responseFringesAction,
           saving: actions.savingFringesTableAction,
           addModelsToState: actions.addFringeModelsToStateAction,
-          setSearch: actions.setFringesSearchAction
+          setSearch: actions.setFringesSearchAction,
+          clear: actions.clearFringesAction
         }
       })
     })
@@ -157,7 +156,6 @@ const genericReducer = combineReducers({
     >({
       initialState: redux.initialState.initialDetailResponseState,
       actions: {
-        request: actions.subAccount.requestSubAccountAction,
         loading: actions.subAccount.loadingSubAccountAction,
         response: actions.subAccount.responseSubAccountAction
       }
@@ -168,12 +166,12 @@ const genericReducer = combineReducers({
       actions: {
         tableChanged: actions.subAccount.handleTableChangeEventAction,
         responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-        request: actions.subAccount.requestAction,
         loading: actions.subAccount.loadingAction,
         response: actions.subAccount.responseAction,
         saving: actions.subAccount.savingTableAction,
         addModelsToState: actions.subAccount.addModelsToStateAction,
-        setSearch: actions.subAccount.setSearchAction
+        setSearch: actions.subAccount.setSearchAction,
+        clear: actions.subAccount.clearAction
       },
       columns: filter(
         SubAccountsTable.Columns,
@@ -198,7 +196,8 @@ const genericReducer = combineReducers({
           response: actions.responseFringesAction,
           saving: actions.savingFringesTableAction,
           addModelsToState: actions.addFringeModelsToStateAction,
-          setSearch: actions.setFringesSearchAction
+          setSearch: actions.setFringesSearchAction,
+          clear: actions.clearFringesAction
         }
       })
     })

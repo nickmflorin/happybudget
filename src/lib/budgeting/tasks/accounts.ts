@@ -78,6 +78,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     const objId = yield select(config.selectObjId);
     if (!isNil(objId)) {
       yield put(config.actions.loading(true));
+      yield put(config.actions.clear(null));
       try {
         const [models, groups]: [Http.ListResponse<C>, Http.ListResponse<Model.BudgetGroup>] = yield all([
           call(requestAccounts, objId),

@@ -29,12 +29,12 @@ const selectSubAccountUnits = redux.selectors.simpleDeepEqualSelector(
 
 const ActionMap = {
   tableChanged: actions.subAccount.handleTableChangeEventAction,
-  request: actions.subAccount.requestAction,
   loading: actions.subAccount.loadingAction,
   response: actions.subAccount.responseAction,
   saving: actions.subAccount.savingTableAction,
   addModelsToState: actions.subAccount.addModelsToStateAction,
-  setSearch: actions.subAccount.setSearchAction
+  setSearch: actions.subAccount.setSearchAction,
+  clear: actions.subAccount.clearAction
 };
 
 const ConnectedTable = connectTableToStore<
@@ -45,13 +45,15 @@ const ConnectedTable = connectTableToStore<
   Tables.SubAccountTableStore
 >({
   actions: ActionMap,
+  // We cannot autoRequest because we have to also request the new data when the dropdown breadcrumbs change.
+  autoRequest: false,
   selector: redux.selectors.simpleDeepEqualSelector(
     (state: Application.Authenticated.Store) => state.budget.subaccount.table
   ),
   footerRowSelectors: {
     page: createSelector(
       [redux.selectors.simpleDeepEqualSelector((state: Application.Authenticated.Store) => state.budget.detail.data)],
-      (budget: Model.Budget | undefined) => ({
+      (budget: Model.Budget | null) => ({
         identifier: !isNil(budget) && !isNil(budget.name) ? `${budget.name} Total` : "Budget Total",
         estimated: budget?.estimated || 0.0,
         variance: budget?.variance || 0.0,
@@ -64,7 +66,7 @@ const ConnectedTable = connectTableToStore<
           (state: Application.Authenticated.Store) => state.budget.subaccount.detail.data
         )
       ],
-      (detail: Model.SubAccount | undefined) => ({
+      (detail: Model.SubAccount | null) => ({
         identifier: !isNil(detail) && !isNil(detail.description) ? `${detail.description} Total` : "Sub Account Total",
         estimated: detail?.estimated || 0.0,
         variance: detail?.variance || 0.0,
@@ -77,7 +79,7 @@ const ConnectedTable = connectTableToStore<
 interface SubAccountsTableProps {
   readonly subaccountId: number;
   readonly budgetId: number;
-  readonly budget: Model.Budget | undefined;
+  readonly budget: Model.Budget | null;
 }
 
 const SubAccountsTable = ({ budget, budgetId, subaccountId }: SubAccountsTableProps): JSX.Element => {

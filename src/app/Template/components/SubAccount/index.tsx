@@ -19,7 +19,7 @@ const selectDetail = redux.selectors.simpleDeepEqualSelector(
 
 interface SubAccountProps {
   readonly templateId: number;
-  readonly template: Model.Template | undefined;
+  readonly template: Model.Template | null;
 }
 
 const SubAccount = ({ template, templateId }: SubAccountProps): JSX.Element => {

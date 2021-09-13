@@ -111,7 +111,6 @@ const genericReducer = combineReducers({
   detail: redux.reducers.createDetailResponseReducer<Model.Budget>({
     initialState: redux.initialState.initialDetailResponseState,
     actions: {
-      request: actions.requestBudgetAction,
       loading: actions.loadingBudgetAction,
       response: actions.responseBudgetAction,
       updateInState: actions.updateBudgetInStateAction
@@ -137,7 +136,6 @@ const genericReducer = combineReducers({
   history: redux.reducers.createListResponseReducer<Model.HistoryEvent>({
     initialState: redux.initialState.initialModelListResponseState,
     actions: {
-      request: actions.accounts.requestHistoryAction,
       response: actions.accounts.responseHistoryAction,
       loading: actions.accounts.loadingHistoryAction
     }
@@ -159,7 +157,6 @@ const genericReducer = combineReducers({
     >({
       initialState: redux.initialState.initialDetailResponseState,
       actions: {
-        request: actions.account.requestAccountAction,
         loading: actions.account.loadingAccountAction,
         response: actions.account.responseAccountAction
       }
@@ -167,8 +164,8 @@ const genericReducer = combineReducers({
     table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
       initialState: initialState.account.table,
       actions: {
+        clear: actions.account.clearAction,
         tableChanged: actions.account.handleTableChangeEventAction,
-        request: actions.account.requestAction,
         loading: actions.account.loadingAction,
         response: actions.account.responseAction,
         responseSubAccountUnits: actions.responseSubAccountUnitsAction,
@@ -189,6 +186,7 @@ const genericReducer = combineReducers({
         initialState: initialState.account.table.fringes,
         columns: FringesTable.Columns,
         actions: {
+          clear: actions.clearFringesAction,
           responseFringeColors: actions.responseFringeColorsAction,
           tableChanged: actions.handleFringesTableChangeEventAction,
           request: actions.requestFringesAction,
@@ -220,7 +218,6 @@ const genericReducer = combineReducers({
     history: redux.reducers.createListResponseReducer<Model.HistoryEvent>({
       initialState: redux.initialState.initialModelListResponseState,
       actions: {
-        request: actions.account.requestHistoryAction,
         response: actions.account.responseHistoryAction,
         loading: actions.account.loadingHistoryAction
       }
@@ -237,7 +234,6 @@ const genericReducer = combineReducers({
     >({
       initialState: redux.initialState.initialDetailResponseState,
       actions: {
-        request: actions.subAccount.requestSubAccountAction,
         loading: actions.subAccount.loadingSubAccountAction,
         response: actions.subAccount.responseSubAccountAction
       }
@@ -246,9 +242,9 @@ const genericReducer = combineReducers({
       tableId: "subaccount-subaccounts-table",
       initialState: initialState.subaccount.table,
       actions: {
+        clear: actions.subAccount.clearAction,
         tableChanged: actions.subAccount.handleTableChangeEventAction,
         responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-        request: actions.subAccount.requestAction,
         loading: actions.subAccount.loadingAction,
         response: actions.subAccount.responseAction,
         saving: actions.subAccount.savingTableAction,
@@ -270,6 +266,7 @@ const genericReducer = combineReducers({
           responseFringeColors: actions.responseFringeColorsAction,
           tableChanged: actions.handleFringesTableChangeEventAction,
           request: actions.requestFringesAction,
+          clear: actions.clearFringesAction,
           loading: actions.loadingFringesAction,
           response: actions.responseFringesAction,
           saving: actions.savingFringesTableAction,
@@ -298,7 +295,6 @@ const genericReducer = combineReducers({
     history: redux.reducers.createListResponseReducer<Model.HistoryEvent>({
       initialState: redux.initialState.initialModelListResponseState,
       actions: {
-        request: actions.subAccount.requestHistoryAction,
         response: actions.subAccount.responseHistoryAction,
         loading: actions.subAccount.loadingHistoryAction
       }
@@ -308,6 +304,7 @@ const genericReducer = combineReducers({
     tableId: "actuals-table",
     initialState: initialState.actuals,
     actions: {
+      clear: actions.actuals.clearAction,
       tableChanged: actions.actuals.handleTableChangeEventAction,
       request: actions.actuals.requestAction,
       loading: actions.actuals.loadingAction,

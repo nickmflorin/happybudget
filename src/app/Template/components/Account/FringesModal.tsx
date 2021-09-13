@@ -14,7 +14,8 @@ const ActionMap = {
   response: actions.responseFringesAction,
   saving: actions.savingFringesTableAction,
   addModelsToState: actions.addFringeModelsToStateAction,
-  setSearch: actions.setFringesSearchAction
+  setSearch: actions.setFringesSearchAction,
+  clear: actions.clearFringesAction
 };
 
 const ConnectedFringesTable = connectTableToStore<
@@ -32,7 +33,7 @@ const ConnectedFringesTable = connectTableToStore<
 })(FringesTable.Table);
 
 interface FringesModalProps extends Pick<GenericFringesModalProps, "open" | "onCancel"> {
-  readonly template: Model.Template | undefined;
+  readonly template: Model.Template | null;
 }
 
 const FringesModal: React.FC<FringesModalProps> = ({ template, open, onCancel }) => {

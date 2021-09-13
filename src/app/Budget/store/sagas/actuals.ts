@@ -9,6 +9,7 @@ import { actuals as actions } from "../actions";
 const ActionMap: Redux.ActionMapObject<budgeting.tasks.actuals.ActualsTableActionMap> = {
   tableChanged: actions.handleTableChangeEventAction,
   request: actions.requestAction,
+  clear: actions.clearAction,
   loading: actions.loadingAction,
   response: actions.responseAction,
   saving: actions.savingTableAction,

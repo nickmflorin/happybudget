@@ -20,7 +20,7 @@ namespace Redux {
   }
 
   type ActionMapObject<M = any> = {
-    [K in keyof M]-?: import("@reduxjs/toolkit").PayloadActionCreator<M[K]>
+    [K in keyof M]: undefined extends M[K] ? import("@reduxjs/toolkit").PayloadActionCreator<Exclude<M[K], undefined>> : import("@reduxjs/toolkit").PayloadActionCreator<M[K]>
   }
 
   type Reducer<S, A = Redux.Action> = import("redux").Reducer<S, A>;
@@ -96,15 +96,13 @@ namespace Redux {
   }
 
   interface ModelDetailResponseStore<T extends Model.Model> {
-    readonly data: T | undefined;
+    readonly data: T | null;
     readonly loading: boolean;
-    readonly responseWasReceived: boolean;
   }
 
   interface ModelDetailResponseActionMap<M extends Model.Model> {
     readonly loading: boolean;
-    readonly request: null;
-    readonly response: M | undefined;
+    readonly response: M | null;
     readonly updateInState: Redux.UpdateActionPayload<M>;
   }
 
@@ -112,12 +110,10 @@ namespace Redux {
     readonly data: T[];
     readonly count: number;
     readonly loading: boolean;
-    readonly responseWasReceived: boolean;
   }
 
   type ListResponseActionMap<T> = {
     readonly loading: boolean;
-    readonly request: null;
     readonly response: Http.ListResponse<M>;
   }
 
@@ -187,8 +183,9 @@ namespace Redux {
   type TableActionMap<M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
     readonly loading: boolean;
     readonly response: Http.TableResponse<M, G>;
-    readonly request: null;
+    readonly request?: null;
     readonly setSearch: string;
+    readonly clear: null;
   }
 
   type AuthenticatedTableActionMap<R extends Table.RowData = any, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = TableActionMap<M, G> & {
@@ -203,7 +200,6 @@ namespace Redux {
     readonly groups: G[];
     readonly search: string;
     readonly loading: boolean;
-    readonly responseWasReceived: boolean;
     readonly saving: boolean;
   }
 
