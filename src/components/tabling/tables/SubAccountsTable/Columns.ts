@@ -48,7 +48,7 @@ const Columns: Table.Column<R, M>[] = [
     cellEditor: "ContactEditor",
     columnType: "contact",
     index: 2,
-    width: 200,
+    width: 120,
     requiresAuthentication: true,
     models: [], // Will be populated by Table.
     modelClipboardValue: (m: Model.Contact) => m.full_name,
@@ -83,7 +83,7 @@ const Columns: Table.Column<R, M>[] = [
     cellRenderer: { data: "SubAccountUnitCell" },
     cellEditor: "SubAccountUnitEditor",
     models: [], // Will be populated by Table.
-    width: 140
+    width: 100
   }),
   framework.columnObjs.BodyColumn<R, M>({
     field: "multiplier",
@@ -105,7 +105,7 @@ const Columns: Table.Column<R, M>[] = [
     field: "fringes",
     headerName: "Fringes",
     cellRenderer: { data: "FringesCell" },
-    width: 200,
+    width: 140,
     nullValue: [],
     processCellForClipboard: (row: R) => "" // Will be populated by Table.
   }),

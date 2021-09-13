@@ -36,7 +36,7 @@ const ContactCell = <
     }
   }
   return (
-    <Cell {...props} onClear={() => !isNil(props.setValue) && props.setValue(null)} hideClear={value === null}>
+    <Cell {...props}>
       <div style={{ display: "flex", justifyContent: "left" }}>
         {!isNil(model) ? (
           <Tag

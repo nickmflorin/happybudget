@@ -21,11 +21,7 @@ const FringesCell = ({ value, onAddFringes, ...props }: FringesCellProps): JSX.E
   }, [hooks.useDeepEqualMemo(fringes), row.fringes]);
 
   return (
-    <Cell<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore>
-      {...props}
-      onClear={() => !isNil(props.setValue) && props.setValue([])}
-      hideClear={models.length === 0}
-    >
+    <Cell<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {...props}>
       <div style={{ display: "flex", justifyContent: "left" }}>
         <Tag.Multiple<Tables.FringeRow> models={models} />
       </div>

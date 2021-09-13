@@ -26,7 +26,7 @@ const ModelTagCell = <
   ...props
 }: ModelTagCellProps<R, M, S, V>): JSX.Element => {
   return (
-    <Cell {...props} onClear={() => !isNil(props.setValue) && props.setValue(null)} hideClear={value === null}>
+    <Cell {...props}>
       <div style={{ display: "flex", justifyContent: leftAlign === true ? "left" : "center" }}>
         {!isNil(value) ? <Tag<V, any> model={value} {...tagProps} /> : <></>}
       </div>
