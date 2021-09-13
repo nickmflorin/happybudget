@@ -23,9 +23,10 @@ const ActionMap = {
 };
 
 const ConnectedContactsTable = connectTableToStore<ContactsTable.Props, R, M, Model.Group, Tables.ContactTableStore>({
-  storeId: "async-DashboardContactsTable",
+  asyncId: "async-contacts-table",
   actions: ActionMap,
   reducer: tabling.reducers.createAuthenticatedTableReducer<R, M, Model.Group, Tables.ContactTableStore>({
+    tableId: "contacts-table",
     columns: ContactsTable.Columns,
     actions: ActionMap,
     getModelRowLabel: (r: R) =>
@@ -45,6 +46,7 @@ const Contacts = (): JSX.Element => {
   return (
     <Page className={"contacts"} title={"My Contacts"}>
       <ConnectedContactsTable
+        tableId={"contacts-table"}
         onRowExpand={(row: Table.ModelRow<R, M>) => {
           /*
           Important!:  At least right now, whenever a row is updated or changed, the

@@ -9,7 +9,7 @@ const createReducerManager = <S extends Application.Store>(
   const reducers = { ...staticReducers };
 
   let combinedReducer = combineReducers<S, Redux.Action>(reducers);
-  let keysToRemove: Redux.AsyncId[] = [];
+  let keysToRemove: Table.AsyncId[] = [];
 
   return {
     getReducerMap: () => reducers,
@@ -23,13 +23,13 @@ const createReducerManager = <S extends Application.Store>(
       }
       return combinedReducer(state, action);
     },
-    injectReducer: (key: Redux.AsyncId, reducer: Redux.Reducer<any>) => {
+    injectReducer: (key: Table.AsyncId, reducer: Redux.Reducer<any>) => {
       if (isNil(reducers[key])) {
         reducers[key as keyof S] = reducer;
         combinedReducer = combineReducers(reducers);
       }
     },
-    ejectReducer: (key: Redux.AsyncId) => {
+    ejectReducer: (key: Table.AsyncId) => {
       if (!isNil(reducers[key])) {
         delete reducers[key];
         keysToRemove.push(key);

@@ -47,6 +47,7 @@ export interface AuthenticateDataGridProps<
   G extends Model.Group = Model.Group
 > {
   readonly apis: Table.GridApis | null;
+  readonly tableId: Table.Id;
   readonly columns: Table.Column<R, M>[];
   readonly groups?: G[];
   readonly defaultRowLabel?: string;
@@ -209,6 +210,7 @@ const authenticateDataGrid =
       const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow, findRowsUpUntilFirstGroupFooterRow] =
         useCellNavigation({
           apis: props.apis,
+          tableId: props.tableId,
           columns,
           includeRowInNavigation: config?.includeRowInNavigation,
           onNewRowRequired: () =>

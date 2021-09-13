@@ -1,7 +1,7 @@
 import React, { useImperativeHandle, useState, useMemo } from "react";
 import { forEach, isNil, find, uniq, map, filter, includes } from "lodash";
 
-import { tabling, util, hooks, events } from "lib";
+import { tabling, util, hooks } from "lib";
 import { AuthenticatedGrid } from "components/tabling/generic";
 
 import { AuthenticatedGridProps } from "../grids";
@@ -28,6 +28,7 @@ export type AuthenticatedTableProps<
   M extends Model.Model = Model.Model,
   G extends Model.Group = Model.Group
 > = TableConfigurationProps<R, M> & {
+  readonly tableId: Table.Id;
   readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
   readonly actions?: Table.AuthenticatedMenuActions<R, M>;
   readonly excludeColumns?: SingleOrArray<keyof R> | ((col: Table.Column<R, M>) => boolean);
@@ -72,26 +73,6 @@ const AuthenticatedTable = <
   props: WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M, G>, R>, R, M, G, S>
 ): JSX.Element => {
   const [selectedRows, setSelectedRows] = useState<Table.DataRow<R, M>[]>([]);
-
-  const scrollToBottom = hooks.useDynamicCallback((numRows: number) => {
-    const apis = props.tableApis.get("data");
-    if (!isNil(apis)) {
-      apis.grid.ensureIndexVisible(numRows - 1, "bottom");
-    }
-  });
-
-  events.useEvent<Events.RowsAddedParams>(
-    "rowsAdded",
-    (params: Events.RowsAddedParams) => {
-      const apis = props.tableApis.get("data");
-      if (!isNil(apis)) {
-        setTimeout(() => {
-          scrollToBottom(params.numRows);
-        }, 100);
-      }
-    },
-    [props.tableApis]
-  );
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the
@@ -281,6 +262,7 @@ const AuthenticatedTable = <
           hasExpandColumn: props.hasExpandColumn,
           framework: props.framework,
           footerRowSelectors: props.footerRowSelectors,
+          tableId: props.tableId,
           onGridReady: props.onDataGridReady,
           onFirstDataRendered: props.onFirstDataRendered,
           onRowSelectionChanged: (rows: Table.DataRow<R, M>[]) => setSelectedRows(rows),

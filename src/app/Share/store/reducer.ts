@@ -40,6 +40,7 @@ const genericReducer = combineReducers({
       }
     }),
     table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
+      tableId: "account-subaccounts-table",
       initialState: initialState.account.table,
       actions: {
         request: actions.account.requestAction,
@@ -58,6 +59,7 @@ const genericReducer = combineReducers({
         (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
       ),
       fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
+        tableId: "fringes-table",
         initialState: initialState.account.table.fringes,
         columns: FringesTable.Columns,
         actions: {
@@ -87,6 +89,7 @@ const genericReducer = combineReducers({
       }
     }),
     table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
+      tableId: "subaccount-subaccounts-table",
       initialState: initialState.account.table,
       actions: {
         request: actions.subAccount.requestAction,
@@ -106,6 +109,7 @@ const genericReducer = combineReducers({
         (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
       ),
       fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
+        tableId: "fringes-table",
         initialState: initialState.subaccount.table.fringes,
         columns: FringesTable.Columns,
         actions: {

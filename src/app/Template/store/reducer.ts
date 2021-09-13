@@ -106,6 +106,7 @@ const genericReducer = combineReducers({
       }
     }),
     table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
+      tableId: "account-subaccounts-table",
       initialState: initialState.account.table,
       actions: {
         tableChanged: actions.account.handleTableChangeEventAction,
@@ -129,6 +130,7 @@ const genericReducer = combineReducers({
       ),
       fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
       fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
+        tableId: "fringes-table",
         initialState: initialState.account.table.fringes,
         columns: FringesTable.Columns,
         actions: {
@@ -161,6 +163,7 @@ const genericReducer = combineReducers({
       }
     }),
     table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
+      tableId: "subaccount-subaccounts-table",
       initialState: initialState.subaccount.table,
       actions: {
         tableChanged: actions.subAccount.handleTableChangeEventAction,
@@ -184,6 +187,7 @@ const genericReducer = combineReducers({
       getPlaceholderRowName: "Sub Account",
       fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
       fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
+        tableId: "fringes-table",
         initialState: initialState.subaccount.table.fringes,
         columns: FringesTable.Columns,
         actions: {

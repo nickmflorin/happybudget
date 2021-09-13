@@ -30,7 +30,7 @@ const ConnectedTable = connectTableToStore<
   Model.BudgetGroup,
   Tables.AccountTableStore
 >({
-  storeId: "async-TemplateAccountsTable",
+  asyncId: "async-accounts-table",
   actions: ActionMap,
   footerRowSelectors: {
     footer: createSelector(
@@ -42,6 +42,7 @@ const ConnectedTable = connectTableToStore<
     )
   },
   reducer: budgeting.reducers.createAuthenticatedAccountsTableReducer({
+    tableId: "accounts-table",
     columns: GenericAccountsTable.TemplateColumns,
     actions: ActionMap,
     getModelRowLabel: (r: R) => r.identifier,
@@ -70,6 +71,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
   return (
     <React.Fragment>
       <ConnectedTable
+        tableId={"accounts-table"}
         tableRef={tableRef}
         budget={template}
         menuPortalId={"supplementary-header"}

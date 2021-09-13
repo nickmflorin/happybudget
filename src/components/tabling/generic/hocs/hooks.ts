@@ -2,9 +2,10 @@ import { isNil, includes, filter } from "lodash";
 
 import { NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-community/core";
 
-import { hooks, tabling } from "lib";
+import { hooks, tabling, events } from "lib";
 
 export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.Model = Model.Model> {
+  readonly tableId?: Table.Id;
   readonly apis: Table.GridApis | null;
   readonly columns: Table.Column<R, M>[];
   readonly includeRowInNavigation?: (row: Table.DataRow<R, M>) => boolean;
@@ -22,6 +23,22 @@ type UseCellNavigationReturnType = [
 export const useCellNavigation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   params: UseCellNavigationParams<R, M>
 ): UseCellNavigationReturnType => {
+  const scrollToBottom = hooks.useDynamicCallback((numRows: number) => {
+    params.apis?.grid.ensureIndexVisible(numRows - 1, "bottom");
+  });
+
+  events.useEvent<Events.RowsAddedParams>(
+    "rowsAdded",
+    (p: Events.RowsAddedParams) => {
+      if (!isNil(params.tableId) && p.tableId === params.tableId) {
+        setTimeout(() => {
+          scrollToBottom(p.numRows);
+        }, 100);
+      }
+    },
+    []
+  );
+
   const findNextNavigatableRow: (
     startingIndex: number,
     direction?: "asc" | "desc"

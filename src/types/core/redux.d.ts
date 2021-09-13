@@ -32,15 +32,15 @@ namespace Redux {
   }
 
   type SagaManager = {
-    readonly injectSaga: (id: Redux.AsyncId, saga: import("redux-saga").Saga) => void;
-    readonly ejectSaga: (id: Redux.AsyncId) => void;
+    readonly injectSaga: (id: Table.AsyncId, saga: import("redux-saga").Saga) => void;
+    readonly ejectSaga: (id: Table.AsyncId) => void;
   };
 
   type ReducerManager<S extends Application.Store> = {
     readonly getReducerMap: () => Redux.ReducersWithAsyncMapObject<S>;
     readonly reduce: (state: S | undefined, action: Redux.Action) => S;
-    readonly injectReducer: (key: Redux.AsyncId, reducer: Redux.Reducer<any>) => void;
-    readonly ejectReducer: (key: Redux.AsyncId) => void;
+    readonly injectReducer: (key: Table.AsyncId, reducer: Redux.Reducer<any>) => void;
+    readonly ejectReducer: (key: Table.AsyncId) => void;
   };
 
   type StoreObj = Record<string, any> | boolean | number;
@@ -54,7 +54,7 @@ namespace Redux {
 
   type ActionOptions = {
     readonly type: string;
-    // readonly asyncId?: Redux.AsyncId;
+    // readonly asyncId?: Table.AsyncId;
     readonly isAuthenticated?: boolean | undefined;
   };
 

@@ -78,6 +78,7 @@ const Actuals = ({ budget, budgetId }: ActualsProps): JSX.Element => {
         />
       </Portal>
       <ConnectedActualsTable
+        tableId={"actuals-table"}
         contacts={contacts}
         onSubAccountsTreeSearch={(value: string) => dispatch(actions.actuals.setSubAccountsTreeSearchAction(value))}
         exportFileName={!isNil(budget) ? `${budget.name}_actuals` : "actuals"}

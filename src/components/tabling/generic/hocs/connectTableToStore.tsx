@@ -50,8 +50,8 @@ const connectTableToStore =
     let selector: (state: Application.Store) => S = (state: Application.Store) =>
       redux.initialState.initialTableState as S;
 
-    if (!isNil(config.storeId)) {
-      selector = (state: Application.Store) => state[config.storeId as Redux.AsyncId] as S;
+    if (!isNil(config.asyncId)) {
+      selector = (state: Application.Store) => state[config.asyncId as Table.AsyncId] as S;
     } else if (!isNil(config.selector)) {
       selector = config.selector;
     }
@@ -71,11 +71,11 @@ const connectTableToStore =
       const dispatch = useDispatch();
 
       useEffect(() => {
-        const storeId = config.storeId;
-        if (!isNil(storeId) && !isNil(config.reducer)) {
-          store.reducerManager.injectReducer(storeId, config.reducer);
+        const asyncId = config.asyncId;
+        if (!isNil(asyncId) && !isNil(config.reducer)) {
+          store.reducerManager.injectReducer(asyncId, config.reducer);
           return () => {
-            store.reducerManager.ejectReducer(storeId);
+            store.reducerManager.ejectReducer(asyncId);
           };
         }
       }, []);

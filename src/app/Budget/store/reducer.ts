@@ -176,7 +176,7 @@ const genericReducer = combineReducers({
         addModelsToState: actions.account.addModelsToStateAction,
         setSearch: actions.account.setSearchAction
       },
-      tableEventId: "subaccounts-table",
+      tableId: "account-subaccounts-table",
       getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
       getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
       getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
@@ -185,6 +185,7 @@ const genericReducer = combineReducers({
       columns: SubAccountsTable.Columns,
       fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
       fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
+        tableId: "fringes-table",
         initialState: initialState.account.table.fringes,
         columns: FringesTable.Columns,
         actions: {
@@ -242,6 +243,7 @@ const genericReducer = combineReducers({
       }
     }),
     table: budgeting.reducers.createAuthenticatedSubAccountsTableReducer({
+      tableId: "subaccount-subaccounts-table",
       initialState: initialState.subaccount.table,
       actions: {
         tableChanged: actions.subAccount.handleTableChangeEventAction,
@@ -261,6 +263,7 @@ const genericReducer = combineReducers({
       getPlaceholderRowName: "Sub Account",
       fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
       fringes: budgeting.reducers.createAuthenticatedFringesTableReducer({
+        tableId: "fringes-table",
         initialState: initialState.subaccount.table.fringes,
         columns: FringesTable.Columns,
         actions: {
@@ -302,6 +305,7 @@ const genericReducer = combineReducers({
     })
   }),
   actuals: budgeting.reducers.createAuthenticatedActualsTableReducer({
+    tableId: "actuals-table",
     initialState: initialState.actuals,
     actions: {
       tableChanged: actions.actuals.handleTableChangeEventAction,

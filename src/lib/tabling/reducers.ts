@@ -264,9 +264,7 @@ export const createTableChangeEventReducer = <
           )
         ]
       };
-      if (!isNil(config.tableEventId)) {
-        applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableEventId, numRows: newState.data.length });
-      }
+      applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableId, numRows: newState.data.length });
     } else if (typeguards.isRowDeleteEvent(e)) {
       const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       /*

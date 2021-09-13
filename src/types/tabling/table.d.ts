@@ -4,8 +4,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Table {
-  type Name = "subaccounts" | "accounts";
+  type Name = "account-subaccounts" | "accounts" | "subaccount-subaccounts" | "fringes" | "actuals" | "contacts";
   type Id = `${Name}-table`;
+  type AsyncId = `async-${Id}`
 
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
@@ -633,7 +634,7 @@ namespace Table {
     A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
   > = TaskConfig<R, M, G, A> & Omit<CreateTableDataConfig<R, M, G>, "models" | "groups" | "columns"> & {
     readonly initialState: S;
-    readonly tableEventId?: Table.Id;
+    readonly tableId: Table.Id;
   }
 
   type SagaConfig<
@@ -650,7 +651,7 @@ namespace Table {
     S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
     A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
   > = {
-    readonly storeId?: Redux.AsyncId;
+    readonly asyncId?: Table.AsyncId;
     readonly actions: Redux.ActionMapObject<A>;
     readonly selector?: (state: Application.Store) => S;
     readonly footerRowSelectors?: Partial<FooterGridSet<RowDataSelector<R>>>;

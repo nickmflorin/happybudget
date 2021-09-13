@@ -24,7 +24,7 @@ const ConnectedTable = connectTableToStore<
   Model.BudgetGroup,
   Tables.AccountTableStore
 >({
-  storeId: "async-ShareAccountsTable",
+  asyncId: "async-accounts-table",
   actions: ActionMap,
   footerRowSelectors: {
     footer: createSelector(
@@ -38,6 +38,7 @@ const ConnectedTable = connectTableToStore<
     )
   },
   reducer: budgeting.reducers.createUnauthenticatedAccountsTableReducer({
+    tableId: "accounts-table",
     columns: GenericAccountsTable.BudgetColumns,
     actions: ActionMap,
     getModelRowLabel: (r: R) => r.identifier,

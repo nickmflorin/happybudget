@@ -92,6 +92,7 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
   return (
     <React.Fragment>
       <ConnectedTable
+        tableId={"account-subaccounts-table"}
         tableRef={tableRef}
         fringes={fringes}
         subAccountUnits={subAccountUnits}
