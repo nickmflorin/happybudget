@@ -2,12 +2,13 @@ import { ReactNode, useEffect, useState } from "react";
 import { Store } from "redux";
 import { Provider } from "react-redux";
 import { Redirect } from "react-router-dom";
+import { ConnectedRouter } from "connected-react-router";
 import { isNil } from "lodash";
 
 import { NetworkError, ServerError, ClientError, AuthenticationError } from "api";
 import { ApplicationSpinner } from "components";
 import { validateToken } from "api/services";
-import { configureAuthenticatedStore } from "store/configureStore";
+import { history, configureAuthenticatedStore } from "store/configureStore";
 
 interface WrapInAuthenticatedStoreProps {
   readonly children: ReactNode;
@@ -56,7 +57,11 @@ const WrapInAuthenticatedStore = ({ children }: WrapInAuthenticatedStoreProps): 
       // redirect to login.
       return <Redirect to={"/login"} />;
     } else {
-      return <Provider store={reduxStore}>{children}</Provider>;
+      return (
+        <Provider store={reduxStore}>
+          <ConnectedRouter history={history}>{children}</ConnectedRouter>
+        </Provider>
+      );
     }
   }
 };

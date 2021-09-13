@@ -31,6 +31,7 @@ namespace Application {
     type ModuleReducers = Redux.ReducersMapObject<ModuleStores>;
 
     type StaticStores = ModuleStores & {
+      readonly router: import("connected-react-router").RouterState<import("history").LocationState>;
       readonly drawerVisible: boolean;
       readonly loading: boolean;
       readonly user: Model.User;

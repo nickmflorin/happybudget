@@ -1,5 +1,7 @@
 import { Middleware, createStore, applyMiddleware, compose } from "redux";
 import createSagaMiddleware, { Saga } from "redux-saga";
+import { routerMiddleware } from "connected-react-router";
+import { createBrowserHistory } from "history";
 import * as Sentry from "@sentry/react";
 
 import { isAuthenticatedStore } from "lib/redux/typeguards";
@@ -9,6 +11,8 @@ import createReducerManager from "./createReducerManager";
 import { createStaticAuthenticatedReducers, createStaticUnauthenticatedReducers } from "./reducer";
 import { createAuthenticatedRootSaga, createUnauthenticatedRootSaga } from "./sagas";
 import { createAuthenticatedInitialState, createUnauthenticatedInitialState } from "./initialState";
+
+export const history = createBrowserHistory();
 
 const authenticatedActionMiddleware: Middleware<{}, Application.Store> = api => next => action => {
   const state = api.getState();
@@ -41,7 +45,7 @@ const configureGenericStore = <S extends Application.Store>(
     ...createStore<S, Redux.Action, any, any>(
       reducerManager.reduce,
       initialState,
-      compose(applyMiddleware(...baseMiddleware), sentryReduxEnhancer)
+      compose(applyMiddleware(...baseMiddleware, routerMiddleware(history)), sentryReduxEnhancer)
     )
   };
 
@@ -52,14 +56,14 @@ const configureGenericStore = <S extends Application.Store>(
 
 export const configureAuthenticatedStore = (user: Model.User): Redux.Store<Application.Authenticated.Store> => {
   const initialState = createAuthenticatedInitialState(GlobalReduxConfig, user);
-  const applicationReducers = createStaticAuthenticatedReducers(GlobalReduxConfig, user);
+  const applicationReducers = createStaticAuthenticatedReducers(GlobalReduxConfig, user, history);
   const applicationSaga = createAuthenticatedRootSaga(GlobalReduxConfig);
   return configureGenericStore<Application.Authenticated.Store>(initialState, applicationReducers, applicationSaga);
 };
 
 export const configureUnauthenticatedStore = (): Redux.Store<Application.Unauthenticated.Store> => {
   const initialState = createUnauthenticatedInitialState(GlobalReduxConfig);
-  const applicationReducers = createStaticUnauthenticatedReducers(GlobalReduxConfig);
+  const applicationReducers = createStaticUnauthenticatedReducers(GlobalReduxConfig, history);
   const applicationSaga = createUnauthenticatedRootSaga(GlobalReduxConfig);
   return configureGenericStore<Application.Unauthenticated.Store>(initialState, applicationReducers, applicationSaga);
 };

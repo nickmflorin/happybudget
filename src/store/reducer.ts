@@ -1,3 +1,6 @@
+import { History } from "history";
+import { connectRouter } from "connected-react-router";
+
 import { isNil, reduce, filter } from "lodash";
 import { redux } from "lib";
 
@@ -57,7 +60,8 @@ function createModularApplicationReducer(config: Application.AnyModuleConfig[]):
  */
 export const createStaticAuthenticatedReducers = (
   config: Application.AnyModuleConfig[],
-  user: Model.User
+  user: Model.User,
+  history: History<any>
 ): Application.Authenticated.StaticReducers => {
   const moduleReducers = createModularApplicationReducer(
     filter(
@@ -67,6 +71,7 @@ export const createStaticAuthenticatedReducers = (
   );
   return {
     ...moduleReducers,
+    router: connectRouter(history),
     contacts: redux.reducers.createModelListResponseReducer<
       Model.Contact,
       Omit<Redux.ModelListResponseActionMap<Model.Contact>, "restoreSearchCache" | "setSearch">
@@ -99,7 +104,8 @@ export const createStaticAuthenticatedReducers = (
  * @param config  The application Redux configuration.
  */
 export const createStaticUnauthenticatedReducers = (
-  config: Application.AnyModuleConfig[]
+  config: Application.AnyModuleConfig[],
+  history: History<any>
 ): Application.Unauthenticated.StaticReducers => {
   const moduleReducers = createModularApplicationReducer(
     filter(config, (c: Application.AnyModuleConfig) =>

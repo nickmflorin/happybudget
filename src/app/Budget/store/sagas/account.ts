@@ -165,7 +165,5 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
 export default function* rootSaga(): SagaIterator {
   yield spawn(watchForAccountIdChangedSaga);
   yield spawn(watchForRequestAccountSaga);
-  // yield spawn(historySaga);
-  // yield spawn(commentsSaga);
   yield spawn(tableSaga);
 }

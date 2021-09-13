@@ -3,18 +3,16 @@ import { Router, Switch } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
-import { createBrowserHistory } from "history";
 import "style/index.scss";
 
 import { ApplicationSpinner } from "components";
 import { AuthenticatedReduxRoute, UnauthenticatedReduxRoute } from "components/routes";
 
 import * as config from "config";
+import { history } from "store";
 
 const Landing = config.lazyWithRetry(() => import("./Landing"));
 const Application = config.lazyWithRetry(() => import("./Application"));
-
-const history = createBrowserHistory();
 
 let prevPath: string | null = null;
 
