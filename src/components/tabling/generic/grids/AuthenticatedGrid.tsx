@@ -23,7 +23,6 @@ const AuthenticatedGrid = <R extends Table.RowData, M extends Model.Model = Mode
 }: AuthenticatedGridProps<R, M>): JSX.Element => {
   const frameworkComponents = useMemo<Table.FrameworkGroup>((): Table.FrameworkGroup => {
     const combinedFramework = tabling.aggrid.combineFrameworks(generic.Framework, framework);
-
     return {
       ...reduce(
         combinedFramework.cells?.[props.id],

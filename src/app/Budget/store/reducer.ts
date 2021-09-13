@@ -176,6 +176,7 @@ const genericReducer = combineReducers({
         addModelsToState: actions.account.addModelsToStateAction,
         setSearch: actions.account.setSearchAction
       },
+      tableEventId: "subaccounts-table",
       getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
       getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
       getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,

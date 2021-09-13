@@ -4,6 +4,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 namespace Table {
+  type Name = "subaccounts" | "accounts";
+  type Id = `${Name}-table`;
+
   type AgGridProps = import("@ag-grid-community/react/lib/interfaces").AgGridReactProps;
 
   type NullValue = null | "" | 0 | [];
@@ -92,8 +95,8 @@ namespace Table {
   type RowData = object;
   type RowValue<R extends RowData> = Exclude<R[keyof R], undefined>;
 
-  type IRow<Id extends RowID, TP extends RowType, D extends RowData, E extends BaseRowMeta> = D & {
-    readonly id: Id;
+  type IRow<RowId extends RowID, TP extends RowType, D extends RowData, E extends BaseRowMeta> = D & {
+    readonly id: RowId;
     readonly meta: E;
     readonly rowType: TP;
   }
@@ -630,6 +633,7 @@ namespace Table {
     A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
   > = TaskConfig<R, M, G, A> & Omit<CreateTableDataConfig<R, M, G>, "models" | "groups" | "columns"> & {
     readonly initialState: S;
+    readonly tableEventId?: Table.Id;
   }
 
   type SagaConfig<

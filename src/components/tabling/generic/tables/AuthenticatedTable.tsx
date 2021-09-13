@@ -1,7 +1,7 @@
 import React, { useImperativeHandle, useState, useMemo } from "react";
 import { forEach, isNil, find, uniq, map, filter, includes } from "lodash";
 
-import { tabling, util, hooks } from "lib";
+import { tabling, util, hooks, events } from "lib";
 import { AuthenticatedGrid } from "components/tabling/generic";
 
 import { AuthenticatedGridProps } from "../grids";
@@ -72,6 +72,26 @@ const AuthenticatedTable = <
   props: WithConnectedTableProps<WithConfiguredTableProps<AuthenticatedTableProps<R, M, G>, R>, R, M, G, S>
 ): JSX.Element => {
   const [selectedRows, setSelectedRows] = useState<Table.DataRow<R, M>[]>([]);
+
+  const scrollToBottom = hooks.useDynamicCallback((numRows: number) => {
+    const apis = props.tableApis.get("data");
+    if (!isNil(apis)) {
+      apis.grid.ensureIndexVisible(numRows - 1, "bottom");
+    }
+  });
+
+  events.useEvent<Events.RowsAddedParams>(
+    "rowsAdded",
+    (params: Events.RowsAddedParams) => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        setTimeout(() => {
+          scrollToBottom(params.numRows);
+        }, 100);
+      }
+    },
+    [props.tableApis]
+  );
 
   /**
    * Note: Ideally, we would be including the selector in the mechanics of the

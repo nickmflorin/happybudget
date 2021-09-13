@@ -1,6 +1,7 @@
 import { tabling } from "lib";
 import { isNil, reduce, map, filter, includes, uniq } from "lodash";
 
+import * as applicationEvents from "../events";
 import * as redux from "../redux";
 import * as util from "../util";
 import * as data from "./data";
@@ -247,7 +248,6 @@ export const createTableChangeEventReducer = <
         );
       }
     } else if (typeguards.isRowAddEvent(e)) {
-      // ToDo: This is where we need to scroll to the bottom of the table.
       const payload: Table.RowAdd<R, M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
       newState = {
         ...newState,
@@ -264,6 +264,9 @@ export const createTableChangeEventReducer = <
           )
         ]
       };
+      if (!isNil(config.tableEventId)) {
+        applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableEventId, numRows: newState.data.length });
+      }
     } else if (typeguards.isRowDeleteEvent(e)) {
       const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       /*
