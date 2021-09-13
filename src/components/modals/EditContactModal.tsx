@@ -65,6 +65,7 @@ const EditContactModal = ({ contact, visible, onCancel, onSuccess }: EditContact
           onChange={(f: UploadedImage | null) => setImage(f)}
           onError={(error: Error | string) => form.setGlobalError(error)}
           ref={headerRef}
+          initialValues={{ first_name: contact.first_name, last_name: contact.last_name }}
         />
       }
       visible={visible}
