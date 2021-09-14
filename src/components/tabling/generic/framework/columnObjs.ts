@@ -44,6 +44,7 @@ export const CalculatedColumn = <
   width?: number
 ): Table.Column<R, M, V> => {
   return Column<R, M, V>({
+    applicableForGroup: true,
     ...col,
     cellStyle: { textAlign: "right", ...col.cellStyle },
     cellRenderer: "CalculatedCell",
