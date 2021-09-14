@@ -26,6 +26,7 @@ const ConnectedFringesTable = connectTableToStore<
   Tables.FringeTableStore
 >({
   actions: ActionMap,
+  autoRequest: false,
   selector: (state: Application.Store) =>
     redux.typeguards.isAuthenticatedStore(state)
       ? state.template.subaccount.table.fringes

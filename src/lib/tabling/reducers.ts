@@ -379,8 +379,6 @@ export const createTableReducer = <
     ) {
       newState = { ...newState, data: [], models: [], groups: [] };
     } else if (action.type === config.actions.response.toString()) {
-      // ToDo: It might make a lot more sense to dispatch all of the table data in one swoop after
-      // it is all collected, to avoid unnecessary rerenders!
       const payload: Http.TableResponse<M, G> = action.payload;
       newState = {
         ...newState,

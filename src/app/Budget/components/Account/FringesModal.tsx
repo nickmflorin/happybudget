@@ -25,11 +25,13 @@ const ConnectedFringesTable = connectTableToStore<
   Model.Group,
   Tables.FringeTableStore
 >({
+  autoRequest: false,
   actions: ActionMap,
-  selector: (state: Application.Store) =>
-    redux.typeguards.isAuthenticatedStore(state)
+  selector: (state: Application.Store) => {
+    return redux.typeguards.isAuthenticatedStore(state)
       ? state.budget.account.table.fringes
-      : initialState.account.table.fringes
+      : initialState.account.table.fringes;
+  }
 })(FringesTable.Table);
 
 interface FringesModalProps extends Pick<GenericFringesModalProps, "open" | "onCancel"> {
