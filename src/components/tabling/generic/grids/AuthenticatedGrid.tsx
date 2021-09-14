@@ -70,7 +70,6 @@ const AuthenticatedGrid = <
       }
     }
   );
-
   return (
     <Grid
       {...props}
