@@ -84,12 +84,17 @@ const DataGrid =
 
       const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
         return map(
-          tabling.columns.updateColumnsOfTableType<Table.Column<R, M>, R, M>(props.columns, "body", {
-            headerComponentParams: {
-              onSort: (order: Order, field: keyof R) => updateOrdering(order, field),
-              ordering
-            }
-          }),
+          tabling.columns.updateColumnsOfTableType<Table.Column<R, M>, R, M>(
+            props.columns,
+            "body",
+            (col: Table.Column<R, M>) => ({
+              headerComponentParams: {
+                ...col.headerComponentParams,
+                onSort: (order: Order, field: keyof R) => updateOrdering(order, field),
+                ordering
+              }
+            })
+          ),
           (col: Table.Column<R, M>) => ({
             ...col,
             cellRendererParams: { ...col.cellRendererParams, getRowColorDef },
