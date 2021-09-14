@@ -90,9 +90,6 @@ export const createAuthenticatedTableSaga = <
               config.tasks.handleRemoveRowFromGroupEvent,
               action as Redux.Action<Table.RowRemoveFromGroupEvent<R, M>>
             );
-          } else if (typeguards.isGroupDeleteEvent(event)) {
-            // Blocking call so that table changes happen sequentially.
-            yield call(config.tasks.handleDeleteGroupEvent, action as Redux.Action<Table.GroupDeleteEvent>);
           }
         }
       }

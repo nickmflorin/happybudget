@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
-import { isNil, map } from "lodash";
+import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 import * as contactsTasks from "store/tasks/contacts";
@@ -242,35 +242,18 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* bulkDeleteTask(objId: ID, e: Table.RowDeleteEvent<R, C>, errorMessage: string): SagaIterator {
+  function* bulkDeleteRows(objId: ID, ids: ID[]): SagaIterator {
     if (isAuthenticatedConfig(config)) {
-      const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-      if (ids.length !== 0) {
-        yield put(config.actions.saving(true));
-        yield put(config.actions.loadingBudget(true));
-        try {
-          const response: Http.BudgetBulkResponse<B, C> = yield call(config.services.bulkDelete, objId, ids, {
-            cancelToken: source.token
-          });
-          /*
-        Note: We also have access to the updated Account from the response (as response.data)
-        so we could use this to update the overall Account in state.  However, the reducer handles
-        that logic pre-request currently, although in the future we may want to use the response
-        data as the fallback/source of truth.
-        */
-          yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
-        } catch (err: unknown) {
-          if (!(yield cancelled())) {
-            api.handleRequestError(err as Error, errorMessage);
-          }
-        } finally {
-          yield put(config.actions.saving(false));
-          yield put(config.actions.loadingBudget(false));
-          if (yield cancelled()) {
-            source.cancel();
-          }
-        }
-      }
+      const response: Http.BudgetBulkResponse<B, C> = yield call(config.services.bulkDelete, objId, ids, {
+        cancelToken: source.token
+      });
+      /*
+      Note: We also have access to the updated Account from the response (as response.data)
+      so we could use this to update the overall Account in state.  However, the reducer handles
+      that logic pre-request currently, although in the future we may want to use the response
+      data as the fallback/source of truth.
+      */
+      yield put(config.actions.updateBudgetInState({ id: response.budget.id, data: response.budget }));
     }
   }
 
@@ -304,25 +287,8 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
     }
   }
 
-  function* handleDeleteGroupEvent(action: Redux.Action<Table.GroupDeleteEvent>): SagaIterator {
-    if (isAuthenticatedConfig(config)) {
-      if (!isNil(action.payload)) {
-        const e: Table.GroupDeleteEvent = action.payload;
-        yield put(config.actions.saving(true));
-        try {
-          yield call(api.deleteGroup, e.payload, { cancelToken: source.token });
-        } catch (err: unknown) {
-          if (!(yield cancelled())) {
-            api.handleRequestError(err as Error, "There was an error deleting the group.");
-          }
-        } finally {
-          yield put(config.actions.saving(false));
-          if (yield cancelled()) {
-            source.cancel();
-          }
-        }
-      }
-    }
+  function* deleteGroups(rows: Table.GroupRow<R>[]): SagaIterator {
+    yield all(map(rows, (row: Table.GroupRow<R>) => call(api.deleteGroup, row.id, { cancelToken: source.token })));
   }
 
   function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, C>>): SagaIterator {
@@ -334,10 +300,40 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
   }
 
   function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, C>>): SagaIterator {
-    const objId = yield select(config.selectObjId);
-    if (!isNil(action.payload) && !isNil(objId)) {
-      const e: Table.RowDeleteEvent<R, C> = action.payload;
-      yield fork(bulkDeleteTask, objId, e, "There was an error deleting the rows.");
+    if (isAuthenticatedConfig(config)) {
+      const objId = yield select(config.selectObjId);
+      if (!isNil(action.payload) && !isNil(objId)) {
+        const e: Table.RowDeleteEvent<R, C> = action.payload;
+        const ids: Table.RowID[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+        if (ids.length !== 0) {
+          yield put(config.actions.loadingBudget(true));
+          yield put(config.actions.saving(true));
+
+          const rows: Table.Row<R, M>[] = yield select(config.selectData);
+
+          const modelsRowIds: ID[] = map(
+            filter(rows, (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, M>[],
+            (r: Table.ModelRow<R, M>) => r.id
+          );
+          const groupRows: Table.GroupRow<R>[] = filter(rows, (r: Table.Row<R, M>) =>
+            tabling.typeguards.isGroupRow(r)
+          ) as Table.GroupRow<R>[];
+
+          try {
+            yield all([call(deleteGroups, groupRows), call(bulkDeleteRows, objId, modelsRowIds)]);
+          } catch (err: unknown) {
+            if (!(yield cancelled())) {
+              api.handleRequestError(err as Error, "There was an error removing the rows.");
+            }
+          } finally {
+            yield put(config.actions.saving(false));
+            yield put(config.actions.loadingBudget(false));
+            if (yield cancelled()) {
+              source.cancel();
+            }
+          }
+        }
+      }
     }
   }
 
@@ -358,7 +354,6 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
   return {
     handleRemoveRowFromGroupEvent,
     handleAddRowToGroupEvent,
-    handleDeleteGroupEvent,
     handleRowAddEvent,
     handleRowDeleteEvent,
     handleDataChangeEvent,

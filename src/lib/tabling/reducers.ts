@@ -15,7 +15,7 @@ import * as typeguards from "./typeguards";
  * provided, it will only return the Group if that Group also pertains to the specific
  * rowId.
  */
-export const groupFromState = <
+export const groupRowFromState = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
   G extends Model.Group = Model.Group,
@@ -23,24 +23,26 @@ export const groupFromState = <
 >(
   action: Redux.Action,
   st: S,
-  id: G | ID,
-  rowId?: Table.RowID,
+  id: Table.GroupRowId,
+  rowId?: Table.DataRowID,
   options: Redux.FindModelOptions = { name: "Group", warnIfMissing: true }
-): G | null => {
-  if (typeof id === "number" || typeof id === "string") {
-    let predicate = (g: G) => g.id === id;
-    if (!isNil(rowId)) {
-      predicate = (g: G) => g.id === id && includes(g.children, rowId);
-    }
-    return redux.reducers.modelFromState<G>(action, st.groups, predicate, options);
+): Table.GroupRow<R> | null => {
+  let predicate = (g: Table.GroupRow<R>) => g.id === id;
+  if (!isNil(rowId)) {
+    predicate = (g: Table.GroupRow<R>) => g.id === id && includes(g.meta.children, rowId);
   }
-  return id;
+  return redux.reducers.modelFromState<Table.GroupRow<R>>(
+    action,
+    filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[],
+    predicate,
+    options
+  );
 };
 
 /**
  * Returns (if present) the Group in state that belongs to a specific row.
  */
-export const rowGroupFromState = <
+export const rowGroupRowFromState = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
   G extends Model.Group = Model.Group,
@@ -48,14 +50,16 @@ export const rowGroupFromState = <
 >(
   action: Redux.Action,
   st: S,
-  rowId: Table.RowID,
+  rowId: Table.DataRowID,
   options: Redux.FindModelOptions = { warnIfMissing: true }
-): G | null => {
-  const predicate = (g: G) => includes(g.children, rowId);
-  return redux.reducers.modelFromState<G>(action, st.groups, predicate, {
-    ...options,
-    name: "Group"
-  });
+): Table.GroupRow<R> | null => {
+  const predicate = (g: Table.GroupRow<R>) => includes(g.meta.children, rowId);
+  return redux.reducers.modelFromState<Table.GroupRow<R>>(
+    action,
+    filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[],
+    predicate,
+    { ...options, name: "Group" }
+  );
 };
 
 export const removeRowsFromAGroup = <
@@ -67,12 +71,15 @@ export const removeRowsFromAGroup = <
   st: S,
   action: Redux.Action,
   rowIds: Table.DataRowID[],
-  groupId: ID,
-  calculateGroup?: (rws: Table.DataRow<R, M>[]) => Partial<G>
+  groupId: Table.GroupRowId,
+  calculateGroup?: (rws: Table.DataRow<R, M>[]) => Partial<R>
 ): S => {
-  const group = groupFromState<R, M, G, S>(action, st, groupId);
-  if (!isNil(group)) {
-    const newChildren: Table.DataRowID[] = filter(group.children, (child: Table.DataRowID) => !includes(rowIds, child));
+  const groupRow = groupRowFromState<R, M, G, S>(action, st, groupId);
+  if (!isNil(groupRow)) {
+    const newChildren: Table.DataRowID[] = filter(
+      groupRow.meta.children,
+      (child: Table.DataRowID) => !includes(rowIds, child)
+    );
     const childrenRows: Table.DataRow<R, M>[] = redux.reducers.findModelsInData(
       action,
       filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)),
@@ -80,10 +87,10 @@ export const removeRowsFromAGroup = <
     );
     return {
       ...st,
-      groups: util.replaceInArray<G>(
-        st.groups,
-        { id: group.id },
-        { ...group, children: newChildren, ...calculateGroup?.(childrenRows) }
+      data: util.replaceInArray<Table.Row<R, M>>(
+        st.data,
+        { id: groupRow.id },
+        { ...groupRow, ...calculateGroup?.(childrenRows), meta: { ...groupRow.meta, children: newChildren } }
       )
     };
   }
@@ -98,63 +105,64 @@ export const removeRowsFromTheirGroupsIfTheyExist = <
 >(
   st: S,
   action: Redux.Action,
-  rowIds: Table.DataRowID[],
-  calculateGroup?: (rws: Table.DataRow<R, M>[]) => Partial<G>
+  rowIds: (Table.DataRowID | Table.DataRow<R, M>)[],
+  calculateGroup?: (rws: Table.DataRow<R, M>[]) => Partial<R>
 ): S => {
   // Keep track of which groups were altered and what their most recent children were after all
   // alterations, because it will be faster to recalculate the groups in the state after so we can
   // only recalculate each group once.
-  let alteredGroupsWithChildren: { [key: ID]: { group: G; children: ID[] } } = {};
-  st = reduce(
+  type Alteration = { groupRow: Table.GroupRow<R>; children: Table.DataRowID[] };
+  type AlteredGroups = { [key: Table.GroupRowId]: Alteration };
+  let alteredGroupsWithChildren: AlteredGroups = reduce(
     rowIds,
-    (s: S, rowId: Table.DataRowID) => {
-      const r: Table.DataRow<R, M> | null = redux.reducers.modelFromState<Table.DataRow<R, M>>(
-        action,
-        filter(st.data, (ri: Table.Row<R, M>) => typeguards.isDataRow(ri)) as Table.DataRow<R, M>[],
-        rowId
-      );
+    (alterations: AlteredGroups, rowId: Table.DataRowID | Table.DataRow<R, M>) => {
+      let r: Table.DataRow<R, M> | null = null;
+      if (typeof rowId === "number" || typeof rowId === "string") {
+        r = redux.reducers.modelFromState<Table.DataRow<R, M>>(
+          action,
+          filter(st.data, (ri: Table.Row<R, M>) => typeguards.isDataRow(ri)) as Table.DataRow<R, M>[],
+          rowId
+        );
+      } else {
+        r = rowId;
+      }
       if (!isNil(r)) {
-        let group = rowGroupFromState<R, M, G, S>(action, st, rowId);
-        if (!isNil(group)) {
-          const newChildren: ID[] = filter(group.children, (child: ID) => child !== r.id);
-          group = {
-            ...group,
-            children: filter(group.children, (child: number) => child !== r.id)
-          };
+        let groupRow = rowGroupRowFromState<R, M, G, S>(action, st, r.id);
+        if (!isNil(groupRow)) {
           // This will be overwrittten if a group belongs to multiple rows associated with the provided
           // IDS - but that is what we want, because we want the final values to have the most up to
           // date children for each group after all alterations.
-          alteredGroupsWithChildren[group.id] = { group, children: newChildren };
+          return {
+            ...alterations,
+            [groupRow.id]: { groupRow, children: filter(groupRow.meta.children, (id: Table.DataRowID) => id !== rowId) }
+          };
         }
-        // TODO: We might, in the future, need to also recalculate the `models` part of the store -
-        // although we do not rely on that as the source of truth.
-        return {
-          ...s,
-          groups: !isNil(group) ? util.replaceInArray<G>(s.groups, { id: group.id }, group) : s.groups
-        };
       }
-      return s;
+      return alterations;
+    },
+    {}
+  );
+
+  st = reduce(
+    alteredGroupsWithChildren,
+    (s: S, alteration: Alteration) => {
+      const childrenRows: Table.DataRow<R, M>[] = redux.reducers.findModelsInData(
+        action,
+        filter(s.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[],
+        alteration.children
+      );
+      const newGroupRow = {
+        ...alteration.groupRow,
+        meta: { ...alteration.groupRow.meta, children: alteration.children },
+        ...calculateGroup?.(childrenRows)
+      };
+      return {
+        ...s,
+        data: util.replaceInArray<Table.Row<R, M>>(st.data, { id: newGroupRow.id }, newGroupRow)
+      };
     },
     st
   );
-  if (!isNil(calculateGroup)) {
-    return reduce(
-      alteredGroupsWithChildren,
-      (s: S, relationship: { group: G; children: ID[] }, id: ID) => {
-        const childrenRows: Table.DataRow<R, M>[] = redux.reducers.findModelsInData(
-          action,
-          filter(s.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)),
-          relationship.children
-        );
-        const newGroup = { ...relationship.group, ...calculateGroup(childrenRows) };
-        return {
-          ...s,
-          groups: util.replaceInArray<G>(s.groups, { id }, newGroup)
-        };
-      },
-      st
-    );
-  }
   return st;
 };
 
@@ -169,8 +177,8 @@ export const createTableChangeEventReducer = <
       state: S,
       action: Redux.Action<Table.ChangeEvent<R, M, G>>,
       row: Table.DataRow<R, M>
-    ) => Table.DataRow<R, M>;
-    readonly calculateGroup?: (rws: Table.DataRow<R, M>[]) => G;
+    ) => Partial<R>;
+    readonly calculateGroup?: (rws: Table.DataRow<R, M>[]) => Partial<R>;
   },
   options?: Pick<Redux.FindModelOptions, "name">
 ): Redux.Reducer<S, Redux.Action<Table.ChangeEvent<R, M, G>>> => {
@@ -184,14 +192,14 @@ export const createTableChangeEventReducer = <
 
       // Note: This grouping may be redundant - we should investigate.
       let changesPerRow: {
-        [key: ID]: { changes: Table.RowChange<R, M>[]; row: Table.DataRow<R, M> };
+        [key: ID]: { changes: Table.RowChange<R, M>[]; row: Table.Row<R, M> };
       } = {};
       for (let i = 0; i < consolidated.length; i++) {
         if (isNil(changesPerRow[consolidated[i].id])) {
           /* eslint-disable no-loop-func */
-          const r: Table.DataRow<R, M> | null = redux.reducers.findModelInData<Table.DataRow<R, M>>(
+          const r: Table.Row<R, M> | null = redux.reducers.findModelInData<Table.Row<R, M>>(
             action,
-            filter(newState.data, (ri: Table.Row<R, M>) => typeguards.isDataRow(ri)) as Table.DataRow<R, M>[],
+            newState.data,
             consolidated[i].id,
             options
           );
@@ -208,18 +216,17 @@ export const createTableChangeEventReducer = <
         }
       }
       // For each Row that was changed, apply that change to the Row stored in state.
-      let newRows: Table.DataRow<R, M>[] = [];
+      let newRows: Table.Row<R, M>[] = [];
       newState = reduce(
         changesPerRow,
-        (s: S, dt: { changes: Table.RowChange<R, M>[]; row: Table.DataRow<R, M> }) => {
-          let r: Table.DataRow<R, M> = reduce(
+        (s: S, dt: { changes: Table.RowChange<R, M>[]; row: Table.Row<R, M> }) => {
+          let r: Table.Row<R, M> = reduce(
             dt.changes,
-            (ri: Table.DataRow<R, M>, change: Table.RowChange<R, M>) =>
-              rows.mergeChangesWithRow<R, M>(ri.id, ri, change),
+            (ri: Table.Row<R, M>, change: Table.RowChange<R, M>) => rows.mergeChangesWithRow<R, M>(ri.id, ri, change),
             dt.row
           );
-          if (!isNil(config.recalculateRow)) {
-            r = config.recalculateRow(s, action, r);
+          if (!isNil(config.recalculateRow) && tabling.typeguards.isDataRow(r)) {
+            r = { ...r, ...config.recalculateRow(s, action, r) };
           }
           newRows = [...newRows, r];
           return {
@@ -230,18 +237,24 @@ export const createTableChangeEventReducer = <
         newState
       );
 
-      if (!isNil(config.calculateGroup)) {
-        const groupsWithRowsChanged: { group: G; rows: Table.DataRow<R, M>[] }[] = data.findDistinctRowsForEachGroup(
-          newRows,
-          newState.groups
-        );
+      const recalculateGroup = config.calculateGroup;
+      if (!isNil(recalculateGroup)) {
+        const groupsWithRowsChanged: { group: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }[] =
+          rows.findDistinctRowsForEachGroupRow(
+            filter(newRows, (ri: Table.Row<R, M>) => tabling.typeguards.isDataRow(ri)) as Table.DataRow<R, M>[],
+            filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[]
+          );
         newState = reduce(
           groupsWithRowsChanged,
-          (s: S, relationship: { group: G; rows: Table.DataRow<R, M>[] }) => {
-            const newGroup = { ...relationship.group };
+          (s: S, relationship: { group: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }) => {
+            const newGroup = { ...relationship.group, ...recalculateGroup(relationship.rows) };
             return {
               ...s,
-              groups: util.replaceInArray<G>(s.groups, { id: relationship.group.id }, newGroup)
+              data: util.replaceInArray<Table.Row<R, M>>(
+                filter(s.data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)),
+                { id: relationship.group.id },
+                newGroup
+              )
             };
           },
           newState
@@ -268,17 +281,24 @@ export const createTableChangeEventReducer = <
     } else if (typeguards.isRowDeleteEvent(e)) {
       const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       /*
-      When a Row is deleted, we first have to remove the rows we are going to delete from their
+      When a Row is deleted, we first have to create a dichotomy of the rows we are deleting.
+
+      For non-group rows, we first have to remove the rows we are going to delete from their
       associated groups (if they are associated with any).  When we remove the references of the
       rows from their potential groups, we need to also recalculate the metrics on the group such that
       it is consistent with the row having been removed.
 
-      Then, we need to actually remove the rows from the state.
+      Then, we need to actually remove the rows, whether they are group rows or non-group rows from the state.
       */
-      newState = removeRowsFromTheirGroupsIfTheyExist(newState, action, ids, config.calculateGroup);
+      const rws = redux.reducers.findModelsInData<Table.Row<R, M>>(action, newState.data, ids);
+      const nonGroupRws = filter(rws, (rw: Table.Row<R, M>) => tabling.typeguards.isDataRow(rw)) as Table.DataRow<
+        R,
+        M
+      >[];
+      newState = removeRowsFromTheirGroupsIfTheyExist(newState, action, nonGroupRws, config.calculateGroup);
       newState = {
         ...newState,
-        data: filter(newState.data, (ri: Table.DataRow<R, M>) => !includes(ids, ri.id))
+        data: filter(newState.data, (ri: Table.Row<R, M>) => !includes(ids, ri.id))
       };
     } else if (typeguards.isRowRemoveFromGroupEvent(e)) {
       /*
@@ -301,37 +321,16 @@ export const createTableChangeEventReducer = <
         filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[],
         ids
       );
-      const g: G | null = groupFromState<R, M, G, S>(action, newState, e.payload.group);
+      const g: Table.GroupRow<R> | null = groupRowFromState<R, M, G, S>(action, newState, e.payload.group);
       if (!isNil(g)) {
-        const newChildren = uniq([...g.children, map(rws, (r: Table.DataRow<R, M>) => r.id)]);
+        const newChildren = uniq([...g.meta.children, map(rws, (r: Table.DataRow<R, M>) => r.id)]);
         newState = {
           ...newState,
-          groups: util.replaceInArray<G>(
-            newState.groups,
+          data: util.replaceInArray<Table.Row<R, M>>(
+            newState.data,
             { id: g.id },
-            { ...g, children: newChildren, ...config.calculateGroup?.(rws) }
+            { ...g, meta: { ...g.meta, children: newChildren }, ...config.calculateGroup?.(rws) }
           )
-        };
-      }
-    } else if (typeguards.isGroupDeleteEvent(e)) {
-      // When we are deleting a Group, we do not need to worry about any recalculations of that
-      // Group because the Group itself is being removed.
-      const group: G | null = groupFromState<R, M, G, S>(action, newState, e.payload);
-      if (!isNil(group)) {
-        newState = {
-          ...newState,
-          groups: filter(newState.groups, (g: G) => g.id !== e.payload)
-        };
-      }
-    } else if (typeguards.isGroupUpdateEvent(e)) {
-      // Right now, we are only really concerned with changes to the color or names field of the
-      // group, as everything else that would trigger mechanical recalculations is handled by separate
-      // events.
-      const group: G | null = groupFromState<R, M, G, S>(action, newState, e.payload.id);
-      if (!isNil(group)) {
-        newState = {
-          ...newState,
-          groups: util.replaceInArray<G>(newState.groups, { id: e.payload.id }, { ...group, ...e.payload.data })
         };
       }
     } else if (typeguards.isGroupAddEvent(e)) {
@@ -347,6 +346,21 @@ export const createTableChangeEventReducer = <
           groups: [...newState.groups, e.payload]
         })
       };
+    } else if (typeguards.isGroupUpdateEvent(e)) {
+      /*
+      Note: Eventually we are going to want to try to treat this the same as an update to a regular row.
+
+      Right now, we are only really concerned with changes to the color or names field of the
+      group, as everything else that would trigger mechanical recalculations is handled by separate
+      events.
+      */
+      const group: G | null = groupRowFromState<R, M, G, S>(action, newState, e.payload.id);
+      if (!isNil(group)) {
+        newState = {
+          ...newState,
+          groups: util.replaceInArray<G>(newState.groups, { id: e.payload.id }, { ...group, ...e.payload.data })
+        };
+      }
     }
     return newState;
   };
@@ -413,8 +427,8 @@ export const createAuthenticatedTableReducer = <
 >(
   config: Table.ReducerConfig<R, M, G, S, Redux.AuthenticatedTableActionMap<R, M, G>> & {
     readonly eventReducer?: Redux.Reducer<S>;
-    readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R, M>) => Table.DataRow<R, M>;
-    readonly recalculateGroup?: (state: S, action: Redux.Action, group: G) => G;
+    readonly recalculateRow?: (state: S, action: Redux.Action, row: Table.DataRow<R, M>) => Partial<R>;
+    readonly calculateGroup?: (rws: Table.DataRow<R, M>[]) => Partial<R>;
   }
 ): Redux.Reducer<S> => {
   const tableEventReducer = config.eventReducer || createTableChangeEventReducer<R, M, G, S>(config);

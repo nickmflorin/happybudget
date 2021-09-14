@@ -1,29 +1,6 @@
-import { includes, groupBy, isNil, reduce, find, filter, map, orderBy, uniqBy } from "lodash";
+import { includes, groupBy, isNil, reduce, find, filter, map, orderBy } from "lodash";
 
-import { model } from "lib";
 import * as rows from "./rows";
-
-/* eslint-disable indent */
-export const findDistinctRowsForEachGroup = <
-  R extends Table.RowData,
-  M extends Model.Model = Model.Model,
-  G extends Model.Group = Model.Group
->(
-  rws: Table.DataRow<R, M>[],
-  groups: G[]
-): { group: G; rows: Table.DataRow<R, M>[] }[] => {
-  return reduce(
-    uniqBy(groups, (g: G) => g.id),
-    (curr: { group: G; rows: Table.DataRow<R, M>[] }[], group: G) => {
-      const children = model.util.getModelsByIds(rws, group.children);
-      if (children.length !== 0) {
-        return [...curr, { rows: children, group }];
-      }
-      return curr;
-    },
-    []
-  );
-};
 
 export const orderModelsWithRowsByFieldOrdering = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   array: Table.ModelWithRow<R, M>[],

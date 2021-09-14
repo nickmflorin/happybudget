@@ -90,7 +90,7 @@ namespace Redux {
   type ModelListActionInstance = { id: ID; count: number };
   type ModelListActionStore = ModelListActionInstance[];
 
-  interface UpdateActionPayload<T extends object> {
+  interface UpdateActionPayload<T extends object, ID extends ID = ID> {
     id: ID;
     data: Partial<T>;
   }
@@ -177,7 +177,6 @@ namespace Redux {
   type TableTaskMapWithGroups<R extends Table.RowData, M extends Model.Model = Model.Model> = TableTaskMap<R, M> & {
     readonly handleAddRowToGroupEvent: Table.RowAddToGroupEvent<R, M>;
     readonly handleRemoveRowFromGroupEvent: Table.RowRemoveFromGroupEvent<R, M>;
-    readonly handleDeleteGroupEvent: Table.GroupDeleteEvent;
   }
 
   type TableActionMap<M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {

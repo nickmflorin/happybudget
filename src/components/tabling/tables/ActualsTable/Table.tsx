@@ -53,7 +53,7 @@ const ActualsTable = ({
                 return null;
               }
               const availableSubAccounts: Model.SimpleSubAccount[] = filter(
-                map(props.data, (row: R) => row.subaccount),
+                map(props.data, (row: Table.Row<R, M>) => row.subaccount),
                 (sub: Model.SimpleSubAccount | null) => sub !== null && sub.identifier !== null
               ) as Model.SimpleSubAccount[];
               // NOTE: If there are multiple sub accounts with the same identifier, this will

@@ -12,24 +12,7 @@ type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 type S = Tables.SubAccountTableStore;
 
-const recalculateGroupMetrics = (
-  /* eslint-disable indent */
-  st: S,
-  action: Redux.Action,
-  group: Model.BudgetGroup
-): Model.BudgetGroup => {
-  const dataRows = filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[];
-  const objs = redux.reducers.findModelsInData<Table.DataRow<R, M>>(action, dataRows, group.children, {
-    name: "Group child account/sub-account"
-  });
-  let payload: any = {
-    estimated: reduce(objs, (sum: number, s: Table.Row<R, M>) => sum + (s.estimated || 0), 0)
-  };
-  const actual = reduce(objs, (sum: number, s: Table.Row<R, M>) => sum + (s.actual || 0), 0);
-  payload = { ...payload, actual, variance: payload.estimated - actual };
-  return { ...group, ...payload };
-};
-
+/* eslint-disable indent */
 const recalculateSubAccountRow = (st: S, action: Redux.Action, row: Table.DataRow<R, M>): Table.DataRow<R, M> => {
   /*
   In the case that the SubAccount has SubAccount(s) itself, the estimated value is determined
@@ -38,7 +21,7 @@ const recalculateSubAccountRow = (st: S, action: Redux.Action, row: Table.DataRo
   changes when the estimated values of it's SubAccount(s) on another page are altered.
   */
   const isValidToRecalculate =
-    tabling.typeguards.isPlaceholderRow(row) || (!isNil(row.meta.children) && row.meta.children.length === 0);
+    tabling.typeguards.isPlaceholderRow<R>(row) || (!isNil(row.meta.children) && row.meta.children.length === 0);
 
   if (isValidToRecalculate && !isNil(row.quantity) && !isNil(row.rate)) {
     const multiplier = row.multiplier || 1.0;
@@ -102,7 +85,13 @@ export const createAuthenticatedSubAccountsTableReducer = (
 ): Redux.Reducer<S> => {
   const generic = tabling.reducers.createAuthenticatedTableReducer<R, M, Model.BudgetGroup, S>({
     ...config,
-    recalculateGroup: recalculateGroupMetrics,
+    calculateGroup: (rws: Table.DataRow<R, M>[]) => {
+      let payload: any = {
+        estimated: reduce(rws, (sum: number, s: Table.DataRow<R, M>) => sum + (s.estimated || 0), 0),
+        actual: reduce(rws, (sum: number, s: Table.DataRow<R, M>) => sum + (s.actual || 0), 0)
+      };
+      return { ...payload, variance: payload.estimated - payload.actual };
+    },
     recalculateRow: recalculateSubAccountRow
   });
 

@@ -8,8 +8,7 @@ export const collapseSoloCellChange = <R extends Table.RowData, M extends Model.
   return {
     oldValue: cellChange.oldValue,
     newValue: cellChange.newValue,
-    row: cellChange.row,
-    column: cellChange.column
+    row: cellChange.row
   };
 };
 

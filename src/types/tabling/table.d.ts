@@ -84,6 +84,7 @@ namespace Table {
   type GroupRowMeta = Omit<BaseRowMeta, "gridId"> & {
     readonly gridId: "data";
     readonly group: ID;
+    readonly children: DataRowID[];
   };
 
   type RowMeta<M extends Model.Model = Model.Model> = ModelRowMeta<M> | PlaceholderRowMeta | GroupRowMeta;
@@ -105,7 +106,7 @@ namespace Table {
   type DataRow<D extends RowData, M extends Model.Model = Model.Model> = ModelRow<D, M> | PlaceholderRow<D>;
 
   type PlaceholderRow<D extends RowData> = IRow<PlaceholderRowId, "placeholder", D, PlaceholderRowMeta>;
-  type GroupRow<D extends RowData> = IRow<GroupRowId, "group", D, GroupRowMeta>;
+  type GroupRow<R extends RowData> = IRow<GroupRowId, "group", D, GroupRowMeta>;
   type ModelRow<D extends RowData, M extends Model.Model = Model.Model> =IRow<ID, "model", D, ModelRowMeta<M>>;
 
   type ModelWithRow<R extends RowData, M extends Model.Model = Model.Model> = {
@@ -244,6 +245,7 @@ namespace Table {
     readonly nullValue?: NullValue;
     readonly index?: number;
     readonly domain: ColumnDomain;
+    readonly applicableForGroup?: boolean;
     readonly getRowValue?: (m: M) => R[keyof R];
   }
 
@@ -398,9 +400,8 @@ namespace Table {
    | "rowDelete"
    | "rowRemoveFromGroup"
    | "rowAddToGroup"
-   | "groupDelete"
-   | "groupAdd"
-   | "groupUpdate";
+   | "groupUpdate"
+   | "groupAdd";
 
   type BaseChangeEvent = {
     readonly type: ChangeEventId;
@@ -413,8 +414,7 @@ namespace Table {
   > = {
     readonly oldValue: V | null;
     readonly newValue: V | null;
-    readonly row: Table.ModelRow<R, M>;
-    readonly column: Table.Column<R, M, V>;
+    readonly row: Table.Row<R, M>;
   };
 
   type CellAdd<
@@ -424,7 +424,6 @@ namespace Table {
   > = {
     readonly value: V | null;
     readonly row: Table.PlaceholderRow<R>;
-    readonly column: Table.Column<R, M, V>;
   };
 
   type SoloCellChange<
@@ -437,20 +436,16 @@ namespace Table {
   };
 
   type RowChangeData<R extends RowData, M extends Model.Model = Model.Model> = Partial<
-    {
-      [Property in keyof R]-?: CellChange<R, M, RowValue<R>>;
-    }
+    { [Property in keyof R]-?: CellChange<R, M, RowValue<R>> }
   >;
 
   type RowChange<R extends RowData, M extends Model.Model = Model.Model> = {
-    readonly id: Table.DataRowID;
+    readonly id: Table.RowID;
     readonly data: RowChangeData<R, M>;
   };
 
   type RowAddData<R extends RowData, M extends Model.Model = Model.Model> = Partial<
-    {
-      [Property in keyof R]-?: CellAdd<R, M, RowValue<R>>;
-    }
+    { [Property in keyof R]-?: CellAdd<R, M, RowValue<R>> }
   >;
 
   type RowAdd<R extends RowData, M extends Model.Model = Model.Model> = {
@@ -477,7 +472,7 @@ namespace Table {
   };
 
   type RowDeletePayload<R extends RowData, M extends Model.Model = Model.Model> = {
-    readonly rows: DataRowID[] | DataRowID;
+    readonly rows: RowID[] | RowID;
   };
   type RowDeleteEvent<R extends RowData, M extends Model.Model = Model.Model> = {
     readonly type: "rowDelete";
@@ -486,7 +481,7 @@ namespace Table {
 
   type RowRemoveFromGroupPayload<R extends RowData, M extends Model.Model = Model.Model> = {
     readonly rows: DataRowID[] | DataRowID;
-    readonly group: ID;
+    readonly group: GroupRowId;
   };
   type RowRemoveFromGroupEvent<R extends RowData, M extends Model.Model = Model.Model> = {
     readonly type: "rowRemoveFromGroup";
@@ -494,24 +489,12 @@ namespace Table {
   };
 
   type RowAddToGroupPayload<R extends RowData, M extends Model.Model = Model.Model> = {
-    readonly group: ID;
+    readonly group: GroupRowId;
     readonly rows: DataRowID[] | DataRowID;
   };
   type RowAddToGroupEvent<R extends RowData, M extends Model.Model = Model.Model> = {
     readonly type: "rowAddToGroup";
     readonly payload: RowAddToGroupPayload<R, M>;
-  };
-
-  type GroupUpdatePayload<G extends Model.Group = Model.Group> = Redux.UpdateActionPayload<G>;
-  type GroupUpdateEvent<G extends Model.Group = Model.Group> = BaseChangeEvent & {
-    readonly type: "groupUpdate";
-    readonly payload: GroupUpdatePayload<G>;
-  };
-
-  type GroupDeletePayload = ID;
-  type GroupDeleteEvent = BaseChangeEvent & {
-    readonly type: "groupDelete";
-    readonly payload: GroupDeletePayload;
   };
 
   type GroupAddPayload<G extends Model.Group = Model.Group> = G;
@@ -520,22 +503,31 @@ namespace Table {
     readonly payload: GroupAddPayload<G>;
   };
 
+  type GroupUpdatePayload<G extends Model.Group = Model.Group> = Redux.UpdateActionPayload<G>;
+  type GroupUpdateEvent<G extends Model.Group = Model.Group> = BaseChangeEvent & {
+    readonly type: "groupUpdate";
+    readonly payload: GroupUpdatePayload<G>;
+  };
+
   type FullRowEvent<R extends RowData, M extends Model.Model = Model.Model> =
     | RowDeleteEvent<R, M>
     | RowRemoveFromGroupEvent<R, M>
     | RowAddToGroupEvent<R, M>;
-  type GrouplessEvent<R extends RowData, M extends Model.Model = Model.Model> =
-    | DataChangeEvent<R, M>
-    | RowAddEvent<R, M>
-    | RowDeleteEvent<R, M>;
+
   type GroupEvent<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> =
     | RowRemoveFromGroupEvent<R, M>
     | RowAddToGroupEvent<R, M>
     | GroupUpdateEvent<G>
-    | GroupAddEvent<G>
-    | GroupDeleteEvent;
+    | GroupAddEvent<G>;
 
-  type ChangeEvent<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = GrouplessEvent<R, M> | GroupEvent<R, M, G>;
+  type ChangeEvent<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> =
+    | DataChangeEvent<R, M>
+    | RowAddEvent<R, M>
+    | RowDeleteEvent<R, M>
+    | RowRemoveFromGroupEvent<R, M>
+    | RowAddToGroupEvent<R, M>
+    | GroupAddEvent<G>
+    | GroupUpdateEvent<G>;
 
   type CellDoneEditingEvent = import("react").SyntheticEvent | KeyboardEvent;
 

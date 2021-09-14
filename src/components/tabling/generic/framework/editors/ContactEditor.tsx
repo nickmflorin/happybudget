@@ -56,8 +56,7 @@ const ContactEditor = <
                     oldValue: (row.contact || null) as unknown as Table.RowValue<R>,
                     field: props.column.field,
                     row,
-                    id: row.id,
-                    column: props.column
+                    id: row.id
                   }
                 });
               } else {
@@ -66,8 +65,7 @@ const ContactEditor = <
                     oldValue: (row.contact || null) as unknown as Table.RowValue<R>,
                     field: props.column.field,
                     row,
-                    id: row.id,
-                    column: props.column
+                    id: row.id
                   }
                 });
               }
