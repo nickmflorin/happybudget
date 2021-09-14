@@ -28,9 +28,9 @@ export const createDetailResponseReducer = <
       data: action.payload
     }),
     loading: (st: S = config.initialState, action: Redux.Action<boolean>) => ({ ...st, loading: action.payload }),
-    updateInState: (st: S = config.initialState, action: Redux.Action<Partial<M>>) => ({
+    updateInState: (st: S = config.initialState, action: Redux.Action<Redux.UpdateActionPayload<M>>) => ({
       ...st,
-      data: { ...st.data, ...action.payload }
+      data: { ...st.data, ...action.payload.data }
     })
   };
   return createObjectReducerFromTransformers<S, A>(config, transformers, subReducers);

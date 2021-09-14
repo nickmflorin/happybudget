@@ -20,7 +20,6 @@ export const setCommentsHistoryDrawerVisibilityAction = createAction<boolean>(
 export const updateBudgetInStateAction = createAction<Redux.UpdateActionPayload<Model.Budget>>(
   ActionType.UpdateInState
 );
-
 export const loadingFringesAction = createAction<boolean>(ActionType.Fringes.Loading);
 export const requestFringesAction = createAction<null>(ActionType.Fringes.Request);
 export const clearFringesAction = createAction<null>(ActionType.Fringes.Clear);
