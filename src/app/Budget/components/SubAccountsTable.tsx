@@ -27,7 +27,9 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
   const [createContactModalVisible, setCreateContactModalVisible] = useState(false);
 
   const contacts = useSelector(selectors.selectContacts);
-  const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<Tables.SubAccountRowData>(props.tableRef);
+  const table = tabling.hooks.useTableIfNotDefined<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>(
+    props.table
+  );
 
   const editingContact = useMemo(() => {
     if (!isNil(contactToEdit)) {
@@ -47,7 +49,7 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
     <React.Fragment>
       <GenericSubAccountsTable.AuthenticatedBudget
         {...props}
-        tableRef={tableRef}
+        table={table}
         contacts={contacts}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
@@ -90,7 +92,7 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
                 ...preContactCreate,
                 newValue: contact.id
               };
-              tableRef.current.applyTableChange({
+              table.current.applyTableChange({
                 type: "dataChange",
                 payload: tabling.events.cellChangeToRowChange(cellChange)
               });

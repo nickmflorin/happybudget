@@ -89,13 +89,13 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
   const subAccountUnits = useSelector(selectSubAccountUnits);
   const fringes = useSelector(selectFringes);
 
-  const tableRef = tabling.hooks.useAuthenticatedTable<R>();
+  const table = tabling.hooks.useTable<R, M, Model.BudgetGroup>();
 
   return (
     <React.Fragment>
       <ConnectedTable
         tableId={"account-subaccounts-table"}
-        tableRef={tableRef}
+        table={table}
         fringes={fringes}
         subAccountUnits={subAccountUnits}
         menuPortalId={"supplementary-header"}
@@ -142,7 +142,7 @@ const SubAccountsTable = ({ accountId, templateId, template }: SubAccountsTableP
               })
             );
             if (group.color !== groupToEdit.color) {
-              tableRef.current.applyGroupColorChange(group);
+              table.current.applyGroupColorChange(group);
             }
           }}
         />

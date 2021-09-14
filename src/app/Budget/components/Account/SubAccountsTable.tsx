@@ -93,7 +93,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
   const fringes = useSelector(selectFringes);
   const accountDetail = useSelector(selectAccountDetail);
   const subAccountUnits = useSelector(selectSubAccountUnits);
-  const tableRef = tabling.hooks.useAuthenticatedTable<R>();
+  const table = tabling.hooks.useTable<R, M, Model.BudgetGroup>();
 
   return (
     <React.Fragment>
@@ -101,7 +101,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         tableId={"account-subaccounts-table"}
         budget={budget}
         budgetId={budgetId}
-        tableRef={tableRef}
+        table={table}
         fringes={fringes}
         subAccountUnits={subAccountUnits}
         onAddFringes={() => setFringesModalVisible(true)}
@@ -148,7 +148,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
               })
             );
             if (group.color !== groupToEdit.color) {
-              tableRef.current.applyGroupColorChange(group);
+              table.current.applyGroupColorChange(group);
             }
           }}
         />

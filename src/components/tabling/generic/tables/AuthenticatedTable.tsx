@@ -29,7 +29,7 @@ export type AuthenticatedTableProps<
   G extends Model.Group = Model.Group
 > = TableConfigurationProps<R, M> & {
   readonly tableId: Table.Id;
-  readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
+  readonly table?: NonNullRef<Table.TableInstance<R, M, G>>;
   readonly actions?: Table.AuthenticatedMenuActions<R, M>;
   readonly excludeColumns?: SingleOrArray<keyof R> | ((col: Table.Column<R, M>) => boolean);
   readonly onEditGroup?: (g: G) => void;
@@ -202,7 +202,7 @@ const AuthenticatedTable = <
     [props.actions]
   );
 
-  useImperativeHandle(props.tableRef, () => ({
+  useImperativeHandle(props.table, () => ({
     getCSVData: props.getCSVData,
     changeColumnVisibility: props.changeColumnVisibility,
     applyTableChange: _onChangeEvent,

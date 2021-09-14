@@ -294,18 +294,15 @@ namespace Table {
     readonly hiddenColumns?: string;
   }
 
-  /* eslint-disable no-shadow */
-  type UnauthenticatedTableRefObj<R extends RowData> = {
+  type TableInstance<
+    R extends RowData = any,
+    M extends Model.Model = any,
+    G extends Model.Group = Model.Group
+  > = {
+    readonly applyTableChange: (event: ChangeEvent<R, M, G>) => void;
+    readonly applyGroupColorChange: (group: G) => void;
     readonly getCSVData: (fields?: string[]) => CSVData;
     readonly changeColumnVisibility: (changes: SingleOrArray<ColumnVisibilityChange<R, M>>, sizeToFit?: boolean) => void;
-  };
-
-  type AuthenticatedTableRefObj<
-    R extends RowData,
-    G extends Model.Group = Model.Group
-  > = UnauthenticatedTableRefObj<R> & {
-    readonly applyTableChange: (event: ChangeEvent<R, M>) => void;
-    readonly applyGroupColorChange: (group: G) => void;
   };
 
   type MenuActionObj = {

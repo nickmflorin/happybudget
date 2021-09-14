@@ -111,32 +111,26 @@ export const useHiddenColumns = <R extends Table.RowData, M extends Model.Model 
   return [hiddenColumns, changeColumnVisibility];
 };
 
-export const InitialUnauthenticatedTableRef: Table.UnauthenticatedTableRefObj<any> = {
+export const InitialTableRef: Table.TableInstance = {
   getCSVData: (fields?: string[]) => [],
-  changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any>>, sizeToFit?: boolean) => {}
-};
-
-export const InitialAuthenticatedTableRef: Table.AuthenticatedTableRefObj<any> = {
+  changeColumnVisibility: (changes: SingleOrArray<Table.ColumnVisibilityChange<any>>, sizeToFit?: boolean) => {},
   applyTableChange: (event: Table.ChangeEvent<any>) => {},
-  applyGroupColorChange: (group: Model.Group) => {},
-  ...InitialUnauthenticatedTableRef
+  applyGroupColorChange: (group: Model.Group) => {}
 };
 
-export const useUnauthenticatedTable = <R extends Table.RowData>(): NonNullRef<Table.UnauthenticatedTableRefObj<R>> => {
-  return useRef<Table.UnauthenticatedTableRefObj<R>>(InitialUnauthenticatedTableRef);
+export const useTable = <
+  R extends Table.RowData = any,
+  M extends Model.Model = any,
+  G extends Model.Group = Model.Group
+>(): NonNullRef<Table.TableInstance<R, M, G>> => {
+  return useRef<Table.TableInstance<R, M, G>>(InitialTableRef);
 };
 
 /* eslint-disable indent */
-export const useUnauthenticatedTableIfNotDefined = <R extends Table.RowData>(
-  grid?: NonNullRef<Table.UnauthenticatedTableRefObj<R>>
-): NonNullRef<Table.UnauthenticatedTableRefObj<R>> =>
-  hooks.useRefIfNotDefined<Table.UnauthenticatedTableRefObj<R>>(useUnauthenticatedTable, grid);
-
-export const useAuthenticatedTable = <R extends Table.RowData>(): NonNullRef<Table.AuthenticatedTableRefObj<R>> => {
-  return useRef<Table.AuthenticatedTableRefObj<R>>(InitialAuthenticatedTableRef);
-};
-
-export const useAuthenticatedTableIfNotDefined = <R extends Table.RowData>(
-  grid?: NonNullRef<Table.AuthenticatedTableRefObj<R>>
-): NonNullRef<Table.AuthenticatedTableRefObj<R>> =>
-  hooks.useRefIfNotDefined<Table.AuthenticatedTableRefObj<R>>(useAuthenticatedTable, grid);
+export const useTableIfNotDefined = <
+  R extends Table.RowData = any,
+  M extends Model.Model = any,
+  G extends Model.Group = Model.Group
+>(
+  table?: NonNullRef<Table.TableInstance<R, M, G>>
+): NonNullRef<Table.TableInstance<R, M, G>> => hooks.useRefIfNotDefined<Table.TableInstance<R, M, G>>(useTable, table);

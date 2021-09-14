@@ -13,7 +13,6 @@ type M = Model.Actual;
 type PreContactCreate = Omit<Table.SoloCellChange<R, M>, "newValue">;
 
 export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
-  readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
   readonly exportFileName: string;
   readonly contacts: Model.Contact[];
   readonly onSubAccountsTreeSearch: (value: string) => void;
@@ -29,20 +28,20 @@ const ActualsTable = ({
   onEditContact,
   ...props
 }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
-  const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
+  const table = tabling.hooks.useTableIfNotDefined<R>(props.table);
 
   return (
     <AuthenticatedModelTable<R, M>
       {...props}
-      tableRef={tableRef}
+      table={table}
       defaultRowLabel={"Actual"}
       showPageFooter={false}
       menuPortalId={"supplementary-header"}
       cookieNames={{ hiddenColumns: "actuals-table-hidden-columns" }}
       framework={Framework}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
-        framework.actions.ToggleColumnAction(tableRef.current, params),
-        framework.actions.ExportCSVAction(tableRef.current, params, exportFileName)
+        framework.actions.ToggleColumnAction(table.current, params),
+        framework.actions.ExportCSVAction(table.current, params, exportFileName)
       ]}
       columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(Columns, {
         subaccount: (col: Table.Column<R, M>) =>

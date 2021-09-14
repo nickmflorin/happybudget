@@ -13,11 +13,11 @@ export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
 };
 
 const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Props, R, M>): JSX.Element => {
-  const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
   return (
     <AuthenticatedModelTable<R, M>
       {...props}
-      tableRef={tableRef}
+      table={table}
       showPageFooter={false}
       defaultRowLabel={"Contact"}
       minimal={true}
@@ -28,8 +28,8 @@ const ContactsTable = ({ exportFileName, ...props }: WithConnectedTableProps<Pro
       expandCellTooltip={"Edit"}
       framework={Framework}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
-        framework.actions.ToggleColumnAction<R, M>(tableRef.current, params),
-        framework.actions.ExportCSVAction<R, M>(tableRef.current, params, exportFileName)
+        framework.actions.ToggleColumnAction<R, M>(table.current, params),
+        framework.actions.ExportCSVAction<R, M>(table.current, params, exportFileName)
       ]}
       columns={util.updateInArray<Table.Column<R, M>>(
         Columns,

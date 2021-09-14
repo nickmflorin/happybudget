@@ -13,13 +13,12 @@ type R = Tables.AccountRowData;
 export type AuthenticatedTemplateProps = AccountsTableProps &
   Omit<AuthenticatedBudgetTableProps<R, M>, "columns" | "cookieNames"> & {
     readonly budget: Model.Template | null;
-    readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
     readonly cookieNames?: Table.CookieNames;
     readonly onEditGroup: (group: Model.BudgetGroup) => void;
   };
 
 const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): JSX.Element => {
-  const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
+  const table = tabling.hooks.useTableIfNotDefined<R, M, Model.BudgetGroup>(props.table);
 
   return (
     <AuthenticatedBudgetTable<R, M>
@@ -32,9 +31,9 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
           isWriteOnly: true
         },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(tableRef.current, params),
-        framework.actions.ExportCSVAction<R, M>(
-          tableRef.current,
+        framework.actions.ToggleColumnAction<R, M, Model.BudgetGroup>(table.current, params),
+        framework.actions.ExportCSVAction<R, M, Model.BudgetGroup>(
+          table.current,
           params,
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )

@@ -19,15 +19,15 @@ const FringesTable: React.FC<WithConnectedTableProps<Props, R, M, Model.Group, S
   exportFileName,
   ...props
 }): JSX.Element => {
-  const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined<R>(props.tableRef);
+  const table = tabling.hooks.useTableIfNotDefined<R, M>(props.table);
 
   return (
     <AuthenticatedModelTable<R, M>
       {...props}
-      tableRef={tableRef}
+      table={table}
       className={classNames("fringes-table", props.className)}
       actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
-        framework.actions.ExportCSVAction<R, M>(tableRef.current, params, exportFileName)
+        framework.actions.ExportCSVAction<R, M>(table.current, params, exportFileName)
       ]}
       showPageFooter={false}
       framework={Framework}

@@ -20,7 +20,6 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
   readonly fringes: Tables.FringeRow[];
   readonly categoryName: "Sub Account" | "Detail";
   readonly identifierFieldHeader: "Account" | "Line";
-  readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
   readonly cookieNames: Table.CookieNames;
   readonly contacts: Model.Contact[];
   readonly exportFileName: string;
@@ -35,12 +34,12 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
 const AuthenticatedBudgetSubAccountsTable = (
   props: WithSubAccountsTableProps<AuthenticatedBudgetProps>
 ): JSX.Element => {
-  const tableRef = tabling.hooks.useAuthenticatedTableIfNotDefined(props.tableRef);
+  const table = tabling.hooks.useTableIfNotDefined(props.table);
 
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
-      tableRef={tableRef}
+      table={table}
       columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(props.columns, {
         identifier: (col: Table.Column<R, M>) =>
           budgetTableFramework.columnObjs.IdentifierColumn<R, M>({
@@ -132,9 +131,9 @@ const AuthenticatedBudgetSubAccountsTable = (
           isWriteOnly: true
         },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M>(tableRef.current, params),
+        framework.actions.ToggleColumnAction<R, M, Model.BudgetGroup>(table.current, params),
         framework.actions.ExportPdfAction(props.onExportPdf),
-        framework.actions.ExportCSVAction<R, M>(tableRef.current, params, props.exportFileName)
+        framework.actions.ExportCSVAction<R, M, Model.BudgetGroup>(table.current, params, props.exportFileName)
       ]}
     />
   );

@@ -10,7 +10,6 @@ export type UnauthenticatedBudgetTableProps<R extends Table.RowData, M extends M
   UnauthenticatedTableProps<R, M, Model.BudgetGroup>,
   "children"
 > & {
-  readonly tableRef?: NonNullRef<Table.UnauthenticatedTableRefObj<R>>;
   readonly onBack?: () => void;
 };
 

@@ -13,7 +13,6 @@ export type AuthenticatedBudgetTableProps<R extends Table.RowData, M extends Mod
   AuthenticatedTableProps<R, M, Model.BudgetGroup>,
   "children"
 > & {
-  readonly tableRef?: NonNullRef<Table.AuthenticatedTableRefObj<R>>;
   readonly onBack?: () => void;
 };
 

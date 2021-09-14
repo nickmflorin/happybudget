@@ -2,7 +2,7 @@ import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
-import { budgeting, tabling, redux } from "lib";
+import { budgeting, redux } from "lib";
 import { AccountsTable as GenericAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -58,11 +58,9 @@ interface AccountsTableProps {
 
 const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element => {
   const history = useHistory();
-  const table = tabling.hooks.useAuthenticatedTable<R>();
 
   return (
     <ConnectedTable
-      tableRef={table}
       budget={budget}
       onRowExpand={(row: Table.ModelRow<R>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
     />

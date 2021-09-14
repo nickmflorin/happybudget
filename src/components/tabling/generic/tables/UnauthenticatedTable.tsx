@@ -27,7 +27,7 @@ export type UnauthenticatedTableProps<
   M extends Model.Model = Model.Model,
   G extends Model.Group = Model.Group
 > = TableConfigurationProps<R, M> & {
-  readonly tableRef?: NonNullRef<Table.UnauthenticatedTableRefObj<R>>;
+  readonly table?: NonNullRef<Table.TableInstance<R, M, G>>;
   readonly actions?: Table.UnauthenticatedMenuActions<R, M>;
   readonly excludeColumns?: SingleOrArray<keyof R> | ((col: Table.Column<R, M>) => boolean);
   readonly children: RenderPropChild<UnauthenticatedTableDataGridProps<R, M, G>>;
@@ -103,9 +103,19 @@ const UnauthenticatedTable = <
     );
   }, [hooks.useDeepEqualMemo(props.columns), props.selector, props.excludeColumns]);
 
-  useImperativeHandle(props.tableRef, () => ({
+  useImperativeHandle(props.table, () => ({
     getCSVData: props.getCSVData,
-    changeColumnVisibility: props.changeColumnVisibility
+    changeColumnVisibility: props.changeColumnVisibility,
+    applyTableChange: (event: Table.ChangeEvent<R, M>) => {},
+    applyGroupColorChange: (group: Model.Group) => {
+      const apis = props.tableApis.get("data");
+      if (!isNil(apis)) {
+        const node: Table.RowNode | undefined = apis.grid.getRowNode(`group-${group.id}`);
+        if (!isNil(node)) {
+          apis.grid.redrawRows({ rowNodes: [node] });
+        }
+      }
+    }
   }));
 
   return (

@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { createSelector } from "reselect";
 import { isNil } from "lodash";
 
-import { redux, tabling } from "lib";
+import { redux } from "lib";
 import { SubAccountsTable as GenericSubAccountsTable, connectTableToStore } from "components/tabling";
 
 import { actions } from "../../store";
@@ -84,11 +84,9 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
   const fringes = useSelector(selectFringes);
   const accountDetail = useSelector(selectAccountDetail);
   const subAccountUnits = useSelector(selectSubAccountUnits);
-  const tableRef = tabling.hooks.useAuthenticatedTable<R>();
 
   return (
     <ConnectedTable
-      tableRef={tableRef}
       fringes={fringes}
       subAccountUnits={subAccountUnits}
       exportFileName={!isNil(accountDetail) ? `account_${accountDetail.identifier}` : ""}

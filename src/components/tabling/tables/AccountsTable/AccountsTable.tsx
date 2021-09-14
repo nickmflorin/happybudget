@@ -1,10 +1,7 @@
 import React from "react";
 import hoistNonReactStatics from "hoist-non-react-statics";
 
-type R = Tables.AccountRowData;
-
 export type AccountsTableProps = {
-  readonly tableRef?: NonNullRef<Table.UnauthenticatedTableRefObj<R>> | NonNullRef<Table.AuthenticatedTableRefObj<R>>;
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
 };
 

@@ -71,13 +71,14 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const table = tabling.hooks.useAuthenticatedTable<R>();
+  const table = tabling.hooks.useTable<R, M, Model.BudgetGroup>();
 
   return (
     <React.Fragment>
       <ConnectedTable
         tableId={"accounts-table"}
         budget={budget}
+        table={table}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
         onExportPdf={() => setPreviewModalVisible(true)}

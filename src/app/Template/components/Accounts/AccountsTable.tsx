@@ -67,13 +67,13 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
   const dispatch = useDispatch();
   const history = useHistory();
 
-  const tableRef = tabling.hooks.useAuthenticatedTable<R>();
+  const table = tabling.hooks.useTable<R, M, Model.BudgetGroup>();
 
   return (
     <React.Fragment>
       <ConnectedTable
         tableId={"accounts-table"}
-        tableRef={tableRef}
+        table={table}
         budget={template}
         menuPortalId={"supplementary-header"}
         savingChangesPortalId={"saving-changes"}
@@ -112,7 +112,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
               })
             );
             if (group.color !== groupToEdit.color) {
-              tableRef.current.applyGroupColorChange(group);
+              table.current.applyGroupColorChange(group);
             }
           }}
         />

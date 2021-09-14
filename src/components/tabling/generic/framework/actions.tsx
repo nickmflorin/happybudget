@@ -8,8 +8,13 @@ export const ExportPdfAction = (onExport: () => void): Table.MenuActionObj => ({
   onClick: () => onExport()
 });
 
-export const ExportCSVAction = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  table: Table.UnauthenticatedTableRefObj<R> | Table.AuthenticatedTableRefObj<R>,
+/* eslint-disable indent */
+export const ExportCSVAction = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  table: Table.TableInstance<R, M, G>,
   params: Table.MenuActionParams<R, M>,
   exportFileName: string
 ): Table.MenuActionObj => ({
@@ -39,8 +44,12 @@ export const ExportCSVAction = <R extends Table.RowData, M extends Model.Model =
   }
 });
 
-export const ToggleColumnAction = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  table: Table.UnauthenticatedTableRefObj<R> | Table.AuthenticatedTableRefObj<R>,
+export const ToggleColumnAction = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  table: Table.TableInstance<R, M, G>,
   params: Table.MenuActionParams<R, M>
 ): Table.MenuActionObj => ({
   /* eslint-disable indent */
