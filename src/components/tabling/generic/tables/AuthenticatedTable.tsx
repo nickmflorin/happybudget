@@ -199,7 +199,7 @@ const AuthenticatedTable = <
         },
         !isNil(props.actions) ? props.actions : []
       ),
-    [props.actions]
+    [props.actions, props.tableApis]
   );
 
   useImperativeHandle(props.table, () => ({
