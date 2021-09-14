@@ -8,27 +8,30 @@ import { framework as budgetFramework } from "../BudgetTable";
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
 
-const Columns: Table.Column<R, M>[] = [
+const Columns: Table.Column<R, M, Model.BudgetGroup>[] = [
   budgetFramework.columnObjs.IdentifierColumn<R, M>({
     field: "identifier",
     headerName: "" // Will be populated by Table.
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  framework.columnObjs.BodyColumn<R, M, Model.BudgetGroup>({
     field: "description",
     minWidth: 200,
     flex: 100,
     columnType: "longText",
     index: 1,
     suppressSizeToFit: false,
-    colSpan: (params: Table.ColSpanParams<R, M>) => {
+    colSpan: (params: Table.ColSpanParams<R, M, Model.BudgetGroup>) => {
       const row: Table.Row<R, M> = params.data;
       if (tabling.typeguards.isModelRow(row)) {
-        if (!isNil(row.meta) && !isNil(row.meta.children) && row.meta.children.length !== 0) {
+        if (!isNil(row.children) && row.children.length !== 0) {
           const agColumns: Column[] | undefined = params.columnApi?.getAllDisplayedColumns();
           if (!isNil(agColumns)) {
             const originalCalculatedColumns = map(
-              filter(params.columns, (col: Table.Column<R, M>) => col.tableColumnType === "calculated"),
-              (col: Table.Column<R, M>) => col.field
+              filter(
+                params.columns,
+                (col: Table.Column<R, M, Model.BudgetGroup>) => col.tableColumnType === "calculated"
+              ),
+              (col: Table.Column<R, M, Model.BudgetGroup>) => col.field
             );
             const indexOfDescriptionColumn = findIndex(agColumns, (col: Column) => col.getColId() === "description");
             const indexOfFirstCalculatedColumn = findIndex(agColumns, (col: Column) =>
@@ -41,7 +44,7 @@ const Columns: Table.Column<R, M>[] = [
       return 1;
     }
   }),
-  framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
+  framework.columnObjs.ModelSelectColumn<R, M, Model.Contact, Model.BudgetGroup>({
     field: "contact",
     headerName: "Contact",
     cellRenderer: { data: "ContactCell" },
@@ -54,7 +57,7 @@ const Columns: Table.Column<R, M>[] = [
     modelClipboardValue: (m: Model.Contact) => m.full_name,
     processCellFromClipboard: (name: string): Model.Contact | null => null // Will be populated by Table.
   }),
-  framework.columnObjs.BodyColumn<R, M, number>({
+  framework.columnObjs.BodyColumn<R, M, Model.BudgetGroup, number>({
     field: "quantity",
     headerName: "Qty",
     width: 60,
@@ -62,7 +65,7 @@ const Columns: Table.Column<R, M>[] = [
     columnType: "number",
     // If the plurality of the quantity changes, we need to refresh the refresh
     // the unit column to change the plurality of the tag in the cell.
-    refreshColumns: (change: Table.CellChange<R, M, number>) => {
+    refreshColumns: (change: Table.CellChange<R, number>) => {
       if (isNil(change.newValue) && isNil(change.oldValue)) {
         return [];
       } else if (
@@ -77,7 +80,7 @@ const Columns: Table.Column<R, M>[] = [
       }
     }
   }),
-  framework.columnObjs.TagSelectColumn<R, M>({
+  framework.columnObjs.TagSelectColumn<R, M, Model.BudgetGroup>({
     field: "unit",
     headerName: "Unit",
     cellRenderer: { data: "SubAccountUnitCell" },
@@ -85,14 +88,14 @@ const Columns: Table.Column<R, M>[] = [
     models: [], // Will be populated by Table.
     width: 100
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  framework.columnObjs.BodyColumn<R, M, Model.BudgetGroup>({
     field: "multiplier",
     headerName: "X",
     width: 60,
     valueSetter: tabling.valueSetters.floatValueSetter<R>("multiplier"),
     columnType: "number"
   }),
-  framework.columnObjs.BodyColumn<R, M>({
+  framework.columnObjs.BodyColumn<R, M, Model.BudgetGroup>({
     field: "rate",
     headerName: "Rate",
     tableColumnType: "body",
@@ -101,7 +104,7 @@ const Columns: Table.Column<R, M>[] = [
     valueSetter: tabling.valueSetters.floatValueSetter<R>("rate"),
     columnType: "currency"
   }),
-  framework.columnObjs.SelectColumn<R, M>({
+  framework.columnObjs.SelectColumn<R, M, Model.BudgetGroup>({
     field: "fringes",
     headerName: "Fringes",
     cellRenderer: { data: "FringesCell" },
@@ -109,17 +112,20 @@ const Columns: Table.Column<R, M>[] = [
     nullValue: [],
     processCellForClipboard: (row: R) => "" // Will be populated by Table.
   }),
-  framework.columnObjs.CalculatedColumn<R, M>({
+  framework.columnObjs.CalculatedColumn<R, M, Model.BudgetGroup>({
     field: "estimated",
-    headerName: "Estimated"
+    headerName: "Estimated",
+    groupField: "estimated"
   }),
-  framework.columnObjs.CalculatedColumn<R, M>({
+  framework.columnObjs.CalculatedColumn<R, M, Model.BudgetGroup>({
     field: "actual",
-    headerName: "Actual"
+    headerName: "Actual",
+    groupField: "actual"
   }),
-  framework.columnObjs.CalculatedColumn<R, M>({
+  framework.columnObjs.CalculatedColumn<R, M, Model.BudgetGroup>({
     field: "variance",
-    headerName: "Variance"
+    headerName: "Variance",
+    groupField: "variance"
   })
 ];
 

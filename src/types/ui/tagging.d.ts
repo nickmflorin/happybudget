@@ -44,7 +44,9 @@ type TagProps<M extends Model.Model = Model.Model, S extends object = React.CSSP
   readonly model?: M | null;
   readonly isPlural?: boolean;
   readonly modelTextField?: keyof M;
+  readonly getModelText?: (m: M) => string | null;
   readonly modelColorField?: keyof M;
+  readonly getModelColor?: (m: M) => string | null;
   readonly scheme?: string[];
   readonly uppercase?: boolean;
   readonly colorIndex?: number;

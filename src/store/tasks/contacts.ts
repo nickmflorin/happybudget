@@ -1,6 +1,6 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { put, call, cancelled, fork } from "redux-saga/effects";
+import { put, call, cancelled, fork, select } from "redux-saga/effects";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
@@ -56,7 +56,7 @@ export const createTableTaskSet = (
     }
   }
 
-  function* bulkCreateTask(e: Table.RowAddEvent<R, M>, errorMessage: string): SagaIterator {
+  function* bulkCreateTask(e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
     const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, M>(
       e.payload,
       config.columns
@@ -70,7 +70,7 @@ export const createTableTaskSet = (
       // assumption that the models in the response are in the same order as the placeholder IDs.
       const placeholderIds: Table.PlaceholderRowId[] = map(
         Array.isArray(e.payload) ? e.payload : [e.payload],
-        (rowAdd: Table.RowAdd<R, M>) => rowAdd.id
+        (rowAdd: Table.RowAdd<R>) => rowAdd.id
       );
       yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.data }));
     } catch (err: unknown) {
@@ -124,9 +124,9 @@ export const createTableTaskSet = (
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, M>>): SagaIterator {
+  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
     if (!isNil(action.payload)) {
-      const e: Table.RowAddEvent<R, M> = action.payload;
+      const e: Table.RowAddEvent<R> = action.payload;
       yield fork(bulkCreateTask, e, "There was an error creating the rows.");
     }
   }
@@ -141,11 +141,12 @@ export const createTableTaskSet = (
   // ToDo: This is an EDGE case, but we need to do it for smooth operation - we need to filter out the
   // changes that correspond to placeholder rows.
   function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
+    const data = yield select(config.selectData);
     if (!isNil(action.payload)) {
       const e: Table.DataChangeEvent<R, M> = action.payload;
       const merged = tabling.events.consolidateTableChange(e.payload);
       if (merged.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns, data);
         yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
       }
     }

@@ -41,7 +41,9 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
     selectObjId: (state: Application.Authenticated.Store) => state.template.id,
     selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
     selectData: (state: Application.Authenticated.Store) =>
-      !isNil(state["async-TemplateAccountsTable"]) ? state["async-TemplateAccountsTable"].data : [],
+      !isNil(state["async-TemplateAccountsTable"])
+        ? (state["async-TemplateAccountsTable"].data as Tables.AccountRow[])
+        : ([] as Tables.AccountRow[]),
     actions: ActionMap,
     services: {
       request: api.getTemplateAccounts,

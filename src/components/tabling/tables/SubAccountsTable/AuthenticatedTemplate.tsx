@@ -12,6 +12,7 @@ import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable"
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
+type G = Model.BudgetGroup;
 
 export type AuthenticatedTemplateProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> & {
   readonly subAccountUnits: Model.Tag[];
@@ -20,7 +21,7 @@ export type AuthenticatedTemplateProps = Omit<AuthenticatedBudgetTableProps<R, M
   readonly identifierFieldHeader: "Account" | "Line";
   readonly cookieNames: Table.CookieNames;
   readonly exportFileName: string;
-  readonly onEditGroup: (group: Model.BudgetGroup) => void;
+  readonly onEditGroup: (group: Table.GroupRow<R>) => void;
   readonly onAddFringes: () => void;
   readonly onEditFringes: () => void;
 };
@@ -35,8 +36,8 @@ const AuthenticatedTemplateSubAccountsTable = (
       {...props}
       table={table}
       excludeColumns={["actual", "contact", "variance"]}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(props.columns, {
-        identifier: (col: Table.Column<R, M>) =>
+      columns={tabling.columns.mergeColumns<Table.Column<R, M, G>, R, M, G>(props.columns, {
+        identifier: (col: Table.Column<R, M, G>) =>
           budgetTableFramework.columnObjs.IdentifierColumn<R, M>({
             ...col,
             cellRendererParams: {
@@ -46,10 +47,10 @@ const AuthenticatedTemplateSubAccountsTable = (
             headerName: props.identifierFieldHeader
           }),
         description: { headerName: `${props.categoryName} Description` },
-        unit: (col: Table.Column<R, M>) =>
-          framework.columnObjs.TagSelectColumn<R, M>({ ...col, models: props.subAccountUnits })
+        unit: (col: Table.Column<R, M, G>) =>
+          framework.columnObjs.TagSelectColumn<R, M, G>({ ...col, models: props.subAccountUnits })
       })}
-      actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
+      actions={(params: Table.AuthenticatedMenuActionParams<R, M, G>) => [
         {
           icon: "folder",
           disabled: true,
@@ -63,8 +64,8 @@ const AuthenticatedTemplateSubAccountsTable = (
           isWriteOnly: true
         },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M, Model.BudgetGroup>(table.current, params),
-        framework.actions.ExportCSVAction<R, M, Model.BudgetGroup>(table.current, params, props.exportFileName)
+        framework.actions.ToggleColumnAction<R, M, G>(table.current, params),
+        framework.actions.ExportCSVAction<R, M, G>(table.current, params, props.exportFileName)
       ]}
     />
   );

@@ -9,7 +9,7 @@ export const orderModelsWithRowsByFieldOrdering = <R extends Table.RowData, M ex
   return orderBy(
     array,
     (row: Table.ModelWithRow<R, M>) =>
-      map(fieldOrdering, (fieldOrder: FieldOrder<keyof R>) => row.row[fieldOrder.field]),
+      map(fieldOrdering, (fieldOrder: FieldOrder<keyof R>) => row.row.data[fieldOrder.field]),
     map(fieldOrdering, (fieldOrder: FieldOrder<keyof R>) => (fieldOrder.order === 1 ? "asc" : "desc"))
   );
 };
@@ -41,10 +41,11 @@ export const createTableData = <R extends Table.RowData, M extends Model.Model, 
       ) as M[],
       (m: M) => ({
         model: m,
-        row: rows.createModelRow<R, M>({
+        row: rows.createModelRow<R, M, G>({
           columns: config.columns,
           model: m,
           gridId: "data",
+          group: null,
           getRowChildren: config.getModelRowChildren,
           getRowLabel: config.getModelRowLabel,
           getRowName: config.getModelRowName
@@ -69,9 +70,10 @@ export const createTableData = <R extends Table.RowData, M extends Model.Model, 
             rows: orderModelsWithRows(
               map(ms, (m: { model: M; group: G }) => ({
                 model: m.model,
-                row: rows.createModelRow<R, M>({
+                row: rows.createModelRow<R, M, G>({
                   ...m,
                   columns: config.columns,
+                  group: ms[0].group.id,
                   gridId: "data",
                   getRowChildren: config.getModelRowChildren,
                   getRowLabel: config.getModelRowLabel,

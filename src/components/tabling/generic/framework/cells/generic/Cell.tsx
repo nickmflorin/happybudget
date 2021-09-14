@@ -10,9 +10,10 @@ import LoadableCellWrapper from "./LoadableCellWrapper";
 const Cell = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  props: Table.CellWithChildrenProps<R, M, S>
+  props: Table.CellWithChildrenProps<R, M, G, S>
 ): JSX.Element => {
   const row: Table.Row<R, M> = props.node.data;
 

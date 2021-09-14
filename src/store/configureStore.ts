@@ -40,12 +40,14 @@ const configureGenericStore = <S extends Application.Store>(
 
   const reducerManager = createReducerManager<S>(staticReducers, initialState);
 
+  const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
   const store: Redux.Store<S> = {
     reducerManager,
     ...createStore<S, Redux.Action, any, any>(
       reducerManager.reduce,
       initialState,
-      compose(applyMiddleware(...baseMiddleware, routerMiddleware(history)), sentryReduxEnhancer)
+      composeEnhancers(applyMiddleware(...baseMiddleware, routerMiddleware(history)), sentryReduxEnhancer)
     )
   };
 

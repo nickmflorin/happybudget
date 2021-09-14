@@ -6,13 +6,14 @@ import Columns from "./Columns";
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
+type G = Model.BudgetGroup;
 
 type SubAccountsTableProps = {
   readonly cookieNames?: Omit<Table.CookieNames, "hiddenColumns">;
 };
 
 export type WithSubAccountsTableProps<T> = T & {
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.Column<R, M, G>[];
 };
 
 function SubAccountsTable<T extends SubAccountsTableProps>(

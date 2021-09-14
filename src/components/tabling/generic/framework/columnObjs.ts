@@ -7,18 +7,23 @@ import { tabling, util, model } from "lib";
 export const Column = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group,
   V extends Table.RowValue<R> = Table.RowValue<R>
 >(
-  col: Partial<Table.Column<R, M, V>>
-): Table.Column<R, M, V> =>
+  col: Partial<Table.Column<R, M, G, V>>
+): Table.Column<R, M, G, V> =>
   ({
     ...col,
     domain: "aggrid"
-  } as Table.Column<R, M, V>);
+  } as Table.Column<R, M, G, V>);
 
-export const ActionColumn = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  col: Partial<Table.Column<R, M>>
-): Partial<Table.Column<R, M>> =>
+export const ActionColumn = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  col: Partial<Table.Column<R, M, G>>
+): Partial<Table.Column<R, M, G>> =>
   Column({
     ...col,
     selectable: false,
@@ -38,13 +43,13 @@ export const ActionColumn = <R extends Table.RowData, M extends Model.Model = Mo
 export const CalculatedColumn = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group,
   V extends Table.RowValue<R> = Table.RowValue<R>
 >(
-  col: Partial<Table.Column<R, M, V>>,
+  col: Partial<Table.Column<R, M, G, V>>,
   width?: number
-): Table.Column<R, M, V> => {
-  return Column<R, M, V>({
-    applicableForGroup: true,
+): Table.Column<R, M, G, V> => {
+  return Column<R, M, G, V>({
     ...col,
     cellStyle: { textAlign: "right", ...col.cellStyle },
     cellRenderer: "CalculatedCell",
@@ -67,11 +72,12 @@ export const CalculatedColumn = <
 export const BodyColumn = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group,
   V extends Table.RowValue<R> = Table.RowValue<R>
 >(
-  col: Partial<Table.Column<R, M, V>>
-): Table.Column<R, M, V> => {
-  return Column<R, M, V>({
+  col: Partial<Table.Column<R, M, G, V>>
+): Table.Column<R, M, G, V> => {
+  return Column<R, M, G, V>({
     // Not using our own cell renderer here boosts performance.
     // cellRenderer: "BodyCell",
     suppressSizeToFit: true,
@@ -80,10 +86,14 @@ export const BodyColumn = <
   });
 };
 
-export const ExpandColumn = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  col: Partial<Table.Column<R, M>>,
+export const ExpandColumn = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  col: Partial<Table.Column<R, M, G>>,
   width?: number
-): Table.Column<R, M> =>
+): Table.Column<R, M, G> =>
   ActionColumn({
     /* eslint-disable indent */
     cellRenderer: "ExpandCell",
@@ -91,13 +101,17 @@ export const ExpandColumn = <R extends Table.RowData, M extends Model.Model = Mo
     width: !isNil(width) ? width : 30,
     maxWidth: !isNil(width) ? width : 30,
     field: "expand" as keyof R & string
-  }) as Table.Column<R, M>;
+  }) as Table.Column<R, M, G>;
 
-export const IndexColumn = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  col: Partial<Table.Column<R, M>>,
+export const IndexColumn = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  col: Partial<Table.Column<R, M, G>>,
   hasExpandColumn: boolean,
   width?: number
-): Table.Column<R, M> =>
+): Table.Column<R, M, G> =>
   ActionColumn({
     /* eslint-disable indent */
     cellRenderer: "EmptyCell",
@@ -105,13 +119,14 @@ export const IndexColumn = <R extends Table.RowData, M extends Model.Model = Mod
     field: "index" as keyof R,
     width: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25,
     maxWidth: !isNil(width) ? width : hasExpandColumn === false ? 40 : 25
-  }) as Table.Column<R, M>;
+  }) as Table.Column<R, M, G>;
 
 export interface SelectColumnProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group,
   V extends Table.RowValue<R> = Table.RowValue<R>
-> extends Omit<Table.Column<R, M, V>, "columnType" | "tableColumnType" | "domain"> {
+> extends Omit<Table.Column<R, M, G, V>, "columnType" | "tableColumnType" | "domain"> {
   readonly columnType?: Table.ColumnTypeId;
 }
 
@@ -120,11 +135,12 @@ export interface SelectColumnProps<
 export const SelectColumn = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group,
   V extends Table.RowValue<R> = Table.RowValue<R>
 >(
-  props: SelectColumnProps<R, M, V>
-): Table.Column<R, M, V> => {
-  return BodyColumn<R, M, V>({
+  props: SelectColumnProps<R, M, G, V>
+): Table.Column<R, M, G, V> => {
+  return BodyColumn<R, M, G, V>({
     columnType: "singleSelect",
     suppressSizeToFit: true,
     ...props,
@@ -144,8 +160,9 @@ export const SelectColumn = <
 export interface UnauthenticatedModelSelectColumnProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  C extends Model.Model = Model.Model
-> extends SetOptional<SelectColumnProps<R, M>, "processCellForClipboard"> {
+  C extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> extends SetOptional<SelectColumnProps<R, M, G>, "processCellForClipboard"> {
   readonly models: C[];
   readonly modelClipboardValue: (m: C) => string;
 }
@@ -153,12 +170,13 @@ export interface UnauthenticatedModelSelectColumnProps<
 export const UnauthenticatedModelSelectColumn = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  C extends Model.Model = Model.Model
+  C extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
 >(
-  props: UnauthenticatedModelSelectColumnProps<R, M, C>
-): Table.Column<R, M> => {
+  props: UnauthenticatedModelSelectColumnProps<R, M, C, G>
+): Table.Column<R, M, G> => {
   const { models, modelClipboardValue, ...column } = props;
-  return SelectColumn<R, M>({
+  return SelectColumn<R, M, G>({
     processCellForClipboard:
       column.processCellForClipboard ??
       ((row: R) => {
@@ -176,30 +194,39 @@ export const UnauthenticatedModelSelectColumn = <
 export interface ModelSelectColumnProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  C extends Model.Model = Model.Model
-> extends UnauthenticatedModelSelectColumnProps<R, M, C> {
+  C extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> extends UnauthenticatedModelSelectColumnProps<R, M, C, G> {
   readonly processCellFromClipboard: (value: string) => C | null;
 }
 
 export const ModelSelectColumn = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  C extends Model.Model = Model.Model
+  C extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
 >(
-  props: ModelSelectColumnProps<R, M, C>
-): Table.Column<R, M> => {
+  props: ModelSelectColumnProps<R, M, C, G>
+): Table.Column<R, M, G> => {
   return UnauthenticatedModelSelectColumn(props);
 };
 
-export interface TagSelectColumnProps<R extends Table.RowData, M extends Model.Model = Model.Model>
-  extends SetOptional<SelectColumnProps<R, M>, "processCellForClipboard"> {
+export interface TagSelectColumnProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> extends SetOptional<SelectColumnProps<R, M, G>, "processCellForClipboard"> {
   readonly models: Model.Tag[];
   readonly processCellFromClipboard?: (value: string) => Model.Tag | null;
 }
 
-export const TagSelectColumn = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  props: TagSelectColumnProps<R, M>
-): Table.Column<R, M> => {
+export const TagSelectColumn = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  props: TagSelectColumnProps<R, M, G>
+): Table.Column<R, M, G> => {
   const { models, ...column } = props;
   return SelectColumn({
     processCellForClipboard: (row: R) => {
@@ -220,8 +247,9 @@ export const TagSelectColumn = <R extends Table.RowData, M extends Model.Model =
 export interface ChoiceSelectColumnProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  C extends Model.Choice<any, any> = Model.Choice<any, any>
-> extends SetOptional<SelectColumnProps<R, M>, "processCellForClipboard"> {
+  C extends Model.Choice<any, any> = Model.Choice<any, any>,
+  G extends Model.Group = Model.Group
+> extends SetOptional<SelectColumnProps<R, M, G>, "processCellForClipboard"> {
   readonly models: C[];
   readonly processCellFromClipboard?: (value: string) => C | null;
 }
@@ -229,10 +257,11 @@ export interface ChoiceSelectColumnProps<
 export const ChoiceSelectColumn = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  C extends Model.Choice<any, any> = Model.Choice<any, any>
+  C extends Model.Choice<any, any> = Model.Choice<any, any>,
+  G extends Model.Group = Model.Group
 >(
-  props: ChoiceSelectColumnProps<R, M, C>
-): Table.Column<R, M> => {
+  props: ChoiceSelectColumnProps<R, M, C, G>
+): Table.Column<R, M, G> => {
   const { models, ...column } = props;
   return SelectColumn({
     getHttpValue: (value: C | null): ID | null => (!isNil(value) ? value.id : null),

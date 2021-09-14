@@ -10,7 +10,7 @@ import Columns from "./Columns";
 type R = Tables.ActualRowData;
 type M = Model.Actual;
 
-type PreContactCreate = Omit<Table.SoloCellChange<R, M>, "newValue">;
+type PreContactCreate = Omit<Table.SoloCellChange<R>, "newValue">;
 
 export type Props = Omit<AuthenticatedModelTableProps<R, M>, "columns"> & {
   readonly exportFileName: string;
@@ -52,7 +52,10 @@ const ActualsTable = ({
                 return null;
               }
               const availableSubAccounts: Model.SimpleSubAccount[] = filter(
-                map(props.data, (row: Table.Row<R, M>) => row.subaccount),
+                map(
+                  filter(props.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)),
+                  (row: Table.Row<R, M>) => row.data.subaccount
+                ),
                 (sub: Model.SimpleSubAccount | null) => sub !== null && sub.identifier !== null
               ) as Model.SimpleSubAccount[];
               // NOTE: If there are multiple sub accounts with the same identifier, this will

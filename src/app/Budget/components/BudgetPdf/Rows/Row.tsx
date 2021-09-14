@@ -2,8 +2,10 @@ import classNames from "classnames";
 import { map, isNil } from "lodash";
 import { View } from "components/pdf";
 
+type G = Model.BudgetGroup;
+
 export type RowProps<R extends Table.RowData, M extends Model.Model = Model.Model> = StandardPdfComponentProps & {
-  readonly columns: PdfTable.Column<R, M>[];
+  readonly columns: PdfTable.Column<R, M, G>[];
   readonly row: Table.Row<R, M>;
   readonly index: number;
   readonly columnIndent?: number;
@@ -12,7 +14,7 @@ export type RowProps<R extends Table.RowData, M extends Model.Model = Model.Mode
 const Row = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   props: RowProps<R, M> & {
     readonly renderCell: (params: {
-      column: PdfTable.Column<R, M>;
+      column: PdfTable.Column<R, M, G>;
       indented: boolean;
       location: PdfTable.CellLocation;
     }) => JSX.Element;
@@ -20,7 +22,7 @@ const Row = <R extends Table.RowData, M extends Model.Model = Model.Model>(
 ): JSX.Element => {
   return (
     <View style={props.style} className={classNames("tr", props.className)} wrap={false}>
-      {map(props.columns, (column: PdfTable.Column<R, M>, colIndex: number) => {
+      {map(props.columns, (column: PdfTable.Column<R, M, G>, colIndex: number) => {
         return props.renderCell({
           column,
           indented: !isNil(props.columnIndent) ? colIndex < props.columnIndent : false,

@@ -5,6 +5,7 @@ const FringeUnitCell = (
   props: framework.cells.ModelTagCellProps<
     Tables.FringeRowData,
     Model.Fringe,
+    Model.Group,
     Tables.FringeTableStore,
     Model.FringeUnit
   >

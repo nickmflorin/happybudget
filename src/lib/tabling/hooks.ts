@@ -9,15 +9,24 @@ import * as util from "../util";
 import TableApis from "./apis";
 import * as cookies from "./cookies";
 
-type UseOrderingParams<R extends Table.RowData, M extends Model.Model = Model.Model> = {
+type UseOrderingParams<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> = {
   readonly cookie?: string;
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.Column<R, M, G>[];
 };
 
 type UseOrderingReturnType<R extends Table.RowData> = [FieldOrder<keyof R>[], (order: Order, field: keyof R) => void];
 
-export const useOrdering = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  params: UseOrderingParams<R, M>
+/* eslint-disable indent */
+export const useOrdering = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  params: UseOrderingParams<R, M, G>
 ): UseOrderingReturnType<R> => {
   const cookiesObj = new Cookies();
   // TODO: When the columns change, we also need to update the ordering
@@ -37,7 +46,7 @@ export const useOrdering = <R extends Table.RowData, M extends Model.Model = Mod
       const cookiesOrdering = cookiesObj.get(params.cookie);
       const validatedOrdering = cookies.validateOrdering(
         cookiesOrdering,
-        filter(params.columns, (col: Table.Column<R, M>) => col.tableColumnType !== "calculated")
+        filter(params.columns, (col: Table.Column<R, M, G>) => col.tableColumnType !== "calculated")
       );
       if (!isNil(validatedOrdering)) {
         setOrdering(validatedOrdering);
@@ -48,9 +57,13 @@ export const useOrdering = <R extends Table.RowData, M extends Model.Model = Mod
   return [ordering, updateOrdering];
 };
 
-type UseHiddenColumnsParams<R extends Table.RowData, M extends Model.Model = Model.Model> = {
+type UseHiddenColumnsParams<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> = {
   readonly cookie?: string;
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.Column<R, M, G>[];
   readonly apis: TableApis;
 };
 
@@ -59,8 +72,12 @@ type UseHiddenColumnsReturnType<R extends Table.RowData> = [
   (changes: SingleOrArray<Table.ColumnVisibilityChange<R>>, sizeToFit?: boolean) => void
 ];
 
-export const useHiddenColumns = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  params: UseHiddenColumnsParams<R, M>
+export const useHiddenColumns = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  params: UseHiddenColumnsParams<R, M, G>
 ): UseHiddenColumnsReturnType<R> => {
   const [hiddenColumns, _setHiddenColumns] = useState<(keyof R)[]>([]);
 
@@ -70,8 +87,8 @@ export const useHiddenColumns = <R extends Table.RowData, M extends Model.Model 
       const hiddenColumnsInCookies: (keyof R)[] | null = cookies.getHiddenColumns(
         params.cookie,
         map(
-          filter(params.columns, (c: Table.Column<R, M>) => c.canBeHidden !== false),
-          (c: Table.Column<R, M>) => c.field
+          filter(params.columns, (c: Table.Column<R, M, G>) => c.canBeHidden !== false),
+          (c: Table.Column<R, M, G>) => c.field
         )
       );
       if (!isNil(hiddenColumnsInCookies)) {
@@ -84,8 +101,8 @@ export const useHiddenColumns = <R extends Table.RowData, M extends Model.Model 
       // cookies are corrupted, we want to set the hidden columns based on the defaultHidden property.
       _setHiddenColumns(
         map(
-          filter(params.columns, (c: Table.Column<R, M>) => c.canBeHidden !== false && c.defaultHidden === true),
-          (c: Table.Column<R, M>) => c.field
+          filter(params.columns, (c: Table.Column<R, M, G>) => c.canBeHidden !== false && c.defaultHidden === true),
+          (c: Table.Column<R, M, G>) => c.field
         )
       );
     }

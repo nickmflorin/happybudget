@@ -84,7 +84,7 @@ interface SubAccountsTableProps {
 
 const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps): JSX.Element => {
   const [groupSubAccounts, setGroupSubAccounts] = useState<ID[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<Model.BudgetGroup | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
 
   const dispatch = useDispatch();
@@ -115,7 +115,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
         onGroupRows={(rows: Table.DataRow<R, M>[]) =>
           setGroupSubAccounts(map(rows, (row: Table.DataRow<R, M>) => row.id))
         }
-        onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
+        onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
       />
       {!isNil(groupSubAccounts) && (
         <CreateSubAccountGroupModal
@@ -136,7 +136,7 @@ const SubAccountsTable = ({ budget, budgetId, accountId }: SubAccountsTableProps
       )}
       {!isNil(groupToEdit) && (
         <EditGroupModal
-          group={groupToEdit}
+          groupId={groupToEdit.group}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.BudgetGroup) => {

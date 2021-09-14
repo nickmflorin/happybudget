@@ -5,12 +5,13 @@ import Cell from "./Cell";
 const ValueCell = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >({
   value,
   ...props
-}: Table.ValueCellProps<R, M, S>): JSX.Element => {
-  return <Cell<R, M, S> {...props}>{value}</Cell>;
+}: Table.ValueCellProps<R, M, G, S>): JSX.Element => {
+  return <Cell<R, M, G, S> {...props}>{value}</Cell>;
 };
 
 export default React.memo(ValueCell) as typeof ValueCell;

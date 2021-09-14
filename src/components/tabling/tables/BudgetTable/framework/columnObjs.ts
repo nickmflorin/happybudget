@@ -3,11 +3,12 @@ import { tabling } from "lib";
 import { framework } from "components/tabling/generic";
 
 export const IdentifierColumn = <R extends Table.RowData, M extends Model.Model>(
-  props: Partial<Table.Column<R, M>>
-): Table.Column<R, M> => {
-  return framework.columnObjs.BodyColumn<R, M>({
+  props: Partial<Table.Column<R, M, Model.BudgetGroup>>
+): Table.Column<R, M, Model.BudgetGroup> => {
+  return framework.columnObjs.BodyColumn<R, M, Model.BudgetGroup>({
     columnType: "number",
     ...props,
+    groupField: "name",
     footer: {
       // We always want the text in the identifier cell to be present, but the column
       // itself isn't always wide enough.  However, applying a colSpan conflicts with the
@@ -25,7 +26,7 @@ export const IdentifierColumn = <R extends Table.RowData, M extends Model.Model>
     width: 100,
     suppressSizeToFit: true,
     cellStyle: { textAlign: "left" },
-    colSpan: (params: Table.ColSpanParams<R, M>) => {
+    colSpan: (params: Table.ColSpanParams<R, M, Model.BudgetGroup>) => {
       const row: Table.Row<R, M> = params.data;
       if (tabling.typeguards.isGroupRow(row)) {
         /*
@@ -36,8 +37,8 @@ export const IdentifierColumn = <R extends Table.RowData, M extends Model.Model>
         const agColumns: Table.AgColumn[] | undefined = params.columnApi?.getAllDisplayedColumns();
         if (!isNil(agColumns)) {
           const originalCalculatedColumns = map(
-            filter(params.columns, (c: Table.Column<R, M>) => c.tableColumnType === "calculated"),
-            (c: Table.Column<R, M>) => c.field
+            filter(params.columns, (c: Table.Column<R, M, Model.BudgetGroup>) => c.tableColumnType === "calculated"),
+            (c: Table.Column<R, M, Model.BudgetGroup>) => c.field
           );
           const indexOfIdentifierColumn = findIndex(agColumns, (c: Table.AgColumn) => c.getColId() === "identifier");
           const indexOfFirstCalculatedColumn = findIndex(agColumns, (c: Table.AgColumn) =>

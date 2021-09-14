@@ -4,18 +4,20 @@ import { Cell } from "./generic";
 export type ColorCellProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> = Table.CellProps<R, M, S, string | null>;
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> = Table.CellProps<R, M, G, S, string | null>;
 
 /* eslint-disable indent */
 const ColorCell = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >({
   value,
   ...props
-}: ColorCellProps<R, M, S>): JSX.Element => {
+}: ColorCellProps<R, M, G, S>): JSX.Element => {
   return (
     <Cell {...props}>
       <Color color={value} />

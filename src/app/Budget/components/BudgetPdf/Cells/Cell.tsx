@@ -7,16 +7,18 @@ import { ShowHide } from "components";
 import { View, Text } from "components/pdf";
 import { tabling } from "lib";
 
+type G = Model.BudgetGroup;
+
 const isCallback = <R extends Table.RowData, M extends Model.Model = Model.Model, T = any>(
-  prop: PdfTable.OptionalCellCallback<R, M, T>
-): prop is PdfTable.CellCallback<R, M, T> => {
+  prop: PdfTable.OptionalCellCallback<R, M, any, T>
+): prop is PdfTable.CellCallback<R, M, any, T> => {
   return typeof prop === "function";
 };
 
 const evaluateOptionalCallbackProp = <R extends Table.RowData, M extends Model.Model = Model.Model, T = any>(
   /* eslint-disable indent */
-  prop: PdfTable.OptionalCellCallback<R, M, T> | undefined,
-  params: PdfTable.CellCallbackParams<R, M>
+  prop: PdfTable.OptionalCellCallback<R, M, any, T> | undefined,
+  params: PdfTable.CellCallbackParams<R, M, G>
 ) => {
   if (isCallback(prop)) {
     return prop(params);
@@ -25,13 +27,13 @@ const evaluateOptionalCallbackProp = <R extends Table.RowData, M extends Model.M
 };
 
 const evaluateClassName = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  className: PdfTable.CellClassName<R, M>,
-  params: PdfTable.CellCallbackParams<R, M>
+  className: PdfTable.CellClassName<R, M, G>,
+  params: PdfTable.CellCallbackParams<R, M, G>
 ): (string | undefined)[] => {
   if (Array.isArray(className)) {
-    const parts: (string | PdfTable.CellCallback<R, M> | PdfTable.CellClassName<R, M> | undefined)[] = className;
+    const parts: (string | PdfTable.CellCallback<R, M, G> | PdfTable.CellClassName<R, M, G> | undefined)[] = className;
     return flatten(
-      map(parts, (csName: string | PdfTable.CellCallback<R, M> | PdfTable.CellClassName<R, M> | undefined) =>
+      map(parts, (csName: string | PdfTable.CellCallback<R, M, G> | PdfTable.CellClassName<R, M, G> | undefined) =>
         evaluateClassName(csName, params)
       )
     );
@@ -41,13 +43,13 @@ const evaluateClassName = <R extends Table.RowData, M extends Model.Model = Mode
 };
 
 const evaluateCellStyle = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  styleObj: PdfTable.CellStyle<R, M>,
-  params: PdfTable.CellCallbackParams<R, M>
+  styleObj: PdfTable.CellStyle<R, M, G>,
+  params: PdfTable.CellCallbackParams<R, M, G>
 ): Style | undefined => {
   if (Array.isArray(styleObj)) {
     return reduce(
       styleObj,
-      (obj: Style, newObj: PdfTable.CellStyle<R, M>) => ({
+      (obj: Style, newObj: PdfTable.CellStyle<R, M, G>) => ({
         ...obj,
         ...evaluateCellStyle(newObj, params)
       }),
@@ -59,24 +61,24 @@ const evaluateCellStyle = <R extends Table.RowData, M extends Model.Model = Mode
 };
 
 export interface CellProps<R extends Table.RowData, M extends Model.Model = Model.Model> {
-  readonly column: PdfTable.Column<R, M>;
+  readonly column: PdfTable.Column<R, M, G>;
   readonly row: Table.Row<R, M>;
   readonly location: PdfTable.CellLocation;
-  readonly style?: PdfTable.CellStyle<R, M>;
-  readonly className?: PdfTable.CellClassName<R, M>;
-  readonly textStyle?: PdfTable.CellStyle<R, M>;
-  readonly textClassName?: PdfTable.CellClassName<R, M>;
+  readonly style?: PdfTable.CellStyle<R, M, G>;
+  readonly className?: PdfTable.CellClassName<R, M, G>;
+  readonly textStyle?: PdfTable.CellStyle<R, M, G>;
+  readonly textClassName?: PdfTable.CellClassName<R, M, G>;
   readonly formatting?: boolean;
   readonly isHeader?: boolean;
   readonly debug?: boolean;
   readonly indented?: boolean;
   readonly border?: boolean;
-  readonly cellContentsVisible?: PdfTable.OptionalCellCallback<R, M, boolean>;
-  readonly valueCallback?: (params: Omit<PdfTable.CellCallbackParams<R, M>, "value" | "rawValue">) => any;
+  readonly cellContentsVisible?: PdfTable.OptionalCellCallback<R, M, G, boolean>;
+  readonly valueCallback?: (params: Omit<PdfTable.CellCallbackParams<R, M, G>, "value" | "rawValue">) => any;
 }
 
 const Cell = <R extends Table.RowData, M extends Model.Model = Model.Model>(props: CellProps<R, M>): JSX.Element => {
-  const callbackParams = useMemo<Omit<PdfTable.CellCallbackParams<R, M>, "value" | "rawValue">>(() => {
+  const callbackParams = useMemo<Omit<PdfTable.CellCallbackParams<R, M, G>, "value" | "rawValue">>(() => {
     return {
       location: props.location,
       row: props.row,
@@ -87,7 +89,9 @@ const Cell = <R extends Table.RowData, M extends Model.Model = Model.Model>(prop
   }, [props.location, props.row, props.column, props.isHeader]);
 
   const rawValue = useMemo(() => {
-    return !isNil(props.valueCallback) ? props.valueCallback(callbackParams) : props.row[props.column.field as keyof R];
+    return !isNil(props.valueCallback)
+      ? props.valueCallback(callbackParams)
+      : props.row[props.column.field as keyof Table.Row<R, M>];
   }, [callbackParams, props.row, props.column]);
 
   const value = useMemo(() => {
@@ -99,7 +103,7 @@ const Cell = <R extends Table.RowData, M extends Model.Model = Model.Model>(prop
     return "";
   }, [rawValue, props.column, props.formatting]);
 
-  const fullCallbackParams = useMemo<PdfTable.CellCallbackParams<R, M>>(() => {
+  const fullCallbackParams = useMemo<PdfTable.CellCallbackParams<R, M, G>>(() => {
     return { ...callbackParams, rawValue, value };
   }, [rawValue, value, callbackParams]);
 

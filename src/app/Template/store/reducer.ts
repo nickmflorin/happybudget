@@ -54,7 +54,7 @@ const genericReducer = combineReducers({
         getPlaceholderRowName: "Sub Account",
         columns: filter(
           SubAccountsTable.Columns,
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
             !includes(["contact", "actual", "variance"], c.field)
         ),
         fringesTableChangedAction: actions.handleFringesTableChangeEventAction,
@@ -102,7 +102,7 @@ const genericReducer = combineReducers({
         },
         columns: filter(
           SubAccountsTable.Columns,
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
             !includes(["contact", "actual", "variance"], c.field)
         ),
         getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,

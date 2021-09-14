@@ -55,13 +55,19 @@ export const createAccountDetailReducer = <S extends MinimalAccountStore>(
             data: {
               ...newState.detail.data,
               estimated: reduce(
-                filter(newState.table.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)),
-                (curr: number, row: Table.DataRow<R, M>) => curr + (row.estimated || 0),
+                filter(newState.table.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<
+                  R,
+                  M
+                >[],
+                (curr: number, row: Table.DataRow<R, M>) => curr + (row.data.estimated || 0),
                 0
               ),
               actual: reduce(
-                filter(newState.table.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)),
-                (curr: number, row: Table.DataRow<R, M>) => curr + (row.actual || 0),
+                filter(newState.table.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<
+                  R,
+                  M
+                >[],
+                (curr: number, row: Table.DataRow<R, M>) => curr + (row.data.actual || 0),
                 0
               )
             }

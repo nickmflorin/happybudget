@@ -2,18 +2,17 @@ import { groupBy, isNil, reduce } from "lodash";
 
 import * as util from "../util";
 
-export const collapseSoloCellChange = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  cellChange: Table.SoloCellChange<R, M>
-): Table.CellChange<R, M> => {
+export const collapseSoloCellChange = <R extends Table.RowData>(
+  cellChange: Table.SoloCellChange<R>
+): Table.CellChange<R> => {
   return {
     oldValue: cellChange.oldValue,
-    newValue: cellChange.newValue,
-    row: cellChange.row
+    newValue: cellChange.newValue
   };
 };
 
 export const cellChangeToRowChange = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  cellChange: Table.SoloCellChange<R, M>
+  cellChange: Table.SoloCellChange<R>
 ): Table.RowChange<R, M> => {
   let rowChange: Table.RowChange<R, M> = {
     id: cellChange.id,
@@ -33,10 +32,10 @@ export const cellChangeToRowChange = <R extends Table.RowData, M extends Model.M
 
 export const addCellChangeToRowChange = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   rowChange: Table.RowChange<R, M>,
-  cellChange: Table.SoloCellChange<R, M>
+  cellChange: Table.SoloCellChange<R>
 ): Table.RowChange<R, M> => {
   const fieldChange = util.getKeyValue<Table.RowChangeData<R, M>, keyof R>(cellChange.field)(rowChange.data) as
-    | Omit<Table.SoloCellChange<R, M>, "field" | "id">
+    | Omit<Table.SoloCellChange<R>, "field" | "id">
     | undefined;
   if (isNil(fieldChange)) {
     return {
@@ -61,21 +60,21 @@ export const addCellChangeToRowChange = <R extends Table.RowData, M extends Mode
 };
 
 export const cellChangesToRowChanges = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  cellChanges: Table.SoloCellChange<R, M>[]
+  cellChanges: Table.SoloCellChange<R>[]
 ): Table.RowChange<R, M>[] => {
   /* eslint-disable no-unused-vars */
-  const grouped: { [key in Table.RowID]: Table.SoloCellChange<R, M>[] } = groupBy(
+  const grouped: { [key in Table.RowID]: Table.SoloCellChange<R>[] } = groupBy(
     cellChanges,
-    (ch: Table.SoloCellChange<R, M>) => ch.id
+    (ch: Table.SoloCellChange<R>) => ch.id
   );
   return reduce(
     grouped,
-    (curr: Table.RowChange<R, M>[], group: Table.SoloCellChange<R, M>[], id: ID) => {
+    (curr: Table.RowChange<R, M>[], group: Table.SoloCellChange<R>[], id: ID) => {
       return [
         ...curr,
         reduce(
           group,
-          (cr: Table.RowChange<R, M>, ch: Table.SoloCellChange<R, M>) => {
+          (cr: Table.RowChange<R, M>, ch: Table.SoloCellChange<R>) => {
             return addCellChangeToRowChange(cr, ch);
           },
           { id, data: {} }
@@ -96,7 +95,7 @@ export const consolidateTableChange = <R extends Table.RowData, M extends Model.
     let rowChange = { ...initial };
     let key: keyof R;
     for (key in ch.data) {
-      const cellChange: Table.CellChange<R, M> | undefined = util.getKeyValue<Table.RowChangeData<R, M>, keyof R>(key)(
+      const cellChange: Table.CellChange<R> | undefined = util.getKeyValue<Table.RowChangeData<R, M>, keyof R>(key)(
         ch.data
       );
       if (!isNil(cellChange)) {
@@ -121,12 +120,10 @@ export const consolidateTableChange = <R extends Table.RowData, M extends Model.
 };
 
 /* eslint-disable indent */
-export const rowAddToRowData = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  add: Table.RowAdd<R, M>
-): R =>
+export const rowAddToRowData = <R extends Table.RowData>(add: Table.RowAdd<R>): R =>
   reduce(
     add.data,
-    (curr: R, cellAdd: Table.CellAdd<R, M> | undefined, field: string) => {
+    (curr: R, cellAdd: Table.CellAdd<R> | undefined, field: string) => {
       return !isNil(cellAdd) ? { ...curr, [field as keyof R]: cellAdd.value } : curr;
     },
     {} as R

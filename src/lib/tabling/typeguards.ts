@@ -25,11 +25,11 @@ export const isAuthenticatedActionMap = <
   (a as Redux.ActionMapObject<Redux.AuthenticatedTableActionMap<R, M, G>>).tableChanged !== undefined;
 
 export const isRow = <M extends Model.Model>(obj: Table.Row<M> | M): obj is Table.Row<M> =>
-  (obj as Table.Row<M>).meta !== undefined;
+  (obj as Table.Row<M>).data !== undefined;
 
-export const isAgColumn = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  col: Table.Column<R, M> | PdfTable.Column<R, M>
-): col is Table.Column<R, M> => (col as Table.Column<R, M>).domain === "aggrid";
+export const isAgColumn = <R extends Table.RowData>(
+  col: Table.Column<R, any, any> | PdfTable.Column<R, any, any>
+): col is Table.Column<R, any, any> => (col as Table.Column<R, any, any>).domain === "aggrid";
 
 export const isKeyboardEvent = (e: Table.CellDoneEditingEvent): e is KeyboardEvent => {
   return (e as KeyboardEvent).type === "keydown" && (e as KeyboardEvent).code !== undefined;
@@ -47,8 +47,8 @@ export const isDataChangeEvent = <R extends Table.RowData, M extends Model.Model
 
 export const isRowAddEvent = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   e: Table.ChangeEvent<R, M>
-): e is Table.RowAddEvent<R, M> => {
-  return (e as Table.RowAddEvent<R, M>).type === "rowAdd";
+): e is Table.RowAddEvent<R> => {
+  return (e as Table.RowAddEvent<R>).type === "rowAdd";
 };
 
 export const isRowDeleteEvent = <R extends Table.RowData, M extends Model.Model = Model.Model>(

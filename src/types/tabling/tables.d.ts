@@ -92,5 +92,5 @@ namespace Tables {
   };
 
   type ContactRow = Table.Row<ContactRowData, Model.Contact>;
-  type ContactTableStore = Redux.TableStore<ContactRow, Model.Contact, Model.Group>;
+  type ContactTableStore = Redux.TableStore<ContactRowData, Model.Contact, Model.Group>;
 }

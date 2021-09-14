@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { isNil, find } from "lodash";
+import { isNil, find, filter } from "lodash";
+import { createSelector } from "reselect";
 
 import { hooks, tabling } from "lib";
 
@@ -12,8 +13,8 @@ interface GroupCellProps<
   M extends Model.Model = Model.Model,
   G extends Model.Group = Model.Group,
   S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
-> extends Table.ValueCellProps<R, M, S> {
-  readonly onEdit?: (group: G) => void;
+> extends Table.ValueCellProps<R, M, G, S> {
+  readonly onEdit?: (group: Table.GroupRow<R>) => void;
 }
 
 /* eslint-disable indent */
@@ -27,26 +28,33 @@ const GroupCell = <
   ...props
 }: GroupCellProps<R, M, G, S>): JSX.Element => {
   const row: Table.Row<R, M> = props.node.data;
-  const groups = useSelector((state: Application.Store) => props.selector(state).groups);
+  const groupRowSelector = createSelector(
+    [(state: Application.Store) => props.selector(state).data],
+    (data: Table.Row<R, M>[]) =>
+      filter(data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[]
+  );
+  const groupRows = useSelector(groupRowSelector);
 
-  const group = useMemo<G | null>((): G | null => {
-    const groupId = tabling.typeguards.isGroupRow(row) ? row.meta.group : null;
-    return isNil(groupId) ? null : (find(groups, { id: groupId } as any) as G | undefined) || null;
-  }, [row, hooks.useDeepEqualMemo(groups)]);
+  const groupRow = useMemo<Table.GroupRow<R> | null>((): Table.GroupRow<R> | null => {
+    const groupId = tabling.typeguards.isGroupRow(row) ? row.group : null;
+    return isNil(groupId)
+      ? null
+      : (find(groupRows, { group: groupId } as any) as Table.GroupRow<R> | undefined) || null;
+  }, [row, hooks.useDeepEqualMemo(groupRows)]);
 
   const colorDef = useMemo<Table.RowColorDef>(() => {
     return props.getRowColorDef(row);
   }, [row]);
 
-  return !isNil(group) ? (
+  return !isNil(groupRow) ? (
     <Cell {...props}>
       <div style={{ display: "flex" }}>
-        <span>{`${group.name} (${group.children.length} Line Items)`}</span>
+        <span>{`${groupRow.name} (${groupRow.children.length} Line Items)`}</span>
         <IconButton
           className={"btn--edit-group"}
           size={"xxsmall"}
           icon={"edit"}
-          onClick={() => onEdit?.(group)}
+          onClick={() => onEdit?.(groupRow)}
           style={!isNil(colorDef.color) ? { color: colorDef.color } : {}}
         />
       </div>

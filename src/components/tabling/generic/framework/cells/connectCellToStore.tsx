@@ -6,10 +6,11 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 /* eslint-disable indent */
 const connectCellToStore = <
-  T extends Table.CellProps<R, M, S>,
   R extends Table.RowData = any,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
+  T extends Table.CellProps<R, M, G, S> = Table.CellProps<R, M, G, S>
 >(
   Component: React.ComponentClass<T, {}> | React.FunctionComponent<T>
 ): React.FunctionComponent<T> => {

@@ -7,12 +7,13 @@ import LinkCell, { LinkCellProps } from "./LinkCell";
 const PhoneNumberCell = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  props: LinkCellProps<R, M, S>
+  props: LinkCellProps<R, M, G, S>
 ): JSX.Element => {
   return (
-    <LinkCell<R, M, S>
+    <LinkCell<R, M, G, S>
       href={(v: string | number | null) => (!isNil(v) ? `tel:${v}` : undefined)}
       rel={"noreferrer"}
       valueFormatter={tabling.formatters.agPhoneNumberValueFormatter}

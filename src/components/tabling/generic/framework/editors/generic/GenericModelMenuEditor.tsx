@@ -7,12 +7,13 @@ export interface GenericModelMenuEditorProps<
   C extends Model.Model = Model.Model,
   R extends Table.RowData = Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> extends Table.EditorParams<R, M, S, V>,
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> extends Table.EditorParams<R, M, G, S, V>,
     ModelTagsMenuProps<C>,
     StandardComponentProps {
   readonly searchIndices: SearchIndicies;
-  readonly editor: IEditor<V, C, R, M, S>;
+  readonly editor: IEditor<V, C, R, M, G, S>;
   readonly tagProps?: Omit<TagProps<C>, "children" | "model" | "text">;
 }
 
@@ -22,9 +23,10 @@ const GenericModelMenuEditor = <
   V = ID,
   R extends Table.RowData = Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  props: GenericModelMenuEditorProps<V, C, R, M, S>
+  props: GenericModelMenuEditorProps<V, C, R, M, G, S>
 ) => {
   return (
     <ModelTagsMenu<C>

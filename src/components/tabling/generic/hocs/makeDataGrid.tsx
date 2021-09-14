@@ -23,12 +23,12 @@ export interface DataGridProps<
   readonly className?: Table.GeneralClassName;
   readonly rowClass?: Table.RowClassName;
   readonly hasExpandColumn: boolean;
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.Column<R, M, G>[];
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
   readonly groups?: G[];
-  readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M>) => void;
-  readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M>) => boolean;
+  readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M, G>) => void;
+  readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M, G>) => boolean;
   readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
   readonly onRowExpand?: null | ((row: Table.ModelRow<R, M>) => void);
   readonly onFirstDataRendered: (e: FirstDataRenderedEvent) => void;
@@ -60,7 +60,7 @@ const DataGrid =
 
       const getRowColorDef = hooks.useDynamicCallback((row: Table.Row<R, M>): Table.RowColorDef => {
         if (tabling.typeguards.isGroupRow(row)) {
-          const group: G | undefined = find(props.groups, { id: row.meta.group } as any);
+          const group: G | undefined = find(props.groups, { id: row.group } as any);
           if (!isNil(group)) {
             const colorDef = model.util.getGroupColorDefinition(group);
             if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
@@ -82,12 +82,12 @@ const DataGrid =
         return {};
       });
 
-      const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+      const columns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
         return map(
-          tabling.columns.updateColumnsOfTableType<Table.Column<R, M>, R, M>(
+          tabling.columns.updateColumnsOfTableType<Table.Column<R, M, G>, R, M, G>(
             props.columns,
             "body",
-            (col: Table.Column<R, M>) => ({
+            (col: Table.Column<R, M, G>) => ({
               headerComponentParams: {
                 ...col.headerComponentParams,
                 onSort: (order: Order, field: keyof R) => updateOrdering(order, field),
@@ -95,7 +95,7 @@ const DataGrid =
               }
             })
           ),
-          (col: Table.Column<R, M>) => ({
+          (col: Table.Column<R, M, G>) => ({
             ...col,
             cellRendererParams: { ...col.cellRendererParams, getRowColorDef },
             selectable: col.selectable || props.isCellSelectable
@@ -147,11 +147,11 @@ const DataGrid =
       const onCellFocused: (e: CellFocusedEvent) => void = hooks.useDynamicCallback((e: CellFocusedEvent) => {
         const getCellFromFocusedEvent = (
           event: CellFocusedEvent,
-          col?: Table.Column<R, M>
-        ): Table.Cell<R, M> | null => {
+          col?: Table.Column<R, M, G>
+        ): Table.Cell<R, M, G> | null => {
           if (!isNil(props.apis) && !isNil(event.rowIndex) && !isNil(event.column)) {
             const rowNode: Table.RowNode | undefined = props.apis.grid.getDisplayedRowAtIndex(event.rowIndex);
-            const column: Table.Column<R, M> | undefined = !isNil(col)
+            const column: Table.Column<R, M, G> | undefined = !isNil(col)
               ? col
               : find(columns, { field: event.column.getColId() } as any);
             if (!isNil(rowNode) && !isNil(column)) {
@@ -162,7 +162,7 @@ const DataGrid =
           return null;
         };
 
-        const cellsTheSame = (cell1: Table.Cell<R, M>, cell2: Table.Cell<R, M>): boolean => {
+        const cellsTheSame = (cell1: Table.Cell<R, M, G>, cell2: Table.Cell<R, M, G>): boolean => {
           return cell1.column.field === cell2.column.field && cell1.row.id === cell2.row.id;
         };
 
@@ -170,9 +170,9 @@ const DataGrid =
           const previousFocusEvent = !isNil(oldFocusedEvent.current) ? { ...oldFocusedEvent.current } : null;
           oldFocusedEvent.current = e;
 
-          const col: Table.Column<R, M> | undefined = find(columns, { field: e.column.getColId() } as any);
+          const col: Table.Column<R, M, G> | undefined = find(columns, { field: e.column.getColId() } as any);
           if (!isNil(col)) {
-            const cell: Table.Cell<R, M> | null = getCellFromFocusedEvent(e);
+            const cell: Table.Cell<R, M, G> | null = getCellFromFocusedEvent(e);
             const previousCell = !isNil(previousFocusEvent) ? getCellFromFocusedEvent(previousFocusEvent) : null;
             if (!isNil(cell)) {
               if (previousCell === null || !cellsTheSame(cell, previousCell)) {
@@ -202,7 +202,7 @@ const DataGrid =
           if (props.hasExpandColumn) {
             if (
               includes(
-                map(columns, (col: Table.Column<R, M>) => col.field),
+                map(columns, (col: Table.Column<R, M, G>) => col.field),
                 e.colDef.field as keyof R
               )
             ) {

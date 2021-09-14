@@ -5,6 +5,7 @@ const PaymentMethodCell = (
   props: framework.cells.ModelTagCellProps<
     Tables.ActualRowData,
     Model.Actual,
+    Model.Group,
     Tables.ActualTableStore,
     Model.PaymentMethod
   >

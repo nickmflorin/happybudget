@@ -8,6 +8,8 @@ import { CellProps } from "../Cells/Cell";
 import { RowProps } from "./Row";
 import BodyRow from "./BodyRow";
 
+type G = Model.BudgetGroup;
+
 const GroupRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   props: Omit<RowProps<R, M>, "row"> & {
     group: Model.BudgetGroup;
@@ -29,7 +31,7 @@ const GroupRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   }, [props.group]);
 
   const groupRow = useMemo((): Table.GroupRow<R> | null => {
-    return tabling.rows.createGroupRow({ group: props.group, columns: props.columns });
+    return tabling.rows.createGroupRow<R, M, Model.BudgetGroup>({ group: props.group, columns: props.columns });
   }, [props.columns, props.group]);
 
   return !isNil(groupRow) ? (
@@ -42,7 +44,7 @@ const GroupRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
         ...props.cellProps,
         className: [
           props.cellProps?.className,
-          (params: PdfTable.CellCallbackParams<R, M>) => {
+          (params: PdfTable.CellCallbackParams<R, M, G>) => {
             // We have to add a borderLeft to the first indented column for the Group Row
             // because the Row itself will not have a borderLeft attribute on it and the
             // Row starts one column to the right.

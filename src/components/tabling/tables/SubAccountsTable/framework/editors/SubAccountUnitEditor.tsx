@@ -11,6 +11,7 @@ const SubAccountUnitEditor = (
       Model.Tag,
       Tables.SubAccountRowData,
       Model.SubAccount,
+      Model.BudgetGroup,
       Tables.SubAccountTableStore
     >,
     "models" | "searchIndices"
@@ -20,12 +21,18 @@ const SubAccountUnitEditor = (
   const units = useSelector((state: Application.Store) => props.selector(state).subaccountUnits);
   const row: Table.DataRow<Tables.SubAccountRowData> = props.node.data;
   return (
-    <ModelSelectEditor<Model.Tag, Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore>
+    <ModelSelectEditor<
+      Model.Tag,
+      Tables.SubAccountRowData,
+      Model.SubAccount,
+      Model.BudgetGroup,
+      Tables.SubAccountTableStore
+    >
       style={{ maxHeight: 300 }}
       searchIndices={["title", "plural_title"]}
       models={units}
       ref={ref}
-      tagProps={{ isPlural: !isNil(row.quantity) && row.quantity > 1 }}
+      tagProps={{ isPlural: !isNil(row.data.quantity) && row.data.quantity > 1 }}
       {...props}
     />
   );

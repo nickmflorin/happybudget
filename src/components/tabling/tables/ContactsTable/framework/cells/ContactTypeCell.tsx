@@ -5,6 +5,7 @@ const ContactTypeCell = (
   props: framework.cells.ModelTagCellProps<
     Tables.ContactRowData,
     Model.Contact,
+    Model.Group,
     Tables.ContactTableStore,
     Model.ContactType
   >

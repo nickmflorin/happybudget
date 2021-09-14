@@ -15,7 +15,7 @@ export const ExportCSVAction = <
   G extends Model.Group = Model.Group
 >(
   table: Table.TableInstance<R, M, G>,
-  params: Table.MenuActionParams<R, M>,
+  params: Table.MenuActionParams<R, M, G>,
   exportFileName: string
 ): Table.MenuActionObj => ({
   /* eslint-disable indent */
@@ -23,7 +23,7 @@ export const ExportCSVAction = <
   icon: "file-csv",
   wrapInDropdown: (children: React.ReactChild | React.ReactChild[]) => {
     return (
-      <ExportCSVDropdown<R, M>
+      <ExportCSVDropdown<R, M, G>
         columns={params.columns}
         hiddenColumns={params.hiddenColumns}
         onDownload={(state: IMenuItemState<MenuItemModel>[]) => {
@@ -50,7 +50,7 @@ export const ToggleColumnAction = <
   G extends Model.Group = Model.Group
 >(
   table: Table.TableInstance<R, M, G>,
-  params: Table.MenuActionParams<R, M>
+  params: Table.MenuActionParams<R, M, G>
 ): Table.MenuActionObj => ({
   /* eslint-disable indent */
   label: "Columns",

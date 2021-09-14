@@ -5,7 +5,13 @@ import { UserImageOrInitials } from "components/images";
 import { Cell } from "components/tabling/generic/framework/cells";
 
 interface ContactNameCellProps
-  extends Table.CellProps<Tables.ContactRowData, Model.Contact, Tables.ContactTableStore, Model.ContactNamesAndImage> {
+  extends Table.CellProps<
+    Tables.ContactRowData,
+    Model.Contact,
+    Model.Group,
+    Tables.ContactTableStore,
+    Model.ContactNamesAndImage
+  > {
   readonly onEditContact: (id: ID) => void;
 }
 

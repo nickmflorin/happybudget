@@ -11,8 +11,9 @@ import { Cell } from "./generic";
 interface ContactCellProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> extends Table.CellProps<R, M, S, number | null> {
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> extends Table.CellProps<R, M, G, S, number | null> {
   readonly onEditContact: (id: ID) => void;
 }
 
@@ -20,11 +21,12 @@ interface ContactCellProps<
 const ContactCell = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >({
   value,
   ...props
-}: ContactCellProps<R, M, S>): JSX.Element => {
+}: ContactCellProps<R, M, G, S>): JSX.Element => {
   const contacts = useContacts();
   const model = useMemo(() => (!isNil(value) ? find(contacts, { id: value } as any) || null : null), [value, contacts]);
 

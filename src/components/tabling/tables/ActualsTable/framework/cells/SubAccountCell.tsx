@@ -5,6 +5,7 @@ import { Cell } from "components/tabling/generic/framework/cells";
 type SubAccountCellProps = Table.CellProps<
   Tables.ActualRowData,
   Model.Actual,
+  Model.Group,
   Tables.ActualTableStore,
   Model.SimpleAccount | Model.SimpleSubAccount | null
 >;

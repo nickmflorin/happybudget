@@ -57,12 +57,13 @@ const ActionMap = {
 const Tasks = budgeting.tasks.subaccounts.createTableTaskSet<Model.SubAccount, Model.Template>({
   columns: filter(
     SubAccountsTable.Columns,
-    (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
+    (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
       !includes(["contact", "actual", "variance"], c.field)
   ),
   selectBudgetId: (state: Application.Authenticated.Store) => state.template.id,
   selectObjId: (state: Application.Authenticated.Store) => state.template.subaccount.id,
   selectAutoIndex: (state: Application.Authenticated.Store) => state.template.autoIndex,
+  selectData: (state: Application.Authenticated.Store) => state.template.subaccount.table.data,
   actions: ActionMap,
   services: {
     request: api.getSubAccountSubAccounts,

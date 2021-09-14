@@ -22,7 +22,7 @@ type MenuButtonClickEvent<M extends MenuItemModel> = {
 }
 
 type MenuItemModel = Model.Model & {
-  readonly label?: string;
+  readonly label?: string | number | null;
   readonly icon?: IconOrElement;
   readonly loading?: boolean;
   readonly url?: string;
@@ -84,6 +84,7 @@ type IMenu<M extends MenuItemModel> = StandardComponentProps & {
   readonly extra?: ExtraMenuItemModel[];
   readonly unfocusMenuOnSearchFocus?: boolean;
   readonly bordersForLevels?: boolean;
+  readonly getLabel?: (m: M) => string;
   readonly onChange?: (params: MenuChangeEvent<M>) => void;
   readonly onSearch?: (value: string) => void;
   readonly getFirstSearchResult?: (models: M[]) => M | null;

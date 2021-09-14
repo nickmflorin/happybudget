@@ -29,7 +29,7 @@ export const groupRowFromState = <
 ): Table.GroupRow<R> | null => {
   let predicate = (g: Table.GroupRow<R>) => g.id === id;
   if (!isNil(rowId)) {
-    predicate = (g: Table.GroupRow<R>) => g.id === id && includes(g.meta.children, rowId);
+    predicate = (g: Table.GroupRow<R>) => g.id === id && includes(g.children, rowId);
   }
   return redux.reducers.modelFromState<Table.GroupRow<R>>(
     action,
@@ -53,7 +53,7 @@ export const rowGroupRowFromState = <
   rowId: Table.DataRowID,
   options: Redux.FindModelOptions = { warnIfMissing: true }
 ): Table.GroupRow<R> | null => {
-  const predicate = (g: Table.GroupRow<R>) => includes(g.meta.children, rowId);
+  const predicate = (g: Table.GroupRow<R>) => includes(g.children, rowId);
   return redux.reducers.modelFromState<Table.GroupRow<R>>(
     action,
     filter(st.data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[],
@@ -77,7 +77,7 @@ export const removeRowsFromAGroup = <
   const groupRow = groupRowFromState<R, M, G, S>(action, st, groupId);
   if (!isNil(groupRow)) {
     const newChildren: Table.DataRowID[] = filter(
-      groupRow.meta.children,
+      groupRow.children,
       (child: Table.DataRowID) => !includes(rowIds, child)
     );
     const childrenRows: Table.DataRow<R, M>[] = redux.reducers.findModelsInData(
@@ -90,7 +90,7 @@ export const removeRowsFromAGroup = <
       data: util.replaceInArray<Table.Row<R, M>>(
         st.data,
         { id: groupRow.id },
-        { ...groupRow, ...calculateGroup?.(childrenRows), meta: { ...groupRow.meta, children: newChildren } }
+        { ...groupRow, children: newChildren, data: { ...groupRow.data, ...calculateGroup?.(childrenRows) } }
       )
     };
   }
@@ -134,7 +134,7 @@ export const removeRowsFromTheirGroupsIfTheyExist = <
           // date children for each group after all alterations.
           return {
             ...alterations,
-            [groupRow.id]: { groupRow, children: filter(groupRow.meta.children, (id: Table.DataRowID) => id !== rowId) }
+            [groupRow.id]: { groupRow, children: filter(groupRow.children, (id: Table.DataRowID) => id !== rowId) }
           };
         }
       }
@@ -153,8 +153,8 @@ export const removeRowsFromTheirGroupsIfTheyExist = <
       );
       const newGroupRow = {
         ...alteration.groupRow,
-        meta: { ...alteration.groupRow.meta, children: alteration.children },
-        ...calculateGroup?.(childrenRows)
+        children: alteration.children,
+        data: { ...alteration.groupRow.data, ...calculateGroup?.(childrenRows) }
       };
       return {
         ...s,
@@ -238,36 +238,40 @@ export const createTableChangeEventReducer = <
       );
       const recalculateGroup = config.calculateGroup;
       if (!isNil(recalculateGroup)) {
-        const groupsWithRowsChanged: { group: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }[] =
+        const groupsWithRowsChanged: { groupRow: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }[] =
           rows.findDistinctRowsForEachGroupRow(
             filter(newRows, (ri: Table.Row<R, M>) => tabling.typeguards.isDataRow(ri)) as Table.DataRow<R, M>[],
             filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[]
           );
         newState = reduce(
           groupsWithRowsChanged,
-          (s: S, relationship: { group: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }) => {
-            const newGroup = { ...relationship.group, ...recalculateGroup(relationship.rows) };
+          (s: S, relationship: { groupRow: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }) => {
+            const newGroupRow = {
+              ...relationship.groupRow,
+              data: { ...relationship.groupRow.data, ...recalculateGroup(relationship.rows) }
+            };
             return {
               ...s,
-              data: util.replaceInArray<Table.Row<R, M>>(s.data, { id: relationship.group.id }, newGroup)
+              data: util.replaceInArray<Table.Row<R, M>>(s.data, { id: newGroupRow.id }, newGroupRow)
             };
           },
           newState
         );
       }
     } else if (typeguards.isRowAddEvent(e)) {
-      const payload: Table.RowAdd<R, M>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
+      const payload: Table.RowAdd<R>[] = Array.isArray(e.payload) ? e.payload : [e.payload];
       newState = {
         ...newState,
         data: [
           ...newState.data,
-          ...map(payload, (addition: Table.RowAdd<R, M>) =>
-            rows.createPlaceholderRow<R, M>({
+          ...map(payload, (addition: Table.RowAdd<R>) =>
+            rows.createPlaceholderRow<R, M, G>({
               id: addition.id,
-              data: events.rowAddToRowData<R, M>(addition),
+              data: events.rowAddToRowData<R>(addition),
               columns: config.columns,
               getRowName: config.getPlaceholderRowName,
-              getRowLabel: config.getPlaceholderRowLabel
+              getRowLabel: config.getPlaceholderRowLabel,
+              group: null
             })
           )
         ]
@@ -316,15 +320,16 @@ export const createTableChangeEventReducer = <
         filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[],
         ids
       );
+
       const g: Table.GroupRow<R> | null = groupRowFromState<R, M, G, S>(action, newState, e.payload.group);
       if (!isNil(g)) {
-        const newChildren = uniq([...g.meta.children, map(rws, (r: Table.DataRow<R, M>) => r.id)]);
+        const newChildren: ID[] = uniq([...g.children, ...map(rws, (r: Table.DataRow<R, M>) => r.id)]);
         newState = {
           ...newState,
           data: util.replaceInArray<Table.Row<R, M>>(
             newState.data,
             { id: g.id },
-            { ...g, meta: { ...g.meta, children: newChildren }, ...config.calculateGroup?.(rws) }
+            { ...g, children: newChildren, data: { ...g.data, ...config.calculateGroup?.(rws) } }
           )
         };
       }
@@ -333,7 +338,6 @@ export const createTableChangeEventReducer = <
       // state.
       newState = {
         ...newState,
-        groups: [...newState.groups, e.payload],
         data: data.createTableRows<R, M, G>({
           ...config,
           gridId: "data",
@@ -349,11 +353,19 @@ export const createTableChangeEventReducer = <
       group, as everything else that would trigger mechanical recalculations is handled by separate
       events.
       */
-      const group: G | null = groupRowFromState<R, M, G, S>(action, newState, e.payload.id);
-      if (!isNil(group)) {
+      const groupRow: Table.GroupRow<R> | null = groupRowFromState<R, M, G, S>(
+        action,
+        newState,
+        `group-${e.payload.id}`
+      );
+      if (!isNil(groupRow)) {
         newState = {
           ...newState,
-          groups: util.replaceInArray<G>(newState.groups, { id: e.payload.id }, { ...group, ...e.payload.data })
+          data: util.replaceInArray<Table.Row<R>>(
+            newState.data,
+            { id: groupRow.id },
+            { ...groupRow, name: e.payload.data.name || groupRow.name, color: e.payload.data.color || groupRow.color }
+          )
         };
       }
     }
@@ -453,6 +465,7 @@ export const createAuthenticatedTableReducer = <
                 { id: r.id },
                 rows.createModelRow({
                   gridId: "data",
+                  group: r.group,
                   model: payload.models[index],
                   columns: config.columns,
                   getRowName: config.getModelRowName,

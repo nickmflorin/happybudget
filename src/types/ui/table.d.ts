@@ -14,12 +14,12 @@ namespace TableUi {
     readonly includeRowInNavigation?: (row: Table.DataRow<R, M>) => boolean;
   };
 
-  type FooterGridConfig<R extends Table.Row, M extends Model.Model = Model.Model> = {
+  type FooterGridConfig<R extends Table.Row, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
     readonly id: "page" | "footer";
     readonly rowId: string;
     readonly rowClass: Table.RowClassName;
     readonly className: Table.GeneralClassName;
     readonly rowHeight?: number;
-    readonly getFooterColumn: (column: Table.Column<R, M>) => Table.FooterColumn<R, M> | null;
+    readonly getFooterColumn: (column: Table.Column<R, M, G>) => Table.FooterColumn<R, M, G> | null;
   }
 }

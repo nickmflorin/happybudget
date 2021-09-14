@@ -58,7 +58,7 @@ const Contacts = (): JSX.Element => {
 
           The relationship between rows and models needs to be improved going forward.
           */
-          setContactToEdit(row.meta.model);
+          setContactToEdit(row.model);
         }}
         exportFileName={"contacts"}
       />

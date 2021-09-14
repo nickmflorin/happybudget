@@ -10,16 +10,18 @@ export type UseModelMenuEditorParams<
   V = ID,
   R extends Table.RowData = Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> = Table.EditorParams<R, M, S, V>;
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> = Table.EditorParams<R, M, G, S, V>;
 
 export type IEditor<
   V = ID,
   C extends Model.Model = Model.Model,
   R extends Table.RowData = Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> = Omit<UseModelMenuEditorParams<V, R, M, S>, "forwardedRef"> & {
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> = Omit<UseModelMenuEditorParams<V, R, M, G, S>, "forwardedRef"> & {
   readonly onChange: (value: V | null, e: Table.CellDoneEditingEvent, stopEditing?: boolean) => void;
   readonly isFirstRender: boolean;
   readonly value: V | null;
@@ -33,10 +35,11 @@ const useModelMenuEditor = <
   V = C,
   R extends Table.RowData = Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  params: UseModelMenuEditorParams<V, R, M, S> & { readonly forwardedRef: ForwardedRef<any> }
-): [IEditor<V, C, R, M, S>] => {
+  params: UseModelMenuEditorParams<V, R, M, G, S> & { readonly forwardedRef: ForwardedRef<any> }
+): [IEditor<V, C, R, M, G, S>] => {
   const menu = ui.hooks.useMenu<C>();
 
   const isFirstRender = ui.hooks.useTrackFirstRender();

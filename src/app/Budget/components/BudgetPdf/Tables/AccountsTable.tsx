@@ -7,11 +7,12 @@ import { BodyRow, GroupRow, HeaderRow, FooterRow } from "../Rows";
 
 type M = Model.PdfAccount;
 type R = Tables.PdfAccountRowData;
+type G = Model.BudgetGroup;
 
 type AccountsTableProps = {
   readonly data: Model.PdfAccount[];
   readonly groups: Model.BudgetGroup[];
-  readonly columns: PdfTable.Column<R, M>[];
+  readonly columns: PdfTable.Column<R, M, G>[];
 };
 
 const AccountsTable = ({
@@ -21,7 +22,7 @@ const AccountsTable = ({
   groups
 }: AccountsTableProps): JSX.Element => {
   const showFooterRow = useMemo(() => {
-    return filter(columns, (column: PdfTable.Column<R, M>) => !isNil(column.footer)).length !== 0;
+    return filter(columns, (column: PdfTable.Column<R, M, G>) => !isNil(column.footer)).length !== 0;
   }, [columns]);
 
   const table: Table.RowGroup<R, M, Model.BudgetGroup>[] = tabling.data.createTableData<

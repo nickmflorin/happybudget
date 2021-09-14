@@ -6,6 +6,8 @@ import { CellProps } from "../Cells/Cell";
 import HeaderCell from "../Cells/HeaderCell";
 import Row, { RowProps } from "./Row";
 
+type G = Model.BudgetGroup;
+
 const HeaderRow = <R extends Table.RowData, M extends Model.Model = Model.Model>({
   cellProps,
   ...props
@@ -13,7 +15,7 @@ const HeaderRow = <R extends Table.RowData, M extends Model.Model = Model.Model>
   const headerRow = useMemo(() => {
     return reduce(
       props.columns,
-      (obj: { [key: string]: any }, col: PdfTable.Column<R, M>) => {
+      (obj: { [key: string]: any }, col: PdfTable.Column<R, M, G>) => {
         obj[col.field as string] = col.headerName;
         return obj;
       },
@@ -25,7 +27,7 @@ const HeaderRow = <R extends Table.RowData, M extends Model.Model = Model.Model>
       {...props}
       className={classNames("header-tr", props.className)}
       row={headerRow}
-      renderCell={(params: { column: PdfTable.Column<R, M>; location: PdfTable.CellLocation }) => {
+      renderCell={(params: { column: PdfTable.Column<R, M, G>; location: PdfTable.CellLocation }) => {
         return (
           <HeaderCell<R, M>
             key={`header-${params.location.index}-${params.location.colIndex}`}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useHistory } from "react-router-dom";
 import classNames from "classnames";
 import { isNil } from "lodash";
@@ -75,10 +75,23 @@ export const ExtraMenuItem = (props: IExtraMenuItem): JSX.Element => {
   );
 };
 
-const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M>): JSX.Element => {
+const PrivateMenuItem = <M extends MenuItemModel>(
+  props: IMenuItem<M> & { readonly label?: string; readonly getLabel?: (m: M) => string }
+): JSX.Element => {
+  const m = useMemo(() => {
+    if (!isNil(props.label)) {
+      return { ...props.model, label: props.label };
+    } else if (!isNil(props.getLabel)) {
+      return { ...props.model, label: props.getLabel(props.model) };
+    } else {
+      return props.model;
+    }
+  }, [props.model, props.label, props.getLabel]);
+
   if (props.model.visible === false) {
     return <></>;
   }
+
   return (
     <CommonMenuItem
       {...props}
@@ -97,23 +110,23 @@ const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M>): JSX.Elem
     >
       <React.Fragment>
         {props.checkbox && <Checkbox checked={props.selected} />}
-        {!isNil(props.model.icon) && (
+        {!isNil(m.icon) && (
           <VerticalFlexCenter>
-            <IconOrSpinner size={16} loading={props.model.loading} icon={props.model.icon} />
+            <IconOrSpinner size={16} loading={m.loading} icon={m.icon} />
           </VerticalFlexCenter>
         )}
-        {isNil(props.model.icon) && props.model.loading && (
+        {isNil(m.icon) && m.loading && (
           <VerticalFlexCenter>
             <Spinner size={16} />
           </VerticalFlexCenter>
         )}
         <VerticalFlexCenter>
           {!isNil(props.renderContent) ? (
-            props.renderContent(props.model, { level: props.level })
-          ) : !isNil(props.model.render) ? (
-            props.model.render()
+            props.renderContent(m, { level: props.level })
+          ) : !isNil(m.render) ? (
+            m.render()
           ) : (
-            <span className={"text-wrapper"}>{props.model.label}</span>
+            <span className={"text-wrapper"}>{m.label}</span>
           )}
         </VerticalFlexCenter>
       </React.Fragment>
@@ -124,7 +137,11 @@ const PrivateMenuItem = <M extends MenuItemModel>(props: IMenuItem<M>): JSX.Elem
 export const MenuItem = React.memo(PrivateMenuItem) as typeof PrivateMenuItem;
 
 const PrivateRecursiveMenuItem = <M extends MenuItemModel>(
-  props: IMenuItem<M> & { readonly recursion?: IMenuItems<M> }
+  props: IMenuItem<M> & {
+    readonly recursion?: IMenuItems<M>;
+    readonly label?: string;
+    readonly getLabel?: (m: M) => string;
+  }
 ): JSX.Element => {
   return (
     <React.Fragment>
@@ -133,7 +150,13 @@ const PrivateRecursiveMenuItem = <M extends MenuItemModel>(
         /* eslint-disable indent */
         props.model.children.length !== 0 &&
         !isNil(props.recursion) && (
-          <MenuItems<M> {...props.recursion} models={props.model.children} level={props.level + 1} />
+          <MenuItems<M>
+            {...props.recursion}
+            label={props.label}
+            getLabel={props.getLabel}
+            models={props.model.children}
+            level={props.level + 1}
+          />
         )}
     </React.Fragment>
   );

@@ -63,7 +63,13 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
           return "";
         }
         return modelTextFieldValue || "";
-      } else if (model.typeguards.isTag(m)) {
+      } else if (!isNil(props.getModelText)) {
+        const text = props.getModelText(m);
+        if (!isNil(text)) {
+          return text;
+        }
+      }
+      if (model.typeguards.isTag(m)) {
         if (props.isPlural === true && !isNil(m.plural_title)) {
           return m.plural_title;
         }
@@ -111,7 +117,13 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
       if (!isNil(props.modelColorField)) {
         const modelColorFieldValue: unknown = m[props.modelColorField];
         return validateAndReturnColor(modelColorFieldValue as string, props.modelColorField as string);
-      } else if (model.typeguards.isTag(m)) {
+      } else if (!isNil(props.getModelColor)) {
+        const color = props.getModelColor(m);
+        if (!isNil(color)) {
+          return validateAndReturnColor(color, "getModelColor callback");
+        }
+      }
+      if (model.typeguards.isTag(m)) {
         return validateAndReturnColor(m.color, "color");
       } else if (model.typeguards.isModelWithColor(m)) {
         return validateAndReturnColor(m.color, "color");

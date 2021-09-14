@@ -9,7 +9,7 @@ import { SubAccountsTable as GenericSubAccountsTable } from "components/tabling"
 
 import PreviewModal from "./PreviewModal";
 
-type PreContactCreate = Omit<Table.SoloCellChange<Tables.SubAccountRowData, Model.SubAccount>, "newValue">;
+type PreContactCreate = Omit<Table.SoloCellChange<Tables.SubAccountRowData>, "newValue">;
 
 type OmitTableProps = "contacts" | "onEditContact" | "onNewContact" | "menuPortalId" | "columns" | "onExportPdf";
 
@@ -88,7 +88,7 @@ const SubAccountsTable = ({ budget, budgetId, ...props }: BudgetSubAccountsTable
             // cell, combine that information with the new value to perform a table update, showing
             // the created contact in the new cell.
             if (!isNil(preContactCreate)) {
-              const cellChange: Table.SoloCellChange<Tables.SubAccountRowData, Model.SubAccount> = {
+              const cellChange: Table.SoloCellChange<Tables.SubAccountRowData> = {
                 ...preContactCreate,
                 newValue: contact.id
               };

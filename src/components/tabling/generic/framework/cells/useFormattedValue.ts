@@ -6,9 +6,10 @@ import { isNil } from "lodash";
 const useFormattedValue = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  props: Table.ValueCellProps<R, M, S>
+  props: Table.ValueCellProps<R, M, G, S>
 ) => {
   const formatterParams = useMemo<ValueFormatterParams | null>(
     () =>

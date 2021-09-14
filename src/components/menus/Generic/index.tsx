@@ -511,6 +511,7 @@ const Menu = <M extends MenuItemModel>(props: IMenu<M> & { readonly menu?: NonNu
                 onClick={(event: MenuItemClickEvent<M>) => onMenuItemClick(event.model, event.event)}
                 renderContent={props.renderItemContent}
                 closeParentDropdown={props.closeParentDropdown}
+                getLabel={props.getLabel}
               />
               {map(availableExtraItems, (item: GenericExtraItem, index: number) => {
                 return (

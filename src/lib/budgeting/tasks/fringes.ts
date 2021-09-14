@@ -86,7 +86,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     );
     yield put(config.actions.response({ models: response, groups: { count: 0, data: [] } }));
     if (response.data.length === 0) {
-      const event: Table.RowAddEvent<R, M> = {
+      const event: Table.RowAddEvent<R> = {
         type: "rowAdd",
         payload: [
           { id: `placeholder-${util.generateRandomNumericId()}`, data: {} },
@@ -104,7 +104,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     yield put(config.actions.responseFringeColors(response));
   }
 
-  function* bulkCreateTask(objId: number, e: Table.RowAddEvent<R, M>, errorMessage: string): SagaIterator {
+  function* bulkCreateTask(objId: number, e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
     const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, M>(
       e.payload,
       config.columns
@@ -125,7 +125,7 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
       // assumption that the models in the response are in the same order as the placeholder IDs.
       const placeholderIds: Table.PlaceholderRowId[] = map(
         Array.isArray(e.payload) ? e.payload : [e.payload],
-        (rowAdd: Table.RowAdd<R, M>) => rowAdd.id
+        (rowAdd: Table.RowAdd<R>) => rowAdd.id
       );
       yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
     } catch (err: unknown) {
@@ -195,10 +195,10 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, M>>): SagaIterator {
+  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const e: Table.RowAddEvent<R, M> = action.payload;
+      const e: Table.RowAddEvent<R> = action.payload;
       yield fork(bulkCreateTask, objId, e, "There was an error creating the fringes.");
     }
   }
@@ -215,11 +215,12 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   // changes that correspond to placeholder rows.
   function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
     const objId = yield select(config.selectObjId);
+    const data = yield select(config.selectData);
     if (!isNil(objId) && !isNil(action.payload)) {
       const e: Table.DataChangeEvent<R, M> = action.payload;
       const merged = tabling.events.consolidateTableChange<R, M>(e.payload);
       if (merged.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns, data);
         yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the rows.");
       }
     }

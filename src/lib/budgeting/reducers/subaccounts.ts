@@ -13,7 +13,7 @@ type M = Model.SubAccount;
 type S = Tables.SubAccountTableStore;
 
 /* eslint-disable indent */
-const recalculateSubAccountRow = (st: S, action: Redux.Action, row: Table.DataRow<R, M>): Table.DataRow<R, M> => {
+const recalculateSubAccountRow = (st: S, action: Redux.Action, row: Table.DataRow<R, M>): Partial<R> => {
   /*
   In the case that the SubAccount has SubAccount(s) itself, the estimated value is determined
   from the accumulation of the estimated values for those children SubAccount(s).  In this
@@ -21,31 +21,30 @@ const recalculateSubAccountRow = (st: S, action: Redux.Action, row: Table.DataRo
   changes when the estimated values of it's SubAccount(s) on another page are altered.
   */
   const isValidToRecalculate =
-    tabling.typeguards.isPlaceholderRow<R>(row) || (!isNil(row.meta.children) && row.meta.children.length === 0);
+    tabling.typeguards.isPlaceholderRow<R>(row) || (!isNil(row.children) && row.children.length === 0);
 
-  if (isValidToRecalculate && !isNil(row.quantity) && !isNil(row.rate)) {
-    const multiplier = row.multiplier || 1.0;
-    let payload: any = {
-      estimated: multiplier * row.quantity * row.rate
-    };
-    if (!isNil(row.actual) && !isNil(payload.estimated)) {
-      payload = { ...payload, variance: payload.estimated - row.actual };
+  let payload: Partial<R> = {};
+
+  if (isValidToRecalculate && !isNil(row.data.quantity) && !isNil(row.data.rate)) {
+    const multiplier = row.data.multiplier || 1.0;
+    payload = { estimated: multiplier * row.data.quantity * row.data.rate };
+    if (!isNil(row.data.actual) && !isNil(payload.estimated)) {
+      payload = { ...payload, variance: payload.estimated - row.data.actual };
     }
-    row = { ...row, ...payload };
     if (!isNil(st.fringes)) {
       // Reapply the fringes to the SubAccount's estimated value.
-      row = {
-        ...row,
-        estimated: !isNil(row.estimated)
+      payload = {
+        ...payload,
+        estimated: !isNil(payload.estimated)
           ? model.util.fringeValue(
-              row.estimated,
-              redux.reducers.findModelsInData(action, st.fringes.data, row.fringes, { name: "Fringe" })
+              payload.estimated,
+              redux.reducers.findModelsInData(action, st.fringes.data, row.data.fringes, { name: "Fringe" })
             )
           : 0.0
       };
     }
   }
-  return row;
+  return payload;
 };
 
 export type SubAccountTableActionMap = Redux.TableActionMap<M, Model.BudgetGroup> & {
@@ -87,8 +86,8 @@ export const createAuthenticatedSubAccountsTableReducer = (
     ...config,
     calculateGroup: (rws: Table.DataRow<R, M>[]) => {
       let payload: any = {
-        estimated: reduce(rws, (sum: number, s: Table.DataRow<R, M>) => sum + (s.estimated || 0), 0),
-        actual: reduce(rws, (sum: number, s: Table.DataRow<R, M>) => sum + (s.actual || 0), 0)
+        estimated: reduce(rws, (sum: number, s: Table.DataRow<R, M>) => sum + (s.data.estimated || 0), 0),
+        actual: reduce(rws, (sum: number, s: Table.DataRow<R, M>) => sum + (s.data.actual || 0), 0)
       };
       return { ...payload, variance: payload.estimated - payload.actual };
     },
@@ -129,23 +128,27 @@ export const createAuthenticatedSubAccountsTableReducer = (
               (id: ID) =>
                 filter(
                   newState.data,
-                  (row: Table.Row<R, M>) => tabling.typeguards.isDataRow(row) && includes(row.fringes, id)
+                  (row: Table.Row<R, M>) => tabling.typeguards.isDataRow(row) && includes(row.data.fringes, id)
                 ) as Table.DataRow<R, M>[]
             )
           );
           return reduce(
             uniqBy(rowsWithFringes, (r: Table.DataRow<R, M>) => r.id),
             (s: S, r: Table.DataRow<R, M>): S => {
-              r = recalculateSubAccountRow(s, action, r);
+              let payload: Partial<R> = recalculateSubAccountRow(s, action, r);
               if (removeFringes === true) {
-                r = {
-                  ...r,
-                  fringes: filter(r.fringes, (fringeId: number) => !includes(fringeIds, fringeId))
+                payload = {
+                  ...payload,
+                  fringes: filter(r.data.fringes, (fringeId: number) => !includes(fringeIds, fringeId))
                 };
               }
               return {
                 ...s,
-                data: util.replaceInArray<Table.Row<R, M>>(s.data, { id: r.id }, r)
+                data: util.replaceInArray<Table.Row<R, M>>(
+                  s.data,
+                  { id: r.id },
+                  { ...r, data: { ...r.data, ...payload } }
+                )
               };
             },
             newState

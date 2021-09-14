@@ -71,7 +71,7 @@ const DEFAULT_OPTIONS: PdfBudgetTable.Options = {
   includeNotes: false,
   columns: map(
     SubAccountColumns,
-    (column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount>) => column.field
+    (column: PdfTable.Column<Tables.PdfSubAccountRowData, Model.PdfSubAccount, Model.BudgetGroup>) => column.field
   )
 };
 

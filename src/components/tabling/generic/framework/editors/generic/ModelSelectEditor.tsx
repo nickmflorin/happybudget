@@ -8,9 +8,10 @@ export interface ModelSelectEditorProps<
   C extends Model.Model,
   R extends Table.RowData = Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> extends GenericModelMenuEditorProps<C, C, R, M, S>,
-    UseModelMenuEditorParams<C, R, M, S>,
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> extends GenericModelMenuEditorProps<C, C, R, M, G, S>,
+    UseModelMenuEditorParams<C, R, M, G, S>,
     StandardComponentProps {
   readonly models: C[];
   readonly tagProps?: Omit<TagProps<C>, "children" | "model" | "text">;
@@ -21,15 +22,16 @@ const ModelSelectEditor = <
   C extends Model.Model,
   R extends Table.RowData = Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  { models, ...props }: ModelSelectEditorProps<C, R, M, S>,
+  { models, ...props }: ModelSelectEditorProps<C, R, M, G, S>,
   ref: ForwardedRef<any>
 ) => {
-  const [editor] = useModelMenuEditor<C, C, R, M, S>({ ...props, forwardedRef: ref });
+  const [editor] = useModelMenuEditor<C, C, R, M, G, S>({ ...props, forwardedRef: ref });
 
   return (
-    <GenericModelMenuEditor<C, C, R, M, S>
+    <GenericModelMenuEditor<C, C, R, M, G, S>
       {...props}
       className={props.className}
       editor={editor}
@@ -45,8 +47,9 @@ export default forwardRef(ModelSelectEditor) as {
     C extends Model.Model,
     R extends Table.RowData = Table.RowData,
     M extends Model.Model = Model.Model,
-    S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+    G extends Model.Group = Model.Group,
+    S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
   >(
-    props: ModelSelectEditorProps<C, R, M, S> & { ref: ForwardedRef<any> }
+    props: ModelSelectEditorProps<C, R, M, G, S> & { ref: ForwardedRef<any> }
   ): JSX.Element;
 };

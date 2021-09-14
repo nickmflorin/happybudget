@@ -5,17 +5,25 @@ import { tabling, hooks } from "lib";
 import { framework as generic } from "components/tabling/generic";
 import Grid, { GridProps } from "./Grid";
 
-export interface UnauthenticatedGridProps<R extends Table.RowData, M extends Model.Model = Model.Model>
-  extends GridProps<R, M> {
+export interface UnauthenticatedGridProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> extends GridProps<R, M, G> {
   readonly framework?: Table.Framework;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
 }
 
-const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
+/* eslint-disable indent */
+const UnauthenticatedGrid = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>({
   framework,
   footerRowSelectors,
   ...props
-}: UnauthenticatedGridProps<R, M>): JSX.Element => {
+}: UnauthenticatedGridProps<R, M, G>): JSX.Element => {
   const frameworkComponents = useMemo<Table.FrameworkGroup>((): Table.FrameworkGroup => {
     const combinedFramework = tabling.aggrid.combineFrameworks(generic.Framework, framework);
     return {
@@ -31,14 +39,14 @@ const UnauthenticatedGrid = <R extends Table.RowData, M extends Model.Model = Mo
     };
   }, [framework, props.id]);
 
-  const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+  const columns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
     return map(
       props.columns,
-      (col: Table.Column<R, M>): Table.Column<R, M> =>
+      (col: Table.Column<R, M, G>): Table.Column<R, M, G> =>
         ({
           ...col,
           cellRendererParams: { ...col.cellRendererParams, readOnly: true }
-        } as Table.Column<R, M>)
+        } as Table.Column<R, M, G>)
     );
   }, [hooks.useDeepEqualMemo(props.columns)]);
 

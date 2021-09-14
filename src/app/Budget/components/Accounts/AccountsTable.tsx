@@ -66,7 +66,7 @@ interface AccountsTableProps {
 const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element => {
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [groupAccounts, setGroupAccounts] = useState<ID[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<Model.BudgetGroup | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -84,7 +84,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
         onExportPdf={() => setPreviewModalVisible(true)}
         onRowExpand={(row: Table.DataRow<R, M>) => history.push(`/budgets/${budgetId}/accounts/${row.id}`)}
         onGroupRows={(rows: Table.DataRow<R, M>[]) => setGroupAccounts(map(rows, (row: Table.DataRow<R, M>) => row.id))}
-        onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
+        onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
       />
       {!isNil(groupAccounts) && !isNil(budgetId) && (
         <CreateBudgetAccountGroupModal
@@ -105,7 +105,7 @@ const AccountsTable = ({ budgetId, budget }: AccountsTableProps): JSX.Element =>
       )}
       {!isNil(groupToEdit) && (
         <EditGroupModal
-          group={groupToEdit}
+          groupId={groupToEdit.group}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.BudgetGroup) => {

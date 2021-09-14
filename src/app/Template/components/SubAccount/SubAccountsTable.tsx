@@ -81,7 +81,7 @@ interface SubAccountsTableProps {
 const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTableProps): JSX.Element => {
   const [fringesModalVisible, setFringesModalVisible] = useState(false);
   const [groupSubAccounts, setGroupSubAccounts] = useState<ID[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<Model.BudgetGroup | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -124,7 +124,7 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
         }}
         cookieNames={!isNil(subaccountDetail) ? { ordering: `subaccount-${subaccountDetail.id}-table-ordering` } : {}}
         onGroupRows={(rows: Table.DataRow<R>[]) => setGroupSubAccounts(map(rows, (row: Table.DataRow<R>) => row.id))}
-        onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
+        onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
       />
       {!isNil(groupSubAccounts) && (
         <CreateSubAccountGroupModal
@@ -145,7 +145,7 @@ const SubAccountsTable = ({ subaccountId, template, templateId }: SubAccountsTab
       )}
       {!isNil(groupToEdit) && (
         <EditGroupModal
-          group={groupToEdit}
+          groupId={groupToEdit.group}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.BudgetGroup) => {

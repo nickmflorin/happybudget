@@ -1,4 +1,8 @@
+import { useEffect } from "react";
+import { isNil } from "lodash";
+
 import * as api from "api";
+import { model } from "lib";
 
 import { Form } from "components";
 import { GroupForm } from "components/forms";
@@ -8,12 +12,35 @@ import Modal from "./Modal";
 interface EditGroupModalProps {
   onSuccess: (group: Model.BudgetGroup) => void;
   onCancel: () => void;
-  group: Model.BudgetGroup;
+  groupId: ID;
   open: boolean;
 }
 
-const EditGroupModal = ({ group, open, onSuccess, onCancel }: EditGroupModalProps): JSX.Element => {
+const EditGroupModal = ({ groupId, open, onSuccess, onCancel }: EditGroupModalProps): JSX.Element => {
   const [form] = Form.useForm<Http.GroupPayload>({ isInModal: true });
+  const [group, loading, error] = model.hooks.useGroup(groupId, {
+    conditional: () => open === true,
+    deps: [open]
+  });
+
+  useEffect(() => {
+    form.setLoading(loading);
+  }, [loading]);
+
+  useEffect(() => {
+    if (!isNil(error)) {
+      form.setGlobalError(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (!isNil(group)) {
+      form.setFields([
+        { name: "name", value: group.name },
+        { name: "color", value: group.color }
+      ]);
+    }
+  }, [group]);
 
   return (
     <Modal.Modal
@@ -23,14 +50,14 @@ const EditGroupModal = ({ group, open, onSuccess, onCancel }: EditGroupModalProp
       okText={"Save"}
       cancelText={"Cancel"}
       getContainer={false}
-      okButtonProps={{ disabled: form.loading }}
+      okButtonProps={{ disabled: form.loading || loading }}
       onOk={() => {
         form
           .validateFields()
           .then((values: Http.GroupPayload) => {
             form.setLoading(true);
             api
-              .updateGroup(group.id, values)
+              .updateGroup(groupId, values)
               .then((response: Model.BudgetGroup) => {
                 form.resetFields();
                 onSuccess(response);
@@ -47,7 +74,7 @@ const EditGroupModal = ({ group, open, onSuccess, onCancel }: EditGroupModalProp
           });
       }}
     >
-      <GroupForm form={form} initialValues={{ name: group.name, color: group.color }} />
+      <GroupForm form={form} />
     </Modal.Modal>
   );
 };

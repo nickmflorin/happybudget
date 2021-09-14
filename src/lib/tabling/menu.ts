@@ -10,15 +10,16 @@ export const orderActions = (actions: Table.MenuActionObj[]): Table.MenuActionOb
 export const evaluateActions = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  T extends Table.MenuActionParams<R, M> = Table.MenuActionParams<R, M>
+  G extends Model.Group = Model.Group,
+  T extends Table.MenuActionParams<R, M, G> = Table.MenuActionParams<R, M, G>
 >(
-  actions: Table.MenuActions<R, M, T>,
+  actions: Table.MenuActions<R, M, G, T>,
   params: T
 ): Table.MenuActionObj[] => {
   return orderActions(
     reduce(
       Array.isArray(actions) ? actions : actions(params),
-      (objs: Table.MenuActionObj[], action: Table.MenuAction<R, M, T>) => {
+      (objs: Table.MenuActionObj[], action: Table.MenuAction<R, M, G, T>) => {
         return [...objs, typeof action === "function" ? action(params) : action];
       },
       []
@@ -27,16 +28,17 @@ export const evaluateActions = <
 };
 
 export const combineMenuActions = <
-  P extends Table.MenuActionParams<R, M>,
+  P extends Table.MenuActionParams<R, M, G>,
   R extends Table.RowData,
-  M extends Model.Model
+  M extends Model.Model,
+  G extends Model.Group = Model.Group
 >(
-  ...args: Table.MenuActions<R, M, P>[]
-): Table.MenuActions<R, M, P> => {
+  ...args: Table.MenuActions<R, M, G, P>[]
+): Table.MenuActions<R, M, G, P> => {
   return (params: P) =>
     reduce(
       args,
-      (curr: Array<Table.MenuAction<R, M, P>>, actions: Table.MenuActions<R, M, P>) => {
+      (curr: Array<Table.MenuAction<R, M, G, P>>, actions: Table.MenuActions<R, M, G, P>) => {
         return [...curr, ...(typeof actions === "function" ? actions(params) : actions)];
       },
       []

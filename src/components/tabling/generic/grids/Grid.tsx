@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { map, isNil, includes } from "lodash";
+import { map, isNil, includes, cloneDeep } from "lodash";
 import classNames from "classnames";
 
 import { AgGridReact } from "@ag-grid-community/react";
@@ -25,7 +25,8 @@ import {
   CellEditingStartedEvent,
   PasteEndEvent,
   PasteStartEvent,
-  ProcessDataFromClipboardParams
+  ProcessDataFromClipboardParams,
+  ValueGetterParams
 } from "@ag-grid-community/core";
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
@@ -91,13 +92,17 @@ type UseAgProps<R extends Table.RowData, M extends Model.Model = Model.Model> = 
   readonly getContextMenuItems?: (row: Table.Row<R, M>, node: Table.RowNode) => Table.MenuItemDef[];
 };
 
-export interface GridProps<R extends Table.RowData, M extends Model.Model = Model.Model> extends UseAgProps<R, M> {
+export interface GridProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> extends UseAgProps<R, M> {
   readonly id: Table.GridId;
   readonly data?: Table.Row<R, M>[];
   readonly hiddenColumns: (keyof R)[];
   readonly gridOptions: Table.GridOptions;
-  readonly indexColumn?: Partial<Table.Column<R, M>>;
-  readonly columns: Table.Column<R, M>[];
+  readonly indexColumn?: Partial<Table.Column<R, M, G>>;
+  readonly columns: Table.Column<R, M, G>[];
   readonly className?: Table.GeneralClassName;
   readonly style?: React.CSSProperties;
   readonly rowClass?: Table.RowClassName;
@@ -114,7 +119,7 @@ export interface GridProps<R extends Table.RowData, M extends Model.Model = Mode
   readonly onFirstDataRendered: (e: Table.FirstDataRenderedEvent) => void;
 }
 
-const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
+const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>({
   id,
   columns,
   data,
@@ -124,16 +129,16 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
   indexColumn,
   style,
   ...props
-}: GridProps<R, M>): JSX.Element => {
-  const rowData = useMemo(
-    () => (isNil(data) ? [] : map(data, (row: Table.Row<R, M>) => ({ ...row, meta: { ...row.meta, gridId: id } }))),
+}: GridProps<R, M, G>): JSX.Element => {
+  const rowData = useMemo<R[]>(
+    () => (isNil(data) ? [] : map(data, (row: Table.Row<R, M>) => row.data)),
     [id, hooks.useDeepEqualMemo(data)]
   );
 
-  const localColumns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
-    let cs: Table.Column<R, M>[] = map(
+  const localColumns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
+    let cs: Table.Column<R, M, G>[] = map(
       columns,
-      (col: Table.Column<R, M>, index: number): Table.Column<R, M> =>
+      (col: Table.Column<R, M, G>, index: number): Table.Column<R, M, G> =>
         ({
           ...col,
           headerComponentParams: { ...col.headerComponentParams, column: col },
@@ -141,21 +146,22 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
           hide: includes(hiddenColumns, col.field),
           resizable: index === columns.length - 1 ? false : !isNil(col.resizable) ? col.resizable : true,
           cellStyle: { ...tabling.columns.getColumnTypeCSSStyle(col.columnType), ...col.cellStyle }
-        } as Table.Column<R, M>)
+        } as Table.Column<R, M, G>)
     );
-    cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M>>(cs, { field: "index" }, indexColumn) : cs;
+    cs = !isNil(indexColumn) ? util.updateInArray<Table.Column<R, M, G>>(cs, { field: "index" }, indexColumn) : cs;
     return cs;
   }, [hooks.useDeepEqualMemo(columns)]);
 
   const colDefs = useMemo(
     () =>
-      map(localColumns, (col: Table.Column<R, M>): ColDef => {
+      map(localColumns, (col: Table.Column<R, M, G>): ColDef => {
         /*
         While AG Grid will not break if we include extra properties on the ColDef(s)
         (properties from our own custom Table.Column model) - they will complain a lot.
         So we need to try to remove them.
         */
         const {
+          groupField,
           footer,
           page,
           selectable,
@@ -184,6 +190,15 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
           field: col.field as string,
           cellStyle: !isNil(col.cellStyle) ? (col.cellStyle as { [key: string]: any }) : undefined,
           suppressMenu: true,
+          valueGetter: (params: ValueGetterParams) => {
+            if (!isNil(params.node)) {
+              const row: Table.Row<R> | undefined = params.node.data;
+              if (!isNil(row) && !isNil(row.data)) {
+                return row.data[params.column.getColId() as keyof R];
+              }
+            }
+            return col.nullValue !== undefined ? col.nullValue : null;
+          },
           cellRenderer:
             /* eslint-disable indent */
             typeof col.cellRenderer === "string"
@@ -193,25 +208,34 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
               : undefined,
           colSpan: (params: ColSpanParams) => (!isNil(col.colSpan) ? col.colSpan({ ...params, columns }) : 1),
           editable: (params: EditableCallbackParams) => {
-            const row: R = params.node.data;
-            /* eslint-disable indent */
-            return isNil(col.editable)
-              ? false
-              : typeof col.editable === "function"
-              ? col.editable({ row, column: col })
-              : col.editable;
+            const row: Table.Row<R, M> = params.node.data;
+            if (tabling.typeguards.isDataRow(row)) {
+              /* eslint-disable indent */
+              return isNil(col.editable)
+                ? false
+                : typeof col.editable === "function"
+                ? col.editable({ row, column: col })
+                : col.editable;
+            }
+            return false;
           },
           cellClass: (params: CellClassParams) => {
-            const row: R = params.node.data;
-            /* eslint-disable indent */
-            const isSelectable = isNil(col.selectable)
-              ? true
-              : typeof col.selectable === "function"
-              ? col.selectable({ row, column: col })
-              : col.selectable;
+            const row: Table.Row<R, M> = params.node.data;
+            if (tabling.typeguards.isDataRow(row)) {
+              /* eslint-disable indent */
+              const isSelectable = isNil(col.selectable)
+                ? true
+                : typeof col.selectable === "function"
+                ? col.selectable({ row, column: col })
+                : col.selectable;
+              return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
+                "cell--not-selectable": isSelectable === false,
+                "cell--not-editable": !(col.editable === true)
+              });
+            }
             return tabling.aggrid.mergeClassNames<CellClassParams>(params, "cell", col.cellClass, {
-              "cell--not-selectable": isSelectable === false,
-              "cell--not-editable": !(col.editable === true)
+              "cell--not-selectable": true,
+              "cell--not-editable": true
             });
           }
         };
@@ -267,7 +291,16 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
         getRowClass={(params: RowClassParams) =>
           tabling.aggrid.mergeClassNames<RowClassParams>(params, "row", rowClass)
         }
-        rowData={rowData}
+        rowData={map(data, (r: Table.Row<R, M>) => {
+          /*
+          We have to deep clone the row data because it is being pulled directly from the store
+          and as such, is immutable.  If we did not do this, than AG Grid would be applying the
+          updates to the elements of the data in the store, i.e. mutating the store.  This only
+          becomes a problem since we are nestling the actual underlying row data in a `data` property
+          of the <Row> model.
+          */
+          return cloneDeep(r);
+        })}
         columnDefs={colDefs}
         debug={Config.tableDebug}
         modules={AllModules}

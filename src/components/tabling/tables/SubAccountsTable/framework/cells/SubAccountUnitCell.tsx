@@ -6,6 +6,7 @@ const SubAccountUnitCell = (
   props: framework.cells.ModelTagCellProps<
     Tables.SubAccountRowData,
     Model.SubAccount,
+    Model.BudgetGroup,
     Tables.SubAccountTableStore,
     Model.Tag
   >

@@ -14,7 +14,7 @@ export type AuthenticatedTemplateProps = AccountsTableProps &
   Omit<AuthenticatedBudgetTableProps<R, M>, "columns" | "cookieNames"> & {
     readonly budget: Model.Template | null;
     readonly cookieNames?: Table.CookieNames;
-    readonly onEditGroup: (group: Model.BudgetGroup) => void;
+    readonly onEditGroup: (group: Table.GroupRow<R>) => void;
   };
 
 const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): JSX.Element => {
@@ -23,7 +23,7 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
   return (
     <AuthenticatedBudgetTable<R, M>
       {...props}
-      actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
+      actions={(params: Table.AuthenticatedMenuActionParams<R, M, Model.BudgetGroup>) => [
         {
           icon: "folder",
           disabled: true,
@@ -38,15 +38,18 @@ const AuthenticatedTemplateAccountsTable = (props: AuthenticatedTemplateProps): 
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(TemplateColumns, {
-        identifier: (col: Table.Column<R, M>) => ({
-          ...col,
-          cellRendererParams: {
-            ...col.cellRendererParams,
-            onGroupEdit: props.onEditGroup
-          }
-        })
-      })}
+      columns={tabling.columns.mergeColumns<Table.Column<R, M, Model.BudgetGroup>, R, M, Model.BudgetGroup>(
+        TemplateColumns,
+        {
+          identifier: (col: Table.Column<R, M, Model.BudgetGroup>) => ({
+            ...col,
+            cellRendererParams: {
+              ...col.cellRendererParams,
+              onGroupEdit: props.onEditGroup
+            }
+          })
+        }
+      )}
     />
   );
 };

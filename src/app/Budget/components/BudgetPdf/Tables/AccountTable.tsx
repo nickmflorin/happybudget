@@ -9,10 +9,11 @@ import { BodyRow, HeaderRow, FooterRow, GroupRow } from "../Rows";
 
 type M = Model.PdfSubAccount;
 type R = Tables.PdfSubAccountRowData;
+type G = Model.BudgetGroup;
 
 type AccountTableProps = {
   readonly account: Model.PdfAccount;
-  readonly columns: PdfTable.Column<R, M>[];
+  readonly columns: PdfTable.Column<R, M, G>[];
   readonly options: PdfBudgetTable.Options;
 };
 
@@ -23,12 +24,12 @@ const AccountTable = ({
   options
 }: AccountTableProps): JSX.Element => {
   const showFooterRow = useMemo(() => {
-    return filter(columns, (column: Table.Column<R, M>) => !isNil(column.footer)).length !== 0;
+    return filter(columns, (column: Table.Column<R, M, G>) => !isNil(column.footer)).length !== 0;
   }, [columns]);
 
   const accountSubHeaderRow = useMemo(() => {
     const row: { [key: string]: any } = {};
-    forEach(columns, (column: PdfTable.Column<R, M>) => {
+    forEach(columns, (column: PdfTable.Column<R, M, G>) => {
       if (!isNil(account[column.field as keyof Model.PdfAccount])) {
         row[column.field as keyof Model.PdfAccount] = account[column.field as keyof Model.PdfAccount];
       } else {
@@ -42,7 +43,7 @@ const AccountTable = ({
     const createSubAccountFooterRow = (subaccount: M) => {
       return reduce(
         columns,
-        (obj: { [key: string]: any }, col: PdfTable.Column<R, M>) => {
+        (obj: { [key: string]: any }, col: PdfTable.Column<R, M, G>) => {
           if (!isNil(col.childFooter) && !isNil(col.childFooter(subaccount).value)) {
             obj[col.field as string] = col.childFooter(subaccount).value;
           } else {
@@ -57,7 +58,7 @@ const AccountTable = ({
     const createSubAccountHeaderRow = (subaccount: M) => {
       return reduce(
         columns,
-        (obj: { [key: string]: any }, col: PdfTable.Column<R, M>) => {
+        (obj: { [key: string]: any }, col: PdfTable.Column<R, M, G>) => {
           if (
             !isNil(subaccount[col.field as keyof M]) &&
             (subaccount.subaccounts.length === 0 || col.tableColumnType !== "calculated")
@@ -95,7 +96,7 @@ const AccountTable = ({
               (subaccountRow: Table.ModelWithRow<R, M>, subaccountRowGroupIndex: number): JSX.Element[] => {
                 const details = subaccountRow.model.subaccounts;
                 const showSubAccountFooterRow =
-                  filter(columns, (column: PdfTable.Column<R, M>) => !isNil(column.childFooter)).length !== 0 &&
+                  filter(columns, (column: PdfTable.Column<R, M, G>) => !isNil(column.childFooter)).length !== 0 &&
                   details.length !== 0;
                 const isLastSubAccount = subaccountRowGroupIndex === subaccounts.length - 1;
 
@@ -121,10 +122,10 @@ const AccountTable = ({
                             className={"detail-tr"}
                             row={detailRow.row}
                             cellProps={{
-                              cellContentsVisible: (params: PdfTable.CellCallbackParams<R, M>) =>
+                              cellContentsVisible: (params: PdfTable.CellCallbackParams<R, M, G>) =>
                                 params.column.field === "identifier" ? false : true,
                               textClassName: "detail-tr-td-text",
-                              className: (params: PdfTable.CellCallbackParams<R, M>) => {
+                              className: (params: PdfTable.CellCallbackParams<R, M, G>) => {
                                 if (params.column.field === "description") {
                                   return classNames("detail-td", "indent-td");
                                 }
@@ -147,7 +148,7 @@ const AccountTable = ({
                           columns={columns}
                           columnIndent={1}
                           cellProps={{
-                            textClassName: (params: PdfTable.CellCallbackParams<R, M>) => {
+                            textClassName: (params: PdfTable.CellCallbackParams<R, M, G>) => {
                               if (params.column.field === "description") {
                                 return "detail-group-indent-td";
                               }

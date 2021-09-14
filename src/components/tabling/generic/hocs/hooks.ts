@@ -4,10 +4,14 @@ import { NavigateToNextCellParams, TabToNextCellParams } from "@ag-grid-communit
 
 import { hooks, tabling, events } from "lib";
 
-export interface UseCellNavigationParams<R extends Table.RowData, M extends Model.Model = Model.Model> {
+export interface UseCellNavigationParams<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> {
   readonly tableId?: Table.Id;
   readonly apis: Table.GridApis | null;
-  readonly columns: Table.Column<R, M>[];
+  readonly columns: Table.Column<R, M, G>[];
   readonly includeRowInNavigation?: (row: Table.DataRow<R, M>) => boolean;
   readonly onNewRowRequired?: () => void;
 }
@@ -20,8 +24,13 @@ type UseCellNavigationReturnType = [
   (node: Table.RowNode) => Table.RowNode[]
 ];
 
-export const useCellNavigation = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  params: UseCellNavigationParams<R, M>
+/* eslint-disable indent */
+export const useCellNavigation = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
+  params: UseCellNavigationParams<R, M, G>
 ): UseCellNavigationReturnType => {
   const scrollToBottom = hooks.useDynamicCallback((numRows: number) => {
     params.apis?.grid.ensureIndexVisible(numRows - 1, "bottom");

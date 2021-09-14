@@ -4,6 +4,8 @@ import { BodyCell } from "../Cells";
 import { CellProps } from "../Cells/Cell";
 import Row, { RowProps } from "./Row";
 
+type G = Model.BudgetGroup;
+
 const BodyRow = <R extends Table.RowData, M extends Model.Model = Model.Model>({
   cellProps,
   ...props
@@ -14,7 +16,7 @@ const BodyRow = <R extends Table.RowData, M extends Model.Model = Model.Model>({
   <Row
     {...props}
     className={classNames("body-tr", props.className)}
-    renderCell={(params: { column: PdfTable.Column<R, M>; indented: boolean; location: PdfTable.CellLocation }) => {
+    renderCell={(params: { column: PdfTable.Column<R, M, G>; indented: boolean; location: PdfTable.CellLocation }) => {
       return (
         <BodyCell<R, M>
           key={`${params.location.index}-${params.location.colIndex}`}

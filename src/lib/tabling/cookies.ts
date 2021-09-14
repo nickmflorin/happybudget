@@ -80,9 +80,14 @@ export const updateHiddenColumns = <R extends Table.RowData>(
   return hiddenColumns;
 };
 
-const validateFieldOrder = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+/* eslint-disable indent */
+const validateFieldOrder = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
   obj: any,
-  cols: Table.Column<R, M>[]
+  cols: Table.Column<R, M, G>[]
 ): FieldOrder<keyof R> | null => {
   if (
     typeof obj === "object" &&
@@ -91,7 +96,7 @@ const validateFieldOrder = <R extends Table.RowData, M extends Model.Model = Mod
     typeof obj.field === "string" &&
     includes([-1, 0, 1], obj.order) &&
     includes(
-      map(cols, (col: Table.Column<R, M>) => col.field),
+      map(cols, (col: Table.Column<R, M, G>) => col.field),
       obj.field
     )
   ) {
@@ -103,9 +108,13 @@ const validateFieldOrder = <R extends Table.RowData, M extends Model.Model = Mod
   return null;
 };
 
-export const validateOrdering = <R extends Table.RowData, M extends Model.Model = Model.Model>(
+export const validateOrdering = <
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+>(
   obj: any,
-  cols: Table.Column<R, M>[]
+  cols: Table.Column<R, M, G>[]
 ): FieldOrder<keyof R>[] | null => {
   if (Array.isArray(obj)) {
     if (obj.length === 0) {

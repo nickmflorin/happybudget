@@ -7,7 +7,12 @@ import { ModelTagsMenu } from "components/menus";
 import { framework } from "components/tabling/generic";
 
 export interface FringesEditorProps
-  extends Table.EditorParams<Tables.SubAccountRowData, Model.SubAccount, Tables.SubAccountTableStore> {
+  extends Table.EditorParams<
+    Tables.SubAccountRowData,
+    Model.SubAccount,
+    Model.BudgetGroup,
+    Tables.SubAccountTableStore
+  > {
   readonly onAddFringes: () => void;
   readonly colId: keyof Tables.SubAccountRowData;
 }
@@ -19,6 +24,7 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
     ID[],
     Tables.SubAccountRowData,
     Model.SubAccount,
+    Model.BudgetGroup,
     Tables.SubAccountTableStore
   >({
     ...props,
@@ -33,7 +39,11 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
       menu={editor.menu}
       includeSearch={true}
       selected={editor.value}
-      models={filter(fringes, (fringe: Tables.FringeRow) => !isNil(fringe.name) && fringe.name.trim() !== "")}
+      models={filter(fringes, (fringe: Tables.FringeRow) => !isNil(fringe.data.name) && fringe.data.name.trim() !== "")}
+      tagProps={{
+        getModelColor: (m: Tables.FringeRow) => m.data.color,
+        getModelText: (m: Tables.FringeRow) => m.data.name
+      }}
       onChange={(e: MenuChangeEvent<Tables.FringeRow>) => {
         const selectedStates = filter(
           e.state,
@@ -42,7 +52,7 @@ const FringesEditor = (props: FringesEditorProps, ref: ForwardedRef<any>) => {
         const ms = map(selectedStates, (s: IMenuItemState<Tables.FringeRow>) => s.model.id);
         editor.onChange(ms, e.event, false);
       }}
-      searchIndices={["name"]}
+      searchIndices={["data.name"]}
       focusSearchOnCharPress={true}
       defaultFocusOnlyItem={true}
       defaultFocusFirstItem={true}

@@ -10,6 +10,7 @@ const PaymentMethodEditor = (
       Model.PaymentMethod,
       Tables.ActualRowData,
       Model.Actual,
+      Model.Group,
       Tables.ActualTableStore
     >,
     "models" | "searchIndices"
@@ -17,7 +18,7 @@ const PaymentMethodEditor = (
   ref: ForwardedRef<any>
 ) => {
   return (
-    <ChoiceSelectEditor<Model.PaymentMethod, Tables.ActualRowData, Model.Actual, Tables.ActualTableStore>
+    <ChoiceSelectEditor<Model.PaymentMethod, Tables.ActualRowData, Model.Actual, Model.Group, Tables.ActualTableStore>
       searchIndices={["name"]}
       ref={ref}
       models={model.models.PaymentMethods}

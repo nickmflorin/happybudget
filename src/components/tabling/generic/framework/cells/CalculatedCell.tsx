@@ -8,8 +8,9 @@ import connectCellToStore from "./connectCellToStore";
 export interface CalculatedCellProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> extends Table.ValueCellProps<R, M, S> {
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> extends Table.ValueCellProps<R, M, G, S> {
   readonly renderRedIfNegative?: boolean;
 }
 
@@ -17,11 +18,12 @@ export interface CalculatedCellProps<
 const CalculatedCell = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >({
   renderRedIfNegative = false,
   ...props
-}: CalculatedCellProps<R, M, S>): JSX.Element => {
+}: CalculatedCellProps<R, M, G, S>): JSX.Element => {
   const renderRed = useMemo(() => {
     if (renderRedIfNegative === true && !isNil(props.value)) {
       if (typeof props.value === "string") {
@@ -37,7 +39,7 @@ const CalculatedCell = <
     }
   }, [props.value, renderRedIfNegative]);
 
-  return <BodyCell<R, M, S> className={classNames({ "color--red": renderRed })} {...props} />;
+  return <BodyCell<R, M, G, S> className={classNames({ "color--red": renderRed })} {...props} />;
 };
 
 export default connectCellToStore(CalculatedCell) as typeof CalculatedCell;

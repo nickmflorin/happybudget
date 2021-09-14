@@ -169,7 +169,7 @@ namespace Redux {
 
   type TableTaskMap<R extends Table.RowData, M extends Model.Model = Model.Model> = {
     readonly request: null;
-    readonly handleRowAddEvent: Table.RowAddEvent<R, M>;
+    readonly handleRowAddEvent: Table.RowAddEvent<R>;
     readonly handleRowDeleteEvent: Table.RowDeleteEvent<R, M>;
     readonly handleDataChangeEvent: Table.DataChangeEvent<R, M>;
   }

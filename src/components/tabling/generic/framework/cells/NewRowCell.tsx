@@ -3,7 +3,7 @@ import { util } from "lib";
 import { Icon } from "components";
 import { IconButton } from "components/buttons";
 
-interface NewRowCellProps extends Table.CellProps<any, any, any, null> {
+interface NewRowCellProps extends Table.CellProps<any, any, any, any, null> {
   onChangeEvent: (e: Table.ChangeEvent<any>) => void;
 }
 

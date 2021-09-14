@@ -48,7 +48,8 @@ const genericReducer = combineReducers({
         getPlaceholderRowName: "Sub Account",
         columns: filter(
           SubAccountsTable.Columns,
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
+            c.requiresAuthentication !== true
         ),
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
           tableId: "fringes-table",
@@ -92,7 +93,8 @@ const genericReducer = combineReducers({
         getPlaceholderRowName: "Sub Account",
         columns: filter(
           SubAccountsTable.Columns,
-          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount, Model.BudgetGroup>) =>
+            c.requiresAuthentication !== true
         ),
         fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
           tableId: "fringes-table",

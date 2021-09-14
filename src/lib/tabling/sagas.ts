@@ -8,10 +8,11 @@ import * as typeguards from "./typeguards";
 export const createTableSaga = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group,
   T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
-  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
+  A extends Redux.AuthenticatedTableActionMap<R, M, G> = Redux.AuthenticatedTableActionMap<R, M, G>
 >(
-  config: Table.SagaConfig<R, M, T, A>
+  config: Table.SagaConfig<R, M, G, T, A>
 ): Saga => {
   function* requestSaga(): SagaIterator {
     let lastTasks;
@@ -35,12 +36,13 @@ export const createTableSaga = <
 export const createUnauthenticatedTableSaga = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group,
   T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
-  A extends Redux.AuthenticatedTableActionMap<R, M> = Redux.AuthenticatedTableActionMap<R, M>
+  A extends Redux.AuthenticatedTableActionMap<R, M, G> = Redux.AuthenticatedTableActionMap<R, M, G>
 >(
-  config: Table.SagaConfig<R, M, T, A>
+  config: Table.SagaConfig<R, M, G, T, A>
 ): Saga => {
-  return createTableSaga<R, M, T, A>(config);
+  return createTableSaga<R, M, G, T, A>(config);
 };
 
 const isTableTaskMapWithGroups = <R extends Table.RowData, M extends Model.Model = Model.Model>(
@@ -56,7 +58,7 @@ export const createAuthenticatedTableSaga = <
   T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
   A extends Redux.AuthenticatedTableActionMap<R, M, G> = Redux.AuthenticatedTableActionMap<R, M, G>
 >(
-  config: Table.SagaConfig<R, M, T, A>
+  config: Table.SagaConfig<R, M, G, T, A>
 ): Saga => {
   function* tableChangeEventSaga(): SagaIterator {
     // TODO: We probably want a way to prevent duplicate events that can cause
@@ -73,9 +75,9 @@ export const createAuthenticatedTableSaga = <
         } else if (typeguards.isRowAddEvent(event)) {
           // If the event is artificial, we are submitting it from inside a task - so we do not want
           // to trigger a subsequent task because it will lead to a recursion.
-          const payload: Table.RowAddEvent<R, M> = (action as Redux.Action<Table.RowAddEvent<R, M>>).payload;
+          const payload: Table.RowAddEvent<R> = (action as Redux.Action<Table.RowAddEvent<R>>).payload;
           if (payload.artificial !== true) {
-            yield call(config.tasks.handleRowAddEvent, action as Redux.Action<Table.RowAddEvent<R, M>>);
+            yield call(config.tasks.handleRowAddEvent, action as Redux.Action<Table.RowAddEvent<R>>);
           }
         } else if (typeguards.isRowDeleteEvent(event)) {
           // Blocking call so that table changes happen sequentially.
@@ -96,7 +98,7 @@ export const createAuthenticatedTableSaga = <
     }
   }
 
-  const baseTableSaga = createTableSaga<R, M, T, A>(config);
+  const baseTableSaga = createTableSaga<R, M, G, T, A>(config);
 
   function* rootSaga(): SagaIterator {
     yield spawn(baseTableSaga);

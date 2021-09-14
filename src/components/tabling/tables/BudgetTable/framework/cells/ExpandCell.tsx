@@ -6,8 +6,9 @@ import { IconButton } from "components/buttons";
 interface ExpandCellProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> extends Table.CellProps<R, M, S, null> {
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> extends Table.CellProps<R, M, G, S, null> {
   onClick: (row: Table.ModelRow<R, M>) => void;
   rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
 }
@@ -16,13 +17,14 @@ interface ExpandCellProps<
 const ExpandCell = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >({
   rowCanExpand,
   onClick,
   node,
   ...props
-}: ExpandCellProps<R, M, S>): JSX.Element => {
+}: ExpandCellProps<R, M, G, S>): JSX.Element => {
   // This cell renderer will only be allowed if the row is of type model.
   const row: Table.ModelRow<R, M> = node.data;
   const rowIsHovered = () => {
@@ -36,7 +38,7 @@ const ExpandCell = <
 
   // Note: Wrapping the cell in a <div> helps alleviate some issues with AG Grid.
   if (isNil(rowCanExpand) || rowCanExpand(row) === true) {
-    if (!isNil(row.meta.children) && row.meta.children.length !== 0) {
+    if (!isNil(row.children) && row.children.length !== 0) {
       return (
         <IconButton
           className={"ag-grid-expand-button"}

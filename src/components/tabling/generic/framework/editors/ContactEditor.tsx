@@ -11,28 +11,30 @@ import { GenericModelMenuEditor } from "./generic";
 interface ContactEditorProps<
   R extends Table.RowData & { readonly contact: number | null },
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> extends Table.EditorParams<R, M, S> {
-  readonly onNewContact: (params: { name?: string; change: Omit<Table.SoloCellChange<R, M>, "newValue"> }) => void;
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> extends Table.EditorParams<R, M, G, S> {
+  readonly onNewContact: (params: { name?: string; change: Omit<Table.SoloCellChange<R>, "newValue"> }) => void;
 }
 
 /* eslint-disable indent */
 const ContactEditor = <
   R extends Table.RowData & { readonly contact: number | null },
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >(
-  props: ContactEditorProps<R, M, S>,
+  props: ContactEditorProps<R, M, G, S>,
   ref: ForwardedRef<any>
 ) => {
   const contacts = useContacts();
 
-  const [editor] = framework.editors.useModelMenuEditor<Model.Contact, ID, R, M, S>({
+  const [editor] = framework.editors.useModelMenuEditor<Model.Contact, ID, R, M, G, S>({
     ...props,
     forwardedRef: ref
   });
   return (
-    <GenericModelMenuEditor<Model.Contact, ID, R, M, S>
+    <GenericModelMenuEditor<Model.Contact, ID, R, M, G, S>
       {...props}
       editor={editor}
       style={{ width: 160 }}
@@ -53,18 +55,16 @@ const ContactEditor = <
                 props.onNewContact({
                   name: searchValue,
                   change: {
-                    oldValue: (row.contact || null) as unknown as Table.RowValue<R>,
+                    oldValue: (row.data.contact || null) as unknown as Table.RowValue<R>,
                     field: props.column.field,
-                    row,
                     id: row.id
                   }
                 });
               } else {
                 props.onNewContact({
                   change: {
-                    oldValue: (row.contact || null) as unknown as Table.RowValue<R>,
+                    oldValue: (row.data.contact || null) as unknown as Table.RowValue<R>,
                     field: props.column.field,
-                    row,
                     id: row.id
                   }
                 });

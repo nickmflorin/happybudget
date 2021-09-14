@@ -62,7 +62,7 @@ interface AccountsTableProps {
 
 const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Element => {
   const [groupAccounts, setGroupAccounts] = useState<ID[] | undefined>(undefined);
-  const [groupToEdit, setGroupToEdit] = useState<Model.BudgetGroup | undefined>(undefined);
+  const [groupToEdit, setGroupToEdit] = useState<Table.GroupRow<R> | undefined>(undefined);
 
   const dispatch = useDispatch();
   const history = useHistory();
@@ -79,7 +79,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
         savingChangesPortalId={"saving-changes"}
         onRowExpand={(row: Table.ModelRow<R>) => history.push(`/templates/${templateId}/accounts/${row.id}`)}
         onGroupRows={(rows: Table.DataRow<R>[]) => setGroupAccounts(map(rows, (row: Table.DataRow<R>) => row.id))}
-        onEditGroup={(group: Model.BudgetGroup) => setGroupToEdit(group)}
+        onEditGroup={(group: Table.GroupRow<R>) => setGroupToEdit(group)}
       />
       {!isNil(groupAccounts) && !isNil(templateId) && (
         <CreateTemplateAccountGroupModal
@@ -100,7 +100,7 @@ const AccountsTable = ({ templateId, template }: AccountsTableProps): JSX.Elemen
       )}
       {!isNil(groupToEdit) && (
         <EditGroupModal
-          group={groupToEdit}
+          groupId={groupToEdit.group}
           open={true}
           onCancel={() => setGroupToEdit(undefined)}
           onSuccess={(group: Model.BudgetGroup) => {

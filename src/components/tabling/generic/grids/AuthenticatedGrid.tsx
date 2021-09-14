@@ -11,7 +11,7 @@ export interface AuthenticatedGridProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
   G extends Model.Group = Model.Group
-> extends GridProps<R, M> {
+> extends GridProps<R, M, G> {
   readonly apis: Table.GridApis | null;
   readonly framework?: Table.Framework;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
@@ -51,14 +51,14 @@ const AuthenticatedGrid = <
     };
   }, [framework, props.id]);
 
-  const columns = useMemo<Table.Column<R, M>[]>((): Table.Column<R, M>[] => {
+  const columns = useMemo<Table.Column<R, M, G>[]>((): Table.Column<R, M, G>[] => {
     return map(
       props.columns,
-      (col: Table.Column<R, M>): Table.Column<R, M> =>
+      (col: Table.Column<R, M, G>): Table.Column<R, M, G> =>
         ({
           ...col,
           cellRendererParams: { ...col.cellRendererParams, onChangeEvent: props.onChangeEvent, readOnly: false }
-        } as Table.Column<R, M>)
+        } as Table.Column<R, M, G>)
     );
   }, [hooks.useDeepEqualMemo(props.columns)]);
 

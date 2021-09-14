@@ -7,6 +7,7 @@
 
 interface Window {
   analytics: any;
+  __REDUX_DEVTOOLS_EXTENSION_COMPOSE__: any;
 }
 
 type ID = string | number;

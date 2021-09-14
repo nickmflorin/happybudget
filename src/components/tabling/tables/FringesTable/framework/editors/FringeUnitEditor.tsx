@@ -10,6 +10,7 @@ const FringeUnitEditor = (
       Model.FringeUnit,
       Tables.FringeRowData,
       Model.Fringe,
+      Model.Group,
       Tables.FringeTableStore
     >,
     "models" | "searchIndices"
@@ -17,7 +18,7 @@ const FringeUnitEditor = (
   ref: ForwardedRef<any>
 ) => {
   return (
-    <ChoiceSelectEditor<Model.FringeUnit, Tables.FringeRowData, Model.Fringe, Tables.FringeTableStore>
+    <ChoiceSelectEditor<Model.FringeUnit, Tables.FringeRowData, Model.Fringe, Model.Group, Tables.FringeTableStore>
       searchIndices={["name"]}
       ref={ref}
       models={model.models.FringeUnits}

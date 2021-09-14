@@ -12,8 +12,9 @@ import SubAccountsTable, { WithSubAccountsTableProps } from "./SubAccountsTable"
 
 type R = Tables.SubAccountRowData;
 type M = Model.SubAccount;
+type G = Model.BudgetGroup;
 
-type PreContactCreate = Omit<Table.SoloCellChange<R, M>, "newValue">;
+type PreContactCreate = Omit<Table.SoloCellChange<R>, "newValue">;
 
 export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>, "columns"> & {
   readonly subAccountUnits: Model.Tag[];
@@ -26,7 +27,7 @@ export type AuthenticatedBudgetProps = Omit<AuthenticatedBudgetTableProps<R, M>,
   readonly onExportPdf: () => void;
   readonly onNewContact: (params: { name?: string; change: PreContactCreate }) => void;
   readonly onEditContact: (id: ID) => void;
-  readonly onEditGroup: (group: Model.BudgetGroup) => void;
+  readonly onEditGroup: (group: Table.GroupRow<R>) => void;
   readonly onAddFringes: () => void;
   readonly onEditFringes: () => void;
 };
@@ -40,8 +41,8 @@ const AuthenticatedBudgetSubAccountsTable = (
     <AuthenticatedBudgetTable<R, M>
       {...props}
       table={table}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(props.columns, {
-        identifier: (col: Table.Column<R, M>) =>
+      columns={tabling.columns.mergeColumns<Table.Column<R, M, G>, R, M, G>(props.columns, {
+        identifier: (col: Table.Column<R, M, G>) =>
           budgetTableFramework.columnObjs.IdentifierColumn<R, M>({
             ...col,
             cellRendererParams: {
@@ -51,8 +52,8 @@ const AuthenticatedBudgetSubAccountsTable = (
             headerName: props.identifierFieldHeader
           }),
         description: { headerName: `${props.categoryName} Description` },
-        unit: (col: Table.Column<R, M>) =>
-          framework.columnObjs.TagSelectColumn<R, M>({ ...col, models: props.subAccountUnits }),
+        unit: (col: Table.Column<R, M, G>) =>
+          framework.columnObjs.TagSelectColumn<R, M, G>({ ...col, models: props.subAccountUnits }),
         fringes: {
           cellEditor: "FringesEditor",
           cellEditorParams: { onAddFringes: props.onAddFringes },
@@ -74,8 +75,8 @@ const AuthenticatedBudgetSubAccountsTable = (
             return map(fringes, (fringe: Tables.FringeRow) => fringe.name).join(", ");
           }
         },
-        contact: (col: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) =>
-          framework.columnObjs.ModelSelectColumn<R, M, Model.Contact>({
+        contact: (col: Table.Column<R, M, G>) =>
+          framework.columnObjs.ModelSelectColumn<R, M, Model.Contact, G>({
             ...col,
             cellRendererParams: { onEditContact: props.onEditContact },
             cellEditorParams: { onNewContact: props.onNewContact },
@@ -95,7 +96,7 @@ const AuthenticatedBudgetSubAccountsTable = (
             }
           })
       })}
-      onCellFocusChanged={(params: Table.CellFocusChangedParams<R, M>) => {
+      onCellFocusChanged={(params: Table.CellFocusChangedParams<R, M, G>) => {
         /*
         For the ContactCell, we want the contact tag in the cell to be clickable
         only when the cell is focused.  This means we have to rerender the cell when
@@ -117,7 +118,7 @@ const AuthenticatedBudgetSubAccountsTable = (
           });
         }
       }}
-      actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
+      actions={(params: Table.AuthenticatedMenuActionParams<R, M, G>) => [
         {
           icon: "folder",
           disabled: true,
@@ -131,9 +132,9 @@ const AuthenticatedBudgetSubAccountsTable = (
           isWriteOnly: true
         },
         ...(isNil(props.actions) ? [] : Array.isArray(props.actions) ? props.actions : props.actions(params)),
-        framework.actions.ToggleColumnAction<R, M, Model.BudgetGroup>(table.current, params),
+        framework.actions.ToggleColumnAction<R, M, G>(table.current, params),
         framework.actions.ExportPdfAction(props.onExportPdf),
-        framework.actions.ExportCSVAction<R, M, Model.BudgetGroup>(table.current, params, props.exportFileName)
+        framework.actions.ExportCSVAction<R, M, G>(table.current, params, props.exportFileName)
       ]}
     />
   );

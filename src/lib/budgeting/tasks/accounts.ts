@@ -10,6 +10,7 @@ import * as util from "../../util";
 type R = Tables.AccountRowData;
 type C = Model.Account;
 type P = Http.AccountPayload;
+type G = Model.BudgetGroup;
 
 export type AccountsTableServiceSet = {
   request: (id: ID, query: Http.ListQuery, options: Http.RequestOptions) => Promise<Http.ListResponse<C>>;
@@ -57,7 +58,6 @@ export type AuthenticatedAccountsTableTaskConfig<B extends Model.Template | Mode
 > & {
   readonly services: AuthenticatedAccountsTableServiceSet<B>;
   readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
-  readonly selectData: (state: Application.Authenticated.Store) => R[];
   readonly selectAutoIndex: (state: Application.Authenticated.Store) => boolean;
 };
 
@@ -86,7 +86,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         ]);
         yield put(config.actions.response({ models, groups }));
         if (models.data.length === 0) {
-          const event: Table.RowAddEvent<R, C> = {
+          const event: Table.RowAddEvent<R> = {
             type: "rowAdd",
             payload: [
               { id: `placeholder-${util.generateRandomNumericId()}`, data: {} },
@@ -119,12 +119,12 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
   const requestGroups = (objId: ID): Promise<Http.ListResponse<Model.BudgetGroup>> =>
     config.services.requestGroups(objId, { no_pagination: true }, { cancelToken: source.token });
 
-  function* bulkCreateTask(objId: ID, e: Table.RowAddEvent<R, C>, errorMessage: string): SagaIterator {
+  function* bulkCreateTask(objId: ID, e: Table.RowAddEvent<R>, errorMessage: string): SagaIterator {
     if (isAuthenticatedConfig(config)) {
       const data = yield select(config.selectData);
       const autoIndex = yield select(config.selectAutoIndex);
 
-      const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, C>(
+      const requestPayload: Http.BulkCreatePayload<P> = tabling.http.createBulkCreatePayload<R, P, C, G>(
         e.payload,
         config.columns,
         {
@@ -155,7 +155,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
         // assumption that the models in the response are in the same order as the placeholder IDs.
         const placeholderIds: Table.PlaceholderRowId[] = map(
           Array.isArray(e.payload) ? e.payload : [e.payload],
-          (rowAdd: Table.RowAdd<R, C>) => rowAdd.id
+          (rowAdd: Table.RowAdd<R>) => rowAdd.id
         );
         yield put(config.actions.addModelsToState({ placeholderIds: placeholderIds, models: response.children }));
       } catch (err: unknown) {
@@ -243,10 +243,10 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
     }
   }
 
-  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R, C>>): SagaIterator {
+  function* handleRowAddEvent(action: Redux.Action<Table.RowAddEvent<R>>): SagaIterator {
     const objId = yield select(config.selectObjId);
     if (!isNil(objId) && !isNil(action.payload)) {
-      const e: Table.RowAddEvent<R, C> = action.payload;
+      const e: Table.RowAddEvent<R> = action.payload;
       yield fork(bulkCreateTask, objId, e, "There was an error creating the rows");
     }
   }
@@ -296,13 +296,16 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
   // ToDo: This is an EDGE case, but we need to do it for smooth operation - we need to filter out the
   // changes that correspond to placeholder rows.
   function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, C>>): SagaIterator {
-    const objId = yield select(config.selectObjId);
-    if (!isNil(action.payload) && !isNil(objId)) {
-      const e: Table.DataChangeEvent<R, C> = action.payload;
-      const merged = tabling.events.consolidateTableChange<R, C>(e.payload);
-      if (merged.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, C>(merged, config.columns);
-        yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the rows.");
+    if (isAuthenticatedConfig(config)) {
+      const data = yield select(config.selectData);
+      const objId = yield select(config.selectObjId);
+      if (!isNil(action.payload) && !isNil(objId)) {
+        const e: Table.DataChangeEvent<R, C> = action.payload;
+        const merged = tabling.events.consolidateTableChange<R, C>(e.payload);
+        if (merged.length !== 0) {
+          const requestPayload = tabling.http.createBulkUpdatePayload<R, P, C, G>(merged, config.columns, data);
+          yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the rows.");
+        }
       }
     }
   }

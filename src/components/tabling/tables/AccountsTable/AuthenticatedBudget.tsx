@@ -15,7 +15,7 @@ export type AuthenticatedBudgetProps = AccountsTableProps &
     readonly budget: Model.Budget | null;
     readonly cookieNames?: Table.CookieNames;
     readonly onExportPdf: () => void;
-    readonly onEditGroup: (group: Model.BudgetGroup) => void;
+    readonly onEditGroup: (group: Table.GroupRow<R>) => void;
   };
 
 const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.Element => {
@@ -25,7 +25,7 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
     <AuthenticatedBudgetTable<R, M>
       {...props}
       table={table}
-      actions={(params: Table.AuthenticatedMenuActionParams<R, M>) => [
+      actions={(params: Table.AuthenticatedMenuActionParams<R, M, Model.BudgetGroup>) => [
         {
           icon: "folder",
           disabled: true,
@@ -47,15 +47,18 @@ const AuthenticatedBudgetAccountsTable = (props: AuthenticatedBudgetProps): JSX.
           !isNil(props.budget) ? `${props.budget.type}_${props.budget.name}_accounts` : ""
         )
       ]}
-      columns={tabling.columns.mergeColumns<Table.Column<R, M>, R, M>(BudgetColumns, {
-        identifier: (col: Table.Column<R, M>) => ({
-          ...col,
-          cellRendererParams: {
-            ...col.cellRendererParams,
-            onGroupEdit: props.onEditGroup
-          }
-        })
-      })}
+      columns={tabling.columns.mergeColumns<Table.Column<R, M, Model.BudgetGroup>, R, M, Model.BudgetGroup>(
+        BudgetColumns,
+        {
+          identifier: (col: Table.Column<R, M, Model.BudgetGroup>) => ({
+            ...col,
+            cellRendererParams: {
+              ...col.cellRendererParams,
+              onGroupEdit: props.onEditGroup
+            }
+          })
+        }
+      )}
     />
   );
 };

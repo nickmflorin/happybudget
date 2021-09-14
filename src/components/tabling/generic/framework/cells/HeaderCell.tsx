@@ -21,13 +21,16 @@ interface IHeaderCompParams {
   api: any;
 }
 
-export interface HeaderCellProps<R extends Table.RowData, M extends Model.Model = Model.Model>
-  extends Omit<IHeaderCompParams, "column">,
+export interface HeaderCellProps<
+  R extends Table.RowData,
+  M extends Model.Model = Model.Model,
+  G extends Model.Group = Model.Group
+> extends Omit<IHeaderCompParams, "column">,
     StandardComponentProps {
-  onSort?: (order: Order, field: keyof R, column: Table.Column<R, M>) => void;
-  onEdit?: (field: keyof R, column: Table.Column<R, M>) => void;
+  onSort?: (order: Order, field: keyof R, column: Table.Column<R, M, G>) => void;
+  onEdit?: (field: keyof R, column: Table.Column<R, M, G>) => void;
   ordering?: FieldOrdering<keyof R>;
-  column: Table.Column<R, M>;
+  column: Table.Column<R, M, G>;
 }
 
 /* eslint-disable indent */

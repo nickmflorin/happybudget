@@ -95,10 +95,11 @@ const connectTableToStore =
           selector={selector}
           footerRowSelectors={config.footerRowSelectors}
           saving={saving}
-          onChangeEvent={(e: Table.ChangeEvent<R, M, G>) =>
-            tabling.typeguards.isAuthenticatedActionMap<R, M, G>(config.actions) &&
-            dispatch(config.actions.tableChanged(e))
-          }
+          onChangeEvent={(e: Table.ChangeEvent<R, M, G>) => {
+            if (tabling.typeguards.isAuthenticatedActionMap<R, M, G>(config.actions)) {
+              dispatch(config.actions.tableChanged(e));
+            }
+          }}
           onSearch={(v: string) => dispatch(config.actions.setSearch(v))}
         />
       );

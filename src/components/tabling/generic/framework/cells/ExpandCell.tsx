@@ -6,8 +6,9 @@ import { IconButton } from "components/buttons";
 interface ExpandCellProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
-> extends Table.CellProps<R, M, S, null> {
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
+> extends Table.CellProps<R, M, G, S, null> {
   readonly onClick: (row: Table.ModelRow<R>) => void;
   readonly rowCanExpand?: (row: Table.ModelRow<R>) => boolean;
   readonly tooltip?: string;
@@ -18,7 +19,8 @@ interface ExpandCellProps<
 const ExpandCell = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
-  S extends Redux.TableStore<R, M> = Redux.TableStore<R, M>
+  G extends Model.Group = Model.Group,
+  S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>
 >({
   rowCanExpand,
   onClick,
@@ -26,7 +28,7 @@ const ExpandCell = <
   cannotExpandTooltip,
   node,
   ...props
-}: ExpandCellProps<R, M, S>): JSX.Element => {
+}: ExpandCellProps<R, M, G, S>): JSX.Element => {
   // This cell renderer will only be allowed if the row is of type model.
   const row: Table.ModelRow<R, M> = node.data;
 
