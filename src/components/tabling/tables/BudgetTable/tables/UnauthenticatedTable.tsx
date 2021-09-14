@@ -20,7 +20,12 @@ const UnauthenticatedBudgetTable = <R extends Table.RowData, M extends Model.Mod
   return (
     <UnauthenticatedTable<R, M, Model.BudgetGroup> {...props}>
       {(params: UnauthenticatedTableDataGridProps<R, M, Model.BudgetGroup>) => (
-        <UnauthenticatedBudgetDataGrid<R, M> {...params} />
+        <UnauthenticatedBudgetDataGrid<R, M>
+          {...params}
+          onBack={props.onBack}
+          rowCanExpand={props.rowCanExpand}
+          onRowExpand={props.onRowExpand}
+        />
       )}
     </UnauthenticatedTable>
   );

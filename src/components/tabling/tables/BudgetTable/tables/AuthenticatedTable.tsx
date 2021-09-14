@@ -26,7 +26,12 @@ const AuthenticatedBudgetTable = <R extends Table.RowData, M extends Model.Model
       framework={tabling.aggrid.combineFrameworks(Framework, props.framework)}
     >
       {(params: AuthenticatedTableDataGridProps<R, M, Model.BudgetGroup>) => (
-        <AuthenticatedBudgetDataGrid<R, M> {...params} />
+        <AuthenticatedBudgetDataGrid<R, M>
+          {...params}
+          onBack={props.onBack}
+          rowCanExpand={props.rowCanExpand}
+          onRowExpand={props.onRowExpand}
+        />
       )}
     </AuthenticatedTable>
   );
