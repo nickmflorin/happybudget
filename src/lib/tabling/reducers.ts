@@ -236,7 +236,6 @@ export const createTableChangeEventReducer = <
         },
         newState
       );
-
       const recalculateGroup = config.calculateGroup;
       if (!isNil(recalculateGroup)) {
         const groupsWithRowsChanged: { group: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }[] =
@@ -250,11 +249,7 @@ export const createTableChangeEventReducer = <
             const newGroup = { ...relationship.group, ...recalculateGroup(relationship.rows) };
             return {
               ...s,
-              data: util.replaceInArray<Table.Row<R, M>>(
-                filter(s.data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)),
-                { id: relationship.group.id },
-                newGroup
-              )
+              data: util.replaceInArray<Table.Row<R, M>>(s.data, { id: relationship.group.id }, newGroup)
             };
           },
           newState
