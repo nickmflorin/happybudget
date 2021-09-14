@@ -176,6 +176,7 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model>({
           getHttpValue,
           getModelValue,
           getRowValue,
+          applicableForGroup,
           ...agColumn
         } = col;
         return {

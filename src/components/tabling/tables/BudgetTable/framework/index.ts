@@ -11,6 +11,6 @@ export const Framework: Table.Framework = {
       IdentifierCell: cells.IdentifierCell
     },
     footer: { IdentifierCell: cells.IdentifierCell },
-    page: { BudgetFooterCalculatedCell: cells.BudgetFooterCalculatedCell, IdentifierCell: cells.IdentifierCell }
+    page: { IdentifierCell: cells.IdentifierCell }
   }
 };
