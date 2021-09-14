@@ -582,7 +582,7 @@ namespace Table {
     readonly onClear?: (row: Table.Row<R, M>, column: Column<R, M>) => void;
     readonly showClear?: (row: Table.Row<R, M>, column: Column<R, M>) => boolean;
     readonly onKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void;
-    readonly onChangeEvent?: (event: ChangeEvent<R, M>) => void;
+    readonly onChangeEvent?: (event: ChangeEvent<R, M, G>) => void;
   }
 
   type CellWithChildrenProps<

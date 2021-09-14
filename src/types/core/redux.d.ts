@@ -188,7 +188,7 @@ namespace Redux {
   }
 
   type AuthenticatedTableActionMap<R extends Table.RowData = any, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = TableActionMap<M, G> & {
-    readonly tableChanged: Table.ChangeEvent<R, M>;
+    readonly tableChanged: Table.ChangeEvent<R, M, G>;
     readonly saving: boolean;
     readonly addModelsToState: Redux.AddModelsToTablePayload<M>;
   }

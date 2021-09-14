@@ -57,7 +57,7 @@ export interface AuthenticateDataGridProps<
   readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;
   readonly onRowExpand?: null | ((row: Table.ModelRow<R, M>) => void);
   readonly isCellEditable?: (params: Table.CellCallbackParams<R, M>) => boolean;
-  readonly onChangeEvent: (event: Table.ChangeEvent<R, M>) => void;
+  readonly onChangeEvent: (event: Table.ChangeEvent<R, M, G>) => void;
   readonly getGroupRowContextMenuItems?: (row: Table.GroupRow<R>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly getDataRowContextMenuItems?: (row: Table.DataRow<R, M>, node: Table.RowNode) => Table.MenuItemDef[];
   readonly onEditGroup?: (g: G) => void; // Need to add to column cell renderer params!

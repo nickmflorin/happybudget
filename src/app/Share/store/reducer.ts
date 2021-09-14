@@ -22,105 +22,93 @@ const genericReducer = combineReducers({
       response: actions.responseBudgetAction
     }
   }),
-  account: combineReducers({
-    id: redux.reducers.createSimplePayloadReducer<ID | null>({
-      initialState: null,
-      actions: { set: actions.account.setAccountIdAction }
-    }),
-    detail: redux.reducers.createDetailResponseReducer<
-      Model.Account,
-      Omit<Redux.ModelDetailResponseActionMap<Model.Account>, "updateInState">
-    >({
-      initialState: redux.initialState.initialDetailResponseState,
-      actions: {
-        loading: actions.account.loadingAccountAction,
-        response: actions.account.responseAccountAction
-      }
-    }),
-    table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
-      tableId: "account-subaccounts-table",
-      initialState: initialState.account.table,
-      actions: {
-        clear: actions.account.clearAction,
-        request: actions.account.requestAction,
-        loading: actions.account.loadingAction,
-        response: actions.account.responseAction,
-        responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-        setSearch: actions.account.setSearchAction
-      },
-      getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-      getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-      getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
-      getModelRowName: "Sub Account",
-      getPlaceholderRowName: "Sub Account",
-      columns: filter(
-        SubAccountsTable.Columns,
-        (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
-      ),
-      fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
-        tableId: "fringes-table",
-        initialState: initialState.account.table.fringes,
-        columns: FringesTable.Columns,
+  account: budgeting.reducers.createAccountDetailReducer({
+    initialState: initialState.account,
+    actions: {
+      loading: actions.account.loadingAccountAction,
+      response: actions.account.responseAccountAction,
+      setId: actions.account.setAccountIdAction
+    },
+    reducers: {
+      table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
+        tableId: "account-subaccounts-table",
+        initialState: initialState.account.table,
         actions: {
-          clear: actions.clearFringesAction,
-          responseFringeColors: actions.responseFringeColorsAction,
-          request: actions.requestFringesAction,
-          loading: actions.loadingFringesAction,
-          response: actions.responseFringesAction,
-          setSearch: actions.setFringesSearchAction
-        }
+          clear: actions.account.clearAction,
+          request: actions.account.requestAction,
+          loading: actions.account.loadingAction,
+          response: actions.account.responseAction,
+          responseSubAccountUnits: actions.responseSubAccountUnitsAction,
+          setSearch: actions.account.setSearchAction
+        },
+        getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
+        getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
+        getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
+        getModelRowName: "Sub Account",
+        getPlaceholderRowName: "Sub Account",
+        columns: filter(
+          SubAccountsTable.Columns,
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
+        ),
+        fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
+          tableId: "fringes-table",
+          initialState: initialState.account.table.fringes,
+          columns: FringesTable.Columns,
+          actions: {
+            clear: actions.clearFringesAction,
+            responseFringeColors: actions.responseFringeColorsAction,
+            request: actions.requestFringesAction,
+            loading: actions.loadingFringesAction,
+            response: actions.responseFringesAction,
+            setSearch: actions.setFringesSearchAction
+          }
+        })
       })
-    })
+    }
   }),
-  subaccount: combineReducers({
-    id: redux.reducers.createSimplePayloadReducer<ID | null>({
-      initialState: null,
-      actions: { set: actions.account.setAccountIdAction }
-    }),
-    detail: redux.reducers.createDetailResponseReducer<
-      Model.SubAccount,
-      Omit<Redux.ModelDetailResponseActionMap<Model.SubAccount>, "updateInState">
-    >({
-      initialState: redux.initialState.initialDetailResponseState,
-      actions: {
-        loading: actions.subAccount.loadingSubAccountAction,
-        response: actions.subAccount.responseSubAccountAction
-      }
-    }),
-    table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
-      tableId: "subaccount-subaccounts-table",
-      initialState: initialState.account.table,
-      actions: {
-        request: actions.subAccount.requestAction,
-        loading: actions.subAccount.loadingAction,
-        response: actions.subAccount.responseAction,
-        responseSubAccountUnits: actions.responseSubAccountUnitsAction,
-        clear: actions.subAccount.clearAction,
-        setSearch: actions.subAccount.setSearchAction
-      },
-      getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-      getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
-      getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
-      getModelRowName: "Sub Account",
-      getPlaceholderRowName: "Sub Account",
-      columns: filter(
-        SubAccountsTable.Columns,
-        (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
-      ),
-      fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
-        tableId: "fringes-table",
-        initialState: initialState.subaccount.table.fringes,
-        columns: FringesTable.Columns,
+  subaccount: budgeting.reducers.createSubAccountDetailReducer({
+    initialState: initialState.subaccount,
+    actions: {
+      setId: actions.subAccount.setSubAccountIdAction,
+      loading: actions.subAccount.loadingSubAccountAction,
+      response: actions.subAccount.responseSubAccountAction
+    },
+    reducers: {
+      table: budgeting.reducers.createUnauthenticatedSubAccountsTableReducer({
+        tableId: "subaccount-subaccounts-table",
+        initialState: initialState.account.table,
         actions: {
-          responseFringeColors: actions.responseFringeColorsAction,
-          request: actions.requestFringesAction,
-          clear: actions.clearFringesAction,
-          loading: actions.loadingFringesAction,
-          response: actions.responseFringesAction,
-          setSearch: actions.setFringesSearchAction
-        }
+          request: actions.subAccount.requestAction,
+          loading: actions.subAccount.loadingAction,
+          response: actions.subAccount.responseAction,
+          responseSubAccountUnits: actions.responseSubAccountUnitsAction,
+          clear: actions.subAccount.clearAction,
+          setSearch: actions.subAccount.setSearchAction
+        },
+        getModelRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
+        getPlaceholderRowLabel: (r: Tables.SubAccountRowData) => r.identifier || r.description,
+        getModelRowChildren: (m: Model.SubAccount) => m.subaccounts,
+        getModelRowName: "Sub Account",
+        getPlaceholderRowName: "Sub Account",
+        columns: filter(
+          SubAccountsTable.Columns,
+          (c: Table.Column<Tables.SubAccountRowData, Model.SubAccount>) => c.requiresAuthentication !== true
+        ),
+        fringes: budgeting.reducers.createUnauthenticatedFringesTableReducer({
+          tableId: "fringes-table",
+          initialState: initialState.subaccount.table.fringes,
+          columns: FringesTable.Columns,
+          actions: {
+            responseFringeColors: actions.responseFringeColorsAction,
+            request: actions.requestFringesAction,
+            clear: actions.clearFringesAction,
+            loading: actions.loadingFringesAction,
+            response: actions.responseFringesAction,
+            setSearch: actions.setFringesSearchAction
+          }
+        })
       })
-    })
+    }
   })
 });
 

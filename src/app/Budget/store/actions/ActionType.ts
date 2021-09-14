@@ -68,7 +68,6 @@ const ActionType = {
     SetId: "budget.subaccount.SetId",
     Loading: "budget.subaccount.Loading",
     Response: "budget.subaccount.Response",
-    UpdateInState: "budget.subaccount.UpdateInState",
     Comments: {
       Loading: "budget.subaccount.comments.Loading",
       Response: "budget.subaccount.comments.Response",
@@ -104,7 +103,6 @@ const ActionType = {
     SetId: "budget.account.SetId",
     Loading: "budget.account.Loading",
     Response: "budget.account.Response",
-    UpdateInState: "budget.account.UpdateInState",
     Comments: {
       Loading: "budget.account.comments.Loading",
       Response: "budget.account.comments.Response",

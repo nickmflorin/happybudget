@@ -5,7 +5,7 @@ export type AuthenticatedDataGridProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
   G extends Model.Group = Model.Group
-> = DataGridProps<R, M, G> & AuthenticateDataGridProps<R, M, G> & Omit<AuthenticatedGridProps<R, M>, "id">;
+> = DataGridProps<R, M, G> & AuthenticateDataGridProps<R, M, G> & Omit<AuthenticatedGridProps<R, M, G>, "id">;
 
 const DG = DataGrid<any, any, any, AuthenticatedDataGridProps<any>>()(AuthenticatedGrid) as {
   <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>(

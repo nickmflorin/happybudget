@@ -1,7 +1,7 @@
 import { createAction } from "@reduxjs/toolkit";
 import ActionType from "./ActionType";
 
-export const setSubAccountIdAction = createAction<ID>(ActionType.SubAccount.SetId);
+export const setSubAccountIdAction = createAction<ID | null>(ActionType.SubAccount.SetId);
 export const requestSubAccountAction = createAction<null>(ActionType.SubAccount.Request);
 export const loadingSubAccountAction = createAction<boolean>(ActionType.SubAccount.Loading);
 export const responseSubAccountAction = createAction<Model.SubAccount | null>(ActionType.SubAccount.Response);

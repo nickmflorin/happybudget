@@ -36,14 +36,12 @@ const ActionType = {
     Loading: "template.subaccount.Loading",
     Response: "template.subaccount.Response",
     Request: "template.subaccount.Request",
-    UpdateInState: "template.subaccount.UpdateInState",
     SubAccounts: {
       TableChanged: "template.subaccount.subaccounts.TableChanged",
       Saving: "template.subaccount.subaccounts.Saving",
       SetSearch: "template.subaccount.subaccounts.SetSearch",
       Loading: "template.subaccount.subaccounts.Loading",
       Response: "template.subaccount.subaccounts.Response",
-      // Request: "template.subaccount.subaccounts.Request",
       AddToState: "template.subaccount.subaccounts.AddToState",
       Clear: "template.subaccount.subaccounts.Clear"
     }
@@ -53,12 +51,10 @@ const ActionType = {
     Loading: "template.account.Loading",
     Response: "template.account.Response",
     Request: "template.account.Request",
-    UpdateInState: "template.account.UpdateInState",
     SubAccounts: {
       TableChanged: "template.account.subaccounts.TableChanged",
       Loading: "template.account.subaccounts.Loading",
       Response: "template.account.subaccounts.Response",
-      // Request: "template.account.subaccounts.Request",
       Saving: "template.account.subaccounts.Saving",
       SetSearch: "template.account.subaccounts.SetSearch",
       AddToState: "template.account.subaccounts.AddToState",

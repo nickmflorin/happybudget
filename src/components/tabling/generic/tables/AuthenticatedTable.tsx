@@ -21,7 +21,7 @@ export type AuthenticatedTableDataGridProps<
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
   G extends Model.Group = Model.Group
-> = AuthenticateDataGridProps<R, M, G> & DataGridProps<R, M, G> & Omit<AuthenticatedGridProps<R, M>, "id">;
+> = AuthenticateDataGridProps<R, M, G> & DataGridProps<R, M, G> & Omit<AuthenticatedGridProps<R, M, G>, "id">;
 
 export type AuthenticatedTableProps<
   R extends Table.RowData,
@@ -38,19 +38,19 @@ export type AuthenticatedTableProps<
   readonly rowHasCheckboxSelection?: (row: Table.DataRow<R, M>) => boolean;
 };
 
-const TableFooterGrid = FooterGrid<any, AuthenticatedGridProps<any>>({
+const TableFooterGrid = FooterGrid<any, AuthenticatedGridProps<any, any, any>>({
   rowId: "footer-row",
   id: "footer",
   className: "grid--table-footer",
   rowClass: "row--table-footer",
   getFooterColumn: (col: Table.Column<any>) => col.footer || null
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.Model = Model.Model>(
-    props: Omit<AuthenticatedGridProps<R, M>, "id">
+  <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>(
+    props: Omit<AuthenticatedGridProps<R, M, G>, "id">
   ): JSX.Element;
 };
 
-const PageFooterGrid = FooterGrid<any, AuthenticatedGridProps<any>>({
+const PageFooterGrid = FooterGrid<any, AuthenticatedGridProps<any, any, any>>({
   rowId: "page-row",
   id: "page",
   className: "grid--page-footer",
@@ -58,8 +58,8 @@ const PageFooterGrid = FooterGrid<any, AuthenticatedGridProps<any>>({
   rowHeight: 28,
   getFooterColumn: (col: Table.Column<any>) => col.page || null
 })(AuthenticatedGrid) as {
-  <R extends Table.RowData, M extends Model.Model = Model.Model>(
-    props: Omit<AuthenticatedGridProps<R, M>, "id">
+  <R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group>(
+    props: Omit<AuthenticatedGridProps<R, M, G>, "id">
   ): JSX.Element;
 };
 
@@ -115,7 +115,7 @@ const AuthenticatedTable = <
    * but then inspect whether or not the column associated with any of the fields
    * that were changed warrant refreshing another column.
    */
-  const _onChangeEvent = (event: Table.ChangeEvent<R, M>) => {
+  const _onChangeEvent = (event: Table.ChangeEvent<R, M, G>) => {
     props.onChangeEvent(event);
 
     const apis: Table.GridApis | null = props.tableApis.get("data");

@@ -4,7 +4,6 @@ import hoistNonReactStatics from "hoist-non-react-statics";
 
 import { isNil } from "lodash";
 import { redux, tabling } from "lib";
-import Application from "app/Application";
 
 type ProvidedProps<
   R extends Table.RowData,
@@ -20,7 +19,7 @@ type ProvidedProps<
   readonly selector: (state: Application.Store) => S;
   readonly footerRowSelectors?: Partial<Table.FooterGridSet<Table.RowDataSelector<R>>>;
   readonly onSearch: (v: string) => void;
-  readonly onChangeEvent: (e: Table.ChangeEvent<R, M>) => void;
+  readonly onChangeEvent: (e: Table.ChangeEvent<R, M, G>) => void;
 };
 
 export type WithConnectedTableProps<
@@ -96,7 +95,7 @@ const connectTableToStore =
           selector={selector}
           footerRowSelectors={config.footerRowSelectors}
           saving={saving}
-          onChangeEvent={(e: Table.ChangeEvent<R, M>) =>
+          onChangeEvent={(e: Table.ChangeEvent<R, M, G>) =>
             tabling.typeguards.isAuthenticatedActionMap<R, M, G>(config.actions) &&
             dispatch(config.actions.tableChanged(e))
           }

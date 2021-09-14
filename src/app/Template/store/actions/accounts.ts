@@ -1,9 +1,9 @@
 import { createAction } from "@reduxjs/toolkit";
 import ActionType from "./ActionType";
 
-export const handleTableChangeEventAction = createAction<Table.ChangeEvent<Tables.AccountRowData, Model.Account>>(
-  ActionType.Accounts.TableChanged
-);
+export const handleTableChangeEventAction = createAction<
+  Table.ChangeEvent<Tables.AccountRowData, Model.Account, Model.BudgetGroup>
+>(ActionType.Accounts.TableChanged);
 export const savingTableAction = createAction<boolean>(ActionType.Accounts.Saving);
 export const addModelsToStateAction = createAction<Redux.AddModelsToTablePayload<Model.Account>>(
   ActionType.Accounts.AddToState
