@@ -118,7 +118,7 @@ const authenticateDataGrid =
                 // By default, AG Grid treats Backspace clearing the cell as setting the
                 // value to undefined - but we have to set it to the null value associated
                 // with the column.
-                if (params.newValue === undefined) {
+                if (params.newValue === undefined || params.newValue === "") {
                   const column: Table.Column<R, M> | undefined = find(props.columns, {
                     field: params.column.getColId()
                   } as any);
