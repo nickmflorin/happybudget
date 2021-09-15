@@ -7,7 +7,7 @@ import { ui } from "lib";
 import { Icon } from "components";
 import { Button, IconButton } from "components/buttons";
 
-interface TableMenuActionProps {
+interface TableMenuActionProps extends StandardComponentProps {
   readonly action: Table.MenuActionObj;
   // For the buttons to properly work when included in a Dropdown, we need to expose
   // the onClick prop such that AntD can automatically set this prop on the action.
@@ -20,10 +20,11 @@ const InnerTableMenuAction = ({ action, ...props }: TableMenuActionProps): JSX.E
   } else if (!isNil(action.label)) {
     return (
       <Button
+        {...props}
         // If the button is being wrapped in a dropdown, we need to allow the onClick prop that AntD sets
         // on the Button when it is nested in a Dropdown to persist.
         onClick={isNil(action.wrapInDropdown) ? () => !isNil(action.onClick) && action.onClick() : props.onClick}
-        className={"btn--bare btn--budget-table-menu"}
+        className={classNames("btn--bare btn--budget-table-menu", props.className)}
         disabled={action.disabled}
         icon={ui.typeguards.iconIsJSX(action.icon) ? action.icon : <Icon icon={action.icon} />}
         tooltip={
