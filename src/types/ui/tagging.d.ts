@@ -29,6 +29,8 @@ interface ITagRenderParams<S extends object = React.CSSProperties> {
   readonly fillWidth: boolean;
   readonly text: string;
   readonly contentRender: ((params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element) | undefined
+  readonly onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  readonly disabled?: boolean;
 }
 
 type TagProps<M extends Model.Model = Model.Model, S extends object = React.CSSProperties> = {
@@ -55,6 +57,8 @@ type TagProps<M extends Model.Model = Model.Model, S extends object = React.CSSP
   readonly render?: (params: ITagRenderParams<S>) => JSX.Element;
   // Used for custom rendering of the tag content.
   readonly contentRender?: (params: Omit<ITagRenderParams<S>, "contentRender">) => JSX.Element;
+  readonly onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  readonly disabled?: boolean;
 }
 
 type MultipleTagsProps<M extends Model.Model = Model.Model> = StandardComponentProps & {

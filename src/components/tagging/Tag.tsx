@@ -13,9 +13,11 @@ const TagRenderer = <S extends object = React.CSSProperties>(params: ITagRenderP
         "tag",
         { uppercase: params.uppercase },
         { "fill-width": params.fillWidth },
+        { disabled: params.disabled },
         params.className
       )}
       style={{ ...params.style, backgroundColor: params.color, color: params.textColor }}
+      onClick={(e: React.MouseEvent<HTMLDivElement, MouseEvent>) => !params.disabled && params.onClick?.(e)}
     >
       {!isNil(contentRender) ? (
         contentRender(rest)
@@ -165,7 +167,9 @@ const Tag = <M extends Model.Model = Model.Model, S extends object = React.CSSPr
       style: props.style,
       textStyle: props.textStyle,
       textClassName: props.textClassName,
-      contentRender: props.contentRender
+      contentRender: props.contentRender,
+      onClick: props.onClick,
+      disabled: props.disabled
     };
   }, [
     props.className,

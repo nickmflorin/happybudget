@@ -3,7 +3,6 @@ import { find, isNil } from "lodash";
 import classNames from "classnames";
 
 import { Tag } from "components/tagging";
-import { ButtonLink } from "components/buttons";
 import { useContacts } from "store/hooks";
 
 import { Cell } from "./generic";
@@ -46,11 +45,8 @@ const ContactCell = <
             color={"#EFEFEF"}
             textColor={"#2182e4"}
             text={model.full_name}
-            contentRender={(params: Omit<ITagRenderParams, "contentRender">) => (
-              <ButtonLink disabled={!isFocused} onClick={() => props.onEditContact(model.id)}>
-                {params.text}
-              </ButtonLink>
-            )}
+            onClick={() => props.onEditContact(model.id)}
+            disabled={!isFocused}
           />
         ) : (
           <></>
