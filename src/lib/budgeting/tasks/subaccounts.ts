@@ -47,7 +47,6 @@ export type SubAccountsTableActionMap = Redux.TableActionMap<C, Model.BudgetGrou
   readonly loadingBudget: boolean;
   readonly responseSubAccountUnits: Http.ListResponse<Model.Tag>;
   readonly responseFringes: Http.TableResponse<Model.Fringe>;
-  readonly responseFringeColors: Http.ListResponse<string>;
 };
 
 export type AuthenticatedSubAccountsTableActionMap<B extends Model.Template | Model.Budget> =

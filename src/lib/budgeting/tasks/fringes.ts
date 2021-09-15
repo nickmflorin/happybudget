@@ -37,7 +37,7 @@ export type FringeTableServiceSet<B extends Model.Template | Model.Budget> = Fri
 
 export type FringesTaskConfig = Redux.TaskConfig<{ loading: boolean; response: Http.ListResponse<Model.Fringe> }> & {
   readonly services: FringeServiceSet;
-  readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
+  readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
 };
 
 export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Table.TaskConfig<
@@ -47,12 +47,12 @@ export type FringesTableTaskConfig<B extends Model.Template | Model.Budget> = Ta
   FringesTableActionMap<B>
 > & {
   readonly services: FringeTableServiceSet<B>;
-  readonly selectObjId: (state: Application.Authenticated.Store) => number | null;
+  readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
 };
 
 export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   config: FringesTableTaskConfig<B>
-): Partial<Redux.TaskMapObject<Redux.TableTaskMap<R, M>>> => {
+): Redux.TaskMapObject<Redux.TableTaskMap<R, M>> => {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
 
