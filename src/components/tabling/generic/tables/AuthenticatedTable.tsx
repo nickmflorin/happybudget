@@ -263,6 +263,7 @@ const AuthenticatedTable = <
           framework: props.framework,
           footerRowSelectors: props.footerRowSelectors,
           tableId: props.tableId,
+          onCellFocusChanged: props.onCellFocusChanged,
           onGridReady: props.onDataGridReady,
           onFirstDataRendered: props.onFirstDataRendered,
           onRowSelectionChanged: (rows: Table.DataRow<R, M>[]) => setSelectedRows(rows),
