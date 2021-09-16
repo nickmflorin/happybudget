@@ -253,7 +253,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
   }
 
   function* deleteGroups(rows: Table.GroupRow<R>[]): SagaIterator {
-    yield all(map(rows, (row: Table.GroupRow<R>) => call(api.deleteGroup, row.id, { cancelToken: source.token })));
+    yield all(map(rows, (row: Table.GroupRow<R>) => call(api.deleteGroup, row.group, { cancelToken: source.token })));
   }
 
   function* handleRowDeleteEvent(action: Redux.Action<Table.RowDeleteEvent<R, C>>): SagaIterator {
