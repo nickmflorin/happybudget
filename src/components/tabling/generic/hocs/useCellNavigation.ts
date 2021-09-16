@@ -20,12 +20,11 @@ type UseCellNavigationReturnType = [
   (p: NavigateToNextCellParams) => Table.CellPosition,
   (p: TabToNextCellParams) => Table.CellPosition,
   (loc: Table.CellPosition) => void,
-  (loc: Table.CellPosition) => void,
-  (node: Table.RowNode) => Table.RowNode[]
+  (loc: Table.CellPosition) => void
 ];
 
 /* eslint-disable indent */
-export const useCellNavigation = <
+const useCellNavigation = <
   R extends Table.RowData,
   M extends Model.Model = Model.Model,
   G extends Model.Group = Model.Group
@@ -179,29 +178,7 @@ export const useCellNavigation = <
     }
   });
 
-  /**
-   * Starting at the provided node, traverses the table upwards and collects
-   * all of the RowNode(s) until a RowNode that is the footer for a group above
-   * the provided node is reached.
-   */
-  const findRowsUpUntilFirstGroupFooterRow = hooks.useDynamicCallback((node: Table.RowNode): Table.RowNode[] => {
-    const nodes: Table.RowNode[] = [node];
-    if (!isNil(params.apis)) {
-      let currentNode: Table.RowNode | undefined = node;
-      while (!isNil(currentNode) && !isNil(currentNode.rowIndex) && currentNode.rowIndex >= 1) {
-        currentNode = params.apis.grid.getDisplayedRowAtIndex(currentNode.rowIndex - 1);
-        if (!isNil(currentNode)) {
-          const row: Table.Row<R, M> = currentNode.data;
-          if (tabling.typeguards.isGroupRow(row)) {
-            break;
-          } else {
-            nodes.push(currentNode);
-          }
-        }
-      }
-    }
-    return nodes;
-  });
-
-  return [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow, findRowsUpUntilFirstGroupFooterRow];
+  return [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow];
 };
+
+export default useCellNavigation;

@@ -6,7 +6,7 @@ import { CellKeyDownEvent, NavigateToNextCellParams, TabToNextCellParams } from 
 
 import { hooks } from "lib";
 
-import { useCellNavigation } from "./hooks";
+import useCellNavigation from "./useCellNavigation";
 
 type InjectedUnauthenticatedDataGridProps = {
   readonly onCellKeyDown?: (event: CellKeyDownEvent) => void;

@@ -24,7 +24,8 @@ import {
 import { FillOperationParams } from "@ag-grid-community/core/dist/cjs/entities/gridOptions";
 
 import { tabling, hooks, util } from "lib";
-import { useCellNavigation } from "./hooks";
+import useCellNavigation from "./useCellNavigation";
+import useContextMenu from "./useContextMenu";
 
 interface InjectedAuthenticatedDataGridProps {
   readonly onCellDoubleClicked?: (e: CellDoubleClickedEvent) => void;
@@ -49,7 +50,7 @@ export interface AuthenticateDataGridProps<
   readonly apis: Table.GridApis | null;
   readonly tableId: Table.Id;
   readonly columns: Table.Column<R, M, G>[];
-  readonly groups?: G[];
+  readonly data: Table.Row<R, M>[];
   readonly defaultRowLabel?: string;
   readonly defaultRowName?: string;
   readonly rowHasCheckboxSelection: ((row: Table.DataRow<R, M>) => boolean) | undefined;
@@ -212,18 +213,29 @@ const authenticateDataGrid =
         return cs;
       }, [hooks.useDeepEqualMemo(props.columns)]);
 
-      const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow, findRowsUpUntilFirstGroupFooterRow] =
-        useCellNavigation({
-          apis: props.apis,
-          tableId: props.tableId,
-          columns,
-          includeRowInNavigation: config?.includeRowInNavigation,
-          onNewRowRequired: () =>
-            props.onChangeEvent({
-              type: "rowAdd",
-              payload: { id: `placeholder-${util.generateRandomNumericId()}`, data: {} }
-            })
-        });
+      const [navigateToNextCell, tabToNextCell, moveToNextColumn, moveToNextRow] = useCellNavigation({
+        apis: props.apis,
+        tableId: props.tableId,
+        columns,
+        includeRowInNavigation: config?.includeRowInNavigation,
+        onNewRowRequired: () =>
+          props.onChangeEvent({
+            type: "rowAdd",
+            payload: { id: `placeholder-${util.generateRandomNumericId()}`, data: {} }
+          })
+      });
+
+      const [getContextMenuItems] = useContextMenu({
+        apis: props.apis,
+        data: props.data,
+        defaultRowLabel: props.defaultRowLabel,
+        defaultRowName: props.defaultRowName,
+        rowCanDelete: config?.rowCanDelete,
+        onChangeEvent: props.onChangeEvent,
+        onGroupRows: props.onGroupRows,
+        getGroupRowContextMenuItems: props.getGroupRowContextMenuItems,
+        getDataRowContextMenuItems: props.getDataRowContextMenuItems
+      });
 
       const getColumn = useMemo(
         () =>
@@ -434,107 +446,6 @@ const authenticateDataGrid =
           });
         }
       });
-
-      const getDataRowContextMenuItems: (row: Table.DataRow<R, M>, node: Table.RowNode) => Table.MenuItemDef[] =
-        hooks.useDynamicCallback((row: Table.DataRow<R, M>, node: Table.RowNode): Table.MenuItemDef[] => {
-          let contextMenuItems: Table.MenuItemDef[] = !isNil(props.getDataRowContextMenuItems)
-            ? props.getDataRowContextMenuItems(row, node)
-            : [];
-          const fullRowLabel =
-            tabling.rows.getFullRowLabel(row, {
-              name: props.defaultRowName,
-              label: props.defaultRowLabel
-            }) || "Row";
-          if (config?.rowCanDelete?.(row) === true) {
-            contextMenuItems = [
-              ...contextMenuItems,
-              {
-                name: `Delete ${
-                  tabling.rows.getFullRowLabel(row, { name: props.defaultRowName, label: props.defaultRowLabel }) ||
-                  "Row"
-                }`,
-                action: () => props.onChangeEvent({ payload: { rows: row }, type: "rowDelete" })
-              }
-            ];
-          }
-          if (!isNil(props.groups)) {
-            const group: G | undefined = find(props.groups, (g: G) => includes(g.children, row.id));
-            if (!isNil(group)) {
-              return [
-                ...contextMenuItems,
-                {
-                  name: `Remove ${fullRowLabel} from Group ${group.name}`,
-                  action: () =>
-                    props.onChangeEvent({
-                      type: "rowRemoveFromGroup",
-                      payload: { rows: [row.id], group: `group-${group.id}` }
-                    })
-                }
-              ];
-            } else {
-              const groupableNodesAbove = findRowsUpUntilFirstGroupFooterRow(node);
-              const onGroupRows = props.onGroupRows;
-              if (groupableNodesAbove.length !== 0 && !isNil(onGroupRows)) {
-                let label: string;
-                if (groupableNodesAbove.length === 1) {
-                  label = `Group ${fullRowLabel}`;
-                } else {
-                  label = `Group ${row.name || props.defaultRowName || "Row"}s`;
-                  if (
-                    !isNil(groupableNodesAbove[groupableNodesAbove.length - 1].data.label) &&
-                    !isNil(groupableNodesAbove[0].data.label)
-                  ) {
-                    label = `Group ${row.name || props.defaultRowName || "Row"}s ${
-                      groupableNodesAbove[groupableNodesAbove.length - 1].data.label
-                    } - ${groupableNodesAbove[0].data.label}`;
-                  }
-                }
-                contextMenuItems.push({
-                  name: label,
-                  action: () =>
-                    onGroupRows(map(groupableNodesAbove, (n: Table.RowNode) => n.data as Table.DataRow<R, M>))
-                });
-              }
-              if (props.groups.length !== 0) {
-                contextMenuItems.push({
-                  name: "Add to Group",
-                  subMenu: map(props.groups, (g: G) => ({
-                    name: g.name,
-                    action: () =>
-                      props.onChangeEvent({
-                        type: "rowAddToGroup",
-                        payload: { rows: [row.id], group: `group-${g.id}` }
-                      })
-                  }))
-                });
-              }
-            }
-          }
-          return contextMenuItems;
-        });
-
-      const getGroupRowContextMenuItems: (row: Table.GroupRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =
-        hooks.useDynamicCallback((row: Table.GroupRow<R>, node: Table.RowNode): Table.MenuItemDef[] => {
-          return [
-            ...(!isNil(props.getGroupRowContextMenuItems) ? props.getGroupRowContextMenuItems(row, node) : []),
-            {
-              name: `Ungroup ${row.name}`,
-              action: () =>
-                props.onChangeEvent({
-                  type: "rowDelete",
-                  payload: { rows: row }
-                })
-            }
-          ];
-        });
-
-      const getContextMenuItems: (row: Table.Row<R, M>, node: Table.RowNode) => Table.MenuItemDef[] =
-        hooks.useDynamicCallback((row: Table.Row<R, M>, node: Table.RowNode): Table.MenuItemDef[] => {
-          if (tabling.typeguards.isDataRow(row)) {
-            return getDataRowContextMenuItems(row, node);
-          }
-          return getGroupRowContextMenuItems(row, node);
-        });
 
       const processDataFromClipboard: (params: ProcessDataFromClipboardParams) => CSVData = hooks.useDynamicCallback(
         (params: ProcessDataFromClipboardParams) => {
