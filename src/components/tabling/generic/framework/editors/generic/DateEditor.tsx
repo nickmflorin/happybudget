@@ -8,14 +8,8 @@ const KEY_DELETE = 46;
 type DateEditorProps = Table.EditorParams<Tables.ActualRow, Model.Actual>;
 
 const DateEditor = (props: DateEditorProps, ref: any): JSX.Element => {
-  const [date, setDate] = useState(new Date(props.value));
+  const [date, setDate] = useState<Date | null>(!isNil(props.value) ? new Date(props.value) : null);
   const [editing, setEditing] = useState(true);
-
-  useEffect(() => {
-    if (isNil(props.value)) {
-      setDate(new Date());
-    }
-  }, []);
 
   useEffect(() => {
     if (!editing) {
