@@ -73,6 +73,7 @@ export type AuthenticatedSubAccountsTableTaskConfig<
   readonly selectBudgetId: (state: Application.Authenticated.Store) => ID | null;
   readonly selectObjId: (state: Application.Authenticated.Store) => ID | null;
   readonly selectAutoIndex: (state: Application.Authenticated.Store) => boolean;
+  readonly selectData: (state: Application.Authenticated.Store) => Table.Row<R, C>[];
 };
 
 const isAuthenticatedConfig = <M extends Model.Account | Model.SubAccount, B extends Model.Template | Model.Budget>(
@@ -341,12 +342,11 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
   function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, C>>): SagaIterator {
     if (isAuthenticatedConfig(config)) {
       const objId = yield select(config.selectObjId);
-      const data = yield select(config.selectData);
       if (!isNil(action.payload) && !isNil(objId)) {
         const e: Table.DataChangeEvent<R, C> = action.payload;
         const merged = tabling.events.consolidateTableChange<R, C>(e.payload);
         if (merged.length !== 0) {
-          const requestPayload = tabling.http.createBulkUpdatePayload<R, P, C, G>(merged, config.columns, data);
+          const requestPayload = tabling.http.createBulkUpdatePayload<R, P, C, G>(merged, config.columns);
           yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the rows.");
         }
       }

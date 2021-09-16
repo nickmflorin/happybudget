@@ -180,7 +180,6 @@ const Grid = <R extends Table.RowData, M extends Model.Model = Model.Model, G ex
           processCellForClipboard,
           processCellFromClipboard,
           getHttpValue,
-          getModelValue,
           getRowValue,
           applicableForGroup,
           ...agColumn

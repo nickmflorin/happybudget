@@ -296,7 +296,6 @@ namespace Table {
     readonly onCellFocus?: (params: CellFocusedParams<R, M, G>) => void;
     readonly onCellUnfocus?: (params: CellFocusedParams<R, M, G>) => void;
     readonly refreshColumns?: (change: SoloCellChange<R, V>) => keyof R | (keyof R)[] | null;
-    readonly getModelValue?: (row: Table.ModelRow<R, M>) => M[keyof M];
     readonly getHttpValue?: (value: any) => any;
     readonly processCellForClipboard?: (row: R) => string;
     readonly processCellFromClipboard?: (value: string) => any;
@@ -640,7 +639,6 @@ namespace Table {
     A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
   > = Redux.TaskConfig<A> & {
     readonly columns: Table.Column<R, M, G>[];
-    readonly selectData: (state: Application.Authenticated.Store) => Table.Row<R, M>[];
   };
 
   type ReducerConfig<
@@ -649,7 +647,7 @@ namespace Table {
     G extends Model.Group = Model.Group,
     S extends Redux.TableStore<R, M, G> = Redux.TableStore<R, M, G>,
     A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
-  > = Omit<TaskConfig<R, M, G, A>, "selectData"> &
+  > = TaskConfig<R, M, G, A> &
     Omit<CreateTableDataConfig<R, M, G>, "models" | "groups" | "columns"> & {
       readonly initialState: S;
       readonly tableId: Table.Id;

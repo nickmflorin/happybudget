@@ -205,13 +205,12 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
   // ToDo: This is an EDGE case, but we need to do it for smooth operation - we need to filter out the
   // changes that correspond to placeholder rows.
   function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
-    const data = yield select(config.selectData);
     const budgetId = yield select(config.selectObjId);
     if (!isNil(action.payload) && !isNil(budgetId)) {
       const e: Table.DataChangeEvent<R, M> = action.payload;
       const merged = tabling.events.consolidateTableChange(e.payload);
       if (merged.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns, data);
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
         yield fork(bulkUpdateTask, budgetId, e, requestPayload, "There was an error updating the rows.");
       }
     }

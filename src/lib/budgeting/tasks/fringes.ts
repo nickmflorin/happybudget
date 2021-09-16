@@ -215,12 +215,11 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   // changes that correspond to placeholder rows.
   function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
     const objId = yield select(config.selectObjId);
-    const data = yield select(config.selectData);
     if (!isNil(objId) && !isNil(action.payload)) {
       const e: Table.DataChangeEvent<R, M> = action.payload;
       const merged = tabling.events.consolidateTableChange<R, M>(e.payload);
       if (merged.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns, data);
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
         yield fork(bulkUpdateTask, objId, e, requestPayload, "There was an error updating the rows.");
       }
     }

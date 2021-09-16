@@ -1,6 +1,6 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
-import { put, call, cancelled, fork, select } from "redux-saga/effects";
+import { put, call, cancelled, fork } from "redux-saga/effects";
 import { map, isNil } from "lodash";
 
 import * as api from "api";
@@ -141,12 +141,11 @@ export const createTableTaskSet = (
   // ToDo: This is an EDGE case, but we need to do it for smooth operation - we need to filter out the
   // changes that correspond to placeholder rows.
   function* handleDataChangeEvent(action: Redux.Action<Table.DataChangeEvent<R, M>>): SagaIterator {
-    const data = yield select(config.selectData);
     if (!isNil(action.payload)) {
       const e: Table.DataChangeEvent<R, M> = action.payload;
       const merged = tabling.events.consolidateTableChange(e.payload);
       if (merged.length !== 0) {
-        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns, data);
+        const requestPayload = tabling.http.createBulkUpdatePayload<R, P, M>(merged, config.columns);
         yield fork(bulkUpdateTask, e, requestPayload, "There was an error updating the rows.");
       }
     }

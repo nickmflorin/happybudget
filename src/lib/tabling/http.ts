@@ -1,5 +1,4 @@
-import { tabling } from "lib";
-import { isNil, filter, map, reduce, find } from "lodash";
+import { isNil, filter, map, reduce } from "lodash";
 
 /* eslint-disable indent */
 export const patchPayloadForChange = <
@@ -9,7 +8,6 @@ export const patchPayloadForChange = <
   G extends Model.Group = Model.Group
 >(
   change: Table.RowChange<R, M>,
-  row: Table.ModelRow<R, M>,
   columns: Table.Column<R, M, G>[]
 ): Http.ModelBulkUpdatePayload<P> | null => {
   const cols = filter(columns, (c: Table.Column<R, M, G>) => c.isWrite !== false);
@@ -20,11 +18,6 @@ export const patchPayloadForChange = <
       // We might not be including data for all of the cells in the row.
       if (cellChange !== undefined) {
         let httpValue = cellChange.newValue as unknown as M[keyof M];
-        if (!isNil(col.getModelValue)) {
-          // We can safely coerce to Table.ModelRow here because we already excluded the change if
-          // it is in regard to a placeholder.
-          httpValue = col.getModelValue({ ...row, data: { ...row.data, [col.field]: cellChange.newValue } });
-        }
         if (!isNil(col.getHttpValue)) {
           httpValue = col.getHttpValue(httpValue);
         }
@@ -43,8 +36,7 @@ export const patchPayloads = <
   G extends Model.Group = Model.Group
 >(
   p: Table.DataChangePayload<R, M> | Table.DataChangeEvent<R, M>,
-  columns: Table.Column<R, M, G>[],
-  rows: Table.Row<R, M>[]
+  columns: Table.Column<R, M, G>[]
 ): Http.ModelBulkUpdatePayload<P>[] => {
   const isEvent = (
     obj: Table.DataChangePayload<R, M> | Table.DataChangeEvent<R, M>
@@ -56,12 +48,9 @@ export const patchPayloads = <
   return reduce(
     changes,
     (prev: Http.ModelBulkUpdatePayload<P>[], change: Table.RowChange<R, M>) => {
-      const row: Table.Row<R, M> | undefined = find(rows, { id: change.id });
-      if (!isNil(row) && tabling.typeguards.isModelRow(row)) {
-        const patchPayload = patchPayloadForChange<R, P, M, G>(change, row, columns);
-        if (!isNil(patchPayload)) {
-          return [...prev, patchPayload];
-        }
+      const patchPayload = patchPayloadForChange<R, P, M, G>(change, columns);
+      if (!isNil(patchPayload)) {
+        return [...prev, patchPayload];
       }
       return prev;
     },
@@ -160,9 +149,8 @@ export const createBulkUpdatePayload = <
 >(
   /* eslint-disable indent */
   p: Table.DataChangePayload<R, M>,
-  columns: Table.Column<R, M, G>[],
-  rows: Table.Row<R, M>[]
-): Http.BulkUpdatePayload<P> => ({ data: patchPayloads(p, columns, rows) });
+  columns: Table.Column<R, M, G>[]
+): Http.BulkUpdatePayload<P> => ({ data: patchPayloads(p, columns) });
 
 export const createBulkCreatePayload = <
   R extends Table.RowData,

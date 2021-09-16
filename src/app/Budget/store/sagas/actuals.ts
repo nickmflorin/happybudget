@@ -25,7 +25,6 @@ const tasks = budgeting.tasks.actuals.createTableTaskSet({
   selectObjId: (state: Application.Authenticated.Store) => state.budget.id,
   selectTreeCache: (state: Application.Authenticated.Store) => state.budget.actuals.subAccountsTree.cache,
   selectTreeSearch: (state: Application.Authenticated.Store) => state.budget.actuals.subAccountsTree.search,
-  selectData: (state: Application.Authenticated.Store) => state.budget.actuals.data,
   actions: ActionMap
 });
 

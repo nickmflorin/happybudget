@@ -52,8 +52,6 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
 >({
   actions: ActionMap,
   tasks: contacts.createTableTaskSet({
-    selectData: (state: Application.Authenticated.Store) =>
-      state["async-contacts-table"].data as Table.Row<Tables.ContactRowData, Model.Contact>[],
     columns: ContactsTable.Columns,
     actions: ActionMap
   })
