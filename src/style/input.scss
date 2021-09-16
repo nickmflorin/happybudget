@@ -4,8 +4,13 @@ button:-webkit-autofill,
 button:-webkit-autofill:hover,
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
-input:-webkit-autofill:focus textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover textarea:-webkit-autofill:focus,
+input:-webkit-autofill:focus,
+input.ant-input:-webkit-autofill,
+input.ant-input:-webkit-autofill:hover,
+input.ant-input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 input:focus,
@@ -41,7 +46,7 @@ input:focus-visible {
   transition: all 0.3s;
   border: none;
   background-color: $gray-light !important;
-  color: #585858;
+  color: #585858 !important;
   cursor: text;
   position: relative;
   box-sizing: border-box;
