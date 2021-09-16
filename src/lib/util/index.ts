@@ -1,4 +1,4 @@
-import { forEach, findIndex, find, isNil, map, filter, reduce, includes, orderBy } from "lodash";
+import { forEach, findIndex, find, isNil, map, filter, reduce, orderBy } from "lodash";
 
 export * as colors from "./colors";
 export * as dates from "./dates";
