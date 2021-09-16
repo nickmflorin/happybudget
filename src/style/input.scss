@@ -22,6 +22,15 @@ select:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px $gray-light inset !important;
 }
 
+input:-webkit-autofill::first-line {
+  font-size: 14px;
+  color: $text-primary !important;
+  font-family: $avenir;
+  font-weight: 500;
+  width: 100%;
+  line-height: 22px;
+}
+
 input:focus-visible {
   outline: none !important;
 }
@@ -46,7 +55,7 @@ input:focus-visible {
   transition: all 0.3s;
   border: none;
   background-color: $gray-light !important;
-  color: #585858 !important;
+  color: $text-primary !important;
   cursor: text;
   position: relative;
   box-sizing: border-box;
