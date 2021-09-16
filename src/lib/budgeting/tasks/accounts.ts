@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
-import { isNil, map, filter } from "lodash";
+import { isNil, map, filter, includes } from "lodash";
 
 import * as api from "api";
 import * as tabling from "../../tabling";
@@ -206,7 +206,7 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
   }
 
   function* bulkDeleteRows(objId: ID, ids: ID[]): SagaIterator {
-    if (isAuthenticatedConfig(config)) {
+    if (isAuthenticatedConfig(config) && ids.length !== 0) {
       const response: Http.BulkModelResponse<B> = yield call(config.services.bulkDelete, objId, ids, {
         cancelToken: source.token
       });
@@ -266,7 +266,8 @@ export const createTableTaskSet = <B extends Model.Budget | Model.Template>(
           yield put(config.actions.loadingBudget(true));
           yield put(config.actions.saving(true));
 
-          const rows: Table.Row<R, C>[] = yield select(config.selectData);
+          const data: Table.Row<R, C>[] = yield select(config.selectData);
+          const rows = filter(data, (r: Table.Row<R, C>) => includes(ids, r.id));
 
           const modelsRowIds: ID[] = map(
             filter(rows, (r: Table.Row<R, C>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, C>[],
