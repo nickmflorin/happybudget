@@ -1,5 +1,5 @@
 import { tabling } from "lib";
-import { isNil, reduce, map, filter, includes, uniq } from "lodash";
+import { isNil, reduce, map, filter, includes, uniq, intersection } from "lodash";
 
 import * as applicationEvents from "../events";
 import * as redux from "../redux";
@@ -157,14 +157,14 @@ export const createTableChangeEventReducer = <
 
       // Note: This grouping may be redundant - we should investigate.
       let changesPerRow: {
-        [key: ID]: { changes: Table.RowChange<R, M>[]; row: Table.Row<R, M> };
+        [key: ID]: { changes: Table.RowChange<R, M>[]; row: Table.DataRow<R, M> };
       } = {};
       for (let i = 0; i < consolidated.length; i++) {
         if (isNil(changesPerRow[consolidated[i].id])) {
           /* eslint-disable no-loop-func */
-          const r: Table.Row<R, M> | null = redux.reducers.findModelInData<Table.Row<R, M>>(
+          const r: Table.DataRow<R, M> | null = redux.reducers.findModelInData<Table.DataRow<R, M>>(
             action,
-            newState.data,
+            filter(newState.data, (ri: Table.Row<R, M>) => tabling.typeguards.isDataRow(ri)) as Table.DataRow<R, M>[],
             consolidated[i].id,
             options
           );
@@ -181,19 +181,20 @@ export const createTableChangeEventReducer = <
         }
       }
       // For each Row that was changed, apply that change to the Row stored in state.
-      let newRows: Table.Row<R, M>[] = [];
+      let modifiedRows: Table.DataRow<R, M>[] = [];
       newState = reduce(
         changesPerRow,
-        (s: S, dt: { changes: Table.RowChange<R, M>[]; row: Table.Row<R, M> }) => {
-          let r: Table.Row<R, M> = reduce(
+        (s: S, dt: { changes: Table.RowChange<R, M>[]; row: Table.DataRow<R, M> }) => {
+          let r: Table.DataRow<R, M> = reduce(
             dt.changes,
-            (ri: Table.Row<R, M>, change: Table.RowChange<R, M>) => rows.mergeChangesWithRow<R, M>(ri.id, ri, change),
+            (ri: Table.DataRow<R, M>, change: Table.RowChange<R, M>) =>
+              rows.mergeChangesWithRow<R, M>(ri.id, ri, change),
             dt.row
           );
           if (!isNil(config.recalculateRow) && tabling.typeguards.isDataRow(r)) {
-            r = { ...r, ...config.recalculateRow(s, action, r) };
+            r = { ...r, data: { ...r.data, ...config.recalculateRow(s, action, r) } };
           }
-          newRows = [...newRows, r];
+          modifiedRows = [...modifiedRows, r];
           return {
             ...s,
             data: util.replaceInArray<Table.Row<R, M>>(s.data, { id: r.id }, r)
@@ -203,21 +204,35 @@ export const createTableChangeEventReducer = <
       );
       const recalculateGroup = config.calculateGroup;
       if (!isNil(recalculateGroup)) {
-        const groupsWithRowsChanged: { groupRow: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }[] =
-          rows.findDistinctRowsForEachGroupRow(
-            filter(newRows, (ri: Table.Row<R, M>) => tabling.typeguards.isDataRow(ri)) as Table.DataRow<R, M>[],
-            filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[]
-          );
+        const groupsWithRowsThatChanged: Table.GroupRow<R>[] = filter(
+          filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isGroupRow(r)) as Table.GroupRow<R>[],
+          (row: Table.GroupRow<R>) => {
+            return (
+              intersection(
+                row.children,
+                map(modifiedRows, (r: Table.DataRow<R, M>) => r.id)
+              ).length !== 0
+            );
+          }
+        );
         newState = reduce(
-          groupsWithRowsChanged,
-          (s: S, relationship: { groupRow: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }) => {
-            const newGroupRow = {
-              ...relationship.groupRow,
-              data: { ...relationship.groupRow.data, ...recalculateGroup(relationship.rows) }
-            };
+          groupsWithRowsThatChanged,
+          (s: S, groupRow: Table.GroupRow<R>) => {
+            const childrenRows: Table.DataRow<R, M>[] = redux.reducers.findModelsInData(
+              action,
+              filter(s.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[],
+              groupRow.children
+            );
             return {
               ...s,
-              data: util.replaceInArray<Table.Row<R, M>>(s.data, { id: newGroupRow.id }, newGroupRow)
+              data: util.replaceInArray<Table.Row<R, M>>(
+                s.data,
+                { id: groupRow.id },
+                {
+                  ...groupRow,
+                  data: { ...groupRow.data, ...recalculateGroup(childrenRows) }
+                }
+              )
             };
           },
           newState

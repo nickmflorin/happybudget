@@ -137,20 +137,6 @@ export const orderByFieldOrdering = <M = any>(array: M[], fieldOrdering: FieldOr
   );
 };
 
-export const includesAnyIn = <T = any>(array: T[], anotherArray: T[] | T): boolean => {
-  if (!Array.isArray(anotherArray)) {
-    return includes(array, anotherArray);
-  }
-  let found = false;
-  forEach(anotherArray, (item: T) => {
-    if (includes(array, item)) {
-      found = true;
-      return false;
-    }
-  });
-  return found;
-};
-
 export const selectRandom = <T = any>(array: T[]): T => {
   return array[Math.floor(Math.random() * array.length)];
 };

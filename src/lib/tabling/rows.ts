@@ -1,6 +1,5 @@
-import { isNil, reduce, filter, uniqBy } from "lodash";
+import { isNil, reduce, filter } from "lodash";
 
-import * as model from "../model";
 import * as util from "../util";
 import { consolidateTableChange } from "./events";
 import { isAgColumn } from "./typeguards";
@@ -8,27 +7,6 @@ import { isAgColumn } from "./typeguards";
 type Defaults = {
   name?: string | undefined;
   label?: string | undefined;
-};
-
-/* eslint-disable indent */
-export const findDistinctRowsForEachGroupRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
-  rws: Table.DataRow<R, M>[],
-  groupRows: Table.GroupRow<R>[]
-): { groupRow: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }[] => {
-  return reduce(
-    uniqBy(groupRows, (g: Table.GroupRow<R>) => g.id),
-    (curr: { groupRow: Table.GroupRow<R>; rows: Table.DataRow<R, M>[] }[], groupRow: Table.GroupRow<R>) => {
-      // We are looking at only the rows for which a change occurred, not the complete set of rows.
-      // This means it is possible that not all of the group children will be in the set or provided
-      // rows.
-      const children = model.util.getModelsByIds(rws, groupRow.children, { warnOnMissing: false });
-      if (children.length !== 0) {
-        return [...curr, { rows: children, groupRow }];
-      }
-      return curr;
-    },
-    []
-  );
 };
 
 /* eslint-disable indent */
@@ -51,9 +29,9 @@ export const getFullRowLabel = <D extends Table.RowData, M extends Model.Model =
 
 export const mergeChangesWithRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   id: Table.RowID,
-  row: Table.Row<R, M>,
+  row: Table.DataRow<R, M>,
   changes: Table.DataChangePayload<R, M>
-): Table.Row<R, M> => {
+): Table.DataRow<R, M> => {
   const consolidated: Table.ConsolidatedChange<R, M> = consolidateTableChange<R, M>(changes);
   return {
     ...row,
