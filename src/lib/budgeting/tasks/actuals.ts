@@ -226,9 +226,11 @@ export const createTableTaskSet = (config: ActualsTableTaskConfig): Redux.TaskMa
 
   return {
     request,
-    handleRowAddEvent,
-    handleRowDeleteEvent,
-    handleDataChangeEvent,
-    requestSubAccountsTree
+    requestSubAccountsTree,
+    handleChangeEvent: tabling.tasks.createChangeEventHandler({
+      rowAdd: handleRowAddEvent,
+      rowDelete: handleRowDeleteEvent,
+      dataChange: handleDataChangeEvent
+    })
   };
 };

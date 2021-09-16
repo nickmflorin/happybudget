@@ -92,7 +92,6 @@ const tableSaga = tabling.sagas.createAuthenticatedTableSaga<
   Tables.AccountRowData,
   Model.Account,
   Model.BudgetGroup,
-  Redux.TableTaskMap<Tables.AccountRowData, Model.Account>,
   Redux.AuthenticatedTableActionMap<Tables.AccountRowData, Model.Account, Model.BudgetGroup>
 >({
   actions: ActionMap,

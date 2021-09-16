@@ -85,7 +85,7 @@ const isAuthenticatedConfig = <M extends Model.Account | Model.SubAccount, B ext
 /* eslint-disable indent */
 export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B extends Model.Budget | Model.Template>(
   config: SubAccountsTableTaskConfig | AuthenticatedSubAccountsTableTaskConfig<M, B>
-): Redux.TaskMapObject<Redux.TableTaskMapWithGroups<R, C>> => {
+): Redux.TaskMapObject<Redux.TableTaskMap<R, C, G>> => {
   const CancelToken = axios.CancelToken;
   const source = CancelToken.source();
 
@@ -355,11 +355,13 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
   }
 
   return {
-    handleRemoveRowFromGroupEvent,
-    handleAddRowToGroupEvent,
-    handleRowAddEvent,
-    handleRowDeleteEvent,
-    handleDataChangeEvent,
-    request
+    request,
+    handleChangeEvent: tabling.tasks.createChangeEventHandler({
+      rowRemoveFromGroup: handleRemoveRowFromGroupEvent,
+      rowAddToGroup: handleAddRowToGroupEvent,
+      rowAdd: handleRowAddEvent,
+      rowDelete: handleRowDeleteEvent,
+      dataChange: handleDataChangeEvent
+    })
   };
 };

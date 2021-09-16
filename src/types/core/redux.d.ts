@@ -167,16 +167,9 @@ namespace Redux {
   // not using pagination anywhere that we are using this cache).
   type SearchCache<T extends Model.Model> = { [key: string]: Http.ListResponse<T> };
 
-  type TableTaskMap<R extends Table.RowData, M extends Model.Model = Model.Model> = {
+  type TableTaskMap<R extends Table.RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
     readonly request: null;
-    readonly handleRowAddEvent: Table.RowAddEvent<R>;
-    readonly handleRowDeleteEvent: Table.RowDeleteEvent<R, M>;
-    readonly handleDataChangeEvent: Table.DataChangeEvent<R, M>;
-  }
-
-  type TableTaskMapWithGroups<R extends Table.RowData, M extends Model.Model = Model.Model> = TableTaskMap<R, M> & {
-    readonly handleAddRowToGroupEvent: Table.RowAddToGroupEvent<R, M>;
-    readonly handleRemoveRowFromGroupEvent: Table.RowRemoveFromGroupEvent<R, M>;
+    readonly handleChangeEvent: Table.ChangeEvent<R, M, G>;
   }
 
   type TableActionMap<M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {

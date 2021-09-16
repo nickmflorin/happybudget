@@ -160,8 +160,10 @@ export const createTableTaskSet = (
 
   return {
     request: tableRequest,
-    handleRowAddEvent,
-    handleRowDeleteEvent,
-    handleDataChangeEvent
+    handleChangeEvent: tabling.tasks.createChangeEventHandler({
+      rowAdd: handleRowAddEvent,
+      rowDelete: handleRowDeleteEvent,
+      dataChange: handleDataChangeEvent
+    })
   };
 };

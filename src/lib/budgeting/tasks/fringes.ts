@@ -235,8 +235,10 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
 
   return {
     request,
-    handleDataChangeEvent,
-    handleRowAddEvent,
-    handleRowDeleteEvent
+    handleChangeEvent: tabling.tasks.createChangeEventHandler({
+      rowAdd: handleRowAddEvent,
+      rowDelete: handleRowDeleteEvent,
+      dataChange: handleDataChangeEvent
+    })
   };
 };

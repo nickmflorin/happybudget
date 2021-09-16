@@ -510,6 +510,18 @@ namespace Table {
     readonly payload: GroupUpdatePayload<G>;
   };
 
+  type ChangeEventTypeMap<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = {
+    dataChange: DataChangeEvent<R, M>;
+    rowAdd: RowAddEvent<R>;
+    rowDelete: RowDeleteEvent<R, M>;
+    rowRemoveFromGroup: RowRemoveFromGroupEvent<R, M>;
+    rowAddToGroup: RowAddToGroupEvent<R, M>;
+    groupAdd: GroupAddEvent<G>;
+    groupUpdate: GroupUpdateEvent<G>;
+  }
+
+  type ChangeEventTaskMap<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> = Redux.TaskMapObject<ChangeEventTypeMap<R, M, G>>
+
   type FullRowEvent<R extends RowData, M extends Model.Model = Model.Model> =
     | RowDeleteEvent<R, M>
     | RowRemoveFromGroupEvent<R, M>
@@ -639,9 +651,8 @@ namespace Table {
     R extends RowData,
     M extends Model.Model = Model.Model,
     G extends Model.Group = Model.Group,
-    T extends Redux.TableTaskMap<R, M> = Redux.TableTaskMap<R, M>,
     A extends Redux.TableActionMap<M, G> = Redux.TableActionMap<M, G>
-  > = Redux.SagaConfig<T, A>;
+  > = Redux.SagaConfig<Redux.TableTaskMap<R, M, G>, A>;
 
   type StoreConfig<
     R extends RowData,
