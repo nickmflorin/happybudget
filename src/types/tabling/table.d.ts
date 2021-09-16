@@ -100,22 +100,6 @@ namespace Table {
   type Row<D extends RowData, M extends Model.Model = Model.Model> = ModelRow<D, M> | PlaceholderRow<D> | GroupRow<D>;
   type DataRow<D extends RowData, M extends Model.Model = Model.Model> = ModelRow<D, M> | PlaceholderRow<D>;
 
-  type ModelWithRow<R extends RowData, M extends Model.Model = Model.Model> = {
-    readonly row: ModelRow<R, M>;
-    readonly model: M;
-  };
-
-  interface RowGroup<R extends RowData, M extends Model.Model = Model.Model, G extends Model.Group = Model.Group> {
-    readonly rows: ModelWithRow<R, M>[];
-    readonly group?: G | null;
-  }
-
-  type TableData<
-    R extends RowData,
-    M extends Model.Model = Model.Model,
-    G extends Model.Group = Model.Group
-  > = RowGroup<R, M, G>[];
-
   type RowNameLabelType = number | string | null;
   type RowStringGetter<ARGS extends any[]> = RowNameLabelType | FnWithTypedArgs<RowNameLabelType, ARGS>;
 

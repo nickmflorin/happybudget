@@ -481,12 +481,12 @@ const authenticateDataGrid =
                 } else {
                   label = `Group ${row.name || props.defaultRowName || "Row"}s`;
                   if (
-                    !isNil(groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label) &&
-                    !isNil(groupableNodesAbove[0].data.meta.label)
+                    !isNil(groupableNodesAbove[groupableNodesAbove.length - 1].data.label) &&
+                    !isNil(groupableNodesAbove[0].data.label)
                   ) {
                     label = `Group ${row.name || props.defaultRowName || "Row"}s ${
-                      groupableNodesAbove[groupableNodesAbove.length - 1].data.meta.label
-                    } - ${groupableNodesAbove[0].data.meta.label}`;
+                      groupableNodesAbove[groupableNodesAbove.length - 1].data.label
+                    } - ${groupableNodesAbove[0].data.label}`;
                   }
                 }
                 contextMenuItems.push({

@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { isNil, filter, forEach, reduce, map, flatten } from "lodash";
+import { isNil, filter, forEach, reduce, find } from "lodash";
 import classNames from "classnames";
 
 import { tabling, hooks } from "lib";
@@ -77,9 +77,10 @@ const AccountTable = ({
       account.subaccounts,
       (subaccount: M) => !(options.excludeZeroTotals === true) || subaccount.estimated !== 0
     );
-    const table = tabling.data.createTableData<R, M, Model.BudgetGroup>({
+    const table = tabling.data.createTableRows<R, M, Model.BudgetGroup>({
       models: subaccounts,
       columns,
+      gridId: "data",
       groups: account.groups,
       defaultNullValue: ""
     });
@@ -87,119 +88,122 @@ const AccountTable = ({
     let runningIndex = 2;
     let rows = reduce(
       table,
-      (rws: JSX.Element[], subaccountRowGroup: Table.RowGroup<R, M, Model.BudgetGroup>) => {
-        const newRows: JSX.Element[] = [
-          ...rws,
-          ...flatten(
-            map(
-              subaccountRowGroup.rows,
-              (subaccountRow: Table.ModelWithRow<R, M>, subaccountRowGroupIndex: number): JSX.Element[] => {
-                const details = subaccountRow.model.subaccounts;
-                const showSubAccountFooterRow =
-                  filter(columns, (column: PdfTable.Column<R, M, G>) => !isNil(column.childFooter)).length !== 0 &&
-                  details.length !== 0;
-                const isLastSubAccount = subaccountRowGroupIndex === subaccounts.length - 1;
+      (rws: JSX.Element[], subAccountRow: Table.Row<R, M>) => {
+        runningIndex = runningIndex + 1;
 
-                const subTable = tabling.data.createTableData<R, M, Model.BudgetGroup>({
-                  models: details,
-                  columns,
-                  groups: subaccountRow.model.groups,
-                  defaultNullValue: ""
-                });
-                runningIndex = runningIndex + 1;
-                let subRows: JSX.Element[] = reduce(
-                  subTable,
-                  (subRws: JSX.Element[], detailRowGroup: Table.RowGroup<R, M, Model.BudgetGroup>) => {
-                    const newSubTableRows = [
-                      ...subRws,
-                      ...map(detailRowGroup.rows, (detailRow: Table.ModelWithRow<R, M>): JSX.Element => {
-                        runningIndex = runningIndex + 1;
-                        const element = (
-                          <BodyRow<R, M>
-                            key={runningIndex}
-                            index={runningIndex}
-                            columns={columns}
-                            className={"detail-tr"}
-                            row={detailRow.row}
-                            cellProps={{
-                              cellContentsVisible: (params: PdfTable.CellCallbackParams<R, M, G>) =>
-                                params.column.field === "identifier" ? false : true,
-                              textClassName: "detail-tr-td-text",
-                              className: (params: PdfTable.CellCallbackParams<R, M, G>) => {
-                                if (params.column.field === "description") {
-                                  return classNames("detail-td", "indent-td");
-                                }
-                                return "detail-td";
-                              }
-                            }}
-                          />
-                        );
-                        return element;
-                      })
-                    ];
-                    if (!isNil(detailRowGroup.group)) {
-                      runningIndex = runningIndex + 1;
-                      newSubTableRows.push(
-                        <GroupRow
-                          className={"detail-group-tr"}
-                          group={detailRowGroup.group}
-                          index={runningIndex}
-                          key={runningIndex}
-                          columns={columns}
-                          columnIndent={1}
-                          cellProps={{
-                            textClassName: (params: PdfTable.CellCallbackParams<R, M, G>) => {
-                              if (params.column.field === "description") {
-                                return "detail-group-indent-td";
-                              }
-                              return "";
-                            }
-                          }}
-                        />
-                      );
-                    }
-                    return newSubTableRows;
-                  },
-                  [
-                    <BodyRow
-                      key={runningIndex}
-                      index={runningIndex}
-                      cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
-                      className={"subaccount-tr"}
-                      columns={columns}
-                      row={createSubAccountHeaderRow(subaccountRow.model)}
-                    />
-                  ]
-                );
+        if (tabling.typeguards.isModelRow(subAccountRow)) {
+          const details = subAccountRow.model.subaccounts;
+          const showSubAccountFooterRow =
+            filter(columns, (column: PdfTable.Column<R, M, G>) => !isNil(column.childFooter)).length !== 0 &&
+            details.length !== 0;
+          // const isLastSubAccount = subaccountRowGroupIndex === subaccounts.length - 1;
+          const isLastSubAccount = false;
 
-                if (showSubAccountFooterRow === true) {
-                  const footerRow: Table.ModelRow<R, M> = createSubAccountFooterRow(subaccountRow.model);
-                  runningIndex = runningIndex + 1;
-                  subRows = [
-                    ...subRows,
-                    <BodyRow
-                      key={runningIndex}
+          const subTable = tabling.data.createTableRows<R, M, Model.BudgetGroup>({
+            models: details,
+            columns,
+            gridId: "data",
+            groups: subAccountRow.model.groups,
+            defaultNullValue: ""
+          });
+
+          let subRows: JSX.Element[] = reduce(
+            subTable,
+            (subRws: JSX.Element[], detailRow: Table.Row<R, M>) => {
+              runningIndex = runningIndex + 1;
+              if (tabling.typeguards.isDataRow(detailRow)) {
+                return [
+                  ...subRws,
+                  <BodyRow<R, M>
+                    key={runningIndex}
+                    index={runningIndex}
+                    columns={columns}
+                    className={"detail-tr"}
+                    row={detailRow}
+                    cellProps={{
+                      cellContentsVisible: (params: PdfTable.CellCallbackParams<R, M, G>) =>
+                        params.column.field === "identifier" ? false : true,
+                      textClassName: "detail-tr-td-text",
+                      className: (params: PdfTable.CellCallbackParams<R, M, G>) => {
+                        if (params.column.field === "description") {
+                          return classNames("detail-td", "indent-td");
+                        }
+                        return "detail-td";
+                      }
+                    }}
+                  />
+                ];
+              } else {
+                const group = find(subAccountRow.model.groups, { id: detailRow.group });
+                if (!isNil(group)) {
+                  return [
+                    ...subRws,
+                    <GroupRow
+                      className={"detail-group-tr"}
+                      group={group}
                       index={runningIndex}
-                      className={"subaccount-footer-tr"}
-                      cellProps={{ className: "subaccount-footer-td", textClassName: "subaccount-footer-tr-td-text" }}
+                      key={runningIndex}
                       columns={columns}
-                      row={footerRow}
-                      style={!isLastSubAccount ? { borderBottomWidth: 1 } : {}}
+                      columnIndent={1}
+                      cellProps={{
+                        textClassName: (params: PdfTable.CellCallbackParams<R, M, G>) => {
+                          if (params.column.field === "description") {
+                            return "detail-group-indent-td";
+                          }
+                          return "";
+                        }
+                      }}
                     />
                   ];
+                } else {
+                  /* eslint-disable no-console */
+                  console.error(
+                    `Could not find group with ID ${detailRow.group} for associated detail row ${detailRow.id}.`
+                  );
+                  return subRws;
                 }
-                return subRows;
               }
-            )
-          )
-        ];
-        if (!isNil(subaccountRowGroup.group)) {
-          runningIndex = runningIndex + 1;
-          newRows.push(
-            <GroupRow group={subaccountRowGroup.group} index={runningIndex} key={runningIndex} columns={columns} />
+            },
+            [
+              <BodyRow
+                key={runningIndex}
+                index={runningIndex}
+                cellProps={{ className: "subaccount-td", textClassName: "subaccount-tr-td-text" }}
+                className={"subaccount-tr"}
+                columns={columns}
+                row={createSubAccountHeaderRow(subAccountRow.model)}
+              />
+            ]
           );
+          if (showSubAccountFooterRow === true) {
+            const footerRow: Table.ModelRow<R, M> = createSubAccountFooterRow(subAccountRow.model);
+            runningIndex = runningIndex + 1;
+            subRows = [
+              ...subRows,
+              <BodyRow
+                key={runningIndex}
+                index={runningIndex}
+                className={"subaccount-footer-tr"}
+                cellProps={{ className: "subaccount-footer-td", textClassName: "subaccount-footer-tr-td-text" }}
+                columns={columns}
+                row={footerRow}
+                style={!isLastSubAccount ? { borderBottomWidth: 1 } : {}}
+              />
+            ];
+          }
+          return [...rws, ...subRows];
+        } else {
+          const group = find(account.groups, { id: subAccountRow.group } as any);
+          if (!isNil(group)) {
+            return [...rws, <GroupRow group={group} index={runningIndex} key={runningIndex} columns={columns} />];
+          } else {
+            /* eslint-disable no-console */
+            console.error(
+              `Could not find group with ID ${subAccountRow.group} for associated sub account row ${subAccountRow.id}.`
+            );
+            return rws;
+          }
         }
-        return newRows;
       },
       [
         <HeaderRow className={"account-header-tr"} columns={columns} index={0} key={0} />,

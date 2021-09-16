@@ -4,7 +4,7 @@ import { Colors } from "style/constants";
 
 import { FringeUnitModels } from "./models";
 
-export const getGroupColorDefinition = (group: Model.Group): Table.RowColorDef => {
+export const getGroupColorDefinition = (group: Model.Group | Table.GroupRow<any>): Table.RowColorDef => {
   if (!isNil(group) && !isNil(group.color)) {
     let backgroundColor = group.color;
     if (!isNil(backgroundColor)) {

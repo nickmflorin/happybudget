@@ -60,23 +60,20 @@ const DataGrid =
 
       const getRowColorDef = hooks.useDynamicCallback((row: Table.Row<R, M>): Table.RowColorDef => {
         if (tabling.typeguards.isGroupRow(row)) {
-          const group: G | undefined = find(props.groups, { id: row.group } as any);
-          if (!isNil(group)) {
-            const colorDef = model.util.getGroupColorDefinition(group);
-            if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
-              return {
-                color: colorDef?.color,
-                backgroundColor: colorDef?.backgroundColor
-              };
-            } else if (!isNil(colorDef?.backgroundColor)) {
-              return {
-                backgroundColor: colorDef?.backgroundColor
-              };
-            } else if (!isNil(colorDef?.color)) {
-              return {
-                color: colorDef?.color
-              };
-            }
+          const colorDef = model.util.getGroupColorDefinition(row);
+          if (!isNil(colorDef?.color) && !isNil(colorDef?.backgroundColor)) {
+            return {
+              color: colorDef?.color,
+              backgroundColor: colorDef?.backgroundColor
+            };
+          } else if (!isNil(colorDef?.backgroundColor)) {
+            return {
+              backgroundColor: colorDef?.backgroundColor
+            };
+          } else if (!isNil(colorDef?.color)) {
+            return {
+              color: colorDef?.color
+            };
           }
         }
         return {};

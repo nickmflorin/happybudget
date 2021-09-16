@@ -320,30 +320,54 @@ export const createTableChangeEventReducer = <
         filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[],
         ids
       );
-
       const g: Table.GroupRow<R> | null = groupRowFromState<R, M, G, S>(action, newState, e.payload.group);
       if (!isNil(g)) {
         const newChildren: ID[] = uniq([...g.children, ...map(rws, (r: Table.DataRow<R, M>) => r.id)]);
         newState = {
           ...newState,
-          data: util.replaceInArray<Table.Row<R, M>>(
-            newState.data,
-            { id: g.id },
-            { ...g, children: newChildren, data: { ...g.data, ...config.calculateGroup?.(rws) } }
+          data: data.orderTableRows<R, M>(
+            util.replaceInArray<Table.Row<R, M>>(
+              newState.data,
+              { id: g.id },
+              { ...g, children: newChildren, data: { ...g.data, ...config.calculateGroup?.(rws) } }
+            )
           )
         };
       }
     } else if (typeguards.isGroupAddEvent(e)) {
-      // ToDo: We should figure out a way to do this without having to regenerate the entire table
-      // state.
+      /*
+      When a Group is added to the table, we must first convert that Group model to a GroupRow.  Then,
+      before we insert that row into the table, we must update the rows that are children of that Group
+      such that they reference that Group.  Then, we insert the GroupRow into the table and reorder
+      the table so that the GroupRow is in the appropriate location.
+      */
+      const groupRow = rows.createGroupRow<R, M, G>({
+        columns: config.columns,
+        group: e.payload,
+        getRowLabel: config.getGroupRowLabel,
+        getRowName: config.getGroupRowName
+      });
+      const rws = redux.reducers.findModelsInData<Table.DataRow<R, M>>(
+        action,
+        filter(newState.data, (r: Table.Row<R, M>) => tabling.typeguards.isDataRow(r)) as Table.DataRow<R, M>[],
+        groupRow.children
+      );
+      // Update the associated rows of the table such that they reference the group they belong to.
+      newState = reduce(
+        rws,
+        (s: S, child: Table.DataRow<R, M>) => {
+          return {
+            ...s,
+            data: util.replaceInArray<Table.Row<R, M>>(s.data, { id: child.id }, { ...child, group: groupRow.group })
+          };
+        },
+        newState
+      );
+      // Insert the new GroupRow(s) into the table and reorder the rows of the table so that the
+      // GroupRow(s) are in the appropriate location.
       newState = {
         ...newState,
-        data: data.createTableRows<R, M, G>({
-          ...config,
-          gridId: "data",
-          models: newState.models,
-          groups: [...newState.groups, e.payload]
-        })
+        data: data.orderTableRows<R, M>([...newState.data, groupRow])
       };
     } else if (typeguards.isGroupUpdateEvent(e)) {
       /*
