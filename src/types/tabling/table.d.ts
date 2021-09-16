@@ -78,7 +78,6 @@ namespace Table {
   type IRow<RowId extends RowID, TP extends RowType, D extends RowData, Grid extends GridId = GridId> = {
     readonly id: RowId;
     readonly rowType: TP;
-    readonly group: ID | null;
     readonly gridId: Grid;
     readonly data: D;
     readonly name?: string | number | null;
@@ -115,7 +114,6 @@ namespace Table {
     // we should probably remove these from the row meta.
     readonly getRowName?: RowStringGetter<ARGS>;
     readonly getRowLabel?: RowStringGetter<ARGS>;
-    readonly group: ID | null;
     readonly gridId: Table.GridId;
   };
 

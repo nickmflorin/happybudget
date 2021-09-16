@@ -147,7 +147,7 @@ export const createPlaceholderRow = <
     data,
     id: config.id,
     rowType: "placeholder",
-    group: null,
+    // group: null,
     gridId: "data",
     name: !isNil(config.getRowName)
       ? typeof config.getRowName === "function"
@@ -188,7 +188,6 @@ export const createModelRow = <R extends Table.RowData, M extends Model.Model, G
     data,
     id: config.model.id,
     rowType: "model",
-    group: config.group,
     gridId: config.gridId,
     model: config.model,
     children: !isNil(config.getRowChildren) ? config.getRowChildren(config.model) : null,

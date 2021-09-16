@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { isNil, filter, forEach, reduce, find } from "lodash";
+import { isNil, filter, forEach, reduce } from "lodash";
 import classNames from "classnames";
 
 import { tabling, hooks } from "lib";
@@ -77,7 +77,7 @@ const AccountTable = ({
       account.subaccounts,
       (subaccount: M) => !(options.excludeZeroTotals === true) || subaccount.estimated !== 0
     );
-    const table = tabling.data.createTableRows<R, M, Model.BudgetGroup>({
+    const table: Table.Row<R, M>[] = tabling.data.createTableRows<R, M, Model.BudgetGroup>({
       models: subaccounts,
       columns,
       gridId: "data",
@@ -99,7 +99,7 @@ const AccountTable = ({
           // const isLastSubAccount = subaccountRowGroupIndex === subaccounts.length - 1;
           const isLastSubAccount = false;
 
-          const subTable = tabling.data.createTableRows<R, M, Model.BudgetGroup>({
+          const subTable: Table.Row<R, M>[] = tabling.data.createTableRows<R, M, Model.BudgetGroup>({
             models: details,
             columns,
             gridId: "data",
@@ -134,34 +134,25 @@ const AccountTable = ({
                   />
                 ];
               } else {
-                const group = find(subAccountRow.model.groups, { id: detailRow.group });
-                if (!isNil(group)) {
-                  return [
-                    ...subRws,
-                    <GroupRow
-                      className={"detail-group-tr"}
-                      group={group}
-                      index={runningIndex}
-                      key={runningIndex}
-                      columns={columns}
-                      columnIndent={1}
-                      cellProps={{
-                        textClassName: (params: PdfTable.CellCallbackParams<R, M, G>) => {
-                          if (params.column.field === "description") {
-                            return "detail-group-indent-td";
-                          }
-                          return "";
+                return [
+                  ...rws,
+                  <GroupRow
+                    className={"detail-group-tr"}
+                    row={detailRow}
+                    index={runningIndex}
+                    key={runningIndex}
+                    columns={columns}
+                    columnIndent={1}
+                    cellProps={{
+                      textClassName: (params: PdfTable.CellCallbackParams<R, M, G>) => {
+                        if (params.column.field === "description") {
+                          return "detail-group-indent-td";
                         }
-                      }}
-                    />
-                  ];
-                } else {
-                  /* eslint-disable no-console */
-                  console.error(
-                    `Could not find group with ID ${detailRow.group} for associated detail row ${detailRow.id}.`
-                  );
-                  return subRws;
-                }
+                        return "";
+                      }
+                    }}
+                  />
+                ];
               }
             },
             [
@@ -192,17 +183,10 @@ const AccountTable = ({
             ];
           }
           return [...rws, ...subRows];
+        } else if (tabling.typeguards.isGroupRow(subAccountRow)) {
+          return [...rws, <GroupRow row={subAccountRow} index={runningIndex} key={runningIndex} columns={columns} />];
         } else {
-          const group = find(account.groups, { id: subAccountRow.group } as any);
-          if (!isNil(group)) {
-            return [...rws, <GroupRow group={group} index={runningIndex} key={runningIndex} columns={columns} />];
-          } else {
-            /* eslint-disable no-console */
-            console.error(
-              `Could not find group with ID ${subAccountRow.group} for associated sub account row ${subAccountRow.id}.`
-            );
-            return rws;
-          }
+          return rws;
         }
       },
       [

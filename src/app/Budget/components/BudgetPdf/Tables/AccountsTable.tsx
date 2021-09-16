@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { isNil, filter, reduce, find } from "lodash";
+import { isNil, filter, reduce } from "lodash";
 
 import { tabling, hooks } from "lib";
 import Table from "./Table";
@@ -46,14 +46,7 @@ const AccountsTable = ({
         if (tabling.typeguards.isDataRow(row)) {
           return [...rws, <BodyRow key={runningIndex} index={runningIndex} columns={columns} row={row} />];
         }
-        const group: Model.BudgetGroup | undefined = find(groups, { id: row.group });
-        if (!isNil(group)) {
-          return [...rws, <GroupRow group={group} index={runningIndex} key={runningIndex} columns={columns} />];
-        } else {
-          /* eslint-disable no-console */
-          console.error(`Could not find group with ID ${row.group} for associated group row ${row.id}.`);
-          return rws;
-        }
+        return [...rws, <GroupRow row={row} index={runningIndex} key={runningIndex} columns={columns} />];
       },
       [<HeaderRow columns={columns} index={0} key={0} />]
     );

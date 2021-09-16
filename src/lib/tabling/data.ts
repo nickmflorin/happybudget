@@ -43,13 +43,8 @@ export const orderTableRows = <R extends Table.RowData, M extends Model.Model = 
   const rowsWithTheirGroup: RowWithPotentialGroupRow<R, M>[] = reduce(
     dataRows,
     (curr: RowWithPotentialGroupRow<R, M>[], dataRow: Table.DataRow<R, M>) => {
-      if (!isNil(dataRow.group)) {
-        const groupRow = find(groupRows, { group: dataRow.group });
-        if (isNil(groupRow)) {
-          /* eslint-disable no-console */
-          console.error(`Could not find group row with group ID ${dataRow.group} for data row ${dataRow.id}!`);
-          return [...curr, { groupRow: null, row: dataRow }];
-        }
+      const groupRow = find(groupRows, (r: Table.GroupRow<R>) => includes(r.children, dataRow.id));
+      if (!isNil(groupRow)) {
         return [...curr, { groupRow, row: dataRow }];
       }
       return [...curr, { groupRow: null, row: dataRow }];
@@ -132,18 +127,14 @@ export const createTableRows = <R extends Table.RowData, M extends Model.Model, 
     readonly gridId: Table.GridId;
   }
 ): Table.Row<R, M>[] => {
-  const getGroupForModel = (m: M): G | null => find(config.groups, (g: G) => includes(g.children, m.id)) || null;
-
   const modelRows: Table.ModelRow<R, M>[] = reduce(
     config.models,
     (curr: Table.ModelRow<R, M>[], m: M) => {
-      let group: G | null = getGroupForModel(m);
       return [
         ...curr,
         rows.createModelRow<R, M, G>({
           model: m,
           columns: config.columns,
-          group: !isNil(group) ? group.id : null,
           gridId: config.gridId,
           getRowChildren: config.getModelRowChildren,
           getRowLabel: config.getModelRowLabel,
@@ -153,7 +144,6 @@ export const createTableRows = <R extends Table.RowData, M extends Model.Model, 
     },
     []
   );
-
   const groupRows: Table.GroupRow<R>[] = reduce(
     config.groups,
     (curr: Table.GroupRow<R>[], g: G) => {

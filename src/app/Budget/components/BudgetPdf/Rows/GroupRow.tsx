@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { isNil } from "lodash";
 import classNames from "classnames";
 
-import { model, tabling } from "lib";
+import { model } from "lib";
 
 import { CellProps } from "../Cells/Cell";
 import { RowProps } from "./Row";
@@ -12,32 +12,28 @@ type G = Model.BudgetGroup;
 
 const GroupRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
   props: Omit<RowProps<R, M>, "row"> & {
-    group: Model.BudgetGroup;
+    readonly row: Table.GroupRow<R>;
     readonly cellProps?: Omit<CellProps<R, M>, "column" | "location" | "row" | "debug" | "isHeader">;
   }
 ): JSX.Element => {
   const cellStyle = useMemo(() => {
-    const colorDef = model.util.getGroupColorDefinition(props.group);
+    const colorDef = model.util.getGroupColorDefinition(props.row);
     return {
       backgroundColor: !isNil(colorDef.backgroundColor) ? colorDef.backgroundColor : "#EFEFEF"
     };
-  }, [props.group]);
+  }, [props.row]);
 
   const cellTextStyle = useMemo(() => {
-    const colorDef = model.util.getGroupColorDefinition(props.group);
+    const colorDef = model.util.getGroupColorDefinition(props.row);
     return {
       color: !isNil(colorDef.color) ? colorDef.color : "#424242"
     };
-  }, [props.group]);
+  }, [props.row]);
 
-  const groupRow = useMemo((): Table.GroupRow<R> | null => {
-    return tabling.rows.createGroupRow<R, M, Model.BudgetGroup>({ group: props.group, columns: props.columns });
-  }, [props.columns, props.group]);
-
-  return !isNil(groupRow) ? (
+  return (
     <BodyRow
       {...props}
-      row={groupRow}
+      row={props.row}
       style={{ ...cellStyle, ...props.style }}
       className={classNames("group-tr", props.className)}
       cellProps={{
@@ -57,8 +53,6 @@ const GroupRow = <R extends Table.RowData, M extends Model.Model = Model.Model>(
         textStyle: [cellTextStyle, props.cellProps?.textStyle]
       }}
     />
-  ) : (
-    <></>
   );
 };
 
