@@ -278,7 +278,6 @@ export const createTableChangeEventReducer = <
       };
       applicationEvents.dispatchRowsAddedEvent({ tableId: config.tableId, numRows: newState.data.length });
     } else if (typeguards.isRowDeleteEvent(e)) {
-      const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
       /*
       When a Row is deleted, we first have to create a dichotomy of the rows we are deleting.
 
@@ -289,7 +288,8 @@ export const createTableChangeEventReducer = <
 
       Then, we need to actually remove the rows, whether they are group rows or non-group rows from the state.
       */
-      const rws = redux.reducers.findModelsInData<Table.Row<R, M>>(action, newState.data, ids);
+      const rws: Table.Row<R, M>[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
+      const ids = map(rws, (r: Table.Row<R, M>) => r.id);
       const nonGroupRws = filter(rws, (rw: Table.Row<R, M>) => tabling.typeguards.isDataRow(rw)) as Table.DataRow<
         R,
         M

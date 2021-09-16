@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { put, call, cancelled, fork, select, all } from "redux-saga/effects";
-import { map, isNil } from "lodash";
+import { map, isNil, filter } from "lodash";
 
 import * as api from "api";
 import * as tabling from "../../tabling";
@@ -172,14 +172,22 @@ export const createTableTaskSet = <B extends Model.Template | Model.Budget>(
   }
 
   function* bulkDeleteTask(objId: number, e: Table.RowDeleteEvent<R, M>, errorMessage: string): SagaIterator {
-    const ids = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-    if (ids.length !== 0) {
+    const rws: Table.ModelRow<R, M>[] = filter(
+      Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows],
+      (r: Table.Row<R, M>) => tabling.typeguards.isModelRow(r)
+    ) as Table.ModelRow<R, M>[];
+    if (rws.length !== 0) {
       yield put(config.actions.saving(true));
       yield put(config.actions.loadingBudget(true));
       try {
-        const response: Http.BulkModelResponse<B> = yield call(config.services.bulkDelete, objId, ids, {
-          cancelToken: source.token
-        });
+        const response: Http.BulkModelResponse<B> = yield call(
+          config.services.bulkDelete,
+          objId,
+          map(rws, (r: Table.ModelRow<R, M>) => r.id),
+          {
+            cancelToken: source.token
+          }
+        );
         yield put(config.actions.updateBudgetInState({ id: response.data.id, data: response.data }));
       } catch (err: unknown) {
         if (!(yield cancelled())) {

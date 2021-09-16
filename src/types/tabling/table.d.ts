@@ -491,7 +491,7 @@ namespace Table {
   };
 
   type RowDeletePayload<R extends RowData, M extends Model.Model = Model.Model> = {
-    readonly rows: RowID[] | RowID;
+    readonly rows: SingleOrArray<Table.Row<R, M>>;
   };
   type RowDeleteEvent<R extends RowData, M extends Model.Model = Model.Model> = {
     readonly type: "rowDelete";

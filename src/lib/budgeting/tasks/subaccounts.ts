@@ -1,7 +1,7 @@
 import axios from "axios";
 import { SagaIterator } from "redux-saga";
 import { call, put, select, fork, cancelled, all } from "redux-saga/effects";
-import { isNil, map, filter, includes } from "lodash";
+import { isNil, map, filter } from "lodash";
 
 import * as api from "api";
 import * as contactsTasks from "store/tasks/contacts";
@@ -304,19 +304,19 @@ export const createTableTaskSet = <M extends Model.Account | Model.SubAccount, B
       const objId = yield select(config.selectObjId);
       if (!isNil(action.payload) && !isNil(objId)) {
         const e: Table.RowDeleteEvent<R, C> = action.payload;
-        const ids: Table.RowID[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-        if (ids.length !== 0) {
+        const rws: Table.Row<R, C>[] = filter(
+          Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows],
+          (r: Table.Row<R, C>) => !tabling.typeguards.isPlaceholderRow(r)
+        );
+        if (rws.length !== 0) {
           yield put(config.actions.loadingBudget(true));
           yield put(config.actions.saving(true));
 
-          const data: Table.Row<R, C>[] = yield select(config.selectData);
-          const rows = filter(data, (r: Table.Row<R, C>) => includes(ids, r.id));
-
           const modelsRowIds: ID[] = map(
-            filter(rows, (r: Table.Row<R, C>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, C>[],
+            filter(rws, (r: Table.Row<R, C>) => tabling.typeguards.isModelRow(r)) as Table.ModelRow<R, C>[],
             (r: Table.ModelRow<R, C>) => r.id
           );
-          const groupRows: Table.GroupRow<R>[] = filter(rows, (r: Table.Row<R, C>) =>
+          const groupRows: Table.GroupRow<R>[] = filter(rws, (r: Table.Row<R, C>) =>
             tabling.typeguards.isGroupRow(r)
           ) as Table.GroupRow<R>[];
 

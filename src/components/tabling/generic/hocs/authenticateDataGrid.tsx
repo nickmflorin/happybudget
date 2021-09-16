@@ -453,7 +453,7 @@ const authenticateDataGrid =
                   tabling.rows.getFullRowLabel(row, { name: props.defaultRowName, label: props.defaultRowLabel }) ||
                   "Row"
                 }`,
-                action: () => props.onChangeEvent({ payload: { rows: [row.id] }, type: "rowDelete" })
+                action: () => props.onChangeEvent({ payload: { rows: row }, type: "rowDelete" })
               }
             ];
           }
@@ -515,26 +515,17 @@ const authenticateDataGrid =
 
       const getGroupRowContextMenuItems: (row: Table.GroupRow<R>, node: Table.RowNode) => Table.MenuItemDef[] =
         hooks.useDynamicCallback((row: Table.GroupRow<R>, node: Table.RowNode): Table.MenuItemDef[] => {
-          let contextMenuItems: Table.MenuItemDef[] = !isNil(props.getGroupRowContextMenuItems)
-            ? props.getGroupRowContextMenuItems(row, node)
-            : [];
-          if (!isNil(props.groups)) {
-            const group: G | undefined = find(props.groups, { id: row.group } as any);
-            if (!isNil(group)) {
-              contextMenuItems = [
-                ...contextMenuItems,
-                {
-                  name: `Ungroup ${group.name}`,
-                  action: () =>
-                    props.onChangeEvent({
-                      type: "rowDelete",
-                      payload: { rows: [`group-${group.id}`] }
-                    })
-                }
-              ];
+          return [
+            ...(!isNil(props.getGroupRowContextMenuItems) ? props.getGroupRowContextMenuItems(row, node) : []),
+            {
+              name: `Ungroup ${row.name}`,
+              action: () =>
+                props.onChangeEvent({
+                  type: "rowDelete",
+                  payload: { rows: row }
+                })
             }
-          }
-          return contextMenuItems;
+          ];
         });
 
       const getContextMenuItems: (row: Table.Row<R, M>, node: Table.RowNode) => Table.MenuItemDef[] =

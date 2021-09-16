@@ -183,8 +183,13 @@ export const createAuthenticatedSubAccountsTableReducer = (
           metrics for each SubAccount(s) that previously had that Fringe applied, while simultaneously
           removing that Fringe from the SubAccount.
           */
-          const ids: Table.DataRowID[] = Array.isArray(e.payload.rows) ? e.payload.rows : [e.payload.rows];
-          newState = recalculateSubAccountsWithFringes(ids, true);
+          const rws: Table.Row<Tables.FringeRowData, Model.Fringe>[] = Array.isArray(e.payload.rows)
+            ? e.payload.rows
+            : [e.payload.rows];
+          newState = recalculateSubAccountsWithFringes(
+            map(rws, (r: Table.Row<Tables.FringeRowData, Model.Fringe>) => r.id),
+            true
+          );
         }
       }
     }

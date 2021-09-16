@@ -189,7 +189,7 @@ const AuthenticatedTable = <
                 ) as Table.DataRow<R, M>[];
                 if (rows.length !== 0) {
                   props.onChangeEvent({
-                    payload: { rows: map(rows, (r: Table.DataRow<R, M>) => r.id) },
+                    payload: { rows: rows },
                     type: "rowDelete"
                   });
                 }
