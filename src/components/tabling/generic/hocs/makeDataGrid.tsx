@@ -26,7 +26,6 @@ export interface DataGridProps<
   readonly columns: Table.Column<R, M, G>[];
   readonly search?: string;
   readonly cookieNames?: Table.CookieNames;
-  readonly groups?: G[];
   readonly onCellFocusChanged?: (params: Table.CellFocusChangedParams<R, M, G>) => void;
   readonly isCellSelectable?: (params: Table.CellCallbackParams<R, M, G>) => boolean;
   readonly rowCanExpand?: (row: Table.ModelRow<R, M>) => boolean;

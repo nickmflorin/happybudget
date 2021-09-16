@@ -151,7 +151,6 @@ const UnauthenticatedTable = <
           columns: columns,
           gridOptions: props.tableGridOptions.data,
           data: props.data,
-          groups: props.groups,
           hasExpandColumn: props.hasExpandColumn,
           framework: props.framework,
           onGridReady: props.onDataGridReady,

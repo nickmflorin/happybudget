@@ -13,7 +13,6 @@ type ProvidedProps<
 > = {
   readonly search: string;
   readonly data: Table.Row<R, M>[];
-  readonly groups?: G[];
   readonly loading: boolean;
   readonly saving: boolean;
   readonly selector: (state: Application.Store) => S;
@@ -54,7 +53,6 @@ const connectTableToStore =
     } else if (!isNil(config.selector)) {
       selector = config.selector;
     }
-    const selectGroups = (state: Application.Store) => selector(state)?.groups || [];
     const selectData = (state: Application.Store) => selector(state)?.data || [];
     const selectSearch = (state: Application.Store) => selector(state)?.search || "";
     const selectSaving = (state: Application.Store) => selector(state)?.saving || false;
@@ -65,7 +63,6 @@ const connectTableToStore =
       const data = useSelector(selectData);
       const search = useSelector(selectSearch);
       const loading = useSelector(selectLoading);
-      const groups = useSelector(selectGroups);
       const saving = useSelector(selectSaving);
       const dispatch = useDispatch();
 
@@ -90,7 +87,6 @@ const connectTableToStore =
           {...props}
           search={search}
           data={data}
-          groups={groups}
           loading={loading}
           selector={selector}
           footerRowSelectors={config.footerRowSelectors}
